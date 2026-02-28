@@ -2,8 +2,8 @@ import { NavLink, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   LayoutDashboard, BookOpen, Calendar, Megaphone, Users, MessageSquare,
-  Mail, Award, FileText, HardDrive, User, LogOut, GraduationCap,
-  BarChart3, ChevronLeft, ChevronRight, Library, Wallet, Trophy,
+  Mail, Award, FileText, User, LogOut, GraduationCap,
+  BarChart3, ChevronLeft, ChevronRight, Library, Wallet, Trophy, ClipboardList,
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -15,16 +15,15 @@ interface NavItem {
 }
 
 const studentNav: NavItem[] = [
+  { label: "Anúncios", icon: Megaphone, path: "/student/announcements" },
   { label: "Início", icon: LayoutDashboard, path: "/student" },
   { label: "As Minhas Disciplinas", icon: BookOpen, path: "/student/disciplines" },
   { label: "Calendário", icon: Calendar, path: "/student/calendar" },
-  { label: "Anúncios", icon: Megaphone, path: "/student/announcements" },
-  { label: "Contactos", icon: Users, path: "/student/contacts" },
   { label: "Email", icon: Mail, path: "/student/email" },
   { label: "Chat", icon: MessageSquare, path: "/student/chat" },
+  { label: "Contactos", icon: Users, path: "/student/contacts" },
   { label: "Notas", icon: Award, path: "/student/grades" },
-  { label: "Criar Documentos", icon: FileText, path: "/student/documents" },
-  { label: "Armazenamento", icon: HardDrive, path: "/student/storage" },
+  { label: "Tarefas", icon: ClipboardList, path: "/student/tasks" },
   { label: "Biblioteca Virtual", icon: Library, path: "/student/library" },
   { label: "Finanças", icon: Wallet, path: "/student/finances" },
   { label: "Extra Curriculares", icon: Trophy, path: "/student/activities" },
@@ -32,31 +31,29 @@ const studentNav: NavItem[] = [
 ];
 
 const professorNav: NavItem[] = [
+  { label: "Anúncios", icon: Megaphone, path: "/professor/announcements" },
   { label: "Início", icon: LayoutDashboard, path: "/professor" },
   { label: "As Minhas Turmas", icon: BookOpen, path: "/professor/disciplines" },
   { label: "Os Meus Estudantes", icon: Users, path: "/professor/students" },
   { label: "Minhas Aulas", icon: Library, path: "/professor/lessons" },
-  { label: "Tarefas", icon: FileText, path: "/professor/tasks" },
+  { label: "Tarefas", icon: ClipboardList, path: "/professor/tasks" },
   { label: "Avaliações", icon: Award, path: "/professor/evaluations" },
   { label: "Notas", icon: GraduationCap, path: "/professor/grades" },
   { label: "Calendário", icon: Calendar, path: "/professor/calendar" },
-  { label: "Anúncios", icon: Megaphone, path: "/professor/announcements" },
-  { label: "Contactos", icon: Users, path: "/professor/contacts" },
   { label: "Email", icon: Mail, path: "/professor/email" },
   { label: "Chat", icon: MessageSquare, path: "/professor/chat" },
-  { label: "Criar Documentos", icon: FileText, path: "/professor/documents" },
-  { label: "Armazenamento", icon: HardDrive, path: "/professor/storage" },
+  { label: "Contactos", icon: Users, path: "/professor/contacts" },
   { label: "Perfil", icon: User, path: "/professor/profile" },
 ];
 
 const coordinatorNav: NavItem[] = [
+  { label: "Anúncios", icon: Megaphone, path: "/coordinator/announcements" },
   { label: "Visão Geral do Curso", icon: LayoutDashboard, path: "/coordinator" },
   { label: "Disciplinas", icon: BookOpen, path: "/coordinator/disciplines" },
   { label: "Professores", icon: GraduationCap, path: "/coordinator/professors" },
   { label: "Alunos", icon: Users, path: "/coordinator/students" },
   { label: "Avaliações", icon: Award, path: "/coordinator/evaluations" },
   { label: "Calendário", icon: Calendar, path: "/coordinator/calendar" },
-  { label: "Anúncios", icon: Megaphone, path: "/coordinator/announcements" },
   { label: "Relatórios", icon: BarChart3, path: "/coordinator/reports" },
 ];
 

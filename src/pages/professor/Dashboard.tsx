@@ -36,8 +36,8 @@ export default function ProfessorDashboard() {
 
   const statusConfig = {
     concluída: { label: "Rever", color: "bg-accent/10 text-accent", icon: CheckCircle, action: "rever" },
-    em_curso: { label: "Entrar", color: "bg-secondary/10 text-secondary", icon: Play, action: "entrar" },
-    agendada: { label: "Entrar", color: "bg-muted text-muted-foreground", icon: Clock, action: "entrar" },
+    em_curso: { label: "Ver Aula", color: "bg-secondary/10 text-secondary", icon: Play, action: "ver" },
+    agendada: { label: "Ver Aula", color: "bg-muted text-muted-foreground", icon: Clock, action: "ver" },
   };
 
   const recentRecorded = [...profLessons]
@@ -105,7 +105,7 @@ export default function ProfessorDashboard() {
                       size="sm"
                       variant={aula.status === "concluída" ? "outline" : "default"}
                       className="gap-1.5 text-xs"
-                      onClick={() => navigate(aula.status === "concluída" ? `/professor/disciplines/${aula.disciplineId}` : "/professor/class-lobby")}
+                      onClick={() => navigate(`/professor/disciplines/${aula.disciplineId}`)}
                     >
                       <StatusIcon className="w-3.5 h-3.5" />
                       {cfg.label}
@@ -182,59 +182,9 @@ export default function ProfessorDashboard() {
           )}
         </div>
 
-        {/* Right column */}
+        {/* Right column - Anúncios on TOP, then Turmas */}
         <div className="space-y-6">
-          {/* My Turmas — compact cards with avg & attendance */}
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
-                <GraduationCap className="w-5 h-5 text-primary" /> As Minhas Turmas
-              </h2>
-              <Link to="/professor/disciplines" className="text-sm text-primary hover:underline flex items-center gap-1">
-                Ver todas <ChevronRight className="w-4 h-4" />
-              </Link>
-            </div>
-            <div className="space-y-2">
-              {allTurmas.map(turma => {
-                const turmaDiscs = profDisciplines.filter(d => d.turmas.some(t => t.id === turma.id));
-                const turmaStudents = profStudents.filter(s => s.turmaId === turma.id);
-                const unique = turmaStudents.filter((s, i, arr) => arr.findIndex(x => x.email === s.email) === i);
-                const avg = unique.length > 0 && unique.some(s => s.avgGrade !== null)
-                  ? Math.round(unique.filter(s => s.avgGrade !== null).reduce((s, st) => s + (st.avgGrade || 0), 0) / unique.filter(s => s.avgGrade !== null).length * 10) / 10
-                  : null;
-                const attendance = unique.length > 0
-                  ? Math.round(unique.reduce((s, st) => s + st.attendance, 0) / unique.length)
-                  : 0;
-
-                return (
-                  <Link key={turma.id} to={`/professor/disciplines?turma=${turma.id}`}>
-                    <Card className="p-3 hover:shadow-md transition-shadow cursor-pointer flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-primary/10 text-primary shrink-0">
-                        <GraduationCap className="w-4 h-4" />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="font-semibold text-foreground text-xs truncate">{turma.name}</p>
-                        <p className="text-[10px] text-muted-foreground">{turma.students} est. • {turmaDiscs.length} disc.</p>
-                      </div>
-                      <div className="flex items-center gap-3 shrink-0">
-                        <div className="text-center">
-                          <p className={`text-xs font-bold ${avg !== null && avg >= 10 ? "text-accent" : avg !== null ? "text-destructive" : "text-muted-foreground"}`}>{avg ?? "—"}</p>
-                          <p className="text-[9px] text-muted-foreground">Média</p>
-                        </div>
-                        <div className="text-center">
-                          <p className={`text-xs font-bold ${attendance >= 75 ? "text-accent" : "text-destructive"}`}>{attendance}%</p>
-                          <p className="text-[9px] text-muted-foreground">Presença</p>
-                        </div>
-                      </div>
-                      <ChevronRight className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-                    </Card>
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Announcements */}
+          {/* Announcements FIRST */}
           <div>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
@@ -256,6 +206,65 @@ export default function ProfessorDashboard() {
                     <p className="text-sm font-semibold text-foreground line-clamp-1">{ann.title}</p>
                     <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{ann.content}</p>
                   </Card>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* My Turmas SECOND — improved cards */}
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+                <GraduationCap className="w-5 h-5 text-primary" /> As Minhas Turmas
+              </h2>
+              <Link to="/professor/disciplines" className="text-sm text-primary hover:underline flex items-center gap-1">
+                Ver todas <ChevronRight className="w-4 h-4" />
+              </Link>
+            </div>
+            <div className="space-y-3">
+              {allTurmas.map(turma => {
+                const turmaDiscs = profDisciplines.filter(d => d.turmas.some(t => t.id === turma.id));
+                const turmaStudents = profStudents.filter(s => s.turmaId === turma.id);
+                const unique = turmaStudents.filter((s, i, arr) => arr.findIndex(x => x.email === s.email) === i);
+                const avg = unique.length > 0 && unique.some(s => s.avgGrade !== null)
+                  ? Math.round(unique.filter(s => s.avgGrade !== null).reduce((s, st) => s + (st.avgGrade || 0), 0) / unique.filter(s => s.avgGrade !== null).length * 10) / 10
+                  : null;
+                const attendance = unique.length > 0
+                  ? Math.round(unique.reduce((s, st) => s + st.attendance, 0) / unique.length)
+                  : 0;
+
+                return (
+                  <Link key={turma.id} to={`/professor/disciplines?turma=${turma.id}`}>
+                    <Card className="p-4 hover:shadow-md transition-shadow cursor-pointer">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-primary/10 text-primary shrink-0">
+                            <GraduationCap className="w-5 h-5" />
+                          </div>
+                          <div>
+                            <p className="font-bold text-foreground text-sm">{turma.name}</p>
+                            <p className="text-[11px] text-muted-foreground">{turma.course} • {turma.year}º Ano</p>
+                          </div>
+                        </div>
+                        <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
+                      </div>
+                      <div className="grid grid-cols-3 gap-2">
+                        <div className="text-center p-2 rounded-lg bg-muted/40">
+                          <p className="text-sm font-bold text-foreground">{turma.students}</p>
+                          <p className="text-[9px] text-muted-foreground">Estudantes</p>
+                        </div>
+                        <div className="text-center p-2 rounded-lg bg-muted/40">
+                          <p className={`text-sm font-bold ${avg !== null && avg >= 10 ? "text-accent" : avg !== null ? "text-destructive" : "text-muted-foreground"}`}>{avg ?? "—"}</p>
+                          <p className="text-[9px] text-muted-foreground">Média</p>
+                        </div>
+                        <div className="text-center p-2 rounded-lg bg-muted/40">
+                          <p className={`text-sm font-bold ${attendance >= 75 ? "text-accent" : "text-destructive"}`}>{attendance}%</p>
+                          <p className="text-[9px] text-muted-foreground">Presença</p>
+                        </div>
+                      </div>
+                      <p className="text-[10px] text-muted-foreground mt-2">{turmaDiscs.map(d => d.code).join(" • ")} • {turmaDiscs.length} disc.</p>
+                    </Card>
+                  </Link>
                 );
               })}
             </div>

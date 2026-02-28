@@ -12,15 +12,13 @@ import DisciplineDetail from "./pages/student/DisciplineDetail";
 import LessonDetail from "./pages/student/LessonDetail";
 import EvaluationDetail from "./pages/student/EvaluationDetail";
 import TaskDetail from "./pages/student/TaskDetail";
+import StudentTasks from "./pages/student/Tasks";
 import StudentCalendar from "./pages/student/Calendar";
-import ClassLobby from "./pages/student/ClassLobby";
 import StudentAnnouncements from "./pages/student/Announcements";
 import StudentContacts from "./pages/student/Contacts";
 import StudentEmail from "./pages/student/Email";
 import StudentChat from "./pages/student/Chat";
 import StudentGrades from "./pages/student/Grades";
-import StudentDocuments from "./pages/student/Documents";
-import StudentStorage from "./pages/student/Storage";
 import StudentLibrary from "./pages/student/Library";
 import StudentProfile from "./pages/student/Profile";
 import StudentFinances from "./pages/student/Finances";
@@ -34,7 +32,6 @@ import ProfessorCalendar from "./pages/professor/Calendar";
 import ProfessorContacts from "./pages/professor/Contacts";
 import ProfessorLessons from "./pages/professor/Lessons";
 import ProfessorGrades from "./pages/professor/Grades";
-import ProfessorClassLobby from "./pages/professor/ClassLobby";
 import ProfessorTasks from "./pages/professor/Tasks";
 import ProfessorEvaluations from "./pages/professor/Evaluations";
 import ProfessorTaskDetail from "./pages/professor/TaskDetail";
@@ -45,7 +42,6 @@ import CoordinatorStudents from "./pages/coordinator/Students";
 import CoordinatorEvaluations from "./pages/coordinator/Evaluations";
 import CoordinatorAnnouncements from "./pages/coordinator/Announcements";
 import CoordinatorReports from "./pages/coordinator/Reports";
-import ComingSoon from "./components/ComingSoon";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -75,15 +71,13 @@ function AppRoutes() {
         <Route path="/student/disciplines/:disciplineId/lessons/:lessonId" element={<LessonDetail />} />
         <Route path="/student/disciplines/:disciplineId/evaluation" element={<EvaluationDetail />} />
         <Route path="/student/disciplines/:disciplineId/tasks" element={<TaskDetail />} />
+        <Route path="/student/tasks" element={<StudentTasks />} />
         <Route path="/student/calendar" element={<StudentCalendar />} />
-        <Route path="/student/class-lobby" element={<ClassLobby />} />
         <Route path="/student/announcements" element={<StudentAnnouncements />} />
         <Route path="/student/contacts" element={<StudentContacts />} />
         <Route path="/student/email" element={<StudentEmail />} />
         <Route path="/student/chat" element={<StudentChat />} />
         <Route path="/student/grades" element={<StudentGrades />} />
-        <Route path="/student/documents" element={<StudentDocuments />} />
-        <Route path="/student/storage" element={<StudentStorage />} />
         <Route path="/student/library" element={<StudentLibrary />} />
         <Route path="/student/profile" element={<StudentProfile />} />
         <Route path="/student/finances" element={<StudentFinances />} />
@@ -97,7 +91,6 @@ function AppRoutes() {
         <Route path="/professor/lessons" element={<ProfessorLessons />} />
         <Route path="/professor/grades" element={<ProfessorGrades />} />
         <Route path="/professor/calendar" element={<ProfessorCalendar />} />
-        <Route path="/professor/class-lobby" element={<ProfessorClassLobby />} />
         <Route path="/professor/announcements" element={<ProfessorAnnouncements />} />
         <Route path="/professor/tasks" element={<ProfessorTasks />} />
         <Route path="/professor/evaluations" element={<ProfessorEvaluations />} />
@@ -105,8 +98,6 @@ function AppRoutes() {
         <Route path="/professor/contacts" element={<ProfessorContacts />} />
         <Route path="/professor/email" element={<StudentEmail />} />
         <Route path="/professor/chat" element={<StudentChat />} />
-        <Route path="/professor/documents" element={<StudentDocuments />} />
-        <Route path="/professor/storage" element={<StudentStorage />} />
         <Route path="/professor/profile" element={<StudentProfile />} />
 
         {/* Coordinator routes */}
