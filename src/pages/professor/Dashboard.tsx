@@ -1,0 +1,267 @@
+import { useAuth } from "@/contexts/AuthContext";
+import { profDisciplines, profLessons, profStudents, profTasks, profTodayClasses, allTurmas } from "@/data/professorData";
+import { announcements } from "@/data/mockData";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
+import {
+  BookOpen, Users, Video, Calendar, ChevronRight,
+  Clock, MapPin, Play, AlertTriangle, CheckCircle,
+  Eye, ArrowRight, Megaphone, GraduationCap, BarChart3,
+} from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+
+const typeStyles: Record<string, { bg: string; label: string }> = {
+  urgente: { bg: "bg-destructive text-destructive-foreground", label: "Urgente" },
+  evento: { bg: "bg-secondary text-secondary-foreground", label: "Evento" },
+  academico: { bg: "bg-primary text-primary-foreground", label: "Académico" },
+  geral: { bg: "bg-muted text-foreground", label: "Geral" },
+};
+
+export default function ProfessorDashboard() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  const totalStudents = allTurmas.reduce((s, t) => s + t.students, 0);
+  const totalLessonsPublished = profDisciplines.reduce((s, d) => s + d.publishedLessons, 0);
+  const atRiskStudents = profStudents.filter(s => s.status === "risco");
+
+  const stats = [
+    { icon: Users, label: "Estudantes", value: totalStudents, color: "text-accent bg-accent/10" },
+    { icon: GraduationCap, label: "Turmas", value: allTurmas.length, color: "text-primary bg-primary/10" },
+    { icon: BookOpen, label: "Disciplinas", value: profDisciplines.length, color: "text-secondary bg-secondary/10" },
+    { icon: Video, label: "Aulas Publicadas", value: totalLessonsPublished, color: "text-primary bg-primary/10" },
+  ];
+
+  const statusConfig = {
+    concluída: { label: "Rever", color: "bg-accent/10 text-accent", icon: CheckCircle, action: "rever" },
+    em_curso: { label: "Entrar", color: "bg-secondary/10 text-secondary", icon: Play, action: "entrar" },
+    agendada: { label: "Entrar", color: "bg-muted text-muted-foreground", icon: Clock, action: "entrar" },
+  };
+
+  const recentRecorded = [...profLessons]
+    .filter(l => l.status === "publicada")
+    .sort((a, b) => b.date.localeCompare(a.date))
+    .slice(0, 3);
+
+  const recentAnnouncements = announcements.slice(0, 3);
+
+  return (
+    <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl font-bold text-foreground">
+          Bom dia, {user?.name?.split(" ").pop()} 👋
+        </h1>
+        <p className="text-muted-foreground mt-1">Painel do Professor — Universidade Privada de Angola</p>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {stats.map(s => (
+          <Card key={s.label} className="p-4 flex items-center gap-4">
+            <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${s.color}`}>
+              <s.icon className="w-5 h-5" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-foreground">{s.value}</p>
+              <p className="text-xs text-muted-foreground">{s.label}</p>
+            </div>
+          </Card>
+        ))}
+      </div>
+
+      <div className="grid lg:grid-cols-3 gap-6">
+        {/* Left column */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Today's classes */}
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+                <Calendar className="w-5 h-5 text-primary" /> Aulas de Hoje
+              </h2>
+              <Link to="/professor/calendar" className="text-sm text-primary hover:underline flex items-center gap-1">
+                Ver calendário <ChevronRight className="w-4 h-4" />
+              </Link>
+            </div>
+            <div className="space-y-3">
+              {profTodayClasses.map((aula, i) => {
+                const disc = profDisciplines.find(d => d.id === aula.disciplineId);
+                const cfg = statusConfig[aula.status];
+                const StatusIcon = cfg.icon;
+                return (
+                  <Card key={i} className="p-4 flex items-center gap-4">
+                    <div className="w-1.5 h-12 rounded-full shrink-0" style={{ background: disc?.color }} />
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-foreground">{aula.name}</p>
+                      <div className="flex items-center gap-3 text-sm text-muted-foreground mt-0.5">
+                        <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" />{aula.time}</span>
+                        <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" />{aula.room}</span>
+                        <span>{aula.turma}</span>
+                      </div>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant={aula.status === "concluída" ? "outline" : "default"}
+                      className="gap-1.5 text-xs"
+                      onClick={() => navigate(aula.status === "concluída" ? `/professor/disciplines/${aula.disciplineId}` : "/professor/class-lobby")}
+                    >
+                      <StatusIcon className="w-3.5 h-3.5" />
+                      {cfg.label}
+                    </Button>
+                  </Card>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Recent recorded lessons - 3 horizontal cards */}
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+                <Video className="w-5 h-5 text-secondary" /> Aulas Recentes
+              </h2>
+              <Link to="/professor/lessons" className="text-sm text-primary hover:underline flex items-center gap-1">
+                Ver todas <ChevronRight className="w-4 h-4" />
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {recentRecorded.map(lesson => {
+                const disc = profDisciplines.find(d => d.id === lesson.disciplineId);
+                const turma = allTurmas.find(t => t.id === lesson.turmaId);
+                return (
+                  <Card key={lesson.id} className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer group">
+                    <div className="h-28 bg-muted/40 flex items-center justify-center relative">
+                      <div className="w-12 h-12 rounded-full bg-background/80 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <Play className="w-5 h-5 text-primary" />
+                      </div>
+                      <div className="absolute top-2 right-2">
+                        <Badge className="bg-background/80 text-foreground text-[10px] gap-1">
+                          <Eye className="w-3 h-3" /> {lesson.views}
+                        </Badge>
+                      </div>
+                      <div className="absolute bottom-0 left-0 right-0 h-1" style={{ backgroundColor: disc?.color }} />
+                    </div>
+                    <div className="p-3">
+                      <p className="text-sm font-semibold text-foreground truncate">{lesson.title}</p>
+                      <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground mt-1">
+                        <span style={{ color: disc?.color }}>{disc?.code}</span>
+                        <span>•</span>
+                        <span>{turma?.name}</span>
+                      </div>
+                      <div className="flex items-center justify-between text-[11px] text-muted-foreground mt-2">
+                        <span>{lesson.date}</span>
+                        <span className="flex items-center gap-1"><Users className="w-3 h-3" />{lesson.attendance}/{lesson.totalStudents}</span>
+                      </div>
+                    </div>
+                  </Card>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* At-risk students link */}
+          {atRiskStudents.length > 0 && (
+            <Link to="/professor/students?status=risco" className="block">
+              <Card className="p-4 flex items-center gap-4 hover:shadow-md transition-shadow cursor-pointer border-l-[3px] border-l-destructive">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-destructive/10 shrink-0">
+                  <AlertTriangle className="w-5 h-5 text-destructive" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-foreground">
+                    {atRiskStudents.length} Estudantes em Risco
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Estudantes com baixa presença, média ou entregas insuficientes
+                  </p>
+                </div>
+                <ArrowRight className="w-5 h-5 text-destructive shrink-0" />
+              </Card>
+            </Link>
+          )}
+        </div>
+
+        {/* Right column */}
+        <div className="space-y-6">
+          {/* My Turmas — compact cards with avg & attendance */}
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+                <GraduationCap className="w-5 h-5 text-primary" /> As Minhas Turmas
+              </h2>
+              <Link to="/professor/disciplines" className="text-sm text-primary hover:underline flex items-center gap-1">
+                Ver todas <ChevronRight className="w-4 h-4" />
+              </Link>
+            </div>
+            <div className="space-y-2">
+              {allTurmas.map(turma => {
+                const turmaDiscs = profDisciplines.filter(d => d.turmas.some(t => t.id === turma.id));
+                const turmaStudents = profStudents.filter(s => s.turmaId === turma.id);
+                const unique = turmaStudents.filter((s, i, arr) => arr.findIndex(x => x.email === s.email) === i);
+                const avg = unique.length > 0 && unique.some(s => s.avgGrade !== null)
+                  ? Math.round(unique.filter(s => s.avgGrade !== null).reduce((s, st) => s + (st.avgGrade || 0), 0) / unique.filter(s => s.avgGrade !== null).length * 10) / 10
+                  : null;
+                const attendance = unique.length > 0
+                  ? Math.round(unique.reduce((s, st) => s + st.attendance, 0) / unique.length)
+                  : 0;
+
+                return (
+                  <Link key={turma.id} to={`/professor/disciplines?turma=${turma.id}`}>
+                    <Card className="p-3 hover:shadow-md transition-shadow cursor-pointer flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-primary/10 text-primary shrink-0">
+                        <GraduationCap className="w-4 h-4" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="font-semibold text-foreground text-xs truncate">{turma.name}</p>
+                        <p className="text-[10px] text-muted-foreground">{turma.students} est. • {turmaDiscs.length} disc.</p>
+                      </div>
+                      <div className="flex items-center gap-3 shrink-0">
+                        <div className="text-center">
+                          <p className={`text-xs font-bold ${avg !== null && avg >= 10 ? "text-accent" : avg !== null ? "text-destructive" : "text-muted-foreground"}`}>{avg ?? "—"}</p>
+                          <p className="text-[9px] text-muted-foreground">Média</p>
+                        </div>
+                        <div className="text-center">
+                          <p className={`text-xs font-bold ${attendance >= 75 ? "text-accent" : "text-destructive"}`}>{attendance}%</p>
+                          <p className="text-[9px] text-muted-foreground">Presença</p>
+                        </div>
+                      </div>
+                      <ChevronRight className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                    </Card>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Announcements */}
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+                <Megaphone className="w-5 h-5 text-secondary" /> Anúncios
+              </h2>
+              <Link to="/professor/announcements" className="text-sm text-primary hover:underline flex items-center gap-1">
+                Ver todos <ChevronRight className="w-4 h-4" />
+              </Link>
+            </div>
+            <div className="space-y-3">
+              {recentAnnouncements.map(ann => {
+                const style = typeStyles[ann.type] || typeStyles.geral;
+                return (
+                  <Card key={ann.id} className="p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Badge className={`${style.bg} text-[10px]`}>{style.label}</Badge>
+                      <span className="text-[11px] text-muted-foreground ml-auto">{ann.date}</span>
+                    </div>
+                    <p className="text-sm font-semibold text-foreground line-clamp-1">{ann.title}</p>
+                    <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{ann.content}</p>
+                  </Card>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
