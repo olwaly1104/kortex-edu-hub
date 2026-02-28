@@ -283,8 +283,7 @@ export default function DisciplineDetail() {
                     <span className="text-muted-foreground/30">•</span>
                     <span>{task.assignedDate} → {task.dueDate}</span>
                     <Badge variant="outline" className="text-[10px] gap-1 ml-1">
-                      {task.modality === "online" ? <Monitor className="w-3 h-3" /> : <MapPin className="w-3 h-3" />}
-                      {task.modality === "online" ? "Online" : "Presencial"}
+                      <MapPin className="w-3 h-3" /> Presencial
                     </Badge>
                   </div>
                 </div>
@@ -333,8 +332,7 @@ export default function DisciplineDetail() {
                           <span className="text-muted-foreground/30">•</span>
                           <span>Peso: {ev.weight}%</span>
                           <Badge variant="outline" className="text-[10px] gap-1">
-                            {ev.modality === "online" ? <Monitor className="w-3 h-3" /> : <MapPin className="w-3 h-3" />}
-                            {ev.modality === "online" ? "Online" : "Presencial"}
+                            <MapPin className="w-3 h-3" /> Presencial
                           </Badge>
                         </div>
                       </div>

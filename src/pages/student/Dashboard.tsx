@@ -1,6 +1,6 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { disciplines, announcements, lessons, calendarEvents, grades } from "@/data/mockData";
-import { BookOpen, Video, Calendar, Bell, ChevronRight, Clock, MapPin, Play, BarChart3, ArrowRight, LogIn } from "lucide-react";
+import { BookOpen, Video, Calendar, Bell, ChevronRight, Clock, MapPin, Play, BarChart3, ArrowRight } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -38,8 +38,7 @@ export default function StudentDashboard() {
     { label: "Perguntar à área financeira sobre pagamentos", to: "/student/chat" },
     { label: "Ver notas do último exame de Matemática", to: "/student/grades" },
     { label: "Consultar horário de atendimento do professor", to: "/student/contacts" },
-    { label: "Pedir declaração de matrícula", to: "/student/documents" },
-    { label: "Verificar prazos de entrega pendentes", to: "/student/disciplines" },
+    { label: "Verificar prazos de entrega pendentes", to: "/student/tasks" },
     { label: "Consultar livros disponíveis na biblioteca", to: "/student/library" },
   ];
 
@@ -110,9 +109,13 @@ export default function StudentDashboard() {
                     <Button variant="outline" size="sm" className="gap-1.5 text-xs shrink-0" onClick={() => navigate(`/student/disciplines/${disc!.id}/lessons/${matchingLesson.id}`)}>
                       <Play className="w-3.5 h-3.5" /> Rever
                     </Button>
+                  ) : matchingLesson ? (
+                    <Button size="sm" className="gap-1.5 text-xs shrink-0" onClick={() => navigate(`/student/disciplines/${disc!.id}/lessons/${matchingLesson.id}`)}>
+                      <Play className="w-3.5 h-3.5" /> Ver Aula
+                    </Button>
                   ) : (
-                    <Button size="sm" className="gap-1.5 text-xs shrink-0" onClick={() => navigate(`/student/class-lobby?eventId=${event.id}`)}>
-                      <LogIn className="w-3.5 h-3.5" /> Entrar
+                    <Button size="sm" variant="outline" className="gap-1.5 text-xs shrink-0" disabled>
+                      <Clock className="w-3.5 h-3.5" /> Em breve
                     </Button>
                   )}
                 </Card>

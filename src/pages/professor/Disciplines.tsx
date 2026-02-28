@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Link } from "react-router-dom";
-import { BookOpen, Users, Clock, MapPin, ChevronRight, Video, FileText, GraduationCap, BarChart3, UserCheck } from "lucide-react";
+import { BookOpen, Users, Clock, MapPin, ChevronRight, Video, FileText, GraduationCap, Calendar } from "lucide-react";
 
 export default function ProfessorDisciplines() {
   return (
@@ -23,7 +23,6 @@ export default function ProfessorDisciplines() {
           const turmaTasks = profTasks.filter(t => t.turmaId === turma.id);
           const turmaActive = turmaTasks.filter(t => t.status === "publicada").length;
           const turmaStudents = profStudents.filter(s => s.turmaId === turma.id);
-          // Deduplicate students by email for turma-level stats
           const uniqueStudents = turmaStudents.filter((s, i, arr) => arr.findIndex(x => x.email === s.email) === i);
           const avgGrade = uniqueStudents.length > 0 && uniqueStudents.some(s => s.avgGrade !== null)
             ? Math.round(uniqueStudents.filter(s => s.avgGrade !== null).reduce((s, st) => s + (st.avgGrade || 0), 0) / uniqueStudents.filter(s => s.avgGrade !== null).length * 10) / 10
@@ -34,14 +33,21 @@ export default function ProfessorDisciplines() {
           const lessonPct = turmaLessons.length > 0 ? Math.round((turmaPublished / turmaLessons.length) * 100) : 0;
           const totalContents = turmaDiscs.reduce((s, d) => s + d.totalMaterials, 0);
 
+          // Extract schedule days from disciplines
+          const scheduleDays = turmaDiscs.length > 0 ? turmaDiscs[0].schedule.split(" ")[0] : "";
+          const room = turmaDiscs.length > 0 ? turmaDiscs[0].room : "";
+
           return (
             <Card key={turma.id} className="overflow-hidden hover:shadow-lg transition-shadow">
               <div className="h-1.5 bg-primary" />
               <div className="p-5">
                 <div className="flex items-start justify-between mb-4">
                   <div>
-                    <h3 className="font-bold text-foreground text-base">{turma.name}</h3>
-                    <p className="text-xs text-muted-foreground mt-0.5">{turma.course} • {turma.year}º Ano</p>
+                    <h3 className="font-bold text-foreground text-lg">{turma.name}</h3>
+                    <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
+                      <span>{turma.course} • {turma.year}º Ano</span>
+                      <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{room}</span>
+                    </div>
                   </div>
                   <Link to={`/professor/disciplines/${turmaDiscs[0]?.id || ''}?turma=${turma.id}`}>
                     <ChevronRight className="w-5 h-5 text-muted-foreground hover:text-primary transition-colors" />
@@ -71,12 +77,16 @@ export default function ProfessorDisciplines() {
                 {/* Details */}
                 <div className="space-y-2.5 pt-3 border-t border-border/50">
                   <div className="flex items-center justify-between text-xs">
+                    <span className="text-muted-foreground flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /> Dias</span>
+                    <span className="font-semibold text-foreground">{scheduleDays}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-xs">
                     <span className="text-muted-foreground flex items-center gap-1.5"><BookOpen className="w-3.5 h-3.5" /> Disciplinas</span>
                     <span className="font-semibold text-foreground">{turmaDiscs.map(d => d.code).join(", ")}</span>
                   </div>
                   <div>
                     <div className="flex justify-between text-xs mb-1">
-                      <span className="text-muted-foreground flex items-center gap-1.5"><Video className="w-3.5 h-3.5" /> Aulas</span>
+                      <span className="text-muted-foreground flex items-center gap-1.5"><Video className="w-3.5 h-3.5" /> Aulas Gravadas</span>
                       <span className="font-semibold text-foreground">{turmaPublished}/{turmaLessons.length}</span>
                     </div>
                     <Progress value={lessonPct} className="h-1.5" />
