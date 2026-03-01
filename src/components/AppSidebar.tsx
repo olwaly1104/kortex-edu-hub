@@ -2,7 +2,7 @@ import { NavLink, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   LayoutDashboard, BookOpen, Calendar, Megaphone, Users, MessageSquare,
-  Mail, Award, FileText, User, LogOut, GraduationCap,
+  Mail, Award, User, LogOut, GraduationCap,
   BarChart3, ChevronLeft, ChevronRight, Library, Wallet, Trophy, ClipboardList,
 } from "lucide-react";
 import { useState } from "react";
@@ -14,47 +14,102 @@ interface NavItem {
   path: string;
 }
 
-const studentNav: NavItem[] = [
-  { label: "Anúncios", icon: Megaphone, path: "/student/announcements" },
-  { label: "Início", icon: LayoutDashboard, path: "/student" },
-  { label: "As Minhas Disciplinas", icon: BookOpen, path: "/student/disciplines" },
-  { label: "Calendário", icon: Calendar, path: "/student/calendar" },
-  { label: "Email", icon: Mail, path: "/student/email" },
-  { label: "Chat", icon: MessageSquare, path: "/student/chat" },
-  { label: "Contactos", icon: Users, path: "/student/contacts" },
-  { label: "Notas", icon: Award, path: "/student/grades" },
-  { label: "Tarefas", icon: ClipboardList, path: "/student/tasks" },
-  { label: "Biblioteca Virtual", icon: Library, path: "/student/library" },
-  { label: "Finanças", icon: Wallet, path: "/student/finances" },
-  { label: "Extra Curriculares", icon: Trophy, path: "/student/activities" },
-  { label: "Perfil", icon: User, path: "/student/profile" },
+interface NavSection {
+  title: string;
+  items: NavItem[];
+}
+
+const studentSections: NavSection[] = [
+  {
+    title: "Geral",
+    items: [
+      { label: "Início", icon: LayoutDashboard, path: "/student" },
+      { label: "Calendário", icon: Calendar, path: "/student/calendar" },
+      { label: "Anúncios", icon: Megaphone, path: "/student/announcements" },
+    ],
+  },
+  {
+    title: "Académico",
+    items: [
+      { label: "As Minhas Disciplinas", icon: BookOpen, path: "/student/disciplines" },
+      { label: "Tarefas", icon: ClipboardList, path: "/student/tasks" },
+      { label: "Notas", icon: Award, path: "/student/grades" },
+      { label: "Biblioteca Virtual", icon: Library, path: "/student/library" },
+    ],
+  },
+  {
+    title: "Comunicação",
+    items: [
+      { label: "Chat", icon: MessageSquare, path: "/student/chat" },
+      { label: "Email", icon: Mail, path: "/student/email" },
+      { label: "Contactos", icon: Users, path: "/student/contacts" },
+    ],
+  },
+  {
+    title: "Pessoal",
+    items: [
+      { label: "Finanças", icon: Wallet, path: "/student/finances" },
+      { label: "Extra Curriculares", icon: Trophy, path: "/student/activities" },
+      { label: "Perfil", icon: User, path: "/student/profile" },
+    ],
+  },
 ];
 
-const professorNav: NavItem[] = [
-  { label: "Anúncios", icon: Megaphone, path: "/professor/announcements" },
-  { label: "Início", icon: LayoutDashboard, path: "/professor" },
-  { label: "As Minhas Turmas", icon: BookOpen, path: "/professor/disciplines" },
-  { label: "Os Meus Estudantes", icon: Users, path: "/professor/students" },
-  { label: "Minhas Aulas", icon: Library, path: "/professor/lessons" },
-  { label: "Tarefas", icon: ClipboardList, path: "/professor/tasks" },
-  { label: "Avaliações", icon: Award, path: "/professor/evaluations" },
-  { label: "Notas", icon: GraduationCap, path: "/professor/grades" },
-  { label: "Calendário", icon: Calendar, path: "/professor/calendar" },
-  { label: "Email", icon: Mail, path: "/professor/email" },
-  { label: "Chat", icon: MessageSquare, path: "/professor/chat" },
-  { label: "Contactos", icon: Users, path: "/professor/contacts" },
-  { label: "Perfil", icon: User, path: "/professor/profile" },
+const professorSections: NavSection[] = [
+  {
+    title: "Geral",
+    items: [
+      { label: "Início", icon: LayoutDashboard, path: "/professor" },
+      { label: "Calendário", icon: Calendar, path: "/professor/calendar" },
+      { label: "Anúncios", icon: Megaphone, path: "/professor/announcements" },
+    ],
+  },
+  {
+    title: "Académico",
+    items: [
+      { label: "As Minhas Turmas", icon: BookOpen, path: "/professor/disciplines" },
+      { label: "Os Meus Estudantes", icon: Users, path: "/professor/students" },
+      { label: "Tarefas", icon: ClipboardList, path: "/professor/tasks" },
+      { label: "Avaliações", icon: Award, path: "/professor/evaluations" },
+      { label: "Notas", icon: GraduationCap, path: "/professor/grades" },
+    ],
+  },
+  {
+    title: "Comunicação",
+    items: [
+      { label: "Chat", icon: MessageSquare, path: "/professor/chat" },
+      { label: "Email", icon: Mail, path: "/professor/email" },
+      { label: "Contactos", icon: Users, path: "/professor/contacts" },
+    ],
+  },
+  {
+    title: "Pessoal",
+    items: [
+      { label: "Finanças", icon: Wallet, path: "/professor/finances" },
+      { label: "Perfil", icon: User, path: "/professor/profile" },
+    ],
+  },
 ];
 
-const coordinatorNav: NavItem[] = [
-  { label: "Anúncios", icon: Megaphone, path: "/coordinator/announcements" },
-  { label: "Visão Geral do Curso", icon: LayoutDashboard, path: "/coordinator" },
-  { label: "Disciplinas", icon: BookOpen, path: "/coordinator/disciplines" },
-  { label: "Professores", icon: GraduationCap, path: "/coordinator/professors" },
-  { label: "Alunos", icon: Users, path: "/coordinator/students" },
-  { label: "Avaliações", icon: Award, path: "/coordinator/evaluations" },
-  { label: "Calendário", icon: Calendar, path: "/coordinator/calendar" },
-  { label: "Relatórios", icon: BarChart3, path: "/coordinator/reports" },
+const coordinatorSections: NavSection[] = [
+  {
+    title: "Geral",
+    items: [
+      { label: "Visão Geral", icon: LayoutDashboard, path: "/coordinator" },
+      { label: "Calendário", icon: Calendar, path: "/coordinator/calendar" },
+      { label: "Anúncios", icon: Megaphone, path: "/coordinator/announcements" },
+    ],
+  },
+  {
+    title: "Académico",
+    items: [
+      { label: "Disciplinas", icon: BookOpen, path: "/coordinator/disciplines" },
+      { label: "Professores", icon: GraduationCap, path: "/coordinator/professors" },
+      { label: "Alunos", icon: Users, path: "/coordinator/students" },
+      { label: "Avaliações", icon: Award, path: "/coordinator/evaluations" },
+      { label: "Relatórios", icon: BarChart3, path: "/coordinator/reports" },
+    ],
+  },
 ];
 
 export default function AppSidebar() {
@@ -64,9 +119,19 @@ export default function AppSidebar() {
 
   if (!user) return null;
 
-  const navItems = user.role === "coordinator" ? coordinatorNav : user.role === "professor" ? professorNav : studentNav;
+  const sections =
+    user.role === "coordinator"
+      ? coordinatorSections
+      : user.role === "professor"
+        ? professorSections
+        : studentSections;
 
-  const roleLabel = user.role === "coordinator" ? "Coordenador" : user.role === "professor" ? "Professor" : "Estudante";
+  const roleLabel =
+    user.role === "coordinator"
+      ? "Coordenador"
+      : user.role === "professor"
+        ? "Professor"
+        : "Estudante";
 
   return (
     <aside
@@ -89,27 +154,43 @@ export default function AppSidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto py-3 px-2 space-y-0.5">
-        {navItems.map((item) => {
-          const isActive = location.pathname === item.path || 
-            (item.path !== `/${user.role}` && location.pathname.startsWith(item.path + "/"));
-          return (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              className={cn(
-                "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors",
-                isActive
-                  ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
-                  : "text-sidebar-foreground/80 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
-              )}
-              title={collapsed ? item.label : undefined}
-            >
-              <item.icon className="w-[18px] h-[18px] shrink-0" />
-              {!collapsed && <span className="truncate">{item.label}</span>}
-            </NavLink>
-          );
-        })}
+      <nav className="flex-1 overflow-y-auto py-2 px-2">
+        {sections.map((section, sIdx) => (
+          <div key={section.title} className={cn(sIdx > 0 && "mt-3")}>
+            {!collapsed && (
+              <p className="px-3 pt-2 pb-1.5 text-[10px] font-semibold uppercase tracking-wider text-sidebar-foreground/40">
+                {section.title}
+              </p>
+            )}
+            {collapsed && sIdx > 0 && (
+              <div className="mx-3 my-2 h-px bg-sidebar-border" />
+            )}
+            <div className="space-y-0.5">
+              {section.items.map((item) => {
+                const isActive =
+                  location.pathname === item.path ||
+                  (item.path !== `/${user.role}` &&
+                    location.pathname.startsWith(item.path + "/"));
+                return (
+                  <NavLink
+                    key={item.path}
+                    to={item.path}
+                    className={cn(
+                      "flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] transition-colors",
+                      isActive
+                        ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
+                        : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+                    )}
+                    title={collapsed ? item.label : undefined}
+                  >
+                    <item.icon className="w-[18px] h-[18px] shrink-0" />
+                    {!collapsed && <span className="truncate">{item.label}</span>}
+                  </NavLink>
+                );
+              })}
+            </div>
+          </div>
+        ))}
       </nav>
 
       {/* User section */}
