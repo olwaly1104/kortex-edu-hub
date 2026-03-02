@@ -7,13 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import {
-  ClipboardList, Plus, Search, Clock, CheckCircle, Users, Send,
-  FolderKanban, Calendar, AlertCircle, BarChart3, MapPin, ArrowRight,
+  GraduationCap, Plus, Search, Clock, CheckCircle, Users, Send,
+  FolderKanban, Calendar, AlertCircle, BarChart3, MapPin, ArrowRight, ClipboardList,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const typeLabel: Record<string, string> = { quiz: "Quiz", exame: "Exame" };
-const typeIcon: Record<string, React.ElementType> = { quiz: FolderKanban, exame: ClipboardList };
+const typeIcon: Record<string, React.ElementType> = { quiz: FolderKanban, exame: GraduationCap };
 const statusStyle: Record<string, { bg: string; label: string; icon: React.ElementType }> = {
   rascunho: { bg: "bg-muted text-muted-foreground", label: "Rascunho", icon: Clock },
   publicada: { bg: "bg-primary/10 text-primary", label: "Activa", icon: Clock },
@@ -60,15 +60,21 @@ export default function ProfessorEvaluations() {
 
   const activeCount = scopedEvals.filter(t => t.status === "publicada").length;
   const closedCount = scopedEvals.filter(t => t.status === "encerrada").length;
-  const pendingCorrection = scopedEvals.filter(t => t.status !== "rascunho" && t.avgGrade === null && t.submissions > 0).length;
+  const porAtribuir = scopedEvals.filter(t => t.status === "encerrada" && t.avgGrade === null).length;
   const totalSub = scopedEvals.reduce((s, t) => s + t.submissions, 0);
   const totalExp = scopedEvals.filter(t => t.status !== "rascunho").reduce((s, t) => s + t.totalStudents, 0);
   const deliveryRate = totalExp > 0 ? Math.round(totalSub / totalExp * 100) : 0;
   const graded = scopedEvals.filter(t => t.avgGrade !== null);
   const avgGrade = graded.length > 0 ? (graded.reduce((s, t) => s + (t.avgGrade || 0), 0) / graded.length).toFixed(1) : null;
 
+  const isPorAtribuirEnabled = filterStatus === "encerrada";
+
   const filtered = scopedEvals
-    .filter(t => filterStatus === "all" || (filterStatus === "por_corrigir" ? (t.status !== "rascunho" && t.avgGrade === null && t.submissions > 0) : t.status === filterStatus))
+    .filter(t => {
+      if (filterStatus === "all") return true;
+      if (filterStatus === "por_atribuir") return t.status === "encerrada" && t.avgGrade === null;
+      return t.status === filterStatus;
+    })
     .filter(t => t.title.toLowerCase().includes(searchTerm.toLowerCase()));
 
   const handleSubmit = () => {
@@ -86,7 +92,7 @@ export default function ProfessorEvaluations() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-            <ClipboardList className="w-6 h-6 text-secondary" /> Avaliações
+            <GraduationCap className="w-6 h-6 text-secondary" /> Avaliações
           </h1>
           <p className="text-sm text-muted-foreground mt-1">Gerir quizzes e exames das suas disciplinas</p>
         </div>
@@ -146,10 +152,10 @@ export default function ProfessorEvaluations() {
       {/* Summary cards */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
         <SummaryCard label="Activas" value={activeCount} icon={Clock} iconBg="bg-primary/10" iconColor="text-primary" />
-        <SummaryCard label="Por Corrigir" value={pendingCorrection} icon={AlertCircle} iconBg="bg-destructive/10" iconColor="text-destructive" valueClass={pendingCorrection > 0 ? "text-destructive" : undefined} />
+        <SummaryCard label="Por Atribuir" value={porAtribuir} icon={AlertCircle} iconBg="bg-destructive/10" iconColor="text-destructive" valueClass={porAtribuir > 0 ? "text-destructive" : undefined} />
         <SummaryCard label="Encerradas" value={closedCount} icon={CheckCircle} iconBg="bg-accent/10" iconColor="text-accent" />
         <SummaryCard label="Taxa Entrega" value={`${deliveryRate}%`} icon={BarChart3} iconBg="bg-secondary/10" iconColor="text-secondary" />
-        <SummaryCard label="Nota Geral" value={avgGrade ?? "—"} icon={ClipboardList} iconBg="bg-accent/10" iconColor="text-accent" valueClass={avgGrade && Number(avgGrade) >= 10 ? "text-accent" : avgGrade ? "text-destructive" : "text-muted-foreground"} />
+        <SummaryCard label="Nota Geral" value={avgGrade ?? "—"} icon={GraduationCap} iconBg="bg-accent/10" iconColor="text-accent" valueClass={avgGrade && Number(avgGrade) >= 10 ? "text-accent" : avgGrade ? "text-destructive" : "text-muted-foreground"} />
       </div>
 
       {/* Turma toggle */}
@@ -158,17 +164,11 @@ export default function ProfessorEvaluations() {
         <button
           onClick={() => setFilterTurma("all")}
           className={`px-3.5 py-2 rounded-lg text-xs font-medium border transition-all ${filterTurma === "all" ? "bg-primary text-primary-foreground border-primary shadow-sm" : "bg-card text-muted-foreground border-border hover:border-primary/30 hover:text-foreground"}`}
-        >
-          Todas
-        </button>
+        >Todas</button>
         {allTurmas.map(t => (
-          <button
-            key={t.id}
-            onClick={() => setFilterTurma(t.id)}
+          <button key={t.id} onClick={() => setFilterTurma(t.id)}
             className={`px-3.5 py-2 rounded-lg text-xs font-medium border transition-all ${filterTurma === t.id ? "bg-primary text-primary-foreground border-primary shadow-sm" : "bg-card text-muted-foreground border-border hover:border-primary/30 hover:text-foreground"}`}
-          >
-            {t.name}
-          </button>
+          >{t.name}</button>
         ))}
       </div>
 
@@ -180,25 +180,31 @@ export default function ProfessorEvaluations() {
         </div>
         <div className="flex gap-1.5">
           {([
-            { key: "all", label: "Todos" },
-            { key: "publicada", label: "Activa" },
-            { key: "por_corrigir", label: "Por Corrigir" },
-            { key: "encerrada", label: "Encerrada" },
-          ]).map(s => (
-            <button
-              key={s.key}
-              onClick={() => setFilterStatus(s.key)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
-                filterStatus === s.key
-                  ? s.key === "por_corrigir"
-                    ? "bg-destructive text-destructive-foreground border-destructive shadow-sm"
-                    : "bg-primary text-primary-foreground border-primary shadow-sm"
-                  : "bg-card text-muted-foreground border-border hover:border-primary/30 hover:text-foreground"
-              }`}
-            >
-              {s.label}
-            </button>
-          ))}
+            { key: "all", label: "Todos", always: true },
+            { key: "publicada", label: "Activa", always: true },
+            { key: "encerrada", label: "Encerrada", always: true },
+            { key: "por_atribuir", label: "Por Atribuir", always: false },
+          ]).map(s => {
+            const isEnabled = s.always || isPorAtribuirEnabled;
+            return (
+              <button
+                key={s.key}
+                onClick={() => isEnabled && setFilterStatus(s.key)}
+                disabled={!isEnabled}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
+                  !isEnabled
+                    ? "bg-card text-muted-foreground/40 border-border/50 cursor-not-allowed"
+                    : filterStatus === s.key
+                      ? s.key === "por_atribuir"
+                        ? "bg-destructive text-destructive-foreground border-destructive shadow-sm"
+                        : "bg-primary text-primary-foreground border-primary shadow-sm"
+                      : "bg-card text-muted-foreground border-border hover:border-primary/30 hover:text-foreground"
+                }`}
+              >
+                {s.label}
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -206,18 +212,20 @@ export default function ProfessorEvaluations() {
       <div className="space-y-3">
         {filtered.length === 0 && (
           <div className="rounded-xl border border-border bg-card p-12 text-center">
-            <ClipboardList className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" />
+            <GraduationCap className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" />
             <p className="text-sm font-medium text-muted-foreground">Nenhuma avaliação encontrada</p>
           </div>
         )}
         {filtered.map(task => {
           const disc = profDisciplines.find(d => d.id === task.disciplineId);
           const turma = allTurmas.find(t => t.id === task.turmaId);
-          const TypeIcon = typeIcon[task.type] || ClipboardList;
+          const TypeIcon = typeIcon[task.type] || GraduationCap;
           const sStyle = statusStyle[task.status];
           const StatusIcon = sStyle.icon;
           const submissionPct = task.totalStudents > 0 ? Math.round(task.submissions / task.totalStudents * 100) : 0;
-          const isPorCorrigir = task.status !== "rascunho" && task.avgGrade === null && task.submissions > 0;
+          const isPorAtribuir = task.status === "encerrada" && task.avgGrade === null;
+          const naoCompletado = task.status === "encerrada" && task.submissions < task.totalStudents;
+          const missingCount = task.totalStudents - task.submissions;
 
           return (
             <div
@@ -239,9 +247,14 @@ export default function ProfessorEvaluations() {
                       <TypeIcon className="w-3 h-3" />
                       {typeLabel[task.type]}
                     </Badge>
-                    {isPorCorrigir && (
+                    {isPorAtribuir && (
                       <Badge className="bg-destructive/10 text-destructive border-destructive/20 gap-1 text-[10px]">
-                        <AlertCircle className="w-3 h-3" /> Por corrigir
+                        <AlertCircle className="w-3 h-3" /> {task.totalStudents} estudantes por atribuir nota
+                      </Badge>
+                    )}
+                    {naoCompletado && task.avgGrade !== null && (
+                      <Badge className="bg-secondary/10 text-secondary border-0 text-[10px]">
+                        {missingCount} não completado — Nota 0
                       </Badge>
                     )}
                     <Badge className={`${sStyle.bg} gap-1 text-[10px] border-0`}>
@@ -267,7 +280,7 @@ export default function ProfessorEvaluations() {
                 {task.status !== "rascunho" && (
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="flex items-center gap-1.5 text-muted-foreground"><Users className="w-3.5 h-3.5" />Submissões</span>
+                      <span className="flex items-center gap-1.5 text-muted-foreground"><Users className="w-3.5 h-3.5" />Participação</span>
                       <span className="font-semibold text-foreground">{task.submissions}/{task.totalStudents} ({submissionPct}%)</span>
                     </div>
                     <Progress value={submissionPct} className="h-1.5" />

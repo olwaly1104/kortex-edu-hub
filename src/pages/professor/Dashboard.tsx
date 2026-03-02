@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import {
   BookOpen, Users, Video, Calendar, ChevronRight,
   Clock, MapPin, Play, AlertTriangle, CheckCircle,
-  Eye, ArrowRight, Megaphone, GraduationCap, BarChart3,
+  Eye, ArrowRight, Megaphone, GraduationCap, UserCheck,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -24,14 +24,19 @@ export default function ProfessorDashboard() {
   const navigate = useNavigate();
 
   const totalStudents = allTurmas.reduce((s, t) => s + t.students, 0);
-  const totalLessonsPublished = profDisciplines.reduce((s, d) => s + d.publishedLessons, 0);
   const atRiskStudents = profStudents.filter(s => s.status === "risco");
+
+  // Calculate overall attendance for professor
+  const allStudentsUnique = profStudents.filter((s, i, arr) => arr.findIndex(x => x.email === s.email) === i);
+  const overallAttendance = allStudentsUnique.length > 0
+    ? Math.round(allStudentsUnique.reduce((s, st) => s + st.attendance, 0) / allStudentsUnique.length)
+    : 0;
 
   const stats = [
     { icon: Users, label: "Estudantes", value: totalStudents, color: "text-accent bg-accent/10" },
     { icon: GraduationCap, label: "Turmas", value: allTurmas.length, color: "text-primary bg-primary/10" },
     { icon: BookOpen, label: "Disciplinas", value: profDisciplines.length, color: "text-secondary bg-secondary/10" },
-    { icon: Video, label: "Aulas Publicadas", value: totalLessonsPublished, color: "text-primary bg-primary/10" },
+    { icon: UserCheck, label: "Minha Presença", value: `${overallAttendance}%`, color: "text-accent bg-accent/10" },
   ];
 
   const statusConfig = {
@@ -49,7 +54,6 @@ export default function ProfessorDashboard() {
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
-      {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-foreground">
           Bom dia, {user?.name?.split(" ").pop()} 👋
@@ -57,7 +61,6 @@ export default function ProfessorDashboard() {
         <p className="text-muted-foreground mt-1">Painel do Professor — Universidade Privada de Angola</p>
       </div>
 
-      {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map(s => (
           <Card key={s.label} className="p-4 flex items-center gap-4">
@@ -73,7 +76,6 @@ export default function ProfessorDashboard() {
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6">
-        {/* Left column */}
         <div className="lg:col-span-2 space-y-6">
           {/* Today's classes */}
           <div>
@@ -116,7 +118,7 @@ export default function ProfessorDashboard() {
             </div>
           </div>
 
-          {/* Recent recorded lessons - 3 horizontal cards */}
+          {/* Recent recorded lessons */}
           <div>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
@@ -161,7 +163,6 @@ export default function ProfessorDashboard() {
             </div>
           </div>
 
-          {/* At-risk students link */}
           {atRiskStudents.length > 0 && (
             <Link to="/professor/students?status=risco" className="block">
               <Card className="p-4 flex items-center gap-4 hover:shadow-md transition-shadow cursor-pointer border-l-[3px] border-l-destructive">
@@ -169,12 +170,8 @@ export default function ProfessorDashboard() {
                   <AlertTriangle className="w-5 h-5 text-destructive" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-foreground">
-                    {atRiskStudents.length} Estudantes em Risco
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    Estudantes com baixa presença, média ou entregas insuficientes
-                  </p>
+                  <p className="text-sm font-semibold text-foreground">{atRiskStudents.length} Estudantes em Risco</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">Estudantes com baixa presença, média ou entregas insuficientes</p>
                 </div>
                 <ArrowRight className="w-5 h-5 text-destructive shrink-0" />
               </Card>
@@ -182,9 +179,8 @@ export default function ProfessorDashboard() {
           )}
         </div>
 
-        {/* Right column - Anúncios on TOP, then Turmas */}
         <div className="space-y-6">
-          {/* Announcements FIRST */}
+          {/* Announcements */}
           <div>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
@@ -211,7 +207,7 @@ export default function ProfessorDashboard() {
             </div>
           </div>
 
-          {/* My Turmas SECOND — improved cards */}
+          {/* My Turmas */}
           <div>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">

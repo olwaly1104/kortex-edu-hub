@@ -1,8 +1,9 @@
-import { grades } from "@/data/mockData";
+import { grades, disciplines } from "@/data/mockData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Award, Monitor, MapPin, Clock, CheckCircle, TrendingUp, ClipboardList, FolderKanban, FileText, Presentation, BookOpen, GraduationCap } from "lucide-react";
+import { Award, MapPin, Clock, CheckCircle, TrendingUp, ClipboardList, FolderKanban, FileText, Presentation, BookOpen, GraduationCap } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 const getEvalIcon = (name: string) => {
   const lower = name.toLowerCase();
@@ -16,11 +17,14 @@ const getEvalIcon = (name: string) => {
 
 export default function StudentGrades() {
   const navigate = useNavigate();
+  const [filterDisc, setFilterDisc] = useState<string>("all");
 
   const allPublished = grades.flatMap(g => g.evaluations.filter(e => e.published && e.grade !== null));
   const overallAvg = allPublished.length > 0
     ? Math.round(allPublished.reduce((s, e) => s + (e.grade || 0), 0) / allPublished.length * 10) / 10
     : null;
+
+  const filteredGrades = filterDisc === "all" ? grades : grades.filter(g => g.disciplineId === filterDisc);
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
@@ -49,8 +53,24 @@ export default function StudentGrades() {
         </Card>
       )}
 
+      {/* Discipline filter */}
+      <div className="flex items-center gap-2 flex-wrap">
+        <span className="text-xs font-medium text-muted-foreground mr-1">Disciplina:</span>
+        <button
+          onClick={() => setFilterDisc("all")}
+          className={`px-3.5 py-2 rounded-lg text-xs font-medium border transition-all ${filterDisc === "all" ? "bg-primary text-primary-foreground border-primary shadow-sm" : "bg-card text-muted-foreground border-border hover:border-primary/30 hover:text-foreground"}`}
+        >Todas</button>
+        {disciplines.map(d => (
+          <button
+            key={d.id}
+            onClick={() => setFilterDisc(d.id)}
+            className={`px-3.5 py-2 rounded-lg text-xs font-medium border transition-all ${filterDisc === d.id ? "bg-primary text-primary-foreground border-primary shadow-sm" : "bg-card text-muted-foreground border-border hover:border-primary/30 hover:text-foreground"}`}
+          >{d.code}</button>
+        ))}
+      </div>
+
       <div className="space-y-6">
-        {grades.map(g => {
+        {filteredGrades.map(g => {
           const published = g.evaluations.filter(e => e.published && e.grade !== null);
           const avg = published.length > 0 ? Math.round(published.reduce((s, e) => s + (e.grade || 0), 0) / published.length * 10) / 10 : null;
           return (
@@ -94,8 +114,7 @@ export default function StudentGrades() {
                         <span>•</span>
                         <span>Peso: {ev.weight}%</span>
                         <Badge variant="outline" className="text-[10px] gap-1">
-                          {ev.modality === "online" ? <Monitor className="w-3 h-3" /> : <MapPin className="w-3 h-3" />}
-                          {ev.modality === "online" ? "Online" : "Presencial"}
+                          <MapPin className="w-3 h-3" /> Presencial
                         </Badge>
                       </div>
                     </div>

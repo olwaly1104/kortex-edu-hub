@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, BookOpen, User, Users, Clock, MapPin, Video, FileText, GraduationCap, ClipboardList, Play, Download, ChevronDown, ChevronRight, Eye, Calendar, CheckCircle, AlertCircle, Monitor, TrendingUp, FolderOpen, Link2, ExternalLink, Mail } from "lucide-react";
+import { ArrowLeft, BookOpen, User, Users, Clock, MapPin, Video, FileText, GraduationCap, ClipboardList, Play, Download, ChevronDown, ChevronRight, Eye, Calendar, CheckCircle, AlertCircle, TrendingUp, FolderOpen, Link2, ExternalLink, Mail } from "lucide-react";
 import { useState } from "react";
 
 export default function DisciplineDetail() {
@@ -22,7 +22,6 @@ export default function DisciplineDetail() {
   const attendancePct = Math.round((disc.attendance.present / total) * 100);
   const allTasks = discLessons.flatMap(l => l.tasks.map(t => ({ ...t, lessonNumber: l.number, lessonTitle: l.title })));
 
-  // Computed grade
   const publishedEvals = discGrades?.evaluations.filter(e => e.published && e.grade !== null) || [];
   const totalEvals = discGrades?.evaluations.length || 0;
   const weightedSum = publishedEvals.reduce((sum, e) => sum + (e.grade! * e.weight), 0);
@@ -31,14 +30,18 @@ export default function DisciplineDetail() {
 
   const progressPct = Math.round((disc.progress.watched / disc.progress.total) * 100);
 
+  // Get participants from all lessons of this discipline
+  const allParticipants = new Set<string>();
+  discLessons.forEach(l => l.participants.forEach(p => allParticipants.add(p)));
+  const participantList = Array.from(allParticipants).filter(p => !p.startsWith("Prof.")).sort();
+
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
-      {/* Back link */}
       <Link to="/student/disciplines" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
         <ArrowLeft className="w-4 h-4" /> Voltar às disciplinas
       </Link>
 
-      {/* Hero header with discipline color accent */}
+      {/* Hero header */}
       <div className="relative overflow-hidden rounded-2xl p-6 lg:p-8" style={{ background: `linear-gradient(135deg, ${disc.color}12, ${disc.color}06)` }}>
         <div className="absolute top-0 right-0 w-40 h-40 rounded-full opacity-[0.07]" style={{ background: disc.color, transform: "translate(30%, -30%)" }} />
         <div className="relative flex items-start gap-5">
@@ -55,9 +58,8 @@ export default function DisciplineDetail() {
         </div>
       </div>
 
-      {/* Key metrics - 4 cards with discipline color accents */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Professor */}
+      {/* Key metrics */}
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
         <Card className="p-4 group hover:shadow-md transition-shadow">
           <div className="flex items-center gap-2 mb-3">
             <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: disc.color + "15", color: disc.color }}>
@@ -72,7 +74,6 @@ export default function DisciplineDetail() {
           </div>
         </Card>
 
-        {/* Schedule + Room */}
         <Card className="p-4 group hover:shadow-md transition-shadow">
           <div className="flex items-center gap-2 mb-3">
             <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: disc.color + "15", color: disc.color }}>
@@ -87,28 +88,6 @@ export default function DisciplineDetail() {
           </div>
         </Card>
 
-        {/* Média Atual */}
-        <Card className="p-4 group hover:shadow-md transition-shadow">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: disc.color + "15", color: disc.color }}>
-              <TrendingUp className="w-4 h-4" />
-            </div>
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Média</span>
-          </div>
-          {avg !== null ? (
-            <>
-              <div className="flex items-baseline gap-1">
-                <span className={`text-2xl font-bold ${avg >= 10 ? "text-accent" : "text-destructive"}`}>{avg.toFixed(1)}</span>
-                <span className="text-sm text-muted-foreground font-medium">/20</span>
-              </div>
-              <p className="text-[11px] text-muted-foreground mt-1">{publishedEvals.length}/{totalEvals} avaliações</p>
-            </>
-          ) : (
-            <p className="font-medium text-muted-foreground text-lg">—</p>
-          )}
-        </Card>
-
-        {/* Presença */}
         <Card className="p-4 group hover:shadow-md transition-shadow">
           <div className="flex items-center gap-2 mb-3">
             <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: disc.color + "15", color: disc.color }}>
@@ -125,28 +104,47 @@ export default function DisciplineDetail() {
       </div>
 
       {/* Tabs */}
-      <Tabs defaultValue="lessons" className="space-y-5">
+      <Tabs defaultValue="participants" className="space-y-5">
         <div className="border-b">
           <TabsList className="bg-transparent h-auto p-0 gap-0">
             {[
+              { value: "participants", icon: Users, label: "Participantes" },
               { value: "lessons", icon: Video, label: "Gravações" },
               { value: "materials", icon: FileText, label: "Conteúdos" },
               { value: "tasks", icon: ClipboardList, label: "Tarefas" },
               { value: "exams", icon: GraduationCap, label: "Exames" },
               { value: "calendar", icon: Calendar, label: "Calendário" },
-              { value: "resources", icon: FolderOpen, label: "Recursos" },
             ].map(tab => (
               <TabsTrigger
                 key={tab.value}
                 value={tab.value}
                 className="rounded-none border-b-2 border-transparent data-[state=active]:border-current data-[state=active]:shadow-none data-[state=active]:bg-transparent px-4 py-3 text-sm gap-2"
-                style={{ '--tw-text-opacity': 1 } as React.CSSProperties}
               >
                 <tab.icon className="w-4 h-4" />{tab.label}
               </TabsTrigger>
             ))}
           </TabsList>
         </div>
+
+        {/* Participantes */}
+        <TabsContent value="participants" className="space-y-4">
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-muted-foreground">{participantList.length} colegas nesta disciplina</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+            {participantList.map((name, i) => (
+              <div key={i} className="flex items-center gap-3 p-3 rounded-xl border border-border hover:bg-muted/30 transition-colors">
+                <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center text-xs font-bold text-muted-foreground shrink-0">
+                  {name.split(" ").map(n => n[0]).slice(0, 2).join("")}
+                </div>
+                <p className="text-sm font-medium text-foreground truncate">{name}</p>
+              </div>
+            ))}
+          </div>
+          {participantList.length === 0 && (
+            <p className="text-sm text-muted-foreground py-8 text-center">Nenhum participante encontrado.</p>
+          )}
+        </TabsContent>
 
         {/* Gravações */}
         <TabsContent value="lessons" className="space-y-4">
@@ -259,12 +257,12 @@ export default function DisciplineDetail() {
         {/* Tarefas */}
         <TabsContent value="tasks" className="space-y-3">
           {allTasks.length > 0 ? allTasks.map((task) => {
-            const statusConfig = {
+            const statusCfg = {
               entregue: { icon: CheckCircle, label: "Entregue", color: "hsl(var(--accent))", bg: "hsl(var(--accent) / 0.1)" },
               atrasada: { icon: AlertCircle, label: "Atrasada", color: "hsl(var(--destructive))", bg: "hsl(var(--destructive) / 0.1)" },
               pendente: { icon: Clock, label: "Pendente", color: disc.color, bg: disc.color + "12" },
             };
-            const cfg = statusConfig[task.status];
+            const cfg = statusCfg[task.status];
             const StatusIcon = cfg.icon;
             return (
               <Card
@@ -274,7 +272,7 @@ export default function DisciplineDetail() {
                 onClick={() => navigate(`/student/disciplines/${id}/tasks?taskId=${task.id}`)}
               >
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: cfg.bg }}>
-                  <StatusIcon className="w-5 h-5" style={{ color: cfg.color }} />
+                  <ClipboardList className="w-5 h-5" style={{ color: cfg.color }} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-foreground">{task.title}</p>
@@ -303,7 +301,7 @@ export default function DisciplineDetail() {
           <Card className="overflow-hidden">
             <div className="px-5 py-4 border-b flex items-center gap-2" style={{ background: disc.color + "08" }}>
               <GraduationCap className="w-5 h-5" style={{ color: disc.color }} />
-              <h3 className="font-semibold text-foreground">Avaliação</h3>
+              <h3 className="font-semibold text-foreground">Avaliações</h3>
             </div>
             {discGrades ? (
               <div className="divide-y">
@@ -322,7 +320,7 @@ export default function DisciplineDetail() {
                         {ev.published && ev.grade !== null ? (
                           <span className={`text-sm font-bold ${ev.grade >= 10 ? "text-accent" : "text-destructive"}`}>{ev.grade}</span>
                         ) : (
-                          <Clock className="w-4 h-4" style={{ color: disc.color }} />
+                          <GraduationCap className="w-4 h-4" style={{ color: disc.color }} />
                         )}
                       </div>
                       <div>
@@ -360,15 +358,10 @@ export default function DisciplineDetail() {
         {/* Calendário */}
         <TabsContent value="calendar" className="space-y-4">
           {(() => {
-            const taskDates = allTasks.map(t => ({ title: t.title, date: t.dueDate, type: "tarefa" as const, status: t.status }));
-            const examDates = discGrades?.evaluations.map(e => ({ title: e.name, date: e.date, type: "exame" as const, published: e.published })) || [];
-
-            const allDates = [
-              ...taskDates.map(t => ({ title: t.title, date: t.date, type: t.type })),
-              ...examDates.map(e => ({ title: e.title, date: e.date, type: "exame" })),
-            ];
-
-            const typeLabels: Record<string, string> = { tarefa: "Tarefa", exame: "Exame", teste: "Teste", entrega: "Entrega" };
+            const taskDates = allTasks.map(t => ({ title: t.title, date: t.dueDate, type: "tarefa" as const }));
+            const examDates = discGrades?.evaluations.map(e => ({ title: e.name, date: e.date, type: "exame" as const })) || [];
+            const allDates = [...taskDates, ...examDates];
+            const typeLabels: Record<string, string> = { tarefa: "Tarefa", exame: "Exame" };
 
             return allDates.length > 0 ? (
               <div className="space-y-2">
@@ -395,52 +388,6 @@ export default function DisciplineDetail() {
                 <Calendar className="w-10 h-10 text-muted-foreground/30 mx-auto mb-2" />
                 <p className="text-sm text-muted-foreground">Nenhuma data importante registada.</p>
               </Card>
-            );
-          })()}
-        </TabsContent>
-
-        {/* Recursos */}
-        <TabsContent value="resources" className="space-y-3">
-          {(() => {
-            const resources = [
-              { name: "Plano Curricular", description: "Programa completo da disciplina com objectivos e bibliografia", type: "pdf", icon: FileText },
-              { name: "Formulário de Cálculo", description: "Formulário oficial permitido nos testes e exames", type: "pdf", icon: FileText },
-              { name: "Bibliografia Recomendada", description: "Lista de livros e referências para estudo", type: "link", icon: Link2, url: "#" },
-              { name: "Plataforma de Exercícios", description: "Acesso à plataforma online de exercícios práticos", type: "link", icon: ExternalLink, url: "#" },
-              { name: "Gravações Anteriores", description: "Arquivo de aulas gravadas do semestre anterior", type: "folder", icon: FolderOpen },
-              { name: "Regulamento de Avaliação", description: "Regras e critérios de avaliação da disciplina", type: "pdf", icon: FileText },
-            ];
-
-            return (
-              <div className="space-y-2">
-                {resources.map((res, i) => (
-                  <Card key={i} className="p-4 flex items-center gap-3 hover:shadow-sm transition-shadow">
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: disc.color + "12" }}>
-                      <res.icon className="w-5 h-5" style={{ color: disc.color }} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-foreground">{res.name}</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">{res.description}</p>
-                    </div>
-                    <div className="flex items-center gap-1 shrink-0">
-                      {res.type === "link" ? (
-                        <button className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground" title="Abrir">
-                          <ExternalLink className="w-4 h-4" />
-                        </button>
-                      ) : (
-                        <>
-                          <button className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground" title="Ver">
-                            <Eye className="w-4 h-4" />
-                          </button>
-                          <button className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground" title="Descarregar">
-                            <Download className="w-4 h-4" />
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  </Card>
-                ))}
-              </div>
             );
           })()}
         </TabsContent>
