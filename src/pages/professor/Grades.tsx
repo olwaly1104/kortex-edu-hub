@@ -5,9 +5,9 @@ import { Badge } from "@/components/ui/badge";
 import { Award, TrendingUp, Users, Clock, CheckCircle, ClipboardList, FolderKanban, BookOpen, GraduationCap, MapPin, Calendar, ArrowRight } from "lucide-react";
 
 const getEvalIcon = (type: string) => {
-  if (type === "exame") return ClipboardList;
+  if (type === "exame") return GraduationCap;
   if (type === "quiz") return FolderKanban;
-  return BookOpen;
+  return ClipboardList;
 };
 
 export default function ProfessorGrades() {
@@ -52,17 +52,11 @@ export default function ProfessorGrades() {
         <button
           onClick={() => setFilterTurma("all")}
           className={`px-3.5 py-2 rounded-lg text-xs font-medium border transition-all ${filterTurma === "all" ? "bg-primary text-primary-foreground border-primary shadow-sm" : "bg-card text-muted-foreground border-border hover:border-primary/30 hover:text-foreground"}`}
-        >
-          Todas
-        </button>
+        >Todas</button>
         {allTurmas.map(t => (
-          <button
-            key={t.id}
-            onClick={() => setFilterTurma(t.id)}
+          <button key={t.id} onClick={() => setFilterTurma(t.id)}
             className={`px-3.5 py-2 rounded-lg text-xs font-medium border transition-all ${filterTurma === t.id ? "bg-primary text-primary-foreground border-primary shadow-sm" : "bg-card text-muted-foreground border-border hover:border-primary/30 hover:text-foreground"}`}
-          >
-            {t.name}
-          </button>
+          >{t.name}</button>
         ))}
       </div>
 
@@ -78,20 +72,20 @@ export default function ProfessorGrades() {
           if (turmaTasks.length === 0) return null;
 
           return (
-            <div key={turma.id} className="rounded-xl border border-border bg-card overflow-hidden">
+            <div key={turma.id} className="rounded-xl border-2 border-border bg-card overflow-hidden">
               {/* Turma header */}
               <div className="px-5 py-4 border-b border-border bg-muted/20 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-primary/10">
-                    <GraduationCap className="w-4 h-4 text-primary" />
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-primary/10 border border-primary/20">
+                    <GraduationCap className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-foreground text-sm">{turma.name}</h3>
+                    <h3 className="font-bold text-foreground">{turma.name}</h3>
                     <p className="text-xs text-muted-foreground">{turma.course} · {turmaTasks.length} avaliações · {turma.students} estudantes</p>
                   </div>
                 </div>
                 {turmaAvg !== null && (
-                  <div className="text-right">
+                  <div className="text-right px-4 py-2 rounded-xl border border-border bg-card">
                     <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Média</p>
                     <p className={`text-xl font-bold ${turmaAvg >= 10 ? "text-accent" : "text-destructive"}`}>{turmaAvg}</p>
                   </div>
@@ -109,10 +103,10 @@ export default function ProfessorGrades() {
                       className="px-5 py-3.5 flex items-center gap-3 cursor-pointer hover:bg-muted/20 transition-colors group"
                       onClick={() => navigate(`/professor/tasks/${task.id}`)}
                     >
-                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border ${
                         task.avgGrade !== null
-                          ? task.avgGrade >= 10 ? "bg-accent/10" : "bg-destructive/10"
-                          : "bg-muted"
+                          ? task.avgGrade >= 10 ? "bg-accent/10 border-accent/20" : "bg-destructive/10 border-destructive/20"
+                          : "bg-muted border-border"
                       }`}>
                         {task.avgGrade !== null ? (
                           <span className={`text-sm font-bold ${task.avgGrade >= 10 ? "text-accent" : "text-destructive"}`}>{task.avgGrade}</span>
@@ -123,6 +117,10 @@ export default function ProfessorGrades() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <p className="text-sm font-medium text-foreground group-hover:text-primary transition-colors truncate">{task.title}</p>
+                          <Badge variant="outline" className="text-[10px] gap-1 rounded-md border-border">
+                            {task.type === "exame" ? <GraduationCap className="w-3 h-3" /> : task.type === "quiz" ? <FolderKanban className="w-3 h-3" /> : <ClipboardList className="w-3 h-3" />}
+                            {task.type === "tarefa" ? "Tarefa" : task.type === "quiz" ? "Quiz" : "Exame"}
+                          </Badge>
                           <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: disc?.color }} />
                           <span className="text-[10px] text-muted-foreground shrink-0">{disc?.code}</span>
                         </div>
@@ -142,7 +140,7 @@ export default function ProfessorGrades() {
                         {task.avgGrade !== null ? (
                           <div className="flex items-center gap-1.5 text-accent">
                             <CheckCircle className="w-4 h-4" />
-                            <span className="text-xs font-medium">Corrigido</span>
+                            <span className="text-xs font-medium">Atribuído</span>
                           </div>
                         ) : (
                           <div className="flex items-center gap-1.5 text-muted-foreground">

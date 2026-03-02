@@ -1,15 +1,23 @@
 import { useState } from "react";
-import { Wallet, TrendingUp, Calendar, FileText, Download, ChevronDown, ChevronRight, Eye, AlertTriangle, MessageSquare, X } from "lucide-react";
+import { Wallet, TrendingUp, Calendar, FileText, Download, Eye, AlertTriangle, MessageSquare, X, ChevronRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useToast } from "@/hooks/use-toast";
 
 const salaryHistory = [
-  { month: "Março 2025", gross: 450000, net: 382500, date: "31 Mar 2025", status: "pending" as const },
-  { month: "Fevereiro 2025", gross: 450000, net: 382500, date: "28 Fev 2025", status: "paid" as const },
   { month: "Janeiro 2025", gross: 450000, net: 382500, date: "31 Jan 2025", status: "paid" as const },
-  { month: "Dezembro 2024", gross: 450000, net: 382500, date: "31 Dez 2024", status: "paid" as const },
-  { month: "Novembro 2024", gross: 450000, net: 382500, date: "30 Nov 2024", status: "paid" as const },
-  { month: "Outubro 2024", gross: 450000, net: 382500, date: "31 Out 2024", status: "paid" as const },
+  { month: "Fevereiro 2025", gross: 450000, net: 382500, date: "28 Fev 2025", status: "paid" as const },
+  { month: "Março 2025", gross: 450000, net: 382500, date: "31 Mar 2025", status: "pending" as const },
+  { month: "Abril 2025", gross: 450000, net: 382500, date: "30 Abr 2025", status: "pending" as const },
+  { month: "Maio 2025", gross: 450000, net: 382500, date: "31 Mai 2025", status: "pending" as const },
+  { month: "Junho 2025", gross: 450000, net: 382500, date: "30 Jun 2025", status: "pending" as const },
+  { month: "Julho 2025", gross: 450000, net: 382500, date: "31 Jul 2025", status: "pending" as const },
+  { month: "Agosto 2025", gross: 450000, net: 382500, date: "31 Ago 2025", status: "pending" as const },
+  { month: "Setembro 2025", gross: 450000, net: 382500, date: "30 Set 2025", status: "pending" as const },
+  { month: "Outubro 2025", gross: 450000, net: 382500, date: "31 Out 2025", status: "pending" as const },
+  { month: "Novembro 2025", gross: 450000, net: 382500, date: "30 Nov 2025", status: "pending" as const },
+  { month: "Dezembro 2025", gross: 450000, net: 382500, date: "31 Dez 2025", status: "pending" as const },
 ];
 
 const deductions = [
@@ -19,9 +27,9 @@ const deductions = [
 ];
 
 const multas = [
-  { id: "m1", date: "15 Fev 2025", reason: "Atraso na entrega de notas", amount: 5000, status: "active" as const },
-  { id: "m2", date: "20 Jan 2025", reason: "Falta injustificada", amount: 8000, status: "disputed" as const },
-  { id: "m3", date: "05 Dez 2024", reason: "Atraso na entrega de programa", amount: 3000, status: "paid" as const },
+  { id: "m1", date: "15 Fev 2025", reason: "Atraso na entrega de notas", amount: 5000, status: "aplicada" as const, details: "Notas do Teste 1 de Matemática II entregues com 3 dias de atraso. Prazo era 12/02/2025." },
+  { id: "m2", date: "20 Jan 2025", reason: "Falta injustificada", amount: 8000, status: "pendente" as const, details: "Falta à aula de 20/01/2025 sem justificação apresentada dentro do prazo regulamentar." },
+  { id: "m3", date: "05 Dez 2024", reason: "Atraso na entrega de programa", amount: 3000, status: "aplicada" as const, details: "Programa da disciplina de Estatística entregue com 5 dias de atraso." },
 ];
 
 function formatCurrency(value: number) {
@@ -29,10 +37,18 @@ function formatCurrency(value: number) {
 }
 
 export default function ProfessorFinances() {
-  const [expandedMonth, setExpandedMonth] = useState<string | null>(null);
-  const [showMultas, setShowMultas] = useState(false);
+  const { toast } = useToast();
+  const [multasModalOpen, setMultasModalOpen] = useState(false);
+  const [selectedMulta, setSelectedMulta] = useState<typeof multas[0] | null>(null);
+  const [historicoModalOpen, setHistoricoModalOpen] = useState(false);
+  const [selectedMonth, setSelectedMonth] = useState<typeof salaryHistory[0] | null>(null);
 
-  const totalMultasActive = multas.filter(m => m.status === "active").reduce((s, m) => s + m.amount, 0);
+  const totalMultasAplicadas = multas.filter(m => m.status === "aplicada").reduce((s, m) => s + m.amount, 0);
+  const aplicadaCount = multas.filter(m => m.status === "aplicada").length;
+  const pendenteCount = multas.filter(m => m.status === "pendente").length;
+
+  // Net salary = liquido - applied multas
+  const salarioRecebido = 382500 - totalMultasAplicadas;
 
   return (
     <div className="p-6 lg:p-8 max-w-5xl mx-auto space-y-6 animate-fade-in">
@@ -94,142 +110,200 @@ export default function ProfessorFinances() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <p className="text-sm text-foreground font-medium">Multas</p>
-                {totalMultasActive > 0 && (
-                  <Badge className="bg-destructive/10 text-destructive border-0 text-[10px]">
-                    {multas.filter(m => m.status === "active").length} activa(s)
-                  </Badge>
-                )}
+                <Badge className="bg-destructive/10 text-destructive border-0 text-[10px]">{aplicadaCount} aplicada(s)</Badge>
+                {pendenteCount > 0 && <Badge className="bg-secondary/10 text-secondary border-0 text-[10px]">{pendenteCount} pendente(s)</Badge>}
               </div>
               <div className="flex items-center gap-3">
-                <p className="text-sm font-semibold text-destructive">-{formatCurrency(totalMultasActive)}</p>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="text-xs h-7 gap-1.5 rounded-lg"
-                  onClick={() => setShowMultas(!showMultas)}
-                >
-                  <Eye className="w-3.5 h-3.5" />
-                  {showMultas ? "Fechar" : "Ver multas"}
+                <Button variant="outline" size="sm" className="text-xs h-7 gap-1.5 rounded-lg"
+                  onClick={() => toast({ title: "PDF gerado", description: "Tabela de multas a descarregar..." })}>
+                  <FileText className="w-3.5 h-3.5" /> Ver Tabela de Multas
+                </Button>
+                <Button variant="outline" size="sm" className="text-xs h-7 gap-1.5 rounded-lg"
+                  onClick={() => setMultasModalOpen(true)}>
+                  <Eye className="w-3.5 h-3.5" /> Ver Multas
                 </Button>
               </div>
             </div>
-
-            {/* Multas panel */}
-            {showMultas && (
-              <div className="mt-4 rounded-lg border border-border bg-muted/30 overflow-hidden">
-                <div className="px-4 py-3 border-b border-border bg-muted/50">
-                  <p className="text-xs font-semibold text-foreground uppercase tracking-wider">As Suas Multas</p>
-                </div>
-                <div className="divide-y divide-border">
-                  {multas.map(m => (
-                    <div key={m.id} className="px-4 py-3 flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                          m.status === "active" ? "bg-destructive/10" : m.status === "disputed" ? "bg-secondary/10" : "bg-muted"
-                        }`}>
-                          <AlertTriangle className={`w-4 h-4 ${
-                            m.status === "active" ? "text-destructive" : m.status === "disputed" ? "text-secondary" : "text-muted-foreground"
-                          }`} />
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium text-foreground">{m.reason}</p>
-                          <p className="text-xs text-muted-foreground">{m.date}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <div className="text-right">
-                          <p className="text-sm font-semibold text-foreground">{formatCurrency(m.amount)}</p>
-                          <Badge className={`text-[10px] border-0 ${
-                            m.status === "active" ? "bg-destructive/10 text-destructive" :
-                            m.status === "disputed" ? "bg-secondary/10 text-secondary" :
-                            "bg-accent/10 text-accent"
-                          }`}>
-                            {m.status === "active" ? "Activa" : m.status === "disputed" ? "Em disputa" : "Paga"}
-                          </Badge>
-                        </div>
-                        {m.status === "active" && (
-                          <Button variant="outline" size="sm" className="text-xs h-7 gap-1 rounded-lg">
-                            <MessageSquare className="w-3 h-3" /> Disputar
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </div>
 
-      {/* Salary History */}
+      {/* Histórico Salarial */}
       <div className="rounded-xl border border-border bg-card overflow-hidden">
         <div className="p-5 border-b border-border flex items-center justify-between">
           <h2 className="text-sm font-semibold text-foreground">Histórico Salarial</h2>
-          <Button variant="outline" size="sm" className="text-xs h-7 gap-1.5 rounded-lg">
-            <Download className="w-3.5 h-3.5" /> Exportar Tudo
+          <Button variant="outline" size="sm" className="text-xs h-8 gap-1.5 rounded-lg"
+            onClick={() => setHistoricoModalOpen(true)}>
+            <Eye className="w-3.5 h-3.5" /> Ver Todos
           </Button>
         </div>
         <div className="divide-y divide-border">
-          {salaryHistory.map((s) => {
-            const isExpanded = expandedMonth === s.month;
-            return (
-              <div key={s.month}>
-                <div
-                  className="flex items-center justify-between px-5 py-4 cursor-pointer hover:bg-muted/30 transition-colors"
-                  onClick={() => setExpandedMonth(isExpanded ? null : s.month)}
-                >
+          {salaryHistory.filter(s => s.status === "paid").slice(0, 3).map((s) => (
+            <div key={s.month} className="flex items-center justify-between px-5 py-3.5">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center shrink-0">
+                  <FileText className="w-4 h-4 text-accent" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-foreground">{s.month}</p>
+                  <p className="text-xs text-muted-foreground">{s.date}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <p className="text-sm font-semibold text-foreground">{formatCurrency(s.net)}</p>
+                <Badge className="bg-accent/10 text-accent border-0 text-[10px]">Pago</Badge>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Multas Modal */}
+      <Dialog open={multasModalOpen} onOpenChange={setMultasModalOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5 text-destructive" /> As Suas Multas
+            </DialogTitle>
+          </DialogHeader>
+          {selectedMulta ? (
+            <div className="space-y-4">
+              <Button variant="ghost" size="sm" className="text-xs gap-1" onClick={() => setSelectedMulta(null)}>
+                ← Voltar
+              </Button>
+              <div className="rounded-xl border border-border p-5 space-y-4">
+                <div className="flex items-center justify-between">
+                  <Badge className={`text-[10px] border-0 ${selectedMulta.status === "aplicada" ? "bg-destructive/10 text-destructive" : "bg-secondary/10 text-secondary"}`}>
+                    {selectedMulta.status === "aplicada" ? "Aplicada" : "Pendente"}
+                  </Badge>
+                  <p className="text-xs text-muted-foreground">{selectedMulta.date}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-foreground">{selectedMulta.reason}</p>
+                  <p className="text-xs text-muted-foreground mt-2 leading-relaxed">{selectedMulta.details}</p>
+                </div>
+                <div className="rounded-lg border border-border bg-muted/30 p-3">
+                  <p className="text-xs text-muted-foreground">Valor da multa</p>
+                  <p className="text-lg font-bold text-foreground">{formatCurrency(selectedMulta.amount)}</p>
+                  {selectedMulta.status === "aplicada" && (
+                    <p className="text-[11px] text-muted-foreground mt-1">Este valor será descontado automaticamente do salário.</p>
+                  )}
+                </div>
+                {selectedMulta.status !== "aplicada" && (
+                  <Button variant="outline" size="sm" className="w-full gap-2 text-xs"
+                    onClick={() => { toast({ title: "Disputa submetida", description: "A sua disputa foi registada e será analisada." }); setSelectedMulta(null); }}>
+                    <MessageSquare className="w-3.5 h-3.5" /> Disputar Multa
+                  </Button>
+                )}
+                {selectedMulta.status === "aplicada" && (
+                  <Button variant="outline" size="sm" className="w-full gap-2 text-xs"
+                    onClick={() => { toast({ title: "Disputa submetida", description: "A sua disputa foi registada e será analisada." }); setSelectedMulta(null); }}>
+                    <MessageSquare className="w-3.5 h-3.5" /> Disputar
+                  </Button>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="divide-y divide-border">
+              {multas.map(m => (
+                <div key={m.id} className="flex items-center justify-between py-3.5 cursor-pointer hover:bg-muted/30 transition-colors rounded-lg px-2 -mx-2"
+                  onClick={() => setSelectedMulta(m)}>
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center shrink-0">
-                      <FileText className="w-4 h-4 text-muted-foreground" />
+                    <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${m.status === "aplicada" ? "bg-destructive/10" : "bg-secondary/10"}`}>
+                      <AlertTriangle className={`w-4 h-4 ${m.status === "aplicada" ? "text-destructive" : "text-secondary"}`} />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-foreground">{m.reason}</p>
+                      <p className="text-xs text-muted-foreground">{m.date}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="text-right">
+                      <p className="text-sm font-semibold text-foreground">{formatCurrency(m.amount)}</p>
+                      <Badge className={`text-[10px] border-0 ${m.status === "aplicada" ? "bg-destructive/10 text-destructive" : "bg-secondary/10 text-secondary"}`}>
+                        {m.status === "aplicada" ? "Aplicada" : "Pendente"}
+                      </Badge>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Histórico Salarial Modal */}
+      <Dialog open={historicoModalOpen} onOpenChange={setHistoricoModalOpen}>
+        <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Wallet className="w-5 h-5 text-primary" /> Histórico Salarial
+            </DialogTitle>
+          </DialogHeader>
+          {selectedMonth ? (
+            <div className="space-y-4">
+              <Button variant="ghost" size="sm" className="text-xs gap-1" onClick={() => setSelectedMonth(null)}>
+                ← Voltar
+              </Button>
+              <div className="rounded-xl border border-border p-5 space-y-4">
+                <h3 className="font-semibold text-foreground">{selectedMonth.month}</h3>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="rounded-lg border border-border bg-muted/30 p-3">
+                    <p className="text-xs text-muted-foreground">Bruto</p>
+                    <p className="text-lg font-bold text-foreground">{formatCurrency(selectedMonth.gross)}</p>
+                  </div>
+                  <div className="rounded-lg border border-border bg-muted/30 p-3">
+                    <p className="text-xs text-muted-foreground">Líquido</p>
+                    <p className="text-lg font-bold text-foreground">{formatCurrency(selectedMonth.net)}</p>
+                  </div>
+                </div>
+                <Badge className={`text-[10px] border-0 ${selectedMonth.status === "paid" ? "bg-accent/10 text-accent" : "bg-secondary/10 text-secondary"}`}>
+                  {selectedMonth.status === "paid" ? "Pago" : "Pendente"}
+                </Badge>
+                {selectedMonth.status === "paid" && (
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm" className="text-xs h-9 gap-1.5 rounded-lg flex-1"
+                      onClick={() => toast({ title: "PDF gerado", description: "Recibo de vencimento a descarregar..." })}>
+                      <FileText className="w-3.5 h-3.5" /> Recibo de Vencimento
+                    </Button>
+                    <Button variant="outline" size="sm" className="text-xs h-9 gap-1.5 rounded-lg flex-1"
+                      onClick={() => toast({ title: "PDF gerado", description: "Comprovativo a descarregar..." })}>
+                      <Download className="w-3.5 h-3.5" /> Comprovativo
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="divide-y divide-border">
+              {salaryHistory.map((s) => (
+                <div key={s.month} className="flex items-center justify-between py-3 cursor-pointer hover:bg-muted/30 transition-colors rounded-lg px-2 -mx-2"
+                  onClick={() => setSelectedMonth(s)}>
+                  <div className="flex items-center gap-3">
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${s.status === "paid" ? "bg-accent/10" : "bg-muted"}`}>
+                      <FileText className={`w-4 h-4 ${s.status === "paid" ? "text-accent" : "text-muted-foreground"}`} />
                     </div>
                     <div>
                       <p className="text-sm font-medium text-foreground">{s.month}</p>
                       <p className="text-xs text-muted-foreground">{s.date}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-3">
                     <div className="text-right">
                       <p className="text-sm font-semibold text-foreground">{formatCurrency(s.net)}</p>
-                      <Badge className={`text-[10px] border-0 ${
-                        s.status === "paid" ? "bg-accent/10 text-accent" : "bg-secondary/10 text-secondary"
-                      }`}>
+                      <Badge className={`text-[10px] border-0 ${s.status === "paid" ? "bg-accent/10 text-accent" : "bg-secondary/10 text-secondary"}`}>
                         {s.status === "paid" ? "Pago" : "Pendente"}
                       </Badge>
                     </div>
-                    {isExpanded ? <ChevronDown className="w-4 h-4 text-muted-foreground" /> : <ChevronRight className="w-4 h-4 text-muted-foreground" />}
+                    <ChevronRight className="w-4 h-4 text-muted-foreground" />
                   </div>
                 </div>
-
-                {isExpanded && (
-                  <div className="px-5 pb-4 pt-0">
-                    <div className="rounded-lg border border-border bg-muted/20 p-4 space-y-3">
-                      <div className="grid grid-cols-2 gap-3 text-xs">
-                        <div>
-                          <p className="text-muted-foreground">Bruto</p>
-                          <p className="font-semibold text-foreground">{formatCurrency(s.gross)}</p>
-                        </div>
-                        <div>
-                          <p className="text-muted-foreground">Líquido</p>
-                          <p className="font-semibold text-foreground">{formatCurrency(s.net)}</p>
-                        </div>
-                      </div>
-                      <div className="flex gap-2 pt-1">
-                        <Button variant="outline" size="sm" className="text-xs h-8 gap-1.5 rounded-lg flex-1">
-                          <FileText className="w-3.5 h-3.5" /> Recibo de Vencimento
-                        </Button>
-                        <Button variant="outline" size="sm" className="text-xs h-8 gap-1.5 rounded-lg flex-1">
-                          <Download className="w-3.5 h-3.5" /> Comprovativo
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </div>
+              ))}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

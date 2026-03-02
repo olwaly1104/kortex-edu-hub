@@ -2,7 +2,7 @@ import { disciplines, lessons, grades } from "@/data/mockData";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Link } from "react-router-dom";
-import { BookOpen, User, Clock, MapPin, ChevronRight, TrendingUp, FileText } from "lucide-react";
+import { BookOpen, User, Clock, MapPin, ChevronRight, FileText } from "lucide-react";
 
 export default function StudentDisciplines() {
   return (
@@ -37,15 +37,6 @@ export default function StudentDisciplines() {
           const total = disc.attendance.present + disc.attendance.absent + disc.attendance.justified;
           const attendancePct = Math.round((disc.attendance.present / total) * 100);
           const progressPct = Math.round((disc.progress.watched / disc.progress.total) * 100);
-          
-          // Calculate média geral for this discipline
-          const discGrades = grades.find(g => g.disciplineId === disc.id);
-          const publishedEvals = discGrades?.evaluations.filter(e => e.published && e.grade !== null) || [];
-          const weightedSum = publishedEvals.reduce((sum, e) => sum + (e.grade! * e.weight), 0);
-          const totalWeight = publishedEvals.reduce((sum, e) => sum + e.weight, 0);
-          const avg = totalWeight > 0 ? weightedSum / totalWeight : null;
-
-          // Count total contents (materials) across lessons
           const discLessons = lessons.filter(l => l.disciplineId === disc.id);
           const totalContents = discLessons.reduce((s, l) => s + l.materials.length, 0);
 
@@ -76,16 +67,6 @@ export default function StudentDisciplines() {
                       <span className={`font-semibold ${attendancePct >= 75 ? "text-accent" : "text-destructive"}`}>{attendancePct}%</span>
                     </div>
                     <Progress value={attendancePct} className="h-1.5" />
-                  </div>
-                  <div>
-                    <div className="flex justify-between text-xs mb-1">
-                      <span className="text-muted-foreground flex items-center gap-1"><TrendingUp className="w-3 h-3" /> Média Geral</span>
-                      {avg !== null ? (
-                        <span className={`font-semibold ${avg >= 10 ? "text-accent" : "text-destructive"}`}>{avg.toFixed(1)}/20</span>
-                      ) : (
-                        <span className="font-semibold text-muted-foreground">—</span>
-                      )}
-                    </div>
                   </div>
                   <div>
                     <div className="flex justify-between text-xs mb-1">
