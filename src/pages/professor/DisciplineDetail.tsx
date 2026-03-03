@@ -22,8 +22,9 @@ export default function ProfessorDisciplineDetail() {
   const { toast } = useToast();
   const disc = profDisciplines.find(d => d.id === id);
 
-  const initialTurma = searchParams.get("turma") || "all";
-  const [selectedTurma, setSelectedTurma] = useState(initialTurma);
+  const turmaParam = searchParams.get("turma");
+  const isSingleTurma = !!turmaParam;
+  const [selectedTurma, setSelectedTurma] = useState(turmaParam || "all");
 
   const discLessons = profLessons.filter(l => l.disciplineId === id && (selectedTurma === "all" || l.turmaId === selectedTurma));
   const discTasks = profTasks.filter(t => t.disciplineId === id && (selectedTurma === "all" || t.turmaId === selectedTurma));
@@ -79,40 +80,54 @@ export default function ProfessorDisciplineDetail() {
       </Link>
 
       {/* Hero */}
-      <div className="relative overflow-hidden rounded-2xl p-6 lg:p-8" style={{ background: `linear-gradient(135deg, ${disc.color}12, ${disc.color}06)` }}>
-        <div className="absolute top-0 right-0 w-40 h-40 rounded-full opacity-[0.07]" style={{ background: disc.color, transform: "translate(30%, -30%)" }} />
-        <div className="relative flex items-start gap-5">
-          <div className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 shadow-sm" style={{ background: disc.color, color: "white" }}>
-            <BookOpen className="w-7 h-7" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1">
-              <Badge variant="outline" className="text-xs font-mono" style={{ borderColor: disc.color + "40", color: disc.color }}>{disc.code}</Badge>
-              {disc.turmas.map(t => (
-                <Badge key={t.id} variant="outline" className="text-[10px]">{t.name}</Badge>
-              ))}
+      {(() => {
+        const activeTurma = isSingleTurma ? disc.turmas.find(t => t.id === turmaParam) : null;
+        return (
+          <div className="relative overflow-hidden rounded-2xl p-6 lg:p-8" style={{ background: `linear-gradient(135deg, ${disc.color}12, ${disc.color}06)` }}>
+            <div className="absolute top-0 right-0 w-40 h-40 rounded-full opacity-[0.07]" style={{ background: disc.color, transform: "translate(30%, -30%)" }} />
+            <div className="relative flex items-start gap-5">
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 shadow-sm" style={{ background: disc.color, color: "white" }}>
+                <BookOpen className="w-7 h-7" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <Badge variant="outline" className="text-xs font-mono" style={{ borderColor: disc.color + "40", color: disc.color }}>{disc.code}</Badge>
+                  {activeTurma && <Badge variant="outline" className="text-[10px]">{activeTurma.name}</Badge>}
+                  {!isSingleTurma && disc.turmas.map(t => (
+                    <Badge key={t.id} variant="outline" className="text-[10px]">{t.name}</Badge>
+                  ))}
+                </div>
+                <h1 className="text-2xl lg:text-3xl font-bold text-foreground">{disc.name}</h1>
+                <p className="text-muted-foreground mt-2 leading-relaxed max-w-2xl">{disc.summary}</p>
+                {activeTurma && (
+                  <div className="flex items-center gap-4 mt-3 text-sm text-muted-foreground">
+                    <span className="flex items-center gap-1.5"><GraduationCap className="w-4 h-4" />{activeTurma.course}</span>
+                    <span className="flex items-center gap-1.5"><Calendar className="w-4 h-4" />{activeTurma.year}º Ano</span>
+                  </div>
+                )}
+              </div>
             </div>
-            <h1 className="text-2xl lg:text-3xl font-bold text-foreground">{disc.name}</h1>
-            <p className="text-muted-foreground mt-2 leading-relaxed max-w-2xl">{disc.summary}</p>
           </div>
-        </div>
-      </div>
+        );
+      })()}
 
-      {/* Turma selector */}
-      <div className="flex items-center gap-2">
-        <span className="text-xs text-muted-foreground font-medium">Turma:</span>
-        <button
-          onClick={() => setSelectedTurma("all")}
-          className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${selectedTurma === "all" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}
-        >Todas</button>
-        {disc.turmas.map(t => (
+      {/* Turma selector — only when not locked to a single turma */}
+      {!isSingleTurma && (
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-muted-foreground font-medium">Turma:</span>
           <button
-            key={t.id}
-            onClick={() => setSelectedTurma(t.id)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${selectedTurma === t.id ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}
-          >{t.name}</button>
-        ))}
-      </div>
+            onClick={() => setSelectedTurma("all")}
+            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${selectedTurma === "all" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}
+          >Todas</button>
+          {disc.turmas.map(t => (
+            <button
+              key={t.id}
+              onClick={() => setSelectedTurma(t.id)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${selectedTurma === t.id ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}
+            >{t.name}</button>
+          ))}
+        </div>
+      )}
 
       {/* Key metrics */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
