@@ -2,6 +2,7 @@ import { useParams, Link } from "react-router-dom";
 import { coordCursoInfo, coordTurmas, coordDisciplinas, coordTurmaLessons, coordTurmaResources } from "@/data/institutionData";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, GraduationCap, Users, Award, ChevronRight, BookOpen, CheckCircle, UserCheck, Video, FileText, Calendar, MapPin } from "lucide-react";
 
 export default function CoordenadorAnoDetail() {
@@ -69,7 +70,7 @@ export default function CoordenadorAnoDetail() {
         </Card>
       </div>
 
-      {/* Turmas grid — same style as professor */}
+      {/* Turmas grid */}
       <div>
         <h2 className="text-lg font-semibold text-foreground mb-4">Turmas</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -81,17 +82,18 @@ export default function CoordenadorAnoDetail() {
 
             return (
               <Link key={t.id} to={`/coordenador/anos/${yearNum}/turma/${t.id}`}>
-                <Card className="overflow-hidden hover:shadow-lg transition-shadow h-full">
-                  <div className="h-1.5 bg-primary" />
+                <Card className="overflow-hidden hover:shadow-lg transition-all h-full group">
                   <div className="p-5">
+                    {/* Header */}
                     <div className="flex items-start justify-between mb-4">
                       <div>
-                        <h3 className="font-bold text-foreground text-lg">{t.name}</h3>
-                        <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
-                          <span>{yearNum}º Ano Eng. Civil</span>
+                        <div className="flex items-center gap-2 mb-1">
+                          <Badge variant="outline" className="text-[10px] font-mono text-muted-foreground">{t.id.toUpperCase()}</Badge>
+                          <span className="text-xs text-muted-foreground">{yearNum}º Ano Eng. Civil</span>
                         </div>
+                        <h3 className="font-bold text-foreground text-lg">{t.name}</h3>
                       </div>
-                      <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                      <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
                     </div>
 
                     {/* Key metrics row */}
@@ -113,12 +115,8 @@ export default function CoordenadorAnoDetail() {
                     {/* Details */}
                     <div className="space-y-2.5 pt-3 border-t border-border/50">
                       <div className="flex items-center justify-between text-xs">
-                        <span className="text-muted-foreground flex items-center gap-1.5"><UserCheck className="w-3.5 h-3.5" /> Director</span>
+                        <span className="text-muted-foreground flex items-center gap-1.5"><UserCheck className="w-3.5 h-3.5" /> Professor</span>
                         <span className="font-semibold text-foreground">{t.director.replace("Prof. ", "")}</span>
-                      </div>
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="text-muted-foreground flex items-center gap-1.5"><BookOpen className="w-3.5 h-3.5" /> Cadeiras</span>
-                        <span className="font-semibold text-foreground">{t.disciplinas}</span>
                       </div>
                       <div>
                         <div className="flex justify-between text-xs mb-1">
