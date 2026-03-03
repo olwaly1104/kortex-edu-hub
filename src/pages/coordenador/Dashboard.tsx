@@ -185,9 +185,9 @@ export default function CoordenadorCursoDashboard() {
             <h2 className="text-base font-semibold text-foreground">Alertas em Risco</h2>
           </div>
 
-          <div className="grid grid-cols-3 gap-0">
+          <div className="grid grid-cols-3 gap-0 flex-1">
             {/* Docentes em Risco */}
-            <div className="pr-3 border-r border-border">
+            <div className="pr-3 border-r border-border flex flex-col">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1">
                   <GraduationCap className="w-3 h-3" /> Docentes
@@ -197,10 +197,10 @@ export default function CoordenadorCursoDashboard() {
                   Ver todos
                 </Link>
               </div>
-              <div className="space-y-1.5">
+              <div className="flex flex-col gap-1.5 flex-1">
                 {docentesEmRisco.slice(0, 5).map(d => (
-                  <Link key={d.id} to="/coordenador/docentes">
-                    <div className="px-2 py-2 rounded-lg border border-border bg-card border-l-[3px] border-l-destructive hover:bg-muted/40 transition-colors cursor-pointer">
+                  <Link key={d.id} to="/coordenador/docentes" className="flex-1 flex">
+                    <div className="px-2.5 py-2.5 rounded-lg border border-border bg-card border-l-[3px] border-l-destructive hover:bg-muted/40 transition-colors cursor-pointer w-full flex flex-col justify-center">
                       <p className="text-[11px] font-semibold text-foreground leading-tight truncate">{d.name.replace("Prof. ", "")}</p>
                       <p className="text-[9px] text-muted-foreground truncate">{d.department}</p>
                       <div className="flex items-center gap-2 mt-1 text-[9px]">
@@ -215,7 +215,7 @@ export default function CoordenadorCursoDashboard() {
             </div>
 
             {/* Turmas em Risco */}
-            <div className="px-3 border-r border-border">
+            <div className="px-3 border-r border-border flex flex-col">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1">
                   <Users className="w-3 h-3" /> Turmas
@@ -225,10 +225,10 @@ export default function CoordenadorCursoDashboard() {
                   Ver todos
                 </Link>
               </div>
-              <div className="space-y-1.5">
+              <div className="flex flex-col gap-1.5 flex-1">
                 {turmasEmRisco.slice(0, 5).map(t => (
-                  <Link key={t.id} to={`/coordenador/anos/${t.year}/turma/${t.id}`}>
-                    <div className="px-2 py-2 rounded-lg border border-border bg-card border-l-[3px] border-l-destructive hover:bg-muted/40 transition-colors cursor-pointer">
+                  <Link key={t.id} to={`/coordenador/anos/${t.year}/turma/${t.id}`} className="flex-1 flex">
+                    <div className="px-2.5 py-2.5 rounded-lg border border-border bg-card border-l-[3px] border-l-destructive hover:bg-muted/40 transition-colors cursor-pointer w-full flex flex-col justify-center">
                       <p className="text-[11px] font-semibold text-foreground leading-tight">{t.name} <span className="font-normal text-[9px] text-muted-foreground">• {t.year}º Ano</span></p>
                       <p className="text-[9px] text-muted-foreground truncate">{t.director}</p>
                       <div className="flex items-center gap-2 mt-1 text-[9px]">
@@ -243,7 +243,7 @@ export default function CoordenadorCursoDashboard() {
             </div>
 
             {/* Estudantes em Risco */}
-            <div className="pl-3">
+            <div className="pl-3 flex flex-col">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1">
                   <UserX className="w-3 h-3" /> Estudantes
@@ -253,10 +253,10 @@ export default function CoordenadorCursoDashboard() {
                   Ver todos
                 </Link>
               </div>
-              <div className="space-y-1.5">
+              <div className="flex flex-col gap-1.5 flex-1">
                 {estudantesEmRisco.slice(0, 5).map(e => (
-                  <Link key={e.id} to="/coordenador/estudantes">
-                    <div className="px-2 py-2 rounded-lg border border-border bg-card border-l-[3px] border-l-destructive hover:bg-muted/40 transition-colors cursor-pointer">
+                  <Link key={e.id} to="/coordenador/estudantes" className="flex-1 flex">
+                    <div className="px-2.5 py-2.5 rounded-lg border border-border bg-card border-l-[3px] border-l-destructive hover:bg-muted/40 transition-colors cursor-pointer w-full flex flex-col justify-center">
                       <p className="text-[11px] font-semibold text-foreground leading-tight truncate">{e.name}</p>
                       <p className="text-[9px] text-muted-foreground">{e.year}º Ano • Turma {e.turma}</p>
                       <div className="flex items-center gap-2 mt-1 text-[9px]">
