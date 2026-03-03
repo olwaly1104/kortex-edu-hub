@@ -298,7 +298,7 @@ export default function CoordenadorCursoDashboard() {
                       <div className="flex-1 min-w-0">
                         <p className="text-xs font-semibold text-foreground line-clamp-1">{sol.title}</p>
                         <p className="text-[10px] text-muted-foreground mt-0.5">
-                          <span className="font-medium">Assunto:</span> {sol.type}
+                          <span className="font-medium">Tipo:</span> {sol.type}
                         </p>
                       </div>
                       <Badge className={`${priorityStyles[sol.priority]} text-[8px] px-1.5 py-0 shrink-0`}>{sol.priority}</Badge>
