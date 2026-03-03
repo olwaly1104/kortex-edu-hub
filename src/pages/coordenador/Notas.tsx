@@ -185,10 +185,14 @@ export default function CoordenadorNotas() {
                                     <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{a.local}</span>
                                   </div>
                                 </div>
-                                <div className="grid grid-cols-3 gap-4 shrink-0 text-center">
+                                <div className="grid grid-cols-4 gap-4 shrink-0 text-center">
                                   <div>
                                     <p className="text-[10px] text-muted-foreground uppercase">Média</p>
                                     <p className={`text-xs font-bold ${a.media >= 10 ? "text-accent" : "text-destructive"}`}>{a.media}/20</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-[10px] text-muted-foreground uppercase">Participantes</p>
+                                    <p className="text-xs font-bold text-foreground">{total}</p>
                                   </div>
                                   <div>
                                     <p className="text-[10px] text-muted-foreground uppercase">Aprov.</p>
