@@ -200,13 +200,12 @@ export default function CoordenadorCursoDashboard() {
               <div className="flex flex-col gap-1.5 flex-1">
                 {docentesEmRisco.slice(0, 5).map(d => (
                   <Link key={d.id} to="/coordenador/docentes" className="flex-1 flex">
-                    <div className="px-2.5 py-2 rounded-lg border border-border bg-card border-l-[3px] border-l-destructive hover:bg-muted/40 transition-colors cursor-pointer w-full flex flex-col justify-center">
+                    <div className="px-2.5 py-1.5 rounded-lg border border-border bg-card border-l-[3px] border-l-destructive hover:bg-muted/40 transition-colors cursor-pointer w-full flex flex-col justify-center">
                       <p className="text-[11px] font-semibold text-foreground leading-tight truncate">{d.name.replace("Prof. ", "")}</p>
-                      <p className="text-[9px] text-muted-foreground truncate">{d.department}</p>
                       <div className="flex items-center justify-between mt-1 text-[9px]">
-                        <span className={`flex items-center gap-0.5 ${d.presenca < 85 ? "text-destructive font-medium" : "text-muted-foreground"}`}><Clock className="w-2.5 h-2.5" />{d.presenca}%</span>
-                        <span className={`flex items-center gap-0.5 ${d.taxaEntrega < 80 ? "text-destructive font-medium" : "text-muted-foreground"}`}><ClipboardCheck className="w-2.5 h-2.5" />{d.taxaEntrega}%</span>
-                        <span className={`flex items-center gap-0.5 ${d.mediaGeral < 11 ? "text-destructive font-medium" : "text-muted-foreground"}`}><BarChart3 className="w-2.5 h-2.5" />{d.mediaGeral}</span>
+                        <span className={d.presenca < 85 ? "text-destructive font-medium" : "text-muted-foreground"}>Presença {d.presenca}%</span>
+                        <span className={d.taxaEntrega < 80 ? "text-destructive font-medium" : "text-muted-foreground"}>Entrega {d.taxaEntrega}%</span>
+                        <span className={d.mediaGeral < 11 ? "text-destructive font-medium" : "text-muted-foreground"}>Média {d.mediaGeral}</span>
                       </div>
                     </div>
                   </Link>
@@ -228,13 +227,12 @@ export default function CoordenadorCursoDashboard() {
               <div className="flex flex-col gap-1.5 flex-1">
                 {turmasEmRisco.slice(0, 5).map(t => (
                   <Link key={t.id} to={`/coordenador/anos/${t.year}/turma/${t.id}`} className="flex-1 flex">
-                    <div className="px-2.5 py-2 rounded-lg border border-border bg-card border-l-[3px] border-l-destructive hover:bg-muted/40 transition-colors cursor-pointer w-full flex flex-col justify-center">
+                    <div className="px-2.5 py-1.5 rounded-lg border border-border bg-card border-l-[3px] border-l-destructive hover:bg-muted/40 transition-colors cursor-pointer w-full flex flex-col justify-center">
                       <p className="text-[11px] font-semibold text-foreground leading-tight">{t.name} <span className="font-normal text-[9px] text-muted-foreground">• {t.year}º Ano</span></p>
-                      <p className="text-[9px] text-muted-foreground truncate">{t.director}</p>
                       <div className="flex items-center justify-between mt-1 text-[9px]">
-                        <span className={`flex items-center gap-0.5 ${t.presenca < 80 ? "text-destructive font-medium" : "text-muted-foreground"}`}><Clock className="w-2.5 h-2.5" />{t.presenca}%</span>
-                        <span className={`flex items-center gap-0.5 ${t.taxaEntrega < 85 ? "text-destructive font-medium" : "text-muted-foreground"}`}><ClipboardCheck className="w-2.5 h-2.5" />{t.taxaEntrega}%</span>
-                        <span className={`flex items-center gap-0.5 ${t.media < 12 ? "text-destructive font-medium" : "text-muted-foreground"}`}><BarChart3 className="w-2.5 h-2.5" />{t.media}</span>
+                        <span className={t.presenca < 80 ? "text-destructive font-medium" : "text-muted-foreground"}>Presença {t.presenca}%</span>
+                        <span className={t.taxaEntrega < 85 ? "text-destructive font-medium" : "text-muted-foreground"}>Entrega {t.taxaEntrega}%</span>
+                        <span className={t.media < 12 ? "text-destructive font-medium" : "text-muted-foreground"}>Média {t.media}</span>
                       </div>
                     </div>
                   </Link>
@@ -256,13 +254,12 @@ export default function CoordenadorCursoDashboard() {
               <div className="flex flex-col gap-1.5 flex-1">
                 {estudantesEmRisco.slice(0, 5).map(e => (
                   <Link key={e.id} to="/coordenador/estudantes" className="flex-1 flex">
-                    <div className="px-2.5 py-2 rounded-lg border border-border bg-card border-l-[3px] border-l-destructive hover:bg-muted/40 transition-colors cursor-pointer w-full flex flex-col justify-center">
+                    <div className="px-2.5 py-1.5 rounded-lg border border-border bg-card border-l-[3px] border-l-destructive hover:bg-muted/40 transition-colors cursor-pointer w-full flex flex-col justify-center">
                       <p className="text-[11px] font-semibold text-foreground leading-tight truncate">{e.name}</p>
-                      <p className="text-[9px] text-muted-foreground">{e.year}º Ano • Turma {e.turma}</p>
                       <div className="flex items-center justify-between mt-1 text-[9px]">
-                        <span className="flex items-center gap-0.5 text-destructive font-medium"><BarChart3 className="w-2.5 h-2.5" />{e.media ?? "—"}</span>
-                        <span className={`flex items-center gap-0.5 ${e.presenca < 70 ? "text-destructive font-medium" : "text-muted-foreground"}`}><Clock className="w-2.5 h-2.5" />{e.presenca}%</span>
-                        <span className={`flex items-center gap-0.5 ${e.taxaEntrega < 60 ? "text-destructive font-medium" : "text-muted-foreground"}`}><ClipboardCheck className="w-2.5 h-2.5" />{e.taxaEntrega}%</span>
+                        <span className="text-destructive font-medium">Média {e.media ?? "—"}</span>
+                        <span className={e.presenca < 70 ? "text-destructive font-medium" : "text-muted-foreground"}>Presença {e.presenca}%</span>
+                        <span className={e.taxaEntrega < 60 ? "text-destructive font-medium" : "text-muted-foreground"}>Entrega {e.taxaEntrega}%</span>
                       </div>
                     </div>
                   </Link>
