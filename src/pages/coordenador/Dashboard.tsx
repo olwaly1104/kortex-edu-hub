@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { coordCursoInfo, coordAprovacoes, coordTurmas, coordAnuncios } from "@/data/institutionData";
+import { coordCursoInfo, coordAprovacoes, coordTurmas, coordAnuncios, coordTodayClasses } from "@/data/institutionData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -8,10 +8,9 @@ import {
   Users, BookOpen, Clock, Award, ChevronRight,
   AlertTriangle, FileText, Calendar as CalendarIcon,
   Megaphone, X, CheckCircle, ClipboardList,
-  Eye, XCircle, GraduationCap,
+  Eye, XCircle, GraduationCap, MapPin, Play,
 } from "lucide-react";
-import { Link } from "react-router-dom";
-import { Calendar } from "@/components/ui/calendar";
+import { Link, useNavigate } from "react-router-dom";
 
 const typeStyles: Record<string, { bg: string; label: string }> = {
   urgente: { bg: "bg-destructive text-destructive-foreground", label: "Urgente" },
@@ -29,10 +28,16 @@ const typeIcons: Record<string, React.ElementType> = {
 
 export default function CoordenadorCursoDashboard() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const info = coordCursoInfo;
   const pendentes = coordAprovacoes.filter(a => a.status === "pendente");
-  const [date, setDate] = useState<Date | undefined>(new Date());
   const [showAllRisk, setShowAllRisk] = useState(false);
+
+  const statusConfig: Record<string, { label: string; icon: React.ElementType; variant: "default" | "outline" }> = {
+    concluída: { label: "Concluída", icon: CheckCircle, variant: "outline" },
+    em_curso: { label: "Em Curso", icon: Play, variant: "default" },
+    agendada: { label: "Agendada", icon: Clock, variant: "outline" },
+  };
 
   // Turmas em risco: presença < 80% OR média < 12 OR taxaEntrega < 85%
   const turmasEmRisco = coordTurmas.filter(
@@ -84,21 +89,36 @@ export default function CoordenadorCursoDashboard() {
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Left column */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Calendar — same style as student/professor */}
+          {/* Aulas de Hoje — same style as student/professor */}
           <div>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
-                <CalendarIcon className="w-5 h-5 text-primary" /> Calendário
+                <CalendarIcon className="w-5 h-5 text-primary" /> Aulas de Hoje
               </h2>
             </div>
-            <Card className="p-4 flex justify-center">
-              <Calendar
-                mode="single"
-                selected={date}
-                onSelect={setDate}
-                className="pointer-events-auto"
-              />
-            </Card>
+            <div className="space-y-3">
+              {coordTodayClasses.map(aula => {
+                const cfg = statusConfig[aula.status];
+                const StatusIcon = cfg.icon;
+                return (
+                  <Card key={aula.id} className="p-4 flex items-center gap-4">
+                    <div className="w-1.5 h-12 rounded-full shrink-0" style={{ background: aula.color }} />
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-foreground">{aula.name}</p>
+                      <div className="flex items-center gap-3 text-sm text-muted-foreground mt-0.5 flex-wrap">
+                        <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" />{aula.time}</span>
+                        <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" />{aula.room}</span>
+                        <span>{aula.professor}</span>
+                      </div>
+                      <p className="text-[11px] text-muted-foreground mt-0.5">{aula.turma}</p>
+                    </div>
+                    <Badge variant={aula.status === "em_curso" ? "default" : "outline"} className="text-[10px] gap-1 shrink-0">
+                      <StatusIcon className="w-3 h-3" /> {cfg.label}
+                    </Badge>
+                  </Card>
+                );
+              })}
+            </div>
           </div>
 
           {/* Aprovações Pendentes — clean table with actions */}
