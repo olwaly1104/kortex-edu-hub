@@ -74,6 +74,8 @@ export interface CursoDisciplina {
   estudantes: number;
   media: number | null;
   taxaSucesso: number;
+  diasAula: string;
+  location: string;
 }
 
 export interface CursoNota {
@@ -132,16 +134,16 @@ export const coordEstudantes: CursoEstudante[] = [
 ];
 
 export const coordDisciplinas: CursoDisciplina[] = [
-  { id: "cd1", name: "Matemática I", code: "MAT101", year: 1, professor: "Prof. Sofia Martins", estudantes: 64, media: 12.1, taxaSucesso: 75 },
-  { id: "cd2", name: "Física I", code: "FIS101", year: 1, professor: "Prof. Maria Santos", estudantes: 64, media: 11.8, taxaSucesso: 72 },
-  { id: "cd3", name: "Desenho Técnico I", code: "DES101", year: 1, professor: "Prof. Luísa Tavares", estudantes: 64, media: 13.2, taxaSucesso: 82 },
-  { id: "cd4", name: "Matemática II", code: "MAT201", year: 2, professor: "Prof. António Silva", estudantes: 52, media: 13.0, taxaSucesso: 80 },
-  { id: "cd5", name: "Resistência dos Materiais", code: "RES201", year: 2, professor: "Prof. Carlos Mendes", estudantes: 52, media: 12.5, taxaSucesso: 78 },
-  { id: "cd6", name: "Mecânica dos Solos", code: "GEO301", year: 3, professor: "Prof. Maria Santos", estudantes: 45, media: 13.9, taxaSucesso: 85 },
-  { id: "cd7", name: "Hidráulica", code: "HID301", year: 3, professor: "Prof. Pedro Ferreira", estudantes: 45, media: 13.5, taxaSucesso: 83 },
-  { id: "cd8", name: "Estruturas de Betão", code: "EST401", year: 4, professor: "Prof. António Silva", estudantes: 38, media: 14.2, taxaSucesso: 88 },
-  { id: "cd9", name: "Gestão de Obras", code: "GES401", year: 4, professor: "Prof. Ana Costa", estudantes: 38, media: 14.5, taxaSucesso: 90 },
-  { id: "cd10", name: "Projecto Final", code: "PRJ501", year: 5, professor: "Prof. Carlos Mendes", estudantes: 30, media: 15.0, taxaSucesso: 93 },
+  { id: "cd1", name: "Matemática I", code: "MAT101", year: 1, professor: "Prof. Sofia Martins", estudantes: 64, media: 12.1, taxaSucesso: 75, diasAula: "Seg, Qua, Sex", location: "Sala A101" },
+  { id: "cd2", name: "Física I", code: "FIS101", year: 1, professor: "Prof. Maria Santos", estudantes: 64, media: 11.8, taxaSucesso: 72, diasAula: "Ter, Qui", location: "Lab. Física" },
+  { id: "cd3", name: "Desenho Técnico I", code: "DES101", year: 1, professor: "Prof. Luísa Tavares", estudantes: 64, media: 13.2, taxaSucesso: 82, diasAula: "Seg, Qua", location: "Sala B203" },
+  { id: "cd4", name: "Matemática II", code: "MAT201", year: 2, professor: "Prof. António Silva", estudantes: 52, media: 13.0, taxaSucesso: 80, diasAula: "Ter, Qui, Sex", location: "Sala A102" },
+  { id: "cd5", name: "Resistência dos Materiais", code: "RES201", year: 2, professor: "Prof. Carlos Mendes", estudantes: 52, media: 12.5, taxaSucesso: 78, diasAula: "Seg, Qua", location: "Sala C301" },
+  { id: "cd6", name: "Mecânica dos Solos", code: "GEO301", year: 3, professor: "Prof. Maria Santos", estudantes: 45, media: 13.9, taxaSucesso: 85, diasAula: "Ter, Qui", location: "Lab. Geotecnia" },
+  { id: "cd7", name: "Hidráulica", code: "HID301", year: 3, professor: "Prof. Pedro Ferreira", estudantes: 45, media: 13.5, taxaSucesso: 83, diasAula: "Seg, Qua, Sex", location: "Lab. Hidráulica" },
+  { id: "cd8", name: "Estruturas de Betão", code: "EST401", year: 4, professor: "Prof. António Silva", estudantes: 38, media: 14.2, taxaSucesso: 88, diasAula: "Ter, Qui", location: "Sala D401" },
+  { id: "cd9", name: "Gestão de Obras", code: "GES401", year: 4, professor: "Prof. Ana Costa", estudantes: 38, media: 14.5, taxaSucesso: 90, diasAula: "Seg, Qua", location: "Sala D402" },
+  { id: "cd10", name: "Projecto Final", code: "PRJ501", year: 5, professor: "Prof. Carlos Mendes", estudantes: 30, media: 15.0, taxaSucesso: 93, diasAula: "Sex", location: "Sala E501" },
 ];
 
 export const coordNotas: CursoNota[] = [

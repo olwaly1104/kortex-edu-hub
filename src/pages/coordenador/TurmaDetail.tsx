@@ -10,7 +10,7 @@ import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   ArrowLeft, GraduationCap, Users, BookOpen, CheckCircle, Search,
-  TrendingUp, Calendar, Video, Clock, Play, Eye, FileText,
+  TrendingUp, Calendar, Video, Clock, Play, Eye, FileText, MapPin,
   ClipboardList, Edit, Settings, Download, AlertCircle, FolderOpen, Award,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -52,6 +52,7 @@ export default function CoordenadorTurmaDetail() {
   // Avaliações
   const avaliacoes = turmaTasks.filter(t => t.type === "exame" || t.type === "quiz");
 
+  const avgPresenca = estudantes.length > 0 ? Math.round(estudantes.reduce((s, e) => s + e.presenca, 0) / estudantes.length) : 0;
   const filteredStudents = estudantes.filter(e => e.name.toLowerCase().includes(studentSearch.toLowerCase()));
 
   const statusColors: Record<string, string> = { excelente: "border-l-accent", normal: "border-l-secondary", risco: "border-l-destructive" };
@@ -95,11 +96,12 @@ export default function CoordenadorTurmaDetail() {
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
+              <Badge variant="outline" className="text-[10px] font-mono text-muted-foreground">{turma.id.toUpperCase()}</Badge>
               <Badge variant="outline" className="text-xs font-mono">{coordCursoInfo.code}</Badge>
               <Badge variant="outline" className="text-[10px]">{turma.name}</Badge>
             </div>
             <h1 className="text-2xl lg:text-3xl font-bold text-foreground">{coordCursoInfo.name} — {turma.name}</h1>
-            <p className="text-muted-foreground mt-2 leading-relaxed max-w-2xl">Director de turma: {turma.director}</p>
+            <p className="text-muted-foreground mt-2 leading-relaxed max-w-2xl">Professor: {turma.director}</p>
             <div className="flex items-center gap-4 mt-3 text-sm text-muted-foreground">
               <span className="flex items-center gap-1.5"><GraduationCap className="w-4 h-4" />{coordCursoInfo.faculty}</span>
               <span className="flex items-center gap-1.5"><Calendar className="w-4 h-4" />{yearNum}º Ano</span>
@@ -175,30 +177,33 @@ export default function CoordenadorTurmaDetail() {
           <p className="text-sm text-muted-foreground">{turmaCadeiras.length} cadeiras no {yearNum}º Ano</p>
           <div className="space-y-3">
             {turmaCadeiras.map(cadeira => (
-              <Card key={cadeira.id} className="p-5 border-l-[3px] border-l-primary">
-                <div className="flex items-center justify-between">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h4 className="text-sm font-semibold text-foreground">{cadeira.name}</h4>
-                      <Badge variant="outline" className="text-[10px] font-mono">{cadeira.code}</Badge>
+              <Link key={cadeira.id} to={`/coordenador/anos/${yearNum}/turma/${turmaId}/cadeira/${cadeira.id}`}>
+                <Card className="p-5 border-l-[3px] border-l-primary hover:shadow-md transition-shadow cursor-pointer">
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h4 className="text-sm font-semibold text-foreground">{cadeira.name}</h4>
+                        <Badge variant="outline" className="text-[10px] font-mono">{cadeira.code}</Badge>
+                      </div>
+                      <p className="text-[11px] text-muted-foreground flex items-center gap-3">
+                        <span className="flex items-center gap-1"><Users className="w-3 h-3" /> {cadeira.professor}</span>
+                        <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {cadeira.diasAula}</span>
+                        <span className="flex items-center gap-1"><MapPin className="w-3 h-3" /> {cadeira.location}</span>
+                      </p>
                     </div>
-                    <p className="text-[11px] text-muted-foreground flex items-center gap-3">
-                      <span className="flex items-center gap-1"><Users className="w-3 h-3" /> {cadeira.professor}</span>
-                      <span>{cadeira.estudantes} estudantes</span>
-                    </p>
+                    <div className="grid grid-cols-2 gap-6 shrink-0 text-center">
+                      <div>
+                        <p className="text-[10px] text-muted-foreground uppercase">Presença</p>
+                        <p className={`text-sm font-bold ${avgPresenca >= 75 ? "text-accent" : "text-destructive"}`}>{avgPresenca}%</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-muted-foreground uppercase">Média</p>
+                        <p className={`text-sm font-bold ${cadeira.media !== null && cadeira.media >= 10 ? "text-accent" : "text-destructive"}`}>{cadeira.media ?? "—"}/20</p>
+                      </div>
+                    </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-6 shrink-0 text-center">
-                    <div>
-                      <p className="text-[10px] text-muted-foreground uppercase">Média</p>
-                      <p className={`text-sm font-bold ${cadeira.media !== null && cadeira.media >= 10 ? "text-accent" : "text-destructive"}`}>{cadeira.media ?? "—"}/20</p>
-                    </div>
-                    <div>
-                      <p className="text-[10px] text-muted-foreground uppercase">Sucesso</p>
-                      <p className={`text-sm font-bold ${cadeira.taxaSucesso >= 75 ? "text-accent" : "text-destructive"}`}>{cadeira.taxaSucesso}%</p>
-                    </div>
-                  </div>
-                </div>
-              </Card>
+                </Card>
+              </Link>
             ))}
             {turmaCadeiras.length === 0 && <p className="text-center text-muted-foreground py-8">Nenhuma cadeira neste ano.</p>}
           </div>
