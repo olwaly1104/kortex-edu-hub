@@ -114,18 +114,18 @@ export default function CoordenadorCursoDashboard() {
             {todayAgenda.length === 0 ? (
               <p className="text-sm text-muted-foreground text-center py-4">Sem eventos hoje 🎉</p>
             ) : (
-              <div className="space-y-2.5">
+              <div className="space-y-2">
                 {todayAgenda.map(evento => {
                   const status = getEventStatus(evento);
                   const cfg = statusConfig[status];
                   const StatusIcon = cfg.icon;
                   return (
-                    <div key={evento.id} className="flex items-center gap-3 p-3 rounded-lg border border-border/50 hover:bg-muted/30 transition-colors">
+                    <div key={evento.id} className="flex items-center gap-3 px-3.5 py-3 rounded-xl border border-border bg-card hover:bg-muted/40 transition-colors">
                       <div className="w-1 h-10 rounded-full shrink-0" style={{ background: evento.color }} />
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-foreground text-sm">{evento.title}</p>
-                        <div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5">
-                          <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{evento.startTime} - {evento.endTime}</span>
+                        <p className="font-medium text-foreground text-sm leading-tight">{evento.title}</p>
+                        <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1">
+                          <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{evento.startTime} – {evento.endTime}</span>
                           {evento.room && <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{evento.room}</span>}
                         </div>
                       </div>
@@ -153,28 +153,28 @@ export default function CoordenadorCursoDashboard() {
             {pendentes.length === 0 ? (
               <p className="text-sm text-muted-foreground text-center py-4">Sem solicitações pendentes 🎉</p>
             ) : (
-              <div className="space-y-2.5">
+              <div className="space-y-2">
                 {pendentes.slice(0, 3).map(sol => {
                   const Icon = typeIcons[sol.type] || FileText;
                   return (
-                    <div key={sol.id} className="flex items-center gap-3 p-3 rounded-lg border border-border/50">
-                      <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 bg-muted">
+                    <div key={sol.id} className="flex items-center gap-3 px-3.5 py-3 rounded-xl border border-border bg-card hover:bg-muted/40 transition-colors">
+                      <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 bg-muted/60">
                         <Icon className="w-4 h-4 text-muted-foreground" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-foreground line-clamp-1">{sol.title}</p>
+                        <p className="text-sm font-semibold text-foreground line-clamp-1 leading-tight">{sol.title}</p>
                         <p className="text-[11px] text-muted-foreground mt-0.5">{sol.requester} • {sol.date}</p>
                       </div>
-                      <div className="flex items-center gap-1.5 shrink-0">
+                      <div className="flex items-center gap-1 shrink-0">
                         <Link to="/coordenador/solicitacoes">
-                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                          <Button variant="ghost" size="sm" className="h-7 w-7 p-0 rounded-lg">
                             <Eye className="w-3.5 h-3.5 text-muted-foreground" />
                           </Button>
                         </Link>
-                        <Button size="sm" className="h-8 w-8 p-0 bg-accent hover:bg-accent/90 text-accent-foreground">
+                        <Button size="sm" className="h-7 w-7 p-0 rounded-lg bg-accent hover:bg-accent/90 text-accent-foreground">
                           <CheckCircle className="w-3.5 h-3.5" />
                         </Button>
-                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10">
+                        <Button variant="ghost" size="sm" className="h-7 w-7 p-0 rounded-lg text-destructive hover:text-destructive hover:bg-destructive/10">
                           <XCircle className="w-3.5 h-3.5" />
                         </Button>
                       </div>
@@ -198,16 +198,16 @@ export default function CoordenadorCursoDashboard() {
                 Ver todos <ChevronRight className="w-4 h-4" />
               </Link>
             </div>
-            <div className="space-y-3">
+            <div className="space-y-2">
               {announcements.slice(0, 3).map(an => {
                 const style = typeStyles[an.type] || typeStyles.geral;
                 return (
-                  <div key={an.id} className="p-3 rounded-lg border border-border/50">
-                    <div className="flex items-center gap-2 mb-2">
+                  <div key={an.id} className="px-3.5 py-3 rounded-xl border border-border bg-card">
+                    <div className="flex items-center gap-2 mb-1.5">
                       <Badge className={`${style.bg} text-[10px]`}>{style.label}</Badge>
                       <span className="text-[11px] text-muted-foreground ml-auto">{an.date}</span>
                     </div>
-                    <p className="text-sm font-semibold text-foreground line-clamp-1">{an.title}</p>
+                    <p className="text-sm font-semibold text-foreground line-clamp-1 leading-tight">{an.title}</p>
                     <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{an.content}</p>
                     <p className="text-[11px] text-muted-foreground mt-1.5">— {an.author}</p>
                   </div>
@@ -243,23 +243,23 @@ export default function CoordenadorCursoDashboard() {
             {turmasEmRisco.length === 0 ? (
               <p className="text-sm text-muted-foreground text-center py-4">Nenhuma turma em risco 🎉</p>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {(showAllRisk ? turmasEmRisco : turmasEmRisco.slice(0, 3)).map(t => (
                   <Link key={t.id} to={`/coordenador/anos/${t.year}/turma/${t.id}`}>
-                    <div className="p-3 rounded-lg border border-border/50 border-l-[3px] border-l-destructive hover:bg-muted/30 transition-colors cursor-pointer">
-                      <div className="flex items-center justify-between mb-2.5">
+                    <div className="px-3.5 py-3 rounded-xl border border-border bg-card border-l-[3px] border-l-destructive hover:bg-muted/40 transition-colors cursor-pointer">
+                      <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2.5">
                           <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-destructive/10 text-destructive shrink-0">
                             <GraduationCap className="w-4 h-4" />
                           </div>
                           <div>
-                            <p className="font-bold text-foreground text-sm">{t.name}</p>
+                            <p className="font-semibold text-foreground text-sm leading-tight">{t.name}</p>
                             <p className="text-[11px] text-muted-foreground">{t.year}º Ano</p>
                           </div>
                         </div>
                         <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
                       </div>
-                      <div className="space-y-1.5 pt-2.5 border-t border-border/50">
+                      <div className="space-y-1.5 pt-2 border-t border-border">
                         <div className="flex items-center justify-between text-xs">
                           <span className="text-muted-foreground flex items-center gap-1.5">
                             <CheckCircle className="w-3 h-3" /> Presença

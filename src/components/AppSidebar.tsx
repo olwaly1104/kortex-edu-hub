@@ -74,6 +74,11 @@ const coordenadorCursoSections: NavSection[] = [
     { label: "Notas do Curso", icon: Award, path: "/coordenador/notas" },
     { label: "Relatórios", icon: BarChart3, path: "/coordenador/relatorios" },
   ]},
+  { title: "Comunicação", items: [
+    { label: "Chat", icon: MessageSquare, path: "/coordenador/chat" },
+    { label: "Email", icon: Mail, path: "/coordenador/email" },
+    { label: "Contactos", icon: Users, path: "/coordenador/contactos" },
+  ]},
   { title: "Pessoal", items: [
     { label: "Finanças", icon: Wallet, path: "/coordenador/financas" },
     { label: "Perfil", icon: User, path: "/coordenador/perfil" },
