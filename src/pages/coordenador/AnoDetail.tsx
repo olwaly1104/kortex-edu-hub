@@ -85,16 +85,14 @@ export default function CoordenadorAnoDetail() {
                 <Card className="overflow-hidden hover:shadow-lg transition-all h-full group">
                   <div className="p-5">
                     {/* Header */}
-                    <div className="flex items-start justify-between mb-4">
-                      <div>
+                    <div className="flex items-start justify-between mb-1">
+                      <div className="flex items-center gap-2">
                         <h3 className="font-bold text-foreground text-lg">{t.name}</h3>
-                        <div className="flex items-center gap-2 mt-1">
-                          <span className="text-xs text-muted-foreground">{yearNum}º Ano Eng. Civil</span>
-                          <Badge variant="outline" className="text-[10px] font-mono text-muted-foreground">{t.id.toUpperCase()}</Badge>
-                        </div>
+                        <Badge variant="outline" className="text-[10px] font-mono text-muted-foreground">{t.id.toUpperCase()}</Badge>
                       </div>
                       <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
                     </div>
+                    <p className="text-xs text-muted-foreground mb-4">{yearNum}º Ano · {info.name}</p>
 
                     {/* Key metrics row */}
                     <div className="grid grid-cols-3 gap-3 mb-4">
