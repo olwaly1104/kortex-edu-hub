@@ -36,16 +36,21 @@ export interface Docente {
   status: "activo" | "licença" | "inactivo";
 }
 
-export interface Aprovacao {
+export interface Solicitacao {
   id: string;
-  type: "nota" | "plano" | "horário" | "transferência" | "recurso";
+  type: "nota" | "plano" | "horário" | "transferência" | "recurso" | "material" | "reunião";
   title: string;
   description: string;
   requester: string;
   date: string;
   status: "pendente" | "aprovado" | "rejeitado";
   priority: "alta" | "média" | "baixa";
+  direction: "recebida" | "enviada";
+  destinatario?: string;
 }
+
+// Backward compat alias for decano/reitoria
+export type Aprovacao = Omit<Solicitacao, 'direction' | 'destinatario'>;
 
 export interface RecentActivity {
   id: string;
@@ -171,15 +176,21 @@ export const coordNotas: CursoNota[] = [
   ]},
 ];
 
-export const coordAprovacoes: Aprovacao[] = [
-  { id: "ap1", type: "nota", title: "Revisão de nota — Matemática II", description: "Estudante João Fernandes solicita revisão de nota do Teste 1", requester: "João Fernandes", date: "28/02/2024", status: "pendente", priority: "média" },
-  { id: "ap2", type: "recurso", title: "Recurso de Exame — Física", description: "Pedido de exame de recurso para Física Aplicada", requester: "Maria Silva", date: "27/02/2024", status: "pendente", priority: "alta" },
-  { id: "ap3", type: "plano", title: "Alteração de plano curricular — 3º Ano", description: "Proposta de inclusão de nova disciplina optativa", requester: "Prof. António Silva", date: "25/02/2024", status: "pendente", priority: "média" },
-  { id: "ap4", type: "transferência", title: "Transferência de turma", description: "Estudante Pedro Nascimento solicita mudança de turma A para B", requester: "Pedro Nascimento", date: "24/02/2024", status: "pendente", priority: "baixa" },
-  { id: "ap5", type: "horário", title: "Alteração de horário — Desenho Técnico", description: "Troca de sala devido a obras no edifício B", requester: "Prof. Luísa Tavares", date: "23/02/2024", status: "aprovado", priority: "alta" },
-  { id: "ap6", type: "nota", title: "Lançamento de notas — Química Geral", description: "Notas do Teste 1 prontas para publicação", requester: "Prof. Ana Costa", date: "22/02/2024", status: "aprovado", priority: "média" },
-  { id: "ap7", type: "recurso", title: "Recurso disciplinar — Atraso reincidente", description: "Processo disciplinar por faltas injustificadas repetidas", requester: "Direcção Académica", date: "20/02/2024", status: "pendente", priority: "alta" },
-  { id: "ap8", type: "nota", title: "Publicação de notas — Desenho Técnico", description: "Notas finais de Desenho Técnico I aprovadas", requester: "Prof. Luísa Tavares", date: "18/02/2024", status: "rejeitado", priority: "média" },
+export const coordSolicitacoes: Solicitacao[] = [
+  // Recebidas (para aprovar)
+  { id: "sol1", type: "nota", title: "Revisão de nota — Matemática II", description: "Estudante João Fernandes solicita revisão de nota do Teste 1", requester: "João Fernandes", date: "28/02/2024", status: "pendente", priority: "média", direction: "recebida" },
+  { id: "sol2", type: "recurso", title: "Recurso de Exame — Física", description: "Pedido de exame de recurso para Física Aplicada", requester: "Maria Silva", date: "27/02/2024", status: "pendente", priority: "alta", direction: "recebida" },
+  { id: "sol3", type: "plano", title: "Alteração de plano curricular — 3º Ano", description: "Proposta de inclusão de nova disciplina optativa", requester: "Prof. António Silva", date: "25/02/2024", status: "pendente", priority: "média", direction: "recebida" },
+  { id: "sol4", type: "transferência", title: "Transferência de turma", description: "Estudante Pedro Nascimento solicita mudança de turma A para B", requester: "Pedro Nascimento", date: "24/02/2024", status: "pendente", priority: "baixa", direction: "recebida" },
+  { id: "sol5", type: "horário", title: "Alteração de horário — Desenho Técnico", description: "Troca de sala devido a obras no edifício B", requester: "Prof. Luísa Tavares", date: "23/02/2024", status: "aprovado", priority: "alta", direction: "recebida" },
+  { id: "sol6", type: "nota", title: "Lançamento de notas — Química Geral", description: "Notas do Teste 1 prontas para publicação", requester: "Prof. Ana Costa", date: "22/02/2024", status: "aprovado", priority: "média", direction: "recebida" },
+  { id: "sol7", type: "recurso", title: "Recurso disciplinar — Atraso reincidente", description: "Processo disciplinar por faltas injustificadas repetidas", requester: "Direcção Académica", date: "20/02/2024", status: "pendente", priority: "alta", direction: "recebida" },
+  { id: "sol8", type: "nota", title: "Publicação de notas — Desenho Técnico", description: "Notas finais de Desenho Técnico I aprovadas", requester: "Prof. Luísa Tavares", date: "18/02/2024", status: "rejeitado", priority: "média", direction: "recebida" },
+  // Enviadas (ao Decano)
+  { id: "sol9", type: "material", title: "Requisição de equipamento laboratorial", description: "Solicitação de 5 kits de microscopia para o Lab. de Biologia do 2º Ano", requester: "Coord. de Curso", date: "26/02/2024", status: "pendente", priority: "alta", direction: "enviada", destinatario: "Decano da Faculdade" },
+  { id: "sol10", type: "reunião", title: "Reunião para revisão curricular", description: "Pedido de reunião com o Decano para discutir alterações ao plano do 4º Ano", requester: "Coord. de Curso", date: "25/02/2024", status: "aprovado", priority: "média", direction: "enviada", destinatario: "Decano da Faculdade" },
+  { id: "sol11", type: "plano", title: "Aprovação de nova disciplina optativa", description: "Proposta de criação da cadeira 'Inteligência Artificial Aplicada' para o 3º Ano", requester: "Coord. de Curso", date: "20/02/2024", status: "pendente", priority: "alta", direction: "enviada", destinatario: "Decano da Faculdade" },
+  { id: "sol12", type: "horário", title: "Extensão do horário de laboratórios", description: "Pedido para estender o horário de acesso aos laboratórios até às 22h", requester: "Coord. de Curso", date: "15/02/2024", status: "rejeitado", priority: "baixa", direction: "enviada", destinatario: "Decano da Faculdade" },
 ];
 
 export const coordRecentActivity: RecentActivity[] = [
