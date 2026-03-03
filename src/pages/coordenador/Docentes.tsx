@@ -3,27 +3,28 @@ import { coordDocentes } from "@/data/institutionData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { GraduationCap, Search, Users, CheckCircle, ClipboardList, Award, ArrowUpDown } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { GraduationCap, Search, Users, CheckCircle, ClipboardList, Award, ArrowUpDown, SlidersHorizontal } from "lucide-react";
 
-type SortOption = "none" | "presenca-asc" | "presenca-desc" | "taxaEntrega-asc" | "taxaEntrega-desc" | "mediaGeral-asc" | "mediaGeral-desc";
+type SortDir = "desc" | "asc";
+type FilterField = "presenca" | "taxaEntrega" | "mediaGeral";
 
 export default function CoordenadorDocentes() {
   const [search, setSearch] = useState("");
-  const [sortBy, setSortBy] = useState<SortOption>("none");
+  const [sortDir, setSortDir] = useState<SortDir>("desc");
+  const [filterField, setFilterField] = useState<FilterField>("presenca");
 
   const filtered = useMemo(() => {
     let list = coordDocentes.filter(d => !search || d.name.toLowerCase().includes(search.toLowerCase()));
-    if (sortBy !== "none") {
-      const [field, dir] = sortBy.split("-") as [keyof typeof list[0], string];
-      list = [...list].sort((a, b) => {
-        const va = a[field] as number;
-        const vb = b[field] as number;
-        return dir === "asc" ? va - vb : vb - va;
-      });
-    }
+    list = [...list].sort((a, b) => {
+      const va = a[filterField] as number;
+      const vb = b[filterField] as number;
+      return sortDir === "asc" ? va - vb : vb - va;
+    });
     return list;
-  }, [search, sortBy]);
+  }, [search, sortDir, filterField]);
 
   const totalDocentes = coordDocentes.length;
   const presencaGeral = Math.round(coordDocentes.reduce((s, d) => s + d.presenca, 0) / totalDocentes);
@@ -69,20 +70,40 @@ export default function CoordenadorDocentes() {
         </Card>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-3">
+      <div className="flex items-center justify-between gap-3">
         <div className="relative flex-1 max-w-md"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" /><Input placeholder="Pesquisar docente..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9" /></div>
-        <Select value={sortBy} onValueChange={v => setSortBy(v as SortOption)}>
-          <SelectTrigger className="w-[220px]"><ArrowUpDown className="w-4 h-4 mr-2 text-muted-foreground" /><SelectValue placeholder="Ordenar por..." /></SelectTrigger>
-          <SelectContent>
-            <SelectItem value="none">Sem ordenação</SelectItem>
-            <SelectItem value="presenca-desc">Presença ↑ Maior</SelectItem>
-            <SelectItem value="presenca-asc">Presença ↓ Menor</SelectItem>
-            <SelectItem value="taxaEntrega-desc">Taxa Entrega ↑ Maior</SelectItem>
-            <SelectItem value="taxaEntrega-asc">Taxa Entrega ↓ Menor</SelectItem>
-            <SelectItem value="mediaGeral-desc">Média Geral ↑ Maior</SelectItem>
-            <SelectItem value="mediaGeral-asc">Média Geral ↓ Menor</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setSortDir(d => d === "desc" ? "asc" : "desc")}
+            className="gap-1.5"
+          >
+            <ArrowUpDown className="w-4 h-4" />
+            {sortDir === "desc" ? "Maior" : "Menor"}
+          </Button>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm" className="gap-1.5">
+                <SlidersHorizontal className="w-4 h-4" />
+                Filtro
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-48 p-2" align="end">
+              <div className="space-y-1">
+                {([["presenca", "Presença"], ["taxaEntrega", "Taxa Entrega"], ["mediaGeral", "Média Geral"]] as const).map(([val, label]) => (
+                  <button
+                    key={val}
+                    onClick={() => setFilterField(val)}
+                    className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${filterField === val ? "bg-primary text-primary-foreground" : "hover:bg-muted"}`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </PopoverContent>
+          </Popover>
+        </div>
       </div>
       <Card className="overflow-hidden">
         <table className="w-full text-sm">
