@@ -1,13 +1,29 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { coordDocentes } from "@/data/institutionData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { GraduationCap, Search, Users, CheckCircle, ClipboardList, Award } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { GraduationCap, Search, Users, CheckCircle, ClipboardList, Award, ArrowUpDown } from "lucide-react";
+
+type SortOption = "none" | "presenca-asc" | "presenca-desc" | "taxaEntrega-asc" | "taxaEntrega-desc" | "mediaGeral-asc" | "mediaGeral-desc";
 
 export default function CoordenadorDocentes() {
   const [search, setSearch] = useState("");
-  const filtered = coordDocentes.filter(d => !search || d.name.toLowerCase().includes(search.toLowerCase()));
+  const [sortBy, setSortBy] = useState<SortOption>("none");
+
+  const filtered = useMemo(() => {
+    let list = coordDocentes.filter(d => !search || d.name.toLowerCase().includes(search.toLowerCase()));
+    if (sortBy !== "none") {
+      const [field, dir] = sortBy.split("-") as [keyof typeof list[0], string];
+      list = [...list].sort((a, b) => {
+        const va = a[field] as number;
+        const vb = b[field] as number;
+        return dir === "asc" ? va - vb : vb - va;
+      });
+    }
+    return list;
+  }, [search, sortBy]);
 
   const totalDocentes = coordDocentes.length;
   const presencaGeral = Math.round(coordDocentes.reduce((s, d) => s + d.presenca, 0) / totalDocentes);
@@ -53,7 +69,21 @@ export default function CoordenadorDocentes() {
         </Card>
       </div>
 
-      <div className="relative"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" /><Input placeholder="Pesquisar docente..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9 max-w-md" /></div>
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1 max-w-md"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" /><Input placeholder="Pesquisar docente..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9" /></div>
+        <Select value={sortBy} onValueChange={v => setSortBy(v as SortOption)}>
+          <SelectTrigger className="w-[220px]"><ArrowUpDown className="w-4 h-4 mr-2 text-muted-foreground" /><SelectValue placeholder="Ordenar por..." /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="none">Sem ordenação</SelectItem>
+            <SelectItem value="presenca-desc">Presença ↑ Maior</SelectItem>
+            <SelectItem value="presenca-asc">Presença ↓ Menor</SelectItem>
+            <SelectItem value="taxaEntrega-desc">Taxa Entrega ↑ Maior</SelectItem>
+            <SelectItem value="taxaEntrega-asc">Taxa Entrega ↓ Menor</SelectItem>
+            <SelectItem value="mediaGeral-desc">Média Geral ↑ Maior</SelectItem>
+            <SelectItem value="mediaGeral-asc">Média Geral ↓ Menor</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
       <Card className="overflow-hidden">
         <table className="w-full text-sm">
           <thead><tr className="border-b bg-muted/30">
