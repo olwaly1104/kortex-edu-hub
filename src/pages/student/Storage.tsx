@@ -181,7 +181,7 @@ export default function StudentStorage() {
       return (
         <div className="space-y-3">
           <button onClick={() => setSelectedDiscipline(null)} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
-            <ArrowLeft className="w-4 h-4" /> Voltar às disciplinas
+            <ArrowLeft className="w-4 h-4" /> Voltar às cadeiras
           </button>
           <div className="flex items-center gap-2">
             <div className="w-1 h-4 rounded-full bg-secondary" />
@@ -197,7 +197,7 @@ export default function StudentStorage() {
       return (
         <div className="space-y-3">
           <button onClick={() => setSelectedDiscipline(null)} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
-            <ArrowLeft className="w-4 h-4" /> Voltar às disciplinas
+            <ArrowLeft className="w-4 h-4" /> Voltar às cadeiras
           </button>
           <div className="flex items-center gap-2">
             <div className="w-1 h-4 rounded-full bg-secondary" />
@@ -274,7 +274,7 @@ export default function StudentStorage() {
         <div className="mb-5 space-y-2.5">
           <div className="flex items-center gap-2">
             <div className="w-1 h-4 rounded-full bg-primary" />
-            <h2 className="text-sm font-semibold text-foreground">Disciplinas</h2>
+            <h2 className="text-sm font-semibold text-foreground">Cadeiras</h2>
             <span className="text-[11px] text-muted-foreground">({disciplinesWithContent.length})</span>
           </div>
           {renderDisciplineCarousel(carouselOnClick)}

@@ -16,7 +16,7 @@ export default function DisciplineDetail() {
   const discGrades = grades.find(g => g.disciplineId === id);
   const [expandedLesson, setExpandedLesson] = useState<string | null>(null);
 
-  if (!disc) return <div className="p-8 text-muted-foreground">Disciplina não encontrada.</div>;
+  if (!disc) return <div className="p-8 text-muted-foreground">Cadeira não encontrada.</div>;
 
   const total = disc.attendance.present + disc.attendance.absent + disc.attendance.justified;
   const attendancePct = Math.round((disc.attendance.present / total) * 100);
@@ -38,7 +38,7 @@ export default function DisciplineDetail() {
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       <Link to="/student/disciplines" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
-        <ArrowLeft className="w-4 h-4" /> Voltar às disciplinas
+        <ArrowLeft className="w-4 h-4" /> Voltar às cadeiras
       </Link>
 
       {/* Hero header */}
@@ -129,7 +129,7 @@ export default function DisciplineDetail() {
         {/* Participantes */}
         <TabsContent value="participants" className="space-y-4">
           <div className="flex items-center justify-between">
-            <p className="text-sm text-muted-foreground">{participantList.length} colegas nesta disciplina</p>
+            <p className="text-sm text-muted-foreground">{participantList.length} colegas nesta cadeira</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
             {participantList.map((name, i) => (

@@ -72,7 +72,7 @@ export default function CoordenadorNotas() {
         </Card>
       </div>
 
-      {/* Disciplinas */}
+      {/* Cadeiras */}
       {data.map(yearData => (
         <div key={yearData.year}>
           <h2 className="text-lg font-semibold text-foreground mb-3">{yearData.year}º Ano</h2>

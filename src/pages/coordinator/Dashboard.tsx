@@ -42,31 +42,31 @@ export default function CoordinatorDashboard() {
 
   const lowAvgDiscs = disciplineStats.filter(d => d.avg !== null && d.avg < 10);
   if (lowAvgDiscs.length > 0) {
-    alerts.push({ text: `${lowAvgDiscs.length} disciplina(s) com média abaixo de 10`, type: "error" });
+    alerts.push({ text: `${lowAvgDiscs.length} cadeira(s) com média abaixo de 10`, type: "error" });
   }
 
   const highFailDiscs = disciplineStats.filter(d => d.approvalRate < 70);
   if (highFailDiscs.length > 0) {
-    alerts.push({ text: `${highFailDiscs.length} disciplina(s) com taxa de aprovação < 70%`, type: "warning" });
+    alerts.push({ text: `${highFailDiscs.length} cadeira(s) com taxa de aprovação < 70%`, type: "warning" });
   }
 
   const lowAttendanceDiscs = disciplineStats.filter(d => d.avgAttendance < 75);
   if (lowAttendanceDiscs.length > 0) {
-    alerts.push({ text: `${lowAttendanceDiscs.length} disciplina(s) com presença média < 75%`, type: "warning" });
+    alerts.push({ text: `${lowAttendanceDiscs.length} cadeira(s) com presença média < 75%`, type: "warning" });
   }
 
   const uncorrectedDiscs = disciplineStats.filter(d => d.pendingCorrection > 0);
   if (uncorrectedDiscs.length > 0) {
-    alerts.push({ text: `${uncorrectedDiscs.length} disciplina(s) com avaliações por corrigir`, type: "error" });
+    alerts.push({ text: `${uncorrectedDiscs.length} cadeira(s) com avaliações por corrigir`, type: "error" });
   }
 
   const riskDiscs = disciplineStats.filter(d => d.atRisk > 0);
   if (riskDiscs.length > 0) {
-    alerts.push({ text: `${riskDiscs.length} disciplina(s) com alunos em risco`, type: "warning" });
+    alerts.push({ text: `${riskDiscs.length} cadeira(s) com alunos em risco`, type: "warning" });
   }
 
   const stats = [
-    { icon: BookOpen, label: "Disciplinas", value: totalDisciplines.toString(), color: "text-primary bg-primary/10" },
+    { icon: BookOpen, label: "Cadeiras", value: totalDisciplines.toString(), color: "text-primary bg-primary/10" },
     { icon: GraduationCap, label: "Professores", value: totalProfessors.toString(), color: "text-accent bg-accent/10" },
     { icon: Users, label: "Total Alunos", value: totalStudents.toString(), color: "text-secondary bg-secondary/10" },
     { icon: Award, label: "Média Geral", value: overallAvg.toFixed(1), color: "text-primary bg-primary/10" },
@@ -98,7 +98,7 @@ export default function CoordinatorDashboard() {
         {/* Disciplines overview */}
         <Card className="p-6 lg:col-span-2">
           <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-            <BookOpen className="w-5 h-5 text-accent" /> Disciplinas do Curso
+            <BookOpen className="w-5 h-5 text-accent" /> Cadeiras do Curso
           </h2>
           <div className="space-y-3">
             {disciplineStats.map(({ disc, avg, approvalRate, avgAttendance, publishPct, atRisk, pendingCorrection }) => (
@@ -144,7 +144,7 @@ export default function CoordinatorDashboard() {
         <div className="space-y-6">
           <Card className="p-5">
             <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 text-secondary" /> Alertas por Disciplina
+              <AlertTriangle className="w-4 h-4 text-secondary" /> Alertas por Cadeira
             </h3>
             {alerts.length > 0 ? (
               <div className="space-y-2">
@@ -167,7 +167,7 @@ export default function CoordinatorDashboard() {
             <h3 className="font-semibold text-foreground mb-3">Acesso Rápido</h3>
             <div className="space-y-2">
               {[
-                { label: "Disciplinas", path: "/coordinator/disciplines", icon: BookOpen },
+                { label: "Cadeiras", path: "/coordinator/disciplines", icon: BookOpen },
                 { label: "Professores", path: "/coordinator/professors", icon: GraduationCap },
                 { label: "Alunos", path: "/coordinator/students", icon: Users },
                 { label: "Relatórios", path: "/coordinator/reports", icon: BarChart3 },

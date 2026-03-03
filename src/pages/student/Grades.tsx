@@ -55,7 +55,7 @@ export default function StudentGrades() {
 
       {/* Discipline filter */}
       <div className="flex items-center gap-2 flex-wrap">
-        <span className="text-xs font-medium text-muted-foreground mr-1">Disciplina:</span>
+        <span className="text-xs font-medium text-muted-foreground mr-1">Cadeira:</span>
         <button
           onClick={() => setFilterDisc("all")}
           className={`px-3.5 py-2 rounded-lg text-xs font-medium border transition-all ${filterDisc === "all" ? "bg-primary text-primary-foreground border-primary shadow-sm" : "bg-card text-muted-foreground border-border hover:border-primary/30 hover:text-foreground"}`}

@@ -35,7 +35,7 @@ export default function ProfessorDashboard() {
   const stats = [
     { icon: Users, label: "Estudantes", value: totalStudents, color: "text-accent bg-accent/10" },
     { icon: GraduationCap, label: "Turmas", value: allTurmas.length, color: "text-primary bg-primary/10" },
-    { icon: BookOpen, label: "Disciplinas", value: profDisciplines.length, color: "text-secondary bg-secondary/10" },
+    { icon: BookOpen, label: "Cadeiras", value: profDisciplines.length, color: "text-secondary bg-secondary/10" },
     { icon: UserCheck, label: "Minha Presença", value: `${overallAttendance}%`, color: "text-accent bg-accent/10" },
   ];
 
@@ -258,7 +258,7 @@ export default function ProfessorDashboard() {
                           <p className="text-[9px] text-muted-foreground">Presença</p>
                         </div>
                       </div>
-                      <p className="text-[10px] text-muted-foreground mt-2">{turmaDiscs.map(d => d.code).join(" • ")} • {turmaDiscs.length} disc.</p>
+                      <p className="text-[10px] text-muted-foreground mt-2">{turmaDiscs.map(d => d.code).join(" • ")} • {turmaDiscs.length} cad.</p>
                     </Card>
                   </Link>
                 );

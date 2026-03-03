@@ -81,7 +81,7 @@ export default function ProfessorDisciplines() {
                     <span className="font-semibold text-foreground">{scheduleDays}</span>
                   </div>
                   <div className="flex items-center justify-between text-xs">
-                    <span className="text-muted-foreground flex items-center gap-1.5"><BookOpen className="w-3.5 h-3.5" /> Disciplinas</span>
+                    <span className="text-muted-foreground flex items-center gap-1.5"><BookOpen className="w-3.5 h-3.5" /> Cadeiras</span>
                     <span className="font-semibold text-foreground">{turmaDiscs.map(d => d.code).join(", ")}</span>
                   </div>
                   <div>

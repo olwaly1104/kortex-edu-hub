@@ -8,8 +8,8 @@ export default function CoordinatorDisciplines() {
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Disciplinas do Curso</h1>
-        <p className="text-muted-foreground mt-1">{profDisciplines.length} disciplinas sob supervisão</p>
+        <h1 className="text-2xl font-bold text-foreground">Cadeiras do Curso</h1>
+        <p className="text-muted-foreground mt-1">{profDisciplines.length} cadeiras sob supervisão</p>
       </div>
 
       <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-5">
@@ -71,7 +71,7 @@ export default function CoordinatorDisciplines() {
                 </div>
                 {avg !== null && (
                   <div className="flex items-center justify-between text-xs">
-                    <span className="text-muted-foreground flex items-center gap-1"><GraduationCap className="w-3 h-3" /> Média da disciplina</span>
+                    <span className="text-muted-foreground flex items-center gap-1"><GraduationCap className="w-3 h-3" /> Média da cadeira</span>
                     <span className={`font-semibold ${avg < 10 ? "text-destructive" : "text-foreground"}`}>{avg.toFixed(1)}</span>
                   </div>
                 )}

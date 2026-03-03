@@ -94,7 +94,7 @@ export default function ProfessorEvaluations() {
           <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
             <GraduationCap className="w-6 h-6 text-secondary" /> Avaliações
           </h1>
-          <p className="text-sm text-muted-foreground mt-1">Gerir quizzes e exames das suas disciplinas</p>
+          <p className="text-sm text-muted-foreground mt-1">Gerir quizzes e exames das suas cadeiras</p>
         </div>
         <Button size="sm" className="gap-2 rounded-lg" onClick={() => setShowForm(!showForm)}>
           <Plus className="w-4 h-4" /> {showForm ? "Cancelar" : "Nova Avaliação"}
@@ -108,7 +108,7 @@ export default function ProfessorEvaluations() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Disciplina *</label>
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Cadeira *</label>
               <select value={formDisc} onChange={e => setFormDisc(e.target.value)} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
                 {profDisciplines.map(d => <option key={d.id} value={d.id}>{d.name} ({d.code})</option>)}
               </select>

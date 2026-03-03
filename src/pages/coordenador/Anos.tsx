@@ -37,7 +37,7 @@ export default function CoordenadorAnos() {
                   </div>
                   <div className="text-center p-2.5 rounded-lg bg-muted/40">
                     <p className="text-lg font-bold text-foreground">{y.disciplinas}</p>
-                    <p className="text-[10px] text-muted-foreground">Disciplinas</p>
+                    <p className="text-[10px] text-muted-foreground">Cadeiras</p>
                   </div>
                   <div className="text-center p-2.5 rounded-lg bg-muted/40">
                     <p className="text-lg font-bold text-foreground">{y.estudantes}</p>

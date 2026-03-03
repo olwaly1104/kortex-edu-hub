@@ -8,8 +8,8 @@ export default function StudentDisciplines() {
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       <div>
-        <h1 className="text-2xl font-bold text-foreground">As Minhas Disciplinas</h1>
-        <p className="text-muted-foreground mt-1">{disciplines.length} disciplinas inscritas</p>
+        <h1 className="text-2xl font-bold text-foreground">As Minhas Cadeiras</h1>
+        <p className="text-muted-foreground mt-1">{disciplines.length} cadeiras inscritas</p>
       </div>
 
       {/* Recentes */}

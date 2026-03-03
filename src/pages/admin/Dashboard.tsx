@@ -9,7 +9,7 @@ export default function AdminDashboard() {
   const stats = [
     { icon: Users, label: "Total Estudantes", value: "1,247", color: "text-primary bg-primary/10" },
     { icon: Users, label: "Total Professores", value: "86", color: "text-accent bg-accent/10" },
-    { icon: BookOpen, label: "Disciplinas", value: "142", color: "text-secondary bg-secondary/10" },
+    { icon: BookOpen, label: "Cadeiras", value: "142", color: "text-secondary bg-secondary/10" },
     { icon: Video, label: "Aulas Gravadas", value: "3,891", color: "text-primary bg-primary/10" },
   ];
 

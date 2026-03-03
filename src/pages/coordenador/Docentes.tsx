@@ -21,7 +21,7 @@ export default function CoordenadorDocentes() {
           <thead><tr className="border-b bg-muted/30">
             <th className="text-left p-3 font-medium text-muted-foreground">Nome</th>
             <th className="text-center p-3 font-medium text-muted-foreground">Estudantes</th>
-            <th className="text-center p-3 font-medium text-muted-foreground">Disciplinas</th>
+            <th className="text-center p-3 font-medium text-muted-foreground">Cadeiras</th>
             <th className="text-center p-3 font-medium text-muted-foreground">Turmas</th>
             <th className="text-center p-3 font-medium text-muted-foreground">Presença</th>
             <th className="text-center p-3 font-medium text-muted-foreground">Média Geral</th>
