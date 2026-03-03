@@ -93,20 +93,20 @@ export default function CoordenadorAnos() {
                   {/* Stats grid */}
                   <div className="grid grid-cols-4 gap-2 mb-4">
                     <div className="text-center p-2 rounded-lg bg-muted/40">
-                      <p className="text-base font-bold text-foreground">{y.turmas}</p>
-                      <p className="text-[10px] text-muted-foreground">Turmas</p>
-                    </div>
-                    <div className="text-center p-2 rounded-lg bg-muted/40">
-                      <p className="text-base font-bold text-foreground">{y.disciplinas}</p>
-                      <p className="text-[10px] text-muted-foreground">Cadeiras</p>
-                    </div>
-                    <div className="text-center p-2 rounded-lg bg-muted/40">
                       <p className="text-base font-bold text-foreground">{y.estudantes}</p>
                       <p className="text-[10px] text-muted-foreground">Estudantes</p>
                     </div>
                     <div className="text-center p-2 rounded-lg bg-muted/40">
+                      <p className="text-base font-bold text-foreground">{y.turmas}</p>
+                      <p className="text-[10px] text-muted-foreground">Turmas</p>
+                    </div>
+                    <div className="text-center p-2 rounded-lg bg-muted/40">
                       <p className="text-base font-bold text-foreground">{yearProfessores}</p>
                       <p className="text-[10px] text-muted-foreground">Professores</p>
+                    </div>
+                    <div className="text-center p-2 rounded-lg bg-muted/40">
+                      <p className="text-base font-bold text-foreground">{y.disciplinas}</p>
+                      <p className="text-[10px] text-muted-foreground">Cadeiras</p>
                     </div>
                   </div>
 
