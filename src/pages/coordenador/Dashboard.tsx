@@ -290,29 +290,47 @@ export default function CoordenadorCursoDashboard() {
               {pendentes.slice(0, 3).map(sol => {
                 const Icon = typeIcons[sol.type] || FileText;
                 return (
-                  <div key={sol.id} className="px-3.5 py-3 rounded-xl border border-border bg-card hover:bg-muted/40 transition-colors">
-                    <div className="flex items-center gap-2 mb-1.5">
-                      <div className="w-6 h-6 rounded-md flex items-center justify-center shrink-0 bg-muted/60">
-                        <Icon className="w-3 h-3 text-muted-foreground" />
+                  <div key={sol.id} className="px-3.5 py-3 rounded-xl border border-border bg-card hover:bg-muted/40 transition-colors space-y-2">
+                    {/* Header: icon + title + priority */}
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 bg-muted/60">
+                        <Icon className="w-3.5 h-3.5 text-muted-foreground" />
                       </div>
-                      <p className="text-xs font-semibold text-foreground line-clamp-1 flex-1">{sol.title}</p>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-semibold text-foreground line-clamp-1">{sol.title}</p>
+                        <p className="text-[10px] text-muted-foreground mt-0.5">
+                          <span className="font-medium">Assunto:</span> {sol.type}
+                        </p>
+                      </div>
                       <Badge className={`${priorityStyles[sol.priority]} text-[8px] px-1.5 py-0 shrink-0`}>{sol.priority}</Badge>
                     </div>
-                    <p className="text-[11px] text-muted-foreground line-clamp-2 mb-2">{sol.description}</p>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+
+                    {/* Description — 1 line only */}
+                    <p className="text-[11px] text-muted-foreground line-clamp-1">{sol.description}</p>
+
+                    {/* Requester + Date row */}
+                    <div className="flex items-center gap-3 text-[10px]">
+                      <div className="flex items-center gap-1.5">
+                        <Users className="w-3 h-3 text-muted-foreground" />
                         <span className="font-medium text-foreground">{sol.requester}</span>
-                        <span>•</span>
-                        <span>{sol.date}</span>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <Button size="sm" className="h-6 px-2 rounded-md text-[10px] bg-accent hover:bg-accent/90 text-accent-foreground gap-1">
-                          <CheckCircle className="w-3 h-3" /> Aprovar
-                        </Button>
-                        <Button variant="ghost" size="sm" className="h-6 px-2 rounded-md text-[10px] text-destructive hover:text-destructive hover:bg-destructive/10 gap-1">
-                          <XCircle className="w-3 h-3" /> Rejeitar
-                        </Button>
+                      <div className="flex items-center gap-1.5">
+                        <CalendarIcon className="w-3 h-3 text-muted-foreground" />
+                        <span className="text-muted-foreground">{sol.date}</span>
                       </div>
+                    </div>
+
+                    {/* Actions: Rejeitar left — Ver detalhes center — Aprovar right */}
+                    <div className="flex items-center justify-between pt-1 border-t border-border">
+                      <Button variant="ghost" size="sm" className="h-6 px-2 rounded-md text-[10px] text-destructive hover:text-destructive hover:bg-destructive/10 gap-1">
+                        <XCircle className="w-3 h-3" /> Rejeitar
+                      </Button>
+                      <Link to="/coordenador/solicitacoes" className="text-[10px] text-primary hover:underline flex items-center gap-0.5">
+                        <Eye className="w-3 h-3" /> Ver detalhes
+                      </Link>
+                      <Button size="sm" className="h-6 px-2 rounded-md text-[10px] bg-accent hover:bg-accent/90 text-accent-foreground gap-1">
+                        <CheckCircle className="w-3 h-3" /> Aprovar
+                      </Button>
                     </div>
                   </div>
                 );
