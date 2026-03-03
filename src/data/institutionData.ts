@@ -675,3 +675,21 @@ export const reitoriaDocentes: UniDocente[] = [
   { id: "ud7", name: "Prof. Margarida Lopes", email: "prof.mlopes@upra.kor", faculty: "Fac. Medicina", course: "Medicina Geral", disciplinas: 2, presenca: 97, status: "activo" },
   { id: "ud8", name: "Prof. Fernando Dias", email: "prof.dias@upra.kor", faculty: "Fac. Ciências Sociais", course: "Sociologia", disciplinas: 2, presenca: 89, status: "licença" },
 ];
+
+// ── Coordenador Anúncios ──
+export interface CoordAnuncio {
+  id: string;
+  title: string;
+  content: string;
+  date: string;
+  author: string;
+  type: "geral" | "academico" | "urgente";
+}
+
+export const coordAnuncios: CoordAnuncio[] = [
+  { id: "an1", title: "Início do período de matrículas 2024/25", content: "As matrículas para o ano lectivo 2024/25 decorrem de 1 a 15 de Março.", date: "01/03/2024", author: "Serviços Académicos", type: "geral" },
+  { id: "an2", title: "Suspensão de aulas — Semana Santa", content: "As aulas serão suspensas de 28 a 31 de Março.", date: "28/02/2024", author: "Reitoria", type: "geral" },
+  { id: "an3", title: "Entrega de notas do 1º semestre", content: "As notas finais devem ser submetidas até 5 de Março.", date: "27/02/2024", author: "Direcção Académica", type: "urgente" },
+  { id: "an4", title: "Seminário de Engenharia Civil", content: "Seminário aberto sobre inovação na construção sustentável. Auditório principal.", date: "25/02/2024", author: "Coordenação ECIV", type: "academico" },
+  { id: "an5", title: "Manutenção do sistema de notas", content: "O sistema estará indisponível no sábado, das 8h às 12h.", date: "23/02/2024", author: "TI", type: "geral" },
+];
