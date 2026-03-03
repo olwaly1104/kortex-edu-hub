@@ -111,21 +111,18 @@ export default function CoordenadorAnos() {
                   </div>
 
                   {/* Bottom metrics */}
-                  <div className="flex items-center gap-4 pt-3 border-t border-border/50">
-                    <div className="flex items-center gap-1.5 text-sm">
-                      <Award className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-xs text-muted-foreground">Média</span>
-                      <span className={`font-semibold ${y.mediaGeral >= 10 ? "text-accent" : "text-destructive"}`}>{y.mediaGeral}</span>
+                  <div className="grid grid-cols-3 gap-3 pt-3 border-t border-border/50">
+                    <div className="text-center">
+                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Média</p>
+                      <p className={`text-lg font-bold ${y.mediaGeral >= 10 ? "text-accent" : "text-destructive"}`}>{y.mediaGeral}</p>
                     </div>
-                    <div className="flex items-center gap-1.5 text-sm">
-                      <CheckCircle className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-xs text-muted-foreground">Presença</span>
-                      <span className={`font-semibold ${avgPresenca >= 75 ? "text-accent" : "text-destructive"}`}>{avgPresenca}%</span>
+                    <div className="text-center border-x border-border/30">
+                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Presença</p>
+                      <p className={`text-lg font-bold ${avgPresenca >= 75 ? "text-accent" : "text-destructive"}`}>{avgPresenca}%</p>
                     </div>
-                    <div className="flex items-center gap-1.5 text-sm">
-                      <ClipboardList className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-xs text-muted-foreground">Entrega</span>
-                      <span className={`font-semibold ${avgTaxaEntrega >= 80 ? "text-accent" : "text-destructive"}`}>{avgTaxaEntrega}%</span>
+                    <div className="text-center">
+                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Entrega</p>
+                      <p className={`text-lg font-bold ${avgTaxaEntrega >= 80 ? "text-accent" : "text-destructive"}`}>{avgTaxaEntrega}%</p>
                     </div>
                   </div>
                 </div>
