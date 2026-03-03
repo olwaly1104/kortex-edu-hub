@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { coordCursoInfo, coordAprovacoes, coordTurmas, coordAnuncios, coordTodayClasses } from "@/data/institutionData";
+import { coordCursoInfo, coordAprovacoes, coordTurmas, coordTodayClasses } from "@/data/institutionData";
+import { announcements } from "@/data/mockData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -172,12 +173,12 @@ export default function CoordenadorCursoDashboard() {
               <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
                 <Megaphone className="w-5 h-5 text-secondary" /> Anúncios
               </h2>
-              <Link to="/coordenador/aprovacoes" className="text-sm text-primary hover:underline flex items-center gap-1">
+              <Link to="/coordenador/anuncios" className="text-sm text-primary hover:underline flex items-center gap-1">
                 Ver todos <ChevronRight className="w-4 h-4" />
               </Link>
             </div>
             <div className="space-y-3">
-              {coordAnuncios.slice(0, 4).map(an => {
+              {announcements.slice(0, 4).map(an => {
                 const style = typeStyles[an.type] || typeStyles.geral;
                 return (
                   <Card key={an.id} className="p-4">
@@ -187,7 +188,7 @@ export default function CoordenadorCursoDashboard() {
                     </div>
                     <p className="text-sm font-semibold text-foreground line-clamp-1">{an.title}</p>
                     <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{an.content}</p>
-                    <p className="text-[11px] text-muted-foreground mt-1.5">{an.author}</p>
+                    <p className="text-[11px] text-muted-foreground mt-1.5">— {an.author}</p>
                   </Card>
                 );
               })}
