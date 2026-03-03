@@ -124,16 +124,16 @@ export default function CoordenadorAnoDetail() {
                         <span className="text-muted-foreground flex items-center gap-1.5"><ClipboardList className="w-3.5 h-3.5" /> Taxa de Entrega</span>
                         <span className={`font-semibold ${t.taxaEntrega >= 80 ? "text-accent" : "text-destructive"}`}>{t.taxaEntrega}%</span>
                       </div>
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-muted-foreground flex items-center gap-1.5"><FileText className="w-3.5 h-3.5" /> Conteúdos</span>
+                        <span className="font-semibold text-foreground">{turmaResources.length}</span>
+                      </div>
                       <div>
                         <div className="flex justify-between text-xs mb-1">
                           <span className="text-muted-foreground flex items-center gap-1.5"><Video className="w-3.5 h-3.5" /> Aulas Gravadas</span>
                           <span className="font-semibold text-foreground">{turmaPublished}/{turmaLessons.length}</span>
                         </div>
                         <Progress value={lessonPct} className="h-1.5" />
-                      </div>
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="text-muted-foreground flex items-center gap-1.5"><FileText className="w-3.5 h-3.5" /> Conteúdos</span>
-                        <span className="font-semibold text-foreground">{turmaResources.length}</span>
                       </div>
                     </div>
                   </div>
