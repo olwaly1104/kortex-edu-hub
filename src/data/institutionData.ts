@@ -141,6 +141,8 @@ export const coordEstudantes: CursoEstudante[] = [
   { id: "e13", name: "Helena Costa", email: "3132@upra.kor", year: 1, turma: "B", media: 7.2, presenca: 55, taxaEntrega: 45, status: "risco" },
   { id: "e14", name: "Igor Martins", email: "3143@upra.kor", year: 2, turma: "B", media: 12.1, presenca: 80, taxaEntrega: 78, status: "normal" },
   { id: "e15", name: "Joana Cardoso", email: "3154@upra.kor", year: 3, turma: "A", media: 15.8, presenca: 94, taxaEntrega: 97, status: "excelente" },
+  { id: "e16", name: "Tiago Barbosa", email: "3165@upra.kor", year: 2, turma: "B", media: 8.1, presenca: 58, taxaEntrega: 50, status: "risco" },
+  { id: "e17", name: "Vanessa Rocha", email: "3176@upra.kor", year: 3, turma: "B", media: 9.0, presenca: 60, taxaEntrega: 52, status: "risco" },
 ];
 
 export const coordDisciplinas: CursoDisciplina[] = [
@@ -295,7 +297,7 @@ export const coordTurmas: Turma[] = [
   { id: "t2a", name: "Turma A", year: 2, estudantes: 28, disciplinas: 7, professores: 3, media: 13.4, taxaSucesso: 84, presenca: 88, taxaEntrega: 91, director: "Prof. António Silva" },
   { id: "t2b", name: "Turma B", year: 2, estudantes: 24, disciplinas: 7, professores: 3, media: 12.7, taxaSucesso: 79, presenca: 80, taxaEntrega: 84, director: "Prof. Carlos Mendes" },
   { id: "t2c", name: "Turma C", year: 2, estudantes: 30, disciplinas: 7, professores: 3, media: 13.0, taxaSucesso: 81, presenca: 85, taxaEntrega: 87, director: "Prof. Maria Santos" },
-  { id: "t2d", name: "Turma D", year: 2, estudantes: 29, disciplinas: 7, professores: 3, media: 12.4, taxaSucesso: 78, presenca: 82, taxaEntrega: 85, director: "Prof. Sofia Martins" },
+  { id: "t2d", name: "Turma D", year: 2, estudantes: 29, disciplinas: 7, professores: 3, media: 11.8, taxaSucesso: 74, presenca: 77, taxaEntrega: 83, director: "Prof. Sofia Martins" },
   { id: "t2e", name: "Turma E", year: 2, estudantes: 29, disciplinas: 7, professores: 3, media: 13.2, taxaSucesso: 83, presenca: 86, taxaEntrega: 89, director: "Prof. Luísa Tavares" },
   // 3º Ano
   { id: "t3a", name: "Turma A", year: 3, estudantes: 25, disciplinas: 7, professores: 3, media: 14.1, taxaSucesso: 87, presenca: 90, taxaEntrega: 93, director: "Prof. Maria Santos" },
