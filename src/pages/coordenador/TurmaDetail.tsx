@@ -2,7 +2,8 @@ import { useParams, Link } from "react-router-dom";
 import { coordTurmas, coordDisciplinas, coordEstudantes, coordCursoInfo } from "@/data/institutionData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, GraduationCap, Users, Award, TrendingUp, BookOpen, CheckCircle, Search } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ArrowLeft, GraduationCap, Users, Award, BookOpen, CheckCircle, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 
@@ -13,11 +14,15 @@ export default function CoordenadorTurmaDetail() {
   const disciplinas = coordDisciplinas.filter(d => d.year === yearNum);
   const turmaLetter = turma?.name.replace("Turma ", "") || "";
   const estudantes = coordEstudantes.filter(e => e.year === yearNum && e.turma === turmaLetter);
-  const [search, setSearch] = useState("");
+  const [studentSearch, setStudentSearch] = useState("");
 
   if (!turma) return <div className="p-8 text-muted-foreground">Turma não encontrada.</div>;
 
-  const filtered = estudantes.filter(e => e.name.toLowerCase().includes(search.toLowerCase()));
+  const filteredStudents = estudantes.filter(e => e.name.toLowerCase().includes(studentSearch.toLowerCase()));
+
+  const statusColors: Record<string, string> = { excelente: "border-l-accent", normal: "border-l-secondary", risco: "border-l-destructive" };
+  const statusLabels: Record<string, string> = { excelente: "Excelente", normal: "Normal", risco: "Em Risco" };
+  const statusBadgeStyle: Record<string, string> = { excelente: "bg-accent/10 text-accent", normal: "bg-secondary/10 text-secondary", risco: "bg-destructive/10 text-destructive" };
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
@@ -32,7 +37,7 @@ export default function CoordenadorTurmaDetail() {
           <div className="w-14 h-14 rounded-2xl bg-primary flex items-center justify-center shrink-0 shadow-sm">
             <GraduationCap className="w-7 h-7 text-primary-foreground" />
           </div>
-          <div>
+          <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
               <Badge variant="outline" className="text-xs">{yearNum}º Ano</Badge>
               <Badge variant="outline" className="text-xs">{coordCursoInfo.name}</Badge>
@@ -75,66 +80,105 @@ export default function CoordenadorTurmaDetail() {
         </Card>
       </div>
 
-      {/* Estudantes */}
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-foreground">Estudantes</h2>
-          <div className="relative w-64">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-            <Input placeholder="Pesquisar..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9" />
-          </div>
+      {/* Tabs like professor view */}
+      <Tabs defaultValue="students" className="space-y-5">
+        <div className="border-b">
+          <TabsList className="bg-transparent h-auto p-0 gap-0">
+            {[
+              { value: "students", icon: Users, label: "Estudantes" },
+              { value: "disciplines", icon: BookOpen, label: "Disciplinas" },
+            ].map(tab => (
+              <TabsTrigger
+                key={tab.value}
+                value={tab.value}
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-current data-[state=active]:shadow-none data-[state=active]:bg-transparent px-4 py-3 text-sm gap-2"
+              >
+                <tab.icon className="w-4 h-4" />{tab.label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
         </div>
-        <Card className="overflow-hidden">
-          <table className="w-full text-sm">
-            <thead><tr className="border-b bg-muted/30">
-              <th className="text-left p-3 font-medium text-muted-foreground">Nome</th>
-              <th className="text-left p-3 font-medium text-muted-foreground">Email</th>
-              <th className="text-center p-3 font-medium text-muted-foreground">Média</th>
-              <th className="text-center p-3 font-medium text-muted-foreground">Presença</th>
-              <th className="text-center p-3 font-medium text-muted-foreground">Estado</th>
-            </tr></thead>
-            <tbody>{filtered.map(e => (
-              <tr key={e.id} className="border-b last:border-0 hover:bg-muted/20">
-                <td className="p-3 font-medium text-foreground">{e.name}</td>
-                <td className="p-3 text-muted-foreground">{e.email}</td>
-                <td className="p-3 text-center"><span className={e.media !== null && e.media >= 10 ? "text-accent font-medium" : "text-destructive font-medium"}>{e.media ?? "—"}</span></td>
-                <td className="p-3 text-center"><span className={e.presenca >= 75 ? "text-accent font-medium" : "text-destructive font-medium"}>{e.presenca}%</span></td>
-                <td className="p-3 text-center">
-                  <Badge variant={e.status === "excelente" ? "default" : e.status === "risco" ? "destructive" : "secondary"} className="text-[10px]">
-                    {e.status === "excelente" ? "Excelente" : e.status === "risco" ? "Em Risco" : "Normal"}
-                  </Badge>
-                </td>
-              </tr>
-            ))}</tbody>
-          </table>
-          {filtered.length === 0 && <p className="text-center text-muted-foreground py-8">Nenhum estudante encontrado.</p>}
-        </Card>
-      </div>
 
-      {/* Disciplinas */}
-      <div>
-        <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-          <BookOpen className="w-5 h-5 text-primary" /> Disciplinas
-        </h2>
-        <Card className="overflow-hidden">
-          <table className="w-full text-sm">
-            <thead><tr className="border-b bg-muted/30">
-              <th className="text-left p-3 font-medium text-muted-foreground">Disciplina</th>
-              <th className="text-left p-3 font-medium text-muted-foreground">Professor</th>
-              <th className="text-center p-3 font-medium text-muted-foreground">Média</th>
-              <th className="text-center p-3 font-medium text-muted-foreground">Sucesso</th>
-            </tr></thead>
-            <tbody>{disciplinas.map(d => (
-              <tr key={d.id} className="border-b last:border-0 hover:bg-muted/20">
-                <td className="p-3"><p className="font-medium text-foreground">{d.name}</p><p className="text-[11px] text-muted-foreground">{d.code}</p></td>
-                <td className="p-3 text-muted-foreground">{d.professor}</td>
-                <td className="p-3 text-center"><span className={d.media !== null && d.media >= 10 ? "text-accent font-medium" : "text-destructive font-medium"}>{d.media ?? "—"}</span></td>
-                <td className="p-3 text-center"><Badge variant={d.taxaSucesso >= 80 ? "default" : "secondary"} className="text-[10px]">{d.taxaSucesso}%</Badge></td>
-              </tr>
-            ))}</tbody>
-          </table>
-        </Card>
-      </div>
+        {/* Estudantes tab */}
+        <TabsContent value="students" className="space-y-4">
+          <div className="flex items-center justify-between gap-4">
+            <div className="relative flex-1 max-w-sm">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Pesquisar estudante..."
+                value={studentSearch}
+                onChange={e => setStudentSearch(e.target.value)}
+                className="pl-9"
+              />
+            </div>
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-accent" /> Excelente ({estudantes.filter(s => s.status === "excelente").length})</span>
+              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-secondary" /> Normal ({estudantes.filter(s => s.status === "normal").length})</span>
+              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-destructive" /> Risco ({estudantes.filter(s => s.status === "risco").length})</span>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            {filteredStudents.map(student => (
+              <Card key={student.id} className={`p-4 flex items-center gap-4 border-l-[3px] ${statusColors[student.status]}`}>
+                <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-xs font-bold text-muted-foreground shrink-0">
+                  {student.name.split(" ").map(n => n[0]).slice(0, 2).join("")}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-semibold text-foreground truncate">{student.name}</p>
+                    <Badge className={`${statusBadgeStyle[student.status]} text-[10px]`}>{statusLabels[student.status]}</Badge>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">{student.email}</p>
+                </div>
+                <div className="grid grid-cols-2 gap-4 shrink-0 text-center">
+                  <div>
+                    <p className="text-[10px] text-muted-foreground uppercase">Presença</p>
+                    <p className={`text-sm font-bold ${student.presenca >= 75 ? "text-accent" : "text-destructive"}`}>{student.presenca}%</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-muted-foreground uppercase">Média</p>
+                    <p className={`text-sm font-bold ${student.media !== null && student.media >= 10 ? "text-accent" : "text-destructive"}`}>{student.media ?? "—"}</p>
+                  </div>
+                </div>
+              </Card>
+            ))}
+            {filteredStudents.length === 0 && <p className="text-center text-muted-foreground py-8">Nenhum estudante encontrado.</p>}
+          </div>
+        </TabsContent>
+
+        {/* Disciplinas tab */}
+        <TabsContent value="disciplines" className="space-y-4">
+          <p className="text-sm text-muted-foreground">{disciplinas.length} disciplinas neste ano</p>
+          <div className="space-y-2">
+            {disciplinas.map(d => (
+              <Card key={d.id} className={`p-4 flex items-center gap-4 border-l-[3px] ${d.media !== null && d.media >= 10 ? "border-l-accent" : "border-l-destructive"}`}>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-semibold text-foreground">{d.name}</p>
+                    <Badge variant="outline" className="text-[10px] font-mono">{d.code}</Badge>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">{d.professor}</p>
+                </div>
+                <div className="grid grid-cols-3 gap-4 shrink-0 text-center">
+                  <div>
+                    <p className="text-[10px] text-muted-foreground uppercase">Estudantes</p>
+                    <p className="text-sm font-bold text-foreground">{d.estudantes}</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-muted-foreground uppercase">Média</p>
+                    <p className={`text-sm font-bold ${d.media !== null && d.media >= 10 ? "text-accent" : "text-destructive"}`}>{d.media ?? "—"}</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-muted-foreground uppercase">Sucesso</p>
+                    <Badge variant={d.taxaSucesso >= 80 ? "default" : "secondary"} className="text-[10px]">{d.taxaSucesso}%</Badge>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
