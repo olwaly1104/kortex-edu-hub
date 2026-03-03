@@ -3,7 +3,7 @@ import { coordTurmas, coordDisciplinas, coordEstudantes, coordCursoInfo } from "
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, GraduationCap, Users, Award, BookOpen, CheckCircle, Search } from "lucide-react";
+import { ArrowLeft, GraduationCap, Users, BookOpen, CheckCircle, Search, TrendingUp, Calendar } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 
@@ -30,7 +30,7 @@ export default function CoordenadorTurmaDetail() {
         <ArrowLeft className="w-4 h-4" /> Voltar ao {yearNum}º Ano
       </Link>
 
-      {/* Hero */}
+      {/* Hero — matches professor discipline detail */}
       <div className="relative overflow-hidden rounded-2xl p-6 lg:p-8 bg-primary/5">
         <div className="absolute top-0 right-0 w-40 h-40 rounded-full bg-primary/5" style={{ transform: "translate(30%, -30%)" }} />
         <div className="relative flex items-start gap-5">
@@ -39,11 +39,17 @@ export default function CoordenadorTurmaDetail() {
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
-              <Badge variant="outline" className="text-xs">{yearNum}º Ano</Badge>
-              <Badge variant="outline" className="text-xs">{coordCursoInfo.name}</Badge>
+              <Badge variant="outline" className="text-xs font-mono">{coordCursoInfo.code}</Badge>
+              <Badge variant="outline" className="text-[10px]">{turma.name}</Badge>
             </div>
-            <h1 className="text-2xl lg:text-3xl font-bold text-foreground">{turma.name}</h1>
-            <p className="text-muted-foreground mt-1">Director de turma: {turma.director}</p>
+            <h1 className="text-2xl lg:text-3xl font-bold text-foreground">{coordCursoInfo.name} — {turma.name}</h1>
+            <p className="text-muted-foreground mt-2 leading-relaxed max-w-2xl">
+              Director de turma: {turma.director}
+            </p>
+            <div className="flex items-center gap-4 mt-3 text-sm text-muted-foreground">
+              <span className="flex items-center gap-1.5"><GraduationCap className="w-4 h-4" />{coordCursoInfo.faculty}</span>
+              <span className="flex items-center gap-1.5"><Calendar className="w-4 h-4" />{yearNum}º Ano</span>
+            </div>
           </div>
         </div>
       </div>
@@ -66,21 +72,30 @@ export default function CoordenadorTurmaDetail() {
         </Card>
         <Card className="p-4">
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><Award className="w-4 h-4 text-primary" /></div>
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><TrendingUp className="w-4 h-4 text-primary" /></div>
             <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Média</span>
           </div>
-          <p className={`text-2xl font-bold ${turma.media >= 10 ? "text-accent" : "text-destructive"}`}>{turma.media}</p>
+          {turma.media !== null ? (
+            <div className="flex items-baseline gap-1">
+              <span className={`text-2xl font-bold ${turma.media >= 10 ? "text-accent" : "text-destructive"}`}>{turma.media}</span>
+              <span className="text-sm text-muted-foreground">/20</span>
+            </div>
+          ) : (
+            <p className="text-2xl font-bold text-muted-foreground">—</p>
+          )}
         </Card>
         <Card className="p-4">
           <div className="flex items-center gap-2 mb-3">
             <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><CheckCircle className="w-4 h-4 text-primary" /></div>
             <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Presença</span>
           </div>
-          <p className={`text-2xl font-bold ${turma.presenca >= 75 ? "text-accent" : "text-destructive"}`}>{turma.presenca}%</p>
+          <div className="flex items-baseline gap-1">
+            <span className={`text-2xl font-bold ${turma.presenca >= 75 ? "text-accent" : "text-destructive"}`}>{turma.presenca}%</span>
+          </div>
         </Card>
       </div>
 
-      {/* Tabs like professor view */}
+      {/* Tabs — same pattern as professor */}
       <Tabs defaultValue="students" className="space-y-5">
         <div className="border-b">
           <TabsList className="bg-transparent h-auto p-0 gap-0">
@@ -99,7 +114,7 @@ export default function CoordenadorTurmaDetail() {
           </TabsList>
         </div>
 
-        {/* Estudantes tab */}
+        {/* Estudantes */}
         <TabsContent value="students" className="space-y-4">
           <div className="flex items-center justify-between gap-4">
             <div className="relative flex-1 max-w-sm">
@@ -147,7 +162,7 @@ export default function CoordenadorTurmaDetail() {
           </div>
         </TabsContent>
 
-        {/* Disciplinas tab */}
+        {/* Disciplinas */}
         <TabsContent value="disciplines" className="space-y-4">
           <p className="text-sm text-muted-foreground">{disciplinas.length} disciplinas neste ano</p>
           <div className="space-y-2">
@@ -170,7 +185,7 @@ export default function CoordenadorTurmaDetail() {
                     <p className={`text-sm font-bold ${d.media !== null && d.media >= 10 ? "text-accent" : "text-destructive"}`}>{d.media ?? "—"}</p>
                   </div>
                   <div>
-                    <p className="text-[10px] text-muted-foreground uppercase">Sucesso</p>
+                    <p className="text-[10px] text-muted-foreground uppercase">Presença</p>
                     <Badge variant={d.taxaSucesso >= 80 ? "default" : "secondary"} className="text-[10px]">{d.taxaSucesso}%</Badge>
                   </div>
                 </div>
