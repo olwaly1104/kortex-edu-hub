@@ -181,22 +181,22 @@ export default function CoordenadorCursoDashboard() {
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
                   <GraduationCap className="w-3.5 h-3.5" /> Docentes
+                  <Badge variant="outline" className="text-[9px] px-1.5 py-0">{docentesEmRisco.length}</Badge>
                 </h3>
                 <Link to="/coordenador/docentes" className="text-[11px] text-primary hover:underline flex items-center gap-0.5">
                   Ver todos <ChevronRight className="w-3 h-3" />
                 </Link>
               </div>
               {docentesEmRisco.length > 0 ? (
-                <div className="space-y-2">
+                <div className="space-y-1.5">
                   {docentesEmRisco.map(d => (
                     <Link key={d.id} to="/coordenador/docentes">
-                      <div className="px-3 py-2.5 rounded-xl border border-border bg-card border-l-[3px] border-l-destructive hover:bg-muted/40 transition-colors cursor-pointer">
-                        <p className="text-xs font-semibold text-foreground leading-tight">{d.name}</p>
-                        <p className="text-[10px] text-muted-foreground mt-0.5">{d.department}</p>
-                        <div className="flex items-center gap-3 mt-1.5 text-[10px]">
-                          <span className={d.presenca < 85 ? "text-destructive font-medium" : "text-muted-foreground"}>Presença: {d.presenca}%</span>
-                          <span className={d.taxaEntrega < 80 ? "text-destructive font-medium" : "text-muted-foreground"}>Entrega: {d.taxaEntrega}%</span>
-                          <span className={d.mediaGeral < 11 ? "text-destructive font-medium" : "text-muted-foreground"}>Média: {d.mediaGeral}</span>
+                      <div className="px-2.5 py-2 rounded-lg border border-border bg-card border-l-[3px] border-l-destructive hover:bg-muted/40 transition-colors cursor-pointer">
+                        <p className="text-[11px] font-semibold text-foreground leading-tight">{d.name}</p>
+                        <div className="flex items-center gap-2 mt-1 text-[10px]">
+                          <span className={d.presenca < 85 ? "text-destructive font-medium" : "text-muted-foreground"}>{d.presenca}%</span>
+                          <span className={d.taxaEntrega < 80 ? "text-destructive font-medium" : "text-muted-foreground"}>{d.taxaEntrega}%</span>
+                          <span className={d.mediaGeral < 11 ? "text-destructive font-medium" : "text-muted-foreground"}>{d.mediaGeral}</span>
                         </div>
                       </div>
                     </Link>
@@ -212,6 +212,7 @@ export default function CoordenadorCursoDashboard() {
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
                   <Users className="w-3.5 h-3.5" /> Turmas
+                  <Badge variant="outline" className="text-[9px] px-1.5 py-0">{turmasEmRisco.length}</Badge>
                 </h3>
                 {!showAllRisk && turmasEmRisco.length > 3 && (
                   <button onClick={() => setShowAllRisk(true)} className="text-[11px] text-primary hover:underline flex items-center gap-0.5">
@@ -225,35 +226,18 @@ export default function CoordenadorCursoDashboard() {
                 )}
               </div>
               {turmasEmRisco.length > 0 ? (
-                <div className="space-y-2">
+                <div className="space-y-1.5">
                   {(showAllRisk ? turmasEmRisco : turmasEmRisco.slice(0, 3)).map(t => (
                     <Link key={t.id} to={`/coordenador/anos/${t.year}/turma/${t.id}`}>
-                      <div className="px-3 py-2.5 rounded-xl border border-border bg-card border-l-[3px] border-l-destructive hover:bg-muted/40 transition-colors cursor-pointer">
-                        <div className="flex items-center justify-between mb-1.5">
-                          <div className="flex items-center gap-2">
-                            <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-destructive/10 text-destructive shrink-0">
-                              <GraduationCap className="w-3.5 h-3.5" />
-                            </div>
-                            <div>
-                              <p className="font-semibold text-foreground text-xs leading-tight">{t.name}</p>
-                              <p className="text-[10px] text-muted-foreground">{t.year}º Ano</p>
-                            </div>
-                          </div>
-                          <ChevronRight className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                      <div className="px-2.5 py-2 rounded-lg border border-border bg-card border-l-[3px] border-l-destructive hover:bg-muted/40 transition-colors cursor-pointer">
+                        <div className="flex items-center justify-between">
+                          <p className="text-[11px] font-semibold text-foreground leading-tight">{t.name}</p>
+                          <span className="text-[10px] text-muted-foreground">{t.year}º Ano</span>
                         </div>
-                        <div className="space-y-1 pt-1.5 border-t border-border">
-                          <div className="flex items-center justify-between text-[10px]">
-                            <span className="text-muted-foreground">Presença</span>
-                            <span className={`font-semibold ${t.presenca >= 80 ? "text-accent" : "text-destructive"}`}>{t.presenca}%</span>
-                          </div>
-                          <div className="flex items-center justify-between text-[10px]">
-                            <span className="text-muted-foreground">Entrega</span>
-                            <span className={`font-semibold ${t.taxaEntrega >= 85 ? "text-accent" : "text-destructive"}`}>{t.taxaEntrega}%</span>
-                          </div>
-                          <div className="flex items-center justify-between text-[10px]">
-                            <span className="text-muted-foreground">Média</span>
-                            <span className={`font-semibold ${t.media >= 12 ? "text-accent" : "text-destructive"}`}>{t.media}</span>
-                          </div>
+                        <div className="flex items-center gap-2 mt-1 text-[10px]">
+                          <span className={t.presenca >= 80 ? "text-muted-foreground" : "text-destructive font-medium"}>{t.presenca}%</span>
+                          <span className={t.taxaEntrega >= 85 ? "text-muted-foreground" : "text-destructive font-medium"}>{t.taxaEntrega}%</span>
+                          <span className={t.media >= 12 ? "text-muted-foreground" : "text-destructive font-medium"}>{t.media}</span>
                         </div>
                       </div>
                     </Link>
@@ -283,15 +267,16 @@ export default function CoordenadorCursoDashboard() {
               {pendentes.slice(0, 3).map(sol => {
                 const Icon = typeIcons[sol.type] || FileText;
                 return (
-                  <div key={sol.id} className="flex items-center gap-3 px-3 py-2.5 rounded-xl border border-border bg-card hover:bg-muted/40 transition-colors">
-                    <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-muted/60">
+                  <div key={sol.id} className="flex items-start gap-3 px-3 py-2.5 rounded-xl border border-border bg-card hover:bg-muted/40 transition-colors">
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-muted/60 mt-0.5">
                       <Icon className="w-3.5 h-3.5 text-muted-foreground" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-semibold text-foreground line-clamp-1 leading-tight">{sol.title}</p>
-                      <p className="text-[10px] text-muted-foreground mt-0.5">{sol.requester} • {sol.date}</p>
+                      <p className="text-[10px] text-muted-foreground mt-0.5 line-clamp-2">{sol.description}</p>
+                      <p className="text-[10px] text-muted-foreground mt-1">{sol.requester} • {sol.date}</p>
                     </div>
-                    <div className="flex items-center gap-1 shrink-0">
+                    <div className="flex items-center gap-1 shrink-0 mt-0.5">
                       <Button size="sm" className="h-6 w-6 p-0 rounded-lg bg-accent hover:bg-accent/90 text-accent-foreground">
                         <CheckCircle className="w-3 h-3" />
                       </Button>
