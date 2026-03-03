@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Users, Search } from "lucide-react";
+import { Users, Search, TrendingUp, AlertTriangle, Award } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const statusBadge: Record<string, { label: string; cls: string }> = {
@@ -24,24 +24,55 @@ export default function CoordenadorEstudantes() {
     (filterStatus === "todos" || e.status === filterStatus)
   );
 
-  const stats = [
-    { label: "Total", value: coordCursoInfo.totalEstudantes, color: "text-primary bg-primary/10" },
-    { label: "Excelentes", value: coordEstudantes.filter(e => e.status === "excelente").length, color: "text-accent bg-accent/10" },
-    { label: "Normal", value: coordEstudantes.filter(e => e.status === "normal").length, color: "text-primary bg-primary/10" },
-    { label: "Em Risco", value: coordEstudantes.filter(e => e.status === "risco").length, color: "text-destructive bg-destructive/10" },
-  ];
+  const totalEstudantes = coordCursoInfo.totalEstudantes;
+  const excelentes = coordEstudantes.filter(e => e.status === "excelente").length;
+  const normais = coordEstudantes.filter(e => e.status === "normal").length;
+  const emRisco = coordEstudantes.filter(e => e.status === "risco").length;
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       <h1 className="text-2xl font-bold text-foreground flex items-center gap-2"><Users className="w-6 h-6 text-primary" /> Estudantes do Curso</h1>
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        {stats.map(s => (
-          <Card key={s.label} className="p-4 text-center">
-            <p className={cn("text-2xl font-bold", s.color.split(" ")[0])}>{s.value}</p>
-            <p className="text-xs text-muted-foreground">{s.label}</p>
-          </Card>
-        ))}
+
+      {/* Professional stat cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card className="p-5 flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0">
+            <Users className="w-6 h-6 text-primary" />
+          </div>
+          <div>
+            <p className="text-2xl font-bold text-foreground">{totalEstudantes}</p>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Total</p>
+          </div>
+        </Card>
+        <Card className="p-5 flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-accent/10 flex items-center justify-center shrink-0">
+            <Award className="w-6 h-6 text-accent" />
+          </div>
+          <div>
+            <p className="text-2xl font-bold text-accent">{excelentes}</p>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Excelentes</p>
+          </div>
+        </Card>
+        <Card className="p-5 flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0">
+            <TrendingUp className="w-6 h-6 text-primary" />
+          </div>
+          <div>
+            <p className="text-2xl font-bold text-foreground">{normais}</p>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Normal</p>
+          </div>
+        </Card>
+        <Card className="p-5 flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-destructive/10 flex items-center justify-center shrink-0">
+            <AlertTriangle className="w-6 h-6 text-destructive" />
+          </div>
+          <div>
+            <p className="text-2xl font-bold text-destructive">{emRisco}</p>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Em Risco</p>
+          </div>
+        </Card>
       </div>
+
       <div className="flex flex-wrap gap-2">
         {[null, 1, 2, 3, 4, 5].map(y => (
           <Button key={String(y)} size="sm" variant={filterYear === y ? "default" : "outline"} onClick={() => setFilterYear(y)}>
