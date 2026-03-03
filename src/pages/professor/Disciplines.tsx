@@ -49,7 +49,7 @@ export default function ProfessorDisciplines() {
                       <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{room}</span>
                     </div>
                   </div>
-                  <Link to={`/professor/disciplines/${turmaDiscs[0]?.id || ''}?turma=${turma.id}`}>
+                  <Link to={`/professor/turma/${turma.id}`}>
                     <ChevronRight className="w-5 h-5 text-muted-foreground hover:text-primary transition-colors" />
                   </Link>
                 </div>
