@@ -63,6 +63,7 @@ export interface CursoEstudante {
   turma: string;
   media: number | null;
   presenca: number;
+  taxaEntrega: number;
   status: "excelente" | "normal" | "risco";
 }
 
@@ -117,21 +118,21 @@ export const coordDocentes: Docente[] = [
 ];
 
 export const coordEstudantes: CursoEstudante[] = [
-  { id: "e1", name: "João Fernandes", email: "2934@upra.kor", year: 2, turma: "A", media: 14.2, presenca: 92, status: "excelente" },
-  { id: "e2", name: "Maria Silva", email: "3012@upra.kor", year: 2, turma: "A", media: 15.1, presenca: 95, status: "excelente" },
-  { id: "e3", name: "Pedro Nascimento", email: "2987@upra.kor", year: 2, turma: "B", media: 11.8, presenca: 78, status: "normal" },
-  { id: "e4", name: "Ana Gomes", email: "3045@upra.kor", year: 1, turma: "A", media: 12.5, presenca: 88, status: "normal" },
-  { id: "e5", name: "Carlos Santos", email: "3100@upra.kor", year: 1, turma: "A", media: 8.9, presenca: 62, status: "risco" },
-  { id: "e6", name: "Rita Oliveira", email: "3055@upra.kor", year: 3, turma: "A", media: 16.2, presenca: 97, status: "excelente" },
-  { id: "e7", name: "Bruno Mendes", email: "3066@upra.kor", year: 3, turma: "B", media: 13.4, presenca: 85, status: "normal" },
-  { id: "e8", name: "Catarina Reis", email: "3077@upra.kor", year: 1, turma: "B", media: 9.5, presenca: 65, status: "risco" },
-  { id: "e9", name: "Diogo Pereira", email: "3088@upra.kor", year: 4, turma: "A", media: 14.8, presenca: 93, status: "excelente" },
-  { id: "e10", name: "Eva Cunha", email: "3099@upra.kor", year: 4, turma: "A", media: 13.0, presenca: 82, status: "normal" },
-  { id: "e11", name: "Francisco Lima", email: "3110@upra.kor", year: 5, turma: "A", media: 15.5, presenca: 96, status: "excelente" },
-  { id: "e12", name: "Gonçalo Dias", email: "3121@upra.kor", year: 5, turma: "A", media: 14.0, presenca: 90, status: "normal" },
-  { id: "e13", name: "Helena Costa", email: "3132@upra.kor", year: 1, turma: "B", media: 7.2, presenca: 55, status: "risco" },
-  { id: "e14", name: "Igor Martins", email: "3143@upra.kor", year: 2, turma: "B", media: 12.1, presenca: 80, status: "normal" },
-  { id: "e15", name: "Joana Cardoso", email: "3154@upra.kor", year: 3, turma: "A", media: 15.8, presenca: 94, status: "excelente" },
+  { id: "e1", name: "João Fernandes", email: "2934@upra.kor", year: 2, turma: "A", media: 14.2, presenca: 92, taxaEntrega: 95, status: "excelente" },
+  { id: "e2", name: "Maria Silva", email: "3012@upra.kor", year: 2, turma: "A", media: 15.1, presenca: 95, taxaEntrega: 98, status: "excelente" },
+  { id: "e3", name: "Pedro Nascimento", email: "2987@upra.kor", year: 2, turma: "B", media: 11.8, presenca: 78, taxaEntrega: 82, status: "normal" },
+  { id: "e4", name: "Ana Gomes", email: "3045@upra.kor", year: 1, turma: "A", media: 12.5, presenca: 88, taxaEntrega: 90, status: "normal" },
+  { id: "e5", name: "Carlos Santos", email: "3100@upra.kor", year: 1, turma: "A", media: 8.9, presenca: 62, taxaEntrega: 55, status: "risco" },
+  { id: "e6", name: "Rita Oliveira", email: "3055@upra.kor", year: 3, turma: "A", media: 16.2, presenca: 97, taxaEntrega: 100, status: "excelente" },
+  { id: "e7", name: "Bruno Mendes", email: "3066@upra.kor", year: 3, turma: "B", media: 13.4, presenca: 85, taxaEntrega: 88, status: "normal" },
+  { id: "e8", name: "Catarina Reis", email: "3077@upra.kor", year: 1, turma: "B", media: 9.5, presenca: 65, taxaEntrega: 60, status: "risco" },
+  { id: "e9", name: "Diogo Pereira", email: "3088@upra.kor", year: 4, turma: "A", media: 14.8, presenca: 93, taxaEntrega: 96, status: "excelente" },
+  { id: "e10", name: "Eva Cunha", email: "3099@upra.kor", year: 4, turma: "A", media: 13.0, presenca: 82, taxaEntrega: 85, status: "normal" },
+  { id: "e11", name: "Francisco Lima", email: "3110@upra.kor", year: 5, turma: "A", media: 15.5, presenca: 96, taxaEntrega: 100, status: "excelente" },
+  { id: "e12", name: "Gonçalo Dias", email: "3121@upra.kor", year: 5, turma: "A", media: 14.0, presenca: 90, taxaEntrega: 92, status: "normal" },
+  { id: "e13", name: "Helena Costa", email: "3132@upra.kor", year: 1, turma: "B", media: 7.2, presenca: 55, taxaEntrega: 45, status: "risco" },
+  { id: "e14", name: "Igor Martins", email: "3143@upra.kor", year: 2, turma: "B", media: 12.1, presenca: 80, taxaEntrega: 78, status: "normal" },
+  { id: "e15", name: "Joana Cardoso", email: "3154@upra.kor", year: 3, turma: "A", media: 15.8, presenca: 94, taxaEntrega: 97, status: "excelente" },
 ];
 
 export const coordDisciplinas: CursoDisciplina[] = [
