@@ -693,3 +693,25 @@ export const coordAnuncios: CoordAnuncio[] = [
   { id: "an4", title: "Seminário de Engenharia Civil", content: "Seminário aberto sobre inovação na construção sustentável. Auditório principal.", date: "25/02/2024", author: "Coordenação ECIV", type: "academico" },
   { id: "an5", title: "Manutenção do sistema de notas", content: "O sistema estará indisponível no sábado, das 8h às 12h.", date: "23/02/2024", author: "TI", type: "geral" },
 ];
+
+// ── Coordenador Today Schedule ──
+export interface CoordTodayClass {
+  id: string;
+  name: string;
+  discipline: string;
+  turma: string;
+  professor: string;
+  time: string;
+  room: string;
+  year: number;
+  color: string;
+  status: "concluída" | "em_curso" | "agendada";
+}
+
+export const coordTodayClasses: CoordTodayClass[] = [
+  { id: "ctc1", name: "Matemática I — Aula 4", discipline: "MAT101", turma: "Turma A — 1º Ano", professor: "Prof. Sofia Martins", time: "08:00 - 09:30", room: "Sala A101", year: 1, color: "hsl(220, 70%, 50%)", status: "concluída" },
+  { id: "ctc2", name: "Física I — Aula 3", discipline: "FIS101", turma: "Turma A — 1º Ano", professor: "Prof. Maria Santos", time: "09:45 - 11:15", room: "Lab. Física", year: 1, color: "hsl(340, 70%, 50%)", status: "concluída" },
+  { id: "ctc3", name: "Resistência dos Materiais — Aula 2", discipline: "RES201", turma: "Turma A — 2º Ano", professor: "Prof. Carlos Mendes", time: "11:30 - 13:00", room: "Sala C301", year: 2, color: "hsl(160, 60%, 40%)", status: "em_curso" },
+  { id: "ctc4", name: "Mecânica dos Solos — Aula 2", discipline: "GEO301", turma: "Turma A — 3º Ano", professor: "Prof. Maria Santos", time: "14:00 - 15:30", room: "Lab. Geotecnia", year: 3, color: "hsl(30, 70%, 50%)", status: "agendada" },
+  { id: "ctc5", name: "Estruturas de Betão — Aula 2", discipline: "EST401", turma: "Turma A — 4º Ano", professor: "Prof. António Silva", time: "15:45 - 17:15", room: "Sala D401", year: 4, color: "hsl(270, 60%, 50%)", status: "agendada" },
+];
