@@ -403,6 +403,20 @@ export const contacts: Contact[] = [
   { id: "ct42", name: "Nuno Barros", email: "3298@upra.kor", role: "Colega - 2º Ano", category: "colega" },
 ];
 
+// Coordinator personal agenda events (synced with calendar)
+export const coordAgendaEvents: CalendarEvent[] = [
+  { id: "ca1", title: "Reunião Conselho Pedagógico", type: "pessoal", date: "2024-02-12", startTime: "09:00", endTime: "10:30", duration: "1h 30min", room: "Sala de Reuniões B", color: "hsl(220, 70%, 50%)" },
+  { id: "ca2", title: "Revisão Planos Curriculares", type: "pessoal", date: "2024-02-13", startTime: "10:00", endTime: "12:00", duration: "2h", room: "Gabinete", color: "hsl(160, 60%, 40%)" },
+  { id: "ca3", title: "Reunião com Docentes — 1º Ano", type: "pessoal", date: "2024-02-14", startTime: "08:30", endTime: "09:30", duration: "1h", room: "Sala de Reuniões A", color: "hsl(220, 70%, 50%)" },
+  { id: "ca4", title: "Análise de Aprovações Pendentes", type: "pessoal", date: "2024-02-14", startTime: "10:00", endTime: "11:00", duration: "1h", room: "Gabinete", color: "hsl(30, 70%, 50%)" },
+  { id: "ca5", title: "Almoço com Decano da Faculdade", type: "pessoal", date: "2024-02-14", startTime: "12:30", endTime: "14:00", duration: "1h 30min", room: "Restaurante Universitário", color: "hsl(340, 70%, 50%)" },
+  { id: "ca6", title: "Atendimento a Estudantes", type: "pessoal", date: "2024-02-14", startTime: "14:30", endTime: "16:00", duration: "1h 30min", room: "Gabinete 204", color: "hsl(270, 60%, 50%)" },
+  { id: "ca7", title: "Preparação Relatório Semestral", type: "pessoal", date: "2024-02-14", startTime: "16:30", endTime: "18:00", duration: "1h 30min", room: "Gabinete", color: "hsl(160, 60%, 40%)" },
+  { id: "ca8", title: "Reunião Comissão de Avaliação", type: "pessoal", date: "2024-02-15", startTime: "09:00", endTime: "10:30", duration: "1h 30min", room: "Sala de Reuniões C", color: "hsl(220, 70%, 50%)" },
+  { id: "ca9", title: "Visita Laboratórios — 2º Ano", type: "pessoal", date: "2024-02-15", startTime: "14:00", endTime: "15:30", duration: "1h 30min", room: "Lab. Engenharia", color: "hsl(30, 70%, 50%)" },
+  { id: "ca10", title: "Entrevista Candidatos Docentes", type: "pessoal", date: "2024-02-16", startTime: "10:00", endTime: "12:00", duration: "2h", room: "Sala de Reuniões A", color: "hsl(340, 70%, 50%)" },
+];
+
 // Calendar events
 export const calendarEvents: CalendarEvent[] = [
   { id: "e1", title: "Matemática II", type: "aula", date: "2024-02-12", startTime: "08:00", endTime: "09:30", duration: "1h 30min", professor: "Prof. António Silva", room: "Sala 101", discipline: "Matemática II", color: "hsl(224, 64%, 33%)" },
@@ -420,6 +434,7 @@ export const calendarEvents: CalendarEvent[] = [
   { id: "e13", title: "Teste 2 Matemática II", type: "teste", date: "2024-03-25", startTime: "08:00", endTime: "10:00", duration: "2h", discipline: "Matemática II", color: "hsl(0, 84%, 60%)" },
   { id: "e14", title: "Entrega Trabalho Programação", type: "entrega", date: "2024-04-15", startTime: "23:59", endTime: "23:59", discipline: "Programação II", color: "hsl(38, 92%, 50%)" },
   { id: "e15", title: "Exame Final Física", type: "exame", date: "2024-05-20", startTime: "09:00", endTime: "12:00", duration: "3h", discipline: "Física Aplicada", color: "hsl(0, 84%, 60%)" },
+  ...coordAgendaEvents,
 ];
 
 // Storage files
