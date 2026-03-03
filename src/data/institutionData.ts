@@ -120,6 +120,9 @@ export const coordDocentes: Docente[] = [
   { id: "d6", name: "Prof. Luísa Tavares", email: "prof.tavares@upra.kor", department: "Topografia", disciplinas: 2, turmas: 2, presenca: 95, mediaGeral: 13.5, estudantesTotal: 64, taxaEntrega: 89, status: "activo" },
   { id: "d7", name: "Prof. Carlos Mendes", email: "prof.mendes@upra.kor", department: "Estruturas", disciplinas: 2, turmas: 3, presenca: 91, mediaGeral: 14.5, estudantesTotal: 68, taxaEntrega: 94, status: "activo" },
   { id: "d8", name: "Prof. Sofia Martins", email: "prof.martins@upra.kor", department: "Matemática", disciplinas: 2, turmas: 4, presenca: 97, mediaGeral: 12.9, estudantesTotal: 128, taxaEntrega: 85, status: "activo" },
+  { id: "d9", name: "Prof. Ricardo Nunes", email: "prof.nunes@upra.kor", department: "Física", disciplinas: 2, turmas: 3, presenca: 82, mediaGeral: 10.5, estudantesTotal: 85, taxaEntrega: 74, status: "activo" },
+  { id: "d10", name: "Prof. Teresa Almeida", email: "prof.almeida@upra.kor", department: "Construção", disciplinas: 1, turmas: 2, presenca: 79, mediaGeral: 9.8, estudantesTotal: 42, taxaEntrega: 68, status: "activo" },
+  { id: "d11", name: "Prof. Miguel Sousa", email: "prof.sousa@upra.kor", department: "Urbanismo", disciplinas: 2, turmas: 2, presenca: 84, mediaGeral: 10.2, estudantesTotal: 56, taxaEntrega: 76, status: "activo" },
 ];
 
 export const coordEstudantes: CursoEstudante[] = [
