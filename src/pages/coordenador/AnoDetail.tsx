@@ -3,7 +3,7 @@ import { coordCursoInfo, coordTurmas, coordDisciplinas, coordTurmaLessons, coord
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, GraduationCap, Users, Award, ChevronRight, BookOpen, CheckCircle, UserCheck, Video, FileText, Calendar, MapPin } from "lucide-react";
+import { ArrowLeft, GraduationCap, Users, Award, ChevronRight, BookOpen, CheckCircle, UserCheck, Video, FileText, Calendar, MapPin, ClipboardList } from "lucide-react";
 
 export default function CoordenadorAnoDetail() {
   const { year } = useParams();
@@ -95,7 +95,7 @@ export default function CoordenadorAnoDetail() {
                     <p className="text-xs text-muted-foreground mb-4">{yearNum}º Ano · {info.name}</p>
 
                     {/* Key metrics row */}
-                    <div className="grid grid-cols-3 gap-3 mb-4">
+                    <div className="grid grid-cols-4 gap-3 mb-4">
                       <div className="text-center p-2.5 rounded-lg bg-muted/50">
                         <p className="text-lg font-bold text-foreground">{t.estudantes}</p>
                         <p className="text-[10px] text-muted-foreground">Estudantes</p>
@@ -107,6 +107,10 @@ export default function CoordenadorAnoDetail() {
                       <div className="text-center p-2.5 rounded-lg bg-muted/50">
                         <p className={`text-lg font-bold ${t.presenca >= 75 ? "text-accent" : "text-destructive"}`}>{t.presenca}%</p>
                         <p className="text-[10px] text-muted-foreground">Presença</p>
+                      </div>
+                      <div className="text-center p-2.5 rounded-lg bg-muted/50">
+                        <p className={`text-lg font-bold ${t.taxaEntrega >= 80 ? "text-accent" : "text-destructive"}`}>{t.taxaEntrega}%</p>
+                        <p className="text-[10px] text-muted-foreground">Entrega</p>
                       </div>
                     </div>
 

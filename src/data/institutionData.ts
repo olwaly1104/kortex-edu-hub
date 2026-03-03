@@ -202,6 +202,7 @@ export interface Turma {
   media: number;
   taxaSucesso: number;
   presenca: number;
+  taxaEntrega: number;
   director: string;
 }
 
@@ -270,35 +271,35 @@ export interface TurmaGradeCriteria {
 
 export const coordTurmas: Turma[] = [
   // 1º Ano
-  { id: "t1a", name: "Turma A", year: 1, estudantes: 34, disciplinas: 8, professores: 4, media: 12.8, taxaSucesso: 80, presenca: 82, director: "Prof. Sofia Martins" },
-  { id: "t1b", name: "Turma B", year: 1, estudantes: 30, disciplinas: 8, professores: 4, media: 11.9, taxaSucesso: 75, presenca: 76, director: "Prof. Luísa Tavares" },
-  { id: "t1c", name: "Turma C", year: 1, estudantes: 32, disciplinas: 8, professores: 4, media: 12.3, taxaSucesso: 77, presenca: 80, director: "Prof. Pedro Ferreira" },
-  { id: "t1d", name: "Turma D", year: 1, estudantes: 33, disciplinas: 8, professores: 4, media: 11.5, taxaSucesso: 73, presenca: 74, director: "Prof. Carlos Mendes" },
-  { id: "t1e", name: "Turma E", year: 1, estudantes: 31, disciplinas: 8, professores: 4, media: 12.0, taxaSucesso: 76, presenca: 78, director: "Prof. Ana Costa" },
+  { id: "t1a", name: "Turma A", year: 1, estudantes: 34, disciplinas: 8, professores: 4, media: 12.8, taxaSucesso: 80, presenca: 82, taxaEntrega: 88, director: "Prof. Sofia Martins" },
+  { id: "t1b", name: "Turma B", year: 1, estudantes: 30, disciplinas: 8, professores: 4, media: 11.9, taxaSucesso: 75, presenca: 76, taxaEntrega: 82, director: "Prof. Luísa Tavares" },
+  { id: "t1c", name: "Turma C", year: 1, estudantes: 32, disciplinas: 8, professores: 4, media: 12.3, taxaSucesso: 77, presenca: 80, taxaEntrega: 85, director: "Prof. Pedro Ferreira" },
+  { id: "t1d", name: "Turma D", year: 1, estudantes: 33, disciplinas: 8, professores: 4, media: 11.5, taxaSucesso: 73, presenca: 74, taxaEntrega: 79, director: "Prof. Carlos Mendes" },
+  { id: "t1e", name: "Turma E", year: 1, estudantes: 31, disciplinas: 8, professores: 4, media: 12.0, taxaSucesso: 76, presenca: 78, taxaEntrega: 83, director: "Prof. Ana Costa" },
   // 2º Ano
-  { id: "t2a", name: "Turma A", year: 2, estudantes: 28, disciplinas: 7, professores: 3, media: 13.4, taxaSucesso: 84, presenca: 88, director: "Prof. António Silva" },
-  { id: "t2b", name: "Turma B", year: 2, estudantes: 24, disciplinas: 7, professores: 3, media: 12.7, taxaSucesso: 79, presenca: 80, director: "Prof. Carlos Mendes" },
-  { id: "t2c", name: "Turma C", year: 2, estudantes: 30, disciplinas: 7, professores: 3, media: 13.0, taxaSucesso: 81, presenca: 85, director: "Prof. Maria Santos" },
-  { id: "t2d", name: "Turma D", year: 2, estudantes: 29, disciplinas: 7, professores: 3, media: 12.4, taxaSucesso: 78, presenca: 82, director: "Prof. Sofia Martins" },
-  { id: "t2e", name: "Turma E", year: 2, estudantes: 29, disciplinas: 7, professores: 3, media: 13.2, taxaSucesso: 83, presenca: 86, director: "Prof. Luísa Tavares" },
+  { id: "t2a", name: "Turma A", year: 2, estudantes: 28, disciplinas: 7, professores: 3, media: 13.4, taxaSucesso: 84, presenca: 88, taxaEntrega: 91, director: "Prof. António Silva" },
+  { id: "t2b", name: "Turma B", year: 2, estudantes: 24, disciplinas: 7, professores: 3, media: 12.7, taxaSucesso: 79, presenca: 80, taxaEntrega: 84, director: "Prof. Carlos Mendes" },
+  { id: "t2c", name: "Turma C", year: 2, estudantes: 30, disciplinas: 7, professores: 3, media: 13.0, taxaSucesso: 81, presenca: 85, taxaEntrega: 87, director: "Prof. Maria Santos" },
+  { id: "t2d", name: "Turma D", year: 2, estudantes: 29, disciplinas: 7, professores: 3, media: 12.4, taxaSucesso: 78, presenca: 82, taxaEntrega: 85, director: "Prof. Sofia Martins" },
+  { id: "t2e", name: "Turma E", year: 2, estudantes: 29, disciplinas: 7, professores: 3, media: 13.2, taxaSucesso: 83, presenca: 86, taxaEntrega: 89, director: "Prof. Luísa Tavares" },
   // 3º Ano
-  { id: "t3a", name: "Turma A", year: 3, estudantes: 25, disciplinas: 7, professores: 3, media: 14.1, taxaSucesso: 87, presenca: 90, director: "Prof. Maria Santos" },
-  { id: "t3b", name: "Turma B", year: 3, estudantes: 20, disciplinas: 7, professores: 3, media: 13.4, taxaSucesso: 82, presenca: 84, director: "Prof. Pedro Ferreira" },
-  { id: "t3c", name: "Turma C", year: 3, estudantes: 28, disciplinas: 7, professores: 3, media: 13.8, taxaSucesso: 85, presenca: 87, director: "Prof. António Silva" },
-  { id: "t3d", name: "Turma D", year: 3, estudantes: 26, disciplinas: 7, professores: 3, media: 13.2, taxaSucesso: 80, presenca: 83, director: "Prof. Ana Costa" },
-  { id: "t3e", name: "Turma E", year: 3, estudantes: 31, disciplinas: 7, professores: 3, media: 14.0, taxaSucesso: 86, presenca: 89, director: "Prof. Carlos Mendes" },
+  { id: "t3a", name: "Turma A", year: 3, estudantes: 25, disciplinas: 7, professores: 3, media: 14.1, taxaSucesso: 87, presenca: 90, taxaEntrega: 93, director: "Prof. Maria Santos" },
+  { id: "t3b", name: "Turma B", year: 3, estudantes: 20, disciplinas: 7, professores: 3, media: 13.4, taxaSucesso: 82, presenca: 84, taxaEntrega: 86, director: "Prof. Pedro Ferreira" },
+  { id: "t3c", name: "Turma C", year: 3, estudantes: 28, disciplinas: 7, professores: 3, media: 13.8, taxaSucesso: 85, presenca: 87, taxaEntrega: 90, director: "Prof. António Silva" },
+  { id: "t3d", name: "Turma D", year: 3, estudantes: 26, disciplinas: 7, professores: 3, media: 13.2, taxaSucesso: 80, presenca: 83, taxaEntrega: 86, director: "Prof. Ana Costa" },
+  { id: "t3e", name: "Turma E", year: 3, estudantes: 31, disciplinas: 7, professores: 3, media: 14.0, taxaSucesso: 86, presenca: 89, taxaEntrega: 92, director: "Prof. Carlos Mendes" },
   // 4º Ano
-  { id: "t4a", name: "Turma A", year: 4, estudantes: 24, disciplinas: 6, professores: 3, media: 14.2, taxaSucesso: 89, presenca: 91, director: "Prof. Ana Costa" },
-  { id: "t4b", name: "Turma B", year: 4, estudantes: 25, disciplinas: 6, professores: 3, media: 13.9, taxaSucesso: 87, presenca: 88, director: "Prof. António Silva" },
-  { id: "t4c", name: "Turma C", year: 4, estudantes: 23, disciplinas: 6, professores: 3, media: 14.5, taxaSucesso: 90, presenca: 92, director: "Prof. Carlos Mendes" },
-  { id: "t4d", name: "Turma D", year: 4, estudantes: 24, disciplinas: 6, professores: 3, media: 13.7, taxaSucesso: 86, presenca: 89, director: "Prof. Maria Santos" },
-  { id: "t4e", name: "Turma E", year: 4, estudantes: 24, disciplinas: 6, professores: 3, media: 14.0, taxaSucesso: 88, presenca: 90, director: "Prof. Pedro Ferreira" },
+  { id: "t4a", name: "Turma A", year: 4, estudantes: 24, disciplinas: 6, professores: 3, media: 14.2, taxaSucesso: 89, presenca: 91, taxaEntrega: 94, director: "Prof. Ana Costa" },
+  { id: "t4b", name: "Turma B", year: 4, estudantes: 25, disciplinas: 6, professores: 3, media: 13.9, taxaSucesso: 87, presenca: 88, taxaEntrega: 91, director: "Prof. António Silva" },
+  { id: "t4c", name: "Turma C", year: 4, estudantes: 23, disciplinas: 6, professores: 3, media: 14.5, taxaSucesso: 90, presenca: 92, taxaEntrega: 95, director: "Prof. Carlos Mendes" },
+  { id: "t4d", name: "Turma D", year: 4, estudantes: 24, disciplinas: 6, professores: 3, media: 13.7, taxaSucesso: 86, presenca: 89, taxaEntrega: 90, director: "Prof. Maria Santos" },
+  { id: "t4e", name: "Turma E", year: 4, estudantes: 24, disciplinas: 6, professores: 3, media: 14.0, taxaSucesso: 88, presenca: 90, taxaEntrega: 93, director: "Prof. Pedro Ferreira" },
   // 5º Ano
-  { id: "t5a", name: "Turma A", year: 5, estudantes: 20, disciplinas: 4, professores: 2, media: 14.8, taxaSucesso: 92, presenca: 94, director: "Prof. Carlos Mendes" },
-  { id: "t5b", name: "Turma B", year: 5, estudantes: 20, disciplinas: 4, professores: 2, media: 14.5, taxaSucesso: 91, presenca: 93, director: "Prof. Ana Costa" },
-  { id: "t5c", name: "Turma C", year: 5, estudantes: 20, disciplinas: 4, professores: 2, media: 15.0, taxaSucesso: 93, presenca: 95, director: "Prof. António Silva" },
-  { id: "t5d", name: "Turma D", year: 5, estudantes: 20, disciplinas: 4, professores: 2, media: 14.3, taxaSucesso: 90, presenca: 92, director: "Prof. Maria Santos" },
-  { id: "t5e", name: "Turma E", year: 5, estudantes: 20, disciplinas: 4, professores: 2, media: 14.6, taxaSucesso: 91, presenca: 93, director: "Prof. Pedro Ferreira" },
+  { id: "t5a", name: "Turma A", year: 5, estudantes: 20, disciplinas: 4, professores: 2, media: 14.8, taxaSucesso: 92, presenca: 94, taxaEntrega: 96, director: "Prof. Carlos Mendes" },
+  { id: "t5b", name: "Turma B", year: 5, estudantes: 20, disciplinas: 4, professores: 2, media: 14.5, taxaSucesso: 91, presenca: 93, taxaEntrega: 95, director: "Prof. Ana Costa" },
+  { id: "t5c", name: "Turma C", year: 5, estudantes: 20, disciplinas: 4, professores: 2, media: 15.0, taxaSucesso: 93, presenca: 95, taxaEntrega: 97, director: "Prof. António Silva" },
+  { id: "t5d", name: "Turma D", year: 5, estudantes: 20, disciplinas: 4, professores: 2, media: 14.3, taxaSucesso: 90, presenca: 92, taxaEntrega: 94, director: "Prof. Maria Santos" },
+  { id: "t5e", name: "Turma E", year: 5, estudantes: 20, disciplinas: 4, professores: 2, media: 14.6, taxaSucesso: 91, presenca: 93, taxaEntrega: 95, director: "Prof. Pedro Ferreira" },
 ];
 
 // ── Turma Lessons Data ──
@@ -427,42 +428,42 @@ export const coordTurmaGradeCriteria: TurmaGradeCriteria[] = [
 // Turmas for each decano course (by courseId)
 export const decanoTurmas: Turma[] = [
   // Eng. Civil (c1)
-  { id: "dc1t1a", name: "Turma A", year: 1, courseId: "c1", courseName: "Eng. Civil", estudantes: 34, disciplinas: 8, professores: 4, media: 12.8, taxaSucesso: 80, presenca: 82, director: "Prof. Sofia Martins" },
-  { id: "dc1t1b", name: "Turma B", year: 1, courseId: "c1", courseName: "Eng. Civil", estudantes: 30, disciplinas: 8, professores: 4, media: 11.9, taxaSucesso: 75, presenca: 76, director: "Prof. Luísa Tavares" },
-  { id: "dc1t2a", name: "Turma A", year: 2, courseId: "c1", courseName: "Eng. Civil", estudantes: 28, disciplinas: 7, professores: 3, media: 13.4, taxaSucesso: 84, presenca: 88, director: "Prof. António Silva" },
-  { id: "dc1t2b", name: "Turma B", year: 2, courseId: "c1", courseName: "Eng. Civil", estudantes: 24, disciplinas: 7, professores: 3, media: 12.7, taxaSucesso: 79, presenca: 80, director: "Prof. Carlos Mendes" },
-  { id: "dc1t3a", name: "Turma A", year: 3, courseId: "c1", courseName: "Eng. Civil", estudantes: 25, disciplinas: 7, professores: 3, media: 14.1, taxaSucesso: 87, presenca: 90, director: "Prof. Maria Santos" },
-  { id: "dc1t4a", name: "Turma A", year: 4, courseId: "c1", courseName: "Eng. Civil", estudantes: 38, disciplinas: 6, professores: 3, media: 14.2, taxaSucesso: 89, presenca: 91, director: "Prof. Ana Costa" },
-  { id: "dc1t5a", name: "Turma A", year: 5, courseId: "c1", courseName: "Eng. Civil", estudantes: 30, disciplinas: 4, professores: 2, media: 14.8, taxaSucesso: 92, presenca: 94, director: "Prof. Carlos Mendes" },
+  { id: "dc1t1a", name: "Turma A", year: 1, courseId: "c1", courseName: "Eng. Civil", estudantes: 34, disciplinas: 8, professores: 4, media: 12.8, taxaSucesso: 80, presenca: 82, taxaEntrega: 88, director: "Prof. Sofia Martins" },
+  { id: "dc1t1b", name: "Turma B", year: 1, courseId: "c1", courseName: "Eng. Civil", estudantes: 30, disciplinas: 8, professores: 4, media: 11.9, taxaSucesso: 75, presenca: 76, taxaEntrega: 82, director: "Prof. Luísa Tavares" },
+  { id: "dc1t2a", name: "Turma A", year: 2, courseId: "c1", courseName: "Eng. Civil", estudantes: 28, disciplinas: 7, professores: 3, media: 13.4, taxaSucesso: 84, presenca: 88, taxaEntrega: 91, director: "Prof. António Silva" },
+  { id: "dc1t2b", name: "Turma B", year: 2, courseId: "c1", courseName: "Eng. Civil", estudantes: 24, disciplinas: 7, professores: 3, media: 12.7, taxaSucesso: 79, presenca: 80, taxaEntrega: 84, director: "Prof. Carlos Mendes" },
+  { id: "dc1t3a", name: "Turma A", year: 3, courseId: "c1", courseName: "Eng. Civil", estudantes: 25, disciplinas: 7, professores: 3, media: 14.1, taxaSucesso: 87, presenca: 90, taxaEntrega: 93, director: "Prof. Maria Santos" },
+  { id: "dc1t4a", name: "Turma A", year: 4, courseId: "c1", courseName: "Eng. Civil", estudantes: 38, disciplinas: 6, professores: 3, media: 14.2, taxaSucesso: 89, presenca: 91, taxaEntrega: 94, director: "Prof. Ana Costa" },
+  { id: "dc1t5a", name: "Turma A", year: 5, courseId: "c1", courseName: "Eng. Civil", estudantes: 30, disciplinas: 4, professores: 2, media: 14.8, taxaSucesso: 92, presenca: 94, taxaEntrega: 96, director: "Prof. Carlos Mendes" },
   // Eng. Informática (c2)
-  { id: "dc2t1a", name: "Turma A", year: 1, courseId: "c2", courseName: "Eng. Informática", estudantes: 42, disciplinas: 8, professores: 4, media: 13.2, taxaSucesso: 81, presenca: 83, director: "Prof. Hugo Araújo" },
-  { id: "dc2t1b", name: "Turma B", year: 1, courseId: "c2", courseName: "Eng. Informática", estudantes: 38, disciplinas: 8, professores: 4, media: 12.8, taxaSucesso: 78, presenca: 79, director: "Prof. Teresa Moura" },
-  { id: "dc2t2a", name: "Turma A", year: 2, courseId: "c2", courseName: "Eng. Informática", estudantes: 40, disciplinas: 7, professores: 3, media: 13.9, taxaSucesso: 84, presenca: 86, director: "Prof. Pedro Ferreira" },
-  { id: "dc2t3a", name: "Turma A", year: 3, courseId: "c2", courseName: "Eng. Informática", estudantes: 35, disciplinas: 7, professores: 3, media: 14.3, taxaSucesso: 86, presenca: 88, director: "Prof. Hugo Araújo" },
-  { id: "dc2t4a", name: "Turma A", year: 4, courseId: "c2", courseName: "Eng. Informática", estudantes: 32, disciplinas: 6, professores: 3, media: 14.5, taxaSucesso: 88, presenca: 90, director: "Prof. Teresa Moura" },
+  { id: "dc2t1a", name: "Turma A", year: 1, courseId: "c2", courseName: "Eng. Informática", estudantes: 42, disciplinas: 8, professores: 4, media: 13.2, taxaSucesso: 81, presenca: 83, taxaEntrega: 87, director: "Prof. Hugo Araújo" },
+  { id: "dc2t1b", name: "Turma B", year: 1, courseId: "c2", courseName: "Eng. Informática", estudantes: 38, disciplinas: 8, professores: 4, media: 12.8, taxaSucesso: 78, presenca: 79, taxaEntrega: 84, director: "Prof. Teresa Moura" },
+  { id: "dc2t2a", name: "Turma A", year: 2, courseId: "c2", courseName: "Eng. Informática", estudantes: 40, disciplinas: 7, professores: 3, media: 13.9, taxaSucesso: 84, presenca: 86, taxaEntrega: 89, director: "Prof. Pedro Ferreira" },
+  { id: "dc2t3a", name: "Turma A", year: 3, courseId: "c2", courseName: "Eng. Informática", estudantes: 35, disciplinas: 7, professores: 3, media: 14.3, taxaSucesso: 86, presenca: 88, taxaEntrega: 91, director: "Prof. Hugo Araújo" },
+  { id: "dc2t4a", name: "Turma A", year: 4, courseId: "c2", courseName: "Eng. Informática", estudantes: 32, disciplinas: 6, professores: 3, media: 14.5, taxaSucesso: 88, presenca: 90, taxaEntrega: 93, director: "Prof. Teresa Moura" },
   // Eng. Mecânica (c3)
-  { id: "dc3t1a", name: "Turma A", year: 1, courseId: "c3", courseName: "Eng. Mecânica", estudantes: 45, disciplinas: 8, professores: 4, media: 12.2, taxaSucesso: 74, presenca: 77, director: "Prof. David Lopes" },
-  { id: "dc3t2a", name: "Turma A", year: 2, courseId: "c3", courseName: "Eng. Mecânica", estudantes: 40, disciplinas: 7, professores: 3, media: 12.8, taxaSucesso: 78, presenca: 80, director: "Prof. David Lopes" },
-  { id: "dc3t3a", name: "Turma A", year: 3, courseId: "c3", courseName: "Eng. Mecânica", estudantes: 38, disciplinas: 7, professores: 3, media: 13.2, taxaSucesso: 80, presenca: 82, director: "Prof. David Lopes" },
-  { id: "dc3t4a", name: "Turma A", year: 4, courseId: "c3", courseName: "Eng. Mecânica", estudantes: 35, disciplinas: 6, professores: 3, media: 13.5, taxaSucesso: 82, presenca: 85, director: "Prof. David Lopes" },
-  { id: "dc3t5a", name: "Turma A", year: 5, courseId: "c3", courseName: "Eng. Mecânica", estudantes: 30, disciplinas: 4, professores: 2, media: 14.0, taxaSucesso: 85, presenca: 88, director: "Prof. David Lopes" },
+  { id: "dc3t1a", name: "Turma A", year: 1, courseId: "c3", courseName: "Eng. Mecânica", estudantes: 45, disciplinas: 8, professores: 4, media: 12.2, taxaSucesso: 74, presenca: 77, taxaEntrega: 80, director: "Prof. David Lopes" },
+  { id: "dc3t2a", name: "Turma A", year: 2, courseId: "c3", courseName: "Eng. Mecânica", estudantes: 40, disciplinas: 7, professores: 3, media: 12.8, taxaSucesso: 78, presenca: 80, taxaEntrega: 83, director: "Prof. David Lopes" },
+  { id: "dc3t3a", name: "Turma A", year: 3, courseId: "c3", courseName: "Eng. Mecânica", estudantes: 38, disciplinas: 7, professores: 3, media: 13.2, taxaSucesso: 80, presenca: 82, taxaEntrega: 85, director: "Prof. David Lopes" },
+  { id: "dc3t4a", name: "Turma A", year: 4, courseId: "c3", courseName: "Eng. Mecânica", estudantes: 35, disciplinas: 6, professores: 3, media: 13.5, taxaSucesso: 82, presenca: 85, taxaEntrega: 88, director: "Prof. David Lopes" },
+  { id: "dc3t5a", name: "Turma A", year: 5, courseId: "c3", courseName: "Eng. Mecânica", estudantes: 30, disciplinas: 4, professores: 2, media: 14.0, taxaSucesso: 85, presenca: 88, taxaEntrega: 91, director: "Prof. David Lopes" },
   // Eng. Electrotécnica (c4)
-  { id: "dc4t1a", name: "Turma A", year: 1, courseId: "c4", courseName: "Eng. Electrotécnica", estudantes: 40, disciplinas: 8, professores: 4, media: 12.5, taxaSucesso: 76, presenca: 78, director: "Prof. Carlos Mendes" },
-  { id: "dc4t2a", name: "Turma A", year: 2, courseId: "c4", courseName: "Eng. Electrotécnica", estudantes: 36, disciplinas: 7, professores: 3, media: 13.0, taxaSucesso: 79, presenca: 81, director: "Prof. Carlos Mendes" },
-  { id: "dc4t3a", name: "Turma A", year: 3, courseId: "c4", courseName: "Eng. Electrotécnica", estudantes: 34, disciplinas: 7, professores: 3, media: 13.5, taxaSucesso: 82, presenca: 84, director: "Prof. Carlos Mendes" },
-  { id: "dc4t4a", name: "Turma A", year: 4, courseId: "c4", courseName: "Eng. Electrotécnica", estudantes: 33, disciplinas: 6, professores: 3, media: 13.8, taxaSucesso: 84, presenca: 86, director: "Prof. Carlos Mendes" },
-  { id: "dc4t5a", name: "Turma A", year: 5, courseId: "c4", courseName: "Eng. Electrotécnica", estudantes: 33, disciplinas: 4, professores: 2, media: 14.1, taxaSucesso: 86, presenca: 89, director: "Prof. Carlos Mendes" },
+  { id: "dc4t1a", name: "Turma A", year: 1, courseId: "c4", courseName: "Eng. Electrotécnica", estudantes: 40, disciplinas: 8, professores: 4, media: 12.5, taxaSucesso: 76, presenca: 78, taxaEntrega: 82, director: "Prof. Carlos Mendes" },
+  { id: "dc4t2a", name: "Turma A", year: 2, courseId: "c4", courseName: "Eng. Electrotécnica", estudantes: 36, disciplinas: 7, professores: 3, media: 13.0, taxaSucesso: 79, presenca: 81, taxaEntrega: 84, director: "Prof. Carlos Mendes" },
+  { id: "dc4t3a", name: "Turma A", year: 3, courseId: "c4", courseName: "Eng. Electrotécnica", estudantes: 34, disciplinas: 7, professores: 3, media: 13.5, taxaSucesso: 82, presenca: 84, taxaEntrega: 87, director: "Prof. Carlos Mendes" },
+  { id: "dc4t4a", name: "Turma A", year: 4, courseId: "c4", courseName: "Eng. Electrotécnica", estudantes: 33, disciplinas: 6, professores: 3, media: 13.8, taxaSucesso: 84, presenca: 86, taxaEntrega: 89, director: "Prof. Carlos Mendes" },
+  { id: "dc4t5a", name: "Turma A", year: 5, courseId: "c4", courseName: "Eng. Electrotécnica", estudantes: 33, disciplinas: 4, professores: 2, media: 14.1, taxaSucesso: 86, presenca: 89, taxaEntrega: 92, director: "Prof. Carlos Mendes" },
   // Eng. Ambiental (c5)
-  { id: "dc5t1a", name: "Turma A", year: 1, courseId: "c5", courseName: "Eng. Ambiental", estudantes: 40, disciplinas: 8, professores: 4, media: 13.5, taxaSucesso: 84, presenca: 86, director: "Prof. Sofia Martins" },
-  { id: "dc5t2a", name: "Turma A", year: 2, courseId: "c5", courseName: "Eng. Ambiental", estudantes: 38, disciplinas: 7, professores: 3, media: 14.0, taxaSucesso: 87, presenca: 89, director: "Prof. Sofia Martins" },
-  { id: "dc5t3a", name: "Turma A", year: 3, courseId: "c5", courseName: "Eng. Ambiental", estudantes: 35, disciplinas: 7, professores: 3, media: 14.5, taxaSucesso: 89, presenca: 91, director: "Prof. Sofia Martins" },
-  { id: "dc5t4a", name: "Turma A", year: 4, courseId: "c5", courseName: "Eng. Ambiental", estudantes: 32, disciplinas: 6, professores: 3, media: 14.8, taxaSucesso: 91, presenca: 93, director: "Prof. Sofia Martins" },
+  { id: "dc5t1a", name: "Turma A", year: 1, courseId: "c5", courseName: "Eng. Ambiental", estudantes: 40, disciplinas: 8, professores: 4, media: 13.5, taxaSucesso: 84, presenca: 86, taxaEntrega: 89, director: "Prof. Sofia Martins" },
+  { id: "dc5t2a", name: "Turma A", year: 2, courseId: "c5", courseName: "Eng. Ambiental", estudantes: 38, disciplinas: 7, professores: 3, media: 14.0, taxaSucesso: 87, presenca: 89, taxaEntrega: 92, director: "Prof. Sofia Martins" },
+  { id: "dc5t3a", name: "Turma A", year: 3, courseId: "c5", courseName: "Eng. Ambiental", estudantes: 35, disciplinas: 7, professores: 3, media: 14.5, taxaSucesso: 89, presenca: 91, taxaEntrega: 93, director: "Prof. Sofia Martins" },
+  { id: "dc5t4a", name: "Turma A", year: 4, courseId: "c5", courseName: "Eng. Ambiental", estudantes: 32, disciplinas: 6, professores: 3, media: 14.8, taxaSucesso: 91, presenca: 93, taxaEntrega: 95, director: "Prof. Sofia Martins" },
   // Eng. Química (c6)
-  { id: "dc6t1a", name: "Turma A", year: 1, courseId: "c6", courseName: "Eng. Química", estudantes: 42, disciplinas: 8, professores: 4, media: 11.8, taxaSucesso: 68, presenca: 70, director: "Prof. Ana Costa" },
-  { id: "dc6t2a", name: "Turma A", year: 2, courseId: "c6", courseName: "Eng. Química", estudantes: 38, disciplinas: 7, professores: 3, media: 12.2, taxaSucesso: 70, presenca: 73, director: "Prof. Ana Costa" },
-  { id: "dc6t3a", name: "Turma A", year: 3, courseId: "c6", courseName: "Eng. Química", estudantes: 35, disciplinas: 7, professores: 3, media: 12.8, taxaSucesso: 73, presenca: 76, director: "Prof. Ana Costa" },
-  { id: "dc6t4a", name: "Turma A", year: 4, courseId: "c6", courseName: "Eng. Química", estudantes: 33, disciplinas: 6, professores: 3, media: 13.0, taxaSucesso: 75, presenca: 78, director: "Prof. Ana Costa" },
-  { id: "dc6t5a", name: "Turma A", year: 5, courseId: "c6", courseName: "Eng. Química", estudantes: 32, disciplinas: 4, professores: 2, media: 13.2, taxaSucesso: 77, presenca: 80, director: "Prof. Ana Costa" },
+  { id: "dc6t1a", name: "Turma A", year: 1, courseId: "c6", courseName: "Eng. Química", estudantes: 42, disciplinas: 8, professores: 4, media: 11.8, taxaSucesso: 68, presenca: 70, taxaEntrega: 75, director: "Prof. Ana Costa" },
+  { id: "dc6t2a", name: "Turma A", year: 2, courseId: "c6", courseName: "Eng. Química", estudantes: 38, disciplinas: 7, professores: 3, media: 12.2, taxaSucesso: 70, presenca: 73, taxaEntrega: 78, director: "Prof. Ana Costa" },
+  { id: "dc6t3a", name: "Turma A", year: 3, courseId: "c6", courseName: "Eng. Química", estudantes: 35, disciplinas: 7, professores: 3, media: 12.8, taxaSucesso: 73, presenca: 76, taxaEntrega: 80, director: "Prof. Ana Costa" },
+  { id: "dc6t4a", name: "Turma A", year: 4, courseId: "c6", courseName: "Eng. Química", estudantes: 33, disciplinas: 6, professores: 3, media: 13.0, taxaSucesso: 75, presenca: 78, taxaEntrega: 82, director: "Prof. Ana Costa" },
+  { id: "dc6t5a", name: "Turma A", year: 5, courseId: "c6", courseName: "Eng. Química", estudantes: 32, disciplinas: 4, professores: 2, media: 13.2, taxaSucesso: 77, presenca: 80, taxaEntrega: 84, director: "Prof. Ana Costa" },
 ];
 
 // ── Decano ──

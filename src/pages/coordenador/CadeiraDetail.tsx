@@ -91,7 +91,7 @@ export default function CoordenadorCadeiraDetail() {
       </div>
 
       {/* KPIs */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         <Card className="p-4">
           <div className="flex items-center gap-2 mb-3">
             <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><Users className="w-4 h-4 text-primary" /></div>
@@ -101,13 +101,17 @@ export default function CoordenadorCadeiraDetail() {
         </Card>
         <Card className="p-4">
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><Video className="w-4 h-4 text-primary" /></div>
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Aulas</span>
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><Calendar className="w-4 h-4 text-primary" /></div>
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Dias de Aula</span>
           </div>
-          <div className="flex items-baseline gap-1">
-            <span className="text-2xl font-bold text-foreground">{publishedLessons}</span>
-            <span className="text-sm text-muted-foreground">/{turmaLessons.length || allTurmaLessons.length}</span>
+          <p className="text-lg font-bold text-foreground">{cadeira.diasAula}</p>
+        </Card>
+        <Card className="p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><MapPin className="w-4 h-4 text-primary" /></div>
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Local</span>
           </div>
+          <p className="text-lg font-bold text-foreground">{cadeira.location}</p>
         </Card>
         <Card className="p-4">
           <div className="flex items-center gap-2 mb-3">
