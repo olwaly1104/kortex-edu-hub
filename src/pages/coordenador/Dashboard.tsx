@@ -154,7 +154,7 @@ export default function CoordenadorCursoDashboard() {
               <p className="text-sm text-muted-foreground text-center py-4">Sem solicitações pendentes 🎉</p>
             ) : (
               <div className="space-y-2">
-                {pendentes.slice(0, 2).map(sol => {
+                {pendentes.slice(0, 3).map(sol => {
                   const Icon = typeIcons[sol.type] || FileText;
                   return (
                     <div key={sol.id} className="flex items-center gap-3 px-3.5 py-3 rounded-xl border border-border bg-card hover:bg-muted/40 transition-colors">
@@ -222,7 +222,7 @@ export default function CoordenadorCursoDashboard() {
               </Link>
             </div>
             <div className="space-y-2">
-              {announcements.slice(0, 2).map(an => {
+              {announcements.slice(0, 3).map(an => {
                 const style = typeStyles[an.type] || typeStyles.geral;
                 return (
                   <div key={an.id} className="px-3.5 py-3 rounded-xl border border-border bg-card">
@@ -266,7 +266,7 @@ export default function CoordenadorCursoDashboard() {
             {turmasEmRisco.length === 0 ? (
               <p className="text-sm text-muted-foreground text-center py-4">Nenhuma turma em risco 🎉</p>
             ) : (
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {(showAllRisk ? turmasEmRisco : turmasEmRisco.slice(0, 2)).map(t => (
                   <Link key={t.id} to={`/coordenador/anos/${t.year}/turma/${t.id}`}>
                     <div className="px-3.5 py-3 rounded-xl border border-border bg-card border-l-[3px] border-l-destructive hover:bg-muted/40 transition-colors cursor-pointer">
