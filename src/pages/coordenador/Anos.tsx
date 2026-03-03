@@ -102,7 +102,7 @@ export default function CoordenadorAnos() {
                     </div>
                     <div className="text-center p-2 rounded-lg bg-muted/40">
                       <p className="text-base font-bold text-foreground">{yearProfessores}</p>
-                      <p className="text-[10px] text-muted-foreground">Professores</p>
+                      <p className="text-[10px] text-muted-foreground">Prof.</p>
                     </div>
                     <div className="text-center p-2 rounded-lg bg-muted/40">
                       <p className="text-base font-bold text-foreground">{y.disciplinas}</p>
@@ -111,18 +111,18 @@ export default function CoordenadorAnos() {
                   </div>
 
                   {/* Bottom metrics */}
-                  <div className="grid grid-cols-3 gap-3 pt-3 border-t border-border/50">
-                    <div className="text-center">
-                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Média</p>
-                      <p className={`text-lg font-bold ${y.mediaGeral >= 10 ? "text-accent" : "text-destructive"}`}>{y.mediaGeral}</p>
+                  <div className="grid grid-cols-3 gap-2 pt-3 border-t border-border/50">
+                    <div className="text-center p-2 rounded-lg border border-border/60">
+                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-0.5">Média</p>
+                      <p className={`text-base font-bold ${y.mediaGeral >= 10 ? "text-accent" : "text-destructive"}`}>{y.mediaGeral}</p>
                     </div>
-                    <div className="text-center border-x border-border/30">
-                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Presença</p>
-                      <p className={`text-lg font-bold ${avgPresenca >= 75 ? "text-accent" : "text-destructive"}`}>{avgPresenca}%</p>
+                    <div className="text-center p-2 rounded-lg border border-border/60">
+                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-0.5">Presença</p>
+                      <p className={`text-base font-bold ${avgPresenca >= 75 ? "text-accent" : "text-destructive"}`}>{avgPresenca}%</p>
                     </div>
-                    <div className="text-center">
-                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Entrega</p>
-                      <p className={`text-lg font-bold ${avgTaxaEntrega >= 80 ? "text-accent" : "text-destructive"}`}>{avgTaxaEntrega}%</p>
+                    <div className="text-center p-2 rounded-lg border border-border/60">
+                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-0.5">Entrega</p>
+                      <p className={`text-base font-bold ${avgTaxaEntrega >= 80 ? "text-accent" : "text-destructive"}`}>{avgTaxaEntrega}%</p>
                     </div>
                   </div>
                 </div>
