@@ -111,18 +111,18 @@ export default function CoordenadorAnos() {
                   </div>
 
                   {/* Bottom metrics */}
-                  <div className="grid grid-cols-3 gap-2 pt-3 border-t border-border/50">
-                    <div className="text-center p-2 rounded-lg border border-border/60">
-                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-0.5">Média</p>
-                      <p className={`text-base font-bold ${y.mediaGeral >= 10 ? "text-accent" : "text-destructive"}`}>{y.mediaGeral}</p>
+                  <div className="space-y-2 pt-3 border-t border-border/50">
+                    <div className="flex items-center justify-between px-1">
+                      <span className="text-xs text-muted-foreground">Média Geral</span>
+                      <span className={`text-sm font-semibold tabular-nums ${y.mediaGeral >= 10 ? "text-accent" : "text-destructive"}`}>{y.mediaGeral}</span>
                     </div>
-                    <div className="text-center p-2 rounded-lg border border-border/60">
-                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-0.5">Presença</p>
-                      <p className={`text-base font-bold ${avgPresenca >= 75 ? "text-accent" : "text-destructive"}`}>{avgPresenca}%</p>
+                    <div className="flex items-center justify-between px-1">
+                      <span className="text-xs text-muted-foreground">Presença</span>
+                      <span className={`text-sm font-semibold tabular-nums ${avgPresenca >= 75 ? "text-accent" : "text-destructive"}`}>{avgPresenca}%</span>
                     </div>
-                    <div className="text-center p-2 rounded-lg border border-border/60">
-                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-0.5">Entrega</p>
-                      <p className={`text-base font-bold ${avgTaxaEntrega >= 80 ? "text-accent" : "text-destructive"}`}>{avgTaxaEntrega}%</p>
+                    <div className="flex items-center justify-between px-1">
+                      <span className="text-xs text-muted-foreground">Entrega</span>
+                      <span className={`text-sm font-semibold tabular-nums ${avgTaxaEntrega >= 80 ? "text-accent" : "text-destructive"}`}>{avgTaxaEntrega}%</span>
                     </div>
                   </div>
                 </div>
