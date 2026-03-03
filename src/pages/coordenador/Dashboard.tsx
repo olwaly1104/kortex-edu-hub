@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { coordCursoInfo, coordSolicitacoes, coordTurmas, coordDocentes } from "@/data/institutionData";
+import { coordCursoInfo, coordSolicitacoes, coordTurmas, coordDocentes, coordEstudantes } from "@/data/institutionData";
 import { announcements, coordAgendaEvents } from "@/data/mockData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -10,7 +10,7 @@ import {
   AlertTriangle, FileText, Calendar as CalendarIcon,
   Megaphone, X, CheckCircle, ClipboardList,
   Eye, XCircle, GraduationCap, MapPin, Play,
-  ArrowDownLeft,
+  ArrowDownLeft, UserX,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -28,11 +28,16 @@ const typeIcons: Record<string, React.ElementType> = {
   recurso: AlertTriangle,
 };
 
+const priorityStyles: Record<string, string> = {
+  alta: "bg-destructive/10 text-destructive",
+  média: "bg-secondary/10 text-secondary",
+  baixa: "bg-muted text-muted-foreground",
+};
+
 export default function CoordenadorCursoDashboard() {
   const { user } = useAuth();
   const info = coordCursoInfo;
   const pendentes = coordSolicitacoes.filter(s => s.status === "pendente" && s.direction === "recebida");
-  const [showAllRisk, setShowAllRisk] = useState(false);
 
   const TODAY_DATE = "2024-02-14";
   const todayAgenda = coordAgendaEvents
@@ -57,6 +62,10 @@ export default function CoordenadorCursoDashboard() {
   );
 
   const docentesEmRisco = coordDocentes.filter(d => d.presenca < 85 || d.taxaEntrega < 80 || d.mediaGeral < 11);
+
+  const estudantesEmRisco = coordEstudantes
+    .filter(e => e.status === "risco")
+    .sort((a, b) => (a.media ?? 0) - (b.media ?? 0));
 
   const stats = [
     { icon: Users, label: "Total Estudantes", value: info.totalEstudantes, color: "text-accent bg-accent/10" },
@@ -167,90 +176,106 @@ export default function CoordenadorCursoDashboard() {
         </Card>
       </div>
 
-      {/* Row 2: Alertas em Risco + Solicitações */}
-      <div className="grid lg:grid-cols-2 gap-6">
-        <Card className="p-5">
+      {/* Row 2: Alertas em Risco (wider) + Solicitações */}
+      <div className="grid lg:grid-cols-5 gap-6">
+        {/* Alertas em Risco — 3 columns: Docentes | Turmas | Estudantes */}
+        <Card className="p-5 lg:col-span-3">
           <div className="flex items-center gap-2 mb-4">
             <AlertTriangle className="w-5 h-5 text-destructive" />
             <h2 className="text-base font-semibold text-foreground">Alertas em Risco</h2>
           </div>
 
-          <div className="grid grid-cols-2 gap-0">
+          <div className="grid grid-cols-3 gap-0">
             {/* Docentes em Risco */}
-            <div className="pr-4 border-r border-border">
+            <div className="pr-3 border-r border-border">
               <div className="flex items-center justify-between mb-2">
-                <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
-                  <GraduationCap className="w-3.5 h-3.5" /> Docentes
+                <h3 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1">
+                  <GraduationCap className="w-3 h-3" /> Docentes
                   <Badge variant="outline" className="text-[9px] px-1.5 py-0">{docentesEmRisco.length}</Badge>
                 </h3>
-                <Link to="/coordenador/docentes" className="text-[11px] text-primary hover:underline flex items-center gap-0.5">
-                  Ver todos <ChevronRight className="w-3 h-3" />
+                <Link to="/coordenador/docentes" className="text-[10px] text-primary hover:underline">
+                  Ver todos
                 </Link>
               </div>
-              {docentesEmRisco.length > 0 ? (
-                <div className="space-y-1.5">
-                  {docentesEmRisco.map(d => (
-                    <Link key={d.id} to="/coordenador/docentes">
-                      <div className="px-2.5 py-2 rounded-lg border border-border bg-card border-l-[3px] border-l-destructive hover:bg-muted/40 transition-colors cursor-pointer">
-                        <p className="text-[11px] font-semibold text-foreground leading-tight">{d.name}</p>
-                        <div className="flex items-center gap-2 mt-1 text-[10px]">
-                          <span className={d.presenca < 85 ? "text-destructive font-medium" : "text-muted-foreground"}>{d.presenca}%</span>
-                          <span className={d.taxaEntrega < 80 ? "text-destructive font-medium" : "text-muted-foreground"}>{d.taxaEntrega}%</span>
-                          <span className={d.mediaGeral < 11 ? "text-destructive font-medium" : "text-muted-foreground"}>{d.mediaGeral}</span>
-                        </div>
+              <div className="space-y-1.5">
+                {docentesEmRisco.slice(0, 5).map(d => (
+                  <Link key={d.id} to="/coordenador/docentes">
+                    <div className="px-2 py-1.5 rounded-lg border border-border bg-card border-l-[3px] border-l-destructive hover:bg-muted/40 transition-colors cursor-pointer">
+                      <p className="text-[11px] font-semibold text-foreground leading-tight truncate">{d.name.replace("Prof. ", "")}</p>
+                      <p className="text-[9px] text-muted-foreground truncate">{d.department}</p>
+                      <div className="flex items-center gap-1.5 mt-0.5 text-[9px]">
+                        <span className={d.presenca < 85 ? "text-destructive font-medium" : "text-muted-foreground"}>P:{d.presenca}%</span>
+                        <span className={d.taxaEntrega < 80 ? "text-destructive font-medium" : "text-muted-foreground"}>E:{d.taxaEntrega}%</span>
+                        <span className={d.mediaGeral < 11 ? "text-destructive font-medium" : "text-muted-foreground"}>M:{d.mediaGeral}</span>
                       </div>
-                    </Link>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-xs text-muted-foreground text-center py-4">Nenhum docente em risco 🎉</p>
-              )}
+                    </div>
+                  </Link>
+                ))}
+              </div>
             </div>
 
             {/* Turmas em Risco */}
-            <div className="pl-4">
+            <div className="px-3 border-r border-border">
               <div className="flex items-center justify-between mb-2">
-                <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
-                  <Users className="w-3.5 h-3.5" /> Turmas
+                <h3 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1">
+                  <Users className="w-3 h-3" /> Turmas
                   <Badge variant="outline" className="text-[9px] px-1.5 py-0">{turmasEmRisco.length}</Badge>
                 </h3>
-                {!showAllRisk && turmasEmRisco.length > 3 && (
-                  <button onClick={() => setShowAllRisk(true)} className="text-[11px] text-primary hover:underline flex items-center gap-0.5">
-                    Ver todos <ChevronRight className="w-3 h-3" />
-                  </button>
-                )}
-                {showAllRisk && (
-                  <button onClick={() => setShowAllRisk(false)} className="text-[11px] text-muted-foreground hover:text-foreground flex items-center gap-0.5">
-                    <X className="w-3 h-3" /> Fechar
-                  </button>
-                )}
+                <Link to="/coordenador/anos" className="text-[10px] text-primary hover:underline">
+                  Ver todos
+                </Link>
               </div>
-              {turmasEmRisco.length > 0 ? (
-                <div className="space-y-1.5">
-                  {(showAllRisk ? turmasEmRisco : turmasEmRisco.slice(0, 3)).map(t => (
-                    <Link key={t.id} to={`/coordenador/anos/${t.year}/turma/${t.id}`}>
-                      <div className="px-2.5 py-2 rounded-lg border border-border bg-card border-l-[3px] border-l-destructive hover:bg-muted/40 transition-colors cursor-pointer">
-                        <div className="flex items-center justify-between">
-                          <p className="text-[11px] font-semibold text-foreground leading-tight">{t.name}</p>
-                          <span className="text-[10px] text-muted-foreground">{t.year}º Ano</span>
-                        </div>
-                        <div className="flex items-center gap-2 mt-1 text-[10px]">
-                          <span className={t.presenca >= 80 ? "text-muted-foreground" : "text-destructive font-medium"}>{t.presenca}%</span>
-                          <span className={t.taxaEntrega >= 85 ? "text-muted-foreground" : "text-destructive font-medium"}>{t.taxaEntrega}%</span>
-                          <span className={t.media >= 12 ? "text-muted-foreground" : "text-destructive font-medium"}>{t.media}</span>
-                        </div>
+              <div className="space-y-1.5">
+                {turmasEmRisco.slice(0, 5).map(t => (
+                  <Link key={t.id} to={`/coordenador/anos/${t.year}/turma/${t.id}`}>
+                    <div className="px-2 py-1.5 rounded-lg border border-border bg-card border-l-[3px] border-l-destructive hover:bg-muted/40 transition-colors cursor-pointer">
+                      <div className="flex items-center justify-between">
+                        <p className="text-[11px] font-semibold text-foreground leading-tight">{t.name}</p>
+                        <span className="text-[9px] text-muted-foreground">{t.year}º Ano</span>
                       </div>
-                    </Link>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-xs text-muted-foreground text-center py-4">Nenhuma turma em risco 🎉</p>
-              )}
+                      <div className="flex items-center gap-1.5 mt-0.5 text-[9px]">
+                        <span className={t.presenca < 80 ? "text-destructive font-medium" : "text-muted-foreground"}>P:{t.presenca}%</span>
+                        <span className={t.taxaEntrega < 85 ? "text-destructive font-medium" : "text-muted-foreground"}>E:{t.taxaEntrega}%</span>
+                        <span className={t.media < 12 ? "text-destructive font-medium" : "text-muted-foreground"}>M:{t.media}</span>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {/* Estudantes em Risco */}
+            <div className="pl-3">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1">
+                  <UserX className="w-3 h-3" /> Estudantes
+                  <Badge variant="outline" className="text-[9px] px-1.5 py-0">{estudantesEmRisco.length}</Badge>
+                </h3>
+                <Link to="/coordenador/estudantes" className="text-[10px] text-primary hover:underline">
+                  Ver todos
+                </Link>
+              </div>
+              <div className="space-y-1.5">
+                {estudantesEmRisco.slice(0, 5).map(e => (
+                  <Link key={e.id} to="/coordenador/estudantes">
+                    <div className="px-2 py-1.5 rounded-lg border border-border bg-card border-l-[3px] border-l-destructive hover:bg-muted/40 transition-colors cursor-pointer">
+                      <p className="text-[11px] font-semibold text-foreground leading-tight truncate">{e.name}</p>
+                      <p className="text-[9px] text-muted-foreground">{e.year}º Ano • Turma {e.turma}</p>
+                      <div className="flex items-center gap-1.5 mt-0.5 text-[9px]">
+                        <span className="text-destructive font-medium">M:{e.media ?? "—"}</span>
+                        <span className={e.presenca < 70 ? "text-destructive font-medium" : "text-muted-foreground"}>P:{e.presenca}%</span>
+                        <span className={e.taxaEntrega < 60 ? "text-destructive font-medium" : "text-muted-foreground"}>E:{e.taxaEntrega}%</span>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
             </div>
           </div>
         </Card>
 
-        <Card className="p-5">
+        {/* Solicitações — 5 items */}
+        <Card className="p-5 lg:col-span-2">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
               <ArrowDownLeft className="w-5 h-5 text-secondary" /> Solicitações
@@ -264,17 +289,26 @@ export default function CoordenadorCursoDashboard() {
             <p className="text-sm text-muted-foreground text-center py-4">Sem solicitações pendentes 🎉</p>
           ) : (
             <div className="space-y-2">
-              {pendentes.slice(0, 3).map(sol => {
+              {pendentes.slice(0, 5).map(sol => {
                 const Icon = typeIcons[sol.type] || FileText;
                 return (
                   <div key={sol.id} className="flex items-start gap-3 px-3 py-2.5 rounded-xl border border-border bg-card hover:bg-muted/40 transition-colors">
-                    <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-muted/60 mt-0.5">
+                    <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 bg-muted/60 mt-0.5">
                       <Icon className="w-3.5 h-3.5 text-muted-foreground" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs font-semibold text-foreground line-clamp-1 leading-tight">{sol.title}</p>
-                      <p className="text-[10px] text-muted-foreground mt-0.5 line-clamp-2">{sol.description}</p>
-                      <p className="text-[10px] text-muted-foreground mt-1">{sol.requester} • {sol.date}</p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-xs font-semibold text-foreground line-clamp-1 leading-tight flex-1">{sol.title}</p>
+                        <Badge className={`${priorityStyles[sol.priority]} text-[8px] px-1.5 py-0 shrink-0`}>{sol.priority}</Badge>
+                      </div>
+                      <p className="text-[10px] text-muted-foreground mt-0.5 line-clamp-1">{sol.description}</p>
+                      <div className="flex items-center gap-2 mt-1 text-[10px] text-muted-foreground">
+                        <span className="font-medium text-foreground">{sol.requester}</span>
+                        <span>•</span>
+                        <span>{sol.date}</span>
+                        <span>•</span>
+                        <Badge variant="outline" className="text-[8px] px-1 py-0">{sol.type}</Badge>
+                      </div>
                     </div>
                     <div className="flex items-center gap-1 shrink-0 mt-0.5">
                       <Button size="sm" className="h-6 w-6 p-0 rounded-lg bg-accent hover:bg-accent/90 text-accent-foreground">
