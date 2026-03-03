@@ -10,7 +10,7 @@ import {
   AlertTriangle, FileText, Calendar as CalendarIcon,
   Megaphone, X, CheckCircle, ClipboardList,
   Eye, XCircle, GraduationCap, MapPin, Play,
-  ArrowDownLeft,
+  ArrowDownLeft, ArrowRight,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -184,6 +184,24 @@ export default function CoordenadorCursoDashboard() {
               </div>
             )}
           </Card>
+
+          {/* Acções Rápidas */}
+          <div className="space-y-2">
+            {[
+              { label: "Enviar pedido de contratação ao Decano", to: "/coordenador/solicitacoes" },
+              { label: "Verificar notas pendentes de lançamento", to: "/coordenador/notas" },
+              { label: "Consultar relatório de desempenho do curso", to: "/coordenador/relatorios" },
+              { label: "Enviar comunicado aos docentes do curso", to: "/coordenador/chat" },
+              { label: "Rever horários e salas das turmas activas", to: "/coordenador/anos" },
+            ].map((s, i) => (
+              <Link key={i} to={s.to}>
+                <Card className="px-4 py-3 flex items-center justify-between hover:bg-muted/40 transition-colors cursor-pointer group rounded-xl border border-border">
+                  <p className="text-sm text-foreground">{s.label}</p>
+                  <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
+                </Card>
+              </Link>
+            ))}
+          </div>
         </div>
 
         {/* Right column */}
