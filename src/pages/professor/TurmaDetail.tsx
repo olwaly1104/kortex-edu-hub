@@ -1,5 +1,5 @@
 import { useParams, Link } from "react-router-dom";
-import { profDisciplines, profLessons, profTasks, profStudents, allTurmas } from "@/data/professorData";
+import { profDisciplines, profLessons, profTasks, profStudents, allTurmas, profGradeCriteria } from "@/data/professorData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -7,16 +7,18 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   ArrowLeft, BookOpen, Users, Clock, Video, FileText,
   GraduationCap, ClipboardList, Play, Eye, Calendar, CheckCircle,
-  TrendingUp, Search, Edit,
+  TrendingUp, Search, Edit, Settings, Download, AlertCircle,
 } from "lucide-react";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 
 export default function ProfessorTurmaDetail() {
   const { turmaId } = useParams();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const turma = allTurmas.find(t => t.id === turmaId);
 
   const turmaDiscs = profDisciplines.filter(d => d.turmas.some(t => t.id === turmaId));
@@ -26,6 +28,25 @@ export default function ProfessorTurmaDetail() {
   const uniqueStudents = turmaStudents.filter((s, i, arr) => arr.findIndex(x => x.email === s.email) === i);
 
   const [studentSearch, setStudentSearch] = useState("");
+
+  // Criteria
+  const firstDisc = turmaDiscs[0];
+  const existingCriteria = firstDisc ? profGradeCriteria.find(c => c.disciplineId === firstDisc.id) : null;
+  const [criteria, setCriteria] = useState(existingCriteria?.criteria || [
+    { label: "Excelente", minGrade: 16, color: "hsl(var(--accent))" },
+    { label: "Bom", minGrade: 14, color: "hsl(175, 84%, 32%)" },
+    { label: "Suficiente", minGrade: 10, color: "hsl(var(--secondary))" },
+    { label: "Insuficiente", minGrade: 0, color: "hsl(var(--destructive))" },
+  ]);
+
+  // Resources from all lessons
+  const allMaterials = turmaLessons.flatMap(l => l.materials.map(m => ({ ...m, lesson: l.title, lessonNumber: l.number, disc: profDisciplines.find(d => d.id === l.disciplineId) })));
+
+  // Calendar events
+  const calendarEvents = [
+    ...turmaTasks.filter(t => t.status === "publicada").map(t => ({ id: t.id, title: t.title, date: t.dueDate, type: "entrega" as const, description: t.description })),
+    ...turmaTasks.filter(t => t.type === "exame").map(t => ({ id: `ex-${t.id}`, title: t.title, date: t.dueDate, type: "exame" as const, description: t.description })),
+  ];
 
   if (!turma) return <div className="p-8 text-muted-foreground">Turma não encontrada.</div>;
 
@@ -45,9 +66,9 @@ export default function ProfessorTurmaDetail() {
 
   const statusColors: Record<string, string> = { excelente: "border-l-accent", normal: "border-l-secondary", risco: "border-l-destructive" };
   const statusLabels: Record<string, string> = { excelente: "Excelente", normal: "Normal", risco: "Em Risco" };
-  const statusBadge: Record<string, string> = { excelente: "bg-accent/10 text-accent", normal: "bg-secondary/10 text-secondary", risco: "bg-destructive/10 text-destructive" };
+  const statusBadgeMap: Record<string, string> = { excelente: "bg-accent/10 text-accent", normal: "bg-secondary/10 text-secondary", risco: "bg-destructive/10 text-destructive" };
 
-  const statusConfig: Record<string, { label: string; color: string; icon: typeof CheckCircle }> = {
+  const lessonStatusConfig: Record<string, { label: string; color: string; icon: typeof CheckCircle }> = {
     publicada: { label: "Publicada", color: "bg-accent/10 text-accent", icon: CheckCircle },
     agendada: { label: "Agendada", color: "bg-secondary/10 text-secondary", icon: Clock },
     rascunho: { label: "Rascunho", color: "bg-muted text-muted-foreground", icon: Edit },
@@ -57,6 +78,20 @@ export default function ProfessorTurmaDetail() {
     publicada: { label: "Activa", color: "bg-secondary/10 text-secondary" },
     encerrada: { label: "Encerrada", color: "bg-accent/10 text-accent" },
     rascunho: { label: "Rascunho", color: "bg-muted text-muted-foreground" },
+  };
+
+  const calendarTypeColors: Record<string, string> = {
+    exame: "border-l-destructive",
+    entrega: "border-l-secondary",
+    reunião: "border-l-primary",
+    feriado: "border-l-accent",
+    evento: "border-l-primary",
+  };
+  const calendarTypeLabels: Record<string, string> = { exame: "Exame", entrega: "Entrega", reunião: "Reunião", feriado: "Feriado", evento: "Evento" };
+  const calendarTypeBadge: Record<string, string> = { exame: "bg-destructive/10 text-destructive", entrega: "bg-secondary/10 text-secondary", reunião: "bg-primary/10 text-primary", feriado: "bg-accent/10 text-accent", evento: "bg-primary/10 text-primary" };
+
+  const handleSaveCriteria = () => {
+    toast({ title: "Critérios guardados!", description: "Os critérios de avaliação foram actualizados." });
   };
 
   return (
@@ -142,8 +177,10 @@ export default function ProfessorTurmaDetail() {
             {[
               { value: "students", icon: Users, label: "Estudantes" },
               { value: "lessons", icon: Video, label: "Aulas" },
-              { value: "tasks", icon: ClipboardList, label: "Avaliações" },
-              { value: "disciplines", icon: BookOpen, label: "Disciplinas" },
+              { value: "tasks", icon: ClipboardList, label: "Tarefas" },
+              { value: "resources", icon: FileText, label: "Recursos" },
+              { value: "calendar", icon: Calendar, label: "Calendário" },
+              { value: "criteria", icon: Settings, label: "Critério" },
             ].map(tab => (
               <TabsTrigger
                 key={tab.value}
@@ -161,12 +198,7 @@ export default function ProfessorTurmaDetail() {
           <div className="flex items-center justify-between gap-4">
             <div className="relative flex-1 max-w-sm">
               <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="Pesquisar estudante..."
-                value={studentSearch}
-                onChange={e => setStudentSearch(e.target.value)}
-                className="pl-9"
-              />
+              <Input placeholder="Pesquisar estudante..." value={studentSearch} onChange={e => setStudentSearch(e.target.value)} className="pl-9" />
             </div>
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-accent" /> Excelente ({uniqueStudents.filter(s => s.status === "excelente").length})</span>
@@ -174,7 +206,6 @@ export default function ProfessorTurmaDetail() {
               <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-destructive" /> Risco ({uniqueStudents.filter(s => s.status === "risco").length})</span>
             </div>
           </div>
-
           <div className="space-y-2">
             {filteredStudents.map(student => (
               <Card key={student.id} className={`p-4 flex items-center gap-4 border-l-[3px] ${statusColors[student.status]}`}>
@@ -184,27 +215,15 @@ export default function ProfessorTurmaDetail() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <p className="text-sm font-semibold text-foreground truncate">{student.name}</p>
-                    <Badge className={`${statusBadge[student.status]} text-[10px]`}>{statusLabels[student.status]}</Badge>
+                    <Badge className={`${statusBadgeMap[student.status]} text-[10px]`}>{statusLabels[student.status]}</Badge>
                   </div>
                   <p className="text-[11px] text-muted-foreground">{student.email}</p>
                 </div>
                 <div className="grid grid-cols-4 gap-4 shrink-0 text-center">
-                  <div>
-                    <p className="text-[10px] text-muted-foreground uppercase">Presença</p>
-                    <p className={`text-sm font-bold ${student.attendance >= 75 ? "text-accent" : "text-destructive"}`}>{student.attendance}%</p>
-                  </div>
-                  <div>
-                    <p className="text-[10px] text-muted-foreground uppercase">Média</p>
-                    <p className={`text-sm font-bold ${student.avgGrade && student.avgGrade >= 10 ? "text-accent" : "text-destructive"}`}>{student.avgGrade ?? "—"}</p>
-                  </div>
-                  <div>
-                    <p className="text-[10px] text-muted-foreground uppercase">Entregas</p>
-                    <p className="text-sm font-bold text-foreground">{student.submittedTasks}/{student.totalTasks}</p>
-                  </div>
-                  <div>
-                    <p className="text-[10px] text-muted-foreground uppercase">Última</p>
-                    <p className="text-xs text-muted-foreground">{student.lastActive}</p>
-                  </div>
+                  <div><p className="text-[10px] text-muted-foreground uppercase">Presença</p><p className={`text-sm font-bold ${student.attendance >= 75 ? "text-accent" : "text-destructive"}`}>{student.attendance}%</p></div>
+                  <div><p className="text-[10px] text-muted-foreground uppercase">Média</p><p className={`text-sm font-bold ${student.avgGrade && student.avgGrade >= 10 ? "text-accent" : "text-destructive"}`}>{student.avgGrade ?? "—"}</p></div>
+                  <div><p className="text-[10px] text-muted-foreground uppercase">Entregas</p><p className="text-sm font-bold text-foreground">{student.submittedTasks}/{student.totalTasks}</p></div>
+                  <div><p className="text-[10px] text-muted-foreground uppercase">Última</p><p className="text-xs text-muted-foreground">{student.lastActive}</p></div>
                 </div>
               </Card>
             ))}
@@ -214,19 +233,15 @@ export default function ProfessorTurmaDetail() {
 
         {/* ── Aulas ── */}
         <TabsContent value="lessons" className="space-y-4">
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-muted-foreground">{turmaLessons.filter(l => l.status === "publicada").length} publicadas, {turmaLessons.filter(l => l.status === "agendada").length} agendadas</p>
-          </div>
+          <p className="text-sm text-muted-foreground">{turmaLessons.filter(l => l.status === "publicada").length} publicadas, {turmaLessons.filter(l => l.status === "agendada").length} agendadas</p>
           <div className="space-y-3">
             {turmaLessons.map(lesson => {
-              const cfg = statusConfig[lesson.status];
+              const cfg = lessonStatusConfig[lesson.status];
               const StatusIcon = cfg.icon;
               const disc = profDisciplines.find(d => d.id === lesson.disciplineId);
               return (
                 <Card key={lesson.id} className="p-4 flex items-center gap-4 border-l-[3px]" style={{ borderLeftColor: lesson.status === "publicada" ? "hsl(var(--accent))" : "hsl(var(--muted))" }}>
-                  <div className="w-20 h-14 rounded-xl bg-muted/50 flex items-center justify-center shrink-0">
-                    <Play className="w-5 h-5 text-muted-foreground/60" />
-                  </div>
+                  <div className="w-20 h-14 rounded-xl bg-muted/50 flex items-center justify-center shrink-0"><Play className="w-5 h-5 text-muted-foreground/60" /></div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <span className="text-xs font-mono font-semibold px-1.5 py-0.5 rounded bg-primary/10 text-primary">#{lesson.number}</span>
@@ -245,9 +260,7 @@ export default function ProfessorTurmaDetail() {
                       )}
                     </div>
                   </div>
-                  <Badge className={`${cfg.color} gap-1 text-[10px]`}>
-                    <StatusIcon className="w-3 h-3" /> {cfg.label}
-                  </Badge>
+                  <Badge className={`${cfg.color} gap-1 text-[10px]`}><StatusIcon className="w-3 h-3" /> {cfg.label}</Badge>
                 </Card>
               );
             })}
@@ -255,93 +268,125 @@ export default function ProfessorTurmaDetail() {
           </div>
         </TabsContent>
 
-        {/* ── Avaliações ── */}
+        {/* ── Tarefas ── */}
         <TabsContent value="tasks" className="space-y-4">
-          <p className="text-sm text-muted-foreground">{turmaTasks.length} avaliações</p>
+          <p className="text-sm text-muted-foreground">{turmaTasks.length} tarefas / avaliações</p>
           <div className="space-y-3">
             {turmaTasks.map(task => {
               const tcfg = taskStatusConfig[task.status];
               const submPct = Math.round((task.submissions / task.totalStudents) * 100);
               return (
                 <Card key={task.id} className="p-4 border-l-[3px] border-l-primary cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate(`/professor/tasks/${task.id}`)}>
-                  <div className="flex items-start justify-between mb-2">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <p className="text-sm font-semibold text-foreground">{task.title}</p>
-                        <Badge className={`${tcfg.color} text-[10px]`}>{tcfg.label}</Badge>
-                        <Badge variant="outline" className="text-[10px]">
-                          {task.type === "tarefa" ? "Tarefa" : task.type === "quiz" ? "Quiz" : "Exame"}
-                        </Badge>
-                      </div>
-                      <p className="text-xs text-muted-foreground line-clamp-1">{task.description}</p>
-                    </div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <p className="text-sm font-semibold text-foreground">{task.title}</p>
+                    <Badge className={`${tcfg.color} text-[10px]`}>{tcfg.label}</Badge>
+                    <Badge variant="outline" className="text-[10px]">{task.type === "tarefa" ? "Tarefa" : task.type === "quiz" ? "Quiz" : "Exame"}</Badge>
                   </div>
+                  <p className="text-xs text-muted-foreground line-clamp-1">{task.description}</p>
                   <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-3">
-                    <div>
-                      <p className="text-[10px] text-muted-foreground uppercase">Entrega</p>
-                      <p className="text-xs font-medium text-foreground">{task.dueDate}</p>
-                    </div>
-                    <div>
-                      <p className="text-[10px] text-muted-foreground uppercase">Entregas</p>
-                      <p className="text-xs font-medium text-foreground">{task.submissions}/{task.totalStudents} ({submPct}%)</p>
-                    </div>
-                    <div>
-                      <p className="text-[10px] text-muted-foreground uppercase">Peso</p>
-                      <p className="text-xs font-medium text-foreground">{task.weight}%</p>
-                    </div>
-                    <div>
-                      <p className="text-[10px] text-muted-foreground uppercase">Média</p>
-                      <p className={`text-xs font-medium ${task.avgGrade !== null ? (task.avgGrade >= 10 ? "text-accent" : "text-destructive") : "text-muted-foreground"}`}>
-                        {task.avgGrade !== null ? `${task.avgGrade}/20` : "—"}
-                      </p>
-                    </div>
+                    <div><p className="text-[10px] text-muted-foreground uppercase">Entrega</p><p className="text-xs font-medium text-foreground">{task.dueDate}</p></div>
+                    <div><p className="text-[10px] text-muted-foreground uppercase">Entregas</p><p className="text-xs font-medium text-foreground">{task.submissions}/{task.totalStudents} ({submPct}%)</p></div>
+                    <div><p className="text-[10px] text-muted-foreground uppercase">Peso</p><p className="text-xs font-medium text-foreground">{task.weight}%</p></div>
+                    <div><p className="text-[10px] text-muted-foreground uppercase">Média</p><p className={`text-xs font-medium ${task.avgGrade !== null ? (task.avgGrade >= 10 ? "text-accent" : "text-destructive") : "text-muted-foreground"}`}>{task.avgGrade !== null ? `${task.avgGrade}/20` : "—"}</p></div>
                   </div>
                   <Progress value={submPct} className="h-1.5 mt-3" />
                 </Card>
               );
             })}
-            {turmaTasks.length === 0 && <p className="text-center text-muted-foreground py-8">Nenhuma avaliação nesta turma.</p>}
+            {turmaTasks.length === 0 && <p className="text-center text-muted-foreground py-8">Nenhuma tarefa nesta turma.</p>}
           </div>
         </TabsContent>
 
-        {/* ── Disciplinas ── */}
-        <TabsContent value="disciplines" className="space-y-4">
-          <p className="text-sm text-muted-foreground">{turmaDiscs.length} disciplinas nesta turma</p>
+        {/* ── Recursos ── */}
+        <TabsContent value="resources" className="space-y-4">
+          <p className="text-sm text-muted-foreground">{allMaterials.length} recursos disponíveis</p>
           <div className="space-y-2">
-            {turmaDiscs.map(d => {
-              const dStudents = profStudents.filter(s => s.turmaId === turmaId && s.disciplineId === d.id);
-              const dAvg = (() => {
-                const wg = dStudents.filter(s => s.avgGrade !== null);
-                return wg.length > 0 ? Math.round(wg.reduce((s, st) => s + (st.avgGrade || 0), 0) / wg.length * 10) / 10 : null;
-              })();
-              return (
-                <Link key={d.id} to={`/professor/disciplines/${d.id}?turma=${turmaId}`}>
-                  <Card className={`p-4 flex items-center gap-4 border-l-[3px] hover:shadow-md transition-shadow ${dAvg !== null && dAvg >= 10 ? "border-l-accent" : "border-l-destructive"}`}>
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: d.color + "15", color: d.color }}>
-                      <BookOpen className="w-5 h-5" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <p className="text-sm font-semibold text-foreground">{d.name}</p>
-                        <Badge variant="outline" className="text-[10px] font-mono">{d.code}</Badge>
-                      </div>
-                      <p className="text-[11px] text-muted-foreground mt-0.5">{d.schedule} • {d.room}</p>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4 shrink-0 text-center">
-                      <div>
-                        <p className="text-[10px] text-muted-foreground uppercase">Estudantes</p>
-                        <p className="text-sm font-bold text-foreground">{dStudents.length}</p>
-                      </div>
-                      <div>
-                        <p className="text-[10px] text-muted-foreground uppercase">Média</p>
-                        <p className={`text-sm font-bold ${dAvg !== null && dAvg >= 10 ? "text-accent" : "text-destructive"}`}>{dAvg ?? "—"}</p>
-                      </div>
-                    </div>
-                  </Card>
-                </Link>
-              );
-            })}
+            {allMaterials.map((mat, i) => (
+              <Card key={i} className="p-4 flex items-center gap-4">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                  <FileText className="w-5 h-5 text-primary" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-foreground">{mat.name}</p>
+                  <p className="text-[11px] text-muted-foreground">{mat.type.toUpperCase()} • {mat.size} • Aula #{mat.lessonNumber}: {mat.lesson}</p>
+                </div>
+                {mat.disc && <Badge variant="outline" className="text-[10px] font-mono">{mat.disc.code}</Badge>}
+                <Button variant="ghost" size="icon" className="shrink-0"><Download className="w-4 h-4" /></Button>
+              </Card>
+            ))}
+            {allMaterials.length === 0 && <p className="text-center text-muted-foreground py-8">Nenhum recurso disponível.</p>}
           </div>
+        </TabsContent>
+
+        {/* ── Calendário ── */}
+        <TabsContent value="calendar" className="space-y-4">
+          <p className="text-sm text-muted-foreground">{calendarEvents.length} datas importantes</p>
+          <div className="space-y-2">
+            {calendarEvents.map(ev => (
+              <Card key={ev.id} className={`p-4 flex items-center gap-4 border-l-[3px] ${calendarTypeColors[ev.type]}`}>
+                <div className="w-10 h-10 rounded-xl bg-muted/50 flex items-center justify-center shrink-0">
+                  {ev.type === "exame" ? <AlertCircle className="w-5 h-5 text-destructive" /> : ev.type === "entrega" ? <ClipboardList className="w-5 h-5 text-secondary" /> : <Calendar className="w-5 h-5 text-primary" />}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-semibold text-foreground">{ev.title}</p>
+                    <Badge className={`${calendarTypeBadge[ev.type]} text-[10px]`}>{calendarTypeLabels[ev.type]}</Badge>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">{ev.description}</p>
+                </div>
+                <p className="text-xs font-medium text-foreground shrink-0">{ev.date}</p>
+              </Card>
+            ))}
+            {calendarEvents.length === 0 && <p className="text-center text-muted-foreground py-8">Nenhum evento agendado.</p>}
+          </div>
+        </TabsContent>
+
+        {/* ── Critério ── */}
+        <TabsContent value="criteria" className="space-y-6">
+          <div>
+            <h2 className="text-lg font-semibold text-foreground flex items-center gap-2 mb-1"><Settings className="w-5 h-5 text-primary" /> Critérios de Classificação</h2>
+            <p className="text-sm text-muted-foreground">Defina os intervalos de nota para cada nível de desempenho nesta turma.</p>
+          </div>
+          <Card className="p-6 space-y-4">
+            {criteria.map((c, i) => (
+              <div key={i} className="flex items-center gap-4 p-4 rounded-xl border border-border bg-muted/20">
+                <div className="w-3 h-10 rounded-full shrink-0" style={{ backgroundColor: c.color }} />
+                <div className="flex-1 space-y-2">
+                  <div className="flex items-center gap-3">
+                    <Input value={c.label} onChange={e => { const u = [...criteria]; u[i] = { ...u[i], label: e.target.value }; setCriteria(u); }} className="max-w-[200px] h-9 text-sm font-semibold" />
+                    <span className="text-xs text-muted-foreground">Nota mínima:</span>
+                    <Input type="number" value={c.minGrade} onChange={e => { const u = [...criteria]; u[i] = { ...u[i], minGrade: Number(e.target.value) }; setCriteria(u); }} className="w-20 h-9 text-sm font-bold text-center" min="0" max="20" />
+                    <span className="text-xs text-muted-foreground">/20 valores</span>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">{i === 0 ? `Nota ≥ ${c.minGrade}` : i === criteria.length - 1 ? `Nota < ${criteria[i - 1].minGrade}` : `${c.minGrade} ≤ Nota < ${criteria[i - 1].minGrade}`}</p>
+                </div>
+                <div className="text-right shrink-0">
+                  <p className="text-xs text-muted-foreground">Estudantes</p>
+                  <p className="text-lg font-bold text-foreground">{uniqueStudents.filter(s => { if (s.avgGrade === null) return false; if (i === 0) return s.avgGrade >= c.minGrade; if (i === criteria.length - 1) return s.avgGrade < criteria[i - 1].minGrade; return s.avgGrade >= c.minGrade && s.avgGrade < criteria[i - 1].minGrade; }).length}</p>
+                </div>
+              </div>
+            ))}
+          </Card>
+          <div className="flex justify-end">
+            <Button onClick={handleSaveCriteria} className="gap-2"><CheckCircle className="w-4 h-4" /> Guardar Critérios</Button>
+          </div>
+          <Card className="p-5">
+            <h3 className="text-sm font-semibold text-foreground mb-4">Distribuição Actual</h3>
+            <div className="space-y-3">
+              {criteria.map((c, i) => {
+                const count = uniqueStudents.filter(s => { if (s.avgGrade === null) return false; if (i === 0) return s.avgGrade >= c.minGrade; if (i === criteria.length - 1) return s.avgGrade < criteria[i - 1].minGrade; return s.avgGrade >= c.minGrade && s.avgGrade < criteria[i - 1].minGrade; }).length;
+                const pct = uniqueStudents.length > 0 ? Math.round((count / uniqueStudents.length) * 100) : 0;
+                return (
+                  <div key={i} className="flex items-center gap-3">
+                    <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: c.color }} />
+                    <span className="text-sm font-medium text-foreground w-24">{c.label}</span>
+                    <div className="flex-1"><div className="h-6 rounded-full bg-muted overflow-hidden"><div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, backgroundColor: c.color, opacity: 0.7 }} /></div></div>
+                    <span className="text-sm font-bold text-foreground w-16 text-right">{count} ({pct}%)</span>
+                  </div>
+                );
+              })}
+            </div>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>
