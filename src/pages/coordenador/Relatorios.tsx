@@ -6,7 +6,7 @@ export default function CoordenadorRelatorios() {
   const info = coordCursoInfo;
   const stats = [
     { icon: Users, label: "Total Estudantes", value: info.totalEstudantes, color: "text-accent bg-accent/10" },
-    { icon: BookOpen, label: "Disciplinas Activas", value: info.disciplinasActivas, color: "text-primary bg-primary/10" },
+    { icon: BookOpen, label: "Cadeiras Activas", value: info.disciplinasActivas, color: "text-primary bg-primary/10" },
     { icon: Award, label: "Média Geral", value: info.mediaGeral, color: "text-secondary bg-secondary/10" },
     { icon: TrendingUp, label: "Taxa Sucesso Média", value: `${Math.round(info.years.reduce((s, y) => s + y.taxaSucesso, 0) / info.years.length)}%`, color: "text-accent bg-accent/10" },
   ];
@@ -29,7 +29,7 @@ export default function CoordenadorRelatorios() {
             <h3 className="font-bold text-foreground mb-3">{y.year}º Ano</h3>
             <div className="space-y-2">
               <div className="flex justify-between text-sm"><span className="text-muted-foreground">Estudantes</span><span className="font-medium">{y.estudantes}</span></div>
-              <div className="flex justify-between text-sm"><span className="text-muted-foreground">Disciplinas</span><span className="font-medium">{y.disciplinas}</span></div>
+              <div className="flex justify-between text-sm"><span className="text-muted-foreground">Cadeiras</span><span className="font-medium">{y.disciplinas}</span></div>
               <div className="flex justify-between text-sm"><span className="text-muted-foreground">Média Geral</span><span className={`font-bold ${y.mediaGeral >= 10 ? "text-accent" : "text-destructive"}`}>{y.mediaGeral}</span></div>
               <div className="flex justify-between text-sm"><span className="text-muted-foreground">Taxa Sucesso</span><span className={`font-bold ${y.taxaSucesso >= 80 ? "text-accent" : "text-secondary"}`}>{y.taxaSucesso}%</span></div>
               <div className="w-full bg-muted rounded-full h-2 mt-1"><div className={`h-2 rounded-full ${y.taxaSucesso >= 80 ? "bg-accent" : "bg-secondary"}`} style={{ width: `${y.taxaSucesso}%` }} /></div>

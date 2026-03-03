@@ -39,7 +39,7 @@ export default function CoordinatorAnnouncements() {
       {/* Tabs */}
       <div className="flex gap-1.5 border-b border-border pb-0">
         {([
-          { key: "disciplinas" as const, label: "Anúncios das Disciplinas", icon: Megaphone },
+          { key: "disciplinas" as const, label: "Anúncios das Cadeiras", icon: Megaphone },
           { key: "institucionais" as const, label: "Anúncios Institucionais", icon: Bell },
         ]).map(tab => (
           <button

@@ -60,7 +60,7 @@ export default function StudentDashboard() {
         {[
           { icon: BarChart3, label: "Presença Geral", value: `${generalPct}%`, color: generalPct >= 75 ? "text-accent bg-accent/10" : "text-destructive bg-destructive/10" },
           { icon: BarChart3, label: "Média Geral", value: overallAvg !== null ? overallAvg : "—", color: overallAvg !== null && overallAvg >= 10 ? "text-accent bg-accent/10" : "text-destructive bg-destructive/10", suffix: overallAvg !== null ? "/20" : "" },
-          { icon: BookOpen, label: "Disciplinas", value: disciplines.length, color: "text-primary bg-primary/10" },
+          { icon: BookOpen, label: "Cadeiras", value: disciplines.length, color: "text-primary bg-primary/10" },
           { icon: Video, label: "Aulas Gravadas", value: lessons.length, color: "text-secondary bg-secondary/10" },
         ].map((stat) => (
           <Card key={stat.label} className="p-4 flex items-center gap-4">

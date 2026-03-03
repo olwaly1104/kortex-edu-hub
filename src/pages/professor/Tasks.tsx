@@ -106,7 +106,7 @@ export default function ProfessorTasks() {
             <Plus className="w-5 h-5 text-primary" /> Nova Tarefa
           </h2>
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Disciplina *</label>
+            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Cadeira *</label>
             <select value={formDisc} onChange={e => setFormDisc(e.target.value)} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
               {profDisciplines.map(d => <option key={d.id} value={d.id}>{d.name} ({d.code})</option>)}
             </select>

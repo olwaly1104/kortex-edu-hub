@@ -26,7 +26,7 @@ export default function CoordenadorAnoDetail() {
         <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
           <GraduationCap className="w-6 h-6 text-primary" /> {yearNum}º Ano — {info.name}
         </h1>
-        <p className="text-muted-foreground mt-1">{turmas.length} turmas · {disciplinas.length} disciplinas</p>
+        <p className="text-muted-foreground mt-1">{turmas.length} turmas · {disciplinas.length} cadeiras</p>
       </div>
 
       {/* KPI row */}
@@ -41,7 +41,7 @@ export default function CoordenadorAnoDetail() {
         <Card className="p-4">
           <div className="flex items-center gap-2 mb-3">
             <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><BookOpen className="w-4 h-4 text-primary" /></div>
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Disciplinas</span>
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Cadeiras</span>
           </div>
           <p className="text-2xl font-bold text-foreground">{yearData.disciplinas}</p>
         </Card>
@@ -84,7 +84,7 @@ export default function CoordenadorAnoDetail() {
                     </div>
                     <div className="text-center p-2.5 rounded-lg bg-muted/50">
                       <p className="text-lg font-bold text-foreground">{t.disciplinas}</p>
-                      <p className="text-[10px] text-muted-foreground">Disciplinas</p>
+                      <p className="text-[10px] text-muted-foreground">Cadeiras</p>
                     </div>
                     <div className="text-center p-2.5 rounded-lg bg-muted/50">
                       <p className="text-lg font-bold text-foreground">{t.professores}</p>
@@ -108,15 +108,15 @@ export default function CoordenadorAnoDetail() {
         </div>
       </div>
 
-      {/* Disciplinas table */}
+      {/* Cadeiras table */}
       <div>
         <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-          <BookOpen className="w-5 h-5 text-primary" /> Disciplinas
+          <BookOpen className="w-5 h-5 text-primary" /> Cadeiras
         </h2>
         <Card className="overflow-hidden">
           <table className="w-full text-sm">
             <thead><tr className="border-b bg-muted/30">
-              <th className="text-left p-3 font-medium text-muted-foreground">Disciplina</th>
+              <th className="text-left p-3 font-medium text-muted-foreground">Cadeira</th>
               <th className="text-left p-3 font-medium text-muted-foreground">Professor</th>
               <th className="text-center p-3 font-medium text-muted-foreground">Estudantes</th>
               <th className="text-center p-3 font-medium text-muted-foreground">Média</th>

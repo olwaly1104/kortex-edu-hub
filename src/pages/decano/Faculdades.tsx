@@ -140,7 +140,7 @@ export default function DecanoFaculdades() {
               <p className="text-xs text-muted-foreground mb-3">Director: {t.director}</p>
               <div className="grid grid-cols-2 gap-2">
                 <div className="text-center p-2 rounded-lg bg-muted/40"><p className="text-sm font-bold text-foreground">{t.estudantes}</p><p className="text-[9px] text-muted-foreground">Estudantes</p></div>
-                <div className="text-center p-2 rounded-lg bg-muted/40"><p className="text-sm font-bold text-foreground">{t.disciplinas}</p><p className="text-[9px] text-muted-foreground">Disciplinas</p></div>
+                <div className="text-center p-2 rounded-lg bg-muted/40"><p className="text-sm font-bold text-foreground">{t.disciplinas}</p><p className="text-[9px] text-muted-foreground">Cadeiras</p></div>
               </div>
               <div className="flex items-center justify-between mt-3 pt-3 border-t">
                 <div className="flex items-center gap-1 text-xs"><Award className="w-3.5 h-3.5 text-muted-foreground" /><span className={t.media >= 10 ? "text-accent font-medium" : "text-destructive font-medium"}>{t.media}</span></div>

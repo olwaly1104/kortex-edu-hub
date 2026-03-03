@@ -40,7 +40,7 @@ export default function ProfessorDisciplineDetail() {
     { label: "Insuficiente", minGrade: 0, color: "hsl(var(--destructive))" },
   ]);
 
-  if (!disc) return <div className="p-8 text-muted-foreground">Disciplina não encontrada.</div>;
+  if (!disc) return <div className="p-8 text-muted-foreground">Cadeira não encontrada.</div>;
 
   const publishPct = Math.round((disc.publishedLessons / disc.totalLessons) * 100);
   const avgAttendance = discStudents.length > 0
@@ -76,7 +76,7 @@ export default function ProfessorDisciplineDetail() {
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       <Link to="/professor/disciplines" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
-        <ArrowLeft className="w-4 h-4" /> Voltar às disciplinas
+        <ArrowLeft className="w-4 h-4" /> Voltar às cadeiras
       </Link>
 
       {/* Hero */}

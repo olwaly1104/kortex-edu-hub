@@ -31,7 +31,7 @@ export default function CoordenadorCursoDashboard() {
 
   const stats = [
     { icon: Users, label: "Total Estudantes", value: info.totalEstudantes, color: "text-accent bg-accent/10" },
-    { icon: BookOpen, label: "Disciplinas Activas", value: info.disciplinasActivas, color: "text-primary bg-primary/10" },
+    { icon: BookOpen, label: "Cadeiras Activas", value: info.disciplinasActivas, color: "text-primary bg-primary/10" },
     { icon: Clock, label: "Aprovações Pendentes", value: info.aprovacoesPendentes, color: "text-secondary bg-secondary/10" },
     { icon: Award, label: "Média Geral", value: info.mediaGeral, color: "text-accent bg-accent/10" },
   ];
@@ -98,8 +98,8 @@ export default function CoordenadorCursoDashboard() {
                         <p className="text-[9px] text-muted-foreground">Estudantes</p>
                       </div>
                       <div className="text-center p-2 rounded-lg bg-muted/40">
-                        <p className="text-sm font-bold text-foreground">{y.disciplinas}</p>
-                        <p className="text-[9px] text-muted-foreground">Disciplinas</p>
+                       <p className="text-sm font-bold text-foreground">{y.disciplinas}</p>
+                        <p className="text-[9px] text-muted-foreground">Cadeiras</p>
                       </div>
                       <div className="text-center p-2 rounded-lg bg-muted/40">
                         <p className={`text-sm font-bold ${y.mediaGeral >= 10 ? "text-accent" : "text-destructive"}`}>{y.mediaGeral}</p>
@@ -133,7 +133,7 @@ export default function CoordenadorCursoDashboard() {
                     <tr className="border-b bg-muted/30">
                       <th className="text-left p-3 font-medium text-muted-foreground">Nome</th>
                       <th className="text-left p-3 font-medium text-muted-foreground">Departamento</th>
-                      <th className="text-center p-3 font-medium text-muted-foreground">Disciplinas</th>
+                      <th className="text-center p-3 font-medium text-muted-foreground">Cadeiras</th>
                       <th className="text-center p-3 font-medium text-muted-foreground">Presença</th>
                       <th className="text-center p-3 font-medium text-muted-foreground">Estado</th>
                     </tr>
