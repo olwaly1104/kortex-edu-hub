@@ -4,25 +4,33 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { GraduationCap, Search, Users, CheckCircle, ClipboardList, Award, ArrowUpDown, SlidersHorizontal } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuLabel } from "@/components/ui/dropdown-menu";
+import { GraduationCap, Search, Users, CheckCircle, ClipboardList, Award, ArrowUpDown, ArrowUp, ArrowDown, SlidersHorizontal, X } from "lucide-react";
 
-type SortDir = "desc" | "asc";
+type SortDir = "desc" | "asc" | null;
 type FilterField = "presenca" | "taxaEntrega" | "mediaGeral";
+
+const filterLabels: Record<FilterField, string> = {
+  presenca: "Presença",
+  taxaEntrega: "Entrega",
+  mediaGeral: "Média",
+};
 
 export default function CoordenadorDocentes() {
   const [search, setSearch] = useState("");
-  const [sortDir, setSortDir] = useState<SortDir>("desc");
+  const [sortDir, setSortDir] = useState<SortDir>(null);
   const [filterField, setFilterField] = useState<FilterField>("presenca");
+  const isActive = sortDir !== null;
 
   const filtered = useMemo(() => {
     let list = coordDocentes.filter(d => !search || d.name.toLowerCase().includes(search.toLowerCase()));
-    list = [...list].sort((a, b) => {
-      const va = a[filterField] as number;
-      const vb = b[filterField] as number;
-      return sortDir === "asc" ? va - vb : vb - va;
-    });
+    if (sortDir) {
+      list = [...list].sort((a, b) => {
+        const va = a[filterField] as number;
+        const vb = b[filterField] as number;
+        return sortDir === "asc" ? va - vb : vb - va;
+      });
+    }
     return list;
   }, [search, sortDir, filterField]);
 
@@ -73,36 +81,39 @@ export default function CoordenadorDocentes() {
       <div className="flex items-center justify-between gap-3">
         <div className="relative flex-1 max-w-md"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" /><Input placeholder="Pesquisar docente..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9" /></div>
         <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setSortDir(d => d === "desc" ? "asc" : "desc")}
-            className="gap-1.5"
-          >
-            <ArrowUpDown className="w-4 h-4" />
-            {sortDir === "desc" ? "Maior" : "Menor"}
-          </Button>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline" size="sm" className="gap-1.5">
+          {isActive && (
+            <Button variant="ghost" size="sm" onClick={() => setSortDir(null)} className="gap-1 text-muted-foreground hover:text-foreground h-8 px-2">
+              <X className="w-3.5 h-3.5" /> Limpar
+            </Button>
+          )}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant={isActive ? "secondary" : "outline"} size="sm" className="gap-1.5 h-9">
                 <SlidersHorizontal className="w-4 h-4" />
-                Filtro
+                {isActive ? filterLabels[filterField] : "Ordenar"}
               </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-48 p-2" align="end">
-              <div className="space-y-1">
-                {([["presenca", "Presença"], ["taxaEntrega", "Taxa Entrega"], ["mediaGeral", "Média Geral"]] as const).map(([val, label]) => (
-                  <button
-                    key={val}
-                    onClick={() => setFilterField(val)}
-                    className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${filterField === val ? "bg-primary text-primary-foreground" : "hover:bg-muted"}`}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-            </PopoverContent>
-          </Popover>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-44">
+              <DropdownMenuLabel className="text-xs text-muted-foreground">Ordenar por</DropdownMenuLabel>
+              {(Object.entries(filterLabels) as [FilterField, string][]).map(([val, label]) => (
+                <DropdownMenuItem
+                  key={val}
+                  onClick={() => { setFilterField(val); if (!sortDir) setSortDir("desc"); }}
+                  className={filterField === val && isActive ? "bg-muted font-medium" : ""}
+                >
+                  {label}
+                </DropdownMenuItem>
+              ))}
+              <DropdownMenuSeparator />
+              <DropdownMenuLabel className="text-xs text-muted-foreground">Direção</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => setSortDir("desc")} className={sortDir === "desc" ? "bg-muted font-medium" : ""}>
+                <ArrowDown className="w-3.5 h-3.5 mr-2" /> Maior primeiro
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSortDir("asc")} className={sortDir === "asc" ? "bg-muted font-medium" : ""}>
+                <ArrowUp className="w-3.5 h-3.5 mr-2" /> Menor primeiro
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
       <Card className="overflow-hidden">

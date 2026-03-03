@@ -124,7 +124,7 @@ export default function CoordenadorAnos() {
                     </div>
                     <div className="flex items-center gap-1.5 text-sm">
                       <ClipboardList className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-xs text-muted-foreground">Taxa Entrega</span>
+                      <span className="text-xs text-muted-foreground">Entrega</span>
                       <span className={`font-semibold ${avgTaxaEntrega >= 80 ? "text-accent" : "text-destructive"}`}>{avgTaxaEntrega}%</span>
                     </div>
                   </div>
