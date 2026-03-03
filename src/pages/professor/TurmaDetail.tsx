@@ -8,6 +8,7 @@ import {
   ArrowLeft, BookOpen, Users, Clock, Video, FileText,
   GraduationCap, ClipboardList, Play, Eye, Calendar, CheckCircle,
   TrendingUp, Search, Edit, Settings, Download, AlertCircle,
+  FolderOpen, Award,
 } from "lucide-react";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
@@ -41,6 +42,22 @@ export default function ProfessorTurmaDetail() {
 
   // Resources from all lessons
   const allMaterials = turmaLessons.flatMap(l => l.materials.map(m => ({ ...m, lesson: l.title, lessonNumber: l.number, disc: profDisciplines.find(d => d.id === l.disciplineId) })));
+
+  // Conteúdos - content linked to lessons
+  const conteudos = turmaLessons.filter(l => l.status === "publicada").flatMap(l => {
+    const disc = profDisciplines.find(d => d.id === l.disciplineId);
+    return l.materials.map(m => ({
+      ...m,
+      lessonId: l.id,
+      lessonTitle: l.title,
+      lessonNumber: l.number,
+      date: l.date,
+      disc,
+    }));
+  });
+
+  // Avaliações - exams and graded tasks
+  const avaliacoes = turmaTasks.filter(t => t.type === "exame" || t.type === "quiz");
 
   // Calendar events
   const calendarEvents = [
@@ -172,12 +189,14 @@ export default function ProfessorTurmaDetail() {
 
       {/* Tabs */}
       <Tabs defaultValue="students" className="space-y-5">
-        <div className="border-b">
+        <div className="border-b overflow-x-auto">
           <TabsList className="bg-transparent h-auto p-0 gap-0">
             {[
               { value: "students", icon: Users, label: "Estudantes" },
               { value: "lessons", icon: Video, label: "Aulas" },
+              { value: "conteudos", icon: FolderOpen, label: "Conteúdos" },
               { value: "tasks", icon: ClipboardList, label: "Tarefas" },
+              { value: "avaliacoes", icon: Award, label: "Avaliações" },
               { value: "resources", icon: FileText, label: "Recursos" },
               { value: "calendar", icon: Calendar, label: "Calendário" },
               { value: "criteria", icon: Settings, label: "Critério" },
@@ -240,27 +259,44 @@ export default function ProfessorTurmaDetail() {
               const StatusIcon = cfg.icon;
               const disc = profDisciplines.find(d => d.id === lesson.disciplineId);
               return (
-                <Card key={lesson.id} className="p-4 flex items-center gap-4 border-l-[3px]" style={{ borderLeftColor: lesson.status === "publicada" ? "hsl(var(--accent))" : "hsl(var(--muted))" }}>
-                  <div className="w-20 h-14 rounded-xl bg-muted/50 flex items-center justify-center shrink-0"><Play className="w-5 h-5 text-muted-foreground/60" /></div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-mono font-semibold px-1.5 py-0.5 rounded bg-primary/10 text-primary">#{lesson.number}</span>
-                      <h4 className="font-medium text-foreground truncate">{lesson.title}</h4>
-                      {disc && <Badge variant="outline" className="text-[10px] font-mono">{disc.code}</Badge>}
+                <Card key={lesson.id} className="p-4 border-l-[3px]" style={{ borderLeftColor: lesson.status === "publicada" ? "hsl(var(--accent))" : "hsl(var(--muted))" }}>
+                  <div className="flex items-center gap-4">
+                    <div className="w-20 h-14 rounded-xl bg-muted/50 flex items-center justify-center shrink-0"><Play className="w-5 h-5 text-muted-foreground/60" /></div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-mono font-semibold px-1.5 py-0.5 rounded bg-primary/10 text-primary">#{lesson.number}</span>
+                        <h4 className="font-medium text-foreground truncate">{lesson.title}</h4>
+                        {disc && <Badge variant="outline" className="text-[10px] font-mono">{disc.code}</Badge>}
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1 line-clamp-1">{lesson.summary}</p>
+                      <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
+                        <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{lesson.duration}</span>
+                        <span>{lesson.date}</span>
+                        {lesson.status === "publicada" && (
+                          <>
+                            <span className="flex items-center gap-1"><Eye className="w-3 h-3" />{lesson.views}</span>
+                            <span className="flex items-center gap-1"><Users className="w-3 h-3" />{lesson.attendance}/{lesson.totalStudents}</span>
+                          </>
+                        )}
+                      </div>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-1 line-clamp-1">{lesson.summary}</p>
-                    <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
-                      <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{lesson.duration}</span>
-                      <span>{lesson.date}</span>
-                      {lesson.status === "publicada" && (
-                        <>
-                          <span className="flex items-center gap-1"><Eye className="w-3 h-3" />{lesson.views}</span>
-                          <span className="flex items-center gap-1"><Users className="w-3 h-3" />{lesson.attendance}/{lesson.totalStudents}</span>
-                        </>
-                      )}
-                    </div>
+                    <Badge className={`${cfg.color} gap-1 text-[10px]`}><StatusIcon className="w-3 h-3" /> {cfg.label}</Badge>
                   </div>
-                  <Badge className={`${cfg.color} gap-1 text-[10px]`}><StatusIcon className="w-3 h-3" /> {cfg.label}</Badge>
+                  {/* Conteúdos / Ficheiros da aula */}
+                  {lesson.materials.length > 0 && (
+                    <div className="mt-3 pt-3 border-t border-border/50">
+                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1"><FolderOpen className="w-3 h-3" /> Conteúdos / Ficheiros</p>
+                      <div className="flex flex-wrap gap-2">
+                        {lesson.materials.map((m, idx) => (
+                          <div key={idx} className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-muted/50 text-xs">
+                            <FileText className="w-3 h-3 text-primary" />
+                            <span className="text-foreground font-medium">{m.name}</span>
+                            <span className="text-muted-foreground">{m.size}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </Card>
               );
             })}
@@ -268,11 +304,32 @@ export default function ProfessorTurmaDetail() {
           </div>
         </TabsContent>
 
+        {/* ── Conteúdos ── */}
+        <TabsContent value="conteudos" className="space-y-4">
+          <p className="text-sm text-muted-foreground">{conteudos.length} conteúdos disponíveis</p>
+          <div className="space-y-2">
+            {conteudos.map((c, i) => (
+              <Card key={i} className="p-4 flex items-center gap-4">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                  <FileText className="w-5 h-5 text-primary" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-foreground">{c.name}</p>
+                  <p className="text-[11px] text-muted-foreground">{c.type.toUpperCase()} • {c.size} • Aula #{c.lessonNumber}: {c.lessonTitle} • {c.date}</p>
+                </div>
+                {c.disc && <Badge variant="outline" className="text-[10px] font-mono">{c.disc.code}</Badge>}
+                <Button variant="ghost" size="icon" className="shrink-0"><Download className="w-4 h-4" /></Button>
+              </Card>
+            ))}
+            {conteudos.length === 0 && <p className="text-center text-muted-foreground py-8">Nenhum conteúdo disponível.</p>}
+          </div>
+        </TabsContent>
+
         {/* ── Tarefas ── */}
         <TabsContent value="tasks" className="space-y-4">
-          <p className="text-sm text-muted-foreground">{turmaTasks.length} tarefas / avaliações</p>
+          <p className="text-sm text-muted-foreground">{turmaTasks.filter(t => t.type === "tarefa").length} tarefas</p>
           <div className="space-y-3">
-            {turmaTasks.map(task => {
+            {turmaTasks.filter(t => t.type === "tarefa").map(task => {
               const tcfg = taskStatusConfig[task.status];
               const submPct = Math.round((task.submissions / task.totalStudents) * 100);
               return (
@@ -280,7 +337,7 @@ export default function ProfessorTurmaDetail() {
                   <div className="flex items-center gap-2 mb-1">
                     <p className="text-sm font-semibold text-foreground">{task.title}</p>
                     <Badge className={`${tcfg.color} text-[10px]`}>{tcfg.label}</Badge>
-                    <Badge variant="outline" className="text-[10px]">{task.type === "tarefa" ? "Tarefa" : task.type === "quiz" ? "Quiz" : "Exame"}</Badge>
+                    <Badge variant="outline" className="text-[10px]">Tarefa</Badge>
                   </div>
                   <p className="text-xs text-muted-foreground line-clamp-1">{task.description}</p>
                   <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-3">
@@ -293,7 +350,36 @@ export default function ProfessorTurmaDetail() {
                 </Card>
               );
             })}
-            {turmaTasks.length === 0 && <p className="text-center text-muted-foreground py-8">Nenhuma tarefa nesta turma.</p>}
+            {turmaTasks.filter(t => t.type === "tarefa").length === 0 && <p className="text-center text-muted-foreground py-8">Nenhuma tarefa nesta turma.</p>}
+          </div>
+        </TabsContent>
+
+        {/* ── Avaliações ── */}
+        <TabsContent value="avaliacoes" className="space-y-4">
+          <p className="text-sm text-muted-foreground">{avaliacoes.length} avaliações (exames e quizzes)</p>
+          <div className="space-y-3">
+            {avaliacoes.map(task => {
+              const tcfg = taskStatusConfig[task.status];
+              const submPct = Math.round((task.submissions / task.totalStudents) * 100);
+              return (
+                <Card key={task.id} className="p-4 border-l-[3px] border-l-destructive">
+                  <div className="flex items-center gap-2 mb-1">
+                    <p className="text-sm font-semibold text-foreground">{task.title}</p>
+                    <Badge className={`${tcfg.color} text-[10px]`}>{tcfg.label}</Badge>
+                    <Badge variant="outline" className="text-[10px]">{task.type === "exame" ? "Exame" : "Quiz"}</Badge>
+                  </div>
+                  <p className="text-xs text-muted-foreground line-clamp-1">{task.description}</p>
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-3">
+                    <div><p className="text-[10px] text-muted-foreground uppercase">Data</p><p className="text-xs font-medium text-foreground">{task.dueDate}</p></div>
+                    <div><p className="text-[10px] text-muted-foreground uppercase">Entregas</p><p className="text-xs font-medium text-foreground">{task.submissions}/{task.totalStudents} ({submPct}%)</p></div>
+                    <div><p className="text-[10px] text-muted-foreground uppercase">Peso</p><p className="text-xs font-medium text-foreground">{task.weight}%</p></div>
+                    <div><p className="text-[10px] text-muted-foreground uppercase">Média</p><p className={`text-xs font-medium ${task.avgGrade !== null ? (task.avgGrade >= 10 ? "text-accent" : "text-destructive") : "text-muted-foreground"}`}>{task.avgGrade !== null ? `${task.avgGrade}/20` : "—"}</p></div>
+                  </div>
+                  <Progress value={submPct} className="h-1.5 mt-3" />
+                </Card>
+              );
+            })}
+            {avaliacoes.length === 0 && <p className="text-center text-muted-foreground py-8">Nenhuma avaliação nesta turma.</p>}
           </div>
         </TabsContent>
 
