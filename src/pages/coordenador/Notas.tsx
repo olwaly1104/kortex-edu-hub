@@ -2,7 +2,7 @@ import { useState } from "react";
 import { coordNotas, coordCursoInfo } from "@/data/institutionData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Award, Users, TrendingUp, ChevronRight, ClipboardList } from "lucide-react";
+import { Award, Users, TrendingUp, ChevronRight, ClipboardList, Calendar, Clock, MapPin, User } from "lucide-react";
 
 export default function CoordenadorNotas() {
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
@@ -162,37 +162,41 @@ export default function CoordenadorNotas() {
                       </div>
                     </Card>
 
-                    {/* Expanded: discipline details when turma is selected */}
+                    {/* Expanded: avaliações when turma is selected */}
                     {isExpanded && (
                       <div className="ml-4 mt-2 space-y-1.5 animate-fade-in">
-                        {t.disciplinas.map(d => {
-                          const total = d.aprovados + d.reprovados;
-                          const taxa = total > 0 ? Math.round((d.aprovados / total) * 100) : 0;
+                        {t.avaliacoes.map((a, i) => {
+                          const total = a.aprovados + a.reprovados;
+                          const taxa = total > 0 ? Math.round((a.aprovados / total) * 100) : 0;
                           return (
-                            <Card key={d.code} className={`p-3 border-l-[3px] ${d.media >= 10 ? "border-l-accent/50" : "border-l-destructive/50"}`}>
+                            <Card key={`${a.code}-${i}`} className={`p-4 border-l-[3px] ${a.media >= 10 ? "border-l-accent/50" : "border-l-destructive/50"}`}>
                               <div className="flex items-center gap-4">
                                 <div className="flex-1 min-w-0">
-                                  <div className="flex items-center gap-2">
-                                    <p className="text-xs font-semibold text-foreground">{d.name}</p>
-                                    <Badge variant="outline" className="text-[10px] font-mono">{d.code}</Badge>
+                                  <div className="flex items-center gap-2 mb-1">
+                                    <p className="text-xs font-semibold text-foreground">{a.name}</p>
+                                    <Badge variant="outline" className="text-[10px] font-mono">{a.code}</Badge>
+                                  </div>
+                                  <p className="text-[10px] text-muted-foreground font-medium mb-1.5">{a.cadeira}</p>
+                                  <div className="flex items-center gap-3 text-[10px] text-muted-foreground flex-wrap">
+                                    <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{a.date}</span>
+                                    <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{a.time}</span>
+                                    <span className="flex items-center gap-1">{a.period}</span>
+                                    <span className="flex items-center gap-1"><User className="w-3 h-3" />{a.professor}</span>
+                                    <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{a.local}</span>
                                   </div>
                                 </div>
-                                <div className="grid grid-cols-4 gap-4 shrink-0 text-center">
+                                <div className="grid grid-cols-3 gap-4 shrink-0 text-center">
                                   <div>
                                     <p className="text-[10px] text-muted-foreground uppercase">Média</p>
-                                    <p className={`text-xs font-bold ${d.media >= 10 ? "text-accent" : "text-destructive"}`}>{d.media}/20</p>
+                                    <p className={`text-xs font-bold ${a.media >= 10 ? "text-accent" : "text-destructive"}`}>{a.media}/20</p>
                                   </div>
                                   <div>
                                     <p className="text-[10px] text-muted-foreground uppercase">Aprov.</p>
-                                    <p className="text-xs font-bold text-accent">{d.aprovados}</p>
+                                    <p className="text-xs font-bold text-accent">{a.aprovados}</p>
                                   </div>
                                   <div>
                                     <p className="text-[10px] text-muted-foreground uppercase">Reprov.</p>
-                                    <p className="text-xs font-bold text-destructive">{d.reprovados}</p>
-                                  </div>
-                                  <div>
-                                    <p className="text-[10px] text-muted-foreground uppercase">Sucesso</p>
-                                    <Badge variant={taxa >= 80 ? "default" : "secondary"} className="text-[10px]">{taxa}%</Badge>
+                                    <p className="text-xs font-bold text-destructive">{a.reprovados}</p>
                                   </div>
                                 </div>
                               </div>

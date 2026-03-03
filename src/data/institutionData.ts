@@ -85,12 +85,18 @@ export interface CursoDisciplina {
   location: string;
 }
 
-export interface TurmaNotaDetail {
+export interface AvaliacaoNota {
   name: string;
   code: string;
+  cadeira: string;
   media: number;
   aprovados: number;
   reprovados: number;
+  date: string;
+  time: string;
+  period: string;
+  professor: string;
+  local: string;
 }
 
 export interface TurmaNota {
@@ -98,7 +104,7 @@ export interface TurmaNota {
   mediaGeral: number;
   avaliacoesCompletas: number;
   avaliacoesTotal: number;
-  disciplinas: TurmaNotaDetail[];
+  avaliacoes: AvaliacaoNota[];
 }
 
 export interface CursoNota {
@@ -176,113 +182,146 @@ export const coordDisciplinas: CursoDisciplina[] = [
 
 export const coordNotas: CursoNota[] = [
   { year: 1, turmas: [
-    { turma: "A", mediaGeral: 12.8, avaliacoesCompletas: 18, avaliacoesTotal: 24, disciplinas: [
-      { name: "Matemática I", code: "MAT101", media: 12.1, aprovados: 10, reprovados: 3 },
-      { name: "Física I", code: "FIS101", media: 11.8, aprovados: 9, reprovados: 4 },
-      { name: "Desenho Técnico I", code: "DES101", media: 13.2, aprovados: 11, reprovados: 2 },
+    { turma: "A", mediaGeral: 12.8, avaliacoesCompletas: 5, avaliacoesTotal: 8, avaliacoes: [
+      { name: "Teste 1", code: "T1-MAT101", cadeira: "Matemática I", media: 12.5, aprovados: 10, reprovados: 3, date: "15/10/2024", time: "09:00", period: "1º Semestre", professor: "Prof. Sofia Martins", local: "Sala A101" },
+      { name: "Teste 2", code: "T2-MAT101", cadeira: "Matemática I", media: 11.8, aprovados: 9, reprovados: 4, date: "20/12/2024", time: "10:00", period: "1º Semestre", professor: "Prof. Sofia Martins", local: "Sala A101" },
+      { name: "Teste 1", code: "T1-FIS101", cadeira: "Física I", media: 11.2, aprovados: 8, reprovados: 5, date: "18/10/2024", time: "14:00", period: "1º Semestre", professor: "Prof. Maria Santos", local: "Lab. Física" },
+      { name: "Projecto", code: "P1-FIS101", cadeira: "Física I", media: 13.0, aprovados: 11, reprovados: 2, date: "10/01/2025", time: "11:00", period: "1º Semestre", professor: "Prof. Maria Santos", local: "Lab. Física" },
+      { name: "Teste 1", code: "T1-DES101", cadeira: "Desenho Técnico I", media: 13.5, aprovados: 11, reprovados: 2, date: "22/10/2024", time: "08:30", period: "1º Semestre", professor: "Prof. Luísa Tavares", local: "Sala B203" },
     ]},
-    { turma: "B", mediaGeral: 11.5, avaliacoesCompletas: 16, avaliacoesTotal: 24, disciplinas: [
-      { name: "Matemática I", code: "MAT101", media: 11.0, aprovados: 8, reprovados: 5 },
-      { name: "Física I", code: "FIS101", media: 10.8, aprovados: 8, reprovados: 5 },
-      { name: "Desenho Técnico I", code: "DES101", media: 12.5, aprovados: 10, reprovados: 3 },
+    { turma: "B", mediaGeral: 11.5, avaliacoesCompletas: 4, avaliacoesTotal: 8, avaliacoes: [
+      { name: "Teste 1", code: "T1-MAT101", cadeira: "Matemática I", media: 10.8, aprovados: 8, reprovados: 5, date: "15/10/2024", time: "09:00", period: "1º Semestre", professor: "Prof. Sofia Martins", local: "Sala A102" },
+      { name: "Teste 2", code: "T2-MAT101", cadeira: "Matemática I", media: 11.2, aprovados: 8, reprovados: 5, date: "20/12/2024", time: "10:00", period: "1º Semestre", professor: "Prof. Sofia Martins", local: "Sala A102" },
+      { name: "Teste 1", code: "T1-FIS101", cadeira: "Física I", media: 10.5, aprovados: 7, reprovados: 6, date: "18/10/2024", time: "14:00", period: "1º Semestre", professor: "Prof. Maria Santos", local: "Lab. Física" },
+      { name: "Teste 1", code: "T1-DES101", cadeira: "Desenho Técnico I", media: 12.8, aprovados: 10, reprovados: 3, date: "22/10/2024", time: "08:30", period: "1º Semestre", professor: "Prof. Luísa Tavares", local: "Sala B203" },
     ]},
-    { turma: "C", mediaGeral: 12.2, avaliacoesCompletas: 17, avaliacoesTotal: 24, disciplinas: [
-      { name: "Matemática I", code: "MAT101", media: 12.4, aprovados: 10, reprovados: 3 },
-      { name: "Física I", code: "FIS101", media: 11.5, aprovados: 9, reprovados: 4 },
-      { name: "Desenho Técnico I", code: "DES101", media: 12.8, aprovados: 10, reprovados: 3 },
+    { turma: "C", mediaGeral: 12.2, avaliacoesCompletas: 5, avaliacoesTotal: 8, avaliacoes: [
+      { name: "Teste 1", code: "T1-MAT101", cadeira: "Matemática I", media: 12.0, aprovados: 10, reprovados: 3, date: "15/10/2024", time: "09:00", period: "1º Semestre", professor: "Prof. Sofia Martins", local: "Sala A103" },
+      { name: "Teste 2", code: "T2-MAT101", cadeira: "Matemática I", media: 12.8, aprovados: 10, reprovados: 3, date: "20/12/2024", time: "10:00", period: "1º Semestre", professor: "Prof. Sofia Martins", local: "Sala A103" },
+      { name: "Teste 1", code: "T1-FIS101", cadeira: "Física I", media: 11.5, aprovados: 9, reprovados: 4, date: "18/10/2024", time: "14:00", period: "1º Semestre", professor: "Prof. Maria Santos", local: "Lab. Física" },
+      { name: "Projecto", code: "P1-FIS101", cadeira: "Física I", media: 12.2, aprovados: 10, reprovados: 3, date: "10/01/2025", time: "11:00", period: "1º Semestre", professor: "Prof. Maria Santos", local: "Lab. Física" },
+      { name: "Teste 1", code: "T1-DES101", cadeira: "Desenho Técnico I", media: 12.5, aprovados: 10, reprovados: 3, date: "22/10/2024", time: "08:30", period: "1º Semestre", professor: "Prof. Luísa Tavares", local: "Sala B203" },
     ]},
-    { turma: "D", mediaGeral: 13.0, avaliacoesCompletas: 19, avaliacoesTotal: 24, disciplinas: [
-      { name: "Matemática I", code: "MAT101", media: 13.2, aprovados: 11, reprovados: 2 },
-      { name: "Física I", code: "FIS101", media: 12.5, aprovados: 10, reprovados: 3 },
-      { name: "Desenho Técnico I", code: "DES101", media: 13.5, aprovados: 11, reprovados: 2 },
+    { turma: "D", mediaGeral: 13.0, avaliacoesCompletas: 5, avaliacoesTotal: 8, avaliacoes: [
+      { name: "Teste 1", code: "T1-MAT101", cadeira: "Matemática I", media: 13.5, aprovados: 11, reprovados: 2, date: "15/10/2024", time: "09:00", period: "1º Semestre", professor: "Prof. Sofia Martins", local: "Sala A104" },
+      { name: "Teste 2", code: "T2-MAT101", cadeira: "Matemática I", media: 13.0, aprovados: 11, reprovados: 2, date: "20/12/2024", time: "10:00", period: "1º Semestre", professor: "Prof. Sofia Martins", local: "Sala A104" },
+      { name: "Teste 1", code: "T1-FIS101", cadeira: "Física I", media: 12.5, aprovados: 10, reprovados: 3, date: "18/10/2024", time: "14:00", period: "1º Semestre", professor: "Prof. Maria Santos", local: "Lab. Física" },
+      { name: "Projecto", code: "P1-FIS101", cadeira: "Física I", media: 13.2, aprovados: 11, reprovados: 2, date: "10/01/2025", time: "11:00", period: "1º Semestre", professor: "Prof. Maria Santos", local: "Lab. Física" },
+      { name: "Teste 1", code: "T1-DES101", cadeira: "Desenho Técnico I", media: 12.8, aprovados: 11, reprovados: 2, date: "22/10/2024", time: "08:30", period: "1º Semestre", professor: "Prof. Luísa Tavares", local: "Sala B203" },
     ]},
-    { turma: "E", mediaGeral: 11.9, avaliacoesCompletas: 15, avaliacoesTotal: 24, disciplinas: [
-      { name: "Matemática I", code: "MAT101", media: 11.6, aprovados: 9, reprovados: 4 },
-      { name: "Física I", code: "FIS101", media: 11.2, aprovados: 10, reprovados: 3 },
-      { name: "Desenho Técnico I", code: "DES101", media: 13.0, aprovados: 10, reprovados: 3 },
+    { turma: "E", mediaGeral: 11.9, avaliacoesCompletas: 4, avaliacoesTotal: 8, avaliacoes: [
+      { name: "Teste 1", code: "T1-MAT101", cadeira: "Matemática I", media: 11.2, aprovados: 9, reprovados: 4, date: "15/10/2024", time: "09:00", period: "1º Semestre", professor: "Prof. Sofia Martins", local: "Sala A105" },
+      { name: "Teste 1", code: "T1-FIS101", cadeira: "Física I", media: 11.0, aprovados: 9, reprovados: 4, date: "18/10/2024", time: "14:00", period: "1º Semestre", professor: "Prof. Maria Santos", local: "Lab. Física" },
+      { name: "Teste 1", code: "T1-DES101", cadeira: "Desenho Técnico I", media: 13.0, aprovados: 10, reprovados: 3, date: "22/10/2024", time: "08:30", period: "1º Semestre", professor: "Prof. Luísa Tavares", local: "Sala B203" },
+      { name: "Projecto", code: "P1-DES101", cadeira: "Desenho Técnico I", media: 12.5, aprovados: 10, reprovados: 3, date: "15/01/2025", time: "10:00", period: "1º Semestre", professor: "Prof. Luísa Tavares", local: "Sala B203" },
     ]},
   ]},
   { year: 2, turmas: [
-    { turma: "A", mediaGeral: 13.5, avaliacoesCompletas: 14, avaliacoesTotal: 18, disciplinas: [
-      { name: "Matemática II", code: "MAT201", media: 13.4, aprovados: 11, reprovados: 2 },
-      { name: "Resistência dos Materiais", code: "RES201", media: 13.6, aprovados: 11, reprovados: 2 },
+    { turma: "A", mediaGeral: 13.5, avaliacoesCompletas: 4, avaliacoesTotal: 6, avaliacoes: [
+      { name: "Teste 1", code: "T1-MAT201", cadeira: "Matemática II", media: 13.2, aprovados: 11, reprovados: 2, date: "12/10/2024", time: "09:00", period: "1º Semestre", professor: "Prof. António Silva", local: "Sala A102" },
+      { name: "Teste 2", code: "T2-MAT201", cadeira: "Matemática II", media: 13.6, aprovados: 11, reprovados: 2, date: "18/12/2024", time: "10:00", period: "1º Semestre", professor: "Prof. António Silva", local: "Sala A102" },
+      { name: "Teste 1", code: "T1-RES201", cadeira: "Resistência dos Materiais", media: 13.8, aprovados: 11, reprovados: 2, date: "16/10/2024", time: "14:00", period: "1º Semestre", professor: "Prof. Carlos Mendes", local: "Sala C301" },
+      { name: "Projecto", code: "P1-RES201", cadeira: "Resistência dos Materiais", media: 13.5, aprovados: 12, reprovados: 1, date: "08/01/2025", time: "11:00", period: "1º Semestre", professor: "Prof. Carlos Mendes", local: "Sala C301" },
     ]},
-    { turma: "B", mediaGeral: 12.0, avaliacoesCompletas: 12, avaliacoesTotal: 18, disciplinas: [
-      { name: "Matemática II", code: "MAT201", media: 12.2, aprovados: 9, reprovados: 4 },
-      { name: "Resistência dos Materiais", code: "RES201", media: 11.8, aprovados: 9, reprovados: 4 },
+    { turma: "B", mediaGeral: 12.0, avaliacoesCompletas: 3, avaliacoesTotal: 6, avaliacoes: [
+      { name: "Teste 1", code: "T1-MAT201", cadeira: "Matemática II", media: 12.0, aprovados: 9, reprovados: 4, date: "12/10/2024", time: "09:00", period: "1º Semestre", professor: "Prof. António Silva", local: "Sala A102" },
+      { name: "Teste 1", code: "T1-RES201", cadeira: "Resistência dos Materiais", media: 11.5, aprovados: 9, reprovados: 4, date: "16/10/2024", time: "14:00", period: "1º Semestre", professor: "Prof. Carlos Mendes", local: "Sala C301" },
+      { name: "Projecto", code: "P1-RES201", cadeira: "Resistência dos Materiais", media: 12.5, aprovados: 10, reprovados: 3, date: "08/01/2025", time: "11:00", period: "1º Semestre", professor: "Prof. Carlos Mendes", local: "Sala C301" },
     ]},
-    { turma: "C", mediaGeral: 13.1, avaliacoesCompletas: 13, avaliacoesTotal: 18, disciplinas: [
-      { name: "Matemática II", code: "MAT201", media: 13.0, aprovados: 10, reprovados: 3 },
-      { name: "Resistência dos Materiais", code: "RES201", media: 13.2, aprovados: 11, reprovados: 2 },
+    { turma: "C", mediaGeral: 13.1, avaliacoesCompletas: 3, avaliacoesTotal: 6, avaliacoes: [
+      { name: "Teste 1", code: "T1-MAT201", cadeira: "Matemática II", media: 13.0, aprovados: 10, reprovados: 3, date: "12/10/2024", time: "09:00", period: "1º Semestre", professor: "Prof. António Silva", local: "Sala A102" },
+      { name: "Teste 1", code: "T1-RES201", cadeira: "Resistência dos Materiais", media: 13.0, aprovados: 10, reprovados: 3, date: "16/10/2024", time: "14:00", period: "1º Semestre", professor: "Prof. Carlos Mendes", local: "Sala C301" },
+      { name: "Teste 2", code: "T2-MAT201", cadeira: "Matemática II", media: 13.2, aprovados: 11, reprovados: 2, date: "18/12/2024", time: "10:00", period: "1º Semestre", professor: "Prof. António Silva", local: "Sala A102" },
     ]},
-    { turma: "D", mediaGeral: 13.8, avaliacoesCompletas: 15, avaliacoesTotal: 18, disciplinas: [
-      { name: "Matemática II", code: "MAT201", media: 14.0, aprovados: 12, reprovados: 1 },
-      { name: "Resistência dos Materiais", code: "RES201", media: 13.5, aprovados: 11, reprovados: 2 },
+    { turma: "D", mediaGeral: 13.8, avaliacoesCompletas: 4, avaliacoesTotal: 6, avaliacoes: [
+      { name: "Teste 1", code: "T1-MAT201", cadeira: "Matemática II", media: 14.0, aprovados: 12, reprovados: 1, date: "12/10/2024", time: "09:00", period: "1º Semestre", professor: "Prof. António Silva", local: "Sala A102" },
+      { name: "Teste 2", code: "T2-MAT201", cadeira: "Matemática II", media: 14.2, aprovados: 12, reprovados: 1, date: "18/12/2024", time: "10:00", period: "1º Semestre", professor: "Prof. António Silva", local: "Sala A102" },
+      { name: "Teste 1", code: "T1-RES201", cadeira: "Resistência dos Materiais", media: 13.2, aprovados: 11, reprovados: 2, date: "16/10/2024", time: "14:00", period: "1º Semestre", professor: "Prof. Carlos Mendes", local: "Sala C301" },
+      { name: "Projecto", code: "P1-RES201", cadeira: "Resistência dos Materiais", media: 13.8, aprovados: 11, reprovados: 2, date: "08/01/2025", time: "11:00", period: "1º Semestre", professor: "Prof. Carlos Mendes", local: "Sala C301" },
     ]},
-    { turma: "E", mediaGeral: 12.5, avaliacoesCompletas: 11, avaliacoesTotal: 18, disciplinas: [
-      { name: "Matemática II", code: "MAT201", media: 12.4, aprovados: 10, reprovados: 3 },
-      { name: "Resistência dos Materiais", code: "RES201", media: 12.6, aprovados: 10, reprovados: 3 },
+    { turma: "E", mediaGeral: 12.5, avaliacoesCompletas: 3, avaliacoesTotal: 6, avaliacoes: [
+      { name: "Teste 1", code: "T1-MAT201", cadeira: "Matemática II", media: 12.2, aprovados: 10, reprovados: 3, date: "12/10/2024", time: "09:00", period: "1º Semestre", professor: "Prof. António Silva", local: "Sala A102" },
+      { name: "Teste 1", code: "T1-RES201", cadeira: "Resistência dos Materiais", media: 12.5, aprovados: 10, reprovados: 3, date: "16/10/2024", time: "14:00", period: "1º Semestre", professor: "Prof. Carlos Mendes", local: "Sala C301" },
+      { name: "Teste 2", code: "T2-MAT201", cadeira: "Matemática II", media: 12.8, aprovados: 10, reprovados: 3, date: "18/12/2024", time: "10:00", period: "1º Semestre", professor: "Prof. António Silva", local: "Sala A102" },
     ]},
   ]},
   { year: 3, turmas: [
-    { turma: "A", mediaGeral: 14.5, avaliacoesCompletas: 12, avaliacoesTotal: 14, disciplinas: [
-      { name: "Mecânica dos Solos", code: "GEO301", media: 14.2, aprovados: 10, reprovados: 1 },
-      { name: "Hidráulica", code: "HID301", media: 14.8, aprovados: 10, reprovados: 1 },
+    { turma: "A", mediaGeral: 14.5, avaliacoesCompletas: 4, avaliacoesTotal: 5, avaliacoes: [
+      { name: "Teste 1", code: "T1-GEO301", cadeira: "Mecânica dos Solos", media: 14.0, aprovados: 10, reprovados: 1, date: "10/10/2024", time: "09:00", period: "1º Semestre", professor: "Prof. Maria Santos", local: "Lab. Geotecnia" },
+      { name: "Relatório", code: "R1-GEO301", cadeira: "Mecânica dos Solos", media: 14.5, aprovados: 11, reprovados: 0, date: "05/12/2024", time: "14:00", period: "1º Semestre", professor: "Prof. Maria Santos", local: "Lab. Geotecnia" },
+      { name: "Teste 1", code: "T1-HID301", cadeira: "Hidráulica", media: 14.8, aprovados: 10, reprovados: 1, date: "14/10/2024", time: "10:00", period: "1º Semestre", professor: "Prof. Pedro Ferreira", local: "Lab. Hidráulica" },
+      { name: "Projecto", code: "P1-HID301", cadeira: "Hidráulica", media: 15.0, aprovados: 11, reprovados: 0, date: "12/01/2025", time: "11:00", period: "1º Semestre", professor: "Prof. Pedro Ferreira", local: "Lab. Hidráulica" },
     ]},
-    { turma: "B", mediaGeral: 12.8, avaliacoesCompletas: 10, avaliacoesTotal: 14, disciplinas: [
-      { name: "Mecânica dos Solos", code: "GEO301", media: 12.5, aprovados: 9, reprovados: 2 },
-      { name: "Hidráulica", code: "HID301", media: 13.1, aprovados: 9, reprovados: 2 },
+    { turma: "B", mediaGeral: 12.8, avaliacoesCompletas: 3, avaliacoesTotal: 5, avaliacoes: [
+      { name: "Teste 1", code: "T1-GEO301", cadeira: "Mecânica dos Solos", media: 12.2, aprovados: 9, reprovados: 2, date: "10/10/2024", time: "09:00", period: "1º Semestre", professor: "Prof. Maria Santos", local: "Lab. Geotecnia" },
+      { name: "Teste 1", code: "T1-HID301", cadeira: "Hidráulica", media: 13.0, aprovados: 9, reprovados: 2, date: "14/10/2024", time: "10:00", period: "1º Semestre", professor: "Prof. Pedro Ferreira", local: "Lab. Hidráulica" },
+      { name: "Relatório", code: "R1-GEO301", cadeira: "Mecânica dos Solos", media: 13.2, aprovados: 10, reprovados: 1, date: "05/12/2024", time: "14:00", period: "1º Semestre", professor: "Prof. Maria Santos", local: "Lab. Geotecnia" },
     ]},
-    { turma: "C", mediaGeral: 13.5, avaliacoesCompletas: 11, avaliacoesTotal: 14, disciplinas: [
-      { name: "Mecânica dos Solos", code: "GEO301", media: 13.8, aprovados: 10, reprovados: 1 },
-      { name: "Hidráulica", code: "HID301", media: 13.2, aprovados: 9, reprovados: 2 },
+    { turma: "C", mediaGeral: 13.5, avaliacoesCompletas: 3, avaliacoesTotal: 5, avaliacoes: [
+      { name: "Teste 1", code: "T1-GEO301", cadeira: "Mecânica dos Solos", media: 13.8, aprovados: 10, reprovados: 1, date: "10/10/2024", time: "09:00", period: "1º Semestre", professor: "Prof. Maria Santos", local: "Lab. Geotecnia" },
+      { name: "Teste 1", code: "T1-HID301", cadeira: "Hidráulica", media: 13.0, aprovados: 9, reprovados: 2, date: "14/10/2024", time: "10:00", period: "1º Semestre", professor: "Prof. Pedro Ferreira", local: "Lab. Hidráulica" },
+      { name: "Relatório", code: "R1-GEO301", cadeira: "Mecânica dos Solos", media: 13.5, aprovados: 10, reprovados: 1, date: "05/12/2024", time: "14:00", period: "1º Semestre", professor: "Prof. Maria Santos", local: "Lab. Geotecnia" },
     ]},
-    { turma: "D", mediaGeral: 14.0, avaliacoesCompletas: 12, avaliacoesTotal: 14, disciplinas: [
-      { name: "Mecânica dos Solos", code: "GEO301", media: 14.5, aprovados: 10, reprovados: 1 },
-      { name: "Hidráulica", code: "HID301", media: 13.5, aprovados: 9, reprovados: 2 },
+    { turma: "D", mediaGeral: 14.0, avaliacoesCompletas: 4, avaliacoesTotal: 5, avaliacoes: [
+      { name: "Teste 1", code: "T1-GEO301", cadeira: "Mecânica dos Solos", media: 14.5, aprovados: 10, reprovados: 1, date: "10/10/2024", time: "09:00", period: "1º Semestre", professor: "Prof. Maria Santos", local: "Lab. Geotecnia" },
+      { name: "Relatório", code: "R1-GEO301", cadeira: "Mecânica dos Solos", media: 14.0, aprovados: 10, reprovados: 1, date: "05/12/2024", time: "14:00", period: "1º Semestre", professor: "Prof. Maria Santos", local: "Lab. Geotecnia" },
+      { name: "Teste 1", code: "T1-HID301", cadeira: "Hidráulica", media: 13.5, aprovados: 9, reprovados: 2, date: "14/10/2024", time: "10:00", period: "1º Semestre", professor: "Prof. Pedro Ferreira", local: "Lab. Hidráulica" },
+      { name: "Projecto", code: "P1-HID301", cadeira: "Hidráulica", media: 14.0, aprovados: 10, reprovados: 1, date: "12/01/2025", time: "11:00", period: "1º Semestre", professor: "Prof. Pedro Ferreira", local: "Lab. Hidráulica" },
     ]},
-    { turma: "E", mediaGeral: 13.0, avaliacoesCompletas: 9, avaliacoesTotal: 14, disciplinas: [
-      { name: "Mecânica dos Solos", code: "GEO301", media: 13.2, aprovados: 9, reprovados: 2 },
-      { name: "Hidráulica", code: "HID301", media: 12.8, aprovados: 8, reprovados: 3 },
+    { turma: "E", mediaGeral: 13.0, avaliacoesCompletas: 3, avaliacoesTotal: 5, avaliacoes: [
+      { name: "Teste 1", code: "T1-GEO301", cadeira: "Mecânica dos Solos", media: 13.0, aprovados: 9, reprovados: 2, date: "10/10/2024", time: "09:00", period: "1º Semestre", professor: "Prof. Maria Santos", local: "Lab. Geotecnia" },
+      { name: "Teste 1", code: "T1-HID301", cadeira: "Hidráulica", media: 12.5, aprovados: 8, reprovados: 3, date: "14/10/2024", time: "10:00", period: "1º Semestre", professor: "Prof. Pedro Ferreira", local: "Lab. Hidráulica" },
+      { name: "Relatório", code: "R1-GEO301", cadeira: "Mecânica dos Solos", media: 13.5, aprovados: 9, reprovados: 2, date: "05/12/2024", time: "14:00", period: "1º Semestre", professor: "Prof. Maria Santos", local: "Lab. Geotecnia" },
     ]},
   ]},
   { year: 4, turmas: [
-    { turma: "A", mediaGeral: 14.8, avaliacoesCompletas: 10, avaliacoesTotal: 12, disciplinas: [
-      { name: "Estruturas de Betão", code: "EST401", media: 14.5, aprovados: 9, reprovados: 1 },
-      { name: "Gestão de Obras", code: "GES401", media: 15.0, aprovados: 9, reprovados: 1 },
+    { turma: "A", mediaGeral: 14.8, avaliacoesCompletas: 4, avaliacoesTotal: 4, avaliacoes: [
+      { name: "Teste 1", code: "T1-EST401", cadeira: "Estruturas de Betão", media: 14.5, aprovados: 9, reprovados: 1, date: "08/10/2024", time: "09:00", period: "1º Semestre", professor: "Prof. António Silva", local: "Sala D401" },
+      { name: "Projecto", code: "P1-EST401", cadeira: "Estruturas de Betão", media: 15.0, aprovados: 10, reprovados: 0, date: "15/12/2024", time: "14:00", period: "1º Semestre", professor: "Prof. António Silva", local: "Sala D401" },
+      { name: "Teste 1", code: "T1-GES401", cadeira: "Gestão de Obras", media: 14.8, aprovados: 9, reprovados: 1, date: "11/10/2024", time: "10:00", period: "1º Semestre", professor: "Prof. Ana Costa", local: "Sala D402" },
+      { name: "Apresentação", code: "A1-GES401", cadeira: "Gestão de Obras", media: 15.2, aprovados: 10, reprovados: 0, date: "20/12/2024", time: "11:00", period: "1º Semestre", professor: "Prof. Ana Costa", local: "Sala D402" },
     ]},
-    { turma: "B", mediaGeral: 13.5, avaliacoesCompletas: 9, avaliacoesTotal: 12, disciplinas: [
-      { name: "Estruturas de Betão", code: "EST401", media: 13.2, aprovados: 8, reprovados: 2 },
-      { name: "Gestão de Obras", code: "GES401", media: 13.8, aprovados: 8, reprovados: 2 },
+    { turma: "B", mediaGeral: 13.5, avaliacoesCompletas: 3, avaliacoesTotal: 4, avaliacoes: [
+      { name: "Teste 1", code: "T1-EST401", cadeira: "Estruturas de Betão", media: 13.0, aprovados: 8, reprovados: 2, date: "08/10/2024", time: "09:00", period: "1º Semestre", professor: "Prof. António Silva", local: "Sala D401" },
+      { name: "Teste 1", code: "T1-GES401", cadeira: "Gestão de Obras", media: 13.5, aprovados: 8, reprovados: 2, date: "11/10/2024", time: "10:00", period: "1º Semestre", professor: "Prof. Ana Costa", local: "Sala D402" },
+      { name: "Projecto", code: "P1-EST401", cadeira: "Estruturas de Betão", media: 14.0, aprovados: 9, reprovados: 1, date: "15/12/2024", time: "14:00", period: "1º Semestre", professor: "Prof. António Silva", local: "Sala D401" },
     ]},
-    { turma: "C", mediaGeral: 14.2, avaliacoesCompletas: 10, avaliacoesTotal: 12, disciplinas: [
-      { name: "Estruturas de Betão", code: "EST401", media: 14.0, aprovados: 9, reprovados: 1 },
-      { name: "Gestão de Obras", code: "GES401", media: 14.5, aprovados: 9, reprovados: 1 },
+    { turma: "C", mediaGeral: 14.2, avaliacoesCompletas: 4, avaliacoesTotal: 4, avaliacoes: [
+      { name: "Teste 1", code: "T1-EST401", cadeira: "Estruturas de Betão", media: 14.0, aprovados: 9, reprovados: 1, date: "08/10/2024", time: "09:00", period: "1º Semestre", professor: "Prof. António Silva", local: "Sala D401" },
+      { name: "Projecto", code: "P1-EST401", cadeira: "Estruturas de Betão", media: 14.5, aprovados: 9, reprovados: 1, date: "15/12/2024", time: "14:00", period: "1º Semestre", professor: "Prof. António Silva", local: "Sala D401" },
+      { name: "Teste 1", code: "T1-GES401", cadeira: "Gestão de Obras", media: 14.2, aprovados: 9, reprovados: 1, date: "11/10/2024", time: "10:00", period: "1º Semestre", professor: "Prof. Ana Costa", local: "Sala D402" },
+      { name: "Apresentação", code: "A1-GES401", cadeira: "Gestão de Obras", media: 14.0, aprovados: 9, reprovados: 1, date: "20/12/2024", time: "11:00", period: "1º Semestre", professor: "Prof. Ana Costa", local: "Sala D402" },
     ]},
-    { turma: "D", mediaGeral: 14.5, avaliacoesCompletas: 10, avaliacoesTotal: 12, disciplinas: [
-      { name: "Estruturas de Betão", code: "EST401", media: 14.8, aprovados: 9, reprovados: 1 },
-      { name: "Gestão de Obras", code: "GES401", media: 14.2, aprovados: 8, reprovados: 2 },
+    { turma: "D", mediaGeral: 14.5, avaliacoesCompletas: 3, avaliacoesTotal: 4, avaliacoes: [
+      { name: "Teste 1", code: "T1-EST401", cadeira: "Estruturas de Betão", media: 14.8, aprovados: 9, reprovados: 1, date: "08/10/2024", time: "09:00", period: "1º Semestre", professor: "Prof. António Silva", local: "Sala D401" },
+      { name: "Teste 1", code: "T1-GES401", cadeira: "Gestão de Obras", media: 14.0, aprovados: 8, reprovados: 2, date: "11/10/2024", time: "10:00", period: "1º Semestre", professor: "Prof. Ana Costa", local: "Sala D402" },
+      { name: "Projecto", code: "P1-EST401", cadeira: "Estruturas de Betão", media: 14.8, aprovados: 10, reprovados: 0, date: "15/12/2024", time: "14:00", period: "1º Semestre", professor: "Prof. António Silva", local: "Sala D401" },
     ]},
-    { turma: "E", mediaGeral: 13.8, avaliacoesCompletas: 9, avaliacoesTotal: 12, disciplinas: [
-      { name: "Estruturas de Betão", code: "EST401", media: 14.0, aprovados: 8, reprovados: 2 },
-      { name: "Gestão de Obras", code: "GES401", media: 13.5, aprovados: 8, reprovados: 2 },
+    { turma: "E", mediaGeral: 13.8, avaliacoesCompletas: 3, avaliacoesTotal: 4, avaliacoes: [
+      { name: "Teste 1", code: "T1-EST401", cadeira: "Estruturas de Betão", media: 14.0, aprovados: 8, reprovados: 2, date: "08/10/2024", time: "09:00", period: "1º Semestre", professor: "Prof. António Silva", local: "Sala D401" },
+      { name: "Teste 1", code: "T1-GES401", cadeira: "Gestão de Obras", media: 13.2, aprovados: 8, reprovados: 2, date: "11/10/2024", time: "10:00", period: "1º Semestre", professor: "Prof. Ana Costa", local: "Sala D402" },
+      { name: "Projecto", code: "P1-EST401", cadeira: "Estruturas de Betão", media: 14.2, aprovados: 9, reprovados: 1, date: "15/12/2024", time: "14:00", period: "1º Semestre", professor: "Prof. António Silva", local: "Sala D401" },
     ]},
   ]},
   { year: 5, turmas: [
-    { turma: "A", mediaGeral: 15.2, avaliacoesCompletas: 6, avaliacoesTotal: 6, disciplinas: [
-      { name: "Projecto Final", code: "PRJ501", media: 15.2, aprovados: 8, reprovados: 0 },
+    { turma: "A", mediaGeral: 15.2, avaliacoesCompletas: 2, avaliacoesTotal: 2, avaliacoes: [
+      { name: "Apresentação Intermédia", code: "AI-PRJ501", cadeira: "Projecto Final", media: 14.8, aprovados: 8, reprovados: 0, date: "20/11/2024", time: "09:00", period: "1º Semestre", professor: "Prof. Carlos Mendes", local: "Sala E501" },
+      { name: "Defesa Final", code: "DF-PRJ501", cadeira: "Projecto Final", media: 15.5, aprovados: 8, reprovados: 0, date: "28/01/2025", time: "10:00", period: "1º Semestre", professor: "Prof. Carlos Mendes", local: "Sala E501" },
     ]},
-    { turma: "B", mediaGeral: 14.5, avaliacoesCompletas: 5, avaliacoesTotal: 6, disciplinas: [
-      { name: "Projecto Final", code: "PRJ501", media: 14.5, aprovados: 7, reprovados: 1 },
+    { turma: "B", mediaGeral: 14.5, avaliacoesCompletas: 2, avaliacoesTotal: 2, avaliacoes: [
+      { name: "Apresentação Intermédia", code: "AI-PRJ501", cadeira: "Projecto Final", media: 14.0, aprovados: 7, reprovados: 1, date: "20/11/2024", time: "14:00", period: "1º Semestre", professor: "Prof. Carlos Mendes", local: "Sala E501" },
+      { name: "Defesa Final", code: "DF-PRJ501", cadeira: "Projecto Final", media: 15.0, aprovados: 7, reprovados: 1, date: "28/01/2025", time: "15:00", period: "1º Semestre", professor: "Prof. Carlos Mendes", local: "Sala E501" },
     ]},
-    { turma: "C", mediaGeral: 14.8, avaliacoesCompletas: 6, avaliacoesTotal: 6, disciplinas: [
-      { name: "Projecto Final", code: "PRJ501", media: 14.8, aprovados: 7, reprovados: 1 },
+    { turma: "C", mediaGeral: 14.8, avaliacoesCompletas: 2, avaliacoesTotal: 2, avaliacoes: [
+      { name: "Apresentação Intermédia", code: "AI-PRJ501", cadeira: "Projecto Final", media: 14.5, aprovados: 7, reprovados: 1, date: "21/11/2024", time: "09:00", period: "1º Semestre", professor: "Prof. Carlos Mendes", local: "Sala E501" },
+      { name: "Defesa Final", code: "DF-PRJ501", cadeira: "Projecto Final", media: 15.0, aprovados: 7, reprovados: 1, date: "29/01/2025", time: "10:00", period: "1º Semestre", professor: "Prof. Carlos Mendes", local: "Sala E501" },
     ]},
-    { turma: "D", mediaGeral: 15.5, avaliacoesCompletas: 6, avaliacoesTotal: 6, disciplinas: [
-      { name: "Projecto Final", code: "PRJ501", media: 15.5, aprovados: 8, reprovados: 0 },
+    { turma: "D", mediaGeral: 15.5, avaliacoesCompletas: 2, avaliacoesTotal: 2, avaliacoes: [
+      { name: "Apresentação Intermédia", code: "AI-PRJ501", cadeira: "Projecto Final", media: 15.2, aprovados: 8, reprovados: 0, date: "21/11/2024", time: "14:00", period: "1º Semestre", professor: "Prof. Carlos Mendes", local: "Sala E501" },
+      { name: "Defesa Final", code: "DF-PRJ501", cadeira: "Projecto Final", media: 15.8, aprovados: 8, reprovados: 0, date: "29/01/2025", time: "15:00", period: "1º Semestre", professor: "Prof. Carlos Mendes", local: "Sala E501" },
     ]},
-    { turma: "E", mediaGeral: 14.2, avaliacoesCompletas: 5, avaliacoesTotal: 6, disciplinas: [
-      { name: "Projecto Final", code: "PRJ501", media: 14.2, aprovados: 6, reprovados: 2 },
+    { turma: "E", mediaGeral: 14.2, avaliacoesCompletas: 1, avaliacoesTotal: 2, avaliacoes: [
+      { name: "Apresentação Intermédia", code: "AI-PRJ501", cadeira: "Projecto Final", media: 14.2, aprovados: 6, reprovados: 2, date: "22/11/2024", time: "09:00", period: "1º Semestre", professor: "Prof. Carlos Mendes", local: "Sala E501" },
     ]},
   ]},
 ];
