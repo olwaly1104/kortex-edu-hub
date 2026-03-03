@@ -170,15 +170,14 @@ export default function CoordenadorCursoDashboard() {
       {/* Row 2: Alertas em Risco + Solicitações */}
       <div className="grid lg:grid-cols-2 gap-6">
         <Card className="p-5">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5 text-destructive" /> Alertas em Risco
-            </h2>
+          <div className="flex items-center gap-2 mb-4">
+            <AlertTriangle className="w-5 h-5 text-destructive" />
+            <h2 className="text-base font-semibold text-foreground">Alertas em Risco</h2>
           </div>
 
-          {/* Docentes em Risco */}
-          {docentesEmRisco.length > 0 && (
-            <div className="mb-5">
+          <div className="grid grid-cols-2 gap-0">
+            {/* Docentes em Risco */}
+            <div className="pr-4 border-r border-border">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
                   <GraduationCap className="w-3.5 h-3.5" /> Docentes
@@ -187,27 +186,29 @@ export default function CoordenadorCursoDashboard() {
                   Ver todos <ChevronRight className="w-3 h-3" />
                 </Link>
               </div>
-              <div className="space-y-2">
-                {docentesEmRisco.map(d => (
-                  <Link key={d.id} to="/coordenador/docentes">
-                    <div className="px-3 py-2.5 rounded-xl border border-border bg-card border-l-[3px] border-l-destructive hover:bg-muted/40 transition-colors cursor-pointer">
-                      <p className="text-xs font-semibold text-foreground leading-tight">{d.name}</p>
-                      <p className="text-[10px] text-muted-foreground mt-0.5">{d.department}</p>
-                      <div className="flex items-center gap-3 mt-1.5 text-[10px]">
-                        <span className={d.presenca < 85 ? "text-destructive font-medium" : "text-muted-foreground"}>Presença: {d.presenca}%</span>
-                        <span className={d.taxaEntrega < 80 ? "text-destructive font-medium" : "text-muted-foreground"}>Entrega: {d.taxaEntrega}%</span>
-                        <span className={d.mediaGeral < 11 ? "text-destructive font-medium" : "text-muted-foreground"}>Média: {d.mediaGeral}</span>
+              {docentesEmRisco.length > 0 ? (
+                <div className="space-y-2">
+                  {docentesEmRisco.map(d => (
+                    <Link key={d.id} to="/coordenador/docentes">
+                      <div className="px-3 py-2.5 rounded-xl border border-border bg-card border-l-[3px] border-l-destructive hover:bg-muted/40 transition-colors cursor-pointer">
+                        <p className="text-xs font-semibold text-foreground leading-tight">{d.name}</p>
+                        <p className="text-[10px] text-muted-foreground mt-0.5">{d.department}</p>
+                        <div className="flex items-center gap-3 mt-1.5 text-[10px]">
+                          <span className={d.presenca < 85 ? "text-destructive font-medium" : "text-muted-foreground"}>Presença: {d.presenca}%</span>
+                          <span className={d.taxaEntrega < 80 ? "text-destructive font-medium" : "text-muted-foreground"}>Entrega: {d.taxaEntrega}%</span>
+                          <span className={d.mediaGeral < 11 ? "text-destructive font-medium" : "text-muted-foreground"}>Média: {d.mediaGeral}</span>
+                        </div>
                       </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-xs text-muted-foreground text-center py-4">Nenhum docente em risco 🎉</p>
+              )}
             </div>
-          )}
 
-          {/* Turmas em Risco */}
-          {turmasEmRisco.length > 0 ? (
-            <div>
+            {/* Turmas em Risco */}
+            <div className="pl-4">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
                   <Users className="w-3.5 h-3.5" /> Turmas
@@ -223,44 +224,46 @@ export default function CoordenadorCursoDashboard() {
                   </button>
                 )}
               </div>
-              <div className="space-y-2">
-                {(showAllRisk ? turmasEmRisco : turmasEmRisco.slice(0, 3)).map(t => (
-                  <Link key={t.id} to={`/coordenador/anos/${t.year}/turma/${t.id}`}>
-                    <div className="px-3 py-2.5 rounded-xl border border-border bg-card border-l-[3px] border-l-destructive hover:bg-muted/40 transition-colors cursor-pointer">
-                      <div className="flex items-center justify-between mb-1.5">
-                        <div className="flex items-center gap-2">
-                          <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-destructive/10 text-destructive shrink-0">
-                            <GraduationCap className="w-3.5 h-3.5" />
+              {turmasEmRisco.length > 0 ? (
+                <div className="space-y-2">
+                  {(showAllRisk ? turmasEmRisco : turmasEmRisco.slice(0, 3)).map(t => (
+                    <Link key={t.id} to={`/coordenador/anos/${t.year}/turma/${t.id}`}>
+                      <div className="px-3 py-2.5 rounded-xl border border-border bg-card border-l-[3px] border-l-destructive hover:bg-muted/40 transition-colors cursor-pointer">
+                        <div className="flex items-center justify-between mb-1.5">
+                          <div className="flex items-center gap-2">
+                            <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-destructive/10 text-destructive shrink-0">
+                              <GraduationCap className="w-3.5 h-3.5" />
+                            </div>
+                            <div>
+                              <p className="font-semibold text-foreground text-xs leading-tight">{t.name}</p>
+                              <p className="text-[10px] text-muted-foreground">{t.year}º Ano</p>
+                            </div>
                           </div>
-                          <div>
-                            <p className="font-semibold text-foreground text-xs leading-tight">{t.name}</p>
-                            <p className="text-[10px] text-muted-foreground">{t.year}º Ano</p>
+                          <ChevronRight className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                        </div>
+                        <div className="space-y-1 pt-1.5 border-t border-border">
+                          <div className="flex items-center justify-between text-[10px]">
+                            <span className="text-muted-foreground">Presença</span>
+                            <span className={`font-semibold ${t.presenca >= 80 ? "text-accent" : "text-destructive"}`}>{t.presenca}%</span>
+                          </div>
+                          <div className="flex items-center justify-between text-[10px]">
+                            <span className="text-muted-foreground">Entrega</span>
+                            <span className={`font-semibold ${t.taxaEntrega >= 85 ? "text-accent" : "text-destructive"}`}>{t.taxaEntrega}%</span>
+                          </div>
+                          <div className="flex items-center justify-between text-[10px]">
+                            <span className="text-muted-foreground">Média</span>
+                            <span className={`font-semibold ${t.media >= 12 ? "text-accent" : "text-destructive"}`}>{t.media}</span>
                           </div>
                         </div>
-                        <ChevronRight className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
                       </div>
-                      <div className="space-y-1 pt-1.5 border-t border-border">
-                        <div className="flex items-center justify-between text-[10px]">
-                          <span className="text-muted-foreground">Presença</span>
-                          <span className={`font-semibold ${t.presenca >= 80 ? "text-accent" : "text-destructive"}`}>{t.presenca}%</span>
-                        </div>
-                        <div className="flex items-center justify-between text-[10px]">
-                          <span className="text-muted-foreground">Entrega</span>
-                          <span className={`font-semibold ${t.taxaEntrega >= 85 ? "text-accent" : "text-destructive"}`}>{t.taxaEntrega}%</span>
-                        </div>
-                        <div className="flex items-center justify-between text-[10px]">
-                          <span className="text-muted-foreground">Média</span>
-                          <span className={`font-semibold ${t.media >= 12 ? "text-accent" : "text-destructive"}`}>{t.media}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-xs text-muted-foreground text-center py-4">Nenhuma turma em risco 🎉</p>
+              )}
             </div>
-          ) : docentesEmRisco.length === 0 ? (
-            <p className="text-sm text-muted-foreground text-center py-4">Nenhum alerta de risco 🎉</p>
-          ) : null}
+          </div>
         </Card>
 
         <Card className="p-5">
