@@ -126,8 +126,20 @@ export default function CoordenadorDocentes() {
             <th className="text-center p-3 font-medium text-muted-foreground">Presença</th>
             <th className="text-center p-3 font-medium text-muted-foreground">Taxa Entrega</th>
             <th className="text-center p-3 font-medium text-muted-foreground">Média Geral</th>
+            <th className="text-center p-3 font-medium text-muted-foreground">Estado</th>
           </tr></thead>
-          <tbody>{filtered.map(d => (
+          <tbody>{filtered.map(d => {
+            const estado = (d.presenca < 85 || d.taxaEntrega < 80 || d.mediaGeral < 11)
+              ? "em risco"
+              : (d.presenca >= 93 && d.taxaEntrega >= 90 && d.mediaGeral >= 14)
+                ? "excelente"
+                : "normal";
+            const estadoStyle = estado === "excelente"
+              ? "bg-accent/10 text-accent"
+              : estado === "em risco"
+                ? "bg-destructive/10 text-destructive"
+                : "bg-muted text-muted-foreground";
+            return (
             <tr key={d.id} className="border-b last:border-0 hover:bg-muted/20">
               <td className="p-3"><p className="font-medium text-foreground">{d.name}</p><p className="text-[11px] text-muted-foreground">{d.email}</p></td>
               <td className="p-3 text-center font-medium text-foreground">{d.estudantesTotal}</td>
@@ -136,8 +148,10 @@ export default function CoordenadorDocentes() {
               <td className="p-3 text-center"><span className={d.presenca >= 90 ? "text-accent font-medium" : "text-destructive font-medium"}>{d.presenca}%</span></td>
               <td className="p-3 text-center"><span className={d.taxaEntrega >= 80 ? "text-accent font-medium" : "text-destructive font-medium"}>{d.taxaEntrega}%</span></td>
               <td className="p-3 text-center"><span className={d.mediaGeral >= 10 ? "text-accent font-bold" : "text-destructive font-bold"}>{d.mediaGeral}</span></td>
+              <td className="p-3 text-center"><Badge className={`${estadoStyle} text-[10px]`}>{estado === "em risco" ? "Em Risco" : estado === "excelente" ? "Excelente" : "Normal"}</Badge></td>
             </tr>
-          ))}</tbody>
+            );
+          })}</tbody>
         </table>
       </Card>
     </div>
