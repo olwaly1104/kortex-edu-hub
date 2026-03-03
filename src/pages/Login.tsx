@@ -134,9 +134,15 @@ export default function Login() {
             </Button>
           </form>
 
-          <div className="mt-8 text-center">
+          <div className="mt-8 text-center space-y-1">
             <p className="text-xs text-muted-foreground">
-              Dica: Use <span className="font-medium">2934@upra.kor</span> (estudante), <span className="font-medium">prof.silva@upra.kor</span> (professor) ou <span className="font-medium">coord@upra.kor</span> (coordenador)
+              <span className="font-medium">Dica:</span> Use qualquer palavra-passe com os emails abaixo:
+            </p>
+            <p className="text-xs text-muted-foreground">
+              <span className="font-medium">2934@upra.kor</span> (Estudante) · <span className="font-medium">prof.silva@upra.kor</span> (Professor) · <span className="font-medium">coord@upra.kor</span> (Coordenador)
+            </p>
+            <p className="text-xs text-muted-foreground">
+              <span className="font-medium">coordcurso@upra.kor</span> (Coord. Curso) · <span className="font-medium">decano@upra.kor</span> (Decano) · <span className="font-medium">reitoria@upra.kor</span> (Reitoria)
             </p>
           </div>
         </div>
