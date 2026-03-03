@@ -113,16 +113,16 @@ export default function CoordenadorAnos() {
                   {/* Bottom metrics */}
                   <div className="space-y-2 pt-3 border-t border-border/50">
                     <div className="flex items-center justify-between px-1">
-                      <span className="text-xs text-muted-foreground">Média Geral</span>
-                      <span className={`text-sm font-semibold tabular-nums ${y.mediaGeral >= 10 ? "text-accent" : "text-destructive"}`}>{y.mediaGeral}</span>
-                    </div>
-                    <div className="flex items-center justify-between px-1">
                       <span className="text-xs text-muted-foreground">Presença</span>
                       <span className={`text-sm font-semibold tabular-nums ${avgPresenca >= 75 ? "text-accent" : "text-destructive"}`}>{avgPresenca}%</span>
                     </div>
                     <div className="flex items-center justify-between px-1">
-                      <span className="text-xs text-muted-foreground">Entrega</span>
+                      <span className="text-xs text-muted-foreground">Taxa de Entrega</span>
                       <span className={`text-sm font-semibold tabular-nums ${avgTaxaEntrega >= 80 ? "text-accent" : "text-destructive"}`}>{avgTaxaEntrega}%</span>
+                    </div>
+                    <div className="flex items-center justify-between px-1">
+                      <span className="text-xs text-muted-foreground">Média Geral</span>
+                      <span className={`text-sm font-semibold tabular-nums ${y.mediaGeral >= 10 ? "text-accent" : "text-destructive"}`}>{y.mediaGeral}</span>
                     </div>
                   </div>
                 </div>
