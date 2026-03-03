@@ -101,20 +101,28 @@ export default function CoordenadorAnoDetail() {
                         <p className="text-[10px] text-muted-foreground">Estudantes</p>
                       </div>
                       <div className="text-center p-2.5 rounded-lg bg-muted/50">
-                        <p className={`text-lg font-bold ${t.media >= 10 ? "text-accent" : "text-destructive"}`}>{t.media}</p>
-                        <p className="text-[10px] text-muted-foreground">Média</p>
+                        <p className="text-lg font-bold text-foreground">{t.professores}</p>
+                        <p className="text-[10px] text-muted-foreground">Professores</p>
                       </div>
                       <div className="text-center p-2.5 rounded-lg bg-muted/50">
-                        <p className={`text-lg font-bold ${t.presenca >= 75 ? "text-accent" : "text-destructive"}`}>{t.presenca}%</p>
-                        <p className="text-[10px] text-muted-foreground">Presença</p>
+                        <p className="text-lg font-bold text-foreground">{t.disciplinas}</p>
+                        <p className="text-[10px] text-muted-foreground">Cadeiras</p>
                       </div>
                     </div>
 
                     {/* Details */}
                     <div className="space-y-2.5 pt-3 border-t border-border/50">
                       <div className="flex items-center justify-between text-xs">
-                        <span className="text-muted-foreground flex items-center gap-1.5"><UserCheck className="w-3.5 h-3.5" /> Professor</span>
-                        <span className="font-semibold text-foreground">{t.director.replace("Prof. ", "")}</span>
+                        <span className="text-muted-foreground flex items-center gap-1.5"><Award className="w-3.5 h-3.5" /> Média Geral</span>
+                        <span className={`font-semibold ${t.media >= 10 ? "text-accent" : "text-destructive"}`}>{t.media}</span>
+                      </div>
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-muted-foreground flex items-center gap-1.5"><CheckCircle className="w-3.5 h-3.5" /> Presença</span>
+                        <span className={`font-semibold ${t.presenca >= 75 ? "text-accent" : "text-destructive"}`}>{t.presenca}%</span>
+                      </div>
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-muted-foreground flex items-center gap-1.5"><ClipboardList className="w-3.5 h-3.5" /> Taxa de Entrega</span>
+                        <span className={`font-semibold ${t.taxaEntrega >= 80 ? "text-accent" : "text-destructive"}`}>{t.taxaEntrega}%</span>
                       </div>
                       <div>
                         <div className="flex justify-between text-xs mb-1">
@@ -126,10 +134,6 @@ export default function CoordenadorAnoDetail() {
                       <div className="flex items-center justify-between text-xs">
                         <span className="text-muted-foreground flex items-center gap-1.5"><FileText className="w-3.5 h-3.5" /> Conteúdos</span>
                         <span className="font-semibold text-foreground">{turmaResources.length}</span>
-                      </div>
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="text-muted-foreground flex items-center gap-1.5"><ClipboardList className="w-3.5 h-3.5" /> Taxa de Entrega</span>
-                        <span className={`font-semibold ${t.taxaEntrega >= 80 ? "text-accent" : "text-destructive"}`}>{t.taxaEntrega}%</span>
                       </div>
                     </div>
                   </div>
