@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { coordCursoInfo, coordAprovacoes, coordTurmas } from "@/data/institutionData";
+import { coordCursoInfo, coordSolicitacoes, coordTurmas } from "@/data/institutionData";
 import { announcements, coordAgendaEvents } from "@/data/mockData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -10,8 +10,9 @@ import {
   AlertTriangle, FileText, Calendar as CalendarIcon,
   Megaphone, X, CheckCircle, ClipboardList,
   Eye, XCircle, GraduationCap, MapPin, Play,
+  ArrowDownLeft,
 } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const typeStyles: Record<string, { bg: string; label: string }> = {
   urgente: { bg: "bg-destructive text-destructive-foreground", label: "Urgente" },
@@ -29,9 +30,8 @@ const typeIcons: Record<string, React.ElementType> = {
 
 export default function CoordenadorCursoDashboard() {
   const { user } = useAuth();
-  const navigate = useNavigate();
   const info = coordCursoInfo;
-  const pendentes = coordAprovacoes.filter(a => a.status === "pendente");
+  const pendentes = coordSolicitacoes.filter(s => s.status === "pendente" && s.direction === "recebida");
   const [showAllRisk, setShowAllRisk] = useState(false);
 
   const TODAY_DATE = "2024-02-14";
@@ -52,7 +52,6 @@ export default function CoordenadorCursoDashboard() {
     agendada: { label: "Agendada", icon: Clock, variant: "outline" },
   };
 
-  // Turmas em risco: presença < 80% OR média < 12 OR taxaEntrega < 85%
   const turmasEmRisco = coordTurmas.filter(
     t => t.presenca < 80 || t.media < 12 || t.taxaEntrega < 85
   );
@@ -60,7 +59,7 @@ export default function CoordenadorCursoDashboard() {
   const stats = [
     { icon: Users, label: "Total Estudantes", value: info.totalEstudantes, color: "text-accent bg-accent/10" },
     { icon: BookOpen, label: "Cadeiras Activas", value: info.disciplinasActivas, color: "text-primary bg-primary/10" },
-    { icon: Clock, label: "Aprovações Pendentes", value: info.aprovacoesPendentes, color: "text-secondary bg-secondary/10" },
+    { icon: Clock, label: "Solicitações Pendentes", value: pendentes.length, color: "text-secondary bg-secondary/10" },
     { icon: Award, label: "Média Geral", value: info.mediaGeral, color: "text-accent bg-accent/10" },
   ];
 
@@ -103,7 +102,7 @@ export default function CoordenadorCursoDashboard() {
         {/* Left column */}
         <div className="lg:col-span-2 space-y-6">
           {/* Agenda de Hoje */}
-          <div>
+          <Card className="p-5">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
                 <CalendarIcon className="w-5 h-5 text-primary" /> Agenda de Hoje
@@ -113,84 +112,84 @@ export default function CoordenadorCursoDashboard() {
               </Link>
             </div>
             {todayAgenda.length === 0 ? (
-              <Card className="p-4">
-                <p className="text-sm text-muted-foreground text-center">Sem eventos hoje 🎉</p>
-              </Card>
+              <p className="text-sm text-muted-foreground text-center py-4">Sem eventos hoje 🎉</p>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-2.5">
                 {todayAgenda.map(evento => {
                   const status = getEventStatus(evento);
                   const cfg = statusConfig[status];
                   const StatusIcon = cfg.icon;
                   return (
-                    <Card key={evento.id} className="p-4 flex items-center gap-4">
-                      <div className="w-1.5 h-12 rounded-full shrink-0" style={{ background: evento.color }} />
+                    <div key={evento.id} className="flex items-center gap-3 p-3 rounded-lg border border-border/50 hover:bg-muted/30 transition-colors">
+                      <div className="w-1 h-10 rounded-full shrink-0" style={{ background: evento.color }} />
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-foreground">{evento.title}</p>
-                        <div className="flex items-center gap-3 text-sm text-muted-foreground mt-0.5 flex-wrap">
-                          <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" />{evento.startTime} - {evento.endTime}</span>
-                          {evento.room && <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" />{evento.room}</span>}
+                        <p className="font-medium text-foreground text-sm">{evento.title}</p>
+                        <div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5">
+                          <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{evento.startTime} - {evento.endTime}</span>
+                          {evento.room && <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{evento.room}</span>}
                         </div>
                       </div>
                       <Badge variant={status === "em_curso" ? "default" : "outline"} className="text-[10px] gap-1 shrink-0">
                         <StatusIcon className="w-3 h-3" /> {cfg.label}
                       </Badge>
-                    </Card>
+                    </div>
                   );
                 })}
               </div>
             )}
-          </div>
+          </Card>
 
-          {/* Aprovações Pendentes */}
-          <div>
+          {/* Solicitações Pendentes */}
+          <Card className="p-5">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
-                <Clock className="w-5 h-5 text-secondary" /> Aprovações Pendentes
+                <ArrowDownLeft className="w-5 h-5 text-secondary" /> Solicitações Pendentes
                 <Badge variant="outline" className="text-[10px] ml-1">{pendentes.length}</Badge>
               </h2>
-              <Link to="/coordenador/aprovacoes" className="text-sm text-primary hover:underline flex items-center gap-1">
+              <Link to="/coordenador/solicitacoes" className="text-sm text-primary hover:underline flex items-center gap-1">
                 Ver todas <ChevronRight className="w-4 h-4" />
               </Link>
             </div>
-            <div className="space-y-3">
-              {pendentes.slice(0, 3).map(ap => {
-                const Icon = typeIcons[ap.type] || FileText;
-                return (
-                  <Card key={ap.id} className="p-4">
-                    <div className="flex items-start gap-3">
+            {pendentes.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-4">Sem solicitações pendentes 🎉</p>
+            ) : (
+              <div className="space-y-2.5">
+                {pendentes.slice(0, 3).map(sol => {
+                  const Icon = typeIcons[sol.type] || FileText;
+                  return (
+                    <div key={sol.id} className="flex items-center gap-3 p-3 rounded-lg border border-border/50">
                       <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 bg-muted">
                         <Icon className="w-4 h-4 text-muted-foreground" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-foreground line-clamp-1">{ap.title}</p>
-                        <p className="text-[11px] text-muted-foreground mt-0.5">{ap.requester} • {ap.date}</p>
+                        <p className="text-sm font-semibold text-foreground line-clamp-1">{sol.title}</p>
+                        <p className="text-[11px] text-muted-foreground mt-0.5">{sol.requester} • {sol.date}</p>
+                      </div>
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        <Link to="/coordenador/solicitacoes">
+                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                            <Eye className="w-3.5 h-3.5 text-muted-foreground" />
+                          </Button>
+                        </Link>
+                        <Button size="sm" className="h-8 w-8 p-0 bg-accent hover:bg-accent/90 text-accent-foreground">
+                          <CheckCircle className="w-3.5 h-3.5" />
+                        </Button>
+                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10">
+                          <XCircle className="w-3.5 h-3.5" />
+                        </Button>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border/50">
-                      <Link to="/coordenador/aprovacoes" className="flex-1">
-                        <Button variant="outline" size="sm" className="text-xs gap-1.5 w-full">
-                          <Eye className="w-3.5 h-3.5" /> Ver Detalhes
-                        </Button>
-                      </Link>
-                      <Button size="sm" className="text-xs gap-1.5 bg-accent hover:bg-accent/90 text-accent-foreground h-8 px-3">
-                        <CheckCircle className="w-3.5 h-3.5" />
-                      </Button>
-                      <Button variant="ghost" size="sm" className="text-xs gap-1.5 text-destructive hover:text-destructive hover:bg-destructive/10 h-8 px-3">
-                        <XCircle className="w-3.5 h-3.5" />
-                      </Button>
-                    </div>
-                  </Card>
-                );
-              })}
-            </div>
-          </div>
+                  );
+                })}
+              </div>
+            )}
+          </Card>
         </div>
 
         {/* Right column */}
         <div className="space-y-6">
-          {/* Anúncios — same as student/professor */}
-          <div>
+          {/* Anúncios */}
+          <Card className="p-5">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
                 <Megaphone className="w-5 h-5 text-secondary" /> Anúncios
@@ -203,7 +202,7 @@ export default function CoordenadorCursoDashboard() {
               {announcements.slice(0, 3).map(an => {
                 const style = typeStyles[an.type] || typeStyles.geral;
                 return (
-                  <Card key={an.id} className="p-4">
+                  <div key={an.id} className="p-3 rounded-lg border border-border/50">
                     <div className="flex items-center gap-2 mb-2">
                       <Badge className={`${style.bg} text-[10px]`}>{style.label}</Badge>
                       <span className="text-[11px] text-muted-foreground ml-auto">{an.date}</span>
@@ -211,14 +210,14 @@ export default function CoordenadorCursoDashboard() {
                     <p className="text-sm font-semibold text-foreground line-clamp-1">{an.title}</p>
                     <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{an.content}</p>
                     <p className="text-[11px] text-muted-foreground mt-1.5">— {an.author}</p>
-                  </Card>
+                  </div>
                 );
               })}
             </div>
-          </div>
+          </Card>
 
-          {/* Turmas em Risco — card style like Os Meus Anos */}
-          <div>
+          {/* Turmas em Risco */}
+          <Card className="p-5">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
                 <AlertTriangle className="w-5 h-5 text-destructive" /> Turmas em Risco
@@ -242,54 +241,50 @@ export default function CoordenadorCursoDashboard() {
             </div>
 
             {turmasEmRisco.length === 0 ? (
-              <Card className="p-4">
-                <p className="text-sm text-muted-foreground text-center">Nenhuma turma em risco 🎉</p>
-              </Card>
+              <p className="text-sm text-muted-foreground text-center py-4">Nenhuma turma em risco 🎉</p>
             ) : (
               <div className="space-y-3">
                 {(showAllRisk ? turmasEmRisco : turmasEmRisco.slice(0, 3)).map(t => (
                   <Link key={t.id} to={`/coordenador/anos/${t.year}/turma/${t.id}`}>
-                    <Card className="p-4 hover:shadow-md transition-shadow cursor-pointer border-l-[3px] border-l-destructive">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-destructive/10 text-destructive shrink-0">
-                            <GraduationCap className="w-5 h-5" />
+                    <div className="p-3 rounded-lg border border-border/50 border-l-[3px] border-l-destructive hover:bg-muted/30 transition-colors cursor-pointer">
+                      <div className="flex items-center justify-between mb-2.5">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-destructive/10 text-destructive shrink-0">
+                            <GraduationCap className="w-4 h-4" />
                           </div>
                           <div>
                             <p className="font-bold text-foreground text-sm">{t.name}</p>
-                            <p className="text-[11px] text-muted-foreground">{t.year}º Ano • {info.name}</p>
+                            <p className="text-[11px] text-muted-foreground">{t.year}º Ano</p>
                           </div>
                         </div>
                         <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
                       </div>
-
-                      {/* Metrics — vertical list like turma cards in Anos */}
-                      <div className="space-y-2 pt-3 border-t border-border/50">
+                      <div className="space-y-1.5 pt-2.5 border-t border-border/50">
                         <div className="flex items-center justify-between text-xs">
                           <span className="text-muted-foreground flex items-center gap-1.5">
-                            <CheckCircle className="w-3.5 h-3.5" /> Presença
+                            <CheckCircle className="w-3 h-3" /> Presença
                           </span>
                           <span className={`font-semibold ${t.presenca >= 80 ? "text-accent" : "text-destructive"}`}>{t.presenca}%</span>
                         </div>
                         <div className="flex items-center justify-between text-xs">
                           <span className="text-muted-foreground flex items-center gap-1.5">
-                            <ClipboardList className="w-3.5 h-3.5" /> Taxa de Entrega
+                            <ClipboardList className="w-3 h-3" /> Entrega
                           </span>
                           <span className={`font-semibold ${t.taxaEntrega >= 85 ? "text-accent" : "text-destructive"}`}>{t.taxaEntrega}%</span>
                         </div>
                         <div className="flex items-center justify-between text-xs">
                           <span className="text-muted-foreground flex items-center gap-1.5">
-                            <Award className="w-3.5 h-3.5" /> Média Geral
+                            <Award className="w-3 h-3" /> Média
                           </span>
                           <span className={`font-semibold ${t.media >= 12 ? "text-accent" : "text-destructive"}`}>{t.media}</span>
                         </div>
                       </div>
-                    </Card>
+                    </div>
                   </Link>
                 ))}
               </div>
             )}
-          </div>
+          </Card>
         </div>
       </div>
     </div>

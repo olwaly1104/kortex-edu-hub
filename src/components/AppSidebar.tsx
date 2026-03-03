@@ -65,7 +65,7 @@ const coordenadorCursoSections: NavSection[] = [
     { label: "Início", icon: LayoutDashboard, path: "/coordenador" },
     { label: "Calendário", icon: Calendar, path: "/coordenador/calendario" },
     { label: "Anúncios", icon: Megaphone, path: "/coordenador/anuncios" },
-    { label: "Aprovações", icon: CheckSquare, path: "/coordenador/aprovacoes" },
+    { label: "Solicitações", icon: CheckSquare, path: "/coordenador/solicitacoes" },
   ]},
   { title: "O Meu Curso", items: [
     { label: "Os Meus Anos", icon: Layers, path: "/coordenador/anos" },

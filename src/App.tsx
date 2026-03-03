@@ -38,7 +38,7 @@ import ProfessorTaskDetail from "./pages/professor/TaskDetail";
 import ProfessorFinances from "./pages/professor/Finances";
 import ProfessorTurmaDetail from "./pages/professor/TurmaDetail";
 import CoordenadorDashboard from "./pages/coordenador/Dashboard";
-import CoordenadorAprovacoes from "./pages/coordenador/Aprovacoes";
+import CoordenadorSolicitacoes from "./pages/coordenador/Solicitacoes";
 import CoordenadorAnos from "./pages/coordenador/Anos";
 import CoordenadorAnoDetail from "./pages/coordenador/AnoDetail";
 import CoordenadorTurmaDetail from "./pages/coordenador/TurmaDetail";
@@ -127,7 +127,7 @@ function AppRoutes() {
         <Route path="/coordenador" element={<CoordenadorDashboard />} />
         <Route path="/coordenador/calendario" element={<StudentCalendar />} />
         <Route path="/coordenador/anuncios" element={<StudentAnnouncements />} />
-        <Route path="/coordenador/aprovacoes" element={<CoordenadorAprovacoes />} />
+        <Route path="/coordenador/solicitacoes" element={<CoordenadorSolicitacoes />} />
         <Route path="/coordenador/anos" element={<CoordenadorAnos />} />
         <Route path="/coordenador/anos/:year" element={<CoordenadorAnoDetail />} />
         <Route path="/coordenador/anos/:year/turma/:turmaId" element={<CoordenadorTurmaDetail />} />
