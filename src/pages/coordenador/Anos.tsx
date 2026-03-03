@@ -1,8 +1,8 @@
-import { coordCursoInfo, coordTurmas } from "@/data/institutionData";
+import { coordCursoInfo, coordTurmas, coordDisciplinas, coordTurmaLessons, coordTurmaResources } from "@/data/institutionData";
 import { Card } from "@/components/ui/card";
-import { Layers, Users, BookOpen, Award, ChevronRight, TrendingUp, CheckCircle } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { Layers, Users, BookOpen, Award, ChevronRight, TrendingUp, CheckCircle, UserCheck, Video, FileText } from "lucide-react";
 import { Link } from "react-router-dom";
-import { cn } from "@/lib/utils";
 
 export default function CoordenadorAnos() {
   const info = coordCursoInfo;
