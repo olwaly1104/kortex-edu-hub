@@ -1,6 +1,6 @@
 import { coordCursoInfo, coordTurmas, coordDisciplinas } from "@/data/institutionData";
 import { Card } from "@/components/ui/card";
-import { Layers, Users, BookOpen, Award, ChevronRight, CheckCircle, UserCheck, GraduationCap } from "lucide-react";
+import { Layers, Users, BookOpen, Award, ChevronRight, CheckCircle, UserCheck, GraduationCap, ClipboardList } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export default function CoordenadorAnos() {
@@ -74,6 +74,9 @@ export default function CoordenadorAnos() {
           const avgPresenca = turmas.length
             ? Math.round(turmas.reduce((s, t) => s + t.presenca, 0) / turmas.length)
             : 0;
+          const avgTaxaEntrega = turmas.length
+            ? Math.round(turmas.reduce((s, t) => s + t.taxaEntrega, 0) / turmas.length)
+            : 0;
           const yearProfessores = new Set(coordDisciplinas.filter(d => d.year === y.year).map(d => d.professor)).size;
 
           return (
@@ -118,6 +121,11 @@ export default function CoordenadorAnos() {
                       <CheckCircle className="w-4 h-4 text-muted-foreground" />
                       <span className="text-xs text-muted-foreground">Presença</span>
                       <span className={`font-semibold ${avgPresenca >= 75 ? "text-accent" : "text-destructive"}`}>{avgPresenca}%</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-sm">
+                      <ClipboardList className="w-4 h-4 text-muted-foreground" />
+                      <span className="text-xs text-muted-foreground">Taxa Entrega</span>
+                      <span className={`font-semibold ${avgTaxaEntrega >= 80 ? "text-accent" : "text-destructive"}`}>{avgTaxaEntrega}%</span>
                     </div>
                   </div>
                 </div>
