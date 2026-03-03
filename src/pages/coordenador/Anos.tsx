@@ -91,10 +91,10 @@ export default function CoordenadorAnos() {
                   <p className="text-xs text-muted-foreground mb-4">{info.name}</p>
 
                   {/* Stats grid */}
-                  <div className="grid grid-cols-4 gap-2 mb-4">
+                  <div className="grid grid-cols-4 gap-1.5 mb-4">
                     <div className="text-center p-2 rounded-lg bg-muted/40">
                       <p className="text-base font-bold text-foreground">{y.estudantes}</p>
-                      <p className="text-[10px] text-muted-foreground">Estudantes</p>
+                      <p className="text-[10px] text-muted-foreground">Estud.</p>
                     </div>
                     <div className="text-center p-2 rounded-lg bg-muted/40">
                       <p className="text-base font-bold text-foreground">{y.turmas}</p>
