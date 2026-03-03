@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Users, Search, TrendingUp, AlertTriangle, Award } from "lucide-react";
+import { Users, Search, TrendingUp, AlertTriangle, Award, ClipboardList } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const statusBadge: Record<string, { label: string; cls: string }> = {
@@ -95,8 +95,9 @@ export default function CoordenadorEstudantes() {
             <th className="text-left p-3 font-medium text-muted-foreground">Email</th>
             <th className="text-center p-3 font-medium text-muted-foreground">Ano</th>
             <th className="text-center p-3 font-medium text-muted-foreground">Turma</th>
-            <th className="text-center p-3 font-medium text-muted-foreground">Média</th>
             <th className="text-center p-3 font-medium text-muted-foreground">Presença</th>
+            <th className="text-center p-3 font-medium text-muted-foreground">Taxa Entrega</th>
+            <th className="text-center p-3 font-medium text-muted-foreground">Média</th>
             <th className="text-center p-3 font-medium text-muted-foreground">Estado</th>
           </tr></thead>
           <tbody>{filtered.map(e => {
@@ -107,8 +108,9 @@ export default function CoordenadorEstudantes() {
                 <td className="p-3 text-muted-foreground">{e.email}</td>
                 <td className="p-3 text-center">{e.year}º</td>
                 <td className="p-3 text-center">{e.turma}</td>
+                <td className="p-3 text-center"><span className={e.presenca >= 75 ? "text-accent font-medium" : "text-destructive font-medium"}>{e.presenca}%</span></td>
+                <td className="p-3 text-center"><span className={e.taxaEntrega >= 80 ? "text-accent font-medium" : "text-destructive font-medium"}>{e.taxaEntrega}%</span></td>
                 <td className="p-3 text-center"><span className={e.media !== null && e.media >= 10 ? "text-accent font-medium" : "text-destructive font-medium"}>{e.media ?? "—"}</span></td>
-                <td className="p-3 text-center"><span className={e.presenca >= 75 ? "text-accent" : "text-destructive"}>{e.presenca}%</span></td>
                 <td className="p-3 text-center"><Badge className={cn("text-[10px]", sb.cls)}>{sb.label}</Badge></td>
               </tr>
             );

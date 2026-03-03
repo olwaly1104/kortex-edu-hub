@@ -317,13 +317,14 @@ export default function CoordenadorCadeiraDetail() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <p className="text-sm font-semibold text-foreground truncate">{student.name}</p>
+                    <Badge variant="outline" className="text-[10px] font-mono">T{student.turma}</Badge>
                     <Badge className={`${statusBadgeStyle[student.status]} text-[10px]`}>{statusLabels[student.status]}</Badge>
                   </div>
                   <p className="text-[11px] text-muted-foreground">{student.email}</p>
                 </div>
                 <div className="grid grid-cols-3 gap-4 shrink-0 text-center">
                   <div><p className="text-[10px] text-muted-foreground uppercase">Presença</p><p className={`text-sm font-bold ${student.presenca >= 75 ? "text-accent" : "text-destructive"}`}>{student.presenca}%</p></div>
-                  <div><p className="text-[10px] text-muted-foreground uppercase">Entrega</p><p className={`text-sm font-bold ${student.presenca >= 75 ? "text-accent" : "text-destructive"}`}>{Math.min(100, student.presenca + Math.floor(Math.random() * 10))}%</p></div>
+                  <div><p className="text-[10px] text-muted-foreground uppercase">Entrega</p><p className={`text-sm font-bold ${student.taxaEntrega >= 80 ? "text-accent" : "text-destructive"}`}>{student.taxaEntrega}%</p></div>
                   <div><p className="text-[10px] text-muted-foreground uppercase">Média</p><p className={`text-sm font-bold ${student.media !== null && student.media >= 10 ? "text-accent" : "text-destructive"}`}>{student.media ?? "—"}</p></div>
                 </div>
               </Card>
