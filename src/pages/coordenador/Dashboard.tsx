@@ -28,6 +28,16 @@ const typeIcons: Record<string, React.ElementType> = {
   recurso: AlertTriangle,
 };
 
+const typeLabels: Record<string, string> = {
+  nota: "Nota",
+  plano: "Plano",
+  horário: "Horário",
+  transferência: "Transferência",
+  recurso: "Recurso",
+  material: "Material",
+  reunião: "Reunião",
+};
+
 const priorityStyles: Record<string, string> = {
   alta: "bg-destructive/10 text-destructive",
   média: "bg-secondary/10 text-secondary",
@@ -297,9 +307,7 @@ export default function CoordenadorCursoDashboard() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-xs font-semibold text-foreground line-clamp-1">{sol.title}</p>
-                        <p className="text-[10px] text-muted-foreground mt-0.5">
-                          <span className="font-medium">Tipo:</span> {sol.type}
-                        </p>
+                        <Badge variant="outline" className="text-[10px] mt-0.5">{typeLabels[sol.type] || sol.type}</Badge>
                       </div>
                       <Badge className={`${priorityStyles[sol.priority]} text-[8px] px-1.5 py-0 shrink-0`}>{sol.priority}</Badge>
                     </div>
