@@ -122,18 +122,19 @@ export default function CoordenadorCursoDashboard() {
             </div>
           </div>
 
-          {/* Aprovações Pendentes — clean table with actions */}
+          {/* Aprovações Pendentes */}
           <div>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
                 <Clock className="w-5 h-5 text-secondary" /> Aprovações Pendentes
+                <Badge variant="outline" className="text-[10px] ml-1">{pendentes.length}</Badge>
               </h2>
               <Link to="/coordenador/aprovacoes" className="text-sm text-primary hover:underline flex items-center gap-1">
                 Ver todas <ChevronRight className="w-4 h-4" />
               </Link>
             </div>
             <div className="space-y-3">
-              {pendentes.slice(0, 4).map(ap => {
+              {pendentes.slice(0, 3).map(ap => {
                 const Icon = typeIcons[ap.type] || FileText;
                 return (
                   <Card key={ap.id} className="p-4">
@@ -144,18 +145,19 @@ export default function CoordenadorCursoDashboard() {
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold text-foreground line-clamp-1">{ap.title}</p>
                         <p className="text-[11px] text-muted-foreground mt-0.5">{ap.requester} • {ap.date}</p>
-                        <p className="text-xs text-muted-foreground mt-1 line-clamp-1">{ap.description}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border/50">
-                      <Button variant="outline" size="sm" className="text-xs gap-1.5 flex-1">
-                        <Eye className="w-3.5 h-3.5" /> Ver Detalhes
+                      <Link to="/coordenador/aprovacoes" className="flex-1">
+                        <Button variant="outline" size="sm" className="text-xs gap-1.5 w-full">
+                          <Eye className="w-3.5 h-3.5" /> Ver Detalhes
+                        </Button>
+                      </Link>
+                      <Button size="sm" className="text-xs gap-1.5 bg-accent hover:bg-accent/90 text-accent-foreground h-8 px-3">
+                        <CheckCircle className="w-3.5 h-3.5" />
                       </Button>
-                      <Button size="sm" className="text-xs gap-1.5 bg-accent hover:bg-accent/90 text-accent-foreground">
-                        <CheckCircle className="w-3.5 h-3.5" /> Aprovar
-                      </Button>
-                      <Button variant="outline" size="sm" className="text-xs gap-1.5 text-destructive hover:text-destructive hover:bg-destructive/10">
-                        <XCircle className="w-3.5 h-3.5" /> Rejeitar
+                      <Button variant="ghost" size="sm" className="text-xs gap-1.5 text-destructive hover:text-destructive hover:bg-destructive/10 h-8 px-3">
+                        <XCircle className="w-3.5 h-3.5" />
                       </Button>
                     </div>
                   </Card>
@@ -178,7 +180,7 @@ export default function CoordenadorCursoDashboard() {
               </Link>
             </div>
             <div className="space-y-3">
-              {announcements.slice(0, 4).map(an => {
+              {announcements.slice(0, 3).map(an => {
                 const style = typeStyles[an.type] || typeStyles.geral;
                 return (
                   <Card key={an.id} className="p-4">
