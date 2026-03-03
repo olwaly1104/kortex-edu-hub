@@ -9,202 +9,121 @@ import {
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 
-interface NavItem {
-  label: string;
-  icon: React.ElementType;
-  path: string;
-}
-
-interface NavSection {
-  title: string;
-  items: NavItem[];
-}
+interface NavItem { label: string; icon: React.ElementType; path: string; }
+interface NavSection { title: string; items: NavItem[]; }
 
 const studentSections: NavSection[] = [
-  {
-    title: "Geral",
-    items: [
-      { label: "Início", icon: LayoutDashboard, path: "/student" },
-      { label: "Calendário", icon: Calendar, path: "/student/calendar" },
-      { label: "Anúncios", icon: Megaphone, path: "/student/announcements" },
-    ],
-  },
-  {
-    title: "Académico",
-    items: [
-      { label: "As Minhas Disciplinas", icon: BookOpen, path: "/student/disciplines" },
-      { label: "Tarefas", icon: ClipboardList, path: "/student/tasks" },
-      { label: "Notas", icon: Award, path: "/student/grades" },
-      { label: "Biblioteca Virtual", icon: Library, path: "/student/library" },
-    ],
-  },
-  {
-    title: "Comunicação",
-    items: [
-      { label: "Chat", icon: MessageSquare, path: "/student/chat" },
-      { label: "Email", icon: Mail, path: "/student/email" },
-      { label: "Contactos", icon: Users, path: "/student/contacts" },
-    ],
-  },
-  {
-    title: "Pessoal",
-    items: [
-      { label: "Finanças", icon: Wallet, path: "/student/finances" },
-      { label: "Extra Curriculares", icon: Trophy, path: "/student/activities" },
-      { label: "Perfil", icon: User, path: "/student/profile" },
-    ],
-  },
+  { title: "Geral", items: [
+    { label: "Início", icon: LayoutDashboard, path: "/student" },
+    { label: "Calendário", icon: Calendar, path: "/student/calendar" },
+    { label: "Anúncios", icon: Megaphone, path: "/student/announcements" },
+  ]},
+  { title: "Académico", items: [
+    { label: "As Minhas Disciplinas", icon: BookOpen, path: "/student/disciplines" },
+    { label: "Tarefas", icon: ClipboardList, path: "/student/tasks" },
+    { label: "Notas", icon: Award, path: "/student/grades" },
+    { label: "Biblioteca Virtual", icon: Library, path: "/student/library" },
+  ]},
+  { title: "Comunicação", items: [
+    { label: "Chat", icon: MessageSquare, path: "/student/chat" },
+    { label: "Email", icon: Mail, path: "/student/email" },
+    { label: "Contactos", icon: Users, path: "/student/contacts" },
+  ]},
+  { title: "Pessoal", items: [
+    { label: "Finanças", icon: Wallet, path: "/student/finances" },
+    { label: "Extra Curriculares", icon: Trophy, path: "/student/activities" },
+    { label: "Perfil", icon: User, path: "/student/profile" },
+  ]},
 ];
 
 const professorSections: NavSection[] = [
-  {
-    title: "Geral",
-    items: [
-      { label: "Início", icon: LayoutDashboard, path: "/professor" },
-      { label: "Calendário", icon: Calendar, path: "/professor/calendar" },
-      { label: "Anúncios", icon: Megaphone, path: "/professor/announcements" },
-    ],
-  },
-  {
-    title: "Académico",
-    items: [
-      { label: "As Minhas Turmas", icon: BookOpen, path: "/professor/disciplines" },
-      { label: "Os Meus Estudantes", icon: Users, path: "/professor/students" },
-      { label: "Tarefas", icon: ClipboardList, path: "/professor/tasks" },
-      { label: "Avaliações", icon: Award, path: "/professor/evaluations" },
-      { label: "Notas", icon: GraduationCap, path: "/professor/grades" },
-    ],
-  },
-  {
-    title: "Comunicação",
-    items: [
-      { label: "Chat", icon: MessageSquare, path: "/professor/chat" },
-      { label: "Email", icon: Mail, path: "/professor/email" },
-      { label: "Contactos", icon: Users, path: "/professor/contacts" },
-    ],
-  },
-  {
-    title: "Pessoal",
-    items: [
-      { label: "Finanças", icon: Wallet, path: "/professor/finances" },
-      { label: "Perfil", icon: User, path: "/professor/profile" },
-    ],
-  },
-];
-
-const coordinatorSections: NavSection[] = [
-  {
-    title: "Geral",
-    items: [
-      { label: "Visão Geral", icon: LayoutDashboard, path: "/coordinator" },
-      { label: "Calendário", icon: Calendar, path: "/coordinator/calendar" },
-      { label: "Anúncios", icon: Megaphone, path: "/coordinator/announcements" },
-    ],
-  },
-  {
-    title: "Académico",
-    items: [
-      { label: "Disciplinas", icon: BookOpen, path: "/coordinator/disciplines" },
-      { label: "Professores", icon: GraduationCap, path: "/coordinator/professors" },
-      { label: "Alunos", icon: Users, path: "/coordinator/students" },
-      { label: "Avaliações", icon: Award, path: "/coordinator/evaluations" },
-      { label: "Relatórios", icon: BarChart3, path: "/coordinator/reports" },
-    ],
-  },
+  { title: "Geral", items: [
+    { label: "Início", icon: LayoutDashboard, path: "/professor" },
+    { label: "Calendário", icon: Calendar, path: "/professor/calendar" },
+    { label: "Anúncios", icon: Megaphone, path: "/professor/announcements" },
+  ]},
+  { title: "Académico", items: [
+    { label: "As Minhas Turmas", icon: BookOpen, path: "/professor/disciplines" },
+    { label: "Os Meus Estudantes", icon: Users, path: "/professor/students" },
+    { label: "Tarefas", icon: ClipboardList, path: "/professor/tasks" },
+    { label: "Avaliações", icon: Award, path: "/professor/evaluations" },
+    { label: "Notas", icon: GraduationCap, path: "/professor/grades" },
+  ]},
+  { title: "Comunicação", items: [
+    { label: "Chat", icon: MessageSquare, path: "/professor/chat" },
+    { label: "Email", icon: Mail, path: "/professor/email" },
+    { label: "Contactos", icon: Users, path: "/professor/contacts" },
+  ]},
+  { title: "Pessoal", items: [
+    { label: "Finanças", icon: Wallet, path: "/professor/finances" },
+    { label: "Perfil", icon: User, path: "/professor/profile" },
+  ]},
 ];
 
 const coordenadorCursoSections: NavSection[] = [
-  {
-    title: "Geral",
-    items: [
-      { label: "Início", icon: LayoutDashboard, path: "/coordenador" },
-      { label: "Calendário", icon: Calendar, path: "/coordenador/calendario" },
-      { label: "Anúncios", icon: Megaphone, path: "/coordenador/anuncios" },
-      { label: "Aprovações", icon: CheckSquare, path: "/coordenador/aprovacoes" },
-    ],
-  },
-  {
-    title: "O Meu Curso",
-    items: [
-      { label: "Os Meus Anos", icon: Layers, path: "/coordenador/anos" },
-      { label: "Estudantes do Curso", icon: Users, path: "/coordenador/estudantes" },
-      { label: "Docentes do Curso", icon: GraduationCap, path: "/coordenador/docentes" },
-      { label: "Notas do Curso", icon: Award, path: "/coordenador/notas" },
-      { label: "Relatórios", icon: BarChart3, path: "/coordenador/relatorios" },
-    ],
-  },
-  {
-    title: "Pessoal",
-    items: [
-      { label: "Finanças", icon: Wallet, path: "/coordenador/financas" },
-      { label: "Perfil", icon: User, path: "/coordenador/perfil" },
-    ],
-  },
+  { title: "Geral", items: [
+    { label: "Início", icon: LayoutDashboard, path: "/coordenador" },
+    { label: "Calendário", icon: Calendar, path: "/coordenador/calendario" },
+    { label: "Anúncios", icon: Megaphone, path: "/coordenador/anuncios" },
+    { label: "Aprovações", icon: CheckSquare, path: "/coordenador/aprovacoes" },
+  ]},
+  { title: "O Meu Curso", items: [
+    { label: "Os Meus Anos", icon: Layers, path: "/coordenador/anos" },
+    { label: "Estudantes do Curso", icon: Users, path: "/coordenador/estudantes" },
+    { label: "Docentes do Curso", icon: GraduationCap, path: "/coordenador/docentes" },
+    { label: "Notas do Curso", icon: Award, path: "/coordenador/notas" },
+    { label: "Relatórios", icon: BarChart3, path: "/coordenador/relatorios" },
+  ]},
+  { title: "Pessoal", items: [
+    { label: "Finanças", icon: Wallet, path: "/coordenador/financas" },
+    { label: "Perfil", icon: User, path: "/coordenador/perfil" },
+  ]},
 ];
 
 const decanoSections: NavSection[] = [
-  {
-    title: "Geral",
-    items: [
-      { label: "Início", icon: LayoutDashboard, path: "/decano" },
-      { label: "Calendário", icon: Calendar, path: "/decano/calendario" },
-      { label: "Anúncios", icon: Megaphone, path: "/decano/anuncios" },
-      { label: "Aprovações", icon: CheckSquare, path: "/decano/aprovacoes" },
-    ],
-  },
-  {
-    title: "Académico",
-    items: [
-      { label: "Faculdades", icon: Building2, path: "/decano/faculdades" },
-      { label: "Estudantes", icon: Users, path: "/decano/estudantes" },
-      { label: "Docentes", icon: GraduationCap, path: "/decano/docentes" },
-      { label: "Notas", icon: Award, path: "/decano/notas" },
-      { label: "Relatórios & Análise", icon: BarChart3, path: "/decano/relatorios" },
-    ],
-  },
-  {
-    title: "Pessoal",
-    items: [
-      { label: "Finanças", icon: Wallet, path: "/decano/financas" },
-      { label: "Perfil", icon: User, path: "/decano/perfil" },
-    ],
-  },
+  { title: "Geral", items: [
+    { label: "Início", icon: LayoutDashboard, path: "/decano" },
+    { label: "Calendário", icon: Calendar, path: "/decano/calendario" },
+    { label: "Anúncios", icon: Megaphone, path: "/decano/anuncios" },
+    { label: "Aprovações", icon: CheckSquare, path: "/decano/aprovacoes" },
+  ]},
+  { title: "Académico", items: [
+    { label: "Faculdades", icon: Building2, path: "/decano/faculdades" },
+    { label: "Estudantes", icon: Users, path: "/decano/estudantes" },
+    { label: "Docentes", icon: GraduationCap, path: "/decano/docentes" },
+    { label: "Notas", icon: Award, path: "/decano/notas" },
+    { label: "Relatórios & Análise", icon: BarChart3, path: "/decano/relatorios" },
+  ]},
+  { title: "Pessoal", items: [
+    { label: "Finanças", icon: Wallet, path: "/decano/financas" },
+    { label: "Perfil", icon: User, path: "/decano/perfil" },
+  ]},
 ];
 
 const reitoriaSections: NavSection[] = [
-  {
-    title: "Geral",
-    items: [
-      { label: "Início", icon: LayoutDashboard, path: "/reitoria" },
-      { label: "Calendário", icon: Calendar, path: "/reitoria/calendario" },
-      { label: "Anúncios", icon: Megaphone, path: "/reitoria/anuncios" },
-      { label: "Aprovações", icon: CheckSquare, path: "/reitoria/aprovacoes" },
-    ],
-  },
-  {
-    title: "Académico",
-    items: [
-      { label: "Visão Geral", icon: Eye, path: "/reitoria/visao-geral" },
-      { label: "Faculdades", icon: Building2, path: "/reitoria/faculdades" },
-      { label: "Decanos", icon: UserCog, path: "/reitoria/decanos" },
-      { label: "Coordenadores", icon: GraduationCap, path: "/reitoria/coordenadores" },
-      { label: "Docentes", icon: Users, path: "/reitoria/docentes" },
-      { label: "Relatórios & Análise", icon: BarChart3, path: "/reitoria/relatorios" },
-    ],
-  },
-  {
-    title: "Pessoal",
-    items: [
-      { label: "Finanças", icon: Wallet, path: "/reitoria/financas" },
-      { label: "Perfil", icon: User, path: "/reitoria/perfil" },
-    ],
-  },
+  { title: "Geral", items: [
+    { label: "Início", icon: LayoutDashboard, path: "/reitoria" },
+    { label: "Calendário", icon: Calendar, path: "/reitoria/calendario" },
+    { label: "Anúncios", icon: Megaphone, path: "/reitoria/anuncios" },
+    { label: "Aprovações", icon: CheckSquare, path: "/reitoria/aprovacoes" },
+  ]},
+  { title: "Académico", items: [
+    { label: "Visão Geral", icon: Eye, path: "/reitoria/visao-geral" },
+    { label: "Faculdades", icon: Building2, path: "/reitoria/faculdades" },
+    { label: "Decanos", icon: UserCog, path: "/reitoria/decanos" },
+    { label: "Coordenadores", icon: GraduationCap, path: "/reitoria/coordenadores" },
+    { label: "Docentes", icon: Users, path: "/reitoria/docentes" },
+    { label: "Relatórios & Análise", icon: BarChart3, path: "/reitoria/relatorios" },
+  ]},
+  { title: "Pessoal", items: [
+    { label: "Finanças", icon: Wallet, path: "/reitoria/financas" },
+    { label: "Perfil", icon: User, path: "/reitoria/perfil" },
+  ]},
 ];
 
 const roleSectionsMap: Record<string, NavSection[]> = {
   student: studentSections,
   professor: professorSections,
-  coordinator: coordinatorSections,
   coordenador_curso: coordenadorCursoSections,
   decano: decanoSections,
   reitoria: reitoriaSections,
@@ -213,11 +132,12 @@ const roleSectionsMap: Record<string, NavSection[]> = {
 const roleLabelMap: Record<string, string> = {
   student: "Estudante",
   professor: "Professor",
-  coordinator: "Coordenador",
   coordenador_curso: "Coord. de Curso",
   decano: "Decano",
   reitoria: "Reitoria",
 };
+
+const roleBasePaths = ["/student", "/professor", "/coordenador", "/decano", "/reitoria"];
 
 export default function AppSidebar() {
   const { user, logout } = useAuth();
@@ -230,13 +150,7 @@ export default function AppSidebar() {
   const roleLabel = roleLabelMap[user.role] || "Utilizador";
 
   return (
-    <aside
-      className={cn(
-        "h-screen bg-sidebar text-sidebar-foreground flex flex-col transition-all duration-300 sticky top-0 shrink-0",
-        collapsed ? "w-[68px]" : "w-[260px]"
-      )}
-    >
-      {/* Logo */}
+    <aside className={cn("h-screen bg-sidebar text-sidebar-foreground flex flex-col transition-all duration-300 sticky top-0 shrink-0", collapsed ? "w-[68px]" : "w-[260px]")}>
       <div className="flex items-center gap-3 px-4 py-5 border-b border-sidebar-border">
         <div className="w-9 h-9 rounded-lg bg-secondary flex items-center justify-center shrink-0">
           <GraduationCap className="w-5 h-5 text-secondary-foreground" />
@@ -249,7 +163,6 @@ export default function AppSidebar() {
         )}
       </div>
 
-      {/* Navigation */}
       <nav className="flex-1 overflow-y-auto py-2 px-2">
         {sections.map((section, sIdx) => (
           <div key={section.title} className={cn(sIdx > 0 && "mt-3")}>
@@ -258,30 +171,16 @@ export default function AppSidebar() {
                 {section.title}
               </p>
             )}
-            {collapsed && sIdx > 0 && (
-              <div className="mx-3 my-2 h-px bg-sidebar-border" />
-            )}
+            {collapsed && sIdx > 0 && <div className="mx-3 my-2 h-px bg-sidebar-border" />}
             <div className="space-y-0.5">
               {section.items.map((item) => {
-                const isActive =
-                  location.pathname === item.path ||
-                  (item.path !== `/${user.role}` &&
-                    item.path !== "/coordenador" &&
-                    item.path !== "/decano" &&
-                    item.path !== "/reitoria" &&
-                    location.pathname.startsWith(item.path + "/"));
+                const isActive = location.pathname === item.path ||
+                  (!roleBasePaths.includes(item.path) && location.pathname.startsWith(item.path + "/"));
                 return (
-                  <NavLink
-                    key={item.path}
-                    to={item.path}
-                    className={cn(
-                      "flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] transition-colors",
-                      isActive
-                        ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
-                        : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
-                    )}
-                    title={collapsed ? item.label : undefined}
-                  >
+                  <NavLink key={item.path} to={item.path}
+                    className={cn("flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] transition-colors",
+                      isActive ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+                    )} title={collapsed ? item.label : undefined}>
                     <item.icon className="w-[18px] h-[18px] shrink-0" />
                     {!collapsed && <span className="truncate">{item.label}</span>}
                   </NavLink>
@@ -292,7 +191,6 @@ export default function AppSidebar() {
         ))}
       </nav>
 
-      {/* User section */}
       <div className="border-t border-sidebar-border p-3 space-y-2">
         {!collapsed && (
           <div className="flex items-center gap-3 px-1 pb-2">
@@ -305,28 +203,20 @@ export default function AppSidebar() {
             </div>
           </div>
         )}
-        {!collapsed && (user.role === "student" || user.role === "coordinator" || user.role === "coordenador_curso" || user.role === "decano" || user.role === "reitoria") && (
+        {!collapsed && (
           <div className="px-3 py-1.5 rounded-lg border border-sidebar-border">
             <p className="text-[11px] font-medium text-sidebar-foreground/70 truncate">Universidade Privada de Angola</p>
           </div>
         )}
         <div className="border-t border-sidebar-border pt-2 mt-2">
-          <button
-            onClick={logout}
-            className="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm text-destructive/70 hover:bg-destructive/10 hover:text-destructive transition-colors"
-            title="Sair"
-          >
+          <button onClick={logout} className="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm text-destructive/70 hover:bg-destructive/10 hover:text-destructive transition-colors" title="Sair">
             <LogOut className="w-[18px] h-[18px] shrink-0" />
             {!collapsed && <span>Sair</span>}
           </button>
         </div>
       </div>
 
-      {/* Collapse toggle */}
-      <button
-        onClick={() => setCollapsed(!collapsed)}
-        className="absolute -right-3 top-20 w-6 h-6 rounded-full bg-card border border-border shadow-sm flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
-      >
+      <button onClick={() => setCollapsed(!collapsed)} className="absolute -right-3 top-20 w-6 h-6 rounded-full bg-card border border-border shadow-sm flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
         {collapsed ? <ChevronRight className="w-3.5 h-3.5" /> : <ChevronLeft className="w-3.5 h-3.5" />}
       </button>
     </aside>

@@ -1,4 +1,4 @@
-export type UserRole = "coordinator" | "professor" | "student" | "coordenador_curso" | "decano" | "reitoria";
+export type UserRole = "professor" | "student" | "coordenador_curso" | "decano" | "reitoria";
 
 export interface User {
   id: string;
@@ -176,14 +176,6 @@ export const currentProfessor: User = {
   name: "Prof. António Silva",
   email: "prof.silva@upra.kor",
   role: "professor",
-};
-
-export const currentCoordinator: User = {
-  id: "3",
-  name: "Carlos Mendes",
-  email: "coord@upra.kor",
-  role: "coordinator",
-  course: "Engenharia Informática",
 };
 
 export const currentCoordenadorCurso: User = {
@@ -462,7 +454,6 @@ export function detectRole(email: string): UserRole {
   if (email.startsWith("reitoria")) return "reitoria";
   if (email.startsWith("decano")) return "decano";
   if (email.startsWith("coordcurso")) return "coordenador_curso";
-  if (email.startsWith("coord")) return "coordinator";
   if (email.startsWith("prof.")) return "professor";
   return "student";
 }
