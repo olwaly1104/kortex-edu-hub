@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { coordCursoInfo, coordAprovacoes, coordTurmas, coordTodayClasses } from "@/data/institutionData";
-import { announcements } from "@/data/mockData";
+import { coordCursoInfo, coordAprovacoes, coordTurmas } from "@/data/institutionData";
+import { announcements, coordAgendaEvents } from "@/data/mockData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -33,6 +33,18 @@ export default function CoordenadorCursoDashboard() {
   const info = coordCursoInfo;
   const pendentes = coordAprovacoes.filter(a => a.status === "pendente");
   const [showAllRisk, setShowAllRisk] = useState(false);
+
+  const TODAY_DATE = "2024-02-14";
+  const todayAgenda = coordAgendaEvents
+    .filter(e => e.date === TODAY_DATE)
+    .sort((a, b) => a.startTime.localeCompare(b.startTime));
+
+  const now = "10:45";
+  const getEventStatus = (e: typeof coordAgendaEvents[0]) => {
+    if (e.endTime <= now) return "concluída";
+    if (e.startTime <= now && e.endTime > now) return "em_curso";
+    return "agendada";
+  };
 
   const statusConfig: Record<string, { label: string; icon: React.ElementType; variant: "default" | "outline" }> = {
     concluída: { label: "Concluída", icon: CheckCircle, variant: "outline" },
@@ -90,36 +102,44 @@ export default function CoordenadorCursoDashboard() {
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Left column */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Aulas de Hoje — same style as student/professor */}
+          {/* Agenda de Hoje */}
           <div>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
-                <CalendarIcon className="w-5 h-5 text-primary" /> Aulas de Hoje
+                <CalendarIcon className="w-5 h-5 text-primary" /> Agenda de Hoje
               </h2>
+              <Link to="/coordenador/calendario" className="text-sm text-primary hover:underline flex items-center gap-1">
+                Ver calendário <ChevronRight className="w-4 h-4" />
+              </Link>
             </div>
-            <div className="space-y-3">
-              {coordTodayClasses.map(aula => {
-                const cfg = statusConfig[aula.status];
-                const StatusIcon = cfg.icon;
-                return (
-                  <Card key={aula.id} className="p-4 flex items-center gap-4">
-                    <div className="w-1.5 h-12 rounded-full shrink-0" style={{ background: aula.color }} />
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-foreground">{aula.name}</p>
-                      <div className="flex items-center gap-3 text-sm text-muted-foreground mt-0.5 flex-wrap">
-                        <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" />{aula.time}</span>
-                        <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" />{aula.room}</span>
-                        <span>{aula.professor}</span>
+            {todayAgenda.length === 0 ? (
+              <Card className="p-4">
+                <p className="text-sm text-muted-foreground text-center">Sem eventos hoje 🎉</p>
+              </Card>
+            ) : (
+              <div className="space-y-3">
+                {todayAgenda.map(evento => {
+                  const status = getEventStatus(evento);
+                  const cfg = statusConfig[status];
+                  const StatusIcon = cfg.icon;
+                  return (
+                    <Card key={evento.id} className="p-4 flex items-center gap-4">
+                      <div className="w-1.5 h-12 rounded-full shrink-0" style={{ background: evento.color }} />
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-foreground">{evento.title}</p>
+                        <div className="flex items-center gap-3 text-sm text-muted-foreground mt-0.5 flex-wrap">
+                          <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" />{evento.startTime} - {evento.endTime}</span>
+                          {evento.room && <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" />{evento.room}</span>}
+                        </div>
                       </div>
-                      <p className="text-[11px] text-muted-foreground mt-0.5">{aula.turma}</p>
-                    </div>
-                    <Badge variant={aula.status === "em_curso" ? "default" : "outline"} className="text-[10px] gap-1 shrink-0">
-                      <StatusIcon className="w-3 h-3" /> {cfg.label}
-                    </Badge>
-                  </Card>
-                );
-              })}
-            </div>
+                      <Badge variant={status === "em_curso" ? "default" : "outline"} className="text-[10px] gap-1 shrink-0">
+                        <StatusIcon className="w-3 h-3" /> {cfg.label}
+                      </Badge>
+                    </Card>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           {/* Aprovações Pendentes */}
