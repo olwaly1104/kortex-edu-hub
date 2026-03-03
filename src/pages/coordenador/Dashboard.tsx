@@ -152,6 +152,9 @@ export default function CoordenadorCursoDashboard() {
               <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
                 <Megaphone className="w-5 h-5 text-secondary" /> Anúncios
               </h2>
+              <Link to="/coordenador/aprovacoes" className="text-sm text-primary hover:underline flex items-center gap-1">
+                Ver todos <ChevronRight className="w-4 h-4" />
+              </Link>
             </div>
             <div className="space-y-3">
               {coordAnuncios.slice(0, 4).map(an => {
@@ -164,6 +167,7 @@ export default function CoordenadorCursoDashboard() {
                     </div>
                     <p className="text-sm font-semibold text-foreground line-clamp-1">{an.title}</p>
                     <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{an.content}</p>
+                    <p className="text-[11px] text-muted-foreground mt-1.5">{an.author}</p>
                   </Card>
                 );
               })}
