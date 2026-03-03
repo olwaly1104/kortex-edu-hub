@@ -81,10 +81,11 @@ export default function CoordenadorAnos() {
               <Card className="overflow-hidden hover:shadow-lg transition-all h-full group cursor-pointer">
                 <div className="p-5">
                   {/* Header */}
-                  <div className="flex items-start justify-between mb-4">
-                    <h3 className="text-xl font-bold text-foreground">{y.year}º Ano · {info.name}</h3>
+                  <div className="flex items-start justify-between mb-1">
+                    <h3 className="text-xl font-bold text-foreground">{y.year}º Ano</h3>
                     <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
                   </div>
+                  <p className="text-xs text-muted-foreground mb-4">{info.name}</p>
 
                   {/* Stats grid */}
                   <div className="grid grid-cols-4 gap-2 mb-4">
