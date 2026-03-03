@@ -154,7 +154,7 @@ export default function CoordenadorCursoDashboard() {
               <p className="text-sm text-muted-foreground text-center py-4">Sem solicitações pendentes 🎉</p>
             ) : (
               <div className="space-y-2">
-                {pendentes.slice(0, 3).map(sol => {
+                {pendentes.slice(0, 2).map(sol => {
                   const Icon = typeIcons[sol.type] || FileText;
                   return (
                     <div key={sol.id} className="flex items-center gap-3 px-3.5 py-3 rounded-xl border border-border bg-card hover:bg-muted/40 transition-colors">
@@ -186,25 +186,27 @@ export default function CoordenadorCursoDashboard() {
           </Card>
 
           {/* Acções Rápidas */}
-          <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
-            <ArrowRight className="w-5 h-5 text-primary" /> Acções Rápidas
-          </h2>
-          <div className="space-y-2">
-            {[
-              { label: "Enviar pedido de contratação ao Decano", to: "/coordenador/solicitacoes" },
-              { label: "Verificar notas pendentes de lançamento", to: "/coordenador/notas" },
-              { label: "Consultar relatório de desempenho do curso", to: "/coordenador/relatorios" },
-              { label: "Enviar comunicado aos docentes do curso", to: "/coordenador/chat" },
-              { label: "Rever horários e salas das turmas activas", to: "/coordenador/anos" },
-            ].map((s, i) => (
-              <Link key={i} to={s.to}>
-                <Card className="px-4 py-3 flex items-center justify-between hover:bg-muted/40 transition-colors cursor-pointer group rounded-xl border border-border">
-                  <p className="text-sm text-foreground">{s.label}</p>
-                  <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
-                </Card>
-              </Link>
-            ))}
-          </div>
+          <Card className="p-5">
+            <h2 className="text-lg font-semibold text-foreground flex items-center gap-2 mb-4">
+              <ArrowRight className="w-5 h-5 text-primary" /> Acções Rápidas
+            </h2>
+            <div className="space-y-2">
+              {[
+                { label: "Enviar pedido de contratação ao Decano", to: "/coordenador/solicitacoes" },
+                { label: "Verificar notas pendentes de lançamento", to: "/coordenador/notas" },
+                { label: "Consultar relatório de desempenho do curso", to: "/coordenador/relatorios" },
+                { label: "Enviar comunicado aos docentes do curso", to: "/coordenador/chat" },
+                { label: "Rever horários e salas das turmas activas", to: "/coordenador/anos" },
+              ].map((s, i) => (
+                <Link key={i} to={s.to}>
+                  <div className="px-3.5 py-2.5 flex items-center justify-between hover:bg-muted/40 transition-colors cursor-pointer group rounded-xl border border-border">
+                    <p className="text-sm text-foreground">{s.label}</p>
+                    <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </Card>
         </div>
 
         {/* Right column */}
@@ -220,7 +222,7 @@ export default function CoordenadorCursoDashboard() {
               </Link>
             </div>
             <div className="space-y-2">
-              {announcements.slice(0, 3).map(an => {
+              {announcements.slice(0, 2).map(an => {
                 const style = typeStyles[an.type] || typeStyles.geral;
                 return (
                   <div key={an.id} className="px-3.5 py-3 rounded-xl border border-border bg-card">
@@ -243,7 +245,7 @@ export default function CoordenadorCursoDashboard() {
               <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
                 <AlertTriangle className="w-5 h-5 text-destructive" /> Turmas em Risco
               </h2>
-              {!showAllRisk && turmasEmRisco.length > 3 && (
+              {!showAllRisk && turmasEmRisco.length > 2 && (
                 <button
                   onClick={() => setShowAllRisk(true)}
                   className="text-sm text-primary hover:underline flex items-center gap-1"
@@ -265,7 +267,7 @@ export default function CoordenadorCursoDashboard() {
               <p className="text-sm text-muted-foreground text-center py-4">Nenhuma turma em risco 🎉</p>
             ) : (
               <div className="space-y-2">
-                {(showAllRisk ? turmasEmRisco : turmasEmRisco.slice(0, 3)).map(t => (
+                {(showAllRisk ? turmasEmRisco : turmasEmRisco.slice(0, 2)).map(t => (
                   <Link key={t.id} to={`/coordenador/anos/${t.year}/turma/${t.id}`}>
                     <div className="px-3.5 py-3 rounded-xl border border-border bg-card border-l-[3px] border-l-destructive hover:bg-muted/40 transition-colors cursor-pointer">
                       <div className="flex items-center justify-between mb-2">
