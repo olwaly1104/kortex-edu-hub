@@ -229,7 +229,7 @@ export default function CoordenadorCursoDashboard() {
                   <Link key={t.id} to={`/coordenador/anos/${t.year}/turma/${t.id}`} className="flex-1 flex">
                     <div className="px-2.5 py-1.5 rounded-lg border border-border bg-card border-l-[3px] border-l-destructive hover:bg-muted/40 transition-colors cursor-pointer w-full flex flex-col justify-center">
                       <p className="text-[11px] font-semibold text-foreground leading-tight">{t.name}</p>
-                      <p className="text-[9px] text-muted-foreground">{t.year}º Ano</p>
+                      <p className="text-[9px] text-muted-foreground">{t.year}º Ano • {t.director}</p>
                       <div className="flex items-center justify-between mt-1 text-[9px]">
                         <span className={`flex items-center gap-0.5 ${t.presenca < 80 ? "text-destructive font-medium" : "text-muted-foreground"}`}><Clock className="w-2.5 h-2.5" />{t.presenca}%</span>
                         <span className={`flex items-center gap-0.5 ${t.taxaEntrega < 85 ? "text-destructive font-medium" : "text-muted-foreground"}`}><ClipboardCheck className="w-2.5 h-2.5" />{t.taxaEntrega}%</span>
