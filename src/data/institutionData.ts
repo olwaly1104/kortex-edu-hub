@@ -85,9 +85,25 @@ export interface CursoDisciplina {
   location: string;
 }
 
+export interface TurmaNotaDetail {
+  name: string;
+  code: string;
+  media: number;
+  aprovados: number;
+  reprovados: number;
+}
+
+export interface TurmaNota {
+  turma: string;
+  mediaGeral: number;
+  avaliacoesCompletas: number;
+  avaliacoesTotal: number;
+  disciplinas: TurmaNotaDetail[];
+}
+
 export interface CursoNota {
   year: number;
-  disciplinas: { name: string; code: string; media: number; aprovados: number; reprovados: number }[];
+  turmas: TurmaNota[];
 }
 
 // Mock Coordenador Curso
@@ -159,28 +175,117 @@ export const coordDisciplinas: CursoDisciplina[] = [
 ];
 
 export const coordNotas: CursoNota[] = [
-  { year: 1, disciplinas: [
-    { name: "Matemática I", code: "MAT101", media: 12.1, aprovados: 48, reprovados: 16 },
-    { name: "Física I", code: "FIS101", media: 11.8, aprovados: 46, reprovados: 18 },
-    { name: "Desenho Técnico I", code: "DES101", media: 13.2, aprovados: 52, reprovados: 12 },
+  { year: 1, turmas: [
+    { turma: "A", mediaGeral: 12.8, avaliacoesCompletas: 18, avaliacoesTotal: 24, disciplinas: [
+      { name: "Matemática I", code: "MAT101", media: 12.1, aprovados: 10, reprovados: 3 },
+      { name: "Física I", code: "FIS101", media: 11.8, aprovados: 9, reprovados: 4 },
+      { name: "Desenho Técnico I", code: "DES101", media: 13.2, aprovados: 11, reprovados: 2 },
+    ]},
+    { turma: "B", mediaGeral: 11.5, avaliacoesCompletas: 16, avaliacoesTotal: 24, disciplinas: [
+      { name: "Matemática I", code: "MAT101", media: 11.0, aprovados: 8, reprovados: 5 },
+      { name: "Física I", code: "FIS101", media: 10.8, aprovados: 8, reprovados: 5 },
+      { name: "Desenho Técnico I", code: "DES101", media: 12.5, aprovados: 10, reprovados: 3 },
+    ]},
+    { turma: "C", mediaGeral: 12.2, avaliacoesCompletas: 17, avaliacoesTotal: 24, disciplinas: [
+      { name: "Matemática I", code: "MAT101", media: 12.4, aprovados: 10, reprovados: 3 },
+      { name: "Física I", code: "FIS101", media: 11.5, aprovados: 9, reprovados: 4 },
+      { name: "Desenho Técnico I", code: "DES101", media: 12.8, aprovados: 10, reprovados: 3 },
+    ]},
+    { turma: "D", mediaGeral: 13.0, avaliacoesCompletas: 19, avaliacoesTotal: 24, disciplinas: [
+      { name: "Matemática I", code: "MAT101", media: 13.2, aprovados: 11, reprovados: 2 },
+      { name: "Física I", code: "FIS101", media: 12.5, aprovados: 10, reprovados: 3 },
+      { name: "Desenho Técnico I", code: "DES101", media: 13.5, aprovados: 11, reprovados: 2 },
+    ]},
+    { turma: "E", mediaGeral: 11.9, avaliacoesCompletas: 15, avaliacoesTotal: 24, disciplinas: [
+      { name: "Matemática I", code: "MAT101", media: 11.6, aprovados: 9, reprovados: 4 },
+      { name: "Física I", code: "FIS101", media: 11.2, aprovados: 10, reprovados: 3 },
+      { name: "Desenho Técnico I", code: "DES101", media: 13.0, aprovados: 10, reprovados: 3 },
+    ]},
   ]},
-  { year: 2, disciplinas: [
-    { name: "Matemática II", code: "MAT201", media: 13.0, aprovados: 42, reprovados: 10 },
-    { name: "Resistência dos Materiais", code: "RES201", media: 12.5, aprovados: 40, reprovados: 12 },
+  { year: 2, turmas: [
+    { turma: "A", mediaGeral: 13.5, avaliacoesCompletas: 14, avaliacoesTotal: 18, disciplinas: [
+      { name: "Matemática II", code: "MAT201", media: 13.4, aprovados: 11, reprovados: 2 },
+      { name: "Resistência dos Materiais", code: "RES201", media: 13.6, aprovados: 11, reprovados: 2 },
+    ]},
+    { turma: "B", mediaGeral: 12.0, avaliacoesCompletas: 12, avaliacoesTotal: 18, disciplinas: [
+      { name: "Matemática II", code: "MAT201", media: 12.2, aprovados: 9, reprovados: 4 },
+      { name: "Resistência dos Materiais", code: "RES201", media: 11.8, aprovados: 9, reprovados: 4 },
+    ]},
+    { turma: "C", mediaGeral: 13.1, avaliacoesCompletas: 13, avaliacoesTotal: 18, disciplinas: [
+      { name: "Matemática II", code: "MAT201", media: 13.0, aprovados: 10, reprovados: 3 },
+      { name: "Resistência dos Materiais", code: "RES201", media: 13.2, aprovados: 11, reprovados: 2 },
+    ]},
+    { turma: "D", mediaGeral: 13.8, avaliacoesCompletas: 15, avaliacoesTotal: 18, disciplinas: [
+      { name: "Matemática II", code: "MAT201", media: 14.0, aprovados: 12, reprovados: 1 },
+      { name: "Resistência dos Materiais", code: "RES201", media: 13.5, aprovados: 11, reprovados: 2 },
+    ]},
+    { turma: "E", mediaGeral: 12.5, avaliacoesCompletas: 11, avaliacoesTotal: 18, disciplinas: [
+      { name: "Matemática II", code: "MAT201", media: 12.4, aprovados: 10, reprovados: 3 },
+      { name: "Resistência dos Materiais", code: "RES201", media: 12.6, aprovados: 10, reprovados: 3 },
+    ]},
   ]},
-  { year: 3, disciplinas: [
-    { name: "Mecânica dos Solos", code: "GEO301", media: 13.9, aprovados: 38, reprovados: 7 },
-    { name: "Hidráulica", code: "HID301", media: 13.5, aprovados: 37, reprovados: 8 },
+  { year: 3, turmas: [
+    { turma: "A", mediaGeral: 14.5, avaliacoesCompletas: 12, avaliacoesTotal: 14, disciplinas: [
+      { name: "Mecânica dos Solos", code: "GEO301", media: 14.2, aprovados: 10, reprovados: 1 },
+      { name: "Hidráulica", code: "HID301", media: 14.8, aprovados: 10, reprovados: 1 },
+    ]},
+    { turma: "B", mediaGeral: 12.8, avaliacoesCompletas: 10, avaliacoesTotal: 14, disciplinas: [
+      { name: "Mecânica dos Solos", code: "GEO301", media: 12.5, aprovados: 9, reprovados: 2 },
+      { name: "Hidráulica", code: "HID301", media: 13.1, aprovados: 9, reprovados: 2 },
+    ]},
+    { turma: "C", mediaGeral: 13.5, avaliacoesCompletas: 11, avaliacoesTotal: 14, disciplinas: [
+      { name: "Mecânica dos Solos", code: "GEO301", media: 13.8, aprovados: 10, reprovados: 1 },
+      { name: "Hidráulica", code: "HID301", media: 13.2, aprovados: 9, reprovados: 2 },
+    ]},
+    { turma: "D", mediaGeral: 14.0, avaliacoesCompletas: 12, avaliacoesTotal: 14, disciplinas: [
+      { name: "Mecânica dos Solos", code: "GEO301", media: 14.5, aprovados: 10, reprovados: 1 },
+      { name: "Hidráulica", code: "HID301", media: 13.5, aprovados: 9, reprovados: 2 },
+    ]},
+    { turma: "E", mediaGeral: 13.0, avaliacoesCompletas: 9, avaliacoesTotal: 14, disciplinas: [
+      { name: "Mecânica dos Solos", code: "GEO301", media: 13.2, aprovados: 9, reprovados: 2 },
+      { name: "Hidráulica", code: "HID301", media: 12.8, aprovados: 8, reprovados: 3 },
+    ]},
   ]},
-  { year: 4, disciplinas: [
-    { name: "Estruturas de Betão", code: "EST401", media: 14.2, aprovados: 34, reprovados: 4 },
-    { name: "Gestão de Obras", code: "GES401", media: 14.5, aprovados: 34, reprovados: 4 },
+  { year: 4, turmas: [
+    { turma: "A", mediaGeral: 14.8, avaliacoesCompletas: 10, avaliacoesTotal: 12, disciplinas: [
+      { name: "Estruturas de Betão", code: "EST401", media: 14.5, aprovados: 9, reprovados: 1 },
+      { name: "Gestão de Obras", code: "GES401", media: 15.0, aprovados: 9, reprovados: 1 },
+    ]},
+    { turma: "B", mediaGeral: 13.5, avaliacoesCompletas: 9, avaliacoesTotal: 12, disciplinas: [
+      { name: "Estruturas de Betão", code: "EST401", media: 13.2, aprovados: 8, reprovados: 2 },
+      { name: "Gestão de Obras", code: "GES401", media: 13.8, aprovados: 8, reprovados: 2 },
+    ]},
+    { turma: "C", mediaGeral: 14.2, avaliacoesCompletas: 10, avaliacoesTotal: 12, disciplinas: [
+      { name: "Estruturas de Betão", code: "EST401", media: 14.0, aprovados: 9, reprovados: 1 },
+      { name: "Gestão de Obras", code: "GES401", media: 14.5, aprovados: 9, reprovados: 1 },
+    ]},
+    { turma: "D", mediaGeral: 14.5, avaliacoesCompletas: 10, avaliacoesTotal: 12, disciplinas: [
+      { name: "Estruturas de Betão", code: "EST401", media: 14.8, aprovados: 9, reprovados: 1 },
+      { name: "Gestão de Obras", code: "GES401", media: 14.2, aprovados: 8, reprovados: 2 },
+    ]},
+    { turma: "E", mediaGeral: 13.8, avaliacoesCompletas: 9, avaliacoesTotal: 12, disciplinas: [
+      { name: "Estruturas de Betão", code: "EST401", media: 14.0, aprovados: 8, reprovados: 2 },
+      { name: "Gestão de Obras", code: "GES401", media: 13.5, aprovados: 8, reprovados: 2 },
+    ]},
   ]},
-  { year: 5, disciplinas: [
-    { name: "Projecto Final", code: "PRJ501", media: 15.0, aprovados: 28, reprovados: 2 },
+  { year: 5, turmas: [
+    { turma: "A", mediaGeral: 15.2, avaliacoesCompletas: 6, avaliacoesTotal: 6, disciplinas: [
+      { name: "Projecto Final", code: "PRJ501", media: 15.2, aprovados: 8, reprovados: 0 },
+    ]},
+    { turma: "B", mediaGeral: 14.5, avaliacoesCompletas: 5, avaliacoesTotal: 6, disciplinas: [
+      { name: "Projecto Final", code: "PRJ501", media: 14.5, aprovados: 7, reprovados: 1 },
+    ]},
+    { turma: "C", mediaGeral: 14.8, avaliacoesCompletas: 6, avaliacoesTotal: 6, disciplinas: [
+      { name: "Projecto Final", code: "PRJ501", media: 14.8, aprovados: 7, reprovados: 1 },
+    ]},
+    { turma: "D", mediaGeral: 15.5, avaliacoesCompletas: 6, avaliacoesTotal: 6, disciplinas: [
+      { name: "Projecto Final", code: "PRJ501", media: 15.5, aprovados: 8, reprovados: 0 },
+    ]},
+    { turma: "E", mediaGeral: 14.2, avaliacoesCompletas: 5, avaliacoesTotal: 6, disciplinas: [
+      { name: "Projecto Final", code: "PRJ501", media: 14.2, aprovados: 6, reprovados: 2 },
+    ]},
   ]},
 ];
-
 export const coordSolicitacoes: Solicitacao[] = [
   // Recebidas (para aprovar)
   { id: "sol1", type: "nota", title: "Revisão de nota — Matemática II", description: "Estudante João Fernandes solicita revisão de nota do Teste 1", requester: "João Fernandes", date: "28/02/2024", status: "pendente", priority: "média", direction: "recebida" },
