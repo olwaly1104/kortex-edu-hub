@@ -32,6 +32,7 @@ export interface Docente {
   presenca: number;
   mediaGeral: number;
   estudantesTotal: number;
+  taxaEntrega: number;
   status: "activo" | "licença" | "inactivo";
 }
 
@@ -105,14 +106,14 @@ export const coordCursoInfo: CursoInfo = {
 };
 
 export const coordDocentes: Docente[] = [
-  { id: "d1", name: "Prof. António Silva", email: "prof.silva@upra.kor", department: "Estruturas", disciplinas: 3, turmas: 4, presenca: 96, mediaGeral: 13.8, estudantesTotal: 120, status: "activo" },
-  { id: "d2", name: "Prof. Maria Santos", email: "prof.santos@upra.kor", department: "Geotecnia", disciplinas: 2, turmas: 3, presenca: 92, mediaGeral: 13.2, estudantesTotal: 97, status: "activo" },
-  { id: "d3", name: "Prof. Pedro Ferreira", email: "prof.ferreira@upra.kor", department: "Hidráulica", disciplinas: 2, turmas: 2, presenca: 88, mediaGeral: 12.5, estudantesTotal: 45, status: "activo" },
-  { id: "d4", name: "Prof. Ana Costa", email: "prof.costa@upra.kor", department: "Materiais", disciplinas: 3, turmas: 3, presenca: 94, mediaGeral: 14.1, estudantesTotal: 76, status: "activo" },
-  { id: "d5", name: "Prof. David Lopes", email: "prof.lopes@upra.kor", department: "Transportes", disciplinas: 2, turmas: 2, presenca: 90, mediaGeral: 12.8, estudantesTotal: 52, status: "licença" },
-  { id: "d6", name: "Prof. Luísa Tavares", email: "prof.tavares@upra.kor", department: "Topografia", disciplinas: 2, turmas: 2, presenca: 95, mediaGeral: 13.5, estudantesTotal: 64, status: "activo" },
-  { id: "d7", name: "Prof. Carlos Mendes", email: "prof.mendes@upra.kor", department: "Estruturas", disciplinas: 2, turmas: 3, presenca: 91, mediaGeral: 14.5, estudantesTotal: 68, status: "activo" },
-  { id: "d8", name: "Prof. Sofia Martins", email: "prof.martins@upra.kor", department: "Matemática", disciplinas: 2, turmas: 4, presenca: 97, mediaGeral: 12.9, estudantesTotal: 128, status: "activo" },
+  { id: "d1", name: "Prof. António Silva", email: "prof.silva@upra.kor", department: "Estruturas", disciplinas: 3, turmas: 4, presenca: 96, mediaGeral: 13.8, estudantesTotal: 120, taxaEntrega: 91, status: "activo" },
+  { id: "d2", name: "Prof. Maria Santos", email: "prof.santos@upra.kor", department: "Geotecnia", disciplinas: 2, turmas: 3, presenca: 92, mediaGeral: 13.2, estudantesTotal: 97, taxaEntrega: 87, status: "activo" },
+  { id: "d3", name: "Prof. Pedro Ferreira", email: "prof.ferreira@upra.kor", department: "Hidráulica", disciplinas: 2, turmas: 2, presenca: 88, mediaGeral: 12.5, estudantesTotal: 45, taxaEntrega: 78, status: "activo" },
+  { id: "d4", name: "Prof. Ana Costa", email: "prof.costa@upra.kor", department: "Materiais", disciplinas: 3, turmas: 3, presenca: 94, mediaGeral: 14.1, estudantesTotal: 76, taxaEntrega: 93, status: "activo" },
+  { id: "d5", name: "Prof. David Lopes", email: "prof.lopes@upra.kor", department: "Transportes", disciplinas: 2, turmas: 2, presenca: 90, mediaGeral: 12.8, estudantesTotal: 52, taxaEntrega: 82, status: "licença" },
+  { id: "d6", name: "Prof. Luísa Tavares", email: "prof.tavares@upra.kor", department: "Topografia", disciplinas: 2, turmas: 2, presenca: 95, mediaGeral: 13.5, estudantesTotal: 64, taxaEntrega: 89, status: "activo" },
+  { id: "d7", name: "Prof. Carlos Mendes", email: "prof.mendes@upra.kor", department: "Estruturas", disciplinas: 2, turmas: 3, presenca: 91, mediaGeral: 14.5, estudantesTotal: 68, taxaEntrega: 94, status: "activo" },
+  { id: "d8", name: "Prof. Sofia Martins", email: "prof.martins@upra.kor", department: "Matemática", disciplinas: 2, turmas: 4, presenca: 97, mediaGeral: 12.9, estudantesTotal: 128, taxaEntrega: 85, status: "activo" },
 ];
 
 export const coordEstudantes: CursoEstudante[] = [

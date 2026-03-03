@@ -24,6 +24,7 @@ export default function CoordenadorDocentes() {
             <th className="text-center p-3 font-medium text-muted-foreground">Cadeiras</th>
             <th className="text-center p-3 font-medium text-muted-foreground">Turmas</th>
             <th className="text-center p-3 font-medium text-muted-foreground">Presença</th>
+            <th className="text-center p-3 font-medium text-muted-foreground">Taxa Entrega</th>
             <th className="text-center p-3 font-medium text-muted-foreground">Média Geral</th>
           </tr></thead>
           <tbody>{filtered.map(d => (
@@ -33,6 +34,7 @@ export default function CoordenadorDocentes() {
               <td className="p-3 text-center">{d.disciplinas}</td>
               <td className="p-3 text-center">{d.turmas}</td>
               <td className="p-3 text-center"><span className={d.presenca >= 90 ? "text-accent font-medium" : "text-destructive font-medium"}>{d.presenca}%</span></td>
+              <td className="p-3 text-center"><span className={d.taxaEntrega >= 80 ? "text-accent font-medium" : "text-destructive font-medium"}>{d.taxaEntrega}%</span></td>
               <td className="p-3 text-center"><span className={d.mediaGeral >= 10 ? "text-accent font-bold" : "text-destructive font-bold"}>{d.mediaGeral}</span></td>
             </tr>
           ))}</tbody>
