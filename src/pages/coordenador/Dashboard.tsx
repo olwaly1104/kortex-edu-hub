@@ -7,15 +7,16 @@ import { Button } from "@/components/ui/button";
 import {
   Users, BookOpen, Clock, Award, ChevronRight,
   AlertTriangle, FileText, Calendar as CalendarIcon,
-  Megaphone, ArrowLeft, X,
+  Megaphone, X, CheckCircle, ClipboardList,
+  Eye, XCircle, GraduationCap,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Calendar } from "@/components/ui/calendar";
 
-const priorityStyles: Record<string, string> = {
-  alta: "bg-destructive/10 text-destructive border-destructive/20",
-  média: "bg-secondary/10 text-secondary border-secondary/20",
-  baixa: "bg-muted text-muted-foreground border-border",
+const typeStyles: Record<string, { bg: string; label: string }> = {
+  urgente: { bg: "bg-destructive text-destructive-foreground", label: "Urgente" },
+  academico: { bg: "bg-primary text-primary-foreground", label: "Académico" },
+  geral: { bg: "bg-muted text-foreground", label: "Geral" },
 };
 
 const typeIcons: Record<string, React.ElementType> = {
@@ -24,12 +25,6 @@ const typeIcons: Record<string, React.ElementType> = {
   horário: CalendarIcon,
   transferência: Users,
   recurso: AlertTriangle,
-};
-
-const anuncioTypeStyles: Record<string, string> = {
-  urgente: "bg-destructive/10 text-destructive",
-  academico: "bg-primary/10 text-primary",
-  geral: "bg-muted text-muted-foreground",
 };
 
 export default function CoordenadorCursoDashboard() {
@@ -89,11 +84,13 @@ export default function CoordenadorCursoDashboard() {
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Left column */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Calendar */}
+          {/* Calendar — same style as student/professor */}
           <div>
-            <h2 className="text-lg font-semibold text-foreground flex items-center gap-2 mb-4">
-              <CalendarIcon className="w-5 h-5 text-primary" /> Calendário
-            </h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+                <CalendarIcon className="w-5 h-5 text-primary" /> Calendário
+              </h2>
+            </div>
             <Card className="p-4 flex justify-center">
               <Calendar
                 mode="single"
@@ -104,7 +101,7 @@ export default function CoordenadorCursoDashboard() {
             </Card>
           </div>
 
-          {/* Aprovações Pendentes (moved from right column) */}
+          {/* Aprovações Pendentes — clean table with actions */}
           <div>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
@@ -114,72 +111,66 @@ export default function CoordenadorCursoDashboard() {
                 Ver todas <ChevronRight className="w-4 h-4" />
               </Link>
             </div>
-            <Card className="overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b bg-muted/30">
-                      <th className="text-left p-3 font-medium text-muted-foreground">Pedido</th>
-                      <th className="text-left p-3 font-medium text-muted-foreground">Requerente</th>
-                      <th className="text-center p-3 font-medium text-muted-foreground">Data</th>
-                      <th className="text-center p-3 font-medium text-muted-foreground">Prioridade</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {pendentes.slice(0, 5).map(ap => {
-                      const Icon = typeIcons[ap.type] || FileText;
-                      return (
-                        <tr key={ap.id} className="border-b last:border-0 hover:bg-muted/20">
-                          <td className="p-3">
-                            <div className="flex items-center gap-2">
-                              <div className={`w-7 h-7 rounded-md flex items-center justify-center shrink-0 ${priorityStyles[ap.priority]}`}>
-                                <Icon className="w-3.5 h-3.5" />
-                              </div>
-                              <span className="font-medium text-foreground line-clamp-1">{ap.title}</span>
-                            </div>
-                          </td>
-                          <td className="p-3 text-muted-foreground">{ap.requester}</td>
-                          <td className="p-3 text-center text-muted-foreground text-xs">{ap.date}</td>
-                          <td className="p-3 text-center">
-                            <Badge variant="outline" className={`text-[10px] ${priorityStyles[ap.priority]}`}>
-                              {ap.priority}
-                            </Badge>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </Card>
+            <div className="space-y-3">
+              {pendentes.slice(0, 4).map(ap => {
+                const Icon = typeIcons[ap.type] || FileText;
+                return (
+                  <Card key={ap.id} className="p-4">
+                    <div className="flex items-start gap-3">
+                      <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 bg-muted">
+                        <Icon className="w-4 h-4 text-muted-foreground" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-foreground line-clamp-1">{ap.title}</p>
+                        <p className="text-[11px] text-muted-foreground mt-0.5">{ap.requester} • {ap.date}</p>
+                        <p className="text-xs text-muted-foreground mt-1 line-clamp-1">{ap.description}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border/50">
+                      <Button variant="outline" size="sm" className="text-xs gap-1.5 flex-1">
+                        <Eye className="w-3.5 h-3.5" /> Ver Detalhes
+                      </Button>
+                      <Button size="sm" className="text-xs gap-1.5 bg-accent hover:bg-accent/90 text-accent-foreground">
+                        <CheckCircle className="w-3.5 h-3.5" /> Aprovar
+                      </Button>
+                      <Button variant="outline" size="sm" className="text-xs gap-1.5 text-destructive hover:text-destructive hover:bg-destructive/10">
+                        <XCircle className="w-3.5 h-3.5" /> Rejeitar
+                      </Button>
+                    </div>
+                  </Card>
+                );
+              })}
+            </div>
           </div>
         </div>
 
         {/* Right column */}
         <div className="space-y-6">
-          {/* Anúncios */}
+          {/* Anúncios — same as student/professor */}
           <div>
-            <h2 className="text-lg font-semibold text-foreground flex items-center gap-2 mb-4">
-              <Megaphone className="w-5 h-5 text-primary" /> Anúncios
-            </h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+                <Megaphone className="w-5 h-5 text-secondary" /> Anúncios
+              </h2>
+            </div>
             <div className="space-y-3">
-              {coordAnuncios.slice(0, 4).map(an => (
-                <Card key={an.id} className="p-4">
-                  <div className="flex items-start gap-3">
-                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${anuncioTypeStyles[an.type]}`}>
-                      <Megaphone className="w-4 h-4" />
+              {coordAnuncios.slice(0, 4).map(an => {
+                const style = typeStyles[an.type] || typeStyles.geral;
+                return (
+                  <Card key={an.id} className="p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Badge className={`${style.bg} text-[10px]`}>{style.label}</Badge>
+                      <span className="text-[11px] text-muted-foreground ml-auto">{an.date}</span>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-foreground line-clamp-1">{an.title}</p>
-                      <p className="text-[11px] text-muted-foreground mt-0.5">{an.author} • {an.date}</p>
-                    </div>
-                  </div>
-                </Card>
-              ))}
+                    <p className="text-sm font-semibold text-foreground line-clamp-1">{an.title}</p>
+                    <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{an.content}</p>
+                  </Card>
+                );
+              })}
             </div>
           </div>
 
-          {/* Turmas em Risco */}
+          {/* Turmas em Risco — card style like Os Meus Anos */}
           <div>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
@@ -208,33 +199,47 @@ export default function CoordenadorCursoDashboard() {
                 <p className="text-sm text-muted-foreground text-center">Nenhuma turma em risco 🎉</p>
               </Card>
             ) : (
-              <div className="space-y-2">
-                {(showAllRisk ? turmasEmRisco : turmasEmRisco.slice(0, 3)).map(t => {
-                  const reasons: string[] = [];
-                  if (t.presenca < 80) reasons.push(`Pres. ${t.presenca}%`);
-                  if (t.media < 12) reasons.push(`Média ${t.media}`);
-                  if (t.taxaEntrega < 85) reasons.push(`Entrega ${t.taxaEntrega}%`);
-
-                  return (
-                    <Link key={t.id} to={`/coordenador/anos/${t.year}/turma/${t.id}`}>
-                      <Card className="p-3 border-l-[3px] border-l-destructive hover:bg-muted/30 transition-colors cursor-pointer">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="text-sm font-medium text-foreground">
-                              {t.name} — {t.year}º Ano
-                            </p>
-                            <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                              {reasons.map((r, i) => (
-                                <span key={i} className="text-[10px] text-destructive font-medium">{r}</span>
-                              ))}
-                            </div>
+              <div className="space-y-3">
+                {(showAllRisk ? turmasEmRisco : turmasEmRisco.slice(0, 3)).map(t => (
+                  <Link key={t.id} to={`/coordenador/anos/${t.year}/turma/${t.id}`}>
+                    <Card className="p-4 hover:shadow-md transition-shadow cursor-pointer border-l-[3px] border-l-destructive">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-destructive/10 text-destructive shrink-0">
+                            <GraduationCap className="w-5 h-5" />
                           </div>
-                          <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
+                          <div>
+                            <p className="font-bold text-foreground text-sm">{t.name}</p>
+                            <p className="text-[11px] text-muted-foreground">{t.year}º Ano • {info.name}</p>
+                          </div>
                         </div>
-                      </Card>
-                    </Link>
-                  );
-                })}
+                        <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
+                      </div>
+
+                      {/* Metrics — vertical list like turma cards in Anos */}
+                      <div className="space-y-2 pt-3 border-t border-border/50">
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-muted-foreground flex items-center gap-1.5">
+                            <CheckCircle className="w-3.5 h-3.5" /> Presença
+                          </span>
+                          <span className={`font-semibold ${t.presenca >= 80 ? "text-accent" : "text-destructive"}`}>{t.presenca}%</span>
+                        </div>
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-muted-foreground flex items-center gap-1.5">
+                            <ClipboardList className="w-3.5 h-3.5" /> Taxa de Entrega
+                          </span>
+                          <span className={`font-semibold ${t.taxaEntrega >= 85 ? "text-accent" : "text-destructive"}`}>{t.taxaEntrega}%</span>
+                        </div>
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-muted-foreground flex items-center gap-1.5">
+                            <Award className="w-3.5 h-3.5" /> Média Geral
+                          </span>
+                          <span className={`font-semibold ${t.media >= 12 ? "text-accent" : "text-destructive"}`}>{t.media}</span>
+                        </div>
+                      </div>
+                    </Card>
+                  </Link>
+                ))}
               </div>
             )}
           </div>
