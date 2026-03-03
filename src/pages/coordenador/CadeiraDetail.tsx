@@ -85,6 +85,7 @@ export default function CoordenadorCadeiraDetail() {
               <span className="flex items-center gap-1.5"><GraduationCap className="w-4 h-4" />{coordCursoInfo.faculty}</span>
               <span className="flex items-center gap-1.5"><Calendar className="w-4 h-4" />{yearNum}º Ano</span>
               <span className="flex items-center gap-1.5"><Users className="w-4 h-4" />{cadeira.professor}</span>
+              <span className="flex items-center gap-1.5"><MapPin className="w-4 h-4" />{cadeira.location}</span>
             </div>
           </div>
         </div>
@@ -108,10 +109,21 @@ export default function CoordenadorCadeiraDetail() {
         </Card>
         <Card className="p-4">
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><MapPin className="w-4 h-4 text-primary" /></div>
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Local</span>
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><CheckCircle className="w-4 h-4 text-primary" /></div>
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Presença</span>
           </div>
-          <p className="text-lg font-bold text-foreground">{cadeira.location}</p>
+          <div className="flex items-baseline gap-1">
+            <span className={`text-2xl font-bold ${avgPresenca >= 75 ? "text-accent" : "text-destructive"}`}>{avgPresenca}%</span>
+          </div>
+        </Card>
+        <Card className="p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><ClipboardList className="w-4 h-4 text-primary" /></div>
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Taxa Entrega</span>
+          </div>
+          <div className="flex items-baseline gap-1">
+            <span className={`text-2xl font-bold ${cadeira.taxaSucesso >= 80 ? "text-accent" : "text-destructive"}`}>{cadeira.taxaSucesso}%</span>
+          </div>
         </Card>
         <Card className="p-4">
           <div className="flex items-center gap-2 mb-3">
@@ -123,27 +135,18 @@ export default function CoordenadorCadeiraDetail() {
             <span className="text-sm text-muted-foreground">/20</span>
           </div>
         </Card>
-        <Card className="p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><CheckCircle className="w-4 h-4 text-primary" /></div>
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Presença</span>
-          </div>
-          <div className="flex items-baseline gap-1">
-            <span className={`text-2xl font-bold ${avgPresenca >= 75 ? "text-accent" : "text-destructive"}`}>{avgPresenca}%</span>
-          </div>
-        </Card>
       </div>
 
       {/* Tabs */}
-      <Tabs defaultValue="lessons" className="space-y-5">
+      <Tabs defaultValue="students" className="space-y-5">
         <div className="border-b overflow-x-auto">
           <TabsList className="bg-transparent h-auto p-0 gap-0">
             {[
+              { value: "students", icon: Users, label: "Estudantes" },
               { value: "lessons", icon: Video, label: "Aulas" },
               { value: "conteudos", icon: FolderOpen, label: "Conteúdos" },
               { value: "tasks", icon: ClipboardList, label: "Tarefas" },
               { value: "avaliacoes", icon: Award, label: "Avaliações" },
-              { value: "students", icon: Users, label: "Estudantes" },
               { value: "resources", icon: FileText, label: "Recursos" },
             ].map(tab => (
               <TabsTrigger key={tab.value} value={tab.value} className="rounded-none border-b-2 border-transparent data-[state=active]:border-current data-[state=active]:shadow-none data-[state=active]:bg-transparent px-4 py-3 text-sm gap-2">
@@ -161,7 +164,8 @@ export default function CoordenadorCadeiraDetail() {
               const cfg = lessonStatusConfig[lesson.status];
               const StatusIcon = cfg.icon;
               return (
-                <Card key={lesson.id} className="p-4 border-l-[3px]" style={{ borderLeftColor: lesson.status === "publicada" ? "hsl(var(--accent))" : "hsl(var(--muted))" }}>
+                <Link key={lesson.id} to={`/coordenador/anos/${yearNum}/turma/${turmaId}/cadeira/${cadeiraId}/aula/${lesson.id}`}>
+                <Card className="p-4 border-l-[3px] hover:shadow-md transition-shadow cursor-pointer" style={{ borderLeftColor: lesson.status === "publicada" ? "hsl(var(--accent))" : "hsl(var(--muted))" }}>
                   <div className="flex items-center gap-4">
                     <div className="w-20 h-14 rounded-xl bg-muted/50 flex items-center justify-center shrink-0"><Play className="w-5 h-5 text-muted-foreground/60" /></div>
                     <div className="flex-1 min-w-0">
@@ -198,6 +202,7 @@ export default function CoordenadorCadeiraDetail() {
                     </div>
                   )}
                 </Card>
+                </Link>
               );
             })}
           </div>
@@ -316,8 +321,9 @@ export default function CoordenadorCadeiraDetail() {
                   </div>
                   <p className="text-[11px] text-muted-foreground">{student.email}</p>
                 </div>
-                <div className="grid grid-cols-2 gap-4 shrink-0 text-center">
+                <div className="grid grid-cols-3 gap-4 shrink-0 text-center">
                   <div><p className="text-[10px] text-muted-foreground uppercase">Presença</p><p className={`text-sm font-bold ${student.presenca >= 75 ? "text-accent" : "text-destructive"}`}>{student.presenca}%</p></div>
+                  <div><p className="text-[10px] text-muted-foreground uppercase">Entrega</p><p className={`text-sm font-bold ${student.presenca >= 75 ? "text-accent" : "text-destructive"}`}>{Math.min(100, student.presenca + Math.floor(Math.random() * 10))}%</p></div>
                   <div><p className="text-[10px] text-muted-foreground uppercase">Média</p><p className={`text-sm font-bold ${student.media !== null && student.media >= 10 ? "text-accent" : "text-destructive"}`}>{student.media ?? "—"}</p></div>
                 </div>
               </Card>

@@ -113,16 +113,16 @@ export default function CoordenadorAnoDetail() {
                     {/* Details */}
                     <div className="space-y-2.5 pt-3 border-t border-border/50">
                       <div className="flex items-center justify-between text-xs">
-                        <span className="text-muted-foreground flex items-center gap-1.5"><Award className="w-3.5 h-3.5" /> Média Geral</span>
-                        <span className={`font-semibold ${t.media >= 10 ? "text-accent" : "text-destructive"}`}>{t.media}</span>
-                      </div>
-                      <div className="flex items-center justify-between text-xs">
                         <span className="text-muted-foreground flex items-center gap-1.5"><CheckCircle className="w-3.5 h-3.5" /> Presença</span>
                         <span className={`font-semibold ${t.presenca >= 75 ? "text-accent" : "text-destructive"}`}>{t.presenca}%</span>
                       </div>
                       <div className="flex items-center justify-between text-xs">
                         <span className="text-muted-foreground flex items-center gap-1.5"><ClipboardList className="w-3.5 h-3.5" /> Taxa de Entrega</span>
                         <span className={`font-semibold ${t.taxaEntrega >= 80 ? "text-accent" : "text-destructive"}`}>{t.taxaEntrega}%</span>
+                      </div>
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-muted-foreground flex items-center gap-1.5"><Award className="w-3.5 h-3.5" /> Média Geral</span>
+                        <span className={`font-semibold ${t.media >= 10 ? "text-accent" : "text-destructive"}`}>{t.media}</span>
                       </div>
                       <div className="flex items-center justify-between text-xs">
                         <span className="text-muted-foreground flex items-center gap-1.5"><FileText className="w-3.5 h-3.5" /> Conteúdos</span>
