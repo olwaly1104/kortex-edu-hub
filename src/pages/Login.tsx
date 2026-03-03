@@ -139,7 +139,7 @@ export default function Login() {
               <span className="font-medium">Dica:</span> Use qualquer palavra-passe com os emails abaixo:
             </p>
             <p className="text-xs text-muted-foreground">
-              <span className="font-medium">2934@upra.kor</span> (Estudante) · <span className="font-medium">prof.silva@upra.kor</span> (Professor) · <span className="font-medium">coord@upra.kor</span> (Coordenador)
+              <span className="font-medium">2934@upra.kor</span> (Estudante) · <span className="font-medium">prof.silva@upra.kor</span> (Professor)
             </p>
             <p className="text-xs text-muted-foreground">
               <span className="font-medium">coordcurso@upra.kor</span> (Coord. Curso) · <span className="font-medium">decano@upra.kor</span> (Decano) · <span className="font-medium">reitoria@upra.kor</span> (Reitoria)

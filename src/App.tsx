@@ -36,15 +36,7 @@ import ProfessorTasks from "./pages/professor/Tasks";
 import ProfessorEvaluations from "./pages/professor/Evaluations";
 import ProfessorTaskDetail from "./pages/professor/TaskDetail";
 import ProfessorFinances from "./pages/professor/Finances";
-import CoordinatorDashboard from "./pages/coordinator/Dashboard";
-import CoordinatorDisciplines from "./pages/coordinator/Disciplines";
-import CoordinatorProfessors from "./pages/coordinator/Professors";
-import CoordinatorStudents from "./pages/coordinator/Students";
-import CoordinatorEvaluations from "./pages/coordinator/Evaluations";
-import CoordinatorAnnouncements from "./pages/coordinator/Announcements";
-import CoordinatorReports from "./pages/coordinator/Reports";
-// Coordenador de Curso
-import CoordenadorCursoDashboard from "./pages/coordenador/Dashboard";
+import CoordenadorDashboard from "./pages/coordenador/Dashboard";
 import CoordenadorAprovacoes from "./pages/coordenador/Aprovacoes";
 import CoordenadorAnos from "./pages/coordenador/Anos";
 import CoordenadorEstudantes from "./pages/coordenador/Estudantes";
@@ -52,7 +44,6 @@ import CoordenadorDocentes from "./pages/coordenador/Docentes";
 import CoordenadorNotas from "./pages/coordenador/Notas";
 import CoordenadorRelatorios from "./pages/coordenador/Relatorios";
 import CoordenadorFinancas from "./pages/coordenador/Financas";
-// Decano
 import DecanoDashboard from "./pages/decano/Dashboard";
 import DecanoAprovacoes from "./pages/decano/Aprovacoes";
 import DecanoFaculdades from "./pages/decano/Faculdades";
@@ -61,7 +52,6 @@ import DecanoDocentes from "./pages/decano/Docentes";
 import DecanoNotas from "./pages/decano/Notas";
 import DecanoRelatorios from "./pages/decano/Relatorios";
 import DecanoFinancas from "./pages/decano/Financas";
-// Reitoria
 import ReitoriaDashboard from "./pages/reitoria/Dashboard";
 import ReitoriaAprovacoes from "./pages/reitoria/Aprovacoes";
 import ReitoriaVisaoGeral from "./pages/reitoria/VisaoGeral";
@@ -71,13 +61,11 @@ import ReitoriaCoordenadores from "./pages/reitoria/Coordenadores";
 import ReitoriaDocentes from "./pages/reitoria/Docentes";
 import ReitoriaRelatorios from "./pages/reitoria/Relatorios";
 import ReitoriaFinancas from "./pages/reitoria/Financas";
-
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
 const homeRedirectMap: Record<string, string> = {
-  coordinator: "/coordinator",
   professor: "/professor",
   student: "/student",
   coordenador_curso: "/coordenador",
@@ -87,23 +75,14 @@ const homeRedirectMap: Record<string, string> = {
 
 function AppRoutes() {
   const { isAuthenticated, user } = useAuth();
-
-  if (!isAuthenticated) {
-    return (
-      <Routes>
-        <Route path="*" element={<Login />} />
-      </Routes>
-    );
-  }
-
+  if (!isAuthenticated) return <Routes><Route path="*" element={<Login />} /></Routes>;
   const homeRedirect = homeRedirectMap[user?.role || "student"] || "/student";
 
   return (
     <Routes>
       <Route path="/" element={<Navigate to={homeRedirect} replace />} />
-
-      {/* Student routes */}
       <Route element={<AppLayout />}>
+        {/* Student */}
         <Route path="/student" element={<StudentDashboard />} />
         <Route path="/student/disciplines" element={<StudentDisciplines />} />
         <Route path="/student/disciplines/:id" element={<DisciplineDetail />} />
@@ -121,8 +100,7 @@ function AppRoutes() {
         <Route path="/student/profile" element={<StudentProfile />} />
         <Route path="/student/finances" element={<StudentFinances />} />
         <Route path="/student/activities" element={<StudentActivities />} />
-
-        {/* Professor routes */}
+        {/* Professor */}
         <Route path="/professor" element={<ProfessorDashboard />} />
         <Route path="/professor/disciplines" element={<ProfessorDisciplines />} />
         <Route path="/professor/disciplines/:id" element={<ProfessorDisciplineDetail />} />
@@ -139,19 +117,8 @@ function AppRoutes() {
         <Route path="/professor/email" element={<StudentEmail />} />
         <Route path="/professor/chat" element={<StudentChat />} />
         <Route path="/professor/profile" element={<StudentProfile />} />
-
-        {/* Coordinator routes */}
-        <Route path="/coordinator" element={<CoordinatorDashboard />} />
-        <Route path="/coordinator/disciplines" element={<CoordinatorDisciplines />} />
-        <Route path="/coordinator/professors" element={<CoordinatorProfessors />} />
-        <Route path="/coordinator/students" element={<CoordinatorStudents />} />
-        <Route path="/coordinator/evaluations" element={<CoordinatorEvaluations />} />
-        <Route path="/coordinator/calendar" element={<StudentCalendar />} />
-        <Route path="/coordinator/reports" element={<CoordinatorReports />} />
-        <Route path="/coordinator/announcements" element={<CoordinatorAnnouncements />} />
-
-        {/* Coordenador de Curso routes */}
-        <Route path="/coordenador" element={<CoordenadorCursoDashboard />} />
+        {/* Coordenador de Curso */}
+        <Route path="/coordenador" element={<CoordenadorDashboard />} />
         <Route path="/coordenador/calendario" element={<StudentCalendar />} />
         <Route path="/coordenador/anuncios" element={<StudentAnnouncements />} />
         <Route path="/coordenador/aprovacoes" element={<CoordenadorAprovacoes />} />
@@ -163,8 +130,7 @@ function AppRoutes() {
         <Route path="/coordenador/relatorios" element={<CoordenadorRelatorios />} />
         <Route path="/coordenador/financas" element={<CoordenadorFinancas />} />
         <Route path="/coordenador/perfil" element={<StudentProfile />} />
-
-        {/* Decano routes */}
+        {/* Decano */}
         <Route path="/decano" element={<DecanoDashboard />} />
         <Route path="/decano/calendario" element={<StudentCalendar />} />
         <Route path="/decano/anuncios" element={<StudentAnnouncements />} />
@@ -176,8 +142,7 @@ function AppRoutes() {
         <Route path="/decano/relatorios" element={<DecanoRelatorios />} />
         <Route path="/decano/financas" element={<DecanoFinancas />} />
         <Route path="/decano/perfil" element={<StudentProfile />} />
-
-        {/* Reitoria routes */}
+        {/* Reitoria */}
         <Route path="/reitoria" element={<ReitoriaDashboard />} />
         <Route path="/reitoria/calendario" element={<StudentCalendar />} />
         <Route path="/reitoria/anuncios" element={<StudentAnnouncements />} />
@@ -191,7 +156,6 @@ function AppRoutes() {
         <Route path="/reitoria/financas" element={<ReitoriaFinancas />} />
         <Route path="/reitoria/perfil" element={<StudentProfile />} />
       </Route>
-
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
