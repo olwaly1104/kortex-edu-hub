@@ -88,7 +88,7 @@ const decanoSections: NavSection[] = [
     { label: "Aprovações", icon: CheckSquare, path: "/decano/aprovacoes" },
   ]},
   { title: "Académico", items: [
-    { label: "Faculdades", icon: Building2, path: "/decano/faculdades" },
+    { label: "Meus Cursos", icon: Building2, path: "/decano/faculdades" },
     { label: "Estudantes", icon: Users, path: "/decano/estudantes" },
     { label: "Docentes", icon: GraduationCap, path: "/decano/docentes" },
     { label: "Notas", icon: Award, path: "/decano/notas" },
