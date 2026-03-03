@@ -203,9 +203,9 @@ export default function CoordenadorCursoDashboard() {
                     <div className="px-2.5 py-1.5 rounded-lg border border-border bg-card border-l-[3px] border-l-destructive hover:bg-muted/40 transition-colors cursor-pointer w-full flex flex-col justify-center">
                       <p className="text-[11px] font-semibold text-foreground leading-tight truncate">{d.name.replace("Prof. ", "")}</p>
                       <div className="flex items-center justify-between mt-1 text-[9px] gap-1">
-                        <span className={`px-1.5 py-0.5 rounded border ${d.presenca < 85 ? "border-destructive/30 text-destructive font-medium bg-destructive/5" : "border-border text-muted-foreground"}`}>Presença {d.presenca}%</span>
-                        <span className={`px-1.5 py-0.5 rounded border ${d.taxaEntrega < 80 ? "border-destructive/30 text-destructive font-medium bg-destructive/5" : "border-border text-muted-foreground"}`}>Entrega {d.taxaEntrega}%</span>
-                        <span className={`px-1.5 py-0.5 rounded border ${d.mediaGeral < 11 ? "border-destructive/30 text-destructive font-medium bg-destructive/5" : "border-border text-muted-foreground"}`}>Média {d.mediaGeral}</span>
+                        <span className={d.presenca < 85 ? "text-destructive font-medium" : "text-muted-foreground"}><span className="px-1 py-0.5 rounded border border-border text-muted-foreground mr-0.5">Presença</span> {d.presenca}%</span>
+                        <span className={d.taxaEntrega < 80 ? "text-destructive font-medium" : "text-muted-foreground"}><span className="px-1 py-0.5 rounded border border-border text-muted-foreground mr-0.5">Entrega</span> {d.taxaEntrega}%</span>
+                        <span className={d.mediaGeral < 11 ? "text-destructive font-medium" : "text-muted-foreground"}><span className="px-1 py-0.5 rounded border border-border text-muted-foreground mr-0.5">Média</span> {d.mediaGeral}</span>
                       </div>
                     </div>
                   </Link>
@@ -230,9 +230,9 @@ export default function CoordenadorCursoDashboard() {
                     <div className="px-2.5 py-1.5 rounded-lg border border-border bg-card border-l-[3px] border-l-destructive hover:bg-muted/40 transition-colors cursor-pointer w-full flex flex-col justify-center">
                       <p className="text-[11px] font-semibold text-foreground leading-tight">{t.name} <span className="font-normal text-[9px] text-muted-foreground">• {t.year}º Ano</span></p>
                       <div className="flex items-center justify-between mt-1 text-[9px] gap-1">
-                        <span className={`px-1.5 py-0.5 rounded border ${t.presenca < 80 ? "border-destructive/30 text-destructive font-medium bg-destructive/5" : "border-border text-muted-foreground"}`}>Presença {t.presenca}%</span>
-                        <span className={`px-1.5 py-0.5 rounded border ${t.taxaEntrega < 85 ? "border-destructive/30 text-destructive font-medium bg-destructive/5" : "border-border text-muted-foreground"}`}>Entrega {t.taxaEntrega}%</span>
-                        <span className={`px-1.5 py-0.5 rounded border ${t.media < 12 ? "border-destructive/30 text-destructive font-medium bg-destructive/5" : "border-border text-muted-foreground"}`}>Média {t.media}</span>
+                        <span className={t.presenca < 80 ? "text-destructive font-medium" : "text-muted-foreground"}><span className="px-1 py-0.5 rounded border border-border text-muted-foreground mr-0.5">Presença</span> {t.presenca}%</span>
+                        <span className={t.taxaEntrega < 85 ? "text-destructive font-medium" : "text-muted-foreground"}><span className="px-1 py-0.5 rounded border border-border text-muted-foreground mr-0.5">Entrega</span> {t.taxaEntrega}%</span>
+                        <span className={t.media < 12 ? "text-destructive font-medium" : "text-muted-foreground"}><span className="px-1 py-0.5 rounded border border-border text-muted-foreground mr-0.5">Média</span> {t.media}</span>
                       </div>
                     </div>
                   </Link>
@@ -257,9 +257,9 @@ export default function CoordenadorCursoDashboard() {
                     <div className="px-2.5 py-1.5 rounded-lg border border-border bg-card border-l-[3px] border-l-destructive hover:bg-muted/40 transition-colors cursor-pointer w-full flex flex-col justify-center">
                       <p className="text-[11px] font-semibold text-foreground leading-tight truncate">{e.name}</p>
                       <div className="flex items-center justify-between mt-1 text-[9px] gap-1">
-                        <span className="px-1.5 py-0.5 rounded border border-destructive/30 text-destructive font-medium bg-destructive/5">Média {e.media ?? "—"}</span>
-                        <span className={`px-1.5 py-0.5 rounded border ${e.presenca < 70 ? "border-destructive/30 text-destructive font-medium bg-destructive/5" : "border-border text-muted-foreground"}`}>Presença {e.presenca}%</span>
-                        <span className={`px-1.5 py-0.5 rounded border ${e.taxaEntrega < 60 ? "border-destructive/30 text-destructive font-medium bg-destructive/5" : "border-border text-muted-foreground"}`}>Entrega {e.taxaEntrega}%</span>
+                        <span className="text-destructive font-medium"><span className="px-1 py-0.5 rounded border border-border text-muted-foreground mr-0.5">Média</span> {e.media ?? "—"}</span>
+                        <span className={e.presenca < 70 ? "text-destructive font-medium" : "text-muted-foreground"}><span className="px-1 py-0.5 rounded border border-border text-muted-foreground mr-0.5">Presença</span> {e.presenca}%</span>
+                        <span className={e.taxaEntrega < 60 ? "text-destructive font-medium" : "text-muted-foreground"}><span className="px-1 py-0.5 rounded border border-border text-muted-foreground mr-0.5">Entrega</span> {e.taxaEntrega}%</span>
                       </div>
                     </div>
                   </Link>
