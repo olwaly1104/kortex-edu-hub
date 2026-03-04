@@ -164,7 +164,7 @@ export default function CoordenadorNotas() {
                         <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{a.local}</span>
                       </div>
                     </div>
-                    <div className="grid grid-cols-4 gap-4 shrink-0 text-center">
+                    <div className="grid grid-cols-6 gap-3 shrink-0 text-center">
                       <div>
                         <p className="text-[10px] text-muted-foreground uppercase">Média</p>
                         <p className={`text-xs font-bold ${a.media >= 10 ? "text-accent" : "text-destructive"}`}>{a.media}/20</p>
@@ -178,8 +178,16 @@ export default function CoordenadorNotas() {
                         <p className="text-xs font-bold text-accent">{a.aprovados}</p>
                       </div>
                       <div>
+                        <p className="text-[10px] text-muted-foreground uppercase">% Aprov.</p>
+                        <p className={`text-xs font-bold ${total > 0 && Math.round((a.aprovados / total) * 100) >= 70 ? "text-accent" : total > 0 && Math.round((a.aprovados / total) * 100) >= 50 ? "text-foreground" : "text-destructive"}`}>{total > 0 ? Math.round((a.aprovados / total) * 100) : 0}%</p>
+                      </div>
+                      <div>
                         <p className="text-[10px] text-muted-foreground uppercase">Reprov.</p>
                         <p className="text-xs font-bold text-destructive">{a.reprovados}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-muted-foreground uppercase">% Reprov.</p>
+                        <p className={`text-xs font-bold ${total > 0 && Math.round((a.reprovados / total) * 100) > 30 ? "text-destructive" : "text-foreground"}`}>{total > 0 ? Math.round((a.reprovados / total) * 100) : 0}%</p>
                       </div>
                     </div>
                   </div>
