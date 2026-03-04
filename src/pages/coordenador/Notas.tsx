@@ -87,6 +87,16 @@ export default function CoordenadorNotas() {
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2 min-w-0">
                           <p className="text-xs font-semibold text-foreground">Turma {t.turma}</p>
+                          <Badge
+                            variant="outline"
+                            className={`text-[9px] ${
+                              t.mediaGeral >= 14 ? "bg-accent/15 text-accent border-accent/30"
+                              : t.mediaGeral >= 10 ? "bg-muted text-muted-foreground border-border"
+                              : "bg-destructive/15 text-destructive border-destructive/30"
+                            }`}
+                          >
+                            {t.mediaGeral >= 14 ? "Excelente" : t.mediaGeral >= 10 ? "Normal" : "Em Risco"}
+                          </Badge>
                         </div>
                         <div className="flex items-center gap-3 shrink-0">
                           <div className="text-right">
