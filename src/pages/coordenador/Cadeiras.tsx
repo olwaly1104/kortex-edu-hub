@@ -2,20 +2,37 @@ import { coordDisciplinas, coordCursoInfo } from "@/data/institutionData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { BookOpen, Award, ClipboardCheck, Clock, Search, ArrowUpDown, X } from "lucide-react";
+import { BookOpen, Award, ClipboardCheck, Clock, Search, X, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { useState, useMemo } from "react";
 
-type SortField = "none" | "media-asc" | "media-desc" | "presenca-asc" | "presenca-desc" | "entrega-asc" | "entrega-desc" | "estudantes-asc" | "estudantes-desc";
+type SortField = "media" | "presenca" | "entrega" | null;
+type SortDir = "asc" | "desc";
+type StatusFilter = "excelente" | "normal" | "risco";
 
 export default function CoordenadorCadeiras() {
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [search, setSearch] = useState("");
-  const [sortBy, setSortBy] = useState<SortField>("none");
+  const [sortField, setSortField] = useState<SortField>(null);
+  const [sortDir, setSortDir] = useState<SortDir>("desc");
+  const [statusFilters, setStatusFilters] = useState<StatusFilter[]>([]);
 
-  const hasFilters = selectedYear !== null || search !== "" || sortBy !== "none";
+  const toggleStatus = (s: StatusFilter) => {
+    setStatusFilters(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s]);
+  };
+
+  const toggleSort = (field: SortField) => {
+    if (sortField === field) {
+      if (sortDir === "desc") setSortDir("asc");
+      else { setSortField(null); setSortDir("desc"); }
+    } else {
+      setSortField(field);
+      setSortDir("desc");
+    }
+  };
+
+  const hasFilters = selectedYear !== null || search !== "" || sortField !== null || statusFilters.length > 0;
 
   const filtered = useMemo(() => {
     let list = coordDisciplinas
@@ -24,22 +41,21 @@ export default function CoordenadorCadeiras() {
         if (!search) return true;
         const q = search.toLowerCase();
         return d.name.toLowerCase().includes(q) || d.code.toLowerCase().includes(q) || d.professor.toLowerCase().includes(q);
-      });
+      })
+      .filter(d => statusFilters.length === 0 || statusFilters.includes(d.status as StatusFilter));
 
-    if (sortBy !== "none") {
-      const [field, dir] = sortBy.split("-") as [string, string];
+    if (sortField) {
       list = [...list].sort((a, b) => {
         let va = 0, vb = 0;
-        if (field === "media") { va = a.media ?? 0; vb = b.media ?? 0; }
-        else if (field === "presenca") { va = a.presenca; vb = b.presenca; }
-        else if (field === "entrega") { va = a.taxaEntrega; vb = b.taxaEntrega; }
-        else if (field === "estudantes") { va = a.estudantes; vb = b.estudantes; }
-        return dir === "asc" ? va - vb : vb - va;
+        if (sortField === "media") { va = a.media ?? 0; vb = b.media ?? 0; }
+        else if (sortField === "presenca") { va = a.presenca; vb = b.presenca; }
+        else if (sortField === "entrega") { va = a.taxaEntrega; vb = b.taxaEntrega; }
+        return sortDir === "asc" ? va - vb : vb - va;
       });
     }
 
     return list;
-  }, [selectedYear, search, sortBy]);
+  }, [selectedYear, search, sortField, sortDir, statusFilters]);
 
   const totalCadeiras = filtered.length;
   const avgPresenca = filtered.length
@@ -55,7 +71,14 @@ export default function CoordenadorCadeiras() {
   const clearFilters = () => {
     setSelectedYear(null);
     setSearch("");
-    setSortBy("none");
+    setSortField(null);
+    setSortDir("desc");
+    setStatusFilters([]);
+  };
+
+  const SortIcon = ({ field }: { field: SortField }) => {
+    if (sortField !== field) return <ArrowUpDown className="w-3 h-3 text-muted-foreground/50" />;
+    return sortDir === "desc" ? <ArrowDown className="w-3 h-3 text-primary" /> : <ArrowUp className="w-3 h-3 text-primary" />;
   };
 
   return (
@@ -99,58 +122,76 @@ export default function CoordenadorCadeiras() {
         </Card>
       </div>
 
-      {/* Year toggle */}
-      <div className="flex items-center gap-2 flex-wrap">
-        <span className="text-xs text-muted-foreground font-medium">Ano:</span>
-        <button
-          onClick={() => setSelectedYear(null)}
-          className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${selectedYear === null ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}
-        >Todos</button>
-        {coordCursoInfo.years.map(y => (
-          <button
-            key={y.year}
-            onClick={() => setSelectedYear(y.year)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${selectedYear === y.year ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}
-          >{y.year}º Ano</button>
-        ))}
-        {hasFilters && (
-          <Button variant="ghost" size="sm" onClick={clearFilters} className="text-xs h-7 gap-1 text-muted-foreground ml-auto">
-            <X className="w-3.5 h-3.5" /> Limpar filtros
-          </Button>
-        )}
-      </div>
+      {/* Filters bar */}
+      <Card className="p-4">
+        <div className="flex flex-col gap-3">
+          {/* Row 1: Search + Year + Clear */}
+          <div className="flex items-center gap-3 flex-wrap">
+            <div className="relative w-full sm:w-56">
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                placeholder="Pesquisar cadeira..."
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                className="pl-8 h-8 text-xs"
+              />
+            </div>
+            <div className="h-6 w-px bg-border hidden sm:block" />
+            <div className="flex items-center gap-1.5">
+              <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Ano:</span>
+              <button
+                onClick={() => setSelectedYear(null)}
+                className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-all ${selectedYear === null ? "bg-primary text-primary-foreground shadow-sm" : "bg-muted/60 text-muted-foreground hover:bg-muted"}`}
+              >Todos</button>
+              {coordCursoInfo.years.map(y => (
+                <button
+                  key={y.year}
+                  onClick={() => setSelectedYear(y.year)}
+                  className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-all ${selectedYear === y.year ? "bg-primary text-primary-foreground shadow-sm" : "bg-muted/60 text-muted-foreground hover:bg-muted"}`}
+                >{y.year}º</button>
+              ))}
+            </div>
+            {hasFilters && (
+              <Button variant="ghost" size="sm" onClick={clearFilters} className="text-[11px] h-7 gap-1 text-muted-foreground ml-auto">
+                <X className="w-3 h-3" /> Limpar
+              </Button>
+            )}
+          </div>
 
-      {/* Search + Sort row */}
-      <div className="flex items-center gap-3">
-        <div className="relative w-full sm:w-64">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder="Pesquisar cadeira..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            className="pl-8 h-9 text-xs"
-          />
+          {/* Row 2: Sort chips + Status chips */}
+          <div className="flex items-center gap-3 flex-wrap">
+            <div className="flex items-center gap-1.5">
+              <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Ordenar:</span>
+              {(["media", "presenca", "entrega"] as SortField[]).map(f => (
+                <button
+                  key={f}
+                  onClick={() => toggleSort(f)}
+                  className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-all flex items-center gap-1 ${sortField === f ? "bg-primary/10 text-primary border border-primary/30" : "bg-muted/60 text-muted-foreground hover:bg-muted border border-transparent"}`}
+                >
+                  {f === "media" ? "Média" : f === "presenca" ? "Presença" : "Entrega"}
+                  <SortIcon field={f} />
+                </button>
+              ))}
+            </div>
+            <div className="h-5 w-px bg-border hidden sm:block" />
+            <div className="flex items-center gap-1.5">
+              <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Estado:</span>
+              <button
+                onClick={() => toggleStatus("excelente")}
+                className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-all border ${statusFilters.includes("excelente") ? "bg-accent/15 text-accent border-accent/30" : "bg-muted/60 text-muted-foreground hover:bg-muted border-transparent"}`}
+              >Excelente</button>
+              <button
+                onClick={() => toggleStatus("normal")}
+                className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-all border ${statusFilters.includes("normal") ? "bg-secondary/15 text-secondary-foreground border-border" : "bg-muted/60 text-muted-foreground hover:bg-muted border-transparent"}`}
+              >Normal</button>
+              <button
+                onClick={() => toggleStatus("risco")}
+                className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-all border ${statusFilters.includes("risco") ? "bg-destructive/15 text-destructive border-destructive/30" : "bg-muted/60 text-muted-foreground hover:bg-muted border-transparent"}`}
+              >Em Risco</button>
+            </div>
+          </div>
         </div>
-        <div className="flex items-center gap-2 ml-auto">
-          <ArrowUpDown className="w-3.5 h-3.5 text-muted-foreground" />
-          <Select value={sortBy} onValueChange={(v) => setSortBy(v as SortField)}>
-            <SelectTrigger className="w-48 h-9 text-xs">
-              <SelectValue placeholder="Ordenar" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="none">Sem ordenação</SelectItem>
-              <SelectItem value="media-desc">Média ↓ (maior)</SelectItem>
-              <SelectItem value="media-asc">Média ↑ (menor)</SelectItem>
-              <SelectItem value="presenca-desc">Presença ↓ (maior)</SelectItem>
-              <SelectItem value="presenca-asc">Presença ↑ (menor)</SelectItem>
-              <SelectItem value="entrega-desc">Entrega ↓ (maior)</SelectItem>
-              <SelectItem value="entrega-asc">Entrega ↑ (menor)</SelectItem>
-              <SelectItem value="estudantes-desc">Estudantes ↓ (maior)</SelectItem>
-              <SelectItem value="estudantes-asc">Estudantes ↑ (menor)</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
+      </Card>
 
       {/* Table */}
       <Card>
@@ -159,8 +200,8 @@ export default function CoordenadorCadeiras() {
             <TableRow>
               <TableHead className="text-xs">Cadeira</TableHead>
               <TableHead className="text-xs">Curso</TableHead>
-              <TableHead className="text-xs">Professor</TableHead>
               <TableHead className="text-xs">Ano</TableHead>
+              <TableHead className="text-xs">Professor</TableHead>
               <TableHead className="text-xs text-center">Estudantes</TableHead>
               <TableHead className="text-xs text-center">Presença</TableHead>
               <TableHead className="text-xs text-center">Entrega</TableHead>
@@ -178,8 +219,8 @@ export default function CoordenadorCadeiras() {
                   </div>
                 </TableCell>
                 <TableCell className="text-xs text-muted-foreground">{coordCursoInfo.name}</TableCell>
-                <TableCell className="text-xs text-muted-foreground">{d.professor}</TableCell>
                 <TableCell className="text-xs text-muted-foreground">{d.year}º</TableCell>
+                <TableCell className="text-xs text-muted-foreground">{d.professor}</TableCell>
                 <TableCell className="text-xs font-bold text-foreground text-center">{d.estudantes}</TableCell>
                 <TableCell className="text-center">
                   <span className={`text-xs font-bold ${d.presenca >= 75 ? "text-accent" : "text-destructive"}`}>{d.presenca}%</span>
