@@ -4,7 +4,8 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Users, Award, MapPin, Calendar, User, ClipboardCheck, Clock, Search, ArrowUpDown, X } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { BookOpen, Award, ClipboardCheck, Clock, Search, ArrowUpDown, X } from "lucide-react";
 import { useState, useMemo } from "react";
 
 type SortField = "none" | "media-asc" | "media-desc" | "presenca-asc" | "presenca-desc" | "entrega-asc" | "entrega-desc" | "estudantes-asc" | "estudantes-desc";
@@ -151,60 +152,54 @@ export default function CoordenadorCadeiras() {
         </div>
       </div>
 
-      {/* Discipline cards grouped by year */}
-      {(selectedYear ? [selectedYear] : [...new Set(coordDisciplinas.map(d => d.year))].sort()).map(year => {
-        const yearDisciplinas = filtered.filter(d => d.year === year);
-        if (yearDisciplinas.length === 0) return null;
-        return (
-          <div key={year}>
-            <h2 className="text-lg font-semibold text-foreground mb-3">{year}º Ano</h2>
-            <div className="space-y-2">
-              {yearDisciplinas.map(d => (
-                <Card key={d.id} className={`p-4 border-l-[3px] ${(d.media ?? 0) >= 10 ? "border-l-accent" : "border-l-destructive"} hover:shadow-md transition-shadow`}>
-                  <div className="flex items-center gap-4">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <p className="text-sm font-semibold text-foreground">{d.name}</p>
-                        <Badge variant="outline" className="text-[10px] font-mono">{d.code}</Badge>
-                      </div>
-                      <div className="flex items-center gap-3 text-[10px] text-muted-foreground flex-wrap">
-                        <span className="flex items-center gap-1"><BookOpen className="w-3 h-3" />{coordCursoInfo.name}</span>
-                        <span className="flex items-center gap-1"><User className="w-3 h-3" />{d.professor}</span>
-                        <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{d.diasAula}</span>
-                        <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{d.location}</span>
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-5 gap-4 shrink-0 text-center">
-                      <div>
-                        <p className="text-[10px] text-muted-foreground uppercase">Estudantes</p>
-                        <p className="text-xs font-bold text-foreground">{d.estudantes}</p>
-                      </div>
-                      <div>
-                        <p className="text-[10px] text-muted-foreground uppercase">Média</p>
-                        <p className={`text-xs font-bold ${(d.media ?? 0) >= 10 ? "text-accent" : "text-destructive"}`}>{d.media ?? "–"}/20</p>
-                      </div>
-                      <div>
-                        <p className="text-[10px] text-muted-foreground uppercase">Presença</p>
-                        <p className={`text-xs font-bold ${d.presenca >= 75 ? "text-accent" : "text-destructive"}`}>{d.presenca}%</p>
-                      </div>
-                      <div>
-                        <p className="text-[10px] text-muted-foreground uppercase">Entrega</p>
-                        <p className={`text-xs font-bold ${d.taxaEntrega >= 75 ? "text-accent" : "text-destructive"}`}>{d.taxaEntrega}%</p>
-                      </div>
-                      <div>
-                        <p className="text-[10px] text-muted-foreground uppercase">Estado</p>
-                        <Badge className={`text-[10px] ${d.status === "excelente" ? "bg-accent/15 text-accent border-accent/30" : d.status === "risco" ? "bg-destructive/15 text-destructive border-destructive/30" : "bg-muted text-muted-foreground border-border"}`} variant="outline">
-                          {d.status === "excelente" ? "Excelente" : d.status === "risco" ? "Em Risco" : "Normal"}
-                        </Badge>
-                      </div>
-                    </div>
+      {/* Table */}
+      <Card>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="text-xs">Cadeira</TableHead>
+              <TableHead className="text-xs">Curso</TableHead>
+              <TableHead className="text-xs">Professor</TableHead>
+              <TableHead className="text-xs">Ano</TableHead>
+              <TableHead className="text-xs text-center">Estudantes</TableHead>
+              <TableHead className="text-xs text-center">Presença</TableHead>
+              <TableHead className="text-xs text-center">Entrega</TableHead>
+              <TableHead className="text-xs text-center">Média</TableHead>
+              <TableHead className="text-xs text-center">Estado</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filtered.map(d => (
+              <TableRow key={d.id} className="hover:bg-muted/50">
+                <TableCell>
+                  <div>
+                    <p className="text-sm font-medium text-foreground">{d.name}</p>
+                    <p className="text-[10px] text-muted-foreground font-mono">{d.code}</p>
                   </div>
-                </Card>
-              ))}
-            </div>
-          </div>
-        );
-      })}
+                </TableCell>
+                <TableCell className="text-xs text-muted-foreground">{coordCursoInfo.name}</TableCell>
+                <TableCell className="text-xs text-muted-foreground">{d.professor}</TableCell>
+                <TableCell className="text-xs text-muted-foreground">{d.year}º</TableCell>
+                <TableCell className="text-xs font-bold text-foreground text-center">{d.estudantes}</TableCell>
+                <TableCell className="text-center">
+                  <span className={`text-xs font-bold ${d.presenca >= 75 ? "text-accent" : "text-destructive"}`}>{d.presenca}%</span>
+                </TableCell>
+                <TableCell className="text-center">
+                  <span className={`text-xs font-bold ${d.taxaEntrega >= 75 ? "text-accent" : "text-destructive"}`}>{d.taxaEntrega}%</span>
+                </TableCell>
+                <TableCell className="text-center">
+                  <span className={`text-xs font-bold ${(d.media ?? 0) >= 10 ? "text-accent" : "text-destructive"}`}>{d.media ?? "–"}/20</span>
+                </TableCell>
+                <TableCell className="text-center">
+                  <Badge className={`text-[10px] ${d.status === "excelente" ? "bg-accent/15 text-accent border-accent/30" : d.status === "risco" ? "bg-destructive/15 text-destructive border-destructive/30" : "bg-muted text-muted-foreground border-border"}`} variant="outline">
+                    {d.status === "excelente" ? "Excelente" : d.status === "risco" ? "Em Risco" : "Normal"}
+                  </Badge>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </Card>
     </div>
   );
 }
