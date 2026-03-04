@@ -166,9 +166,6 @@ export default function CoordenadorCadeiras() {
                       <div className="flex items-center gap-2 mb-1">
                         <p className="text-sm font-semibold text-foreground">{d.name}</p>
                         <Badge variant="outline" className="text-[10px] font-mono">{d.code}</Badge>
-                        <Badge className={`text-[10px] ${d.status === "excelente" ? "bg-accent/15 text-accent border-accent/30" : d.status === "risco" ? "bg-destructive/15 text-destructive border-destructive/30" : "bg-muted text-muted-foreground border-border"}`} variant="outline">
-                          {d.status === "excelente" ? "Excelente" : d.status === "risco" ? "Em Risco" : "Normal"}
-                        </Badge>
                       </div>
                       <div className="flex items-center gap-3 text-[10px] text-muted-foreground flex-wrap">
                         <span className="flex items-center gap-1"><BookOpen className="w-3 h-3" />{coordCursoInfo.name}</span>
@@ -177,7 +174,7 @@ export default function CoordenadorCadeiras() {
                         <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{d.location}</span>
                       </div>
                     </div>
-                    <div className="grid grid-cols-4 gap-4 shrink-0 text-center">
+                    <div className="grid grid-cols-5 gap-4 shrink-0 text-center">
                       <div>
                         <p className="text-[10px] text-muted-foreground uppercase">Estudantes</p>
                         <p className="text-xs font-bold text-foreground">{d.estudantes}</p>
@@ -193,6 +190,12 @@ export default function CoordenadorCadeiras() {
                       <div>
                         <p className="text-[10px] text-muted-foreground uppercase">Entrega</p>
                         <p className={`text-xs font-bold ${d.taxaEntrega >= 75 ? "text-accent" : "text-destructive"}`}>{d.taxaEntrega}%</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-muted-foreground uppercase">Estado</p>
+                        <Badge className={`text-[10px] ${d.status === "excelente" ? "bg-accent/15 text-accent border-accent/30" : d.status === "risco" ? "bg-destructive/15 text-destructive border-destructive/30" : "bg-muted text-muted-foreground border-border"}`} variant="outline">
+                          {d.status === "excelente" ? "Excelente" : d.status === "risco" ? "Em Risco" : "Normal"}
+                        </Badge>
                       </div>
                     </div>
                   </div>
