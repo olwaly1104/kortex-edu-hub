@@ -1,23 +1,31 @@
 import { coordDisciplinas, coordCursoInfo } from "@/data/institutionData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { BookOpen, Users, Award, MapPin, Calendar, User, TrendingUp } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { BookOpen, Users, Award, MapPin, Calendar, User, ClipboardCheck, Clock, Search } from "lucide-react";
 import { useState } from "react";
 
 export default function CoordenadorCadeiras() {
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
+  const [search, setSearch] = useState("");
 
-  const filtered = selectedYear
-    ? coordDisciplinas.filter(d => d.year === selectedYear)
-    : coordDisciplinas;
+  const filtered = coordDisciplinas
+    .filter(d => selectedYear === null || d.year === selectedYear)
+    .filter(d => {
+      if (!search) return true;
+      const q = search.toLowerCase();
+      return d.name.toLowerCase().includes(q) || d.code.toLowerCase().includes(q) || d.professor.toLowerCase().includes(q);
+    });
 
   const totalCadeiras = filtered.length;
-  const totalEstudantes = filtered.reduce((s, d) => s + d.estudantes, 0);
+  const avgPresenca = filtered.length
+    ? Math.round(filtered.reduce((s, d) => s + d.presenca, 0) / filtered.length)
+    : 0;
+  const avgTaxaEntrega = filtered.length
+    ? Math.round(filtered.reduce((s, d) => s + d.taxaEntrega, 0) / filtered.length)
+    : 0;
   const avgMedia = filtered.length
     ? Math.round((filtered.reduce((s, d) => s + (d.media ?? 0), 0) / filtered.length) * 10) / 10
-    : 0;
-  const avgTaxaSucesso = filtered.length
-    ? Math.round(filtered.reduce((s, d) => s + d.taxaSucesso, 0) / filtered.length)
     : 0;
 
   return (
@@ -27,22 +35,6 @@ export default function CoordenadorCadeiras() {
           <BookOpen className="w-6 h-6 text-primary" /> Cadeiras do Curso
         </h1>
         <p className="text-muted-foreground mt-1">{coordCursoInfo.name} · {coordCursoInfo.faculty}</p>
-      </div>
-
-      {/* Year selector */}
-      <div className="flex items-center gap-2 flex-wrap">
-        <span className="text-xs text-muted-foreground font-medium">Ano:</span>
-        <button
-          onClick={() => setSelectedYear(null)}
-          className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${selectedYear === null ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}
-        >Todos</button>
-        {coordCursoInfo.years.map(y => (
-          <button
-            key={y.year}
-            onClick={() => setSelectedYear(y.year)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${selectedYear === y.year ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}
-          >{y.year}º Ano</button>
-        ))}
       </div>
 
       {/* KPI Cards */}
@@ -56,10 +48,17 @@ export default function CoordenadorCadeiras() {
         </Card>
         <Card className="p-4">
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><Users className="w-4 h-4 text-primary" /></div>
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Estudantes</span>
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><Clock className="w-4 h-4 text-primary" /></div>
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Presença Geral</span>
           </div>
-          <p className="text-2xl font-bold text-foreground">{totalEstudantes}</p>
+          <p className={`text-2xl font-bold ${avgPresenca >= 75 ? "text-accent" : "text-destructive"}`}>{avgPresenca}%</p>
+        </Card>
+        <Card className="p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><ClipboardCheck className="w-4 h-4 text-primary" /></div>
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Taxa de Entrega</span>
+          </div>
+          <p className={`text-2xl font-bold ${avgTaxaEntrega >= 75 ? "text-accent" : "text-destructive"}`}>{avgTaxaEntrega}%</p>
         </Card>
         <Card className="p-4">
           <div className="flex items-center gap-2 mb-3">
@@ -68,13 +67,33 @@ export default function CoordenadorCadeiras() {
           </div>
           <p className={`text-2xl font-bold ${avgMedia >= 10 ? "text-accent" : "text-destructive"}`}>{avgMedia}/20</p>
         </Card>
-        <Card className="p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><TrendingUp className="w-4 h-4 text-primary" /></div>
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Taxa Sucesso</span>
-          </div>
-          <p className={`text-2xl font-bold ${avgTaxaSucesso >= 75 ? "text-accent" : "text-destructive"}`}>{avgTaxaSucesso}%</p>
-        </Card>
+      </div>
+
+      {/* Year toggle + Search */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-xs text-muted-foreground font-medium">Ano:</span>
+          <button
+            onClick={() => setSelectedYear(null)}
+            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${selectedYear === null ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}
+          >Todos</button>
+          {coordCursoInfo.years.map(y => (
+            <button
+              key={y.year}
+              onClick={() => setSelectedYear(y.year)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${selectedYear === y.year ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}
+            >{y.year}º Ano</button>
+          ))}
+        </div>
+        <div className="relative w-full sm:w-64 sm:ml-auto">
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            placeholder="Pesquisar cadeira..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            className="pl-8 h-9 text-xs"
+          />
+        </div>
       </div>
 
       {/* Discipline cards grouped by year */}
@@ -99,18 +118,22 @@ export default function CoordenadorCadeiras() {
                         <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{d.location}</span>
                       </div>
                     </div>
-                    <div className="grid grid-cols-3 gap-4 shrink-0 text-center">
-                      <div>
-                        <p className="text-[10px] text-muted-foreground uppercase">Média</p>
-                        <p className={`text-xs font-bold ${(d.media ?? 0) >= 10 ? "text-accent" : "text-destructive"}`}>{d.media ?? "–"}/20</p>
-                      </div>
+                    <div className="grid grid-cols-4 gap-4 shrink-0 text-center">
                       <div>
                         <p className="text-[10px] text-muted-foreground uppercase">Estudantes</p>
                         <p className="text-xs font-bold text-foreground">{d.estudantes}</p>
                       </div>
                       <div>
-                        <p className="text-[10px] text-muted-foreground uppercase">Sucesso</p>
-                        <p className={`text-xs font-bold ${d.taxaSucesso >= 75 ? "text-accent" : "text-destructive"}`}>{d.taxaSucesso}%</p>
+                        <p className="text-[10px] text-muted-foreground uppercase">Média</p>
+                        <p className={`text-xs font-bold ${(d.media ?? 0) >= 10 ? "text-accent" : "text-destructive"}`}>{d.media ?? "–"}/20</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-muted-foreground uppercase">Presença</p>
+                        <p className={`text-xs font-bold ${d.presenca >= 75 ? "text-accent" : "text-destructive"}`}>{d.presenca}%</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-muted-foreground uppercase">Entrega</p>
+                        <p className={`text-xs font-bold ${d.taxaEntrega >= 75 ? "text-accent" : "text-destructive"}`}>{d.taxaEntrega}%</p>
                       </div>
                     </div>
                   </div>
