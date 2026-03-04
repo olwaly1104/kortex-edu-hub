@@ -89,85 +89,88 @@ export default function CoordenadorCadeiras() {
         </Card>
       </div>
 
-      {/* Year filter */}
-      <div className="flex flex-wrap gap-2">
-        {[null, ...coordCursoInfo.years.map(y => y.year)].map(y => (
-          <Button key={String(y)} size="sm" variant={selectedYear === y ? "default" : "outline"} onClick={() => setSelectedYear(y)}>
-            {y === null ? "Todos os Anos" : `${y}º Ano`}
-          </Button>
-        ))}
-      </div>
-
-      {/* Search + Sort + Filter row */}
-      <div className="flex gap-2 items-center">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input placeholder="Pesquisar cadeira..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9 h-9" />
+      {/* Controls box */}
+      <Card className="p-3 space-y-3">
+        {/* Year filter */}
+        <div className="flex flex-wrap gap-2">
+          {[null, ...coordCursoInfo.years.map(y => y.year)].map(y => (
+            <Button key={String(y)} size="sm" variant={selectedYear === y ? "default" : "outline"} onClick={() => setSelectedYear(y)}>
+              {y === null ? "Todos os Anos" : `${y}º Ano`}
+            </Button>
+          ))}
         </div>
 
-        <div className="flex-1" />
+        {/* Search + Sort + Filter row */}
+        <div className="flex gap-2 items-center">
+          <div className="relative flex-1 max-w-sm">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input placeholder="Pesquisar cadeira..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9 h-9" />
+          </div>
 
-        {(filterStatus !== "todos" || sortDir !== "desc" || sortField !== "media") && (
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-xs text-muted-foreground shrink-0 gap-1"
-            onClick={() => { setFilterStatus("todos"); setSortField("media"); setSortDir("desc"); }}
-          >
-            <X className="w-3 h-3" /> Limpar filtros
-          </Button>
-        )}
+          <div className="flex-1" />
 
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="outline" size="sm" className="gap-1.5 shrink-0">
-              <ArrowDown className="w-3.5 h-3.5" />
-              Ordenar
+          {(filterStatus !== "todos" || sortDir !== "desc") && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-xs text-muted-foreground shrink-0 gap-1"
+              onClick={() => { setFilterStatus("todos"); setSortField("media"); setSortDir("desc"); }}
+            >
+              <X className="w-3 h-3" /> Limpar filtros
             </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-40 p-2 space-y-0.5" align="end">
-            <button onClick={() => setSortDir("desc")} className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${sortDir === "desc" ? "bg-primary/10 text-primary font-medium" : "text-foreground hover:bg-muted"}`}>
-              Maior
-            </button>
-            <button onClick={() => setSortDir("asc")} className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${sortDir === "asc" ? "bg-primary/10 text-primary font-medium" : "text-foreground hover:bg-muted"}`}>
-              Menor
-            </button>
-          </PopoverContent>
-        </Popover>
+          )}
 
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="outline" size="sm" className="gap-1.5 shrink-0">
-              <SlidersHorizontal className="w-3.5 h-3.5" />
-              Filtrar por{filterStatus !== "todos" && ":"} {filterStatus === "todos" ? "" : filterStatus === "excelente" ? "Excelente" : filterStatus === "normal" ? "Normal" : filterStatus === "risco" ? "Em Risco" : filterStatus === "media" ? "Média" : filterStatus === "presenca" ? "Presença" : "Entrega"}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-44 p-2 space-y-0.5" align="end">
-            {[
-              { key: "todos", label: "Todos" },
-              { key: "media", label: "Média" },
-              { key: "presenca", label: "Presença" },
-              { key: "entrega", label: "Entrega" },
-              { key: "excelente", label: "Excelente" },
-              { key: "normal", label: "Normal" },
-              { key: "risco", label: "Em Risco" },
-            ].map(opt => (
-              <button
-                key={opt.key}
-                onClick={() => {
-                  setFilterStatus(opt.key);
-                  if (["media", "presenca", "entrega"].includes(opt.key)) {
-                    setSortField(opt.key as SortField);
-                  }
-                }}
-                className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${filterStatus === opt.key ? "bg-primary/10 text-primary font-medium" : "text-foreground hover:bg-muted"}`}
-              >
-                {opt.label}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm" className="gap-1.5 shrink-0">
+                <ArrowDown className="w-3.5 h-3.5" />
+                Ordenar
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-40 p-2 space-y-0.5" align="end">
+              <button onClick={() => setSortDir("desc")} className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${sortDir === "desc" ? "bg-primary/10 text-primary font-medium" : "text-foreground hover:bg-muted"}`}>
+                Maior
               </button>
-            ))}
-          </PopoverContent>
-        </Popover>
-      </div>
+              <button onClick={() => setSortDir("asc")} className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${sortDir === "asc" ? "bg-primary/10 text-primary font-medium" : "text-foreground hover:bg-muted"}`}>
+                Menor
+              </button>
+            </PopoverContent>
+          </Popover>
+
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm" className="gap-1.5 shrink-0">
+                <SlidersHorizontal className="w-3.5 h-3.5" />
+                Filtrar por{filterStatus !== "todos" && ":"} {filterStatus === "todos" ? "" : filterStatus === "excelente" ? "Excelente" : filterStatus === "normal" ? "Normal" : filterStatus === "risco" ? "Em Risco" : filterStatus === "media" ? "Média" : filterStatus === "presenca" ? "Presença" : "Entrega"}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-44 p-2 space-y-0.5" align="end">
+              {[
+                { key: "todos", label: "Todos" },
+                { key: "media", label: "Média" },
+                { key: "presenca", label: "Presença" },
+                { key: "entrega", label: "Entrega" },
+                { key: "excelente", label: "Excelente" },
+                { key: "normal", label: "Normal" },
+                { key: "risco", label: "Em Risco" },
+              ].map(opt => (
+                <button
+                  key={opt.key}
+                  onClick={() => {
+                    setFilterStatus(opt.key);
+                    if (["media", "presenca", "entrega"].includes(opt.key)) {
+                      setSortField(opt.key as SortField);
+                    }
+                  }}
+                  className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${filterStatus === opt.key ? "bg-primary/10 text-primary font-medium" : "text-foreground hover:bg-muted"}`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </PopoverContent>
+          </Popover>
+        </div>
+      </Card>
 
       {/* Table */}
       <Card className="overflow-hidden">
