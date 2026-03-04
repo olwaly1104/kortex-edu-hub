@@ -4,8 +4,9 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { BookOpen, Award, ClipboardCheck, Clock, Search, ArrowUp, ArrowDown } from "lucide-react";
+import { BookOpen, Award, ClipboardCheck, Clock, Search, ArrowUp, ArrowDown, SlidersHorizontal, Filter } from "lucide-react";
 import { useState, useMemo } from "react";
 
 type SortField = "media" | "presenca" | "entrega";
@@ -92,6 +93,79 @@ export default function CoordenadorCadeiras() {
             {y === null ? "Todos os Anos" : `${y}º Ano`}
           </Button>
         ))}
+      </div>
+
+      {/* Search + Sort + Filter — compact row */}
+      <div className="flex gap-2 flex-wrap">
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" size="sm" className="gap-1.5">
+              <Search className="w-3.5 h-3.5" /> Pesquisar
+              {search && <Badge variant="secondary" className="text-[10px] ml-1 px-1.5 py-0">{filtered.length}</Badge>}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-64 p-2" align="start">
+            <Input
+              placeholder="Nome, código ou professor..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              className="h-8 text-xs"
+              autoFocus
+            />
+          </PopoverContent>
+        </Popover>
+
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" size="sm" className="gap-1.5">
+              <SlidersHorizontal className="w-3.5 h-3.5" /> Ordenar
+              <span className="text-muted-foreground text-[10px]">
+                {sortField === "media" ? "Média" : sortField === "presenca" ? "Presença" : "Entrega"}
+              </span>
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-48 p-2 space-y-2" align="start">
+            <div className="flex gap-1">
+              <Button size="sm" variant={sortDir === "desc" ? "default" : "outline"} className="flex-1 text-xs h-7 gap-1" onClick={() => setSortDir("desc")}>
+                <ArrowDown className="w-3 h-3" /> Maior
+              </Button>
+              <Button size="sm" variant={sortDir === "asc" ? "default" : "outline"} className="flex-1 text-xs h-7 gap-1" onClick={() => setSortDir("asc")}>
+                <ArrowUp className="w-3 h-3" /> Menor
+              </Button>
+            </div>
+            <div className="space-y-0.5">
+              {(["media", "presenca", "entrega"] as SortField[]).map(f => (
+                <button
+                  key={f}
+                  onClick={() => setSortField(f)}
+                  className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${sortField === f ? "bg-primary/10 text-primary font-medium" : "text-foreground hover:bg-muted"}`}
+                >
+                  {f === "media" ? "Média" : f === "presenca" ? "Presença" : "Entrega"}
+                </button>
+              ))}
+            </div>
+          </PopoverContent>
+        </Popover>
+
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" size="sm" className="gap-1.5">
+              <Filter className="w-3.5 h-3.5" /> Filtrar
+              {filterStatus !== "todos" && <Badge variant="secondary" className="text-[10px] ml-1 px-1.5 py-0">1</Badge>}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-40 p-2 space-y-0.5" align="start">
+            {["todos", "excelente", "normal", "risco"].map(s => (
+              <button
+                key={s}
+                onClick={() => setFilterStatus(s)}
+                className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${filterStatus === s ? "bg-primary/10 text-primary font-medium" : "text-foreground hover:bg-muted"}`}
+              >
+                {s === "todos" ? "Todos" : s === "excelente" ? "Excelente" : s === "normal" ? "Normal" : "Em Risco"}
+              </button>
+            ))}
+          </PopoverContent>
+        </Popover>
       </div>
 
       {/* Search + Sort + Status filter */}
