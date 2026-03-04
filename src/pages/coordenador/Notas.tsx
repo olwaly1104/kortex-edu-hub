@@ -16,6 +16,16 @@ export default function CoordenadorNotas() {
   const totalAvalCompletas = allTurmas.reduce((s, t) => s + t.avaliacoesCompletas, 0);
   const totalAvalTotal = allTurmas.reduce((s, t) => s + t.avaliacoesTotal, 0);
 
+  const getTurmaAprovacao = (t: { avaliacoes: { aprovados: number; reprovados: number }[] }) => {
+    const totalAprov = t.avaliacoes.reduce((s, a) => s + a.aprovados, 0);
+    const totalPart = t.avaliacoes.reduce((s, a) => s + a.aprovados + a.reprovados, 0);
+    return totalPart > 0 ? Math.round((totalAprov / totalPart) * 100) : 0;
+  };
+
+  const globalAprov = allTurmas.reduce((s, t) => s + t.avaliacoes.reduce((a, e) => a + e.aprovados, 0), 0);
+  const globalPart = allTurmas.reduce((s, t) => s + t.avaliacoes.reduce((a, e) => a + e.aprovados + e.reprovados, 0), 0);
+  const taxaAprovacao = globalPart > 0 ? Math.round((globalAprov / globalPart) * 100) : 0;
+
   const selectedData = selectedTurma
     ? (() => {
         const [yr, tm] = selectedTurma.split("-");
@@ -53,10 +63,10 @@ export default function CoordenadorNotas() {
         <Card className="p-4 col-span-2 lg:col-span-1">
           <div className="flex items-center gap-2 mb-3">
             <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><Clock className="w-4 h-4 text-primary" /></div>
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Taxa Conclusão</span>
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Taxa Aprovação</span>
           </div>
-          <p className={`text-2xl font-bold ${totalAvalTotal > 0 && (totalAvalCompletas / totalAvalTotal) >= 0.8 ? "text-accent" : "text-foreground"}`}>
-            {totalAvalTotal > 0 ? Math.round((totalAvalCompletas / totalAvalTotal) * 100) : 0}%
+          <p className={`text-2xl font-bold ${taxaAprovacao >= 70 ? "text-accent" : taxaAprovacao >= 50 ? "text-foreground" : "text-destructive"}`}>
+            {taxaAprovacao}%
           </p>
         </Card>
       </div>
@@ -102,6 +112,10 @@ export default function CoordenadorNotas() {
                           <div className="text-right">
                             <p className="text-[9px] text-muted-foreground uppercase leading-tight">Média</p>
                             <p className={`text-xs font-bold ${t.mediaGeral >= 10 ? "text-accent" : "text-destructive"}`}>{t.mediaGeral}</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-[9px] text-muted-foreground uppercase leading-tight">Aprov.</p>
+                            <p className={`text-xs font-bold ${getTurmaAprovacao(t) >= 70 ? "text-accent" : getTurmaAprovacao(t) >= 50 ? "text-foreground" : "text-destructive"}`}>{getTurmaAprovacao(t)}%</p>
                           </div>
                           <div className="text-right">
                             <p className="text-[9px] text-muted-foreground uppercase leading-tight">Aval.</p>
