@@ -84,6 +84,7 @@ export interface CursoDisciplina {
   taxaEntrega: number;
   diasAula: string;
   location: string;
+  status: "excelente" | "normal" | "risco";
 }
 
 export interface AvaliacaoNota {
@@ -169,16 +170,16 @@ export const coordEstudantes: CursoEstudante[] = [
 ];
 
 export const coordDisciplinas: CursoDisciplina[] = [
-  { id: "cd1", name: "Matemática I", code: "MAT101", year: 1, professor: "Prof. Sofia Martins", estudantes: 64, media: 12.1, presenca: 82, taxaEntrega: 78, diasAula: "Seg, Qua, Sex", location: "Sala A101" },
-  { id: "cd2", name: "Física I", code: "FIS101", year: 1, professor: "Prof. Maria Santos", estudantes: 64, media: 11.8, presenca: 79, taxaEntrega: 74, diasAula: "Ter, Qui", location: "Lab. Física" },
-  { id: "cd3", name: "Desenho Técnico I", code: "DES101", year: 1, professor: "Prof. Luísa Tavares", estudantes: 64, media: 13.2, presenca: 88, taxaEntrega: 85, diasAula: "Seg, Qua", location: "Sala B203" },
-  { id: "cd4", name: "Matemática II", code: "MAT201", year: 2, professor: "Prof. António Silva", estudantes: 52, media: 13.0, presenca: 85, taxaEntrega: 82, diasAula: "Ter, Qui, Sex", location: "Sala A102" },
-  { id: "cd5", name: "Resistência dos Materiais", code: "RES201", year: 2, professor: "Prof. Carlos Mendes", estudantes: 52, media: 12.5, presenca: 83, taxaEntrega: 80, diasAula: "Seg, Qua", location: "Sala C301" },
-  { id: "cd6", name: "Mecânica dos Solos", code: "GEO301", year: 3, professor: "Prof. Maria Santos", estudantes: 45, media: 13.9, presenca: 90, taxaEntrega: 88, diasAula: "Ter, Qui", location: "Lab. Geotecnia" },
-  { id: "cd7", name: "Hidráulica", code: "HID301", year: 3, professor: "Prof. Pedro Ferreira", estudantes: 45, media: 13.5, presenca: 86, taxaEntrega: 83, diasAula: "Seg, Qua, Sex", location: "Lab. Hidráulica" },
-  { id: "cd8", name: "Estruturas de Betão", code: "EST401", year: 4, professor: "Prof. António Silva", estudantes: 38, media: 14.2, presenca: 91, taxaEntrega: 90, diasAula: "Ter, Qui", location: "Sala D401" },
-  { id: "cd9", name: "Gestão de Obras", code: "GES401", year: 4, professor: "Prof. Ana Costa", estudantes: 38, media: 14.5, presenca: 93, taxaEntrega: 92, diasAula: "Seg, Qua", location: "Sala D402" },
-  { id: "cd10", name: "Projecto Final", code: "PRJ501", year: 5, professor: "Prof. Carlos Mendes", estudantes: 30, media: 15.0, presenca: 95, taxaEntrega: 96, diasAula: "Sex", location: "Sala E501" },
+  { id: "cd1", name: "Matemática I", code: "MAT101", year: 1, professor: "Prof. Sofia Martins", estudantes: 64, media: 12.1, presenca: 82, taxaEntrega: 78, diasAula: "Seg, Qua, Sex", location: "Sala A101", status: "normal" },
+  { id: "cd2", name: "Física I", code: "FIS101", year: 1, professor: "Prof. Maria Santos", estudantes: 64, media: 11.8, presenca: 79, taxaEntrega: 74, diasAula: "Ter, Qui", location: "Lab. Física", status: "risco" },
+  { id: "cd3", name: "Desenho Técnico I", code: "DES101", year: 1, professor: "Prof. Luísa Tavares", estudantes: 64, media: 13.2, presenca: 88, taxaEntrega: 85, diasAula: "Seg, Qua", location: "Sala B203", status: "normal" },
+  { id: "cd4", name: "Matemática II", code: "MAT201", year: 2, professor: "Prof. António Silva", estudantes: 52, media: 13.0, presenca: 85, taxaEntrega: 82, diasAula: "Ter, Qui, Sex", location: "Sala A102", status: "normal" },
+  { id: "cd5", name: "Resistência dos Materiais", code: "RES201", year: 2, professor: "Prof. Carlos Mendes", estudantes: 52, media: 12.5, presenca: 83, taxaEntrega: 80, diasAula: "Seg, Qua", location: "Sala C301", status: "normal" },
+  { id: "cd6", name: "Mecânica dos Solos", code: "GEO301", year: 3, professor: "Prof. Maria Santos", estudantes: 45, media: 13.9, presenca: 90, taxaEntrega: 88, diasAula: "Ter, Qui", location: "Lab. Geotecnia", status: "excelente" },
+  { id: "cd7", name: "Hidráulica", code: "HID301", year: 3, professor: "Prof. Pedro Ferreira", estudantes: 45, media: 13.5, presenca: 86, taxaEntrega: 83, diasAula: "Seg, Qua, Sex", location: "Lab. Hidráulica", status: "normal" },
+  { id: "cd8", name: "Estruturas de Betão", code: "EST401", year: 4, professor: "Prof. António Silva", estudantes: 38, media: 14.2, presenca: 91, taxaEntrega: 90, diasAula: "Ter, Qui", location: "Sala D401", status: "excelente" },
+  { id: "cd9", name: "Gestão de Obras", code: "GES401", year: 4, professor: "Prof. Ana Costa", estudantes: 38, media: 14.5, presenca: 93, taxaEntrega: 92, diasAula: "Seg, Qua", location: "Sala D402", status: "excelente" },
+  { id: "cd10", name: "Projecto Final", code: "PRJ501", year: 5, professor: "Prof. Carlos Mendes", estudantes: 30, media: 15.0, presenca: 95, taxaEntrega: 96, diasAula: "Sex", location: "Sala E501", status: "excelente" },
 ];
 
 export const coordNotas: CursoNota[] = [

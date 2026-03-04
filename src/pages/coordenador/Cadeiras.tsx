@@ -166,6 +166,9 @@ export default function CoordenadorCadeiras() {
                       <div className="flex items-center gap-2 mb-1">
                         <p className="text-sm font-semibold text-foreground">{d.name}</p>
                         <Badge variant="outline" className="text-[10px] font-mono">{d.code}</Badge>
+                        <Badge className={`text-[10px] ${d.status === "excelente" ? "bg-accent/15 text-accent border-accent/30" : d.status === "risco" ? "bg-destructive/15 text-destructive border-destructive/30" : "bg-muted text-muted-foreground border-border"}`} variant="outline">
+                          {d.status === "excelente" ? "Excelente" : d.status === "risco" ? "Em Risco" : "Normal"}
+                        </Badge>
                       </div>
                       <div className="flex items-center gap-3 text-[10px] text-muted-foreground flex-wrap">
                         <span className="flex items-center gap-1"><BookOpen className="w-3 h-3" />{coordCursoInfo.name}</span>
