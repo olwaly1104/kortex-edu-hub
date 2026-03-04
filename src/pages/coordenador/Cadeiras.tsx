@@ -98,41 +98,43 @@ export default function CoordenadorCadeiras() {
         </Card>
       </div>
 
-      {/* Year toggle + Search + Sort */}
-      <div className="flex flex-col gap-3">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-xs text-muted-foreground font-medium">Ano:</span>
-            <button
-              onClick={() => setSelectedYear(null)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${selectedYear === null ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}
-            >Todos</button>
-            {coordCursoInfo.years.map(y => (
-              <button
-                key={y.year}
-                onClick={() => setSelectedYear(y.year)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${selectedYear === y.year ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}
-              >{y.year}º Ano</button>
-            ))}
-          </div>
-          <div className="relative w-full sm:w-64 sm:ml-auto">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input
-              placeholder="Pesquisar cadeira..."
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              className="pl-8 h-9 text-xs"
-            />
-          </div>
+      {/* Year toggle */}
+      <div className="flex items-center gap-2 flex-wrap">
+        <span className="text-xs text-muted-foreground font-medium">Ano:</span>
+        <button
+          onClick={() => setSelectedYear(null)}
+          className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${selectedYear === null ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}
+        >Todos</button>
+        {coordCursoInfo.years.map(y => (
+          <button
+            key={y.year}
+            onClick={() => setSelectedYear(y.year)}
+            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${selectedYear === y.year ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}
+          >{y.year}º Ano</button>
+        ))}
+        {hasFilters && (
+          <Button variant="ghost" size="sm" onClick={clearFilters} className="text-xs h-7 gap-1 text-muted-foreground ml-auto">
+            <X className="w-3.5 h-3.5" /> Limpar filtros
+          </Button>
+        )}
+      </div>
+
+      {/* Search + Sort row */}
+      <div className="flex items-center gap-3">
+        <div className="relative w-full sm:w-64">
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            placeholder="Pesquisar cadeira..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            className="pl-8 h-9 text-xs"
+          />
         </div>
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <ArrowUpDown className="w-3.5 h-3.5 text-muted-foreground" />
-            <span className="text-xs text-muted-foreground font-medium">Ordenar:</span>
-          </div>
+        <div className="flex items-center gap-2 ml-auto">
+          <ArrowUpDown className="w-3.5 h-3.5 text-muted-foreground" />
           <Select value={sortBy} onValueChange={(v) => setSortBy(v as SortField)}>
             <SelectTrigger className="w-48 h-9 text-xs">
-              <SelectValue placeholder="Sem ordenação" />
+              <SelectValue placeholder="Ordenar" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="none">Sem ordenação</SelectItem>
@@ -146,11 +148,6 @@ export default function CoordenadorCadeiras() {
               <SelectItem value="estudantes-asc">Estudantes ↑ (menor)</SelectItem>
             </SelectContent>
           </Select>
-          {hasFilters && (
-            <Button variant="ghost" size="sm" onClick={clearFilters} className="text-xs h-9 gap-1 text-muted-foreground">
-              <X className="w-3.5 h-3.5" /> Limpar filtros
-            </Button>
-          )}
         </div>
       </div>
 
