@@ -34,86 +34,77 @@ export default function CoordenadorNotas() {
         <h1 className="text-2xl font-bold text-foreground flex items-center gap-2"><Award className="w-6 h-6 text-primary" /> Notas do Curso</h1>
       </div>
 
-      {/* Year selector */}
-      <div className="flex items-center gap-2 flex-wrap">
-        <span className="text-xs text-muted-foreground font-medium">Ano:</span>
-        <button
-          onClick={() => { setSelectedYear(null); setSelectedTurma(null); }}
-          className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${selectedYear === null ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}
-        >Todos</button>
-        {coordCursoInfo.years.map(y => (
-          <button
-            key={y.year}
-            onClick={() => { setSelectedYear(y.year); setSelectedTurma(null); }}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${selectedYear === y.year ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}
-          >{y.year}º Ano</button>
-        ))}
-      </div>
-
-      {/* Turma selector — only when a year is selected */}
-      {selectedYear && turmasForYear.length > 0 && (
+      {/* Year selector + KPIs in a unified block */}
+      <Card className="p-5 space-y-5">
+        {/* Year toggle */}
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-xs text-muted-foreground font-medium">Turma:</span>
+          <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Ano:</span>
           <button
-            onClick={() => setSelectedTurma(null)}
-            className={`px-3.5 py-2 rounded-lg text-xs font-medium border transition-all ${
-              selectedTurma === null
-                ? "bg-primary text-primary-foreground border-primary shadow-sm"
-                : "bg-card text-muted-foreground border-border hover:border-primary/30 hover:text-foreground"
-            }`}
-          >Todas</button>
-          {turmasForYear.map(t => {
-            const key = `${selectedYear}-${t.turma}`;
-            return (
-              <button
-                key={key}
-                onClick={() => setSelectedTurma(selectedTurma === key ? null : key)}
-                className={`px-3.5 py-2 rounded-lg text-xs font-medium border transition-all ${
-                  selectedTurma === key
-                    ? "bg-primary text-primary-foreground border-primary shadow-sm"
-                    : "bg-card text-muted-foreground border-border hover:border-primary/30 hover:text-foreground"
-                }`}
-              >Turma {t.turma}</button>
-            );
-          })}
+            onClick={() => { setSelectedYear(null); setSelectedTurma(null); }}
+            className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${selectedYear === null ? "bg-primary text-primary-foreground shadow-sm" : "bg-muted/60 text-muted-foreground hover:bg-muted"}`}
+          >Todos</button>
+          {coordCursoInfo.years.map(y => (
+            <button
+              key={y.year}
+              onClick={() => { setSelectedYear(y.year); setSelectedTurma(null); }}
+              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${selectedYear === y.year ? "bg-primary text-primary-foreground shadow-sm" : "bg-muted/60 text-muted-foreground hover:bg-muted"}`}
+            >{y.year}º Ano</button>
+          ))}
         </div>
-      )}
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><Award className="w-4 h-4 text-primary" /></div>
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Média Geral</span>
+        {/* Turma selector — only when a year is selected */}
+        {selectedYear && turmasForYear.length > 0 && (
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Turma:</span>
+            <button
+              onClick={() => setSelectedTurma(null)}
+              className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all border ${
+                selectedTurma === null
+                  ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                  : "bg-card text-muted-foreground border-border hover:border-primary/30 hover:text-foreground"
+              }`}
+            >Todas</button>
+            {turmasForYear.map(t => {
+              const key = `${selectedYear}-${t.turma}`;
+              return (
+                <button
+                  key={key}
+                  onClick={() => setSelectedTurma(selectedTurma === key ? null : key)}
+                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all border ${
+                    selectedTurma === key
+                      ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                      : "bg-card text-muted-foreground border-border hover:border-primary/30 hover:text-foreground"
+                  }`}
+                >Turma {t.turma}</button>
+              );
+            })}
           </div>
-          <p className={`text-2xl font-bold ${mediaGeral >= 10 ? "text-accent" : "text-destructive"}`}>{mediaGeral}/20</p>
-        </Card>
-        <Card className="p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><ClipboardList className="w-4 h-4 text-primary" /></div>
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Avaliações</span>
-          </div>
-          <p className="text-2xl font-bold text-foreground">{totalAvalCompletas}<span className="text-sm text-muted-foreground font-medium">/{totalAvalTotal}</span></p>
-        </Card>
-        <Card className="p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><Users className="w-4 h-4 text-primary" /></div>
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Turmas</span>
-          </div>
-          <p className="text-2xl font-bold text-foreground">{totalTurmas}</p>
-        </Card>
-        <Card className="p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><TrendingUp className="w-4 h-4 text-primary" /></div>
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Taxa Conclusão</span>
-          </div>
-          <p className={`text-2xl font-bold ${totalAvalTotal > 0 && (totalAvalCompletas / totalAvalTotal) >= 0.8 ? "text-accent" : "text-secondary"}`}>
-            {totalAvalTotal > 0 ? Math.round((totalAvalCompletas / totalAvalTotal) * 100) : 0}%
-          </p>
-        </Card>
-      </div>
+        )}
 
-      {/* Turma cards — show when a specific turma is selected, or all turmas when no turma filter */}
+        {/* KPI row inside the card */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="p-3 rounded-lg bg-muted/40">
+            <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium mb-1">Média Geral</p>
+            <p className={`text-xl font-bold ${mediaGeral >= 10 ? "text-accent" : "text-destructive"}`}>{mediaGeral}/20</p>
+          </div>
+          <div className="p-3 rounded-lg bg-muted/40">
+            <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium mb-1">Avaliações</p>
+            <p className="text-xl font-bold text-foreground">{totalAvalCompletas}<span className="text-sm text-muted-foreground font-medium">/{totalAvalTotal}</span></p>
+          </div>
+          <div className="p-3 rounded-lg bg-muted/40">
+            <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium mb-1">Turmas</p>
+            <p className="text-xl font-bold text-foreground">{totalTurmas}</p>
+          </div>
+          <div className="p-3 rounded-lg bg-muted/40">
+            <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium mb-1">Taxa Conclusão</p>
+            <p className={`text-xl font-bold ${totalAvalTotal > 0 && (totalAvalCompletas / totalAvalTotal) >= 0.8 ? "text-accent" : "text-secondary"}`}>
+              {totalAvalTotal > 0 ? Math.round((totalAvalCompletas / totalAvalTotal) * 100) : 0}%
+            </p>
+          </div>
+        </div>
+      </Card>
+
+      {/* Turma cards */}
       {data.map(yearData => {
         const visibleTurmas = selectedTurma
           ? yearData.turmas.filter(t => `${yearData.year}-${t.turma}` === selectedTurma)
@@ -126,7 +117,6 @@ export default function CoordenadorNotas() {
             <div className="space-y-2">
               {visibleTurmas.map(t => {
                 const turmaKey = `${yearData.year}-${t.turma}`;
-                // If a turma is selected via toggle, auto-expand it
                 const isExpanded = selectedTurma === turmaKey;
                 return (
                   <div key={turmaKey}>
@@ -162,12 +152,10 @@ export default function CoordenadorNotas() {
                       </div>
                     </Card>
 
-                    {/* Expanded: avaliações when turma is selected */}
                     {isExpanded && (
                       <div className="ml-4 mt-2 space-y-1.5 animate-fade-in">
                         {t.avaliacoes.map((a, i) => {
                           const total = a.aprovados + a.reprovados;
-                          const taxa = total > 0 ? Math.round((a.aprovados / total) * 100) : 0;
                           return (
                             <Card key={`${a.code}-${i}`} className={`p-4 border-l-[3px] ${a.media >= 10 ? "border-l-accent/50" : "border-l-destructive/50"}`}>
                               <div className="flex items-center gap-4">
