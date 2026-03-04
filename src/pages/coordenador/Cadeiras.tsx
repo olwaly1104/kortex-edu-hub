@@ -100,19 +100,32 @@ export default function CoordenadorCadeiras() {
 
       {/* Search + Sort + Filter row */}
       <div className="flex gap-2 items-center">
-        <div className="relative flex-1 min-w-[260px]">
+        <div className="relative flex-1 max-w-xs">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input placeholder="Pesquisar cadeira, código ou professor..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9" />
+          <Input placeholder="Pesquisar cadeira..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9 h-9" />
         </div>
+
+        <div className="flex-1" />
+
+        {(search || filterStatus !== "todos" || sortDir !== "desc" || sortField !== "media") && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-xs text-muted-foreground shrink-0"
+            onClick={() => { setSearch(""); setFilterStatus("todos"); setSortField("media"); setSortDir("desc"); }}
+          >
+            Limpar filtros
+          </Button>
+        )}
 
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline" size="sm" className="gap-1.5 shrink-0">
-              {sortDir === "desc" ? <ArrowDown className="w-3.5 h-3.5" /> : <ArrowUp className="w-3.5 h-3.5" />}
-              {sortDir === "desc" ? "Maior" : "Menor"}
+              <ArrowDown className="w-3.5 h-3.5" />
+              Ordenar
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-36 p-2 space-y-0.5" align="end">
+          <PopoverContent className="w-40 p-2 space-y-0.5" align="end">
             <button onClick={() => setSortDir("desc")} className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${sortDir === "desc" ? "bg-primary/10 text-primary font-medium" : "text-foreground hover:bg-muted"}`}>
               Maior
             </button>
