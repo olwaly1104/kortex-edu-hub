@@ -27,7 +27,10 @@ export default function CoordenadorCadeiras() {
         const q = search.toLowerCase();
         return d.name.toLowerCase().includes(q) || d.code.toLowerCase().includes(q) || d.professor.toLowerCase().includes(q);
       })
-      .filter(d => filterStatus === "todos" || d.status === filterStatus);
+      .filter(d => {
+        if (filterStatus === "todos" || ["media", "presenca", "entrega"].includes(filterStatus)) return true;
+        return d.status === filterStatus;
+      });
 
     list = [...list].sort((a, b) => {
       let va = 0, vb = 0;
@@ -95,105 +98,62 @@ export default function CoordenadorCadeiras() {
         ))}
       </div>
 
-      {/* Search + Sort + Filter — compact row */}
-      <div className="flex gap-2 flex-wrap">
+      {/* Search + Sort + Filter row */}
+      <div className="flex gap-2 items-center">
+        <div className="relative flex-1 min-w-[260px]">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input placeholder="Pesquisar cadeira, código ou professor..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9" />
+        </div>
+
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="outline" size="sm" className="gap-1.5">
-              <Search className="w-3.5 h-3.5" /> Pesquisar
-              {search && <Badge variant="secondary" className="text-[10px] ml-1 px-1.5 py-0">{filtered.length}</Badge>}
+            <Button variant="outline" size="sm" className="gap-1.5 shrink-0">
+              {sortDir === "desc" ? <ArrowDown className="w-3.5 h-3.5" /> : <ArrowUp className="w-3.5 h-3.5" />}
+              {sortDir === "desc" ? "Maior" : "Menor"}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-64 p-2" align="start">
-            <Input
-              placeholder="Nome, código ou professor..."
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              className="h-8 text-xs"
-              autoFocus
-            />
+          <PopoverContent className="w-36 p-2 space-y-0.5" align="end">
+            <button onClick={() => setSortDir("desc")} className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${sortDir === "desc" ? "bg-primary/10 text-primary font-medium" : "text-foreground hover:bg-muted"}`}>
+              Maior
+            </button>
+            <button onClick={() => setSortDir("asc")} className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${sortDir === "asc" ? "bg-primary/10 text-primary font-medium" : "text-foreground hover:bg-muted"}`}>
+              Menor
+            </button>
           </PopoverContent>
         </Popover>
 
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="outline" size="sm" className="gap-1.5">
-              <SlidersHorizontal className="w-3.5 h-3.5" /> Ordenar
-              <span className="text-muted-foreground text-[10px]">
-                {sortField === "media" ? "Média" : sortField === "presenca" ? "Presença" : "Entrega"}
-              </span>
+            <Button variant="outline" size="sm" className="gap-1.5 shrink-0">
+              <SlidersHorizontal className="w-3.5 h-3.5" />
+              Filtrar por{filterStatus !== "todos" && ":"} {filterStatus === "todos" ? "" : filterStatus === "excelente" ? "Excelente" : filterStatus === "normal" ? "Normal" : filterStatus === "risco" ? "Em Risco" : filterStatus === "media" ? "Média" : filterStatus === "presenca" ? "Presença" : "Entrega"}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-48 p-2 space-y-2" align="start">
-            <div className="flex gap-1">
-              <Button size="sm" variant={sortDir === "desc" ? "default" : "outline"} className="flex-1 text-xs h-7 gap-1" onClick={() => setSortDir("desc")}>
-                <ArrowDown className="w-3 h-3" /> Maior
-              </Button>
-              <Button size="sm" variant={sortDir === "asc" ? "default" : "outline"} className="flex-1 text-xs h-7 gap-1" onClick={() => setSortDir("asc")}>
-                <ArrowUp className="w-3 h-3" /> Menor
-              </Button>
-            </div>
-            <div className="space-y-0.5">
-              {(["media", "presenca", "entrega"] as SortField[]).map(f => (
-                <button
-                  key={f}
-                  onClick={() => setSortField(f)}
-                  className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${sortField === f ? "bg-primary/10 text-primary font-medium" : "text-foreground hover:bg-muted"}`}
-                >
-                  {f === "media" ? "Média" : f === "presenca" ? "Presença" : "Entrega"}
-                </button>
-              ))}
-            </div>
-          </PopoverContent>
-        </Popover>
-
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="outline" size="sm" className="gap-1.5">
-              <Filter className="w-3.5 h-3.5" /> Filtrar
-              {filterStatus !== "todos" && <Badge variant="secondary" className="text-[10px] ml-1 px-1.5 py-0">1</Badge>}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-40 p-2 space-y-0.5" align="start">
-            {["todos", "excelente", "normal", "risco"].map(s => (
+          <PopoverContent className="w-44 p-2 space-y-0.5" align="end">
+            {[
+              { key: "todos", label: "Todos" },
+              { key: "media", label: "Média" },
+              { key: "presenca", label: "Presença" },
+              { key: "entrega", label: "Entrega" },
+              { key: "excelente", label: "Excelente" },
+              { key: "normal", label: "Normal" },
+              { key: "risco", label: "Em Risco" },
+            ].map(opt => (
               <button
-                key={s}
-                onClick={() => setFilterStatus(s)}
-                className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${filterStatus === s ? "bg-primary/10 text-primary font-medium" : "text-foreground hover:bg-muted"}`}
+                key={opt.key}
+                onClick={() => {
+                  setFilterStatus(opt.key);
+                  if (["media", "presenca", "entrega"].includes(opt.key)) {
+                    setSortField(opt.key as SortField);
+                  }
+                }}
+                className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${filterStatus === opt.key ? "bg-primary/10 text-primary font-medium" : "text-foreground hover:bg-muted"}`}
               >
-                {s === "todos" ? "Todos" : s === "excelente" ? "Excelente" : s === "normal" ? "Normal" : "Em Risco"}
+                {opt.label}
               </button>
             ))}
           </PopoverContent>
         </Popover>
-      </div>
-
-      {/* Search + Sort + Status filter */}
-      <div className="flex gap-2 flex-wrap">
-        <div className="relative flex-1 min-w-[200px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input placeholder="Pesquisar cadeira..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9" />
-        </div>
-        <div className="flex items-center gap-1">
-          <Button size="sm" variant="outline" onClick={() => setSortDir(d => d === "desc" ? "asc" : "desc")} className="gap-1">
-            {sortDir === "desc" ? <><ArrowDown className="w-3.5 h-3.5" /> Maior</> : <><ArrowUp className="w-3.5 h-3.5" /> Menor</>}
-          </Button>
-          <Select value={sortField} onValueChange={v => setSortField(v as SortField)}>
-            <SelectTrigger className="w-[120px] h-9 text-xs">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="media">Média</SelectItem>
-              <SelectItem value="presenca">Presença</SelectItem>
-              <SelectItem value="entrega">Entrega</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        {["todos", "excelente", "normal", "risco"].map(s => (
-          <Button key={s} size="sm" variant={filterStatus === s ? "default" : "outline"} onClick={() => setFilterStatus(s)}>
-            {s === "todos" ? "Todos" : s === "excelente" ? "Excelente" : s === "normal" ? "Normal" : "Em Risco"}
-          </Button>
-        ))}
       </div>
 
       {/* Table */}
