@@ -144,24 +144,7 @@ export default function CoordenadorCadeiras() {
                 Ordenar
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-40 p-2 space-y-0.5" align="end">
-              <button onClick={() => setSortDir("desc")} className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${sortDir === "desc" && isSortActive ? "bg-primary/10 text-primary font-medium" : "text-foreground hover:bg-muted"}`}>
-                Maior → Menor
-              </button>
-              <button onClick={() => setSortDir("asc")} className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${sortDir === "asc" && isSortActive ? "bg-primary/10 text-primary font-medium" : "text-foreground hover:bg-muted"}`}>
-                Menor → Maior
-              </button>
-            </PopoverContent>
-          </Popover>
-
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline" size="sm" className={`gap-1.5 shrink-0 text-xs ${isFilterActive || sortField !== null ? "border-primary/50 bg-primary/5 text-primary" : ""}`}>
-                <SlidersHorizontal className="w-3.5 h-3.5" />
-                Filtrar
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-44 p-2 space-y-1" align="end">
+            <PopoverContent className="w-44 p-2 space-y-1" align="end" side="top">
               <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-2 pt-1">Campo</p>
               {[
                 { key: "todos", label: "Todos" },
@@ -181,7 +164,24 @@ export default function CoordenadorCadeiras() {
                 </button>
               ))}
               <div className="border-t border-border my-1" />
-              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-2">Estado</p>
+              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-2">Direção</p>
+              <button onClick={() => setSortDir("desc")} className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${sortDir === "desc" && isSortActive ? "bg-primary/10 text-primary font-medium" : "text-foreground hover:bg-muted"}`}>
+                Maior → Menor
+              </button>
+              <button onClick={() => setSortDir("asc")} className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${sortDir === "asc" && isSortActive ? "bg-primary/10 text-primary font-medium" : "text-foreground hover:bg-muted"}`}>
+                Menor → Maior
+              </button>
+            </PopoverContent>
+          </Popover>
+
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm" className={`gap-1.5 shrink-0 text-xs ${isFilterActive ? "border-primary/50 bg-primary/5 text-primary" : ""}`}>
+                <SlidersHorizontal className="w-3.5 h-3.5" />
+                Filtrar
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-40 p-2 space-y-0.5" align="end" side="top">
               {[
                 { key: "excelente", label: "Excelente" },
                 { key: "normal", label: "Normal" },
