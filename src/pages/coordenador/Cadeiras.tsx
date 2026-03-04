@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { BookOpen, Award, ClipboardCheck, Clock, Search, ArrowUp, ArrowDown, SlidersHorizontal, Filter } from "lucide-react";
+import { BookOpen, Award, ClipboardCheck, Clock, Search, ArrowUp, ArrowDown, SlidersHorizontal, Filter, X } from "lucide-react";
 import { useState, useMemo } from "react";
 
 type SortField = "media" | "presenca" | "entrega";
@@ -100,21 +100,21 @@ export default function CoordenadorCadeiras() {
 
       {/* Search + Sort + Filter row */}
       <div className="flex gap-2 items-center">
-        <div className="relative flex-1 max-w-xs">
+        <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input placeholder="Pesquisar cadeira..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9 h-9" />
         </div>
 
         <div className="flex-1" />
 
-        {(search || filterStatus !== "todos" || sortDir !== "desc" || sortField !== "media") && (
+        {(filterStatus !== "todos" || sortDir !== "desc" || sortField !== "media") && (
           <Button
             variant="ghost"
             size="sm"
-            className="text-xs text-muted-foreground shrink-0"
-            onClick={() => { setSearch(""); setFilterStatus("todos"); setSortField("media"); setSortDir("desc"); }}
+            className="text-xs text-muted-foreground shrink-0 gap-1"
+            onClick={() => { setFilterStatus("todos"); setSortField("media"); setSortDir("desc"); }}
           >
-            Limpar filtros
+            <X className="w-3 h-3" /> Limpar filtros
           </Button>
         )}
 
