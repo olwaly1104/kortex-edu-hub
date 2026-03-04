@@ -69,6 +69,7 @@ const coordenadorCursoSections: NavSection[] = [
   ]},
   { title: "O Meu Curso", items: [
     { label: "Os Meus Anos", icon: Layers, path: "/coordenador/anos" },
+    { label: "Cadeiras do Curso", icon: BookOpen, path: "/coordenador/cadeiras" },
     { label: "Estudantes do Curso", icon: Users, path: "/coordenador/estudantes" },
     { label: "Docentes do Curso", icon: GraduationCap, path: "/coordenador/docentes" },
     { label: "Notas do Curso", icon: Award, path: "/coordenador/notas" },
