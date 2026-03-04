@@ -33,6 +33,7 @@ export interface Docente {
   mediaGeral: number;
   estudantesTotal: number;
   taxaEntrega: number;
+  taxaAprovacao: number;
   status: "activo" | "licença" | "inactivo";
 }
 
@@ -82,6 +83,7 @@ export interface CursoDisciplina {
   media: number | null;
   presenca: number;
   taxaEntrega: number;
+  taxaAprovacao: number;
   diasAula: string;
   location: string;
   status: "excelente" | "normal" | "risco";
@@ -136,17 +138,17 @@ export const coordCursoInfo: CursoInfo = {
 };
 
 export const coordDocentes: Docente[] = [
-  { id: "d1", name: "Prof. António Silva", email: "prof.silva@upra.kor", department: "Estruturas", disciplinas: 3, turmas: 4, presenca: 96, mediaGeral: 13.8, estudantesTotal: 120, taxaEntrega: 91, status: "activo" },
-  { id: "d2", name: "Prof. Maria Santos", email: "prof.santos@upra.kor", department: "Geotecnia", disciplinas: 2, turmas: 3, presenca: 92, mediaGeral: 13.2, estudantesTotal: 97, taxaEntrega: 87, status: "activo" },
-  { id: "d3", name: "Prof. Pedro Ferreira", email: "prof.ferreira@upra.kor", department: "Hidráulica", disciplinas: 2, turmas: 2, presenca: 88, mediaGeral: 12.5, estudantesTotal: 45, taxaEntrega: 78, status: "activo" },
-  { id: "d4", name: "Prof. Ana Costa", email: "prof.costa@upra.kor", department: "Materiais", disciplinas: 3, turmas: 3, presenca: 94, mediaGeral: 14.1, estudantesTotal: 76, taxaEntrega: 93, status: "activo" },
-  { id: "d5", name: "Prof. David Lopes", email: "prof.lopes@upra.kor", department: "Transportes", disciplinas: 2, turmas: 2, presenca: 90, mediaGeral: 12.8, estudantesTotal: 52, taxaEntrega: 82, status: "licença" },
-  { id: "d6", name: "Prof. Luísa Tavares", email: "prof.tavares@upra.kor", department: "Topografia", disciplinas: 2, turmas: 2, presenca: 95, mediaGeral: 13.5, estudantesTotal: 64, taxaEntrega: 89, status: "activo" },
-  { id: "d7", name: "Prof. Carlos Mendes", email: "prof.mendes@upra.kor", department: "Estruturas", disciplinas: 2, turmas: 3, presenca: 91, mediaGeral: 14.5, estudantesTotal: 68, taxaEntrega: 94, status: "activo" },
-  { id: "d8", name: "Prof. Sofia Martins", email: "prof.martins@upra.kor", department: "Matemática", disciplinas: 2, turmas: 4, presenca: 97, mediaGeral: 12.9, estudantesTotal: 128, taxaEntrega: 85, status: "activo" },
-  { id: "d9", name: "Prof. Ricardo Nunes", email: "prof.nunes@upra.kor", department: "Física", disciplinas: 2, turmas: 3, presenca: 82, mediaGeral: 10.5, estudantesTotal: 85, taxaEntrega: 74, status: "activo" },
-  { id: "d10", name: "Prof. Teresa Almeida", email: "prof.almeida@upra.kor", department: "Construção", disciplinas: 1, turmas: 2, presenca: 79, mediaGeral: 9.8, estudantesTotal: 42, taxaEntrega: 68, status: "activo" },
-  { id: "d11", name: "Prof. Miguel Sousa", email: "prof.sousa@upra.kor", department: "Urbanismo", disciplinas: 2, turmas: 2, presenca: 84, mediaGeral: 10.2, estudantesTotal: 56, taxaEntrega: 76, status: "activo" },
+  { id: "d1", name: "Prof. António Silva", email: "prof.silva@upra.kor", department: "Estruturas", disciplinas: 3, turmas: 4, presenca: 96, mediaGeral: 13.8, estudantesTotal: 120, taxaEntrega: 91, taxaAprovacao: 88, status: "activo" },
+  { id: "d2", name: "Prof. Maria Santos", email: "prof.santos@upra.kor", department: "Geotecnia", disciplinas: 2, turmas: 3, presenca: 92, mediaGeral: 13.2, estudantesTotal: 97, taxaEntrega: 87, taxaAprovacao: 82, status: "activo" },
+  { id: "d3", name: "Prof. Pedro Ferreira", email: "prof.ferreira@upra.kor", department: "Hidráulica", disciplinas: 2, turmas: 2, presenca: 88, mediaGeral: 12.5, estudantesTotal: 45, taxaEntrega: 78, taxaAprovacao: 71, status: "activo" },
+  { id: "d4", name: "Prof. Ana Costa", email: "prof.costa@upra.kor", department: "Materiais", disciplinas: 3, turmas: 3, presenca: 94, mediaGeral: 14.1, estudantesTotal: 76, taxaEntrega: 93, taxaAprovacao: 91, status: "activo" },
+  { id: "d5", name: "Prof. David Lopes", email: "prof.lopes@upra.kor", department: "Transportes", disciplinas: 2, turmas: 2, presenca: 90, mediaGeral: 12.8, estudantesTotal: 52, taxaEntrega: 82, taxaAprovacao: 75, status: "licença" },
+  { id: "d6", name: "Prof. Luísa Tavares", email: "prof.tavares@upra.kor", department: "Topografia", disciplinas: 2, turmas: 2, presenca: 95, mediaGeral: 13.5, estudantesTotal: 64, taxaEntrega: 89, taxaAprovacao: 84, status: "activo" },
+  { id: "d7", name: "Prof. Carlos Mendes", email: "prof.mendes@upra.kor", department: "Estruturas", disciplinas: 2, turmas: 3, presenca: 91, mediaGeral: 14.5, estudantesTotal: 68, taxaEntrega: 94, taxaAprovacao: 92, status: "activo" },
+  { id: "d8", name: "Prof. Sofia Martins", email: "prof.martins@upra.kor", department: "Matemática", disciplinas: 2, turmas: 4, presenca: 97, mediaGeral: 12.9, estudantesTotal: 128, taxaEntrega: 85, taxaAprovacao: 78, status: "activo" },
+  { id: "d9", name: "Prof. Ricardo Nunes", email: "prof.nunes@upra.kor", department: "Física", disciplinas: 2, turmas: 3, presenca: 82, mediaGeral: 10.5, estudantesTotal: 85, taxaEntrega: 74, taxaAprovacao: 62, status: "activo" },
+  { id: "d10", name: "Prof. Teresa Almeida", email: "prof.almeida@upra.kor", department: "Construção", disciplinas: 1, turmas: 2, presenca: 79, mediaGeral: 9.8, estudantesTotal: 42, taxaEntrega: 68, taxaAprovacao: 48, status: "activo" },
+  { id: "d11", name: "Prof. Miguel Sousa", email: "prof.sousa@upra.kor", department: "Urbanismo", disciplinas: 2, turmas: 2, presenca: 84, mediaGeral: 10.2, estudantesTotal: 56, taxaEntrega: 76, taxaAprovacao: 65, status: "activo" },
 ];
 
 export const coordEstudantes: CursoEstudante[] = [
@@ -170,16 +172,16 @@ export const coordEstudantes: CursoEstudante[] = [
 ];
 
 export const coordDisciplinas: CursoDisciplina[] = [
-  { id: "cd1", name: "Matemática I", code: "MAT101", year: 1, professor: "Prof. Sofia Martins", estudantes: 64, media: 12.1, presenca: 82, taxaEntrega: 78, diasAula: "Seg, Qua, Sex", location: "Sala A101", status: "normal" },
-  { id: "cd2", name: "Física I", code: "FIS101", year: 1, professor: "Prof. Maria Santos", estudantes: 64, media: 11.8, presenca: 79, taxaEntrega: 74, diasAula: "Ter, Qui", location: "Lab. Física", status: "risco" },
-  { id: "cd3", name: "Desenho Técnico I", code: "DES101", year: 1, professor: "Prof. Luísa Tavares", estudantes: 64, media: 13.2, presenca: 88, taxaEntrega: 85, diasAula: "Seg, Qua", location: "Sala B203", status: "normal" },
-  { id: "cd4", name: "Matemática II", code: "MAT201", year: 2, professor: "Prof. António Silva", estudantes: 52, media: 13.0, presenca: 85, taxaEntrega: 82, diasAula: "Ter, Qui, Sex", location: "Sala A102", status: "normal" },
-  { id: "cd5", name: "Resistência dos Materiais", code: "RES201", year: 2, professor: "Prof. Carlos Mendes", estudantes: 52, media: 12.5, presenca: 83, taxaEntrega: 80, diasAula: "Seg, Qua", location: "Sala C301", status: "normal" },
-  { id: "cd6", name: "Mecânica dos Solos", code: "GEO301", year: 3, professor: "Prof. Maria Santos", estudantes: 45, media: 13.9, presenca: 90, taxaEntrega: 88, diasAula: "Ter, Qui", location: "Lab. Geotecnia", status: "excelente" },
-  { id: "cd7", name: "Hidráulica", code: "HID301", year: 3, professor: "Prof. Pedro Ferreira", estudantes: 45, media: 13.5, presenca: 86, taxaEntrega: 83, diasAula: "Seg, Qua, Sex", location: "Lab. Hidráulica", status: "normal" },
-  { id: "cd8", name: "Estruturas de Betão", code: "EST401", year: 4, professor: "Prof. António Silva", estudantes: 38, media: 14.2, presenca: 91, taxaEntrega: 90, diasAula: "Ter, Qui", location: "Sala D401", status: "excelente" },
-  { id: "cd9", name: "Gestão de Obras", code: "GES401", year: 4, professor: "Prof. Ana Costa", estudantes: 38, media: 14.5, presenca: 93, taxaEntrega: 92, diasAula: "Seg, Qua", location: "Sala D402", status: "excelente" },
-  { id: "cd10", name: "Projecto Final", code: "PRJ501", year: 5, professor: "Prof. Carlos Mendes", estudantes: 30, media: 15.0, presenca: 95, taxaEntrega: 96, diasAula: "Sex", location: "Sala E501", status: "excelente" },
+  { id: "cd1", name: "Matemática I", code: "MAT101", year: 1, professor: "Prof. Sofia Martins", estudantes: 64, media: 12.1, presenca: 82, taxaEntrega: 78, taxaAprovacao: 75, diasAula: "Seg, Qua, Sex", location: "Sala A101", status: "normal" },
+  { id: "cd2", name: "Física I", code: "FIS101", year: 1, professor: "Prof. Maria Santos", estudantes: 64, media: 11.8, presenca: 79, taxaEntrega: 74, taxaAprovacao: 68, diasAula: "Ter, Qui", location: "Lab. Física", status: "risco" },
+  { id: "cd3", name: "Desenho Técnico I", code: "DES101", year: 1, professor: "Prof. Luísa Tavares", estudantes: 64, media: 13.2, presenca: 88, taxaEntrega: 85, taxaAprovacao: 82, diasAula: "Seg, Qua", location: "Sala B203", status: "normal" },
+  { id: "cd4", name: "Matemática II", code: "MAT201", year: 2, professor: "Prof. António Silva", estudantes: 52, media: 13.0, presenca: 85, taxaEntrega: 82, taxaAprovacao: 79, diasAula: "Ter, Qui, Sex", location: "Sala A102", status: "normal" },
+  { id: "cd5", name: "Resistência dos Materiais", code: "RES201", year: 2, professor: "Prof. Carlos Mendes", estudantes: 52, media: 12.5, presenca: 83, taxaEntrega: 80, taxaAprovacao: 76, diasAula: "Seg, Qua", location: "Sala C301", status: "normal" },
+  { id: "cd6", name: "Mecânica dos Solos", code: "GEO301", year: 3, professor: "Prof. Maria Santos", estudantes: 45, media: 13.9, presenca: 90, taxaEntrega: 88, taxaAprovacao: 87, diasAula: "Ter, Qui", location: "Lab. Geotecnia", status: "excelente" },
+  { id: "cd7", name: "Hidráulica", code: "HID301", year: 3, professor: "Prof. Pedro Ferreira", estudantes: 45, media: 13.5, presenca: 86, taxaEntrega: 83, taxaAprovacao: 80, diasAula: "Seg, Qua, Sex", location: "Lab. Hidráulica", status: "normal" },
+  { id: "cd8", name: "Estruturas de Betão", code: "EST401", year: 4, professor: "Prof. António Silva", estudantes: 38, media: 14.2, presenca: 91, taxaEntrega: 90, taxaAprovacao: 89, diasAula: "Ter, Qui", location: "Sala D401", status: "excelente" },
+  { id: "cd9", name: "Gestão de Obras", code: "GES401", year: 4, professor: "Prof. Ana Costa", estudantes: 38, media: 14.5, presenca: 93, taxaEntrega: 92, taxaAprovacao: 91, diasAula: "Seg, Qua", location: "Sala D402", status: "excelente" },
+  { id: "cd10", name: "Projecto Final", code: "PRJ501", year: 5, professor: "Prof. Carlos Mendes", estudantes: 30, media: 15.0, presenca: 95, taxaEntrega: 96, taxaAprovacao: 93, diasAula: "Sex", location: "Sala E501", status: "excelente" },
 ];
 
 export const coordNotas: CursoNota[] = [
