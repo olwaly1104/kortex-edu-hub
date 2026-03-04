@@ -3,10 +3,9 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { BookOpen, Award, ClipboardCheck, Clock, Search, ArrowUp, ArrowDown, SlidersHorizontal, Filter, X } from "lucide-react";
+import { BookOpen, Award, ClipboardCheck, Clock, Search, ArrowUpDown, SlidersHorizontal, X } from "lucide-react";
 import { useState, useMemo } from "react";
 
 type SortField = "media" | "presenca" | "entrega";
@@ -15,9 +14,18 @@ type SortDir = "asc" | "desc";
 export default function CoordenadorCadeiras() {
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [search, setSearch] = useState("");
-  const [sortField, setSortField] = useState<SortField>("media");
+  const [sortField, setSortField] = useState<SortField | null>(null);
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [filterStatus, setFilterStatus] = useState<string>("todos");
+
+  const isSortActive = sortField !== null;
+  const isFilterActive = filterStatus !== "todos";
+  const isSearchActive = search !== "";
+  const hasActiveControls = isSortActive || isFilterActive || isSearchActive;
+
+  const sortLabel = sortField === "media" ? "Média" : sortField === "presenca" ? "Presença" : sortField === "entrega" ? "Entrega" : "";
+  const dirLabel = sortDir === "desc" ? "Maior" : "Menor";
+  const filterLabel = filterStatus === "excelente" ? "Excelente" : filterStatus === "normal" ? "Normal" : filterStatus === "risco" ? "Em Risco" : "";
 
   const filtered = useMemo(() => {
     let list = coordDisciplinas
@@ -28,17 +36,21 @@ export default function CoordenadorCadeiras() {
         return d.name.toLowerCase().includes(q) || d.code.toLowerCase().includes(q) || d.professor.toLowerCase().includes(q);
       })
       .filter(d => {
-        if (filterStatus === "todos" || ["media", "presenca", "entrega"].includes(filterStatus)) return true;
+        if (filterStatus === "todos") return true;
         return d.status === filterStatus;
       });
 
-    list = [...list].sort((a, b) => {
-      let va = 0, vb = 0;
-      if (sortField === "media") { va = a.media ?? 0; vb = b.media ?? 0; }
-      else if (sortField === "presenca") { va = a.presenca; vb = b.presenca; }
-      else if (sortField === "entrega") { va = a.taxaEntrega; vb = b.taxaEntrega; }
-      return sortDir === "asc" ? va - vb : vb - va;
-    });
+    if (sortField) {
+      list = [...list].sort((a, b) => {
+        let va = 0, vb = 0;
+        if (sortField === "media") { va = a.media ?? 0; vb = b.media ?? 0; }
+        else if (sortField === "presenca") { va = a.presenca; vb = b.presenca; }
+        else if (sortField === "entrega") { va = a.taxaEntrega; vb = b.taxaEntrega; }
+        return sortDir === "asc" ? va - vb : vb - va;
+      });
+    } else {
+      list = [...list].sort((a, b) => a.year - b.year);
+    }
 
     return list;
   }, [selectedYear, search, sortField, sortDir, filterStatus]);
@@ -47,6 +59,8 @@ export default function CoordenadorCadeiras() {
   const avgPresenca = filtered.length ? Math.round(filtered.reduce((s, d) => s + d.presenca, 0) / filtered.length) : 0;
   const avgTaxaEntrega = filtered.length ? Math.round(filtered.reduce((s, d) => s + d.taxaEntrega, 0) / filtered.length) : 0;
   const avgMedia = filtered.length ? Math.round((filtered.reduce((s, d) => s + (d.media ?? 0), 0) / filtered.length) * 10) / 10 : 0;
+
+  const resetAll = () => { setFilterStatus("todos"); setSortField(null); setSortDir("desc"); setSearch(""); };
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
@@ -90,15 +104,18 @@ export default function CoordenadorCadeiras() {
       </div>
 
       {/* Controls box */}
-      <div className="rounded-lg border border-border p-3 space-y-3">
+      <div className="rounded-xl border border-border bg-card p-4 space-y-3">
         {/* Year filter */}
         <div className="flex flex-wrap gap-2">
           {[null, ...coordCursoInfo.years.map(y => y.year)].map(y => (
-            <Button key={String(y)} size="sm" variant={selectedYear === y ? "default" : "outline"} onClick={() => setSelectedYear(y)}>
+            <Button key={String(y)} size="sm" variant={selectedYear === y ? "default" : "outline"} onClick={() => setSelectedYear(y)} className="text-xs">
               {y === null ? "Todos os Anos" : `${y}º Ano`}
             </Button>
           ))}
         </div>
+
+        {/* Divider */}
+        <div className="border-t border-border" />
 
         {/* Search + Sort + Filter row */}
         <div className="flex gap-2 items-center">
@@ -109,59 +126,59 @@ export default function CoordenadorCadeiras() {
 
           <div className="flex-1" />
 
-          {(filterStatus !== "todos" || sortDir !== "desc" || search !== "") && (
+          {hasActiveControls && (
             <Button
               variant="ghost"
               size="sm"
-              className="text-xs text-muted-foreground shrink-0 gap-1"
-              onClick={() => { setFilterStatus("todos"); setSortField("media"); setSortDir("desc"); setSearch(""); }}
+              className="text-xs text-destructive hover:text-destructive hover:bg-destructive/10 shrink-0 gap-1"
+              onClick={resetAll}
             >
-              <X className="w-3 h-3" /> Limpar filtros
+              <X className="w-3 h-3" /> Limpar
             </Button>
           )}
 
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="outline" size="sm" className="gap-1.5 shrink-0">
-                <ArrowDown className="w-3.5 h-3.5" />
+              <Button variant="outline" size="sm" className={`gap-1.5 shrink-0 text-xs ${isSortActive ? "border-primary/50 bg-primary/5 text-primary" : ""}`}>
+                <ArrowUpDown className="w-3.5 h-3.5" />
                 Ordenar
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-40 p-2 space-y-0.5" align="end">
+            <PopoverContent className="w-48 p-2 space-y-2" align="end">
+              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-2 pt-1">Campo</p>
+              {(["media", "presenca", "entrega"] as SortField[]).map(f => (
+                <button key={f} onClick={() => setSortField(f)} className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${sortField === f ? "bg-primary/10 text-primary font-medium" : "text-foreground hover:bg-muted"}`}>
+                  {f === "media" ? "Média" : f === "presenca" ? "Presença" : "Entrega"}
+                </button>
+              ))}
+              <div className="border-t border-border my-1" />
+              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-2">Direção</p>
               <button onClick={() => setSortDir("desc")} className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${sortDir === "desc" ? "bg-primary/10 text-primary font-medium" : "text-foreground hover:bg-muted"}`}>
-                Maior
+                Maior → Menor
               </button>
               <button onClick={() => setSortDir("asc")} className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${sortDir === "asc" ? "bg-primary/10 text-primary font-medium" : "text-foreground hover:bg-muted"}`}>
-                Menor
+                Menor → Maior
               </button>
             </PopoverContent>
           </Popover>
 
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="outline" size="sm" className="gap-1.5 shrink-0">
+              <Button variant="outline" size="sm" className={`gap-1.5 shrink-0 text-xs ${isFilterActive ? "border-primary/50 bg-primary/5 text-primary" : ""}`}>
                 <SlidersHorizontal className="w-3.5 h-3.5" />
-                Filtrar por{filterStatus !== "todos" && ":"} {filterStatus === "todos" ? "" : filterStatus === "excelente" ? "Excelente" : filterStatus === "normal" ? "Normal" : filterStatus === "risco" ? "Em Risco" : filterStatus === "media" ? "Média" : filterStatus === "presenca" ? "Presença" : "Entrega"}
+                Filtrar
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-44 p-2 space-y-0.5" align="end">
               {[
                 { key: "todos", label: "Todos" },
-                { key: "media", label: "Média" },
-                { key: "presenca", label: "Presença" },
-                { key: "entrega", label: "Entrega" },
                 { key: "excelente", label: "Excelente" },
                 { key: "normal", label: "Normal" },
                 { key: "risco", label: "Em Risco" },
               ].map(opt => (
                 <button
                   key={opt.key}
-                  onClick={() => {
-                    setFilterStatus(opt.key);
-                    if (["media", "presenca", "entrega"].includes(opt.key)) {
-                      setSortField(opt.key as SortField);
-                    }
-                  }}
+                  onClick={() => setFilterStatus(opt.key)}
                   className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${filterStatus === opt.key ? "bg-primary/10 text-primary font-medium" : "text-foreground hover:bg-muted"}`}
                 >
                   {opt.label}
@@ -170,6 +187,30 @@ export default function CoordenadorCadeiras() {
             </PopoverContent>
           </Popover>
         </div>
+
+        {/* Active tags */}
+        {hasActiveControls && (
+          <div className="flex flex-wrap gap-1.5 pt-1">
+            {isSortActive && (
+              <Badge variant="outline" className="text-[10px] gap-1 bg-primary/5 text-primary border-primary/20 cursor-pointer hover:bg-primary/10" onClick={() => { setSortField(null); setSortDir("desc"); }}>
+                {sortLabel}: {dirLabel}
+                <X className="w-2.5 h-2.5" />
+              </Badge>
+            )}
+            {isFilterActive && (
+              <Badge variant="outline" className="text-[10px] gap-1 bg-accent/10 text-accent border-accent/20 cursor-pointer hover:bg-accent/15" onClick={() => setFilterStatus("todos")}>
+                Estado: {filterLabel}
+                <X className="w-2.5 h-2.5" />
+              </Badge>
+            )}
+            {isSearchActive && (
+              <Badge variant="outline" className="text-[10px] gap-1 bg-secondary/10 text-secondary border-secondary/20 cursor-pointer hover:bg-secondary/15" onClick={() => setSearch("")}>
+                Pesquisa: "{search}"
+                <X className="w-2.5 h-2.5" />
+              </Badge>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Table */}
