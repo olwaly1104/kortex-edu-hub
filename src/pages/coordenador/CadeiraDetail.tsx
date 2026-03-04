@@ -122,7 +122,7 @@ export default function CoordenadorCadeiraDetail() {
             <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Taxa Entrega</span>
           </div>
           <div className="flex items-baseline gap-1">
-            <span className={`text-2xl font-bold ${cadeira.taxaSucesso >= 80 ? "text-accent" : "text-destructive"}`}>{cadeira.taxaSucesso}%</span>
+            <span className={`text-2xl font-bold ${cadeira.taxaEntrega >= 80 ? "text-accent" : "text-destructive"}`}>{cadeira.taxaEntrega}%</span>
           </div>
         </Card>
         <Card className="p-4">
