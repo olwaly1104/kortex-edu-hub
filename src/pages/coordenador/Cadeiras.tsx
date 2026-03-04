@@ -90,7 +90,7 @@ export default function CoordenadorCadeiras() {
       </div>
 
       {/* Controls box */}
-      <Card className="p-3 space-y-3">
+      <div className="rounded-lg border border-border p-3 space-y-3">
         {/* Year filter */}
         <div className="flex flex-wrap gap-2">
           {[null, ...coordCursoInfo.years.map(y => y.year)].map(y => (
@@ -109,12 +109,12 @@ export default function CoordenadorCadeiras() {
 
           <div className="flex-1" />
 
-          {(filterStatus !== "todos" || sortDir !== "desc") && (
+          {(filterStatus !== "todos" || sortDir !== "desc" || search !== "") && (
             <Button
               variant="ghost"
               size="sm"
               className="text-xs text-muted-foreground shrink-0 gap-1"
-              onClick={() => { setFilterStatus("todos"); setSortField("media"); setSortDir("desc"); }}
+              onClick={() => { setFilterStatus("todos"); setSortField("media"); setSortDir("desc"); setSearch(""); }}
             >
               <X className="w-3 h-3" /> Limpar filtros
             </Button>
@@ -170,7 +170,7 @@ export default function CoordenadorCadeiras() {
             </PopoverContent>
           </Popover>
         </div>
-      </Card>
+      </div>
 
       {/* Table */}
       <Card className="overflow-hidden">
