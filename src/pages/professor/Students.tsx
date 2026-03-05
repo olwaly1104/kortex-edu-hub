@@ -2,7 +2,9 @@ import { profStudents, allTurmas } from "@/data/professorData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Users, Search, AlertTriangle, TrendingUp, UserCheck } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Users, Search, AlertTriangle, TrendingUp, UserCheck, ArrowUpDown, SlidersHorizontal, X } from "lucide-react";
 import { useState, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 
@@ -23,13 +25,21 @@ function SummaryCard({ label, value, icon: Icon, iconBg, iconColor, valueClass }
   );
 }
 
+type SortKey = "attendance" | "avgGrade" | "submissions";
+type SortDir = "asc" | "desc";
+type FilterStatus = "excelente" | "normal" | "risco";
+
 export default function ProfessorStudents() {
   const [searchParams] = useSearchParams();
-  const initialStatus = searchParams.get("status") || "todos";
+  const initialStatus = searchParams.get("status") || "";
 
   const [search, setSearch] = useState("");
-  const [filterStatus, setFilterStatus] = useState<string>(initialStatus);
   const [filterTurma, setFilterTurma] = useState<string>("todos");
+  const [sortKey, setSortKey] = useState<SortKey | null>(null);
+  const [sortDir, setSortDir] = useState<SortDir>("desc");
+  const [filterStatuses, setFilterStatuses] = useState<FilterStatus[]>(
+    initialStatus && ["excelente", "normal", "risco"].includes(initialStatus) ? [initialStatus as FilterStatus] : []
+  );
 
   const scopedStudents = useMemo(() => {
     return filterTurma === "todos" ? profStudents : profStudents.filter(s => s.turmaId === filterTurma);
@@ -40,9 +50,29 @@ export default function ProfessorStudents() {
   const normal = scopedStudents.filter(s => s.status === "normal").length;
   const atRisk = scopedStudents.filter(s => s.status === "risco").length;
 
-  const filtered = scopedStudents
-    .filter(s => filterStatus === "todos" || s.status === filterStatus)
-    .filter(s => s.name.toLowerCase().includes(search.toLowerCase()));
+  const filtered = useMemo(() => {
+    let result = scopedStudents
+      .filter(s => filterStatuses.length === 0 || filterStatuses.includes(s.status as FilterStatus))
+      .filter(s => s.name.toLowerCase().includes(search.toLowerCase()));
+
+    if (sortKey) {
+      result = [...result].sort((a, b) => {
+        let va: number, vb: number;
+        if (sortKey === "attendance") { va = a.attendance; vb = b.attendance; }
+        else if (sortKey === "avgGrade") { va = a.avgGrade ?? -1; vb = b.avgGrade ?? -1; }
+        else { va = a.totalTasks > 0 ? a.submittedTasks / a.totalTasks : 0; vb = b.totalTasks > 0 ? b.submittedTasks / b.totalTasks : 0; }
+        return sortDir === "desc" ? vb - va : va - vb;
+      });
+    }
+    return result;
+  }, [scopedStudents, filterStatuses, search, sortKey, sortDir]);
+
+  const toggleFilterStatus = (s: FilterStatus) => {
+    setFilterStatuses(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s]);
+  };
+
+  const hasActiveFilters = filterStatuses.length > 0 || sortKey !== null || search !== "";
+  const clearFilters = () => { setFilterStatuses([]); setSortKey(null); setSearch(""); };
 
   const statusColors: Record<string, string> = { excelente: "border-l-accent", normal: "border-l-secondary", risco: "border-l-destructive" };
   const statusLabels: Record<string, string> = { excelente: "Excelente", normal: "Normal", risco: "Em Risco" };
@@ -51,11 +81,12 @@ export default function ProfessorStudents() {
   return (
     <div className="p-6 lg:p-8 space-y-5 animate-fade-in">
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Os Meus Estudantes</h1>
+        <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+          <Users className="w-6 h-6 text-primary" /> Os Meus Estudantes
+        </h1>
         <p className="text-sm text-muted-foreground mt-1">{profStudents.length} estudantes no total</p>
       </div>
 
-      {/* Summary cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <SummaryCard label="Total" value={total} icon={Users} iconBg="bg-primary/10" iconColor="text-primary" />
         <SummaryCard label="Excelentes" value={excellent} icon={TrendingUp} iconBg="bg-accent/10" iconColor="text-accent" valueClass="text-accent" />
@@ -63,48 +94,100 @@ export default function ProfessorStudents() {
         <SummaryCard label="Em Risco" value={atRisk} icon={AlertTriangle} iconBg="bg-destructive/10" iconColor="text-destructive" valueClass={atRisk > 0 ? "text-destructive" : undefined} />
       </div>
 
-      {/* Turma toggle */}
-      <div className="flex items-center gap-2 flex-wrap">
-        <span className="text-xs font-medium text-muted-foreground mr-1">Turma:</span>
-        <button
-          onClick={() => setFilterTurma("todos")}
-          className={`px-3.5 py-2 rounded-lg text-xs font-medium border transition-all ${filterTurma === "todos" ? "bg-primary text-primary-foreground border-primary shadow-sm" : "bg-card text-muted-foreground border-border hover:border-primary/30 hover:text-foreground"}`}
-        >Todas</button>
-        {allTurmas.map(t => (
-          <button
-            key={t.id}
-            onClick={() => setFilterTurma(t.id)}
-            className={`px-3.5 py-2 rounded-lg text-xs font-medium border transition-all ${filterTurma === t.id ? "bg-primary text-primary-foreground border-primary shadow-sm" : "bg-card text-muted-foreground border-border hover:border-primary/30 hover:text-foreground"}`}
-          >{t.name}</button>
-        ))}
-      </div>
-
-      {/* Search + status filters */}
-      <div className="flex items-center gap-3 flex-wrap">
-        <div className="relative flex-1 min-w-[200px] max-w-sm">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-          <Input placeholder="Pesquisar estudante..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9 h-9 rounded-lg" />
-        </div>
-        <div className="flex gap-1.5">
-          {["todos", "excelente", "normal", "risco"].map(s => (
-            <button
-              key={s}
-              onClick={() => setFilterStatus(s)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
-                filterStatus === s
-                  ? s === "risco"
-                    ? "bg-destructive text-destructive-foreground border-destructive shadow-sm"
-                    : "bg-primary text-primary-foreground border-primary shadow-sm"
-                  : "bg-card text-muted-foreground border-border hover:border-primary/30 hover:text-foreground"
-              }`}
-            >
-              {s === "todos" ? "Todos" : s === "risco" ? "Em Risco" : s.charAt(0).toUpperCase() + s.slice(1)}
-            </button>
+      {/* Controls box */}
+      <div className="rounded-xl border border-border bg-card p-4 space-y-3">
+        <div className="flex flex-wrap gap-2">
+          <Button size="sm" variant={filterTurma === "todos" ? "default" : "outline"} onClick={() => setFilterTurma("todos")} className="text-xs">
+            Todas as Turmas
+          </Button>
+          {allTurmas.map(t => (
+            <Button key={t.id} size="sm" variant={filterTurma === t.id ? "default" : "outline"} onClick={() => setFilterTurma(t.id)} className="text-xs">
+              {t.name}
+            </Button>
           ))}
         </div>
+
+        <div className="border-t border-border" />
+
+        <div className="flex gap-2 items-center">
+          <div className="relative flex-1 max-w-sm">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input placeholder="Pesquisar estudante..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9 h-9" />
+          </div>
+
+          <div className="flex-1" />
+
+          {hasActiveFilters && (
+            <Button variant="ghost" size="sm" className="text-xs text-destructive hover:text-destructive hover:bg-destructive/10 shrink-0 gap-1" onClick={clearFilters}>
+              <X className="w-3 h-3" /> Limpar
+            </Button>
+          )}
+
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm" className={`gap-1.5 shrink-0 text-xs ${sortKey ? "border-primary/50 bg-primary/5 text-primary" : ""}`}>
+                <ArrowUpDown className="w-3.5 h-3.5" /> Ordenar
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-44 p-2 space-y-1" align="end" side="top">
+              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-2 pt-1">Campo</p>
+              {[
+                { key: null, label: "Todos" },
+                { key: "attendance" as SortKey, label: "Presença" },
+                { key: "avgGrade" as SortKey, label: "Média" },
+                { key: "submissions" as SortKey, label: "Entregas" },
+              ].map(opt => (
+                <button key={String(opt.key)} onClick={() => setSortKey(opt.key)} className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${sortKey === opt.key ? "bg-primary/10 text-primary font-medium" : "text-foreground hover:bg-muted"}`}>{opt.label}</button>
+              ))}
+              <div className="border-t border-border my-1" />
+              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-2">Direção</p>
+              <button onClick={() => setSortDir("desc")} className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${sortDir === "desc" && sortKey ? "bg-primary/10 text-primary font-medium" : "text-foreground hover:bg-muted"}`}>Maior → Menor</button>
+              <button onClick={() => setSortDir("asc")} className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${sortDir === "asc" && sortKey ? "bg-primary/10 text-primary font-medium" : "text-foreground hover:bg-muted"}`}>Menor → Maior</button>
+            </PopoverContent>
+          </Popover>
+
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm" className={`gap-1.5 shrink-0 text-xs ${filterStatuses.length > 0 ? "border-primary/50 bg-primary/5 text-primary" : ""}`}>
+                <SlidersHorizontal className="w-3.5 h-3.5" /> Filtrar
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-40 p-2 space-y-0.5" align="end" side="top">
+              {([
+                { key: "excelente" as FilterStatus, label: "Excelente" },
+                { key: "normal" as FilterStatus, label: "Normal" },
+                { key: "risco" as FilterStatus, label: "Em Risco" },
+              ]).map(s => (
+                <button key={s.key} onClick={() => toggleFilterStatus(s.key)} className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${filterStatuses.includes(s.key) ? "bg-primary/10 text-primary font-medium" : "text-foreground hover:bg-muted"}`}>{s.label}</button>
+              ))}
+            </PopoverContent>
+          </Popover>
+        </div>
+
+        {hasActiveFilters && (
+          <div className="flex flex-wrap gap-1.5 pt-1">
+            {sortKey && (
+              <Badge variant="outline" className="text-[10px] gap-1 bg-primary/5 text-primary border-primary/20 cursor-pointer hover:bg-primary/10" onClick={() => { setSortKey(null); setSortDir("desc"); }}>
+                {sortKey === "attendance" ? "Presença" : sortKey === "avgGrade" ? "Média" : "Entregas"}: {sortDir === "desc" ? "Maior" : "Menor"}
+                <X className="w-2.5 h-2.5" />
+              </Badge>
+            )}
+            {filterStatuses.map(s => (
+              <Badge key={s} variant="outline" className="text-[10px] gap-1 bg-accent/10 text-accent border-accent/20 cursor-pointer hover:bg-accent/15" onClick={() => toggleFilterStatus(s)}>
+                Estado: {statusLabels[s]}
+                <X className="w-2.5 h-2.5" />
+              </Badge>
+            ))}
+            {search && (
+              <Badge variant="outline" className="text-[10px] gap-1 bg-secondary/10 text-secondary border-secondary/20 cursor-pointer hover:bg-secondary/15" onClick={() => setSearch("")}>
+                Pesquisa: "{search}"
+                <X className="w-2.5 h-2.5" />
+              </Badge>
+            )}
+          </div>
+        )}
       </div>
 
-      {/* Student list */}
       <div className="space-y-2">
         {filtered.map(student => (
           <Card key={student.id} className={`p-4 flex items-center gap-4 border-l-[3px] ${statusColors[student.status]}`}>

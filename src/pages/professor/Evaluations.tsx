@@ -10,7 +10,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import {
   GraduationCap, Plus, Search, Clock, CheckCircle, Users, Send,
   FolderKanban, Calendar, AlertCircle, BarChart3, MapPin, ArrowRight, ClipboardList,
-  ArrowUpDown, Filter, X,
+  ArrowUpDown, SlidersHorizontal, X,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -181,87 +181,100 @@ export default function ProfessorEvaluations() {
         <SummaryCard label="Nota Geral" value={avgGrade ?? "—"} icon={GraduationCap} iconBg="bg-accent/10" iconColor="text-accent" valueClass={avgGrade && Number(avgGrade) >= 10 ? "text-accent" : avgGrade ? "text-destructive" : "text-muted-foreground"} />
       </div>
 
-      {/* Turma toggle */}
-      <div className="flex items-center gap-2 flex-wrap">
-        <span className="text-xs font-medium text-muted-foreground mr-1">Turma:</span>
-        <button
-          onClick={() => setFilterTurma("all")}
-          className={`px-3.5 py-2 rounded-lg text-xs font-medium border transition-all ${filterTurma === "all" ? "bg-primary text-primary-foreground border-primary shadow-sm" : "bg-card text-muted-foreground border-border hover:border-primary/30 hover:text-foreground"}`}
-        >Todas</button>
-        {allTurmas.map(t => (
-          <button key={t.id} onClick={() => setFilterTurma(t.id)}
-            className={`px-3.5 py-2 rounded-lg text-xs font-medium border transition-all ${filterTurma === t.id ? "bg-primary text-primary-foreground border-primary shadow-sm" : "bg-card text-muted-foreground border-border hover:border-primary/30 hover:text-foreground"}`}
-          >{t.name}</button>
-        ))}
-      </div>
-
-      {/* Search + Ordenar + Filtrar */}
-      <div className="rounded-xl border border-border bg-card p-3 flex items-center gap-3 flex-wrap">
-        <div className="relative flex-1 min-w-[200px] max-w-sm">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-          <Input placeholder="Pesquisar avaliação..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-9 h-9 rounded-lg border-0 bg-muted/50" />
-        </div>
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="outline" size="sm" className="gap-1.5 text-xs">
-              <ArrowUpDown className="w-3.5 h-3.5" /> Ordenar
-              {sortKey && <span className="w-1.5 h-1.5 rounded-full bg-primary" />}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent side="top" className="w-52 p-2 space-y-1">
-            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-2 py-1">Ordenar por</p>
-            {([
-              { key: "weight" as SortKey, label: "Peso" },
-              { key: "submissions" as SortKey, label: "Taxa Entrega" },
-              { key: "avgGrade" as SortKey, label: "Média" },
-            ]).map(opt => (
-              <button key={opt.key} onClick={() => { setSortKey(sortKey === opt.key ? null : opt.key); }} className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${sortKey === opt.key ? "bg-primary/10 text-primary font-semibold" : "hover:bg-muted text-foreground"}`}>{opt.label}</button>
-            ))}
-            {sortKey && (
-              <>
-                <div className="border-t my-1" />
-                <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-2 py-1">Direcção</p>
-                {([{ key: "desc" as SortDir, label: "Maior primeiro" }, { key: "asc" as SortDir, label: "Menor primeiro" }]).map(d => (
-                  <button key={d.key} onClick={() => setSortDir(d.key)} className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${sortDir === d.key ? "bg-primary/10 text-primary font-semibold" : "hover:bg-muted text-foreground"}`}>{d.label}</button>
-                ))}
-              </>
-            )}
-          </PopoverContent>
-        </Popover>
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="outline" size="sm" className="gap-1.5 text-xs">
-              <Filter className="w-3.5 h-3.5" /> Filtrar
-              {filterStatuses.length > 0 && <span className="w-1.5 h-1.5 rounded-full bg-primary" />}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent side="top" className="w-48 p-2 space-y-1">
-            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-2 py-1">Estado</p>
-            {([
-              { key: "publicada" as FilterStatus, label: "Activa" },
-              { key: "encerrada" as FilterStatus, label: "Encerrada" },
-              { key: "rascunho" as FilterStatus, label: "Rascunho" },
-            ]).map(s => (
-              <button key={s.key} onClick={() => toggleFilterStatus(s.key)} className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${filterStatuses.includes(s.key) ? "bg-primary/10 text-primary font-semibold" : "hover:bg-muted text-foreground"}`}>{s.label}</button>
-            ))}
-          </PopoverContent>
-        </Popover>
-        {hasActiveFilters && (
-          <Button variant="ghost" size="sm" className="gap-1 text-xs text-muted-foreground" onClick={clearFilters}>
-            <X className="w-3 h-3" /> Limpar
+      {/* Controls box */}
+      <div className="rounded-xl border border-border bg-card p-4 space-y-3">
+        {/* Turma toggle */}
+        <div className="flex flex-wrap gap-2">
+          <Button size="sm" variant={filterTurma === "all" ? "default" : "outline"} onClick={() => setFilterTurma("all")} className="text-xs">
+            Todas as Turmas
           </Button>
-        )}
-        {filterStatuses.map(s => (
-          <Badge key={s} variant="outline" className="gap-1 text-[10px] cursor-pointer" onClick={() => toggleFilterStatus(s)}>
-            {s === "publicada" ? "Activa" : s === "encerrada" ? "Encerrada" : "Rascunho"}
-            <X className="w-2.5 h-2.5" />
-          </Badge>
-        ))}
-        {sortKey && (
-          <Badge variant="outline" className="gap-1 text-[10px] cursor-pointer" onClick={() => setSortKey(null)}>
-            {sortKey === "weight" ? "Peso" : sortKey === "submissions" ? "Entrega" : "Média"} {sortDir === "desc" ? "↓" : "↑"}
-            <X className="w-2.5 h-2.5" />
-          </Badge>
+          {allTurmas.map(t => (
+            <Button key={t.id} size="sm" variant={filterTurma === t.id ? "default" : "outline"} onClick={() => setFilterTurma(t.id)} className="text-xs">
+              {t.name}
+            </Button>
+          ))}
+        </div>
+
+        <div className="border-t border-border" />
+
+        {/* Search + Sort + Filter row */}
+        <div className="flex gap-2 items-center">
+          <div className="relative flex-1 max-w-sm">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input placeholder="Pesquisar avaliação..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-9 h-9" />
+          </div>
+
+          <div className="flex-1" />
+
+          {hasActiveFilters && (
+            <Button variant="ghost" size="sm" className="text-xs text-destructive hover:text-destructive hover:bg-destructive/10 shrink-0 gap-1" onClick={clearFilters}>
+              <X className="w-3 h-3" /> Limpar
+            </Button>
+          )}
+
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm" className={`gap-1.5 shrink-0 text-xs ${sortKey ? "border-primary/50 bg-primary/5 text-primary" : ""}`}>
+                <ArrowUpDown className="w-3.5 h-3.5" /> Ordenar
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-44 p-2 space-y-1" align="end" side="top">
+              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-2 pt-1">Campo</p>
+              {[
+                { key: null, label: "Todos" },
+                { key: "weight" as SortKey, label: "Peso" },
+                { key: "submissions" as SortKey, label: "Taxa Entrega" },
+                { key: "avgGrade" as SortKey, label: "Média" },
+              ].map(opt => (
+                <button key={String(opt.key)} onClick={() => setSortKey(opt.key)} className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${sortKey === opt.key ? "bg-primary/10 text-primary font-medium" : "text-foreground hover:bg-muted"}`}>{opt.label}</button>
+              ))}
+              <div className="border-t border-border my-1" />
+              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-2">Direção</p>
+              <button onClick={() => setSortDir("desc")} className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${sortDir === "desc" && sortKey ? "bg-primary/10 text-primary font-medium" : "text-foreground hover:bg-muted"}`}>Maior → Menor</button>
+              <button onClick={() => setSortDir("asc")} className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${sortDir === "asc" && sortKey ? "bg-primary/10 text-primary font-medium" : "text-foreground hover:bg-muted"}`}>Menor → Maior</button>
+            </PopoverContent>
+          </Popover>
+
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm" className={`gap-1.5 shrink-0 text-xs ${filterStatuses.length > 0 ? "border-primary/50 bg-primary/5 text-primary" : ""}`}>
+                <SlidersHorizontal className="w-3.5 h-3.5" /> Filtrar
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-40 p-2 space-y-0.5" align="end" side="top">
+              {([
+                { key: "publicada" as FilterStatus, label: "Activa" },
+                { key: "encerrada" as FilterStatus, label: "Encerrada" },
+                { key: "rascunho" as FilterStatus, label: "Rascunho" },
+              ]).map(s => (
+                <button key={s.key} onClick={() => toggleFilterStatus(s.key)} className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${filterStatuses.includes(s.key) ? "bg-primary/10 text-primary font-medium" : "text-foreground hover:bg-muted"}`}>{s.label}</button>
+              ))}
+            </PopoverContent>
+          </Popover>
+        </div>
+
+        {/* Active tags */}
+        {hasActiveFilters && (
+          <div className="flex flex-wrap gap-1.5 pt-1">
+            {sortKey && (
+              <Badge variant="outline" className="text-[10px] gap-1 bg-primary/5 text-primary border-primary/20 cursor-pointer hover:bg-primary/10" onClick={() => { setSortKey(null); setSortDir("desc"); }}>
+                {sortKey === "weight" ? "Peso" : sortKey === "submissions" ? "Entrega" : "Média"}: {sortDir === "desc" ? "Maior" : "Menor"}
+                <X className="w-2.5 h-2.5" />
+              </Badge>
+            )}
+            {filterStatuses.map(s => (
+              <Badge key={s} variant="outline" className="text-[10px] gap-1 bg-accent/10 text-accent border-accent/20 cursor-pointer hover:bg-accent/15" onClick={() => toggleFilterStatus(s)}>
+                Estado: {s === "publicada" ? "Activa" : s === "encerrada" ? "Encerrada" : "Rascunho"}
+                <X className="w-2.5 h-2.5" />
+              </Badge>
+            ))}
+            {searchTerm && (
+              <Badge variant="outline" className="text-[10px] gap-1 bg-secondary/10 text-secondary border-secondary/20 cursor-pointer hover:bg-secondary/15" onClick={() => setSearchTerm("")}>
+                Pesquisa: "{searchTerm}"
+                <X className="w-2.5 h-2.5" />
+              </Badge>
+            )}
+          </div>
         )}
       </div>
 
