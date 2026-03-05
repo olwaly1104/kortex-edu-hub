@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button";
 import {
   BookOpen, Users, Video, Calendar, ChevronRight,
   Clock, MapPin, Play, AlertTriangle, CheckCircle,
-  Eye, ArrowRight, Megaphone, GraduationCap, UserCheck,
+  Eye, Megaphone, GraduationCap, UserCheck,
+  UserX, ClipboardCheck, BarChart3,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -163,20 +164,104 @@ export default function ProfessorDashboard() {
             </div>
           </div>
 
-          {atRiskStudents.length > 0 && (
-            <Link to="/professor/students?status=risco" className="block">
-              <Card className="p-4 flex items-center gap-4 hover:shadow-md transition-shadow cursor-pointer border-l-[3px] border-l-destructive">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-destructive/10 shrink-0">
+          {/* Alertas em Risco — 2 columns: Turmas | Estudantes */}
+          {(atRiskStudents.length > 0 || allTurmas.some(t => {
+            const ts = profStudents.filter(s => s.turmaId === t.id);
+            const unique = ts.filter((s, i, arr) => arr.findIndex(x => x.email === s.email) === i);
+            const avg = unique.length > 0 && unique.some(s => s.avgGrade !== null)
+              ? Math.round(unique.filter(s => s.avgGrade !== null).reduce((s, st) => s + (st.avgGrade || 0), 0) / unique.filter(s => s.avgGrade !== null).length * 10) / 10
+              : null;
+            const att = unique.length > 0 ? Math.round(unique.reduce((s, st) => s + st.attendance, 0) / unique.length) : 0;
+            return att < 80 || (avg !== null && avg < 12);
+          })) && (() => {
+            const turmasEmRisco = allTurmas.filter(t => {
+              const ts = profStudents.filter(s => s.turmaId === t.id);
+              const unique = ts.filter((s, i, arr) => arr.findIndex(x => x.email === s.email) === i);
+              const avg = unique.length > 0 && unique.some(s => s.avgGrade !== null)
+                ? Math.round(unique.filter(s => s.avgGrade !== null).reduce((s, st) => s + (st.avgGrade || 0), 0) / unique.filter(s => s.avgGrade !== null).length * 10) / 10
+                : null;
+              const att = unique.length > 0 ? Math.round(unique.reduce((s, st) => s + st.attendance, 0) / unique.length) : 0;
+              return att < 80 || (avg !== null && avg < 12);
+            }).map(t => {
+              const ts = profStudents.filter(s => s.turmaId === t.id);
+              const unique = ts.filter((s, i, arr) => arr.findIndex(x => x.email === s.email) === i);
+              const avg = unique.length > 0 && unique.some(s => s.avgGrade !== null)
+                ? Math.round(unique.filter(s => s.avgGrade !== null).reduce((s, st) => s + (st.avgGrade || 0), 0) / unique.filter(s => s.avgGrade !== null).length * 10) / 10
+                : null;
+              const att = unique.length > 0 ? Math.round(unique.reduce((s, st) => s + st.attendance, 0) / unique.length) : 0;
+              const entrega = unique.length > 0 ? Math.round(unique.reduce((s, st) => s + (st.submittedTasks / Math.max(st.totalTasks, 1) * 100), 0) / unique.length) : 0;
+              return { ...t, avg, att, entrega };
+            });
+
+            return (
+              <Card className="p-5">
+                <div className="flex items-center gap-2 mb-4">
                   <AlertTriangle className="w-5 h-5 text-destructive" />
+                  <h2 className="text-base font-semibold text-foreground">Alertas em Risco</h2>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-foreground">{atRiskStudents.length} Estudantes em Risco</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">Estudantes com baixa presença, média ou entregas insuficientes</p>
+                <div className="grid grid-cols-2 gap-0 flex-1">
+                  {/* Turmas em Risco */}
+                  <div className="pr-3 border-r border-border flex flex-col">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1">
+                        <Users className="w-3 h-3" /> Turmas
+                        <Badge variant="outline" className="text-[9px] px-1.5 py-0">{turmasEmRisco.length}</Badge>
+                      </h3>
+                      <Link to="/professor/disciplines" className="text-[10px] text-primary hover:underline">
+                        Ver todos
+                      </Link>
+                    </div>
+                    <div className="flex flex-col gap-1.5 flex-1">
+                      {turmasEmRisco.slice(0, 5).map(t => {
+                        const disc = profDisciplines.find(d => d.turmas.some(tr => tr.id === t.id));
+                        return (
+                          <Link key={t.id} to={`/professor/disciplines?turma=${t.id}`} className="flex-1 flex">
+                            <div className="px-2.5 py-1.5 rounded-lg border border-border bg-card border-l-[3px] border-l-destructive hover:bg-muted/40 transition-colors cursor-pointer w-full flex flex-col justify-center">
+                              <p className="text-[11px] font-semibold text-foreground leading-tight">{t.name}</p>
+                              <p className="text-[9px] text-muted-foreground">{t.year}º Ano • {disc?.code}</p>
+                              <div className="flex items-center justify-between mt-1 text-[9px]">
+                                <span className={`flex items-center gap-0.5 ${t.att < 80 ? "text-destructive font-medium" : "text-muted-foreground"}`}><Clock className="w-2.5 h-2.5" />{t.att}%</span>
+                                <span className={`flex items-center gap-0.5 ${t.entrega < 80 ? "text-destructive font-medium" : "text-muted-foreground"}`}><ClipboardCheck className="w-2.5 h-2.5" />{t.entrega}%</span>
+                                <span className={`flex items-center gap-0.5 ${t.avg !== null && t.avg < 12 ? "text-destructive font-medium" : "text-muted-foreground"}`}><BarChart3 className="w-2.5 h-2.5" />{t.avg ?? "—"}/20</span>
+                              </div>
+                            </div>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Estudantes em Risco */}
+                  <div className="pl-3 flex flex-col">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1">
+                        <UserX className="w-3 h-3" /> Estudantes
+                        <Badge variant="outline" className="text-[9px] px-1.5 py-0">{atRiskStudents.length}</Badge>
+                      </h3>
+                      <Link to="/professor/students?status=risco" className="text-[10px] text-primary hover:underline">
+                        Ver todos
+                      </Link>
+                    </div>
+                    <div className="flex flex-col gap-1.5 flex-1">
+                      {atRiskStudents.slice(0, 5).map(e => (
+                        <Link key={e.id} to={`/professor/students/${e.id}`} className="flex-1 flex">
+                          <div className="px-2.5 py-1.5 rounded-lg border border-border bg-card border-l-[3px] border-l-destructive hover:bg-muted/40 transition-colors cursor-pointer w-full flex flex-col justify-center">
+                            <p className="text-[11px] font-semibold text-foreground leading-tight truncate">{e.name}</p>
+                            <p className="text-[9px] text-muted-foreground">{e.turma}</p>
+                            <div className="flex items-center justify-between mt-1 text-[9px]">
+                              <span className="flex items-center gap-0.5 text-destructive font-medium"><BarChart3 className="w-2.5 h-2.5" />{e.avgGrade !== null ? `${e.avgGrade}/20` : "—"}</span>
+                              <span className={`flex items-center gap-0.5 ${e.attendance < 70 ? "text-destructive font-medium" : "text-muted-foreground"}`}><Clock className="w-2.5 h-2.5" />{e.attendance}%</span>
+                              <span className={`flex items-center gap-0.5 ${(e.submittedTasks / Math.max(e.totalTasks, 1) * 100) < 60 ? "text-destructive font-medium" : "text-muted-foreground"}`}><ClipboardCheck className="w-2.5 h-2.5" />{Math.round(e.submittedTasks / Math.max(e.totalTasks, 1) * 100)}%</span>
+                            </div>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
                 </div>
-                <ArrowRight className="w-5 h-5 text-destructive shrink-0" />
               </Card>
-            </Link>
-          )}
+            );
+          })()}
         </div>
 
         <div className="space-y-6">
