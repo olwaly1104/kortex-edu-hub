@@ -313,24 +313,36 @@ export default function CoordenadorTurmaDetail() {
         </TabsContent>
 
         {/* ── Conteúdos ── */}
-        <TabsContent value="conteudos" className="space-y-4">
+        <TabsContent value="conteudos" className="space-y-5">
           <p className="text-sm text-muted-foreground">{conteudos.length} conteúdos disponíveis</p>
-          <div className="space-y-2">
-            {conteudos.map((c, i) => (
-              <Card key={i} className="p-4 flex items-center gap-4">
-                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                  <FileText className="w-5 h-5 text-primary" />
+          {turmaLessons.filter(l => l.status === "publicada").map(lesson => {
+            const lessonConteudos = conteudos.filter(c => c.lessonId === lesson.id);
+            if (lessonConteudos.length === 0) return null;
+            return (
+              <div key={lesson.id} className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-mono font-semibold px-2 py-0.5 rounded bg-primary/10 text-primary">Aula #{lesson.number}</span>
+                  <span className="text-sm font-medium text-foreground">{lesson.title}</span>
+                  <Badge variant="outline" className="text-[10px] font-mono">{lesson.disciplineCode}</Badge>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-foreground">{c.name}</p>
-                  <p className="text-[11px] text-muted-foreground">{c.type.toUpperCase()} • {c.size} • Aula #{c.lessonNumber}: {c.lessonTitle} • {c.date}</p>
+                <div className="space-y-1.5 pl-4 border-l-2 border-border/50">
+                  {lessonConteudos.map((c, i) => (
+                    <Card key={i} className="p-3 flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                        <FileText className="w-4 h-4 text-primary" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-foreground">{c.name}</p>
+                        <p className="text-[10px] text-muted-foreground">{c.type.toUpperCase()} • {c.size}</p>
+                      </div>
+                      <Button variant="ghost" size="icon" className="shrink-0"><Download className="w-4 h-4" /></Button>
+                    </Card>
+                  ))}
                 </div>
-                <Badge variant="outline" className="text-[10px] font-mono">{c.disciplineCode}</Badge>
-                <Button variant="ghost" size="icon" className="shrink-0"><Download className="w-4 h-4" /></Button>
-              </Card>
-            ))}
-            {conteudos.length === 0 && <p className="text-center text-muted-foreground py-8">Nenhum conteúdo disponível.</p>}
-          </div>
+              </div>
+            );
+          })}
+          {conteudos.length === 0 && <p className="text-center text-muted-foreground py-8">Nenhum conteúdo disponível.</p>}
         </TabsContent>
 
         {/* ── Tarefas ── */}
