@@ -74,6 +74,8 @@ export default function ProfessorEvaluations() {
   const deliveryRate = totalExp > 0 ? Math.round(totalSub / totalExp * 100) : 0;
   const graded = scopedEvals.filter(t => t.avgGrade !== null);
   const avgGrade = graded.length > 0 ? (graded.reduce((s, t) => s + (t.avgGrade || 0), 0) / graded.length).toFixed(1) : null;
+  const approvedEvals = graded.filter(t => (t.avgGrade || 0) >= 10).length;
+  const taxaAprovacao = graded.length > 0 ? Math.round(approvedEvals / graded.length * 100) : 0;
 
   const filtered = useMemo(() => {
     let result = scopedEvals
@@ -173,12 +175,20 @@ export default function ProfessorEvaluations() {
       )}
 
       {/* Summary cards */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-        <SummaryCard label="Activas" value={activeCount} icon={Clock} iconBg="bg-primary/10" iconColor="text-primary" />
-        <SummaryCard label="Por Atribuir" value={porAtribuir} icon={AlertCircle} iconBg="bg-destructive/10" iconColor="text-destructive" valueClass={porAtribuir > 0 ? "text-destructive" : undefined} />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4">
+          <div className="flex items-center justify-between">
+            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Activas</p>
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-primary/10">
+              <Clock className="w-4 h-4 text-primary" />
+            </div>
+          </div>
+          <p className="text-2xl font-bold text-foreground">{activeCount}</p>
+          {porAtribuir > 0 && <p className="text-[11px] text-destructive font-medium">{porAtribuir} por atribuir</p>}
+        </div>
         <SummaryCard label="Encerradas" value={closedCount} icon={CheckCircle} iconBg="bg-accent/10" iconColor="text-accent" />
-        <SummaryCard label="Taxa Entrega" value={`${deliveryRate}%`} icon={BarChart3} iconBg="bg-secondary/10" iconColor="text-secondary" />
         <SummaryCard label="Nota Geral" value={avgGrade ?? "—"} icon={GraduationCap} iconBg="bg-accent/10" iconColor="text-accent" valueClass={avgGrade && Number(avgGrade) >= 10 ? "text-accent" : avgGrade ? "text-destructive" : "text-muted-foreground"} />
+        <SummaryCard label="Taxa Aprovação" value={`${taxaAprovacao}%`} icon={CheckCircle} iconBg="bg-accent/10" iconColor="text-accent" valueClass={taxaAprovacao >= 50 ? "text-accent" : "text-destructive"} />
       </div>
 
       {/* Controls box */}
@@ -320,11 +330,6 @@ export default function ProfessorEvaluations() {
                     {isActive && (
                       <Badge className="bg-destructive/10 text-destructive border-destructive/20 gap-1 text-[10px]">
                         <AlertCircle className="w-3 h-3" /> Por atribuir
-                      </Badge>
-                    )}
-                    {naoCompletado && task.avgGrade !== null && (
-                      <Badge className="bg-secondary/10 text-secondary border-0 text-[10px]">
-                        {missingCount} não completado — Nota 0
                       </Badge>
                     )}
                     <Badge className={`${sStyle.bg} gap-1 text-[10px] border-0`}>

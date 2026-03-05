@@ -158,9 +158,17 @@ export default function ProfessorTasks() {
       )}
 
       {/* Summary cards */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-        <SummaryCard label="Activas" value={activeTasks.length} icon={Clock} iconBg="bg-primary/10" iconColor="text-primary" />
-        <SummaryCard label="Por Atribuir" value={porAtribuir} icon={AlertCircle} iconBg="bg-destructive/10" iconColor="text-destructive" valueClass={porAtribuir > 0 ? "text-destructive" : undefined} />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4">
+          <div className="flex items-center justify-between">
+            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Activas</p>
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-primary/10">
+              <Clock className="w-4 h-4 text-primary" />
+            </div>
+          </div>
+          <p className="text-2xl font-bold text-foreground">{activeTasks.length}</p>
+          {porAtribuir > 0 && <p className="text-[11px] text-destructive font-medium">{porAtribuir} por atribuir</p>}
+        </div>
         <SummaryCard label="Encerradas" value={closedTasks.length} icon={CheckCircle} iconBg="bg-accent/10" iconColor="text-accent" />
         <SummaryCard label="Taxa Entrega" value={`${avgSubmissionRate}%`} icon={BarChart3} iconBg="bg-secondary/10" iconColor="text-secondary" />
         <SummaryCard label="Nota Geral" value={overallAvg ?? "—"} icon={BookOpen} iconBg="bg-accent/10" iconColor="text-accent" valueClass={overallAvg && Number(overallAvg) >= 10 ? "text-accent" : overallAvg ? "text-destructive" : "text-muted-foreground"} />
@@ -300,11 +308,6 @@ export default function ProfessorTasks() {
                     {isActive && (
                       <Badge className="bg-destructive/10 text-destructive border-destructive/20 gap-1 text-[10px]">
                         <AlertCircle className="w-3 h-3" /> Por atribuir
-                      </Badge>
-                    )}
-                    {naoEntregue && (
-                      <Badge className="bg-secondary/10 text-secondary border-0 text-[10px]">
-                        {missingCount} não entregue — Nota 0
                       </Badge>
                     )}
                     <Badge className={`${sStyle.bg} gap-1 text-[10px] border-0`}>
