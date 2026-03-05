@@ -336,10 +336,10 @@ export default function ProfessorTasks() {
                     </div>
                     <div className="space-y-1.5">
                       <div className="flex items-center justify-between text-xs">
-                        <span className="flex items-center gap-1.5 text-secondary"><CheckCircle className="w-3.5 h-3.5" />Corrigido</span>
-                        <span className={`font-semibold ${pendingCorrection > 0 ? "text-secondary" : "text-accent"}`}>{task.corrected}/{task.submissions}{pendingCorrection > 0 ? ` · ${pendingCorrection} por corrigir` : ""}</span>
+                        <span className="flex items-center gap-1.5 text-primary"><CheckCircle className="w-3.5 h-3.5" />Corrigido</span>
+                        <span className={`font-semibold ${pendingCorrection > 0 ? "text-primary" : "text-accent"}`}>{task.corrected}/{task.submissions}{pendingCorrection > 0 ? ` · ${pendingCorrection} por corrigir` : ""}</span>
                       </div>
-                      <Progress value={correctedPct} className={`h-1.5 ${pendingCorrection > 0 ? "[&>div]:bg-secondary" : "[&>div]:bg-accent"}`} />
+                      <Progress value={correctedPct} className={`h-1.5 ${pendingCorrection > 0 ? "" : "[&>div]:bg-accent"}`} />
                       {isActive && task.correctionDeadline && (
                         <p className="text-[10px] text-muted-foreground flex items-center gap-1 mt-1">
                           <Clock className="w-3 h-3" /> Prazo de correcção: <span className="font-medium text-foreground">{task.correctionDeadline}</span>
