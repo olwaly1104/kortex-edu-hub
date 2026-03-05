@@ -3,16 +3,39 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Link } from "react-router-dom";
-import { BookOpen, Users, Clock, MapPin, ChevronRight, Video, FileText, GraduationCap, Calendar } from "lucide-react";
+import { BookOpen, Users, Clock, MapPin, ChevronRight, Video, FileText, GraduationCap, Calendar, CheckCircle, AlertCircle, BarChart3, ClipboardList } from "lucide-react";
 
 export default function ProfessorDisciplines() {
+  // Global stats
+  const totalEvals = profTasks.length;
+  const allStudentsWithGrades = profStudents.filter(s => s.avgGrade !== null);
+  const aprovados = allStudentsWithGrades.filter(s => (s.avgGrade || 0) >= 10).length;
+  const reprovados = allStudentsWithGrades.filter(s => (s.avgGrade || 0) < 10).length;
+  const totalWithGrades = allStudentsWithGrades.length;
+  const taxaAprovacao = totalWithGrades > 0 ? Math.round((aprovados / totalWithGrades) * 100) : 0;
+  const taxaReprovacao = totalWithGrades > 0 ? Math.round((reprovados / totalWithGrades) * 100) : 0;
+  const encerradas = profTasks.filter(t => t.status === "encerrada").length;
+  const taxaConclusao = profTasks.length > 0 ? Math.round((encerradas / profTasks.length) * 100) : 0;
+
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       <div>
         <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
           <GraduationCap className="w-6 h-6 text-primary" /> As Minhas Turmas
         </h1>
-        <p className="text-muted-foreground mt-1">{allTurmas.length} turmas atribuídas</p>
+        <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground flex-wrap">
+          <span className="flex items-center gap-1"><GraduationCap className="w-3.5 h-3.5" /> Faculdade de Engenharia</span>
+          <span className="flex items-center gap-1"><ClipboardList className="w-3.5 h-3.5" /> {totalEvals} Avaliações</span>
+          <span className="flex items-center gap-1">
+            <CheckCircle className="w-3.5 h-3.5" /> Aprov. <span className={`font-bold ${taxaAprovacao >= 70 ? "text-accent" : taxaAprovacao >= 50 ? "text-foreground" : "text-destructive"}`}>{taxaAprovacao}%</span>
+          </span>
+          <span className="flex items-center gap-1">
+            <AlertCircle className="w-3.5 h-3.5" /> Reprov. <span className={`font-bold ${taxaReprovacao > 30 ? "text-destructive" : "text-foreground"}`}>{taxaReprovacao}%</span>
+          </span>
+          <span className="flex items-center gap-1">
+            <BarChart3 className="w-3.5 h-3.5" /> Conclusão <span className="font-bold text-foreground">{taxaConclusao}%</span>
+          </span>
+        </div>
       </div>
 
       <div className="grid md:grid-cols-2 gap-5">
@@ -33,7 +56,15 @@ export default function ProfessorDisciplines() {
           const lessonPct = turmaLessons.length > 0 ? Math.round((turmaPublished / turmaLessons.length) * 100) : 0;
           const totalContents = turmaDiscs.reduce((s, d) => s + d.totalMaterials, 0);
 
-          // Extract schedule days from disciplines
+          // Taxa aprovação per turma
+          const turmaGraded = uniqueStudents.filter(s => s.avgGrade !== null);
+          const turmaAprov = turmaGraded.filter(s => (s.avgGrade || 0) >= 10).length;
+          const turmaReprov = turmaGraded.filter(s => (s.avgGrade || 0) < 10).length;
+          const turmaAprovPct = turmaGraded.length > 0 ? Math.round((turmaAprov / turmaGraded.length) * 100) : 0;
+          const turmaReprovPct = turmaGraded.length > 0 ? Math.round((turmaReprov / turmaGraded.length) * 100) : 0;
+          const turmaEncerradas = turmaTasks.filter(t => t.status === "encerrada").length;
+          const turmaConclusaoPct = turmaTasks.length > 0 ? Math.round((turmaEncerradas / turmaTasks.length) * 100) : 0;
+
           const scheduleDays = turmaDiscs.length > 0 ? turmaDiscs[0].schedule.split(" ")[0] : "";
           const room = turmaDiscs.length > 0 ? turmaDiscs[0].room : "";
 
@@ -83,6 +114,18 @@ export default function ProfessorDisciplines() {
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-muted-foreground flex items-center gap-1.5"><BookOpen className="w-3.5 h-3.5" /> Cadeiras</span>
                     <span className="font-semibold text-foreground">{turmaDiscs.map(d => d.code).join(", ")}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-muted-foreground flex items-center gap-1.5"><CheckCircle className="w-3.5 h-3.5" /> Taxa Aprovação</span>
+                    <span className={`font-bold ${turmaAprovPct >= 70 ? "text-accent" : turmaAprovPct >= 50 ? "text-foreground" : "text-destructive"}`}>{turmaAprovPct}%</span>
+                  </div>
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-muted-foreground flex items-center gap-1.5"><AlertCircle className="w-3.5 h-3.5" /> Taxa Reprovação</span>
+                    <span className={`font-bold ${turmaReprovPct > 30 ? "text-destructive" : "text-foreground"}`}>{turmaReprovPct}%</span>
+                  </div>
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-muted-foreground flex items-center gap-1.5"><BarChart3 className="w-3.5 h-3.5" /> Conclusão</span>
+                    <span className="font-semibold text-foreground">{turmaConclusaoPct}%</span>
                   </div>
                   <div>
                     <div className="flex justify-between text-xs mb-1">
