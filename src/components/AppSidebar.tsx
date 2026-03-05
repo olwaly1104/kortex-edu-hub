@@ -25,8 +25,6 @@ const studentSections: NavSection[] = [
     { label: "Biblioteca Virtual", icon: Library, path: "/student/library" },
   ]},
   { title: "Comunicação", items: [
-    { label: "Chat", icon: MessageSquare, path: "/student/chat" },
-    { label: "Email", icon: Mail, path: "/student/email" },
     { label: "Contactos", icon: Users, path: "/student/contacts" },
   ]},
   { title: "Pessoal", items: [
@@ -51,8 +49,6 @@ const professorSections: NavSection[] = [
     { label: "Notas", icon: GraduationCap, path: "/professor/grades" },
   ]},
   { title: "Comunicação", items: [
-    { label: "Chat", icon: MessageSquare, path: "/professor/chat" },
-    { label: "Email", icon: Mail, path: "/professor/email" },
     { label: "Contactos", icon: Users, path: "/professor/contacts" },
   ]},
   { title: "Pessoal", items: [
@@ -77,8 +73,6 @@ const coordenadorCursoSections: NavSection[] = [
     { label: "Relatórios", icon: BarChart3, path: "/coordenador/relatorios" },
   ]},
   { title: "Comunicação", items: [
-    { label: "Chat", icon: MessageSquare, path: "/coordenador/chat" },
-    { label: "Email", icon: Mail, path: "/coordenador/email" },
     { label: "Contactos", icon: Users, path: "/coordenador/contactos" },
   ]},
   { title: "Pessoal", items: [
