@@ -8,7 +8,7 @@ import { Progress } from "@/components/ui/progress";
 import {
   ArrowLeft, ClipboardList, BookOpen, FolderKanban, Calendar, Users,
   CheckCircle, Clock, Download, AlertCircle, FileText, MapPin, Eye,
-  Save, Send, UserCircle,
+  Save, Send, FileCheck, Check, RotateCcw
 } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
@@ -62,6 +62,17 @@ export default function ProfessorTaskDetail() {
   const submittedList = allSubmissions.filter(s => s.submitted);
   const notSubmittedList = allSubmissions.filter(s => !s.submitted);
 
+  // Calculate approval rate
+  const computedGrades = allSubmissions.map(s => {
+    if (s.grade !== null) return s.grade;
+    if (isEncerrada) return 0;
+    return null;
+  }).filter((g): g is number => g !== null);
+  
+  const positiveGrades = computedGrades.filter(g => g >= 10).length;
+  const totalGraded = computedGrades.length;
+  const approvalRate = totalGraded > 0 ? Math.round((positiveGrades / totalGraded) * 100) : 0;
+
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       <Button variant="ghost" onClick={() => navigate(-1)} className="gap-2">
@@ -85,7 +96,12 @@ export default function ProfessorTaskDetail() {
           <span className="flex items-center gap-1.5"><ClipboardList className="w-4 h-4" /> Peso: <span className="font-semibold text-foreground">{task.weight}%</span></span>
           <span className="flex items-center gap-1.5"><MapPin className="w-4 h-4" /> Presencial</span>
           {task.avgGrade !== null && (
-            <span className="flex items-center gap-1.5">Média: <span className={`font-semibold ${task.avgGrade >= 10 ? "text-accent" : "text-destructive"}`}>{task.avgGrade}/20</span></span>
+            <>
+              <span className="flex items-center gap-1.5">Média: <span className={`font-semibold ${task.avgGrade >= 10 ? "text-accent" : "text-destructive"}`}>{task.avgGrade}/20</span></span>
+              {isEncerrada && (
+                <span className="flex items-center gap-1.5">Aprovação: <span className={`font-semibold ${approvalRate >= 50 ? "text-accent" : "text-destructive"}`}>{approvalRate}%</span></span>
+              )}
+            </>
           )}
         </div>
       </div>
@@ -101,8 +117,8 @@ export default function ProfessorTaskDetail() {
         </Card>
         <Card className="p-4 space-y-2">
           <div className="flex items-center justify-between text-sm">
-            <span className={`flex items-center gap-2 ${pendingCorrection > 0 ? "text-destructive" : "text-muted-foreground"}`}><CheckCircle className="w-4 h-4" /> Corrigido</span>
-            <span className={`font-semibold ${pendingCorrection > 0 ? "text-destructive" : "text-muted-foreground"}`}>{task.corrected}/{task.submissions}{pendingCorrection > 0 ? ` · ${pendingCorrection} por corrigir` : ""}</span>
+            <span className={`flex items-center gap-2 ${pendingCorrection > 0 ? "text-destructive" : "text-muted-foreground"}`}><FileCheck className="w-4 h-4" /> Corrigido</span>
+            <span className={`font-semibold ${pendingCorrection > 0 ? "text-destructive" : "text-muted-foreground"}`}>{task.corrected}/{task.submissions} ({correctedPct}%)</span>
           </div>
           <Progress value={correctedPct} className={`h-2 ${pendingCorrection > 0 ? "[&>div]:bg-destructive" : ""}`} />
           {isActiva && task.correctionDeadline && (
@@ -169,6 +185,7 @@ function GradingTable({ submittedList, notSubmittedList, task, submissionPct, is
   const [atribuirGrade, setAtribuirGrade] = useState("");
   const [atribuirStudent, setAtribuirStudent] = useState<any>(null);
   const [atribuidos, setAtribuidos] = useState<Set<string>>(new Set());
+  const [tempGrades, setTempGrades] = useState<Record<string, string>>({});
 
   const handleGradeChange = (studentId: string, value: string) => {
     if (isEncerrada) return;
@@ -180,8 +197,10 @@ function GradingTable({ submittedList, notSubmittedList, task, submissionPct, is
   };
 
   const handleAtribuir = (student: any) => {
+    const val = tempGrades[student.id];
+    if (!val) return;
     setAtribuirStudent(student);
-    setAtribuirGrade("");
+    setAtribuirGrade(val);
   };
 
   const confirmAtribuir = () => {
@@ -196,6 +215,10 @@ function GradingTable({ submittedList, notSubmittedList, task, submissionPct, is
     toast({ title: "Nota atribuída!", description: `${atribuirStudent.name} recebeu ${atribuirGrade}/20.` });
     setAtribuirStudent(null);
     setAtribuirGrade("");
+  };
+
+  const handleTempGradeChange = (studentId: string, value: string) => {
+    setTempGrades(prev => ({ ...prev, [studentId]: value }));
   };
 
   return (
@@ -325,9 +348,23 @@ function GradingTable({ submittedList, notSubmittedList, task, submissionPct, is
                       ) : wasAtribuido ? (
                         <span className="text-sm font-bold text-muted-foreground w-14 text-right">{grades[student.id] || "0"}/20</span>
                       ) : (
-                        <Button size="sm" variant="outline" className="text-xs gap-1.5 h-7 text-destructive border-destructive/30 hover:bg-destructive/10" onClick={() => handleAtribuir(student)}>
-                          <AlertCircle className="w-3 h-3" /> Atribuir Nota
-                        </Button>
+                        <div className="flex items-center gap-2">
+                          <Input
+                            type="number" min="0" max="20" step="0.5"
+                            value={tempGrades[student.id] || ""}
+                            onChange={e => handleTempGradeChange(student.id, e.target.value)}
+                            className="w-14 h-7 text-center text-xs font-bold"
+                            placeholder="0"
+                          />
+                          <Button 
+                            size="sm" 
+                            className={`text-xs gap-1.5 h-7 transition-all ${!tempGrades[student.id] ? "opacity-50 grayscale" : "bg-destructive hover:bg-destructive/90 text-destructive-foreground"}`} 
+                            disabled={!tempGrades[student.id]}
+                            onClick={() => handleAtribuir(student)}
+                          >
+                            Atribuir
+                          </Button>
+                        </div>
                       )}
                     </div>
                   </div>
@@ -344,7 +381,7 @@ function GradingTable({ submittedList, notSubmittedList, task, submissionPct, is
           <DialogHeader>
             <DialogTitle>Atribuir Nota</DialogTitle>
             <DialogDescription>
-              Atribuir nota a <span className="font-semibold text-foreground">{atribuirStudent?.name}</span> que não submeteu a tarefa.
+              Confirma a atribuição da nota <span className="font-bold text-foreground">{atribuirGrade}/20</span> ao estudante <span className="font-semibold text-foreground">{atribuirStudent?.name}</span>?
             </DialogDescription>
           </DialogHeader>
           <div className="flex items-center gap-3 py-4">
@@ -355,16 +392,9 @@ function GradingTable({ submittedList, notSubmittedList, task, submissionPct, is
               <p className="text-sm font-medium">{atribuirStudent?.name}</p>
               <p className="text-xs text-muted-foreground">{atribuirStudent?.email}</p>
             </div>
-            <div className="flex items-center gap-1.5">
-              <Input
-                type="number" min="0" max="20" step="0.5"
-                value={atribuirGrade}
-                onChange={e => setAtribuirGrade(e.target.value)}
-                className="w-20 h-9 text-center text-sm font-bold"
-                placeholder="0"
-                autoFocus
-              />
-              <span className="text-sm text-muted-foreground">/20</span>
+            <div className="flex flex-col items-end">
+              <span className="text-3xl font-bold text-foreground">{atribuirGrade}</span>
+              <span className="text-xs text-muted-foreground">/20 valores</span>
             </div>
           </div>
           <DialogFooter>
