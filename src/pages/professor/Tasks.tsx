@@ -287,7 +287,6 @@ export default function ProfessorTasks() {
               className="rounded-xl border border-border bg-card overflow-hidden cursor-pointer hover:shadow-md hover:border-primary/20 transition-all group"
               onClick={() => navigate(`/professor/tasks/${task.id}`)}
             >
-              <div className="h-1 rounded-t-xl" style={{ backgroundColor: disc?.color }} />
               <div className="p-5">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
@@ -296,17 +295,10 @@ export default function ProfessorTasks() {
                     <span className="text-[10px] text-muted-foreground font-medium">{disc?.code}</span>
                     {turma && <Badge variant="outline" className="text-[10px] px-1.5 py-0 rounded-md">{turma.name}</Badge>}
                   </div>
-                  <div className="flex items-center gap-2">
-                    {isActive && (
-                      <Badge className="bg-destructive/10 text-destructive border-destructive/20 gap-1 text-[10px]">
-                        <AlertCircle className="w-3 h-3" /> Por atribuir
-                      </Badge>
-                    )}
-                    <Badge className={`${sStyle.bg} gap-1 text-[10px] border-0`}>
-                      <StatusIcon className="w-3 h-3" />
-                      {sStyle.label}
-                    </Badge>
-                  </div>
+                  <Badge className={`${sStyle.bg} gap-1 text-[10px] border-0`}>
+                    <StatusIcon className="w-3 h-3" />
+                    {sStyle.label}
+                  </Badge>
                 </div>
 
                 <h3 className="text-sm font-semibold text-foreground mb-3 group-hover:text-primary transition-colors">
@@ -325,6 +317,12 @@ export default function ProfessorTasks() {
                   <span className="flex items-center gap-1.5">
                     <MapPin className="w-3.5 h-3.5" /> Presencial
                   </span>
+                  {isActive && missingCount > 0 && (
+                    <span className="flex items-center gap-1.5 text-destructive">
+                      <AlertCircle className="w-3.5 h-3.5" />
+                      <span className="font-medium">{missingCount} por atribuir</span>
+                    </span>
+                  )}
                   {task.avgGrade !== null && (
                     <span className="flex items-center gap-1.5">
                       <BarChart3 className="w-3.5 h-3.5" />
