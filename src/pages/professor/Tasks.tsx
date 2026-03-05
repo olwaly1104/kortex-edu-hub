@@ -10,7 +10,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import {
   BookOpen, Plus, Search, Clock, CheckCircle, Users, Send,
   Calendar, AlertCircle, ClipboardList, BarChart3,
-  MapPin, ArrowRight, ArrowUpDown, SlidersHorizontal, X,
+  MapPin, ArrowRight, ArrowUpDown, SlidersHorizontal, X, FileCheck,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -277,9 +277,9 @@ export default function ProfessorTasks() {
           const sStyle = statusStyle[task.status];
           const StatusIcon = sStyle.icon;
           const submissionPct = task.totalStudents > 0 ? Math.round(task.submissions / task.totalStudents * 100) : 0;
-          const missingCount = task.totalStudents - task.submissions;
           const isActive = task.status === "publicada";
-          const naoEntregue = task.status === "encerrada" && task.submissions < task.totalStudents;
+          const correctedPct = task.submissions > 0 ? Math.round(task.corrected / task.submissions * 100) : 0;
+          const pendingCorrection = task.submissions - task.corrected;
 
           return (
             <div
@@ -326,7 +326,7 @@ export default function ProfessorTasks() {
                 </div>
 
                 {task.status !== "rascunho" && (
-                  <div className="space-y-2.5">
+                  <div className="space-y-3">
                     <div className="space-y-1.5">
                       <div className="flex items-center justify-between text-xs">
                         <span className="flex items-center gap-1.5 text-muted-foreground"><Users className="w-3.5 h-3.5" />Submetido</span>
@@ -334,15 +334,18 @@ export default function ProfessorTasks() {
                       </div>
                       <Progress value={submissionPct} className="h-1.5" />
                     </div>
-                    {isActive && missingCount > 0 && (
-                      <div className="space-y-1.5">
-                        <div className="flex items-center justify-between text-xs">
-                          <span className="flex items-center gap-1.5 text-destructive"><AlertCircle className="w-3.5 h-3.5" />Atribuídos/Submetidos</span>
-                          <span className="font-semibold text-destructive">{task.submissions}/{task.totalStudents} · {missingCount} por atribuir</span>
-                        </div>
-                        <Progress value={submissionPct} className="h-1.5 [&>div]:bg-destructive" />
+                    <div className="space-y-1.5">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="flex items-center gap-1.5 text-secondary"><FileCheck className="w-3.5 h-3.5" />Corrigido</span>
+                        <span className={`font-semibold ${pendingCorrection > 0 ? "text-secondary" : "text-accent"}`}>{task.corrected}/{task.submissions}{pendingCorrection > 0 ? ` · ${pendingCorrection} por corrigir` : ""}</span>
                       </div>
-                    )}
+                      <Progress value={correctedPct} className={`h-1.5 ${pendingCorrection > 0 ? "[&>div]:bg-secondary" : "[&>div]:bg-accent"}`} />
+                      {isActive && task.correctionDeadline && (
+                        <p className="text-[10px] text-muted-foreground flex items-center gap-1 mt-1">
+                          <Clock className="w-3 h-3" /> Prazo de correcção: <span className="font-medium text-foreground">{task.correctionDeadline}</span>
+                        </p>
+                      )}
+                    </div>
                   </div>
                 )}
 
