@@ -60,7 +60,7 @@ export default function ProfessorEvaluations() {
   const [formDue, setFormDue] = useState("");
   const [formWeight, setFormWeight] = useState("25");
 
-  const allEvals = profTasks.filter(t => t.type === "quiz" || t.type === "exame");
+  const allEvals = profTasks.filter(t => t.type === "exame");
 
   const scopedEvals = useMemo(() => {
     return filterTurma === "all" ? allEvals : allEvals.filter(t => t.turmaId === filterTurma);
@@ -138,16 +138,6 @@ export default function ProfessorEvaluations() {
                 {profDisciplines.map(d => <option key={d.id} value={d.id}>{d.name} ({d.code})</option>)}
               </select>
             </div>
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Tipo *</label>
-              <div className="flex gap-2">
-                {(["quiz", "exame"] as const).map(t => (
-                  <button key={t} onClick={() => setFormType(t)} className={`px-3.5 py-2 rounded-lg text-xs font-medium border transition-all ${formType === t ? "bg-primary text-primary-foreground border-primary" : "bg-card text-muted-foreground border-border hover:border-primary/30"}`}>
-                    {typeLabel[t]}
-                  </button>
-                ))}
-              </div>
-            </div>
           </div>
           <div className="space-y-1.5">
             <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Título *</label>
@@ -175,17 +165,9 @@ export default function ProfessorEvaluations() {
       )}
 
       {/* Summary cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <div className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4">
-          <div className="flex items-center justify-between">
-            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Activas</p>
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-primary/10">
-              <Clock className="w-4 h-4 text-primary" />
-            </div>
-          </div>
-          <p className="text-2xl font-bold text-foreground">{activeCount}</p>
-          {porAtribuir > 0 && <p className="text-[11px] text-destructive font-medium">{porAtribuir} por atribuir</p>}
-        </div>
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+        <SummaryCard label="Activas" value={activeCount} icon={Clock} iconBg="bg-primary/10" iconColor="text-primary" />
+        <SummaryCard label="Por Atribuir" value={porAtribuir} icon={AlertCircle} iconBg="bg-destructive/10" iconColor="text-destructive" valueClass={porAtribuir > 0 ? "text-destructive" : undefined} />
         <SummaryCard label="Encerradas" value={closedCount} icon={CheckCircle} iconBg="bg-accent/10" iconColor="text-accent" />
         <SummaryCard label="Nota Geral" value={avgGrade ?? "—"} icon={GraduationCap} iconBg="bg-accent/10" iconColor="text-accent" valueClass={avgGrade && Number(avgGrade) >= 10 ? "text-accent" : avgGrade ? "text-destructive" : "text-muted-foreground"} />
         <SummaryCard label="Taxa Aprovação" value={`${taxaAprovacao}%`} icon={CheckCircle} iconBg="bg-accent/10" iconColor="text-accent" valueClass={taxaAprovacao >= 50 ? "text-accent" : "text-destructive"} />
