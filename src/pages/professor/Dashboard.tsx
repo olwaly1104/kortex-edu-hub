@@ -313,6 +313,9 @@ export default function ProfessorDashboard() {
                 const attendance = unique.length > 0
                   ? Math.round(unique.reduce((s, st) => s + st.attendance, 0) / unique.length)
                   : 0;
+                const graded = unique.filter(s => s.avgGrade !== null);
+                const approved = graded.filter(s => (s.avgGrade || 0) >= 10).length;
+                const taxaAprovacao = graded.length > 0 ? Math.round((approved / graded.length) * 100) : null;
 
                 return (
                   <Link key={turma.id} to={`/professor/disciplines?turma=${turma.id}`}>
@@ -329,7 +332,7 @@ export default function ProfessorDashboard() {
                         </div>
                         <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
                       </div>
-                      <div className="grid grid-cols-3 gap-2">
+                      <div className="grid grid-cols-4 gap-2">
                         <div className="text-center p-2 rounded-lg bg-muted/40">
                           <p className="text-sm font-bold text-foreground">{turma.students}</p>
                           <p className="text-[9px] text-muted-foreground">Estudantes</p>
@@ -341,6 +344,10 @@ export default function ProfessorDashboard() {
                         <div className="text-center p-2 rounded-lg bg-muted/40">
                           <p className={`text-sm font-bold ${attendance >= 75 ? "text-accent" : "text-destructive"}`}>{attendance}%</p>
                           <p className="text-[9px] text-muted-foreground">Presença</p>
+                        </div>
+                        <div className="text-center p-2 rounded-lg bg-muted/40">
+                          <p className={`text-sm font-bold ${taxaAprovacao !== null && taxaAprovacao >= 70 ? "text-accent" : taxaAprovacao !== null ? "text-destructive" : "text-muted-foreground"}`}>{taxaAprovacao !== null ? `${taxaAprovacao}%` : "—"}</p>
+                          <p className="text-[9px] text-muted-foreground">Aprovação</p>
                         </div>
                       </div>
                       <p className="text-[10px] text-muted-foreground mt-2">{turmaDiscs.map(d => d.code).join(" • ")} • {turmaDiscs.length} cad.</p>

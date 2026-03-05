@@ -1,6 +1,7 @@
 import { coordCursoInfo, coordTurmas, coordDisciplinas } from "@/data/institutionData";
 import { Card } from "@/components/ui/card";
-import { Layers, Users, BookOpen, Award, ChevronRight, CheckCircle, UserCheck, GraduationCap, ClipboardList } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Layers, Users, BookOpen, Award, ChevronRight, CheckCircle, UserCheck, GraduationCap, ClipboardList, TrendingUp } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export default function CoordenadorAnos() {
@@ -79,6 +80,17 @@ export default function CoordenadorAnos() {
             : 0;
           const yearProfessores = new Set(coordDisciplinas.filter(d => d.year === y.year).map(d => d.professor)).size;
 
+          // Compute estado
+          const estado = avgPresenca < 75 || y.mediaGeral < 11 || y.taxaSucesso < 70
+            ? "risco" : avgPresenca >= 85 && y.mediaGeral >= 13 && y.taxaSucesso >= 85
+            ? "excelente" : "normal";
+          const estadoConfig = {
+            excelente: { label: "Excelente", class: "bg-accent/10 text-accent border-accent/30" },
+            normal: { label: "Normal", class: "bg-primary/10 text-primary border-primary/30" },
+            risco: { label: "Em Risco", class: "bg-destructive/10 text-destructive border-destructive/30" },
+          };
+          const ec = estadoConfig[estado];
+
           return (
             <Link key={y.year} to={`/coordenador/anos/${y.year}`}>
               <Card className="overflow-hidden hover:shadow-lg transition-all h-full group cursor-pointer">
@@ -86,7 +98,10 @@ export default function CoordenadorAnos() {
                   {/* Header */}
                   <div className="flex items-start justify-between mb-1">
                     <h3 className="text-xl font-bold text-foreground">{y.year}º Ano</h3>
-                    <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                    <div className="flex items-center gap-2">
+                      <Badge className={`text-[10px] border ${ec.class}`}>{ec.label}</Badge>
+                      <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                    </div>
                   </div>
                   <p className="text-xs text-muted-foreground mb-4">{info.name}</p>
 
@@ -123,6 +138,10 @@ export default function CoordenadorAnos() {
                     <div className="flex items-center justify-between px-1">
                       <span className="text-xs text-muted-foreground flex items-center gap-1.5"><Award className="w-3.5 h-3.5" /> Média Geral</span>
                       <span className={`text-sm font-semibold tabular-nums ${y.mediaGeral >= 10 ? "text-accent" : "text-destructive"}`}>{y.mediaGeral}</span>
+                    </div>
+                    <div className="flex items-center justify-between px-1">
+                      <span className="text-xs text-muted-foreground flex items-center gap-1.5"><TrendingUp className="w-3.5 h-3.5" /> Taxa Aprovação</span>
+                      <span className={`text-sm font-semibold tabular-nums ${y.taxaSucesso >= 70 ? "text-accent" : "text-destructive"}`}>{y.taxaSucesso}%</span>
                     </div>
                   </div>
                 </div>
