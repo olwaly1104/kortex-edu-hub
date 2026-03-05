@@ -180,10 +180,10 @@ export const currentProfessor: User = {
 
 export const currentCoordenadorCurso: User = {
   id: "4",
-  name: "Dr. Manuel Rodrigues",
+  name: "Dr. Fábio Costa",
   email: "coordcurso@upra.kor",
   role: "coordenador_curso",
-  course: "Engenharia Civil",
+  course: "Arquitectura",
 };
 
 export const currentDecano: User = {
