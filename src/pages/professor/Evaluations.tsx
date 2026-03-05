@@ -315,12 +315,6 @@ export default function ProfessorEvaluations() {
                   <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /> <span className="font-medium text-foreground">{task.dueDate}</span></span>
                   <span className="flex items-center gap-1.5">Peso: <span className="font-medium text-foreground">{task.weight}%</span></span>
                   <span className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5" /> Presencial</span>
-                  {isActive && missingCount > 0 && (
-                    <span className="flex items-center gap-1.5 text-destructive">
-                      <AlertCircle className="w-3.5 h-3.5" />
-                      <span className="font-medium">{missingCount} por atribuir</span>
-                    </span>
-                  )}
                   {task.avgGrade !== null && (
                     <span className="flex items-center gap-1.5">
                       Média: <span className={`font-bold ${task.avgGrade >= 10 ? "text-accent" : "text-destructive"}`}>{task.avgGrade}/20</span>
@@ -329,12 +323,20 @@ export default function ProfessorEvaluations() {
                 </div>
 
                 {task.status !== "rascunho" && (
-                  <div className="space-y-1.5">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="flex items-center gap-1.5 text-muted-foreground"><Users className="w-3.5 h-3.5" />Participação</span>
-                      <span className="font-semibold text-foreground">{task.submissions}/{task.totalStudents} ({submissionPct}%)</span>
+                  <div className="space-y-2.5">
+                    <div className="space-y-1.5">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="flex items-center gap-1.5 text-muted-foreground"><Users className="w-3.5 h-3.5" />Submetido</span>
+                        <span className="font-semibold text-foreground">{task.submissions}/{task.totalStudents} ({submissionPct}%)</span>
+                      </div>
+                      <Progress value={submissionPct} className="h-1.5" />
                     </div>
-                    <Progress value={submissionPct} className="h-1.5" />
+                    {isActive && missingCount > 0 && (
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="flex items-center gap-1.5 text-destructive"><AlertCircle className="w-3.5 h-3.5" />Atribuídos/Submetidos</span>
+                        <span className="font-semibold text-destructive">{missingCount} por atribuir</span>
+                      </div>
+                    )}
                   </div>
                 )}
 

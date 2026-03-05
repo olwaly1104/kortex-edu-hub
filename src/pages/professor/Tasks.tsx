@@ -317,12 +317,6 @@ export default function ProfessorTasks() {
                   <span className="flex items-center gap-1.5">
                     <MapPin className="w-3.5 h-3.5" /> Presencial
                   </span>
-                  {isActive && missingCount > 0 && (
-                    <span className="flex items-center gap-1.5 text-destructive">
-                      <AlertCircle className="w-3.5 h-3.5" />
-                      <span className="font-medium">{missingCount} por atribuir</span>
-                    </span>
-                  )}
                   {task.avgGrade !== null && (
                     <span className="flex items-center gap-1.5">
                       <BarChart3 className="w-3.5 h-3.5" />
@@ -332,12 +326,20 @@ export default function ProfessorTasks() {
                 </div>
 
                 {task.status !== "rascunho" && (
-                  <div className="space-y-1.5">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="flex items-center gap-1.5 text-muted-foreground"><Users className="w-3.5 h-3.5" />Entregas</span>
-                      <span className="font-semibold text-foreground">{task.submissions}/{task.totalStudents} ({submissionPct}%)</span>
+                  <div className="space-y-2.5">
+                    <div className="space-y-1.5">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="flex items-center gap-1.5 text-muted-foreground"><Users className="w-3.5 h-3.5" />Submetido</span>
+                        <span className="font-semibold text-foreground">{task.submissions}/{task.totalStudents} ({submissionPct}%)</span>
+                      </div>
+                      <Progress value={submissionPct} className="h-1.5" />
                     </div>
-                    <Progress value={submissionPct} className="h-1.5" />
+                    {isActive && missingCount > 0 && (
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="flex items-center gap-1.5 text-destructive"><AlertCircle className="w-3.5 h-3.5" />Atribuídos/Submetidos</span>
+                        <span className="font-semibold text-destructive">{missingCount} por atribuir</span>
+                      </div>
+                    )}
                   </div>
                 )}
 
