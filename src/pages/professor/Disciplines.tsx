@@ -3,19 +3,22 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Link } from "react-router-dom";
-import { BookOpen, Users, Clock, MapPin, ChevronRight, Video, FileText, GraduationCap, Calendar, CheckCircle, AlertCircle, BarChart3, ClipboardList } from "lucide-react";
+import { BookOpen, Users, Clock, MapPin, ChevronRight, Video, FileText, GraduationCap, Calendar, CheckCircle, AlertCircle, BarChart3, ClipboardList, UserCheck } from "lucide-react";
 
 export default function ProfessorDisciplines() {
   // Global stats
-  const totalEvals = profTasks.length;
-  const allStudentsWithGrades = profStudents.filter(s => s.avgGrade !== null);
+  const totalStudents = allTurmas.reduce((s, t) => s + t.students, 0);
+  const allStudentsUnique = profStudents.filter((s, i, arr) => arr.findIndex(x => x.email === s.email) === i);
+  const allStudentsWithGrades = allStudentsUnique.filter(s => s.avgGrade !== null);
   const aprovados = allStudentsWithGrades.filter(s => (s.avgGrade || 0) >= 10).length;
-  const reprovados = allStudentsWithGrades.filter(s => (s.avgGrade || 0) < 10).length;
   const totalWithGrades = allStudentsWithGrades.length;
   const taxaAprovacao = totalWithGrades > 0 ? Math.round((aprovados / totalWithGrades) * 100) : 0;
-  const taxaReprovacao = totalWithGrades > 0 ? Math.round((reprovados / totalWithGrades) * 100) : 0;
-  const encerradas = profTasks.filter(t => t.status === "encerrada").length;
-  const taxaConclusao = profTasks.length > 0 ? Math.round((encerradas / profTasks.length) * 100) : 0;
+  const overallAvg = allStudentsWithGrades.length > 0
+    ? Math.round(allStudentsWithGrades.reduce((s, st) => s + (st.avgGrade || 0), 0) / allStudentsWithGrades.length * 10) / 10
+    : 0;
+  const overallAttendance = allStudentsUnique.length > 0
+    ? Math.round(allStudentsUnique.reduce((s, st) => s + st.attendance, 0) / allStudentsUnique.length)
+    : 0;
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
@@ -24,16 +27,12 @@ export default function ProfessorDisciplines() {
           <GraduationCap className="w-6 h-6 text-primary" /> As Minhas Turmas
         </h1>
         <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground flex-wrap">
-          <span className="flex items-center gap-1"><GraduationCap className="w-3.5 h-3.5" /> Faculdade de Engenharia</span>
-          <span className="flex items-center gap-1"><ClipboardList className="w-3.5 h-3.5" /> {totalEvals} Avaliações</span>
+          <span className="flex items-center gap-1"><Users className="w-3.5 h-3.5" /> <span className="font-bold text-foreground">{totalStudents}</span> Estudantes</span>
+          <span className="flex items-center gap-1"><GraduationCap className="w-3.5 h-3.5" /> <span className="font-bold text-foreground">{allTurmas.length}</span> Turmas</span>
+          <span className="flex items-center gap-1"><UserCheck className="w-3.5 h-3.5" /> Presença <span className={`font-bold ${overallAttendance >= 75 ? "text-accent" : "text-destructive"}`}>{overallAttendance}%</span></span>
+          <span className="flex items-center gap-1"><BarChart3 className="w-3.5 h-3.5" /> Média <span className={`font-bold ${overallAvg >= 10 ? "text-accent" : "text-destructive"}`}>{overallAvg}/20</span></span>
           <span className="flex items-center gap-1">
             <CheckCircle className="w-3.5 h-3.5" /> Aprov. <span className={`font-bold ${taxaAprovacao >= 70 ? "text-accent" : taxaAprovacao >= 50 ? "text-foreground" : "text-destructive"}`}>{taxaAprovacao}%</span>
-          </span>
-          <span className="flex items-center gap-1">
-            <AlertCircle className="w-3.5 h-3.5" /> Reprov. <span className={`font-bold ${taxaReprovacao > 30 ? "text-destructive" : "text-foreground"}`}>{taxaReprovacao}%</span>
-          </span>
-          <span className="flex items-center gap-1">
-            <BarChart3 className="w-3.5 h-3.5" /> Conclusão <span className="font-bold text-foreground">{taxaConclusao}%</span>
           </span>
         </div>
       </div>
@@ -93,16 +92,16 @@ export default function ProfessorDisciplines() {
                     <p className="text-[10px] text-muted-foreground">Estudantes</p>
                   </div>
                   <div className="text-center p-2.5 rounded-lg bg-muted/50">
-                    <p className={`text-lg font-bold ${avgGrade !== null && avgGrade >= 10 ? "text-accent" : avgGrade !== null ? "text-destructive" : "text-muted-foreground"}`}>
-                      {avgGrade ?? "—"}
-                    </p>
-                    <p className="text-[10px] text-muted-foreground">Média</p>
-                  </div>
-                  <div className="text-center p-2.5 rounded-lg bg-muted/50">
                     <p className={`text-lg font-bold ${avgAttendance >= 75 ? "text-accent" : "text-destructive"}`}>
                       {avgAttendance}%
                     </p>
                     <p className="text-[10px] text-muted-foreground">Presença</p>
+                  </div>
+                  <div className="text-center p-2.5 rounded-lg bg-muted/50">
+                    <p className={`text-lg font-bold ${avgGrade !== null && avgGrade >= 10 ? "text-accent" : avgGrade !== null ? "text-destructive" : "text-muted-foreground"}`}>
+                      {avgGrade ?? "—"}
+                    </p>
+                    <p className="text-[10px] text-muted-foreground">Média</p>
                   </div>
                   <div className="text-center p-2.5 rounded-lg bg-muted/50">
                     <p className={`text-lg font-bold ${turmaAprovPct >= 70 ? "text-accent" : turmaAprovPct >= 50 ? "text-foreground" : "text-destructive"}`}>
@@ -115,8 +114,8 @@ export default function ProfessorDisciplines() {
                 {/* Details */}
                 <div className="space-y-2.5 pt-3 border-t border-border/50">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="text-muted-foreground flex items-center gap-1.5"><AlertCircle className="w-3.5 h-3.5" /> Taxa Reprovação</span>
-                    <span className={`font-bold ${turmaReprovPct > 30 ? "text-destructive" : "text-foreground"}`}>{turmaReprovPct}%</span>
+                    <span className="text-muted-foreground flex items-center gap-1.5"><ClipboardList className="w-3.5 h-3.5" /> Avaliações</span>
+                    <span className="font-semibold text-foreground">{turmaEncerradas}/{turmaTasks.length}</span>
                   </div>
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-muted-foreground flex items-center gap-1.5"><FileText className="w-3.5 h-3.5" /> Conteúdos</span>
