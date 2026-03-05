@@ -295,7 +295,7 @@ function GradingTable({ submittedList, notSubmittedList, task, submissionPct, is
                           <Button
                             size="sm"
                             variant="outline"
-                            className={`text-xs gap-1.5 h-7 w-full transition-all border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground ${!gradeVal ? "opacity-40 pointer-events-none" : ""}`}
+                            className={`text-xs gap-1.5 h-7 w-full mt-2 transition-all border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground ${!gradeVal ? "opacity-40 pointer-events-none" : ""}`}
                             disabled={!gradeVal}
                             onClick={() => {
                               setAtribuirStudent(student);
