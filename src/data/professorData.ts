@@ -69,6 +69,8 @@ export interface ProfTask {
   status: "rascunho" | "publicada" | "encerrada";
   submissions: number;
   totalStudents: number;
+  corrected: number;
+  correctionDeadline?: string;
   avgGrade: number | null;
   weight: number;
   modality: "online" | "presencial";
@@ -378,26 +380,26 @@ export const profStudents: ProfStudent[] = [
 // ── Tarefas / Avaliações ──
 export const profTasks: ProfTask[] = [
   // Matemática II - t1
-  { id: "pt1", disciplineId: "pd1", turmaId: "t1", title: "Exercícios Integrais Indefinidos", description: "Resolver exercícios 1-10 do capítulo 3.", dueDate: "08/02/2024", assignedDate: "05/02/2024", type: "tarefa", status: "encerrada", submissions: 42, totalStudents: 45, avgGrade: 14.5, weight: 15, modality: "presencial" },
-  { id: "pt2", disciplineId: "pd1", turmaId: "t1", title: "Integração por Partes", description: "Resolver 5 integrais usando integração por partes.", dueDate: "12/02/2024", assignedDate: "08/02/2024", type: "tarefa", status: "encerrada", submissions: 40, totalStudents: 45, avgGrade: 13.8, weight: 15, modality: "presencial" },
-  { id: "pt3", disciplineId: "pd1", turmaId: "t1", title: "Teste 1 - Cálculo Integral", description: "Teste sobre integrais definidos e indefinidos.", dueDate: "15/02/2024", assignedDate: "05/02/2024", type: "exame", status: "encerrada", submissions: 44, totalStudents: 45, avgGrade: 12.5, weight: 25, modality: "presencial" },
-  { id: "pt4", disciplineId: "pd1", turmaId: "t1", title: "Séries Geométricas", description: "Determinar convergência de 8 séries.", dueDate: "19/02/2024", assignedDate: "15/02/2024", type: "tarefa", status: "publicada", submissions: 28, totalStudents: 45, avgGrade: null, weight: 20, modality: "presencial" },
-  { id: "pt5", disciplineId: "pd1", turmaId: "t1", title: "Quiz - Critérios de Convergência", description: "Quiz de 20 minutos.", dueDate: "23/02/2024", assignedDate: "19/02/2024", type: "quiz", status: "publicada", submissions: 15, totalStudents: 45, avgGrade: null, weight: 10, modality: "presencial" },
+  { id: "pt1", disciplineId: "pd1", turmaId: "t1", title: "Exercícios Integrais Indefinidos", description: "Resolver exercícios 1-10 do capítulo 3.", dueDate: "08/02/2024", assignedDate: "05/02/2024", type: "tarefa", status: "encerrada", submissions: 42, totalStudents: 45, corrected: 42, avgGrade: 14.5, weight: 15, modality: "presencial" },
+  { id: "pt2", disciplineId: "pd1", turmaId: "t1", title: "Integração por Partes", description: "Resolver 5 integrais usando integração por partes.", dueDate: "12/02/2024", assignedDate: "08/02/2024", type: "tarefa", status: "encerrada", submissions: 40, totalStudents: 45, corrected: 40, avgGrade: 13.8, weight: 15, modality: "presencial" },
+  { id: "pt3", disciplineId: "pd1", turmaId: "t1", title: "Teste 1 - Cálculo Integral", description: "Teste sobre integrais definidos e indefinidos.", dueDate: "15/02/2024", assignedDate: "05/02/2024", type: "exame", status: "encerrada", submissions: 44, totalStudents: 45, corrected: 44, avgGrade: 12.5, weight: 25, modality: "presencial" },
+  { id: "pt4", disciplineId: "pd1", turmaId: "t1", title: "Séries Geométricas", description: "Determinar convergência de 8 séries.", dueDate: "19/02/2024", assignedDate: "15/02/2024", type: "tarefa", status: "publicada", submissions: 28, totalStudents: 45, corrected: 12, correctionDeadline: "22/02/2024", avgGrade: null, weight: 20, modality: "presencial" },
+  { id: "pt5", disciplineId: "pd1", turmaId: "t1", title: "Quiz - Critérios de Convergência", description: "Quiz de 20 minutos.", dueDate: "23/02/2024", assignedDate: "19/02/2024", type: "quiz", status: "publicada", submissions: 15, totalStudents: 45, corrected: 5, correctionDeadline: "26/02/2024", avgGrade: null, weight: 10, modality: "presencial" },
 
   // Matemática II - t3
-  { id: "pt9", disciplineId: "pd1", turmaId: "t3", title: "Exercícios Integrais Indefinidos", description: "Resolver exercícios 1-10 do capítulo 3.", dueDate: "09/02/2024", assignedDate: "06/02/2024", type: "tarefa", status: "encerrada", submissions: 27, totalStudents: 30, avgGrade: 12.0, weight: 15, modality: "presencial" },
-  { id: "pt10", disciplineId: "pd1", turmaId: "t3", title: "Integração por Partes", description: "Resolver 5 integrais usando integração por partes.", dueDate: "13/02/2024", assignedDate: "09/02/2024", type: "tarefa", status: "publicada", submissions: 18, totalStudents: 30, avgGrade: null, weight: 15, modality: "presencial" },
+  { id: "pt9", disciplineId: "pd1", turmaId: "t3", title: "Exercícios Integrais Indefinidos", description: "Resolver exercícios 1-10 do capítulo 3.", dueDate: "09/02/2024", assignedDate: "06/02/2024", type: "tarefa", status: "encerrada", submissions: 27, totalStudents: 30, corrected: 27, avgGrade: 12.0, weight: 15, modality: "presencial" },
+  { id: "pt10", disciplineId: "pd1", turmaId: "t3", title: "Integração por Partes", description: "Resolver 5 integrais usando integração por partes.", dueDate: "13/02/2024", assignedDate: "09/02/2024", type: "tarefa", status: "publicada", submissions: 18, totalStudents: 30, corrected: 8, correctionDeadline: "16/02/2024", avgGrade: null, weight: 15, modality: "presencial" },
 
   // Matemática I - t2
-  { id: "pt6", disciplineId: "pd2", turmaId: "t2", title: "Exercícios de Limites", description: "Calcular limites de 15 funções.", dueDate: "10/02/2024", assignedDate: "06/02/2024", type: "tarefa", status: "encerrada", submissions: 50, totalStudents: 52, avgGrade: 13.2, weight: 15, modality: "presencial" },
-  { id: "pt7", disciplineId: "pd2", turmaId: "t2", title: "Teste 1 - Limites e Derivadas", description: "Teste presencial.", dueDate: "20/02/2024", assignedDate: "06/02/2024", type: "exame", status: "publicada", submissions: 0, totalStudents: 52, avgGrade: null, weight: 30, modality: "presencial" },
+  { id: "pt6", disciplineId: "pd2", turmaId: "t2", title: "Exercícios de Limites", description: "Calcular limites de 15 funções.", dueDate: "10/02/2024", assignedDate: "06/02/2024", type: "tarefa", status: "encerrada", submissions: 50, totalStudents: 52, corrected: 50, avgGrade: 13.2, weight: 15, modality: "presencial" },
+  { id: "pt7", disciplineId: "pd2", turmaId: "t2", title: "Teste 1 - Limites e Derivadas", description: "Teste presencial.", dueDate: "20/02/2024", assignedDate: "06/02/2024", type: "exame", status: "publicada", submissions: 0, totalStudents: 52, corrected: 0, correctionDeadline: "25/02/2024", avgGrade: null, weight: 30, modality: "presencial" },
 
   // Estatística - t1
-  { id: "pt8", disciplineId: "pd3", turmaId: "t1", title: "Exercícios de Probabilidade", description: "Resolver problemas de probabilidade condicional.", dueDate: "14/02/2024", assignedDate: "07/02/2024", type: "tarefa", status: "encerrada", submissions: 41, totalStudents: 45, avgGrade: 14.0, weight: 15, modality: "presencial" },
+  { id: "pt8", disciplineId: "pd3", turmaId: "t1", title: "Exercícios de Probabilidade", description: "Resolver problemas de probabilidade condicional.", dueDate: "14/02/2024", assignedDate: "07/02/2024", type: "tarefa", status: "encerrada", submissions: 41, totalStudents: 45, corrected: 41, avgGrade: 14.0, weight: 15, modality: "presencial" },
 
   // Álgebra Linear - t4
-  { id: "pt11", disciplineId: "pd4", turmaId: "t4", title: "Exercícios de Matrizes", description: "Resolver operações com matrizes 3x3.", dueDate: "10/02/2024", assignedDate: "05/02/2024", type: "tarefa", status: "encerrada", submissions: 35, totalStudents: 38, avgGrade: 13.5, weight: 15, modality: "presencial" },
-  { id: "pt12", disciplineId: "pd4", turmaId: "t4", title: "Teste 1 - Determinantes", description: "Teste sobre cálculo de determinantes.", dueDate: "18/02/2024", assignedDate: "08/02/2024", type: "exame", status: "publicada", submissions: 10, totalStudents: 38, avgGrade: null, weight: 25, modality: "presencial" },
+  { id: "pt11", disciplineId: "pd4", turmaId: "t4", title: "Exercícios de Matrizes", description: "Resolver operações com matrizes 3x3.", dueDate: "10/02/2024", assignedDate: "05/02/2024", type: "tarefa", status: "encerrada", submissions: 35, totalStudents: 38, corrected: 35, avgGrade: 13.5, weight: 15, modality: "presencial" },
+  { id: "pt12", disciplineId: "pd4", turmaId: "t4", title: "Teste 1 - Determinantes", description: "Teste sobre cálculo de determinantes.", dueDate: "18/02/2024", assignedDate: "08/02/2024", type: "exame", status: "publicada", submissions: 10, totalStudents: 38, corrected: 3, correctionDeadline: "22/02/2024", avgGrade: null, weight: 25, modality: "presencial" },
 ];
 
 // ── Anúncios do Professor ──
