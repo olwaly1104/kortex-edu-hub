@@ -1,4 +1,4 @@
-import { profStudents, allTurmas } from "@/data/professorData";
+import { profStudents, profTasks, allTurmas } from "@/data/professorData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -189,7 +189,16 @@ export default function ProfessorStudents() {
       </div>
 
       <div className="space-y-2">
-        {filtered.map(student => (
+        {filtered.map(student => {
+          // Count tarefas and avaliações for this student's turma
+          const studentTasks = profTasks.filter(t => t.turmaId === student.turmaId);
+          const tarefas = studentTasks.filter(t => t.type === "tarefa" || t.type === "quiz");
+          const avaliacoes = studentTasks.filter(t => t.type === "exame");
+          const tarefasEncerradas = tarefas.filter(t => t.status === "encerrada").length;
+          const avaliacoesEncerradas = avaliacoes.filter(t => t.status === "encerrada").length;
+          const entregaPct = student.totalTasks > 0 ? Math.round((student.submittedTasks / student.totalTasks) * 100) : 0;
+
+          return (
           <Card key={student.id} className={`p-4 flex items-center gap-4 border-l-[3px] ${statusColors[student.status]}`}>
             <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-xs font-bold text-muted-foreground shrink-0">
               {student.name.split(" ").map(n => n[0]).slice(0, 2).join("")}
@@ -201,7 +210,7 @@ export default function ProfessorStudents() {
               </div>
               <p className="text-[11px] text-muted-foreground">{student.email} • {student.turma}</p>
             </div>
-            <div className="grid grid-cols-4 gap-4 shrink-0 text-center">
+            <div className="grid grid-cols-6 gap-3 shrink-0 text-center">
               <div>
                 <p className="text-[10px] text-muted-foreground uppercase">Presença</p>
                 <p className={`text-sm font-bold ${student.attendance >= 75 ? "text-accent" : "text-destructive"}`}>{student.attendance}%</p>
@@ -211,8 +220,16 @@ export default function ProfessorStudents() {
                 <p className={`text-sm font-bold ${student.avgGrade && student.avgGrade >= 10 ? "text-accent" : "text-destructive"}`}>{student.avgGrade ?? "—"}</p>
               </div>
               <div>
-                <p className="text-[10px] text-muted-foreground uppercase">Entregas</p>
+                <p className="text-[10px] text-muted-foreground uppercase">Entrega</p>
+                <p className={`text-sm font-bold ${entregaPct >= 80 ? "text-accent" : entregaPct >= 50 ? "text-foreground" : "text-destructive"}`}>{entregaPct}%</p>
+              </div>
+              <div>
+                <p className="text-[10px] text-muted-foreground uppercase">Tarefas</p>
                 <p className="text-sm font-bold text-foreground">{student.submittedTasks}/{student.totalTasks}</p>
+              </div>
+              <div>
+                <p className="text-[10px] text-muted-foreground uppercase">Avaliações</p>
+                <p className="text-sm font-bold text-foreground">{avaliacoesEncerradas}/{avaliacoes.length}</p>
               </div>
               <div>
                 <p className="text-[10px] text-muted-foreground uppercase">Última</p>
@@ -220,7 +237,8 @@ export default function ProfessorStudents() {
               </div>
             </div>
           </Card>
-        ))}
+          );
+        })}
         {filtered.length === 0 && (
           <p className="text-sm text-muted-foreground py-8 text-center">Nenhum estudante encontrado.</p>
         )}
