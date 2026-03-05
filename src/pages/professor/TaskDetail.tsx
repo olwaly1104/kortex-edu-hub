@@ -245,70 +245,68 @@ function GradingTable({ submittedList, notSubmittedList, task, submissionPct, is
                 const isGraded = student.corrected || atribuidos.has(student.id);
                 const gradeVal = grades[student.id];
                 return (
-                  <div key={student.id} className="px-5 py-4 hover:bg-muted/20 transition-colors space-y-3">
-                    {/* Row 1: Student info */}
-                    <div className="flex items-center gap-3">
+                  <div key={student.id} className="px-5 py-3.5 flex items-center gap-3 hover:bg-muted/20 transition-colors">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); navigate(`/professor/students/${student.id}`); }}
+                      className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary shrink-0 hover:bg-primary/20 transition-colors"
+                      title="Ver perfil"
+                    >
+                      {student.name.split(" ").map((n: string) => n[0]).slice(0, 2).join("")}
+                    </button>
+                    <div className="flex-1 min-w-0">
                       <button
                         onClick={(e) => { e.stopPropagation(); navigate(`/professor/students/${student.id}`); }}
-                        className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary shrink-0 hover:bg-primary/20 transition-colors"
-                        title="Ver perfil"
+                        className="text-sm font-medium text-foreground truncate hover:text-primary transition-colors text-left"
                       >
-                        {student.name.split(" ").map((n: string) => n[0]).slice(0, 2).join("")}
+                        {student.name}
                       </button>
-                      <div className="flex-1 min-w-0">
-                        <button
-                          onClick={(e) => { e.stopPropagation(); navigate(`/professor/students/${student.id}`); }}
-                          className="text-sm font-medium text-foreground truncate hover:text-primary transition-colors text-left"
-                        >
-                          {student.name}
-                        </button>
-                        <p className="text-[11px] text-muted-foreground">{student.email}</p>
-                      </div>
-                      <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground shrink-0">
-                        <Clock className="w-3 h-3" />
-                        {student.submittedDate} · {student.submittedTime}
-                      </div>
-                      {student.fileName && (
-                        <div className="flex items-center gap-1.5 rounded border px-2 py-1 bg-muted/20 shrink-0">
-                          <FileText className="w-3 h-3 text-destructive/60" />
-                          <span className="text-[11px] font-medium text-foreground max-w-[100px] truncate">{student.fileName}</span>
-                          <button className="p-0.5 rounded hover:bg-muted/50 transition"><Eye className="w-3 h-3 text-muted-foreground" /></button>
-                        </div>
-                      )}
-                      {/* Show grade inline if already graded or encerrada */}
-                      {(isEncerrada || isGraded) && (
-                        <span className={`text-sm font-bold shrink-0 ${isEncerrada ? (Number(gradeVal || 0) >= 10 ? "text-accent" : "text-destructive") : "text-muted-foreground"}`}>
-                          {gradeVal || "—"}/20
-                        </span>
-                      )}
+                      <p className="text-[11px] text-muted-foreground">{student.email}</p>
                     </div>
-                    {/* Row 2: Grading action — only when not graded and not encerrada */}
-                    {!isEncerrada && !isGraded && (
-                      <div className="ml-11 flex items-center gap-2">
-                        <div className="flex items-center gap-1.5 rounded-md border bg-muted/30 px-2 py-1">
-                          <Input
-                            type="number" min="0" max="20" step="0.5"
-                            value={gradeVal || ""}
-                            onChange={e => handleGradeChange(student.id, e.target.value)}
-                            className="w-14 h-6 text-center text-xs font-bold border-0 bg-transparent p-0 focus-visible:ring-0 focus-visible:ring-offset-0"
-                            placeholder="—"
-                          />
-                          <span className="text-[11px] text-muted-foreground">/20</span>
-                        </div>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className={`text-[11px] gap-1.5 h-7 px-3 transition-all border-destructive/50 text-destructive hover:bg-destructive hover:text-destructive-foreground ${!gradeVal ? "opacity-30 pointer-events-none" : ""}`}
-                          disabled={!gradeVal}
-                          onClick={() => {
-                            setAtribuirStudent(student);
-                            setAtribuirGrade(gradeVal);
-                          }}
-                        >
-                          <Check className="w-3 h-3" /> Atribuir Nota
-                        </Button>
+                    <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground shrink-0">
+                      <Clock className="w-3 h-3" />
+                      {student.submittedDate} · {student.submittedTime}
+                    </div>
+                    {student.fileName && (
+                      <div className="flex items-center gap-1.5 rounded border px-2 py-1 bg-muted/20 shrink-0">
+                        <FileText className="w-3 h-3 text-destructive/60" />
+                        <span className="text-[11px] font-medium text-foreground max-w-[100px] truncate">{student.fileName}</span>
+                        <button className="p-0.5 rounded hover:bg-muted/50 transition"><Eye className="w-3 h-3 text-muted-foreground" /></button>
                       </div>
                     )}
+                    <div className="flex flex-col items-end gap-1.5 shrink-0">
+                      {isEncerrada ? (
+                        <span className={`text-sm font-bold w-14 text-right ${Number(gradeVal || 0) >= 10 ? "text-accent" : "text-destructive"}`}>
+                          {gradeVal || "—"}/20
+                        </span>
+                      ) : isGraded ? (
+                        <span className="text-sm font-bold text-muted-foreground w-14 text-right">{gradeVal || "—"}/20</span>
+                      ) : (
+                        <>
+                          <div className="flex items-center gap-1">
+                            <Input
+                              type="number" min="0" max="20" step="0.5"
+                              value={gradeVal || ""}
+                              onChange={e => handleGradeChange(student.id, e.target.value)}
+                              className="w-14 h-7 text-center text-xs font-bold"
+                              placeholder="—"
+                            />
+                            <span className="text-[11px] text-muted-foreground">/20</span>
+                          </div>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className={`text-xs gap-1.5 h-7 w-full transition-all border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground ${!gradeVal ? "opacity-40 pointer-events-none" : ""}`}
+                            disabled={!gradeVal}
+                            onClick={() => {
+                              setAtribuirStudent(student);
+                              setAtribuirGrade(gradeVal);
+                            }}
+                          >
+                            Atribuir
+                          </Button>
+                        </>
+                      )}
+                    </div>
                   </div>
                 );
               })}
