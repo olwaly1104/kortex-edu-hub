@@ -118,6 +118,10 @@ export default function ProfessorDisciplines() {
                     <span className="text-muted-foreground flex items-center gap-1.5"><AlertCircle className="w-3.5 h-3.5" /> Taxa Reprovação</span>
                     <span className={`font-bold ${turmaReprovPct > 30 ? "text-destructive" : "text-foreground"}`}>{turmaReprovPct}%</span>
                   </div>
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-muted-foreground flex items-center gap-1.5"><FileText className="w-3.5 h-3.5" /> Conteúdos</span>
+                    <span className="font-semibold text-foreground">{totalContents}</span>
+                  </div>
                   <div>
                     <div className="flex justify-between text-xs mb-1">
                       <span className="text-muted-foreground flex items-center gap-1.5"><Video className="w-3.5 h-3.5" /> Aulas Gravadas</span>
@@ -125,16 +129,6 @@ export default function ProfessorDisciplines() {
                     </div>
                     <Progress value={lessonPct} className="h-1.5" />
                   </div>
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-muted-foreground flex items-center gap-1.5"><FileText className="w-3.5 h-3.5" /> Conteúdos</span>
-                    <span className="font-semibold text-foreground">{totalContents}</span>
-                  </div>
-                  {turmaActive > 0 && (
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-muted-foreground flex items-center gap-1.5"><GraduationCap className="w-3.5 h-3.5" /> Tarefas activas</span>
-                      <Badge className="bg-secondary/10 text-secondary text-[10px]">{turmaActive}</Badge>
-                    </div>
-                  )}
                 </div>
               </div>
             </Card>
