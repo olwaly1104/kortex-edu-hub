@@ -335,9 +335,12 @@ export default function ProfessorTasks() {
                       <Progress value={submissionPct} className="h-1.5" />
                     </div>
                     {isActive && missingCount > 0 && (
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="flex items-center gap-1.5 text-destructive"><AlertCircle className="w-3.5 h-3.5" />Atribuídos/Submetidos</span>
-                        <span className="font-semibold text-destructive">{missingCount} por atribuir</span>
+                      <div className="space-y-1.5">
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="flex items-center gap-1.5 text-destructive"><AlertCircle className="w-3.5 h-3.5" />Atribuídos/Submetidos</span>
+                          <span className="font-semibold text-destructive">{task.submissions}/{task.totalStudents} · {missingCount} por atribuir</span>
+                        </div>
+                        <Progress value={submissionPct} className="h-1.5 [&>div]:bg-destructive" />
                       </div>
                     )}
                   </div>
