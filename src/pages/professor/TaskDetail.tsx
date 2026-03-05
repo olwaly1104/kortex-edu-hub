@@ -4,13 +4,18 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Progress } from "@/components/ui/progress";
 import {
   ArrowLeft, ClipboardList, BookOpen, FolderKanban, Calendar, Users,
   CheckCircle, Clock, Download, AlertCircle, FileText, MapPin, Eye,
-  MessageCircle, Mail, Save,
+  Save, Send, UserCircle,
 } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import {
+  Dialog, DialogContent, DialogDescription, DialogFooter,
+  DialogHeader, DialogTitle,
+} from "@/components/ui/dialog";
 
 const typeLabel: Record<string, string> = { tarefa: "Tarefa", quiz: "Quiz", exame: "Exame" };
 const typeIcon: Record<string, React.ElementType> = { tarefa: BookOpen, quiz: FolderKanban, exame: ClipboardList };
@@ -31,25 +36,26 @@ export default function ProfessorTaskDetail() {
   }
 
   const disc = profDisciplines.find(d => d.id === task.disciplineId);
-  const TypeIcon = typeIcon[task.type] || BookOpen;
   const submissionPct = task.totalStudents > 0 ? Math.round(task.submissions / task.totalStudents * 100) : 0;
+  const correctedPct = task.submissions > 0 ? Math.round(task.corrected / task.submissions * 100) : 0;
+  const pendingCorrection = task.submissions - task.corrected;
   const isEncerrada = task.status === "encerrada";
   const isActiva = task.status === "publicada";
 
-  // Mock student submissions
   const students = profStudents.filter(s => s.disciplineId === task.disciplineId);
   const mockSubmissions = students.map((s, i) => ({
     ...s,
     submitted: i < task.submissions,
-    grade: task.avgGrade !== null ? Math.round((task.avgGrade + (Math.random() * 4 - 2)) * 10) / 10 : null,
+    corrected: i < task.corrected,
+    grade: i < task.corrected ? Math.round(((task.avgGrade || 12) + (Math.random() * 4 - 2)) * 10) / 10 : null,
     submittedDate: i < task.submissions ? task.dueDate : null,
     submittedTime: i < task.submissions ? `${String(8 + (i % 12)).padStart(2, "0")}:${String((i * 17) % 60).padStart(2, "0")}` : null,
     fileName: i < task.submissions ? `${s.name.split(" ")[0]}_${task.title.replace(/\s+/g, "_").substring(0, 20)}.pdf` : null,
   }));
 
   const extraNotSubmitted = [
-    { id: "ps_extra1", name: "Tiago Almeida", email: "3088@upra.kor", turma: "2º Ano Informática", disciplineId: task.disciplineId, attendance: 60, avgGrade: 9.0, submittedTasks: 1, totalTasks: 4, lastActive: "5 dias", status: "risco" as const, submitted: false, grade: null, submittedDate: null, submittedTime: null, fileName: null, turmaId: "" },
-    { id: "ps_extra2", name: "Inês Cardoso", email: "3099@upra.kor", turma: "2º Ano Informática", disciplineId: task.disciplineId, attendance: 70, avgGrade: 10.5, submittedTasks: 2, totalTasks: 4, lastActive: "3 dias", status: "normal" as const, submitted: false, grade: null, submittedDate: null, submittedTime: null, fileName: null, turmaId: "" },
+    { id: "ps_extra1", name: "Tiago Almeida", email: "3088@upra.kor", turma: "2º Ano Informática", disciplineId: task.disciplineId, attendance: 60, avgGrade: 9.0, submittedTasks: 1, totalTasks: 4, lastActive: "5 dias", status: "risco" as const, submitted: false, corrected: false, grade: null, submittedDate: null, submittedTime: null, fileName: null, turmaId: "" },
+    { id: "ps_extra2", name: "Inês Cardoso", email: "3099@upra.kor", turma: "2º Ano Informática", disciplineId: task.disciplineId, attendance: 70, avgGrade: 10.5, submittedTasks: 2, totalTasks: 4, lastActive: "3 dias", status: "normal" as const, submitted: false, corrected: false, grade: null, submittedDate: null, submittedTime: null, fileName: null, turmaId: "" },
   ];
 
   const allSubmissions = [...mockSubmissions, ...extraNotSubmitted];
@@ -72,63 +78,35 @@ export default function ProfessorTaskDetail() {
           <Badge className={task.status === "encerrada" ? "bg-accent/10 text-accent" : task.status === "publicada" ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}>
             {task.status === "encerrada" ? "Encerrada" : task.status === "publicada" ? "Activa" : "Rascunho"}
           </Badge>
-          {isActiva && (
-            <Badge className="bg-destructive/10 text-destructive border-destructive/20 gap-1 text-[10px]">
-              <AlertCircle className="w-3 h-3" /> Por atribuir
-            </Badge>
-          )}
         </div>
         <h1 className="text-2xl font-bold text-foreground">{task.title}</h1>
-
         <div className="flex items-center gap-5 mt-3 text-sm text-muted-foreground flex-wrap">
-          <span className="flex items-center gap-1.5">
-            <Calendar className="w-4 h-4" />
-            Prazo: <span className="font-semibold text-foreground">{task.dueDate}</span>
-          </span>
-          <span className="flex items-center gap-1.5">
-            <ClipboardList className="w-4 h-4" />
-            Média: <span className={`font-semibold ${task.avgGrade !== null ? (task.avgGrade >= 10 ? "text-accent" : "text-destructive") : "text-muted-foreground"}`}>
-              {task.avgGrade !== null ? `${task.avgGrade}/20` : "Pendente"}
-            </span>
-            <span className="text-xs text-muted-foreground">(peso {task.weight}%)</span>
-          </span>
-          <span className="flex items-center gap-1.5">
-            <MapPin className="w-4 h-4" /> Presencial
-          </span>
+          <span className="flex items-center gap-1.5"><Calendar className="w-4 h-4" /> Prazo: <span className="font-semibold text-foreground">{task.dueDate}</span></span>
+          <span className="flex items-center gap-1.5"><ClipboardList className="w-4 h-4" /> Peso: <span className="font-semibold text-foreground">{task.weight}%</span></span>
+          <span className="flex items-center gap-1.5"><MapPin className="w-4 h-4" /> Presencial</span>
+          {task.avgGrade !== null && (
+            <span className="flex items-center gap-1.5">Média: <span className={`font-semibold ${task.avgGrade >= 10 ? "text-accent" : "text-destructive"}`}>{task.avgGrade}/20</span></span>
+          )}
         </div>
       </div>
 
-      {/* 4 Info cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card className="p-4 text-center">
-          <Calendar className="w-5 h-5 text-muted-foreground mx-auto mb-1" />
-          <p className="text-xs text-muted-foreground">Prazo</p>
-          <p className="text-sm font-semibold text-foreground">{task.dueDate}</p>
-          <p className="text-[10px] text-muted-foreground mt-1">Atribuída: {task.assignedDate}</p>
+      {/* Progress overview */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Card className="p-4 space-y-2">
+          <div className="flex items-center justify-between text-sm">
+            <span className="flex items-center gap-2 text-muted-foreground"><Users className="w-4 h-4" /> Submetido</span>
+            <span className="font-semibold text-foreground">{task.submissions}/{task.totalStudents} ({submissionPct}%)</span>
+          </div>
+          <Progress value={submissionPct} className="h-2" />
         </Card>
-        <Card className="p-4 text-center">
-          <Users className="w-5 h-5 text-muted-foreground mx-auto mb-1" />
-          <p className="text-xs text-muted-foreground">Submissões</p>
-          <p className="text-sm font-semibold text-foreground">{task.submissions}/{task.totalStudents} ({submissionPct}%)</p>
-        </Card>
-        <Card className="p-4 text-center">
-          <ClipboardList className="w-5 h-5 text-muted-foreground mx-auto mb-1" />
-          <p className="text-xs text-muted-foreground">Peso</p>
-          <p className="text-sm font-semibold text-foreground">{task.weight}%</p>
-        </Card>
-        <Card className="p-4 text-center">
-          {task.avgGrade !== null ? (
-            <>
-              <CheckCircle className="w-5 h-5 text-accent mx-auto mb-1" />
-              <p className="text-xs text-muted-foreground">Média</p>
-              <p className={`text-sm font-semibold ${task.avgGrade >= 10 ? "text-accent" : "text-destructive"}`}>{task.avgGrade}/20</p>
-            </>
-          ) : (
-            <>
-              <Clock className="w-5 h-5 text-muted-foreground mx-auto mb-1" />
-              <p className="text-xs text-muted-foreground">Média</p>
-              <p className="text-sm font-semibold text-muted-foreground">Pendente</p>
-            </>
+        <Card className="p-4 space-y-2">
+          <div className="flex items-center justify-between text-sm">
+            <span className={`flex items-center gap-2 ${pendingCorrection > 0 ? "text-destructive" : "text-muted-foreground"}`}><CheckCircle className="w-4 h-4" /> Corrigido</span>
+            <span className={`font-semibold ${pendingCorrection > 0 ? "text-destructive" : "text-muted-foreground"}`}>{task.corrected}/{task.submissions}{pendingCorrection > 0 ? ` · ${pendingCorrection} por corrigir` : ""}</span>
+          </div>
+          <Progress value={correctedPct} className={`h-2 ${pendingCorrection > 0 ? "[&>div]:bg-destructive" : ""}`} />
+          {isActiva && task.correctionDeadline && (
+            <p className="text-[11px] text-muted-foreground flex items-center gap-1"><Clock className="w-3 h-3" /> Prazo de correcção: <span className="font-medium text-foreground">{task.correctionDeadline}</span></p>
           )}
         </Card>
       </div>
@@ -153,7 +131,7 @@ export default function ProfessorTaskDetail() {
         </div>
       </Card>
 
-      {/* Student submissions with grading */}
+      {/* Submissions & Grading */}
       <GradingTable
         submittedList={submittedList}
         notSubmittedList={notSubmittedList}
@@ -161,18 +139,20 @@ export default function ProfessorTaskDetail() {
         submissionPct={submissionPct}
         isEncerrada={isEncerrada}
         isActiva={isActiva}
+        navigate={navigate}
       />
     </div>
   );
 }
 
-function GradingTable({ submittedList, notSubmittedList, task, submissionPct, isEncerrada, isActiva }: {
+function GradingTable({ submittedList, notSubmittedList, task, submissionPct, isEncerrada, isActiva, navigate }: {
   submittedList: any[];
   notSubmittedList: any[];
   task: any;
   submissionPct: number;
   isEncerrada: boolean;
   isActiva: boolean;
+  navigate: any;
 }) {
   const { toast } = useToast();
   const [grades, setGrades] = useState<Record<string, string>>(() => {
@@ -180,17 +160,18 @@ function GradingTable({ submittedList, notSubmittedList, task, submissionPct, is
     submittedList.forEach(s => {
       if (s.grade !== null) initial[s.id] = String(s.grade);
     });
-    // For encerrada, not submitted get 0
     if (isEncerrada) {
-      notSubmittedList.forEach(s => {
-        initial[s.id] = "0";
-      });
+      notSubmittedList.forEach(s => { initial[s.id] = "0"; });
     }
     return initial;
   });
 
+  const [atribuirGrade, setAtribuirGrade] = useState("");
+  const [atribuirStudent, setAtribuirStudent] = useState<any>(null);
+  const [atribuidos, setAtribuidos] = useState<Set<string>>(new Set());
+
   const handleGradeChange = (studentId: string, value: string) => {
-    if (isEncerrada) return; // immutable when encerrada
+    if (isEncerrada) return;
     setGrades(prev => ({ ...prev, [studentId]: value }));
   };
 
@@ -198,157 +179,202 @@ function GradingTable({ submittedList, notSubmittedList, task, submissionPct, is
     toast({ title: "Notas guardadas!", description: "As notas foram actualizadas com sucesso." });
   };
 
+  const handleAtribuir = (student: any) => {
+    setAtribuirStudent(student);
+    setAtribuirGrade("");
+  };
+
+  const confirmAtribuir = () => {
+    if (!atribuirStudent || !atribuirGrade) return;
+    const gradeNum = Number(atribuirGrade);
+    if (isNaN(gradeNum) || gradeNum < 0 || gradeNum > 20) {
+      toast({ title: "Nota inválida", description: "Introduza um valor entre 0 e 20.", variant: "destructive" });
+      return;
+    }
+    setGrades(prev => ({ ...prev, [atribuirStudent.id]: atribuirGrade }));
+    setAtribuidos(prev => new Set(prev).add(atribuirStudent.id));
+    toast({ title: "Nota atribuída!", description: `${atribuirStudent.name} recebeu ${atribuirGrade}/20.` });
+    setAtribuirStudent(null);
+    setAtribuirGrade("");
+  };
+
   return (
-    <Card className="overflow-hidden">
-      <div className="p-5 border-b bg-muted/30 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <h3 className="font-semibold text-foreground">Submissões e Notas</h3>
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-            {task.submissions}/{task.totalStudents}
-            <span className="text-primary/70">·</span>
-            <span>{submissionPct}%</span>
-          </span>
-          {isActiva && (
-            <Badge className="bg-destructive/10 text-destructive border-destructive/20 gap-1 text-[10px]">
-              <AlertCircle className="w-3 h-3" /> Por atribuir
+    <>
+      <Card className="overflow-hidden">
+        <div className="p-5 border-b bg-muted/30 flex items-center justify-between flex-wrap gap-3">
+          <div className="flex items-center gap-3">
+            <h3 className="font-semibold text-foreground">Submissões e Notas</h3>
+            <Badge variant="outline" className="text-xs gap-1">
+              <Users className="w-3 h-3" />
+              {task.submissions}/{task.totalStudents} ({submissionPct}%)
             </Badge>
-          )}
-          {isEncerrada && (
-            <Badge className="bg-accent/10 text-accent gap-1 text-[10px]">
-              <CheckCircle className="w-3 h-3" /> Notas atribuídas
-            </Badge>
-          )}
+            {isEncerrada && (
+              <Badge className="bg-accent/10 text-accent gap-1 text-[10px] border-0">
+                <CheckCircle className="w-3 h-3" /> Notas atribuídas
+              </Badge>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" className="gap-2 text-xs"><Download className="w-3.5 h-3.5" /> Exportar</Button>
+            {!isEncerrada && (
+              <Button size="sm" className="gap-2 text-xs" onClick={handleSaveGrades}><Save className="w-3.5 h-3.5" /> Guardar Notas</Button>
+            )}
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="gap-2"><Download className="w-3.5 h-3.5" /> Exportar</Button>
-          {!isEncerrada && (
-            <Button size="sm" className="gap-2" onClick={handleSaveGrades}><Save className="w-3.5 h-3.5" /> Guardar Notas</Button>
-          )}
-        </div>
-      </div>
 
-      {/* Submitted */}
-      {submittedList.length > 0 && (
-        <div className="divide-y">
-          {submittedList.map(student => (
-            <div key={student.id} className="px-5 py-4 flex items-start gap-3">
-              <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-xs font-bold text-muted-foreground shrink-0 mt-0.5">
-                {student.name.split(" ").map((n: string) => n[0]).slice(0, 2).join("")}
-              </div>
-              <div className="flex-1 min-w-0 space-y-1.5">
-                <div className="flex items-center justify-between gap-2">
-                  <div>
-                    <div className="flex items-center gap-1.5">
-                      <p className="text-sm font-medium text-foreground truncate">{student.name}</p>
-                      <span className="inline-flex items-center gap-0.5 ml-1">
-                        <button className="p-1 rounded-full hover:bg-primary/10 hover:text-primary transition-colors" title="Enviar mensagem"><MessageCircle className="w-3.5 h-3.5" /></button>
-                        <button className="p-1 rounded-full hover:bg-primary/10 hover:text-primary transition-colors" title="Enviar email"><Mail className="w-3.5 h-3.5" /></button>
-                      </span>
+        {/* Submitted students */}
+        {submittedList.length > 0 && (
+          <div>
+            <div className="px-5 py-2.5 bg-muted/20 border-b">
+              <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+                <Send className="w-3 h-3" /> Submetido ({submittedList.length})
+              </p>
+            </div>
+            <div className="divide-y">
+              {submittedList.map(student => {
+                const isGraded = student.corrected || atribuidos.has(student.id);
+                const gradeVal = grades[student.id];
+                return (
+                  <div key={student.id} className="px-5 py-3.5 flex items-center gap-3 hover:bg-muted/20 transition-colors">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); navigate(`/professor/students/${student.id}`); }}
+                      className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary shrink-0 hover:bg-primary/20 transition-colors"
+                      title="Ver perfil"
+                    >
+                      {student.name.split(" ").map((n: string) => n[0]).slice(0, 2).join("")}
+                    </button>
+                    <div className="flex-1 min-w-0">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); navigate(`/professor/students/${student.id}`); }}
+                        className="text-sm font-medium text-foreground truncate hover:text-primary transition-colors text-left"
+                      >
+                        {student.name}
+                      </button>
+                      <p className="text-[11px] text-muted-foreground">{student.email}</p>
                     </div>
-                    <p className="text-xs text-muted-foreground">{student.email}</p>
-                  </div>
-                  <div className="flex items-center gap-3 shrink-0">
-                    <div className="flex items-center gap-1.5 text-accent">
-                      <CheckCircle className="w-4 h-4" />
-                      <span className="text-xs font-medium">Entregue</span>
+                    <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground shrink-0">
+                      <Clock className="w-3 h-3" />
+                      {student.submittedDate} · {student.submittedTime}
                     </div>
-                    {/* Grade display/input */}
-                    <div className="flex items-center gap-1">
+                    {student.fileName && (
+                      <div className="flex items-center gap-1.5 rounded border px-2 py-1 bg-muted/20 shrink-0">
+                        <FileText className="w-3 h-3 text-destructive/60" />
+                        <span className="text-[11px] font-medium text-foreground max-w-[100px] truncate">{student.fileName}</span>
+                        <button className="p-0.5 rounded hover:bg-muted/50 transition"><Eye className="w-3 h-3 text-muted-foreground" /></button>
+                      </div>
+                    )}
+                    <div className="flex items-center gap-2 shrink-0">
                       {isEncerrada ? (
-                        <span className={`text-sm font-bold w-16 text-center ${Number(grades[student.id] || 0) >= 10 ? "text-accent" : "text-destructive"}`}>
-                          {grades[student.id] || "—"}
+                        <span className={`text-sm font-bold w-14 text-right ${Number(gradeVal || 0) >= 10 ? "text-accent" : "text-destructive"}`}>
+                          {gradeVal || "—"}/20
                         </span>
+                      ) : isGraded ? (
+                        <span className="text-sm font-bold text-muted-foreground w-14 text-right">{gradeVal || "—"}/20</span>
                       ) : (
-                        <Input
-                          type="number"
-                          min="0"
-                          max="20"
-                          step="0.5"
-                          value={grades[student.id] || ""}
-                          onChange={e => handleGradeChange(student.id, e.target.value)}
-                          className="w-16 h-8 text-center text-sm font-bold"
-                          placeholder="—"
-                        />
+                        <div className="flex items-center gap-1">
+                          <Input
+                            type="number" min="0" max="20" step="0.5"
+                            value={gradeVal || ""}
+                            onChange={e => handleGradeChange(student.id, e.target.value)}
+                            className="w-14 h-7 text-center text-xs font-bold"
+                            placeholder="—"
+                          />
+                          <span className="text-[11px] text-muted-foreground">/20</span>
+                        </div>
                       )}
-                      <span className="text-xs text-muted-foreground">/20</span>
                     </div>
                   </div>
-                </div>
-                <div className="flex items-center gap-4 text-[11px] text-muted-foreground">
-                  <span className="flex items-center gap-1">
-                    <Clock className="w-3 h-3" />
-                    {student.submittedDate} às {student.submittedTime}
-                  </span>
-                </div>
-                {student.fileName && (
-                  <div className="inline-flex items-center gap-2 rounded border px-2.5 py-1.5 bg-muted/20 mt-1">
-                    <FileText className="w-3.5 h-3.5 text-destructive/60" />
-                    <span className="text-xs font-medium text-foreground">{student.fileName}</span>
-                    <button className="p-0.5 rounded hover:bg-muted/50 transition"><Eye className="w-3 h-3 text-muted-foreground" /></button>
-                    <button className="p-0.5 rounded hover:bg-muted/50 transition"><Download className="w-3 h-3 text-muted-foreground" /></button>
-                  </div>
-                )}
-              </div>
+                );
+              })}
             </div>
-          ))}
-        </div>
-      )}
+          </div>
+        )}
 
-      {/* Divider */}
-      {submittedList.length > 0 && notSubmittedList.length > 0 && (
-        <div className="border-t border-border" />
-      )}
-
-      {/* Not submitted */}
-      {notSubmittedList.length > 0 && (
-        <div className="divide-y">
-          {notSubmittedList.map(student => (
-            <div key={student.id} className="px-5 py-4 flex items-start gap-3">
-              <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-xs font-bold text-muted-foreground shrink-0 mt-0.5">
-                {student.name.split(" ").map((n: string) => n[0]).slice(0, 2).join("")}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between gap-2">
-                  <div>
-                    <div className="flex items-center gap-1.5">
-                      <p className="text-sm font-medium text-foreground truncate">{student.name}</p>
-                      <span className="inline-flex items-center gap-0.5 ml-1">
-                        <button className="p-1 rounded-full hover:bg-primary/10 hover:text-primary transition-colors" title="Enviar mensagem"><MessageCircle className="w-3.5 h-3.5" /></button>
-                        <button className="p-1 rounded-full hover:bg-primary/10 hover:text-primary transition-colors" title="Enviar email"><Mail className="w-3.5 h-3.5" /></button>
-                      </span>
+        {/* Not submitted students */}
+        {notSubmittedList.length > 0 && (
+          <div>
+            <div className="px-5 py-2.5 bg-destructive/5 border-y">
+              <p className="text-[11px] font-semibold text-destructive uppercase tracking-wider flex items-center gap-1.5">
+                <AlertCircle className="w-3 h-3" /> Não submetido ({notSubmittedList.length})
+              </p>
+            </div>
+            <div className="divide-y">
+              {notSubmittedList.map(student => {
+                const wasAtribuido = atribuidos.has(student.id);
+                return (
+                  <div key={student.id} className="px-5 py-3.5 flex items-center gap-3 hover:bg-muted/20 transition-colors">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); navigate(`/professor/students/${student.id}`); }}
+                      className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-xs font-bold text-muted-foreground shrink-0 hover:bg-muted/80 transition-colors"
+                      title="Ver perfil"
+                    >
+                      {student.name.split(" ").map((n: string) => n[0]).slice(0, 2).join("")}
+                    </button>
+                    <div className="flex-1 min-w-0">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); navigate(`/professor/students/${student.id}`); }}
+                        className="text-sm font-medium text-foreground truncate hover:text-primary transition-colors text-left"
+                      >
+                        {student.name}
+                      </button>
+                      <p className="text-[11px] text-muted-foreground">{student.email}</p>
                     </div>
-                    <p className="text-xs text-muted-foreground">{student.email}</p>
-                  </div>
-                  <div className="flex items-center gap-3 shrink-0">
-                    <div className="flex items-center gap-1.5 text-destructive/70">
-                      <AlertCircle className="w-4 h-4" />
-                      <span className="text-xs font-medium">Não entregue</span>
-                    </div>
-                    {/* Grade display/input */}
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-2 shrink-0">
                       {isEncerrada ? (
-                        <span className="text-sm font-bold w-16 text-center text-destructive">0</span>
+                        <span className="text-sm font-bold text-destructive w-14 text-right">0/20</span>
+                      ) : wasAtribuido ? (
+                        <span className="text-sm font-bold text-muted-foreground w-14 text-right">{grades[student.id] || "0"}/20</span>
                       ) : (
-                        <Input
-                          type="number"
-                          min="0"
-                          max="20"
-                          step="0.5"
-                          value={grades[student.id] || ""}
-                          onChange={e => handleGradeChange(student.id, e.target.value)}
-                          className="w-16 h-8 text-center text-sm font-bold"
-                          placeholder="—"
-                        />
+                        <Button size="sm" variant="outline" className="text-xs gap-1.5 h-7 text-destructive border-destructive/30 hover:bg-destructive/10" onClick={() => handleAtribuir(student)}>
+                          <AlertCircle className="w-3 h-3" /> Atribuir Nota
+                        </Button>
                       )}
-                      <span className="text-xs text-muted-foreground">/20</span>
                     </div>
                   </div>
-                </div>
-              </div>
+                );
+              })}
             </div>
-          ))}
-        </div>
-      )}
-    </Card>
+          </div>
+        )}
+      </Card>
+
+      {/* Atribuir confirmation dialog */}
+      <Dialog open={!!atribuirStudent} onOpenChange={() => setAtribuirStudent(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Atribuir Nota</DialogTitle>
+            <DialogDescription>
+              Atribuir nota a <span className="font-semibold text-foreground">{atribuirStudent?.name}</span> que não submeteu a tarefa.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex items-center gap-3 py-4">
+            <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-sm font-bold text-muted-foreground">
+              {atribuirStudent?.name.split(" ").map((n: string) => n[0]).slice(0, 2).join("")}
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-medium">{atribuirStudent?.name}</p>
+              <p className="text-xs text-muted-foreground">{atribuirStudent?.email}</p>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Input
+                type="number" min="0" max="20" step="0.5"
+                value={atribuirGrade}
+                onChange={e => setAtribuirGrade(e.target.value)}
+                className="w-20 h-9 text-center text-sm font-bold"
+                placeholder="0"
+                autoFocus
+              />
+              <span className="text-sm text-muted-foreground">/20</span>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setAtribuirStudent(null)}>Cancelar</Button>
+            <Button onClick={confirmAtribuir} disabled={!atribuirGrade} className="gap-1.5">
+              <CheckCircle className="w-4 h-4" /> Confirmar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

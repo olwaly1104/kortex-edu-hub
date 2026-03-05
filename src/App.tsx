@@ -16,8 +16,6 @@ import StudentTasks from "./pages/student/Tasks";
 import StudentCalendar from "./pages/student/Calendar";
 import StudentAnnouncements from "./pages/student/Announcements";
 import StudentContacts from "./pages/student/Contacts";
-import StudentEmail from "./pages/student/Email";
-import StudentChat from "./pages/student/Chat";
 import StudentGrades from "./pages/student/Grades";
 import StudentLibrary from "./pages/student/Library";
 import StudentProfile from "./pages/student/Profile";
@@ -38,6 +36,7 @@ import ProfessorTaskDetail from "./pages/professor/TaskDetail";
 import ProfessorFinances from "./pages/professor/Finances";
 import ProfessorTurmaDetail from "./pages/professor/TurmaDetail";
 import ProfessorLessonDetailPage from "./pages/professor/LessonDetail";
+import ProfessorStudentProfile from "./pages/professor/StudentProfile";
 import CoordenadorDashboard from "./pages/coordenador/Dashboard";
 import CoordenadorSolicitacoes from "./pages/coordenador/Solicitacoes";
 import CoordenadorAnos from "./pages/coordenador/Anos";
@@ -100,8 +99,6 @@ function AppRoutes() {
         <Route path="/student/calendar" element={<StudentCalendar />} />
         <Route path="/student/announcements" element={<StudentAnnouncements />} />
         <Route path="/student/contacts" element={<StudentContacts />} />
-        <Route path="/student/email" element={<StudentEmail />} />
-        <Route path="/student/chat" element={<StudentChat />} />
         <Route path="/student/grades" element={<StudentGrades />} />
         <Route path="/student/library" element={<StudentLibrary />} />
         <Route path="/student/profile" element={<StudentProfile />} />
@@ -121,10 +118,9 @@ function AppRoutes() {
         <Route path="/professor/tasks" element={<ProfessorTasks />} />
         <Route path="/professor/evaluations" element={<ProfessorEvaluations />} />
         <Route path="/professor/tasks/:taskId" element={<ProfessorTaskDetail />} />
+        <Route path="/professor/students/:studentId" element={<ProfessorStudentProfile />} />
         <Route path="/professor/contacts" element={<ProfessorContacts />} />
         <Route path="/professor/finances" element={<ProfessorFinances />} />
-        <Route path="/professor/email" element={<StudentEmail />} />
-        <Route path="/professor/chat" element={<StudentChat />} />
         <Route path="/professor/profile" element={<StudentProfile />} />
         {/* Coordenador de Curso */}
         <Route path="/coordenador" element={<CoordenadorDashboard />} />
@@ -142,8 +138,6 @@ function AppRoutes() {
         <Route path="/coordenador/notas" element={<CoordenadorNotas />} />
         <Route path="/coordenador/relatorios" element={<CoordenadorRelatorios />} />
         <Route path="/coordenador/financas" element={<CoordenadorFinancas />} />
-        <Route path="/coordenador/chat" element={<StudentChat />} />
-        <Route path="/coordenador/email" element={<StudentEmail />} />
         <Route path="/coordenador/contactos" element={<StudentContacts />} />
         <Route path="/coordenador/perfil" element={<StudentProfile />} />
         {/* Decano */}
