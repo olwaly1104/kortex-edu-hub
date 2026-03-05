@@ -33,6 +33,8 @@ export default function ProfessorTaskDetail() {
   const disc = profDisciplines.find(d => d.id === task.disciplineId);
   const TypeIcon = typeIcon[task.type] || BookOpen;
   const submissionPct = task.totalStudents > 0 ? Math.round(task.submissions / task.totalStudents * 100) : 0;
+  const isEncerrada = task.status === "encerrada";
+  const isActiva = task.status === "publicada";
 
   // Mock student submissions
   const students = profStudents.filter(s => s.disciplineId === task.disciplineId);
@@ -68,8 +70,13 @@ export default function ProfessorTaskDetail() {
           <Badge variant="outline" className="text-[10px]">{disc?.code}</Badge>
           <Badge variant="outline" className="text-[10px]">{typeLabel[task.type]}</Badge>
           <Badge className={task.status === "encerrada" ? "bg-accent/10 text-accent" : task.status === "publicada" ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}>
-            {task.status === "encerrada" ? "Encerrada" : task.status === "publicada" ? "Publicada" : "Rascunho"}
+            {task.status === "encerrada" ? "Encerrada" : task.status === "publicada" ? "Activa" : "Rascunho"}
           </Badge>
+          {isActiva && (
+            <Badge className="bg-destructive/10 text-destructive border-destructive/20 gap-1 text-[10px]">
+              <AlertCircle className="w-3 h-3" /> Por atribuir
+            </Badge>
+          )}
         </div>
         <h1 className="text-2xl font-bold text-foreground">{task.title}</h1>
 
@@ -152,16 +159,20 @@ export default function ProfessorTaskDetail() {
         notSubmittedList={notSubmittedList}
         task={task}
         submissionPct={submissionPct}
+        isEncerrada={isEncerrada}
+        isActiva={isActiva}
       />
     </div>
   );
 }
 
-function GradingTable({ submittedList, notSubmittedList, task, submissionPct }: {
+function GradingTable({ submittedList, notSubmittedList, task, submissionPct, isEncerrada, isActiva }: {
   submittedList: any[];
   notSubmittedList: any[];
   task: any;
   submissionPct: number;
+  isEncerrada: boolean;
+  isActiva: boolean;
 }) {
   const { toast } = useToast();
   const [grades, setGrades] = useState<Record<string, string>>(() => {
@@ -169,10 +180,17 @@ function GradingTable({ submittedList, notSubmittedList, task, submissionPct }: 
     submittedList.forEach(s => {
       if (s.grade !== null) initial[s.id] = String(s.grade);
     });
+    // For encerrada, not submitted get 0
+    if (isEncerrada) {
+      notSubmittedList.forEach(s => {
+        initial[s.id] = "0";
+      });
+    }
     return initial;
   });
 
   const handleGradeChange = (studentId: string, value: string) => {
+    if (isEncerrada) return; // immutable when encerrada
     setGrades(prev => ({ ...prev, [studentId]: value }));
   };
 
@@ -190,10 +208,22 @@ function GradingTable({ submittedList, notSubmittedList, task, submissionPct }: 
             <span className="text-primary/70">·</span>
             <span>{submissionPct}%</span>
           </span>
+          {isActiva && (
+            <Badge className="bg-destructive/10 text-destructive border-destructive/20 gap-1 text-[10px]">
+              <AlertCircle className="w-3 h-3" /> Por atribuir
+            </Badge>
+          )}
+          {isEncerrada && (
+            <Badge className="bg-accent/10 text-accent gap-1 text-[10px]">
+              <CheckCircle className="w-3 h-3" /> Notas atribuídas
+            </Badge>
+          )}
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" className="gap-2"><Download className="w-3.5 h-3.5" /> Exportar</Button>
-          <Button size="sm" className="gap-2" onClick={handleSaveGrades}><Save className="w-3.5 h-3.5" /> Guardar Notas</Button>
+          {!isEncerrada && (
+            <Button size="sm" className="gap-2" onClick={handleSaveGrades}><Save className="w-3.5 h-3.5" /> Guardar Notas</Button>
+          )}
         </div>
       </div>
 
@@ -222,18 +252,24 @@ function GradingTable({ submittedList, notSubmittedList, task, submissionPct }: 
                       <CheckCircle className="w-4 h-4" />
                       <span className="text-xs font-medium">Entregue</span>
                     </div>
-                    {/* Grade input */}
+                    {/* Grade display/input */}
                     <div className="flex items-center gap-1">
-                      <Input
-                        type="number"
-                        min="0"
-                        max="20"
-                        step="0.5"
-                        value={grades[student.id] || ""}
-                        onChange={e => handleGradeChange(student.id, e.target.value)}
-                        className="w-16 h-8 text-center text-sm font-bold"
-                        placeholder="—"
-                      />
+                      {isEncerrada ? (
+                        <span className={`text-sm font-bold w-16 text-center ${Number(grades[student.id] || 0) >= 10 ? "text-accent" : "text-destructive"}`}>
+                          {grades[student.id] || "—"}
+                        </span>
+                      ) : (
+                        <Input
+                          type="number"
+                          min="0"
+                          max="20"
+                          step="0.5"
+                          value={grades[student.id] || ""}
+                          onChange={e => handleGradeChange(student.id, e.target.value)}
+                          className="w-16 h-8 text-center text-sm font-bold"
+                          placeholder="—"
+                        />
+                      )}
                       <span className="text-xs text-muted-foreground">/20</span>
                     </div>
                   </div>
@@ -288,18 +324,22 @@ function GradingTable({ submittedList, notSubmittedList, task, submissionPct }: 
                       <AlertCircle className="w-4 h-4" />
                       <span className="text-xs font-medium">Não entregue</span>
                     </div>
-                    {/* Grade input even for not submitted (presencial) */}
+                    {/* Grade display/input */}
                     <div className="flex items-center gap-1">
-                      <Input
-                        type="number"
-                        min="0"
-                        max="20"
-                        step="0.5"
-                        value={grades[student.id] || ""}
-                        onChange={e => handleGradeChange(student.id, e.target.value)}
-                        className="w-16 h-8 text-center text-sm font-bold"
-                        placeholder="—"
-                      />
+                      {isEncerrada ? (
+                        <span className="text-sm font-bold w-16 text-center text-destructive">0</span>
+                      ) : (
+                        <Input
+                          type="number"
+                          min="0"
+                          max="20"
+                          step="0.5"
+                          value={grades[student.id] || ""}
+                          onChange={e => handleGradeChange(student.id, e.target.value)}
+                          className="w-16 h-8 text-center text-sm font-bold"
+                          placeholder="—"
+                        />
+                      )}
                       <span className="text-xs text-muted-foreground">/20</span>
                     </div>
                   </div>

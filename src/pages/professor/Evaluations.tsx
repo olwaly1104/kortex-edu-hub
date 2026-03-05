@@ -6,9 +6,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   GraduationCap, Plus, Search, Clock, CheckCircle, Users, Send,
   FolderKanban, Calendar, AlertCircle, BarChart3, MapPin, ArrowRight, ClipboardList,
+  ArrowUpDown, Filter, X,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -37,13 +39,19 @@ function SummaryCard({ label, value, icon: Icon, iconBg, iconColor, valueClass }
   );
 }
 
+type SortKey = "dueDate" | "weight" | "submissions" | "avgGrade";
+type SortDir = "asc" | "desc";
+type FilterStatus = "publicada" | "encerrada" | "rascunho";
+
 export default function ProfessorEvaluations() {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [filterTurma, setFilterTurma] = useState<string>("all");
-  const [filterStatus, setFilterStatus] = useState<string>("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [showForm, setShowForm] = useState(false);
+  const [sortKey, setSortKey] = useState<SortKey | null>(null);
+  const [sortDir, setSortDir] = useState<SortDir>("desc");
+  const [filterStatuses, setFilterStatuses] = useState<FilterStatus[]>([]);
 
   const [formDisc, setFormDisc] = useState(profDisciplines[0]?.id || "");
   const [formTitle, setFormTitle] = useState("");
@@ -60,22 +68,37 @@ export default function ProfessorEvaluations() {
 
   const activeCount = scopedEvals.filter(t => t.status === "publicada").length;
   const closedCount = scopedEvals.filter(t => t.status === "encerrada").length;
-  const porAtribuir = scopedEvals.filter(t => t.status === "encerrada" && t.avgGrade === null).length;
+  const porAtribuir = activeCount;
   const totalSub = scopedEvals.reduce((s, t) => s + t.submissions, 0);
   const totalExp = scopedEvals.filter(t => t.status !== "rascunho").reduce((s, t) => s + t.totalStudents, 0);
   const deliveryRate = totalExp > 0 ? Math.round(totalSub / totalExp * 100) : 0;
   const graded = scopedEvals.filter(t => t.avgGrade !== null);
   const avgGrade = graded.length > 0 ? (graded.reduce((s, t) => s + (t.avgGrade || 0), 0) / graded.length).toFixed(1) : null;
 
-  const isPorAtribuirEnabled = filterStatus === "encerrada";
+  const filtered = useMemo(() => {
+    let result = scopedEvals
+      .filter(t => filterStatuses.length === 0 || filterStatuses.includes(t.status as FilterStatus))
+      .filter(t => t.title.toLowerCase().includes(searchTerm.toLowerCase()));
 
-  const filtered = scopedEvals
-    .filter(t => {
-      if (filterStatus === "all") return true;
-      if (filterStatus === "por_atribuir") return t.status === "encerrada" && t.avgGrade === null;
-      return t.status === filterStatus;
-    })
-    .filter(t => t.title.toLowerCase().includes(searchTerm.toLowerCase()));
+    if (sortKey) {
+      result = [...result].sort((a, b) => {
+        let va: number, vb: number;
+        if (sortKey === "weight") { va = a.weight; vb = b.weight; }
+        else if (sortKey === "submissions") { va = a.totalStudents > 0 ? a.submissions / a.totalStudents : 0; vb = b.totalStudents > 0 ? b.submissions / b.totalStudents : 0; }
+        else if (sortKey === "avgGrade") { va = a.avgGrade ?? -1; vb = b.avgGrade ?? -1; }
+        else { va = 0; vb = 0; }
+        return sortDir === "desc" ? vb - va : va - vb;
+      });
+    }
+    return result;
+  }, [scopedEvals, filterStatuses, searchTerm, sortKey, sortDir]);
+
+  const toggleFilterStatus = (s: FilterStatus) => {
+    setFilterStatuses(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s]);
+  };
+
+  const hasActiveFilters = filterStatuses.length > 0 || sortKey !== null || searchTerm !== "";
+  const clearFilters = () => { setFilterStatuses([]); setSortKey(null); setSearchTerm(""); };
 
   const handleSubmit = () => {
     if (!formTitle || !formDesc || !formDue) {
@@ -172,40 +195,74 @@ export default function ProfessorEvaluations() {
         ))}
       </div>
 
-      {/* Search + status filters */}
-      <div className="flex items-center gap-3 flex-wrap">
+      {/* Search + Ordenar + Filtrar */}
+      <div className="rounded-xl border border-border bg-card p-3 flex items-center gap-3 flex-wrap">
         <div className="relative flex-1 min-w-[200px] max-w-sm">
           <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-          <Input placeholder="Pesquisar avaliação..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-9 h-9 rounded-lg" />
+          <Input placeholder="Pesquisar avaliação..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-9 h-9 rounded-lg border-0 bg-muted/50" />
         </div>
-        <div className="flex gap-1.5">
-          {([
-            { key: "all", label: "Todos", always: true },
-            { key: "publicada", label: "Activa", always: true },
-            { key: "encerrada", label: "Encerrada", always: true },
-            { key: "por_atribuir", label: "Por Atribuir", always: false },
-          ]).map(s => {
-            const isEnabled = s.always || isPorAtribuirEnabled;
-            return (
-              <button
-                key={s.key}
-                onClick={() => isEnabled && setFilterStatus(s.key)}
-                disabled={!isEnabled}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
-                  !isEnabled
-                    ? "bg-card text-muted-foreground/40 border-border/50 cursor-not-allowed"
-                    : filterStatus === s.key
-                      ? s.key === "por_atribuir"
-                        ? "bg-destructive text-destructive-foreground border-destructive shadow-sm"
-                        : "bg-primary text-primary-foreground border-primary shadow-sm"
-                      : "bg-card text-muted-foreground border-border hover:border-primary/30 hover:text-foreground"
-                }`}
-              >
-                {s.label}
-              </button>
-            );
-          })}
-        </div>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" size="sm" className="gap-1.5 text-xs">
+              <ArrowUpDown className="w-3.5 h-3.5" /> Ordenar
+              {sortKey && <span className="w-1.5 h-1.5 rounded-full bg-primary" />}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent side="top" className="w-52 p-2 space-y-1">
+            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-2 py-1">Ordenar por</p>
+            {([
+              { key: "weight" as SortKey, label: "Peso" },
+              { key: "submissions" as SortKey, label: "Taxa Entrega" },
+              { key: "avgGrade" as SortKey, label: "Média" },
+            ]).map(opt => (
+              <button key={opt.key} onClick={() => { setSortKey(sortKey === opt.key ? null : opt.key); }} className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${sortKey === opt.key ? "bg-primary/10 text-primary font-semibold" : "hover:bg-muted text-foreground"}`}>{opt.label}</button>
+            ))}
+            {sortKey && (
+              <>
+                <div className="border-t my-1" />
+                <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-2 py-1">Direcção</p>
+                {([{ key: "desc" as SortDir, label: "Maior primeiro" }, { key: "asc" as SortDir, label: "Menor primeiro" }]).map(d => (
+                  <button key={d.key} onClick={() => setSortDir(d.key)} className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${sortDir === d.key ? "bg-primary/10 text-primary font-semibold" : "hover:bg-muted text-foreground"}`}>{d.label}</button>
+                ))}
+              </>
+            )}
+          </PopoverContent>
+        </Popover>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" size="sm" className="gap-1.5 text-xs">
+              <Filter className="w-3.5 h-3.5" /> Filtrar
+              {filterStatuses.length > 0 && <span className="w-1.5 h-1.5 rounded-full bg-primary" />}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent side="top" className="w-48 p-2 space-y-1">
+            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-2 py-1">Estado</p>
+            {([
+              { key: "publicada" as FilterStatus, label: "Activa" },
+              { key: "encerrada" as FilterStatus, label: "Encerrada" },
+              { key: "rascunho" as FilterStatus, label: "Rascunho" },
+            ]).map(s => (
+              <button key={s.key} onClick={() => toggleFilterStatus(s.key)} className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${filterStatuses.includes(s.key) ? "bg-primary/10 text-primary font-semibold" : "hover:bg-muted text-foreground"}`}>{s.label}</button>
+            ))}
+          </PopoverContent>
+        </Popover>
+        {hasActiveFilters && (
+          <Button variant="ghost" size="sm" className="gap-1 text-xs text-muted-foreground" onClick={clearFilters}>
+            <X className="w-3 h-3" /> Limpar
+          </Button>
+        )}
+        {filterStatuses.map(s => (
+          <Badge key={s} variant="outline" className="gap-1 text-[10px] cursor-pointer" onClick={() => toggleFilterStatus(s)}>
+            {s === "publicada" ? "Activa" : s === "encerrada" ? "Encerrada" : "Rascunho"}
+            <X className="w-2.5 h-2.5" />
+          </Badge>
+        ))}
+        {sortKey && (
+          <Badge variant="outline" className="gap-1 text-[10px] cursor-pointer" onClick={() => setSortKey(null)}>
+            {sortKey === "weight" ? "Peso" : sortKey === "submissions" ? "Entrega" : "Média"} {sortDir === "desc" ? "↓" : "↑"}
+            <X className="w-2.5 h-2.5" />
+          </Badge>
+        )}
       </div>
 
       {/* Evaluation list */}
@@ -223,7 +280,7 @@ export default function ProfessorEvaluations() {
           const sStyle = statusStyle[task.status];
           const StatusIcon = sStyle.icon;
           const submissionPct = task.totalStudents > 0 ? Math.round(task.submissions / task.totalStudents * 100) : 0;
-          const isPorAtribuir = task.status === "encerrada" && task.avgGrade === null;
+          const isActive = task.status === "publicada";
           const naoCompletado = task.status === "encerrada" && task.submissions < task.totalStudents;
           const missingCount = task.totalStudents - task.submissions;
 
@@ -247,9 +304,9 @@ export default function ProfessorEvaluations() {
                       <TypeIcon className="w-3 h-3" />
                       {typeLabel[task.type]}
                     </Badge>
-                    {isPorAtribuir && (
+                    {isActive && (
                       <Badge className="bg-destructive/10 text-destructive border-destructive/20 gap-1 text-[10px]">
-                        <AlertCircle className="w-3 h-3" /> {task.totalStudents} estudantes por atribuir nota
+                        <AlertCircle className="w-3 h-3" /> Por atribuir
                       </Badge>
                     )}
                     {naoCompletado && task.avgGrade !== null && (
