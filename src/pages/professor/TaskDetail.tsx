@@ -185,8 +185,6 @@ function GradingTable({ submittedList, notSubmittedList, task, submissionPct, is
   const [atribuirGrade, setAtribuirGrade] = useState("");
   const [atribuirStudent, setAtribuirStudent] = useState<any>(null);
   const [atribuidos, setAtribuidos] = useState<Set<string>>(new Set());
-  const [tempGrades, setTempGrades] = useState<Record<string, string>>({});
-
   const handleGradeChange = (studentId: string, value: string) => {
     if (isEncerrada) return;
     setGrades(prev => ({ ...prev, [studentId]: value }));
@@ -194,13 +192,6 @@ function GradingTable({ submittedList, notSubmittedList, task, submissionPct, is
 
   const handleSaveGrades = () => {
     toast({ title: "Notas guardadas!", description: "As notas foram actualizadas com sucesso." });
-  };
-
-  const handleAtribuir = (student: any) => {
-    const val = tempGrades[student.id];
-    if (!val) return;
-    setAtribuirStudent(student);
-    setAtribuirGrade(val);
   };
 
   const confirmAtribuir = () => {
@@ -215,10 +206,6 @@ function GradingTable({ submittedList, notSubmittedList, task, submissionPct, is
     toast({ title: "Nota atribuída!", description: `${atribuirStudent.name} recebeu ${atribuirGrade}/20.` });
     setAtribuirStudent(null);
     setAtribuirGrade("");
-  };
-
-  const handleTempGradeChange = (studentId: string, value: string) => {
-    setTempGrades(prev => ({ ...prev, [studentId]: value }));
   };
 
   return (
@@ -294,7 +281,7 @@ function GradingTable({ submittedList, notSubmittedList, task, submissionPct, is
                       ) : isGraded ? (
                         <span className="text-sm font-bold text-muted-foreground w-14 text-right">{gradeVal || "—"}/20</span>
                       ) : (
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-2">
                           <Input
                             type="number" min="0" max="20" step="0.5"
                             value={gradeVal || ""}
@@ -303,6 +290,17 @@ function GradingTable({ submittedList, notSubmittedList, task, submissionPct, is
                             placeholder="—"
                           />
                           <span className="text-[11px] text-muted-foreground">/20</span>
+                          <Button
+                            size="sm"
+                            className={`text-xs gap-1.5 h-7 transition-all ${!gradeVal ? "opacity-50 grayscale" : "bg-destructive hover:bg-destructive/90 text-destructive-foreground"}`}
+                            disabled={!gradeVal}
+                            onClick={() => {
+                              setAtribuirStudent(student);
+                              setAtribuirGrade(gradeVal);
+                            }}
+                          >
+                            Atribuir
+                          </Button>
                         </div>
                       )}
                     </div>
@@ -342,31 +340,7 @@ function GradingTable({ submittedList, notSubmittedList, task, submissionPct, is
                       </button>
                       <p className="text-[11px] text-muted-foreground">{student.email}</p>
                     </div>
-                    <div className="flex items-center gap-2 shrink-0">
-                      {isEncerrada ? (
-                        <span className="text-sm font-bold text-destructive w-14 text-right">0/20</span>
-                      ) : wasAtribuido ? (
-                        <span className="text-sm font-bold text-muted-foreground w-14 text-right">{grades[student.id] || "0"}/20</span>
-                      ) : (
-                        <div className="flex items-center gap-2">
-                          <Input
-                            type="number" min="0" max="20" step="0.5"
-                            value={tempGrades[student.id] || ""}
-                            onChange={e => handleTempGradeChange(student.id, e.target.value)}
-                            className="w-14 h-7 text-center text-xs font-bold"
-                            placeholder="0"
-                          />
-                          <Button 
-                            size="sm" 
-                            className={`text-xs gap-1.5 h-7 transition-all ${!tempGrades[student.id] ? "opacity-50 grayscale" : "bg-destructive hover:bg-destructive/90 text-destructive-foreground"}`} 
-                            disabled={!tempGrades[student.id]}
-                            onClick={() => handleAtribuir(student)}
-                          >
-                            Atribuir
-                          </Button>
-                        </div>
-                      )}
-                    </div>
+                    <span className="text-sm font-bold text-destructive w-14 text-right shrink-0">0/20</span>
                   </div>
                 );
               })}
