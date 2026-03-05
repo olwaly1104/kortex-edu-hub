@@ -72,12 +72,13 @@ export default function ProfessorDisciplines() {
             <Card key={turma.id} className="overflow-hidden hover:shadow-lg transition-shadow">
               <div className="h-1.5 bg-primary" />
               <div className="p-5">
-                <div className="flex items-start justify-between mb-4">
+                <div className="flex items-start justify-between mb-3">
                   <div>
                     <h3 className="font-bold text-foreground text-lg">{turma.name}</h3>
-                    <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
-                      <span>{turma.course} • {turma.year}º Ano</span>
+                    <div className="flex items-center gap-3 mt-1.5 text-xs text-muted-foreground">
                       <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{room}</span>
+                      <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{scheduleDays}</span>
+                      <span className="flex items-center gap-1"><BookOpen className="w-3 h-3" />{turmaDiscs.map(d => d.code).join(", ")}</span>
                     </div>
                   </div>
                   <Link to={`/professor/turma/${turma.id}`}>
@@ -86,7 +87,7 @@ export default function ProfessorDisciplines() {
                 </div>
 
                 {/* Key metrics row */}
-                <div className="grid grid-cols-3 gap-3 mb-4">
+                <div className="grid grid-cols-4 gap-2.5 mb-4">
                   <div className="text-center p-2.5 rounded-lg bg-muted/50">
                     <p className="text-lg font-bold text-foreground">{turma.students}</p>
                     <p className="text-[10px] text-muted-foreground">Estudantes</p>
@@ -103,29 +104,19 @@ export default function ProfessorDisciplines() {
                     </p>
                     <p className="text-[10px] text-muted-foreground">Presença</p>
                   </div>
+                  <div className="text-center p-2.5 rounded-lg bg-muted/50">
+                    <p className={`text-lg font-bold ${turmaAprovPct >= 70 ? "text-accent" : turmaAprovPct >= 50 ? "text-foreground" : "text-destructive"}`}>
+                      {turmaAprovPct}%
+                    </p>
+                    <p className="text-[10px] text-muted-foreground">Aprovação</p>
+                  </div>
                 </div>
 
                 {/* Details */}
                 <div className="space-y-2.5 pt-3 border-t border-border/50">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="text-muted-foreground flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /> Dias</span>
-                    <span className="font-semibold text-foreground">{scheduleDays}</span>
-                  </div>
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-muted-foreground flex items-center gap-1.5"><BookOpen className="w-3.5 h-3.5" /> Cadeiras</span>
-                    <span className="font-semibold text-foreground">{turmaDiscs.map(d => d.code).join(", ")}</span>
-                  </div>
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-muted-foreground flex items-center gap-1.5"><CheckCircle className="w-3.5 h-3.5" /> Taxa Aprovação</span>
-                    <span className={`font-bold ${turmaAprovPct >= 70 ? "text-accent" : turmaAprovPct >= 50 ? "text-foreground" : "text-destructive"}`}>{turmaAprovPct}%</span>
-                  </div>
-                  <div className="flex items-center justify-between text-xs">
                     <span className="text-muted-foreground flex items-center gap-1.5"><AlertCircle className="w-3.5 h-3.5" /> Taxa Reprovação</span>
                     <span className={`font-bold ${turmaReprovPct > 30 ? "text-destructive" : "text-foreground"}`}>{turmaReprovPct}%</span>
-                  </div>
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-muted-foreground flex items-center gap-1.5"><BarChart3 className="w-3.5 h-3.5" /> Conclusão</span>
-                    <span className="font-semibold text-foreground">{turmaConclusaoPct}%</span>
                   </div>
                   <div>
                     <div className="flex justify-between text-xs mb-1">
