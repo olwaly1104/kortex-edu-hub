@@ -319,27 +319,36 @@ export default function CoordenadorTurmaDetail() {
             const lessonConteudos = conteudos.filter(c => c.lessonId === lesson.id);
             if (lessonConteudos.length === 0) return null;
             return (
-              <div key={lesson.id} className="space-y-2">
+              <Card key={lesson.id} className="p-4 space-y-3">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-mono font-semibold px-2 py-0.5 rounded bg-primary/10 text-primary">Aula #{lesson.number}</span>
-                  <span className="text-sm font-medium text-foreground">{lesson.title}</span>
-                  <Badge variant="outline" className="text-[10px] font-mono">{lesson.disciplineCode}</Badge>
+                  <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                    <Video className="w-4 h-4 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-xs font-mono font-semibold px-2 py-0.5 rounded bg-primary/10 text-primary">Aula #{lesson.number}</span>
+                      <span className="text-sm font-semibold text-foreground">{lesson.title}</span>
+                      <Badge variant="outline" className="text-[10px] font-mono">{lesson.disciplineCode}</Badge>
+                    </div>
+                    <p className="text-[11px] text-muted-foreground mt-0.5">{lesson.date} • {lesson.duration} • {lessonConteudos.length} ficheiros</p>
+                  </div>
                 </div>
-                <div className="space-y-1.5 pl-4 border-l-2 border-border/50">
+                <div className="space-y-1.5">
                   {lessonConteudos.map((c, i) => (
-                    <Card key={i} className="p-3 flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                    <div key={i} className="flex items-center gap-3 p-2.5 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
+                      <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
                         <FileText className="w-4 h-4 text-primary" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-foreground">{c.name}</p>
                         <p className="text-[10px] text-muted-foreground">{c.type.toUpperCase()} • {c.size}</p>
                       </div>
-                      <Button variant="ghost" size="icon" className="shrink-0"><Download className="w-4 h-4" /></Button>
-                    </Card>
+                      <Button variant="ghost" size="icon" className="shrink-0" title="Ver"><Eye className="w-4 h-4" /></Button>
+                      <Button variant="ghost" size="icon" className="shrink-0" title="Descarregar"><Download className="w-4 h-4" /></Button>
+                    </div>
                   ))}
                 </div>
-              </div>
+              </Card>
             );
           })}
           {conteudos.length === 0 && <p className="text-center text-muted-foreground py-8">Nenhum conteúdo disponível.</p>}
