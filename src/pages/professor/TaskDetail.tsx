@@ -273,7 +273,7 @@ function GradingTable({ submittedList, notSubmittedList, task, submissionPct, is
                         <button className="p-0.5 rounded hover:bg-muted/50 transition"><Eye className="w-3 h-3 text-muted-foreground" /></button>
                       </div>
                     )}
-                    <div className="flex items-center gap-2 shrink-0">
+                    <div className="flex flex-col items-end gap-1.5 shrink-0">
                       {isEncerrada ? (
                         <span className={`text-sm font-bold w-14 text-right ${Number(gradeVal || 0) >= 10 ? "text-accent" : "text-destructive"}`}>
                           {gradeVal || "—"}/20
@@ -281,18 +281,21 @@ function GradingTable({ submittedList, notSubmittedList, task, submissionPct, is
                       ) : isGraded ? (
                         <span className="text-sm font-bold text-muted-foreground w-14 text-right">{gradeVal || "—"}/20</span>
                       ) : (
-                        <div className="flex items-center gap-2">
-                          <Input
-                            type="number" min="0" max="20" step="0.5"
-                            value={gradeVal || ""}
-                            onChange={e => handleGradeChange(student.id, e.target.value)}
-                            className="w-14 h-7 text-center text-xs font-bold"
-                            placeholder="—"
-                          />
-                          <span className="text-[11px] text-muted-foreground">/20</span>
+                        <>
+                          <div className="flex items-center gap-1">
+                            <Input
+                              type="number" min="0" max="20" step="0.5"
+                              value={gradeVal || ""}
+                              onChange={e => handleGradeChange(student.id, e.target.value)}
+                              className="w-14 h-7 text-center text-xs font-bold"
+                              placeholder="—"
+                            />
+                            <span className="text-[11px] text-muted-foreground">/20</span>
+                          </div>
                           <Button
                             size="sm"
-                            className={`text-xs gap-1.5 h-7 transition-all ${!gradeVal ? "opacity-50 grayscale" : "bg-destructive hover:bg-destructive/90 text-destructive-foreground"}`}
+                            variant="outline"
+                            className={`text-xs gap-1.5 h-7 w-full transition-all border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground ${!gradeVal ? "opacity-40 pointer-events-none" : ""}`}
                             disabled={!gradeVal}
                             onClick={() => {
                               setAtribuirStudent(student);
@@ -301,7 +304,7 @@ function GradingTable({ submittedList, notSubmittedList, task, submissionPct, is
                           >
                             Atribuir
                           </Button>
-                        </div>
+                        </>
                       )}
                     </div>
                   </div>
