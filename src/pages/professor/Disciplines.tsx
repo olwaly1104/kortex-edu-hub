@@ -22,18 +22,55 @@ export default function ProfessorDisciplines() {
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-          <GraduationCap className="w-6 h-6 text-primary" /> As Minhas Turmas
-        </h1>
-        <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground flex-wrap">
-          <span className="flex items-center gap-1"><Users className="w-3.5 h-3.5" /> <span className="font-bold text-foreground">{totalStudents}</span> Estudantes</span>
-          <span className="flex items-center gap-1"><GraduationCap className="w-3.5 h-3.5" /> <span className="font-bold text-foreground">{allTurmas.length}</span> Turmas</span>
-          <span className="flex items-center gap-1"><UserCheck className="w-3.5 h-3.5" /> Presença <span className={`font-bold ${overallAttendance >= 75 ? "text-accent" : "text-destructive"}`}>{overallAttendance}%</span></span>
-          <span className="flex items-center gap-1"><BarChart3 className="w-3.5 h-3.5" /> Média <span className={`font-bold ${overallAvg >= 10 ? "text-accent" : "text-destructive"}`}>{overallAvg}/20</span></span>
-          <span className="flex items-center gap-1">
-            <CheckCircle className="w-3.5 h-3.5" /> Aprov. <span className={`font-bold ${taxaAprovacao >= 70 ? "text-accent" : taxaAprovacao >= 50 ? "text-foreground" : "text-destructive"}`}>{taxaAprovacao}%</span>
-          </span>
+      <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+        <GraduationCap className="w-6 h-6 text-primary" /> As Minhas Turmas
+      </h1>
+
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+        <div className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4">
+          <div className="flex items-center justify-between">
+            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Estudantes</p>
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-primary/10">
+              <Users className="w-4 h-4 text-primary" />
+            </div>
+          </div>
+          <p className="text-2xl font-bold text-foreground">{totalStudents}</p>
+        </div>
+        <div className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4">
+          <div className="flex items-center justify-between">
+            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Turmas</p>
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-secondary/10">
+              <GraduationCap className="w-4 h-4 text-secondary" />
+            </div>
+          </div>
+          <p className="text-2xl font-bold text-foreground">{allTurmas.length}</p>
+        </div>
+        <div className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4">
+          <div className="flex items-center justify-between">
+            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Presença Geral</p>
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-accent/10">
+              <UserCheck className="w-4 h-4 text-accent" />
+            </div>
+          </div>
+          <p className={`text-2xl font-bold ${overallAttendance >= 75 ? "text-accent" : "text-destructive"}`}>{overallAttendance}%</p>
+        </div>
+        <div className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4">
+          <div className="flex items-center justify-between">
+            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Média Geral</p>
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-primary/10">
+              <BarChart3 className="w-4 h-4 text-primary" />
+            </div>
+          </div>
+          <p className={`text-2xl font-bold ${overallAvg >= 10 ? "text-accent" : "text-destructive"}`}>{overallAvg}/20</p>
+        </div>
+        <div className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4">
+          <div className="flex items-center justify-between">
+            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Taxa Aprovação</p>
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-accent/10">
+              <CheckCircle className="w-4 h-4 text-accent" />
+            </div>
+          </div>
+          <p className={`text-2xl font-bold ${taxaAprovacao >= 70 ? "text-accent" : taxaAprovacao >= 50 ? "text-foreground" : "text-destructive"}`}>{taxaAprovacao}%</p>
         </div>
       </div>
 
