@@ -8,7 +8,7 @@ import {
   ArrowLeft, BookOpen, Users, Clock, Video, FileText,
   GraduationCap, ClipboardList, Play, Eye, Calendar, CheckCircle,
   TrendingUp, Search, Edit, Settings, Download, AlertCircle,
-  FolderOpen, Award,
+  FolderOpen, Award, BarChart3,
 } from "lucide-react";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
@@ -76,6 +76,9 @@ export default function ProfessorTurmaDetail() {
   const avgAttendance = uniqueStudents.length > 0
     ? Math.round(uniqueStudents.reduce((s, st) => s + st.attendance, 0) / uniqueStudents.length)
     : 0;
+  const totalSub = turmaTasks.filter(t => t.status !== "rascunho").reduce((s, t) => s + t.submissions, 0);
+  const totalExp = turmaTasks.filter(t => t.status !== "rascunho").reduce((s, t) => s + t.totalStudents, 0);
+  const deliveryRate = totalExp > 0 ? Math.round(totalSub / totalExp * 100) : 0;
 
   const filteredStudents = uniqueStudents.filter(s =>
     s.name.toLowerCase().includes(studentSearch.toLowerCase())
@@ -154,12 +157,11 @@ export default function ProfessorTurmaDetail() {
         </Card>
         <Card className="p-4">
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><Video className="w-4 h-4 text-primary" /></div>
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Aulas</span>
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><CheckCircle className="w-4 h-4 text-primary" /></div>
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Presença</span>
           </div>
           <div className="flex items-baseline gap-1">
-            <span className="text-2xl font-bold text-foreground">{turmaLessons.filter(l => l.status === "publicada").length}</span>
-            <span className="text-sm text-muted-foreground">/{turmaLessons.length}</span>
+            <span className={`text-2xl font-bold ${avgAttendance >= 75 ? "text-accent" : "text-destructive"}`}>{avgAttendance}%</span>
           </div>
         </Card>
         <Card className="p-4">
@@ -178,11 +180,11 @@ export default function ProfessorTurmaDetail() {
         </Card>
         <Card className="p-4">
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><CheckCircle className="w-4 h-4 text-primary" /></div>
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Presença</span>
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><BarChart3 className="w-4 h-4 text-primary" /></div>
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Taxa Entrega</span>
           </div>
           <div className="flex items-baseline gap-1">
-            <span className={`text-2xl font-bold ${avgAttendance >= 75 ? "text-accent" : "text-destructive"}`}>{avgAttendance}%</span>
+            <span className={`text-2xl font-bold ${deliveryRate >= 70 ? "text-accent" : deliveryRate >= 50 ? "text-foreground" : "text-destructive"}`}>{deliveryRate}%</span>
           </div>
         </Card>
       </div>
@@ -196,7 +198,7 @@ export default function ProfessorTurmaDetail() {
               { value: "lessons", icon: Video, label: "Aulas" },
               { value: "conteudos", icon: FolderOpen, label: "Conteúdos" },
               { value: "tasks", icon: ClipboardList, label: "Tarefas" },
-              { value: "avaliacoes", icon: Award, label: "Avaliações" },
+              { value: "avaliacoes", icon: Award, label: `Avaliações ${avaliacoes.length}/${turmaTasks.length}` },
               { value: "resources", icon: FileText, label: "Recursos" },
               { value: "calendar", icon: Calendar, label: "Calendário" },
               { value: "criteria", icon: Settings, label: "Critério" },
@@ -259,7 +261,12 @@ export default function ProfessorTurmaDetail() {
               const StatusIcon = cfg.icon;
               const disc = profDisciplines.find(d => d.id === lesson.disciplineId);
               return (
-                <Card key={lesson.id} className="p-4 border-l-[3px]" style={{ borderLeftColor: lesson.status === "publicada" ? "hsl(var(--accent))" : "hsl(var(--muted))" }}>
+                <Card
+                  key={lesson.id}
+                  className="p-4 border-l-[3px] cursor-pointer hover:shadow-md transition-shadow"
+                  style={{ borderLeftColor: lesson.status === "publicada" ? "hsl(var(--accent))" : "hsl(var(--muted))" }}
+                  onClick={() => navigate(`/professor/lessons/${lesson.id}`)}
+                >
                   <div className="flex items-center gap-4">
                     <div className="w-20 h-14 rounded-xl bg-muted/50 flex items-center justify-center shrink-0"><Play className="w-5 h-5 text-muted-foreground/60" /></div>
                     <div className="flex-1 min-w-0">
@@ -282,7 +289,6 @@ export default function ProfessorTurmaDetail() {
                     </div>
                     <Badge className={`${cfg.color} gap-1 text-[10px]`}><StatusIcon className="w-3 h-3" /> {cfg.label}</Badge>
                   </div>
-                  {/* Conteúdos / Ficheiros da aula */}
                   {lesson.materials.length > 0 && (
                     <div className="mt-3 pt-3 border-t border-border/50">
                       <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1"><FolderOpen className="w-3 h-3" /> Conteúdos / Ficheiros</p>
@@ -304,25 +310,45 @@ export default function ProfessorTurmaDetail() {
           </div>
         </TabsContent>
 
-        {/* ── Conteúdos ── */}
+        {/* ── Conteúdos (grouped by aula) ── */}
         <TabsContent value="conteudos" className="space-y-4">
           <p className="text-sm text-muted-foreground">{conteudos.length} conteúdos disponíveis</p>
-          <div className="space-y-2">
-            {conteudos.map((c, i) => (
-              <Card key={i} className="p-4 flex items-center gap-4">
-                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                  <FileText className="w-5 h-5 text-primary" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-foreground">{c.name}</p>
-                  <p className="text-[11px] text-muted-foreground">{c.type.toUpperCase()} • {c.size} • Aula #{c.lessonNumber}: {c.lessonTitle} • {c.date}</p>
-                </div>
-                {c.disc && <Badge variant="outline" className="text-[10px] font-mono">{c.disc.code}</Badge>}
-                <Button variant="ghost" size="icon" className="shrink-0"><Download className="w-4 h-4" /></Button>
-              </Card>
-            ))}
-            {conteudos.length === 0 && <p className="text-center text-muted-foreground py-8">Nenhum conteúdo disponível.</p>}
-          </div>
+          {(() => {
+            const lessonsWithContent = turmaLessons.filter(l => l.status === "publicada" && l.materials.length > 0);
+            return lessonsWithContent.length > 0 ? (
+              <div className="space-y-4">
+                {lessonsWithContent.map(lesson => {
+                  const disc = profDisciplines.find(d => d.id === lesson.disciplineId);
+                  return (
+                    <Card key={lesson.id} className="overflow-hidden">
+                      <div className="px-5 py-3 border-b flex items-center gap-3 bg-muted/30 cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => navigate(`/professor/lessons/${lesson.id}`)}>
+                        <span className="text-xs font-mono font-semibold px-1.5 py-0.5 rounded bg-primary/10 text-primary">#{lesson.number}</span>
+                        <p className="text-sm font-semibold text-foreground flex-1">{lesson.title}</p>
+                        <span className="text-[11px] text-muted-foreground">{lesson.date}</span>
+                        {disc && <Badge variant="outline" className="text-[10px] font-mono">{disc.code}</Badge>}
+                      </div>
+                      <div className="divide-y">
+                        {lesson.materials.map((m, i) => (
+                          <div key={i} className="px-5 py-3 flex items-center gap-3 hover:bg-muted/20 transition-colors">
+                            <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: (disc?.color || "hsl(var(--primary))") + "15" }}>
+                              <FileText className="w-4 h-4" style={{ color: disc?.color }} />
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-sm font-medium text-foreground">{m.name}</p>
+                              <p className="text-[10px] text-muted-foreground">{m.type.toUpperCase()} • {m.size}</p>
+                            </div>
+                            <Button variant="ghost" size="icon" className="shrink-0"><Download className="w-4 h-4" /></Button>
+                          </div>
+                        ))}
+                      </div>
+                    </Card>
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="text-center text-muted-foreground py-8">Nenhum conteúdo disponível.</p>
+            );
+          })()}
         </TabsContent>
 
         {/* ── Tarefas ── */}
