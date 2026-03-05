@@ -3,7 +3,7 @@ import { coordCursoInfo, coordTurmas, coordDisciplinas, coordTurmaLessons, coord
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, GraduationCap, Users, Award, ChevronRight, BookOpen, CheckCircle, UserCheck, Video, FileText, Calendar, MapPin, ClipboardList } from "lucide-react";
+import { ArrowLeft, GraduationCap, Users, Award, ChevronRight, BookOpen, CheckCircle, UserCheck, Video, FileText, Calendar, MapPin, ClipboardList, TrendingUp } from "lucide-react";
 
 export default function CoordenadorAnoDetail() {
   const { year } = useParams();
@@ -74,73 +74,91 @@ export default function CoordenadorAnoDetail() {
       <div>
         <h2 className="text-lg font-semibold text-foreground mb-4">Turmas</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {turmas.map(t => {
-            const turmaLessons = coordTurmaLessons.filter(l => l.turmaId === t.id);
-            const turmaPublished = turmaLessons.filter(l => l.status === "publicada").length;
-            const lessonPct = turmaLessons.length > 0 ? Math.round((turmaPublished / turmaLessons.length) * 100) : 0;
-            const turmaResources = coordTurmaResources.filter(r => r.turmaId === t.id);
+            {turmas.map(t => {
+              const turmaLessons = coordTurmaLessons.filter(l => l.turmaId === t.id);
+              const turmaPublished = turmaLessons.filter(l => l.status === "publicada").length;
+              const lessonPct = turmaLessons.length > 0 ? Math.round((turmaPublished / turmaLessons.length) * 100) : 0;
+              const turmaResources = coordTurmaResources.filter(r => r.turmaId === t.id);
 
-            return (
-              <Link key={t.id} to={`/coordenador/anos/${yearNum}/turma/${t.id}`}>
-                <Card className="overflow-hidden hover:shadow-lg transition-all h-full group">
-                  <div className="p-5">
-                    {/* Header */}
-                    <div className="flex items-start justify-between mb-1">
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-bold text-foreground text-lg">{t.name}</h3>
-                        <Badge variant="outline" className="text-[10px] font-mono text-muted-foreground">{t.id.toUpperCase()}</Badge>
-                      </div>
-                      <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
-                    </div>
-                    <p className="text-xs text-muted-foreground mb-4">{yearNum}º Ano · {info.name}</p>
+              // Compute estado
+              const estado = t.presenca < 75 || t.media < 11 || t.taxaSucesso < 70
+                ? "risco" : t.presenca >= 85 && t.media >= 13 && t.taxaSucesso >= 85
+                ? "excelente" : "normal";
+              const estadoConfig = {
+                excelente: { label: "Excelente", class: "bg-accent/10 text-accent border-accent/30" },
+                normal: { label: "Normal", class: "bg-primary/10 text-primary border-primary/30" },
+                risco: { label: "Em Risco", class: "bg-destructive/10 text-destructive border-destructive/30" },
+              };
+              const ec = estadoConfig[estado];
 
-                    {/* Key metrics row */}
-                    <div className="grid grid-cols-3 gap-3 mb-4">
-                      <div className="text-center p-2.5 rounded-lg bg-muted/50">
-                        <p className="text-lg font-bold text-foreground">{t.estudantes}</p>
-                        <p className="text-[10px] text-muted-foreground">Estudantes</p>
-                      </div>
-                      <div className="text-center p-2.5 rounded-lg bg-muted/50">
-                        <p className="text-lg font-bold text-foreground">{t.professores}</p>
-                        <p className="text-[10px] text-muted-foreground">Professores</p>
-                      </div>
-                      <div className="text-center p-2.5 rounded-lg bg-muted/50">
-                        <p className="text-lg font-bold text-foreground">{t.disciplinas}</p>
-                        <p className="text-[10px] text-muted-foreground">Cadeiras</p>
-                      </div>
-                    </div>
-
-                    {/* Details */}
-                    <div className="space-y-2.5 pt-3 border-t border-border/50">
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="text-muted-foreground flex items-center gap-1.5"><CheckCircle className="w-3.5 h-3.5" /> Presença</span>
-                        <span className={`font-semibold ${t.presenca >= 75 ? "text-accent" : "text-destructive"}`}>{t.presenca}%</span>
-                      </div>
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="text-muted-foreground flex items-center gap-1.5"><ClipboardList className="w-3.5 h-3.5" /> Taxa de Entrega</span>
-                        <span className={`font-semibold ${t.taxaEntrega >= 80 ? "text-accent" : "text-destructive"}`}>{t.taxaEntrega}%</span>
-                      </div>
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="text-muted-foreground flex items-center gap-1.5"><Award className="w-3.5 h-3.5" /> Média Geral</span>
-                        <span className={`font-semibold ${t.media >= 10 ? "text-accent" : "text-destructive"}`}>{t.media}</span>
-                      </div>
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="text-muted-foreground flex items-center gap-1.5"><FileText className="w-3.5 h-3.5" /> Conteúdos</span>
-                        <span className="font-semibold text-foreground">{turmaResources.length}</span>
-                      </div>
-                      <div>
-                        <div className="flex justify-between text-xs mb-1">
-                          <span className="text-muted-foreground flex items-center gap-1.5"><Video className="w-3.5 h-3.5" /> Aulas Gravadas</span>
-                          <span className="font-semibold text-foreground">{turmaPublished}/{turmaLessons.length}</span>
+              return (
+                <Link key={t.id} to={`/coordenador/anos/${yearNum}/turma/${t.id}`}>
+                  <Card className="overflow-hidden hover:shadow-lg transition-all h-full group">
+                    <div className="p-5">
+                      {/* Header */}
+                      <div className="flex items-start justify-between mb-1">
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-bold text-foreground text-lg">{t.name}</h3>
+                          <Badge variant="outline" className="text-[10px] font-mono text-muted-foreground">{t.id.toUpperCase()}</Badge>
                         </div>
-                        <Progress value={lessonPct} className="h-1.5" />
+                        <div className="flex items-center gap-2">
+                          <Badge className={`text-[10px] border ${ec.class}`}>{ec.label}</Badge>
+                          <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                        </div>
+                      </div>
+                      <p className="text-xs text-muted-foreground mb-4">{yearNum}º Ano · {info.name}</p>
+
+                      {/* Key metrics row */}
+                      <div className="grid grid-cols-3 gap-3 mb-4">
+                        <div className="text-center p-2.5 rounded-lg bg-muted/50">
+                          <p className="text-lg font-bold text-foreground">{t.estudantes}</p>
+                          <p className="text-[10px] text-muted-foreground">Estudantes</p>
+                        </div>
+                        <div className="text-center p-2.5 rounded-lg bg-muted/50">
+                          <p className="text-lg font-bold text-foreground">{t.professores}</p>
+                          <p className="text-[10px] text-muted-foreground">Professores</p>
+                        </div>
+                        <div className="text-center p-2.5 rounded-lg bg-muted/50">
+                          <p className="text-lg font-bold text-foreground">{t.disciplinas}</p>
+                          <p className="text-[10px] text-muted-foreground">Cadeiras</p>
+                        </div>
+                      </div>
+
+                      {/* Details */}
+                      <div className="space-y-2.5 pt-3 border-t border-border/50">
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-muted-foreground flex items-center gap-1.5"><CheckCircle className="w-3.5 h-3.5" /> Presença</span>
+                          <span className={`font-semibold ${t.presenca >= 75 ? "text-accent" : "text-destructive"}`}>{t.presenca}%</span>
+                        </div>
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-muted-foreground flex items-center gap-1.5"><ClipboardList className="w-3.5 h-3.5" /> Taxa de Entrega</span>
+                          <span className={`font-semibold ${t.taxaEntrega >= 80 ? "text-accent" : "text-destructive"}`}>{t.taxaEntrega}%</span>
+                        </div>
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-muted-foreground flex items-center gap-1.5"><Award className="w-3.5 h-3.5" /> Média Geral</span>
+                          <span className={`font-semibold ${t.media >= 10 ? "text-accent" : "text-destructive"}`}>{t.media}</span>
+                        </div>
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-muted-foreground flex items-center gap-1.5"><TrendingUp className="w-3.5 h-3.5" /> Taxa Aprovação</span>
+                          <span className={`font-semibold ${t.taxaSucesso >= 70 ? "text-accent" : "text-destructive"}`}>{t.taxaSucesso}%</span>
+                        </div>
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-muted-foreground flex items-center gap-1.5"><FileText className="w-3.5 h-3.5" /> Conteúdos</span>
+                          <span className="font-semibold text-foreground">{turmaResources.length}</span>
+                        </div>
+                        <div>
+                          <div className="flex justify-between text-xs mb-1">
+                            <span className="text-muted-foreground flex items-center gap-1.5"><Video className="w-3.5 h-3.5" /> Aulas Gravadas</span>
+                            <span className="font-semibold text-foreground">{turmaPublished}/{turmaLessons.length}</span>
+                          </div>
+                          <Progress value={lessonPct} className="h-1.5" />
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </Card>
-              </Link>
-            );
-          })}
+                  </Card>
+                </Link>
+              );
+            })}
         </div>
       </div>
     </div>
