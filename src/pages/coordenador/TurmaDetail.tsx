@@ -44,10 +44,15 @@ export default function CoordenadorTurmaDetail() {
 
   if (!turma) return <div className="p-8 text-muted-foreground">Turma não encontrada.</div>;
 
-  // Conteúdos
-  const conteudos = turmaLessons.filter(l => l.status === "publicada").flatMap(l =>
-    l.materials.map(m => ({ ...m, lessonId: l.id, lessonTitle: l.title, lessonNumber: l.number, date: l.date, discipline: l.discipline, disciplineCode: l.disciplineCode }))
-  );
+  // Conteúdos — ensure at least 2 per published lesson
+  const conteudos = turmaLessons.filter(l => l.status === "publicada").flatMap(l => {
+    const mats = l.materials.length >= 2
+      ? l.materials
+      : l.materials.length === 1
+        ? [...l.materials, { name: `Exercícios ${l.discipline}`, type: "pdf", size: "350 KB" }]
+        : [{ name: `Slides Aula #${l.number}`, type: "pdf", size: "1.8 MB" }, { name: `Exercícios ${l.discipline}`, type: "pdf", size: "350 KB" }];
+    return mats.slice(0, 2).map(m => ({ ...m, lessonId: l.id, lessonTitle: l.title, lessonNumber: l.number, date: l.date, discipline: l.discipline, disciplineCode: l.disciplineCode }));
+  });
 
   // Avaliações
   const avaliacoes = turmaTasks.filter(t => t.type === "exame" || t.type === "quiz");
@@ -111,23 +116,13 @@ export default function CoordenadorTurmaDetail() {
       </div>
 
       {/* KPIs */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         <Card className="p-4">
           <div className="flex items-center gap-2 mb-3">
             <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><Users className="w-4 h-4 text-primary" /></div>
             <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Estudantes</span>
           </div>
           <p className="text-2xl font-bold text-foreground">{turma.estudantes}</p>
-        </Card>
-        <Card className="p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><Video className="w-4 h-4 text-primary" /></div>
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Aulas</span>
-          </div>
-          <div className="flex items-baseline gap-1">
-            <span className="text-2xl font-bold text-foreground">{turmaLessons.filter(l => l.status === "publicada").length}</span>
-            <span className="text-sm text-muted-foreground">/{turmaLessons.length}</span>
-          </div>
         </Card>
         <Card className="p-4">
           <div className="flex items-center gap-2 mb-3">
@@ -146,6 +141,24 @@ export default function CoordenadorTurmaDetail() {
           </div>
           <div className="flex items-baseline gap-1">
             <span className={`text-2xl font-bold ${turma.presenca >= 75 ? "text-accent" : "text-destructive"}`}>{turma.presenca}%</span>
+          </div>
+        </Card>
+        <Card className="p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><ClipboardList className="w-4 h-4 text-primary" /></div>
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Taxa Entrega</span>
+          </div>
+          <div className="flex items-baseline gap-1">
+            <span className={`text-2xl font-bold ${turma.taxaEntrega >= 80 ? "text-accent" : "text-destructive"}`}>{turma.taxaEntrega}%</span>
+          </div>
+        </Card>
+        <Card className="p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><Award className="w-4 h-4 text-primary" /></div>
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Taxa Aprovação</span>
+          </div>
+          <div className="flex items-baseline gap-1">
+            <span className={`text-2xl font-bold ${turma.taxaSucesso >= 70 ? "text-accent" : "text-destructive"}`}>{turma.taxaSucesso}%</span>
           </div>
         </Card>
       </div>
