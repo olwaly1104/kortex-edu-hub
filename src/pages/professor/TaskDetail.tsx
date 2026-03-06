@@ -95,12 +95,16 @@ export default function ProfessorTaskDetail() {
           {task.type === "exame" ? (
             <>
               <span className="flex items-center gap-1.5"><Calendar className="w-4 h-4" /> Data de Entrega: <span className="font-semibold text-foreground">{task.dueDate}</span></span>
+              <span className="flex items-center gap-1.5"><Clock className="w-4 h-4" /> Termina às: <span className="font-semibold text-foreground">{task.dueTime || "—"}</span></span>
               {task.correctionDeadline && (
                 <span className="flex items-center gap-1.5"><Clock className="w-4 h-4" /> Corrigir até: <span className="font-semibold text-foreground">{task.correctionDeadline}</span></span>
               )}
             </>
           ) : (
-            <span className="flex items-center gap-1.5"><Calendar className="w-4 h-4" /> Prazo da Tarefa: <span className="font-semibold text-foreground">{task.assignedDate} – {task.dueDate}</span></span>
+            <>
+              <span className="flex items-center gap-1.5"><Calendar className="w-4 h-4" /> Prazo da Tarefa: <span className="font-semibold text-foreground">{task.assignedDate} – {task.dueDate}</span></span>
+              <span className="flex items-center gap-1.5"><Clock className="w-4 h-4" /> Hora limite: <span className="font-semibold text-foreground">{task.dueTime || "—"}</span></span>
+            </>
           )}
           <span className="flex items-center gap-1.5"><MapPin className="w-4 h-4" /> Presencial</span>
         </div>
@@ -282,6 +286,8 @@ function GradingTable({ submittedList, notSubmittedList, task, submissionPct, co
             {task.type === "exame" ? (
               <>
                 <span className="text-xs text-muted-foreground flex items-center gap-1"><Calendar className="w-3 h-3" /> Data de Entrega: <span className="font-semibold text-foreground">{task.dueDate}</span></span>
+                <span className="text-muted-foreground/30">|</span>
+                <span className="text-xs text-muted-foreground flex items-center gap-1"><Clock className="w-3 h-3" /> Termina às: <span className="font-semibold text-foreground">{task.dueTime || "—"}</span></span>
                 {task.correctionDeadline && (
                   <>
                     <span className="text-muted-foreground/30">|</span>
@@ -290,7 +296,11 @@ function GradingTable({ submittedList, notSubmittedList, task, submissionPct, co
                 )}
               </>
             ) : (
-              <span className="text-xs text-muted-foreground flex items-center gap-1"><Calendar className="w-3 h-3" /> Prazo da Tarefa: <span className="font-semibold text-foreground">{task.assignedDate} – {task.dueDate}</span></span>
+              <>
+                <span className="text-xs text-muted-foreground flex items-center gap-1"><Calendar className="w-3 h-3" /> Prazo da Tarefa: <span className="font-semibold text-foreground">{task.assignedDate} – {task.dueDate}</span></span>
+                <span className="text-muted-foreground/30">|</span>
+                <span className="text-xs text-muted-foreground flex items-center gap-1"><Clock className="w-3 h-3" /> Hora limite: <span className="font-semibold text-foreground">{task.dueTime || "—"}</span></span>
+              </>
             )}
             {!isActiva && !isEncerrada && pendingCorrection > 0 && task.correctionDeadline && (
               <>
