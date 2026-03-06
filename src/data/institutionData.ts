@@ -404,14 +404,16 @@ export interface TurmaTask {
   description: string;
   discipline: string;
   dueDate: string;
+  dueTime?: string;
   assignedDate: string;
   type: "tarefa" | "quiz" | "exame";
-  status: "rascunho" | "publicada" | "encerrada";
+  status: "rascunho" | "publicada" | "encerrada" | "pendente";
   submissions: number;
   totalStudents: number;
   avgGrade: number | null;
   weight: number;
   corrected: number;
+  correctionDeadline?: string;
 }
 
 // ── Turma Resources ──
@@ -505,24 +507,26 @@ export const coordTurmaLessons: TurmaLesson[] = [
 // ── Turma Tasks Data ──
 export const coordTurmaTasks: TurmaTask[] = [
   // 1º Ano - Turma A
-  { id: "ct1", turmaId: "t1a", title: "Exercícios de Limites", description: "Calcular limites de 15 funções.", discipline: "Matemática I", dueDate: "10/02/2024", assignedDate: "05/02/2024", type: "tarefa", status: "encerrada", submissions: 31, totalStudents: 34, avgGrade: 12.8, weight: 15, corrected: 31 },
-  { id: "ct2", turmaId: "t1a", title: "Teste 1 — Mecânica", description: "Teste sobre leis de Newton e aplicações.", discipline: "Física I", dueDate: "14/02/2024", assignedDate: "06/02/2024", type: "exame", status: "encerrada", submissions: 33, totalStudents: 34, avgGrade: 11.5, weight: 25, corrected: 33 },
-  { id: "ct3", turmaId: "t1a", title: "Derivadas — Lista 1", description: "Resolver exercícios de derivadas simples e compostas.", discipline: "Matemática I", dueDate: "15/02/2024", assignedDate: "08/02/2024", type: "tarefa", status: "publicada", submissions: 20, totalStudents: 34, avgGrade: null, weight: 15, corrected: 0 },
-  { id: "ct4", turmaId: "t1a", title: "Projecto DT — Vistas", description: "Desenhar 3 vistas ortogonais de uma peça.", discipline: "Desenho Técnico I", dueDate: "20/02/2024", assignedDate: "07/02/2024", type: "tarefa", status: "publicada", submissions: 12, totalStudents: 34, avgGrade: null, weight: 20, corrected: 0 },
+  { id: "ct1", turmaId: "t1a", title: "Exercícios de Limites", description: "Calcular limites de 15 funções.", discipline: "Matemática I", dueDate: "10/02/2024", dueTime: "23:59", assignedDate: "05/02/2024", type: "tarefa", status: "encerrada", submissions: 31, totalStudents: 34, avgGrade: 12.8, weight: 15, corrected: 31 },
+  { id: "ct2", turmaId: "t1a", title: "Teste 1 — Mecânica", description: "Teste sobre leis de Newton e aplicações.", discipline: "Física I", dueDate: "14/02/2024", dueTime: "11:30", assignedDate: "06/02/2024", type: "exame", status: "encerrada", submissions: 33, totalStudents: 34, avgGrade: 11.5, weight: 25, corrected: 33 },
+  { id: "ct3", turmaId: "t1a", title: "Derivadas — Lista 1", description: "Resolver exercícios de derivadas simples e compostas.", discipline: "Matemática I", dueDate: "15/02/2024", dueTime: "23:59", assignedDate: "08/02/2024", type: "tarefa", status: "publicada", submissions: 20, totalStudents: 34, avgGrade: null, weight: 15, corrected: 0 },
+  { id: "ct4", turmaId: "t1a", title: "Projecto DT — Vistas", description: "Desenhar 3 vistas ortogonais de uma peça.", discipline: "Desenho Técnico I", dueDate: "20/02/2024", dueTime: "23:59", assignedDate: "07/02/2024", type: "tarefa", status: "publicada", submissions: 12, totalStudents: 34, avgGrade: null, weight: 20, corrected: 0 },
   // 1º Ano - Turma B
-  { id: "ct5", turmaId: "t1b", title: "Exercícios de Limites", description: "Calcular limites de 15 funções.", discipline: "Matemática I", dueDate: "10/02/2024", assignedDate: "05/02/2024", type: "tarefa", status: "encerrada", submissions: 27, totalStudents: 30, avgGrade: 11.2, weight: 15, corrected: 27 },
-  { id: "ct6", turmaId: "t1b", title: "Quiz — Derivadas", description: "Quiz rápido de 20 minutos.", discipline: "Matemática I", dueDate: "16/02/2024", assignedDate: "12/02/2024", type: "quiz", status: "publicada", submissions: 8, totalStudents: 30, avgGrade: null, weight: 10, corrected: 0 },
+  { id: "ct5", turmaId: "t1b", title: "Exercícios de Limites", description: "Calcular limites de 15 funções.", discipline: "Matemática I", dueDate: "10/02/2024", dueTime: "23:59", assignedDate: "05/02/2024", type: "tarefa", status: "encerrada", submissions: 27, totalStudents: 30, avgGrade: 11.2, weight: 15, corrected: 27 },
+  { id: "ct6", turmaId: "t1b", title: "Quiz — Derivadas", description: "Quiz rápido de 20 minutos.", discipline: "Matemática I", dueDate: "16/02/2024", dueTime: "10:20", assignedDate: "12/02/2024", type: "quiz", status: "publicada", submissions: 8, totalStudents: 30, avgGrade: null, weight: 10, corrected: 0 },
   // 2º Ano - Turma A
-  { id: "ct7", turmaId: "t2a", title: "Integrais Indefinidos", description: "Resolver exercícios 1-10 do capítulo 3.", discipline: "Matemática II", dueDate: "08/02/2024", assignedDate: "05/02/2024", type: "tarefa", status: "encerrada", submissions: 26, totalStudents: 28, avgGrade: 13.5, weight: 15, corrected: 26 },
-  { id: "ct8", turmaId: "t2a", title: "Teste 1 — Integrais", description: "Teste sobre integrais definidos e indefinidos.", discipline: "Matemática II", dueDate: "15/02/2024", assignedDate: "05/02/2024", type: "exame", status: "publicada", submissions: 5, totalStudents: 28, avgGrade: null, weight: 25, corrected: 0 },
-  { id: "ct9", turmaId: "t2a", title: "Diagrama de Esforços", description: "Traçar diagramas de esforço para 3 vigas.", discipline: "Resistência dos Materiais", dueDate: "12/02/2024", assignedDate: "06/02/2024", type: "tarefa", status: "encerrada", submissions: 25, totalStudents: 28, avgGrade: 14.0, weight: 20, corrected: 25 },
+  { id: "ct7", turmaId: "t2a", title: "Integrais Indefinidos", description: "Resolver exercícios 1-10 do capítulo 3.", discipline: "Matemática II", dueDate: "08/02/2024", dueTime: "23:59", assignedDate: "05/02/2024", type: "tarefa", status: "encerrada", submissions: 26, totalStudents: 28, avgGrade: 13.5, weight: 15, corrected: 26 },
+  { id: "ct8", turmaId: "t2a", title: "Teste 1 — Integrais", description: "Teste sobre integrais definidos e indefinidos.", discipline: "Matemática II", dueDate: "15/02/2024", dueTime: "11:30", assignedDate: "05/02/2024", type: "exame", status: "publicada", submissions: 5, totalStudents: 28, avgGrade: null, weight: 25, corrected: 0, correctionDeadline: "20/02/2024" },
+  { id: "ct9", turmaId: "t2a", title: "Diagrama de Esforços", description: "Traçar diagramas de esforço para 3 vigas.", discipline: "Resistência dos Materiais", dueDate: "12/02/2024", dueTime: "23:59", assignedDate: "06/02/2024", type: "tarefa", status: "encerrada", submissions: 25, totalStudents: 28, avgGrade: 14.0, weight: 20, corrected: 25 },
+  // 2º Ano - Turma A (pendente)
+  { id: "ct14", turmaId: "t2a", title: "Exercícios de Séries", description: "Determinar convergência de séries numéricas.", discipline: "Matemática II", dueDate: "19/02/2024", dueTime: "23:59", assignedDate: "12/02/2024", type: "tarefa", status: "pendente", submissions: 24, totalStudents: 28, avgGrade: null, weight: 15, corrected: 10, correctionDeadline: "22/02/2024" },
   // 3º Ano - Turma A
-  { id: "ct10", turmaId: "t3a", title: "Classificação de Solos", description: "Classificar 5 amostras de solo.", discipline: "Mecânica dos Solos", dueDate: "12/02/2024", assignedDate: "05/02/2024", type: "tarefa", status: "encerrada", submissions: 24, totalStudents: 25, avgGrade: 14.5, weight: 15, corrected: 24 },
-  { id: "ct11", turmaId: "t3a", title: "Teste 1 — Hidráulica", description: "Teste sobre escoamento e perdas de carga.", discipline: "Hidráulica", dueDate: "18/02/2024", assignedDate: "06/02/2024", type: "exame", status: "publicada", submissions: 0, totalStudents: 25, avgGrade: null, weight: 30, corrected: 0 },
+  { id: "ct10", turmaId: "t3a", title: "Classificação de Solos", description: "Classificar 5 amostras de solo.", discipline: "Mecânica dos Solos", dueDate: "12/02/2024", dueTime: "23:59", assignedDate: "05/02/2024", type: "tarefa", status: "encerrada", submissions: 24, totalStudents: 25, avgGrade: 14.5, weight: 15, corrected: 24 },
+  { id: "ct11", turmaId: "t3a", title: "Teste 1 — Hidráulica", description: "Teste sobre escoamento e perdas de carga.", discipline: "Hidráulica", dueDate: "18/02/2024", dueTime: "11:00", assignedDate: "06/02/2024", type: "exame", status: "publicada", submissions: 0, totalStudents: 25, avgGrade: null, weight: 30, corrected: 0, correctionDeadline: "23/02/2024" },
   // 4º Ano
-  { id: "ct12", turmaId: "t4a", title: "Dimensionamento de Laje", description: "Calcular armaduras para laje maciça.", discipline: "Estruturas de Betão", dueDate: "14/02/2024", assignedDate: "05/02/2024", type: "tarefa", status: "encerrada", submissions: 36, totalStudents: 38, avgGrade: 14.8, weight: 20, corrected: 36 },
+  { id: "ct12", turmaId: "t4a", title: "Dimensionamento de Laje", description: "Calcular armaduras para laje maciça.", discipline: "Estruturas de Betão", dueDate: "14/02/2024", dueTime: "23:59", assignedDate: "05/02/2024", type: "tarefa", status: "encerrada", submissions: 36, totalStudents: 38, avgGrade: 14.8, weight: 20, corrected: 36 },
   // 5º Ano
-  { id: "ct13", turmaId: "t5a", title: "Proposta de Projecto", description: "Entregar proposta com tema, objectivos e metodologia.", discipline: "Projecto Final", dueDate: "20/02/2024", assignedDate: "05/02/2024", type: "tarefa", status: "publicada", submissions: 22, totalStudents: 30, avgGrade: null, weight: 15, corrected: 0 },
+  { id: "ct13", turmaId: "t5a", title: "Proposta de Projecto", description: "Entregar proposta com tema, objectivos e metodologia.", discipline: "Projecto Final", dueDate: "20/02/2024", dueTime: "23:59", assignedDate: "05/02/2024", type: "tarefa", status: "publicada", submissions: 22, totalStudents: 30, avgGrade: null, weight: 15, corrected: 0 },
 ];
 
 // ── Turma Resources Data ──
