@@ -3,7 +3,7 @@ import { coordNotas, coordCursoInfo } from "@/data/institutionData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Award, ChevronRight, Calendar, Clock, MapPin, User } from "lucide-react";
+import { Award, ChevronRight, Calendar, Clock, MapPin, User, CheckCircle } from "lucide-react";
 
 export default function CoordenadorNotas() {
   const [selectedTurma, setSelectedTurma] = useState<string | null>(null);
@@ -23,8 +23,11 @@ export default function CoordenadorNotas() {
   };
 
   const globalAprov = allTurmas.reduce((s, t) => s + t.avaliacoes.reduce((a, e) => a + e.aprovados, 0), 0);
-  const globalPart = allTurmas.reduce((s, t) => s + t.avaliacoes.reduce((a, e) => a + e.aprovados + e.reprovados, 0), 0);
+  const globalReprov = allTurmas.reduce((s, t) => s + t.avaliacoes.reduce((a, e) => a + e.reprovados, 0), 0);
+  const globalPart = globalAprov + globalReprov;
   const taxaAprovacao = globalPart > 0 ? Math.round((globalAprov / globalPart) * 100) : 0;
+  const taxaReprovacao = globalPart > 0 ? Math.round((globalReprov / globalPart) * 100) : 0;
+  const taxaConclusao = totalAvalTotal > 0 ? Math.round((totalAvalCompletas / totalAvalTotal) * 100) : 0;
 
   const selectedData = selectedTurma
     ? (() => {
@@ -45,7 +48,7 @@ export default function CoordenadorNotas() {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         <Card className="p-4">
           <div className="flex items-center gap-2 mb-3">
             <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><Award className="w-4 h-4 text-primary" /></div>
@@ -60,13 +63,31 @@ export default function CoordenadorNotas() {
           </div>
           <p className="text-2xl font-bold text-foreground">{totalAvalCompletas}<span className="text-sm text-muted-foreground font-medium">/{totalAvalTotal}</span></p>
         </Card>
-        <Card className="p-4 col-span-2 lg:col-span-1">
+        <Card className="p-4">
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><Clock className="w-4 h-4 text-primary" /></div>
+            <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center"><CheckCircle className="w-4 h-4 text-accent" /></div>
             <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Taxa Aprovado</span>
           </div>
           <p className={`text-2xl font-bold ${taxaAprovacao >= 70 ? "text-accent" : taxaAprovacao >= 50 ? "text-foreground" : "text-destructive"}`}>
             {taxaAprovacao}%
+          </p>
+        </Card>
+        <Card className="p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-8 h-8 rounded-lg bg-destructive/10 flex items-center justify-center"><Award className="w-4 h-4 text-destructive" /></div>
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Taxa Reprovado</span>
+          </div>
+          <p className={`text-2xl font-bold ${taxaReprovacao > 30 ? "text-destructive" : "text-foreground"}`}>
+            {taxaReprovacao}%
+          </p>
+        </Card>
+        <Card className="p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><Clock className="w-4 h-4 text-primary" /></div>
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Taxa Conclusão</span>
+          </div>
+          <p className={`text-2xl font-bold ${taxaConclusao >= 80 ? "text-accent" : taxaConclusao >= 50 ? "text-foreground" : "text-destructive"}`}>
+            {taxaConclusao}%
           </p>
         </Card>
       </div>
