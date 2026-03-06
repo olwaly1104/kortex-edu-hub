@@ -395,6 +395,7 @@ export const profTasks: ProfTask[] = [
   // Matemática I - t2
   { id: "pt6", disciplineId: "pd2", turmaId: "t2", title: "Exercícios de Limites", description: "Calcular limites de 15 funções.", dueDate: "10/02/2024", dueTime: "23:59", assignedDate: "06/02/2024", type: "tarefa", status: "encerrada", submissions: 50, totalStudents: 52, corrected: 50, avgGrade: 13.2, weight: 15, modality: "presencial" },
   { id: "pt7", disciplineId: "pd2", turmaId: "t2", title: "Teste 1 - Limites e Derivadas", description: "Teste presencial.", dueDate: "20/02/2024", dueTime: "11:30", assignedDate: "06/02/2024", type: "exame", status: "agendada", submissions: 0, totalStudents: 52, corrected: 0, correctionDeadline: "25/02/2024", avgGrade: null, weight: 30, modality: "presencial" },
+  { id: "pt14", disciplineId: "pd2", turmaId: "t2", title: "Teste 2 - Continuidade e Derivadas", description: "Teste sobre continuidade de funções e regras de derivação.", dueDate: "28/02/2024", dueTime: "10:00", assignedDate: "14/02/2024", type: "exame", status: "publicada", submissions: 18, totalStudents: 52, corrected: 0, correctionDeadline: "05/03/2024", avgGrade: null, weight: 25, modality: "presencial" },
 
   // Estatística - t1
   { id: "pt8", disciplineId: "pd3", turmaId: "t1", title: "Exercícios de Probabilidade", description: "Resolver problemas de probabilidade condicional.", dueDate: "14/02/2024", dueTime: "23:59", assignedDate: "07/02/2024", type: "tarefa", status: "encerrada", submissions: 41, totalStudents: 45, corrected: 41, avgGrade: 14.0, weight: 15, modality: "presencial" },
@@ -402,6 +403,8 @@ export const profTasks: ProfTask[] = [
   // Álgebra Linear - t4
   { id: "pt11", disciplineId: "pd4", turmaId: "t4", title: "Exercícios de Matrizes", description: "Resolver operações com matrizes 3x3.", dueDate: "10/02/2024", dueTime: "23:59", assignedDate: "05/02/2024", type: "tarefa", status: "encerrada", submissions: 35, totalStudents: 38, corrected: 35, avgGrade: 13.5, weight: 15, modality: "presencial" },
   { id: "pt12", disciplineId: "pd4", turmaId: "t4", title: "Teste 1 - Determinantes", description: "Teste sobre cálculo de determinantes.", dueDate: "18/02/2024", dueTime: "11:00", assignedDate: "08/02/2024", type: "exame", status: "pendente", submissions: 10, totalStudents: 38, corrected: 3, correctionDeadline: "22/02/2024", avgGrade: null, weight: 25, modality: "presencial" },
+  { id: "pt15", disciplineId: "pd1", turmaId: "t1", title: "Teste 2 - Séries Numéricas", description: "Teste sobre séries numéricas e critérios de convergência.", dueDate: "25/02/2024", dueTime: "09:30", assignedDate: "12/02/2024", type: "exame", status: "publicada", submissions: 22, totalStudents: 45, corrected: 0, correctionDeadline: "01/03/2024", avgGrade: null, weight: 25, modality: "presencial" },
+  { id: "pt16", disciplineId: "pd3", turmaId: "t1", title: "Teste 1 - Probabilidade e Estatística Descritiva", description: "Teste sobre distribuições de probabilidade e estatística descritiva.", dueDate: "27/02/2024", dueTime: "14:00", assignedDate: "10/02/2024", type: "exame", status: "publicada", submissions: 30, totalStudents: 45, corrected: 0, correctionDeadline: "04/03/2024", avgGrade: null, weight: 30, modality: "presencial" },
 ];
 
 // ── Anúncios do Professor ──
