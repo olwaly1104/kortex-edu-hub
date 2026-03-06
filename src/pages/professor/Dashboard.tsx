@@ -350,7 +350,7 @@ export default function ProfessorDashboard() {
                           <p className="text-[9px] text-muted-foreground">Aprovação</p>
                         </div>
                       </div>
-                      <p className="text-[10px] text-muted-foreground mt-2">{turmaDiscs.map(d => d.code).join(" • ")} • {turmaDiscs.length} cad.</p>
+                      <p className="text-[10px] text-muted-foreground mt-2">{turmaDiscs.map(d => d.code).join(" • ")}</p>
                     </Card>
                   </Link>
                 );

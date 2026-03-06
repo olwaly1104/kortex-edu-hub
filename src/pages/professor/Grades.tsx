@@ -140,7 +140,7 @@ export default function ProfessorGrades() {
                         {task.avgGrade !== null ? (
                           <div className="flex items-center gap-1.5 text-accent">
                             <CheckCircle className="w-4 h-4" />
-                            <span className="text-xs font-medium">Atribuído</span>
+                            <span className="text-xs font-medium">Encerrada</span>
                           </div>
                         ) : (
                           <div className="flex items-center gap-1.5 text-muted-foreground">
