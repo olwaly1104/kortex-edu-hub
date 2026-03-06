@@ -88,12 +88,14 @@ export default function ProfessorTurmaDetail() {
   const statusLabels: Record<string, string> = { excelente: "Excelente", normal: "Normal", risco: "Em Risco" };
   const statusBadgeMap: Record<string, string> = { excelente: "bg-accent/10 text-accent", normal: "bg-secondary/10 text-secondary", risco: "bg-destructive/10 text-destructive" };
 
+  const defaultLessonCfg = { label: "Desconhecido", color: "bg-muted text-muted-foreground", icon: Clock };
   const lessonStatusConfig: Record<string, { label: string; color: string; icon: typeof CheckCircle }> = {
     publicada: { label: "Publicada", color: "bg-accent/10 text-accent", icon: CheckCircle },
     agendada: { label: "Agendada", color: "bg-secondary/10 text-secondary", icon: Clock },
     rascunho: { label: "Rascunho", color: "bg-muted text-muted-foreground", icon: Edit },
   };
 
+  const defaultTaskCfg = { label: "Desconhecido", color: "bg-muted text-muted-foreground" };
   const taskStatusConfig: Record<string, { label: string; color: string }> = {
     publicada: { label: "Activa", color: "bg-secondary/10 text-secondary" },
     encerrada: { label: "Encerrada", color: "bg-accent/10 text-accent" },
@@ -257,7 +259,7 @@ export default function ProfessorTurmaDetail() {
           <p className="text-sm text-muted-foreground">{turmaLessons.filter(l => l.status === "publicada").length} publicadas, {turmaLessons.filter(l => l.status === "agendada").length} agendadas</p>
           <div className="space-y-3">
             {turmaLessons.map(lesson => {
-              const cfg = lessonStatusConfig[lesson.status];
+              const cfg = lessonStatusConfig[lesson.status] || defaultLessonCfg;
               const StatusIcon = cfg.icon;
               const disc = profDisciplines.find(d => d.id === lesson.disciplineId);
               return (
@@ -356,7 +358,7 @@ export default function ProfessorTurmaDetail() {
           <p className="text-sm text-muted-foreground">{turmaTasks.filter(t => t.type === "tarefa").length} tarefas</p>
           <div className="space-y-3">
             {turmaTasks.filter(t => t.type === "tarefa").map(task => {
-              const tcfg = taskStatusConfig[task.status];
+               const tcfg = taskStatusConfig[task.status] || defaultTaskCfg;
               const submPct = Math.round((task.submissions / task.totalStudents) * 100);
               return (
                 <Card key={task.id} className="p-4 border-l-[3px] border-l-primary cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate(`/professor/tasks/${task.id}`)}>
@@ -385,7 +387,7 @@ export default function ProfessorTurmaDetail() {
           <p className="text-sm text-muted-foreground">{avaliacoes.length} avaliações (exames e quizzes)</p>
           <div className="space-y-3">
             {avaliacoes.map(task => {
-              const tcfg = taskStatusConfig[task.status];
+              const tcfg = taskStatusConfig[task.status] || defaultTaskCfg;
               const submPct = Math.round((task.submissions / task.totalStudents) * 100);
               return (
                 <Card key={task.id} className="p-4 border-l-[3px] border-l-destructive">
