@@ -186,15 +186,15 @@ export default function CoordenadorAnos() {
                     </div>
                     <div className="flex items-center justify-between px-1">
                       <span className="text-xs text-muted-foreground flex items-center gap-1.5">
-                        <TrendingUp className="w-3.5 h-3.5 text-secondary" /> Taxa de Conclusão
-                      </span>
-                      <span className={`text-sm font-semibold tabular-nums ${y.taxaSucesso >= 70 ? "text-accent" : "text-destructive"}`}>{y.taxaSucesso}%</span>
-                    </div>
-                    <div className="flex items-center justify-between px-1">
-                      <span className="text-xs text-muted-foreground flex items-center gap-1.5">
                         <FileText className="w-3.5 h-3.5 text-primary" /> Tarefas
                       </span>
                       <span className="text-sm font-semibold tabular-nums text-foreground">{totalMaterials}</span>
+                    </div>
+                    <div className="flex items-center justify-between px-1">
+                      <span className="text-xs text-muted-foreground flex items-center gap-1.5">
+                        <TrendingUp className="w-3.5 h-3.5 text-secondary" /> Taxa de Conclusão
+                      </span>
+                      <span className={`text-sm font-semibold tabular-nums ${y.taxaSucesso >= 70 ? "text-accent" : "text-destructive"}`}>{y.taxaSucesso}%</span>
                     </div>
                     <div className="flex items-center justify-between px-1">
                       <span className="text-xs text-muted-foreground flex items-center gap-1.5">
