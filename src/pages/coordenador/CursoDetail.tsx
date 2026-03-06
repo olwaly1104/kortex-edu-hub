@@ -1,11 +1,12 @@
 import { coordCursoInfo, coordDocentes, coordEstudantes } from "@/data/institutionData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Users, BookOpen, GraduationCap, ChevronRight,
   Building2, UserCheck, Clock, MapPin, Calendar,
-  Award,
+  Award, ArrowLeft,
 } from "lucide-react";
 
 export default function CursoDetail() {
@@ -13,9 +14,13 @@ export default function CursoDetail() {
   const totalTurmas = info.years.reduce((s, y) => s + y.turmas, 0);
   const totalDisciplinas = info.years.reduce((s, y) => s + y.disciplinas, 0);
   const docentesActivos = coordDocentes.filter(d => d.status === "activo").length;
+  const navigate = useNavigate();
 
   return (
     <div className="p-6 lg:p-8 max-w-3xl mx-auto space-y-6 animate-fade-in">
+      <Button variant="ghost" onClick={() => navigate(-1)} className="gap-2">
+        <ArrowLeft className="w-4 h-4" /> Voltar
+      </Button>
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
