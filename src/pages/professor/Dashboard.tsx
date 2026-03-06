@@ -211,11 +211,11 @@ export default function ProfessorDashboard() {
                         Ver todos
                       </Link>
                     </div>
-                    <div className="flex flex-col gap-1.5 flex-1">
+                    <div className="space-y-1.5">
                       {turmasEmRisco.slice(0, 5).map(t => {
                         const disc = profDisciplines.find(d => d.turmas.some(tr => tr.id === t.id));
                         return (
-                          <Link key={t.id} to={`/professor/disciplines?turma=${t.id}`} className="flex-1 flex">
+                          <Link key={t.id} to={`/professor/disciplines?turma=${t.id}`} className="block">
                             <div className="px-2.5 py-1.5 rounded-lg border border-border bg-card border-l-[3px] border-l-destructive hover:bg-muted/40 transition-colors cursor-pointer w-full flex flex-col justify-center">
                               <p className="text-[11px] font-semibold text-foreground leading-tight">{t.name}</p>
                               <p className="text-[9px] text-muted-foreground">{t.year}º Ano · {t.course}</p>
@@ -242,9 +242,9 @@ export default function ProfessorDashboard() {
                         Ver todos
                       </Link>
                     </div>
-                    <div className="flex flex-col gap-1.5 flex-1">
+                    <div className="space-y-1.5">
                       {atRiskStudents.slice(0, 5).map(e => (
-                        <Link key={e.id} to={`/professor/students/${e.id}`} className="flex-1 flex">
+                        <Link key={e.id} to={`/professor/students/${e.id}`} className="block">
                           <div className="px-2.5 py-1.5 rounded-lg border border-border bg-card border-l-[3px] border-l-destructive hover:bg-muted/40 transition-colors cursor-pointer w-full flex flex-col justify-center">
                             <p className="text-[11px] font-semibold text-foreground leading-tight truncate">{e.name}</p>
                             <p className="text-[9px] text-muted-foreground">{e.turma}</p>
@@ -327,13 +327,18 @@ export default function ProfessorDashboard() {
                   <Link key={turma.id} to={`/professor/disciplines?turma=${turma.id}`}>
                     <Card className="overflow-hidden hover:shadow-lg transition-all group">
                       <div className="p-5">
-                        <div className="flex items-start justify-between mb-1">
+                         <div className="flex items-start justify-between mb-1">
                           <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-primary/10 text-primary shrink-0">
                               <GraduationCap className="w-5 h-5" />
                             </div>
                             <div>
-                              <p className="font-bold text-foreground">{turma.name}</p>
+                              <div className="flex items-center gap-2">
+                                <p className="font-bold text-foreground">{turma.name}</p>
+                                <Badge className={`text-[10px] border ${taxaAprovacao !== null && taxaAprovacao >= 85 ? "bg-accent/10 text-accent border-accent/30" : (taxaAprovacao !== null && taxaAprovacao < 60) || attendance < 75 ? "bg-destructive/10 text-destructive border-destructive/30" : "bg-primary/10 text-primary border-primary/30"}`}>
+                                  {taxaAprovacao !== null && taxaAprovacao >= 85 ? "Excelente" : (taxaAprovacao !== null && taxaAprovacao < 60) || attendance < 75 ? "Em Risco" : "Normal"}
+                                </Badge>
+                              </div>
                               <p className="text-[11px] text-muted-foreground">{turma.course} · {turma.year}º Ano</p>
                             </div>
                           </div>
@@ -357,23 +362,16 @@ export default function ProfessorDashboard() {
 
                         <div className="space-y-2.5 pt-3 border-t border-border/50">
                           <div className="flex items-center justify-between text-xs">
-                            <span className="text-muted-foreground flex items-center gap-1.5"><CheckCircle className="w-3.5 h-3.5" /> Taxa Aprovado</span>
-                            <span className={`font-semibold ${taxaAprovacao !== null && taxaAprovacao >= 70 ? "text-accent" : taxaAprovacao !== null ? "text-destructive" : "text-muted-foreground"}`}>{taxaAprovacao !== null ? `${taxaAprovacao}%` : "—"}</span>
+                            <span className="text-muted-foreground flex items-center gap-1.5"><ClipboardCheck className="w-3.5 h-3.5" /> Taxa de Entrega</span>
+                            <span className={`font-semibold ${entrega >= 80 ? "text-accent" : "text-destructive"}`}>{entrega}%</span>
                           </div>
-
-                          <div className="border-t border-border/40 pt-2.5 space-y-2.5">
-                            <div className="flex items-center justify-between text-xs">
-                              <span className="text-muted-foreground flex items-center gap-1.5"><ClipboardCheck className="w-3.5 h-3.5" /> Taxa de Entrega</span>
-                              <span className={`font-semibold ${entrega >= 80 ? "text-accent" : "text-destructive"}`}>{entrega}%</span>
-                            </div>
-                            <div className="flex items-center justify-between text-xs">
-                              <span className="text-muted-foreground flex items-center gap-1.5"><ClipboardCheck className="w-3.5 h-3.5" /> Tarefas</span>
-                              <span className="font-semibold text-foreground">{tarefasEncerradas}/{tarefas.length}</span>
-                            </div>
-                            <div className="flex items-center justify-between text-xs">
-                              <span className="text-muted-foreground flex items-center gap-1.5"><BarChart3 className="w-3.5 h-3.5" /> Avaliações</span>
-                              <span className="font-semibold text-foreground">{avaliacoesEncerradas}/{avaliacoes.length}</span>
-                            </div>
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="text-muted-foreground flex items-center gap-1.5"><ClipboardCheck className="w-3.5 h-3.5" /> Tarefas</span>
+                            <span className="font-semibold text-foreground">{tarefasEncerradas}/{tarefas.length}</span>
+                          </div>
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="text-muted-foreground flex items-center gap-1.5"><BarChart3 className="w-3.5 h-3.5" /> Avaliações</span>
+                            <span className="font-semibold text-foreground">{avaliacoesEncerradas}/{avaliacoes.length}</span>
                           </div>
                         </div>
                       </div>
