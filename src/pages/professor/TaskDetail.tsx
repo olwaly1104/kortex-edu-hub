@@ -98,37 +98,10 @@ export default function ProfessorTaskDetail() {
         </div>
       </div>
 
-      {/* Submission & Grading KPIs */}
-      <div className="rounded-xl border border-border bg-card overflow-hidden">
-        {/* Header: Submissão e Notas */}
-        <div className="px-5 py-3 border-b bg-muted/20">
-          <h3 className="text-sm font-semibold text-foreground">Submissão e Notas</h3>
-        </div>
-
-        {/* Submetido & Corrigido bars */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-0 divide-y md:divide-y-0 md:divide-x divide-border">
-          <div className="p-4 space-y-2">
-            <div className="flex items-center justify-between text-sm">
-              <span className="flex items-center gap-2 text-muted-foreground"><Users className="w-4 h-4" /> Submetido</span>
-              <span className="font-semibold text-foreground">{task.submissions}/{task.totalStudents} ({submissionPct}%)</span>
-            </div>
-            <Progress value={submissionPct} className="h-2" />
-          </div>
-          <div className="p-4 space-y-2">
-            <div className="flex items-center justify-between text-sm">
-              <span className={`flex items-center gap-2 ${pendingCorrection > 0 ? "text-destructive" : "text-muted-foreground"}`}><AlertCircle className="w-4 h-4" /> Corrigido</span>
-              <span className={`font-semibold ${pendingCorrection > 0 ? "text-destructive" : "text-muted-foreground"}`}>{task.corrected}/{task.submissions} ({correctedPct}%)</span>
-            </div>
-            <Progress value={correctedPct} className={`h-2 ${pendingCorrection > 0 ? "[&>div]:bg-destructive" : ""}`} />
-            {isActiva && task.correctionDeadline && (
-              <p className="text-[11px] text-muted-foreground flex items-center gap-1"><Clock className="w-3 h-3" /> Prazo de correcção: <span className="font-medium text-foreground">{task.correctionDeadline}</span></p>
-            )}
-          </div>
-        </div>
-
-        {/* Média, Taxa Aprovação, Taxa Reprovação */}
-        {task.avgGrade !== null && (
-          <div className="border-t border-border grid grid-cols-3 divide-x divide-border">
+      {/* Média, Taxa Aprovação, Taxa Reprovação */}
+      {task.avgGrade !== null && (
+        <div className="rounded-xl border border-border bg-card overflow-hidden">
+          <div className="grid grid-cols-3 divide-x divide-border">
             <div className="p-4 text-center">
               <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">Média</p>
               <p className={`text-xl font-bold mt-1 ${task.avgGrade >= 10 ? "text-accent" : "text-destructive"}`}>{task.avgGrade}/20</p>
@@ -142,8 +115,8 @@ export default function ProfessorTaskDetail() {
               <p className={`text-xl font-bold mt-1 ${(100 - approvalRate) > 50 ? "text-destructive" : "text-foreground"}`}>{100 - approvalRate}%</p>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Description */}
       <Card className="p-5 space-y-4">
@@ -171,6 +144,8 @@ export default function ProfessorTaskDetail() {
         notSubmittedList={notSubmittedList}
         task={task}
         submissionPct={submissionPct}
+        correctedPct={correctedPct}
+        pendingCorrection={pendingCorrection}
         isEncerrada={isEncerrada}
         isActiva={isActiva}
         navigate={navigate}
@@ -179,11 +154,13 @@ export default function ProfessorTaskDetail() {
   );
 }
 
-function GradingTable({ submittedList, notSubmittedList, task, submissionPct, isEncerrada, isActiva, navigate }: {
+function GradingTable({ submittedList, notSubmittedList, task, submissionPct, correctedPct, pendingCorrection, isEncerrada, isActiva, navigate }: {
   submittedList: any[];
   notSubmittedList: any[];
   task: any;
   submissionPct: number;
+  correctedPct: number;
+  pendingCorrection: number;
   isEncerrada: boolean;
   isActiva: boolean;
   navigate: any;
@@ -228,7 +205,7 @@ function GradingTable({ submittedList, notSubmittedList, task, submissionPct, is
 
   return (
     <>
-      <Card className="overflow-hidden">
+       <Card className="overflow-hidden">
         <div className="p-5 border-b bg-muted/30 flex items-center justify-between flex-wrap gap-3">
           <div className="flex items-center gap-3">
             <h3 className="font-semibold text-foreground">Submissões e Notas</h3>
@@ -241,6 +218,27 @@ function GradingTable({ submittedList, notSubmittedList, task, submissionPct, is
             <Button variant="outline" size="sm" className="gap-2 text-xs"><Download className="w-3.5 h-3.5" /> Exportar</Button>
             {!isEncerrada && (
               <Button size="sm" className="gap-2 text-xs" onClick={handleSaveGrades}><Save className="w-3.5 h-3.5" /> Guardar Notas</Button>
+            )}
+          </div>
+        </div>
+
+        {/* Submetido & Corrigido bars */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-0 divide-y md:divide-y-0 md:divide-x divide-border border-b">
+          <div className="p-4 space-y-2">
+            <div className="flex items-center justify-between text-sm">
+              <span className="flex items-center gap-2 text-muted-foreground"><Users className="w-4 h-4" /> Submetido</span>
+              <span className="font-semibold text-foreground">{task.submissions}/{task.totalStudents} ({submissionPct}%)</span>
+            </div>
+            <Progress value={submissionPct} className="h-2" />
+          </div>
+          <div className="p-4 space-y-2">
+            <div className="flex items-center justify-between text-sm">
+              <span className={`flex items-center gap-2 ${pendingCorrection > 0 ? "text-destructive" : "text-muted-foreground"}`}><AlertCircle className="w-4 h-4" /> Corrigido</span>
+              <span className={`font-semibold ${pendingCorrection > 0 ? "text-destructive" : "text-muted-foreground"}`}>{task.corrected}/{task.submissions} ({correctedPct}%)</span>
+            </div>
+            <Progress value={correctedPct} className={`h-2 ${pendingCorrection > 0 ? "[&>div]:bg-destructive" : ""}`} />
+            {isActiva && task.correctionDeadline && (
+              <p className="text-[11px] text-muted-foreground flex items-center gap-1"><Clock className="w-3 h-3" /> Prazo de correcção: <span className="font-medium text-foreground">{task.correctionDeadline}</span></p>
             )}
           </div>
         </div>
