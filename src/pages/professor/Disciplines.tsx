@@ -110,17 +110,19 @@ export default function ProfessorDisciplines() {
               <div className="p-5">
                 <div className="flex items-start justify-between mb-3">
                   <div>
-                    <h3 className="font-bold text-foreground text-lg">{turma.name}</h3>
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-bold text-foreground text-lg">{turma.name}</h3>
+                      {turmaDiscs.length > 0 && (
+                        <Badge variant="outline" className="text-[10px] gap-1">
+                          <BookOpen className="w-3 h-3" /> {turmaDiscs[0].name}
+                        </Badge>
+                      )}
+                    </div>
                     <p className="text-xs text-muted-foreground mt-0.5">{turma.course} · {turma.year}º Ano</p>
                     <div className="flex items-center gap-3 mt-1.5 text-xs text-muted-foreground">
                       <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{room}</span>
                       <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{scheduleDays}</span>
                     </div>
-                    {turmaDiscs.length > 0 && (
-                      <Badge variant="outline" className="text-[10px] gap-1 mt-1.5">
-                        <BookOpen className="w-3 h-3" /> {turmaDiscs[0].name}
-                      </Badge>
-                    )}
                   </div>
                   <Link to={`/professor/turma/${turma.id}`}>
                     <ChevronRight className="w-5 h-5 text-muted-foreground hover:text-primary transition-colors" />
