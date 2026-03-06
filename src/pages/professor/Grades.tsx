@@ -19,7 +19,8 @@ export default function ProfessorGrades() {
     ? Math.round(allGraded.reduce((s, t) => s + (t.avgGrade || 0), 0) / allGraded.length * 10) / 10
     : null;
 
-  const turmasToShow = filterTurma === "all" ? allTurmas : allTurmas.filter(t => t.id === filterTurma);
+  const sortedTurmas = [...allTurmas].sort((a, b) => a.year - b.year);
+  const turmasToShow = filterTurma === "all" ? sortedTurmas : sortedTurmas.filter(t => t.id === filterTurma);
 
   return (
     <div className="p-6 lg:p-8 space-y-5 animate-fade-in">
@@ -53,7 +54,7 @@ export default function ProfessorGrades() {
           onClick={() => setFilterTurma("all")}
           className={`px-3.5 py-2 rounded-lg text-xs font-medium border transition-all ${filterTurma === "all" ? "bg-primary text-primary-foreground border-primary shadow-sm" : "bg-card text-muted-foreground border-border hover:border-primary/30 hover:text-foreground"}`}
         >Todas</button>
-        {allTurmas.map(t => (
+        {sortedTurmas.map(t => (
           <button key={t.id} onClick={() => setFilterTurma(t.id)}
             className={`px-3.5 py-2 rounded-lg text-xs font-medium border transition-all ${filterTurma === t.id ? "bg-primary text-primary-foreground border-primary shadow-sm" : "bg-card text-muted-foreground border-border hover:border-primary/30 hover:text-foreground"}`}
           >{t.name}</button>
