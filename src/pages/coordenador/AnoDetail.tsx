@@ -130,21 +130,24 @@ export default function CoordenadorAnoDetail() {
                           <span className="text-muted-foreground flex items-center gap-1.5"><CheckCircle className="w-3.5 h-3.5" /> Presença</span>
                           <span className={`font-semibold ${t.presenca >= 75 ? "text-accent" : "text-destructive"}`}>{t.presenca}%</span>
                         </div>
-                        <div className="flex items-center justify-between text-xs">
-                          <span className="text-muted-foreground flex items-center gap-1.5"><Award className="w-3.5 h-3.5" /> Média</span>
-                          <span className={`font-semibold ${t.media >= 10 ? "text-accent" : "text-destructive"}`}>{t.media}</span>
-                        </div>
-                        <div className="flex items-center justify-between text-xs">
-                          <span className="text-muted-foreground flex items-center gap-1.5"><TrendingUp className="w-3.5 h-3.5" /> Taxa Aprovado</span>
-                          <span className={`font-semibold ${t.taxaSucesso >= 70 ? "text-accent" : "text-destructive"}`}>{t.taxaSucesso}%</span>
-                        </div>
-                        <div className="flex items-center justify-between text-xs">
-                          <span className="text-muted-foreground flex items-center gap-1.5"><TrendingUp className="w-3.5 h-3.5" /> Taxa Reprovado</span>
-                          <span className={`font-semibold ${(100 - t.taxaSucesso) > 30 ? "text-destructive" : "text-foreground"}`}>{100 - t.taxaSucesso}%</span>
-                        </div>
-                        <div className="flex items-center justify-between text-xs">
-                          <span className="text-muted-foreground flex items-center gap-1.5"><CheckCircle className="w-3.5 h-3.5" /> Taxa de Conclusão</span>
-                          <span className={`font-semibold ${Math.round(t.taxaSucesso * 0.95) >= 70 ? "text-accent" : "text-destructive"}`}>{Math.round(t.taxaSucesso * 0.95)}%</span>
+
+                        <div className="border-t border-border/40 pt-2.5 space-y-2.5">
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="text-muted-foreground flex items-center gap-1.5"><Award className="w-3.5 h-3.5" /> Média</span>
+                            <span className={`font-semibold ${t.media >= 10 ? "text-accent" : "text-destructive"}`}>{t.media}</span>
+                          </div>
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="text-muted-foreground flex items-center gap-1.5"><TrendingUp className="w-3.5 h-3.5" /> Taxa Aprovado</span>
+                            <span className={`font-semibold ${t.taxaSucesso >= 70 ? "text-accent" : "text-destructive"}`}>{t.taxaSucesso}%</span>
+                          </div>
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="text-muted-foreground flex items-center gap-1.5"><TrendingUp className="w-3.5 h-3.5" /> Taxa Reprovado</span>
+                            <span className={`font-semibold ${(100 - t.taxaSucesso) > 30 ? "text-destructive" : "text-foreground"}`}>{100 - t.taxaSucesso}%</span>
+                          </div>
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="text-muted-foreground flex items-center gap-1.5"><CheckCircle className="w-3.5 h-3.5" /> Taxa de Conclusão</span>
+                            <span className={`font-semibold ${Math.round(t.taxaSucesso * 0.95) >= 70 ? "text-accent" : "text-destructive"}`}>{Math.round(t.taxaSucesso * 0.95)}%</span>
+                          </div>
                         </div>
 
                         <div className="border-t border-border/40 pt-2.5 space-y-2.5">
