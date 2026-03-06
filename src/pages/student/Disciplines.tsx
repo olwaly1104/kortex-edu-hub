@@ -54,19 +54,10 @@ export default function StudentDisciplines() {
                   <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0 ml-auto" />
                 </div>
 
-                <div className="space-y-2.5 text-xs flex-1">
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground flex items-center gap-1.5"><User className="w-3.5 h-3.5 text-primary" /> Professor</span>
-                    <span className="font-semibold text-foreground">{disc.professor}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-secondary" /> Dias de Aula</span>
-                    <span className="font-semibold text-foreground">{disc.schedule}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5 text-muted-foreground" /> Sala</span>
-                    <span className="font-semibold text-foreground">{disc.room}</span>
-                  </div>
+                <div className="space-y-2 text-sm text-muted-foreground flex-1">
+                  <div className="flex items-center gap-2"><User className="w-3.5 h-3.5" />{disc.professor}</div>
+                  <div className="flex items-center gap-2"><Clock className="w-3.5 h-3.5" />{disc.schedule}</div>
+                  <div className="flex items-center gap-2"><MapPin className="w-3.5 h-3.5" />{disc.room}</div>
                 </div>
 
                 <div className="mt-4 pt-4 border-t space-y-3">
