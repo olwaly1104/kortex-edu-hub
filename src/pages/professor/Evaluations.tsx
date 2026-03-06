@@ -161,12 +161,11 @@ export default function ProfessorEvaluations() {
       )}
 
       {/* Summary cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <SummaryCard label="Activas" value={activeCount} icon={Clock} iconBg="bg-primary/10" iconColor="text-primary" />
         <SummaryCard label="Encerradas" value={closedCount} icon={CheckCircle} iconBg="bg-accent/10" iconColor="text-accent" />
-        <SummaryCard label="Pendente Tarefas" value={pendenteTarefas} icon={ClipboardList} iconBg="bg-destructive/10" iconColor="text-destructive" valueClass={pendenteTarefas > 0 ? "text-destructive" : undefined} />
-        <SummaryCard label="Pendente Avaliações" value={pendenteAvaliacoes} icon={AlertCircle} iconBg="bg-destructive/10" iconColor="text-destructive" valueClass={pendenteAvaliacoes > 0 ? "text-destructive" : undefined} />
-        <SummaryCard label="Nota Geral" value={avgGrade ?? "—"} icon={GraduationCap} iconBg="bg-accent/10" iconColor="text-accent" valueClass={avgGrade && Number(avgGrade) >= 10 ? "text-accent" : avgGrade ? "text-destructive" : "text-muted-foreground"} />
+        <SummaryCard label="Pendente" value={pendenteAvaliacoes} icon={AlertCircle} iconBg="bg-destructive/10" iconColor="text-destructive" valueClass={pendenteAvaliacoes > 0 ? "text-destructive" : undefined} />
+        <SummaryCard label="Taxa de Conclusão" value={scopedEvals.length > 0 ? `${Math.round(closedCount / scopedEvals.length * 100)}%` : "—"} icon={ClipboardList} iconBg="bg-accent/10" iconColor="text-accent" valueClass={scopedEvals.length > 0 && Math.round(closedCount / scopedEvals.length * 100) >= 50 ? "text-accent" : "text-muted-foreground"} />
       </div>
 
       {/* Controls box */}
