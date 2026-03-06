@@ -86,11 +86,12 @@ export default function ProfessorStudents() {
         <p className="text-sm text-muted-foreground mt-1">{profStudents.length} estudantes no total</p>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
         <SummaryCard label="Total" value={total} icon={Users} iconBg="bg-primary/10" iconColor="text-primary" />
         <SummaryCard label="Excelentes" value={excellent} icon={TrendingUp} iconBg="bg-accent/10" iconColor="text-accent" valueClass="text-accent" />
         <SummaryCard label="Normal" value={normal} icon={UserCheck} iconBg="bg-secondary/10" iconColor="text-secondary" valueClass="text-secondary" />
         <SummaryCard label="Em Risco" value={atRisk} icon={AlertTriangle} iconBg="bg-destructive/10" iconColor="text-destructive" valueClass={atRisk > 0 ? "text-destructive" : undefined} />
+        <SummaryCard label="Estado" value={excellent > atRisk ? "Bom" : atRisk > excellent ? "Em Risco" : "Normal"} icon={TrendingUp} iconBg={excellent > atRisk ? "bg-accent/10" : "bg-destructive/10"} iconColor={excellent > atRisk ? "text-accent" : "text-destructive"} valueClass={excellent > atRisk ? "text-accent" : atRisk > excellent ? "text-destructive" : "text-foreground"} />
       </div>
 
       {/* Controls box */}

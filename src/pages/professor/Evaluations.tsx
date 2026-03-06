@@ -32,7 +32,7 @@ function SummaryCard({ label, value, icon: Icon, iconBg, iconColor, valueClass }
   );
 }
 
-type StatusFilter = "todas" | "ativa" | "encerrada" | "pendente";
+type StatusFilter = "todas" | "ativa" | "pendente" | "agendada" | "encerrada";
 type SortOption = "recente" | "antiga" | "nome-az" | "nome-za" | "nota-asc" | "nota-desc";
 
 export default function ProfessorEvaluations() {
@@ -55,8 +55,8 @@ export default function ProfessorEvaluations() {
 
   // All tasks/quizzes for pendente count
   const allTarefas = profTasks.filter(t => t.type === "tarefa" || t.type === "quiz");
-  const pendenteTarefas = allTarefas.filter(t => t.status === "publicada" && t.corrected < t.submissions).length;
-  const pendenteAvaliacoes = allEvals.filter(t => t.status === "publicada" && t.corrected < t.submissions).length;
+  const pendenteTarefas = allTarefas.filter(t => t.status === "pendente").length;
+  const pendenteAvaliacoes = allEvals.filter(t => t.status === "pendente").length;
 
   const scopedEvals = useMemo(() => {
     return filterTurma === "all" ? allEvals : allEvals.filter(t => t.turmaId === filterTurma);
@@ -73,8 +73,9 @@ export default function ProfessorEvaluations() {
     let result = scopedEvals.filter(t => t.title.toLowerCase().includes(searchTerm.toLowerCase()));
 
     if (filterStatus === "ativa") result = result.filter(t => t.status === "publicada");
+    else if (filterStatus === "pendente") result = result.filter(t => t.status === "pendente");
+    else if (filterStatus === "agendada") result = result.filter(t => t.status === "agendada");
     else if (filterStatus === "encerrada") result = result.filter(t => t.status === "encerrada");
-    else if (filterStatus === "pendente") result = result.filter(t => t.status === "publicada" && t.corrected < t.submissions);
 
     result.sort((a, b) => {
       switch (sortBy) {
@@ -104,8 +105,9 @@ export default function ProfessorEvaluations() {
   const statusToggles: { key: StatusFilter; label: string }[] = [
     { key: "todas", label: "Todas" },
     { key: "ativa", label: "Ativa" },
-    { key: "encerrada", label: "Encerrada" },
     { key: "pendente", label: "Pendente" },
+    { key: "agendada", label: "Agendada" },
+    { key: "encerrada", label: "Encerrada" },
   ];
 
   return (
@@ -246,9 +248,9 @@ export default function ProfessorEvaluations() {
           const notaAtribuidaPct = task.submissions > 0 ? Math.round(task.corrected / task.submissions * 100) : 0;
           const pendingCorrection = task.submissions - task.corrected;
 
-          const statusBg = task.status === "encerrada" ? "bg-accent/10 text-accent" : task.status === "publicada" ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground";
-          const statusLabel = task.status === "encerrada" ? "Encerrada" : task.status === "publicada" ? "Activa" : "Rascunho";
-          const StatusIcon = task.status === "encerrada" ? CheckCircle : Clock;
+          const statusBg = task.status === "encerrada" ? "bg-accent/10 text-accent" : task.status === "publicada" ? "bg-primary/10 text-primary" : task.status === "pendente" ? "bg-destructive/10 text-destructive" : task.status === "agendada" ? "bg-secondary/10 text-secondary" : "bg-muted text-muted-foreground";
+          const statusLabel = task.status === "encerrada" ? "Encerrada" : task.status === "publicada" ? "Activa" : task.status === "pendente" ? "Pendente" : task.status === "agendada" ? "Agendada" : "Rascunho";
+          const StatusIcon = task.status === "encerrada" ? CheckCircle : task.status === "pendente" ? AlertCircle : Clock;
 
           return (
             <div

@@ -65,12 +65,14 @@ export default function ProfessorDisciplines() {
         </div>
         <div className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4">
           <div className="flex items-center justify-between">
-            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Taxa Aprovado</p>
+            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Estado</p>
             <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-accent/10">
               <CheckCircle className="w-4 h-4 text-accent" />
             </div>
           </div>
-          <p className={`text-2xl font-bold ${taxaAprovacao >= 70 ? "text-accent" : taxaAprovacao >= 50 ? "text-foreground" : "text-destructive"}`}>{taxaAprovacao}%</p>
+          <p className={`text-2xl font-bold ${taxaAprovacao >= 70 ? "text-accent" : taxaAprovacao >= 50 ? "text-foreground" : "text-destructive"}`}>
+            {taxaAprovacao >= 85 ? "Excelente" : taxaAprovacao < 60 ? "Em Risco" : "Normal"}
+          </p>
         </div>
       </div>
 
@@ -106,7 +108,6 @@ export default function ProfessorDisciplines() {
 
           return (
             <Card key={turma.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-              <div className="h-1.5 bg-primary" />
               <div className="p-5">
                 <div className="flex items-start justify-between mb-3">
                   <div>
