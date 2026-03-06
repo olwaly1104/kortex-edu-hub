@@ -70,9 +70,9 @@ export default function ProfessorDisciplines() {
               <CheckCircle className="w-4 h-4 text-accent" />
             </div>
           </div>
-          <p className={`text-2xl font-bold ${taxaAprovacao >= 70 ? "text-accent" : taxaAprovacao >= 50 ? "text-foreground" : "text-destructive"}`}>
+          <Badge className={`text-xs mt-1 border ${taxaAprovacao >= 85 ? "bg-accent/10 text-accent border-accent/30" : taxaAprovacao < 60 ? "bg-destructive/10 text-destructive border-destructive/30" : "bg-primary/10 text-primary border-primary/30"}`}>
             {taxaAprovacao >= 85 ? "Excelente" : taxaAprovacao < 60 ? "Em Risco" : "Normal"}
-          </p>
+          </Badge>
         </div>
       </div>
 
