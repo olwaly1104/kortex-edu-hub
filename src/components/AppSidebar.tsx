@@ -49,6 +49,8 @@ const professorSections: NavSection[] = [
     { label: "Notas", icon: GraduationCap, path: "/professor/grades" },
   ]},
   { title: "Comunicação", items: [
+    { label: "Chat", icon: MessageSquare, path: "/professor/chat" },
+    { label: "Email", icon: Mail, path: "/professor/email" },
     { label: "Contactos", icon: Users, path: "/professor/contacts" },
   ]},
   { title: "Pessoal", items: [
