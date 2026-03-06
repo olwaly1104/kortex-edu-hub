@@ -8,7 +8,7 @@ import { Progress } from "@/components/ui/progress";
 import {
   ArrowLeft, ClipboardList, BookOpen, FolderKanban, Calendar, Users,
   CheckCircle, Clock, Download, AlertCircle, FileText, MapPin, Eye,
-  Save, Send, FileCheck, Check, RotateCcw
+  Save, Send, FileCheck, Check, RotateCcw, BarChart3
 } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
@@ -92,31 +92,61 @@ export default function ProfessorTaskDetail() {
         </div>
         <h1 className="text-2xl font-bold text-foreground">{task.title}</h1>
         <div className="flex items-center gap-5 mt-3 text-sm text-muted-foreground flex-wrap">
-          <span className="flex items-center gap-1.5"><Calendar className="w-4 h-4" /> Prazo: <span className="font-semibold text-foreground">{task.dueDate}</span></span>
-          <span className="flex items-center gap-1.5"><ClipboardList className="w-4 h-4" /> Peso: <span className="font-semibold text-foreground">{task.weight}%</span></span>
+          <span className="flex items-center gap-1.5"><Calendar className="w-4 h-4" /> Data: <span className="font-semibold text-foreground">{task.dueDate}</span></span>
           <span className="flex items-center gap-1.5"><MapPin className="w-4 h-4" /> Presencial</span>
         </div>
       </div>
 
-      {/* Média, Taxa Aprovação, Taxa Reprovação */}
-      {task.avgGrade !== null && (
-        <div className="rounded-xl border border-border bg-card overflow-hidden">
-          <div className="grid grid-cols-3 divide-x divide-border">
-            <div className="p-4 text-center">
-              <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">Média</p>
-              <p className={`text-xl font-bold mt-1 ${task.avgGrade >= 10 ? "text-accent" : "text-destructive"}`}>{task.avgGrade}/20</p>
-            </div>
-            <div className="p-4 text-center">
-              <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">Taxa Aprovação</p>
-              <p className={`text-xl font-bold mt-1 ${approvalRate >= 50 ? "text-accent" : "text-destructive"}`}>{approvalRate}%</p>
-            </div>
-            <div className="p-4 text-center">
-              <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">Taxa Reprovação</p>
-              <p className={`text-xl font-bold mt-1 ${(100 - approvalRate) > 50 ? "text-destructive" : "text-foreground"}`}>{100 - approvalRate}%</p>
+      {/* KPI Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+        <div className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4">
+          <div className="flex items-center justify-between">
+            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Média</p>
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-primary/10">
+              <BarChart3 className="w-4 h-4 text-primary" />
             </div>
           </div>
+          <p className={`text-2xl font-bold ${task.avgGrade !== null && task.avgGrade >= 10 ? "text-accent" : "text-destructive"}`}>{task.avgGrade !== null ? `${task.avgGrade}/20` : "—"}</p>
         </div>
-      )}
+        <div className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4">
+          <div className="flex items-center justify-between">
+            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Taxa Aprovação</p>
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-accent/10">
+              <CheckCircle className="w-4 h-4 text-accent" />
+            </div>
+          </div>
+          <p className={`text-2xl font-bold ${approvalRate >= 50 ? "text-accent" : "text-destructive"}`}>{approvalRate}%</p>
+          <p className="text-[11px] text-muted-foreground">{positiveGrades} aprovados</p>
+        </div>
+        <div className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4">
+          <div className="flex items-center justify-between">
+            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Taxa Reprovação</p>
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-destructive/10">
+              <AlertCircle className="w-4 h-4 text-destructive" />
+            </div>
+          </div>
+          <p className={`text-2xl font-bold ${(100 - approvalRate) > 50 ? "text-destructive" : "text-foreground"}`}>{100 - approvalRate}%</p>
+          <p className="text-[11px] text-muted-foreground">{totalGraded - positiveGrades} reprovados</p>
+        </div>
+        <div className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4">
+          <div className="flex items-center justify-between">
+            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Peso</p>
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-muted">
+              <ClipboardList className="w-4 h-4 text-muted-foreground" />
+            </div>
+          </div>
+          <p className="text-2xl font-bold text-foreground">{task.weight}%</p>
+        </div>
+        <div className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4">
+          <div className="flex items-center justify-between">
+            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Estudantes</p>
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-primary/10">
+              <Users className="w-4 h-4 text-primary" />
+            </div>
+          </div>
+          <p className="text-2xl font-bold text-foreground">{task.totalStudents}</p>
+        </div>
+      </div>
 
       {/* Description */}
       <Card className="p-5 space-y-4">
@@ -149,12 +179,14 @@ export default function ProfessorTaskDetail() {
         isEncerrada={isEncerrada}
         isActiva={isActiva}
         navigate={navigate}
+        positiveGrades={positiveGrades}
+        totalGraded={totalGraded}
       />
     </div>
   );
 }
 
-function GradingTable({ submittedList, notSubmittedList, task, submissionPct, correctedPct, pendingCorrection, isEncerrada, isActiva, navigate }: {
+function GradingTable({ submittedList, notSubmittedList, task, submissionPct, correctedPct, pendingCorrection, isEncerrada, isActiva, navigate, positiveGrades, totalGraded }: {
   submittedList: any[];
   notSubmittedList: any[];
   task: any;
@@ -164,6 +196,8 @@ function GradingTable({ submittedList, notSubmittedList, task, submissionPct, co
   isEncerrada: boolean;
   isActiva: boolean;
   navigate: any;
+  positiveGrades: number;
+  totalGraded: number;
 }) {
   const { toast } = useToast();
   const [grades, setGrades] = useState<Record<string, string>>(() => {
@@ -216,8 +250,10 @@ function GradingTable({ submittedList, notSubmittedList, task, submissionPct, co
               <CheckCircle className="w-3 h-3" /> Corrigido {task.corrected}/{task.submissions} ({correctedPct}%)
             </Badge>
           </div>
-          <div className="flex items-center gap-2">
+           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-xs text-muted-foreground flex items-center gap-1"><Calendar className="w-3 h-3" /> Data Limite: <span className="font-semibold text-foreground">{task.dueDate}</span></span>
+            <span className="text-muted-foreground/30">|</span>
+            <span className="text-xs text-muted-foreground flex items-center gap-1"><Clock className="w-3 h-3" /> Corrigir até: <span className="font-semibold text-foreground">{task.correctionDeadline || "—"}</span></span>
             <span className="text-muted-foreground/30">|</span>
             <Button variant="outline" size="sm" className="gap-2 text-xs"><Download className="w-3.5 h-3.5" /> Exportar</Button>
             {!isEncerrada && (
