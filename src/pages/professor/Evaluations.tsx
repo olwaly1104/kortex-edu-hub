@@ -6,19 +6,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   GraduationCap, Plus, Search, Clock, CheckCircle, Users, Send,
-  Calendar, AlertCircle, MapPin, ArrowRight,
-  ArrowUpDown, SlidersHorizontal, X, BarChart3,
+  Calendar, AlertCircle, MapPin, ArrowRight, ClipboardList, X,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-
-const statusStyle: Record<string, { bg: string; label: string; icon: React.ElementType }> = {
-  rascunho: { bg: "bg-muted text-muted-foreground", label: "Rascunho", icon: Clock },
-  publicada: { bg: "bg-primary/10 text-primary", label: "Activa", icon: Clock },
-  encerrada: { bg: "bg-accent/10 text-accent", label: "Encerrada", icon: CheckCircle },
-};
 
 function SummaryCard({ label, value, icon: Icon, iconBg, iconColor, valueClass }: {
   label: string; value: string | number; icon: React.ElementType;
@@ -37,19 +29,15 @@ function SummaryCard({ label, value, icon: Icon, iconBg, iconColor, valueClass }
   );
 }
 
-type SortKey = "dueDate" | "weight" | "submissions" | "avgGrade";
-type SortDir = "asc" | "desc";
-type FilterStatus = "publicada" | "encerrada" | "rascunho";
+type StatusFilter = "todas" | "ativa" | "encerrada" | "pendente";
 
 export default function ProfessorEvaluations() {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [filterTurma, setFilterTurma] = useState<string>("all");
+  const [filterStatus, setFilterStatus] = useState<StatusFilter>("todas");
   const [searchTerm, setSearchTerm] = useState("");
   const [showForm, setShowForm] = useState(false);
-  const [sortKey, setSortKey] = useState<SortKey | null>(null);
-  const [sortDir, setSortDir] = useState<SortDir>("desc");
-  const [filterStatuses, setFilterStatuses] = useState<FilterStatus[]>([]);
 
   const [formDisc, setFormDisc] = useState(profDisciplines[0]?.id || "");
   const [formTitle, setFormTitle] = useState("");
@@ -60,45 +48,31 @@ export default function ProfessorEvaluations() {
   const sortedTurmas = [...allTurmas].sort((a, b) => a.year - b.year);
   const allEvals = profTasks.filter(t => t.type === "exame");
 
+  // All tasks/quizzes for pendente count
+  const allTarefas = profTasks.filter(t => t.type === "tarefa" || t.type === "quiz");
+  const pendenteTarefas = allTarefas.filter(t => t.status === "publicada" && t.corrected < t.submissions).length;
+  const pendenteAvaliacoes = allEvals.filter(t => t.status === "publicada" && t.corrected < t.submissions).length;
+
   const scopedEvals = useMemo(() => {
     return filterTurma === "all" ? allEvals : allEvals.filter(t => t.turmaId === filterTurma);
   }, [filterTurma, allEvals]);
 
   const activeCount = scopedEvals.filter(t => t.status === "publicada").length;
   const closedCount = scopedEvals.filter(t => t.status === "encerrada").length;
-  const porAtribuir = activeCount;
-  const totalSub = scopedEvals.reduce((s, t) => s + t.submissions, 0);
-  const totalExp = scopedEvals.filter(t => t.status !== "rascunho").reduce((s, t) => s + t.totalStudents, 0);
-  const deliveryRate = totalExp > 0 ? Math.round(totalSub / totalExp * 100) : 0;
   const graded = scopedEvals.filter(t => t.avgGrade !== null);
   const avgGrade = graded.length > 0 ? (graded.reduce((s, t) => s + (t.avgGrade || 0), 0) / graded.length).toFixed(1) : null;
   const approvedEvals = graded.filter(t => (t.avgGrade || 0) >= 10).length;
   const taxaAprovacao = graded.length > 0 ? Math.round(approvedEvals / graded.length * 100) : 0;
 
   const filtered = useMemo(() => {
-    let result = scopedEvals
-      .filter(t => filterStatuses.length === 0 || filterStatuses.includes(t.status as FilterStatus))
-      .filter(t => t.title.toLowerCase().includes(searchTerm.toLowerCase()));
+    let result = scopedEvals.filter(t => t.title.toLowerCase().includes(searchTerm.toLowerCase()));
 
-    if (sortKey) {
-      result = [...result].sort((a, b) => {
-        let va: number, vb: number;
-        if (sortKey === "weight") { va = a.weight; vb = b.weight; }
-        else if (sortKey === "submissions") { va = a.totalStudents > 0 ? a.submissions / a.totalStudents : 0; vb = b.totalStudents > 0 ? b.submissions / b.totalStudents : 0; }
-        else if (sortKey === "avgGrade") { va = a.avgGrade ?? -1; vb = b.avgGrade ?? -1; }
-        else { va = 0; vb = 0; }
-        return sortDir === "desc" ? vb - va : va - vb;
-      });
-    }
+    if (filterStatus === "ativa") result = result.filter(t => t.status === "publicada");
+    else if (filterStatus === "encerrada") result = result.filter(t => t.status === "encerrada");
+    else if (filterStatus === "pendente") result = result.filter(t => t.status === "publicada" && t.corrected < t.submissions);
+
     return result;
-  }, [scopedEvals, filterStatuses, searchTerm, sortKey, sortDir]);
-
-  const toggleFilterStatus = (s: FilterStatus) => {
-    setFilterStatuses(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s]);
-  };
-
-  const hasActiveFilters = filterStatuses.length > 0 || sortKey !== null || searchTerm !== "";
-  const clearFilters = () => { setFilterStatuses([]); setSortKey(null); setSearchTerm(""); };
+  }, [scopedEvals, filterStatus, searchTerm]);
 
   const handleSubmit = () => {
     if (!formTitle || !formDesc || !formDue) {
@@ -109,6 +83,13 @@ export default function ProfessorEvaluations() {
     setShowForm(false);
     setFormTitle(""); setFormDesc(""); setFormDue("");
   };
+
+  const statusToggles: { key: StatusFilter; label: string }[] = [
+    { key: "todas", label: "Todas" },
+    { key: "ativa", label: "Ativa" },
+    { key: "encerrada", label: "Encerrada" },
+    { key: "pendente", label: "Pendente" },
+  ];
 
   return (
     <div className="p-6 lg:p-8 space-y-5 animate-fade-in">
@@ -165,10 +146,10 @@ export default function ProfessorEvaluations() {
       {/* Summary cards */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
         <SummaryCard label="Activas" value={activeCount} icon={Clock} iconBg="bg-primary/10" iconColor="text-primary" />
-        <SummaryCard label="Por Atribuir" value={porAtribuir} icon={AlertCircle} iconBg="bg-destructive/10" iconColor="text-destructive" valueClass={porAtribuir > 0 ? "text-destructive" : undefined} />
         <SummaryCard label="Encerradas" value={closedCount} icon={CheckCircle} iconBg="bg-accent/10" iconColor="text-accent" />
+        <SummaryCard label="Pendente Tarefas" value={pendenteTarefas} icon={ClipboardList} iconBg="bg-destructive/10" iconColor="text-destructive" valueClass={pendenteTarefas > 0 ? "text-destructive" : undefined} />
+        <SummaryCard label="Pendente Avaliações" value={pendenteAvaliacoes} icon={AlertCircle} iconBg="bg-destructive/10" iconColor="text-destructive" valueClass={pendenteAvaliacoes > 0 ? "text-destructive" : undefined} />
         <SummaryCard label="Nota Geral" value={avgGrade ?? "—"} icon={GraduationCap} iconBg="bg-accent/10" iconColor="text-accent" valueClass={avgGrade && Number(avgGrade) >= 10 ? "text-accent" : avgGrade ? "text-destructive" : "text-muted-foreground"} />
-        <SummaryCard label="Taxa Aprovado" value={`${taxaAprovacao}%`} icon={CheckCircle} iconBg="bg-accent/10" iconColor="text-accent" valueClass={taxaAprovacao >= 50 ? "text-accent" : "text-destructive"} />
       </div>
 
       {/* Controls box */}
@@ -187,85 +168,29 @@ export default function ProfessorEvaluations() {
 
         <div className="border-t border-border" />
 
-        {/* Search + Sort + Filter row */}
+        {/* Status toggles */}
+        <div className="flex flex-wrap gap-2">
+          {statusToggles.map(s => (
+            <Button key={s.key} size="sm" variant={filterStatus === s.key ? "default" : "outline"} onClick={() => setFilterStatus(s.key)} className="text-xs">
+              {s.label}
+            </Button>
+          ))}
+        </div>
+
+        <div className="border-t border-border" />
+
+        {/* Search */}
         <div className="flex gap-2 items-center">
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input placeholder="Pesquisar avaliação..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-9 h-9" />
           </div>
-
-          <div className="flex-1" />
-
-          {hasActiveFilters && (
-            <Button variant="ghost" size="sm" className="text-xs text-destructive hover:text-destructive hover:bg-destructive/10 shrink-0 gap-1" onClick={clearFilters}>
+          {searchTerm && (
+            <Button variant="ghost" size="sm" className="text-xs text-destructive hover:text-destructive hover:bg-destructive/10 shrink-0 gap-1" onClick={() => setSearchTerm("")}>
               <X className="w-3 h-3" /> Limpar
             </Button>
           )}
-
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline" size="sm" className={`gap-1.5 shrink-0 text-xs ${sortKey ? "border-primary/50 bg-primary/5 text-primary" : ""}`}>
-                <ArrowUpDown className="w-3.5 h-3.5" /> Ordenar
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-44 p-2 space-y-1" align="end" side="top">
-              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-2 pt-1">Campo</p>
-              {[
-                { key: null, label: "Todos" },
-                { key: "weight" as SortKey, label: "Peso" },
-                { key: "submissions" as SortKey, label: "Taxa Entrega" },
-                { key: "avgGrade" as SortKey, label: "Média" },
-              ].map(opt => (
-                <button key={String(opt.key)} onClick={() => setSortKey(opt.key)} className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${sortKey === opt.key ? "bg-primary/10 text-primary font-medium" : "text-foreground hover:bg-muted"}`}>{opt.label}</button>
-              ))}
-              <div className="border-t border-border my-1" />
-              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-2">Direção</p>
-              <button onClick={() => setSortDir("desc")} className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${sortDir === "desc" && sortKey ? "bg-primary/10 text-primary font-medium" : "text-foreground hover:bg-muted"}`}>Maior → Menor</button>
-              <button onClick={() => setSortDir("asc")} className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${sortDir === "asc" && sortKey ? "bg-primary/10 text-primary font-medium" : "text-foreground hover:bg-muted"}`}>Menor → Maior</button>
-            </PopoverContent>
-          </Popover>
-
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline" size="sm" className={`gap-1.5 shrink-0 text-xs ${filterStatuses.length > 0 ? "border-primary/50 bg-primary/5 text-primary" : ""}`}>
-                <SlidersHorizontal className="w-3.5 h-3.5" /> Filtrar
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-40 p-2 space-y-0.5" align="end" side="top">
-              {([
-                { key: "publicada" as FilterStatus, label: "Activa" },
-                { key: "encerrada" as FilterStatus, label: "Encerrada" },
-                { key: "rascunho" as FilterStatus, label: "Rascunho" },
-              ]).map(s => (
-                <button key={s.key} onClick={() => toggleFilterStatus(s.key)} className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${filterStatuses.includes(s.key) ? "bg-primary/10 text-primary font-medium" : "text-foreground hover:bg-muted"}`}>{s.label}</button>
-              ))}
-            </PopoverContent>
-          </Popover>
         </div>
-
-        {/* Active tags */}
-        {hasActiveFilters && (
-          <div className="flex flex-wrap gap-1.5 pt-1">
-            {sortKey && (
-              <Badge variant="outline" className="text-[10px] gap-1 bg-primary/5 text-primary border-primary/20 cursor-pointer hover:bg-primary/10" onClick={() => { setSortKey(null); setSortDir("desc"); }}>
-                {sortKey === "weight" ? "Peso" : sortKey === "submissions" ? "Entrega" : "Média"}: {sortDir === "desc" ? "Maior" : "Menor"}
-                <X className="w-2.5 h-2.5" />
-              </Badge>
-            )}
-            {filterStatuses.map(s => (
-              <Badge key={s} variant="outline" className="text-[10px] gap-1 bg-accent/10 text-accent border-accent/20 cursor-pointer hover:bg-accent/15" onClick={() => toggleFilterStatus(s)}>
-                Estado: {s === "publicada" ? "Activa" : s === "encerrada" ? "Encerrada" : "Rascunho"}
-                <X className="w-2.5 h-2.5" />
-              </Badge>
-            ))}
-            {searchTerm && (
-              <Badge variant="outline" className="text-[10px] gap-1 bg-secondary/10 text-secondary border-secondary/20 cursor-pointer hover:bg-secondary/15" onClick={() => setSearchTerm("")}>
-                Pesquisa: "{searchTerm}"
-                <X className="w-2.5 h-2.5" />
-              </Badge>
-            )}
-          </div>
-        )}
       </div>
 
       {/* Evaluation list */}
@@ -279,12 +204,14 @@ export default function ProfessorEvaluations() {
         {filtered.map(task => {
           const disc = profDisciplines.find(d => d.id === task.disciplineId);
           const turma = allTurmas.find(t => t.id === task.turmaId);
-          const sStyle = statusStyle[task.status];
-          const StatusIcon = sStyle.icon;
           const submissionPct = task.totalStudents > 0 ? Math.round(task.submissions / task.totalStudents * 100) : 0;
           const isActive = task.status === "publicada";
-          const correctedPct = task.submissions > 0 ? Math.round(task.corrected / task.submissions * 100) : 0;
+          const notaAtribuidaPct = task.submissions > 0 ? Math.round(task.corrected / task.submissions * 100) : 0;
           const pendingCorrection = task.submissions - task.corrected;
+
+          const statusBg = task.status === "encerrada" ? "bg-accent/10 text-accent" : task.status === "publicada" ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground";
+          const statusLabel = task.status === "encerrada" ? "Encerrada" : task.status === "publicada" ? "Activa" : "Rascunho";
+          const StatusIcon = task.status === "encerrada" ? CheckCircle : Clock;
 
           return (
             <div
@@ -300,9 +227,9 @@ export default function ProfessorEvaluations() {
                     <span className="text-[10px] text-muted-foreground font-medium">{disc?.code}</span>
                     {turma && <Badge variant="outline" className="text-[10px] px-1.5 py-0 rounded-md">{turma.name}</Badge>}
                   </div>
-                  <Badge className={`${sStyle.bg} gap-1 text-[10px] border-0`}>
+                  <Badge className={`${statusBg} gap-1 text-[10px] border-0`}>
                     <StatusIcon className="w-3 h-3" />
-                    {sStyle.label}
+                    {statusLabel}
                   </Badge>
                 </div>
 
@@ -330,16 +257,16 @@ export default function ProfessorEvaluations() {
                     </div>
                     <div className="space-y-1.5">
                       <div className="flex items-center justify-between text-xs">
-                        <span className={`flex items-center gap-1.5 ${pendingCorrection > 0 ? "text-destructive" : "text-muted-foreground"}`}><CheckCircle className="w-3.5 h-3.5" />Corrigido</span>
-                        <span className={`font-semibold ${pendingCorrection > 0 ? "text-destructive" : "text-muted-foreground"}`}>{task.corrected}/{task.submissions}{pendingCorrection > 0 ? ` · ${pendingCorrection} por corrigir` : ""}</span>
+                        <span className="flex items-center gap-1.5 text-muted-foreground"><CheckCircle className="w-3.5 h-3.5" />Nota Atribuída</span>
+                        <span className="font-semibold text-foreground">{task.corrected}/{task.submissions}{pendingCorrection > 0 ? ` · ${pendingCorrection} pendente` : ""}</span>
                       </div>
-                      <Progress value={correctedPct} className={`h-1.5 ${pendingCorrection > 0 ? "[&>div]:bg-destructive" : ""}`} />
-                      {isActive && task.correctionDeadline && (
-                        <p className="text-[10px] text-muted-foreground flex items-center gap-1 mt-1">
-                          <Clock className="w-3 h-3" /> Prazo de correcção: <span className="font-medium text-foreground">{task.correctionDeadline}</span>
-                        </p>
-                      )}
+                      <Progress value={notaAtribuidaPct} className="h-1.5" />
                     </div>
+                    {isActive && task.correctionDeadline && (
+                      <p className="text-[10px] text-muted-foreground flex items-center gap-1">
+                        <Clock className="w-3 h-3" /> Corrigir até: <span className="font-medium text-foreground">{task.correctionDeadline}</span>
+                      </p>
+                    )}
                   </div>
                 )}
 
