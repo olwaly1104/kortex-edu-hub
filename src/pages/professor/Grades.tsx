@@ -39,17 +39,17 @@ export default function ProfessorGrades() {
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         <Card className="p-4">
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><Award className="w-4 h-4 text-primary" /></div>
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Média Geral</span>
-          </div>
-          <p className={`text-2xl font-bold ${overallAvg !== null && overallAvg >= 10 ? "text-accent" : overallAvg !== null ? "text-destructive" : "text-muted-foreground"}`}>{overallAvg ?? "—"}{overallAvg !== null ? "/20" : ""}</p>
-        </Card>
-        <Card className="p-4">
-          <div className="flex items-center gap-2 mb-3">
             <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><Calendar className="w-4 h-4 text-primary" /></div>
             <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Avaliações</span>
           </div>
           <p className="text-2xl font-bold text-foreground">{closedEvals}<span className="text-sm text-muted-foreground font-medium">/{totalEvals}</span></p>
+        </Card>
+        <Card className="p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><Award className="w-4 h-4 text-primary" /></div>
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Média Geral</span>
+          </div>
+          <p className={`text-2xl font-bold ${overallAvg !== null && overallAvg >= 10 ? "text-accent" : overallAvg !== null ? "text-destructive" : "text-muted-foreground"}`}>{overallAvg ?? "—"}{overallAvg !== null ? "/20" : ""}</p>
         </Card>
         <Card className="p-4">
           <div className="flex items-center gap-2 mb-3">
