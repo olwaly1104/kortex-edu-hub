@@ -1,5 +1,6 @@
 import { coordCursoInfo, coordTurmas, coordDisciplinas, coordEstudantes, coordTurmaLessons } from "@/data/institutionData";
 import { Card } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import {
   Layers, Users, BookOpen, Award, ChevronRight, UserCheck, GraduationCap,
@@ -211,16 +212,12 @@ export default function CoordenadorAnos() {
                       </span>
                       <span className="text-sm font-semibold tabular-nums text-foreground">{totalMaterials}</span>
                     </div>
-                    <div className="flex items-center justify-between px-1">
-                      <span className="text-xs text-muted-foreground flex items-center gap-1.5">
-                        <Video className="w-3.5 h-3.5 text-secondary" /> Aulas Gravadas
-                      </span>
-                      <div className="flex items-center gap-2">
-                        <div className="w-16 h-1.5 bg-muted rounded-full overflow-hidden">
-                          <div className="h-full bg-secondary rounded-full" style={{ width: `${publishedLessons.length > 0 ? (recordedLessons / publishedLessons.length) * 100 : 0}%` }} />
-                        </div>
+                    <div className="px-1">
+                      <div className="flex justify-between text-xs mb-1">
+                        <span className="text-muted-foreground flex items-center gap-1.5"><Video className="w-3.5 h-3.5 text-secondary" /> Aulas Gravadas</span>
                         <span className="text-sm font-semibold tabular-nums text-foreground">{recordedLessons}/{publishedLessons.length}</span>
                       </div>
+                      <Progress value={publishedLessons.length > 0 ? (recordedLessons / publishedLessons.length) * 100 : 0} className="h-1.5" />
                     </div>
                   </div>
                 </div>
