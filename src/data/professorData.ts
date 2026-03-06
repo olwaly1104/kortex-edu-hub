@@ -98,7 +98,7 @@ const turmas: ProfTurma[] = [
   { id: "t4", name: "3º Ano Informática", year: 3, course: "Eng. Informática", students: 38 },
 ];
 
-export const allTurmas = turmas;
+export const allTurmas = [...turmas].sort((a, b) => a.year - b.year);
 
 // ── Disciplinas do Professor ──
 export const profDisciplines: ProfDiscipline[] = [
