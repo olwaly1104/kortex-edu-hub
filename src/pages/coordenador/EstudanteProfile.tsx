@@ -1,18 +1,18 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { coordEstudantes, coordDisciplinas, coordCursoInfo } from "@/data/institutionData";
+import { coordEstudantes, coordDisciplinas, coordCursoInfo, coordTurmas } from "@/data/institutionData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import {
-  ArrowLeft, Mail, MessageCircle, Users, BookOpen,
-  CheckCircle, Clock, BarChart3, Award, ClipboardList, TrendingUp,
+  ArrowLeft, Mail, MessageCircle, BookOpen,
+  Award, Users, Phone, MapPin, UserCheck, Calendar, GraduationCap,
+  CheckCircle, ClipboardList, TrendingUp,
 } from "lucide-react";
 
 const statusConfig = {
-  excelente: { label: "Excelente", bg: "bg-accent/10 text-accent" },
-  normal: { label: "Normal", bg: "bg-muted text-muted-foreground" },
-  risco: { label: "Em Risco", bg: "bg-destructive/10 text-destructive" },
+  excelente: { label: "Excelente", bg: "bg-accent/10 text-accent border-accent/30" },
+  normal: { label: "Normal", bg: "bg-muted text-muted-foreground border-border" },
+  risco: { label: "Em Risco", bg: "bg-destructive/10 text-destructive border-destructive/30" },
 };
 
 export default function CoordenadorEstudanteProfile() {
@@ -31,80 +31,186 @@ export default function CoordenadorEstudanteProfile() {
 
   const sc = statusConfig[student.status];
   const yearDiscs = coordDisciplinas.filter(d => d.year === student.year);
+  const studentTurmas = coordTurmas.filter(t => t.year === student.year);
 
   return (
-    <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
+    <div className="p-6 lg:p-8 max-w-3xl mx-auto space-y-6 animate-fade-in">
       <Button variant="ghost" onClick={() => navigate(-1)} className="gap-2">
         <ArrowLeft className="w-4 h-4" /> Voltar
       </Button>
 
-      {/* Profile header */}
-      <div className="flex items-start gap-5">
-        <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-xl font-bold text-primary shrink-0">
-          {student.name.split(" ").map(n => n[0]).slice(0, 2).join("")}
-        </div>
-        <div className="flex-1">
-          <div className="flex items-center gap-3 flex-wrap">
-            <h1 className="text-2xl font-bold text-foreground">{student.name}</h1>
-            <Badge className={`${sc.bg} border-0 text-[11px]`}>{sc.label}</Badge>
-          </div>
-          <p className="text-sm text-muted-foreground mt-1">{student.email}</p>
-          <p className="text-sm text-muted-foreground">{student.year}º Ano · Turma {student.turma} · {coordCursoInfo.name}</p>
-          <div className="flex items-center gap-2 mt-3">
-            <Button size="sm" variant="outline" className="gap-1.5 text-xs">
-              <MessageCircle className="w-3.5 h-3.5" /> Enviar Mensagem
-            </Button>
-            <Button size="sm" variant="outline" className="gap-1.5 text-xs">
-              <Mail className="w-3.5 h-3.5" /> Enviar Email
-            </Button>
-          </div>
-        </div>
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+          <Users className="w-6 h-6 text-primary" /> Perfil do Estudante
+        </h1>
+        <p className="text-sm text-muted-foreground mt-1">Informações pessoais e académicas</p>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
-        <Card className="p-4">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Presença</p>
-            <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center"><CheckCircle className="w-3.5 h-3.5 text-primary" /></div>
-          </div>
-          <p className={`text-2xl font-bold ${student.presenca >= 75 ? "text-foreground" : "text-destructive"}`}>{student.presenca}%</p>
-        </Card>
-        <Card className="p-4">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Média Geral</p>
-            <div className="w-7 h-7 rounded-lg bg-accent/10 flex items-center justify-center"><Award className="w-3.5 h-3.5 text-accent" /></div>
-          </div>
-          <p className={`text-2xl font-bold ${student.media !== null && student.media >= 10 ? "text-accent" : "text-destructive"}`}>{student.media ?? "—"}/20</p>
-        </Card>
-        <Card className="p-4">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Taxa Entrega</p>
-            <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center"><ClipboardList className="w-3.5 h-3.5 text-primary" /></div>
-          </div>
-          <p className={`text-2xl font-bold ${student.taxaEntrega >= 80 ? "text-accent" : "text-destructive"}`}>{student.taxaEntrega}%</p>
-        </Card>
-        <Card className="p-4">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Cadeiras</p>
-            <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center"><BookOpen className="w-3.5 h-3.5 text-primary" /></div>
-          </div>
-          <p className="text-2xl font-bold text-foreground">{yearDiscs.length}</p>
-        </Card>
-        <Card className="p-4">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Estado</p>
-            <div className="w-7 h-7 rounded-lg bg-muted flex items-center justify-center"><TrendingUp className="w-3.5 h-3.5 text-muted-foreground" /></div>
-          </div>
-          <Badge className={`${sc.bg} border-0 text-xs`}>{sc.label}</Badge>
-        </Card>
-      </div>
+      {/* Identity banner */}
+      <Card className="px-5 py-3.5 border-l-4 border-l-primary space-y-1">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-bold text-foreground">{student.name}</h2>
+          <Badge variant="outline" className={`text-xs ${sc.bg}`}>{sc.label}</Badge>
+        </div>
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-muted-foreground">{coordCursoInfo.name} · {student.year}º Ano · Turma {student.turma}</p>
+          <Badge variant="outline" className="text-xs">{student.turma}</Badge>
+        </div>
+      </Card>
 
-      {/* Cadeiras do Ano */}
+      {/* Personal Info */}
       <Card className="overflow-hidden">
-        <div className="p-5 border-b bg-muted/30">
-          <h3 className="font-semibold text-foreground flex items-center gap-2"><BookOpen className="w-4 h-4" /> Cadeiras do {student.year}º Ano</h3>
+        <div className="p-4 border-b bg-muted/30">
+          <h3 className="text-sm font-semibold text-foreground">Informações Pessoais</h3>
         </div>
-        <div className="divide-y">
+        <div className="divide-y divide-border">
+          <div className="flex items-center justify-between px-5 py-3.5">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                <Mail className="w-4 h-4 text-primary" />
+              </div>
+              <p className="text-sm text-muted-foreground">Email</p>
+            </div>
+            <p className="text-sm font-semibold text-foreground">{student.email}</p>
+          </div>
+          <div className="flex items-center justify-between px-5 py-3.5">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-secondary/10 flex items-center justify-center">
+                <Phone className="w-4 h-4 text-secondary" />
+              </div>
+              <p className="text-sm text-muted-foreground">Telefone</p>
+            </div>
+            <p className="text-sm font-semibold text-foreground">+244 923 456 789</p>
+          </div>
+          <div className="flex items-center justify-between px-5 py-3.5">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center">
+                <MapPin className="w-4 h-4 text-accent" />
+              </div>
+              <p className="text-sm text-muted-foreground">Morada</p>
+            </div>
+            <p className="text-sm font-semibold text-foreground">Rua da Samba, Nº 45, Luanda</p>
+          </div>
+          <div className="flex items-center justify-between px-5 py-3.5">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-secondary/10 flex items-center justify-center">
+                <Calendar className="w-4 h-4 text-secondary" />
+              </div>
+              <p className="text-sm text-muted-foreground">Data de Nascimento</p>
+            </div>
+            <p className="text-sm font-semibold text-foreground">15/03/2001</p>
+          </div>
+          <div className="flex items-center justify-between px-5 py-3.5">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                <UserCheck className="w-4 h-4 text-primary" />
+              </div>
+              <p className="text-sm text-muted-foreground">Encarregado de Educação</p>
+            </div>
+            <p className="text-sm font-semibold text-foreground">Maria Santos</p>
+          </div>
+          <div className="flex items-center justify-between px-5 py-3.5">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-secondary/10 flex items-center justify-center">
+                <Phone className="w-4 h-4 text-secondary" />
+              </div>
+              <p className="text-sm text-muted-foreground">Nº Encarregado</p>
+            </div>
+            <p className="text-sm font-semibold text-foreground">+244 912 345 678</p>
+          </div>
+        </div>
+      </Card>
+
+      {/* Academic Info */}
+      <Card className="overflow-hidden">
+        <div className="p-4 border-b bg-muted/30">
+          <h3 className="text-sm font-semibold text-foreground">Informações Académicas</h3>
+        </div>
+        <div className="divide-y divide-border">
+          <div className="flex items-center justify-between px-5 py-3.5">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                <GraduationCap className="w-4 h-4 text-primary" />
+              </div>
+              <p className="text-sm text-muted-foreground">Curso</p>
+            </div>
+            <p className="text-sm font-semibold text-foreground">{coordCursoInfo.name}</p>
+          </div>
+          <div className="flex items-center justify-between px-5 py-3.5">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-secondary/10 flex items-center justify-center">
+                <Calendar className="w-4 h-4 text-secondary" />
+              </div>
+              <p className="text-sm text-muted-foreground">Ano Curricular</p>
+            </div>
+            <p className="text-sm font-semibold text-foreground">{student.year}º Ano</p>
+          </div>
+          <div className="flex items-center justify-between px-5 py-3.5">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center">
+                <Users className="w-4 h-4 text-accent" />
+              </div>
+              <p className="text-sm text-muted-foreground">Turma</p>
+            </div>
+            <p className="text-sm font-semibold text-foreground">Turma {student.turma}</p>
+          </div>
+          <div className="flex items-center justify-between px-5 py-3.5">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                <BookOpen className="w-4 h-4 text-primary" />
+              </div>
+              <p className="text-sm text-muted-foreground">Cadeiras</p>
+            </div>
+            <p className="text-sm font-semibold text-foreground">{yearDiscs.length}</p>
+          </div>
+          <div className="flex items-center justify-between px-5 py-3.5">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                <CheckCircle className="w-4 h-4 text-muted-foreground" />
+              </div>
+              <p className="text-sm text-muted-foreground">Presença</p>
+            </div>
+            <p className={`text-sm font-semibold ${student.presenca >= 75 ? "text-accent" : "text-destructive"}`}>{student.presenca}%</p>
+          </div>
+          <div className="flex items-center justify-between px-5 py-3.5">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center">
+                <TrendingUp className="w-4 h-4 text-accent" />
+              </div>
+              <p className="text-sm text-muted-foreground">Média Geral</p>
+            </div>
+            <p className={`text-sm font-semibold ${student.media !== null && student.media >= 10 ? "text-accent" : "text-destructive"}`}>{student.media ?? "—"}/20</p>
+          </div>
+          <div className="flex items-center justify-between px-5 py-3.5">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                <ClipboardList className="w-4 h-4 text-primary" />
+              </div>
+              <p className="text-sm text-muted-foreground">Taxa de Entrega</p>
+            </div>
+            <p className={`text-sm font-semibold ${student.taxaEntrega >= 80 ? "text-accent" : "text-destructive"}`}>{student.taxaEntrega}%</p>
+          </div>
+          <div className="flex items-center justify-between px-5 py-3.5">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                <Award className="w-4 h-4 text-secondary" />
+              </div>
+              <p className="text-sm text-muted-foreground">Avaliações</p>
+            </div>
+            <p className="text-sm font-semibold text-foreground">{student.avaliacoesFeitas}/{student.avaliacoesTotal}</p>
+          </div>
+        </div>
+      </Card>
+
+      {/* Cadeiras */}
+      <Card className="overflow-hidden">
+        <div className="p-4 border-b bg-muted/30">
+          <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+            <BookOpen className="w-4 h-4" /> Cadeiras do {student.year}º Ano
+          </h3>
+        </div>
+        <div className="divide-y divide-border">
           {yearDiscs.length > 0 ? yearDiscs.map(disc => (
             <div key={disc.id} className="px-5 py-3.5 flex items-center gap-3 hover:bg-muted/20 transition-colors">
               <div className="flex-1 min-w-0">
@@ -121,11 +227,11 @@ export default function CoordenadorEstudanteProfile() {
                 </div>
                 <div className="text-center">
                   <p className={`font-semibold ${disc.media !== null && disc.media >= 10 ? "text-accent" : "text-destructive"}`}>{disc.media ?? "—"}</p>
-                  <p className="text-[10px] text-muted-foreground">Média Geral</p>
+                  <p className="text-[10px] text-muted-foreground">Média</p>
                 </div>
                 <div className="text-center">
                   <p className={`font-semibold ${disc.taxaAprovacao >= 70 ? "text-accent" : "text-destructive"}`}>{disc.taxaAprovacao}%</p>
-                  <p className="text-[10px] text-muted-foreground">Aprovado</p>
+                  <p className="text-[10px] text-muted-foreground">Aprovação</p>
                 </div>
               </div>
             </div>
@@ -134,6 +240,16 @@ export default function CoordenadorEstudanteProfile() {
           )}
         </div>
       </Card>
+
+      {/* Actions */}
+      <div className="flex items-center gap-2">
+        <Button size="sm" variant="outline" className="gap-1.5 text-xs">
+          <MessageCircle className="w-3.5 h-3.5" /> Enviar Mensagem
+        </Button>
+        <Button size="sm" variant="outline" className="gap-1.5 text-xs">
+          <Mail className="w-3.5 h-3.5" /> Enviar Email
+        </Button>
+      </div>
     </div>
   );
 }

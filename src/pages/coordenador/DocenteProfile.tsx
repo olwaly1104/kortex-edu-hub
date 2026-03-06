@@ -1,12 +1,12 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { coordDocentes, coordDisciplinas } from "@/data/institutionData";
+import { coordDocentes, coordDisciplinas, coordCursoInfo } from "@/data/institutionData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import {
-  ArrowLeft, Mail, MessageCircle, Users, BookOpen,
-  CheckCircle, Award, TrendingUp, ClipboardList, GraduationCap,
+  ArrowLeft, Mail, MessageCircle, BookOpen,
+  Award, Users, Phone, MapPin, Calendar, GraduationCap,
+  CheckCircle, ClipboardList, TrendingUp, Building2,
 } from "lucide-react";
 
 export default function CoordenadorDocenteProfile() {
@@ -29,86 +29,161 @@ export default function CoordenadorDocenteProfile() {
       ? "excelente"
       : "normal";
   const statusLabel = estado === "excelente" ? "Excelente" : estado === "risco" ? "Em Risco" : "Normal";
-  const statusBg = estado === "excelente" ? "bg-accent/10 text-accent" : estado === "risco" ? "bg-destructive/10 text-destructive" : "bg-muted text-muted-foreground";
+  const statusBg = estado === "excelente" ? "bg-accent/10 text-accent border-accent/30" : estado === "risco" ? "bg-destructive/10 text-destructive border-destructive/30" : "bg-muted text-muted-foreground border-border";
 
   const docenteDisciplinas = coordDisciplinas.filter(d => d.professor === docente.name);
 
   return (
-    <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
+    <div className="p-6 lg:p-8 max-w-3xl mx-auto space-y-6 animate-fade-in">
       <Button variant="ghost" onClick={() => navigate(-1)} className="gap-2">
         <ArrowLeft className="w-4 h-4" /> Voltar
       </Button>
 
-      {/* Profile header */}
-      <div className="flex items-start gap-5">
-        <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-xl font-bold text-primary shrink-0">
-          {docente.name.replace("Prof. ", "").split(" ").map(n => n[0]).slice(0, 2).join("")}
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+          <GraduationCap className="w-6 h-6 text-primary" /> Perfil do Docente
+        </h1>
+        <p className="text-sm text-muted-foreground mt-1">Informações pessoais e académicas</p>
+      </div>
+
+      {/* Identity banner */}
+      <Card className="px-5 py-3.5 border-l-4 border-l-primary space-y-1">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-bold text-foreground">{docente.name}</h2>
+          <Badge variant="outline" className={`text-xs ${statusBg}`}>{statusLabel}</Badge>
         </div>
-        <div className="flex-1">
-          <div className="flex items-center gap-3 flex-wrap">
-            <h1 className="text-2xl font-bold text-foreground">{docente.name}</h1>
-            <Badge className={`${statusBg} border-0 text-[11px]`}>{statusLabel}</Badge>
-            <Badge variant="outline" className="text-[10px]">{docente.status === "activo" ? "Activo" : docente.status === "licença" ? "Em Licença" : "Inactivo"}</Badge>
-          </div>
-          <p className="text-sm text-muted-foreground mt-1">{docente.email}</p>
+        <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">Departamento de {docente.department}</p>
-          <div className="flex items-center gap-2 mt-3">
-            <Button size="sm" variant="outline" className="gap-1.5 text-xs">
-              <MessageCircle className="w-3.5 h-3.5" /> Enviar Mensagem
-            </Button>
-            <Button size="sm" variant="outline" className="gap-1.5 text-xs">
-              <Mail className="w-3.5 h-3.5" /> Enviar Email
-            </Button>
-          </div>
+          <Badge variant="outline" className="text-xs">{docente.status === "activo" ? "Activo" : docente.status === "licença" ? "Em Licença" : "Inactivo"}</Badge>
         </div>
-      </div>
+      </Card>
 
-      {/* Stats cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
-        <Card className="p-4">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Estudantes</p>
-            <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center"><Users className="w-3.5 h-3.5 text-primary" /></div>
-          </div>
-          <p className="text-2xl font-bold text-foreground">{docente.estudantesTotal}</p>
-        </Card>
-        <Card className="p-4">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Presença</p>
-            <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center"><CheckCircle className="w-3.5 h-3.5 text-primary" /></div>
-          </div>
-          <p className={`text-2xl font-bold ${docente.presenca >= 90 ? "text-accent" : "text-destructive"}`}>{docente.presenca}%</p>
-        </Card>
-        <Card className="p-4">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Média Geral</p>
-            <div className="w-7 h-7 rounded-lg bg-accent/10 flex items-center justify-center"><Award className="w-3.5 h-3.5 text-accent" /></div>
-          </div>
-          <p className={`text-2xl font-bold ${docente.mediaGeral >= 10 ? "text-accent" : "text-destructive"}`}>{docente.mediaGeral}/20</p>
-        </Card>
-        <Card className="p-4">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Cadeiras</p>
-            <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center"><BookOpen className="w-3.5 h-3.5 text-primary" /></div>
-          </div>
-          <p className="text-2xl font-bold text-foreground">{docenteDisciplinas.length}</p>
-        </Card>
-        <Card className="p-4">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Turmas</p>
-            <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center"><GraduationCap className="w-3.5 h-3.5 text-primary" /></div>
-          </div>
-          <p className="text-2xl font-bold text-foreground">{docenteDisciplinas.length}</p>
-        </Card>
-      </div>
-
-
-      {/* Turmas list */}
+      {/* Personal Info */}
       <Card className="overflow-hidden">
-        <div className="p-5 border-b bg-muted/30">
-          <h3 className="font-semibold text-foreground flex items-center gap-2"><GraduationCap className="w-4 h-4" /> Turmas</h3>
+        <div className="p-4 border-b bg-muted/30">
+          <h3 className="text-sm font-semibold text-foreground">Informações Pessoais</h3>
         </div>
-        <div className="divide-y">
+        <div className="divide-y divide-border">
+          <div className="flex items-center justify-between px-5 py-3.5">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                <Mail className="w-4 h-4 text-primary" />
+              </div>
+              <p className="text-sm text-muted-foreground">Email</p>
+            </div>
+            <p className="text-sm font-semibold text-foreground">{docente.email}</p>
+          </div>
+          <div className="flex items-center justify-between px-5 py-3.5">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-secondary/10 flex items-center justify-center">
+                <Phone className="w-4 h-4 text-secondary" />
+              </div>
+              <p className="text-sm text-muted-foreground">Telefone</p>
+            </div>
+            <p className="text-sm font-semibold text-foreground">+244 934 567 890</p>
+          </div>
+          <div className="flex items-center justify-between px-5 py-3.5">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center">
+                <MapPin className="w-4 h-4 text-accent" />
+              </div>
+              <p className="text-sm text-muted-foreground">Morada</p>
+            </div>
+            <p className="text-sm font-semibold text-foreground">Av. 4 de Fevereiro, Nº 120, Luanda</p>
+          </div>
+          <div className="flex items-center justify-between px-5 py-3.5">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-secondary/10 flex items-center justify-center">
+                <Calendar className="w-4 h-4 text-secondary" />
+              </div>
+              <p className="text-sm text-muted-foreground">Data de Nascimento</p>
+            </div>
+            <p className="text-sm font-semibold text-foreground">22/08/1978</p>
+          </div>
+          <div className="flex items-center justify-between px-5 py-3.5">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                <Building2 className="w-4 h-4 text-primary" />
+              </div>
+              <p className="text-sm text-muted-foreground">Departamento</p>
+            </div>
+            <p className="text-sm font-semibold text-foreground">{docente.department}</p>
+          </div>
+        </div>
+      </Card>
+
+      {/* Academic Info */}
+      <Card className="overflow-hidden">
+        <div className="p-4 border-b bg-muted/30">
+          <h3 className="text-sm font-semibold text-foreground">Informações Académicas</h3>
+        </div>
+        <div className="divide-y divide-border">
+          <div className="flex items-center justify-between px-5 py-3.5">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                <Users className="w-4 h-4 text-primary" />
+              </div>
+              <p className="text-sm text-muted-foreground">Total Estudantes</p>
+            </div>
+            <p className="text-sm font-semibold text-foreground">{docente.estudantesTotal}</p>
+          </div>
+          <div className="flex items-center justify-between px-5 py-3.5">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                <BookOpen className="w-4 h-4 text-primary" />
+              </div>
+              <p className="text-sm text-muted-foreground">Cadeiras</p>
+            </div>
+            <p className="text-sm font-semibold text-foreground">{docenteDisciplinas.length}</p>
+          </div>
+          <div className="flex items-center justify-between px-5 py-3.5">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                <GraduationCap className="w-4 h-4 text-primary" />
+              </div>
+              <p className="text-sm text-muted-foreground">Turmas</p>
+            </div>
+            <p className="text-sm font-semibold text-foreground">{docenteDisciplinas.length}</p>
+          </div>
+          <div className="flex items-center justify-between px-5 py-3.5">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                <CheckCircle className="w-4 h-4 text-muted-foreground" />
+              </div>
+              <p className="text-sm text-muted-foreground">Presença</p>
+            </div>
+            <p className={`text-sm font-semibold ${docente.presenca >= 90 ? "text-accent" : "text-destructive"}`}>{docente.presenca}%</p>
+          </div>
+          <div className="flex items-center justify-between px-5 py-3.5">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center">
+                <TrendingUp className="w-4 h-4 text-accent" />
+              </div>
+              <p className="text-sm text-muted-foreground">Média Geral</p>
+            </div>
+            <p className={`text-sm font-semibold ${docente.mediaGeral >= 10 ? "text-accent" : "text-destructive"}`}>{docente.mediaGeral}/20</p>
+          </div>
+          <div className="flex items-center justify-between px-5 py-3.5">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                <ClipboardList className="w-4 h-4 text-primary" />
+              </div>
+              <p className="text-sm text-muted-foreground">Taxa de Entrega</p>
+            </div>
+            <p className={`text-sm font-semibold ${docente.taxaEntrega >= 80 ? "text-accent" : "text-destructive"}`}>{docente.taxaEntrega}%</p>
+          </div>
+        </div>
+      </Card>
+
+      {/* Turmas */}
+      <Card className="overflow-hidden">
+        <div className="p-4 border-b bg-muted/30">
+          <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+            <GraduationCap className="w-4 h-4" /> Turmas
+          </h3>
+        </div>
+        <div className="divide-y divide-border">
           {docenteDisciplinas.length > 0 ? docenteDisciplinas.map(disc => {
             const estadoDisc = disc.taxaAprovacao >= 85 ? "excelente" : disc.taxaAprovacao < 70 ? "risco" : "normal";
             const estadoStyle = estadoDisc === "excelente"
@@ -132,11 +207,11 @@ export default function CoordenadorDocenteProfile() {
                   </div>
                   <div className="text-center">
                     <p className={`font-semibold ${disc.media >= 10 ? "text-accent" : "text-destructive"}`}>{disc.media}</p>
-                    <p className="text-[10px] text-muted-foreground">Média Geral</p>
+                    <p className="text-[10px] text-muted-foreground">Média</p>
                   </div>
                   <div className="text-center">
                     <p className={`font-semibold ${disc.taxaAprovacao >= 70 ? "text-accent" : "text-destructive"}`}>{disc.taxaAprovacao}%</p>
-                    <p className="text-[10px] text-muted-foreground">Aprovado</p>
+                    <p className="text-[10px] text-muted-foreground">Aprovação</p>
                   </div>
                   <Badge variant="outline" className={`${estadoStyle} text-[10px]`}>
                     {estadoDisc === "excelente" ? "Excelente" : estadoDisc === "risco" ? "Em Risco" : "Normal"}
@@ -149,6 +224,16 @@ export default function CoordenadorDocenteProfile() {
           )}
         </div>
       </Card>
+
+      {/* Actions */}
+      <div className="flex items-center gap-2">
+        <Button size="sm" variant="outline" className="gap-1.5 text-xs">
+          <MessageCircle className="w-3.5 h-3.5" /> Enviar Mensagem
+        </Button>
+        <Button size="sm" variant="outline" className="gap-1.5 text-xs">
+          <Mail className="w-3.5 h-3.5" /> Enviar Email
+        </Button>
+      </div>
     </div>
   );
 }
