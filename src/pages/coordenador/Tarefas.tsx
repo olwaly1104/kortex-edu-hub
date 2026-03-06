@@ -41,18 +41,28 @@ type FilterStatus = "todas" | "publicada" | "encerrada";
 
 export default function CoordenadorTarefas() {
   const navigate = useNavigate();
+  const [filterYear, setFilterYear] = useState<number | null>(null);
   const [filterTurma, setFilterTurma] = useState<string>("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [sortKey, setSortKey] = useState<SortKey | null>(null);
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [filterStatus, setFilterStatus] = useState<FilterStatus>("todas");
 
-  const sortedTurmas = [...coordTurmas].sort((a, b) => a.year - b.year);
+  const years = [...new Set(coordTurmas.map(t => t.year))].sort();
+  const turmasForYear = filterYear ? coordTurmas.filter(t => t.year === filterYear).sort((a, b) => a.name.localeCompare(b.name)) : [];
+
   const allTarefas = coordTurmaTasks.filter(t => t.type === "tarefa" || t.type === "quiz");
 
   const scopedTasks = useMemo(() => {
-    return filterTurma === "all" ? allTarefas : allTarefas.filter(t => t.turmaId === filterTurma);
-  }, [filterTurma, allTarefas]);
+    let tasks = allTarefas;
+    if (filterTurma !== "all") {
+      tasks = tasks.filter(t => t.turmaId === filterTurma);
+    } else if (filterYear) {
+      const yearTurmaIds = coordTurmas.filter(t => t.year === filterYear).map(t => t.id);
+      tasks = tasks.filter(t => yearTurmaIds.includes(t.turmaId));
+    }
+    return tasks;
+  }, [filterYear, filterTurma, allTarefas]);
 
   const activeTasks = scopedTasks.filter(t => t.status === "publicada");
   const closedTasks = scopedTasks.filter(t => t.status === "encerrada");
@@ -84,6 +94,16 @@ export default function CoordenadorTarefas() {
   const hasActiveFilters = filterStatus !== "todas" || sortKey !== null || searchTerm !== "";
   const clearFilters = () => { setFilterStatus("todas"); setSortKey(null); setSearchTerm(""); };
 
+  const handleYearClick = (year: number) => {
+    if (filterYear === year) {
+      setFilterYear(null);
+      setFilterTurma("all");
+    } else {
+      setFilterYear(year);
+      setFilterTurma("all");
+    }
+  };
+
   return (
     <div className="p-6 lg:p-8 space-y-5 animate-fade-in">
       <div>
@@ -98,23 +118,37 @@ export default function CoordenadorTarefas() {
         <SummaryCard label="Activas" value={activeTasks.length} icon={Clock} iconBg="bg-primary/10" iconColor="text-primary" />
         <SummaryCard label="Pendente" value={pendentes} icon={AlertCircle} iconBg="bg-destructive/10" iconColor="text-destructive" valueClass={pendentes > 0 ? "text-destructive" : undefined} />
         <SummaryCard label="Encerradas" value={closedTasks.length} icon={CheckCircle} iconBg="bg-accent/10" iconColor="text-accent" />
-        <SummaryCard label="Taxa Entrega" value={`${avgSubmissionRate}%`} icon={BarChart3} iconBg="bg-secondary/10" iconColor="text-secondary" valueClass={avgSubmissionRate >= 70 ? "text-accent" : "text-destructive"} />
+        <SummaryCard label="Taxa Entrega" value={`${avgSubmissionRate}%`} icon={BarChart3} iconBg="bg-secondary/10" iconColor="text-secondary" valueClass={avgSubmissionRate >= 70 ? "text-secondary" : "text-destructive"} />
         <SummaryCard label="Nota Geral" value={overallAvg ?? "—"} icon={BookOpen} iconBg="bg-accent/10" iconColor="text-accent" valueClass={overallAvg && Number(overallAvg) >= 10 ? "text-accent" : overallAvg ? "text-destructive" : "text-muted-foreground"} />
       </div>
 
       {/* Controls box */}
       <div className="rounded-xl border border-border bg-card p-4 space-y-3">
-        {/* Turma toggle */}
+        {/* Row 1: Year toggles */}
         <div className="flex flex-wrap gap-2">
-          <Button size="sm" variant={filterTurma === "all" ? "default" : "outline"} onClick={() => setFilterTurma("all")} className="text-xs">
-            Todas as Turmas
+          <Button size="sm" variant={!filterYear ? "default" : "outline"} onClick={() => { setFilterYear(null); setFilterTurma("all"); }} className="text-xs">
+            Todos os Anos
           </Button>
-          {sortedTurmas.map(t => (
-            <Button key={t.id} size="sm" variant={filterTurma === t.id ? "default" : "outline"} onClick={() => setFilterTurma(t.id)} className="text-xs">
-              {t.name} ({t.year}º)
+          {years.map(y => (
+            <Button key={y} size="sm" variant={filterYear === y ? "default" : "outline"} onClick={() => handleYearClick(y)} className="text-xs">
+              {y}º Ano
             </Button>
           ))}
         </div>
+
+        {/* Row 1.5: Turma toggles (when year is selected) */}
+        {filterYear && turmasForYear.length > 0 && (
+          <div className="flex flex-wrap gap-2 pl-4 border-l-2 border-primary/20">
+            <Button size="sm" variant={filterTurma === "all" ? "secondary" : "ghost"} onClick={() => setFilterTurma("all")} className="text-xs">
+              Ver Todas
+            </Button>
+            {turmasForYear.map(t => (
+              <Button key={t.id} size="sm" variant={filterTurma === t.id ? "secondary" : "ghost"} onClick={() => setFilterTurma(t.id)} className="text-xs">
+                {t.name}
+              </Button>
+            ))}
+          </div>
+        )}
 
         <div className="border-t border-border" />
 
@@ -206,6 +240,9 @@ export default function CoordenadorTarefas() {
           const sStyle = statusStyle[task.status] || statusStyle.rascunho;
           const StatusIcon = sStyle.icon;
           const submissionPct = task.totalStudents > 0 ? Math.round(task.submissions / task.totalStudents * 100) : 0;
+          const notSubmitted = task.totalStudents - task.submissions;
+          const notaAtribuidaPct = task.submissions > 0 ? Math.round(task.corrected / task.submissions * 100) : 0;
+          const pendingCorrection = task.submissions - task.corrected;
 
           return (
             <div
@@ -239,6 +276,15 @@ export default function CoordenadorTarefas() {
                     <ClipboardList className="w-3.5 h-3.5" />
                     Peso: <span className="font-medium text-foreground">{task.weight}%</span>
                   </span>
+                  <span className="flex items-center gap-1.5">
+                    <MapPin className="w-3.5 h-3.5" /> Presencial
+                  </span>
+                  {task.status === "publicada" && notSubmitted > 0 && (
+                    <span className="flex items-center gap-1.5 text-destructive">
+                      <AlertCircle className="w-3.5 h-3.5" />
+                      {notSubmitted} por submeter
+                    </span>
+                  )}
                   {task.avgGrade !== null && (
                     <span className="flex items-center gap-1.5">
                       <BarChart3 className="w-3.5 h-3.5" />
@@ -255,6 +301,13 @@ export default function CoordenadorTarefas() {
                         <span className="font-semibold text-foreground">{task.submissions}/{task.totalStudents} ({submissionPct}%)</span>
                       </div>
                       <Progress value={submissionPct} className="h-1.5" />
+                    </div>
+                    <div className="space-y-1.5">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className={`flex items-center gap-1.5 ${pendingCorrection > 0 ? "text-destructive" : "text-muted-foreground"}`}><CheckCircle className="w-3.5 h-3.5" />Nota Atribuída</span>
+                        <span className={`font-semibold ${pendingCorrection > 0 ? "text-destructive" : "text-muted-foreground"}`}>{task.corrected}/{task.submissions}{pendingCorrection > 0 ? ` · ${pendingCorrection} pendente` : ""}</span>
+                      </div>
+                      <Progress value={notaAtribuidaPct} className={`h-1.5 ${pendingCorrection > 0 ? "[&>div]:bg-destructive" : ""}`} />
                     </div>
                   </div>
                 )}
