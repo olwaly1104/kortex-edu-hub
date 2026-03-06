@@ -127,19 +127,17 @@ export default function ProfessorDisciplines() {
                   </div>
 
                   {/* Turma Info - Estudantes, Sala, Dias de Aula */}
-                  <div className="flex items-center gap-4 text-xs mb-4 pb-4 border-b border-border/50">
-                    <div className="flex items-center gap-1.5">
+                  <div className="flex items-center gap-2 flex-wrap text-xs mb-4 pb-4 border-b border-border/50">
+                    <div className="flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1.5">
                       <Users className="w-3.5 h-3.5 text-primary" />
                       <span className="font-semibold text-foreground">{turma.students}</span>
                       <span className="text-muted-foreground">estudantes</span>
                     </div>
-                    <span className="text-border">·</span>
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1.5">
                       <MapPin className="w-3.5 h-3.5 text-muted-foreground" />
                       <span className="font-semibold text-foreground">{room || "—"}</span>
                     </div>
-                    <span className="text-border">·</span>
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1.5">
                       <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
                       <span className="font-semibold text-foreground">{scheduleDays || "—"}</span>
                     </div>
