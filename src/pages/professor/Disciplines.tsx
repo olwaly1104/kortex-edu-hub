@@ -125,10 +125,27 @@ export default function ProfessorDisciplines() {
                     </div>
                     <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
                   </div>
-                  <p className="text-xs text-muted-foreground mb-4">{turma.course} · {turma.year}º Ano · <span className="font-semibold text-foreground">{turma.students} estudantes</span></p>
 
                   {/* Turma Info rows */}
                   <div className="space-y-2 mb-4 pb-4 border-b border-border/50">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-muted-foreground flex items-center gap-1.5">
+                        <Users className="w-3.5 h-3.5 text-primary" /> Estudantes
+                      </span>
+                      <span className="font-semibold text-foreground">{turma.students}</span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-muted-foreground flex items-center gap-1.5">
+                        <BookOpen className="w-3.5 h-3.5 text-secondary" /> Cadeira
+                      </span>
+                      <span className="font-semibold text-foreground">{turmaDiscs.length > 0 ? turmaDiscs[0].name : "—"}</span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-muted-foreground flex items-center gap-1.5">
+                        <GraduationCap className="w-3.5 h-3.5 text-primary" /> Ano
+                      </span>
+                      <span className="font-semibold text-foreground">{turma.year}º Ano</span>
+                    </div>
                     <div className="flex items-center justify-between text-xs">
                       <span className="text-muted-foreground flex items-center gap-1.5">
                         <MapPin className="w-3.5 h-3.5 text-muted-foreground" /> Sala
