@@ -1,141 +1,236 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { coordTurmaTasks, coordTurmas } from "@/data/institutionData";
-import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Progress } from "@/components/ui/progress";
 import {
-  Award, Search, Clock, CheckCircle, Users,
-  AlertCircle, BarChart3,
+  GraduationCap, Search, Clock, CheckCircle, Users,
+  Calendar, AlertCircle, ClipboardList, ArrowRight, ArrowUpDown, X,
+  MapPin,
 } from "lucide-react";
+import {
+  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 
-const statusStyle: Record<string, { bg: string; label: string }> = {
-  rascunho: { bg: "bg-muted text-muted-foreground", label: "Rascunho" },
-  publicada: { bg: "bg-primary/10 text-primary", label: "Activa" },
-  encerrada: { bg: "bg-accent/10 text-accent", label: "Encerrada" },
+const statusStyle: Record<string, { bg: string; label: string; icon: React.ElementType }> = {
+  rascunho: { bg: "bg-muted text-muted-foreground", label: "Rascunho", icon: Clock },
+  publicada: { bg: "bg-primary/10 text-primary", label: "Activa", icon: Clock },
+  encerrada: { bg: "bg-accent/10 text-accent", label: "Encerrada", icon: CheckCircle },
 };
 
+function SummaryCard({ label, value, icon: Icon, iconBg, iconColor, valueClass }: {
+  label: string; value: string | number; icon: React.ElementType;
+  iconBg: string; iconColor: string; valueClass?: string;
+}) {
+  return (
+    <div className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4">
+      <div className="flex items-center justify-between">
+        <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">{label}</p>
+        <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${iconBg}`}>
+          <Icon className={`w-4 h-4 ${iconColor}`} />
+        </div>
+      </div>
+      <p className={`text-2xl font-bold ${valueClass || "text-foreground"}`}>{value}</p>
+    </div>
+  );
+}
+
+type StatusFilter = "todas" | "publicada" | "encerrada";
+type SortOption = "recente" | "antiga" | "nome-az" | "nome-za" | "nota-desc" | "nota-asc";
+
 export default function CoordenadorAvaliacoes() {
+  const navigate = useNavigate();
+  const [filterTurma, setFilterTurma] = useState<string>("all");
+  const [filterStatus, setFilterStatus] = useState<StatusFilter>("todas");
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterStatus, setFilterStatus] = useState<string>("todas");
-  const [filterYear, setFilterYear] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<SortOption>("recente");
 
-  const avaliacoes = coordTurmaTasks.filter(t => t.type === "exame" || t.type === "quiz");
+  const sortedTurmas = [...coordTurmas].sort((a, b) => a.year - b.year);
+  const allEvals = coordTurmaTasks.filter(t => t.type === "exame");
 
-  const activas = avaliacoes.filter(t => t.status === "publicada").length;
-  const encerradas = avaliacoes.filter(t => t.status === "encerrada").length;
-  const pendentes = avaliacoes.filter(t => t.status === "publicada" && t.submissions < t.totalStudents).length;
-  const totalConc = avaliacoes.length > 0 ? Math.round((encerradas / avaliacoes.length) * 100) : 0;
+  const scopedEvals = useMemo(() => {
+    return filterTurma === "all" ? allEvals : allEvals.filter(t => t.turmaId === filterTurma);
+  }, [filterTurma, allEvals]);
 
-  const years = [...new Set(coordTurmas.map(t => t.year))].sort();
+  const activeCount = scopedEvals.filter(t => t.status === "publicada").length;
+  const closedCount = scopedEvals.filter(t => t.status === "encerrada").length;
+  const pendentes = scopedEvals.filter(t => t.status === "publicada" && t.submissions < t.totalStudents).length;
+  const graded = scopedEvals.filter(t => t.avgGrade !== null);
+  const avgGrade = graded.length > 0 ? (graded.reduce((s, t) => s + (t.avgGrade || 0), 0) / graded.length).toFixed(1) : null;
 
-  const filtered = avaliacoes.filter(t => {
-    if (filterStatus !== "todas" && t.status !== filterStatus) return false;
-    if (filterYear !== "all") {
-      const turma = coordTurmas.find(tr => tr.id === t.turmaId);
-      if (!turma || turma.year !== parseInt(filterYear)) return false;
-    }
-    if (searchTerm && !t.title.toLowerCase().includes(searchTerm.toLowerCase()) && !t.discipline.toLowerCase().includes(searchTerm.toLowerCase())) return false;
-    return true;
-  });
+  const filtered = useMemo(() => {
+    let result = scopedEvals
+      .filter(t => t.title.toLowerCase().includes(searchTerm.toLowerCase()) || t.discipline.toLowerCase().includes(searchTerm.toLowerCase()))
+      .filter(t => filterStatus === "todas" || t.status === filterStatus);
+
+    result.sort((a, b) => {
+      switch (sortBy) {
+        case "recente": return b.dueDate.localeCompare(a.dueDate);
+        case "antiga": return a.dueDate.localeCompare(b.dueDate);
+        case "nome-az": return a.title.localeCompare(b.title);
+        case "nome-za": return b.title.localeCompare(a.title);
+        case "nota-asc": return (a.avgGrade ?? -1) - (b.avgGrade ?? -1);
+        case "nota-desc": return (b.avgGrade ?? -1) - (a.avgGrade ?? -1);
+        default: return 0;
+      }
+    });
+
+    return result;
+  }, [scopedEvals, filterStatus, searchTerm, sortBy]);
+
+  const statusToggles: { key: StatusFilter; label: string }[] = [
+    { key: "todas", label: "Todas" },
+    { key: "publicada", label: "Activa" },
+    { key: "encerrada", label: "Encerrada" },
+  ];
 
   return (
-    <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
-      <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-        <Award className="w-6 h-6 text-primary" /> Avaliações do Curso
-      </h1>
+    <div className="p-6 lg:p-8 space-y-5 animate-fade-in">
+      <div>
+        <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+          <GraduationCap className="w-6 h-6 text-secondary" /> Avaliações do Curso
+        </h1>
+        <p className="text-sm text-muted-foreground mt-1">Visão geral dos exames e testes do curso</p>
+      </div>
 
+      {/* Summary cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <div className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4">
-          <div className="flex items-center justify-between">
-            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Activas</p>
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-primary/10"><Clock className="w-4 h-4 text-primary" /></div>
-          </div>
-          <p className="text-2xl font-bold text-foreground">{activas}</p>
+        <SummaryCard label="Activas" value={activeCount} icon={Clock} iconBg="bg-primary/10" iconColor="text-primary" />
+        <SummaryCard label="Encerradas" value={closedCount} icon={CheckCircle} iconBg="bg-accent/10" iconColor="text-accent" />
+        <SummaryCard label="Pendente" value={pendentes} icon={AlertCircle} iconBg="bg-destructive/10" iconColor="text-destructive" valueClass={pendentes > 0 ? "text-destructive" : undefined} />
+        <SummaryCard label="Taxa de Conclusão" value={scopedEvals.length > 0 ? `${Math.round(closedCount / scopedEvals.length * 100)}%` : "—"} icon={ClipboardList} iconBg="bg-accent/10" iconColor="text-accent" valueClass={scopedEvals.length > 0 && Math.round(closedCount / scopedEvals.length * 100) >= 50 ? "text-accent" : "text-muted-foreground"} />
+      </div>
+
+      {/* Controls box */}
+      <div className="rounded-xl border border-border bg-card p-4 space-y-3">
+        {/* Row 1: Turma toggles */}
+        <div className="flex flex-wrap gap-2">
+          <Button size="sm" variant={filterTurma === "all" ? "default" : "outline"} onClick={() => setFilterTurma("all")} className="text-xs">
+            Todas as Turmas
+          </Button>
+          {sortedTurmas.map(t => (
+            <Button key={t.id} size="sm" variant={filterTurma === t.id ? "default" : "outline"} onClick={() => setFilterTurma(t.id)} className="text-xs">
+              {t.name} ({t.year}º)
+            </Button>
+          ))}
         </div>
-        <div className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4">
-          <div className="flex items-center justify-between">
-            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Encerradas</p>
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-accent/10"><CheckCircle className="w-4 h-4 text-accent" /></div>
+
+        <div className="border-t border-border" />
+
+        {/* Row 2: Search + Status toggles + Ordenar */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="relative flex-1 min-w-[180px] max-w-sm">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input placeholder="Pesquisar avaliação..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-9 h-9" />
           </div>
-          <p className="text-2xl font-bold text-foreground">{encerradas}</p>
-        </div>
-        <div className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4">
-          <div className="flex items-center justify-between">
-            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Pendente</p>
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-destructive/10"><AlertCircle className="w-4 h-4 text-destructive" /></div>
+          {searchTerm && (
+            <Button variant="ghost" size="sm" className="text-xs text-destructive hover:text-destructive hover:bg-destructive/10 shrink-0 gap-1" onClick={() => setSearchTerm("")}>
+              <X className="w-3 h-3" /> Limpar
+            </Button>
+          )}
+
+          <div className="flex items-center gap-2 ml-auto">
+            {statusToggles.map(s => (
+              <Button key={s.key} size="sm" variant={filterStatus === s.key ? "default" : "outline"} onClick={() => setFilterStatus(s.key)} className="text-xs">
+                {s.label}
+              </Button>
+            ))}
+
+            <div className="w-px h-6 bg-border" />
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="text-xs gap-1.5">
+                  <ArrowUpDown className="w-3.5 h-3.5" /> Ordenar
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-44">
+                {([
+                  { key: "recente", label: "Mais recente" },
+                  { key: "antiga", label: "Mais antiga" },
+                  { key: "nome-az", label: "Nome A–Z" },
+                  { key: "nome-za", label: "Nome Z–A" },
+                  { key: "nota-desc", label: "Nota ↓" },
+                  { key: "nota-asc", label: "Nota ↑" },
+                ] as { key: SortOption; label: string }[]).map(o => (
+                  <DropdownMenuItem key={o.key} onClick={() => setSortBy(o.key)} className={sortBy === o.key ? "bg-accent font-medium" : ""}>
+                    {o.label}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
-          <p className="text-2xl font-bold text-destructive">{pendentes}</p>
-        </div>
-        <div className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4">
-          <div className="flex items-center justify-between">
-            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Taxa de Conclusão</p>
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-secondary/10"><BarChart3 className="w-4 h-4 text-secondary" /></div>
-          </div>
-          <p className={`text-2xl font-bold ${totalConc >= 70 ? "text-accent" : "text-destructive"}`}>{totalConc}%</p>
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="flex items-center gap-3 flex-wrap">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-          <Input placeholder="Pesquisar avaliação..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-9" />
-        </div>
-        <div className="flex items-center gap-1.5">
-          {["todas", "publicada", "encerrada"].map(s => (
-            <button key={s} onClick={() => setFilterStatus(s)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${filterStatus === s ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}>
-              {s === "todas" ? "Todos" : s === "publicada" ? "Activas" : "Encerradas"}
-            </button>
-          ))}
-        </div>
-        <div className="flex items-center gap-1.5">
-          <button onClick={() => setFilterYear("all")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${filterYear === "all" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}>
-            Todos Anos
-          </button>
-          {years.map(y => (
-            <button key={y} onClick={() => setFilterYear(String(y))}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${filterYear === String(y) ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}>
-              {y}º Ano
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* List */}
+      {/* Evaluation list */}
       <div className="space-y-3">
+        {filtered.length === 0 && (
+          <div className="rounded-xl border border-border bg-card p-12 text-center">
+            <GraduationCap className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" />
+            <p className="text-sm font-medium text-muted-foreground">Nenhuma avaliação encontrada</p>
+          </div>
+        )}
         {filtered.map(task => {
           const turma = coordTurmas.find(t => t.id === task.turmaId);
-          const st = statusStyle[task.status] || statusStyle.rascunho;
-          const submPct = Math.round((task.submissions / task.totalStudents) * 100);
+          const sStyle = statusStyle[task.status] || statusStyle.rascunho;
+          const StatusIcon = sStyle.icon;
+          const submissionPct = task.totalStudents > 0 ? Math.round(task.submissions / task.totalStudents * 100) : 0;
+
           return (
-            <Card key={task.id} className="p-4 border-l-[3px] border-l-destructive">
-              <div className="flex items-center gap-2 mb-1">
-                <p className="text-sm font-semibold text-foreground">{task.title}</p>
-                <Badge className={`${st.bg} text-[10px]`}>{st.label}</Badge>
-                <Badge variant="outline" className="text-[10px]">{task.type === "exame" ? "Exame" : "Quiz"}</Badge>
-                {turma && <Badge variant="outline" className="text-[10px]">{turma.name} · {turma.year}º Ano</Badge>}
-              </div>
-              <p className="text-xs text-muted-foreground line-clamp-1 mb-3">{task.description}</p>
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-3">
-                <div><p className="text-[10px] text-muted-foreground uppercase">Cadeira</p><p className="text-xs font-medium text-foreground">{task.discipline}</p></div>
-                <div><p className="text-[10px] text-muted-foreground uppercase">Data</p><p className="text-xs font-medium text-foreground">{task.dueDate}</p></div>
-                <div><p className="text-[10px] text-muted-foreground uppercase">Entregas</p><p className="text-xs font-medium text-foreground">{task.submissions}/{task.totalStudents} ({submPct}%)</p></div>
-                <div><p className="text-[10px] text-muted-foreground uppercase">Média</p><p className={`text-xs font-medium ${task.avgGrade !== null ? (task.avgGrade >= 10 ? "text-accent" : "text-destructive") : "text-muted-foreground"}`}>{task.avgGrade !== null ? `${task.avgGrade}/20` : "—"}</p></div>
-              </div>
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between text-[10px]">
-                  <span className="text-muted-foreground flex items-center gap-1"><Users className="w-3 h-3" /> Submetido</span>
-                  <span className="font-medium text-foreground">{task.submissions}/{task.totalStudents}</span>
+            <div
+              key={task.id}
+              className="rounded-xl border border-border bg-card overflow-hidden cursor-pointer hover:shadow-md hover:border-primary/20 transition-all group"
+              onClick={() => navigate(`/coordenador/avaliacoes/${task.id}`)}
+            >
+              <div className="p-5">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-semibold text-foreground">{task.discipline}</span>
+                    {turma && <Badge variant="outline" className="text-[10px] px-1.5 py-0 rounded-md">{turma.name} · {turma.year}º Ano</Badge>}
+                  </div>
+                  <Badge className={`${sStyle.bg} gap-1 text-[10px] border-0`}>
+                    <StatusIcon className="w-3 h-3" />
+                    {sStyle.label}
+                  </Badge>
                 </div>
-                <Progress value={submPct} className="h-1.5" />
+
+                <h3 className="text-sm font-semibold text-foreground mb-3 group-hover:text-primary transition-colors">{task.title}</h3>
+
+                <div className="flex items-center gap-4 text-xs text-muted-foreground mb-3 flex-wrap">
+                  <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /> <span className="font-medium text-foreground">{task.dueDate}</span></span>
+                  <span className="flex items-center gap-1.5">Peso: <span className="font-medium text-foreground">{task.weight}%</span></span>
+                  <span className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5" /> Presencial</span>
+                  {task.avgGrade !== null && (
+                    <span className="flex items-center gap-1.5">
+                      Média: <span className={`font-bold ${task.avgGrade >= 10 ? "text-accent" : "text-destructive"}`}>{task.avgGrade}/20</span>
+                    </span>
+                  )}
+                </div>
+
+                {task.status !== "rascunho" && (
+                  <div className="space-y-3">
+                    <div className="space-y-1.5">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="flex items-center gap-1.5 text-muted-foreground"><Users className="w-3.5 h-3.5" />Submetido</span>
+                        <span className="font-semibold text-foreground">{task.submissions}/{task.totalStudents} ({submissionPct}%)</span>
+                      </div>
+                      <Progress value={submissionPct} className="h-1.5" />
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex items-center justify-end mt-3 pt-3 border-t border-border/50">
+                  <span className="text-[11px] text-muted-foreground/60 flex items-center gap-1 group-hover:text-primary/60 transition-colors">
+                    Ver detalhes <ArrowRight className="w-3 h-3" />
+                  </span>
+                </div>
               </div>
-            </Card>
+            </div>
           );
         })}
-        {filtered.length === 0 && <p className="text-center text-muted-foreground py-8">Nenhuma avaliação encontrada.</p>}
       </div>
     </div>
   );
