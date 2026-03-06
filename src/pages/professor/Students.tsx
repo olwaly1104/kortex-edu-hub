@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Users, Search, AlertTriangle, TrendingUp, UserCheck, ArrowUpDown, SlidersHorizontal, X } from "lucide-react";
+import { Users, Search, AlertTriangle, TrendingUp, UserCheck, ArrowUpDown, X } from "lucide-react";
 import { useState, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 
@@ -123,45 +123,43 @@ export default function ProfessorStudents() {
             </Button>
           )}
 
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline" size="sm" className={`gap-1.5 shrink-0 text-xs ${sortKey ? "border-primary/50 bg-primary/5 text-primary" : ""}`}>
-                <ArrowUpDown className="w-3.5 h-3.5" /> Ordenar
+          <div className="flex items-center gap-2">
+            {([
+              { key: "", label: "Todos" },
+              { key: "excelente" as FilterStatus, label: "Excelente" },
+              { key: "normal" as FilterStatus, label: "Normal" },
+              { key: "risco" as FilterStatus, label: "Em Risco" },
+            ]).map(s => (
+              <Button key={s.key} size="sm" variant={(!s.key && filterStatuses.length === 0) || filterStatuses.includes(s.key as FilterStatus) ? "default" : "outline"} onClick={() => { if (!s.key) setFilterStatuses([]); else toggleFilterStatus(s.key as FilterStatus); }} className="text-xs">
+                {s.label}
               </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-44 p-2 space-y-1" align="end" side="top">
-              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-2 pt-1">Campo</p>
-              {[
-                { key: null, label: "Todos" },
-                { key: "attendance" as SortKey, label: "Presença" },
-                { key: "avgGrade" as SortKey, label: "Média" },
-                { key: "submissions" as SortKey, label: "Entregas" },
-              ].map(opt => (
-                <button key={String(opt.key)} onClick={() => setSortKey(opt.key)} className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${sortKey === opt.key ? "bg-primary/10 text-primary font-medium" : "text-foreground hover:bg-muted"}`}>{opt.label}</button>
-              ))}
-              <div className="border-t border-border my-1" />
-              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-2">Direção</p>
-              <button onClick={() => setSortDir("desc")} className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${sortDir === "desc" && sortKey ? "bg-primary/10 text-primary font-medium" : "text-foreground hover:bg-muted"}`}>Maior → Menor</button>
-              <button onClick={() => setSortDir("asc")} className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${sortDir === "asc" && sortKey ? "bg-primary/10 text-primary font-medium" : "text-foreground hover:bg-muted"}`}>Menor → Maior</button>
-            </PopoverContent>
-          </Popover>
+            ))}
 
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline" size="sm" className={`gap-1.5 shrink-0 text-xs ${filterStatuses.length > 0 ? "border-primary/50 bg-primary/5 text-primary" : ""}`}>
-                <SlidersHorizontal className="w-3.5 h-3.5" /> Filtrar
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-40 p-2 space-y-0.5" align="end" side="top">
-              {([
-                { key: "excelente" as FilterStatus, label: "Excelente" },
-                { key: "normal" as FilterStatus, label: "Normal" },
-                { key: "risco" as FilterStatus, label: "Em Risco" },
-              ]).map(s => (
-                <button key={s.key} onClick={() => toggleFilterStatus(s.key)} className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${filterStatuses.includes(s.key) ? "bg-primary/10 text-primary font-medium" : "text-foreground hover:bg-muted"}`}>{s.label}</button>
-              ))}
-            </PopoverContent>
-          </Popover>
+            <div className="w-px h-6 bg-border" />
+
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="sm" className={`gap-1.5 shrink-0 text-xs ${sortKey ? "border-primary/50 bg-primary/5 text-primary" : ""}`}>
+                  <ArrowUpDown className="w-3.5 h-3.5" /> Ordenar
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-44 p-2 space-y-1" align="end" side="top">
+                <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-2 pt-1">Campo</p>
+                {[
+                  { key: null, label: "Todos" },
+                  { key: "attendance" as SortKey, label: "Presença" },
+                  { key: "avgGrade" as SortKey, label: "Média" },
+                  { key: "submissions" as SortKey, label: "Entregas" },
+                ].map(opt => (
+                  <button key={String(opt.key)} onClick={() => setSortKey(opt.key)} className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${sortKey === opt.key ? "bg-primary/10 text-primary font-medium" : "text-foreground hover:bg-muted"}`}>{opt.label}</button>
+                ))}
+                <div className="border-t border-border my-1" />
+                <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-2">Direção</p>
+                <button onClick={() => setSortDir("desc")} className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${sortDir === "desc" && sortKey ? "bg-primary/10 text-primary font-medium" : "text-foreground hover:bg-muted"}`}>Maior → Menor</button>
+                <button onClick={() => setSortDir("asc")} className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${sortDir === "asc" && sortKey ? "bg-primary/10 text-primary font-medium" : "text-foreground hover:bg-muted"}`}>Menor → Maior</button>
+              </PopoverContent>
+            </Popover>
+          </div>
         </div>
 
         {hasActiveFilters && (
