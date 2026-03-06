@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { coordEstudantes, coordCursoInfo } from "@/data/institutionData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -18,6 +19,7 @@ const statusBadge: Record<string, { label: string; cls: string }> = {
 };
 
 export default function CoordenadorEstudantes() {
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [sortField, setSortField] = useState<SortField | null>(null);
@@ -227,7 +229,7 @@ export default function CoordenadorEstudantes() {
           <tbody>{filtered.map(e => {
             const sb = statusBadge[e.status];
             return (
-              <tr key={e.id} className="border-b last:border-0 hover:bg-muted/20">
+              <tr key={e.id} className="border-b last:border-0 hover:bg-muted/20 cursor-pointer transition-colors" onClick={() => navigate(`/coordenador/estudantes/${e.id}`)}>
                 <td className="p-3 font-medium text-foreground">{e.name}</td>
                 <td className="p-3 text-muted-foreground">{e.email}</td>
                 <td className="p-3 text-center">{e.year}º</td>

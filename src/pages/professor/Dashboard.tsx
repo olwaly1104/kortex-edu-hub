@@ -218,7 +218,7 @@ export default function ProfessorDashboard() {
                           <Link key={t.id} to={`/professor/disciplines?turma=${t.id}`} className="flex-1 flex">
                             <div className="px-2.5 py-1.5 rounded-lg border border-border bg-card border-l-[3px] border-l-destructive hover:bg-muted/40 transition-colors cursor-pointer w-full flex flex-col justify-center">
                               <p className="text-[11px] font-semibold text-foreground leading-tight">{t.name}</p>
-                              <p className="text-[9px] text-muted-foreground">{t.year}º Ano • {disc?.code}</p>
+                              <p className="text-[9px] text-muted-foreground">{t.year}º Ano · {t.course}</p>
                               <div className="flex items-center justify-between mt-1 text-[9px]">
                                 <span className={`flex items-center gap-0.5 ${t.att < 80 ? "text-destructive font-medium" : "text-muted-foreground"}`}><Clock className="w-2.5 h-2.5" />{t.att}%</span>
                                 <span className={`flex items-center gap-0.5 ${t.entrega < 80 ? "text-destructive font-medium" : "text-muted-foreground"}`}><ClipboardCheck className="w-2.5 h-2.5" />{t.entrega}%</span>
@@ -304,7 +304,6 @@ export default function ProfessorDashboard() {
             </div>
             <div className="space-y-3">
               {allTurmas.map(turma => {
-                const turmaDiscs = profDisciplines.filter(d => d.turmas.some(t => t.id === turma.id));
                 const turmaStudents = profStudents.filter(s => s.turmaId === turma.id);
                 const unique = turmaStudents.filter((s, i, arr) => arr.findIndex(x => x.email === s.email) === i);
                 const avg = unique.length > 0 && unique.some(s => s.avgGrade !== null)
@@ -316,41 +315,68 @@ export default function ProfessorDashboard() {
                 const graded = unique.filter(s => s.avgGrade !== null);
                 const approved = graded.filter(s => (s.avgGrade || 0) >= 10).length;
                 const taxaAprovacao = graded.length > 0 ? Math.round((approved / graded.length) * 100) : null;
+                const entrega = unique.length > 0 ? Math.round(unique.reduce((s, st) => s + (st.submittedTasks / Math.max(st.totalTasks, 1) * 100), 0) / unique.length) : 0;
+
+                const turmaTasks = profTasks.filter(t => t.turmaId === turma.id);
+                const tarefas = turmaTasks.filter(t => t.type === "tarefa" || t.type === "quiz");
+                const avaliacoes = turmaTasks.filter(t => t.type === "exame");
+                const tarefasEncerradas = tarefas.filter(t => t.status === "encerrada").length;
+                const avaliacoesEncerradas = avaliacoes.filter(t => t.status === "encerrada").length;
 
                 return (
                   <Link key={turma.id} to={`/professor/disciplines?turma=${turma.id}`}>
-                    <Card className="p-4 hover:shadow-md transition-shadow cursor-pointer">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-primary/10 text-primary shrink-0">
-                            <GraduationCap className="w-5 h-5" />
+                    <Card className="overflow-hidden hover:shadow-lg transition-all group">
+                      <div className="p-5">
+                        <div className="flex items-start justify-between mb-1">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-primary/10 text-primary shrink-0">
+                              <GraduationCap className="w-5 h-5" />
+                            </div>
+                            <div>
+                              <p className="font-bold text-foreground">{turma.name}</p>
+                              <p className="text-[11px] text-muted-foreground">{turma.course} · {turma.year}º Ano</p>
+                            </div>
                           </div>
-                          <div>
-                            <p className="font-bold text-foreground text-sm">{turma.name}</p>
-                            <p className="text-[11px] text-muted-foreground">{turma.course} • {turma.year}º Ano</p>
+                          <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
+                        </div>
+
+                        <div className="grid grid-cols-3 gap-3 mt-4 mb-4">
+                          <div className="text-center p-2.5 rounded-lg bg-muted/50">
+                            <p className="text-lg font-bold text-foreground">{turma.students}</p>
+                            <p className="text-[10px] text-muted-foreground">Estudantes</p>
+                          </div>
+                          <div className="text-center p-2.5 rounded-lg bg-muted/50">
+                            <p className={`text-lg font-bold ${avg !== null && avg >= 10 ? "text-accent" : avg !== null ? "text-destructive" : "text-muted-foreground"}`}>{avg ?? "—"}</p>
+                            <p className="text-[10px] text-muted-foreground">Média</p>
+                          </div>
+                          <div className="text-center p-2.5 rounded-lg bg-muted/50">
+                            <p className={`text-lg font-bold ${attendance >= 75 ? "text-accent" : "text-destructive"}`}>{attendance}%</p>
+                            <p className="text-[10px] text-muted-foreground">Presença</p>
                           </div>
                         </div>
-                        <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
+
+                        <div className="space-y-2.5 pt-3 border-t border-border/50">
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="text-muted-foreground flex items-center gap-1.5"><CheckCircle className="w-3.5 h-3.5" /> Taxa Aprovação</span>
+                            <span className={`font-semibold ${taxaAprovacao !== null && taxaAprovacao >= 70 ? "text-accent" : taxaAprovacao !== null ? "text-destructive" : "text-muted-foreground"}`}>{taxaAprovacao !== null ? `${taxaAprovacao}%` : "—"}</span>
+                          </div>
+
+                          <div className="border-t border-border/40 pt-2.5 space-y-2.5">
+                            <div className="flex items-center justify-between text-xs">
+                              <span className="text-muted-foreground flex items-center gap-1.5"><ClipboardCheck className="w-3.5 h-3.5" /> Taxa de Entrega</span>
+                              <span className={`font-semibold ${entrega >= 80 ? "text-accent" : "text-destructive"}`}>{entrega}%</span>
+                            </div>
+                            <div className="flex items-center justify-between text-xs">
+                              <span className="text-muted-foreground flex items-center gap-1.5"><ClipboardCheck className="w-3.5 h-3.5" /> Tarefas</span>
+                              <span className="font-semibold text-foreground">{tarefasEncerradas}/{tarefas.length}</span>
+                            </div>
+                            <div className="flex items-center justify-between text-xs">
+                              <span className="text-muted-foreground flex items-center gap-1.5"><BarChart3 className="w-3.5 h-3.5" /> Avaliações</span>
+                              <span className="font-semibold text-foreground">{avaliacoesEncerradas}/{avaliacoes.length}</span>
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                      <div className="grid grid-cols-4 gap-2">
-                        <div className="text-center p-2 rounded-lg bg-muted/40">
-                          <p className="text-sm font-bold text-foreground">{turma.students}</p>
-                          <p className="text-[9px] text-muted-foreground">Estudantes</p>
-                        </div>
-                        <div className="text-center p-2 rounded-lg bg-muted/40">
-                          <p className={`text-sm font-bold ${avg !== null && avg >= 10 ? "text-accent" : avg !== null ? "text-destructive" : "text-muted-foreground"}`}>{avg ?? "—"}</p>
-                          <p className="text-[9px] text-muted-foreground">Média</p>
-                        </div>
-                        <div className="text-center p-2 rounded-lg bg-muted/40">
-                          <p className={`text-sm font-bold ${attendance >= 75 ? "text-accent" : "text-destructive"}`}>{attendance}%</p>
-                          <p className="text-[9px] text-muted-foreground">Presença</p>
-                        </div>
-                        <div className="text-center p-2 rounded-lg bg-muted/40">
-                          <p className={`text-sm font-bold ${taxaAprovacao !== null && taxaAprovacao >= 70 ? "text-accent" : taxaAprovacao !== null ? "text-destructive" : "text-muted-foreground"}`}>{taxaAprovacao !== null ? `${taxaAprovacao}%` : "—"}</p>
-                          <p className="text-[9px] text-muted-foreground">Aprovação</p>
-                        </div>
-                      </div>
-                      <p className="text-[10px] text-muted-foreground mt-2">{turmaDiscs.map(d => d.code).join(" • ")}</p>
                     </Card>
                   </Link>
                 );
