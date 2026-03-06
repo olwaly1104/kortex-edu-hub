@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { coordDocentes } from "@/data/institutionData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -11,6 +12,7 @@ type SortField = "presenca" | "taxaEntrega" | "mediaGeral";
 type SortDir = "asc" | "desc";
 
 export default function CoordenadorDocentes() {
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [sortField, setSortField] = useState<SortField | null>(null);
   const [sortDir, setSortDir] = useState<SortDir>("desc");
@@ -222,7 +224,7 @@ export default function CoordenadorDocentes() {
                 ? "bg-destructive/15 text-destructive border-destructive/30"
                 : "bg-muted text-muted-foreground border-border";
             return (
-              <tr key={d.id} className="border-b last:border-0 hover:bg-muted/20">
+              <tr key={d.id} className="border-b last:border-0 hover:bg-muted/20 cursor-pointer" onClick={() => navigate(`/coordenador/docentes/${d.id}`)}>
                 <td className="p-3"><p className="font-medium text-foreground">{d.name}</p><p className="text-[11px] text-muted-foreground">{d.email}</p></td>
                 <td className="p-3 text-center font-medium text-foreground">{d.estudantesTotal}</td>
                 <td className="p-3 text-center">{d.disciplinas}</td>

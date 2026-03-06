@@ -138,17 +138,20 @@ export default function CoordenadorAnoDetail() {
                           <span className="text-muted-foreground flex items-center gap-1.5"><TrendingUp className="w-3.5 h-3.5" /> Taxa Aprovação</span>
                           <span className={`font-semibold ${t.taxaSucesso >= 70 ? "text-accent" : "text-destructive"}`}>{t.taxaSucesso}%</span>
                         </div>
-                        <div className="flex items-center justify-between text-xs">
-                          <span className="text-muted-foreground flex items-center gap-1.5"><ClipboardList className="w-3.5 h-3.5" /> Taxa de Entrega</span>
-                          <span className={`font-semibold ${t.taxaEntrega >= 80 ? "text-accent" : "text-destructive"}`}>{t.taxaEntrega}%</span>
-                        </div>
-                        <div className="flex items-center justify-between text-xs">
-                          <span className="text-muted-foreground flex items-center gap-1.5"><ClipboardList className="w-3.5 h-3.5" /> Tarefas</span>
-                          <span className="font-semibold text-foreground">{Math.round(turmaLessons.length * 0.7)}/{turmaLessons.length}</span>
-                        </div>
-                        <div className="flex items-center justify-between text-xs">
-                          <span className="text-muted-foreground flex items-center gap-1.5"><Award className="w-3.5 h-3.5" /> Avaliações</span>
-                          <span className="font-semibold text-foreground">{Math.round(t.disciplinas * 0.8)}/{t.disciplinas}</span>
+
+                        <div className="border-t border-border/40 pt-2.5 space-y-2.5">
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="text-muted-foreground flex items-center gap-1.5"><ClipboardList className="w-3.5 h-3.5" /> Taxa de Entrega</span>
+                            <span className={`font-semibold ${t.taxaEntrega >= 80 ? "text-accent" : "text-destructive"}`}>{t.taxaEntrega}%</span>
+                          </div>
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="text-muted-foreground flex items-center gap-1.5"><ClipboardList className="w-3.5 h-3.5" /> Tarefas</span>
+                            <span className="font-semibold text-foreground">{Math.round(turmaLessons.length * 0.7)}/{turmaLessons.length}</span>
+                          </div>
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="text-muted-foreground flex items-center gap-1.5"><Award className="w-3.5 h-3.5" /> Avaliações</span>
+                            <span className="font-semibold text-foreground">{Math.round(t.disciplinas * 0.8)}/{t.disciplinas}</span>
+                          </div>
                         </div>
 
                         <div className="border-t border-border/40 pt-2.5 space-y-2.5">
