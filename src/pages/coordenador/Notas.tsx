@@ -139,6 +139,10 @@ export default function CoordenadorNotas() {
                             <p className={`text-xs font-bold ${getTurmaAprovacao(t) >= 70 ? "text-accent" : getTurmaAprovacao(t) >= 50 ? "text-foreground" : "text-destructive"}`}>{getTurmaAprovacao(t)}%</p>
                           </div>
                           <div className="text-right">
+                            <p className="text-[9px] text-muted-foreground uppercase leading-tight">Reprov.</p>
+                            <p className={`text-xs font-bold ${(100 - getTurmaAprovacao(t)) > 30 ? "text-destructive" : "text-foreground"}`}>{100 - getTurmaAprovacao(t)}%</p>
+                          </div>
+                          <div className="text-right">
                             <p className="text-[9px] text-muted-foreground uppercase leading-tight">Aval.</p>
                             <p className="text-xs font-bold text-foreground">{t.avaliacoesCompletas}/{t.avaliacoesTotal}</p>
                           </div>

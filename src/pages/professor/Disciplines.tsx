@@ -117,6 +117,9 @@ export default function ProfessorDisciplines() {
                           <BookOpen className="w-3 h-3" /> {turmaDiscs[0].name}
                         </Badge>
                       )}
+                      <Badge className={`text-[10px] border ${turmaAprovPct >= 85 ? "bg-accent/10 text-accent border-accent/30" : turmaAprovPct < 60 || avgAttendance < 75 ? "bg-destructive/10 text-destructive border-destructive/30" : "bg-primary/10 text-primary border-primary/30"}`}>
+                        {turmaAprovPct >= 85 ? "Excelente" : turmaAprovPct < 60 || avgAttendance < 75 ? "Em Risco" : "Normal"}
+                      </Badge>
                     </div>
                     <p className="text-xs text-muted-foreground mt-0.5">{turma.course} · {turma.year}º Ano</p>
                     <div className="flex items-center gap-3 mt-1.5 text-xs text-muted-foreground">
@@ -164,8 +167,10 @@ export default function ProfessorDisciplines() {
                 {/* Details */}
                 <div className="space-y-2.5 pt-3 border-t border-border/50">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="text-muted-foreground flex items-center gap-1.5"><CheckCircle className="w-3.5 h-3.5" /> Taxa Aprovado</span>
-                    <span className="font-semibold text-foreground">{turmaAprov}/{turmaGraded.length}</span>
+                    <span className="text-muted-foreground flex items-center gap-1.5"><UserCheck className="w-3.5 h-3.5" /> Taxa de Entrega</span>
+                    <span className={`font-semibold ${(() => { const totalSub = turmaTasks.reduce((s, t) => s + t.submissions, 0); const totalStu = turmaTasks.reduce((s, t) => s + t.totalStudents, 0); return totalStu > 0 ? Math.round((totalSub / totalStu) * 100) : 0; })() >= 80 ? "text-accent" : "text-destructive"}`}>
+                      {(() => { const totalSub = turmaTasks.reduce((s, t) => s + t.submissions, 0); const totalStu = turmaTasks.reduce((s, t) => s + t.totalStudents, 0); return totalStu > 0 ? Math.round((totalSub / totalStu) * 100) : 0; })()}%
+                    </span>
                   </div>
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-muted-foreground flex items-center gap-1.5"><ClipboardList className="w-3.5 h-3.5" /> Tarefas</span>
@@ -175,18 +180,19 @@ export default function ProfessorDisciplines() {
                     <span className="text-muted-foreground flex items-center gap-1.5"><AlertCircle className="w-3.5 h-3.5" /> Avaliações</span>
                     <span className="font-semibold text-foreground">{turmaTasks.filter(t => t.type === "exame").filter(t => t.status === "encerrada").length}/{turmaTasks.filter(t => t.type === "exame").length}</span>
                   </div>
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-muted-foreground flex items-center gap-1.5"><UserCheck className="w-3.5 h-3.5" /> Taxa Entrega</span>
-                    <span className={`font-semibold ${turmaConclusaoPct >= 80 ? "text-accent" : turmaConclusaoPct >= 50 ? "text-foreground" : "text-destructive"}`}>
-                      {(() => { const totalSub = turmaTasks.reduce((s, t) => s + t.submissions, 0); const totalStu = turmaTasks.reduce((s, t) => s + t.totalStudents, 0); return totalStu > 0 ? Math.round((totalSub / totalStu) * 100) : 0; })()}%
-                    </span>
-                  </div>
-                  <div>
-                    <div className="flex justify-between text-xs mb-1">
-                      <span className="text-muted-foreground flex items-center gap-1.5"><Video className="w-3.5 h-3.5" /> Aulas Gravadas</span>
-                      <span className="font-semibold text-foreground">{turmaPublished}/{turmaLessons.length}</span>
+
+                  <div className="border-t border-border/40 pt-2.5 space-y-2.5">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-muted-foreground flex items-center gap-1.5"><FileText className="w-3.5 h-3.5" /> Conteúdos</span>
+                      <span className="font-semibold text-foreground">{totalContents}</span>
                     </div>
-                    <Progress value={lessonPct} className="h-1.5" />
+                    <div>
+                      <div className="flex justify-between text-xs mb-1">
+                        <span className="text-muted-foreground flex items-center gap-1.5"><Video className="w-3.5 h-3.5" /> Aulas Gravadas</span>
+                        <span className="font-semibold text-foreground">{turmaPublished}/{turmaLessons.length}</span>
+                      </div>
+                      <Progress value={lessonPct} className="h-1.5" />
+                    </div>
                   </div>
                 </div>
               </div>

@@ -1,7 +1,7 @@
 import { coordCursoInfo, coordTurmas, coordDisciplinas } from "@/data/institutionData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Layers, Users, BookOpen, Award, ChevronRight, CheckCircle, UserCheck, GraduationCap, ClipboardList, TrendingUp } from "lucide-react";
+import { Layers, Users, BookOpen, Award, ChevronRight, CheckCircle, UserCheck, GraduationCap, ClipboardList, TrendingUp, AlertTriangle } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export default function CoordenadorAnos() {
@@ -142,6 +142,10 @@ export default function CoordenadorAnos() {
                     <div className="flex items-center justify-between px-1">
                       <span className="text-xs text-muted-foreground flex items-center gap-1.5"><TrendingUp className="w-3.5 h-3.5" /> Taxa Aprovado</span>
                       <span className={`text-sm font-semibold tabular-nums ${y.taxaSucesso >= 70 ? "text-accent" : "text-destructive"}`}>{y.taxaSucesso}%</span>
+                    </div>
+                    <div className="flex items-center justify-between px-1">
+                      <span className="text-xs text-muted-foreground flex items-center gap-1.5"><AlertTriangle className="w-3.5 h-3.5" /> Taxa Reprovado</span>
+                      <span className={`text-sm font-semibold tabular-nums ${(100 - y.taxaSucesso) > 30 ? "text-destructive" : "text-foreground"}`}>{100 - y.taxaSucesso}%</span>
                     </div>
                   </div>
                 </div>

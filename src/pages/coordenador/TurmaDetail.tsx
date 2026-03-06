@@ -106,10 +106,13 @@ export default function CoordenadorTurmaDetail() {
               <Badge variant="outline" className="text-[10px]">{turma.name}</Badge>
             </div>
             <h1 className="text-2xl lg:text-3xl font-bold text-foreground">{coordCursoInfo.name} — {turma.name}</h1>
-            <p className="text-muted-foreground mt-2 leading-relaxed max-w-2xl">Professor: {turma.director}</p>
-            <div className="flex items-center gap-4 mt-3 text-sm text-muted-foreground">
+            <p className="text-muted-foreground mt-2 leading-relaxed max-w-2xl">Director: {turma.director}</p>
+            <div className="flex items-center gap-4 mt-3 text-sm text-muted-foreground flex-wrap">
               <span className="flex items-center gap-1.5"><GraduationCap className="w-4 h-4" />{coordCursoInfo.faculty}</span>
               <span className="flex items-center gap-1.5"><Calendar className="w-4 h-4" />{yearNum}º Ano</span>
+              {turmaCadeiras.length > 0 && (
+                <span className="flex items-center gap-1.5"><Clock className="w-4 h-4" />{turmaCadeiras[0].diasAula}</span>
+              )}
             </div>
           </div>
         </div>

@@ -333,14 +333,14 @@ export const profStudents: ProfStudent[] = [
   { id: "ps12", name: "Inês Rodrigues", email: "3099@upra.kor", turma: "2º Ano Informática", turmaId: "t1", disciplineId: "pd1", attendance: 93, avgGrade: 16.0, submittedTasks: 4, totalTasks: 4, lastActive: "Hoje", status: "excelente" },
 
   // Matemática II - t3 (2º Ano Eng. Civil)
-  { id: "ps20", name: "André Lopes", email: "4001@upra.kor", turma: "2º Ano Eng. Civil", turmaId: "t3", disciplineId: "pd1", attendance: 85, avgGrade: 13.0, submittedTasks: 3, totalTasks: 4, lastActive: "Hoje", status: "normal" },
+  { id: "ps20", name: "André Lopes", email: "4001@upra.kor", turma: "2º Ano Eng. Civil", turmaId: "t3", disciplineId: "pd1", attendance: 78, avgGrade: 13.0, submittedTasks: 3, totalTasks: 4, lastActive: "Hoje", status: "normal" },
   { id: "ps21", name: "Luísa Fernandes", email: "4002@upra.kor", turma: "2º Ano Eng. Civil", turmaId: "t3", disciplineId: "pd1", attendance: 91, avgGrade: 15.5, submittedTasks: 4, totalTasks: 4, lastActive: "Hoje", status: "excelente" },
-  { id: "ps22", name: "Rui Baptista", email: "4003@upra.kor", turma: "2º Ano Eng. Civil", turmaId: "t3", disciplineId: "pd1", attendance: 60, avgGrade: 7.5, submittedTasks: 1, totalTasks: 4, lastActive: "5 dias", status: "risco" },
-  { id: "ps23", name: "Helena Costa", email: "4004@upra.kor", turma: "2º Ano Eng. Civil", turmaId: "t3", disciplineId: "pd1", attendance: 88, avgGrade: 14.2, submittedTasks: 4, totalTasks: 4, lastActive: "Ontem", status: "normal" },
-  { id: "ps24", name: "Marcos Almeida", email: "4005@upra.kor", turma: "2º Ano Eng. Civil", turmaId: "t3", disciplineId: "pd1", attendance: 70, avgGrade: 9.0, submittedTasks: 2, totalTasks: 4, lastActive: "3 dias", status: "risco" },
+  { id: "ps22", name: "Rui Baptista", email: "4003@upra.kor", turma: "2º Ano Eng. Civil", turmaId: "t3", disciplineId: "pd1", attendance: 55, avgGrade: 7.5, submittedTasks: 1, totalTasks: 4, lastActive: "5 dias", status: "risco" },
+  { id: "ps23", name: "Helena Costa", email: "4004@upra.kor", turma: "2º Ano Eng. Civil", turmaId: "t3", disciplineId: "pd1", attendance: 82, avgGrade: 14.2, submittedTasks: 4, totalTasks: 4, lastActive: "Ontem", status: "normal" },
+  { id: "ps24", name: "Marcos Almeida", email: "4005@upra.kor", turma: "2º Ano Eng. Civil", turmaId: "t3", disciplineId: "pd1", attendance: 62, avgGrade: 9.0, submittedTasks: 2, totalTasks: 4, lastActive: "3 dias", status: "risco" },
   { id: "ps25", name: "Patrícia Sousa", email: "4006@upra.kor", turma: "2º Ano Eng. Civil", turmaId: "t3", disciplineId: "pd1", attendance: 94, avgGrade: 17.0, submittedTasks: 4, totalTasks: 4, lastActive: "Hoje", status: "excelente" },
-  { id: "ps26", name: "Fábio Nunes", email: "4007@upra.kor", turma: "2º Ano Eng. Civil", turmaId: "t3", disciplineId: "pd1", attendance: 76, avgGrade: 11.8, submittedTasks: 3, totalTasks: 4, lastActive: "Ontem", status: "normal" },
-  { id: "ps27", name: "Sara Vieira", email: "4008@upra.kor", turma: "2º Ano Eng. Civil", turmaId: "t3", disciplineId: "pd1", attendance: 83, avgGrade: 12.5, submittedTasks: 3, totalTasks: 4, lastActive: "Ontem", status: "normal" },
+  { id: "ps26", name: "Fábio Nunes", email: "4007@upra.kor", turma: "2º Ano Eng. Civil", turmaId: "t3", disciplineId: "pd1", attendance: 70, avgGrade: 11.8, submittedTasks: 3, totalTasks: 4, lastActive: "Ontem", status: "normal" },
+  { id: "ps27", name: "Sara Vieira", email: "4008@upra.kor", turma: "2º Ano Eng. Civil", turmaId: "t3", disciplineId: "pd1", attendance: 72, avgGrade: 10.5, submittedTasks: 3, totalTasks: 4, lastActive: "Ontem", status: "normal" },
 
   // Matemática I - t2 (1º Ano Informática)
   { id: "ps30", name: "Beatriz Monteiro", email: "5001@upra.kor", turma: "1º Ano Informática", turmaId: "t2", disciplineId: "pd2", attendance: 96, avgGrade: 18.0, submittedTasks: 3, totalTasks: 3, lastActive: "Hoje", status: "excelente" },
