@@ -97,10 +97,9 @@ export default function CoordenadorCursoDashboard() {
               Coordenador de Curso — {info.name} • {info.faculty}
             </p>
           </div>
-          <div className="hidden md:flex items-center gap-2">
-            <Badge variant="outline" className="text-xs">{info.code}</Badge>
-            <Badge className="bg-accent text-accent-foreground text-xs">{info.years.length} Anos</Badge>
-          </div>
+          <Link to="/coordenador/curso" className="text-sm text-primary hover:underline flex items-center gap-1">
+            Ver Detalhes <ChevronRight className="w-4 h-4" />
+          </Link>
         </div>
       </Card>
 
