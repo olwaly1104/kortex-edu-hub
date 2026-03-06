@@ -114,7 +114,7 @@ export default function ProfessorGrades() {
                 </div>
                 {turmaAvg !== null && (
                   <div className="text-right px-4 py-2 rounded-xl border border-border bg-card">
-                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Média</p>
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Média Geral</p>
                     <p className={`text-xl font-bold ${turmaAvg >= 10 ? "text-accent" : "text-destructive"}`}>{turmaAvg}</p>
                   </div>
                 )}

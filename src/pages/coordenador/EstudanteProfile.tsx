@@ -61,8 +61,7 @@ export default function CoordenadorEstudanteProfile() {
         </div>
       </div>
 
-      {/* Stats cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
         <Card className="p-4">
           <div className="flex items-center justify-between mb-2">
             <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Presença</p>
@@ -72,7 +71,7 @@ export default function CoordenadorEstudanteProfile() {
         </Card>
         <Card className="p-4">
           <div className="flex items-center justify-between mb-2">
-            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Média</p>
+            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Média Geral</p>
             <div className="w-7 h-7 rounded-lg bg-accent/10 flex items-center justify-center"><Award className="w-3.5 h-3.5 text-accent" /></div>
           </div>
           <p className={`text-2xl font-bold ${student.media !== null && student.media >= 10 ? "text-accent" : "text-destructive"}`}>{student.media ?? "—"}/20</p>
@@ -83,6 +82,13 @@ export default function CoordenadorEstudanteProfile() {
             <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center"><ClipboardList className="w-3.5 h-3.5 text-primary" /></div>
           </div>
           <p className={`text-2xl font-bold ${student.taxaEntrega >= 80 ? "text-accent" : "text-destructive"}`}>{student.taxaEntrega}%</p>
+        </Card>
+        <Card className="p-4">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Cadeiras</p>
+            <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center"><BookOpen className="w-3.5 h-3.5 text-primary" /></div>
+          </div>
+          <p className="text-2xl font-bold text-foreground">{yearDiscs.length}</p>
         </Card>
         <Card className="p-4">
           <div className="flex items-center justify-between mb-2">
@@ -115,7 +121,7 @@ export default function CoordenadorEstudanteProfile() {
                 </div>
                 <div className="text-center">
                   <p className={`font-semibold ${disc.media !== null && disc.media >= 10 ? "text-accent" : "text-destructive"}`}>{disc.media ?? "—"}</p>
-                  <p className="text-[10px] text-muted-foreground">Média</p>
+                  <p className="text-[10px] text-muted-foreground">Média Geral</p>
                 </div>
                 <div className="text-center">
                   <p className={`font-semibold ${disc.taxaAprovacao >= 70 ? "text-accent" : "text-destructive"}`}>{disc.taxaAprovacao}%</p>

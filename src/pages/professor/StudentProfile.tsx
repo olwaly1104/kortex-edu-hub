@@ -69,7 +69,7 @@ export default function ProfessorStudentProfile() {
         </Card>
         <Card className="p-4">
           <div className="flex items-center justify-between mb-2">
-            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Média</p>
+            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Média Geral</p>
             <div className="w-7 h-7 rounded-lg bg-accent/10 flex items-center justify-center"><BarChart3 className="w-3.5 h-3.5 text-accent" /></div>
           </div>
           <p className={`text-2xl font-bold ${student.avgGrade >= 10 ? "text-accent" : "text-destructive"}`}>{student.avgGrade}/20</p>

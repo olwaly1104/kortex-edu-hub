@@ -1,9 +1,10 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { coordNotas, coordCursoInfo } from "@/data/institutionData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Award, ChevronRight, Calendar, Clock, MapPin, User, CheckCircle } from "lucide-react";
+import { Award, ChevronRight, Calendar, Clock, MapPin, User, CheckCircle, ArrowLeft } from "lucide-react";
 
 export default function CoordenadorNotas() {
   const [selectedTurma, setSelectedTurma] = useState<string | null>(null);
@@ -40,6 +41,12 @@ export default function CoordenadorNotas() {
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
+      {selectedTurma && (
+        <Link to="/coordenador/notas" onClick={(e) => { e.preventDefault(); setSelectedTurma(null); }} className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+          <ArrowLeft className="w-4 h-4" /> Voltar às Turmas
+        </Link>
+      )}
+
       <div>
         <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
           <Award className="w-6 h-6 text-primary" /> Notas do Curso
@@ -92,12 +99,8 @@ export default function CoordenadorNotas() {
         </Card>
       </div>
 
-      {/* Back button when turma selected */}
-      {selectedTurma && (
-        <Button variant="outline" size="sm" onClick={() => setSelectedTurma(null)} className="text-xs gap-1">
-          ← Voltar às Turmas
-        </Button>
-      )}
+
+
 
       {/* Years grid — 3 per row */}
       {!selectedTurma && (
@@ -131,7 +134,7 @@ export default function CoordenadorNotas() {
                         </div>
                         <div className="flex items-center gap-3 shrink-0">
                           <div className="text-right">
-                            <p className="text-[9px] text-muted-foreground uppercase leading-tight">Média</p>
+                            <p className="text-[9px] text-muted-foreground uppercase leading-tight">Média Geral</p>
                             <p className={`text-xs font-bold ${t.mediaGeral >= 10 ? "text-accent" : "text-destructive"}`}>{t.mediaGeral}</p>
                           </div>
                           <div className="text-right">
@@ -164,8 +167,8 @@ export default function CoordenadorNotas() {
           <div className="flex items-center gap-2">
             <h2 className="text-lg font-semibold text-foreground">Turma {selectedData.turma}</h2>
             <Badge variant="outline" className="text-[10px]">{selectedData.year}º Ano</Badge>
-            <Badge variant={selectedData.mediaGeral >= 10 ? "default" : "destructive"} className="text-[10px]">
-              Média {selectedData.mediaGeral}/20
+             <Badge variant={selectedData.mediaGeral >= 10 ? "default" : "destructive"} className="text-[10px]">
+               Média Geral {selectedData.mediaGeral}/20
             </Badge>
           </div>
 
@@ -191,7 +194,7 @@ export default function CoordenadorNotas() {
                     </div>
                     <div className="grid grid-cols-6 gap-3 shrink-0 text-center">
                       <div>
-                        <p className="text-[10px] text-muted-foreground uppercase">Média</p>
+                        <p className="text-[10px] text-muted-foreground uppercase">Média Geral</p>
                         <p className={`text-xs font-bold ${a.media >= 10 ? "text-accent" : "text-destructive"}`}>{a.media}/20</p>
                       </div>
                       <div>
