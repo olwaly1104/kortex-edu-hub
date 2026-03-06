@@ -173,67 +173,35 @@ export default function CoordenadorDocenteProfile() {
             </div>
             <p className={`text-sm font-semibold ${docente.taxaEntrega >= 80 ? "text-accent" : "text-destructive"}`}>{docente.taxaEntrega}%</p>
           </div>
-        </div>
-      </Card>
-
-      {/* Turmas */}
-      <Card className="overflow-hidden">
-        <div className="p-4 border-b bg-muted/30">
-          <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
-            <GraduationCap className="w-4 h-4" /> Turmas
-          </h3>
-        </div>
-        <div className="divide-y divide-border">
-          {docenteDisciplinas.length > 0 ? docenteDisciplinas.map(disc => {
-            const estadoDisc = disc.taxaAprovacao >= 85 ? "excelente" : disc.taxaAprovacao < 70 ? "risco" : "normal";
-            const estadoStyle = estadoDisc === "excelente"
-              ? "bg-accent/15 text-accent border-accent/30"
-              : estadoDisc === "risco"
-                ? "bg-destructive/15 text-destructive border-destructive/30"
-                : "bg-muted text-muted-foreground border-border";
-            return (
-              <div key={disc.id} className="px-5 py-3.5 flex items-center gap-3 hover:bg-muted/20 transition-colors">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <p className="text-sm font-medium text-foreground">Turma — {disc.year}º Ano</p>
-                    <Badge variant="outline" className="text-[10px]">{disc.name}</Badge>
-                  </div>
-                  <p className="text-[11px] text-muted-foreground mt-0.5">{disc.estudantes} estudantes · {disc.diasAula} · {disc.location}</p>
-                </div>
-                <div className="flex items-center gap-3 text-xs shrink-0">
-                  <div className="text-center">
-                    <p className={`font-semibold ${disc.presenca >= 75 ? "text-accent" : "text-destructive"}`}>{disc.presenca}%</p>
-                    <p className="text-[10px] text-muted-foreground">Presença</p>
-                  </div>
-                  <div className="text-center">
-                    <p className={`font-semibold ${disc.media >= 10 ? "text-accent" : "text-destructive"}`}>{disc.media}</p>
-                    <p className="text-[10px] text-muted-foreground">Média</p>
-                  </div>
-                  <div className="text-center">
-                    <p className={`font-semibold ${disc.taxaAprovacao >= 70 ? "text-accent" : "text-destructive"}`}>{disc.taxaAprovacao}%</p>
-                    <p className="text-[10px] text-muted-foreground">Aprovação</p>
-                  </div>
-                  <Badge variant="outline" className={`${estadoStyle} text-[10px]`}>
-                    {estadoDisc === "excelente" ? "Excelente" : estadoDisc === "risco" ? "Em Risco" : "Normal"}
-                  </Badge>
-                </div>
+          <div className="flex items-center justify-between px-5 py-3.5">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center">
+                <CheckCircle className="w-4 h-4 text-accent" />
               </div>
-            );
-          }) : (
-            <div className="px-5 py-8 text-center text-muted-foreground text-sm">Nenhuma turma associada.</div>
-          )}
+              <p className="text-sm text-muted-foreground">Taxa de Conclusão</p>
+            </div>
+            <p className="text-sm font-semibold text-accent">88%</p>
+          </div>
+          <div className="flex items-center justify-between px-5 py-3.5">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center">
+                <Award className="w-4 h-4 text-accent" />
+              </div>
+              <p className="text-sm text-muted-foreground">Taxa Aprovado</p>
+            </div>
+            <p className="text-sm font-semibold text-accent">82%</p>
+          </div>
+          <div className="flex items-center justify-between px-5 py-3.5">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-destructive/10 flex items-center justify-center">
+                <TrendingUp className="w-4 h-4 text-destructive" />
+              </div>
+              <p className="text-sm text-muted-foreground">Taxa Reprovado</p>
+            </div>
+            <p className="text-sm font-semibold text-destructive">18%</p>
+          </div>
         </div>
       </Card>
-
-      {/* Actions */}
-      <div className="flex items-center gap-2">
-        <Button size="sm" variant="outline" className="gap-1.5 text-xs">
-          <MessageCircle className="w-3.5 h-3.5" /> Enviar Mensagem
-        </Button>
-        <Button size="sm" variant="outline" className="gap-1.5 text-xs">
-          <Mail className="w-3.5 h-3.5" /> Enviar Email
-        </Button>
-      </div>
     </div>
   );
 }
