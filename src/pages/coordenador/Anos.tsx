@@ -1,7 +1,10 @@
-import { coordCursoInfo, coordTurmas, coordDisciplinas } from "@/data/institutionData";
+import { coordCursoInfo, coordTurmas, coordDisciplinas, coordEstudantes, coordTurmaLessons } from "@/data/institutionData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Layers, Users, BookOpen, Award, ChevronRight, CheckCircle, UserCheck, GraduationCap, ClipboardList, TrendingUp, AlertTriangle } from "lucide-react";
+import {
+  Layers, Users, BookOpen, Award, ChevronRight, UserCheck, GraduationCap,
+  ClipboardList, TrendingUp, XCircle, Clock, CheckCircle, FileText, Video,
+} from "lucide-react";
 import { Link } from "react-router-dom";
 
 export default function CoordenadorAnos() {
@@ -35,8 +38,8 @@ export default function CoordenadorAnos() {
         </Card>
         <Card className="p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-              <GraduationCap className="w-5 h-5 text-primary" />
+            <div className="w-10 h-10 rounded-xl bg-secondary/10 flex items-center justify-center">
+              <GraduationCap className="w-5 h-5 text-secondary" />
             </div>
             <div>
               <p className="text-2xl font-bold text-foreground">{totalTurmas}</p>
@@ -46,8 +49,8 @@ export default function CoordenadorAnos() {
         </Card>
         <Card className="p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-              <UserCheck className="w-5 h-5 text-primary" />
+            <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center">
+              <UserCheck className="w-5 h-5 text-accent" />
             </div>
             <div>
               <p className="text-2xl font-bold text-foreground">{totalProfessores}</p>
@@ -79,8 +82,23 @@ export default function CoordenadorAnos() {
             ? Math.round(turmas.reduce((s, t) => s + t.taxaEntrega, 0) / turmas.length)
             : 0;
           const yearProfessores = new Set(coordDisciplinas.filter(d => d.year === y.year).map(d => d.professor)).size;
+          const taxaReprovado = 100 - y.taxaSucesso;
 
-          // Compute estado
+          // Avaliações from students
+          const yearStudents = coordEstudantes.filter(e => e.year === y.year);
+          const totalAvaliacoes = yearStudents.length > 0 ? yearStudents[0].avaliacoesTotal : 0;
+          const avgAvalFeitas = yearStudents.length > 0
+            ? Math.round(yearStudents.reduce((s, e) => s + e.avaliacoesFeitas, 0) / yearStudents.length)
+            : 0;
+
+          // Lessons / content
+          const yearTurmaIds = turmas.map(t => t.id);
+          const yearLessons = coordTurmaLessons.filter(l => yearTurmaIds.includes(l.turmaId));
+          const publishedLessons = yearLessons.filter(l => l.status === "publicada");
+          const totalMaterials = yearLessons.reduce((s, l) => s + l.materials.length, 0);
+          const recordedLessons = Math.round(publishedLessons.length * 0.6); // simulated
+
+          // Estado
           const estado = avgPresenca < 75 || y.mediaGeral < 11 || y.taxaSucesso < 70
             ? "risco" : avgPresenca >= 85 && y.mediaGeral >= 13 && y.taxaSucesso >= 85
             ? "excelente" : "normal";
@@ -125,27 +143,67 @@ export default function CoordenadorAnos() {
                     </div>
                   </div>
 
-                  {/* Bottom metrics */}
+                  {/* Section 1: Presença */}
                   <div className="space-y-2 pt-3 border-t border-border/50">
                     <div className="flex items-center justify-between px-1">
-                      <span className="text-xs text-muted-foreground flex items-center gap-1.5"><CheckCircle className="w-3.5 h-3.5" /> Presença</span>
+                      <span className="text-xs text-muted-foreground flex items-center gap-1.5">
+                        <Clock className="w-3.5 h-3.5 text-secondary" /> Presença
+                      </span>
                       <span className={`text-sm font-semibold tabular-nums ${avgPresenca >= 75 ? "text-accent" : "text-destructive"}`}>{avgPresenca}%</span>
                     </div>
+                  </div>
+
+                  {/* Section 2: Performance */}
+                  <div className="space-y-2 pt-3 mt-3 border-t border-border/50">
                     <div className="flex items-center justify-between px-1">
-                      <span className="text-xs text-muted-foreground flex items-center gap-1.5"><ClipboardList className="w-3.5 h-3.5" /> Taxa de Entrega</span>
-                      <span className={`text-sm font-semibold tabular-nums ${avgTaxaEntrega >= 80 ? "text-accent" : "text-destructive"}`}>{avgTaxaEntrega}%</span>
+                      <span className="text-xs text-muted-foreground flex items-center gap-1.5">
+                        <Award className="w-3.5 h-3.5 text-primary" /> Média Geral
+                      </span>
+                      <span className={`text-sm font-semibold tabular-nums ${y.mediaGeral >= 10 ? "text-accent" : "text-destructive"}`}>{y.mediaGeral}/20</span>
                     </div>
                     <div className="flex items-center justify-between px-1">
-                      <span className="text-xs text-muted-foreground flex items-center gap-1.5"><Award className="w-3.5 h-3.5" /> Média Geral</span>
-                      <span className={`text-sm font-semibold tabular-nums ${y.mediaGeral >= 10 ? "text-accent" : "text-destructive"}`}>{y.mediaGeral}</span>
-                    </div>
-                    <div className="flex items-center justify-between px-1">
-                      <span className="text-xs text-muted-foreground flex items-center gap-1.5"><TrendingUp className="w-3.5 h-3.5" /> Taxa Aprovado</span>
+                      <span className="text-xs text-muted-foreground flex items-center gap-1.5">
+                        <CheckCircle className="w-3.5 h-3.5 text-accent" /> Taxa Aprovado
+                      </span>
                       <span className={`text-sm font-semibold tabular-nums ${y.taxaSucesso >= 70 ? "text-accent" : "text-destructive"}`}>{y.taxaSucesso}%</span>
                     </div>
                     <div className="flex items-center justify-between px-1">
-                      <span className="text-xs text-muted-foreground flex items-center gap-1.5"><AlertTriangle className="w-3.5 h-3.5" /> Taxa Reprovado</span>
-                      <span className={`text-sm font-semibold tabular-nums ${(100 - y.taxaSucesso) > 30 ? "text-destructive" : "text-foreground"}`}>{100 - y.taxaSucesso}%</span>
+                      <span className="text-xs text-muted-foreground flex items-center gap-1.5">
+                        <XCircle className="w-3.5 h-3.5 text-destructive/70" /> Taxa Reprovado
+                      </span>
+                      <span className={`text-sm font-semibold tabular-nums ${taxaReprovado > 30 ? "text-destructive" : "text-foreground"}`}>{taxaReprovado}%</span>
+                    </div>
+                  </div>
+
+                  {/* Section 3: Activity */}
+                  <div className="space-y-2 pt-3 mt-3 border-t border-border/50">
+                    <div className="flex items-center justify-between px-1">
+                      <span className="text-xs text-muted-foreground flex items-center gap-1.5">
+                        <GraduationCap className="w-3.5 h-3.5 text-secondary" /> Avaliações
+                      </span>
+                      <span className="text-sm font-semibold tabular-nums text-foreground">{avgAvalFeitas}/{totalAvaliacoes}</span>
+                    </div>
+                    <div className="flex items-center justify-between px-1">
+                      <span className="text-xs text-muted-foreground flex items-center gap-1.5">
+                        <ClipboardList className="w-3.5 h-3.5 text-primary" /> Taxa de Entrega
+                      </span>
+                      <span className={`text-sm font-semibold tabular-nums ${avgTaxaEntrega >= 80 ? "text-accent" : "text-destructive"}`}>{avgTaxaEntrega}%</span>
+                    </div>
+                  </div>
+
+                  {/* Section 4: Resources */}
+                  <div className="space-y-2 pt-3 mt-3 border-t border-border/50">
+                    <div className="flex items-center justify-between px-1">
+                      <span className="text-xs text-muted-foreground flex items-center gap-1.5">
+                        <FileText className="w-3.5 h-3.5 text-accent" /> Conteúdos
+                      </span>
+                      <span className="text-sm font-semibold tabular-nums text-foreground">{totalMaterials}</span>
+                    </div>
+                    <div className="flex items-center justify-between px-1">
+                      <span className="text-xs text-muted-foreground flex items-center gap-1.5">
+                        <Video className="w-3.5 h-3.5 text-secondary" /> Aulas Gravadas
+                      </span>
+                      <span className="text-sm font-semibold tabular-nums text-foreground">{recordedLessons}</span>
                     </div>
                   </div>
                 </div>
