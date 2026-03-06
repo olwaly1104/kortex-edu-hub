@@ -146,6 +146,8 @@ function AppRoutes() {
         <Route path="/coordenador/notas" element={<CoordenadorNotas />} />
         <Route path="/coordenador/relatorios" element={<CoordenadorRelatorios />} />
         <Route path="/coordenador/financas" element={<CoordenadorFinancas />} />
+        <Route path="/coordenador/chat" element={<StudentChat />} />
+        <Route path="/coordenador/email" element={<StudentEmail />} />
         <Route path="/coordenador/contactos" element={<StudentContacts />} />
         <Route path="/coordenador/perfil" element={<StudentProfile />} />
         {/* Decano */}
