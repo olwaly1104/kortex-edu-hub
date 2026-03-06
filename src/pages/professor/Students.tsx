@@ -195,8 +195,8 @@ export default function ProfessorStudents() {
             <th className="text-left p-3 font-medium text-muted-foreground">Email</th>
             <th className="text-center p-3 font-medium text-muted-foreground">Turma</th>
             <th className="text-center p-3 font-medium text-muted-foreground">Presença</th>
-            <th className="text-center p-3 font-medium text-muted-foreground">Taxa Entrega</th>
             <th className="text-center p-3 font-medium text-muted-foreground">Média</th>
+            <th className="text-center p-3 font-medium text-muted-foreground">Taxa Entrega</th>
             <th className="text-center p-3 font-medium text-muted-foreground">Tarefas</th>
             <th className="text-center p-3 font-medium text-muted-foreground">Avaliações</th>
             <th className="text-center p-3 font-medium text-muted-foreground">Estado</th>
@@ -213,8 +213,8 @@ export default function ProfessorStudents() {
                 <td className="p-3 text-muted-foreground">{student.email}</td>
                 <td className="p-3 text-center text-muted-foreground">{student.turma}</td>
                 <td className="p-3 text-center"><span className={student.attendance >= 75 ? "text-accent font-medium" : "text-destructive font-medium"}>{student.attendance}%</span></td>
-                <td className="p-3 text-center"><span className={entregaPct >= 80 ? "text-accent font-medium" : entregaPct >= 50 ? "text-foreground font-medium" : "text-destructive font-medium"}>{entregaPct}%</span></td>
                 <td className="p-3 text-center"><span className={student.avgGrade !== null && student.avgGrade >= 10 ? "text-accent font-medium" : "text-destructive font-medium"}>{student.avgGrade ?? "—"}</span></td>
+                <td className="p-3 text-center"><span className={entregaPct >= 80 ? "text-accent font-medium" : entregaPct >= 50 ? "text-foreground font-medium" : "text-destructive font-medium"}>{entregaPct}%</span></td>
                 <td className="p-3 text-center text-foreground">{student.submittedTasks}/{student.totalTasks}</td>
                 <td className="p-3 text-center text-foreground">{avaliacoesEncerradas}/{avaliacoes.length}</td>
                 <td className="p-3 text-center"><Badge className={`${sb} text-[10px]`}>{statusLabels[student.status]}</Badge></td>
