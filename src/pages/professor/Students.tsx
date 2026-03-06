@@ -37,8 +37,8 @@ export default function ProfessorStudents() {
   const [filterTurma, setFilterTurma] = useState<string>("todos");
   const [sortKey, setSortKey] = useState<SortKey | null>(null);
   const [sortDir, setSortDir] = useState<SortDir>("desc");
-  const [filterStatuses, setFilterStatuses] = useState<FilterStatus[]>(
-    initialStatus && ["excelente", "normal", "risco"].includes(initialStatus) ? [initialStatus as FilterStatus] : []
+  const [filterStatus, setFilterStatus] = useState<string>(
+    initialStatus && ["excelente", "normal", "risco"].includes(initialStatus) ? initialStatus : "todos"
   );
 
   const scopedStudents = useMemo(() => {
@@ -52,7 +52,7 @@ export default function ProfessorStudents() {
 
   const filtered = useMemo(() => {
     let result = scopedStudents
-      .filter(s => filterStatuses.length === 0 || filterStatuses.includes(s.status as FilterStatus))
+      .filter(s => filterStatus === "todos" || s.status === filterStatus)
       .filter(s => s.name.toLowerCase().includes(search.toLowerCase()));
 
     if (sortKey) {
@@ -65,14 +65,13 @@ export default function ProfessorStudents() {
       });
     }
     return result;
-  }, [scopedStudents, filterStatuses, search, sortKey, sortDir]);
+  }, [scopedStudents, filterStatus, search, sortKey, sortDir]);
 
-  const toggleFilterStatus = (s: FilterStatus) => {
-    setFilterStatuses(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s]);
-  };
+  const hasActiveFilters = filterStatus !== "todos" || sortKey !== null || search !== "";
+  const clearFilters = () => { setFilterStatus("todos"); setSortKey(null); setSearch(""); };
 
-  const hasActiveFilters = filterStatuses.length > 0 || sortKey !== null || search !== "";
-  const clearFilters = () => { setFilterStatuses([]); setSortKey(null); setSearch(""); };
+
+
 
   // statusColors unused after table conversion
   const statusLabels: Record<string, string> = { excelente: "Excelente", normal: "Normal", risco: "Em Risco" };
@@ -125,12 +124,12 @@ export default function ProfessorStudents() {
 
           <div className="flex items-center gap-2">
             {([
-              { key: "", label: "Todos" },
-              { key: "excelente" as FilterStatus, label: "Excelente" },
-              { key: "normal" as FilterStatus, label: "Normal" },
-              { key: "risco" as FilterStatus, label: "Em Risco" },
+              { key: "todos", label: "Todos" },
+              { key: "excelente", label: "Excelente" },
+              { key: "normal", label: "Normal" },
+              { key: "risco", label: "Em Risco" },
             ]).map(s => (
-              <Button key={s.key} size="sm" variant={(!s.key && filterStatuses.length === 0) || filterStatuses.includes(s.key as FilterStatus) ? "default" : "outline"} onClick={() => { if (!s.key) setFilterStatuses([]); else toggleFilterStatus(s.key as FilterStatus); }} className="text-xs">
+              <Button key={s.key} size="sm" variant={filterStatus === s.key ? "default" : "outline"} onClick={() => setFilterStatus(s.key)} className="text-xs">
                 {s.label}
               </Button>
             ))}
@@ -170,12 +169,12 @@ export default function ProfessorStudents() {
                 <X className="w-2.5 h-2.5" />
               </Badge>
             )}
-            {filterStatuses.map(s => (
-              <Badge key={s} variant="outline" className="text-[10px] gap-1 bg-accent/10 text-accent border-accent/20 cursor-pointer hover:bg-accent/15" onClick={() => toggleFilterStatus(s)}>
-                Estado: {statusLabels[s]}
+            {filterStatus !== "todos" && (
+              <Badge variant="outline" className="text-[10px] gap-1 bg-accent/10 text-accent border-accent/20 cursor-pointer hover:bg-accent/15" onClick={() => setFilterStatus("todos")}>
+                Estado: {statusLabels[filterStatus]}
                 <X className="w-2.5 h-2.5" />
               </Badge>
-            ))}
+            )}
             {search && (
               <Badge variant="outline" className="text-[10px] gap-1 bg-secondary/10 text-secondary border-secondary/20 cursor-pointer hover:bg-secondary/15" onClick={() => setSearch("")}>
                 Pesquisa: "{search}"
