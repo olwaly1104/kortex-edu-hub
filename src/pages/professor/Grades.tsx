@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { profDisciplines, profTasks, allTurmas } from "@/data/professorData";
 import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
 import { Award, TrendingUp, Users, Clock, CheckCircle, ClipboardList, FolderKanban, BookOpen, GraduationCap, MapPin, Calendar, ArrowRight } from "lucide-react";
 
 const getEvalIcon = (type: string) => {
@@ -18,6 +19,12 @@ export default function ProfessorGrades() {
   const overallAvg = allGraded.length > 0
     ? Math.round(allGraded.reduce((s, t) => s + (t.avgGrade || 0), 0) / allGraded.length * 10) / 10
     : null;
+  const totalEvals = profTasks.length;
+  const closedEvals = profTasks.filter(t => t.status === "encerrada").length;
+  const approvedEvals = allGraded.filter(t => (t.avgGrade || 0) >= 10).length;
+  const taxaAprovacao = allGraded.length > 0 ? Math.round(approvedEvals / allGraded.length * 100) : 0;
+  const taxaReprovacao = allGraded.length > 0 ? Math.round((allGraded.length - approvedEvals) / allGraded.length * 100) : 0;
+  const taxaConclusao = totalEvals > 0 ? Math.round(closedEvals / totalEvals * 100) : 0;
 
   const sortedTurmas = [...allTurmas].sort((a, b) => a.year - b.year);
   const turmasToShow = filterTurma === "all" ? sortedTurmas : sortedTurmas.filter(t => t.id === filterTurma);
@@ -28,24 +35,44 @@ export default function ProfessorGrades() {
         <Award className="w-6 h-6 text-secondary" /> Notas
       </h1>
 
-      {/* Overall average */}
-      {overallAvg !== null && (
-        <div className="rounded-xl border border-border bg-card p-5 flex items-center gap-4">
-          <div className={`w-14 h-14 rounded-xl flex items-center justify-center shrink-0 ${overallAvg >= 10 ? "bg-accent/10" : "bg-destructive/10"}`}>
-            <TrendingUp className={`w-6 h-6 ${overallAvg >= 10 ? "text-accent" : "text-destructive"}`} />
+      {/* KPI Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+        <Card className="p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><Award className="w-4 h-4 text-primary" /></div>
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Média Geral</span>
           </div>
-          <div className="flex-1">
-            <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wider">Média Geral dos Estudantes</p>
-            <div className="flex items-baseline gap-1.5 mt-0.5">
-              <span className={`text-3xl font-bold ${overallAvg >= 10 ? "text-accent" : "text-destructive"}`}>{overallAvg}</span>
-              <span className="text-sm text-muted-foreground font-medium">/ 20</span>
-            </div>
+          <p className={`text-2xl font-bold ${overallAvg !== null && overallAvg >= 10 ? "text-accent" : overallAvg !== null ? "text-destructive" : "text-muted-foreground"}`}>{overallAvg ?? "—"}{overallAvg !== null ? "/20" : ""}</p>
+        </Card>
+        <Card className="p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><Calendar className="w-4 h-4 text-primary" /></div>
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Avaliações</span>
           </div>
-          <div className="text-right">
-            <p className="text-xs text-muted-foreground">{allGraded.length} avaliações corrigidas</p>
+          <p className="text-2xl font-bold text-foreground">{closedEvals}<span className="text-sm text-muted-foreground font-medium">/{totalEvals}</span></p>
+        </Card>
+        <Card className="p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center"><CheckCircle className="w-4 h-4 text-accent" /></div>
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Taxa Aprovado</span>
           </div>
-        </div>
-      )}
+          <p className={`text-2xl font-bold ${taxaAprovacao >= 70 ? "text-accent" : taxaAprovacao >= 50 ? "text-foreground" : "text-destructive"}`}>{taxaAprovacao}%</p>
+        </Card>
+        <Card className="p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-8 h-8 rounded-lg bg-destructive/10 flex items-center justify-center"><Award className="w-4 h-4 text-destructive" /></div>
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Taxa Reprovado</span>
+          </div>
+          <p className={`text-2xl font-bold ${taxaReprovacao > 30 ? "text-destructive" : "text-foreground"}`}>{taxaReprovacao}%</p>
+        </Card>
+        <Card className="p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><Clock className="w-4 h-4 text-primary" /></div>
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Taxa Conclusão</span>
+          </div>
+          <p className={`text-2xl font-bold ${taxaConclusao >= 80 ? "text-accent" : taxaConclusao >= 50 ? "text-foreground" : "text-destructive"}`}>{taxaConclusao}%</p>
+        </Card>
+      </div>
 
       {/* Turma filter */}
       <div className="flex items-center gap-2 flex-wrap">
