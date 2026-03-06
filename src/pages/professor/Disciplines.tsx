@@ -107,10 +107,11 @@ export default function ProfessorDisciplines() {
           const room = turmaDiscs.length > 0 ? turmaDiscs[0].room : "";
 
           return (
-            <Card key={turma.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-              <div className="p-5">
-                <div className="flex items-start justify-between mb-3">
-                  <div>
+            <Link key={turma.id} to={`/professor/turma/${turma.id}`}>
+              <Card className="overflow-hidden hover:shadow-lg transition-shadow group">
+                <div className="p-5">
+                  {/* Header */}
+                  <div className="flex items-center justify-between mb-1">
                     <div className="flex items-center gap-2">
                       <h3 className="font-bold text-foreground text-lg">{turma.name}</h3>
                       {turmaDiscs.length > 0 && (
@@ -122,82 +123,105 @@ export default function ProfessorDisciplines() {
                         {turmaAprovPct >= 85 ? "Excelente" : turmaAprovPct < 60 || avgAttendance < 75 ? "Em Risco" : "Normal"}
                       </Badge>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-0.5">{turma.course} · {turma.year}º Ano</p>
-                    <div className="flex items-center gap-3 mt-1.5 text-xs text-muted-foreground">
-                      <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{room}</span>
-                      <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{scheduleDays}</span>
+                    <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
+                  </div>
+                  <p className="text-xs text-muted-foreground mb-4">{turma.course} · {turma.year}º Ano · <span className="font-semibold text-foreground">{turma.students} estudantes</span></p>
+
+                  {/* Turma Info rows */}
+                  <div className="space-y-2 mb-4 pb-4 border-b border-border/50">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-muted-foreground flex items-center gap-1.5">
+                        <MapPin className="w-3.5 h-3.5 text-muted-foreground" /> Sala
+                      </span>
+                      <span className="font-semibold text-foreground">{room || "—"}</span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-muted-foreground flex items-center gap-1.5">
+                        <Calendar className="w-3.5 h-3.5 text-muted-foreground" /> Dias de Aula
+                      </span>
+                      <span className="font-semibold text-foreground">{scheduleDays || "—"}</span>
                     </div>
                   </div>
-                  <Link to={`/professor/turma/${turma.id}`}>
-                    <ChevronRight className="w-5 h-5 text-muted-foreground hover:text-primary transition-colors" />
-                  </Link>
-                </div>
 
-                {/* Key metrics row */}
-                <div className="grid grid-cols-5 gap-2.5 mb-4">
-                  <div className="text-center p-2.5 rounded-lg bg-muted/50">
-                    <p className="text-lg font-bold text-foreground">{turma.students}</p>
-                    <p className="text-[10px] text-muted-foreground">Estudantes</p>
-                  </div>
-                  <div className="text-center p-2.5 rounded-lg bg-muted/50">
-                    <p className={`text-lg font-bold ${avgAttendance >= 75 ? "text-accent" : "text-destructive"}`}>
-                      {avgAttendance}%
-                    </p>
-                    <p className="text-[10px] text-muted-foreground">Presença</p>
-                  </div>
-                  <div className="text-center p-2.5 rounded-lg bg-muted/50">
-                    <p className={`text-lg font-bold ${avgGrade !== null && avgGrade >= 10 ? "text-accent" : avgGrade !== null ? "text-destructive" : "text-muted-foreground"}`}>
-                      {avgGrade ?? "—"}
-                    </p>
-                    <p className="text-[10px] text-muted-foreground">Média</p>
-                  </div>
-                  <div className="text-center p-2.5 rounded-lg bg-muted/50">
-                    <p className={`text-lg font-bold ${turmaAprovPct >= 70 ? "text-accent" : turmaAprovPct >= 50 ? "text-foreground" : "text-destructive"}`}>
-                      {turmaAprovPct}%
-                    </p>
-                    <p className="text-[10px] text-muted-foreground">Aprovado</p>
-                  </div>
-                  <div className="text-center p-2.5 rounded-lg bg-muted/50">
-                    <p className={`text-lg font-bold ${turmaReprovPct > 30 ? "text-destructive" : "text-foreground"}`}>
-                      {turmaReprovPct}%
-                    </p>
-                    <p className="text-[10px] text-muted-foreground">Reprovado</p>
-                  </div>
-                </div>
-
-                {/* Details */}
-                <div className="space-y-2.5 pt-3 border-t border-border/50">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-muted-foreground flex items-center gap-1.5"><UserCheck className="w-3.5 h-3.5" /> Taxa de Entrega</span>
-                    <span className={`font-semibold ${(() => { const totalSub = turmaTasks.reduce((s, t) => s + t.submissions, 0); const totalStu = turmaTasks.reduce((s, t) => s + t.totalStudents, 0); return totalStu > 0 ? Math.round((totalSub / totalStu) * 100) : 0; })() >= 80 ? "text-accent" : "text-destructive"}`}>
-                      {(() => { const totalSub = turmaTasks.reduce((s, t) => s + t.submissions, 0); const totalStu = turmaTasks.reduce((s, t) => s + t.totalStudents, 0); return totalStu > 0 ? Math.round((totalSub / totalStu) * 100) : 0; })()}%
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-muted-foreground flex items-center gap-1.5"><ClipboardList className="w-3.5 h-3.5" /> Tarefas</span>
-                    <span className="font-semibold text-foreground">{turmaTasks.filter(t => t.type === "tarefa" || t.type === "quiz").filter(t => t.status === "encerrada").length}/{turmaTasks.filter(t => t.type === "tarefa" || t.type === "quiz").length}</span>
-                  </div>
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-muted-foreground flex items-center gap-1.5"><AlertCircle className="w-3.5 h-3.5" /> Avaliações</span>
-                    <span className="font-semibold text-foreground">{turmaTasks.filter(t => t.type === "exame").filter(t => t.status === "encerrada").length}/{turmaTasks.filter(t => t.type === "exame").length}</span>
-                  </div>
-
-                  <div className="border-t border-border/40 pt-2.5 space-y-2.5">
+                  {/* Performance metrics */}
+                  <div className="space-y-2.5 mb-4 pb-4 border-b border-border/50">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-muted-foreground flex items-center gap-1.5"><FileText className="w-3.5 h-3.5" /> Conteúdos</span>
+                      <span className="text-muted-foreground flex items-center gap-1.5">
+                        <CheckCircle className="w-3.5 h-3.5 text-muted-foreground" /> Presença
+                      </span>
+                      <span className={`font-semibold ${avgAttendance >= 75 ? "text-accent" : "text-destructive"}`}>{avgAttendance}%</span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-muted-foreground flex items-center gap-1.5">
+                        <BarChart3 className="w-3.5 h-3.5 text-accent" /> Média Geral
+                      </span>
+                      <span className={`font-semibold ${avgGrade !== null && avgGrade >= 10 ? "text-accent" : avgGrade !== null ? "text-destructive" : "text-muted-foreground"}`}>{avgGrade ?? "—"}/20</span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-muted-foreground flex items-center gap-1.5">
+                        <CheckCircle className="w-3.5 h-3.5 text-accent" /> Taxa Aprovado
+                      </span>
+                      <span className={`font-semibold ${turmaAprovPct >= 70 ? "text-accent" : "text-destructive"}`}>{turmaAprovPct}%</span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-muted-foreground flex items-center gap-1.5">
+                        <AlertCircle className="w-3.5 h-3.5 text-destructive" /> Taxa Reprovado
+                      </span>
+                      <span className={`font-semibold ${turmaReprovPct > 30 ? "text-destructive" : "text-foreground"}`}>{turmaReprovPct}%</span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-muted-foreground flex items-center gap-1.5">
+                        <UserCheck className="w-3.5 h-3.5 text-secondary" /> Taxa de Entrega
+                      </span>
+                      <span className={`font-semibold ${(() => { const totalSub = turmaTasks.reduce((s, t) => s + t.submissions, 0); const totalStu = turmaTasks.reduce((s, t) => s + t.totalStudents, 0); return totalStu > 0 ? Math.round((totalSub / totalStu) * 100) : 0; })() >= 80 ? "text-accent" : "text-destructive"}`}>
+                        {(() => { const totalSub = turmaTasks.reduce((s, t) => s + t.submissions, 0); const totalStu = turmaTasks.reduce((s, t) => s + t.totalStudents, 0); return totalStu > 0 ? Math.round((totalSub / totalStu) * 100) : 0; })()}%
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-muted-foreground flex items-center gap-1.5">
+                        <CheckCircle className="w-3.5 h-3.5 text-secondary" /> Taxa de Conclusão
+                      </span>
+                      <span className="font-semibold text-foreground">{turmaConclusaoPct}%</span>
+                    </div>
+                  </div>
+
+                  {/* Activity */}
+                  <div className="space-y-2.5 mb-4 pb-4 border-b border-border/50">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-muted-foreground flex items-center gap-1.5">
+                        <ClipboardList className="w-3.5 h-3.5 text-primary" /> Tarefas
+                      </span>
+                      <span className="font-semibold text-foreground">{turmaTasks.filter(t => t.type === "tarefa" || t.type === "quiz").filter(t => t.status === "encerrada").length}/{turmaTasks.filter(t => t.type === "tarefa" || t.type === "quiz").length}</span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-muted-foreground flex items-center gap-1.5">
+                        <BarChart3 className="w-3.5 h-3.5 text-secondary" /> Avaliações
+                      </span>
+                      <span className="font-semibold text-foreground">{turmaTasks.filter(t => t.type === "exame").filter(t => t.status === "encerrada").length}/{turmaTasks.filter(t => t.type === "exame").length}</span>
+                    </div>
+                  </div>
+
+                  {/* Resources */}
+                  <div className="space-y-2.5">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-muted-foreground flex items-center gap-1.5">
+                        <FileText className="w-3.5 h-3.5 text-muted-foreground" /> Conteúdos
+                      </span>
                       <span className="font-semibold text-foreground">{totalContents}</span>
                     </div>
                     <div>
                       <div className="flex justify-between text-xs mb-1">
-                        <span className="text-muted-foreground flex items-center gap-1.5"><Video className="w-3.5 h-3.5" /> Aulas Gravadas</span>
+                        <span className="text-muted-foreground flex items-center gap-1.5">
+                          <Video className="w-3.5 h-3.5 text-muted-foreground" /> Aulas Gravadas
+                        </span>
                         <span className="font-semibold text-foreground">{turmaPublished}/{turmaLessons.length}</span>
                       </div>
                       <Progress value={lessonPct} className="h-1.5" />
                     </div>
                   </div>
                 </div>
-              </div>
-            </Card>
+              </Card>
+            </Link>
           );
         })}
       </div>
