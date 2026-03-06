@@ -276,6 +276,9 @@ export default function ProfessorEvaluations() {
                   <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /> <span className="font-medium text-foreground">{task.dueDate}</span></span>
                   <span className="flex items-center gap-1.5">Peso: <span className="font-medium text-foreground">{task.weight}%</span></span>
                   <span className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5" /> Presencial</span>
+                  {isActive && task.correctionDeadline && (
+                    <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> Corrigir até: <span className="font-medium text-foreground">{task.correctionDeadline}</span></span>
+                  )}
                   {task.avgGrade !== null && (
                     <span className="flex items-center gap-1.5">
                       Média: <span className={`font-bold ${task.avgGrade >= 10 ? "text-accent" : "text-destructive"}`}>{task.avgGrade}/20</span>
@@ -299,11 +302,6 @@ export default function ProfessorEvaluations() {
                       </div>
                       <Progress value={notaAtribuidaPct} className="h-1.5" />
                     </div>
-                    {isActive && task.correctionDeadline && (
-                      <p className="text-[10px] text-muted-foreground flex items-center gap-1">
-                        <Clock className="w-3 h-3" /> Corrigir até: <span className="font-medium text-foreground">{task.correctionDeadline}</span>
-                      </p>
-                    )}
                   </div>
                 )}
 
