@@ -102,35 +102,11 @@ export default function CoordenadorDocenteProfile() {
         </Card>
       </div>
 
-      {/* Summary info */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
-        <Card className="p-4 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center"><BookOpen className="w-4 h-4 text-primary" /></div>
-          <div>
-            <p className="text-lg font-bold text-foreground">{docente.disciplinas}</p>
-            <p className="text-xs text-muted-foreground">Cadeiras</p>
-          </div>
-        </Card>
-        <Card className="p-4 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center"><GraduationCap className="w-4 h-4 text-primary" /></div>
-          <div>
-            <p className="text-lg font-bold text-foreground">{docente.turmas}</p>
-            <p className="text-xs text-muted-foreground">Turmas</p>
-          </div>
-        </Card>
-        <Card className="p-4 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center"><Users className="w-4 h-4 text-primary" /></div>
-          <div>
-            <p className="text-lg font-bold text-foreground">{docente.estudantesTotal}</p>
-            <p className="text-xs text-muted-foreground">Total Estudantes</p>
-          </div>
-        </Card>
-      </div>
 
-      {/* Disciplines list */}
+      {/* Turmas list */}
       <Card className="overflow-hidden">
         <div className="p-5 border-b bg-muted/30">
-          <h3 className="font-semibold text-foreground flex items-center gap-2"><BookOpen className="w-4 h-4" /> Cadeiras Leccionadas</h3>
+          <h3 className="font-semibold text-foreground flex items-center gap-2"><GraduationCap className="w-4 h-4" /> Turmas</h3>
         </div>
         <div className="divide-y">
           {docenteDisciplinas.length > 0 ? docenteDisciplinas.map(disc => {
@@ -144,10 +120,10 @@ export default function CoordenadorDocenteProfile() {
               <div key={disc.id} className="px-5 py-3.5 flex items-center gap-3 hover:bg-muted/20 transition-colors">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <p className="text-sm font-medium text-foreground">{disc.name}</p>
-                    <Badge variant="outline" className="text-[10px]">{disc.code}</Badge>
+                    <p className="text-sm font-medium text-foreground">Turma — {disc.year}º Ano</p>
+                    <Badge variant="outline" className="text-[10px]">{disc.name}</Badge>
                   </div>
-                  <p className="text-[11px] text-muted-foreground mt-0.5">{disc.year}º Ano · {disc.estudantes} estudantes · {disc.diasAula} · {disc.location}</p>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">{disc.estudantes} estudantes · {disc.diasAula} · {disc.location}</p>
                 </div>
                 <div className="flex items-center gap-3 text-xs shrink-0">
                   <div className="text-center">
@@ -169,7 +145,7 @@ export default function CoordenadorDocenteProfile() {
               </div>
             );
           }) : (
-            <div className="px-5 py-8 text-center text-muted-foreground text-sm">Nenhuma cadeira associada.</div>
+            <div className="px-5 py-8 text-center text-muted-foreground text-sm">Nenhuma turma associada.</div>
           )}
         </div>
       </Card>
