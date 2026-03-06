@@ -8,9 +8,12 @@ import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import {
   GraduationCap, Plus, Search, Clock, CheckCircle, Users, Send,
-  Calendar, AlertCircle, MapPin, ArrowRight, ClipboardList, X,
+  Calendar, AlertCircle, MapPin, ArrowRight, ClipboardList, X, ArrowUpDown,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import {
+  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 
 function SummaryCard({ label, value, icon: Icon, iconBg, iconColor, valueClass }: {
   label: string; value: string | number; icon: React.ElementType;
@@ -30,6 +33,7 @@ function SummaryCard({ label, value, icon: Icon, iconBg, iconColor, valueClass }
 }
 
 type StatusFilter = "todas" | "ativa" | "encerrada" | "pendente";
+type SortOption = "recente" | "antiga" | "nome-az" | "nome-za" | "nota-asc" | "nota-desc";
 
 export default function ProfessorEvaluations() {
   const { toast } = useToast();
@@ -37,6 +41,7 @@ export default function ProfessorEvaluations() {
   const [filterTurma, setFilterTurma] = useState<string>("all");
   const [filterStatus, setFilterStatus] = useState<StatusFilter>("todas");
   const [searchTerm, setSearchTerm] = useState("");
+  const [sortBy, setSortBy] = useState<SortOption>("recente");
   const [showForm, setShowForm] = useState(false);
 
   const [formDisc, setFormDisc] = useState(profDisciplines[0]?.id || "");
@@ -71,8 +76,20 @@ export default function ProfessorEvaluations() {
     else if (filterStatus === "encerrada") result = result.filter(t => t.status === "encerrada");
     else if (filterStatus === "pendente") result = result.filter(t => t.status === "publicada" && t.corrected < t.submissions);
 
+    result.sort((a, b) => {
+      switch (sortBy) {
+        case "recente": return b.dueDate.localeCompare(a.dueDate);
+        case "antiga": return a.dueDate.localeCompare(b.dueDate);
+        case "nome-az": return a.title.localeCompare(b.title);
+        case "nome-za": return b.title.localeCompare(a.title);
+        case "nota-asc": return (a.avgGrade ?? -1) - (b.avgGrade ?? -1);
+        case "nota-desc": return (b.avgGrade ?? -1) - (a.avgGrade ?? -1);
+        default: return 0;
+      }
+    });
+
     return result;
-  }, [scopedEvals, filterStatus, searchTerm]);
+  }, [scopedEvals, filterStatus, searchTerm, sortBy]);
 
   const handleSubmit = () => {
     if (!formTitle || !formDesc || !formDue) {
@@ -154,7 +171,7 @@ export default function ProfessorEvaluations() {
 
       {/* Controls box */}
       <div className="rounded-xl border border-border bg-card p-4 space-y-3">
-        {/* Turma toggle */}
+        {/* Row 1: Turma toggles */}
         <div className="flex flex-wrap gap-2">
           <Button size="sm" variant={filterTurma === "all" ? "default" : "outline"} onClick={() => setFilterTurma("all")} className="text-xs">
             Todas as Turmas
@@ -168,20 +185,9 @@ export default function ProfessorEvaluations() {
 
         <div className="border-t border-border" />
 
-        {/* Status toggles */}
-        <div className="flex flex-wrap gap-2">
-          {statusToggles.map(s => (
-            <Button key={s.key} size="sm" variant={filterStatus === s.key ? "default" : "outline"} onClick={() => setFilterStatus(s.key)} className="text-xs">
-              {s.label}
-            </Button>
-          ))}
-        </div>
-
-        <div className="border-t border-border" />
-
-        {/* Search */}
-        <div className="flex gap-2 items-center">
-          <div className="relative flex-1 max-w-sm">
+        {/* Row 2: Search + Status toggles + Ordenar */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="relative flex-1 min-w-[180px] max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input placeholder="Pesquisar avaliação..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-9 h-9" />
           </div>
@@ -190,6 +196,38 @@ export default function ProfessorEvaluations() {
               <X className="w-3 h-3" /> Limpar
             </Button>
           )}
+
+          <div className="flex items-center gap-2 ml-auto">
+            {statusToggles.map(s => (
+              <Button key={s.key} size="sm" variant={filterStatus === s.key ? "default" : "outline"} onClick={() => setFilterStatus(s.key)} className="text-xs">
+                {s.label}
+              </Button>
+            ))}
+
+            <div className="w-px h-6 bg-border" />
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="text-xs gap-1.5">
+                  <ArrowUpDown className="w-3.5 h-3.5" /> Ordenar
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-44">
+                {([
+                  { key: "recente", label: "Mais recente" },
+                  { key: "antiga", label: "Mais antiga" },
+                  { key: "nome-az", label: "Nome A–Z" },
+                  { key: "nome-za", label: "Nome Z–A" },
+                  { key: "nota-desc", label: "Nota ↓" },
+                  { key: "nota-asc", label: "Nota ↑" },
+                ] as { key: SortOption; label: string }[]).map(o => (
+                  <DropdownMenuItem key={o.key} onClick={() => setSortBy(o.key)} className={sortBy === o.key ? "bg-accent font-medium" : ""}>
+                    {o.label}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       </div>
 
