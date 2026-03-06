@@ -111,7 +111,7 @@ export default function ProfessorDisciplines() {
               <Card className="overflow-hidden hover:shadow-lg transition-shadow group">
                 <div className="p-5">
                   {/* Header */}
-                  <div className="flex items-center justify-between mb-1">
+                  <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
                       <h3 className="font-bold text-foreground text-lg">{turma.name}</h3>
                       {turmaDiscs.length > 0 && (
@@ -126,48 +126,35 @@ export default function ProfessorDisciplines() {
                     <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
                   </div>
 
-                  {/* Turma Info rows */}
-                  <div className="space-y-2 mb-4 pb-4 border-b border-border/50">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-muted-foreground flex items-center gap-1.5">
-                        <Users className="w-3.5 h-3.5 text-primary" /> Estudantes
-                      </span>
+                  {/* Turma Info - Estudantes, Sala, Dias de Aula */}
+                  <div className="flex items-center gap-4 text-xs mb-4 pb-4 border-b border-border/50">
+                    <div className="flex items-center gap-1.5">
+                      <Users className="w-3.5 h-3.5 text-primary" />
                       <span className="font-semibold text-foreground">{turma.students}</span>
+                      <span className="text-muted-foreground">estudantes</span>
                     </div>
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-muted-foreground flex items-center gap-1.5">
-                        <BookOpen className="w-3.5 h-3.5 text-secondary" /> Cadeira
-                      </span>
-                      <span className="font-semibold text-foreground">{turmaDiscs.length > 0 ? turmaDiscs[0].name : "—"}</span>
-                    </div>
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-muted-foreground flex items-center gap-1.5">
-                        <GraduationCap className="w-3.5 h-3.5 text-primary" /> Ano
-                      </span>
-                      <span className="font-semibold text-foreground">{turma.year}º Ano</span>
-                    </div>
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-muted-foreground flex items-center gap-1.5">
-                        <MapPin className="w-3.5 h-3.5 text-muted-foreground" /> Sala
-                      </span>
+                    <span className="text-border">·</span>
+                    <div className="flex items-center gap-1.5">
+                      <MapPin className="w-3.5 h-3.5 text-muted-foreground" />
                       <span className="font-semibold text-foreground">{room || "—"}</span>
                     </div>
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-muted-foreground flex items-center gap-1.5">
-                        <Calendar className="w-3.5 h-3.5 text-muted-foreground" /> Dias de Aula
-                      </span>
+                    <span className="text-border">·</span>
+                    <div className="flex items-center gap-1.5">
+                      <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
                       <span className="font-semibold text-foreground">{scheduleDays || "—"}</span>
                     </div>
                   </div>
 
-                  {/* Performance metrics */}
-                  <div className="space-y-2.5 mb-4 pb-4 border-b border-border/50">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-muted-foreground flex items-center gap-1.5">
-                        <CheckCircle className="w-3.5 h-3.5 text-muted-foreground" /> Presença
-                      </span>
-                      <span className={`font-semibold ${avgAttendance >= 75 ? "text-accent" : "text-destructive"}`}>{avgAttendance}%</span>
-                    </div>
+                  {/* Presença */}
+                  <div className="flex items-center justify-between text-xs mb-3 pb-3 border-b border-border/50">
+                    <span className="text-muted-foreground flex items-center gap-1.5">
+                      <CheckCircle className="w-3.5 h-3.5 text-muted-foreground" /> Presença
+                    </span>
+                    <span className={`font-semibold ${avgAttendance >= 75 ? "text-accent" : "text-destructive"}`}>{avgAttendance}%</span>
+                  </div>
+
+                  {/* Performance */}
+                  <div className="space-y-2.5 mb-3 pb-3 border-b border-border/50">
                     <div className="flex items-center justify-between text-xs">
                       <span className="text-muted-foreground flex items-center gap-1.5">
                         <BarChart3 className="w-3.5 h-3.5 text-accent" /> Média Geral
@@ -186,6 +173,16 @@ export default function ProfessorDisciplines() {
                       </span>
                       <span className={`font-semibold ${turmaReprovPct > 30 ? "text-destructive" : "text-foreground"}`}>{turmaReprovPct}%</span>
                     </div>
+                  </div>
+
+                  {/* Activity */}
+                  <div className="space-y-2.5 mb-3 pb-3 border-b border-border/50">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-muted-foreground flex items-center gap-1.5">
+                        <ClipboardList className="w-3.5 h-3.5 text-primary" /> Tarefas
+                      </span>
+                      <span className="font-semibold text-foreground">{turmaTasks.filter(t => t.type === "tarefa" || t.type === "quiz").filter(t => t.status === "encerrada").length}/{turmaTasks.filter(t => t.type === "tarefa" || t.type === "quiz").length}</span>
+                    </div>
                     <div className="flex items-center justify-between text-xs">
                       <span className="text-muted-foreground flex items-center gap-1.5">
                         <UserCheck className="w-3.5 h-3.5 text-secondary" /> Taxa de Entrega
@@ -196,25 +193,15 @@ export default function ProfessorDisciplines() {
                     </div>
                     <div className="flex items-center justify-between text-xs">
                       <span className="text-muted-foreground flex items-center gap-1.5">
-                        <CheckCircle className="w-3.5 h-3.5 text-secondary" /> Taxa de Conclusão
-                      </span>
-                      <span className="font-semibold text-foreground">{turmaConclusaoPct}%</span>
-                    </div>
-                  </div>
-
-                  {/* Activity */}
-                  <div className="space-y-2.5 mb-4 pb-4 border-b border-border/50">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-muted-foreground flex items-center gap-1.5">
-                        <ClipboardList className="w-3.5 h-3.5 text-primary" /> Tarefas
-                      </span>
-                      <span className="font-semibold text-foreground">{turmaTasks.filter(t => t.type === "tarefa" || t.type === "quiz").filter(t => t.status === "encerrada").length}/{turmaTasks.filter(t => t.type === "tarefa" || t.type === "quiz").length}</span>
-                    </div>
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-muted-foreground flex items-center gap-1.5">
                         <BarChart3 className="w-3.5 h-3.5 text-secondary" /> Avaliações
                       </span>
                       <span className="font-semibold text-foreground">{turmaTasks.filter(t => t.type === "exame").filter(t => t.status === "encerrada").length}/{turmaTasks.filter(t => t.type === "exame").length}</span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-muted-foreground flex items-center gap-1.5">
+                        <CheckCircle className="w-3.5 h-3.5 text-secondary" /> Taxa de Conclusão
+                      </span>
+                      <span className="font-semibold text-foreground">{turmaConclusaoPct}%</span>
                     </div>
                   </div>
 
