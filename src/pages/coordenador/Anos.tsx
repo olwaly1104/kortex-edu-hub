@@ -157,7 +157,7 @@ export default function CoordenadorAnos() {
                   <div className="space-y-2 pt-3 mt-3 border-t border-border/50">
                     <div className="flex items-center justify-between px-1">
                       <span className="text-xs text-muted-foreground flex items-center gap-1.5">
-                        <Award className="w-3.5 h-3.5 text-primary" /> Média Geral
+                        <TrendingUp className="w-3.5 h-3.5 text-primary" /> Média Geral
                       </span>
                       <span className={`text-sm font-semibold tabular-nums ${y.mediaGeral >= 10 ? "text-accent" : "text-destructive"}`}>{y.mediaGeral}/20</span>
                     </div>
@@ -179,15 +179,27 @@ export default function CoordenadorAnos() {
                   <div className="space-y-2 pt-3 mt-3 border-t border-border/50">
                     <div className="flex items-center justify-between px-1">
                       <span className="text-xs text-muted-foreground flex items-center gap-1.5">
-                        <GraduationCap className="w-3.5 h-3.5 text-secondary" /> Avaliações
-                      </span>
-                      <span className="text-sm font-semibold tabular-nums text-foreground">{avgAvalFeitas}/{totalAvaliacoes}</span>
-                    </div>
-                    <div className="flex items-center justify-between px-1">
-                      <span className="text-xs text-muted-foreground flex items-center gap-1.5">
                         <ClipboardList className="w-3.5 h-3.5 text-primary" /> Taxa de Entrega
                       </span>
                       <span className={`text-sm font-semibold tabular-nums ${avgTaxaEntrega >= 80 ? "text-accent" : "text-destructive"}`}>{avgTaxaEntrega}%</span>
+                    </div>
+                    <div className="flex items-center justify-between px-1">
+                      <span className="text-xs text-muted-foreground flex items-center gap-1.5">
+                        <TrendingUp className="w-3.5 h-3.5 text-secondary" /> Taxa de Conclusão
+                      </span>
+                      <span className={`text-sm font-semibold tabular-nums ${y.taxaSucesso >= 70 ? "text-accent" : "text-destructive"}`}>{y.taxaSucesso}%</span>
+                    </div>
+                    <div className="flex items-center justify-between px-1">
+                      <span className="text-xs text-muted-foreground flex items-center gap-1.5">
+                        <FileText className="w-3.5 h-3.5 text-accent" /> Tarefas
+                      </span>
+                      <span className="text-sm font-semibold tabular-nums text-foreground">{totalMaterials}</span>
+                    </div>
+                    <div className="flex items-center justify-between px-1">
+                      <span className="text-xs text-muted-foreground flex items-center gap-1.5">
+                        <GraduationCap className="w-3.5 h-3.5 text-secondary" /> Avaliações
+                      </span>
+                      <span className="text-sm font-semibold tabular-nums text-foreground">{avgAvalFeitas}/{totalAvaliacoes}</span>
                     </div>
                   </div>
 
@@ -203,7 +215,12 @@ export default function CoordenadorAnos() {
                       <span className="text-xs text-muted-foreground flex items-center gap-1.5">
                         <Video className="w-3.5 h-3.5 text-secondary" /> Aulas Gravadas
                       </span>
-                      <span className="text-sm font-semibold tabular-nums text-foreground">{recordedLessons}</span>
+                      <div className="flex items-center gap-2">
+                        <div className="w-16 h-1.5 bg-muted rounded-full overflow-hidden">
+                          <div className="h-full bg-secondary rounded-full" style={{ width: `${publishedLessons.length > 0 ? (recordedLessons / publishedLessons.length) * 100 : 0}%` }} />
+                        </div>
+                        <span className="text-sm font-semibold tabular-nums text-foreground">{recordedLessons}/{publishedLessons.length}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
