@@ -247,7 +247,7 @@ export default function ProfessorCalendar() {
 
           {/* Upcoming events */}
           <Card className="p-4">
-            <h3 className="text-sm font-bold text-foreground mb-3">Próximos Eventos</h3>
+            <h3 className="text-sm font-bold text-foreground mb-3">Próximos Eventos Importantes</h3>
             <div className="space-y-2">
               {profUpcomingEvents.map(event => (
                 <div key={event.id} className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer border" onClick={() => setSelectedEvent(event.id)}>

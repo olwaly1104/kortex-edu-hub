@@ -95,36 +95,54 @@ export default function ProfessorTaskDetail() {
           <span className="flex items-center gap-1.5"><Calendar className="w-4 h-4" /> Prazo: <span className="font-semibold text-foreground">{task.dueDate}</span></span>
           <span className="flex items-center gap-1.5"><ClipboardList className="w-4 h-4" /> Peso: <span className="font-semibold text-foreground">{task.weight}%</span></span>
           <span className="flex items-center gap-1.5"><MapPin className="w-4 h-4" /> Presencial</span>
-          {task.avgGrade !== null && (
-            <>
-              <span className="flex items-center gap-1.5">Média: <span className={`font-semibold ${task.avgGrade >= 10 ? "text-accent" : "text-destructive"}`}>{task.avgGrade}/20</span></span>
-              {isEncerrada && (
-                <span className="flex items-center gap-1.5">Aprovação: <span className={`font-semibold ${approvalRate >= 50 ? "text-accent" : "text-destructive"}`}>{approvalRate}%</span></span>
-              )}
-            </>
-          )}
         </div>
       </div>
 
-      {/* Progress overview */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Card className="p-4 space-y-2">
-          <div className="flex items-center justify-between text-sm">
-            <span className="flex items-center gap-2 text-muted-foreground"><Users className="w-4 h-4" /> Submetido</span>
-            <span className="font-semibold text-foreground">{task.submissions}/{task.totalStudents} ({submissionPct}%)</span>
+      {/* Submission & Grading KPIs */}
+      <div className="rounded-xl border border-border bg-card overflow-hidden">
+        {/* Header: Submissão e Notas */}
+        <div className="px-5 py-3 border-b bg-muted/20">
+          <h3 className="text-sm font-semibold text-foreground">Submissão e Notas</h3>
+        </div>
+
+        {/* Submetido & Corrigido bars */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-0 divide-y md:divide-y-0 md:divide-x divide-border">
+          <div className="p-4 space-y-2">
+            <div className="flex items-center justify-between text-sm">
+              <span className="flex items-center gap-2 text-muted-foreground"><Users className="w-4 h-4" /> Submetido</span>
+              <span className="font-semibold text-foreground">{task.submissions}/{task.totalStudents} ({submissionPct}%)</span>
+            </div>
+            <Progress value={submissionPct} className="h-2" />
           </div>
-          <Progress value={submissionPct} className="h-2" />
-        </Card>
-        <Card className="p-4 space-y-2">
-          <div className="flex items-center justify-between text-sm">
-            <span className={`flex items-center gap-2 ${pendingCorrection > 0 ? "text-destructive" : "text-muted-foreground"}`}><FileCheck className="w-4 h-4" /> Corrigido</span>
-            <span className={`font-semibold ${pendingCorrection > 0 ? "text-destructive" : "text-muted-foreground"}`}>{task.corrected}/{task.submissions} ({correctedPct}%)</span>
+          <div className="p-4 space-y-2">
+            <div className="flex items-center justify-between text-sm">
+              <span className={`flex items-center gap-2 ${pendingCorrection > 0 ? "text-destructive" : "text-muted-foreground"}`}><AlertCircle className="w-4 h-4" /> Corrigido</span>
+              <span className={`font-semibold ${pendingCorrection > 0 ? "text-destructive" : "text-muted-foreground"}`}>{task.corrected}/{task.submissions} ({correctedPct}%)</span>
+            </div>
+            <Progress value={correctedPct} className={`h-2 ${pendingCorrection > 0 ? "[&>div]:bg-destructive" : ""}`} />
+            {isActiva && task.correctionDeadline && (
+              <p className="text-[11px] text-muted-foreground flex items-center gap-1"><Clock className="w-3 h-3" /> Prazo de correcção: <span className="font-medium text-foreground">{task.correctionDeadline}</span></p>
+            )}
           </div>
-          <Progress value={correctedPct} className={`h-2 ${pendingCorrection > 0 ? "[&>div]:bg-destructive" : ""}`} />
-          {isActiva && task.correctionDeadline && (
-            <p className="text-[11px] text-muted-foreground flex items-center gap-1"><Clock className="w-3 h-3" /> Prazo de correcção: <span className="font-medium text-foreground">{task.correctionDeadline}</span></p>
-          )}
-        </Card>
+        </div>
+
+        {/* Média, Taxa Aprovação, Taxa Reprovação */}
+        {task.avgGrade !== null && (
+          <div className="border-t border-border grid grid-cols-3 divide-x divide-border">
+            <div className="p-4 text-center">
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">Média</p>
+              <p className={`text-xl font-bold mt-1 ${task.avgGrade >= 10 ? "text-accent" : "text-destructive"}`}>{task.avgGrade}/20</p>
+            </div>
+            <div className="p-4 text-center">
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">Taxa Aprovação</p>
+              <p className={`text-xl font-bold mt-1 ${approvalRate >= 50 ? "text-accent" : "text-destructive"}`}>{approvalRate}%</p>
+            </div>
+            <div className="p-4 text-center">
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">Taxa Reprovação</p>
+              <p className={`text-xl font-bold mt-1 ${(100 - approvalRate) > 50 ? "text-destructive" : "text-foreground"}`}>{100 - approvalRate}%</p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Description */}
@@ -218,11 +236,6 @@ function GradingTable({ submittedList, notSubmittedList, task, submissionPct, is
               <Users className="w-3 h-3" />
               {task.submissions}/{task.totalStudents} ({submissionPct}%)
             </Badge>
-            {isEncerrada && (
-              <Badge className="bg-accent/10 text-accent gap-1 text-[10px] border-0">
-                <CheckCircle className="w-3 h-3" /> Notas atribuídas
-              </Badge>
-            )}
           </div>
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" className="gap-2 text-xs"><Download className="w-3.5 h-3.5" /> Exportar</Button>
