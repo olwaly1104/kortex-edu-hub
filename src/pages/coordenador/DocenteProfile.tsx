@@ -1,12 +1,12 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { coordDocentes, coordDisciplinas, coordCursoInfo } from "@/data/institutionData";
+import { coordDocentes, coordDisciplinas, coordCursoInfo, coordTurmas } from "@/data/institutionData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   ArrowLeft, Mail, MessageCircle, BookOpen,
   Award, Users, Phone, MapPin, Calendar, GraduationCap,
-  CheckCircle, ClipboardList, TrendingUp, Building2,
+  CheckCircle, ClipboardList, TrendingUp, Building2, AlertCircle,
 } from "lucide-react";
 
 export default function CoordenadorDocenteProfile() {
@@ -48,14 +48,24 @@ export default function CoordenadorDocenteProfile() {
       </div>
 
       {/* Identity banner */}
-      <Card className="px-5 py-3.5 border-l-4 border-l-primary space-y-1">
+      <Card className="px-5 py-3.5 border-l-4 border-l-primary space-y-2">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-bold text-foreground">{docente.name}</h2>
           <Badge variant="outline" className={`text-xs ${statusBg}`}>{statusLabel}</Badge>
         </div>
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-muted-foreground">Departamento de {docente.department}</p>
-          <Badge variant="outline" className="text-xs">{docente.status === "activo" ? "Activo" : docente.status === "licença" ? "Em Licença" : "Inactivo"}</Badge>
+        <div className="flex items-center gap-2 flex-wrap">
+          <Badge variant="outline" className="text-[10px] gap-1"><GraduationCap className="w-3 h-3" /> {coordCursoInfo.code}</Badge>
+          <Badge variant="outline" className="text-[10px] gap-1"><BookOpen className="w-3 h-3" /> {coordCursoInfo.faculty}</Badge>
+          <Badge variant="outline" className="text-[10px]">Departamento de {docente.department}</Badge>
+          <Badge variant="outline" className="text-[10px]">{docente.status === "activo" ? "Activo" : docente.status === "licença" ? "Em Licença" : "Inactivo"}</Badge>
+        </div>
+        <div className="flex items-center gap-2 pt-1">
+          <Button size="sm" variant="outline" className="gap-1.5 text-xs h-7">
+            <MessageCircle className="w-3.5 h-3.5" /> Chat
+          </Button>
+          <Button size="sm" variant="outline" className="gap-1.5 text-xs h-7">
+            <Mail className="w-3.5 h-3.5" /> Email
+          </Button>
         </div>
       </Card>
 
@@ -209,6 +219,52 @@ export default function CoordenadorDocenteProfile() {
             </div>
             <p className="text-sm font-semibold text-destructive">18%</p>
           </div>
+        </div>
+      </Card>
+
+      {/* Turmas */}
+      <Card className="overflow-hidden">
+        <div className="p-4 border-b bg-muted/30">
+          <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+            <Users className="w-4 h-4" /> Turmas Leccionadas
+          </h3>
+        </div>
+        <div className="divide-y divide-border">
+          {docenteDisciplinas.length > 0 ? docenteDisciplinas.map(disc => {
+            const turma = coordTurmas.find(t => t.year === disc.year);
+            return (
+              <div key={disc.id} className="px-5 py-3.5 flex items-center gap-3 hover:bg-muted/20 transition-colors">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-medium text-foreground">{disc.name}</p>
+                    <Badge variant="outline" className="text-[10px]">{disc.code}</Badge>
+                    <Badge variant="outline" className="text-[10px]">{disc.year}º Ano</Badge>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">{disc.diasAula} · {disc.location}</p>
+                </div>
+                <div className="flex items-center gap-3 text-xs shrink-0">
+                  <div className="text-center">
+                    <p className="font-semibold text-foreground">{disc.estudantes}</p>
+                    <p className="text-[10px] text-muted-foreground">Estudantes</p>
+                  </div>
+                  <div className="text-center">
+                    <p className={`font-semibold ${disc.presenca >= 75 ? "text-accent" : "text-destructive"}`}>{disc.presenca}%</p>
+                    <p className="text-[10px] text-muted-foreground">Presença</p>
+                  </div>
+                  <div className="text-center">
+                    <p className={`font-semibold ${disc.media !== null && disc.media >= 10 ? "text-accent" : "text-destructive"}`}>{disc.media ?? "—"}</p>
+                    <p className="text-[10px] text-muted-foreground">Média</p>
+                  </div>
+                  <div className="text-center">
+                    <p className={`font-semibold ${disc.taxaAprovacao >= 70 ? "text-accent" : "text-destructive"}`}>{disc.taxaAprovacao}%</p>
+                    <p className="text-[10px] text-muted-foreground">Aprovação</p>
+                  </div>
+                </div>
+              </div>
+            );
+          }) : (
+            <div className="px-5 py-8 text-center text-muted-foreground text-sm">Nenhuma turma encontrada.</div>
+          )}
         </div>
       </Card>
     </div>

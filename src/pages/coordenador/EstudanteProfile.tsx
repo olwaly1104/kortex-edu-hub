@@ -48,14 +48,23 @@ export default function CoordenadorEstudanteProfile() {
       </div>
 
       {/* Identity banner */}
-      <Card className="px-5 py-3.5 border-l-4 border-l-primary space-y-1">
+      <Card className="px-5 py-3.5 border-l-4 border-l-primary space-y-2">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-bold text-foreground">{student.name}</h2>
           <Badge variant="outline" className={`text-xs ${sc.bg}`}>{sc.label}</Badge>
         </div>
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-muted-foreground">{coordCursoInfo.name} · {student.year}º Ano · Turma {student.turma}</p>
-          <Badge variant="outline" className="text-xs">{student.turma}</Badge>
+        <div className="flex items-center gap-2 flex-wrap">
+          <Badge variant="outline" className="text-[10px] gap-1"><GraduationCap className="w-3 h-3" /> {coordCursoInfo.code}</Badge>
+          <Badge variant="outline" className="text-[10px] gap-1"><BookOpen className="w-3 h-3" /> {coordCursoInfo.faculty}</Badge>
+          <Badge variant="outline" className="text-[10px]">{student.year}º Ano · Turma {student.turma}</Badge>
+        </div>
+        <div className="flex items-center gap-2 pt-1">
+          <Button size="sm" variant="outline" className="gap-1.5 text-xs h-7">
+            <MessageCircle className="w-3.5 h-3.5" /> Chat
+          </Button>
+          <Button size="sm" variant="outline" className="gap-1.5 text-xs h-7">
+            <Mail className="w-3.5 h-3.5" /> Email
+          </Button>
         </div>
       </Card>
 
@@ -241,15 +250,6 @@ export default function CoordenadorEstudanteProfile() {
         </div>
       </Card>
 
-      {/* Actions */}
-      <div className="flex items-center gap-2">
-        <Button size="sm" variant="outline" className="gap-1.5 text-xs">
-          <MessageCircle className="w-3.5 h-3.5" /> Enviar Mensagem
-        </Button>
-        <Button size="sm" variant="outline" className="gap-1.5 text-xs">
-          <Mail className="w-3.5 h-3.5" /> Enviar Email
-        </Button>
-      </div>
     </div>
   );
 }
