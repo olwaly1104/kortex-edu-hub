@@ -146,20 +146,20 @@ export default function CoordenadorAnos() {
                   {/* Section 1: Presença */}
                   <div className="space-y-2 pt-3 border-t border-border/50">
                     <div className="flex items-center justify-between px-1">
-                      <span className="text-xs text-muted-foreground/60 flex items-center gap-1.5">
-                        <Clock className="w-3.5 h-3.5 text-muted-foreground/40" /> Presença
+                      <span className="text-xs text-muted-foreground flex items-center gap-1.5">
+                        <Clock className="w-3.5 h-3.5 text-secondary" /> Presença
                       </span>
-                      <span className="text-sm font-semibold tabular-nums text-muted-foreground/60">{avgPresenca}%</span>
+                      <span className={`text-sm font-semibold tabular-nums ${avgPresenca >= 75 ? "text-accent" : "text-destructive"}`}>{avgPresenca}%</span>
                     </div>
                   </div>
 
                   {/* Section 2: Performance */}
                   <div className="space-y-2 pt-3 mt-3 border-t border-border/50">
                     <div className="flex items-center justify-between px-1">
-                      <span className="text-xs text-muted-foreground/60 flex items-center gap-1.5">
-                        <Award className="w-3.5 h-3.5 text-muted-foreground/40" /> Média Geral
+                      <span className="text-xs text-muted-foreground flex items-center gap-1.5">
+                        <Award className="w-3.5 h-3.5 text-primary" /> Média Geral
                       </span>
-                      <span className="text-sm font-semibold tabular-nums text-muted-foreground/60">{y.mediaGeral}/20</span>
+                      <span className={`text-sm font-semibold tabular-nums ${y.mediaGeral >= 10 ? "text-accent" : "text-destructive"}`}>{y.mediaGeral}/20</span>
                     </div>
                     <div className="flex items-center justify-between px-1">
                       <span className="text-xs text-muted-foreground flex items-center gap-1.5">
@@ -175,14 +175,8 @@ export default function CoordenadorAnos() {
                     </div>
                   </div>
 
-                  {/* Section 3: Activity - reordered */}
+                  {/* Section 3: Activity */}
                   <div className="space-y-2 pt-3 mt-3 border-t border-border/50">
-                    <div className="flex items-center justify-between px-1">
-                      <span className="text-xs text-muted-foreground flex items-center gap-1.5">
-                        <FileText className="w-3.5 h-3.5 text-secondary" /> Tarefas
-                      </span>
-                      <span className="text-sm font-semibold tabular-nums text-foreground">{Math.round(avgAvalFeitas * 1.5)}/{Math.round(totalAvaliacoes * 1.5)}</span>
-                    </div>
                     <div className="flex items-center justify-between px-1">
                       <span className="text-xs text-muted-foreground flex items-center gap-1.5">
                         <GraduationCap className="w-3.5 h-3.5 text-secondary" /> Avaliações
@@ -191,15 +185,9 @@ export default function CoordenadorAnos() {
                     </div>
                     <div className="flex items-center justify-between px-1">
                       <span className="text-xs text-muted-foreground flex items-center gap-1.5">
-                        <ClipboardList className="w-3.5 h-3.5 text-secondary" /> Taxa de Entrega
+                        <ClipboardList className="w-3.5 h-3.5 text-primary" /> Taxa de Entrega
                       </span>
                       <span className={`text-sm font-semibold tabular-nums ${avgTaxaEntrega >= 80 ? "text-accent" : "text-destructive"}`}>{avgTaxaEntrega}%</span>
-                    </div>
-                    <div className="flex items-center justify-between px-1">
-                      <span className="text-xs text-muted-foreground flex items-center gap-1.5">
-                        <TrendingUp className="w-3.5 h-3.5 text-secondary" /> Taxa de Conclusão
-                      </span>
-                      <span className="text-sm font-semibold tabular-nums text-foreground">{Math.round(y.taxaSucesso * 0.95)}%</span>
                     </div>
                   </div>
 
@@ -213,14 +201,9 @@ export default function CoordenadorAnos() {
                     </div>
                     <div className="flex items-center justify-between px-1">
                       <span className="text-xs text-muted-foreground flex items-center gap-1.5">
-                        <Video className="w-3.5 h-3.5 text-chart-4" /> Aulas Gravadas
+                        <Video className="w-3.5 h-3.5 text-secondary" /> Aulas Gravadas
                       </span>
-                      <div className="flex items-center gap-2">
-                        <div className="w-16 h-1.5 rounded-full bg-muted overflow-hidden">
-                          <div className="h-full rounded-full bg-chart-4" style={{ width: `${publishedLessons.length > 0 ? Math.round((recordedLessons / publishedLessons.length) * 100) : 0}%` }} />
-                        </div>
-                        <span className="text-sm font-semibold tabular-nums text-chart-4">{recordedLessons}</span>
-                      </div>
+                      <span className="text-sm font-semibold tabular-nums text-foreground">{recordedLessons}</span>
                     </div>
                   </div>
                 </div>
