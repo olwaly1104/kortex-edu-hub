@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { coordDocentes, coordDisciplinas, coordCursoInfo, coordTurmas } from "@/data/institutionData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -54,8 +54,12 @@ export default function CoordenadorDocenteProfile() {
           <Badge variant="outline" className={`text-xs ${statusBg}`}>{statusLabel}</Badge>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
-          <Badge variant="outline" className="text-[10px] gap-1"><GraduationCap className="w-3 h-3" /> {coordCursoInfo.code}</Badge>
-          <Badge variant="outline" className="text-[10px] gap-1"><BookOpen className="w-3 h-3" /> {coordCursoInfo.faculty}</Badge>
+          <Link to="/coordenador/curso">
+            <Badge variant="outline" className="text-[10px] gap-1 cursor-pointer hover:bg-muted/50 transition-colors"><GraduationCap className="w-3 h-3" /> {coordCursoInfo.code}</Badge>
+          </Link>
+          <Link to="/coordenador/faculdade">
+            <Badge variant="outline" className="text-[10px] gap-1 cursor-pointer hover:bg-muted/50 transition-colors"><BookOpen className="w-3 h-3" /> {coordCursoInfo.faculty}</Badge>
+          </Link>
           <Badge variant="outline" className="text-[10px]">Departamento de {docente.department}</Badge>
           <Badge variant="outline" className="text-[10px]">{docente.status === "activo" ? "Activo" : docente.status === "licença" ? "Em Licença" : "Inactivo"}</Badge>
         </div>
