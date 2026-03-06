@@ -128,7 +128,7 @@ export const coordCursoInfo: CursoInfo = {
   id: "curso1",
   name: "Arquitectura",
   code: "ARQ",
-  faculty: "Faculdade de Engenharia",
+  faculty: "Faculdade de Arquitectura",
   coordinator: "Dr. Fábio Costa",
   years: [
     { year: 1, turmas: 5, disciplinas: 8, estudantes: 160, mediaGeral: 12.4, taxaSucesso: 78 },
@@ -159,23 +159,23 @@ export const coordDocentes: Docente[] = [
 ];
 
 export const coordEstudantes: CursoEstudante[] = [
-  { id: "e1", name: "João Fernandes", email: "2934@upra.kor", year: 2, turma: "A", media: 14.2, presenca: 92, taxaEntrega: 95, tarefasFeitas: 8, tarefasTotal: 10, avaliacoesFeitas: 4, avaliacoesTotal: 5, faculdade: "Fac. de Engenharia", status: "excelente" },
-  { id: "e2", name: "Maria Silva", email: "3012@upra.kor", year: 2, turma: "A", media: 15.1, presenca: 95, taxaEntrega: 98, tarefasFeitas: 10, tarefasTotal: 10, avaliacoesFeitas: 5, avaliacoesTotal: 5, faculdade: "Fac. de Engenharia", status: "excelente" },
-  { id: "e3", name: "Pedro Nascimento", email: "2987@upra.kor", year: 2, turma: "B", media: 11.8, presenca: 78, taxaEntrega: 82, tarefasFeitas: 7, tarefasTotal: 10, avaliacoesFeitas: 3, avaliacoesTotal: 5, faculdade: "Fac. de Engenharia", status: "normal" },
-  { id: "e4", name: "Ana Gomes", email: "3045@upra.kor", year: 1, turma: "A", media: 12.5, presenca: 88, taxaEntrega: 90, tarefasFeitas: 6, tarefasTotal: 8, avaliacoesFeitas: 3, avaliacoesTotal: 4, faculdade: "Fac. de Engenharia", status: "normal" },
-  { id: "e5", name: "Carlos Santos", email: "3100@upra.kor", year: 1, turma: "A", media: 8.9, presenca: 62, taxaEntrega: 55, tarefasFeitas: 3, tarefasTotal: 8, avaliacoesFeitas: 2, avaliacoesTotal: 4, faculdade: "Fac. de Engenharia", status: "risco" },
-  { id: "e6", name: "Rita Oliveira", email: "3055@upra.kor", year: 3, turma: "A", media: 16.2, presenca: 97, taxaEntrega: 100, tarefasFeitas: 9, tarefasTotal: 9, avaliacoesFeitas: 4, avaliacoesTotal: 4, faculdade: "Fac. de Engenharia", status: "excelente" },
-  { id: "e7", name: "Bruno Mendes", email: "3066@upra.kor", year: 3, turma: "B", media: 13.4, presenca: 85, taxaEntrega: 88, tarefasFeitas: 7, tarefasTotal: 9, avaliacoesFeitas: 3, avaliacoesTotal: 4, faculdade: "Fac. de Engenharia", status: "normal" },
-  { id: "e8", name: "Catarina Reis", email: "3077@upra.kor", year: 1, turma: "B", media: 9.5, presenca: 65, taxaEntrega: 60, tarefasFeitas: 4, tarefasTotal: 8, avaliacoesFeitas: 1, avaliacoesTotal: 4, faculdade: "Fac. de Engenharia", status: "risco" },
-  { id: "e9", name: "Diogo Pereira", email: "3088@upra.kor", year: 4, turma: "A", media: 14.8, presenca: 93, taxaEntrega: 96, tarefasFeitas: 7, tarefasTotal: 7, avaliacoesFeitas: 3, avaliacoesTotal: 3, faculdade: "Fac. de Engenharia", status: "excelente" },
-  { id: "e10", name: "Eva Cunha", email: "3099@upra.kor", year: 4, turma: "A", media: 13.0, presenca: 82, taxaEntrega: 85, tarefasFeitas: 5, tarefasTotal: 7, avaliacoesFeitas: 2, avaliacoesTotal: 3, faculdade: "Fac. de Engenharia", status: "normal" },
-  { id: "e11", name: "Francisco Lima", email: "3110@upra.kor", year: 5, turma: "A", media: 15.5, presenca: 96, taxaEntrega: 100, tarefasFeitas: 6, tarefasTotal: 6, avaliacoesFeitas: 2, avaliacoesTotal: 2, faculdade: "Fac. de Engenharia", status: "excelente" },
-  { id: "e12", name: "Gonçalo Dias", email: "3121@upra.kor", year: 5, turma: "A", media: 14.0, presenca: 90, taxaEntrega: 92, tarefasFeitas: 5, tarefasTotal: 6, avaliacoesFeitas: 2, avaliacoesTotal: 2, faculdade: "Fac. de Engenharia", status: "normal" },
-  { id: "e13", name: "Helena Costa", email: "3132@upra.kor", year: 1, turma: "B", media: 7.2, presenca: 55, taxaEntrega: 45, tarefasFeitas: 2, tarefasTotal: 8, avaliacoesFeitas: 1, avaliacoesTotal: 4, faculdade: "Fac. de Engenharia", status: "risco" },
-  { id: "e14", name: "Igor Martins", email: "3143@upra.kor", year: 2, turma: "B", media: 12.1, presenca: 80, taxaEntrega: 78, tarefasFeitas: 6, tarefasTotal: 10, avaliacoesFeitas: 3, avaliacoesTotal: 5, faculdade: "Fac. de Engenharia", status: "normal" },
-  { id: "e15", name: "Joana Cardoso", email: "3154@upra.kor", year: 3, turma: "A", media: 15.8, presenca: 94, taxaEntrega: 97, tarefasFeitas: 9, tarefasTotal: 9, avaliacoesFeitas: 4, avaliacoesTotal: 4, faculdade: "Fac. de Engenharia", status: "excelente" },
-  { id: "e16", name: "Tiago Barbosa", email: "3165@upra.kor", year: 2, turma: "B", media: 8.1, presenca: 58, taxaEntrega: 50, tarefasFeitas: 3, tarefasTotal: 10, avaliacoesFeitas: 1, avaliacoesTotal: 5, faculdade: "Fac. de Engenharia", status: "risco" },
-  { id: "e17", name: "Vanessa Rocha", email: "3176@upra.kor", year: 3, turma: "B", media: 9.0, presenca: 60, taxaEntrega: 52, tarefasFeitas: 4, tarefasTotal: 9, avaliacoesFeitas: 1, avaliacoesTotal: 4, faculdade: "Fac. de Engenharia", status: "risco" },
+  { id: "e1", name: "João Fernandes", email: "2934@upra.kor", year: 2, turma: "A", media: 14.2, presenca: 92, taxaEntrega: 95, tarefasFeitas: 8, tarefasTotal: 10, avaliacoesFeitas: 4, avaliacoesTotal: 5, faculdade: "Fac. de Arquitectura", status: "excelente" },
+  { id: "e2", name: "Maria Silva", email: "3012@upra.kor", year: 2, turma: "A", media: 15.1, presenca: 95, taxaEntrega: 98, tarefasFeitas: 10, tarefasTotal: 10, avaliacoesFeitas: 5, avaliacoesTotal: 5, faculdade: "Fac. de Arquitectura", status: "excelente" },
+  { id: "e3", name: "Pedro Nascimento", email: "2987@upra.kor", year: 2, turma: "B", media: 11.8, presenca: 78, taxaEntrega: 82, tarefasFeitas: 7, tarefasTotal: 10, avaliacoesFeitas: 3, avaliacoesTotal: 5, faculdade: "Fac. de Arquitectura", status: "normal" },
+  { id: "e4", name: "Ana Gomes", email: "3045@upra.kor", year: 1, turma: "A", media: 12.5, presenca: 88, taxaEntrega: 90, tarefasFeitas: 6, tarefasTotal: 8, avaliacoesFeitas: 3, avaliacoesTotal: 4, faculdade: "Fac. de Arquitectura", status: "normal" },
+  { id: "e5", name: "Carlos Santos", email: "3100@upra.kor", year: 1, turma: "A", media: 8.9, presenca: 62, taxaEntrega: 55, tarefasFeitas: 3, tarefasTotal: 8, avaliacoesFeitas: 2, avaliacoesTotal: 4, faculdade: "Fac. de Arquitectura", status: "risco" },
+  { id: "e6", name: "Rita Oliveira", email: "3055@upra.kor", year: 3, turma: "A", media: 16.2, presenca: 97, taxaEntrega: 100, tarefasFeitas: 9, tarefasTotal: 9, avaliacoesFeitas: 4, avaliacoesTotal: 4, faculdade: "Fac. de Arquitectura", status: "excelente" },
+  { id: "e7", name: "Bruno Mendes", email: "3066@upra.kor", year: 3, turma: "B", media: 13.4, presenca: 85, taxaEntrega: 88, tarefasFeitas: 7, tarefasTotal: 9, avaliacoesFeitas: 3, avaliacoesTotal: 4, faculdade: "Fac. de Arquitectura", status: "normal" },
+  { id: "e8", name: "Catarina Reis", email: "3077@upra.kor", year: 1, turma: "B", media: 9.5, presenca: 65, taxaEntrega: 60, tarefasFeitas: 4, tarefasTotal: 8, avaliacoesFeitas: 1, avaliacoesTotal: 4, faculdade: "Fac. de Arquitectura", status: "risco" },
+  { id: "e9", name: "Diogo Pereira", email: "3088@upra.kor", year: 4, turma: "A", media: 14.8, presenca: 93, taxaEntrega: 96, tarefasFeitas: 7, tarefasTotal: 7, avaliacoesFeitas: 3, avaliacoesTotal: 3, faculdade: "Fac. de Arquitectura", status: "excelente" },
+  { id: "e10", name: "Eva Cunha", email: "3099@upra.kor", year: 4, turma: "A", media: 13.0, presenca: 82, taxaEntrega: 85, tarefasFeitas: 5, tarefasTotal: 7, avaliacoesFeitas: 2, avaliacoesTotal: 3, faculdade: "Fac. de Arquitectura", status: "normal" },
+  { id: "e11", name: "Francisco Lima", email: "3110@upra.kor", year: 5, turma: "A", media: 15.5, presenca: 96, taxaEntrega: 100, tarefasFeitas: 6, tarefasTotal: 6, avaliacoesFeitas: 2, avaliacoesTotal: 2, faculdade: "Fac. de Arquitectura", status: "excelente" },
+  { id: "e12", name: "Gonçalo Dias", email: "3121@upra.kor", year: 5, turma: "A", media: 14.0, presenca: 90, taxaEntrega: 92, tarefasFeitas: 5, tarefasTotal: 6, avaliacoesFeitas: 2, avaliacoesTotal: 2, faculdade: "Fac. de Arquitectura", status: "normal" },
+  { id: "e13", name: "Helena Costa", email: "3132@upra.kor", year: 1, turma: "B", media: 7.2, presenca: 55, taxaEntrega: 45, tarefasFeitas: 2, tarefasTotal: 8, avaliacoesFeitas: 1, avaliacoesTotal: 4, faculdade: "Fac. de Arquitectura", status: "risco" },
+  { id: "e14", name: "Igor Martins", email: "3143@upra.kor", year: 2, turma: "B", media: 12.1, presenca: 80, taxaEntrega: 78, tarefasFeitas: 6, tarefasTotal: 10, avaliacoesFeitas: 3, avaliacoesTotal: 5, faculdade: "Fac. de Arquitectura", status: "normal" },
+  { id: "e15", name: "Joana Cardoso", email: "3154@upra.kor", year: 3, turma: "A", media: 15.8, presenca: 94, taxaEntrega: 97, tarefasFeitas: 9, tarefasTotal: 9, avaliacoesFeitas: 4, avaliacoesTotal: 4, faculdade: "Fac. de Arquitectura", status: "excelente" },
+  { id: "e16", name: "Tiago Barbosa", email: "3165@upra.kor", year: 2, turma: "B", media: 8.1, presenca: 58, taxaEntrega: 50, tarefasFeitas: 3, tarefasTotal: 10, avaliacoesFeitas: 1, avaliacoesTotal: 5, faculdade: "Fac. de Arquitectura", status: "risco" },
+  { id: "e17", name: "Vanessa Rocha", email: "3176@upra.kor", year: 3, turma: "B", media: 9.0, presenca: 60, taxaEntrega: 52, tarefasFeitas: 4, tarefasTotal: 9, avaliacoesFeitas: 1, avaliacoesTotal: 4, faculdade: "Fac. de Arquitectura", status: "risco" },
 ];
 
 export const coordDisciplinas: CursoDisciplina[] = [
@@ -686,7 +686,7 @@ export interface FacultyEstudante {
 
 export const decanoFaculty: FacultyInfo = {
   id: "fac1",
-  name: "Faculdade de Engenharia",
+  name: "Faculdade de Arquitectura",
   dean: "Prof. Dr. Ricardo Almeida",
   totalEstudantes: 1240,
   totalDocentes: 86,
@@ -768,7 +768,7 @@ export const reitoriaInfo: UniversityInfo = {
   totalDocentes: 312,
   taxaSucesso: 79,
   faculties: [
-    { id: "f1", name: "Faculdade de Engenharia", dean: "Prof. Dr. Ricardo Almeida", courses: 6, estudantes: 1240, docentes: 86, taxaSucesso: 81, mediaGeral: 13.3 },
+    { id: "f1", name: "Faculdade de Arquitectura", dean: "Prof. Dr. Ricardo Almeida", courses: 6, estudantes: 1240, docentes: 86, taxaSucesso: 81, mediaGeral: 13.3 },
     { id: "f2", name: "Faculdade de Economia", dean: "Profª. Dra. Helena Sousa", courses: 4, estudantes: 980, docentes: 52, taxaSucesso: 84, mediaGeral: 13.8 },
     { id: "f3", name: "Faculdade de Direito", dean: "Prof. Dr. Tomás Carvalho", courses: 3, estudantes: 1120, docentes: 68, taxaSucesso: 76, mediaGeral: 12.9 },
     { id: "f4", name: "Faculdade de Medicina", dean: "Profª. Dra. Margarida Lopes", courses: 4, estudantes: 860, docentes: 72, taxaSucesso: 74, mediaGeral: 13.1 },
@@ -777,7 +777,7 @@ export const reitoriaInfo: UniversityInfo = {
 };
 
 export const reitoriaAprovacoes: Aprovacao[] = [
-  { id: "rap1", type: "plano", title: "Abertura de novo curso — Ciência de Dados", description: "Proposta de criação do curso de Ciência de Dados na Fac. de Engenharia", requester: "Prof. Dr. Ricardo Almeida", date: "28/02/2024", status: "pendente", priority: "alta" },
+  { id: "rap1", type: "plano", title: "Abertura de novo curso — Ciência de Dados", description: "Proposta de criação do curso de Ciência de Dados na Fac. de Arquitectura", requester: "Prof. Dr. Ricardo Almeida", date: "28/02/2024", status: "pendente", priority: "alta" },
   { id: "rap2", type: "recurso", title: "Orçamento anual — Faculdade de Medicina", description: "Aprovação do orçamento para equipamentos laboratoriais", requester: "Profª. Dra. Margarida Lopes", date: "26/02/2024", status: "pendente", priority: "alta" },
   { id: "rap3", type: "plano", title: "Protocolo internacional — Universidade de Lisboa", description: "Acordo de mobilidade estudantil e docente", requester: "Gabinete de Relações Internacionais", date: "25/02/2024", status: "pendente", priority: "alta" },
   { id: "rap4", type: "horário", title: "Calendário académico 2024/2025", description: "Aprovação do calendário académico do próximo ano lectivo", requester: "Serviços Académicos", date: "23/02/2024", status: "pendente", priority: "média" },
@@ -796,7 +796,7 @@ export interface DecanoInfo {
 }
 
 export const reitoriaDecanos: DecanoInfo[] = [
-  { id: "dec1", name: "Prof. Dr. Ricardo Almeida", faculty: "Faculdade de Engenharia", email: "r.almeida@upra.kor", since: "2019", courses: 6, estudantes: 1240 },
+  { id: "dec1", name: "Prof. Dr. Ricardo Almeida", faculty: "Faculdade de Arquitectura", email: "r.almeida@upra.kor", since: "2019", courses: 6, estudantes: 1240 },
   { id: "dec2", name: "Profª. Dra. Helena Sousa", faculty: "Faculdade de Economia", email: "h.sousa@upra.kor", since: "2020", courses: 4, estudantes: 980 },
   { id: "dec3", name: "Prof. Dr. Tomás Carvalho", faculty: "Faculdade de Direito", email: "t.carvalho@upra.kor", since: "2018", courses: 3, estudantes: 1120 },
   { id: "dec4", name: "Profª. Dra. Margarida Lopes", faculty: "Faculdade de Medicina", email: "m.lopes@upra.kor", since: "2021", courses: 4, estudantes: 860 },
@@ -813,12 +813,12 @@ export interface CoordInfo {
 }
 
 export const reitoriaCoords: CoordInfo[] = [
-  { id: "co1", name: "Dr. Manuel Rodrigues", course: "Engenharia Civil", faculty: "Fac. Engenharia", email: "m.rodrigues@upra.kor", estudantes: 229 },
-  { id: "co2", name: "Dra. Teresa Moura", course: "Engenharia Informática", faculty: "Fac. Engenharia", email: "t.moura@upra.kor", estudantes: 312 },
-  { id: "co3", name: "Dr. Jorge Bastos", course: "Engenharia Mecânica", faculty: "Fac. Engenharia", email: "j.bastos@upra.kor", estudantes: 198 },
-  { id: "co4", name: "Dra. Fernanda Reis", course: "Engenharia Electrotécnica", faculty: "Fac. Engenharia", email: "f.reis@upra.kor", estudantes: 176 },
-  { id: "co5", name: "Dr. Paulo Henriques", course: "Engenharia Ambiental", faculty: "Fac. Engenharia", email: "p.henriques@upra.kor", estudantes: 145 },
-  { id: "co6", name: "Dra. Carla Nunes", course: "Engenharia Química", faculty: "Fac. Engenharia", email: "c.nunes@upra.kor", estudantes: 180 },
+  { id: "co1", name: "Dr. Manuel Rodrigues", course: "Engenharia Civil", faculty: "Fac. Arquitectura", email: "m.rodrigues@upra.kor", estudantes: 229 },
+  { id: "co2", name: "Dra. Teresa Moura", course: "Engenharia Informática", faculty: "Fac. Arquitectura", email: "t.moura@upra.kor", estudantes: 312 },
+  { id: "co3", name: "Dr. Jorge Bastos", course: "Engenharia Mecânica", faculty: "Fac. Arquitectura", email: "j.bastos@upra.kor", estudantes: 198 },
+  { id: "co4", name: "Dra. Fernanda Reis", course: "Engenharia Electrotécnica", faculty: "Fac. Arquitectura", email: "f.reis@upra.kor", estudantes: 176 },
+  { id: "co5", name: "Dr. Paulo Henriques", course: "Engenharia Ambiental", faculty: "Fac. Arquitectura", email: "p.henriques@upra.kor", estudantes: 145 },
+  { id: "co6", name: "Dra. Carla Nunes", course: "Engenharia Química", faculty: "Fac. Arquitectura", email: "c.nunes@upra.kor", estudantes: 180 },
   { id: "co7", name: "Dr. Álvaro Mendes", course: "Gestão de Empresas", faculty: "Fac. Economia", email: "a.mendes@upra.kor", estudantes: 340 },
   { id: "co8", name: "Dra. Beatriz Santos", course: "Contabilidade", faculty: "Fac. Economia", email: "b.santos@upra.kor", estudantes: 280 },
   { id: "co9", name: "Dr. Nuno Barros", course: "Direito Civil", faculty: "Fac. Direito", email: "n.barros@upra.kor", estudantes: 420 },
@@ -837,10 +837,10 @@ export interface UniDocente {
 }
 
 export const reitoriaDocentes: UniDocente[] = [
-  { id: "ud1", name: "Prof. António Silva", email: "prof.silva@upra.kor", faculty: "Fac. Engenharia", course: "Eng. Civil", disciplinas: 3, presenca: 96, status: "activo" },
-  { id: "ud2", name: "Prof. Maria Santos", email: "prof.santos@upra.kor", faculty: "Fac. Engenharia", course: "Eng. Civil", disciplinas: 2, presenca: 92, status: "activo" },
-  { id: "ud3", name: "Prof. Pedro Ferreira", email: "prof.ferreira@upra.kor", faculty: "Fac. Engenharia", course: "Eng. Informática", disciplinas: 2, presenca: 88, status: "activo" },
-  { id: "ud4", name: "Prof. Ana Costa", email: "prof.costa@upra.kor", faculty: "Fac. Engenharia", course: "Eng. Química", disciplinas: 3, presenca: 94, status: "activo" },
+  { id: "ud1", name: "Prof. António Silva", email: "prof.silva@upra.kor", faculty: "Fac. Arquitectura", course: "Eng. Civil", disciplinas: 3, presenca: 96, status: "activo" },
+  { id: "ud2", name: "Prof. Maria Santos", email: "prof.santos@upra.kor", faculty: "Fac. Arquitectura", course: "Eng. Civil", disciplinas: 2, presenca: 92, status: "activo" },
+  { id: "ud3", name: "Prof. Pedro Ferreira", email: "prof.ferreira@upra.kor", faculty: "Fac. Arquitectura", course: "Eng. Informática", disciplinas: 2, presenca: 88, status: "activo" },
+  { id: "ud4", name: "Prof. Ana Costa", email: "prof.costa@upra.kor", faculty: "Fac. Arquitectura", course: "Eng. Química", disciplinas: 3, presenca: 94, status: "activo" },
   { id: "ud5", name: "Prof. Helena Sousa", email: "prof.sousa@upra.kor", faculty: "Fac. Economia", course: "Gestão", disciplinas: 2, presenca: 91, status: "activo" },
   { id: "ud6", name: "Prof. Tomás Carvalho", email: "prof.carvalho@upra.kor", faculty: "Fac. Direito", course: "Direito Civil", disciplinas: 3, presenca: 95, status: "activo" },
   { id: "ud7", name: "Prof. Margarida Lopes", email: "prof.mlopes@upra.kor", faculty: "Fac. Medicina", course: "Medicina Geral", disciplinas: 2, presenca: 97, status: "activo" },
