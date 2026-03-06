@@ -92,7 +92,16 @@ export default function ProfessorTaskDetail() {
         </div>
         <h1 className="text-2xl font-bold text-foreground">{task.title}</h1>
         <div className="flex items-center gap-5 mt-3 text-sm text-muted-foreground flex-wrap">
-          <span className="flex items-center gap-1.5"><Calendar className="w-4 h-4" /> Data: <span className="font-semibold text-foreground">{task.dueDate}</span></span>
+          {task.type === "exame" ? (
+            <>
+              <span className="flex items-center gap-1.5"><Calendar className="w-4 h-4" /> Data de Entrega: <span className="font-semibold text-foreground">{task.dueDate}</span></span>
+              {task.correctionDeadline && (
+                <span className="flex items-center gap-1.5"><Clock className="w-4 h-4" /> Corrigir até: <span className="font-semibold text-foreground">{task.correctionDeadline}</span></span>
+              )}
+            </>
+          ) : (
+            <span className="flex items-center gap-1.5"><Calendar className="w-4 h-4" /> Prazo da Tarefa: <span className="font-semibold text-foreground">{task.assignedDate} – {task.dueDate}</span></span>
+          )}
           <span className="flex items-center gap-1.5"><MapPin className="w-4 h-4" /> Presencial</span>
         </div>
       </div>
@@ -206,12 +215,15 @@ function GradingTable({ submittedList, notSubmittedList, task, submissionPct, co
 }) {
   const { toast } = useToast();
   const [submittedIds, setSubmittedIds] = useState<Map<string, string>>(new Map());
+  const [submeterStudent, setSubmeterStudent] = useState<any>(null);
 
-  const handleMarkSubmitted = (studentId: string, studentName: string) => {
+  const confirmSubmeter = () => {
+    if (!submeterStudent) return;
     const now = new Date();
     const time = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
-    setSubmittedIds(prev => new Map(prev).set(studentId, time));
-    toast({ title: "Submissão registada", description: `${studentName} marcado como submetido às ${time}.` });
+    setSubmittedIds(prev => new Map(prev).set(submeterStudent.id, time));
+    toast({ title: "Submissão registada", description: `${submeterStudent.name} marcado como submetido às ${time}.` });
+    setSubmeterStudent(null);
   };
 
   const [grades, setGrades] = useState<Record<string, string>>(() => {
@@ -254,22 +266,36 @@ function GradingTable({ submittedList, notSubmittedList, task, submissionPct, co
   return (
     <>
        <Card className="overflow-hidden">
-        <div className="p-5 border-b bg-muted/30 flex items-center justify-between flex-wrap gap-3">
+         <div className="p-5 border-b bg-muted/30 flex items-center justify-between flex-wrap gap-3">
           <div className="flex items-center gap-3 flex-wrap">
             <h3 className="font-semibold text-foreground">Submissões e Notas</h3>
             <Badge variant="outline" className="text-xs gap-1">
-              <Users className="w-3 h-3" /> Submetido {task.submissions}/{task.totalStudents} ({submissionPct}%)
+              <Users className="w-3 h-3" /> Submetido {task.submissions + submittedIds.size}/{task.totalStudents}
             </Badge>
-             <Badge variant="outline" className={`text-xs gap-1 ${pendingCorrection > 0 ? "border-destructive text-destructive" : ""}`}>
-               <CheckCircle className="w-3 h-3" /> Nota Atribuída {task.corrected}/{task.submissions} ({correctedPct}%)
-            </Badge>
+            {!isActiva && (
+              <Badge variant="outline" className={`text-xs gap-1 ${pendingCorrection > 0 ? "border-destructive text-destructive" : ""}`}>
+                <CheckCircle className="w-3 h-3" /> Nota Atribuída {task.corrected}/{task.submissions} ({correctedPct}%)
+              </Badge>
+            )}
           </div>
-           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-xs text-muted-foreground flex items-center gap-1"><Calendar className="w-3 h-3" /> {task.type === "exame" ? "Data da Avaliação" : "Data da Tarefa"}: <span className="font-semibold text-foreground">{task.dueDate}</span></span>
-            {!isEncerrada && pendingCorrection > 0 && (
+          <div className="flex items-center gap-2 flex-wrap">
+            {task.type === "exame" ? (
+              <>
+                <span className="text-xs text-muted-foreground flex items-center gap-1"><Calendar className="w-3 h-3" /> Data de Entrega: <span className="font-semibold text-foreground">{task.dueDate}</span></span>
+                {task.correctionDeadline && (
+                  <>
+                    <span className="text-muted-foreground/30">|</span>
+                    <span className="text-xs text-muted-foreground flex items-center gap-1"><Clock className="w-3 h-3" /> Corrigir até: <span className="font-semibold text-foreground">{task.correctionDeadline}</span></span>
+                  </>
+                )}
+              </>
+            ) : (
+              <span className="text-xs text-muted-foreground flex items-center gap-1"><Calendar className="w-3 h-3" /> Prazo da Tarefa: <span className="font-semibold text-foreground">{task.assignedDate} – {task.dueDate}</span></span>
+            )}
+            {!isActiva && !isEncerrada && pendingCorrection > 0 && task.correctionDeadline && (
               <>
                 <span className="text-muted-foreground/30">|</span>
-                <span className="text-xs text-muted-foreground flex items-center gap-1"><Clock className="w-3 h-3" /> Corrigir até: <span className="font-semibold text-foreground">{task.correctionDeadline || "—"}</span></span>
+                <span className="text-xs text-muted-foreground flex items-center gap-1"><Clock className="w-3 h-3" /> Corrigir até: <span className="font-semibold text-foreground">{task.correctionDeadline}</span></span>
               </>
             )}
             <span className="text-muted-foreground/30">|</span>
@@ -359,12 +385,57 @@ function GradingTable({ submittedList, notSubmittedList, task, submissionPct, co
           </div>
         )}
 
-        {/* Newly submitted by teacher (active tasks) */}
+        {/* Submeter section - students not yet submitted (TOP for active) */}
+        {isActiva && (() => {
+          const remaining = notSubmittedList.filter(s => !submittedIds.has(s.id));
+          if (remaining.length === 0) return null;
+          return (
+            <div>
+              <div className="px-5 py-2.5 bg-primary/5 border-y">
+                <p className="text-[11px] font-semibold text-primary uppercase tracking-wider flex items-center gap-1.5">
+                  <Send className="w-3 h-3" /> Submeter ({remaining.length})
+                </p>
+              </div>
+              <div className="divide-y">
+                {remaining.map(student => (
+                  <div key={student.id} className="px-5 py-3.5 flex items-center gap-3 hover:bg-muted/20 transition-colors">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); navigate(`/professor/students/${student.id}`); }}
+                      className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-xs font-bold text-muted-foreground shrink-0 hover:bg-muted/80 transition-colors"
+                      title="Ver perfil"
+                    >
+                      {student.name.split(" ").map((n: string) => n[0]).slice(0, 2).join("")}
+                    </button>
+                    <div className="flex-1 min-w-0">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); navigate(`/professor/students/${student.id}`); }}
+                        className="text-sm font-medium text-foreground truncate hover:text-primary transition-colors text-left"
+                      >
+                        {student.name}
+                      </button>
+                      <p className="text-[11px] text-muted-foreground">{student.email}</p>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="text-xs gap-1.5 border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+                      onClick={(e) => { e.stopPropagation(); setSubmeterStudent(student); }}
+                    >
+                      <Send className="w-3 h-3" /> Submeter
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
+
+        {/* Newly submitted by teacher (active tasks) - BOTTOM */}
         {isActiva && submittedIds.size > 0 && (
           <div>
             <div className="px-5 py-2.5 bg-accent/5 border-y">
               <p className="text-[11px] font-semibold text-accent uppercase tracking-wider flex items-center gap-1.5">
-                <Check className="w-3 h-3" /> Submetido agora ({submittedIds.size})
+                <CheckCircle className="w-3 h-3" /> Submetido ({submittedIds.size})
               </p>
             </div>
             <div className="divide-y">
@@ -387,8 +458,8 @@ function GradingTable({ submittedList, notSubmittedList, task, submissionPct, co
                     <p className="text-[11px] text-muted-foreground">{student.email}</p>
                   </div>
                   <div className="flex items-center gap-1.5 text-[11px] text-accent shrink-0">
-                    <CheckCircle className="w-3 h-3" />
-                    Submetido · {submittedIds.get(student.id)}
+                    <CheckCircle className="w-3.5 h-3.5" />
+                    <span className="font-medium">Submetido</span> · {submittedIds.get(student.id)}
                   </div>
                 </div>
               ))}
@@ -396,57 +467,39 @@ function GradingTable({ submittedList, notSubmittedList, task, submissionPct, co
           </div>
         )}
 
-        {/* Not submitted students */}
-        {(() => {
-          const remaining = notSubmittedList.filter(s => !submittedIds.has(s.id));
-          if (remaining.length === 0) return null;
-          return (
-            <div>
-              <div className="px-5 py-2.5 bg-destructive/5 border-y">
-                <p className="text-[11px] font-semibold text-destructive uppercase tracking-wider flex items-center gap-1.5">
-                  <AlertCircle className="w-3 h-3" /> {isActiva ? "Estudantes" : "Não submetido"} ({remaining.length})
-                </p>
-              </div>
-              <div className="divide-y">
-                {remaining.map(student => {
-                  const wasAtribuido = atribuidos.has(student.id);
-                  return (
-                    <div key={student.id} className="px-5 py-3.5 flex items-center gap-3 hover:bg-muted/20 transition-colors">
-                      <button
-                        onClick={(e) => { e.stopPropagation(); navigate(`/professor/students/${student.id}`); }}
-                        className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-xs font-bold text-muted-foreground shrink-0 hover:bg-muted/80 transition-colors"
-                        title="Ver perfil"
-                      >
-                        {student.name.split(" ").map((n: string) => n[0]).slice(0, 2).join("")}
-                      </button>
-                      <div className="flex-1 min-w-0">
-                        <button
-                          onClick={(e) => { e.stopPropagation(); navigate(`/professor/students/${student.id}`); }}
-                          className="text-sm font-medium text-foreground truncate hover:text-primary transition-colors text-left"
-                        >
-                          {student.name}
-                        </button>
-                        <p className="text-[11px] text-muted-foreground">{student.email}</p>
-                      </div>
-                      {isActiva ? (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="text-xs gap-1.5 border-primary text-primary hover:bg-primary hover:text-primary-foreground"
-                          onClick={(e) => { e.stopPropagation(); handleMarkSubmitted(student.id, student.name); }}
-                        >
-                          <Send className="w-3 h-3" /> Submetido
-                        </Button>
-                      ) : (
-                        <span className="text-sm font-bold text-destructive w-14 text-right shrink-0">0/20</span>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
+        {/* Not submitted students (non-active tasks) */}
+        {!isActiva && notSubmittedList.length > 0 && (
+          <div>
+            <div className="px-5 py-2.5 bg-destructive/5 border-y">
+              <p className="text-[11px] font-semibold text-destructive uppercase tracking-wider flex items-center gap-1.5">
+                <AlertCircle className="w-3 h-3" /> Não submetido ({notSubmittedList.length})
+              </p>
             </div>
-          );
-        })()}
+            <div className="divide-y">
+              {notSubmittedList.map(student => (
+                <div key={student.id} className="px-5 py-3.5 flex items-center gap-3 hover:bg-muted/20 transition-colors">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); navigate(`/professor/students/${student.id}`); }}
+                    className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-xs font-bold text-muted-foreground shrink-0 hover:bg-muted/80 transition-colors"
+                    title="Ver perfil"
+                  >
+                    {student.name.split(" ").map((n: string) => n[0]).slice(0, 2).join("")}
+                  </button>
+                  <div className="flex-1 min-w-0">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); navigate(`/professor/students/${student.id}`); }}
+                      className="text-sm font-medium text-foreground truncate hover:text-primary transition-colors text-left"
+                    >
+                      {student.name}
+                    </button>
+                    <p className="text-[11px] text-muted-foreground">{student.email}</p>
+                  </div>
+                  <span className="text-sm font-bold text-destructive w-14 text-right shrink-0">0/20</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </Card>
 
       {/* Atribuir confirmation dialog */}
@@ -474,6 +527,37 @@ function GradingTable({ submittedList, notSubmittedList, task, submissionPct, co
           <DialogFooter>
             <Button variant="outline" onClick={() => setAtribuirStudent(null)}>Cancelar</Button>
             <Button onClick={confirmAtribuir} disabled={!atribuirGrade} className="gap-1.5">
+              <CheckCircle className="w-4 h-4" /> Confirmar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Submeter confirmation dialog */}
+      <Dialog open={!!submeterStudent} onOpenChange={() => setSubmeterStudent(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Confirmar Submissão</DialogTitle>
+            <DialogDescription>
+              Confirma que o estudante <span className="font-semibold text-foreground">{submeterStudent?.name}</span> submeteu esta {task.type === "exame" ? "avaliação" : "tarefa"}?
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex items-center gap-3 py-4">
+            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-sm font-bold text-primary">
+              {submeterStudent?.name.split(" ").map((n: string) => n[0]).slice(0, 2).join("")}
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-medium">{submeterStudent?.name}</p>
+              <p className="text-xs text-muted-foreground">{submeterStudent?.email}</p>
+            </div>
+            <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+              <Clock className="w-4 h-4" />
+              {new Date().toLocaleTimeString("pt-PT", { hour: "2-digit", minute: "2-digit" })}
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setSubmeterStudent(null)}>Cancelar</Button>
+            <Button onClick={confirmSubmeter} className="gap-1.5">
               <CheckCircle className="w-4 h-4" /> Confirmar
             </Button>
           </DialogFooter>
