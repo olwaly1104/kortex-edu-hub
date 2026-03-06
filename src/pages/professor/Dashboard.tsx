@@ -341,10 +341,6 @@ export default function ProfessorDashboard() {
                             <p className={`font-bold ${avg !== null && avg >= 10 ? "text-accent" : avg !== null ? "text-destructive" : "text-muted-foreground"}`}>{avg ?? "—"}</p>
                             <p className="text-[9px] text-muted-foreground">Média</p>
                           </div>
-                          <div className="text-center">
-                            <p className={`font-bold ${taxaAprovacao !== null && taxaAprovacao >= 70 ? "text-accent" : taxaAprovacao !== null ? "text-destructive" : "text-muted-foreground"}`}>{taxaAprovacao ?? "—"}%</p>
-                            <p className="text-[9px] text-muted-foreground">Aprov.</p>
-                          </div>
                           <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
                         </div>
                       </div>
