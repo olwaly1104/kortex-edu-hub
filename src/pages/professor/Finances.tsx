@@ -3,6 +3,7 @@ import { Wallet, TrendingUp, Calendar, FileText, Download, Eye, AlertTriangle, M
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 
 const salaryHistory = [
@@ -27,9 +28,16 @@ const deductions = [
 ];
 
 const multas = [
-  { id: "m1", date: "15 Fev 2025", reason: "Atraso na entrega de notas", amount: 5000, status: "aplicada" as const, details: "Notas do Teste 1 de Matemática II entregues com 3 dias de atraso. Prazo era 12/02/2025." },
-  { id: "m2", date: "20 Jan 2025", reason: "Falta injustificada", amount: 8000, status: "pendente" as const, details: "Falta à aula de 20/01/2025 sem justificação apresentada dentro do prazo regulamentar." },
+  { id: "m1", date: "15 Fev 2025", reason: "Atraso na entrega de notas", amount: 5000, status: "aplicada" as const, details: "Notas do Teste 1 de Matemática II entregues com 3 dias de atraso." },
+  { id: "m2", date: "20 Jan 2025", reason: "Falta injustificada", amount: 8000, status: "pendente" as const, details: "Falta à aula de 20/01/2025 sem justificação apresentada dentro do prazo." },
   { id: "m3", date: "05 Dez 2024", reason: "Atraso na entrega de programa", amount: 3000, status: "aplicada" as const, details: "Programa da disciplina de Estatística entregue com 5 dias de atraso." },
+  { id: "m4", date: "18 Nov 2024", reason: "Falta injustificada", amount: 8000, status: "aplicada" as const, details: "Falta à aula de 18/11/2024 sem justificação." },
+  { id: "m5", date: "02 Nov 2024", reason: "Atraso na publicação de notas", amount: 4000, status: "aplicada" as const, details: "Notas do Quiz 2 publicadas com 5 dias de atraso." },
+  { id: "m6", date: "10 Out 2024", reason: "Não compareceu à reunião de departamento", amount: 6000, status: "aplicada" as const, details: "Ausência na reunião de departamento de 10/10/2024." },
+  { id: "m7", date: "25 Set 2024", reason: "Atraso na entrega de pautas", amount: 5000, status: "pendente" as const, details: "Pautas finais entregues 4 dias após o prazo." },
+  { id: "m8", date: "12 Set 2024", reason: "Falta injustificada", amount: 8000, status: "aplicada" as const, details: "Falta à aula de 12/09/2024 sem justificação." },
+  { id: "m9", date: "01 Ago 2024", reason: "Incumprimento de horário de atendimento", amount: 3500, status: "aplicada" as const, details: "Não cumpriu horário de atendimento a estudantes em 01/08/2024." },
+  { id: "m10", date: "15 Jul 2024", reason: "Atraso na correcção de exames", amount: 7000, status: "aplicada" as const, details: "Exames corrigidos com 7 dias de atraso face ao prazo regulamentar." },
 ];
 
 function formatCurrency(value: number) {
@@ -113,20 +121,16 @@ export default function ProfessorFinances() {
                 <Badge className="bg-destructive/10 text-destructive border-0 text-[10px]">{aplicadaCount} aplicada(s)</Badge>
                 {pendenteCount > 0 && <Badge className="bg-secondary/10 text-secondary border-0 text-[10px]">{pendenteCount} pendente(s)</Badge>}
               </div>
-              <Button variant="outline" size="sm" className="text-xs h-7 gap-1.5 rounded-lg"
-                onClick={() => setMultasModalOpen(true)}>
-                <Eye className="w-3.5 h-3.5" /> Ver Multas
-              </Button>
-            </div>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" className="text-xs h-7 gap-1.5 rounded-lg"
-                onClick={() => toast({ title: "PDF gerado", description: "Tabela de multas a descarregar..." })}>
-                <FileText className="w-3.5 h-3.5" /> Tabela de Multas (PDF)
-              </Button>
-              <Button variant="outline" size="sm" className="text-xs h-7 gap-1.5 rounded-lg"
-                onClick={() => toast({ title: "Exportação iniciada", description: "Ficheiro a descarregar..." })}>
-                <Download className="w-3.5 h-3.5" /> Exportar
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm" className="text-xs h-7 gap-1.5 rounded-lg"
+                  onClick={() => setMultasModalOpen(true)}>
+                  <Eye className="w-3.5 h-3.5" /> Ver
+                </Button>
+                <Button variant="outline" size="sm" className="text-xs h-7 gap-1.5 rounded-lg"
+                  onClick={() => toast({ title: "PDF gerado", description: "Tabela de multas a descarregar..." })}>
+                  <Download className="w-3.5 h-3.5" /> Exportar
+                </Button>
+              </div>
             </div>
           </div>
         </div>
@@ -162,10 +166,10 @@ export default function ProfessorFinances() {
 
       {/* Multas Modal */}
       <Dialog open={multasModalOpen} onOpenChange={setMultasModalOpen}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5 text-destructive" /> As Suas Multas
+              <AlertTriangle className="w-5 h-5 text-destructive" /> Tabela de Multas
             </DialogTitle>
           </DialogHeader>
           {selectedMulta ? (
@@ -191,46 +195,41 @@ export default function ProfessorFinances() {
                     <p className="text-[11px] text-muted-foreground mt-1">Este valor será descontado automaticamente do salário.</p>
                   )}
                 </div>
-                {selectedMulta.status !== "aplicada" && (
-                  <Button variant="outline" size="sm" className="w-full gap-2 text-xs"
-                    onClick={() => { toast({ title: "Disputa submetida", description: "A sua disputa foi registada e será analisada." }); setSelectedMulta(null); }}>
-                    <MessageSquare className="w-3.5 h-3.5" /> Disputar Multa
-                  </Button>
-                )}
-                {selectedMulta.status === "aplicada" && (
-                  <Button variant="outline" size="sm" className="w-full gap-2 text-xs"
-                    onClick={() => { toast({ title: "Disputa submetida", description: "A sua disputa foi registada e será analisada." }); setSelectedMulta(null); }}>
-                    <MessageSquare className="w-3.5 h-3.5" /> Disputar
-                  </Button>
-                )}
+                <Button variant="outline" size="sm" className="w-full gap-2 text-xs"
+                  onClick={() => { toast({ title: "Disputa submetida", description: "A sua disputa foi registada e será analisada." }); setSelectedMulta(null); }}>
+                  <MessageSquare className="w-3.5 h-3.5" /> Disputar
+                </Button>
               </div>
             </div>
           ) : (
-            <div className="divide-y divide-border">
-              {multas.map(m => (
-                <div key={m.id} className="flex items-center justify-between py-3.5 cursor-pointer hover:bg-muted/30 transition-colors rounded-lg px-2 -mx-2"
-                  onClick={() => setSelectedMulta(m)}>
-                  <div className="flex items-center gap-3">
-                    <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${m.status === "aplicada" ? "bg-destructive/10" : "bg-secondary/10"}`}>
-                      <AlertTriangle className={`w-4 h-4 ${m.status === "aplicada" ? "text-destructive" : "text-secondary"}`} />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-foreground">{m.reason}</p>
-                      <p className="text-xs text-muted-foreground">{m.date}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="text-right">
-                      <p className="text-sm font-semibold text-foreground">{formatCurrency(m.amount)}</p>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="text-xs">Data</TableHead>
+                  <TableHead className="text-xs">Motivo</TableHead>
+                  <TableHead className="text-xs text-right">Valor</TableHead>
+                  <TableHead className="text-xs text-center">Estado</TableHead>
+                  <TableHead className="text-xs w-10"></TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {multas.map(m => (
+                  <TableRow key={m.id} className="cursor-pointer hover:bg-muted/50" onClick={() => setSelectedMulta(m)}>
+                    <TableCell className="text-xs text-muted-foreground whitespace-nowrap">{m.date}</TableCell>
+                    <TableCell className="text-xs font-medium text-foreground">{m.reason}</TableCell>
+                    <TableCell className="text-xs font-semibold text-foreground text-right whitespace-nowrap">{formatCurrency(m.amount)}</TableCell>
+                    <TableCell className="text-center">
                       <Badge className={`text-[10px] border-0 ${m.status === "aplicada" ? "bg-destructive/10 text-destructive" : "bg-secondary/10 text-secondary"}`}>
                         {m.status === "aplicada" ? "Aplicada" : "Pendente"}
                       </Badge>
-                    </div>
-                    <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                  </div>
-                </div>
-              ))}
-            </div>
+                    </TableCell>
+                    <TableCell>
+                      <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           )}
         </DialogContent>
       </Dialog>
