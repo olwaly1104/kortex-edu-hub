@@ -105,24 +105,28 @@ export default function ProfessorFinances() {
               <p className="text-sm font-semibold text-foreground">-{formatCurrency(d.amount)}</p>
             </div>
           ))}
-          {/* Multas row */}
-          <div className="px-5 py-3.5">
+          {/* Multas section */}
+          <div className="px-5 py-3.5 space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <p className="text-sm text-foreground font-medium">Multas</p>
                 <Badge className="bg-destructive/10 text-destructive border-0 text-[10px]">{aplicadaCount} aplicada(s)</Badge>
                 {pendenteCount > 0 && <Badge className="bg-secondary/10 text-secondary border-0 text-[10px]">{pendenteCount} pendente(s)</Badge>}
               </div>
-              <div className="flex items-center gap-3">
-                <Button variant="outline" size="sm" className="text-xs h-7 gap-1.5 rounded-lg"
-                  onClick={() => toast({ title: "PDF gerado", description: "Tabela de multas a descarregar..." })}>
-                  <FileText className="w-3.5 h-3.5" /> Ver Tabela de Multas
-                </Button>
-                <Button variant="outline" size="sm" className="text-xs h-7 gap-1.5 rounded-lg"
-                  onClick={() => setMultasModalOpen(true)}>
-                  <Eye className="w-3.5 h-3.5" /> Ver Multas
-                </Button>
-              </div>
+              <Button variant="outline" size="sm" className="text-xs h-7 gap-1.5 rounded-lg"
+                onClick={() => setMultasModalOpen(true)}>
+                <Eye className="w-3.5 h-3.5" /> Ver Multas
+              </Button>
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" className="text-xs h-7 gap-1.5 rounded-lg"
+                onClick={() => toast({ title: "PDF gerado", description: "Tabela de multas a descarregar..." })}>
+                <FileText className="w-3.5 h-3.5" /> Tabela de Multas (PDF)
+              </Button>
+              <Button variant="outline" size="sm" className="text-xs h-7 gap-1.5 rounded-lg"
+                onClick={() => toast({ title: "Exportação iniciada", description: "Ficheiro a descarregar..." })}>
+                <Download className="w-3.5 h-3.5" /> Exportar
+              </Button>
             </div>
           </div>
         </div>
@@ -138,23 +142,21 @@ export default function ProfessorFinances() {
           </Button>
         </div>
         <div className="divide-y divide-border">
-          {salaryHistory.filter(s => s.status === "paid").slice(0, 3).map((s) => (
-            <div key={s.month} className="flex items-center justify-between px-5 py-3.5">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center shrink-0">
-                  <FileText className="w-4 h-4 text-accent" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-foreground">{s.month}</p>
-                  <p className="text-xs text-muted-foreground">{s.date}</p>
-                </div>
+          <div className="flex items-center justify-between px-5 py-3.5">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-secondary/10 flex items-center justify-center shrink-0">
+                <FileText className="w-4 h-4 text-secondary" />
               </div>
-              <div className="flex items-center gap-3">
-                <p className="text-sm font-semibold text-foreground">{formatCurrency(s.net)}</p>
-                <Badge className="bg-accent/10 text-accent border-0 text-[10px]">Pago</Badge>
+              <div>
+                <p className="text-sm font-medium text-foreground">{salaryHistory[2].month}</p>
+                <p className="text-xs text-muted-foreground">{salaryHistory[2].date}</p>
               </div>
             </div>
-          ))}
+            <div className="flex items-center gap-3">
+              <p className="text-sm font-semibold text-foreground">{formatCurrency(salaryHistory[2].net)}</p>
+              <Badge className="bg-secondary/10 text-secondary border-0 text-[10px]">Pendente</Badge>
+            </div>
+          </div>
         </div>
       </div>
 
