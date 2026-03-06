@@ -74,7 +74,7 @@ export default function ProfessorStudents() {
   const hasActiveFilters = filterStatuses.length > 0 || sortKey !== null || search !== "";
   const clearFilters = () => { setFilterStatuses([]); setSortKey(null); setSearch(""); };
 
-  const statusColors: Record<string, string> = { excelente: "border-l-accent", normal: "border-l-secondary", risco: "border-l-destructive" };
+  // statusColors unused after table conversion
   const statusLabels: Record<string, string> = { excelente: "Excelente", normal: "Normal", risco: "Em Risco" };
   const statusBadge: Record<string, string> = { excelente: "bg-accent/10 text-accent", normal: "bg-secondary/10 text-secondary", risco: "bg-destructive/10 text-destructive" };
 
@@ -188,61 +188,44 @@ export default function ProfessorStudents() {
         )}
       </div>
 
-      <div className="space-y-2">
-        {filtered.map(student => {
-          // Count tarefas and avaliações for this student's turma
-          const studentTasks = profTasks.filter(t => t.turmaId === student.turmaId);
-          const tarefas = studentTasks.filter(t => t.type === "tarefa" || t.type === "quiz");
-          const avaliacoes = studentTasks.filter(t => t.type === "exame");
-          const tarefasEncerradas = tarefas.filter(t => t.status === "encerrada").length;
-          const avaliacoesEncerradas = avaliacoes.filter(t => t.status === "encerrada").length;
-          const entregaPct = student.totalTasks > 0 ? Math.round((student.submittedTasks / student.totalTasks) * 100) : 0;
-
-          return (
-          <Card key={student.id} className={`p-4 flex items-center gap-4 border-l-[3px] ${statusColors[student.status]}`}>
-            <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-xs font-bold text-muted-foreground shrink-0">
-              {student.name.split(" ").map(n => n[0]).slice(0, 2).join("")}
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2">
-                <p className="text-sm font-semibold text-foreground truncate">{student.name}</p>
-                <Badge className={`${statusBadge[student.status]} text-[10px]`}>{statusLabels[student.status]}</Badge>
-              </div>
-              <p className="text-[11px] text-muted-foreground">{student.email} • {student.turma}</p>
-            </div>
-            <div className="grid grid-cols-6 gap-3 shrink-0 text-center">
-              <div>
-                <p className="text-[10px] text-muted-foreground uppercase">Presença</p>
-                <p className={`text-sm font-bold ${student.attendance >= 75 ? "text-accent" : "text-destructive"}`}>{student.attendance}%</p>
-              </div>
-              <div>
-                <p className="text-[10px] text-muted-foreground uppercase">Média</p>
-                <p className={`text-sm font-bold ${student.avgGrade && student.avgGrade >= 10 ? "text-accent" : "text-destructive"}`}>{student.avgGrade ?? "—"}</p>
-              </div>
-              <div>
-                <p className="text-[10px] text-muted-foreground uppercase">Entrega</p>
-                <p className={`text-sm font-bold ${entregaPct >= 80 ? "text-accent" : entregaPct >= 50 ? "text-foreground" : "text-destructive"}`}>{entregaPct}%</p>
-              </div>
-              <div>
-                <p className="text-[10px] text-muted-foreground uppercase">Tarefas</p>
-                <p className="text-sm font-bold text-foreground">{student.submittedTasks}/{student.totalTasks}</p>
-              </div>
-              <div>
-                <p className="text-[10px] text-muted-foreground uppercase">Avaliações</p>
-                <p className="text-sm font-bold text-foreground">{avaliacoesEncerradas}/{avaliacoes.length}</p>
-              </div>
-              <div>
-                <p className="text-[10px] text-muted-foreground uppercase">Última</p>
-                <p className="text-xs text-muted-foreground">{student.lastActive}</p>
-              </div>
-            </div>
-          </Card>
-          );
-        })}
-        {filtered.length === 0 && (
-          <p className="text-sm text-muted-foreground py-8 text-center">Nenhum estudante encontrado.</p>
-        )}
-      </div>
+      <Card className="overflow-hidden">
+        <table className="w-full text-sm">
+          <thead><tr className="border-b bg-muted/30">
+            <th className="text-left p-3 font-medium text-muted-foreground">Nome</th>
+            <th className="text-left p-3 font-medium text-muted-foreground">Email</th>
+            <th className="text-center p-3 font-medium text-muted-foreground">Turma</th>
+            <th className="text-center p-3 font-medium text-muted-foreground">Presença</th>
+            <th className="text-center p-3 font-medium text-muted-foreground">Taxa Entrega</th>
+            <th className="text-center p-3 font-medium text-muted-foreground">Média</th>
+            <th className="text-center p-3 font-medium text-muted-foreground">Tarefas</th>
+            <th className="text-center p-3 font-medium text-muted-foreground">Avaliações</th>
+            <th className="text-center p-3 font-medium text-muted-foreground">Estado</th>
+          </tr></thead>
+          <tbody>{filtered.map(student => {
+            const studentTasks = profTasks.filter(t => t.turmaId === student.turmaId);
+            const avaliacoes = studentTasks.filter(t => t.type === "exame");
+            const avaliacoesEncerradas = avaliacoes.filter(t => t.status === "encerrada").length;
+            const entregaPct = student.totalTasks > 0 ? Math.round((student.submittedTasks / student.totalTasks) * 100) : 0;
+            const sb = statusBadge[student.status];
+            return (
+              <tr key={student.id} className="border-b last:border-0 hover:bg-muted/20 transition-colors">
+                <td className="p-3 font-medium text-foreground">{student.name}</td>
+                <td className="p-3 text-muted-foreground">{student.email}</td>
+                <td className="p-3 text-center text-muted-foreground">{student.turma}</td>
+                <td className="p-3 text-center"><span className={student.attendance >= 75 ? "text-accent font-medium" : "text-destructive font-medium"}>{student.attendance}%</span></td>
+                <td className="p-3 text-center"><span className={entregaPct >= 80 ? "text-accent font-medium" : entregaPct >= 50 ? "text-foreground font-medium" : "text-destructive font-medium"}>{entregaPct}%</span></td>
+                <td className="p-3 text-center"><span className={student.avgGrade !== null && student.avgGrade >= 10 ? "text-accent font-medium" : "text-destructive font-medium"}>{student.avgGrade ?? "—"}</span></td>
+                <td className="p-3 text-center text-foreground">{student.submittedTasks}/{student.totalTasks}</td>
+                <td className="p-3 text-center text-foreground">{avaliacoesEncerradas}/{avaliacoes.length}</td>
+                <td className="p-3 text-center"><Badge className={`${sb} text-[10px]`}>{statusLabels[student.status]}</Badge></td>
+              </tr>
+            );
+          })}</tbody>
+        </table>
+      </Card>
+      {filtered.length === 0 && (
+        <p className="text-sm text-muted-foreground py-8 text-center">Nenhum estudante encontrado.</p>
+      )}
     </div>
   );
 }

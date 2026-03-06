@@ -34,6 +34,7 @@ export interface Docente {
   estudantesTotal: number;
   taxaEntrega: number;
   taxaAprovacao: number;
+  taxaReprovacao: number;
   status: "activo" | "licença" | "inactivo";
 }
 
@@ -70,6 +71,9 @@ export interface CursoEstudante {
   media: number | null;
   presenca: number;
   taxaEntrega: number;
+  taxaAprovacao: number;
+  taxaReprovacao: number;
+  faculdade: string;
   status: "excelente" | "normal" | "risco";
 }
 
@@ -84,6 +88,7 @@ export interface CursoDisciplina {
   presenca: number;
   taxaEntrega: number;
   taxaAprovacao: number;
+  taxaReprovacao: number;
   diasAula: string;
   location: string;
   status: "excelente" | "normal" | "risco";
@@ -138,50 +143,50 @@ export const coordCursoInfo: CursoInfo = {
 };
 
 export const coordDocentes: Docente[] = [
-  { id: "d1", name: "Prof. António Silva", email: "prof.silva@upra.kor", department: "Estruturas", disciplinas: 3, turmas: 4, presenca: 96, mediaGeral: 13.8, estudantesTotal: 120, taxaEntrega: 91, taxaAprovacao: 88, status: "activo" },
-  { id: "d2", name: "Prof. Maria Santos", email: "prof.santos@upra.kor", department: "Geotecnia", disciplinas: 2, turmas: 3, presenca: 92, mediaGeral: 13.2, estudantesTotal: 97, taxaEntrega: 87, taxaAprovacao: 82, status: "activo" },
-  { id: "d3", name: "Prof. Pedro Ferreira", email: "prof.ferreira@upra.kor", department: "Hidráulica", disciplinas: 2, turmas: 2, presenca: 88, mediaGeral: 12.5, estudantesTotal: 45, taxaEntrega: 78, taxaAprovacao: 71, status: "activo" },
-  { id: "d4", name: "Prof. Ana Costa", email: "prof.costa@upra.kor", department: "Materiais", disciplinas: 3, turmas: 3, presenca: 94, mediaGeral: 14.1, estudantesTotal: 76, taxaEntrega: 93, taxaAprovacao: 91, status: "activo" },
-  { id: "d5", name: "Prof. David Lopes", email: "prof.lopes@upra.kor", department: "Transportes", disciplinas: 2, turmas: 2, presenca: 90, mediaGeral: 12.8, estudantesTotal: 52, taxaEntrega: 82, taxaAprovacao: 75, status: "licença" },
-  { id: "d6", name: "Prof. Luísa Tavares", email: "prof.tavares@upra.kor", department: "Topografia", disciplinas: 2, turmas: 2, presenca: 95, mediaGeral: 13.5, estudantesTotal: 64, taxaEntrega: 89, taxaAprovacao: 84, status: "activo" },
-  { id: "d7", name: "Prof. Carlos Mendes", email: "prof.mendes@upra.kor", department: "Estruturas", disciplinas: 2, turmas: 3, presenca: 91, mediaGeral: 14.5, estudantesTotal: 68, taxaEntrega: 94, taxaAprovacao: 92, status: "activo" },
-  { id: "d8", name: "Prof. Sofia Martins", email: "prof.martins@upra.kor", department: "Matemática", disciplinas: 2, turmas: 4, presenca: 97, mediaGeral: 12.9, estudantesTotal: 128, taxaEntrega: 85, taxaAprovacao: 78, status: "activo" },
-  { id: "d9", name: "Prof. Ricardo Nunes", email: "prof.nunes@upra.kor", department: "Física", disciplinas: 2, turmas: 3, presenca: 82, mediaGeral: 10.5, estudantesTotal: 85, taxaEntrega: 74, taxaAprovacao: 62, status: "activo" },
-  { id: "d10", name: "Prof. Teresa Almeida", email: "prof.almeida@upra.kor", department: "Construção", disciplinas: 1, turmas: 2, presenca: 79, mediaGeral: 9.8, estudantesTotal: 42, taxaEntrega: 68, taxaAprovacao: 48, status: "activo" },
-  { id: "d11", name: "Prof. Miguel Sousa", email: "prof.sousa@upra.kor", department: "Urbanismo", disciplinas: 2, turmas: 2, presenca: 84, mediaGeral: 10.2, estudantesTotal: 56, taxaEntrega: 76, taxaAprovacao: 65, status: "activo" },
+  { id: "d1", name: "Prof. António Silva", email: "prof.silva@upra.kor", department: "Estruturas", disciplinas: 3, turmas: 4, presenca: 96, mediaGeral: 13.8, estudantesTotal: 120, taxaEntrega: 91, taxaAprovacao: 88, taxaReprovacao: 12, status: "activo" },
+  { id: "d2", name: "Prof. Maria Santos", email: "prof.santos@upra.kor", department: "Geotecnia", disciplinas: 2, turmas: 3, presenca: 92, mediaGeral: 13.2, estudantesTotal: 97, taxaEntrega: 87, taxaAprovacao: 82, taxaReprovacao: 18, status: "activo" },
+  { id: "d3", name: "Prof. Pedro Ferreira", email: "prof.ferreira@upra.kor", department: "Hidráulica", disciplinas: 2, turmas: 2, presenca: 88, mediaGeral: 12.5, estudantesTotal: 45, taxaEntrega: 78, taxaAprovacao: 71, taxaReprovacao: 29, status: "activo" },
+  { id: "d4", name: "Prof. Ana Costa", email: "prof.costa@upra.kor", department: "Materiais", disciplinas: 3, turmas: 3, presenca: 94, mediaGeral: 14.1, estudantesTotal: 76, taxaEntrega: 93, taxaAprovacao: 91, taxaReprovacao: 9, status: "activo" },
+  { id: "d5", name: "Prof. David Lopes", email: "prof.lopes@upra.kor", department: "Transportes", disciplinas: 2, turmas: 2, presenca: 90, mediaGeral: 12.8, estudantesTotal: 52, taxaEntrega: 82, taxaAprovacao: 75, taxaReprovacao: 25, status: "licença" },
+  { id: "d6", name: "Prof. Luísa Tavares", email: "prof.tavares@upra.kor", department: "Topografia", disciplinas: 2, turmas: 2, presenca: 95, mediaGeral: 13.5, estudantesTotal: 64, taxaEntrega: 89, taxaAprovacao: 84, taxaReprovacao: 16, status: "activo" },
+  { id: "d7", name: "Prof. Carlos Mendes", email: "prof.mendes@upra.kor", department: "Estruturas", disciplinas: 2, turmas: 3, presenca: 91, mediaGeral: 14.5, estudantesTotal: 68, taxaEntrega: 94, taxaAprovacao: 92, taxaReprovacao: 8, status: "activo" },
+  { id: "d8", name: "Prof. Sofia Martins", email: "prof.martins@upra.kor", department: "Matemática", disciplinas: 2, turmas: 4, presenca: 97, mediaGeral: 12.9, estudantesTotal: 128, taxaEntrega: 85, taxaAprovacao: 78, taxaReprovacao: 22, status: "activo" },
+  { id: "d9", name: "Prof. Ricardo Nunes", email: "prof.nunes@upra.kor", department: "Física", disciplinas: 2, turmas: 3, presenca: 82, mediaGeral: 10.5, estudantesTotal: 85, taxaEntrega: 74, taxaAprovacao: 62, taxaReprovacao: 38, status: "activo" },
+  { id: "d10", name: "Prof. Teresa Almeida", email: "prof.almeida@upra.kor", department: "Construção", disciplinas: 1, turmas: 2, presenca: 79, mediaGeral: 9.8, estudantesTotal: 42, taxaEntrega: 68, taxaAprovacao: 48, taxaReprovacao: 52, status: "activo" },
+  { id: "d11", name: "Prof. Miguel Sousa", email: "prof.sousa@upra.kor", department: "Urbanismo", disciplinas: 2, turmas: 2, presenca: 84, mediaGeral: 10.2, estudantesTotal: 56, taxaEntrega: 76, taxaAprovacao: 65, taxaReprovacao: 35, status: "activo" },
 ];
 
 export const coordEstudantes: CursoEstudante[] = [
-  { id: "e1", name: "João Fernandes", email: "2934@upra.kor", year: 2, turma: "A", media: 14.2, presenca: 92, taxaEntrega: 95, status: "excelente" },
-  { id: "e2", name: "Maria Silva", email: "3012@upra.kor", year: 2, turma: "A", media: 15.1, presenca: 95, taxaEntrega: 98, status: "excelente" },
-  { id: "e3", name: "Pedro Nascimento", email: "2987@upra.kor", year: 2, turma: "B", media: 11.8, presenca: 78, taxaEntrega: 82, status: "normal" },
-  { id: "e4", name: "Ana Gomes", email: "3045@upra.kor", year: 1, turma: "A", media: 12.5, presenca: 88, taxaEntrega: 90, status: "normal" },
-  { id: "e5", name: "Carlos Santos", email: "3100@upra.kor", year: 1, turma: "A", media: 8.9, presenca: 62, taxaEntrega: 55, status: "risco" },
-  { id: "e6", name: "Rita Oliveira", email: "3055@upra.kor", year: 3, turma: "A", media: 16.2, presenca: 97, taxaEntrega: 100, status: "excelente" },
-  { id: "e7", name: "Bruno Mendes", email: "3066@upra.kor", year: 3, turma: "B", media: 13.4, presenca: 85, taxaEntrega: 88, status: "normal" },
-  { id: "e8", name: "Catarina Reis", email: "3077@upra.kor", year: 1, turma: "B", media: 9.5, presenca: 65, taxaEntrega: 60, status: "risco" },
-  { id: "e9", name: "Diogo Pereira", email: "3088@upra.kor", year: 4, turma: "A", media: 14.8, presenca: 93, taxaEntrega: 96, status: "excelente" },
-  { id: "e10", name: "Eva Cunha", email: "3099@upra.kor", year: 4, turma: "A", media: 13.0, presenca: 82, taxaEntrega: 85, status: "normal" },
-  { id: "e11", name: "Francisco Lima", email: "3110@upra.kor", year: 5, turma: "A", media: 15.5, presenca: 96, taxaEntrega: 100, status: "excelente" },
-  { id: "e12", name: "Gonçalo Dias", email: "3121@upra.kor", year: 5, turma: "A", media: 14.0, presenca: 90, taxaEntrega: 92, status: "normal" },
-  { id: "e13", name: "Helena Costa", email: "3132@upra.kor", year: 1, turma: "B", media: 7.2, presenca: 55, taxaEntrega: 45, status: "risco" },
-  { id: "e14", name: "Igor Martins", email: "3143@upra.kor", year: 2, turma: "B", media: 12.1, presenca: 80, taxaEntrega: 78, status: "normal" },
-  { id: "e15", name: "Joana Cardoso", email: "3154@upra.kor", year: 3, turma: "A", media: 15.8, presenca: 94, taxaEntrega: 97, status: "excelente" },
-  { id: "e16", name: "Tiago Barbosa", email: "3165@upra.kor", year: 2, turma: "B", media: 8.1, presenca: 58, taxaEntrega: 50, status: "risco" },
-  { id: "e17", name: "Vanessa Rocha", email: "3176@upra.kor", year: 3, turma: "B", media: 9.0, presenca: 60, taxaEntrega: 52, status: "risco" },
+  { id: "e1", name: "João Fernandes", email: "2934@upra.kor", year: 2, turma: "A", media: 14.2, presenca: 92, taxaEntrega: 95, taxaAprovacao: 90, taxaReprovacao: 10, faculdade: "Fac. de Engenharia", status: "excelente" },
+  { id: "e2", name: "Maria Silva", email: "3012@upra.kor", year: 2, turma: "A", media: 15.1, presenca: 95, taxaEntrega: 98, taxaAprovacao: 95, taxaReprovacao: 5, faculdade: "Fac. de Engenharia", status: "excelente" },
+  { id: "e3", name: "Pedro Nascimento", email: "2987@upra.kor", year: 2, turma: "B", media: 11.8, presenca: 78, taxaEntrega: 82, taxaAprovacao: 72, taxaReprovacao: 28, faculdade: "Fac. de Engenharia", status: "normal" },
+  { id: "e4", name: "Ana Gomes", email: "3045@upra.kor", year: 1, turma: "A", media: 12.5, presenca: 88, taxaEntrega: 90, taxaAprovacao: 78, taxaReprovacao: 22, faculdade: "Fac. de Engenharia", status: "normal" },
+  { id: "e5", name: "Carlos Santos", email: "3100@upra.kor", year: 1, turma: "A", media: 8.9, presenca: 62, taxaEntrega: 55, taxaAprovacao: 40, taxaReprovacao: 60, faculdade: "Fac. de Engenharia", status: "risco" },
+  { id: "e6", name: "Rita Oliveira", email: "3055@upra.kor", year: 3, turma: "A", media: 16.2, presenca: 97, taxaEntrega: 100, taxaAprovacao: 100, taxaReprovacao: 0, faculdade: "Fac. de Engenharia", status: "excelente" },
+  { id: "e7", name: "Bruno Mendes", email: "3066@upra.kor", year: 3, turma: "B", media: 13.4, presenca: 85, taxaEntrega: 88, taxaAprovacao: 80, taxaReprovacao: 20, faculdade: "Fac. de Engenharia", status: "normal" },
+  { id: "e8", name: "Catarina Reis", email: "3077@upra.kor", year: 1, turma: "B", media: 9.5, presenca: 65, taxaEntrega: 60, taxaAprovacao: 45, taxaReprovacao: 55, faculdade: "Fac. de Engenharia", status: "risco" },
+  { id: "e9", name: "Diogo Pereira", email: "3088@upra.kor", year: 4, turma: "A", media: 14.8, presenca: 93, taxaEntrega: 96, taxaAprovacao: 92, taxaReprovacao: 8, faculdade: "Fac. de Engenharia", status: "excelente" },
+  { id: "e10", name: "Eva Cunha", email: "3099@upra.kor", year: 4, turma: "A", media: 13.0, presenca: 82, taxaEntrega: 85, taxaAprovacao: 75, taxaReprovacao: 25, faculdade: "Fac. de Engenharia", status: "normal" },
+  { id: "e11", name: "Francisco Lima", email: "3110@upra.kor", year: 5, turma: "A", media: 15.5, presenca: 96, taxaEntrega: 100, taxaAprovacao: 96, taxaReprovacao: 4, faculdade: "Fac. de Engenharia", status: "excelente" },
+  { id: "e12", name: "Gonçalo Dias", email: "3121@upra.kor", year: 5, turma: "A", media: 14.0, presenca: 90, taxaEntrega: 92, taxaAprovacao: 85, taxaReprovacao: 15, faculdade: "Fac. de Engenharia", status: "normal" },
+  { id: "e13", name: "Helena Costa", email: "3132@upra.kor", year: 1, turma: "B", media: 7.2, presenca: 55, taxaEntrega: 45, taxaAprovacao: 30, taxaReprovacao: 70, faculdade: "Fac. de Engenharia", status: "risco" },
+  { id: "e14", name: "Igor Martins", email: "3143@upra.kor", year: 2, turma: "B", media: 12.1, presenca: 80, taxaEntrega: 78, taxaAprovacao: 70, taxaReprovacao: 30, faculdade: "Fac. de Engenharia", status: "normal" },
+  { id: "e15", name: "Joana Cardoso", email: "3154@upra.kor", year: 3, turma: "A", media: 15.8, presenca: 94, taxaEntrega: 97, taxaAprovacao: 95, taxaReprovacao: 5, faculdade: "Fac. de Engenharia", status: "excelente" },
+  { id: "e16", name: "Tiago Barbosa", email: "3165@upra.kor", year: 2, turma: "B", media: 8.1, presenca: 58, taxaEntrega: 50, taxaAprovacao: 35, taxaReprovacao: 65, faculdade: "Fac. de Engenharia", status: "risco" },
+  { id: "e17", name: "Vanessa Rocha", email: "3176@upra.kor", year: 3, turma: "B", media: 9.0, presenca: 60, taxaEntrega: 52, taxaAprovacao: 38, taxaReprovacao: 62, faculdade: "Fac. de Engenharia", status: "risco" },
 ];
 
 export const coordDisciplinas: CursoDisciplina[] = [
-  { id: "cd1", name: "Desenho Arquitectónico I", code: "DAR101", year: 1, professor: "Prof. Sofia Martins", estudantes: 64, media: 12.1, presenca: 82, taxaEntrega: 78, taxaAprovacao: 75, diasAula: "Seg, Qua, Sex", location: "Atelier A1", status: "normal" },
-  { id: "cd2", name: "História da Arquitectura I", code: "HAR101", year: 1, professor: "Prof. Maria Santos", estudantes: 64, media: 11.8, presenca: 79, taxaEntrega: 74, taxaAprovacao: 68, diasAula: "Ter, Qui", location: "Sala A102", status: "risco" },
-  { id: "cd3", name: "Geometria Descritiva", code: "GDE101", year: 1, professor: "Prof. Luísa Tavares", estudantes: 64, media: 13.2, presenca: 88, taxaEntrega: 85, taxaAprovacao: 82, diasAula: "Seg, Qua", location: "Sala B203", status: "normal" },
-  { id: "cd4", name: "Projecto de Arquitectura I", code: "PAR201", year: 2, professor: "Prof. António Silva", estudantes: 52, media: 13.0, presenca: 85, taxaEntrega: 82, taxaAprovacao: 79, diasAula: "Ter, Qui, Sex", location: "Atelier A2", status: "normal" },
-  { id: "cd5", name: "Construção e Materiais", code: "CMA201", year: 2, professor: "Prof. Carlos Mendes", estudantes: 52, media: 12.5, presenca: 83, taxaEntrega: 80, taxaAprovacao: 76, diasAula: "Seg, Qua", location: "Sala C301", status: "normal" },
-  { id: "cd6", name: "Teoria da Arquitectura", code: "TAR301", year: 3, professor: "Prof. Maria Santos", estudantes: 45, media: 13.9, presenca: 90, taxaEntrega: 88, taxaAprovacao: 87, diasAula: "Ter, Qui", location: "Sala D201", status: "excelente" },
-  { id: "cd7", name: "Urbanismo e Planeamento", code: "URB301", year: 3, professor: "Prof. Pedro Ferreira", estudantes: 45, media: 13.5, presenca: 86, taxaEntrega: 83, taxaAprovacao: 80, diasAula: "Seg, Qua, Sex", location: "Atelier A3", status: "normal" },
-  { id: "cd8", name: "Projecto de Arquitectura II", code: "PAR401", year: 4, professor: "Prof. António Silva", estudantes: 38, media: 14.2, presenca: 91, taxaEntrega: 90, taxaAprovacao: 89, diasAula: "Ter, Qui", location: "Atelier A4", status: "excelente" },
-  { id: "cd9", name: "Reabilitação e Restauro", code: "RER401", year: 4, professor: "Prof. Ana Costa", estudantes: 38, media: 14.5, presenca: 93, taxaEntrega: 92, taxaAprovacao: 91, diasAula: "Seg, Qua", location: "Sala D402", status: "excelente" },
-  { id: "cd10", name: "Projecto Final de Arquitectura", code: "PFA501", year: 5, professor: "Prof. Carlos Mendes", estudantes: 30, media: 15.0, presenca: 95, taxaEntrega: 96, taxaAprovacao: 93, diasAula: "Sex", location: "Atelier A5", status: "excelente" },
+  { id: "cd1", name: "Desenho Arquitectónico I", code: "DAR101", year: 1, professor: "Prof. Sofia Martins", estudantes: 64, media: 12.1, presenca: 82, taxaEntrega: 78, taxaAprovacao: 75, taxaReprovacao: 25, diasAula: "Seg, Qua, Sex", location: "Atelier A1", status: "normal" },
+  { id: "cd2", name: "História da Arquitectura I", code: "HAR101", year: 1, professor: "Prof. Maria Santos", estudantes: 64, media: 11.8, presenca: 79, taxaEntrega: 74, taxaAprovacao: 68, taxaReprovacao: 32, diasAula: "Ter, Qui", location: "Sala A102", status: "risco" },
+  { id: "cd3", name: "Geometria Descritiva", code: "GDE101", year: 1, professor: "Prof. Luísa Tavares", estudantes: 64, media: 13.2, presenca: 88, taxaEntrega: 85, taxaAprovacao: 82, taxaReprovacao: 18, diasAula: "Seg, Qua", location: "Sala B203", status: "normal" },
+  { id: "cd4", name: "Projecto de Arquitectura I", code: "PAR201", year: 2, professor: "Prof. António Silva", estudantes: 52, media: 13.0, presenca: 85, taxaEntrega: 82, taxaAprovacao: 79, taxaReprovacao: 21, diasAula: "Ter, Qui, Sex", location: "Atelier A2", status: "normal" },
+  { id: "cd5", name: "Construção e Materiais", code: "CMA201", year: 2, professor: "Prof. Carlos Mendes", estudantes: 52, media: 12.5, presenca: 83, taxaEntrega: 80, taxaAprovacao: 76, taxaReprovacao: 24, diasAula: "Seg, Qua", location: "Sala C301", status: "normal" },
+  { id: "cd6", name: "Teoria da Arquitectura", code: "TAR301", year: 3, professor: "Prof. Maria Santos", estudantes: 45, media: 13.9, presenca: 90, taxaEntrega: 88, taxaAprovacao: 87, taxaReprovacao: 13, diasAula: "Ter, Qui", location: "Sala D201", status: "excelente" },
+  { id: "cd7", name: "Urbanismo e Planeamento", code: "URB301", year: 3, professor: "Prof. Pedro Ferreira", estudantes: 45, media: 13.5, presenca: 86, taxaEntrega: 83, taxaAprovacao: 80, taxaReprovacao: 20, diasAula: "Seg, Qua, Sex", location: "Atelier A3", status: "normal" },
+  { id: "cd8", name: "Projecto de Arquitectura II", code: "PAR401", year: 4, professor: "Prof. António Silva", estudantes: 38, media: 14.2, presenca: 91, taxaEntrega: 90, taxaAprovacao: 89, taxaReprovacao: 11, diasAula: "Ter, Qui", location: "Atelier A4", status: "excelente" },
+  { id: "cd9", name: "Reabilitação e Restauro", code: "RER401", year: 4, professor: "Prof. Ana Costa", estudantes: 38, media: 14.5, presenca: 93, taxaEntrega: 92, taxaAprovacao: 91, taxaReprovacao: 9, diasAula: "Seg, Qua", location: "Sala D402", status: "excelente" },
+  { id: "cd10", name: "Projecto Final de Arquitectura", code: "PFA501", year: 5, professor: "Prof. Carlos Mendes", estudantes: 30, media: 15.0, presenca: 95, taxaEntrega: 96, taxaAprovacao: 93, taxaReprovacao: 7, diasAula: "Sex", location: "Atelier A5", status: "excelente" },
 ];
 
 export const coordNotas: CursoNota[] = [
