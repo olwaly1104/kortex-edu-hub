@@ -127,19 +127,27 @@ export default function ProfessorDisciplines() {
                   </div>
 
                   {/* Turma Info - Estudantes, Sala, Dias de Aula */}
-                  <div className="flex items-center gap-3 flex-wrap text-sm mb-4 pb-4 border-b border-border/50">
-                    <div className="flex items-center gap-2 rounded-lg border border-border px-4 py-2.5">
-                      <Users className="w-4.5 h-4.5 text-primary" />
-                      <span className="font-bold text-foreground text-base">{turma.students}</span>
-                      <span className="text-muted-foreground">estudantes</span>
+                  <div className="grid grid-cols-3 gap-3 mb-4">
+                    <div className="text-center p-2.5 rounded-lg bg-muted/50">
+                      <div className="flex items-center justify-center gap-1.5 mb-1">
+                        <Users className="w-3.5 h-3.5 text-primary" />
+                        <p className="text-lg font-bold text-foreground">{turma.students}</p>
+                      </div>
+                      <p className="text-[10px] text-muted-foreground">Estudantes</p>
                     </div>
-                    <div className="flex items-center gap-2 rounded-lg border border-border px-4 py-2.5">
-                      <MapPin className="w-4.5 h-4.5 text-muted-foreground" />
-                      <span className="font-bold text-foreground text-base">{room || "—"}</span>
+                    <div className="text-center p-2.5 rounded-lg bg-muted/50">
+                      <div className="flex items-center justify-center gap-1.5 mb-1">
+                        <MapPin className="w-3.5 h-3.5 text-muted-foreground" />
+                        <p className="text-lg font-bold text-foreground">{room || "—"}</p>
+                      </div>
+                      <p className="text-[10px] text-muted-foreground">Sala</p>
                     </div>
-                    <div className="flex items-center gap-2 rounded-lg border border-border px-4 py-2.5">
-                      <Calendar className="w-4.5 h-4.5 text-muted-foreground" />
-                      <span className="font-bold text-foreground text-base">{scheduleDays || "—"}</span>
+                    <div className="text-center p-2.5 rounded-lg bg-muted/50">
+                      <div className="flex items-center justify-center gap-1.5 mb-1">
+                        <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
+                        <p className="text-lg font-bold text-foreground">{scheduleDays || "—"}</p>
+                      </div>
+                      <p className="text-[10px] text-muted-foreground">Dias de Aula</p>
                     </div>
                   </div>
 
