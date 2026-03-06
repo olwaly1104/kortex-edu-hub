@@ -10,13 +10,15 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import {
   BookOpen, Plus, Search, Clock, CheckCircle, Users, Send,
   Calendar, AlertCircle, ClipboardList, BarChart3,
-  MapPin, ArrowRight, ArrowUpDown, SlidersHorizontal, X, FileCheck,
+  MapPin, ArrowRight, ArrowUpDown, X, FileCheck,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const statusStyle: Record<string, { bg: string; label: string; icon: React.ElementType }> = {
   rascunho: { bg: "bg-muted text-muted-foreground", label: "Rascunho", icon: Clock },
+  agendada: { bg: "bg-secondary/10 text-secondary", label: "Agendada", icon: Calendar },
   publicada: { bg: "bg-primary/10 text-primary", label: "Activa", icon: Clock },
+  pendente: { bg: "bg-destructive/10 text-destructive", label: "Pendente", icon: AlertCircle },
   encerrada: { bg: "bg-accent/10 text-accent", label: "Encerrada", icon: CheckCircle },
 };
 
@@ -39,7 +41,7 @@ function SummaryCard({ label, value, icon: Icon, iconBg, iconColor, valueClass }
 
 type SortKey = "dueDate" | "weight" | "submissions" | "avgGrade";
 type SortDir = "asc" | "desc";
-type FilterStatus = "publicada" | "encerrada" | "rascunho";
+type FilterStatus = "todas" | "publicada" | "pendente" | "agendada" | "encerrada";
 
 export default function ProfessorTasks() {
   const { toast } = useToast();
@@ -49,7 +51,7 @@ export default function ProfessorTasks() {
   const [showForm, setShowForm] = useState(false);
   const [sortKey, setSortKey] = useState<SortKey | null>(null);
   const [sortDir, setSortDir] = useState<SortDir>("desc");
-  const [filterStatuses, setFilterStatuses] = useState<FilterStatus[]>([]);
+  const [filterStatus, setFilterStatus] = useState<FilterStatus>("todas");
 
   const [formDisc, setFormDisc] = useState(profDisciplines[0]?.id || "");
   const [formTitle, setFormTitle] = useState("");
@@ -64,8 +66,10 @@ export default function ProfessorTasks() {
   }, [filterTurma, allTarefas]);
 
   const activeTasks = scopedTasks.filter(t => t.status === "publicada");
+  const pendenteTasks = scopedTasks.filter(t => t.status === "pendente");
+  const agendadaTasks = scopedTasks.filter(t => t.status === "agendada");
   const closedTasks = scopedTasks.filter(t => t.status === "encerrada");
-  const porAtribuir = activeTasks.length;
+  const porAtribuir = activeTasks.length + pendenteTasks.length;
   const totalSubmissions = scopedTasks.reduce((s, t) => s + t.submissions, 0);
   const totalExpected = scopedTasks.filter(t => t.status !== "rascunho").reduce((s, t) => s + t.totalStudents, 0);
   const avgSubmissionRate = totalExpected > 0 ? Math.round(totalSubmissions / totalExpected * 100) : 0;
@@ -74,7 +78,7 @@ export default function ProfessorTasks() {
 
   const filtered = useMemo(() => {
     let result = scopedTasks
-      .filter(t => filterStatuses.length === 0 || filterStatuses.includes(t.status as FilterStatus))
+      .filter(t => filterStatus === "todas" || t.status === filterStatus)
       .filter(t => t.title.toLowerCase().includes(searchTerm.toLowerCase()));
 
     if (sortKey) {
@@ -88,14 +92,10 @@ export default function ProfessorTasks() {
       });
     }
     return result;
-  }, [scopedTasks, filterStatuses, searchTerm, sortKey, sortDir]);
+  }, [scopedTasks, filterStatus, searchTerm, sortKey, sortDir]);
 
-  const toggleFilterStatus = (s: FilterStatus) => {
-    setFilterStatuses(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s]);
-  };
-
-  const hasActiveFilters = filterStatuses.length > 0 || sortKey !== null || searchTerm !== "";
-  const clearFilters = () => { setFilterStatuses([]); setSortKey(null); setSearchTerm(""); };
+  const hasActiveFilters = filterStatus !== "todas" || sortKey !== null || searchTerm !== "";
+  const clearFilters = () => { setFilterStatus("todas"); setSortKey(null); setSearchTerm(""); };
 
   const handleSubmit = () => {
     if (!formTitle || !formDesc || !formDue) {
@@ -160,9 +160,9 @@ export default function ProfessorTasks() {
       {/* Summary cards */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
         <SummaryCard label="Activas" value={activeTasks.length} icon={Clock} iconBg="bg-primary/10" iconColor="text-primary" />
-        <SummaryCard label="Por Atribuir" value={porAtribuir} icon={AlertCircle} iconBg="bg-destructive/10" iconColor="text-destructive" valueClass={porAtribuir > 0 ? "text-destructive" : undefined} />
+        <SummaryCard label="Pendente" value={pendenteTasks.length} icon={AlertCircle} iconBg="bg-destructive/10" iconColor="text-destructive" valueClass={pendenteTasks.length > 0 ? "text-destructive" : undefined} />
+        <SummaryCard label="Agendadas" value={agendadaTasks.length} icon={Calendar} iconBg="bg-secondary/10" iconColor="text-secondary" />
         <SummaryCard label="Encerradas" value={closedTasks.length} icon={CheckCircle} iconBg="bg-accent/10" iconColor="text-accent" />
-        <SummaryCard label="Taxa Entrega" value={`${avgSubmissionRate}%`} icon={BarChart3} iconBg="bg-secondary/10" iconColor="text-secondary" />
         <SummaryCard label="Nota Geral" value={overallAvg ?? "—"} icon={BookOpen} iconBg="bg-accent/10" iconColor="text-accent" valueClass={overallAvg && Number(overallAvg) >= 10 ? "text-accent" : overallAvg ? "text-destructive" : "text-muted-foreground"} />
       </div>
 
@@ -182,14 +182,11 @@ export default function ProfessorTasks() {
 
         <div className="border-t border-border" />
 
-        {/* Search + Sort + Filter row */}
-        <div className="flex gap-2 items-center">
-          <div className="relative flex-1 max-w-sm">
+        <div className="flex gap-2 items-center flex-wrap">
+          <div className="relative flex-1 min-w-[180px] max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input placeholder="Pesquisar tarefa..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-9 h-9" />
           </div>
-
-          <div className="flex-1" />
 
           {hasActiveFilters && (
             <Button variant="ghost" size="sm" className="text-xs text-destructive hover:text-destructive hover:bg-destructive/10 shrink-0 gap-1" onClick={clearFilters}>
@@ -197,45 +194,44 @@ export default function ProfessorTasks() {
             </Button>
           )}
 
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline" size="sm" className={`gap-1.5 shrink-0 text-xs ${sortKey ? "border-primary/50 bg-primary/5 text-primary" : ""}`}>
-                <ArrowUpDown className="w-3.5 h-3.5" /> Ordenar
+          <div className="flex items-center gap-2 ml-auto">
+            {([
+              { key: "todas" as FilterStatus, label: "Todas" },
+              { key: "publicada" as FilterStatus, label: "Activa" },
+              { key: "pendente" as FilterStatus, label: "Pendente" },
+              { key: "agendada" as FilterStatus, label: "Agendada" },
+              { key: "encerrada" as FilterStatus, label: "Encerrada" },
+            ]).map(s => (
+              <Button key={s.key} size="sm" variant={filterStatus === s.key ? "default" : "outline"} onClick={() => setFilterStatus(s.key)} className="text-xs">
+                {s.label}
               </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-44 p-2 space-y-1" align="end" side="top">
-              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-2 pt-1">Campo</p>
-              {[
-                { key: null, label: "Todos" },
-                { key: "weight" as SortKey, label: "Peso" },
-                { key: "submissions" as SortKey, label: "Taxa Entrega" },
-                { key: "avgGrade" as SortKey, label: "Média" },
-              ].map(opt => (
-                <button key={String(opt.key)} onClick={() => setSortKey(opt.key)} className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${sortKey === opt.key ? "bg-primary/10 text-primary font-medium" : "text-foreground hover:bg-muted"}`}>{opt.label}</button>
-              ))}
-              <div className="border-t border-border my-1" />
-              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-2">Direção</p>
-              <button onClick={() => setSortDir("desc")} className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${sortDir === "desc" && sortKey ? "bg-primary/10 text-primary font-medium" : "text-foreground hover:bg-muted"}`}>Maior → Menor</button>
-              <button onClick={() => setSortDir("asc")} className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${sortDir === "asc" && sortKey ? "bg-primary/10 text-primary font-medium" : "text-foreground hover:bg-muted"}`}>Menor → Maior</button>
-            </PopoverContent>
-          </Popover>
+            ))}
 
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline" size="sm" className={`gap-1.5 shrink-0 text-xs ${filterStatuses.length > 0 ? "border-primary/50 bg-primary/5 text-primary" : ""}`}>
-                <SlidersHorizontal className="w-3.5 h-3.5" /> Filtrar
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-40 p-2 space-y-0.5" align="end" side="top">
-              {([
-                { key: "publicada" as FilterStatus, label: "Activa" },
-                { key: "encerrada" as FilterStatus, label: "Encerrada" },
-                { key: "rascunho" as FilterStatus, label: "Rascunho" },
-              ]).map(s => (
-                <button key={s.key} onClick={() => toggleFilterStatus(s.key)} className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${filterStatuses.includes(s.key) ? "bg-primary/10 text-primary font-medium" : "text-foreground hover:bg-muted"}`}>{s.label}</button>
-              ))}
-            </PopoverContent>
-          </Popover>
+            <div className="w-px h-6 bg-border" />
+
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="sm" className={`gap-1.5 shrink-0 text-xs ${sortKey ? "border-primary/50 bg-primary/5 text-primary" : ""}`}>
+                  <ArrowUpDown className="w-3.5 h-3.5" /> Ordenar
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-44 p-2 space-y-1" align="end" side="top">
+                <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-2 pt-1">Campo</p>
+                {[
+                  { key: null, label: "Todos" },
+                  { key: "weight" as SortKey, label: "Peso" },
+                  { key: "submissions" as SortKey, label: "Taxa Entrega" },
+                  { key: "avgGrade" as SortKey, label: "Média" },
+                ].map(opt => (
+                  <button key={String(opt.key)} onClick={() => setSortKey(opt.key)} className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${sortKey === opt.key ? "bg-primary/10 text-primary font-medium" : "text-foreground hover:bg-muted"}`}>{opt.label}</button>
+                ))}
+                <div className="border-t border-border my-1" />
+                <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-2">Direção</p>
+                <button onClick={() => setSortDir("desc")} className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${sortDir === "desc" && sortKey ? "bg-primary/10 text-primary font-medium" : "text-foreground hover:bg-muted"}`}>Maior → Menor</button>
+                <button onClick={() => setSortDir("asc")} className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${sortDir === "asc" && sortKey ? "bg-primary/10 text-primary font-medium" : "text-foreground hover:bg-muted"}`}>Menor → Maior</button>
+              </PopoverContent>
+            </Popover>
+          </div>
         </div>
 
         {/* Active tags */}
@@ -247,12 +243,12 @@ export default function ProfessorTasks() {
                 <X className="w-2.5 h-2.5" />
               </Badge>
             )}
-            {filterStatuses.map(s => (
-              <Badge key={s} variant="outline" className="text-[10px] gap-1 bg-accent/10 text-accent border-accent/20 cursor-pointer hover:bg-accent/15" onClick={() => toggleFilterStatus(s)}>
-                Estado: {s === "publicada" ? "Activa" : s === "encerrada" ? "Encerrada" : "Rascunho"}
+            {filterStatus !== "todas" && (
+              <Badge variant="outline" className="text-[10px] gap-1 bg-accent/10 text-accent border-accent/20 cursor-pointer hover:bg-accent/15" onClick={() => setFilterStatus("todas")}>
+                Estado: {filterStatus === "publicada" ? "Activa" : filterStatus === "pendente" ? "Pendente" : filterStatus === "agendada" ? "Agendada" : "Encerrada"}
                 <X className="w-2.5 h-2.5" />
               </Badge>
-            ))}
+            )}
             {searchTerm && (
               <Badge variant="outline" className="text-[10px] gap-1 bg-secondary/10 text-secondary border-secondary/20 cursor-pointer hover:bg-secondary/15" onClick={() => setSearchTerm("")}>
                 Pesquisa: "{searchTerm}"
