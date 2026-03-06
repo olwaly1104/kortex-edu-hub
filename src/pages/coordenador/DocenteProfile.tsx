@@ -121,6 +121,15 @@ export default function CoordenadorDocenteProfile() {
         <div className="divide-y divide-border">
           <div className="flex items-center justify-between px-5 py-3.5">
             <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-secondary/10 flex items-center justify-center">
+                <Calendar className="w-4 h-4 text-secondary" />
+              </div>
+              <p className="text-sm text-muted-foreground">Ano Lectivo</p>
+            </div>
+            <p className="text-sm font-semibold text-foreground">2024/2025</p>
+          </div>
+          <div className="flex items-center justify-between px-5 py-3.5">
+            <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
                 <Users className="w-4 h-4 text-primary" />
               </div>
