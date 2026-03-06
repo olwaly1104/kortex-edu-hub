@@ -251,9 +251,13 @@ function GradingTable({ submittedList, notSubmittedList, task, submissionPct, co
             </Badge>
           </div>
            <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-xs text-muted-foreground flex items-center gap-1"><Calendar className="w-3 h-3" /> Data Limite: <span className="font-semibold text-foreground">{task.dueDate}</span></span>
-            <span className="text-muted-foreground/30">|</span>
-            <span className="text-xs text-muted-foreground flex items-center gap-1"><Clock className="w-3 h-3" /> Corrigir até: <span className="font-semibold text-foreground">{task.correctionDeadline || "—"}</span></span>
+            <span className="text-xs text-muted-foreground flex items-center gap-1"><Calendar className="w-3 h-3" /> {task.type === "exame" ? "Data da Avaliação" : "Data da Tarefa"}: <span className="font-semibold text-foreground">{task.dueDate}</span></span>
+            {!isEncerrada && pendingCorrection > 0 && (
+              <>
+                <span className="text-muted-foreground/30">|</span>
+                <span className="text-xs text-muted-foreground flex items-center gap-1"><Clock className="w-3 h-3" /> Corrigir até: <span className="font-semibold text-foreground">{task.correctionDeadline || "—"}</span></span>
+              </>
+            )}
             <span className="text-muted-foreground/30">|</span>
             <Button variant="outline" size="sm" className="gap-2 text-xs"><Download className="w-3.5 h-3.5" /> Exportar</Button>
             {!isEncerrada && (
