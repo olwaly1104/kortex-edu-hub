@@ -16,6 +16,8 @@ import StudentTasks from "./pages/student/Tasks";
 import StudentCalendar from "./pages/student/Calendar";
 import StudentAnnouncements from "./pages/student/Announcements";
 import StudentContacts from "./pages/student/Contacts";
+import StudentChat from "./pages/student/Chat";
+import StudentEmail from "./pages/student/Email";
 import StudentGrades from "./pages/student/Grades";
 import StudentLibrary from "./pages/student/Library";
 import StudentProfile from "./pages/student/Profile";
@@ -122,6 +124,8 @@ function AppRoutes() {
         <Route path="/professor/tasks/:taskId" element={<ProfessorTaskDetail />} />
         <Route path="/professor/students/:studentId" element={<ProfessorStudentProfile />} />
         <Route path="/professor/contacts" element={<ProfessorContacts />} />
+        <Route path="/professor/chat" element={<StudentChat />} />
+        <Route path="/professor/email" element={<StudentEmail />} />
         <Route path="/professor/finances" element={<ProfessorFinances />} />
         <Route path="/professor/profile" element={<StudentProfile />} />
         {/* Coordenador de Curso */}
