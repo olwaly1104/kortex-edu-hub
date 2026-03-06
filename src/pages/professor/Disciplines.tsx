@@ -19,6 +19,10 @@ export default function ProfessorDisciplines() {
   const overallAttendance = allStudentsUnique.length > 0
     ? Math.round(allStudentsUnique.reduce((s, st) => s + st.attendance, 0) / allStudentsUnique.length)
     : 0;
+  const totalTarefas = profTasks.filter(t => t.type === "tarefa" || t.type === "quiz").length;
+  const totalTarefasEncerradas = profTasks.filter(t => t.type === "tarefa" || t.type === "quiz").filter(t => t.status === "encerrada").length;
+  const totalAvaliacoes = profTasks.filter(t => t.type === "exame").length;
+  const totalAvaliacoesEncerradas = profTasks.filter(t => t.type === "exame").filter(t => t.status === "encerrada").length;
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
@@ -26,7 +30,7 @@ export default function ProfessorDisciplines() {
         <GraduationCap className="w-6 h-6 text-primary" /> As Minhas Turmas
       </h1>
 
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+      <div className="grid grid-cols-2 lg:grid-cols-7 gap-3">
         <div className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4">
           <div className="flex items-center justify-between">
             <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Estudantes</p>
@@ -73,6 +77,24 @@ export default function ProfessorDisciplines() {
           <Badge className={`text-xs mt-1 border ${taxaAprovacao >= 85 ? "bg-accent/10 text-accent border-accent/30" : taxaAprovacao < 60 ? "bg-destructive/10 text-destructive border-destructive/30" : "bg-primary/10 text-primary border-primary/30"}`}>
             {taxaAprovacao >= 85 ? "Excelente" : taxaAprovacao < 60 ? "Em Risco" : "Normal"}
           </Badge>
+        </div>
+        <div className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4">
+          <div className="flex items-center justify-between">
+            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Tarefas</p>
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-primary/10">
+              <ClipboardList className="w-4 h-4 text-primary" />
+            </div>
+          </div>
+          <p className="text-2xl font-bold text-foreground">{totalTarefasEncerradas}/{totalTarefas}</p>
+        </div>
+        <div className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4">
+          <div className="flex items-center justify-between">
+            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Avaliações</p>
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-secondary/10">
+              <BarChart3 className="w-4 h-4 text-secondary" />
+            </div>
+          </div>
+          <p className="text-2xl font-bold text-foreground">{totalAvaliacoesEncerradas}/{totalAvaliacoes}</p>
         </div>
       </div>
 
