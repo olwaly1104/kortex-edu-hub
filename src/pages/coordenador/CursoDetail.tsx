@@ -25,16 +25,14 @@ export default function CursoDetail() {
       </div>
 
       {/* Course Identity */}
-      <Card className="px-5 py-3.5 border-l-4 border-l-primary">
+      <Card className="px-5 py-3.5 border-l-4 border-l-primary space-y-1">
         <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-lg font-bold text-foreground">Curso de Arquitectura</h2>
-            <p className="text-sm text-muted-foreground">Faculdade de Ciências Exatas</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Badge variant="outline" className="text-xs">{info.code}</Badge>
-            <Badge variant="outline" className="text-xs">Ciências Exatas</Badge>
-          </div>
+          <h2 className="text-lg font-bold text-foreground">Curso de Arquitectura</h2>
+          <Badge variant="outline" className="text-xs">{info.code}</Badge>
+        </div>
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-muted-foreground">Faculdade de Ciências Exatas</p>
+          <Badge variant="outline" className="text-xs">Ciências Exatas</Badge>
         </div>
       </Card>
 
