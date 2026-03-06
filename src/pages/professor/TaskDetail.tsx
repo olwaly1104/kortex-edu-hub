@@ -215,11 +215,10 @@ function GradingTable({ submittedList, notSubmittedList, task, submissionPct, co
             <Badge variant={pendingCorrection > 0 ? "destructive" : "outline"} className="text-xs gap-1">
               <CheckCircle className="w-3 h-3" /> Corrigido {task.corrected}/{task.submissions} ({correctedPct}%)
             </Badge>
-            <Badge variant="outline" className="text-xs gap-1">
-              <Calendar className="w-3 h-3" /> Data Limite {task.dueDate}
-            </Badge>
           </div>
           <div className="flex items-center gap-2">
+            <span className="text-xs text-muted-foreground flex items-center gap-1"><Calendar className="w-3 h-3" /> Data Limite: <span className="font-semibold text-foreground">{task.dueDate}</span></span>
+            <span className="text-muted-foreground/30">|</span>
             <Button variant="outline" size="sm" className="gap-2 text-xs"><Download className="w-3.5 h-3.5" /> Exportar</Button>
             {!isEncerrada && (
               <Button size="sm" className="gap-2 text-xs" onClick={handleSaveGrades}><Save className="w-3.5 h-3.5" /> Guardar Notas</Button>
