@@ -116,13 +116,11 @@ export default function ProfessorDisciplines() {
                       <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{room}</span>
                       <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{scheduleDays}</span>
                     </div>
-                    <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
-                      {turmaDiscs.map(d => (
-                        <Badge key={d.id} variant="outline" className="text-[10px] gap-1">
-                          <BookOpen className="w-3 h-3" /> {d.name}
-                        </Badge>
-                      ))}
-                    </div>
+                    {turmaDiscs.length > 0 && (
+                      <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
+                        <BookOpen className="w-3 h-3" /> {turmaDiscs[0].name}
+                      </p>
+                    )}
                   </div>
                   <Link to={`/professor/turma/${turma.id}`}>
                     <ChevronRight className="w-5 h-5 text-muted-foreground hover:text-primary transition-colors" />
