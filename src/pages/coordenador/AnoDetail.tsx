@@ -133,7 +133,7 @@ export default function CoordenadorAnoDetail() {
 
                         <div className="border-t border-border/40 pt-2.5 space-y-2.5">
                           <div className="flex items-center justify-between text-xs">
-                            <span className="text-muted-foreground flex items-center gap-1.5"><Award className="w-3.5 h-3.5" /> Média</span>
+                            <span className="text-muted-foreground flex items-center gap-1.5"><Award className="w-3.5 h-3.5" /> Média Geral</span>
                             <span className={`font-semibold ${t.media >= 10 ? "text-accent" : "text-destructive"}`}>{t.media}</span>
                           </div>
                           <div className="flex items-center justify-between text-xs">
