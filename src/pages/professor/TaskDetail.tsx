@@ -41,7 +41,7 @@ export default function ProfessorTaskDetail() {
   const pendingCorrection = task.submissions - task.corrected;
   const isEncerrada = task.status === "encerrada";
   const isActiva = task.status === "publicada";
-
+  const isPendente = task.status === "pendente";
   const students = profStudents.filter(s => s.disciplineId === task.disciplineId);
   const mockSubmissions = students.map((s, i) => ({
     ...s,
@@ -86,8 +86,8 @@ export default function ProfessorTaskDetail() {
           <span className="text-xs font-medium" style={{ color: disc?.color }}>{disc?.name}</span>
           <Badge variant="outline" className="text-[10px]">{disc?.code}</Badge>
           <Badge variant="outline" className="text-[10px]">{typeLabel[task.type]}</Badge>
-          <Badge className={task.status === "encerrada" ? "bg-accent/10 text-accent" : task.status === "publicada" ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}>
-            {task.status === "encerrada" ? "Encerrada" : task.status === "publicada" ? "Activa" : "Rascunho"}
+          <Badge className={task.status === "encerrada" ? "bg-accent/10 text-accent" : task.status === "publicada" ? "bg-primary/10 text-primary" : task.status === "pendente" ? "bg-destructive/10 text-destructive" : task.status === "agendada" ? "bg-secondary/10 text-secondary" : "bg-muted text-muted-foreground"}>
+            {task.status === "encerrada" ? "Encerrada" : task.status === "publicada" ? "Activa" : task.status === "pendente" ? "Pendente" : task.status === "agendada" ? "Agendada" : "Rascunho"}
           </Badge>
         </div>
         <h1 className="text-2xl font-bold text-foreground">{task.title}</h1>
@@ -179,15 +179,17 @@ export default function ProfessorTaskDetail() {
         pendingCorrection={pendingCorrection}
         isEncerrada={isEncerrada}
         isActiva={isActiva}
+        isPendente={isPendente}
         navigate={navigate}
         positiveGrades={positiveGrades}
         totalGraded={totalGraded}
+        allStudents={allSubmissions}
       />
     </div>
   );
 }
 
-function GradingTable({ submittedList, notSubmittedList, task, submissionPct, correctedPct, pendingCorrection, isEncerrada, isActiva, navigate, positiveGrades, totalGraded }: {
+function GradingTable({ submittedList, notSubmittedList, task, submissionPct, correctedPct, pendingCorrection, isEncerrada, isActiva, isPendente, navigate, positiveGrades, totalGraded, allStudents }: {
   submittedList: any[];
   notSubmittedList: any[];
   task: any;
@@ -196,11 +198,22 @@ function GradingTable({ submittedList, notSubmittedList, task, submissionPct, co
   pendingCorrection: number;
   isEncerrada: boolean;
   isActiva: boolean;
+  isPendente: boolean;
   navigate: any;
   positiveGrades: number;
   totalGraded: number;
+  allStudents: any[];
 }) {
   const { toast } = useToast();
+  const [submittedIds, setSubmittedIds] = useState<Map<string, string>>(new Map());
+
+  const handleMarkSubmitted = (studentId: string, studentName: string) => {
+    const now = new Date();
+    const time = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+    setSubmittedIds(prev => new Map(prev).set(studentId, time));
+    toast({ title: "Submissão registada", description: `${studentName} marcado como submetido às ${time}.` });
+  };
+
   const [grades, setGrades] = useState<Record<string, string>>(() => {
     const initial: Record<string, string> = {};
     submittedList.forEach(s => {
@@ -346,42 +359,94 @@ function GradingTable({ submittedList, notSubmittedList, task, submissionPct, co
           </div>
         )}
 
-        {/* Not submitted students */}
-        {notSubmittedList.length > 0 && (
+        {/* Newly submitted by teacher (active tasks) */}
+        {isActiva && submittedIds.size > 0 && (
           <div>
-            <div className="px-5 py-2.5 bg-destructive/5 border-y">
-              <p className="text-[11px] font-semibold text-destructive uppercase tracking-wider flex items-center gap-1.5">
-                <AlertCircle className="w-3 h-3" /> Não submetido ({notSubmittedList.length})
+            <div className="px-5 py-2.5 bg-accent/5 border-y">
+              <p className="text-[11px] font-semibold text-accent uppercase tracking-wider flex items-center gap-1.5">
+                <Check className="w-3 h-3" /> Submetido agora ({submittedIds.size})
               </p>
             </div>
             <div className="divide-y">
-              {notSubmittedList.map(student => {
-                const wasAtribuido = atribuidos.has(student.id);
-                return (
-                  <div key={student.id} className="px-5 py-3.5 flex items-center gap-3 hover:bg-muted/20 transition-colors">
+              {allStudents.filter(s => submittedIds.has(s.id)).map(student => (
+                <div key={student.id} className="px-5 py-3.5 flex items-center gap-3 hover:bg-muted/20 transition-colors">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); navigate(`/professor/students/${student.id}`); }}
+                    className="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center text-xs font-bold text-accent shrink-0 hover:bg-accent/20 transition-colors"
+                    title="Ver perfil"
+                  >
+                    {student.name.split(" ").map((n: string) => n[0]).slice(0, 2).join("")}
+                  </button>
+                  <div className="flex-1 min-w-0">
                     <button
                       onClick={(e) => { e.stopPropagation(); navigate(`/professor/students/${student.id}`); }}
-                      className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-xs font-bold text-muted-foreground shrink-0 hover:bg-muted/80 transition-colors"
-                      title="Ver perfil"
+                      className="text-sm font-medium text-foreground truncate hover:text-primary transition-colors text-left"
                     >
-                      {student.name.split(" ").map((n: string) => n[0]).slice(0, 2).join("")}
+                      {student.name}
                     </button>
-                    <div className="flex-1 min-w-0">
-                      <button
-                        onClick={(e) => { e.stopPropagation(); navigate(`/professor/students/${student.id}`); }}
-                        className="text-sm font-medium text-foreground truncate hover:text-primary transition-colors text-left"
-                      >
-                        {student.name}
-                      </button>
-                      <p className="text-[11px] text-muted-foreground">{student.email}</p>
-                    </div>
-                    <span className="text-sm font-bold text-destructive w-14 text-right shrink-0">0/20</span>
+                    <p className="text-[11px] text-muted-foreground">{student.email}</p>
                   </div>
-                );
-              })}
+                  <div className="flex items-center gap-1.5 text-[11px] text-accent shrink-0">
+                    <CheckCircle className="w-3 h-3" />
+                    Submetido · {submittedIds.get(student.id)}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         )}
+
+        {/* Not submitted students */}
+        {(() => {
+          const remaining = notSubmittedList.filter(s => !submittedIds.has(s.id));
+          if (remaining.length === 0) return null;
+          return (
+            <div>
+              <div className="px-5 py-2.5 bg-destructive/5 border-y">
+                <p className="text-[11px] font-semibold text-destructive uppercase tracking-wider flex items-center gap-1.5">
+                  <AlertCircle className="w-3 h-3" /> {isActiva ? "Estudantes" : "Não submetido"} ({remaining.length})
+                </p>
+              </div>
+              <div className="divide-y">
+                {remaining.map(student => {
+                  const wasAtribuido = atribuidos.has(student.id);
+                  return (
+                    <div key={student.id} className="px-5 py-3.5 flex items-center gap-3 hover:bg-muted/20 transition-colors">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); navigate(`/professor/students/${student.id}`); }}
+                        className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-xs font-bold text-muted-foreground shrink-0 hover:bg-muted/80 transition-colors"
+                        title="Ver perfil"
+                      >
+                        {student.name.split(" ").map((n: string) => n[0]).slice(0, 2).join("")}
+                      </button>
+                      <div className="flex-1 min-w-0">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); navigate(`/professor/students/${student.id}`); }}
+                          className="text-sm font-medium text-foreground truncate hover:text-primary transition-colors text-left"
+                        >
+                          {student.name}
+                        </button>
+                        <p className="text-[11px] text-muted-foreground">{student.email}</p>
+                      </div>
+                      {isActiva ? (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="text-xs gap-1.5 border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+                          onClick={(e) => { e.stopPropagation(); handleMarkSubmitted(student.id, student.name); }}
+                        >
+                          <Send className="w-3 h-3" /> Submetido
+                        </Button>
+                      ) : (
+                        <span className="text-sm font-bold text-destructive w-14 text-right shrink-0">0/20</span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })()}
       </Card>
 
       {/* Atribuir confirmation dialog */}
