@@ -235,6 +235,7 @@ export default function CoordenadorCadeiras() {
               <TableHead className="text-xs">Professor</TableHead>
               <TableHead className="text-xs text-center">Estudantes</TableHead>
               <TableHead className="text-xs text-center">Presença</TableHead>
+              <TableHead className="text-xs text-center">Conclusão</TableHead>
               <TableHead className="text-xs text-center">Aprovado</TableHead>
               <TableHead className="text-xs text-center">Reprovado</TableHead>
               <TableHead className="text-xs text-center">Média</TableHead>
@@ -256,6 +257,9 @@ export default function CoordenadorCadeiras() {
                 <TableCell className="text-xs font-bold text-foreground text-center">{d.estudantes}</TableCell>
                 <TableCell className="text-center">
                   <span className={`text-xs font-bold ${d.presenca >= 75 ? "text-accent" : "text-destructive"}`}>{d.presenca}%</span>
+                </TableCell>
+                <TableCell className="text-center">
+                  <span className="text-xs font-bold text-foreground">{Math.round((d.taxaAprovacao + d.presenca) / 2)}%</span>
                 </TableCell>
                 <TableCell className="text-center">
                   <span className={`text-xs font-bold ${d.taxaAprovacao >= 70 ? "text-accent" : d.taxaAprovacao >= 50 ? "text-foreground" : "text-destructive"}`}>{d.taxaAprovacao}%</span>
