@@ -139,12 +139,13 @@ export default function ProfessorTaskDetail() {
         </div>
         <div className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4">
           <div className="flex items-center justify-between">
-            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Estudantes</p>
+            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Taxa de Conclusão</p>
             <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-primary/10">
               <Users className="w-4 h-4 text-primary" />
             </div>
           </div>
-          <p className="text-2xl font-bold text-foreground">{task.totalStudents}</p>
+          <p className="text-2xl font-bold text-foreground">{submissionPct}%</p>
+          <p className="text-[11px] text-muted-foreground">{task.submissions} de {task.totalStudents} participantes</p>
         </div>
       </div>
 
