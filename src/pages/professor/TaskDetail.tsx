@@ -207,38 +207,19 @@ function GradingTable({ submittedList, notSubmittedList, task, submissionPct, co
     <>
        <Card className="overflow-hidden">
         <div className="p-5 border-b bg-muted/30 flex items-center justify-between flex-wrap gap-3">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
             <h3 className="font-semibold text-foreground">Submissões e Notas</h3>
             <Badge variant="outline" className="text-xs gap-1">
-              <Users className="w-3 h-3" />
-              {task.submissions}/{task.totalStudents} ({submissionPct}%)
+              <Users className="w-3 h-3" /> Submetido {task.submissions}/{task.totalStudents} ({submissionPct}%)
+            </Badge>
+            <Badge variant={pendingCorrection > 0 ? "destructive" : "outline"} className="text-xs gap-1">
+              <CheckCircle className="w-3 h-3" /> Corrigido {task.corrected}/{task.submissions} ({correctedPct}%)
             </Badge>
           </div>
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" className="gap-2 text-xs"><Download className="w-3.5 h-3.5" /> Exportar</Button>
             {!isEncerrada && (
               <Button size="sm" className="gap-2 text-xs" onClick={handleSaveGrades}><Save className="w-3.5 h-3.5" /> Guardar Notas</Button>
-            )}
-          </div>
-        </div>
-
-        {/* Submetido & Corrigido bars */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-0 divide-y md:divide-y-0 md:divide-x divide-border border-b">
-          <div className="p-4 space-y-2">
-            <div className="flex items-center justify-between text-sm">
-              <span className="flex items-center gap-2 text-muted-foreground"><Users className="w-4 h-4" /> Submetido</span>
-              <span className="font-semibold text-foreground">{task.submissions}/{task.totalStudents} ({submissionPct}%)</span>
-            </div>
-            <Progress value={submissionPct} className="h-2" />
-          </div>
-          <div className="p-4 space-y-2">
-            <div className="flex items-center justify-between text-sm">
-              <span className={`flex items-center gap-2 ${pendingCorrection > 0 ? "text-destructive" : "text-muted-foreground"}`}><AlertCircle className="w-4 h-4" /> Corrigido</span>
-              <span className={`font-semibold ${pendingCorrection > 0 ? "text-destructive" : "text-muted-foreground"}`}>{task.corrected}/{task.submissions} ({correctedPct}%)</span>
-            </div>
-            <Progress value={correctedPct} className={`h-2 ${pendingCorrection > 0 ? "[&>div]:bg-destructive" : ""}`} />
-            {isActiva && task.correctionDeadline && (
-              <p className="text-[11px] text-muted-foreground flex items-center gap-1"><Clock className="w-3 h-3" /> Prazo de correcção: <span className="font-medium text-foreground">{task.correctionDeadline}</span></p>
             )}
           </div>
         </div>
