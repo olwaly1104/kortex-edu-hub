@@ -158,7 +158,7 @@ export default function CoordenadorAnos() {
                   <div className="space-y-2 pt-3 mt-3 border-t border-border/50">
                     <div className="flex items-center justify-between px-1">
                       <span className="text-xs text-muted-foreground flex items-center gap-1.5">
-                        <TrendingUp className="w-3.5 h-3.5 text-muted-foreground" /> Média Geral
+                        <TrendingUp className="w-3.5 h-3.5 text-accent" /> Média Geral
                       </span>
                       <span className={`text-sm font-semibold tabular-nums ${y.mediaGeral >= 10 ? "text-accent" : "text-destructive"}`}>{y.mediaGeral}/20</span>
                     </div>
@@ -192,7 +192,7 @@ export default function CoordenadorAnos() {
                     </div>
                     <div className="flex items-center justify-between px-1">
                       <span className="text-xs text-muted-foreground flex items-center gap-1.5">
-                        <FileText className="w-3.5 h-3.5 text-accent" /> Tarefas
+                        <FileText className="w-3.5 h-3.5 text-primary" /> Tarefas
                       </span>
                       <span className="text-sm font-semibold tabular-nums text-foreground">{totalMaterials}</span>
                     </div>
@@ -210,11 +210,11 @@ export default function CoordenadorAnos() {
                       <span className="text-xs text-muted-foreground flex items-center gap-1.5">
                         <FileText className="w-3.5 h-3.5 text-muted-foreground" /> Conteúdos
                       </span>
-                      <span className="text-sm font-semibold tabular-nums" style={{ color: 'hsl(25, 95%, 53%)' }}>{totalMaterials}</span>
+                      <span className="text-sm font-semibold tabular-nums text-foreground">{totalMaterials}</span>
                     </div>
                     <div className="px-1">
                       <div className="flex justify-between text-xs mb-1">
-                        <span className="text-muted-foreground flex items-center gap-1.5"><Video className="w-3.5 h-3.5 text-secondary" /> Aulas Gravadas</span>
+                        <span className="text-muted-foreground flex items-center gap-1.5"><Video className="w-3.5 h-3.5 text-muted-foreground" /> Aulas Gravadas</span>
                         <span className="text-sm font-semibold tabular-nums text-foreground">{recordedLessons}/{publishedLessons.length}</span>
                       </div>
                       <Progress value={publishedLessons.length > 0 ? (recordedLessons / publishedLessons.length) * 100 : 0} className="h-1.5" />
