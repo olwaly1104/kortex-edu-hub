@@ -81,24 +81,24 @@ export default function CoordenadorDocenteProfile() {
         </Card>
         <Card className="p-4">
           <div className="flex items-center justify-between mb-2">
-            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Média</p>
+            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Média Geral</p>
             <div className="w-7 h-7 rounded-lg bg-accent/10 flex items-center justify-center"><Award className="w-3.5 h-3.5 text-accent" /></div>
           </div>
           <p className={`text-2xl font-bold ${docente.mediaGeral >= 10 ? "text-accent" : "text-destructive"}`}>{docente.mediaGeral}/20</p>
         </Card>
         <Card className="p-4">
           <div className="flex items-center justify-between mb-2">
-            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Taxa Entrega</p>
-            <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center"><ClipboardList className="w-3.5 h-3.5 text-primary" /></div>
+            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Cadeiras</p>
+            <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center"><BookOpen className="w-3.5 h-3.5 text-primary" /></div>
           </div>
-          <p className={`text-2xl font-bold ${docente.taxaEntrega >= 80 ? "text-accent" : "text-destructive"}`}>{docente.taxaEntrega}%</p>
+          <p className="text-2xl font-bold text-foreground">{docenteDisciplinas.length}</p>
         </Card>
         <Card className="p-4">
           <div className="flex items-center justify-between mb-2">
-            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Taxa Aprovado</p>
-            <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center"><TrendingUp className="w-3.5 h-3.5 text-primary" /></div>
+            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Turmas</p>
+            <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center"><GraduationCap className="w-3.5 h-3.5 text-primary" /></div>
           </div>
-          <p className={`text-2xl font-bold ${docente.taxaAprovacao >= 70 ? "text-accent" : "text-destructive"}`}>{docente.taxaAprovacao}%</p>
+          <p className="text-2xl font-bold text-foreground">{docenteDisciplinas.length}</p>
         </Card>
       </div>
 
@@ -132,7 +132,7 @@ export default function CoordenadorDocenteProfile() {
                   </div>
                   <div className="text-center">
                     <p className={`font-semibold ${disc.media >= 10 ? "text-accent" : "text-destructive"}`}>{disc.media}</p>
-                    <p className="text-[10px] text-muted-foreground">Média</p>
+                    <p className="text-[10px] text-muted-foreground">Média Geral</p>
                   </div>
                   <div className="text-center">
                     <p className={`font-semibold ${disc.taxaAprovacao >= 70 ? "text-accent" : "text-destructive"}`}>{disc.taxaAprovacao}%</p>
