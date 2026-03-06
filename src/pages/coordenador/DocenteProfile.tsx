@@ -95,7 +95,7 @@ export default function CoordenadorDocenteProfile() {
         </Card>
         <Card className="p-4">
           <div className="flex items-center justify-between mb-2">
-            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Taxa Aprovação</p>
+            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Taxa Aprovado</p>
             <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center"><TrendingUp className="w-3.5 h-3.5 text-primary" /></div>
           </div>
           <p className={`text-2xl font-bold ${docente.taxaAprovacao >= 70 ? "text-accent" : "text-destructive"}`}>{docente.taxaAprovacao}%</p>
@@ -160,7 +160,7 @@ export default function CoordenadorDocenteProfile() {
                   </div>
                   <div className="text-center">
                     <p className={`font-semibold ${disc.taxaAprovacao >= 70 ? "text-accent" : "text-destructive"}`}>{disc.taxaAprovacao}%</p>
-                    <p className="text-[10px] text-muted-foreground">Aprovação</p>
+                    <p className="text-[10px] text-muted-foreground">Aprovado</p>
                   </div>
                   <Badge variant="outline" className={`${estadoStyle} text-[10px]`}>
                     {estadoDisc === "excelente" ? "Excelente" : estadoDisc === "risco" ? "Em Risco" : "Normal"}

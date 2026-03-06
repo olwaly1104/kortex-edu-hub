@@ -63,7 +63,7 @@ export default function CoordenadorNotas() {
         <Card className="p-4 col-span-2 lg:col-span-1">
           <div className="flex items-center gap-2 mb-3">
             <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><Clock className="w-4 h-4 text-primary" /></div>
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Taxa Aprovação</span>
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Taxa Aprovado</span>
           </div>
           <p className={`text-2xl font-bold ${taxaAprovacao >= 70 ? "text-accent" : taxaAprovacao >= 50 ? "text-foreground" : "text-destructive"}`}>
             {taxaAprovacao}%

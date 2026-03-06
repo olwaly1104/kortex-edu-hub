@@ -155,7 +155,7 @@ export default function CoordenadorTurmaDetail() {
         <Card className="p-4">
           <div className="flex items-center gap-2 mb-3">
             <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><Award className="w-4 h-4 text-primary" /></div>
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Taxa Aprovação</span>
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Taxa Aprovado</span>
           </div>
           <div className="flex items-baseline gap-1">
             <span className={`text-2xl font-bold ${turma.taxaSucesso >= 70 ? "text-accent" : "text-destructive"}`}>{turma.taxaSucesso}%</span>

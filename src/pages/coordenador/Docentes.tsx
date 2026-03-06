@@ -208,8 +208,8 @@ export default function CoordenadorDocentes() {
             <th className="text-center p-3 font-medium text-muted-foreground">Turmas</th>
             <th className="text-center p-3 font-medium text-muted-foreground">Presença</th>
             <th className="text-center p-3 font-medium text-muted-foreground">Taxa Entrega</th>
-            <th className="text-center p-3 font-medium text-muted-foreground">Taxa Aprovação</th>
-            <th className="text-center p-3 font-medium text-muted-foreground">Taxa Reprovação</th>
+             <th className="text-center p-3 font-medium text-muted-foreground">Taxa Aprovado</th>
+            <th className="text-center p-3 font-medium text-muted-foreground">Taxa Reprovado</th>
             <th className="text-center p-3 font-medium text-muted-foreground">Média Geral</th>
             <th className="text-center p-3 font-medium text-muted-foreground">Estado</th>
           </tr></thead>

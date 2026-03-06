@@ -135,7 +135,7 @@ export default function CoordenadorAnoDetail() {
                           <span className={`font-semibold ${t.media >= 10 ? "text-accent" : "text-destructive"}`}>{t.media}</span>
                         </div>
                         <div className="flex items-center justify-between text-xs">
-                          <span className="text-muted-foreground flex items-center gap-1.5"><TrendingUp className="w-3.5 h-3.5" /> Taxa Aprovação</span>
+                          <span className="text-muted-foreground flex items-center gap-1.5"><TrendingUp className="w-3.5 h-3.5" /> Taxa Aprovado</span>
                           <span className={`font-semibold ${t.taxaSucesso >= 70 ? "text-accent" : "text-destructive"}`}>{t.taxaSucesso}%</span>
                         </div>
 

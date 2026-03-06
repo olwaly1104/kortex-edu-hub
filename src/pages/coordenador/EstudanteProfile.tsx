@@ -119,7 +119,7 @@ export default function CoordenadorEstudanteProfile() {
                 </div>
                 <div className="text-center">
                   <p className={`font-semibold ${disc.taxaAprovacao >= 70 ? "text-accent" : "text-destructive"}`}>{disc.taxaAprovacao}%</p>
-                  <p className="text-[10px] text-muted-foreground">Aprovação</p>
+                  <p className="text-[10px] text-muted-foreground">Aprovado</p>
                 </div>
               </div>
             </div>

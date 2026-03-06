@@ -65,7 +65,7 @@ export default function ProfessorDisciplines() {
         </div>
         <div className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4">
           <div className="flex items-center justify-between">
-            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Taxa Aprovação</p>
+            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Taxa Aprovado</p>
             <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-accent/10">
               <CheckCircle className="w-4 h-4 text-accent" />
             </div>
@@ -151,20 +151,20 @@ export default function ProfessorDisciplines() {
                     <p className={`text-lg font-bold ${turmaAprovPct >= 70 ? "text-accent" : turmaAprovPct >= 50 ? "text-foreground" : "text-destructive"}`}>
                       {turmaAprovPct}%
                     </p>
-                    <p className="text-[10px] text-muted-foreground">Aprovação</p>
+                    <p className="text-[10px] text-muted-foreground">Aprovado</p>
                   </div>
                   <div className="text-center p-2.5 rounded-lg bg-muted/50">
                     <p className={`text-lg font-bold ${turmaReprovPct > 30 ? "text-destructive" : "text-foreground"}`}>
                       {turmaReprovPct}%
                     </p>
-                    <p className="text-[10px] text-muted-foreground">Reprovação</p>
+                    <p className="text-[10px] text-muted-foreground">Reprovado</p>
                   </div>
                 </div>
 
                 {/* Details */}
                 <div className="space-y-2.5 pt-3 border-t border-border/50">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="text-muted-foreground flex items-center gap-1.5"><CheckCircle className="w-3.5 h-3.5" /> Taxa Aprovação</span>
+                    <span className="text-muted-foreground flex items-center gap-1.5"><CheckCircle className="w-3.5 h-3.5" /> Taxa Aprovado</span>
                     <span className="font-semibold text-foreground">{turmaAprov}/{turmaGraded.length}</span>
                   </div>
                   <div className="flex items-center justify-between text-xs">

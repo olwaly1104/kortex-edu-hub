@@ -71,8 +71,10 @@ export interface CursoEstudante {
   media: number | null;
   presenca: number;
   taxaEntrega: number;
-  taxaAprovacao: number;
-  taxaReprovacao: number;
+  tarefasFeitas: number;
+  tarefasTotal: number;
+  avaliacoesFeitas: number;
+  avaliacoesTotal: number;
   faculdade: string;
   status: "excelente" | "normal" | "risco";
 }
@@ -157,23 +159,23 @@ export const coordDocentes: Docente[] = [
 ];
 
 export const coordEstudantes: CursoEstudante[] = [
-  { id: "e1", name: "João Fernandes", email: "2934@upra.kor", year: 2, turma: "A", media: 14.2, presenca: 92, taxaEntrega: 95, taxaAprovacao: 90, taxaReprovacao: 10, faculdade: "Fac. de Engenharia", status: "excelente" },
-  { id: "e2", name: "Maria Silva", email: "3012@upra.kor", year: 2, turma: "A", media: 15.1, presenca: 95, taxaEntrega: 98, taxaAprovacao: 95, taxaReprovacao: 5, faculdade: "Fac. de Engenharia", status: "excelente" },
-  { id: "e3", name: "Pedro Nascimento", email: "2987@upra.kor", year: 2, turma: "B", media: 11.8, presenca: 78, taxaEntrega: 82, taxaAprovacao: 72, taxaReprovacao: 28, faculdade: "Fac. de Engenharia", status: "normal" },
-  { id: "e4", name: "Ana Gomes", email: "3045@upra.kor", year: 1, turma: "A", media: 12.5, presenca: 88, taxaEntrega: 90, taxaAprovacao: 78, taxaReprovacao: 22, faculdade: "Fac. de Engenharia", status: "normal" },
-  { id: "e5", name: "Carlos Santos", email: "3100@upra.kor", year: 1, turma: "A", media: 8.9, presenca: 62, taxaEntrega: 55, taxaAprovacao: 40, taxaReprovacao: 60, faculdade: "Fac. de Engenharia", status: "risco" },
-  { id: "e6", name: "Rita Oliveira", email: "3055@upra.kor", year: 3, turma: "A", media: 16.2, presenca: 97, taxaEntrega: 100, taxaAprovacao: 100, taxaReprovacao: 0, faculdade: "Fac. de Engenharia", status: "excelente" },
-  { id: "e7", name: "Bruno Mendes", email: "3066@upra.kor", year: 3, turma: "B", media: 13.4, presenca: 85, taxaEntrega: 88, taxaAprovacao: 80, taxaReprovacao: 20, faculdade: "Fac. de Engenharia", status: "normal" },
-  { id: "e8", name: "Catarina Reis", email: "3077@upra.kor", year: 1, turma: "B", media: 9.5, presenca: 65, taxaEntrega: 60, taxaAprovacao: 45, taxaReprovacao: 55, faculdade: "Fac. de Engenharia", status: "risco" },
-  { id: "e9", name: "Diogo Pereira", email: "3088@upra.kor", year: 4, turma: "A", media: 14.8, presenca: 93, taxaEntrega: 96, taxaAprovacao: 92, taxaReprovacao: 8, faculdade: "Fac. de Engenharia", status: "excelente" },
-  { id: "e10", name: "Eva Cunha", email: "3099@upra.kor", year: 4, turma: "A", media: 13.0, presenca: 82, taxaEntrega: 85, taxaAprovacao: 75, taxaReprovacao: 25, faculdade: "Fac. de Engenharia", status: "normal" },
-  { id: "e11", name: "Francisco Lima", email: "3110@upra.kor", year: 5, turma: "A", media: 15.5, presenca: 96, taxaEntrega: 100, taxaAprovacao: 96, taxaReprovacao: 4, faculdade: "Fac. de Engenharia", status: "excelente" },
-  { id: "e12", name: "Gonçalo Dias", email: "3121@upra.kor", year: 5, turma: "A", media: 14.0, presenca: 90, taxaEntrega: 92, taxaAprovacao: 85, taxaReprovacao: 15, faculdade: "Fac. de Engenharia", status: "normal" },
-  { id: "e13", name: "Helena Costa", email: "3132@upra.kor", year: 1, turma: "B", media: 7.2, presenca: 55, taxaEntrega: 45, taxaAprovacao: 30, taxaReprovacao: 70, faculdade: "Fac. de Engenharia", status: "risco" },
-  { id: "e14", name: "Igor Martins", email: "3143@upra.kor", year: 2, turma: "B", media: 12.1, presenca: 80, taxaEntrega: 78, taxaAprovacao: 70, taxaReprovacao: 30, faculdade: "Fac. de Engenharia", status: "normal" },
-  { id: "e15", name: "Joana Cardoso", email: "3154@upra.kor", year: 3, turma: "A", media: 15.8, presenca: 94, taxaEntrega: 97, taxaAprovacao: 95, taxaReprovacao: 5, faculdade: "Fac. de Engenharia", status: "excelente" },
-  { id: "e16", name: "Tiago Barbosa", email: "3165@upra.kor", year: 2, turma: "B", media: 8.1, presenca: 58, taxaEntrega: 50, taxaAprovacao: 35, taxaReprovacao: 65, faculdade: "Fac. de Engenharia", status: "risco" },
-  { id: "e17", name: "Vanessa Rocha", email: "3176@upra.kor", year: 3, turma: "B", media: 9.0, presenca: 60, taxaEntrega: 52, taxaAprovacao: 38, taxaReprovacao: 62, faculdade: "Fac. de Engenharia", status: "risco" },
+  { id: "e1", name: "João Fernandes", email: "2934@upra.kor", year: 2, turma: "A", media: 14.2, presenca: 92, taxaEntrega: 95, tarefasFeitas: 8, tarefasTotal: 10, avaliacoesFeitas: 4, avaliacoesTotal: 5, faculdade: "Fac. de Engenharia", status: "excelente" },
+  { id: "e2", name: "Maria Silva", email: "3012@upra.kor", year: 2, turma: "A", media: 15.1, presenca: 95, taxaEntrega: 98, tarefasFeitas: 10, tarefasTotal: 10, avaliacoesFeitas: 5, avaliacoesTotal: 5, faculdade: "Fac. de Engenharia", status: "excelente" },
+  { id: "e3", name: "Pedro Nascimento", email: "2987@upra.kor", year: 2, turma: "B", media: 11.8, presenca: 78, taxaEntrega: 82, tarefasFeitas: 7, tarefasTotal: 10, avaliacoesFeitas: 3, avaliacoesTotal: 5, faculdade: "Fac. de Engenharia", status: "normal" },
+  { id: "e4", name: "Ana Gomes", email: "3045@upra.kor", year: 1, turma: "A", media: 12.5, presenca: 88, taxaEntrega: 90, tarefasFeitas: 6, tarefasTotal: 8, avaliacoesFeitas: 3, avaliacoesTotal: 4, faculdade: "Fac. de Engenharia", status: "normal" },
+  { id: "e5", name: "Carlos Santos", email: "3100@upra.kor", year: 1, turma: "A", media: 8.9, presenca: 62, taxaEntrega: 55, tarefasFeitas: 3, tarefasTotal: 8, avaliacoesFeitas: 2, avaliacoesTotal: 4, faculdade: "Fac. de Engenharia", status: "risco" },
+  { id: "e6", name: "Rita Oliveira", email: "3055@upra.kor", year: 3, turma: "A", media: 16.2, presenca: 97, taxaEntrega: 100, tarefasFeitas: 9, tarefasTotal: 9, avaliacoesFeitas: 4, avaliacoesTotal: 4, faculdade: "Fac. de Engenharia", status: "excelente" },
+  { id: "e7", name: "Bruno Mendes", email: "3066@upra.kor", year: 3, turma: "B", media: 13.4, presenca: 85, taxaEntrega: 88, tarefasFeitas: 7, tarefasTotal: 9, avaliacoesFeitas: 3, avaliacoesTotal: 4, faculdade: "Fac. de Engenharia", status: "normal" },
+  { id: "e8", name: "Catarina Reis", email: "3077@upra.kor", year: 1, turma: "B", media: 9.5, presenca: 65, taxaEntrega: 60, tarefasFeitas: 4, tarefasTotal: 8, avaliacoesFeitas: 1, avaliacoesTotal: 4, faculdade: "Fac. de Engenharia", status: "risco" },
+  { id: "e9", name: "Diogo Pereira", email: "3088@upra.kor", year: 4, turma: "A", media: 14.8, presenca: 93, taxaEntrega: 96, tarefasFeitas: 7, tarefasTotal: 7, avaliacoesFeitas: 3, avaliacoesTotal: 3, faculdade: "Fac. de Engenharia", status: "excelente" },
+  { id: "e10", name: "Eva Cunha", email: "3099@upra.kor", year: 4, turma: "A", media: 13.0, presenca: 82, taxaEntrega: 85, tarefasFeitas: 5, tarefasTotal: 7, avaliacoesFeitas: 2, avaliacoesTotal: 3, faculdade: "Fac. de Engenharia", status: "normal" },
+  { id: "e11", name: "Francisco Lima", email: "3110@upra.kor", year: 5, turma: "A", media: 15.5, presenca: 96, taxaEntrega: 100, tarefasFeitas: 6, tarefasTotal: 6, avaliacoesFeitas: 2, avaliacoesTotal: 2, faculdade: "Fac. de Engenharia", status: "excelente" },
+  { id: "e12", name: "Gonçalo Dias", email: "3121@upra.kor", year: 5, turma: "A", media: 14.0, presenca: 90, taxaEntrega: 92, tarefasFeitas: 5, tarefasTotal: 6, avaliacoesFeitas: 2, avaliacoesTotal: 2, faculdade: "Fac. de Engenharia", status: "normal" },
+  { id: "e13", name: "Helena Costa", email: "3132@upra.kor", year: 1, turma: "B", media: 7.2, presenca: 55, taxaEntrega: 45, tarefasFeitas: 2, tarefasTotal: 8, avaliacoesFeitas: 1, avaliacoesTotal: 4, faculdade: "Fac. de Engenharia", status: "risco" },
+  { id: "e14", name: "Igor Martins", email: "3143@upra.kor", year: 2, turma: "B", media: 12.1, presenca: 80, taxaEntrega: 78, tarefasFeitas: 6, tarefasTotal: 10, avaliacoesFeitas: 3, avaliacoesTotal: 5, faculdade: "Fac. de Engenharia", status: "normal" },
+  { id: "e15", name: "Joana Cardoso", email: "3154@upra.kor", year: 3, turma: "A", media: 15.8, presenca: 94, taxaEntrega: 97, tarefasFeitas: 9, tarefasTotal: 9, avaliacoesFeitas: 4, avaliacoesTotal: 4, faculdade: "Fac. de Engenharia", status: "excelente" },
+  { id: "e16", name: "Tiago Barbosa", email: "3165@upra.kor", year: 2, turma: "B", media: 8.1, presenca: 58, taxaEntrega: 50, tarefasFeitas: 3, tarefasTotal: 10, avaliacoesFeitas: 1, avaliacoesTotal: 5, faculdade: "Fac. de Engenharia", status: "risco" },
+  { id: "e17", name: "Vanessa Rocha", email: "3176@upra.kor", year: 3, turma: "B", media: 9.0, presenca: 60, taxaEntrega: 52, tarefasFeitas: 4, tarefasTotal: 9, avaliacoesFeitas: 1, avaliacoesTotal: 4, faculdade: "Fac. de Engenharia", status: "risco" },
 ];
 
 export const coordDisciplinas: CursoDisciplina[] = [
