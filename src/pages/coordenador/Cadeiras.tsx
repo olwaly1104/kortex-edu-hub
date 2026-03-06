@@ -237,6 +237,7 @@ export default function CoordenadorCadeiras() {
               <TableHead className="text-xs text-center">Presença</TableHead>
               <TableHead className="text-xs text-center">Entrega</TableHead>
               <TableHead className="text-xs text-center">Aprovação</TableHead>
+              <TableHead className="text-xs text-center">Reprovação</TableHead>
               <TableHead className="text-xs text-center">Média</TableHead>
               <TableHead className="text-xs text-center">Estado</TableHead>
             </TableRow>
@@ -262,6 +263,9 @@ export default function CoordenadorCadeiras() {
                 </TableCell>
                 <TableCell className="text-center">
                   <span className={`text-xs font-bold ${d.taxaAprovacao >= 70 ? "text-accent" : d.taxaAprovacao >= 50 ? "text-foreground" : "text-destructive"}`}>{d.taxaAprovacao}%</span>
+                </TableCell>
+                <TableCell className="text-center">
+                  <span className={`text-xs font-bold ${d.taxaReprovacao > 30 ? "text-destructive" : "text-foreground"}`}>{d.taxaReprovacao}%</span>
                 </TableCell>
                 <TableCell className="text-center">
                   <span className={`text-xs font-bold ${(d.media ?? 0) >= 10 ? "text-accent" : "text-destructive"}`}>{d.media ?? "–"}/20</span>

@@ -18,9 +18,7 @@ export default function CoordinatorStudents() {
   const atRisk = profStudents.filter(s => s.status === "risco").length;
   const excellent = profStudents.filter(s => s.status === "excelente").length;
 
-  const statusColors = { excelente: "border-l-accent", normal: "border-l-secondary", risco: "border-l-destructive" };
-  const statusLabels = { excelente: "Excelente", normal: "Normal", risco: "Em Risco" };
-  const statusBadge = { excelente: "bg-accent/10 text-accent", normal: "bg-secondary/10 text-secondary", risco: "bg-destructive/10 text-destructive" };
+  // statusColors/labels moved inline into table
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
@@ -82,48 +80,39 @@ export default function CoordinatorStudents() {
         </div>
       </div>
 
-      {/* Student list */}
-      <div className="space-y-2">
-        {filtered.map(student => {
-          const disc = profDisciplines.find(d => d.id === student.disciplineId);
-          return (
-            <Card key={student.id} className={`p-4 flex items-center gap-4 border-l-[3px] ${statusColors[student.status]}`}>
-              <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-xs font-bold text-muted-foreground shrink-0">
-                {student.name.split(" ").map(n => n[0]).slice(0, 2).join("")}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <p className="text-sm font-semibold text-foreground truncate">{student.name}</p>
-                  <Badge className={`${statusBadge[student.status]} text-[10px]`}>{statusLabels[student.status]}</Badge>
-                  {disc && <Badge variant="outline" className="text-[10px]" style={{ borderColor: disc.color + "40", color: disc.color }}>{disc.code}</Badge>}
-                </div>
-                <p className="text-[11px] text-muted-foreground">{student.email} • {student.turma}</p>
-              </div>
-              <div className="grid grid-cols-4 gap-4 shrink-0 text-center">
-                <div>
-                  <p className="text-[10px] text-muted-foreground uppercase">Presença</p>
-                  <p className={`text-sm font-bold ${student.attendance >= 75 ? "text-accent" : "text-destructive"}`}>{student.attendance}%</p>
-                </div>
-                <div>
-                  <p className="text-[10px] text-muted-foreground uppercase">Média</p>
-                  <p className={`text-sm font-bold ${student.avgGrade && student.avgGrade >= 10 ? "text-accent" : "text-destructive"}`}>{student.avgGrade ?? "—"}</p>
-                </div>
-                <div>
-                  <p className="text-[10px] text-muted-foreground uppercase">Entregas</p>
-                  <p className="text-sm font-bold text-foreground">{student.submittedTasks}/{student.totalTasks}</p>
-                </div>
-                <div>
-                  <p className="text-[10px] text-muted-foreground uppercase">Última</p>
-                  <p className="text-xs text-muted-foreground">{student.lastActive}</p>
-                </div>
-              </div>
-            </Card>
-          );
-        })}
-        {filtered.length === 0 && (
-          <p className="text-sm text-muted-foreground py-8 text-center">Nenhum aluno encontrado.</p>
-        )}
-      </div>
+      <Card className="overflow-hidden">
+        <table className="w-full text-sm">
+          <thead><tr className="border-b bg-muted/30">
+            <th className="text-left p-3 font-medium text-muted-foreground">Nome</th>
+            <th className="text-left p-3 font-medium text-muted-foreground">Email</th>
+            <th className="text-center p-3 font-medium text-muted-foreground">Turma</th>
+            <th className="text-center p-3 font-medium text-muted-foreground">Presença</th>
+            <th className="text-center p-3 font-medium text-muted-foreground">Média</th>
+            <th className="text-center p-3 font-medium text-muted-foreground">Entregas</th>
+            <th className="text-center p-3 font-medium text-muted-foreground">Última</th>
+            <th className="text-center p-3 font-medium text-muted-foreground">Estado</th>
+          </tr></thead>
+          <tbody>{filtered.map(student => {
+            const statusBadgeCls: Record<string, string> = { excelente: "bg-accent/10 text-accent", normal: "bg-secondary/10 text-secondary", risco: "bg-destructive/10 text-destructive" };
+            const statusLbl: Record<string, string> = { excelente: "Excelente", normal: "Normal", risco: "Em Risco" };
+            return (
+              <tr key={student.id} className="border-b last:border-0 hover:bg-muted/20 transition-colors">
+                <td className="p-3 font-medium text-foreground">{student.name}</td>
+                <td className="p-3 text-muted-foreground">{student.email}</td>
+                <td className="p-3 text-center text-muted-foreground">{student.turma}</td>
+                <td className="p-3 text-center"><span className={student.attendance >= 75 ? "text-accent font-medium" : "text-destructive font-medium"}>{student.attendance}%</span></td>
+                <td className="p-3 text-center"><span className={student.avgGrade !== null && student.avgGrade >= 10 ? "text-accent font-medium" : "text-destructive font-medium"}>{student.avgGrade ?? "—"}</span></td>
+                <td className="p-3 text-center text-foreground">{student.submittedTasks}/{student.totalTasks}</td>
+                <td className="p-3 text-center text-xs text-muted-foreground">{student.lastActive}</td>
+                <td className="p-3 text-center"><Badge className={`${statusBadgeCls[student.status]} text-[10px]`}>{statusLbl[student.status]}</Badge></td>
+              </tr>
+            );
+          })}</tbody>
+        </table>
+      </Card>
+      {filtered.length === 0 && (
+        <p className="text-sm text-muted-foreground py-8 text-center">Nenhum aluno encontrado.</p>
+      )}
     </div>
   );
 }

@@ -209,6 +209,7 @@ export default function CoordenadorDocentes() {
             <th className="text-center p-3 font-medium text-muted-foreground">Presença</th>
             <th className="text-center p-3 font-medium text-muted-foreground">Taxa Entrega</th>
             <th className="text-center p-3 font-medium text-muted-foreground">Taxa Aprovação</th>
+            <th className="text-center p-3 font-medium text-muted-foreground">Taxa Reprovação</th>
             <th className="text-center p-3 font-medium text-muted-foreground">Média Geral</th>
             <th className="text-center p-3 font-medium text-muted-foreground">Estado</th>
           </tr></thead>
@@ -232,6 +233,7 @@ export default function CoordenadorDocentes() {
                 <td className="p-3 text-center"><span className={d.presenca >= 90 ? "text-accent font-medium" : "text-destructive font-medium"}>{d.presenca}%</span></td>
                 <td className="p-3 text-center"><span className={d.taxaEntrega >= 80 ? "text-accent font-medium" : "text-destructive font-medium"}>{d.taxaEntrega}%</span></td>
                 <td className="p-3 text-center"><span className={`font-medium ${d.taxaAprovacao >= 70 ? "text-accent" : d.taxaAprovacao >= 50 ? "text-foreground" : "text-destructive"}`}>{d.taxaAprovacao}%</span></td>
+                <td className="p-3 text-center"><span className={`font-medium ${d.taxaReprovacao > 30 ? "text-destructive" : "text-foreground"}`}>{d.taxaReprovacao}%</span></td>
                 <td className="p-3 text-center"><span className={d.mediaGeral >= 10 ? "text-accent font-bold" : "text-destructive font-bold"}>{d.mediaGeral}</span></td>
                 <td className="p-3 text-center"><Badge variant="outline" className={`${estadoStyle} text-[10px]`}>{estado === "em risco" ? "Em Risco" : estado === "excelente" ? "Excelente" : "Normal"}</Badge></td>
               </tr>

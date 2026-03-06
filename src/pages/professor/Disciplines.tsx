@@ -130,7 +130,7 @@ export default function ProfessorDisciplines() {
                 </div>
 
                 {/* Key metrics row */}
-                <div className="grid grid-cols-4 gap-2.5 mb-4">
+                <div className="grid grid-cols-5 gap-2.5 mb-4">
                   <div className="text-center p-2.5 rounded-lg bg-muted/50">
                     <p className="text-lg font-bold text-foreground">{turma.students}</p>
                     <p className="text-[10px] text-muted-foreground">Estudantes</p>
@@ -152,6 +152,12 @@ export default function ProfessorDisciplines() {
                       {turmaAprovPct}%
                     </p>
                     <p className="text-[10px] text-muted-foreground">Aprovação</p>
+                  </div>
+                  <div className="text-center p-2.5 rounded-lg bg-muted/50">
+                    <p className={`text-lg font-bold ${turmaReprovPct > 30 ? "text-destructive" : "text-foreground"}`}>
+                      {turmaReprovPct}%
+                    </p>
+                    <p className="text-[10px] text-muted-foreground">Reprovação</p>
                   </div>
                 </div>
 
