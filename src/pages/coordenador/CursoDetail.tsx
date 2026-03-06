@@ -42,6 +42,16 @@ export default function CursoDetail() {
         <div className="divide-y divide-border">
           <div className="flex items-center justify-between px-5 py-3.5">
             <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-secondary/10 flex items-center justify-center">
+                <Award className="w-4 h-4 text-secondary" />
+              </div>
+              <p className="text-sm text-muted-foreground">Decano</p>
+            </div>
+            <p className="text-sm font-semibold text-foreground">Prof. Dr. Manuel Rodrigues</p>
+          </div>
+
+          <div className="flex items-center justify-between px-5 py-3.5">
+            <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
                 <UserCheck className="w-4 h-4 text-primary" />
               </div>
@@ -110,15 +120,6 @@ export default function CursoDetail() {
             <p className="text-sm font-semibold text-foreground">{totalTurmas}</p>
           </div>
 
-          <div className="flex items-center justify-between px-5 py-3.5">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center">
-                <Award className="w-4 h-4 text-accent" />
-              </div>
-              <p className="text-sm text-muted-foreground">Média Geral</p>
-            </div>
-            <p className={`text-sm font-semibold ${info.mediaGeral >= 10 ? "text-accent" : "text-destructive"}`}>{info.mediaGeral}/20</p>
-          </div>
 
           <div className="flex items-center justify-between px-5 py-3.5">
             <div className="flex items-center gap-3">
