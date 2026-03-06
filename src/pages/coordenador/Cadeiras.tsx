@@ -236,8 +236,8 @@ export default function CoordenadorCadeiras() {
               <TableHead className="text-xs text-center">Estudantes</TableHead>
               <TableHead className="text-xs text-center">Presença</TableHead>
               <TableHead className="text-xs text-center">Entrega</TableHead>
-              <TableHead className="text-xs text-center">Aprovação</TableHead>
-              <TableHead className="text-xs text-center">Reprovação</TableHead>
+              <TableHead className="text-xs text-center">Aprovado</TableHead>
+              <TableHead className="text-xs text-center">Reprovado</TableHead>
               <TableHead className="text-xs text-center">Média</TableHead>
               <TableHead className="text-xs text-center">Estado</TableHead>
             </TableRow>

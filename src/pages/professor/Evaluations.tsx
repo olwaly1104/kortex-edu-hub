@@ -170,7 +170,7 @@ export default function ProfessorEvaluations() {
         <SummaryCard label="Por Atribuir" value={porAtribuir} icon={AlertCircle} iconBg="bg-destructive/10" iconColor="text-destructive" valueClass={porAtribuir > 0 ? "text-destructive" : undefined} />
         <SummaryCard label="Encerradas" value={closedCount} icon={CheckCircle} iconBg="bg-accent/10" iconColor="text-accent" />
         <SummaryCard label="Nota Geral" value={avgGrade ?? "—"} icon={GraduationCap} iconBg="bg-accent/10" iconColor="text-accent" valueClass={avgGrade && Number(avgGrade) >= 10 ? "text-accent" : avgGrade ? "text-destructive" : "text-muted-foreground"} />
-        <SummaryCard label="Taxa Aprovação" value={`${taxaAprovacao}%`} icon={CheckCircle} iconBg="bg-accent/10" iconColor="text-accent" valueClass={taxaAprovacao >= 50 ? "text-accent" : "text-destructive"} />
+        <SummaryCard label="Taxa Aprovado" value={`${taxaAprovacao}%`} icon={CheckCircle} iconBg="bg-accent/10" iconColor="text-accent" valueClass={taxaAprovacao >= 50 ? "text-accent" : "text-destructive"} />
       </div>
 
       {/* Controls box */}

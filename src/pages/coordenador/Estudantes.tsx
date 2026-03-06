@@ -225,8 +225,8 @@ export default function CoordenadorEstudantes() {
             <th className="text-center p-3 font-medium text-muted-foreground">Presença</th>
             <th className="text-center p-3 font-medium text-muted-foreground">Taxa Entrega</th>
             <th className="text-center p-3 font-medium text-muted-foreground">Média</th>
-            <th className="text-center p-3 font-medium text-muted-foreground">Aprovação</th>
-            <th className="text-center p-3 font-medium text-muted-foreground">Reprovação</th>
+            <th className="text-center p-3 font-medium text-muted-foreground">Tarefas</th>
+            <th className="text-center p-3 font-medium text-muted-foreground">Avaliações</th>
             <th className="text-center p-3 font-medium text-muted-foreground">Estado</th>
           </tr></thead>
           <tbody>{filtered.map(e => {
@@ -241,8 +241,8 @@ export default function CoordenadorEstudantes() {
                 <td className="p-3 text-center"><span className={e.presenca >= 75 ? "text-accent font-medium" : "text-destructive font-medium"}>{e.presenca}%</span></td>
                 <td className="p-3 text-center"><span className={e.taxaEntrega >= 80 ? "text-accent font-medium" : "text-destructive font-medium"}>{e.taxaEntrega}%</span></td>
                 <td className="p-3 text-center"><span className={e.media !== null && e.media >= 10 ? "text-accent font-medium" : "text-destructive font-medium"}>{e.media ?? "—"}</span></td>
-                <td className="p-3 text-center"><span className={`font-medium ${e.taxaAprovacao >= 70 ? "text-accent" : e.taxaAprovacao >= 50 ? "text-foreground" : "text-destructive"}`}>{e.taxaAprovacao}%</span></td>
-                <td className="p-3 text-center"><span className={`font-medium ${e.taxaReprovacao > 30 ? "text-destructive" : "text-foreground"}`}>{e.taxaReprovacao}%</span></td>
+                <td className="p-3 text-center"><span className="font-medium text-foreground">{e.tarefasFeitas}/{e.tarefasTotal}</span></td>
+                <td className="p-3 text-center"><span className="font-medium text-foreground">{e.avaliacoesFeitas}/{e.avaliacoesTotal}</span></td>
                 <td className="p-3 text-center"><Badge variant="outline" className={cn("text-[10px]", sb.cls)}>{sb.label}</Badge></td>
               </tr>
             );

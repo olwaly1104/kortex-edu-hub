@@ -110,7 +110,7 @@ export default function ProfessorTaskDetail() {
         </div>
         <div className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4">
           <div className="flex items-center justify-between">
-            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Taxa Aprovação</p>
+            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Taxa Aprovado</p>
             <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-accent/10">
               <CheckCircle className="w-4 h-4 text-accent" />
             </div>
@@ -120,7 +120,7 @@ export default function ProfessorTaskDetail() {
         </div>
         <div className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4">
           <div className="flex items-center justify-between">
-            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Taxa Reprovação</p>
+            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Taxa Reprovado</p>
             <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-destructive/10">
               <AlertCircle className="w-4 h-4 text-destructive" />
             </div>

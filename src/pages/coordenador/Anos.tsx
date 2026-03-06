@@ -140,7 +140,7 @@ export default function CoordenadorAnos() {
                       <span className={`text-sm font-semibold tabular-nums ${y.mediaGeral >= 10 ? "text-accent" : "text-destructive"}`}>{y.mediaGeral}</span>
                     </div>
                     <div className="flex items-center justify-between px-1">
-                      <span className="text-xs text-muted-foreground flex items-center gap-1.5"><TrendingUp className="w-3.5 h-3.5" /> Taxa Aprovação</span>
+                      <span className="text-xs text-muted-foreground flex items-center gap-1.5"><TrendingUp className="w-3.5 h-3.5" /> Taxa Aprovado</span>
                       <span className={`text-sm font-semibold tabular-nums ${y.taxaSucesso >= 70 ? "text-accent" : "text-destructive"}`}>{y.taxaSucesso}%</span>
                     </div>
                   </div>

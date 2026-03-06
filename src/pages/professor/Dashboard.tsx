@@ -357,7 +357,7 @@ export default function ProfessorDashboard() {
 
                         <div className="space-y-2.5 pt-3 border-t border-border/50">
                           <div className="flex items-center justify-between text-xs">
-                            <span className="text-muted-foreground flex items-center gap-1.5"><CheckCircle className="w-3.5 h-3.5" /> Taxa Aprovação</span>
+                            <span className="text-muted-foreground flex items-center gap-1.5"><CheckCircle className="w-3.5 h-3.5" /> Taxa Aprovado</span>
                             <span className={`font-semibold ${taxaAprovacao !== null && taxaAprovacao >= 70 ? "text-accent" : taxaAprovacao !== null ? "text-destructive" : "text-muted-foreground"}`}>{taxaAprovacao !== null ? `${taxaAprovacao}%` : "—"}</span>
                           </div>
 
