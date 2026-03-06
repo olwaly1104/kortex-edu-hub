@@ -75,7 +75,7 @@ export default function CursoDetail() {
               <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center">
                 <Clock className="w-4 h-4 text-accent" />
               </div>
-              <p className="text-sm text-muted-foreground">Duração</p>
+              <p className="text-sm text-muted-foreground">Anos Curriculares</p>
             </div>
             <p className="text-sm font-semibold text-foreground">{info.years.length} Anos</p>
           </div>
@@ -143,36 +143,6 @@ export default function CursoDetail() {
         </div>
       </Card>
 
-      {/* Years summary */}
-      <Card className="overflow-hidden">
-        <div className="px-5 py-3.5 border-b border-border flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-foreground">Anos Curriculares</h3>
-          <Link to="/coordenador/anos" className="text-xs text-primary hover:underline flex items-center gap-1">
-            Ver todos <ChevronRight className="w-3.5 h-3.5" />
-          </Link>
-        </div>
-        <div className="divide-y divide-border">
-          {info.years.map(y => (
-            <Link key={y.year} to={`/coordenador/anos/${y.year}`} className="flex items-center justify-between px-5 py-3.5 hover:bg-muted/40 transition-colors">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center">
-                  <span className="text-xs font-bold text-foreground">{y.year}º</span>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-foreground">{y.year}º Ano</p>
-                  <p className="text-xs text-muted-foreground">{y.turmas} turmas · {y.disciplinas} cadeiras · {y.estudantes} estudantes</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <Badge className={`text-[10px] border ${y.taxaSucesso >= 85 ? "bg-accent/10 text-accent border-accent/30" : y.taxaSucesso < 70 ? "bg-destructive/10 text-destructive border-destructive/30" : "bg-primary/10 text-primary border-primary/30"}`}>
-                  {y.mediaGeral}/20
-                </Badge>
-                <ChevronRight className="w-4 h-4 text-muted-foreground" />
-              </div>
-            </Link>
-          ))}
-        </div>
-      </Card>
     </div>
   );
 }
