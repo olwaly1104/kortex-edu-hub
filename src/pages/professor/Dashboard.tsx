@@ -302,7 +302,7 @@ export default function ProfessorDashboard() {
                 Ver todas <ChevronRight className="w-4 h-4" />
               </Link>
             </div>
-            <div className="space-y-3">
+            <div className="space-y-2">
               {allTurmas.map(turma => {
                 const turmaStudents = profStudents.filter(s => s.turmaId === turma.id);
                 const unique = turmaStudents.filter((s, i, arr) => arr.findIndex(x => x.email === s.email) === i);
@@ -315,64 +315,37 @@ export default function ProfessorDashboard() {
                 const graded = unique.filter(s => s.avgGrade !== null);
                 const approved = graded.filter(s => (s.avgGrade || 0) >= 10).length;
                 const taxaAprovacao = graded.length > 0 ? Math.round((approved / graded.length) * 100) : null;
-                const entrega = unique.length > 0 ? Math.round(unique.reduce((s, st) => s + (st.submittedTasks / Math.max(st.totalTasks, 1) * 100), 0) / unique.length) : 0;
 
-                const turmaTasks = profTasks.filter(t => t.turmaId === turma.id);
-                const tarefas = turmaTasks.filter(t => t.type === "tarefa" || t.type === "quiz");
-                const avaliacoes = turmaTasks.filter(t => t.type === "exame");
-                const tarefasEncerradas = tarefas.filter(t => t.status === "encerrada").length;
-                const avaliacoesEncerradas = avaliacoes.filter(t => t.status === "encerrada").length;
+                const estado = taxaAprovacao !== null && taxaAprovacao >= 85 ? "excelente" : (taxaAprovacao !== null && taxaAprovacao < 60) || attendance < 75 ? "risco" : "normal";
+                const estadoStyle = estado === "excelente" ? "bg-accent/10 text-accent border-accent/30" : estado === "risco" ? "bg-destructive/10 text-destructive border-destructive/30" : "bg-primary/10 text-primary border-primary/30";
 
                 return (
                   <Link key={turma.id} to={`/professor/disciplines?turma=${turma.id}`}>
-                    <Card className="overflow-hidden hover:shadow-lg transition-all group">
-                      <div className="p-5">
-                         <div className="flex items-start justify-between mb-1">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-primary/10 text-primary shrink-0">
-                              <GraduationCap className="w-5 h-5" />
-                            </div>
-                            <div>
-                              <div className="flex items-center gap-2">
-                                <p className="font-bold text-foreground">{turma.name}</p>
-                                <Badge className={`text-[10px] border ${taxaAprovacao !== null && taxaAprovacao >= 85 ? "bg-accent/10 text-accent border-accent/30" : (taxaAprovacao !== null && taxaAprovacao < 60) || attendance < 75 ? "bg-destructive/10 text-destructive border-destructive/30" : "bg-primary/10 text-primary border-primary/30"}`}>
-                                  {taxaAprovacao !== null && taxaAprovacao >= 85 ? "Excelente" : (taxaAprovacao !== null && taxaAprovacao < 60) || attendance < 75 ? "Em Risco" : "Normal"}
-                                </Badge>
-                              </div>
-                              <p className="text-[11px] text-muted-foreground">{turma.course} · {turma.year}º Ano</p>
-                            </div>
+                    <Card className="px-4 py-3 hover:bg-muted/30 transition-colors group">
+                      <div className="flex items-center gap-3">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <p className="text-sm font-semibold text-foreground truncate">{turma.name}</p>
+                            <Badge variant="outline" className={`text-[9px] ${estadoStyle}`}>
+                              {estado === "excelente" ? "Excelente" : estado === "risco" ? "Em Risco" : "Normal"}
+                            </Badge>
                           </div>
-                          <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
+                          <p className="text-[10px] text-muted-foreground">{turma.course} · {turma.year}º Ano · {turma.students} estudantes</p>
                         </div>
-
-                        <div className="grid grid-cols-3 gap-3 mt-4 mb-4">
-                          <div className="text-center p-2.5 rounded-lg bg-muted/50">
-                            <p className="text-lg font-bold text-foreground">{turma.students}</p>
-                            <p className="text-[10px] text-muted-foreground">Estudantes</p>
+                        <div className="flex items-center gap-4 text-[11px] shrink-0">
+                          <div className="text-center">
+                            <p className={`font-bold ${attendance >= 75 ? "text-accent" : "text-destructive"}`}>{attendance}%</p>
+                            <p className="text-[9px] text-muted-foreground">Presença</p>
                           </div>
-                          <div className="text-center p-2.5 rounded-lg bg-muted/50">
-                            <p className={`text-lg font-bold ${avg !== null && avg >= 10 ? "text-accent" : avg !== null ? "text-destructive" : "text-muted-foreground"}`}>{avg ?? "—"}</p>
-                            <p className="text-[10px] text-muted-foreground">Média</p>
+                          <div className="text-center">
+                            <p className={`font-bold ${avg !== null && avg >= 10 ? "text-accent" : avg !== null ? "text-destructive" : "text-muted-foreground"}`}>{avg ?? "—"}</p>
+                            <p className="text-[9px] text-muted-foreground">Média</p>
                           </div>
-                          <div className="text-center p-2.5 rounded-lg bg-muted/50">
-                            <p className={`text-lg font-bold ${attendance >= 75 ? "text-accent" : "text-destructive"}`}>{attendance}%</p>
-                            <p className="text-[10px] text-muted-foreground">Presença</p>
+                          <div className="text-center">
+                            <p className={`font-bold ${taxaAprovacao !== null && taxaAprovacao >= 70 ? "text-accent" : taxaAprovacao !== null ? "text-destructive" : "text-muted-foreground"}`}>{taxaAprovacao ?? "—"}%</p>
+                            <p className="text-[9px] text-muted-foreground">Aprov.</p>
                           </div>
-                        </div>
-
-                        <div className="space-y-2.5 pt-3 border-t border-border/50">
-                          <div className="flex items-center justify-between text-xs">
-                            <span className="text-muted-foreground flex items-center gap-1.5"><ClipboardCheck className="w-3.5 h-3.5" /> Taxa de Entrega</span>
-                            <span className={`font-semibold ${entrega >= 80 ? "text-accent" : "text-destructive"}`}>{entrega}%</span>
-                          </div>
-                          <div className="flex items-center justify-between text-xs">
-                            <span className="text-muted-foreground flex items-center gap-1.5"><ClipboardCheck className="w-3.5 h-3.5" /> Tarefas</span>
-                            <span className="font-semibold text-foreground">{tarefasEncerradas}/{tarefas.length}</span>
-                          </div>
-                          <div className="flex items-center justify-between text-xs">
-                            <span className="text-muted-foreground flex items-center gap-1.5"><BarChart3 className="w-3.5 h-3.5" /> Avaliações</span>
-                            <span className="font-semibold text-foreground">{avaliacoesEncerradas}/{avaliacoes.length}</span>
-                          </div>
+                          <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
                         </div>
                       </div>
                     </Card>
