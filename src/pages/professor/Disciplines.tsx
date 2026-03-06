@@ -117,9 +117,9 @@ export default function ProfessorDisciplines() {
                       <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{scheduleDays}</span>
                     </div>
                     {turmaDiscs.length > 0 && (
-                      <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
+                      <Badge variant="outline" className="text-[10px] gap-1 mt-1.5">
                         <BookOpen className="w-3 h-3" /> {turmaDiscs[0].name}
-                      </p>
+                      </Badge>
                     )}
                   </div>
                   <Link to={`/professor/turma/${turma.id}`}>
