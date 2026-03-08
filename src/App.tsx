@@ -36,6 +36,7 @@ import ProfessorTasks from "./pages/professor/Tasks";
 import ProfessorEvaluations from "./pages/professor/Evaluations";
 import ProfessorTaskDetail from "./pages/professor/TaskDetail";
 import ProfessorFinances from "./pages/professor/Finances";
+import ProfessorProfile from "./pages/professor/Profile";
 import ProfessorTurmaDetail from "./pages/professor/TurmaDetail";
 import ProfessorLessonDetailPage from "./pages/professor/LessonDetail";
 import ProfessorStudentProfile from "./pages/professor/StudentProfile";
@@ -131,7 +132,7 @@ function AppRoutes() {
         <Route path="/professor/chat" element={<StudentChat />} />
         <Route path="/professor/email" element={<StudentEmail />} />
         <Route path="/professor/finances" element={<ProfessorFinances />} />
-        <Route path="/professor/profile" element={<StudentProfile />} />
+        <Route path="/professor/profile" element={<ProfessorProfile />} />
         {/* Coordenador de Curso */}
         <Route path="/coordenador" element={<CoordenadorDashboard />} />
         <Route path="/coordenador/curso" element={<CoordenadorCursoDetail />} />

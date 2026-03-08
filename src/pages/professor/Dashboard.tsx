@@ -61,11 +61,19 @@ export default function ProfessorDashboard() {
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">
-          Bom dia, {user?.name?.split(" ").pop()} 👋
-        </h1>
-        <p className="text-muted-foreground mt-1">Painel do Professor — Universidade Privada de Angola</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">
+            Bom dia, {user?.name?.split(" ").pop()} 👋
+          </h1>
+          <p className="text-muted-foreground mt-1">Painel do Professor — Universidade Privada de Angola</p>
+        </div>
+        <Link to="/professor/profile" className="flex items-center gap-2 px-3 py-2 rounded-lg border border-border hover:bg-muted/50 transition-colors">
+          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+            <UserCheck className="w-4 h-4 text-primary" />
+          </div>
+          <span className="text-xs font-medium text-foreground hidden sm:inline">Meu Perfil</span>
+        </Link>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -78,10 +86,10 @@ export default function ProfessorDashboard() {
               <p className="text-2xl font-bold text-foreground">{s.value}</p>
               <p className="text-xs text-muted-foreground">{s.label}</p>
               {s.label === "Minha Presença" && (
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="text-[10px] text-accent font-semibold">{presencas}P</span>
-                  <span className="text-[10px] text-secondary font-semibold">{faltasJustificadas}J</span>
-                  <span className="text-[10px] text-destructive font-semibold">{faltasNaoJustificadas}F</span>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  <span className="inline-flex items-center gap-0.5 text-[10px] font-medium text-accent"><span className="w-1.5 h-1.5 rounded-full bg-accent inline-block" />{presencas}</span>
+                  <span className="inline-flex items-center gap-0.5 text-[10px] font-medium text-secondary"><span className="w-1.5 h-1.5 rounded-full bg-secondary inline-block" />{faltasJustificadas}</span>
+                  <span className="inline-flex items-center gap-0.5 text-[10px] font-medium text-destructive"><span className="w-1.5 h-1.5 rounded-full bg-destructive inline-block" />{faltasNaoJustificadas}</span>
                 </div>
               )}
             </div>
