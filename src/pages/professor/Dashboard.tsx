@@ -33,6 +33,12 @@ export default function ProfessorDashboard() {
     ? Math.round(allStudentsUnique.reduce((s, st) => s + st.attendance, 0) / allStudentsUnique.length)
     : 0;
 
+  // Attendance breakdown mock
+  const totalAulas = 48;
+  const presencas = Math.round(totalAulas * overallAttendance / 100);
+  const faltasJustificadas = 4;
+  const faltasNaoJustificadas = totalAulas - presencas - faltasJustificadas;
+
   const stats = [
     { icon: Users, label: "Estudantes", value: totalStudents, color: "text-accent bg-accent/10" },
     { icon: GraduationCap, label: "Turmas", value: allTurmas.length, color: "text-primary bg-primary/10" },
