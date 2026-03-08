@@ -72,9 +72,9 @@ export default function ProfessorDashboard() {
         {stats.map(s => {
           const isPresenca = s.label === "Minha Presença";
           return (
-            <Card key={s.label} className={`p-4 ${isPresenca ? "" : "flex items-center gap-4"}`}>
-              <div className={isPresenca ? "flex items-center gap-4" : "flex items-center gap-4 contents"}>
-                <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${s.color}`}>
+            <Card key={s.label} className="p-4">
+              <div className="flex items-center gap-4">
+                <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${s.color}`}>
                   <s.icon className="w-5 h-5" />
                 </div>
                 <div>
