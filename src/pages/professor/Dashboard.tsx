@@ -69,40 +69,24 @@ export default function ProfessorDashboard() {
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {stats.map(s => {
-          const isPresenca = s.label === "Minha Presença";
-          return (
-            <Card key={s.label} className="p-4">
-              <div className="flex items-center gap-4">
-                <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${s.color}`}>
-                  <s.icon className="w-5 h-5" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-foreground">{s.value}</p>
-                  <p className="text-xs text-muted-foreground">{s.label}</p>
-                </div>
-              </div>
-              {isPresenca && (
-                <div className="flex items-center gap-3 mt-3 pt-3 border-t border-border">
-                  <div className="flex-1 text-center">
-                    <p className="text-sm font-bold text-accent">{presencas}</p>
-                    <p className="text-[9px] text-muted-foreground">Presenças</p>
-                  </div>
-                  <div className="w-px h-6 bg-border" />
-                  <div className="flex-1 text-center">
-                    <p className="text-sm font-bold text-secondary">{faltasJustificadas}</p>
-                    <p className="text-[9px] text-muted-foreground">Justificadas</p>
-                  </div>
-                  <div className="w-px h-6 bg-border" />
-                  <div className="flex-1 text-center">
-                    <p className="text-sm font-bold text-destructive">{faltasNaoJustificadas}</p>
-                    <p className="text-[9px] text-muted-foreground">Não Justif.</p>
-                  </div>
+        {stats.map(s => (
+          <Card key={s.label} className="p-4 flex items-center gap-4">
+            <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${s.color}`}>
+              <s.icon className="w-5 h-5" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-2xl font-bold text-foreground">{s.value}</p>
+              <p className="text-xs text-muted-foreground">{s.label}</p>
+              {s.label === "Minha Presença" && (
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-[10px] text-accent font-semibold">{presencas}P</span>
+                  <span className="text-[10px] text-secondary font-semibold">{faltasJustificadas}J</span>
+                  <span className="text-[10px] text-destructive font-semibold">{faltasNaoJustificadas}F</span>
                 </div>
               )}
-            </Card>
-          );
-        })}
+            </div>
+          </Card>
+        ))}
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6">
