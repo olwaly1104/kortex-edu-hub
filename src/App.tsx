@@ -132,7 +132,7 @@ function AppRoutes() {
         <Route path="/professor/chat" element={<StudentChat />} />
         <Route path="/professor/email" element={<StudentEmail />} />
         <Route path="/professor/finances" element={<ProfessorFinances />} />
-        <Route path="/professor/profile" element={<StudentProfile />} />
+        <Route path="/professor/profile" element={<ProfessorProfile />} />
         {/* Coordenador de Curso */}
         <Route path="/coordenador" element={<CoordenadorDashboard />} />
         <Route path="/coordenador/curso" element={<CoordenadorCursoDetail />} />
