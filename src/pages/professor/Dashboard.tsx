@@ -80,6 +80,28 @@ export default function ProfessorDashboard() {
             </div>
           </Card>
         ))}
+        {/* Attendance breakdown below stats */}
+        <Card className="col-span-2 lg:col-span-4 p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <UserCheck className="w-4 h-4 text-accent" />
+            <p className="text-xs font-semibold text-foreground">Detalhe de Presenças</p>
+            <span className="text-[10px] text-muted-foreground ml-auto">Este mês · {totalAulas} aulas</span>
+          </div>
+          <div className="grid grid-cols-3 gap-3">
+            <div className="rounded-lg bg-accent/10 px-3 py-2 text-center">
+              <p className="text-lg font-bold text-accent">{presencas}</p>
+              <p className="text-[10px] text-muted-foreground">Presenças</p>
+            </div>
+            <div className="rounded-lg bg-secondary/10 px-3 py-2 text-center">
+              <p className="text-lg font-bold text-secondary">{faltasJustificadas}</p>
+              <p className="text-[10px] text-muted-foreground">Faltas Justificadas</p>
+            </div>
+            <div className="rounded-lg bg-destructive/10 px-3 py-2 text-center">
+              <p className="text-lg font-bold text-destructive">{faltasNaoJustificadas}</p>
+              <p className="text-[10px] text-muted-foreground">Faltas Não Justificadas</p>
+            </div>
+          </div>
+        </Card>
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6">
