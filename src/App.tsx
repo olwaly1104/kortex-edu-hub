@@ -36,6 +36,7 @@ import ProfessorTasks from "./pages/professor/Tasks";
 import ProfessorEvaluations from "./pages/professor/Evaluations";
 import ProfessorTaskDetail from "./pages/professor/TaskDetail";
 import ProfessorFinances from "./pages/professor/Finances";
+import ProfessorProfile from "./pages/professor/Profile";
 import ProfessorTurmaDetail from "./pages/professor/TurmaDetail";
 import ProfessorLessonDetailPage from "./pages/professor/LessonDetail";
 import ProfessorStudentProfile from "./pages/professor/StudentProfile";
