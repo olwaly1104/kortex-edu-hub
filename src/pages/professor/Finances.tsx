@@ -121,18 +121,18 @@ export default function ProfessorFinances() {
                 <Badge className="bg-destructive/10 text-destructive border-0 text-[10px]">{aplicadaCount} aplicada(s)</Badge>
                 {pendenteCount > 0 && <Badge className="bg-secondary/10 text-secondary border-0 text-[10px]">{pendenteCount} pendente(s)</Badge>}
               </div>
-              <p className="text-sm font-semibold text-destructive">-{formatCurrency(totalMultasAplicadas)}</p>
+              <div className="flex items-center gap-3">
+                <p className="text-sm font-semibold text-destructive">-{formatCurrency(totalMultasAplicadas)}</p>
+                <Button variant="outline" size="sm" className="text-xs h-7 gap-1.5 rounded-lg"
+                  onClick={() => setMultasModalOpen(true)}>
+                  <Eye className="w-3.5 h-3.5" /> Ver Multas
+                </Button>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" className="text-xs h-7 gap-1.5 rounded-lg"
-                onClick={() => toast({ title: "PDF gerado", description: "Tabela de multas a descarregar..." })}>
-                <FileText className="w-3.5 h-3.5" /> Tabela de Multas (PDF)
-              </Button>
-              <Button variant="outline" size="sm" className="text-xs h-7 gap-1.5 rounded-lg"
-                onClick={() => setMultasModalOpen(true)}>
-                <Eye className="w-3.5 h-3.5" /> Ver Multas
-              </Button>
-            </div>
+            <Button variant="outline" size="sm" className="text-xs h-7 gap-1.5 rounded-lg"
+              onClick={() => toast({ title: "PDF gerado", description: "Tabela de multas a descarregar..." })}>
+              <FileText className="w-3.5 h-3.5" /> Tabela de Multas (PDF)
+            </Button>
           </div>
         </div>
       </div>
