@@ -86,10 +86,10 @@ export default function ProfessorDashboard() {
               <p className="text-2xl font-bold text-foreground">{s.value}</p>
               <p className="text-xs text-muted-foreground">{s.label}</p>
               {s.label === "Minha Presença" && (
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="text-[10px] text-accent font-semibold">{presencas}P</span>
-                  <span className="text-[10px] text-secondary font-semibold">{faltasJustificadas}J</span>
-                  <span className="text-[10px] text-destructive font-semibold">{faltasNaoJustificadas}F</span>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  <span className="inline-flex items-center gap-0.5 text-[10px] font-medium text-accent"><span className="w-1.5 h-1.5 rounded-full bg-accent inline-block" />{presencas}</span>
+                  <span className="inline-flex items-center gap-0.5 text-[10px] font-medium text-secondary"><span className="w-1.5 h-1.5 rounded-full bg-secondary inline-block" />{faltasJustificadas}</span>
+                  <span className="inline-flex items-center gap-0.5 text-[10px] font-medium text-destructive"><span className="w-1.5 h-1.5 rounded-full bg-destructive inline-block" />{faltasNaoJustificadas}</span>
                 </div>
               )}
             </div>
