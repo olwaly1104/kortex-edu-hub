@@ -13,6 +13,7 @@ import {
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
+import { ExportButton } from "@/components/ExportButton";
 
 const statusStyle: Record<string, { bg: string; label: string; icon: React.ElementType }> = {
   rascunho: { bg: "bg-muted text-muted-foreground", label: "Rascunho", icon: Clock },
