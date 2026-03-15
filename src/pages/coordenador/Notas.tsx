@@ -8,6 +8,9 @@ import { Award, ChevronRight, Calendar, Clock, MapPin, User, CheckCircle, ArrowL
 
 export default function CoordenadorNotas() {
   const [selectedTurma, setSelectedTurma] = useState<string | null>(null);
+  const [filterYear, setFilterYear] = useState<number | null>(null);
+
+  const years = [...new Set(coordNotas.map(n => n.year))].sort();
 
   const allTurmas = coordNotas.flatMap(y => y.turmas.map(t => ({ ...t, year: y.year })));
 
