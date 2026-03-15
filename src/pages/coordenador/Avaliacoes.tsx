@@ -13,7 +13,6 @@ import {
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { ExportButton } from "@/components/ExportButton";
 
 const statusStyle: Record<string, { bg: string; label: string; icon: React.ElementType }> = {
   rascunho: { bg: "bg-muted text-muted-foreground", label: "Rascunho", icon: Clock },
@@ -107,26 +106,11 @@ export default function CoordenadorAvaliacoes() {
 
   return (
     <div className="p-6 lg:p-8 space-y-5 animate-fade-in">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-            <GraduationCap className="w-6 h-6 text-secondary" /> Avaliações do Curso
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">Visão geral dos exames e testes do curso</p>
-        </div>
-        <ExportButton
-          data={filtered}
-          filename="avaliacoes"
-          title="Relatório de Avaliações"
-          columns={[
-            { header: "Título", accessor: r => r.title },
-            { header: "Disciplina", accessor: r => r.discipline },
-            { header: "Data", accessor: r => r.dueDate },
-            { header: "Estado", accessor: r => r.status === "publicada" ? "Activa" : r.status === "encerrada" ? "Encerrada" : "Rascunho" },
-            { header: "Submissões", accessor: r => `${r.submissions}/${r.totalStudents}` },
-            { header: "Média", accessor: r => r.averageGrade ?? "—" },
-          ]}
-        />
+      <div>
+        <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+          <GraduationCap className="w-6 h-6 text-secondary" /> Avaliações do Curso
+        </h1>
+        <p className="text-sm text-muted-foreground mt-1">Visão geral dos exames e testes do curso</p>
       </div>
 
       {/* Summary cards */}

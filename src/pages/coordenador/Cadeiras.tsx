@@ -7,7 +7,6 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { BookOpen, Award, ClipboardCheck, Clock, Search, ArrowUpDown, X } from "lucide-react";
 import { useState, useMemo } from "react";
-import { ExportButton } from "@/components/ExportButton";
 
 type SortField = "media" | "presenca" | "entrega";
 type SortDir = "asc" | "desc";
@@ -65,29 +64,11 @@ export default function CoordenadorCadeiras() {
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-            <BookOpen className="w-6 h-6 text-primary" /> Cadeiras do Curso
-          </h1>
-          <p className="text-muted-foreground mt-1">{coordCursoInfo.name} · {coordCursoInfo.faculty}</p>
-        </div>
-        <ExportButton
-          data={filtered}
-          filename="cadeiras"
-          title="Relatório de Cadeiras"
-          columns={[
-            { header: "Cadeira", accessor: r => r.name },
-            { header: "Código", accessor: r => r.code },
-            { header: "Ano", accessor: r => `${r.year}º` },
-            { header: "Professor", accessor: r => r.professor },
-            { header: "Estudantes", accessor: r => r.estudantes },
-            { header: "Média", accessor: r => r.media },
-            { header: "Presença", accessor: r => `${r.presenca}%` },
-            { header: "Taxa Entrega", accessor: r => `${r.taxaEntrega}%` },
-            { header: "Taxa Aprovação", accessor: r => `${r.taxaAprovacao}%` },
-          ]}
-        />
+      <div>
+        <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+          <BookOpen className="w-6 h-6 text-primary" /> Cadeiras do Curso
+        </h1>
+        <p className="text-muted-foreground mt-1">{coordCursoInfo.name} · {coordCursoInfo.faculty}</p>
       </div>
 
       {/* KPI Cards */}
