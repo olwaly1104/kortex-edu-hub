@@ -191,7 +191,6 @@ export default function CoordenadorNotas() {
           })}
           </div>
         </div>
-        </div>
       )}
       {/* Expanded turma detail */}
       {selectedData && (
