@@ -9,7 +9,20 @@ export default function CoordenadorFinancas() {
   const salarioBase = 320000;
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
-      <h1 className="text-2xl font-bold text-foreground flex items-center gap-2"><Wallet className="w-6 h-6 text-primary" /> Finanças</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-foreground flex items-center gap-2"><Wallet className="w-6 h-6 text-primary" /> Finanças</h1>
+        <ExportButton
+          data={months.map((m, i) => ({ mes: `${m} 2024`, bruto: salarioBase, liquido: Math.round(salarioBase * 0.88), estado: i < 2 ? "Pago" : "Pendente" }))}
+          filename="financas"
+          title="Relatório Financeiro"
+          columns={[
+            { header: "Mês", accessor: r => r.mes },
+            { header: "Bruto (Kz)", accessor: r => r.bruto.toLocaleString() },
+            { header: "Líquido (Kz)", accessor: r => r.liquido.toLocaleString() },
+            { header: "Estado", accessor: r => r.estado },
+          ]}
+        />
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card className="p-5 text-center"><p className="text-2xl font-bold text-foreground">{salarioBase.toLocaleString()} Kz</p><p className="text-xs text-muted-foreground">Salário Base</p></Card>
         <Card className="p-5 text-center"><p className="text-2xl font-bold text-accent">{Math.round(salarioBase * 0.88).toLocaleString()} Kz</p><p className="text-xs text-muted-foreground">Salário Líquido</p></Card>

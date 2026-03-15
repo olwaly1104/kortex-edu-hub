@@ -52,11 +52,31 @@ export default function CoordenadorNotas() {
         </Link>
       )}
 
-      <div>
-        <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-          <Award className="w-6 h-6 text-primary" /> Notas do Curso
-        </h1>
-        <p className="text-muted-foreground mt-1">{coordCursoInfo.name} · {coordCursoInfo.faculty}</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+            <Award className="w-6 h-6 text-primary" /> Notas do Curso
+          </h1>
+          <p className="text-muted-foreground mt-1">{coordCursoInfo.name} · {coordCursoInfo.faculty}</p>
+        </div>
+        {!selectedTurma && (
+          <ExportButton
+            data={allTurmas.flatMap(t => t.avaliacoes.map(a => ({ ...a, turma: t.turma, year: t.year })))}
+            filename="notas"
+            title="Relatório de Notas do Curso"
+            columns={[
+              { header: "Ano", accessor: r => `${r.year}º` },
+              { header: "Turma", accessor: r => r.turma },
+              { header: "Avaliação", accessor: r => r.name },
+              { header: "Cadeira", accessor: r => r.cadeira },
+              { header: "Média", accessor: r => r.media },
+              { header: "Aprovados", accessor: r => r.aprovados },
+              { header: "Reprovados", accessor: r => r.reprovados },
+              { header: "Data", accessor: r => r.date },
+              { header: "Professor", accessor: r => r.professor },
+            ]}
+          />
+        )}
       </div>
 
       {/* Controls + KPIs */}
