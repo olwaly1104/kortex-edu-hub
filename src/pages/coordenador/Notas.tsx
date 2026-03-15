@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Award, ChevronRight, Calendar, Clock, MapPin, User, CheckCircle, ArrowLeft } from "lucide-react";
+import { ExportButton } from "@/components/ExportButton";
 
 export default function CoordenadorNotas() {
   const [selectedTurma, setSelectedTurma] = useState<string | null>(null);
