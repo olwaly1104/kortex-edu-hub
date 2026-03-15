@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Users, Search, TrendingUp, AlertTriangle, Award, ArrowUpDown, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ExportButton } from "@/components/ExportButton";
 
 type SortField = "media" | "presenca" | "taxaEntrega";
 type SortDir = "asc" | "desc";
