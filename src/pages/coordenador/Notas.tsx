@@ -104,62 +104,127 @@ export default function CoordenadorNotas() {
 
 
 
-      {/* Years grid — 3 per row */}
+      {/* Toggle + Years grid */}
       {!selectedTurma && (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {coordNotas.map(yearData => (
-            <div key={yearData.year} className="space-y-2">
-              <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">{yearData.year}º Ano</h2>
-              <div className="space-y-1.5">
-                {yearData.turmas.map(t => {
-                  const turmaKey = `${yearData.year}-${t.turma}`;
-                  return (
-                    <Card
-                      key={turmaKey}
-                      className="p-3 transition-all cursor-pointer hover:shadow-md border-l-[3px] group"
-                      style={{ borderLeftColor: t.mediaGeral >= 10 ? "hsl(var(--accent))" : "hsl(var(--destructive))" }}
-                      onClick={() => setSelectedTurma(turmaKey)}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2 min-w-0">
-                          <p className="text-xs font-semibold text-foreground">Turma {t.turma}</p>
-                          <Badge
-                            variant="outline"
-                            className={`text-[9px] ${
-                              t.mediaGeral >= 14 ? "bg-accent/15 text-accent border-accent/30"
-                              : t.mediaGeral >= 10 ? "bg-muted text-muted-foreground border-border"
-                              : "bg-destructive/15 text-destructive border-destructive/30"
-                            }`}
-                          >
-                            {t.mediaGeral >= 14 ? "Excelente" : t.mediaGeral >= 10 ? "Normal" : "Em Risco"}
-                          </Badge>
-                        </div>
-                        <div className="flex items-center gap-3 shrink-0">
-                          <div className="text-right">
-                            <p className="text-[9px] text-muted-foreground uppercase leading-tight">Média Geral</p>
-                            <p className={`text-xs font-bold ${t.mediaGeral >= 10 ? "text-accent" : "text-destructive"}`}>{t.mediaGeral}</p>
-                          </div>
-                          <div className="text-right">
-                            <p className="text-[9px] text-muted-foreground uppercase leading-tight">Aprov.</p>
-                            <p className={`text-xs font-bold ${getTurmaAprovacao(t) >= 70 ? "text-accent" : getTurmaAprovacao(t) >= 50 ? "text-foreground" : "text-destructive"}`}>{getTurmaAprovacao(t)}%</p>
-                          </div>
-                          <div className="text-right">
-                            <p className="text-[9px] text-muted-foreground uppercase leading-tight">Reprov.</p>
-                            <p className={`text-xs font-bold ${(100 - getTurmaAprovacao(t)) > 30 ? "text-destructive" : "text-foreground"}`}>{100 - getTurmaAprovacao(t)}%</p>
-                          </div>
-                          <div className="text-right">
-                            <p className="text-[9px] text-muted-foreground uppercase leading-tight">Aval.</p>
-                            <p className="text-xs font-bold text-foreground">{t.avaliacoesCompletas}/{t.avaliacoesTotal}</p>
-                          </div>
-                          <ChevronRight className="w-3.5 h-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
-                        </div>
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <Toggle
+              pressed={showYearMetrics}
+              onPressedChange={setShowYearMetrics}
+              variant="outline"
+              size="sm"
+              className="gap-1.5 text-xs data-[state=on]:bg-primary/10 data-[state=on]:text-primary data-[state=on]:border-primary/30"
+            >
+              <BarChart3 className="w-3.5 h-3.5" />
+              Resumo por Ano
+            </Toggle>
+          </div>
+
+          {showYearMetrics ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              {coordNotas.map(yearData => {
+                const yTurmas = yearData.turmas;
+                const yMedia = yTurmas.length > 0 ? Math.round((yTurmas.reduce((s, t) => s + t.mediaGeral, 0) / yTurmas.length) * 10) / 10 : 0;
+                const yAprov = yTurmas.reduce((s, t) => s + t.avaliacoes.reduce((a, e) => a + e.aprovados, 0), 0);
+                const yReprov = yTurmas.reduce((s, t) => s + t.avaliacoes.reduce((a, e) => a + e.reprovados, 0), 0);
+                const yTotal = yAprov + yReprov;
+                const yTaxaAprov = yTotal > 0 ? Math.round((yAprov / yTotal) * 100) : 0;
+                const yTaxaReprov = yTotal > 0 ? Math.round((yReprov / yTotal) * 100) : 0;
+                const yAvalC = yTurmas.reduce((s, t) => s + t.avaliacoesCompletas, 0);
+                const yAvalT = yTurmas.reduce((s, t) => s + t.avaliacoesTotal, 0);
+                const yTaxaConc = yAvalT > 0 ? Math.round((yAvalC / yAvalT) * 100) : 0;
+
+                return (
+                  <Card key={yearData.year} className="p-4 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-sm font-semibold text-foreground">{yearData.year}º Ano</h3>
+                      <Badge variant="outline" className="text-[10px]">{yTurmas.length} turma{yTurmas.length !== 1 ? "s" : ""}</Badge>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Média Geral</p>
+                        <p className={`text-lg font-bold ${yMedia >= 10 ? "text-accent" : "text-destructive"}`}>{yMedia}/20</p>
                       </div>
-                    </Card>
-                  );
-                })}
-              </div>
+                      <div>
+                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Avaliações</p>
+                        <p className="text-lg font-bold text-foreground">{yAvalC}<span className="text-sm text-muted-foreground font-medium">/{yAvalT}</span></p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Taxa Aprovado</p>
+                        <p className={`text-lg font-bold ${yTaxaAprov >= 70 ? "text-accent" : yTaxaAprov >= 50 ? "text-foreground" : "text-destructive"}`}>{yTaxaAprov}%</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Taxa Reprovado</p>
+                        <p className={`text-lg font-bold ${yTaxaReprov > 30 ? "text-destructive" : "text-foreground"}`}>{yTaxaReprov}%</p>
+                      </div>
+                    </div>
+                    <div className="pt-2 border-t border-border">
+                      <div className="flex items-center justify-between">
+                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Taxa Conclusão</p>
+                        <p className={`text-sm font-bold ${yTaxaConc >= 80 ? "text-accent" : yTaxaConc >= 50 ? "text-foreground" : "text-destructive"}`}>{yTaxaConc}%</p>
+                      </div>
+                    </div>
+                  </Card>
+                );
+              })}
             </div>
-          ))}
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              {coordNotas.map(yearData => (
+                <div key={yearData.year} className="space-y-2">
+                  <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">{yearData.year}º Ano</h2>
+                  <div className="space-y-1.5">
+                    {yearData.turmas.map(t => {
+                      const turmaKey = `${yearData.year}-${t.turma}`;
+                      return (
+                        <Card
+                          key={turmaKey}
+                          className="p-3 transition-all cursor-pointer hover:shadow-md border-l-[3px] group"
+                          style={{ borderLeftColor: t.mediaGeral >= 10 ? "hsl(var(--accent))" : "hsl(var(--destructive))" }}
+                          onClick={() => setSelectedTurma(turmaKey)}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2 min-w-0">
+                              <p className="text-xs font-semibold text-foreground">Turma {t.turma}</p>
+                              <Badge
+                                variant="outline"
+                                className={`text-[9px] ${
+                                  t.mediaGeral >= 14 ? "bg-accent/15 text-accent border-accent/30"
+                                  : t.mediaGeral >= 10 ? "bg-muted text-muted-foreground border-border"
+                                  : "bg-destructive/15 text-destructive border-destructive/30"
+                                }`}
+                              >
+                                {t.mediaGeral >= 14 ? "Excelente" : t.mediaGeral >= 10 ? "Normal" : "Em Risco"}
+                              </Badge>
+                            </div>
+                            <div className="flex items-center gap-3 shrink-0">
+                              <div className="text-right">
+                                <p className="text-[9px] text-muted-foreground uppercase leading-tight">Média Geral</p>
+                                <p className={`text-xs font-bold ${t.mediaGeral >= 10 ? "text-accent" : "text-destructive"}`}>{t.mediaGeral}</p>
+                              </div>
+                              <div className="text-right">
+                                <p className="text-[9px] text-muted-foreground uppercase leading-tight">Aprov.</p>
+                                <p className={`text-xs font-bold ${getTurmaAprovacao(t) >= 70 ? "text-accent" : getTurmaAprovacao(t) >= 50 ? "text-foreground" : "text-destructive"}`}>{getTurmaAprovacao(t)}%</p>
+                              </div>
+                              <div className="text-right">
+                                <p className="text-[9px] text-muted-foreground uppercase leading-tight">Reprov.</p>
+                                <p className={`text-xs font-bold ${(100 - getTurmaAprovacao(t)) > 30 ? "text-destructive" : "text-foreground"}`}>{100 - getTurmaAprovacao(t)}%</p>
+                              </div>
+                              <div className="text-right">
+                                <p className="text-[9px] text-muted-foreground uppercase leading-tight">Aval.</p>
+                                <p className="text-xs font-bold text-foreground">{t.avaliacoesCompletas}/{t.avaliacoesTotal}</p>
+                              </div>
+                              <ChevronRight className="w-3.5 h-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+                            </div>
+                          </div>
+                        </Card>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
