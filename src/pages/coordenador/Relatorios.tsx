@@ -196,7 +196,7 @@ export default function CoordenadorRelatorios() {
           <div className="mb-5">
             {(files.length > 0 || isRoot) && <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mb-3">Pastas</p>}
             {view === "grid" ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
+              <div className="flex flex-col gap-0.5">
                 {fFolders.map(f=>(
                   <button key={f.id} onClick={()=>nav(f.id)} className="flex items-center gap-3 px-3 py-3 rounded-lg border border-transparent hover:border-border hover:bg-muted/40 transition-all text-left group">
                     <FolderSVG className="w-10 h-8 shrink-0"/>
