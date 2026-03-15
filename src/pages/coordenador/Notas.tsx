@@ -70,13 +70,6 @@ export default function CoordenadorNotas() {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0"><Calendar className="w-3.5 h-3.5 text-primary" /></div>
-              <div>
-                <p className="text-[10px] text-muted-foreground uppercase tracking-wider leading-tight">Avaliações</p>
-                <p className="text-sm font-bold text-foreground">{totalAvalCompletas}<span className="text-xs text-muted-foreground font-medium">/{totalAvalTotal}</span></p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
               <div className="w-7 h-7 rounded-lg bg-accent/10 flex items-center justify-center shrink-0"><CheckCircle className="w-3.5 h-3.5 text-accent" /></div>
               <div>
                 <p className="text-[10px] text-muted-foreground uppercase tracking-wider leading-tight">Taxa Aprovado</p>
@@ -88,6 +81,13 @@ export default function CoordenadorNotas() {
               <div>
                 <p className="text-[10px] text-muted-foreground uppercase tracking-wider leading-tight">Taxa Reprovado</p>
                 <p className={`text-sm font-bold ${taxaReprovacao > 30 ? "text-destructive" : "text-foreground"}`}>{taxaReprovacao}%</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0"><Calendar className="w-3.5 h-3.5 text-primary" /></div>
+              <div>
+                <p className="text-[10px] text-muted-foreground uppercase tracking-wider leading-tight">Avaliações</p>
+                <p className="text-sm font-bold text-foreground">{totalAvalCompletas}<span className="text-xs text-muted-foreground font-medium">/{totalAvalTotal}</span></p>
               </div>
             </div>
             <div className="flex items-center gap-2">
