@@ -62,7 +62,7 @@ export default function CoordenadorDocentes() {
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-foreground flex items-center gap-2"><GraduationCap className="w-6 h-6 text-primary" /> Docentes do Curso</h1>
-        <Badge variant="outline">{totalDocentes} docentes</Badge>
+        
       </div>
 
       {/* KPI Cards */}
