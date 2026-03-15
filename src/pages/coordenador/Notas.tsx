@@ -4,12 +4,10 @@ import { coordNotas, coordCursoInfo } from "@/data/institutionData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Toggle } from "@/components/ui/toggle";
-import { Award, ChevronRight, Calendar, Clock, MapPin, User, CheckCircle, ArrowLeft, BarChart3 } from "lucide-react";
+import { Award, ChevronRight, Calendar, Clock, MapPin, User, CheckCircle, ArrowLeft } from "lucide-react";
 
 export default function CoordenadorNotas() {
   const [selectedTurma, setSelectedTurma] = useState<string | null>(null);
-  const [showYearMetrics, setShowYearMetrics] = useState(false);
 
   const allTurmas = coordNotas.flatMap(y => y.turmas.map(t => ({ ...t, year: y.year })));
 
