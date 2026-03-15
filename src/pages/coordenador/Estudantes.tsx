@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Users, Search, TrendingUp, AlertTriangle, Award, ArrowUpDown, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ExportButton } from "@/components/ExportButton";
 
 type SortField = "media" | "presenca" | "taxaEntrega";
 type SortDir = "asc" | "desc";
@@ -67,7 +68,24 @@ export default function CoordenadorEstudantes() {
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
-      <h1 className="text-2xl font-bold text-foreground flex items-center gap-2"><Users className="w-6 h-6 text-primary" /> Estudantes do Curso</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-foreground flex items-center gap-2"><Users className="w-6 h-6 text-primary" /> Estudantes do Curso</h1>
+        <ExportButton
+          data={filtered}
+          filename="estudantes"
+          title="Relatório de Estudantes"
+          columns={[
+            { header: "Nome", accessor: r => r.name },
+            { header: "Email", accessor: r => r.email },
+            { header: "Ano", accessor: r => `${r.year}º` },
+            { header: "Turma", accessor: r => r.turma },
+            { header: "Média", accessor: r => r.media },
+            { header: "Presença", accessor: r => `${r.presenca}%` },
+            { header: "Taxa Entrega", accessor: r => `${r.taxaEntrega}%` },
+            { header: "Estado", accessor: r => r.status },
+          ]}
+        />
+      </div>
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
