@@ -168,8 +168,7 @@ export default function CoordenadorNotas() {
                   })}
                 </div>
               </div>
-            );
-          })}
+          ))}
           </div>
         </div>
       )}
