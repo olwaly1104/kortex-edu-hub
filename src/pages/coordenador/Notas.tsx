@@ -116,28 +116,9 @@ export default function CoordenadorNotas() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {coordNotas.filter(yd => !filterYear || yd.year === filterYear).map(yearData => {
-            const yTurmas = yearData.turmas;
-            const yMedia = yTurmas.length > 0 ? Math.round((yTurmas.reduce((s, t) => s + t.mediaGeral, 0) / yTurmas.length) * 10) / 10 : 0;
-            const yAprov = yTurmas.reduce((s, t) => s + t.avaliacoes.reduce((a, e) => a + e.aprovados, 0), 0);
-            const yReprov = yTurmas.reduce((s, t) => s + t.avaliacoes.reduce((a, e) => a + e.reprovados, 0), 0);
-            const yTotal = yAprov + yReprov;
-            const yTaxaAprov = yTotal > 0 ? Math.round((yAprov / yTotal) * 100) : 0;
-            const yTaxaReprov = yTotal > 0 ? Math.round((yReprov / yTotal) * 100) : 0;
-            const yAvalC = yTurmas.reduce((s, t) => s + t.avaliacoesCompletas, 0);
-            const yAvalT = yTurmas.reduce((s, t) => s + t.avaliacoesTotal, 0);
-
-            return (
+          {coordNotas.filter(yd => !filterYear || yd.year === filterYear).map(yearData => (
               <div key={yearData.year} className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">{yearData.year}º Ano</h2>
-                  <div className="flex items-center gap-3 text-[10px] text-muted-foreground">
-                    <span>Média <span className={`font-bold ${yMedia >= 10 ? "text-accent" : "text-destructive"}`}>{yMedia}</span></span>
-                    <span>Aprov. <span className={`font-bold ${yTaxaAprov >= 70 ? "text-accent" : yTaxaAprov >= 50 ? "text-foreground" : "text-destructive"}`}>{yTaxaAprov}%</span></span>
-                    <span>Reprov. <span className={`font-bold ${yTaxaReprov > 30 ? "text-destructive" : "text-foreground"}`}>{yTaxaReprov}%</span></span>
-                    <span>Aval. <span className="font-bold text-foreground">{yAvalC}/{yAvalT}</span></span>
-                  </div>
-                </div>
+                <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">{yearData.year}º Ano</h2>
                 <div className="space-y-1.5">
                   {yearData.turmas.map(t => {
                     const turmaKey = `${yearData.year}-${t.turma}`;
@@ -187,8 +168,7 @@ export default function CoordenadorNotas() {
                   })}
                 </div>
               </div>
-            );
-          })}
+          ))}
           </div>
         </div>
       )}
