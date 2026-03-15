@@ -61,6 +61,20 @@ export default function CoordenadorNotas() {
       {/* Controls + KPIs */}
       {!selectedTurma && (
         <div className="rounded-xl border border-border bg-card p-4 space-y-3">
+          {/* Year toggles */}
+          <div className="flex flex-wrap gap-2">
+            <Button size="sm" variant={!filterYear ? "default" : "outline"} onClick={() => setFilterYear(null)} className="text-xs">
+              Todos os Anos
+            </Button>
+            {years.map(y => (
+              <Button key={y} size="sm" variant={filterYear === y ? "default" : "outline"} onClick={() => setFilterYear(filterYear === y ? null : y)} className="text-xs">
+                {y}º Ano
+              </Button>
+            ))}
+          </div>
+
+          <div className="border-t border-border" />
+
           {/* KPI row */}
           <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
             <div className="flex items-center gap-2">
@@ -98,20 +112,6 @@ export default function CoordenadorNotas() {
                 <p className={`text-sm font-bold ${taxaConclusao >= 80 ? "text-accent" : taxaConclusao >= 50 ? "text-foreground" : "text-destructive"}`}>{taxaConclusao}%</p>
               </div>
             </div>
-          </div>
-
-          <div className="border-t border-border" />
-
-          {/* Year toggles */}
-          <div className="flex flex-wrap gap-2">
-            <Button size="sm" variant={!filterYear ? "default" : "outline"} onClick={() => setFilterYear(null)} className="text-xs">
-              Todos os Anos
-            </Button>
-            {years.map(y => (
-              <Button key={y} size="sm" variant={filterYear === y ? "default" : "outline"} onClick={() => setFilterYear(filterYear === y ? null : y)} className="text-xs">
-                {y}º Ano
-              </Button>
-            ))}
           </div>
         </div>
       )}
