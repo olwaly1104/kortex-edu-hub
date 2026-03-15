@@ -70,15 +70,20 @@ const cadeiras = ["Matemática","Física","Química","Programação","Estatísti
 const docentes = ["Prof. Silva","Prof. Santos","Prof. Mendes","Prof. Costa","Prof. Oliveira"];
 const estudantes = ["Ana Silva","João Santos","Maria Costa","Pedro Mendes","Carla Oliveira","Bruno Ferreira"];
 
-const driveTree: DriveNode[] = [
-  {id:"desempenho",name:"Desempenho Académico",children:mkAL([
+const mkCategories = (): DriveNode[] => [
+  {id:`desempenho-${_c++}`,name:"Desempenho Académico",children:[
     ...["1º Ano","2º Ano","3º Ano"].map(a=>({id:`da-${a}-${_c++}`,name:a,children:mkPeriods(dMo,dSe,dAn)})),
     ...["Turma A","Turma B","Turma C"].map(t=>({id:`dt-${t}-${_c++}`,name:t,children:mkPeriods(dMo,dSe,dAn)})),
-  ])},
-  {id:"cadeiras",name:"Cadeiras do Curso",children:mkAL(cadeiras.map(c=>({id:`cd-${c}-${_c++}`,name:c,children:mkPeriods(cMo,cSe,cAn)})))},
-  {id:"docentes",name:"Docentes do Curso",children:mkAL(docentes.map(d=>({id:`dc-${d}-${_c++}`,name:d,children:mkPeriods(pMo,pSe,pAn)})))},
-  {id:"estudantes",name:"Estudantes do Curso",children:mkAL(estudantes.map(e=>({id:`es-${e}-${_c++}`,name:e,children:mkPeriods(eMo,eSe,eAn)})))},
-  {id:"geral",name:"Geral",children:mkAL(mkPeriods(gMo,gSe,gAn))},
+  ]},
+  {id:`cadeiras-${_c++}`,name:"Cadeiras do Curso",children:cadeiras.map(c=>({id:`cd-${c}-${_c++}`,name:c,children:mkPeriods(cMo,cSe,cAn)}))},
+  {id:`docentes-${_c++}`,name:"Docentes do Curso",children:docentes.map(d=>({id:`dc-${d}-${_c++}`,name:d,children:mkPeriods(pMo,pSe,pAn)}))},
+  {id:`estudantes-${_c++}`,name:"Estudantes do Curso",children:estudantes.map(e=>({id:`es-${e}-${_c++}`,name:e,children:mkPeriods(eMo,eSe,eAn)}))},
+  {id:`geral-${_c++}`,name:"Geral",children:mkPeriods(gMo,gSe,gAn)},
+];
+
+const driveTree: DriveNode[] = [
+  {id:"al-current",name:`Ano Letivo ${AY}`,children:mkCategories()},
+  {id:"al-previous",name:`Ano Letivo ${PAY}`,children:[]},
 ];
 
 function collectAll(n: DriveNode): DriveFile[] {
