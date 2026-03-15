@@ -12,7 +12,8 @@ export default function CoordenadorNotas() {
 
   const years = [...new Set(coordNotas.map(n => n.year))].sort();
 
-  const allTurmas = coordNotas.flatMap(y => y.turmas.map(t => ({ ...t, year: y.year })));
+  const filteredNotas = filterYear ? coordNotas.filter(n => n.year === filterYear) : coordNotas;
+  const allTurmas = filteredNotas.flatMap(y => y.turmas.map(t => ({ ...t, year: y.year })));
 
   const mediaGeral = allTurmas.length > 0
     ? Math.round((allTurmas.reduce((s, t) => s + t.mediaGeral, 0) / allTurmas.length) * 10) / 10
