@@ -86,15 +86,6 @@ function collectAll(n: DriveNode): DriveFile[] {
 }
 const allFiles = driveTree.flatMap(collectAll);
 
-// ─── Folder SVG (OneDrive-style) ─────────────────────────
-function FolderSVG({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 48 40" fill="none" className={className}>
-      <path d="M4 8C4 5.79 5.79 4 8 4h10.34a4 4 0 013.12 1.5L24 8.5h16c2.21 0 4 1.79 4 4V32c0 2.21-1.79 4-4 4H8c-2.21 0-4-1.79-4-4V8z" fill="hsl(var(--primary))" opacity="0.15"/>
-      <path d="M4 12.5h40V32c0 2.21-1.79 4-4 4H8c-2.21 0-4-1.79-4-4V12.5z" fill="hsl(var(--primary))" opacity="0.25"/>
-    </svg>
-  );
-}
 
 // ─── Main Component ──────────────────────────────────────
 export default function CoordenadorRelatorios() {
