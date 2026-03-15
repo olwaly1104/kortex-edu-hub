@@ -71,10 +71,8 @@ const coordenadorCursoSections: NavSection[] = [
     { label: "Cadeiras do Curso", icon: BookOpen, path: "/coordenador/cadeiras" },
     { label: "Estudantes do Curso", icon: Users, path: "/coordenador/estudantes" },
     { label: "Docentes do Curso", icon: GraduationCap, path: "/coordenador/docentes" },
-    { label: "Tarefas", icon: ClipboardList, path: "/coordenador/tarefas" },
     { label: "Avaliações", icon: Award, path: "/coordenador/avaliacoes" },
     { label: "Notas do Curso", icon: Trophy, path: "/coordenador/notas" },
-    { label: "Relatórios", icon: BarChart3, path: "/coordenador/relatorios" },
   ]},
   { title: "Comunicação", items: [
     { label: "Chat", icon: MessageSquare, path: "/coordenador/chat" },
