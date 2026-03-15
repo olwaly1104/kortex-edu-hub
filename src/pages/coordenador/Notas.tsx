@@ -189,9 +189,10 @@ export default function CoordenadorNotas() {
               </div>
             );
           })}
+          </div>
+        </div>
         </div>
       )}
-
       {/* Expanded turma detail */}
       {selectedData && (
         <div className="space-y-4 animate-fade-in">
