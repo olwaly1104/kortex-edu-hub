@@ -8,6 +8,9 @@ import { Award, ChevronRight, Calendar, Clock, MapPin, User, CheckCircle, ArrowL
 
 export default function CoordenadorNotas() {
   const [selectedTurma, setSelectedTurma] = useState<string | null>(null);
+  const [filterYear, setFilterYear] = useState<number | null>(null);
+
+  const years = [...new Set(coordNotas.map(n => n.year))].sort();
 
   const allTurmas = coordNotas.flatMap(y => y.turmas.map(t => ({ ...t, year: y.year })));
 
@@ -98,14 +101,22 @@ export default function CoordenadorNotas() {
           </p>
         </Card>
       </div>
-
-
-
-
-      {/* Years grid */}
+      {/* Year toggles + Years grid */}
       {!selectedTurma && (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {coordNotas.map(yearData => {
+        <div className="space-y-4">
+          <div className="flex flex-wrap gap-2">
+            <Button size="sm" variant={!filterYear ? "default" : "outline"} onClick={() => setFilterYear(null)} className="text-xs">
+              Todos os Anos
+            </Button>
+            {years.map(y => (
+              <Button key={y} size="sm" variant={filterYear === y ? "default" : "outline"} onClick={() => setFilterYear(filterYear === y ? null : y)} className="text-xs">
+                {y}º Ano
+              </Button>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          {coordNotas.filter(yd => !filterYear || yd.year === filterYear).map(yearData => {
             const yTurmas = yearData.turmas;
             const yMedia = yTurmas.length > 0 ? Math.round((yTurmas.reduce((s, t) => s + t.mediaGeral, 0) / yTurmas.length) * 10) / 10 : 0;
             const yAprov = yTurmas.reduce((s, t) => s + t.avaliacoes.reduce((a, e) => a + e.aprovados, 0), 0);
@@ -178,9 +189,9 @@ export default function CoordenadorNotas() {
               </div>
             );
           })}
+          </div>
         </div>
       )}
-
       {/* Expanded turma detail */}
       {selectedData && (
         <div className="space-y-4 animate-fade-in">
