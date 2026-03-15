@@ -7,6 +7,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { BookOpen, Award, ClipboardCheck, Clock, Search, ArrowUpDown, X } from "lucide-react";
 import { useState, useMemo } from "react";
+import { ExportButton } from "@/components/ExportButton";
 
 type SortField = "media" | "presenca" | "entrega";
 type SortDir = "asc" | "desc";
