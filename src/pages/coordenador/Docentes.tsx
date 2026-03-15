@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { GraduationCap, Search, Users, CheckCircle, ClipboardList, Award, ArrowUpDown, X } from "lucide-react";
+import { ExportButton } from "@/components/ExportButton";
 
 type SortField = "presenca" | "taxaEntrega" | "mediaGeral";
 type SortDir = "asc" | "desc";
