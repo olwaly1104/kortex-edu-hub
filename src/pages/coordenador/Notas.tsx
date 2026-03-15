@@ -4,7 +4,8 @@ import { coordNotas, coordCursoInfo } from "@/data/institutionData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Award, ChevronRight, Calendar, Clock, MapPin, User, CheckCircle, ArrowLeft } from "lucide-react";
+import { Toggle } from "@/components/ui/toggle";
+import { Award, ChevronRight, Calendar, Clock, MapPin, User, CheckCircle, ArrowLeft, BarChart3 } from "lucide-react";
 
 export default function CoordenadorNotas() {
   const [selectedTurma, setSelectedTurma] = useState<string | null>(null);
