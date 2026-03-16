@@ -37,7 +37,7 @@ export default function CoordenadorLessonDetail() {
 
   const estudantes = coordEstudantes.filter(e => e.year === yearNum);
   const studentNames = estudantes.slice(0, lesson.totalStudents).map(e => e.name);
-  const attendance = generateAttendance(cadeira.professor, studentNames, lesson.totalStudents);
+  const attendance = generateAttendance(cadeira.professor, studentNames);
   const transcript = generateTranscript(lesson.title, lesson.summary);
 
   return (
