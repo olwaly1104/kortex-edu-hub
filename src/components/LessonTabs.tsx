@@ -143,7 +143,7 @@ export default function LessonTabs({ attendance, materials, transcript, summary,
               </div>
             );
           })}
-          {filteredAttendance.length === 0 && (
+          {attendance.length === 0 && (
             <div className="px-4 py-8 text-center text-sm text-muted-foreground">Nenhum participante encontrado.</div>
           )}
         </Card>
