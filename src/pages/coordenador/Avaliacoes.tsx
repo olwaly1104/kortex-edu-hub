@@ -245,8 +245,7 @@ export default function CoordenadorAvaliacoes() {
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-xs font-semibold text-foreground">{task.discipline}</span>
                     {turma && <Badge variant="outline" className="text-[10px] px-1.5 py-0 rounded-md">{turma.name}</Badge>}
-                    {turma && <Badge variant="outline" className="text-[10px] px-1.5 py-0 rounded-md">{turma.year}º Ano</Badge>}
-                    <Badge variant="outline" className="text-[10px] px-1.5 py-0 rounded-md">Fac. de Arquitectura</Badge>
+                    {turma && <Badge variant="outline" className="text-[10px] px-1.5 py-0 rounded-md">{turma.year}º Ano · Fac. de Arquitectura</Badge>}
                   </div>
                   <Badge className={`${sStyle.bg} gap-1 text-[10px] border-0`}>
                     <StatusIcon className="w-3 h-3" />
