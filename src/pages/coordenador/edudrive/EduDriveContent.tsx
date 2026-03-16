@@ -8,6 +8,7 @@ import { FolderIcon, FileIcon, StatusBadge, FrequencyBadge, FolderMeta } from ".
 
 type SortBy = "name" | "date" | "type";
 type FilterBy = "all" | "mensal" | "semestral" | "anual" | "documentos";
+type ViewMode = "list" | "grid";
 
 interface ContentProps {
   currentPath: string[];
