@@ -236,13 +236,47 @@ function FolderGrid({ folders, currentPath, onNavigate }: { folders: DriveNode[]
   );
 }
 
-function FileList({ files, onSelect, selectedId, pathLabels, timestamps }: {
+function FileList({ files, onSelect, selectedId, pathLabels, timestamps, viewMode = "list" }: {
   files: DriveFile[];
   onSelect: (f: DriveFile) => void;
   selectedId?: string;
   pathLabels?: Record<string, string>;
   timestamps?: Record<string, string>;
+  viewMode?: "list" | "grid";
 }) {
+  if (viewMode === "grid") {
+    return (
+      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
+        {files.map(f => (
+          <button
+            key={f.id}
+            onClick={() => onSelect(f)}
+            className={`flex flex-col items-center gap-2 p-4 rounded-lg border text-center transition-all group
+              ${selectedId === f.id ? "border-primary/30 bg-primary/5" : "border-border bg-card hover:bg-muted/30 hover:border-primary/20"}
+            `}
+          >
+            <FileIcon file={f} size="md" />
+            <p className="text-[11px] font-medium text-foreground truncate w-full">{f.name}</p>
+            <div className="flex items-center gap-1 flex-wrap justify-center">
+              <FrequencyBadge frequency={f.frequency} />
+              <StatusBadge status={f.status} />
+            </div>
+            <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
+              <span>{f.size || "—"}</span>
+              {f.generatedAt && <><span>·</span><span>{f.generatedAt}</span></>}
+            </div>
+            {/* Hover actions */}
+            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              <span className="p-1 rounded hover:bg-muted transition-colors" title="Visualizar"><Eye className="w-3.5 h-3.5 text-muted-foreground" /></span>
+              <span className="p-1 rounded hover:bg-muted transition-colors" title="Exportar"><Download className="w-3.5 h-3.5 text-muted-foreground" /></span>
+              <span className="p-1 rounded hover:bg-muted transition-colors" title="Partilhar"><Share2 className="w-3.5 h-3.5 text-muted-foreground" /></span>
+            </div>
+          </button>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className="border border-border rounded-lg overflow-hidden divide-y divide-border">
       {/* Header */}
