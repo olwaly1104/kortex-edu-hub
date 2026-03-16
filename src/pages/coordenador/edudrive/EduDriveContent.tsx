@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { ChevronRight, Search, X, Bell, Pin, Clock, Upload, Eye, Download, Share2 } from "lucide-react";
+import { ChevronRight, Search, X, Bell, Pin, Clock, Upload, Eye, Download, Share2, LayoutList, LayoutGrid } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { DriveNode, DriveFile, Frequency } from "./types";
@@ -8,6 +8,7 @@ import { FolderIcon, FileIcon, StatusBadge, FrequencyBadge, FolderMeta } from ".
 
 type SortBy = "name" | "date" | "type";
 type FilterBy = "all" | "mensal" | "semestral" | "anual" | "documentos";
+type ViewMode = "list" | "grid";
 
 interface ContentProps {
   currentPath: string[];
@@ -21,6 +22,7 @@ export default function EduDriveContent({ currentPath, onNavigate, onSelectFile,
   const [sortBy, setSortBy] = useState<SortBy>("name");
   const [filterBy, setFilterBy] = useState<FilterBy>("all");
   const [showNotifs, setShowNotifs] = useState(false);
+  const [viewMode, setViewMode] = useState<ViewMode>("list");
 
   const node = resolveNode(currentPath);
   const crumbs = buildBreadcrumbs(currentPath);
@@ -111,6 +113,14 @@ export default function EduDriveContent({ currentPath, onNavigate, onSelectFile,
             <option value="anual">Anual</option>
             <option value="documentos">Documentos</option>
           </select>
+          <div className="flex items-center border border-border rounded-lg overflow-hidden">
+            <button onClick={() => setViewMode("list")} className={`p-1.5 transition-colors ${viewMode === "list" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted"}`} title="Vista lista">
+              <LayoutList className="w-4 h-4" />
+            </button>
+            <button onClick={() => setViewMode("grid")} className={`p-1.5 transition-colors ${viewMode === "grid" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted"}`} title="Vista grelha">
+              <LayoutGrid className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       </div>
 
@@ -120,7 +130,7 @@ export default function EduDriveContent({ currentPath, onNavigate, onSelectFile,
         {/* Global search */}
         {isRoot && search && globalResults.length > 0 && (
           <Section label={`${globalResults.length} resultado${globalResults.length > 1 ? "s" : ""}`}>
-            <FileList files={globalResults} onSelect={onSelectFile} selectedId={selectedFile?.id} />
+            <FileList files={globalResults} onSelect={onSelectFile} selectedId={selectedFile?.id} viewMode={viewMode} />
           </Section>
         )}
         {isRoot && search && globalResults.length === 0 && <EmptyState message="Nenhum resultado encontrado" sub="Tente pesquisar com outros termos" />}
@@ -130,12 +140,12 @@ export default function EduDriveContent({ currentPath, onNavigate, onSelectFile,
           <>
             {seedPinned.length > 0 && (
               <Section label="Fixados" icon={<Pin className="w-3 h-3" />}>
-                <FileList files={seedPinned.map(p => p.file)} onSelect={onSelectFile} selectedId={selectedFile?.id} pathLabels={Object.fromEntries(seedPinned.map(p => [p.file.id, p.pathLabel]))} />
+                <FileList files={seedPinned.map(p => p.file)} onSelect={onSelectFile} selectedId={selectedFile?.id} viewMode={viewMode} pathLabels={Object.fromEntries(seedPinned.map(p => [p.file.id, p.pathLabel]))} />
               </Section>
             )}
 
             <Section label="Recentes" icon={<Clock className="w-3 h-3" />}>
-              <FileList files={seedRecent.map(r => r.file)} onSelect={onSelectFile} selectedId={selectedFile?.id} pathLabels={Object.fromEntries(seedRecent.map(r => [r.file.id, r.pathLabel]))} timestamps={Object.fromEntries(seedRecent.map(r => [r.file.id, r.openedAt]))} />
+              <FileList files={seedRecent.map(r => r.file)} onSelect={onSelectFile} selectedId={selectedFile?.id} viewMode={viewMode} pathLabels={Object.fromEntries(seedRecent.map(r => [r.file.id, r.pathLabel]))} timestamps={Object.fromEntries(seedRecent.map(r => [r.file.id, r.openedAt]))} />
             </Section>
           </>
         )}
@@ -149,7 +159,7 @@ export default function EduDriveContent({ currentPath, onNavigate, onSelectFile,
               </p>
               <div className="flex-1 h-px bg-border" />
             </div>
-            <FileList files={filteredFiles} onSelect={onSelectFile} selectedId={selectedFile?.id} />
+            <FileList files={filteredFiles} onSelect={onSelectFile} selectedId={selectedFile?.id} viewMode={viewMode} />
           </div>
         )}
 
@@ -178,7 +188,7 @@ export default function EduDriveContent({ currentPath, onNavigate, onSelectFile,
         {/* Files only */}
         {filteredFiles.length > 0 && filteredFolders.length === 0 && (
           <Section label={node?.filesLabel}>
-            <FileList files={filteredFiles} onSelect={onSelectFile} selectedId={selectedFile?.id} />
+            <FileList files={filteredFiles} onSelect={onSelectFile} selectedId={selectedFile?.id} viewMode={viewMode} />
           </Section>
         )}
 
@@ -226,13 +236,47 @@ function FolderGrid({ folders, currentPath, onNavigate }: { folders: DriveNode[]
   );
 }
 
-function FileList({ files, onSelect, selectedId, pathLabels, timestamps }: {
+function FileList({ files, onSelect, selectedId, pathLabels, timestamps, viewMode = "list" }: {
   files: DriveFile[];
   onSelect: (f: DriveFile) => void;
   selectedId?: string;
   pathLabels?: Record<string, string>;
   timestamps?: Record<string, string>;
+  viewMode?: "list" | "grid";
 }) {
+  if (viewMode === "grid") {
+    return (
+      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
+        {files.map(f => (
+          <button
+            key={f.id}
+            onClick={() => onSelect(f)}
+            className={`flex flex-col items-center gap-2 p-4 rounded-lg border text-center transition-all group
+              ${selectedId === f.id ? "border-primary/30 bg-primary/5" : "border-border bg-card hover:bg-muted/30 hover:border-primary/20"}
+            `}
+          >
+            <FileIcon file={f} size="md" />
+            <p className="text-[11px] font-medium text-foreground truncate w-full">{f.name}</p>
+            <div className="flex items-center gap-1 flex-wrap justify-center">
+              <FrequencyBadge frequency={f.frequency} />
+              <StatusBadge status={f.status} />
+            </div>
+            <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
+              <span>{f.size || "—"}</span>
+              {f.generatedAt && <><span>·</span><span>{f.generatedAt}</span></>}
+            </div>
+            {/* Hover actions */}
+            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              <span className="p-1 rounded hover:bg-muted transition-colors" title="Visualizar"><Eye className="w-3.5 h-3.5 text-muted-foreground" /></span>
+              <span className="p-1 rounded hover:bg-muted transition-colors" title="Exportar"><Download className="w-3.5 h-3.5 text-muted-foreground" /></span>
+              <span className="p-1 rounded hover:bg-muted transition-colors" title="Partilhar"><Share2 className="w-3.5 h-3.5 text-muted-foreground" /></span>
+            </div>
+          </button>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className="border border-border rounded-lg overflow-hidden divide-y divide-border">
       {/* Header */}
