@@ -1,13 +1,25 @@
 import { useParams, Link } from "react-router-dom";
-import { coordTurmaLessons, coordEstudantes, coordDisciplinas, coordCursoInfo } from "@/data/institutionData";
+import { coordTurmaLessons, coordEstudantes, coordDisciplinas } from "@/data/institutionData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  ArrowLeft, Video, Clock, Calendar, Users, FileText, Play, Eye,
-  Download, CheckCircle, Maximize2, Minimize2, User,
+  ArrowLeft, Video, Clock, Calendar, Users, Play, User,
+  Maximize2, Minimize2,
 } from "lucide-react";
 import { useState } from "react";
+import LessonTabs, { generateAttendance } from "@/components/LessonTabs";
+
+function generateTranscript(title: string, summary: string): { speaker: string; text: string }[] {
+  return [
+    { speaker: "Professor", text: `Bom dia a todos. Hoje vamos abordar o tema "${title}". ${summary}` },
+    { speaker: "Professor", text: "Vamos começar por rever os conceitos fundamentais que foram abordados na aula anterior." },
+    { speaker: "Estudante", text: "Professor, pode explicar novamente a relação entre os dois conceitos principais?" },
+    { speaker: "Professor", text: "Claro, boa pergunta. Os dois conceitos estão interligados porque um depende directamente do outro." },
+    { speaker: "Estudante", text: "E como é que isto se aplica nos exercícios?" },
+    { speaker: "Professor", text: "Nos exercícios, vocês vão precisar de aplicar exactamente este princípio. Vou demonstrar com um exemplo." },
+    { speaker: "Professor", text: "Para a próxima aula, revisem o capítulo correspondente. Até à próxima!" },
+  ];
+}
 
 export default function CoordenadorLessonDetail() {
   const { year, turmaId, cadeiraId, lessonId } = useParams();
@@ -23,12 +35,10 @@ export default function CoordenadorLessonDetail() {
     </div>
   );
 
-  // Mock participants from students in this year
   const estudantes = coordEstudantes.filter(e => e.year === yearNum);
-  const participants = [cadeira.professor, ...estudantes.slice(0, lesson.attendance).map(e => e.name)];
-
-  // Mock transcript
-  const transcriptSegments = generateTranscript(lesson.title, lesson.summary, cadeira.professor);
+  const studentNames = estudantes.slice(0, lesson.totalStudents).map(e => e.name);
+  const attendance = generateAttendance(cadeira.professor, studentNames, lesson.totalStudents);
+  const transcript = generateTranscript(lesson.title, lesson.summary);
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
@@ -100,103 +110,14 @@ export default function CoordenadorLessonDetail() {
       )}
 
       {/* Tabs */}
-      <Tabs defaultValue="transcript" className="space-y-5">
-        <div className="border-b">
-          <TabsList className="bg-transparent h-auto p-0 gap-0">
-            {[
-              { value: "transcript", label: "Transcrição" },
-              { value: "content", label: `Conteúdos (${lesson.materials.length})` },
-              { value: "participants", label: `Participantes (${participants.length})` },
-            ].map(tab => (
-              <TabsTrigger key={tab.value} value={tab.value} className="rounded-none border-b-2 border-transparent data-[state=active]:border-current data-[state=active]:shadow-none data-[state=active]:bg-transparent px-4 py-3 text-sm">
-                {tab.label}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-        </div>
-
-        {/* Transcrição */}
-        <TabsContent value="transcript">
-          <Card className="p-6 space-y-5">
-            <h3 className="font-semibold text-foreground flex items-center gap-2">
-              <FileText className="w-4 h-4 text-primary" /> Transcrição da Aula
-            </h3>
-            {transcriptSegments.map((seg, i) => (
-              <div key={i} className="flex gap-3">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-[10px] font-bold ${
-                  seg.speaker === "Professor" ? "bg-primary/10 text-primary" : "bg-secondary/10 text-secondary"
-                }`}>
-                  {seg.speaker === "Professor" ? "P" : "E"}
-                </div>
-                <div className="flex-1">
-                  <p className="text-xs font-semibold text-foreground mb-0.5">
-                    {seg.speaker === "Professor" ? cadeira.professor : seg.speaker}
-                  </p>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{seg.text}</p>
-                </div>
-              </div>
-            ))}
-          </Card>
-        </TabsContent>
-
-        {/* Conteúdos */}
-        <TabsContent value="content" className="space-y-2">
-          {lesson.materials.length > 0 ? lesson.materials.map((mat, i) => (
-            <Card key={i} className="p-4 flex items-center gap-3 hover:shadow-sm transition-shadow">
-              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                <FileText className="w-5 h-5 text-primary" />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-medium text-foreground">{mat.name}</p>
-                <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{mat.type} • {mat.size}</p>
-              </div>
-              <div className="flex items-center gap-1">
-                <button className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground" title="Ver"><Eye className="w-4 h-4" /></button>
-                <button className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground" title="Descarregar"><Download className="w-4 h-4" /></button>
-              </div>
-            </Card>
-          )) : (
-            <Card className="p-8 text-center">
-              <FileText className="w-10 h-10 text-muted-foreground/30 mx-auto mb-2" />
-              <p className="text-sm text-muted-foreground">Nenhum conteúdo associado a esta aula.</p>
-            </Card>
-          )}
-        </TabsContent>
-
-        {/* Participantes */}
-        <TabsContent value="participants">
-          <Card className="divide-y overflow-hidden">
-            {participants.map((p, i) => (
-              <div key={i} className="px-4 py-3 flex items-center gap-3 hover:bg-muted/30 transition-colors">
-                <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold ${
-                  i === 0 ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
-                }`}>
-                  {p.split(" ").map(n => n[0]).slice(0, 2).join("")}
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-foreground">{p}</p>
-                  <p className="text-xs text-muted-foreground">{i === 0 ? "Professor" : "Estudante"}</p>
-                </div>
-                {i === 0 && <Badge variant="outline" className="text-[10px]">Docente</Badge>}
-                {i > 0 && <CheckCircle className="w-4 h-4 text-accent" />}
-              </div>
-            ))}
-          </Card>
-        </TabsContent>
-      </Tabs>
+      <LessonTabs
+        attendance={attendance}
+        students={estudantes.map(e => ({ name: e.name, turma: `${e.year}º Ano` }))}
+        materials={lesson.materials}
+        transcript={transcript}
+        summary={lesson.summary}
+        professorName={cadeira.professor}
+      />
     </div>
   );
-}
-
-function generateTranscript(title: string, summary: string, professor: string): { speaker: string; text: string }[] {
-  return [
-    { speaker: "Professor", text: `Bom dia a todos. Hoje vamos abordar o tema "${title}". ${summary}` },
-    { speaker: "Professor", text: "Vamos começar por rever os conceitos fundamentais que foram abordados na aula anterior, pois são essenciais para compreender o que vamos trabalhar hoje." },
-    { speaker: "Estudante", text: "Professor, pode explicar novamente a relação entre os dois conceitos principais?" },
-    { speaker: "Professor", text: "Claro, boa pergunta. Essencialmente, os dois conceitos estão interligados porque um depende directamente do outro. Vou usar um exemplo prático para ilustrar." },
-    { speaker: "Professor", text: "Reparem neste diagrama. Podemos observar como a aplicação prática se relaciona com a teoria que acabámos de discutir." },
-    { speaker: "Estudante", text: "E como é que isto se aplica nos exercícios que temos de resolver?" },
-    { speaker: "Professor", text: "Excelente pergunta. Nos exercícios, vocês vão precisar de aplicar exactamente este princípio. Vou demonstrar com um exemplo resolvido passo a passo." },
-    { speaker: "Professor", text: "Para a próxima aula, revisem o capítulo correspondente e tentem resolver os exercícios propostos. Qualquer dúvida, contactem-me por email. Até à próxima!" },
-  ];
 }
