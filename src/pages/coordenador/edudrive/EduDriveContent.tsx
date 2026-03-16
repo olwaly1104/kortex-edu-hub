@@ -159,7 +159,7 @@ export default function EduDriveContent({ currentPath, onNavigate, onSelectFile,
               </p>
               <div className="flex-1 h-px bg-border" />
             </div>
-            <FileList files={filteredFiles} onSelect={onSelectFile} selectedId={selectedFile?.id} />
+            <FileList files={filteredFiles} onSelect={onSelectFile} selectedId={selectedFile?.id} viewMode={viewMode} />
           </div>
         )}
 
