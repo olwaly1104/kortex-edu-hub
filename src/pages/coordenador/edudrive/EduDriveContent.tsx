@@ -113,6 +113,14 @@ export default function EduDriveContent({ currentPath, onNavigate, onSelectFile,
             <option value="anual">Anual</option>
             <option value="documentos">Documentos</option>
           </select>
+          <div className="flex items-center border border-border rounded-lg overflow-hidden">
+            <button onClick={() => setViewMode("list")} className={`p-1.5 transition-colors ${viewMode === "list" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted"}`} title="Vista lista">
+              <LayoutList className="w-4 h-4" />
+            </button>
+            <button onClick={() => setViewMode("grid")} className={`p-1.5 transition-colors ${viewMode === "grid" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted"}`} title="Vista grelha">
+              <LayoutGrid className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       </div>
 
