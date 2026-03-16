@@ -43,6 +43,22 @@ const desempenhoAnualFiles: DriveFile[] = [
   mkFile("Assiduidade", "anual", "agendado", "csv"), mkFile("Avaliações e Tarefas", "anual", "agendado"), mkFile("Progressão dos Estudantes", "anual", "agendado"),
 ];
 
+const courseDesempenhoFiles = (s: FileStatus): DriveFile[] => [
+  mkFile("Relatório de Desempenho Geral", "mensal", s),
+  mkFile("Desempenho por Cadeiras", "mensal", s),
+  mkFile("Desempenho por Docente", "mensal", s),
+  mkFile("Estudantes em Risco", "mensal", s),
+  mkFile("Quadro de Honra", "mensal", s),
+];
+
+const yearDesempenhoFiles = (s: FileStatus): DriveFile[] => [
+  mkFile("Relatório de Desempenho Geral", "mensal", s),
+  mkFile("Desempenho por Cadeiras", "mensal", s),
+  mkFile("Desempenho por Docente", "mensal", s),
+  mkFile("Estudantes em Risco", "mensal", s),
+  mkFile("Quadro de Honra", "mensal", s),
+];
+
 const mkDesempenhoTurma = (turma: string): DriveNode => ({
   id: uid(), name: turma, children: [
     { id: uid(), name: "Mensal", children: months.map(m => ({ id: uid(), name: m.label, files: desempenhoMensalFiles(m.status) })) },
@@ -55,11 +71,16 @@ const mkDesempenhoTurma = (turma: string): DriveNode => ({
 });
 
 const mkDesempenhoAno = (ano: string): DriveNode => ({
-  id: uid(), name: ano, children: ["Turma A", "Turma B", "Turma C"].map(mkDesempenhoTurma),
+  id: uid(), name: ano,
+  files: yearDesempenhoFiles("gerado"),
+  filesLabel: `Desempenho Académico do ${ano}`,
+  children: ["Turma A", "Turma B", "Turma C"].map(mkDesempenhoTurma),
 });
 
 const desempenhoAcademico: DriveNode = {
   id: uid(), name: "Desempenho Académico", icon: "bar-chart",
+  files: courseDesempenhoFiles("gerado"),
+  filesLabel: "Relatórios de Desempenho Académico do Curso",
   children: ["1º Ano", "2º Ano", "3º Ano"].map(mkDesempenhoAno),
 };
 
