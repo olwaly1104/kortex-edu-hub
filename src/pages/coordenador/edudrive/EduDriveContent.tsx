@@ -1,12 +1,11 @@
 import { useState, useMemo } from "react";
-import { ChevronRight, Search, X, Grid3X3, List, Bell, Pin, Clock, Upload, ArrowUpDown, Filter, Eye, Download, Share2 } from "lucide-react";
+import { ChevronRight, Search, X, Bell, Pin, Clock, Upload, Eye, Download, Share2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { DriveNode, DriveFile, Frequency } from "./types";
 import { driveTree, resolveNode, buildBreadcrumbs, allFiles, seedNotifications, seedRecent, seedPinned } from "./data";
 import { FolderIcon, FileIcon, StatusBadge, FrequencyBadge } from "./components";
 
-type ViewMode = "grid" | "list";
 type SortBy = "name" | "date" | "type";
 type FilterBy = "all" | "mensal" | "semestral" | "anual" | "documentos";
 
@@ -19,7 +18,6 @@ interface ContentProps {
 
 export default function EduDriveContent({ currentPath, onNavigate, onSelectFile, selectedFile }: ContentProps) {
   const [search, setSearch] = useState("");
-  const [view, setView] = useState<ViewMode>("grid");
   const [sortBy, setSortBy] = useState<SortBy>("name");
   const [filterBy, setFilterBy] = useState<FilterBy>("all");
   const [showNotifs, setShowNotifs] = useState(false);
@@ -58,7 +56,7 @@ export default function EduDriveContent({ currentPath, onNavigate, onSelectFile,
 
   return (
     <div className="flex-1 flex flex-col h-full min-w-0 bg-background">
-      {/* ─── Top Bar ─── */}
+      {/* Top Bar */}
       <div className="shrink-0 px-6 pt-4 pb-0">
         <div className="flex items-center justify-between mb-3">
           {/* Breadcrumb */}
@@ -105,12 +103,6 @@ export default function EduDriveContent({ currentPath, onNavigate, onSelectFile,
             {search && <button onClick={() => setSearch("")} className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"><X className="w-3 h-3" /></button>}
           </div>
 
-          {/* View Toggle */}
-          <div className="flex border border-border rounded-lg overflow-hidden">
-            <button onClick={() => setView("grid")} className={`p-1.5 transition-colors ${view === "grid" ? "bg-muted text-foreground" : "text-muted-foreground hover:bg-muted/50"}`}><Grid3X3 className="w-4 h-4" /></button>
-            <button onClick={() => setView("list")} className={`p-1.5 transition-colors ${view === "list" ? "bg-muted text-foreground" : "text-muted-foreground hover:bg-muted/50"}`}><List className="w-4 h-4" /></button>
-          </div>
-
           {/* Sort */}
           <select value={sortBy} onChange={e => setSortBy(e.target.value as SortBy)} className="h-8 px-2 text-xs border border-border rounded-lg bg-card text-foreground">
             <option value="name">Nome</option>
@@ -129,27 +121,26 @@ export default function EduDriveContent({ currentPath, onNavigate, onSelectFile,
         </div>
       </div>
 
-      {/* ─── Content Area ─── */}
+      {/* Content Area */}
       <div className="flex-1 overflow-y-auto px-6 py-4">
 
         {/* Global search results */}
         {isRoot && search && globalResults.length > 0 && (
           <Section label={`${globalResults.length} resultado${globalResults.length > 1 ? "s" : ""}`}>
-            <FileList files={globalResults} view="list" onSelect={onSelectFile} selectedId={selectedFile?.id} />
+            <FileList files={globalResults} onSelect={onSelectFile} selectedId={selectedFile?.id} />
           </Section>
         )}
         {isRoot && search && globalResults.length === 0 && <EmptyState message="Nenhum resultado encontrado" sub="Tente pesquisar com outros termos" />}
 
-        {/* Root: Pinned + Recent + Folders */}
+        {/* Root: Pinned + Recent */}
         {isRoot && !search && (
           <>
-            {/* Pinned */}
             {seedPinned.length > 0 && (
               <Section label="Fixados" icon={<Pin className="w-3 h-3" />}>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                <div className="flex flex-col gap-0.5">
                   {seedPinned.map(p => (
                     <button key={p.file.id} onClick={() => onSelectFile(p.file)}
-                      className="flex items-center gap-3 px-3.5 py-3 rounded-lg border border-border hover:border-primary/20 hover:bg-[hsl(213,100%,97%)] transition-all text-left group">
+                      className="flex items-center gap-3 px-3.5 py-2.5 rounded-lg border border-border hover:border-primary/20 hover:bg-accent transition-all text-left group">
                       <FileIcon file={p.file} size="sm" />
                       <div className="min-w-0 flex-1">
                         <p className="text-[12px] font-medium text-foreground truncate">{p.file.name}</p>
@@ -162,12 +153,11 @@ export default function EduDriveContent({ currentPath, onNavigate, onSelectFile,
               </Section>
             )}
 
-            {/* Recent */}
             <Section label="Recentes" icon={<Clock className="w-3 h-3" />}>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+              <div className="flex flex-col gap-0.5">
                 {seedRecent.map(r => (
                   <button key={r.file.id} onClick={() => onSelectFile(r.file)}
-                    className="flex items-center gap-3 px-3.5 py-3 rounded-lg border border-transparent hover:border-border hover:bg-muted/40 transition-all text-left group">
+                    className="flex items-center gap-3 px-3.5 py-2.5 rounded-lg border border-transparent hover:border-border hover:bg-muted/40 transition-all text-left group">
                     <FileIcon file={r.file} size="sm" />
                     <div className="min-w-0 flex-1">
                       <p className="text-[12px] font-medium text-foreground truncate">{r.file.name}</p>
@@ -184,55 +174,31 @@ export default function EduDriveContent({ currentPath, onNavigate, onSelectFile,
           </>
         )}
 
-        {/* Folders */}
+        {/* Folders — vertical list */}
         {(isRoot ? !search : true) && filteredFolders.length > 0 && (
           <Section label={isRoot ? "Pastas" : undefined}>
-            {view === "grid" ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-                {filteredFolders.map(f => (
-                  <button key={f.id} onClick={() => onNavigate([...currentPath, f.id])}
-                    className="flex items-center gap-3 px-3.5 py-3.5 rounded-lg border border-transparent hover:border-border hover:bg-muted/40 hover:shadow-[0_1px_3px_rgba(0,0,0,0.08)] transition-all text-left group">
-                    <FolderIcon className="w-10 h-8 shrink-0" isDocument={f.isDocumentFolder} />
-                    <div className="min-w-0 flex-1">
-                      <p className="text-[13px] font-medium text-foreground truncate">{f.name}</p>
-                      <p className="text-[10px] text-muted-foreground mt-0.5">
-                        {(f.children?.length || 0) + (f.files?.length || 0)} itens
-                      </p>
-                    </div>
-                    <ChevronRight className="w-4 h-4 text-muted-foreground/0 group-hover:text-muted-foreground/40 transition-colors shrink-0" />
-                  </button>
-                ))}
-              </div>
-            ) : (
-              <table className="w-full text-left">
-                <thead><tr className="border-b border-border text-[11px] text-muted-foreground">
-                  <th className="py-2 font-medium">Nome</th>
-                  <th className="py-2 font-medium w-20">Itens</th>
-                  <th className="py-2 w-8"></th>
-                </tr></thead>
-                <tbody>
-                  {filteredFolders.map(f => (
-                    <tr key={f.id} onClick={() => onNavigate([...currentPath, f.id])} className="border-b border-border/50 hover:bg-muted/40 cursor-pointer transition-colors">
-                      <td className="py-2.5">
-                        <div className="flex items-center gap-2.5">
-                          <FolderIcon className="w-8 h-6 shrink-0" isDocument={f.isDocumentFolder} />
-                          <span className="text-[13px] font-medium text-foreground">{f.name}</span>
-                        </div>
-                      </td>
-                      <td className="py-2.5 text-[12px] text-muted-foreground">{(f.children?.length || 0) + (f.files?.length || 0)}</td>
-                      <td><ChevronRight className="w-4 h-4 text-muted-foreground/30" /></td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
+            <div className="flex flex-col gap-0.5">
+              {filteredFolders.map(f => (
+                <button key={f.id} onClick={() => onNavigate([...currentPath, f.id])}
+                  className="flex items-center gap-3 px-3.5 py-2.5 rounded-lg border border-transparent hover:border-border hover:bg-muted/40 transition-all text-left group">
+                  <FolderIcon className="w-8 h-6 shrink-0" isDocument={f.isDocumentFolder} />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[13px] font-medium text-foreground truncate">{f.name}</p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">
+                      {(f.children?.length || 0) + (f.files?.length || 0)} itens
+                    </p>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-muted-foreground/0 group-hover:text-muted-foreground/40 transition-colors shrink-0" />
+                </button>
+              ))}
+            </div>
           </Section>
         )}
 
-        {/* Files */}
+        {/* Files — vertical list */}
         {filteredFiles.length > 0 && (
           <Section label={filteredFolders.length > 0 ? "Ficheiros" : undefined}>
-            <FileList files={filteredFiles} view={view} onSelect={onSelectFile} selectedId={selectedFile?.id} />
+            <FileList files={filteredFiles} onSelect={onSelectFile} selectedId={selectedFile?.id} />
           </Section>
         )}
 
@@ -254,7 +220,7 @@ function Section({ label, icon, children }: { label?: string; icon?: React.React
   return (
     <div className="mb-5">
       {label && (
-        <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-1.5">
+        <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1.5">
           {icon} {label}
         </p>
       )}
@@ -263,72 +229,31 @@ function Section({ label, icon, children }: { label?: string; icon?: React.React
   );
 }
 
-function FileList({ files, view, onSelect, selectedId }: { files: DriveFile[]; view: ViewMode; onSelect: (f: DriveFile) => void; selectedId?: string }) {
-  if (view === "grid") {
-    return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-        {files.map(f => (
-          <button key={f.id} onClick={() => onSelect(f)}
-            className={`flex items-center gap-3 px-3.5 py-3 rounded-lg border transition-all text-left group
-              ${selectedId === f.id ? "border-primary/30 bg-[hsl(213,100%,97%)]" : "border-transparent hover:border-border hover:bg-muted/40 hover:shadow-[0_1px_3px_rgba(0,0,0,0.08)]"}
-            `}>
-            <FileIcon file={f} />
-            <div className="min-w-0 flex-1">
-              <p className="text-[13px] font-medium text-foreground truncate">{f.name}</p>
-              <div className="flex items-center gap-1.5 mt-1 flex-wrap">
-                <FrequencyBadge frequency={f.frequency} />
-                <StatusBadge status={f.status} />
-              </div>
-              {f.generatedAt && <p className="text-[10px] text-muted-foreground mt-1">{f.generatedAt} · {f.size}</p>}
-            </div>
-            <div className="flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-              <Eye className="w-3.5 h-3.5 text-muted-foreground" />
-              <Download className="w-3.5 h-3.5 text-muted-foreground" />
-              <Share2 className="w-3.5 h-3.5 text-muted-foreground" />
-            </div>
-          </button>
-        ))}
-      </div>
-    );
-  }
-
+function FileList({ files, onSelect, selectedId }: { files: DriveFile[]; onSelect: (f: DriveFile) => void; selectedId?: string }) {
   return (
-    <table className="w-full text-left">
-      <thead><tr className="border-b border-border text-[11px] text-muted-foreground">
-        <th className="py-2 font-medium">Nome</th>
-        <th className="py-2 font-medium w-24">Frequência</th>
-        <th className="py-2 font-medium w-28">Estado</th>
-        <th className="py-2 font-medium w-28">Gerado</th>
-        <th className="py-2 font-medium w-20">Tamanho</th>
-        <th className="py-2 w-24"></th>
-      </tr></thead>
-      <tbody>
-        {files.map(f => (
-          <tr key={f.id} onClick={() => onSelect(f)}
-            className={`border-b border-border/50 cursor-pointer transition-colors group
-              ${selectedId === f.id ? "bg-[hsl(213,100%,97%)]" : "hover:bg-muted/40"}
-            `}>
-            <td className="py-2.5">
-              <div className="flex items-center gap-2.5">
-                <FileIcon file={f} size="sm" />
-                <span className="text-[13px] font-medium text-foreground">{f.name}</span>
-              </div>
-            </td>
-            <td className="py-2.5"><FrequencyBadge frequency={f.frequency} /></td>
-            <td className="py-2.5"><StatusBadge status={f.status} /></td>
-            <td className="py-2.5 text-[12px] text-muted-foreground">{f.generatedAt || "—"}</td>
-            <td className="py-2.5 text-[12px] text-muted-foreground">{f.size}</td>
-            <td className="py-2.5">
-              <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                <Button variant="ghost" size="icon" className="h-7 w-7"><Eye className="w-3.5 h-3.5" /></Button>
-                <Button variant="ghost" size="icon" className="h-7 w-7"><Download className="w-3.5 h-3.5" /></Button>
-                <Button variant="ghost" size="icon" className="h-7 w-7"><Share2 className="w-3.5 h-3.5" /></Button>
-              </div>
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
+    <div className="flex flex-col gap-0.5">
+      {files.map(f => (
+        <button key={f.id} onClick={() => onSelect(f)}
+          className={`flex items-center gap-3 px-3.5 py-2.5 rounded-lg border transition-all text-left group
+            ${selectedId === f.id ? "border-primary/30 bg-accent" : "border-transparent hover:border-border hover:bg-muted/40"}
+          `}>
+          <FileIcon file={f} size="sm" />
+          <div className="min-w-0 flex-1">
+            <p className="text-[13px] font-medium text-foreground truncate">{f.name}</p>
+            <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+              <FrequencyBadge frequency={f.frequency} />
+              <StatusBadge status={f.status} />
+              {f.generatedAt && <span className="text-[10px] text-muted-foreground">· {f.generatedAt} · {f.size}</span>}
+            </div>
+          </div>
+          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+            <Eye className="w-3.5 h-3.5 text-muted-foreground" />
+            <Download className="w-3.5 h-3.5 text-muted-foreground" />
+            <Share2 className="w-3.5 h-3.5 text-muted-foreground" />
+          </div>
+        </button>
+      ))}
+    </div>
   );
 }
 
