@@ -219,7 +219,25 @@ function Section({ label, icon, children }: { label?: string; icon?: React.React
   );
 }
 
-function FolderGrid({ folders, currentPath, onNavigate }: { folders: DriveNode[]; currentPath: string[]; onNavigate: (path: string[]) => void }) {
+function FolderGrid({ folders, currentPath, onNavigate, viewMode = "grid" }: { folders: DriveNode[]; currentPath: string[]; onNavigate: (path: string[]) => void; viewMode?: "list" | "grid" }) {
+  if (viewMode === "list") {
+    return (
+      <div className="border border-border rounded-lg overflow-hidden divide-y divide-border">
+        {folders.map(f => (
+          <button key={f.id} onClick={() => onNavigate([...currentPath, f.id])}
+            className="flex items-center gap-3 px-4 py-2.5 w-full hover:bg-muted/30 transition-colors text-left group">
+            <FolderIcon className="w-8 h-6 shrink-0" isDocument={f.isDocumentFolder} />
+            <div className="min-w-0 flex-1">
+              <p className="text-[12px] font-medium text-foreground truncate">{f.name}</p>
+            </div>
+            <FolderMeta node={f} />
+            <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/0 group-hover:text-muted-foreground/50 transition-colors shrink-0" />
+          </button>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
       {folders.map(f => (
