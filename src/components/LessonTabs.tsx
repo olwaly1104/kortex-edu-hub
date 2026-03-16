@@ -34,16 +34,12 @@ const statusConfig: Record<AttendanceStatus, { label: string; icon: typeof Check
 };
 
 export default function LessonTabs({ attendance, materials, transcript, summary, professorName, discColor, lessonStartTime = "08:00" }: LessonTabsProps) {
-  const [attendanceSearch, setAttendanceSearch] = useState("");
 
   const presentCount = attendance.filter(a => a.status === "presente" && a.role === "estudante").length;
   const lateCount = attendance.filter(a => a.status === "atrasado" && a.role === "estudante").length;
   const absentCount = attendance.filter(a => a.status === "ausente" && a.role === "estudante").length;
   const totalStudents = attendance.filter(a => a.role === "estudante").length;
 
-  const filteredAttendance = attendance.filter(a =>
-    a.name.toLowerCase().includes(attendanceSearch.toLowerCase())
-  );
 
   return (
     <Tabs defaultValue="participantes" className="space-y-5">
