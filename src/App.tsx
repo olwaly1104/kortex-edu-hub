@@ -59,6 +59,7 @@ import CoordenadorCursoDetail from "./pages/coordenador/CursoDetail";
 import CoordenadorFaculdadeDetail from "./pages/coordenador/FaculdadeDetail";
 import CoordenadorTarefas from "./pages/coordenador/Tarefas";
 import CoordenadorAvaliacoes from "./pages/coordenador/Avaliacoes";
+import CoordenadorAvaliacaoDetail from "./pages/coordenador/AvaliacaoDetail";
 import DecanoDashboard from "./pages/decano/Dashboard";
 import DecanoAprovacoes from "./pages/decano/Aprovacoes";
 import DecanoFaculdades from "./pages/decano/Faculdades";
