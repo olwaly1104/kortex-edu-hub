@@ -111,7 +111,7 @@ export default function LessonTabs({ attendance, materials, transcript, summary,
             <span>Hora de Entrada</span>
             <span className="text-right">Estado</span>
           </div>
-          {filteredAttendance.map((a, i) => {
+          {attendance.map((a, i) => {
             const cfg = statusConfig[a.status];
             const Icon = cfg.icon;
             return (
