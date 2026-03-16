@@ -145,7 +145,7 @@ export default function EduDriveContent({ currentPath, onNavigate, onSelectFile,
             )}
 
             <Section label="Recentes" icon={<Clock className="w-3 h-3" />}>
-              <FileList files={seedRecent.map(r => r.file)} onSelect={onSelectFile} selectedId={selectedFile?.id} pathLabels={Object.fromEntries(seedRecent.map(r => [r.file.id, r.pathLabel]))} timestamps={Object.fromEntries(seedRecent.map(r => [r.file.id, r.openedAt]))} />
+              <FileList files={seedRecent.map(r => r.file)} onSelect={onSelectFile} selectedId={selectedFile?.id} viewMode={viewMode} pathLabels={Object.fromEntries(seedRecent.map(r => [r.file.id, r.pathLabel]))} timestamps={Object.fromEntries(seedRecent.map(r => [r.file.id, r.openedAt]))} />
             </Section>
           </>
         )}
