@@ -137,12 +137,12 @@ export default function ProfessorLessonDetail() {
       {/* Tabs */}
       <LessonTabs
         attendance={attendance}
-        students={lessonStudents.map(s => ({ name: s.name, email: s.email, turma: s.turma }))}
         materials={lesson.materials}
         transcript={transcript}
         summary={lesson.summary}
         professorName={professorName}
         discColor={disc?.color}
+        lessonStartTime="08:00"
       />
     </div>
   );

@@ -112,11 +112,11 @@ export default function CoordenadorLessonDetail() {
       {/* Tabs */}
       <LessonTabs
         attendance={attendance}
-        students={estudantes.map(e => ({ name: e.name, turma: `${e.year}º Ano` }))}
         materials={lesson.materials}
         transcript={transcript}
         summary={lesson.summary}
         professorName={cadeira.professor}
+        lessonStartTime="08:00"
       />
     </div>
   );
