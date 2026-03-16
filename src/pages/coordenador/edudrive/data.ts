@@ -96,7 +96,7 @@ const mkDesempenhoTurma = (turma: string): DriveNode => ({
 });
 
 const mkDesempenhoAno = (ano: string): DriveNode => ({
-  id: uid(), name: ano,
+  id: uid(), name: `${ano} — Curso de Arquitectura`,
   children: [
     { id: uid(), name: `Relatórios de Desempenho Académico do ${ano}`, children: courseReportNames.map(mkReportWithFrequency) },
     ...["Turma A", "Turma B", "Turma C"].map(mkDesempenhoTurma),
