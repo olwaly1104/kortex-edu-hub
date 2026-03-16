@@ -130,7 +130,7 @@ export default function EduDriveContent({ currentPath, onNavigate, onSelectFile,
         {/* Global search */}
         {isRoot && search && globalResults.length > 0 && (
           <Section label={`${globalResults.length} resultado${globalResults.length > 1 ? "s" : ""}`}>
-            <FileList files={globalResults} onSelect={onSelectFile} selectedId={selectedFile?.id} />
+            <FileList files={globalResults} onSelect={onSelectFile} selectedId={selectedFile?.id} viewMode={viewMode} />
           </Section>
         )}
         {isRoot && search && globalResults.length === 0 && <EmptyState message="Nenhum resultado encontrado" sub="Tente pesquisar com outros termos" />}
