@@ -21,6 +21,7 @@ export interface DriveNode {
   icon?: string;
   children?: DriveNode[];
   files?: DriveFile[];
+  filesLabel?: string;
   isDocumentFolder?: boolean;
 }
 
