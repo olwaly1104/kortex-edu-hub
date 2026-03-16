@@ -34,16 +34,12 @@ const statusConfig: Record<AttendanceStatus, { label: string; icon: typeof Check
 };
 
 export default function LessonTabs({ attendance, materials, transcript, summary, professorName, discColor, lessonStartTime = "08:00" }: LessonTabsProps) {
-  const [attendanceSearch, setAttendanceSearch] = useState("");
 
   const presentCount = attendance.filter(a => a.status === "presente" && a.role === "estudante").length;
   const lateCount = attendance.filter(a => a.status === "atrasado" && a.role === "estudante").length;
   const absentCount = attendance.filter(a => a.status === "ausente" && a.role === "estudante").length;
   const totalStudents = attendance.filter(a => a.role === "estudante").length;
 
-  const filteredAttendance = attendance.filter(a =>
-    a.name.toLowerCase().includes(attendanceSearch.toLowerCase())
-  );
 
   return (
     <Tabs defaultValue="participantes" className="space-y-5">
@@ -107,11 +103,6 @@ export default function LessonTabs({ attendance, materials, transcript, summary,
           </div>
         </div>
 
-        {/* Search */}
-        <div className="relative max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input placeholder="Pesquisar participante..." value={attendanceSearch} onChange={e => setAttendanceSearch(e.target.value)} className="pl-9 h-9" />
-        </div>
 
         {/* List */}
         <Card className="divide-y divide-border overflow-hidden">
@@ -120,7 +111,7 @@ export default function LessonTabs({ attendance, materials, transcript, summary,
             <span>Hora de Entrada</span>
             <span className="text-right">Estado</span>
           </div>
-          {filteredAttendance.map((a, i) => {
+          {attendance.map((a, i) => {
             const cfg = statusConfig[a.status];
             const Icon = cfg.icon;
             return (
@@ -152,7 +143,7 @@ export default function LessonTabs({ attendance, materials, transcript, summary,
               </div>
             );
           })}
-          {filteredAttendance.length === 0 && (
+          {attendance.length === 0 && (
             <div className="px-4 py-8 text-center text-sm text-muted-foreground">Nenhum participante encontrado.</div>
           )}
         </Card>
