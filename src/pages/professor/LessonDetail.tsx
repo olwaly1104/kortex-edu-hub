@@ -52,7 +52,7 @@ export default function ProfessorLessonDetail() {
   const lessonStudents = profStudents.filter(s => s.turmaId === lesson.turmaId && s.disciplineId === lesson.disciplineId);
   const studentNames = lessonStudents.map(s => s.name);
   const professorName = disc?.name ? `Prof. ${disc.code}` : "Professor";
-  const attendance = generateAttendance(professorName, studentNames.length > 0 ? studentNames : Array.from({ length: lesson.totalStudents }, (_, i) => `Estudante ${i + 1}`), lesson.totalStudents);
+  const attendance = generateAttendance(professorName, studentNames.length > 0 ? studentNames : Array.from({ length: lesson.totalStudents }, (_, i) => `Estudante ${i + 1}`));
   const transcript = generateTranscript(lesson.title, lesson.summary);
 
   return (
@@ -137,12 +137,12 @@ export default function ProfessorLessonDetail() {
       {/* Tabs */}
       <LessonTabs
         attendance={attendance}
-        students={lessonStudents.map(s => ({ name: s.name, email: s.email, turma: s.turma }))}
         materials={lesson.materials}
         transcript={transcript}
         summary={lesson.summary}
         professorName={professorName}
         discColor={disc?.color}
+        lessonStartTime="08:00"
       />
     </div>
   );
