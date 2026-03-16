@@ -59,6 +59,7 @@ import CoordenadorCursoDetail from "./pages/coordenador/CursoDetail";
 import CoordenadorFaculdadeDetail from "./pages/coordenador/FaculdadeDetail";
 import CoordenadorTarefas from "./pages/coordenador/Tarefas";
 import CoordenadorAvaliacoes from "./pages/coordenador/Avaliacoes";
+import CoordenadorAvaliacaoDetail from "./pages/coordenador/AvaliacaoDetail";
 import DecanoDashboard from "./pages/decano/Dashboard";
 import DecanoAprovacoes from "./pages/decano/Aprovacoes";
 import DecanoFaculdades from "./pages/decano/Faculdades";
@@ -142,6 +143,7 @@ function AppRoutes() {
         <Route path="/coordenador/solicitacoes" element={<CoordenadorSolicitacoes />} />
         <Route path="/coordenador/tarefas" element={<CoordenadorTarefas />} />
         <Route path="/coordenador/avaliacoes" element={<CoordenadorAvaliacoes />} />
+        <Route path="/coordenador/avaliacoes/:avaliacaoId" element={<CoordenadorAvaliacaoDetail />} />
         <Route path="/coordenador/anos" element={<CoordenadorAnos />} />
         <Route path="/coordenador/cadeiras" element={<CoordenadorCadeiras />} />
         <Route path="/coordenador/anos/:year" element={<CoordenadorAnoDetail />} />

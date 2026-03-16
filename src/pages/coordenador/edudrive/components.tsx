@@ -1,11 +1,11 @@
-import { File, FileSpreadsheet, FileText, Table2, Loader2, AlertCircle, Clock, CheckCircle2, Pin } from "lucide-react";
+import { File, FileSpreadsheet, FileText, Table2, Loader2, AlertCircle, Clock, CheckCircle2, Pin, Zap } from "lucide-react";
 import type { DriveFile, FileStatus, Frequency } from "./types";
 
 // ─── Status Badge ────────────────────────────────────────
 const statusConfig: Record<FileStatus, { label: string; className: string; icon?: React.ReactNode }> = {
-  gerado: { label: "Gerado", className: "bg-[hsl(142,71%,45%)]/10 text-[hsl(142,71%,35%)]", icon: <CheckCircle2 className="w-3 h-3" /> },
-  agendado: { label: "Agendado", className: "bg-muted text-muted-foreground", icon: <Clock className="w-3 h-3" /> },
-  a_gerar: { label: "A Gerar", className: "bg-primary/10 text-primary", icon: <Loader2 className="w-3 h-3 animate-spin" /> },
+  gerado: { label: "Auto Gerado", className: "bg-[hsl(142,71%,45%)]/10 text-[hsl(142,71%,35%)]", icon: <Zap className="w-3 h-3" /> },
+  agendado: { label: "Em Progresso", className: "bg-primary/10 text-primary", icon: <Loader2 className="w-3 h-3 animate-spin" /> },
+  a_gerar: { label: "A Gerar", className: "bg-[hsl(210,80%,55%)]/10 text-[hsl(210,80%,45%)]", icon: <Loader2 className="w-3 h-3 animate-spin" /> },
   dados_insuficientes: { label: "Dados Insuficientes", className: "bg-[hsl(38,92%,50%)]/10 text-[hsl(38,92%,40%)]", icon: <AlertCircle className="w-3 h-3" /> },
   erro: { label: "Erro", className: "bg-destructive/10 text-destructive", icon: <AlertCircle className="w-3 h-3" /> },
 };
@@ -34,13 +34,13 @@ export function FrequencyBadge({ frequency }: { frequency?: Frequency }) {
 
 // ─── File Type Icon ──────────────────────────────────────
 export function FileIcon({ file, size = "md" }: { file: DriveFile; size?: "sm" | "md" }) {
-  const s = size === "sm" ? "w-8 h-8" : "w-10 h-10";
+  const s = size === "sm" ? "w-9 h-9" : "w-10 h-10";
   const is = size === "sm" ? "w-4 h-4" : "w-5 h-5";
-  const colorMap: Record<string, string> = {
-    pdf: "bg-destructive/10 text-destructive",
-    csv: "bg-[hsl(175,84%,32%)]/10 text-[hsl(175,84%,32%)]",
-    docx: "bg-primary/10 text-primary",
-    xlsx: "bg-[hsl(142,71%,45%)]/10 text-[hsl(142,71%,35%)]",
+  const configs: Record<string, { bg: string; text: string; label: string }> = {
+    pdf: { bg: "bg-destructive/8", text: "text-destructive", label: "PDF" },
+    csv: { bg: "bg-[hsl(175,84%,32%)]/8", text: "text-[hsl(175,84%,32%)]", label: "CSV" },
+    docx: { bg: "bg-primary/8", text: "text-primary", label: "DOC" },
+    xlsx: { bg: "bg-[hsl(142,71%,45%)]/8", text: "text-[hsl(142,71%,35%)]", label: "XLS" },
   };
   const iconMap: Record<string, React.ReactNode> = {
     pdf: <File className={is} />,
@@ -48,9 +48,11 @@ export function FileIcon({ file, size = "md" }: { file: DriveFile; size?: "sm" |
     docx: <FileText className={is} />,
     xlsx: <FileSpreadsheet className={is} />,
   };
+  const cfg = configs[file.fileType] || configs.pdf;
   return (
-    <div className={`${s} rounded-lg flex items-center justify-center shrink-0 ${colorMap[file.fileType] || colorMap.pdf}`}>
+    <div className={`${s} rounded-lg flex flex-col items-center justify-center shrink-0 ${cfg.bg} ${cfg.text} relative`}>
       {iconMap[file.fileType] || iconMap.pdf}
+      <span className="text-[7px] font-bold uppercase tracking-wider mt-0.5 leading-none">{cfg.label}</span>
     </div>
   );
 }
@@ -73,4 +75,19 @@ export function PinButton({ pinned, onClick }: { pinned: boolean; onClick: (e: R
       <Pin className="w-3.5 h-3.5" fill={pinned ? "currentColor" : "none"} />
     </button>
   );
+}
+
+// ─── Folder stats helper ────────────────────────────────
+function countDeep(node: { children?: { children?: any[]; files?: any[] }[]; files?: any[] }): { folders: number; files: number } {
+  const folders = node.children?.length || 0;
+  const files = node.files?.length || 0;
+  return { folders, files };
+}
+
+export function FolderMeta({ node }: { node: { children?: any[]; files?: any[] } }) {
+  const { folders, files } = countDeep(node);
+  const parts: string[] = [];
+  if (folders > 0) parts.push(`${folders} pasta${folders !== 1 ? "s" : ""}`);
+  if (files > 0) parts.push(`${files} ficheiro${files !== 1 ? "s" : ""}`);
+  return <span className="text-[10px] text-muted-foreground">{parts.join(" · ") || "Vazio"}</span>;
 }
