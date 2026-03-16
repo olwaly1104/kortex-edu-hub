@@ -43,21 +43,24 @@ const desempenhoAnualFiles: DriveFile[] = [
   mkFile("Assiduidade", "anual", "agendado", "csv"), mkFile("Avaliações e Tarefas", "anual", "agendado"), mkFile("Progressão dos Estudantes", "anual", "agendado"),
 ];
 
-const courseDesempenhoFiles = (s: FileStatus): DriveFile[] => [
-  mkFile("Relatório de Desempenho Geral", "mensal", s),
-  mkFile("Desempenho por Cadeiras", "mensal", s),
-  mkFile("Desempenho por Docente", "mensal", s),
-  mkFile("Estudantes em Risco", "mensal", s),
-  mkFile("Quadro de Honra", "mensal", s),
+const courseReportNames = [
+  "Relatório de Desempenho Geral",
+  "Desempenho por Cadeiras",
+  "Desempenho por Docente",
+  "Estudantes em Risco",
+  "Quadro de Honra",
 ];
 
-const yearDesempenhoFiles = (s: FileStatus): DriveFile[] => [
-  mkFile("Relatório de Desempenho Geral", "mensal", s),
-  mkFile("Desempenho por Cadeiras", "mensal", s),
-  mkFile("Desempenho por Docente", "mensal", s),
-  mkFile("Estudantes em Risco", "mensal", s),
-  mkFile("Quadro de Honra", "mensal", s),
-];
+const mkReportWithFrequency = (name: string): DriveNode => ({
+  id: uid(), name, children: [
+    { id: uid(), name: "Mensal", children: months.map(m => ({ id: uid(), name: m.label, files: [mkFile(name, "mensal", m.status)] })) },
+    { id: uid(), name: "Semestral", children: [
+      { id: uid(), name: "Semestre 1", files: [mkFile(name, "semestral", "gerado")] },
+      { id: uid(), name: "Semestre 2", files: [mkFile(name, "semestral", "agendado")] },
+    ]},
+    { id: uid(), name: "Anual", files: [mkFile(name, "anual", "agendado")] },
+  ],
+});
 
 const mkDesempenhoTurma = (turma: string): DriveNode => ({
   id: uid(), name: turma, children: [
@@ -72,16 +75,18 @@ const mkDesempenhoTurma = (turma: string): DriveNode => ({
 
 const mkDesempenhoAno = (ano: string): DriveNode => ({
   id: uid(), name: ano,
-  files: yearDesempenhoFiles("gerado"),
-  filesLabel: `Desempenho Académico do ${ano}`,
-  children: ["Turma A", "Turma B", "Turma C"].map(mkDesempenhoTurma),
+  children: [
+    { id: uid(), name: `Relatórios de Desempenho Académico do ${ano}`, children: courseReportNames.map(mkReportWithFrequency) },
+    ...["Turma A", "Turma B", "Turma C"].map(mkDesempenhoTurma),
+  ],
 });
 
 const desempenhoAcademico: DriveNode = {
   id: uid(), name: "Desempenho Académico", icon: "bar-chart",
-  files: courseDesempenhoFiles("gerado"),
-  filesLabel: "Relatórios de Desempenho Académico do Curso",
-  children: ["1º Ano", "2º Ano", "3º Ano"].map(mkDesempenhoAno),
+  children: [
+    { id: uid(), name: "Relatórios de Desempenho Académico do Curso", children: courseReportNames.map(mkReportWithFrequency) },
+    ...["1º Ano", "2º Ano", "3º Ano"].map(mkDesempenhoAno),
+  ],
 };
 
 // ─── Cadeiras do Curso ──────────────────────────────────
