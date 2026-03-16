@@ -187,26 +187,27 @@ export default function EduDriveContent({ currentPath, onNavigate, onSelectFile,
           </div>
         )}
 
-        {/* Folders — vertical list */}
-        {(isRoot ? !search : true) && filteredFolders.length > 0 && (
-          <Section label={isRoot ? "Pastas" : filteredFiles.length > 0 ? undefined : undefined}>
-            <div className="flex flex-col gap-0.5">
-              {filteredFolders.map(f => (
-                <button key={f.id} onClick={() => onNavigate([...currentPath, f.id])}
-                  className="flex items-center gap-3 px-3.5 py-2.5 rounded-lg border border-transparent hover:border-border hover:bg-muted/40 transition-all text-left group">
-                  <FolderIcon className="w-8 h-6 shrink-0" isDocument={f.isDocumentFolder} />
-                  <div className="min-w-0 flex-1">
-                    <p className="text-[13px] font-medium text-foreground truncate">{f.name}</p>
-                    <p className="text-[10px] text-muted-foreground mt-0.5">
-                      {(f.children?.length || 0) + (f.files?.length || 0)} itens
-                    </p>
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-muted-foreground/0 group-hover:text-muted-foreground/40 transition-colors shrink-0" />
-                </button>
-              ))}
+        {/* Folders — split report folders from structural folders with divider */}
+        {(isRoot ? !search : true) && filteredFolders.length > 0 && (() => {
+          const reportFolders = filteredFolders.filter(f => f.name.startsWith("Relatórios"));
+          const structFolders = filteredFolders.filter(f => !f.name.startsWith("Relatórios"));
+          return (
+            <div className="mb-5">
+              {isRoot && <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mb-2">Pastas</p>}
+              {reportFolders.length > 0 && (
+                <FolderList folders={reportFolders} currentPath={currentPath} onNavigate={onNavigate} />
+              )}
+              {reportFolders.length > 0 && structFolders.length > 0 && (
+                <div className="flex items-center gap-3 my-3">
+                  <div className="flex-1 h-px bg-border" />
+                </div>
+              )}
+              {structFolders.length > 0 && (
+                <FolderList folders={structFolders} currentPath={currentPath} onNavigate={onNavigate} />
+              )}
             </div>
-          </Section>
-        )}
+          );
+        })()}
 
         {/* Files only (no folders) */}
         {filteredFiles.length > 0 && filteredFolders.length === 0 && (
@@ -238,6 +239,26 @@ function Section({ label, icon, children }: { label?: string; icon?: React.React
         </p>
       )}
       {children}
+    </div>
+  );
+}
+
+function FolderList({ folders, currentPath, onNavigate }: { folders: DriveNode[]; currentPath: string[]; onNavigate: (path: string[]) => void }) {
+  return (
+    <div className="flex flex-col gap-0.5">
+      {folders.map(f => (
+        <button key={f.id} onClick={() => onNavigate([...currentPath, f.id])}
+          className="flex items-center gap-3 px-3.5 py-2.5 rounded-lg border border-transparent hover:border-border hover:bg-muted/40 transition-all text-left group">
+          <FolderIcon className="w-8 h-6 shrink-0" isDocument={f.isDocumentFolder} />
+          <div className="min-w-0 flex-1">
+            <p className="text-[13px] font-medium text-foreground truncate">{f.name}</p>
+            <p className="text-[10px] text-muted-foreground mt-0.5">
+              {(f.children?.length || 0) + (f.files?.length || 0)} itens
+            </p>
+          </div>
+          <ChevronRight className="w-4 h-4 text-muted-foreground/0 group-hover:text-muted-foreground/40 transition-colors shrink-0" />
+        </button>
+      ))}
     </div>
   );
 }
