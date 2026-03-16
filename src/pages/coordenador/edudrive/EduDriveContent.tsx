@@ -243,6 +243,26 @@ function Section({ label, icon, children }: { label?: string; icon?: React.React
   );
 }
 
+function FolderList({ folders, currentPath, onNavigate }: { folders: DriveNode[]; currentPath: string[]; onNavigate: (path: string[]) => void }) {
+  return (
+    <div className="flex flex-col gap-0.5">
+      {folders.map(f => (
+        <button key={f.id} onClick={() => onNavigate([...currentPath, f.id])}
+          className="flex items-center gap-3 px-3.5 py-2.5 rounded-lg border border-transparent hover:border-border hover:bg-muted/40 transition-all text-left group">
+          <FolderIcon className="w-8 h-6 shrink-0" isDocument={f.isDocumentFolder} />
+          <div className="min-w-0 flex-1">
+            <p className="text-[13px] font-medium text-foreground truncate">{f.name}</p>
+            <p className="text-[10px] text-muted-foreground mt-0.5">
+              {(f.children?.length || 0) + (f.files?.length || 0)} itens
+            </p>
+          </div>
+          <ChevronRight className="w-4 h-4 text-muted-foreground/0 group-hover:text-muted-foreground/40 transition-colors shrink-0" />
+        </button>
+      ))}
+    </div>
+  );
+}
+
 function FileList({ files, onSelect, selectedId }: { files: DriveFile[]; onSelect: (f: DriveFile) => void; selectedId?: string }) {
   return (
     <div className="flex flex-col gap-0.5">
