@@ -22,6 +22,7 @@ export default function EduDriveContent({ currentPath, onNavigate, onSelectFile,
   const [sortBy, setSortBy] = useState<SortBy>("name");
   const [filterBy, setFilterBy] = useState<FilterBy>("all");
   const [showNotifs, setShowNotifs] = useState(false);
+  const [viewMode, setViewMode] = useState<ViewMode>("list");
 
   const node = resolveNode(currentPath);
   const crumbs = buildBreadcrumbs(currentPath);
