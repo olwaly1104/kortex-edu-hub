@@ -6,10 +6,6 @@ const fid = () => `f${_id++}`;
 
 // Status logic: Sep 2025 - Mar 2026 = gerado, Apr 2026+ = agendado
 const months = [
-  { label: "Setembro 2025", short: "Set 2025", status: "gerado" as FileStatus },
-  { label: "Outubro 2025", short: "Out 2025", status: "gerado" as FileStatus },
-  { label: "Novembro 2025", short: "Nov 2025", status: "gerado" as FileStatus },
-  { label: "Dezembro 2025", short: "Dez 2025", status: "gerado" as FileStatus },
   { label: "Janeiro 2026", short: "Jan 2026", status: "gerado" as FileStatus },
   { label: "Fevereiro 2026", short: "Fev 2026", status: "gerado" as FileStatus },
   { label: "Março 2026", short: "Mar 2026", status: "gerado" as FileStatus },
@@ -18,6 +14,10 @@ const months = [
   { label: "Junho 2026", short: "Jun 2026", status: "agendado" as FileStatus },
   { label: "Julho 2026", short: "Jul 2026", status: "agendado" as FileStatus },
   { label: "Agosto 2026", short: "Ago 2026", status: "agendado" as FileStatus },
+  { label: "Setembro 2026", short: "Set 2026", status: "agendado" as FileStatus },
+  { label: "Outubro 2026", short: "Out 2026", status: "agendado" as FileStatus },
+  { label: "Novembro 2026", short: "Nov 2026", status: "agendado" as FileStatus },
+  { label: "Dezembro 2026", short: "Dez 2026", status: "agendado" as FileStatus },
 ];
 
 const mkFile = (name: string, freq: Frequency, status: FileStatus, type: "pdf" | "csv" = "pdf", size?: string): DriveFile => ({
