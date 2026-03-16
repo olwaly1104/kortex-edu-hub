@@ -188,7 +188,7 @@ export default function EduDriveContent({ currentPath, onNavigate, onSelectFile,
         {/* Files only */}
         {filteredFiles.length > 0 && filteredFolders.length === 0 && (
           <Section label={node?.filesLabel}>
-            <FileList files={filteredFiles} onSelect={onSelectFile} selectedId={selectedFile?.id} />
+            <FileList files={filteredFiles} onSelect={onSelectFile} selectedId={selectedFile?.id} viewMode={viewMode} />
           </Section>
         )}
 
