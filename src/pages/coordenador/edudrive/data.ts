@@ -153,7 +153,7 @@ const mkDocente = (name: string): DriveNode => ({
 const docentesDoCurso: DriveNode = {
   id: uid(), name: "Docentes do Curso", icon: "users",
   children: ["1º Ano", "2º Ano", "3º Ano"].map(ano => ({
-    id: uid(), name: ano, children: (teachersByYear[ano] || []).map(mkDocente),
+    id: uid(), name: `${ano} — Curso de Arquitectura`, children: (teachersByYear[ano] || []).map(mkDocente),
   })),
 };
 
