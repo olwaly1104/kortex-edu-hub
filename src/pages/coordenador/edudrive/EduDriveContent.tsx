@@ -179,7 +179,7 @@ export default function EduDriveContent({ currentPath, onNavigate, onSelectFile,
                 </div>
               )}
               {structFolders.length > 0 && (
-                <FolderGrid folders={structFolders} currentPath={currentPath} onNavigate={onNavigate} />
+                <FolderGrid folders={structFolders} currentPath={currentPath} onNavigate={onNavigate} viewMode={viewMode} />
               )}
             </div>
           );
