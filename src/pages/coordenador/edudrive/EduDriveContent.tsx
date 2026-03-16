@@ -171,7 +171,7 @@ export default function EduDriveContent({ currentPath, onNavigate, onSelectFile,
             <div className="mb-5">
               {isRoot && <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-3">Pastas</p>}
               {reportFolders.length > 0 && (
-                <FolderGrid folders={reportFolders} currentPath={currentPath} onNavigate={onNavigate} />
+                <FolderGrid folders={reportFolders} currentPath={currentPath} onNavigate={onNavigate} viewMode={viewMode} />
               )}
               {reportFolders.length > 0 && structFolders.length > 0 && (
                 <div className="flex items-center gap-3 my-3">
