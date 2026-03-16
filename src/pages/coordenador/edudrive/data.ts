@@ -176,7 +176,7 @@ const mkEstudante = (name: string): DriveNode => ({
 const estudantesDoCurso: DriveNode = {
   id: uid(), name: "Estudantes do Curso", icon: "graduation-cap",
   children: ["1º Ano", "2º Ano", "3º Ano"].map(ano => ({
-    id: uid(), name: ano, children: (studentsByYear[ano] || []).map(mkEstudante),
+    id: uid(), name: `${ano} — Curso de Arquitectura`, children: (studentsByYear[ano] || []).map(mkEstudante),
   })),
 };
 
