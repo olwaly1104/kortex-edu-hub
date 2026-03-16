@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { ChevronRight, Search, X, Bell, Pin, Clock, Upload, Eye, Download, Share2 } from "lucide-react";
+import { ChevronRight, Search, X, Bell, Pin, Clock, Upload, Eye, Download, Share2, LayoutList, LayoutGrid } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { DriveNode, DriveFile, Frequency } from "./types";
