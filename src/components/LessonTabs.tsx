@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Users, FileText, Eye, Download, CheckCircle, Clock,
-  Search, AlertCircle, BookOpen,
+  Search, AlertCircle, BookOpen, Timer,
 } from "lucide-react";
 
 export type AttendanceStatus = "presente" | "atrasado" | "ausente";
@@ -19,12 +19,12 @@ export interface AttendanceRecord {
 
 interface LessonTabsProps {
   attendance: AttendanceRecord[];
-  students: { name: string; email?: string; turma?: string }[];
   materials: { name: string; type: string; size: string }[];
   transcript: { speaker: string; text: string }[];
   summary: string;
   professorName: string;
   discColor?: string;
+  lessonStartTime?: string;
 }
 
 const statusConfig: Record<AttendanceStatus, { label: string; icon: typeof CheckCircle; className: string }> = {
@@ -33,20 +33,16 @@ const statusConfig: Record<AttendanceStatus, { label: string; icon: typeof Check
   ausente: { label: "Ausente", icon: AlertCircle, className: "text-destructive bg-destructive/10" },
 };
 
-export default function LessonTabs({ attendance, students, materials, transcript, summary, professorName, discColor }: LessonTabsProps) {
+export default function LessonTabs({ attendance, materials, transcript, summary, professorName, discColor, lessonStartTime = "08:00" }: LessonTabsProps) {
   const [attendanceSearch, setAttendanceSearch] = useState("");
-  const [studentSearch, setStudentSearch] = useState("");
 
-  const presentCount = attendance.filter(a => a.status === "presente").length;
-  const lateCount = attendance.filter(a => a.status === "atrasado").length;
-  const absentCount = attendance.filter(a => a.status === "ausente").length;
+  const presentCount = attendance.filter(a => a.status === "presente" && a.role === "estudante").length;
+  const lateCount = attendance.filter(a => a.status === "atrasado" && a.role === "estudante").length;
+  const absentCount = attendance.filter(a => a.status === "ausente" && a.role === "estudante").length;
+  const totalStudents = attendance.filter(a => a.role === "estudante").length;
 
   const filteredAttendance = attendance.filter(a =>
     a.name.toLowerCase().includes(attendanceSearch.toLowerCase())
-  );
-
-  const filteredStudents = students.filter(s =>
-    s.name.toLowerCase().includes(studentSearch.toLowerCase())
   );
 
   return (
@@ -54,8 +50,7 @@ export default function LessonTabs({ attendance, students, materials, transcript
       <div className="border-b border-border">
         <TabsList className="bg-transparent h-auto p-0 gap-0">
           {[
-            { value: "participantes", label: "Participantes", count: attendance.length },
-            { value: "estudantes", label: "Estudantes", count: students.length },
+            { value: "participantes", label: "Participantes", count: totalStudents },
             { value: "conteudos", label: "Conteúdos", count: materials.length },
             { value: "transcricao", label: "Transcrição" },
             { value: "resumo", label: "Resumo da Aula" },
@@ -73,7 +68,16 @@ export default function LessonTabs({ attendance, students, materials, transcript
       {/* Participantes / Lista de Presença */}
       <TabsContent value="participantes" className="space-y-4">
         {/* Stats */}
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-4 gap-3">
+          <div className="flex items-center gap-3 rounded-xl border border-border bg-card p-3">
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Timer className="w-4 h-4 text-primary" />
+            </div>
+            <div>
+              <p className="text-lg font-bold text-foreground">{lessonStartTime}</p>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Início</p>
+            </div>
+          </div>
           <div className="flex items-center gap-3 rounded-xl border border-border bg-card p-3">
             <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center">
               <CheckCircle className="w-4 h-4 text-accent" />
@@ -120,19 +124,26 @@ export default function LessonTabs({ attendance, students, materials, transcript
             const cfg = statusConfig[a.status];
             const Icon = cfg.icon;
             return (
-              <div key={i} className="grid grid-cols-[1fr_100px_80px] gap-2 items-center px-4 py-3 hover:bg-muted/20 transition-colors">
+              <div key={i} className={`grid grid-cols-[1fr_100px_80px] gap-2 items-center px-4 py-3 transition-colors ${
+                a.status === "ausente" ? "bg-destructive/[0.03]" : "hover:bg-muted/20"
+              }`}>
                 <div className="flex items-center gap-3 min-w-0">
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold ${
-                    a.role === "professor" ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
+                    a.role === "professor" ? "bg-primary/10 text-primary" :
+                    a.status === "ausente" ? "bg-destructive/10 text-destructive" :
+                    a.status === "atrasado" ? "bg-[hsl(38,92%,50%)]/10 text-[hsl(38,92%,50%)]" :
+                    "bg-muted text-muted-foreground"
                   }`}>
                     {a.name.split(" ").map(n => n[0]).slice(0, 2).join("")}
                   </div>
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-foreground truncate">{a.name}</p>
+                    <p className={`text-sm font-medium truncate ${a.status === "ausente" ? "text-muted-foreground line-through" : "text-foreground"}`}>{a.name}</p>
                     <p className="text-[10px] text-muted-foreground">{a.role === "professor" ? "Docente" : "Estudante"}</p>
                   </div>
                 </div>
-                <span className="text-xs text-muted-foreground">{a.arrivalTime || "—"}</span>
+                <span className={`text-xs ${a.status === "ausente" ? "text-destructive" : "text-muted-foreground"}`}>
+                  {a.status === "ausente" ? "—" : a.arrivalTime || "—"}
+                </span>
                 <div className="flex justify-end">
                   <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold ${cfg.className}`}>
                     <Icon className="w-3 h-3" /> {cfg.label}
@@ -143,31 +154,6 @@ export default function LessonTabs({ attendance, students, materials, transcript
           })}
           {filteredAttendance.length === 0 && (
             <div className="px-4 py-8 text-center text-sm text-muted-foreground">Nenhum participante encontrado.</div>
-          )}
-        </Card>
-      </TabsContent>
-
-      {/* Estudantes */}
-      <TabsContent value="estudantes" className="space-y-4">
-        <div className="relative max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input placeholder="Pesquisar estudante..." value={studentSearch} onChange={e => setStudentSearch(e.target.value)} className="pl-9 h-9" />
-        </div>
-        <Card className="divide-y divide-border overflow-hidden">
-          {filteredStudents.map((s, i) => (
-            <div key={i} className="flex items-center gap-3 px-4 py-3 hover:bg-muted/20 transition-colors">
-              <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-[10px] font-bold text-muted-foreground">
-                {s.name.split(" ").map(n => n[0]).slice(0, 2).join("")}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-foreground truncate">{s.name}</p>
-                {s.email && <p className="text-[10px] text-muted-foreground">{s.email}</p>}
-              </div>
-              {s.turma && <Badge variant="outline" className="text-[10px]">{s.turma}</Badge>}
-            </div>
-          ))}
-          {filteredStudents.length === 0 && (
-            <div className="px-4 py-8 text-center text-sm text-muted-foreground">Nenhum estudante encontrado.</div>
           )}
         </Card>
       </TabsContent>
@@ -233,22 +219,25 @@ export default function LessonTabs({ attendance, students, materials, transcript
   );
 }
 
-// Helper to generate mock attendance from participant names
-export function generateAttendance(professorName: string, studentNames: string[], totalStudents: number): AttendanceRecord[] {
+// Helper to generate mock attendance — ALL students included
+export function generateAttendance(professorName: string, studentNames: string[], lessonStartTime = "08:00"): AttendanceRecord[] {
   const records: AttendanceRecord[] = [
-    { name: professorName, role: "professor", status: "presente", arrivalTime: "08:00" },
+    { name: professorName, role: "professor", status: "presente", arrivalTime: lessonStartTime },
   ];
 
-  const times = ["08:00", "08:01", "08:02", "08:03", "08:05", "08:07", "08:10", "08:12", "08:15", "08:20", "08:25", "08:30"];
-  const lateThreshold = 5; // index 5+ = late
-
+  // Shuffle-like distribution: ~60% present, ~20% late, ~20% absent
   studentNames.forEach((name, i) => {
-    if (i < Math.floor(totalStudents * 0.75)) {
+    const mod = i % 10;
+    if (mod < 6) {
       // Present on time
-      records.push({ name, role: "estudante", status: "presente", arrivalTime: times[i % lateThreshold] || "08:04" });
-    } else if (i < Math.floor(totalStudents * 0.9)) {
+      const minutes = ["00", "01", "02", "03", "04", "05"];
+      const h = parseInt(lessonStartTime.split(":")[0]);
+      records.push({ name, role: "estudante", status: "presente", arrivalTime: `${String(h).padStart(2, "0")}:${minutes[i % minutes.length]}` });
+    } else if (mod < 8) {
       // Late
-      records.push({ name, role: "estudante", status: "atrasado", arrivalTime: times[lateThreshold + (i % (times.length - lateThreshold))] || "08:20" });
+      const h = parseInt(lessonStartTime.split(":")[0]);
+      const lateMins = [12, 18, 22, 25, 30, 35];
+      records.push({ name, role: "estudante", status: "atrasado", arrivalTime: `${String(h).padStart(2, "0")}:${lateMins[i % lateMins.length]}` });
     } else {
       // Absent
       records.push({ name, role: "estudante", status: "ausente" });
