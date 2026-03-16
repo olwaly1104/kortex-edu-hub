@@ -171,7 +171,7 @@ export default function EduDriveContent({ currentPath, onNavigate, onSelectFile,
             <div className="mb-5">
               {isRoot && <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-3">Pastas</p>}
               {reportFolders.length > 0 && (
-                <FolderGrid folders={reportFolders} currentPath={currentPath} onNavigate={onNavigate} />
+                <FolderGrid folders={reportFolders} currentPath={currentPath} onNavigate={onNavigate} viewMode={viewMode} />
               )}
               {reportFolders.length > 0 && structFolders.length > 0 && (
                 <div className="flex items-center gap-3 my-3">
@@ -179,7 +179,7 @@ export default function EduDriveContent({ currentPath, onNavigate, onSelectFile,
                 </div>
               )}
               {structFolders.length > 0 && (
-                <FolderGrid folders={structFolders} currentPath={currentPath} onNavigate={onNavigate} />
+                <FolderGrid folders={structFolders} currentPath={currentPath} onNavigate={onNavigate} viewMode={viewMode} />
               )}
             </div>
           );
@@ -219,7 +219,25 @@ function Section({ label, icon, children }: { label?: string; icon?: React.React
   );
 }
 
-function FolderGrid({ folders, currentPath, onNavigate }: { folders: DriveNode[]; currentPath: string[]; onNavigate: (path: string[]) => void }) {
+function FolderGrid({ folders, currentPath, onNavigate, viewMode = "grid" }: { folders: DriveNode[]; currentPath: string[]; onNavigate: (path: string[]) => void; viewMode?: "list" | "grid" }) {
+  if (viewMode === "list") {
+    return (
+      <div className="border border-border rounded-lg overflow-hidden divide-y divide-border">
+        {folders.map(f => (
+          <button key={f.id} onClick={() => onNavigate([...currentPath, f.id])}
+            className="flex items-center gap-3 px-4 py-2.5 w-full hover:bg-muted/30 transition-colors text-left group">
+            <FolderIcon className="w-8 h-6 shrink-0" isDocument={f.isDocumentFolder} />
+            <div className="min-w-0 flex-1">
+              <p className="text-[12px] font-medium text-foreground truncate">{f.name}</p>
+            </div>
+            <FolderMeta node={f} />
+            <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/0 group-hover:text-muted-foreground/50 transition-colors shrink-0" />
+          </button>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
       {folders.map(f => (
