@@ -174,9 +174,22 @@ export default function EduDriveContent({ currentPath, onNavigate, onSelectFile,
           </>
         )}
 
+        {/* Files above folders (with section label divider) */}
+        {(isRoot ? !search : true) && filteredFiles.length > 0 && filteredFolders.length > 0 && (
+          <div className="mb-5">
+            <div className="flex items-center gap-3 mb-2">
+              <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider shrink-0">
+                {node?.filesLabel || "Ficheiros"}
+              </p>
+              <div className="flex-1 h-px bg-border" />
+            </div>
+            <FileList files={filteredFiles} onSelect={onSelectFile} selectedId={selectedFile?.id} />
+          </div>
+        )}
+
         {/* Folders — vertical list */}
         {(isRoot ? !search : true) && filteredFolders.length > 0 && (
-          <Section label={isRoot ? "Pastas" : undefined}>
+          <Section label={isRoot ? "Pastas" : filteredFiles.length > 0 ? undefined : undefined}>
             <div className="flex flex-col gap-0.5">
               {filteredFolders.map(f => (
                 <button key={f.id} onClick={() => onNavigate([...currentPath, f.id])}
@@ -195,9 +208,9 @@ export default function EduDriveContent({ currentPath, onNavigate, onSelectFile,
           </Section>
         )}
 
-        {/* Files — vertical list */}
-        {filteredFiles.length > 0 && (
-          <Section label={filteredFolders.length > 0 ? "Ficheiros" : undefined}>
+        {/* Files only (no folders) */}
+        {filteredFiles.length > 0 && filteredFolders.length === 0 && (
+          <Section label={node?.filesLabel}>
             <FileList files={filteredFiles} onSelect={onSelectFile} selectedId={selectedFile?.id} />
           </Section>
         )}
