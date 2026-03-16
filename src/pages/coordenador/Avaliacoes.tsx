@@ -8,11 +8,14 @@ import { Progress } from "@/components/ui/progress";
 import {
   GraduationCap, Search, Clock, CheckCircle, Users,
   Calendar, AlertCircle, ClipboardList, ArrowRight, ArrowUpDown, X,
-  MapPin,
+  MapPin, HelpCircle,
 } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
+import {
+  Tooltip, TooltipContent, TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const statusStyle: Record<string, { bg: string; label: string; icon: React.ElementType }> = {
   rascunho: { bg: "bg-muted text-muted-foreground", label: "Rascunho", icon: Clock },
@@ -20,14 +23,34 @@ const statusStyle: Record<string, { bg: string; label: string; icon: React.Eleme
   encerrada: { bg: "bg-accent/10 text-accent", label: "Encerrada", icon: CheckCircle },
 };
 
+const summaryTooltips: Record<string, string> = {
+  "Activas": "Avaliações actualmente em curso e a receber submissões dos estudantes.",
+  "Encerradas": "Avaliações já finalizadas com todas as notas atribuídas.",
+  "Pendente": "Avaliações activas onde nem todos os estudantes submeteram.",
+  "Taxa de Conclusão": "Percentagem de avaliações já encerradas sobre o total.",
+};
+
 function SummaryCard({ label, value, icon: Icon, iconBg, iconColor, valueClass }: {
   label: string; value: string | number; icon: React.ElementType;
   iconBg: string; iconColor: string; valueClass?: string;
 }) {
+  const tip = summaryTooltips[label];
   return (
     <div className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4">
       <div className="flex items-center justify-between">
-        <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">{label}</p>
+        <div className="flex items-center gap-1.5">
+          <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">{label}</p>
+          {tip && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <HelpCircle className="w-3 h-3 text-muted-foreground/50 cursor-help" />
+              </TooltipTrigger>
+              <TooltipContent side="top" className="max-w-[220px] text-xs">
+                {tip}
+              </TooltipContent>
+            </Tooltip>
+          )}
+        </div>
         <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${iconBg}`}>
           <Icon className={`w-4 h-4 ${iconColor}`} />
         </div>
@@ -123,7 +146,6 @@ export default function CoordenadorAvaliacoes() {
 
       {/* Controls box */}
       <div className="rounded-xl border border-border bg-card p-4 space-y-3">
-        {/* Row 1: Year toggles */}
         <div className="flex flex-wrap gap-2">
           <Button size="sm" variant={!filterYear ? "default" : "outline"} onClick={() => { setFilterYear(null); setFilterTurma("all"); }} className="text-xs">
             Todos os Anos
@@ -135,7 +157,6 @@ export default function CoordenadorAvaliacoes() {
           ))}
         </div>
 
-        {/* Row 1.5: Turma toggles (when year is selected) */}
         {filterYear && turmasForYear.length > 0 && (
           <div className="flex flex-wrap gap-2 pl-4 border-l-2 border-primary/20">
             <Button size="sm" variant={filterTurma === "all" ? "secondary" : "ghost"} onClick={() => setFilterTurma("all")} className="text-xs">
@@ -151,7 +172,6 @@ export default function CoordenadorAvaliacoes() {
 
         <div className="border-t border-border" />
 
-        {/* Row 2: Search + Status toggles + Ordenar */}
         <div className="flex items-center gap-2 flex-wrap">
           <div className="relative flex-1 min-w-[180px] max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
