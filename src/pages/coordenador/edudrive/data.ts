@@ -96,7 +96,7 @@ const mkDesempenhoTurma = (turma: string): DriveNode => ({
 });
 
 const mkDesempenhoAno = (ano: string): DriveNode => ({
-  id: uid(), name: ano,
+  id: uid(), name: `${ano} — Curso de Arquitectura`,
   children: [
     { id: uid(), name: `Relatórios de Desempenho Académico do ${ano}`, children: courseReportNames.map(mkReportWithFrequency) },
     ...["Turma A", "Turma B", "Turma C"].map(mkDesempenhoTurma),
@@ -130,7 +130,7 @@ const mkCadeira = (name: string): DriveNode => ({
 const cadeirasDoCurso: DriveNode = {
   id: uid(), name: "Cadeiras do Curso", icon: "book-open",
   children: ["1º Ano", "2º Ano", "3º Ano"].map(ano => ({
-    id: uid(), name: ano, children: (subjectsByYear[ano] || []).map(mkCadeira),
+    id: uid(), name: `${ano} — Curso de Arquitectura`, children: (subjectsByYear[ano] || []).map(mkCadeira),
   })),
 };
 
@@ -153,7 +153,7 @@ const mkDocente = (name: string): DriveNode => ({
 const docentesDoCurso: DriveNode = {
   id: uid(), name: "Docentes do Curso", icon: "users",
   children: ["1º Ano", "2º Ano", "3º Ano"].map(ano => ({
-    id: uid(), name: ano, children: (teachersByYear[ano] || []).map(mkDocente),
+    id: uid(), name: `${ano} — Curso de Arquitectura`, children: (teachersByYear[ano] || []).map(mkDocente),
   })),
 };
 
@@ -176,7 +176,7 @@ const mkEstudante = (name: string): DriveNode => ({
 const estudantesDoCurso: DriveNode = {
   id: uid(), name: "Estudantes do Curso", icon: "graduation-cap",
   children: ["1º Ano", "2º Ano", "3º Ano"].map(ano => ({
-    id: uid(), name: ano, children: (studentsByYear[ano] || []).map(mkEstudante),
+    id: uid(), name: `${ano} — Curso de Arquitectura`, children: (studentsByYear[ano] || []).map(mkEstudante),
   })),
 };
 
