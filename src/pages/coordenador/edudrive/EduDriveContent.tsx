@@ -140,7 +140,7 @@ export default function EduDriveContent({ currentPath, onNavigate, onSelectFile,
           <>
             {seedPinned.length > 0 && (
               <Section label="Fixados" icon={<Pin className="w-3 h-3" />}>
-                <FileList files={seedPinned.map(p => p.file)} onSelect={onSelectFile} selectedId={selectedFile?.id} pathLabels={Object.fromEntries(seedPinned.map(p => [p.file.id, p.pathLabel]))} />
+                <FileList files={seedPinned.map(p => p.file)} onSelect={onSelectFile} selectedId={selectedFile?.id} viewMode={viewMode} pathLabels={Object.fromEntries(seedPinned.map(p => [p.file.id, p.pathLabel]))} />
               </Section>
             )}
 
