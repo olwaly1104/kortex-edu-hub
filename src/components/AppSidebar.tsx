@@ -1,10 +1,10 @@
 import { NavLink, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import {
-  LayoutDashboard, BookOpen, Calendar, Megaphone, Users, MessageSquare,
+  LayoutDashboard, BookOpen, Calendar, CalendarDays, Megaphone, Users, MessageSquare,
   Mail, Award, User, LogOut, GraduationCap,
   BarChart3, ChevronLeft, ChevronRight, Library, Wallet, Trophy, ClipboardList,
-  CheckSquare, Building2, UserCog, Eye, Layers,
+  CheckSquare, Building2, UserCog, Eye, Layers, FileText, FolderOpen,
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -127,12 +127,37 @@ const reitoriaSections: NavSection[] = [
   ]},
 ];
 
+const secretariaSections: NavSection[] = [
+  { title: "Geral", items: [
+    { label: "Início", icon: LayoutDashboard, path: "/secretaria" },
+    { label: "Calendário", icon: Calendar, path: "/secretaria/calendario" },
+    { label: "Anúncios", icon: Megaphone, path: "/secretaria/anuncios" },
+    { label: "Solicitações", icon: CheckSquare, path: "/secretaria/solicitacoes" },
+  ]},
+  { title: "Admissões", items: [
+    { label: "Dashboard", icon: BarChart3, path: "/secretaria/admissoes" },
+    { label: "Candidaturas", icon: FileText, path: "/secretaria/admissoes/candidaturas" },
+    { label: "Convocações", icon: CalendarDays, path: "/secretaria/admissoes/convocacoes" },
+    { label: "Resultados", icon: Award, path: "/secretaria/admissoes/resultados" },
+  ]},
+  { title: "Comunicação", items: [
+    { label: "Chat", icon: MessageSquare, path: "/secretaria/chat" },
+    { label: "Email", icon: Mail, path: "/secretaria/email" },
+    { label: "Contactos", icon: Users, path: "/secretaria/contactos" },
+  ]},
+  { title: "Pessoal", items: [
+    { label: "Finanças", icon: Wallet, path: "/secretaria/financas" },
+    { label: "Perfil", icon: User, path: "/secretaria/perfil" },
+  ]},
+];
+
 const roleSectionsMap: Record<string, NavSection[]> = {
   student: studentSections,
   professor: professorSections,
   coordenador_curso: coordenadorCursoSections,
   decano: decanoSections,
   reitoria: reitoriaSections,
+  secretaria: secretariaSections,
 };
 
 const roleLabelMap: Record<string, string> = {
@@ -141,9 +166,10 @@ const roleLabelMap: Record<string, string> = {
   coordenador_curso: "Coord. de Curso",
   decano: "Decano",
   reitoria: "Reitoria",
+  secretaria: "Secretaria",
 };
 
-const roleBasePaths = ["/student", "/professor", "/coordenador", "/decano", "/reitoria"];
+const roleBasePaths = ["/student", "/professor", "/coordenador", "/decano", "/reitoria", "/secretaria"];
 
 export default function AppSidebar() {
   const { user, logout } = useAuth();
