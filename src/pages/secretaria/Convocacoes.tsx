@@ -10,7 +10,7 @@ export default function SecretariaConvocacoes() {
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Convocações</h1>
+        <h1 className="text-2xl font-bold text-foreground">Provas de Acesso</h1>
         <p className="text-sm text-muted-foreground mt-1">Sessões de prova de acesso geral</p>
       </div>
 
@@ -45,7 +45,7 @@ export default function SecretariaConvocacoes() {
             </div>
             <div>
               <p className="text-xl font-bold text-foreground">{sessoesProva.reduce((s, ss) => s + ss.candidatosIds.length, 0)}</p>
-              <p className="text-xs text-muted-foreground">Total Convocados</p>
+              <p className="text-xs text-muted-foreground">Total Candidatos</p>
             </div>
           </div>
         </Card>
@@ -57,7 +57,7 @@ export default function SecretariaConvocacoes() {
           const isPast = new Date(s.data) < now;
           const occupancy = Math.round((s.candidatosIds.length / s.capacidadeMax) * 100);
           return (
-            <Link key={s.id} to={`/secretaria/admissoes/convocacoes/${s.id}`}>
+            <Link key={s.id} to={`/secretaria/admissoes/provas-de-acesso/${s.id}`}>
               <Card className="p-5 hover:shadow-md hover:border-primary/20 transition-all group cursor-pointer mb-3">
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
@@ -75,7 +75,6 @@ export default function SecretariaConvocacoes() {
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
-                    {/* Occupancy bar */}
                     <div className="w-24">
                       <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
                         <span>Ocupação</span>

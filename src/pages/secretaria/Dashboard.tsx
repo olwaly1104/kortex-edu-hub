@@ -2,23 +2,22 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { candidaturas, sessoesProva, estadoLabels, estadoColors, type EstadoCandidatura } from "@/data/admissoesData";
 import {
   Users, FileText, CalendarDays, Clock, ChevronRight,
-  AlertTriangle, CheckCircle, XCircle, Eye, TrendingUp,
+  AlertTriangle, CheckCircle, XCircle, Eye, TrendingUp, AlertCircle,
 } from "lucide-react";
 
-const pipelineStates: EstadoCandidatura[] = ["pendente", "docs_aprovados", "convocado", "aguarda_resultados", "aprovado", "reprovado", "desistiu"];
+const pipelineStates: EstadoCandidatura[] = ["incompleto", "pendente", "aprovado", "reprovado"];
 
 export default function SecretariaDashboard() {
   const { user } = useAuth();
   const total = candidaturas.length;
   const now = new Date();
 
-  const pendingReview = candidaturas.filter(c => c.estado === "pendente");
+  const incompletos = candidaturas.filter(c => c.estado === "incompleto");
   const unconfirmedPayments = candidaturas.filter(c => c.pagamento.estado === "pendente").length;
-  const missingDocs = candidaturas.filter(c => c.estado === "pendente" && c.documentos.some(d => !d.entregue)).length;
+  const missingDocs = incompletos.length;
   const aprovados = candidaturas.filter(c => c.estado === "aprovado").length;
   const avaliados = candidaturas.filter(c => c.estado === "aprovado" || c.estado === "reprovado").length;
   const taxaAprovacao = avaliados > 0 ? Math.round((aprovados / avaliados) * 100) : 0;
@@ -27,7 +26,6 @@ export default function SecretariaDashboard() {
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
-      {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-foreground">
           Bom dia, {user?.name?.split(" ").pop()} 👋
@@ -45,8 +43,8 @@ export default function SecretariaDashboard() {
             </div>
           )}
           {missingDocs > 0 && (
-            <div className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-800 px-4 py-2.5 rounded-lg text-sm">
-              <AlertTriangle className="w-4 h-4" />
+            <div className="flex items-center gap-2 bg-orange-50 border border-orange-200 text-orange-800 px-4 py-2.5 rounded-lg text-sm">
+              <AlertCircle className="w-4 h-4" />
               <span><strong>{missingDocs}</strong> candidatura(s) com documentos em falta</span>
             </div>
           )}
@@ -57,7 +55,7 @@ export default function SecretariaDashboard() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           { icon: Users, label: "Total Candidaturas", value: total, color: "text-primary bg-primary/10" },
-          { icon: Clock, label: "Aguardam Revisão", value: pendingReview.length, color: "text-yellow-600 bg-yellow-100" },
+          { icon: AlertCircle, label: "Incompletos", value: missingDocs, color: "text-orange-600 bg-orange-100" },
           { icon: CheckCircle, label: "Aprovados", value: aprovados, color: "text-green-600 bg-green-100" },
           { icon: TrendingUp, label: "Taxa Aprovação", value: `${taxaAprovacao}%`, color: "text-primary bg-primary/10" },
         ].map(s => (
@@ -83,7 +81,7 @@ export default function SecretariaDashboard() {
             Ver todas <ChevronRight className="w-3 h-3" />
           </Link>
         </div>
-        <div className="grid grid-cols-7 gap-2">
+        <div className="grid grid-cols-4 gap-2">
           {pipelineStates.map(state => {
             const count = candidaturas.filter(c => c.estado === state).length;
             return (
@@ -98,22 +96,22 @@ export default function SecretariaDashboard() {
 
       {/* Action panels */}
       <div className="grid lg:grid-cols-2 gap-6">
-        {/* Fila de Ação */}
+        {/* Fila de Ação - incompletos */}
         <Card className="overflow-hidden">
           <div className="p-4 border-b flex items-center justify-between">
             <h2 className="text-sm font-semibold text-foreground flex items-center gap-2">
               <FileText className="w-4 h-4 text-primary" /> Fila de Ação
-              <Badge variant="outline" className="text-[10px]">{pendingReview.length}</Badge>
+              <Badge variant="outline" className="text-[10px]">{incompletos.length}</Badge>
             </h2>
             <Link to="/secretaria/admissoes/candidaturas" className="text-xs text-primary hover:underline">
               Ver todas
             </Link>
           </div>
           <div className="divide-y divide-border">
-            {pendingReview.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-8">Sem candidaturas pendentes 🎉</p>
+            {incompletos.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-8">Sem candidaturas incompletas 🎉</p>
             ) : (
-              pendingReview.slice(0, 5).map(c => {
+              incompletos.slice(0, 5).map(c => {
                 const daysWaiting = Math.floor((now.getTime() - new Date(c.dataSubmissao).getTime()) / (1000 * 60 * 60 * 24));
                 const docsEntregues = c.documentos.filter(d => d.entregue).length;
                 return (
@@ -146,9 +144,9 @@ export default function SecretariaDashboard() {
         <Card className="overflow-hidden">
           <div className="p-4 border-b flex items-center justify-between">
             <h2 className="text-sm font-semibold text-foreground flex items-center gap-2">
-              <CalendarDays className="w-4 h-4 text-primary" /> Próximas Sessões
+              <CalendarDays className="w-4 h-4 text-primary" /> Próximas Provas de Acesso
             </h2>
-            <Link to="/secretaria/admissoes/convocacoes" className="text-xs text-primary hover:underline">
+            <Link to="/secretaria/admissoes/provas-de-acesso" className="text-xs text-primary hover:underline">
               Ver todas
             </Link>
           </div>
@@ -157,7 +155,7 @@ export default function SecretariaDashboard() {
               <p className="text-sm text-muted-foreground text-center py-8">Nenhuma sessão agendada.</p>
             ) : (
               upcomingSessions.map(s => (
-                <Link key={s.id} to={`/secretaria/admissoes/convocacoes/${s.id}`}>
+                <Link key={s.id} to={`/secretaria/admissoes/provas-de-acesso/${s.id}`}>
                   <div className="flex items-center justify-between px-4 py-3 hover:bg-muted/40 transition-colors">
                     <div>
                       <p className="text-sm font-medium text-foreground">{s.nome}</p>
@@ -182,7 +180,7 @@ export default function SecretariaDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {[
           { to: "/secretaria/admissoes/candidaturas", icon: FileText, label: "Candidaturas", desc: `${total} registadas`, color: "bg-primary/10 text-primary" },
-          { to: "/secretaria/admissoes/convocacoes", icon: CalendarDays, label: "Convocações", desc: `${sessoesProva.length} sessões`, color: "bg-purple-100 text-purple-700" },
+          { to: "/secretaria/admissoes/provas-de-acesso", icon: CalendarDays, label: "Provas de Acesso", desc: `${sessoesProva.length} sessões`, color: "bg-purple-100 text-purple-700" },
           { to: "/secretaria/admissoes/resultados", icon: Eye, label: "Resultados", desc: `${avaliados} avaliados`, color: "bg-green-100 text-green-700" },
         ].map(link => (
           <Link key={link.to} to={link.to}>
