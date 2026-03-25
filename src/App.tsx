@@ -78,6 +78,13 @@ import ReitoriaDocentes from "./pages/reitoria/Docentes";
 import ReitoriaRelatorios from "./pages/reitoria/Relatorios";
 import ReitoriaFinancas from "./pages/reitoria/Financas";
 import NotFound from "./pages/NotFound";
+import SecretariaDashboard from "./pages/secretaria/Dashboard";
+import SecretariaCandidaturas from "./pages/secretaria/Candidaturas";
+import SecretariaCandidaturaDetail from "./pages/secretaria/CandidaturaDetail";
+import SecretariaConvocacoes from "./pages/secretaria/Convocacoes";
+import SecretariaResultados from "./pages/secretaria/Resultados";
+import SecretariaAdmissoesDashboard from "./pages/secretaria/AdmissoesDashboard";
+import SecretariaSolicitacoes from "./pages/secretaria/Solicitacoes";
 
 const queryClient = new QueryClient();
 
@@ -87,6 +94,7 @@ const homeRedirectMap: Record<string, string> = {
   coordenador_curso: "/coordenador",
   decano: "/decano",
   reitoria: "/reitoria",
+  secretaria: "/secretaria",
 };
 
 function AppRoutes() {
@@ -186,6 +194,21 @@ function AppRoutes() {
         <Route path="/reitoria/relatorios" element={<ReitoriaRelatorios />} />
         <Route path="/reitoria/financas" element={<ReitoriaFinancas />} />
         <Route path="/reitoria/perfil" element={<StudentProfile />} />
+        {/* Secretaria Académica */}
+        <Route path="/secretaria" element={<SecretariaDashboard />} />
+        <Route path="/secretaria/calendario" element={<StudentCalendar />} />
+        <Route path="/secretaria/anuncios" element={<StudentAnnouncements />} />
+        <Route path="/secretaria/solicitacoes" element={<SecretariaSolicitacoes />} />
+        <Route path="/secretaria/admissoes" element={<SecretariaAdmissoesDashboard />} />
+        <Route path="/secretaria/admissoes/candidaturas" element={<SecretariaCandidaturas />} />
+        <Route path="/secretaria/admissoes/candidaturas/:id" element={<SecretariaCandidaturaDetail />} />
+        <Route path="/secretaria/admissoes/convocacoes" element={<SecretariaConvocacoes />} />
+        <Route path="/secretaria/admissoes/resultados" element={<SecretariaResultados />} />
+        <Route path="/secretaria/chat" element={<StudentChat />} />
+        <Route path="/secretaria/email" element={<StudentEmail />} />
+        <Route path="/secretaria/contactos" element={<StudentContacts />} />
+        <Route path="/secretaria/financas" element={<StudentFinances />} />
+        <Route path="/secretaria/perfil" element={<StudentProfile />} />
       </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>
