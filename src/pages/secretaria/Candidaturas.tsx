@@ -4,10 +4,9 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { candidaturas, periodos, cursos, sessoesProva, estadoColors, estadoLabels, type EstadoCandidatura } from "@/data/admissoesData";
-import { Search, ChevronLeft, ChevronRight, Eye, Users, Clock, CheckCircle, XCircle, AlertCircle, ArrowUpDown } from "lucide-react";
+import { candidaturas, sessoesProva, estadoColors, estadoLabels, type EstadoCandidatura } from "@/data/admissoesData";
+import { Search, ChevronLeft, ChevronRight, Eye, Users, Clock, CheckCircle, AlertCircle, ArrowUpDown, X } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
@@ -21,8 +20,7 @@ type SortOption = "recente" | "antiga" | "nome-az" | "nome-za";
 export default function SecretariaCandidaturas() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
-  const [filterPeriodo, setFilterPeriodo] = useState("all");
-  const [filterCurso, setFilterCurso] = useState("all");
+  const [filterSessao, setFilterSessao] = useState<string | null>(null);
   const [filterStatus, setFilterStatus] = useState<StatusFilter>("todas");
   const [sortBy, setSortBy] = useState<SortOption>("recente");
   const [page, setPage] = useState(1);
@@ -30,8 +28,7 @@ export default function SecretariaCandidaturas() {
   const filtered = useMemo(() => {
     let list = candidaturas.filter(c => {
       if (search && !c.nome.toLowerCase().includes(search.toLowerCase()) && !c.bi.includes(search)) return false;
-      if (filterPeriodo !== "all" && c.periodo !== filterPeriodo) return false;
-      if (filterCurso !== "all" && c.cursoOpcao1 !== filterCurso) return false;
+      if (filterSessao && c.sessaoProvaId !== filterSessao) return false;
       if (filterStatus !== "todas" && c.estado !== filterStatus) return false;
       return true;
     });
@@ -47,7 +44,7 @@ export default function SecretariaCandidaturas() {
     });
 
     return list;
-  }, [search, filterPeriodo, filterCurso, filterStatus, sortBy]);
+  }, [search, filterSessao, filterStatus, sortBy]);
 
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
   const paginated = filtered.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
@@ -57,99 +54,99 @@ export default function SecretariaCandidaturas() {
   const incompletos = candidaturas.filter(c => c.estado === "incompleto").length;
   const pendentes = candidaturas.filter(c => c.estado === "pendente").length;
   const aprovados = candidaturas.filter(c => c.estado === "aprovado").length;
-  const reprovados = candidaturas.filter(c => c.estado === "reprovado").length;
 
-  const sortLabels: Record<SortOption, string> = {
-    "recente": "Mais Recente",
-    "antiga": "Mais Antiga",
-    "nome-az": "Nome A-Z",
-    "nome-za": "Nome Z-A",
-  };
+  const statusToggles: { key: StatusFilter; label: string }[] = [
+    { key: "todas", label: "Todas" },
+    { key: "incompleto", label: "Incompleto" },
+    { key: "pendente", label: "Pendente" },
+    { key: "aprovado", label: "Aprovado" },
+    { key: "reprovado", label: "Reprovado" },
+  ];
 
   return (
-    <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
+    <div className="p-6 lg:p-8 space-y-5 animate-fade-in">
       <div>
         <h1 className="text-2xl font-bold text-foreground">Candidaturas</h1>
         <p className="text-muted-foreground text-sm mt-1">Gerir candidaturas de admissão</p>
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {[
           { icon: Users, label: "Total", value: total, color: "text-primary bg-primary/10" },
           { icon: AlertCircle, label: "Incompletos", value: incompletos, color: "text-orange-600 bg-orange-100" },
           { icon: Clock, label: "Pendentes", value: pendentes, color: "text-yellow-600 bg-yellow-100" },
           { icon: CheckCircle, label: "Aprovados", value: aprovados, color: "text-green-600 bg-green-100" },
         ].map(s => (
-          <Card key={s.label} className="p-4">
-            <div className="flex items-center gap-3">
-              <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${s.color}`}>
+          <div key={s.label} className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4">
+            <div className="flex items-center justify-between">
+              <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">{s.label}</p>
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${s.color}`}>
                 <s.icon className="w-4 h-4" />
               </div>
-              <div>
-                <p className="text-xl font-bold text-foreground">{s.value}</p>
-                <p className="text-xs text-muted-foreground">{s.label}</p>
-              </div>
             </div>
-          </Card>
+            <p className="text-2xl font-bold text-foreground">{s.value}</p>
+          </div>
         ))}
       </div>
 
-      {/* Filters row 1: Search + Status toggles + Sort */}
-      <div className="space-y-3">
-        <div className="flex items-center gap-3">
-          <div className="relative flex-1 max-w-sm">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input placeholder="Pesquisar candidato..." value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} className="pl-9" />
-          </div>
-
-          <div className="flex items-center gap-1 bg-muted/50 rounded-lg p-1">
-            {(["todas", ...allStates] as const).map(s => (
-              <Button
-                key={s}
-                size="sm"
-                variant={filterStatus === s ? "default" : "ghost"}
-                className={`text-xs h-8 px-3 ${filterStatus === s ? "" : "text-muted-foreground hover:text-foreground"}`}
-                onClick={() => { setFilterStatus(s); setPage(1); }}
-              >
-                {s === "todas" ? "Todas" : estadoLabels[s]}
-              </Button>
-            ))}
-          </div>
-
-          <div className="h-6 w-px bg-border" />
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs">
-                <ArrowUpDown className="w-3.5 h-3.5" />
-                {sortLabels[sortBy]}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              {(Object.entries(sortLabels) as [SortOption, string][]).map(([key, label]) => (
-                <DropdownMenuItem key={key} onClick={() => setSortBy(key)}>{label}</DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+      {/* Controls box — matching Avaliações pattern */}
+      <div className="rounded-xl border border-border bg-card p-4 space-y-3">
+        {/* Row 1: Session toggles */}
+        <div className="flex flex-wrap gap-2">
+          <Button size="sm" variant={!filterSessao ? "default" : "outline"} onClick={() => { setFilterSessao(null); setPage(1); }} className="text-xs">
+            Todas as Sessões
+          </Button>
+          {sessoesProva.map((s, i) => (
+            <Button key={s.id} size="sm" variant={filterSessao === s.id ? "default" : "outline"} onClick={() => { setFilterSessao(s.id); setPage(1); }} className="text-xs">
+              {i + 1}ª Sessão
+            </Button>
+          ))}
         </div>
 
-        {/* Filters row 2: Período + Curso */}
-        <div className="flex items-center gap-3">
-          <Select value={filterPeriodo} onValueChange={v => { setFilterPeriodo(v); setPage(1); }}>
-            <SelectTrigger className="w-[180px] h-8 text-xs"><SelectValue placeholder="Período" /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todos os Períodos</SelectItem>
-              {periodos.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
-            </SelectContent>
-          </Select>
-          <Select value={filterCurso} onValueChange={v => { setFilterCurso(v); setPage(1); }}>
-            <SelectTrigger className="w-[200px] h-8 text-xs"><SelectValue placeholder="Curso" /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todos os Cursos</SelectItem>
-              {cursos.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-            </SelectContent>
-          </Select>
+        <div className="border-t border-border" />
+
+        {/* Row 2: Search + status toggles + sort */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="relative flex-1 min-w-[180px] max-w-sm">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input placeholder="Pesquisar candidato..." value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} className="pl-9 h-9" />
+          </div>
+          {search && (
+            <Button variant="ghost" size="sm" className="text-xs text-destructive hover:text-destructive hover:bg-destructive/10 shrink-0 gap-1" onClick={() => setSearch("")}>
+              <X className="w-3 h-3" /> Limpar
+            </Button>
+          )}
+
+          <div className="flex items-center gap-2 ml-auto">
+            {statusToggles.map(s => (
+              <Button key={s.key} size="sm" variant={filterStatus === s.key ? "default" : "outline"} onClick={() => { setFilterStatus(s.key); setPage(1); }} className="text-xs">
+                {s.label}
+              </Button>
+            ))}
+
+            <div className="w-px h-6 bg-border" />
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="text-xs gap-1.5">
+                  <ArrowUpDown className="w-3.5 h-3.5" /> Ordenar
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-44">
+                {([
+                  { key: "recente", label: "Mais Recente" },
+                  { key: "antiga", label: "Mais Antiga" },
+                  { key: "nome-az", label: "Nome A–Z" },
+                  { key: "nome-za", label: "Nome Z–A" },
+                ] as { key: SortOption; label: string }[]).map(o => (
+                  <DropdownMenuItem key={o.key} onClick={() => setSortBy(o.key)} className={sortBy === o.key ? "bg-accent font-medium" : ""}>
+                    {o.label}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       </div>
 
@@ -171,6 +168,7 @@ export default function SecretariaCandidaturas() {
               const docsEntregues = c.documentos.filter(d => d.entregue).length;
               const totalDocs = c.documentos.length;
               const sessao = sessoesProva.find(s => s.candidatosIds.includes(c.id));
+              const sessaoIndex = sessao ? sessoesProva.indexOf(sessao) + 1 : null;
               return (
                 <TableRow key={c.id} className="cursor-pointer hover:bg-muted/50" onClick={() => navigate(`/secretaria/admissoes/candidaturas/${c.id}`)}>
                   <TableCell>
@@ -188,9 +186,7 @@ export default function SecretariaCandidaturas() {
                   </TableCell>
                   <TableCell className="text-sm">{c.cursoOpcao1}</TableCell>
                   <TableCell className="text-sm text-muted-foreground">
-                    {sessao ? (
-                      <span className="text-xs">{sessao.nome.replace("Prova de Acesso Geral — ", "")}</span>
-                    ) : <span className="text-muted-foreground">—</span>}
+                    {sessaoIndex ? <span className="text-xs">{sessaoIndex}ª Sessão</span> : <span className="text-muted-foreground">—</span>}
                   </TableCell>
                   <TableCell><Badge className={`text-[10px] ${estadoColors[c.estado]}`}>{estadoLabels[c.estado]}</Badge></TableCell>
                   <TableCell className="text-sm text-muted-foreground">{new Date(c.dataSubmissao).toLocaleDateString("pt-AO")}</TableCell>
