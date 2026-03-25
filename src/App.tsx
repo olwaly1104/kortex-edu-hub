@@ -82,6 +82,7 @@ import SecretariaDashboard from "./pages/secretaria/Dashboard";
 import SecretariaCandidaturas from "./pages/secretaria/Candidaturas";
 import SecretariaCandidaturaDetail from "./pages/secretaria/CandidaturaDetail";
 import SecretariaConvocacoes from "./pages/secretaria/Convocacoes";
+import SecretariaSessaoDetail from "./pages/secretaria/SessaoProvaDetail";
 import SecretariaResultados from "./pages/secretaria/Resultados";
 import SecretariaAdmissoesDashboard from "./pages/secretaria/AdmissoesDashboard";
 import SecretariaSolicitacoes from "./pages/secretaria/Solicitacoes";
@@ -203,6 +204,7 @@ function AppRoutes() {
         <Route path="/secretaria/admissoes/candidaturas" element={<SecretariaCandidaturas />} />
         <Route path="/secretaria/admissoes/candidaturas/:id" element={<SecretariaCandidaturaDetail />} />
         <Route path="/secretaria/admissoes/convocacoes" element={<SecretariaConvocacoes />} />
+        <Route path="/secretaria/admissoes/convocacoes/:sessionId" element={<SecretariaSessaoDetail />} />
         <Route path="/secretaria/admissoes/resultados" element={<SecretariaResultados />} />
         <Route path="/secretaria/chat" element={<StudentChat />} />
         <Route path="/secretaria/email" element={<StudentEmail />} />
