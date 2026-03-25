@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { candidaturas, estadoColors, estadoLabels } from "@/data/admissoesData";
 import {
   ArrowLeft, Phone, Mail, FileText, CheckCircle, XCircle, Clock,
-  MessageSquare, Eye, GraduationCap, Calendar, User, CreditCard,
+  MessageSquare, Eye, GraduationCap, CreditCard,
 } from "lucide-react";
 
 export default function CandidaturaDetail() {
@@ -97,21 +97,14 @@ export default function CandidaturaDetail() {
             {c.documentos.map((d, i) => (
               <div key={i} className="flex items-center justify-between px-5 py-3">
                 <div className="flex items-center gap-3">
-                  {d.aprovado === true ? <CheckCircle className="w-4 h-4 text-green-600" /> :
-                   d.aprovado === false ? <XCircle className="w-4 h-4 text-red-600" /> :
-                   d.entregue ? <Clock className="w-4 h-4 text-yellow-600" /> :
-                   <XCircle className="w-4 h-4 text-muted-foreground/40" />}
+                  {d.entregue ? <CheckCircle className="w-4 h-4 text-green-600" /> : <XCircle className="w-4 h-4 text-muted-foreground/40" />}
                   <span className="text-sm text-foreground">{d.nome}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   {!d.entregue ? (
                     <Badge variant="outline" className="text-[10px] bg-red-50 text-red-600 border-red-200">Em falta</Badge>
-                  ) : d.aprovado === true ? (
-                    <Badge variant="outline" className="text-[10px] bg-green-50 text-green-600 border-green-200">Aprovado</Badge>
-                  ) : d.aprovado === false ? (
-                    <Badge variant="outline" className="text-[10px] bg-red-50 text-red-600 border-red-200">Rejeitado</Badge>
                   ) : (
-                    <Badge variant="outline" className="text-[10px] bg-yellow-50 text-yellow-600 border-yellow-200">Pendente</Badge>
+                    <Badge variant="outline" className="text-[10px] bg-green-50 text-green-600 border-green-200">Entregue</Badge>
                   )}
                   {d.entregue && (
                     <Button variant="ghost" size="sm" className="h-7 text-xs gap-1"><Eye className="w-3 h-3" /> Ver</Button>
@@ -120,17 +113,6 @@ export default function CandidaturaDetail() {
               </div>
             ))}
           </div>
-          {/* Approve/Reject buttons for pending state */}
-          {c.estado === "pendente" && docsEntregues === c.documentos.length && (
-            <div className="p-4 border-t bg-muted/20 flex items-center gap-3">
-              <Button size="sm" className="gap-1.5 flex-1">
-                <CheckCircle className="w-4 h-4" /> Aprovar Todos os Documentos
-              </Button>
-              <Button size="sm" variant="destructive" className="gap-1.5">
-                <XCircle className="w-4 h-4" /> Rejeitar
-              </Button>
-            </div>
-          )}
         </Card>
       </div>
 
@@ -166,14 +148,6 @@ export default function CandidaturaDetail() {
           </div>
         </div>
       </Card>
-
-      {/* Actions based on state */}
-      {c.estado === "docs_aprovados" && (
-        <Card className="p-4 flex items-center gap-3">
-          <Button className="gap-1.5"><Calendar className="w-4 h-4" /> Convocar para Prova</Button>
-          <Button variant="outline" className="gap-1.5"><MessageSquare className="w-4 h-4" /> Enviar Mensagem</Button>
-        </Card>
-      )}
     </div>
   );
 }

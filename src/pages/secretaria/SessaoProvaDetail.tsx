@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { sessoesProva, candidaturas, estadoColors, estadoLabels } from "@/data/admissoesData";
 import {
-  ArrowLeft, CalendarDays, Clock, MapPin, Users, Phone, Mail,
+  ArrowLeft, CalendarDays, Clock, MapPin, Users,
   GraduationCap, CheckCircle, Eye,
 } from "lucide-react";
 
@@ -64,7 +64,7 @@ export default function SessaoProvaDetail() {
             </div>
             <div>
               <p className="text-xl font-bold text-foreground">{session.candidatosIds.length}</p>
-              <p className="text-xs text-muted-foreground">Convocados</p>
+              <p className="text-xs text-muted-foreground">Candidatos</p>
             </div>
           </div>
         </Card>
@@ -92,11 +92,11 @@ export default function SessaoProvaDetail() {
         </Card>
       </div>
 
-      {/* Candidates Table */}
+      {/* Candidates Table - only candidato, 1ª opção, nota, estado */}
       <Card>
         <div className="p-4 border-b">
           <h2 className="text-sm font-semibold text-foreground flex items-center gap-2">
-            <Users className="w-4 h-4 text-primary" /> Candidatos Convocados
+            <Users className="w-4 h-4 text-primary" /> Candidatos
             <Badge variant="outline" className="text-[10px]">{sessionCandidates.length}</Badge>
           </h2>
         </div>
@@ -104,11 +104,9 @@ export default function SessaoProvaDetail() {
           <TableHeader>
             <TableRow>
               <TableHead>Candidato</TableHead>
-              <TableHead>Telefone</TableHead>
-              <TableHead>Email</TableHead>
               <TableHead>1ª Opção</TableHead>
+              <TableHead>Nota</TableHead>
               <TableHead>Estado</TableHead>
-              {isPast && <TableHead>Nota</TableHead>}
               <TableHead className="w-[50px]"></TableHead>
             </TableRow>
           </TableHeader>
@@ -126,28 +124,20 @@ export default function SessaoProvaDetail() {
                     </div>
                   </div>
                 </TableCell>
-                <TableCell className="text-sm text-muted-foreground">
-                  <span className="flex items-center gap-1"><Phone className="w-3 h-3" /> {c.telefone}</span>
-                </TableCell>
-                <TableCell className="text-sm text-muted-foreground">
-                  <span className="flex items-center gap-1"><Mail className="w-3 h-3" /> {c.email}</span>
-                </TableCell>
                 <TableCell className="text-sm">{c.cursoOpcao1}</TableCell>
+                <TableCell className="text-sm font-bold">
+                  {c.nota !== undefined ? `${c.nota}/20` : <span className="text-muted-foreground font-normal">—</span>}
+                </TableCell>
                 <TableCell>
                   <Badge className={`text-[10px] ${estadoColors[c.estado]}`}>{estadoLabels[c.estado]}</Badge>
                 </TableCell>
-                {isPast && (
-                  <TableCell className="text-sm font-medium">
-                    {c.nota !== undefined ? `${c.nota}/20` : <span className="text-muted-foreground">—</span>}
-                  </TableCell>
-                )}
                 <TableCell>
                   <Button variant="ghost" size="icon" className="h-8 w-8"><Eye className="w-4 h-4" /></Button>
                 </TableCell>
               </TableRow>
             ))}
             {sessionCandidates.length === 0 && (
-              <TableRow><TableCell colSpan={isPast ? 7 : 6} className="text-center text-muted-foreground py-8">Nenhum candidato convocado para esta sessão.</TableCell></TableRow>
+              <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground py-8">Nenhum candidato nesta sessão.</TableCell></TableRow>
             )}
           </TableBody>
         </Table>

@@ -137,7 +137,7 @@ const secretariaSections: NavSection[] = [
   { title: "Admissões", items: [
     { label: "Dashboard", icon: BarChart3, path: "/secretaria/admissoes" },
     { label: "Candidaturas", icon: FileText, path: "/secretaria/admissoes/candidaturas" },
-    { label: "Convocações", icon: CalendarDays, path: "/secretaria/admissoes/convocacoes" },
+    { label: "Provas de Acesso", icon: CalendarDays, path: "/secretaria/admissoes/provas-de-acesso" },
     { label: "Resultados", icon: Award, path: "/secretaria/admissoes/resultados" },
   ]},
   { title: "Comunicação", items: [
