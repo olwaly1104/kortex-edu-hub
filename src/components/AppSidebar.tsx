@@ -1,7 +1,7 @@
 import { NavLink, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import {
-  LayoutDashboard, BookOpen, Calendar, Megaphone, Users, MessageSquare,
+  LayoutDashboard, BookOpen, Calendar, CalendarDays, Megaphone, Users, MessageSquare,
   Mail, Award, User, LogOut, GraduationCap,
   BarChart3, ChevronLeft, ChevronRight, Library, Wallet, Trophy, ClipboardList,
   CheckSquare, Building2, UserCog, Eye, Layers, FileText, FolderOpen,
