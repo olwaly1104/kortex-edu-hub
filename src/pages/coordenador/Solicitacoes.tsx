@@ -43,14 +43,14 @@ const typeLabels: Record<string, string> = {
 };
 
 const statusConfig: Record<string, { label: string; cls: string; icon: React.ElementType }> = {
-  pendente: { label: "Pendente", cls: "bg-secondary/10 text-secondary border-secondary/20", icon: Clock },
-  aprovado: { label: "Aprovado", cls: "bg-accent/10 text-accent border-accent/20", icon: CheckCircle },
-  rejeitado: { label: "Rejeitado", cls: "bg-destructive/10 text-destructive border-destructive/20", icon: XCircle },
+  pendente: { label: "Pendente", cls: "bg-amber-50 text-amber-700 border-amber-200", icon: Clock },
+  aprovado: { label: "Aprovado", cls: "bg-emerald-50 text-emerald-700 border-emerald-200", icon: CheckCircle },
+  rejeitado: { label: "Rejeitado", cls: "bg-red-50 text-red-600 border-red-200", icon: XCircle },
 };
 
 const priorityConfig: Record<string, { label: string; cls: string }> = {
-  alta: { label: "Alta", cls: "bg-destructive/10 text-destructive" },
-  média: { label: "Média", cls: "bg-secondary/10 text-secondary" },
+  alta: { label: "Alta", cls: "bg-red-50 text-red-600" },
+  média: { label: "Média", cls: "bg-amber-50 text-amber-700" },
   baixa: { label: "Baixa", cls: "bg-muted text-muted-foreground" },
 };
 
