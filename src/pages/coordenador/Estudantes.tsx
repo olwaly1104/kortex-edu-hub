@@ -237,7 +237,7 @@ export default function CoordenadorEstudantes() {
           <FileText className="w-3.5 h-3.5" /> Ver Relatórios
         </Button>
       </div>
-      <ReportsDialog open={showReports} onOpenChange={setShowReports} title="Estudantes do Curso" reportPrefix="Relatório de Estudantes" />
+      <ReportsDialog open={showReports} onOpenChange={setShowReports} title="Estudantes do Curso" reportPrefix="Relatório de Estudantes" type="estudantes" data={coordEstudantes} />
     </div>
   );
 }

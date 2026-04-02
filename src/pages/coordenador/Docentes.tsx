@@ -228,7 +228,7 @@ export default function CoordenadorDocentes() {
           <FileText className="w-3.5 h-3.5" /> Ver Relatórios
         </Button>
       </div>
-      <ReportsDialog open={showReports} onOpenChange={setShowReports} title="Docentes do Curso" reportPrefix="Relatório de Docentes" />
+      <ReportsDialog open={showReports} onOpenChange={setShowReports} title="Docentes do Curso" reportPrefix="Relatório de Docentes" type="docentes" data={coordDocentes.map(d => ({ ...d, media: d.mediaGeral, estudantes: d.estudantesTotal }))} />
     </div>
   );
 }

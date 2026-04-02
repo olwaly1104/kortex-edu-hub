@@ -279,7 +279,7 @@ export default function CoordenadorCadeiras() {
           <FileText className="w-3.5 h-3.5" /> Ver Relatórios
         </Button>
       </div>
-      <ReportsDialog open={showReports} onOpenChange={setShowReports} title="Cadeiras do Curso" reportPrefix="Relatório de Cadeiras" />
+      <ReportsDialog open={showReports} onOpenChange={setShowReports} title="Cadeiras do Curso" reportPrefix="Relatório de Cadeiras" type="cadeiras" data={coordDisciplinas} />
     </div>
   );
 }
