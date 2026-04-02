@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { FileText, CheckCircle, Loader2, Download, Eye, ArrowLeft, BookOpen, Users, TrendingUp, Award } from "lucide-react";
+import { FileText, CheckCircle, Loader2, Download, Eye, ArrowLeft, TrendingUp, AlertTriangle, BarChart2, Printer } from "lucide-react";
 
 const MONTHS = [
   "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
