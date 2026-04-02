@@ -234,48 +234,149 @@ export default function ReportsDialog({ open, onOpenChange, title, reportPrefix,
     onOpenChange(val);
   };
 
-  // Detail view for a selected month
+  // Detail view — professional document style
   if (selectedMonth !== null) {
     const monthName = MONTHS[selectedMonth];
+    const avgPresenca = Math.round(data.reduce((s, d) => s + vary(d.presenca, selectedMonth), 0) / data.length);
+    const avgEntrega = Math.round(data.reduce((s, d) => s + vary(d.taxaEntrega ?? 0, selectedMonth), 0) / data.length);
+    const grades = data.map(d => varyGrade(type === "docentes" && d.mediaGeral !== undefined ? d.mediaGeral : d.media, selectedMonth)).filter((g): g is number => g !== null);
+    const avgMedia = grades.length ? +(grades.reduce((s, g) => s + g, 0) / grades.length).toFixed(1) : null;
+    const typeLabel = type === "cadeiras" ? "Cadeiras" : type === "docentes" ? "Docentes" : "Estudantes";
+    const approvedCount = type === "cadeiras"
+      ? data.filter(d => vary(d.taxaAprovacao ?? 0, selectedMonth) >= 70).length
+      : data.filter(d => varyGrade(type === "docentes" && d.mediaGeral !== undefined ? d.mediaGeral : d.media, selectedMonth) !== null && (varyGrade(type === "docentes" && d.mediaGeral !== undefined ? d.mediaGeral : d.media, selectedMonth) ?? 0) >= 10).length;
+    const atRiskCount = data.filter(d => vary(d.presenca, selectedMonth) < 75).length;
+
     return (
       <Dialog open={open} onOpenChange={handleClose}>
-        <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-foreground">
-              <FileText className="w-5 h-5 text-primary" />
-              {reportPrefix} — {monthName}
-            </DialogTitle>
-          </DialogHeader>
-
-          <div className="flex items-center justify-between">
+        <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto p-0">
+          {/* Floating back button */}
+          <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border px-6 py-3 flex items-center justify-between">
             <Button variant="ghost" size="sm" className="gap-1.5 text-xs" onClick={() => setSelectedMonth(null)}>
-              <ArrowLeft className="w-3.5 h-3.5" /> Voltar aos Relatórios
+              <ArrowLeft className="w-3.5 h-3.5" /> Voltar
             </Button>
             <div className="flex items-center gap-2">
-              <Badge variant="outline" className="text-[10px] gap-1 bg-accent/10 text-accent border-accent/30">
-                <CheckCircle className="w-3 h-3" /> Gerado
-              </Badge>
-              <Badge variant="outline" className="text-[10px]">
-                Ano Lectivo 2024/2025
-              </Badge>
+              <Button variant="outline" size="sm" className="gap-1.5 text-xs">
+                <Printer className="w-3.5 h-3.5" /> Imprimir
+              </Button>
+              <Button variant="outline" size="sm" className="gap-1.5 text-xs">
+                <Download className="w-3.5 h-3.5" /> Exportar PDF
+              </Button>
             </div>
           </div>
 
-          <MonthSummary data={data} monthIdx={selectedMonth} type={type} />
+          {/* Document */}
+          <div className="bg-muted/30 p-6 lg:p-10">
+            <div className="bg-background rounded-lg shadow-sm border border-border max-w-[800px] mx-auto">
+              {/* Document header — institution style */}
+              <div className="border-b-2 border-primary px-8 pt-8 pb-6">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-[10px] font-semibold text-primary uppercase tracking-[0.2em]">Universidade Privada de Angola</p>
+                    <p className="text-[9px] text-muted-foreground mt-0.5">Faculdade de Engenharia e Tecnologias</p>
+                    <p className="text-[9px] text-muted-foreground">Curso de Arquitectura</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-[9px] text-muted-foreground">Ref: RPT/{selectedMonth + 1 < 10 ? `0${selectedMonth + 1}` : selectedMonth + 1}/2025</p>
+                    <p className="text-[9px] text-muted-foreground">Data: {selectedMonth + 1 < 10 ? `0${selectedMonth + 1}` : selectedMonth + 1}/04/2025</p>
+                  </div>
+                </div>
 
-          <div className="space-y-2">
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-              {type === "cadeiras" ? `${data.length} Cadeiras` : type === "docentes" ? `${data.length} Docentes` : `${data.length} Estudantes`}
-            </p>
-            {type === "cadeiras" && <CadeirasReport data={data} monthIdx={selectedMonth} />}
-            {type === "docentes" && <DocentesReport data={data} monthIdx={selectedMonth} />}
-            {type === "estudantes" && <EstudantesReport data={data} monthIdx={selectedMonth} />}
-          </div>
+                <div className="mt-5">
+                  <h1 className="text-lg font-bold text-foreground">{reportPrefix}</h1>
+                  <p className="text-sm text-muted-foreground mt-1">{monthName} 2025 · Ano Lectivo 2024/2025</p>
+                </div>
+              </div>
 
-          <div className="flex justify-end pt-2">
-            <Button variant="outline" size="sm" className="gap-1.5 text-xs">
-              <Download className="w-3.5 h-3.5" /> Exportar Relatório
-            </Button>
+              {/* Executive summary */}
+              <div className="px-8 py-6 border-b border-border">
+                <h2 className="text-xs font-bold text-foreground uppercase tracking-wider mb-4 flex items-center gap-2">
+                  <div className="w-1 h-4 rounded-full bg-primary" />
+                  Resumo Executivo
+                </h2>
+                <p className="text-xs text-muted-foreground leading-relaxed mb-4">
+                  Este relatório apresenta os indicadores de desempenho referentes ao mês de {monthName.toLowerCase()} de 2025,
+                  abrangendo {data.length} {typeLabel.toLowerCase()} do curso. A análise contempla métricas de presença,
+                  taxa de entrega e desempenho académico geral.
+                </p>
+
+                {/* KPI grid */}
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                  <div className="rounded-md border border-border p-3">
+                    <p className="text-[9px] font-medium text-muted-foreground uppercase tracking-wider">Total {typeLabel}</p>
+                    <p className="text-xl font-bold text-foreground mt-1">{data.length}</p>
+                  </div>
+                  <div className="rounded-md border border-border p-3">
+                    <p className="text-[9px] font-medium text-muted-foreground uppercase tracking-wider">Presença Média</p>
+                    <p className={`text-xl font-bold mt-1 ${avgPresenca >= 75 ? "text-accent" : "text-destructive"}`}>{avgPresenca}%</p>
+                  </div>
+                  <div className="rounded-md border border-border p-3">
+                    <p className="text-[9px] font-medium text-muted-foreground uppercase tracking-wider">Taxa de Entrega</p>
+                    <p className={`text-xl font-bold mt-1 ${avgEntrega >= 75 ? "text-accent" : "text-destructive"}`}>{avgEntrega}%</p>
+                  </div>
+                  <div className="rounded-md border border-border p-3">
+                    <p className="text-[9px] font-medium text-muted-foreground uppercase tracking-wider">Média Geral</p>
+                    <p className={`text-xl font-bold mt-1 ${avgMedia !== null && avgMedia >= 10 ? "text-accent" : "text-destructive"}`}>{avgMedia ?? "—"}<span className="text-xs font-normal text-muted-foreground">/20</span></p>
+                  </div>
+                </div>
+
+                {/* Highlight badges */}
+                <div className="flex items-center gap-3 mt-4 flex-wrap">
+                  <div className="flex items-center gap-1.5 text-[10px]">
+                    <div className="w-2 h-2 rounded-full bg-accent" />
+                    <span className="text-muted-foreground">Acima da média: <span className="font-semibold text-accent">{approvedCount}</span></span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-[10px]">
+                    <div className="w-2 h-2 rounded-full bg-destructive" />
+                    <span className="text-muted-foreground">Em risco (presença &lt;75%): <span className="font-semibold text-destructive">{atRiskCount}</span></span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Data table section */}
+              <div className="px-8 py-6 border-b border-border">
+                <h2 className="text-xs font-bold text-foreground uppercase tracking-wider mb-4 flex items-center gap-2">
+                  <div className="w-1 h-4 rounded-full bg-primary" />
+                  Dados Detalhados — {monthName}
+                </h2>
+
+                {type === "cadeiras" && <CadeirasReport data={data} monthIdx={selectedMonth} />}
+                {type === "docentes" && <DocentesReport data={data} monthIdx={selectedMonth} />}
+                {type === "estudantes" && <EstudantesReport data={data} monthIdx={selectedMonth} />}
+              </div>
+
+              {/* Observations */}
+              <div className="px-8 py-6 border-b border-border">
+                <h2 className="text-xs font-bold text-foreground uppercase tracking-wider mb-3 flex items-center gap-2">
+                  <div className="w-1 h-4 rounded-full bg-primary" />
+                  Observações
+                </h2>
+                <ul className="space-y-2 text-xs text-muted-foreground">
+                  {atRiskCount > 0 && (
+                    <li className="flex items-start gap-2">
+                      <AlertTriangle className="w-3.5 h-3.5 text-destructive shrink-0 mt-0.5" />
+                      <span>{atRiskCount} {typeLabel.toLowerCase()} apresentam taxa de presença inferior a 75%, requerendo atenção imediata.</span>
+                    </li>
+                  )}
+                  <li className="flex items-start gap-2">
+                    <BarChart2 className="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" />
+                    <span>A média geral de {avgMedia ?? "—"}/20 encontra-se {avgMedia !== null && avgMedia >= 10 ? "acima" : "abaixo"} do limiar de aprovação.</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <TrendingUp className="w-3.5 h-3.5 text-accent shrink-0 mt-0.5" />
+                    <span>Taxa de entrega média de {avgEntrega}% — {avgEntrega >= 80 ? "dentro dos padrões esperados" : "abaixo do mínimo recomendado de 80%"}.</span>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Footer */}
+              <div className="px-8 py-4 bg-muted/20 rounded-b-lg">
+                <div className="flex items-center justify-between text-[9px] text-muted-foreground">
+                  <span>Documento gerado automaticamente · UPRA — Sistema de Gestão Académica</span>
+                  <span>Página 1 de 1</span>
+                </div>
+              </div>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
