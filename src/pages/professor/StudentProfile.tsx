@@ -38,8 +38,8 @@ export default function ProfessorStudentProfile() {
 
       {/* Profile header */}
       <div className="flex items-start gap-5">
-        <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-xl font-bold text-primary shrink-0">
-          {student.name.split(" ").map(n => n[0]).slice(0, 2).join("")}
+        <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center overflow-hidden shrink-0">
+          <img src={placeholderStudent} alt="Foto do estudante" className="w-full h-full object-cover" loading="lazy" width={64} height={64} />
         </div>
         <div className="flex-1">
           <div className="flex items-center gap-3 flex-wrap">
