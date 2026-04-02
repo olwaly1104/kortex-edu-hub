@@ -137,99 +137,106 @@ export default function CoordenadorSolicitacoes() {
         </Button>
       </div>
 
-      {/* KPI row */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {[
-          { label: "Total", value: allWithStatus.length, icon: FileText, color: "text-primary bg-primary/10" },
-          { label: "Pendentes", value: pendingRecebidas + pendingEnviadas, icon: Clock, color: "text-amber-700 bg-amber-50" },
-          { label: "Aprovadas", value: allWithStatus.filter(s => s.status === "aprovado").length, icon: CheckCircle, color: "text-emerald-700 bg-emerald-50" },
-          { label: "Rejeitadas", value: allWithStatus.filter(s => s.status === "rejeitado").length, icon: XCircle, color: "text-red-600 bg-red-50" },
-        ].map(s => (
-          <Card key={s.label} className="p-4 flex items-center gap-3">
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${s.color}`}>
-              <s.icon className="w-5 h-5" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">{s.value}</p>
-              <p className="text-xs text-muted-foreground">{s.label}</p>
-            </div>
-          </Card>
-        ))}
-      </div>
-
-      {/* Main tabs: Recebidas / Enviadas */}
-      <div className="flex flex-col gap-4">
-        <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-          <div className="flex gap-2">
-            {mainTabs.map(t => (
-              <Button
-                key={t.key}
-                size="sm"
-                variant={tab === t.key ? "default" : "outline"}
-                onClick={() => { setTab(t.key); setSubTab("pendentes"); setTypeFilter(null); }}
-                className="gap-1.5"
-              >
-                <t.icon className="w-4 h-4" />
-                {t.label}
-                {t.count > 0 && (
-                  <Badge variant="secondary" className="ml-1 text-[10px] h-5 min-w-5 justify-center">
-                    {t.count}
-                  </Badge>
-                )}
-              </Button>
-            ))}
-          </div>
-          <Separator orientation="vertical" className="h-6 hidden sm:block" />
-          <div className="flex gap-1">
-            {subTabs.map(t => (
-              <Button
-                key={t.key}
-                size="sm"
-                variant={subTab === t.key ? "secondary" : "ghost"}
-                onClick={() => setSubTab(t.key)}
-                className="text-xs gap-1 h-8"
-              >
-                {t.label}
-                <Badge variant="outline" className="text-[10px] h-4 min-w-4 justify-center ml-0.5">
+      {/* Controls box */}
+      <div className="rounded-xl border border-border bg-card p-4 space-y-3">
+        {/* Direction tabs */}
+        <div className="flex flex-wrap gap-2">
+          {mainTabs.map(t => (
+            <Button
+              key={t.key}
+              size="sm"
+              variant={tab === t.key ? "default" : "outline"}
+              onClick={() => { setTab(t.key); setSubTab("pendentes"); setTypeFilter(null); }}
+              className="text-xs gap-1.5"
+            >
+              <t.icon className="w-3.5 h-3.5" />
+              {t.label}
+              {t.count > 0 && (
+                <Badge variant="secondary" className="ml-0.5 text-[10px] h-4 min-w-4 justify-center">
                   {t.count}
                 </Badge>
+              )}
+            </Button>
+          ))}
+          <div className="w-px h-6 bg-border self-center" />
+          {subTabs.map(t => (
+            <Button
+              key={t.key}
+              size="sm"
+              variant={subTab === t.key ? "default" : "outline"}
+              onClick={() => setSubTab(t.key)}
+              className="text-xs gap-1"
+            >
+              {t.label}
+              <Badge variant="outline" className="text-[10px] h-4 min-w-4 justify-center ml-0.5">
+                {t.count}
+              </Badge>
+            </Button>
+          ))}
+        </div>
+
+        <div className="border-t border-border" />
+
+        {/* Search + Type filters */}
+        <div className="flex gap-2 items-center">
+          <div className="relative flex-1 max-w-sm">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              placeholder="Pesquisar solicitação..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              className="pl-9 h-9"
+            />
+          </div>
+
+          <div className="flex-1" />
+
+          {(search || typeFilter) && (
+            <Button variant="ghost" size="sm" className="text-xs text-destructive hover:text-destructive hover:bg-destructive/10 shrink-0 gap-1" onClick={() => { setSearch(""); setTypeFilter(null); }}>
+              <X className="w-3 h-3" /> Limpar
+            </Button>
+          )}
+
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              variant={typeFilter === null ? "default" : "outline"}
+              onClick={() => setTypeFilter(null)}
+              className="text-xs"
+            >
+              Todos
+            </Button>
+            {Object.entries(typeLabels).map(([key, label]) => (
+              <Button
+                key={key}
+                size="sm"
+                variant={typeFilter === key ? "default" : "outline"}
+                onClick={() => setTypeFilter(typeFilter === key ? null : key)}
+                className="text-xs"
+              >
+                {label}
               </Button>
             ))}
           </div>
-          <div className="flex-1" />
-          <div className="flex items-center gap-2">
-            <div className="relative">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                placeholder="Pesquisar..."
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                className="pl-9 h-9 w-48"
-              />
-            </div>
-            <div className="flex gap-1 overflow-x-auto">
-              <Button
-                size="sm"
-                variant={typeFilter === null ? "default" : "outline"}
-                onClick={() => setTypeFilter(null)}
-                className="h-8 text-xs shrink-0"
-              >
-                Todos
-              </Button>
-              {Object.entries(typeLabels).map(([key, label]) => (
-                <Button
-                  key={key}
-                  size="sm"
-                  variant={typeFilter === key ? "default" : "outline"}
-                  onClick={() => setTypeFilter(typeFilter === key ? null : key)}
-                  className="h-8 text-xs hidden lg:inline-flex shrink-0"
-                >
-                  {label}
-                </Button>
-              ))}
-            </div>
-          </div>
         </div>
+
+        {/* Active tags */}
+        {(search || typeFilter) && (
+          <div className="flex flex-wrap gap-1.5 pt-1">
+            {typeFilter && (
+              <Badge variant="outline" className="text-[10px] gap-1 bg-primary/5 text-primary border-primary/20 cursor-pointer hover:bg-primary/10" onClick={() => setTypeFilter(null)}>
+                Tipo: {typeLabels[typeFilter]}
+                <X className="w-2.5 h-2.5" />
+              </Badge>
+            )}
+            {search && (
+              <Badge variant="outline" className="text-[10px] gap-1 bg-secondary/10 text-secondary border-secondary/20 cursor-pointer hover:bg-secondary/15" onClick={() => setSearch("")}>
+                Pesquisa: "{search}"
+                <X className="w-2.5 h-2.5" />
+              </Badge>
+            )}
+          </div>
+        )}
       </div>
 
       {/* List */}

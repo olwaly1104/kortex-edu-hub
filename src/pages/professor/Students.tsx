@@ -213,8 +213,8 @@ export default function ProfessorStudents() {
                 <td className="p-3 text-center"><span className={student.avgGrade !== null && student.avgGrade >= 10 ? "text-accent font-medium" : "text-destructive font-medium"}>{student.avgGrade ?? "—"}</span></td>
                 <td className="p-3 text-center text-muted-foreground">{student.turma}</td>
                 <td className="p-3 text-center text-foreground font-medium">{studentDiscs.length}</td>
-                <td className="p-3 text-center text-foreground">{student.submittedTasks}/{student.totalTasks}</td>
-                <td className="p-3 text-center text-foreground">{avaliacoesEncerradas}/{avaliacoes.length}</td>
+                <td className="p-3 text-center"><span className={`font-medium ${student.totalTasks > 0 && Math.round((student.submittedTasks / student.totalTasks) * 100) >= 80 ? "text-secondary" : "text-destructive"}`}>{student.totalTasks > 0 ? Math.round((student.submittedTasks / student.totalTasks) * 100) : 0}%</span></td>
+                <td className="p-3 text-center"><span className={`font-medium ${avaliacoes.length > 0 && Math.round((avaliacoesEncerradas / avaliacoes.length) * 100) >= 80 ? "text-accent" : "text-destructive"}`}>{avaliacoes.length > 0 ? Math.round((avaliacoesEncerradas / avaliacoes.length) * 100) : 0}%</span></td>
                 <td className="p-3 text-center"><Badge className={`${sb} text-[10px]`}>{statusLabels[student.status]}</Badge></td>
               </tr>
             );
