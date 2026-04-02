@@ -8,6 +8,7 @@ import {
   ArrowLeft, Mail, MessageCircle, Users, BookOpen,
   CheckCircle, Clock, BarChart3, Calendar, AlertCircle,
 } from "lucide-react";
+import placeholderStudent from "@/assets/placeholder-student.jpg";
 
 export default function ProfessorStudentProfile() {
   const { studentId } = useParams();
