@@ -105,6 +105,13 @@ export default function CoordenadorCadeiras() {
         </Card>
       </div>
 
+      <div className="flex justify-end">
+        <Button variant="outline" size="sm" className="gap-1.5 text-xs" onClick={() => setShowReports(true)}>
+          <FileText className="w-3.5 h-3.5" /> Ver Relatórios
+        </Button>
+      </div>
+      <ReportsDialog open={showReports} onOpenChange={setShowReports} title="Cadeiras do Curso" reportPrefix="Relatório de Cadeiras" type="cadeiras" data={coordDisciplinas} />
+
       {/* Controls box */}
       <div className="rounded-xl border border-border bg-card p-4 space-y-3">
         {/* Year filter */}
