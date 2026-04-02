@@ -6,8 +6,9 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Users, Search, TrendingUp, AlertTriangle, Award, ArrowUpDown, X } from "lucide-react";
+import { Users, Search, TrendingUp, AlertTriangle, Award, ArrowUpDown, X, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
+import ReportsDialog from "@/components/ReportsDialog";
 
 type SortField = "media" | "presenca" | "taxaEntrega";
 type SortDir = "asc" | "desc";
