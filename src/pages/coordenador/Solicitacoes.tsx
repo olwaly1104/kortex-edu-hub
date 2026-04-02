@@ -366,14 +366,14 @@ export default function CoordenadorSolicitacoes() {
                     <Button variant="outline" className="flex-1">Fechar</Button>
                   </DialogClose>
                   <Button
-                    variant="ghost"
-                    className="text-destructive hover:text-destructive hover:bg-destructive/10 gap-1.5"
+                    variant="outline"
+                    className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 gap-1.5"
                     onClick={() => handleAction(selected.id, "rejeitado")}
                   >
                     <XCircle className="w-4 h-4" /> Rejeitar
                   </Button>
                   <Button
-                    className="bg-accent hover:bg-accent/90 text-accent-foreground gap-1.5"
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white gap-1.5"
                     onClick={() => handleAction(selected.id, "aprovado")}
                   >
                     <CheckCircle className="w-4 h-4" /> Aprovar
