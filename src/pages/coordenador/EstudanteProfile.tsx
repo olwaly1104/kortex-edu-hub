@@ -8,6 +8,7 @@ import {
   Award, Users, Phone, MapPin, UserCheck, Calendar, GraduationCap,
   CheckCircle, ClipboardList, TrendingUp,
 } from "lucide-react";
+import placeholderStudent from "@/assets/placeholder-student.jpg";
 
 const statusConfig = {
   excelente: { label: "Excelente", bg: "bg-accent/10 text-accent border-accent/30" },

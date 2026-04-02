@@ -87,7 +87,7 @@ export default function ProfessorProfile() {
       <Card className="px-5 py-4 border-l-4 border-l-primary">
         <div className="flex items-center gap-4">
           <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center shrink-0 overflow-hidden">
-            <img src="/placeholder.svg" alt="Foto" className="w-full h-full object-cover" />
+            <img src={placeholderProfessor} alt="Foto do professor" className="w-full h-full object-cover" loading="lazy" width={56} height={56} />
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
