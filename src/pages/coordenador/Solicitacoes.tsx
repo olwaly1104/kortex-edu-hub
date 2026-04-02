@@ -9,7 +9,7 @@ import {
   CheckSquare, Clock, CheckCircle, XCircle, Award,
   FileText, Calendar, Users, AlertTriangle, Search,
   Eye, Plus, Send, ArrowDownLeft, ArrowUpRight,
-  Briefcase, MessageSquare,
+  Briefcase, MessageSquare, X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
