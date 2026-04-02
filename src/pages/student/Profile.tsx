@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { User, Mail, BookOpen, Calendar, Camera, Bell, Moon, Globe, Lock, Shield, Eye } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { useState } from "react";
+import placeholderStudent from "@/assets/placeholder-student.jpg";
 
 export default function StudentProfile() {
   const { user } = useAuth();
