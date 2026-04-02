@@ -5,8 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { BookOpen, Award, ClipboardCheck, Clock, Search, ArrowUpDown, X } from "lucide-react";
+import { BookOpen, Award, ClipboardCheck, Clock, Search, ArrowUpDown, X, FileText } from "lucide-react";
 import { useState, useMemo } from "react";
+import ReportsDialog from "@/components/ReportsDialog";
 
 type SortField = "media" | "presenca" | "entrega";
 type SortDir = "asc" | "desc";
