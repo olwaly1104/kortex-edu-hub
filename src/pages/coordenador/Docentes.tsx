@@ -96,6 +96,13 @@ export default function CoordenadorDocentes() {
         </Card>
       </div>
 
+      <div className="flex justify-end">
+        <Button variant="outline" size="sm" className="gap-1.5 text-xs" onClick={() => setShowReports(true)}>
+          <FileText className="w-3.5 h-3.5" /> Ver Relatórios
+        </Button>
+      </div>
+      <ReportsDialog open={showReports} onOpenChange={setShowReports} title="Docentes do Curso" reportPrefix="Relatório de Docentes" type="docentes" data={coordDocentes.map(d => ({ ...d, media: d.mediaGeral, estudantes: d.estudantesTotal }))} />
+
       {/* Controls box - no year filter for Docentes */}
       <div className="rounded-xl border border-border bg-card p-4 space-y-3">
         {/* Search + Sort + Filter row */}
@@ -222,13 +229,6 @@ export default function CoordenadorDocentes() {
           })}</tbody>
         </table>
       </Card>
-
-      <div className="flex justify-end">
-        <Button variant="outline" size="sm" className="gap-1.5 text-xs" onClick={() => setShowReports(true)}>
-          <FileText className="w-3.5 h-3.5" /> Ver Relatórios
-        </Button>
-      </div>
-      <ReportsDialog open={showReports} onOpenChange={setShowReports} title="Docentes do Curso" reportPrefix="Relatório de Docentes" type="docentes" data={coordDocentes.map(d => ({ ...d, media: d.mediaGeral, estudantes: d.estudantesTotal }))} />
     </div>
   );
 }
