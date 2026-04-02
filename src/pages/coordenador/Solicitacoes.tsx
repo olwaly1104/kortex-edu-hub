@@ -43,14 +43,14 @@ const typeLabels: Record<string, string> = {
 };
 
 const statusConfig: Record<string, { label: string; cls: string; icon: React.ElementType }> = {
-  pendente: { label: "Pendente", cls: "bg-secondary/10 text-secondary border-secondary/20", icon: Clock },
-  aprovado: { label: "Aprovado", cls: "bg-accent/10 text-accent border-accent/20", icon: CheckCircle },
-  rejeitado: { label: "Rejeitado", cls: "bg-destructive/10 text-destructive border-destructive/20", icon: XCircle },
+  pendente: { label: "Pendente", cls: "bg-amber-50 text-amber-700 border-amber-200", icon: Clock },
+  aprovado: { label: "Aprovado", cls: "bg-emerald-50 text-emerald-700 border-emerald-200", icon: CheckCircle },
+  rejeitado: { label: "Rejeitado", cls: "bg-red-50 text-red-600 border-red-200", icon: XCircle },
 };
 
 const priorityConfig: Record<string, { label: string; cls: string }> = {
-  alta: { label: "Alta", cls: "bg-destructive/10 text-destructive" },
-  média: { label: "Média", cls: "bg-secondary/10 text-secondary" },
+  alta: { label: "Alta", cls: "bg-red-50 text-red-600" },
+  média: { label: "Média", cls: "bg-amber-50 text-amber-700" },
   baixa: { label: "Baixa", cls: "bg-muted text-muted-foreground" },
 };
 
@@ -141,9 +141,9 @@ export default function CoordenadorSolicitacoes() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           { label: "Total", value: allWithStatus.length, icon: FileText, color: "text-primary bg-primary/10" },
-          { label: "Pendentes", value: pendingRecebidas + pendingEnviadas, icon: Clock, color: "text-secondary bg-secondary/10" },
-          { label: "Aprovadas", value: allWithStatus.filter(s => s.status === "aprovado").length, icon: CheckCircle, color: "text-accent bg-accent/10" },
-          { label: "Rejeitadas", value: allWithStatus.filter(s => s.status === "rejeitado").length, icon: XCircle, color: "text-destructive bg-destructive/10" },
+          { label: "Pendentes", value: pendingRecebidas + pendingEnviadas, icon: Clock, color: "text-amber-700 bg-amber-50" },
+          { label: "Aprovadas", value: allWithStatus.filter(s => s.status === "aprovado").length, icon: CheckCircle, color: "text-emerald-700 bg-emerald-50" },
+          { label: "Rejeitadas", value: allWithStatus.filter(s => s.status === "rejeitado").length, icon: XCircle, color: "text-red-600 bg-red-50" },
         ].map(s => (
           <Card key={s.label} className="p-4 flex items-center gap-3">
             <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${s.color}`}>
@@ -279,15 +279,15 @@ export default function CoordenadorSolicitacoes() {
                         <>
                           <Button
                             size="sm"
-                            className="text-xs gap-1.5 h-8 bg-accent hover:bg-accent/90 text-accent-foreground"
+                            className="text-xs gap-1.5 h-8 bg-emerald-600 hover:bg-emerald-700 text-white"
                             onClick={() => handleAction(sol.id, "aprovado")}
                           >
                             <CheckCircle className="w-3.5 h-3.5" /> Aprovar
                           </Button>
                           <Button
-                            variant="ghost"
+                            variant="outline"
                             size="sm"
-                            className="text-xs gap-1.5 h-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                            className="text-xs gap-1.5 h-8 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
                             onClick={() => handleAction(sol.id, "rejeitado")}
                           >
                             <XCircle className="w-3.5 h-3.5" /> Rejeitar
@@ -366,14 +366,14 @@ export default function CoordenadorSolicitacoes() {
                     <Button variant="outline" className="flex-1">Fechar</Button>
                   </DialogClose>
                   <Button
-                    variant="ghost"
-                    className="text-destructive hover:text-destructive hover:bg-destructive/10 gap-1.5"
+                    variant="outline"
+                    className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 gap-1.5"
                     onClick={() => handleAction(selected.id, "rejeitado")}
                   >
                     <XCircle className="w-4 h-4" /> Rejeitar
                   </Button>
                   <Button
-                    className="bg-accent hover:bg-accent/90 text-accent-foreground gap-1.5"
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white gap-1.5"
                     onClick={() => handleAction(selected.id, "aprovado")}
                   >
                     <CheckCircle className="w-4 h-4" /> Aprovar
