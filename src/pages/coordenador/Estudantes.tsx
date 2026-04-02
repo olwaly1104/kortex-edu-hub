@@ -6,8 +6,9 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Users, Search, TrendingUp, AlertTriangle, Award, ArrowUpDown, X } from "lucide-react";
+import { Users, Search, TrendingUp, AlertTriangle, Award, ArrowUpDown, X, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
+import ReportsDialog from "@/components/ReportsDialog";
 
 type SortField = "media" | "presenca" | "taxaEntrega";
 type SortDir = "asc" | "desc";
@@ -25,6 +26,7 @@ export default function CoordenadorEstudantes() {
   const [sortField, setSortField] = useState<SortField | null>(null);
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [filterStatus, setFilterStatus] = useState<string>("todos");
+  const [showReports, setShowReports] = useState(false);
 
   const isSortActive = sortField !== null;
   const isFilterActive = filterStatus !== "todos";
@@ -67,7 +69,14 @@ export default function CoordenadorEstudantes() {
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
-      <h1 className="text-2xl font-bold text-foreground flex items-center gap-2"><Users className="w-6 h-6 text-primary" /> Estudantes do Curso</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-foreground flex items-center gap-2"><Users className="w-6 h-6 text-primary" /> Estudantes do Curso</h1>
+        <Button variant="outline" size="sm" className="gap-1.5 text-xs" onClick={() => setShowReports(true)}>
+          <FileText className="w-3.5 h-3.5" /> Ver Relatórios
+        </Button>
+      </div>
+
+      <ReportsDialog open={showReports} onOpenChange={setShowReports} title="Estudantes do Curso" reportPrefix="Relatório de Estudantes" />
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
