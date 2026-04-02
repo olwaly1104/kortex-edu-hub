@@ -62,14 +62,7 @@ export default function CoordenadorDocentes() {
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-foreground flex items-center gap-2"><GraduationCap className="w-6 h-6 text-primary" /> Docentes do Curso</h1>
-        <Button variant="outline" size="sm" className="gap-1.5 text-xs" onClick={() => setShowReports(true)}>
-          <FileText className="w-3.5 h-3.5" /> Ver Relatórios
-        </Button>
-      </div>
-
-      <ReportsDialog open={showReports} onOpenChange={setShowReports} title="Docentes do Curso" reportPrefix="Relatório de Docentes" />
+      <h1 className="text-2xl font-bold text-foreground flex items-center gap-2"><GraduationCap className="w-6 h-6 text-primary" /> Docentes do Curso</h1>
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -229,6 +222,13 @@ export default function CoordenadorDocentes() {
           })}</tbody>
         </table>
       </Card>
+
+      <div className="flex justify-end">
+        <Button variant="outline" size="sm" className="gap-1.5 text-xs" onClick={() => setShowReports(true)}>
+          <FileText className="w-3.5 h-3.5" /> Ver Relatórios
+        </Button>
+      </div>
+      <ReportsDialog open={showReports} onOpenChange={setShowReports} title="Docentes do Curso" reportPrefix="Relatório de Docentes" />
     </div>
   );
 }
