@@ -195,8 +195,8 @@ export default function ProfessorStudents() {
             <th className="text-center p-3 font-medium text-muted-foreground">Média Geral</th>
             <th className="text-center p-3 font-medium text-muted-foreground">Turma</th>
             <th className="text-center p-3 font-medium text-muted-foreground">Cadeiras</th>
-            <th className="text-center p-3 font-medium text-muted-foreground">Tarefas</th>
-            <th className="text-center p-3 font-medium text-muted-foreground">Avaliações</th>
+            <th className="text-center p-3 font-medium text-muted-foreground">Taxa de Entrega</th>
+            <th className="text-center p-3 font-medium text-muted-foreground">Taxa de Conclusão</th>
             <th className="text-center p-3 font-medium text-muted-foreground">Estado</th>
           </tr></thead>
           <tbody>{filtered.map(student => {
