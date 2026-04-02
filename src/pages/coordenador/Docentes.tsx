@@ -6,7 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { GraduationCap, Search, Users, CheckCircle, ClipboardList, Award, ArrowUpDown, X } from "lucide-react";
+import { GraduationCap, Search, Users, CheckCircle, ClipboardList, Award, ArrowUpDown, X, FileText } from "lucide-react";
+import ReportsDialog from "@/components/ReportsDialog";
 
 type SortField = "presenca" | "taxaEntrega" | "mediaGeral";
 type SortDir = "asc" | "desc";
