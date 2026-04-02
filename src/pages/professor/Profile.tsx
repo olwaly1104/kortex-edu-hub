@@ -1,5 +1,6 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { profDisciplines, profStudents, allTurmas } from "@/data/professorData";
+import placeholderProfessor from "@/assets/placeholder-professor.jpg";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
