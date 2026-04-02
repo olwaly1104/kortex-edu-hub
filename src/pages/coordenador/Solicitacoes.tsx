@@ -141,9 +141,9 @@ export default function CoordenadorSolicitacoes() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           { label: "Total", value: allWithStatus.length, icon: FileText, color: "text-primary bg-primary/10" },
-          { label: "Pendentes", value: pendingRecebidas + pendingEnviadas, icon: Clock, color: "text-secondary bg-secondary/10" },
-          { label: "Aprovadas", value: allWithStatus.filter(s => s.status === "aprovado").length, icon: CheckCircle, color: "text-accent bg-accent/10" },
-          { label: "Rejeitadas", value: allWithStatus.filter(s => s.status === "rejeitado").length, icon: XCircle, color: "text-destructive bg-destructive/10" },
+          { label: "Pendentes", value: pendingRecebidas + pendingEnviadas, icon: Clock, color: "text-amber-700 bg-amber-50" },
+          { label: "Aprovadas", value: allWithStatus.filter(s => s.status === "aprovado").length, icon: CheckCircle, color: "text-emerald-700 bg-emerald-50" },
+          { label: "Rejeitadas", value: allWithStatus.filter(s => s.status === "rejeitado").length, icon: XCircle, color: "text-red-600 bg-red-50" },
         ].map(s => (
           <Card key={s.label} className="p-4 flex items-center gap-3">
             <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${s.color}`}>
