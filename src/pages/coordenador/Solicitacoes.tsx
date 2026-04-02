@@ -279,15 +279,15 @@ export default function CoordenadorSolicitacoes() {
                         <>
                           <Button
                             size="sm"
-                            className="text-xs gap-1.5 h-8 bg-accent hover:bg-accent/90 text-accent-foreground"
+                            className="text-xs gap-1.5 h-8 bg-emerald-600 hover:bg-emerald-700 text-white"
                             onClick={() => handleAction(sol.id, "aprovado")}
                           >
                             <CheckCircle className="w-3.5 h-3.5" /> Aprovar
                           </Button>
                           <Button
-                            variant="ghost"
+                            variant="outline"
                             size="sm"
-                            className="text-xs gap-1.5 h-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                            className="text-xs gap-1.5 h-8 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
                             onClick={() => handleAction(sol.id, "rejeitado")}
                           >
                             <XCircle className="w-3.5 h-3.5" /> Rejeitar
