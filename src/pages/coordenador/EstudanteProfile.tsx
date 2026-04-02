@@ -8,6 +8,7 @@ import {
   Award, Users, Phone, MapPin, UserCheck, Calendar, GraduationCap,
   CheckCircle, ClipboardList, TrendingUp,
 } from "lucide-react";
+import placeholderStudent from "@/assets/placeholder-student.jpg";
 
 const statusConfig = {
   excelente: { label: "Excelente", bg: "bg-accent/10 text-accent border-accent/30" },
@@ -48,27 +49,34 @@ export default function CoordenadorEstudanteProfile() {
       </div>
 
       {/* Identity banner */}
-      <Card className="px-5 py-3.5 border-l-4 border-l-primary space-y-2">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-bold text-foreground">{student.name}</h2>
-          <Badge variant="outline" className={`text-xs ${sc.bg}`}>{sc.label}</Badge>
-        </div>
-        <div className="flex items-center gap-2 flex-wrap">
-          <Link to="/coordenador/curso">
-            <Badge variant="outline" className="text-[10px] gap-1 cursor-pointer hover:bg-muted/50 transition-colors"><GraduationCap className="w-3 h-3" /> {coordCursoInfo.code}</Badge>
-          </Link>
-          <Link to="/coordenador/faculdade">
-            <Badge variant="outline" className="text-[10px] gap-1 cursor-pointer hover:bg-muted/50 transition-colors"><BookOpen className="w-3 h-3" /> {coordCursoInfo.faculty}</Badge>
-          </Link>
-          <Badge variant="outline" className="text-[10px]">{student.year}º Ano · Turma {student.turma}</Badge>
-        </div>
-        <div className="flex items-center gap-2 pt-1">
-          <Button size="sm" variant="outline" className="gap-1.5 text-xs h-7">
-            <MessageCircle className="w-3.5 h-3.5" /> Chat
-          </Button>
-          <Button size="sm" variant="outline" className="gap-1.5 text-xs h-7">
-            <Mail className="w-3.5 h-3.5" /> Email
-          </Button>
+      <Card className="px-5 py-4 border-l-4 border-l-primary">
+        <div className="flex items-center gap-4">
+          <div className="w-14 h-14 rounded-full bg-muted flex items-center justify-center shrink-0 overflow-hidden">
+            <img src={placeholderStudent} alt="Foto do estudante" className="w-full h-full object-cover" loading="lazy" width={56} height={56} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h2 className="text-lg font-bold text-foreground">{student.name}</h2>
+              <Badge variant="outline" className={`text-xs ${sc.bg}`}>{sc.label}</Badge>
+            </div>
+            <div className="flex items-center gap-2 flex-wrap mt-1">
+              <Link to="/coordenador/curso">
+                <Badge variant="outline" className="text-[10px] gap-1 cursor-pointer hover:bg-muted/50 transition-colors"><GraduationCap className="w-3 h-3" /> {coordCursoInfo.code}</Badge>
+              </Link>
+              <Link to="/coordenador/faculdade">
+                <Badge variant="outline" className="text-[10px] gap-1 cursor-pointer hover:bg-muted/50 transition-colors"><BookOpen className="w-3 h-3" /> {coordCursoInfo.faculty}</Badge>
+              </Link>
+              <Badge variant="outline" className="text-[10px]">{student.year}º Ano · Turma {student.turma}</Badge>
+            </div>
+            <div className="flex items-center gap-2 mt-2">
+              <Button size="sm" variant="outline" className="gap-1.5 text-xs h-7">
+                <MessageCircle className="w-3.5 h-3.5" /> Chat
+              </Button>
+              <Button size="sm" variant="outline" className="gap-1.5 text-xs h-7">
+                <Mail className="w-3.5 h-3.5" /> Email
+              </Button>
+            </div>
+          </div>
         </div>
       </Card>
 

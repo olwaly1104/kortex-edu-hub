@@ -142,36 +142,48 @@ export default function CoordenadorSolicitacoes() {
         {/* Direction tabs */}
         <div className="flex flex-wrap gap-2">
           {mainTabs.map(t => (
-            <Button
+            <button
               key={t.key}
-              size="sm"
-              variant={tab === t.key ? "default" : "outline"}
               onClick={() => { setTab(t.key); setSubTab("pendentes"); setTypeFilter(null); }}
-              className="text-xs gap-1.5"
+              className={cn(
+                "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors",
+                tab === t.key
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted text-muted-foreground hover:bg-muted/80"
+              )}
             >
               <t.icon className="w-3.5 h-3.5" />
               {t.label}
               {t.count > 0 && (
-                <Badge variant="secondary" className="ml-0.5 text-[10px] h-4 min-w-4 justify-center">
+                <span className={cn(
+                  "ml-0.5 text-[10px] font-semibold rounded-full px-1.5 min-w-[16px] text-center",
+                  tab === t.key ? "bg-primary-foreground/20 text-primary-foreground" : "bg-background text-muted-foreground"
+                )}>
                   {t.count}
-                </Badge>
+                </span>
               )}
-            </Button>
+            </button>
           ))}
           <div className="w-px h-6 bg-border self-center" />
           {subTabs.map(t => (
-            <Button
+            <button
               key={t.key}
-              size="sm"
-              variant={subTab === t.key ? "default" : "outline"}
               onClick={() => setSubTab(t.key)}
-              className="text-xs gap-1"
+              className={cn(
+                "inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors",
+                subTab === t.key
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted text-muted-foreground hover:bg-muted/80"
+              )}
             >
               {t.label}
-              <Badge variant="outline" className="text-[10px] h-4 min-w-4 justify-center ml-0.5">
+              <span className={cn(
+                "text-[10px] font-semibold rounded-full px-1.5 min-w-[16px] text-center",
+                subTab === t.key ? "bg-primary-foreground/20 text-primary-foreground" : "bg-background text-muted-foreground"
+              )}>
                 {t.count}
-              </Badge>
-            </Button>
+              </span>
+            </button>
           ))}
         </div>
 

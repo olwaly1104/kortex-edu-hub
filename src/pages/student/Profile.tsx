@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { User, Mail, BookOpen, Calendar, Camera, Bell, Moon, Globe, Lock, Shield, Eye } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { useState } from "react";
+import placeholderStudent from "@/assets/placeholder-student.jpg";
 
 export default function StudentProfile() {
   const { user } = useAuth();
@@ -22,8 +23,8 @@ export default function StudentProfile() {
         <Card className="p-6">
           <div className="flex items-start gap-6">
             <div className="relative">
-              <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center text-2xl font-bold text-primary">
-                {user?.name.split(" ").map(n => n[0]).slice(0, 2).join("")}
+              <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center overflow-hidden">
+                <img src={placeholderStudent} alt="Foto do estudante" className="w-full h-full object-cover" loading="lazy" width={80} height={80} />
               </div>
               <button className="absolute bottom-0 right-0 w-7 h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
                 <Camera className="w-3.5 h-3.5" />
