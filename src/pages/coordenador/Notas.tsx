@@ -59,6 +59,12 @@ export default function CoordenadorNotas() {
         <p className="text-muted-foreground mt-1">{coordCursoInfo.name} · {coordCursoInfo.faculty}</p>
       </div>
 
+      {!selectedTurma && (
+        <div className="flex justify-end">
+          <ReportsMenuButton categories={notasCategories} data={coordDisciplinas} />
+        </div>
+      )}
+
       {/* Controls + KPIs */}
       {!selectedTurma && (
         <div className="rounded-xl border border-border bg-card p-4 space-y-3">
