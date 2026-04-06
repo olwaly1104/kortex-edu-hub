@@ -114,6 +114,7 @@ export default function CoordenadorEstudantes() {
               </Button>
             ))}
           </div>
+          <div className="h-6 w-px bg-border shrink-0" />
           <ReportsMenuButton categories={estudantesCategories} data={coordEstudantes} />
         </div>
 
