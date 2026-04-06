@@ -73,6 +73,7 @@ export default function CoordenadorNotas() {
                 </Button>
               ))}
             </div>
+            <div className="h-6 w-px bg-border shrink-0" />
             <ReportsMenuButton categories={notasCategories} data={coordDisciplinas} />
           </div>
 

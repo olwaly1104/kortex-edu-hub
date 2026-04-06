@@ -116,6 +116,7 @@ export default function CoordenadorCadeiras() {
               </Button>
             ))}
           </div>
+          <div className="h-6 w-px bg-border shrink-0" />
           <ReportsMenuButton categories={cadeirasCategories} data={coordDisciplinas} />
         </div>
 
