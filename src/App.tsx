@@ -156,6 +156,7 @@ function AppRoutes() {
         <Route path="/coordenador/avaliacoes/:avaliacaoId" element={<CoordenadorAvaliacaoDetail />} />
         <Route path="/coordenador/anos" element={<CoordenadorAnos />} />
         <Route path="/coordenador/cadeiras" element={<CoordenadorCadeiras />} />
+        <Route path="/coordenador/cadeiras/:cadeiraId" element={<CoordenadorCadeiraProfile />} />
         <Route path="/coordenador/anos/:year" element={<CoordenadorAnoDetail />} />
         <Route path="/coordenador/anos/:year/turma/:turmaId" element={<CoordenadorTurmaDetail />} />
         <Route path="/coordenador/anos/:year/turma/:turmaId/cadeira/:cadeiraId" element={<CoordenadorCadeiraDetail />} />
