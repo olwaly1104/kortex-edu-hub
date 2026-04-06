@@ -56,6 +56,7 @@ import CoordenadorEstudanteProfile from "./pages/coordenador/EstudanteProfile";
 import CoordenadorRelatorios from "./pages/coordenador/Relatorios";
 import CoordenadorFinancas from "./pages/coordenador/Financas";
 import CoordenadorCursoDetail from "./pages/coordenador/CursoDetail";
+import CoordenadorCadeiraProfile from "./pages/coordenador/CadeiraProfile";
 import CoordenadorFaculdadeDetail from "./pages/coordenador/FaculdadeDetail";
 import CoordenadorTarefas from "./pages/coordenador/Tarefas";
 import CoordenadorAvaliacoes from "./pages/coordenador/Avaliacoes";
