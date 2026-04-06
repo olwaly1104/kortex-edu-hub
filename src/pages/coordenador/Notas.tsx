@@ -60,24 +60,20 @@ export default function CoordenadorNotas() {
       </div>
 
       {!selectedTurma && (
-        <div className="flex justify-end">
-          <ReportsMenuButton categories={notasCategories} data={coordDisciplinas} />
-        </div>
-      )}
-
-      {/* Controls + KPIs */}
-      {!selectedTurma && (
         <div className="rounded-xl border border-border bg-card p-4 space-y-3">
-          {/* Year toggles */}
-          <div className="flex flex-wrap gap-2">
-            <Button size="sm" variant={!filterYear ? "default" : "outline"} onClick={() => setFilterYear(null)} className="text-xs">
-              Todos os Anos
-            </Button>
-            {years.map(y => (
-              <Button key={y} size="sm" variant={filterYear === y ? "default" : "outline"} onClick={() => setFilterYear(filterYear === y ? null : y)} className="text-xs">
-                {y}º Ano
+          {/* Year toggles + Reports */}
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex flex-wrap gap-2">
+              <Button size="sm" variant={!filterYear ? "default" : "outline"} onClick={() => setFilterYear(null)} className="text-xs">
+                Todos os Anos
               </Button>
-            ))}
+              {years.map(y => (
+                <Button key={y} size="sm" variant={filterYear === y ? "default" : "outline"} onClick={() => setFilterYear(filterYear === y ? null : y)} className="text-xs">
+                  {y}º Ano
+                </Button>
+              ))}
+            </div>
+            <ReportsMenuButton categories={notasCategories} data={coordDisciplinas} />
           </div>
 
           <div className="border-t border-border" />
