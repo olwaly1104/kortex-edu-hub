@@ -97,11 +97,8 @@ export default function CoordenadorDocentes() {
       </div>
 
       <div className="flex justify-end">
-        <Button variant="outline" size="sm" className="gap-1.5 text-xs" onClick={() => setShowReports(true)}>
-          <FileText className="w-3.5 h-3.5" /> Ver Relatórios
-        </Button>
+        <ReportsMenuButton categories={docentesCategories} data={coordDocentes.map(d => ({ ...d, media: d.mediaGeral, estudantes: d.estudantesTotal }))} />
       </div>
-      <ReportsDialog open={showReports} onOpenChange={setShowReports} title="Docentes do Curso" reportPrefix="Relatório de Docentes" type="docentes" data={coordDocentes.map(d => ({ ...d, media: d.mediaGeral, estudantes: d.estudantesTotal }))} />
 
       {/* Controls box - no year filter for Docentes */}
       <div className="rounded-xl border border-border bg-card p-4 space-y-3">
