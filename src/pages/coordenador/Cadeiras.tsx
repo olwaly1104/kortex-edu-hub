@@ -7,7 +7,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { BookOpen, Award, ClipboardCheck, Clock, Search, ArrowUpDown, X, FileText } from "lucide-react";
 import { useState, useMemo } from "react";
-import ReportsDialog from "@/components/ReportsDialog";
+import ReportsMenuButton, { cadeirasCategories } from "@/components/ReportsMenuButton";
 
 type SortField = "media" | "presenca" | "entrega";
 type SortDir = "asc" | "desc";
