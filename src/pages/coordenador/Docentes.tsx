@@ -106,6 +106,7 @@ export default function CoordenadorDocentes() {
           </div>
 
           <div className="flex-1" />
+          <div className="h-6 w-px bg-border shrink-0" />
           <ReportsMenuButton categories={docentesCategories} data={coordDocentes.map(d => ({ ...d, media: d.mediaGeral, estudantes: d.estudantesTotal }))} />
 
           {hasActiveControls && (
