@@ -14,6 +14,7 @@ type SortField = "media" | "presenca" | "entrega";
 type SortDir = "asc" | "desc";
 
 export default function CoordenadorCadeiras() {
+  const navigate = useNavigate();
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [search, setSearch] = useState("");
   const [sortField, setSortField] = useState<SortField | null>(null);
