@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { coordDisciplinas, coordCursoInfo } from "@/data/institutionData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +14,7 @@ type SortField = "media" | "presenca" | "entrega";
 type SortDir = "asc" | "desc";
 
 export default function CoordenadorCadeiras() {
+  const navigate = useNavigate();
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [search, setSearch] = useState("");
   const [sortField, setSortField] = useState<SortField | null>(null);
@@ -116,7 +118,6 @@ export default function CoordenadorCadeiras() {
               </Button>
             ))}
           </div>
-          <div className="h-7 w-[1.5px] bg-muted-foreground/25 shrink-0" />
           <ReportsMenuButton categories={cadeirasCategories} data={coordDisciplinas} />
         </div>
 
@@ -241,7 +242,7 @@ export default function CoordenadorCadeiras() {
           </TableHeader>
           <TableBody>
             {filtered.map(d => (
-              <TableRow key={d.id} className="hover:bg-muted/50">
+              <TableRow key={d.id} className="hover:bg-muted/50 cursor-pointer" onClick={() => navigate(`/coordenador/cadeiras/${d.id}`)}>
                 <TableCell>
                   <div>
                     <p className="text-sm font-medium text-foreground">{d.name}</p>
