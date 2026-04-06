@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { coordDisciplinas, coordCursoInfo } from "@/data/institutionData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
