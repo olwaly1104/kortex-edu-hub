@@ -242,7 +242,7 @@ export default function CoordenadorCadeiras() {
           </TableHeader>
           <TableBody>
             {filtered.map(d => (
-              <TableRow key={d.id} className="hover:bg-muted/50">
+              <TableRow key={d.id} className="hover:bg-muted/50 cursor-pointer" onClick={() => navigate(`/coordenador/cadeiras/${d.id}`)}>
                 <TableCell>
                   <div>
                     <p className="text-sm font-medium text-foreground">{d.name}</p>
