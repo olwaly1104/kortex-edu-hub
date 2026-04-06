@@ -18,7 +18,7 @@ export default function CoordenadorDocentes() {
   const [sortField, setSortField] = useState<SortField | null>(null);
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [filterStatus, setFilterStatus] = useState<string>("todos");
-  const [showReports, setShowReports] = useState(false);
+  
 
   const isSortActive = sortField !== null;
   const isFilterActive = filterStatus !== "todos";
