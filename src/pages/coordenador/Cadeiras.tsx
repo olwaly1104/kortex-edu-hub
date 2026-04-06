@@ -105,19 +105,18 @@ export default function CoordenadorCadeiras() {
         </Card>
       </div>
 
-      <div className="flex justify-end">
-        <ReportsMenuButton categories={cadeirasCategories} data={coordDisciplinas} />
-      </div>
-
       {/* Controls box */}
       <div className="rounded-xl border border-border bg-card p-4 space-y-3">
-        {/* Year filter */}
-        <div className="flex flex-wrap gap-2">
-          {[null, ...coordCursoInfo.years.map(y => y.year)].map(y => (
-            <Button key={String(y)} size="sm" variant={selectedYear === y ? "default" : "outline"} onClick={() => setSelectedYear(y)} className="text-xs">
-              {y === null ? "Todos os Anos" : `${y}º Ano`}
-            </Button>
-          ))}
+        {/* Year filter + Reports */}
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex flex-wrap gap-2">
+            {[null, ...coordCursoInfo.years.map(y => y.year)].map(y => (
+              <Button key={String(y)} size="sm" variant={selectedYear === y ? "default" : "outline"} onClick={() => setSelectedYear(y)} className="text-xs">
+                {y === null ? "Todos os Anos" : `${y}º Ano`}
+              </Button>
+            ))}
+          </div>
+          <ReportsMenuButton categories={cadeirasCategories} data={coordDisciplinas} />
         </div>
 
         {/* Divider */}

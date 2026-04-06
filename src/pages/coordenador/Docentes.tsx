@@ -96,13 +96,9 @@ export default function CoordenadorDocentes() {
         </Card>
       </div>
 
-      <div className="flex justify-end">
-        <ReportsMenuButton categories={docentesCategories} data={coordDocentes.map(d => ({ ...d, media: d.mediaGeral, estudantes: d.estudantesTotal }))} />
-      </div>
-
-      {/* Controls box - no year filter for Docentes */}
+      {/* Controls box */}
       <div className="rounded-xl border border-border bg-card p-4 space-y-3">
-        {/* Search + Sort + Filter row */}
+        {/* Reports + Search row */}
         <div className="flex gap-2 items-center">
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -110,6 +106,7 @@ export default function CoordenadorDocentes() {
           </div>
 
           <div className="flex-1" />
+          <ReportsMenuButton categories={docentesCategories} data={coordDocentes.map(d => ({ ...d, media: d.mediaGeral, estudantes: d.estudantesTotal }))} />
 
           {hasActiveControls && (
             <Button variant="ghost" size="sm" className="text-xs text-destructive hover:text-destructive hover:bg-destructive/10 shrink-0 gap-1" onClick={resetAll}>
