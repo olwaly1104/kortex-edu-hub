@@ -7,7 +7,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { BookOpen, Award, ClipboardCheck, Clock, Search, ArrowUpDown, X, FileText } from "lucide-react";
 import { useState, useMemo } from "react";
-import ReportsDialog from "@/components/ReportsDialog";
+import ReportsMenuButton, { cadeirasCategories } from "@/components/ReportsMenuButton";
 
 type SortField = "media" | "presenca" | "entrega";
 type SortDir = "asc" | "desc";
@@ -18,7 +18,7 @@ export default function CoordenadorCadeiras() {
   const [sortField, setSortField] = useState<SortField | null>(null);
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [filterStatus, setFilterStatus] = useState<string>("todos");
-  const [showReports, setShowReports] = useState(false);
+  
 
   const isSortActive = sortField !== null;
   const isFilterActive = filterStatus !== "todos";
@@ -106,11 +106,8 @@ export default function CoordenadorCadeiras() {
       </div>
 
       <div className="flex justify-end">
-        <Button variant="outline" size="sm" className="gap-1.5 text-xs" onClick={() => setShowReports(true)}>
-          <FileText className="w-3.5 h-3.5" /> Ver Relatórios
-        </Button>
+        <ReportsMenuButton categories={cadeirasCategories} data={coordDisciplinas} />
       </div>
-      <ReportsDialog open={showReports} onOpenChange={setShowReports} title="Cadeiras do Curso" reportPrefix="Relatório de Cadeiras" type="cadeiras" data={coordDisciplinas} />
 
       {/* Controls box */}
       <div className="rounded-xl border border-border bg-card p-4 space-y-3">

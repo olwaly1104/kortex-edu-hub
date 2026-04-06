@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { coordNotas, coordCursoInfo } from "@/data/institutionData";
+import { coordNotas, coordCursoInfo, coordDisciplinas } from "@/data/institutionData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Award, ChevronRight, Calendar, Clock, MapPin, User, CheckCircle, ArrowLeft } from "lucide-react";
+import ReportsMenuButton, { notasCategories } from "@/components/ReportsMenuButton";
 
 export default function CoordenadorNotas() {
   const [selectedTurma, setSelectedTurma] = useState<string | null>(null);
@@ -57,6 +58,12 @@ export default function CoordenadorNotas() {
         </h1>
         <p className="text-muted-foreground mt-1">{coordCursoInfo.name} · {coordCursoInfo.faculty}</p>
       </div>
+
+      {!selectedTurma && (
+        <div className="flex justify-end">
+          <ReportsMenuButton categories={notasCategories} data={coordDisciplinas} />
+        </div>
+      )}
 
       {/* Controls + KPIs */}
       {!selectedTurma && (

@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Users, Search, TrendingUp, AlertTriangle, Award, ArrowUpDown, X, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
-import ReportsDialog from "@/components/ReportsDialog";
+import ReportsMenuButton, { estudantesCategories } from "@/components/ReportsMenuButton";
 
 type SortField = "media" | "presenca" | "taxaEntrega";
 type SortDir = "asc" | "desc";
@@ -26,7 +26,7 @@ export default function CoordenadorEstudantes() {
   const [sortField, setSortField] = useState<SortField | null>(null);
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [filterStatus, setFilterStatus] = useState<string>("todos");
-  const [showReports, setShowReports] = useState(false);
+  
 
   const isSortActive = sortField !== null;
   const isFilterActive = filterStatus !== "todos";
@@ -104,11 +104,8 @@ export default function CoordenadorEstudantes() {
       </div>
 
       <div className="flex justify-end">
-        <Button variant="outline" size="sm" className="gap-1.5 text-xs" onClick={() => setShowReports(true)}>
-          <FileText className="w-3.5 h-3.5" /> Ver Relatórios
-        </Button>
+        <ReportsMenuButton categories={estudantesCategories} data={coordEstudantes} />
       </div>
-      <ReportsDialog open={showReports} onOpenChange={setShowReports} title="Estudantes do Curso" reportPrefix="Relatório de Estudantes" type="estudantes" data={coordEstudantes} />
 
       {/* Controls box */}
       <div className="rounded-xl border border-border bg-card p-4 space-y-3">
