@@ -196,9 +196,9 @@ export default function DecanoDashboard() {
       </div>
 
       {/* Row 2: Alertas em Risco + Solicitações */}
-      <div className="space-y-6">
+      <div className="grid lg:grid-cols-5 gap-6">
         {/* Alertas em Risco */}
-        <Card className="p-5">
+        <Card className="p-5 lg:col-span-3">
           <div className="flex items-center gap-2 mb-4">
             <AlertTriangle className="w-5 h-5 text-destructive" />
             <h2 className="text-base font-semibold text-foreground">Alertas em Risco</h2>
@@ -289,7 +289,7 @@ export default function DecanoDashboard() {
         </Card>
 
         {/* Solicitações Pendentes */}
-        <Card className="p-5">
+        <Card className="p-5 lg:col-span-2">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
               <ArrowDownLeft className="w-5 h-5 text-secondary" /> Solicitações
