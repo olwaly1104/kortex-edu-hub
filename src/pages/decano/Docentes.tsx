@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { decanoDocentes, decanoFaculty } from "@/data/institutionData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -12,6 +13,7 @@ type SortField = "presenca" | "taxaEntrega" | "mediaGeral";
 type SortDir = "asc" | "desc";
 
 export default function DecanoDocentes() {
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [filterCourse, setFilterCourse] = useState<string>("todos");
   const [sortField, setSortField] = useState<SortField | null>(null);
@@ -39,10 +41,7 @@ export default function DecanoDocentes() {
     let list = decanoDocentes
       .filter(d => filterCourse === "todos" || d.course === filterCourse)
       .filter(d => !search || d.name.toLowerCase().includes(search.toLowerCase()))
-      .filter(d => {
-        if (filterStatus === "todos") return true;
-        return getEstado(d) === filterStatus;
-      });
+      .filter(d => filterStatus === "todos" || getEstado(d) === filterStatus);
 
     if (sortField) {
       list = [...list].sort((a, b) => {
@@ -66,7 +65,6 @@ export default function DecanoDocentes() {
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       <h1 className="text-2xl font-bold text-foreground flex items-center gap-2"><GraduationCap className="w-6 h-6 text-primary" /> Docentes da Faculdade</h1>
 
-      {/* KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="p-4">
           <div className="flex items-center gap-2 mb-3">
@@ -98,9 +96,7 @@ export default function DecanoDocentes() {
         </Card>
       </div>
 
-      {/* Controls box */}
       <div className="rounded-xl border border-border bg-card p-4 space-y-3">
-        {/* Course filter */}
         <div className="flex flex-wrap gap-2">
           <Button size="sm" variant={filterCourse === "todos" ? "default" : "outline"} onClick={() => setFilterCourse("todos")} className="text-xs">Todos os Cursos</Button>
           {courses.map(c => (
@@ -110,7 +106,6 @@ export default function DecanoDocentes() {
 
         <div className="border-t border-border" />
 
-        {/* Search + Sort + Filter row */}
         <div className="flex gap-2 items-center">
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -157,38 +152,32 @@ export default function DecanoDocentes() {
           </div>
         </div>
 
-        {/* Active tags */}
         {hasActiveControls && (
           <div className="flex flex-wrap gap-1.5 pt-1">
             {isCourseActive && (
               <Badge variant="outline" className="text-[10px] gap-1 bg-primary/5 text-primary border-primary/20 cursor-pointer hover:bg-primary/10" onClick={() => setFilterCourse("todos")}>
-                Curso: {filterCourse}
-                <X className="w-2.5 h-2.5" />
+                Curso: {filterCourse} <X className="w-2.5 h-2.5" />
               </Badge>
             )}
             {isSortActive && (
               <Badge variant="outline" className="text-[10px] gap-1 bg-primary/5 text-primary border-primary/20 cursor-pointer hover:bg-primary/10" onClick={() => { setSortField(null); setSortDir("desc"); }}>
-                {sortLabel}: {dirLabel}
-                <X className="w-2.5 h-2.5" />
+                {sortLabel}: {dirLabel} <X className="w-2.5 h-2.5" />
               </Badge>
             )}
             {isFilterActive && (
               <Badge variant="outline" className="text-[10px] gap-1 bg-accent/10 text-accent border-accent/20 cursor-pointer hover:bg-accent/15" onClick={() => setFilterStatus("todos")}>
-                Estado: {filterLabel}
-                <X className="w-2.5 h-2.5" />
+                Estado: {filterLabel} <X className="w-2.5 h-2.5" />
               </Badge>
             )}
             {isSearchActive && (
               <Badge variant="outline" className="text-[10px] gap-1 bg-secondary/10 text-secondary border-secondary/20 cursor-pointer hover:bg-secondary/15" onClick={() => setSearch("")}>
-                Pesquisa: "{search}"
-                <X className="w-2.5 h-2.5" />
+                Pesquisa: "{search}" <X className="w-2.5 h-2.5" />
               </Badge>
             )}
           </div>
         )}
       </div>
 
-      {/* Table */}
       <Card className="overflow-hidden">
         <table className="w-full text-sm">
           <thead><tr className="border-b bg-muted/30">
@@ -212,7 +201,7 @@ export default function DecanoDocentes() {
                 ? "bg-destructive/15 text-destructive border-destructive/30"
                 : "bg-muted text-muted-foreground border-border";
             return (
-              <tr key={d.id} className="border-b last:border-0 hover:bg-muted/20 transition-colors">
+              <tr key={d.id} className="border-b last:border-0 hover:bg-muted/20 transition-colors cursor-pointer" onClick={() => navigate(`/decano/docentes/${d.id}`)}>
                 <td className="p-3"><p className="font-medium text-foreground">{d.name}</p><p className="text-[11px] text-muted-foreground">{d.email}</p></td>
                 <td className="p-3 text-muted-foreground text-xs">{d.course}</td>
                 <td className="p-3 text-center font-medium text-foreground">{d.estudantesTotal}</td>

@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { decanoEstudantes, decanoFaculty } from "@/data/institutionData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -18,6 +19,7 @@ const statusBadge: Record<string, { label: string; cls: string }> = {
 };
 
 export default function DecanoEstudantes() {
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [filterCourse, setFilterCourse] = useState<string>("todos");
   const [sortField, setSortField] = useState<SortField | null>(null);
@@ -161,26 +163,22 @@ export default function DecanoEstudantes() {
           <div className="flex flex-wrap gap-1.5 pt-1">
             {isCourseActive && (
               <Badge variant="outline" className="text-[10px] gap-1 bg-primary/5 text-primary border-primary/20 cursor-pointer hover:bg-primary/10" onClick={() => setFilterCourse("todos")}>
-                Curso: {filterCourse.replace("Engenharia ", "")}
-                <X className="w-2.5 h-2.5" />
+                Curso: {filterCourse.replace("Engenharia ", "")} <X className="w-2.5 h-2.5" />
               </Badge>
             )}
             {isSortActive && (
               <Badge variant="outline" className="text-[10px] gap-1 bg-primary/5 text-primary border-primary/20 cursor-pointer hover:bg-primary/10" onClick={() => { setSortField(null); setSortDir("desc"); }}>
-                {sortLabel}: {dirLabel}
-                <X className="w-2.5 h-2.5" />
+                {sortLabel}: {dirLabel} <X className="w-2.5 h-2.5" />
               </Badge>
             )}
             {isFilterActive && (
               <Badge variant="outline" className="text-[10px] gap-1 bg-accent/10 text-accent border-accent/20 cursor-pointer hover:bg-accent/15" onClick={() => setFilterStatus("todos")}>
-                Estado: {filterLabel}
-                <X className="w-2.5 h-2.5" />
+                Estado: {filterLabel} <X className="w-2.5 h-2.5" />
               </Badge>
             )}
             {isSearchActive && (
               <Badge variant="outline" className="text-[10px] gap-1 bg-secondary/10 text-secondary border-secondary/20 cursor-pointer hover:bg-secondary/15" onClick={() => setSearch("")}>
-                Pesquisa: "{search}"
-                <X className="w-2.5 h-2.5" />
+                Pesquisa: "{search}" <X className="w-2.5 h-2.5" />
               </Badge>
             )}
           </div>
@@ -205,7 +203,7 @@ export default function DecanoEstudantes() {
           <tbody>{filtered.map(e => {
             const sb = statusBadge[e.status];
             return (
-              <tr key={e.id} className="border-b last:border-0 hover:bg-muted/20 transition-colors">
+              <tr key={e.id} className="border-b last:border-0 hover:bg-muted/20 transition-colors cursor-pointer" onClick={() => navigate(`/decano/estudantes/${e.id}`)}>
                 <td className="p-3 font-medium text-foreground">{e.name}</td>
                 <td className="p-3 text-muted-foreground">{e.email}</td>
                 <td className="p-3 text-muted-foreground text-xs">{e.course}</td>
