@@ -90,16 +90,28 @@ export default function CoordenadorAvaliacaoDetail() {
 
         <div className="border-t border-border" />
 
-        {/* Guia da Avaliação */}
-        <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/40 hover:bg-muted/60 transition-colors cursor-pointer">
-          <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-            <BookOpen className="w-4 h-4 text-primary" />
+        {/* Guia + Critério side by side */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
+          <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/40 hover:bg-muted/60 transition-colors cursor-pointer">
+            <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+              <BookOpen className="w-4 h-4 text-primary" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-medium text-foreground">Guia da Avaliação</p>
+              <p className="text-[10px] text-muted-foreground">PDF · 3 páginas</p>
+            </div>
+            <Badge variant="outline" className="text-[10px] shrink-0">Abrir</Badge>
           </div>
-          <div className="min-w-0 flex-1">
-            <p className="text-xs font-medium text-foreground">Guia da Avaliação</p>
-            <p className="text-[10px] text-muted-foreground">PDF · 3 páginas</p>
+          <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/40 hover:bg-muted/60 transition-colors cursor-pointer">
+            <div className="w-9 h-9 rounded-lg bg-accent/10 flex items-center justify-center shrink-0">
+              <Award className="w-4 h-4 text-accent" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-medium text-foreground">Critério da Avaliação</p>
+              <p className="text-[10px] text-muted-foreground">PDF · 2 páginas</p>
+            </div>
+            <Badge variant="outline" className="text-[10px] shrink-0">Abrir</Badge>
           </div>
-          <Badge variant="outline" className="text-[10px] shrink-0">Abrir</Badge>
         </div>
 
         {/* Conteúdo Relevante */}
