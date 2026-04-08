@@ -91,10 +91,14 @@ export default function DecanoFaculdades() {
 
                 <div className="mx-5 border-t border-border/60" />
 
-                <div className="px-5 py-3 grid grid-cols-4 gap-3">
+                <div className="px-5 py-3 grid grid-cols-5 gap-3">
                   <div className="text-center">
                     <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-0.5">Estudantes</p>
                     <p className="text-lg font-bold text-foreground">{c.estudantes}</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-0.5">Turmas</p>
+                    <p className="text-lg font-bold text-foreground">{turmas.length}</p>
                   </div>
                   <div className="text-center">
                     <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-0.5">Docentes</p>
