@@ -1,11 +1,10 @@
-import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { coordTurmaTasks, coordTurmas, coordNotas } from "@/data/institutionData";
+import { coordTurmaTasks, coordTurmas, coordEstudantes } from "@/data/institutionData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Award, ChevronRight, Calendar, Clock, MapPin, User, CheckCircle, ArrowLeft, Users, AlertCircle, HelpCircle } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Award, Calendar, Clock, CheckCircle, ArrowLeft, Users, AlertCircle, HelpCircle, MapPin, User } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 const statusStyle: Record<string, { bg: string; label: string; icon: React.ElementType }> = {
@@ -14,6 +13,17 @@ const statusStyle: Record<string, { bg: string; label: string; icon: React.Eleme
   encerrada: { bg: "bg-accent/10 text-accent", label: "Encerrada", icon: CheckCircle },
   pendente: { bg: "bg-[hsl(38,92%,50%)]/10 text-[hsl(38,92%,40%)]", label: "Pendente", icon: AlertCircle },
 };
+
+// Generate mock student results for an evaluation
+function generateStudentResults(task: typeof coordTurmaTasks[0], turma: typeof coordTurmas[0]) {
+  const studentsInYear = coordEstudantes.filter(e => e.year === turma.year);
+  return studentsInYear.map((student, i) => {
+    const submetido = i < task.submissions;
+    const corrigido = submetido && i < task.corrected;
+    const nota = corrigido ? Math.round((Math.random() * 8 + 8) * 10) / 10 : null;
+    return { ...student, submetido, corrigido, nota };
+  });
+}
 
 export default function CoordenadorAvaliacaoDetail() {
   const { avaliacaoId } = useParams<{ avaliacaoId: string }>();
@@ -41,12 +51,7 @@ export default function CoordenadorAvaliacaoDetail() {
   const notaAtribuidaPct = task.submissions > 0 ? Math.round(task.corrected / task.submissions * 100) : 0;
   const pendingCorrection = task.submissions - task.corrected;
 
-  // Find the matching notas data for this turma
-  const yearData = coordNotas.find(n => n.year === turma.year);
-  const turmaNotas = yearData?.turmas.find(t => t.turma === turma.name.replace("Turma ", ""));
-
-  // Filter avaliacoes that match this task's discipline
-  const relatedAvaliacoes = turmaNotas?.avaliacoes.filter(a => a.cadeira === task.discipline) || [];
+  const studentResults = generateStudentResults(task, turma);
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
@@ -67,16 +72,18 @@ export default function CoordenadorAvaliacaoDetail() {
         <div className="flex items-center gap-3 mt-3 flex-wrap">
           <Badge variant="outline" className="text-xs">{task.discipline}</Badge>
           <Badge variant="outline" className="text-xs">{turma.name} · {turma.year}º Ano</Badge>
+          <Badge variant="outline" className="text-xs">{task.modality === "online" ? "Online" : "Presencial"}</Badge>
+          <Badge variant="outline" className="text-xs">{task.type === "quiz" ? "Quiz" : task.type === "exame" ? "Exame" : "Tarefa"}</Badge>
         </div>
       </div>
 
       {/* KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
-        <KpiCard label="Data" value={task.dueDate} icon={Calendar} iconBg="bg-primary/10" iconColor="text-primary" tooltip="Data de realização da avaliação." />
-        <KpiCard label="Peso" value={`${task.weight}%`} icon={Award} iconBg="bg-accent/10" iconColor="text-accent" tooltip="Peso desta avaliação na nota final da cadeira." />
-        <KpiCard label="Submissões" value={`${task.submissions}/${task.totalStudents}`} icon={Users} iconBg="bg-primary/10" iconColor="text-primary" tooltip="Número de estudantes que submeteram vs total inscrito." />
-        <KpiCard label="Corrigidos" value={`${task.corrected}/${task.submissions}`} icon={CheckCircle} iconBg="bg-accent/10" iconColor="text-accent" tooltip="Número de submissões com nota atribuída pelo docente." />
-        <KpiCard label="Média" value={task.avgGrade !== null ? `${task.avgGrade}/20` : "—"} icon={Award} iconBg={task.avgGrade !== null && task.avgGrade >= 10 ? "bg-accent/10" : "bg-destructive/10"} iconColor={task.avgGrade !== null && task.avgGrade >= 10 ? "text-accent" : "text-destructive"} tooltip="Média aritmética das notas atribuídas." />
+        <KpiCard label="Data" value={task.dueDate} icon={Calendar} iconBg="bg-primary/10" iconColor="text-primary" />
+        <KpiCard label="Peso" value={`${task.weight}%`} icon={Award} iconBg="bg-accent/10" iconColor="text-accent" />
+        <KpiCard label="Submissões" value={`${task.submissions}/${task.totalStudents}`} icon={Users} iconBg="bg-primary/10" iconColor="text-primary" />
+        <KpiCard label="Corrigidos" value={`${task.corrected}/${task.submissions}`} icon={CheckCircle} iconBg="bg-accent/10" iconColor="text-accent" />
+        <KpiCard label="Média" value={task.avgGrade !== null ? `${task.avgGrade}/20` : "—"} icon={Award} iconBg={task.avgGrade !== null && task.avgGrade >= 10 ? "bg-accent/10" : "bg-destructive/10"} iconColor={task.avgGrade !== null && task.avgGrade >= 10 ? "text-accent" : "text-destructive"} />
       </div>
 
       {/* Progress bars */}
@@ -112,133 +119,95 @@ export default function CoordenadorAvaliacaoDetail() {
         </div>
       )}
 
-      {/* Related grades from Notas */}
-      {relatedAvaliacoes.length > 0 && (
-        <div className="space-y-3">
-          <h2 className="text-sm font-semibold text-foreground flex items-center gap-2">
-            Resultados da Cadeira — {task.discipline}
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <HelpCircle className="w-3.5 h-3.5 text-muted-foreground/50 cursor-help" />
-              </TooltipTrigger>
-              <TooltipContent side="top" className="max-w-[240px] text-xs">
-                Todas as avaliações desta cadeira na turma seleccionada, com médias e taxas de aprovação.
-              </TooltipContent>
-            </Tooltip>
-          </h2>
-          {relatedAvaliacoes.map((a, i) => {
-            const total = a.aprovados + a.reprovados;
-            return (
-              <Card key={`${a.code}-${i}`} className="p-4 border-l-[3px]" style={{ borderLeftColor: a.media >= 10 ? "hsl(var(--accent) / 0.6)" : "hsl(var(--destructive) / 0.6)" }}>
-                <div className="flex items-center gap-4">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <p className="text-xs font-semibold text-foreground">{a.name}</p>
-                      <Badge variant="outline" className="text-[10px] font-mono">{a.code}</Badge>
-                    </div>
-                    <div className="flex items-center gap-3 text-[10px] text-muted-foreground flex-wrap">
-                      <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{a.date}</span>
-                      <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{a.time}</span>
-                      <span className="flex items-center gap-1">{a.period}</span>
-                      <span className="flex items-center gap-1"><User className="w-3 h-3" />{a.professor}</span>
-                      <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{a.local}</span>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-4 gap-4 shrink-0 text-center">
-                    <div>
-                      <p className="text-[10px] text-muted-foreground uppercase">Média</p>
-                      <p className={`text-xs font-bold ${a.media >= 10 ? "text-accent" : "text-destructive"}`}>{a.media}/20</p>
-                    </div>
-                    <div>
-                      <p className="text-[10px] text-muted-foreground uppercase">Partic.</p>
-                      <p className="text-xs font-bold text-foreground">{total}</p>
-                    </div>
-                    <div>
-                      <p className="text-[10px] text-muted-foreground uppercase">Aprov.</p>
-                      <p className="text-xs font-bold text-accent">{a.aprovados} ({total > 0 ? Math.round((a.aprovados / total) * 100) : 0}%)</p>
-                    </div>
-                    <div>
-                      <p className="text-[10px] text-muted-foreground uppercase">Reprov.</p>
-                      <p className="text-xs font-bold text-destructive">{a.reprovados} ({total > 0 ? Math.round((a.reprovados / total) * 100) : 0}%)</p>
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            );
-          })}
+      {/* Student Results Table */}
+      <Card className="overflow-hidden">
+        <div className="p-4 border-b bg-muted/30 flex items-center justify-between">
+          <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+            <Users className="w-4 h-4" /> Estudantes ({studentResults.length})
+          </h3>
+          <div className="flex gap-2 text-[10px]">
+            <Badge variant="outline" className="bg-accent/10 text-accent border-accent/20">
+              {studentResults.filter(s => s.corrigido).length} Corrigidos
+            </Badge>
+            <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20">
+              {studentResults.filter(s => s.submetido && !s.corrigido).length} Por corrigir
+            </Badge>
+            <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/20">
+              {studentResults.filter(s => !s.submetido).length} Não submetido
+            </Badge>
+          </div>
         </div>
-      )}
-
-      {/* All turma grades if available */}
-      {turmaNotas && turmaNotas.avaliacoes.length > 0 && (
-        <div className="space-y-3">
-          <h2 className="text-sm font-semibold text-foreground flex items-center gap-2">
-            Todas as Avaliações — {turma.name}
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <HelpCircle className="w-3.5 h-3.5 text-muted-foreground/50 cursor-help" />
-              </TooltipTrigger>
-              <TooltipContent side="top" className="max-w-[240px] text-xs">
-                Listagem completa de todas as avaliações realizadas nesta turma, independentemente da cadeira.
-              </TooltipContent>
-            </Tooltip>
-          </h2>
-          {turmaNotas.avaliacoes.map((a, i) => {
-            const total = a.aprovados + a.reprovados;
-            return (
-              <Card key={`all-${a.code}-${i}`} className="p-4 border-l-[3px]" style={{ borderLeftColor: a.media >= 10 ? "hsl(var(--accent) / 0.6)" : "hsl(var(--destructive) / 0.6)" }}>
-                <div className="flex items-center gap-4">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <p className="text-xs font-semibold text-foreground">{a.name}</p>
-                      <Badge variant="outline" className="text-[10px] font-mono">{a.code}</Badge>
-                    </div>
-                    <p className="text-[10px] text-muted-foreground font-medium mb-1">{a.cadeira}</p>
-                    <div className="flex items-center gap-3 text-[10px] text-muted-foreground flex-wrap">
-                      <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{a.date}</span>
-                      <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{a.time}</span>
-                      <span className="flex items-center gap-1"><User className="w-3 h-3" />{a.professor}</span>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-3 gap-4 shrink-0 text-center">
-                    <div>
-                      <p className="text-[10px] text-muted-foreground uppercase">Média</p>
-                      <p className={`text-xs font-bold ${a.media >= 10 ? "text-accent" : "text-destructive"}`}>{a.media}/20</p>
-                    </div>
-                    <div>
-                      <p className="text-[10px] text-muted-foreground uppercase">Aprov.</p>
-                      <p className="text-xs font-bold text-accent">{total > 0 ? Math.round((a.aprovados / total) * 100) : 0}%</p>
-                    </div>
-                    <div>
-                      <p className="text-[10px] text-muted-foreground uppercase">Reprov.</p>
-                      <p className={`text-xs font-bold ${(total > 0 && Math.round((a.reprovados / total) * 100) > 30) ? "text-destructive" : "text-foreground"}`}>{total > 0 ? Math.round((a.reprovados / total) * 100) : 0}%</p>
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            );
-          })}
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="text-xs">Estudante</TableHead>
+                <TableHead className="text-xs">Turma</TableHead>
+                <TableHead className="text-xs text-center">Submetido</TableHead>
+                <TableHead className="text-xs text-center">Corrigido</TableHead>
+                <TableHead className="text-xs text-center">Nota</TableHead>
+                <TableHead className="text-xs text-center">Estado</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {studentResults.map(s => (
+                <TableRow key={s.id} className="hover:bg-muted/50">
+                  <TableCell>
+                    <Link to={`/coordenador/estudantes/${s.id}`} className="text-sm font-medium text-foreground hover:text-primary transition-colors">
+                      {s.name}
+                    </Link>
+                    <p className="text-[10px] text-muted-foreground">{s.email}</p>
+                  </TableCell>
+                  <TableCell className="text-xs text-muted-foreground">T{s.turma}</TableCell>
+                  <TableCell className="text-center">
+                    {s.submetido ? (
+                      <CheckCircle className="w-4 h-4 text-accent mx-auto" />
+                    ) : (
+                      <AlertCircle className="w-4 h-4 text-destructive mx-auto" />
+                    )}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    {s.corrigido ? (
+                      <CheckCircle className="w-4 h-4 text-accent mx-auto" />
+                    ) : s.submetido ? (
+                      <Clock className="w-4 h-4 text-primary mx-auto" />
+                    ) : (
+                      <span className="text-xs text-muted-foreground">—</span>
+                    )}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    {s.nota !== null ? (
+                      <span className={`text-xs font-bold ${s.nota >= 10 ? "text-accent" : "text-destructive"}`}>{s.nota}/20</span>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">—</span>
+                    )}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <Badge variant="outline" className={`text-[10px] ${
+                      s.corrigido ? "bg-accent/10 text-accent border-accent/20" :
+                      s.submetido ? "bg-primary/10 text-primary border-primary/20" :
+                      "bg-destructive/10 text-destructive border-destructive/20"
+                    }`}>
+                      {s.corrigido ? "Corrigido" : s.submetido ? "Por corrigir" : "Não submetido"}
+                    </Badge>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
-      )}
+      </Card>
     </div>
   );
 }
 
-function KpiCard({ label, value, icon: Icon, iconBg, iconColor, tooltip }: {
-  label: string; value: string; icon: React.ElementType; iconBg: string; iconColor: string; tooltip: string;
+function KpiCard({ label, value, icon: Icon, iconBg, iconColor }: {
+  label: string; value: string; icon: React.ElementType; iconBg: string; iconColor: string;
 }) {
   return (
     <div className="rounded-xl border border-border bg-card p-4">
       <div className="flex items-center justify-between mb-2">
-        <div className="flex items-center gap-1.5">
-          <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">{label}</p>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <HelpCircle className="w-3 h-3 text-muted-foreground/50 cursor-help" />
-            </TooltipTrigger>
-            <TooltipContent side="top" className="max-w-[200px] text-xs">{tooltip}</TooltipContent>
-          </Tooltip>
-        </div>
+        <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">{label}</p>
         <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${iconBg}`}>
           <Icon className={`w-3.5 h-3.5 ${iconColor}`} />
         </div>
