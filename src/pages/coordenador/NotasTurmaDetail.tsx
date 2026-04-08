@@ -120,6 +120,7 @@ export default function NotasTurmaDetail() {
               style={{ borderLeftColor: a.media >= 10 ? "hsl(var(--accent) / 0.6)" : "hsl(var(--destructive) / 0.6)" }}
               onClick={() => navigate(`/coordenador/avaliacoes/${taskId}`)}
             >
+              <div className="flex items-center gap-4">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <p className="text-xs font-semibold text-foreground">{a.name}</p>
