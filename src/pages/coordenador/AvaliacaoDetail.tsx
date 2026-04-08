@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Award, Calendar, Clock, CheckCircle, ArrowLeft, Users, AlertCircle, HelpCircle, MapPin, User } from "lucide-react";
+import { Award, Calendar, Clock, CheckCircle, ArrowLeft, Users, AlertCircle, HelpCircle, MapPin, User, BookOpen, FileText, Link2 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 const statusStyle: Record<string, { bg: string; label: string; icon: React.ElementType }> = {
@@ -86,7 +86,61 @@ export default function CoordenadorAvaliacaoDetail() {
         <KpiCard label="Média" value={task.avgGrade !== null ? `${task.avgGrade}/20` : "—"} icon={Award} iconBg={task.avgGrade !== null && task.avgGrade >= 10 ? "bg-accent/10" : "bg-destructive/10"} iconColor={task.avgGrade !== null && task.avgGrade >= 10 ? "text-accent" : "text-destructive"} />
       </div>
 
-      {/* Progress bars + Student Table in same card */}
+      {/* Guia da Avaliação + Conteúdo Relevante */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <Card className="p-5 space-y-3">
+          <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+            <BookOpen className="w-4 h-4 text-primary" /> Guia da Avaliação
+          </h3>
+          <div className="space-y-2.5 text-xs text-muted-foreground">
+            <div className="flex items-start gap-2">
+              <span className="font-medium text-foreground min-w-[80px]">Formato</span>
+              <span>{task.type === "quiz" ? "Quiz online — resposta múltipla" : task.type === "exame" ? "Exame presencial — prova escrita" : "Entrega de trabalho individual"}</span>
+            </div>
+            <div className="flex items-start gap-2">
+              <span className="font-medium text-foreground min-w-[80px]">Duração</span>
+              <span>{task.type === "quiz" ? "45 minutos" : task.type === "exame" ? "2 horas" : "Sem limite"}</span>
+            </div>
+            <div className="flex items-start gap-2">
+              <span className="font-medium text-foreground min-w-[80px]">Tentativas</span>
+              <span>{task.type === "quiz" ? "1 tentativa" : "Submissão única"}</span>
+            </div>
+            <div className="flex items-start gap-2">
+              <span className="font-medium text-foreground min-w-[80px]">Critérios</span>
+              <span>Clareza, rigor técnico, fundamentação teórica</span>
+            </div>
+            <div className="flex items-start gap-2">
+              <span className="font-medium text-foreground min-w-[80px]">Observações</span>
+              <span>Consulta de material não é permitida durante a prova.</span>
+            </div>
+          </div>
+        </Card>
+
+        <Card className="p-5 space-y-3">
+          <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+            <FileText className="w-4 h-4 text-primary" /> Conteúdo Relevante
+          </h3>
+          <div className="space-y-2">
+            {[
+              { name: "Capítulo 4 — Estruturas de Dados", type: "PDF" },
+              { name: "Slides Aula 7 — Algoritmos de Ordenação", type: "PPTX" },
+              { name: "Exercícios Práticos — Semana 5", type: "PDF" },
+              { name: "Vídeo: Revisão para o Teste", type: "Link" },
+            ].map((item, i) => (
+              <div key={i} className="flex items-center gap-3 p-2.5 rounded-lg bg-muted/40 hover:bg-muted/60 transition-colors">
+                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                  {item.type === "Link" ? <Link2 className="w-3.5 h-3.5 text-primary" /> : <FileText className="w-3.5 h-3.5 text-primary" />}
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs font-medium text-foreground truncate">{item.name}</p>
+                  <p className="text-[10px] text-muted-foreground">{item.type}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      </div>
+
       <Card className="overflow-hidden">
         {task.status !== "rascunho" && (
           <div className="p-5 space-y-4 border-b border-border">
