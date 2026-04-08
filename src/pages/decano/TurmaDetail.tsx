@@ -15,6 +15,11 @@ import { Button } from "@/components/ui/button";
 import { useState, useMemo } from "react";
 import { useToast } from "@/hooks/use-toast";
 
+const getEstado = (media: number) =>
+  media >= 14 ? { label: "Excelente", cls: "bg-accent/15 text-accent border-accent/30" }
+  : media >= 10 ? { label: "Normal", cls: "bg-muted text-muted-foreground border-border" }
+  : { label: "Em Risco", cls: "bg-destructive/15 text-destructive border-destructive/30" };
+
 // Generate mock lessons for any turma
 function generateLessons(turmaId: string, turma: { estudantes: number; name: string }) {
   const disciplines = ["Matemática I", "Física Aplicada", "Desenho Técnico", "Programação", "Química Geral"];
