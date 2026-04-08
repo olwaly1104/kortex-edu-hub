@@ -65,7 +65,7 @@ export default function CoordenadorAvaliacaoDetail() {
         <div className="relative border-b border-border">
           <div className="absolute inset-0 bg-gradient-to-r from-primary/6 via-primary/3 to-transparent" />
           <div className="relative px-5 py-4">
-            <div className="flex items-center justify-between gap-4 mb-2">
+            <div className="flex items-center gap-2.5 mb-2">
               <h1 className="text-xl font-bold text-foreground tracking-tight leading-tight">{task.title}</h1>
               <Badge className={`${sStyle.bg} gap-1.5 text-[11px] border-0 px-2.5 py-1 shrink-0`}>
                 <StatusIcon className="w-3 h-3" />
