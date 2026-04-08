@@ -128,6 +128,27 @@ const reitoriaSections: NavSection[] = [
   ]},
 ];
 
+const reitorSections: NavSection[] = [
+  { title: "Geral", items: [
+    { label: "Início", icon: LayoutDashboard, path: "/reitor" },
+    { label: "Calendário", icon: Calendar, path: "/reitor/calendario" },
+    { label: "Anúncios", icon: Megaphone, path: "/reitor/anuncios" },
+    { label: "Solicitações", icon: CheckSquare, path: "/reitor/solicitacoes" },
+  ]},
+  { title: "Académico", items: [
+    { label: "Faculdades", icon: Building2, path: "/reitor/faculdades" },
+    { label: "Decanos", icon: UserCog, path: "/reitor/decanos" },
+    { label: "Coordenadores", icon: GraduationCap, path: "/reitor/coordenadores" },
+    { label: "Docentes", icon: Users, path: "/reitor/docentes" },
+    { label: "Notas", icon: Award, path: "/reitor/notas" },
+    { label: "Relatórios & Análise", icon: BarChart3, path: "/reitor/relatorios" },
+  ]},
+  { title: "Pessoal", items: [
+    { label: "Finanças", icon: Wallet, path: "/reitor/financas" },
+    { label: "Perfil", icon: User, path: "/reitor/perfil" },
+  ]},
+];
+
 const secretariaSections: NavSection[] = [
   { title: "Geral", items: [
     { label: "Início", icon: LayoutDashboard, path: "/secretaria" },
@@ -158,6 +179,7 @@ const roleSectionsMap: Record<string, NavSection[]> = {
   coordenador_curso: coordenadorCursoSections,
   decano: decanoSections,
   reitoria: reitoriaSections,
+  reitor: reitorSections,
   secretaria: secretariaSections,
 };
 

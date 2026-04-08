@@ -929,3 +929,85 @@ export const decanoCoordenadores: DecanoCoordenador[] = [
   { id: "fc5", name: "Dr. Paulo Henriques", email: "p.henriques@upra.kor", course: "Engenharia Ambiental", courseCode: "EAMB", department: "Ciências Ambientais", estudantesTotal: 145, docentesTotal: 10, turmasTotal: 8, cadeirasTotal: 20, presenca: 95, mediaGeral: 14.1, taxaEntrega: 93, taxaAprovacao: 87, status: "activo" },
   { id: "fc6", name: "Dra. Carla Nunes", email: "c.nunes@upra.kor", course: "Engenharia Química", courseCode: "EQUI", department: "Química Industrial", estudantesTotal: 180, docentesTotal: 6, turmasTotal: 10, cadeirasTotal: 30, presenca: 83, mediaGeral: 12.5, taxaEntrega: 78, taxaAprovacao: 72, status: "activo" },
 ];
+
+// ── Reitor Data ──
+
+export interface ReitorFacultyDetail {
+  id: string;
+  name: string;
+  dean: string;
+  deanId: string;
+  courses: { id: string; name: string; code: string; coordinator: string; estudantes: number; docentes: number; mediaGeral: number; presenca: number; years: number; }[];
+  totalEstudantes: number;
+  totalDocentes: number;
+  totalCursos: number;
+  mediaGeral: number;
+  presenca: number;
+  taxaSucesso: number;
+}
+
+export const reitorFaculties: ReitorFacultyDetail[] = [
+  {
+    id: "f1", name: "Faculdade de Arquitectura", dean: "Prof. Dr. Ricardo Almeida", deanId: "dec1",
+    totalEstudantes: 1240, totalDocentes: 86, totalCursos: 6, mediaGeral: 13.3, presenca: 84, taxaSucesso: 81,
+    courses: [
+      { id: "rf1c1", name: "Engenharia Civil", code: "ECIV", coordinator: "Dr. Manuel Rodrigues", estudantes: 229, docentes: 18, mediaGeral: 13.5, presenca: 82, years: 5 },
+      { id: "rf1c2", name: "Engenharia Informática", code: "EINF", coordinator: "Dra. Teresa Moura", estudantes: 312, docentes: 22, mediaGeral: 13.8, presenca: 85, years: 4 },
+      { id: "rf1c3", name: "Engenharia Mecânica", code: "EMEC", coordinator: "Dr. Jorge Bastos", estudantes: 198, docentes: 16, mediaGeral: 12.9, presenca: 80, years: 5 },
+      { id: "rf1c4", name: "Engenharia Electrotécnica", code: "EELT", coordinator: "Dra. Fernanda Reis", estudantes: 176, docentes: 14, mediaGeral: 13.2, presenca: 83, years: 5 },
+      { id: "rf1c5", name: "Engenharia Ambiental", code: "EAMB", coordinator: "Dr. Paulo Henriques", estudantes: 145, docentes: 10, mediaGeral: 14.1, presenca: 88, years: 4 },
+      { id: "rf1c6", name: "Engenharia Química", code: "EQUI", coordinator: "Dra. Carla Nunes", estudantes: 180, docentes: 6, mediaGeral: 12.5, presenca: 78, years: 5 },
+    ],
+  },
+  {
+    id: "f2", name: "Faculdade de Economia", dean: "Profª. Dra. Helena Sousa", deanId: "dec2",
+    totalEstudantes: 980, totalDocentes: 52, totalCursos: 4, mediaGeral: 13.8, presenca: 86, taxaSucesso: 84,
+    courses: [
+      { id: "rf2c1", name: "Gestão de Empresas", code: "GEST", coordinator: "Dr. Álvaro Mendes", estudantes: 340, docentes: 18, mediaGeral: 14.2, presenca: 88, years: 4 },
+      { id: "rf2c2", name: "Contabilidade e Finanças", code: "CONT", coordinator: "Dra. Beatriz Santos", estudantes: 280, docentes: 14, mediaGeral: 13.5, presenca: 85, years: 4 },
+      { id: "rf2c3", name: "Economia", code: "ECON", coordinator: "Dr. Rui Tavares", estudantes: 210, docentes: 12, mediaGeral: 13.9, presenca: 84, years: 4 },
+      { id: "rf2c4", name: "Marketing", code: "MARK", coordinator: "Dra. Inês Ferreira", estudantes: 150, docentes: 8, mediaGeral: 13.6, presenca: 87, years: 3 },
+    ],
+  },
+  {
+    id: "f3", name: "Faculdade de Direito", dean: "Prof. Dr. Tomás Carvalho", deanId: "dec3",
+    totalEstudantes: 1120, totalDocentes: 68, totalCursos: 3, mediaGeral: 12.9, presenca: 81, taxaSucesso: 76,
+    courses: [
+      { id: "rf3c1", name: "Direito Civil", code: "DCIV", coordinator: "Dr. Nuno Barros", estudantes: 420, docentes: 26, mediaGeral: 12.8, presenca: 80, years: 5 },
+      { id: "rf3c2", name: "Direito Penal", code: "DPEN", coordinator: "Dra. Sofia Lima", estudantes: 380, docentes: 22, mediaGeral: 13.1, presenca: 82, years: 5 },
+      { id: "rf3c3", name: "Direito Internacional", code: "DINT", coordinator: "Dr. Pedro Viana", estudantes: 320, docentes: 20, mediaGeral: 12.7, presenca: 79, years: 5 },
+    ],
+  },
+  {
+    id: "f4", name: "Faculdade de Medicina", dean: "Profª. Dra. Margarida Lopes", deanId: "dec4",
+    totalEstudantes: 860, totalDocentes: 72, totalCursos: 4, mediaGeral: 13.1, presenca: 90, taxaSucesso: 74,
+    courses: [
+      { id: "rf4c1", name: "Medicina Geral", code: "MGER", coordinator: "Dra. Leonor Pinto", estudantes: 310, docentes: 28, mediaGeral: 13.4, presenca: 92, years: 6 },
+      { id: "rf4c2", name: "Enfermagem", code: "ENFE", coordinator: "Dra. Clara Rocha", estudantes: 240, docentes: 18, mediaGeral: 12.8, presenca: 89, years: 4 },
+      { id: "rf4c3", name: "Farmácia", code: "FARM", coordinator: "Dr. Vítor Soares", estudantes: 180, docentes: 14, mediaGeral: 13.0, presenca: 88, years: 5 },
+      { id: "rf4c4", name: "Análises Clínicas", code: "ACLI", coordinator: "Dra. Ana Mota", estudantes: 130, docentes: 12, mediaGeral: 13.2, presenca: 91, years: 4 },
+    ],
+  },
+  {
+    id: "f5", name: "Faculdade de Ciências Sociais", dean: "Prof. Dr. Fernando Dias", deanId: "dec5",
+    totalEstudantes: 620, totalDocentes: 34, totalCursos: 5, mediaGeral: 14.0, presenca: 83, taxaSucesso: 82,
+    courses: [
+      { id: "rf5c1", name: "Sociologia", code: "SOCI", coordinator: "Dr. Miguel Costa", estudantes: 140, docentes: 8, mediaGeral: 14.2, presenca: 84, years: 4 },
+      { id: "rf5c2", name: "Psicologia", code: "PSIC", coordinator: "Dra. Joana Martins", estudantes: 160, docentes: 10, mediaGeral: 14.5, presenca: 86, years: 5 },
+      { id: "rf5c3", name: "Comunicação Social", code: "COMS", coordinator: "Dr. André Pereira", estudantes: 130, docentes: 6, mediaGeral: 13.8, presenca: 82, years: 4 },
+      { id: "rf5c4", name: "Relações Internacionais", code: "RINT", coordinator: "Dra. Lúcia Alves", estudantes: 110, docentes: 6, mediaGeral: 13.6, presenca: 80, years: 4 },
+      { id: "rf5c5", name: "Serviço Social", code: "SESO", coordinator: "Dra. Marta Fonseca", estudantes: 80, docentes: 4, mediaGeral: 14.0, presenca: 83, years: 4 },
+    ],
+  },
+];
+
+export const reitorSolicitacoes: Solicitacao[] = [
+  { id: "rs1", type: "plano", title: "Abertura de novo curso — Ciência de Dados", description: "Proposta de criação do curso de Ciência de Dados na Fac. de Arquitectura.", requester: "Prof. Dr. Ricardo Almeida", destinatario: "Reitor", date: "28/02/2024", status: "pendente", priority: "alta", direction: "recebida" },
+  { id: "rs2", type: "recurso", title: "Orçamento anual — Faculdade de Medicina", description: "Aprovação do orçamento para equipamentos laboratoriais.", requester: "Profª. Dra. Margarida Lopes", destinatario: "Reitor", date: "26/02/2024", status: "pendente", priority: "alta", direction: "recebida" },
+  { id: "rs3", type: "plano", title: "Protocolo internacional — Universidade de Lisboa", description: "Acordo de mobilidade estudantil e docente.", requester: "Gabinete de Relações Internacionais", destinatario: "Reitor", date: "25/02/2024", status: "pendente", priority: "alta", direction: "recebida" },
+  { id: "rs4", type: "horário", title: "Calendário académico 2024/2025", description: "Aprovação do calendário académico do próximo ano lectivo.", requester: "Serviços Académicos", destinatario: "Reitor", date: "23/02/2024", status: "pendente", priority: "média", direction: "recebida" },
+  { id: "rs5", type: "recurso", title: "Renovação de protocolo — Hospital Central", description: "Renovação do protocolo de estágios com o Hospital Central de Luanda.", requester: "Profª. Dra. Margarida Lopes", destinatario: "Reitor", date: "20/02/2024", status: "aprovado", priority: "alta", direction: "recebida" },
+  { id: "rs6", type: "plano", title: "Regulamento de propinas 2024/2025", description: "Actualização das tabelas de propinas.", requester: "Direcção Financeira", destinatario: "Reitor", date: "18/02/2024", status: "aprovado", priority: "alta", direction: "recebida" },
+  { id: "rs7", type: "material", title: "Pedido de equipamento para laboratórios", description: "Solicitar equipamento de última geração para os laboratórios de Engenharia.", requester: "Prof. Dr. António Bernardo", destinatario: "Ministério da Educação", date: "15/02/2024", status: "pendente", priority: "média", direction: "enviada" },
+  { id: "rs8", type: "reunião", title: "Reunião com parceiros internacionais", description: "Agendar reunião com universidades parceiras.", requester: "Prof. Dr. António Bernardo", destinatario: "Gabinete Relações Internacionais", date: "12/02/2024", status: "aprovado", priority: "baixa", direction: "enviada" },
+];
