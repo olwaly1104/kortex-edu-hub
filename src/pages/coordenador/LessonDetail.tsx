@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
   ArrowLeft, Video, Clock, Calendar, Users, Play, User,
-  Maximize2, Minimize2,
+  Maximize2, Minimize2, BookOpen,
 } from "lucide-react";
 import { useState } from "react";
 import LessonTabs, { generateAttendance } from "@/components/LessonTabs";
