@@ -1,5 +1,5 @@
 import { useAuth } from "@/contexts/AuthContext";
-import { decanoFaculty, decanoAprovacoes, decanoTurmas, decanoCoordenadores } from "@/data/institutionData";
+import { decanoFaculty, decanoSolicitacoes, decanoTurmas, decanoCoordenadores } from "@/data/institutionData";
 import { announcements, coordAgendaEvents } from "@/data/mockData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -46,7 +46,7 @@ const priorityStyles: Record<string, string> = {
 export default function DecanoDashboard() {
   const { user } = useAuth();
   const fac = decanoFaculty;
-  const pendentes = decanoAprovacoes.filter(a => a.status === "pendente");
+  const pendentes = decanoSolicitacoes.filter(a => a.status === "pendente");
 
   const TODAY_DATE = "2024-02-14";
   const todayAgenda = coordAgendaEvents
