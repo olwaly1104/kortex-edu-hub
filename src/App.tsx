@@ -70,6 +70,8 @@ import DecanoDocentes from "./pages/decano/Docentes";
 import DecanoNotas from "./pages/decano/Notas";
 import DecanoRelatorios from "./pages/decano/Relatorios";
 import DecanoFinancas from "./pages/decano/Financas";
+import DecanoCursoDetail from "./pages/decano/CursoDetail";
+import DecanoAnoDetail from "./pages/decano/AnoDetail";
 import ReitoriaDashboard from "./pages/reitoria/Dashboard";
 import ReitoriaAprovacoes from "./pages/reitoria/Aprovacoes";
 import ReitoriaVisaoGeral from "./pages/reitoria/VisaoGeral";
@@ -180,6 +182,8 @@ function AppRoutes() {
         <Route path="/decano/anuncios" element={<StudentAnnouncements />} />
         <Route path="/decano/aprovacoes" element={<DecanoAprovacoes />} />
         <Route path="/decano/faculdades" element={<DecanoFaculdades />} />
+        <Route path="/decano/cursos/:cursoId" element={<DecanoCursoDetail />} />
+        <Route path="/decano/cursos/:cursoId/ano/:year" element={<DecanoAnoDetail />} />
         <Route path="/decano/estudantes" element={<DecanoEstudantes />} />
         <Route path="/decano/docentes" element={<DecanoDocentes />} />
         <Route path="/decano/notas" element={<DecanoNotas />} />
