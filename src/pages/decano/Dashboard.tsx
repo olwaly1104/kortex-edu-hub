@@ -293,9 +293,7 @@ export default function DecanoDashboard() {
                 { label: "Gerir coordenadores e desempenho", icon: UserCog, path: "/decano/coordenadores", color: "bg-primary/10 text-primary" },
                 { label: "Consultar cursos da faculdade", icon: Building2, path: "/decano/faculdades", color: "bg-accent/10 text-accent" },
                 { label: "Ver listagem de estudantes", icon: Users, path: "/decano/estudantes", color: "bg-secondary/10 text-secondary" },
-                { label: "Consultar corpo docente", icon: GraduationCap, path: "/decano/docentes", color: "bg-primary/10 text-primary" },
-                { label: "Verificar notas e pautas", icon: Award, path: "/decano/notas", color: "bg-accent/10 text-accent" },
-                { label: "Gerar relatórios académicos", icon: BarChart3, path: "/decano/relatorios", color: "bg-secondary/10 text-secondary" },
+                { label: "Gerar relatórios académicos", icon: BarChart3, path: "/decano/relatorios", color: "bg-primary/10 text-primary" },
               ].map(action => (
                 <Link key={action.path} to={action.path}>
                   <div className="flex items-center gap-2.5 px-3 py-2 rounded-lg border border-border hover:bg-muted/40 transition-colors cursor-pointer">
