@@ -66,6 +66,8 @@ export default function DecanoFaculdades() {
                       <div className="flex items-center gap-2 mb-2">
                         <h3 className="text-base font-bold text-foreground truncate">{c.name}</h3>
                         <Badge variant="outline" className="text-[10px] font-mono shrink-0">{c.code}</Badge>
+                        <Badge variant="outline" className="text-[10px] shrink-0">{turmas.length} turmas</Badge>
+                        <Badge variant="outline" className={`text-[10px] shrink-0 ${estado.cls}`}>{estado.label}</Badge>
                       </div>
                       <div className="space-y-1.5">
                         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -73,15 +75,10 @@ export default function DecanoFaculdades() {
                           <span className="font-medium text-foreground/70">Coordenador:</span>
                           <span>{c.coordinator}</span>
                         </div>
-                        <div className="flex items-center gap-4">
-                          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                            <Clock className="w-3.5 h-3.5 text-primary/60" />
-                            <span className="font-medium text-foreground/70">Duração:</span>
-                            <span>{c.years} anos</span>
-                          </div>
-                          <Badge variant="outline" className={`text-[10px] ${estado.cls}`}>
-                            {estado.label}
-                          </Badge>
+                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                          <Clock className="w-3.5 h-3.5 text-primary/60" />
+                          <span className="font-medium text-foreground/70">Duração:</span>
+                          <span>{c.years} anos</span>
                         </div>
                       </div>
                     </div>
