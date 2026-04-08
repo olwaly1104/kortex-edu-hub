@@ -91,6 +91,7 @@ export default function CoordenadorAvaliacaoDetail() {
         <div className="border-t border-border" />
 
         {/* Guia + Critério side by side */}
+        <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Documentação</p>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
           <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/40 hover:bg-muted/60 transition-colors cursor-pointer">
             <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
