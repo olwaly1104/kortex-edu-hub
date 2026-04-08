@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   ArrowLeft, Clock, Video, Users, Eye, Calendar,
-  CheckCircle, Edit, Play,
+  CheckCircle, Edit, Play, BookOpen, User,
 } from "lucide-react";
 import LessonTabs, { generateAttendance } from "@/components/LessonTabs";
 
@@ -61,63 +61,52 @@ export default function ProfessorLessonDetail() {
         <ArrowLeft className="w-4 h-4" /> Voltar
       </Button>
 
-      {/* Header */}
-      <div>
-        <div className="flex items-center gap-2 mb-2 flex-wrap">
-          <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: disc?.color }} />
-          <span className="text-xs font-medium" style={{ color: disc?.color }}>{disc?.name}</span>
-          <Badge variant="outline" className="text-[10px]">{disc?.code}</Badge>
-          {turma && <Badge variant="outline" className="text-[10px]">{turma.name}</Badge>}
-          <Badge className={`${cfg.color} gap-1 text-[10px]`}>
-            <StatusIcon className="w-3 h-3" /> {cfg.label}
-          </Badge>
+      {/* Unified Card Header */}
+      <Card className="overflow-hidden">
+        <div className="relative border-b border-border">
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/6 via-primary/3 to-transparent" />
+          <div className="relative px-5 py-4">
+            <div className="flex items-center gap-2.5 mb-1">
+              <span className="text-xs font-mono font-semibold px-2 py-0.5 rounded bg-primary/10 text-primary">#{lesson.number}</span>
+              <h1 className="text-xl font-bold text-foreground tracking-tight leading-tight">{lesson.title}</h1>
+              <Badge className={`${cfg.color} gap-1 text-[11px] border-0 shrink-0`}>
+                <StatusIcon className="w-3 h-3" /> {cfg.label}
+              </Badge>
+            </div>
+            <p className="text-sm text-muted-foreground mb-2.5 leading-relaxed">{lesson.summary || disc?.name}</p>
+            <div className="flex items-center gap-2 flex-wrap">
+              <Badge variant="outline" className="text-[11px] bg-background/80 gap-1">
+                <BookOpen className="w-3 h-3" /> {disc?.name}
+              </Badge>
+              {turma && (
+                <Badge variant="outline" className="text-[11px] bg-background/80">
+                  {turma.name}
+                </Badge>
+              )}
+              <Badge variant="outline" className="text-[11px] bg-background/80 gap-1">
+                <Calendar className="w-3 h-3" /> {lesson.date}
+              </Badge>
+              <Badge variant="outline" className="text-[11px] bg-background/80 gap-1">
+                <Clock className="w-3 h-3" /> {lesson.duration}
+              </Badge>
+              {isPast ? (
+                <>
+                  <Badge variant="outline" className="text-[11px] bg-background/80 gap-1">
+                    <Users className="w-3 h-3" /> {lesson.attendance}/{lesson.totalStudents} ({attendancePct}%)
+                  </Badge>
+                  <Badge variant="outline" className="text-[11px] bg-background/80 gap-1">
+                    <Eye className="w-3 h-3" /> {lesson.views} visualizações
+                  </Badge>
+                </>
+              ) : (
+                <Badge variant="outline" className="text-[11px] bg-background/80 gap-1">
+                  <Users className="w-3 h-3" /> {lesson.totalStudents} estudantes
+                </Badge>
+              )}
+            </div>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-mono font-semibold px-2 py-1 rounded" style={{ background: (disc?.color || "hsl(var(--primary))") + "15", color: disc?.color }}>#{lesson.number}</span>
-          <h1 className="text-2xl font-bold text-foreground">{lesson.title}</h1>
-        </div>
-      </div>
-
-      {/* Info cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card className="p-4 text-center">
-          <Calendar className="w-5 h-5 text-muted-foreground mx-auto mb-1" />
-          <p className="text-xs text-muted-foreground">Data</p>
-          <p className="text-sm font-semibold text-foreground">{lesson.date}</p>
-        </Card>
-        <Card className="p-4 text-center">
-          <Clock className="w-5 h-5 text-muted-foreground mx-auto mb-1" />
-          <p className="text-xs text-muted-foreground">Duração</p>
-          <p className="text-sm font-semibold text-foreground">{lesson.duration}</p>
-        </Card>
-        {isPast ? (
-          <>
-            <Card className="p-4 text-center">
-              <Users className="w-5 h-5 text-muted-foreground mx-auto mb-1" />
-              <p className="text-xs text-muted-foreground">Presença</p>
-              <p className={`text-sm font-semibold ${attendancePct >= 75 ? "text-accent" : "text-destructive"}`}>{lesson.attendance}/{lesson.totalStudents} ({attendancePct}%)</p>
-            </Card>
-            <Card className="p-4 text-center">
-              <Eye className="w-5 h-5 text-muted-foreground mx-auto mb-1" />
-              <p className="text-xs text-muted-foreground">Visualizações</p>
-              <p className="text-sm font-semibold text-foreground">{lesson.views}</p>
-            </Card>
-          </>
-        ) : (
-          <>
-            <Card className="p-4 text-center">
-              <Users className="w-5 h-5 text-muted-foreground mx-auto mb-1" />
-              <p className="text-xs text-muted-foreground">Estudantes</p>
-              <p className="text-sm font-semibold text-foreground">{lesson.totalStudents}</p>
-            </Card>
-            <Card className="p-4 text-center">
-              <Video className="w-5 h-5 text-muted-foreground mx-auto mb-1" />
-              <p className="text-xs text-muted-foreground">Estado</p>
-              <p className="text-sm font-semibold text-muted-foreground">{cfg.label}</p>
-            </Card>
-          </>
-        )}
-      </div>
+      </Card>
 
       {/* Video placeholder for past lessons */}
       {isPast && (

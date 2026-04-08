@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
   ArrowLeft, Video, Clock, Calendar, Users, Play, User,
-  Maximize2, Minimize2,
+  Maximize2, Minimize2, BookOpen,
 } from "lucide-react";
 import { useState } from "react";
 import LessonTabs, { generateAttendance } from "@/components/LessonTabs";
@@ -46,44 +46,39 @@ export default function CoordenadorLessonDetail() {
         <ArrowLeft className="w-4 h-4" /> Voltar a {cadeira.name}
       </Link>
 
-      {/* Hero */}
-      <div className="relative overflow-hidden rounded-2xl p-6 lg:p-8 bg-primary/5">
-        <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-primary/5" style={{ transform: "translate(30%, -30%)" }} />
-        <div className="relative flex items-start gap-5">
-          <div className="w-14 h-14 rounded-2xl bg-primary flex items-center justify-center shrink-0 shadow-sm">
-            <Video className="w-7 h-7 text-primary-foreground" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1 flex-wrap">
+      {/* Unified Card Header */}
+      <Card className="overflow-hidden">
+        <div className="relative border-b border-border">
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/6 via-primary/3 to-transparent" />
+          <div className="relative px-5 py-4">
+            <div className="flex items-center gap-2.5 mb-1">
               <span className="text-xs font-mono font-semibold px-2 py-0.5 rounded bg-primary/10 text-primary">Aula {lesson.number}</span>
-              <Badge variant="outline" className="text-xs font-mono">{lesson.disciplineCode}</Badge>
-              <Badge variant="outline" className="text-[10px]">{turmaId?.toUpperCase()}</Badge>
+              <h1 className="text-xl font-bold text-foreground tracking-tight leading-tight">{lesson.title}</h1>
             </div>
-            <h1 className="text-2xl lg:text-3xl font-bold text-foreground">{lesson.title}</h1>
-            <p className="text-muted-foreground mt-2 leading-relaxed">{lesson.summary}</p>
+            <p className="text-sm text-muted-foreground mb-2.5 leading-relaxed">{lesson.summary}</p>
+            <div className="flex items-center gap-2 flex-wrap">
+              <Badge variant="outline" className="text-[11px] bg-background/80 gap-1">
+                <BookOpen className="w-3 h-3" /> {cadeira.name}
+              </Badge>
+              <Badge variant="outline" className="text-[11px] bg-background/80 gap-1">
+                <User className="w-3 h-3" /> {cadeira.professor}
+              </Badge>
+              <Badge variant="outline" className="text-[11px] bg-background/80">
+                {turmaId?.toUpperCase()}
+              </Badge>
+              <Badge variant="outline" className="text-[11px] bg-background/80 gap-1">
+                <Calendar className="w-3 h-3" /> {lesson.date}
+              </Badge>
+              <Badge variant="outline" className="text-[11px] bg-background/80 gap-1">
+                <Clock className="w-3 h-3" /> {lesson.duration}
+              </Badge>
+              <Badge variant="outline" className="text-[11px] bg-background/80 gap-1">
+                <Users className="w-3 h-3" /> {lesson.attendance}/{lesson.totalStudents}
+              </Badge>
+            </div>
           </div>
         </div>
-      </div>
-
-      {/* Info cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {[
-          { icon: Clock, label: "Duração", value: lesson.duration },
-          { icon: Calendar, label: "Data", value: lesson.date },
-          { icon: User, label: "Professor", value: cadeira.professor },
-          { icon: Users, label: "Participantes", value: `${lesson.attendance}/${lesson.totalStudents}` },
-        ].map(item => (
-          <Card key={item.label} className="p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                <item.icon className="w-4 h-4 text-primary" />
-              </div>
-              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{item.label}</span>
-            </div>
-            <p className="font-semibold text-foreground text-sm">{item.value}</p>
-          </Card>
-        ))}
-      </div>
+      </Card>
 
       {/* Video player */}
       {lesson.status === "publicada" && (

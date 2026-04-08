@@ -3,7 +3,7 @@ import { lessons, disciplines } from "@/data/mockData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Video, Clock, Calendar, User, FileText, ClipboardList, Users, Play, Download, Eye, CheckCircle, AlertCircle, Monitor, MapPin, Mail, MessageSquare, Upload, Maximize2, Minimize2 } from "lucide-react";
+import { ArrowLeft, Video, Clock, Calendar, User, FileText, ClipboardList, Users, Play, Download, Eye, CheckCircle, AlertCircle, Monitor, MapPin, Mail, MessageSquare, Upload, Maximize2, Minimize2, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 
@@ -29,43 +29,39 @@ export default function LessonDetail() {
         <ArrowLeft className="w-4 h-4" /> Voltar a {disc.name}
       </Link>
 
-      {/* Hero header with discipline color */}
-      <div className="relative overflow-hidden rounded-2xl p-6 lg:p-8" style={{ background: `linear-gradient(135deg, ${disc.color}12, ${disc.color}06)` }}>
-        <div className="absolute top-0 right-0 w-32 h-32 rounded-full opacity-[0.07]" style={{ background: disc.color, transform: "translate(30%, -30%)" }} />
-        <div className="relative flex items-start gap-5">
-          <div className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 shadow-sm" style={{ background: disc.color, color: "white" }}>
-            <Video className="w-7 h-7" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1 flex-wrap">
-              <span className="text-xs font-mono font-semibold px-2 py-0.5 rounded" style={{ background: disc.color + "15", color: disc.color }}>Aula {lesson.number}</span>
-              <Badge className="text-xs border-none" style={{ background: disc.color + "20", color: disc.color }}>{disc.name}</Badge>
+      {/* Unified Card Header */}
+      <Card className="overflow-hidden">
+        <div className="relative border-b border-border">
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/6 via-primary/3 to-transparent" />
+          <div className="relative px-5 py-4">
+            <div className="flex items-center gap-2.5 mb-1">
+              <span className="text-xs font-mono font-semibold px-2 py-0.5 rounded bg-primary/10 text-primary">Aula {lesson.number}</span>
+              <h1 className="text-xl font-bold text-foreground tracking-tight leading-tight">{lesson.title}</h1>
             </div>
-            <h1 className="text-2xl lg:text-3xl font-bold text-foreground">{lesson.title}</h1>
-            <p className="text-muted-foreground mt-2 leading-relaxed">{lesson.summary}</p>
+            <p className="text-sm text-muted-foreground mb-2.5 leading-relaxed">{lesson.summary}</p>
+            <div className="flex items-center gap-2 flex-wrap">
+              <Badge variant="outline" className="text-[11px] bg-background/80 gap-1">
+                <BookOpen className="w-3 h-3" /> {disc.name}
+              </Badge>
+              <Badge variant="outline" className="text-[11px] bg-background/80 gap-1">
+                <User className="w-3 h-3" /> {lesson.professor}
+              </Badge>
+              <Badge variant="outline" className="text-[11px] bg-background/80 gap-1">
+                <Calendar className="w-3 h-3" /> {lesson.date}
+              </Badge>
+              <Badge variant="outline" className="text-[11px] bg-background/80 gap-1">
+                <Clock className="w-3 h-3" /> {lesson.duration}
+              </Badge>
+              <Badge variant="outline" className="text-[11px] bg-background/80 gap-1">
+                <Users className="w-3 h-3" /> {lesson.participants.length} participantes
+              </Badge>
+            </div>
           </div>
         </div>
-      </div>
+      </Card>
 
-      {/* Info cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {[
-          { icon: Clock, label: "Duração", value: lesson.duration },
-          { icon: Calendar, label: "Data", value: lesson.date },
-          { icon: User, label: "Professor", value: lesson.professor },
-          { icon: Users, label: "Participantes", value: String(lesson.participants.length) },
-        ].map(item => (
-          <Card key={item.label} className="p-4 hover:shadow-md transition-shadow">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: disc.color + "15", color: disc.color }}>
-                <item.icon className="w-4 h-4" />
-              </div>
-              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{item.label}</span>
-            </div>
-            <p className="font-semibold text-foreground text-sm">{item.value}</p>
-          </Card>
-        ))}
-      </div>
+
+
 
       {/* Video player */}
       <Card
