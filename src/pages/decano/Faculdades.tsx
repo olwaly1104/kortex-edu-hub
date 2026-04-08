@@ -79,8 +79,8 @@ export default function DecanoFaculdades() {
                           {(() => {
                             const coord = decanoCoordenadores.find(co => co.name === c.coordinator);
                             return coord ? (
-                              <Link to={`/decano/coordenadores/${coord.id}`} className="text-primary hover:underline" onClick={e => e.stopPropagation()}>
-                                {c.coordinator}
+                              <Link to={`/decano/coordenadores/${coord.id}`} onClick={e => e.stopPropagation()}>
+                                <Badge variant="outline" className="text-[10px] font-medium hover:bg-primary/10 transition-colors cursor-pointer">{c.coordinator}</Badge>
                               </Link>
                             ) : <span>{c.coordinator}</span>;
                           })()}
