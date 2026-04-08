@@ -894,3 +894,30 @@ export const coordAnuncios: CoordAnuncio[] = [
   { id: "an4", title: "Seminário de Engenharia Civil", content: "Seminário aberto sobre inovação na construção sustentável. Auditório principal.", date: "25/02/2024", author: "Coordenação ECIV", type: "academico" },
   { id: "an5", title: "Manutenção do sistema de notas", content: "O sistema estará indisponível no sábado, das 8h às 12h.", date: "23/02/2024", author: "TI", type: "geral" },
 ];
+
+export interface DecanoCoordenador {
+  id: string;
+  name: string;
+  email: string;
+  course: string;
+  courseCode: string;
+  department: string;
+  estudantesTotal: number;
+  docentesTotal: number;
+  turmasTotal: number;
+  cadeirasTotal: number;
+  presenca: number;
+  mediaGeral: number;
+  taxaEntrega: number;
+  taxaAprovacao: number;
+  status: "activo" | "licença" | "inactivo";
+}
+
+export const decanoCoordenadores: DecanoCoordenador[] = [
+  { id: "fc1", name: "Dr. Manuel Rodrigues", email: "m.rodrigues@upra.kor", course: "Engenharia Civil", courseCode: "ECIV", department: "Estruturas", estudantesTotal: 229, docentesTotal: 18, turmasTotal: 12, cadeirasTotal: 28, presenca: 94, mediaGeral: 13.5, taxaEntrega: 91, taxaAprovacao: 85, status: "activo" },
+  { id: "fc2", name: "Dra. Teresa Moura", email: "t.moura@upra.kor", course: "Engenharia Informática", courseCode: "EINF", department: "Ciências da Computação", estudantesTotal: 312, docentesTotal: 22, turmasTotal: 10, cadeirasTotal: 24, presenca: 91, mediaGeral: 13.8, taxaEntrega: 88, taxaAprovacao: 83, status: "activo" },
+  { id: "fc3", name: "Dr. Jorge Bastos", email: "j.bastos@upra.kor", course: "Engenharia Mecânica", courseCode: "EMEC", department: "Mecânica Aplicada", estudantesTotal: 198, docentesTotal: 16, turmasTotal: 10, cadeirasTotal: 30, presenca: 87, mediaGeral: 12.9, taxaEntrega: 82, taxaAprovacao: 79, status: "activo" },
+  { id: "fc4", name: "Dra. Fernanda Reis", email: "f.reis@upra.kor", course: "Engenharia Electrotécnica", courseCode: "EELT", department: "Electrónica", estudantesTotal: 176, docentesTotal: 14, turmasTotal: 10, cadeirasTotal: 30, presenca: 90, mediaGeral: 13.2, taxaEntrega: 85, taxaAprovacao: 80, status: "activo" },
+  { id: "fc5", name: "Dr. Paulo Henriques", email: "p.henriques@upra.kor", course: "Engenharia Ambiental", courseCode: "EAMB", department: "Ciências Ambientais", estudantesTotal: 145, docentesTotal: 10, turmasTotal: 8, cadeirasTotal: 20, presenca: 95, mediaGeral: 14.1, taxaEntrega: 93, taxaAprovacao: 87, status: "activo" },
+  { id: "fc6", name: "Dra. Carla Nunes", email: "c.nunes@upra.kor", course: "Engenharia Química", courseCode: "EQUI", department: "Química Industrial", estudantesTotal: 180, docentesTotal: 6, turmasTotal: 10, cadeirasTotal: 30, presenca: 83, mediaGeral: 12.5, taxaEntrega: 78, taxaAprovacao: 72, status: "activo" },
+];
