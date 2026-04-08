@@ -142,6 +142,7 @@ export default function CoordenadorAvaliacaoDetail() {
             </div>
           ))}
         </div>
+        </div>
       </Card>
       <Card className="overflow-hidden">
         {task.status !== "rascunho" && (
