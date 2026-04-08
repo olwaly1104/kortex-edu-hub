@@ -1,5 +1,5 @@
 import { useAuth } from "@/contexts/AuthContext";
-import { decanoFaculty, decanoAprovacoes, decanoTurmas, decanoDocentes, decanoEstudantes } from "@/data/institutionData";
+import { decanoFaculty, decanoAprovacoes, decanoTurmas, decanoDocentes, decanoEstudantes, decanoCoordenadores } from "@/data/institutionData";
 import { announcements, coordAgendaEvents } from "@/data/mockData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -9,7 +9,7 @@ import {
   AlertTriangle, FileText, Calendar as CalendarIcon,
   Megaphone, CheckCircle, GraduationCap, MapPin, Play,
   ArrowDownLeft, UserX, ClipboardCheck, BarChart3,
-  Eye, XCircle,
+  Eye, XCircle, UserCog, Building2, Layers,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -67,6 +67,8 @@ export default function DecanoDashboard() {
   };
 
   // Alertas em risco
+  const coordsEmRisco = decanoCoordenadores.filter(c => c.presenca < 85 || c.taxaEntrega < 80 || c.mediaGeral < 11);
+  const cursosEmRisco = decanoFaculty.courses.filter(c => c.mediaGeral < 12 || c.taxaSucesso < 75);
   const turmasEmRisco = decanoTurmas.filter(t => t.presenca < 80 || t.media < 12 || t.taxaEntrega < 85);
   const docentesEmRisco = decanoDocentes.filter(d => d.presenca < 85 || d.taxaEntrega < 80 || d.mediaGeral < 11);
   const estudantesEmRisco = decanoEstudantes
@@ -182,33 +184,62 @@ export default function DecanoDashboard() {
       </div>
 
       {/* Row 2: Alertas em Risco + Solicitações */}
-      <div className="grid lg:grid-cols-5 gap-6">
+      <div className="space-y-6">
         {/* Alertas em Risco */}
-        <Card className="p-5 lg:col-span-3">
+        <Card className="p-5">
           <div className="flex items-center gap-2 mb-4">
             <AlertTriangle className="w-5 h-5 text-destructive" />
             <h2 className="text-base font-semibold text-foreground">Alertas em Risco</h2>
           </div>
 
-          <div className="grid grid-cols-3 gap-0 flex-1">
-            {/* Docentes em Risco */}
+          <div className="grid grid-cols-5 gap-0 flex-1">
+            {/* Coordenadores em Risco */}
             <div className="pr-3 border-r border-border flex flex-col">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1">
-                  <GraduationCap className="w-3 h-3" /> Docentes
-                  <Badge variant="outline" className="text-[9px] px-1.5 py-0">{docentesEmRisco.length}</Badge>
+                  <UserCog className="w-3 h-3" /> Coordenadores
+                  <Badge variant="outline" className="text-[9px] px-1.5 py-0">{coordsEmRisco.length}</Badge>
                 </h3>
-                <Link to="/decano/docentes" className="text-[10px] text-primary hover:underline">Ver todos</Link>
+                <Link to="/decano/coordenadores" className="text-[10px] text-primary hover:underline">Ver</Link>
               </div>
               <div className="flex flex-col gap-1.5 flex-1">
-                {docentesEmRisco.slice(0, 5).map(d => (
-                  <Link key={d.id} to={`/decano/docentes/${d.id}`} className="flex-1 flex">
+                {coordsEmRisco.length === 0 ? (
+                  <p className="text-[10px] text-muted-foreground text-center py-3">Nenhum alerta ✓</p>
+                ) : coordsEmRisco.slice(0, 4).map(c => (
+                  <Link key={c.id} to={`/decano/coordenadores/${c.id}`} className="flex-1 flex">
                     <div className="px-2.5 py-1.5 rounded-lg border border-border bg-card border-l-[3px] border-l-destructive hover:bg-muted/40 transition-colors cursor-pointer w-full flex flex-col justify-center">
-                      <p className="text-[11px] font-semibold text-foreground leading-tight truncate">{d.name.replace("Prof. ", "")}</p>
+                      <p className="text-[11px] font-semibold text-foreground leading-tight truncate">{c.name}</p>
+                      <p className="text-[9px] text-muted-foreground truncate">{c.courseCode}</p>
                       <div className="flex items-center justify-between mt-1 text-[9px]">
-                        <span className={`flex items-center gap-0.5 ${d.presenca < 85 ? "text-destructive font-medium" : "text-muted-foreground"}`}><Clock className="w-2.5 h-2.5" />{d.presenca}%</span>
-                        <span className={`flex items-center gap-0.5 ${d.taxaEntrega < 80 ? "text-destructive font-medium" : "text-muted-foreground"}`}><ClipboardCheck className="w-2.5 h-2.5" />{d.taxaEntrega}%</span>
-                        <span className={`flex items-center gap-0.5 ${d.mediaGeral < 11 ? "text-destructive font-medium" : "text-muted-foreground"}`}><BarChart3 className="w-2.5 h-2.5" />{d.mediaGeral}/20</span>
+                        <span className={`flex items-center gap-0.5 ${c.presenca < 85 ? "text-destructive font-medium" : "text-muted-foreground"}`}><Clock className="w-2.5 h-2.5" />{c.presenca}%</span>
+                        <span className={`flex items-center gap-0.5 ${c.mediaGeral < 11 ? "text-destructive font-medium" : "text-muted-foreground"}`}><BarChart3 className="w-2.5 h-2.5" />{c.mediaGeral}</span>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {/* Cursos em Risco */}
+            <div className="px-3 border-r border-border flex flex-col">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1">
+                  <Building2 className="w-3 h-3" /> Cursos
+                  <Badge variant="outline" className="text-[9px] px-1.5 py-0">{cursosEmRisco.length}</Badge>
+                </h3>
+                <Link to="/decano/faculdades" className="text-[10px] text-primary hover:underline">Ver</Link>
+              </div>
+              <div className="flex flex-col gap-1.5 flex-1">
+                {cursosEmRisco.length === 0 ? (
+                  <p className="text-[10px] text-muted-foreground text-center py-3">Nenhum alerta ✓</p>
+                ) : cursosEmRisco.slice(0, 4).map(c => (
+                  <Link key={c.id} to={`/decano/cursos/${c.id}`} className="flex-1 flex">
+                    <div className="px-2.5 py-1.5 rounded-lg border border-border bg-card border-l-[3px] border-l-destructive hover:bg-muted/40 transition-colors cursor-pointer w-full flex flex-col justify-center">
+                      <p className="text-[11px] font-semibold text-foreground leading-tight truncate">{c.name}</p>
+                      <p className="text-[9px] text-muted-foreground truncate">{c.code}</p>
+                      <div className="flex items-center justify-between mt-1 text-[9px]">
+                        <span className={`flex items-center gap-0.5 ${c.mediaGeral < 12 ? "text-destructive font-medium" : "text-muted-foreground"}`}><BarChart3 className="w-2.5 h-2.5" />{c.mediaGeral}</span>
+                        <span className={`flex items-center gap-0.5 ${c.taxaSucesso < 75 ? "text-destructive font-medium" : "text-muted-foreground"}`}><ClipboardCheck className="w-2.5 h-2.5" />{c.taxaSucesso}%</span>
                       </div>
                     </div>
                   </Link>
@@ -223,18 +254,41 @@ export default function DecanoDashboard() {
                   <Users className="w-3 h-3" /> Turmas
                   <Badge variant="outline" className="text-[9px] px-1.5 py-0">{turmasEmRisco.length}</Badge>
                 </h3>
-                <Link to="/decano/faculdades" className="text-[10px] text-primary hover:underline">Ver todos</Link>
+                <Link to="/decano/faculdades" className="text-[10px] text-primary hover:underline">Ver</Link>
               </div>
-              <div className="space-y-1.5">
-                {turmasEmRisco.slice(0, 5).map(t => (
-                  <Link key={t.id} to={`/decano/cursos/${t.courseId}`} className="block">
+              <div className="flex flex-col gap-1.5 flex-1">
+                {turmasEmRisco.slice(0, 4).map(t => (
+                  <Link key={t.id} to={`/decano/cursos/${t.courseId}`} className="flex-1 flex">
                     <div className="px-2.5 py-1.5 rounded-lg border border-border bg-card border-l-[3px] border-l-destructive hover:bg-muted/40 transition-colors cursor-pointer w-full flex flex-col justify-center">
-                      <p className="text-[11px] font-semibold text-foreground leading-tight truncate">{t.name} — {t.courseName}</p>
-                      <p className="text-[9px] text-muted-foreground truncate">{t.year}º Ano • {t.director}</p>
+                      <p className="text-[11px] font-semibold text-foreground leading-tight truncate">{t.name}</p>
+                      <p className="text-[9px] text-muted-foreground truncate">{t.year}º Ano • {t.courseName}</p>
                       <div className="flex items-center justify-between mt-1 text-[9px]">
                         <span className={`flex items-center gap-0.5 ${t.presenca < 80 ? "text-destructive font-medium" : "text-muted-foreground"}`}><Clock className="w-2.5 h-2.5" />{t.presenca}%</span>
-                        <span className={`flex items-center gap-0.5 ${t.taxaEntrega < 85 ? "text-destructive font-medium" : "text-muted-foreground"}`}><ClipboardCheck className="w-2.5 h-2.5" />{t.taxaEntrega}%</span>
-                        <span className={`flex items-center gap-0.5 ${t.media < 12 ? "text-destructive font-medium" : "text-muted-foreground"}`}><BarChart3 className="w-2.5 h-2.5" />{t.media}/20</span>
+                        <span className={`flex items-center gap-0.5 ${t.media < 12 ? "text-destructive font-medium" : "text-muted-foreground"}`}><BarChart3 className="w-2.5 h-2.5" />{t.media}</span>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {/* Docentes em Risco */}
+            <div className="px-3 border-r border-border flex flex-col">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1">
+                  <GraduationCap className="w-3 h-3" /> Docentes
+                  <Badge variant="outline" className="text-[9px] px-1.5 py-0">{docentesEmRisco.length}</Badge>
+                </h3>
+                <Link to="/decano/docentes" className="text-[10px] text-primary hover:underline">Ver</Link>
+              </div>
+              <div className="flex flex-col gap-1.5 flex-1">
+                {docentesEmRisco.slice(0, 4).map(d => (
+                  <Link key={d.id} to={`/decano/docentes/${d.id}`} className="flex-1 flex">
+                    <div className="px-2.5 py-1.5 rounded-lg border border-border bg-card border-l-[3px] border-l-destructive hover:bg-muted/40 transition-colors cursor-pointer w-full flex flex-col justify-center">
+                      <p className="text-[11px] font-semibold text-foreground leading-tight truncate">{d.name.replace("Prof. ", "")}</p>
+                      <div className="flex items-center justify-between mt-1 text-[9px]">
+                        <span className={`flex items-center gap-0.5 ${d.presenca < 85 ? "text-destructive font-medium" : "text-muted-foreground"}`}><Clock className="w-2.5 h-2.5" />{d.presenca}%</span>
+                        <span className={`flex items-center gap-0.5 ${d.mediaGeral < 11 ? "text-destructive font-medium" : "text-muted-foreground"}`}><BarChart3 className="w-2.5 h-2.5" />{d.mediaGeral}</span>
                       </div>
                     </div>
                   </Link>
@@ -249,18 +303,17 @@ export default function DecanoDashboard() {
                   <UserX className="w-3 h-3" /> Estudantes
                   <Badge variant="outline" className="text-[9px] px-1.5 py-0">{estudantesEmRisco.length}</Badge>
                 </h3>
-                <Link to="/decano/estudantes" className="text-[10px] text-primary hover:underline">Ver todos</Link>
+                <Link to="/decano/estudantes" className="text-[10px] text-primary hover:underline">Ver</Link>
               </div>
               <div className="flex flex-col gap-1.5 flex-1">
-                {estudantesEmRisco.slice(0, 5).map(e => (
+                {estudantesEmRisco.slice(0, 4).map(e => (
                   <Link key={e.id} to={`/decano/estudantes/${e.id}`} className="flex-1 flex">
                     <div className="px-2.5 py-1.5 rounded-lg border border-border bg-card border-l-[3px] border-l-destructive hover:bg-muted/40 transition-colors cursor-pointer w-full flex flex-col justify-center">
                       <p className="text-[11px] font-semibold text-foreground leading-tight truncate">{e.name}</p>
                       <p className="text-[9px] text-muted-foreground">{e.course}</p>
                       <div className="flex items-center justify-between mt-1 text-[9px]">
-                        <span className="flex items-center gap-0.5 text-destructive font-medium"><BarChart3 className="w-2.5 h-2.5" />{e.media !== null ? `${e.media}/20` : "—"}</span>
+                        <span className="flex items-center gap-0.5 text-destructive font-medium"><BarChart3 className="w-2.5 h-2.5" />{e.media !== null ? `${e.media}` : "—"}</span>
                         <span className={`flex items-center gap-0.5 ${e.presenca < 70 ? "text-destructive font-medium" : "text-muted-foreground"}`}><Clock className="w-2.5 h-2.5" />{e.presenca}%</span>
-                        <span className={`flex items-center gap-0.5 ${e.taxaEntrega < 60 ? "text-destructive font-medium" : "text-muted-foreground"}`}><ClipboardCheck className="w-2.5 h-2.5" />{e.taxaEntrega}%</span>
                       </div>
                     </div>
                   </Link>
@@ -271,7 +324,7 @@ export default function DecanoDashboard() {
         </Card>
 
         {/* Solicitações Pendentes */}
-        <Card className="p-5 lg:col-span-2">
+        <Card className="p-5">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
               <ArrowDownLeft className="w-5 h-5 text-secondary" /> Solicitações
