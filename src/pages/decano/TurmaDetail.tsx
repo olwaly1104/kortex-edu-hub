@@ -8,11 +8,17 @@ import {
   ArrowLeft, GraduationCap, Users, BookOpen, CheckCircle, Search,
   TrendingUp, Calendar, Video, Clock, Play, Eye, FileText, MapPin,
   ClipboardList, Edit, Settings, Download, AlertCircle, FolderOpen, Award,
+  ChevronRight,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useState, useMemo } from "react";
 import { useToast } from "@/hooks/use-toast";
+
+const getEstado = (media: number) =>
+  media >= 14 ? { label: "Excelente", cls: "bg-accent/15 text-accent border-accent/30" }
+  : media >= 10 ? { label: "Normal", cls: "bg-muted text-muted-foreground border-border" }
+  : { label: "Em Risco", cls: "bg-destructive/15 text-destructive border-destructive/30" };
 
 // Generate mock lessons for any turma
 function generateLessons(turmaId: string, turma: { estudantes: number; name: string }) {
@@ -62,6 +68,27 @@ function generateCalendar(turmaId: string) {
   ];
 }
 
+function generateCadeiras(turmaId: string, turma: { estudantes: number; year: number }) {
+  const cadeiras = [
+    { name: "Matemática I", code: "MAT101", professor: "Prof. João Silva", diasAula: "Seg, Qua, Sex", location: "Sala 101" },
+    { name: "Física Aplicada", code: "FIS101", professor: "Prof. Ana Costa", diasAula: "Ter, Qui", location: "Lab F1" },
+    { name: "Desenho Técnico", code: "DTE101", professor: "Prof. Carlos Mendes", diasAula: "Seg, Qua", location: "Atelier A2" },
+    { name: "Programação", code: "PRG101", professor: "Prof. Rita Lopes", diasAula: "Ter, Qui, Sex", location: "Lab I3" },
+    { name: "Química Geral", code: "QUI101", professor: "Prof. Marta Reis", diasAula: "Seg, Qui", location: "Lab Q1" },
+  ];
+  return cadeiras.map((c, i) => ({
+    id: `${turmaId}-cad${i + 1}`,
+    ...c,
+    year: turma.year,
+    estudantes: turma.estudantes,
+    media: +(10 + Math.random() * 6).toFixed(1),
+    presenca: Math.floor(72 + Math.random() * 20),
+    taxaEntrega: Math.floor(70 + Math.random() * 25),
+    taxaAprovacao: Math.floor(65 + Math.random() * 30),
+    status: i < 3 ? "normal" as const : i === 3 ? "excelente" as const : "risco" as const,
+  }));
+}
+
 export default function DecanoTurmaDetail() {
   const { cursoId, turmaId } = useParams();
   const navigate = useNavigate();
@@ -75,6 +102,7 @@ export default function DecanoTurmaDetail() {
   const tasks = useMemo(() => turma ? generateTasks(turma.id, turma) : [], [turma?.id]);
   const resources = useMemo(() => turma ? generateResources(turma.id) : [], [turma?.id]);
   const calendar = useMemo(() => turma ? generateCalendar(turma.id) : [], [turma?.id]);
+  const cadeiras = useMemo(() => turma ? generateCadeiras(turma.id, turma) : [], [turma?.id]);
 
   const [studentSearch, setStudentSearch] = useState("");
   const [criteria, setCriteria] = useState([
@@ -178,10 +206,11 @@ export default function DecanoTurmaDetail() {
       </Card>
 
       {/* Tabs */}
-      <Tabs defaultValue="students" className="space-y-5">
+      <Tabs defaultValue="cadeiras" className="space-y-5">
         <div className="border-b overflow-x-auto">
           <TabsList className="bg-transparent h-auto p-0 gap-0">
             {[
+              { value: "cadeiras", icon: BookOpen, label: "Cadeiras" },
               { value: "students", icon: Users, label: "Estudantes" },
               { value: "lessons", icon: Video, label: "Aulas" },
               { value: "conteudos", icon: FolderOpen, label: "Conteúdos" },
@@ -198,7 +227,47 @@ export default function DecanoTurmaDetail() {
           </TabsList>
         </div>
 
-        {/* Estudantes */}
+        {/* Cadeiras */}
+        <TabsContent value="cadeiras" className="space-y-4">
+          <p className="text-sm text-muted-foreground">{cadeiras.length} cadeiras na {turma.name}</p>
+          <div className="space-y-3">
+            {cadeiras.map(cadeira => {
+              const cEstado = getEstado(cadeira.media);
+              return (
+                <Link key={cadeira.id} to={`/decano/cursos/${cursoId}/turma/${turmaId}/cadeira/${cadeira.id}`}>
+                  <Card className="p-5 border-l-[3px] border-l-primary hover:shadow-md transition-shadow cursor-pointer">
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h4 className="text-sm font-semibold text-foreground">{cadeira.name}</h4>
+                          <Badge variant="outline" className="text-[10px] font-mono">{cadeira.code}</Badge>
+                          <Badge variant="outline" className={`text-[9px] ${cEstado.cls}`}>{cEstado.label}</Badge>
+                        </div>
+                        <p className="text-[11px] text-muted-foreground flex items-center gap-3">
+                          <span className="flex items-center gap-1"><GraduationCap className="w-3 h-3" /> {cadeira.professor}</span>
+                          <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {cadeira.diasAula}</span>
+                          <span className="flex items-center gap-1"><MapPin className="w-3 h-3" /> {cadeira.location}</span>
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-4 shrink-0">
+                        <div className="text-center">
+                          <p className="text-[10px] text-muted-foreground uppercase">Presença</p>
+                          <p className={`text-sm font-bold ${cadeira.presenca >= 75 ? "text-accent" : "text-destructive"}`}>{cadeira.presenca}%</p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-[10px] text-muted-foreground uppercase">Média</p>
+                          <p className={`text-sm font-bold ${cadeira.media >= 10 ? "text-accent" : "text-destructive"}`}>{cadeira.media}/20</p>
+                        </div>
+                        <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                      </div>
+                    </div>
+                  </Card>
+                </Link>
+              );
+            })}
+            {cadeiras.length === 0 && <p className="text-center text-muted-foreground py-8">Nenhuma cadeira nesta turma.</p>}
+          </div>
+        </TabsContent>
         <TabsContent value="students" className="space-y-4">
           <div className="flex items-center justify-between gap-4">
             <div className="relative flex-1 max-w-sm">
