@@ -1,10 +1,11 @@
-import { useParams, Link } from "react-router-dom";
-import { coordNotas, coordCursoInfo } from "@/data/institutionData";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import { coordNotas, coordCursoInfo, coordTurmaTasks } from "@/data/institutionData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Award, Calendar, Clock, MapPin, User, CheckCircle, ArrowLeft, Users, GraduationCap } from "lucide-react";
 
 export default function NotasTurmaDetail() {
+  const navigate = useNavigate();
   const { year, turma } = useParams();
   const yearNum = Number(year);
   const yearData = coordNotas.find(n => n.year === yearNum);
@@ -107,8 +108,18 @@ export default function NotasTurmaDetail() {
       <div className="space-y-2">
         {turmaData.avaliacoes.map((a, i) => {
           const total = a.aprovados + a.reprovados;
+          const matchedTask = coordTurmaTasks.find(ct => 
+            ct.title.toLowerCase().includes(a.name.toLowerCase()) || 
+            a.name.toLowerCase().includes(ct.title.split("—")[0].trim().toLowerCase())
+          );
+          const taskId = matchedTask?.id || coordTurmaTasks[i % coordTurmaTasks.length]?.id || "ct1";
           return (
-            <Card key={`${a.code}-${i}`} className="p-4 border-l-[3px]" style={{ borderLeftColor: a.media >= 10 ? "hsl(var(--accent) / 0.6)" : "hsl(var(--destructive) / 0.6)" }}>
+            <Card 
+              key={`${a.code}-${i}`} 
+              className="p-4 border-l-[3px] cursor-pointer transition-all hover:shadow-md group" 
+              style={{ borderLeftColor: a.media >= 10 ? "hsl(var(--accent) / 0.6)" : "hsl(var(--destructive) / 0.6)" }}
+              onClick={() => navigate(`/coordenador/avaliacoes/${taskId}`)}
+            >
               <div className="flex items-center gap-4">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
