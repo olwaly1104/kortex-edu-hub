@@ -268,8 +268,11 @@ export default function CoordenadorTurmaDetail() {
             {turmaLessons.map(lesson => {
               const cfg = lessonStatusConfig[lesson.status];
               const StatusIcon = cfg.icon;
+              const firstCadeira = coordDisciplinas.find(d => d.code === lesson.disciplineCode);
+              const cadeiraIdForLink = firstCadeira?.id || "c1";
               return (
-                <Card key={lesson.id} className="p-4 border-l-[3px]" style={{ borderLeftColor: lesson.status === "publicada" ? "hsl(var(--accent))" : "hsl(var(--muted))" }}>
+                <Link key={lesson.id} to={`/coordenador/anos/${yearNum}/turma/${turmaId}/cadeira/${cadeiraIdForLink}/aula/${lesson.id}`}>
+                <Card className="p-4 border-l-[3px] hover:shadow-md transition-shadow cursor-pointer" style={{ borderLeftColor: lesson.status === "publicada" ? "hsl(var(--accent))" : "hsl(var(--muted))" }}>
                   <div className="flex items-center gap-4">
                     <div className="w-20 h-14 rounded-xl bg-muted/50 flex items-center justify-center shrink-0"><Play className="w-5 h-5 text-muted-foreground/60" /></div>
                     <div className="flex-1 min-w-0">
@@ -309,6 +312,7 @@ export default function CoordenadorTurmaDetail() {
                     </div>
                   )}
                 </Card>
+                </Link>
               );
             })}
             {turmaLessons.length === 0 && <p className="text-center text-muted-foreground py-8">Nenhuma aula nesta turma.</p>}
