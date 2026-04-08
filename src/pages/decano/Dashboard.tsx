@@ -321,7 +321,6 @@ export default function DecanoDashboard() {
               </div>
             </div>
           </div>
-          </div>
         </Card>
 
         {/* Solicitações Pendentes */}
