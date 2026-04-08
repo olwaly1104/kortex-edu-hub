@@ -21,7 +21,10 @@ function generateStudentResults(task: typeof coordTurmaTasks[0], turma: typeof c
     const submetido = i < task.submissions;
     const corrigido = submetido && i < task.corrected;
     const nota = corrigido ? Math.round((Math.random() * 8 + 8) * 10) / 10 : null;
-    return { ...student, submetido, corrigido, nota };
+    const submissionTime = submetido
+      ? `${String(8 + (i % 10)).padStart(2, "0")}:${String((i * 7 + 13) % 60).padStart(2, "0")}`
+      : null;
+    return { ...student, submetido, corrigido, nota, submissionTime };
   });
 }
 
@@ -221,7 +224,10 @@ export default function CoordenadorAvaliacaoDetail() {
                   <TableCell className="text-xs text-muted-foreground">T{s.turma}</TableCell>
                   <TableCell className="text-center">
                     {s.submetido ? (
-                      <CheckCircle className="w-4 h-4 text-accent mx-auto" />
+                      <div className="flex flex-col items-center gap-0.5">
+                        <CheckCircle className="w-4 h-4 text-accent" />
+                        {s.submissionTime && <span className="text-[10px] text-muted-foreground font-mono">{s.submissionTime}</span>}
+                      </div>
                     ) : (
                       <AlertCircle className="w-4 h-4 text-destructive mx-auto" />
                     )}
