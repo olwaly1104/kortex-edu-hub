@@ -204,22 +204,22 @@ export default function DecanoDashboard() {
             <h2 className="text-base font-semibold text-foreground">Alertas em Risco</h2>
           </div>
 
-          <div className="grid grid-cols-3 gap-0 flex-1">
+          <div className="grid grid-cols-3 gap-0">
             {/* Coordenadores em Risco */}
-            <div className="pr-3 border-r border-border flex flex-col">
+            <div className="pr-3 border-r border-border">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1">
                   <UserCog className="w-3 h-3" /> Coordenadores
                   <Badge variant="outline" className="text-[9px] px-1.5 py-0">{coordsEmRisco.length}</Badge>
                 </h3>
-                <Link to="/decano/coordenadores" className="text-[10px] text-primary hover:underline">Ver</Link>
+                <Link to="/decano/coordenadores" className="text-[10px] text-primary hover:underline">Ver todos</Link>
               </div>
-              <div className="flex flex-col gap-1.5 flex-1">
+              <div className="space-y-1.5">
                 {coordsEmRisco.length === 0 ? (
                   <p className="text-[10px] text-muted-foreground text-center py-3">Nenhum alerta ✓</p>
                 ) : coordsEmRisco.slice(0, 4).map(c => (
-                  <Link key={c.id} to={`/decano/coordenadores/${c.id}`} className="flex-1 flex">
-                    <div className="px-2.5 py-1.5 rounded-lg border border-border bg-card border-l-[3px] border-l-destructive hover:bg-muted/40 transition-colors cursor-pointer w-full flex flex-col justify-center">
+                  <Link key={c.id} to={`/decano/coordenadores/${c.id}`} className="block">
+                    <div className="px-2.5 py-1.5 rounded-lg border border-border bg-card border-l-[3px] border-l-destructive hover:bg-muted/40 transition-colors cursor-pointer">
                       <p className="text-[11px] font-semibold text-foreground leading-tight truncate">{c.name}</p>
                       <p className="text-[9px] text-muted-foreground truncate">{c.courseCode}</p>
                       <div className="flex items-center justify-between mt-1 text-[9px]">
@@ -233,20 +233,20 @@ export default function DecanoDashboard() {
             </div>
 
             {/* Cursos em Risco */}
-            <div className="px-3 border-r border-border flex flex-col">
+            <div className="px-3 border-r border-border">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1">
                   <Building2 className="w-3 h-3" /> Cursos
                   <Badge variant="outline" className="text-[9px] px-1.5 py-0">{cursosEmRisco.length}</Badge>
                 </h3>
-                <Link to="/decano/faculdades" className="text-[10px] text-primary hover:underline">Ver</Link>
+                <Link to="/decano/faculdades" className="text-[10px] text-primary hover:underline">Ver todos</Link>
               </div>
-              <div className="flex flex-col gap-1.5 flex-1">
+              <div className="space-y-1.5">
                 {cursosEmRisco.length === 0 ? (
                   <p className="text-[10px] text-muted-foreground text-center py-3">Nenhum alerta ✓</p>
                 ) : cursosEmRisco.slice(0, 4).map(c => (
-                  <Link key={c.id} to={`/decano/cursos/${c.id}`} className="flex-1 flex">
-                    <div className="px-2.5 py-1.5 rounded-lg border border-border bg-card border-l-[3px] border-l-destructive hover:bg-muted/40 transition-colors cursor-pointer w-full flex flex-col justify-center">
+                  <Link key={c.id} to={`/decano/cursos/${c.id}`} className="block">
+                    <div className="px-2.5 py-1.5 rounded-lg border border-border bg-card border-l-[3px] border-l-destructive hover:bg-muted/40 transition-colors cursor-pointer">
                       <p className="text-[11px] font-semibold text-foreground leading-tight truncate">{c.name}</p>
                       <p className="text-[9px] text-muted-foreground truncate">{c.code}</p>
                       <div className="flex items-center justify-between mt-1 text-[9px]">
@@ -260,19 +260,20 @@ export default function DecanoDashboard() {
             </div>
 
             {/* Anos em Risco */}
-            <div className="pl-3 flex flex-col">
+            <div className="pl-3">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1">
                   <Layers className="w-3 h-3" /> Anos
                   <Badge variant="outline" className="text-[9px] px-1.5 py-0">{anosEmRisco.length}</Badge>
                 </h3>
+                <Link to="/decano/faculdades" className="text-[10px] text-primary hover:underline">Ver todos</Link>
               </div>
-              <div className="flex flex-col gap-1.5 flex-1">
+              <div className="space-y-1.5">
                 {anosEmRisco.length === 0 ? (
                   <p className="text-[10px] text-muted-foreground text-center py-3">Nenhum alerta ✓</p>
                 ) : anosEmRisco.slice(0, 4).map(a => (
-                  <Link key={`${a.courseId}-${a.year}`} to={`/decano/cursos/${a.courseId}`} className="flex-1 flex">
-                    <div className="px-2.5 py-1.5 rounded-lg border border-border bg-card border-l-[3px] border-l-destructive hover:bg-muted/40 transition-colors cursor-pointer w-full flex flex-col justify-center">
+                  <Link key={`${a.courseId}-${a.year}`} to={`/decano/cursos/${a.courseId}`} className="block">
+                    <div className="px-2.5 py-1.5 rounded-lg border border-border bg-card border-l-[3px] border-l-destructive hover:bg-muted/40 transition-colors cursor-pointer">
                       <p className="text-[11px] font-semibold text-foreground leading-tight truncate">{a.year}º Ano — {a.courseName}</p>
                       <p className="text-[9px] text-muted-foreground">{a.turmas} turma{a.turmas > 1 ? "s" : ""}</p>
                       <div className="flex items-center justify-between mt-1 text-[9px]">
