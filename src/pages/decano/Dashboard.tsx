@@ -1,5 +1,5 @@
 import { useAuth } from "@/contexts/AuthContext";
-import { decanoFaculty, decanoAprovacoes, decanoTurmas, decanoDocentes, decanoEstudantes } from "@/data/institutionData";
+import { decanoFaculty, decanoAprovacoes, decanoTurmas, decanoDocentes, decanoEstudantes, decanoCoordenadores } from "@/data/institutionData";
 import { announcements, coordAgendaEvents } from "@/data/mockData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -9,7 +9,7 @@ import {
   AlertTriangle, FileText, Calendar as CalendarIcon,
   Megaphone, CheckCircle, GraduationCap, MapPin, Play,
   ArrowDownLeft, UserX, ClipboardCheck, BarChart3,
-  Eye, XCircle,
+  Eye, XCircle, UserCog, Building2, Layers,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -67,6 +67,8 @@ export default function DecanoDashboard() {
   };
 
   // Alertas em risco
+  const coordsEmRisco = decanoCoordenadores.filter(c => c.presenca < 85 || c.taxaEntrega < 80 || c.mediaGeral < 11);
+  const cursosEmRisco = decanoFaculty.courses.filter(c => c.mediaGeral < 12 || c.taxaSucesso < 75);
   const turmasEmRisco = decanoTurmas.filter(t => t.presenca < 80 || t.media < 12 || t.taxaEntrega < 85);
   const docentesEmRisco = decanoDocentes.filter(d => d.presenca < 85 || d.taxaEntrega < 80 || d.mediaGeral < 11);
   const estudantesEmRisco = decanoEstudantes
