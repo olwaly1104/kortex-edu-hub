@@ -60,25 +60,8 @@ export default function LessonDetail() {
         </div>
       </Card>
 
-      {/* Info cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {[
-          { icon: Clock, label: "Duração", value: lesson.duration },
-          { icon: Calendar, label: "Data", value: lesson.date },
-          { icon: User, label: "Professor", value: lesson.professor },
-          { icon: Users, label: "Participantes", value: String(lesson.participants.length) },
-        ].map(item => (
-          <Card key={item.label} className="p-4 hover:shadow-md transition-shadow">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: disc.color + "15", color: disc.color }}>
-                <item.icon className="w-4 h-4" />
-              </div>
-              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{item.label}</span>
-            </div>
-            <p className="font-semibold text-foreground text-sm">{item.value}</p>
-          </Card>
-        ))}
-      </div>
+
+
 
       {/* Video player */}
       <Card
