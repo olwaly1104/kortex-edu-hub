@@ -155,31 +155,95 @@ export default function LessonDetail() {
           )}
         </TabsContent>
 
-        <TabsContent value="participants">
-          <Card className="divide-y overflow-hidden">
-            {lesson.participants.map((p, i) => (
-              <div key={i} className="px-4 py-3 flex items-center gap-3 hover:bg-muted/30 transition-colors">
-                <div className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold" style={{
-                  background: i === 0 ? disc.color + "15" : "hsl(var(--muted))",
-                  color: i === 0 ? disc.color : "hsl(var(--muted-foreground))",
-                }}>
-                  {p.split(" ").map(n => n[0]).slice(0, 2).join("")}
+        <TabsContent value="participants" className="space-y-4">
+          {/* Stats */}
+          {(() => {
+            const attendanceData = lesson.participants.map((p, i) => {
+              if (i === 0) return { name: p, role: "professor" as const, status: "presente" as const, arrivalTime: "08:00" };
+              const rand = Math.random();
+              if (rand < 0.15) return { name: p, role: "estudante" as const, status: "ausente" as const };
+              if (rand < 0.35) {
+                const mins = Math.floor(Math.random() * 20) + 5;
+                return { name: p, role: "estudante" as const, status: "atrasado" as const, arrivalTime: `08:${String(mins).padStart(2, "0")}` };
+              }
+              return { name: p, role: "estudante" as const, status: "presente" as const, arrivalTime: "08:00" };
+            });
+            const students = attendanceData.filter(a => a.role === "estudante");
+            const presentCount = students.filter(a => a.status === "presente").length;
+            const lateCount = students.filter(a => a.status === "atrasado").length;
+            const absentCount = students.filter(a => a.status === "ausente").length;
+
+            return (
+              <>
+                <div className="grid grid-cols-4 gap-3">
+                  <div className="flex items-center gap-3 rounded-xl border border-border bg-card p-3">
+                    <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                      <Clock className="w-4 h-4 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-lg font-bold text-foreground">08:00</p>
+                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Início</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 rounded-xl border border-border bg-card p-3">
+                    <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center">
+                      <CheckCircle className="w-4 h-4 text-accent" />
+                    </div>
+                    <div>
+                      <p className="text-lg font-bold text-accent">{presentCount}</p>
+                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Presentes</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 rounded-xl border border-border bg-card p-3">
+                    <div className="w-8 h-8 rounded-lg bg-[hsl(38,92%,50%)]/10 flex items-center justify-center">
+                      <Clock className="w-4 h-4 text-[hsl(38,92%,50%)]" />
+                    </div>
+                    <div>
+                      <p className="text-lg font-bold text-[hsl(38,92%,50%)]">{lateCount}</p>
+                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Atrasados</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 rounded-xl border border-border bg-card p-3">
+                    <div className="w-8 h-8 rounded-lg bg-destructive/10 flex items-center justify-center">
+                      <AlertCircle className="w-4 h-4 text-destructive" />
+                    </div>
+                    <div>
+                      <p className="text-lg font-bold text-destructive">{absentCount}</p>
+                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Ausentes</p>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-foreground">{p}</p>
-                  <p className="text-xs text-muted-foreground">{i === 0 ? "Professor" : "Estudante"}</p>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Button variant="ghost" size="icon" className="w-8 h-8" onClick={() => navigate("/student/email")}>
-                    <Mail className="w-3.5 h-3.5 text-muted-foreground" />
-                  </Button>
-                  <Button variant="ghost" size="icon" className="w-8 h-8" onClick={() => navigate("/student/chat")}>
-                    <MessageSquare className="w-3.5 h-3.5 text-muted-foreground" />
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </Card>
+
+                <Card className="divide-y overflow-hidden">
+                  {attendanceData.map((a, i) => {
+                    const cfg = {
+                      presente: { label: "Presente", icon: CheckCircle, className: "text-accent bg-accent/10" },
+                      atrasado: { label: "Atrasado", icon: Clock, className: "text-[hsl(38,92%,50%)] bg-[hsl(38,92%,50%)]/10" },
+                      ausente: { label: "Ausente", icon: AlertCircle, className: "text-destructive bg-destructive/10" },
+                    }[a.status];
+                    const StatusIcon = cfg.icon;
+                    return (
+                      <div key={i} className={`px-4 py-3 flex items-center gap-3 hover:bg-muted/30 transition-colors ${a.status === "ausente" ? "bg-destructive/[0.03]" : ""}`}>
+                        <div className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold bg-muted text-muted-foreground">
+                          {a.name.split(" ").map(n => n[0]).slice(0, 2).join("")}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className={`text-sm font-medium ${a.status === "ausente" ? "line-through text-muted-foreground" : "text-foreground"}`}>{a.name}</p>
+                          <p className="text-xs text-muted-foreground">{a.role === "professor" ? "Professor" : "Estudante"}</p>
+                        </div>
+                        {a.arrivalTime && (
+                          <span className="text-xs text-muted-foreground font-mono">{a.arrivalTime}</span>
+                        )}
+                        <Badge className={`${cfg.className} text-[10px] gap-1 border-0`}>
+                          <StatusIcon className="w-3 h-3" /> {cfg.label}
+                        </Badge>
+                      </div>
+                    );
+                  })}
+                </Card>
+              </>
+            );
+          })()}
         </TabsContent>
 
         <TabsContent value="tasks" className="space-y-3">
