@@ -101,11 +101,11 @@ export default function DecanoCursoDetail() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 min-w-0">
                         <p className="text-xs font-semibold text-foreground">{t.name}</p>
-                        <Badge variant="outline" className={`text-[9px] ${tEstado.cls}`}>
-                          {tEstado.label}
-                        </Badge>
                         <Badge variant="outline" className="text-[9px] gap-0.5">
                           <Calendar className="w-2.5 h-2.5" /> {t.disciplinas} cadeiras
+                        </Badge>
+                        <Badge variant="outline" className={`text-[9px] ${tEstado.cls}`}>
+                          {tEstado.label}
                         </Badge>
                       </div>
                       <div className="flex items-center gap-3 shrink-0">
@@ -120,10 +120,6 @@ export default function DecanoCursoDetail() {
                         <div className="text-right">
                           <p className="text-[9px] text-muted-foreground uppercase leading-tight">Presença</p>
                           <p className={`text-xs font-bold ${t.presenca >= 75 ? "text-accent" : "text-destructive"}`}>{t.presenca}%</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-[9px] text-muted-foreground uppercase leading-tight">Entrega</p>
-                          <p className={`text-xs font-bold ${t.taxaEntrega >= 80 ? "text-accent" : "text-destructive"}`}>{t.taxaEntrega}%</p>
                         </div>
                         <ChevronRight className="w-3.5 h-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
                       </div>
