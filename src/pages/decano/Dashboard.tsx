@@ -324,7 +324,7 @@ export default function DecanoDashboard() {
         </Card>
 
         {/* Solicitações Pendentes */}
-        <Card className="p-5 lg:col-span-2">
+        <Card className="p-5">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
               <ArrowDownLeft className="w-5 h-5 text-secondary" /> Solicitações
