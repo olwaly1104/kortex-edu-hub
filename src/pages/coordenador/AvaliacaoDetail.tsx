@@ -72,7 +72,7 @@ export default function CoordenadorAvaliacaoDetail() {
         <div className="flex items-center gap-3 mt-3 flex-wrap">
           <Badge variant="outline" className="text-xs">{task.discipline}</Badge>
           <Badge variant="outline" className="text-xs">{turma.name} · {turma.year}º Ano</Badge>
-          <Badge variant="outline" className="text-xs">{task.modality === "online" ? "Online" : "Presencial"}</Badge>
+          <Badge variant="outline" className="text-xs">{task.type === "quiz" ? "Quiz" : task.type === "exame" ? "Exame" : "Tarefa"}</Badge>
           <Badge variant="outline" className="text-xs">{task.type === "quiz" ? "Quiz" : task.type === "exame" ? "Exame" : "Tarefa"}</Badge>
         </div>
       </div>
