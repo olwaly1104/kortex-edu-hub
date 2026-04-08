@@ -179,7 +179,6 @@ const roleSectionsMap: Record<string, NavSection[]> = {
   professor: professorSections,
   coordenador_curso: coordenadorCursoSections,
   decano: decanoSections,
-  reitoria: reitoriaSections,
   reitor: reitorSections,
   secretaria: secretariaSections,
 };
@@ -189,11 +188,11 @@ const roleLabelMap: Record<string, string> = {
   professor: "Professor",
   coordenador_curso: "Coord. de Curso",
   decano: "Decano",
-  reitoria: "Reitoria",
+  
   secretaria: "Secretaria",
 };
 
-const roleBasePaths = ["/student", "/professor", "/coordenador", "/decano", "/reitoria", "/secretaria"];
+const roleBasePaths = ["/student", "/professor", "/coordenador", "/decano", "/reitor", "/secretaria"];
 
 export default function AppSidebar() {
   const { user, logout } = useAuth();
