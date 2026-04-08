@@ -1,7 +1,8 @@
-import { decanoFaculty } from "@/data/institutionData";
+import { decanoFaculty, decanoTurmas } from "@/data/institutionData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Building2, Users, BookOpen, GraduationCap, TrendingUp, Award, ChevronRight } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { Building2, Users, BookOpen, GraduationCap, TrendingUp, Award, ChevronRight, Layers, MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export default function DecanoFaculdades() {
@@ -36,27 +37,59 @@ export default function DecanoFaculdades() {
         ))}
       </div>
 
-      {/* Course cards */}
-      <div className="space-y-3">
-        {fac.courses.map(c => (
-          <Link key={c.id} to={`/decano/cursos/${c.id}`}>
-            <Card className="p-5 border-l-[3px] border-l-primary hover:shadow-md transition-shadow cursor-pointer">
-              <div className="flex items-center justify-between">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h3 className="font-semibold text-foreground">{c.name}</h3>
-                    <Badge variant="outline" className="text-[10px] font-mono">{c.code}</Badge>
-                    <Badge className={`text-[10px] border-0 ${c.status === "activo" ? "bg-accent/10 text-accent" : "bg-secondary/10 text-secondary"}`}>
-                      {c.status === "activo" ? "Activo" : "Em Revisão"}
-                    </Badge>
+      {/* Course cards - premium design */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        {fac.courses.map(c => {
+          const turmas = decanoTurmas.filter(t => t.courseId === c.id);
+          const avgPresenca = turmas.length ? Math.round(turmas.reduce((s, t) => s + t.presenca, 0) / turmas.length) : 0;
+          const avgEntrega = turmas.length ? Math.round(turmas.reduce((s, t) => s + t.taxaEntrega, 0) / turmas.length) : 0;
+          const statusColor = c.taxaSucesso >= 85 ? "border-l-accent" : c.taxaSucesso >= 75 ? "border-l-secondary" : "border-l-destructive";
+
+          return (
+            <Link key={c.id} to={`/decano/cursos/${c.id}`}>
+              <Card className={`overflow-hidden hover:shadow-lg transition-all cursor-pointer border-l-[4px] ${statusColor}`}>
+                {/* Header */}
+                <div className="px-5 pt-5 pb-3">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <h3 className="text-base font-bold text-foreground truncate">{c.name}</h3>
+                        <Badge variant="outline" className="text-[10px] font-mono shrink-0">{c.code}</Badge>
+                      </div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <Badge className={`text-[10px] border-0 ${c.status === "activo" ? "bg-accent/10 text-accent" : "bg-secondary/10 text-secondary"}`}>
+                          {c.status === "activo" ? "Activo" : "Em Revisão"}
+                        </Badge>
+                        <Badge variant="outline" className="text-[10px] gap-1 bg-background/80">
+                          <GraduationCap className="w-3 h-3" /> {c.coordinator}
+                        </Badge>
+                        <Badge variant="outline" className="text-[10px] gap-1 bg-background/80">
+                          <Layers className="w-3 h-3" /> {c.years} anos
+                        </Badge>
+                      </div>
+                    </div>
+                    <ChevronRight className="w-5 h-5 text-muted-foreground shrink-0 mt-1" />
                   </div>
-                  <p className="text-[11px] text-muted-foreground flex items-center gap-3">
-                    <span className="flex items-center gap-1"><GraduationCap className="w-3 h-3" /> {c.coordinator}</span>
-                    <span className="flex items-center gap-1"><Users className="w-3 h-3" /> {c.estudantes} estudantes</span>
-                    <span className="flex items-center gap-1"><BookOpen className="w-3 h-3" /> {c.years} anos · {c.docentes} docentes</span>
-                  </p>
                 </div>
-                <div className="grid grid-cols-2 gap-6 shrink-0 text-center">
+
+                {/* Metrics grid */}
+                <div className="px-5 pb-3 grid grid-cols-3 gap-3">
+                  <div className="bg-muted/30 rounded-lg p-2.5 text-center">
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Estudantes</p>
+                    <p className="text-lg font-bold text-foreground">{c.estudantes}</p>
+                  </div>
+                  <div className="bg-muted/30 rounded-lg p-2.5 text-center">
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Docentes</p>
+                    <p className="text-lg font-bold text-foreground">{c.docentes}</p>
+                  </div>
+                  <div className="bg-muted/30 rounded-lg p-2.5 text-center">
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Turmas</p>
+                    <p className="text-lg font-bold text-foreground">{turmas.length}</p>
+                  </div>
+                </div>
+
+                {/* Performance row */}
+                <div className="px-5 pb-3 grid grid-cols-4 gap-3">
                   <div>
                     <p className="text-[10px] text-muted-foreground uppercase">Média</p>
                     <p className={`text-sm font-bold ${c.mediaGeral >= 10 ? "text-accent" : "text-destructive"}`}>{c.mediaGeral}</p>
@@ -65,11 +98,28 @@ export default function DecanoFaculdades() {
                     <p className="text-[10px] text-muted-foreground uppercase">Sucesso</p>
                     <p className={`text-sm font-bold ${c.taxaSucesso >= 80 ? "text-accent" : "text-secondary"}`}>{c.taxaSucesso}%</p>
                   </div>
+                  <div>
+                    <p className="text-[10px] text-muted-foreground uppercase">Presença</p>
+                    <p className={`text-sm font-bold ${avgPresenca >= 80 ? "text-accent" : "text-destructive"}`}>{avgPresenca}%</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-muted-foreground uppercase">Entrega</p>
+                    <p className={`text-sm font-bold ${avgEntrega >= 80 ? "text-accent" : "text-destructive"}`}>{avgEntrega}%</p>
+                  </div>
                 </div>
-              </div>
-            </Card>
-          </Link>
-        ))}
+
+                {/* Progress bar */}
+                <div className="px-5 pb-4">
+                  <div className="flex justify-between text-[10px] mb-1">
+                    <span className="text-muted-foreground uppercase">Taxa de Sucesso</span>
+                    <span className="font-semibold text-foreground">{c.taxaSucesso}%</span>
+                  </div>
+                  <Progress value={c.taxaSucesso} className="h-1.5" />
+                </div>
+              </Card>
+            </Link>
+          );
+        })}
       </div>
     </div>
   );
