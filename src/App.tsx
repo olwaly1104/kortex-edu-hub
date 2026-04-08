@@ -98,6 +98,7 @@ import ReitorDocentes from "./pages/reitor/Docentes";
 import ReitorNotas from "./pages/reitor/Notas";
 import ReitorRelatorios from "./pages/reitor/Relatorios";
 import ReitorFinancas from "./pages/reitor/Financas";
+import ReitorEstudantes from "./pages/reitor/Estudantes";
 import NotFound from "./pages/NotFound";
 import SecretariaDashboard from "./pages/secretaria/Dashboard";
 import SecretariaCandidaturas from "./pages/secretaria/Candidaturas";
@@ -238,6 +239,7 @@ function AppRoutes() {
         <Route path="/reitor/decanos" element={<ReitorDecanos />} />
         <Route path="/reitor/coordenadores" element={<ReitorCoordenadores />} />
         <Route path="/reitor/docentes" element={<ReitorDocentes />} />
+        <Route path="/reitor/estudantes" element={<ReitorEstudantes />} />
         <Route path="/reitor/notas" element={<ReitorNotas />} />
         <Route path="/reitor/relatorios" element={<ReitorRelatorios />} />
         <Route path="/reitor/financas" element={<ReitorFinancas />} />

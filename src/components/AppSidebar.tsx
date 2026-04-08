@@ -140,6 +140,7 @@ const reitorSections: NavSection[] = [
     { label: "Decanos", icon: UserCog, path: "/reitor/decanos" },
     { label: "Coordenadores", icon: GraduationCap, path: "/reitor/coordenadores" },
     { label: "Docentes", icon: Users, path: "/reitor/docentes" },
+    { label: "Estudantes", icon: Users, path: "/reitor/estudantes" },
     { label: "Notas", icon: Award, path: "/reitor/notas" },
     { label: "Relatórios & Análise", icon: BarChart3, path: "/reitor/relatorios" },
   ]},

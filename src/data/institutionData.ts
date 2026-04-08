@@ -885,6 +885,131 @@ export const reitoriaDocentes: UniDocente[] = [
   { id: "ud8", name: "Prof. Fernando Dias", email: "prof.dias@upra.kor", faculty: "Fac. Ciências Sociais", course: "Sociologia", disciplinas: 2, presenca: 89, status: "licença" },
 ];
 
+// Reitor enriched data for professional tables
+export interface ReitorDecanoDetail {
+  id: string;
+  name: string;
+  email: string;
+  faculty: string;
+  since: string;
+  cursosTotal: number;
+  estudantesTotal: number;
+  docentesTotal: number;
+  coordenadoresTotal: number;
+  presenca: number;
+  mediaGeral: number;
+  taxaEntrega: number;
+  taxaAprovacao: number;
+  status: "activo" | "licença" | "inactivo";
+}
+
+export const reitorDecanosDetail: ReitorDecanoDetail[] = [
+  { id: "dec1", name: "Prof. Dr. Ricardo Almeida", email: "r.almeida@upra.kor", faculty: "Fac. Arquitectura", since: "2019", cursosTotal: 6, estudantesTotal: 1240, docentesTotal: 86, coordenadoresTotal: 6, presenca: 84, mediaGeral: 13.3, taxaEntrega: 87, taxaAprovacao: 81, status: "activo" },
+  { id: "dec2", name: "Profª. Dra. Helena Sousa", email: "h.sousa@upra.kor", faculty: "Fac. Economia", since: "2020", cursosTotal: 4, estudantesTotal: 980, docentesTotal: 52, coordenadoresTotal: 4, presenca: 86, mediaGeral: 13.8, taxaEntrega: 90, taxaAprovacao: 84, status: "activo" },
+  { id: "dec3", name: "Prof. Dr. Tomás Carvalho", email: "t.carvalho@upra.kor", faculty: "Fac. Direito", since: "2018", cursosTotal: 3, estudantesTotal: 1120, docentesTotal: 68, coordenadoresTotal: 3, presenca: 81, mediaGeral: 12.9, taxaEntrega: 83, taxaAprovacao: 76, status: "activo" },
+  { id: "dec4", name: "Profª. Dra. Margarida Lopes", email: "m.lopes@upra.kor", faculty: "Fac. Medicina", since: "2021", cursosTotal: 4, estudantesTotal: 860, docentesTotal: 72, coordenadoresTotal: 4, presenca: 90, mediaGeral: 13.1, taxaEntrega: 92, taxaAprovacao: 74, status: "activo" },
+  { id: "dec5", name: "Prof. Dr. Fernando Dias", email: "f.dias@upra.kor", faculty: "Fac. Ciências Sociais", since: "2022", cursosTotal: 5, estudantesTotal: 620, docentesTotal: 34, coordenadoresTotal: 5, presenca: 83, mediaGeral: 14.0, taxaEntrega: 88, taxaAprovacao: 82, status: "activo" },
+];
+
+export interface ReitorCoordDetail {
+  id: string;
+  name: string;
+  email: string;
+  course: string;
+  faculty: string;
+  estudantesTotal: number;
+  docentesTotal: number;
+  turmasTotal: number;
+  cadeirasTotal: number;
+  presenca: number;
+  mediaGeral: number;
+  taxaEntrega: number;
+  taxaAprovacao: number;
+  status: "activo" | "licença" | "inactivo";
+}
+
+export const reitorCoordsDetail: ReitorCoordDetail[] = [
+  { id: "co1", name: "Dr. Manuel Rodrigues", email: "m.rodrigues@upra.kor", course: "Eng. Civil", faculty: "Fac. Arquitectura", estudantesTotal: 229, docentesTotal: 18, turmasTotal: 12, cadeirasTotal: 28, presenca: 94, mediaGeral: 13.5, taxaEntrega: 91, taxaAprovacao: 85, status: "activo" },
+  { id: "co2", name: "Dra. Teresa Moura", email: "t.moura@upra.kor", course: "Eng. Informática", faculty: "Fac. Arquitectura", estudantesTotal: 312, docentesTotal: 22, turmasTotal: 10, cadeirasTotal: 24, presenca: 91, mediaGeral: 13.8, taxaEntrega: 88, taxaAprovacao: 83, status: "activo" },
+  { id: "co3", name: "Dr. Jorge Bastos", email: "j.bastos@upra.kor", course: "Eng. Mecânica", faculty: "Fac. Arquitectura", estudantesTotal: 198, docentesTotal: 16, turmasTotal: 10, cadeirasTotal: 30, presenca: 87, mediaGeral: 12.9, taxaEntrega: 82, taxaAprovacao: 79, status: "activo" },
+  { id: "co4", name: "Dra. Fernanda Reis", email: "f.reis@upra.kor", course: "Eng. Electrotécnica", faculty: "Fac. Arquitectura", estudantesTotal: 176, docentesTotal: 14, turmasTotal: 10, cadeirasTotal: 30, presenca: 90, mediaGeral: 13.2, taxaEntrega: 85, taxaAprovacao: 80, status: "activo" },
+  { id: "co5", name: "Dr. Paulo Henriques", email: "p.henriques@upra.kor", course: "Eng. Ambiental", faculty: "Fac. Arquitectura", estudantesTotal: 145, docentesTotal: 10, turmasTotal: 8, cadeirasTotal: 20, presenca: 95, mediaGeral: 14.1, taxaEntrega: 93, taxaAprovacao: 87, status: "activo" },
+  { id: "co6", name: "Dra. Carla Nunes", email: "c.nunes@upra.kor", course: "Eng. Química", faculty: "Fac. Arquitectura", estudantesTotal: 180, docentesTotal: 6, turmasTotal: 10, cadeirasTotal: 30, presenca: 83, mediaGeral: 12.5, taxaEntrega: 78, taxaAprovacao: 72, status: "activo" },
+  { id: "co7", name: "Dr. Álvaro Mendes", email: "a.mendes@upra.kor", course: "Gestão de Empresas", faculty: "Fac. Economia", estudantesTotal: 340, docentesTotal: 18, turmasTotal: 8, cadeirasTotal: 22, presenca: 88, mediaGeral: 14.2, taxaEntrega: 90, taxaAprovacao: 84, status: "activo" },
+  { id: "co8", name: "Dra. Beatriz Santos", email: "b.santos@upra.kor", course: "Contabilidade", faculty: "Fac. Economia", estudantesTotal: 280, docentesTotal: 14, turmasTotal: 6, cadeirasTotal: 18, presenca: 85, mediaGeral: 13.5, taxaEntrega: 86, taxaAprovacao: 80, status: "activo" },
+  { id: "co9", name: "Dr. Nuno Barros", email: "n.barros@upra.kor", course: "Direito Civil", faculty: "Fac. Direito", estudantesTotal: 420, docentesTotal: 26, turmasTotal: 10, cadeirasTotal: 32, presenca: 80, mediaGeral: 12.8, taxaEntrega: 82, taxaAprovacao: 76, status: "activo" },
+  { id: "co10", name: "Dra. Leonor Pinto", email: "l.pinto@upra.kor", course: "Medicina Geral", faculty: "Fac. Medicina", estudantesTotal: 310, docentesTotal: 28, turmasTotal: 12, cadeirasTotal: 36, presenca: 92, mediaGeral: 13.4, taxaEntrega: 92, taxaAprovacao: 78, status: "activo" },
+];
+
+export interface ReitorDocenteDetail {
+  id: string;
+  name: string;
+  email: string;
+  faculty: string;
+  course: string;
+  disciplinas: number;
+  turmas: number;
+  presenca: number;
+  mediaGeral: number;
+  estudantesTotal: number;
+  taxaEntrega: number;
+  taxaAprovacao: number;
+  taxaReprovacao: number;
+  status: "activo" | "licença" | "inactivo";
+}
+
+export const reitorDocentesDetail: ReitorDocenteDetail[] = [
+  { id: "rd1", name: "Prof. António Silva", email: "prof.silva@upra.kor", faculty: "Fac. Arquitectura", course: "Eng. Civil", disciplinas: 3, turmas: 4, presenca: 96, mediaGeral: 13.8, estudantesTotal: 120, taxaEntrega: 91, taxaAprovacao: 88, taxaReprovacao: 12, status: "activo" },
+  { id: "rd2", name: "Prof. Maria Santos", email: "prof.santos@upra.kor", faculty: "Fac. Arquitectura", course: "Eng. Civil", disciplinas: 2, turmas: 3, presenca: 92, mediaGeral: 13.2, estudantesTotal: 97, taxaEntrega: 87, taxaAprovacao: 82, taxaReprovacao: 18, status: "activo" },
+  { id: "rd3", name: "Prof. Pedro Ferreira", email: "prof.ferreira@upra.kor", faculty: "Fac. Arquitectura", course: "Eng. Informática", disciplinas: 2, turmas: 2, presenca: 88, mediaGeral: 12.5, estudantesTotal: 45, taxaEntrega: 78, taxaAprovacao: 71, taxaReprovacao: 29, status: "activo" },
+  { id: "rd4", name: "Prof. Ana Costa", email: "prof.costa@upra.kor", faculty: "Fac. Arquitectura", course: "Eng. Química", disciplinas: 3, turmas: 3, presenca: 94, mediaGeral: 14.1, estudantesTotal: 76, taxaEntrega: 93, taxaAprovacao: 91, taxaReprovacao: 9, status: "activo" },
+  { id: "rd5", name: "Prof. Helena Sousa", email: "prof.sousa@upra.kor", faculty: "Fac. Economia", course: "Gestão", disciplinas: 2, turmas: 3, presenca: 91, mediaGeral: 14.2, estudantesTotal: 85, taxaEntrega: 90, taxaAprovacao: 84, taxaReprovacao: 16, status: "activo" },
+  { id: "rd6", name: "Prof. Tomás Carvalho", email: "prof.carvalho@upra.kor", faculty: "Fac. Direito", course: "Direito Civil", disciplinas: 3, turmas: 4, presenca: 95, mediaGeral: 12.8, estudantesTotal: 110, taxaEntrega: 83, taxaAprovacao: 76, taxaReprovacao: 24, status: "activo" },
+  { id: "rd7", name: "Prof. Margarida Lopes", email: "prof.mlopes@upra.kor", faculty: "Fac. Medicina", course: "Medicina Geral", disciplinas: 2, turmas: 3, presenca: 97, mediaGeral: 13.4, estudantesTotal: 92, taxaEntrega: 94, taxaAprovacao: 78, taxaReprovacao: 22, status: "activo" },
+  { id: "rd8", name: "Prof. Fernando Dias", email: "prof.dias@upra.kor", faculty: "Fac. Ciências Sociais", course: "Sociologia", disciplinas: 2, turmas: 2, presenca: 89, mediaGeral: 14.0, estudantesTotal: 48, taxaEntrega: 88, taxaAprovacao: 82, taxaReprovacao: 18, status: "licença" },
+  { id: "rd9", name: "Prof. Carlos Mendes", email: "prof.cmendes@upra.kor", faculty: "Fac. Arquitectura", course: "Eng. Electrotécnica", disciplinas: 2, turmas: 3, presenca: 91, mediaGeral: 14.5, estudantesTotal: 68, taxaEntrega: 94, taxaAprovacao: 92, taxaReprovacao: 8, status: "activo" },
+  { id: "rd10", name: "Prof. Sofia Martins", email: "prof.smartins@upra.kor", faculty: "Fac. Economia", course: "Contabilidade", disciplinas: 2, turmas: 2, presenca: 93, mediaGeral: 13.5, estudantesTotal: 55, taxaEntrega: 86, taxaAprovacao: 80, taxaReprovacao: 20, status: "activo" },
+  { id: "rd11", name: "Prof. Ricardo Nunes", email: "prof.rnunes@upra.kor", faculty: "Fac. Arquitectura", course: "Eng. Mecânica", disciplinas: 2, turmas: 3, presenca: 82, mediaGeral: 10.5, estudantesTotal: 85, taxaEntrega: 74, taxaAprovacao: 62, taxaReprovacao: 38, status: "activo" },
+  { id: "rd12", name: "Prof. Teresa Almeida", email: "prof.talmeida@upra.kor", faculty: "Fac. Medicina", course: "Enfermagem", disciplinas: 1, turmas: 2, presenca: 79, mediaGeral: 9.8, estudantesTotal: 42, taxaEntrega: 68, taxaAprovacao: 48, taxaReprovacao: 52, status: "activo" },
+];
+
+export interface ReitorEstudanteDetail {
+  id: string;
+  name: string;
+  email: string;
+  faculty: string;
+  course: string;
+  year: number;
+  turma: string;
+  media: number | null;
+  presenca: number;
+  taxaEntrega: number;
+  tarefasFeitas: number;
+  tarefasTotal: number;
+  avaliacoesFeitas: number;
+  avaliacoesTotal: number;
+  status: "excelente" | "normal" | "risco";
+}
+
+export const reitorEstudantesDetail: ReitorEstudanteDetail[] = [
+  { id: "re1", name: "João Fernandes", email: "2934@upra.kor", faculty: "Fac. Arquitectura", course: "Eng. Civil", year: 2, turma: "A", media: 14.2, presenca: 92, taxaEntrega: 95, tarefasFeitas: 8, tarefasTotal: 10, avaliacoesFeitas: 4, avaliacoesTotal: 5, status: "excelente" },
+  { id: "re2", name: "Maria Silva", email: "3012@upra.kor", faculty: "Fac. Arquitectura", course: "Eng. Informática", year: 3, turma: "A", media: 15.1, presenca: 95, taxaEntrega: 98, tarefasFeitas: 10, tarefasTotal: 10, avaliacoesFeitas: 5, avaliacoesTotal: 5, status: "excelente" },
+  { id: "re3", name: "Pedro Nascimento", email: "2987@upra.kor", faculty: "Fac. Arquitectura", course: "Eng. Mecânica", year: 1, turma: "A", media: 11.8, presenca: 78, taxaEntrega: 82, tarefasFeitas: 7, tarefasTotal: 10, avaliacoesFeitas: 3, avaliacoesTotal: 5, status: "normal" },
+  { id: "re4", name: "Ana Gomes", email: "3045@upra.kor", faculty: "Fac. Economia", course: "Gestão", year: 1, turma: "A", media: 12.5, presenca: 88, taxaEntrega: 90, tarefasFeitas: 6, tarefasTotal: 8, avaliacoesFeitas: 3, avaliacoesTotal: 4, status: "normal" },
+  { id: "re5", name: "Carlos Santos", email: "3100@upra.kor", faculty: "Fac. Arquitectura", course: "Eng. Química", year: 2, turma: "A", media: 8.9, presenca: 62, taxaEntrega: 55, tarefasFeitas: 3, tarefasTotal: 8, avaliacoesFeitas: 2, avaliacoesTotal: 4, status: "risco" },
+  { id: "re6", name: "Rita Oliveira", email: "3055@upra.kor", faculty: "Fac. Direito", course: "Direito Civil", year: 3, turma: "A", media: 16.2, presenca: 97, taxaEntrega: 100, tarefasFeitas: 9, tarefasTotal: 9, avaliacoesFeitas: 4, avaliacoesTotal: 4, status: "excelente" },
+  { id: "re7", name: "Bruno Mendes", email: "3066@upra.kor", faculty: "Fac. Medicina", course: "Medicina Geral", year: 2, turma: "A", media: 13.4, presenca: 85, taxaEntrega: 88, tarefasFeitas: 7, tarefasTotal: 9, avaliacoesFeitas: 3, avaliacoesTotal: 4, status: "normal" },
+  { id: "re8", name: "Catarina Reis", email: "3077@upra.kor", faculty: "Fac. Arquitectura", course: "Eng. Informática", year: 1, turma: "B", media: 9.5, presenca: 65, taxaEntrega: 60, tarefasFeitas: 4, tarefasTotal: 8, avaliacoesFeitas: 1, avaliacoesTotal: 4, status: "risco" },
+  { id: "re9", name: "Diogo Pereira", email: "3088@upra.kor", faculty: "Fac. Economia", course: "Contabilidade", year: 4, turma: "A", media: 14.8, presenca: 93, taxaEntrega: 96, tarefasFeitas: 7, tarefasTotal: 7, avaliacoesFeitas: 3, avaliacoesTotal: 3, status: "excelente" },
+  { id: "re10", name: "Eva Cunha", email: "3099@upra.kor", faculty: "Fac. Ciências Sociais", course: "Sociologia", year: 3, turma: "A", media: 13.0, presenca: 82, taxaEntrega: 85, tarefasFeitas: 5, tarefasTotal: 7, avaliacoesFeitas: 2, avaliacoesTotal: 3, status: "normal" },
+  { id: "re11", name: "Francisco Lima", email: "3110@upra.kor", faculty: "Fac. Arquitectura", course: "Eng. Civil", year: 5, turma: "A", media: 15.5, presenca: 96, taxaEntrega: 100, tarefasFeitas: 6, tarefasTotal: 6, avaliacoesFeitas: 2, avaliacoesTotal: 2, status: "excelente" },
+  { id: "re12", name: "Gonçalo Dias", email: "3121@upra.kor", faculty: "Fac. Direito", course: "Direito Penal", year: 2, turma: "A", media: 14.0, presenca: 90, taxaEntrega: 92, tarefasFeitas: 5, tarefasTotal: 6, avaliacoesFeitas: 2, avaliacoesTotal: 2, status: "normal" },
+  { id: "re13", name: "Helena Costa", email: "3132@upra.kor", faculty: "Fac. Medicina", course: "Enfermagem", year: 1, turma: "A", media: 7.2, presenca: 55, taxaEntrega: 45, tarefasFeitas: 2, tarefasTotal: 8, avaliacoesFeitas: 1, avaliacoesTotal: 4, status: "risco" },
+  { id: "re14", name: "Igor Martins", email: "3143@upra.kor", faculty: "Fac. Ciências Sociais", course: "Psicologia", year: 2, turma: "B", media: 12.1, presenca: 80, taxaEntrega: 78, tarefasFeitas: 6, tarefasTotal: 10, avaliacoesFeitas: 3, avaliacoesTotal: 5, status: "normal" },
+  { id: "re15", name: "Joana Cardoso", email: "3154@upra.kor", faculty: "Fac. Arquitectura", course: "Eng. Ambiental", year: 2, turma: "A", media: 15.8, presenca: 94, taxaEntrega: 97, tarefasFeitas: 9, tarefasTotal: 9, avaliacoesFeitas: 4, avaliacoesTotal: 4, status: "excelente" },
+  { id: "re16", name: "Tiago Barbosa", email: "3165@upra.kor", faculty: "Fac. Economia", course: "Marketing", year: 3, turma: "A", media: 8.1, presenca: 58, taxaEntrega: 50, tarefasFeitas: 3, tarefasTotal: 10, avaliacoesFeitas: 1, avaliacoesTotal: 5, status: "risco" },
+];
+
 // ── Coordenador Anúncios ──
 export interface CoordAnuncio {
   id: string;
