@@ -68,74 +68,73 @@ export default function CoordenadorCadeiraDetail() {
         <ArrowLeft className="w-4 h-4" /> Voltar à turma
       </Link>
 
-      {/* Hero */}
-      <div className="relative overflow-hidden rounded-2xl p-6 lg:p-8 bg-primary/5">
-        <div className="absolute top-0 right-0 w-40 h-40 rounded-full bg-primary/5" style={{ transform: "translate(30%, -30%)" }} />
-        <div className="relative flex items-start gap-5">
-          <div className="w-14 h-14 rounded-2xl bg-primary flex items-center justify-center shrink-0 shadow-sm">
-            <BookOpen className="w-7 h-7 text-primary-foreground" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1">
-              <Badge variant="outline" className="text-[10px] font-mono text-muted-foreground">{turmaId?.toUpperCase()}</Badge>
-              <Badge variant="outline" className="text-xs font-mono">{cadeira.code}</Badge>
+      {/* Unified Card */}
+      <Card className="overflow-hidden">
+        {/* Header */}
+        <div className="relative border-b border-border">
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/6 via-primary/3 to-transparent" />
+          <div className="relative px-5 py-4">
+            <div className="flex items-center gap-2.5 mb-2">
+              <h1 className="text-xl font-bold text-foreground tracking-tight leading-tight">{cadeira.name}</h1>
+              <Badge variant="outline" className="text-[10px] font-mono shrink-0">{cadeira.code}</Badge>
             </div>
-            <h1 className="text-2xl lg:text-3xl font-bold text-foreground">{cadeira.name}</h1>
-            <div className="flex items-center gap-4 mt-3 text-sm text-muted-foreground">
-              <span className="flex items-center gap-1.5"><GraduationCap className="w-4 h-4" />{coordCursoInfo.faculty}</span>
-              <span className="flex items-center gap-1.5"><Calendar className="w-4 h-4" />{yearNum}º Ano</span>
-              <span className="flex items-center gap-1.5"><Users className="w-4 h-4" />{cadeira.professor}</span>
-              <span className="flex items-center gap-1.5"><MapPin className="w-4 h-4" />{cadeira.location}</span>
+            <div className="flex items-center gap-2 flex-wrap">
+              <Badge variant="outline" className="text-[11px] bg-background/80 gap-1">
+                <BookOpen className="w-3 h-3" /> {cadeira.name}
+              </Badge>
+              <Badge variant="outline" className="text-[11px] bg-background/80 gap-1">
+                <Users className="w-3 h-3" /> Turma {turmaId?.replace("t", "").replace(/\d/, "").toUpperCase()}
+              </Badge>
+              <Badge variant="outline" className="text-[11px] bg-background/80">
+                {yearNum}º Ano · {coordCursoInfo.faculty}
+              </Badge>
+              <Badge variant="outline" className="text-[11px] bg-background/80 gap-1">
+                <MapPin className="w-3 h-3" /> {cadeira.location}
+              </Badge>
+            </div>
+            <p className="text-sm text-muted-foreground mt-2">{cadeira.professor}</p>
+          </div>
+        </div>
+
+        {/* KPIs */}
+        <div className="px-5 py-4 grid grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0"><Users className="w-3.5 h-3.5 text-primary" /></div>
+            <div>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider leading-tight">Estudantes</p>
+              <p className="text-sm font-bold text-foreground">{cadeira.estudantes}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0"><Calendar className="w-3.5 h-3.5 text-primary" /></div>
+            <div>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider leading-tight">Dias de Aula</p>
+              <p className="text-sm font-bold text-foreground">{cadeira.diasAula}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0"><CheckCircle className="w-3.5 h-3.5 text-primary" /></div>
+            <div>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider leading-tight">Presença</p>
+              <p className={`text-sm font-bold ${avgPresenca >= 75 ? "text-accent" : "text-destructive"}`}>{avgPresenca}%</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-secondary/10 flex items-center justify-center shrink-0"><ClipboardList className="w-3.5 h-3.5 text-secondary" /></div>
+            <div>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider leading-tight">Taxa Entrega</p>
+              <p className={`text-sm font-bold ${cadeira.taxaEntrega >= 80 ? "text-accent" : "text-destructive"}`}>{cadeira.taxaEntrega}%</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-accent/10 flex items-center justify-center shrink-0"><TrendingUp className="w-3.5 h-3.5 text-accent" /></div>
+            <div>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider leading-tight">Média Geral</p>
+              <p className={`text-sm font-bold ${cadeira.media !== null && cadeira.media >= 10 ? "text-accent" : "text-destructive"}`}>{cadeira.media ?? "—"}/20</p>
             </div>
           </div>
         </div>
-      </div>
-
-      {/* KPIs */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
-        <Card className="p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><Users className="w-4 h-4 text-primary" /></div>
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Estudantes</span>
-          </div>
-          <p className="text-2xl font-bold text-foreground">{cadeira.estudantes}</p>
-        </Card>
-        <Card className="p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><Calendar className="w-4 h-4 text-primary" /></div>
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Dias de Aula</span>
-          </div>
-          <p className="text-lg font-bold text-foreground">{cadeira.diasAula}</p>
-        </Card>
-        <Card className="p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><CheckCircle className="w-4 h-4 text-primary" /></div>
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Presença</span>
-          </div>
-          <div className="flex items-baseline gap-1">
-            <span className={`text-2xl font-bold ${avgPresenca >= 75 ? "text-accent" : "text-destructive"}`}>{avgPresenca}%</span>
-          </div>
-        </Card>
-        <Card className="p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><ClipboardList className="w-4 h-4 text-primary" /></div>
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Taxa Entrega</span>
-          </div>
-          <div className="flex items-baseline gap-1">
-            <span className={`text-2xl font-bold ${cadeira.taxaEntrega >= 80 ? "text-accent" : "text-destructive"}`}>{cadeira.taxaEntrega}%</span>
-          </div>
-        </Card>
-        <Card className="p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><TrendingUp className="w-4 h-4 text-primary" /></div>
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Média</span>
-          </div>
-          <div className="flex items-baseline gap-1">
-            <span className={`text-2xl font-bold ${cadeira.media !== null && cadeira.media >= 10 ? "text-accent" : "text-destructive"}`}>{cadeira.media ?? "—"}</span>
-            <span className="text-sm text-muted-foreground">/20</span>
-          </div>
-        </Card>
-      </div>
+      </Card>
 
       {/* Tabs */}
       <Tabs defaultValue="students" className="space-y-5">
