@@ -32,7 +32,6 @@ export default function DecanoEstudanteProfile() {
 
   const sc = statusConfig[student.status];
   const curso = decanoFaculty.courses.find(c => c.name === student.course);
-  const cadeiras = curso ? curso.years.find(y => y.year === student.year)?.cadeiras ?? 0 : 0;
 
   return (
     <div className="p-6 lg:p-8 max-w-3xl mx-auto space-y-6 animate-fade-in">
