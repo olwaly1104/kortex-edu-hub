@@ -58,8 +58,7 @@ export default function DecanoFaculdades() {
 
           return (
             <Link key={c.id} to={`/decano/cursos/${c.id}`}>
-              <Card className="overflow-hidden hover:shadow-md transition-all cursor-pointer group border-l-[3px]"
-                style={{ borderLeftColor: c.mediaGeral >= 14 ? "hsl(var(--accent))" : c.mediaGeral >= 10 ? "hsl(var(--primary))" : "hsl(var(--destructive))" }}>
+              <Card className="overflow-hidden hover:shadow-md transition-all cursor-pointer group">
                 <div className="px-5 pt-5 pb-3">
                   <div className="flex items-start justify-between">
                     <div className="flex-1 min-w-0">
@@ -85,9 +84,7 @@ export default function DecanoFaculdades() {
                   </div>
                 </div>
 
-                <div className="mx-5 border-t border-border/60" />
-
-                <div className="px-5 py-3 grid grid-cols-4 gap-3">
+                <div className="px-5 py-3 bg-muted/30 grid grid-cols-4 gap-3">
                   <div className="text-center">
                     <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-0.5">Estudantes</p>
                     <p className="text-lg font-bold text-foreground">{c.estudantes}</p>
