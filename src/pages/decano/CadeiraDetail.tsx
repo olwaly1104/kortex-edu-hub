@@ -68,22 +68,22 @@ export default function DecanoCadeiraDetail() {
 
   const [studentSearch, setStudentSearch] = useState("");
 
+  const turmaLetter = turma?.name.replace("Turma ", "") || "";
+  const estudantes = turma && course ? decanoEstudantes.filter(e => e.course === course.name && e.year === turma.year && e.turma === turmaLetter) : [];
+  const filteredStudents = estudantes.filter(e => e.name.toLowerCase().includes(studentSearch.toLowerCase()));
+
+  const lessons = useMemo(() => cadeira ? generateLessons(cadeira.code) : [], [cadeira?.code]);
+  const tasks = useMemo(() => cadeira ? generateTasks(cadeira.name) : [], [cadeira?.name]);
+
+  const conteudos = lessons.filter(l => l.status === "publicada").flatMap(l =>
+    l.materials.map(m => ({ ...m, lessonTitle: l.title, lessonNumber: l.number, date: l.date }))
+  );
+
   if (!turma || !course || !cadeira) return (
     <div className="p-8 text-muted-foreground">
       <Link to={turma && course ? `/decano/cursos/${cursoId}/turma/${turmaId}` : "/decano/faculdades"} className="text-primary hover:underline">← Voltar</Link>
       <p className="mt-4">Cadeira não encontrada.</p>
     </div>
-  );
-
-  const turmaLetter = turma.name.replace("Turma ", "");
-  const estudantes = decanoEstudantes.filter(e => e.course === course.name && e.year === turma.year && e.turma === turmaLetter);
-  const filteredStudents = estudantes.filter(e => e.name.toLowerCase().includes(studentSearch.toLowerCase()));
-
-  const lessons = useMemo(() => generateLessons(cadeira.code), [cadeira.code]);
-  const tasks = useMemo(() => generateTasks(cadeira.name), [cadeira.name]);
-
-  const conteudos = lessons.filter(l => l.status === "publicada").flatMap(l =>
-    l.materials.map(m => ({ ...m, lessonTitle: l.title, lessonNumber: l.number, date: l.date }))
   );
 
   const statusBadgeStyle: Record<string, string> = { excelente: "bg-accent/10 text-accent", normal: "bg-secondary/10 text-secondary", risco: "bg-destructive/10 text-destructive" };
