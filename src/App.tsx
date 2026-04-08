@@ -75,6 +75,8 @@ import DecanoAnoDetail from "./pages/decano/AnoDetail";
 import DecanoEstudanteProfile from "./pages/decano/EstudanteProfile";
 import DecanoDocenteProfile from "./pages/decano/DocenteProfile";
 import DecanoTurmaDetail from "./pages/decano/TurmaDetail";
+import DecanoCoordenadores from "./pages/decano/Coordenadores";
+import DecanoCoordenadorProfile from "./pages/decano/CoordenadorProfile";
 import ReitoriaDashboard from "./pages/reitoria/Dashboard";
 import ReitoriaAprovacoes from "./pages/reitoria/Aprovacoes";
 import ReitoriaVisaoGeral from "./pages/reitoria/VisaoGeral";
@@ -189,6 +191,8 @@ function AppRoutes() {
         <Route path="/decano/cursos/:cursoId/ano/:year" element={<DecanoAnoDetail />} />
         <Route path="/decano/cursos/:cursoId/turma/:turmaId" element={<DecanoTurmaDetail />} />
         <Route path="/decano/estudantes" element={<DecanoEstudantes />} />
+        <Route path="/decano/coordenadores" element={<DecanoCoordenadores />} />
+        <Route path="/decano/coordenadores/:coordenadorId" element={<DecanoCoordenadorProfile />} />
         <Route path="/decano/estudantes/:estudanteId" element={<DecanoEstudanteProfile />} />
         <Route path="/decano/docentes" element={<DecanoDocentes />} />
         <Route path="/decano/docentes/:docenteId" element={<DecanoDocenteProfile />} />
