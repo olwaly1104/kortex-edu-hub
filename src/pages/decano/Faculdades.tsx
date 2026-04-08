@@ -65,8 +65,7 @@ export default function DecanoFaculdades() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-2">
                         <h3 className="text-base font-bold text-foreground truncate">{c.name}</h3>
-                        <Badge variant="outline" className="text-[10px] font-mono shrink-0">{c.code}</Badge>
-                        <Badge variant="outline" className="text-[10px] shrink-0">{turmas.length} turmas</Badge>
+                        <Badge className="text-[10px] font-mono shrink-0 bg-primary/10 text-primary border border-primary/20">{c.code}</Badge>
                         <Badge variant="outline" className={`text-[10px] shrink-0 ${estado.cls}`}>{estado.label}</Badge>
                       </div>
                       <div className="space-y-1.5">
@@ -88,14 +87,10 @@ export default function DecanoFaculdades() {
 
                 <div className="mx-5 border-t border-border/60" />
 
-                <div className="px-5 py-3 grid grid-cols-5 gap-3">
+                <div className="px-5 py-3 grid grid-cols-4 gap-3">
                   <div className="text-center">
                     <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-0.5">Estudantes</p>
                     <p className="text-lg font-bold text-foreground">{c.estudantes}</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-0.5">Turmas</p>
-                    <p className="text-lg font-bold text-foreground">{turmas.length}</p>
                   </div>
                   <div className="text-center">
                     <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-0.5">Docentes</p>
