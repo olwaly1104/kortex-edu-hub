@@ -26,10 +26,11 @@ export default function DecanoFaculdades() {
             <p className="text-sm text-muted-foreground">{fac.name} — {fac.courses.length} cursos</p>
           </div>
         </div>
-        <div className="px-5 py-4 grid grid-cols-2 lg:grid-cols-5 gap-4">
+        <div className="px-5 py-4 grid grid-cols-2 lg:grid-cols-6 gap-4">
           {[
             { icon: Users, label: "Total Estudantes", value: fac.totalEstudantes },
             { icon: BookOpen, label: "Cursos", value: fac.totalCursos },
+            { icon: Clock, label: "Turmas", value: decanoTurmas.length },
             { icon: GraduationCap, label: "Docentes", value: fac.totalDocentes },
             { icon: Award, label: "Média Global", value: "13.2/20" },
             { icon: CheckCircle, label: "Presença Global", value: "82%" },
