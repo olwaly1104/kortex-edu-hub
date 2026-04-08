@@ -312,6 +312,7 @@ export default function CoordenadorTurmaDetail() {
                     </div>
                   )}
                 </Card>
+                </Link>
               );
             })}
             {turmaLessons.length === 0 && <p className="text-center text-muted-foreground py-8">Nenhuma aula nesta turma.</p>}
