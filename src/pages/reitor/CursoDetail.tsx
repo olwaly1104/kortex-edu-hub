@@ -37,6 +37,9 @@ export default function ReitorCursoDetail() {
   const { faculdadeId, cursoId } = useParams();
   const fac = reitorFaculties.find(f => f.id === faculdadeId);
   const course = fac?.courses.find(c => c.id === cursoId);
+  const turmas = useMemo(() => course ? generateTurmas(course.id, course.years, course.estudantes) : [], [course?.id]);
+  const courseYears = [...new Set(turmas.map(t => t.year))].sort();
+  const estado = course ? getEstado(course.mediaGeral) : getEstado(0);
 
   if (!fac || !course) return (
     <div className="p-8 text-muted-foreground">
@@ -44,10 +47,6 @@ export default function ReitorCursoDetail() {
       <p className="mt-4">Curso não encontrado.</p>
     </div>
   );
-
-  const turmas = useMemo(() => generateTurmas(course.id, course.years, course.estudantes), [course.id]);
-  const courseYears = [...new Set(turmas.map(t => t.year))].sort();
-  const estado = getEstado(course.mediaGeral);
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
