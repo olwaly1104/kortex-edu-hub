@@ -15,17 +15,21 @@ export default function DecanoFaculdades() {
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       {/* Header */}
-      <Card className="overflow-hidden">
-        <div className="relative border-b border-border">
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/6 via-primary/3 to-transparent" />
-          <div className="relative px-5 py-4">
-            <div className="flex items-center gap-2.5 mb-1">
-              <Building2 className="w-5 h-5 text-primary" />
-              <h1 className="text-xl font-bold text-foreground tracking-tight">Meus Cursos</h1>
+      <Link to="/decano/faculdade">
+        <Card className="overflow-hidden hover:shadow-md transition-all cursor-pointer group">
+          <div className="relative border-b border-border">
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/6 via-primary/3 to-transparent" />
+            <div className="relative px-5 py-4 flex items-center justify-between">
+              <div>
+                <div className="flex items-center gap-2.5 mb-1">
+                  <Building2 className="w-5 h-5 text-primary" />
+                  <h1 className="text-xl font-bold text-foreground tracking-tight">Meus Cursos</h1>
+                </div>
+                <p className="text-sm text-muted-foreground">{fac.name}</p>
+              </div>
+              <ChevronRight className="w-5 h-5 text-muted-foreground shrink-0 group-hover:text-primary transition-colors" />
             </div>
-            <p className="text-sm text-muted-foreground">{fac.name} — {fac.courses.length} cursos</p>
           </div>
-        </div>
         <div className="px-5 py-4 grid grid-cols-2 lg:grid-cols-6 gap-4">
           {[
             { icon: Users, label: "Total Estudantes", value: fac.totalEstudantes },
@@ -47,6 +51,7 @@ export default function DecanoFaculdades() {
           ))}
         </div>
       </Card>
+      </Link>
 
       {/* Course cards */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
