@@ -14,6 +14,7 @@ const getEstado = (media: number) =>
 
 export default function DecanoCursoDetail() {
   const { cursoId } = useParams();
+  const navigate = useNavigate();
   const course = decanoFaculty.courses.find(c => c.id === cursoId);
 
   if (!course) return (
