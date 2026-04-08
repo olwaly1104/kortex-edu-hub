@@ -147,11 +147,9 @@ export default function CoordenadorAvaliacaoDetail() {
             </div>
           ))}
         </div>
-        </div>
-      </Card>
-      <Card className="overflow-hidden">
+
         {task.status !== "rascunho" && (
-          <div className="p-5 space-y-4 border-b border-border">
+          <div className="p-5 space-y-4 border-t border-border">
             <div className="space-y-2">
               <div className="flex items-center justify-between text-xs">
                 <span className="flex items-center gap-1.5 text-muted-foreground font-medium"><Users className="w-3.5 h-3.5" />Taxa de Submissão</span>
@@ -181,6 +179,9 @@ export default function CoordenadorAvaliacaoDetail() {
             </div>
           </div>
         )}
+        </div>
+      </Card>
+      <Card className="overflow-hidden">
         <div className="p-4 border-b bg-muted/30 flex items-center justify-between">
           <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
             <Users className="w-4 h-4" /> Estudantes ({studentResults.length})
