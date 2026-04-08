@@ -97,6 +97,7 @@ export default function DecanoTurmaDetail() {
   const tasks = useMemo(() => turma ? generateTasks(turma.id, turma) : [], [turma?.id]);
   const resources = useMemo(() => turma ? generateResources(turma.id) : [], [turma?.id]);
   const calendar = useMemo(() => turma ? generateCalendar(turma.id) : [], [turma?.id]);
+  const cadeiras = useMemo(() => turma ? generateCadeiras(turma.id, turma) : [], [turma?.id]);
 
   const [studentSearch, setStudentSearch] = useState("");
   const [criteria, setCriteria] = useState([
