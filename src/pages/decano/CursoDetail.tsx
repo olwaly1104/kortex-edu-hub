@@ -96,7 +96,7 @@ export default function DecanoCursoDetail() {
                     key={t.id}
                     className="p-3 transition-all cursor-pointer hover:shadow-md border-l-[3px] group"
                     style={{ borderLeftColor: t.media >= 14 ? "hsl(var(--accent))" : t.media >= 10 ? "hsl(var(--primary))" : "hsl(var(--destructive))" }}
-                    onClick={() => {}}
+                    onClick={() => navigate(`/decano/cursos/${cursoId}/turma/${t.id}`)}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 min-w-0">
