@@ -77,8 +77,8 @@ export default function CoordenadorAvaliacaoDetail() {
         </div>
       </div>
 
-      {/* Dados + Guia + Conteúdo — single card */}
-      <Card className="p-5 space-y-5">
+      {/* Info card */}
+      <Card className="p-5 space-y-4">
         {/* KPIs */}
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
           <KpiCard label="Data" value={task.dueDate} icon={Calendar} iconBg="bg-primary/10" iconColor="text-primary" />
@@ -90,46 +90,37 @@ export default function CoordenadorAvaliacaoDetail() {
 
         <div className="border-t border-border" />
 
-        {/* Guia + Conteúdo side by side */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-          <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
-              <BookOpen className="w-4 h-4 text-primary" /> Guia da Avaliação
-            </h3>
-            <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/40 hover:bg-muted/60 transition-colors cursor-pointer">
-              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                <FileText className="w-4 h-4 text-primary" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-xs font-medium text-foreground truncate">Guia — {task.title}</p>
-                <p className="text-[10px] text-muted-foreground">PDF · 3 páginas · Actualizado {task.dueDate}</p>
-              </div>
-              <Badge variant="outline" className="text-[10px] shrink-0">Abrir</Badge>
+        {/* Guia + Conteúdo inline row */}
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-4">
+          {/* Guia — single doc inline */}
+          <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/40 hover:bg-muted/60 transition-colors cursor-pointer">
+            <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+              <BookOpen className="w-4 h-4 text-primary" />
             </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-medium text-foreground">Guia da Avaliação</p>
+              <p className="text-[10px] text-muted-foreground">PDF · 3 páginas</p>
+            </div>
+            <Badge variant="outline" className="text-[10px] shrink-0">Abrir</Badge>
           </div>
 
-          <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
-              <FileText className="w-4 h-4 text-primary" /> Conteúdo Relevante
-            </h3>
-            <div className="space-y-2">
-              {[
-                { name: "Capítulo 4 — Estruturas de Dados", type: "PDF" },
-                { name: "Slides Aula 7 — Algoritmos de Ordenação", type: "PPTX" },
-                { name: "Exercícios Práticos — Semana 5", type: "PDF" },
-                { name: "Vídeo: Revisão para o Teste", type: "Link" },
-              ].map((item, i) => (
-                <div key={i} className="flex items-center gap-3 p-2.5 rounded-lg bg-muted/40 hover:bg-muted/60 transition-colors">
-                  <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                    {item.type === "Link" ? <Link2 className="w-3.5 h-3.5 text-primary" /> : <FileText className="w-3.5 h-3.5 text-primary" />}
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-xs font-medium text-foreground truncate">{item.name}</p>
-                    <p className="text-[10px] text-muted-foreground">{item.type}</p>
-                  </div>
+          {/* Conteúdo Relevante */}
+          <div className="space-y-2">
+            <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider mb-1">Conteúdo Relevante</p>
+            {[
+              { name: "Capítulo 4 — Estruturas de Dados", type: "PDF" },
+              { name: "Slides Aula 7 — Algoritmos de Ordenação", type: "PPTX" },
+              { name: "Exercícios Práticos — Semana 5", type: "PDF" },
+              { name: "Vídeo: Revisão para o Teste", type: "Link" },
+            ].map((item, i) => (
+              <div key={i} className="flex items-center gap-2.5 p-2 rounded-lg bg-muted/40 hover:bg-muted/60 transition-colors cursor-pointer">
+                <div className="w-7 h-7 rounded-md bg-primary/10 flex items-center justify-center shrink-0">
+                  {item.type === "Link" ? <Link2 className="w-3 h-3 text-primary" /> : <FileText className="w-3 h-3 text-primary" />}
                 </div>
-              ))}
-            </div>
+                <p className="text-xs text-foreground truncate flex-1">{item.name}</p>
+                <span className="text-[10px] text-muted-foreground shrink-0">{item.type}</span>
+              </div>
+            ))}
           </div>
         </div>
       </Card>
