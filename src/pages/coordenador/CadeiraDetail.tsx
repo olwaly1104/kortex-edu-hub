@@ -309,8 +309,9 @@ export default function CoordenadorCadeiraDetail() {
             </div>
           </div>
           <div className="space-y-2">
-            {filteredStudents.map(student => (
-              <Card key={student.id} className={`p-4 flex items-center gap-4 border-l-[3px] ${statusColors[student.status]}`}>
+           {filteredStudents.map(student => (
+              <Link key={student.id} to={`/coordenador/estudantes/${student.id}`}>
+              <Card className={`p-4 flex items-center gap-4 border-l-[3px] hover:shadow-md transition-shadow cursor-pointer ${statusColors[student.status]}`}>
                 <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-xs font-bold text-muted-foreground shrink-0">
                   {student.name.split(" ").map(n => n[0]).slice(0, 2).join("")}
                 </div>
@@ -328,6 +329,7 @@ export default function CoordenadorCadeiraDetail() {
                   <div><p className="text-[10px] text-muted-foreground uppercase">Média</p><p className={`text-sm font-bold ${student.media !== null && student.media >= 10 ? "text-accent" : "text-destructive"}`}>{student.media ?? "—"}</p></div>
                 </div>
               </Card>
+              </Link>
             ))}
             {filteredStudents.length === 0 && <p className="text-center text-muted-foreground py-8">Nenhum estudante encontrado.</p>}
           </div>
