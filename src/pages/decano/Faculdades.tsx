@@ -1,4 +1,4 @@
-import { decanoFaculty, decanoTurmas } from "@/data/institutionData";
+import { decanoFaculty, decanoTurmas, decanoCoordenadores } from "@/data/institutionData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Building2, Users, BookOpen, GraduationCap, Award, ChevronRight, Clock, CheckCircle } from "lucide-react";
@@ -76,7 +76,14 @@ export default function DecanoFaculdades() {
                         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                           <GraduationCap className="w-3.5 h-3.5 text-primary/60" />
                           <span className="font-medium text-foreground/70">Coordenador:</span>
-                          <span>{c.coordinator}</span>
+                          {(() => {
+                            const coord = decanoCoordenadores.find(co => co.name === c.coordinator);
+                            return coord ? (
+                              <Link to={`/decano/coordenadores/${coord.id}`} className="text-primary hover:underline" onClick={e => e.stopPropagation()}>
+                                {c.coordinator}
+                              </Link>
+                            ) : <span>{c.coordinator}</span>;
+                          })()}
                         </div>
                         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                           <Clock className="w-3.5 h-3.5 text-primary/60" />
