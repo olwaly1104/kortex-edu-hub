@@ -675,7 +675,13 @@ export interface FacultyDocente {
   course: string;
   department: string;
   disciplinas: number;
+  turmas: number;
   presenca: number;
+  mediaGeral: number;
+  estudantesTotal: number;
+  taxaEntrega: number;
+  taxaAprovacao: number;
+  taxaReprovacao: number;
   status: "activo" | "licença" | "inactivo";
 }
 
@@ -685,7 +691,14 @@ export interface FacultyEstudante {
   email: string;
   course: string;
   year: number;
+  turma: string;
   media: number | null;
+  presenca: number;
+  taxaEntrega: number;
+  tarefasFeitas: number;
+  tarefasTotal: number;
+  avaliacoesFeitas: number;
+  avaliacoesTotal: number;
   status: "excelente" | "normal" | "risco";
 }
 
