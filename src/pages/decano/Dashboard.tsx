@@ -70,10 +70,22 @@ export default function DecanoDashboard() {
   const coordsEmRisco = decanoCoordenadores.filter(c => c.presenca < 85 || c.taxaEntrega < 80 || c.mediaGeral < 11);
   const cursosEmRisco = decanoFaculty.courses.filter(c => c.mediaGeral < 12 || c.taxaSucesso < 75);
   const turmasEmRisco = decanoTurmas.filter(t => t.presenca < 80 || t.media < 12 || t.taxaEntrega < 85);
-  const docentesEmRisco = decanoDocentes.filter(d => d.presenca < 85 || d.taxaEntrega < 80 || d.mediaGeral < 11);
-  const estudantesEmRisco = decanoEstudantes
-    .filter(e => e.status === "risco")
-    .sort((a, b) => (a.media ?? 0) - (b.media ?? 0));
+
+  // Anos em risco: aggregate turmas by courseId+year
+  const anosMap = new Map<string, { courseId: string; courseName: string; year: number; media: number; presenca: number; taxaEntrega: number; turmas: number }>();
+  decanoTurmas.forEach(t => {
+    const key = `${t.courseId}-${t.year}`;
+    const existing = anosMap.get(key);
+    if (!existing) {
+      anosMap.set(key, { courseId: t.courseId, courseName: t.courseName, year: t.year, media: t.media, presenca: t.presenca, taxaEntrega: t.taxaEntrega, turmas: 1 });
+    } else {
+      existing.media = +((existing.media * existing.turmas + t.media) / (existing.turmas + 1)).toFixed(1);
+      existing.presenca = Math.round((existing.presenca * existing.turmas + t.presenca) / (existing.turmas + 1));
+      existing.taxaEntrega = Math.round((existing.taxaEntrega * existing.turmas + t.taxaEntrega) / (existing.turmas + 1));
+      existing.turmas++;
+    }
+  });
+  const anosEmRisco = [...anosMap.values()].filter(a => a.presenca < 80 || a.media < 12 || a.taxaEntrega < 85);
 
   const stats = [
     { icon: Users, label: "Total Estudantes", value: fac.totalEstudantes, color: "text-accent bg-accent/10" },
