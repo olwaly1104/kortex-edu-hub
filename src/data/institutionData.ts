@@ -758,15 +758,23 @@ export const decanoEstudantes: FacultyEstudante[] = [
   { id: "fe20", name: "André Sousa", email: "3209@upra.kor", course: "Eng. Química", year: 3, turma: "A", media: 10.2, presenca: 72, taxaEntrega: 68, tarefasFeitas: 5, tarefasTotal: 9, avaliacoesFeitas: 2, avaliacoesTotal: 4, status: "normal" },
 ];
 
-export const decanoAprovacoes: Aprovacao[] = [
-  { id: "dap1", type: "plano", title: "Reestruturação curricular — Eng. Química", description: "Proposta de reestruturação do currículo de Engenharia Química", requester: "Dra. Carla Nunes", date: "28/02/2024", status: "pendente", priority: "alta" },
-  { id: "dap2", type: "recurso", title: "Contratação de docente — Eng. Informática", description: "Pedido de abertura de vaga para novo docente de IA", requester: "Dra. Teresa Moura", date: "27/02/2024", status: "pendente", priority: "alta" },
-  { id: "dap3", type: "horário", title: "Calendário de exames — 2º Semestre", description: "Aprovação do calendário de exames para todos os cursos", requester: "Serviços Académicos", date: "25/02/2024", status: "pendente", priority: "alta" },
-  { id: "dap4", type: "nota", title: "Homologação de pautas — Eng. Civil 4º Ano", description: "Pautas finais do 1º semestre para homologação", requester: "Dr. Manuel Rodrigues", date: "24/02/2024", status: "pendente", priority: "média" },
-  { id: "dap5", type: "transferência", title: "Transferência inter-cursos", description: "Pedido de transferência de Eng. Mecânica para Eng. Civil", requester: "Estudante Carlos Pereira", date: "22/02/2024", status: "pendente", priority: "baixa" },
-  { id: "dap6", type: "plano", title: "Nova disciplina optativa — Eng. Informática", description: "Proposta de criação de disciplina de Machine Learning", requester: "Dra. Teresa Moura", date: "20/02/2024", status: "aprovado", priority: "média" },
-  { id: "dap7", type: "horário", title: "Alteração de sala — Eng. Mecânica", description: "Mudança de sala para Lab. de Termodinâmica", requester: "Dr. Jorge Bastos", date: "18/02/2024", status: "aprovado", priority: "baixa" },
+export const decanoSolicitacoes: Solicitacao[] = [
+  // Recebidas (dos coordenadores)
+  { id: "dap1", type: "plano", title: "Reestruturação curricular — Eng. Química", description: "Proposta de reestruturação do currículo de Engenharia Química", requester: "Dra. Carla Nunes", date: "28/02/2024", status: "pendente", priority: "alta", direction: "recebida" },
+  { id: "dap2", type: "recurso", title: "Contratação de docente — Eng. Informática", description: "Pedido de abertura de vaga para novo docente de IA", requester: "Dra. Teresa Moura", date: "27/02/2024", status: "pendente", priority: "alta", direction: "recebida" },
+  { id: "dap3", type: "horário", title: "Calendário de exames — 2º Semestre", description: "Aprovação do calendário de exames para todos os cursos", requester: "Serviços Académicos", date: "25/02/2024", status: "pendente", priority: "alta", direction: "recebida" },
+  { id: "dap4", type: "nota", title: "Homologação de pautas — Eng. Civil 4º Ano", description: "Pautas finais do 1º semestre para homologação", requester: "Dr. Manuel Rodrigues", date: "24/02/2024", status: "pendente", priority: "média", direction: "recebida" },
+  { id: "dap5", type: "transferência", title: "Transferência inter-cursos", description: "Pedido de transferência de Eng. Mecânica para Eng. Civil", requester: "Estudante Carlos Pereira", date: "22/02/2024", status: "pendente", priority: "baixa", direction: "recebida" },
+  { id: "dap6", type: "plano", title: "Nova disciplina optativa — Eng. Informática", description: "Proposta de criação de disciplina de Machine Learning", requester: "Dra. Teresa Moura", date: "20/02/2024", status: "aprovado", priority: "média", direction: "recebida" },
+  { id: "dap7", type: "horário", title: "Alteração de sala — Eng. Mecânica", description: "Mudança de sala para Lab. de Termodinâmica", requester: "Dr. Jorge Bastos", date: "18/02/2024", status: "aprovado", priority: "baixa", direction: "recebida" },
+  { id: "dap8", type: "nota", title: "Revisão de nota — Eng. Civil 3º Ano", description: "Pedido de revisão de pauta de Estruturas II", requester: "Dr. Fábio Costa", date: "15/02/2024", status: "rejeitado", priority: "média", direction: "recebida" },
+  // Enviadas (à Reitoria)
+  { id: "dap9", type: "material", title: "Requisição de orçamento para laboratórios", description: "Pedido de reforço orçamental para equipar os laboratórios da faculdade", requester: "Decano", date: "26/02/2024", status: "pendente", priority: "alta", direction: "enviada", destinatario: "Reitoria" },
+  { id: "dap10", type: "reunião", title: "Reunião sobre acreditação de cursos", description: "Pedido de reunião com a Reitoria para discutir processo de acreditação", requester: "Decano", date: "22/02/2024", status: "aprovado", priority: "média", direction: "enviada", destinatario: "Reitoria" },
+  { id: "dap11", type: "plano", title: "Criação de novo mestrado", description: "Proposta de abertura de Mestrado em Arquitectura Sustentável", requester: "Decano", date: "18/02/2024", status: "pendente", priority: "alta", direction: "enviada", destinatario: "Reitoria" },
 ];
+// Backward compat
+export const decanoAprovacoes = decanoSolicitacoes;
 
 // ── Reitoria ──
 export interface UniversityFaculty {
