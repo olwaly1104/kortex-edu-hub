@@ -288,21 +288,22 @@ export default function DecanoDashboard() {
             <h2 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
               <Play className="w-4 h-4 text-primary" /> Acções Rápidas
             </h2>
-            <div className="grid grid-cols-2 gap-2 flex-1 content-start">
+            <div className="flex flex-col gap-1.5 flex-1 justify-evenly">
               {[
-                { label: "Coordenadores", icon: UserCog, path: "/decano/coordenadores", color: "bg-primary/10 text-primary" },
-                { label: "Cursos", icon: Building2, path: "/decano/faculdades", color: "bg-accent/10 text-accent" },
-                { label: "Estudantes", icon: Users, path: "/decano/estudantes", color: "bg-secondary/10 text-secondary" },
-                { label: "Docentes", icon: GraduationCap, path: "/decano/docentes", color: "bg-primary/10 text-primary" },
-                { label: "Notas", icon: Award, path: "/decano/notas", color: "bg-accent/10 text-accent" },
-                { label: "Relatórios", icon: BarChart3, path: "/decano/relatorios", color: "bg-secondary/10 text-secondary" },
+                { label: "Gerir coordenadores e desempenho", icon: UserCog, path: "/decano/coordenadores", color: "bg-primary/10 text-primary" },
+                { label: "Consultar cursos da faculdade", icon: Building2, path: "/decano/faculdades", color: "bg-accent/10 text-accent" },
+                { label: "Ver listagem de estudantes", icon: Users, path: "/decano/estudantes", color: "bg-secondary/10 text-secondary" },
+                { label: "Consultar corpo docente", icon: GraduationCap, path: "/decano/docentes", color: "bg-primary/10 text-primary" },
+                { label: "Verificar notas e pautas", icon: Award, path: "/decano/notas", color: "bg-accent/10 text-accent" },
+                { label: "Gerar relatórios académicos", icon: BarChart3, path: "/decano/relatorios", color: "bg-secondary/10 text-secondary" },
               ].map(action => (
                 <Link key={action.path} to={action.path}>
-                  <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-border hover:bg-muted/40 transition-colors cursor-pointer">
+                  <div className="flex items-center gap-2.5 px-3 py-2 rounded-lg border border-border hover:bg-muted/40 transition-colors cursor-pointer">
                     <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${action.color}`}>
                       <action.icon className="w-3.5 h-3.5" />
                     </div>
                     <p className="text-xs font-medium text-foreground">{action.label}</p>
+                    <ChevronRight className="w-3.5 h-3.5 text-muted-foreground ml-auto" />
                   </div>
                 </Link>
               ))}
