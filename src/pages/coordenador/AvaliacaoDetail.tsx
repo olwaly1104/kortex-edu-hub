@@ -65,13 +65,10 @@ export default function CoordenadorAvaliacaoDetail() {
         <div className="relative border-b border-border">
           <div className="absolute inset-0 bg-gradient-to-r from-primary/6 via-primary/3 to-transparent" />
           <div className="relative px-6 py-5">
-            <div className="flex items-center justify-between gap-4 mb-4">
-              <div className="flex items-center gap-2 text-[11px]">
-                <span className="text-muted-foreground">{task.discipline}</span>
-                <span className="text-muted-foreground/40">›</span>
-                <span className="text-muted-foreground">{turma.name} · {turma.year}º Ano</span>
-                <span className="text-muted-foreground/40">›</span>
-                <span className="text-foreground font-medium">{turma.director}</span>
+            <div className="flex items-center justify-between gap-4 mb-3">
+              <div className="flex items-center gap-2">
+                <Badge variant="outline" className="text-[11px] bg-background/80">{task.discipline}</Badge>
+                <Badge variant="outline" className="text-[11px] bg-background/80">{turma.name} · {turma.year}º Ano</Badge>
               </div>
               <Badge className={`${sStyle.bg} gap-1.5 text-[11px] border-0 px-2.5 py-1 shrink-0`}>
                 <StatusIcon className="w-3 h-3" />
@@ -82,6 +79,9 @@ export default function CoordenadorAvaliacaoDetail() {
             {task.description && (
               <p className="text-sm text-muted-foreground mt-1.5 max-w-2xl">{task.description}</p>
             )}
+            <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1.5">
+              <User className="w-3.5 h-3.5" /> {turma.director}
+            </p>
           </div>
         </div>
 
