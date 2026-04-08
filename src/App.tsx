@@ -187,9 +187,9 @@ function AppRoutes() {
         <Route path="/decano/cursos/:cursoId" element={<DecanoCursoDetail />} />
         <Route path="/decano/cursos/:cursoId/ano/:year" element={<DecanoAnoDetail />} />
         <Route path="/decano/estudantes" element={<DecanoEstudantes />} />
-        <Route path="/decano/estudantes/:estudanteId" element={<CoordenadorEstudanteProfile />} />
+        <Route path="/decano/estudantes/:estudanteId" element={<DecanoEstudanteProfile />} />
         <Route path="/decano/docentes" element={<DecanoDocentes />} />
-        <Route path="/decano/docentes/:docenteId" element={<CoordenadorDocenteProfile />} />
+        <Route path="/decano/docentes/:docenteId" element={<DecanoDocenteProfile />} />
         <Route path="/decano/notas" element={<DecanoNotas />} />
         <Route path="/decano/relatorios" element={<DecanoRelatorios />} />
         <Route path="/decano/financas" element={<DecanoFinancas />} />
