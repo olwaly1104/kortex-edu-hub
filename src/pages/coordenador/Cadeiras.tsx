@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { coordDisciplinas, coordCursoInfo } from "@/data/institutionData";
+import { coordDisciplinas, coordCursoInfo, coordTurmas } from "@/data/institutionData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -242,7 +242,7 @@ export default function CoordenadorCadeiras() {
           </TableHeader>
           <TableBody>
             {filtered.map(d => (
-              <TableRow key={d.id} className="hover:bg-muted/50 cursor-pointer" onClick={() => navigate(`/coordenador/cadeiras/${d.id}`)}>
+              <TableRow key={d.id} className="hover:bg-muted/50 cursor-pointer" onClick={() => { const firstTurma = coordTurmas.find(t => t.year === d.year); navigate(`/coordenador/anos/${d.year}/turma/${firstTurma?.id}/cadeira/${d.id}`); }}>
                 <TableCell>
                   <div>
                     <p className="text-sm font-medium text-foreground">{d.name}</p>
