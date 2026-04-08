@@ -675,7 +675,13 @@ export interface FacultyDocente {
   course: string;
   department: string;
   disciplinas: number;
+  turmas: number;
   presenca: number;
+  mediaGeral: number;
+  estudantesTotal: number;
+  taxaEntrega: number;
+  taxaAprovacao: number;
+  taxaReprovacao: number;
   status: "activo" | "licença" | "inactivo";
 }
 
@@ -685,7 +691,14 @@ export interface FacultyEstudante {
   email: string;
   course: string;
   year: number;
+  turma: string;
   media: number | null;
+  presenca: number;
+  taxaEntrega: number;
+  tarefasFeitas: number;
+  tarefasTotal: number;
+  avaliacoesFeitas: number;
+  avaliacoesTotal: number;
   status: "excelente" | "normal" | "risco";
 }
 
@@ -708,29 +721,41 @@ export const decanoFaculty: FacultyInfo = {
 };
 
 export const decanoDocentes: FacultyDocente[] = [
-  { id: "fd1", name: "Prof. António Silva", email: "prof.silva@upra.kor", course: "Eng. Civil", department: "Estruturas", disciplinas: 3, presenca: 96, status: "activo" },
-  { id: "fd2", name: "Prof. Maria Santos", email: "prof.santos@upra.kor", course: "Eng. Civil", department: "Geotecnia", disciplinas: 2, presenca: 92, status: "activo" },
-  { id: "fd3", name: "Prof. Pedro Ferreira", email: "prof.ferreira@upra.kor", course: "Eng. Informática", department: "Software", disciplinas: 2, presenca: 88, status: "activo" },
-  { id: "fd4", name: "Prof. Ana Costa", email: "prof.costa@upra.kor", course: "Eng. Química", department: "Química", disciplinas: 3, presenca: 94, status: "activo" },
-  { id: "fd5", name: "Prof. David Lopes", email: "prof.lopes@upra.kor", course: "Eng. Mecânica", department: "Termodinâmica", disciplinas: 2, presenca: 90, status: "licença" },
-  { id: "fd6", name: "Prof. Luísa Tavares", email: "prof.tavares@upra.kor", course: "Eng. Civil", department: "Topografia", disciplinas: 2, presenca: 95, status: "activo" },
-  { id: "fd7", name: "Prof. Carlos Mendes", email: "prof.mendes@upra.kor", course: "Eng. Electrotécnica", department: "Circuitos", disciplinas: 2, presenca: 91, status: "activo" },
-  { id: "fd8", name: "Prof. Sofia Martins", email: "prof.martins@upra.kor", course: "Eng. Ambiental", department: "Ecologia", disciplinas: 2, presenca: 97, status: "activo" },
-  { id: "fd9", name: "Prof. Hugo Araújo", email: "prof.araujo@upra.kor", course: "Eng. Informática", department: "IA", disciplinas: 3, presenca: 93, status: "activo" },
-  { id: "fd10", name: "Prof. Teresa Moura", email: "prof.moura@upra.kor", course: "Eng. Informática", department: "Redes", disciplinas: 2, presenca: 89, status: "activo" },
+  { id: "fd1", name: "Prof. António Silva", email: "prof.silva@upra.kor", course: "Eng. Civil", department: "Estruturas", disciplinas: 3, turmas: 4, presenca: 96, mediaGeral: 13.8, estudantesTotal: 120, taxaEntrega: 91, taxaAprovacao: 88, taxaReprovacao: 12, status: "activo" },
+  { id: "fd2", name: "Prof. Maria Santos", email: "prof.santos@upra.kor", course: "Eng. Civil", department: "Geotecnia", disciplinas: 2, turmas: 3, presenca: 92, mediaGeral: 13.2, estudantesTotal: 97, taxaEntrega: 87, taxaAprovacao: 82, taxaReprovacao: 18, status: "activo" },
+  { id: "fd3", name: "Prof. Pedro Ferreira", email: "prof.ferreira@upra.kor", course: "Eng. Informática", department: "Software", disciplinas: 2, turmas: 2, presenca: 88, mediaGeral: 12.5, estudantesTotal: 45, taxaEntrega: 78, taxaAprovacao: 71, taxaReprovacao: 29, status: "activo" },
+  { id: "fd4", name: "Prof. Ana Costa", email: "prof.costa@upra.kor", course: "Eng. Química", department: "Química", disciplinas: 3, turmas: 3, presenca: 94, mediaGeral: 14.1, estudantesTotal: 76, taxaEntrega: 93, taxaAprovacao: 91, taxaReprovacao: 9, status: "activo" },
+  { id: "fd5", name: "Prof. David Lopes", email: "prof.lopes@upra.kor", course: "Eng. Mecânica", department: "Termodinâmica", disciplinas: 2, turmas: 2, presenca: 90, mediaGeral: 12.8, estudantesTotal: 52, taxaEntrega: 82, taxaAprovacao: 75, taxaReprovacao: 25, status: "licença" },
+  { id: "fd6", name: "Prof. Luísa Tavares", email: "prof.tavares@upra.kor", course: "Eng. Civil", department: "Topografia", disciplinas: 2, turmas: 2, presenca: 95, mediaGeral: 13.5, estudantesTotal: 64, taxaEntrega: 89, taxaAprovacao: 84, taxaReprovacao: 16, status: "activo" },
+  { id: "fd7", name: "Prof. Carlos Mendes", email: "prof.mendes@upra.kor", course: "Eng. Electrotécnica", department: "Circuitos", disciplinas: 2, turmas: 3, presenca: 91, mediaGeral: 14.5, estudantesTotal: 68, taxaEntrega: 94, taxaAprovacao: 92, taxaReprovacao: 8, status: "activo" },
+  { id: "fd8", name: "Prof. Sofia Martins", email: "prof.martins@upra.kor", course: "Eng. Ambiental", department: "Ecologia", disciplinas: 2, turmas: 4, presenca: 97, mediaGeral: 12.9, estudantesTotal: 128, taxaEntrega: 85, taxaAprovacao: 78, taxaReprovacao: 22, status: "activo" },
+  { id: "fd9", name: "Prof. Hugo Araújo", email: "prof.araujo@upra.kor", course: "Eng. Informática", department: "IA", disciplinas: 3, turmas: 3, presenca: 93, mediaGeral: 14.2, estudantesTotal: 95, taxaEntrega: 90, taxaAprovacao: 86, taxaReprovacao: 14, status: "activo" },
+  { id: "fd10", name: "Prof. Teresa Moura", email: "prof.moura@upra.kor", course: "Eng. Informática", department: "Redes", disciplinas: 2, turmas: 2, presenca: 89, mediaGeral: 11.8, estudantesTotal: 58, taxaEntrega: 76, taxaAprovacao: 68, taxaReprovacao: 32, status: "activo" },
+  { id: "fd11", name: "Prof. Ricardo Nunes", email: "prof.nunes@upra.kor", course: "Eng. Mecânica", department: "Física", disciplinas: 2, turmas: 3, presenca: 82, mediaGeral: 10.5, estudantesTotal: 85, taxaEntrega: 74, taxaAprovacao: 62, taxaReprovacao: 38, status: "activo" },
+  { id: "fd12", name: "Prof. Teresa Almeida", email: "prof.almeida@upra.kor", course: "Eng. Electrotécnica", department: "Potência", disciplinas: 1, turmas: 2, presenca: 79, mediaGeral: 9.8, estudantesTotal: 42, taxaEntrega: 68, taxaAprovacao: 48, taxaReprovacao: 52, status: "activo" },
 ];
 
 export const decanoEstudantes: FacultyEstudante[] = [
-  { id: "fe1", name: "João Fernandes", email: "2934@upra.kor", course: "Eng. Civil", year: 2, media: 14.2, status: "excelente" },
-  { id: "fe2", name: "Maria Silva", email: "3012@upra.kor", course: "Eng. Informática", year: 3, media: 15.1, status: "excelente" },
-  { id: "fe3", name: "Pedro Nascimento", email: "2987@upra.kor", course: "Eng. Mecânica", year: 1, media: 11.8, status: "normal" },
-  { id: "fe4", name: "Ana Gomes", email: "3045@upra.kor", course: "Eng. Civil", year: 1, media: 12.5, status: "normal" },
-  { id: "fe5", name: "Carlos Santos", email: "3100@upra.kor", course: "Eng. Química", year: 2, media: 8.9, status: "risco" },
-  { id: "fe6", name: "Rita Oliveira", email: "3055@upra.kor", course: "Eng. Ambiental", year: 3, media: 16.2, status: "excelente" },
-  { id: "fe7", name: "Bruno Mendes", email: "3066@upra.kor", course: "Eng. Electrotécnica", year: 2, media: 13.4, status: "normal" },
-  { id: "fe8", name: "Catarina Reis", email: "3077@upra.kor", course: "Eng. Informática", year: 1, media: 9.5, status: "risco" },
-  { id: "fe9", name: "Diogo Pereira", email: "3088@upra.kor", course: "Eng. Civil", year: 4, media: 14.8, status: "excelente" },
-  { id: "fe10", name: "Eva Cunha", email: "3099@upra.kor", course: "Eng. Mecânica", year: 3, media: 13.0, status: "normal" },
+  { id: "fe1", name: "João Fernandes", email: "2934@upra.kor", course: "Eng. Civil", year: 2, turma: "A", media: 14.2, presenca: 92, taxaEntrega: 95, tarefasFeitas: 8, tarefasTotal: 10, avaliacoesFeitas: 4, avaliacoesTotal: 5, status: "excelente" },
+  { id: "fe2", name: "Maria Silva", email: "3012@upra.kor", course: "Eng. Informática", year: 3, turma: "A", media: 15.1, presenca: 95, taxaEntrega: 98, tarefasFeitas: 10, tarefasTotal: 10, avaliacoesFeitas: 5, avaliacoesTotal: 5, status: "excelente" },
+  { id: "fe3", name: "Pedro Nascimento", email: "2987@upra.kor", course: "Eng. Mecânica", year: 1, turma: "A", media: 11.8, presenca: 78, taxaEntrega: 82, tarefasFeitas: 7, tarefasTotal: 10, avaliacoesFeitas: 3, avaliacoesTotal: 5, status: "normal" },
+  { id: "fe4", name: "Ana Gomes", email: "3045@upra.kor", course: "Eng. Civil", year: 1, turma: "A", media: 12.5, presenca: 88, taxaEntrega: 90, tarefasFeitas: 6, tarefasTotal: 8, avaliacoesFeitas: 3, avaliacoesTotal: 4, status: "normal" },
+  { id: "fe5", name: "Carlos Santos", email: "3100@upra.kor", course: "Eng. Química", year: 2, turma: "A", media: 8.9, presenca: 62, taxaEntrega: 55, tarefasFeitas: 3, tarefasTotal: 8, avaliacoesFeitas: 2, avaliacoesTotal: 4, status: "risco" },
+  { id: "fe6", name: "Rita Oliveira", email: "3055@upra.kor", course: "Eng. Ambiental", year: 3, turma: "A", media: 16.2, presenca: 97, taxaEntrega: 100, tarefasFeitas: 9, tarefasTotal: 9, avaliacoesFeitas: 4, avaliacoesTotal: 4, status: "excelente" },
+  { id: "fe7", name: "Bruno Mendes", email: "3066@upra.kor", course: "Eng. Electrotécnica", year: 2, turma: "A", media: 13.4, presenca: 85, taxaEntrega: 88, tarefasFeitas: 7, tarefasTotal: 9, avaliacoesFeitas: 3, avaliacoesTotal: 4, status: "normal" },
+  { id: "fe8", name: "Catarina Reis", email: "3077@upra.kor", course: "Eng. Informática", year: 1, turma: "B", media: 9.5, presenca: 65, taxaEntrega: 60, tarefasFeitas: 4, tarefasTotal: 8, avaliacoesFeitas: 1, avaliacoesTotal: 4, status: "risco" },
+  { id: "fe9", name: "Diogo Pereira", email: "3088@upra.kor", course: "Eng. Civil", year: 4, turma: "A", media: 14.8, presenca: 93, taxaEntrega: 96, tarefasFeitas: 7, tarefasTotal: 7, avaliacoesFeitas: 3, avaliacoesTotal: 3, status: "excelente" },
+  { id: "fe10", name: "Eva Cunha", email: "3099@upra.kor", course: "Eng. Mecânica", year: 3, turma: "A", media: 13.0, presenca: 82, taxaEntrega: 85, tarefasFeitas: 5, tarefasTotal: 7, avaliacoesFeitas: 2, avaliacoesTotal: 3, status: "normal" },
+  { id: "fe11", name: "Francisco Lima", email: "3110@upra.kor", course: "Eng. Civil", year: 5, turma: "A", media: 15.5, presenca: 96, taxaEntrega: 100, tarefasFeitas: 6, tarefasTotal: 6, avaliacoesFeitas: 2, avaliacoesTotal: 2, status: "excelente" },
+  { id: "fe12", name: "Gonçalo Dias", email: "3121@upra.kor", course: "Eng. Informática", year: 2, turma: "A", media: 14.0, presenca: 90, taxaEntrega: 92, tarefasFeitas: 5, tarefasTotal: 6, avaliacoesFeitas: 2, avaliacoesTotal: 2, status: "normal" },
+  { id: "fe13", name: "Helena Costa", email: "3132@upra.kor", course: "Eng. Química", year: 1, turma: "A", media: 7.2, presenca: 55, taxaEntrega: 45, tarefasFeitas: 2, tarefasTotal: 8, avaliacoesFeitas: 1, avaliacoesTotal: 4, status: "risco" },
+  { id: "fe14", name: "Igor Martins", email: "3143@upra.kor", course: "Eng. Mecânica", year: 2, turma: "B", media: 12.1, presenca: 80, taxaEntrega: 78, tarefasFeitas: 6, tarefasTotal: 10, avaliacoesFeitas: 3, avaliacoesTotal: 5, status: "normal" },
+  { id: "fe15", name: "Joana Cardoso", email: "3154@upra.kor", course: "Eng. Ambiental", year: 2, turma: "A", media: 15.8, presenca: 94, taxaEntrega: 97, tarefasFeitas: 9, tarefasTotal: 9, avaliacoesFeitas: 4, avaliacoesTotal: 4, status: "excelente" },
+  { id: "fe16", name: "Tiago Barbosa", email: "3165@upra.kor", course: "Eng. Electrotécnica", year: 3, turma: "A", media: 8.1, presenca: 58, taxaEntrega: 50, tarefasFeitas: 3, tarefasTotal: 10, avaliacoesFeitas: 1, avaliacoesTotal: 5, status: "risco" },
+  { id: "fe17", name: "Vanessa Rocha", email: "3176@upra.kor", course: "Eng. Informática", year: 4, turma: "A", media: 9.0, presenca: 60, taxaEntrega: 52, tarefasFeitas: 4, tarefasTotal: 9, avaliacoesFeitas: 1, avaliacoesTotal: 4, status: "risco" },
+  { id: "fe18", name: "Luís Ferreira", email: "3187@upra.kor", course: "Eng. Civil", year: 3, turma: "A", media: 13.7, presenca: 87, taxaEntrega: 89, tarefasFeitas: 7, tarefasTotal: 8, avaliacoesFeitas: 3, avaliacoesTotal: 4, status: "normal" },
+  { id: "fe19", name: "Sara Moreira", email: "3198@upra.kor", course: "Eng. Mecânica", year: 4, turma: "A", media: 14.5, presenca: 91, taxaEntrega: 93, tarefasFeitas: 6, tarefasTotal: 7, avaliacoesFeitas: 3, avaliacoesTotal: 3, status: "excelente" },
+  { id: "fe20", name: "André Sousa", email: "3209@upra.kor", course: "Eng. Química", year: 3, turma: "A", media: 10.2, presenca: 72, taxaEntrega: 68, tarefasFeitas: 5, tarefasTotal: 9, avaliacoesFeitas: 2, avaliacoesTotal: 4, status: "normal" },
 ];
 
 export const decanoAprovacoes: Aprovacao[] = [

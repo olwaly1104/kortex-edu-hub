@@ -1,84 +1,235 @@
-import { useState } from "react";
-import { decanoDocentes } from "@/data/institutionData";
+import { useState, useMemo } from "react";
+import { decanoDocentes, decanoFaculty } from "@/data/institutionData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { GraduationCap, Search, Users, BookOpen, CheckCircle } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { GraduationCap, Search, Users, CheckCircle, ClipboardList, Award, ArrowUpDown, X } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-const statusBadge: Record<string, { label: string; cls: string }> = {
-  activo: { label: "Activo", cls: "bg-accent/10 text-accent" },
-  licença: { label: "Licença", cls: "bg-secondary/10 text-secondary" },
-  inactivo: { label: "Inactivo", cls: "bg-muted text-muted-foreground" },
-};
+type SortField = "presenca" | "taxaEntrega" | "mediaGeral";
+type SortDir = "asc" | "desc";
 
 export default function DecanoDocentes() {
   const [search, setSearch] = useState("");
-  const [filterCourse, setFilterCourse] = useState("todos");
-  const courses = [...new Set(decanoDocentes.map(d => d.course))];
-  const filtered = decanoDocentes.filter(d =>
-    (!search || d.name.toLowerCase().includes(search.toLowerCase())) &&
-    (filterCourse === "todos" || d.course === filterCourse)
-  );
+  const [filterCourse, setFilterCourse] = useState<string>("todos");
+  const [sortField, setSortField] = useState<SortField | null>(null);
+  const [sortDir, setSortDir] = useState<SortDir>("desc");
+  const [filterStatus, setFilterStatus] = useState<string>("todos");
 
-  const activos = decanoDocentes.filter(d => d.status === "activo").length;
+  const courses = [...new Set(decanoDocentes.map(d => d.course))];
+
+  const isSortActive = sortField !== null;
+  const isFilterActive = filterStatus !== "todos";
+  const isCourseActive = filterCourse !== "todos";
+  const isSearchActive = search !== "";
+  const hasActiveControls = isSortActive || isFilterActive || isSearchActive || isCourseActive;
+
+  const sortLabel = sortField === "presenca" ? "Presença" : sortField === "taxaEntrega" ? "Entrega" : sortField === "mediaGeral" ? "Média" : "";
+  const dirLabel = sortDir === "desc" ? "Maior" : "Menor";
+  const filterLabel = filterStatus === "excelente" ? "Excelente" : filterStatus === "normal" ? "Normal" : filterStatus === "risco" ? "Em Risco" : "";
+
+  const getEstado = (d: typeof decanoDocentes[0]) =>
+    (d.presenca < 85 || d.taxaEntrega < 80 || d.mediaGeral < 11) ? "risco"
+    : (d.presenca >= 93 && d.taxaEntrega >= 90 && d.mediaGeral >= 14) ? "excelente"
+    : "normal";
+
+  const filtered = useMemo(() => {
+    let list = decanoDocentes
+      .filter(d => filterCourse === "todos" || d.course === filterCourse)
+      .filter(d => !search || d.name.toLowerCase().includes(search.toLowerCase()))
+      .filter(d => {
+        if (filterStatus === "todos") return true;
+        return getEstado(d) === filterStatus;
+      });
+
+    if (sortField) {
+      list = [...list].sort((a, b) => {
+        const va = a[sortField] as number;
+        const vb = b[sortField] as number;
+        return sortDir === "asc" ? va - vb : vb - va;
+      });
+    }
+
+    return list;
+  }, [filterCourse, search, sortField, sortDir, filterStatus]);
+
+  const totalDocentes = decanoFaculty.totalDocentes;
+  const presencaGeral = Math.round(decanoDocentes.reduce((s, d) => s + d.presenca, 0) / decanoDocentes.length);
+  const taxaEntregaGeral = Math.round(decanoDocentes.reduce((s, d) => s + d.taxaEntrega, 0) / decanoDocentes.length);
+  const mediaGeral = +(decanoDocentes.reduce((s, d) => s + d.mediaGeral, 0) / decanoDocentes.length).toFixed(1);
+
+  const resetAll = () => { setFilterStatus("todos"); setSortField(null); setSortDir("desc"); setSearch(""); setFilterCourse("todos"); };
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-          <GraduationCap className="w-6 h-6 text-primary" /> Docentes
-        </h1>
-        <p className="text-muted-foreground mt-1">{decanoDocentes.length} docentes · {activos} activos</p>
+      <h1 className="text-2xl font-bold text-foreground flex items-center gap-2"><GraduationCap className="w-6 h-6 text-primary" /> Docentes da Faculdade</h1>
+
+      {/* KPI Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card className="p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><Users className="w-4 h-4 text-primary" /></div>
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Total Docentes</span>
+          </div>
+          <p className="text-2xl font-bold text-foreground">{totalDocentes}</p>
+        </Card>
+        <Card className="p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><CheckCircle className="w-4 h-4 text-primary" /></div>
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Presença Geral</span>
+          </div>
+          <p className={`text-2xl font-bold ${presencaGeral >= 75 ? "text-accent" : "text-destructive"}`}>{presencaGeral}%</p>
+        </Card>
+        <Card className="p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><ClipboardList className="w-4 h-4 text-primary" /></div>
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Taxa Entrega Geral</span>
+          </div>
+          <p className={`text-2xl font-bold ${taxaEntregaGeral >= 80 ? "text-accent" : "text-destructive"}`}>{taxaEntregaGeral}%</p>
+        </Card>
+        <Card className="p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><Award className="w-4 h-4 text-primary" /></div>
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Média Geral</span>
+          </div>
+          <p className={`text-2xl font-bold ${mediaGeral >= 10 ? "text-accent" : "text-destructive"}`}>{mediaGeral}</p>
+        </Card>
       </div>
 
-      <div className="flex items-center gap-3 flex-wrap">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input placeholder="Pesquisar docente..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9" />
-        </div>
-        <div className="flex gap-1.5 flex-wrap">
-          <Button size="sm" variant={filterCourse === "todos" ? "default" : "outline"} onClick={() => setFilterCourse("todos")}>Todos</Button>
+      {/* Controls box */}
+      <div className="rounded-xl border border-border bg-card p-4 space-y-3">
+        {/* Course filter */}
+        <div className="flex flex-wrap gap-2">
+          <Button size="sm" variant={filterCourse === "todos" ? "default" : "outline"} onClick={() => setFilterCourse("todos")} className="text-xs">Todos os Cursos</Button>
           {courses.map(c => (
             <Button key={c} size="sm" variant={filterCourse === c ? "default" : "outline"} onClick={() => setFilterCourse(c)} className="text-xs">{c}</Button>
           ))}
         </div>
+
+        <div className="border-t border-border" />
+
+        {/* Search + Sort + Filter row */}
+        <div className="flex gap-2 items-center">
+          <div className="relative flex-1 max-w-sm">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input placeholder="Pesquisar docente..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9 h-9" />
+          </div>
+          <div className="flex-1" />
+          {hasActiveControls && (
+            <Button variant="ghost" size="sm" className="text-xs text-destructive hover:text-destructive hover:bg-destructive/10 shrink-0 gap-1" onClick={resetAll}>
+              <X className="w-3 h-3" /> Limpar
+            </Button>
+          )}
+          <div className="flex items-center gap-2">
+            {[
+              { key: "todos", label: "Todos" },
+              { key: "excelente", label: "Excelente" },
+              { key: "normal", label: "Normal" },
+              { key: "risco", label: "Em Risco" },
+            ].map(s => (
+              <Button key={s.key} size="sm" variant={filterStatus === s.key ? "default" : "outline"} onClick={() => setFilterStatus(s.key)} className="text-xs">{s.label}</Button>
+            ))}
+            <div className="w-px h-6 bg-border" />
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="sm" className={`gap-1.5 shrink-0 text-xs ${isSortActive ? "border-primary/50 bg-primary/5 text-primary" : ""}`}>
+                  <ArrowUpDown className="w-3.5 h-3.5" /> Ordenar
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-44 p-2 space-y-1" align="end" side="top">
+                <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-2 pt-1">Campo</p>
+                {[
+                  { key: "todos", label: "Todos" },
+                  { key: "presenca", label: "Presença" },
+                  { key: "taxaEntrega", label: "Entrega" },
+                  { key: "mediaGeral", label: "Média" },
+                ].map(opt => (
+                  <button key={opt.key} onClick={() => { if (opt.key === "todos") { setSortField(null); } else { setSortField(opt.key as SortField); } }} className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${(opt.key === "todos" && sortField === null) || sortField === opt.key ? "bg-primary/10 text-primary font-medium" : "text-foreground hover:bg-muted"}`}>{opt.label}</button>
+                ))}
+                <div className="border-t border-border my-1" />
+                <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-2">Direção</p>
+                <button onClick={() => setSortDir("desc")} className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${sortDir === "desc" && isSortActive ? "bg-primary/10 text-primary font-medium" : "text-foreground hover:bg-muted"}`}>Maior → Menor</button>
+                <button onClick={() => setSortDir("asc")} className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors ${sortDir === "asc" && isSortActive ? "bg-primary/10 text-primary font-medium" : "text-foreground hover:bg-muted"}`}>Menor → Maior</button>
+              </PopoverContent>
+            </Popover>
+          </div>
+        </div>
+
+        {/* Active tags */}
+        {hasActiveControls && (
+          <div className="flex flex-wrap gap-1.5 pt-1">
+            {isCourseActive && (
+              <Badge variant="outline" className="text-[10px] gap-1 bg-primary/5 text-primary border-primary/20 cursor-pointer hover:bg-primary/10" onClick={() => setFilterCourse("todos")}>
+                Curso: {filterCourse}
+                <X className="w-2.5 h-2.5" />
+              </Badge>
+            )}
+            {isSortActive && (
+              <Badge variant="outline" className="text-[10px] gap-1 bg-primary/5 text-primary border-primary/20 cursor-pointer hover:bg-primary/10" onClick={() => { setSortField(null); setSortDir("desc"); }}>
+                {sortLabel}: {dirLabel}
+                <X className="w-2.5 h-2.5" />
+              </Badge>
+            )}
+            {isFilterActive && (
+              <Badge variant="outline" className="text-[10px] gap-1 bg-accent/10 text-accent border-accent/20 cursor-pointer hover:bg-accent/15" onClick={() => setFilterStatus("todos")}>
+                Estado: {filterLabel}
+                <X className="w-2.5 h-2.5" />
+              </Badge>
+            )}
+            {isSearchActive && (
+              <Badge variant="outline" className="text-[10px] gap-1 bg-secondary/10 text-secondary border-secondary/20 cursor-pointer hover:bg-secondary/15" onClick={() => setSearch("")}>
+                Pesquisa: "{search}"
+                <X className="w-2.5 h-2.5" />
+              </Badge>
+            )}
+          </div>
+        )}
       </div>
 
-      <div className="space-y-2">
-        {filtered.map(d => {
-          const sb = statusBadge[d.status];
-          return (
-            <Card key={d.id} className={`p-4 flex items-center gap-4 border-l-[3px] ${d.status === "activo" ? "border-l-accent" : d.status === "licença" ? "border-l-secondary" : "border-l-border"}`}>
-              <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-xs font-bold text-muted-foreground shrink-0">
-                {d.name.split(" ").map(n => n[0]).slice(0, 2).join("")}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <p className="text-sm font-semibold text-foreground truncate">{d.name}</p>
-                  <Badge className={`${sb.cls} text-[10px] border-0`}>{sb.label}</Badge>
-                </div>
-                <p className="text-[11px] text-muted-foreground">{d.email}</p>
-                <div className="flex items-center gap-3 mt-1 text-[11px] text-muted-foreground">
-                  <span className="flex items-center gap-1"><BookOpen className="w-3 h-3" /> {d.course}</span>
-                  <span>{d.department}</span>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4 shrink-0 text-center">
-                <div>
-                  <p className="text-[10px] text-muted-foreground uppercase">Cadeiras</p>
-                  <p className="text-sm font-bold text-foreground">{d.disciplinas}</p>
-                </div>
-                <div>
-                  <p className="text-[10px] text-muted-foreground uppercase">Presença</p>
-                  <p className={`text-sm font-bold ${d.presenca >= 90 ? "text-accent" : "text-destructive"}`}>{d.presenca}%</p>
-                </div>
-              </div>
-            </Card>
-          );
-        })}
+      {/* Table */}
+      <Card className="overflow-hidden">
+        <table className="w-full text-sm">
+          <thead><tr className="border-b bg-muted/30">
+            <th className="text-left p-3 font-medium text-muted-foreground">Nome</th>
+            <th className="text-left p-3 font-medium text-muted-foreground">Curso</th>
+            <th className="text-center p-3 font-medium text-muted-foreground">Estudantes</th>
+            <th className="text-center p-3 font-medium text-muted-foreground">Cadeiras</th>
+            <th className="text-center p-3 font-medium text-muted-foreground">Turmas</th>
+            <th className="text-center p-3 font-medium text-muted-foreground">Presença</th>
+            <th className="text-center p-3 font-medium text-muted-foreground">Taxa Entrega</th>
+            <th className="text-center p-3 font-medium text-muted-foreground">Taxa Aprovado</th>
+            <th className="text-center p-3 font-medium text-muted-foreground">Taxa Reprovado</th>
+            <th className="text-center p-3 font-medium text-muted-foreground">Média Geral</th>
+            <th className="text-center p-3 font-medium text-muted-foreground">Estado</th>
+          </tr></thead>
+          <tbody>{filtered.map(d => {
+            const estado = getEstado(d);
+            const estadoStyle = estado === "excelente"
+              ? "bg-accent/15 text-accent border-accent/30"
+              : estado === "risco"
+                ? "bg-destructive/15 text-destructive border-destructive/30"
+                : "bg-muted text-muted-foreground border-border";
+            return (
+              <tr key={d.id} className="border-b last:border-0 hover:bg-muted/20 transition-colors">
+                <td className="p-3"><p className="font-medium text-foreground">{d.name}</p><p className="text-[11px] text-muted-foreground">{d.email}</p></td>
+                <td className="p-3 text-muted-foreground text-xs">{d.course}</td>
+                <td className="p-3 text-center font-medium text-foreground">{d.estudantesTotal}</td>
+                <td className="p-3 text-center">{d.disciplinas}</td>
+                <td className="p-3 text-center">{d.turmas}</td>
+                <td className="p-3 text-center"><span className={d.presenca >= 90 ? "text-accent font-medium" : "text-destructive font-medium"}>{d.presenca}%</span></td>
+                <td className="p-3 text-center"><span className={d.taxaEntrega >= 80 ? "text-accent font-medium" : "text-destructive font-medium"}>{d.taxaEntrega}%</span></td>
+                <td className="p-3 text-center"><span className={`font-medium ${d.taxaAprovacao >= 70 ? "text-accent" : d.taxaAprovacao >= 50 ? "text-foreground" : "text-destructive"}`}>{d.taxaAprovacao}%</span></td>
+                <td className="p-3 text-center"><span className={`font-medium ${d.taxaReprovacao > 30 ? "text-destructive" : "text-foreground"}`}>{d.taxaReprovacao}%</span></td>
+                <td className="p-3 text-center"><span className={d.mediaGeral >= 10 ? "text-accent font-bold" : "text-destructive font-bold"}>{d.mediaGeral}</span></td>
+                <td className="p-3 text-center"><Badge variant="outline" className={cn("text-[10px]", estadoStyle)}>{estado === "risco" ? "Em Risco" : estado === "excelente" ? "Excelente" : "Normal"}</Badge></td>
+              </tr>
+            );
+          })}</tbody>
+        </table>
         {filtered.length === 0 && <p className="text-center text-muted-foreground py-8">Nenhum docente encontrado.</p>}
-      </div>
+      </Card>
     </div>
   );
 }
