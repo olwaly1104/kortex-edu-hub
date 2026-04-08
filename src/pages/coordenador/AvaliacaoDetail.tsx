@@ -59,26 +59,26 @@ export default function CoordenadorAvaliacaoDetail() {
         <ArrowLeft className="w-4 h-4" /> Voltar às Avaliações
       </Link>
 
-      {/* Header */}
-      <div>
-        <div className="flex items-center gap-3 mb-2">
-          <h1 className="text-2xl font-bold text-foreground">{task.title}</h1>
-          <Badge className={`${sStyle.bg} gap-1 text-[10px] border-0`}>
-            <StatusIcon className="w-3 h-3" />
-            {sStyle.label}
-          </Badge>
-        </div>
-        <p className="text-sm text-muted-foreground">{task.description}</p>
-        <div className="flex items-center gap-3 mt-3 flex-wrap">
-          <Badge variant="outline" className="text-xs">{task.discipline}</Badge>
-          <Badge variant="outline" className="text-xs">{turma.name} · {turma.year}º Ano</Badge>
-          <Badge variant="outline" className="text-xs">{task.type === "quiz" ? "Quiz" : task.type === "exame" ? "Exame" : "Tarefa"}</Badge>
-          <Badge variant="outline" className="text-xs">{task.type === "quiz" ? "Quiz" : task.type === "exame" ? "Exame" : "Tarefa"}</Badge>
-        </div>
-      </div>
-
-      {/* Info card */}
+      {/* Unified card */}
       <Card className="p-5 space-y-4">
+        {/* Header */}
+        <div>
+          <div className="flex items-center gap-3 mb-2">
+            <h1 className="text-2xl font-bold text-foreground">{task.title}</h1>
+            <Badge className={`${sStyle.bg} gap-1 text-[10px] border-0`}>
+              <StatusIcon className="w-3 h-3" />
+              {sStyle.label}
+            </Badge>
+          </div>
+          <p className="text-sm text-muted-foreground">{task.description}</p>
+          <div className="flex items-center gap-3 mt-3 flex-wrap">
+            <Badge variant="outline" className="text-xs">{task.discipline}</Badge>
+            <Badge variant="outline" className="text-xs">{turma.name} · {turma.year}º Ano</Badge>
+            <Badge variant="outline" className="text-xs">{task.type === "quiz" ? "Quiz" : task.type === "exame" ? "Exame" : "Tarefa"}</Badge>
+          </div>
+        </div>
+
+        <div className="border-t border-border" />
         {/* KPIs */}
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
           <KpiCard label="Data" value={task.dueDate} icon={Calendar} iconBg="bg-primary/10" iconColor="text-primary" />
