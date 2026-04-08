@@ -87,13 +87,6 @@ export default function DecanoDashboard() {
   });
   const anosEmRisco = [...anosMap.values()].filter(a => a.presenca < 80 || a.media < 12 || a.taxaEntrega < 85);
 
-  const stats = [
-    { icon: Users, label: "Total Estudantes", value: fac.totalEstudantes, color: "text-accent bg-accent/10" },
-    { icon: BookOpen, label: "Total Cursos", value: fac.totalCursos, color: "text-primary bg-primary/10" },
-    { icon: GraduationCap, label: "Total Docentes", value: fac.totalDocentes, color: "text-primary bg-primary/10" },
-    { icon: Award, label: "Média Geral", value: "13.2", color: "text-accent bg-accent/10" },
-  ];
-
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       {/* Welcome */}
@@ -111,21 +104,6 @@ export default function DecanoDashboard() {
             Ver Cursos <ChevronRight className="w-4 h-4" />
           </Link>
         </div>
-      </div>
-
-      {/* KPI Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {stats.map(s => (
-          <Card key={s.label} className="p-4 flex items-center gap-4">
-            <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${s.color}`}>
-              <s.icon className="w-5 h-5" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">{s.value}</p>
-              <p className="text-xs text-muted-foreground">{s.label}</p>
-            </div>
-          </Card>
-        ))}
       </div>
 
       {/* Row 1: Agenda + Anúncios */}
