@@ -35,29 +35,37 @@ export default function NotasTurmaDetail() {
         <ArrowLeft className="w-4 h-4" /> Voltar às Notas
       </Link>
 
-      {/* Header + KPIs Card */}
+      {/* Unified Card */}
       <Card className="overflow-hidden">
-        <div className="px-5 py-4 border-b border-border">
-          <div className="flex items-center gap-2.5 mb-1">
-            <h1 className="text-xl font-bold text-foreground">Turma {turmaData.turma}</h1>
-            <Badge
-              variant="outline"
-              className={`text-[10px] ${
-                turmaData.mediaGeral >= 14 ? "bg-accent/15 text-accent border-accent/30"
-                : turmaData.mediaGeral >= 10 ? "bg-muted text-muted-foreground border-border"
-                : "bg-destructive/15 text-destructive border-destructive/30"
-              }`}
-            >
-              {turmaData.mediaGeral >= 14 ? "Excelente" : turmaData.mediaGeral >= 10 ? "Normal" : "Em Risco"}
-            </Badge>
-          </div>
-          <div className="flex items-center gap-2 flex-wrap">
-            <Badge variant="outline" className="text-[10px] gap-1"><GraduationCap className="w-3 h-3" />{coordCursoInfo.name}</Badge>
-            <Badge variant="outline" className="text-[10px] gap-1">{yearNum}º Ano</Badge>
-            <Badge variant="outline" className="text-[10px] gap-1">{coordCursoInfo.faculty}</Badge>
+        {/* Header */}
+        <div className="relative border-b border-border">
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/6 via-primary/3 to-transparent" />
+          <div className="relative px-5 py-4">
+            <div className="flex items-center gap-2.5 mb-2">
+              <h1 className="text-xl font-bold text-foreground tracking-tight leading-tight">Turma {turmaData.turma}</h1>
+              <Badge className={`text-[11px] border-0 px-2.5 py-1 shrink-0 ${
+                turmaData.mediaGeral >= 14 ? "bg-accent/10 text-accent"
+                : turmaData.mediaGeral >= 10 ? "bg-muted text-muted-foreground"
+                : "bg-destructive/10 text-destructive"
+              }`}>
+                {turmaData.mediaGeral >= 14 ? "Excelente" : turmaData.mediaGeral >= 10 ? "Normal" : "Em Risco"}
+              </Badge>
+            </div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <Badge variant="outline" className="text-[11px] bg-background/80 gap-1">
+                <BookOpen className="w-3 h-3" /> {coordCursoInfo.name}
+              </Badge>
+              <Badge variant="outline" className="text-[11px] bg-background/80 gap-1">
+                <Users className="w-3 h-3" /> Turma {turmaData.turma}
+              </Badge>
+              <Badge variant="outline" className="text-[11px] bg-background/80">
+                {yearNum}º Ano · {coordCursoInfo.faculty}
+              </Badge>
+            </div>
           </div>
         </div>
 
+        {/* KPIs */}
         <div className="px-5 py-4 grid grid-cols-2 lg:grid-cols-6 gap-4">
           <div className="flex items-center gap-2">
             <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0"><Award className="w-3.5 h-3.5 text-primary" /></div>

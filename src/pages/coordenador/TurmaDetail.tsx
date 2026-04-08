@@ -92,79 +92,79 @@ export default function CoordenadorTurmaDetail() {
         <ArrowLeft className="w-4 h-4" /> Voltar ao {yearNum}º Ano
       </Link>
 
-      {/* Hero */}
-      <div className="relative overflow-hidden rounded-2xl p-6 lg:p-8 bg-primary/5">
-        <div className="absolute top-0 right-0 w-40 h-40 rounded-full bg-primary/5" style={{ transform: "translate(30%, -30%)" }} />
-        <div className="relative flex items-start gap-5">
-          <div className="w-14 h-14 rounded-2xl bg-primary flex items-center justify-center shrink-0 shadow-sm">
-            <GraduationCap className="w-7 h-7 text-primary-foreground" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1">
-              <Badge variant="outline" className="text-[10px] font-mono text-muted-foreground">{turma.id.toUpperCase()}</Badge>
-              <Badge variant="outline" className="text-xs font-mono">{coordCursoInfo.code}</Badge>
-              <Badge variant="outline" className="text-[10px]">{turma.name}</Badge>
+      {/* Unified Card */}
+      <Card className="overflow-hidden">
+        {/* Header */}
+        <div className="relative border-b border-border">
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/6 via-primary/3 to-transparent" />
+          <div className="relative px-5 py-4">
+            <div className="flex items-center gap-2.5 mb-2">
+              <h1 className="text-xl font-bold text-foreground tracking-tight leading-tight">{turma.name}</h1>
+              <Badge className={`text-[11px] border-0 px-2.5 py-1 shrink-0 ${
+                turma.media >= 14 ? "bg-accent/10 text-accent" : turma.media >= 10 ? "bg-muted text-muted-foreground" : "bg-destructive/10 text-destructive"
+              }`}>
+                {turma.media >= 14 ? "Excelente" : turma.media >= 10 ? "Normal" : "Em Risco"}
+              </Badge>
             </div>
-            <h1 className="text-2xl lg:text-3xl font-bold text-foreground">{coordCursoInfo.name} — {turma.name}</h1>
-            <p className="text-muted-foreground mt-2 leading-relaxed max-w-2xl">Director: {turma.director}</p>
-            <div className="flex items-center gap-4 mt-3 text-sm text-muted-foreground flex-wrap">
-              <span className="flex items-center gap-1.5"><GraduationCap className="w-4 h-4" />{coordCursoInfo.faculty}</span>
-              <span className="flex items-center gap-1.5"><Calendar className="w-4 h-4" />{yearNum}º Ano</span>
+            <p className="text-sm text-muted-foreground mb-2.5">Director: {turma.director}</p>
+            <div className="flex items-center gap-2 flex-wrap">
+              <Badge variant="outline" className="text-[11px] bg-background/80 gap-1">
+                <BookOpen className="w-3 h-3" /> {coordCursoInfo.name}
+              </Badge>
+              <Badge variant="outline" className="text-[11px] bg-background/80 gap-1">
+                <Users className="w-3 h-3" /> {turma.name}
+              </Badge>
+              <Badge variant="outline" className="text-[11px] bg-background/80">
+                {yearNum}º Ano · {coordCursoInfo.faculty}
+              </Badge>
               {turmaCadeiras.length > 0 && (
-                <span className="flex items-center gap-1.5"><Clock className="w-4 h-4" />{turmaCadeiras[0].diasAula}</span>
+                <Badge variant="outline" className="text-[11px] bg-background/80 gap-1">
+                  <Clock className="w-3 h-3" /> {turmaCadeiras[0].diasAula}
+                </Badge>
               )}
             </div>
           </div>
         </div>
-      </div>
 
-      {/* KPIs */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
-        <Card className="p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><Users className="w-4 h-4 text-primary" /></div>
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Estudantes</span>
+        {/* KPIs */}
+        <div className="px-5 py-4 grid grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0"><Users className="w-3.5 h-3.5 text-primary" /></div>
+            <div>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider leading-tight">Estudantes</p>
+              <p className="text-sm font-bold text-foreground">{turma.estudantes}</p>
+            </div>
           </div>
-          <p className="text-2xl font-bold text-foreground">{turma.estudantes}</p>
-        </Card>
-        <Card className="p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><TrendingUp className="w-4 h-4 text-primary" /></div>
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Média</span>
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0"><TrendingUp className="w-3.5 h-3.5 text-primary" /></div>
+            <div>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider leading-tight">Média Geral</p>
+              <p className={`text-sm font-bold ${turma.media >= 10 ? "text-accent" : "text-destructive"}`}>{turma.media}/20</p>
+            </div>
           </div>
-          <div className="flex items-baseline gap-1">
-            <span className={`text-2xl font-bold ${turma.media >= 10 ? "text-accent" : "text-destructive"}`}>{turma.media}</span>
-            <span className="text-sm text-muted-foreground">/20</span>
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0"><CheckCircle className="w-3.5 h-3.5 text-primary" /></div>
+            <div>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider leading-tight">Presença</p>
+              <p className={`text-sm font-bold ${turma.presenca >= 75 ? "text-accent" : "text-destructive"}`}>{turma.presenca}%</p>
+            </div>
           </div>
-        </Card>
-        <Card className="p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><CheckCircle className="w-4 h-4 text-primary" /></div>
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Presença</span>
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-secondary/10 flex items-center justify-center shrink-0"><ClipboardList className="w-3.5 h-3.5 text-secondary" /></div>
+            <div>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider leading-tight">Taxa Entrega</p>
+              <p className={`text-sm font-bold ${turma.taxaEntrega >= 80 ? "text-accent" : "text-destructive"}`}>{turma.taxaEntrega}%</p>
+            </div>
           </div>
-          <div className="flex items-baseline gap-1">
-            <span className={`text-2xl font-bold ${turma.presenca >= 75 ? "text-accent" : "text-destructive"}`}>{turma.presenca}%</span>
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-accent/10 flex items-center justify-center shrink-0"><Award className="w-3.5 h-3.5 text-accent" /></div>
+            <div>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider leading-tight">Taxa Aprovado</p>
+              <p className={`text-sm font-bold ${turma.taxaSucesso >= 70 ? "text-accent" : "text-destructive"}`}>{turma.taxaSucesso}%</p>
+            </div>
           </div>
-        </Card>
-        <Card className="p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><ClipboardList className="w-4 h-4 text-primary" /></div>
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Taxa Entrega</span>
-          </div>
-          <div className="flex items-baseline gap-1">
-            <span className={`text-2xl font-bold ${turma.taxaEntrega >= 80 ? "text-accent" : "text-destructive"}`}>{turma.taxaEntrega}%</span>
-          </div>
-        </Card>
-        <Card className="p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><Award className="w-4 h-4 text-primary" /></div>
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Taxa Aprovado</span>
-          </div>
-          <div className="flex items-baseline gap-1">
-            <span className={`text-2xl font-bold ${turma.taxaSucesso >= 70 ? "text-accent" : "text-destructive"}`}>{turma.taxaSucesso}%</span>
-          </div>
-        </Card>
-      </div>
+        </div>
+      </Card>
 
       {/* Tabs */}
       <Tabs defaultValue="cadeiras" className="space-y-5">
