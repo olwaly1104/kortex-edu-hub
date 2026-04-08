@@ -227,6 +227,21 @@ function AppRoutes() {
         <Route path="/reitoria/relatorios" element={<ReitoriaRelatorios />} />
         <Route path="/reitoria/financas" element={<ReitoriaFinancas />} />
         <Route path="/reitoria/perfil" element={<StudentProfile />} />
+        {/* Reitor */}
+        <Route path="/reitor" element={<ReitorDashboard />} />
+        <Route path="/reitor/calendario" element={<StudentCalendar />} />
+        <Route path="/reitor/anuncios" element={<StudentAnnouncements />} />
+        <Route path="/reitor/solicitacoes" element={<ReitorSolicitacoes />} />
+        <Route path="/reitor/faculdades" element={<ReitorFaculdades />} />
+        <Route path="/reitor/faculdades/:faculdadeId" element={<ReitorFaculdadeDetail />} />
+        <Route path="/reitor/faculdades/:faculdadeId/cursos/:cursoId" element={<ReitorCursoDetail />} />
+        <Route path="/reitor/decanos" element={<ReitorDecanos />} />
+        <Route path="/reitor/coordenadores" element={<ReitorCoordenadores />} />
+        <Route path="/reitor/docentes" element={<ReitorDocentes />} />
+        <Route path="/reitor/notas" element={<ReitorNotas />} />
+        <Route path="/reitor/relatorios" element={<ReitorRelatorios />} />
+        <Route path="/reitor/financas" element={<ReitorFinancas />} />
+        <Route path="/reitor/perfil" element={<StudentProfile />} />
         {/* Secretaria Académica */}
         <Route path="/secretaria" element={<SecretariaDashboard />} />
         <Route path="/secretaria/calendario" element={<StudentCalendar />} />
