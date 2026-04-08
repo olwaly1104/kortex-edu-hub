@@ -107,26 +107,6 @@ const decanoSections: NavSection[] = [
   ]},
 ];
 
-const reitoriaSections: NavSection[] = [
-  { title: "Geral", items: [
-    { label: "Início", icon: LayoutDashboard, path: "/reitoria" },
-    { label: "Calendário", icon: Calendar, path: "/reitoria/calendario" },
-    { label: "Anúncios", icon: Megaphone, path: "/reitoria/anuncios" },
-    { label: "Aprovações", icon: CheckSquare, path: "/reitoria/aprovacoes" },
-  ]},
-  { title: "Académico", items: [
-    { label: "Visão Geral", icon: Eye, path: "/reitoria/visao-geral" },
-    { label: "Faculdades", icon: Building2, path: "/reitoria/faculdades" },
-    { label: "Decanos", icon: UserCog, path: "/reitoria/decanos" },
-    { label: "Coordenadores", icon: GraduationCap, path: "/reitoria/coordenadores" },
-    { label: "Docentes", icon: Users, path: "/reitoria/docentes" },
-    { label: "Relatórios & Análise", icon: BarChart3, path: "/reitoria/relatorios" },
-  ]},
-  { title: "Pessoal", items: [
-    { label: "Finanças", icon: Wallet, path: "/reitoria/financas" },
-    { label: "Perfil", icon: User, path: "/reitoria/perfil" },
-  ]},
-];
 
 const reitorSections: NavSection[] = [
   { title: "Geral", items: [

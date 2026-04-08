@@ -193,12 +193,6 @@ export const currentDecano: User = {
   role: "decano",
 };
 
-export const currentReitoria: User = {
-  id: "6",
-  name: "Prof. Dr. António Bernardo",
-  email: "reitoria@upra.kor",
-  role: "reitoria",
-};
 
 export const currentReitor: User = {
   id: "7",
@@ -481,8 +475,7 @@ export const emailMessages: EmailMessage[] = [
 // Helper function
 export function detectRole(email: string): UserRole {
   if (email.startsWith("secretaria")) return "secretaria";
-  if (email.startsWith("reitor@")) return "reitor";
-  if (email.startsWith("reitoria")) return "reitoria";
+  if (email.startsWith("reitor")) return "reitor";
   if (email.startsWith("decano")) return "decano";
   if (email.startsWith("coordcurso")) return "coordenador_curso";
   if (email.startsWith("prof.")) return "professor";
