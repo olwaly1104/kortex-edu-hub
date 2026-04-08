@@ -201,10 +201,11 @@ export default function DecanoTurmaDetail() {
       </Card>
 
       {/* Tabs */}
-      <Tabs defaultValue="students" className="space-y-5">
+      <Tabs defaultValue="cadeiras" className="space-y-5">
         <div className="border-b overflow-x-auto">
           <TabsList className="bg-transparent h-auto p-0 gap-0">
             {[
+              { value: "cadeiras", icon: BookOpen, label: "Cadeiras" },
               { value: "students", icon: Users, label: "Estudantes" },
               { value: "lessons", icon: Video, label: "Aulas" },
               { value: "conteudos", icon: FolderOpen, label: "Conteúdos" },
@@ -221,7 +222,47 @@ export default function DecanoTurmaDetail() {
           </TabsList>
         </div>
 
-        {/* Estudantes */}
+        {/* Cadeiras */}
+        <TabsContent value="cadeiras" className="space-y-4">
+          <p className="text-sm text-muted-foreground">{cadeiras.length} cadeiras na {turma.name}</p>
+          <div className="space-y-3">
+            {cadeiras.map(cadeira => {
+              const cEstado = getEstado(cadeira.media);
+              return (
+                <Link key={cadeira.id} to={`/decano/cursos/${cursoId}/turma/${turmaId}/cadeira/${cadeira.id}`}>
+                  <Card className="p-5 border-l-[3px] border-l-primary hover:shadow-md transition-shadow cursor-pointer">
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h4 className="text-sm font-semibold text-foreground">{cadeira.name}</h4>
+                          <Badge variant="outline" className="text-[10px] font-mono">{cadeira.code}</Badge>
+                          <Badge variant="outline" className={`text-[9px] ${cEstado.cls}`}>{cEstado.label}</Badge>
+                        </div>
+                        <p className="text-[11px] text-muted-foreground flex items-center gap-3">
+                          <span className="flex items-center gap-1"><GraduationCap className="w-3 h-3" /> {cadeira.professor}</span>
+                          <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {cadeira.diasAula}</span>
+                          <span className="flex items-center gap-1"><MapPin className="w-3 h-3" /> {cadeira.location}</span>
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-4 shrink-0">
+                        <div className="text-center">
+                          <p className="text-[10px] text-muted-foreground uppercase">Presença</p>
+                          <p className={`text-sm font-bold ${cadeira.presenca >= 75 ? "text-accent" : "text-destructive"}`}>{cadeira.presenca}%</p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-[10px] text-muted-foreground uppercase">Média</p>
+                          <p className={`text-sm font-bold ${cadeira.media >= 10 ? "text-accent" : "text-destructive"}`}>{cadeira.media}/20</p>
+                        </div>
+                        <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                      </div>
+                    </div>
+                  </Card>
+                </Link>
+              );
+            })}
+            {cadeiras.length === 0 && <p className="text-center text-muted-foreground py-8">Nenhuma cadeira nesta turma.</p>}
+          </div>
+        </TabsContent>
         <TabsContent value="students" className="space-y-4">
           <div className="flex items-center justify-between gap-4">
             <div className="relative flex-1 max-w-sm">
