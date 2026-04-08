@@ -90,12 +90,12 @@ export default function CoordenadorAvaliacaoDetail() {
         {/* KPIs */}
         <div className="p-5 space-y-4">
           <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
-          <KpiCard label="Data" value={task.dueDate} icon={Calendar} iconBg="bg-primary/10" iconColor="text-primary" />
-          <KpiCard label="Peso" value={`${task.weight}%`} icon={Award} iconBg="bg-accent/10" iconColor="text-accent" />
-          <KpiCard label="Duração" value={task.type === "quiz" ? "45 min" : task.type === "exame" ? "2 horas" : "Sem limite"} icon={Clock} iconBg="bg-primary/10" iconColor="text-primary" />
-          <KpiCard label="Local" value={task.type === "exame" ? "Sala A2.04" : "Online"} icon={MapPin} iconBg="bg-accent/10" iconColor="text-accent" />
-          <KpiCard label="Média" value={task.avgGrade !== null ? `${task.avgGrade}/20` : "—"} icon={Award} iconBg={task.avgGrade !== null && task.avgGrade >= 10 ? "bg-accent/10" : "bg-destructive/10"} iconColor={task.avgGrade !== null && task.avgGrade >= 10 ? "text-accent" : "text-destructive"} />
-        </div>
+            <KpiCard label="Data" value={task.dueDate} icon={Calendar} iconBg="bg-primary/10" iconColor="text-primary" />
+            <KpiCard label="Peso" value={`${task.weight}%`} icon={Award} iconBg="bg-accent/10" iconColor="text-accent" />
+            <KpiCard label="Duração" value={task.type === "quiz" ? "45 min" : task.type === "exame" ? "2 horas" : "Sem limite"} icon={Clock} iconBg="bg-primary/10" iconColor="text-primary" />
+            <KpiCard label="Local" value={task.type === "exame" ? "Sala A2.04" : "Online"} icon={MapPin} iconBg="bg-accent/10" iconColor="text-accent" />
+            <KpiCard label="Média" value={task.avgGrade !== null ? `${task.avgGrade}/20` : "—"} icon={Award} iconBg={task.avgGrade !== null && task.avgGrade >= 10 ? "bg-accent/10" : "bg-destructive/10"} iconColor={task.avgGrade !== null && task.avgGrade >= 10 ? "text-accent" : "text-destructive"} />
+          </div>
 
         <div className="border-t border-border" />
 
