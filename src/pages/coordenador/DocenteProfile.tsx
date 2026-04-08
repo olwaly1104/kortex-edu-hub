@@ -58,23 +58,24 @@ export default function CoordenadorDocenteProfile() {
               <h2 className="text-lg font-bold text-foreground">{docente.name}</h2>
               <Badge variant="outline" className={`text-xs ${statusBg}`}>{statusLabel}</Badge>
             </div>
-        <div className="flex items-center gap-2 flex-wrap">
-          <Link to="/coordenador/curso">
-            <Badge variant="outline" className="text-[10px] gap-1 cursor-pointer hover:bg-muted/50 transition-colors"><GraduationCap className="w-3 h-3" /> {coordCursoInfo.code}</Badge>
-          </Link>
-          <Link to="/coordenador/faculdade">
-            <Badge variant="outline" className="text-[10px] gap-1 cursor-pointer hover:bg-muted/50 transition-colors"><BookOpen className="w-3 h-3" /> {coordCursoInfo.faculty}</Badge>
-          </Link>
-          <Badge variant="outline" className="text-[10px]">Departamento de {docente.department}</Badge>
-          <Badge variant="outline" className="text-[10px]">{docente.status === "activo" ? "Activo" : docente.status === "licença" ? "Em Licença" : "Inactivo"}</Badge>
-        </div>
-        <div className="flex items-center gap-2 pt-1">
-          <Button size="sm" variant="outline" className="gap-1.5 text-xs h-7">
-            <MessageCircle className="w-3.5 h-3.5" /> Chat
-          </Button>
-          <Button size="sm" variant="outline" className="gap-1.5 text-xs h-7">
-            <Mail className="w-3.5 h-3.5" /> Email
-          </Button>
+            <div className="flex items-center gap-2 flex-wrap mt-1">
+              <Link to="/coordenador/curso">
+                <Badge variant="outline" className="text-[10px] gap-1 cursor-pointer hover:bg-muted/50 transition-colors"><GraduationCap className="w-3 h-3" /> {coordCursoInfo.code}</Badge>
+              </Link>
+              <Link to="/coordenador/faculdade">
+                <Badge variant="outline" className="text-[10px] gap-1 cursor-pointer hover:bg-muted/50 transition-colors"><BookOpen className="w-3 h-3" /> {coordCursoInfo.faculty}</Badge>
+              </Link>
+              <Badge variant="outline" className="text-[10px]">Departamento de {docente.department}</Badge>
+              <Badge variant="outline" className="text-[10px]">{docente.status === "activo" ? "Activo" : docente.status === "licença" ? "Em Licença" : "Inactivo"}</Badge>
+            </div>
+            <div className="flex items-center gap-2 pt-1">
+              <Button size="sm" variant="outline" className="gap-1.5 text-xs h-7">
+                <MessageCircle className="w-3.5 h-3.5" /> Chat
+              </Button>
+              <Button size="sm" variant="outline" className="gap-1.5 text-xs h-7">
+                <Mail className="w-3.5 h-3.5" /> Email
+              </Button>
+            </div>
           </div>
         </div>
       </Card>
