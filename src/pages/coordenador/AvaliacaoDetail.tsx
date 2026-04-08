@@ -60,33 +60,42 @@ export default function CoordenadorAvaliacaoDetail() {
       </Link>
 
       {/* Unified card */}
-      <Card className="p-5 space-y-4">
-        {/* Header */}
-        <div>
-          <div className="flex items-center gap-3 mb-2">
-            <h1 className="text-2xl font-bold text-foreground">{task.title}</h1>
-            <Badge className={`${sStyle.bg} gap-1 text-[10px] border-0`}>
-              <StatusIcon className="w-3 h-3" />
+      <Card className="overflow-hidden">
+        {/* Hero header */}
+        <div className="relative bg-gradient-to-br from-primary/8 via-primary/4 to-transparent p-6">
+          <div className="flex items-start justify-between gap-4">
+            <div className="space-y-3 flex-1">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <Award className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <h1 className="text-xl font-bold text-foreground leading-tight">{task.title}</h1>
+                  <p className="text-xs text-muted-foreground mt-0.5">{task.description}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <Badge variant="outline" className="text-[11px] bg-background/80 backdrop-blur-sm">{task.discipline}</Badge>
+                <Badge variant="outline" className="text-[11px] bg-background/80 backdrop-blur-sm">{turma.name} · {turma.year}º Ano</Badge>
+                <Badge variant="outline" className="text-[11px] bg-background/80 backdrop-blur-sm">{task.type === "quiz" ? "Quiz" : task.type === "exame" ? "Exame" : "Tarefa"}</Badge>
+              </div>
+            </div>
+            <Badge className={`${sStyle.bg} gap-1.5 text-xs border-0 px-3 py-1.5 shrink-0`}>
+              <StatusIcon className="w-3.5 h-3.5" />
               {sStyle.label}
             </Badge>
           </div>
-          <p className="text-sm text-muted-foreground">{task.description}</p>
-          <div className="flex items-center gap-3 mt-3 flex-wrap">
-            <Badge variant="outline" className="text-xs">{task.discipline}</Badge>
-            <Badge variant="outline" className="text-xs">{turma.name} · {turma.year}º Ano</Badge>
-            <Badge variant="outline" className="text-xs">{task.type === "quiz" ? "Quiz" : task.type === "exame" ? "Exame" : "Tarefa"}</Badge>
-          </div>
         </div>
 
-        <div className="border-t border-border" />
         {/* KPIs */}
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
-          <KpiCard label="Data" value={task.dueDate} icon={Calendar} iconBg="bg-primary/10" iconColor="text-primary" />
-          <KpiCard label="Peso" value={`${task.weight}%`} icon={Award} iconBg="bg-accent/10" iconColor="text-accent" />
-          <KpiCard label="Duração" value={task.type === "quiz" ? "45 min" : task.type === "exame" ? "2 horas" : "Sem limite"} icon={Clock} iconBg="bg-primary/10" iconColor="text-primary" />
-          <KpiCard label="Local" value={task.type === "exame" ? "Sala A2.04" : "Online"} icon={MapPin} iconBg="bg-accent/10" iconColor="text-accent" />
-          <KpiCard label="Média" value={task.avgGrade !== null ? `${task.avgGrade}/20` : "—"} icon={Award} iconBg={task.avgGrade !== null && task.avgGrade >= 10 ? "bg-accent/10" : "bg-destructive/10"} iconColor={task.avgGrade !== null && task.avgGrade >= 10 ? "text-accent" : "text-destructive"} />
-        </div>
+        <div className="p-5 space-y-4">
+          <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+            <KpiCard label="Data" value={task.dueDate} icon={Calendar} iconBg="bg-primary/10" iconColor="text-primary" />
+            <KpiCard label="Peso" value={`${task.weight}%`} icon={Award} iconBg="bg-accent/10" iconColor="text-accent" />
+            <KpiCard label="Duração" value={task.type === "quiz" ? "45 min" : task.type === "exame" ? "2 horas" : "Sem limite"} icon={Clock} iconBg="bg-primary/10" iconColor="text-primary" />
+            <KpiCard label="Local" value={task.type === "exame" ? "Sala A2.04" : "Online"} icon={MapPin} iconBg="bg-accent/10" iconColor="text-accent" />
+            <KpiCard label="Média" value={task.avgGrade !== null ? `${task.avgGrade}/20` : "—"} icon={Award} iconBg={task.avgGrade !== null && task.avgGrade >= 10 ? "bg-accent/10" : "bg-destructive/10"} iconColor={task.avgGrade !== null && task.avgGrade >= 10 ? "text-accent" : "text-destructive"} />
+          </div>
 
         <div className="border-t border-border" />
 
@@ -132,6 +141,7 @@ export default function CoordenadorAvaliacaoDetail() {
               <span className="text-[10px] text-muted-foreground shrink-0">{item.type}</span>
             </div>
           ))}
+        </div>
         </div>
       </Card>
       <Card className="overflow-hidden">
