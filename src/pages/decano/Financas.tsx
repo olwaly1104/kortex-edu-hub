@@ -25,7 +25,6 @@ const deductions = [
   { label: "IRT (Imposto)", percentage: "8%", amount: 38400 },
   { label: "Segurança Social", percentage: "3%", amount: 14400 },
   { label: "Seguro de Saúde", percentage: "1%", amount: 4800 },
-  { label: "Subsídio de Cargo", percentage: "+5%", amount: -24000 },
 ];
 
 const multas = [
