@@ -62,28 +62,26 @@ export default function CoordenadorAvaliacaoDetail() {
       {/* Unified card */}
       <Card className="overflow-hidden">
         {/* Hero header */}
-        <div className="relative bg-gradient-to-br from-primary/8 via-primary/4 to-transparent p-6">
-          <div className="flex items-start justify-between gap-4">
-            <div className="space-y-3 flex-1">
-              <div className="flex items-center gap-2.5">
-                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                  <Award className="w-5 h-5 text-primary" />
-                </div>
-                <div>
-                  <h1 className="text-xl font-bold text-foreground leading-tight">{task.title}</h1>
-                  <p className="text-xs text-muted-foreground mt-0.5">{task.description}</p>
-                </div>
+        <div className="relative border-b border-border">
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/6 via-primary/3 to-transparent" />
+          <div className="relative px-6 py-5">
+            <div className="flex items-center justify-between gap-4 mb-4">
+              <div className="flex items-center gap-2 text-[11px]">
+                <span className="text-muted-foreground">{task.discipline}</span>
+                <span className="text-muted-foreground/40">›</span>
+                <span className="text-muted-foreground">{turma.name} · {turma.year}º Ano</span>
+                <span className="text-muted-foreground/40">›</span>
+                <span className="text-foreground font-medium">{task.type === "quiz" ? "Quiz" : task.type === "exame" ? "Exame" : "Tarefa"}</span>
               </div>
-              <div className="flex items-center gap-2 flex-wrap">
-                <Badge variant="outline" className="text-[11px] bg-background/80 backdrop-blur-sm">{task.discipline}</Badge>
-                <Badge variant="outline" className="text-[11px] bg-background/80 backdrop-blur-sm">{turma.name} · {turma.year}º Ano</Badge>
-                <Badge variant="outline" className="text-[11px] bg-background/80 backdrop-blur-sm">{task.type === "quiz" ? "Quiz" : task.type === "exame" ? "Exame" : "Tarefa"}</Badge>
-              </div>
+              <Badge className={`${sStyle.bg} gap-1.5 text-[11px] border-0 px-2.5 py-1 shrink-0`}>
+                <StatusIcon className="w-3 h-3" />
+                {sStyle.label}
+              </Badge>
             </div>
-            <Badge className={`${sStyle.bg} gap-1.5 text-xs border-0 px-3 py-1.5 shrink-0`}>
-              <StatusIcon className="w-3.5 h-3.5" />
-              {sStyle.label}
-            </Badge>
+            <h1 className="text-2xl font-bold text-foreground tracking-tight">{task.title}</h1>
+            {task.description && (
+              <p className="text-sm text-muted-foreground mt-1.5 max-w-2xl">{task.description}</p>
+            )}
           </div>
         </div>
 
