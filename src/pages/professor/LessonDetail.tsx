@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   ArrowLeft, Clock, Video, Users, Eye, Calendar,
-  CheckCircle, Edit, Play,
+  CheckCircle, Edit, Play, BookOpen, User,
 } from "lucide-react";
 import LessonTabs, { generateAttendance } from "@/components/LessonTabs";
 
