@@ -23,7 +23,7 @@ export default function DecanoFaculdades() {
               <Building2 className="w-5 h-5 text-primary" />
               <h1 className="text-xl font-bold text-foreground tracking-tight">Meus Cursos</h1>
             </div>
-            <p className="text-sm text-muted-foreground">{fac.name} — {fac.courses.length} cursos</p>
+            <p className="text-sm text-muted-foreground">{fac.name}</p>
           </div>
         </div>
         <div className="px-5 py-4 grid grid-cols-2 lg:grid-cols-6 gap-4">
