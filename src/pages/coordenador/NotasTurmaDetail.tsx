@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Award, Calendar, Clock, MapPin, User, CheckCircle, ArrowLeft, Users, GraduationCap } from "lucide-react";
 
 export default function NotasTurmaDetail() {
+  const navigate = useNavigate();
   const { year, turma } = useParams();
   const yearNum = Number(year);
   const yearData = coordNotas.find(n => n.year === yearNum);
