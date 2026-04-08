@@ -1,4 +1,4 @@
-import { decanoFaculty, decanoTurmas } from "@/data/institutionData";
+import { decanoFaculty, decanoTurmas, decanoCoordenadores } from "@/data/institutionData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Building2, Users, BookOpen, GraduationCap, Award, ChevronRight, Clock, CheckCircle } from "lucide-react";
