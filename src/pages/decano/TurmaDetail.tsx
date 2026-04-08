@@ -63,6 +63,27 @@ function generateCalendar(turmaId: string) {
   ];
 }
 
+function generateCadeiras(turmaId: string, turma: { estudantes: number; year: number }) {
+  const cadeiras = [
+    { name: "Matemática I", code: "MAT101", professor: "Prof. João Silva", diasAula: "Seg, Qua, Sex", location: "Sala 101" },
+    { name: "Física Aplicada", code: "FIS101", professor: "Prof. Ana Costa", diasAula: "Ter, Qui", location: "Lab F1" },
+    { name: "Desenho Técnico", code: "DTE101", professor: "Prof. Carlos Mendes", diasAula: "Seg, Qua", location: "Atelier A2" },
+    { name: "Programação", code: "PRG101", professor: "Prof. Rita Lopes", diasAula: "Ter, Qui, Sex", location: "Lab I3" },
+    { name: "Química Geral", code: "QUI101", professor: "Prof. Marta Reis", diasAula: "Seg, Qui", location: "Lab Q1" },
+  ];
+  return cadeiras.map((c, i) => ({
+    id: `${turmaId}-cad${i + 1}`,
+    ...c,
+    year: turma.year,
+    estudantes: turma.estudantes,
+    media: +(10 + Math.random() * 6).toFixed(1),
+    presenca: Math.floor(72 + Math.random() * 20),
+    taxaEntrega: Math.floor(70 + Math.random() * 25),
+    taxaAprovacao: Math.floor(65 + Math.random() * 30),
+    status: i < 3 ? "normal" as const : i === 3 ? "excelente" as const : "risco" as const,
+  }));
+}
+
 export default function DecanoTurmaDetail() {
   const { cursoId, turmaId } = useParams();
   const navigate = useNavigate();
