@@ -69,19 +69,12 @@ export default function DecanoTurmaDetail() {
   const turma = decanoTurmas.find(t => t.id === turmaId);
   const course = decanoFaculty.courses.find(c => c.id === cursoId);
 
-  if (!turma || !course) return (
-    <div className="p-8 text-muted-foreground">
-      <Button variant="ghost" onClick={() => navigate(-1)} className="gap-2"><ArrowLeft className="w-4 h-4" /> Voltar</Button>
-      <p className="mt-4">Turma não encontrada.</p>
-    </div>
-  );
-
-  const turmaLetter = turma.name.replace("Turma ", "");
-  const estudantes = decanoEstudantes.filter(e => e.course === course.name && e.year === turma.year && e.turma === turmaLetter);
-  const lessons = useMemo(() => generateLessons(turma.id, turma), [turma.id]);
-  const tasks = useMemo(() => generateTasks(turma.id, turma), [turma.id]);
-  const resources = useMemo(() => generateResources(turma.id), [turma.id]);
-  const calendar = useMemo(() => generateCalendar(turma.id), [turma.id]);
+  const turmaLetter = turma?.name.replace("Turma ", "") || "";
+  const estudantes = turma && course ? decanoEstudantes.filter(e => e.course === course.name && e.year === turma.year && e.turma === turmaLetter) : [];
+  const lessons = useMemo(() => turma ? generateLessons(turma.id, turma) : [], [turma?.id]);
+  const tasks = useMemo(() => turma ? generateTasks(turma.id, turma) : [], [turma?.id]);
+  const resources = useMemo(() => turma ? generateResources(turma.id) : [], [turma?.id]);
+  const calendar = useMemo(() => turma ? generateCalendar(turma.id) : [], [turma?.id]);
 
   const [studentSearch, setStudentSearch] = useState("");
   const [criteria, setCriteria] = useState([
@@ -90,6 +83,13 @@ export default function DecanoTurmaDetail() {
     { label: "Suficiente", minGrade: 10, color: "hsl(var(--secondary))" },
     { label: "Insuficiente", minGrade: 0, color: "hsl(var(--destructive))" },
   ]);
+
+  if (!turma || !course) return (
+    <div className="p-8 text-muted-foreground">
+      <Button variant="ghost" onClick={() => navigate(-1)} className="gap-2"><ArrowLeft className="w-4 h-4" /> Voltar</Button>
+      <p className="mt-4">Turma não encontrada.</p>
+    </div>
+  );
 
   const conteudos = lessons.filter(l => l.status === "publicada").flatMap(l =>
     l.materials.map(m => ({ ...m, lessonId: l.id, lessonTitle: l.title, lessonNumber: l.number, date: l.date, discipline: l.discipline, disciplineCode: l.disciplineCode }))
