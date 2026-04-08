@@ -1,5 +1,5 @@
 import { useAuth } from "@/contexts/AuthContext";
-import { decanoFaculty, decanoAprovacoes, decanoTurmas, decanoDocentes, decanoEstudantes, decanoCoordenadores } from "@/data/institutionData";
+import { decanoFaculty, decanoAprovacoes, decanoTurmas, decanoCoordenadores } from "@/data/institutionData";
 import { announcements, coordAgendaEvents } from "@/data/mockData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
