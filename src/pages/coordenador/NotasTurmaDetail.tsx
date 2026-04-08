@@ -108,9 +108,18 @@ export default function NotasTurmaDetail() {
       <div className="space-y-2">
         {turmaData.avaliacoes.map((a, i) => {
           const total = a.aprovados + a.reprovados;
+          const matchedTask = coordTurmaTasks.find(ct => 
+            ct.title.toLowerCase().includes(a.name.toLowerCase()) || 
+            a.name.toLowerCase().includes(ct.title.split("—")[0].trim().toLowerCase())
+          );
+          const taskId = matchedTask?.id || coordTurmaTasks[i % coordTurmaTasks.length]?.id || "ct1";
           return (
-            <Card key={`${a.code}-${i}`} className="p-4 border-l-[3px]" style={{ borderLeftColor: a.media >= 10 ? "hsl(var(--accent) / 0.6)" : "hsl(var(--destructive) / 0.6)" }}>
-              <div className="flex items-center gap-4">
+            <Card 
+              key={`${a.code}-${i}`} 
+              className="p-4 border-l-[3px] cursor-pointer transition-all hover:shadow-md group" 
+              style={{ borderLeftColor: a.media >= 10 ? "hsl(var(--accent) / 0.6)" : "hsl(var(--destructive) / 0.6)" }}
+              onClick={() => navigate(`/coordenador/avaliacoes/${taskId}`)}
+            >
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <p className="text-xs font-semibold text-foreground">{a.name}</p>
