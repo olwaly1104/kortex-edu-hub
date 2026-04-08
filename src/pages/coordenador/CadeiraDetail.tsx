@@ -80,7 +80,7 @@ export default function CoordenadorCadeiraDetail() {
             </div>
             <div className="flex items-center gap-2 flex-wrap">
               <Badge variant="outline" className="text-[11px] bg-background/80 gap-1">
-                <BookOpen className="w-3 h-3" /> {cadeira.name}
+                <GraduationCap className="w-3 h-3" /> {cadeira.professor}
               </Badge>
               <Badge variant="outline" className="text-[11px] bg-background/80 gap-1">
                 <Users className="w-3 h-3" /> Turma {turmaId?.replace("t", "").replace(/\d/, "").toUpperCase()}
@@ -92,7 +92,6 @@ export default function CoordenadorCadeiraDetail() {
                 <MapPin className="w-3 h-3" /> {cadeira.location}
               </Badge>
             </div>
-            <p className="text-sm text-muted-foreground mt-2">{cadeira.professor}</p>
           </div>
         </div>
 
