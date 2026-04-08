@@ -86,41 +86,39 @@ export default function CoordenadorAvaliacaoDetail() {
         <KpiCard label="Média" value={task.avgGrade !== null ? `${task.avgGrade}/20` : "—"} icon={Award} iconBg={task.avgGrade !== null && task.avgGrade >= 10 ? "bg-accent/10" : "bg-destructive/10"} iconColor={task.avgGrade !== null && task.avgGrade >= 10 ? "text-accent" : "text-destructive"} />
       </div>
 
-      {/* Progress bars */}
-      {task.status !== "rascunho" && (
-        <div className="rounded-xl border border-border bg-card p-5 space-y-4">
-          <div className="space-y-2">
-            <div className="flex items-center justify-between text-xs">
-              <span className="flex items-center gap-1.5 text-muted-foreground font-medium"><Users className="w-3.5 h-3.5" />Taxa de Submissão</span>
-              <span className="font-bold text-foreground">{submissionPct}%</span>
-            </div>
-            <Progress value={submissionPct} className="h-2" />
-            {notSubmitted > 0 && (
-              <p className="text-[11px] text-destructive flex items-center gap-1">
-                <AlertCircle className="w-3 h-3" /> {notSubmitted} estudantes ainda não submeteram
-              </p>
-            )}
-          </div>
-          <div className="border-t border-border" />
-          <div className="space-y-2">
-            <div className="flex items-center justify-between text-xs">
-              <span className={`flex items-center gap-1.5 font-medium ${pendingCorrection > 0 ? "text-destructive" : "text-muted-foreground"}`}>
-                <CheckCircle className="w-3.5 h-3.5" />Taxa de Correcção
-              </span>
-              <span className={`font-bold ${pendingCorrection > 0 ? "text-destructive" : "text-foreground"}`}>{notaAtribuidaPct}%</span>
-            </div>
-            <Progress value={notaAtribuidaPct} className={`h-2 ${pendingCorrection > 0 ? "[&>div]:bg-destructive" : ""}`} />
-            {pendingCorrection > 0 && (
-              <p className="text-[11px] text-destructive flex items-center gap-1">
-                <AlertCircle className="w-3 h-3" /> {pendingCorrection} submissões pendentes de correcção
-              </p>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Student Results Table */}
+      {/* Progress bars + Student Table in same card */}
       <Card className="overflow-hidden">
+        {task.status !== "rascunho" && (
+          <div className="p-5 space-y-4 border-b border-border">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-xs">
+                <span className="flex items-center gap-1.5 text-muted-foreground font-medium"><Users className="w-3.5 h-3.5" />Taxa de Submissão</span>
+                <span className="font-bold text-foreground">{submissionPct}%</span>
+              </div>
+              <Progress value={submissionPct} className="h-2" />
+              {notSubmitted > 0 && (
+                <p className="text-[11px] text-destructive flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3" /> {notSubmitted} estudantes ainda não submeteram
+                </p>
+              )}
+            </div>
+            <div className="border-t border-border" />
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-xs">
+                <span className={`flex items-center gap-1.5 font-medium ${pendingCorrection > 0 ? "text-destructive" : "text-muted-foreground"}`}>
+                  <CheckCircle className="w-3.5 h-3.5" />Taxa de Correcção
+                </span>
+                <span className={`font-bold ${pendingCorrection > 0 ? "text-destructive" : "text-foreground"}`}>{notaAtribuidaPct}%</span>
+              </div>
+              <Progress value={notaAtribuidaPct} className={`h-2 ${pendingCorrection > 0 ? "[&>div]:bg-destructive" : ""}`} />
+              {pendingCorrection > 0 && (
+                <p className="text-[11px] text-destructive flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3" /> {pendingCorrection} submissões pendentes de correcção
+                </p>
+              )}
+            </div>
+          </div>
+        )}
         <div className="p-4 border-b bg-muted/30 flex items-center justify-between">
           <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
             <Users className="w-4 h-4" /> Estudantes ({studentResults.length})
@@ -146,7 +144,6 @@ export default function CoordenadorAvaliacaoDetail() {
                 <TableHead className="text-xs text-center">Submetido</TableHead>
                 <TableHead className="text-xs text-center">Corrigido</TableHead>
                 <TableHead className="text-xs text-center">Nota</TableHead>
-                <TableHead className="text-xs text-center">Estado</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -181,15 +178,6 @@ export default function CoordenadorAvaliacaoDetail() {
                     ) : (
                       <span className="text-xs text-muted-foreground">—</span>
                     )}
-                  </TableCell>
-                  <TableCell className="text-center">
-                    <Badge variant="outline" className={`text-[10px] ${
-                      s.corrigido ? "bg-accent/10 text-accent border-accent/20" :
-                      s.submetido ? "bg-primary/10 text-primary border-primary/20" :
-                      "bg-destructive/10 text-destructive border-destructive/20"
-                    }`}>
-                      {s.corrigido ? "Corrigido" : s.submetido ? "Por corrigir" : "Não submetido"}
-                    </Badge>
                   </TableCell>
                 </TableRow>
               ))}
