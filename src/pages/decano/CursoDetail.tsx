@@ -1,5 +1,5 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { decanoFaculty, decanoTurmas } from "@/data/institutionData";
+import { decanoFaculty, decanoTurmas, decanoCoordenadores } from "@/data/institutionData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -48,9 +48,20 @@ export default function DecanoCursoDetail() {
               </Badge>
             </div>
             <div className="flex items-center gap-2 flex-wrap mt-2">
-              <Badge variant="outline" className="text-[11px] bg-background/80 gap-1">
-                <GraduationCap className="w-3 h-3" /> {course.coordinator}
-              </Badge>
+              {(() => {
+                const coord = decanoCoordenadores.find(co => co.name === course.coordinator);
+                return coord ? (
+                  <Link to={`/decano/coordenadores/${coord.id}`} onClick={e => e.stopPropagation()}>
+                    <Badge variant="outline" className="text-[11px] bg-background/80 gap-1 hover:bg-primary/10 hover:text-primary transition-colors cursor-pointer">
+                      <GraduationCap className="w-3 h-3" /> {course.coordinator}
+                    </Badge>
+                  </Link>
+                ) : (
+                  <Badge variant="outline" className="text-[11px] bg-background/80 gap-1">
+                    <GraduationCap className="w-3 h-3" /> {course.coordinator}
+                  </Badge>
+                );
+              })()}
               <Badge variant="outline" className="text-[11px] bg-background/80">
                 {decanoFaculty.name}
               </Badge>
@@ -104,9 +115,6 @@ export default function DecanoCursoDetail() {
                         <Badge variant="outline" className="text-[9px] gap-0.5">
                           <Calendar className="w-2.5 h-2.5" /> {t.disciplinas} cadeiras
                         </Badge>
-                        <Badge variant="outline" className={`text-[9px] ${tEstado.cls}`}>
-                          {tEstado.label}
-                        </Badge>
                       </div>
                       <div className="flex items-center gap-3 shrink-0">
                         <div className="text-right">
@@ -121,6 +129,9 @@ export default function DecanoCursoDetail() {
                           <p className="text-[9px] text-muted-foreground uppercase leading-tight">Presença</p>
                           <p className={`text-xs font-bold ${t.presenca >= 75 ? "text-accent" : "text-destructive"}`}>{t.presenca}%</p>
                         </div>
+                        <Badge variant="outline" className={`text-[9px] ${tEstado.cls}`}>
+                          {tEstado.label}
+                        </Badge>
                         <ChevronRight className="w-3.5 h-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
                       </div>
                     </div>
