@@ -77,6 +77,7 @@ import DecanoDocenteProfile from "./pages/decano/DocenteProfile";
 import DecanoTurmaDetail from "./pages/decano/TurmaDetail";
 import DecanoCoordenadores from "./pages/decano/Coordenadores";
 import DecanoCoordenadorProfile from "./pages/decano/CoordenadorProfile";
+import DecanoCadeiraDetail from "./pages/decano/CadeiraDetail";
 import ReitoriaDashboard from "./pages/reitoria/Dashboard";
 import ReitoriaAprovacoes from "./pages/reitoria/Aprovacoes";
 import ReitoriaVisaoGeral from "./pages/reitoria/VisaoGeral";
