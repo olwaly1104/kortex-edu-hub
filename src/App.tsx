@@ -78,15 +78,6 @@ import DecanoTurmaDetail from "./pages/decano/TurmaDetail";
 import DecanoCoordenadores from "./pages/decano/Coordenadores";
 import DecanoCoordenadorProfile from "./pages/decano/CoordenadorProfile";
 import DecanoCadeiraDetail from "./pages/decano/CadeiraDetail";
-import ReitoriaDashboard from "./pages/reitoria/Dashboard";
-import ReitoriaAprovacoes from "./pages/reitoria/Aprovacoes";
-import ReitoriaVisaoGeral from "./pages/reitoria/VisaoGeral";
-import ReitoriaFaculdades from "./pages/reitoria/Faculdades";
-import ReitoriaDecanos from "./pages/reitoria/Decanos";
-import ReitoriaCoordenadores from "./pages/reitoria/Coordenadores";
-import ReitoriaDocentes from "./pages/reitoria/Docentes";
-import ReitoriaRelatorios from "./pages/reitoria/Relatorios";
-import ReitoriaFinancas from "./pages/reitoria/Financas";
 import ReitorDashboard from "./pages/reitor/Dashboard";
 import ReitorFaculdades from "./pages/reitor/Faculdades";
 import ReitorFaculdadeDetail from "./pages/reitor/FaculdadeDetail";
@@ -116,7 +107,6 @@ const homeRedirectMap: Record<string, string> = {
   student: "/student",
   coordenador_curso: "/coordenador",
   decano: "/decano",
-  reitoria: "/reitoria",
   reitor: "/reitor",
   secretaria: "/secretaria",
 };
@@ -215,19 +205,6 @@ function AppRoutes() {
         <Route path="/decano/relatorios" element={<DecanoRelatorios />} />
         <Route path="/decano/financas" element={<DecanoFinancas />} />
         <Route path="/decano/perfil" element={<StudentProfile />} />
-        {/* Reitoria */}
-        <Route path="/reitoria" element={<ReitoriaDashboard />} />
-        <Route path="/reitoria/calendario" element={<StudentCalendar />} />
-        <Route path="/reitoria/anuncios" element={<StudentAnnouncements />} />
-        <Route path="/reitoria/aprovacoes" element={<ReitoriaAprovacoes />} />
-        <Route path="/reitoria/visao-geral" element={<ReitoriaVisaoGeral />} />
-        <Route path="/reitoria/faculdades" element={<ReitoriaFaculdades />} />
-        <Route path="/reitoria/decanos" element={<ReitoriaDecanos />} />
-        <Route path="/reitoria/coordenadores" element={<ReitoriaCoordenadores />} />
-        <Route path="/reitoria/docentes" element={<ReitoriaDocentes />} />
-        <Route path="/reitoria/relatorios" element={<ReitoriaRelatorios />} />
-        <Route path="/reitoria/financas" element={<ReitoriaFinancas />} />
-        <Route path="/reitoria/perfil" element={<StudentProfile />} />
         {/* Reitor */}
         <Route path="/reitor" element={<ReitorDashboard />} />
         <Route path="/reitor/calendario" element={<StudentCalendar />} />
