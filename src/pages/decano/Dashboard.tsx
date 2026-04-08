@@ -204,7 +204,7 @@ export default function DecanoDashboard() {
             <h2 className="text-base font-semibold text-foreground">Alertas em Risco</h2>
           </div>
 
-          <div className="grid grid-cols-2 gap-0 flex-1">
+          <div className="grid grid-cols-3 gap-0 flex-1">
             {/* Coordenadores em Risco */}
             <div className="pr-3 border-r border-border flex flex-col">
               <div className="flex items-center justify-between mb-2">
@@ -233,7 +233,7 @@ export default function DecanoDashboard() {
             </div>
 
             {/* Cursos em Risco */}
-            <div className="pl-3 flex flex-col">
+            <div className="px-3 border-r border-border flex flex-col">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1">
                   <Building2 className="w-3 h-3" /> Cursos
@@ -252,6 +252,32 @@ export default function DecanoDashboard() {
                       <div className="flex items-center justify-between mt-1 text-[9px]">
                         <span className={`flex items-center gap-0.5 ${c.mediaGeral < 12 ? "text-destructive font-medium" : "text-muted-foreground"}`}><BarChart3 className="w-2.5 h-2.5" />{c.mediaGeral}</span>
                         <span className={`flex items-center gap-0.5 ${c.taxaSucesso < 75 ? "text-destructive font-medium" : "text-muted-foreground"}`}><ClipboardCheck className="w-2.5 h-2.5" />{c.taxaSucesso}%</span>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {/* Anos em Risco */}
+            <div className="pl-3 flex flex-col">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1">
+                  <Layers className="w-3 h-3" /> Anos
+                  <Badge variant="outline" className="text-[9px] px-1.5 py-0">{anosEmRisco.length}</Badge>
+                </h3>
+              </div>
+              <div className="flex flex-col gap-1.5 flex-1">
+                {anosEmRisco.length === 0 ? (
+                  <p className="text-[10px] text-muted-foreground text-center py-3">Nenhum alerta ✓</p>
+                ) : anosEmRisco.slice(0, 4).map(a => (
+                  <Link key={`${a.courseId}-${a.year}`} to={`/decano/cursos/${a.courseId}`} className="flex-1 flex">
+                    <div className="px-2.5 py-1.5 rounded-lg border border-border bg-card border-l-[3px] border-l-destructive hover:bg-muted/40 transition-colors cursor-pointer w-full flex flex-col justify-center">
+                      <p className="text-[11px] font-semibold text-foreground leading-tight truncate">{a.year}º Ano — {a.courseName}</p>
+                      <p className="text-[9px] text-muted-foreground">{a.turmas} turma{a.turmas > 1 ? "s" : ""}</p>
+                      <div className="flex items-center justify-between mt-1 text-[9px]">
+                        <span className={`flex items-center gap-0.5 ${a.presenca < 80 ? "text-destructive font-medium" : "text-muted-foreground"}`}><Clock className="w-2.5 h-2.5" />{a.presenca}%</span>
+                        <span className={`flex items-center gap-0.5 ${a.media < 12 ? "text-destructive font-medium" : "text-muted-foreground"}`}><BarChart3 className="w-2.5 h-2.5" />{a.media}</span>
                       </div>
                     </div>
                   </Link>
