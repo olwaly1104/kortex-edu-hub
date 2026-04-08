@@ -61,27 +61,32 @@ export default function CoordenadorAvaliacaoDetail() {
 
       {/* Unified card */}
       <Card className="overflow-hidden">
-        {/* Hero header */}
+        {/* Header */}
         <div className="relative border-b border-border">
           <div className="absolute inset-0 bg-gradient-to-r from-primary/6 via-primary/3 to-transparent" />
-          <div className="relative px-6 py-5">
-            <div className="flex items-center justify-between gap-4 mb-3">
-              <div className="flex items-center gap-2">
-                <Badge variant="outline" className="text-[11px] bg-background/80">{task.discipline}</Badge>
-                <Badge variant="outline" className="text-[11px] bg-background/80">{turma.name} · {turma.year}º Ano</Badge>
+          <div className="relative px-5 py-4">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2 mb-1.5">
+                  <Badge variant="outline" className="text-[11px] bg-background/80">{task.discipline}</Badge>
+                  <Badge variant="outline" className="text-[11px] bg-background/80">{turma.name} · {turma.year}º Ano</Badge>
+                </div>
+                <h1 className="text-xl font-bold text-foreground tracking-tight leading-tight">{task.title}</h1>
+                <div className="flex items-center gap-3 mt-1.5">
+                  {task.description && (
+                    <p className="text-sm text-muted-foreground">{task.description}</p>
+                  )}
+                  <span className="text-muted-foreground/30">·</span>
+                  <p className="text-xs text-muted-foreground flex items-center gap-1 shrink-0">
+                    <User className="w-3 h-3" /> {turma.director}
+                  </p>
+                </div>
               </div>
-              <Badge className={`${sStyle.bg} gap-1.5 text-[11px] border-0 px-2.5 py-1 shrink-0`}>
+              <Badge className={`${sStyle.bg} gap-1.5 text-[11px] border-0 px-2.5 py-1 shrink-0 mt-0.5`}>
                 <StatusIcon className="w-3 h-3" />
                 {sStyle.label}
               </Badge>
             </div>
-            <h1 className="text-2xl font-bold text-foreground tracking-tight">{task.title}</h1>
-            {task.description && (
-              <p className="text-sm text-muted-foreground mt-1.5 max-w-2xl">{task.description}</p>
-            )}
-            <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1.5">
-              <User className="w-3.5 h-3.5" /> {turma.director}
-            </p>
           </div>
         </div>
 
