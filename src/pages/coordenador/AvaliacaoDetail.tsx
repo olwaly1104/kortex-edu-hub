@@ -81,38 +81,26 @@ export default function CoordenadorAvaliacaoDetail() {
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
         <KpiCard label="Data" value={task.dueDate} icon={Calendar} iconBg="bg-primary/10" iconColor="text-primary" />
         <KpiCard label="Peso" value={`${task.weight}%`} icon={Award} iconBg="bg-accent/10" iconColor="text-accent" />
-        <KpiCard label="Submissões" value={`${task.submissions}/${task.totalStudents}`} icon={Users} iconBg="bg-primary/10" iconColor="text-primary" />
-        <KpiCard label="Corrigidos" value={`${task.corrected}/${task.submissions}`} icon={CheckCircle} iconBg="bg-accent/10" iconColor="text-accent" />
+        <KpiCard label="Duração" value={task.type === "quiz" ? "45 min" : task.type === "exame" ? "2 horas" : "Sem limite"} icon={Clock} iconBg="bg-primary/10" iconColor="text-primary" />
+        <KpiCard label="Local" value={task.type === "exame" ? "Sala A2.04" : "Online"} icon={MapPin} iconBg="bg-accent/10" iconColor="text-accent" />
         <KpiCard label="Média" value={task.avgGrade !== null ? `${task.avgGrade}/20` : "—"} icon={Award} iconBg={task.avgGrade !== null && task.avgGrade >= 10 ? "bg-accent/10" : "bg-destructive/10"} iconColor={task.avgGrade !== null && task.avgGrade >= 10 ? "text-accent" : "text-destructive"} />
       </div>
 
-      {/* Guia da Avaliação + Conteúdo Relevante */}
+      {/* Guia da Avaliação (document) + Conteúdo Relevante */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <Card className="p-5 space-y-3">
           <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
             <BookOpen className="w-4 h-4 text-primary" /> Guia da Avaliação
           </h3>
-          <div className="space-y-2.5 text-xs text-muted-foreground">
-            <div className="flex items-start gap-2">
-              <span className="font-medium text-foreground min-w-[80px]">Formato</span>
-              <span>{task.type === "quiz" ? "Quiz online — resposta múltipla" : task.type === "exame" ? "Exame presencial — prova escrita" : "Entrega de trabalho individual"}</span>
+          <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/40 hover:bg-muted/60 transition-colors cursor-pointer">
+            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+              <FileText className="w-4.5 h-4.5 text-primary" />
             </div>
-            <div className="flex items-start gap-2">
-              <span className="font-medium text-foreground min-w-[80px]">Duração</span>
-              <span>{task.type === "quiz" ? "45 minutos" : task.type === "exame" ? "2 horas" : "Sem limite"}</span>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-medium text-foreground truncate">Guia — {task.title}</p>
+              <p className="text-[10px] text-muted-foreground">PDF · 3 páginas · Actualizado {task.dueDate}</p>
             </div>
-            <div className="flex items-start gap-2">
-              <span className="font-medium text-foreground min-w-[80px]">Tentativas</span>
-              <span>{task.type === "quiz" ? "1 tentativa" : "Submissão única"}</span>
-            </div>
-            <div className="flex items-start gap-2">
-              <span className="font-medium text-foreground min-w-[80px]">Critérios</span>
-              <span>Clareza, rigor técnico, fundamentação teórica</span>
-            </div>
-            <div className="flex items-start gap-2">
-              <span className="font-medium text-foreground min-w-[80px]">Observações</span>
-              <span>Consulta de material não é permitida durante a prova.</span>
-            </div>
+            <Badge variant="outline" className="text-[10px] shrink-0">Abrir</Badge>
           </div>
         </Card>
 
