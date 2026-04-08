@@ -99,14 +99,14 @@ export default function DecanoCursoDetail() {
                     onClick={() => navigate(`/decano/cursos/${cursoId}/turma/${t.id}`)}
                   >
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 min-w-0">
-                        <p className="text-xs font-semibold text-foreground">{t.name}</p>
-                        <Badge variant="outline" className="text-[9px] gap-0.5">
-                          <Calendar className="w-2.5 h-2.5" /> {t.disciplinas} cadeiras
-                        </Badge>
-                        <Badge variant="outline" className={`text-[9px] ${tEstado.cls}`}>
-                          {tEstado.label}
-                        </Badge>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <p className="text-xs font-semibold text-foreground">{t.name}</p>
+                          <Badge variant="outline" className={`text-[9px] ${tEstado.cls}`}>
+                            {tEstado.label}
+                          </Badge>
+                        </div>
+                        <p className="text-[10px] text-muted-foreground mt-0.5">{t.disciplinas} cadeiras</p>
                       </div>
                       <div className="flex items-center gap-3 shrink-0">
                         <div className="text-right">
