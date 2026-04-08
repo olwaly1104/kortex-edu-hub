@@ -65,26 +65,28 @@ export default function CoordenadorAvaliacaoDetail() {
         <div className="relative border-b border-border">
           <div className="absolute inset-0 bg-gradient-to-r from-primary/6 via-primary/3 to-transparent" />
           <div className="relative px-5 py-4">
-            <div className="flex items-start justify-between gap-3">
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2 mb-1.5">
-                  <Badge variant="outline" className="text-[11px] bg-background/80">{task.discipline}</Badge>
-                  <Badge variant="outline" className="text-[11px] bg-background/80">{turma.name} · {turma.year}º Ano</Badge>
-                </div>
-                <h1 className="text-xl font-bold text-foreground tracking-tight leading-tight">{task.title}</h1>
-                <div className="flex items-center gap-3 mt-1.5">
-                  {task.description && (
-                    <p className="text-sm text-muted-foreground">{task.description}</p>
-                  )}
-                  <span className="text-muted-foreground/30">·</span>
-                  <p className="text-xs text-muted-foreground flex items-center gap-1 shrink-0">
-                    <User className="w-3 h-3" /> {turma.director}
-                  </p>
-                </div>
-              </div>
-              <Badge className={`${sStyle.bg} gap-1.5 text-[11px] border-0 px-2.5 py-1 shrink-0 mt-0.5`}>
+            <div className="flex items-center justify-between gap-4 mb-2">
+              <h1 className="text-xl font-bold text-foreground tracking-tight leading-tight">{task.title}</h1>
+              <Badge className={`${sStyle.bg} gap-1.5 text-[11px] border-0 px-2.5 py-1 shrink-0`}>
                 <StatusIcon className="w-3 h-3" />
                 {sStyle.label}
+              </Badge>
+            </div>
+            {task.description && (
+              <p className="text-sm text-muted-foreground mb-2.5">{task.description}</p>
+            )}
+            <div className="flex items-center gap-2 flex-wrap">
+              <Badge variant="outline" className="text-[11px] bg-background/80 gap-1">
+                <BookOpen className="w-3 h-3" /> {task.discipline}
+              </Badge>
+              <Badge variant="outline" className="text-[11px] bg-background/80 gap-1">
+                <Users className="w-3 h-3" /> {turma.name}
+              </Badge>
+              <Badge variant="outline" className="text-[11px] bg-background/80">
+                {turma.year}º Ano
+              </Badge>
+              <Badge variant="outline" className="text-[11px] bg-background/80 gap-1">
+                <User className="w-3 h-3" /> {turma.director}
               </Badge>
             </div>
           </div>
