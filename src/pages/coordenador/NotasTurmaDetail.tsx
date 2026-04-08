@@ -2,7 +2,7 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { coordNotas, coordCursoInfo, coordTurmaTasks } from "@/data/institutionData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Award, Calendar, Clock, MapPin, User, CheckCircle, ArrowLeft, Users, GraduationCap } from "lucide-react";
+import { Award, Calendar, Clock, MapPin, User, CheckCircle, ArrowLeft, Users, GraduationCap, BookOpen } from "lucide-react";
 
 export default function NotasTurmaDetail() {
   const navigate = useNavigate();
