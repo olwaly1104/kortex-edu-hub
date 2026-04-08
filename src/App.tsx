@@ -70,6 +70,8 @@ import DecanoDocentes from "./pages/decano/Docentes";
 import DecanoNotas from "./pages/decano/Notas";
 import DecanoRelatorios from "./pages/decano/Relatorios";
 import DecanoFinancas from "./pages/decano/Financas";
+import DecanoCursoDetail from "./pages/decano/CursoDetail";
+import DecanoAnoDetail from "./pages/decano/AnoDetail";
 import ReitoriaDashboard from "./pages/reitoria/Dashboard";
 import ReitoriaAprovacoes from "./pages/reitoria/Aprovacoes";
 import ReitoriaVisaoGeral from "./pages/reitoria/VisaoGeral";
