@@ -1,7 +1,7 @@
 import { decanoFaculty, decanoTurmas } from "@/data/institutionData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Building2, Users, BookOpen, GraduationCap, Award, ChevronRight, Clock } from "lucide-react";
+import { Building2, Users, BookOpen, GraduationCap, Award, ChevronRight, Clock, CheckCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const getEstado = (media: number) =>
@@ -26,12 +26,13 @@ export default function DecanoFaculdades() {
             <p className="text-sm text-muted-foreground">{fac.name} — {fac.courses.length} cursos</p>
           </div>
         </div>
-        <div className="px-5 py-4 grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="px-5 py-4 grid grid-cols-2 lg:grid-cols-5 gap-4">
           {[
             { icon: Users, label: "Total Estudantes", value: fac.totalEstudantes },
             { icon: BookOpen, label: "Cursos", value: fac.totalCursos },
             { icon: GraduationCap, label: "Docentes", value: fac.totalDocentes },
             { icon: Award, label: "Média Global", value: "13.2/20" },
+            { icon: CheckCircle, label: "Presença Global", value: "82%" },
           ].map(s => (
             <div key={s.label} className="flex items-center gap-2">
               <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
