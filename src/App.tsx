@@ -105,6 +105,7 @@ const homeRedirectMap: Record<string, string> = {
   coordenador_curso: "/coordenador",
   decano: "/decano",
   reitoria: "/reitoria",
+  reitor: "/reitor",
   secretaria: "/secretaria",
 };
 

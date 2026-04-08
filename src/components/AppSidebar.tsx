@@ -179,6 +179,7 @@ const roleSectionsMap: Record<string, NavSection[]> = {
   coordenador_curso: coordenadorCursoSections,
   decano: decanoSections,
   reitoria: reitoriaSections,
+  reitor: reitorSections,
   secretaria: secretariaSections,
 };
 
