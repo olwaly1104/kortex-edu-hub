@@ -95,6 +95,7 @@ const decanoSections: NavSection[] = [
   ]},
   { title: "Académico", items: [
     { label: "Meus Cursos", icon: Building2, path: "/decano/faculdades" },
+    { label: "Coordenadores", icon: UserCog, path: "/decano/coordenadores" },
     { label: "Estudantes", icon: Users, path: "/decano/estudantes" },
     { label: "Docentes", icon: GraduationCap, path: "/decano/docentes" },
     { label: "Notas", icon: Award, path: "/decano/notas" },
