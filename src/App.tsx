@@ -52,6 +52,7 @@ import CoordenadorEstudantes from "./pages/coordenador/Estudantes";
 import CoordenadorDocentes from "./pages/coordenador/Docentes";
 import CoordenadorDocenteProfile from "./pages/coordenador/DocenteProfile";
 import CoordenadorNotas from "./pages/coordenador/Notas";
+import CoordenadorNotasTurmaDetail from "./pages/coordenador/NotasTurmaDetail";
 import CoordenadorEstudanteProfile from "./pages/coordenador/EstudanteProfile";
 import CoordenadorRelatorios from "./pages/coordenador/Relatorios";
 import CoordenadorFinancas from "./pages/coordenador/Financas";
@@ -166,6 +167,7 @@ function AppRoutes() {
         <Route path="/coordenador/docentes" element={<CoordenadorDocentes />} />
         <Route path="/coordenador/docentes/:docenteId" element={<CoordenadorDocenteProfile />} />
         <Route path="/coordenador/notas" element={<CoordenadorNotas />} />
+        <Route path="/coordenador/notas/:year/:turma" element={<CoordenadorNotasTurmaDetail />} />
         <Route path="/coordenador/relatorios" element={<CoordenadorRelatorios />} />
         <Route path="/coordenador/financas" element={<CoordenadorFinancas />} />
         <Route path="/coordenador/chat" element={<StudentChat />} />

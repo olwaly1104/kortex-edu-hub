@@ -1,14 +1,14 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { coordNotas, coordCursoInfo, coordDisciplinas } from "@/data/institutionData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Award, ChevronRight, Calendar, Clock, MapPin, User, CheckCircle, ArrowLeft } from "lucide-react";
+import { Award, ChevronRight, Calendar, Clock, CheckCircle } from "lucide-react";
 import ReportsMenuButton, { notasCategories } from "@/components/ReportsMenuButton";
 
 export default function CoordenadorNotas() {
-  const [selectedTurma, setSelectedTurma] = useState<string | null>(null);
+  const navigate = useNavigate();
   const [filterYear, setFilterYear] = useState<number | null>(null);
 
   const years = [...new Set(coordNotas.map(n => n.year))].sort();
@@ -35,23 +35,8 @@ export default function CoordenadorNotas() {
   const taxaReprovacao = globalPart > 0 ? Math.round((globalReprov / globalPart) * 100) : 0;
   const taxaConclusao = totalAvalTotal > 0 ? Math.round((totalAvalCompletas / totalAvalTotal) * 100) : 0;
 
-  const selectedData = selectedTurma
-    ? (() => {
-        const [yr, tm] = selectedTurma.split("-");
-        const yearData = coordNotas.find(n => n.year === Number(yr));
-        const turma = yearData?.turmas.find(t => t.turma === tm);
-        return turma ? { year: Number(yr), ...turma } : null;
-      })()
-    : null;
-
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
-      {selectedTurma && (
-        <Link to="/coordenador/notas" onClick={(e) => { e.preventDefault(); setSelectedTurma(null); }} className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
-          <ArrowLeft className="w-4 h-4" /> Voltar às Turmas
-        </Link>
-      )}
-
       <div>
         <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
           <Award className="w-6 h-6 text-primary" /> Notas do Curso
@@ -59,8 +44,7 @@ export default function CoordenadorNotas() {
         <p className="text-muted-foreground mt-1">{coordCursoInfo.name} · {coordCursoInfo.faculty}</p>
       </div>
 
-      {!selectedTurma && (
-        <div className="rounded-xl border border-border bg-card p-4 space-y-3">
+      <div className="rounded-xl border border-border bg-card p-4 space-y-3">
           {/* Year toggles + Reports */}
           <div className="flex items-center justify-between gap-2">
             <div className="flex flex-wrap gap-2">
@@ -116,11 +100,9 @@ export default function CoordenadorNotas() {
               </div>
             </div>
           </div>
-        </div>
-      )}
+      </div>
 
-      {!selectedTurma && (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {coordNotas.filter(yd => !filterYear || yd.year === filterYear).map(yearData => (
             <div key={yearData.year} className="space-y-2">
               <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">{yearData.year}º Ano</h2>
@@ -132,7 +114,7 @@ export default function CoordenadorNotas() {
                       key={turmaKey}
                       className="p-3 transition-all cursor-pointer hover:shadow-md border-l-[3px] group"
                       style={{ borderLeftColor: t.mediaGeral >= 10 ? "hsl(var(--accent))" : "hsl(var(--destructive))" }}
-                      onClick={() => setSelectedTurma(turmaKey)}
+                      onClick={() => navigate(`/coordenador/notas/${yearData.year}/${t.turma}`)}
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2 min-w-0">
@@ -174,72 +156,7 @@ export default function CoordenadorNotas() {
               </div>
             </div>
           ))}
-        </div>
-      )}
-      {/* Expanded turma detail */}
-      {selectedData && (
-        <div className="space-y-4 animate-fade-in">
-          <div className="flex items-center gap-2">
-            <h2 className="text-lg font-semibold text-foreground">Turma {selectedData.turma}</h2>
-            <Badge variant="outline" className="text-[10px]">{selectedData.year}º Ano</Badge>
-             <Badge variant={selectedData.mediaGeral >= 10 ? "default" : "destructive"} className="text-[10px]">
-               Média Geral {selectedData.mediaGeral}/20
-            </Badge>
-          </div>
-
-          <div className="space-y-2">
-            {selectedData.avaliacoes.map((a, i) => {
-              const total = a.aprovados + a.reprovados;
-              return (
-                <Card key={`${a.code}-${i}`} className="p-4 border-l-[3px]" style={{ borderLeftColor: a.media >= 10 ? "hsl(var(--accent) / 0.6)" : "hsl(var(--destructive) / 0.6)" }}>
-                  <div className="flex items-center gap-4">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <p className="text-xs font-semibold text-foreground">{a.name}</p>
-                        <Badge variant="outline" className="text-[10px] font-mono">{a.code}</Badge>
-                      </div>
-                      <p className="text-[10px] text-muted-foreground font-medium mb-1.5">{a.cadeira}</p>
-                      <div className="flex items-center gap-3 text-[10px] text-muted-foreground flex-wrap">
-                        <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{a.date}</span>
-                        <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{a.time}</span>
-                        <span className="flex items-center gap-1">{a.period}</span>
-                        <span className="flex items-center gap-1"><User className="w-3 h-3" />{a.professor}</span>
-                        <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{a.local}</span>
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-6 gap-3 shrink-0 text-center">
-                      <div>
-                        <p className="text-[10px] text-muted-foreground uppercase">Média Geral</p>
-                        <p className={`text-xs font-bold ${a.media >= 10 ? "text-accent" : "text-destructive"}`}>{a.media}/20</p>
-                      </div>
-                      <div>
-                        <p className="text-[10px] text-muted-foreground uppercase">Partic.</p>
-                        <p className="text-xs font-bold text-foreground">{total}</p>
-                      </div>
-                      <div>
-                        <p className="text-[10px] text-muted-foreground uppercase">Aprov.</p>
-                        <p className="text-xs font-bold text-accent">{a.aprovados}</p>
-                      </div>
-                      <div>
-                        <p className="text-[10px] text-muted-foreground uppercase">% Aprov.</p>
-                        <p className={`text-xs font-bold ${total > 0 && Math.round((a.aprovados / total) * 100) >= 70 ? "text-accent" : total > 0 && Math.round((a.aprovados / total) * 100) >= 50 ? "text-foreground" : "text-destructive"}`}>{total > 0 ? Math.round((a.aprovados / total) * 100) : 0}%</p>
-                      </div>
-                      <div>
-                        <p className="text-[10px] text-muted-foreground uppercase">Reprov.</p>
-                        <p className="text-xs font-bold text-destructive">{a.reprovados}</p>
-                      </div>
-                      <div>
-                        <p className="text-[10px] text-muted-foreground uppercase">% Reprov.</p>
-                        <p className={`text-xs font-bold ${total > 0 && Math.round((a.reprovados / total) * 100) > 30 ? "text-destructive" : "text-foreground"}`}>{total > 0 ? Math.round((a.reprovados / total) * 100) : 0}%</p>
-                      </div>
-                    </div>
-                  </div>
-                </Card>
-              );
-            })}
-          </div>
-        </div>
-      )}
+      </div>
     </div>
   );
 }
