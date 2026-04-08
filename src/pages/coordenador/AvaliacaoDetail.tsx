@@ -71,7 +71,7 @@ export default function CoordenadorAvaliacaoDetail() {
                 <span className="text-muted-foreground/40">›</span>
                 <span className="text-muted-foreground">{turma.name} · {turma.year}º Ano</span>
                 <span className="text-muted-foreground/40">›</span>
-                <span className="text-foreground font-medium">{task.type === "quiz" ? "Quiz" : task.type === "exame" ? "Exame" : "Tarefa"}</span>
+                <span className="text-foreground font-medium">{turma.director}</span>
               </div>
               <Badge className={`${sStyle.bg} gap-1.5 text-[11px] border-0 px-2.5 py-1 shrink-0`}>
                 <StatusIcon className="w-3 h-3" />
