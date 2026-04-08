@@ -1,5 +1,5 @@
 import { useAuth } from "@/contexts/AuthContext";
-import { decanoFaculty, decanoAprovacoes, decanoTurmas, decanoCoordenadores } from "@/data/institutionData";
+import { decanoFaculty, decanoSolicitacoes, decanoTurmas, decanoCoordenadores } from "@/data/institutionData";
 import { announcements, coordAgendaEvents } from "@/data/mockData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -46,7 +46,7 @@ const priorityStyles: Record<string, string> = {
 export default function DecanoDashboard() {
   const { user } = useAuth();
   const fac = decanoFaculty;
-  const pendentes = decanoAprovacoes.filter(a => a.status === "pendente");
+  const pendentes = decanoSolicitacoes.filter(a => a.status === "pendente");
 
   const TODAY_DATE = "2024-02-14";
   const todayAgenda = coordAgendaEvents
@@ -97,21 +97,21 @@ export default function DecanoDashboard() {
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       {/* Welcome */}
-      <Card className="p-6 border-l-4 border-l-primary">
+      <div className="rounded-xl border border-border bg-gradient-to-r from-primary/5 to-transparent p-6">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-foreground">
               Bom dia, {user?.name?.split(" ").pop()} 👋
             </h1>
-            <p className="text-muted-foreground mt-1">
-              Decano — {fac.name}
+            <p className="text-muted-foreground mt-1 text-sm">
+              Decano · Faculdade de Ciências Exatas
             </p>
           </div>
           <Link to="/decano/faculdades" className="text-sm text-primary hover:underline flex items-center gap-1">
             Ver Cursos <ChevronRight className="w-4 h-4" />
           </Link>
         </div>
-      </Card>
+      </div>
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
