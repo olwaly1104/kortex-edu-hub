@@ -8,6 +8,7 @@ import {
   ArrowLeft, GraduationCap, Users, BookOpen, CheckCircle, Search,
   TrendingUp, Calendar, Video, Clock, Play, Eye, FileText, MapPin,
   ClipboardList, Edit, Settings, Download, AlertCircle, FolderOpen, Award,
+  ChevronRight,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
