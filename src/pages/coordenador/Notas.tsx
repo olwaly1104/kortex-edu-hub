@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { coordNotas, coordCursoInfo, coordDisciplinas } from "@/data/institutionData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -8,7 +8,7 @@ import { Award, ChevronRight, Calendar, Clock, MapPin, User, CheckCircle, ArrowL
 import ReportsMenuButton, { notasCategories } from "@/components/ReportsMenuButton";
 
 export default function CoordenadorNotas() {
-  const [selectedTurma, setSelectedTurma] = useState<string | null>(null);
+  const navigate = useNavigate();
   const [filterYear, setFilterYear] = useState<number | null>(null);
 
   const years = [...new Set(coordNotas.map(n => n.year))].sort();
@@ -35,23 +35,8 @@ export default function CoordenadorNotas() {
   const taxaReprovacao = globalPart > 0 ? Math.round((globalReprov / globalPart) * 100) : 0;
   const taxaConclusao = totalAvalTotal > 0 ? Math.round((totalAvalCompletas / totalAvalTotal) * 100) : 0;
 
-  const selectedData = selectedTurma
-    ? (() => {
-        const [yr, tm] = selectedTurma.split("-");
-        const yearData = coordNotas.find(n => n.year === Number(yr));
-        const turma = yearData?.turmas.find(t => t.turma === tm);
-        return turma ? { year: Number(yr), ...turma } : null;
-      })()
-    : null;
-
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
-      {selectedTurma && (
-        <Link to="/coordenador/notas" onClick={(e) => { e.preventDefault(); setSelectedTurma(null); }} className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
-          <ArrowLeft className="w-4 h-4" /> Voltar às Turmas
-        </Link>
-      )}
-
       <div>
         <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
           <Award className="w-6 h-6 text-primary" /> Notas do Curso
@@ -59,8 +44,7 @@ export default function CoordenadorNotas() {
         <p className="text-muted-foreground mt-1">{coordCursoInfo.name} · {coordCursoInfo.faculty}</p>
       </div>
 
-      {!selectedTurma && (
-        <div className="rounded-xl border border-border bg-card p-4 space-y-3">
+      <div className="rounded-xl border border-border bg-card p-4 space-y-3">
           {/* Year toggles + Reports */}
           <div className="flex items-center justify-between gap-2">
             <div className="flex flex-wrap gap-2">
@@ -117,10 +101,9 @@ export default function CoordenadorNotas() {
             </div>
           </div>
         </div>
-      )}
+      </div>
 
-      {!selectedTurma && (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {coordNotas.filter(yd => !filterYear || yd.year === filterYear).map(yearData => (
             <div key={yearData.year} className="space-y-2">
               <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">{yearData.year}º Ano</h2>
@@ -132,7 +115,7 @@ export default function CoordenadorNotas() {
                       key={turmaKey}
                       className="p-3 transition-all cursor-pointer hover:shadow-md border-l-[3px] group"
                       style={{ borderLeftColor: t.mediaGeral >= 10 ? "hsl(var(--accent))" : "hsl(var(--destructive))" }}
-                      onClick={() => setSelectedTurma(turmaKey)}
+                      onClick={() => navigate(`/coordenador/notas/${yearData.year}/${t.turma}`)}
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2 min-w-0">
