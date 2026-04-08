@@ -1,9 +1,13 @@
 import { decanoFaculty, decanoTurmas } from "@/data/institutionData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Building2, Users, BookOpen, GraduationCap, TrendingUp, Award, ChevronRight, Layers, Clock } from "lucide-react";
+import { Building2, Users, BookOpen, GraduationCap, Award, ChevronRight, Clock } from "lucide-react";
 import { Link } from "react-router-dom";
+
+const getEstado = (media: number) =>
+  media >= 14 ? { label: "Excelente", cls: "bg-accent/15 text-accent border-accent/30" }
+  : media >= 10 ? { label: "Normal", cls: "bg-muted text-muted-foreground border-border" }
+  : { label: "Em Risco", cls: "bg-destructive/15 text-destructive border-destructive/30" };
 
 export default function DecanoFaculdades() {
   const fac = decanoFaculty;
@@ -47,11 +51,13 @@ export default function DecanoFaculdades() {
         {fac.courses.map(c => {
           const turmas = decanoTurmas.filter(t => t.courseId === c.id);
           const avgPresenca = turmas.length ? Math.round(turmas.reduce((s, t) => s + t.presenca, 0) / turmas.length) : 0;
+          const estado = getEstado(c.mediaGeral);
+          const totalDisciplinas = turmas.length > 0 ? turmas[0].disciplinas : 0;
 
           return (
             <Link key={c.id} to={`/decano/cursos/${c.id}`}>
-              <Card className="overflow-hidden hover:shadow-md transition-all cursor-pointer group">
-                {/* Card header */}
+              <Card className="overflow-hidden hover:shadow-md transition-all cursor-pointer group border-l-[3px]"
+                style={{ borderLeftColor: c.mediaGeral >= 14 ? "hsl(var(--accent))" : c.mediaGeral >= 10 ? "hsl(var(--primary))" : "hsl(var(--destructive))" }}>
                 <div className="px-5 pt-5 pb-3">
                   <div className="flex items-start justify-between">
                     <div className="flex-1 min-w-0">
@@ -71,14 +77,9 @@ export default function DecanoFaculdades() {
                             <span className="font-medium text-foreground/70">Duração:</span>
                             <span>{c.years} anos</span>
                           </div>
-                          <div className="flex items-center gap-1.5 text-xs">
-                            <Badge
-                              variant="outline"
-                              className={`text-[10px] border-0 ${c.status === "activo" ? "bg-accent/10 text-accent" : "bg-secondary/10 text-secondary"}`}
-                            >
-                              {c.status === "activo" ? "Activo" : "Em Revisão"}
-                            </Badge>
-                          </div>
+                          <Badge variant="outline" className={`text-[10px] ${estado.cls}`}>
+                            {estado.label}
+                          </Badge>
                         </div>
                       </div>
                     </div>
@@ -86,10 +87,8 @@ export default function DecanoFaculdades() {
                   </div>
                 </div>
 
-                {/* Divider */}
                 <div className="mx-5 border-t border-border/60" />
 
-                {/* Metrics */}
                 <div className="px-5 py-3 grid grid-cols-4 gap-3">
                   <div className="text-center">
                     <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-0.5">Estudantes</p>

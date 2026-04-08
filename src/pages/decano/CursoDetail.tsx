@@ -3,9 +3,14 @@ import { decanoFaculty, decanoTurmas } from "@/data/institutionData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
-  ArrowLeft, BookOpen, Users, GraduationCap, TrendingUp, Award,
-  CheckCircle, ChevronRight, Layers, MapPin,
+  ArrowLeft, BookOpen, Users, GraduationCap, Award,
+  CheckCircle, ChevronRight, Layers, Clock, Calendar,
 } from "lucide-react";
+
+const getEstado = (media: number) =>
+  media >= 14 ? { label: "Excelente", cls: "bg-accent/15 text-accent border-accent/30" }
+  : media >= 10 ? { label: "Normal", cls: "bg-muted text-muted-foreground border-border" }
+  : { label: "Em Risco", cls: "bg-destructive/15 text-destructive border-destructive/30" };
 
 export default function DecanoCursoDetail() {
   const { cursoId } = useParams();
@@ -18,16 +23,10 @@ export default function DecanoCursoDetail() {
     </div>
   );
 
-  const courseYears = Array.from({ length: course.years }, (_, i) => i + 1);
-
-  const yearStats = (year: number) => {
-    const turmas = decanoTurmas.filter(t => t.courseId === cursoId && t.year === year);
-    const totalEst = turmas.reduce((s, t) => s + t.estudantes, 0);
-    const avgMedia = turmas.length ? +(turmas.reduce((s, t) => s + t.media, 0) / turmas.length).toFixed(1) : 0;
-    const avgSucesso = turmas.length ? Math.round(turmas.reduce((s, t) => s + t.taxaSucesso, 0) / turmas.length) : 0;
-    const avgPresenca = turmas.length ? Math.round(turmas.reduce((s, t) => s + t.presenca, 0) / turmas.length) : 0;
-    return { turmas: turmas.length, estudantes: totalEst, media: avgMedia, taxaSucesso: avgSucesso, presenca: avgPresenca };
-  };
+  const turmas = decanoTurmas.filter(t => t.courseId === cursoId);
+  const courseYears = [...new Set(turmas.map(t => t.year))].sort();
+  const estado = getEstado(course.mediaGeral);
+  const avgPresenca = turmas.length ? Math.round(turmas.reduce((s, t) => s + t.presenca, 0) / turmas.length) : 0;
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
@@ -43,8 +42,8 @@ export default function DecanoCursoDetail() {
             <div className="flex items-center gap-2.5 mb-1">
               <h1 className="text-xl font-bold text-foreground tracking-tight leading-tight">{course.name}</h1>
               <Badge variant="outline" className="text-[10px] font-mono shrink-0">{course.code}</Badge>
-              <Badge className={`text-[11px] border-0 shrink-0 ${course.status === "activo" ? "bg-accent/10 text-accent" : "bg-secondary/10 text-secondary"}`}>
-                {course.status === "activo" ? "Activo" : "Em Revisão"}
+              <Badge variant="outline" className={`text-[10px] shrink-0 ${estado.cls}`}>
+                {estado.label}
               </Badge>
             </div>
             <div className="flex items-center gap-2 flex-wrap mt-2">
@@ -61,14 +60,13 @@ export default function DecanoCursoDetail() {
           </div>
         </div>
 
-        {/* KPIs */}
         <div className="px-5 py-4 grid grid-cols-2 lg:grid-cols-5 gap-4">
           {[
             { icon: Users, label: "Estudantes", value: course.estudantes, color: "" },
             { icon: GraduationCap, label: "Docentes", value: course.docentes, color: "" },
-            { icon: Award, label: "Média Geral", value: course.mediaGeral, color: course.mediaGeral >= 10 ? "text-accent" : "text-destructive" },
-            { icon: TrendingUp, label: "Taxa Sucesso", value: `${course.taxaSucesso}%`, color: course.taxaSucesso >= 80 ? "text-accent" : "text-secondary" },
-            { icon: CheckCircle, label: "Estado", value: course.status === "activo" ? "Activo" : "Em Revisão", color: course.status === "activo" ? "text-accent" : "text-secondary" },
+            { icon: Award, label: "Média Geral", value: `${course.mediaGeral}/20`, color: course.mediaGeral >= 10 ? "text-accent" : "text-destructive" },
+            { icon: CheckCircle, label: "Presença", value: `${avgPresenca}%`, color: avgPresenca >= 75 ? "text-accent" : "text-destructive" },
+            { icon: BookOpen, label: "Turmas", value: turmas.length, color: "" },
           ].map(kpi => (
             <div key={kpi.label} className="flex items-center gap-2">
               <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
@@ -83,46 +81,59 @@ export default function DecanoCursoDetail() {
         </div>
       </Card>
 
-      {/* Year Cards */}
-      <div>
-        <h2 className="text-lg font-semibold text-foreground mb-4">Anos Curriculares</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {courseYears.map(year => {
-            const stats = yearStats(year);
-            return (
-              <Link key={year} to={`/decano/cursos/${cursoId}/ano/${year}`}>
-                <Card className="p-5 hover:shadow-md transition-shadow cursor-pointer border-l-[3px] border-l-primary">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-bold text-foreground">{year}º Ano</h3>
-                    <Badge variant="outline" className="text-[10px]">{stats.turmas} turmas</Badge>
-                  </div>
-
-                  {/* Metrics */}
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-muted-foreground flex items-center gap-1"><Users className="w-3 h-3" /> Estudantes</span>
-                      <span className="font-semibold text-foreground">{stats.estudantes}</span>
+      {/* Year sections with turma cards */}
+      {courseYears.map(year => {
+        const yearTurmas = turmas.filter(t => t.year === year);
+        return (
+          <div key={year} className="space-y-2">
+            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">{year}º Ano</h2>
+            <div className="space-y-1.5">
+              {yearTurmas.map(t => {
+                const tEstado = getEstado(t.media);
+                return (
+                  <Card
+                    key={t.id}
+                    className="p-3 transition-all cursor-pointer hover:shadow-md border-l-[3px] group"
+                    style={{ borderLeftColor: t.media >= 14 ? "hsl(var(--accent))" : t.media >= 10 ? "hsl(var(--primary))" : "hsl(var(--destructive))" }}
+                    onClick={() => {}}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <p className="text-xs font-semibold text-foreground">{t.name}</p>
+                        <Badge variant="outline" className={`text-[9px] ${tEstado.cls}`}>
+                          {tEstado.label}
+                        </Badge>
+                        <Badge variant="outline" className="text-[9px] gap-0.5">
+                          <Calendar className="w-2.5 h-2.5" /> {t.disciplinas} cadeiras
+                        </Badge>
+                      </div>
+                      <div className="flex items-center gap-3 shrink-0">
+                        <div className="text-right">
+                          <p className="text-[9px] text-muted-foreground uppercase leading-tight">Estudantes</p>
+                          <p className="text-xs font-bold text-foreground">{t.estudantes}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-[9px] text-muted-foreground uppercase leading-tight">Média</p>
+                          <p className={`text-xs font-bold ${t.media >= 10 ? "text-accent" : "text-destructive"}`}>{t.media}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-[9px] text-muted-foreground uppercase leading-tight">Presença</p>
+                          <p className={`text-xs font-bold ${t.presenca >= 75 ? "text-accent" : "text-destructive"}`}>{t.presenca}%</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-[9px] text-muted-foreground uppercase leading-tight">Entrega</p>
+                          <p className={`text-xs font-bold ${t.taxaEntrega >= 80 ? "text-accent" : "text-destructive"}`}>{t.taxaEntrega}%</p>
+                        </div>
+                        <ChevronRight className="w-3.5 h-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+                      </div>
                     </div>
-                    <div className="border-t border-border/50" />
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-muted-foreground flex items-center gap-1"><Award className="w-3 h-3" /> Média Geral</span>
-                      <span className={`font-semibold ${stats.media >= 10 ? "text-accent" : "text-destructive"}`}>{stats.media}/20</span>
-                    </div>
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-muted-foreground flex items-center gap-1"><TrendingUp className="w-3 h-3" /> Taxa Sucesso</span>
-                      <span className={`font-semibold ${stats.taxaSucesso >= 80 ? "text-accent" : "text-secondary"}`}>{stats.taxaSucesso}%</span>
-                    </div>
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-muted-foreground flex items-center gap-1"><CheckCircle className="w-3 h-3" /> Presença</span>
-                      <span className={`font-semibold ${stats.presenca >= 75 ? "text-accent" : "text-destructive"}`}>{stats.presenca}%</span>
-                    </div>
-                  </div>
-                </Card>
-              </Link>
-            );
-          })}
-        </div>
-      </div>
+                  </Card>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }
