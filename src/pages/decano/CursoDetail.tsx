@@ -1,4 +1,4 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { decanoFaculty, decanoTurmas } from "@/data/institutionData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -14,6 +14,7 @@ const getEstado = (media: number) =>
 
 export default function DecanoCursoDetail() {
   const { cursoId } = useParams();
+  const navigate = useNavigate();
   const course = decanoFaculty.courses.find(c => c.id === cursoId);
 
   if (!course) return (
@@ -95,7 +96,7 @@ export default function DecanoCursoDetail() {
                     key={t.id}
                     className="p-3 transition-all cursor-pointer hover:shadow-md border-l-[3px] group"
                     style={{ borderLeftColor: t.media >= 14 ? "hsl(var(--accent))" : t.media >= 10 ? "hsl(var(--primary))" : "hsl(var(--destructive))" }}
-                    onClick={() => {}}
+                    onClick={() => navigate(`/decano/cursos/${cursoId}/turma/${t.id}`)}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 min-w-0">
