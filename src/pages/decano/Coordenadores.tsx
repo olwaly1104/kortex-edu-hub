@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { UserCog, Search, Users, CheckCircle, ClipboardList, Award, ArrowUpDown, X, GraduationCap } from "lucide-react";
+import { UserCog, Search, Users, CheckCircle, ClipboardList, Award, ArrowUpDown, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type SortField = "presenca" | "taxaEntrega" | "mediaGeral";
@@ -15,14 +15,18 @@ type SortDir = "asc" | "desc";
 export default function DecanoCoordenadores() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
+  const [filterCourse, setFilterCourse] = useState<string>("todos");
   const [sortField, setSortField] = useState<SortField | null>(null);
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [filterStatus, setFilterStatus] = useState<string>("todos");
 
+  const courses = [...new Set(decanoCoordenadores.map(c => c.course))];
+
   const isSortActive = sortField !== null;
   const isFilterActive = filterStatus !== "todos";
+  const isCourseActive = filterCourse !== "todos";
   const isSearchActive = search !== "";
-  const hasActiveControls = isSortActive || isFilterActive || isSearchActive;
+  const hasActiveControls = isSortActive || isFilterActive || isSearchActive || isCourseActive;
 
   const sortLabel = sortField === "presenca" ? "Presença" : sortField === "taxaEntrega" ? "Entrega" : sortField === "mediaGeral" ? "Média" : "";
   const dirLabel = sortDir === "desc" ? "Maior" : "Menor";
@@ -35,6 +39,7 @@ export default function DecanoCoordenadores() {
 
   const filtered = useMemo(() => {
     let list = decanoCoordenadores
+      .filter(c => filterCourse === "todos" || c.course === filterCourse)
       .filter(c => !search || c.name.toLowerCase().includes(search.toLowerCase()))
       .filter(c => filterStatus === "todos" || getEstado(c) === filterStatus);
     if (sortField) {
@@ -45,14 +50,14 @@ export default function DecanoCoordenadores() {
       });
     }
     return list;
-  }, [search, sortField, sortDir, filterStatus]);
+  }, [search, filterCourse, sortField, sortDir, filterStatus]);
 
   const totalCoord = decanoCoordenadores.length;
   const presencaGeral = Math.round(decanoCoordenadores.reduce((s, c) => s + c.presenca, 0) / totalCoord);
   const taxaEntregaGeral = Math.round(decanoCoordenadores.reduce((s, c) => s + c.taxaEntrega, 0) / totalCoord);
   const mediaGeral = +(decanoCoordenadores.reduce((s, c) => s + c.mediaGeral, 0) / totalCoord).toFixed(1);
 
-  const resetAll = () => { setFilterStatus("todos"); setSortField(null); setSortDir("desc"); setSearch(""); };
+  const resetAll = () => { setFilterStatus("todos"); setSortField(null); setSortDir("desc"); setSearch(""); setFilterCourse("todos"); };
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
@@ -90,6 +95,15 @@ export default function DecanoCoordenadores() {
       </div>
 
       <div className="rounded-xl border border-border bg-card p-4 space-y-3">
+        <div className="flex flex-wrap gap-2">
+          <Button size="sm" variant={filterCourse === "todos" ? "default" : "outline"} onClick={() => setFilterCourse("todos")} className="text-xs">Todos os Cursos</Button>
+          {courses.map(c => (
+            <Button key={c} size="sm" variant={filterCourse === c ? "default" : "outline"} onClick={() => setFilterCourse(c)} className="text-xs">{c.replace("Engenharia ", "Eng. ")}</Button>
+          ))}
+        </div>
+
+        <div className="border-t border-border" />
+
         <div className="flex gap-2 items-center">
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -138,6 +152,11 @@ export default function DecanoCoordenadores() {
 
         {hasActiveControls && (
           <div className="flex flex-wrap gap-1.5 pt-1">
+            {isCourseActive && (
+              <Badge variant="outline" className="text-[10px] gap-1 bg-primary/5 text-primary border-primary/20 cursor-pointer hover:bg-primary/10" onClick={() => setFilterCourse("todos")}>
+                Curso: {filterCourse.replace("Engenharia ", "")} <X className="w-2.5 h-2.5" />
+              </Badge>
+            )}
             {isSortActive && (
               <Badge variant="outline" className="text-[10px] gap-1 bg-primary/5 text-primary border-primary/20 cursor-pointer hover:bg-primary/10" onClick={() => { setSortField(null); setSortDir("desc"); }}>
                 {sortLabel}: {dirLabel} <X className="w-2.5 h-2.5" />

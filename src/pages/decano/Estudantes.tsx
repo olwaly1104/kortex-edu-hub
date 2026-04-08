@@ -187,37 +187,61 @@ export default function DecanoEstudantes() {
 
       <Card className="overflow-hidden">
         <table className="w-full text-sm">
-          <thead><tr className="border-b bg-muted/30">
-            <th className="text-left p-3 font-medium text-muted-foreground">Nome</th>
-            <th className="text-left p-3 font-medium text-muted-foreground">Email</th>
-            <th className="text-left p-3 font-medium text-muted-foreground">Curso</th>
-            <th className="text-center p-3 font-medium text-muted-foreground">Ano</th>
-            <th className="text-center p-3 font-medium text-muted-foreground">Turma</th>
-            <th className="text-center p-3 font-medium text-muted-foreground">Presença</th>
-            <th className="text-center p-3 font-medium text-muted-foreground">Taxa Entrega</th>
-            <th className="text-center p-3 font-medium text-muted-foreground">Média Geral</th>
-            <th className="text-center p-3 font-medium text-muted-foreground">Tarefas</th>
-            <th className="text-center p-3 font-medium text-muted-foreground">Avaliações</th>
-            <th className="text-center p-3 font-medium text-muted-foreground">Estado</th>
-          </tr></thead>
-          <tbody>{filtered.map(e => {
-            const sb = statusBadge[e.status];
-            return (
-              <tr key={e.id} className="border-b last:border-0 hover:bg-muted/20 transition-colors cursor-pointer" onClick={() => navigate(`/decano/estudantes/${e.id}`)}>
-                <td className="p-3 font-medium text-foreground">{e.name}</td>
-                <td className="p-3 text-muted-foreground">{e.email}</td>
-                <td className="p-3 text-muted-foreground text-xs">{e.course}</td>
-                <td className="p-3 text-center">{e.year}º</td>
-                <td className="p-3 text-center">{e.turma}</td>
-                <td className="p-3 text-center"><span className={e.presenca >= 75 ? "text-accent font-medium" : "text-destructive font-medium"}>{e.presenca}%</span></td>
-                <td className="p-3 text-center"><span className={e.taxaEntrega >= 80 ? "text-accent font-medium" : "text-destructive font-medium"}>{e.taxaEntrega}%</span></td>
-                <td className="p-3 text-center"><span className={e.media !== null && e.media >= 10 ? "text-accent font-medium" : "text-destructive font-medium"}>{e.media ?? "—"}</span></td>
-                <td className="p-3 text-center"><span className="font-medium text-foreground">{e.tarefasFeitas}/{e.tarefasTotal}</span></td>
-                <td className="p-3 text-center"><span className="font-medium text-foreground">{e.avaliacoesFeitas}/{e.avaliacoesTotal}</span></td>
-                <td className="p-3 text-center"><Badge variant="outline" className={cn("text-[10px]", sb.cls)}>{sb.label}</Badge></td>
-              </tr>
-            );
-          })}</tbody>
+          <thead>
+            <tr className="border-b bg-muted/30">
+              <th className="text-left p-3 font-medium text-muted-foreground">Estudante</th>
+              <th className="text-left p-3 font-medium text-muted-foreground">Curso</th>
+              <th className="text-center p-3 font-medium text-muted-foreground">Turma</th>
+              <th className="text-center p-3 font-medium text-muted-foreground">Média</th>
+              <th className="text-center p-3 font-medium text-muted-foreground">Presença</th>
+              <th className="text-center p-3 font-medium text-muted-foreground">Entrega</th>
+              <th className="text-center p-3 font-medium text-muted-foreground">Tarefas</th>
+              <th className="text-center p-3 font-medium text-muted-foreground">Avaliações</th>
+              <th className="text-center p-3 font-medium text-muted-foreground">Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filtered.map(e => {
+              const sb = statusBadge[e.status];
+              return (
+                <tr key={e.id} className="border-b last:border-0 hover:bg-muted/20 transition-colors cursor-pointer" onClick={() => navigate(`/decano/estudantes/${e.id}`)}>
+                  <td className="p-3">
+                    <p className="font-medium text-foreground text-sm">{e.name}</p>
+                    <p className="text-[11px] text-muted-foreground">{e.email}</p>
+                  </td>
+                  <td className="p-3">
+                    <p className="text-xs text-foreground">{e.course.replace("Engenharia ", "Eng. ")}</p>
+                    <p className="text-[11px] text-muted-foreground">{e.year}º Ano</p>
+                  </td>
+                  <td className="p-3 text-center text-sm text-foreground">{e.turma}</td>
+                  <td className="p-3 text-center">
+                    <span className={cn("font-bold text-sm", e.media !== null && e.media >= 10 ? "text-accent" : "text-destructive")}>
+                      {e.media ?? "—"}
+                    </span>
+                  </td>
+                  <td className="p-3 text-center">
+                    <span className={cn("font-medium text-sm", e.presenca >= 75 ? "text-accent" : "text-destructive")}>
+                      {e.presenca}%
+                    </span>
+                  </td>
+                  <td className="p-3 text-center">
+                    <span className={cn("font-medium text-sm", e.taxaEntrega >= 80 ? "text-accent" : "text-destructive")}>
+                      {e.taxaEntrega}%
+                    </span>
+                  </td>
+                  <td className="p-3 text-center">
+                    <span className="text-sm text-foreground">{e.tarefasFeitas}/{e.tarefasTotal}</span>
+                  </td>
+                  <td className="p-3 text-center">
+                    <span className="text-sm text-foreground">{e.avaliacoesFeitas}/{e.avaliacoesTotal}</span>
+                  </td>
+                  <td className="p-3 text-center">
+                    <Badge variant="outline" className={cn("text-[10px]", sb.cls)}>{sb.label}</Badge>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
         </table>
         {filtered.length === 0 && <p className="text-center text-muted-foreground py-8">Nenhum estudante encontrado.</p>}
       </Card>

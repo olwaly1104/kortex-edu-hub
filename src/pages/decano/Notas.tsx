@@ -33,7 +33,6 @@ export default function DecanoNotas() {
       </div>
 
       <div className="rounded-xl border border-border bg-card p-4 space-y-3">
-        {/* Course toggles */}
         <div className="flex flex-wrap gap-2">
           <Button size="sm" variant={selectedCourse === "todos" ? "default" : "outline"} onClick={() => setSelectedCourse("todos")} className="text-xs">
             Todos os Cursos
@@ -47,7 +46,6 @@ export default function DecanoNotas() {
 
         <div className="border-t border-border" />
 
-        {/* KPI row */}
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
           <div className="flex items-center gap-2">
             <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0"><Award className="w-3.5 h-3.5 text-primary" /></div>
@@ -118,12 +116,16 @@ export default function DecanoNotas() {
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2 min-w-0">
                           <p className="text-xs font-semibold text-foreground">{year}º Ano</p>
+                          <span className="text-[10px] text-muted-foreground">{yearTurmas.length} turma{yearTurmas.length > 1 ? "s" : ""}</span>
                           <Badge variant="outline" className={`text-[9px] ${estado.cls}`}>
                             {estado.label}
                           </Badge>
-                          <span className="text-[10px] text-muted-foreground">{yearTurmas.length} turma{yearTurmas.length > 1 ? "s" : ""}</span>
                         </div>
                         <div className="flex items-center gap-3 shrink-0">
+                          <div className="text-right">
+                            <p className="text-[9px] text-muted-foreground uppercase leading-tight">Estudantes</p>
+                            <p className="text-xs font-bold text-foreground">{yearTurmas.reduce((s, t) => s + t.estudantes, 0)}</p>
+                          </div>
                           <div className="text-right">
                             <p className="text-[9px] text-muted-foreground uppercase leading-tight">Média</p>
                             <p className={`text-xs font-bold ${avgM >= 10 ? "text-accent" : "text-destructive"}`}>{avgM}</p>
@@ -131,10 +133,6 @@ export default function DecanoNotas() {
                           <div className="text-right">
                             <p className="text-[9px] text-muted-foreground uppercase leading-tight">Presença</p>
                             <p className={`text-xs font-bold ${avgP >= 75 ? "text-accent" : "text-destructive"}`}>{avgP}%</p>
-                          </div>
-                          <div className="text-right">
-                            <p className="text-[9px] text-muted-foreground uppercase leading-tight">Estudantes</p>
-                            <p className="text-xs font-bold text-foreground">{yearTurmas.reduce((s, t) => s + t.estudantes, 0)}</p>
                           </div>
                           <ChevronRight className="w-3.5 h-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
                         </div>
