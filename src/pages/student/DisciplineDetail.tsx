@@ -372,24 +372,6 @@ export default function DisciplineDetail() {
             <p className="text-sm text-muted-foreground py-8 text-center">Sem informação de avaliação.</p>
           )}
         </TabsContent>
-
-        {/* Participantes */}
-        <TabsContent value="participants" className="space-y-4">
-          <p className="text-sm text-muted-foreground">{participantList.length} colegas nesta cadeira</p>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-            {participantList.map((name, i) => (
-              <div key={i} className="flex items-center gap-3 p-3 rounded-xl border border-border hover:bg-muted/30 transition-colors">
-                <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center text-xs font-bold text-muted-foreground shrink-0">
-                  {name.split(" ").map(n => n[0]).slice(0, 2).join("")}
-                </div>
-                <p className="text-sm font-medium text-foreground truncate">{name}</p>
-              </div>
-            ))}
-          </div>
-          {participantList.length === 0 && (
-            <p className="text-sm text-muted-foreground py-8 text-center">Nenhum participante encontrado.</p>
-          )}
-        </TabsContent>
       </Tabs>
     </div>
   );
