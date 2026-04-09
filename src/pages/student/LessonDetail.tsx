@@ -3,9 +3,9 @@ import { lessons, disciplines } from "@/data/mockData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Video, Clock, Calendar, User, FileText, ClipboardList, Users, Play, Download, Eye, CheckCircle, AlertCircle, Monitor, MapPin, Mail, MessageSquare, Upload, Maximize2, Minimize2, BookOpen } from "lucide-react";
+import { ArrowLeft, Video, Clock, Calendar, User, FileText, ClipboardList, Users, Play, Download, Eye, CheckCircle, AlertCircle, Monitor, MapPin, Mail, MessageSquare, Upload, Maximize2, Minimize2, BookOpen, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 
 export default function LessonDetail() {
   const { disciplineId, lessonId } = useParams();
@@ -13,6 +13,15 @@ export default function LessonDetail() {
   const lesson = lessons.find(l => l.id === lessonId);
   const disc = disciplines.find(d => d.id === disciplineId);
   const [videoExpanded, setVideoExpanded] = useState(false);
+
+  // Determine lesson status based on progress/date
+  const lessonStatus = useMemo(() => {
+    if (!lesson) return "agendada";
+    // progress 100 = concluída, progress > 0 = a decorrer, 0 = agendada
+    if (lesson.progress >= 100) return "concluída";
+    if (lesson.progress > 0) return "a_decorrer";
+    return "agendada";
+  }, [lesson]);
 
   if (!lesson || !disc) return (
     <div className="p-8 text-muted-foreground">
@@ -63,29 +72,51 @@ export default function LessonDetail() {
 
 
 
-      {/* Video player */}
-      <Card
-        className={`relative flex items-center justify-center cursor-pointer hover:shadow-lg transition-all w-full overflow-hidden rounded-2xl ${
-          videoExpanded ? "aspect-video" : "aspect-video max-h-[420px]"
-        }`}
-        style={{ background: `linear-gradient(135deg, ${disc.color}08, ${disc.color}15)` }}
-        onClick={() => setVideoExpanded(!videoExpanded)}
-      >
-        <div className="text-center">
-          <div className={`rounded-full flex items-center justify-center mx-auto mb-3 transition-all shadow-lg ${videoExpanded ? "w-20 h-20" : "w-16 h-16"}`} style={{ background: disc.color, color: "white" }}>
-            <Play className={`${videoExpanded ? "w-8 h-8" : "w-6 h-6"} ml-1`} />
-          </div>
-          <p className="text-sm text-foreground font-semibold">Reproduzir gravação</p>
-          <p className="text-xs text-muted-foreground mt-0.5">{lesson.duration}</p>
-        </div>
-        <button
-          onClick={(e) => { e.stopPropagation(); setVideoExpanded(!videoExpanded); }}
-          className="absolute top-3 right-3 p-2 rounded-xl hover:bg-muted/50 transition-colors text-muted-foreground hover:text-foreground backdrop-blur-sm"
-          title={videoExpanded ? "Reduzir" : "Ecrã completo"}
+      {/* Video area — status-aware */}
+      {lessonStatus === "concluída" ? (
+        <Card
+          className={`relative flex items-center justify-center cursor-pointer hover:shadow-lg transition-all w-full overflow-hidden rounded-2xl ${
+            videoExpanded ? "aspect-video" : "aspect-video max-h-[420px]"
+          }`}
+          style={{ background: `linear-gradient(135deg, ${disc.color}08, ${disc.color}15)` }}
+          onClick={() => setVideoExpanded(!videoExpanded)}
         >
-          {videoExpanded ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
-        </button>
-      </Card>
+          <div className="text-center">
+            <div className={`rounded-full flex items-center justify-center mx-auto mb-3 transition-all shadow-lg ${videoExpanded ? "w-20 h-20" : "w-16 h-16"}`} style={{ background: disc.color, color: "white" }}>
+              <Play className={`${videoExpanded ? "w-8 h-8" : "w-6 h-6"} ml-1`} />
+            </div>
+            <p className="text-sm text-foreground font-semibold">Reproduzir gravação</p>
+            <p className="text-xs text-muted-foreground mt-0.5">{lesson.duration}</p>
+          </div>
+          <button
+            onClick={(e) => { e.stopPropagation(); setVideoExpanded(!videoExpanded); }}
+            className="absolute top-3 right-3 p-2 rounded-xl hover:bg-muted/50 transition-colors text-muted-foreground hover:text-foreground backdrop-blur-sm"
+            title={videoExpanded ? "Reduzir" : "Ecrã completo"}
+          >
+            {videoExpanded ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+          </button>
+        </Card>
+      ) : lessonStatus === "a_decorrer" ? (
+        <Card className="relative flex items-center justify-center w-full overflow-hidden rounded-2xl aspect-video max-h-[420px] bg-muted/30 border-dashed">
+          <div className="text-center">
+            <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 bg-amber-100 text-amber-600">
+              <Loader2 className="w-7 h-7 animate-spin" />
+            </div>
+            <p className="text-sm text-foreground font-semibold">Aula a decorrer</p>
+            <p className="text-xs text-muted-foreground mt-1 max-w-xs mx-auto">A gravação será disponibilizada automaticamente após a conclusão da aula.</p>
+          </div>
+        </Card>
+      ) : (
+        <Card className="relative flex items-center justify-center w-full overflow-hidden rounded-2xl aspect-video max-h-[420px] bg-muted/20 border-dashed">
+          <div className="text-center">
+            <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 bg-muted text-muted-foreground">
+              <Video className="w-7 h-7" />
+            </div>
+            <p className="text-sm text-foreground font-semibold">Aula agendada</p>
+            <p className="text-xs text-muted-foreground mt-1">A gravação ficará disponível após a aula ser leccionada.</p>
+          </div>
+        </Card>
+      )}
 
       {/* Tabs */}
       <Tabs defaultValue="transcript" className="space-y-5">
