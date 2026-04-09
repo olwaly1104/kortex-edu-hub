@@ -442,6 +442,10 @@ export const calendarEvents: CalendarEvent[] = [
   { id: "e13", title: "Teste 2 Matemática II", type: "teste", date: "2024-03-25", startTime: "08:00", endTime: "10:00", duration: "2h", discipline: "Matemática II", color: "hsl(0, 84%, 60%)" },
   { id: "e14", title: "Entrega Trabalho Programação", type: "entrega", date: "2024-04-15", startTime: "23:59", endTime: "23:59", discipline: "Programação II", color: "hsl(38, 92%, 50%)" },
   { id: "e15", title: "Exame Final Física", type: "exame", date: "2024-05-20", startTime: "09:00", endTime: "12:00", duration: "3h", discipline: "Física Aplicada", color: "hsl(0, 84%, 60%)" },
+  // Tasks and evaluations within the current week
+  { id: "e16", title: "Entrega: Exercícios Séries Geométricas", type: "entrega", date: "2024-02-14", startTime: "23:59", endTime: "23:59", discipline: "Matemática II", color: "hsl(38, 92%, 50%)" },
+  { id: "e17", title: "Entrega: Relatório Laboratório Pressão", type: "entrega", date: "2024-02-14", startTime: "23:59", endTime: "23:59", discipline: "Física Aplicada", color: "hsl(38, 92%, 50%)" },
+  { id: "e18", title: "Apresentação Oral — Inglês Técnico", type: "teste", date: "2024-02-14", startTime: "14:00", endTime: "14:15", duration: "15min", room: "Sala 205", discipline: "Inglês Técnico", color: "hsl(0, 84%, 60%)" },
   ...coordAgendaEvents,
 ];
 
