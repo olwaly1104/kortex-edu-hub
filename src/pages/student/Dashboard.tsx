@@ -188,20 +188,20 @@ export default function StudentDashboard() {
                         </div>
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
-                        <Badge variant="outline" className={`text-[10px] gap-1 ${cfg.cls}`}>
+                        <Badge variant="outline" className={`text-[10px] gap-1 font-medium border-0 ${cfg.cls}`}>
                           <StatusIcon className="w-3 h-3" /> {cfg.label}
                         </Badge>
                         {status === "concluída" && matchingLesson ? (
-                          <Button variant="ghost" size="sm" className="h-7 px-2.5 text-[10px] gap-1 text-muted-foreground hover:text-primary" onClick={() => navigate(`/student/disciplines/${disc!.id}/lessons/${matchingLesson.id}`)}>
-                            <Play className="w-3 h-3" /> Rever
+                          <Button variant="outline" size="sm" className="h-7 px-3 text-[10px] gap-1.5 font-medium" onClick={() => navigate(`/student/disciplines/${disc!.id}/lessons/${matchingLesson.id}`)}>
+                            <Play className="w-3 h-3" /> Rever Aula
                           </Button>
                         ) : isActive && matchingLesson ? (
-                          <Button size="sm" className="h-7 px-2.5 text-[10px] gap-1 bg-accent hover:bg-accent/90 text-accent-foreground" onClick={() => navigate(`/student/disciplines/${disc!.id}/lessons/${matchingLesson.id}`)}>
+                          <Button size="sm" className="h-7 px-3 text-[10px] gap-1.5 font-medium bg-primary hover:bg-primary/90" onClick={() => navigate(`/student/disciplines/${disc!.id}/lessons/${matchingLesson.id}`)}>
                             <Play className="w-3 h-3" /> Entrar
                           </Button>
                         ) : status === "agendada" && matchingLesson ? (
-                          <Button variant="outline" size="sm" className="h-7 px-2.5 text-[10px] gap-1 border-primary/20 text-primary hover:bg-primary/5" onClick={() => navigate(`/student/disciplines/${disc!.id}/lessons/${matchingLesson.id}`)}>
-                            <Play className="w-3 h-3" /> Ver
+                          <Button variant="ghost" size="sm" className="h-7 px-3 text-[10px] gap-1.5 font-medium text-muted-foreground" onClick={() => navigate(`/student/disciplines/${disc!.id}/lessons/${matchingLesson.id}`)}>
+                            <Clock className="w-3 h-3" /> Detalhes
                           </Button>
                         ) : null}
                       </div>
