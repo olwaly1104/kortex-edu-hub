@@ -3,9 +3,9 @@ import { lessons, disciplines } from "@/data/mockData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Video, Clock, Calendar, User, FileText, ClipboardList, Users, Play, Download, Eye, CheckCircle, AlertCircle, Monitor, MapPin, Mail, MessageSquare, Upload, Maximize2, Minimize2, BookOpen } from "lucide-react";
+import { ArrowLeft, Video, Clock, Calendar, User, FileText, ClipboardList, Users, Play, Download, Eye, CheckCircle, AlertCircle, Monitor, MapPin, Mail, MessageSquare, Upload, Maximize2, Minimize2, BookOpen, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 
 export default function LessonDetail() {
   const { disciplineId, lessonId } = useParams();
