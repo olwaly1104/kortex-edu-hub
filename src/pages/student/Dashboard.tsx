@@ -206,7 +206,6 @@ export default function StudentDashboard() {
                         ) : null}
                       </div>
                     </div>
-                    </div>
                   );
                 })}
               </div>
