@@ -63,20 +63,26 @@ export default function StudentDashboard() {
           { icon: BarChart3, label: "Média Geral", value: overallAvg !== null ? overallAvg : "—", color: overallAvg !== null && overallAvg >= 10 ? "text-accent bg-accent/10" : "text-destructive bg-destructive/10", suffix: overallAvg !== null ? "/20" : "" },
           { icon: BookOpen, label: "Cadeiras", value: disciplines.length, color: "text-primary bg-primary/10" },
           { icon: Wallet, label: "Situação Financeira", value: payments.some(p => p.status === 'overdue') ? "Em dívida" : payments.some(p => p.status === 'pending') ? "Pendente" : "Em dia", color: payments.some(p => p.status === 'overdue') ? "text-destructive bg-destructive/10" : payments.some(p => p.status === 'pending') ? "text-yellow-600 bg-yellow-500/10" : "text-accent bg-accent/10", link: "/student/finances" },
-        ].map((stat) => (
-          <Card key={stat.label} className="p-4 flex items-center gap-4">
-            <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${stat.color}`}>
-              <stat.icon className="w-5 h-5" />
-            </div>
-            <div className="min-w-0">
-              <div className="flex items-baseline gap-1">
-                <p className={`font-bold text-foreground ${typeof stat.value === 'string' && stat.value.length > 10 ? 'text-xs' : 'text-2xl'}`}>{stat.value}</p>
-                {"suffix" in stat && stat.suffix && <span className="text-sm text-muted-foreground font-medium">{stat.suffix}</span>}
-              </div>
-              <p className="text-xs text-muted-foreground">{stat.label}</p>
-            </div>
-          </Card>
-        ))}
+        ].map((stat) => {
+          const Wrapper = "link" in stat && stat.link ? Link : "div";
+          const wrapperProps = "link" in stat && stat.link ? { to: stat.link as string } : {};
+          return (
+            <Card key={stat.label} className={`p-4 flex items-center gap-4 ${"link" in stat && stat.link ? "cursor-pointer hover:shadow-md transition-shadow" : ""}`} asChild={"link" in stat && !!stat.link}>
+              <Wrapper {...(wrapperProps as any)}>
+                <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${stat.color}`}>
+                  <stat.icon className="w-5 h-5" />
+                </div>
+                <div className="min-w-0">
+                  <div className="flex items-baseline gap-1">
+                    <p className={`font-bold text-foreground ${typeof stat.value === 'string' && stat.value.length > 10 ? 'text-xs' : 'text-2xl'}`}>{stat.value}</p>
+                    {"suffix" in stat && stat.suffix && <span className="text-sm text-muted-foreground font-medium">{stat.suffix}</span>}
+                  </div>
+                  <p className="text-xs text-muted-foreground">{stat.label}</p>
+                </div>
+              </Wrapper>
+            </Card>
+          );
+        })}
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6">
