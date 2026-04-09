@@ -97,90 +97,84 @@ export default function TaskDetail() {
         </div>
       </Card>
 
-      {/* Description + content + upload */}
-      <Card className="p-5 space-y-5">
-        <div>
-          <h3 className="font-semibold text-foreground mb-2 flex items-center gap-2 text-sm"><FileText className="w-4 h-4 text-primary" /> Descrição da Tarefa</h3>
-          <p className="text-sm text-muted-foreground leading-relaxed">{task.description}</p>
+      {/* Descrição & Guia */}
+      <Card className="p-5 space-y-4">
+        <h3 className="font-semibold text-foreground flex items-center gap-2 text-sm">
+          <FileText className="w-4 h-4 text-primary" /> Descrição & Guia da Tarefa
+        </h3>
+        <p className="text-sm text-muted-foreground leading-relaxed">{task.description}</p>
+        <div className="flex items-center gap-3 p-3 rounded-lg border border-primary/15 bg-primary/[0.03]">
+          <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+            <FileText className="w-4 h-4 text-primary" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-foreground">Guia_da_Tarefa_{task.title.replace(/\s+/g, "_")}.pdf</p>
+            <p className="text-[11px] text-muted-foreground">PDF · Instruções detalhadas e critérios de avaliação</p>
+          </div>
+          <div className="flex items-center gap-0.5 shrink-0">
+            <button className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground" title="Ver"><Eye className="w-4 h-4" /></button>
+            <button className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground" title="Descarregar"><Download className="w-4 h-4" /></button>
+            <button className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground" title="Partilhar"><Share2 className="w-4 h-4" /></button>
+          </div>
         </div>
+      </Card>
 
-        <div className="border-t pt-4">
-          <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2 text-sm">
-            <ClipboardList className="w-4 h-4 text-primary" /> Guia da Tarefa
+      {/* Conteúdo Relevante */}
+      {task.materials && task.materials.length > 0 && (
+        <Card className="p-5 space-y-4">
+          <h3 className="font-semibold text-foreground flex items-center gap-2 text-sm">
+            <BookOpen className="w-4 h-4 text-primary" /> Conteúdo Relevante
           </h3>
-          <div className="flex items-center gap-3 p-3 rounded-lg border border-primary/15 bg-primary/[0.03]">
-            <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-              <FileText className="w-4 h-4 text-primary" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-foreground">Guia_da_Tarefa_{task.title.replace(/\s+/g, "_")}.pdf</p>
-              <p className="text-[11px] text-muted-foreground">PDF · Instruções detalhadas e critérios de avaliação</p>
-            </div>
-            <div className="flex items-center gap-0.5 shrink-0">
-              <button className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground" title="Ver"><Eye className="w-4 h-4" /></button>
-              <button className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground" title="Descarregar"><Download className="w-4 h-4" /></button>
-              <button className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground" title="Partilhar"><Share2 className="w-4 h-4" /></button>
-            </div>
-          </div>
-        </div>
-
-        {task.materials && task.materials.length > 0 && (
-          <div className="border-t pt-4">
-            <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2 text-sm">
-              <BookOpen className="w-4 h-4 text-primary" /> Conteúdo Relevante
-            </h3>
-            <div className="space-y-2">
-              {task.materials.map((mat, i) => (
-                <div key={i} className="flex items-center gap-3 p-3 rounded-lg bg-muted/30">
-                  <FileText className="w-5 h-5 text-primary shrink-0" />
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-foreground">{mat.name}</p>
-                    <p className="text-xs text-muted-foreground">{mat.type.toUpperCase()}</p>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <button className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"><Eye className="w-4 h-4" /></button>
-                    <button className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"><Download className="w-4 h-4" /></button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Upload section */}
-        {task.modality === "online" && (
-          <div className="border-t pt-4">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="font-semibold text-foreground flex items-center gap-2 text-sm"><Upload className="w-4 h-4 text-primary" /> Upload Tarefa</h3>
-              {task.status === "entregue" && (
-                <div className="flex items-center gap-1.5 text-accent">
-                  <CheckCircle className="w-4 h-4" />
-                  <span className="text-xs font-medium">Entregue</span>
-                </div>
-              )}
-            </div>
-            {task.status === "entregue" ? (
-              <div className="flex items-center gap-3 p-3 rounded-lg bg-accent/5 border border-accent/20">
-                <FileText className="w-5 h-5 text-accent shrink-0" />
+          <div className="space-y-2">
+            {task.materials.map((mat, i) => (
+              <div key={i} className="flex items-center gap-3 p-3 rounded-lg bg-muted/30">
+                <FileText className="w-5 h-5 text-primary shrink-0" />
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-foreground">{task.title.replace(/\s+/g, "_")}.pdf</p>
-                  <p className="text-xs text-muted-foreground">Entregue em {task.dueDate}</p>
+                  <p className="text-sm font-medium text-foreground">{mat.name}</p>
+                  <p className="text-xs text-muted-foreground">{mat.type.toUpperCase()}</p>
                 </div>
                 <div className="flex items-center gap-1">
                   <button className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"><Eye className="w-4 h-4" /></button>
                   <button className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"><Download className="w-4 h-4" /></button>
                 </div>
               </div>
-            ) : (
-              <div className="border-2 border-dashed border-border rounded-lg p-8 text-center">
-                <Upload className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-                <p className="text-sm text-muted-foreground mb-3">Arraste o ficheiro ou clique para carregar</p>
-                <Button className="gap-2"><Upload className="w-4 h-4" />Carregar ficheiro</Button>
+            ))}
+          </div>
+        </Card>
+      )}
+
+      {task.modality === "online" && (
+        <Card className="p-5">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-semibold text-foreground flex items-center gap-2 text-sm"><Upload className="w-4 h-4 text-primary" /> Upload Tarefa</h3>
+            {task.status === "entregue" && (
+              <div className="flex items-center gap-1.5 text-accent">
+                <CheckCircle className="w-4 h-4" />
+                <span className="text-xs font-medium">Entregue</span>
               </div>
             )}
           </div>
-        )}
-      </Card>
+          {task.status === "entregue" ? (
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-accent/5 border border-accent/20">
+              <FileText className="w-5 h-5 text-accent shrink-0" />
+              <div className="flex-1">
+                <p className="text-sm font-medium text-foreground">{task.title.replace(/\s+/g, "_")}.pdf</p>
+                <p className="text-xs text-muted-foreground">Entregue em {task.dueDate}</p>
+              </div>
+              <div className="flex items-center gap-1">
+                <button className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"><Eye className="w-4 h-4" /></button>
+                <button className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"><Download className="w-4 h-4" /></button>
+              </div>
+            </div>
+          ) : (
+            <div className="border-2 border-dashed border-border rounded-lg p-8 text-center">
+              <Upload className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
+              <p className="text-sm text-muted-foreground mb-3">Arraste o ficheiro ou clique para carregar</p>
+              <Button className="gap-2"><Upload className="w-4 h-4" />Carregar ficheiro</Button>
+            </div>
+          )}
+        </Card>
+      )}
     </div>
   );
 }
