@@ -96,7 +96,8 @@ export default function StudentDashboard() {
           const hasOverdue = payments.some(p => p.status === 'overdue');
           const hasPending = payments.some(p => p.status === 'pending');
           const label = hasOverdue ? "Por regularizar" : hasPending ? "Pendente" : "Em dia";
-          const borderColor = hasOverdue ? "border-destructive/40 text-destructive" : hasPending ? "border-yellow-500/40 text-yellow-600" : "border-accent/40 text-accent";
+          const dotColor = hasOverdue ? "bg-destructive" : hasPending ? "bg-yellow-500" : "bg-accent";
+          const textColor = hasOverdue ? "text-destructive" : hasPending ? "text-yellow-600" : "text-accent";
           const iconBg = hasOverdue ? "text-destructive bg-destructive/10" : hasPending ? "text-yellow-600 bg-yellow-500/10" : "text-accent bg-accent/10";
           return (
             <Link to="/student/finances">
@@ -104,11 +105,12 @@ export default function StudentDashboard() {
                 <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${iconBg}`}>
                   <Wallet className="w-5 h-5" />
                 </div>
-                <div className="min-w-0">
-                  <p className="text-xs text-muted-foreground mb-1.5">Estado Financeiro</p>
-                  <span className={`inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium ${borderColor}`}>
-                    {label}
-                  </span>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className={`w-2 h-2 rounded-full ${dotColor}`} />
+                    <p className={`text-sm font-semibold ${textColor}`}>{label}</p>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-0.5">Estado Financeiro</p>
                 </div>
               </Card>
             </Link>
