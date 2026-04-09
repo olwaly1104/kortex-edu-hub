@@ -381,31 +381,6 @@ export default function StudentCalendar() {
             </Card>
           )}
 
-          {/* Próximos Eventos - below calendar */}
-          <Card className="p-4">
-            <h3 className="text-sm font-bold text-foreground mb-3">Próximos Eventos Importantes</h3>
-            <div className="space-y-2">
-              {upcomingEvents.map(event => (
-                <div key={event.id} className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer border" onClick={() => setSelectedEvent(event.id)}>
-                  <div className="w-1 h-10 rounded-full shrink-0" style={{ backgroundColor: event.color }} />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-semibold text-foreground truncate">{event.title}</p>
-                    <div className="flex items-center gap-2 text-[11px] text-muted-foreground mt-0.5">
-                      <Clock className="w-3 h-3 shrink-0" />
-                      <span>{event.date.split("-").reverse().join("/")} · {event.startTime} – {event.endTime}</span>
-                    </div>
-                  </div>
-                  <Badge variant="outline" className={cn("text-[10px] shrink-0",
-                    event.type === "teste" ? "border-destructive/30 text-destructive" :
-                    event.type === "entrega" ? "border-secondary/30 text-secondary" :
-                    "border-destructive/30 text-destructive"
-                  )}>
-                    {event.type === "teste" ? "Teste" : event.type === "entrega" ? "Tarefa" : "Exame"}
-                  </Badge>
-                </div>
-              ))}
-            </div>
-          </Card>
         </div>
 
         {/* Right sidebar - selected day schedule */}
@@ -450,11 +425,11 @@ export default function StudentCalendar() {
                 {selected.type === "aula" && (
                   <div className="pt-2">
                     {isPastDate(selected.date) || (isToday(selected.date) && timeToMinutes(selected.endTime) < timeToMinutes("10:45")) ? (
-                      <Button size="sm" className="w-full gap-2 text-xs" onClick={() => handleReverAula(selected)}>
+                      <Button size="sm" variant="outline" className="w-full gap-2 text-xs border-muted-foreground/30 text-muted-foreground hover:bg-muted/50" onClick={() => handleReverAula(selected)}>
                         <Play className="w-3.5 h-3.5" /> Rever Aula
                       </Button>
                     ) : (
-                      <Button size="sm" className="w-full gap-2 text-xs" onClick={() => handleEntrarAula(selected)}>
+                      <Button size="sm" className="w-full gap-2 text-xs bg-primary hover:bg-primary/90" onClick={() => handleEntrarAula(selected)}>
                         <Video className="w-3.5 h-3.5" /> Entrar na Aula
                       </Button>
                     )}
