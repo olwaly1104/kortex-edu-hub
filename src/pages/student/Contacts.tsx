@@ -1,8 +1,9 @@
-import { contacts } from "@/data/mockData";
+import { contacts, currentStudent } from "@/data/mockData";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Mail, MessageSquare, User, Building, Clock, BookOpen } from "lucide-react";
+import { Mail, MessageSquare, User, Building, Clock, BookOpen, GraduationCap } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { Badge } from "@/components/ui/badge";
 
 export default function StudentContacts() {
   const navigate = useNavigate();
@@ -26,6 +27,28 @@ export default function StudentContacts() {
         </div>
         <h1 className="text-2xl font-bold text-foreground">Contactos</h1>
       </div>
+
+      {/* Student's own contact card */}
+      <Card className="p-5 border-l-4 border-l-primary">
+        <div className="flex items-start gap-4">
+          <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+            <GraduationCap className="w-6 h-6 text-primary" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="font-semibold text-foreground">{currentStudent.name}</p>
+            <p className="text-xs text-muted-foreground">{currentStudent.email}</p>
+            <div className="flex flex-wrap gap-1.5 mt-2">
+              <Badge variant="outline" className="text-[10px]">{currentStudent.course}</Badge>
+              <Badge variant="outline" className="text-[10px]">{currentStudent.year}º Ano</Badge>
+              <Badge variant="outline" className="text-[10px]">Turma 24B</Badge>
+            </div>
+          </div>
+        </div>
+        <div className="flex gap-2 mt-4">
+          <Button variant="outline" size="sm" className="flex-1 gap-1.5" onClick={() => navigate("/student/email")}><Mail className="w-3.5 h-3.5" />Email</Button>
+          <Button variant="outline" size="sm" className="flex-1 gap-1.5" onClick={() => navigate("/student/chat")}><MessageSquare className="w-3.5 h-3.5" />Chat</Button>
+        </div>
+      </Card>
 
       {/* Support contacts */}
       <section>

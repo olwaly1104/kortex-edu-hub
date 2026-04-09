@@ -120,7 +120,7 @@ export default function StudentGrades() {
         <div className="flex flex-wrap gap-2">
           <Button size="sm" variant={filterDisc === "todos" ? "default" : "outline"} onClick={() => setFilterDisc("todos")} className="text-xs">Todas Cadeiras</Button>
           {disciplines.map(d => (
-            <Button key={d.id} size="sm" variant={filterDisc === d.id ? "default" : "outline"} onClick={() => setFilterDisc(d.id)} className="text-xs">{d.code}</Button>
+            <Button key={d.id} size="sm" variant={filterDisc === d.id ? "default" : "outline"} onClick={() => setFilterDisc(d.id)} className="text-xs">{d.name}</Button>
           ))}
         </div>
 
@@ -183,7 +183,7 @@ export default function StudentGrades() {
           <div className="flex flex-wrap gap-1.5 pt-1">
             {isFacultyActive && (
               <Badge variant="outline" className="text-[10px] gap-1 bg-primary/5 text-primary border-primary/20 cursor-pointer hover:bg-primary/10" onClick={() => setFilterDisc("todos")}>
-                Cadeira: {disciplines.find(d => d.id === filterDisc)?.code} <X className="w-2.5 h-2.5" />
+                Cadeira: {disciplines.find(d => d.id === filterDisc)?.name} <X className="w-2.5 h-2.5" />
               </Badge>
             )}
             {isSortActive && (
@@ -214,8 +214,8 @@ export default function StudentGrades() {
               <th className="text-left p-3 font-medium text-muted-foreground">Cadeira</th>
               <th className="text-center p-3 font-medium text-muted-foreground">Data</th>
               <th className="text-center p-3 font-medium text-muted-foreground">Peso</th>
-              <th className="text-center p-3 font-medium text-muted-foreground">Nota</th>
               <th className="text-center p-3 font-medium text-muted-foreground">Estado</th>
+              <th className="text-center p-3 font-medium text-muted-foreground">Nota</th>
             </tr>
           </thead>
           <tbody>
@@ -231,7 +231,7 @@ export default function StudentGrades() {
                     <p className="font-medium text-foreground text-sm">{ev.name}</p>
                   </td>
                   <td className="p-3">
-                    <span className="text-xs font-medium" style={{ color: ev.disciplineColor }}>{ev.disciplineCode}</span>
+                    <span className="text-xs font-medium" style={{ color: ev.disciplineColor }}>{ev.disciplineName}</span>
                   </td>
                   <td className="p-3 text-center">
                     <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground">
@@ -244,16 +244,16 @@ export default function StudentGrades() {
                   </td>
                   <td className="p-3 text-center">
                     {isPublished ? (
-                      <span className={cn("font-bold text-sm", (ev.grade || 0) >= 10 ? "text-accent" : "text-destructive")}>{ev.grade}/{ev.maxGrade}</span>
+                      <Badge variant="outline" className="text-[10px] bg-accent/10 text-accent border-transparent">Publicada</Badge>
                     ) : (
-                      <span className="text-muted-foreground text-sm">—</span>
+                      <Badge variant="outline" className="text-[10px] bg-secondary/10 text-secondary border-transparent">Pendente</Badge>
                     )}
                   </td>
                   <td className="p-3 text-center">
                     {isPublished ? (
-                      <Badge variant="outline" className="text-[10px] bg-accent/10 text-accent border-transparent">Publicada</Badge>
+                      <span className={cn("font-bold text-sm", (ev.grade || 0) >= 10 ? "text-accent" : "text-destructive")}>{ev.grade}/{ev.maxGrade}</span>
                     ) : (
-                      <Badge variant="outline" className="text-[10px] bg-secondary/10 text-secondary border-transparent">Pendente</Badge>
+                      <span className="text-muted-foreground text-sm">—</span>
                     )}
                   </td>
                 </tr>
