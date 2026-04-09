@@ -2,7 +2,7 @@ import { disciplines, lessons, grades } from "@/data/mockData";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Link } from "react-router-dom";
-import { BookOpen, User, Clock, MapPin, ChevronRight, FileText } from "lucide-react";
+import { BookOpen, User, Clock, MapPin, ChevronRight, FileText, Video, Award, BarChart3 } from "lucide-react";
 
 export default function StudentDisciplines() {
   return (
@@ -39,6 +39,11 @@ export default function StudentDisciplines() {
           const progressPct = Math.round((disc.progress.watched / disc.progress.total) * 100);
           const discLessons = lessons.filter(l => l.disciplineId === disc.id);
           const totalContents = discLessons.reduce((s, l) => s + l.materials.length, 0);
+          const discGrade = grades.find(g => g.disciplineId === disc.id);
+          const publishedEvals = discGrade?.evaluations.filter(e => e.published && e.grade !== null) || [];
+          const discAvg = publishedEvals.length > 0
+            ? Math.round(publishedEvals.reduce((s, e) => s + (e.grade || 0), 0) / publishedEvals.length * 10) / 10
+            : null;
 
           return (
             <Link to={`/student/disciplines/${disc.id}`} key={disc.id}>
@@ -55,29 +60,50 @@ export default function StudentDisciplines() {
                 </div>
 
                 <div className="space-y-2 text-sm text-muted-foreground flex-1">
-                  <div className="flex items-center gap-2"><User className="w-3.5 h-3.5" />{disc.professor}</div>
+                  <Link
+                    to="/student/contacts"
+                    onClick={(e) => e.stopPropagation()}
+                    className="flex items-center gap-2 hover:text-primary transition-colors"
+                  >
+                    <User className="w-3.5 h-3.5" />{disc.professor}
+                  </Link>
                   <div className="flex items-center gap-2"><Clock className="w-3.5 h-3.5" />{disc.schedule}</div>
                   <div className="flex items-center gap-2"><MapPin className="w-3.5 h-3.5" />{disc.room}</div>
                 </div>
 
                 <div className="mt-4 pt-4 border-t space-y-3">
+                  {/* Presença */}
                   <div>
                     <div className="flex justify-between text-xs mb-1">
-                      <span className="text-muted-foreground">Presença</span>
+                      <span className="text-muted-foreground flex items-center gap-1"><BarChart3 className="w-3 h-3 text-muted-foreground" /> Presença</span>
                       <span className={`font-semibold ${attendancePct >= 75 ? "text-accent" : "text-destructive"}`}>{attendancePct}%</span>
                     </div>
                     <Progress value={attendancePct} className="h-1.5" />
                   </div>
+                  {/* Média Geral */}
+                  <div>
+                    <div className="flex justify-between text-xs">
+                      <span className="text-muted-foreground flex items-center gap-1"><Award className="w-3 h-3 text-accent" /> Média Geral</span>
+                      <span className={`font-semibold ${discAvg !== null && discAvg >= 10 ? "text-accent" : discAvg !== null ? "text-destructive" : "text-muted-foreground"}`}>
+                        {discAvg !== null ? `${discAvg}/20` : "—"}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="border-t border-border" />
+
+                  {/* Gravações */}
                   <div>
                     <div className="flex justify-between text-xs mb-1">
-                      <span className="text-muted-foreground">Gravações disponíveis</span>
+                      <span className="text-muted-foreground flex items-center gap-1"><Video className="w-3 h-3 text-muted-foreground" /> Gravações</span>
                       <span className="font-semibold text-foreground">{disc.progress.watched}/{disc.progress.total}</span>
                     </div>
                     <Progress value={progressPct} className="h-1.5" />
                   </div>
+                  {/* Conteúdos */}
                   <div>
                     <div className="flex justify-between text-xs">
-                      <span className="text-muted-foreground flex items-center gap-1"><FileText className="w-3 h-3" /> Conteúdos</span>
+                      <span className="text-muted-foreground flex items-center gap-1"><FileText className="w-3 h-3 text-muted-foreground" /> Conteúdos</span>
                       <span className="font-semibold text-foreground">{totalContents}</span>
                     </div>
                   </div>
