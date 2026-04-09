@@ -2,7 +2,7 @@ import { useParams, Link, useSearchParams } from "react-router-dom";
 import { lessons, disciplines } from "@/data/mockData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, ClipboardList, Calendar, CheckCircle, AlertCircle, Monitor, MapPin, BookOpen, FileText, Upload, Download, Eye, Share2, Clock, Award } from "lucide-react";
+import { ArrowLeft, ClipboardList, Calendar, CheckCircle, AlertCircle, Monitor, MapPin, BookOpen, FileText, Upload, Download, Eye, Share2, Clock, Award, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function TaskDetail() {
@@ -22,9 +22,9 @@ export default function TaskDetail() {
   );
 
   const statusConfig = {
-    entregue: { color: "bg-accent text-accent-foreground", icon: CheckCircle, label: "Entregue" },
-    atrasada: { color: "bg-destructive text-destructive-foreground", icon: AlertCircle, label: "Atrasada" },
-    pendente: { color: "bg-secondary/10 text-secondary", icon: ClipboardList, label: "Pendente" },
+    entregue: { color: "text-accent", bg: "bg-accent/10", border: "border-accent/20", label: "Entregue", icon: CheckCircle },
+    atrasada: { color: "text-destructive", bg: "bg-destructive/10", border: "border-destructive/20", label: "Atrasada", icon: AlertCircle },
+    pendente: { color: "text-secondary", bg: "bg-secondary/10", border: "border-secondary/20", label: "Pendente", icon: Clock },
   };
 
   const sc = statusConfig[task.status];
@@ -35,80 +35,78 @@ export default function TaskDetail() {
         <ArrowLeft className="w-4 h-4" /> Voltar a {disc.name}
       </Link>
 
-      {/* Unified header + description card */}
-      <Card className="p-4 border">
-        {/* Title row */}
+      {/* Header card with gradient */}
+      <Card className="p-5 bg-gradient-to-r from-primary/6 to-transparent border">
         <div className="flex items-start gap-3 mb-3">
-          <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
-            task.status === "entregue" ? "bg-accent/10" : task.status === "atrasada" ? "bg-destructive/10" : "bg-secondary/10"
-          }`}>
-            <sc.icon className={`w-4 h-4 ${
-              task.status === "entregue" ? "text-accent" : task.status === "atrasada" ? "text-destructive" : "text-secondary"
-            }`} />
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-primary/10">
+            <ClipboardList className="w-5 h-5 text-primary" />
           </div>
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-              <Badge variant="outline" className="text-[10px]" style={{ color: disc.color, borderColor: disc.color + "60" }}>{disc.name}</Badge>
-              {task.status === "entregue" && (
-                <Badge variant="outline" className="text-[10px] text-accent border-accent/30 gap-1">
-                  <CheckCircle className="w-3 h-3" /> Entregue
-                </Badge>
-              )}
-              {task.status === "atrasada" && (
-                <Badge variant="outline" className="text-[10px] text-destructive border-destructive/30 gap-1">
-                  <AlertCircle className="w-3 h-3" /> Atrasada
-                </Badge>
-              )}
-              {task.status === "pendente" && (
-                <Badge variant="outline" className="text-[10px] text-secondary border-secondary/30 gap-1">
-                  <Clock className="w-3 h-3" /> Pendente
-                </Badge>
-              )}
+            <div className="flex items-center gap-2 flex-wrap mb-1">
+              <h1 className="text-lg font-bold text-foreground leading-tight">{task.title}</h1>
+              <Badge variant="outline" className={`text-[10px] gap-1 ${sc.color} ${sc.border}`}>
+                <sc.icon className="w-3 h-3" /> {sc.label}
+              </Badge>
             </div>
-            <h1 className="text-lg font-bold text-foreground leading-tight">{task.title}</h1>
+            <div className="flex items-center gap-2 flex-wrap">
+              <Badge variant="outline" className="text-[10px] gap-1">
+                <BookOpen className="w-3 h-3" /> {disc.name}
+              </Badge>
+              <Badge variant="outline" className="text-[10px] gap-1">
+                <User className="w-3 h-3" /> {disc.professor}
+              </Badge>
+            </div>
           </div>
         </div>
 
-        {/* Info rows */}
-        <div className="border-t pt-3 space-y-1">
-          <div className="flex items-center gap-6">
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground w-24">Prazo</span>
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground w-24 ml-auto text-right">Modalidade</span>
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground w-24 text-right">Nota</span>
+        {/* KPI grid inside header */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-4 pt-4 border-t border-border/50">
+          <div>
+            <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider mb-1">Data de Início</p>
+            <div className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
+              <Calendar className="w-3.5 h-3.5 text-muted-foreground" /> {task.assignedDate}
+            </div>
           </div>
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-1.5 text-sm">
-              <Calendar className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-              <span className="font-semibold text-foreground">{task.assignedDate} – {task.dueDate}</span>
+          <div>
+            <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider mb-1">Data de Entrega</p>
+            <div className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
+              <Clock className="w-3.5 h-3.5 text-muted-foreground" /> {task.dueDate}
             </div>
-            <div className="flex items-center gap-1.5 text-sm ml-auto">
-              {task.modality === "online" ? <Monitor className="w-3.5 h-3.5 text-muted-foreground shrink-0" /> : <MapPin className="w-3.5 h-3.5 text-muted-foreground shrink-0" />}
-              <span className="font-medium text-foreground">{task.modality === "online" ? "Online" : "Presencial"}</span>
+          </div>
+          <div>
+            <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider mb-1">Modalidade</p>
+            <div className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
+              {task.modality === "online" ? <Monitor className="w-3.5 h-3.5 text-muted-foreground" /> : <MapPin className="w-3.5 h-3.5 text-muted-foreground" />}
+              {task.modality === "online" ? "Online" : "Presencial"}
             </div>
-            <div className="flex items-center gap-1.5 text-sm w-24 justify-end">
-              <Award className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+          </div>
+          <div>
+            <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider mb-1">Nota</p>
+            <div className="flex items-center gap-1.5 text-sm font-semibold">
+              <Award className="w-3.5 h-3.5 text-muted-foreground" />
               {task.grade != null ? (
-                <span className="font-bold text-foreground">
+                <span>
                   <span className={task.grade >= 10 ? "text-accent" : "text-destructive"}>{task.grade}</span>
-                  <span className="text-muted-foreground font-normal">/20</span>
-                  {task.weight ? <span className="text-muted-foreground font-normal text-xs"> · {task.weight}%</span> : null}
+                  <span className="text-muted-foreground font-normal">/{task.weight ? `20 · ${task.weight}%` : "20"}</span>
                 </span>
               ) : (
-                <span className="text-muted-foreground">
-                  —{task.weight ? <span className="text-xs"> · {task.weight}%</span> : null}
-                </span>
+                <span className="text-muted-foreground font-normal">—{task.weight ? ` · ${task.weight}%` : ""}</span>
               )}
             </div>
           </div>
         </div>
+      </Card>
 
-        {/* Description inside same card */}
-        <div className="border-t mt-3 pt-3">
+      {/* Description + content + upload */}
+      <Card className="p-5 space-y-5">
+        <div>
           <h3 className="font-semibold text-foreground mb-2 flex items-center gap-2 text-sm"><FileText className="w-4 h-4 text-primary" /> Descrição da Tarefa</h3>
           <p className="text-sm text-muted-foreground leading-relaxed">{task.description}</p>
+        </div>
 
-          {task.modality === "online" && (
-            <div className="mt-4 flex items-center gap-3 p-3 rounded-lg border border-primary/15 bg-primary/[0.03]">
+        {task.modality === "online" && (
+          <div className="border-t pt-4">
+            <div className="flex items-center gap-3 p-3 rounded-lg border border-primary/15 bg-primary/[0.03]">
               <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
                 <FileText className="w-4 h-4 text-primary" />
               </div>
@@ -122,12 +120,11 @@ export default function TaskDetail() {
                 <button className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground" title="Partilhar"><Share2 className="w-4 h-4" /></button>
               </div>
             </div>
-          )}
-        </div>
+          </div>
+        )}
 
-        {/* Conteúdo Relevante */}
         {task.materials && task.materials.length > 0 && (
-          <div className="border-t mt-3 pt-3">
+          <div className="border-t pt-4">
             <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2 text-sm">
               <BookOpen className="w-4 h-4 text-primary" /> Conteúdo Relevante
             </h3>
@@ -149,9 +146,9 @@ export default function TaskDetail() {
           </div>
         )}
 
-        {/* Upload Tarefa */}
+        {/* Upload section */}
         {task.modality === "online" && (
-          <div className="border-t mt-3 pt-3">
+          <div className="border-t pt-4">
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-semibold text-foreground flex items-center gap-2 text-sm"><Upload className="w-4 h-4 text-primary" /> Upload Tarefa</h3>
               {task.status === "entregue" && (
@@ -162,8 +159,8 @@ export default function TaskDetail() {
               )}
             </div>
             {task.status === "entregue" ? (
-              <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/40 border border-border">
-                <FileText className="w-5 h-5 text-primary shrink-0" />
+              <div className="flex items-center gap-3 p-3 rounded-lg bg-accent/5 border border-accent/20">
+                <FileText className="w-5 h-5 text-accent shrink-0" />
                 <div className="flex-1">
                   <p className="text-sm font-medium text-foreground">{task.title.replace(/\s+/g, "_")}.pdf</p>
                   <p className="text-xs text-muted-foreground">Entregue em {task.dueDate}</p>
