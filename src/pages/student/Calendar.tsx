@@ -322,7 +322,7 @@ export default function StudentCalendar() {
                 ))}
                 {monthDays.map(day => {
                   const dateStr = `2024-02-${String(day).padStart(2, "0")}`;
-                  const dayEvents = calendarEvents.filter(e => e.date === dateStr);
+                  const dayEvents = allCalendarEvents.filter(e => e.date === dateStr);
                   const isWeekend = ((monthStartDay + day - 1) % 7) >= 5;
                   const isTodayDay = dateStr === TODAY_DATE;
                   const isSelectedDay = selectedDate === dateStr;
