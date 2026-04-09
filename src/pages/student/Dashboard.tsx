@@ -2,7 +2,7 @@ import React from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { disciplines, announcements, lessons, calendarEvents, grades } from "@/data/mockData";
 import { payments } from "@/data/financeData";
-import { BookOpen, Wallet, Calendar, Bell, ChevronRight, Clock, MapPin, Play, BarChart3, ArrowRight, CheckCircle, Building2, GraduationCap, Users } from "lucide-react";
+import { BookOpen, Wallet, Calendar, Bell, ChevronRight, Clock, MapPin, Play, BarChart3, ArrowRight, CheckCircle, Building2, GraduationCap, Users, Loader2, Video } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -41,8 +41,8 @@ export default function StudentDashboard() {
     return "agendada";
   };
   const statusConfig: Record<string, { label: string; icon: React.ElementType; cls: string }> = {
-    concluída: { label: "Concluída", icon: CheckCircle, cls: "bg-muted text-muted-foreground" },
-    em_curso: { label: "A Decorrer", icon: Play, cls: "bg-accent/15 text-accent border-accent/30" },
+    concluída: { label: "Concluída", icon: CheckCircle, cls: "bg-emerald-50 text-emerald-600 border-emerald-200" },
+    em_curso: { label: "A Decorrer", icon: Loader2, cls: "bg-amber-50 text-amber-600 border-amber-200" },
     agendada: { label: "Agendada", icon: Clock, cls: "bg-muted text-muted-foreground" },
   };
 
@@ -192,16 +192,16 @@ export default function StudentDashboard() {
                       </Badge>
                       <div className="shrink-0">
                         {status === "concluída" && matchingLesson ? (
-                          <Button variant="outline" size="sm" className="h-7 px-3 text-[10px] gap-1.5 font-medium" onClick={() => navigate(`/student/disciplines/${disc!.id}/lessons/${matchingLesson.id}`)}>
+                          <Button variant="outline" size="sm" className="h-7 px-3 text-[10px] gap-1.5 font-medium border-emerald-200 text-emerald-600 hover:bg-emerald-50" onClick={() => navigate(`/student/disciplines/${disc!.id}/lessons/${matchingLesson.id}`)}>
                             <Play className="w-3 h-3" /> Rever
                           </Button>
                         ) : isActive && matchingLesson ? (
-                          <Button variant="outline" size="sm" className="h-7 px-3 text-[10px] gap-1.5 font-medium border-primary text-primary hover:bg-primary hover:text-primary-foreground" onClick={() => navigate(`/student/disciplines/${disc!.id}/lessons/${matchingLesson.id}`)}>
-                            <Play className="w-3 h-3" /> Entrar
+                          <Button variant="outline" size="sm" className="h-7 px-3 text-[10px] gap-1.5 font-medium border-amber-200 text-amber-600 hover:bg-amber-50" onClick={() => navigate(`/student/disciplines/${disc!.id}/lessons/${matchingLesson.id}`)}>
+                            <Video className="w-3 h-3" /> Entrar
                           </Button>
                         ) : status === "agendada" && matchingLesson ? (
                           <Button variant="outline" size="sm" className="h-7 px-3 text-[10px] gap-1.5 font-medium" onClick={() => navigate(`/student/disciplines/${disc!.id}/lessons/${matchingLesson.id}`)}>
-                            Ver
+                            <Video className="w-3 h-3" /> Entrar
                           </Button>
                         ) : null}
                       </div>
