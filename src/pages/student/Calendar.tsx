@@ -230,6 +230,7 @@ export default function StudentCalendar() {
                   {DAYS.map((_, dayIndex) => {
                     const dayDate = `2024-02-${12 + dayIndex}`;
                     const dayEvents = allAulas.filter(e => e.date === dayDate);
+                    const dayDeadlines = allCalendarEvents.filter(e => e.date === dayDate && (e.type === "entrega" || e.type === "teste" || e.type === "exame"));
                     const isTodayCol = isToday(dayDate);
                     const isPast = isPastDate(dayDate);
                     const isSelectedDay = selectedDate === dayDate;
@@ -248,7 +249,23 @@ export default function StudentCalendar() {
                           <div key={i} className="absolute w-full border-t border-border/20" style={{ top: i * HOUR_HEIGHT + 10 }} />
                         ))}
 
-                        {/* Now indicator removed */}
+                        {/* Deadline markers at top of column */}
+                        {dayDeadlines.length > 0 && (
+                          <div className="absolute top-1 left-1 right-1 z-20 space-y-0.5">
+                            {dayDeadlines.slice(0, 2).map(dl => (
+                              <div
+                                key={dl.id}
+                                onClick={(e) => { e.stopPropagation(); setSelectedEvent(dl.id); setSelectedDate(dayDate); }}
+                                className={cn(
+                                  "text-[8px] font-semibold px-1.5 py-0.5 rounded truncate cursor-pointer",
+                                  dl.type === "entrega" ? "bg-amber-500/15 text-amber-700 border border-amber-500/30" : "bg-red-500/15 text-red-600 border border-red-500/30"
+                                )}
+                              >
+                                {dl.type === "entrega" ? "📋" : "📝"} {dl.title.replace("Entrega: ", "").substring(0, 18)}…
+                              </div>
+                            ))}
+                          </div>
+                        )}
 
                         {dayEvents.map(event => {
                           const startMin = timeToMinutes(event.startTime) - HOUR_START_MIN;
@@ -283,15 +300,15 @@ export default function StudentCalendar() {
                                 {height > 60 && (
                                   past ? (
                                     <div
-                                      className="flex items-center justify-center gap-1 text-[9px] font-semibold text-white bg-white/25 rounded-md px-2 py-1 w-full mt-1"
-                                      onClick={(e) => { e.stopPropagation(); handleReverAula(event); }}
+                                      className="flex items-center justify-center gap-1 text-[9px] font-semibold text-white/90 bg-white/20 rounded-md px-2 py-1 w-full mt-1 hover:bg-white/30 transition-colors"
+                                      onClick={(ev) => { ev.stopPropagation(); handleReverAula(event); }}
                                     >
                                       <Play className="w-3 h-3" /> Rever
                                     </div>
                                   ) : (
                                     <div
-                                      className="flex items-center justify-center gap-1 text-[9px] font-semibold text-white bg-white/25 rounded-md px-2 py-1 w-full mt-1"
-                                      onClick={(e) => { e.stopPropagation(); handleEntrarAula(event); }}
+                                      className="flex items-center justify-center gap-1 text-[9px] font-semibold text-white bg-white/25 rounded-md px-2 py-1 w-full mt-1 hover:bg-white/35 transition-colors"
+                                      onClick={(ev) => { ev.stopPropagation(); handleEntrarAula(event); }}
                                     >
                                       <Video className="w-3 h-3" /> Entrar
                                     </div>
