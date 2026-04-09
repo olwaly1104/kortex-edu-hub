@@ -170,15 +170,20 @@ export default function StudentDashboard() {
                   const disc = disciplines.find(d => d.name === evento.discipline);
                   const matchingLesson = disc ? lessons.find(l => l.disciplineId === disc.id) : null;
                   return (
-                    <div key={evento.id} className={`flex items-center gap-4 px-4 py-3.5 transition-colors ${isActive ? "bg-primary/5" : "hover:bg-muted/30"}`}>
-                      <div className="text-center shrink-0 w-14">
+                    <div key={evento.id} className={`flex items-center gap-4 px-4 py-3 transition-colors ${isActive ? "bg-primary/5" : "hover:bg-muted/30"}`}>
+                      <div className="text-center shrink-0 w-12">
                         <p className={`text-sm font-bold ${isActive ? "text-primary" : "text-foreground"}`}>{evento.startTime}</p>
                         <p className="text-[10px] text-muted-foreground">{evento.endTime}</p>
                       </div>
                       <div className="w-0.5 h-10 rounded-full shrink-0" style={{ background: evento.color }} />
                       <div className="flex-1 min-w-0">
-                        <p className={`font-medium text-sm leading-tight ${isActive ? "text-primary" : "text-foreground"}`}>{evento.title}</p>
-                        <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1">
+                        <div className="flex items-center gap-2 mb-0.5">
+                          <p className={`font-medium text-sm leading-tight truncate ${isActive ? "text-primary" : "text-foreground"}`}>{evento.title}</p>
+                          <Badge variant="outline" className={`text-[9px] gap-1 font-medium border-0 shrink-0 ${cfg.cls}`}>
+                            <StatusIcon className="w-2.5 h-2.5" /> {cfg.label}
+                          </Badge>
+                        </div>
+                        <div className="flex items-center gap-3 text-xs text-muted-foreground">
                           {evento.room && (
                             <span className="flex items-center gap-1">
                               <MapPin className="w-3 h-3" />{evento.room}
@@ -187,21 +192,18 @@ export default function StudentDashboard() {
                           {evento.professor && <span>{evento.professor}</span>}
                         </div>
                       </div>
-                      <div className="flex items-center gap-2 shrink-0">
-                        <Badge variant="outline" className={`text-[10px] gap-1 font-medium border-0 ${cfg.cls}`}>
-                          <StatusIcon className="w-3 h-3" /> {cfg.label}
-                        </Badge>
+                      <div className="shrink-0">
                         {status === "concluída" && matchingLesson ? (
-                          <Button variant="outline" size="sm" className="h-7 px-3 text-[10px] gap-1.5 font-medium" onClick={() => navigate(`/student/disciplines/${disc!.id}/lessons/${matchingLesson.id}`)}>
-                            <Play className="w-3 h-3" /> Rever Aula
+                          <Button variant="ghost" size="sm" className="h-7 px-2.5 text-[10px] gap-1 font-medium text-muted-foreground hover:text-foreground" onClick={() => navigate(`/student/disciplines/${disc!.id}/lessons/${matchingLesson.id}`)}>
+                            <Play className="w-3 h-3" /> Rever
                           </Button>
                         ) : isActive && matchingLesson ? (
                           <Button size="sm" className="h-7 px-3 text-[10px] gap-1.5 font-medium bg-primary hover:bg-primary/90" onClick={() => navigate(`/student/disciplines/${disc!.id}/lessons/${matchingLesson.id}`)}>
                             <Play className="w-3 h-3" /> Entrar
                           </Button>
                         ) : status === "agendada" && matchingLesson ? (
-                          <Button variant="ghost" size="sm" className="h-7 px-3 text-[10px] gap-1.5 font-medium text-muted-foreground" onClick={() => navigate(`/student/disciplines/${disc!.id}/lessons/${matchingLesson.id}`)}>
-                            <Clock className="w-3 h-3" /> Detalhes
+                          <Button variant="ghost" size="sm" className="h-7 px-2.5 text-[10px] gap-1 font-medium text-muted-foreground" onClick={() => navigate(`/student/disciplines/${disc!.id}/lessons/${matchingLesson.id}`)}>
+                            Ver
                           </Button>
                         ) : null}
                       </div>
