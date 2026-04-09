@@ -5,8 +5,14 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, BookOpen, User, Users, Clock, MapPin, Video, FileText, GraduationCap, ClipboardList, Play, Download, ChevronDown, ChevronRight, Eye, Calendar, CheckCircle, AlertCircle, TrendingUp, FolderOpen, Link2, ExternalLink, Mail } from "lucide-react";
-import { useState } from "react";
+import {
+  ArrowLeft, BookOpen, User, Users, Clock, MapPin, Video, FileText,
+  GraduationCap, ClipboardList, Play, Download, ChevronDown, ChevronRight,
+  Eye, Calendar, CheckCircle, AlertCircle, TrendingUp, FolderOpen,
+  Mail, LogIn, Award,
+} from "lucide-react";
+import { useState, useMemo } from "react";
+import { Button } from "@/components/ui/button";
 
 export default function DisciplineDetail() {
   const { id } = useParams();
@@ -26,14 +32,20 @@ export default function DisciplineDetail() {
   const totalEvals = discGrades?.evaluations.length || 0;
   const weightedSum = publishedEvals.reduce((sum, e) => sum + (e.grade! * e.weight), 0);
   const totalWeight = publishedEvals.reduce((sum, e) => sum + e.weight, 0);
-  const avg = totalWeight > 0 ? weightedSum / totalWeight : null;
+  const avg = totalWeight > 0 ? Math.round((weightedSum / totalWeight) * 10) / 10 : null;
 
   const progressPct = Math.round((disc.progress.watched / disc.progress.total) * 100);
 
-  // Get participants from all lessons of this discipline
   const allParticipants = new Set<string>();
   discLessons.forEach(l => l.participants.forEach(p => allParticipants.add(p)));
   const participantList = Array.from(allParticipants).filter(p => !p.startsWith("Prof.")).sort();
+
+  // Lesson status helper
+  const getLessonStatus = (lesson: typeof lessons[0]) => {
+    if (lesson.progress >= 100) return "concluída";
+    if (lesson.progress > 0) return "a_decorrer";
+    return "agendada";
+  };
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
@@ -41,79 +53,94 @@ export default function DisciplineDetail() {
         <ArrowLeft className="w-4 h-4" /> Voltar às cadeiras
       </Link>
 
-      {/* Hero header */}
-      <div className="relative overflow-hidden rounded-2xl p-6 lg:p-8" style={{ background: `linear-gradient(135deg, ${disc.color}12, ${disc.color}06)` }}>
-        <div className="absolute top-0 right-0 w-40 h-40 rounded-full opacity-[0.07]" style={{ background: disc.color, transform: "translate(30%, -30%)" }} />
-        <div className="relative flex items-start gap-5">
-          <div className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 shadow-sm" style={{ background: disc.color, color: "white" }}>
-            <BookOpen className="w-7 h-7" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1">
-              <Badge variant="outline" className="text-xs font-mono" style={{ borderColor: disc.color + "40", color: disc.color }}>{disc.code}</Badge>
+      {/* Unified Card Header — matching coordenador CadeiraDetail */}
+      <Card className="overflow-hidden">
+        <div className="relative border-b border-border">
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/6 via-primary/3 to-transparent" />
+          <div className="relative px-5 py-4">
+            <div className="flex items-center gap-2.5 mb-2">
+              <h1 className="text-xl font-bold text-foreground tracking-tight leading-tight">{disc.name}</h1>
+              <Badge variant="outline" className="text-[10px] font-mono shrink-0">{disc.code}</Badge>
             </div>
-            <h1 className="text-2xl lg:text-3xl font-bold text-foreground">{disc.name}</h1>
-            <p className="text-muted-foreground mt-2 leading-relaxed max-w-2xl">{disc.summary}</p>
+            <div className="flex items-center gap-2 flex-wrap">
+              <Link to="/student/contacts" onClick={e => e.stopPropagation()}>
+                <Badge variant="outline" className="text-[11px] bg-background/80 gap-1 hover:bg-muted cursor-pointer">
+                  <GraduationCap className="w-3 h-3" /> {disc.professor}
+                </Badge>
+              </Link>
+              <Badge variant="outline" className="text-[11px] bg-background/80 gap-1">
+                <Clock className="w-3 h-3" /> {disc.schedule}
+              </Badge>
+              <Badge variant="outline" className="text-[11px] bg-background/80 gap-1">
+                <MapPin className="w-3 h-3" /> {disc.room}
+              </Badge>
+              <Badge variant="outline" className="text-[11px] bg-background/80 gap-1">
+                <Mail className="w-3 h-3" /> {disc.professorEmail}
+              </Badge>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Key metrics */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-        <Card className="p-4 group hover:shadow-md transition-shadow">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: disc.color + "15", color: disc.color }}>
-              <User className="w-4 h-4" />
+        {/* KPIs */}
+        <div className="px-5 py-4 grid grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+              <Users className="w-3.5 h-3.5 text-primary" />
             </div>
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Professor</span>
-          </div>
-          <p className="font-semibold text-foreground text-sm">{disc.professor}</p>
-          <div className="flex items-center gap-1.5 mt-1.5">
-            <Mail className="w-3 h-3 text-muted-foreground" />
-            <p className="text-[11px] text-muted-foreground truncate">{disc.professorEmail}</p>
-          </div>
-        </Card>
-
-        <Card className="p-4 group hover:shadow-md transition-shadow">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: disc.color + "15", color: disc.color }}>
-              <Clock className="w-4 h-4" />
+            <div>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider leading-tight">Colegas</p>
+              <p className="text-sm font-bold text-foreground">{participantList.length}</p>
             </div>
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Horário</span>
           </div>
-          <p className="font-semibold text-foreground text-sm">{disc.schedule}</p>
-          <div className="flex items-center gap-1.5 mt-1.5">
-            <MapPin className="w-3 h-3 text-muted-foreground" />
-            <span className="text-[11px] text-muted-foreground">{disc.room}</span>
-          </div>
-        </Card>
-
-        <Card className="p-4 group hover:shadow-md transition-shadow">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: disc.color + "15", color: disc.color }}>
-              <Users className="w-4 h-4" />
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+              <Video className="w-3.5 h-3.5 text-primary" />
             </div>
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Presença</span>
+            <div>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider leading-tight">Aulas</p>
+              <p className="text-sm font-bold text-foreground">{disc.progress.watched}/{disc.progress.total}</p>
+            </div>
           </div>
-          <div className="flex items-baseline gap-1">
-            <span className={`text-2xl font-bold ${attendancePct >= 75 ? "text-accent" : "text-destructive"}`}>{attendancePct}%</span>
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+              <CheckCircle className="w-3.5 h-3.5 text-primary" />
+            </div>
+            <div>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider leading-tight">Presença</p>
+              <p className={`text-sm font-bold ${attendancePct >= 75 ? "text-accent" : "text-destructive"}`}>{attendancePct}%</p>
+            </div>
           </div>
-          <Progress value={attendancePct} className="h-1.5 mt-2" />
-          <p className="text-[11px] text-muted-foreground mt-1.5">{disc.attendance.present}P / {disc.attendance.absent}F / {disc.attendance.justified}J</p>
-        </Card>
-      </div>
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+              <ClipboardList className="w-3.5 h-3.5 text-primary" />
+            </div>
+            <div>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider leading-tight">Tarefas</p>
+              <p className="text-sm font-bold text-foreground">{allTasks.filter(t => t.status === "entregue").length}/{allTasks.length}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-accent/10 flex items-center justify-center shrink-0">
+              <TrendingUp className="w-3.5 h-3.5 text-accent" />
+            </div>
+            <div>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider leading-tight">Média</p>
+              <p className={`text-sm font-bold ${avg !== null && avg >= 10 ? "text-accent" : avg !== null ? "text-destructive" : "text-muted-foreground"}`}>{avg !== null ? `${avg}/20` : "—"}</p>
+            </div>
+          </div>
+        </div>
+      </Card>
 
       {/* Tabs */}
-      <Tabs defaultValue="participants" className="space-y-5">
-        <div className="border-b">
+      <Tabs defaultValue="lessons" className="space-y-5">
+        <div className="border-b overflow-x-auto">
           <TabsList className="bg-transparent h-auto p-0 gap-0">
             {[
-              { value: "participants", icon: Users, label: "Participantes" },
-              { value: "lessons", icon: Video, label: "Gravações" },
-              { value: "materials", icon: FileText, label: "Conteúdos" },
+              { value: "lessons", icon: Video, label: "Aulas" },
+              { value: "materials", icon: FolderOpen, label: "Conteúdos" },
               { value: "tasks", icon: ClipboardList, label: "Tarefas" },
-              { value: "exams", icon: GraduationCap, label: "Exames" },
-              { value: "calendar", icon: Calendar, label: "Calendário" },
+              { value: "exams", icon: Award, label: "Avaliações" },
+              { value: "participants", icon: Users, label: "Participantes" },
             ].map(tab => (
               <TabsTrigger
                 key={tab.value}
@@ -126,115 +153,111 @@ export default function DisciplineDetail() {
           </TabsList>
         </div>
 
-        {/* Participantes */}
-        <TabsContent value="participants" className="space-y-4">
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-muted-foreground">{participantList.length} colegas nesta cadeira</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-            {participantList.map((name, i) => (
-              <div key={i} className="flex items-center gap-3 p-3 rounded-xl border border-border hover:bg-muted/30 transition-colors">
-                <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center text-xs font-bold text-muted-foreground shrink-0">
-                  {name.split(" ").map(n => n[0]).slice(0, 2).join("")}
-                </div>
-                <p className="text-sm font-medium text-foreground truncate">{name}</p>
-              </div>
-            ))}
-          </div>
-          {participantList.length === 0 && (
-            <p className="text-sm text-muted-foreground py-8 text-center">Nenhum participante encontrado.</p>
-          )}
-        </TabsContent>
-
-        {/* Gravações */}
+        {/* Aulas */}
         <TabsContent value="lessons" className="space-y-4">
           <div className="flex items-center justify-between">
-            <p className="text-sm text-muted-foreground">{disc.progress.watched} de {disc.progress.total} gravações assistidas</p>
+            <p className="text-sm text-muted-foreground">{disc.progress.watched} de {disc.progress.total} aulas assistidas</p>
             <div className="flex items-center gap-2">
               <Progress value={progressPct} className="w-24 h-1.5" />
               <span className="text-xs font-medium text-muted-foreground">{progressPct}%</span>
             </div>
           </div>
           <div className="space-y-3">
-            {discLessons.map((lesson) => (
-              <Card
-                key={lesson.id}
-                className="p-4 flex items-center gap-4 hover:shadow-md transition-all cursor-pointer group border-l-[3px]"
-                style={{ borderLeftColor: lesson.progress === 100 ? "hsl(var(--accent))" : lesson.progress > 0 ? disc.color : "transparent" }}
-                onClick={() => navigate(`/student/disciplines/${id}/lessons/${lesson.id}`)}
-              >
-                <div className="w-24 h-16 rounded-xl bg-muted/50 flex items-center justify-center shrink-0 relative overflow-hidden">
-                  <div className="w-10 h-10 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform" style={{ background: disc.color + "15" }}>
-                    <Play className="w-5 h-5 ml-0.5" style={{ color: disc.color }} />
-                  </div>
-                  {lesson.progress > 0 && (
-                    <div className="absolute bottom-0 left-0 right-0">
-                      <div className="h-1 rounded-b-xl" style={{ width: `${lesson.progress}%`, background: lesson.progress === 100 ? "hsl(var(--accent))" : disc.color }} />
-                    </div>
-                  )}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-mono font-semibold px-1.5 py-0.5 rounded" style={{ background: disc.color + "12", color: disc.color }}>#{lesson.number}</span>
-                    <h4 className="font-medium text-foreground truncate">{lesson.title}</h4>
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-1 line-clamp-1">{lesson.summary}</p>
-                  <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
-                    <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{lesson.duration}</span>
-                    <span>{lesson.uploadDate}</span>
-                    {lesson.materials.length > 0 && (
-                      <button
-                        onClick={(e) => { e.stopPropagation(); setExpandedLesson(expandedLesson === lesson.id ? null : lesson.id); }}
-                        className="flex items-center gap-1 hover:underline" style={{ color: disc.color }}
-                      >
-                        <FileText className="w-3 h-3" />{lesson.materials.length} ficheiro(s)
-                        {expandedLesson === lesson.id ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
-                      </button>
-                    )}
-                    {lesson.tasks.length > 0 && (
-                      <span className="flex items-center gap-1 text-secondary">
-                        <ClipboardList className="w-3 h-3" />{lesson.tasks.length} tarefa(s)
-                      </span>
-                    )}
-                  </div>
-                  {expandedLesson === lesson.id && lesson.materials.length > 0 && (
-                    <div className="mt-3 pl-1 space-y-1.5 border-l-2 ml-1" style={{ borderColor: disc.color + "30" }} onClick={e => e.stopPropagation()}>
-                      {lesson.materials.map((mat, i) => (
-                        <div key={i} className="flex items-center gap-2 text-xs text-muted-foreground py-1 pl-3">
-                          <FileText className="w-3 h-3" style={{ color: disc.color }} />
-                          <span className="text-foreground">{mat.name}</span>
-                          <span className="uppercase text-muted-foreground/50 text-[10px]">{mat.type}</span>
+            {discLessons.map((lesson) => {
+              const status = getLessonStatus(lesson);
+              return (
+                <Card
+                  key={lesson.id}
+                  className="p-4 border-l-[3px] hover:shadow-md transition-all cursor-pointer"
+                  style={{ borderLeftColor: status === "concluída" ? "hsl(var(--accent))" : status === "a_decorrer" ? "hsl(var(--primary))" : "hsl(var(--muted))" }}
+                  onClick={() => navigate(`/student/disciplines/${id}/lessons/${lesson.id}`)}
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="w-20 h-14 rounded-xl bg-muted/50 flex items-center justify-center shrink-0 relative overflow-hidden">
+                      <Play className="w-5 h-5 text-muted-foreground/60" />
+                      {lesson.progress > 0 && (
+                        <div className="absolute bottom-0 left-0 right-0">
+                          <div className="h-1 rounded-b-xl" style={{ width: `${lesson.progress}%`, background: lesson.progress === 100 ? "hsl(var(--accent))" : "hsl(var(--primary))" }} />
                         </div>
-                      ))}
+                      )}
                     </div>
-                  )}
-                </div>
-                {lesson.progress > 0 && lesson.progress < 100 && (
-                  <span className="text-xs font-semibold shrink-0 px-2 py-1 rounded-full" style={{ background: disc.color + "12", color: disc.color }}>{lesson.progress}%</span>
-                )}
-                {lesson.progress === 100 && (
-                  <CheckCircle className="w-5 h-5 text-accent shrink-0" />
-                )}
-              </Card>
-            ))}
-            {discLessons.length === 0 && <p className="text-sm text-muted-foreground py-8 text-center">Nenhuma aula gravada disponível.</p>}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-mono font-semibold px-1.5 py-0.5 rounded bg-primary/10 text-primary">#{lesson.number}</span>
+                        <h4 className="font-medium text-foreground truncate">{lesson.title}</h4>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1 line-clamp-1">{lesson.summary}</p>
+                      <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
+                        <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{lesson.duration}</span>
+                        <span>{lesson.uploadDate}</span>
+                        {lesson.materials.length > 0 && (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setExpandedLesson(expandedLesson === lesson.id ? null : lesson.id); }}
+                            className="flex items-center gap-1 text-primary hover:underline"
+                          >
+                            <FileText className="w-3 h-3" />{lesson.materials.length} ficheiro(s)
+                            {expandedLesson === lesson.id ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
+                          </button>
+                        )}
+                        {lesson.tasks.length > 0 && (
+                          <span className="flex items-center gap-1 text-secondary">
+                            <ClipboardList className="w-3 h-3" />{lesson.tasks.length} tarefa(s)
+                          </span>
+                        )}
+                      </div>
+                      {expandedLesson === lesson.id && lesson.materials.length > 0 && (
+                        <div className="mt-3 pl-1 space-y-1.5 border-l-2 border-primary/20 ml-1" onClick={e => e.stopPropagation()}>
+                          {lesson.materials.map((mat, i) => (
+                            <div key={i} className="flex items-center gap-2 text-xs text-muted-foreground py-1 pl-3">
+                              <FileText className="w-3 h-3 text-primary" />
+                              <span className="text-foreground">{mat.name}</span>
+                              <span className="uppercase text-muted-foreground/50 text-[10px]">{mat.type}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      {status === "concluída" ? (
+                        <Badge className="bg-accent/10 text-accent text-[10px] gap-1">
+                          <CheckCircle className="w-3 h-3" /> Concluída
+                        </Badge>
+                      ) : status === "a_decorrer" ? (
+                        <Badge className="bg-primary/10 text-primary text-[10px] gap-1">
+                          <Clock className="w-3 h-3" /> A Decorrer
+                        </Badge>
+                      ) : (
+                        <Badge className="bg-muted text-muted-foreground text-[10px] gap-1">
+                          <Clock className="w-3 h-3" /> Agendada
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                </Card>
+              );
+            })}
+            {discLessons.length === 0 && <p className="text-sm text-muted-foreground py-8 text-center">Nenhuma aula disponível.</p>}
           </div>
         </TabsContent>
 
         {/* Conteúdos */}
         <TabsContent value="materials" className="space-y-4">
+          <p className="text-sm text-muted-foreground">
+            {discLessons.reduce((s, l) => s + l.materials.length, 0)} ficheiros disponíveis
+          </p>
           {discLessons.filter(l => l.materials.length > 0).length > 0 ? (
             discLessons.filter(l => l.materials.length > 0).map((lesson) => (
               <Card key={lesson.id} className="overflow-hidden">
-                <div className="px-4 py-3 border-b flex items-center gap-2" style={{ background: disc.color + "08" }}>
-                  <span className="text-xs font-mono font-semibold px-1.5 py-0.5 rounded" style={{ background: disc.color + "15", color: disc.color }}>#{lesson.number}</span>
+                <div className="px-4 py-3 border-b flex items-center gap-2 bg-primary/5">
+                  <span className="text-xs font-mono font-semibold px-1.5 py-0.5 rounded bg-primary/10 text-primary">#{lesson.number}</span>
                   <p className="text-sm font-semibold text-foreground">{lesson.title}</p>
+                  <span className="text-[10px] text-muted-foreground ml-auto">{lesson.uploadDate}</span>
                 </div>
                 <div className="divide-y">
                   {lesson.materials.map((mat, i) => (
                     <div key={i} className="px-4 py-3 flex items-center gap-3 hover:bg-muted/30 transition-colors">
-                      <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: disc.color + "12" }}>
-                        <FileText className="w-4 h-4" style={{ color: disc.color }} />
+                      <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-primary/10">
+                        <FileText className="w-4 h-4 text-primary" />
                       </div>
                       <div className="flex-1">
                         <p className="text-sm font-medium text-foreground">{mat.name}</p>
@@ -258,36 +281,34 @@ export default function DisciplineDetail() {
         <TabsContent value="tasks" className="space-y-3">
           {allTasks.length > 0 ? allTasks.map((task) => {
             const statusCfg = {
-              entregue: { icon: CheckCircle, label: "Entregue", color: "hsl(var(--accent))", bg: "hsl(var(--accent) / 0.1)" },
-              atrasada: { icon: AlertCircle, label: "Atrasada", color: "hsl(var(--destructive))", bg: "hsl(var(--destructive) / 0.1)" },
-              pendente: { icon: Clock, label: "Pendente", color: disc.color, bg: disc.color + "12" },
+              entregue: { icon: CheckCircle, label: "Entregue", cls: "bg-accent/10 text-accent" },
+              atrasada: { icon: AlertCircle, label: "Atrasada", cls: "bg-destructive/10 text-destructive" },
+              pendente: { icon: Clock, label: "Pendente", cls: "bg-primary/10 text-primary" },
             };
             const cfg = statusCfg[task.status];
             const StatusIcon = cfg.icon;
             return (
               <Card
                 key={task.id}
-                className="p-4 flex items-center gap-3 cursor-pointer hover:shadow-md transition-all border-l-[3px]"
-                style={{ borderLeftColor: cfg.color }}
+                className="p-4 border-l-[3px] hover:shadow-md transition-all cursor-pointer"
+                style={{ borderLeftColor: task.status === "entregue" ? "hsl(var(--accent))" : task.status === "atrasada" ? "hsl(var(--destructive))" : "hsl(var(--primary))" }}
                 onClick={() => navigate(`/student/disciplines/${id}/tasks?taskId=${task.id}`)}
               >
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: cfg.bg }}>
-                  <ClipboardList className="w-5 h-5" style={{ color: cfg.color }} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-foreground">{task.title}</p>
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
-                    <span>Aula {task.lessonNumber}</span>
-                    <span className="text-muted-foreground/30">•</span>
-                    <span>{task.assignedDate} → {task.dueDate}</span>
-                    <Badge variant="outline" className="text-[10px] gap-1 ml-1">
-                      <MapPin className="w-3 h-3" /> Presencial
-                    </Badge>
+                <div className="flex items-center gap-3">
+                  <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center shrink-0", cfg.cls)}>
+                    <ClipboardList className="w-5 h-5" />
                   </div>
-                </div>
-                <div className="flex items-center gap-1.5 shrink-0" style={{ color: cfg.color }}>
-                  <StatusIcon className="w-4 h-4" />
-                  <span className="text-xs font-medium">{cfg.label}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-foreground">{task.title}</p>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
+                      <span>Aula {task.lessonNumber}</span>
+                      <span className="text-muted-foreground/30">•</span>
+                      <span>{task.assignedDate} → {task.dueDate}</span>
+                    </div>
+                  </div>
+                  <Badge className={cn("text-[10px] gap-1", cfg.cls)}>
+                    <StatusIcon className="w-3 h-3" /> {cfg.label}
+                  </Badge>
                 </div>
               </Card>
             );
@@ -296,100 +317,77 @@ export default function DisciplineDetail() {
           )}
         </TabsContent>
 
-        {/* Exames */}
-        <TabsContent value="exams" className="space-y-5">
-          <Card className="overflow-hidden">
-            <div className="px-5 py-4 border-b flex items-center gap-2" style={{ background: disc.color + "08" }}>
-              <GraduationCap className="w-5 h-5" style={{ color: disc.color }} />
-              <h3 className="font-semibold text-foreground">Avaliações</h3>
-            </div>
-            {discGrades ? (
-              <div className="divide-y">
-                {discGrades.evaluations.map((ev, i) => (
-                  <div
-                    key={i}
-                    className="flex items-center justify-between px-5 py-4 cursor-pointer hover:bg-muted/30 transition-colors"
-                    onClick={() => navigate(`/student/disciplines/${id}/evaluation?index=${i}`)}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center shrink-0",
-                        ev.published && ev.grade !== null
-                          ? ev.grade >= 10 ? "bg-accent/10" : "bg-destructive/10"
-                          : ""
-                      )} style={!(ev.published && ev.grade !== null) ? { background: disc.color + "12" } : {}}>
-                        {ev.published && ev.grade !== null ? (
-                          <span className={`text-sm font-bold ${ev.grade >= 10 ? "text-accent" : "text-destructive"}`}>{ev.grade}</span>
-                        ) : (
-                          <GraduationCap className="w-4 h-4" style={{ color: disc.color }} />
-                        )}
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold text-foreground">{ev.name}</p>
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
-                          <span>{ev.date}</span>
-                          <span className="text-muted-foreground/30">•</span>
-                          <span>Peso: {ev.weight}%</span>
-                          <Badge variant="outline" className="text-[10px] gap-1">
-                            <MapPin className="w-3 h-3" /> Presencial
-                          </Badge>
-                        </div>
-                      </div>
-                    </div>
-                    {ev.published && ev.grade !== null ? (
-                      <div className="flex items-center gap-1.5 text-accent shrink-0">
-                        <CheckCircle className="w-4 h-4" />
-                        <span className="text-xs font-semibold">{ev.grade}/{ev.maxGrade}</span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-1.5 shrink-0" style={{ color: disc.color }}>
-                        <Clock className="w-4 h-4" />
-                        <span className="text-xs font-medium">Pendente</span>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-muted-foreground p-5">Sem informação de avaliação.</p>
-            )}
-          </Card>
-        </TabsContent>
-
-        {/* Calendário */}
-        <TabsContent value="calendar" className="space-y-4">
-          {(() => {
-            const taskDates = allTasks.map(t => ({ title: t.title, date: t.dueDate, type: "tarefa" as const }));
-            const examDates = discGrades?.evaluations.map(e => ({ title: e.name, date: e.date, type: "exame" as const })) || [];
-            const allDates = [...taskDates, ...examDates];
-            const typeLabels: Record<string, string> = { tarefa: "Tarefa", exame: "Exame" };
-
-            return allDates.length > 0 ? (
-              <div className="space-y-2">
-                {allDates.map((item, i) => (
-                  <div key={i} className="flex items-center gap-3 p-3.5 rounded-xl hover:bg-muted/40 transition-colors cursor-pointer border" style={{ borderLeftWidth: 3, borderLeftColor: disc.color }}>
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: disc.color + "12" }}>
-                      {item.type === "exame" ? <GraduationCap className="w-4 h-4" style={{ color: disc.color }} /> : <ClipboardList className="w-4 h-4" style={{ color: disc.color }} />}
+        {/* Avaliações */}
+        <TabsContent value="exams" className="space-y-3">
+          {discGrades ? (
+            discGrades.evaluations.map((ev, i) => {
+              const hasGrade = ev.published && ev.grade !== null;
+              const passed = hasGrade && ev.grade! >= 10;
+              return (
+                <Card
+                  key={i}
+                  className="p-4 border-l-[3px] hover:shadow-md transition-all cursor-pointer"
+                  style={{ borderLeftColor: hasGrade ? (passed ? "hsl(var(--accent))" : "hsl(var(--destructive))") : "hsl(var(--muted))" }}
+                  onClick={() => navigate(`/student/disciplines/${id}/evaluation?index=${i}`)}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center shrink-0",
+                      hasGrade ? (passed ? "bg-accent/10" : "bg-destructive/10") : "bg-muted"
+                    )}>
+                      {hasGrade ? (
+                        <span className={`text-sm font-bold ${passed ? "text-accent" : "text-destructive"}`}>{ev.grade}</span>
+                      ) : (
+                        <GraduationCap className="w-4 h-4 text-muted-foreground" />
+                      )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-foreground truncate">{item.title}</p>
-                      <div className="flex items-center gap-2 text-[11px] text-muted-foreground mt-0.5">
-                        <Clock className="w-3 h-3 shrink-0" />
-                        <span>{item.date}</span>
+                      <p className="text-sm font-semibold text-foreground">{ev.name}</p>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
+                        <span>{ev.date}</span>
+                        <span className="text-muted-foreground/30">•</span>
+                        <span>Peso: {ev.weight}%</span>
+                        {ev.room && (
+                          <>
+                            <span className="text-muted-foreground/30">•</span>
+                            <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{ev.room}</span>
+                          </>
+                        )}
                       </div>
                     </div>
-                    <Badge variant="outline" className="text-[10px] shrink-0" style={{ borderColor: disc.color + "30", color: disc.color }}>
-                      {typeLabels[item.type] || item.type}
-                    </Badge>
+                    {hasGrade ? (
+                      <Badge className="bg-accent/10 text-accent text-[10px] gap-1">
+                        <CheckCircle className="w-3 h-3" /> {ev.grade}/{ev.maxGrade}
+                      </Badge>
+                    ) : (
+                      <Badge className="bg-muted text-muted-foreground text-[10px] gap-1">
+                        <Clock className="w-3 h-3" /> Pendente
+                      </Badge>
+                    )}
                   </div>
-                ))}
+                </Card>
+              );
+            })
+          ) : (
+            <p className="text-sm text-muted-foreground py-8 text-center">Sem informação de avaliação.</p>
+          )}
+        </TabsContent>
+
+        {/* Participantes */}
+        <TabsContent value="participants" className="space-y-4">
+          <p className="text-sm text-muted-foreground">{participantList.length} colegas nesta cadeira</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+            {participantList.map((name, i) => (
+              <div key={i} className="flex items-center gap-3 p-3 rounded-xl border border-border hover:bg-muted/30 transition-colors">
+                <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center text-xs font-bold text-muted-foreground shrink-0">
+                  {name.split(" ").map(n => n[0]).slice(0, 2).join("")}
+                </div>
+                <p className="text-sm font-medium text-foreground truncate">{name}</p>
               </div>
-            ) : (
-              <Card className="p-8 text-center">
-                <Calendar className="w-10 h-10 text-muted-foreground/30 mx-auto mb-2" />
-                <p className="text-sm text-muted-foreground">Nenhuma data importante registada.</p>
-              </Card>
-            );
-          })()}
+            ))}
+          </div>
+          {participantList.length === 0 && (
+            <p className="text-sm text-muted-foreground py-8 text-center">Nenhum participante encontrado.</p>
+          )}
         </TabsContent>
       </Tabs>
     </div>
