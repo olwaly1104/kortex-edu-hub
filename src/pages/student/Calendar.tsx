@@ -101,7 +101,7 @@ export default function StudentCalendar() {
   const allCalendarEvents = useMemo(() => [...calendarEvents, ...derivedEvents], [derivedEvents]);
 
   const allAulas = calendarEvents.filter(e => e.type === "aula");
-  const upcomingEvents = allCalendarEvents.filter(e => e.type === "teste" || e.type === "entrega" || e.type === "exame");
+  
   const selectedDayEvents = allAulas.filter(e => e.date === selectedDate);
 
   // Compute lesson number per discipline (sorted by date+time)
