@@ -143,41 +143,38 @@ export default function TaskDetail() {
         </Card>
       )}
 
-      {/* Upload section */}
-      <Card className="p-5 space-y-5">
-        {task.modality === "online" && (
-          <div className="border-t pt-4">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="font-semibold text-foreground flex items-center gap-2 text-sm"><Upload className="w-4 h-4 text-primary" /> Upload Tarefa</h3>
-              {task.status === "entregue" && (
-                <div className="flex items-center gap-1.5 text-accent">
-                  <CheckCircle className="w-4 h-4" />
-                  <span className="text-xs font-medium">Entregue</span>
-                </div>
-              )}
-            </div>
-            {task.status === "entregue" ? (
-              <div className="flex items-center gap-3 p-3 rounded-lg bg-accent/5 border border-accent/20">
-                <FileText className="w-5 h-5 text-accent shrink-0" />
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-foreground">{task.title.replace(/\s+/g, "_")}.pdf</p>
-                  <p className="text-xs text-muted-foreground">Entregue em {task.dueDate}</p>
-                </div>
-                <div className="flex items-center gap-1">
-                  <button className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"><Eye className="w-4 h-4" /></button>
-                  <button className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"><Download className="w-4 h-4" /></button>
-                </div>
-              </div>
-            ) : (
-              <div className="border-2 border-dashed border-border rounded-lg p-8 text-center">
-                <Upload className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-                <p className="text-sm text-muted-foreground mb-3">Arraste o ficheiro ou clique para carregar</p>
-                <Button className="gap-2"><Upload className="w-4 h-4" />Carregar ficheiro</Button>
+      {task.modality === "online" && (
+        <Card className="p-5">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-semibold text-foreground flex items-center gap-2 text-sm"><Upload className="w-4 h-4 text-primary" /> Upload Tarefa</h3>
+            {task.status === "entregue" && (
+              <div className="flex items-center gap-1.5 text-accent">
+                <CheckCircle className="w-4 h-4" />
+                <span className="text-xs font-medium">Entregue</span>
               </div>
             )}
           </div>
-        )}
-      </Card>
+          {task.status === "entregue" ? (
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-accent/5 border border-accent/20">
+              <FileText className="w-5 h-5 text-accent shrink-0" />
+              <div className="flex-1">
+                <p className="text-sm font-medium text-foreground">{task.title.replace(/\s+/g, "_")}.pdf</p>
+                <p className="text-xs text-muted-foreground">Entregue em {task.dueDate}</p>
+              </div>
+              <div className="flex items-center gap-1">
+                <button className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"><Eye className="w-4 h-4" /></button>
+                <button className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"><Download className="w-4 h-4" /></button>
+              </div>
+            </div>
+          ) : (
+            <div className="border-2 border-dashed border-border rounded-lg p-8 text-center">
+              <Upload className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
+              <p className="text-sm text-muted-foreground mb-3">Arraste o ficheiro ou clique para carregar</p>
+              <Button className="gap-2"><Upload className="w-4 h-4" />Carregar ficheiro</Button>
+            </div>
+          )}
+        </Card>
+      )}
     </div>
   );
 }
