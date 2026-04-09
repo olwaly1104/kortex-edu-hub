@@ -97,21 +97,12 @@ export default function TaskDetail() {
         </div>
       </Card>
 
-      {/* Descrição, Guia & Conteúdo */}
-      <Card className="p-5">
-        {/* Descrição */}
-        <h3 className="font-semibold text-foreground flex items-center gap-2 text-sm mb-3">
-          <FileText className="w-4 h-4 text-primary" /> Descrição da Tarefa
+      {/* Descrição & Guia da Tarefa */}
+      <Card className="p-5 space-y-4">
+        <h3 className="font-semibold text-foreground flex items-center gap-2 text-sm">
+          <FileText className="w-4 h-4 text-primary" /> Descrição & Guia da Tarefa
         </h3>
         <p className="text-sm text-muted-foreground leading-relaxed">{task.description}</p>
-
-        {/* Separator */}
-        <div className="border-t border-border/60 my-4" />
-
-        {/* Guia da Tarefa */}
-        <h3 className="font-semibold text-foreground flex items-center gap-2 text-sm mb-3">
-          <ClipboardList className="w-4 h-4 text-primary" /> Guia da Tarefa
-        </h3>
         <div className="flex items-center gap-3 p-3 rounded-lg border border-primary/15 bg-primary/[0.03]">
           <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
             <FileText className="w-4 h-4 text-primary" />
@@ -126,30 +117,22 @@ export default function TaskDetail() {
             <button className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground" title="Partilhar"><Share2 className="w-4 h-4" /></button>
           </div>
         </div>
-
-        {/* Conteúdo Relevante */}
         {task.materials && task.materials.length > 0 && (
-          <>
-            <div className="border-t border-border/60 my-4" />
-            <h3 className="font-semibold text-foreground flex items-center gap-2 text-sm mb-3">
-              <BookOpen className="w-4 h-4 text-primary" /> Conteúdo Relevante
-            </h3>
-            <div className="space-y-2">
-              {task.materials.map((mat, i) => (
-                <div key={i} className="flex items-center gap-3 p-3 rounded-lg bg-muted/30">
-                  <FileText className="w-5 h-5 text-primary shrink-0" />
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-foreground">{mat.name}</p>
-                    <p className="text-xs text-muted-foreground">{mat.type.toUpperCase()}</p>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <button className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"><Eye className="w-4 h-4" /></button>
-                    <button className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"><Download className="w-4 h-4" /></button>
-                  </div>
+          <div className="space-y-2">
+            {task.materials.map((mat, i) => (
+              <div key={i} className="flex items-center gap-3 p-3 rounded-lg bg-muted/30">
+                <FileText className="w-5 h-5 text-primary shrink-0" />
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-foreground">{mat.name}</p>
+                  <p className="text-xs text-muted-foreground">{mat.type.toUpperCase()}</p>
                 </div>
-              ))}
-            </div>
-          </>
+                <div className="flex items-center gap-1">
+                  <button className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"><Eye className="w-4 h-4" /></button>
+                  <button className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"><Download className="w-4 h-4" /></button>
+                </div>
+              </div>
+            ))}
+          </div>
         )}
       </Card>
 
