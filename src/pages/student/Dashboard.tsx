@@ -1,6 +1,6 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { disciplines, announcements, lessons, calendarEvents, grades } from "@/data/mockData";
-import { BookOpen, Video, Calendar, Bell, ChevronRight, Clock, MapPin, Play, BarChart3, ArrowRight } from "lucide-react";
+import { BookOpen, Wallet, Calendar, Bell, ChevronRight, Clock, MapPin, Play, BarChart3, ArrowRight } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
