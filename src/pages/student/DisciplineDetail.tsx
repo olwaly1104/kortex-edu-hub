@@ -62,7 +62,8 @@ export default function DisciplineDetail() {
               <h1 className="text-xl font-bold text-foreground tracking-tight leading-tight">{disc.name}</h1>
               <Badge variant="outline" className="text-[10px] font-mono shrink-0">{disc.code}</Badge>
             </div>
-            <div className="flex items-center gap-2 flex-wrap">
+            <p className="text-sm text-muted-foreground leading-relaxed mt-2 max-w-3xl">{disc.summary}</p>
+            <div className="flex items-center gap-2 flex-wrap mt-3">
               <Link to="/student/contacts" onClick={e => e.stopPropagation()}>
                 <Badge variant="outline" className="text-[11px] bg-background/80 gap-1 hover:bg-muted cursor-pointer">
                   <GraduationCap className="w-3 h-3" /> {disc.professor}
@@ -85,11 +86,11 @@ export default function DisciplineDetail() {
         <div className="px-5 py-4 grid grid-cols-2 lg:grid-cols-5 gap-4">
           <div className="flex items-center gap-2">
             <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-              <Users className="w-3.5 h-3.5 text-primary" />
+              <Award className="w-3.5 h-3.5 text-primary" />
             </div>
             <div>
-              <p className="text-[10px] text-muted-foreground uppercase tracking-wider leading-tight">Colegas</p>
-              <p className="text-sm font-bold text-foreground">{participantList.length}</p>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider leading-tight">Avaliações</p>
+              <p className="text-sm font-bold text-foreground">{publishedEvals.length}/{totalEvals}</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -140,7 +141,7 @@ export default function DisciplineDetail() {
               { value: "materials", icon: FolderOpen, label: "Conteúdos" },
               { value: "tasks", icon: ClipboardList, label: "Tarefas" },
               { value: "exams", icon: Award, label: "Avaliações" },
-              { value: "participants", icon: Users, label: "Participantes" },
+              
             ].map(tab => (
               <TabsTrigger
                 key={tab.value}
@@ -369,24 +370,6 @@ export default function DisciplineDetail() {
             })
           ) : (
             <p className="text-sm text-muted-foreground py-8 text-center">Sem informação de avaliação.</p>
-          )}
-        </TabsContent>
-
-        {/* Participantes */}
-        <TabsContent value="participants" className="space-y-4">
-          <p className="text-sm text-muted-foreground">{participantList.length} colegas nesta cadeira</p>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-            {participantList.map((name, i) => (
-              <div key={i} className="flex items-center gap-3 p-3 rounded-xl border border-border hover:bg-muted/30 transition-colors">
-                <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center text-xs font-bold text-muted-foreground shrink-0">
-                  {name.split(" ").map(n => n[0]).slice(0, 2).join("")}
-                </div>
-                <p className="text-sm font-medium text-foreground truncate">{name}</p>
-              </div>
-            ))}
-          </div>
-          {participantList.length === 0 && (
-            <p className="text-sm text-muted-foreground py-8 text-center">Nenhum participante encontrado.</p>
           )}
         </TabsContent>
       </Tabs>
