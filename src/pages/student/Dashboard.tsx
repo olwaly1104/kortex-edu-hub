@@ -1,3 +1,4 @@
+import React from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { disciplines, announcements, lessons, calendarEvents, grades } from "@/data/mockData";
 import { payments } from "@/data/financeData";
@@ -58,28 +59,38 @@ export default function StudentDashboard() {
 
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {[
-          { icon: BarChart3, label: "Presença Geral", value: `${generalPct}%`, color: generalPct >= 75 ? "text-accent bg-accent/10" : "text-destructive bg-destructive/10" },
-          { icon: BarChart3, label: "Média Geral", value: overallAvg !== null ? overallAvg : "—", color: overallAvg !== null && overallAvg >= 10 ? "text-accent bg-accent/10" : "text-destructive bg-destructive/10", suffix: overallAvg !== null ? "/20" : "" },
-          { icon: BookOpen, label: "Cadeiras", value: disciplines.length, color: "text-primary bg-primary/10" },
-          { icon: Wallet, label: "Situação Financeira", value: payments.some(p => p.status === 'overdue') ? "Por regularizar" : payments.some(p => p.status === 'pending') ? "Pendente" : "Em dia", color: payments.some(p => p.status === 'overdue') ? "text-destructive bg-destructive/10" : payments.some(p => p.status === 'pending') ? "text-yellow-600 bg-yellow-500/10" : "text-accent bg-accent/10", link: "/student/finances" },
-        ].map((stat) => {
-          const content = (
-            <Card key={stat.label} className={`p-4 flex items-center gap-4 ${"link" in stat ? "hover:shadow-md transition-shadow" : ""}`}>
-              <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${stat.color}`}>
-                <stat.icon className="w-5 h-5" />
-              </div>
-              <div className="min-w-0">
-                <div className="flex items-baseline gap-1">
-                  <p className={`font-bold text-foreground ${typeof stat.value === 'string' && stat.value.length > 10 ? 'text-xs' : 'text-2xl'}`}>{stat.value}</p>
-                  {"suffix" in stat && stat.suffix && <span className="text-sm text-muted-foreground font-medium">{stat.suffix}</span>}
+        {(() => {
+          const finStatus = payments.some(p => p.status === 'overdue') ? 'overdue' : payments.some(p => p.status === 'pending') ? 'pending' : 'ok';
+          const finLabel = finStatus === 'overdue' ? 'Por regularizar' : finStatus === 'pending' ? 'Pendente' : 'Em dia';
+          const finBadge = finStatus === 'overdue' ? 'bg-destructive/10 text-destructive' : finStatus === 'pending' ? 'bg-yellow-500/10 text-yellow-600' : 'bg-accent/10 text-accent';
+          const stats = [
+            { icon: BarChart3, label: "Presença Geral", value: `${generalPct}%`, color: generalPct >= 75 ? "text-accent bg-accent/10" : "text-destructive bg-destructive/10" },
+            { icon: BarChart3, label: "Média Geral", value: overallAvg !== null ? overallAvg : "—", color: overallAvg !== null && overallAvg >= 10 ? "text-accent bg-accent/10" : "text-destructive bg-destructive/10", suffix: overallAvg !== null ? "/20" : "" },
+            { icon: BookOpen, label: "Cadeiras", value: disciplines.length, color: "text-primary bg-primary/10" },
+            { icon: Wallet, label: "Estado Financeiro", badge: finLabel, badgeClass: finBadge, color: finStatus === 'overdue' ? "text-destructive bg-destructive/10" : finStatus === 'pending' ? "text-yellow-600 bg-yellow-500/10" : "text-accent bg-accent/10", link: "/student/finances" },
+          ];
+          return stats.map((stat) => {
+            const content = (
+              <Card key={stat.label} className={`p-4 flex items-center gap-4 ${"link" in stat ? "hover:shadow-md transition-shadow cursor-pointer" : ""}`}>
+                <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${stat.color}`}>
+                  <stat.icon className="w-5 h-5" />
                 </div>
-                <p className="text-xs text-muted-foreground">{stat.label}</p>
-              </div>
-            </Card>
-          );
-          return "link" in stat && stat.link ? <Link key={stat.label} to={stat.link as string}>{content}</Link> : content;
-        })}
+                <div className="min-w-0">
+                  {"badge" in stat ? (
+                    <Badge className={`${stat.badgeClass} text-xs font-semibold border-0`}>{stat.badge}</Badge>
+                  ) : (
+                    <div className="flex items-baseline gap-1">
+                      <p className="font-bold text-foreground text-2xl">{stat.value}</p>
+                      {"suffix" in stat && stat.suffix && <span className="text-sm text-muted-foreground font-medium">{stat.suffix}</span>}
+                    </div>
+                  )}
+                  <p className="text-xs text-muted-foreground mt-0.5">{stat.label}</p>
+                </div>
+              </Card>
+            );
+            return "link" in stat && stat.link ? <Link key={stat.label} to={stat.link as string}>{content}</Link> : <React.Fragment key={stat.label}>{content}</React.Fragment>;
+          });
+        })()}
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6">
