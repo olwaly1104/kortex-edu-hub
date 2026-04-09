@@ -106,11 +106,8 @@ export default function StudentDashboard() {
                   <Wallet className="w-5 h-5" />
                 </div>
                 <div>
-                  <div className="flex items-center gap-2">
-                    <span className={`w-2 h-2 rounded-full ${dotColor}`} />
-                    <p className={`text-sm font-semibold ${textColor}`}>{label}</p>
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-0.5">Estado Financeiro</p>
+                  <Badge variant="outline" className={`${textColor} border-current font-semibold text-xs`}>{label}</Badge>
+                  <p className="text-xs text-muted-foreground mt-1">Estado Financeiro</p>
                 </div>
               </Card>
             </Link>
