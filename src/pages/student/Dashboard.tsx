@@ -40,10 +40,10 @@ export default function StudentDashboard() {
     if (e.startTime <= now && e.endTime > now) return "em_curso";
     return "agendada";
   };
-  const statusConfig: Record<string, { label: string; icon: React.ElementType; variant: "default" | "outline" }> = {
-    concluída: { label: "Concluída", icon: CheckCircle, variant: "outline" },
-    em_curso: { label: "Em Curso", icon: Play, variant: "default" },
-    agendada: { label: "Agendada", icon: Clock, variant: "outline" },
+  const statusConfig: Record<string, { label: string; icon: React.ElementType; cls: string }> = {
+    concluída: { label: "Concluída", icon: CheckCircle, cls: "bg-muted/60 text-muted-foreground border-border" },
+    em_curso: { label: "Em Curso", icon: Play, cls: "bg-accent/15 text-accent border-accent/30" },
+    agendada: { label: "Agendada", icon: Clock, cls: "bg-primary/10 text-primary border-primary/20" },
   };
 
   const quickSuggestions = [
@@ -188,15 +188,19 @@ export default function StudentDashboard() {
                         </div>
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
-                        <Badge variant={isActive ? "default" : "outline"} className="text-[10px] gap-1">
+                        <Badge variant="outline" className={`text-[10px] gap-1 ${cfg.cls}`}>
                           <StatusIcon className="w-3 h-3" /> {cfg.label}
                         </Badge>
                         {status === "concluída" && matchingLesson ? (
-                          <Button variant="outline" size="sm" className="h-7 px-2 text-[10px] gap-1" onClick={() => navigate(`/student/disciplines/${disc!.id}/lessons/${matchingLesson.id}`)}>
+                          <Button variant="ghost" size="sm" className="h-7 px-2.5 text-[10px] gap-1 text-muted-foreground hover:text-primary" onClick={() => navigate(`/student/disciplines/${disc!.id}/lessons/${matchingLesson.id}`)}>
                             <Play className="w-3 h-3" /> Rever
                           </Button>
-                        ) : status !== "concluída" && matchingLesson ? (
-                          <Button size="sm" className="h-7 px-2 text-[10px] gap-1" onClick={() => navigate(`/student/disciplines/${disc!.id}/lessons/${matchingLesson.id}`)}>
+                        ) : isActive && matchingLesson ? (
+                          <Button size="sm" className="h-7 px-2.5 text-[10px] gap-1 bg-accent hover:bg-accent/90 text-accent-foreground" onClick={() => navigate(`/student/disciplines/${disc!.id}/lessons/${matchingLesson.id}`)}>
+                            <Play className="w-3 h-3" /> Entrar
+                          </Button>
+                        ) : status === "agendada" && matchingLesson ? (
+                          <Button variant="outline" size="sm" className="h-7 px-2.5 text-[10px] gap-1 border-primary/20 text-primary hover:bg-primary/5" onClick={() => navigate(`/student/disciplines/${disc!.id}/lessons/${matchingLesson.id}`)}>
                             <Play className="w-3 h-3" /> Ver
                           </Button>
                         ) : null}
