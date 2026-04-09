@@ -14,6 +14,15 @@ export default function LessonDetail() {
   const disc = disciplines.find(d => d.id === disciplineId);
   const [videoExpanded, setVideoExpanded] = useState(false);
 
+  // Determine lesson status based on progress/date
+  const lessonStatus = useMemo(() => {
+    if (!lesson) return "agendada";
+    // progress 100 = concluída, progress > 0 = a decorrer, 0 = agendada
+    if (lesson.progress >= 100) return "concluída";
+    if (lesson.progress > 0) return "a_decorrer";
+    return "agendada";
+  }, [lesson]);
+
   if (!lesson || !disc) return (
     <div className="p-8 text-muted-foreground">
       <Link to={`/student/disciplines/${disciplineId}`} className="text-primary hover:underline">← Voltar</Link>
