@@ -141,7 +141,7 @@ export default function DisciplineDetail() {
               { value: "materials", icon: FolderOpen, label: "Conteúdos" },
               { value: "tasks", icon: ClipboardList, label: "Tarefas" },
               { value: "exams", icon: Award, label: "Avaliações" },
-              { value: "participants", icon: Users, label: "Participantes" },
+              
             ].map(tab => (
               <TabsTrigger
                 key={tab.value}
