@@ -2,7 +2,7 @@ import React from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { disciplines, announcements, lessons, calendarEvents, grades } from "@/data/mockData";
 import { payments } from "@/data/financeData";
-import { BookOpen, Wallet, Calendar, Bell, ChevronRight, Clock, MapPin, Play, BarChart3, ArrowRight } from "lucide-react";
+import { BookOpen, Wallet, Calendar, Bell, ChevronRight, Clock, MapPin, Play, BarChart3, ArrowRight, CheckCircle, Building2, GraduationCap, Users } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -12,17 +12,15 @@ import { Link, useNavigate } from "react-router-dom";
 export default function StudentDashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const todayEvents = calendarEvents.filter(e => e.type === "aula").slice(0, 4);
+  const todayEvents = calendarEvents.filter(e => e.type === "aula" && e.date === "2024-02-14").sort((a, b) => a.startTime.localeCompare(b.startTime));
   const recentAnnouncements = announcements.slice(0, 3);
-  const continueLessons = lessons.filter(l => l.progress > 0).slice(0, 3);
+  const continueLessons = lessons.filter(l => l.progress > 0 && l.progress < 100).slice(0, 3);
 
-  // Overall average
   const allPublished = grades.flatMap(g => g.evaluations.filter(e => e.published && e.grade !== null));
   const overallAvg = allPublished.length > 0
     ? Math.round(allPublished.reduce((s, e) => s + (e.grade || 0), 0) / allPublished.length * 10) / 10
     : null;
 
-  // General attendance
   const totalPresent = disciplines.reduce((s, d) => s + d.attendance.present, 0);
   const totalAbsent = disciplines.reduce((s, d) => s + d.attendance.absent, 0);
   const totalJustified = disciplines.reduce((s, d) => s + d.attendance.justified, 0);
@@ -36,6 +34,18 @@ export default function StudentDashboard() {
     geral: "bg-muted text-muted-foreground",
   };
 
+  const now = "10:45";
+  const getEventStatus = (e: typeof calendarEvents[0]) => {
+    if (e.endTime <= now) return "concluída";
+    if (e.startTime <= now && e.endTime > now) return "em_curso";
+    return "agendada";
+  };
+  const statusConfig: Record<string, { label: string; icon: React.ElementType; variant: "default" | "outline" }> = {
+    concluída: { label: "Concluída", icon: CheckCircle, variant: "outline" },
+    em_curso: { label: "Em Curso", icon: Play, variant: "default" },
+    agendada: { label: "Agendada", icon: Clock, variant: "outline" },
+  };
+
   const quickSuggestions = [
     { label: "Perguntar à área financeira sobre pagamentos", to: "/student/chat" },
     { label: "Ver notas do último exame de Matemática", to: "/student/grades" },
@@ -46,15 +56,33 @@ export default function StudentDashboard() {
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">
-          Bom dia, {user?.name?.split(" ")[0]} 👋
-        </h1>
-        <p className="text-muted-foreground mt-1">
-          {user?.course} — {user?.year}º Ano — Turma 24B
-        </p>
-        <p className="text-xs text-muted-foreground mt-0.5">Universidade Privada de Angola</p>
+      {/* Professional Header */}
+      <div className="rounded-xl border border-border bg-gradient-to-r from-primary/5 to-transparent p-6">
+        <div className="flex items-center justify-between mb-3">
+          <h1 className="text-2xl font-bold text-foreground">
+            Bom dia, {user?.name?.split(" ")[0]} 👋
+          </h1>
+          <Link to="/student/profile" className="text-sm text-primary hover:underline flex items-center gap-1">
+            Meu Perfil <ChevronRight className="w-4 h-4" />
+          </Link>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge variant="outline" className="gap-1.5 text-xs font-medium px-2.5 py-1">
+            <Building2 className="w-3 h-3" /> Universidade Privada de Angola
+          </Badge>
+          <Badge variant="outline" className="gap-1.5 text-xs font-medium px-2.5 py-1">
+            <GraduationCap className="w-3 h-3" /> Faculdade de Engenharia
+          </Badge>
+          <Badge variant="outline" className="gap-1.5 text-xs font-medium px-2.5 py-1">
+            <BookOpen className="w-3 h-3" /> {user?.course || "Engenharia Informática"}
+          </Badge>
+          <Badge variant="outline" className="gap-1.5 text-xs font-medium px-2.5 py-1">
+            <Calendar className="w-3 h-3" /> {user?.year || 2}º Ano
+          </Badge>
+          <Badge variant="outline" className="gap-1.5 text-xs font-medium px-2.5 py-1">
+            <Users className="w-3 h-3" /> Turma 24B
+          </Badge>
+        </div>
       </div>
 
       {/* Stats */}
@@ -119,54 +147,71 @@ export default function StudentDashboard() {
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6">
-        {/* Today's schedule */}
+        {/* Today's schedule - Reitor style */}
         <div className="lg:col-span-2 space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
-              <Calendar className="w-5 h-5 text-primary" /> Horário de Hoje
-            </h2>
-            <Link to="/student/calendar" className="text-sm text-primary hover:underline flex items-center gap-1">
-              Ver calendário <ChevronRight className="w-4 h-4" />
-            </Link>
-          </div>
-          <div className="space-y-3">
-            {todayEvents.map((event, idx) => {
-              const disc = disciplines.find(d => d.name === event.discipline);
-              const isPast = idx < todayEvents.length - 1;
-              const matchingLesson = disc ? lessons.find(l => l.disciplineId === disc.id) : null;
-              return (
-                <Card key={event.id} className="p-4 flex items-center gap-4">
-                  <div className="w-1.5 h-12 rounded-full shrink-0" style={{ background: event.color }} />
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-foreground">{event.title}</p>
-                    <div className="flex items-center gap-3 text-sm text-muted-foreground mt-0.5">
-                      <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" />{event.startTime} - {event.endTime}</span>
-                      <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" />{event.room}</span>
-                      <span>{event.professor}</span>
+          <Card className="p-5">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+                <Calendar className="w-5 h-5 text-primary" /> Horário de Hoje
+              </h2>
+              <Link to="/student/calendar" className="text-sm text-primary hover:underline flex items-center gap-1">
+                Ver calendário <ChevronRight className="w-4 h-4" />
+              </Link>
+            </div>
+            {todayEvents.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-4">Sem aulas hoje 🎉</p>
+            ) : (
+              <div className="divide-y divide-border">
+                {todayEvents.map(evento => {
+                  const status = getEventStatus(evento);
+                  const cfg = statusConfig[status];
+                  const StatusIcon = cfg.icon;
+                  const isActive = status === "em_curso";
+                  const disc = disciplines.find(d => d.name === evento.discipline);
+                  const matchingLesson = disc ? lessons.find(l => l.disciplineId === disc.id) : null;
+                  return (
+                    <div key={evento.id} className={`flex items-center gap-4 px-4 py-3.5 transition-colors ${isActive ? "bg-primary/5" : "hover:bg-muted/30"}`}>
+                      <div className="text-center shrink-0 w-14">
+                        <p className={`text-sm font-bold ${isActive ? "text-primary" : "text-foreground"}`}>{evento.startTime}</p>
+                        <p className="text-[10px] text-muted-foreground">{evento.endTime}</p>
+                      </div>
+                      <div className="w-0.5 h-10 rounded-full shrink-0" style={{ background: evento.color }} />
+                      <div className="flex-1 min-w-0">
+                        <p className={`font-medium text-sm leading-tight ${isActive ? "text-primary" : "text-foreground"}`}>{evento.title}</p>
+                        <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1">
+                          {evento.room && (
+                            <span className="flex items-center gap-1">
+                              <MapPin className="w-3 h-3" />{evento.room}
+                            </span>
+                          )}
+                          {evento.professor && <span>{evento.professor}</span>}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <Badge variant={isActive ? "default" : "outline"} className="text-[10px] gap-1">
+                          <StatusIcon className="w-3 h-3" /> {cfg.label}
+                        </Badge>
+                        {status === "concluída" && matchingLesson ? (
+                          <Button variant="outline" size="sm" className="h-7 px-2 text-[10px] gap-1" onClick={() => navigate(`/student/disciplines/${disc!.id}/lessons/${matchingLesson.id}`)}>
+                            <Play className="w-3 h-3" /> Rever
+                          </Button>
+                        ) : status !== "concluída" && matchingLesson ? (
+                          <Button size="sm" className="h-7 px-2 text-[10px] gap-1" onClick={() => navigate(`/student/disciplines/${disc!.id}/lessons/${matchingLesson.id}`)}>
+                            <Play className="w-3 h-3" /> Ver
+                          </Button>
+                        ) : null}
+                      </div>
                     </div>
-                  </div>
-                  {isPast && matchingLesson ? (
-                    <Button variant="outline" size="sm" className="gap-1.5 text-xs shrink-0" onClick={() => navigate(`/student/disciplines/${disc!.id}/lessons/${matchingLesson.id}`)}>
-                      <Play className="w-3.5 h-3.5" /> Rever
-                    </Button>
-                  ) : matchingLesson ? (
-                    <Button size="sm" className="gap-1.5 text-xs shrink-0" onClick={() => navigate(`/student/disciplines/${disc!.id}/lessons/${matchingLesson.id}`)}>
-                      <Play className="w-3.5 h-3.5" /> Ver Aula
-                    </Button>
-                  ) : (
-                    <Button size="sm" variant="outline" className="gap-1.5 text-xs shrink-0" disabled>
-                      <Clock className="w-3.5 h-3.5" /> Em breve
-                    </Button>
-                  )}
-                </Card>
-              );
-            })}
-          </div>
+                  );
+                })}
+              </div>
+            )}
+          </Card>
 
-          {/* Continue watching - 3 videos */}
+          {/* Continue watching */}
           {continueLessons.length > 0 && (
             <>
-              <h2 className="text-lg font-semibold text-foreground flex items-center gap-2 mt-6">
+              <h2 className="text-lg font-semibold text-foreground flex items-center gap-2 mt-2">
                 <Play className="w-5 h-5 text-secondary" /> Continuar a Assistir
               </h2>
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -190,8 +235,8 @@ export default function StudentDashboard() {
             </>
           )}
 
-          {/* Ações Rápidas - phrase suggestions */}
-          <h2 className="text-lg font-semibold text-foreground mt-6">Ações Rápidas</h2>
+          {/* Ações Rápidas */}
+          <h2 className="text-lg font-semibold text-foreground mt-2">Ações Rápidas</h2>
           <div className="space-y-2">
             {quickSuggestions.map((s, i) => (
               <Link key={i} to={s.to}>
@@ -228,10 +273,8 @@ export default function StudentDashboard() {
             ))}
           </div>
 
-          {/* Attendance - General first, then all disciplines */}
+          {/* Attendance */}
           <h2 className="text-lg font-semibold text-foreground mt-6">Presenças</h2>
-          
-          {/* General attendance card */}
           <Card className="p-4 border-2 border-primary/20">
             <div className="flex items-center justify-between mb-2">
               <p className="text-sm font-semibold text-foreground">Presença Geral</p>
@@ -239,9 +282,7 @@ export default function StudentDashboard() {
             </div>
             <Progress value={generalPct} className="h-2" />
             <p className="text-[11px] text-muted-foreground mt-1.5">{totalPresent}P / {totalAbsent}F / {totalJustified}J</p>
-            <p className="text-[10px] text-muted-foreground mt-0.5">Engenharia Informática — 2º Ano</p>
           </Card>
-
           <div className="space-y-3">
             {disciplines.map((disc) => {
               const total = disc.attendance.present + disc.attendance.absent + disc.attendance.justified;

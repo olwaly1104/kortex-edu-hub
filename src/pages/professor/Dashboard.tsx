@@ -105,35 +105,44 @@ export default function ProfessorDashboard() {
                 Ver calendário <ChevronRight className="w-4 h-4" />
               </Link>
             </div>
-            <div className="space-y-3">
+          <Card className="p-0 overflow-hidden">
+            <div className="divide-y divide-border">
               {profTodayClasses.map((aula, i) => {
                 const disc = profDisciplines.find(d => d.id === aula.disciplineId);
                 const cfg = statusConfig[aula.status];
                 const StatusIcon = cfg.icon;
+                const isActive = aula.status === "em_curso";
                 return (
-                  <Card key={i} className="p-4 flex items-center gap-4">
-                    <div className="w-1.5 h-12 rounded-full shrink-0" style={{ background: disc?.color }} />
+                  <div key={i} className={`flex items-center gap-4 px-4 py-3.5 transition-colors ${isActive ? "bg-primary/5" : "hover:bg-muted/30"}`}>
+                    <div className="text-center shrink-0 w-14">
+                      <p className={`text-sm font-bold ${isActive ? "text-primary" : "text-foreground"}`}>{aula.time.split(" – ")[0]}</p>
+                      <p className="text-[10px] text-muted-foreground">{aula.time.split(" – ")[1]}</p>
+                    </div>
+                    <div className="w-0.5 h-10 rounded-full shrink-0" style={{ background: disc?.color }} />
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-foreground">{aula.name}</p>
-                      <div className="flex items-center gap-3 text-sm text-muted-foreground mt-0.5">
-                        <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" />{aula.time}</span>
-                        <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" />{aula.room}</span>
+                      <p className={`font-medium text-sm leading-tight ${isActive ? "text-primary" : "text-foreground"}`}>{aula.name}</p>
+                      <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1">
+                        <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{aula.room}</span>
                         <span>{aula.turma}</span>
                       </div>
                     </div>
+                    <Badge variant={isActive ? "default" : "outline"} className="text-[10px] gap-1 shrink-0">
+                      <StatusIcon className="w-3 h-3" /> {cfg.label}
+                    </Badge>
                     <Button
                       size="sm"
                       variant={aula.status === "concluída" ? "outline" : "default"}
-                      className="gap-1.5 text-xs"
+                      className="gap-1.5 text-xs h-7 px-2"
                       onClick={() => navigate(`/professor/disciplines/${aula.disciplineId}`)}
                     >
-                      <StatusIcon className="w-3.5 h-3.5" />
-                      {cfg.label}
+                      <StatusIcon className="w-3 h-3" />
+                      {cfg.label === "Rever" ? "Rever" : "Ver"}
                     </Button>
-                  </Card>
+                  </div>
                 );
               })}
             </div>
+          </Card>
           </div>
 
           {/* Recent recorded lessons */}
