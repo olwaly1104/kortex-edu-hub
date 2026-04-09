@@ -53,8 +53,55 @@ export default function StudentCalendar() {
   const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
   const navigate = useNavigate();
 
+  // Generate task due date and evaluation date events
+  const derivedEvents = useMemo(() => {
+    const events: typeof calendarEvents = [];
+    // Task due dates from lessons
+    lessons.forEach(lesson => {
+      lesson.tasks.forEach(task => {
+        const dateParts = task.dueDate.split("/");
+        const isoDate = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
+        events.push({
+          id: `task-${task.id}`,
+          title: `Entrega: ${task.title}`,
+          type: "entrega" as const,
+          date: isoDate,
+          startTime: "23:59",
+          endTime: "23:59",
+          discipline: disciplines.find(d => d.id === lesson.disciplineId)?.name,
+          color: "hsl(38, 92%, 50%)",
+        });
+      });
+    });
+    // Evaluation dates from grades
+    grades.forEach(g => {
+      g.evaluations.forEach((ev, i) => {
+        const dateParts = ev.date.split("/");
+        const isoDate = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
+        const existing = calendarEvents.find(e => e.date === isoDate && e.discipline === g.disciplineName);
+        if (!existing) {
+          events.push({
+            id: `eval-${g.id}-${i}`,
+            title: `${ev.name} — ${g.disciplineName}`,
+            type: ev.name.toLowerCase().includes("exame") ? "exame" as const : "teste" as const,
+            date: isoDate,
+            startTime: ev.room ? "08:00" : "23:59",
+            endTime: ev.duration ? "10:00" : "23:59",
+            duration: ev.duration,
+            room: ev.room,
+            discipline: g.disciplineName,
+            color: "hsl(0, 84%, 60%)",
+          });
+        }
+      });
+    });
+    return events;
+  }, []);
+
+  const allCalendarEvents = useMemo(() => [...calendarEvents, ...derivedEvents], [derivedEvents]);
+
   const allAulas = calendarEvents.filter(e => e.type === "aula");
-  const upcomingEvents = calendarEvents.filter(e => e.type === "teste" || e.type === "entrega" || e.type === "exame");
+  const upcomingEvents = allCalendarEvents.filter(e => e.type === "teste" || e.type === "entrega" || e.type === "exame");
   const selectedDayEvents = allAulas.filter(e => e.date === selectedDate);
 
   // Compute lesson number per discipline (sorted by date+time)
