@@ -177,13 +177,8 @@ export default function StudentDashboard() {
                       </div>
                       <div className="w-0.5 h-10 rounded-full shrink-0" style={{ background: evento.color }} />
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-0.5">
-                          <p className={`font-medium text-sm leading-tight truncate ${isActive ? "text-primary" : "text-foreground"}`}>{evento.title}</p>
-                          <Badge variant="outline" className={`text-[9px] gap-1 font-medium border-0 shrink-0 ${cfg.cls}`}>
-                            <StatusIcon className="w-2.5 h-2.5" /> {cfg.label}
-                          </Badge>
-                        </div>
-                        <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                        <p className={`font-medium text-sm leading-tight truncate ${isActive ? "text-primary" : "text-foreground"}`}>{evento.title}</p>
+                        <div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5">
                           {evento.room && (
                             <span className="flex items-center gap-1">
                               <MapPin className="w-3 h-3" />{evento.room}
@@ -192,21 +187,25 @@ export default function StudentDashboard() {
                           {evento.professor && <span>{evento.professor}</span>}
                         </div>
                       </div>
+                      <Badge variant="outline" className={`text-[9px] gap-1 font-medium shrink-0 ${cfg.cls}`}>
+                        <StatusIcon className="w-2.5 h-2.5" /> {cfg.label}
+                      </Badge>
                       <div className="shrink-0">
                         {status === "concluída" && matchingLesson ? (
-                          <Button variant="ghost" size="sm" className="h-7 px-2.5 text-[10px] gap-1 font-medium text-muted-foreground hover:text-foreground" onClick={() => navigate(`/student/disciplines/${disc!.id}/lessons/${matchingLesson.id}`)}>
+                          <Button variant="outline" size="sm" className="h-7 px-3 text-[10px] gap-1.5 font-medium" onClick={() => navigate(`/student/disciplines/${disc!.id}/lessons/${matchingLesson.id}`)}>
                             <Play className="w-3 h-3" /> Rever
                           </Button>
                         ) : isActive && matchingLesson ? (
-                          <Button size="sm" className="h-7 px-3 text-[10px] gap-1.5 font-medium bg-primary hover:bg-primary/90" onClick={() => navigate(`/student/disciplines/${disc!.id}/lessons/${matchingLesson.id}`)}>
+                          <Button variant="outline" size="sm" className="h-7 px-3 text-[10px] gap-1.5 font-medium border-primary text-primary hover:bg-primary hover:text-primary-foreground" onClick={() => navigate(`/student/disciplines/${disc!.id}/lessons/${matchingLesson.id}`)}>
                             <Play className="w-3 h-3" /> Entrar
                           </Button>
                         ) : status === "agendada" && matchingLesson ? (
-                          <Button variant="ghost" size="sm" className="h-7 px-2.5 text-[10px] gap-1 font-medium text-muted-foreground" onClick={() => navigate(`/student/disciplines/${disc!.id}/lessons/${matchingLesson.id}`)}>
+                          <Button variant="outline" size="sm" className="h-7 px-3 text-[10px] gap-1.5 font-medium" onClick={() => navigate(`/student/disciplines/${disc!.id}/lessons/${matchingLesson.id}`)}>
                             Ver
                           </Button>
                         ) : null}
                       </div>
+                    </div>
                     </div>
                   );
                 })}
