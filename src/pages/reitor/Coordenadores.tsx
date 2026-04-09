@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { Link } from "react-router-dom";
 import { reitorCoordsDetail } from "@/data/institutionData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -197,7 +198,7 @@ export default function ReitorCoordenadores() {
                 : "bg-muted text-muted-foreground border-border";
             return (
               <tr key={c.id} className="border-b last:border-0 hover:bg-muted/20 transition-colors">
-                <td className="p-3"><p className="font-medium text-foreground">{c.name}</p><p className="text-[11px] text-muted-foreground">{c.email}</p></td>
+                <td className="p-3"><Link to={`/reitor/coordenadores/${c.id}`} className="font-medium text-primary hover:underline">{c.name}</Link><p className="text-[11px] text-muted-foreground">{c.email}</p></td>
                 <td className="p-3 text-muted-foreground text-xs">{c.course}</td>
                 <td className="p-3 text-muted-foreground text-xs">{c.faculty}</td>
                 <td className="p-3 text-center font-medium text-foreground">{c.estudantesTotal}</td>
