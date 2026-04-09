@@ -1,5 +1,6 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { disciplines, announcements, lessons, calendarEvents, grades } from "@/data/mockData";
+import { payments } from "@/data/financeData";
 import { BookOpen, Wallet, Calendar, Bell, ChevronRight, Clock, MapPin, Play, BarChart3, ArrowRight } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -61,7 +62,7 @@ export default function StudentDashboard() {
           { icon: BarChart3, label: "Presença Geral", value: `${generalPct}%`, color: generalPct >= 75 ? "text-accent bg-accent/10" : "text-destructive bg-destructive/10" },
           { icon: BarChart3, label: "Média Geral", value: overallAvg !== null ? overallAvg : "—", color: overallAvg !== null && overallAvg >= 10 ? "text-accent bg-accent/10" : "text-destructive bg-destructive/10", suffix: overallAvg !== null ? "/20" : "" },
           { icon: BookOpen, label: "Cadeiras", value: disciplines.length, color: "text-primary bg-primary/10" },
-          { icon: Video, label: "Aulas Gravadas", value: lessons.length, color: "text-secondary bg-secondary/10" },
+          { icon: Wallet, label: "Situação Financeira", value: payments.some(p => p.status === 'overdue') ? "Em dívida" : payments.some(p => p.status === 'pending') ? "Pendente" : "Em dia", color: payments.some(p => p.status === 'overdue') ? "text-destructive bg-destructive/10" : payments.some(p => p.status === 'pending') ? "text-yellow-600 bg-yellow-500/10" : "text-accent bg-accent/10", link: "/student/finances" },
         ].map((stat) => (
           <Card key={stat.label} className="p-4 flex items-center gap-4">
             <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${stat.color}`}>
