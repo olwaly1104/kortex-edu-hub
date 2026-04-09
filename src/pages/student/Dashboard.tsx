@@ -41,8 +41,8 @@ export default function StudentDashboard() {
     return "agendada";
   };
   const statusConfig: Record<string, { label: string; icon: React.ElementType; cls: string }> = {
-    concluída: { label: "Concluída", icon: CheckCircle, cls: "bg-muted text-muted-foreground" },
-    em_curso: { label: "A Decorrer", icon: Play, cls: "bg-accent/15 text-accent border-accent/30" },
+    concluída: { label: "Concluída", icon: CheckCircle, cls: "bg-emerald-50 text-emerald-600 border-emerald-200" },
+    em_curso: { label: "A Decorrer", icon: Loader2, cls: "bg-amber-50 text-amber-600 border-amber-200" },
     agendada: { label: "Agendada", icon: Clock, cls: "bg-muted text-muted-foreground" },
   };
 
