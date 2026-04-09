@@ -192,16 +192,16 @@ export default function StudentDashboard() {
                       </Badge>
                       <div className="shrink-0">
                         {status === "concluída" && matchingLesson ? (
-                          <Button variant="outline" size="sm" className="h-7 px-3 text-[10px] gap-1.5 font-medium" onClick={() => navigate(`/student/disciplines/${disc!.id}/lessons/${matchingLesson.id}`)}>
+                          <Button variant="outline" size="sm" className="h-7 px-3 text-[10px] gap-1.5 font-medium border-emerald-200 text-emerald-600 hover:bg-emerald-50" onClick={() => navigate(`/student/disciplines/${disc!.id}/lessons/${matchingLesson.id}`)}>
                             <Play className="w-3 h-3" /> Rever
                           </Button>
                         ) : isActive && matchingLesson ? (
-                          <Button variant="outline" size="sm" className="h-7 px-3 text-[10px] gap-1.5 font-medium border-primary text-primary hover:bg-primary hover:text-primary-foreground" onClick={() => navigate(`/student/disciplines/${disc!.id}/lessons/${matchingLesson.id}`)}>
-                            <Play className="w-3 h-3" /> Entrar
+                          <Button variant="outline" size="sm" className="h-7 px-3 text-[10px] gap-1.5 font-medium border-amber-200 text-amber-600 hover:bg-amber-50" onClick={() => navigate(`/student/disciplines/${disc!.id}/lessons/${matchingLesson.id}`)}>
+                            <Video className="w-3 h-3" /> Entrar
                           </Button>
                         ) : status === "agendada" && matchingLesson ? (
                           <Button variant="outline" size="sm" className="h-7 px-3 text-[10px] gap-1.5 font-medium" onClick={() => navigate(`/student/disciplines/${disc!.id}/lessons/${matchingLesson.id}`)}>
-                            Ver
+                            <Video className="w-3 h-3" /> Entrar
                           </Button>
                         ) : null}
                       </div>
