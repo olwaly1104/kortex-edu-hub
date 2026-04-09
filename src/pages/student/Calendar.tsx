@@ -436,7 +436,7 @@ export default function StudentCalendar() {
                 {selected.type === "aula" && (
                   <div className="pt-2">
                     {isPastDate(selected.date) || (isToday(selected.date) && timeToMinutes(selected.endTime) < timeToMinutes("10:45")) ? (
-                      <Button size="sm" variant="outline" className="w-full gap-2 text-xs border-emerald-200 text-emerald-600 hover:bg-emerald-50" onClick={() => handleReverAula(selected)}>
+                      <Button size="sm" variant="outline" className="w-full gap-2 text-xs" onClick={() => handleReverAula(selected)}>
                         <Video className="w-3.5 h-3.5" /> Rever Aula
                       </Button>
                     ) : (
@@ -514,7 +514,7 @@ export default function StudentCalendar() {
                         </div>
                       </div>
                       {past ? (
-                        <Button variant="outline" size="sm" className="w-full gap-2 text-xs border-emerald-200 text-emerald-600 hover:bg-emerald-50" onClick={e => { e.stopPropagation(); handleReverAula(event); }}>
+                        <Button variant="outline" size="sm" className="w-full gap-2 text-xs" onClick={e => { e.stopPropagation(); handleReverAula(event); }}>
                           <Video className="w-3.5 h-3.5" /> Rever Aula
                         </Button>
                       ) : (
