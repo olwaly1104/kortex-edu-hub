@@ -4,7 +4,7 @@ import { calendarEvents, disciplines, lessons, grades } from "@/data/mockData";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ChevronLeft, ChevronRight, Clock, MapPin, Video, Play, User, CalendarDays, ClipboardCheck, FileText } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock, MapPin, Video, Play, User, CalendarDays, ClipboardCheck, FileText, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
