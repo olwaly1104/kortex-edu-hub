@@ -4,7 +4,7 @@ import { calendarEvents, disciplines, lessons, grades } from "@/data/mockData";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ChevronLeft, ChevronRight, Clock, MapPin, Video, Play, User, CalendarDays, ClipboardCheck, FileText, AlertTriangle } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock, MapPin, Video, Play, User, CalendarDays, ClipboardCheck, FileText, AlertTriangle, LogIn } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -303,14 +303,14 @@ export default function StudentCalendar() {
                                       className="flex items-center justify-center gap-1 text-[9px] font-semibold text-white/90 bg-white/20 rounded-md px-2 py-1 w-full mt-1 hover:bg-white/30 transition-colors"
                                       onClick={(ev) => { ev.stopPropagation(); handleReverAula(event); }}
                                     >
-                                      <Play className="w-3 h-3" /> Rever
+                                      <Video className="w-3 h-3" /> Rever
                                     </div>
                                   ) : (
                                     <div
                                       className="flex items-center justify-center gap-1 text-[9px] font-semibold text-white bg-white/25 rounded-md px-2 py-1 w-full mt-1 hover:bg-white/35 transition-colors"
                                       onClick={(ev) => { ev.stopPropagation(); handleEntrarAula(event); }}
                                     >
-                                      <Video className="w-3 h-3" /> Entrar
+                                      <LogIn className="w-3 h-3" /> Entrar
                                     </div>
                                   )
                                 )}
@@ -360,16 +360,27 @@ export default function StudentCalendar() {
                         isSelectedDay ? "bg-primary text-primary-foreground" : isTodayDay ? "ring-2 ring-primary text-foreground" : "text-foreground"
                       )}>{day}</p>
                       <div className="space-y-0.5">
-                        {dayEvents.slice(0, 3).map(ev => (
-                          <div
-                            key={ev.id}
-                            className="text-[9px] px-1.5 py-0.5 rounded truncate font-medium text-white cursor-pointer hover:brightness-110"
-                            style={{ backgroundColor: ev.color }}
-                            onClick={(e) => { e.stopPropagation(); setSelectedEvent(ev.id); setSelectedDate(dateStr); }}
-                          >
-                            {ev.startTime} {ev.title}
-                          </div>
-                        ))}
+                        {dayEvents.slice(0, 3).map(ev => {
+                          const isTask = ev.type === "entrega";
+                          const isEval = ev.type === "teste" || ev.type === "exame";
+                          return (
+                            <div
+                              key={ev.id}
+                              className={cn(
+                                "text-[9px] px-1.5 py-0.5 rounded truncate font-medium cursor-pointer",
+                                isTask
+                                  ? "bg-amber-100 text-amber-700 border border-amber-300/50 hover:bg-amber-200"
+                                  : isEval
+                                  ? "bg-red-100 text-red-700 border border-red-300/50 hover:bg-red-200"
+                                  : "text-white hover:brightness-110"
+                              )}
+                              style={!isTask && !isEval ? { backgroundColor: ev.color } : undefined}
+                              onClick={(e) => { e.stopPropagation(); setSelectedEvent(ev.id); setSelectedDate(dateStr); }}
+                            >
+                              {isTask ? "📋 " : isEval ? "📝 " : ""}{ev.startTime !== "23:59" ? `${ev.startTime} ` : ""}{ev.title}
+                            </div>
+                          );
+                        })}
                         {dayEvents.length > 3 && (
                           <p className="text-[9px] text-muted-foreground pl-1">+{dayEvents.length - 3} mais</p>
                         )}
@@ -425,12 +436,12 @@ export default function StudentCalendar() {
                 {selected.type === "aula" && (
                   <div className="pt-2">
                     {isPastDate(selected.date) || (isToday(selected.date) && timeToMinutes(selected.endTime) < timeToMinutes("10:45")) ? (
-                      <Button size="sm" variant="outline" className="w-full gap-2 text-xs border-muted-foreground/30 text-muted-foreground hover:bg-muted/50" onClick={() => handleReverAula(selected)}>
-                        <Play className="w-3.5 h-3.5" /> Rever Aula
+                      <Button size="sm" variant="outline" className="w-full gap-2 text-xs border-emerald-200 text-emerald-600 hover:bg-emerald-50" onClick={() => handleReverAula(selected)}>
+                        <Video className="w-3.5 h-3.5" /> Rever Aula
                       </Button>
                     ) : (
-                      <Button size="sm" className="w-full gap-2 text-xs bg-primary hover:bg-primary/90" onClick={() => handleEntrarAula(selected)}>
-                        <Video className="w-3.5 h-3.5" /> Entrar na Aula
+                      <Button size="sm" variant="outline" className="w-full gap-2 text-xs" onClick={() => handleEntrarAula(selected)}>
+                        <LogIn className="w-3.5 h-3.5" /> Entrar na Aula
                       </Button>
                     )}
                   </div>
@@ -503,12 +514,12 @@ export default function StudentCalendar() {
                         </div>
                       </div>
                       {past ? (
-                        <Button variant="outline" size="sm" className="w-full gap-2 text-xs border-muted-foreground/30 text-muted-foreground hover:bg-muted/50" onClick={e => { e.stopPropagation(); handleReverAula(event); }}>
-                          <Play className="w-3.5 h-3.5" /> Rever Aula
+                        <Button variant="outline" size="sm" className="w-full gap-2 text-xs border-emerald-200 text-emerald-600 hover:bg-emerald-50" onClick={e => { e.stopPropagation(); handleReverAula(event); }}>
+                          <Video className="w-3.5 h-3.5" /> Rever Aula
                         </Button>
                       ) : (
-                        <Button size="sm" className="w-full gap-2 text-xs bg-primary hover:bg-primary/90" onClick={e => { e.stopPropagation(); handleEntrarAula(event); }}>
-                          <Video className="w-3.5 h-3.5" /> Entrar na Aula
+                        <Button variant="outline" size="sm" className="w-full gap-2 text-xs" onClick={e => { e.stopPropagation(); handleEntrarAula(event); }}>
+                          <LogIn className="w-3.5 h-3.5" /> Entrar na Aula
                         </Button>
                       )}
                     </div>

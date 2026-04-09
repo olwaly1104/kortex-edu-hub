@@ -25,6 +25,8 @@ const studentSections: NavSection[] = [
     { label: "Biblioteca Virtual", icon: Library, path: "/student/library" },
   ]},
   { title: "Comunicação", items: [
+    { label: "Chat", icon: MessageSquare, path: "/student/chat" },
+    { label: "Email", icon: Mail, path: "/student/email" },
     { label: "Contactos", icon: Users, path: "/student/contacts" },
   ]},
   { title: "Pessoal", items: [

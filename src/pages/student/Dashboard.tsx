@@ -2,7 +2,7 @@ import React from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { disciplines, announcements, lessons, calendarEvents, grades } from "@/data/mockData";
 import { payments } from "@/data/financeData";
-import { BookOpen, Wallet, Calendar, Bell, ChevronRight, Clock, MapPin, Play, BarChart3, ArrowRight, CheckCircle, Building2, GraduationCap, Users, Loader2, Video } from "lucide-react";
+import { BookOpen, Wallet, Calendar, Bell, ChevronRight, Clock, MapPin, Play, BarChart3, ArrowRight, CheckCircle, Building2, GraduationCap, Users, Loader2, Video, LogIn } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -193,15 +193,15 @@ export default function StudentDashboard() {
                       <div className="shrink-0">
                         {status === "concluída" && matchingLesson ? (
                           <Button variant="outline" size="sm" className="h-7 px-3 text-[10px] gap-1.5 font-medium border-emerald-200 text-emerald-600 hover:bg-emerald-50" onClick={() => navigate(`/student/disciplines/${disc!.id}/lessons/${matchingLesson.id}`)}>
-                            <Play className="w-3 h-3" /> Rever
+                            <Video className="w-3 h-3" /> Rever
                           </Button>
                         ) : isActive && matchingLesson ? (
                           <Button variant="outline" size="sm" className="h-7 px-3 text-[10px] gap-1.5 font-medium border-amber-200 text-amber-600 hover:bg-amber-50" onClick={() => navigate(`/student/disciplines/${disc!.id}/lessons/${matchingLesson.id}`)}>
-                            <Video className="w-3 h-3" /> Entrar
+                            <LogIn className="w-3 h-3" /> Entrar
                           </Button>
                         ) : status === "agendada" && matchingLesson ? (
                           <Button variant="outline" size="sm" className="h-7 px-3 text-[10px] gap-1.5 font-medium" onClick={() => navigate(`/student/disciplines/${disc!.id}/lessons/${matchingLesson.id}`)}>
-                            <Video className="w-3 h-3" /> Entrar
+                            <LogIn className="w-3 h-3" /> Entrar
                           </Button>
                         ) : null}
                       </div>

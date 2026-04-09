@@ -132,6 +132,8 @@ function AppRoutes() {
         <Route path="/student/calendar" element={<StudentCalendar />} />
         <Route path="/student/announcements" element={<StudentAnnouncements />} />
         <Route path="/student/contacts" element={<StudentContacts />} />
+        <Route path="/student/chat" element={<StudentChat />} />
+        <Route path="/student/email" element={<StudentEmail />} />
         <Route path="/student/grades" element={<StudentGrades />} />
         <Route path="/student/library" element={<StudentLibrary />} />
         <Route path="/student/profile" element={<StudentProfile />} />
