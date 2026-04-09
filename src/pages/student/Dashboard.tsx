@@ -1,3 +1,4 @@
+import React from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { disciplines, announcements, lessons, calendarEvents, grades } from "@/data/mockData";
 import { payments } from "@/data/financeData";
