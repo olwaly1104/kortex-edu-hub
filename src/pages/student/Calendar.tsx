@@ -381,7 +381,6 @@ export default function StudentCalendar() {
                             </div>
                           );
                         })}
-                        ))}
                         {dayEvents.length > 3 && (
                           <p className="text-[9px] text-muted-foreground pl-1">+{dayEvents.length - 3} mais</p>
                         )}
