@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { reitorCoordsDetail } from "@/data/institutionData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +13,7 @@ type SortField = "presenca" | "taxaEntrega" | "mediaGeral";
 type SortDir = "asc" | "desc";
 
 export default function ReitorCoordenadores() {
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [filterFaculty, setFilterFaculty] = useState<string>("todos");
   const [sortField, setSortField] = useState<SortField | null>(null);
@@ -197,8 +198,8 @@ export default function ReitorCoordenadores() {
                 ? "bg-destructive/15 text-destructive border-destructive/30"
                 : "bg-muted text-muted-foreground border-border";
             return (
-              <tr key={c.id} className="border-b last:border-0 hover:bg-muted/20 transition-colors">
-                <td className="p-3"><Link to={`/reitor/coordenadores/${c.id}`} className="font-medium text-primary hover:underline">{c.name}</Link><p className="text-[11px] text-muted-foreground">{c.email}</p></td>
+              <tr key={c.id} className="border-b last:border-0 hover:bg-muted/20 transition-colors cursor-pointer" onClick={() => navigate(`/reitor/coordenadores/${c.id}`)}>
+                <td className="p-3"><span className="font-medium text-foreground">{c.name}</span><p className="text-[11px] text-muted-foreground">{c.email}</p></td>
                 <td className="p-3 text-muted-foreground text-xs">{c.course}</td>
                 <td className="p-3 text-muted-foreground text-xs">{c.faculty}</td>
                 <td className="p-3 text-center font-medium text-foreground">{c.estudantesTotal}</td>
