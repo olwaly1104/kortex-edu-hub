@@ -303,14 +303,14 @@ export default function StudentCalendar() {
                                       className="flex items-center justify-center gap-1 text-[9px] font-semibold text-white/90 bg-white/20 rounded-md px-2 py-1 w-full mt-1 hover:bg-white/30 transition-colors"
                                       onClick={(ev) => { ev.stopPropagation(); handleReverAula(event); }}
                                     >
-                                      <Play className="w-3 h-3" /> Rever
+                                      <Video className="w-3 h-3" /> Rever
                                     </div>
                                   ) : (
                                     <div
                                       className="flex items-center justify-center gap-1 text-[9px] font-semibold text-white bg-white/25 rounded-md px-2 py-1 w-full mt-1 hover:bg-white/35 transition-colors"
                                       onClick={(ev) => { ev.stopPropagation(); handleEntrarAula(event); }}
                                     >
-                                      <Video className="w-3 h-3" /> Entrar
+                                      <LogIn className="w-3 h-3" /> Entrar
                                     </div>
                                   )
                                 )}
@@ -425,12 +425,12 @@ export default function StudentCalendar() {
                 {selected.type === "aula" && (
                   <div className="pt-2">
                     {isPastDate(selected.date) || (isToday(selected.date) && timeToMinutes(selected.endTime) < timeToMinutes("10:45")) ? (
-                      <Button size="sm" variant="outline" className="w-full gap-2 text-xs border-muted-foreground/30 text-muted-foreground hover:bg-muted/50" onClick={() => handleReverAula(selected)}>
-                        <Play className="w-3.5 h-3.5" /> Rever Aula
+                      <Button size="sm" variant="outline" className="w-full gap-2 text-xs border-emerald-200 text-emerald-600 hover:bg-emerald-50" onClick={() => handleReverAula(selected)}>
+                        <Video className="w-3.5 h-3.5" /> Rever Aula
                       </Button>
                     ) : (
-                      <Button size="sm" className="w-full gap-2 text-xs bg-primary hover:bg-primary/90" onClick={() => handleEntrarAula(selected)}>
-                        <Video className="w-3.5 h-3.5" /> Entrar na Aula
+                      <Button size="sm" variant="outline" className="w-full gap-2 text-xs" onClick={() => handleEntrarAula(selected)}>
+                        <LogIn className="w-3.5 h-3.5" /> Entrar na Aula
                       </Button>
                     )}
                   </div>
@@ -503,12 +503,12 @@ export default function StudentCalendar() {
                         </div>
                       </div>
                       {past ? (
-                        <Button variant="outline" size="sm" className="w-full gap-2 text-xs border-muted-foreground/30 text-muted-foreground hover:bg-muted/50" onClick={e => { e.stopPropagation(); handleReverAula(event); }}>
-                          <Play className="w-3.5 h-3.5" /> Rever Aula
+                        <Button variant="outline" size="sm" className="w-full gap-2 text-xs border-emerald-200 text-emerald-600 hover:bg-emerald-50" onClick={e => { e.stopPropagation(); handleReverAula(event); }}>
+                          <Video className="w-3.5 h-3.5" /> Rever Aula
                         </Button>
                       ) : (
-                        <Button size="sm" className="w-full gap-2 text-xs bg-primary hover:bg-primary/90" onClick={e => { e.stopPropagation(); handleEntrarAula(event); }}>
-                          <Video className="w-3.5 h-3.5" /> Entrar na Aula
+                        <Button variant="outline" size="sm" className="w-full gap-2 text-xs" onClick={e => { e.stopPropagation(); handleEntrarAula(event); }}>
+                          <LogIn className="w-3.5 h-3.5" /> Entrar na Aula
                         </Button>
                       )}
                     </div>
