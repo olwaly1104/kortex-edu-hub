@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { calendarEvents, disciplines, lessons } from "@/data/mockData";
+import { calendarEvents, disciplines, lessons, grades } from "@/data/mockData";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ChevronLeft, ChevronRight, Clock, MapPin, Video, Play, User, CalendarDays } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock, MapPin, Video, Play, User, CalendarDays, ClipboardCheck, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -53,8 +53,55 @@ export default function StudentCalendar() {
   const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
   const navigate = useNavigate();
 
+  // Generate task due date and evaluation date events
+  const derivedEvents = useMemo(() => {
+    const events: typeof calendarEvents = [];
+    // Task due dates from lessons
+    lessons.forEach(lesson => {
+      lesson.tasks.forEach(task => {
+        const dateParts = task.dueDate.split("/");
+        const isoDate = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
+        events.push({
+          id: `task-${task.id}`,
+          title: `Entrega: ${task.title}`,
+          type: "entrega" as const,
+          date: isoDate,
+          startTime: "23:59",
+          endTime: "23:59",
+          discipline: disciplines.find(d => d.id === lesson.disciplineId)?.name,
+          color: "hsl(38, 92%, 50%)",
+        });
+      });
+    });
+    // Evaluation dates from grades
+    grades.forEach(g => {
+      g.evaluations.forEach((ev, i) => {
+        const dateParts = ev.date.split("/");
+        const isoDate = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
+        const existing = calendarEvents.find(e => e.date === isoDate && e.discipline === g.disciplineName);
+        if (!existing) {
+          events.push({
+            id: `eval-${g.id}-${i}`,
+            title: `${ev.name} — ${g.disciplineName}`,
+            type: ev.name.toLowerCase().includes("exame") ? "exame" as const : "teste" as const,
+            date: isoDate,
+            startTime: ev.room ? "08:00" : "23:59",
+            endTime: ev.duration ? "10:00" : "23:59",
+            duration: ev.duration,
+            room: ev.room,
+            discipline: g.disciplineName,
+            color: "hsl(0, 84%, 60%)",
+          });
+        }
+      });
+    });
+    return events;
+  }, []);
+
+  const allCalendarEvents = useMemo(() => [...calendarEvents, ...derivedEvents], [derivedEvents]);
+
   const allAulas = calendarEvents.filter(e => e.type === "aula");
-  const upcomingEvents = calendarEvents.filter(e => e.type === "teste" || e.type === "entrega" || e.type === "exame");
+  const upcomingEvents = allCalendarEvents.filter(e => e.type === "teste" || e.type === "entrega" || e.type === "exame");
   const selectedDayEvents = allAulas.filter(e => e.date === selectedDate);
 
   // Compute lesson number per discipline (sorted by date+time)
@@ -275,7 +322,7 @@ export default function StudentCalendar() {
                 ))}
                 {monthDays.map(day => {
                   const dateStr = `2024-02-${String(day).padStart(2, "0")}`;
-                  const dayEvents = calendarEvents.filter(e => e.date === dateStr);
+                  const dayEvents = allCalendarEvents.filter(e => e.date === dateStr);
                   const isWeekend = ((monthStartDay + day - 1) % 7) >= 5;
                   const isTodayDay = dateStr === TODAY_DATE;
                   const isSelectedDay = selectedDate === dateStr;
@@ -423,6 +470,36 @@ export default function StudentCalendar() {
               <ChevronRight className="w-4 h-4" />
             </Button>
           </div>
+          {/* Tasks & Evaluations for selected day */}
+          {(() => {
+            const dayDeadlines = allCalendarEvents.filter(e => e.date === selectedDate && (e.type === "entrega" || e.type === "teste" || e.type === "exame"));
+            if (dayDeadlines.length > 0) {
+              return (
+                <div className="space-y-2 mb-4">
+                  <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+                    <ClipboardCheck className="w-3.5 h-3.5" /> Prazos & Avaliações
+                  </h4>
+                  {dayDeadlines.map(ev => (
+                    <div key={ev.id} className="flex items-center gap-3 p-2.5 rounded-lg border border-border bg-card">
+                      <div className="w-1 h-8 rounded-full shrink-0" style={{ backgroundColor: ev.color }} />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-semibold text-foreground truncate">{ev.title}</p>
+                        {ev.discipline && <p className="text-[10px] text-muted-foreground">{ev.discipline}</p>}
+                      </div>
+                      <Badge variant="outline" className={cn("text-[10px] shrink-0",
+                        ev.type === "entrega" ? "border-secondary/30 text-secondary" : "border-destructive/30 text-destructive"
+                      )}>
+                        {ev.type === "entrega" ? "Tarefa" : ev.type === "teste" ? "Teste" : "Exame"}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              );
+            }
+            return null;
+          })()}
+
+          {/* Aulas */}
           <div className="space-y-3">
               {selectedDayEvents.length > 0 ? selectedDayEvents.map(event => {
                 const past = isPastDate(event.date) || (isToday(event.date) && timeToMinutes(event.endTime) < timeToMinutes("10:45"));
@@ -435,10 +512,8 @@ export default function StudentCalendar() {
                       selectedEvent === event.id && "ring-1 ring-primary/40 shadow-md"
                     )}
                   >
-                    {/* Color top bar */}
                     <div className="h-1" style={{ backgroundColor: event.color }} />
                     <div className="p-3.5">
-                       {/* Discipline title + lesson number */}
                        <div className="flex items-center justify-between gap-2 mb-2.5">
                          <div className="flex items-center gap-2 min-w-0">
                            <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: event.color }} />
@@ -450,7 +525,6 @@ export default function StudentCalendar() {
                            </span>
                          )}
                        </div>
-                      {/* Details */}
                       <div className="space-y-1.5 mb-3 pl-4">
                         <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
                           <Clock className="w-3 h-3 shrink-0" />
@@ -465,7 +539,6 @@ export default function StudentCalendar() {
                           <span>{event.room}</span>
                         </div>
                       </div>
-                      {/* Action */}
                       {past ? (
                         <Button variant="secondary" size="sm" className="w-full gap-2 text-xs" onClick={e => { e.stopPropagation(); handleReverAula(event); }}>
                           <Play className="w-3.5 h-3.5" /> Rever Aula
