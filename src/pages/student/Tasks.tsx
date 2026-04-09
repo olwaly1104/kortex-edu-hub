@@ -126,7 +126,7 @@ export default function StudentTasks() {
         <div className="flex flex-wrap gap-2">
           <Button size="sm" variant={filterDisc === "todos" ? "default" : "outline"} onClick={() => setFilterDisc("todos")} className="text-xs">Todas Cadeiras</Button>
           {disciplines.map(d => (
-            <Button key={d.id} size="sm" variant={filterDisc === d.id ? "default" : "outline"} onClick={() => setFilterDisc(d.id)} className="text-xs">{d.code}</Button>
+            <Button key={d.id} size="sm" variant={filterDisc === d.id ? "default" : "outline"} onClick={() => setFilterDisc(d.id)} className="text-xs">{d.name}</Button>
           ))}
         </div>
 
@@ -189,7 +189,7 @@ export default function StudentTasks() {
           <div className="flex flex-wrap gap-1.5 pt-1">
             {isFacultyActive && (
               <Badge variant="outline" className="text-[10px] gap-1 bg-primary/5 text-primary border-primary/20 cursor-pointer hover:bg-primary/10" onClick={() => setFilterDisc("todos")}>
-                Cadeira: {disciplines.find(d => d.id === filterDisc)?.code} <X className="w-2.5 h-2.5" />
+                Cadeira: {disciplines.find(d => d.id === filterDisc)?.name} <X className="w-2.5 h-2.5" />
               </Badge>
             )}
             {isSortActive && (
@@ -219,8 +219,8 @@ export default function StudentTasks() {
               <th className="text-left p-3 font-medium text-muted-foreground">Tarefa</th>
               <th className="text-left p-3 font-medium text-muted-foreground">Cadeira</th>
               <th className="text-center p-3 font-medium text-muted-foreground">Prazo</th>
-              <th className="text-center p-3 font-medium text-muted-foreground">Nota</th>
               <th className="text-center p-3 font-medium text-muted-foreground">Estado</th>
+              <th className="text-center p-3 font-medium text-muted-foreground">Nota</th>
             </tr>
           </thead>
           <tbody>
@@ -236,7 +236,7 @@ export default function StudentTasks() {
                     <p className="font-medium text-foreground text-sm">{task.title}</p>
                   </td>
                   <td className="p-3">
-                    <span className="text-xs font-medium" style={{ color: task.disciplineColor }}>{task.disciplineCode}</span>
+                    <span className="text-xs font-medium" style={{ color: task.disciplineColor }}>{task.disciplineName}</span>
                   </td>
                   <td className="p-3 text-center">
                     <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground">
@@ -245,14 +245,14 @@ export default function StudentTasks() {
                     </div>
                   </td>
                   <td className="p-3 text-center">
+                    <Badge variant="outline" className={cn("text-[10px]", cfg.bg, cfg.color, "border-transparent")}>{cfg.label}</Badge>
+                  </td>
+                  <td className="p-3 text-center">
                     {task.grade != null ? (
                       <span className={cn("font-bold text-sm", task.grade >= 10 ? "text-accent" : "text-destructive")}>{task.grade}/20</span>
                     ) : (
                       <span className="text-muted-foreground text-sm">—</span>
                     )}
-                  </td>
-                  <td className="p-3 text-center">
-                    <Badge variant="outline" className={cn("text-[10px]", cfg.bg, cfg.color, "border-transparent")}>{cfg.label}</Badge>
                   </td>
                 </tr>
               );
