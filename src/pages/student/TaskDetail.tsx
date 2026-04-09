@@ -108,33 +108,18 @@ export default function TaskDetail() {
           <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2 text-sm">
             <ClipboardList className="w-4 h-4 text-primary" /> Guia da Tarefa
           </h3>
-          <div className="space-y-2">
-            <div className="flex items-center gap-3 p-3 rounded-lg border border-primary/15 bg-primary/[0.03]">
-              <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                <FileText className="w-4 h-4 text-primary" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-foreground">Guia_da_Tarefa_{task.title.replace(/\s+/g, "_")}.pdf</p>
-                <p className="text-[11px] text-muted-foreground">PDF · Instruções detalhadas e critérios de avaliação</p>
-              </div>
-              <div className="flex items-center gap-0.5 shrink-0">
-                <button className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground" title="Ver"><Eye className="w-4 h-4" /></button>
-                <button className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground" title="Descarregar"><Download className="w-4 h-4" /></button>
-                <button className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground" title="Partilhar"><Share2 className="w-4 h-4" /></button>
-              </div>
+          <div className="flex items-center gap-3 p-3 rounded-lg border border-primary/15 bg-primary/[0.03]">
+            <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+              <FileText className="w-4 h-4 text-primary" />
             </div>
-            <div className="flex items-center gap-3 p-3 rounded-lg border border-primary/15 bg-primary/[0.03]">
-              <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                <Monitor className="w-4 h-4 text-primary" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-foreground">Slides_Guia_{task.title.replace(/\s+/g, "_")}.pptx</p>
-                <p className="text-[11px] text-muted-foreground">PPTX · Apresentação de apoio à tarefa</p>
-              </div>
-              <div className="flex items-center gap-0.5 shrink-0">
-                <button className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground" title="Ver"><Eye className="w-4 h-4" /></button>
-                <button className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground" title="Descarregar"><Download className="w-4 h-4" /></button>
-              </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-foreground">Guia_da_Tarefa_{task.title.replace(/\s+/g, "_")}.pdf</p>
+              <p className="text-[11px] text-muted-foreground">PDF · Instruções detalhadas e critérios de avaliação</p>
+            </div>
+            <div className="flex items-center gap-0.5 shrink-0">
+              <button className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground" title="Ver"><Eye className="w-4 h-4" /></button>
+              <button className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground" title="Descarregar"><Download className="w-4 h-4" /></button>
+              <button className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground" title="Partilhar"><Share2 className="w-4 h-4" /></button>
             </div>
           </div>
         </div>
