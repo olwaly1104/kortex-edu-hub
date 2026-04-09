@@ -462,35 +462,6 @@ export default function StudentCalendar() {
               <ChevronRight className="w-4 h-4" />
             </Button>
           </div>
-          {/* Tasks & Evaluations for selected day */}
-          {(() => {
-            const dayDeadlines = allCalendarEvents.filter(e => e.date === selectedDate && (e.type === "entrega" || e.type === "teste" || e.type === "exame"));
-            if (dayDeadlines.length > 0) {
-              return (
-                <div className="space-y-2 mb-4">
-                  <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
-                    <ClipboardCheck className="w-3.5 h-3.5" /> Prazos & Avaliações
-                  </h4>
-                  {dayDeadlines.map(ev => (
-                    <div key={ev.id} className="flex items-center gap-3 p-2.5 rounded-lg border border-border bg-card">
-                      <div className="w-1 h-8 rounded-full shrink-0" style={{ backgroundColor: ev.color }} />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-semibold text-foreground truncate">{ev.title}</p>
-                        {ev.discipline && <p className="text-[10px] text-muted-foreground">{ev.discipline}</p>}
-                      </div>
-                      <Badge variant="outline" className={cn("text-[10px] shrink-0",
-                        ev.type === "entrega" ? "border-secondary/30 text-secondary" : "border-destructive/30 text-destructive"
-                      )}>
-                        {ev.type === "entrega" ? "Tarefa" : ev.type === "teste" ? "Teste" : "Exame"}
-                      </Badge>
-                    </div>
-                  ))}
-                </div>
-              );
-            }
-            return null;
-          })()}
-
           {/* Aulas */}
           <div className="space-y-3">
               {selectedDayEvents.length > 0 ? selectedDayEvents.map(event => {
@@ -532,11 +503,11 @@ export default function StudentCalendar() {
                         </div>
                       </div>
                       {past ? (
-                        <Button variant="secondary" size="sm" className="w-full gap-2 text-xs" onClick={e => { e.stopPropagation(); handleReverAula(event); }}>
+                        <Button variant="outline" size="sm" className="w-full gap-2 text-xs border-muted-foreground/30 text-muted-foreground hover:bg-muted/50" onClick={e => { e.stopPropagation(); handleReverAula(event); }}>
                           <Play className="w-3.5 h-3.5" /> Rever Aula
                         </Button>
                       ) : (
-                        <Button variant="default" size="sm" className="w-full gap-2 text-xs" onClick={e => { e.stopPropagation(); handleEntrarAula(event); }}>
+                        <Button size="sm" className="w-full gap-2 text-xs bg-primary hover:bg-primary/90" onClick={e => { e.stopPropagation(); handleEntrarAula(event); }}>
                           <Video className="w-3.5 h-3.5" /> Entrar na Aula
                         </Button>
                       )}
