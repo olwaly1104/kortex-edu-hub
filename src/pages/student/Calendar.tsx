@@ -360,15 +360,27 @@ export default function StudentCalendar() {
                         isSelectedDay ? "bg-primary text-primary-foreground" : isTodayDay ? "ring-2 ring-primary text-foreground" : "text-foreground"
                       )}>{day}</p>
                       <div className="space-y-0.5">
-                        {dayEvents.slice(0, 3).map(ev => (
-                          <div
-                            key={ev.id}
-                            className="text-[9px] px-1.5 py-0.5 rounded truncate font-medium text-white cursor-pointer hover:brightness-110"
-                            style={{ backgroundColor: ev.color }}
-                            onClick={(e) => { e.stopPropagation(); setSelectedEvent(ev.id); setSelectedDate(dateStr); }}
-                          >
-                            {ev.startTime} {ev.title}
-                          </div>
+                        {dayEvents.slice(0, 3).map(ev => {
+                          const isTask = ev.type === "entrega";
+                          const isEval = ev.type === "teste" || ev.type === "exame";
+                          return (
+                            <div
+                              key={ev.id}
+                              className={cn(
+                                "text-[9px] px-1.5 py-0.5 rounded truncate font-medium cursor-pointer",
+                                isTask
+                                  ? "bg-amber-100 text-amber-700 border border-amber-300/50 hover:bg-amber-200"
+                                  : isEval
+                                  ? "bg-red-100 text-red-700 border border-red-300/50 hover:bg-red-200"
+                                  : "text-white hover:brightness-110"
+                              )}
+                              style={!isTask && !isEval ? { backgroundColor: ev.color } : undefined}
+                              onClick={(e) => { e.stopPropagation(); setSelectedEvent(ev.id); setSelectedDate(dateStr); }}
+                            >
+                              {isTask ? "📋 " : isEval ? "📝 " : ""}{ev.startTime !== "23:59" ? `${ev.startTime} ` : ""}{ev.title}
+                            </div>
+                          );
+                        })}
                         ))}
                         {dayEvents.length > 3 && (
                           <p className="text-[9px] text-muted-foreground pl-1">+{dayEvents.length - 3} mais</p>
