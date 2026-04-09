@@ -168,7 +168,7 @@ const roleLabelMap: Record<string, string> = {
   professor: "Professor",
   coordenador_curso: "Coord. de Curso",
   decano: "Decano",
-  
+  reitor: "Reitor",
   secretaria: "Secretaria",
 };
 
