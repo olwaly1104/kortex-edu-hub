@@ -59,37 +59,62 @@ export default function StudentDashboard() {
 
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card className="p-4 flex items-center gap-4">
+          <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${generalPct >= 75 ? "text-accent bg-accent/10" : "text-destructive bg-destructive/10"}`}>
+            <BarChart3 className="w-5 h-5" />
+          </div>
+          <div>
+            <p className="text-2xl font-bold text-foreground">{generalPct}%</p>
+            <p className="text-xs text-muted-foreground">Presença Geral</p>
+          </div>
+        </Card>
+
+        <Card className="p-4 flex items-center gap-4">
+          <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${overallAvg !== null && overallAvg >= 10 ? "text-accent bg-accent/10" : "text-destructive bg-destructive/10"}`}>
+            <BarChart3 className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="flex items-baseline gap-1">
+              <p className="text-2xl font-bold text-foreground">{overallAvg !== null ? overallAvg : "—"}</p>
+              {overallAvg !== null && <span className="text-sm text-muted-foreground font-medium">/20</span>}
+            </div>
+            <p className="text-xs text-muted-foreground">Média Geral</p>
+          </div>
+        </Card>
+
+        <Card className="p-4 flex items-center gap-4">
+          <div className="w-11 h-11 rounded-xl flex items-center justify-center text-primary bg-primary/10">
+            <BookOpen className="w-5 h-5" />
+          </div>
+          <div>
+            <p className="text-2xl font-bold text-foreground">{disciplines.length}</p>
+            <p className="text-xs text-muted-foreground">Cadeiras</p>
+          </div>
+        </Card>
+
         {(() => {
-          const finStatus = payments.some(p => p.status === 'overdue') ? 'overdue' : payments.some(p => p.status === 'pending') ? 'pending' : 'ok';
-          const finLabel = finStatus === 'overdue' ? 'Por regularizar' : finStatus === 'pending' ? 'Pendente' : 'Em dia';
-          const finBadge = finStatus === 'overdue' ? 'bg-destructive/10 text-destructive' : finStatus === 'pending' ? 'bg-yellow-500/10 text-yellow-600' : 'bg-accent/10 text-accent';
-          const stats = [
-            { icon: BarChart3, label: "Presença Geral", value: `${generalPct}%`, color: generalPct >= 75 ? "text-accent bg-accent/10" : "text-destructive bg-destructive/10" },
-            { icon: BarChart3, label: "Média Geral", value: overallAvg !== null ? overallAvg : "—", color: overallAvg !== null && overallAvg >= 10 ? "text-accent bg-accent/10" : "text-destructive bg-destructive/10", suffix: overallAvg !== null ? "/20" : "" },
-            { icon: BookOpen, label: "Cadeiras", value: disciplines.length, color: "text-primary bg-primary/10" },
-            { icon: Wallet, label: "Estado Financeiro", badge: finLabel, badgeClass: finBadge, color: finStatus === 'overdue' ? "text-destructive bg-destructive/10" : finStatus === 'pending' ? "text-yellow-600 bg-yellow-500/10" : "text-accent bg-accent/10", link: "/student/finances" },
-          ];
-          return stats.map((stat) => {
-            const content = (
-              <Card key={stat.label} className={`p-4 flex items-center gap-4 ${"link" in stat ? "hover:shadow-md transition-shadow cursor-pointer" : ""}`}>
-                <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${stat.color}`}>
-                  <stat.icon className="w-5 h-5" />
+          const hasOverdue = payments.some(p => p.status === 'overdue');
+          const hasPending = payments.some(p => p.status === 'pending');
+          const label = hasOverdue ? "Por regularizar" : hasPending ? "Pendente" : "Em dia";
+          const dotColor = hasOverdue ? "bg-destructive" : hasPending ? "bg-yellow-500" : "bg-accent";
+          const textColor = hasOverdue ? "text-destructive" : hasPending ? "text-yellow-600" : "text-accent";
+          const iconBg = hasOverdue ? "text-destructive bg-destructive/10" : hasPending ? "text-yellow-600 bg-yellow-500/10" : "text-accent bg-accent/10";
+          return (
+            <Link to="/student/finances">
+              <Card className="p-4 flex items-center gap-4 hover:shadow-md transition-shadow cursor-pointer h-full">
+                <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${iconBg}`}>
+                  <Wallet className="w-5 h-5" />
                 </div>
-                <div className="min-w-0">
-                  {"badge" in stat ? (
-                    <Badge className={`${stat.badgeClass} text-xs font-semibold border-0`}>{stat.badge}</Badge>
-                  ) : (
-                    <div className="flex items-baseline gap-1">
-                      <p className="font-bold text-foreground text-2xl">{stat.value}</p>
-                      {"suffix" in stat && stat.suffix && <span className="text-sm text-muted-foreground font-medium">{stat.suffix}</span>}
-                    </div>
-                  )}
-                  <p className="text-xs text-muted-foreground mt-0.5">{stat.label}</p>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className={`w-2 h-2 rounded-full ${dotColor}`} />
+                    <p className={`text-sm font-semibold ${textColor}`}>{label}</p>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-0.5">Estado Financeiro</p>
                 </div>
               </Card>
-            );
-            return "link" in stat && stat.link ? <Link key={stat.label} to={stat.link as string}>{content}</Link> : <React.Fragment key={stat.label}>{content}</React.Fragment>;
-          });
+            </Link>
+          );
         })()}
       </div>
 
