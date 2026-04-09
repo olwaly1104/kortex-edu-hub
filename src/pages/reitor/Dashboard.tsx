@@ -91,22 +91,28 @@ export default function ReitorDashboard() {
           {todayAgenda.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-4">Sem eventos hoje 🎉</p>
           ) : (
-            <div className="space-y-2">
+            <div className="divide-y divide-border">
               {todayAgenda.map(evento => {
                 const status = getEventStatus(evento);
                 const cfg = statusConfig[status];
                 const StatusIcon = cfg.icon;
+                const isActive = status === "em_curso";
                 return (
-                  <div key={evento.id} className="flex items-center gap-3 px-3.5 py-3 rounded-xl border border-border bg-card hover:bg-muted/40 transition-colors">
-                    <div className="w-1 h-10 rounded-full shrink-0" style={{ background: evento.color }} />
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-foreground text-sm leading-tight">{evento.title}</p>
-                      <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1">
-                        <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{evento.startTime} – {evento.endTime}</span>
-                        {evento.room && <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{evento.room}</span>}
-                      </div>
+                  <div key={evento.id} className={`flex items-center gap-4 px-4 py-3.5 transition-colors ${isActive ? "bg-primary/5" : "hover:bg-muted/30"}`}>
+                    <div className="text-center shrink-0 w-14">
+                      <p className={`text-sm font-bold ${isActive ? "text-primary" : "text-foreground"}`}>{evento.startTime}</p>
+                      <p className="text-[10px] text-muted-foreground">{evento.endTime}</p>
                     </div>
-                    <Badge variant={status === "em_curso" ? "default" : "outline"} className="text-[10px] gap-1 shrink-0">
+                    <div className="w-0.5 h-10 rounded-full shrink-0" style={{ background: evento.color }} />
+                    <div className="flex-1 min-w-0">
+                      <p className={`font-medium text-sm leading-tight ${isActive ? "text-primary" : "text-foreground"}`}>{evento.title}</p>
+                      {evento.room && (
+                        <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+                          <MapPin className="w-3 h-3" />{evento.room}
+                        </p>
+                      )}
+                    </div>
+                    <Badge variant={isActive ? "default" : "outline"} className="text-[10px] gap-1 shrink-0">
                       <StatusIcon className="w-3 h-3" /> {cfg.label}
                     </Badge>
                   </div>
