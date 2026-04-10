@@ -142,9 +142,7 @@ export default function ReitorNotas() {
                               {c.coordinator}
                             </Link>
                           </div>
-                          <Badge variant="outline" className="text-[9px] font-mono w-fit bg-muted/50 border-border gap-1">
-                            <Users className="w-2.5 h-2.5" /> {turmas} turmas
-                          </Badge>
+                          <span className="text-[10px] text-muted-foreground">{turmas} turmas</span>
                         </div>
 
                         {/* Stats footer */}
