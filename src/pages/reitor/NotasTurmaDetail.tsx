@@ -26,15 +26,15 @@ function generateCadeiras(turmaId: string, count: number) {
   return Array.from({ length: count }, (_, i) => {
     const base = cadeirasBase[(seed + i) % cadeirasBase.length];
     const media = +(10 + ((seed * (i + 1)) % 60) / 10).toFixed(1);
-    const presenca = 72 + ((seed * (i + 2)) % 20);
+    const conclusao = 60 + ((seed * (i + 2)) % 35);
     const aprovados = 15 + ((seed * (i + 3)) % 15);
     const reprovados = 2 + ((seed * (i + 1)) % 8);
-    return { ...base, id: `${turmaId}-cad${i}`, media, presenca, aprovados, reprovados };
+    return { ...base, id: `${turmaId}-cad${i}`, media, conclusao, aprovados, reprovados };
   });
 }
 
 function generateTurmas(courseId: string, years: number, estudantes: number) {
-  const turmas: { id: string; name: string; year: number; estudantes: number; disciplinas: number; media: number; presenca: number; }[] = [];
+  const turmas: { id: string; name: string; year: number; estudantes: number; disciplinas: number; media: number; conclusao: number; }[] = [];
   for (let y = 1; y <= years; y++) {
     const count = y <= 2 ? 2 : 1;
     for (let t = 0; t < count; t++) {
@@ -47,7 +47,7 @@ function generateTurmas(courseId: string, years: number, estudantes: number) {
         estudantes: Math.floor(estudantes / (years * count) + (seed % 10) - 5),
         disciplinas: 4 + (seed % 4),
         media: +(10 + (seed % 60) / 10).toFixed(1),
-        presenca: 72 + (seed % 20),
+        conclusao: 60 + (seed % 35),
       });
     }
   }
@@ -135,10 +135,10 @@ export default function ReitorNotasTurmaDetail() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0"><Calendar className="w-3.5 h-3.5 text-primary" /></div>
+            <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0"><Clock className="w-3.5 h-3.5 text-primary" /></div>
             <div>
-              <p className="text-[10px] text-muted-foreground uppercase tracking-wider leading-tight">Presença</p>
-              <p className={`text-sm font-bold ${turma.presenca >= 75 ? "text-accent" : "text-destructive"}`}>{turma.presenca}%</p>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider leading-tight">% Conclusão</p>
+              <p className={`text-sm font-bold ${turma.conclusao >= 80 ? "text-accent" : turma.conclusao >= 50 ? "text-foreground" : "text-destructive"}`}>{turma.conclusao}%</p>
             </div>
           </div>
         </div>
@@ -155,7 +155,7 @@ export default function ReitorNotasTurmaDetail() {
               <th className="text-left p-3 font-medium text-muted-foreground">Cadeira</th>
               <th className="text-left p-3 font-medium text-muted-foreground">Professor</th>
               <th className="text-center p-3 font-medium text-muted-foreground">Média</th>
-              <th className="text-center p-3 font-medium text-muted-foreground">Presença</th>
+              <th className="text-center p-3 font-medium text-muted-foreground">% Conclusão</th>
               <th className="text-center p-3 font-medium text-muted-foreground">Aprovados</th>
               <th className="text-center p-3 font-medium text-muted-foreground">Reprovados</th>
               <th className="text-center p-3 font-medium text-muted-foreground">% Aprov.</th>
@@ -179,7 +179,7 @@ export default function ReitorNotasTurmaDetail() {
                     <span className={`text-xs font-bold ${c.media >= 10 ? "text-accent" : "text-destructive"}`}>{c.media}</span>
                   </td>
                   <td className="p-3 text-center">
-                    <span className={`text-xs font-medium ${c.presenca >= 75 ? "text-accent" : "text-destructive"}`}>{c.presenca}%</span>
+                    <span className={`text-xs font-medium ${c.conclusao >= 80 ? "text-accent" : c.conclusao >= 50 ? "text-foreground" : "text-destructive"}`}>{c.conclusao}%</span>
                   </td>
                   <td className="p-3 text-center">
                     <span className="text-xs font-medium text-accent">{c.aprovados}</span>
