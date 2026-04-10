@@ -59,13 +59,6 @@ export default function ReitorNotas() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0"><BookOpen className="w-3.5 h-3.5 text-primary" /></div>
-            <div>
-              <p className="text-[10px] text-muted-foreground uppercase tracking-wider leading-tight">Cursos</p>
-              <p className="text-sm font-bold text-foreground">{allCourses.length}</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
             <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0"><Users className="w-3.5 h-3.5 text-primary" /></div>
             <div>
               <p className="text-[10px] text-muted-foreground uppercase tracking-wider leading-tight">Estudantes</p>
