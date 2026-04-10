@@ -92,6 +92,9 @@ export default function ReitorNotasTurmaDetail() {
             </div>
             <div className="flex items-center gap-2 flex-wrap">
               <Badge variant="outline" className="text-[11px] bg-background/80 gap-1">
+                <Users className="w-3 h-3" /> {turma.name}
+              </Badge>
+              <Badge variant="outline" className="text-[11px] bg-background/80 gap-1">
                 <BookOpen className="w-3 h-3" /> {course.name}
               </Badge>
               <Badge variant="outline" className="text-[11px] bg-background/80">
