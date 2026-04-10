@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { reitorEstudantesDetail, reitoriaInfo } from "@/data/institutionData";
+import { reitorEstudantesDetail, reitoriaInfo, reitorFaculties } from "@/data/institutionData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -7,6 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Users, Search, TrendingUp, AlertTriangle, Award, ArrowUpDown, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Link } from "react-router-dom";
+
+const facultyIdMap: Record<string, string> = {};
+reitorFaculties.forEach(f => {
+  facultyIdMap[f.name] = f.id;
+  facultyIdMap[f.name.replace("Faculdade de ", "Fac. ")] = f.id;
+});
 
 type SortField = "media" | "presenca" | "taxaEntrega";
 type SortDir = "asc" | "desc";
@@ -204,7 +211,7 @@ export default function ReitorEstudantes() {
                     <p className="font-medium text-foreground text-sm">{e.name}</p>
                     <p className="text-[11px] text-muted-foreground">{e.email}</p>
                   </td>
-                  <td className="p-3 text-xs text-muted-foreground">{e.faculty}</td>
+                  <td className="p-3 text-xs">{facultyIdMap[e.faculty] ? <Link to={`/reitor/faculdades/${facultyIdMap[e.faculty]}`} className="text-primary hover:underline">{e.faculty}</Link> : <span className="text-muted-foreground">{e.faculty}</span>}</td>
                   <td className="p-3">
                     <p className="text-xs text-foreground">{e.course}</p>
                     <p className="text-[11px] text-muted-foreground">{e.year}º Ano</p>

@@ -1,12 +1,18 @@
 import { useState, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
-import { reitorCoordsDetail } from "@/data/institutionData";
+import { useNavigate, Link } from "react-router-dom";
+import { reitorCoordsDetail, reitorFaculties } from "@/data/institutionData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { UserCog, Search, Users, CheckCircle, ClipboardList, Award, ArrowUpDown, X } from "lucide-react";
+
+const facultyIdMap: Record<string, string> = {};
+reitorFaculties.forEach(f => {
+  facultyIdMap[f.name] = f.id;
+  facultyIdMap[f.name.replace("Faculdade de ", "Fac. ")] = f.id;
+});
 import { cn } from "@/lib/utils";
 
 type SortField = "presenca" | "taxaEntrega" | "mediaGeral";
@@ -201,7 +207,7 @@ export default function ReitorCoordenadores() {
               <tr key={c.id} className="border-b last:border-0 hover:bg-muted/20 transition-colors cursor-pointer" onClick={() => navigate(`/reitor/coordenadores/${c.id}`)}>
                 <td className="p-3"><span className="font-medium text-foreground">{c.name}</span><p className="text-[11px] text-muted-foreground">{c.email}</p></td>
                 <td className="p-3 text-muted-foreground text-xs">{c.course}</td>
-                <td className="p-3 text-muted-foreground text-xs">{c.faculty}</td>
+                <td className="p-3 text-xs">{facultyIdMap[c.faculty] ? <Link to={`/reitor/faculdades/${facultyIdMap[c.faculty]}`} className="text-primary hover:underline" onClick={e => e.stopPropagation()}>{c.faculty}</Link> : <span className="text-muted-foreground">{c.faculty}</span>}</td>
                 <td className="p-3 text-center font-medium text-foreground">{c.estudantesTotal}</td>
                 <td className="p-3 text-center">{c.docentesTotal}</td>
                 <td className="p-3 text-center">{c.turmasTotal}</td>
