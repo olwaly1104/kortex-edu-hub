@@ -108,7 +108,7 @@ export default function ReitorNotas() {
                   const avalDone = Math.round(avalTotal * (c.mediaGeral >= 14 ? 0.9 : c.mediaGeral >= 12 ? 0.75 : 0.6));
                   const aprov = c.mediaGeral >= 14 ? 87 : c.mediaGeral >= 13 ? 79 : c.mediaGeral >= 12 ? 72 : 61;
                   return (
-                    <Link key={c.id} to={`/reitor/faculdades/${f.id}/cursos/${c.id}`}>
+                    <Link key={c.id} to={`/reitor/notas/${f.id}/${c.id}`}>
                       <Card className="p-0 transition-all cursor-pointer hover:shadow-md group overflow-hidden">
                         {/* Top bar */}
                         <div className="flex items-center justify-between px-3 pt-3 pb-2">
@@ -142,9 +142,7 @@ export default function ReitorNotas() {
                               {c.coordinator}
                             </Link>
                           </div>
-                          <Badge variant="outline" className="text-[9px] font-mono w-fit bg-muted/50 border-border gap-1">
-                            <Users className="w-2.5 h-2.5" /> {turmas} turmas
-                          </Badge>
+                          <span className="text-[10px] text-muted-foreground">{turmas} turmas</span>
                         </div>
 
                         {/* Stats footer */}

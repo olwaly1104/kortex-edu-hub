@@ -90,6 +90,8 @@ import ReitorCoordenadores from "./pages/reitor/Coordenadores";
 import ReitorCoordenadorProfile from "./pages/reitor/CoordenadorProfile";
 import ReitorDocentes from "./pages/reitor/Docentes";
 import ReitorNotas from "./pages/reitor/Notas";
+import ReitorNotasCursoDetail from "./pages/reitor/NotasCursoDetail";
+import ReitorNotasTurmaDetail from "./pages/reitor/NotasTurmaDetail";
 import ReitorRelatorios from "./pages/reitor/Relatorios";
 import ReitorFinancas from "./pages/reitor/Financas";
 import ReitorEstudantes from "./pages/reitor/Estudantes";
@@ -224,6 +226,8 @@ function AppRoutes() {
         <Route path="/reitor/docentes" element={<ReitorDocentes />} />
         <Route path="/reitor/estudantes" element={<ReitorEstudantes />} />
         <Route path="/reitor/notas" element={<ReitorNotas />} />
+        <Route path="/reitor/notas/:faculdadeId/:cursoId" element={<ReitorNotasCursoDetail />} />
+        <Route path="/reitor/notas/:faculdadeId/:cursoId/:turmaId" element={<ReitorNotasTurmaDetail />} />
         <Route path="/reitor/relatorios" element={<ReitorRelatorios />} />
         <Route path="/reitor/financas" element={<ReitorFinancas />} />
         <Route path="/reitor/perfil" element={<StudentProfile />} />
