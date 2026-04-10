@@ -7,13 +7,13 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { UserCog, Search, Users, CheckCircle, ClipboardList, Award, ArrowUpDown, X } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const facultyIdMap: Record<string, string> = {};
 reitorFaculties.forEach(f => {
   facultyIdMap[f.name] = f.id;
   facultyIdMap[f.name.replace("Faculdade de ", "Fac. ")] = f.id;
 });
-import { cn } from "@/lib/utils";
 
 type SortField = "presenca" | "taxaEntrega" | "mediaGeral";
 type SortDir = "asc" | "desc";
