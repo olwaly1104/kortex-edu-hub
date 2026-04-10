@@ -3,7 +3,7 @@ import { reitorFaculties } from "@/data/institutionData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Award, Users, CheckCircle, Building2, BookOpen, ChevronRight } from "lucide-react";
+import { Award, Users, CheckCircle, ClipboardList, BookOpen, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const facultyIdMap: Record<string, string> = {};
