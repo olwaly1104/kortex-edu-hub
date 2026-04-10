@@ -60,6 +60,7 @@ import CoordenadorCursoDetail from "./pages/coordenador/CursoDetail";
 
 import CoordenadorFaculdadeDetail from "./pages/coordenador/FaculdadeDetail";
 import CoordenadorTarefas from "./pages/coordenador/Tarefas";
+import CoordenadorCalendar from "./pages/coordenador/Calendar";
 import CoordenadorAvaliacoes from "./pages/coordenador/Avaliacoes";
 import CoordenadorAvaliacaoDetail from "./pages/coordenador/AvaliacaoDetail";
 import DecanoDashboard from "./pages/decano/Dashboard";
@@ -78,6 +79,7 @@ import DecanoTurmaDetail from "./pages/decano/TurmaDetail";
 import DecanoCoordenadores from "./pages/decano/Coordenadores";
 import DecanoCoordenadorProfile from "./pages/decano/CoordenadorProfile";
 import DecanoCadeiraDetail from "./pages/decano/CadeiraDetail";
+import DecanoCalendar from "./pages/decano/Calendar";
 import ReitorDashboard from "./pages/reitor/Dashboard";
 import ReitorFaculdades from "./pages/reitor/Faculdades";
 import ReitorFaculdadeDetail from "./pages/reitor/FaculdadeDetail";
