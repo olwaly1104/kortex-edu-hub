@@ -3,7 +3,7 @@ import { reitorFaculties } from "@/data/institutionData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Award, Users, CheckCircle, Building2, BookOpen, ChevronRight, UserCog } from "lucide-react";
+import { Award, Users, CheckCircle, Building2, BookOpen, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const getEstado = (media: number) =>
@@ -22,7 +22,6 @@ export default function ReitorNotas() {
   const totalEstudantes = faculties.reduce((s, f) => s + f.totalEstudantes, 0);
   const avgMedia = +(faculties.reduce((s, f) => s + f.mediaGeral, 0) / faculties.length).toFixed(1);
   const avgAprov = Math.round(faculties.reduce((s, f) => s + f.taxaSucesso, 0) / faculties.length);
-  const avgSucesso = Math.round(faculties.reduce((s, f) => s + f.taxaSucesso, 0) / faculties.length);
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
@@ -80,8 +79,8 @@ export default function ReitorNotas() {
           <div className="flex items-center gap-2">
             <div className="w-7 h-7 rounded-lg bg-accent/10 flex items-center justify-center shrink-0"><CheckCircle className="w-3.5 h-3.5 text-accent" /></div>
             <div>
-              <p className="text-[10px] text-muted-foreground uppercase tracking-wider leading-tight">Taxa Sucesso</p>
-              <p className={`text-sm font-bold ${avgSucesso >= 75 ? "text-accent" : avgSucesso >= 50 ? "text-foreground" : "text-destructive"}`}>{avgSucesso}%</p>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider leading-tight">% Aprov.</p>
+              <p className={`text-sm font-bold ${avgAprov >= 75 ? "text-accent" : avgAprov >= 50 ? "text-foreground" : "text-destructive"}`}>{avgAprov}%</p>
             </div>
           </div>
         </div>
@@ -93,13 +92,11 @@ export default function ReitorNotas() {
           const fEstado = getEstado(f.mediaGeral);
           return (
             <div key={f.id} className="space-y-3">
-              {/* Faculty header */}
               <div className="flex items-center gap-2">
                 <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">{f.name}</h2>
                 <Badge variant="outline" className={`text-[9px] ${fEstado.cls}`}>{fEstado.label}</Badge>
               </div>
 
-              {/* Course cards grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
                 {f.courses.map(c => {
                   const cEstado = getEstado(c.mediaGeral);
@@ -110,7 +107,6 @@ export default function ReitorNotas() {
                   return (
                     <Link key={c.id} to={`/reitor/notas/${f.id}/${c.id}`}>
                       <Card className="p-0 transition-all cursor-pointer hover:shadow-md group overflow-hidden">
-                        {/* Top bar */}
                         <div className="flex items-center justify-between px-3 pt-3 pb-2">
                           <div className="flex items-center gap-2 min-w-0">
                             <p className="text-xs font-semibold text-foreground truncate">{c.name}</p>
@@ -120,7 +116,6 @@ export default function ReitorNotas() {
                           <ChevronRight className="w-3.5 h-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
                         </div>
 
-                        {/* Meta rows */}
                         <div className="flex flex-col gap-1.5 px-3 pb-3 text-[10px]">
                           <div className="flex items-center gap-1">
                             <span className="font-medium text-foreground/70">Decano:</span>
@@ -145,7 +140,6 @@ export default function ReitorNotas() {
                           <span className="text-[10px] text-muted-foreground">{turmas} turmas</span>
                         </div>
 
-                        {/* Stats footer */}
                         <div className="grid grid-cols-4 bg-muted/30 border-t border-border">
                           <div className="px-2 py-2 text-center">
                             <p className="text-[9px] text-muted-foreground uppercase leading-tight">Est.</p>
