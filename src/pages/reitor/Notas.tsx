@@ -6,6 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Award, Users, CheckCircle, Building2, BookOpen, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 
+const facultyIdMap: Record<string, string> = {};
+reitorFaculties.forEach(f => { facultyIdMap[f.name] = f.id; });
+
 const getEstado = (media: number) =>
   media >= 14 ? { label: "Excelente", cls: "bg-accent/15 text-accent border-accent/30" }
   : media >= 10 ? { label: "Normal", cls: "bg-muted text-muted-foreground border-border" }
@@ -93,7 +96,9 @@ export default function ReitorNotas() {
           return (
             <div key={f.id} className="space-y-3">
               <div className="flex items-center gap-2">
-                <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">{f.name}</h2>
+                <Link to={`/reitor/faculdades/${f.id}`} className="text-sm font-semibold text-muted-foreground uppercase tracking-wider hover:text-primary transition-colors">
+                  {f.name}
+                </Link>
                 <Badge variant="outline" className={`text-[9px] ${fEstado.cls}`}>{fEstado.label}</Badge>
               </div>
 
