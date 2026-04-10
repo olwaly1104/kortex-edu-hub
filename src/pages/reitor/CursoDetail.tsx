@@ -1,10 +1,10 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { reitorFaculties } from "@/data/institutionData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
   ArrowLeft, BookOpen, Users, GraduationCap, Award,
-  CheckCircle, ChevronRight, Clock, Calendar,
+  CheckCircle, ChevronRight, Layers,
 } from "lucide-react";
 import { useMemo } from "react";
 
@@ -19,14 +19,15 @@ function generateTurmas(courseId: string, years: number, estudantes: number) {
     const count = y <= 2 ? 2 : 1;
     for (let t = 0; t < count; t++) {
       const letter = String.fromCharCode(65 + t);
+      const seed = (courseId + y + letter).split("").reduce((s, c) => s + c.charCodeAt(0), 0);
       turmas.push({
         id: `${courseId}-y${y}t${letter}`,
         name: `Turma ${letter}`,
         year: y,
-        estudantes: Math.floor(estudantes / (years * count) + Math.random() * 10 - 5),
-        disciplinas: Math.floor(4 + Math.random() * 4),
-        media: +(10 + Math.random() * 6).toFixed(1),
-        presenca: Math.floor(72 + Math.random() * 20),
+        estudantes: Math.floor(estudantes / (years * count) + (seed % 10) - 5),
+        disciplinas: 4 + (seed % 4),
+        media: +(10 + (seed % 60) / 10).toFixed(1),
+        presenca: 72 + (seed % 20),
       });
     }
   }
@@ -35,6 +36,7 @@ function generateTurmas(courseId: string, years: number, estudantes: number) {
 
 export default function ReitorCursoDetail() {
   const { faculdadeId, cursoId } = useParams();
+  const navigate = useNavigate();
   const fac = reitorFaculties.find(f => f.id === faculdadeId);
   const course = fac?.courses.find(c => c.id === cursoId);
   const turmas = useMemo(() => course ? generateTurmas(course.id, course.years, course.estudantes) : [], [course?.id]);
@@ -69,7 +71,7 @@ export default function ReitorCursoDetail() {
               </Badge>
               <Badge variant="outline" className="text-[11px] bg-background/80">{fac.name}</Badge>
               <Badge variant="outline" className="text-[11px] bg-background/80 gap-1">
-                <BookOpen className="w-3 h-3" /> {course.years} anos
+                <Layers className="w-3 h-3" /> {course.years} anos
               </Badge>
             </div>
           </div>
@@ -105,8 +107,12 @@ export default function ReitorCursoDetail() {
               {yearTurmas.map(t => {
                 const tEstado = getEstado(t.media);
                 return (
-                  <Card key={t.id} className="p-3 transition-all border-l-[3px]"
-                    style={{ borderLeftColor: t.media >= 14 ? "hsl(var(--accent))" : t.media >= 10 ? "hsl(var(--primary))" : "hsl(var(--destructive))" }}>
+                  <Card
+                    key={t.id}
+                    className="p-3 transition-all cursor-pointer hover:shadow-md border-l-[3px] group"
+                    style={{ borderLeftColor: t.media >= 14 ? "hsl(var(--accent))" : t.media >= 10 ? "hsl(var(--primary))" : "hsl(var(--destructive))" }}
+                    onClick={() => navigate(`/reitor/faculdades/${faculdadeId}/cursos/${cursoId}/turma/${t.id}`)}
+                  >
                     <div className="flex items-center justify-between">
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
@@ -128,6 +134,7 @@ export default function ReitorCursoDetail() {
                           <p className="text-[9px] text-muted-foreground uppercase leading-tight">Presença</p>
                           <p className={`text-xs font-bold ${t.presenca >= 75 ? "text-accent" : "text-destructive"}`}>{t.presenca}%</p>
                         </div>
+                        <ChevronRight className="w-3.5 h-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
                       </div>
                     </div>
                   </Card>

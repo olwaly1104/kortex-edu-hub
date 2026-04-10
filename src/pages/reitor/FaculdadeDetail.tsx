@@ -12,6 +12,12 @@ const getEstado = (media: number) =>
   : media >= 10 ? { label: "Normal", cls: "bg-muted text-muted-foreground border-border" }
   : { label: "Em Risco", cls: "bg-destructive/15 text-destructive border-destructive/30" };
 
+function countCourseTurmas(years: number) {
+  let t = 0;
+  for (let y = 1; y <= years; y++) t += y <= 2 ? 2 : 1;
+  return t;
+}
+
 export default function ReitorFaculdadeDetail() {
   const { faculdadeId } = useParams();
   const fac = reitorFaculties.find(f => f.id === faculdadeId);
@@ -25,6 +31,7 @@ export default function ReitorFaculdadeDetail() {
 
   const estado = getEstado(fac.mediaGeral);
   const dean = reitoriaDecanos.find(d => d.id === fac.deanId);
+  const totalTurmas = fac.courses.reduce((s, c) => s + countCourseTurmas(c.years), 0);
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
@@ -56,6 +63,9 @@ export default function ReitorFaculdadeDetail() {
               <Badge variant="outline" className="text-[11px] bg-background/80 gap-1">
                 <BookOpen className="w-3 h-3" /> {fac.totalCursos} cursos
               </Badge>
+              <Badge variant="outline" className="text-[11px] bg-background/80 gap-1">
+                <Users className="w-3 h-3" /> {totalTurmas} turmas
+              </Badge>
             </div>
           </div>
         </div>
@@ -66,7 +76,7 @@ export default function ReitorFaculdadeDetail() {
             { icon: GraduationCap, label: "Docentes", value: fac.totalDocentes, color: "" },
             { icon: Award, label: "Média Geral", value: `${fac.mediaGeral}/20`, color: fac.mediaGeral >= 10 ? "text-accent" : "text-destructive" },
             { icon: CheckCircle, label: "Presença", value: `${fac.presenca}%`, color: fac.presenca >= 75 ? "text-accent" : "text-destructive" },
-            { icon: BookOpen, label: "Taxa Sucesso", value: `${fac.taxaSucesso}%`, color: fac.taxaSucesso >= 75 ? "text-accent" : "text-destructive" },
+            { icon: BookOpen, label: "% Aprov.", value: `${fac.taxaSucesso}%`, color: fac.taxaSucesso >= 75 ? "text-accent" : "text-destructive" },
           ].map(kpi => (
             <div key={kpi.label} className="flex items-center gap-2">
               <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
@@ -85,6 +95,7 @@ export default function ReitorFaculdadeDetail() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {fac.courses.map(c => {
           const cEstado = getEstado(c.mediaGeral);
+          const cTurmas = countCourseTurmas(c.years);
           return (
             <Link key={c.id} to={`/reitor/faculdades/${faculdadeId}/cursos/${c.id}`}>
               <Card className="overflow-hidden hover:shadow-md transition-all cursor-pointer group">
@@ -106,6 +117,11 @@ export default function ReitorFaculdadeDetail() {
                           <Clock className="w-3.5 h-3.5 text-primary/60" />
                           <span className="font-medium text-foreground/70">Duração:</span>
                           <span>{c.years} anos</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                          <Users className="w-3.5 h-3.5 text-primary/60" />
+                          <span className="font-medium text-foreground/70">Turmas:</span>
+                          <span>{cTurmas} turmas</span>
                         </div>
                       </div>
                     </div>
