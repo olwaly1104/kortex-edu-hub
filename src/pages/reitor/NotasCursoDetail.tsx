@@ -11,20 +11,27 @@ const getEstado = (media: number) =>
   : { label: "Em Risco", cls: "bg-destructive/15 text-destructive border-destructive/30" };
 
 function generateTurmas(courseId: string, years: number, estudantes: number) {
-  const turmas: { id: string; name: string; year: number; estudantes: number; disciplinas: number; media: number; presenca: number; }[] = [];
+  const turmas: { id: string; name: string; year: number; estudantes: number; disciplinas: number; media: number; aprov: number; avalDone: number; avalTotal: number; }[] = [];
   for (let y = 1; y <= years; y++) {
     const count = y <= 2 ? 2 : 1;
     for (let t = 0; t < count; t++) {
       const letter = String.fromCharCode(65 + t);
       const seed = (courseId + y + letter).split("").reduce((s, c) => s + c.charCodeAt(0), 0);
+      const media = +(10 + (seed % 60) / 10).toFixed(1);
+      const disc = 4 + (seed % 4);
+      const avalTotal = disc * 2;
+      const avalDone = Math.round(avalTotal * (media >= 14 ? 0.9 : media >= 12 ? 0.75 : 0.6));
+      const aprov = media >= 14 ? 87 : media >= 13 ? 79 : media >= 12 ? 72 : 61;
       turmas.push({
         id: `${courseId}-y${y}t${letter}`,
         name: `Turma ${letter}`,
         year: y,
         estudantes: Math.floor(estudantes / (years * count) + (seed % 10) - 5),
-        disciplinas: 4 + (seed % 4),
-        media: +(10 + (seed % 60) / 10).toFixed(1),
-        presenca: 72 + (seed % 20),
+        disciplinas: disc,
+        media,
+        aprov,
+        avalDone,
+        avalTotal,
       });
     }
   }
@@ -142,12 +149,16 @@ export default function ReitorNotasCursoDetail() {
                             <p className="text-xs font-bold text-foreground">{t.estudantes}</p>
                           </div>
                           <div className="text-right">
+                            <p className="text-[9px] text-muted-foreground uppercase leading-tight">Aval.</p>
+                            <p className="text-xs font-bold text-foreground">{t.avalDone}/{t.avalTotal}</p>
+                          </div>
+                          <div className="text-right">
                             <p className="text-[9px] text-muted-foreground uppercase leading-tight">Média</p>
                             <p className={`text-xs font-bold ${t.media >= 10 ? "text-accent" : "text-destructive"}`}>{t.media}</p>
                           </div>
                           <div className="text-right">
-                            <p className="text-[9px] text-muted-foreground uppercase leading-tight">Presença</p>
-                            <p className={`text-xs font-bold ${t.presenca >= 75 ? "text-accent" : "text-destructive"}`}>{t.presenca}%</p>
+                            <p className="text-[9px] text-muted-foreground uppercase leading-tight">% Aprov.</p>
+                            <p className={`text-xs font-bold ${t.aprov >= 75 ? "text-accent" : t.aprov >= 60 ? "text-foreground" : "text-destructive"}`}>{t.aprov}%</p>
                           </div>
                           <ChevronRight className="w-3.5 h-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
                         </div>
