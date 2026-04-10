@@ -50,12 +50,12 @@ export default function ReitorNotas() {
 
         <div className="border-t border-border" />
 
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0"><Building2 className="w-3.5 h-3.5 text-primary" /></div>
+            <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0"><ClipboardList className="w-3.5 h-3.5 text-primary" /></div>
             <div>
-              <p className="text-[10px] text-muted-foreground uppercase tracking-wider leading-tight">Faculdades</p>
-              <p className="text-sm font-bold text-foreground">{faculties.length}</p>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider leading-tight">Avaliações</p>
+              <p className="text-sm font-bold text-foreground">{allCourses.reduce((s, c) => { const t = c.years * 2; const total = t * c.years; const done = Math.round(total * (c.mediaGeral >= 14 ? 0.9 : c.mediaGeral >= 12 ? 0.75 : 0.6)); return s + done; }, 0)}/{allCourses.reduce((s, c) => { const t = c.years * 2; return s + t * c.years; }, 0)}</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
