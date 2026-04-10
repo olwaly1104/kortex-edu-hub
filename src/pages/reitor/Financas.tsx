@@ -45,7 +45,7 @@ export default function ReitorFinancas() {
 
   const totalMultasAplicadas = multas.filter(m => m.status === "aplicada").reduce((s, m) => s + m.amount, 0);
   const aplicadaCount = multas.filter(m => m.status === "aplicada").length;
-  const pendenteCount = multas.filter(m => m.status === "pendente").length;
+  const pendenteCount = multas.filter(m => (m.status as string) === "pendente").length;
 
   return (
     <div className="p-6 lg:p-8 max-w-5xl mx-auto space-y-6 animate-fade-in">
