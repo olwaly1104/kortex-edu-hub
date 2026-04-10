@@ -120,27 +120,33 @@ export default function ReitorNotas() {
                           <ChevronRight className="w-3.5 h-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
                         </div>
 
-                        {/* Meta row */}
-                        <div className="flex flex-col gap-1 px-3 pb-2.5 text-[10px]">
-                          <p className="text-muted-foreground"><span className="font-medium text-foreground/70">Coordenador:</span> {c.coordinator}</p>
+                        {/* Meta rows */}
+                        <div className="flex flex-col gap-1.5 px-3 pb-3 text-[10px]">
+                          <div className="flex items-center gap-1">
+                            <span className="font-medium text-foreground/70">Coordenador:</span>
+                            <Link
+                              to={`/reitor/faculdades/${f.id}/cursos/${c.id}`}
+                              onClick={e => e.stopPropagation()}
+                              className="font-medium text-primary hover:text-primary/80 hover:underline transition-colors"
+                            >
+                              {c.coordinator}
+                            </Link>
+                          </div>
                           <div className="flex items-center gap-1">
                             <span className="font-medium text-foreground/70">Decano:</span>
                             <Link
                               to={`/reitor/faculdades/${f.id}`}
                               onClick={e => e.stopPropagation()}
-                              className="inline-flex items-center gap-1 font-medium text-primary hover:text-primary/80 bg-primary/5 hover:bg-primary/10 px-1.5 py-0.5 rounded transition-colors"
+                              className="font-medium text-primary hover:text-primary/80 hover:underline transition-colors"
                             >
                               {f.dean.replace(/^(Prof\.\s*)?(Profª\.\s*)?(Dr\.\s*)?(Dra\.\s*)?/, "")}
                             </Link>
                           </div>
+                          <p className="text-muted-foreground">{turmas} Turmas</p>
                         </div>
 
                         {/* Stats footer */}
-                        <div className="grid grid-cols-5 bg-muted/30 border-t border-border">
-                          <div className="px-2 py-2 text-center">
-                            <p className="text-[9px] text-muted-foreground uppercase leading-tight">Turmas</p>
-                            <p className="text-xs font-bold text-foreground">{turmas}</p>
-                          </div>
+                        <div className="grid grid-cols-4 bg-muted/30 border-t border-border">
                           <div className="px-2 py-2 text-center">
                             <p className="text-[9px] text-muted-foreground uppercase leading-tight">Est.</p>
                             <p className="text-xs font-bold text-foreground">{c.estudantes}</p>
