@@ -63,9 +63,6 @@ export default function ReitorFaculdadeDetail() {
               <Badge variant="outline" className="text-[11px] bg-background/80 gap-1">
                 <BookOpen className="w-3 h-3" /> {fac.totalCursos} cursos
               </Badge>
-              <Badge variant="outline" className="text-[11px] bg-background/80 gap-1">
-                <Users className="w-3 h-3" /> {totalTurmas} turmas
-              </Badge>
             </div>
           </div>
         </div>
