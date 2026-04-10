@@ -1,5 +1,5 @@
 import { useParams, Link } from "react-router-dom";
-import { reitorFaculties, reitoriaDecanos } from "@/data/institutionData";
+import { reitorFaculties, reitoriaDecanos, reitorCoordsDetail } from "@/data/institutionData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -111,9 +111,14 @@ export default function ReitorFaculdadeDetail() {
                         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                           <GraduationCap className="w-3.5 h-3.5 text-primary/60" />
                           <span className="font-medium text-foreground/70">Coordenador:</span>
-                          <Link to={`/reitor/coordenadores/${c.coordinator}`} onClick={e => e.stopPropagation()}>
-                            <Badge variant="outline" className="text-[10px] font-medium hover:bg-primary/10 transition-colors cursor-pointer">{c.coordinator}</Badge>
-                          </Link>
+                          {(() => {
+                            const coord = reitorCoordsDetail.find(co => co.name === c.coordinator);
+                            return coord ? (
+                              <Link to={`/reitor/coordenadores/${coord.id}`} onClick={e => e.stopPropagation()}>
+                                <Badge variant="outline" className="text-[10px] font-medium hover:bg-primary/10 transition-colors cursor-pointer">{c.coordinator}</Badge>
+                              </Link>
+                            ) : <span>{c.coordinator}</span>;
+                          })()}
                         </div>
                         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                           <Clock className="w-3.5 h-3.5 text-primary/60" />
