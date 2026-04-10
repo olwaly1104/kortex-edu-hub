@@ -123,16 +123,6 @@ export default function ReitorNotas() {
                         {/* Meta rows */}
                         <div className="flex flex-col gap-1.5 px-3 pb-3 text-[10px]">
                           <div className="flex items-center gap-1">
-                            <span className="font-medium text-foreground/70">Coordenador:</span>
-                            <Link
-                              to={`/reitor/faculdades/${f.id}/cursos/${c.id}`}
-                              onClick={e => e.stopPropagation()}
-                              className="font-medium text-primary hover:text-primary/80 hover:underline transition-colors"
-                            >
-                              {c.coordinator}
-                            </Link>
-                          </div>
-                          <div className="flex items-center gap-1">
                             <span className="font-medium text-foreground/70">Decano:</span>
                             <Link
                               to={`/reitor/faculdades/${f.id}`}
@@ -142,7 +132,21 @@ export default function ReitorNotas() {
                               {f.dean.replace(/^(Prof\.\s*)?(Profª\.\s*)?(Dr\.\s*)?(Dra\.\s*)?/, "")}
                             </Link>
                           </div>
-                          <p className="text-muted-foreground">{turmas} Turmas</p>
+                          <div className="flex items-center gap-1">
+                            <span className="font-medium text-foreground/70">Coordenador:</span>
+                            <Link
+                              to={`/reitor/faculdades/${f.id}/cursos/${c.id}`}
+                              onClick={e => e.stopPropagation()}
+                              className="font-medium text-primary hover:text-primary/80 hover:underline transition-colors"
+                            >
+                              {c.coordinator}
+                            </Link>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <Users className="w-3 h-3 text-muted-foreground" />
+                            <span className="font-medium text-foreground">{turmas}</span>
+                            <span className="text-muted-foreground">Turmas</span>
+                          </div>
                         </div>
 
                         {/* Stats footer */}
