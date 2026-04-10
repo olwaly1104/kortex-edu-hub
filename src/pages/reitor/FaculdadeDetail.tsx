@@ -128,10 +128,14 @@ export default function ReitorFaculdadeDetail() {
                     <ChevronRight className="w-5 h-5 text-muted-foreground shrink-0 mt-1 group-hover:text-primary transition-colors" />
                   </div>
                 </div>
-                <div className="px-5 py-3 bg-muted/30 grid grid-cols-4 gap-3">
+                <div className="px-5 py-3 bg-muted/30 grid grid-cols-5 gap-3">
                   <div className="text-center">
                     <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-0.5">Estudantes</p>
                     <p className="text-lg font-bold text-foreground">{c.estudantes}</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-0.5">Turmas</p>
+                    <p className="text-lg font-bold text-foreground">{cTurmas}</p>
                   </div>
                   <div className="text-center">
                     <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-0.5">Docentes</p>
