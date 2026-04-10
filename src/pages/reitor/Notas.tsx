@@ -112,7 +112,7 @@ export default function ReitorNotas() {
                   const cEstado = getEstado(c.mediaGeral);
                   const turmas = c.years * 2;
                   const avaliacoes = Math.round(c.estudantes / 10);
-                  const aprov = Math.round(c.mediaGeral >= 14 ? 85 + Math.random() * 10 : c.mediaGeral >= 12 ? 70 + Math.random() * 10 : 55 + Math.random() * 10);
+                  const aprov = c.mediaGeral >= 14 ? 87 : c.mediaGeral >= 13 ? 79 : c.mediaGeral >= 12 ? 72 : 61;
                   return (
                     <Link key={c.id} to={`/reitor/faculdades/${f.id}/cursos/${c.id}`}>
                       <Card className="p-3 transition-all cursor-pointer hover:shadow-md border-l-[3px] group"
