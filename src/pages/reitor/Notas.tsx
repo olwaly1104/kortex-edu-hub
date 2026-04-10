@@ -21,7 +21,7 @@ export default function ReitorNotas() {
   const allCourses = faculties.flatMap(f => f.courses);
   const totalEstudantes = faculties.reduce((s, f) => s + f.totalEstudantes, 0);
   const avgMedia = +(faculties.reduce((s, f) => s + f.mediaGeral, 0) / faculties.length).toFixed(1);
-  const avgPresenca = Math.round(faculties.reduce((s, f) => s + f.presenca, 0) / faculties.length);
+  const avgAprov = Math.round(faculties.reduce((s, f) => s + f.taxaSucesso, 0) / faculties.length);
   const avgSucesso = Math.round(faculties.reduce((s, f) => s + f.taxaSucesso, 0) / faculties.length);
 
   return (
@@ -102,7 +102,7 @@ export default function ReitorNotas() {
                 <div className="flex items-center gap-4 text-xs text-muted-foreground">
                   <span>{f.totalEstudantes.toLocaleString()} est.</span>
                   <span className={`font-bold ${f.mediaGeral >= 10 ? "text-accent" : "text-destructive"}`}>{f.mediaGeral}/20</span>
-                  <span className={`font-bold ${f.presenca >= 80 ? "text-accent" : "text-destructive"}`}>{f.presenca}%</span>
+                  <span className={`font-bold ${f.taxaSucesso >= 75 ? "text-accent" : "text-destructive"}`}>{f.taxaSucesso}% aprov.</span>
                 </div>
               </div>
 
@@ -112,6 +112,7 @@ export default function ReitorNotas() {
                   const cEstado = getEstado(c.mediaGeral);
                   const turmas = c.years * 2;
                   const avaliacoes = Math.round(c.estudantes / 10);
+                  const aprov = Math.round(c.mediaGeral >= 14 ? 85 + Math.random() * 10 : c.mediaGeral >= 12 ? 70 + Math.random() * 10 : 55 + Math.random() * 10);
                   return (
                     <Link key={c.id} to={`/reitor/faculdades/${f.id}/cursos/${c.id}`}>
                       <Card className="p-3 transition-all cursor-pointer hover:shadow-md border-l-[3px] group"
@@ -145,8 +146,8 @@ export default function ReitorNotas() {
                             <p className={`text-xs font-bold ${c.mediaGeral >= 10 ? "text-accent" : "text-destructive"}`}>{c.mediaGeral}</p>
                           </div>
                           <div>
-                            <p className="text-[9px] text-muted-foreground uppercase leading-tight">Presença</p>
-                            <p className={`text-xs font-bold ${c.presenca >= 80 ? "text-accent" : "text-destructive"}`}>{c.presenca}%</p>
+                            <p className="text-[9px] text-muted-foreground uppercase leading-tight">% Aprov.</p>
+                            <p className={`text-xs font-bold ${aprov >= 75 ? "text-accent" : aprov >= 60 ? "text-foreground" : "text-destructive"}`}>{aprov}%</p>
                           </div>
                         </div>
                       </Card>
