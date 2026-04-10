@@ -76,7 +76,9 @@ export default function ReitorFaculdades() {
                         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                           <GraduationCap className="w-3.5 h-3.5 text-primary/60" />
                           <span className="font-medium text-foreground/70">Decano:</span>
-                          <span>{f.dean}</span>
+                          <Link to={`/reitor/decanos/${f.deanId}`} onClick={e => e.stopPropagation()}>
+                            <Badge variant="outline" className="text-[10px] font-medium hover:bg-primary/10 transition-colors cursor-pointer">{f.dean.replace(/^(Prof\.\s*)?(Profª\.\s*)?(Dr\.\s*)?(Dra\.\s*)?/, "")}</Badge>
+                          </Link>
                         </div>
                         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                           <Clock className="w-3.5 h-3.5 text-primary/60" />
