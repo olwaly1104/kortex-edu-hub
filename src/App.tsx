@@ -60,6 +60,7 @@ import CoordenadorCursoDetail from "./pages/coordenador/CursoDetail";
 
 import CoordenadorFaculdadeDetail from "./pages/coordenador/FaculdadeDetail";
 import CoordenadorTarefas from "./pages/coordenador/Tarefas";
+import CoordenadorCalendar from "./pages/coordenador/Calendar";
 import CoordenadorAvaliacoes from "./pages/coordenador/Avaliacoes";
 import CoordenadorAvaliacaoDetail from "./pages/coordenador/AvaliacaoDetail";
 import DecanoDashboard from "./pages/decano/Dashboard";
@@ -78,6 +79,7 @@ import DecanoTurmaDetail from "./pages/decano/TurmaDetail";
 import DecanoCoordenadores from "./pages/decano/Coordenadores";
 import DecanoCoordenadorProfile from "./pages/decano/CoordenadorProfile";
 import DecanoCadeiraDetail from "./pages/decano/CadeiraDetail";
+import DecanoCalendar from "./pages/decano/Calendar";
 import ReitorDashboard from "./pages/reitor/Dashboard";
 import ReitorFaculdades from "./pages/reitor/Faculdades";
 import ReitorFaculdadeDetail from "./pages/reitor/FaculdadeDetail";
@@ -163,7 +165,7 @@ function AppRoutes() {
         <Route path="/coordenador" element={<CoordenadorDashboard />} />
         <Route path="/coordenador/curso" element={<CoordenadorCursoDetail />} />
         <Route path="/coordenador/faculdade" element={<CoordenadorFaculdadeDetail />} />
-        <Route path="/coordenador/calendario" element={<StudentCalendar />} />
+        <Route path="/coordenador/calendario" element={<CoordenadorCalendar />} />
         <Route path="/coordenador/anuncios" element={<StudentAnnouncements />} />
         <Route path="/coordenador/solicitacoes" element={<CoordenadorSolicitacoes />} />
         <Route path="/coordenador/tarefas" element={<CoordenadorTarefas />} />
@@ -190,7 +192,7 @@ function AppRoutes() {
         <Route path="/coordenador/perfil" element={<StudentProfile />} />
         {/* Decano */}
         <Route path="/decano" element={<DecanoDashboard />} />
-        <Route path="/decano/calendario" element={<StudentCalendar />} />
+        <Route path="/decano/calendario" element={<DecanoCalendar />} />
         <Route path="/decano/anuncios" element={<StudentAnnouncements />} />
         <Route path="/decano/aprovacoes" element={<DecanoAprovacoes />} />
         <Route path="/decano/faculdades" element={<DecanoFaculdades />} />

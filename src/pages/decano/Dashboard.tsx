@@ -150,7 +150,7 @@ export default function DecanoDashboard() {
             <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
               <Megaphone className="w-5 h-5 text-secondary" /> Anúncios
               <Badge variant="outline" className="text-[10px] font-mono">{announcements.length}</Badge>
-              <Badge className="bg-destructive/10 text-destructive border-destructive/20 text-[10px]">{announcements.length} não lidos</Badge>
+              
             </h2>
             <Link to="/decano/anuncios" className="text-sm text-primary hover:underline flex items-center gap-1">
               Ver todos <ChevronRight className="w-4 h-4" />
