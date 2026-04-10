@@ -120,17 +120,14 @@ export default function ReitorNotas() {
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center gap-2 min-w-0">
                             <p className="text-xs font-semibold text-foreground truncate">{c.name}</p>
-                            <Badge variant="outline" className="text-[9px] font-mono shrink-0">{turmas} turmas</Badge>
+                            <Badge variant="outline" className="text-[9px] font-mono shrink-0">{c.code}</Badge>
                             <Badge variant="outline" className={`text-[9px] shrink-0 ${cEstado.cls}`}>{cEstado.label}</Badge>
                           </div>
                           <ChevronRight className="w-3.5 h-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
                         </div>
                         <div className="space-y-0.5 mb-2">
-                          <div className="flex items-center gap-1">
-                            <Badge variant="outline" className="text-[9px] font-mono bg-primary/5">{c.code}</Badge>
-                            <span className="text-[10px] text-muted-foreground">{c.coordinator}</span>
-                          </div>
-                          <p className="text-[10px] text-muted-foreground"><span className="font-medium text-foreground/70">Decano:</span> {f.dean}</p>
+                          <span className="text-[10px] text-muted-foreground">{c.coordinator}</span>
+                          <p className="text-[10px] text-muted-foreground">{turmas} turmas</p>
                         </div>
                         <div className="grid grid-cols-4 gap-2 pt-2 border-t border-border">
                           <div>
