@@ -108,7 +108,7 @@ export default function ReitorNotas() {
                   const avalDone = Math.round(avalTotal * (c.mediaGeral >= 14 ? 0.9 : c.mediaGeral >= 12 ? 0.75 : 0.6));
                   const aprov = c.mediaGeral >= 14 ? 87 : c.mediaGeral >= 13 ? 79 : c.mediaGeral >= 12 ? 72 : 61;
                   return (
-                    <Link key={c.id} to={`/reitor/faculdades/${f.id}/cursos/${c.id}`}>
+                    <Link key={c.id} to={`/reitor/notas/${f.id}/${c.id}`}>
                       <Card className="p-0 transition-all cursor-pointer hover:shadow-md group overflow-hidden">
                         {/* Top bar */}
                         <div className="flex items-center justify-between px-3 pt-3 pb-2">
