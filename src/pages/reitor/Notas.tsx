@@ -104,7 +104,8 @@ export default function ReitorNotas() {
                 {f.courses.map(c => {
                   const cEstado = getEstado(c.mediaGeral);
                   const turmas = c.years * 2;
-                  const avaliacoes = Math.round(c.estudantes / 10);
+                  const avalTotal = turmas * c.years;
+                  const avalDone = Math.round(avalTotal * (c.mediaGeral >= 14 ? 0.9 : c.mediaGeral >= 12 ? 0.75 : 0.6));
                   const aprov = c.mediaGeral >= 14 ? 87 : c.mediaGeral >= 13 ? 79 : c.mediaGeral >= 12 ? 72 : 61;
                   return (
                     <Link key={c.id} to={`/reitor/faculdades/${f.id}/cursos/${c.id}`}>
