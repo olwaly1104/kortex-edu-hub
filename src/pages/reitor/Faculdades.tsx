@@ -88,6 +88,11 @@ export default function ReitorFaculdades() {
                           <span className="font-medium text-foreground/70">Turmas:</span>
                           <span>{facTurmas} turmas</span>
                         </div>
+                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                          <GraduationCap className="w-3.5 h-3.5 text-primary/60" />
+                          <span className="font-medium text-foreground/70">Docentes:</span>
+                          <span>{f.totalDocentes}</span>
+                        </div>
                       </div>
                     </div>
                     <ChevronRight className="w-5 h-5 text-muted-foreground shrink-0 mt-1 group-hover:text-primary transition-colors" />
@@ -99,8 +104,8 @@ export default function ReitorFaculdades() {
                     <p className="text-lg font-bold text-foreground">{f.totalEstudantes.toLocaleString()}</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-0.5">Docentes</p>
-                    <p className="text-lg font-bold text-foreground">{f.totalDocentes}</p>
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-0.5">Presença</p>
+                    <p className={`text-lg font-bold ${f.presenca >= 75 ? "text-accent" : "text-destructive"}`}>{f.presenca}%</p>
                   </div>
                   <div className="text-center">
                     <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-0.5">Média</p>
