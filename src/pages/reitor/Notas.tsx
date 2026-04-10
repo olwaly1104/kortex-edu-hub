@@ -100,9 +100,7 @@ export default function ReitorNotas() {
                   <Badge variant="outline" className={`text-[9px] ${fEstado.cls}`}>{fEstado.label}</Badge>
                 </div>
                 <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                  <span>{f.totalEstudantes.toLocaleString()} est.</span>
-                  <span className={`font-bold ${f.mediaGeral >= 10 ? "text-accent" : "text-destructive"}`}>{f.mediaGeral}/20</span>
-                  <span className={`font-bold ${f.taxaSucesso >= 75 ? "text-accent" : "text-destructive"}`}>{f.taxaSucesso}% aprov.</span>
+                  <Badge variant="outline" className={`text-[9px] ${fEstado.cls}`}>{fEstado.label}</Badge>
                 </div>
               </div>
 
