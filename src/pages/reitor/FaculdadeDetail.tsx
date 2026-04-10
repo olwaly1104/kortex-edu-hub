@@ -111,7 +111,9 @@ export default function ReitorFaculdadeDetail() {
                         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                           <GraduationCap className="w-3.5 h-3.5 text-primary/60" />
                           <span className="font-medium text-foreground/70">Coordenador:</span>
-                          <span>{c.coordinator}</span>
+                          <Link to={`/reitor/coordenadores/${c.coordinator}`} onClick={e => e.stopPropagation()}>
+                            <Badge variant="outline" className="text-[10px] font-medium hover:bg-primary/10 transition-colors cursor-pointer">{c.coordinator}</Badge>
+                          </Link>
                         </div>
                         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                           <Clock className="w-3.5 h-3.5 text-primary/60" />
