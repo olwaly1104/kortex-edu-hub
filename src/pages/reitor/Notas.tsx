@@ -121,16 +121,18 @@ export default function ReitorNotas() {
                         </div>
 
                         {/* Meta row */}
-                        <div className="flex items-center gap-2 px-3 pb-2.5">
-                          <span className="text-[10px] text-muted-foreground">{c.coordinator}</span>
-                          <span className="text-muted-foreground/30">·</span>
-                          <Link
-                            to={`/reitor/faculdades/${f.id}`}
-                            onClick={e => e.stopPropagation()}
-                            className="inline-flex items-center gap-1 text-[10px] font-medium text-primary hover:text-primary/80 bg-primary/5 hover:bg-primary/10 px-1.5 py-0.5 rounded transition-colors"
-                          >
-                            <UserCog className="w-2.5 h-2.5" /> Decano: {f.dean.replace(/^(Prof\.\s*)?(Profª\.\s*)?(Dr\.\s*)?(Dra\.\s*)?/, "")}
-                          </Link>
+                        <div className="flex flex-col gap-1 px-3 pb-2.5 text-[10px]">
+                          <p className="text-muted-foreground"><span className="font-medium text-foreground/70">Coordenador:</span> {c.coordinator}</p>
+                          <div className="flex items-center gap-1">
+                            <span className="font-medium text-foreground/70">Decano:</span>
+                            <Link
+                              to={`/reitor/faculdades/${f.id}`}
+                              onClick={e => e.stopPropagation()}
+                              className="inline-flex items-center gap-1 font-medium text-primary hover:text-primary/80 bg-primary/5 hover:bg-primary/10 px-1.5 py-0.5 rounded transition-colors"
+                            >
+                              {f.dean.replace(/^(Prof\.\s*)?(Profª\.\s*)?(Dr\.\s*)?(Dra\.\s*)?/, "")}
+                            </Link>
+                          </div>
                         </div>
 
                         {/* Stats footer */}
