@@ -31,7 +31,11 @@ export default function ReitorFaculdades() {
             <div className="flex items-center gap-2.5 mb-1">
               <Building2 className="w-5 h-5 text-primary" />
               <h1 className="text-xl font-bold text-foreground tracking-tight">As Minhas Faculdades</h1>
-              <Badge variant="outline" className="text-[10px] shrink-0">{uni.totalFaculdades} faculdades</Badge>
+              {(() => {
+                const avg = reitorFaculties.reduce((s, f) => s + f.mediaGeral, 0) / reitorFaculties.length;
+                const e = getEstado(avg);
+                return <Badge variant="outline" className={`text-[10px] shrink-0 ${e.cls}`}>{e.label}</Badge>;
+              })()}
             </div>
             <p className="text-sm text-muted-foreground">{uni.name}</p>
           </div>
