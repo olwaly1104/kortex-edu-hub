@@ -104,7 +104,8 @@ export default function ReitorNotas() {
                 {f.courses.map(c => {
                   const cEstado = getEstado(c.mediaGeral);
                   const turmas = c.years * 2;
-                  const avaliacoes = Math.round(c.estudantes / 10);
+                  const avalTotal = turmas * c.years;
+                  const avalDone = Math.round(avalTotal * (c.mediaGeral >= 14 ? 0.9 : c.mediaGeral >= 12 ? 0.75 : 0.6));
                   const aprov = c.mediaGeral >= 14 ? 87 : c.mediaGeral >= 13 ? 79 : c.mediaGeral >= 12 ? 72 : 61;
                   return (
                     <Link key={c.id} to={`/reitor/faculdades/${f.id}/cursos/${c.id}`}>
@@ -133,20 +134,24 @@ export default function ReitorNotas() {
                         </div>
 
                         {/* Stats footer */}
-                        <div className="grid grid-cols-4 bg-muted/30 border-t border-border">
-                          <div className="px-3 py-2 text-center">
+                        <div className="grid grid-cols-5 bg-muted/30 border-t border-border">
+                          <div className="px-2 py-2 text-center">
                             <p className="text-[9px] text-muted-foreground uppercase leading-tight">Turmas</p>
                             <p className="text-xs font-bold text-foreground">{turmas}</p>
                           </div>
-                          <div className="px-3 py-2 text-center">
+                          <div className="px-2 py-2 text-center">
                             <p className="text-[9px] text-muted-foreground uppercase leading-tight">Est.</p>
                             <p className="text-xs font-bold text-foreground">{c.estudantes}</p>
                           </div>
-                          <div className="px-3 py-2 text-center">
+                          <div className="px-2 py-2 text-center">
+                            <p className="text-[9px] text-muted-foreground uppercase leading-tight">Aval.</p>
+                            <p className="text-xs font-bold text-foreground">{avalDone}/{avalTotal}</p>
+                          </div>
+                          <div className="px-2 py-2 text-center">
                             <p className="text-[9px] text-muted-foreground uppercase leading-tight">Média</p>
                             <p className={`text-xs font-bold ${c.mediaGeral >= 10 ? "text-accent" : "text-destructive"}`}>{c.mediaGeral}</p>
                           </div>
-                          <div className="px-3 py-2 text-center">
+                          <div className="px-2 py-2 text-center">
                             <p className="text-[9px] text-muted-foreground uppercase leading-tight">% Aprov.</p>
                             <p className={`text-xs font-bold ${aprov >= 75 ? "text-accent" : aprov >= 60 ? "text-foreground" : "text-destructive"}`}>{aprov}%</p>
                           </div>
