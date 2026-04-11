@@ -14,19 +14,21 @@ export interface Transaction {
   department?: string;
   requestedBy?: string;
   payer?: string;
+  studentId?: string;
+  course?: string;
 }
 
 export const recentTransactions: Transaction[] = [
-  { id: "t1", date: "2025-04-10", description: "Propinas — Abril (Eng. Informática)", category: "Propinas", amount: 12500000, type: "receita", status: "pago", source: "Propinas" },
-  { id: "t2", date: "2025-04-09", description: "Salários — Docentes Faculdade de Engenharia", category: "Pessoal", amount: 8200000, type: "despesa", status: "aprovada", department: "Fac. Engenharia" },
+  { id: "t1", date: "2025-04-10", description: "Propina — Abril", category: "Propinas", amount: 52000, type: "receita", status: "pago", source: "Propinas", payer: "João Mendes", studentId: "EST-1001" },
+  { id: "t2", date: "2025-04-09", description: "Salários — Docentes Fac. Engenharia", category: "Pessoal", amount: 8200000, type: "despesa", status: "aprovada", department: "Fac. Engenharia" },
   { id: "t3", date: "2025-04-08", description: "Manutenção Laboratórios", category: "Infraestrutura", amount: 1500000, type: "despesa", status: "pendente", department: "Manutenção", requestedBy: "Eng. Pedro Neto" },
-  { id: "t4", date: "2025-04-07", description: "Subsídio Governamental — Q1", category: "Subsídios", amount: 25000000, type: "receita", status: "pago", source: "Subsídios" },
+  { id: "t4", date: "2025-04-07", description: "Propina — Abril", category: "Propinas", amount: 65000, type: "receita", status: "pago", source: "Propinas", payer: "Maria Santos", studentId: "EST-1002" },
   { id: "t5", date: "2025-04-06", description: "Material de Escritório", category: "Operacional", amount: 350000, type: "despesa", status: "aprovada", department: "Administração" },
-  { id: "t6", date: "2025-04-05", description: "Propinas — Abril (Direito)", category: "Propinas", amount: 9800000, type: "receita", status: "pendente", source: "Propinas" },
+  { id: "t6", date: "2025-04-05", description: "Propina — Abril", category: "Propinas", amount: 52000, type: "receita", status: "pendente", source: "Propinas", payer: "Carlos Ferreira", studentId: "EST-1003" },
   { id: "t7", date: "2025-04-04", description: "Seguro Institucional — Mensal", category: "Operacional", amount: 2100000, type: "despesa", status: "aprovada", department: "Administração" },
-  { id: "t8", date: "2025-04-03", description: "Inscrições Exames — Extraordinários", category: "Taxas", amount: 3200000, type: "receita", status: "pago", source: "Outros" },
-  { id: "t9", date: "2025-04-02", description: "Compra de Projetores — 5 unidades", category: "Infraestrutura", amount: 4500000, type: "despesa", status: "rejeitada", department: "TI", requestedBy: "Dr. Luís Campos" },
-  { id: "t10", date: "2025-04-01", description: "Aluguer Espaço Conferência", category: "Outros", amount: 800000, type: "receita", status: "pago", source: "Outros" },
+  { id: "t8", date: "2025-04-03", description: "Taxa de Exame", category: "Taxas", amount: 15000, type: "receita", status: "pago", source: "Taxas", payer: "Ana Lopes", studentId: "EST-1004" },
+  { id: "t9", date: "2025-04-02", description: "Compra de Projetores", category: "Infraestrutura", amount: 4500000, type: "despesa", status: "rejeitada", department: "TI", requestedBy: "Dr. Luís Campos" },
+  { id: "t10", date: "2025-04-01", description: "Propina — Março", category: "Propinas", amount: 52000, type: "receita", status: "em_atraso", source: "Propinas", payer: "Pedro Baptista", studentId: "EST-1005" },
 ];
 
 export const monthlyData = [
@@ -51,32 +53,71 @@ export const alerts = [
   { id: "a3", type: "error" as const, message: "Orçamento de Infraestrutura atingiu 92% do limite" },
 ];
 
-export const receitas: Transaction[] = [
-  { id: "r1", date: "2025-04-10", description: "Propinas — Abril (Eng. Informática)", category: "Propinas", amount: 12500000, type: "receita", status: "pago", source: "Propinas", payer: "Fac. Engenharia — 245 estudantes" },
-  { id: "r2", date: "2025-04-09", description: "Propinas — Abril (Direito)", category: "Propinas", amount: 9800000, type: "receita", status: "pendente", source: "Propinas", payer: "Fac. Direito — 189 estudantes" },
-  { id: "r3", date: "2025-04-07", description: "Subsídio Governamental — Q1", category: "Subsídios", amount: 25000000, type: "receita", status: "pago", source: "Subsídios", payer: "Ministério do Ensino Superior" },
-  { id: "r4", date: "2025-04-03", description: "Inscrições Exames — Extraordinários", category: "Taxas", amount: 3200000, type: "receita", status: "pago", source: "Outros", payer: "Secretaria Académica" },
-  { id: "r5", date: "2025-04-01", description: "Aluguer Espaço Conferência", category: "Outros", amount: 800000, type: "receita", status: "pago", source: "Outros", payer: "Empresa ABC, Lda." },
-  { id: "r6", date: "2025-03-28", description: "Propinas — Março (Medicina)", category: "Propinas", amount: 18500000, type: "receita", status: "pago", source: "Propinas", payer: "Fac. Medicina — 312 estudantes" },
-  { id: "r7", date: "2025-03-25", description: "Propinas — Março (Eng. Civil)", category: "Propinas", amount: 7200000, type: "receita", status: "em_atraso", source: "Propinas", payer: "Fac. Engenharia — 98 estudantes" },
-  { id: "r8", date: "2025-03-20", description: "Doação — Fundação XYZ", category: "Outros", amount: 5000000, type: "receita", status: "pago", source: "Outros", payer: "Fundação XYZ" },
-  { id: "r9", date: "2025-03-15", description: "Taxas de Matrícula — 2º Semestre", category: "Taxas", amount: 14200000, type: "receita", status: "pago", source: "Propinas", payer: "Todas as Faculdades — 1.240 estudantes" },
-  { id: "r10", date: "2025-03-10", description: "Propinas — Março (Arquitectura)", category: "Propinas", amount: 6300000, type: "receita", status: "pendente", source: "Propinas", payer: "Fac. Arquitectura — 76 estudantes" },
-  { id: "r11", date: "2025-03-05", description: "Aluguer Cantina — Mensal", category: "Outros", amount: 1200000, type: "receita", status: "pago", source: "Outros", payer: "Restaurante Bom Sabor, Lda." },
-  { id: "r12", date: "2025-02-28", description: "Propinas — Fevereiro (Eng. Informática)", category: "Propinas", amount: 12500000, type: "receita", status: "pago", source: "Propinas", payer: "Fac. Engenharia — 245 estudantes" },
+// Per-student receitas
+const studentNames = [
+  "João Mendes", "Maria Santos", "Carlos Ferreira", "Ana Lopes", "Pedro Baptista",
+  "Sofia Rodrigues", "André Costa", "Beatriz Silva", "Diogo Nascimento", "Catarina Almeida",
+  "Ricardo Neto", "Inês Martins", "Hugo Tavares", "Marta Gonçalves", "Tiago Pereira",
+  "Raquel Sousa", "Bruno Fernandes", "Cláudia Ramos", "Daniel Moreira", "Filipa Cardoso",
+  "Miguel Oliveira", "Sara Teixeira", "Nuno Vieira", "Luísa Carvalho", "Rui Campos",
+  "Diana Pinto", "Paulo Machado", "Teresa Figueiredo", "Vitor Correia", "Joana Barros",
+  "Marco Reis", "Patrícia Duarte", "Simão Gomes", "Helena Castro", "Fábio Araújo",
+  "Lara Henriques", "Gustavo Monteiro", "Vera Marques", "Sérgio Coelho", "Mónica Freitas",
 ];
+
+const courses = ["Eng. Informática", "Eng. Civil", "Direito", "Medicina", "Arquitectura", "Ciências", "Letras", "Gestão"];
+const receitaStatuses: Array<'pago' | 'pendente' | 'em_atraso'> = ["pago", "pago", "pago", "pendente", "em_atraso"];
+const propinasAmounts = [52000, 55000, 58000, 62000, 65000, 70000, 48000, 50000];
+
+function generateReceitas(): Transaction[] {
+  const items: Transaction[] = [];
+  let id = 1;
+  for (let i = 0; i < 40; i++) {
+    const name = studentNames[i];
+    const course = courses[i % courses.length];
+    const amount = propinasAmounts[i % propinasAmounts.length];
+    const status = receitaStatuses[i % receitaStatuses.length];
+    const day = String(Math.max(1, 28 - i)).padStart(2, "0");
+    const month = i < 15 ? "04" : i < 30 ? "03" : "02";
+    items.push({
+      id: `r${id++}`, date: `2025-${month}-${day}`, description: "Propina Mensal", category: "Propinas",
+      amount, type: "receita", status, source: "Propinas", payer: name, studentId: `EST-${1000 + i + 1}`, course,
+    });
+  }
+  // Additional non-propina receitas
+  items.push(
+    { id: `r${id++}`, date: "2025-04-05", description: "Taxa de Exame Extraordinário", category: "Taxas", amount: 15000, type: "receita", status: "pago", source: "Taxas", payer: "João Mendes", studentId: "EST-1001", course: "Eng. Informática" },
+    { id: `r${id++}`, date: "2025-04-03", description: "Taxa de Matrícula", category: "Taxas", amount: 25000, type: "receita", status: "pago", source: "Taxas", payer: "Sofia Rodrigues", studentId: "EST-1006", course: "Arquitectura" },
+    { id: `r${id++}`, date: "2025-04-01", description: "Multa por Atraso", category: "Taxas", amount: 5000, type: "receita", status: "pendente", source: "Taxas", payer: "Carlos Ferreira", studentId: "EST-1003", course: "Direito" },
+    { id: `r${id++}`, date: "2025-03-28", description: "Taxa de Certificado", category: "Taxas", amount: 8000, type: "receita", status: "pago", source: "Taxas", payer: "Ana Lopes", studentId: "EST-1004", course: "Medicina" },
+    { id: `r${id++}`, date: "2025-03-25", description: "Propina Mensal", category: "Propinas", amount: 52000, type: "receita", status: "em_atraso", source: "Propinas", payer: "Diogo Nascimento", studentId: "EST-1009", course: "Eng. Informática" },
+  );
+  return items;
+}
+
+export const receitas: Transaction[] = generateReceitas();
 
 export const despesas: Transaction[] = [
   { id: "d1", date: "2025-04-09", description: "Salários — Docentes Fac. Engenharia", category: "Pessoal", amount: 8200000, type: "despesa", status: "aprovada", department: "Fac. Engenharia", requestedBy: "RH" },
-  { id: "d2", date: "2025-04-08", description: "Manutenção Laboratórios", category: "Infraestrutura", amount: 1500000, type: "despesa", status: "pendente", department: "Manutenção", requestedBy: "Eng. Pedro Neto" },
-  { id: "d3", date: "2025-04-05", description: "Material de Escritório", category: "Operacional", amount: 350000, type: "despesa", status: "aprovada", department: "Administração", requestedBy: "Secretaria" },
-  { id: "d4", date: "2025-04-04", description: "Seguro Institucional — Mensal", category: "Operacional", amount: 2100000, type: "despesa", status: "aprovada", department: "Administração", requestedBy: "Direcção" },
-  { id: "d5", date: "2025-04-02", description: "Compra de Projetores — 5 unidades", category: "Infraestrutura", amount: 4500000, type: "despesa", status: "rejeitada", department: "TI", requestedBy: "Dr. Luís Campos" },
-  { id: "d6", date: "2025-03-30", description: "Limpeza e Higienização", category: "Operacional", amount: 900000, type: "despesa", status: "aprovada", department: "Serviços Gerais", requestedBy: "Coord. Serviços" },
-  { id: "d7", date: "2025-03-28", description: "Salários — Staff Administrativo", category: "Pessoal", amount: 5400000, type: "despesa", status: "aprovada", department: "Administração", requestedBy: "RH" },
-  { id: "d8", date: "2025-03-25", description: "Renovação Mobiliário — Sala 305", category: "Infraestrutura", amount: 3200000, type: "despesa", status: "pendente", department: "Manutenção", requestedBy: "Decano Eng." },
-  { id: "d9", date: "2025-03-20", description: "Licenças Software Académico", category: "Operacional", amount: 6800000, type: "despesa", status: "aprovada", department: "TI", requestedBy: "Dir. TI" },
-  { id: "d10", date: "2025-03-15", description: "Energia Eléctrica — Março", category: "Operacional", amount: 4100000, type: "despesa", status: "aprovada", department: "Infraestrutura", requestedBy: "Administração" },
+  { id: "d2", date: "2025-04-08", description: "Manutenção Laboratórios Bloco A", category: "Infraestrutura", amount: 1500000, type: "despesa", status: "pendente", department: "Manutenção", requestedBy: "Eng. Pedro Neto" },
+  { id: "d3", date: "2025-04-07", description: "Material de Escritório — Resma e Toners", category: "Operacional", amount: 350000, type: "despesa", status: "aprovada", department: "Administração", requestedBy: "Secretaria" },
+  { id: "d4", date: "2025-04-06", description: "Seguro Institucional — Abril", category: "Operacional", amount: 2100000, type: "despesa", status: "aprovada", department: "Administração", requestedBy: "Direcção" },
+  { id: "d5", date: "2025-04-05", description: "Compra de Projetores — 5 un.", category: "Infraestrutura", amount: 4500000, type: "despesa", status: "rejeitada", department: "TI", requestedBy: "Dr. Luís Campos" },
+  { id: "d6", date: "2025-04-04", description: "Serviço de Limpeza — Abril", category: "Operacional", amount: 900000, type: "despesa", status: "aprovada", department: "Serviços Gerais", requestedBy: "Coord. Serviços" },
+  { id: "d7", date: "2025-04-03", description: "Salários — Staff Administrativo", category: "Pessoal", amount: 5400000, type: "despesa", status: "aprovada", department: "Administração", requestedBy: "RH" },
+  { id: "d8", date: "2025-04-02", description: "Renovação Mobiliário Sala 305", category: "Infraestrutura", amount: 3200000, type: "despesa", status: "pendente", department: "Manutenção", requestedBy: "Decano Eng." },
+  { id: "d9", date: "2025-04-01", description: "Licenças Software Académico", category: "Operacional", amount: 6800000, type: "despesa", status: "aprovada", department: "TI", requestedBy: "Dir. TI" },
+  { id: "d10", date: "2025-03-30", description: "Energia Eléctrica — Março", category: "Operacional", amount: 4100000, type: "despesa", status: "aprovada", department: "Infraestrutura", requestedBy: "Administração" },
+  { id: "d11", date: "2025-03-28", description: "Água e Saneamento — Março", category: "Operacional", amount: 1800000, type: "despesa", status: "aprovada", department: "Infraestrutura", requestedBy: "Administração" },
+  { id: "d12", date: "2025-03-25", description: "Combustível — Frota Institucional", category: "Operacional", amount: 750000, type: "despesa", status: "aprovada", department: "Serviços Gerais", requestedBy: "Motorista Chefe" },
+  { id: "d13", date: "2025-03-22", description: "Reagentes Laboratório Química", category: "Académico", amount: 2300000, type: "despesa", status: "pendente", department: "Fac. Ciências", requestedBy: "Prof. Ana Costa" },
+  { id: "d14", date: "2025-03-20", description: "Impressão de Diplomas — 2024", category: "Académico", amount: 980000, type: "despesa", status: "aprovada", department: "Secretaria", requestedBy: "Secretária Académica" },
+  { id: "d15", date: "2025-03-18", description: "Catering — Cerimónia Abertura", category: "Eventos", amount: 1450000, type: "despesa", status: "aprovada", department: "Reitoria", requestedBy: "Gabinete do Reitor" },
+  { id: "d16", date: "2025-03-15", description: "Reparação Ar Condicionado Bloco C", category: "Infraestrutura", amount: 620000, type: "despesa", status: "rejeitada", department: "Manutenção", requestedBy: "Técnico HVAC" },
+  { id: "d17", date: "2025-03-12", description: "Bolsas de Mérito — Fevereiro", category: "Académico", amount: 3500000, type: "despesa", status: "aprovada", department: "Reitoria", requestedBy: "Vice-Reitor" },
+  { id: "d18", date: "2025-03-10", description: "Internet e Telecomunicações", category: "Operacional", amount: 1200000, type: "despesa", status: "aprovada", department: "TI", requestedBy: "Dir. TI" },
+  { id: "d19", date: "2025-03-08", description: "Uniformes — Pessoal de Apoio", category: "Pessoal", amount: 450000, type: "despesa", status: "pendente", department: "Serviços Gerais", requestedBy: "RH" },
+  { id: "d20", date: "2025-03-05", description: "Publicação Revista Científica", category: "Académico", amount: 1100000, type: "despesa", status: "aprovada", department: "Investigação", requestedBy: "Dir. Investigação" },
 ];
 
 export interface Salary {
@@ -93,29 +134,87 @@ export interface Salary {
   payDate: string;
 }
 
-export const salarios: Salary[] = [
-  { id: "s1", employeeId: "FUN-001", name: "Prof. Dr. Ricardo Almeida", role: "Decano", department: "Fac. Engenharia", contractType: "efectivo", grossSalary: 950000, netSalary: 817000, deductions: 133000, status: "pendente", payDate: "2025-04-30" },
-  { id: "s2", employeeId: "FUN-002", name: "Prof. António Silva", role: "Professor Titular", department: "Fac. Engenharia", contractType: "efectivo", grossSalary: 850000, netSalary: 731000, deductions: 119000, status: "pago", payDate: "2025-03-31" },
-  { id: "s3", employeeId: "FUN-003", name: "Prof. Maria Santos", role: "Professora Associada", department: "Fac. Engenharia", contractType: "efectivo", grossSalary: 720000, netSalary: 619200, deductions: 100800, status: "pago", payDate: "2025-03-31" },
-  { id: "s4", employeeId: "FUN-004", name: "Dr. Fábio Costa", role: "Coordenador de Curso", department: "Fac. Engenharia", contractType: "efectivo", grossSalary: 680000, netSalary: 584800, deductions: 95200, status: "pendente", payDate: "2025-04-30" },
-  { id: "s5", employeeId: "FUN-005", name: "Prof. Pedro Ferreira", role: "Professor Auxiliar", department: "Fac. Engenharia", contractType: "contratado", grossSalary: 620000, netSalary: 533200, deductions: 86800, status: "pendente", payDate: "2025-04-30" },
-  { id: "s6", employeeId: "FUN-006", name: "Prof. Ana Costa", role: "Professora Associada", department: "Fac. Ciências", contractType: "efectivo", grossSalary: 720000, netSalary: 619200, deductions: 100800, status: "pago", payDate: "2025-03-31" },
-  { id: "s7", employeeId: "FUN-007", name: "Prof. David Lopes", role: "Professor Auxiliar", department: "Fac. Letras", contractType: "contratado", grossSalary: 580000, netSalary: 498800, deductions: 81200, status: "processando", payDate: "2025-04-30" },
-  { id: "s8", employeeId: "FUN-008", name: "Dra. Teresa Nascimento", role: "Secretária Académica", department: "Administração", contractType: "efectivo", grossSalary: 550000, netSalary: 473000, deductions: 77000, status: "pago", payDate: "2025-03-31" },
-  { id: "s9", employeeId: "FUN-009", name: "Eng. João Martins", role: "Técnico de TI", department: "TI", contractType: "contratado", grossSalary: 420000, netSalary: 361200, deductions: 58800, status: "pago", payDate: "2025-03-31" },
-  { id: "s10", employeeId: "FUN-010", name: "Ana Beatriz Soares", role: "Assistente Administrativa", department: "Administração", contractType: "colaborador", grossSalary: 350000, netSalary: 301000, deductions: 49000, status: "processando", payDate: "2025-04-30" },
-  { id: "s11", employeeId: "FUN-011", name: "Prof. Carlos Mendes", role: "Professor Titular", department: "Fac. Medicina", contractType: "efectivo", grossSalary: 920000, netSalary: 791200, deductions: 128800, status: "pago", payDate: "2025-03-31" },
-  { id: "s12", employeeId: "FUN-012", name: "Profª. Margarida Lopes", role: "Decana", department: "Fac. Medicina", contractType: "efectivo", grossSalary: 980000, netSalary: 842800, deductions: 137200, status: "pendente", payDate: "2025-04-30" },
-  { id: "s13", employeeId: "FUN-013", name: "Dr. Manuel Rodrigues", role: "Professor Auxiliar", department: "Fac. Direito", contractType: "efectivo", grossSalary: 650000, netSalary: 559000, deductions: 91000, status: "pago", payDate: "2025-03-31" },
-  { id: "s14", employeeId: "FUN-014", name: "Eng. Sofia Ribeiro", role: "Técnica de Laboratório", department: "Fac. Engenharia", contractType: "contratado", grossSalary: 480000, netSalary: 412800, deductions: 67200, status: "pago", payDate: "2025-03-31" },
-  { id: "s15", employeeId: "FUN-015", name: "José Alberto Campos", role: "Segurança", department: "Serviços Gerais", contractType: "contratado", grossSalary: 280000, netSalary: 240800, deductions: 39200, status: "pago", payDate: "2025-03-31" },
-  { id: "s16", employeeId: "FUN-016", name: "Maria do Céu Ferreira", role: "Bibliotecária", department: "Administração", contractType: "efectivo", grossSalary: 420000, netSalary: 361200, deductions: 58800, status: "pago", payDate: "2025-03-31" },
-  { id: "s17", employeeId: "FUN-017", name: "Prof. Nelson Baptista", role: "Professor Associado", department: "Fac. Arquitectura", contractType: "efectivo", grossSalary: 700000, netSalary: 602000, deductions: 98000, status: "pendente", payDate: "2025-04-30" },
-  { id: "s18", employeeId: "FUN-018", name: "Luís Nascimento", role: "Motorista", department: "Serviços Gerais", contractType: "colaborador", grossSalary: 250000, netSalary: 215000, deductions: 35000, status: "processando", payDate: "2025-04-30" },
+const roles = [
+  { role: "Professor Titular", gross: [800000, 950000] },
+  { role: "Professor Associado", gross: [680000, 780000] },
+  { role: "Professor Auxiliar", gross: [550000, 680000] },
+  { role: "Assistente", gross: [400000, 550000] },
+  { role: "Decano", gross: [900000, 1050000] },
+  { role: "Coordenador de Curso", gross: [650000, 750000] },
+  { role: "Técnico de Laboratório", gross: [350000, 480000] },
+  { role: "Técnico de TI", gross: [380000, 520000] },
+  { role: "Secretário(a)", gross: [300000, 420000] },
+  { role: "Assistente Administrativo", gross: [280000, 380000] },
+  { role: "Bibliotecário(a)", gross: [320000, 420000] },
+  { role: "Segurança", gross: [220000, 300000] },
+  { role: "Motorista", gross: [200000, 280000] },
+  { role: "Auxiliar de Limpeza", gross: [180000, 250000] },
+  { role: "Recepcionista", gross: [250000, 340000] },
 ];
 
+const departments = ["Fac. Engenharia", "Fac. Medicina", "Fac. Direito", "Fac. Ciências", "Fac. Letras", "Fac. Arquitectura", "Fac. Gestão", "Administração", "TI", "Serviços Gerais", "Reitoria", "Biblioteca", "Secretaria"];
+const contracts: Array<'efectivo' | 'contratado' | 'colaborador'> = ["efectivo", "efectivo", "efectivo", "contratado", "contratado", "colaborador"];
+const salaryStatuses: Array<'pago' | 'pendente' | 'processando'> = ["pago", "pago", "pago", "pendente", "pendente", "processando"];
+
+const firstNames = [
+  "Ricardo", "António", "Maria", "Fábio", "Pedro", "Ana", "David", "Teresa", "João", "Beatriz",
+  "Carlos", "Margarida", "Manuel", "Sofia", "José", "Céu", "Nelson", "Luís", "Inês", "Hugo",
+  "Tiago", "Raquel", "Bruno", "Cláudia", "Daniel", "Filipa", "Miguel", "Sara", "Nuno", "Luísa",
+  "Rui", "Diana", "Paulo", "Patrícia", "Simão", "Helena", "Gustavo", "Vera", "Sérgio", "Mónica",
+  "André", "Catarina", "Diogo", "Marta", "Vitor", "Joana", "Marco", "Lara", "Gonçalo", "Rita",
+  "Alexandre", "Isabel", "Tomás", "Francisca", "Rafael", "Leonor", "Bernardo", "Carolina", "Henrique", "Eva",
+  "Martim", "Matilde", "Gabriel", "Mariana", "Afonso", "Bianca", "Vicente", "Alice", "Dinis", "Laura",
+  "Artur", "Gabriela", "Francisco", "Mafalda", "Duarte", "Constança", "Salvador", "Carminho", "Lourenço", "Aurora",
+  "Valentim", "Amélia", "Edgar", "Ivone", "Frederico", "Olga", "Gaspar", "Natália", "Ivo", "Celeste",
+  "Jaime", "Odete", "Kevin", "Perpétua", "Leandro", "Quitéria", "Márcio", "Rosa", "Orlando", "Sílvia",
+];
+const lastNames = [
+  "Almeida", "Silva", "Santos", "Costa", "Ferreira", "Rodrigues", "Lopes", "Nascimento", "Martins", "Soares",
+  "Mendes", "Neto", "Campos", "Ribeiro", "Pereira", "Carvalho", "Baptista", "Monteiro", "Oliveira", "Teixeira",
+  "Vieira", "Pinto", "Machado", "Figueiredo", "Correia", "Barros", "Reis", "Duarte", "Gomes", "Castro",
+  "Araújo", "Henriques", "Marques", "Coelho", "Freitas", "Tavares", "Gonçalves", "Moreira", "Cardoso", "Ramos",
+  "Matos", "Rocha", "Antunes", "Brito", "Cruz", "Domingues", "Esteves", "Fonseca", "Guerra", "Leal",
+];
+
+function rand(min: number, max: number): number {
+  return Math.floor(min + (max - min) * ((Math.sin(min * 9301 + max * 49297) + 1) / 2));
+}
+
+function generateSalarios(): Salary[] {
+  const list: Salary[] = [];
+  for (let i = 0; i < 100; i++) {
+    const first = firstNames[i % firstNames.length];
+    const last = lastNames[i % lastNames.length];
+    const roleInfo = roles[i % roles.length];
+    const dept = departments[i % departments.length];
+    const contract = contracts[i % contracts.length];
+    const status = salaryStatuses[i % salaryStatuses.length];
+    const gross = roleInfo.gross[0] + Math.round(((i * 7 + 13) % (roleInfo.gross[1] - roleInfo.gross[0])) / 1000) * 1000;
+    const deductionRate = 0.14;
+    const deductions = Math.round(gross * deductionRate);
+    const net = gross - deductions;
+    const prefix = i < 50 ? "Prof. " : (i < 70 ? "Dr(a). " : "");
+    list.push({
+      id: `s${i + 1}`,
+      employeeId: `FUN-${String(i + 1).padStart(3, "0")}`,
+      name: `${prefix}${first} ${last}`,
+      role: roleInfo.role,
+      department: dept,
+      contractType: contract,
+      grossSalary: gross,
+      netSalary: net,
+      deductions,
+      status,
+      payDate: status === "pago" ? "2025-03-31" : "2025-04-30",
+    });
+  }
+  return list;
+}
+
+export const salarios: Salary[] = generateSalarios();
+
 export const payrollBudget = {
-  totalBudget: 15000000,
+  totalBudget: 65000000,
   currentMonth: "Abril 2025",
 };
 
