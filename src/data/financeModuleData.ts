@@ -86,10 +86,10 @@ function generateReceitas(): Transaction[] {
   }
   // Additional non-propina receitas
   items.push(
-    { id: `r${id++}`, date: "2025-04-05", description: "Taxa de Exame Extraordinário", category: "Taxas", amount: 15000, type: "receita", status: "pago", source: "Taxas", payer: "João Mendes", studentId: "EST-1001", course: "Eng. Informática" },
-    { id: `r${id++}`, date: "2025-04-03", description: "Taxa de Matrícula", category: "Taxas", amount: 25000, type: "receita", status: "pago", source: "Taxas", payer: "Sofia Rodrigues", studentId: "EST-1006", course: "Arquitectura" },
-    { id: `r${id++}`, date: "2025-04-01", description: "Multa por Atraso", category: "Taxas", amount: 5000, type: "receita", status: "pendente", source: "Taxas", payer: "Carlos Ferreira", studentId: "EST-1003", course: "Direito" },
-    { id: `r${id++}`, date: "2025-03-28", description: "Taxa de Certificado", category: "Taxas", amount: 8000, type: "receita", status: "pago", source: "Taxas", payer: "Ana Lopes", studentId: "EST-1004", course: "Medicina" },
+    { id: `r${id++}`, date: "2025-04-05", description: "Taxa de Exame", category: "Emolumentos", amount: 15000, type: "receita", status: "pago", source: "Emolumentos", payer: "João Mendes", studentId: "EST-1001", course: "Eng. Informática" },
+    { id: `r${id++}`, date: "2025-04-03", description: "Taxa de Matrícula", category: "Emolumentos", amount: 25000, type: "receita", status: "pago", source: "Emolumentos", payer: "Sofia Rodrigues", studentId: "EST-1006", course: "Arquitectura" },
+    { id: `r${id++}`, date: "2025-04-01", description: "Emolumentos de Inscrição", category: "Emolumentos", amount: 18000, type: "receita", status: "pendente", source: "Emolumentos", payer: "Carlos Ferreira", studentId: "EST-1003", course: "Direito" },
+    { id: `r${id++}`, date: "2025-03-28", description: "Taxa de Certificado", category: "Emolumentos", amount: 8000, type: "receita", status: "pago", source: "Emolumentos", payer: "Ana Lopes", studentId: "EST-1004", course: "Medicina" },
     { id: `r${id++}`, date: "2025-03-25", description: "Propina Mensal", category: "Propinas", amount: 52000, type: "receita", status: "em_atraso", source: "Propinas", payer: "Diogo Nascimento", studentId: "EST-1009", course: "Eng. Informática" },
   );
   return items;
@@ -98,26 +98,26 @@ function generateReceitas(): Transaction[] {
 export const receitas: Transaction[] = generateReceitas();
 
 export const despesas: Transaction[] = [
-  { id: "d1", date: "2025-04-09", description: "Salários — Docentes Fac. Engenharia", category: "Pessoal", amount: 8200000, type: "despesa", status: "aprovada", department: "Fac. Engenharia", requestedBy: "RH" },
+  { id: "d1", date: "2025-04-09", description: "Salários — Docentes Fac. Engenharia", category: "Salários", amount: 8200000, type: "despesa", status: "aprovada", department: "Fac. Engenharia", requestedBy: "RH" },
   { id: "d2", date: "2025-04-08", description: "Manutenção Laboratórios Bloco A", category: "Infraestrutura", amount: 1500000, type: "despesa", status: "pendente", department: "Manutenção", requestedBy: "Eng. Pedro Neto" },
-  { id: "d3", date: "2025-04-07", description: "Material de Escritório — Resma e Toners", category: "Operacional", amount: 350000, type: "despesa", status: "aprovada", department: "Administração", requestedBy: "Secretaria" },
-  { id: "d4", date: "2025-04-06", description: "Seguro Institucional — Abril", category: "Operacional", amount: 2100000, type: "despesa", status: "aprovada", department: "Administração", requestedBy: "Direcção" },
+  { id: "d3", date: "2025-04-07", description: "Resmas, Toners e Material de Escritório", category: "Material Didáctico", amount: 350000, type: "despesa", status: "aprovada", department: "Administração", requestedBy: "Secretaria" },
+  { id: "d4", date: "2025-04-06", description: "Seguro Institucional — Abril", category: "Serviços e Utilities", amount: 2100000, type: "despesa", status: "aprovada", department: "Administração", requestedBy: "Direcção" },
   { id: "d5", date: "2025-04-05", description: "Compra de Projetores — 5 un.", category: "Infraestrutura", amount: 4500000, type: "despesa", status: "rejeitada", department: "TI", requestedBy: "Dr. Luís Campos" },
-  { id: "d6", date: "2025-04-04", description: "Serviço de Limpeza — Abril", category: "Operacional", amount: 900000, type: "despesa", status: "aprovada", department: "Serviços Gerais", requestedBy: "Coord. Serviços" },
-  { id: "d7", date: "2025-04-03", description: "Salários — Staff Administrativo", category: "Pessoal", amount: 5400000, type: "despesa", status: "aprovada", department: "Administração", requestedBy: "RH" },
+  { id: "d6", date: "2025-04-04", description: "Serviço de Limpeza — Abril", category: "Serviços e Utilities", amount: 900000, type: "despesa", status: "aprovada", department: "Serviços Gerais", requestedBy: "Coord. Serviços" },
+  { id: "d7", date: "2025-04-03", description: "Salários — Staff Administrativo", category: "Salários", amount: 5400000, type: "despesa", status: "aprovada", department: "Administração", requestedBy: "RH" },
   { id: "d8", date: "2025-04-02", description: "Renovação Mobiliário Sala 305", category: "Infraestrutura", amount: 3200000, type: "despesa", status: "pendente", department: "Manutenção", requestedBy: "Decano Eng." },
-  { id: "d9", date: "2025-04-01", description: "Licenças Software Académico", category: "Operacional", amount: 6800000, type: "despesa", status: "aprovada", department: "TI", requestedBy: "Dir. TI" },
-  { id: "d10", date: "2025-03-30", description: "Energia Eléctrica — Março", category: "Operacional", amount: 4100000, type: "despesa", status: "aprovada", department: "Infraestrutura", requestedBy: "Administração" },
-  { id: "d11", date: "2025-03-28", description: "Água e Saneamento — Março", category: "Operacional", amount: 1800000, type: "despesa", status: "aprovada", department: "Infraestrutura", requestedBy: "Administração" },
-  { id: "d12", date: "2025-03-25", description: "Combustível — Frota Institucional", category: "Operacional", amount: 750000, type: "despesa", status: "aprovada", department: "Serviços Gerais", requestedBy: "Motorista Chefe" },
-  { id: "d13", date: "2025-03-22", description: "Reagentes Laboratório Química", category: "Académico", amount: 2300000, type: "despesa", status: "pendente", department: "Fac. Ciências", requestedBy: "Prof. Ana Costa" },
-  { id: "d14", date: "2025-03-20", description: "Impressão de Diplomas — 2024", category: "Académico", amount: 980000, type: "despesa", status: "aprovada", department: "Secretaria", requestedBy: "Secretária Académica" },
-  { id: "d15", date: "2025-03-18", description: "Catering — Cerimónia Abertura", category: "Eventos", amount: 1450000, type: "despesa", status: "aprovada", department: "Reitoria", requestedBy: "Gabinete do Reitor" },
+  { id: "d9", date: "2025-04-01", description: "Licenças Software Académico", category: "Material Didáctico", amount: 6800000, type: "despesa", status: "aprovada", department: "TI", requestedBy: "Dir. TI" },
+  { id: "d10", date: "2025-03-30", description: "Energia Eléctrica — Março", category: "Serviços e Utilities", amount: 4100000, type: "despesa", status: "aprovada", department: "Infraestrutura", requestedBy: "Administração" },
+  { id: "d11", date: "2025-03-28", description: "Água e Saneamento — Março", category: "Serviços e Utilities", amount: 1800000, type: "despesa", status: "aprovada", department: "Infraestrutura", requestedBy: "Administração" },
+  { id: "d12", date: "2025-03-25", description: "Combustível — Frota Institucional", category: "Serviços e Utilities", amount: 750000, type: "despesa", status: "aprovada", department: "Serviços Gerais", requestedBy: "Motorista Chefe" },
+  { id: "d13", date: "2025-03-22", description: "Reagentes Laboratório Química", category: "Material Didáctico", amount: 2300000, type: "despesa", status: "pendente", department: "Fac. Ciências", requestedBy: "Prof. Ana Costa" },
+  { id: "d14", date: "2025-03-20", description: "Impressão de Diplomas — 2024", category: "Material Didáctico", amount: 980000, type: "despesa", status: "aprovada", department: "Secretaria", requestedBy: "Secretária Académica" },
+  { id: "d15", date: "2025-03-18", description: "Catering — Cerimónia Abertura", category: "Serviços e Utilities", amount: 1450000, type: "despesa", status: "aprovada", department: "Reitoria", requestedBy: "Gabinete do Reitor" },
   { id: "d16", date: "2025-03-15", description: "Reparação Ar Condicionado Bloco C", category: "Infraestrutura", amount: 620000, type: "despesa", status: "rejeitada", department: "Manutenção", requestedBy: "Técnico HVAC" },
-  { id: "d17", date: "2025-03-12", description: "Bolsas de Mérito — Fevereiro", category: "Académico", amount: 3500000, type: "despesa", status: "aprovada", department: "Reitoria", requestedBy: "Vice-Reitor" },
-  { id: "d18", date: "2025-03-10", description: "Internet e Telecomunicações", category: "Operacional", amount: 1200000, type: "despesa", status: "aprovada", department: "TI", requestedBy: "Dir. TI" },
-  { id: "d19", date: "2025-03-08", description: "Uniformes — Pessoal de Apoio", category: "Pessoal", amount: 450000, type: "despesa", status: "pendente", department: "Serviços Gerais", requestedBy: "RH" },
-  { id: "d20", date: "2025-03-05", description: "Publicação Revista Científica", category: "Académico", amount: 1100000, type: "despesa", status: "aprovada", department: "Investigação", requestedBy: "Dir. Investigação" },
+  { id: "d17", date: "2025-03-12", description: "Bolsas de Mérito — Fevereiro", category: "Bolsas e Apoios", amount: 3500000, type: "despesa", status: "aprovada", department: "Reitoria", requestedBy: "Vice-Reitor" },
+  { id: "d18", date: "2025-03-10", description: "Internet e Telecomunicações", category: "Serviços e Utilities", amount: 1200000, type: "despesa", status: "aprovada", department: "TI", requestedBy: "Dir. TI" },
+  { id: "d19", date: "2025-03-08", description: "Uniformes — Pessoal de Apoio", category: "Salários", amount: 450000, type: "despesa", status: "pendente", department: "Serviços Gerais", requestedBy: "RH" },
+  { id: "d20", date: "2025-03-05", description: "Bolsas de Investigação — Q1", category: "Investigação", amount: 1100000, type: "despesa", status: "aprovada", department: "Investigação", requestedBy: "Dir. Investigação" },
 ];
 
 export interface Salary {
