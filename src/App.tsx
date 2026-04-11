@@ -107,6 +107,7 @@ import SecretariaResultados from "./pages/secretaria/Resultados";
 import SecretariaAdmissoesDashboard from "./pages/secretaria/AdmissoesDashboard";
 import SecretariaSolicitacoes from "./pages/secretaria/Solicitacoes";
 import FinancasDashboard from "./pages/financas/Dashboard";
+import FinancasInicio from "./pages/financas/Inicio";
 import FinancasReceitas from "./pages/financas/Receitas";
 import FinancasDespesas from "./pages/financas/Despesas";
 import FinancasSalarios from "./pages/financas/Salarios";
