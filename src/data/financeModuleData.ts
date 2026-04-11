@@ -89,53 +89,35 @@ export interface Salary {
   grossSalary: number;
   netSalary: number;
   deductions: number;
-  bonus: number;
   status: 'pago' | 'pendente' | 'processando';
   payDate: string;
-  hireDate: string;
-  bankAccount: string;
 }
 
 export const salarios: Salary[] = [
-  { id: "s1", employeeId: "FUN-001", name: "Prof. Dr. Ricardo Almeida", role: "Decano", department: "Fac. Engenharia", contractType: "efectivo", grossSalary: 950000, netSalary: 817000, deductions: 133000, bonus: 0, status: "pendente", payDate: "2025-04-30", hireDate: "2010-03-15", bankAccount: "****4521" },
-  { id: "s2", employeeId: "FUN-002", name: "Prof. António Silva", role: "Professor Titular", department: "Fac. Engenharia", contractType: "efectivo", grossSalary: 850000, netSalary: 731000, deductions: 119000, bonus: 0, status: "pago", payDate: "2025-03-31", hireDate: "2012-09-01", bankAccount: "****7834" },
-  { id: "s3", employeeId: "FUN-003", name: "Prof. Maria Santos", role: "Professora Associada", department: "Fac. Engenharia", contractType: "efectivo", grossSalary: 720000, netSalary: 619200, deductions: 100800, bonus: 0, status: "pago", payDate: "2025-03-31", hireDate: "2014-02-10", bankAccount: "****2198" },
-  { id: "s4", employeeId: "FUN-004", name: "Dr. Fábio Costa", role: "Coordenador de Curso", department: "Fac. Engenharia", contractType: "efectivo", grossSalary: 680000, netSalary: 584800, deductions: 95200, bonus: 0, status: "pendente", payDate: "2025-04-30", hireDate: "2016-08-20", bankAccount: "****6543" },
-  { id: "s5", employeeId: "FUN-005", name: "Prof. Pedro Ferreira", role: "Professor Auxiliar", department: "Fac. Engenharia", contractType: "contratado", grossSalary: 620000, netSalary: 533200, deductions: 86800, bonus: 0, status: "pendente", payDate: "2025-04-30", hireDate: "2019-01-15", bankAccount: "****9012" },
-  { id: "s6", employeeId: "FUN-006", name: "Prof. Ana Costa", role: "Professora Associada", department: "Fac. Ciências", contractType: "efectivo", grossSalary: 720000, netSalary: 619200, deductions: 100800, bonus: 0, status: "pago", payDate: "2025-03-31", hireDate: "2013-04-01", bankAccount: "****3456" },
-  { id: "s7", employeeId: "FUN-007", name: "Prof. David Lopes", role: "Professor Auxiliar", department: "Fac. Letras", contractType: "contratado", grossSalary: 580000, netSalary: 498800, deductions: 81200, bonus: 0, status: "processando", payDate: "2025-04-30", hireDate: "2020-09-01", bankAccount: "****7890" },
-  { id: "s8", employeeId: "FUN-008", name: "Dra. Teresa Nascimento", role: "Secretária Académica", department: "Administração", contractType: "efectivo", grossSalary: 550000, netSalary: 473000, deductions: 77000, bonus: 0, status: "pago", payDate: "2025-03-31", hireDate: "2011-06-15", bankAccount: "****1234" },
-  { id: "s9", employeeId: "FUN-009", name: "Eng. João Martins", role: "Técnico de TI", department: "TI", contractType: "contratado", grossSalary: 420000, netSalary: 361200, deductions: 58800, bonus: 0, status: "pago", payDate: "2025-03-31", hireDate: "2021-03-01", bankAccount: "****5678" },
-  { id: "s10", employeeId: "FUN-010", name: "Ana Beatriz Soares", role: "Assistente Administrativa", department: "Administração", contractType: "colaborador", grossSalary: 350000, netSalary: 301000, deductions: 49000, bonus: 0, status: "processando", payDate: "2025-04-30", hireDate: "2022-01-10", bankAccount: "****4567" },
-  { id: "s11", employeeId: "FUN-011", name: "Prof. Carlos Mendes", role: "Professor Titular", department: "Fac. Medicina", contractType: "efectivo", grossSalary: 920000, netSalary: 791200, deductions: 128800, bonus: 0, status: "pago", payDate: "2025-03-31", hireDate: "2009-09-01", bankAccount: "****8901" },
-  { id: "s12", employeeId: "FUN-012", name: "Profª. Margarida Lopes", role: "Decana", department: "Fac. Medicina", contractType: "efectivo", grossSalary: 980000, netSalary: 842800, deductions: 137200, bonus: 0, status: "pendente", payDate: "2025-04-30", hireDate: "2008-03-01", bankAccount: "****2345" },
-  { id: "s13", employeeId: "FUN-013", name: "Dr. Manuel Rodrigues", role: "Professor Auxiliar", department: "Fac. Direito", contractType: "efectivo", grossSalary: 650000, netSalary: 559000, deductions: 91000, bonus: 0, status: "pago", payDate: "2025-03-31", hireDate: "2017-02-15", bankAccount: "****6789" },
-  { id: "s14", employeeId: "FUN-014", name: "Eng. Sofia Ribeiro", role: "Técnica de Laboratório", department: "Fac. Engenharia", contractType: "contratado", grossSalary: 480000, netSalary: 412800, deductions: 67200, bonus: 0, status: "pago", payDate: "2025-03-31", hireDate: "2020-06-01", bankAccount: "****0123" },
-  { id: "s15", employeeId: "FUN-015", name: "José Alberto Campos", role: "Segurança", department: "Serviços Gerais", contractType: "contratado", grossSalary: 280000, netSalary: 240800, deductions: 39200, bonus: 0, status: "pago", payDate: "2025-03-31", hireDate: "2019-11-01", bankAccount: "****3457" },
-  { id: "s16", employeeId: "FUN-016", name: "Maria do Céu Ferreira", role: "Bibliotecária", department: "Administração", contractType: "efectivo", grossSalary: 420000, netSalary: 361200, deductions: 58800, bonus: 0, status: "pago", payDate: "2025-03-31", hireDate: "2015-01-10", bankAccount: "****7891" },
-  { id: "s17", employeeId: "FUN-017", name: "Prof. Nelson Baptista", role: "Professor Associado", department: "Fac. Arquitectura", contractType: "efectivo", grossSalary: 700000, netSalary: 602000, deductions: 98000, bonus: 0, status: "pendente", payDate: "2025-04-30", hireDate: "2014-09-01", bankAccount: "****2346" },
-  { id: "s18", employeeId: "FUN-018", name: "Luís Nascimento", role: "Motorista", department: "Serviços Gerais", contractType: "colaborador", grossSalary: 250000, netSalary: 215000, deductions: 35000, bonus: 0, status: "processando", payDate: "2025-04-30", hireDate: "2021-07-01", bankAccount: "****5679" },
+  { id: "s1", employeeId: "FUN-001", name: "Prof. Dr. Ricardo Almeida", role: "Decano", department: "Fac. Engenharia", contractType: "efectivo", grossSalary: 950000, netSalary: 817000, deductions: 133000, status: "pendente", payDate: "2025-04-30" },
+  { id: "s2", employeeId: "FUN-002", name: "Prof. António Silva", role: "Professor Titular", department: "Fac. Engenharia", contractType: "efectivo", grossSalary: 850000, netSalary: 731000, deductions: 119000, status: "pago", payDate: "2025-03-31" },
+  { id: "s3", employeeId: "FUN-003", name: "Prof. Maria Santos", role: "Professora Associada", department: "Fac. Engenharia", contractType: "efectivo", grossSalary: 720000, netSalary: 619200, deductions: 100800, status: "pago", payDate: "2025-03-31" },
+  { id: "s4", employeeId: "FUN-004", name: "Dr. Fábio Costa", role: "Coordenador de Curso", department: "Fac. Engenharia", contractType: "efectivo", grossSalary: 680000, netSalary: 584800, deductions: 95200, status: "pendente", payDate: "2025-04-30" },
+  { id: "s5", employeeId: "FUN-005", name: "Prof. Pedro Ferreira", role: "Professor Auxiliar", department: "Fac. Engenharia", contractType: "contratado", grossSalary: 620000, netSalary: 533200, deductions: 86800, status: "pendente", payDate: "2025-04-30" },
+  { id: "s6", employeeId: "FUN-006", name: "Prof. Ana Costa", role: "Professora Associada", department: "Fac. Ciências", contractType: "efectivo", grossSalary: 720000, netSalary: 619200, deductions: 100800, status: "pago", payDate: "2025-03-31" },
+  { id: "s7", employeeId: "FUN-007", name: "Prof. David Lopes", role: "Professor Auxiliar", department: "Fac. Letras", contractType: "contratado", grossSalary: 580000, netSalary: 498800, deductions: 81200, status: "processando", payDate: "2025-04-30" },
+  { id: "s8", employeeId: "FUN-008", name: "Dra. Teresa Nascimento", role: "Secretária Académica", department: "Administração", contractType: "efectivo", grossSalary: 550000, netSalary: 473000, deductions: 77000, status: "pago", payDate: "2025-03-31" },
+  { id: "s9", employeeId: "FUN-009", name: "Eng. João Martins", role: "Técnico de TI", department: "TI", contractType: "contratado", grossSalary: 420000, netSalary: 361200, deductions: 58800, status: "pago", payDate: "2025-03-31" },
+  { id: "s10", employeeId: "FUN-010", name: "Ana Beatriz Soares", role: "Assistente Administrativa", department: "Administração", contractType: "colaborador", grossSalary: 350000, netSalary: 301000, deductions: 49000, status: "processando", payDate: "2025-04-30" },
+  { id: "s11", employeeId: "FUN-011", name: "Prof. Carlos Mendes", role: "Professor Titular", department: "Fac. Medicina", contractType: "efectivo", grossSalary: 920000, netSalary: 791200, deductions: 128800, status: "pago", payDate: "2025-03-31" },
+  { id: "s12", employeeId: "FUN-012", name: "Profª. Margarida Lopes", role: "Decana", department: "Fac. Medicina", contractType: "efectivo", grossSalary: 980000, netSalary: 842800, deductions: 137200, status: "pendente", payDate: "2025-04-30" },
+  { id: "s13", employeeId: "FUN-013", name: "Dr. Manuel Rodrigues", role: "Professor Auxiliar", department: "Fac. Direito", contractType: "efectivo", grossSalary: 650000, netSalary: 559000, deductions: 91000, status: "pago", payDate: "2025-03-31" },
+  { id: "s14", employeeId: "FUN-014", name: "Eng. Sofia Ribeiro", role: "Técnica de Laboratório", department: "Fac. Engenharia", contractType: "contratado", grossSalary: 480000, netSalary: 412800, deductions: 67200, status: "pago", payDate: "2025-03-31" },
+  { id: "s15", employeeId: "FUN-015", name: "José Alberto Campos", role: "Segurança", department: "Serviços Gerais", contractType: "contratado", grossSalary: 280000, netSalary: 240800, deductions: 39200, status: "pago", payDate: "2025-03-31" },
+  { id: "s16", employeeId: "FUN-016", name: "Maria do Céu Ferreira", role: "Bibliotecária", department: "Administração", contractType: "efectivo", grossSalary: 420000, netSalary: 361200, deductions: 58800, status: "pago", payDate: "2025-03-31" },
+  { id: "s17", employeeId: "FUN-017", name: "Prof. Nelson Baptista", role: "Professor Associado", department: "Fac. Arquitectura", contractType: "efectivo", grossSalary: 700000, netSalary: 602000, deductions: 98000, status: "pendente", payDate: "2025-04-30" },
+  { id: "s18", employeeId: "FUN-018", name: "Luís Nascimento", role: "Motorista", department: "Serviços Gerais", contractType: "colaborador", grossSalary: 250000, netSalary: 215000, deductions: 35000, status: "processando", payDate: "2025-04-30" },
 ];
 
-// Payroll budget data
 export const payrollBudget = {
-  totalBudget: 15000000, // monthly payroll budget
+  totalBudget: 15000000,
   currentMonth: "Abril 2025",
-  previousMonth: "Março 2025",
 };
-
-// Department salary summary
-export const departmentSalarySummary = [
-  { department: "Fac. Engenharia", employees: 6, totalGross: 4300000, totalNet: 3698200, budgetAlloc: 5000000 },
-  { department: "Fac. Medicina", employees: 2, totalGross: 1900000, totalNet: 1634000, budgetAlloc: 2200000 },
-  { department: "Fac. Ciências", employees: 1, totalGross: 720000, totalNet: 619200, budgetAlloc: 900000 },
-  { department: "Fac. Letras", employees: 1, totalGross: 580000, totalNet: 498800, budgetAlloc: 750000 },
-  { department: "Fac. Direito", employees: 1, totalGross: 650000, totalNet: 559000, budgetAlloc: 800000 },
-  { department: "Fac. Arquitectura", employees: 1, totalGross: 700000, totalNet: 602000, budgetAlloc: 850000 },
-  { department: "Administração", employees: 3, totalGross: 1320000, totalNet: 1135200, budgetAlloc: 1600000 },
-  { department: "TI", employees: 1, totalGross: 420000, totalNet: 361200, budgetAlloc: 500000 },
-  { department: "Serviços Gerais", employees: 2, totalGross: 530000, totalNet: 455800, budgetAlloc: 650000 },
-];
 
 export interface Budget {
   id: string;
