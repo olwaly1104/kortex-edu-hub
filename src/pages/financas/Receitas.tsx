@@ -62,19 +62,12 @@ export default function Receitas() {
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-foreground flex items-center gap-2"><TrendingUp className="w-6 h-6 text-primary" /> Receitas</h1>
-        <div className="flex items-center gap-1 rounded-lg border border-border bg-muted/30 p-0.5">
-          {(["mensal", "semestral", "anual"] as Periodo[]).map(p => (
-            <Button key={p} size="sm" variant={periodo === p ? "default" : "ghost"} onClick={() => setPeriodo(p)} className="text-xs h-8 px-3">{periodoLabels[p]}</Button>
-          ))}
-        </div>
-      </div>
+      <h1 className="text-2xl font-bold text-foreground flex items-center gap-2"><TrendingUp className="w-6 h-6 text-primary" /> Receitas</h1>
 
       {/* KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: `Receita Esperada`, value: formatCurrency(estimativaMensal * mult), icon: TrendingUp, color: "text-foreground" },
+          { label: "Receita Esperada", value: formatCurrency(estimativaMensal * mult), icon: TrendingUp, color: "text-foreground" },
           { label: "Recebido", value: formatCurrency(recebido * mult), icon: Wallet, color: "text-accent" },
           { label: "Pendente", value: formatCurrency(pendente * mult), icon: Clock, color: "text-amber-600" },
           { label: "Em Atraso", value: formatCurrency(emAtraso * mult), icon: AlertTriangle, color: "text-destructive" },
@@ -91,8 +84,14 @@ export default function Receitas() {
 
       {/* Controls */}
       <div className="rounded-xl border border-border bg-card p-4 space-y-3">
+        {/* Row 1: Period + Category toggles */}
         <div className="flex gap-2 items-center flex-wrap">
-          {/* Categories first */}
+          <div className="flex items-center gap-2">
+            {(["mensal", "semestral", "anual"] as Periodo[]).map(p => (
+              <Button key={p} size="sm" variant={periodo === p ? "default" : "outline"} onClick={() => setPeriodo(p)} className="text-xs">{periodoLabels[p]}</Button>
+            ))}
+          </div>
+          <div className="w-px h-6 bg-border" />
           <div className="flex items-center gap-2">
             {[
               { key: "todos", label: "Todas" },
@@ -102,7 +101,10 @@ export default function Receitas() {
               <Button key={s.key} size="sm" variant={filterCategory === s.key ? "default" : "outline"} onClick={() => setFilterCategory(s.key)} className="text-xs">{s.label}</Button>
             ))}
           </div>
-          <div className="w-px h-6 bg-border" />
+        </div>
+
+        {/* Row 2: Search + Status + Sort */}
+        <div className="flex gap-2 items-center flex-wrap">
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input placeholder="Pesquisar estudante, ID, curso..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9 h-9" />
@@ -116,9 +118,9 @@ export default function Receitas() {
           <div className="flex items-center gap-2">
             {[
               { key: "todos", label: "Todos" },
-              { key: "pago", label: "Pago" },
               { key: "pendente", label: "Pendente" },
-              { key: "em_atraso", label: "Em Atraso" },
+              { key: "pago", label: "Aprovada" },
+              { key: "em_atraso", label: "Rejeitada" },
             ].map(s => (
               <Button key={s.key} size="sm" variant={filterStatus === s.key ? "default" : "outline"} onClick={() => setFilterStatus(s.key)} className="text-xs">{s.label}</Button>
             ))}
