@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { CreditCard, Search, Users, Wallet, TrendingDown, ArrowUpDown, X, Download, BadgeCheck } from "lucide-react";
+import { CreditCard, Search, Users, Wallet, TrendingDown, ArrowUpDown, X, Download, FileText, Receipt } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 
 type SortField = "grossSalary" | "netSalary" | "deductions";
 type SortDir = "asc" | "desc";
+type Periodo = "mensal" | "semestral" | "anual";
 
 const statusColors: Record<string, string> = {
   pago: "bg-accent/15 text-accent border-accent/30",
@@ -27,6 +28,9 @@ const contractColors: Record<string, string> = {
 };
 const contractLabels: Record<string, string> = { efectivo: "Efectivo", contratado: "Contratado", colaborador: "Colaborador" };
 
+const periodoMultiplier: Record<Periodo, number> = { mensal: 1, semestral: 6, anual: 12 };
+const periodoLabels: Record<Periodo, string> = { mensal: "Mensal", semestral: "Semestral", anual: "Anual" };
+
 export default function Salarios() {
   const { toast } = useToast();
   const [search, setSearch] = useState("");
@@ -34,6 +38,9 @@ export default function Salarios() {
   const [filterContract, setFilterContract] = useState("todos");
   const [sortField, setSortField] = useState<SortField | null>(null);
   const [sortDir, setSortDir] = useState<SortDir>("desc");
+  const [periodo, setPeriodo] = useState<Periodo>("mensal");
+
+  const mult = periodoMultiplier[periodo];
 
   const isStatusActive = filterStatus !== "todos";
   const isContractActive = filterContract !== "todos";
@@ -43,7 +50,7 @@ export default function Salarios() {
 
   const filtered = useMemo(() => {
     let list = salarios
-      .filter(s => !search || s.name.toLowerCase().includes(search.toLowerCase()) || s.employeeId.toLowerCase().includes(search.toLowerCase()) || s.department.toLowerCase().includes(search.toLowerCase()))
+      .filter(s => !search || s.name.toLowerCase().includes(search.toLowerCase()) || s.employeeId.toLowerCase().includes(search.toLowerCase()) || s.department.toLowerCase().includes(search.toLowerCase()) || s.role.toLowerCase().includes(search.toLowerCase()))
       .filter(s => filterStatus === "todos" || s.status === filterStatus)
       .filter(s => filterContract === "todos" || s.contractType === filterContract);
 
@@ -66,9 +73,16 @@ export default function Salarios() {
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-foreground flex items-center gap-2"><CreditCard className="w-6 h-6 text-primary" /> Salários</h1>
-        <Button variant="outline" size="sm" className="gap-1.5" onClick={() => toast({ title: "Relatório exportado" })}>
-          <Download className="w-4 h-4" /> Exportar
-        </Button>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1 rounded-lg border border-border bg-muted/30 p-0.5">
+            {(["mensal", "semestral", "anual"] as Periodo[]).map(p => (
+              <Button key={p} size="sm" variant={periodo === p ? "default" : "ghost"} onClick={() => setPeriodo(p)} className="text-xs h-8 px-3">{periodoLabels[p]}</Button>
+            ))}
+          </div>
+          <Button variant="outline" size="sm" className="gap-1.5" onClick={() => toast({ title: "Relatório exportado" })}>
+            <Download className="w-4 h-4" /> Exportar
+          </Button>
+        </div>
       </div>
 
       {/* KPIs */}
@@ -85,21 +99,21 @@ export default function Salarios() {
             <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><Wallet className="w-4 h-4 text-primary" /></div>
             <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Total Bruto</span>
           </div>
-          <p className="text-2xl font-bold text-foreground">{formatCurrency(totalBruto)}</p>
+          <p className="text-2xl font-bold text-foreground">{formatCurrency(totalBruto * mult)}</p>
         </Card>
         <Card className="p-4">
           <div className="flex items-center gap-2 mb-3">
             <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><CreditCard className="w-4 h-4 text-primary" /></div>
             <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Total Líquido</span>
           </div>
-          <p className="text-2xl font-bold text-primary">{formatCurrency(totalLiquido)}</p>
+          <p className="text-2xl font-bold text-primary">{formatCurrency(totalLiquido * mult)}</p>
         </Card>
         <Card className="p-4">
           <div className="flex items-center gap-2 mb-3">
             <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><TrendingDown className="w-4 h-4 text-primary" /></div>
             <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Total Descontos</span>
           </div>
-          <p className="text-2xl font-bold text-destructive">{formatCurrency(totalDescontos)}</p>
+          <p className="text-2xl font-bold text-destructive">{formatCurrency(totalDescontos * mult)}</p>
         </Card>
       </div>
 
@@ -119,10 +133,10 @@ export default function Salarios() {
 
       {/* Controls */}
       <div className="rounded-xl border border-border bg-card p-4 space-y-3">
-        <div className="flex gap-2 items-center">
+        <div className="flex gap-2 items-center flex-wrap">
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input placeholder="Pesquisar por nome, ID ou departamento..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9 h-9" />
+            <Input placeholder="Pesquisar por nome, ID, departamento ou função..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9 h-9" />
           </div>
           <div className="flex-1" />
           {hasActiveControls && (
@@ -197,6 +211,7 @@ export default function Salarios() {
             <th className="text-right p-3 font-medium text-muted-foreground">Líquido</th>
             <th className="text-center p-3 font-medium text-muted-foreground">Pagamento</th>
             <th className="text-center p-3 font-medium text-muted-foreground">Estado</th>
+            <th className="text-center p-3 font-medium text-muted-foreground">Documentos</th>
           </tr></thead>
           <tbody>{filtered.map(s => (
             <tr key={s.id} className="border-b last:border-0 hover:bg-muted/20 transition-colors">
@@ -209,6 +224,13 @@ export default function Salarios() {
               <td className="p-3 text-right text-xs font-semibold text-primary">{formatCurrency(s.netSalary)}</td>
               <td className="p-3 text-center text-xs text-muted-foreground">{new Date(s.payDate).toLocaleDateString("pt-PT", { day: "2-digit", month: "short" })}</td>
               <td className="p-3 text-center"><Badge variant="outline" className={cn("text-[10px]", statusColors[s.status])}>{statusLabels[s.status]}</Badge></td>
+              <td className="p-3 text-center">
+                <div className="flex gap-1 justify-center">
+                  <Button variant="ghost" size="sm" className="h-7 px-2 text-[10px] gap-1 text-muted-foreground hover:text-primary" onClick={() => toast({ title: "Recibo aberto" })}>
+                    <FileText className="w-3 h-3" /> Recibo
+                  </Button>
+                </div>
+              </td>
             </tr>
           ))}</tbody>
         </table>

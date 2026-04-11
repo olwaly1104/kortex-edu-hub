@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Plus, Search, ArrowUpDown, X, Check, Wallet, Clock, Ban, TrendingDown } from "lucide-react";
+import { Plus, Search, ArrowUpDown, X, Check, Wallet, Clock, Ban, TrendingDown, FileText, Receipt } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -8,13 +8,13 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Progress } from "@/components/ui/progress";
 import { formatCurrency, despesas } from "@/data/financeModuleData";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
 type SortField = "amount";
 type SortDir = "asc" | "desc";
+type Periodo = "mensal" | "semestral" | "anual";
 
 const statusColors: Record<string, string> = {
   aprovada: "bg-accent/15 text-accent border-accent/30",
@@ -23,7 +23,10 @@ const statusColors: Record<string, string> = {
 };
 const statusLabels: Record<string, string> = { aprovada: "Aprovada", pendente: "Pendente", rejeitada: "Rejeitada" };
 
-const orcamentoDespesas = 55000000;
+const periodoMultiplier: Record<Periodo, number> = { mensal: 1, semestral: 6, anual: 12 };
+const periodoLabels: Record<Periodo, string> = { mensal: "Mensal", semestral: "Semestral", anual: "Anual" };
+
+const despesaCategories = ["Salários", "Infraestrutura", "Material Didáctico", "Serviços e Utilities", "Investigação", "Bolsas e Apoios"];
 
 export default function Despesas() {
   const { toast } = useToast();
@@ -33,14 +36,15 @@ export default function Despesas() {
   const [sortField, setSortField] = useState<SortField | null>(null);
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [periodo, setPeriodo] = useState<Periodo>("mensal");
+
+  const mult = periodoMultiplier[periodo];
 
   const isSortActive = sortField !== null;
   const isStatusActive = filterStatus !== "todos";
   const isCatActive = filterCategory !== "todos";
   const isSearchActive = search !== "";
   const hasActiveControls = isSortActive || isStatusActive || isSearchActive || isCatActive;
-
-  const categories = [...new Set(despesas.map(d => d.category))];
 
   const filtered = useMemo(() => {
     let list = despesas
@@ -57,7 +61,6 @@ export default function Despesas() {
   const aprovadas = despesas.filter(d => d.status === "aprovada").reduce((s, d) => s + d.amount, 0);
   const pendentes = despesas.filter(d => d.status === "pendente").reduce((s, d) => s + d.amount, 0);
   const rejeitadas = despesas.filter(d => d.status === "rejeitada").reduce((s, d) => s + d.amount, 0);
-  const gastoPct = Math.round((aprovadas / orcamentoDespesas) * 100);
 
   const resetAll = () => { setFilterStatus("todos"); setFilterCategory("todos"); setSortField(null); setSortDir("desc"); setSearch(""); };
 
@@ -65,16 +68,23 @@ export default function Despesas() {
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-foreground flex items-center gap-2"><TrendingDown className="w-6 h-6 text-primary" /> Despesas</h1>
-        <Button size="sm" onClick={() => setSheetOpen(true)} className="gap-1.5"><Plus className="w-4 h-4" /> Nova Despesa</Button>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1 rounded-lg border border-border bg-muted/30 p-0.5">
+            {(["mensal", "semestral", "anual"] as Periodo[]).map(p => (
+              <Button key={p} size="sm" variant={periodo === p ? "default" : "ghost"} onClick={() => setPeriodo(p)} className="text-xs h-8 px-3">{periodoLabels[p]}</Button>
+            ))}
+          </div>
+          <Button size="sm" onClick={() => setSheetOpen(true)} className="gap-1.5"><Plus className="w-4 h-4" /> Nova Despesa</Button>
+        </div>
       </div>
 
       {/* KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: "Total do Mês", value: formatCurrency(totalMes), icon: TrendingDown, color: "text-foreground" },
-          { label: "Aprovadas", value: formatCurrency(aprovadas), icon: Wallet, color: "text-accent" },
-          { label: "Pendentes", value: formatCurrency(pendentes), icon: Clock, color: "text-amber-600" },
-          { label: "Rejeitadas", value: formatCurrency(rejeitadas), icon: Ban, color: "text-destructive" },
+          { label: "Despesas Total do Mês", value: formatCurrency(totalMes * mult), icon: TrendingDown, color: "text-foreground" },
+          { label: "Aprovadas", value: formatCurrency(aprovadas * mult), icon: Wallet, color: "text-accent" },
+          { label: "Pendentes", value: formatCurrency(pendentes * mult), icon: Clock, color: "text-amber-600" },
+          { label: "Rejeitadas", value: formatCurrency(rejeitadas * mult), icon: Ban, color: "text-destructive" },
         ].map(kpi => (
           <Card key={kpi.label} className="p-4">
             <div className="flex items-center gap-2 mb-3">
@@ -86,23 +96,18 @@ export default function Despesas() {
         ))}
       </div>
 
-      {/* Budget */}
-      <Card className="p-4">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Orçamento Mensal de Despesas</span>
-          <span className="text-xs font-semibold text-primary">{gastoPct}% utilizado</span>
-        </div>
-        <Progress value={Math.min(gastoPct, 100)} className="h-2 mb-2" />
-        <div className="flex justify-between text-[11px] text-muted-foreground">
-          <span>Gasto: {formatCurrency(aprovadas)}</span>
-          <span>Disponível: {formatCurrency(Math.max(0, orcamentoDespesas - aprovadas))}</span>
-          <span>Orçamento: {formatCurrency(orcamentoDespesas)}</span>
-        </div>
-      </Card>
-
       {/* Controls */}
       <div className="rounded-xl border border-border bg-card p-4 space-y-3">
-        <div className="flex gap-2 items-center">
+        <div className="flex gap-2 items-center flex-wrap">
+          {/* Categories first */}
+          <div className="flex items-center gap-2">
+            <Button size="sm" variant={filterCategory === "todos" ? "default" : "outline"} onClick={() => setFilterCategory("todos")} className="text-xs">Todas</Button>
+            {despesaCategories.map(c => (
+              <Button key={c} size="sm" variant={filterCategory === c ? "default" : "outline"} onClick={() => setFilterCategory(c)} className="text-xs">{c}</Button>
+            ))}
+          </div>
+        </div>
+        <div className="flex gap-2 items-center flex-wrap">
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input placeholder="Pesquisar despesa, departamento..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9 h-9" />
@@ -121,10 +126,6 @@ export default function Despesas() {
               { key: "rejeitada", label: "Rejeitada" },
             ].map(s => (
               <Button key={s.key} size="sm" variant={filterStatus === s.key ? "default" : "outline"} onClick={() => setFilterStatus(s.key)} className="text-xs">{s.label}</Button>
-            ))}
-            <div className="w-px h-6 bg-border" />
-            {[{ key: "todos", label: "Categoria" }, ...categories.map(c => ({ key: c, label: c }))].map(s => (
-              <Button key={s.key} size="sm" variant={filterCategory === s.key ? "default" : "outline"} onClick={() => setFilterCategory(s.key)} className="text-xs">{s.label}</Button>
             ))}
             <div className="w-px h-6 bg-border" />
             <Popover>
@@ -165,6 +166,7 @@ export default function Despesas() {
             <th className="text-right p-3 font-medium text-muted-foreground">Valor</th>
             <th className="text-left p-3 font-medium text-muted-foreground">Solicitado por</th>
             <th className="text-center p-3 font-medium text-muted-foreground">Estado</th>
+            <th className="text-center p-3 font-medium text-muted-foreground">Documentos</th>
             <th className="text-center p-3 font-medium text-muted-foreground">Ações</th>
           </tr></thead>
           <tbody>{filtered.map(d => (
@@ -176,6 +178,16 @@ export default function Despesas() {
               <td className="p-3 text-right text-xs font-semibold text-destructive">-{formatCurrency(d.amount)}</td>
               <td className="p-3 text-xs text-muted-foreground">{d.requestedBy || "—"}</td>
               <td className="p-3 text-center"><Badge variant="outline" className={cn("text-[10px]", statusColors[d.status])}>{statusLabels[d.status] || d.status}</Badge></td>
+              <td className="p-3 text-center">
+                <div className="flex gap-1 justify-center">
+                  <Button variant="ghost" size="sm" className="h-7 px-2 text-[10px] gap-1 text-muted-foreground hover:text-primary" onClick={() => toast({ title: "Comprovativo aberto" })}>
+                    <FileText className="w-3 h-3" /> Comprovativo
+                  </Button>
+                  <Button variant="ghost" size="sm" className="h-7 px-2 text-[10px] gap-1 text-muted-foreground hover:text-primary" onClick={() => toast({ title: "Factura aberta" })}>
+                    <Receipt className="w-3 h-3" /> Factura
+                  </Button>
+                </div>
+              </td>
               <td className="p-3 text-center">
                 {d.status === "pendente" && (
                   <div className="flex gap-1 justify-center">
@@ -196,7 +208,7 @@ export default function Despesas() {
         <SheetContent>
           <SheetHeader><SheetTitle>Nova Despesa</SheetTitle></SheetHeader>
           <div className="space-y-4 mt-6">
-            {["Descrição", "Categoria", "Departamento", "Valor (Kz)", "Data"].map(f => (
+            {["Descrição", "Departamento", "Valor (Kz)", "Data"].map(f => (
               <div key={f} className="space-y-1.5">
                 <Label className="text-xs">{f}</Label>
                 <Input placeholder={f} className="h-9" />
