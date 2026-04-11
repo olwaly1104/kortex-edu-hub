@@ -37,11 +37,25 @@ const PIE_COLORS = ["hsl(var(--primary))", "hsl(210, 70%, 55%)", "hsl(25, 90%, 5
 const catData = Array.from(catMap.entries()).sort((a, b) => b[1] - a[1]).map(([name, value], i) => ({ name, value, color: PIE_COLORS[i % PIE_COLORS.length] }));
 const despesaAprovadas = catData.reduce((s, c) => s + c.value, 0);
 
-/* recent transactions merged */
-const recentTx = [
-  ...receitas.slice(0, 5).map(r => ({ id: r.id, desc: r.description, date: r.date, amount: r.amount, type: "receita" as const, category: r.category })),
-  ...despesas.slice(0, 5).map(d => ({ id: d.id, desc: d.description, date: d.date, amount: d.amount, type: "despesa" as const, category: d.category })),
-].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 8);
+/* all transactions merged */
+const allTx = [
+  ...receitas.map(r => ({ id: r.id, desc: r.description, date: r.date, amount: r.amount, type: "receita" as const, category: r.category, status: r.status })),
+  ...despesas.map(d => ({ id: d.id, desc: d.description, date: d.date, amount: d.amount, type: "despesa" as const, category: d.category, status: d.status })),
+].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+const txCategories = Array.from(new Set(allTx.map(t => t.category)));
+
+const statusColors: Record<string, string> = {
+  aprovada: "bg-accent/15 text-accent border-accent/30",
+  pendente: "bg-amber-100 text-amber-700 border-amber-200",
+  rejeitada: "bg-destructive/15 text-destructive border-destructive/30",
+  recebido: "bg-accent/15 text-accent border-accent/30",
+  em_atraso: "bg-destructive/15 text-destructive border-destructive/30",
+};
+const statusLabels: Record<string, string> = {
+  aprovada: "Aprovada", pendente: "Pendente", rejeitada: "Rejeitada",
+  recebido: "Recebido", em_atraso: "Em Atraso",
+};
 
 /* ── component ───────────────────────────────────── */
 export default function FinancasDashboard() {
