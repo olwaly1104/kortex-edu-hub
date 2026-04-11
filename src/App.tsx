@@ -260,7 +260,7 @@ function AppRoutes() {
         <Route path="/secretaria/financas" element={<StudentFinances />} />
         <Route path="/secretaria/perfil" element={<StudentProfile />} />
         {/* Finanças */}
-        <Route path="/financas" element={<FinancasDashboard />} />
+        <Route path="/financas" element={<FinancasInicio />} />
         <Route path="/financas/calendario" element={<StudentCalendar />} />
         <Route path="/financas/anuncios" element={<StudentAnnouncements />} />
         <Route path="/financas/solicitacoes" element={<FinancasSolicitacoes />} />
