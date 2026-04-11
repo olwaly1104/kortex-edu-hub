@@ -1,8 +1,11 @@
+import { useState, useMemo } from "react";
 import {
   Wallet, TrendingUp, TrendingDown, CreditCard,
-  ArrowUpRight, ArrowDownRight, ArrowDownLeft, Clock, AlertTriangle, FileText, ChevronRight,
+  ArrowUpRight, ArrowDownRight, Clock, AlertTriangle, FileText, ChevronRight, Receipt, Search, X,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -34,14 +37,41 @@ const PIE_COLORS = ["hsl(var(--primary))", "hsl(210, 70%, 55%)", "hsl(25, 90%, 5
 const catData = Array.from(catMap.entries()).sort((a, b) => b[1] - a[1]).map(([name, value], i) => ({ name, value, color: PIE_COLORS[i % PIE_COLORS.length] }));
 const despesaAprovadas = catData.reduce((s, c) => s + c.value, 0);
 
-/* recent transactions merged */
-const recentTx = [
-  ...receitas.slice(0, 5).map(r => ({ id: r.id, desc: r.description, date: r.date, amount: r.amount, type: "receita" as const, category: r.category })),
-  ...despesas.slice(0, 5).map(d => ({ id: d.id, desc: d.description, date: d.date, amount: d.amount, type: "despesa" as const, category: d.category })),
-].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 8);
+/* all transactions merged */
+const allTx = [
+  ...receitas.map(r => ({ id: r.id, desc: r.description, date: r.date, amount: r.amount, type: "receita" as const, category: r.category, status: r.status })),
+  ...despesas.map(d => ({ id: d.id, desc: d.description, date: d.date, amount: d.amount, type: "despesa" as const, category: d.category, status: d.status })),
+].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+const txCategories = Array.from(new Set(allTx.map(t => t.category)));
+
+const statusColors: Record<string, string> = {
+  aprovada: "bg-accent/15 text-accent border-accent/30",
+  pendente: "bg-amber-100 text-amber-700 border-amber-200",
+  rejeitada: "bg-destructive/15 text-destructive border-destructive/30",
+  recebido: "bg-accent/15 text-accent border-accent/30",
+  em_atraso: "bg-destructive/15 text-destructive border-destructive/30",
+};
+const statusLabels: Record<string, string> = {
+  aprovada: "Aprovada", pendente: "Pendente", rejeitada: "Rejeitada",
+  recebido: "Recebido", em_atraso: "Em Atraso",
+};
 
 /* ── component ───────────────────────────────────── */
 export default function FinancasDashboard() {
+  const [txSearch, setTxSearch] = useState("");
+  const [txCategory, setTxCategory] = useState("todos");
+  const [txType, setTxType] = useState("todos");
+
+  const filteredTx = useMemo(() => {
+    return allTx
+      .filter(t => txCategory === "todos" || t.category === txCategory)
+      .filter(t => txType === "todos" || t.type === txType)
+      .filter(t => !txSearch || t.desc.toLowerCase().includes(txSearch.toLowerCase()) || t.category.toLowerCase().includes(txSearch.toLowerCase()))
+      .slice(0, 15);
+  }, [txSearch, txCategory, txType]);
+
+  const hasFilters = txSearch !== "" || txCategory !== "todos" || txType !== "todos";
   const navigate = useNavigate();
 
   return (
@@ -112,43 +142,86 @@ export default function FinancasDashboard() {
         </Card>
       </div>
 
-      {/* ── Últimas Transações ── */}
-      <Card className="p-5">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-base font-semibold text-foreground flex items-center gap-2">
-            <Wallet className="w-5 h-5 text-primary" /> Últimas Transações
-          </h3>
-        </div>
-        <div className="rounded-lg border border-border overflow-hidden">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-muted/50 text-muted-foreground text-[11px] uppercase tracking-wider">
-                <th className="text-left px-4 py-2.5 font-medium">Tipo</th>
-                <th className="text-left px-4 py-2.5 font-medium">Descrição</th>
-                <th className="text-left px-4 py-2.5 font-medium">Categoria</th>
-                <th className="text-left px-4 py-2.5 font-medium">Data</th>
-                <th className="text-right px-4 py-2.5 font-medium">Valor</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {recentTx.map(t => (
-                <tr key={t.id} className="hover:bg-muted/30 transition-colors">
-                  <td className="px-4 py-2.5">
-                    <div className={cn("w-7 h-7 rounded-lg flex items-center justify-center", t.type === "receita" ? "bg-accent/10" : "bg-destructive/10")}>
-                      {t.type === "receita" ? <TrendingUp className="w-3.5 h-3.5 text-accent" /> : <TrendingDown className="w-3.5 h-3.5 text-destructive" />}
-                    </div>
-                  </td>
-                  <td className="px-4 py-2.5 text-xs font-medium text-foreground">{t.desc}</td>
-                  <td className="px-4 py-2.5 text-xs text-muted-foreground">{t.category}</td>
-                  <td className="px-4 py-2.5 text-xs text-muted-foreground">{new Date(t.date).toLocaleDateString("pt-PT", { day: "2-digit", month: "short", year: "numeric" })}</td>
-                  <td className={cn("px-4 py-2.5 text-xs font-bold text-right", t.type === "receita" ? "text-accent" : "text-destructive")}>
-                    {t.type === "receita" ? "+" : "-"}{formatCurrency(t.amount)}
-                  </td>
-                </tr>
+      {/* ── Transações ── */}
+      <Card className="overflow-hidden">
+        <div className="p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="text-base font-semibold text-foreground flex items-center gap-2">
+              <Wallet className="w-5 h-5 text-primary" /> Transações
+            </h3>
+          </div>
+          {/* Category filters */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <Button size="sm" variant={txCategory === "todos" ? "default" : "outline"} onClick={() => setTxCategory("todos")} className="text-xs">Todas</Button>
+            {txCategories.map(c => (
+              <Button key={c} size="sm" variant={txCategory === c ? "default" : "outline"} onClick={() => setTxCategory(c)} className="text-xs">{c}</Button>
+            ))}
+          </div>
+          {/* Search + type filter */}
+          <div className="flex gap-2 items-center flex-wrap">
+            <div className="relative flex-1 max-w-sm">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input placeholder="Pesquisar transação..." value={txSearch} onChange={e => setTxSearch(e.target.value)} className="pl-9 h-9" />
+            </div>
+            <div className="flex-1" />
+            {hasFilters && (
+              <Button variant="ghost" size="sm" className="text-xs text-destructive hover:text-destructive hover:bg-destructive/10 gap-1" onClick={() => { setTxSearch(""); setTxCategory("todos"); setTxType("todos"); }}>
+                <X className="w-3 h-3" /> Limpar
+              </Button>
+            )}
+            <div className="flex items-center gap-2">
+              {[
+                { key: "todos", label: "Todos" },
+                { key: "receita", label: "Receitas" },
+                { key: "despesa", label: "Despesas" },
+              ].map(s => (
+                <Button key={s.key} size="sm" variant={txType === s.key ? "default" : "outline"} onClick={() => setTxType(s.key)} className="text-xs">{s.label}</Button>
               ))}
-            </tbody>
-          </table>
+            </div>
+          </div>
         </div>
+
+        <table className="w-full text-sm">
+          <thead><tr className="border-b bg-muted/30">
+            <th className="text-left p-3 font-medium text-muted-foreground">Data</th>
+            <th className="text-left p-3 font-medium text-muted-foreground">Tipo</th>
+            <th className="text-left p-3 font-medium text-muted-foreground">Descrição</th>
+            <th className="text-left p-3 font-medium text-muted-foreground">Categoria</th>
+            <th className="text-right p-3 font-medium text-muted-foreground">Valor</th>
+            <th className="text-center p-3 font-medium text-muted-foreground">Estado</th>
+            <th className="text-center p-3 font-medium text-muted-foreground">Documentos</th>
+          </tr></thead>
+          <tbody>{filteredTx.map(t => (
+            <tr key={t.id} className="border-b last:border-0 hover:bg-muted/20 transition-colors">
+              <td className="p-3 text-xs text-muted-foreground">{new Date(t.date).toLocaleDateString("pt-PT", { day: "2-digit", month: "short" })}</td>
+              <td className="p-3">
+                <div className={cn("w-7 h-7 rounded-lg flex items-center justify-center", t.type === "receita" ? "bg-accent/10" : "bg-destructive/10")}>
+                  {t.type === "receita" ? <TrendingUp className="w-3.5 h-3.5 text-accent" /> : <TrendingDown className="w-3.5 h-3.5 text-destructive" />}
+                </div>
+              </td>
+              <td className="p-3 text-xs font-medium text-foreground">{t.desc}</td>
+              <td className="p-3"><Badge variant="outline" className="text-[10px]">{t.category}</Badge></td>
+              <td className={cn("p-3 text-right text-xs font-semibold", t.type === "receita" ? "text-accent" : "text-destructive")}>
+                {t.type === "receita" ? "+" : "-"}{formatCurrency(t.amount)}
+              </td>
+              <td className="p-3 text-center">
+                <Badge variant="outline" className={cn("text-[10px]", statusColors[t.status] || "")}>{statusLabels[t.status] || t.status}</Badge>
+              </td>
+              <td className="p-3 text-center">
+                <div className="flex gap-1 justify-center">
+                  <Button variant="ghost" size="sm" className="h-7 px-2 text-[10px] gap-1 text-muted-foreground hover:text-primary">
+                    <FileText className="w-3 h-3" /> Comprovativo
+                  </Button>
+                  <Button variant="ghost" size="sm" className="h-7 px-2 text-[10px] gap-1 text-muted-foreground hover:text-primary">
+                    <Receipt className="w-3 h-3" /> Factura
+                  </Button>
+                </div>
+              </td>
+            </tr>
+          ))}</tbody>
+        </table>
+        {filteredTx.length === 0 && <p className="text-center text-muted-foreground py-8">Nenhuma transação encontrada.</p>}
+        <div className="border-t bg-muted/20 px-3 py-2 text-xs text-muted-foreground">{filteredTx.length} transações</div>
       </Card>
 
       {/* ── Alerts ── */}
