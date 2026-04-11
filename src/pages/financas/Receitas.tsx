@@ -232,6 +232,7 @@ export default function Receitas() {
             <TableRow>
               <TableHead className="text-[11px]">Data</TableHead>
               <TableHead className="text-[11px]">Descrição</TableHead>
+              <TableHead className="text-[11px]">Pagador</TableHead>
               <TableHead className="text-[11px]">Categoria</TableHead>
               <TableHead className="text-[11px]">Fonte</TableHead>
               <TableHead className="text-[11px]">Valor</TableHead>
@@ -243,6 +244,7 @@ export default function Receitas() {
               <TableRow key={r.id}>
                 <TableCell className="text-xs text-muted-foreground">{new Date(r.date).toLocaleDateString("pt-PT", { day: "2-digit", month: "short", year: "numeric" })}</TableCell>
                 <TableCell className="text-xs font-medium">{r.description}</TableCell>
+                <TableCell className="text-xs text-muted-foreground">{r.payer || "—"}</TableCell>
                 <TableCell><Badge variant="outline" className="text-[10px]">{r.category}</Badge></TableCell>
                 <TableCell className="text-xs text-muted-foreground">{r.source}</TableCell>
                 <TableCell className="text-xs font-semibold text-emerald-600">+{formatCurrency(r.amount)}</TableCell>
