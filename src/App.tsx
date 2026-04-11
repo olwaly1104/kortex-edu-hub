@@ -107,6 +107,7 @@ import SecretariaResultados from "./pages/secretaria/Resultados";
 import SecretariaAdmissoesDashboard from "./pages/secretaria/AdmissoesDashboard";
 import SecretariaSolicitacoes from "./pages/secretaria/Solicitacoes";
 import FinancasDashboard from "./pages/financas/Dashboard";
+import FinancasInicio from "./pages/financas/Inicio";
 import FinancasReceitas from "./pages/financas/Receitas";
 import FinancasDespesas from "./pages/financas/Despesas";
 import FinancasSalarios from "./pages/financas/Salarios";
@@ -260,7 +261,7 @@ function AppRoutes() {
         <Route path="/secretaria/financas" element={<StudentFinances />} />
         <Route path="/secretaria/perfil" element={<StudentProfile />} />
         {/* Finanças */}
-        <Route path="/financas" element={<FinancasDashboard />} />
+        <Route path="/financas" element={<FinancasInicio />} />
         <Route path="/financas/calendario" element={<StudentCalendar />} />
         <Route path="/financas/anuncios" element={<StudentAnnouncements />} />
         <Route path="/financas/solicitacoes" element={<FinancasSolicitacoes />} />
