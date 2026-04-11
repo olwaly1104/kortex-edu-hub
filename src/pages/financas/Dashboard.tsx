@@ -9,7 +9,7 @@ import {
   PieChart, Pie, Cell,
 } from "recharts";
 import {
-  formatCurrency, monthlyData, salarios, receitas, despesas, payrollBudget,
+  formatCurrency, monthlyData, salarios, receitas, despesas,
 } from "@/data/financeModuleData";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
