@@ -13,6 +13,7 @@ export interface Transaction {
   source?: string;
   department?: string;
   requestedBy?: string;
+  payer?: string;
 }
 
 export const recentTransactions: Transaction[] = [
@@ -51,18 +52,18 @@ export const alerts = [
 ];
 
 export const receitas: Transaction[] = [
-  { id: "r1", date: "2025-04-10", description: "Propinas — Abril (Eng. Informática)", category: "Propinas", amount: 12500000, type: "receita", status: "pago", source: "Propinas" },
-  { id: "r2", date: "2025-04-09", description: "Propinas — Abril (Direito)", category: "Propinas", amount: 9800000, type: "receita", status: "pendente", source: "Propinas" },
-  { id: "r3", date: "2025-04-07", description: "Subsídio Governamental — Q1", category: "Subsídios", amount: 25000000, type: "receita", status: "pago", source: "Subsídios" },
-  { id: "r4", date: "2025-04-03", description: "Inscrições Exames — Extraordinários", category: "Taxas", amount: 3200000, type: "receita", status: "pago", source: "Outros" },
-  { id: "r5", date: "2025-04-01", description: "Aluguer Espaço Conferência", category: "Outros", amount: 800000, type: "receita", status: "pago", source: "Outros" },
-  { id: "r6", date: "2025-03-28", description: "Propinas — Março (Medicina)", category: "Propinas", amount: 18500000, type: "receita", status: "pago", source: "Propinas" },
-  { id: "r7", date: "2025-03-25", description: "Propinas — Março (Eng. Civil)", category: "Propinas", amount: 7200000, type: "receita", status: "em_atraso", source: "Propinas" },
-  { id: "r8", date: "2025-03-20", description: "Doação — Fundação XYZ", category: "Outros", amount: 5000000, type: "receita", status: "pago", source: "Outros" },
-  { id: "r9", date: "2025-03-15", description: "Taxas de Matrícula — 2º Semestre", category: "Taxas", amount: 14200000, type: "receita", status: "pago", source: "Propinas" },
-  { id: "r10", date: "2025-03-10", description: "Propinas — Março (Arquitectura)", category: "Propinas", amount: 6300000, type: "receita", status: "pendente", source: "Propinas" },
-  { id: "r11", date: "2025-03-05", description: "Aluguer Cantina — Mensal", category: "Outros", amount: 1200000, type: "receita", status: "pago", source: "Outros" },
-  { id: "r12", date: "2025-02-28", description: "Propinas — Fevereiro (Eng. Informática)", category: "Propinas", amount: 12500000, type: "receita", status: "pago", source: "Propinas" },
+  { id: "r1", date: "2025-04-10", description: "Propinas — Abril (Eng. Informática)", category: "Propinas", amount: 12500000, type: "receita", status: "pago", source: "Propinas", payer: "Fac. Engenharia — 245 estudantes" },
+  { id: "r2", date: "2025-04-09", description: "Propinas — Abril (Direito)", category: "Propinas", amount: 9800000, type: "receita", status: "pendente", source: "Propinas", payer: "Fac. Direito — 189 estudantes" },
+  { id: "r3", date: "2025-04-07", description: "Subsídio Governamental — Q1", category: "Subsídios", amount: 25000000, type: "receita", status: "pago", source: "Subsídios", payer: "Ministério do Ensino Superior" },
+  { id: "r4", date: "2025-04-03", description: "Inscrições Exames — Extraordinários", category: "Taxas", amount: 3200000, type: "receita", status: "pago", source: "Outros", payer: "Secretaria Académica" },
+  { id: "r5", date: "2025-04-01", description: "Aluguer Espaço Conferência", category: "Outros", amount: 800000, type: "receita", status: "pago", source: "Outros", payer: "Empresa ABC, Lda." },
+  { id: "r6", date: "2025-03-28", description: "Propinas — Março (Medicina)", category: "Propinas", amount: 18500000, type: "receita", status: "pago", source: "Propinas", payer: "Fac. Medicina — 312 estudantes" },
+  { id: "r7", date: "2025-03-25", description: "Propinas — Março (Eng. Civil)", category: "Propinas", amount: 7200000, type: "receita", status: "em_atraso", source: "Propinas", payer: "Fac. Engenharia — 98 estudantes" },
+  { id: "r8", date: "2025-03-20", description: "Doação — Fundação XYZ", category: "Outros", amount: 5000000, type: "receita", status: "pago", source: "Outros", payer: "Fundação XYZ" },
+  { id: "r9", date: "2025-03-15", description: "Taxas de Matrícula — 2º Semestre", category: "Taxas", amount: 14200000, type: "receita", status: "pago", source: "Propinas", payer: "Todas as Faculdades — 1.240 estudantes" },
+  { id: "r10", date: "2025-03-10", description: "Propinas — Março (Arquitectura)", category: "Propinas", amount: 6300000, type: "receita", status: "pendente", source: "Propinas", payer: "Fac. Arquitectura — 76 estudantes" },
+  { id: "r11", date: "2025-03-05", description: "Aluguer Cantina — Mensal", category: "Outros", amount: 1200000, type: "receita", status: "pago", source: "Outros", payer: "Restaurante Bom Sabor, Lda." },
+  { id: "r12", date: "2025-02-28", description: "Propinas — Fevereiro (Eng. Informática)", category: "Propinas", amount: 12500000, type: "receita", status: "pago", source: "Propinas", payer: "Fac. Engenharia — 245 estudantes" },
 ];
 
 export const despesas: Transaction[] = [
