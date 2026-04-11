@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { formatCurrency, salarios, payrollBudget } from "@/data/financeModuleData";
+import { formatCurrency, salarios } from "@/data/financeModuleData";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
