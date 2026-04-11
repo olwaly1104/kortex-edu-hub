@@ -59,6 +59,19 @@ const statusLabels: Record<string, string> = {
 
 /* ── component ───────────────────────────────────── */
 export default function FinancasDashboard() {
+  const [txSearch, setTxSearch] = useState("");
+  const [txCategory, setTxCategory] = useState("todos");
+  const [txType, setTxType] = useState("todos");
+
+  const filteredTx = useMemo(() => {
+    return allTx
+      .filter(t => txCategory === "todos" || t.category === txCategory)
+      .filter(t => txType === "todos" || t.type === txType)
+      .filter(t => !txSearch || t.desc.toLowerCase().includes(txSearch.toLowerCase()) || t.category.toLowerCase().includes(txSearch.toLowerCase()))
+      .slice(0, 15);
+  }, [txSearch, txCategory, txType]);
+
+  const hasFilters = txSearch !== "" || txCategory !== "todos" || txType !== "todos";
   const navigate = useNavigate();
 
   return (
