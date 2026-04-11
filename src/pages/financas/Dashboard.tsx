@@ -9,7 +9,7 @@ import {
   PieChart, Pie, Cell,
 } from "recharts";
 import {
-  formatCurrency, monthlyData, salarios, receitas, despesas, payrollBudget,
+  formatCurrency, monthlyData, salarios, receitas, despesas,
 } from "@/data/financeModuleData";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -119,23 +119,35 @@ export default function FinancasDashboard() {
             <Wallet className="w-5 h-5 text-primary" /> Últimas Transações
           </h3>
         </div>
-        <div className="space-y-2">
-          {recentTx.map(t => (
-            <div key={t.id} className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl border border-border bg-card hover:bg-muted/40 transition-colors">
-              <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center shrink-0", t.type === "receita" ? "bg-accent/10" : "bg-destructive/10")}>
-                {t.type === "receita" ? <TrendingUp className="w-4 h-4 text-accent" /> : <TrendingDown className="w-4 h-4 text-destructive" />}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-semibold text-foreground line-clamp-1">{t.desc}</p>
-                <p className="text-[10px] text-muted-foreground">
-                  {new Date(t.date).toLocaleDateString("pt-PT", { day: "2-digit", month: "short" })} · {t.category}
-                </p>
-              </div>
-              <p className={cn("text-xs font-bold shrink-0", t.type === "receita" ? "text-accent" : "text-destructive")}>
-                {t.type === "receita" ? "+" : "-"}{formatCurrency(t.amount)}
-              </p>
-            </div>
-          ))}
+        <div className="rounded-lg border border-border overflow-hidden">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="bg-muted/50 text-muted-foreground text-[11px] uppercase tracking-wider">
+                <th className="text-left px-4 py-2.5 font-medium">Tipo</th>
+                <th className="text-left px-4 py-2.5 font-medium">Descrição</th>
+                <th className="text-left px-4 py-2.5 font-medium">Categoria</th>
+                <th className="text-left px-4 py-2.5 font-medium">Data</th>
+                <th className="text-right px-4 py-2.5 font-medium">Valor</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {recentTx.map(t => (
+                <tr key={t.id} className="hover:bg-muted/30 transition-colors">
+                  <td className="px-4 py-2.5">
+                    <div className={cn("w-7 h-7 rounded-lg flex items-center justify-center", t.type === "receita" ? "bg-accent/10" : "bg-destructive/10")}>
+                      {t.type === "receita" ? <TrendingUp className="w-3.5 h-3.5 text-accent" /> : <TrendingDown className="w-3.5 h-3.5 text-destructive" />}
+                    </div>
+                  </td>
+                  <td className="px-4 py-2.5 text-xs font-medium text-foreground">{t.desc}</td>
+                  <td className="px-4 py-2.5 text-xs text-muted-foreground">{t.category}</td>
+                  <td className="px-4 py-2.5 text-xs text-muted-foreground">{new Date(t.date).toLocaleDateString("pt-PT", { day: "2-digit", month: "short", year: "numeric" })}</td>
+                  <td className={cn("px-4 py-2.5 text-xs font-bold text-right", t.type === "receita" ? "text-accent" : "text-destructive")}>
+                    {t.type === "receita" ? "+" : "-"}{formatCurrency(t.amount)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </Card>
 
