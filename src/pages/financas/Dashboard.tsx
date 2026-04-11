@@ -1,8 +1,11 @@
+import { useState, useMemo } from "react";
 import {
   Wallet, TrendingUp, TrendingDown, CreditCard,
-  ArrowUpRight, ArrowDownRight, ArrowDownLeft, Clock, AlertTriangle, FileText, ChevronRight,
+  ArrowUpRight, ArrowDownRight, Clock, AlertTriangle, FileText, ChevronRight, Receipt, Search, X,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
