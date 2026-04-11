@@ -1,11 +1,12 @@
 import { useState, useMemo } from "react";
-import { CreditCard, Search, Users, Wallet, TrendingDown, BadgeCheck, ArrowUpDown, X, Download } from "lucide-react";
+import { CreditCard, Search, Users, Wallet, TrendingDown, ArrowUpDown, X, Download, BadgeCheck } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { formatCurrency, salarios } from "@/data/financeModuleData";
+import { Progress } from "@/components/ui/progress";
+import { formatCurrency, salarios, payrollBudget } from "@/data/financeModuleData";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
@@ -30,39 +31,36 @@ export default function Salarios() {
   const { toast } = useToast();
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("todos");
-  const [filterDept, setFilterDept] = useState("todos");
+  const [filterContract, setFilterContract] = useState("todos");
   const [sortField, setSortField] = useState<SortField | null>(null);
   const [sortDir, setSortDir] = useState<SortDir>("desc");
 
-  const departments = [...new Set(salarios.map(s => s.department))];
-
-  const isSortActive = sortField !== null;
   const isStatusActive = filterStatus !== "todos";
-  const isDeptActive = filterDept !== "todos";
+  const isContractActive = filterContract !== "todos";
+  const isSortActive = sortField !== null;
   const isSearchActive = search !== "";
-  const hasActiveControls = isSortActive || isStatusActive || isDeptActive || isSearchActive;
-
-  const sortLabel = sortField === "grossSalary" ? "Bruto" : sortField === "netSalary" ? "Líquido" : sortField === "deductions" ? "Descontos" : "";
-  const dirLabel = sortDir === "desc" ? "Maior" : "Menor";
+  const hasActiveControls = isSortActive || isStatusActive || isSearchActive || isContractActive;
 
   const filtered = useMemo(() => {
     let list = salarios
-      .filter(s => filterDept === "todos" || s.department === filterDept)
-      .filter(s => !search || s.name.toLowerCase().includes(search.toLowerCase()) || s.employeeId.toLowerCase().includes(search.toLowerCase()))
-      .filter(s => filterStatus === "todos" || s.status === filterStatus);
+      .filter(s => !search || s.name.toLowerCase().includes(search.toLowerCase()) || s.employeeId.toLowerCase().includes(search.toLowerCase()) || s.department.toLowerCase().includes(search.toLowerCase()))
+      .filter(s => filterStatus === "todos" || s.status === filterStatus)
+      .filter(s => filterContract === "todos" || s.contractType === filterContract);
 
     if (sortField) {
       list = [...list].sort((a, b) => sortDir === "asc" ? (a[sortField] as number) - (b[sortField] as number) : (b[sortField] as number) - (a[sortField] as number));
     }
     return list;
-  }, [filterDept, search, sortField, sortDir, filterStatus]);
+  }, [search, sortField, sortDir, filterStatus, filterContract]);
 
   const totalBruto = salarios.reduce((s, v) => s + v.grossSalary, 0);
   const totalLiquido = salarios.reduce((s, v) => s + v.netSalary, 0);
   const totalDescontos = salarios.reduce((s, v) => s + v.deductions, 0);
   const totalFuncionarios = salarios.length;
+  const budgetPct = Math.round((totalBruto / payrollBudget.totalBudget) * 100);
+  const budgetDisponivel = payrollBudget.totalBudget - totalBruto;
 
-  const resetAll = () => { setFilterStatus("todos"); setSortField(null); setSortDir("desc"); setSearch(""); setFilterDept("todos"); };
+  const resetAll = () => { setFilterStatus("todos"); setFilterContract("todos"); setSortField(null); setSortDir("desc"); setSearch(""); };
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
@@ -105,21 +103,26 @@ export default function Salarios() {
         </Card>
       </div>
 
+      {/* Budget */}
+      <Card className="p-4">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Orçamento Salarial — {payrollBudget.currentMonth}</span>
+          <span className="text-xs font-semibold text-primary">{budgetPct}% utilizado</span>
+        </div>
+        <Progress value={Math.min(budgetPct, 100)} className="h-2 mb-2" />
+        <div className="flex justify-between text-[11px] text-muted-foreground">
+          <span>Utilizado: {formatCurrency(totalBruto)}</span>
+          <span>Disponível: {formatCurrency(Math.max(0, budgetDisponivel))}</span>
+          <span>Total: {formatCurrency(payrollBudget.totalBudget)}</span>
+        </div>
+      </Card>
+
       {/* Controls */}
       <div className="rounded-xl border border-border bg-card p-4 space-y-3">
-        <div className="flex flex-wrap gap-2">
-          <Button size="sm" variant={filterDept === "todos" ? "default" : "outline"} onClick={() => setFilterDept("todos")} className="text-xs">Todos os Dept.</Button>
-          {departments.map(d => (
-            <Button key={d} size="sm" variant={filterDept === d ? "default" : "outline"} onClick={() => setFilterDept(d)} className="text-xs">{d}</Button>
-          ))}
-        </div>
-
-        <div className="border-t border-border" />
-
         <div className="flex gap-2 items-center">
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input placeholder="Pesquisar por nome ou ID..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9 h-9" />
+            <Input placeholder="Pesquisar por nome, ID ou departamento..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9 h-9" />
           </div>
           <div className="flex-1" />
           {hasActiveControls && (
@@ -135,6 +138,15 @@ export default function Salarios() {
               { key: "processando", label: "Processando" },
             ].map(s => (
               <Button key={s.key} size="sm" variant={filterStatus === s.key ? "default" : "outline"} onClick={() => setFilterStatus(s.key)} className="text-xs">{s.label}</Button>
+            ))}
+            <div className="w-px h-6 bg-border" />
+            {[
+              { key: "todos", label: "Contratos" },
+              { key: "efectivo", label: "Efectivo" },
+              { key: "contratado", label: "Contratado" },
+              { key: "colaborador", label: "Colaborador" },
+            ].map(s => (
+              <Button key={s.key} size="sm" variant={filterContract === s.key ? "default" : "outline"} onClick={() => setFilterContract(s.key)} className="text-xs">{s.label}</Button>
             ))}
             <div className="w-px h-6 bg-border" />
             <Popover>
@@ -164,26 +176,10 @@ export default function Salarios() {
 
         {hasActiveControls && (
           <div className="flex flex-wrap gap-1.5 pt-1">
-            {isDeptActive && (
-              <Badge variant="outline" className="text-[10px] gap-1 bg-primary/5 text-primary border-primary/20 cursor-pointer hover:bg-primary/10" onClick={() => setFilterDept("todos")}>
-                Dept: {filterDept} <X className="w-2.5 h-2.5" />
-              </Badge>
-            )}
-            {isSortActive && (
-              <Badge variant="outline" className="text-[10px] gap-1 bg-primary/5 text-primary border-primary/20 cursor-pointer hover:bg-primary/10" onClick={() => { setSortField(null); setSortDir("desc"); }}>
-                {sortLabel}: {dirLabel} <X className="w-2.5 h-2.5" />
-              </Badge>
-            )}
-            {isStatusActive && (
-              <Badge variant="outline" className="text-[10px] gap-1 bg-accent/10 text-accent border-accent/20 cursor-pointer hover:bg-accent/15" onClick={() => setFilterStatus("todos")}>
-                Estado: {statusLabels[filterStatus]} <X className="w-2.5 h-2.5" />
-              </Badge>
-            )}
-            {isSearchActive && (
-              <Badge variant="outline" className="text-[10px] gap-1 bg-secondary/10 text-secondary border-secondary/20 cursor-pointer hover:bg-secondary/15" onClick={() => setSearch("")}>
-                Pesquisa: "{search}" <X className="w-2.5 h-2.5" />
-              </Badge>
-            )}
+            {isStatusActive && <Badge variant="outline" className="text-[10px] gap-1 bg-accent/10 text-accent border-accent/20 cursor-pointer hover:bg-accent/15" onClick={() => setFilterStatus("todos")}>Estado: {statusLabels[filterStatus]} <X className="w-2.5 h-2.5" /></Badge>}
+            {isContractActive && <Badge variant="outline" className="text-[10px] gap-1 bg-primary/5 text-primary border-primary/20 cursor-pointer hover:bg-primary/10" onClick={() => setFilterContract("todos")}>Contrato: {contractLabels[filterContract]} <X className="w-2.5 h-2.5" /></Badge>}
+            {isSortActive && <Badge variant="outline" className="text-[10px] gap-1 bg-primary/5 text-primary border-primary/20 cursor-pointer hover:bg-primary/10" onClick={() => { setSortField(null); setSortDir("desc"); }}>{sortField === "grossSalary" ? "Bruto" : sortField === "netSalary" ? "Líquido" : "Descontos"}: {sortDir === "desc" ? "Maior" : "Menor"} <X className="w-2.5 h-2.5" /></Badge>}
+            {isSearchActive && <Badge variant="outline" className="text-[10px] gap-1 bg-secondary/10 text-secondary border-secondary/20 cursor-pointer hover:bg-secondary/15" onClick={() => setSearch("")}>Pesquisa: "{search}" <X className="w-2.5 h-2.5" /></Badge>}
           </div>
         )}
       </div>
@@ -203,7 +199,7 @@ export default function Salarios() {
             <th className="text-center p-3 font-medium text-muted-foreground">Estado</th>
           </tr></thead>
           <tbody>{filtered.map(s => (
-            <tr key={s.id} className="border-b last:border-0 hover:bg-muted/20 transition-colors cursor-pointer">
+            <tr key={s.id} className="border-b last:border-0 hover:bg-muted/20 transition-colors">
               <td className="p-3 text-[10px] text-muted-foreground font-mono">{s.employeeId}</td>
               <td className="p-3"><p className="font-medium text-foreground text-xs">{s.name}</p><p className="text-[11px] text-muted-foreground">{s.role}</p></td>
               <td className="p-3 text-xs text-muted-foreground">{s.department}</td>
@@ -217,6 +213,7 @@ export default function Salarios() {
           ))}</tbody>
         </table>
         {filtered.length === 0 && <p className="text-center text-muted-foreground py-8">Nenhum funcionário encontrado.</p>}
+        <div className="border-t bg-muted/20 px-3 py-2 text-xs text-muted-foreground">{filtered.length} de {salarios.length} funcionários</div>
       </Card>
     </div>
   );
