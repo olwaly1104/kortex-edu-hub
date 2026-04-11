@@ -106,6 +106,13 @@ import SecretariaSessaoDetail from "./pages/secretaria/SessaoProvaDetail";
 import SecretariaResultados from "./pages/secretaria/Resultados";
 import SecretariaAdmissoesDashboard from "./pages/secretaria/AdmissoesDashboard";
 import SecretariaSolicitacoes from "./pages/secretaria/Solicitacoes";
+import FinancasDashboard from "./pages/financas/Dashboard";
+import FinancasReceitas from "./pages/financas/Receitas";
+import FinancasDespesas from "./pages/financas/Despesas";
+import FinancasSalarios from "./pages/financas/Salarios";
+import FinancasOrcamentos from "./pages/financas/Orcamentos";
+import FinancasSolicitacoes from "./pages/financas/Solicitacoes";
+import FinancasPessoalFinancas from "./pages/financas/PessoalFinancas";
 
 const queryClient = new QueryClient();
 
@@ -116,6 +123,7 @@ const homeRedirectMap: Record<string, string> = {
   decano: "/decano",
   reitor: "/reitor",
   secretaria: "/secretaria",
+  financas: "/financas",
 };
 
 function AppRoutes() {
@@ -251,6 +259,21 @@ function AppRoutes() {
         <Route path="/secretaria/contactos" element={<StudentContacts />} />
         <Route path="/secretaria/financas" element={<StudentFinances />} />
         <Route path="/secretaria/perfil" element={<StudentProfile />} />
+        {/* Finanças */}
+        <Route path="/financas" element={<FinancasDashboard />} />
+        <Route path="/financas/calendario" element={<StudentCalendar />} />
+        <Route path="/financas/anuncios" element={<StudentAnnouncements />} />
+        <Route path="/financas/solicitacoes" element={<FinancasSolicitacoes />} />
+        <Route path="/financas/dashboard" element={<FinancasDashboard />} />
+        <Route path="/financas/receitas" element={<FinancasReceitas />} />
+        <Route path="/financas/despesas" element={<FinancasDespesas />} />
+        <Route path="/financas/salarios" element={<FinancasSalarios />} />
+        <Route path="/financas/orcamentos" element={<FinancasOrcamentos />} />
+        <Route path="/financas/chat" element={<StudentChat />} />
+        <Route path="/financas/email" element={<StudentEmail />} />
+        <Route path="/financas/contactos" element={<StudentContacts />} />
+        <Route path="/financas/pessoal/financas" element={<FinancasPessoalFinancas />} />
+        <Route path="/financas/perfil" element={<StudentProfile />} />
       </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>

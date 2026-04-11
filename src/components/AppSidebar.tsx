@@ -4,7 +4,7 @@ import {
   LayoutDashboard, BookOpen, Calendar, CalendarDays, Megaphone, Users, MessageSquare,
   Mail, Award, User, LogOut, GraduationCap,
   BarChart3, ChevronLeft, ChevronRight, Library, Wallet, Trophy, ClipboardList,
-  CheckSquare, Building2, UserCog, Eye, Layers, FileText, FolderOpen,
+  CheckSquare, Building2, UserCog, Eye, Layers, FileText, FolderOpen, TrendingUp,
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -156,6 +156,31 @@ const secretariaSections: NavSection[] = [
   ]},
 ];
 
+const financasSections: NavSection[] = [
+  { title: "Geral", items: [
+    { label: "Início", icon: LayoutDashboard, path: "/financas" },
+    { label: "Calendário", icon: Calendar, path: "/financas/calendario" },
+    { label: "Anúncios", icon: Megaphone, path: "/financas/anuncios" },
+    { label: "Solicitações", icon: CheckSquare, path: "/financas/solicitacoes" },
+  ]},
+  { title: "Finanças", items: [
+    { label: "Dashboard", icon: BarChart3, path: "/financas/dashboard" },
+    { label: "Receitas", icon: TrendingUp, path: "/financas/receitas" },
+    { label: "Despesas", icon: FileText, path: "/financas/despesas" },
+    { label: "Salários", icon: Users, path: "/financas/salarios" },
+    { label: "Orçamentos", icon: FolderOpen, path: "/financas/orcamentos" },
+  ]},
+  { title: "Comunicação", items: [
+    { label: "Chat", icon: MessageSquare, path: "/financas/chat" },
+    { label: "Email", icon: Mail, path: "/financas/email" },
+    { label: "Contactos", icon: Users, path: "/financas/contactos" },
+  ]},
+  { title: "Pessoal", items: [
+    { label: "Finanças", icon: Wallet, path: "/financas/pessoal/financas" },
+    { label: "Perfil", icon: User, path: "/financas/perfil" },
+  ]},
+];
+
 const roleSectionsMap: Record<string, NavSection[]> = {
   student: studentSections,
   professor: professorSections,
@@ -163,6 +188,7 @@ const roleSectionsMap: Record<string, NavSection[]> = {
   decano: decanoSections,
   reitor: reitorSections,
   secretaria: secretariaSections,
+  financas: financasSections,
 };
 
 const roleLabelMap: Record<string, string> = {
@@ -172,9 +198,10 @@ const roleLabelMap: Record<string, string> = {
   decano: "Decano",
   reitor: "Reitor",
   secretaria: "Secretaria",
+  financas: "Finanças",
 };
 
-const roleBasePaths = ["/student", "/professor", "/coordenador", "/decano", "/reitor", "/secretaria"];
+const roleBasePaths = ["/student", "/professor", "/coordenador", "/decano", "/reitor", "/secretaria", "/financas"];
 
 export default function AppSidebar() {
   const { user, logout } = useAuth();
