@@ -1,19 +1,17 @@
 import { useState, useMemo } from "react";
-import { TrendingUp, Search, Plus, ArrowUpDown, X, Wallet, Clock, AlertTriangle } from "lucide-react";
+import { TrendingUp, Search, ArrowUpDown, X, Wallet, Clock, AlertTriangle, FileText, Receipt } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Progress } from "@/components/ui/progress";
 import { formatCurrency, receitas } from "@/data/financeModuleData";
+import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
 type SortField = "amount";
 type SortDir = "asc" | "desc";
+type Periodo = "mensal" | "semestral" | "anual";
 
 const statusColors: Record<string, string> = {
   pago: "bg-accent/15 text-accent border-accent/30",
@@ -22,15 +20,21 @@ const statusColors: Record<string, string> = {
 };
 const statusLabels: Record<string, string> = { pago: "Pago", pendente: "Pendente", em_atraso: "Em Atraso" };
 
-const estimativaAnual = 52000000;
+const periodoMultiplier: Record<Periodo, number> = { mensal: 1, semestral: 6, anual: 12 };
+const periodoLabels: Record<Periodo, string> = { mensal: "Mensal", semestral: "Semestral", anual: "Anual" };
+
+const estimativaMensal = 4800000;
 
 export default function Receitas() {
+  const { toast } = useToast();
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("todos");
   const [filterCategory, setFilterCategory] = useState("todos");
   const [sortField, setSortField] = useState<SortField | null>(null);
   const [sortDir, setSortDir] = useState<SortDir>("desc");
-  const [sheetOpen, setSheetOpen] = useState(false);
+  const [periodo, setPeriodo] = useState<Periodo>("mensal");
+
+  const mult = periodoMultiplier[periodo];
 
   const isSortActive = sortField !== null;
   const isStatusActive = filterStatus !== "todos";
@@ -38,11 +42,9 @@ export default function Receitas() {
   const isSearchActive = search !== "";
   const hasActiveControls = isSortActive || isStatusActive || isSearchActive || isCatActive;
 
-  const categories = [...new Set(receitas.map(r => r.category))];
-
   const filtered = useMemo(() => {
     let list = receitas
-      .filter(r => !search || r.description.toLowerCase().includes(search.toLowerCase()) || (r.payer || "").toLowerCase().includes(search.toLowerCase()) || (r.studentId || "").toLowerCase().includes(search.toLowerCase()))
+      .filter(r => !search || (r.payer || "").toLowerCase().includes(search.toLowerCase()) || (r.studentId || "").toLowerCase().includes(search.toLowerCase()) || (r.course || "").toLowerCase().includes(search.toLowerCase()))
       .filter(r => filterStatus === "todos" || r.status === filterStatus)
       .filter(r => filterCategory === "todos" || r.category === filterCategory);
     if (sortField) {
@@ -55,7 +57,6 @@ export default function Receitas() {
   const recebido = receitas.filter(r => r.status === "pago").reduce((s, r) => s + r.amount, 0);
   const pendente = receitas.filter(r => r.status === "pendente").reduce((s, r) => s + r.amount, 0);
   const emAtraso = receitas.filter(r => r.status === "em_atraso").reduce((s, r) => s + r.amount, 0);
-  const cobradoPct = Math.round((recebido / estimativaAnual) * 100);
 
   const resetAll = () => { setFilterStatus("todos"); setFilterCategory("todos"); setSortField(null); setSortDir("desc"); setSearch(""); };
 
@@ -63,16 +64,20 @@ export default function Receitas() {
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-foreground flex items-center gap-2"><TrendingUp className="w-6 h-6 text-primary" /> Receitas</h1>
-        <Button size="sm" onClick={() => setSheetOpen(true)} className="gap-1.5"><Plus className="w-4 h-4" /> Nova Receita</Button>
+        <div className="flex items-center gap-1 rounded-lg border border-border bg-muted/30 p-0.5">
+          {(["mensal", "semestral", "anual"] as Periodo[]).map(p => (
+            <Button key={p} size="sm" variant={periodo === p ? "default" : "ghost"} onClick={() => setPeriodo(p)} className="text-xs h-8 px-3">{periodoLabels[p]}</Button>
+          ))}
+        </div>
       </div>
 
       {/* KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: "Total do Mês", value: formatCurrency(totalMes), icon: TrendingUp, color: "text-foreground" },
-          { label: "Recebido", value: formatCurrency(recebido), icon: Wallet, color: "text-accent" },
-          { label: "Pendente", value: formatCurrency(pendente), icon: Clock, color: "text-amber-600" },
-          { label: "Em Atraso", value: formatCurrency(emAtraso), icon: AlertTriangle, color: "text-destructive" },
+          { label: `Receita Esperada`, value: formatCurrency(estimativaMensal * mult), icon: TrendingUp, color: "text-foreground" },
+          { label: "Recebido", value: formatCurrency(recebido * mult), icon: Wallet, color: "text-accent" },
+          { label: "Pendente", value: formatCurrency(pendente * mult), icon: Clock, color: "text-amber-600" },
+          { label: "Em Atraso", value: formatCurrency(emAtraso * mult), icon: AlertTriangle, color: "text-destructive" },
         ].map(kpi => (
           <Card key={kpi.label} className="p-4">
             <div className="flex items-center gap-2 mb-3">
@@ -84,26 +89,23 @@ export default function Receitas() {
         ))}
       </div>
 
-      {/* Estimativa Anual */}
-      <Card className="p-4">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Estimativa Anual 2025</span>
-          <span className="text-xs font-semibold text-primary">{cobradoPct}% cobrado</span>
-        </div>
-        <Progress value={Math.min(cobradoPct, 100)} className="h-2 mb-2" />
-        <div className="flex justify-between text-[11px] text-muted-foreground">
-          <span>Cobrado: {formatCurrency(recebido)}</span>
-          <span>Pendente + Atraso: {formatCurrency(pendente + emAtraso)}</span>
-          <span>Estimativa: {formatCurrency(estimativaAnual)}</span>
-        </div>
-      </Card>
-
       {/* Controls */}
       <div className="rounded-xl border border-border bg-card p-4 space-y-3">
-        <div className="flex gap-2 items-center">
+        <div className="flex gap-2 items-center flex-wrap">
+          {/* Categories first */}
+          <div className="flex items-center gap-2">
+            {[
+              { key: "todos", label: "Todas" },
+              { key: "Propinas", label: "Propina" },
+              { key: "Emolumentos", label: "Emolumentos" },
+            ].map(s => (
+              <Button key={s.key} size="sm" variant={filterCategory === s.key ? "default" : "outline"} onClick={() => setFilterCategory(s.key)} className="text-xs">{s.label}</Button>
+            ))}
+          </div>
+          <div className="w-px h-6 bg-border" />
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input placeholder="Pesquisar por estudante, ID ou descrição..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9 h-9" />
+            <Input placeholder="Pesquisar estudante, ID, curso..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9 h-9" />
           </div>
           <div className="flex-1" />
           {hasActiveControls && (
@@ -119,10 +121,6 @@ export default function Receitas() {
               { key: "em_atraso", label: "Em Atraso" },
             ].map(s => (
               <Button key={s.key} size="sm" variant={filterStatus === s.key ? "default" : "outline"} onClick={() => setFilterStatus(s.key)} className="text-xs">{s.label}</Button>
-            ))}
-            <div className="w-px h-6 bg-border" />
-            {[{ key: "todos", label: "Categoria" }, ...categories.map(c => ({ key: c, label: c }))].map(s => (
-              <Button key={s.key} size="sm" variant={filterCategory === s.key ? "default" : "outline"} onClick={() => setFilterCategory(s.key)} className="text-xs">{s.label}</Button>
             ))}
             <div className="w-px h-6 bg-border" />
             <Popover>
@@ -157,12 +155,12 @@ export default function Receitas() {
         <table className="w-full text-sm">
           <thead><tr className="border-b bg-muted/30">
             <th className="text-left p-3 font-medium text-muted-foreground">Data</th>
-            <th className="text-left p-3 font-medium text-muted-foreground">Estudante</th>
-            <th className="text-left p-3 font-medium text-muted-foreground">Descrição</th>
+            <th className="text-left p-3 font-medium text-muted-foreground">Pagador</th>
             <th className="text-left p-3 font-medium text-muted-foreground">Curso</th>
             <th className="text-left p-3 font-medium text-muted-foreground">Categoria</th>
             <th className="text-right p-3 font-medium text-muted-foreground">Valor</th>
             <th className="text-center p-3 font-medium text-muted-foreground">Estado</th>
+            <th className="text-center p-3 font-medium text-muted-foreground">Documentos</th>
           </tr></thead>
           <tbody>{filtered.map(r => (
             <tr key={r.id} className="border-b last:border-0 hover:bg-muted/20 transition-colors">
@@ -171,42 +169,26 @@ export default function Receitas() {
                 <p className="text-xs font-medium text-foreground">{r.payer || "—"}</p>
                 <p className="text-[10px] text-muted-foreground font-mono">{r.studentId || "—"}</p>
               </td>
-              <td className="p-3 text-xs text-foreground">{r.description}</td>
               <td className="p-3 text-xs text-muted-foreground">{r.course || "—"}</td>
               <td className="p-3"><Badge variant="outline" className="text-[10px]">{r.category}</Badge></td>
               <td className="p-3 text-right text-xs font-semibold text-accent">+{formatCurrency(r.amount)}</td>
               <td className="p-3 text-center"><Badge variant="outline" className={cn("text-[10px]", statusColors[r.status])}>{statusLabels[r.status] || r.status}</Badge></td>
+              <td className="p-3 text-center">
+                <div className="flex gap-1 justify-center">
+                  <Button variant="ghost" size="sm" className="h-7 px-2 text-[10px] gap-1 text-muted-foreground hover:text-primary" onClick={() => toast({ title: "Comprovativo aberto" })}>
+                    <FileText className="w-3 h-3" /> Comprovativo
+                  </Button>
+                  <Button variant="ghost" size="sm" className="h-7 px-2 text-[10px] gap-1 text-muted-foreground hover:text-primary" onClick={() => toast({ title: "Factura aberta" })}>
+                    <Receipt className="w-3 h-3" /> Factura
+                  </Button>
+                </div>
+              </td>
             </tr>
           ))}</tbody>
         </table>
         {filtered.length === 0 && <p className="text-center text-muted-foreground py-8">Nenhuma receita encontrada.</p>}
         <div className="border-t bg-muted/20 px-3 py-2 text-xs text-muted-foreground">{filtered.length} de {receitas.length} transacções</div>
       </Card>
-
-      {/* Sheet */}
-      <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
-        <SheetContent>
-          <SheetHeader><SheetTitle>Nova Receita</SheetTitle></SheetHeader>
-          <div className="space-y-4 mt-6">
-            {["Nome do Estudante", "ID do Estudante", "Curso", "Descrição", "Categoria", "Valor (Kz)", "Data"].map(f => (
-              <div key={f} className="space-y-1.5">
-                <Label className="text-xs">{f}</Label>
-                <Input placeholder={f} className="h-9" />
-              </div>
-            ))}
-            <div className="space-y-1.5">
-              <Label className="text-xs">Estado</Label>
-              <Select><SelectTrigger className="h-9"><SelectValue placeholder="Seleccionar" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="pago">Pago</SelectItem>
-                  <SelectItem value="pendente">Pendente</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <Button className="w-full mt-4">Guardar Receita</Button>
-          </div>
-        </SheetContent>
-      </Sheet>
     </div>
   );
 }
