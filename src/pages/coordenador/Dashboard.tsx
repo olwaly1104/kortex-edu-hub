@@ -13,14 +13,6 @@ import {
   CheckSquare, XCircle,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-  Users, BookOpen, Clock, Award, ChevronRight,
-  AlertTriangle, FileText, Calendar as CalendarIcon,
-  Megaphone, CheckCircle,
-  GraduationCap, MapPin, Play, Plus,
-  UserX, ClipboardCheck, BarChart3,
-} from "lucide-react";
-import { Link } from "react-router-dom";
-import { toast } from "sonner";
 
 const typeStyles: Record<string, { bg: string; label: string }> = {
   urgente: { bg: "bg-destructive text-destructive-foreground", label: "Urgente" },
