@@ -3,7 +3,7 @@ import { coordAgendaEvents } from "@/data/mockData";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ChevronLeft, ChevronRight, Clock, MapPin, CalendarDays } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock, MapPin, CalendarDays, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
