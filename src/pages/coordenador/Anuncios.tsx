@@ -249,7 +249,11 @@ export default function CoordenadorAnuncios() {
               </Card>
             );
           })}
+          {filteredAnnouncements.length === 0 && (
+            <p className="text-sm text-muted-foreground py-8 text-center">Nenhum anúncio encontrado.</p>
+          )}
         </div>
+        </>
       )}
 
       {/* Meus Anúncios */}
