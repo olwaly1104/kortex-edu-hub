@@ -1,18 +1,22 @@
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { coordCursoInfo, coordSolicitacoes, coordTurmas, coordDocentes, coordEstudantes } from "@/data/institutionData";
+import { coordCursoInfo, coordTurmas, coordDocentes, coordEstudantes } from "@/data/institutionData";
 import { announcements, coordAgendaEvents } from "@/data/mockData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Users, BookOpen, Clock, Award, ChevronRight,
   AlertTriangle, FileText, Calendar as CalendarIcon,
-  Megaphone, X, CheckCircle, ClipboardList,
-  Eye, XCircle, GraduationCap, MapPin, Play,
-  ArrowDownLeft, UserX, ClipboardCheck, BarChart3,
+  Megaphone, CheckCircle,
+  GraduationCap, MapPin, Play, Plus,
+  UserX, ClipboardCheck, BarChart3,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { toast } from "sonner";
 
 const typeStyles: Record<string, { bg: string; label: string }> = {
   urgente: { bg: "bg-destructive text-destructive-foreground", label: "Urgente" },
@@ -20,34 +24,16 @@ const typeStyles: Record<string, { bg: string; label: string }> = {
   geral: { bg: "bg-muted text-foreground", label: "Geral" },
 };
 
-const typeIcons: Record<string, React.ElementType> = {
-  nota: Award,
-  plano: FileText,
-  horário: CalendarIcon,
-  transferência: Users,
-  recurso: AlertTriangle,
-};
-
-const typeLabels: Record<string, string> = {
-  nota: "Nota",
-  plano: "Plano",
-  horário: "Horário",
-  transferência: "Transferência",
-  recurso: "Recurso",
-  material: "Material",
-  reunião: "Reunião",
-};
-
-const priorityStyles: Record<string, string> = {
-  alta: "bg-destructive/10 text-destructive",
-  média: "bg-secondary/10 text-secondary",
-  baixa: "bg-muted text-muted-foreground",
-};
-
 export default function CoordenadorCursoDashboard() {
   const { user } = useAuth();
   const info = coordCursoInfo;
-  const pendentes = coordSolicitacoes.filter(s => s.status === "pendente" && s.direction === "recebida");
+
+  const [eventTitle, setEventTitle] = useState("");
+  const [eventDate, setEventDate] = useState("");
+  const [eventStart, setEventStart] = useState("");
+  const [eventEnd, setEventEnd] = useState("");
+  const [eventType, setEventType] = useState("reunião");
+  const [eventLocal, setEventLocal] = useState("");
 
   const TODAY_DATE = "2024-02-14";
   const todayAgenda = coordAgendaEvents
@@ -80,7 +66,7 @@ export default function CoordenadorCursoDashboard() {
   const stats = [
     { icon: Users, label: "Total Estudantes", value: info.totalEstudantes, color: "text-accent bg-accent/10" },
     { icon: BookOpen, label: "Cadeiras Activas", value: info.disciplinasActivas, color: "text-primary bg-primary/10" },
-    { icon: Clock, label: "Solicitações Pendentes", value: pendentes.length, color: "text-secondary bg-secondary/10" },
+    { icon: Clock, label: "Aulas Hoje", value: todayAgenda.length, color: "text-secondary bg-secondary/10" },
     { icon: Award, label: "Média Geral", value: info.mediaGeral, color: "text-accent bg-accent/10" },
   ];
 
@@ -286,69 +272,68 @@ export default function CoordenadorCursoDashboard() {
           </div>
         </Card>
 
-        {/* Solicitações — 3 items, clean */}
+        {/* Adicionar à Agenda */}
         <Card className="p-5 lg:col-span-2">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
-              <ArrowDownLeft className="w-5 h-5 text-secondary" /> Solicitações
-              <Badge variant="outline" className="text-[10px] ml-1">{pendentes.length}</Badge>
+              <Plus className="w-5 h-5 text-primary" /> Adicionar à Agenda
             </h2>
-            <Link to="/coordenador/solicitacoes" className="text-sm text-primary hover:underline flex items-center gap-1">
-              Ver todas <ChevronRight className="w-4 h-4" />
+            <Link to="/coordenador/calendario" className="text-sm text-primary hover:underline flex items-center gap-1">
+              Ver calendário <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
-          {pendentes.length === 0 ? (
-            <p className="text-sm text-muted-foreground text-center py-4">Sem solicitações pendentes 🎉</p>
-          ) : (
-            <div className="space-y-2.5">
-              {pendentes.slice(0, 3).map(sol => {
-                const Icon = typeIcons[sol.type] || FileText;
-                return (
-                  <div key={sol.id} className="px-3.5 py-3 rounded-xl border border-border bg-card hover:bg-muted/40 transition-colors space-y-2">
-                    {/* Header: icon + title + priority */}
-                    <div className="flex items-center gap-2">
-                      <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 bg-muted/60">
-                        <Icon className="w-3.5 h-3.5 text-muted-foreground" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-semibold text-foreground line-clamp-1">{sol.title}</p>
-                        <Badge variant="outline" className="text-[10px] mt-0.5">{typeLabels[sol.type] || sol.type}</Badge>
-                      </div>
-                      <Badge className={`${priorityStyles[sol.priority]} text-[8px] px-1.5 py-0 shrink-0`}>{sol.priority}</Badge>
-                    </div>
-
-                    {/* Description — 1 line only */}
-                    <p className="text-[11px] text-muted-foreground line-clamp-1">{sol.description}</p>
-
-                    {/* Requester + Date row */}
-                    <div className="flex items-center gap-3 text-[10px]">
-                      <div className="flex items-center gap-1.5">
-                        <Users className="w-3 h-3 text-muted-foreground" />
-                        <span className="font-medium text-foreground">{sol.requester}</span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <CalendarIcon className="w-3 h-3 text-muted-foreground" />
-                        <span className="text-muted-foreground">{sol.date}</span>
-                      </div>
-                    </div>
-
-                    {/* Actions: Rejeitar left — Ver detalhes center — Aprovar right */}
-                    <div className="flex items-center justify-between pt-1 border-t border-border">
-                      <Button variant="ghost" size="sm" className="h-6 px-2 rounded-md text-[10px] text-destructive hover:text-destructive hover:bg-destructive/10 gap-1">
-                        <XCircle className="w-3 h-3" /> Rejeitar
-                      </Button>
-                      <Link to="/coordenador/solicitacoes" className="text-[10px] text-primary hover:underline flex items-center gap-0.5">
-                        <Eye className="w-3 h-3" /> Ver detalhes
-                      </Link>
-                      <Button size="sm" className="h-6 px-2 rounded-md text-[10px] bg-accent hover:bg-accent/90 text-accent-foreground gap-1">
-                        <CheckCircle className="w-3 h-3" /> Aprovar
-                      </Button>
-                    </div>
-                  </div>
-                );
-              })}
+          <div className="space-y-3">
+            <div>
+              <Label className="text-xs text-muted-foreground mb-1">Título</Label>
+              <Input placeholder="Ex: Reunião de coordenação" value={eventTitle} onChange={e => setEventTitle(e.target.value)} className="h-9 text-sm" />
             </div>
-          )}
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label className="text-xs text-muted-foreground mb-1">Tipo</Label>
+                <Select value={eventType} onValueChange={setEventType}>
+                  <SelectTrigger className="h-9 text-sm"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="reunião">Reunião</SelectItem>
+                    <SelectItem value="aula">Aula</SelectItem>
+                    <SelectItem value="avaliação">Avaliação</SelectItem>
+                    <SelectItem value="evento">Evento</SelectItem>
+                    <SelectItem value="prazo">Prazo</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label className="text-xs text-muted-foreground mb-1">Data</Label>
+                <Input type="date" value={eventDate} onChange={e => setEventDate(e.target.value)} className="h-9 text-sm" />
+              </div>
+            </div>
+            <div className="grid grid-cols-3 gap-3">
+              <div>
+                <Label className="text-xs text-muted-foreground mb-1">Início</Label>
+                <Input type="time" value={eventStart} onChange={e => setEventStart(e.target.value)} className="h-9 text-sm" />
+              </div>
+              <div>
+                <Label className="text-xs text-muted-foreground mb-1">Fim</Label>
+                <Input type="time" value={eventEnd} onChange={e => setEventEnd(e.target.value)} className="h-9 text-sm" />
+              </div>
+              <div>
+                <Label className="text-xs text-muted-foreground mb-1">Local</Label>
+                <Input placeholder="Sala / Link" value={eventLocal} onChange={e => setEventLocal(e.target.value)} className="h-9 text-sm" />
+              </div>
+            </div>
+            <Button
+              className="w-full h-9 text-sm gap-2"
+              onClick={() => {
+                if (!eventTitle || !eventDate || !eventStart || !eventEnd) {
+                  toast.error("Preencha todos os campos obrigatórios.");
+                  return;
+                }
+                toast.success(`"${eventTitle}" adicionado à agenda.`);
+                setEventTitle(""); setEventDate(""); setEventStart(""); setEventEnd(""); setEventLocal(""); setEventType("reunião");
+              }}
+            >
+              <Plus className="w-4 h-4" /> Adicionar Evento
+            </Button>
+          </div>
         </Card>
       </div>
     </div>
