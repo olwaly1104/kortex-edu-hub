@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import {
   Megaphone, Calendar, Clock, ChevronRight, Plus,
   Building2, User, Bell, Send, Trash2, Eye, AlertTriangle,
-  CalendarDays, Tag, Search,
+  CalendarDays, Tag, Search, Wallet,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -20,6 +20,7 @@ const typeConfig: Record<string, { icon: typeof AlertTriangle; label: string; cl
   evento: { icon: CalendarDays, label: "Evento", className: "bg-secondary/10 text-secondary border-secondary/20" },
   academico: { icon: Tag, label: "Académico", className: "bg-primary/10 text-primary border-primary/20" },
   geral: { icon: Bell, label: "Geral", className: "bg-muted text-muted-foreground border-border" },
+  financas: { icon: Wallet, label: "Finanças", className: "bg-accent/10 text-accent border-accent/20" },
 };
 
 interface MyAnnouncement {
@@ -180,6 +181,7 @@ export default function CoordenadorAnuncios() {
                 { key: "academico", label: "Académico", icon: Tag },
                 { key: "evento", label: "Evento", icon: CalendarDays },
                 { key: "geral", label: "Geral", icon: Bell },
+                { key: "financas", label: "Finanças", icon: Wallet },
               ].map(f => {
                 const active = filterType === f.key;
                 return (
