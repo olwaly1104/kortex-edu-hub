@@ -122,7 +122,7 @@ export default function CoordenadorAnuncios() {
       {/* Tabs */}
       <div className="flex gap-1 border-b border-border">
         {([
-          { key: "institucionais" as const, label: "Direcção Académica", icon: Building2 },
+          { key: "institucionais" as const, label: "Todos os Anúncios", icon: Building2 },
           { key: "meus" as const, label: "Meus Anúncios", icon: User },
         ]).map(tab => (
           <button
