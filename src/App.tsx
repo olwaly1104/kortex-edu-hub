@@ -61,6 +61,7 @@ import CoordenadorCursoDetail from "./pages/coordenador/CursoDetail";
 import CoordenadorFaculdadeDetail from "./pages/coordenador/FaculdadeDetail";
 import CoordenadorTarefas from "./pages/coordenador/Tarefas";
 import CoordenadorCalendar from "./pages/coordenador/Calendar";
+import CoordenadorAnuncios from "./pages/coordenador/Anuncios";
 import CoordenadorAvaliacoes from "./pages/coordenador/Avaliacoes";
 import CoordenadorAvaliacaoDetail from "./pages/coordenador/AvaliacaoDetail";
 import DecanoDashboard from "./pages/decano/Dashboard";
@@ -179,7 +180,7 @@ function AppRoutes() {
         <Route path="/coordenador/curso" element={<CoordenadorCursoDetail />} />
         <Route path="/coordenador/faculdade" element={<CoordenadorFaculdadeDetail />} />
         <Route path="/coordenador/calendario" element={<CoordenadorCalendar />} />
-        <Route path="/coordenador/anuncios" element={<StudentAnnouncements />} />
+        <Route path="/coordenador/anuncios" element={<CoordenadorAnuncios />} />
         <Route path="/coordenador/solicitacoes" element={<CoordenadorSolicitacoes />} />
         <Route path="/coordenador/tarefas" element={<CoordenadorTarefas />} />
         <Route path="/coordenador/avaliacoes" element={<CoordenadorAvaliacoes />} />
