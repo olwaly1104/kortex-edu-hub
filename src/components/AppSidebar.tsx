@@ -136,7 +136,7 @@ const secretariaSections: NavSection[] = [
   { title: "Geral", items: [
     { label: "Início", icon: LayoutDashboard, path: "/secretaria" },
     { label: "Calendário", icon: Calendar, path: "/secretaria/calendario" },
-    { label: "Anúncios", icon: Megaphone, path: "/secretaria/anuncios" },
+    { label: "Anúncios", icon: Megaphone, path: "/secretaria/anuncios", badge: 4 },
     { label: "Solicitações", icon: CheckSquare, path: "/secretaria/solicitacoes" },
   ]},
   { title: "Admissões", items: [
