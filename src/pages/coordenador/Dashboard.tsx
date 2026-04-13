@@ -65,8 +65,8 @@ export default function CoordenadorCursoDashboard() {
 
   const stats = [
     { icon: Users, label: "Total Estudantes", value: info.totalEstudantes, color: "text-accent bg-accent/10" },
-    { icon: BookOpen, label: "Cadeiras Activas", value: info.disciplinasActivas, color: "text-primary bg-primary/10" },
-    { icon: Clock, label: "Aulas Hoje", value: todayAgenda.length, color: "text-secondary bg-secondary/10" },
+    { icon: ClipboardCheck, label: "Minha Presença", value: "96%", color: "text-primary bg-primary/10" },
+    { icon: BarChart3, label: "Presença Geral", value: "89%", color: "text-secondary bg-secondary/10" },
     { icon: Award, label: "Média Geral", value: info.mediaGeral, color: "text-accent bg-accent/10" },
   ];
 
