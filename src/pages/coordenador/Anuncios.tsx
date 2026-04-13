@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import {
   Megaphone, Calendar, Clock, ChevronRight, Plus,
   Building2, User, Bell, Send, Trash2, Eye, AlertTriangle,
-  CalendarDays, Tag,
+  CalendarDays, Tag, Search,
 } from "lucide-react";
 import { toast } from "sonner";
 
