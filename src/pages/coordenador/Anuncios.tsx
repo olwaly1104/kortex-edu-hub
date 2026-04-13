@@ -151,18 +151,18 @@ export default function CoordenadorAnuncios() {
                 onClick={() => setSelectedAnn(ann)}
               >
                 <div className="flex items-start justify-between gap-3 mb-2">
-                  <div className="flex items-center gap-2">
-                    <Badge className={style.bg}>{style.label}</Badge>
-                    <span className="text-xs text-muted-foreground font-medium">{ann.author}</span>
-                  </div>
-                  <div className="flex items-center gap-3 text-xs text-muted-foreground shrink-0">
-                    <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{ann.date}</span>
-                    <span className="flex items-center gap-1"><Clock className="w-3 h-3" />08:00</span>
-                    <ChevronRight className="w-4 h-4 text-muted-foreground/50 group-hover:text-foreground transition-colors" />
-                  </div>
+                  <Badge className={style.bg}>{style.label}</Badge>
+                  <ChevronRight className="w-4 h-4 text-muted-foreground/50 group-hover:text-foreground transition-colors" />
                 </div>
                 <h3 className="text-sm font-semibold text-foreground mb-1">{ann.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">{ann.content}</p>
+                <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2 mb-3">{ann.content}</p>
+                <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                  <Badge variant="outline" className="cursor-pointer hover:bg-muted/50 transition-colors gap-1 text-[11px]" onClick={(e) => { e.stopPropagation(); }}>
+                    <User className="w-3 h-3" /> {ann.author}
+                  </Badge>
+                  <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{ann.date}</span>
+                  <span className="flex items-center gap-1"><Clock className="w-3 h-3" />08:00</span>
+                </div>
               </Card>
             );
           })}
