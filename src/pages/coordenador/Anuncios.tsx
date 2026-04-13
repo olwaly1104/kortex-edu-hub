@@ -1,15 +1,21 @@
 import { useState } from "react";
 import { announcements } from "@/data/mockData";
-import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Megaphone, Search, Clock, ChevronDown, ChevronUp, User, Calendar, Tag } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Megaphone, Search, Calendar, User, Tag, FileText } from "lucide-react";
 
 const typeStyles: Record<string, { bg: string; label: string }> = {
-  urgente: { bg: "bg-destructive text-destructive-foreground", label: "Urgente" },
-  evento: { bg: "bg-secondary text-secondary-foreground", label: "Evento" },
-  academico: { bg: "bg-primary text-primary-foreground", label: "Académico" },
-  geral: { bg: "bg-muted text-foreground", label: "Geral" },
+  urgente: { bg: "bg-destructive/10 text-destructive border-destructive/20", label: "Urgente" },
+  evento: { bg: "bg-secondary/10 text-secondary-foreground border-secondary/20", label: "Evento" },
+  academico: { bg: "bg-primary/10 text-primary border-primary/20", label: "Académico" },
+  geral: { bg: "bg-muted text-muted-foreground border-border", label: "Geral" },
 };
 
 const allAnnouncements = [
@@ -21,11 +27,14 @@ const allAnnouncements = [
 export default function CoordenadorAnuncios() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState<string>("all");
-  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [selectedAnn, setSelectedAnn] = useState<typeof allAnnouncements[0] | null>(null);
 
   const filtered = allAnnouncements
     .filter(a => filterType === "all" || a.type === filterType)
-    .filter(a => a.title.toLowerCase().includes(searchTerm.toLowerCase()) || a.author.toLowerCase().includes(searchTerm.toLowerCase()));
+    .filter(a =>
+      a.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      a.author.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
@@ -63,65 +72,86 @@ export default function CoordenadorAnuncios() {
         </div>
       </div>
 
-      {/* Announcements list */}
-      <div className="space-y-3">
-        {filtered.map((ann) => {
-          const style = typeStyles[ann.type] || typeStyles.geral;
-          const isExpanded = expandedId === ann.id;
-
-          return (
-            <Card
-              key={ann.id}
-              className="overflow-hidden cursor-pointer hover:shadow-md transition-shadow"
-              onClick={() => setExpandedId(isExpanded ? null : ann.id)}
-            >
-              <div className="p-5">
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-3 min-w-0 flex-1">
-                    <Badge className={`${style.bg} shrink-0`}>{style.label}</Badge>
-                    <h3 className="font-semibold text-foreground truncate">{ann.title}</h3>
-                  </div>
-                  <div className="flex items-center gap-3 shrink-0">
-                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                      <Calendar className="w-3.5 h-3.5" />
-                      <span>{ann.date}</span>
-                    </div>
-                    {isExpanded ? (
-                      <ChevronUp className="w-4 h-4 text-muted-foreground" />
-                    ) : (
-                      <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                    )}
-                  </div>
-                </div>
-
-                {!isExpanded && (
-                  <p className="text-sm text-muted-foreground mt-2 line-clamp-1">{ann.content}</p>
-                )}
-
-                {isExpanded && (
-                  <div className="mt-4 space-y-3 border-t border-border pt-4">
-                    <p className="text-sm text-foreground leading-relaxed">{ann.content}</p>
-                    <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                      <span className="flex items-center gap-1.5">
-                        <User className="w-3.5 h-3.5" /> {ann.author}
-                      </span>
-                      <span className="flex items-center gap-1.5">
-                        <Calendar className="w-3.5 h-3.5" /> {ann.date}
-                      </span>
-                      <span className="flex items-center gap-1.5">
-                        <Tag className="w-3.5 h-3.5" /> {style.label}
-                      </span>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </Card>
-          );
-        })}
+      {/* Table */}
+      <div className="rounded-lg border border-border overflow-hidden">
+        <table className="w-full">
+          <thead>
+            <tr className="bg-muted/50 border-b border-border">
+              <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-3">Título</th>
+              <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-3">Categoria</th>
+              <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-3">Emitido por</th>
+              <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-3">Data</th>
+              <th className="text-right text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-3"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {filtered.map((ann, idx) => {
+              const style = typeStyles[ann.type] || typeStyles.geral;
+              return (
+                <tr
+                  key={ann.id}
+                  className={`border-b border-border last:border-0 hover:bg-muted/30 transition-colors cursor-pointer ${idx % 2 === 0 ? "bg-card" : "bg-card/50"}`}
+                  onClick={() => setSelectedAnn(ann)}
+                >
+                  <td className="px-4 py-3.5">
+                    <p className="text-sm font-medium text-foreground">{ann.title}</p>
+                  </td>
+                  <td className="px-4 py-3.5">
+                    <Badge variant="outline" className={`text-[11px] ${style.bg}`}>{style.label}</Badge>
+                  </td>
+                  <td className="px-4 py-3.5">
+                    <span className="text-sm text-muted-foreground">{ann.author}</span>
+                  </td>
+                  <td className="px-4 py-3.5">
+                    <span className="text-sm text-muted-foreground">{ann.date}</span>
+                  </td>
+                  <td className="px-4 py-3.5 text-right">
+                    <Button variant="ghost" size="sm" className="text-xs text-primary h-7">
+                      Ver detalhes
+                    </Button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
         {filtered.length === 0 && (
           <p className="text-sm text-muted-foreground py-8 text-center">Nenhum anúncio encontrado.</p>
         )}
       </div>
+
+      {/* Detail Dialog */}
+      <Dialog open={!!selectedAnn} onOpenChange={() => setSelectedAnn(null)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="text-lg">{selectedAnn?.title}</DialogTitle>
+          </DialogHeader>
+          {selectedAnn && (
+            <div className="space-y-4 pt-2">
+              <div className="grid grid-cols-3 gap-3 text-sm">
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider flex items-center gap-1"><Tag className="w-3 h-3" /> Categoria</p>
+                  <Badge variant="outline" className={typeStyles[selectedAnn.type]?.bg}>
+                    {typeStyles[selectedAnn.type]?.label}
+                  </Badge>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider flex items-center gap-1"><User className="w-3 h-3" /> Emitido por</p>
+                  <p className="font-medium text-foreground">{selectedAnn.author}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider flex items-center gap-1"><Calendar className="w-3 h-3" /> Data</p>
+                  <p className="font-medium text-foreground">{selectedAnn.date}</p>
+                </div>
+              </div>
+              <div className="border-t border-border pt-4 space-y-1">
+                <p className="text-xs text-muted-foreground uppercase tracking-wider flex items-center gap-1"><FileText className="w-3 h-3" /> Conteúdo</p>
+                <p className="text-sm text-foreground leading-relaxed">{selectedAnn.content}</p>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
