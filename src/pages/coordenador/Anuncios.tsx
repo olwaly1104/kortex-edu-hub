@@ -2,25 +2,26 @@ import { useState } from "react";
 import { announcements } from "@/data/mockData";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Megaphone, Search, Calendar, User, ChevronRight } from "lucide-react";
+import { Megaphone, Search, Calendar, User, ArrowRight } from "lucide-react";
 
-const typeStyles: Record<string, { dot: string; label: string }> = {
-  urgente: { dot: "bg-destructive", label: "Urgente" },
-  evento: { dot: "bg-secondary", label: "Evento" },
-  academico: { dot: "bg-primary", label: "Académico" },
-  geral: { dot: "bg-muted-foreground", label: "Geral" },
+const typeConfig: Record<string, { label: string; color: string; bgLight: string }> = {
+  urgente: { label: "Urgente", color: "text-destructive", bgLight: "bg-destructive/8 text-destructive border-destructive/20" },
+  evento: { label: "Evento", color: "text-secondary", bgLight: "bg-secondary/10 text-secondary-foreground border-secondary/20" },
+  academico: { label: "Académico", color: "text-primary", bgLight: "bg-primary/8 text-primary border-primary/20" },
+  geral: { label: "Geral", color: "text-muted-foreground", bgLight: "bg-muted text-muted-foreground border-border" },
 };
 
 const allAnnouncements = [
   ...announcements,
   { id: "a5", title: "Manutenção do Portal Académico", content: "O portal académico estará indisponível no sábado, 17 de Fevereiro, entre as 08:00 e as 14:00 para manutenção programada. Pedimos que realizem todas as operações necessárias antes desse período.", type: "geral" as const, date: "14/02/2024", author: "Direcção de Informática" },
-  { id: "a6", title: "Prazo de Entrega de Notas do 1º Semestre", content: "Relembramos que o prazo final para lançamento de notas do 1º semestre é dia 28 de Fevereiro. Todos os docentes devem submeter as pautas até essa data. O não cumprimento poderá resultar em atrasos na publicação dos resultados finais.", type: "academico" as const, date: "13/02/2024", author: "Direcção Académica" },
+  { id: "a6", title: "Prazo de Entrega de Notas do 1º Semestre", content: "Relembramos que o prazo final para lançamento de notas do 1º semestre é dia 28 de Fevereiro. Todos os docentes devem submeter as pautas até essa data. O não cumprimento poderá resultar em atrasos na publicação dos resultados finais aos estudantes e respectivas famílias.", type: "academico" as const, date: "13/02/2024", author: "Direcção Académica" },
 ];
 
 export default function CoordenadorAnuncios() {
@@ -72,46 +73,55 @@ export default function CoordenadorAnuncios() {
       </div>
 
       {/* Announcements */}
-      <div className="rounded-lg border border-border overflow-hidden divide-y divide-border">
+      <div className="space-y-3">
         {filtered.map((ann) => {
-          const style = typeStyles[ann.type] || typeStyles.geral;
-          const isLong = ann.content.length > 120;
+          const config = typeConfig[ann.type] || typeConfig.geral;
+          const isLong = ann.content.length > 140;
 
           return (
             <div
               key={ann.id}
-              className="bg-card px-5 py-4 hover:bg-muted/30 transition-colors cursor-pointer group"
-              onClick={() => isLong ? setSelectedAnn(ann) : null}
+              className="rounded-lg border border-border bg-card p-5 hover:shadow-sm transition-all group"
             >
-              <div className="flex items-start gap-4">
-                {/* Left: dot + content */}
-                <div className="flex items-start gap-3 flex-1 min-w-0">
-                  <div className={`w-2 h-2 rounded-full mt-2 shrink-0 ${style.dot}`} />
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="text-sm font-semibold text-foreground truncate">{ann.title}</h3>
-                      <Badge variant="outline" className="text-[10px] shrink-0 font-normal">{style.label}</Badge>
-                    </div>
-                    <p className={`text-sm text-muted-foreground leading-relaxed ${isLong ? "line-clamp-2" : ""}`}>
-                      {ann.content}
-                    </p>
-                    <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
-                      <span className="flex items-center gap-1"><User className="w-3 h-3" />{ann.author}</span>
-                      <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{ann.date}</span>
-                    </div>
-                  </div>
+              {/* Header row */}
+              <div className="flex items-center justify-between mb-2.5">
+                <div className="flex items-center gap-2.5">
+                  <Badge variant="outline" className={`text-[11px] font-medium px-2 py-0.5 ${config.bgLight}`}>
+                    {config.label}
+                  </Badge>
+                  <span className="text-xs text-muted-foreground flex items-center gap-1">
+                    <Calendar className="w-3 h-3" /> {ann.date}
+                  </span>
                 </div>
-
-                {/* Right: arrow if long */}
-                {isLong && (
-                  <ChevronRight className="w-4 h-4 text-muted-foreground mt-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
-                )}
+                <span className="text-xs text-muted-foreground flex items-center gap-1">
+                  <User className="w-3 h-3" /> {ann.author}
+                </span>
               </div>
+
+              {/* Title */}
+              <h3 className="text-[15px] font-semibold text-foreground mb-1.5">{ann.title}</h3>
+
+              {/* Content preview */}
+              <p className={`text-sm text-muted-foreground leading-relaxed ${isLong ? "line-clamp-2" : ""}`}>
+                {ann.content}
+              </p>
+
+              {/* Read more */}
+              {isLong && (
+                <button
+                  onClick={() => setSelectedAnn(ann)}
+                  className="mt-2.5 text-xs font-medium text-primary flex items-center gap-1 hover:gap-2 transition-all"
+                >
+                  Ler mais <ArrowRight className="w-3 h-3" />
+                </button>
+              )}
             </div>
           );
         })}
         {filtered.length === 0 && (
-          <p className="text-sm text-muted-foreground py-8 text-center bg-card">Nenhum anúncio encontrado.</p>
+          <div className="rounded-lg border border-border bg-card p-8 text-center">
+            <p className="text-sm text-muted-foreground">Nenhum anúncio encontrado.</p>
+          </div>
         )}
       </div>
 
@@ -119,16 +129,20 @@ export default function CoordenadorAnuncios() {
       <Dialog open={!!selectedAnn} onOpenChange={() => setSelectedAnn(null)}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle className="text-lg leading-snug">{selectedAnn?.title}</DialogTitle>
+            <DialogTitle className="text-lg leading-snug pr-6">{selectedAnn?.title}</DialogTitle>
           </DialogHeader>
           {selectedAnn && (
             <div className="space-y-4 pt-1">
-              <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                <Badge variant="outline" className="text-[10px] font-normal">{typeStyles[selectedAnn.type]?.label}</Badge>
-                <span className="flex items-center gap-1"><User className="w-3 h-3" />{selectedAnn.author}</span>
-                <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{selectedAnn.date}</span>
+              <div className="flex items-center gap-3 text-xs text-muted-foreground flex-wrap">
+                <Badge variant="outline" className={`text-[11px] font-medium ${typeConfig[selectedAnn.type]?.bgLight}`}>
+                  {typeConfig[selectedAnn.type]?.label}
+                </Badge>
+                <span className="flex items-center gap-1"><User className="w-3 h-3" /> {selectedAnn.author}</span>
+                <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {selectedAnn.date}</span>
               </div>
-              <p className="text-sm text-foreground leading-relaxed">{selectedAnn.content}</p>
+              <div className="border-t border-border pt-4">
+                <p className="text-sm text-foreground leading-relaxed">{selectedAnn.content}</p>
+              </div>
             </div>
           )}
         </DialogContent>
