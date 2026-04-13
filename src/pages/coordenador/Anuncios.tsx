@@ -106,32 +106,39 @@ export default function CoordenadorAnuncios() {
   };
 
   return (
-    <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
+    <div className="p-6 lg:p-8 space-y-5 animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
-              <Megaphone className="w-5 h-5 text-primary" />
-            </div>
-            Anúncios
-            {unreadCount > 0 && (
-              <span className="ml-1 min-w-[22px] h-[22px] flex items-center justify-center rounded-full text-[11px] font-bold bg-destructive text-destructive-foreground px-1.5">
-                {unreadCount}
-              </span>
-            )}
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1 ml-[46px]">
-            {unreadCount > 0
-              ? `${unreadCount} anúncio${unreadCount > 1 ? "s" : ""} por ler`
-              : "Todas as comunicações lidas"}
-          </p>
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+            <Megaphone className="w-5 h-5 text-primary" />
+          </div>
+          <div>
+            <h1 className="text-xl font-bold text-foreground">Anúncios</h1>
+            <p className="text-[13px] text-muted-foreground">
+              {unreadCount > 0
+                ? <span>{unreadCount} por ler · {announcements.length} total</span>
+                : "Todas as comunicações lidas"}
+            </p>
+          </div>
         </div>
-        {activeTab === "meus" && (
-          <Button onClick={() => setShowCreate(true)} className="gap-2 shadow-sm">
-            <Plus className="w-4 h-4" /> Novo Anúncio
-          </Button>
-        )}
+        <div className="flex items-center gap-2">
+          {unreadCount > 0 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-xs text-muted-foreground hover:text-foreground gap-1.5"
+              onClick={() => setReadIds(new Set(announcements.map(a => a.id)))}
+            >
+              <Eye className="w-3.5 h-3.5" /> Marcar tudo como lido
+            </Button>
+          )}
+          {activeTab === "meus" && (
+            <Button onClick={() => setShowCreate(true)} size="sm" className="gap-1.5 shadow-sm">
+              <Plus className="w-4 h-4" /> Novo Anúncio
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Tabs */}
@@ -161,55 +168,49 @@ export default function CoordenadorAnuncios() {
 
       {/* Todos os Anúncios */}
       {activeTab === "institucionais" && (
-        <div className="space-y-3">
+        <div className="space-y-2">
           {announcements.map((ann) => {
             const config = typeConfig[ann.type] || typeConfig.geral;
             const TypeIcon = config.icon;
+            const isUnread = !readIds.has(ann.id);
             return (
               <Card
                 key={ann.id}
-                className={`p-0 overflow-hidden cursor-pointer hover:shadow-md transition-all duration-200 group ${!readIds.has(ann.id) ? "border-primary/40 bg-primary/[0.02]" : "border-border/80"}`}
+                className={`p-0 overflow-hidden cursor-pointer transition-all duration-200 group border ${isUnread ? "border-primary/30 bg-primary/[0.02] shadow-sm" : "border-border/60 hover:border-border"}`}
                 onClick={() => {
                   setReadIds(prev => new Set(prev).add(ann.id));
                   setSelectedAnn(ann);
                 }}
               >
-                <div className="flex">
-                  {/* Type indicator stripe */}
-                  <div className={`w-1 shrink-0 ${ann.type === "urgente" ? "bg-destructive" : ann.type === "evento" ? "bg-secondary" : ann.type === "academico" ? "bg-primary" : "bg-muted-foreground/30"}`} />
+                <div className="flex items-center gap-4 px-4 py-3.5">
+                  {/* Unread dot */}
+                  <div className="w-2 shrink-0 flex justify-center">
+                    {isUnread && <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />}
+                  </div>
 
-                  <div className="flex-1 p-5">
-                    <div className="flex items-start justify-between gap-3 mb-2">
-                      <Badge variant="outline" className={`gap-1.5 text-[11px] font-medium border ${config.className}`}>
-                        <TypeIcon className="w-3 h-3" /> {config.label}
-                      </Badge>
-                      <div className="flex items-center gap-1.5 shrink-0 mt-0.5">
-                        {!readIds.has(ann.id) && (
-                          <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                        )}
-                        <ChevronRight className="w-4 h-4 text-muted-foreground/40 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
-                      </div>
+                  {/* Type icon */}
+                  <div className={`w-8 h-8 rounded-lg shrink-0 flex items-center justify-center ${
+                    ann.type === "urgente" ? "bg-destructive/10" : ann.type === "evento" ? "bg-secondary/10" : ann.type === "academico" ? "bg-primary/10" : "bg-muted"
+                  }`}>
+                    <TypeIcon className={`w-4 h-4 ${
+                      ann.type === "urgente" ? "text-destructive" : ann.type === "evento" ? "text-secondary" : ann.type === "academico" ? "text-primary" : "text-muted-foreground"
+                    }`} />
+                  </div>
+
+                  {/* Content */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <h3 className={`text-sm truncate group-hover:text-primary transition-colors ${isUnread ? "font-semibold text-foreground" : "font-medium text-foreground/80"}`}>{ann.title}</h3>
                     </div>
+                    <p className="text-xs text-muted-foreground truncate">{ann.author} · {ann.date}</p>
+                  </div>
 
-                    <h3 className="text-[15px] font-semibold text-foreground mb-1.5 group-hover:text-primary transition-colors">{ann.title}</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2 mb-3">{ann.content}</p>
-
-                    <div className="flex items-center gap-2.5 flex-wrap">
-                      <Badge
-                        variant="outline"
-                        className="cursor-pointer hover:bg-primary/5 transition-colors gap-1.5 text-[11px] font-medium text-foreground/70 border-border"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <User className="w-3 h-3 text-primary" /> {ann.author}
-                      </Badge>
-                      <span className="text-muted-foreground/30">·</span>
-                      <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <Calendar className="w-3 h-3" />{ann.date}
-                      </span>
-                      <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <Clock className="w-3 h-3" />08:00
-                      </span>
-                    </div>
+                  {/* Badge + Arrow */}
+                  <div className="flex items-center gap-2 shrink-0">
+                    <Badge variant="outline" className={`text-[10px] font-medium border ${config.className} hidden sm:flex`}>
+                      {config.label}
+                    </Badge>
+                    <ChevronRight className="w-4 h-4 text-muted-foreground/30 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
                   </div>
                 </div>
               </Card>
