@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import {
   Megaphone, Calendar, Clock, ChevronRight, Plus,
   Building2, User, Bell, Send, Trash2, Eye, AlertTriangle,
-  CalendarDays, Tag,
+  CalendarDays, Tag, Search,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -66,6 +66,12 @@ export default function CoordenadorAnuncios() {
   const [activeTab, setActiveTab] = useState<"institucionais" | "meus">("institucionais");
   const [selectedAnn, setSelectedAnn] = useState<typeof announcements[0] | null>(null);
   const [readIds, setReadIds] = useState<Set<string>>(new Set());
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterType, setFilterType] = useState<string>("all");
+
+  const filteredAnnouncements = announcements
+    .filter(a => filterType === "all" || a.type === filterType)
+    .filter(a => a.title.toLowerCase().includes(searchTerm.toLowerCase()) || a.content.toLowerCase().includes(searchTerm.toLowerCase()));
 
   const unreadCount = announcements.filter(a => !readIds.has(a.id)).length;
 
@@ -154,8 +160,43 @@ export default function CoordenadorAnuncios() {
 
       {/* Todos os Anúncios */}
       {activeTab === "institucionais" && (
-        <div className="space-y-3">
-          {announcements.map((ann) => {
+        <>
+          {/* Search & Filter */}
+          <div className="flex items-center gap-3 flex-wrap">
+            <div className="relative flex-1 max-w-sm">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Pesquisar anúncios..."
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+                className="pl-9 h-9"
+              />
+            </div>
+            <div className="flex items-center gap-1.5 ml-auto">
+              {[
+                { key: "all", label: "Todos" },
+                { key: "urgente", label: "Urgente" },
+                { key: "academico", label: "Académico" },
+                { key: "evento", label: "Evento" },
+                { key: "geral", label: "Geral" },
+              ].map(f => (
+                <button
+                  key={f.key}
+                  onClick={() => setFilterType(f.key)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                    filterType === f.key
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted text-muted-foreground hover:bg-muted/80"
+                  }`}
+                >
+                  {f.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-3">
+          {filteredAnnouncements.map((ann) => {
             const config = typeConfig[ann.type] || typeConfig.geral;
             const TypeIcon = config.icon;
             return (
@@ -208,7 +249,11 @@ export default function CoordenadorAnuncios() {
               </Card>
             );
           })}
+          {filteredAnnouncements.length === 0 && (
+            <p className="text-sm text-muted-foreground py-8 text-center">Nenhum anúncio encontrado.</p>
+          )}
         </div>
+        </>
       )}
 
       {/* Meus Anúncios */}
