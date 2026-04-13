@@ -9,14 +9,14 @@ import {
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 
-interface NavItem { label: string; icon: React.ElementType; path: string; }
+interface NavItem { label: string; icon: React.ElementType; path: string; badge?: number; }
 interface NavSection { title: string; items: NavItem[]; }
 
 const studentSections: NavSection[] = [
   { title: "Geral", items: [
     { label: "Início", icon: LayoutDashboard, path: "/student" },
     { label: "Calendário", icon: Calendar, path: "/student/calendar" },
-    { label: "Anúncios", icon: Megaphone, path: "/student/announcements" },
+    { label: "Anúncios", icon: Megaphone, path: "/student/announcements", badge: 4 },
   ]},
   { title: "Académico", items: [
     { label: "As Minhas Cadeiras", icon: BookOpen, path: "/student/disciplines" },
@@ -40,7 +40,7 @@ const professorSections: NavSection[] = [
   { title: "Geral", items: [
     { label: "Início", icon: LayoutDashboard, path: "/professor" },
     { label: "Calendário", icon: Calendar, path: "/professor/calendar" },
-    { label: "Anúncios", icon: Megaphone, path: "/professor/announcements" },
+    { label: "Anúncios", icon: Megaphone, path: "/professor/announcements", badge: 4 },
     { label: "Solicitações", icon: CheckSquare, path: "/professor/solicitacoes" },
   ]},
   { title: "Académico", items: [
@@ -65,7 +65,7 @@ const coordenadorCursoSections: NavSection[] = [
   { title: "Geral", items: [
     { label: "Início", icon: LayoutDashboard, path: "/coordenador" },
     { label: "Calendário", icon: Calendar, path: "/coordenador/calendario" },
-    { label: "Anúncios", icon: Megaphone, path: "/coordenador/anuncios" },
+    { label: "Anúncios", icon: Megaphone, path: "/coordenador/anuncios", badge: 4 },
     { label: "Solicitações", icon: CheckSquare, path: "/coordenador/solicitacoes" },
   ]},
   { title: "O Meu Curso", items: [
@@ -92,7 +92,7 @@ const decanoSections: NavSection[] = [
   { title: "Geral", items: [
     { label: "Início", icon: LayoutDashboard, path: "/decano" },
     { label: "Calendário", icon: Calendar, path: "/decano/calendario" },
-    { label: "Anúncios", icon: Megaphone, path: "/decano/anuncios" },
+    { label: "Anúncios", icon: Megaphone, path: "/decano/anuncios", badge: 4 },
     { label: "Aprovações", icon: CheckSquare, path: "/decano/aprovacoes" },
   ]},
   { title: "Académico", items: [
@@ -114,7 +114,7 @@ const reitorSections: NavSection[] = [
   { title: "Geral", items: [
     { label: "Início", icon: LayoutDashboard, path: "/reitor" },
     { label: "Calendário", icon: Calendar, path: "/reitor/calendario" },
-    { label: "Anúncios", icon: Megaphone, path: "/reitor/anuncios" },
+    { label: "Anúncios", icon: Megaphone, path: "/reitor/anuncios", badge: 4 },
     { label: "Solicitações", icon: CheckSquare, path: "/reitor/solicitacoes" },
   ]},
   { title: "Académico", items: [
@@ -136,7 +136,7 @@ const secretariaSections: NavSection[] = [
   { title: "Geral", items: [
     { label: "Início", icon: LayoutDashboard, path: "/secretaria" },
     { label: "Calendário", icon: Calendar, path: "/secretaria/calendario" },
-    { label: "Anúncios", icon: Megaphone, path: "/secretaria/anuncios" },
+    { label: "Anúncios", icon: Megaphone, path: "/secretaria/anuncios", badge: 4 },
     { label: "Solicitações", icon: CheckSquare, path: "/secretaria/solicitacoes" },
   ]},
   { title: "Admissões", items: [
@@ -160,7 +160,7 @@ const financasSections: NavSection[] = [
   { title: "Geral", items: [
     { label: "Início", icon: LayoutDashboard, path: "/financas" },
     { label: "Calendário", icon: Calendar, path: "/financas/calendario" },
-    { label: "Anúncios", icon: Megaphone, path: "/financas/anuncios" },
+    { label: "Anúncios", icon: Megaphone, path: "/financas/anuncios", badge: 4 },
     { label: "Solicitações", icon: CheckSquare, path: "/financas/solicitacoes" },
   ]},
   { title: "Finanças", items: [
@@ -242,11 +242,16 @@ export default function AppSidebar() {
                   (!roleBasePaths.includes(item.path) && location.pathname.startsWith(item.path + "/"));
                 return (
                   <NavLink key={item.path} to={item.path}
-                    className={cn("flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] transition-colors",
+                    className={cn("flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] transition-colors relative",
                       isActive ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
                     )} title={collapsed ? item.label : undefined}>
                     <item.icon className="w-[18px] h-[18px] shrink-0" />
-                    {!collapsed && <span className="truncate">{item.label}</span>}
+                    {!collapsed && <span className="truncate flex-1">{item.label}</span>}
+                    {item.badge && item.badge > 0 && (
+                      <span className={cn("shrink-0 min-w-[18px] h-[18px] flex items-center justify-center rounded-full text-[10px] font-bold bg-destructive text-destructive-foreground", collapsed && "absolute -top-1 -right-1 min-w-[16px] h-[16px] text-[9px]")}>
+                        {item.badge}
+                      </span>
+                    )}
                   </NavLink>
                 );
               })}
