@@ -10,15 +10,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import {
   Megaphone, Calendar, Clock, ChevronRight, Plus,
-  Building2, User, Bell, Send, Trash2, Eye,
+  Building2, User, Bell, Send, Trash2, Eye, AlertTriangle,
+  CalendarDays, Tag,
 } from "lucide-react";
 import { toast } from "sonner";
 
-const typeStyles: Record<string, { bg: string; label: string }> = {
-  urgente: { bg: "bg-destructive text-destructive-foreground", label: "Urgente" },
-  evento: { bg: "bg-secondary text-secondary-foreground", label: "Evento" },
-  academico: { bg: "bg-primary text-primary-foreground", label: "Académico" },
-  geral: { bg: "bg-muted text-foreground", label: "Geral" },
+const typeConfig: Record<string, { icon: typeof AlertTriangle; label: string; className: string }> = {
+  urgente: { icon: AlertTriangle, label: "Urgente", className: "bg-destructive/10 text-destructive border-destructive/20" },
+  evento: { icon: CalendarDays, label: "Evento", className: "bg-secondary/10 text-secondary border-secondary/20" },
+  academico: { icon: Tag, label: "Académico", className: "bg-primary/10 text-primary border-primary/20" },
+  geral: { icon: Bell, label: "Geral", className: "bg-muted text-muted-foreground border-border" },
 };
 
 interface MyAnnouncement {
@@ -65,7 +66,6 @@ export default function CoordenadorAnuncios() {
   const [activeTab, setActiveTab] = useState<"institucionais" | "meus">("institucionais");
   const [selectedAnn, setSelectedAnn] = useState<typeof announcements[0] | null>(null);
 
-  // My announcements state
   const [myAnns, setMyAnns] = useState<MyAnnouncement[]>(initialMyAnnouncements);
   const [showCreate, setShowCreate] = useState(false);
   const [newTitle, setNewTitle] = useState("");
@@ -107,13 +107,16 @@ export default function CoordenadorAnuncios() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-            <Megaphone className="w-6 h-6 text-secondary" /> Anúncios
+          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Megaphone className="w-5 h-5 text-primary" />
+            </div>
+            Anúncios
           </h1>
-          <p className="text-sm text-muted-foreground mt-1">Comunicações institucionais e do curso</p>
+          <p className="text-sm text-muted-foreground mt-1 ml-[46px]">Comunicações institucionais e do curso</p>
         </div>
         {activeTab === "meus" && (
-          <Button onClick={() => setShowCreate(true)} className="gap-2">
+          <Button onClick={() => setShowCreate(true)} className="gap-2 shadow-sm">
             <Plus className="w-4 h-4" /> Novo Anúncio
           </Button>
         )}
@@ -139,29 +142,50 @@ export default function CoordenadorAnuncios() {
         ))}
       </div>
 
-      {/* Direcção Académica */}
+      {/* Todos os Anúncios */}
       {activeTab === "institucionais" && (
         <div className="space-y-3">
           {announcements.map((ann) => {
-            const style = typeStyles[ann.type] || typeStyles.geral;
+            const config = typeConfig[ann.type] || typeConfig.geral;
+            const TypeIcon = config.icon;
             return (
               <Card
                 key={ann.id}
-                className="p-5 cursor-pointer hover:bg-muted/30 transition-colors group"
+                className="p-0 overflow-hidden cursor-pointer hover:shadow-md transition-all duration-200 group border-border/80"
                 onClick={() => setSelectedAnn(ann)}
               >
-                <div className="flex items-start justify-between gap-3 mb-2">
-                  <Badge className={style.bg}>{style.label}</Badge>
-                  <ChevronRight className="w-4 h-4 text-muted-foreground/50 group-hover:text-foreground transition-colors" />
-                </div>
-                <h3 className="text-sm font-semibold text-foreground mb-1">{ann.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2 mb-3">{ann.content}</p>
-                <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                  <Badge variant="outline" className="cursor-pointer hover:bg-muted/50 transition-colors gap-1 text-[11px]" onClick={(e) => { e.stopPropagation(); }}>
-                    <User className="w-3 h-3" /> {ann.author}
-                  </Badge>
-                  <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{ann.date}</span>
-                  <span className="flex items-center gap-1"><Clock className="w-3 h-3" />08:00</span>
+                <div className="flex">
+                  {/* Type indicator stripe */}
+                  <div className={`w-1 shrink-0 ${ann.type === "urgente" ? "bg-destructive" : ann.type === "evento" ? "bg-secondary" : ann.type === "academico" ? "bg-primary" : "bg-muted-foreground/30"}`} />
+
+                  <div className="flex-1 p-5">
+                    <div className="flex items-start justify-between gap-3 mb-2">
+                      <Badge variant="outline" className={`gap-1.5 text-[11px] font-medium border ${config.className}`}>
+                        <TypeIcon className="w-3 h-3" /> {config.label}
+                      </Badge>
+                      <ChevronRight className="w-4 h-4 text-muted-foreground/40 group-hover:text-primary group-hover:translate-x-0.5 transition-all shrink-0 mt-0.5" />
+                    </div>
+
+                    <h3 className="text-[15px] font-semibold text-foreground mb-1.5 group-hover:text-primary transition-colors">{ann.title}</h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2 mb-3">{ann.content}</p>
+
+                    <div className="flex items-center gap-2.5 flex-wrap">
+                      <Badge
+                        variant="outline"
+                        className="cursor-pointer hover:bg-primary/5 transition-colors gap-1.5 text-[11px] font-medium text-foreground/70 border-border"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <User className="w-3 h-3 text-primary" /> {ann.author}
+                      </Badge>
+                      <span className="text-muted-foreground/30">·</span>
+                      <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                        <Calendar className="w-3 h-3" />{ann.date}
+                      </span>
+                      <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                        <Clock className="w-3 h-3" />08:00
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </Card>
             );
@@ -173,66 +197,96 @@ export default function CoordenadorAnuncios() {
       {activeTab === "meus" && (
         <div className="space-y-3">
           {myAnns.length === 0 && (
-            <div className="text-center py-12">
-              <Megaphone className="w-10 h-10 text-muted-foreground/40 mx-auto mb-3" />
-              <p className="text-sm text-muted-foreground">Ainda não publicou nenhum anúncio.</p>
-              <Button variant="outline" className="mt-4 gap-2" onClick={() => setShowCreate(true)}>
-                <Plus className="w-4 h-4" /> Criar Primeiro Anúncio
-              </Button>
-            </div>
+            <Card className="border-dashed border-2 border-border">
+              <div className="text-center py-14">
+                <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
+                  <Megaphone className="w-6 h-6 text-muted-foreground/50" />
+                </div>
+                <p className="text-sm font-medium text-foreground mb-1">Sem anúncios publicados</p>
+                <p className="text-xs text-muted-foreground mb-4">Crie o seu primeiro anúncio para comunicar com estudantes e docentes.</p>
+                <Button variant="outline" className="gap-2" onClick={() => setShowCreate(true)}>
+                  <Plus className="w-4 h-4" /> Criar Primeiro Anúncio
+                </Button>
+              </div>
+            </Card>
           )}
           {myAnns.map((ann) => {
-            const style = typeStyles[ann.type] || typeStyles.geral;
+            const config = typeConfig[ann.type] || typeConfig.geral;
+            const TypeIcon = config.icon;
             return (
-              <Card key={ann.id} className="p-5">
-                <div className="flex items-start justify-between gap-3 mb-2">
-                  <div className="flex items-center gap-2">
-                    <Badge className={style.bg}>{style.label}</Badge>
-                    <Badge variant="outline" className="text-[10px] gap-1">
-                      <Eye className="w-3 h-3" /> {ann.status === "publicado" ? "Publicado" : "Rascunho"}
-                    </Badge>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                      <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{ann.date}</span>
-                      <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{ann.time}</span>
+              <Card key={ann.id} className="p-0 overflow-hidden border-border/80">
+                <div className="flex">
+                  <div className={`w-1 shrink-0 ${ann.type === "urgente" ? "bg-destructive" : ann.type === "evento" ? "bg-secondary" : ann.type === "academico" ? "bg-primary" : "bg-muted-foreground/30"}`} />
+                  <div className="flex-1 p-5">
+                    <div className="flex items-start justify-between gap-3 mb-2">
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline" className={`gap-1.5 text-[11px] font-medium border ${config.className}`}>
+                          <TypeIcon className="w-3 h-3" /> {config.label}
+                        </Badge>
+                        <Badge variant="outline" className="text-[11px] gap-1 text-muted-foreground border-border">
+                          <Eye className="w-3 h-3" /> {ann.status === "publicado" ? "Publicado" : "Rascunho"}
+                        </Badge>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+                        onClick={() => handleDelete(ann.id)}
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </Button>
                     </div>
-                    <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive" onClick={() => handleDelete(ann.id)}>
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </Button>
+
+                    <h3 className="text-[15px] font-semibold text-foreground mb-1.5">{ann.title}</h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed mb-3">{ann.content}</p>
+
+                    <div className="flex items-center gap-2.5">
+                      <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                        <Calendar className="w-3 h-3" />{ann.date}
+                      </span>
+                      <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                        <Clock className="w-3 h-3" />{ann.time}
+                      </span>
+                    </div>
                   </div>
                 </div>
-                <h3 className="text-sm font-semibold text-foreground mb-1">{ann.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{ann.content}</p>
               </Card>
             );
           })}
         </div>
       )}
 
-      {/* Detail Dialog for Direcção Académica */}
+      {/* Detail Dialog */}
       <Dialog open={!!selectedAnn} onOpenChange={() => setSelectedAnn(null)}>
         <DialogContent className="sm:max-w-lg">
-          {selectedAnn && (
-            <>
-              <DialogHeader>
-                <div className="flex items-center gap-2 mb-1">
-                  <Badge className={(typeStyles[selectedAnn.type] || typeStyles.geral).bg}>
-                    {(typeStyles[selectedAnn.type] || typeStyles.geral).label}
-                  </Badge>
+          {selectedAnn && (() => {
+            const config = typeConfig[selectedAnn.type] || typeConfig.geral;
+            const TypeIcon = config.icon;
+            return (
+              <>
+                <DialogHeader>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Badge variant="outline" className={`gap-1.5 text-[11px] font-medium border ${config.className}`}>
+                      <TypeIcon className="w-3 h-3" /> {config.label}
+                    </Badge>
+                  </div>
+                  <DialogTitle className="text-lg leading-snug">{selectedAnn.title}</DialogTitle>
+                  <DialogDescription asChild>
+                    <div className="flex items-center gap-3 pt-2 flex-wrap">
+                      <Badge variant="outline" className="gap-1.5 text-[11px] font-medium text-foreground/70 border-border">
+                        <User className="w-3 h-3 text-primary" /> {selectedAnn.author}
+                      </Badge>
+                      <span className="flex items-center gap-1 text-xs"><Calendar className="w-3.5 h-3.5" />{selectedAnn.date}</span>
+                      <span className="flex items-center gap-1 text-xs"><Clock className="w-3.5 h-3.5" />08:00</span>
+                    </div>
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="py-3">
+                  <p className="text-sm text-foreground leading-relaxed">{selectedAnn.content}</p>
                 </div>
-                <DialogTitle className="text-lg">{selectedAnn.title}</DialogTitle>
-                <DialogDescription className="flex items-center gap-4 pt-1">
-                  <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" />{selectedAnn.date}</span>
-                  <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" />08:00</span>
-                  <span className="flex items-center gap-1"><Building2 className="w-3.5 h-3.5" />{selectedAnn.author}</span>
-                </DialogDescription>
-              </DialogHeader>
-              <div className="py-2">
-                <p className="text-sm text-foreground leading-relaxed">{selectedAnn.content}</p>
-              </div>
-            </>
-          )}
+              </>
+            );
+          })()}
         </DialogContent>
       </Dialog>
 
@@ -240,8 +294,11 @@ export default function CoordenadorAnuncios() {
       <Dialog open={showCreate} onOpenChange={setShowCreate}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Send className="w-5 h-5 text-primary" /> Novo Anúncio
+            <DialogTitle className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                <Send className="w-4 h-4 text-primary" />
+              </div>
+              Novo Anúncio
             </DialogTitle>
             <DialogDescription>Publique um comunicado para estudantes e docentes do curso.</DialogDescription>
           </DialogHeader>
