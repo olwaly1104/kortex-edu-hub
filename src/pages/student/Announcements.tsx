@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { announcements } from "@/data/mockData";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -7,16 +7,33 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Search, Clock, User, Plus, ChevronDown, AlertTriangle, BookOpen, CalendarDays, Info, Megaphone } from "lucide-react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Clock, Plus, AlertTriangle, BookOpen, CalendarDays, Info, Megaphone, Heart, MessageCircle, Share2, MoreHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
-const typeConfig: Record<string, { label: string; icon: React.ElementType; accent: string; iconBg: string }> = {
-  urgente: { label: "Urgente", icon: AlertTriangle, accent: "text-destructive", iconBg: "bg-destructive/10" },
-  evento: { label: "Evento", icon: CalendarDays, accent: "text-secondary", iconBg: "bg-secondary/10" },
-  academico: { label: "Académico", icon: BookOpen, accent: "text-primary", iconBg: "bg-primary/10" },
-  geral: { label: "Geral", icon: Info, accent: "text-muted-foreground", iconBg: "bg-muted" },
+const typeConfig: Record<string, { label: string; icon: React.ElementType; color: string }> = {
+  urgente: { label: "Urgente", icon: AlertTriangle, color: "text-destructive" },
+  evento: { label: "Evento", icon: CalendarDays, color: "text-secondary" },
+  academico: { label: "Académico", icon: BookOpen, color: "text-primary" },
+  geral: { label: "Geral", icon: Info, color: "text-muted-foreground" },
 };
+
+function getInitials(name: string) {
+  return name.split(" ").map(w => w[0]).slice(0, 2).join("").toUpperCase();
+}
+
+function getAvatarColor(name: string) {
+  const colors = [
+    "bg-primary/15 text-primary",
+    "bg-secondary/15 text-secondary",
+    "bg-destructive/15 text-destructive",
+    "bg-accent text-accent-foreground",
+  ];
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  return colors[Math.abs(hash) % colors.length];
+}
 
 const myAnnouncements = [
   { id: "my1", title: "Alteração de Horário — Turma A", content: "A aula de quarta-feira da Turma A passa para as 14h00, sala 204. Esta alteração é válida a partir da próxima semana.", type: "academico", date: "13/02/2024", author: "Você" },
@@ -26,13 +43,22 @@ const myAnnouncements = [
 
 export default function StudentAnnouncements() {
   const [tab, setTab] = useState<"todos" | "meus">("todos");
-  const [expandedId, setExpandedId] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [newType, setNewType] = useState("geral");
   const [newContent, setNewContent] = useState("");
+  const [liked, setLiked] = useState<Set<string>>(new Set());
 
   const sourceData = tab === "meus" ? myAnnouncements : announcements;
+
+  const toggleLike = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setLiked(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
 
   const handleCreate = () => {
     if (!newTitle.trim() || !newContent.trim()) {
@@ -49,7 +75,7 @@ export default function StudentAnnouncements() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Anúncios</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">{sourceData.length} anúncio{sourceData.length !== 1 ? "s" : ""}</p>
+          <p className="text-sm text-muted-foreground mt-0.5">{sourceData.length} publicações</p>
         </div>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
@@ -88,11 +114,11 @@ export default function StudentAnnouncements() {
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-4 mb-5 border-b border-border">
-        {([["todos", "Todos os Anúncios"], ["meus", "Meus Anúncios"]] as const).map(([key, label]) => (
+      <div className="flex items-center gap-4 mb-6 border-b border-border">
+        {([["todos", "Feed"], ["meus", "Meus Anúncios"]] as const).map(([key, label]) => (
           <button
             key={key}
-            onClick={() => { setTab(key); setExpandedId(null); }}
+            onClick={() => setTab(key)}
             className={cn(
               "pb-2.5 text-sm font-medium transition-colors border-b-2 -mb-px",
               tab === key ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"
@@ -103,56 +129,75 @@ export default function StudentAnnouncements() {
         ))}
       </div>
 
-      {/* Feed */}
-      <div className="space-y-px rounded-xl border border-border overflow-hidden bg-card">
-        {sourceData.length > 0 ? sourceData.map((ann, i) => {
+      {/* Social feed */}
+      <div className="max-w-2xl mx-auto space-y-4">
+        {sourceData.length > 0 ? sourceData.map(ann => {
           const config = typeConfig[ann.type] || typeConfig.geral;
           const Icon = config.icon;
-          const isExpanded = expandedId === ann.id;
+          const isLiked = liked.has(ann.id);
           const isUrgent = ann.type === "urgente";
 
           return (
-            <div
-              key={ann.id}
-              onClick={() => setExpandedId(isExpanded ? null : ann.id)}
-              className={cn(
-                "cursor-pointer transition-colors",
-                "hover:bg-muted/40",
-                isExpanded && "bg-muted/30",
-                i > 0 && "border-t border-border"
-              )}
-            >
-              {/* Main row */}
-              <div className="flex items-center gap-3.5 px-4 sm:px-5 py-3.5">
-                {/* Icon */}
-                <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center shrink-0", config.iconBg)}>
-                  <Icon className={cn("w-3.5 h-3.5", config.accent)} />
-                </div>
-
-                {/* Title + Author */}
+            <div key={ann.id} className={cn(
+              "rounded-xl border bg-card overflow-hidden transition-all",
+              isUrgent && "border-destructive/25"
+            )}>
+              {/* Author header */}
+              <div className="flex items-center gap-3 px-5 pt-4 pb-2">
+                <Avatar className="w-9 h-9">
+                  <AvatarFallback className={cn("text-xs font-bold", getAvatarColor(ann.author))}>
+                    {getInitials(ann.author)}
+                  </AvatarFallback>
+                </Avatar>
                 <div className="flex-1 min-w-0">
-                  <h3 className={cn("text-sm font-semibold text-foreground truncate", isUrgent && "text-destructive")}>{ann.title}</h3>
-                  <div className="flex items-center gap-3 mt-0.5">
-                    <span className="text-[11px] text-muted-foreground flex items-center gap-1 truncate">
-                      <User className="w-3 h-3 shrink-0" /> {ann.author}
-                    </span>
-                    <span className="text-[11px] text-muted-foreground flex items-center gap-1 shrink-0">
+                  <p className="text-sm font-semibold text-foreground truncate">{ann.author}</p>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[11px] text-muted-foreground flex items-center gap-1">
                       <Clock className="w-3 h-3" /> {ann.date}
                     </span>
+                    <span className="text-muted-foreground/30">·</span>
+                    <Badge variant="outline" className="text-[10px] py-0 h-4 gap-1 border-border">
+                      <Icon className={cn("w-2.5 h-2.5", config.color)} />
+                      {config.label}
+                    </Badge>
                   </div>
                 </div>
-
-                {/* Category badge + chevron */}
-                <Badge variant="outline" className="text-[10px] shrink-0 hidden sm:inline-flex">{config.label}</Badge>
-                <ChevronDown className={cn("w-4 h-4 text-muted-foreground/40 shrink-0 transition-transform", isExpanded && "rotate-180")} />
+                <button className="p-1.5 rounded-lg hover:bg-muted transition-colors">
+                  <MoreHorizontal className="w-4 h-4 text-muted-foreground" />
+                </button>
               </div>
 
-              {/* Expanded content */}
-              {isExpanded && (
-                <div className="px-5 pb-4 pl-[60px] sm:pl-[68px]">
-                  <p className="text-[13px] text-muted-foreground leading-relaxed">{ann.content}</p>
-                </div>
-              )}
+              {/* Content */}
+              <div className="px-5 pb-3">
+                <h3 className={cn("text-[15px] font-bold text-foreground mb-1.5", isUrgent && "text-destructive")}>
+                  {ann.title}
+                </h3>
+                <p className="text-[13px] text-muted-foreground leading-relaxed">
+                  {ann.content}
+                </p>
+              </div>
+
+              {/* Actions bar */}
+              <div className="flex items-center gap-1 px-3 py-2 border-t border-border/50">
+                <button
+                  onClick={(e) => toggleLike(ann.id, e)}
+                  className={cn(
+                    "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors",
+                    isLiked ? "text-destructive bg-destructive/8" : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                  )}
+                >
+                  <Heart className={cn("w-4 h-4", isLiked && "fill-current")} />
+                  Útil
+                </button>
+                <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
+                  <MessageCircle className="w-4 h-4" />
+                  Comentar
+                </button>
+                <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors ml-auto">
+                  <Share2 className="w-4 h-4" />
+                  Partilhar
+                </button>
+              </div>
             </div>
           );
         }) : (
