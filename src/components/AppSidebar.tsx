@@ -16,7 +16,7 @@ const studentSections: NavSection[] = [
   { title: "Geral", items: [
     { label: "Início", icon: LayoutDashboard, path: "/student" },
     { label: "Calendário", icon: Calendar, path: "/student/calendar" },
-    { label: "Anúncios", icon: Megaphone, path: "/student/announcements" },
+    { label: "Anúncios", icon: Megaphone, path: "/student/announcements", badge: 4 },
   ]},
   { title: "Académico", items: [
     { label: "As Minhas Cadeiras", icon: BookOpen, path: "/student/disciplines" },
