@@ -242,7 +242,7 @@ export default function AppSidebar() {
                   (!roleBasePaths.includes(item.path) && location.pathname.startsWith(item.path + "/"));
                 return (
                   <NavLink key={item.path} to={item.path}
-                    className={cn("flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] transition-colors",
+                    className={cn("flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] transition-colors relative",
                       isActive ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
                     )} title={collapsed ? item.label : undefined}>
                     <item.icon className="w-[18px] h-[18px] shrink-0" />
