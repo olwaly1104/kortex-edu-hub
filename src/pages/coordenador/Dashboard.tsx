@@ -1,22 +1,17 @@
-import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { coordCursoInfo, coordTurmas, coordDocentes, coordEstudantes } from "@/data/institutionData";
+import { coordCursoInfo, coordTurmas, coordDocentes, coordEstudantes, coordSolicitacoes } from "@/data/institutionData";
 import { announcements, coordAgendaEvents } from "@/data/mockData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Users, BookOpen, Clock, Award, ChevronRight,
   AlertTriangle, FileText, Calendar as CalendarIcon,
   Megaphone, CheckCircle,
-  GraduationCap, MapPin, Play, Plus,
+  GraduationCap, MapPin, Play,
   UserX, ClipboardCheck, BarChart3,
+  CheckSquare, XCircle,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { toast } from "sonner";
 
 const typeStyles: Record<string, { bg: string; label: string }> = {
   urgente: { bg: "bg-destructive text-destructive-foreground", label: "Urgente" },
@@ -28,12 +23,6 @@ export default function CoordenadorCursoDashboard() {
   const { user } = useAuth();
   const info = coordCursoInfo;
 
-  const [eventTitle, setEventTitle] = useState("");
-  const [eventDate, setEventDate] = useState("");
-  const [eventStart, setEventStart] = useState("");
-  const [eventEnd, setEventEnd] = useState("");
-  const [eventType, setEventType] = useState("reunião");
-  const [eventLocal, setEventLocal] = useState("");
 
   const TODAY_DATE = "2024-02-14";
   const todayAgenda = coordAgendaEvents
@@ -272,68 +261,57 @@ export default function CoordenadorCursoDashboard() {
           </div>
         </Card>
 
-        {/* Adicionar à Agenda */}
+        {/* Solicitações */}
         <Card className="p-5 lg:col-span-2">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
-              <Plus className="w-5 h-5 text-primary" /> Adicionar à Agenda
+              <CheckSquare className="w-5 h-5 text-primary" /> Solicitações
             </h2>
-            <Link to="/coordenador/calendario" className="text-sm text-primary hover:underline flex items-center gap-1">
-              Ver calendário <ChevronRight className="w-4 h-4" />
+            <Link to="/coordenador/solicitacoes" className="text-sm text-primary hover:underline flex items-center gap-1">
+              Ver todas <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
-          <div className="space-y-3">
-            <div>
-              <Label className="text-xs text-muted-foreground mb-1">Título</Label>
-              <Input placeholder="Ex: Reunião de coordenação" value={eventTitle} onChange={e => setEventTitle(e.target.value)} className="h-9 text-sm" />
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label className="text-xs text-muted-foreground mb-1">Tipo</Label>
-                <Select value={eventType} onValueChange={setEventType}>
-                  <SelectTrigger className="h-9 text-sm"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="reunião">Reunião</SelectItem>
-                    <SelectItem value="aula">Aula</SelectItem>
-                    <SelectItem value="avaliação">Avaliação</SelectItem>
-                    <SelectItem value="evento">Evento</SelectItem>
-                    <SelectItem value="prazo">Prazo</SelectItem>
-                  </SelectContent>
-                </Select>
+          {(() => {
+            const pendentes = coordSolicitacoes.filter(s => s.status === "pendente");
+            const recentes = coordSolicitacoes.slice(0, 5);
+            return (
+              <div className="space-y-3">
+                <div className="flex items-center gap-3 text-sm">
+                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-50 text-amber-700">
+                    <Clock className="w-3.5 h-3.5" />
+                    <span className="font-semibold">{pendentes.length}</span>
+                    <span className="text-xs">Pendentes</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700">
+                    <CheckCircle className="w-3.5 h-3.5" />
+                    <span className="font-semibold">{coordSolicitacoes.filter(s => s.status === "aprovado").length}</span>
+                    <span className="text-xs">Aprovadas</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-50 text-red-600">
+                    <XCircle className="w-3.5 h-3.5" />
+                    <span className="font-semibold">{coordSolicitacoes.filter(s => s.status === "rejeitado").length}</span>
+                    <span className="text-xs">Rejeitadas</span>
+                  </div>
+                </div>
+                <div className="divide-y divide-border">
+                  {recentes.map(sol => {
+                    const statusCls = sol.status === "pendente" ? "bg-amber-100 text-amber-700" : sol.status === "aprovado" ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-600";
+                    return (
+                      <div key={sol.id} className="flex items-center gap-3 py-2.5">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-foreground truncate">{sol.title}</p>
+                          <p className="text-[11px] text-muted-foreground">{sol.requester} • {sol.date}</p>
+                        </div>
+                        <Badge className={`${statusCls} text-[10px] shrink-0`}>
+                          {sol.status === "pendente" ? "Pendente" : sol.status === "aprovado" ? "Aprovado" : "Rejeitado"}
+                        </Badge>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-              <div>
-                <Label className="text-xs text-muted-foreground mb-1">Data</Label>
-                <Input type="date" value={eventDate} onChange={e => setEventDate(e.target.value)} className="h-9 text-sm" />
-              </div>
-            </div>
-            <div className="grid grid-cols-3 gap-3">
-              <div>
-                <Label className="text-xs text-muted-foreground mb-1">Início</Label>
-                <Input type="time" value={eventStart} onChange={e => setEventStart(e.target.value)} className="h-9 text-sm" />
-              </div>
-              <div>
-                <Label className="text-xs text-muted-foreground mb-1">Fim</Label>
-                <Input type="time" value={eventEnd} onChange={e => setEventEnd(e.target.value)} className="h-9 text-sm" />
-              </div>
-              <div>
-                <Label className="text-xs text-muted-foreground mb-1">Local</Label>
-                <Input placeholder="Sala / Link" value={eventLocal} onChange={e => setEventLocal(e.target.value)} className="h-9 text-sm" />
-              </div>
-            </div>
-            <Button
-              className="w-full h-9 text-sm gap-2"
-              onClick={() => {
-                if (!eventTitle || !eventDate || !eventStart || !eventEnd) {
-                  toast.error("Preencha todos os campos obrigatórios.");
-                  return;
-                }
-                toast.success(`"${eventTitle}" adicionado à agenda.`);
-                setEventTitle(""); setEventDate(""); setEventStart(""); setEventEnd(""); setEventLocal(""); setEventType("reunião");
-              }}
-            >
-              <Plus className="w-4 h-4" /> Adicionar Evento
-            </Button>
-          </div>
+            );
+          })()}
         </Card>
       </div>
     </div>
