@@ -115,8 +115,17 @@ export default function CoordenadorAnuncios() {
               <Megaphone className="w-5 h-5 text-primary" />
             </div>
             Anúncios
+            {unreadCount > 0 && (
+              <span className="ml-1 min-w-[22px] h-[22px] flex items-center justify-center rounded-full text-[11px] font-bold bg-destructive text-destructive-foreground px-1.5">
+                {unreadCount}
+              </span>
+            )}
           </h1>
-          <p className="text-sm text-muted-foreground mt-1 ml-[46px]">Comunicações institucionais e do curso</p>
+          <p className="text-sm text-muted-foreground mt-1 ml-[46px]">
+            {unreadCount > 0
+              ? `${unreadCount} anúncio${unreadCount > 1 ? "s" : ""} por ler`
+              : "Todas as comunicações lidas"}
+          </p>
         </div>
         {activeTab === "meus" && (
           <Button onClick={() => setShowCreate(true)} className="gap-2 shadow-sm">
