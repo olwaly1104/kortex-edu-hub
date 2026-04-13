@@ -65,6 +65,7 @@ const initialMyAnnouncements: MyAnnouncement[] = [
 export default function CoordenadorAnuncios() {
   const [activeTab, setActiveTab] = useState<"institucionais" | "meus">("institucionais");
   const [selectedAnn, setSelectedAnn] = useState<typeof announcements[0] | null>(null);
+  const [readIds, setReadIds] = useState<Set<string>>(new Set());
 
   const [myAnns, setMyAnns] = useState<MyAnnouncement[]>(initialMyAnnouncements);
   const [showCreate, setShowCreate] = useState(false);
@@ -151,8 +152,11 @@ export default function CoordenadorAnuncios() {
             return (
               <Card
                 key={ann.id}
-                className="p-0 overflow-hidden cursor-pointer hover:shadow-md transition-all duration-200 group border-border/80"
-                onClick={() => setSelectedAnn(ann)}
+                className={`p-0 overflow-hidden cursor-pointer hover:shadow-md transition-all duration-200 group ${!readIds.has(ann.id) ? "border-primary/40 bg-primary/[0.02]" : "border-border/80"}`}
+                onClick={() => {
+                  setReadIds(prev => new Set(prev).add(ann.id));
+                  setSelectedAnn(ann);
+                }}
               >
                 <div className="flex">
                   {/* Type indicator stripe */}
@@ -163,7 +167,12 @@ export default function CoordenadorAnuncios() {
                       <Badge variant="outline" className={`gap-1.5 text-[11px] font-medium border ${config.className}`}>
                         <TypeIcon className="w-3 h-3" /> {config.label}
                       </Badge>
-                      <ChevronRight className="w-4 h-4 text-muted-foreground/40 group-hover:text-primary group-hover:translate-x-0.5 transition-all shrink-0 mt-0.5" />
+                      <div className="flex items-center gap-1.5 shrink-0 mt-0.5">
+                        {!readIds.has(ann.id) && (
+                          <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                        )}
+                        <ChevronRight className="w-4 h-4 text-muted-foreground/40 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
+                      </div>
                     </div>
 
                     <h3 className="text-[15px] font-semibold text-foreground mb-1.5 group-hover:text-primary transition-colors">{ann.title}</h3>
