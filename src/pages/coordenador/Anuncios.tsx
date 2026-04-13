@@ -283,31 +283,42 @@ export default function CoordenadorAnuncios() {
 
       {/* Detail Dialog */}
       <Dialog open={!!selectedAnn} onOpenChange={() => setSelectedAnn(null)}>
-        <DialogContent className="sm:max-w-lg">
+        <DialogContent className="sm:max-w-xl p-0 overflow-hidden">
           {selectedAnn && (() => {
             const config = typeConfig[selectedAnn.type] || typeConfig.geral;
             const TypeIcon = config.icon;
+            const stripeColor = selectedAnn.type === "urgente" ? "from-destructive to-destructive/80" : selectedAnn.type === "evento" ? "from-secondary to-secondary/80" : selectedAnn.type === "academico" ? "from-primary to-primary/80" : "from-muted-foreground/40 to-muted-foreground/20";
             return (
               <>
-                <DialogHeader>
-                  <div className="flex items-center gap-2 mb-2">
-                    <Badge variant="outline" className={`gap-1.5 text-[11px] font-medium border ${config.className}`}>
+                {/* Gradient header */}
+                <div className={`bg-gradient-to-r ${stripeColor} px-6 pt-6 pb-5`}>
+                  <div className="flex items-center gap-2 mb-3">
+                    <Badge variant="outline" className="gap-1.5 text-[11px] font-medium border border-white/30 bg-white/15 text-white backdrop-blur-sm">
                       <TypeIcon className="w-3 h-3" /> {config.label}
                     </Badge>
                   </div>
-                  <DialogTitle className="text-lg leading-snug">{selectedAnn.title}</DialogTitle>
-                  <DialogDescription asChild>
-                    <div className="flex items-center gap-3 pt-2 flex-wrap">
-                      <Badge variant="outline" className="gap-1.5 text-[11px] font-medium text-foreground/70 border-border">
-                        <User className="w-3 h-3 text-primary" /> {selectedAnn.author}
-                      </Badge>
-                      <span className="flex items-center gap-1 text-xs"><Calendar className="w-3.5 h-3.5" />{selectedAnn.date}</span>
-                      <span className="flex items-center gap-1 text-xs"><Clock className="w-3.5 h-3.5" />08:00</span>
-                    </div>
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="py-3">
-                  <p className="text-sm text-foreground leading-relaxed">{selectedAnn.content}</p>
+                  <DialogHeader className="space-y-0">
+                    <DialogTitle className="text-lg font-bold text-white leading-snug">{selectedAnn.title}</DialogTitle>
+                    <DialogDescription className="sr-only">Detalhes do anúncio</DialogDescription>
+                  </DialogHeader>
+                </div>
+
+                {/* Meta info */}
+                <div className="px-6 pt-4 pb-3 flex items-center gap-3 flex-wrap border-b border-border">
+                  <Badge variant="outline" className="gap-1.5 text-[11px] font-medium text-foreground/70 border-border">
+                    <User className="w-3 h-3 text-primary" /> {selectedAnn.author}
+                  </Badge>
+                  <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <Calendar className="w-3.5 h-3.5" /> {selectedAnn.date}
+                  </span>
+                  <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <Clock className="w-3.5 h-3.5" /> 08:00
+                  </span>
+                </div>
+
+                {/* Content */}
+                <div className="px-6 py-5">
+                  <p className="text-sm text-foreground leading-relaxed whitespace-pre-line">{selectedAnn.content}</p>
                 </div>
               </>
             );
