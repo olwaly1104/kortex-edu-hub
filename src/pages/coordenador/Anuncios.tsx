@@ -160,8 +160,43 @@ export default function CoordenadorAnuncios() {
 
       {/* Todos os Anúncios */}
       {activeTab === "institucionais" && (
-        <div className="space-y-3">
-          {announcements.map((ann) => {
+        <>
+          {/* Search & Filter */}
+          <div className="flex items-center gap-3 flex-wrap">
+            <div className="relative flex-1 max-w-sm">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Pesquisar anúncios..."
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+                className="pl-9 h-9"
+              />
+            </div>
+            <div className="flex items-center gap-1.5 ml-auto">
+              {[
+                { key: "all", label: "Todos" },
+                { key: "urgente", label: "Urgente" },
+                { key: "academico", label: "Académico" },
+                { key: "evento", label: "Evento" },
+                { key: "geral", label: "Geral" },
+              ].map(f => (
+                <button
+                  key={f.key}
+                  onClick={() => setFilterType(f.key)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                    filterType === f.key
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted text-muted-foreground hover:bg-muted/80"
+                  }`}
+                >
+                  {f.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-3">
+          {filteredAnnouncements.map((ann) => {
             const config = typeConfig[ann.type] || typeConfig.geral;
             const TypeIcon = config.icon;
             return (
