@@ -3,15 +3,42 @@ import { coordCursoInfo, coordTurmas, coordDocentes, coordEstudantes, coordSolic
 import { announcements, coordAgendaEvents } from "@/data/mockData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Users, BookOpen, Clock, Award, ChevronRight,
   AlertTriangle, FileText, Calendar as CalendarIcon,
   Megaphone, CheckCircle,
   GraduationCap, MapPin, Play,
   UserX, ClipboardCheck, BarChart3,
-  CheckSquare, XCircle,
+  ArrowDownLeft, XCircle, Eye,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+
+const typeIcons: Record<string, React.ElementType> = {
+  nota: Award,
+  plano: FileText,
+  horário: CalendarIcon,
+  transferência: Users,
+  recurso: AlertTriangle,
+  material: FileText,
+  reunião: CalendarIcon,
+};
+
+const typeLabels: Record<string, string> = {
+  nota: "Nota",
+  plano: "Plano",
+  horário: "Horário",
+  transferência: "Transferência",
+  recurso: "Recurso",
+  material: "Material",
+  reunião: "Reunião",
+};
+
+const priorityStyles: Record<string, string> = {
+  alta: "bg-destructive/10 text-destructive",
+  média: "bg-secondary/10 text-secondary",
+  baixa: "bg-muted text-muted-foreground",
+};
 
 const typeStyles: Record<string, { bg: string; label: string }> = {
   urgente: { bg: "bg-destructive text-destructive-foreground", label: "Urgente" },
@@ -261,57 +288,62 @@ export default function CoordenadorCursoDashboard() {
           </div>
         </Card>
 
-        {/* Solicitações */}
+        {/* Solicitações Pendentes */}
         <Card className="p-5 lg:col-span-2">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
-              <CheckSquare className="w-5 h-5 text-primary" /> Solicitações
+              <ArrowDownLeft className="w-5 h-5 text-secondary" /> Solicitações
+              <Badge variant="outline" className="text-[10px] ml-1">{coordSolicitacoes.filter(s => s.status === "pendente").length}</Badge>
             </h2>
             <Link to="/coordenador/solicitacoes" className="text-sm text-primary hover:underline flex items-center gap-1">
               Ver todas <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
-          {(() => {
-            const pendentes = coordSolicitacoes.filter(s => s.status === "pendente");
-            const recentes = coordSolicitacoes.slice(0, 5);
-            return (
-              <div className="space-y-3">
-                <div className="flex items-center gap-3 text-sm">
-                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-50 text-amber-700">
-                    <Clock className="w-3.5 h-3.5" />
-                    <span className="font-semibold">{pendentes.length}</span>
-                    <span className="text-xs">Pendentes</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700">
-                    <CheckCircle className="w-3.5 h-3.5" />
-                    <span className="font-semibold">{coordSolicitacoes.filter(s => s.status === "aprovado").length}</span>
-                    <span className="text-xs">Aprovadas</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-50 text-red-600">
-                    <XCircle className="w-3.5 h-3.5" />
-                    <span className="font-semibold">{coordSolicitacoes.filter(s => s.status === "rejeitado").length}</span>
-                    <span className="text-xs">Rejeitadas</span>
-                  </div>
-                </div>
-                <div className="divide-y divide-border">
-                  {recentes.map(sol => {
-                    const statusCls = sol.status === "pendente" ? "bg-amber-100 text-amber-700" : sol.status === "aprovado" ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-600";
-                    return (
-                      <div key={sol.id} className="flex items-center gap-3 py-2.5">
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-foreground truncate">{sol.title}</p>
-                          <p className="text-[11px] text-muted-foreground">{sol.requester} • {sol.date}</p>
-                        </div>
-                        <Badge className={`${statusCls} text-[10px] shrink-0`}>
-                          {sol.status === "pendente" ? "Pendente" : sol.status === "aprovado" ? "Aprovado" : "Rejeitado"}
-                        </Badge>
+          {coordSolicitacoes.filter(s => s.status === "pendente").length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-4">Sem solicitações pendentes 🎉</p>
+          ) : (
+            <div className="space-y-2.5">
+              {coordSolicitacoes.filter(s => s.status === "pendente").slice(0, 3).map(sol => {
+                const Icon = typeIcons[sol.type] || FileText;
+                return (
+                  <div key={sol.id} className="px-3.5 py-3 rounded-xl border border-border bg-card hover:bg-muted/40 transition-colors space-y-2">
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 bg-muted/60">
+                        <Icon className="w-3.5 h-3.5 text-muted-foreground" />
                       </div>
-                    );
-                  })}
-                </div>
-              </div>
-            );
-          })()}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-semibold text-foreground line-clamp-1">{sol.title}</p>
+                        <Badge variant="outline" className="text-[10px] mt-0.5">{typeLabels[sol.type] || sol.type}</Badge>
+                      </div>
+                      <Badge className={`${priorityStyles[sol.priority]} text-[8px] px-1.5 py-0 shrink-0`}>{sol.priority}</Badge>
+                    </div>
+                    <p className="text-[11px] text-muted-foreground line-clamp-1">{sol.description}</p>
+                    <div className="flex items-center gap-3 text-[10px]">
+                      <div className="flex items-center gap-1.5">
+                        <Users className="w-3 h-3 text-muted-foreground" />
+                        <span className="font-medium text-foreground">{sol.requester}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <CalendarIcon className="w-3 h-3 text-muted-foreground" />
+                        <span className="text-muted-foreground">{sol.date}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between pt-1 border-t border-border">
+                      <Button variant="ghost" size="sm" className="h-6 px-2 rounded-md text-[10px] text-destructive hover:text-destructive hover:bg-destructive/10 gap-1">
+                        <XCircle className="w-3 h-3" /> Rejeitar
+                      </Button>
+                      <Link to="/coordenador/solicitacoes" className="text-[10px] text-primary hover:underline flex items-center gap-0.5">
+                        <Eye className="w-3 h-3" /> Ver detalhes
+                      </Link>
+                      <Button size="sm" className="h-6 px-2 rounded-md text-[10px] bg-accent hover:bg-accent/90 text-accent-foreground gap-1">
+                        <CheckCircle className="w-3 h-3" /> Aprovar
+                      </Button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </Card>
       </div>
     </div>
