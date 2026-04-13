@@ -7,58 +7,32 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Clock, Plus, AlertTriangle, BookOpen, CalendarDays, Info, Megaphone, Heart, MessageCircle, Share2, MoreHorizontal } from "lucide-react";
+import { Clock, Plus, AlertTriangle, BookOpen, CalendarDays, Info, Megaphone } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
-const typeConfig: Record<string, { label: string; icon: React.ElementType; color: string }> = {
-  urgente: { label: "Urgente", icon: AlertTriangle, color: "text-destructive" },
-  evento: { label: "Evento", icon: CalendarDays, color: "text-secondary" },
-  academico: { label: "Académico", icon: BookOpen, color: "text-primary" },
-  geral: { label: "Geral", icon: Info, color: "text-muted-foreground" },
+const typeConfig: Record<string, { label: string; icon: React.ElementType; stripe: string; badge: string }> = {
+  urgente: { label: "Urgente", icon: AlertTriangle, stripe: "bg-destructive", badge: "bg-destructive/10 text-destructive" },
+  evento: { label: "Evento", icon: CalendarDays, stripe: "bg-secondary", badge: "bg-secondary/10 text-secondary" },
+  academico: { label: "Académico", icon: BookOpen, stripe: "bg-primary", badge: "bg-primary/10 text-primary" },
+  geral: { label: "Geral", icon: Info, stripe: "bg-muted-foreground", badge: "bg-muted text-muted-foreground" },
 };
 
-function getInitials(name: string) {
-  return name.split(" ").map(w => w[0]).slice(0, 2).join("").toUpperCase();
-}
-
-function getAvatarColor(name: string) {
-  const colors = [
-    "bg-primary/15 text-primary",
-    "bg-secondary/15 text-secondary",
-    "bg-destructive/15 text-destructive",
-    "bg-accent text-accent-foreground",
-  ];
-  let hash = 0;
-  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
-  return colors[Math.abs(hash) % colors.length];
-}
-
 const myAnnouncements = [
-  { id: "my1", title: "Alteração de Horário — Turma A", content: "A aula de quarta-feira da Turma A passa para as 14h00, sala 204. Esta alteração é válida a partir da próxima semana.", type: "academico", date: "13/02/2024", author: "Você" },
-  { id: "my2", title: "Reunião de Coordenação", content: "Reunião com todos os docentes do curso agendada para sexta-feira, 16/02, às 10h00 na sala de reuniões.", type: "evento", date: "10/02/2024", author: "Você" },
-  { id: "my3", title: "Entrega de Relatórios — Prazo Final", content: "Lembrete: o prazo final para entrega dos relatórios de estágio é dia 28/02. Não serão aceites entregas após esta data.", type: "urgente", date: "08/02/2024", author: "Você" },
+  { id: "my1", title: "Alteração de Horário — Turma A", content: "A aula de quarta-feira da Turma A passa para as 14h00, sala 204. Esta alteração é válida a partir da próxima semana.", type: "academico", date: "13/02/2024", author: "Coordenação de Curso" },
+  { id: "my2", title: "Reunião de Coordenação", content: "Reunião com todos os docentes do curso agendada para sexta-feira, 16/02, às 10h00 na sala de reuniões.", type: "evento", date: "10/02/2024", author: "Coordenação de Curso" },
+  { id: "my3", title: "Entrega de Relatórios — Prazo Final", content: "Lembrete: o prazo final para entrega dos relatórios de estágio é dia 28/02. Não serão aceites entregas após esta data.", type: "urgente", date: "08/02/2024", author: "Coordenação de Curso" },
 ];
 
 export default function StudentAnnouncements() {
   const [tab, setTab] = useState<"todos" | "meus">("todos");
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
   const [newTitle, setNewTitle] = useState("");
   const [newType, setNewType] = useState("geral");
   const [newContent, setNewContent] = useState("");
-  const [liked, setLiked] = useState<Set<string>>(new Set());
 
   const sourceData = tab === "meus" ? myAnnouncements : announcements;
-
-  const toggleLike = (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setLiked(prev => {
-      const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
-      return next;
-    });
-  };
 
   const handleCreate = () => {
     if (!newTitle.trim() || !newContent.trim()) {
@@ -75,7 +49,7 @@ export default function StudentAnnouncements() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Anúncios</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">{sourceData.length} publicações</p>
+          <p className="text-sm text-muted-foreground mt-0.5">{sourceData.length} anúncio{sourceData.length !== 1 ? "s" : ""}</p>
         </div>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
@@ -114,11 +88,11 @@ export default function StudentAnnouncements() {
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-4 mb-6 border-b border-border">
-        {([["todos", "Feed"], ["meus", "Meus Anúncios"]] as const).map(([key, label]) => (
+      <div className="flex items-center gap-4 mb-5 border-b border-border">
+        {([["todos", "Todos"], ["meus", "Publicados por mim"]] as const).map(([key, label]) => (
           <button
             key={key}
-            onClick={() => setTab(key)}
+            onClick={() => { setTab(key); setExpandedId(null); }}
             className={cn(
               "pb-2.5 text-sm font-medium transition-colors border-b-2 -mb-px",
               tab === key ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"
@@ -129,74 +103,53 @@ export default function StudentAnnouncements() {
         ))}
       </div>
 
-      {/* Social feed */}
-      <div className="max-w-2xl mx-auto space-y-4">
+      {/* Announcements list */}
+      <div className="space-y-3">
         {sourceData.length > 0 ? sourceData.map(ann => {
           const config = typeConfig[ann.type] || typeConfig.geral;
           const Icon = config.icon;
-          const isLiked = liked.has(ann.id);
-          const isUrgent = ann.type === "urgente";
+          const isExpanded = expandedId === ann.id;
 
           return (
-            <div key={ann.id} className={cn(
-              "rounded-xl border bg-card overflow-hidden transition-all",
-              isUrgent && "border-destructive/25"
-            )}>
-              {/* Author header */}
-              <div className="flex items-center gap-3 px-5 pt-4 pb-2">
-                <Avatar className="w-9 h-9">
-                  <AvatarFallback className={cn("text-xs font-bold", getAvatarColor(ann.author))}>
-                    {getInitials(ann.author)}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-foreground truncate">{ann.author}</p>
-                  <div className="flex items-center gap-2">
-                    <span className="text-[11px] text-muted-foreground flex items-center gap-1">
-                      <Clock className="w-3 h-3" /> {ann.date}
-                    </span>
-                    <span className="text-muted-foreground/30">·</span>
-                    <Badge variant="outline" className="text-[10px] py-0 h-4 gap-1 border-border">
-                      <Icon className={cn("w-2.5 h-2.5", config.color)} />
-                      {config.label}
-                    </Badge>
-                  </div>
-                </div>
-                <button className="p-1.5 rounded-lg hover:bg-muted transition-colors">
-                  <MoreHorizontal className="w-4 h-4 text-muted-foreground" />
-                </button>
-              </div>
+            <div
+              key={ann.id}
+              onClick={() => setExpandedId(isExpanded ? null : ann.id)}
+              className={cn(
+                "flex rounded-lg border bg-card overflow-hidden cursor-pointer transition-all hover:shadow-sm",
+                isExpanded && "shadow-sm"
+              )}
+            >
+              {/* Left colour stripe */}
+              <div className={cn("w-1 shrink-0", config.stripe)} />
 
-              {/* Content */}
-              <div className="px-5 pb-3">
-                <h3 className={cn("text-[15px] font-bold text-foreground mb-1.5", isUrgent && "text-destructive")}>
-                  {ann.title}
-                </h3>
-                <p className="text-[13px] text-muted-foreground leading-relaxed">
+              <div className="flex-1 px-4 py-3.5 min-w-0">
+                {/* Row 1: category + date */}
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className={cn("inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide", config.badge, "rounded px-1.5 py-0.5")}>
+                    <Icon className="w-3 h-3" /> {config.label}
+                  </span>
+                  <span className="text-[11px] text-muted-foreground flex items-center gap-1">
+                    <Clock className="w-3 h-3" /> {ann.date}
+                  </span>
+                </div>
+
+                {/* Row 2: title */}
+                <h3 className="text-sm font-semibold text-foreground leading-snug mb-1">{ann.title}</h3>
+
+                {/* Row 3: content */}
+                <p className={cn(
+                  "text-[13px] text-muted-foreground leading-relaxed",
+                  !isExpanded && "line-clamp-1"
+                )}>
                   {ann.content}
                 </p>
-              </div>
 
-              {/* Actions bar */}
-              <div className="flex items-center gap-1 px-3 py-2 border-t border-border/50">
-                <button
-                  onClick={(e) => toggleLike(ann.id, e)}
-                  className={cn(
-                    "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors",
-                    isLiked ? "text-destructive bg-destructive/8" : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                  )}
-                >
-                  <Heart className={cn("w-4 h-4", isLiked && "fill-current")} />
-                  Útil
-                </button>
-                <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
-                  <MessageCircle className="w-4 h-4" />
-                  Comentar
-                </button>
-                <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors ml-auto">
-                  <Share2 className="w-4 h-4" />
-                  Partilhar
-                </button>
+                {/* Row 4: author (visible when expanded) */}
+                {isExpanded && (
+                  <p className="text-[11px] text-muted-foreground mt-2.5 pt-2.5 border-t border-border/50">
+                    Publicado por <span className="font-medium text-foreground">{ann.author}</span>
+                  </p>
+                )}
               </div>
             </div>
           );
@@ -204,7 +157,7 @@ export default function StudentAnnouncements() {
           <div className="text-center py-16">
             <Megaphone className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" />
             <p className="text-sm text-muted-foreground">
-              {tab === "meus" ? "Ainda não publicou nenhum anúncio." : "Nenhum anúncio encontrado."}
+              {tab === "meus" ? "Ainda não publicou nenhum anúncio." : "Nenhum anúncio disponível."}
             </p>
           </div>
         )}
