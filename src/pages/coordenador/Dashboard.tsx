@@ -3,15 +3,42 @@ import { coordCursoInfo, coordTurmas, coordDocentes, coordEstudantes, coordSolic
 import { announcements, coordAgendaEvents } from "@/data/mockData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Users, BookOpen, Clock, Award, ChevronRight,
   AlertTriangle, FileText, Calendar as CalendarIcon,
   Megaphone, CheckCircle,
   GraduationCap, MapPin, Play,
   UserX, ClipboardCheck, BarChart3,
-  CheckSquare, XCircle,
+  ArrowDownLeft, XCircle, Eye,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+
+const typeIcons: Record<string, React.ElementType> = {
+  nota: Award,
+  plano: FileText,
+  horário: CalendarIcon,
+  transferência: Users,
+  recurso: AlertTriangle,
+  material: FileText,
+  reunião: CalendarIcon,
+};
+
+const typeLabels: Record<string, string> = {
+  nota: "Nota",
+  plano: "Plano",
+  horário: "Horário",
+  transferência: "Transferência",
+  recurso: "Recurso",
+  material: "Material",
+  reunião: "Reunião",
+};
+
+const priorityStyles: Record<string, string> = {
+  alta: "bg-destructive/10 text-destructive",
+  média: "bg-secondary/10 text-secondary",
+  baixa: "bg-muted text-muted-foreground",
+};
 
 const typeStyles: Record<string, { bg: string; label: string }> = {
   urgente: { bg: "bg-destructive text-destructive-foreground", label: "Urgente" },
