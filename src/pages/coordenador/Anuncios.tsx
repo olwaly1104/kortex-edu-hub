@@ -161,37 +161,42 @@ export default function CoordenadorAnuncios() {
       {/* Todos os Anúncios */}
       {activeTab === "institucionais" && (
         <>
-          {/* Search & Filter */}
-          <div className="flex items-center gap-3 flex-wrap">
-            <div className="relative flex-1 max-w-sm">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+          {/* Search & Filter Bar */}
+          <div className="flex items-center gap-2 bg-muted/40 rounded-xl p-1.5 border border-border/50">
+            <div className="relative flex-1 min-w-0">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/60" />
               <Input
                 placeholder="Pesquisar anúncios..."
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
-                className="pl-9 h-9"
+                className="pl-9 h-8 border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 text-sm placeholder:text-muted-foreground/50"
               />
             </div>
-            <div className="flex items-center gap-1.5 ml-auto">
+            <div className="h-5 w-px bg-border/60 shrink-0" />
+            <div className="flex items-center gap-0.5 shrink-0">
               {[
-                { key: "all", label: "Todos" },
-                { key: "urgente", label: "Urgente" },
-                { key: "academico", label: "Académico" },
-                { key: "evento", label: "Evento" },
-                { key: "geral", label: "Geral" },
-              ].map(f => (
-                <button
-                  key={f.key}
-                  onClick={() => setFilterType(f.key)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                    filterType === f.key
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted text-muted-foreground hover:bg-muted/80"
-                  }`}
-                >
-                  {f.label}
-                </button>
-              ))}
+                { key: "all", label: "Todos", icon: null },
+                { key: "urgente", label: "Urgente", icon: AlertTriangle },
+                { key: "academico", label: "Académico", icon: Tag },
+                { key: "evento", label: "Evento", icon: CalendarDays },
+                { key: "geral", label: "Geral", icon: Bell },
+              ].map(f => {
+                const active = filterType === f.key;
+                return (
+                  <button
+                    key={f.key}
+                    onClick={() => setFilterType(f.key)}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
+                      active
+                        ? "bg-background text-foreground shadow-sm border border-border/80"
+                        : "text-muted-foreground hover:text-foreground hover:bg-background/50"
+                    }`}
+                  >
+                    {f.icon && <f.icon className={`w-3 h-3 ${active ? "text-primary" : ""}`} />}
+                    {f.label}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
