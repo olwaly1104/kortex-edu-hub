@@ -2,26 +2,25 @@ import { useState } from "react";
 import { announcements } from "@/data/mockData";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Megaphone, Search, Calendar, User, Tag, FileText } from "lucide-react";
+import { Megaphone, Search, Calendar, User, ChevronRight } from "lucide-react";
 
-const typeStyles: Record<string, { bg: string; label: string }> = {
-  urgente: { bg: "bg-destructive/10 text-destructive border-destructive/20", label: "Urgente" },
-  evento: { bg: "bg-secondary/10 text-secondary-foreground border-secondary/20", label: "Evento" },
-  academico: { bg: "bg-primary/10 text-primary border-primary/20", label: "Académico" },
-  geral: { bg: "bg-muted text-muted-foreground border-border", label: "Geral" },
+const typeStyles: Record<string, { dot: string; label: string }> = {
+  urgente: { dot: "bg-destructive", label: "Urgente" },
+  evento: { dot: "bg-secondary", label: "Evento" },
+  academico: { dot: "bg-primary", label: "Académico" },
+  geral: { dot: "bg-muted-foreground", label: "Geral" },
 };
 
 const allAnnouncements = [
   ...announcements,
   { id: "a5", title: "Manutenção do Portal Académico", content: "O portal académico estará indisponível no sábado, 17 de Fevereiro, entre as 08:00 e as 14:00 para manutenção programada. Pedimos que realizem todas as operações necessárias antes desse período.", type: "geral" as const, date: "14/02/2024", author: "Direcção de Informática" },
-  { id: "a6", title: "Prazo de Entrega de Notas do 1º Semestre", content: "Relembramos que o prazo final para lançamento de notas do 1º semestre é dia 28 de Fevereiro. Todos os docentes devem submeter as pautas até essa data.", type: "academico" as const, date: "13/02/2024", author: "Direcção Académica" },
+  { id: "a6", title: "Prazo de Entrega de Notas do 1º Semestre", content: "Relembramos que o prazo final para lançamento de notas do 1º semestre é dia 28 de Fevereiro. Todos os docentes devem submeter as pautas até essa data. O não cumprimento poderá resultar em atrasos na publicação dos resultados finais.", type: "academico" as const, date: "13/02/2024", author: "Direcção Académica" },
 ];
 
 export default function CoordenadorAnuncios() {
@@ -72,51 +71,47 @@ export default function CoordenadorAnuncios() {
         </div>
       </div>
 
-      {/* Table */}
-      <div className="rounded-lg border border-border overflow-hidden">
-        <table className="w-full">
-          <thead>
-            <tr className="bg-muted/50 border-b border-border">
-              <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-3">Título</th>
-              <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-3">Categoria</th>
-              <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-3">Emitido por</th>
-              <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-3">Data</th>
-              <th className="text-right text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-3"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map((ann, idx) => {
-              const style = typeStyles[ann.type] || typeStyles.geral;
-              return (
-                <tr
-                  key={ann.id}
-                  className={`border-b border-border last:border-0 hover:bg-muted/30 transition-colors cursor-pointer ${idx % 2 === 0 ? "bg-card" : "bg-card/50"}`}
-                  onClick={() => setSelectedAnn(ann)}
-                >
-                  <td className="px-4 py-3.5">
-                    <p className="text-sm font-medium text-foreground">{ann.title}</p>
-                  </td>
-                  <td className="px-4 py-3.5">
-                    <Badge variant="outline" className={`text-[11px] ${style.bg}`}>{style.label}</Badge>
-                  </td>
-                  <td className="px-4 py-3.5">
-                    <span className="text-sm text-muted-foreground">{ann.author}</span>
-                  </td>
-                  <td className="px-4 py-3.5">
-                    <span className="text-sm text-muted-foreground">{ann.date}</span>
-                  </td>
-                  <td className="px-4 py-3.5 text-right">
-                    <Button variant="ghost" size="sm" className="text-xs text-primary h-7">
-                      Ver detalhes
-                    </Button>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+      {/* Announcements */}
+      <div className="rounded-lg border border-border overflow-hidden divide-y divide-border">
+        {filtered.map((ann) => {
+          const style = typeStyles[ann.type] || typeStyles.geral;
+          const isLong = ann.content.length > 120;
+
+          return (
+            <div
+              key={ann.id}
+              className="bg-card px-5 py-4 hover:bg-muted/30 transition-colors cursor-pointer group"
+              onClick={() => isLong ? setSelectedAnn(ann) : null}
+            >
+              <div className="flex items-start gap-4">
+                {/* Left: dot + content */}
+                <div className="flex items-start gap-3 flex-1 min-w-0">
+                  <div className={`w-2 h-2 rounded-full mt-2 shrink-0 ${style.dot}`} />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="text-sm font-semibold text-foreground truncate">{ann.title}</h3>
+                      <Badge variant="outline" className="text-[10px] shrink-0 font-normal">{style.label}</Badge>
+                    </div>
+                    <p className={`text-sm text-muted-foreground leading-relaxed ${isLong ? "line-clamp-2" : ""}`}>
+                      {ann.content}
+                    </p>
+                    <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
+                      <span className="flex items-center gap-1"><User className="w-3 h-3" />{ann.author}</span>
+                      <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{ann.date}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right: arrow if long */}
+                {isLong && (
+                  <ChevronRight className="w-4 h-4 text-muted-foreground mt-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
+                )}
+              </div>
+            </div>
+          );
+        })}
         {filtered.length === 0 && (
-          <p className="text-sm text-muted-foreground py-8 text-center">Nenhum anúncio encontrado.</p>
+          <p className="text-sm text-muted-foreground py-8 text-center bg-card">Nenhum anúncio encontrado.</p>
         )}
       </div>
 
@@ -124,30 +119,16 @@ export default function CoordenadorAnuncios() {
       <Dialog open={!!selectedAnn} onOpenChange={() => setSelectedAnn(null)}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle className="text-lg">{selectedAnn?.title}</DialogTitle>
+            <DialogTitle className="text-lg leading-snug">{selectedAnn?.title}</DialogTitle>
           </DialogHeader>
           {selectedAnn && (
-            <div className="space-y-4 pt-2">
-              <div className="grid grid-cols-3 gap-3 text-sm">
-                <div className="space-y-1">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wider flex items-center gap-1"><Tag className="w-3 h-3" /> Categoria</p>
-                  <Badge variant="outline" className={typeStyles[selectedAnn.type]?.bg}>
-                    {typeStyles[selectedAnn.type]?.label}
-                  </Badge>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wider flex items-center gap-1"><User className="w-3 h-3" /> Emitido por</p>
-                  <p className="font-medium text-foreground">{selectedAnn.author}</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wider flex items-center gap-1"><Calendar className="w-3 h-3" /> Data</p>
-                  <p className="font-medium text-foreground">{selectedAnn.date}</p>
-                </div>
+            <div className="space-y-4 pt-1">
+              <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                <Badge variant="outline" className="text-[10px] font-normal">{typeStyles[selectedAnn.type]?.label}</Badge>
+                <span className="flex items-center gap-1"><User className="w-3 h-3" />{selectedAnn.author}</span>
+                <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{selectedAnn.date}</span>
               </div>
-              <div className="border-t border-border pt-4 space-y-1">
-                <p className="text-xs text-muted-foreground uppercase tracking-wider flex items-center gap-1"><FileText className="w-3 h-3" /> Conteúdo</p>
-                <p className="text-sm text-foreground leading-relaxed">{selectedAnn.content}</p>
-              </div>
+              <p className="text-sm text-foreground leading-relaxed">{selectedAnn.content}</p>
             </div>
           )}
         </DialogContent>
