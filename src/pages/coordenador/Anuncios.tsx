@@ -66,6 +66,12 @@ export default function CoordenadorAnuncios() {
   const [activeTab, setActiveTab] = useState<"institucionais" | "meus">("institucionais");
   const [selectedAnn, setSelectedAnn] = useState<typeof announcements[0] | null>(null);
   const [readIds, setReadIds] = useState<Set<string>>(new Set());
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterType, setFilterType] = useState<string>("all");
+
+  const filteredAnnouncements = announcements
+    .filter(a => filterType === "all" || a.type === filterType)
+    .filter(a => a.title.toLowerCase().includes(searchTerm.toLowerCase()) || a.content.toLowerCase().includes(searchTerm.toLowerCase()));
 
   const unreadCount = announcements.filter(a => !readIds.has(a.id)).length;
 
