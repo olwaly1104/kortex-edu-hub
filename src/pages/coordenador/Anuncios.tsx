@@ -67,6 +67,8 @@ export default function CoordenadorAnuncios() {
   const [selectedAnn, setSelectedAnn] = useState<typeof announcements[0] | null>(null);
   const [readIds, setReadIds] = useState<Set<string>>(new Set());
 
+  const unreadCount = announcements.filter(a => !readIds.has(a.id)).length;
+
   const [myAnns, setMyAnns] = useState<MyAnnouncement[]>(initialMyAnnouncements);
   const [showCreate, setShowCreate] = useState(false);
   const [newTitle, setNewTitle] = useState("");
