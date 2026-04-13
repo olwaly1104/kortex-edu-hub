@@ -1,5 +1,4 @@
 import { useAuth } from "@/contexts/AuthContext";
-import { useAuth } from "@/contexts/AuthContext";
 import { coordCursoInfo, coordTurmas, coordDocentes, coordEstudantes, coordSolicitacoes } from "@/data/institutionData";
 import { announcements, coordAgendaEvents } from "@/data/mockData";
 import { Card } from "@/components/ui/card";
