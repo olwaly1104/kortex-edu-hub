@@ -246,7 +246,12 @@ export default function AppSidebar() {
                       isActive ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
                     )} title={collapsed ? item.label : undefined}>
                     <item.icon className="w-[18px] h-[18px] shrink-0" />
-                    {!collapsed && <span className="truncate">{item.label}</span>}
+                    {!collapsed && <span className="truncate flex-1">{item.label}</span>}
+                    {item.badge && item.badge > 0 && (
+                      <span className={cn("shrink-0 min-w-[18px] h-[18px] flex items-center justify-center rounded-full text-[10px] font-bold bg-destructive text-destructive-foreground", collapsed && "absolute -top-1 -right-1 min-w-[16px] h-[16px] text-[9px]")}>
+                        {item.badge}
+                      </span>
+                    )}
                   </NavLink>
                 );
               })}
