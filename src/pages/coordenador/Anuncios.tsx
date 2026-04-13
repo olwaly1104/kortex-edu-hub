@@ -65,6 +65,7 @@ const initialMyAnnouncements: MyAnnouncement[] = [
 export default function CoordenadorAnuncios() {
   const [activeTab, setActiveTab] = useState<"institucionais" | "meus">("institucionais");
   const [selectedAnn, setSelectedAnn] = useState<typeof announcements[0] | null>(null);
+  const [readIds, setReadIds] = useState<Set<string>>(new Set());
 
   const [myAnns, setMyAnns] = useState<MyAnnouncement[]>(initialMyAnnouncements);
   const [showCreate, setShowCreate] = useState(false);
