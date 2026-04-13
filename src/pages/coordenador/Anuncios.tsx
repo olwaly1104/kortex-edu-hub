@@ -67,6 +67,8 @@ export default function CoordenadorAnuncios() {
   const [selectedAnn, setSelectedAnn] = useState<typeof announcements[0] | null>(null);
   const [readIds, setReadIds] = useState<Set<string>>(new Set());
 
+  const unreadCount = announcements.filter(a => !readIds.has(a.id)).length;
+
   const [myAnns, setMyAnns] = useState<MyAnnouncement[]>(initialMyAnnouncements);
   const [showCreate, setShowCreate] = useState(false);
   const [newTitle, setNewTitle] = useState("");
@@ -113,8 +115,17 @@ export default function CoordenadorAnuncios() {
               <Megaphone className="w-5 h-5 text-primary" />
             </div>
             Anúncios
+            {unreadCount > 0 && (
+              <span className="ml-1 min-w-[22px] h-[22px] flex items-center justify-center rounded-full text-[11px] font-bold bg-destructive text-destructive-foreground px-1.5">
+                {unreadCount}
+              </span>
+            )}
           </h1>
-          <p className="text-sm text-muted-foreground mt-1 ml-[46px]">Comunicações institucionais e do curso</p>
+          <p className="text-sm text-muted-foreground mt-1 ml-[46px]">
+            {unreadCount > 0
+              ? `${unreadCount} anúncio${unreadCount > 1 ? "s" : ""} por ler`
+              : "Todas as comunicações lidas"}
+          </p>
         </div>
         {activeTab === "meus" && (
           <Button onClick={() => setShowCreate(true)} className="gap-2 shadow-sm">
@@ -126,8 +137,8 @@ export default function CoordenadorAnuncios() {
       {/* Tabs */}
       <div className="flex gap-1 border-b border-border">
         {([
-          { key: "institucionais" as const, label: "Todos os Anúncios", icon: Building2 },
-          { key: "meus" as const, label: "Meus Anúncios", icon: User },
+          { key: "institucionais" as const, label: "Todos os Anúncios", icon: Building2, count: unreadCount },
+          { key: "meus" as const, label: "Meus Anúncios", icon: User, count: 0 },
         ]).map(tab => (
           <button
             key={tab.key}
@@ -139,6 +150,11 @@ export default function CoordenadorAnuncios() {
             }`}
           >
             <tab.icon className="w-4 h-4" /> {tab.label}
+            {tab.count > 0 && (
+              <span className="min-w-[18px] h-[18px] flex items-center justify-center rounded-full text-[10px] font-bold bg-destructive text-destructive-foreground px-1">
+                {tab.count}
+              </span>
+            )}
           </button>
         ))}
       </div>
