@@ -8,15 +8,16 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Megaphone, Search, Pin, Clock, User, Plus, ChevronDown, AlertTriangle, BookOpen, CalendarDays, Info } from "lucide-react";
+import { Search, Clock, User, Plus, ChevronDown, AlertTriangle, BookOpen, CalendarDays, Info, Megaphone } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
 
-const typeConfig: Record<string, { label: string; icon: React.ElementType; dot: string; bg: string; border: string }> = {
-  urgente: { label: "Urgente", icon: AlertTriangle, dot: "bg-destructive", bg: "bg-destructive/8", border: "border-destructive/20" },
-  evento: { label: "Evento", icon: CalendarDays, dot: "bg-secondary", bg: "bg-secondary/8", border: "border-secondary/20" },
-  academico: { label: "Académico", icon: BookOpen, dot: "bg-primary", bg: "bg-primary/8", border: "border-primary/20" },
-  geral: { label: "Geral", icon: Info, dot: "bg-muted-foreground", bg: "bg-muted/50", border: "border-border" },
+const typeConfig: Record<string, { label: string; icon: React.ElementType; accent: string; accentBg: string }> = {
+  urgente: { label: "Urgente", icon: AlertTriangle, accent: "text-destructive", accentBg: "bg-destructive" },
+  evento: { label: "Evento", icon: CalendarDays, accent: "text-secondary", accentBg: "bg-secondary" },
+  academico: { label: "Académico", icon: BookOpen, accent: "text-primary", accentBg: "bg-primary" },
+  geral: { label: "Geral", icon: Info, accent: "text-muted-foreground", accentBg: "bg-muted-foreground" },
 };
 
 const categories = [
@@ -27,22 +28,31 @@ const categories = [
   { key: "geral", label: "Geral" },
 ];
 
+// Simulated "my announcements"
+const myAnnouncements = [
+  { id: "my1", title: "Alteração de Horário — Turma A", content: "A aula de quarta-feira da Turma A passa para as 14h00, sala 204. Esta alteração é válida a partir da próxima semana.", type: "academico", date: "13/02/2024", author: "Você" },
+  { id: "my2", title: "Reunião de Coordenação", content: "Reunião com todos os docentes do curso agendada para sexta-feira, 16/02, às 10h00 na sala de reuniões.", type: "evento", date: "10/02/2024", author: "Você" },
+  { id: "my3", title: "Entrega de Relatórios — Prazo Final", content: "Lembrete: o prazo final para entrega dos relatórios de estágio é dia 28/02. Não serão aceites entregas após esta data.", type: "urgente", date: "08/02/2024", author: "Você" },
+];
+
 export default function StudentAnnouncements() {
+  const [tab, setTab] = useState<"todos" | "meus">("todos");
   const [activeFilter, setActiveFilter] = useState("todos");
   const [search, setSearch] = useState("");
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  // Create form
   const [newTitle, setNewTitle] = useState("");
   const [newType, setNewType] = useState("geral");
   const [newContent, setNewContent] = useState("");
 
+  const sourceData = tab === "meus" ? myAnnouncements : announcements;
+
   const filtered = useMemo(() => {
-    return announcements
+    return sourceData
       .filter(a => activeFilter === "todos" || a.type === activeFilter)
       .filter(a => !search || a.title.toLowerCase().includes(search.toLowerCase()) || a.content.toLowerCase().includes(search.toLowerCase()));
-  }, [activeFilter, search]);
+  }, [activeFilter, search, sourceData]);
 
   const handleCreate = () => {
     if (!newTitle.trim() || !newContent.trim()) {
@@ -106,6 +116,28 @@ export default function StudentAnnouncements() {
         </Dialog>
       </div>
 
+      {/* Tabs: Todos / Meus Anúncios */}
+      <div className="flex items-center gap-4 mb-5 border-b border-border">
+        <button
+          onClick={() => { setTab("todos"); setActiveFilter("todos"); setSearch(""); setExpandedId(null); }}
+          className={cn(
+            "pb-2.5 text-sm font-medium transition-colors border-b-2 -mb-px",
+            tab === "todos" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"
+          )}
+        >
+          Todos os Anúncios
+        </button>
+        <button
+          onClick={() => { setTab("meus"); setActiveFilter("todos"); setSearch(""); setExpandedId(null); }}
+          className={cn(
+            "pb-2.5 text-sm font-medium transition-colors border-b-2 -mb-px",
+            tab === "meus" ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"
+          )}
+        >
+          Meus Anúncios
+        </button>
+      </div>
+
       {/* Filters */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-5">
         <div className="flex items-center gap-1.5 flex-wrap">
@@ -135,8 +167,8 @@ export default function StudentAnnouncements() {
         </div>
       </div>
 
-      {/* Announcements feed */}
-      <div className="space-y-3">
+      {/* Feed */}
+      <div className="space-y-2.5">
         {filtered.length > 0 ? filtered.map(ann => {
           const config = typeConfig[ann.type] || typeConfig.geral;
           const Icon = config.icon;
@@ -144,60 +176,73 @@ export default function StudentAnnouncements() {
           const isUrgent = ann.type === "urgente";
 
           return (
-            <Card
+            <div
               key={ann.id}
               onClick={() => setExpandedId(isExpanded ? null : ann.id)}
               className={cn(
-                "overflow-hidden cursor-pointer transition-all hover:shadow-md border",
-                isUrgent && "border-destructive/30",
-                isExpanded && "shadow-md"
+                "group rounded-xl border bg-card cursor-pointer transition-all",
+                "hover:border-primary/20 hover:shadow-sm",
+                isExpanded && "border-primary/25 shadow-sm",
+                isUrgent && !isExpanded && "border-destructive/20"
               )}
             >
-              {/* Color accent bar */}
-              <div className={cn("h-1", isUrgent ? "bg-destructive" : config.dot)} />
-
-              <div className="p-4 sm:p-5">
-                {/* Top row: badge + date */}
-                <div className="flex items-center justify-between mb-2.5">
-                  <Badge variant="outline" className={cn("text-[10px] gap-1 font-medium", config.bg, config.border)}>
-                    <Icon className="w-3 h-3" />
-                    {config.label}
-                  </Badge>
-                  <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-                    <Clock className="w-3 h-3" />
-                    {ann.date}
-                  </div>
-                </div>
-
-                {/* Title */}
-                <div className="flex items-start gap-2 mb-1.5">
-                  {isUrgent && <Pin className="w-3.5 h-3.5 text-destructive mt-0.5 shrink-0" />}
-                  <h3 className={cn("font-semibold text-foreground text-[15px] leading-snug", isUrgent && "text-destructive")}>{ann.title}</h3>
-                </div>
-
-                {/* Content preview or full */}
-                <p className={cn(
-                  "text-sm text-muted-foreground leading-relaxed mt-1",
-                  !isExpanded && "line-clamp-2"
+              <div className="flex items-start gap-4 p-4 sm:px-5">
+                {/* Left accent icon */}
+                <div className={cn(
+                  "w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5",
+                  isUrgent ? "bg-destructive/10" : "bg-muted"
                 )}>
-                  {ann.content}
-                </p>
+                  <Icon className={cn("w-4 h-4", config.accent)} />
+                </div>
 
-                {/* Author + expand hint */}
-                <div className="flex items-center justify-between mt-3 pt-3 border-t border-border/50">
-                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                    <User className="w-3 h-3" />
-                    <span>{ann.author}</span>
+                {/* Content */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <h3 className="text-sm font-semibold text-foreground truncate">{ann.title}</h3>
+                    <Badge variant="outline" className="text-[10px] shrink-0 hidden sm:inline-flex">{config.label}</Badge>
                   </div>
-                  <ChevronDown className={cn("w-4 h-4 text-muted-foreground transition-transform", isExpanded && "rotate-180")} />
+                  <p className={cn(
+                    "text-[13px] text-muted-foreground leading-relaxed",
+                    !isExpanded && "line-clamp-1"
+                  )}>
+                    {ann.content}
+                  </p>
+                </div>
+
+                {/* Right meta */}
+                <div className="flex flex-col items-end gap-2 shrink-0">
+                  <span className="text-[11px] text-muted-foreground whitespace-nowrap">{ann.date}</span>
+                  <ChevronDown className={cn(
+                    "w-4 h-4 text-muted-foreground/50 transition-transform",
+                    isExpanded && "rotate-180"
+                  )} />
                 </div>
               </div>
-            </Card>
+
+              {/* Expanded details */}
+              {isExpanded && (
+                <div className="px-5 pb-4 pt-0 ml-[52px] sm:ml-[52px]">
+                  <div className="pt-3 border-t border-border/50">
+                    <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                      <span className="flex items-center gap-1.5">
+                        <User className="w-3 h-3" /> {ann.author}
+                      </span>
+                      <span className="flex items-center gap-1.5">
+                        <Clock className="w-3 h-3" /> {ann.date}
+                      </span>
+                      <Badge variant="outline" className="text-[10px] sm:hidden">{config.label}</Badge>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           );
         }) : (
           <div className="text-center py-16">
-            <Megaphone className="w-10 h-10 text-muted-foreground/40 mx-auto mb-3" />
-            <p className="text-sm text-muted-foreground">Nenhum anúncio encontrado.</p>
+            <Megaphone className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" />
+            <p className="text-sm text-muted-foreground">
+              {tab === "meus" ? "Ainda não publicou nenhum anúncio." : "Nenhum anúncio encontrado."}
+            </p>
           </div>
         )}
       </div>
