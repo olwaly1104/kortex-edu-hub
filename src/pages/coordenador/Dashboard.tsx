@@ -27,7 +27,13 @@ const typeStyles: Record<string, { bg: string; label: string }> = {
 export default function CoordenadorCursoDashboard() {
   const { user } = useAuth();
   const info = coordCursoInfo;
-  const pendentes = coordSolicitacoes.filter(s => s.status === "pendente" && s.direction === "recebida");
+
+  const [eventTitle, setEventTitle] = useState("");
+  const [eventDate, setEventDate] = useState("");
+  const [eventStart, setEventStart] = useState("");
+  const [eventEnd, setEventEnd] = useState("");
+  const [eventType, setEventType] = useState("reunião");
+  const [eventLocal, setEventLocal] = useState("");
 
   const TODAY_DATE = "2024-02-14";
   const todayAgenda = coordAgendaEvents
