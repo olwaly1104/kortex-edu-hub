@@ -152,8 +152,11 @@ export default function CoordenadorAnuncios() {
             return (
               <Card
                 key={ann.id}
-                className="p-0 overflow-hidden cursor-pointer hover:shadow-md transition-all duration-200 group border-border/80"
-                onClick={() => setSelectedAnn(ann)}
+                className={`p-0 overflow-hidden cursor-pointer hover:shadow-md transition-all duration-200 group ${!readIds.has(ann.id) ? "border-primary/40 bg-primary/[0.02]" : "border-border/80"}`}
+                onClick={() => {
+                  setReadIds(prev => new Set(prev).add(ann.id));
+                  setSelectedAnn(ann);
+                }}
               >
                 <div className="flex">
                   {/* Type indicator stripe */}
