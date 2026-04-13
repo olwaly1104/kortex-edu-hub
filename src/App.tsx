@@ -63,6 +63,7 @@ import CoordenadorTarefas from "./pages/coordenador/Tarefas";
 import CoordenadorCalendar from "./pages/coordenador/Calendar";
 import CoordenadorAvaliacoes from "./pages/coordenador/Avaliacoes";
 import CoordenadorAvaliacaoDetail from "./pages/coordenador/AvaliacaoDetail";
+import CoordenadorAnuncios from "./pages/coordenador/Anuncios";
 import DecanoDashboard from "./pages/decano/Dashboard";
 import DecanoAprovacoes from "./pages/decano/Aprovacoes";
 import DecanoFaculdades from "./pages/decano/Faculdades";
