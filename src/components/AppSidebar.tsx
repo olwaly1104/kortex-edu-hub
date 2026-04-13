@@ -9,7 +9,7 @@ import {
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 
-interface NavItem { label: string; icon: React.ElementType; path: string; }
+interface NavItem { label: string; icon: React.ElementType; path: string; badge?: number; }
 interface NavSection { title: string; items: NavItem[]; }
 
 const studentSections: NavSection[] = [
