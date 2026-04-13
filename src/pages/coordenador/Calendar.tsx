@@ -56,9 +56,14 @@ export default function CoordenadorCalendar() {
 
   return (
     <div className="p-6 lg:p-8 animate-fade-in">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-foreground">Calendário</h1>
-        <p className="text-sm text-muted-foreground mt-0.5">Quarta-feira, 14 de Fevereiro 2024</p>
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">Calendário</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">Quarta-feira, 14 de Fevereiro 2024</p>
+        </div>
+        <Button className="gap-2">
+          <Plus className="w-4 h-4" /> Criar Evento
+        </Button>
       </div>
 
       <div className="flex gap-6">
