@@ -92,7 +92,7 @@ const decanoSections: NavSection[] = [
   { title: "Geral", items: [
     { label: "Início", icon: LayoutDashboard, path: "/decano" },
     { label: "Calendário", icon: Calendar, path: "/decano/calendario" },
-    { label: "Anúncios", icon: Megaphone, path: "/decano/anuncios" },
+    { label: "Anúncios", icon: Megaphone, path: "/decano/anuncios", badge: 4 },
     { label: "Aprovações", icon: CheckSquare, path: "/decano/aprovacoes" },
   ]},
   { title: "Académico", items: [
