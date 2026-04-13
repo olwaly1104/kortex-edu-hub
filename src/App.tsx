@@ -180,7 +180,7 @@ function AppRoutes() {
         <Route path="/coordenador/curso" element={<CoordenadorCursoDetail />} />
         <Route path="/coordenador/faculdade" element={<CoordenadorFaculdadeDetail />} />
         <Route path="/coordenador/calendario" element={<CoordenadorCalendar />} />
-        <Route path="/coordenador/anuncios" element={<StudentAnnouncements />} />
+        <Route path="/coordenador/anuncios" element={<CoordenadorAnuncios />} />
         <Route path="/coordenador/solicitacoes" element={<CoordenadorSolicitacoes />} />
         <Route path="/coordenador/tarefas" element={<CoordenadorTarefas />} />
         <Route path="/coordenador/avaliacoes" element={<CoordenadorAvaliacoes />} />
