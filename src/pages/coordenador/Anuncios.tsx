@@ -167,7 +167,12 @@ export default function CoordenadorAnuncios() {
                       <Badge variant="outline" className={`gap-1.5 text-[11px] font-medium border ${config.className}`}>
                         <TypeIcon className="w-3 h-3" /> {config.label}
                       </Badge>
-                      <ChevronRight className="w-4 h-4 text-muted-foreground/40 group-hover:text-primary group-hover:translate-x-0.5 transition-all shrink-0 mt-0.5" />
+                      <div className="flex items-center gap-1.5 shrink-0 mt-0.5">
+                        {!readIds.has(ann.id) && (
+                          <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                        )}
+                        <ChevronRight className="w-4 h-4 text-muted-foreground/40 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
+                      </div>
                     </div>
 
                     <h3 className="text-[15px] font-semibold text-foreground mb-1.5 group-hover:text-primary transition-colors">{ann.title}</h3>
