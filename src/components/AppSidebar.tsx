@@ -114,7 +114,7 @@ const reitorSections: NavSection[] = [
   { title: "Geral", items: [
     { label: "Início", icon: LayoutDashboard, path: "/reitor" },
     { label: "Calendário", icon: Calendar, path: "/reitor/calendario" },
-    { label: "Anúncios", icon: Megaphone, path: "/reitor/anuncios" },
+    { label: "Anúncios", icon: Megaphone, path: "/reitor/anuncios", badge: 4 },
     { label: "Solicitações", icon: CheckSquare, path: "/reitor/solicitacoes" },
   ]},
   { title: "Académico", items: [
