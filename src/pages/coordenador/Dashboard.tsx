@@ -24,30 +24,6 @@ const typeStyles: Record<string, { bg: string; label: string }> = {
   geral: { bg: "bg-muted text-foreground", label: "Geral" },
 };
 
-const typeIcons: Record<string, React.ElementType> = {
-  nota: Award,
-  plano: FileText,
-  horário: CalendarIcon,
-  transferência: Users,
-  recurso: AlertTriangle,
-};
-
-const typeLabels: Record<string, string> = {
-  nota: "Nota",
-  plano: "Plano",
-  horário: "Horário",
-  transferência: "Transferência",
-  recurso: "Recurso",
-  material: "Material",
-  reunião: "Reunião",
-};
-
-const priorityStyles: Record<string, string> = {
-  alta: "bg-destructive/10 text-destructive",
-  média: "bg-secondary/10 text-secondary",
-  baixa: "bg-muted text-muted-foreground",
-};
-
 export default function CoordenadorCursoDashboard() {
   const { user } = useAuth();
   const info = coordCursoInfo;
