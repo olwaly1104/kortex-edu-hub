@@ -108,6 +108,7 @@ import SecretariaSessaoDetail from "./pages/secretaria/SessaoProvaDetail";
 import SecretariaResultados from "./pages/secretaria/Resultados";
 import SecretariaAdmissoesDashboard from "./pages/secretaria/AdmissoesDashboard";
 import SecretariaSolicitacoes from "./pages/secretaria/Solicitacoes";
+import ApoioEstudante from "./pages/secretaria/ApoioEstudante";
 import FinancasDashboard from "./pages/financas/Dashboard";
 import FinancasInicio from "./pages/financas/Inicio";
 import FinancasReceitas from "./pages/financas/Receitas";
@@ -257,7 +258,7 @@ function AppRoutes() {
         <Route path="/secretaria/admissoes/provas-de-acesso" element={<SecretariaConvocacoes />} />
         <Route path="/secretaria/admissoes/provas-de-acesso/:sessionId" element={<SecretariaSessaoDetail />} />
         <Route path="/secretaria/admissoes/resultados" element={<SecretariaResultados />} />
-        <Route path="/secretaria/apoio-estudante" element={<ComingSoon title="Apoio ao Estudante" description="Gestão de apoio e acompanhamento académico dos estudantes." />} />
+        <Route path="/secretaria/apoio-estudante" element={<ApoioEstudante />} />
         <Route path="/secretaria/chat" element={<StudentChat />} />
         <Route path="/secretaria/email" element={<StudentEmail />} />
         <Route path="/secretaria/contactos" element={<StudentContacts />} />
