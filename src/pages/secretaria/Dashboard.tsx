@@ -81,6 +81,13 @@ export default function SecretariaDashboard() {
 
   const recentCandidaturas = [...candidaturas].slice(0, 5);
 
+  const pedidosRecentes = [
+    { id: "p1", title: "Declaração de matrícula", student: "Ana Sousa", date: "08 Abr", icon: FileText, statusLabel: "Aberto", statusColor: "bg-orange-50 text-orange-600", badgeColor: "bg-orange-100 text-orange-700" },
+    { id: "p2", title: "Pedido de equivalência", student: "Carlos Mendes", date: "07 Abr", icon: ClipboardCheck, statusLabel: "Em Curso", statusColor: "bg-primary/10 text-primary", badgeColor: "bg-primary/10 text-primary" },
+    { id: "p3", title: "Certidão de habilitações", student: "Maria João", date: "06 Abr", icon: FileText, statusLabel: "Resolvido", statusColor: "bg-emerald-50 text-emerald-600", badgeColor: "bg-emerald-100 text-emerald-700" },
+    { id: "p4", title: "Transferência de curso", student: "Pedro Lopes", date: "05 Abr", icon: Users, statusLabel: "Aberto", statusColor: "bg-orange-50 text-orange-600", badgeColor: "bg-orange-100 text-orange-700" },
+  ];
+
   const stats = [
     { icon: ClipboardCheck, label: "Total Candidaturas", value: total, color: "text-primary bg-primary/10" },
     { icon: UserCheck, label: "Aprovados", value: aprovados, color: "text-accent bg-accent/10" },
