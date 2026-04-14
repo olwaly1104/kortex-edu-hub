@@ -15,10 +15,11 @@ type StatusFilter = "todas" | EstadoCandidatura;
 
 export default function SecretariaCandidaturas() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const cursoParam = searchParams.get("curso");
   const [search, setSearch] = useState("");
   const [filterSessao, setFilterSessao] = useState<string | null>(null);
   const [filterStatus, setFilterStatus] = useState<StatusFilter>("todas");
-  const [sortBy, setSortBy] = useState<SortOption>("recente");
   const [page, setPage] = useState(1);
 
   const filtered = useMemo(() => {
@@ -26,21 +27,14 @@ export default function SecretariaCandidaturas() {
       if (search && !c.nome.toLowerCase().includes(search.toLowerCase()) && !c.bi.includes(search)) return false;
       if (filterSessao && c.sessaoProvaId !== filterSessao) return false;
       if (filterStatus !== "todas" && c.estado !== filterStatus) return false;
+      if (cursoParam && c.cursoOpcao1 !== cursoParam) return false;
       return true;
     });
 
-    list.sort((a, b) => {
-      switch (sortBy) {
-        case "recente": return new Date(b.dataSubmissao).getTime() - new Date(a.dataSubmissao).getTime();
-        case "antiga": return new Date(a.dataSubmissao).getTime() - new Date(b.dataSubmissao).getTime();
-        case "nome-az": return a.nome.localeCompare(b.nome);
-        case "nome-za": return b.nome.localeCompare(a.nome);
-        default: return 0;
-      }
-    });
+    list.sort((a, b) => new Date(b.dataSubmissao).getTime() - new Date(a.dataSubmissao).getTime());
 
     return list;
-  }, [search, filterSessao, filterStatus, sortBy]);
+  }, [search, filterSessao, filterStatus, cursoParam]);
 
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
   const paginated = filtered.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
@@ -120,28 +114,6 @@ export default function SecretariaCandidaturas() {
                 {s.label}
               </Button>
             ))}
-
-            <div className="w-px h-6 bg-border" />
-
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="text-xs gap-1.5">
-                  <ArrowUpDown className="w-3.5 h-3.5" /> Ordenar
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-44">
-                {([
-                  { key: "recente", label: "Mais Recente" },
-                  { key: "antiga", label: "Mais Antiga" },
-                  { key: "nome-az", label: "Nome A–Z" },
-                  { key: "nome-za", label: "Nome Z–A" },
-                ] as { key: SortOption; label: string }[]).map(o => (
-                  <DropdownMenuItem key={o.key} onClick={() => setSortBy(o.key)} className={sortBy === o.key ? "bg-accent font-medium" : ""}>
-                    {o.label}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
           </div>
         </div>
       </div>
