@@ -4,7 +4,7 @@ import { calendarEvents, disciplines, lessons, grades } from "@/data/mockData";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ChevronLeft, ChevronRight, Clock, MapPin, Video, Play, User, CalendarDays, ClipboardCheck, FileText, AlertTriangle, LogIn } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock, MapPin, Video, Play, User, CalendarDays, ClipboardCheck, FileText, AlertTriangle, LogIn, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -168,6 +168,10 @@ export default function StudentCalendar() {
               </span>
               <Button variant="ghost" size="icon" className="w-8 h-8"><ChevronRight className="w-4 h-4" /></Button>
             </div>
+            <div className="flex items-center gap-3">
+              <Button size="sm" className="gap-2">
+                <Plus className="w-4 h-4" /> Criar Evento
+              </Button>
             <div className="flex bg-muted rounded-lg p-0.5">
               <button
                 onClick={() => setView("week")}
@@ -181,6 +185,7 @@ export default function StudentCalendar() {
               >
                 Mês
               </button>
+            </div>
             </div>
           </div>
 
