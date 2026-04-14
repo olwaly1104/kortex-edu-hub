@@ -186,6 +186,7 @@ export default function StudentCalendar() {
                 Mês
               </button>
             </div>
+            </div>
           </div>
 
           {view === "week" ? (
