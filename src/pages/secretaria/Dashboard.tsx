@@ -133,32 +133,61 @@ export default function SecretariaDashboard() {
         <Card className="p-5 lg:col-span-2">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
-              <GraduationCap className="w-5 h-5 text-primary" /> Candidaturas por Curso
+              <Building2 className="w-5 h-5 text-primary" /> Candidatos por Faculdade
             </h2>
             <Link to="/secretaria/admissoes/candidaturas" className="text-sm text-primary hover:underline flex items-center gap-1">
               Ver todas <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
-          <div className="space-y-3">
-            {cursoStats.map(c => (
-              <div key={c.curso} className="flex items-center gap-4 px-3.5 py-3 rounded-xl border border-border bg-card">
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-primary/10 shrink-0">
-                  <BookOpen className="w-4 h-4 text-primary" />
+          <div className="space-y-2.5">
+            {faculdadeStats.map(f => {
+              const isExpanded = expandedFaculdade === f.nome;
+              return (
+                <div key={f.nome} className="rounded-xl border border-border bg-card overflow-hidden">
+                  <button
+                    onClick={() => setExpandedFaculdade(isExpanded ? null : f.nome)}
+                    className="w-full flex items-center gap-4 px-3.5 py-3 hover:bg-muted/40 transition-colors"
+                  >
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-primary/10 shrink-0">
+                      <Building2 className="w-4 h-4 text-primary" />
+                    </div>
+                    <div className="flex-1 min-w-0 text-left">
+                      <p className="text-sm font-semibold text-foreground">{f.nome}</p>
+                      <div className="flex items-center gap-3 mt-1">
+                        <span className="text-[10px] text-muted-foreground">{f.total} candidaturas</span>
+                        <span className="text-[10px] text-emerald-600">{f.aprovados} aprov.</span>
+                        <span className="text-[10px] text-amber-600">{f.pendentes} pend.</span>
+                      </div>
+                    </div>
+                    <div className="w-20 shrink-0">
+                      <Progress value={f.total > 0 ? (f.aprovados / f.total) * 100 : 0} className="h-2" />
+                    </div>
+                    <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${isExpanded ? "rotate-180" : ""}`} />
+                  </button>
+                  {isExpanded && (
+                    <div className="border-t border-border bg-muted/20 px-4 py-2.5 space-y-2">
+                      {f.cursoStats.map(c => (
+                        <div key={c.curso} className="flex items-center gap-3 px-3 py-2 rounded-lg border border-border bg-card">
+                          <BookOpen className="w-3.5 h-3.5 text-primary shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs font-semibold text-foreground">{c.curso}</p>
+                            <div className="flex items-center gap-2 mt-0.5">
+                              <span className="text-[10px] text-muted-foreground">{c.total} cand.</span>
+                              <span className="text-[10px] text-emerald-600">{c.aprovados} aprov.</span>
+                              <span className="text-[10px] text-amber-600">{c.pendentes} pend.</span>
+                              <span className="text-[10px] text-orange-600">{c.incompletos} incomp.</span>
+                            </div>
+                          </div>
+                          <div className="w-16 shrink-0">
+                            <Progress value={c.total > 0 ? (c.aprovados / c.total) * 100 : 0} className="h-1.5" />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-foreground">{c.curso}</p>
-                  <div className="flex items-center gap-3 mt-1">
-                    <span className="text-[10px] text-muted-foreground">{c.total} candidaturas</span>
-                    <span className="text-[10px] text-emerald-600">{c.aprovados} aprov.</span>
-                    <span className="text-[10px] text-amber-600">{c.pendentes} pend.</span>
-                    <span className="text-[10px] text-orange-600">{c.incompletos} incomp.</span>
-                  </div>
-                </div>
-                <div className="w-20 shrink-0">
-                  <Progress value={c.total > 0 ? (c.aprovados / c.total) * 100 : 0} className="h-2" />
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </Card>
 
