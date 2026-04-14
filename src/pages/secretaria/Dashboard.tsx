@@ -167,21 +167,24 @@ export default function SecretariaDashboard() {
                   {isExpanded && (
                     <div className="border-t border-border bg-muted/20 px-4 py-2.5 space-y-2">
                       {f.cursoStats.map(c => (
-                        <div key={c.curso} className="flex items-center gap-3 px-3 py-2 rounded-lg border border-border bg-card">
-                          <BookOpen className="w-3.5 h-3.5 text-primary shrink-0" />
-                          <div className="flex-1 min-w-0">
-                            <p className="text-xs font-semibold text-foreground">{c.curso}</p>
-                            <div className="flex items-center gap-2 mt-0.5">
-                              <span className="text-[10px] text-muted-foreground">{c.total} cand.</span>
-                              <span className="text-[10px] text-emerald-600">{c.aprovados} aprov.</span>
-                              <span className="text-[10px] text-amber-600">{c.pendentes} pend.</span>
-                              <span className="text-[10px] text-orange-600">{c.incompletos} incomp.</span>
+                        <Link key={c.curso} to={`/secretaria/admissoes/candidaturas?curso=${encodeURIComponent(c.curso)}`}>
+                          <div className="flex items-center gap-3 px-3 py-2 rounded-lg border border-border bg-card hover:bg-muted/40 transition-colors cursor-pointer">
+                            <BookOpen className="w-3.5 h-3.5 text-primary shrink-0" />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs font-semibold text-foreground">{c.curso}</p>
+                              <div className="flex items-center gap-2 mt-0.5">
+                                <span className="text-[10px] text-muted-foreground">{c.total} cand.</span>
+                                <span className="text-[10px] text-emerald-600">{c.aprovados} aprov.</span>
+                                <span className="text-[10px] text-amber-600">{c.pendentes} pend.</span>
+                                <span className="text-[10px] text-orange-600">{c.incompletos} incomp.</span>
+                              </div>
                             </div>
+                            <div className="w-16 shrink-0">
+                              <Progress value={c.total > 0 ? (c.aprovados / c.total) * 100 : 0} className="h-1.5" />
+                            </div>
+                            <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" />
                           </div>
-                          <div className="w-16 shrink-0">
-                            <Progress value={c.total > 0 ? (c.aprovados / c.total) * 100 : 0} className="h-1.5" />
-                          </div>
-                        </div>
+                        </Link>
                       ))}
                     </div>
                   )}

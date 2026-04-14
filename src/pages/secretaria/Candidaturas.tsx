@@ -56,8 +56,15 @@ export default function SecretariaCandidaturas() {
   return (
     <div className="p-6 lg:p-8 space-y-5 animate-fade-in">
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Candidaturas</h1>
+        <h1 className="text-2xl font-bold text-foreground">
+          Candidaturas{cursoParam ? ` — ${cursoParam}` : ""}
+        </h1>
         <p className="text-muted-foreground text-sm mt-1">Gerir candidaturas de admissão</p>
+        {cursoParam && (
+          <Button variant="ghost" size="sm" className="text-xs mt-1 gap-1 text-primary" onClick={() => navigate("/secretaria/admissoes/candidaturas")}>
+            <X className="w-3 h-3" /> Limpar filtro de curso
+          </Button>
+        )}
       </div>
 
       {/* Summary Cards */}
