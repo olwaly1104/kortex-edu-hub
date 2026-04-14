@@ -168,6 +168,10 @@ export default function StudentCalendar() {
               </span>
               <Button variant="ghost" size="icon" className="w-8 h-8"><ChevronRight className="w-4 h-4" /></Button>
             </div>
+            <div className="flex items-center gap-3">
+              <Button size="sm" className="gap-2">
+                <Plus className="w-4 h-4" /> Criar Evento
+              </Button>
             <div className="flex bg-muted rounded-lg p-0.5">
               <button
                 onClick={() => setView("week")}
