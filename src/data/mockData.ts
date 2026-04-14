@@ -204,7 +204,7 @@ export const currentReitor: User = {
 export const currentSecretaria: User = {
   id: "7",
   name: "Dra. Teresa Nascimento",
-  email: "secretaria@upra.kor",
+  email: "academica@upra.kor",
   role: "secretaria",
 };
 
@@ -486,7 +486,7 @@ export const emailMessages: EmailMessage[] = [
 // Helper function
 export function detectRole(email: string): UserRole {
   if (email.startsWith("financas")) return "financas";
-  if (email.startsWith("secretaria")) return "secretaria";
+  if (email.startsWith("academica")) return "secretaria";
   if (email.startsWith("reitor")) return "reitor";
   if (email.startsWith("decano")) return "decano";
   if (email.startsWith("coordcurso")) return "coordenador_curso";
