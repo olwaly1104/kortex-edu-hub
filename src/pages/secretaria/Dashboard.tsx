@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { candidaturas, sessoesProva, cursos } from "@/data/admissoesData";
 import { reitorSolicitacoes } from "@/data/institutionData";
@@ -9,7 +10,7 @@ import {
   Calendar as CalendarIcon, CheckCircle, UserCheck,
   ClipboardCheck, BarChart3, AlertCircle, XCircle,
   Eye, Award, GraduationCap, BookOpen, TrendingUp,
-  AlertTriangle, ArrowDownLeft, Play,
+  AlertTriangle, ArrowDownLeft, Play, Building2, ChevronDown,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Progress } from "@/components/ui/progress";
