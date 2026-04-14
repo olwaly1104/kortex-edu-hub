@@ -81,6 +81,13 @@ export default function SecretariaDashboard() {
 
   const recentCandidaturas = [...candidaturas].slice(0, 5);
 
+  const pedidosRecentes = [
+    { id: "p1", title: "Declaração de matrícula", student: "Ana Sousa", date: "08 Abr", icon: FileText, statusLabel: "Aberto", statusColor: "bg-orange-50 text-orange-600", badgeColor: "bg-orange-100 text-orange-700" },
+    { id: "p2", title: "Pedido de equivalência", student: "Carlos Mendes", date: "07 Abr", icon: ClipboardCheck, statusLabel: "Em Curso", statusColor: "bg-primary/10 text-primary", badgeColor: "bg-primary/10 text-primary" },
+    { id: "p3", title: "Certidão de habilitações", student: "Maria João", date: "06 Abr", icon: FileText, statusLabel: "Resolvido", statusColor: "bg-emerald-50 text-emerald-600", badgeColor: "bg-emerald-100 text-emerald-700" },
+    { id: "p4", title: "Transferência de curso", student: "Pedro Lopes", date: "05 Abr", icon: Users, statusLabel: "Aberto", statusColor: "bg-orange-50 text-orange-600", badgeColor: "bg-orange-100 text-orange-700" },
+  ];
+
   const stats = [
     { icon: ClipboardCheck, label: "Total Candidaturas", value: total, color: "text-primary bg-primary/10" },
     { icon: UserCheck, label: "Aprovados", value: aprovados, color: "text-accent bg-accent/10" },
@@ -195,39 +202,67 @@ export default function SecretariaDashboard() {
         </Card>
       </div>
 
-      {/* Row 2: Candidaturas Recentes + Solicitações */}
+      {/* Row 2: Candidaturas + Pedidos Recentes (stacked) + Solicitações */}
       <div className="grid lg:grid-cols-5 gap-6">
-        <Card className="p-5 lg:col-span-3">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
-              <Users className="w-5 h-5 text-primary" /> Candidaturas Recentes
-            </h2>
-            <Link to="/secretaria/admissoes/candidaturas" className="text-sm text-primary hover:underline flex items-center gap-1">
-              Ver todas <ChevronRight className="w-4 h-4" />
-            </Link>
-          </div>
-          <div className="space-y-2">
-            {recentCandidaturas.map(c => {
-              const docsEntregues = c.documentos.filter(d => d.entregue).length;
-              const totalDocs = c.documentos.length;
-              return (
-                <Link key={c.id} to={`/secretaria/admissoes/candidaturas/${c.id}`}>
-                  <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg border border-border hover:bg-muted/40 transition-colors">
-                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-semibold text-primary shrink-0">
-                      {c.nome.charAt(0)}
+        <div className="lg:col-span-3 space-y-4 flex flex-col">
+          <Card className="p-5">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
+                <Users className="w-5 h-5 text-primary" /> Candidaturas Recentes
+              </h2>
+              <Link to="/secretaria/admissoes/candidaturas" className="text-sm text-primary hover:underline flex items-center gap-1">
+                Ver todas <ChevronRight className="w-4 h-4" />
+              </Link>
+            </div>
+            <div className="space-y-2">
+              {recentCandidaturas.map(c => {
+                const docsEntregues = c.documentos.filter(d => d.entregue).length;
+                const totalDocs = c.documentos.length;
+                return (
+                  <Link key={c.id} to={`/secretaria/admissoes/candidaturas/${c.id}`}>
+                    <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg border border-border hover:bg-muted/40 transition-colors">
+                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-semibold text-primary shrink-0">
+                        {c.nome.charAt(0)}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-foreground truncate">{c.nome}</p>
+                        <p className="text-xs text-muted-foreground">{c.cursoOpcao1} • Docs {docsEntregues}/{totalDocs}</p>
+                      </div>
+                      <Badge className={`${estadoBadge[c.estado]} text-[10px] border-0`}>{estadoLabel[c.estado]}</Badge>
+                      <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-foreground truncate">{c.nome}</p>
-                      <p className="text-xs text-muted-foreground">{c.cursoOpcao1} • Docs {docsEntregues}/{totalDocs}</p>
-                    </div>
-                    <Badge className={`${estadoBadge[c.estado]} text-[10px] border-0`}>{estadoLabel[c.estado]}</Badge>
-                    <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
+                  </Link>
+                );
+              })}
+            </div>
+          </Card>
+
+          <Card className="p-5 flex-1">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
+                <FileText className="w-5 h-5 text-secondary" /> Pedidos Recentes
+                <Badge variant="outline" className="text-[10px] font-mono">{pedidosRecentes.length}</Badge>
+              </h2>
+              <Link to="/secretaria/apoio-estudante" className="text-sm text-primary hover:underline flex items-center gap-1">
+                Ver todos <ChevronRight className="w-4 h-4" />
+              </Link>
+            </div>
+            <div className="space-y-2">
+              {pedidosRecentes.map(p => (
+                <div key={p.id} className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl border border-border bg-card hover:bg-muted/40 transition-colors">
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${p.statusColor}`}>
+                    <p.icon className="w-4 h-4" />
                   </div>
-                </Link>
-              );
-            })}
-          </div>
-        </Card>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-semibold text-foreground line-clamp-1">{p.title}</p>
+                    <p className="text-[10px] text-muted-foreground">{p.student} • {p.date}</p>
+                  </div>
+                  <Badge className={`${p.badgeColor} text-[10px] border-0`}>{p.statusLabel}</Badge>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </div>
 
         {/* Solicitações Pendentes */}
         <Card className="p-5 lg:col-span-2">
