@@ -1,21 +1,17 @@
 import { useState, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { candidaturas, sessoesProva, estadoColors, estadoLabels, type EstadoCandidatura } from "@/data/admissoesData";
-import { Search, ChevronLeft, ChevronRight, Eye, Users, Clock, CheckCircle, AlertCircle, ArrowUpDown, X } from "lucide-react";
-import {
-  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
+import { Search, ChevronLeft, ChevronRight, Eye, Users, Clock, CheckCircle, AlertCircle, X } from "lucide-react";
 
 const ITEMS_PER_PAGE = 8;
 const allStates: EstadoCandidatura[] = ["incompleto", "pendente", "aprovado", "reprovado"];
 
 type StatusFilter = "todas" | EstadoCandidatura;
-type SortOption = "recente" | "antiga" | "nome-az" | "nome-za";
 
 export default function SecretariaCandidaturas() {
   const navigate = useNavigate();
