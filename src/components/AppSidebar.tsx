@@ -139,9 +139,10 @@ const secretariaSections: NavSection[] = [
     { label: "Anúncios", icon: Megaphone, path: "/secretaria/anuncios", badge: 4 },
     { label: "Solicitações", icon: CheckSquare, path: "/secretaria/solicitacoes" },
   ]},
-  { title: "Admissões", items: [
+  { title: "Área Académica", items: [
     { label: "Dashboard", icon: BarChart3, path: "/secretaria/admissoes" },
     { label: "Candidaturas", icon: FileText, path: "/secretaria/admissoes/candidaturas" },
+    { label: "Apoio ao Estudante", icon: HelpCircle, path: "/secretaria/apoio-estudante" },
     { label: "Provas de Acesso", icon: CalendarDays, path: "/secretaria/admissoes/provas-de-acesso" },
     { label: "Resultados", icon: Award, path: "/secretaria/admissoes/resultados" },
   ]},
