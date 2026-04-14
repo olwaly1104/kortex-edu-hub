@@ -42,15 +42,6 @@ const typeStyles: Record<string, { bg: string; label: string }> = {
   geral: { bg: "bg-muted text-foreground", label: "Geral" },
 };
 
-const estadoBadge: Record<string, string> = {
-  incompleto: "bg-orange-100 text-orange-700",
-  pendente: "bg-amber-100 text-amber-700",
-  aprovado: "bg-emerald-100 text-emerald-700",
-  reprovado: "bg-red-100 text-red-700",
-};
-const estadoLabel: Record<string, string> = {
-  incompleto: "Incompleto", pendente: "Pendente", aprovado: "Aprovado", reprovado: "Reprovado",
-};
 
 export default function SecretariaDashboard() {
   const { user } = useAuth();
