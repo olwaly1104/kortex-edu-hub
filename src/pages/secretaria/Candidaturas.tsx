@@ -1,28 +1,25 @@
 import { useState, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { candidaturas, sessoesProva, estadoColors, estadoLabels, type EstadoCandidatura } from "@/data/admissoesData";
-import { Search, ChevronLeft, ChevronRight, Eye, Users, Clock, CheckCircle, AlertCircle, ArrowUpDown, X } from "lucide-react";
-import {
-  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
+import { Search, ChevronLeft, ChevronRight, Eye, Users, Clock, CheckCircle, AlertCircle, X } from "lucide-react";
 
 const ITEMS_PER_PAGE = 8;
 const allStates: EstadoCandidatura[] = ["incompleto", "pendente", "aprovado", "reprovado"];
 
 type StatusFilter = "todas" | EstadoCandidatura;
-type SortOption = "recente" | "antiga" | "nome-az" | "nome-za";
 
 export default function SecretariaCandidaturas() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const cursoParam = searchParams.get("curso");
   const [search, setSearch] = useState("");
   const [filterSessao, setFilterSessao] = useState<string | null>(null);
   const [filterStatus, setFilterStatus] = useState<StatusFilter>("todas");
-  const [sortBy, setSortBy] = useState<SortOption>("recente");
   const [page, setPage] = useState(1);
 
   const filtered = useMemo(() => {
@@ -30,21 +27,14 @@ export default function SecretariaCandidaturas() {
       if (search && !c.nome.toLowerCase().includes(search.toLowerCase()) && !c.bi.includes(search)) return false;
       if (filterSessao && c.sessaoProvaId !== filterSessao) return false;
       if (filterStatus !== "todas" && c.estado !== filterStatus) return false;
+      if (cursoParam && c.cursoOpcao1 !== cursoParam) return false;
       return true;
     });
 
-    list.sort((a, b) => {
-      switch (sortBy) {
-        case "recente": return new Date(b.dataSubmissao).getTime() - new Date(a.dataSubmissao).getTime();
-        case "antiga": return new Date(a.dataSubmissao).getTime() - new Date(b.dataSubmissao).getTime();
-        case "nome-az": return a.nome.localeCompare(b.nome);
-        case "nome-za": return b.nome.localeCompare(a.nome);
-        default: return 0;
-      }
-    });
+    list.sort((a, b) => new Date(b.dataSubmissao).getTime() - new Date(a.dataSubmissao).getTime());
 
     return list;
-  }, [search, filterSessao, filterStatus, sortBy]);
+  }, [search, filterSessao, filterStatus, cursoParam]);
 
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
   const paginated = filtered.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
@@ -66,8 +56,15 @@ export default function SecretariaCandidaturas() {
   return (
     <div className="p-6 lg:p-8 space-y-5 animate-fade-in">
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Candidaturas</h1>
+        <h1 className="text-2xl font-bold text-foreground">
+          Candidaturas{cursoParam ? ` — ${cursoParam}` : ""}
+        </h1>
         <p className="text-muted-foreground text-sm mt-1">Gerir candidaturas de admissão</p>
+        {cursoParam && (
+          <Button variant="ghost" size="sm" className="text-xs mt-1 gap-1 text-primary" onClick={() => navigate("/secretaria/admissoes/candidaturas")}>
+            <X className="w-3 h-3" /> Limpar filtro de curso
+          </Button>
+        )}
       </div>
 
       {/* Summary Cards */}
@@ -124,28 +121,6 @@ export default function SecretariaCandidaturas() {
                 {s.label}
               </Button>
             ))}
-
-            <div className="w-px h-6 bg-border" />
-
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="text-xs gap-1.5">
-                  <ArrowUpDown className="w-3.5 h-3.5" /> Ordenar
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-44">
-                {([
-                  { key: "recente", label: "Mais Recente" },
-                  { key: "antiga", label: "Mais Antiga" },
-                  { key: "nome-az", label: "Nome A–Z" },
-                  { key: "nome-za", label: "Nome Z–A" },
-                ] as { key: SortOption; label: string }[]).map(o => (
-                  <DropdownMenuItem key={o.key} onClick={() => setSortBy(o.key)} className={sortBy === o.key ? "bg-accent font-medium" : ""}>
-                    {o.label}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
           </div>
         </div>
       </div>
