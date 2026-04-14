@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import Login from "./pages/Login";
 import AppLayout from "./layouts/AppLayout";
+import ComingSoon from "./components/ComingSoon";
 import StudentDashboard from "./pages/student/Dashboard";
 import StudentDisciplines from "./pages/student/Disciplines";
 import DisciplineDetail from "./pages/student/DisciplineDetail";
@@ -256,6 +257,7 @@ function AppRoutes() {
         <Route path="/secretaria/admissoes/provas-de-acesso" element={<SecretariaConvocacoes />} />
         <Route path="/secretaria/admissoes/provas-de-acesso/:sessionId" element={<SecretariaSessaoDetail />} />
         <Route path="/secretaria/admissoes/resultados" element={<SecretariaResultados />} />
+        <Route path="/secretaria/apoio-estudante" element={<ComingSoon title="Apoio ao Estudante" description="Gestão de apoio e acompanhamento académico dos estudantes." />} />
         <Route path="/secretaria/chat" element={<StudentChat />} />
         <Route path="/secretaria/email" element={<StudentEmail />} />
         <Route path="/secretaria/contactos" element={<StudentContacts />} />
