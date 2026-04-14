@@ -4,7 +4,7 @@ import {
   LayoutDashboard, BookOpen, Calendar, CalendarDays, Megaphone, Users, MessageSquare,
   Mail, Award, User, LogOut, GraduationCap,
   BarChart3, ChevronLeft, ChevronRight, Library, Wallet, Trophy, ClipboardList,
-  CheckSquare, Building2, UserCog, Eye, Layers, FileText, FolderOpen, TrendingUp,
+  CheckSquare, Building2, UserCog, Eye, Layers, FileText, FolderOpen, TrendingUp, HelpCircle,
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
