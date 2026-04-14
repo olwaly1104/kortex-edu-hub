@@ -70,7 +70,7 @@ export default function SecretariaDashboard() {
     agendada: { label: "Agendada", icon: Clock, variant: "outline" },
   };
 
-  const recentCandidaturas = [...candidaturas].slice(0, 5);
+  
 
   const pedidosRecentes = [
     { id: "p1", title: "Declaração de matrícula", student: "Ana Sousa", date: "08 Abr", icon: FileText, statusLabel: "Aberto", statusColor: "bg-orange-50 text-orange-600", badgeColor: "bg-orange-100 text-orange-700" },
