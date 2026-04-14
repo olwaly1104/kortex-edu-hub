@@ -256,6 +256,7 @@ function AppRoutes() {
         <Route path="/secretaria/admissoes/provas-de-acesso" element={<SecretariaConvocacoes />} />
         <Route path="/secretaria/admissoes/provas-de-acesso/:sessionId" element={<SecretariaSessaoDetail />} />
         <Route path="/secretaria/admissoes/resultados" element={<SecretariaResultados />} />
+        <Route path="/secretaria/apoio-estudante" element={<ComingSoon />} />
         <Route path="/secretaria/chat" element={<StudentChat />} />
         <Route path="/secretaria/email" element={<StudentEmail />} />
         <Route path="/secretaria/contactos" element={<StudentContacts />} />
