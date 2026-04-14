@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import Login from "./pages/Login";
 import AppLayout from "./layouts/AppLayout";
+import ComingSoon from "./components/ComingSoon";
 import StudentDashboard from "./pages/student/Dashboard";
 import StudentDisciplines from "./pages/student/Disciplines";
 import DisciplineDetail from "./pages/student/DisciplineDetail";
