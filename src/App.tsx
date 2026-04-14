@@ -100,6 +100,7 @@ import ReitorRelatorios from "./pages/reitor/Relatorios";
 import ReitorFinancas from "./pages/reitor/Financas";
 import ReitorEstudantes from "./pages/reitor/Estudantes";
 import NotFound from "./pages/NotFound";
+import SecretariaInicio from "./pages/secretaria/Inicio";
 import SecretariaDashboard from "./pages/secretaria/Dashboard";
 import SecretariaCandidaturas from "./pages/secretaria/Candidaturas";
 import SecretariaCandidaturaDetail from "./pages/secretaria/CandidaturaDetail";
@@ -248,7 +249,8 @@ function AppRoutes() {
         <Route path="/reitor/financas" element={<ReitorFinancas />} />
         <Route path="/reitor/perfil" element={<StudentProfile />} />
         {/* Secretaria Académica */}
-        <Route path="/secretaria" element={<SecretariaDashboard />} />
+        <Route path="/secretaria" element={<SecretariaInicio />} />
+        <Route path="/secretaria/dashboard" element={<SecretariaDashboard />} />
         <Route path="/secretaria/calendario" element={<StudentCalendar />} />
         <Route path="/secretaria/anuncios" element={<StudentAnnouncements />} />
         <Route path="/secretaria/solicitacoes" element={<SecretariaSolicitacoes />} />
