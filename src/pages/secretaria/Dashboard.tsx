@@ -17,6 +17,7 @@ import { Progress } from "@/components/ui/progress";
 
 export default function SecretariaDashboard() {
   const { user } = useAuth();
+  const [expandedFaculdade, setExpandedFaculdade] = useState<string | null>(null);
 
   // Admissions KPIs
   const total = candidaturas.length;
@@ -25,15 +26,32 @@ export default function SecretariaDashboard() {
   const incompletos = candidaturas.filter(c => c.estado === "incompleto").length;
   const reprovados = candidaturas.filter(c => c.estado === "reprovado").length;
 
-  // Courses breakdown
-  const cursoStats = cursos.map(curso => {
-    const cands = candidaturas.filter(c => c.cursoOpcao1 === curso);
+  // Faculty → Courses mapping
+  const faculdades = [
+    { nome: "Faculdade de Ciências Exatas", cursos: ["Engenharia Informática", "Arquitectura"] },
+    { nome: "Faculdade de Ciências Sociais", cursos: ["Direito", "Gestão"] },
+    { nome: "Faculdade de Ciências da Saúde", cursos: ["Medicina"] },
+  ];
+
+  const faculdadeStats = faculdades.map(f => {
+    const cands = candidaturas.filter(c => f.cursos.includes(c.cursoOpcao1));
+    const cursoStats = f.cursos.map(curso => {
+      const cc = candidaturas.filter(c => c.cursoOpcao1 === curso);
+      return {
+        curso,
+        total: cc.length,
+        aprovados: cc.filter(c => c.estado === "aprovado").length,
+        pendentes: cc.filter(c => c.estado === "pendente").length,
+        incompletos: cc.filter(c => c.estado === "incompleto").length,
+      };
+    }).sort((a, b) => b.total - a.total);
     return {
-      curso,
+      nome: f.nome,
       total: cands.length,
       aprovados: cands.filter(c => c.estado === "aprovado").length,
       pendentes: cands.filter(c => c.estado === "pendente").length,
       incompletos: cands.filter(c => c.estado === "incompleto").length,
+      cursoStats,
     };
   }).sort((a, b) => b.total - a.total);
 
