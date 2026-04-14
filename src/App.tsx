@@ -108,6 +108,7 @@ import SecretariaSessaoDetail from "./pages/secretaria/SessaoProvaDetail";
 import SecretariaResultados from "./pages/secretaria/Resultados";
 import SecretariaAdmissoesDashboard from "./pages/secretaria/AdmissoesDashboard";
 import SecretariaSolicitacoes from "./pages/secretaria/Solicitacoes";
+import ApoioEstudante from "./pages/secretaria/ApoioEstudante";
 import FinancasDashboard from "./pages/financas/Dashboard";
 import FinancasInicio from "./pages/financas/Inicio";
 import FinancasReceitas from "./pages/financas/Receitas";
