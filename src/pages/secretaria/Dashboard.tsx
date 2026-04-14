@@ -42,15 +42,6 @@ const typeStyles: Record<string, { bg: string; label: string }> = {
   geral: { bg: "bg-muted text-foreground", label: "Geral" },
 };
 
-const estadoBadge: Record<string, string> = {
-  incompleto: "bg-orange-100 text-orange-700",
-  pendente: "bg-amber-100 text-amber-700",
-  aprovado: "bg-emerald-100 text-emerald-700",
-  reprovado: "bg-red-100 text-red-700",
-};
-const estadoLabel: Record<string, string> = {
-  incompleto: "Incompleto", pendente: "Pendente", aprovado: "Aprovado", reprovado: "Reprovado",
-};
 
 export default function SecretariaDashboard() {
   const { user } = useAuth();
@@ -79,7 +70,7 @@ export default function SecretariaDashboard() {
     agendada: { label: "Agendada", icon: Clock, variant: "outline" },
   };
 
-  const recentCandidaturas = [...candidaturas].slice(0, 5);
+  
 
   const pedidosRecentes = [
     { id: "p1", title: "Declaração de matrícula", student: "Ana Sousa", date: "08 Abr", icon: FileText, statusLabel: "Aberto", statusColor: "bg-orange-50 text-orange-600", badgeColor: "bg-orange-100 text-orange-700" },
@@ -202,45 +193,13 @@ export default function SecretariaDashboard() {
         </Card>
       </div>
 
-      {/* Row 2: Candidaturas + Pedidos Recentes (stacked) + Solicitações */}
+      {/* Row 2: Pedidos Recentes + Acções Rápidas (stacked) + Solicitações */}
       <div className="grid lg:grid-cols-5 gap-6">
         <div className="lg:col-span-3 space-y-4 flex flex-col">
           <Card className="p-5">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
-                <Users className="w-5 h-5 text-primary" /> Candidaturas Recentes
-              </h2>
-              <Link to="/secretaria/admissoes/candidaturas" className="text-sm text-primary hover:underline flex items-center gap-1">
-                Ver todas <ChevronRight className="w-4 h-4" />
-              </Link>
-            </div>
-            <div className="space-y-2">
-              {recentCandidaturas.map(c => {
-                const docsEntregues = c.documentos.filter(d => d.entregue).length;
-                const totalDocs = c.documentos.length;
-                return (
-                  <Link key={c.id} to={`/secretaria/admissoes/candidaturas/${c.id}`}>
-                    <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg border border-border hover:bg-muted/40 transition-colors">
-                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-semibold text-primary shrink-0">
-                        {c.nome.charAt(0)}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-foreground truncate">{c.nome}</p>
-                        <p className="text-xs text-muted-foreground">{c.cursoOpcao1} • Docs {docsEntregues}/{totalDocs}</p>
-                      </div>
-                      <Badge className={`${estadoBadge[c.estado]} text-[10px] border-0`}>{estadoLabel[c.estado]}</Badge>
-                      <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-          </Card>
-
-          <Card className="p-5 flex-1">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
-                <FileText className="w-5 h-5 text-secondary" /> Pedidos Recentes
+                <FileText className="w-5 h-5 text-primary" /> Pedidos Recentes
                 <Badge variant="outline" className="text-[10px] font-mono">{pedidosRecentes.length}</Badge>
               </h2>
               <Link to="/secretaria/apoio-estudante" className="text-sm text-primary hover:underline flex items-center gap-1">
@@ -259,6 +218,31 @@ export default function SecretariaDashboard() {
                   </div>
                   <Badge className={`${p.badgeColor} text-[10px] border-0`}>{p.statusLabel}</Badge>
                 </div>
+              ))}
+            </div>
+          </Card>
+
+          <Card className="p-4 flex-1">
+            <h2 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+              <Play className="w-4 h-4 text-primary" /> Acções Rápidas
+            </h2>
+            <div className="flex flex-col gap-1.5">
+              {[
+                { label: "Painel de Admissões", icon: BarChart3, path: "/secretaria/admissoes", color: "bg-primary/10 text-primary" },
+                { label: "Gestão de Candidaturas", icon: ClipboardCheck, path: "/secretaria/admissoes/candidaturas", color: "bg-emerald-50 text-emerald-600" },
+                { label: "Apoio ao Estudante", icon: Users, path: "/secretaria/apoio-estudante", color: "bg-amber-50 text-amber-600" },
+                { label: "Provas de Acesso", icon: Award, path: "/secretaria/admissoes/provas-de-acesso", color: "bg-secondary/10 text-secondary" },
+                { label: "Resultados e Convocações", icon: FileText, path: "/secretaria/admissoes/resultados", color: "bg-destructive/10 text-destructive" },
+              ].map(action => (
+                <Link key={action.path} to={action.path}>
+                  <div className="flex items-center gap-2.5 px-3 py-2 rounded-lg border border-border hover:bg-muted/40 transition-colors cursor-pointer">
+                    <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${action.color}`}>
+                      <action.icon className="w-3.5 h-3.5" />
+                    </div>
+                    <p className="text-xs font-medium text-foreground">{action.label}</p>
+                    <ChevronRight className="w-3.5 h-3.5 text-muted-foreground ml-auto" />
+                  </div>
+                </Link>
               ))}
             </div>
           </Card>
