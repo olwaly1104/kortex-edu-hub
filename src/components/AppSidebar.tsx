@@ -142,7 +142,6 @@ const secretariaSections: NavSection[] = [
   { title: "Área Académica", items: [
     { label: "Dashboard", icon: BarChart3, path: "/secretaria/dashboard" },
     { label: "Candidaturas", icon: FileText, path: "/secretaria/admissoes/candidaturas" },
-    { label: "Apoio ao Estudante", icon: HelpCircle, path: "/secretaria/apoio-estudante" },
     { label: "Provas de Acesso", icon: CalendarDays, path: "/secretaria/admissoes/provas-de-acesso" },
     { label: "Resultados", icon: Award, path: "/secretaria/admissoes/resultados" },
   ]},
@@ -182,6 +181,31 @@ const financasSections: NavSection[] = [
   ]},
 ];
 
+const gapSections: NavSection[] = [
+  { title: "Geral", items: [
+    { label: "Início", icon: LayoutDashboard, path: "/gap" },
+    { label: "Calendário", icon: Calendar, path: "/gap/calendario" },
+    { label: "Anúncios", icon: Megaphone, path: "/gap/anuncios", badge: 4 },
+    { label: "Solicitações", icon: CheckSquare, path: "/gap/solicitacoes" },
+  ]},
+  { title: "Apoio ao Estudante", items: [
+    { label: "Dashboard", icon: BarChart3, path: "/gap/dashboard" },
+    { label: "Tickets", icon: HelpCircle, path: "/gap/tickets" },
+    { label: "Atendimentos", icon: CalendarDays, path: "/gap/atendimentos" },
+    { label: "Estudantes", icon: Users, path: "/gap/estudantes" },
+    { label: "Base de Conhecimento", icon: Library, path: "/gap/conhecimento" },
+  ]},
+  { title: "Comunicação", items: [
+    { label: "Chat", icon: MessageSquare, path: "/gap/chat" },
+    { label: "Email", icon: Mail, path: "/gap/email" },
+    { label: "Contactos", icon: Users, path: "/gap/contactos" },
+  ]},
+  { title: "Pessoal", items: [
+    { label: "Finanças", icon: Wallet, path: "/gap/financas" },
+    { label: "Perfil", icon: User, path: "/gap/perfil" },
+  ]},
+];
+
 const roleSectionsMap: Record<string, NavSection[]> = {
   student: studentSections,
   professor: professorSections,
@@ -190,6 +214,7 @@ const roleSectionsMap: Record<string, NavSection[]> = {
   reitor: reitorSections,
   secretaria: secretariaSections,
   financas: financasSections,
+  gap: gapSections,
 };
 
 const roleLabelMap: Record<string, string> = {
@@ -200,9 +225,10 @@ const roleLabelMap: Record<string, string> = {
   reitor: "Reitor",
   secretaria: "Secretaria",
   financas: "Finanças",
+  gap: "GAP — Apoio ao Estudante",
 };
 
-const roleBasePaths = ["/student", "/professor", "/coordenador", "/decano", "/reitor", "/secretaria", "/financas"];
+const roleBasePaths = ["/student", "/professor", "/coordenador", "/decano", "/reitor", "/secretaria", "/financas", "/gap"];
 
 export default function AppSidebar() {
   const { user, logout } = useAuth();

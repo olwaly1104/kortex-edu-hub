@@ -148,7 +148,7 @@ export default function Login() {
               <span className="font-medium">reitor@upra.kor</span> (Reitor) · <span className="font-medium">academica@upra.kor</span> (Académica)
             </p>
             <p className="text-xs text-muted-foreground">
-              <span className="font-medium">financas@upra.kor</span> (Finanças)
+              <span className="font-medium">financas@upra.kor</span> (Finanças) · <span className="font-medium">gap@upra.kor</span> (GAP)
             </p>
           </div>
         </div>
