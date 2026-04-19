@@ -56,7 +56,7 @@ export default function GapAtendimentos() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-            <CalendarIcon className="w-6 h-6 text-primary" /> Atendimentos
+            <CalendarIcon className="w-6 h-6 text-primary" /> Agendamentos
           </h1>
           <p className="text-sm text-muted-foreground mt-0.5">
             Sessões de apoio agendadas e concluídas
@@ -64,10 +64,10 @@ export default function GapAtendimentos() {
         </div>
         <Dialog>
           <DialogTrigger asChild>
-            <Button size="sm" className="gap-1.5"><Plus className="w-4 h-4" /> Agendar Atendimento</Button>
+            <Button size="sm" className="gap-1.5"><Plus className="w-4 h-4" /> Novo Agendamento</Button>
           </DialogTrigger>
           <DialogContent>
-            <DialogHeader><DialogTitle>Agendar Atendimento</DialogTitle></DialogHeader>
+            <DialogHeader><DialogTitle>Novo Agendamento</DialogTitle></DialogHeader>
             <div className="space-y-3 py-2">
               <div className="space-y-2">
                 <Label>Estudante</Label>
@@ -136,7 +136,7 @@ export default function GapAtendimentos() {
       <div className="relative">
         <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
         <Input
-          placeholder="Pesquisar atendimentos..."
+          placeholder="Pesquisar agendamentos..."
           value={search}
           onChange={e => setSearch(e.target.value)}
           className="pl-9 h-9"
@@ -145,7 +145,7 @@ export default function GapAtendimentos() {
 
       <div className="space-y-2">
         {filtered.length === 0 ? (
-          <Card className="p-8 text-center"><p className="text-sm text-muted-foreground">Nenhum atendimento encontrado</p></Card>
+          <Card className="p-8 text-center"><p className="text-sm text-muted-foreground">Nenhum agendamento encontrado</p></Card>
         ) : (
           filtered.map(a => {
             const cat = categoriaConfig[a.categoria];
