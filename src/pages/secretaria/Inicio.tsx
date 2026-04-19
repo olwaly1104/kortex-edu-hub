@@ -190,7 +190,7 @@ export default function SecretariaInicio() {
               <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
                 <FileText className="w-5 h-5 text-primary" /> Pedidos Recentes
               </h2>
-              <Link to="/secretaria/apoio-estudante" className="text-sm text-primary hover:underline flex items-center gap-1">
+              <Link to="/secretaria/admissoes/candidaturas" className="text-sm text-primary hover:underline flex items-center gap-1">
                 Ver todos <ChevronRight className="w-4 h-4" />
               </Link>
             </div>
@@ -219,7 +219,6 @@ export default function SecretariaInicio() {
                 { label: "Gestão de Candidaturas", icon: ClipboardCheck, path: "/secretaria/admissoes/candidaturas", color: "bg-secondary/10 text-secondary" },
                 { label: "Provas de Acesso", icon: CalendarIcon, path: "/secretaria/admissoes/provas-de-acesso", color: "bg-emerald-100 text-emerald-600" },
                 { label: "Resultados", icon: BarChart3, path: "/secretaria/admissoes/resultados", color: "bg-amber-100 text-amber-600" },
-                { label: "Apoio ao Estudante", icon: Users, path: "/secretaria/apoio-estudante", color: "bg-orange-100 text-orange-600" },
               ].map(action => (
                 <Link key={action.path} to={action.path}>
                   <div className="flex items-center gap-2.5 px-3 py-2 rounded-lg border border-border hover:bg-muted/40 transition-colors cursor-pointer">
