@@ -183,17 +183,14 @@ const financasSections: NavSection[] = [
 
 const gapSections: NavSection[] = [
   { title: "Geral", items: [
-    { label: "Início", icon: LayoutDashboard, path: "/gap" },
     { label: "Calendário", icon: Calendar, path: "/gap/calendario" },
     { label: "Anúncios", icon: Megaphone, path: "/gap/anuncios", badge: 4 },
-    { label: "Solicitações", icon: CheckSquare, path: "/gap/solicitacoes" },
   ]},
   { title: "Apoio ao Estudante", items: [
-    { label: "Dashboard", icon: BarChart3, path: "/gap/dashboard" },
-    { label: "Tickets", icon: HelpCircle, path: "/gap/tickets" },
-    { label: "Atendimentos", icon: CalendarDays, path: "/gap/atendimentos" },
+    { label: "Dashboard", icon: BarChart3, path: "/gap" },
+    { label: "Solicitações", icon: HelpCircle, path: "/gap/solicitacoes" },
+    { label: "Agendamentos", icon: CalendarDays, path: "/gap/agendamentos" },
     { label: "Estudantes", icon: Users, path: "/gap/estudantes" },
-    { label: "Base de Conhecimento", icon: Library, path: "/gap/conhecimento" },
   ]},
   { title: "Comunicação", items: [
     { label: "Chat", icon: MessageSquare, path: "/gap/chat" },

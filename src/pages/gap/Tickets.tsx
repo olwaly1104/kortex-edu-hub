@@ -55,7 +55,7 @@ export default function GapTickets() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-            <HelpCircle className="w-6 h-6 text-primary" /> Tickets de Apoio
+            <HelpCircle className="w-6 h-6 text-primary" /> Solicitações
           </h1>
           <p className="text-sm text-muted-foreground mt-0.5">
             Gestão de pedidos de apoio dos estudantes
@@ -64,11 +64,11 @@ export default function GapTickets() {
         <Dialog>
           <DialogTrigger asChild>
             <Button size="sm" className="gap-1.5">
-              <Plus className="w-4 h-4" /> Novo Ticket
+              <Plus className="w-4 h-4" /> Nova Solicitação
             </Button>
           </DialogTrigger>
           <DialogContent>
-            <DialogHeader><DialogTitle>Criar Novo Ticket</DialogTitle></DialogHeader>
+            <DialogHeader><DialogTitle>Criar Nova Solicitação</DialogTitle></DialogHeader>
             <div className="space-y-3 py-2">
               <div className="space-y-2">
                 <Label>Estudante</Label>
@@ -109,7 +109,7 @@ export default function GapTickets() {
             </div>
             <DialogFooter>
               <DialogClose asChild><Button variant="outline">Cancelar</Button></DialogClose>
-              <DialogClose asChild><Button>Criar Ticket</Button></DialogClose>
+              <DialogClose asChild><Button>Criar Solicitação</Button></DialogClose>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -155,7 +155,7 @@ export default function GapTickets() {
       <div className="space-y-2">
         {filtered.length === 0 ? (
           <Card className="p-8 text-center">
-            <p className="text-sm text-muted-foreground">Nenhum ticket encontrado</p>
+            <p className="text-sm text-muted-foreground">Nenhuma solicitação encontrada</p>
           </Card>
         ) : (
           filtered.map(t => {
