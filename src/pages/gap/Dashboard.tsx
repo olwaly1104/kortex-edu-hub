@@ -12,10 +12,10 @@ import {
 
 export default function GapDashboard() {
   const kpis = [
-    { label: "Tickets Abertos", value: gapKpis.ticketsAbertos, icon: HelpCircle, color: "text-orange-600 bg-orange-100", trend: "+3 hoje" },
+    { label: "Solicitações Abertas", value: gapKpis.ticketsAbertos, icon: HelpCircle, color: "text-orange-600 bg-orange-100", trend: "+3 hoje" },
     { label: "Em Andamento", value: gapKpis.ticketsEmAndamento, icon: Clock, color: "text-blue-600 bg-blue-100", trend: "" },
-    { label: "Resolvidos (30d)", value: gapKpis.ticketsResolvidos30d, icon: CheckCircle, color: "text-emerald-600 bg-emerald-100", trend: "+12% vs mês ant." },
-    { label: "Atendimentos Hoje", value: gapKpis.atendimentosHoje, icon: CalendarIcon, color: "text-primary bg-primary/10", trend: "" },
+    { label: "Resolvidas (30d)", value: gapKpis.ticketsResolvidos30d, icon: CheckCircle, color: "text-emerald-600 bg-emerald-100", trend: "+12% vs mês ant." },
+    { label: "Agendamentos Hoje", value: gapKpis.atendimentosHoje, icon: CalendarIcon, color: "text-primary bg-primary/10", trend: "" },
     { label: "Estudantes Activos", value: gapKpis.estudantesAtivos, icon: Heart, color: "text-pink-600 bg-pink-100", trend: "" },
     { label: "Risco Alto", value: gapKpis.estudantesRiscoAlto, icon: AlertTriangle, color: "text-destructive bg-destructive/10", trend: "" },
     { label: "Tempo Médio Resp.", value: gapKpis.tempoMedioResposta, icon: TrendingUp, color: "text-amber-600 bg-amber-100", trend: "" },
@@ -47,7 +47,7 @@ export default function GapDashboard() {
           <BarChart3 className="w-6 h-6 text-primary" /> Dashboard GAP
         </h1>
         <p className="text-sm text-muted-foreground mt-0.5">
-          Visão analítica do Gabinete de Apoio ao Estudante
+          Gabinete de Apoio ao Estudante — visão analítica e operacional
         </p>
       </div>
 
@@ -91,9 +91,9 @@ export default function GapDashboard() {
           </div>
         </Card>
 
-        {/* Estado dos tickets */}
+        {/* Estado das solicitações */}
         <Card className="p-5">
-          <h2 className="text-base font-semibold text-foreground mb-4">Estado dos Tickets</h2>
+          <h2 className="text-base font-semibold text-foreground mb-4">Estado das Solicitações</h2>
           <div className="space-y-3">
             {ticketsByStatus.map(s => {
               const pct = totalTickets > 0 ? (s.count / totalTickets) * 100 : 0;
@@ -119,7 +119,7 @@ export default function GapDashboard() {
         {/* Próximos atendimentos */}
         <Card className="p-5 lg:col-span-2">
           <h2 className="text-base font-semibold text-foreground mb-4 flex items-center gap-2">
-            <CalendarIcon className="w-4 h-4 text-primary" /> Próximos Atendimentos
+            <CalendarIcon className="w-4 h-4 text-primary" /> Próximos Agendamentos
           </h2>
           <div className="space-y-2">
             {proximosAtendimentos.map(a => (
