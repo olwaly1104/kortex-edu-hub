@@ -1,15 +1,19 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { coordAgendaEvents, announcements } from "@/data/mockData";
 import { reitorSolicitacoes } from "@/data/institutionData";
-import { candidaturas } from "@/data/admissoesData";
+import {
+  gapTickets, gapAtendimentos, gapKpis,
+  ticketStatusConfig, categoriaConfig, prioridadeConfig,
+} from "@/data/gapData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   ChevronRight, Clock, CheckCircle, Play,
   Calendar as CalendarIcon, Megaphone, MapPin,
-  FileText, ArrowDownLeft, Users, Eye, XCircle,
-  ClipboardCheck, UserCheck, AlertCircle, BarChart3,
+  HelpCircle, ArrowDownLeft, Users, Eye, XCircle,
+  Heart, AlertCircle, BarChart3, Library, TrendingUp,
+  Smile, FileText,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -19,34 +23,28 @@ const typeStyles: Record<string, { bg: string; label: string }> = {
   geral: { bg: "bg-muted text-foreground", label: "Geral" },
 };
 
-const typeIcons: Record<string, React.ElementType> = {
-  nota: FileText, plano: FileText, horário: CalendarIcon, transferência: Users, recurso: AlertCircle,
+const solTypeIcons: Record<string, React.ElementType> = {
+  nota: HelpCircle, plano: HelpCircle, horário: CalendarIcon, transferência: Users, recurso: AlertCircle,
 };
-const typeLabels: Record<string, string> = {
+const solTypeLabels: Record<string, string> = {
   nota: "Nota", plano: "Plano", horário: "Horário", transferência: "Transferência",
   recurso: "Recurso", material: "Material", reunião: "Reunião",
 };
-const priorityStyles: Record<string, string> = {
+const solPriorityStyles: Record<string, string> = {
   alta: "bg-destructive/10 text-destructive",
   média: "bg-secondary/10 text-secondary",
   baixa: "bg-muted text-muted-foreground",
 };
 
-export default function SecretariaInicio() {
+export default function GapInicio() {
   const { user } = useAuth();
   const pendentes = reitorSolicitacoes.filter(s => s.status === "pendente" && s.direction === "recebida");
 
-  // KPIs
-  const total = candidaturas.length;
-  const aprovados = candidaturas.filter(c => c.estado === "aprovado").length;
-  const pendentesAdm = candidaturas.filter(c => c.estado === "pendente").length;
-  const incompletos = candidaturas.filter(c => c.estado === "incompleto").length;
-
   const stats = [
-    { icon: ClipboardCheck, label: "Total Candidaturas", value: total, color: "text-primary bg-primary/10" },
-    { icon: UserCheck, label: "Aprovados", value: aprovados, color: "text-emerald-600 bg-emerald-100" },
-    { icon: Clock, label: "Pendentes", value: pendentesAdm, color: "text-amber-600 bg-amber-100" },
-    { icon: AlertCircle, label: "Incompletos", value: incompletos, color: "text-orange-600 bg-orange-100" },
+    { icon: HelpCircle, label: "Tickets Abertos", value: gapKpis.ticketsAbertos, color: "text-orange-600 bg-orange-100" },
+    { icon: Clock, label: "Em Andamento", value: gapKpis.ticketsEmAndamento, color: "text-blue-600 bg-blue-100" },
+    { icon: CalendarIcon, label: "Atendimentos Hoje", value: gapKpis.atendimentosHoje, color: "text-primary bg-primary/10" },
+    { icon: Heart, label: "Estudantes Acompanhados", value: gapKpis.estudantesAtivos, color: "text-pink-600 bg-pink-100" },
   ];
 
   const TODAY_DATE = "2024-02-14";
@@ -66,28 +64,30 @@ export default function SecretariaInicio() {
     agendada: { label: "Agendada", icon: Clock, variant: "outline" },
   };
 
-  // Recent pedidos
-  const pedidosRecentes = [
-    { title: "Declaração de matrícula", student: "Ana Sousa", status: "Aberto", color: "bg-orange-100 text-orange-700" },
-    { title: "Pedido de equivalência", student: "Carlos Mendes", status: "Em Curso", color: "bg-primary/10 text-primary" },
-    { title: "Transferência de curso", student: "Pedro Lopes", status: "Aberto", color: "bg-orange-100 text-orange-700" },
-    { title: "Certidão de habilitações", student: "Maria João", status: "Resolvido", color: "bg-emerald-100 text-emerald-700" },
-  ];
+  const ticketsRecentes = [...gapTickets]
+    .filter(t => t.estado !== "resolvido")
+    .sort((a, b) => b.data.localeCompare(a.data))
+    .slice(0, 4);
+
+  const proxAtendimentos = gapAtendimentos
+    .filter(a => a.estado === "agendado")
+    .sort((a, b) => (a.data + a.hora).localeCompare(b.data + b.hora))
+    .slice(0, 3);
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       {/* Welcome */}
-      <div className="rounded-xl border border-border bg-gradient-to-r from-primary/5 to-transparent p-6">
+      <div className="rounded-xl border border-border bg-gradient-to-r from-pink-50 via-primary/5 to-transparent p-6">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-foreground">
               Bom dia, {user?.name?.split(" ").pop()} 👋
             </h1>
             <p className="text-muted-foreground mt-1 text-sm">
-              Área Académica — UPRA
+              GAP — Gabinete de Apoio ao Estudante · UPRA
             </p>
           </div>
-          <Link to="/secretaria/dashboard" className="text-sm text-primary hover:underline flex items-center gap-1">
+          <Link to="/gap/dashboard" className="text-sm text-primary hover:underline flex items-center gap-1">
             Ver Dashboard <ChevronRight className="w-4 h-4" />
           </Link>
         </div>
@@ -115,7 +115,7 @@ export default function SecretariaInicio() {
             <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
               <CalendarIcon className="w-5 h-5 text-primary" /> Agenda de Hoje
             </h2>
-            <Link to="/secretaria/calendario" className="text-sm text-primary hover:underline flex items-center gap-1">
+            <Link to="/gap/calendario" className="text-sm text-primary hover:underline flex items-center gap-1">
               Ver calendário <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
@@ -159,7 +159,7 @@ export default function SecretariaInicio() {
               <Megaphone className="w-5 h-5 text-secondary" /> Anúncios
               <Badge variant="outline" className="text-[10px] font-mono">{announcements.length}</Badge>
             </h2>
-            <Link to="/secretaria/anuncios" className="text-sm text-primary hover:underline flex items-center gap-1">
+            <Link to="/gap/anuncios" className="text-sm text-primary hover:underline flex items-center gap-1">
               Ver todos <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
@@ -182,43 +182,56 @@ export default function SecretariaInicio() {
         </Card>
       </div>
 
-      {/* Row 2: Pedidos Recentes + Acções Rápidas stacked left, Solicitações right */}
+      {/* Row 2: Tickets/Atendimentos + Acções Rápidas left, Solicitações right */}
       <div className="grid lg:grid-cols-5 gap-6">
         <div className="lg:col-span-3 space-y-4 flex flex-col">
           <Card className="p-5">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
-                <FileText className="w-5 h-5 text-primary" /> Pedidos Recentes
+                <HelpCircle className="w-5 h-5 text-primary" /> Tickets Recentes
               </h2>
-              <Link to="/secretaria/admissoes/candidaturas" className="text-sm text-primary hover:underline flex items-center gap-1">
+              <Link to="/gap/tickets" className="text-sm text-primary hover:underline flex items-center gap-1">
                 Ver todos <ChevronRight className="w-4 h-4" />
               </Link>
             </div>
             <div className="space-y-2">
-              {pedidosRecentes.map((p, i) => (
-                <div key={i} className="flex items-center gap-3 px-3 py-2.5 rounded-xl border border-border bg-card">
-                  <FileText className="w-4 h-4 text-muted-foreground shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-semibold text-foreground line-clamp-1">{p.title}</p>
-                    <p className="text-[10px] text-muted-foreground">{p.student}</p>
-                  </div>
-                  <Badge className={`${p.color} text-[10px] border-0`}>{p.status}</Badge>
-                </div>
-              ))}
+              {ticketsRecentes.map(t => {
+                const cat = categoriaConfig[t.categoria];
+                const st = ticketStatusConfig[t.estado];
+                const pr = prioridadeConfig[t.prioridade];
+                return (
+                  <Link key={t.id} to="/gap/tickets" className="block">
+                    <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl border border-border bg-card hover:bg-muted/40 transition-colors">
+                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                        <Users className="w-3.5 h-3.5 text-primary" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-semibold text-foreground line-clamp-1">{t.assunto}</p>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          <span className="text-[10px] text-muted-foreground">{t.estudante}</span>
+                          <Badge variant="outline" className={`text-[9px] ${cat.color}`}>{cat.label}</Badge>
+                        </div>
+                      </div>
+                      <Badge variant="outline" className={`text-[9px] ${pr.color} shrink-0`}>{pr.label}</Badge>
+                      <Badge variant="outline" className={`text-[9px] ${st.color} shrink-0`}>{st.label}</Badge>
+                    </div>
+                  </Link>
+                );
+              })}
             </div>
           </Card>
 
-          {/* Acções Rápidas */}
           <Card className="p-5 flex-1">
             <h2 className="text-base font-semibold text-foreground mb-3 flex items-center gap-2">
               <Play className="w-4 h-4 text-primary" /> Acções Rápidas
             </h2>
             <div className="flex flex-col gap-1.5">
               {[
-                { label: "Dashboard Académico", icon: BarChart3, path: "/secretaria/dashboard", color: "bg-primary/10 text-primary" },
-                { label: "Gestão de Candidaturas", icon: ClipboardCheck, path: "/secretaria/admissoes/candidaturas", color: "bg-secondary/10 text-secondary" },
-                { label: "Provas de Acesso", icon: CalendarIcon, path: "/secretaria/admissoes/provas-de-acesso", color: "bg-emerald-100 text-emerald-600" },
-                { label: "Resultados", icon: BarChart3, path: "/secretaria/admissoes/resultados", color: "bg-amber-100 text-amber-600" },
+                { label: "Dashboard de apoio", icon: BarChart3, path: "/gap/dashboard", color: "bg-primary/10 text-primary" },
+                { label: "Gerir tickets", icon: HelpCircle, path: "/gap/tickets", color: "bg-orange-100 text-orange-600" },
+                { label: "Agendar atendimento", icon: CalendarIcon, path: "/gap/atendimentos", color: "bg-emerald-100 text-emerald-600" },
+                { label: "Estudantes em seguimento", icon: Heart, path: "/gap/estudantes", color: "bg-pink-100 text-pink-600" },
+                { label: "Base de conhecimento", icon: Library, path: "/gap/conhecimento", color: "bg-purple-100 text-purple-600" },
               ].map(action => (
                 <Link key={action.path} to={action.path}>
                   <div className="flex items-center gap-2.5 px-3 py-2 rounded-lg border border-border hover:bg-muted/40 transition-colors cursor-pointer">
@@ -241,7 +254,7 @@ export default function SecretariaInicio() {
               <ArrowDownLeft className="w-5 h-5 text-secondary" /> Solicitações
               <Badge variant="outline" className="text-[10px] ml-1">{pendentes.length}</Badge>
             </h2>
-            <Link to="/secretaria/solicitacoes" className="text-sm text-primary hover:underline flex items-center gap-1">
+            <Link to="/gap/solicitacoes" className="text-sm text-primary hover:underline flex items-center gap-1">
               Ver todas <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
@@ -250,7 +263,7 @@ export default function SecretariaInicio() {
           ) : (
             <div className="space-y-2.5">
               {pendentes.slice(0, 3).map(sol => {
-                const Icon = typeIcons[sol.type] || FileText;
+                const Icon = solTypeIcons[sol.type] || FileText;
                 return (
                   <div key={sol.id} className="px-3.5 py-3 rounded-xl border border-border bg-card hover:bg-muted/40 transition-colors space-y-2">
                     <div className="flex items-center gap-2">
@@ -259,9 +272,9 @@ export default function SecretariaInicio() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-xs font-semibold text-foreground line-clamp-1">{sol.title}</p>
-                        <Badge variant="outline" className="text-[10px] mt-0.5">{typeLabels[sol.type] || sol.type}</Badge>
+                        <Badge variant="outline" className="text-[10px] mt-0.5">{solTypeLabels[sol.type] || sol.type}</Badge>
                       </div>
-                      <Badge className={`${priorityStyles[sol.priority]} text-[8px] px-1.5 py-0 shrink-0`}>{sol.priority}</Badge>
+                      <Badge className={`${solPriorityStyles[sol.priority]} text-[8px] px-1.5 py-0 shrink-0`}>{sol.priority}</Badge>
                     </div>
                     <p className="text-[11px] text-muted-foreground line-clamp-1">{sol.description}</p>
                     <div className="flex items-center gap-3 text-[10px]">
@@ -278,7 +291,7 @@ export default function SecretariaInicio() {
                       <Button variant="ghost" size="sm" className="h-6 px-2 rounded-md text-[10px] text-destructive hover:text-destructive hover:bg-destructive/10 gap-1">
                         <XCircle className="w-3 h-3" /> Rejeitar
                       </Button>
-                      <Link to="/secretaria/solicitacoes" className="text-[10px] text-primary hover:underline flex items-center gap-0.5">
+                      <Link to="/gap/solicitacoes" className="text-[10px] text-primary hover:underline flex items-center gap-0.5">
                         <Eye className="w-3 h-3" /> Ver detalhes
                       </Link>
                       <Button size="sm" className="h-6 px-2 rounded-md text-[10px] bg-accent hover:bg-accent/90 text-accent-foreground gap-1">

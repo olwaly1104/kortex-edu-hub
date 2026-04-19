@@ -109,7 +109,12 @@ import SecretariaSessaoDetail from "./pages/secretaria/SessaoProvaDetail";
 import SecretariaResultados from "./pages/secretaria/Resultados";
 import SecretariaAdmissoesDashboard from "./pages/secretaria/AdmissoesDashboard";
 import SecretariaSolicitacoes from "./pages/secretaria/Solicitacoes";
-import ApoioEstudante from "./pages/secretaria/ApoioEstudante";
+import GapInicio from "./pages/gap/Inicio";
+import GapDashboard from "./pages/gap/Dashboard";
+import GapTickets from "./pages/gap/Tickets";
+import GapAtendimentos from "./pages/gap/Atendimentos";
+import GapEstudantes from "./pages/gap/Estudantes";
+import GapConhecimento from "./pages/gap/Conhecimento";
 import FinancasDashboard from "./pages/financas/Dashboard";
 import FinancasInicio from "./pages/financas/Inicio";
 import FinancasReceitas from "./pages/financas/Receitas";
@@ -129,6 +134,7 @@ const homeRedirectMap: Record<string, string> = {
   reitor: "/reitor",
   secretaria: "/secretaria",
   financas: "/financas",
+  gap: "/gap",
 };
 
 function AppRoutes() {
@@ -260,7 +266,7 @@ function AppRoutes() {
         <Route path="/secretaria/admissoes/provas-de-acesso" element={<SecretariaConvocacoes />} />
         <Route path="/secretaria/admissoes/provas-de-acesso/:sessionId" element={<SecretariaSessaoDetail />} />
         <Route path="/secretaria/admissoes/resultados" element={<SecretariaResultados />} />
-        <Route path="/secretaria/apoio-estudante" element={<ApoioEstudante />} />
+        {/* Apoio ao estudante moved to GAP role */}
         <Route path="/secretaria/chat" element={<StudentChat />} />
         <Route path="/secretaria/email" element={<StudentEmail />} />
         <Route path="/secretaria/contactos" element={<StudentContacts />} />
@@ -281,6 +287,21 @@ function AppRoutes() {
         <Route path="/financas/contactos" element={<StudentContacts />} />
         <Route path="/financas/pessoal/financas" element={<FinancasPessoalFinancas />} />
         <Route path="/financas/perfil" element={<StudentProfile />} />
+        {/* GAP — Gabinete de Apoio Psicopedagógico */}
+        <Route path="/gap" element={<GapInicio />} />
+        <Route path="/gap/dashboard" element={<GapDashboard />} />
+        <Route path="/gap/tickets" element={<GapTickets />} />
+        <Route path="/gap/atendimentos" element={<GapAtendimentos />} />
+        <Route path="/gap/estudantes" element={<GapEstudantes />} />
+        <Route path="/gap/conhecimento" element={<GapConhecimento />} />
+        <Route path="/gap/solicitacoes" element={<GapTickets />} />
+        <Route path="/gap/calendario" element={<StudentCalendar />} />
+        <Route path="/gap/anuncios" element={<StudentAnnouncements />} />
+        <Route path="/gap/chat" element={<StudentChat />} />
+        <Route path="/gap/email" element={<StudentEmail />} />
+        <Route path="/gap/contactos" element={<StudentContacts />} />
+        <Route path="/gap/financas" element={<StudentFinances />} />
+        <Route path="/gap/perfil" element={<StudentProfile />} />
       </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>
