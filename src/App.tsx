@@ -109,10 +109,12 @@ import SecretariaSessaoDetail from "./pages/secretaria/SessaoProvaDetail";
 import SecretariaResultados from "./pages/secretaria/Resultados";
 import SecretariaAdmissoesDashboard from "./pages/secretaria/AdmissoesDashboard";
 import SecretariaSolicitacoes from "./pages/secretaria/Solicitacoes";
+import GapInicio from "./pages/gap/Inicio";
 import GapDashboard from "./pages/gap/Dashboard";
 import GapTickets from "./pages/gap/Tickets";
 import GapAtendimentos from "./pages/gap/Atendimentos";
 import GapEstudantes from "./pages/gap/Estudantes";
+import GapEstudanteProfile from "./pages/gap/EstudanteProfile";
 import FinancasDashboard from "./pages/financas/Dashboard";
 import FinancasInicio from "./pages/financas/Inicio";
 import FinancasReceitas from "./pages/financas/Receitas";
@@ -286,10 +288,12 @@ function AppRoutes() {
         <Route path="/financas/pessoal/financas" element={<FinancasPessoalFinancas />} />
         <Route path="/financas/perfil" element={<StudentProfile />} />
         {/* GAP — Gabinete de Apoio Psicopedagógico */}
-        <Route path="/gap" element={<GapDashboard />} />
+        <Route path="/gap" element={<GapInicio />} />
+        <Route path="/gap/dashboard" element={<GapDashboard />} />
         <Route path="/gap/solicitacoes" element={<GapTickets />} />
         <Route path="/gap/agendamentos" element={<GapAtendimentos />} />
         <Route path="/gap/estudantes" element={<GapEstudantes />} />
+        <Route path="/gap/estudantes/:matricula" element={<GapEstudanteProfile />} />
         <Route path="/gap/calendario" element={<StudentCalendar />} />
         <Route path="/gap/anuncios" element={<StudentAnnouncements />} />
         <Route path="/gap/chat" element={<StudentChat />} />
