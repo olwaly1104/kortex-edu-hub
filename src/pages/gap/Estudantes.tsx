@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -17,6 +17,7 @@ const riscoConfig = {
 };
 
 export default function GapEstudantes() {
+  const navigate = useNavigate();
   const [filter, setFilter] = useState<"todos" | "alto" | "medio" | "baixo">("todos");
   const [search, setSearch] = useState("");
   const [categoria, setCategoria] = useState<"todas" | TicketCategoria>("todas");
@@ -144,8 +145,7 @@ export default function GapEstudantes() {
               const Icon = r.icon;
               const cat = categoriaConfig[e.categoria];
               return (
-                <TableRow key={e.id} asChild className="cursor-pointer">
-                  <Link to={`/gap/estudantes/${e.matricula}`}>
+                <TableRow key={e.id} className="cursor-pointer" onClick={() => navigate(`/gap/estudantes/${e.matricula}`)}>
                     <TableCell>
                       <div>
                         <p className="text-sm font-semibold text-foreground">{e.nome}</p>
@@ -187,7 +187,6 @@ export default function GapEstudantes() {
                     <TableCell>
                       <ChevronRight className="w-4 h-4 text-muted-foreground" />
                     </TableCell>
-                  </Link>
                 </TableRow>
               );
             })}
