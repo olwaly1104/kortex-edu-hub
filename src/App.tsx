@@ -288,10 +288,12 @@ function AppRoutes() {
         <Route path="/financas/pessoal/financas" element={<FinancasPessoalFinancas />} />
         <Route path="/financas/perfil" element={<StudentProfile />} />
         {/* GAP — Gabinete de Apoio Psicopedagógico */}
-        <Route path="/gap" element={<GapDashboard />} />
+        <Route path="/gap" element={<GapInicio />} />
+        <Route path="/gap/dashboard" element={<GapDashboard />} />
         <Route path="/gap/solicitacoes" element={<GapTickets />} />
         <Route path="/gap/agendamentos" element={<GapAtendimentos />} />
         <Route path="/gap/estudantes" element={<GapEstudantes />} />
+        <Route path="/gap/estudantes/:matricula" element={<GapEstudanteProfile />} />
         <Route path="/gap/calendario" element={<StudentCalendar />} />
         <Route path="/gap/anuncios" element={<StudentAnnouncements />} />
         <Route path="/gap/chat" element={<StudentChat />} />
