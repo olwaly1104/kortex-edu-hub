@@ -247,22 +247,22 @@ export default function GapTickets() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b bg-muted/30">
-                <th className="text-left p-3 font-medium text-muted-foreground">ID</th>
+                <th className="text-left p-3 font-medium text-muted-foreground">ID Pedido</th>
                 <th className="text-left p-3 font-medium text-muted-foreground">Estudante</th>
-                <th className="text-center p-3 font-medium text-muted-foreground whitespace-nowrap">Data do pedido</th>
+                <th className="text-left p-3 font-medium text-muted-foreground">Faculdade</th>
+                <th className="text-left p-3 font-medium text-muted-foreground">Categoria</th>
                 <th className="text-left p-3 font-medium text-muted-foreground">Tipo de pedido</th>
+                <th className="text-center p-3 font-medium text-muted-foreground whitespace-nowrap">Data</th>
                 <th className="text-center p-3 font-medium text-muted-foreground">Destino</th>
-                <th className="text-center p-3 font-medium text-muted-foreground">Prioridade</th>
                 <th className="text-center p-3 font-medium text-muted-foreground">Estado</th>
               </tr>
             </thead>
             <tbody>
               {filtered.map(s => {
                 const st = estadoSolicitacaoConfig[s.estado];
-                const pr = prioridadeConfig[s.prioridade];
                 const dest = destinoConfig[s.destino];
                 const tipoLabel = tipoConfig[s.tipo]?.label ?? s.tipo;
-                const tipoCat = tipoConfig[s.tipo]?.categoria;
+                const tipoCat = tipoConfig[s.tipo]?.categoria ?? "—";
                 const d = new Date(s.dataSubmissao);
                 return (
                   <tr key={s.id}
@@ -273,15 +273,19 @@ export default function GapTickets() {
                       <p className="font-medium text-foreground leading-tight">{s.estudante}</p>
                       <p className="text-[11px] text-muted-foreground mt-0.5">{s.matricula} · {s.curso}</p>
                     </td>
+                    <td className="p-3">
+                      <p className="text-xs text-foreground leading-tight">{s.faculdade}</p>
+                    </td>
+                    <td className="p-3">
+                      <Badge variant="outline" className="text-[10px] bg-muted/40 text-foreground border-border font-normal">{tipoCat}</Badge>
+                    </td>
+                    <td className="p-3 max-w-xs">
+                      <p className="text-foreground text-xs font-medium leading-tight line-clamp-2">{tipoLabel}</p>
+                    </td>
                     <td className="p-3 text-center whitespace-nowrap">
                       <p className="text-xs font-medium text-foreground">{d.toLocaleDateString("pt-AO", { day: "2-digit", month: "short", year: "numeric" })}</p>
                     </td>
-                    <td className="p-3 max-w-sm">
-                      <p className="text-foreground text-xs font-medium leading-tight line-clamp-1">{tipoLabel}</p>
-                      {tipoCat && <p className="text-[10px] text-muted-foreground mt-0.5">{tipoCat}</p>}
-                    </td>
                     <td className="p-3 text-center"><Badge variant="outline" className={cn("text-[10px]", dest.color)}>{dest.label}</Badge></td>
-                    <td className="p-3 text-center"><Badge variant="outline" className={cn("text-[10px]", pr.color)}>{pr.label}</Badge></td>
                     <td className="p-3 text-center"><Badge variant="outline" className={cn("text-[10px]", st.color)}>{st.label}</Badge></td>
                   </tr>
                 );
