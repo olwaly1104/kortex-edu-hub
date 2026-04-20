@@ -19,7 +19,7 @@ import { cn } from "@/lib/utils";
 import {
   solicitacoes, Solicitacao, EstadoSolicitacao, Destino,
   estadoSolicitacaoConfig, prioridadeConfig, destinoConfig,
-  tipoConfig, getSlaStatus, slaStatusConfig,
+  tipoConfig,
 } from "@/data/gapData";
 
 const MESES = [
@@ -44,10 +44,6 @@ export default function GapTickets() {
     rejeitada: solicitacoes.filter(t => t.estado === "rejeitada").length,
   }), []);
 
-  const slaEmRisco = useMemo(() => solicitacoes.filter(s => {
-    const st = getSlaStatus(s);
-    return st === "em_risco" || st === "atrasado";
-  }).length, []);
 
   const categoriasDisponiveis = useMemo(() => {
     const set = new Set<string>();
@@ -121,13 +117,12 @@ export default function GapTickets() {
       </div>
 
       {/* KPIs */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           { label: "Total", value: counts.todos, icon: Inbox, color: "bg-primary/10 text-primary" },
           { label: "Recebidas", value: counts.recebida, icon: AlertCircle, color: "bg-orange-100 text-orange-700" },
           { label: "Em Execução", value: counts.em_execucao, icon: Clock, color: "bg-amber-100 text-amber-700" },
           { label: "Concluídas", value: counts.concluida, icon: CheckCircle2, color: "bg-emerald-100 text-emerald-700" },
-          { label: "SLA em Risco", value: slaEmRisco, icon: AlertTriangle, color: "bg-destructive/10 text-destructive" },
         ].map(k => (
           <Card key={k.label} className="p-4">
             <div className="flex items-center gap-2 mb-3">
@@ -305,16 +300,14 @@ export default function GapTickets() {
             const pr = prioridadeConfig[selected.prioridade];
             const dest = destinoConfig[selected.destino];
             const tipoCfg = tipoConfig[selected.tipo];
-            const sla = getSlaStatus(selected);
-            const slaCfg = slaStatusConfig[sla];
             return (
               <>
                 <DialogHeader>
-                  <div className="flex items-center gap-2 mb-1">
+                  <div className="flex items-center gap-2 mb-1 flex-wrap">
                     <span className="text-xs font-mono text-muted-foreground">{selected.id}</span>
                     <Badge variant="outline" className={cn("text-[10px]", dest.color)}>{dest.label}</Badge>
                     <Badge variant="outline" className={cn("text-[10px]", st.color)}>{st.label}</Badge>
-                    <Badge variant="outline" className={cn("text-[10px]", slaCfg.color)}>SLA · {slaCfg.label}</Badge>
+                    <Badge variant="outline" className={cn("text-[10px]", pr.color)}>Prioridade: {pr.label}</Badge>
                   </div>
                   <DialogTitle className="text-lg leading-tight">{selected.assunto}</DialogTitle>
                   <p className="text-xs text-muted-foreground mt-1">{tipoCfg?.label ?? selected.tipo}{tipoCfg && <> · <span className="text-muted-foreground/80">{tipoCfg.categoria}</span></>}</p>
@@ -341,7 +334,7 @@ export default function GapTickets() {
                 </div>
 
                 {/* Encaminhamento */}
-                <div className="grid grid-cols-2 gap-3 text-xs">
+                <div className="grid grid-cols-3 gap-3 text-xs">
                   <div className="rounded-lg border border-border p-3">
                     <p className="text-muted-foreground mb-0.5">Destino</p>
                     <p className="font-medium text-foreground">{dest.label}</p>
@@ -351,15 +344,9 @@ export default function GapTickets() {
                     <p className="font-medium text-foreground">{selected.responsavelDestino ?? "— a atribuir —"}</p>
                   </div>
                   <div className="rounded-lg border border-border p-3">
-                    <p className="text-muted-foreground mb-0.5">Submetida em</p>
+                    <p className="text-muted-foreground mb-0.5">Data do pedido</p>
                     <p className="font-medium text-foreground">
                       {new Date(selected.dataSubmissao).toLocaleDateString("pt-AO", { day: "2-digit", month: "long", year: "numeric" })}
-                    </p>
-                  </div>
-                  <div className="rounded-lg border border-border p-3">
-                    <p className="text-muted-foreground mb-0.5">Prazo (SLA)</p>
-                    <p className="font-medium text-foreground flex items-center gap-1.5">
-                      {selected.slaDias} dias <Badge variant="outline" className={cn("text-[10px]", slaCfg.color)}>{slaCfg.label}</Badge>
                     </p>
                   </div>
                 </div>
