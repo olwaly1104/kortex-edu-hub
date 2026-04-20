@@ -20,7 +20,7 @@ export type Prioridade = "alta" | "media" | "baixa";
 export type TipoSolicitacao = string;
 
 // Categorias macro: alinhadas com a área funcional do pedido (não com o departamento).
-export type Categoria = "Tecnológico" | "Académico" | "Financeiro" | "Pedagógico";
+export type Categoria = "Tecnológico" | "Académico" | "Financeiro";
 
 export const tipoConfig: Record<string, { label: string; categoria: Categoria; destino: Destino; slaDias: number }> = {
   // ── CTI (Tecnológico) ────────────────────────────────────────────────────
