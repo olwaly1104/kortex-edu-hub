@@ -136,7 +136,7 @@ const CTI_SARA  = "Téc. Sara Domingos · CTI";
 export const solicitacoes: Solicitacao[] = [
   {
     id: "SOL-2025-0142",
-    estudante: "Ana Luísa Ferreira", matricula: "2024001", curso: "Eng. Informática", ano: 2,
+    estudante: "Ana Luísa Ferreira", matricula: "2024001", curso: "Eng. Informática", faculdade: "Faculdade de Engenharia", ano: 2,
     tipo: "actualizacao_dados_portal",
     assunto: "Não consigo entrar no Portal — credenciais inválidas",
     descricao: "Após mudança de palavra-passe deixei de aceder. O sistema rejeita as novas credenciais.",
@@ -151,7 +151,7 @@ export const solicitacoes: Solicitacao[] = [
   },
   {
     id: "SOL-2025-0141",
-    estudante: "Carlos Mendes", matricula: "2024015", curso: "Direito", ano: 1,
+    estudante: "Carlos Mendes", matricula: "2024015", curso: "Direito", faculdade: "Faculdade de Direito", ano: 1,
     tipo: "actualizacao_dados_email",
     assunto: "Email institucional não recebe mensagens externas",
     descricao: "Mensagens enviadas de Gmail não chegam à minha caixa @upra.kor.",
@@ -165,7 +165,7 @@ export const solicitacoes: Solicitacao[] = [
   },
   {
     id: "SOL-2025-0140",
-    estudante: "Maria João Santos", matricula: "2023042", curso: "Medicina", ano: 3,
+    estudante: "Maria João Santos", matricula: "2023042", curso: "Medicina", faculdade: "Faculdade de Medicina", ano: 3,
     tipo: "actualizacao_dados_canal",
     assunto: "Canal de Estudante não regista os meus pedidos",
     descricao: "Ao submeter um pedido o sistema mostra erro e não devolve número de protocolo.",
@@ -181,7 +181,7 @@ export const solicitacoes: Solicitacao[] = [
   },
   {
     id: "SOL-2025-0139",
-    estudante: "Pedro Almeida", matricula: "2024033", curso: "Economia", ano: 2,
+    estudante: "Pedro Almeida", matricula: "2024033", curso: "Economia", faculdade: "Faculdade de Economia", ano: 2,
     tipo: "actualizacao_calculo_medias",
     assunto: "Média do 1º semestre incorrecta no portal",
     descricao: "A média apresentada no portal não corresponde ao boletim de notas oficial.",
@@ -197,7 +197,7 @@ export const solicitacoes: Solicitacao[] = [
   },
   {
     id: "SOL-2025-0138",
-    estudante: "Sofia Bernardo", matricula: "2023018", curso: "Eng. Civil", ano: 4,
+    estudante: "Sofia Bernardo", matricula: "2023018", curso: "Eng. Civil", faculdade: "Faculdade de Engenharia", ano: 4,
     tipo: "segunda_via_cartao",
     assunto: "Pedido de 2ª via — cartão extraviado",
     descricao: "Perdi o cartão de estudante no transporte público. Necessito de 2ª via.",
@@ -214,7 +214,7 @@ export const solicitacoes: Solicitacao[] = [
   },
   {
     id: "SOL-2025-0137",
-    estudante: "João Baptista", matricula: "2024050", curso: "Gestão", ano: 1,
+    estudante: "João Baptista", matricula: "2024050", curso: "Gestão", faculdade: "Faculdade de Economia", ano: 1,
     tipo: "falha_cartao",
     assunto: "Cartão não funciona nos torniquetes",
     descricao: "Desde sexta-feira o cartão é rejeitado em todas as entradas.",
@@ -230,7 +230,7 @@ export const solicitacoes: Solicitacao[] = [
   },
   {
     id: "SOL-2025-0136",
-    estudante: "Beatriz Lopes", matricula: "2023089", curso: "Psicologia", ano: 3,
+    estudante: "Beatriz Lopes", matricula: "2023089", curso: "Psicologia", faculdade: "Faculdade de Ciências Sociais", ano: 3,
     tipo: "anulacao_cartao",
     assunto: "Anulação de cartão por suspeita de uso indevido",
     descricao: "Suspeito que o meu cartão foi clonado. Solicito anulação imediata.",
@@ -246,7 +246,7 @@ export const solicitacoes: Solicitacao[] = [
   },
   {
     id: "SOL-2025-0135",
-    estudante: "Tiago Mateus", matricula: "2024077", curso: "Arquitectura", ano: 2,
+    estudante: "Tiago Mateus", matricula: "2024077", curso: "Arquitectura", faculdade: "Faculdade de Ciências Exatas", ano: 2,
     tipo: "segunda_via_cartao",
     assunto: "Pedido de 2ª via — cartão danificado",
     descricao: "O cartão partiu-se e deixou de ser lido. Solicito substituição.",
@@ -260,7 +260,7 @@ export const solicitacoes: Solicitacao[] = [
   },
   {
     id: "SOL-2025-0134",
-    estudante: "Helena Costa", matricula: "2024088", curso: "Enfermagem", ano: 1,
+    estudante: "Helena Costa", matricula: "2024088", curso: "Enfermagem", faculdade: "Faculdade de Medicina", ano: 1,
     tipo: "actualizacao_dados_portal",
     assunto: "Actualização de número de telefone no Portal",
     descricao: "Mudei de operador e o portal não me deixa actualizar o contacto.",
@@ -274,7 +274,7 @@ export const solicitacoes: Solicitacao[] = [
   },
   {
     id: "SOL-2025-0133",
-    estudante: "Rui Vasconcelos", matricula: "2023105", curso: "Eng. Informática", ano: 3,
+    estudante: "Rui Vasconcelos", matricula: "2023105", curso: "Eng. Informática", faculdade: "Faculdade de Engenharia", ano: 3,
     tipo: "actualizacao_dados_email",
     assunto: "Reset de palavra-passe do email institucional",
     descricao: "Esqueci a palavra-passe e a recuperação não envia o código.",
@@ -288,7 +288,7 @@ export const solicitacoes: Solicitacao[] = [
   },
   {
     id: "SOL-2025-0132",
-    estudante: "Lucas Marques", matricula: "2024112", curso: "Direito", ano: 1,
+    estudante: "Lucas Marques", matricula: "2024112", curso: "Direito", faculdade: "Faculdade de Direito", ano: 1,
     tipo: "actualizacao_dados_canal",
     assunto: "Não consigo aceder ao Canal de Estudante",
     descricao: "O Canal mostra ‘perfil não autorizado’ desde a inscrição.",
@@ -302,7 +302,7 @@ export const solicitacoes: Solicitacao[] = [
   },
   {
     id: "SOL-2025-0131",
-    estudante: "Inês Cardoso", matricula: "2023060", curso: "Economia", ano: 3,
+    estudante: "Inês Cardoso", matricula: "2023060", curso: "Economia", faculdade: "Faculdade de Economia", ano: 3,
     tipo: "actualizacao_calculo_medias",
     assunto: "Cadeira em falta no cálculo da média ponderada",
     descricao: "A cadeira de Estatística II não consta no cálculo da minha média do ano.",
@@ -317,7 +317,7 @@ export const solicitacoes: Solicitacao[] = [
   },
   {
     id: "SOL-2025-0130",
-    estudante: "Filipe Soares", matricula: "2024090", curso: "Gestão", ano: 1,
+    estudante: "Filipe Soares", matricula: "2024090", curso: "Gestão", faculdade: "Faculdade de Economia", ano: 1,
     tipo: "falha_cartao",
     assunto: "Cartão lê mas não autoriza acesso à biblioteca",
     descricao: "Os torniquetes da biblioteca recusam o cartão; nas entradas principais funciona.",
@@ -332,7 +332,7 @@ export const solicitacoes: Solicitacao[] = [
   },
   {
     id: "SOL-2025-0129",
-    estudante: "Marta Pires", matricula: "2023072", curso: "Medicina", ano: 4,
+    estudante: "Marta Pires", matricula: "2023072", curso: "Medicina", faculdade: "Faculdade de Medicina", ano: 4,
     tipo: "anulacao_cartao",
     assunto: "Anulação por término de matrícula",
     descricao: "Concluí o curso e quero anular o cartão activo.",
@@ -407,12 +407,12 @@ export const gapAtendimentos: GapAtendimento[] = [
 ];
 
 export const gapEstudantesSeguimento: GapEstudanteSeguimento[] = [
-  { id: "S-001", nome: "Ana Luísa Ferreira", matricula: "2024001", curso: "Eng. Informática", ano: 2, risco: "alto", acompanhamentos: 4, ultimoContacto: "2025-12-14", responsavel: "Dra. Helena Cabral", motivo: "Ansiedade académica" },
-  { id: "S-002", nome: "Carlos Mendes", matricula: "2024015", curso: "Direito", ano: 1, risco: "medio", acompanhamentos: 2, ultimoContacto: "2025-12-13", responsavel: "Dr. João Tavares", motivo: "Adaptação ao curso" },
-  { id: "S-003", nome: "Pedro Almeida", matricula: "2024033", curso: "Economia", ano: 2, risco: "medio", acompanhamentos: 3, ultimoContacto: "2025-12-13", responsavel: "Dr. João Tavares", motivo: "Orientação vocacional" },
-  { id: "S-004", nome: "Maria João Santos", matricula: "2023042", curso: "Medicina", ano: 3, risco: "baixo", acompanhamentos: 1, ultimoContacto: "2025-12-13", responsavel: "Dra. Helena Cabral", motivo: "Apoio financeiro" },
-  { id: "S-005", nome: "Beatriz Lopes", matricula: "2023089", curso: "Psicologia", ano: 3, risco: "baixo", acompanhamentos: 2, ultimoContacto: "2025-12-13", responsavel: "Dra. Helena Cabral", motivo: "Estágio curricular" },
-  { id: "S-006", nome: "João Baptista", matricula: "2024050", curso: "Gestão", ano: 1, risco: "medio", acompanhamentos: 1, ultimoContacto: "2025-12-14", responsavel: "Dr. João Tavares", motivo: "Conflito grupo" },
+  { id: "S-001", nome: "Ana Luísa Ferreira", matricula: "2024001", curso: "Eng. Informática", faculdade: "Faculdade de Engenharia", ano: 2, risco: "alto", acompanhamentos: 4, ultimoContacto: "2025-12-14", responsavel: "Dra. Helena Cabral", motivo: "Ansiedade académica" },
+  { id: "S-002", nome: "Carlos Mendes", matricula: "2024015", curso: "Direito", faculdade: "Faculdade de Direito", ano: 1, risco: "medio", acompanhamentos: 2, ultimoContacto: "2025-12-13", responsavel: "Dr. João Tavares", motivo: "Adaptação ao curso" },
+  { id: "S-003", nome: "Pedro Almeida", matricula: "2024033", curso: "Economia", faculdade: "Faculdade de Economia", ano: 2, risco: "medio", acompanhamentos: 3, ultimoContacto: "2025-12-13", responsavel: "Dr. João Tavares", motivo: "Orientação vocacional" },
+  { id: "S-004", nome: "Maria João Santos", matricula: "2023042", curso: "Medicina", faculdade: "Faculdade de Medicina", ano: 3, risco: "baixo", acompanhamentos: 1, ultimoContacto: "2025-12-13", responsavel: "Dra. Helena Cabral", motivo: "Apoio financeiro" },
+  { id: "S-005", nome: "Beatriz Lopes", matricula: "2023089", curso: "Psicologia", faculdade: "Faculdade de Ciências Sociais", ano: 3, risco: "baixo", acompanhamentos: 2, ultimoContacto: "2025-12-13", responsavel: "Dra. Helena Cabral", motivo: "Estágio curricular" },
+  { id: "S-006", nome: "João Baptista", matricula: "2024050", curso: "Gestão", faculdade: "Faculdade de Economia", ano: 1, risco: "medio", acompanhamentos: 1, ultimoContacto: "2025-12-14", responsavel: "Dr. João Tavares", motivo: "Conflito grupo" },
 ];
 
 // ─── KPIs ───────────────────────────────────────────────────────────────────
