@@ -17,9 +17,9 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
-  solicitacoes, Solicitacao, EstadoSolicitacao, Destino,
+  solicitacoes, Solicitacao, EstadoSolicitacao, Destino, Categoria,
   estadoSolicitacaoConfig, prioridadeConfig, destinoConfig,
-  tipoConfig,
+  tipoConfig, categoriaConfig,
 } from "@/data/gapData";
 
 const MESES = [
@@ -105,72 +105,96 @@ export default function GapTickets() {
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       {/* Header */}
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex items-end justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-            <HelpCircle className="w-6 h-6 text-primary" /> Solicitações
-          </h1>
-          <p className="text-sm text-muted-foreground mt-0.5 max-w-2xl">
-            Submetidas pelo estudante no Portal e encaminhadas automaticamente ao departamento responsável. O GAP acompanha a execução.
+          <h1 className="text-2xl font-bold text-foreground tracking-tight">Solicitações</h1>
+          <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
+            Pedidos submetidos pelos estudantes no Portal e encaminhados automaticamente ao departamento responsável. O GAP acompanha a execução.
           </p>
+        </div>
+        <div className="text-xs text-muted-foreground">
+          <span className="font-medium text-foreground">{filtered.length}</span> de {counts.todos} pedidos
         </div>
       </div>
 
       {/* KPIs */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {[
-          { label: "Total", value: counts.todos, icon: Inbox, color: "bg-primary/10 text-primary" },
-          { label: "Recebidas", value: counts.recebida, icon: AlertCircle, color: "bg-orange-100 text-orange-700" },
-          { label: "Em Execução", value: counts.em_execucao, icon: Clock, color: "bg-amber-100 text-amber-700" },
-          { label: "Concluídas", value: counts.concluida, icon: CheckCircle2, color: "bg-emerald-100 text-emerald-700" },
+          { label: "Total", value: counts.todos, icon: Inbox, tone: "text-foreground", iconBg: "bg-muted text-muted-foreground" },
+          { label: "Recebidas", value: counts.recebida, icon: AlertCircle, tone: "text-foreground", iconBg: "bg-orange-50 text-orange-600" },
+          { label: "Em Execução", value: counts.em_execucao, icon: Clock, tone: "text-foreground", iconBg: "bg-amber-50 text-amber-600" },
+          { label: "Concluídas", value: counts.concluida, icon: CheckCircle2, tone: "text-foreground", iconBg: "bg-emerald-50 text-emerald-600" },
         ].map(k => (
-          <Card key={k.label} className="p-4">
-            <div className="flex items-center gap-2 mb-3">
-              <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center", k.color)}>
+          <Card key={k.label} className="p-4 hover:shadow-sm transition-shadow">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">{k.label}</p>
+                <p className={cn("text-2xl font-bold mt-1", k.tone)}>{k.value}</p>
+              </div>
+              <div className={cn("w-9 h-9 rounded-lg flex items-center justify-center", k.iconBg)}>
                 <k.icon className="w-4 h-4" />
               </div>
-              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{k.label}</span>
             </div>
-            <p className="text-2xl font-bold text-foreground">{k.value}</p>
           </Card>
         ))}
       </div>
 
       {/* Control box */}
-      <div className="rounded-xl border border-border bg-card p-4 space-y-3">
-        <div className="flex flex-wrap gap-2">
-          {estadoTabs.map(t => (
-            <Button
-              key={t.key} size="sm"
-              variant={estado === t.key ? "default" : "outline"}
-              onClick={() => setEstado(t.key)}
-              className="text-xs gap-1.5"
-            >
-              <t.icon className="w-3.5 h-3.5" />
-              {t.label}
-              <Badge variant="outline" className={cn("ml-1 text-[10px] h-4 px-1.5", estado === t.key && "bg-primary-foreground/20 border-primary-foreground/30 text-primary-foreground")}>
-                {counts[t.key]}
-              </Badge>
-            </Button>
-          ))}
+      <div className="rounded-xl border border-border bg-card overflow-hidden">
+        {/* State tabs */}
+        <div className="flex flex-wrap gap-1 p-2 bg-muted/30 border-b border-border">
+          {estadoTabs.map(t => {
+            const active = estado === t.key;
+            return (
+              <button
+                key={t.key}
+                onClick={() => setEstado(t.key)}
+                className={cn(
+                  "inline-flex items-center gap-1.5 px-3 h-8 rounded-md text-xs font-medium transition-all",
+                  active
+                    ? "bg-card text-foreground shadow-sm border border-border"
+                    : "text-muted-foreground hover:text-foreground hover:bg-card/60"
+                )}
+              >
+                <t.icon className="w-3.5 h-3.5" />
+                {t.label}
+                <span className={cn(
+                  "ml-1 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded text-[10px] font-semibold tabular-nums",
+                  active ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
+                )}>
+                  {counts[t.key]}
+                </span>
+              </button>
+            );
+          })}
         </div>
 
-        <div className="border-t border-border" />
-
-        <div className="flex flex-wrap gap-2 items-center">
-          <div className="relative flex-1 min-w-[220px] max-w-sm">
+        {/* Filters row */}
+        <div className="flex flex-wrap gap-2 items-center p-3">
+          <div className="relative flex-1 min-w-[240px] max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               placeholder="Pesquisar por estudante, tipo, matrícula, ID..."
               value={search} onChange={e => setSearch(e.target.value)}
-              className="pl-9 h-9"
+              className="pl-9 h-9 text-sm"
             />
           </div>
           <div className="flex-1" />
 
+          <Select value={categoria} onValueChange={setCategoria}>
+            <SelectTrigger className={cn("w-[160px] h-9 text-xs", isActive.categoria && "border-primary/50 bg-primary/5 text-primary")}>
+              <Layers className="w-3.5 h-3.5 mr-1.5 shrink-0" />
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todas">Todas as categorias</SelectItem>
+              {categoriasDisponiveis.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+            </SelectContent>
+          </Select>
+
           <Select value={destino} onValueChange={v => setDestino(v as Destino | "todos")}>
-            <SelectTrigger className={cn("w-40 h-9 text-xs", isActive.destino && "border-primary/50 bg-primary/5 text-primary")}>
-              <Building2 className="w-3.5 h-3.5 mr-1.5" />
+            <SelectTrigger className={cn("w-[150px] h-9 text-xs", isActive.destino && "border-primary/50 bg-primary/5 text-primary")}>
+              <Building2 className="w-3.5 h-3.5 mr-1.5 shrink-0" />
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -181,20 +205,9 @@ export default function GapTickets() {
             </SelectContent>
           </Select>
 
-          <Select value={categoria} onValueChange={setCategoria}>
-            <SelectTrigger className={cn("w-44 h-9 text-xs", isActive.categoria && "border-primary/50 bg-primary/5 text-primary")}>
-              <Layers className="w-3.5 h-3.5 mr-1.5" />
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="todas">Todas as categorias</SelectItem>
-              {categoriasDisponiveis.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-            </SelectContent>
-          </Select>
-
           <Select value={mes} onValueChange={setMes}>
-            <SelectTrigger className={cn("w-36 h-9 text-xs", isActive.mes && "border-primary/50 bg-primary/5 text-primary")}>
-              <CalendarIcon className="w-3.5 h-3.5 mr-1.5" />
+            <SelectTrigger className={cn("w-[140px] h-9 text-xs", isActive.mes && "border-primary/50 bg-primary/5 text-primary")}>
+              <CalendarIcon className="w-3.5 h-3.5 mr-1.5 shrink-0" />
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -204,27 +217,28 @@ export default function GapTickets() {
           </Select>
 
           {hasActiveControls && (
-            <Button variant="ghost" size="sm" className="text-xs text-destructive hover:text-destructive hover:bg-destructive/10 gap-1" onClick={resetAll}>
-              <X className="w-3 h-3" /> Limpar
+            <Button variant="ghost" size="sm" className="h-9 text-xs text-muted-foreground hover:text-destructive gap-1" onClick={resetAll}>
+              <X className="w-3.5 h-3.5" /> Limpar
             </Button>
           )}
         </div>
 
+        {/* Active filter chips */}
         {hasActiveControls && (
-          <div className="flex flex-wrap gap-1.5 pt-1">
+          <div className="flex flex-wrap gap-1.5 px-3 pb-3 -mt-1">
             {isActive.estado && (
               <Badge variant="outline" className="text-[10px] gap-1 bg-primary/5 text-primary border-primary/20 cursor-pointer hover:bg-primary/10" onClick={() => setEstado("todos")}>
                 Estado: {estadoSolicitacaoConfig[estado as EstadoSolicitacao].label} <X className="w-2.5 h-2.5" />
               </Badge>
             )}
-            {isActive.destino && (
-              <Badge variant="outline" className="text-[10px] gap-1 bg-primary/5 text-primary border-primary/20 cursor-pointer hover:bg-primary/10" onClick={() => setDestino("todos")}>
-                Destino: {destinoConfig[destino as Destino].label} <X className="w-2.5 h-2.5" />
-              </Badge>
-            )}
             {isActive.categoria && (
               <Badge variant="outline" className="text-[10px] gap-1 bg-primary/5 text-primary border-primary/20 cursor-pointer hover:bg-primary/10" onClick={() => setCategoria("todas")}>
                 Categoria: {categoria} <X className="w-2.5 h-2.5" />
+              </Badge>
+            )}
+            {isActive.destino && (
+              <Badge variant="outline" className="text-[10px] gap-1 bg-primary/5 text-primary border-primary/20 cursor-pointer hover:bg-primary/10" onClick={() => setDestino("todos")}>
+                Destino: {destinoConfig[destino as Destino].label} <X className="w-2.5 h-2.5" />
               </Badge>
             )}
             {isActive.mes && (
@@ -233,7 +247,7 @@ export default function GapTickets() {
               </Badge>
             )}
             {isActive.search && (
-              <Badge variant="outline" className="text-[10px] gap-1 bg-secondary/10 text-secondary border-secondary/20 cursor-pointer hover:bg-secondary/15" onClick={() => setSearch("")}>
+              <Badge variant="outline" className="text-[10px] gap-1 bg-muted text-foreground border-border cursor-pointer hover:bg-muted/70" onClick={() => setSearch("")}>
                 Pesquisa: "{search}" <X className="w-2.5 h-2.5" />
               </Badge>
             )}
@@ -277,7 +291,9 @@ export default function GapTickets() {
                       <p className="text-xs text-foreground leading-tight">{s.faculdade}</p>
                     </td>
                     <td className="p-3">
-                      <Badge variant="outline" className="text-[10px] bg-muted/40 text-foreground border-border font-normal">{tipoCat}</Badge>
+                      {tipoCat !== "—" ? (
+                        <Badge variant="outline" className={cn("text-[10px] font-medium", categoriaConfig[tipoCat as Categoria]?.color)}>{tipoCat}</Badge>
+                      ) : <span className="text-xs text-muted-foreground">—</span>}
                     </td>
                     <td className="p-3 max-w-xs">
                       <p className="text-foreground text-xs font-medium leading-tight line-clamp-2">{tipoLabel}</p>
