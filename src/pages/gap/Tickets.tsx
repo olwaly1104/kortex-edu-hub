@@ -17,9 +17,9 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
-  solicitacoes, Solicitacao, EstadoSolicitacao, Destino,
+  solicitacoes, Solicitacao, EstadoSolicitacao, Destino, Categoria,
   estadoSolicitacaoConfig, prioridadeConfig, destinoConfig,
-  tipoConfig,
+  tipoConfig, categoriaConfig,
 } from "@/data/gapData";
 
 const MESES = [
