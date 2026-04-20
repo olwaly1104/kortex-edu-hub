@@ -64,20 +64,19 @@ export const tipoConfig: Record<string, { label: string; categoria: Categoria; d
   pendencias_financeiras:      { label: "Levantamento de pendências financeiras", categoria: "Financeiro", destino: "Financeiro", slaDias: 5 },
   acordo_financeiro:           { label: "Mediação de acordo financeiro / termo de responsabilidade", categoria: "Financeiro", destino: "Financeiro", slaDias: 7 },
 
-  // ── Faculdades (Pedagógico) ──────────────────────────────────────────────
-  falta_lancamento_notas:      { label: "Falta de lançamento de notas (P1/P2/Final/Recurso)", categoria: "Pedagógico", destino: "Faculdade", slaDias: 5 },
-  falta_lancamento_prescrito:  { label: "Falta de lançamento de notas — prescritos", categoria: "Pedagógico", destino: "Faculdade", slaDias: 5 },
-  rectificacao_notas:          { label: "Rectificação de notas lançadas com valor errado", categoria: "Pedagógico", destino: "Faculdade", slaDias: 7 },
-  melhoria_notas:              { label: "Pedido de melhoria de notas", categoria: "Pedagógico", destino: "Faculdade", slaDias: 10 },
-  revisao_notas:               { label: "Pedido de revisão de notas", categoria: "Pedagógico", destino: "Faculdade", slaDias: 10 },
-  justificacao_faltas:         { label: "Pedido de justificação de faltas", categoria: "Pedagógico", destino: "Faculdade", slaDias: 5 },
+  // ── Faculdades (Académico) ───────────────────────────────────────────────
+  falta_lancamento_notas:      { label: "Falta de lançamento de notas (P1/P2/Final/Recurso)", categoria: "Académico", destino: "Faculdade", slaDias: 5 },
+  falta_lancamento_prescrito:  { label: "Falta de lançamento de notas — prescritos", categoria: "Académico", destino: "Faculdade", slaDias: 5 },
+  rectificacao_notas:          { label: "Rectificação de notas lançadas com valor errado", categoria: "Académico", destino: "Faculdade", slaDias: 7 },
+  melhoria_notas:              { label: "Pedido de melhoria de notas", categoria: "Académico", destino: "Faculdade", slaDias: 10 },
+  revisao_notas:               { label: "Pedido de revisão de notas", categoria: "Académico", destino: "Faculdade", slaDias: 10 },
+  justificacao_faltas:         { label: "Pedido de justificação de faltas", categoria: "Académico", destino: "Faculdade", slaDias: 5 },
 };
 
 export const categoriaConfig: Record<Categoria, { label: string; color: string }> = {
-  Tecnológico: { label: "Tecnológico", color: "bg-blue-100 text-blue-700 border-blue-200" },
-  Académico:   { label: "Académico",   color: "bg-purple-100 text-purple-700 border-purple-200" },
-  Financeiro:  { label: "Financeiro",  color: "bg-emerald-100 text-emerald-700 border-emerald-200" },
-  Pedagógico:  { label: "Pedagógico",  color: "bg-indigo-100 text-indigo-700 border-indigo-200" },
+  Tecnológico: { label: "Tecnológico", color: "bg-blue-50 text-blue-700 border-blue-200" },
+  Académico:   { label: "Académico",   color: "bg-violet-50 text-violet-700 border-violet-200" },
+  Financeiro:  { label: "Financeiro",  color: "bg-emerald-50 text-emerald-700 border-emerald-200" },
 };
 
 export const destinoConfig: Record<Destino, { label: string; color: string }> = {
