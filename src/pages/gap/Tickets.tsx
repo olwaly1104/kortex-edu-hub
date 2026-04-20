@@ -291,7 +291,9 @@ export default function GapTickets() {
                       <p className="text-xs text-foreground leading-tight">{s.faculdade}</p>
                     </td>
                     <td className="p-3">
-                      <Badge variant="outline" className="text-[10px] bg-muted/40 text-foreground border-border font-normal">{tipoCat}</Badge>
+                      {tipoCat !== "—" ? (
+                        <Badge variant="outline" className={cn("text-[10px] font-medium", categoriaConfig[tipoCat as Categoria]?.color)}>{tipoCat}</Badge>
+                      ) : <span className="text-xs text-muted-foreground">—</span>}
                     </td>
                     <td className="p-3 max-w-xs">
                       <p className="text-foreground text-xs font-medium leading-tight line-clamp-2">{tipoLabel}</p>
