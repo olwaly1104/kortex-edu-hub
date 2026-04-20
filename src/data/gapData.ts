@@ -620,7 +620,7 @@ export interface GapEstudanteSeguimento {
   acompanhamentos: number; ultimoContacto: string; responsavel: string; motivo: string;
 }
 
-export const categoriaConfig: Record<TicketCategoria, { label: string; color: string }> = {
+export const ticketCategoriaConfig: Record<TicketCategoria, { label: string; color: string }> = {
   academico:    { label: "Académico",    color: "bg-primary/10 text-primary border-primary/20" },
   psicologico:  { label: "Psicológico",  color: "bg-purple-100 text-purple-700 border-purple-200" },
   financeiro:   { label: "Financeiro",   color: "bg-emerald-100 text-emerald-700 border-emerald-200" },
