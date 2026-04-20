@@ -1,206 +1,447 @@
-// GAP — Gabinete de Apoio ao Estudante mock data
-export type TicketStatus = "aberto" | "em_andamento" | "aguarda_estudante" | "resolvido";
-export type TicketPriority = "alta" | "media" | "baixa";
-export type TicketCategoria =
-  | "academico"
-  | "psicologico"
-  | "financeiro"
-  | "documentacao"
-  | "social"
-  | "carreira"
-  | "saude";
+// GAP — Gabinete de Apoio ao Estudante
+// Modelo: pedidos (Solicitações) submetidos pelo estudante no Portal e
+// encaminhados automaticamente ao departamento responsável (CTI, Académica,
+// Financeiro, GAP, Secretaria). O GAP monitoriza a execução — não responde.
 
-export interface GapTicket {
-  id: string;
-  estudante: string;
-  matricula: string;
-  curso: string;
-  ano: number;
-  assunto: string;
-  categoria: TicketCategoria;
-  descricao: string;
-  estado: TicketStatus;
-  prioridade: TicketPriority;
-  data: string;
-  ultimaResposta?: string;
-  responsavel?: string;
-  tags?: string[];
-  mensagens?: { autor: string; isStaff: boolean; data: string; texto: string }[];
-}
+export type Destino = "CTI" | "Académica" | "Financeiro" | "GAP" | "Secretaria";
 
-export interface GapAtendimento {
-  id: string;
-  estudante: string;
-  matricula: string;
-  curso: string;
-  motivo: string;
-  categoria: TicketCategoria;
-  data: string;
-  hora: string;
-  duracao: string;
-  tipo: "presencial" | "online";
-  estado: "agendado" | "concluido" | "cancelado" | "remarcar";
-  responsavel: string;
-  sala?: string;
-  notas?: string;
-}
+export type EstadoSolicitacao =
+  | "recebida"        // submetida pelo estudante no Portal
+  | "encaminhada"     // auto-roteada ao destino
+  | "em_execucao"     // destino a tratar
+  | "concluida"
+  | "rejeitada";
 
-export interface GapEstudanteSeguimento {
-  id: string;
-  nome: string;
-  matricula: string;
-  curso: string;
-  ano: number;
-  risco: "baixo" | "medio" | "alto";
-  acompanhamentos: number;
-  ultimoContacto: string;
-  responsavel: string;
-  motivo: string;
-}
+export type Prioridade = "alta" | "media" | "baixa";
 
-export interface GapArtigo {
-  id: string;
-  titulo: string;
-  categoria: TicketCategoria;
-  resumo: string;
-  visualizacoes: number;
-  atualizado: string;
-  destaque?: boolean;
-}
+// ─── Tipos de pedido (catálogo oficial por departamento) ─────────────────────
+// CTI (do documento oficial — 19 Dez 2025)
+export type TipoCTI =
+  | "actualizacao_dados_portal"
+  | "actualizacao_dados_email"
+  | "actualizacao_dados_canal"
+  | "actualizacao_calculo_medias"
+  | "segunda_via_cartao"
+  | "falha_cartao"
+  | "anulacao_cartao";
 
-export const categoriaConfig: Record<TicketCategoria, { label: string; color: string }> = {
-  academico: { label: "Académico", color: "bg-primary/10 text-primary border-primary/20" },
-  psicologico: { label: "Psicológico", color: "bg-purple-100 text-purple-700 border-purple-200" },
-  financeiro: { label: "Financeiro", color: "bg-emerald-100 text-emerald-700 border-emerald-200" },
-  documentacao: { label: "Documentação", color: "bg-blue-100 text-blue-700 border-blue-200" },
-  social: { label: "Social", color: "bg-pink-100 text-pink-700 border-pink-200" },
-  carreira: { label: "Carreira", color: "bg-amber-100 text-amber-700 border-amber-200" },
-  saude: { label: "Saúde", color: "bg-red-100 text-red-700 border-red-200" },
+// Reservados para futuros uploads (Académica / Financeiro / GAP / Secretaria)
+export type TipoSolicitacao = TipoCTI | string;
+
+export const tipoConfig: Record<string, { label: string; categoria: string; destino: Destino; slaDias: number }> = {
+  // ── CTI ──────────────────────────────────────────────────────────────────
+  actualizacao_dados_portal: { label: "Actualização de dados — Portal do Estudante", categoria: "Acessos & Contas", destino: "CTI", slaDias: 2 },
+  actualizacao_dados_email:  { label: "Actualização de dados — Email institucional", categoria: "Acessos & Contas", destino: "CTI", slaDias: 2 },
+  actualizacao_dados_canal:  { label: "Actualização de dados — Canal de Estudante", categoria: "Acessos & Contas", destino: "CTI", slaDias: 3 },
+  actualizacao_calculo_medias: { label: "Actualização do cálculo de médias no sistema", categoria: "Sistemas Académicos", destino: "CTI", slaDias: 5 },
+  segunda_via_cartao: { label: "Pedido de 2ª via do cartão de estudante", categoria: "Cartão de Estudante", destino: "CTI", slaDias: 7 },
+  falha_cartao:       { label: "Falha de funcionamento do cartão de estudante", categoria: "Cartão de Estudante", destino: "CTI", slaDias: 5 },
+  anulacao_cartao:    { label: "Pedido de anulação do cartão de estudante", categoria: "Cartão de Estudante", destino: "CTI", slaDias: 3 },
 };
 
-export const ticketStatusConfig: Record<TicketStatus, { label: string; color: string }> = {
-  aberto: { label: "Aberto", color: "bg-orange-100 text-orange-700 border-orange-200" },
-  em_andamento: { label: "Em Andamento", color: "bg-blue-100 text-blue-700 border-blue-200" },
-  aguarda_estudante: { label: "Aguarda Estudante", color: "bg-amber-100 text-amber-700 border-amber-200" },
-  resolvido: { label: "Resolvido", color: "bg-emerald-100 text-emerald-700 border-emerald-200" },
+export const destinoConfig: Record<Destino, { label: string; color: string }> = {
+  CTI:         { label: "CTI",         color: "bg-blue-100 text-blue-700 border-blue-200" },
+  Académica:   { label: "Académica",   color: "bg-purple-100 text-purple-700 border-purple-200" },
+  Financeiro:  { label: "Financeiro",  color: "bg-emerald-100 text-emerald-700 border-emerald-200" },
+  GAP:         { label: "GAP",         color: "bg-pink-100 text-pink-700 border-pink-200" },
+  Secretaria:  { label: "Secretaria",  color: "bg-amber-100 text-amber-700 border-amber-200" },
 };
 
-export const prioridadeConfig: Record<TicketPriority, { label: string; color: string }> = {
-  alta: { label: "Alta", color: "bg-destructive/10 text-destructive border-destructive/20" },
+export const estadoSolicitacaoConfig: Record<EstadoSolicitacao, { label: string; color: string }> = {
+  recebida:    { label: "Recebida",    color: "bg-orange-100 text-orange-700 border-orange-200" },
+  encaminhada: { label: "Encaminhada", color: "bg-blue-100 text-blue-700 border-blue-200" },
+  em_execucao: { label: "Em Execução", color: "bg-amber-100 text-amber-700 border-amber-200" },
+  concluida:   { label: "Concluída",   color: "bg-emerald-100 text-emerald-700 border-emerald-200" },
+  rejeitada:   { label: "Rejeitada",   color: "bg-destructive/10 text-destructive border-destructive/20" },
+};
+
+export const prioridadeConfig: Record<Prioridade, { label: string; color: string }> = {
+  alta:  { label: "Alta",  color: "bg-destructive/10 text-destructive border-destructive/20" },
   media: { label: "Média", color: "bg-yellow-100 text-yellow-700 border-yellow-200" },
   baixa: { label: "Baixa", color: "bg-muted text-muted-foreground border-border" },
 };
 
-export const gapTickets: GapTicket[] = [
+export interface HistoricoEntry {
+  data: string;
+  actor: string;
+  accao: string;
+  nota?: string;
+}
+
+export interface Solicitacao {
+  id: string;
+  // Estudante
+  estudante: string;
+  matricula: string;
+  curso: string;
+  ano: number;
+  // Pedido
+  tipo: string;          // chave em tipoConfig
+  assunto: string;
+  descricao: string;
+  // Roteamento
+  destino: Destino;
+  responsavelDestino?: string;
+  // Estado & SLA
+  estado: EstadoSolicitacao;
+  prioridade: Prioridade;
+  slaDias: number;
+  // Datas
+  dataSubmissao: string;
+  dataEncaminhamento?: string;
+  dataConclusao?: string;
+  // Auditoria
+  historico: HistoricoEntry[];
+  anexos?: { nome: string; url?: string }[];
+  notaInterna?: string;
+}
+
+// ─── Solicitações CTI (seed a partir do documento oficial) ───────────────────
+const CTI_PAULO = "Eng. Paulo Neto · CTI";
+const CTI_SARA  = "Téc. Sara Domingos · CTI";
+
+export const solicitacoes: Solicitacao[] = [
   {
-    id: "GAP-001", estudante: "Ana Luísa Ferreira", matricula: "2024001", curso: "Eng. Informática", ano: 2,
-    assunto: "Sobrecarga académica e ansiedade nas avaliações",
-    categoria: "psicologico", prioridade: "alta", estado: "em_andamento",
-    descricao: "Tenho dificuldade em gerir o stress antes das épocas de avaliação. Procuro acompanhamento.",
-    data: "2025-01-13", ultimaResposta: "2025-01-14", responsavel: "Dra. Helena Cabral",
-    tags: ["ansiedade", "stress académico"],
-    mensagens: [
-      { autor: "Ana Luísa Ferreira", isStaff: false, data: "2025-01-13 09:24", texto: "Tenho dificuldade em gerir o stress antes das épocas de avaliação. Procuro acompanhamento." },
-      { autor: "Dra. Helena Cabral", isStaff: true, data: "2025-01-13 11:02", texto: "Olá Ana, obrigada pela tua mensagem. Vamos agendar uma primeira sessão presencial. Qual o teu horário disponível?" },
-      { autor: "Ana Luísa Ferreira", isStaff: false, data: "2025-01-14 08:10", texto: "Posso quinta-feira de manhã, das 9h às 11h." },
+    id: "SOL-2025-0142",
+    estudante: "Ana Luísa Ferreira", matricula: "2024001", curso: "Eng. Informática", ano: 2,
+    tipo: "actualizacao_dados_portal",
+    assunto: "Não consigo entrar no Portal — credenciais inválidas",
+    descricao: "Após mudança de palavra-passe deixei de aceder. O sistema rejeita as novas credenciais.",
+    destino: "CTI", responsavelDestino: CTI_PAULO,
+    estado: "em_execucao", prioridade: "alta", slaDias: 2,
+    dataSubmissao: "2025-12-14", dataEncaminhamento: "2025-12-14",
+    historico: [
+      { data: "2025-12-14 09:12", actor: "Portal do Estudante", accao: "Solicitação submetida pelo estudante" },
+      { data: "2025-12-14 09:13", actor: "Sistema", accao: "Encaminhada automaticamente para CTI" },
+      { data: "2025-12-14 14:32", actor: CTI_PAULO, accao: "Atribuída", nota: "A verificar registo no AD." },
     ],
   },
   {
-    id: "GAP-002", estudante: "Carlos Mendes", matricula: "2024015", curso: "Direito", ano: 1,
-    assunto: "Dificuldade de adaptação ao 1º ano",
-    categoria: "academico", prioridade: "media", estado: "aberto",
-    descricao: "Sinto-me perdido com a metodologia de estudo do curso de Direito. Preciso de orientação.",
-    data: "2025-01-14", responsavel: "Dr. João Tavares",
-    tags: ["adaptação", "métodos de estudo"],
+    id: "SOL-2025-0141",
+    estudante: "Carlos Mendes", matricula: "2024015", curso: "Direito", ano: 1,
+    tipo: "actualizacao_dados_email",
+    assunto: "Email institucional não recebe mensagens externas",
+    descricao: "Mensagens enviadas de Gmail não chegam à minha caixa @upra.kor.",
+    destino: "CTI", responsavelDestino: CTI_SARA,
+    estado: "encaminhada", prioridade: "media", slaDias: 2,
+    dataSubmissao: "2025-12-15", dataEncaminhamento: "2025-12-15",
+    historico: [
+      { data: "2025-12-15 10:04", actor: "Portal do Estudante", accao: "Solicitação submetida" },
+      { data: "2025-12-15 10:04", actor: "Sistema", accao: "Encaminhada automaticamente para CTI" },
+    ],
   },
   {
-    id: "GAP-003", estudante: "Maria João Santos", matricula: "2023042", curso: "Medicina", ano: 3,
-    assunto: "Apoio para bolsa de estudo",
-    categoria: "financeiro", prioridade: "alta", estado: "aguarda_estudante",
-    descricao: "Necessito de orientação sobre o processo de candidatura à bolsa social INAGBE.",
-    data: "2025-01-12", ultimaResposta: "2025-01-13", responsavel: "Dra. Helena Cabral",
-    tags: ["bolsa", "INAGBE"],
+    id: "SOL-2025-0140",
+    estudante: "Maria João Santos", matricula: "2023042", curso: "Medicina", ano: 3,
+    tipo: "actualizacao_dados_canal",
+    assunto: "Canal de Estudante não regista os meus pedidos",
+    descricao: "Ao submeter um pedido o sistema mostra erro e não devolve número de protocolo.",
+    destino: "CTI", responsavelDestino: CTI_PAULO,
+    estado: "em_execucao", prioridade: "alta", slaDias: 3,
+    dataSubmissao: "2025-12-12", dataEncaminhamento: "2025-12-12",
+    historico: [
+      { data: "2025-12-12 11:21", actor: "Portal do Estudante", accao: "Solicitação submetida" },
+      { data: "2025-12-12 11:22", actor: "Sistema", accao: "Encaminhada automaticamente para CTI" },
+      { data: "2025-12-12 15:40", actor: CTI_PAULO, accao: "Atribuída" },
+      { data: "2025-12-13 09:10", actor: CTI_PAULO, accao: "Em diagnóstico", nota: "Erro reproduzido em ambiente de teste." },
+    ],
   },
   {
-    id: "GAP-004", estudante: "Pedro Almeida", matricula: "2024033", curso: "Economia", ano: 2,
-    assunto: "Orientação vocacional — mudança de curso",
-    categoria: "carreira", prioridade: "media", estado: "em_andamento",
-    descricao: "Estou a ponderar mudar para Gestão. Gostaria de uma sessão de orientação vocacional.",
-    data: "2025-01-10", ultimaResposta: "2025-01-13", responsavel: "Dr. João Tavares",
-    tags: ["vocacional", "mudança curso"],
+    id: "SOL-2025-0139",
+    estudante: "Pedro Almeida", matricula: "2024033", curso: "Economia", ano: 2,
+    tipo: "actualizacao_calculo_medias",
+    assunto: "Média do 1º semestre incorrecta no portal",
+    descricao: "A média apresentada no portal não corresponde ao boletim de notas oficial.",
+    destino: "CTI", responsavelDestino: CTI_SARA,
+    estado: "em_execucao", prioridade: "media", slaDias: 5,
+    dataSubmissao: "2025-12-10", dataEncaminhamento: "2025-12-10",
+    historico: [
+      { data: "2025-12-10 08:45", actor: "Portal do Estudante", accao: "Solicitação submetida" },
+      { data: "2025-12-10 08:45", actor: "Sistema", accao: "Encaminhada automaticamente para CTI" },
+      { data: "2025-12-11 10:00", actor: CTI_SARA, accao: "Atribuída" },
+      { data: "2025-12-13 16:20", actor: CTI_SARA, accao: "A aguardar dados da Académica", nota: "Pedido de validação enviado à Académica." },
+    ],
   },
   {
-    id: "GAP-005", estudante: "Sofia Bernardo", matricula: "2023018", curso: "Eng. Civil", ano: 4,
-    assunto: "Encaminhamento para serviço médico",
-    categoria: "saude", prioridade: "alta", estado: "resolvido",
-    descricao: "Necessito de encaminhamento para a clínica parceira da universidade.",
-    data: "2025-01-08", ultimaResposta: "2025-01-09", responsavel: "Dra. Helena Cabral",
+    id: "SOL-2025-0138",
+    estudante: "Sofia Bernardo", matricula: "2023018", curso: "Eng. Civil", ano: 4,
+    tipo: "segunda_via_cartao",
+    assunto: "Pedido de 2ª via — cartão extraviado",
+    descricao: "Perdi o cartão de estudante no transporte público. Necessito de 2ª via.",
+    destino: "CTI", responsavelDestino: CTI_PAULO,
+    estado: "concluida", prioridade: "media", slaDias: 7,
+    dataSubmissao: "2025-12-02", dataEncaminhamento: "2025-12-02", dataConclusao: "2025-12-08",
+    historico: [
+      { data: "2025-12-02 14:10", actor: "Portal do Estudante", accao: "Solicitação submetida" },
+      { data: "2025-12-02 14:10", actor: "Sistema", accao: "Encaminhada automaticamente para CTI" },
+      { data: "2025-12-03 09:30", actor: CTI_PAULO, accao: "Atribuída" },
+      { data: "2025-12-05 11:00", actor: CTI_PAULO, accao: "Cartão produzido" },
+      { data: "2025-12-08 10:15", actor: CTI_PAULO, accao: "Concluída", nota: "Cartão entregue ao estudante." },
+    ],
   },
   {
-    id: "GAP-006", estudante: "João Baptista", matricula: "2024050", curso: "Gestão", ano: 1,
-    assunto: "Conflito interpessoal em trabalho de grupo",
-    categoria: "social", prioridade: "media", estado: "aberto",
-    descricao: "Há tensões no meu grupo de trabalho que estão a afectar o desempenho. Procuro mediação.",
-    data: "2025-01-14", responsavel: "Dr. João Tavares",
+    id: "SOL-2025-0137",
+    estudante: "João Baptista", matricula: "2024050", curso: "Gestão", ano: 1,
+    tipo: "falha_cartao",
+    assunto: "Cartão não funciona nos torniquetes",
+    descricao: "Desde sexta-feira o cartão é rejeitado em todas as entradas.",
+    destino: "CTI", responsavelDestino: CTI_SARA,
+    estado: "concluida", prioridade: "alta", slaDias: 5,
+    dataSubmissao: "2025-12-01", dataEncaminhamento: "2025-12-01", dataConclusao: "2025-12-04",
+    historico: [
+      { data: "2025-12-01 16:22", actor: "Portal do Estudante", accao: "Solicitação submetida" },
+      { data: "2025-12-01 16:22", actor: "Sistema", accao: "Encaminhada automaticamente para CTI" },
+      { data: "2025-12-02 08:50", actor: CTI_SARA, accao: "Atribuída" },
+      { data: "2025-12-04 14:00", actor: CTI_SARA, accao: "Concluída", nota: "Reprogramação do chip; testado com sucesso." },
+    ],
   },
   {
-    id: "GAP-007", estudante: "Beatriz Lopes", matricula: "2023089", curso: "Psicologia", ano: 3,
-    assunto: "Estágio curricular — apoio na procura",
-    categoria: "carreira", prioridade: "baixa", estado: "em_andamento",
-    descricao: "Procuro orientação para encontrar estágio curricular na área clínica.",
-    data: "2025-01-11", ultimaResposta: "2025-01-13", responsavel: "Dra. Helena Cabral",
+    id: "SOL-2025-0136",
+    estudante: "Beatriz Lopes", matricula: "2023089", curso: "Psicologia", ano: 3,
+    tipo: "anulacao_cartao",
+    assunto: "Anulação de cartão por suspeita de uso indevido",
+    descricao: "Suspeito que o meu cartão foi clonado. Solicito anulação imediata.",
+    destino: "CTI", responsavelDestino: CTI_PAULO,
+    estado: "concluida", prioridade: "alta", slaDias: 3,
+    dataSubmissao: "2025-11-28", dataEncaminhamento: "2025-11-28", dataConclusao: "2025-11-29",
+    historico: [
+      { data: "2025-11-28 17:40", actor: "Portal do Estudante", accao: "Solicitação submetida" },
+      { data: "2025-11-28 17:40", actor: "Sistema", accao: "Encaminhada automaticamente para CTI" },
+      { data: "2025-11-29 09:00", actor: CTI_PAULO, accao: "Atribuída" },
+      { data: "2025-11-29 11:30", actor: CTI_PAULO, accao: "Concluída", nota: "Cartão anulado no sistema. 2ª via deve ser pedida." },
+    ],
   },
   {
-    id: "GAP-008", estudante: "Tiago Mateus", matricula: "2024077", curso: "Arquitectura", ano: 2,
-    assunto: "Solicitação de declaração para visto",
-    categoria: "documentacao", prioridade: "alta", estado: "aberto",
-    descricao: "Preciso de declaração urgente para renovação de visto de estudante.",
-    data: "2025-01-14",
-    tags: ["urgente", "visto"],
+    id: "SOL-2025-0135",
+    estudante: "Tiago Mateus", matricula: "2024077", curso: "Arquitectura", ano: 2,
+    tipo: "segunda_via_cartao",
+    assunto: "Pedido de 2ª via — cartão danificado",
+    descricao: "O cartão partiu-se e deixou de ser lido. Solicito substituição.",
+    destino: "CTI",
+    estado: "recebida", prioridade: "baixa", slaDias: 7,
+    dataSubmissao: "2025-12-15",
+    historico: [
+      { data: "2025-12-15 11:55", actor: "Portal do Estudante", accao: "Solicitação submetida" },
+      { data: "2025-12-15 11:55", actor: "Sistema", accao: "Encaminhada automaticamente para CTI" },
+    ],
+  },
+  {
+    id: "SOL-2025-0134",
+    estudante: "Helena Costa", matricula: "2024088", curso: "Enfermagem", ano: 1,
+    tipo: "actualizacao_dados_portal",
+    assunto: "Actualização de número de telefone no Portal",
+    descricao: "Mudei de operador e o portal não me deixa actualizar o contacto.",
+    destino: "CTI",
+    estado: "recebida", prioridade: "baixa", slaDias: 2,
+    dataSubmissao: "2025-12-15",
+    historico: [
+      { data: "2025-12-15 13:08", actor: "Portal do Estudante", accao: "Solicitação submetida" },
+      { data: "2025-12-15 13:08", actor: "Sistema", accao: "Encaminhada automaticamente para CTI" },
+    ],
+  },
+  {
+    id: "SOL-2025-0133",
+    estudante: "Rui Vasconcelos", matricula: "2023105", curso: "Eng. Informática", ano: 3,
+    tipo: "actualizacao_dados_email",
+    assunto: "Reset de palavra-passe do email institucional",
+    descricao: "Esqueci a palavra-passe e a recuperação não envia o código.",
+    destino: "CTI",
+    estado: "encaminhada", prioridade: "media", slaDias: 2,
+    dataSubmissao: "2025-12-15", dataEncaminhamento: "2025-12-15",
+    historico: [
+      { data: "2025-12-15 08:30", actor: "Portal do Estudante", accao: "Solicitação submetida" },
+      { data: "2025-12-15 08:30", actor: "Sistema", accao: "Encaminhada automaticamente para CTI" },
+    ],
+  },
+  {
+    id: "SOL-2025-0132",
+    estudante: "Lucas Marques", matricula: "2024112", curso: "Direito", ano: 1,
+    tipo: "actualizacao_dados_canal",
+    assunto: "Não consigo aceder ao Canal de Estudante",
+    descricao: "O Canal mostra ‘perfil não autorizado’ desde a inscrição.",
+    destino: "CTI",
+    estado: "encaminhada", prioridade: "media", slaDias: 3,
+    dataSubmissao: "2025-12-14", dataEncaminhamento: "2025-12-14",
+    historico: [
+      { data: "2025-12-14 16:10", actor: "Portal do Estudante", accao: "Solicitação submetida" },
+      { data: "2025-12-14 16:10", actor: "Sistema", accao: "Encaminhada automaticamente para CTI" },
+    ],
+  },
+  {
+    id: "SOL-2025-0131",
+    estudante: "Inês Cardoso", matricula: "2023060", curso: "Economia", ano: 3,
+    tipo: "actualizacao_calculo_medias",
+    assunto: "Cadeira em falta no cálculo da média ponderada",
+    descricao: "A cadeira de Estatística II não consta no cálculo da minha média do ano.",
+    destino: "CTI", responsavelDestino: CTI_SARA,
+    estado: "em_execucao", prioridade: "alta", slaDias: 5,
+    dataSubmissao: "2025-12-08", dataEncaminhamento: "2025-12-08",
+    historico: [
+      { data: "2025-12-08 09:00", actor: "Portal do Estudante", accao: "Solicitação submetida" },
+      { data: "2025-12-08 09:00", actor: "Sistema", accao: "Encaminhada automaticamente para CTI" },
+      { data: "2025-12-09 10:00", actor: CTI_SARA, accao: "Atribuída" },
+    ],
+  },
+  {
+    id: "SOL-2025-0130",
+    estudante: "Filipe Soares", matricula: "2024090", curso: "Gestão", ano: 1,
+    tipo: "falha_cartao",
+    assunto: "Cartão lê mas não autoriza acesso à biblioteca",
+    descricao: "Os torniquetes da biblioteca recusam o cartão; nas entradas principais funciona.",
+    destino: "CTI",
+    estado: "rejeitada", prioridade: "baixa", slaDias: 5,
+    dataSubmissao: "2025-12-05", dataEncaminhamento: "2025-12-05", dataConclusao: "2025-12-06",
+    historico: [
+      { data: "2025-12-05 10:30", actor: "Portal do Estudante", accao: "Solicitação submetida" },
+      { data: "2025-12-05 10:30", actor: "Sistema", accao: "Encaminhada automaticamente para CTI" },
+      { data: "2025-12-06 09:15", actor: CTI_PAULO, accao: "Rejeitada", nota: "Estudante sem matrícula activa em Biblioteca; reencaminhado à Académica." },
+    ],
+  },
+  {
+    id: "SOL-2025-0129",
+    estudante: "Marta Pires", matricula: "2023072", curso: "Medicina", ano: 4,
+    tipo: "anulacao_cartao",
+    assunto: "Anulação por término de matrícula",
+    descricao: "Concluí o curso e quero anular o cartão activo.",
+    destino: "CTI", responsavelDestino: CTI_SARA,
+    estado: "concluida", prioridade: "baixa", slaDias: 3,
+    dataSubmissao: "2025-11-25", dataEncaminhamento: "2025-11-25", dataConclusao: "2025-11-27",
+    historico: [
+      { data: "2025-11-25 14:00", actor: "Portal do Estudante", accao: "Solicitação submetida" },
+      { data: "2025-11-25 14:00", actor: "Sistema", accao: "Encaminhada automaticamente para CTI" },
+      { data: "2025-11-26 09:00", actor: CTI_SARA, accao: "Atribuída" },
+      { data: "2025-11-27 11:00", actor: CTI_SARA, accao: "Concluída" },
+    ],
   },
 ];
 
+// ─── Helpers ────────────────────────────────────────────────────────────────
+export const getSlaStatus = (s: Solicitacao): "no_prazo" | "em_risco" | "atrasado" | "concluido" => {
+  if (s.estado === "concluida" || s.estado === "rejeitada") return "concluido";
+  const ref = s.dataEncaminhamento ?? s.dataSubmissao;
+  const diasDecorridos = Math.floor((Date.now() - new Date(ref).getTime()) / 86400000);
+  const restantes = s.slaDias - diasDecorridos;
+  if (restantes < 0) return "atrasado";
+  if (restantes <= 1) return "em_risco";
+  return "no_prazo";
+};
+
+export const slaStatusConfig = {
+  no_prazo:  { label: "No prazo",  color: "bg-emerald-100 text-emerald-700 border-emerald-200" },
+  em_risco:  { label: "Em risco",  color: "bg-amber-100 text-amber-700 border-amber-200" },
+  atrasado:  { label: "Atrasado",  color: "bg-destructive/10 text-destructive border-destructive/20" },
+  concluido: { label: "Concluída", color: "bg-muted text-muted-foreground border-border" },
+} as const;
+
+// ─── Atendimentos & Estudantes em seguimento (mantidos do módulo anterior) ──
+export type TicketCategoria = "academico" | "psicologico" | "financeiro" | "documentacao" | "social" | "carreira" | "saude";
+
+export interface GapAtendimento {
+  id: string;
+  estudante: string; matricula: string; curso: string;
+  motivo: string; categoria: TicketCategoria;
+  data: string; hora: string; duracao: string;
+  tipo: "presencial" | "online";
+  estado: "agendado" | "concluido" | "cancelado" | "remarcar";
+  responsavel: string;
+  sala?: string; notas?: string;
+}
+
+export interface GapEstudanteSeguimento {
+  id: string; nome: string; matricula: string; curso: string; ano: number;
+  risco: "baixo" | "medio" | "alto";
+  acompanhamentos: number; ultimoContacto: string; responsavel: string; motivo: string;
+}
+
+export const categoriaConfig: Record<TicketCategoria, { label: string; color: string }> = {
+  academico:    { label: "Académico",    color: "bg-primary/10 text-primary border-primary/20" },
+  psicologico:  { label: "Psicológico",  color: "bg-purple-100 text-purple-700 border-purple-200" },
+  financeiro:   { label: "Financeiro",   color: "bg-emerald-100 text-emerald-700 border-emerald-200" },
+  documentacao: { label: "Documentação", color: "bg-blue-100 text-blue-700 border-blue-200" },
+  social:       { label: "Social",       color: "bg-pink-100 text-pink-700 border-pink-200" },
+  carreira:     { label: "Carreira",     color: "bg-amber-100 text-amber-700 border-amber-200" },
+  saude:        { label: "Saúde",        color: "bg-red-100 text-red-700 border-red-200" },
+};
+
 export const gapAtendimentos: GapAtendimento[] = [
-  { id: "AT-001", estudante: "Ana Luísa Ferreira", matricula: "2024001", curso: "Eng. Informática", motivo: "1ª sessão de acompanhamento psicológico", categoria: "psicologico", data: "2025-01-16", hora: "09:00", duracao: "50 min", tipo: "presencial", estado: "agendado", responsavel: "Dra. Helena Cabral", sala: "Gab. GAP 1" },
-  { id: "AT-002", estudante: "Carlos Mendes", matricula: "2024015", curso: "Direito", motivo: "Orientação académica — métodos de estudo", categoria: "academico", data: "2025-01-16", hora: "10:30", duracao: "40 min", tipo: "presencial", estado: "agendado", responsavel: "Dr. João Tavares", sala: "Gab. GAP 2" },
-  { id: "AT-003", estudante: "Pedro Almeida", matricula: "2024033", curso: "Economia", motivo: "Orientação vocacional", categoria: "carreira", data: "2025-01-16", hora: "14:00", duracao: "60 min", tipo: "online", estado: "agendado", responsavel: "Dr. João Tavares" },
-  { id: "AT-004", estudante: "Beatriz Lopes", matricula: "2023089", curso: "Psicologia", motivo: "Acompanhamento de estágio", categoria: "carreira", data: "2025-01-17", hora: "11:00", duracao: "30 min", tipo: "presencial", estado: "agendado", responsavel: "Dra. Helena Cabral", sala: "Gab. GAP 1" },
-  { id: "AT-005", estudante: "Sofia Bernardo", matricula: "2023018", curso: "Eng. Civil", motivo: "Encaminhamento médico", categoria: "saude", data: "2025-01-09", hora: "09:30", duracao: "20 min", tipo: "presencial", estado: "concluido", responsavel: "Dra. Helena Cabral", notas: "Encaminhamento entregue. Estudante satisfeita com a resolução." },
-  { id: "AT-006", estudante: "Maria João Santos", matricula: "2023042", curso: "Medicina", motivo: "Apoio candidatura bolsa INAGBE", categoria: "financeiro", data: "2025-01-15", hora: "15:00", duracao: "45 min", tipo: "presencial", estado: "concluido", responsavel: "Dra. Helena Cabral" },
-  { id: "AT-007", estudante: "João Baptista", matricula: "2024050", curso: "Gestão", motivo: "Mediação de conflito", categoria: "social", data: "2025-01-17", hora: "16:00", duracao: "60 min", tipo: "presencial", estado: "agendado", responsavel: "Dr. João Tavares", sala: "Gab. GAP 2" },
+  { id: "AT-001", estudante: "Ana Luísa Ferreira", matricula: "2024001", curso: "Eng. Informática", motivo: "1ª sessão de acompanhamento psicológico", categoria: "psicologico", data: "2025-12-16", hora: "09:00", duracao: "50 min", tipo: "presencial", estado: "agendado", responsavel: "Dra. Helena Cabral", sala: "Gab. GAP 1" },
+  { id: "AT-002", estudante: "Carlos Mendes", matricula: "2024015", curso: "Direito", motivo: "Orientação académica — métodos de estudo", categoria: "academico", data: "2025-12-16", hora: "10:30", duracao: "40 min", tipo: "presencial", estado: "agendado", responsavel: "Dr. João Tavares", sala: "Gab. GAP 2" },
+  { id: "AT-003", estudante: "Pedro Almeida", matricula: "2024033", curso: "Economia", motivo: "Orientação vocacional", categoria: "carreira", data: "2025-12-16", hora: "14:00", duracao: "60 min", tipo: "online", estado: "agendado", responsavel: "Dr. João Tavares" },
+  { id: "AT-004", estudante: "Beatriz Lopes", matricula: "2023089", curso: "Psicologia", motivo: "Acompanhamento de estágio", categoria: "carreira", data: "2025-12-17", hora: "11:00", duracao: "30 min", tipo: "presencial", estado: "agendado", responsavel: "Dra. Helena Cabral", sala: "Gab. GAP 1" },
+  { id: "AT-005", estudante: "Sofia Bernardo", matricula: "2023018", curso: "Eng. Civil", motivo: "Encaminhamento médico", categoria: "saude", data: "2025-12-09", hora: "09:30", duracao: "20 min", tipo: "presencial", estado: "concluido", responsavel: "Dra. Helena Cabral", notas: "Encaminhamento entregue. Estudante satisfeita com a resolução." },
+  { id: "AT-006", estudante: "Maria João Santos", matricula: "2023042", curso: "Medicina", motivo: "Apoio candidatura bolsa INAGBE", categoria: "financeiro", data: "2025-12-15", hora: "15:00", duracao: "45 min", tipo: "presencial", estado: "concluido", responsavel: "Dra. Helena Cabral" },
+  { id: "AT-007", estudante: "João Baptista", matricula: "2024050", curso: "Gestão", motivo: "Mediação de conflito", categoria: "social", data: "2025-12-17", hora: "16:00", duracao: "60 min", tipo: "presencial", estado: "agendado", responsavel: "Dr. João Tavares", sala: "Gab. GAP 2" },
 ];
 
 export const gapEstudantesSeguimento: GapEstudanteSeguimento[] = [
-  { id: "S-001", nome: "Ana Luísa Ferreira", matricula: "2024001", curso: "Eng. Informática", ano: 2, risco: "alto", acompanhamentos: 4, ultimoContacto: "2025-01-14", responsavel: "Dra. Helena Cabral", motivo: "Ansiedade académica" },
-  { id: "S-002", nome: "Carlos Mendes", matricula: "2024015", curso: "Direito", ano: 1, risco: "medio", acompanhamentos: 2, ultimoContacto: "2025-01-13", responsavel: "Dr. João Tavares", motivo: "Adaptação ao curso" },
-  { id: "S-003", nome: "Pedro Almeida", matricula: "2024033", curso: "Economia", ano: 2, risco: "medio", acompanhamentos: 3, ultimoContacto: "2025-01-13", responsavel: "Dr. João Tavares", motivo: "Orientação vocacional" },
-  { id: "S-004", nome: "Maria João Santos", matricula: "2023042", curso: "Medicina", ano: 3, risco: "baixo", acompanhamentos: 1, ultimoContacto: "2025-01-13", responsavel: "Dra. Helena Cabral", motivo: "Apoio financeiro" },
-  { id: "S-005", nome: "Beatriz Lopes", matricula: "2023089", curso: "Psicologia", ano: 3, risco: "baixo", acompanhamentos: 2, ultimoContacto: "2025-01-13", responsavel: "Dra. Helena Cabral", motivo: "Estágio curricular" },
-  { id: "S-006", nome: "João Baptista", matricula: "2024050", curso: "Gestão", ano: 1, risco: "medio", acompanhamentos: 1, ultimoContacto: "2025-01-14", responsavel: "Dr. João Tavares", motivo: "Conflito grupo" },
+  { id: "S-001", nome: "Ana Luísa Ferreira", matricula: "2024001", curso: "Eng. Informática", ano: 2, risco: "alto", acompanhamentos: 4, ultimoContacto: "2025-12-14", responsavel: "Dra. Helena Cabral", motivo: "Ansiedade académica" },
+  { id: "S-002", nome: "Carlos Mendes", matricula: "2024015", curso: "Direito", ano: 1, risco: "medio", acompanhamentos: 2, ultimoContacto: "2025-12-13", responsavel: "Dr. João Tavares", motivo: "Adaptação ao curso" },
+  { id: "S-003", nome: "Pedro Almeida", matricula: "2024033", curso: "Economia", ano: 2, risco: "medio", acompanhamentos: 3, ultimoContacto: "2025-12-13", responsavel: "Dr. João Tavares", motivo: "Orientação vocacional" },
+  { id: "S-004", nome: "Maria João Santos", matricula: "2023042", curso: "Medicina", ano: 3, risco: "baixo", acompanhamentos: 1, ultimoContacto: "2025-12-13", responsavel: "Dra. Helena Cabral", motivo: "Apoio financeiro" },
+  { id: "S-005", nome: "Beatriz Lopes", matricula: "2023089", curso: "Psicologia", ano: 3, risco: "baixo", acompanhamentos: 2, ultimoContacto: "2025-12-13", responsavel: "Dra. Helena Cabral", motivo: "Estágio curricular" },
+  { id: "S-006", nome: "João Baptista", matricula: "2024050", curso: "Gestão", ano: 1, risco: "medio", acompanhamentos: 1, ultimoContacto: "2025-12-14", responsavel: "Dr. João Tavares", motivo: "Conflito grupo" },
 ];
 
-export const gapArtigos: GapArtigo[] = [
-  { id: "A1", titulo: "Como gerir o stress antes das avaliações", categoria: "psicologico", resumo: "Técnicas práticas de respiração, organização e gestão do tempo para reduzir a ansiedade.", visualizacoes: 1248, atualizado: "2025-01-05", destaque: true },
-  { id: "A2", titulo: "Guia de candidatura à bolsa INAGBE", categoria: "financeiro", resumo: "Passo-a-passo do processo, documentos necessários e prazos da bolsa social.", visualizacoes: 982, atualizado: "2024-12-18", destaque: true },
-  { id: "A3", titulo: "Métodos de estudo eficazes para o 1º ano", categoria: "academico", resumo: "Estratégias adaptadas a cada área de conhecimento para facilitar a transição académica.", visualizacoes: 754, atualizado: "2025-01-02" },
-  { id: "A4", titulo: "Orientação vocacional — quando mudar de curso?", categoria: "carreira", resumo: "Sinais a considerar e o processo institucional de mudança ou transferência interna.", visualizacoes: 612, atualizado: "2024-12-22" },
-  { id: "A5", titulo: "Mediação de conflitos em trabalhos de grupo", categoria: "social", resumo: "Como abordar tensões interpessoais e construir dinâmicas saudáveis de colaboração.", visualizacoes: 421, atualizado: "2024-12-15" },
-  { id: "A6", titulo: "Documentos académicos — pedidos urgentes", categoria: "documentacao", resumo: "Lista de documentos disponíveis no GAP e prazos típicos de emissão.", visualizacoes: 537, atualizado: "2025-01-08" },
-];
+// ─── KPIs ───────────────────────────────────────────────────────────────────
+const slaEmRisco = solicitacoes.filter(s => {
+  const st = getSlaStatus(s);
+  return st === "em_risco" || st === "atrasado";
+}).length;
 
 export const gapKpis = {
-  ticketsAbertos: gapTickets.filter(t => t.estado === "aberto").length,
-  ticketsEmAndamento: gapTickets.filter(t => t.estado === "em_andamento").length,
-  ticketsResolvidos30d: 47,
-  atendimentosHoje: gapAtendimentos.filter(a => a.data === "2025-01-16" && a.estado === "agendado").length,
+  recebidas:   solicitacoes.filter(s => s.estado === "recebida").length,
+  encaminhadas: solicitacoes.filter(s => s.estado === "encaminhada").length,
+  emExecucao:  solicitacoes.filter(s => s.estado === "em_execucao").length,
+  concluidas:  solicitacoes.filter(s => s.estado === "concluida").length,
+  total:       solicitacoes.length,
+  slaEmRisco,
+  atendimentosHoje: gapAtendimentos.filter(a => a.data === "2025-12-16" && a.estado === "agendado").length,
   estudantesAtivos: gapEstudantesSeguimento.length,
   estudantesRiscoAlto: gapEstudantesSeguimento.filter(e => e.risco === "alto").length,
-  tempoMedioResposta: "4h 12min",
   satisfacao: 94,
 };
 
-export const gapCategoriaStats = (Object.keys(categoriaConfig) as TicketCategoria[]).map(cat => ({
-  categoria: cat,
-  label: categoriaConfig[cat].label,
-  count: gapTickets.filter(t => t.categoria === cat).length + gapAtendimentos.filter(a => a.categoria === cat).length,
+export const solicitacoesPorDestino = (Object.keys(destinoConfig) as Destino[]).map(d => ({
+  destino: d,
+  label: destinoConfig[d].label,
+  count: solicitacoes.filter(s => s.destino === d).length,
 }));
+
+// ─── Compatibilidade com módulos antigos (Inicio/EstudanteProfile) ──────────
+// Mapeia Solicitacao -> formato "ticket-like" para reutilização visual existente.
+export type GapTicket = {
+  id: string; estudante: string; matricula: string; curso: string; ano: number;
+  assunto: string; descricao: string;
+  categoria: TicketCategoria;        // derivada do destino
+  estado: "aberto" | "em_andamento" | "resolvido" | "aguarda_estudante";
+  prioridade: Prioridade;
+  data: string;
+  responsavel?: string;
+};
+
+const destinoToCategoria: Record<Destino, TicketCategoria> = {
+  CTI: "documentacao", Académica: "academico", Financeiro: "financeiro",
+  GAP: "psicologico", Secretaria: "documentacao",
+};
+const estadoToTicket: Record<EstadoSolicitacao, GapTicket["estado"]> = {
+  recebida: "aberto", encaminhada: "aberto", em_execucao: "em_andamento",
+  concluida: "resolvido", rejeitada: "resolvido",
+};
+export const gapTickets: GapTicket[] = solicitacoes.map(s => ({
+  id: s.id, estudante: s.estudante, matricula: s.matricula, curso: s.curso, ano: s.ano,
+  assunto: s.assunto, descricao: s.descricao,
+  categoria: destinoToCategoria[s.destino],
+  estado: estadoToTicket[s.estado],
+  prioridade: s.prioridade,
+  data: s.dataSubmissao,
+  responsavel: s.responsavelDestino,
+}));
+
+export const ticketStatusConfig: Record<GapTicket["estado"], { label: string; color: string }> = {
+  aberto:            { label: "Aberta",      color: "bg-orange-100 text-orange-700 border-orange-200" },
+  em_andamento:      { label: "Em Execução", color: "bg-amber-100 text-amber-700 border-amber-200" },
+  aguarda_estudante: { label: "Aguarda",     color: "bg-blue-100 text-blue-700 border-blue-200" },
+  resolvido:         { label: "Concluída",   color: "bg-emerald-100 text-emerald-700 border-emerald-200" },
+};
+
+export type TicketStatus = GapTicket["estado"];
