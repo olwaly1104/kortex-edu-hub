@@ -9,7 +9,7 @@ import {
 import {
   gapKpis, solicitacoes, gapAtendimentos, gapEstudantesSeguimento,
   solicitacoesPorDestino, destinoConfig, estadoSolicitacaoConfig,
-  categoriaConfig,
+  ticketCategoriaConfig as categoriaConfig,
 } from "@/data/gapData";
 
 export default function GapDashboard() {

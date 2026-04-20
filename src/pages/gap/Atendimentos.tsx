@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import {
   Plus, Calendar as CalendarIcon, Clock, MapPin, Video, Search, Users, FileText,
 } from "lucide-react";
-import { gapAtendimentos, categoriaConfig, TicketCategoria } from "@/data/gapData";
+import { gapAtendimentos, ticketCategoriaConfig as categoriaConfig, TicketCategoria } from "@/data/gapData";
 
 const estadoConfig: Record<string, { label: string; color: string }> = {
   agendado: { label: "Agendado", color: "bg-blue-100 text-blue-700 border-blue-200" },

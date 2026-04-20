@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import {
   gapEstudantesSeguimento, gapTickets, gapAtendimentos,
-  categoriaConfig, ticketStatusConfig, prioridadeConfig,
+  ticketCategoriaConfig as categoriaConfig, ticketStatusConfig, prioridadeConfig,
 } from "@/data/gapData";
 
 const riscoConfig = {
