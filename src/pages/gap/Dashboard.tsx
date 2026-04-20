@@ -2,41 +2,43 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import {
-  HelpCircle, Clock, CheckCircle, Users, Heart, TrendingUp,
+  HelpCircle, Clock, CheckCircle, Heart,
   Smile, AlertTriangle, Calendar as CalendarIcon, BarChart3,
+  Send, Inbox, Building2,
 } from "lucide-react";
 import {
-  gapKpis, gapTickets, gapAtendimentos, gapEstudantesSeguimento,
-  gapCategoriaStats, categoriaConfig, ticketStatusConfig,
+  gapKpis, solicitacoes, gapAtendimentos, gapEstudantesSeguimento,
+  solicitacoesPorDestino, destinoConfig, estadoSolicitacaoConfig,
+  categoriaConfig,
 } from "@/data/gapData";
 
 export default function GapDashboard() {
   const kpis = [
-    { label: "Solicitações Abertas", value: gapKpis.ticketsAbertos, icon: HelpCircle, color: "text-orange-600 bg-orange-100", trend: "+3 hoje" },
-    { label: "Em Andamento", value: gapKpis.ticketsEmAndamento, icon: Clock, color: "text-blue-600 bg-blue-100", trend: "" },
-    { label: "Resolvidas (30d)", value: gapKpis.ticketsResolvidos30d, icon: CheckCircle, color: "text-emerald-600 bg-emerald-100", trend: "+12% vs mês ant." },
+    { label: "Recebidas", value: gapKpis.recebidas, icon: Inbox, color: "text-orange-600 bg-orange-100", trend: "" },
+    { label: "Encaminhadas", value: gapKpis.encaminhadas, icon: Send, color: "text-blue-600 bg-blue-100", trend: "" },
+    { label: "Em Execução", value: gapKpis.emExecucao, icon: Clock, color: "text-amber-600 bg-amber-100", trend: "" },
+    { label: "Concluídas (mês)", value: gapKpis.concluidas, icon: CheckCircle, color: "text-emerald-600 bg-emerald-100", trend: "" },
+    { label: "SLA em Risco", value: gapKpis.slaEmRisco, icon: AlertTriangle, color: "text-destructive bg-destructive/10", trend: "" },
     { label: "Agendamentos Hoje", value: gapKpis.atendimentosHoje, icon: CalendarIcon, color: "text-primary bg-primary/10", trend: "" },
     { label: "Estudantes Activos", value: gapKpis.estudantesAtivos, icon: Heart, color: "text-pink-600 bg-pink-100", trend: "" },
-    { label: "Risco Alto", value: gapKpis.estudantesRiscoAlto, icon: AlertTriangle, color: "text-destructive bg-destructive/10", trend: "" },
-    { label: "Tempo Médio Resp.", value: gapKpis.tempoMedioResposta, icon: TrendingUp, color: "text-amber-600 bg-amber-100", trend: "" },
-    { label: "Satisfação", value: `${gapKpis.satisfacao}%`, icon: Smile, color: "text-emerald-600 bg-emerald-100", trend: "+2pp" },
+    { label: "Satisfacão", value: `${gapKpis.satisfacao}%`, icon: Smile, color: "text-emerald-600 bg-emerald-100", trend: "+2pp" },
   ];
 
-  const maxCat = Math.max(...gapCategoriaStats.map(c => c.count), 1);
-  const ticketsByStatus = (Object.keys(ticketStatusConfig) as Array<keyof typeof ticketStatusConfig>).map(s => ({
+  const maxDest = Math.max(...solicitacoesPorDestino.map(c => c.count), 1);
+  const totalSol = solicitacoes.length;
+  const estadoStats = (Object.keys(estadoSolicitacaoConfig) as (keyof typeof estadoSolicitacaoConfig)[]).map(s => ({
     estado: s,
-    label: ticketStatusConfig[s].label,
-    color: ticketStatusConfig[s].color,
-    count: gapTickets.filter(t => t.estado === s).length,
+    label: estadoSolicitacaoConfig[s].label,
+    color: estadoSolicitacaoConfig[s].color,
+    count: solicitacoes.filter(t => t.estado === s).length,
   }));
 
-  const totalTickets = gapTickets.length;
   const proximosAtendimentos = gapAtendimentos
     .filter(a => a.estado === "agendado")
     .sort((a, b) => (a.data + a.hora).localeCompare(b.data + b.hora))
     .slice(0, 5);
 
-  const riscoAlto = gapEstudantesSeguimento.filter(e => e.risco === "alto");
+  const riscoAlto  = gapEstudantesSeguimento.filter(e => e.risco === "alto");
   const riscoMedio = gapEstudantesSeguimento.filter(e => e.risco === "medio");
   const riscoBaixo = gapEstudantesSeguimento.filter(e => e.risco === "baixo");
 
@@ -47,7 +49,7 @@ export default function GapDashboard() {
           <BarChart3 className="w-6 h-6 text-primary" /> Dashboard GAP
         </h1>
         <p className="text-sm text-muted-foreground mt-0.5">
-          Gabinete de Apoio ao Estudante — visão analítica e operacional
+          Gabinete de Apoio ao Estudante — monitorização de solicitações encaminhadas e acompanhamento
         </p>
       </div>
 
@@ -68,23 +70,21 @@ export default function GapDashboard() {
       </div>
 
       <div className="grid lg:grid-cols-2 gap-6">
-        {/* Distribuição por categoria */}
+        {/* Solicitações por Destino */}
         <Card className="p-5">
-          <h2 className="text-base font-semibold text-foreground mb-4">Distribuição por Categoria</h2>
+          <h2 className="text-base font-semibold text-foreground mb-1 flex items-center gap-2">
+            <Building2 className="w-4 h-4 text-primary" /> Solicitações por Destino
+          </h2>
+          <p className="text-[11px] text-muted-foreground mb-4">Departamento que executa o pedido após o encaminhamento automático</p>
           <div className="space-y-3">
-            {gapCategoriaStats.map(c => (
-              <div key={c.categoria}>
+            {solicitacoesPorDestino.map(c => (
+              <div key={c.destino}>
                 <div className="flex items-center justify-between mb-1.5">
-                  <Badge variant="outline" className={`text-[10px] ${categoriaConfig[c.categoria].color}`}>
-                    {c.label}
-                  </Badge>
+                  <Badge variant="outline" className={`text-[10px] ${destinoConfig[c.destino].color}`}>{c.label}</Badge>
                   <span className="text-xs font-semibold text-foreground">{c.count}</span>
                 </div>
                 <div className="h-2 rounded-full bg-muted overflow-hidden">
-                  <div
-                    className="h-full bg-primary rounded-full transition-all"
-                    style={{ width: `${(c.count / maxCat) * 100}%` }}
-                  />
+                  <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${(c.count / maxDest) * 100}%` }} />
                 </div>
               </div>
             ))}
@@ -95,8 +95,8 @@ export default function GapDashboard() {
         <Card className="p-5">
           <h2 className="text-base font-semibold text-foreground mb-4">Estado das Solicitações</h2>
           <div className="space-y-3">
-            {ticketsByStatus.map(s => {
-              const pct = totalTickets > 0 ? (s.count / totalTickets) * 100 : 0;
+            {estadoStats.map(s => {
+              const pct = totalSol > 0 ? (s.count / totalSol) * 100 : 0;
               return (
                 <div key={s.estado}>
                   <div className="flex items-center justify-between mb-1.5">
@@ -109,7 +109,7 @@ export default function GapDashboard() {
             })}
           </div>
           <div className="mt-4 pt-4 border-t border-border flex items-center justify-between text-xs">
-            <span className="text-muted-foreground">Taxa de resolução (30d)</span>
+            <span className="text-muted-foreground">SLA cumprido (mês)</span>
             <span className="font-semibold text-emerald-600">87%</span>
           </div>
         </Card>
@@ -125,12 +125,8 @@ export default function GapDashboard() {
             {proximosAtendimentos.map(a => (
               <div key={a.id} className="flex items-center gap-4 px-3 py-2.5 rounded-xl border border-border bg-card">
                 <div className="text-center w-12 shrink-0">
-                  <p className="text-base font-bold text-foreground leading-none">
-                    {new Date(a.data).getDate()}
-                  </p>
-                  <p className="text-[9px] text-muted-foreground uppercase">
-                    {new Date(a.data).toLocaleDateString("pt-AO", { month: "short" })}
-                  </p>
+                  <p className="text-base font-bold text-foreground leading-none">{new Date(a.data).getDate()}</p>
+                  <p className="text-[9px] text-muted-foreground uppercase">{new Date(a.data).toLocaleDateString("pt-AO", { month: "short" })}</p>
                 </div>
                 <div className="w-px h-10 bg-border shrink-0" />
                 <div className="flex-1 min-w-0">
@@ -181,3 +177,6 @@ export default function GapDashboard() {
     </div>
   );
 }
+
+// Suppress unused import warning when HelpCircle isn't used
+void HelpCircle;

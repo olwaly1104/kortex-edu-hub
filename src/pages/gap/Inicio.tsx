@@ -21,10 +21,10 @@ export default function GapInicio() {
   const { user } = useAuth();
 
   const stats = [
-    { icon: HelpCircle, label: "Solicitações Abertas", value: gapKpis.ticketsAbertos, color: "text-orange-600 bg-orange-100" },
-    { icon: Clock, label: "Em Andamento", value: gapKpis.ticketsEmAndamento, color: "text-primary bg-primary/10" },
+    { icon: HelpCircle, label: "Recebidas", value: gapKpis.recebidas, color: "text-orange-600 bg-orange-100" },
+    { icon: Clock, label: "Em Execução", value: gapKpis.emExecucao, color: "text-amber-600 bg-amber-100" },
     { icon: CalendarDays, label: "Agendamentos Hoje", value: gapKpis.atendimentosHoje, color: "text-emerald-600 bg-emerald-100" },
-    { icon: AlertTriangle, label: "Risco Alto", value: gapKpis.estudantesRiscoAlto, color: "text-destructive bg-destructive/10" },
+    { icon: AlertTriangle, label: "SLA em Risco", value: gapKpis.slaEmRisco, color: "text-destructive bg-destructive/10" },
   ];
 
   const TODAY_DATE = "2024-02-14";
