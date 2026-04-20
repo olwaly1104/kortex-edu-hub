@@ -8,7 +8,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, Heart, AlertTriangle, Clock, CheckCircle, Filter, ChevronRight } from "lucide-react";
-import { gapEstudantesSeguimento, categoriaConfig, gapTickets, gapAtendimentos, type TicketCategoria } from "@/data/gapData";
+import { gapEstudantesSeguimento, ticketCategoriaConfig as categoriaConfig, gapTickets, gapAtendimentos, type TicketCategoria } from "@/data/gapData";
 
 const riscoConfig = {
   alto: { label: "Risco Alto", color: "bg-destructive/10 text-destructive border-destructive/20", icon: AlertTriangle },

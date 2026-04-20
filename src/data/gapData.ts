@@ -19,55 +19,65 @@ export type Prioridade = "alta" | "media" | "baixa";
 // CTI · Área Académica · Área Financeira · Faculdades.
 export type TipoSolicitacao = string;
 
-export const tipoConfig: Record<string, { label: string; categoria: string; destino: Destino; slaDias: number }> = {
-  // ── CTI ──────────────────────────────────────────────────────────────────
-  actualizacao_dados_portal:   { label: "Actualização de dados — Portal do Estudante", categoria: "Acessos & Contas", destino: "CTI", slaDias: 2 },
-  actualizacao_dados_email:    { label: "Actualização de dados — Email institucional", categoria: "Acessos & Contas", destino: "CTI", slaDias: 2 },
-  actualizacao_dados_canal:    { label: "Actualização de dados — Canal de Estudante", categoria: "Acessos & Contas", destino: "CTI", slaDias: 3 },
-  actualizacao_calculo_medias: { label: "Actualização do cálculo de médias no sistema", categoria: "Sistemas Académicos", destino: "CTI", slaDias: 5 },
-  segunda_via_cartao:          { label: "Pedido de 2ª via do cartão de estudante", categoria: "Cartão de Estudante", destino: "CTI", slaDias: 7 },
-  falha_cartao:                { label: "Falha de funcionamento do cartão de estudante", categoria: "Cartão de Estudante", destino: "CTI", slaDias: 5 },
-  anulacao_cartao:             { label: "Pedido de anulação do cartão de estudante", categoria: "Cartão de Estudante", destino: "CTI", slaDias: 3 },
+// Categorias macro: alinhadas com a área funcional do pedido (não com o departamento).
+export type Categoria = "Tecnológico" | "Académico" | "Financeiro" | "Pedagógico";
 
-  // ── Área Académica ───────────────────────────────────────────────────────
-  inscricao_semestre:          { label: "Inscrição para o Iº/IIº Semestre", categoria: "Inscrições", destino: "Académica", slaDias: 5 },
-  inscricao_prescritos:        { label: "Inscrição de estudante prescrito", categoria: "Inscrições", destino: "Académica", slaDias: 5 },
-  inscricao_recurso:           { label: "Inscrição para exame de recurso", categoria: "Inscrições", destino: "Académica", slaDias: 3 },
-  inscricao_fora_epoca:        { label: "Inscrição para exame fora de época", categoria: "Inscrições", destino: "Académica", slaDias: 3 },
-  ausencia_lista_disciplina:   { label: "Nome ausente em lista de disciplina", categoria: "Listas & Matrículas", destino: "Académica", slaDias: 4 },
-  ausencia_listas:             { label: "Ausência de nome nas listas", categoria: "Listas & Matrículas", destino: "Académica", slaDias: 4 },
-  estatuto_discente:           { label: "Correcção de estatuto do discente", categoria: "Listas & Matrículas", destino: "Académica", slaDias: 5 },
-  cancelamento_matricula:      { label: "Pedido de cancelamento de matrícula", categoria: "Listas & Matrículas", destino: "Académica", slaDias: 7 },
-  transferencia:               { label: "Pedido de transferência", categoria: "Listas & Matrículas", destino: "Académica", slaDias: 10 },
-  declaracao_com_notas:        { label: "Declaração com notas", categoria: "Documentação", destino: "Académica", slaDias: 5 },
-  declaracao_sem_notas:        { label: "Declaração sem notas", categoria: "Documentação", destino: "Académica", slaDias: 3 },
-  certificado_diploma:         { label: "Certificado / Diploma", categoria: "Documentação", destino: "Académica", slaDias: 15 },
-  conteudo_programatico:       { label: "Conteúdo programático", categoria: "Documentação", destino: "Académica", slaDias: 5 },
-  homologacao_inaares:         { label: "Homologação de documentos (INAARES)", categoria: "Documentação", destino: "Académica", slaDias: 10 },
-  levantamento_cartas:         { label: "Levantamento de cartas / despachos", categoria: "Documentação", destino: "Académica", slaDias: 3 },
-  historico_academico:         { label: "Histórico académico / situação académica", categoria: "Documentação", destino: "Académica", slaDias: 5 },
+export const tipoConfig: Record<string, { label: string; categoria: Categoria; destino: Destino; slaDias: number }> = {
+  // ── CTI (Tecnológico) ────────────────────────────────────────────────────
+  actualizacao_dados_portal:   { label: "Actualização de dados — Portal do Estudante", categoria: "Tecnológico", destino: "CTI", slaDias: 2 },
+  actualizacao_dados_email:    { label: "Actualização de dados — Email institucional", categoria: "Tecnológico", destino: "CTI", slaDias: 2 },
+  actualizacao_dados_canal:    { label: "Actualização de dados — Canal de Estudante", categoria: "Tecnológico", destino: "CTI", slaDias: 3 },
+  actualizacao_calculo_medias: { label: "Actualização do cálculo de médias no sistema", categoria: "Tecnológico", destino: "CTI", slaDias: 5 },
+  segunda_via_cartao:          { label: "Pedido de 2ª via do cartão de estudante", categoria: "Tecnológico", destino: "CTI", slaDias: 7 },
+  falha_cartao:                { label: "Falha de funcionamento do cartão de estudante", categoria: "Tecnológico", destino: "CTI", slaDias: 5 },
+  anulacao_cartao:             { label: "Pedido de anulação do cartão de estudante", categoria: "Tecnológico", destino: "CTI", slaDias: 3 },
 
-  // ── Área Financeira ──────────────────────────────────────────────────────
-  confirmacao_pagamento:       { label: "Verificação / confirmação de pagamento", categoria: "Pagamentos", destino: "Financeiro", slaDias: 3 },
-  divida_aberta:               { label: "Esclarecimento de dívida em aberto", categoria: "Dívidas & Multas", destino: "Financeiro", slaDias: 5 },
-  pagamento_nao_reflectido:    { label: "Pagamento efectuado não reflectido no sistema", categoria: "Pagamentos", destino: "Financeiro", slaDias: 3 },
-  emolumentos_duplicados:      { label: "Remoção de emolumentos duplicados / mal gerados", categoria: "Emolumentos", destino: "Financeiro", slaDias: 5 },
-  calculo_multas:              { label: "Solicitação de cálculo de multas", categoria: "Dívidas & Multas", destino: "Financeiro", slaDias: 3 },
-  ausencia_propinas:           { label: "Ausência de propinas geradas no sistema", categoria: "Propinas", destino: "Financeiro", slaDias: 4 },
-  rectificacao_propinas:       { label: "Rectificação do valor das propinas", categoria: "Propinas", destino: "Financeiro", slaDias: 5 },
-  geracao_referencias:         { label: "Dificuldade na geração de referências de pagamento", categoria: "Propinas", destino: "Financeiro", slaDias: 2 },
-  alteracao_prazo_pagamento:   { label: "Alteração do prazo de pagamento", categoria: "Acordos & Negociação", destino: "Financeiro", slaDias: 7 },
-  apoio_bolseiros:             { label: "Apoio a discente bolseiro (interno/externo)", categoria: "Bolseiros", destino: "Financeiro", slaDias: 5 },
-  pendencias_financeiras:      { label: "Levantamento de pendências financeiras", categoria: "Dívidas & Multas", destino: "Financeiro", slaDias: 5 },
-  acordo_financeiro:           { label: "Mediação de acordo financeiro / termo de responsabilidade", categoria: "Acordos & Negociação", destino: "Financeiro", slaDias: 7 },
+  // ── Área Académica (Académico) ───────────────────────────────────────────
+  inscricao_semestre:          { label: "Inscrição para o Iº/IIº Semestre", categoria: "Académico", destino: "Académica", slaDias: 5 },
+  inscricao_prescritos:        { label: "Inscrição de estudante prescrito", categoria: "Académico", destino: "Académica", slaDias: 5 },
+  inscricao_recurso:           { label: "Inscrição para exame de recurso", categoria: "Académico", destino: "Académica", slaDias: 3 },
+  inscricao_fora_epoca:        { label: "Inscrição para exame fora de época", categoria: "Académico", destino: "Académica", slaDias: 3 },
+  ausencia_lista_disciplina:   { label: "Nome ausente em lista de disciplina", categoria: "Académico", destino: "Académica", slaDias: 4 },
+  ausencia_listas:             { label: "Ausência de nome nas listas", categoria: "Académico", destino: "Académica", slaDias: 4 },
+  estatuto_discente:           { label: "Correcção de estatuto do discente", categoria: "Académico", destino: "Académica", slaDias: 5 },
+  cancelamento_matricula:      { label: "Pedido de cancelamento de matrícula", categoria: "Académico", destino: "Académica", slaDias: 7 },
+  transferencia:               { label: "Pedido de transferência", categoria: "Académico", destino: "Académica", slaDias: 10 },
+  declaracao_com_notas:        { label: "Declaração com notas", categoria: "Académico", destino: "Académica", slaDias: 5 },
+  declaracao_sem_notas:        { label: "Declaração sem notas", categoria: "Académico", destino: "Académica", slaDias: 3 },
+  certificado_diploma:         { label: "Certificado / Diploma", categoria: "Académico", destino: "Académica", slaDias: 15 },
+  conteudo_programatico:       { label: "Conteúdo programático", categoria: "Académico", destino: "Académica", slaDias: 5 },
+  homologacao_inaares:         { label: "Homologação de documentos (INAARES)", categoria: "Académico", destino: "Académica", slaDias: 10 },
+  levantamento_cartas:         { label: "Levantamento de cartas / despachos", categoria: "Académico", destino: "Académica", slaDias: 3 },
+  historico_academico:         { label: "Histórico académico / situação académica", categoria: "Académico", destino: "Académica", slaDias: 5 },
 
-  // ── Faculdades ───────────────────────────────────────────────────────────
-  falta_lancamento_notas:      { label: "Falta de lançamento de notas (P1/P2/Final/Recurso)", categoria: "Lançamento de Notas", destino: "Faculdade", slaDias: 5 },
-  falta_lancamento_prescrito:  { label: "Falta de lançamento de notas — prescritos", categoria: "Lançamento de Notas", destino: "Faculdade", slaDias: 5 },
-  rectificacao_notas:          { label: "Rectificação de notas lançadas com valor errado", categoria: "Correcção de Notas", destino: "Faculdade", slaDias: 7 },
-  melhoria_notas:              { label: "Pedido de melhoria de notas", categoria: "Recurso de Notas", destino: "Faculdade", slaDias: 10 },
-  revisao_notas:               { label: "Pedido de revisão de notas", categoria: "Recurso de Notas", destino: "Faculdade", slaDias: 10 },
-  justificacao_faltas:         { label: "Pedido de justificação de faltas", categoria: "Frequência", destino: "Faculdade", slaDias: 5 },
+  // ── Área Financeira (Financeiro) ─────────────────────────────────────────
+  confirmacao_pagamento:       { label: "Verificação / confirmação de pagamento", categoria: "Financeiro", destino: "Financeiro", slaDias: 3 },
+  divida_aberta:               { label: "Esclarecimento de dívida em aberto", categoria: "Financeiro", destino: "Financeiro", slaDias: 5 },
+  pagamento_nao_reflectido:    { label: "Pagamento efectuado não reflectido no sistema", categoria: "Financeiro", destino: "Financeiro", slaDias: 3 },
+  emolumentos_duplicados:      { label: "Remoção de emolumentos duplicados / mal gerados", categoria: "Financeiro", destino: "Financeiro", slaDias: 5 },
+  calculo_multas:              { label: "Solicitação de cálculo de multas", categoria: "Financeiro", destino: "Financeiro", slaDias: 3 },
+  ausencia_propinas:           { label: "Ausência de propinas geradas no sistema", categoria: "Financeiro", destino: "Financeiro", slaDias: 4 },
+  rectificacao_propinas:       { label: "Rectificação do valor das propinas", categoria: "Financeiro", destino: "Financeiro", slaDias: 5 },
+  geracao_referencias:         { label: "Dificuldade na geração de referências de pagamento", categoria: "Financeiro", destino: "Financeiro", slaDias: 2 },
+  alteracao_prazo_pagamento:   { label: "Alteração do prazo de pagamento", categoria: "Financeiro", destino: "Financeiro", slaDias: 7 },
+  apoio_bolseiros:             { label: "Apoio a discente bolseiro (interno/externo)", categoria: "Financeiro", destino: "Financeiro", slaDias: 5 },
+  pendencias_financeiras:      { label: "Levantamento de pendências financeiras", categoria: "Financeiro", destino: "Financeiro", slaDias: 5 },
+  acordo_financeiro:           { label: "Mediação de acordo financeiro / termo de responsabilidade", categoria: "Financeiro", destino: "Financeiro", slaDias: 7 },
+
+  // ── Faculdades (Pedagógico) ──────────────────────────────────────────────
+  falta_lancamento_notas:      { label: "Falta de lançamento de notas (P1/P2/Final/Recurso)", categoria: "Pedagógico", destino: "Faculdade", slaDias: 5 },
+  falta_lancamento_prescrito:  { label: "Falta de lançamento de notas — prescritos", categoria: "Pedagógico", destino: "Faculdade", slaDias: 5 },
+  rectificacao_notas:          { label: "Rectificação de notas lançadas com valor errado", categoria: "Pedagógico", destino: "Faculdade", slaDias: 7 },
+  melhoria_notas:              { label: "Pedido de melhoria de notas", categoria: "Pedagógico", destino: "Faculdade", slaDias: 10 },
+  revisao_notas:               { label: "Pedido de revisão de notas", categoria: "Pedagógico", destino: "Faculdade", slaDias: 10 },
+  justificacao_faltas:         { label: "Pedido de justificação de faltas", categoria: "Pedagógico", destino: "Faculdade", slaDias: 5 },
+};
+
+export const categoriaConfig: Record<Categoria, { label: string; color: string }> = {
+  Tecnológico: { label: "Tecnológico", color: "bg-blue-100 text-blue-700 border-blue-200" },
+  Académico:   { label: "Académico",   color: "bg-purple-100 text-purple-700 border-purple-200" },
+  Financeiro:  { label: "Financeiro",  color: "bg-emerald-100 text-emerald-700 border-emerald-200" },
+  Pedagógico:  { label: "Pedagógico",  color: "bg-indigo-100 text-indigo-700 border-indigo-200" },
 };
 
 export const destinoConfig: Record<Destino, { label: string; color: string }> = {
@@ -610,7 +620,7 @@ export interface GapEstudanteSeguimento {
   acompanhamentos: number; ultimoContacto: string; responsavel: string; motivo: string;
 }
 
-export const categoriaConfig: Record<TicketCategoria, { label: string; color: string }> = {
+export const ticketCategoriaConfig: Record<TicketCategoria, { label: string; color: string }> = {
   academico:    { label: "Académico",    color: "bg-primary/10 text-primary border-primary/20" },
   psicologico:  { label: "Psicológico",  color: "bg-purple-100 text-purple-700 border-purple-200" },
   financeiro:   { label: "Financeiro",   color: "bg-emerald-100 text-emerald-700 border-emerald-200" },

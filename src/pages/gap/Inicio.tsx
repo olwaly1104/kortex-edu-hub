@@ -9,7 +9,7 @@ import {
   AlertTriangle, BarChart3,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { gapTickets, gapAtendimentos, gapKpis, ticketStatusConfig, categoriaConfig, prioridadeConfig } from "@/data/gapData";
+import { gapTickets, gapAtendimentos, gapKpis, ticketStatusConfig, ticketCategoriaConfig as categoriaConfig, prioridadeConfig } from "@/data/gapData";
 
 const typeStyles: Record<string, { bg: string; label: string }> = {
   urgente: { bg: "bg-destructive text-destructive-foreground", label: "Urgente" },
