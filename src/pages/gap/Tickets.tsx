@@ -254,11 +254,10 @@ export default function GapTickets() {
               <tr className="border-b bg-muted/30">
                 <th className="text-left p-3 font-medium text-muted-foreground">ID</th>
                 <th className="text-left p-3 font-medium text-muted-foreground">Estudante</th>
+                <th className="text-center p-3 font-medium text-muted-foreground whitespace-nowrap">Data do pedido</th>
                 <th className="text-left p-3 font-medium text-muted-foreground">Tipo de pedido</th>
                 <th className="text-center p-3 font-medium text-muted-foreground">Destino</th>
                 <th className="text-center p-3 font-medium text-muted-foreground">Prioridade</th>
-                <th className="text-center p-3 font-medium text-muted-foreground">Submetida</th>
-                <th className="text-center p-3 font-medium text-muted-foreground">SLA</th>
                 <th className="text-center p-3 font-medium text-muted-foreground">Estado</th>
               </tr>
             </thead>
@@ -267,28 +266,27 @@ export default function GapTickets() {
                 const st = estadoSolicitacaoConfig[s.estado];
                 const pr = prioridadeConfig[s.prioridade];
                 const dest = destinoConfig[s.destino];
-                const sla = getSlaStatus(s);
-                const slaCfg = slaStatusConfig[sla];
                 const tipoLabel = tipoConfig[s.tipo]?.label ?? s.tipo;
+                const tipoCat = tipoConfig[s.tipo]?.categoria;
+                const d = new Date(s.dataSubmissao);
                 return (
                   <tr key={s.id}
                     className="border-b last:border-0 hover:bg-muted/20 transition-colors cursor-pointer"
                     onClick={() => setSelected(s)}>
                     <td className="p-3"><span className="text-[11px] font-mono text-muted-foreground">{s.id}</span></td>
                     <td className="p-3">
-                      <p className="font-medium text-foreground">{s.estudante}</p>
-                      <p className="text-[11px] text-muted-foreground">{s.matricula} · {s.curso}</p>
+                      <p className="font-medium text-foreground leading-tight">{s.estudante}</p>
+                      <p className="text-[11px] text-muted-foreground mt-0.5">{s.matricula} · {s.curso}</p>
                     </td>
-                    <td className="p-3 max-w-xs">
-                      <p className="text-foreground truncate text-xs">{tipoLabel}</p>
-                      <p className="text-[10px] text-muted-foreground truncate">{s.assunto}</p>
+                    <td className="p-3 text-center whitespace-nowrap">
+                      <p className="text-xs font-medium text-foreground">{d.toLocaleDateString("pt-AO", { day: "2-digit", month: "short", year: "numeric" })}</p>
+                    </td>
+                    <td className="p-3 max-w-sm">
+                      <p className="text-foreground text-xs font-medium leading-tight line-clamp-1">{tipoLabel}</p>
+                      {tipoCat && <p className="text-[10px] text-muted-foreground mt-0.5">{tipoCat}</p>}
                     </td>
                     <td className="p-3 text-center"><Badge variant="outline" className={cn("text-[10px]", dest.color)}>{dest.label}</Badge></td>
                     <td className="p-3 text-center"><Badge variant="outline" className={cn("text-[10px]", pr.color)}>{pr.label}</Badge></td>
-                    <td className="p-3 text-center text-xs text-muted-foreground whitespace-nowrap">
-                      {new Date(s.dataSubmissao).toLocaleDateString("pt-AO", { day: "2-digit", month: "short" })}
-                    </td>
-                    <td className="p-3 text-center"><Badge variant="outline" className={cn("text-[10px]", slaCfg.color)}>{slaCfg.label}</Badge></td>
                     <td className="p-3 text-center"><Badge variant="outline" className={cn("text-[10px]", st.color)}>{st.label}</Badge></td>
                   </tr>
                 );
