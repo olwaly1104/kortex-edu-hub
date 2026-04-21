@@ -725,9 +725,9 @@ export default function GapAtendimentos() {
       </div>
       )}
 
-      {/* Detail dialog — institutional gradient header pattern */}
+      {/* Detail dialog — clean, simple, complete */}
       <Dialog open={!!selected} onOpenChange={open => !open && setSelected(null)}>
-        <DialogContent className="max-w-2xl p-0 gap-0 max-h-[92vh] overflow-y-auto rounded-xl">
+        <DialogContent className="max-w-lg p-0 gap-0 max-h-[92vh] overflow-y-auto rounded-xl">
           {selected && (() => {
             const cat = categoriaConfig[selected.categoria];
             const est = estadoConfig[selected.estado];
@@ -736,123 +736,102 @@ export default function GapAtendimentos() {
             const endTime = addMinutesToHHMM(selected.hora, parseDuracaoMin(selected.duracao));
             const isToday = selected.data === TODAY;
             const initials = selected.estudante.split(" ").slice(0, 2).map(n => n[0]).join("");
+            const dateLabel = d.toLocaleDateString("pt-AO", { weekday: "long", day: "2-digit", month: "long", year: "numeric" });
+
+            const Row = ({ label, children }: { label: string; children: React.ReactNode }) => (
+              <div className="grid grid-cols-[110px_1fr] gap-3 py-2.5 border-b border-border last:border-b-0">
+                <span className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold pt-0.5">{label}</span>
+                <div className="text-sm text-foreground min-w-0">{children}</div>
+              </div>
+            );
+
             return (
               <>
-                {/* Institutional gradient header */}
-                <div className="relative bg-gradient-to-br from-primary to-primary/80 text-primary-foreground px-6 pt-5 pb-5">
-                  <div className="flex items-center gap-2 flex-wrap mb-3">
-                    <Badge variant="outline" className="text-[10px] font-semibold h-5 bg-white/15 text-primary-foreground border-white/25 backdrop-blur-sm">
-                      {cat.label}
-                    </Badge>
-                    <Badge variant="outline" className="text-[10px] gap-1 h-5 bg-white/15 text-primary-foreground border-white/25 backdrop-blur-sm">
-                      <span className={cn("w-1.5 h-1.5 rounded-full", est.dot)} />
-                      {est.label}
-                    </Badge>
+                {/* Clean header */}
+                <div className="px-6 pt-6 pb-4 border-b border-border">
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="text-[11px] font-mono text-muted-foreground">#{selected.id}</span>
                     {isToday && (
-                      <Badge variant="outline" className="text-[10px] font-bold h-5 bg-secondary text-secondary-foreground border-secondary">
+                      <Badge variant="outline" className="text-[10px] font-bold h-5 bg-primary text-primary-foreground border-primary">
                         HOJE
                       </Badge>
                     )}
-                    <span className="text-[10px] font-mono text-primary-foreground/70 ml-auto pr-6">
-                      #{selected.id.replace(/^AT-?/i, "")}
-                    </span>
                   </div>
-                  <DialogTitle className="text-lg font-bold leading-snug tracking-tight pr-6 text-primary-foreground">
-                    {selected.motivo}
+                  <DialogTitle className="text-lg font-bold leading-snug tracking-tight text-foreground pr-6">
+                    Pedido de Atendimento
                   </DialogTitle>
-                  <p className="text-[12px] text-primary-foreground/75 mt-1.5 capitalize">
-                    {d.toLocaleDateString("pt-AO", { weekday: "long", day: "2-digit", month: "long", year: "numeric" })} · {startTime} – {endTime}
-                  </p>
+                  <p className="text-[13px] text-muted-foreground mt-1">{selected.motivo}</p>
                 </div>
 
-                {/* KPI strip — compact metadata bar */}
-                <div className="grid grid-cols-3 border-b border-border bg-muted/20 divide-x divide-border">
-                  <div className="px-4 py-3">
-                    <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1 flex items-center gap-1">
-                      <Clock className="w-3 h-3" /> Duração
+                {/* Body — clean rows */}
+                <div className="px-6 py-2">
+                  {/* Estudante — clickable */}
+                  <button
+                    onClick={() => { setSelected(null); navigate(`/gap/estudantes/${selected.matricula}`); }}
+                    className="w-full text-left rounded-lg border border-border hover:border-primary hover:bg-primary/[0.03] transition-all p-3 flex items-center gap-3 group my-3"
+                  >
+                    <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 text-xs font-bold">
+                      {initials}
                     </div>
-                    <p className="text-sm font-bold text-foreground tabular-nums">{selected.duracao}</p>
-                  </div>
-                  <div className="px-4 py-3">
-                    <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1 flex items-center gap-1">
-                      {selected.tipo === "online" ? <Video className="w-3 h-3" /> : <MapPin className="w-3 h-3" />}
-                      Modalidade
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-semibold text-foreground group-hover:text-primary truncate">
+                        {selected.estudante}
+                      </p>
+                      <p className="text-[11px] text-muted-foreground truncate">
+                        <span className="tabular-nums font-medium">{selected.matricula}</span> · {selected.curso} · {selected.ano}º ano
+                      </p>
                     </div>
-                    <p className="text-sm font-bold text-foreground capitalize">{selected.tipo}</p>
-                  </div>
-                  <div className="px-4 py-3">
-                    <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1 flex items-center gap-1">
-                      <MapPin className="w-3 h-3" /> Local
-                    </div>
-                    <p className="text-sm font-bold text-foreground truncate">
-                      {selected.tipo === "online" ? "Sessão Online" : (selected.sala ?? "—")}
-                    </p>
+                    <ArrowRight className="w-4 h-4 text-muted-foreground/40 group-hover:text-primary group-hover:translate-x-0.5 transition-all shrink-0" />
+                  </button>
+
+                  {/* Definition list */}
+                  <div>
+                    <Row label="Categoria">
+                      <Badge variant="outline" className={cn("text-[11px] font-medium h-5", cat.color)}>
+                        {cat.label}
+                      </Badge>
+                    </Row>
+                    <Row label="Estado">
+                      <span className="inline-flex items-center gap-1.5">
+                        <span className={cn("w-1.5 h-1.5 rounded-full", est.dot)} />
+                        <span className="font-medium">{est.label}</span>
+                      </span>
+                    </Row>
+                    <Row label="Motivo">
+                      <span className="text-foreground/90">{selected.motivo}</span>
+                    </Row>
+                    <Row label="Data">
+                      <span className="capitalize">{dateLabel}</span>
+                    </Row>
+                    <Row label="Horário">
+                      <span className="tabular-nums">{startTime} – {endTime}</span>
+                      <span className="text-muted-foreground"> · {selected.duracao}</span>
+                    </Row>
+                    <Row label="Modalidade">
+                      <span className="inline-flex items-center gap-1.5 capitalize">
+                        {selected.tipo === "online"
+                          ? <Video className="w-3.5 h-3.5 text-muted-foreground" />
+                          : <MapPin className="w-3.5 h-3.5 text-muted-foreground" />}
+                        {selected.tipo}
+                      </span>
+                    </Row>
+                    <Row label="Local">
+                      <span>{selected.tipo === "online" ? "Sessão Online" : (selected.sala ?? "—")}</span>
+                    </Row>
+                    <Row label="Responsável">
+                      <span>{selected.responsavel}</span>
+                    </Row>
+                    {selected.notas && (
+                      <Row label="Notas">
+                        <span className="text-foreground/90 leading-relaxed">{selected.notas}</span>
+                      </Row>
+                    )}
                   </div>
                 </div>
 
-                {/* Body */}
-                <div className="px-6 py-5 space-y-5">
-                  {/* Estudante card — clickable */}
-                  <section>
-                    <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-2 flex items-center gap-1.5">
-                      <User className="w-3 h-3" /> Estudante
-                    </div>
-                    <button
-                      onClick={() => { setSelected(null); navigate(`/gap/estudantes/${selected.matricula}`); }}
-                      className="w-full text-left rounded-lg border border-border hover:border-primary hover:bg-primary/[0.03] transition-all p-3 flex items-center gap-3 group"
-                    >
-                      <div className="w-11 h-11 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 text-sm font-bold">
-                        {initials}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-semibold text-foreground group-hover:text-primary truncate">
-                          {selected.estudante}
-                        </p>
-                        <div className="flex items-center gap-1.5 mt-0.5 text-[11px] text-muted-foreground">
-                          <span className="tabular-nums font-medium text-foreground/70">{selected.matricula}</span>
-                          <span className="text-border">•</span>
-                          <span className="truncate">{selected.curso}</span>
-                          <span className="text-border">•</span>
-                          <span className="whitespace-nowrap">{selected.ano}º ano</span>
-                        </div>
-                        <p className="text-[10px] text-muted-foreground/80 mt-0.5 truncate">{selected.faculdade}</p>
-                      </div>
-                      <ArrowRight className="w-4 h-4 text-muted-foreground/40 group-hover:text-primary group-hover:translate-x-0.5 transition-all shrink-0" />
-                    </button>
-                  </section>
-
-                  {/* Responsável */}
-                  <section>
-                    <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-2 flex items-center gap-1.5">
-                      <User className="w-3 h-3" /> Responsável GAP
-                    </div>
-                    <div className="rounded-lg border border-border p-3 flex items-center gap-3 bg-muted/20">
-                      <div className="w-9 h-9 rounded-full bg-accent/10 text-accent flex items-center justify-center shrink-0 text-xs font-bold">
-                        {selected.responsavel.split(" ").slice(-2).map(n => n[0]).join("")}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-semibold text-foreground truncate">{selected.responsavel}</p>
-                        <p className="text-[11px] text-muted-foreground">Gabinete de Apoio Psicopedagógico</p>
-                      </div>
-                    </div>
-                  </section>
-
-                  {/* Notas */}
-                  {selected.notas && (
-                    <section>
-                      <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-2 flex items-center gap-1.5">
-                        <FileText className="w-3 h-3" /> Notas da sessão
-                      </div>
-                      <div className="rounded-lg bg-muted/30 p-3.5 text-[13px] text-foreground/90 leading-relaxed border-l-2 border-l-primary">
-                        {selected.notas}
-                      </div>
-                    </section>
-                  )}
-                </div>
-
-                {/* Footer actions */}
+                {/* Footer */}
                 <DialogFooter className="px-6 py-3 border-t border-border bg-muted/20 gap-2 sm:justify-end">
-                  {selected.estado === "agendado" && (
+                  {selected.estado === "agendado" ? (
                     <>
                       <Button variant="outline" size="sm" className="gap-1.5">
                         <CalendarIcon className="w-3.5 h-3.5" /> Remarcar
@@ -864,8 +843,7 @@ export default function GapAtendimentos() {
                         <CheckCircle2 className="w-3.5 h-3.5" /> Concluir
                       </Button>
                     </>
-                  )}
-                  {selected.estado !== "agendado" && (
+                  ) : (
                     <DialogClose asChild><Button variant="outline" size="sm">Fechar</Button></DialogClose>
                   )}
                 </DialogFooter>
