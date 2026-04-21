@@ -29,7 +29,7 @@ const MESES = [
 
 export default function GapTickets() {
   const [search, setSearch] = useState("");
-  const [estado, setEstado] = useState<"todos" | "pendentes" | "em_execucao" | "executadas">("todos");
+  const [estado, setEstado] = useState<"todos" | "pendentes" | "em_execucao" | "executadas" | "rejeitadas">("todos");
   const [destino, setDestino] = useState<Destino | "todos">("todos");
   const [categoria, setCategoria] = useState<string>("todas");
   const [mes, setMes] = useState<string>("todos");
@@ -37,13 +37,15 @@ export default function GapTickets() {
 
   const isPendente = (s: Solicitacao) => s.estado === "recebida";
   const isEmExecucao = (s: Solicitacao) => s.estado === "em_execucao";
-  const isExecutada = (s: Solicitacao) => s.estado === "concluida" || s.estado === "rejeitada";
+  const isExecutada = (s: Solicitacao) => s.estado === "concluida";
+  const isRejeitada = (s: Solicitacao) => s.estado === "rejeitada";
 
   const counts = useMemo(() => ({
     todos: solicitacoes.length,
     pendentes: solicitacoes.filter(isPendente).length,
     em_execucao: solicitacoes.filter(isEmExecucao).length,
     executadas: solicitacoes.filter(isExecutada).length,
+    rejeitadas: solicitacoes.filter(isRejeitada).length,
     recebida: solicitacoes.filter(t => t.estado === "recebida").length,
     concluida: solicitacoes.filter(t => t.estado === "concluida").length,
   }), []);
@@ -63,6 +65,7 @@ export default function GapTickets() {
       if (estado === "pendentes" && !isPendente(s)) return false;
       if (estado === "em_execucao" && !isEmExecucao(s)) return false;
       if (estado === "executadas" && !isExecutada(s)) return false;
+      if (estado === "rejeitadas" && !isRejeitada(s)) return false;
       if (destino !== "todos" && s.destino !== destino) return false;
       if (categoria !== "todas") {
         const cfg = tipoConfig[s.tipo];
@@ -100,11 +103,12 @@ export default function GapTickets() {
     setEstado("todos"); setDestino("todos"); setCategoria("todas"); setMes("todos"); setSearch("");
   };
 
-  const estadoTabs: { key: "todos" | "pendentes" | "em_execucao" | "executadas"; label: string; icon: React.ElementType }[] = [
+  const estadoTabs: { key: "todos" | "pendentes" | "em_execucao" | "executadas" | "rejeitadas"; label: string; icon: React.ElementType }[] = [
     { key: "todos", label: "Todas", icon: Inbox },
     { key: "pendentes", label: "Pendentes", icon: AlertCircle },
     { key: "em_execucao", label: "Em Execução", icon: Clock },
     { key: "executadas", label: "Executadas", icon: CheckCircle2 },
+    { key: "rejeitadas", label: "Rejeitadas", icon: X },
   ];
 
   return (

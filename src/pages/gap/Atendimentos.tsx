@@ -208,24 +208,39 @@ export default function GapAtendimentos() {
           filtered.map(a => {
             const cat = categoriaConfig[a.categoria];
             const est = estadoConfig[a.estado];
+            const d = new Date(a.data);
             return (
-              <Card key={a.id} className="p-4 hover:bg-muted/30 hover:border-primary/30 transition-all cursor-pointer group" onClick={() => setSelected(a)}>
+              <Card
+                key={a.id}
+                className="p-4 hover:bg-muted/30 hover:border-primary/30 transition-all cursor-pointer group"
+                onClick={() => setSelected(a)}
+              >
                 <div className="flex items-center gap-4">
+                  {/* Date chip */}
                   <div className="text-center w-14 shrink-0 py-1.5 rounded-lg bg-muted/40 group-hover:bg-primary/10 transition-colors">
-                    <p className="text-lg font-bold text-foreground leading-none">{new Date(a.data).getDate()}</p>
-                    <p className="text-[10px] text-muted-foreground uppercase mt-0.5">{new Date(a.data).toLocaleDateString("pt-AO", { month: "short" })}</p>
+                    <p className="text-lg font-bold text-foreground leading-none">{d.getDate()}</p>
+                    <p className="text-[10px] text-muted-foreground uppercase mt-0.5">{d.toLocaleDateString("pt-AO", { month: "short" })}</p>
                   </div>
+
+                  {/* Student + motivo */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1 flex-wrap">
-                      <p className="text-sm font-semibold text-foreground">{a.estudante}</p>
+                      <div className="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                        <User className="w-3.5 h-3.5" />
+                      </div>
+                      <p className="text-sm font-semibold text-foreground truncate">{a.estudante}</p>
+                      <span className="text-[11px] text-muted-foreground">· {a.matricula}</span>
                       <Badge variant="outline" className={cn("text-[10px]", cat.color)}>{cat.label}</Badge>
                     </div>
-                    <p className="text-xs text-muted-foreground line-clamp-1">{a.motivo}</p>
+                    <p className="text-[11px] text-muted-foreground ml-9 truncate">{a.curso}</p>
+                    <p className="text-xs text-foreground/80 mt-1.5 line-clamp-1">{a.motivo}</p>
                     <div className="flex items-center gap-3 mt-1.5 text-[10px] text-muted-foreground">
                       <span className="flex items-center gap-1"><Users className="w-3 h-3" /> {a.responsavel}</span>
                       {a.sala && <span className="flex items-center gap-1"><MapPin className="w-3 h-3" /> {a.sala}</span>}
                     </div>
                   </div>
+
+                  {/* Logistics */}
                   <div className="flex items-center gap-2 shrink-0">
                     <div className="text-right">
                       <p className="text-sm font-semibold text-foreground tabular-nums">{a.hora}</p>
@@ -247,7 +262,7 @@ export default function GapAtendimentos() {
         )}
       </div>
 
-      {/* Detail dialog */}
+      {/* Detail dialog — unified structured view */}
       <Dialog open={!!selected} onOpenChange={open => !open && setSelected(null)}>
         <DialogContent className="max-w-2xl p-0 gap-0 max-h-[90vh] overflow-y-auto">
           {selected && (() => {
@@ -256,84 +271,84 @@ export default function GapAtendimentos() {
             const d = new Date(selected.data);
             return (
               <>
-                {/* Header strip */}
-                <div className="bg-gradient-to-br from-primary/5 via-card to-card border-b border-border p-6">
-                  <div className="flex items-start gap-4">
-                    <div className="text-center w-16 shrink-0 py-2 rounded-lg bg-card border border-border shadow-sm">
-                      <p className="text-2xl font-bold text-foreground leading-none">{d.getDate()}</p>
-                      <p className="text-[10px] text-muted-foreground uppercase mt-1">{d.toLocaleDateString("pt-AO", { month: "short" })}</p>
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2 flex-wrap mb-2">
-                        <span className="text-[11px] font-mono px-1.5 py-0.5 rounded bg-muted text-muted-foreground">{selected.id}</span>
-                        <Badge variant="outline" className={cn("text-[10px]", cat.color)}>{cat.label}</Badge>
-                        <Badge variant="outline" className={cn("text-[10px] gap-1", est.color)}>
-                          <span className={cn("w-1.5 h-1.5 rounded-full", est.dot)} /> {est.label}
-                        </Badge>
-                      </div>
-                      <DialogTitle className="text-lg leading-tight">{selected.motivo}</DialogTitle>
-                      <p className="text-xs text-muted-foreground mt-1.5">
-                        {d.toLocaleDateString("pt-AO", { weekday: "long", day: "2-digit", month: "long", year: "numeric" })} · {selected.hora} · {selected.duracao}
-                      </p>
-                    </div>
+                {/* Compact header */}
+                <div className="px-6 pt-6 pb-4 border-b border-border">
+                  <div className="flex items-center gap-2 flex-wrap mb-2">
+                    <span className="text-[11px] font-mono px-1.5 py-0.5 rounded bg-muted text-muted-foreground">{selected.id}</span>
+                    <Badge variant="outline" className={cn("text-[10px]", cat.color)}>{cat.label}</Badge>
+                    <Badge variant="outline" className={cn("text-[10px] gap-1", est.color)}>
+                      <span className={cn("w-1.5 h-1.5 rounded-full", est.dot)} /> {est.label}
+                    </Badge>
+                    <Badge variant="outline" className="text-[10px] gap-1">
+                      {selected.tipo === "online" ? <Video className="w-3 h-3" /> : <MapPin className="w-3 h-3" />}
+                      {selected.tipo === "online" ? "Online" : "Presencial"}
+                    </Badge>
                   </div>
+                  <DialogTitle className="text-lg leading-tight">{selected.motivo}</DialogTitle>
                 </div>
 
                 <div className="p-6 space-y-5">
-                  {/* Estudante */}
-                  <div className="rounded-lg border border-border p-3">
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                  {/* Unified agendamento box */}
+                  <div className="rounded-xl border border-border overflow-hidden">
+                    {/* Row 1: Estudante */}
+                    <div className="flex items-center gap-3 p-4 bg-muted/20 border-b border-border">
+                      <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0">
                         <User className="w-4 h-4" />
                       </div>
-                      <div className="min-w-0">
-                        <p className="text-sm font-semibold text-foreground">{selected.estudante}</p>
-                        <p className="text-[11px] text-muted-foreground">{selected.matricula} · {selected.curso}</p>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-semibold text-foreground truncate">{selected.estudante}</p>
+                        <p className="text-[11px] text-muted-foreground truncate">{selected.matricula} · {selected.curso}</p>
+                      </div>
+                    </div>
+
+                    {/* Row 2: Data / Hora / Duração */}
+                    <div className="grid grid-cols-3 divide-x divide-border border-b border-border">
+                      <div className="p-4">
+                        <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium flex items-center gap-1.5">
+                          <CalendarIcon className="w-3 h-3" /> Data
+                        </p>
+                        <p className="text-sm font-semibold text-foreground mt-1">{d.toLocaleDateString("pt-AO", { day: "2-digit", month: "short", year: "numeric" })}</p>
+                        <p className="text-[11px] text-muted-foreground mt-0.5 capitalize">{d.toLocaleDateString("pt-AO", { weekday: "long" })}</p>
+                      </div>
+                      <div className="p-4">
+                        <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium flex items-center gap-1.5">
+                          <Clock className="w-3 h-3" /> Hora
+                        </p>
+                        <p className="text-sm font-semibold text-foreground mt-1 tabular-nums">{selected.hora}</p>
+                      </div>
+                      <div className="p-4">
+                        <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Duração</p>
+                        <p className="text-sm font-semibold text-foreground mt-1">{selected.duracao}</p>
+                      </div>
+                    </div>
+
+                    {/* Row 3: Local / Responsável */}
+                    <div className="grid grid-cols-2 divide-x divide-border">
+                      <div className="p-4">
+                        <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium flex items-center gap-1.5">
+                          <MapPin className="w-3 h-3" /> Local
+                        </p>
+                        <p className="text-sm font-medium text-foreground mt-1">{selected.sala ?? "—"}</p>
+                      </div>
+                      <div className="p-4">
+                        <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Responsável</p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <div className="w-7 h-7 rounded-full bg-pink-50 text-pink-700 flex items-center justify-center text-[10px] font-semibold shrink-0">
+                            {selected.responsavel.split(" ").slice(-2).map(n => n[0]).join("")}
+                          </div>
+                          <p className="text-sm font-medium text-foreground truncate">{selected.responsavel}</p>
+                        </div>
                       </div>
                     </div>
                   </div>
 
-                  {/* Logística */}
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    <div className="rounded-lg border border-border p-3">
-                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Hora</p>
-                      <p className="text-sm font-semibold text-foreground mt-1 flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-muted-foreground" />{selected.hora}</p>
-                    </div>
-                    <div className="rounded-lg border border-border p-3">
-                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Duração</p>
-                      <p className="text-sm font-semibold text-foreground mt-1">{selected.duracao}</p>
-                    </div>
-                    <div className="rounded-lg border border-border p-3">
-                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Modalidade</p>
-                      <p className="text-sm font-semibold text-foreground mt-1 flex items-center gap-1.5">
-                        {selected.tipo === "online" ? <Video className="w-3.5 h-3.5 text-muted-foreground" /> : <MapPin className="w-3.5 h-3.5 text-muted-foreground" />}
-                        {selected.tipo === "online" ? "Online" : "Presencial"}
-                      </p>
-                    </div>
-                    <div className="rounded-lg border border-border p-3">
-                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Local</p>
-                      <p className="text-sm font-semibold text-foreground mt-1">{selected.sala ?? "—"}</p>
-                    </div>
-                  </div>
-
-                  {/* Responsável */}
-                  <div className="rounded-lg border border-border p-3">
-                    <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-1.5">Responsável</p>
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full bg-pink-50 text-pink-700 flex items-center justify-center text-xs font-semibold">
-                        {selected.responsavel.split(" ").slice(-2).map(n => n[0]).join("")}
-                      </div>
-                      <p className="text-sm font-medium text-foreground">{selected.responsavel}</p>
-                    </div>
-                  </div>
-
-                  {/* Notas */}
+                  {/* Notas — separate box */}
                   {selected.notas && (
                     <div>
-                      <Label className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium flex items-center gap-1.5 mb-1.5">
+                      <Label className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium flex items-center gap-1.5 mb-2">
                         <FileText className="w-3 h-3" /> Notas da sessão
                       </Label>
-                      <div className="rounded-lg border border-border bg-muted/20 p-3 text-sm text-foreground leading-relaxed border-l-2 border-l-primary/40">
+                      <div className="rounded-xl border border-border bg-muted/20 p-4 text-sm text-foreground leading-relaxed border-l-2 border-l-primary/40">
                         {selected.notas}
                       </div>
                     </div>
