@@ -292,7 +292,66 @@ export default function GapAtendimentos() {
       </div>
 
       {view === "lista" ? (
-        <ListView filteredAll={filteredAll} renderSessionRow={renderSessionRow} />
+        (() => {
+          // group filteredAll by date, sort dates desc-ish (today first, then upcoming, then past)
+          const byDate = new Map<string, GapAtendimento[]>();
+          filteredAll.forEach(a => {
+            if (!byDate.has(a.data)) byDate.set(a.data, []);
+            byDate.get(a.data)!.push(a);
+          });
+          byDate.forEach(arr => arr.sort((a, b) => a.hora.localeCompare(b.hora)));
+          const sortedDates = Array.from(byDate.keys()).sort((a, b) => {
+            // today first, then chronological
+            if (a === TODAY) return -1;
+            if (b === TODAY) return 1;
+            return a.localeCompare(b);
+          });
+          if (sortedDates.length === 0) {
+            return (
+              <Card className="p-12 text-center">
+                <CalendarIcon className="w-10 h-10 text-muted-foreground/40 mx-auto mb-3" />
+                <p className="text-sm text-muted-foreground">Nenhum agendamento encontrado</p>
+              </Card>
+            );
+          }
+          return (
+            <div className="space-y-4">
+              {sortedDates.map(dateKey => {
+                const d = new Date(dateKey);
+                const isToday = dateKey === TODAY;
+                const events = byDate.get(dateKey)!;
+                return (
+                  <Card key={dateKey} className="overflow-hidden">
+                    <div className="px-4 py-2.5 border-b border-border bg-muted/20 flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className={cn(
+                          "flex items-center justify-center w-8 h-8 rounded-lg shrink-0 border",
+                          isToday ? "bg-primary text-primary-foreground border-primary" : "bg-card text-foreground border-border"
+                        )}>
+                          <span className="text-xs font-bold tabular-nums">{d.getDate()}</span>
+                        </div>
+                        <div>
+                          <p className="text-xs font-semibold text-foreground capitalize leading-tight">
+                            {isToday ? "Hoje · " : ""}{d.toLocaleDateString("pt-AO", { weekday: "long" })}
+                          </p>
+                          <p className="text-[10px] text-muted-foreground capitalize">
+                            {d.toLocaleDateString("pt-AO", { day: "2-digit", month: "long", year: "numeric" })}
+                          </p>
+                        </div>
+                      </div>
+                      <span className="text-[10px] font-semibold text-muted-foreground tabular-nums">
+                        {events.length} {events.length === 1 ? "sessão" : "sessões"}
+                      </span>
+                    </div>
+                    <div className="divide-y divide-border">
+                      {events.map(renderSessionRow)}
+                    </div>
+                  </Card>
+                );
+              })}
+            </div>
+          );
+        })()
       ) : (
       /* ── Calendar + Side panel ───────────────────────────────────────────── */
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
