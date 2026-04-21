@@ -84,6 +84,55 @@ export default function GapAtendimentos() {
       });
   }, [search, categoria, estado, periodo]);
 
+  // Calendar helpers — calendar respects search + category + estado filters (NOT periodo)
+  const calendarFiltered = useMemo(() => {
+    return gapAtendimentos
+      .filter(a => categoria === "todas" || a.categoria === categoria)
+      .filter(a => estado === "todos" || a.estado === estado)
+      .filter(a => {
+        if (!search) return true;
+        const s = search.toLowerCase();
+        return a.estudante.toLowerCase().includes(s) || a.matricula.includes(search) || a.motivo.toLowerCase().includes(s);
+      });
+  }, [search, categoria, estado]);
+
+  const calendarDays = useMemo(() => {
+    const first = new Date(calYear, calMonth, 1);
+    const startWeekday = first.getDay();
+    const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+    const cells: { dateKey: string | null; day: number | null }[] = [];
+    for (let i = 0; i < startWeekday; i++) cells.push({ dateKey: null, day: null });
+    for (let d = 1; d <= daysInMonth; d++) {
+      const mm = String(calMonth + 1).padStart(2, "0");
+      const dd = String(d).padStart(2, "0");
+      cells.push({ dateKey: `${calYear}-${mm}-${dd}`, day: d });
+    }
+    while (cells.length % 7 !== 0) cells.push({ dateKey: null, day: null });
+    return cells;
+  }, [calMonth, calYear]);
+
+  const eventsByDate = useMemo(() => {
+    const map = new Map<string, GapAtendimento[]>();
+    calendarFiltered.forEach(a => {
+      if (!map.has(a.data)) map.set(a.data, []);
+      map.get(a.data)!.push(a);
+    });
+    map.forEach(arr => arr.sort((a, b) => a.hora.localeCompare(b.hora)));
+    return map;
+  }, [calendarFiltered]);
+
+  const selectedDayEvents = calSelectedDay ? (eventsByDate.get(calSelectedDay) ?? []) : [];
+
+  const goPrevMonth = () => {
+    if (calMonth === 0) { setCalMonth(11); setCalYear(y => y - 1); } else setCalMonth(m => m - 1);
+  };
+  const goNextMonth = () => {
+    if (calMonth === 11) { setCalMonth(0); setCalYear(y => y + 1); } else setCalMonth(m => m + 1);
+  };
+  const goToday = () => {
+    setCalMonth(today.getMonth()); setCalYear(today.getFullYear()); setCalSelectedDay(TODAY);
+  };
+
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       {/* Header */}
