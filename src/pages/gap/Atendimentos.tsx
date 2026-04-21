@@ -44,23 +44,15 @@ export default function GapAtendimentos() {
   const [calYear, setCalYear] = useState(today.getFullYear());
   const [calSelectedDay, setCalSelectedDay] = useState<string>(TODAY);
 
-  const filtered = useMemo(() => {
+  const filteredAll = useMemo(() => {
     return gapAtendimentos
-      .filter(a => {
-        if (view === "calendario") return true; // calendar shows all (filtered by month grid)
-        if (filter === "hoje") return a.data === TODAY;
-        if (filter === "agendados") return a.estado === "agendado";
-        if (filter === "concluidos") return a.estado === "concluido";
-        return true;
-      })
       .filter(a => categoria === "todas" || a.categoria === categoria)
       .filter(a => {
         if (!search) return true;
         const s = search.toLowerCase();
         return a.estudante.toLowerCase().includes(s) || a.matricula.includes(search) || a.motivo.toLowerCase().includes(s);
-      })
-      .sort((a, b) => (b.data + b.hora).localeCompare(a.data + a.hora));
-  }, [filter, search, categoria, view]);
+      });
+  }, [search, categoria]);
 
   const counts = {
     todos: gapAtendimentos.length,
@@ -68,13 +60,6 @@ export default function GapAtendimentos() {
     agendados: gapAtendimentos.filter(a => a.estado === "agendado").length,
     concluidos: gapAtendimentos.filter(a => a.estado === "concluido").length,
   };
-
-  const tabs: { key: typeof filter; label: string; count: number }[] = [
-    { key: "todos", label: "Todos", count: counts.todos },
-    { key: "hoje", label: "Hoje", count: counts.hoje },
-    { key: "agendados", label: "Agendados", count: counts.agendados },
-    { key: "concluidos", label: "Concluídos", count: counts.concluidos },
-  ];
 
   // ── Calendar helpers ──────────────────────────────────────────────────────
   const calendarDays = useMemo(() => {
