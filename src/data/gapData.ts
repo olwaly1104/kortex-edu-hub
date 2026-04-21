@@ -654,7 +654,6 @@ const slaEmRisco = solicitacoes.filter(s => {
 
 export const gapKpis = {
   recebidas:   solicitacoes.filter(s => s.estado === "recebida").length,
-  encaminhadas: solicitacoes.filter(s => s.estado === "encaminhada").length,
   emExecucao:  solicitacoes.filter(s => s.estado === "em_execucao").length,
   concluidas:  solicitacoes.filter(s => s.estado === "concluida").length,
   total:       solicitacoes.length,
@@ -688,7 +687,7 @@ const destinoToCategoria: Record<Destino, TicketCategoria> = {
   Faculdade: "academico", GAP: "psicologico", Secretaria: "documentacao",
 };
 const estadoToTicket: Record<EstadoSolicitacao, GapTicket["estado"]> = {
-  recebida: "aberto", encaminhada: "aberto", em_execucao: "em_andamento",
+  recebida: "aberto", em_execucao: "em_andamento",
   concluida: "resolvido", rejeitada: "resolvido",
 };
 export const gapTickets: GapTicket[] = solicitacoes.map(s => ({
