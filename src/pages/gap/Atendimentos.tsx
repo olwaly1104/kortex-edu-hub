@@ -771,10 +771,7 @@ function NovoAgendamentoDialog() {
                           {cfg.label}
                         </Badge>
                         <span className="text-[10px] text-muted-foreground leading-snug line-clamp-2">
-                          {c === "psicologico" && "Bem-estar, ansiedade, motivação."}
-                          {c === "academico" && "Métodos de estudo, desempenho."}
-                          {c === "vocacional" && "Carreira, percurso académico."}
-                          {c === "social" && "Apoio social e financeiro."}
+                          {CATEGORIA_HINT[c]}
                         </span>
                       </button>
                     );
