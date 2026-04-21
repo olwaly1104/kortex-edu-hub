@@ -259,18 +259,9 @@ export default function GapAtendimentos() {
         ))}
       </div>
 
-      {/* View toggle */}
+      {/* View toggle + filters */}
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div className="inline-flex items-center bg-muted/50 border border-border rounded-lg p-0.5">
-          <button
-            onClick={() => setView("calendario")}
-            className={cn(
-              "inline-flex items-center gap-1.5 px-3 h-8 text-xs font-medium rounded-md transition-colors",
-              view === "calendario" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
-            )}
-          >
-            <LayoutGrid className="w-3.5 h-3.5" /> Calendário
-          </button>
           <button
             onClick={() => setView("lista")}
             className={cn(
@@ -280,9 +271,37 @@ export default function GapAtendimentos() {
           >
             <ListIcon className="w-3.5 h-3.5" /> Lista
           </button>
+          <button
+            onClick={() => setView("calendario")}
+            className={cn(
+              "inline-flex items-center gap-1.5 px-3 h-8 text-xs font-medium rounded-md transition-colors",
+              view === "calendario" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <LayoutGrid className="w-3.5 h-3.5" /> Calendário
+          </button>
         </div>
         {view === "lista" && (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
+            {/* Period chips */}
+            <div className="inline-flex items-center bg-muted/40 border border-border rounded-lg p-0.5">
+              {([
+                { v: "todos", label: "Todos" },
+                { v: "proximos", label: "Próximos" },
+                { v: "anteriores", label: "Anteriores" },
+              ] as const).map(opt => (
+                <button
+                  key={opt.v}
+                  onClick={() => setPeriodo(opt.v)}
+                  className={cn(
+                    "px-2.5 h-7 text-[11px] font-medium rounded-md transition-colors",
+                    periodo === opt.v ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
             <div className="relative w-[200px]">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
               <Input placeholder="Pesquisar..." value={search} onChange={e => setSearch(e.target.value)} className="pl-8 h-8 text-xs" />
