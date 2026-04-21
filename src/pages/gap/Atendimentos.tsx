@@ -323,20 +323,32 @@ export default function GapAtendimentos() {
 
       {view === "lista" ? (
         (() => {
-          // group filteredAll by date, sort dates desc-ish (today first, then upcoming, then past)
+          // Filter by period
+          const periodFiltered = filteredAll.filter(a => {
+            if (periodo === "todos") return true;
+            if (periodo === "proximos") return a.data >= TODAY;
+            return a.data < TODAY;
+          });
+
+          // Group by date
           const byDate = new Map<string, GapAtendimento[]>();
-          filteredAll.forEach(a => {
+          periodFiltered.forEach(a => {
             if (!byDate.has(a.data)) byDate.set(a.data, []);
             byDate.get(a.data)!.push(a);
           });
           byDate.forEach(arr => arr.sort((a, b) => a.hora.localeCompare(b.hora)));
-          const sortedDates = Array.from(byDate.keys()).sort((a, b) => {
-            // today first, then chronological
-            if (a === TODAY) return -1;
-            if (b === TODAY) return 1;
-            return a.localeCompare(b);
-          });
-          if (sortedDates.length === 0) {
+
+          // Bucket: hoje, proximos (asc), anteriores (desc — most recent past first)
+          const todayDates = Array.from(byDate.keys()).filter(k => k === TODAY);
+          const futureDates = Array.from(byDate.keys()).filter(k => k > TODAY).sort();
+          const pastDates = Array.from(byDate.keys()).filter(k => k < TODAY).sort((a, b) => b.localeCompare(a));
+
+          const sections: { id: string; label: string; sub: string; dates: string[] }[] = [];
+          if (todayDates.length) sections.push({ id: "hoje", label: "Hoje", sub: "Sessões de hoje", dates: todayDates });
+          if (futureDates.length) sections.push({ id: "prox", label: "Próximos", sub: `${futureDates.reduce((n, k) => n + byDate.get(k)!.length, 0)} sessões agendadas`, dates: futureDates });
+          if (pastDates.length) sections.push({ id: "ant", label: "Anteriores", sub: `${pastDates.reduce((n, k) => n + byDate.get(k)!.length, 0)} sessões realizadas`, dates: pastDates });
+
+          if (sections.length === 0) {
             return (
               <Card className="p-12 text-center">
                 <CalendarIcon className="w-10 h-10 text-muted-foreground/40 mx-auto mb-3" />
@@ -345,40 +357,53 @@ export default function GapAtendimentos() {
             );
           }
           return (
-            <div className="space-y-4">
-              {sortedDates.map(dateKey => {
-                const d = new Date(dateKey);
-                const isToday = dateKey === TODAY;
-                const events = byDate.get(dateKey)!;
-                return (
-                  <Card key={dateKey} className="overflow-hidden">
-                    <div className="px-4 py-2.5 border-b border-border bg-muted/20 flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <div className={cn(
-                          "flex items-center justify-center w-8 h-8 rounded-lg shrink-0 border",
-                          isToday ? "bg-primary text-primary-foreground border-primary" : "bg-card text-foreground border-border"
-                        )}>
-                          <span className="text-xs font-bold tabular-nums">{d.getDate()}</span>
-                        </div>
-                        <div>
-                          <p className="text-xs font-semibold text-foreground capitalize leading-tight">
-                            {isToday ? "Hoje · " : ""}{d.toLocaleDateString("pt-AO", { weekday: "long" })}
-                          </p>
-                          <p className="text-[10px] text-muted-foreground capitalize">
-                            {d.toLocaleDateString("pt-AO", { day: "2-digit", month: "long", year: "numeric" })}
-                          </p>
-                        </div>
-                      </div>
-                      <span className="text-[10px] font-semibold text-muted-foreground tabular-nums">
-                        {events.length} {events.length === 1 ? "sessão" : "sessões"}
-                      </span>
+            <div className="space-y-6">
+              {sections.map(section => (
+                <div key={section.id} className="space-y-3">
+                  <div className="flex items-baseline justify-between gap-2 px-1">
+                    <div className="flex items-baseline gap-2">
+                      <h3 className="text-sm font-bold text-foreground tracking-tight uppercase">{section.label}</h3>
+                      <span className="text-[11px] text-muted-foreground">· {section.sub}</span>
                     </div>
-                    <div className="divide-y divide-border">
-                      {events.map(renderSessionRow)}
-                    </div>
-                  </Card>
-                );
-              })}
+                  </div>
+                  <div className="space-y-3">
+                    {section.dates.map(dateKey => {
+                      const d = new Date(dateKey);
+                      const isToday = dateKey === TODAY;
+                      const isPast = dateKey < TODAY;
+                      const events = byDate.get(dateKey)!;
+                      return (
+                        <Card key={dateKey} className={cn("overflow-hidden", isPast && "opacity-95")}>
+                          <div className="px-4 py-2.5 border-b border-border bg-muted/20 flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <div className={cn(
+                                "flex items-center justify-center w-8 h-8 rounded-lg shrink-0 border",
+                                isToday ? "bg-primary text-primary-foreground border-primary" : "bg-card text-foreground border-border"
+                              )}>
+                                <span className="text-xs font-bold tabular-nums">{d.getDate()}</span>
+                              </div>
+                              <div>
+                                <p className="text-xs font-semibold text-foreground capitalize leading-tight">
+                                  {isToday ? "Hoje · " : ""}{d.toLocaleDateString("pt-AO", { weekday: "long" })}
+                                </p>
+                                <p className="text-[10px] text-muted-foreground capitalize">
+                                  {d.toLocaleDateString("pt-AO", { day: "2-digit", month: "long", year: "numeric" })}
+                                </p>
+                              </div>
+                            </div>
+                            <span className="text-[10px] font-semibold text-muted-foreground tabular-nums">
+                              {events.length} {events.length === 1 ? "sessão" : "sessões"}
+                            </span>
+                          </div>
+                          <div className="divide-y divide-border">
+                            {events.map(renderSessionRow)}
+                          </div>
+                        </Card>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
             </div>
           );
         })()
