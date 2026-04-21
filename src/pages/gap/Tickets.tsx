@@ -348,42 +348,25 @@ export default function GapTickets() {
                   </div>
                 </div>
 
-                {/* Title block with Estado */}
-                <div className="px-6 pt-5 pb-4 border-b border-border">
-                  <p className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold mb-1">{tipoCfg?.categoria ?? "Pedido"}</p>
+                {/* Title block */}
+                <div className="px-6 pt-5 pb-5 border-b border-border">
                   <div className="flex items-start justify-between gap-4">
-                    <DialogTitle className="text-xl font-semibold leading-tight tracking-tight text-foreground">
-                      {tipoCfg?.label ?? selected.tipo}
-                    </DialogTitle>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        {tipoCfg && (
+                          <Badge variant="outline" className={cn("text-[10px] font-medium", categoriaConfig[tipoCfg.categoria as Categoria]?.color)}>
+                            {tipoCfg.categoria}
+                          </Badge>
+                        )}
+                      </div>
+                      <DialogTitle className="text-xl font-semibold leading-tight tracking-tight text-foreground">
+                        {tipoCfg?.label ?? selected.tipo}
+                      </DialogTitle>
+                    </div>
                     <div className="flex flex-col items-end gap-1 shrink-0">
                       <span className="text-[10px] uppercase tracking-[0.08em] text-muted-foreground font-semibold">Estado</span>
                       <Badge variant="outline" className={cn("text-[11px] font-medium px-2.5 py-0.5", st.color)}>{st.label}</Badge>
                     </div>
-                  </div>
-
-                  {/* Metadata strip */}
-                  <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mt-4 pt-3 border-t border-border">
-                    {tipoCfg && (
-                      <div className="flex items-center gap-1.5">
-                        <Layers className="w-3 h-3 text-muted-foreground" />
-                        <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Categoria</span>
-                        <Badge variant="outline" className={cn("text-[10px]", categoriaConfig[tipoCfg.categoria as Categoria]?.color)}>
-                          {tipoCfg.categoria}
-                        </Badge>
-                      </div>
-                    )}
-                    <div className="flex items-center gap-1.5">
-                      <CalendarIcon className="w-3 h-3 text-muted-foreground" />
-                      <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Submetido</span>
-                      <span className="text-[11px] font-medium text-foreground tabular-nums">{fmt(dSub)} · {fmtT(dSub)}</span>
-                    </div>
-                    {dConc && (
-                      <div className="flex items-center gap-1.5">
-                        <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                        <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Concluído</span>
-                        <span className="text-[11px] font-medium text-foreground tabular-nums">{fmt(dConc)} · {fmtT(dConc)}</span>
-                      </div>
-                    )}
                   </div>
                 </div>
 
