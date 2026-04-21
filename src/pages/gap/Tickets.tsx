@@ -351,18 +351,9 @@ export default function GapTickets() {
                 {/* Title block */}
                 <div className="px-6 pt-5 pb-5 border-b border-border">
                   <div className="flex items-start justify-between gap-4">
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        {tipoCfg && (
-                          <Badge variant="outline" className={cn("text-[10px] font-medium", categoriaConfig[tipoCfg.categoria as Categoria]?.color)}>
-                            {tipoCfg.categoria}
-                          </Badge>
-                        )}
-                      </div>
-                      <DialogTitle className="text-xl font-semibold leading-tight tracking-tight text-foreground">
-                        {tipoCfg?.label ?? selected.tipo}
-                      </DialogTitle>
-                    </div>
+                    <DialogTitle className="text-xl font-semibold leading-tight tracking-tight text-foreground min-w-0 flex-1">
+                      {tipoCfg?.label ?? selected.tipo}
+                    </DialogTitle>
                     <div className="flex flex-col items-end gap-1 shrink-0">
                       <span className="text-[10px] uppercase tracking-[0.08em] text-muted-foreground font-semibold">Estado</span>
                       <Badge variant="outline" className={cn("text-[11px] font-medium px-2.5 py-0.5", st.color)}>{st.label}</Badge>
