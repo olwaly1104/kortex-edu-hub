@@ -321,142 +321,171 @@ export default function GapTickets() {
         {filtered.length === 0 && <p className="text-center text-muted-foreground py-8 text-sm">Nenhuma solicitação encontrada.</p>}
       </Card>
 
-      {/* Detail dialog — refined professional design */}
+      {/* Detail dialog — editorial 2-column layout */}
       <Dialog open={!!selected} onOpenChange={open => !open && setSelected(null)}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto p-0 gap-0">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden p-0 gap-0">
           {selected && (() => {
             const st = estadoSolicitacaoConfig[selected.estado];
             const dest = destinoConfig[selected.destino];
             const tipoCfg = tipoConfig[selected.tipo];
             const dSub = new Date(selected.dataSubmissao);
             const dConc = selected.dataConclusao ? new Date(selected.dataConclusao) : null;
-            const fmtDate = (d: Date) => d.toLocaleDateString("pt-AO", { day: "2-digit", month: "short", year: "numeric" });
-            const fmtTime = (d: Date) => d.toLocaleTimeString("pt-AO", { hour: "2-digit", minute: "2-digit" });
+            const fmt = (d: Date) => d.toLocaleDateString("pt-AO", { day: "2-digit", month: "short", year: "numeric" });
+            const fmtT = (d: Date) => d.toLocaleTimeString("pt-AO", { hour: "2-digit", minute: "2-digit" });
             const initials = selected.estudante.split(" ").slice(0, 2).map(n => n[0]).join("");
             return (
-              <>
-                {/* Header — clean, single line of meta + title */}
-                <div className="px-6 pt-6 pb-5 border-b border-border">
-                  <div className="flex items-center gap-2 flex-wrap mb-3">
+              <div className="flex flex-col max-h-[90vh]">
+                {/* Top bar — ID + state */}
+                <div className="flex items-center justify-between px-6 py-3 border-b border-border bg-muted/20">
+                  <div className="flex items-center gap-2">
                     <span className="text-[11px] font-mono text-muted-foreground">{selected.id}</span>
-                    <span className="text-muted-foreground/40">·</span>
                     {tipoCfg && (
-                      <span className="text-[11px] font-medium text-muted-foreground">{tipoCfg.categoria}</span>
+                      <>
+                        <span className="text-muted-foreground/40">·</span>
+                        <span className="text-[11px] font-medium text-muted-foreground">{tipoCfg.categoria}</span>
+                      </>
                     )}
-                    <div className="flex-1" />
-                    <Badge variant="outline" className={cn("text-[10px] font-medium", st.color)}>{st.label}</Badge>
                   </div>
+                  <Badge variant="outline" className={cn("text-[10px] font-medium", st.color)}>{st.label}</Badge>
+                </div>
+
+                {/* Title block */}
+                <div className="px-6 pt-5 pb-5 border-b border-border">
+                  <p className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold mb-1">{tipoCfg?.categoria ?? "Pedido"}</p>
                   <DialogTitle className="text-xl font-semibold leading-tight tracking-tight text-foreground">
                     {tipoCfg?.label ?? selected.tipo}
                   </DialogTitle>
                 </div>
 
-                <div className="p-6 space-y-6">
-                  {/* Estudante — elevated identity card */}
-                  <div className="flex items-center gap-3 p-4 rounded-xl border border-border bg-gradient-to-br from-primary/[0.04] to-transparent">
-                    <div className="w-11 h-11 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 font-semibold text-sm ring-1 ring-primary/15">
-                      {initials}
+                {/* 2-column body */}
+                <div className="flex-1 overflow-y-auto grid md:grid-cols-[280px_1fr] divide-x divide-border">
+                  {/* LEFT — estudante + meta sidebar */}
+                  <aside className="p-5 space-y-5 bg-muted/15">
+                    {/* Estudante */}
+                    <div>
+                      <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold mb-2">Estudante</p>
+                      <div className="flex items-start gap-3">
+                        <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 font-semibold text-xs ring-1 ring-primary/15">
+                          {initials}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-semibold text-foreground leading-tight">{selected.estudante}</p>
+                          <p className="text-[11px] text-muted-foreground mt-0.5">{selected.matricula}</p>
+                        </div>
+                      </div>
+                      <div className="mt-3 pt-3 border-t border-border space-y-1.5">
+                        <div className="flex items-baseline justify-between gap-2">
+                          <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Ano</span>
+                          <span className="text-[11px] font-medium text-foreground">{selected.ano}º</span>
+                        </div>
+                        <div className="flex items-baseline justify-between gap-2">
+                          <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Curso</span>
+                          <span className="text-[11px] font-medium text-foreground text-right truncate max-w-[150px]">{selected.curso}</span>
+                        </div>
+                        <div className="flex items-baseline justify-between gap-2">
+                          <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Faculdade</span>
+                          <span className="text-[11px] font-medium text-foreground text-right truncate max-w-[150px]">{selected.faculdade}</span>
+                        </div>
+                      </div>
                     </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-semibold text-foreground truncate">{selected.estudante}</p>
-                      <p className="text-[11px] text-muted-foreground truncate">
-                        {selected.matricula} · {selected.ano}º ano · {selected.curso}
-                      </p>
-                      <p className="text-[11px] text-muted-foreground/80 truncate">{selected.faculdade}</p>
-                    </div>
-                  </div>
 
-                  {/* Descrição */}
-                  <div>
-                    <div className="flex items-center gap-2 mb-2">
-                      <FileText className="w-3.5 h-3.5 text-muted-foreground" />
-                      <Label className="text-[10px] uppercase tracking-[0.08em] text-muted-foreground font-semibold">Descrição do pedido</Label>
+                    {/* Encaminhamento */}
+                    <div>
+                      <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold mb-2">Encaminhamento</p>
+                      <div className="space-y-2.5">
+                        <div>
+                          <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Destino</p>
+                          <Badge variant="outline" className={cn("text-[10px]", dest.color)}>{dest.label}</Badge>
+                        </div>
+                        <div>
+                          <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Responsável</p>
+                          <p className="text-[12px] font-medium text-foreground">
+                            {selected.responsavelDestino ?? <span className="text-muted-foreground italic font-normal">a atribuir</span>}
+                          </p>
+                        </div>
+                      </div>
                     </div>
-                    <div className="rounded-xl border border-border p-4 bg-muted/20">
-                      <p className="text-sm text-foreground/85 leading-relaxed">{selected.descricao}</p>
-                    </div>
-                  </div>
 
-                  {/* Metadata grid — clean neutral, no color noise */}
-                  <div className="rounded-xl border border-border overflow-hidden">
-                    <div className="grid grid-cols-2 divide-x divide-border">
-                      <div className="p-4">
-                        <div className="flex items-center gap-1.5 mb-2">
-                          <Clock className="w-3 h-3 text-muted-foreground" />
-                          <p className="text-[10px] uppercase tracking-[0.08em] text-muted-foreground font-semibold">Submetido</p>
+                    {/* Temporal */}
+                    <div>
+                      <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold mb-2">Datas</p>
+                      <div className="space-y-2.5">
+                        <div>
+                          <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-0.5">Submetido</p>
+                          <p className="text-[12px] font-medium text-foreground">{fmt(dSub)}</p>
+                          <p className="text-[10px] text-muted-foreground tabular-nums">{fmtT(dSub)}</p>
                         </div>
-                        <p className="text-sm font-semibold text-foreground">{fmtDate(dSub)}</p>
-                        <p className="text-[11px] text-muted-foreground tabular-nums mt-0.5">{fmtTime(dSub)}</p>
-                      </div>
-                      <div className="p-4">
-                        <div className="flex items-center gap-1.5 mb-2">
-                          <CheckCircle2 className="w-3 h-3 text-muted-foreground" />
-                          <p className="text-[10px] uppercase tracking-[0.08em] text-muted-foreground font-semibold">Estado</p>
-                        </div>
-                        <Badge variant="outline" className={cn("text-[10px]", st.color)}>{st.label}</Badge>
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 divide-x divide-border border-t border-border bg-muted/15">
-                      <div className="p-4">
-                        <div className="flex items-center gap-1.5 mb-2">
-                          <Building2 className="w-3 h-3 text-muted-foreground" />
-                          <p className="text-[10px] uppercase tracking-[0.08em] text-muted-foreground font-semibold">Destino</p>
-                        </div>
-                        <Badge variant="outline" className={cn("text-[10px]", dest.color)}>{dest.label}</Badge>
-                      </div>
-                      <div className="p-4">
-                        <div className="flex items-center gap-1.5 mb-2">
-                          <User className="w-3 h-3 text-muted-foreground" />
-                          <p className="text-[10px] uppercase tracking-[0.08em] text-muted-foreground font-semibold">Responsável</p>
-                        </div>
-                        <p className="text-sm font-medium text-foreground">{selected.responsavelDestino ?? <span className="text-muted-foreground italic font-normal">a atribuir</span>}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Histórico */}
-                  <div>
-                    <div className="flex items-center gap-2 mb-2">
-                      <Clock className="w-3.5 h-3.5 text-muted-foreground" />
-                      <Label className="text-[10px] uppercase tracking-[0.08em] text-muted-foreground font-semibold">Histórico</Label>
-                    </div>
-                    <div className="rounded-xl border border-border p-5">
-                      {selected.historico.map((h, i) => {
-                        const isLast = i === selected.historico.length - 1;
-                        const isCurrent = i === 0;
-                        return (
-                          <div key={i} className="flex gap-3">
-                            <div className="flex flex-col items-center">
-                              <div className={cn(
-                                "w-2.5 h-2.5 rounded-full mt-1.5",
-                                isCurrent ? "bg-primary ring-4 ring-primary/15" : "bg-muted-foreground/30"
-                              )} />
-                              {!isLast && <div className="w-px flex-1 bg-border my-1" />}
-                            </div>
-                            <div className={cn("flex-1 min-w-0", !isLast && "pb-4")}>
-                              <div className="flex items-baseline gap-2 flex-wrap">
-                                <p className="text-sm font-medium text-foreground">{h.accao}</p>
-                                <span className="text-[10px] text-muted-foreground tabular-nums">{h.data}</span>
-                              </div>
-                              <p className="text-[11px] text-muted-foreground mt-0.5">{h.actor}</p>
-                              {h.nota && (
-                                <p className="mt-2 text-xs text-foreground/75 leading-relaxed pl-3 border-l-2 border-border">
-                                  {h.nota}
-                                </p>
-                              )}
-                            </div>
+                        {dConc && (
+                          <div>
+                            <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-0.5">Concluído</p>
+                            <p className="text-[12px] font-medium text-foreground">{fmt(dConc)}</p>
+                            <p className="text-[10px] text-muted-foreground tabular-nums">{fmtT(dConc)}</p>
                           </div>
-                        );
-                      })}
+                        )}
+                      </div>
                     </div>
-                  </div>
+                  </aside>
+
+                  {/* RIGHT — descrição + histórico */}
+                  <main className="p-6 space-y-6 min-w-0">
+                    {/* Descrição */}
+                    <section>
+                      <div className="flex items-center gap-2 mb-2.5">
+                        <FileText className="w-3.5 h-3.5 text-muted-foreground" />
+                        <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Descrição do pedido</h3>
+                      </div>
+                      <p className="text-sm text-foreground/85 leading-relaxed">{selected.descricao}</p>
+                    </section>
+
+                    <div className="border-t border-border" />
+
+                    {/* Histórico */}
+                    <section>
+                      <div className="flex items-center gap-2 mb-4">
+                        <Clock className="w-3.5 h-3.5 text-muted-foreground" />
+                        <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Histórico</h3>
+                      </div>
+                      <ol className="space-y-0">
+                        {selected.historico.map((h, i) => {
+                          const isLast = i === selected.historico.length - 1;
+                          const isCurrent = i === 0;
+                          return (
+                            <li key={i} className="flex gap-3 relative">
+                              <div className="flex flex-col items-center shrink-0 w-3">
+                                <div className={cn(
+                                  "w-2.5 h-2.5 rounded-full mt-1.5 z-10",
+                                  isCurrent
+                                    ? "bg-primary ring-4 ring-primary/15"
+                                    : "bg-card border-2 border-muted-foreground/30"
+                                )} />
+                                {!isLast && <div className="w-px flex-1 bg-border" />}
+                              </div>
+                              <div className={cn("flex-1 min-w-0", !isLast && "pb-5")}>
+                                <div className="flex items-baseline justify-between gap-2 flex-wrap">
+                                  <p className="text-sm font-medium text-foreground">{h.accao}</p>
+                                  <span className="text-[10px] text-muted-foreground tabular-nums whitespace-nowrap">{h.data}</span>
+                                </div>
+                                <p className="text-[11px] text-muted-foreground mt-0.5">{h.actor}</p>
+                                {h.nota && (
+                                  <p className="mt-2 text-xs text-foreground/75 leading-relaxed pl-3 border-l-2 border-border">
+                                    {h.nota}
+                                  </p>
+                                )}
+                              </div>
+                            </li>
+                          );
+                        })}
+                      </ol>
+                    </section>
+                  </main>
                 </div>
 
-                <DialogFooter className="px-6 py-3 border-t border-border bg-muted/15">
-                  <p className="text-[11px] text-muted-foreground italic mr-auto">O GAP monitoriza; a execução é do destino.</p>
+                {/* Footer */}
+                <div className="flex items-center justify-between px-6 py-3 border-t border-border bg-muted/20">
+                  <p className="text-[11px] text-muted-foreground italic">O GAP monitoriza; a execução é do destino.</p>
                   <DialogClose asChild><Button variant="outline" size="sm">Fechar</Button></DialogClose>
-                </DialogFooter>
-              </>
+                </div>
+              </div>
             );
           })()}
         </DialogContent>
