@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import {
   Plus, Calendar as CalendarIcon, Clock, MapPin, Video, Search, FileText,
   CheckCircle2, X, Filter, User, ChevronLeft, ChevronRight, ArrowRight,
+  LayoutGrid, List as ListIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { gapAtendimentos, ticketCategoriaConfig as categoriaConfig, TicketCategoria, GapAtendimento } from "@/data/gapData";
@@ -37,6 +38,7 @@ export default function GapAtendimentos() {
   const [search, setSearch] = useState("");
   const [categoria, setCategoria] = useState<"todas" | TicketCategoria>("todas");
   const [selected, setSelected] = useState<GapAtendimento | null>(null);
+  const [view, setView] = useState<"calendario" | "lista">("calendario");
 
   // Calendar state
   const today = new Date(TODAY);
@@ -246,7 +248,112 @@ export default function GapAtendimentos() {
         ))}
       </div>
 
-      {/* ── Calendar + Side panel ───────────────────────────────────────────── */}
+      {/* View toggle */}
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <div className="inline-flex items-center bg-muted/50 border border-border rounded-lg p-0.5">
+          <button
+            onClick={() => setView("calendario")}
+            className={cn(
+              "inline-flex items-center gap-1.5 px-3 h-8 text-xs font-medium rounded-md transition-colors",
+              view === "calendario" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <LayoutGrid className="w-3.5 h-3.5" /> Calendário
+          </button>
+          <button
+            onClick={() => setView("lista")}
+            className={cn(
+              "inline-flex items-center gap-1.5 px-3 h-8 text-xs font-medium rounded-md transition-colors",
+              view === "lista" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <ListIcon className="w-3.5 h-3.5" /> Lista
+          </button>
+        </div>
+        {view === "lista" && (
+          <div className="flex items-center gap-2">
+            <div className="relative w-[200px]">
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+              <Input placeholder="Pesquisar..." value={search} onChange={e => setSearch(e.target.value)} className="pl-8 h-8 text-xs" />
+            </div>
+            <Select value={categoria} onValueChange={v => setCategoria(v as typeof categoria)}>
+              <SelectTrigger className={cn("w-[160px] h-8 text-xs", categoria !== "todas" && "border-primary/50 bg-primary/5 text-primary")}>
+                <Filter className="w-3 h-3 mr-1 shrink-0" /><SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todas">Todas categorias</SelectItem>
+                {(Object.keys(categoriaConfig) as TicketCategoria[]).map(c => (
+                  <SelectItem key={c} value={c}>{categoriaConfig[c].label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+      </div>
+
+      {view === "lista" ? (
+        (() => {
+          // group filteredAll by date, sort dates desc-ish (today first, then upcoming, then past)
+          const byDate = new Map<string, GapAtendimento[]>();
+          filteredAll.forEach(a => {
+            if (!byDate.has(a.data)) byDate.set(a.data, []);
+            byDate.get(a.data)!.push(a);
+          });
+          byDate.forEach(arr => arr.sort((a, b) => a.hora.localeCompare(b.hora)));
+          const sortedDates = Array.from(byDate.keys()).sort((a, b) => {
+            // today first, then chronological
+            if (a === TODAY) return -1;
+            if (b === TODAY) return 1;
+            return a.localeCompare(b);
+          });
+          if (sortedDates.length === 0) {
+            return (
+              <Card className="p-12 text-center">
+                <CalendarIcon className="w-10 h-10 text-muted-foreground/40 mx-auto mb-3" />
+                <p className="text-sm text-muted-foreground">Nenhum agendamento encontrado</p>
+              </Card>
+            );
+          }
+          return (
+            <div className="space-y-4">
+              {sortedDates.map(dateKey => {
+                const d = new Date(dateKey);
+                const isToday = dateKey === TODAY;
+                const events = byDate.get(dateKey)!;
+                return (
+                  <Card key={dateKey} className="overflow-hidden">
+                    <div className="px-4 py-2.5 border-b border-border bg-muted/20 flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className={cn(
+                          "flex items-center justify-center w-8 h-8 rounded-lg shrink-0 border",
+                          isToday ? "bg-primary text-primary-foreground border-primary" : "bg-card text-foreground border-border"
+                        )}>
+                          <span className="text-xs font-bold tabular-nums">{d.getDate()}</span>
+                        </div>
+                        <div>
+                          <p className="text-xs font-semibold text-foreground capitalize leading-tight">
+                            {isToday ? "Hoje · " : ""}{d.toLocaleDateString("pt-AO", { weekday: "long" })}
+                          </p>
+                          <p className="text-[10px] text-muted-foreground capitalize">
+                            {d.toLocaleDateString("pt-AO", { day: "2-digit", month: "long", year: "numeric" })}
+                          </p>
+                        </div>
+                      </div>
+                      <span className="text-[10px] font-semibold text-muted-foreground tabular-nums">
+                        {events.length} {events.length === 1 ? "sessão" : "sessões"}
+                      </span>
+                    </div>
+                    <div className="divide-y divide-border">
+                      {events.map(renderSessionRow)}
+                    </div>
+                  </Card>
+                );
+              })}
+            </div>
+          );
+        })()
+      ) : (
+      /* ── Calendar + Side panel ───────────────────────────────────────────── */
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Month grid */}
         <div className="lg:col-span-2">
@@ -448,6 +555,7 @@ export default function GapAtendimentos() {
           })()}
         </div>
       </div>
+      )}
 
       {/* Detail dialog */}
       <Dialog open={!!selected} onOpenChange={open => !open && setSelected(null)}>
