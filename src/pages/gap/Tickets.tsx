@@ -349,7 +349,6 @@ export default function GapTickets() {
                   <DialogTitle className="text-xl font-semibold leading-tight tracking-tight text-foreground">
                     {tipoCfg?.label ?? selected.tipo}
                   </DialogTitle>
-                  <p className="text-sm text-muted-foreground mt-1.5 leading-snug">{selected.assunto}</p>
                 </div>
 
                 <div className="p-6 space-y-6">
