@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -30,6 +31,7 @@ const MESES = [
 
 export default function GapTickets() {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [estado, setEstado] = useState<"todos" | "pendentes" | "em_execucao" | "executadas" | "rejeitadas">("todos");
   const [destino, setDestino] = useState<Destino | "todos">("todos");
@@ -293,11 +295,22 @@ export default function GapTickets() {
                 const horaSubmissao = s.historico[0]?.data.split(" ")[1] ?? "—";
                 return (
                   <tr key={s.id}
-                    className="border-b last:border-0 hover:bg-muted/20 transition-colors cursor-pointer"
-                    onClick={() => setSelected(s)}>
-                    <td className="p-3"><span className="text-[10px] font-mono text-muted-foreground/70 tabular-nums">{s.id.replace(/^SOL-?/i, "#")}</span></td>
+                    className="border-b last:border-0 hover:bg-muted/20 transition-colors">
                     <td className="p-3">
-                      <p className="font-medium text-foreground leading-tight">{s.estudante}</p>
+                      <button
+                        onClick={() => setSelected(s)}
+                        className="text-[10px] font-mono text-primary hover:underline tabular-nums"
+                      >
+                        {s.id.replace(/^SOL-?/i, "#")}
+                      </button>
+                    </td>
+                    <td className="p-3">
+                      <button
+                        onClick={() => navigate(`/gap/estudantes/${s.matricula}`)}
+                        className="font-medium text-foreground leading-tight hover:text-primary hover:underline text-left"
+                      >
+                        {s.estudante}
+                      </button>
                       <p className="text-[11px] text-muted-foreground mt-0.5">{s.matricula} · {s.curso}</p>
                     </td>
                     <td className="p-3">
