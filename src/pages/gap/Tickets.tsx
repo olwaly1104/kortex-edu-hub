@@ -326,7 +326,6 @@ export default function GapTickets() {
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto p-0 gap-0">
           {selected && (() => {
             const st = estadoSolicitacaoConfig[selected.estado];
-            const pr = prioridadeConfig[selected.prioridade];
             const dest = destinoConfig[selected.destino];
             const tipoCfg = tipoConfig[selected.tipo];
             const dSub = new Date(selected.dataSubmissao);
@@ -335,23 +334,22 @@ export default function GapTickets() {
             const fmtTime = (d: Date) => d.toLocaleTimeString("pt-AO", { hour: "2-digit", minute: "2-digit" });
             return (
               <>
-                {/* Compact header */}
-                <div className="px-6 pt-6 pb-4 border-b border-border">
-                  <div className="flex items-center gap-2 flex-wrap mb-2">
+                {/* Header */}
+                <div className="px-6 pt-6 pb-5 border-b border-border">
+                  <div className="flex items-center gap-2 flex-wrap mb-2.5">
                     <span className="text-[11px] font-mono px-1.5 py-0.5 rounded bg-muted text-muted-foreground">{selected.id}</span>
                     {tipoCfg && <Badge variant="outline" className={cn("text-[10px] font-medium", categoriaConfig[tipoCfg.categoria].color)}>{tipoCfg.categoria}</Badge>}
                     <Badge variant="outline" className={cn("text-[10px]", st.color)}>{st.label}</Badge>
-                    <Badge variant="outline" className={cn("text-[10px]", pr.color)}>● {pr.label}</Badge>
                   </div>
                   <DialogTitle className="text-lg leading-tight text-foreground">{tipoCfg?.label ?? selected.tipo}</DialogTitle>
                 </div>
 
                 <div className="p-6 space-y-5">
-                  {/* Unified pedido box: estudante + pedido + timeline + responsável/destino + descrição */}
-                  <div className="rounded-xl border border-border overflow-hidden">
-                    {/* Row 1: Estudante */}
-                    <div className="flex items-center gap-3 p-4 bg-muted/20 border-b border-border">
-                      <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                  {/* Unified pedido box */}
+                  <div className="rounded-xl border border-border overflow-hidden bg-card">
+                    {/* Row 1: Estudante — primary accent */}
+                    <div className="flex items-center gap-3 p-4 bg-primary/[0.04] border-b border-border">
+                      <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 ring-1 ring-primary/20">
                         <User className="w-4 h-4" />
                       </div>
                       <div className="min-w-0 flex-1">
@@ -362,31 +360,44 @@ export default function GapTickets() {
                       </div>
                     </div>
 
-                    {/* Row 2: Título + descrição */}
+                    {/* Row 2: Pedido — indigo accent */}
                     <div className="p-4 border-b border-border">
-                      <Label className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium flex items-center gap-1.5 mb-1.5">
-                        <FileText className="w-3 h-3" /> Pedido
-                      </Label>
+                      <div className="flex items-center gap-1.5 mb-2">
+                        <div className="w-5 h-5 rounded bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+                          <FileText className="w-3 h-3" />
+                        </div>
+                        <Label className="text-[10px] uppercase tracking-wider text-indigo-700 font-semibold">Pedido</Label>
+                      </div>
                       <p className="text-sm font-semibold text-foreground leading-snug">{selected.assunto}</p>
-                      <p className="text-sm text-foreground/80 leading-relaxed mt-2">{selected.descricao}</p>
+                      <p className="text-sm text-foreground/75 leading-relaxed mt-2">{selected.descricao}</p>
                     </div>
 
-                    {/* Row 3: Submetido / Concluído */}
-                    <div className="grid grid-cols-2 divide-x divide-border border-b border-border">
+                    {/* Row 3: Submetido / Concluído — slate accent */}
+                    <div className="grid grid-cols-2 divide-x divide-border border-b border-border bg-muted/20">
                       <div className="p-4">
-                        <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Submetido</p>
-                        <p className="text-sm font-semibold text-foreground mt-1">{fmtDate(dSub)}</p>
-                        <p className="text-[11px] text-muted-foreground tabular-nums mt-0.5">{fmtTime(dSub)}</p>
+                        <div className="flex items-center gap-1.5 mb-1.5">
+                          <div className="w-4 h-4 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center">
+                            <Clock className="w-2.5 h-2.5" />
+                          </div>
+                          <p className="text-[10px] uppercase tracking-wider text-slate-600 font-semibold">Submetido</p>
+                        </div>
+                        <p className="text-sm font-semibold text-foreground">{fmtDate(dSub)}</p>
+                        <p className="text-[11px] text-muted-foreground tabular-nums">{fmtTime(dSub)}</p>
                       </div>
                       <div className="p-4">
-                        <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Concluído</p>
+                        <div className="flex items-center gap-1.5 mb-1.5">
+                          <div className={cn("w-4 h-4 rounded-full flex items-center justify-center", dConc ? "bg-emerald-100 text-emerald-600" : "bg-muted text-muted-foreground")}>
+                            <CheckCircle2 className="w-2.5 h-2.5" />
+                          </div>
+                          <p className={cn("text-[10px] uppercase tracking-wider font-semibold", dConc ? "text-emerald-700" : "text-muted-foreground")}>Concluído</p>
+                        </div>
                         {dConc ? (
                           <>
-                            <p className="text-sm font-semibold text-foreground mt-1">{fmtDate(dConc)}</p>
-                            <p className="text-[11px] text-muted-foreground tabular-nums mt-0.5">{fmtTime(dConc)}</p>
+                            <p className="text-sm font-semibold text-foreground">{fmtDate(dConc)}</p>
+                            <p className="text-[11px] text-muted-foreground tabular-nums">{fmtTime(dConc)}</p>
                           </>
                         ) : (
-                          <p className="text-sm font-medium text-muted-foreground mt-1">— em curso —</p>
+                          <p className="text-sm font-medium text-muted-foreground">— em curso —</p>
                         )}
                       </div>
                     </div>
@@ -394,24 +405,35 @@ export default function GapTickets() {
                     {/* Row 4: Destino / Responsável */}
                     <div className="grid grid-cols-2 divide-x divide-border">
                       <div className="p-4">
-                        <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium flex items-center gap-1.5">
-                          <Building2 className="w-3 h-3" /> Destino
-                        </p>
-                        <Badge variant="outline" className={cn("text-[10px] mt-1.5", dest.color)}>{dest.label}</Badge>
+                        <div className="flex items-center gap-1.5 mb-1.5">
+                          <div className="w-4 h-4 rounded bg-violet-100 text-violet-600 flex items-center justify-center">
+                            <Building2 className="w-2.5 h-2.5" />
+                          </div>
+                          <p className="text-[10px] uppercase tracking-wider text-violet-700 font-semibold">Destino</p>
+                        </div>
+                        <Badge variant="outline" className={cn("text-[10px]", dest.color)}>{dest.label}</Badge>
                       </div>
                       <div className="p-4">
-                        <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Responsável</p>
-                        <p className="text-sm font-medium text-foreground mt-1">{selected.responsavelDestino ?? "— a atribuir —"}</p>
+                        <div className="flex items-center gap-1.5 mb-1.5">
+                          <div className="w-4 h-4 rounded-full bg-pink-100 text-pink-600 flex items-center justify-center">
+                            <User className="w-2.5 h-2.5" />
+                          </div>
+                          <p className="text-[10px] uppercase tracking-wider text-pink-700 font-semibold">Responsável</p>
+                        </div>
+                        <p className="text-sm font-medium text-foreground">{selected.responsavelDestino ?? "— a atribuir —"}</p>
                       </div>
                     </div>
                   </div>
 
                   {/* Histórico — separate box */}
                   <div>
-                    <Label className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium flex items-center gap-1.5 mb-2">
-                      <Clock className="w-3 h-3" /> Histórico da solicitação
-                    </Label>
-                    <div className="rounded-xl border border-border p-4">
+                    <div className="flex items-center gap-1.5 mb-2">
+                      <div className="w-5 h-5 rounded bg-amber-50 text-amber-600 flex items-center justify-center">
+                        <Clock className="w-3 h-3" />
+                      </div>
+                      <Label className="text-[10px] uppercase tracking-wider text-amber-700 font-semibold">Histórico da solicitação</Label>
+                    </div>
+                    <div className="rounded-xl border border-border p-4 bg-card">
                       {selected.historico.map((h, i) => {
                         const isLast = i === selected.historico.length - 1;
                         return (
