@@ -38,7 +38,8 @@ export default function GapAtendimentos() {
   const [search, setSearch] = useState("");
   const [categoria, setCategoria] = useState<"todas" | TicketCategoria>("todas");
   const [selected, setSelected] = useState<GapAtendimento | null>(null);
-  const [view, setView] = useState<"calendario" | "lista">("calendario");
+  const [view, setView] = useState<"lista" | "calendario">("lista");
+  const [periodo, setPeriodo] = useState<"todos" | "proximos" | "anteriores">("todos");
 
   // Calendar state
   const today = new Date(TODAY);
