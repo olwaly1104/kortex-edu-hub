@@ -27,6 +27,11 @@ const estadoConfig: Record<string, { label: string; color: string; dot: string }
 };
 
 const TODAY = "2025-12-16";
+const WEEKDAYS = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+const MONTHS = [
+  "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+  "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro",
+];
 
 export default function GapAtendimentos() {
   const navigate = useNavigate();
@@ -34,7 +39,14 @@ export default function GapAtendimentos() {
   const [categoria, setCategoria] = useState<"todas" | TicketCategoria>("todas");
   const [estado, setEstado] = useState<"todos" | keyof typeof estadoConfig>("todos");
   const [periodo, setPeriodo] = useState<"todos" | "hoje" | "proximos" | "anteriores">("todos");
+  const [view, setView] = useState<"tabela" | "calendario">("tabela");
   const [selected, setSelected] = useState<GapAtendimento | null>(null);
+
+  // Calendar state
+  const today = new Date(TODAY);
+  const [calMonth, setCalMonth] = useState(today.getMonth());
+  const [calYear, setCalYear] = useState(today.getFullYear());
+  const [calSelectedDay, setCalSelectedDay] = useState<string>(TODAY);
 
   const counts = {
     todos: gapAtendimentos.length,
