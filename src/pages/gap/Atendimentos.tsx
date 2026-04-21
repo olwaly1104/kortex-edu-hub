@@ -13,7 +13,7 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Plus, Calendar as CalendarIcon, Clock, MapPin, Video, Search, FileText,
-  CheckCircle2, X, Filter, User, List, LayoutGrid, ChevronLeft, ChevronRight,
+  CheckCircle2, X, Filter, User, ChevronLeft, ChevronRight, ArrowRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { gapAtendimentos, ticketCategoriaConfig as categoriaConfig, TicketCategoria, GapAtendimento } from "@/data/gapData";
@@ -34,8 +34,6 @@ const MONTHS = [
 
 export default function GapAtendimentos() {
   const navigate = useNavigate();
-  const [view, setView] = useState<"lista" | "calendario">("lista");
-  const [filter, setFilter] = useState<"todos" | "hoje" | "agendados" | "concluidos">("agendados");
   const [search, setSearch] = useState("");
   const [categoria, setCategoria] = useState<"todas" | TicketCategoria>("todas");
   const [selected, setSelected] = useState<GapAtendimento | null>(null);
@@ -44,7 +42,7 @@ export default function GapAtendimentos() {
   const today = new Date(TODAY);
   const [calMonth, setCalMonth] = useState(today.getMonth());
   const [calYear, setCalYear] = useState(today.getFullYear());
-  const [calSelectedDay, setCalSelectedDay] = useState<string | null>(TODAY);
+  const [calSelectedDay, setCalSelectedDay] = useState<string>(TODAY);
 
   const filtered = useMemo(() => {
     return gapAtendimentos
