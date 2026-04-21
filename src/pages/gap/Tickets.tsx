@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import {
   Search, HelpCircle, User, X, Calendar as CalendarIcon, Building2,
   Inbox, Clock, CheckCircle2, AlertCircle, Send, AlertTriangle,
-  Bell, FileText, Layers,
+  Bell, FileText, Layers, MessageSquare, Mail,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
