@@ -79,12 +79,12 @@ export const categoriaConfig: Record<Categoria, { label: string; color: string }
 };
 
 export const destinoConfig: Record<Destino, { label: string; color: string }> = {
-  CTI:         { label: "CTI",         color: "bg-blue-100 text-blue-700 border-blue-200" },
-  Académica:   { label: "Académica",   color: "bg-purple-100 text-purple-700 border-purple-200" },
-  Financeiro:  { label: "Financeiro",  color: "bg-emerald-100 text-emerald-700 border-emerald-200" },
-  Faculdade:   { label: "Faculdade",   color: "bg-indigo-100 text-indigo-700 border-indigo-200" },
-  GAP:         { label: "GAP",         color: "bg-pink-100 text-pink-700 border-pink-200" },
-  Secretaria:  { label: "Secretaria",  color: "bg-amber-100 text-amber-700 border-amber-200" },
+  CTI:         { label: "CTI",               color: "bg-blue-100 text-blue-700 border-blue-200" },
+  Académica:   { label: "Área Académica",    color: "bg-purple-100 text-purple-700 border-purple-200" },
+  Financeiro:  { label: "Área Financeira",   color: "bg-emerald-100 text-emerald-700 border-emerald-200" },
+  Faculdade:   { label: "Faculdade",         color: "bg-indigo-100 text-indigo-700 border-indigo-200" },
+  GAP:         { label: "GAP",               color: "bg-pink-100 text-pink-700 border-pink-200" },
+  Secretaria:  { label: "Secretaria",        color: "bg-amber-100 text-amber-700 border-amber-200" },
 };
 
 export const estadoSolicitacaoConfig: Record<EstadoSolicitacao, { label: string; color: string }> = {
