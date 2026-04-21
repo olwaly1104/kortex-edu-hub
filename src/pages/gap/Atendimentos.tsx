@@ -613,6 +613,16 @@ const DURACOES = [
 
 const HORAS_SUGERIDAS = ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00"];
 
+const CATEGORIA_HINT: Record<TicketCategoria, string> = {
+  academico:    "Métodos de estudo, desempenho.",
+  psicologico:  "Bem-estar, ansiedade, motivação.",
+  financeiro:   "Apoio financeiro, propinas.",
+  documentacao: "Documentos e certificados.",
+  social:       "Apoio social e familiar.",
+  carreira:     "Vocação e percurso profissional.",
+  saude:        "Saúde e bem-estar físico.",
+};
+
 function NovoAgendamentoDialog() {
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<1 | 2>(1);
