@@ -473,6 +473,171 @@ export default function GapAtendimentos() {
           </div>
         )}
       </Card>
+      ) : (
+      /* Calendar view */
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {/* Month grid */}
+        <div className="lg:col-span-2">
+          <Card className="overflow-hidden">
+            {/* Cal header */}
+            <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-border bg-muted/20 flex-wrap">
+              <div className="flex items-center gap-2">
+                <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={goPrevMonth}><ChevronLeft className="w-4 h-4" /></Button>
+                <p className="text-sm font-semibold text-foreground capitalize min-w-[140px] text-center">
+                  {MONTHS[calMonth]} {calYear}
+                </p>
+                <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={goNextMonth}><ChevronRight className="w-4 h-4" /></Button>
+                <Button variant="outline" size="sm" className="h-8 text-xs ml-1" onClick={goToday}>Hoje</Button>
+              </div>
+              <span className="text-[11px] text-muted-foreground tabular-nums">
+                {calendarFiltered.length} {calendarFiltered.length === 1 ? "agendamento" : "agendamentos"}
+              </span>
+            </div>
+
+            {/* Weekday header */}
+            <div className="grid grid-cols-7 border-b border-border bg-muted/10">
+              {WEEKDAYS.map(w => (
+                <div key={w} className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider text-center py-2">{w}</div>
+              ))}
+            </div>
+
+            {/* Day cells */}
+            <div className="grid grid-cols-7">
+              {calendarDays.map((cell, i) => {
+                if (!cell.dateKey) return <div key={i} className="aspect-square border-r border-b border-border bg-muted/5 last:border-r-0" />;
+                const events = eventsByDate.get(cell.dateKey) ?? [];
+                const isToday = cell.dateKey === TODAY;
+                const isSelected = cell.dateKey === calSelectedDay;
+                return (
+                  <button
+                    key={i}
+                    onClick={() => setCalSelectedDay(cell.dateKey!)}
+                    className={cn(
+                      "aspect-square border-r border-b border-border p-1.5 text-left transition-colors hover:bg-muted/30 flex flex-col gap-1 last:border-r-0",
+                      isSelected && "bg-primary/5 ring-1 ring-inset ring-primary/40"
+                    )}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className={cn(
+                        "inline-flex items-center justify-center text-[11px] font-semibold tabular-nums",
+                        isToday ? "bg-primary text-primary-foreground rounded-full w-5 h-5" : "text-foreground"
+                      )}>{cell.day}</span>
+                      {events.length > 0 && (
+                        <span className="text-[9px] font-semibold text-muted-foreground tabular-nums">{events.length}</span>
+                      )}
+                    </div>
+                    <div className="flex flex-col gap-0.5 overflow-hidden flex-1">
+                      {events.slice(0, 2).map(ev => {
+                        const cat = categoriaConfig[ev.categoria];
+                        return (
+                          <div key={ev.id} className={cn("text-[9px] font-medium truncate px-1 py-0.5 rounded border", cat.color)}>
+                            {ev.hora} {ev.estudante.split(" ")[0]}
+                          </div>
+                        );
+                      })}
+                      {events.length > 2 && (
+                        <span className="text-[9px] text-muted-foreground px-1">+{events.length - 2} mais</span>
+                      )}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </Card>
+        </div>
+
+        {/* Side panel — agendamentos do dia */}
+        <div className="lg:col-span-1">
+          {(() => {
+            const d = new Date(calSelectedDay);
+            const isToday = calSelectedDay === TODAY;
+            const dayLabel = d.toLocaleDateString("pt-AO", { day: "2-digit", month: "short" });
+            return (
+              <div className="space-y-3 sticky top-4">
+                <div className="flex items-baseline justify-between gap-2 px-1">
+                  <div className="flex items-baseline gap-2 min-w-0">
+                    <h2 className="text-base font-bold text-foreground tracking-tight">Agendamentos</h2>
+                    <span className="text-xs text-muted-foreground">·</span>
+                    <span className={cn("text-sm font-semibold capitalize truncate", isToday ? "text-primary" : "text-foreground")}>
+                      {isToday ? "Hoje" : dayLabel}
+                    </span>
+                  </div>
+                  <span className="text-[11px] text-muted-foreground tabular-nums shrink-0">
+                    {selectedDayEvents.length} {selectedDayEvents.length === 1 ? "sessão" : "sessões"}
+                  </span>
+                </div>
+
+                <Card className="overflow-hidden">
+                  <div className="px-4 py-2.5 border-b border-border bg-muted/20 flex items-center gap-2">
+                    <div className={cn(
+                      "flex items-center justify-center w-8 h-8 rounded-lg shrink-0 border",
+                      isToday ? "bg-primary text-primary-foreground border-primary" : "bg-card text-foreground border-border"
+                    )}>
+                      <span className="text-xs font-bold tabular-nums">{d.getDate()}</span>
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[11px] font-semibold text-foreground capitalize leading-tight">
+                        {d.toLocaleDateString("pt-AO", { weekday: "long" })}
+                      </p>
+                      <p className="text-[10px] text-muted-foreground capitalize">
+                        {d.toLocaleDateString("pt-AO", { day: "2-digit", month: "long", year: "numeric" })}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="divide-y divide-border max-h-[560px] overflow-y-auto">
+                    {selectedDayEvents.length === 0 ? (
+                      <div className="p-8 text-center">
+                        <CalendarIcon className="w-8 h-8 text-muted-foreground/40 mx-auto mb-2" />
+                        <p className="text-xs text-muted-foreground">Nenhuma sessão neste dia</p>
+                      </div>
+                    ) : (
+                      selectedDayEvents.map(a => {
+                        const cat = categoriaConfig[a.categoria];
+                        const est = estadoConfig[a.estado];
+                        return (
+                          <div
+                            key={a.id}
+                            onClick={() => setSelected(a)}
+                            className="group p-3 hover:bg-muted/30 cursor-pointer transition-colors"
+                          >
+                            <div className="flex items-center justify-between gap-2 mb-1.5">
+                              <div className="flex items-center gap-1.5">
+                                <Clock className="w-3 h-3 text-muted-foreground" />
+                                <span className="text-xs font-bold tabular-nums text-foreground">{a.hora}</span>
+                                <span className="text-[10px] text-muted-foreground">· {a.duracao}</span>
+                              </div>
+                              <Badge variant="outline" className={cn("text-[9px] gap-1 px-1.5 py-0", est.color)}>
+                                <span className={cn("w-1 h-1 rounded-full", est.dot)} />
+                                {est.label}
+                              </Badge>
+                            </div>
+                            <p className="text-xs font-semibold text-foreground truncate">{a.motivo}</p>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); navigate(`/gap/estudantes/${a.matricula}`); }}
+                              className="text-[11px] text-muted-foreground hover:text-primary hover:underline truncate text-left block w-full mt-0.5"
+                            >
+                              {a.estudante} · <span className="tabular-nums">{a.matricula}</span>
+                            </button>
+                            <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+                              <Badge variant="outline" className={cn("text-[9px] px-1.5 py-0", cat.color)}>{cat.label}</Badge>
+                              <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground">
+                                {a.tipo === "online" ? <Video className="w-2.5 h-2.5" /> : <MapPin className="w-2.5 h-2.5" />}
+                                <span className="truncate max-w-[120px]">{a.tipo === "online" ? "Online" : (a.sala ?? "Presencial")}</span>
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                </Card>
+              </div>
+            );
+          })()}
+        </div>
+      </div>
+      )}
 
       {/* Detail dialog */}
       <Dialog open={!!selected} onOpenChange={open => !open && setSelected(null)}>
