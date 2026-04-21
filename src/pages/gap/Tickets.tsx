@@ -103,11 +103,12 @@ export default function GapTickets() {
     setEstado("todos"); setDestino("todos"); setCategoria("todas"); setMes("todos"); setSearch("");
   };
 
-  const estadoTabs: { key: "todos" | "pendentes" | "em_execucao" | "executadas"; label: string; icon: React.ElementType }[] = [
+  const estadoTabs: { key: "todos" | "pendentes" | "em_execucao" | "executadas" | "rejeitadas"; label: string; icon: React.ElementType }[] = [
     { key: "todos", label: "Todas", icon: Inbox },
     { key: "pendentes", label: "Pendentes", icon: AlertCircle },
     { key: "em_execucao", label: "Em Execução", icon: Clock },
     { key: "executadas", label: "Executadas", icon: CheckCircle2 },
+    { key: "rejeitadas", label: "Rejeitadas", icon: X },
   ];
 
   return (
