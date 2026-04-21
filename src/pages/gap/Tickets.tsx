@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useToast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -28,6 +29,7 @@ const MESES = [
 ];
 
 export default function GapTickets() {
+  const { toast } = useToast();
   const [search, setSearch] = useState("");
   const [estado, setEstado] = useState<"todos" | "pendentes" | "em_execucao" | "executadas" | "rejeitadas">("todos");
   const [destino, setDestino] = useState<Destino | "todos">("todos");
@@ -561,11 +563,11 @@ export default function GapTickets() {
                         }
 
                         const dotCls: Record<Step["tone"], string> = {
-                          submitted: "bg-muted-foreground/40 ring-4 ring-muted-foreground/10",
-                          accepted: "bg-primary ring-4 ring-primary/15",
+                          submitted: "bg-sky-500 ring-4 ring-sky-500/15",
+                          accepted: "bg-amber-500 ring-4 ring-amber-500/15",
                           rejected: "bg-destructive ring-4 ring-destructive/15",
                           executed: "bg-emerald-500 ring-4 ring-emerald-500/15",
-                          pending: "bg-card border-2 border-dashed border-muted-foreground/40",
+                          pending: "bg-background border-2 border-dashed border-border",
                         };
 
                         return (
@@ -608,7 +610,17 @@ export default function GapTickets() {
                 {/* Footer */}
                 <div className="flex items-center justify-between px-6 py-3 border-t border-border bg-muted/20">
                   <p className="text-[11px] text-muted-foreground italic">O GAP monitoriza; a execução é do destino.</p>
-                  <DialogClose asChild><Button variant="outline" size="sm">Fechar</Button></DialogClose>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="gap-1.5"
+                      onClick={() => toast({ title: "Relatório do pedido", description: "Abertura do relatório detalhado em breve." })}
+                    >
+                      <FileText className="w-3.5 h-3.5" /> Ver Relatório
+                    </Button>
+                    <DialogClose asChild><Button variant="outline" size="sm">Fechar</Button></DialogClose>
+                  </div>
                 </div>
               </div>
             );
