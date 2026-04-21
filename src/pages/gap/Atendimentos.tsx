@@ -485,7 +485,7 @@ export default function GapAtendimentos() {
                   return (
                     <tr
                       key={a.id}
-                      onClick={() => setSelected(a)}
+                      onClick={() => navigate(`/gap/agendamentos/${a.id}`)}
                       className={cn(
                         "group border-b border-border last:border-b-0 hover:bg-muted/40 transition-colors cursor-pointer",
                         isPast && "opacity-75",
@@ -684,7 +684,7 @@ export default function GapAtendimentos() {
                         return (
                           <div
                             key={a.id}
-                            onClick={() => setSelected(a)}
+                            onClick={() => navigate(`/gap/agendamentos/${a.id}`)}
                             className="group p-3 hover:bg-muted/30 cursor-pointer transition-colors"
                           >
                             <div className="flex items-center justify-between gap-2 mb-1.5">
