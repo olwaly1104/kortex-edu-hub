@@ -221,78 +221,73 @@ export default function GapAtendimentos() {
         ))}
       </div>
 
-      {/* Controls — institutional 2-line standard */}
-      <div className="space-y-2">
-        {/* Line 1: Period chips (Hoje separated) + View toggle */}
+      {/* Controls — clean solid outline */}
+      <Card className="p-3 space-y-2.5">
+        {/* Line 1: Hoje (pinned) + period segment + view toggle */}
         <div className="flex items-center justify-between gap-3 flex-wrap">
-          <div className="inline-flex items-center gap-1.5 flex-wrap">
-            {/* Hoje — pinned, separated */}
+          <div className="inline-flex items-center gap-2 flex-wrap">
             <button
               onClick={() => setPeriodo("hoje")}
               className={cn(
-                "inline-flex items-center gap-1.5 px-3 h-9 text-xs font-semibold rounded-lg border transition-all",
+                "inline-flex items-center gap-1.5 h-9 px-3 text-xs font-semibold rounded-md border transition-colors",
                 periodo === "hoje"
-                  ? "bg-primary text-primary-foreground border-primary shadow-sm"
-                  : "bg-card text-foreground border-border hover:border-primary/40 hover:text-primary"
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "bg-background text-foreground border-input hover:border-primary hover:text-primary"
               )}
             >
               <Clock className="w-3.5 h-3.5" />
               Hoje
               <span className={cn(
                 "inline-flex items-center justify-center min-w-[18px] h-[16px] px-1 rounded text-[10px] font-bold tabular-nums",
-                periodo === "hoje" ? "bg-primary-foreground/20 text-primary-foreground" : "bg-muted text-muted-foreground"
-              )}>
-                {counts.hoje}
-              </span>
+                periodo === "hoje" ? "bg-primary-foreground/20" : "bg-muted text-muted-foreground"
+              )}>{counts.hoje}</span>
             </button>
 
-            <div className="h-6 w-px bg-border mx-1" />
+            <div className="h-6 w-px bg-border" />
 
-            {/* Other periods */}
-            <div className="inline-flex items-center gap-1 bg-muted/40 border border-border rounded-lg p-1">
+            <div className="inline-flex items-center rounded-md border border-input bg-background overflow-hidden">
               {([
                 { v: "todos", label: "Todos", count: counts.todos },
                 { v: "proximos", label: "Próximos", count: gapAtendimentos.filter(a => a.data > TODAY).length },
                 { v: "anteriores", label: "Anteriores", count: gapAtendimentos.filter(a => a.data < TODAY).length },
-              ] as const).map(opt => (
+              ] as const).map((opt, i) => (
                 <button
                   key={opt.v}
                   onClick={() => setPeriodo(opt.v)}
                   className={cn(
-                    "inline-flex items-center gap-1.5 px-3 h-7 text-xs font-medium rounded-md transition-all",
+                    "inline-flex items-center gap-1.5 h-9 px-3 text-xs font-medium transition-colors",
+                    i > 0 && "border-l border-input",
                     periodo === opt.v
-                      ? "bg-background text-foreground shadow-sm"
-                      : "text-muted-foreground hover:text-foreground hover:bg-background/50"
+                      ? "bg-muted text-foreground"
+                      : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
                   )}
                 >
                   {opt.label}
                   <span className={cn(
                     "inline-flex items-center justify-center min-w-[18px] h-[16px] px-1 rounded text-[10px] font-semibold tabular-nums",
-                    periodo === opt.v ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
-                  )}>
-                    {opt.count}
-                  </span>
+                    periodo === opt.v ? "bg-primary/10 text-primary" : "bg-muted-foreground/15 text-muted-foreground"
+                  )}>{opt.count}</span>
                 </button>
               ))}
             </div>
           </div>
 
-          {/* View toggle */}
-          <div className="inline-flex items-center bg-muted/40 border border-border rounded-lg p-1">
+          {/* View toggle — solid outline */}
+          <div className="inline-flex items-center rounded-md border border-input bg-background overflow-hidden">
             <button
               onClick={() => setView("tabela")}
               className={cn(
-                "inline-flex items-center gap-1.5 px-3 h-7 text-xs font-medium rounded-md transition-all",
-                view === "tabela" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+                "inline-flex items-center gap-1.5 h-9 px-3 text-xs font-medium transition-colors",
+                view === "tabela" ? "bg-muted text-foreground" : "text-muted-foreground hover:bg-muted/50"
               )}
             >
-              <ListIcon className="w-3.5 h-3.5" /> Tabela
+              <ListIcon className="w-3.5 h-3.5" /> Lista
             </button>
             <button
               onClick={() => setView("calendario")}
               className={cn(
-                "inline-flex items-center gap-1.5 px-3 h-7 text-xs font-medium rounded-md transition-all",
-                view === "calendario" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+                "inline-flex items-center gap-1.5 h-9 px-3 text-xs font-medium border-l border-input transition-colors",
+                view === "calendario" ? "bg-muted text-foreground" : "text-muted-foreground hover:bg-muted/50"
               )}
             >
               <LayoutGrid className="w-3.5 h-3.5" /> Calendário
@@ -302,13 +297,13 @@ export default function GapAtendimentos() {
 
         {/* Line 2: Search + filters */}
         <div className="flex items-center gap-2 flex-wrap">
-          <div className="relative flex-1 min-w-[220px] max-w-[360px]">
+          <div className="relative flex-1 min-w-[220px] max-w-[380px]">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
             <Input
-              placeholder="Pesquisar por estudante, matrícula ou motivo..."
+              placeholder="Pesquisar estudante, matrícula ou motivo…"
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="pl-9 pr-8 h-9 text-xs bg-card"
+              className="pl-9 pr-8 h-9 text-xs"
             />
             {search && (
               <button
@@ -321,18 +316,16 @@ export default function GapAtendimentos() {
             )}
           </div>
 
-          <div className="h-6 w-px bg-border" />
-
           <Select value={categoria} onValueChange={v => setCategoria(v as typeof categoria)}>
             <SelectTrigger className={cn(
-              "w-[170px] h-9 text-xs bg-card",
-              categoria !== "todas" && "border-primary/40 bg-primary/5 text-primary"
+              "w-[180px] h-9 text-xs",
+              categoria !== "todas" && "border-primary text-primary"
             )}>
               <Filter className="w-3 h-3 mr-1.5 shrink-0" />
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="todas">Todas categorias</SelectItem>
+              <SelectItem value="todas">Todas as categorias</SelectItem>
               {(Object.keys(categoriaConfig) as TicketCategoria[]).map(c => (
                 <SelectItem key={c} value={c}>{categoriaConfig[c].label}</SelectItem>
               ))}
@@ -341,13 +334,13 @@ export default function GapAtendimentos() {
 
           <Select value={estado} onValueChange={v => setEstado(v as typeof estado)}>
             <SelectTrigger className={cn(
-              "w-[150px] h-9 text-xs bg-card",
-              estado !== "todos" && "border-primary/40 bg-primary/5 text-primary"
+              "w-[160px] h-9 text-xs",
+              estado !== "todos" && "border-primary text-primary"
             )}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="todos">Todos estados</SelectItem>
+              <SelectItem value="todos">Todos os estados</SelectItem>
               {Object.entries(estadoConfig).map(([k, v]) => (
                 <SelectItem key={k} value={k}>{v.label}</SelectItem>
               ))}
@@ -369,23 +362,11 @@ export default function GapAtendimentos() {
             {rows.length} de {counts.todos}
           </div>
         </div>
-      </div>
+      </Card>
 
       {view === "tabela" ? (
-      /* Table */
+      /* List view */
       <Card className="overflow-hidden">
-        {/* Table head */}
-        <div className="hidden md:grid grid-cols-[110px_180px_1fr_130px_130px_110px_28px] gap-3 px-4 py-2.5 border-b border-border bg-muted/20 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-          <div>Data / Hora</div>
-          <div>Estudante</div>
-          <div>Motivo</div>
-          <div>Categoria</div>
-          <div>Local</div>
-          <div>Estado</div>
-          <div></div>
-        </div>
-
-        {/* Rows */}
         {rows.length === 0 ? (
           <div className="p-12 text-center">
             <CalendarIcon className="w-10 h-10 text-muted-foreground/40 mx-auto mb-3" />
@@ -404,69 +385,65 @@ export default function GapAtendimentos() {
                   key={a.id}
                   onClick={() => setSelected(a)}
                   className={cn(
-                    "group grid grid-cols-1 md:grid-cols-[110px_180px_1fr_130px_130px_110px_28px] gap-3 px-4 py-3 items-center hover:bg-muted/30 transition-colors cursor-pointer",
-                    isPast && "opacity-80"
+                    "group flex items-center gap-4 px-4 py-3.5 hover:bg-muted/40 transition-colors cursor-pointer",
+                    isPast && "opacity-75",
+                    isToday && "bg-primary/[0.03]"
                   )}
                 >
-                  {/* Date / hora */}
-                  <div>
-                    <div className="flex items-baseline gap-1.5">
-                      <span className={cn(
-                        "text-sm font-bold tabular-nums",
-                        isToday ? "text-primary" : "text-foreground"
-                      )}>
-                        {d.toLocaleDateString("pt-AO", { day: "2-digit", month: "short" })}
-                      </span>
-                      {isToday && <Badge variant="outline" className="text-[9px] px-1 py-0 bg-primary/10 text-primary border-primary/30">Hoje</Badge>}
+                  {/* Date pill */}
+                  <div className={cn(
+                    "shrink-0 w-14 flex flex-col items-center justify-center rounded-md border py-1.5",
+                    isToday ? "bg-primary text-primary-foreground border-primary"
+                            : "bg-background border-border text-foreground"
+                  )}>
+                    <span className="text-[9px] font-semibold uppercase tracking-wider tabular-nums opacity-80">
+                      {d.toLocaleDateString("pt-AO", { month: "short" }).replace(".", "")}
+                    </span>
+                    <span className="text-base font-bold leading-none tabular-nums">
+                      {d.toLocaleDateString("pt-AO", { day: "2-digit" })}
+                    </span>
+                    <span className={cn("text-[9px] font-medium mt-0.5 tabular-nums", isToday ? "opacity-90" : "text-muted-foreground")}>
+                      {a.hora}
+                    </span>
+                  </div>
+
+                  {/* Main */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Badge variant="outline" className={cn("text-[10px] h-5", cat.color)}>{cat.label}</Badge>
+                      <Badge variant="outline" className={cn("text-[10px] h-5 gap-1", est.color)}>
+                        <span className={cn("w-1.5 h-1.5 rounded-full", est.dot)} />
+                        {est.label}
+                      </Badge>
+                      {isToday && (
+                        <Badge variant="outline" className="text-[10px] h-5 bg-primary/10 text-primary border-primary/30">Hoje</Badge>
+                      )}
                     </div>
-                    <p className="text-[11px] text-muted-foreground tabular-nums">
-                      {a.hora} · {a.duracao}
+                    <p className="text-sm font-semibold text-foreground truncate" title={a.motivo}>
+                      {a.motivo}
                     </p>
+                    <div className="flex items-center gap-3 mt-1 text-[11px] text-muted-foreground min-w-0">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); navigate(`/gap/estudantes/${a.matricula}`); }}
+                        className="inline-flex items-center gap-1 font-medium text-foreground/80 hover:text-primary hover:underline truncate"
+                      >
+                        <User className="w-3 h-3" />
+                        {a.estudante}
+                        <span className="text-muted-foreground font-normal">· {a.matricula}</span>
+                      </button>
+                      <span className="text-border">|</span>
+                      <span className="inline-flex items-center gap-1 truncate">
+                        {a.tipo === "online"
+                          ? <Video className="w-3 h-3 text-blue-600 shrink-0" />
+                          : <MapPin className="w-3 h-3 shrink-0" />}
+                        <span className="truncate">{a.tipo === "online" ? "Online" : (a.sala ?? "Presencial")}</span>
+                      </span>
+                      <span className="text-border hidden sm:inline">|</span>
+                      <span className="hidden sm:inline tabular-nums">{a.duracao}</span>
+                    </div>
                   </div>
 
-                  {/* Estudante */}
-                  <div className="min-w-0">
-                    <button
-                      onClick={(e) => { e.stopPropagation(); navigate(`/gap/estudantes/${a.matricula}`); }}
-                      className="text-sm font-semibold text-foreground hover:text-primary hover:underline truncate text-left block w-full"
-                    >
-                      {a.estudante}
-                    </button>
-                    <p className="text-[11px] text-muted-foreground truncate">
-                      <span className="tabular-nums">{a.matricula}</span> · {a.curso}
-                    </p>
-                  </div>
-
-                  {/* Motivo */}
-                  <div className="min-w-0">
-                    <p className="text-sm text-foreground/90 truncate" title={a.motivo}>{a.motivo}</p>
-                  </div>
-
-                  {/* Category */}
-                  <div>
-                    <Badge variant="outline" className={cn("text-[10px]", cat.color)}>{cat.label}</Badge>
-                  </div>
-
-                  {/* Local */}
-                  <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground min-w-0">
-                    {a.tipo === "online"
-                      ? <Video className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-                      : <MapPin className="w-3.5 h-3.5 text-foreground/60 shrink-0" />}
-                    <span className="truncate">{a.tipo === "online" ? "Online" : (a.sala ?? "Presencial")}</span>
-                  </div>
-
-                  {/* Estado */}
-                  <div>
-                    <Badge variant="outline" className={cn("text-[10px] gap-1", est.color)}>
-                      <span className={cn("w-1.5 h-1.5 rounded-full", est.dot)} />
-                      {est.label}
-                    </Badge>
-                  </div>
-
-                  {/* Chevron */}
-                  <div className="hidden md:flex justify-end">
-                    <ArrowRight className="w-3.5 h-3.5 text-muted-foreground/40 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
-                  </div>
+                  <ArrowRight className="w-4 h-4 text-muted-foreground/40 group-hover:text-primary group-hover:translate-x-0.5 transition-all shrink-0" />
                 </div>
               );
             })}
