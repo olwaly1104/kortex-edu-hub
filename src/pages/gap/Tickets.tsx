@@ -458,19 +458,19 @@ export default function GapTickets() {
                           return a.includes("concluída") || a.includes("concluida") || a.includes("executada");
                         });
 
-                        type Step = { label: string; data?: string; actor?: string; nota?: string; aside?: string; tone: "submitted" | "accepted" | "rejected" | "executed" };
+                        type Step = { label: string; data?: string; actor?: string; nota?: string; aside?: string; tone: "submitted" | "accepted" | "rejected" | "executed" | "pending" };
                         const steps: Step[] = [];
 
-                        if (submetida) {
-                          steps.push({
-                            label: "Solicitação submetida",
-                            data: submetida.data,
-                            actor: submetida.actor,
-                            aside: encaminhada ? `${encaminhada.accao} · ${encaminhada.data}` : undefined,
-                            tone: "submitted",
-                          });
-                        }
+                        // 1. Submetida (sempre existe)
+                        steps.push({
+                          label: "Solicitação submetida",
+                          data: submetida?.data,
+                          actor: submetida?.actor ?? "Portal do Estudante",
+                          aside: encaminhada ? `${encaminhada.accao} · ${encaminhada.data}` : undefined,
+                          tone: "submitted",
+                        });
 
+                        // 2. Aceite ou Rejeitada (ou pendente se ainda recebida)
                         if (selected.estado === "rejeitada") {
                           const rej = selected.historico.slice().reverse().find(h => h.accao.toLowerCase().includes("rejeit"));
                           steps.push({
@@ -480,10 +480,10 @@ export default function GapTickets() {
                             nota: rej?.nota,
                             tone: "rejected",
                           });
-                        } else if (selected.estado === "em_execucao") {
+                        } else if (selected.estado === "em_execucao" || selected.estado === "concluida") {
                           const aceite = selected.historico.find(h => {
                             const a = h.accao.toLowerCase();
-                            return !a.includes("submetida") && !a.includes("encaminhada");
+                            return !a.includes("submetida") && !a.includes("encaminhada") && !a.includes("concluí") && !a.includes("conclui") && !a.includes("executada") && !a.includes("rejeit");
                           });
                           steps.push({
                             label: "Solicitação aceite",
@@ -492,22 +492,33 @@ export default function GapTickets() {
                             nota: aceite?.nota,
                             tone: "accepted",
                           });
-                        } else if (selected.estado === "concluida") {
+                        } else {
                           steps.push({
-                            label: "Solicitação aceite",
-                            data: selected.historico.find(h => {
-                              const a = h.accao.toLowerCase();
-                              return !a.includes("submetida") && !a.includes("encaminhada") && !a.includes("concluí") && !a.includes("conclui") && !a.includes("executada");
-                            })?.data,
-                            actor: selected.responsavelDestino,
-                            tone: "accepted",
+                            label: "Aguarda aceitação",
+                            actor: selected.responsavelDestino ?? dest.label,
+                            tone: "pending",
                           });
+                        }
+
+                        // 3. Executada (sempre — placeholder se ainda não)
+                        if (selected.estado === "concluida") {
                           steps.push({
                             label: "Executada",
                             data: executada?.data,
                             actor: executada?.actor ?? selected.responsavelDestino,
                             nota: executada?.nota,
                             tone: "executed",
+                          });
+                        } else if (selected.estado === "rejeitada") {
+                          steps.push({
+                            label: "—",
+                            tone: "pending",
+                          });
+                        } else {
+                          steps.push({
+                            label: selected.estado === "em_execucao" ? "Em execução pelo destino" : "Aguarda execução",
+                            actor: selected.responsavelDestino ?? dest.label,
+                            tone: "pending",
                           });
                         }
 
@@ -516,6 +527,7 @@ export default function GapTickets() {
                           accepted: "bg-primary ring-4 ring-primary/15",
                           rejected: "bg-destructive ring-4 ring-destructive/15",
                           executed: "bg-emerald-500 ring-4 ring-emerald-500/15",
+                          pending: "bg-card border-2 border-dashed border-muted-foreground/40",
                         };
 
                         return (
