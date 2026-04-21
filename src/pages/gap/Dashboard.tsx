@@ -105,9 +105,14 @@ export default function GapDashboard() {
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Solicitações por Destino */}
         <Card className="p-5">
-          <h2 className="text-base font-semibold text-foreground mb-1 flex items-center gap-2">
-            <Building2 className="w-4 h-4 text-primary" /> Solicitações por Destino
-          </h2>
+          <div className="flex items-center justify-between mb-1">
+            <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
+              <Building2 className="w-4 h-4 text-primary" /> Solicitações por Destino
+            </h2>
+            <Link to="/gap/solicitacoes" className="text-[11px] font-medium text-primary hover:underline flex items-center gap-0.5">
+              Ver todos <ArrowRight className="w-3 h-3" />
+            </Link>
+          </div>
           <p className="text-[11px] text-muted-foreground mb-4">Departamento que executa o pedido após o encaminhamento automático</p>
           <div className="space-y-3">
             {solicitacoesPorDestino.map(c => (
