@@ -62,8 +62,8 @@ export default function GapAtendimentos() {
       .filter(a => {
         if (periodo === "todos") return true;
         if (periodo === "hoje") return a.data === TODAY;
-        if (periodo === "proximos") return a.data > TODAY;
-        return a.data < TODAY;
+        if (periodo === "agendado") return a.estado === "agendado";
+        return a.estado === "concluido";
       })
       .filter(a => {
         if (!search) return true;
