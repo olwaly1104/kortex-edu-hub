@@ -423,9 +423,17 @@ export default function GapTickets() {
                         </div>
                         <div className="flex items-baseline justify-between gap-2">
                           <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Responsável</span>
-                          <span className="text-[11px] font-medium text-foreground text-right truncate max-w-[150px]">
-                            {selected.responsavelDestino ?? <span className="text-muted-foreground italic font-normal">a atribuir</span>}
-                          </span>
+                          {selected.responsavelDestino ? (
+                            <button
+                              type="button"
+                              className="text-[11px] font-medium text-primary hover:underline text-right truncate max-w-[150px]"
+                              onClick={() => toast({ title: "Perfil do responsável", description: "Abertura do perfil institucional em breve." })}
+                            >
+                              {selected.responsavelDestino.split(" · ")[0]}
+                            </button>
+                          ) : (
+                            <span className="text-[11px] text-muted-foreground italic text-right">a atribuir</span>
+                          )}
                         </div>
                         {dConc ? (
                           <div className="flex items-baseline justify-between gap-2">
@@ -439,8 +447,8 @@ export default function GapTickets() {
                           base.setDate(base.getDate() + sla);
                           return (
                             <div className="flex items-baseline justify-between gap-2">
-                              <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Estimativa</span>
-                              <span className="text-[11px] font-medium text-foreground tabular-nums">{fmt(base)}</span>
+                              <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Concluído</span>
+                              <span className="text-[11px] font-medium text-muted-foreground tabular-nums italic">prev. {fmt(base)}</span>
                             </div>
                           );
                         })()}
