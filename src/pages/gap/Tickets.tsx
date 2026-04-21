@@ -439,43 +439,113 @@ export default function GapTickets() {
 
                     <div className="border-t border-border" />
 
-                    {/* Histórico */}
+                    {/* Histórico — 2 bullet points: Submetida + (Aceite|Rejeitada|Executada) */}
                     <section>
                       <div className="flex items-center gap-2 mb-4">
                         <Clock className="w-3.5 h-3.5 text-muted-foreground" />
                         <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Histórico</h3>
                       </div>
-                      <ol className="space-y-0">
-                        {selected.historico.map((h, i) => {
-                          const isLast = i === selected.historico.length - 1;
-                          const isCurrent = i === 0;
-                          return (
-                            <li key={i} className="flex gap-3 relative">
-                              <div className="flex flex-col items-center shrink-0 w-3">
-                                <div className={cn(
-                                  "w-2.5 h-2.5 rounded-full mt-1.5 z-10",
-                                  isCurrent
-                                    ? "bg-primary ring-4 ring-primary/15"
-                                    : "bg-card border-2 border-muted-foreground/30"
-                                )} />
-                                {!isLast && <div className="w-px flex-1 bg-border" />}
-                              </div>
-                              <div className={cn("flex-1 min-w-0", !isLast && "pb-5")}>
-                                <div className="flex items-baseline justify-between gap-2 flex-wrap">
-                                  <p className="text-sm font-medium text-foreground">{h.accao}</p>
-                                  <span className="text-[10px] text-muted-foreground tabular-nums whitespace-nowrap">{h.data}</span>
-                                </div>
-                                <p className="text-[11px] text-muted-foreground mt-0.5">{h.actor}</p>
-                                {h.nota && (
-                                  <p className="mt-2 text-xs text-foreground/75 leading-relaxed pl-3 border-l-2 border-border">
-                                    {h.nota}
-                                  </p>
-                                )}
-                              </div>
-                            </li>
-                          );
-                        })}
-                      </ol>
+                      {(() => {
+                        const submetida = selected.historico.find(h => h.accao.toLowerCase().includes("submetida"));
+                        const encaminhada = selected.historico.find(h => h.accao.toLowerCase().includes("encaminhada"));
+                        const executada = selected.historico.find(h => {
+                          const a = h.accao.toLowerCase();
+                          return a.includes("concluída") || a.includes("concluida") || a.includes("executada");
+                        });
+
+                        type Step = { label: string; data?: string; actor?: string; nota?: string; aside?: string; tone: "submitted" | "accepted" | "rejected" | "executed" };
+                        const steps: Step[] = [];
+
+                        if (submetida) {
+                          steps.push({
+                            label: "Solicitação submetida",
+                            data: submetida.data,
+                            actor: submetida.actor,
+                            aside: encaminhada ? `${encaminhada.accao} · ${encaminhada.data}` : undefined,
+                            tone: "submitted",
+                          });
+                        }
+
+                        if (selected.estado === "rejeitada") {
+                          const rej = selected.historico.slice().reverse().find(h => h.accao.toLowerCase().includes("rejeit"));
+                          steps.push({
+                            label: "Solicitação rejeitada",
+                            data: rej?.data,
+                            actor: rej?.actor ?? selected.responsavelDestino,
+                            nota: rej?.nota,
+                            tone: "rejected",
+                          });
+                        } else if (selected.estado === "em_execucao") {
+                          const aceite = selected.historico.find(h => {
+                            const a = h.accao.toLowerCase();
+                            return !a.includes("submetida") && !a.includes("encaminhada");
+                          });
+                          steps.push({
+                            label: "Solicitação aceite",
+                            data: aceite?.data,
+                            actor: aceite?.actor ?? selected.responsavelDestino,
+                            nota: aceite?.nota,
+                            tone: "accepted",
+                          });
+                        } else if (selected.estado === "concluida") {
+                          steps.push({
+                            label: "Solicitação aceite",
+                            data: selected.historico.find(h => {
+                              const a = h.accao.toLowerCase();
+                              return !a.includes("submetida") && !a.includes("encaminhada") && !a.includes("concluí") && !a.includes("conclui") && !a.includes("executada");
+                            })?.data,
+                            actor: selected.responsavelDestino,
+                            tone: "accepted",
+                          });
+                          steps.push({
+                            label: "Executada",
+                            data: executada?.data,
+                            actor: executada?.actor ?? selected.responsavelDestino,
+                            nota: executada?.nota,
+                            tone: "executed",
+                          });
+                        }
+
+                        const dotCls: Record<Step["tone"], string> = {
+                          submitted: "bg-muted-foreground/40 ring-4 ring-muted-foreground/10",
+                          accepted: "bg-primary ring-4 ring-primary/15",
+                          rejected: "bg-destructive ring-4 ring-destructive/15",
+                          executed: "bg-emerald-500 ring-4 ring-emerald-500/15",
+                        };
+
+                        return (
+                          <ol className="space-y-0">
+                            {steps.map((s, i) => {
+                              const isLast = i === steps.length - 1;
+                              return (
+                                <li key={i} className="flex gap-3 relative">
+                                  <div className="flex flex-col items-center shrink-0 w-3">
+                                    <div className={cn("w-2.5 h-2.5 rounded-full mt-1.5 z-10", dotCls[s.tone])} />
+                                    {!isLast && <div className="w-px flex-1 bg-border" />}
+                                  </div>
+                                  <div className={cn("flex-1 min-w-0", !isLast && "pb-5")}>
+                                    <div className="flex items-baseline justify-between gap-2 flex-wrap">
+                                      <p className="text-sm font-medium text-foreground">{s.label}</p>
+                                      {s.data && <span className="text-[10px] text-muted-foreground tabular-nums whitespace-nowrap">{s.data}</span>}
+                                    </div>
+                                    {s.actor && <p className="text-[11px] text-muted-foreground mt-0.5">{s.actor}</p>}
+                                    {s.aside && (
+                                      <p className="mt-1.5 text-[11px] text-muted-foreground/90 italic">
+                                        {s.aside}
+                                      </p>
+                                    )}
+                                    {s.nota && (
+                                      <p className="mt-2 text-xs text-foreground/75 leading-relaxed pl-3 border-l-2 border-border">
+                                        {s.nota}
+                                      </p>
+                                    )}
+                                  </div>
+                                </li>
+                              );
+                            })}
+                          </ol>
+                        );
+                      })()}
                     </section>
                   </main>
                 </div>
