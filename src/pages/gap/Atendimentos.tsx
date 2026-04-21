@@ -200,65 +200,99 @@ export default function GapAtendimentos() {
         </div>
       </div>
 
-      {/* List */}
-      <div className="space-y-2">
+      {/* List — grouped by day */}
+      <div className="space-y-6">
         {filtered.length === 0 ? (
           <Card className="p-10 text-center"><p className="text-sm text-muted-foreground">Nenhum agendamento encontrado</p></Card>
         ) : (
-          filtered.map(a => {
-            const cat = categoriaConfig[a.categoria];
-            const est = estadoConfig[a.estado];
-            const d = new Date(a.data);
-            return (
-              <Card
-                key={a.id}
-                className="p-4 hover:bg-muted/30 hover:border-primary/30 transition-all cursor-pointer group"
-                onClick={() => setSelected(a)}
-              >
-                <div className="flex items-center gap-4">
-                  {/* Date chip */}
-                  <div className="text-center w-14 shrink-0 py-1.5 rounded-lg bg-muted/40 group-hover:bg-primary/10 transition-colors">
-                    <p className="text-lg font-bold text-foreground leading-none">{d.getDate()}</p>
-                    <p className="text-[10px] text-muted-foreground uppercase mt-0.5">{d.toLocaleDateString("pt-AO", { month: "short" })}</p>
+          Object.entries(
+            filtered.reduce<Record<string, GapAtendimento[]>>((acc, a) => {
+              (acc[a.data] = acc[a.data] || []).push(a);
+              return acc;
+            }, {})
+          )
+            .sort(([a], [b]) => b.localeCompare(a))
+            .map(([dateKey, items]) => {
+              const d = new Date(dateKey);
+              const isToday = dateKey === TODAY;
+              const weekday = d.toLocaleDateString("pt-AO", { weekday: "long" });
+              const dayLabel = d.toLocaleDateString("pt-AO", { day: "2-digit", month: "long", year: "numeric" });
+              return (
+                <div key={dateKey} className="space-y-2">
+                  {/* Day header */}
+                  <div className="flex items-center gap-3 px-1">
+                    <div className={cn(
+                      "flex items-center justify-center w-10 h-10 rounded-lg shrink-0 border",
+                      isToday ? "bg-primary text-primary-foreground border-primary" : "bg-muted/40 text-foreground border-border"
+                    )}>
+                      <span className="text-sm font-bold tabular-nums">{d.getDate()}</span>
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-foreground capitalize leading-tight">
+                        {isToday ? "Hoje" : weekday}
+                      </p>
+                      <p className="text-[11px] text-muted-foreground capitalize">{dayLabel}</p>
+                    </div>
+                    <div className="flex-1 h-px bg-border" />
+                    <span className="text-[11px] text-muted-foreground tabular-nums">{items.length} {items.length === 1 ? "sessão" : "sessões"}</span>
                   </div>
 
-                  {/* Student + motivo */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1 flex-wrap">
-                      <div className="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                        <User className="w-3.5 h-3.5" />
-                      </div>
-                      <p className="text-sm font-semibold text-foreground truncate">{a.estudante}</p>
-                      <span className="text-[11px] text-muted-foreground">· {a.matricula}</span>
-                      <Badge variant="outline" className={cn("text-[10px]", cat.color)}>{cat.label}</Badge>
-                    </div>
-                    <p className="text-[11px] text-muted-foreground ml-9 truncate">{a.curso}</p>
-                    <p className="text-xs text-foreground/80 mt-1.5 line-clamp-1">{a.motivo}</p>
-                    <div className="flex items-center gap-3 mt-1.5 text-[10px] text-muted-foreground">
-                      <span className="flex items-center gap-1"><Users className="w-3 h-3" /> {a.responsavel}</span>
-                      {a.sala && <span className="flex items-center gap-1"><MapPin className="w-3 h-3" /> {a.sala}</span>}
-                    </div>
-                  </div>
+                  {/* Sessions for that day */}
+                  <Card className="divide-y divide-border overflow-hidden">
+                    {items
+                      .sort((a, b) => a.hora.localeCompare(b.hora))
+                      .map(a => {
+                        const cat = categoriaConfig[a.categoria];
+                        const est = estadoConfig[a.estado];
+                        return (
+                          <div
+                            key={a.id}
+                            onClick={() => setSelected(a)}
+                            className="group flex items-stretch gap-4 px-4 py-3 hover:bg-muted/30 transition-colors cursor-pointer"
+                          >
+                            {/* Time block */}
+                            <div className="flex flex-col items-center justify-center w-16 shrink-0 border-r border-border pr-4">
+                              <p className="text-base font-bold text-foreground tabular-nums leading-none">{a.hora}</p>
+                              <p className="text-[10px] text-muted-foreground mt-1">{a.duracao}</p>
+                            </div>
 
-                  {/* Logistics */}
-                  <div className="flex items-center gap-2 shrink-0">
-                    <div className="text-right">
-                      <p className="text-sm font-semibold text-foreground tabular-nums">{a.hora}</p>
-                      <p className="text-[10px] text-muted-foreground">{a.duracao}</p>
-                    </div>
-                    <Badge variant="outline" className="text-[10px] gap-1">
-                      {a.tipo === "online" ? <Video className="w-3 h-3" /> : <MapPin className="w-3 h-3" />}
-                      {a.tipo === "online" ? "Online" : "Presencial"}
-                    </Badge>
-                    <Badge variant="outline" className={cn("text-[10px] gap-1", est.color)}>
-                      <span className={cn("w-1.5 h-1.5 rounded-full", est.dot)} />
-                      {est.label}
-                    </Badge>
-                  </div>
+                            {/* Student + motivo */}
+                            <div className="flex-1 min-w-0 flex items-center gap-3">
+                              <div className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 text-xs font-semibold">
+                                {a.estudante.split(" ").slice(0, 2).map(n => n[0]).join("")}
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <p className="text-sm font-semibold text-foreground truncate">{a.estudante}</p>
+                                  <span className="text-[11px] text-muted-foreground tabular-nums">{a.matricula}</span>
+                                </div>
+                                <p className="text-xs text-muted-foreground truncate mt-0.5">{a.motivo}</p>
+                              </div>
+                            </div>
+
+                            {/* Meta column */}
+                            <div className="hidden md:flex flex-col items-end justify-center gap-1 shrink-0 min-w-[140px]">
+                              <Badge variant="outline" className={cn("text-[10px]", cat.color)}>{cat.label}</Badge>
+                              <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                                {a.tipo === "online" ? <Video className="w-3 h-3" /> : <MapPin className="w-3 h-3" />}
+                                <span className="truncate max-w-[120px]">{a.tipo === "online" ? "Online" : (a.sala ?? "Presencial")}</span>
+                              </div>
+                            </div>
+
+                            {/* Status */}
+                            <div className="flex items-center shrink-0">
+                              <Badge variant="outline" className={cn("text-[10px] gap-1", est.color)}>
+                                <span className={cn("w-1.5 h-1.5 rounded-full", est.dot)} />
+                                {est.label}
+                              </Badge>
+                            </div>
+                          </div>
+                        );
+                      })}
+                  </Card>
                 </div>
-              </Card>
-            );
-          })
+              );
+            })
         )}
       </div>
 
