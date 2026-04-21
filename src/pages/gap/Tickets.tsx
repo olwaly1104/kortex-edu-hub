@@ -419,6 +419,23 @@ export default function GapTickets() {
                       </div>
                     </div>
 
+                    {/* Datas */}
+                    <div>
+                      <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold mb-2">Datas</p>
+                      <div className="space-y-2.5">
+                        <div className="flex items-baseline justify-between gap-2">
+                          <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Submetido</span>
+                          <span className="text-[11px] font-medium text-foreground tabular-nums">{fmt(dSub)} · {fmtT(dSub)}</span>
+                        </div>
+                        {dConc && (
+                          <div className="flex items-baseline justify-between gap-2">
+                            <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Concluído</span>
+                            <span className="text-[11px] font-medium text-foreground tabular-nums">{fmt(dConc)} · {fmtT(dConc)}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
                   </aside>
 
                   {/* RIGHT — descrição + histórico */}
