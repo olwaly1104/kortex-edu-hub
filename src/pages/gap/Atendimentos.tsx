@@ -248,8 +248,8 @@ export default function GapAtendimentos() {
             <div className="inline-flex items-center rounded-md border border-input bg-background overflow-hidden">
               {([
                 { v: "todos", label: "Todos", count: counts.todos },
-                { v: "proximos", label: "Próximos", count: gapAtendimentos.filter(a => a.data > TODAY).length },
-                { v: "anteriores", label: "Anteriores", count: gapAtendimentos.filter(a => a.data < TODAY).length },
+                { v: "agendado", label: "Agendado", count: gapAtendimentos.filter(a => a.estado === "agendado").length },
+                { v: "concluido", label: "Concluído", count: gapAtendimentos.filter(a => a.estado === "concluido").length },
               ] as const).map((opt, i) => (
                 <button
                   key={opt.v}
