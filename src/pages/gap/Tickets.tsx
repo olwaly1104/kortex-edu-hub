@@ -65,6 +65,7 @@ export default function GapTickets() {
       if (estado === "pendentes" && !isPendente(s)) return false;
       if (estado === "em_execucao" && !isEmExecucao(s)) return false;
       if (estado === "executadas" && !isExecutada(s)) return false;
+      if (estado === "rejeitadas" && !isRejeitada(s)) return false;
       if (destino !== "todos" && s.destino !== destino) return false;
       if (categoria !== "todas") {
         const cfg = tipoConfig[s.tipo];
