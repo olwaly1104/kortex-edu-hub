@@ -313,7 +313,20 @@ export default function GapTickets() {
                       <p className="text-xs font-medium text-foreground">{d.toLocaleDateString("pt-AO", { day: "2-digit", month: "short", year: "numeric" })}</p>
                     </td>
                     <td className="p-3 text-center"><Badge variant="outline" className={cn("text-[10px]", dest.color)}>{dest.label}</Badge></td>
-                    <td className="p-3 text-center"><Badge variant="outline" className={cn("text-[10px]", st.color)}>{st.label}</Badge></td>
+                    <td className="p-3 text-center">
+                      <span className={cn("inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[10px] font-semibold", st.color)}>
+                        <span className="relative flex h-1.5 w-1.5">
+                          {s.estado === "em_execucao" && <span className="absolute inset-0 rounded-full bg-sky-500 opacity-75 animate-ping" />}
+                          <span className={cn("relative inline-flex h-1.5 w-1.5 rounded-full",
+                            s.estado === "em_execucao" && "bg-sky-500",
+                            s.estado === "recebida" && "bg-amber-500",
+                            s.estado === "concluida" && "bg-emerald-500",
+                            s.estado === "rejeitada" && "bg-destructive",
+                          )} />
+                        </span>
+                        {st.label}
+                      </span>
+                    </td>
                   </tr>
                 );
               })}
