@@ -377,6 +377,14 @@ export default function GapTickets() {
                           <p className="text-[11px] text-muted-foreground mt-0.5">{selected.matricula}</p>
                         </div>
                       </div>
+                      <div className="flex items-center gap-2 mt-3">
+                        <Button variant="outline" size="sm" className="h-7 px-2.5 text-[11px] gap-1.5 flex-1">
+                          <MessageSquare className="w-3 h-3" /> Chat
+                        </Button>
+                        <Button variant="outline" size="sm" className="h-7 px-2.5 text-[11px] gap-1.5 flex-1">
+                          <Mail className="w-3 h-3" /> Email
+                        </Button>
+                      </div>
                       <div className="mt-3 pt-3 border-t border-border space-y-1.5">
                         <div className="flex items-baseline justify-between gap-2">
                           <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Ano</span>
@@ -397,6 +405,10 @@ export default function GapTickets() {
                     <div>
                       <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold mb-2">Detalhes do Pedido</p>
                       <div className="space-y-2">
+                        <div className="flex items-baseline justify-between gap-2">
+                          <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Submetido</span>
+                          <span className="text-[11px] font-medium text-foreground tabular-nums">{fmt(dSub)} · {fmtT(dSub)}</span>
+                        </div>
                         {tipoCfg && (
                           <div className="flex items-baseline justify-between gap-2">
                             <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Categoria</span>
@@ -415,18 +427,23 @@ export default function GapTickets() {
                             {selected.responsavelDestino ?? <span className="text-muted-foreground italic font-normal">a atribuir</span>}
                           </span>
                         </div>
-                        <div className="pt-2 mt-1 border-t border-border space-y-2">
+                        {dConc ? (
                           <div className="flex items-baseline justify-between gap-2">
-                            <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Submetido</span>
-                            <span className="text-[11px] font-medium text-foreground tabular-nums">{fmt(dSub)} · {fmtT(dSub)}</span>
+                            <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Concluído</span>
+                            <span className="text-[11px] font-medium text-foreground tabular-nums">{fmt(dConc)} · {fmtT(dConc)}</span>
                           </div>
-                          {dConc && (
+                        ) : (() => {
+                          const sla = selected.slaDias ?? tipoCfg?.slaDias;
+                          if (!sla) return null;
+                          const base = new Date(selected.dataEncaminhamento ?? selected.dataSubmissao);
+                          base.setDate(base.getDate() + sla);
+                          return (
                             <div className="flex items-baseline justify-between gap-2">
-                              <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Concluído</span>
-                              <span className="text-[11px] font-medium text-foreground tabular-nums">{fmt(dConc)} · {fmtT(dConc)}</span>
+                              <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Estimativa</span>
+                              <span className="text-[11px] font-medium text-foreground tabular-nums">{fmt(base)}</span>
                             </div>
-                          )}
-                        </div>
+                          );
+                        })()}
                       </div>
                     </div>
 
