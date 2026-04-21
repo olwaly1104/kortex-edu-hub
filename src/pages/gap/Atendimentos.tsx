@@ -496,6 +496,7 @@ export default function GapAtendimentos() {
           })()}
         </div>
       </div>
+      )}
 
       {/* Detail dialog */}
       <Dialog open={!!selected} onOpenChange={open => !open && setSelected(null)}>
