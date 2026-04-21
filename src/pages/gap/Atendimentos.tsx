@@ -94,7 +94,7 @@ export default function GapAtendimentos() {
         const s = search.toLowerCase();
         return a.estudante.toLowerCase().includes(s) || a.matricula.includes(search) || a.motivo.toLowerCase().includes(s);
       });
-  }, [search, categoria, estado]);
+  }, [search, categoria]);
 
   const calendarDays = useMemo(() => {
     const first = new Date(calYear, calMonth, 1);
