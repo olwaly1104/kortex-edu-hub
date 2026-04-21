@@ -312,105 +312,125 @@ export default function GapTickets() {
         {filtered.length === 0 && <p className="text-center text-muted-foreground py-8 text-sm">Nenhuma solicitação encontrada.</p>}
       </Card>
 
-      {/* Detail dialog — tracking, no chat */}
+      {/* Detail dialog — clean, structured tracking view */}
       <Dialog open={!!selected} onOpenChange={open => !open && setSelected(null)}>
-        <DialogContent className="max-w-2xl max-h-[88vh] overflow-y-auto">
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto p-0 gap-0">
           {selected && (() => {
             const st = estadoSolicitacaoConfig[selected.estado];
             const pr = prioridadeConfig[selected.prioridade];
             const dest = destinoConfig[selected.destino];
             const tipoCfg = tipoConfig[selected.tipo];
+            const dSub = new Date(selected.dataSubmissao);
+            const dConc = selected.dataConclusao ? new Date(selected.dataConclusao) : null;
             return (
               <>
-                <DialogHeader>
-                  <div className="flex items-center gap-2 mb-1 flex-wrap">
-                    <span className="text-xs font-mono text-muted-foreground">{selected.id}</span>
-                    <Badge variant="outline" className={cn("text-[10px]", dest.color)}>{dest.label}</Badge>
-                    <Badge variant="outline" className={cn("text-[10px]", st.color)}>{st.label}</Badge>
-                    <Badge variant="outline" className={cn("text-[10px]", pr.color)}>Prioridade: {pr.label}</Badge>
-                  </div>
-                  <DialogTitle className="text-lg leading-tight">{selected.assunto}</DialogTitle>
-                  <p className="text-xs text-muted-foreground mt-1">{tipoCfg?.label ?? selected.tipo}{tipoCfg && <> · <span className="text-muted-foreground/80">{tipoCfg.categoria}</span></>}</p>
-                </DialogHeader>
-
-                {/* Estudante */}
-                <div className="bg-muted/40 rounded-lg p-3 space-y-1">
-                  <div className="flex items-center gap-2">
-                    <User className="w-4 h-4 text-muted-foreground" />
-                    <span className="text-sm font-medium text-foreground">{selected.estudante}</span>
-                    <span className="text-xs text-muted-foreground">· {selected.matricula}</span>
-                  </div>
-                  <p className="text-xs text-muted-foreground">{selected.curso} · {selected.ano}º ano</p>
-                </div>
-
-                {/* Pedido */}
-                <div className="space-y-2">
-                  <Label className="text-xs uppercase tracking-wide text-muted-foreground flex items-center gap-1.5">
-                    <FileText className="w-3 h-3" /> Pedido
-                  </Label>
-                  <div className="rounded-lg border border-border p-3 text-sm text-foreground">
-                    {selected.descricao}
+                {/* Header — gradient identity strip */}
+                <div className="bg-gradient-to-br from-primary/5 via-card to-card border-b border-border p-6">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2 flex-wrap mb-2">
+                        <span className="text-[11px] font-mono px-1.5 py-0.5 rounded bg-muted text-muted-foreground">{selected.id}</span>
+                        {tipoCfg && <Badge variant="outline" className={cn("text-[10px] font-medium", categoriaConfig[tipoCfg.categoria].color)}>{tipoCfg.categoria}</Badge>}
+                        <Badge variant="outline" className={cn("text-[10px]", dest.color)}>{dest.label}</Badge>
+                        <Badge variant="outline" className={cn("text-[10px]", st.color)}>{st.label}</Badge>
+                        <Badge variant="outline" className={cn("text-[10px]", pr.color)}>● {pr.label}</Badge>
+                      </div>
+                      <DialogTitle className="text-lg leading-tight text-foreground">{tipoCfg?.label ?? selected.tipo}</DialogTitle>
+                      <p className="text-sm text-muted-foreground mt-1.5 leading-snug">{selected.assunto}</p>
+                    </div>
                   </div>
                 </div>
 
-                {/* Encaminhamento */}
-                <div className="grid grid-cols-3 gap-3 text-xs">
-                  <div className="rounded-lg border border-border p-3">
-                    <p className="text-muted-foreground mb-0.5">Destino</p>
-                    <p className="font-medium text-foreground">{dest.label}</p>
-                  </div>
-                  <div className="rounded-lg border border-border p-3">
-                    <p className="text-muted-foreground mb-0.5">Responsável</p>
-                    <p className="font-medium text-foreground">{selected.responsavelDestino ?? "— a atribuir —"}</p>
-                  </div>
-                  <div className="rounded-lg border border-border p-3">
-                    <p className="text-muted-foreground mb-0.5">Data do pedido</p>
-                    <p className="font-medium text-foreground">
-                      {new Date(selected.dataSubmissao).toLocaleDateString("pt-AO", { day: "2-digit", month: "long", year: "numeric" })}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Histórico (audit timeline) */}
-                <div className="space-y-2">
-                  <Label className="text-xs uppercase tracking-wide text-muted-foreground flex items-center gap-1.5">
-                    <Clock className="w-3 h-3" /> Histórico de execução
-                  </Label>
-                  <div className="rounded-lg border border-border p-3 space-y-3">
-                    {selected.historico.map((h, i) => (
-                      <div key={i} className="flex gap-3">
-                        <div className="flex flex-col items-center">
-                          <div className="w-2 h-2 rounded-full bg-primary mt-1.5" />
-                          {i < selected.historico.length - 1 && <div className="w-px flex-1 bg-border mt-1" />}
+                <div className="p-6 space-y-5">
+                  {/* Estudante + metadata grid */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="rounded-lg border border-border p-3 col-span-2 sm:col-span-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                          <User className="w-4 h-4" />
                         </div>
-                        <div className="flex-1 pb-1">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <p className="text-sm font-medium text-foreground">{h.accao}</p>
-                            <span className="text-[10px] text-muted-foreground">{h.data}</span>
-                          </div>
-                          <p className="text-[11px] text-muted-foreground">{h.actor}</p>
-                          {h.nota && <p className="text-xs text-foreground/80 mt-1 italic">"{h.nota}"</p>}
+                        <div className="min-w-0">
+                          <p className="text-sm font-semibold text-foreground truncate">{selected.estudante}</p>
+                          <p className="text-[11px] text-muted-foreground">{selected.matricula} · {selected.ano}º ano</p>
                         </div>
                       </div>
-                    ))}
+                      <p className="text-[11px] text-muted-foreground border-t border-border pt-2">
+                        {selected.curso} · {selected.faculdade}
+                      </p>
+                    </div>
+
+                    <div className="rounded-lg border border-border p-3 grid grid-cols-2 gap-3 col-span-2 sm:col-span-1">
+                      <div>
+                        <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Submetido</p>
+                        <p className="text-sm font-semibold text-foreground mt-1">{dSub.toLocaleDateString("pt-AO", { day: "2-digit", month: "short", year: "numeric" })}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Concluído</p>
+                        <p className="text-sm font-semibold text-foreground mt-1">{dConc ? dConc.toLocaleDateString("pt-AO", { day: "2-digit", month: "short", year: "numeric" }) : "—"}</p>
+                      </div>
+                      <div className="col-span-2 border-t border-border pt-2">
+                        <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Responsável no destino</p>
+                        <p className="text-xs font-medium text-foreground mt-1">{selected.responsavelDestino ?? "— a atribuir —"}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Descrição */}
+                  <div>
+                    <Label className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium flex items-center gap-1.5 mb-1.5">
+                      <FileText className="w-3 h-3" /> Descrição do pedido
+                    </Label>
+                    <div className="rounded-lg border border-border bg-muted/20 p-3 text-sm text-foreground leading-relaxed">
+                      {selected.descricao}
+                    </div>
+                  </div>
+
+                  {/* Histórico */}
+                  <div>
+                    <Label className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium flex items-center gap-1.5 mb-2">
+                      <Clock className="w-3 h-3" /> Histórico de execução
+                    </Label>
+                    <div className="rounded-lg border border-border p-4 space-y-0">
+                      {selected.historico.map((h, i) => {
+                        const isLast = i === selected.historico.length - 1;
+                        return (
+                          <div key={i} className="flex gap-3">
+                            <div className="flex flex-col items-center">
+                              <div className={cn("w-2.5 h-2.5 rounded-full mt-1.5 ring-2 ring-card", isLast ? "bg-primary" : "bg-muted-foreground/40")} />
+                              {!isLast && <div className="w-px flex-1 bg-border my-1" />}
+                            </div>
+                            <div className={cn("flex-1 min-w-0", !isLast && "pb-3")}>
+                              <div className="flex items-baseline gap-2 flex-wrap">
+                                <p className="text-sm font-medium text-foreground">{h.accao}</p>
+                                <span className="text-[10px] text-muted-foreground tabular-nums">{h.data}</span>
+                              </div>
+                              <p className="text-[11px] text-muted-foreground mt-0.5">{h.actor}</p>
+                              {h.nota && (
+                                <div className="mt-1.5 text-xs text-foreground/80 bg-muted/30 rounded px-2.5 py-1.5 border-l-2 border-primary/40">
+                                  {h.nota}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Acções GAP */}
+                  <div>
+                    <Label className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-2 block">Acções do GAP · monitorização</Label>
+                    <Textarea placeholder="Nota interna (visível apenas ao GAP)..." rows={2} className="resize-none text-sm" />
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      <Button size="sm" variant="outline" className="gap-1.5 text-xs h-8"><FileText className="w-3.5 h-3.5" /> Guardar nota</Button>
+                      <Button size="sm" variant="outline" className="gap-1.5 text-xs h-8"><AlertTriangle className="w-3.5 h-3.5" /> Marcar urgente</Button>
+                      <Button size="sm" variant="outline" className="gap-1.5 text-xs h-8"><Bell className="w-3.5 h-3.5" /> Pedir actualização</Button>
+                    </div>
                   </div>
                 </div>
 
-                {/* Acções GAP — monitor only */}
-                <div className="space-y-2 pt-1">
-                  <Label className="text-xs uppercase tracking-wide text-muted-foreground">Acções do GAP (monitorização)</Label>
-                  <Textarea placeholder="Adicionar nota interna (visível apenas ao GAP)..." rows={2} className="resize-none text-sm" />
-                  <div className="flex flex-wrap gap-2">
-                    <Button size="sm" variant="outline" className="gap-1.5 text-xs"><FileText className="w-3.5 h-3.5" /> Guardar nota interna</Button>
-                    <Button size="sm" variant="outline" className="gap-1.5 text-xs"><AlertTriangle className="w-3.5 h-3.5" /> Marcar como urgente</Button>
-                    <Button size="sm" variant="outline" className="gap-1.5 text-xs"><Bell className="w-3.5 h-3.5" /> Pedir actualização ao destino</Button>
-                  </div>
-                  <p className="text-[11px] text-muted-foreground italic pt-1">
-                    O GAP não responde directamente ao estudante. A execução é da responsabilidade do departamento de destino.
-                  </p>
-                </div>
-
-                <DialogFooter>
+                <DialogFooter className="px-6 py-3 border-t border-border bg-muted/20">
+                  <p className="text-[11px] text-muted-foreground italic mr-auto">O GAP monitoriza; a execução é do destino.</p>
                   <DialogClose asChild><Button variant="outline" size="sm">Fechar</Button></DialogClose>
                 </DialogFooter>
               </>

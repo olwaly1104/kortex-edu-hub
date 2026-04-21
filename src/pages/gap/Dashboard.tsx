@@ -13,15 +13,19 @@ import {
 } from "@/data/gapData";
 
 export default function GapDashboard() {
-  const kpis = [
-    { label: "Recebidas", value: gapKpis.recebidas, icon: Inbox, color: "text-orange-600 bg-orange-100", trend: "" },
-    { label: "Encaminhadas", value: gapKpis.encaminhadas, icon: Send, color: "text-blue-600 bg-blue-100", trend: "" },
-    { label: "Em Execução", value: gapKpis.emExecucao, icon: Clock, color: "text-amber-600 bg-amber-100", trend: "" },
-    { label: "Concluídas (mês)", value: gapKpis.concluidas, icon: CheckCircle, color: "text-emerald-600 bg-emerald-100", trend: "" },
-    { label: "SLA em Risco", value: gapKpis.slaEmRisco, icon: AlertTriangle, color: "text-destructive bg-destructive/10", trend: "" },
-    { label: "Agendamentos Hoje", value: gapKpis.atendimentosHoje, icon: CalendarIcon, color: "text-primary bg-primary/10", trend: "" },
-    { label: "Estudantes Activos", value: gapKpis.estudantesAtivos, icon: Heart, color: "text-pink-600 bg-pink-100", trend: "" },
-    { label: "Satisfacão", value: `${gapKpis.satisfacao}%`, icon: Smile, color: "text-emerald-600 bg-emerald-100", trend: "+2pp" },
+  const totalSolicitacoes = solicitacoes.length;
+  // Primary KPIs — pipeline de solicitações
+  const primaryKpis = [
+    { label: "Recebidas",    value: gapKpis.recebidas,    icon: Inbox,        iconBg: "bg-orange-50 text-orange-600",   sub: "novas" },
+    { label: "Em Execução",  value: gapKpis.emExecucao,   icon: Clock,        iconBg: "bg-amber-50 text-amber-600",     sub: "no destino" },
+    { label: "Concluídas",   value: gapKpis.concluidas,   icon: CheckCircle,  iconBg: "bg-emerald-50 text-emerald-600", sub: "este mês" },
+    { label: "Total",        value: totalSolicitacoes,    icon: Send,         iconBg: "bg-primary/10 text-primary",     sub: "em circuito" },
+  ];
+  // Secondary — operação GAP
+  const secondaryKpis = [
+    { label: "Agendamentos Hoje", value: gapKpis.atendimentosHoje, icon: CalendarIcon, iconBg: "bg-primary/10 text-primary" },
+    { label: "Estudantes Activos", value: gapKpis.estudantesAtivos, icon: Heart, iconBg: "bg-pink-50 text-pink-600" },
+    { label: "Satisfação", value: `${gapKpis.satisfacao}%`, icon: Smile, iconBg: "bg-emerald-50 text-emerald-600" },
   ];
 
   const maxDest = Math.max(...solicitacoesPorDestino.map(c => c.count), 1);
@@ -44,29 +48,57 @@ export default function GapDashboard() {
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-          <BarChart3 className="w-6 h-6 text-primary" /> Dashboard GAP
-        </h1>
-        <p className="text-sm text-muted-foreground mt-0.5">
-          Gabinete de Apoio ao Estudante — monitorização de solicitações encaminhadas e acompanhamento
-        </p>
+      {/* Header */}
+      <div className="flex items-end justify-between gap-4 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground tracking-tight flex items-center gap-2">
+            <BarChart3 className="w-6 h-6 text-primary" /> Dashboard GAP
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
+            Gabinete de Apoio ao Estudante — monitorização do pipeline de solicitações encaminhadas e acompanhamento individual.
+          </p>
+        </div>
       </div>
 
-      {/* KPIs */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {kpis.map(k => (
-          <Card key={k.label} className="p-4">
-            <div className="flex items-start justify-between">
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${k.color}`}>
-                <k.icon className="w-5 h-5" />
+      {/* Primary pipeline — solicitações */}
+      <div>
+        <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-2">Pipeline de solicitações</p>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          {primaryKpis.map(k => (
+            <Card key={k.label} className="p-4 hover:shadow-sm transition-shadow">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">{k.label}</p>
+                  <p className="text-2xl font-bold text-foreground mt-1 tabular-nums">{k.value}</p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">{k.sub}</p>
+                </div>
+                <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${k.iconBg}`}>
+                  <k.icon className="w-4 h-4" />
+                </div>
               </div>
-              {k.trend && <span className="text-[10px] text-muted-foreground">{k.trend}</span>}
-            </div>
-            <p className="text-2xl font-bold text-foreground mt-3">{k.value}</p>
-            <p className="text-xs text-muted-foreground mt-0.5">{k.label}</p>
-          </Card>
-        ))}
+            </Card>
+          ))}
+        </div>
+      </div>
+
+      {/* Secondary — operação GAP */}
+      <div>
+        <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-2">Operação do GAP</p>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {secondaryKpis.map(k => (
+            <Card key={k.label} className="p-4 hover:shadow-sm transition-shadow">
+              <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${k.iconBg}`}>
+                  <k.icon className="w-5 h-5" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xl font-bold text-foreground tabular-nums">{k.value}</p>
+                  <p className="text-[11px] text-muted-foreground">{k.label}</p>
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
       </div>
 
       <div className="grid lg:grid-cols-2 gap-6">
