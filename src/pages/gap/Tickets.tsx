@@ -35,13 +35,16 @@ export default function GapTickets() {
   const [mes, setMes] = useState<string>("todos");
   const [selected, setSelected] = useState<Solicitacao | null>(null);
 
+  const isPendente = (s: Solicitacao) => s.estado === "recebida" || s.estado === "encaminhada" || s.estado === "em_execucao";
+  const isExecutada = (s: Solicitacao) => s.estado === "concluida" || s.estado === "rejeitada";
+
   const counts = useMemo(() => ({
     todos: solicitacoes.length,
+    pendentes: solicitacoes.filter(isPendente).length,
+    executadas: solicitacoes.filter(isExecutada).length,
     recebida: solicitacoes.filter(t => t.estado === "recebida").length,
-    encaminhada: solicitacoes.filter(t => t.estado === "encaminhada").length,
     em_execucao: solicitacoes.filter(t => t.estado === "em_execucao").length,
     concluida: solicitacoes.filter(t => t.estado === "concluida").length,
-    rejeitada: solicitacoes.filter(t => t.estado === "rejeitada").length,
   }), []);
 
 
