@@ -223,34 +223,80 @@ export default function GapAtendimentos() {
 
       {/* Controls — institutional 2-line standard */}
       <div className="space-y-2">
-        {/* Line 1: Period segmented + count */}
+        {/* Line 1: Period chips (Hoje separated) + View toggle */}
         <div className="flex items-center justify-between gap-3 flex-wrap">
-          <div className="inline-flex items-center gap-1 bg-muted/40 border border-border rounded-lg p-1">
-            {([
-              { v: "todos", label: "Todos", count: counts.todos },
-              { v: "hoje", label: "Hoje", count: counts.hoje },
-              { v: "proximos", label: "Próximos", count: gapAtendimentos.filter(a => a.data > TODAY).length },
-              { v: "anteriores", label: "Anteriores", count: gapAtendimentos.filter(a => a.data < TODAY).length },
-            ] as const).map(opt => (
-              <button
-                key={opt.v}
-                onClick={() => setPeriodo(opt.v)}
-                className={cn(
-                  "inline-flex items-center gap-1.5 px-3 h-8 text-xs font-medium rounded-md transition-all",
-                  periodo === opt.v
-                    ? "bg-background text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground hover:bg-background/50"
-                )}
-              >
-                {opt.label}
-                <span className={cn(
-                  "inline-flex items-center justify-center min-w-[18px] h-[16px] px-1 rounded text-[10px] font-semibold tabular-nums",
-                  periodo === opt.v ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
-                )}>
-                  {opt.count}
-                </span>
-              </button>
-            ))}
+          <div className="inline-flex items-center gap-1.5 flex-wrap">
+            {/* Hoje — pinned, separated */}
+            <button
+              onClick={() => setPeriodo("hoje")}
+              className={cn(
+                "inline-flex items-center gap-1.5 px-3 h-9 text-xs font-semibold rounded-lg border transition-all",
+                periodo === "hoje"
+                  ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                  : "bg-card text-foreground border-border hover:border-primary/40 hover:text-primary"
+              )}
+            >
+              <Clock className="w-3.5 h-3.5" />
+              Hoje
+              <span className={cn(
+                "inline-flex items-center justify-center min-w-[18px] h-[16px] px-1 rounded text-[10px] font-bold tabular-nums",
+                periodo === "hoje" ? "bg-primary-foreground/20 text-primary-foreground" : "bg-muted text-muted-foreground"
+              )}>
+                {counts.hoje}
+              </span>
+            </button>
+
+            <div className="h-6 w-px bg-border mx-1" />
+
+            {/* Other periods */}
+            <div className="inline-flex items-center gap-1 bg-muted/40 border border-border rounded-lg p-1">
+              {([
+                { v: "todos", label: "Todos", count: counts.todos },
+                { v: "proximos", label: "Próximos", count: gapAtendimentos.filter(a => a.data > TODAY).length },
+                { v: "anteriores", label: "Anteriores", count: gapAtendimentos.filter(a => a.data < TODAY).length },
+              ] as const).map(opt => (
+                <button
+                  key={opt.v}
+                  onClick={() => setPeriodo(opt.v)}
+                  className={cn(
+                    "inline-flex items-center gap-1.5 px-3 h-7 text-xs font-medium rounded-md transition-all",
+                    periodo === opt.v
+                      ? "bg-background text-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground hover:bg-background/50"
+                  )}
+                >
+                  {opt.label}
+                  <span className={cn(
+                    "inline-flex items-center justify-center min-w-[18px] h-[16px] px-1 rounded text-[10px] font-semibold tabular-nums",
+                    periodo === opt.v ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
+                  )}>
+                    {opt.count}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* View toggle */}
+          <div className="inline-flex items-center bg-muted/40 border border-border rounded-lg p-1">
+            <button
+              onClick={() => setView("tabela")}
+              className={cn(
+                "inline-flex items-center gap-1.5 px-3 h-7 text-xs font-medium rounded-md transition-all",
+                view === "tabela" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              <ListIcon className="w-3.5 h-3.5" /> Tabela
+            </button>
+            <button
+              onClick={() => setView("calendario")}
+              className={cn(
+                "inline-flex items-center gap-1.5 px-3 h-7 text-xs font-medium rounded-md transition-all",
+                view === "calendario" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              <LayoutGrid className="w-3.5 h-3.5" /> Calendário
+            </button>
           </div>
         </div>
 
