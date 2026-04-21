@@ -118,39 +118,49 @@ export default function GapAtendimentos() {
         onClick={() => setSelected(a)}
         className="group flex items-stretch gap-4 px-4 py-3 hover:bg-muted/30 transition-colors cursor-pointer"
       >
-        <div className="flex flex-col items-center justify-center w-16 shrink-0 border-r border-border pr-4">
-          <p className="text-base font-bold text-foreground tabular-nums leading-none">{a.hora}</p>
-          <p className="text-[10px] text-muted-foreground mt-1">{a.duracao}</p>
+        {/* Time block */}
+        <div className="flex flex-col items-center justify-center w-14 shrink-0 border-r border-border pr-3">
+          <p className="text-sm font-bold text-foreground tabular-nums leading-none">{a.hora}</p>
+          <p className="text-[10px] text-muted-foreground mt-1 tabular-nums">{a.duracao}</p>
         </div>
+
+        {/* Main: title + student */}
         <div className="flex-1 min-w-0 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 text-xs font-semibold">
-            {a.estudante.split(" ").slice(0, 2).map(n => n[0]).join("")}
-          </div>
+          <div className={cn("w-1 self-stretch rounded-full shrink-0", est.dot)} />
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2 flex-wrap">
+            {/* Title = motivo */}
+            <p className="text-sm font-semibold text-foreground truncate">{a.motivo}</p>
+            {/* Student line */}
+            <div className="flex items-center gap-1.5 mt-0.5 text-[11px] text-muted-foreground">
+              <User className="w-3 h-3 shrink-0" />
               <button
                 onClick={(e) => { e.stopPropagation(); navigate(`/gap/estudantes/${a.matricula}`); }}
-                className="text-sm font-semibold text-foreground hover:text-primary hover:underline truncate text-left"
+                className="font-medium text-foreground/80 hover:text-primary hover:underline truncate"
               >
                 {a.estudante}
               </button>
-              <span className="inline-flex items-center gap-1 text-[10px] font-medium text-muted-foreground bg-muted/60 px-1.5 py-0.5 rounded">
-                {a.curso} · {a.ano}º ano
-              </span>
+              <span>·</span>
+              <span className="tabular-nums">{a.matricula}</span>
+              <span className="hidden sm:inline">·</span>
+              <span className="hidden sm:inline truncate">{a.curso} · {a.ano}º ano</span>
             </div>
-            <p className="text-[11px] text-muted-foreground truncate mt-0.5">
-              <span className="tabular-nums">{a.matricula}</span> · {a.faculdade}
-            </p>
-            <p className="text-xs text-foreground/80 truncate mt-1">{a.motivo}</p>
           </div>
         </div>
-        <div className="hidden md:flex flex-col items-end justify-center gap-1 shrink-0 min-w-[140px]">
+
+        {/* Category */}
+        <div className="hidden md:flex items-center shrink-0">
           <Badge variant="outline" className={cn("text-[10px]", cat.color)}>{cat.label}</Badge>
-          <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
-            {a.tipo === "online" ? <Video className="w-3 h-3" /> : <MapPin className="w-3 h-3" />}
-            <span className="truncate max-w-[120px]">{a.tipo === "online" ? "Online" : (a.sala ?? "Presencial")}</span>
-          </div>
         </div>
+
+        {/* Location */}
+        <div className="hidden lg:flex items-center gap-1.5 shrink-0 min-w-[110px] text-[11px] text-muted-foreground">
+          {a.tipo === "online"
+            ? <Video className="w-3.5 h-3.5 text-blue-600" />
+            : <MapPin className="w-3.5 h-3.5 text-foreground/60" />}
+          <span className="truncate">{a.tipo === "online" ? "Online" : (a.sala ?? "Presencial")}</span>
+        </div>
+
+        {/* Status */}
         <div className="flex items-center shrink-0">
           <Badge variant="outline" className={cn("text-[10px] gap-1", est.color)}>
             <span className={cn("w-1.5 h-1.5 rounded-full", est.dot)} />
