@@ -1,10 +1,11 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Link } from "react-router-dom";
 import {
   HelpCircle, Clock, CheckCircle, Heart,
   Smile, AlertTriangle, Calendar as CalendarIcon, BarChart3,
-  Send, Inbox, Building2,
+  Send, Inbox, Building2, ArrowRight,
 } from "lucide-react";
 import {
   gapKpis, solicitacoes, gapAtendimentos, gapEstudantesSeguimento,
@@ -104,9 +105,14 @@ export default function GapDashboard() {
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Solicitações por Destino */}
         <Card className="p-5">
-          <h2 className="text-base font-semibold text-foreground mb-1 flex items-center gap-2">
-            <Building2 className="w-4 h-4 text-primary" /> Solicitações por Destino
-          </h2>
+          <div className="flex items-center justify-between mb-1">
+            <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
+              <Building2 className="w-4 h-4 text-primary" /> Solicitações por Destino
+            </h2>
+            <Link to="/gap/solicitacoes" className="text-[11px] font-medium text-primary hover:underline flex items-center gap-0.5">
+              Ver todos <ArrowRight className="w-3 h-3" />
+            </Link>
+          </div>
           <p className="text-[11px] text-muted-foreground mb-4">Departamento que executa o pedido após o encaminhamento automático</p>
           <div className="space-y-3">
             {solicitacoesPorDestino.map(c => (
@@ -125,7 +131,12 @@ export default function GapDashboard() {
 
         {/* Estado das solicitações */}
         <Card className="p-5">
-          <h2 className="text-base font-semibold text-foreground mb-4">Estado das Solicitações</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-base font-semibold text-foreground">Estado das Solicitações</h2>
+            <Link to="/gap/solicitacoes" className="text-[11px] font-medium text-primary hover:underline flex items-center gap-0.5">
+              Ver todos <ArrowRight className="w-3 h-3" />
+            </Link>
+          </div>
           <div className="space-y-3">
             {estadoStats.map(s => {
               const pct = totalSol > 0 ? (s.count / totalSol) * 100 : 0;
@@ -150,9 +161,14 @@ export default function GapDashboard() {
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Próximos atendimentos */}
         <Card className="p-5 lg:col-span-2">
-          <h2 className="text-base font-semibold text-foreground mb-4 flex items-center gap-2">
-            <CalendarIcon className="w-4 h-4 text-primary" /> Próximos Agendamentos
-          </h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
+              <CalendarIcon className="w-4 h-4 text-primary" /> Próximos Agendamentos
+            </h2>
+            <Link to="/gap/agendamentos" className="text-[11px] font-medium text-primary hover:underline flex items-center gap-0.5">
+              Ver todos <ArrowRight className="w-3 h-3" />
+            </Link>
+          </div>
           <div className="space-y-2">
             {proximosAtendimentos.map(a => (
               <div key={a.id} className="flex items-center gap-4 px-3 py-2.5 rounded-xl border border-border bg-card">
