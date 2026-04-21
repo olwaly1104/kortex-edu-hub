@@ -58,54 +58,82 @@ export default function GapEstudantes() {
     baixo: enriched.filter(e => e.risco === "baixo").length,
   };
 
+  const isFiltered = filter !== "todos" || categoria !== "todas" || responsavel !== "todos" || search !== "";
+  const resetAll = () => { setFilter("todos"); setCategoria("todas"); setResponsavel("todos"); setSearch(""); };
+
+  const tabs: { key: typeof filter; label: string; count: number; icon: typeof Heart }[] = [
+    { key: "todos", label: "Todos", count: counts.todos, icon: Heart },
+    { key: "alto",  label: "Risco Alto", count: counts.alto, icon: AlertTriangle },
+    { key: "medio", label: "Risco Médio", count: counts.medio, icon: Clock },
+    { key: "baixo", label: "Risco Baixo", count: counts.baixo, icon: CheckCircle },
+  ];
+
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-          <Heart className="w-6 h-6 text-pink-600" /> Estudantes em Seguimento
-        </h1>
-        <p className="text-sm text-muted-foreground mt-0.5">
-          Estudantes com acompanhamento activo do GAP
-        </p>
+      {/* Header */}
+      <div className="flex items-end justify-between gap-4 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground tracking-tight">Estudantes em Seguimento</h1>
+          <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
+            Estudantes sob acompanhamento activo do GAP — psicológico, vocacional, social e académico.
+          </p>
+        </div>
+        <div className="text-xs text-muted-foreground">
+          <span className="font-medium text-foreground">{filtered.length}</span> de {counts.todos} estudantes
+        </div>
       </div>
 
-      {/* KPIs */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* KPIs — clean compact */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {[
-          { label: "Total em Seguimento", value: counts.todos, color: "text-primary bg-primary/10", icon: Heart },
-          { label: "Risco Alto", value: counts.alto, color: "text-destructive bg-destructive/10", icon: AlertTriangle },
-          { label: "Risco Médio", value: counts.medio, color: "text-amber-600 bg-amber-100", icon: Clock },
-          { label: "Risco Baixo", value: counts.baixo, color: "text-emerald-600 bg-emerald-100", icon: CheckCircle },
+          { label: "Total", value: counts.todos, icon: Heart, iconBg: "bg-pink-50 text-pink-600" },
+          { label: "Risco Alto", value: counts.alto, icon: AlertTriangle, iconBg: "bg-destructive/10 text-destructive" },
+          { label: "Risco Médio", value: counts.medio, icon: Clock, iconBg: "bg-amber-50 text-amber-600" },
+          { label: "Risco Baixo", value: counts.baixo, icon: CheckCircle, iconBg: "bg-emerald-50 text-emerald-600" },
         ].map(s => (
-          <Card key={s.label} className="p-4 flex items-center gap-4">
-            <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${s.color}`}>
-              <s.icon className="w-5 h-5" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">{s.value}</p>
-              <p className="text-xs text-muted-foreground">{s.label}</p>
+          <Card key={s.label} className="p-4 hover:shadow-sm transition-shadow">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">{s.label}</p>
+                <p className="text-2xl font-bold text-foreground mt-1">{s.value}</p>
+              </div>
+              <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${s.iconBg}`}>
+                <s.icon className="w-4 h-4" />
+              </div>
             </div>
           </Card>
         ))}
       </div>
 
-      {/* Controls — 2 lines */}
-      <Card className="p-4 space-y-3">
-        <Tabs value={filter} onValueChange={v => setFilter(v as typeof filter)}>
-          <TabsList>
-            <TabsTrigger value="todos">Todos <Badge variant="outline" className="ml-1.5 text-[10px]">{counts.todos}</Badge></TabsTrigger>
-            <TabsTrigger value="alto">Risco Alto <Badge variant="outline" className="ml-1.5 text-[10px]">{counts.alto}</Badge></TabsTrigger>
-            <TabsTrigger value="medio">Risco Médio <Badge variant="outline" className="ml-1.5 text-[10px]">{counts.medio}</Badge></TabsTrigger>
-            <TabsTrigger value="baixo">Risco Baixo <Badge variant="outline" className="ml-1.5 text-[10px]">{counts.baixo}</Badge></TabsTrigger>
-          </TabsList>
-        </Tabs>
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="relative flex-1 min-w-[220px]">
+      {/* Control box — unified */}
+      <div className="rounded-xl border border-border bg-card overflow-hidden">
+        <div className="flex flex-wrap gap-1 p-2 bg-muted/30 border-b border-border">
+          {tabs.map(t => {
+            const active = filter === t.key;
+            return (
+              <button key={t.key} onClick={() => setFilter(t.key)}
+                className={`inline-flex items-center gap-1.5 px-3 h-8 rounded-md text-xs font-medium transition-all ${
+                  active ? "bg-card text-foreground shadow-sm border border-border" : "text-muted-foreground hover:text-foreground hover:bg-card/60"
+                }`}>
+                <t.icon className="w-3.5 h-3.5" />
+                {t.label}
+                <span className={`ml-1 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded text-[10px] font-semibold tabular-nums ${
+                  active ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
+                }`}>{t.count}</span>
+              </button>
+            );
+          })}
+        </div>
+        <div className="flex flex-wrap items-center gap-2 p-3">
+          <div className="relative flex-1 min-w-[240px] max-w-md">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-            <Input placeholder="Pesquisar nome, matrícula ou curso..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9 h-9" />
+            <Input placeholder="Pesquisar nome, matrícula ou curso..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9 h-9 text-sm" />
           </div>
+          <div className="flex-1" />
           <Select value={categoria} onValueChange={v => setCategoria(v as typeof categoria)}>
-            <SelectTrigger className="h-9 w-[180px]"><Filter className="w-3.5 h-3.5 mr-1.5" /><SelectValue /></SelectTrigger>
+            <SelectTrigger className={`h-9 w-[180px] text-xs ${categoria !== "todas" ? "border-primary/50 bg-primary/5 text-primary" : ""}`}>
+              <Filter className="w-3.5 h-3.5 mr-1.5 shrink-0" /><SelectValue />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="todas">Todas as categorias</SelectItem>
               {(Object.keys(categoriaConfig) as TicketCategoria[]).map(k => (
@@ -114,14 +142,19 @@ export default function GapEstudantes() {
             </SelectContent>
           </Select>
           <Select value={responsavel} onValueChange={setResponsavel}>
-            <SelectTrigger className="h-9 w-[200px]"><SelectValue /></SelectTrigger>
+            <SelectTrigger className={`h-9 w-[200px] text-xs ${responsavel !== "todos" ? "border-primary/50 bg-primary/5 text-primary" : ""}`}>
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="todos">Todos os responsáveis</SelectItem>
               {responsaveis.map(r => <SelectItem key={r} value={r}>{r}</SelectItem>)}
             </SelectContent>
           </Select>
+          {isFiltered && (
+            <Button variant="ghost" size="sm" className="h-9 text-xs text-muted-foreground hover:text-destructive" onClick={resetAll}>Limpar</Button>
+          )}
         </div>
-      </Card>
+      </div>
 
       {/* Table */}
       <Card className="overflow-hidden">
