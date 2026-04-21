@@ -6,8 +6,7 @@
 export type Destino = "CTI" | "Académica" | "Financeiro" | "Faculdade" | "GAP" | "Secretaria";
 
 export type EstadoSolicitacao =
-  | "recebida"        // submetida pelo estudante no Portal
-  | "encaminhada"     // auto-roteada ao destino
+  | "recebida"        // pendente — submetida pelo estudante, aguarda início
   | "em_execucao"     // destino a tratar
   | "concluida"
   | "rejeitada";
@@ -89,8 +88,7 @@ export const destinoConfig: Record<Destino, { label: string; color: string }> = 
 };
 
 export const estadoSolicitacaoConfig: Record<EstadoSolicitacao, { label: string; color: string }> = {
-  recebida:    { label: "Recebida",    color: "bg-orange-100 text-orange-700 border-orange-200" },
-  encaminhada: { label: "Encaminhada", color: "bg-blue-100 text-blue-700 border-blue-200" },
+  recebida:    { label: "Pendente",    color: "bg-orange-100 text-orange-700 border-orange-200" },
   em_execucao: { label: "Em Execução", color: "bg-amber-100 text-amber-700 border-amber-200" },
   concluida:   { label: "Concluída",   color: "bg-emerald-100 text-emerald-700 border-emerald-200" },
   rejeitada:   { label: "Rejeitada",   color: "bg-destructive/10 text-destructive border-destructive/20" },
@@ -165,7 +163,7 @@ export const solicitacoes: Solicitacao[] = [
     assunto: "Email institucional não recebe mensagens externas",
     descricao: "Mensagens enviadas de Gmail não chegam à minha caixa @upra.kor.",
     destino: "CTI", responsavelDestino: CTI_SARA,
-    estado: "encaminhada", prioridade: "media", slaDias: 2,
+    estado: "recebida", prioridade: "media", slaDias: 2,
     dataSubmissao: "2025-12-15", dataEncaminhamento: "2025-12-15",
     historico: [
       { data: "2025-12-15 10:04", actor: "Portal do Estudante", accao: "Solicitação submetida" },
@@ -288,7 +286,7 @@ export const solicitacoes: Solicitacao[] = [
     assunto: "Reset de palavra-passe do email institucional",
     descricao: "Esqueci a palavra-passe e a recuperação não envia o código.",
     destino: "CTI",
-    estado: "encaminhada", prioridade: "media", slaDias: 2,
+    estado: "recebida", prioridade: "media", slaDias: 2,
     dataSubmissao: "2025-12-15", dataEncaminhamento: "2025-12-15",
     historico: [
       { data: "2025-12-15 08:30", actor: "Portal do Estudante", accao: "Solicitação submetida" },
@@ -302,7 +300,7 @@ export const solicitacoes: Solicitacao[] = [
     assunto: "Não consigo aceder ao Canal de Estudante",
     descricao: "O Canal mostra ‘perfil não autorizado’ desde a inscrição.",
     destino: "CTI",
-    estado: "encaminhada", prioridade: "media", slaDias: 3,
+    estado: "recebida", prioridade: "media", slaDias: 3,
     dataSubmissao: "2025-12-14", dataEncaminhamento: "2025-12-14",
     historico: [
       { data: "2025-12-14 16:10", actor: "Portal do Estudante", accao: "Solicitação submetida" },
@@ -394,7 +392,7 @@ export const solicitacoes: Solicitacao[] = [
     assunto: "Transferência interna de curso",
     descricao: "Pretendo transferir-me de Gestão para Economia no próximo ano lectivo.",
     destino: "Académica",
-    estado: "encaminhada", prioridade: "media", slaDias: 10,
+    estado: "recebida", prioridade: "media", slaDias: 10,
     dataSubmissao: "2025-12-15", dataEncaminhamento: "2025-12-15",
     historico: [
       { data: "2025-12-15 10:20", actor: "Portal do Estudante", accao: "Solicitação submetida" },
@@ -469,7 +467,7 @@ export const solicitacoes: Solicitacao[] = [
     assunto: "Não consigo gerar referência de pagamento",
     descricao: "O sistema dá erro ao tentar gerar a referência multicaixa.",
     destino: "Financeiro",
-    estado: "encaminhada", prioridade: "alta", slaDias: 2,
+    estado: "recebida", prioridade: "alta", slaDias: 2,
     dataSubmissao: "2025-12-15", dataEncaminhamento: "2025-12-15",
     historico: [
       { data: "2025-12-15 09:50", actor: "Portal do Estudante", accao: "Solicitação submetida" },
@@ -514,7 +512,7 @@ export const solicitacoes: Solicitacao[] = [
     assunto: "Nota de Macroeconomia (P2) não lançada",
     descricao: "A nota da P2 de Macroeconomia ainda não consta no portal.",
     destino: "Faculdade", responsavelDestino: "Coord. Faculdade de Economia",
-    estado: "encaminhada", prioridade: "alta", slaDias: 5,
+    estado: "recebida", prioridade: "alta", slaDias: 5,
     dataSubmissao: "2025-12-14", dataEncaminhamento: "2025-12-14",
     historico: [
       { data: "2025-12-14 11:00", actor: "Portal do Estudante", accao: "Solicitação submetida" },
@@ -572,7 +570,7 @@ export const solicitacoes: Solicitacao[] = [
     assunto: "Pedido de melhoria — Desenho Técnico",
     descricao: "Solicito melhoria de nota da cadeira de Desenho Técnico (10).",
     destino: "Faculdade",
-    estado: "encaminhada", prioridade: "baixa", slaDias: 10,
+    estado: "recebida", prioridade: "baixa", slaDias: 10,
     dataSubmissao: "2025-12-13", dataEncaminhamento: "2025-12-13",
     historico: [
       { data: "2025-12-13 15:30", actor: "Portal do Estudante", accao: "Solicitação submetida" },
@@ -656,7 +654,6 @@ const slaEmRisco = solicitacoes.filter(s => {
 
 export const gapKpis = {
   recebidas:   solicitacoes.filter(s => s.estado === "recebida").length,
-  encaminhadas: solicitacoes.filter(s => s.estado === "encaminhada").length,
   emExecucao:  solicitacoes.filter(s => s.estado === "em_execucao").length,
   concluidas:  solicitacoes.filter(s => s.estado === "concluida").length,
   total:       solicitacoes.length,
@@ -690,7 +687,7 @@ const destinoToCategoria: Record<Destino, TicketCategoria> = {
   Faculdade: "academico", GAP: "psicologico", Secretaria: "documentacao",
 };
 const estadoToTicket: Record<EstadoSolicitacao, GapTicket["estado"]> = {
-  recebida: "aberto", encaminhada: "aberto", em_execucao: "em_andamento",
+  recebida: "aberto", em_execucao: "em_andamento",
   concluida: "resolvido", rejeitada: "resolvido",
 };
 export const gapTickets: GapTicket[] = solicitacoes.map(s => ({
