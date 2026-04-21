@@ -29,19 +29,22 @@ const MESES = [
 
 export default function GapTickets() {
   const [search, setSearch] = useState("");
-  const [estado, setEstado] = useState<EstadoSolicitacao | "todos">("todos");
+  const [estado, setEstado] = useState<"todos" | "pendentes" | "executadas">("todos");
   const [destino, setDestino] = useState<Destino | "todos">("todos");
   const [categoria, setCategoria] = useState<string>("todas");
   const [mes, setMes] = useState<string>("todos");
   const [selected, setSelected] = useState<Solicitacao | null>(null);
 
+  const isPendente = (s: Solicitacao) => s.estado === "recebida" || s.estado === "encaminhada" || s.estado === "em_execucao";
+  const isExecutada = (s: Solicitacao) => s.estado === "concluida" || s.estado === "rejeitada";
+
   const counts = useMemo(() => ({
     todos: solicitacoes.length,
+    pendentes: solicitacoes.filter(isPendente).length,
+    executadas: solicitacoes.filter(isExecutada).length,
     recebida: solicitacoes.filter(t => t.estado === "recebida").length,
-    encaminhada: solicitacoes.filter(t => t.estado === "encaminhada").length,
     em_execucao: solicitacoes.filter(t => t.estado === "em_execucao").length,
     concluida: solicitacoes.filter(t => t.estado === "concluida").length,
-    rejeitada: solicitacoes.filter(t => t.estado === "rejeitada").length,
   }), []);
 
 
@@ -56,7 +59,8 @@ export default function GapTickets() {
 
   const filtered = useMemo(() => {
     return solicitacoes.filter(s => {
-      if (estado !== "todos" && s.estado !== estado) return false;
+      if (estado === "pendentes" && !isPendente(s)) return false;
+      if (estado === "executadas" && !isExecutada(s)) return false;
       if (destino !== "todos" && s.destino !== destino) return false;
       if (categoria !== "todas") {
         const cfg = tipoConfig[s.tipo];
@@ -94,12 +98,10 @@ export default function GapTickets() {
     setEstado("todos"); setDestino("todos"); setCategoria("todas"); setMes("todos"); setSearch("");
   };
 
-  const estadoTabs: { key: EstadoSolicitacao | "todos"; label: string; icon: React.ElementType }[] = [
+  const estadoTabs: { key: "todos" | "pendentes" | "executadas"; label: string; icon: React.ElementType }[] = [
     { key: "todos", label: "Todas", icon: Inbox },
-    { key: "recebida", label: "Recebidas", icon: AlertCircle },
-    { key: "encaminhada", label: "Encaminhadas", icon: Send },
-    { key: "em_execucao", label: "Em Execução", icon: Clock },
-    { key: "concluida", label: "Concluídas", icon: CheckCircle2 },
+    { key: "pendentes", label: "Pendentes", icon: Clock },
+    { key: "executadas", label: "Executadas", icon: CheckCircle2 },
   ];
 
   return (
