@@ -264,9 +264,14 @@ export default function GapAtendimentos() {
                               <div className="min-w-0 flex-1">
                                 <div className="flex items-center gap-2 flex-wrap">
                                   <p className="text-sm font-semibold text-foreground truncate">{a.estudante}</p>
-                                  <span className="text-[11px] text-muted-foreground tabular-nums">{a.matricula}</span>
+                                  <span className="inline-flex items-center gap-1 text-[10px] font-medium text-muted-foreground bg-muted/60 px-1.5 py-0.5 rounded">
+                                    {a.curso} · {a.ano}º ano
+                                  </span>
                                 </div>
-                                <p className="text-xs text-muted-foreground truncate mt-0.5">{a.motivo}</p>
+                                <p className="text-[11px] text-muted-foreground truncate mt-0.5">
+                                  <span className="tabular-nums">{a.matricula}</span> · {a.faculdade}
+                                </p>
+                                <p className="text-xs text-foreground/80 truncate mt-1">{a.motivo}</p>
                               </div>
                             </div>
 
