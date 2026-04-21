@@ -82,7 +82,7 @@ export default function GapAtendimentos() {
         if (a.data !== b.data) return b.data.localeCompare(a.data);
         return a.hora.localeCompare(b.hora);
       });
-  }, [search, categoria, estado, periodo]);
+  }, [search, categoria, periodo]);
 
   // Calendar helpers — calendar respects search + category + estado filters (NOT periodo)
   const calendarFiltered = useMemo(() => {
