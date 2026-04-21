@@ -37,7 +37,7 @@ export default function GapAtendimentos() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [categoria, setCategoria] = useState<"todas" | TicketCategoria>("todas");
-  const [estado, setEstado] = useState<"todos" | keyof typeof estadoConfig>("todos");
+  
   const [periodo, setPeriodo] = useState<"todos" | "hoje" | "agendado" | "concluido">("todos");
   const [view, setView] = useState<"tabela" | "calendario">("tabela");
   const [selected, setSelected] = useState<GapAtendimento | null>(null);
@@ -58,7 +58,7 @@ export default function GapAtendimentos() {
   const rows = useMemo(() => {
     return gapAtendimentos
       .filter(a => categoria === "todas" || a.categoria === categoria)
-      .filter(a => estado === "todos" || a.estado === estado)
+      .filter(a => a.estado !== "cancelado")
       .filter(a => {
         if (periodo === "todos") return true;
         if (periodo === "hoje") return a.data === TODAY;
@@ -82,19 +82,19 @@ export default function GapAtendimentos() {
         if (a.data !== b.data) return b.data.localeCompare(a.data);
         return a.hora.localeCompare(b.hora);
       });
-  }, [search, categoria, estado, periodo]);
+  }, [search, categoria, periodo]);
 
   // Calendar helpers — calendar respects search + category + estado filters (NOT periodo)
   const calendarFiltered = useMemo(() => {
     return gapAtendimentos
       .filter(a => categoria === "todas" || a.categoria === categoria)
-      .filter(a => estado === "todos" || a.estado === estado)
+      .filter(a => a.estado !== "cancelado")
       .filter(a => {
         if (!search) return true;
         const s = search.toLowerCase();
         return a.estudante.toLowerCase().includes(s) || a.matricula.includes(search) || a.motivo.toLowerCase().includes(s);
       });
-  }, [search, categoria, estado]);
+  }, [search, categoria]);
 
   const calendarDays = useMemo(() => {
     const first = new Date(calYear, calMonth, 1);
@@ -248,8 +248,8 @@ export default function GapAtendimentos() {
             <div className="inline-flex items-center rounded-md border border-input bg-background overflow-hidden">
               {([
                 { v: "todos", label: "Todos", count: counts.todos },
-                { v: "agendado", label: "Agendado", count: gapAtendimentos.filter(a => a.estado === "agendado").length },
-                { v: "concluido", label: "Concluído", count: gapAtendimentos.filter(a => a.estado === "concluido").length },
+                { v: "agendado", label: "Próximos", count: counts.agendados },
+                { v: "concluido", label: "Anteriores", count: counts.concluidos },
               ] as const).map((opt, i) => (
                 <button
                   key={opt.v}
@@ -332,26 +332,11 @@ export default function GapAtendimentos() {
             </SelectContent>
           </Select>
 
-          <Select value={estado} onValueChange={v => setEstado(v as typeof estado)}>
-            <SelectTrigger className={cn(
-              "w-[160px] h-9 text-xs",
-              estado !== "todos" && "border-primary text-primary"
-            )}>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="todos">Todos os estados</SelectItem>
-              {Object.entries(estadoConfig).map(([k, v]) => (
-                <SelectItem key={k} value={k}>{v.label}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          {(categoria !== "todas" || estado !== "todos" || search) && (
+          {(categoria !== "todas" || search) && (
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => { setCategoria("todas"); setEstado("todos"); setSearch(""); }}
+              onClick={() => { setCategoria("todas"); setSearch(""); }}
               className="h-9 px-2.5 text-xs text-muted-foreground hover:text-foreground gap-1"
             >
               <X className="w-3 h-3" /> Limpar
