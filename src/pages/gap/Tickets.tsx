@@ -515,9 +515,21 @@ export default function GapTickets() {
                             tone: "pending",
                           });
                         } else {
+                          const estimativa = (() => {
+                            const sla = selected.slaDias ?? tipoCfg?.slaDias;
+                            if (!sla) return undefined;
+                            const base = new Date(selected.dataEncaminhamento ?? selected.dataSubmissao);
+                            base.setDate(base.getDate() + sla);
+                            const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
+                            const diff = Math.ceil((base.getTime() - hoje.getTime()) / 86400000);
+                            const dateStr = fmt(base);
+                            const rel = diff < 0 ? `${Math.abs(diff)}d em atraso` : diff === 0 ? "hoje" : `em ${diff}d`;
+                            return { dateStr, rel, overdue: diff < 0, sla };
+                          })();
                           steps.push({
                             label: selected.estado === "em_execucao" ? "Em execução pelo destino" : "Aguarda execução",
                             actor: selected.responsavelDestino ?? dest.label,
+                            aside: estimativa ? `Estimativa: ${estimativa.dateStr} · ${estimativa.rel} · SLA ${estimativa.sla}d` : undefined,
                             tone: "pending",
                           });
                         }
