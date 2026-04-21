@@ -59,7 +59,8 @@ export default function GapTickets() {
 
   const filtered = useMemo(() => {
     return solicitacoes.filter(s => {
-      if (estado !== "todos" && s.estado !== estado) return false;
+      if (estado === "pendentes" && !isPendente(s)) return false;
+      if (estado === "executadas" && !isExecutada(s)) return false;
       if (destino !== "todos" && s.destino !== destino) return false;
       if (categoria !== "todas") {
         const cfg = tipoConfig[s.tipo];
