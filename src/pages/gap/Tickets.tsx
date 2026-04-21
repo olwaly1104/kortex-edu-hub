@@ -436,24 +436,6 @@ export default function GapTickets() {
                       </div>
                     </div>
 
-                    {/* Temporal */}
-                    <div>
-                      <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold mb-2">Datas</p>
-                      <div className="space-y-2.5">
-                        <div>
-                          <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-0.5">Submetido</p>
-                          <p className="text-[12px] font-medium text-foreground">{fmt(dSub)}</p>
-                          <p className="text-[10px] text-muted-foreground tabular-nums">{fmtT(dSub)}</p>
-                        </div>
-                        {dConc && (
-                          <div>
-                            <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-0.5">Concluído</p>
-                            <p className="text-[12px] font-medium text-foreground">{fmt(dConc)}</p>
-                            <p className="text-[10px] text-muted-foreground tabular-nums">{fmtT(dConc)}</p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
                   </aside>
 
                   {/* RIGHT — descrição + histórico */}
