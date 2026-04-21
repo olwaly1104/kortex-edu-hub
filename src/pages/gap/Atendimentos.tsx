@@ -424,8 +424,9 @@ export default function GapAtendimentos() {
                             <span className="inline-flex items-center px-1.5 h-4 rounded text-[9px] font-bold bg-primary text-primary-foreground">HOJE</span>
                           )}
                         </div>
-                        <p className="text-[11px] text-muted-foreground tabular-nums mt-0.5">
-                          {a.hora} · {a.duracao}
+                        <p className="text-[11px] text-muted-foreground tabular-nums mt-0.5 whitespace-nowrap">
+                          {a.hora} – {addMinutesToHHMM(a.hora, parseDuracaoMin(a.duracao))}
+                          <span className="text-muted-foreground/60"> · {a.duracao}</span>
                         </p>
                       </td>
 
