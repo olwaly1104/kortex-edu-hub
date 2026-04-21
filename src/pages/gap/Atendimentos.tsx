@@ -281,7 +281,7 @@ export default function GapAtendimentos() {
                 view === "tabela" ? "bg-muted text-foreground" : "text-muted-foreground hover:bg-muted/50"
               )}
             >
-              <ListIcon className="w-3.5 h-3.5" /> Lista
+              <ListIcon className="w-3.5 h-3.5" /> Tabela
             </button>
             <button
               onClick={() => setView("calendario")}
