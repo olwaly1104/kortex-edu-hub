@@ -17,7 +17,7 @@ import {
   LayoutGrid, List as ListIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { gapAtendimentos, ticketCategoriaConfig as categoriaConfig, TicketCategoria, GapAtendimento } from "@/data/gapData";
+import { gapAtendimentos, ticketCategoriaConfig as categoriaConfig, TicketCategoria } from "@/data/gapData";
 
 const estadoConfig: Record<string, { label: string; color: string; dot: string }> = {
   agendado:  { label: "Agendado",  color: "bg-blue-50 text-blue-700 border-blue-200",          dot: "bg-blue-500" },
