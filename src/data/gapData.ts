@@ -603,6 +603,7 @@ export type TicketCategoria = "academico" | "psicologico" | "financeiro" | "docu
 export interface GapAtendimento {
   id: string;
   estudante: string; matricula: string; curso: string;
+  faculdade: string; ano: number;
   motivo: string; categoria: TicketCategoria;
   data: string; hora: string; duracao: string;
   tipo: "presencial" | "online";
@@ -628,13 +629,13 @@ export const ticketCategoriaConfig: Record<TicketCategoria, { label: string; col
 };
 
 export const gapAtendimentos: GapAtendimento[] = [
-  { id: "AT-001", estudante: "Ana Luísa Ferreira", matricula: "2024001", curso: "Eng. Informática", motivo: "1ª sessão de acompanhamento psicológico", categoria: "psicologico", data: "2025-12-16", hora: "09:00", duracao: "50 min", tipo: "presencial", estado: "agendado", responsavel: "Dra. Helena Cabral", sala: "Gab. GAP 1" },
-  { id: "AT-002", estudante: "Carlos Mendes", matricula: "2024015", curso: "Direito", motivo: "Orientação académica — métodos de estudo", categoria: "academico", data: "2025-12-16", hora: "10:30", duracao: "40 min", tipo: "presencial", estado: "agendado", responsavel: "Dr. João Tavares", sala: "Gab. GAP 2" },
-  { id: "AT-003", estudante: "Pedro Almeida", matricula: "2024033", curso: "Economia", motivo: "Orientação vocacional", categoria: "carreira", data: "2025-12-16", hora: "14:00", duracao: "60 min", tipo: "online", estado: "agendado", responsavel: "Dr. João Tavares" },
-  { id: "AT-004", estudante: "Beatriz Lopes", matricula: "2023089", curso: "Psicologia", motivo: "Acompanhamento de estágio", categoria: "carreira", data: "2025-12-17", hora: "11:00", duracao: "30 min", tipo: "presencial", estado: "agendado", responsavel: "Dra. Helena Cabral", sala: "Gab. GAP 1" },
-  { id: "AT-005", estudante: "Sofia Bernardo", matricula: "2023018", curso: "Eng. Civil", motivo: "Encaminhamento médico", categoria: "saude", data: "2025-12-09", hora: "09:30", duracao: "20 min", tipo: "presencial", estado: "concluido", responsavel: "Dra. Helena Cabral", notas: "Encaminhamento entregue. Estudante satisfeita com a resolução." },
-  { id: "AT-006", estudante: "Maria João Santos", matricula: "2023042", curso: "Medicina", motivo: "Apoio candidatura bolsa INAGBE", categoria: "financeiro", data: "2025-12-15", hora: "15:00", duracao: "45 min", tipo: "presencial", estado: "concluido", responsavel: "Dra. Helena Cabral" },
-  { id: "AT-007", estudante: "João Baptista", matricula: "2024050", curso: "Gestão", motivo: "Mediação de conflito", categoria: "social", data: "2025-12-17", hora: "16:00", duracao: "60 min", tipo: "presencial", estado: "agendado", responsavel: "Dr. João Tavares", sala: "Gab. GAP 2" },
+  { id: "AT-001", estudante: "Ana Luísa Ferreira", matricula: "2024001", curso: "Eng. Informática", faculdade: "Faculdade de Ciências Exatas", ano: 2, motivo: "1ª sessão de acompanhamento psicológico", categoria: "psicologico", data: "2025-12-16", hora: "09:00", duracao: "50 min", tipo: "presencial", estado: "agendado", responsavel: "Dra. Helena Cabral", sala: "Gab. GAP 1" },
+  { id: "AT-002", estudante: "Carlos Mendes", matricula: "2024015", curso: "Direito", faculdade: "Faculdade de Medicina", ano: 1, motivo: "Orientação académica — métodos de estudo", categoria: "academico", data: "2025-12-16", hora: "10:30", duracao: "40 min", tipo: "presencial", estado: "agendado", responsavel: "Dr. João Tavares", sala: "Gab. GAP 2" },
+  { id: "AT-003", estudante: "Pedro Almeida", matricula: "2024033", curso: "Economia", faculdade: "Faculdade de Ciências Exatas", ano: 2, motivo: "Orientação vocacional", categoria: "carreira", data: "2025-12-16", hora: "14:00", duracao: "60 min", tipo: "online", estado: "agendado", responsavel: "Dr. João Tavares" },
+  { id: "AT-004", estudante: "Beatriz Lopes", matricula: "2023089", curso: "Psicologia", faculdade: "Faculdade de Medicina", ano: 3, motivo: "Acompanhamento de estágio", categoria: "carreira", data: "2025-12-17", hora: "11:00", duracao: "30 min", tipo: "presencial", estado: "agendado", responsavel: "Dra. Helena Cabral", sala: "Gab. GAP 1" },
+  { id: "AT-005", estudante: "Sofia Bernardo", matricula: "2023018", curso: "Eng. Civil", faculdade: "Faculdade de Ciências Exatas", ano: 3, motivo: "Encaminhamento médico", categoria: "saude", data: "2025-12-09", hora: "09:30", duracao: "20 min", tipo: "presencial", estado: "concluido", responsavel: "Dra. Helena Cabral", notas: "Encaminhamento entregue. Estudante satisfeita com a resolução." },
+  { id: "AT-006", estudante: "Maria João Santos", matricula: "2023042", curso: "Medicina", faculdade: "Faculdade de Medicina", ano: 3, motivo: "Apoio candidatura bolsa INAGBE", categoria: "financeiro", data: "2025-12-15", hora: "15:00", duracao: "45 min", tipo: "presencial", estado: "concluido", responsavel: "Dra. Helena Cabral" },
+  { id: "AT-007", estudante: "João Baptista", matricula: "2024050", curso: "Gestão", faculdade: "Faculdade de Ciências Exatas", ano: 1, motivo: "Mediação de conflito", categoria: "social", data: "2025-12-17", hora: "16:00", duracao: "60 min", tipo: "presencial", estado: "agendado", responsavel: "Dr. João Tavares", sala: "Gab. GAP 2" },
 ];
 
 export const gapEstudantesSeguimento: GapEstudanteSeguimento[] = [

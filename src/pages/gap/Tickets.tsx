@@ -295,7 +295,7 @@ export default function GapTickets() {
                   <tr key={s.id}
                     className="border-b last:border-0 hover:bg-muted/20 transition-colors cursor-pointer"
                     onClick={() => setSelected(s)}>
-                    <td className="p-3"><span className="text-[11px] font-mono text-muted-foreground">{s.id}</span></td>
+                    <td className="p-3"><span className="text-[10px] font-mono text-muted-foreground/70 tabular-nums">{s.id.replace(/^SOL-?/i, "#")}</span></td>
                     <td className="p-3">
                       <p className="font-medium text-foreground leading-tight">{s.estudante}</p>
                       <p className="text-[11px] text-muted-foreground mt-0.5">{s.matricula} · {s.curso}</p>
