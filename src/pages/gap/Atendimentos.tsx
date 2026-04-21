@@ -332,26 +332,11 @@ export default function GapAtendimentos() {
             </SelectContent>
           </Select>
 
-          <Select value={estado} onValueChange={v => setEstado(v as typeof estado)}>
-            <SelectTrigger className={cn(
-              "w-[160px] h-9 text-xs",
-              estado !== "todos" && "border-primary text-primary"
-            )}>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="todos">Todos os estados</SelectItem>
-              {Object.entries(estadoConfig).map(([k, v]) => (
-                <SelectItem key={k} value={k}>{v.label}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          {(categoria !== "todas" || estado !== "todos" || search) && (
+          {(categoria !== "todas" || search) && (
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => { setCategoria("todas"); setEstado("todos"); setSearch(""); }}
+              onClick={() => { setCategoria("todas"); setSearch(""); }}
               className="h-9 px-2.5 text-xs text-muted-foreground hover:text-foreground gap-1"
             >
               <X className="w-3 h-3" /> Limpar
