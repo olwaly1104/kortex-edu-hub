@@ -557,7 +557,7 @@ export default function GapTickets() {
                           steps.push({
                             label: selected.estado === "em_execucao" ? "Em execução pelo destino" : "Aguarda execução",
                             actor: selected.responsavelDestino ?? dest.label,
-                            aside: estimativa ? `Estimativa: ${estimativa.dateStr} · ${estimativa.rel}` : undefined,
+                            aside: estimativa ? `Conclusão prevista: ${estimativa.dateStr} · ${estimativa.rel}` : undefined,
                             tone: "pending",
                           });
                         }
