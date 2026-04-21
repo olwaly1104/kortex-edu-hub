@@ -27,6 +27,30 @@ const estadoConfig: Record<string, { label: string; color: string; dot: string }
 };
 
 const TODAY = "2025-12-16";
+
+// Parses "50 min", "1h", "1h 30min", "90 min" into minutes
+function parseDuracaoMin(d: string): number {
+  if (!d) return 0;
+  const s = d.toLowerCase().replace(/\s+/g, "");
+  let total = 0;
+  const h = s.match(/(\d+)h/);
+  if (h) total += parseInt(h[1], 10) * 60;
+  const m = s.match(/(\d+)(?:min|m)(?!s)/);
+  if (m) total += parseInt(m[1], 10);
+  if (!h && !m) {
+    const n = s.match(/(\d+)/);
+    if (n) total = parseInt(n[1], 10);
+  }
+  return total;
+}
+
+function addMinutesToHHMM(hhmm: string, minutes: number): string {
+  const [h, m] = hhmm.split(":").map(Number);
+  const total = h * 60 + m + minutes;
+  const nh = Math.floor((total % (24 * 60)) / 60);
+  const nm = total % 60;
+  return `${String(nh).padStart(2, "0")}:${String(nm).padStart(2, "0")}`;
+}
 const WEEKDAYS = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 const MONTHS = [
   "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
