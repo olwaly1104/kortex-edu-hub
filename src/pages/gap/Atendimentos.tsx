@@ -168,7 +168,6 @@ export default function GapAtendimentos() {
             Sessões de apoio individual marcadas pelo GAP — psicológico, académico, vocacional e social.
           </p>
         </div>
-        <div className="flex items-center gap-2">
         <Dialog>
           <DialogTrigger asChild>
             <Button size="sm" className="gap-1.5"><Plus className="w-4 h-4" /> Novo Agendamento</Button>
