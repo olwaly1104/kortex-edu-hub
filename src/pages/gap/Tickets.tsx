@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import {
   Search, HelpCircle, User, X, Calendar as CalendarIcon, Building2,
   Inbox, Clock, CheckCircle2, AlertCircle, Send, AlertTriangle,
-  Bell, FileText, Layers, MessageSquare, Mail,
+  Bell, FileText, Layers, MessageSquare, Mail, Check,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -562,23 +562,29 @@ export default function GapTickets() {
                           });
                         }
 
-                        const dotCls: Record<Step["tone"], string> = {
-                          submitted: "bg-sky-500 ring-4 ring-sky-500/15",
-                          accepted: "bg-amber-500 ring-4 ring-amber-500/15",
-                          rejected: "bg-destructive ring-4 ring-destructive/15",
-                          executed: "bg-emerald-500 ring-4 ring-emerald-500/15",
-                          pending: "bg-background border-2 border-dashed border-border",
+                        const nodeCls: Record<Step["tone"], string> = {
+                          submitted: "bg-emerald-500 text-white ring-4 ring-emerald-500/15",
+                          accepted: "bg-emerald-500 text-white ring-4 ring-emerald-500/15",
+                          rejected: "bg-destructive text-destructive-foreground ring-4 ring-destructive/15",
+                          executed: "bg-emerald-500 text-white ring-4 ring-emerald-500/15",
+                          pending: "bg-background border-2 border-dashed border-border text-muted-foreground",
                         };
 
                         return (
                           <ol className="space-y-0">
                             {steps.map((s, i) => {
                               const isLast = i === steps.length - 1;
+                              const Icon = s.tone === "rejected" ? X : s.tone === "pending" ? null : Check;
                               return (
                                 <li key={i} className="flex gap-3 relative">
-                                  <div className="flex flex-col items-center shrink-0 w-3">
-                                    <div className={cn("w-2.5 h-2.5 rounded-full mt-1.5 z-10", dotCls[s.tone])} />
-                                    {!isLast && <div className="w-px flex-1 bg-border" />}
+                                  <div className="flex flex-col items-center shrink-0 w-5">
+                                    <div className={cn(
+                                      "w-5 h-5 rounded-full flex items-center justify-center mt-0.5 z-10",
+                                      nodeCls[s.tone]
+                                    )}>
+                                      {Icon && <Icon className="w-3 h-3" strokeWidth={3} />}
+                                    </div>
+                                    {!isLast && <div className="w-px flex-1 bg-border mt-1" />}
                                   </div>
                                   <div className={cn("flex-1 min-w-0", !isLast && "pb-5")}>
                                     <div className="flex items-baseline justify-between gap-2 flex-wrap">
