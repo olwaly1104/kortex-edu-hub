@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import {
   Plus, Calendar as CalendarIcon, Clock, MapPin, Video, Search, FileText,
   CheckCircle2, X, Filter, User, ChevronLeft, ChevronRight, ArrowRight,
+  LayoutGrid, List as ListIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { gapAtendimentos, ticketCategoriaConfig as categoriaConfig, TicketCategoria, GapAtendimento } from "@/data/gapData";
