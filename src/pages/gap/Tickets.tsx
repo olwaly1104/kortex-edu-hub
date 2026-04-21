@@ -349,7 +349,6 @@ export default function GapTickets() {
                   <DialogTitle className="text-xl font-semibold leading-tight tracking-tight text-foreground">
                     {tipoCfg?.label ?? selected.tipo}
                   </DialogTitle>
-                  <p className="text-sm text-muted-foreground mt-1.5 leading-snug">{selected.assunto}</p>
                 </div>
 
                 <div className="p-6 space-y-6">
@@ -391,17 +390,10 @@ export default function GapTickets() {
                       </div>
                       <div className="p-4">
                         <div className="flex items-center gap-1.5 mb-2">
-                          <CheckCircle2 className={cn("w-3 h-3", dConc ? "text-emerald-600" : "text-muted-foreground/50")} />
-                          <p className="text-[10px] uppercase tracking-[0.08em] text-muted-foreground font-semibold">Concluído</p>
+                          <CheckCircle2 className="w-3 h-3 text-muted-foreground" />
+                          <p className="text-[10px] uppercase tracking-[0.08em] text-muted-foreground font-semibold">Estado</p>
                         </div>
-                        {dConc ? (
-                          <>
-                            <p className="text-sm font-semibold text-foreground">{fmtDate(dConc)}</p>
-                            <p className="text-[11px] text-muted-foreground tabular-nums mt-0.5">{fmtTime(dConc)}</p>
-                          </>
-                        ) : (
-                          <p className="text-sm text-muted-foreground italic">em curso</p>
-                        )}
+                        <Badge variant="outline" className={cn("text-[10px]", st.color)}>{st.label}</Badge>
                       </div>
                     </div>
                     <div className="grid grid-cols-2 divide-x divide-border border-t border-border bg-muted/15">
