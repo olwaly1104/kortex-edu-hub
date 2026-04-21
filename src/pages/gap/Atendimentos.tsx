@@ -13,7 +13,8 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Plus, Calendar as CalendarIcon, Clock, MapPin, Video, Search, FileText,
-  CheckCircle2, X, Filter, User, ArrowRight,
+  CheckCircle2, X, Filter, User, ArrowRight, ChevronLeft, ChevronRight,
+  LayoutGrid, List as ListIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { gapAtendimentos, ticketCategoriaConfig as categoriaConfig, TicketCategoria, GapAtendimento } from "@/data/gapData";
