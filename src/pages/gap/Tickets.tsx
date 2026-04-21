@@ -335,7 +335,7 @@ export default function GapTickets() {
             const initials = selected.estudante.split(" ").slice(0, 2).map(n => n[0]).join("");
             return (
               <div className="flex flex-col max-h-[90vh]">
-                {/* Top bar — ID + state */}
+                {/* Top bar — ID + categoria */}
                 <div className="flex items-center justify-between px-6 py-3 border-b border-border bg-muted/20">
                   <div className="flex items-center gap-2">
                     <span className="text-[11px] font-mono text-muted-foreground">{selected.id}</span>
@@ -346,15 +346,20 @@ export default function GapTickets() {
                       </>
                     )}
                   </div>
-                  <Badge variant="outline" className={cn("text-[10px] font-medium", st.color)}>{st.label}</Badge>
                 </div>
 
-                {/* Title block */}
+                {/* Title block with Estado */}
                 <div className="px-6 pt-5 pb-5 border-b border-border">
                   <p className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold mb-1">{tipoCfg?.categoria ?? "Pedido"}</p>
-                  <DialogTitle className="text-xl font-semibold leading-tight tracking-tight text-foreground">
-                    {tipoCfg?.label ?? selected.tipo}
-                  </DialogTitle>
+                  <div className="flex items-start justify-between gap-4">
+                    <DialogTitle className="text-xl font-semibold leading-tight tracking-tight text-foreground">
+                      {tipoCfg?.label ?? selected.tipo}
+                    </DialogTitle>
+                    <div className="flex flex-col items-end gap-1 shrink-0">
+                      <span className="text-[10px] uppercase tracking-[0.08em] text-muted-foreground font-semibold">Estado</span>
+                      <Badge variant="outline" className={cn("text-[11px] font-medium px-2.5 py-0.5", st.color)}>{st.label}</Badge>
+                    </div>
+                  </div>
                 </div>
 
                 {/* 2-column body */}
