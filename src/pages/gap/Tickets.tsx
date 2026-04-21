@@ -290,6 +290,7 @@ export default function GapTickets() {
                 const tipoLabel = tipoConfig[s.tipo]?.label ?? s.tipo;
                 const tipoCat = tipoConfig[s.tipo]?.categoria ?? "—";
                 const d = new Date(s.dataSubmissao);
+                const horaSubmissao = s.historico[0]?.data.split(" ")[1] ?? "—";
                 return (
                   <tr key={s.id}
                     className="border-b last:border-0 hover:bg-muted/20 transition-colors cursor-pointer"
@@ -312,6 +313,9 @@ export default function GapTickets() {
                     </td>
                     <td className="p-3 text-center whitespace-nowrap">
                       <p className="text-xs font-medium text-foreground">{d.toLocaleDateString("pt-AO", { day: "2-digit", month: "short", year: "numeric" })}</p>
+                    </td>
+                    <td className="p-3 text-center whitespace-nowrap">
+                      <p className="text-xs font-medium text-foreground tabular-nums">{horaSubmissao}</p>
                     </td>
                     <td className="p-3 text-center"><Badge variant="outline" className={cn("text-[10px]", dest.color)}>{dest.label}</Badge></td>
                     <td className="p-3 text-center">
