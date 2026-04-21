@@ -159,65 +159,117 @@ export default function GapAtendimentos() {
         ))}
       </div>
 
-      {/* Table */}
-      <Card className="overflow-hidden">
-        {/* Control bar */}
-        <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-border bg-muted/20 flex-wrap">
-          {/* Period chips */}
-          <div className="inline-flex items-center bg-background border border-border rounded-lg p-0.5">
+      {/* Controls — institutional 2-line standard */}
+      <div className="space-y-2">
+        {/* Line 1: Period segmented + count */}
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <div className="inline-flex items-center gap-1 bg-muted/40 border border-border rounded-lg p-1">
             {([
-              { v: "todos", label: "Todos" },
-              { v: "hoje", label: "Hoje" },
-              { v: "proximos", label: "Próximos" },
-              { v: "anteriores", label: "Anteriores" },
+              { v: "todos", label: "Todos", count: counts.todos },
+              { v: "hoje", label: "Hoje", count: counts.hoje },
+              { v: "proximos", label: "Próximos", count: gapAtendimentos.filter(a => a.data > TODAY).length },
+              { v: "anteriores", label: "Anteriores", count: gapAtendimentos.filter(a => a.data < TODAY).length },
             ] as const).map(opt => (
               <button
                 key={opt.v}
                 onClick={() => setPeriodo(opt.v)}
                 className={cn(
-                  "px-2.5 h-7 text-[11px] font-medium rounded-md transition-colors",
-                  periodo === opt.v ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+                  "inline-flex items-center gap-1.5 px-3 h-8 text-xs font-medium rounded-md transition-all",
+                  periodo === opt.v
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground hover:bg-background/50"
                 )}
               >
                 {opt.label}
+                <span className={cn(
+                  "inline-flex items-center justify-center min-w-[18px] h-[16px] px-1 rounded text-[10px] font-semibold tabular-nums",
+                  periodo === opt.v ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
+                )}>
+                  {opt.count}
+                </span>
               </button>
             ))}
           </div>
-
-          <div className="flex items-center gap-2 flex-wrap">
-            <div className="relative w-[200px]">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
-              <Input placeholder="Pesquisar..." value={search} onChange={e => setSearch(e.target.value)} className="pl-8 h-8 text-xs" />
-            </div>
-            <Select value={categoria} onValueChange={v => setCategoria(v as typeof categoria)}>
-              <SelectTrigger className={cn("w-[150px] h-8 text-xs", categoria !== "todas" && "border-primary/50 bg-primary/5 text-primary")}>
-                <Filter className="w-3 h-3 mr-1 shrink-0" /><SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="todas">Todas categorias</SelectItem>
-                {(Object.keys(categoriaConfig) as TicketCategoria[]).map(c => (
-                  <SelectItem key={c} value={c}>{categoriaConfig[c].label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select value={estado} onValueChange={v => setEstado(v as typeof estado)}>
-              <SelectTrigger className={cn("w-[140px] h-8 text-xs", estado !== "todos" && "border-primary/50 bg-primary/5 text-primary")}>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="todos">Todos estados</SelectItem>
-                {Object.entries(estadoConfig).map(([k, v]) => (
-                  <SelectItem key={k} value={k}>{v.label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
         </div>
 
+        {/* Line 2: Search + filters */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="relative flex-1 min-w-[220px] max-w-[360px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
+            <Input
+              placeholder="Pesquisar por estudante, matrícula ou motivo..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              className="pl-9 pr-8 h-9 text-xs bg-card"
+            />
+            {search && (
+              <button
+                onClick={() => setSearch("")}
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 rounded hover:bg-muted text-muted-foreground hover:text-foreground"
+                aria-label="Limpar pesquisa"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            )}
+          </div>
+
+          <div className="h-6 w-px bg-border" />
+
+          <Select value={categoria} onValueChange={v => setCategoria(v as typeof categoria)}>
+            <SelectTrigger className={cn(
+              "w-[170px] h-9 text-xs bg-card",
+              categoria !== "todas" && "border-primary/40 bg-primary/5 text-primary"
+            )}>
+              <Filter className="w-3 h-3 mr-1.5 shrink-0" />
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todas">Todas categorias</SelectItem>
+              {(Object.keys(categoriaConfig) as TicketCategoria[]).map(c => (
+                <SelectItem key={c} value={c}>{categoriaConfig[c].label}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Select value={estado} onValueChange={v => setEstado(v as typeof estado)}>
+            <SelectTrigger className={cn(
+              "w-[150px] h-9 text-xs bg-card",
+              estado !== "todos" && "border-primary/40 bg-primary/5 text-primary"
+            )}>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todos">Todos estados</SelectItem>
+              {Object.entries(estadoConfig).map(([k, v]) => (
+                <SelectItem key={k} value={k}>{v.label}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          {(categoria !== "todas" || estado !== "todos" || search) && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => { setCategoria("todas"); setEstado("todos"); setSearch(""); }}
+              className="h-9 px-2.5 text-xs text-muted-foreground hover:text-foreground gap-1"
+            >
+              <X className="w-3 h-3" /> Limpar
+            </Button>
+          )}
+
+          <div className="ml-auto text-[11px] text-muted-foreground tabular-nums whitespace-nowrap">
+            {rows.length} de {counts.todos}
+          </div>
+        </div>
+      </div>
+
+      {/* Table */}
+      <Card className="overflow-hidden">
         {/* Table head */}
-        <div className="hidden md:grid grid-cols-[110px_1fr_140px_140px_120px_28px] gap-3 px-4 py-2.5 border-b border-border bg-muted/10 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+        <div className="hidden md:grid grid-cols-[110px_180px_1fr_130px_130px_110px_28px] gap-3 px-4 py-2.5 border-b border-border bg-muted/20 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
           <div>Data / Hora</div>
-          <div>Agendamento</div>
+          <div>Estudante</div>
+          <div>Motivo</div>
           <div>Categoria</div>
           <div>Local</div>
           <div>Estado</div>
@@ -243,12 +295,12 @@ export default function GapAtendimentos() {
                   key={a.id}
                   onClick={() => setSelected(a)}
                   className={cn(
-                    "group grid grid-cols-1 md:grid-cols-[110px_1fr_140px_140px_120px_28px] gap-3 px-4 py-3 items-center hover:bg-muted/30 transition-colors cursor-pointer",
+                    "group grid grid-cols-1 md:grid-cols-[110px_180px_1fr_130px_130px_110px_28px] gap-3 px-4 py-3 items-center hover:bg-muted/30 transition-colors cursor-pointer",
                     isPast && "opacity-80"
                   )}
                 >
                   {/* Date / hora */}
-                  <div className="flex items-center gap-2 md:block">
+                  <div>
                     <div className="flex items-baseline gap-1.5">
                       <span className={cn(
                         "text-sm font-bold tabular-nums",
@@ -263,26 +315,26 @@ export default function GapAtendimentos() {
                     </p>
                   </div>
 
-                  {/* Agendamento (motivo + student) */}
+                  {/* Estudante */}
                   <div className="min-w-0">
-                    <p className="text-sm font-semibold text-foreground truncate">{a.motivo}</p>
-                    <div className="flex items-center gap-1.5 mt-0.5 text-[11px] text-muted-foreground min-w-0">
-                      <User className="w-3 h-3 shrink-0" />
-                      <button
-                        onClick={(e) => { e.stopPropagation(); navigate(`/gap/estudantes/${a.matricula}`); }}
-                        className="font-medium text-foreground/80 hover:text-primary hover:underline truncate"
-                      >
-                        {a.estudante}
-                      </button>
-                      <span className="hidden sm:inline">·</span>
-                      <span className="hidden sm:inline tabular-nums">{a.matricula}</span>
-                      <span className="hidden lg:inline">·</span>
-                      <span className="hidden lg:inline truncate">{a.curso}</span>
-                    </div>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); navigate(`/gap/estudantes/${a.matricula}`); }}
+                      className="text-sm font-semibold text-foreground hover:text-primary hover:underline truncate text-left block w-full"
+                    >
+                      {a.estudante}
+                    </button>
+                    <p className="text-[11px] text-muted-foreground truncate">
+                      <span className="tabular-nums">{a.matricula}</span> · {a.curso}
+                    </p>
+                  </div>
+
+                  {/* Motivo */}
+                  <div className="min-w-0">
+                    <p className="text-sm text-foreground/90 truncate" title={a.motivo}>{a.motivo}</p>
                   </div>
 
                   {/* Category */}
-                  <div className="flex md:block">
+                  <div>
                     <Badge variant="outline" className={cn("text-[10px]", cat.color)}>{cat.label}</Badge>
                   </div>
 
@@ -309,13 +361,6 @@ export default function GapAtendimentos() {
                 </div>
               );
             })}
-          </div>
-        )}
-
-        {/* Footer count */}
-        {rows.length > 0 && (
-          <div className="px-4 py-2 border-t border-border bg-muted/10 text-[11px] text-muted-foreground tabular-nums">
-            {rows.length} {rows.length === 1 ? "agendamento" : "agendamentos"}
           </div>
         )}
       </Card>
