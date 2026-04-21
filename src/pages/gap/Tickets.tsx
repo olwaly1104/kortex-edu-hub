@@ -1,26 +1,18 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { useToast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import {
-  Dialog, DialogContent, DialogHeader, DialogTitle,
-  DialogFooter, DialogClose,
-} from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
-  Search, HelpCircle, User, X, Calendar as CalendarIcon, Building2,
-  Inbox, Clock, CheckCircle2, AlertCircle, Send, AlertTriangle,
-  Bell, FileText, Layers, MessageSquare, Mail, Check,
+  Search, X, Calendar as CalendarIcon, Building2,
+  Inbox, Clock, CheckCircle2, AlertCircle, Layers,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   solicitacoes, Solicitacao, EstadoSolicitacao, Destino, Categoria,
-  estadoSolicitacaoConfig, prioridadeConfig, destinoConfig,
+  estadoSolicitacaoConfig, destinoConfig,
   tipoConfig, categoriaConfig,
 } from "@/data/gapData";
 
