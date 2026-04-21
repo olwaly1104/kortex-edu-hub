@@ -393,37 +393,40 @@ export default function GapTickets() {
                       </div>
                     </div>
 
-                    {/* Encaminhamento */}
+                    {/* Detalhes do Pedido */}
                     <div>
-                      <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold mb-2">Encaminhamento</p>
-                      <div className="space-y-2.5">
-                        <div>
-                          <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Destino</p>
-                          <Badge variant="outline" className={cn("text-[10px]", dest.color)}>{dest.label}</Badge>
-                        </div>
-                        <div>
-                          <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Responsável</p>
-                          <p className="text-[12px] font-medium text-foreground">
-                            {selected.responsavelDestino ?? <span className="text-muted-foreground italic font-normal">a atribuir</span>}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Datas */}
-                    <div>
-                      <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold mb-2">Datas</p>
-                      <div className="space-y-2.5">
-                        <div className="flex items-baseline justify-between gap-2">
-                          <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Submetido</span>
-                          <span className="text-[11px] font-medium text-foreground tabular-nums">{fmt(dSub)} · {fmtT(dSub)}</span>
-                        </div>
-                        {dConc && (
+                      <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold mb-2">Detalhes do Pedido</p>
+                      <div className="space-y-2">
+                        {tipoCfg && (
                           <div className="flex items-baseline justify-between gap-2">
-                            <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Concluído</span>
-                            <span className="text-[11px] font-medium text-foreground tabular-nums">{fmt(dConc)} · {fmtT(dConc)}</span>
+                            <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Categoria</span>
+                            <Badge variant="outline" className={cn("text-[10px]", categoriaConfig[tipoCfg.categoria as Categoria]?.color)}>
+                              {tipoCfg.categoria}
+                            </Badge>
                           </div>
                         )}
+                        <div className="flex items-baseline justify-between gap-2">
+                          <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Destino</span>
+                          <Badge variant="outline" className={cn("text-[10px]", dest.color)}>{dest.label}</Badge>
+                        </div>
+                        <div className="flex items-baseline justify-between gap-2">
+                          <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Responsável</span>
+                          <span className="text-[11px] font-medium text-foreground text-right truncate max-w-[150px]">
+                            {selected.responsavelDestino ?? <span className="text-muted-foreground italic font-normal">a atribuir</span>}
+                          </span>
+                        </div>
+                        <div className="pt-2 mt-1 border-t border-border space-y-2">
+                          <div className="flex items-baseline justify-between gap-2">
+                            <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Submetido</span>
+                            <span className="text-[11px] font-medium text-foreground tabular-nums">{fmt(dSub)} · {fmtT(dSub)}</span>
+                          </div>
+                          {dConc && (
+                            <div className="flex items-baseline justify-between gap-2">
+                              <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Concluído</span>
+                              <span className="text-[11px] font-medium text-foreground tabular-nums">{fmt(dConc)} · {fmtT(dConc)}</span>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
 
