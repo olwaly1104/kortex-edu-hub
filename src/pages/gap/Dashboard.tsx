@@ -131,7 +131,12 @@ export default function GapDashboard() {
 
         {/* Estado das solicitações */}
         <Card className="p-5">
-          <h2 className="text-base font-semibold text-foreground mb-4">Estado das Solicitações</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-base font-semibold text-foreground">Estado das Solicitações</h2>
+            <Link to="/gap/solicitacoes" className="text-[11px] font-medium text-primary hover:underline flex items-center gap-0.5">
+              Ver todos <ArrowRight className="w-3 h-3" />
+            </Link>
+          </div>
           <div className="space-y-3">
             {estadoStats.map(s => {
               const pct = totalSol > 0 ? (s.count / totalSol) * 100 : 0;
