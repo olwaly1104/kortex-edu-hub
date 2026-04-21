@@ -29,7 +29,7 @@ const MESES = [
 
 export default function GapTickets() {
   const [search, setSearch] = useState("");
-  const [estado, setEstado] = useState<EstadoSolicitacao | "todos">("todos");
+  const [estado, setEstado] = useState<"todos" | "pendentes" | "executadas">("todos");
   const [destino, setDestino] = useState<Destino | "todos">("todos");
   const [categoria, setCategoria] = useState<string>("todas");
   const [mes, setMes] = useState<string>("todos");
