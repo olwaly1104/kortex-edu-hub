@@ -645,105 +645,129 @@ export default function GapAtendimentos() {
       </div>
       )}
 
-      {/* Detail dialog */}
+      {/* Detail dialog — sleek, color-coordinated */}
       <Dialog open={!!selected} onOpenChange={open => !open && setSelected(null)}>
-        <DialogContent className="max-w-2xl p-0 gap-0 max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-xl p-0 gap-0 max-h-[90vh] overflow-y-auto rounded-xl">
           {selected && (() => {
             const cat = categoriaConfig[selected.categoria];
             const est = estadoConfig[selected.estado];
             const d = new Date(selected.data);
+            const startTime = selected.hora;
+            const endTime = addMinutesToHHMM(selected.hora, parseDuracaoMin(selected.duracao));
+            const isToday = selected.data === TODAY;
             return (
               <>
-                <div className="px-6 pt-6 pb-5 border-b border-border">
-                  <div className="flex items-start justify-between gap-3 mb-3">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <Badge variant="outline" className={cn("text-[10px] font-semibold", cat.color)}>{cat.label}</Badge>
-                      <Badge variant="outline" className={cn("text-[10px] gap-1", est.color)}>
+                {/* Header — colored accent strip + clean meta */}
+                <div className="relative">
+                  <div className={cn("h-1 w-full", est.dot)} />
+                  <div className="px-6 pt-5 pb-5">
+                    <div className="flex items-center gap-2 flex-wrap mb-3">
+                      <Badge variant="outline" className={cn("text-[10px] font-semibold h-5", cat.color)}>
+                        {cat.label}
+                      </Badge>
+                      <Badge variant="outline" className={cn("text-[10px] gap-1 h-5", est.color)}>
                         <span className={cn("w-1.5 h-1.5 rounded-full", est.dot)} />
                         {est.label}
                       </Badge>
-                      <span className="text-[10px] font-mono text-muted-foreground">#{selected.id.replace(/^AT-?/i, "")}</span>
+                      {isToday && (
+                        <Badge variant="outline" className="text-[10px] font-bold h-5 bg-primary text-primary-foreground border-primary">
+                          HOJE
+                        </Badge>
+                      )}
+                      <span className="text-[10px] font-mono text-muted-foreground ml-auto">
+                        #{selected.id.replace(/^AT-?/i, "")}
+                      </span>
                     </div>
+                    <DialogTitle className="text-lg font-bold leading-snug tracking-tight pr-8 text-foreground">
+                      {selected.motivo}
+                    </DialogTitle>
                   </div>
-                  <DialogTitle className="text-xl font-bold leading-tight tracking-tight pr-8">
-                    {selected.motivo}
-                  </DialogTitle>
-                  <p className="text-xs text-muted-foreground mt-1.5 capitalize">
-                    {d.toLocaleDateString("pt-AO", { weekday: "long", day: "2-digit", month: "long", year: "numeric" })} · {selected.hora} · {selected.duracao}
-                  </p>
                 </div>
 
-                <div className="p-6 space-y-5">
+                {/* When & Where — prominent, side by side */}
+                <div className="px-6 pb-5 grid grid-cols-2 gap-3">
+                  <div className="rounded-lg border border-border bg-muted/20 p-3.5">
+                    <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-2">
+                      <CalendarIcon className="w-3 h-3" /> Quando
+                    </div>
+                    <p className="text-sm font-bold text-foreground capitalize leading-tight">
+                      {d.toLocaleDateString("pt-AO", { weekday: "long", day: "2-digit", month: "long" })}
+                    </p>
+                    <p className="text-[12px] text-foreground/80 tabular-nums mt-1 flex items-center gap-1.5">
+                      <Clock className="w-3 h-3 text-muted-foreground" />
+                      {startTime} – {endTime}
+                      <span className="text-muted-foreground">· {selected.duracao}</span>
+                    </p>
+                  </div>
+                  <div className="rounded-lg border border-border bg-muted/20 p-3.5">
+                    <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-2">
+                      {selected.tipo === "online" ? <Video className="w-3 h-3" /> : <MapPin className="w-3 h-3" />}
+                      Onde
+                    </div>
+                    <p className="text-sm font-bold text-foreground truncate leading-tight">
+                      {selected.tipo === "online" ? "Sessão Online" : (selected.sala ?? "Presencial")}
+                    </p>
+                    <p className="text-[12px] text-foreground/80 mt-1 flex items-center gap-1.5">
+                      <User className="w-3 h-3 text-muted-foreground" />
+                      <span className="truncate">{selected.responsavel}</span>
+                    </p>
+                  </div>
+                </div>
+
+                {/* Student card — clickable */}
+                <div className="px-6 pb-5">
+                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-2">
+                    Estudante
+                  </div>
                   <button
                     onClick={() => { setSelected(null); navigate(`/gap/estudantes/${selected.matricula}`); }}
-                    className="w-full text-left rounded-xl border border-border hover:border-primary/40 hover:bg-muted/20 transition-colors p-4 flex items-center gap-3 group"
+                    className="w-full text-left rounded-lg border border-border hover:border-primary hover:bg-primary/[0.03] transition-all p-3 flex items-center gap-3 group"
                   >
-                    <div className="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 text-sm font-bold">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 text-xs font-bold">
                       {selected.estudante.split(" ").slice(0, 2).map(n => n[0]).join("")}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-bold text-foreground group-hover:text-primary truncate">{selected.estudante}</p>
-                      <p className="text-[11px] text-muted-foreground truncate">
-                        <span className="tabular-nums">{selected.matricula}</span> · {selected.curso} · {selected.ano}º ano
+                      <p className="text-sm font-semibold text-foreground group-hover:text-primary truncate">
+                        {selected.estudante}
                       </p>
-                      <p className="text-[11px] text-muted-foreground truncate">{selected.faculdade}</p>
+                      <p className="text-[11px] text-muted-foreground truncate">
+                        <span className="tabular-nums font-medium">{selected.matricula}</span> · {selected.curso} · {selected.ano}º ano · {selected.faculdade}
+                      </p>
                     </div>
-                    <ArrowRight className="w-4 h-4 text-muted-foreground/40 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
+                    <ArrowRight className="w-4 h-4 text-muted-foreground/40 group-hover:text-primary group-hover:translate-x-0.5 transition-all shrink-0" />
                   </button>
-
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                    <div className="rounded-lg border border-border bg-muted/20 p-3">
-                      <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5">
-                        <CalendarIcon className="w-3 h-3" /> Data
-                      </div>
-                      <p className="text-sm font-bold text-foreground tabular-nums">{d.toLocaleDateString("pt-AO", { day: "2-digit", month: "short" })}</p>
-                      <p className="text-[10px] text-muted-foreground capitalize">{d.toLocaleDateString("pt-AO", { weekday: "short" })}</p>
-                    </div>
-                    <div className="rounded-lg border border-border bg-muted/20 p-3">
-                      <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5">
-                        <Clock className="w-3 h-3" /> Hora
-                      </div>
-                      <p className="text-sm font-bold text-foreground tabular-nums">{selected.hora}</p>
-                      <p className="text-[10px] text-muted-foreground">{selected.duracao}</p>
-                    </div>
-                    <div className="rounded-lg border border-border bg-muted/20 p-3">
-                      <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5">
-                        {selected.tipo === "online" ? <Video className="w-3 h-3" /> : <MapPin className="w-3 h-3" />}
-                        Local
-                      </div>
-                      <p className="text-sm font-bold text-foreground truncate">{selected.tipo === "online" ? "Online" : (selected.sala ?? "Presencial")}</p>
-                      <p className="text-[10px] text-muted-foreground capitalize">{selected.tipo}</p>
-                    </div>
-                    <div className="rounded-lg border border-border bg-muted/20 p-3">
-                      <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5">
-                        <User className="w-3 h-3" /> Responsável
-                      </div>
-                      <p className="text-sm font-bold text-foreground truncate">{selected.responsavel.split(" ").slice(-2).join(" ")}</p>
-                      <p className="text-[10px] text-muted-foreground">GAP</p>
-                    </div>
-                  </div>
-
-                  {selected.notas && (
-                    <div>
-                      <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-2">
-                        <FileText className="w-3 h-3" /> Notas da sessão
-                      </div>
-                      <div className="rounded-xl border border-border bg-muted/10 p-4 text-sm text-foreground leading-relaxed border-l-2 border-l-primary">
-                        {selected.notas}
-                      </div>
-                    </div>
-                  )}
                 </div>
 
-                <DialogFooter className="px-6 py-3 border-t border-border bg-muted/20 gap-2">
+                {/* Notes */}
+                {selected.notas && (
+                  <div className="px-6 pb-5">
+                    <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-2">
+                      <FileText className="w-3 h-3" /> Notas da sessão
+                    </div>
+                    <div className="rounded-lg bg-muted/30 p-3.5 text-[13px] text-foreground/90 leading-relaxed border-l-2 border-l-primary">
+                      {selected.notas}
+                    </div>
+                  </div>
+                )}
+
+                {/* Footer actions */}
+                <DialogFooter className="px-6 py-3 border-t border-border bg-muted/20 gap-2 sm:justify-end">
                   {selected.estado === "agendado" && (
                     <>
-                      <Button variant="outline" size="sm" className="gap-1.5"><CalendarIcon className="w-3.5 h-3.5" /> Remarcar</Button>
-                      <Button variant="outline" size="sm" className="gap-1.5 text-destructive hover:text-destructive"><X className="w-3.5 h-3.5" /> Cancelar</Button>
-                      <Button size="sm" className="gap-1.5"><CheckCircle2 className="w-3.5 h-3.5" /> Marcar concluído</Button>
+                      <Button variant="outline" size="sm" className="gap-1.5">
+                        <CalendarIcon className="w-3.5 h-3.5" /> Remarcar
+                      </Button>
+                      <Button variant="outline" size="sm" className="gap-1.5 text-destructive hover:text-destructive hover:bg-destructive/5 hover:border-destructive/40">
+                        <X className="w-3.5 h-3.5" /> Cancelar
+                      </Button>
+                      <Button size="sm" className="gap-1.5">
+                        <CheckCircle2 className="w-3.5 h-3.5" /> Concluir
+                      </Button>
                     </>
                   )}
-                  <DialogClose asChild><Button variant="outline" size="sm">Fechar</Button></DialogClose>
+                  {selected.estado !== "agendado" && (
+                    <DialogClose asChild><Button variant="outline" size="sm">Fechar</Button></DialogClose>
+                  )}
                 </DialogFooter>
               </>
             );
