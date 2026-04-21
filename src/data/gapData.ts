@@ -511,12 +511,12 @@ export const solicitacoes: Solicitacao[] = [
     tipo: "falta_lancamento_notas",
     assunto: "Nota de Macroeconomia (P2) não lançada",
     descricao: "A nota da P2 de Macroeconomia ainda não consta no portal.",
-    destino: "Faculdade", responsavelDestino: "Coord. Faculdade de Economia",
+    destino: "Faculdade", responsavelDestino: "Coord. Faculdade de Ciências Exatas",
     estado: "recebida", prioridade: "alta", slaDias: 5,
     dataSubmissao: "2025-12-14", dataEncaminhamento: "2025-12-14",
     historico: [
       { data: "2025-12-14 11:00", actor: "Portal do Estudante", accao: "Solicitação submetida" },
-      { data: "2025-12-14 11:00", actor: "Sistema", accao: "Encaminhada automaticamente para Faculdade de Economia" },
+      { data: "2025-12-14 11:00", actor: "Sistema", accao: "Encaminhada automaticamente para Faculdade de Ciências Exatas" },
     ],
   },
   {
@@ -525,13 +525,13 @@ export const solicitacoes: Solicitacao[] = [
     tipo: "rectificacao_notas",
     assunto: "Rectificação de nota de Introdução ao Direito",
     descricao: "A nota lançada (8) não corresponde à pauta entregue (12).",
-    destino: "Faculdade", responsavelDestino: "Coord. Faculdade de Direito",
+    destino: "Faculdade", responsavelDestino: "Coord. Faculdade de Medicina",
     estado: "em_execucao", prioridade: "alta", slaDias: 7,
     dataSubmissao: "2025-12-09", dataEncaminhamento: "2025-12-09",
     historico: [
       { data: "2025-12-09 10:30", actor: "Portal do Estudante", accao: "Solicitação submetida" },
-      { data: "2025-12-09 10:30", actor: "Sistema", accao: "Encaminhada automaticamente para Faculdade de Direito" },
-      { data: "2025-12-11 14:20", actor: "Coord. Faculdade de Direito", accao: "Em verificação com docente" },
+      { data: "2025-12-09 10:30", actor: "Sistema", accao: "Encaminhada automaticamente para Faculdade de Medicina" },
+      { data: "2025-12-11 14:20", actor: "Coord. Faculdade de Medicina", accao: "Em verificação com docente" },
     ],
   },
   {
@@ -545,7 +545,7 @@ export const solicitacoes: Solicitacao[] = [
     dataSubmissao: "2025-12-15",
     historico: [
       { data: "2025-12-15 17:00", actor: "Portal do Estudante", accao: "Solicitação submetida" },
-      { data: "2025-12-15 17:00", actor: "Sistema", accao: "Encaminhada automaticamente para Faculdade de Engenharia" },
+      { data: "2025-12-15 17:00", actor: "Sistema", accao: "Encaminhada automaticamente para Faculdade de Ciências Exatas" },
     ],
   },
   {
