@@ -278,6 +278,7 @@ export default function GapTickets() {
                 <th className="text-left p-3 font-medium text-muted-foreground">Categoria</th>
                 <th className="text-left p-3 font-medium text-muted-foreground">Tipo de pedido</th>
                 <th className="text-center p-3 font-medium text-muted-foreground whitespace-nowrap">Data</th>
+                <th className="text-center p-3 font-medium text-muted-foreground whitespace-nowrap">Hora</th>
                 <th className="text-center p-3 font-medium text-muted-foreground">Destino</th>
                 <th className="text-center p-3 font-medium text-muted-foreground">Estado</th>
               </tr>
