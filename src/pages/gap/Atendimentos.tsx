@@ -371,7 +371,8 @@ export default function GapAtendimentos() {
         </div>
       </div>
 
-      {/* Table */}
+      {view === "tabela" ? (
+      /* Table */
       <Card className="overflow-hidden">
         {/* Table head */}
         <div className="hidden md:grid grid-cols-[110px_180px_1fr_130px_130px_110px_28px] gap-3 px-4 py-2.5 border-b border-border bg-muted/20 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
