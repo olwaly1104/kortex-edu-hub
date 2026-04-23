@@ -92,19 +92,23 @@ export default function GapSolicitacaoDetail() {
   } else {
     const sla = selected.slaDias ?? tipoCfg?.slaDias;
     let aside: string | undefined;
-    let dataPrev: string | undefined;
+    let labelText = "Conclusão prevista";
     if (sla) {
       const base = new Date(selected.dataEncaminhamento ?? selected.dataSubmissao);
       base.setDate(base.getDate() + sla);
       const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
       const diff = Math.ceil((base.getTime() - hoje.getTime()) / 86400000);
-      const rel = diff < 0 ? `${Math.abs(diff)}d em atraso` : diff === 0 ? "hoje" : `em ${diff}d`;
-      aside = `Conclusão prevista · ${rel}`;
-      dataPrev = fmt(base);
+      labelText = `Conclusão prevista · ${fmt(base)}`;
+      if (diff < 0) {
+        aside = `${Math.abs(diff)} ${Math.abs(diff) === 1 ? "dia" : "dias"} em atraso`;
+      } else if (diff === 0) {
+        aside = "Prazo termina hoje";
+      } else {
+        aside = `Faltam ${diff} ${diff === 1 ? "dia" : "dias"}`;
+      }
     }
     steps.push({
-      label: "Conclusão prevista",
-      data: dataPrev,
+      label: labelText,
       actor: selected.responsavelDestino ?? dest.label,
       aside,
       tone: "scheduled",
@@ -230,33 +234,12 @@ export default function GapSolicitacaoDetail() {
                     <span className="text-[11px] text-muted-foreground italic text-right">a atribuir</span>
                   )}
                 </div>
-                {dConc ? (
+                {dConc && (
                   <div className="flex items-baseline justify-between gap-2">
                     <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Concluído</span>
                     <span className="text-[11px] font-medium text-foreground tabular-nums">{fmt(dConc)} · {fmtT(dConc)}</span>
                   </div>
-                ) : (() => {
-                  const sla = selected.slaDias ?? tipoCfg?.slaDias;
-                  if (!sla) return null;
-                  const base = new Date(selected.dataEncaminhamento ?? selected.dataSubmissao);
-                  base.setDate(base.getDate() + sla);
-                  const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
-                  const diff = Math.ceil((base.getTime() - hoje.getTime()) / 86400000);
-                  const overdue = diff < 0;
-                  return (
-                    <div className="flex items-baseline justify-between gap-2">
-                      <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Concluído</span>
-                      <span className="flex flex-col items-end gap-0.5">
-                        <span className="text-[11px] font-medium text-muted-foreground tabular-nums italic">prev. {fmt(base)}</span>
-                        {overdue && (
-                          <span className="text-[10px] font-semibold text-red-600 tabular-nums">
-                            {Math.abs(diff)} {Math.abs(diff) === 1 ? "dia" : "dias"} de atraso
-                          </span>
-                        )}
-                      </span>
-                    </div>
-                  );
-                })()}
+                )}
               </div>
             </div>
           </aside>
@@ -301,7 +284,12 @@ export default function GapSolicitacaoDetail() {
                           {s.data && <span className="text-[10px] text-muted-foreground tabular-nums whitespace-nowrap">{s.data}</span>}
                         </div>
                         {s.actor && <p className="text-[11px] text-muted-foreground mt-0.5">{s.actor}</p>}
-                        {s.aside && <p className="mt-1.5 text-[11px] text-muted-foreground/90 italic">{s.aside}</p>}
+                        {s.aside && (
+                          <p className={cn(
+                            "mt-1.5 text-[11px] italic",
+                            s.aside.includes("atraso") ? "text-red-600 font-semibold not-italic" : "text-muted-foreground/90"
+                          )}>{s.aside}</p>
+                        )}
                         {s.nota && <p className="mt-2 text-xs text-foreground/75 leading-relaxed pl-3 border-l-2 border-border">{s.nota}</p>}
                       </div>
                     </li>
