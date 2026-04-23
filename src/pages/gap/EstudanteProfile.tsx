@@ -150,27 +150,6 @@ export default function GapEstudanteProfile() {
           </div>
           <div className="flex items-center justify-between px-5 py-3.5">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center"><AlertCircle className="w-4 h-4 text-amber-600" /></div>
-              <p className="text-sm text-muted-foreground">Pendentes</p>
-            </div>
-            <p className="text-sm font-semibold text-foreground">{pendentes}</p>
-          </div>
-          <div className="flex items-center justify-between px-5 py-3.5">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-sky-100 flex items-center justify-center"><Clock className="w-4 h-4 text-sky-600" /></div>
-              <p className="text-sm text-muted-foreground">Em Execução</p>
-            </div>
-            <p className="text-sm font-semibold text-foreground">{emExecucao}</p>
-          </div>
-          <div className="flex items-center justify-between px-5 py-3.5">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center"><CheckCircle2 className="w-4 h-4 text-emerald-600" /></div>
-              <p className="text-sm text-muted-foreground">Concluídas</p>
-            </div>
-            <p className="text-sm font-semibold text-foreground">{concluidas}</p>
-          </div>
-          <div className="flex items-center justify-between px-5 py-3.5">
-            <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-lg bg-pink-100 flex items-center justify-center"><CalendarDays className="w-4 h-4 text-pink-600" /></div>
               <p className="text-sm text-muted-foreground">Agendamentos GAP</p>
             </div>
@@ -182,13 +161,6 @@ export default function GapEstudanteProfile() {
               <p className="text-sm text-muted-foreground">Acompanhamentos</p>
             </div>
             <p className="text-sm font-semibold text-foreground">{estudante.acompanhamentos} sessões</p>
-          </div>
-          <div className="flex items-center justify-between px-5 py-3.5">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><UserCheck className="w-4 h-4 text-primary" /></div>
-              <p className="text-sm text-muted-foreground">Profissional Responsável</p>
-            </div>
-            <p className="text-sm font-semibold text-foreground">{estudante.responsavel}</p>
           </div>
           <div className="flex items-center justify-between px-5 py-3.5">
             <div className="flex items-center gap-3">
