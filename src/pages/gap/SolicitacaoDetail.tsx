@@ -281,7 +281,12 @@ export default function GapSolicitacaoDetail() {
               <ol className="space-y-0">
                 {steps.map((s, i) => {
                   const isLast = i === steps.length - 1;
-                  const Icon = s.tone === "rejected" ? X : s.tone === "pending" ? null : Check;
+                  const Icon =
+                    s.tone === "rejected" ? X :
+                    s.tone === "scheduled" ? Hourglass :
+                    s.tone === "forwarded" ? Send :
+                    s.tone === "pending" ? null :
+                    Check;
                   return (
                     <li key={i} className="flex gap-3 relative">
                       <div className="flex flex-col items-center shrink-0 w-5">
