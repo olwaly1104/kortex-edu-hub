@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  ArrowLeft, Clock, FileText, MessageSquare, Mail, Check, X,
+  ArrowLeft, Clock, FileText, MessageSquare, Mail, Check, X, Hourglass, Send,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
