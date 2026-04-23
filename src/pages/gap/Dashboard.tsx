@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import {
   HelpCircle, Clock, CheckCircle, Heart,
   Smile, AlertTriangle, Calendar as CalendarIcon, BarChart3,
-  Send, Inbox, Building2, ArrowRight,
+  Send, Inbox, Building2, ArrowRight, Timer,
 } from "lucide-react";
 import {
   gapKpis, solicitacoes, gapAtendimentos, gapEstudantesSeguimento,
