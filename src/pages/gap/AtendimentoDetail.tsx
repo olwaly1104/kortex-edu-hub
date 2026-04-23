@@ -94,14 +94,6 @@ export default function GapAtendimentoDetail() {
           <ArrowLeft className="w-4 h-4" />
           <span className="text-sm">Agendamentos</span>
         </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          className="gap-1.5 h-9 rounded-lg"
-          onClick={() => toast({ title: "Relatório do atendimento", description: "Geração do relatório em breve." })}
-        >
-          <FileText className="w-3.5 h-3.5 text-primary" /> Ver Relatório
-        </Button>
       </div>
 
       {/* Main card */}
