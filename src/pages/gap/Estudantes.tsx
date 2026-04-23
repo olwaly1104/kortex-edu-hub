@@ -165,9 +165,7 @@ export default function GapEstudantes() {
               <TableHead>Curso</TableHead>
               <TableHead>Categoria</TableHead>
               <TableHead className="text-center">Solicitações</TableHead>
-              <TableHead className="text-center">Acompanh.</TableHead>
-              <TableHead>Próx. Agend.</TableHead>
-              <TableHead>Responsável</TableHead>
+              <TableHead className="text-center">Agendamentos</TableHead>
               <TableHead>Risco</TableHead>
               <TableHead className="w-10"></TableHead>
             </TableRow>
@@ -197,20 +195,7 @@ export default function GapEstudantes() {
                       {e.abertos > 0 && <div className="text-[10px] text-orange-600">{e.abertos} aberta{e.abertos > 1 ? "s" : ""}</div>}
                     </TableCell>
                     <TableCell className="text-center">
-                      <span className="text-sm font-semibold text-foreground">{e.acompanhamentos}</span>
-                    </TableCell>
-                    <TableCell>
-                      {e.proxAg ? (
-                        <div>
-                          <p className="text-xs font-medium text-foreground">{new Date(e.proxAg.data).toLocaleDateString("pt-AO", { day: "2-digit", month: "short" })} · {e.proxAg.hora}</p>
-                          <p className="text-[10px] text-muted-foreground line-clamp-1">{e.proxAg.motivo}</p>
-                        </div>
-                      ) : (
-                        <span className="text-[11px] text-muted-foreground">—</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <p className="text-xs text-foreground">{e.responsavel}</p>
+                      <span className="text-sm font-semibold text-foreground">{gapAtendimentos.filter(a => a.matricula === e.matricula).length}</span>
                     </TableCell>
                     <TableCell>
                       <Badge variant="outline" className={`text-[10px] gap-1 ${r.color}`}>
