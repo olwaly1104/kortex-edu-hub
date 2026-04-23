@@ -609,7 +609,7 @@ export interface GapAtendimento {
   tipo: "presencial" | "online";
   estado: "agendado" | "concluido" | "cancelado" | "remarcar";
   responsavel: string;
-  sala?: string; notas?: string;
+  sala?: string; notas?: string; descricao?: string;
 }
 
 export interface GapEstudanteSeguimento {
