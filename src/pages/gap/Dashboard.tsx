@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import {
   HelpCircle, Clock, CheckCircle, Heart,
   Smile, AlertTriangle, Calendar as CalendarIcon, BarChart3,
-  Send, Inbox, Building2, ArrowRight, Timer,
+  Send, Inbox, Building2, ArrowRight,
 } from "lucide-react";
 import {
   gapKpis, solicitacoes, gapAtendimentos, gapEstudantesSeguimento,
@@ -43,23 +43,9 @@ export default function GapDashboard() {
     .sort((a, b) => (a.data + a.hora).localeCompare(b.data + b.hora))
     .slice(0, 5);
 
-  // Alertas em Risco — solicitações em atraso ou perto do prazo SLA
-  const TODAY = new Date("2025-12-16"); TODAY.setHours(0, 0, 0, 0);
-  const solicitacoesEmRisco = solicitacoes
-    .filter(s => s.estado === "recebida" || s.estado === "em_execucao")
-    .map(s => {
-      const base = new Date(s.dataEncaminhamento ?? s.dataSubmissao);
-      const limite = new Date(base);
-      limite.setDate(limite.getDate() + s.slaDias);
-      const diasRestantes = Math.ceil((limite.getTime() - TODAY.getTime()) / 86400000);
-      return { ...s, diasRestantes, limite };
-    })
-    .filter(s => s.diasRestantes <= 2)
-    .sort((a, b) => a.diasRestantes - b.diasRestantes);
-
-  const atrasadas = solicitacoesEmRisco.filter(s => s.diasRestantes < 0);
-  const hoje = solicitacoesEmRisco.filter(s => s.diasRestantes === 0);
-  const proximas = solicitacoesEmRisco.filter(s => s.diasRestantes > 0 && s.diasRestantes <= 2);
+  const riscoAlto  = gapEstudantesSeguimento.filter(e => e.risco === "alto");
+  const riscoMedio = gapEstudantesSeguimento.filter(e => e.risco === "medio");
+  const riscoBaixo = gapEstudantesSeguimento.filter(e => e.risco === "baixo");
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
@@ -206,85 +192,39 @@ export default function GapDashboard() {
           </div>
         </Card>
 
-        {/* Alertas em Risco — solicitações em atraso ou perto do prazo SLA */}
+        {/* Risco dos estudantes */}
         <Card className="p-5">
-          <div className="flex items-center justify-between mb-1">
-            <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 text-destructive" /> Alertas em Risco
-            </h2>
-            <Link to="/gap/solicitacoes" className="text-[11px] font-medium text-primary hover:underline flex items-center gap-0.5">
-              Gerir <ArrowRight className="w-3 h-3" />
-            </Link>
+          <h2 className="text-base font-semibold text-foreground mb-4 flex items-center gap-2">
+            <Heart className="w-4 h-4 text-pink-600" /> Nível de Risco
+          </h2>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between p-3 rounded-lg bg-destructive/5 border border-destructive/20">
+              <div>
+                <p className="text-xs text-muted-foreground">Risco Alto</p>
+                <p className="text-xl font-bold text-destructive">{riscoAlto.length}</p>
+              </div>
+              <AlertTriangle className="w-6 h-6 text-destructive" />
+            </div>
+            <div className="flex items-center justify-between p-3 rounded-lg bg-amber-50 border border-amber-200">
+              <div>
+                <p className="text-xs text-muted-foreground">Risco Médio</p>
+                <p className="text-xl font-bold text-amber-600">{riscoMedio.length}</p>
+              </div>
+              <Clock className="w-6 h-6 text-amber-600" />
+            </div>
+            <div className="flex items-center justify-between p-3 rounded-lg bg-emerald-50 border border-emerald-200">
+              <div>
+                <p className="text-xs text-muted-foreground">Risco Baixo</p>
+                <p className="text-xl font-bold text-emerald-600">{riscoBaixo.length}</p>
+              </div>
+              <CheckCircle className="w-6 h-6 text-emerald-600" />
+            </div>
           </div>
-          <p className="text-[11px] text-muted-foreground mb-4">Solicitações com SLA crítico</p>
-
-          {/* Mini KPIs */}
-          <div className="grid grid-cols-3 gap-2 mb-4">
-            <div className="rounded-lg border border-destructive/30 bg-destructive/5 px-2.5 py-2 text-center">
-              <p className="text-lg font-bold text-destructive tabular-nums leading-none">{atrasadas.length}</p>
-              <p className="text-[9px] text-destructive/80 uppercase tracking-wider mt-1 font-semibold">Atrasadas</p>
-            </div>
-            <div className="rounded-lg border border-amber-300 bg-amber-50 px-2.5 py-2 text-center">
-              <p className="text-lg font-bold text-amber-700 tabular-nums leading-none">{hoje.length}</p>
-              <p className="text-[9px] text-amber-700/80 uppercase tracking-wider mt-1 font-semibold">Hoje</p>
-            </div>
-            <div className="rounded-lg border border-border bg-muted/30 px-2.5 py-2 text-center">
-              <p className="text-lg font-bold text-foreground tabular-nums leading-none">{proximas.length}</p>
-              <p className="text-[9px] text-muted-foreground uppercase tracking-wider mt-1 font-semibold">≤ 2 dias</p>
-            </div>
-          </div>
-
-          {/* Lista de alertas */}
-          {solicitacoesEmRisco.length === 0 ? (
-            <div className="text-center py-6">
-              <CheckCircle className="w-8 h-8 text-emerald-500/60 mx-auto mb-2" />
-              <p className="text-xs text-muted-foreground">Sem solicitações em risco</p>
-            </div>
-          ) : (
-            <div className="space-y-1.5">
-              {solicitacoesEmRisco.slice(0, 5).map(s => {
-                const isAtrasada = s.diasRestantes < 0;
-                const isHoje = s.diasRestantes === 0;
-                const dest = destinoConfig[s.destino];
-                return (
-                  <Link
-                    key={s.id}
-                    to={`/gap/solicitacoes/${s.id}`}
-                    className={`flex items-center gap-2.5 px-2.5 py-2 rounded-lg border transition-colors group ${
-                      isAtrasada ? "border-destructive/20 bg-destructive/5 hover:bg-destructive/10" :
-                      "border-border hover:border-primary/30 hover:bg-muted/30"
-                    }`}
-                  >
-                    <div className={`w-11 shrink-0 text-center rounded-md py-1 border ${
-                      isAtrasada ? "bg-destructive/15 border-destructive/30 text-destructive" :
-                      isHoje ? "bg-amber-100 border-amber-300 text-amber-700" :
-                      "bg-muted border-border text-muted-foreground"
-                    }`}>
-                      <Timer className="w-3 h-3 mx-auto mb-0.5" />
-                      <p className="text-[10px] font-bold tabular-nums leading-none">
-                        {isAtrasada ? `+${Math.abs(s.diasRestantes)}d` : isHoje ? "hoje" : `${s.diasRestantes}d`}
-                      </p>
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-[11px] font-semibold text-foreground truncate group-hover:text-primary transition-colors">
-                        {s.estudante}
-                      </p>
-                      <p className="text-[10px] text-muted-foreground truncate">
-                        {s.id.replace(/^SOL-?/i, "#")} · {dest.label}
-                      </p>
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-          )}
         </Card>
       </div>
     </div>
   );
 }
 
-// Suppress unused import warnings
+// Suppress unused import warning when HelpCircle isn't used
 void HelpCircle;
-void Heart;
-void gapEstudantesSeguimento;
