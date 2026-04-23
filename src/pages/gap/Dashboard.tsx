@@ -51,9 +51,9 @@ export default function GapDashboard() {
   const riscoBaixo = gapEstudantesSeguimento.filter(e => e.risco === "baixo");
   void riscoAlto; void riscoMedio; void riscoBaixo;
 
-  // Solicitações em risco — em atraso ou perto do prazo
+  // Solicitações em atraso — prazo SLA já ultrapassado
   const today = new Date(TODAY_STR); today.setHours(0, 0, 0, 0);
-  const solicitacoesEmRisco = solicitacoes
+  const solicitacoesEmAtraso = solicitacoes
     .filter(s => s.estado !== "concluida" && s.estado !== "rejeitada")
     .map(s => {
       const sla = s.slaDias ?? tipoConfig[s.tipo]?.slaDias;
@@ -63,7 +63,7 @@ export default function GapDashboard() {
       const diff = Math.ceil((base.getTime() - today.getTime()) / 86400000);
       return { sol: s, diff, prazo: base };
     })
-    .filter((x): x is NonNullable<typeof x> => x !== null && x.diff <= 1)
+    .filter((x): x is NonNullable<typeof x> => x !== null && x.diff < 0)
     .sort((a, b) => a.diff - b.diff);
 
   return (
