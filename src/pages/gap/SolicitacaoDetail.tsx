@@ -43,17 +43,34 @@ export default function GapSolicitacaoDetail() {
     return a.includes("concluída") || a.includes("concluida") || a.includes("executada");
   });
 
-  type Step = { label: string; data?: string; actor?: string; nota?: string; aside?: string; tone: "submitted" | "accepted" | "rejected" | "executed" | "pending" };
+  type Step = { label: string; data?: string; actor?: string; nota?: string; aside?: string; tone: "submitted" | "forwarded" | "accepted" | "rejected" | "executed" | "pending" | "scheduled" };
   const steps: Step[] = [];
 
+  // 1) Submetida
   steps.push({
     label: "Solicitação submetida",
     data: submetida?.data,
     actor: submetida?.actor ?? "Portal do Estudante",
-    aside: encaminhada ? `${encaminhada.accao} · ${encaminhada.data}` : undefined,
     tone: "submitted",
   });
 
+  // 2) Encaminhada
+  if (encaminhada) {
+    steps.push({
+      label: "Encaminhada para destino",
+      data: encaminhada.data,
+      actor: `${encaminhada.actor} → ${dest.label}`,
+      tone: "forwarded",
+    });
+  } else {
+    steps.push({
+      label: "Aguarda encaminhamento",
+      actor: dest.label,
+      tone: "pending",
+    });
+  }
+
+  // 3) Aceite / rejeitada / aguarda
   if (selected.estado === "rejeitada") {
     const rej = selected.historico.slice().reverse().find(h => h.accao.toLowerCase().includes("rejeit"));
     steps.push({ label: "Solicitação rejeitada", data: rej?.data, actor: rej?.actor ?? selected.responsavelDestino, nota: rej?.nota, tone: "rejected" });
@@ -67,34 +84,40 @@ export default function GapSolicitacaoDetail() {
     steps.push({ label: "Aguarda aceitação", actor: selected.responsavelDestino ?? dest.label, tone: "pending" });
   }
 
+  // 4) Concluída / prevista
   if (selected.estado === "concluida") {
-    steps.push({ label: "Executada", data: executada?.data, actor: executada?.actor ?? selected.responsavelDestino, nota: executada?.nota, tone: "executed" });
+    steps.push({ label: "Concluída", data: executada?.data, actor: executada?.actor ?? selected.responsavelDestino, nota: executada?.nota, tone: "executed" });
   } else if (selected.estado === "rejeitada") {
-    steps.push({ label: "—", tone: "pending" });
+    steps.push({ label: "Sem conclusão", actor: "Pedido encerrado por rejeição", tone: "pending" });
   } else {
     const sla = selected.slaDias ?? tipoCfg?.slaDias;
     let aside: string | undefined;
+    let dataPrev: string | undefined;
     if (sla) {
       const base = new Date(selected.dataEncaminhamento ?? selected.dataSubmissao);
       base.setDate(base.getDate() + sla);
       const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
       const diff = Math.ceil((base.getTime() - hoje.getTime()) / 86400000);
       const rel = diff < 0 ? `${Math.abs(diff)}d em atraso` : diff === 0 ? "hoje" : `em ${diff}d`;
-      aside = `Conclusão prevista: ${fmt(base)} · ${rel}`;
+      aside = `Conclusão prevista · ${rel}`;
+      dataPrev = fmt(base);
     }
     steps.push({
-      label: selected.estado === "em_execucao" ? "Em execução pelo destino" : "Aguarda execução",
+      label: "Conclusão prevista",
+      data: dataPrev,
       actor: selected.responsavelDestino ?? dest.label,
       aside,
-      tone: "pending",
+      tone: "scheduled",
     });
   }
 
   const nodeCls: Record<Step["tone"], string> = {
     submitted: "bg-emerald-500 text-white ring-4 ring-emerald-500/15",
+    forwarded: "bg-emerald-500 text-white ring-4 ring-emerald-500/15",
     accepted: "bg-emerald-500 text-white ring-4 ring-emerald-500/15",
     rejected: "bg-destructive text-destructive-foreground ring-4 ring-destructive/15",
     executed: "bg-emerald-500 text-white ring-4 ring-emerald-500/15",
+    scheduled: "bg-amber-500 text-white ring-4 ring-amber-500/15",
     pending: "bg-background border-2 border-dashed border-border text-muted-foreground",
   };
 
