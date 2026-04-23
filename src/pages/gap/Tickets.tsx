@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import {
   Search, X, Calendar as CalendarIcon, Building2,
   Inbox, Clock, CheckCircle2, AlertCircle, Layers,
+  Timer, CircleSlash, ChevronRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
