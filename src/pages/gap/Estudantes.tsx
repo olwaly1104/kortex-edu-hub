@@ -165,9 +165,7 @@ export default function GapEstudantes() {
               <TableHead>Curso</TableHead>
               <TableHead>Categoria</TableHead>
               <TableHead className="text-center">Solicitações</TableHead>
-              <TableHead className="text-center">Acompanh.</TableHead>
-              <TableHead>Próx. Agend.</TableHead>
-              <TableHead>Responsável</TableHead>
+              <TableHead className="text-center">Agendamentos</TableHead>
               <TableHead>Risco</TableHead>
               <TableHead className="w-10"></TableHead>
             </TableRow>
