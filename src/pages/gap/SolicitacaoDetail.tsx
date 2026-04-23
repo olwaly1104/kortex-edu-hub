@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  ArrowLeft, Clock, FileText, MessageSquare, Mail, Check, X,
+  ArrowLeft, Clock, FileText, MessageSquare, Mail, Check, X, Hourglass, Send,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -43,17 +43,34 @@ export default function GapSolicitacaoDetail() {
     return a.includes("concluída") || a.includes("concluida") || a.includes("executada");
   });
 
-  type Step = { label: string; data?: string; actor?: string; nota?: string; aside?: string; tone: "submitted" | "accepted" | "rejected" | "executed" | "pending" };
+  type Step = { label: string; data?: string; actor?: string; nota?: string; aside?: string; tone: "submitted" | "forwarded" | "accepted" | "rejected" | "executed" | "pending" | "scheduled" };
   const steps: Step[] = [];
 
+  // 1) Submetida
   steps.push({
     label: "Solicitação submetida",
     data: submetida?.data,
     actor: submetida?.actor ?? "Portal do Estudante",
-    aside: encaminhada ? `${encaminhada.accao} · ${encaminhada.data}` : undefined,
     tone: "submitted",
   });
 
+  // 2) Encaminhada
+  if (encaminhada) {
+    steps.push({
+      label: "Encaminhada para destino",
+      data: encaminhada.data,
+      actor: `${encaminhada.actor} → ${dest.label}`,
+      tone: "forwarded",
+    });
+  } else {
+    steps.push({
+      label: "Aguarda encaminhamento",
+      actor: dest.label,
+      tone: "pending",
+    });
+  }
+
+  // 3) Aceite / rejeitada / aguarda
   if (selected.estado === "rejeitada") {
     const rej = selected.historico.slice().reverse().find(h => h.accao.toLowerCase().includes("rejeit"));
     steps.push({ label: "Solicitação rejeitada", data: rej?.data, actor: rej?.actor ?? selected.responsavelDestino, nota: rej?.nota, tone: "rejected" });
@@ -67,34 +84,40 @@ export default function GapSolicitacaoDetail() {
     steps.push({ label: "Aguarda aceitação", actor: selected.responsavelDestino ?? dest.label, tone: "pending" });
   }
 
+  // 4) Concluída / prevista
   if (selected.estado === "concluida") {
-    steps.push({ label: "Executada", data: executada?.data, actor: executada?.actor ?? selected.responsavelDestino, nota: executada?.nota, tone: "executed" });
+    steps.push({ label: "Concluída", data: executada?.data, actor: executada?.actor ?? selected.responsavelDestino, nota: executada?.nota, tone: "executed" });
   } else if (selected.estado === "rejeitada") {
-    steps.push({ label: "—", tone: "pending" });
+    steps.push({ label: "Sem conclusão", actor: "Pedido encerrado por rejeição", tone: "pending" });
   } else {
     const sla = selected.slaDias ?? tipoCfg?.slaDias;
     let aside: string | undefined;
+    let dataPrev: string | undefined;
     if (sla) {
       const base = new Date(selected.dataEncaminhamento ?? selected.dataSubmissao);
       base.setDate(base.getDate() + sla);
       const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
       const diff = Math.ceil((base.getTime() - hoje.getTime()) / 86400000);
       const rel = diff < 0 ? `${Math.abs(diff)}d em atraso` : diff === 0 ? "hoje" : `em ${diff}d`;
-      aside = `Conclusão prevista: ${fmt(base)} · ${rel}`;
+      aside = `Conclusão prevista · ${rel}`;
+      dataPrev = fmt(base);
     }
     steps.push({
-      label: selected.estado === "em_execucao" ? "Em execução pelo destino" : "Aguarda execução",
+      label: "Conclusão prevista",
+      data: dataPrev,
       actor: selected.responsavelDestino ?? dest.label,
       aside,
-      tone: "pending",
+      tone: "scheduled",
     });
   }
 
   const nodeCls: Record<Step["tone"], string> = {
     submitted: "bg-emerald-500 text-white ring-4 ring-emerald-500/15",
+    forwarded: "bg-emerald-500 text-white ring-4 ring-emerald-500/15",
     accepted: "bg-emerald-500 text-white ring-4 ring-emerald-500/15",
     rejected: "bg-destructive text-destructive-foreground ring-4 ring-destructive/15",
     executed: "bg-emerald-500 text-white ring-4 ring-emerald-500/15",
+    scheduled: "bg-amber-500 text-white ring-4 ring-amber-500/15",
     pending: "bg-background border-2 border-dashed border-border text-muted-foreground",
   };
 
@@ -217,10 +240,20 @@ export default function GapSolicitacaoDetail() {
                   if (!sla) return null;
                   const base = new Date(selected.dataEncaminhamento ?? selected.dataSubmissao);
                   base.setDate(base.getDate() + sla);
+                  const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
+                  const diff = Math.ceil((base.getTime() - hoje.getTime()) / 86400000);
+                  const overdue = diff < 0;
                   return (
                     <div className="flex items-baseline justify-between gap-2">
                       <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Concluído</span>
-                      <span className="text-[11px] font-medium text-muted-foreground tabular-nums italic">prev. {fmt(base)}</span>
+                      <span className="flex flex-col items-end gap-0.5">
+                        <span className="text-[11px] font-medium text-muted-foreground tabular-nums italic">prev. {fmt(base)}</span>
+                        {overdue && (
+                          <span className="text-[10px] font-semibold text-red-600 tabular-nums">
+                            {Math.abs(diff)} {Math.abs(diff) === 1 ? "dia" : "dias"} de atraso
+                          </span>
+                        )}
+                      </span>
                     </div>
                   );
                 })()}
@@ -248,7 +281,12 @@ export default function GapSolicitacaoDetail() {
               <ol className="space-y-0">
                 {steps.map((s, i) => {
                   const isLast = i === steps.length - 1;
-                  const Icon = s.tone === "rejected" ? X : s.tone === "pending" ? null : Check;
+                  const Icon =
+                    s.tone === "rejected" ? X :
+                    s.tone === "scheduled" ? Hourglass :
+                    s.tone === "forwarded" ? Send :
+                    s.tone === "pending" ? null :
+                    Check;
                   return (
                     <li key={i} className="flex gap-3 relative">
                       <div className="flex flex-col items-center shrink-0 w-5">
