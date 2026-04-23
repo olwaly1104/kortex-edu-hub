@@ -10,8 +10,10 @@ import {
 import {
   gapKpis, solicitacoes, gapAtendimentos, gapEstudantesSeguimento,
   solicitacoesPorDestino, destinoConfig, estadoSolicitacaoConfig,
-  ticketCategoriaConfig as categoriaConfig,
+  ticketCategoriaConfig as categoriaConfig, tipoConfig,
 } from "@/data/gapData";
+
+const TODAY_STR = "2025-12-16";
 
 export default function GapDashboard() {
   const totalSolicitacoes = solicitacoes.length;
