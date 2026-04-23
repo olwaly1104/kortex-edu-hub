@@ -61,6 +61,12 @@ export default function GapAtendimentos() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [categoria, setCategoria] = useState<"todas" | TicketCategoria>("todas");
+  const [motivoFilter, setMotivoFilter] = useState<string>("todos");
+
+  const motivosUnicos = useMemo(
+    () => Array.from(new Set(gapAtendimentos.map(a => a.motivo))).sort((a, b) => a.localeCompare(b)),
+    []
+  );
   
   const [periodo, setPeriodo] = useState<"todos" | "hoje" | "agendado" | "concluido">("todos");
   const [view, setView] = useState<"tabela" | "calendario">("tabela");
