@@ -88,6 +88,7 @@ export default function GapAtendimentos() {
   const rows = useMemo(() => {
     return gapAtendimentos
       .filter(a => categoria === "todas" || a.categoria === categoria)
+      .filter(a => motivoFilter === "todos" || a.motivo === motivoFilter)
       .filter(a => a.estado !== "cancelado")
       .filter(a => {
         if (periodo === "todos") return true;
