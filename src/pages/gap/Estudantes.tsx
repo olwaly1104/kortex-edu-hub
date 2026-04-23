@@ -195,20 +195,7 @@ export default function GapEstudantes() {
                       {e.abertos > 0 && <div className="text-[10px] text-orange-600">{e.abertos} aberta{e.abertos > 1 ? "s" : ""}</div>}
                     </TableCell>
                     <TableCell className="text-center">
-                      <span className="text-sm font-semibold text-foreground">{e.acompanhamentos}</span>
-                    </TableCell>
-                    <TableCell>
-                      {e.proxAg ? (
-                        <div>
-                          <p className="text-xs font-medium text-foreground">{new Date(e.proxAg.data).toLocaleDateString("pt-AO", { day: "2-digit", month: "short" })} · {e.proxAg.hora}</p>
-                          <p className="text-[10px] text-muted-foreground line-clamp-1">{e.proxAg.motivo}</p>
-                        </div>
-                      ) : (
-                        <span className="text-[11px] text-muted-foreground">—</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <p className="text-xs text-foreground">{e.responsavel}</p>
+                      <span className="text-sm font-semibold text-foreground">{(e.proxAg ? 1 : 0) + (gapAtendimentos.filter(a => a.matricula === e.matricula).length)}</span>
                     </TableCell>
                     <TableCell>
                       <Badge variant="outline" className={`text-[10px] gap-1 ${r.color}`}>
