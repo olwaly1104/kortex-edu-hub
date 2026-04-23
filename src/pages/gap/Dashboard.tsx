@@ -43,9 +43,23 @@ export default function GapDashboard() {
     .sort((a, b) => (a.data + a.hora).localeCompare(b.data + b.hora))
     .slice(0, 5);
 
-  const riscoAlto  = gapEstudantesSeguimento.filter(e => e.risco === "alto");
-  const riscoMedio = gapEstudantesSeguimento.filter(e => e.risco === "medio");
-  const riscoBaixo = gapEstudantesSeguimento.filter(e => e.risco === "baixo");
+  // Alertas em Risco — solicitações em atraso ou perto do prazo SLA
+  const TODAY = new Date("2025-12-16"); TODAY.setHours(0, 0, 0, 0);
+  const solicitacoesEmRisco = solicitacoes
+    .filter(s => s.estado === "recebida" || s.estado === "em_execucao")
+    .map(s => {
+      const base = new Date(s.dataEncaminhamento ?? s.dataSubmissao);
+      const limite = new Date(base);
+      limite.setDate(limite.getDate() + s.slaDias);
+      const diasRestantes = Math.ceil((limite.getTime() - TODAY.getTime()) / 86400000);
+      return { ...s, diasRestantes, limite };
+    })
+    .filter(s => s.diasRestantes <= 2)
+    .sort((a, b) => a.diasRestantes - b.diasRestantes);
+
+  const atrasadas = solicitacoesEmRisco.filter(s => s.diasRestantes < 0);
+  const hoje = solicitacoesEmRisco.filter(s => s.diasRestantes === 0);
+  const proximas = solicitacoesEmRisco.filter(s => s.diasRestantes > 0 && s.diasRestantes <= 2);
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
