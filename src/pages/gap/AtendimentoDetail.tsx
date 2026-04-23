@@ -94,14 +94,6 @@ export default function GapAtendimentoDetail() {
           <ArrowLeft className="w-4 h-4" />
           <span className="text-sm">Agendamentos</span>
         </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          className="gap-1.5 h-9 rounded-lg"
-          onClick={() => toast({ title: "Relatório do atendimento", description: "Geração do relatório em breve." })}
-        >
-          <FileText className="w-3.5 h-3.5 text-primary" /> Ver Relatório
-        </Button>
       </div>
 
       {/* Main card */}
@@ -219,14 +211,25 @@ export default function GapAtendimentoDetail() {
           </div>
         </div>
 
-        {/* Motivo */}
+        {/* Sessão — motivo + descrição */}
         <div className="px-7 py-5 border-b border-border">
-          <h3 className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mb-2.5">
-            Motivo da Sessão
+          <h3 className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mb-3 flex items-center gap-1.5">
+            <FileText className="w-3 h-3" /> Detalhes da Sessão
           </h3>
-          <p className="text-sm text-foreground/85 leading-relaxed pl-3.5 border-l-2 border-primary/40">
-            {atendimento.motivo}
-          </p>
+          <div className="rounded-lg border border-border/70 bg-muted/15 overflow-hidden">
+            <div className="px-4 py-3 border-b border-border/60 bg-background">
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">Motivo</p>
+              <p className="text-sm font-semibold text-foreground leading-snug">{atendimento.motivo}</p>
+            </div>
+            <div className="px-4 py-3.5">
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5">Descrição</p>
+              {atendimento.descricao ? (
+                <p className="text-sm text-foreground/85 leading-relaxed">{atendimento.descricao}</p>
+              ) : (
+                <p className="text-sm text-muted-foreground/70 italic">Sem descrição adicional.</p>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* Notas */}
