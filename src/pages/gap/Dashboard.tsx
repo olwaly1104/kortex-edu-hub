@@ -51,9 +51,9 @@ export default function GapDashboard() {
   const riscoBaixo = gapEstudantesSeguimento.filter(e => e.risco === "baixo");
   void riscoAlto; void riscoMedio; void riscoBaixo;
 
-  // Solicitações em risco — em atraso ou perto do prazo
+  // Solicitações em atraso — prazo SLA já ultrapassado
   const today = new Date(TODAY_STR); today.setHours(0, 0, 0, 0);
-  const solicitacoesEmRisco = solicitacoes
+  const solicitacoesEmAtraso = solicitacoes
     .filter(s => s.estado !== "concluida" && s.estado !== "rejeitada")
     .map(s => {
       const sla = s.slaDias ?? tipoConfig[s.tipo]?.slaDias;
@@ -63,7 +63,7 @@ export default function GapDashboard() {
       const diff = Math.ceil((base.getTime() - today.getTime()) / 86400000);
       return { sol: s, diff, prazo: base };
     })
-    .filter((x): x is NonNullable<typeof x> => x !== null && x.diff <= 1)
+    .filter((x): x is NonNullable<typeof x> => x !== null && x.diff < 0)
     .sort((a, b) => a.diff - b.diff);
 
   return (
@@ -211,11 +211,11 @@ export default function GapDashboard() {
           </div>
         </Card>
 
-        {/* Em Risco — solicitações em atraso ou perto do prazo */}
+        {/* Em Atraso — solicitações com prazo SLA ultrapassado */}
         <Card className="p-5">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 text-destructive" /> Em Risco
+              <AlertTriangle className="w-4 h-4 text-destructive" /> Em Atraso
             </h2>
             <Link
               to="/gap/solicitacoes"
@@ -224,16 +224,14 @@ export default function GapDashboard() {
               Ver todas <ArrowRight className="w-3 h-3" />
             </Link>
           </div>
-          {solicitacoesEmRisco.length === 0 ? (
+          {solicitacoesEmAtraso.length === 0 ? (
             <div className="py-8 text-center">
               <CheckCircle className="w-8 h-8 text-emerald-500/50 mx-auto mb-2" />
-              <p className="text-xs text-muted-foreground">Sem solicitações em risco.</p>
+              <p className="text-xs text-muted-foreground">Sem solicitações em atraso.</p>
             </div>
           ) : (
             <ul className="divide-y divide-border -mx-1">
-              {solicitacoesEmRisco.slice(0, 6).map(({ sol, diff }) => {
-                const overdue = diff < 0;
-                const today = diff === 0;
+              {solicitacoesEmAtraso.slice(0, 6).map(({ sol, diff }) => {
                 const tCfg = tipoConfig[sol.tipo];
                 return (
                   <li key={sol.id}>
@@ -243,12 +241,7 @@ export default function GapDashboard() {
                         "flex items-center gap-3 px-1 py-2.5 hover:bg-muted/40 rounded-md transition-colors"
                       )}
                     >
-                      <div className={cn(
-                        "w-9 h-9 rounded-md flex items-center justify-center shrink-0",
-                        overdue ? "bg-destructive/10 text-destructive" :
-                        today ? "bg-amber-100 text-amber-700" :
-                        "bg-muted text-muted-foreground"
-                      )}>
+                      <div className="w-9 h-9 rounded-md flex items-center justify-center shrink-0 bg-destructive/10 text-destructive">
                         <span className="text-sm font-bold tabular-nums">{Math.abs(diff)}</span>
                       </div>
                       <div className="min-w-0 flex-1">
@@ -257,11 +250,8 @@ export default function GapDashboard() {
                           {sol.estudante} · {destinoConfig[sol.destino].label}
                         </p>
                       </div>
-                      <span className={cn(
-                        "text-[10px] font-semibold tabular-nums whitespace-nowrap",
-                        overdue ? "text-destructive" : today ? "text-amber-600" : "text-muted-foreground"
-                      )}>
-                        {overdue ? `${Math.abs(diff)}d atraso` : today ? "hoje" : `em ${diff}d`}
+                      <span className="text-[10px] font-semibold tabular-nums whitespace-nowrap text-destructive">
+                        {Math.abs(diff)}d atraso
                       </span>
                     </Link>
                   </li>
