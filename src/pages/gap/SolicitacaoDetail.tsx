@@ -240,10 +240,20 @@ export default function GapSolicitacaoDetail() {
                   if (!sla) return null;
                   const base = new Date(selected.dataEncaminhamento ?? selected.dataSubmissao);
                   base.setDate(base.getDate() + sla);
+                  const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
+                  const diff = Math.ceil((base.getTime() - hoje.getTime()) / 86400000);
+                  const overdue = diff < 0;
                   return (
                     <div className="flex items-baseline justify-between gap-2">
                       <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Concluído</span>
-                      <span className="text-[11px] font-medium text-muted-foreground tabular-nums italic">prev. {fmt(base)}</span>
+                      <span className="flex flex-col items-end gap-0.5">
+                        <span className="text-[11px] font-medium text-muted-foreground tabular-nums italic">prev. {fmt(base)}</span>
+                        {overdue && (
+                          <span className="text-[10px] font-semibold text-red-600 tabular-nums">
+                            {Math.abs(diff)} {Math.abs(diff) === 1 ? "dia" : "dias"} de atraso
+                          </span>
+                        )}
+                      </span>
                     </div>
                   );
                 })()}
