@@ -92,19 +92,23 @@ export default function GapSolicitacaoDetail() {
   } else {
     const sla = selected.slaDias ?? tipoCfg?.slaDias;
     let aside: string | undefined;
-    let dataPrev: string | undefined;
+    let labelText = "Conclusão prevista";
     if (sla) {
       const base = new Date(selected.dataEncaminhamento ?? selected.dataSubmissao);
       base.setDate(base.getDate() + sla);
       const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
       const diff = Math.ceil((base.getTime() - hoje.getTime()) / 86400000);
-      const rel = diff < 0 ? `${Math.abs(diff)}d em atraso` : diff === 0 ? "hoje" : `em ${diff}d`;
-      aside = `Conclusão prevista · ${rel}`;
-      dataPrev = fmt(base);
+      labelText = `Conclusão prevista · ${fmt(base)}`;
+      if (diff < 0) {
+        aside = `${Math.abs(diff)} ${Math.abs(diff) === 1 ? "dia" : "dias"} em atraso`;
+      } else if (diff === 0) {
+        aside = "Prazo termina hoje";
+      } else {
+        aside = `Faltam ${diff} ${diff === 1 ? "dia" : "dias"}`;
+      }
     }
     steps.push({
-      label: "Conclusão prevista",
-      data: dataPrev,
+      label: labelText,
       actor: selected.responsavelDestino ?? dest.label,
       aside,
       tone: "scheduled",
