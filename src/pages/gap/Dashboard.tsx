@@ -1,4 +1,5 @@
 import { Card } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Link } from "react-router-dom";
@@ -10,8 +11,10 @@ import {
 import {
   gapKpis, solicitacoes, gapAtendimentos, gapEstudantesSeguimento,
   solicitacoesPorDestino, destinoConfig, estadoSolicitacaoConfig,
-  ticketCategoriaConfig as categoriaConfig,
+  ticketCategoriaConfig as categoriaConfig, tipoConfig,
 } from "@/data/gapData";
+
+const TODAY_STR = "2025-12-16";
 
 export default function GapDashboard() {
   const totalSolicitacoes = solicitacoes.length;
@@ -46,6 +49,22 @@ export default function GapDashboard() {
   const riscoAlto  = gapEstudantesSeguimento.filter(e => e.risco === "alto");
   const riscoMedio = gapEstudantesSeguimento.filter(e => e.risco === "medio");
   const riscoBaixo = gapEstudantesSeguimento.filter(e => e.risco === "baixo");
+  void riscoAlto; void riscoMedio; void riscoBaixo;
+
+  // Solicitações em risco — em atraso ou perto do prazo
+  const today = new Date(TODAY_STR); today.setHours(0, 0, 0, 0);
+  const solicitacoesEmRisco = solicitacoes
+    .filter(s => s.estado !== "concluida" && s.estado !== "rejeitada")
+    .map(s => {
+      const sla = s.slaDias ?? tipoConfig[s.tipo]?.slaDias;
+      if (!sla) return null;
+      const base = new Date(s.dataEncaminhamento ?? s.dataSubmissao);
+      base.setDate(base.getDate() + sla);
+      const diff = Math.ceil((base.getTime() - today.getTime()) / 86400000);
+      return { sol: s, diff, prazo: base };
+    })
+    .filter((x): x is NonNullable<typeof x> => x !== null && x.diff <= 1)
+    .sort((a, b) => a.diff - b.diff);
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
@@ -192,34 +211,64 @@ export default function GapDashboard() {
           </div>
         </Card>
 
-        {/* Risco dos estudantes */}
+        {/* Em Risco — solicitações em atraso ou perto do prazo */}
         <Card className="p-5">
-          <h2 className="text-base font-semibold text-foreground mb-4 flex items-center gap-2">
-            <Heart className="w-4 h-4 text-pink-600" /> Nível de Risco
-          </h2>
-          <div className="space-y-3">
-            <div className="flex items-center justify-between p-3 rounded-lg bg-destructive/5 border border-destructive/20">
-              <div>
-                <p className="text-xs text-muted-foreground">Risco Alto</p>
-                <p className="text-xl font-bold text-destructive">{riscoAlto.length}</p>
-              </div>
-              <AlertTriangle className="w-6 h-6 text-destructive" />
-            </div>
-            <div className="flex items-center justify-between p-3 rounded-lg bg-amber-50 border border-amber-200">
-              <div>
-                <p className="text-xs text-muted-foreground">Risco Médio</p>
-                <p className="text-xl font-bold text-amber-600">{riscoMedio.length}</p>
-              </div>
-              <Clock className="w-6 h-6 text-amber-600" />
-            </div>
-            <div className="flex items-center justify-between p-3 rounded-lg bg-emerald-50 border border-emerald-200">
-              <div>
-                <p className="text-xs text-muted-foreground">Risco Baixo</p>
-                <p className="text-xl font-bold text-emerald-600">{riscoBaixo.length}</p>
-              </div>
-              <CheckCircle className="w-6 h-6 text-emerald-600" />
-            </div>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-destructive" /> Em Risco
+            </h2>
+            <Link
+              to="/gap/solicitacoes"
+              className="text-[11px] font-medium text-muted-foreground hover:text-primary inline-flex items-center gap-1"
+            >
+              Ver todas <ArrowRight className="w-3 h-3" />
+            </Link>
           </div>
+          {solicitacoesEmRisco.length === 0 ? (
+            <div className="py-8 text-center">
+              <CheckCircle className="w-8 h-8 text-emerald-500/50 mx-auto mb-2" />
+              <p className="text-xs text-muted-foreground">Sem solicitações em risco.</p>
+            </div>
+          ) : (
+            <ul className="divide-y divide-border -mx-1">
+              {solicitacoesEmRisco.slice(0, 6).map(({ sol, diff }) => {
+                const overdue = diff < 0;
+                const today = diff === 0;
+                const tCfg = tipoConfig[sol.tipo];
+                return (
+                  <li key={sol.id}>
+                    <Link
+                      to={`/gap/solicitacoes/${sol.id}`}
+                      className={cn(
+                        "flex items-center gap-3 px-1 py-2.5 hover:bg-muted/40 rounded-md transition-colors"
+                      )}
+                    >
+                      <div className={cn(
+                        "w-9 h-9 rounded-md flex items-center justify-center shrink-0",
+                        overdue ? "bg-destructive/10 text-destructive" :
+                        today ? "bg-amber-100 text-amber-700" :
+                        "bg-muted text-muted-foreground"
+                      )}>
+                        <span className="text-sm font-bold tabular-nums">{Math.abs(diff)}</span>
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs font-semibold text-foreground truncate">{tCfg?.label ?? sol.tipo}</p>
+                        <p className="text-[11px] text-muted-foreground truncate">
+                          {sol.estudante} · {destinoConfig[sol.destino].label}
+                        </p>
+                      </div>
+                      <span className={cn(
+                        "text-[10px] font-semibold tabular-nums whitespace-nowrap",
+                        overdue ? "text-destructive" : today ? "text-amber-600" : "text-muted-foreground"
+                      )}>
+                        {overdue ? `${Math.abs(diff)}d atraso` : today ? "hoje" : `em ${diff}d`}
+                      </span>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
         </Card>
       </div>
     </div>
