@@ -113,19 +113,20 @@ export default function GapAtendimentos() {
         if (a.data !== b.data) return b.data.localeCompare(a.data);
         return a.hora.localeCompare(b.hora);
       });
-  }, [search, categoria, periodo]);
+  }, [search, categoria, motivoFilter, periodo]);
 
   // Calendar helpers — calendar respects search + category + estado filters (NOT periodo)
   const calendarFiltered = useMemo(() => {
     return gapAtendimentos
       .filter(a => categoria === "todas" || a.categoria === categoria)
+      .filter(a => motivoFilter === "todos" || a.motivo === motivoFilter)
       .filter(a => a.estado !== "cancelado")
       .filter(a => {
         if (!search) return true;
         const s = search.toLowerCase();
         return a.estudante.toLowerCase().includes(s) || a.matricula.includes(search) || a.motivo.toLowerCase().includes(s);
       });
-  }, [search, categoria]);
+  }, [search, categoria, motivoFilter]);
 
   const calendarDays = useMemo(() => {
     const first = new Date(calYear, calMonth, 1);
