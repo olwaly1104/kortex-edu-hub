@@ -195,7 +195,7 @@ export default function GapEstudantes() {
                       {e.abertos > 0 && <div className="text-[10px] text-orange-600">{e.abertos} aberta{e.abertos > 1 ? "s" : ""}</div>}
                     </TableCell>
                     <TableCell className="text-center">
-                      <span className="text-sm font-semibold text-foreground">{(e.proxAg ? 1 : 0) + (gapAtendimentos.filter(a => a.matricula === e.matricula).length)}</span>
+                      <span className="text-sm font-semibold text-foreground">{gapAtendimentos.filter(a => a.matricula === e.matricula).length}</span>
                     </TableCell>
                     <TableCell>
                       <Badge variant="outline" className={`text-[10px] gap-1 ${r.color}`}>
