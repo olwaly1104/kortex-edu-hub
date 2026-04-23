@@ -311,11 +311,27 @@ export default function GapAtendimentos() {
             </SelectContent>
           </Select>
 
-          {(categoria !== "todas" || search) && (
+          <Select value={motivoFilter} onValueChange={setMotivoFilter}>
+            <SelectTrigger className={cn(
+              "w-[220px] h-9 text-xs",
+              motivoFilter !== "todos" && "border-primary text-primary"
+            )}>
+              <FileText className="w-3 h-3 mr-1.5 shrink-0" />
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="max-h-[280px]">
+              <SelectItem value="todos">Todos os motivos</SelectItem>
+              {motivosUnicos.map(m => (
+                <SelectItem key={m} value={m} className="text-xs">{m}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          {(categoria !== "todas" || motivoFilter !== "todos" || search) && (
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => { setCategoria("todas"); setSearch(""); }}
+              onClick={() => { setCategoria("todas"); setMotivoFilter("todos"); setSearch(""); }}
               className="h-9 px-2.5 text-xs text-muted-foreground hover:text-foreground gap-1"
             >
               <X className="w-3 h-3" /> Limpar
