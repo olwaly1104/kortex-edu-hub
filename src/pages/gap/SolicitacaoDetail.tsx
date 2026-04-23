@@ -284,7 +284,12 @@ export default function GapSolicitacaoDetail() {
                           {s.data && <span className="text-[10px] text-muted-foreground tabular-nums whitespace-nowrap">{s.data}</span>}
                         </div>
                         {s.actor && <p className="text-[11px] text-muted-foreground mt-0.5">{s.actor}</p>}
-                        {s.aside && <p className="mt-1.5 text-[11px] text-muted-foreground/90 italic">{s.aside}</p>}
+                        {s.aside && (
+                          <p className={cn(
+                            "mt-1.5 text-[11px] italic",
+                            s.aside.includes("atraso") ? "text-red-600 font-semibold not-italic" : "text-muted-foreground/90"
+                          )}>{s.aside}</p>
+                        )}
                         {s.nota && <p className="mt-2 text-xs text-foreground/75 leading-relaxed pl-3 border-l-2 border-border">{s.nota}</p>}
                       </div>
                     </li>
