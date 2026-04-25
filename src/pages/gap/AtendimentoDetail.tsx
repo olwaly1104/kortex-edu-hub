@@ -51,6 +51,36 @@ export default function GapAtendimentoDetail() {
 
   if (!atendimento) {
     return (
+      <div className="p-8 max-w-5xl mx-auto">
+        <Button variant="ghost" size="sm" onClick={() => navigate("/gap/agendamentos")} className="gap-1.5 mb-4">
+          <ArrowLeft className="w-4 h-4" /> Voltar aos agendamentos
+        </Button>
+        <div className="rounded-xl border border-border bg-card p-12 text-center">
+          <CalendarIcon className="w-10 h-10 text-muted-foreground/40 mx-auto mb-3" />
+          <p className="text-sm text-muted-foreground">Agendamento não encontrado.</p>
+        </div>
+      </div>
+    );
+  }
+
+  const cat = categoriaConfig[atendimento.categoria];
+  const est = estadoConfig[atendimento.estado];
+  const d = new Date(atendimento.data);
+  const startTime = atendimento.hora;
+  const endTime = addMinutesToHHMM(atendimento.hora, parseDuracaoMin(atendimento.duracao));
+  const initials = atendimento.estudante.split(" ").slice(0, 2).map(n => n[0]).join("");
+  const ModalityIcon = atendimento.tipo === "online" ? Video : MapPin;
+
+  const dayNum = d.getDate();
+  const monthShort = d.toLocaleDateString("pt-AO", { month: "short" }).replace(".", "").toUpperCase();
+  const weekday = d.toLocaleDateString("pt-AO", { weekday: "long" });
+  const fullDate = d.toLocaleDateString("pt-AO", { day: "2-digit", month: "long", year: "numeric" });
+
+  const handleAction = (action: string) => {
+    toast({ title: action, description: `Acção registada para ${atendimento.id}.` });
+  };
+
+  return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       <Link to="/gap/agendamentos" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
         <ArrowLeft className="w-4 h-4" /> Voltar a Agendamentos
