@@ -212,40 +212,53 @@ export default function GapAtendimentoDetail() {
 
 /* ────────────── Helpers ────────────── */
 
-function InfoCell({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
-    <div className="px-6 py-4 flex items-center gap-3">
-      <div className="w-9 h-9 rounded-lg bg-background border border-border flex items-center justify-center text-muted-foreground shrink-0">
+    <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold mb-2">
+      {children}
+    </p>
+  );
+}
+
+function DetailCell({ icon, label, value, sub }: { icon: React.ReactNode; label: string; value: string; sub?: string }) {
+  return (
+    <div className="p-4 border-b sm:border-r border-border last:border-b-0 sm:[&:nth-child(2n)]:border-r-0 lg:[&:nth-child(2n)]:border-r lg:last:border-r-0 lg:border-b-0">
+      <div className="flex items-center gap-1.5 text-muted-foreground mb-2">
         {icon}
+        <p className="text-[10px] uppercase tracking-wider font-semibold">{label}</p>
       </div>
-      <div className="min-w-0">
-        <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">{label}</p>
-        <p className="text-[13px] font-medium text-foreground truncate mt-0.5">{value}</p>
-      </div>
+      <p className="text-sm font-semibold text-foreground leading-tight truncate">{value}</p>
+      {sub && <p className="text-[11px] text-muted-foreground mt-0.5 truncate">{sub}</p>}
     </div>
   );
 }
 
-function Block({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) {
+function LabeledBlock({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) {
   return (
     <section>
-      <div className="flex items-center gap-1.5 text-muted-foreground mb-2.5">
+      <div className="flex items-center gap-2 mb-2.5 text-muted-foreground">
         {icon}
-        <h2 className="text-[11px] uppercase tracking-[0.15em] font-bold">{title}</h2>
+        <h3 className="text-[11px] uppercase tracking-[0.1em] font-semibold">{title}</h3>
       </div>
       {children}
     </section>
   );
 }
 
-function MiniRow({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+function SideRow({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
     <div className="flex items-start gap-2.5">
       <span className="text-muted-foreground mt-0.5 shrink-0">{icon}</span>
-      <div className="min-w-0 flex-1">
-        <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">{label}</p>
-        <p className="text-[12.5px] text-foreground font-medium leading-snug">{value}</p>
-      </div>
+      <MiniRow label={label} value={value} />
+    </div>
+  );
+}
+
+function MiniRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="min-w-0 flex-1 flex items-baseline justify-between gap-2">
+      <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium shrink-0">{label}</span>
+      <span className="text-[11px] font-medium text-foreground text-right truncate">{value}</span>
     </div>
   );
 }
@@ -255,9 +268,9 @@ function ContactBtn({ icon, label, onClick }: { icon: React.ReactNode; label: st
     <button
       type="button"
       onClick={onClick}
-      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12.5px] font-medium text-foreground/80 hover:text-primary hover:bg-primary/5 transition-colors border border-transparent hover:border-primary/20"
+      className="inline-flex items-center justify-center gap-1.5 rounded-md border border-border bg-background px-2 py-1.5 text-[11px] font-medium text-foreground hover:text-primary hover:border-primary/25 hover:bg-primary/5 transition-colors"
     >
-      <span className="text-muted-foreground">{icon}</span>
+      <span className="text-muted-foreground shrink-0">{icon}</span>
       {label}
     </button>
   );
