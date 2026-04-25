@@ -105,11 +105,12 @@ export default function GapAtendimentoDetail() {
           </button>
         </div>
 
-        {/* HERO CARD */}
-        <div className="rounded-2xl bg-card border border-border shadow-sm overflow-hidden">
-          <div className="p-6 lg:p-7">
+        {/* UNIFIED CARD */}
+        <article className="rounded-2xl bg-card border border-border shadow-sm overflow-hidden">
+          {/* Header */}
+          <header className="p-6 lg:p-7 border-b border-border">
             <div className="flex items-start gap-5">
-              {/* Date block */}
+              {/* Date tile */}
               <div className={cn(
                 "shrink-0 w-[78px] rounded-xl border overflow-hidden text-center bg-background",
                 isToday ? "border-primary/40 ring-2 ring-primary/10" : "border-border"
@@ -124,7 +125,7 @@ export default function GapAtendimentoDetail() {
                 <div className="text-[10px] text-muted-foreground pb-2 capitalize">{weekday.slice(0, 3)}</div>
               </div>
 
-              {/* Title block */}
+              {/* Title */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-2.5 flex-wrap">
                   <span className={cn("inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold", est.pill)}>
@@ -133,9 +134,7 @@ export default function GapAtendimentoDetail() {
                   </span>
                   <Badge variant="outline" className={cn("text-[10px] font-medium", cat.color)}>{cat.label}</Badge>
                   {isToday && atendimento.estado === "agendado" && (
-                    <Badge variant="outline" className="text-[10px] border-primary/30 text-primary bg-primary/5 font-semibold">
-                      Hoje
-                    </Badge>
+                    <Badge variant="outline" className="text-[10px] border-primary/30 text-primary bg-primary/5 font-semibold">Hoje</Badge>
                   )}
                 </div>
                 <h1 className="text-[22px] lg:text-[24px] font-semibold leading-tight tracking-tight text-foreground">
@@ -146,144 +145,149 @@ export default function GapAtendimentoDetail() {
                 </p>
               </div>
             </div>
+          </header>
 
-            {/* Compact horizontal facts strip */}
-            <div className="mt-6 grid grid-cols-2 lg:grid-cols-4 gap-px bg-border rounded-xl overflow-hidden border border-border">
-              <FactCell
-                icon={<Clock className="w-3.5 h-3.5" />}
-                label="Horário"
-                value={`${startTime} – ${endTime}`}
-                hint={atendimento.duracao}
-              />
-              <FactCell
-                icon={<ModalityIcon className="w-3.5 h-3.5" />}
-                label="Modalidade"
-                value={atendimento.tipo === "online" ? "Online" : "Presencial"}
-                hint={atendimento.tipo === "online" ? "Videochamada" : "Presencial"}
-              />
-              <FactCell
-                icon={<DoorOpen className="w-3.5 h-3.5" />}
-                label="Local"
-                value={atendimento.tipo === "online" ? "Sessão remota" : (atendimento.sala ?? "—")}
-                hint={atendimento.tipo === "online" ? "Link no email" : "Gabinete"}
-              />
-              <FactCell
-                icon={<User className="w-3.5 h-3.5" />}
-                label="Responsável"
-                value={atendimento.responsavel.replace(/^(Dr\.|Dra\.)\s+/, "")}
-                hint={atendimento.responsavel.startsWith("Dra.") ? "Dra." : "Dr."}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* CONTENT GRID */}
-        <div className="grid lg:grid-cols-3 gap-5">
-          {/* Left: session details + notes */}
-          <div className="lg:col-span-2 space-y-5">
-            {/* Motivo + Descrição as a single editorial block */}
-            <Section title="Sobre a sessão">
-              <div className="space-y-5">
-                <div>
-                  <Label>Motivo</Label>
-                  <p className="text-[15px] font-medium text-foreground leading-snug">{atendimento.motivo}</p>
-                </div>
-                <div className="border-t border-border" />
-                <div>
-                  <Label>Descrição</Label>
-                  {atendimento.descricao ? (
-                    <p className="text-[14px] text-foreground/85 leading-relaxed">{atendimento.descricao}</p>
-                  ) : (
-                    <p className="text-[14px] text-muted-foreground/60 italic">Sem descrição adicional.</p>
-                  )}
-                </div>
-              </div>
-            </Section>
-
-            {atendimento.notas && (
-              <Section title="Notas do profissional" tone="emerald">
-                <p className="text-[14px] text-foreground/85 leading-relaxed italic">"{atendimento.notas}"</p>
-              </Section>
-            )}
+          {/* Facts strip */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 divide-x divide-border border-b border-border bg-muted/15">
+            <FactCell
+              icon={<Clock className="w-3.5 h-3.5" />}
+              label="Horário"
+              value={`${startTime} – ${endTime}`}
+              hint={atendimento.duracao}
+            />
+            <FactCell
+              icon={<ModalityIcon className="w-3.5 h-3.5" />}
+              label="Modalidade"
+              value={atendimento.tipo === "online" ? "Online" : "Presencial"}
+              hint={atendimento.tipo === "online" ? "Videochamada" : "No campus"}
+            />
+            <FactCell
+              icon={<DoorOpen className="w-3.5 h-3.5" />}
+              label="Local"
+              value={atendimento.tipo === "online" ? "Sessão remota" : (atendimento.sala ?? "—")}
+              hint={atendimento.tipo === "online" ? "Link no email" : "Gabinete"}
+            />
+            <FactCell
+              icon={<User className="w-3.5 h-3.5" />}
+              label="Responsável"
+              value={atendimento.responsavel.replace(/^(Dr\.|Dra\.)\s+/, "")}
+              hint={atendimento.responsavel.startsWith("Dra.") ? "Dra." : "Dr."}
+            />
           </div>
 
-          {/* Right: student + actions */}
-          <div className="space-y-5">
-            {/* Student card */}
-            <div className="rounded-xl bg-card border border-border overflow-hidden">
-              <div className="px-4 pt-4 pb-3 flex items-start gap-3">
+          {/* Body — split: Estudante | Sessão */}
+          <div className="grid lg:grid-cols-[300px_1fr] divide-y lg:divide-y-0 lg:divide-x divide-border">
+            {/* LEFT — Estudante */}
+            <aside className="p-6">
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-4">Estudante</p>
+
+              <div className="flex items-start gap-3 mb-4">
                 <Link
                   to={`/gap/estudantes/${atendimento.matricula}`}
-                  className="w-11 h-11 rounded-full bg-gradient-to-br from-primary to-primary/70 text-primary-foreground flex items-center justify-center shrink-0 font-semibold text-[13px] hover:opacity-90 transition-opacity shadow-sm"
+                  className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary/70 text-primary-foreground flex items-center justify-center shrink-0 font-semibold text-[14px] hover:opacity-90 transition-opacity shadow-sm"
                 >
                   {initials}
                 </Link>
                 <div className="min-w-0 flex-1">
                   <Link
                     to={`/gap/estudantes/${atendimento.matricula}`}
-                    className="text-[14px] font-semibold text-foreground hover:text-primary transition-colors block truncate leading-tight"
+                    className="text-[14px] font-semibold text-foreground hover:text-primary transition-colors block leading-tight"
                   >
                     {atendimento.estudante}
                   </Link>
                   <p className="text-[11px] text-muted-foreground font-mono mt-0.5">{atendimento.matricula}</p>
                 </div>
               </div>
-              <div className="px-4 pb-3 space-y-1.5">
+
+              <dl className="space-y-2 mb-4">
                 <Row label="Curso" value={atendimento.curso} />
                 <Row label="Faculdade" value={atendimento.faculdade} />
                 <Row label="Ano" value={`${atendimento.ano}º ano`} />
-              </div>
-              <div className="border-t border-border bg-muted/40 px-2 py-2 flex items-center gap-1">
+              </dl>
+
+              <div className="flex items-center gap-1 -mx-1">
                 <ContactBtn icon={<MessageSquare className="w-3.5 h-3.5" />} label="Chat" onClick={() => handleAction("Chat aberto")} />
                 <ContactBtn icon={<Mail className="w-3.5 h-3.5" />} label="Email" onClick={() => handleAction("Email enviado")} />
                 <ContactBtn icon={<Phone className="w-3.5 h-3.5" />} label="Ligar" onClick={() => handleAction("Chamada iniciada")} />
               </div>
-            </div>
+            </aside>
 
-            {/* Actions */}
-            {atendimento.estado === "agendado" && (
-              <div className="rounded-xl bg-card border border-border p-4 space-y-2">
-                <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-2">Acções</p>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="w-full justify-start gap-2 rounded-lg h-9"
-                  onClick={() => handleAction("Sessão remarcada")}
-                >
+            {/* RIGHT — Sessão */}
+            <div className="p-6 space-y-5">
+              <div>
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-4">Sobre a sessão</p>
+                <div className="space-y-4">
+                  <div>
+                    <Label>Motivo</Label>
+                    <p className="text-[14px] font-medium text-foreground leading-snug">{atendimento.motivo}</p>
+                  </div>
+                  <div className="border-t border-border" />
+                  <div>
+                    <Label>Descrição</Label>
+                    {atendimento.descricao ? (
+                      <p className="text-[13.5px] text-foreground/85 leading-relaxed">{atendimento.descricao}</p>
+                    ) : (
+                      <p className="text-[13.5px] text-muted-foreground/60 italic">Sem descrição adicional.</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {atendimento.notas && (
+                <div className="rounded-lg border border-emerald-200/70 bg-emerald-50/40 px-4 py-3">
+                  <p className="text-[10px] uppercase tracking-wider text-emerald-800 font-semibold mb-1.5">Notas do profissional</p>
+                  <p className="text-[13px] text-emerald-900/85 leading-relaxed italic">"{atendimento.notas}"</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Footer — actions / status */}
+          {atendimento.estado === "agendado" && (
+            <footer className="px-6 py-4 border-t border-border bg-muted/20 flex items-center justify-between gap-3 flex-wrap">
+              <p className="text-[11px] text-muted-foreground leading-snug">
+                Será concluída automaticamente após o horário previsto.
+              </p>
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm" className="gap-1.5 rounded-lg h-9" onClick={() => handleAction("Sessão remarcada")}>
                   <CalendarIcon className="w-3.5 h-3.5" /> Remarcar
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
-                  className="w-full justify-start border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-300 gap-2 rounded-lg h-9"
+                  className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-300 gap-1.5 rounded-lg h-9"
                   onClick={() => handleAction("Sessão cancelada")}
                 >
                   <X className="w-3.5 h-3.5" /> Cancelar
                 </Button>
-                <p className="text-[11px] text-muted-foreground leading-snug pt-1.5">
-                  Será concluída automaticamente após o horário previsto.
-                </p>
               </div>
-            )}
+            </footer>
+          )}
 
-            {atendimento.estado === "concluido" && (
-              <StatusBlock
-                tone="emerald"
-                icon={<CheckCircle2 className="w-4 h-4" />}
-                title="Sessão concluída"
-                subtitle={`${fullDate} · ${startTime}–${endTime}`}
-              />
-            )}
-            {atendimento.estado === "cancelado" && (
-              <StatusBlock
-                tone="red"
-                icon={<X className="w-4 h-4" />}
-                title="Sessão cancelada"
-                subtitle="Este agendamento não foi realizado."
-              />
-            )}
-          </div>
-        </div>
+          {atendimento.estado === "concluido" && (
+            <footer className="px-6 py-4 border-t border-emerald-200 bg-emerald-50/60 flex items-center gap-3">
+              <div className="w-9 h-9 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+                <CheckCircle2 className="w-4 h-4" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-emerald-900">Sessão concluída</p>
+                <p className="text-[11px] text-emerald-700/80">{fullDate} · {startTime}–{endTime}</p>
+              </div>
+            </footer>
+          )}
+
+          {atendimento.estado === "cancelado" && (
+            <footer className="px-6 py-4 border-t border-red-200 bg-red-50/60 flex items-center gap-3">
+              <div className="w-9 h-9 rounded-full bg-red-100 text-red-600 flex items-center justify-center shrink-0">
+                <X className="w-4 h-4" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-red-900">Sessão cancelada</p>
+                <p className="text-[11px] text-red-700/80">Este agendamento não foi realizado.</p>
+              </div>
+            </footer>
+          )}
+        </article>
       </div>
     </div>
   );
