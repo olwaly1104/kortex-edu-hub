@@ -51,216 +51,161 @@ export default function GapAtendimentoDetail() {
 
   if (!atendimento) {
     return (
-      <div className="p-8 max-w-5xl mx-auto">
-        <Button variant="ghost" size="sm" onClick={() => navigate("/gap/agendamentos")} className="gap-1.5 mb-4">
-          <ArrowLeft className="w-4 h-4" /> Voltar aos agendamentos
-        </Button>
-        <div className="rounded-xl border border-border bg-card p-12 text-center">
-          <CalendarIcon className="w-10 h-10 text-muted-foreground/40 mx-auto mb-3" />
-          <p className="text-sm text-muted-foreground">Agendamento não encontrado.</p>
-        </div>
-      </div>
-    );
-  }
+    <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
+      <Link to="/gap/agendamentos" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
+        <ArrowLeft className="w-4 h-4" /> Voltar a Agendamentos
+      </Link>
 
-  const cat = categoriaConfig[atendimento.categoria];
-  const est = estadoConfig[atendimento.estado];
-  const d = new Date(atendimento.data);
-  const startTime = atendimento.hora;
-  const endTime = addMinutesToHHMM(atendimento.hora, parseDuracaoMin(atendimento.duracao));
-  const isToday = atendimento.data === TODAY;
-  const initials = atendimento.estudante.split(" ").slice(0, 2).map(n => n[0]).join("");
-  const ModalityIcon = atendimento.tipo === "online" ? Video : MapPin;
-
-  const dayNum = d.getDate();
-  const monthShort = d.toLocaleDateString("pt-AO", { month: "short" }).replace(".", "").toUpperCase();
-  const weekday = d.toLocaleDateString("pt-AO", { weekday: "long" });
-  const fullDate = d.toLocaleDateString("pt-AO", { day: "2-digit", month: "long", year: "numeric" });
-
-  const handleAction = (action: string) => {
-    toast({ title: action, description: `Acção registada para ${atendimento.id}.` });
-  };
-
-  return (
-    <div className="min-h-screen bg-muted/30 py-6 px-4 lg:px-8">
-      <div className="max-w-5xl mx-auto">
-        {/* Back link */}
-        <button
-          onClick={() => navigate("/gap/agendamentos")}
-          className="inline-flex items-center gap-1.5 text-[12.5px] text-muted-foreground hover:text-foreground transition-colors mb-4"
-        >
-          <ArrowLeft className="w-3.5 h-3.5" />
-          Agendamentos
-          <span className="text-muted-foreground/40 mx-1">/</span>
-          <span className="font-mono text-foreground">{atendimento.id}</span>
-        </button>
-
-        {/* ─── UNIFIED CARD ─── */}
-        <article className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
-          {/* HEADER — date tile + title + status */}
-          <header className="relative p-6 lg:p-8 border-b border-border">
-            <div className={cn("absolute top-0 left-0 right-0 h-1", est.bar)} />
-
-            <div className="flex items-start gap-5">
-              {/* Date tile */}
-              <div className={cn("shrink-0 w-20 text-center rounded-xl border-2 overflow-hidden bg-background ring-4", est.ring)}
-                style={{ borderColor: "transparent" }}
-              >
-                <div className={cn("text-[10px] font-bold tracking-widest text-white py-1", est.bar)}>
-                  {monthShort}
-                </div>
-                <div className="py-2">
-                  <div className="text-3xl font-bold text-foreground tabular-nums leading-none">{dayNum}</div>
-                  <div className="text-[10px] text-muted-foreground capitalize mt-1 px-1 truncate">{weekday}</div>
-                </div>
-              </div>
-
-              {/* Title block */}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-2 flex-wrap">
-                  <span className={cn("inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold", est.pill)}>
-                    <span className={cn("w-1.5 h-1.5 rounded-full", est.dot)} />
-                    {est.label}
-                  </span>
-                  <Badge variant="outline" className={cn("text-[10px] font-medium", cat.color)}>{cat.label}</Badge>
-                  {isToday && atendimento.estado === "agendado" && (
-                    <Badge variant="outline" className="text-[10px] border-primary/30 text-primary bg-primary/5 font-semibold">Hoje</Badge>
-                  )}
-                </div>
-                <h1 className="text-[20px] lg:text-[24px] font-semibold leading-tight tracking-tight text-foreground">
-                  {atendimento.motivo}
-                </h1>
-                <div className="flex items-center gap-2 mt-2 text-[13px] text-muted-foreground">
-                  <Clock className="w-3.5 h-3.5" />
-                  <span className="font-medium text-foreground tabular-nums">{startTime} – {endTime}</span>
-                  <span className="text-muted-foreground/50">·</span>
-                  <span>{atendimento.duracao}</span>
-                </div>
-              </div>
-
-              {/* Quick actions */}
-              {atendimento.estado === "agendado" && (
-                <div className="hidden md:flex items-center gap-2 shrink-0">
-                  <Button variant="outline" size="sm" className="gap-1.5 h-9 rounded-lg" onClick={() => handleAction("Sessão remarcada")}>
-                    <CalendarIcon className="w-3.5 h-3.5" /> Remarcar
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-300 gap-1.5 h-9 rounded-lg"
-                    onClick={() => handleAction("Sessão cancelada")}
-                  >
-                    <X className="w-3.5 h-3.5" /> Cancelar
-                  </Button>
-                </div>
-              )}
-            </div>
-          </header>
-
-          {/* INFO STRIP — 3 cells */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-border bg-muted/20">
-            <InfoCell icon={<ModalityIcon className="w-4 h-4" />} label="Modalidade" value={atendimento.tipo === "online" ? "Sessão Online" : "Presencial"} />
-            <InfoCell icon={<DoorOpen className="w-4 h-4" />} label="Local" value={atendimento.tipo === "presencial" && atendimento.sala ? atendimento.sala : "—"} />
-            <InfoCell icon={<User className="w-4 h-4" />} label="Responsável" value={atendimento.responsavel} />
+      <article className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+        {/* Top bar */}
+        <div className="flex items-center justify-between gap-3 px-6 py-3 border-b border-border bg-muted/20">
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="text-[11px] font-mono text-muted-foreground shrink-0">{atendimento.id}</span>
+            <span className="text-muted-foreground/40">·</span>
+            <span className="text-[11px] font-medium text-muted-foreground truncate">Agendamento GAP</span>
           </div>
+          <Badge variant="outline" className={cn("text-[11px] font-medium px-2.5 py-0.5", est.pill)}>
+            {est.label}
+          </Badge>
+        </div>
 
-          {/* BODY — 2 columns */}
-          <div className="grid lg:grid-cols-[1fr_280px] divide-y lg:divide-y-0 lg:divide-x divide-border">
-            {/* LEFT — session content */}
-            <div className="p-6 lg:p-8 space-y-6 min-w-0">
-              <Block icon={<FileText className="w-3.5 h-3.5" />} title="Descrição">
+        {/* Title block */}
+        <div className="px-6 pt-5 pb-5 border-b border-border">
+          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+            <div className="min-w-0 flex-1">
+              <p className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground font-semibold mb-2">Sessão</p>
+              <h1 className="text-xl font-semibold leading-tight tracking-tight text-foreground">
+                {atendimento.motivo}
+              </h1>
+              <p className="text-sm text-muted-foreground mt-1 capitalize">{weekday}, {fullDate}</p>
+            </div>
+
+            {atendimento.estado === "agendado" && (
+              <div className="flex items-center gap-2 shrink-0">
+                <Button variant="outline" size="sm" className="h-8 px-3 text-[12px] gap-1.5" onClick={() => handleAction("Sessão remarcada")}>
+                  <CalendarIcon className="w-3.5 h-3.5" /> Remarcar
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 px-3 text-[12px] gap-1.5 border-destructive/25 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                  onClick={() => handleAction("Sessão cancelada")}
+                >
+                  <X className="w-3.5 h-3.5" /> Cancelar
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Body — same structure as Solicitações: Estudante left, Sessão right */}
+        <div className="grid md:grid-cols-[280px_1fr] divide-y md:divide-y-0 md:divide-x divide-border">
+          {/* LEFT — estudante */}
+          <aside className="p-5 space-y-5 bg-muted/15">
+            <section>
+              <SectionTitle>Estudante</SectionTitle>
+              <Link
+                to={`/gap/estudantes/${atendimento.matricula}`}
+                className="flex items-start gap-3 w-full text-left hover:bg-muted/40 -mx-2 px-2 py-1.5 rounded-md transition-colors group"
+              >
+                <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 font-semibold text-xs ring-1 ring-primary/15">
+                  {initials}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold text-foreground leading-tight group-hover:text-primary transition-colors">{atendimento.estudante}</p>
+                  <p className="text-[11px] text-muted-foreground mt-0.5 font-mono">{atendimento.matricula}</p>
+                </div>
+              </Link>
+
+              <div className="grid grid-cols-3 gap-2 mt-3">
+                <ContactBtn icon={<MessageSquare className="w-3 h-3" />} label="Chat" onClick={() => handleAction("Chat aberto")} />
+                <ContactBtn icon={<Mail className="w-3 h-3" />} label="Email" onClick={() => handleAction("Email enviado")} />
+                <ContactBtn icon={<Phone className="w-3 h-3" />} label="Ligar" onClick={() => handleAction("Chamada iniciada")} />
+              </div>
+            </section>
+
+            <section className="pt-4 border-t border-border">
+              <SectionTitle>Dados académicos</SectionTitle>
+              <div className="space-y-2.5">
+                <SideRow icon={<Hash className="w-3.5 h-3.5" />} label="Ano" value={`${atendimento.ano}º`} />
+                <SideRow icon={<BookOpen className="w-3.5 h-3.5" />} label="Curso" value={atendimento.curso} />
+                <SideRow icon={<GraduationCap className="w-3.5 h-3.5" />} label="Faculdade" value={atendimento.faculdade} />
+              </div>
+            </section>
+
+            <section className="pt-4 border-t border-border">
+              <SectionTitle>Resumo</SectionTitle>
+              <div className="space-y-2">
+                <MiniRow label="Categoria" value={cat.label} />
+                <MiniRow label="Estado" value={est.label} />
+                <MiniRow label="Responsável" value={atendimento.responsavel} />
+              </div>
+            </section>
+          </aside>
+
+          {/* RIGHT — sessão */}
+          <main className="p-6 space-y-6 min-w-0">
+            <section>
+              <div className="flex items-center gap-2 mb-4">
+                <CalendarIcon className="w-3.5 h-3.5 text-muted-foreground" />
+                <h2 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Detalhes da sessão</h2>
+              </div>
+
+              <div className="grid sm:grid-cols-2 lg:grid-cols-4 border border-border rounded-lg overflow-hidden bg-background">
+                <DetailCell icon={<Clock className="w-3.5 h-3.5" />} label="Horário" value={`${startTime} – ${endTime}`} sub={atendimento.duracao} />
+                <DetailCell icon={<CalendarIcon className="w-3.5 h-3.5" />} label="Data" value={`${dayNum} ${monthShort}`} sub={fullDate} />
+                <DetailCell icon={<ModalityIcon className="w-3.5 h-3.5" />} label="Modalidade" value={atendimento.tipo === "online" ? "Online" : "Presencial"} />
+                <DetailCell icon={<DoorOpen className="w-3.5 h-3.5" />} label="Local" value={atendimento.tipo === "presencial" && atendimento.sala ? atendimento.sala : "—"} />
+              </div>
+            </section>
+
+            <section className="space-y-4">
+              <LabeledBlock icon={<FileText className="w-3.5 h-3.5" />} title="Motivo">
+                <p className="text-sm font-medium text-foreground leading-relaxed">{atendimento.motivo}</p>
+              </LabeledBlock>
+
+              <LabeledBlock icon={<MessageSquare className="w-3.5 h-3.5" />} title="Descrição">
                 {atendimento.descricao ? (
-                  <p className="text-[14px] text-foreground/85 leading-relaxed">{atendimento.descricao}</p>
+                  <p className="text-sm text-foreground/85 leading-relaxed">{atendimento.descricao}</p>
                 ) : (
-                  <p className="text-[13px] text-muted-foreground/60 italic">Sem descrição adicional.</p>
+                  <p className="text-sm text-muted-foreground italic">Sem descrição adicional.</p>
                 )}
-              </Block>
+              </LabeledBlock>
 
               {atendimento.notas && (
-                <Block icon={<StickyNote className="w-3.5 h-3.5" />} title="Notas do profissional">
-                  <div className="rounded-lg bg-amber-50/60 border border-amber-200/70 px-4 py-3">
-                    <p className="text-[14px] text-amber-950 leading-relaxed italic">"{atendimento.notas}"</p>
-                    <p className="text-[11px] text-amber-700/80 mt-2 not-italic">— {atendimento.responsavel}</p>
+                <LabeledBlock icon={<StickyNote className="w-3.5 h-3.5" />} title="Notas do profissional">
+                  <div className="rounded-lg border border-border bg-muted/20 px-4 py-3">
+                    <p className="text-sm text-foreground/85 leading-relaxed italic">“{atendimento.notas}”</p>
+                    <p className="text-[11px] text-muted-foreground mt-2">— {atendimento.responsavel}</p>
                   </div>
-                </Block>
+                </LabeledBlock>
               )}
+            </section>
 
-              {/* Status footnote */}
+            <section className="border-t border-border pt-4">
+              <SectionTitle>Estado da sessão</SectionTitle>
               {atendimento.estado === "agendado" && (
-                <div className="flex items-start gap-2.5 text-[12.5px] text-muted-foreground bg-muted/40 rounded-lg px-4 py-3 border border-border">
+                <div className="flex items-start gap-2.5 text-[12.5px] text-muted-foreground bg-muted/30 rounded-lg px-4 py-3 border border-border">
                   <Clock className="w-3.5 h-3.5 mt-0.5 shrink-0" />
                   <span>A sessão será marcada como concluída automaticamente após {endTime}.</span>
                 </div>
               )}
               {atendimento.estado === "concluido" && (
-                <div className="flex items-center gap-2.5 text-[13px] text-emerald-900 bg-emerald-50 rounded-lg px-4 py-3 border border-emerald-200">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <div className="flex items-center gap-2.5 text-[13px] text-foreground bg-muted/30 rounded-lg px-4 py-3 border border-border">
+                  <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />
                   <span>Sessão concluída em <span className="font-semibold">{fullDate}</span>.</span>
                 </div>
               )}
               {atendimento.estado === "cancelado" && (
-                <div className="flex items-center gap-2.5 text-[13px] text-red-900 bg-red-50 rounded-lg px-4 py-3 border border-red-200">
-                  <X className="w-4 h-4 text-red-600 shrink-0" />
+                <div className="flex items-center gap-2.5 text-[13px] text-destructive bg-destructive/10 rounded-lg px-4 py-3 border border-destructive/20">
+                  <X className="w-4 h-4 shrink-0" />
                   <span>Este agendamento foi cancelado e não será realizado.</span>
                 </div>
               )}
-            </div>
-
-            {/* RIGHT — student panel */}
-            <aside className="p-6 bg-muted/10 space-y-5">
-              <p className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground font-bold">Estudante</p>
-
-              {/* Profile */}
-              <Link
-                to={`/gap/estudantes/${atendimento.matricula}`}
-                className="flex items-center gap-3 group"
-              >
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary/70 text-primary-foreground flex items-center justify-center font-semibold text-sm shadow-sm shrink-0 group-hover:scale-105 transition-transform">
-                  {initials}
-                </div>
-                <div className="min-w-0">
-                  <p className="text-[14px] font-semibold text-foreground group-hover:text-primary transition-colors leading-tight truncate">
-                    {atendimento.estudante}
-                  </p>
-                  <p className="text-[11px] text-muted-foreground font-mono mt-0.5">{atendimento.matricula}</p>
-                </div>
-              </Link>
-
-              {/* Academic mini-list */}
-              <div className="space-y-2.5 pt-1 border-t border-border pt-4">
-                <MiniRow icon={<BookOpen className="w-3.5 h-3.5" />} label="Curso" value={atendimento.curso} />
-                <MiniRow icon={<GraduationCap className="w-3.5 h-3.5" />} label="Faculdade" value={atendimento.faculdade} />
-                <MiniRow icon={<Hash className="w-3.5 h-3.5" />} label="Ano" value={`${atendimento.ano}º`} />
-              </div>
-
-              {/* Quick contact */}
-              <div className="pt-4 border-t border-border space-y-1.5">
-                <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-2">Contactar</p>
-                <ContactBtn icon={<MessageSquare className="w-3.5 h-3.5" />} label="Chat" onClick={() => handleAction("Chat aberto")} />
-                <ContactBtn icon={<Mail className="w-3.5 h-3.5" />} label="Email" onClick={() => handleAction("Email enviado")} />
-                <ContactBtn icon={<Phone className="w-3.5 h-3.5" />} label="Ligar" onClick={() => handleAction("Chamada iniciada")} />
-              </div>
-
-              {/* Mobile actions */}
-              {atendimento.estado === "agendado" && (
-                <div className="flex md:hidden flex-col gap-2 pt-4 border-t border-border">
-                  <Button variant="outline" size="sm" className="gap-1.5 h-9 rounded-lg w-full" onClick={() => handleAction("Sessão remarcada")}>
-                    <CalendarIcon className="w-3.5 h-3.5" /> Remarcar
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="border-red-200 text-red-600 hover:bg-red-50 gap-1.5 h-9 rounded-lg w-full"
-                    onClick={() => handleAction("Sessão cancelada")}
-                  >
-                    <X className="w-3.5 h-3.5" /> Cancelar
-                  </Button>
-                </div>
-              )}
-            </aside>
-          </div>
-        </article>
-      </div>
+            </section>
+          </main>
+        </div>
+      </article>
     </div>
   );
 }
