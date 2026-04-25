@@ -107,15 +107,28 @@ export default function GapAtendimentoDetail() {
           </Badge>
         </div>
 
-        {/* Title block */}
-        <div className="px-6 pt-5 pb-5">
-          <p className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground font-semibold mb-2">Sessão</p>
-          <h1 className="text-xl font-semibold leading-tight tracking-tight text-foreground">
-            {atendimento.motivo}
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1.5 capitalize">
-            {weekday}, {fullDate} · {startTime}–{endTime} · {atendimento.duracao}
-          </p>
+        {/* Title block with moderate date tile */}
+        <div className="px-6 pt-5 pb-5 flex items-start gap-5">
+          {/* Date tile — moderate size */}
+          <div className="shrink-0 w-[68px] rounded-lg border border-border overflow-hidden bg-background text-center">
+            <div className="bg-primary/90 py-1">
+              <p className="text-[10px] uppercase tracking-[0.15em] text-primary-foreground font-bold">{monthShort}</p>
+            </div>
+            <div className="py-1.5">
+              <p className="text-[28px] leading-none font-bold text-foreground tabular-nums tracking-tight">{dayNum}</p>
+              <p className="text-[9px] uppercase tracking-wider text-muted-foreground font-semibold mt-1 capitalize">{weekday.slice(0, 3)}</p>
+            </div>
+          </div>
+
+          <div className="min-w-0 flex-1 pt-0.5">
+            <p className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground font-semibold mb-1.5">Sessão</p>
+            <h1 className="text-xl font-semibold leading-tight tracking-tight text-foreground">
+              {atendimento.motivo}
+            </h1>
+            <p className="text-sm text-muted-foreground mt-1.5 capitalize">
+              {weekday}, {fullDate} · {startTime}–{endTime} · {atendimento.duracao}
+            </p>
+          </div>
         </div>
 
         {/* Body — Estudante left | Sessão right (one continuous card, just a divider) */}
