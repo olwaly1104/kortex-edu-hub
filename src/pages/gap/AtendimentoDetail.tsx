@@ -6,18 +6,18 @@ import { Button } from "@/components/ui/button";
 import {
   ArrowLeft, Calendar as CalendarIcon, Clock, MapPin, Video,
   CheckCircle2, X, MessageSquare, Mail, Phone,
-  User, DoorOpen, ChevronRight, Quote,
+  User, DoorOpen, GraduationCap, BookOpen, Hash, FileText, StickyNote,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { gapAtendimentos, ticketCategoriaConfig as categoriaConfig } from "@/data/gapData";
 
 const TODAY = "2025-12-16";
 
-const estadoConfig: Record<string, { label: string; pill: string; dot: string; accent: string }> = {
-  agendado:  { label: "Agendado",  pill: "bg-blue-50 text-blue-700 ring-1 ring-blue-200/70",          dot: "bg-blue-500",    accent: "from-blue-500 to-indigo-500" },
-  concluido: { label: "Concluído", pill: "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200/70", dot: "bg-emerald-500", accent: "from-emerald-500 to-teal-500" },
-  cancelado: { label: "Cancelado", pill: "bg-red-50 text-red-700 ring-1 ring-red-200/70",             dot: "bg-red-500",     accent: "from-red-500 to-rose-500" },
-  remarcar:  { label: "Remarcar",  pill: "bg-amber-50 text-amber-700 ring-1 ring-amber-200/70",       dot: "bg-amber-500",   accent: "from-amber-500 to-orange-500" },
+const estadoConfig: Record<string, { label: string; pill: string; dot: string; bar: string; ring: string }> = {
+  agendado:  { label: "Agendado",  pill: "bg-blue-100 text-blue-800",       dot: "bg-blue-500",    bar: "bg-blue-500",    ring: "ring-blue-200" },
+  concluido: { label: "Concluído", pill: "bg-emerald-100 text-emerald-800", dot: "bg-emerald-500", bar: "bg-emerald-500", ring: "ring-emerald-200" },
+  cancelado: { label: "Cancelado", pill: "bg-red-100 text-red-800",         dot: "bg-red-500",     bar: "bg-red-500",     ring: "ring-red-200" },
+  remarcar:  { label: "Remarcar",  pill: "bg-amber-100 text-amber-800",     dot: "bg-amber-500",   bar: "bg-amber-500",   ring: "ring-amber-200" },
 };
 
 function parseDuracaoMin(d: string): number {
@@ -73,7 +73,7 @@ export default function GapAtendimentoDetail() {
   const ModalityIcon = atendimento.tipo === "online" ? Video : MapPin;
 
   const dayNum = d.getDate();
-  const monthName = d.toLocaleDateString("pt-AO", { month: "long" });
+  const monthShort = d.toLocaleDateString("pt-AO", { month: "short" }).replace(".", "").toUpperCase();
   const weekday = d.toLocaleDateString("pt-AO", { weekday: "long" });
   const fullDate = d.toLocaleDateString("pt-AO", { day: "2-digit", month: "long", year: "numeric" });
 
@@ -82,178 +82,184 @@ export default function GapAtendimentoDetail() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* TOP BAR */}
-      <div className="border-b border-border bg-card">
-        <div className="max-w-6xl mx-auto px-6 lg:px-8 h-14 flex items-center justify-between gap-3">
-          <nav className="flex items-center gap-1.5 text-[12.5px] text-muted-foreground">
-            <button
-              onClick={() => navigate("/gap/agendamentos")}
-              className="hover:text-foreground transition-colors flex items-center gap-1.5"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              Agendamentos
-            </button>
-            <ChevronRight className="w-3 h-3 text-muted-foreground/50" />
-            <span className="text-foreground font-medium font-mono">{atendimento.id}</span>
-          </nav>
+    <div className="min-h-screen bg-muted/30 py-6 px-4 lg:px-8">
+      <div className="max-w-5xl mx-auto">
+        {/* Back link */}
+        <button
+          onClick={() => navigate("/gap/agendamentos")}
+          className="inline-flex items-center gap-1.5 text-[12.5px] text-muted-foreground hover:text-foreground transition-colors mb-4"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" />
+          Agendamentos
+          <span className="text-muted-foreground/40 mx-1">/</span>
+          <span className="font-mono text-foreground">{atendimento.id}</span>
+        </button>
 
-          {atendimento.estado === "agendado" && (
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" className="gap-1.5 h-8 rounded-lg" onClick={() => handleAction("Sessão remarcada")}>
-                <CalendarIcon className="w-3.5 h-3.5" /> Remarcar
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-300 gap-1.5 h-8 rounded-lg"
-                onClick={() => handleAction("Sessão cancelada")}
+        {/* ─── UNIFIED CARD ─── */}
+        <article className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
+          {/* HEADER — date tile + title + status */}
+          <header className="relative p-6 lg:p-8 border-b border-border">
+            <div className={cn("absolute top-0 left-0 right-0 h-1", est.bar)} />
+
+            <div className="flex items-start gap-5">
+              {/* Date tile */}
+              <div className={cn("shrink-0 w-20 text-center rounded-xl border-2 overflow-hidden bg-background ring-4", est.ring)}
+                style={{ borderColor: "transparent" }}
               >
-                <X className="w-3.5 h-3.5" /> Cancelar
-              </Button>
+                <div className={cn("text-[10px] font-bold tracking-widest text-white py-1", est.bar)}>
+                  {monthShort}
+                </div>
+                <div className="py-2">
+                  <div className="text-3xl font-bold text-foreground tabular-nums leading-none">{dayNum}</div>
+                  <div className="text-[10px] text-muted-foreground capitalize mt-1 px-1 truncate">{weekday}</div>
+                </div>
+              </div>
+
+              {/* Title block */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-2 flex-wrap">
+                  <span className={cn("inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold", est.pill)}>
+                    <span className={cn("w-1.5 h-1.5 rounded-full", est.dot)} />
+                    {est.label}
+                  </span>
+                  <Badge variant="outline" className={cn("text-[10px] font-medium", cat.color)}>{cat.label}</Badge>
+                  {isToday && atendimento.estado === "agendado" && (
+                    <Badge variant="outline" className="text-[10px] border-primary/30 text-primary bg-primary/5 font-semibold">Hoje</Badge>
+                  )}
+                </div>
+                <h1 className="text-[20px] lg:text-[24px] font-semibold leading-tight tracking-tight text-foreground">
+                  {atendimento.motivo}
+                </h1>
+                <div className="flex items-center gap-2 mt-2 text-[13px] text-muted-foreground">
+                  <Clock className="w-3.5 h-3.5" />
+                  <span className="font-medium text-foreground tabular-nums">{startTime} – {endTime}</span>
+                  <span className="text-muted-foreground/50">·</span>
+                  <span>{atendimento.duracao}</span>
+                </div>
+              </div>
+
+              {/* Quick actions */}
+              {atendimento.estado === "agendado" && (
+                <div className="hidden md:flex items-center gap-2 shrink-0">
+                  <Button variant="outline" size="sm" className="gap-1.5 h-9 rounded-lg" onClick={() => handleAction("Sessão remarcada")}>
+                    <CalendarIcon className="w-3.5 h-3.5" /> Remarcar
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-300 gap-1.5 h-9 rounded-lg"
+                    onClick={() => handleAction("Sessão cancelada")}
+                  >
+                    <X className="w-3.5 h-3.5" /> Cancelar
+                  </Button>
+                </div>
+              )}
             </div>
-          )}
-        </div>
-      </div>
+          </header>
 
-      {/* TWO-COLUMN LAYOUT — left rail (estudante) + right (sessão sheet) */}
-      <div className="max-w-6xl mx-auto px-6 lg:px-8 py-8 grid lg:grid-cols-[300px_1fr] gap-8">
-        {/* ─── LEFT RAIL: ESTUDANTE ─── */}
-        <aside className="space-y-5">
-          {/* Profile block */}
-          <div className="text-center pb-5 border-b border-border">
-            <Link
-              to={`/gap/estudantes/${atendimento.matricula}`}
-              className="inline-block mb-3"
-            >
-              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary to-primary/70 text-primary-foreground flex items-center justify-center font-semibold text-xl shadow-md mx-auto hover:scale-105 transition-transform">
-                {initials}
-              </div>
-            </Link>
-            <Link
-              to={`/gap/estudantes/${atendimento.matricula}`}
-              className="text-[15px] font-semibold text-foreground hover:text-primary transition-colors block leading-tight"
-            >
-              {atendimento.estudante}
-            </Link>
-            <p className="text-[11px] text-muted-foreground font-mono mt-1">Matrícula {atendimento.matricula}</p>
+          {/* INFO STRIP — 3 cells */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-border bg-muted/20">
+            <InfoCell icon={<ModalityIcon className="w-4 h-4" />} label="Modalidade" value={atendimento.tipo === "online" ? "Sessão Online" : "Presencial"} />
+            <InfoCell icon={<DoorOpen className="w-4 h-4" />} label="Local" value={atendimento.tipo === "presencial" && atendimento.sala ? atendimento.sala : "—"} />
+            <InfoCell icon={<User className="w-4 h-4" />} label="Responsável" value={atendimento.responsavel} />
           </div>
 
-          {/* Academic info */}
-          <dl className="space-y-3 pb-5 border-b border-border">
-            <RailRow label="Curso" value={atendimento.curso} />
-            <RailRow label="Faculdade" value={atendimento.faculdade} />
-            <RailRow label="Ano lectivo" value={`${atendimento.ano}º ano`} />
-          </dl>
-
-          {/* Quick contacts */}
-          <div className="space-y-1.5">
-            <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-2">Contactar</p>
-            <RailContact icon={<MessageSquare className="w-3.5 h-3.5" />} label="Iniciar chat" onClick={() => handleAction("Chat aberto")} />
-            <RailContact icon={<Mail className="w-3.5 h-3.5" />} label="Enviar email" onClick={() => handleAction("Email enviado")} />
-            <RailContact icon={<Phone className="w-3.5 h-3.5" />} label="Ligar" onClick={() => handleAction("Chamada iniciada")} />
-          </div>
-        </aside>
-
-        {/* ─── RIGHT: SESSÃO SHEET ─── */}
-        <main className="space-y-7 lg:border-l lg:border-border lg:pl-8 min-w-0">
-          {/* TIME BLOCK — bold, agenda-style */}
-          <div className="flex items-stretch gap-5">
-            {/* Vertical accent bar */}
-            <div className={cn("w-1 rounded-full bg-gradient-to-b shrink-0", est.accent)} />
-
-            <div className="flex-1 min-w-0">
-              <p className="text-[12px] uppercase tracking-[0.15em] text-muted-foreground font-semibold capitalize mb-1">
-                {weekday} · {monthName} {dayNum}
-              </p>
-              <div className="flex items-baseline gap-3 flex-wrap">
-                <span className="text-[40px] lg:text-[44px] font-bold text-foreground tabular-nums leading-none tracking-tight">
-                  {startTime}
-                </span>
-                <span className="text-muted-foreground/50 text-2xl">—</span>
-                <span className="text-[28px] lg:text-[32px] font-semibold text-muted-foreground tabular-nums leading-none">
-                  {endTime}
-                </span>
-                <span className="text-[12px] text-muted-foreground ml-1">· {atendimento.duracao}</span>
-              </div>
-
-              <div className="flex items-center gap-2 mt-3 flex-wrap">
-                <span className={cn("inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold", est.pill)}>
-                  <span className={cn("w-1.5 h-1.5 rounded-full", est.dot)} />
-                  {est.label}
-                </span>
-                <Badge variant="outline" className={cn("text-[10px] font-medium", cat.color)}>{cat.label}</Badge>
-                {isToday && atendimento.estado === "agendado" && (
-                  <Badge variant="outline" className="text-[10px] border-primary/30 text-primary bg-primary/5 font-semibold">Hoje</Badge>
+          {/* BODY — 2 columns */}
+          <div className="grid lg:grid-cols-[1fr_280px] divide-y lg:divide-y-0 lg:divide-x divide-border">
+            {/* LEFT — session content */}
+            <div className="p-6 lg:p-8 space-y-6 min-w-0">
+              <Block icon={<FileText className="w-3.5 h-3.5" />} title="Descrição">
+                {atendimento.descricao ? (
+                  <p className="text-[14px] text-foreground/85 leading-relaxed">{atendimento.descricao}</p>
+                ) : (
+                  <p className="text-[13px] text-muted-foreground/60 italic">Sem descrição adicional.</p>
                 )}
+              </Block>
+
+              {atendimento.notas && (
+                <Block icon={<StickyNote className="w-3.5 h-3.5" />} title="Notas do profissional">
+                  <div className="rounded-lg bg-amber-50/60 border border-amber-200/70 px-4 py-3">
+                    <p className="text-[14px] text-amber-950 leading-relaxed italic">"{atendimento.notas}"</p>
+                    <p className="text-[11px] text-amber-700/80 mt-2 not-italic">— {atendimento.responsavel}</p>
+                  </div>
+                </Block>
+              )}
+
+              {/* Status footnote */}
+              {atendimento.estado === "agendado" && (
+                <div className="flex items-start gap-2.5 text-[12.5px] text-muted-foreground bg-muted/40 rounded-lg px-4 py-3 border border-border">
+                  <Clock className="w-3.5 h-3.5 mt-0.5 shrink-0" />
+                  <span>A sessão será marcada como concluída automaticamente após {endTime}.</span>
+                </div>
+              )}
+              {atendimento.estado === "concluido" && (
+                <div className="flex items-center gap-2.5 text-[13px] text-emerald-900 bg-emerald-50 rounded-lg px-4 py-3 border border-emerald-200">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>Sessão concluída em <span className="font-semibold">{fullDate}</span>.</span>
+                </div>
+              )}
+              {atendimento.estado === "cancelado" && (
+                <div className="flex items-center gap-2.5 text-[13px] text-red-900 bg-red-50 rounded-lg px-4 py-3 border border-red-200">
+                  <X className="w-4 h-4 text-red-600 shrink-0" />
+                  <span>Este agendamento foi cancelado e não será realizado.</span>
+                </div>
+              )}
+            </div>
+
+            {/* RIGHT — student panel */}
+            <aside className="p-6 bg-muted/10 space-y-5">
+              <p className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground font-bold">Estudante</p>
+
+              {/* Profile */}
+              <Link
+                to={`/gap/estudantes/${atendimento.matricula}`}
+                className="flex items-center gap-3 group"
+              >
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary/70 text-primary-foreground flex items-center justify-center font-semibold text-sm shadow-sm shrink-0 group-hover:scale-105 transition-transform">
+                  {initials}
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[14px] font-semibold text-foreground group-hover:text-primary transition-colors leading-tight truncate">
+                    {atendimento.estudante}
+                  </p>
+                  <p className="text-[11px] text-muted-foreground font-mono mt-0.5">{atendimento.matricula}</p>
+                </div>
+              </Link>
+
+              {/* Academic mini-list */}
+              <div className="space-y-2.5 pt-1 border-t border-border pt-4">
+                <MiniRow icon={<BookOpen className="w-3.5 h-3.5" />} label="Curso" value={atendimento.curso} />
+                <MiniRow icon={<GraduationCap className="w-3.5 h-3.5" />} label="Faculdade" value={atendimento.faculdade} />
+                <MiniRow icon={<Hash className="w-3.5 h-3.5" />} label="Ano" value={`${atendimento.ano}º`} />
               </div>
-            </div>
+
+              {/* Quick contact */}
+              <div className="pt-4 border-t border-border space-y-1.5">
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-2">Contactar</p>
+                <ContactBtn icon={<MessageSquare className="w-3.5 h-3.5" />} label="Chat" onClick={() => handleAction("Chat aberto")} />
+                <ContactBtn icon={<Mail className="w-3.5 h-3.5" />} label="Email" onClick={() => handleAction("Email enviado")} />
+                <ContactBtn icon={<Phone className="w-3.5 h-3.5" />} label="Ligar" onClick={() => handleAction("Chamada iniciada")} />
+              </div>
+
+              {/* Mobile actions */}
+              {atendimento.estado === "agendado" && (
+                <div className="flex md:hidden flex-col gap-2 pt-4 border-t border-border">
+                  <Button variant="outline" size="sm" className="gap-1.5 h-9 rounded-lg w-full" onClick={() => handleAction("Sessão remarcada")}>
+                    <CalendarIcon className="w-3.5 h-3.5" /> Remarcar
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="border-red-200 text-red-600 hover:bg-red-50 gap-1.5 h-9 rounded-lg w-full"
+                    onClick={() => handleAction("Sessão cancelada")}
+                  >
+                    <X className="w-3.5 h-3.5" /> Cancelar
+                  </Button>
+                </div>
+              )}
+            </aside>
           </div>
-
-          {/* Logistics inline pills */}
-          <div className="flex flex-wrap gap-2">
-            <LogPill icon={<ModalityIcon className="w-3.5 h-3.5" />} label={atendimento.tipo === "online" ? "Sessão Online" : "Presencial"} />
-            {atendimento.tipo === "presencial" && atendimento.sala && (
-              <LogPill icon={<DoorOpen className="w-3.5 h-3.5" />} label={atendimento.sala} />
-            )}
-            <LogPill icon={<User className="w-3.5 h-3.5" />} label={atendimento.responsavel} />
-          </div>
-
-          <hr className="border-border" />
-
-          {/* MOTIVO — large headline */}
-          <div>
-            <p className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground font-semibold mb-2">Motivo da sessão</p>
-            <h1 className="text-[22px] lg:text-[26px] font-semibold leading-snug tracking-tight text-foreground">
-              {atendimento.motivo}
-            </h1>
-          </div>
-
-          {/* DESCRIÇÃO — prose block */}
-          <div>
-            <p className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground font-semibold mb-3">Descrição</p>
-            {atendimento.descricao ? (
-              <p className="text-[15px] text-foreground/85 leading-[1.7] max-w-prose">
-                {atendimento.descricao}
-              </p>
-            ) : (
-              <p className="text-[14px] text-muted-foreground/60 italic">Sem descrição adicional.</p>
-            )}
-          </div>
-
-          {/* NOTAS — pull-quote style */}
-          {atendimento.notas && (
-            <figure className="relative pl-6 border-l-2 border-emerald-300 max-w-prose">
-              <Quote className="absolute -left-3 top-0 w-5 h-5 text-emerald-400 bg-background p-0.5" />
-              <blockquote className="text-[15px] text-foreground/85 leading-[1.7] italic">
-                {atendimento.notas}
-              </blockquote>
-              <figcaption className="text-[11px] text-muted-foreground mt-2 not-italic">
-                — {atendimento.responsavel}
-              </figcaption>
-            </figure>
-          )}
-
-          {/* STATUS FOOTNOTE */}
-          {atendimento.estado === "agendado" && (
-            <div className="flex items-start gap-2.5 text-[12px] text-muted-foreground bg-muted/40 rounded-lg px-4 py-3 border border-border">
-              <Clock className="w-3.5 h-3.5 mt-0.5 shrink-0" />
-              <span>A sessão será marcada como concluída automaticamente após {endTime}.</span>
-            </div>
-          )}
-          {atendimento.estado === "concluido" && (
-            <div className="flex items-center gap-3 text-[13px] text-emerald-900 bg-emerald-50/70 rounded-lg px-4 py-3 border border-emerald-200">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-              <span>Sessão concluída em <span className="font-semibold">{fullDate}</span> · {startTime}–{endTime}.</span>
-            </div>
-          )}
-          {atendimento.estado === "cancelado" && (
-            <div className="flex items-center gap-3 text-[13px] text-red-900 bg-red-50/70 rounded-lg px-4 py-3 border border-red-200">
-              <X className="w-4 h-4 text-red-600 shrink-0" />
-              <span>Este agendamento foi cancelado e não será realizado.</span>
-            </div>
-          )}
-        </main>
+        </article>
       </div>
     </div>
   );
@@ -261,16 +267,45 @@ export default function GapAtendimentoDetail() {
 
 /* ────────────── Helpers ────────────── */
 
-function RailRow({ label, value }: { label: string; value: string }) {
+function InfoCell({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
-    <div>
-      <dt className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">{label}</dt>
-      <dd className="text-[13px] text-foreground font-medium mt-0.5">{value}</dd>
+    <div className="px-6 py-4 flex items-center gap-3">
+      <div className="w-9 h-9 rounded-lg bg-background border border-border flex items-center justify-center text-muted-foreground shrink-0">
+        {icon}
+      </div>
+      <div className="min-w-0">
+        <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">{label}</p>
+        <p className="text-[13px] font-medium text-foreground truncate mt-0.5">{value}</p>
+      </div>
     </div>
   );
 }
 
-function RailContact({ icon, label, onClick }: { icon: React.ReactNode; label: string; onClick: () => void }) {
+function Block({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) {
+  return (
+    <section>
+      <div className="flex items-center gap-1.5 text-muted-foreground mb-2.5">
+        {icon}
+        <h2 className="text-[11px] uppercase tracking-[0.15em] font-bold">{title}</h2>
+      </div>
+      {children}
+    </section>
+  );
+}
+
+function MiniRow({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+  return (
+    <div className="flex items-start gap-2.5">
+      <span className="text-muted-foreground mt-0.5 shrink-0">{icon}</span>
+      <div className="min-w-0 flex-1">
+        <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">{label}</p>
+        <p className="text-[12.5px] text-foreground font-medium leading-snug">{value}</p>
+      </div>
+    </div>
+  );
+}
+
+function ContactBtn({ icon, label, onClick }: { icon: React.ReactNode; label: string; onClick: () => void }) {
   return (
     <button
       type="button"
@@ -280,14 +315,5 @@ function RailContact({ icon, label, onClick }: { icon: React.ReactNode; label: s
       <span className="text-muted-foreground">{icon}</span>
       {label}
     </button>
-  );
-}
-
-function LogPill({ icon, label }: { icon: React.ReactNode; label: string }) {
-  return (
-    <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-muted/60 border border-border text-[12px] font-medium text-foreground/80">
-      <span className="text-muted-foreground">{icon}</span>
-      {label}
-    </span>
   );
 }
