@@ -72,6 +72,8 @@ export default function GapAtendimentoDetail() {
 
   const weekday = d.toLocaleDateString("pt-AO", { weekday: "long" });
   const fullDate = d.toLocaleDateString("pt-AO", { day: "2-digit", month: "long", year: "numeric" });
+  const dayNum = d.getDate();
+  const monthShort = d.toLocaleDateString("pt-AO", { month: "short" }).replace(".", "").toUpperCase();
 
   const handleAction = (action: string) => {
     toast({ title: action, description: `Acção registada para ${atendimento.id}.` });
