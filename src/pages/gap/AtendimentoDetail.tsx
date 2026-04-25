@@ -335,19 +335,3 @@ function ContactBtn({ icon, label, onClick }: { icon: React.ReactNode; label: st
   );
 }
 
-function StatusBlock({ tone, icon, title, subtitle }: { tone: "emerald" | "red"; icon: React.ReactNode; title: string; subtitle: string }) {
-  const styles = tone === "emerald"
-    ? { box: "border-emerald-200 bg-emerald-50/60", iconBg: "bg-emerald-100 text-emerald-600", title: "text-emerald-900", sub: "text-emerald-700/80" }
-    : { box: "border-red-200 bg-red-50/60", iconBg: "bg-red-100 text-red-600", title: "text-red-900", sub: "text-red-700/80" };
-  return (
-    <div className={cn("rounded-xl border p-4 flex items-center gap-3", styles.box)}>
-      <div className={cn("w-9 h-9 rounded-full flex items-center justify-center shrink-0", styles.iconBg)}>
-        {icon}
-      </div>
-      <div className="min-w-0">
-        <p className={cn("text-sm font-semibold", styles.title)}>{title}</p>
-        <p className={cn("text-[11px]", styles.sub)}>{subtitle}</p>
-      </div>
-    </div>
-  );
-}
