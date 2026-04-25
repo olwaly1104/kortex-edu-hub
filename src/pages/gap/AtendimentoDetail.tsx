@@ -5,19 +5,19 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   ArrowLeft, Calendar as CalendarIcon, Clock, MapPin, Video,
-  FileText, CheckCircle2, X, MessageSquare, Mail, Phone,
-  GraduationCap, Building2, Hash, User, AlertCircle,
+  CheckCircle2, X, MessageSquare, Mail, Phone,
+  GraduationCap, Building2, Hash, User, FileText, DoorOpen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { gapAtendimentos, ticketCategoriaConfig as categoriaConfig } from "@/data/gapData";
 
 const TODAY = "2025-12-16";
 
-const estadoConfig: Record<string, { label: string; color: string; dot: string; bar: string }> = {
-  agendado:  { label: "Agendado",  color: "bg-blue-50 text-blue-700 border-blue-200",          dot: "bg-blue-500",    bar: "from-blue-500 to-indigo-500" },
-  concluido: { label: "Concluído", color: "bg-emerald-50 text-emerald-700 border-emerald-200", dot: "bg-emerald-500", bar: "from-emerald-500 to-teal-500" },
-  cancelado: { label: "Cancelado", color: "bg-red-50 text-red-700 border-red-200",             dot: "bg-red-500",     bar: "from-red-500 to-rose-500" },
-  remarcar:  { label: "Remarcar",  color: "bg-amber-50 text-amber-700 border-amber-200",       dot: "bg-amber-500",   bar: "from-amber-500 to-orange-500" },
+const estadoConfig: Record<string, { label: string; pill: string; dot: string }> = {
+  agendado:  { label: "Agendado",  pill: "bg-blue-50 text-blue-700 ring-1 ring-blue-200",          dot: "bg-blue-500" },
+  concluido: { label: "Concluído", pill: "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200", dot: "bg-emerald-500" },
+  cancelado: { label: "Cancelado", pill: "bg-red-50 text-red-700 ring-1 ring-red-200",             dot: "bg-red-500" },
+  remarcar:  { label: "Remarcar",  pill: "bg-amber-50 text-amber-700 ring-1 ring-amber-200",       dot: "bg-amber-500" },
 };
 
 function parseDuracaoMin(d: string): number {
@@ -51,7 +51,7 @@ export default function GapAtendimentoDetail() {
 
   if (!atendimento) {
     return (
-      <div className="p-8 max-w-4xl mx-auto">
+      <div className="p-8 max-w-5xl mx-auto">
         <Button variant="ghost" size="sm" onClick={() => navigate("/gap/agendamentos")} className="gap-1.5 mb-4">
           <ArrowLeft className="w-4 h-4" /> Voltar aos agendamentos
         </Button>
@@ -72,8 +72,6 @@ export default function GapAtendimentoDetail() {
   const initials = atendimento.estudante.split(" ").slice(0, 2).map(n => n[0]).join("");
   const ModalityIcon = atendimento.tipo === "online" ? Video : MapPin;
 
-  const dayNum = d.getDate();
-  const monthName = d.toLocaleDateString("pt-AO", { month: "short" }).replace(".", "").toUpperCase();
   const weekday = d.toLocaleDateString("pt-AO", { weekday: "long" });
   const fullDate = d.toLocaleDateString("pt-AO", { day: "2-digit", month: "long", year: "numeric" });
 
@@ -82,8 +80,8 @@ export default function GapAtendimentoDetail() {
   };
 
   return (
-    <div className="p-6 lg:p-8 max-w-4xl mx-auto space-y-5 animate-fade-in">
-      {/* Top bar — refined back button */}
+    <div className="p-6 lg:p-8 max-w-5xl mx-auto space-y-6 animate-fade-in">
+      {/* Top bar */}
       <div className="flex items-center justify-between gap-3">
         <Button
           variant="ghost"
@@ -94,206 +92,225 @@ export default function GapAtendimentoDetail() {
           <ArrowLeft className="w-4 h-4" />
           <span className="text-sm">Agendamentos</span>
         </Button>
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] font-mono text-muted-foreground">{atendimento.id}</span>
+          <span className={cn("inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium", est.pill)}>
+            <span className={cn("w-1.5 h-1.5 rounded-full", est.dot)} />
+            {est.label}
+          </span>
+        </div>
       </div>
 
-      {/* Main card */}
-      <div className="rounded-2xl border border-border bg-card overflow-hidden shadow-sm">
-        {/* Accent bar */}
-        <div className={cn("h-1 w-full bg-gradient-to-r", est.bar)} />
-
-        {/* Header strip */}
-        <div className="px-7 py-6 border-b border-border flex items-start gap-5">
-          {/* Date tile */}
-          <div className="shrink-0 w-[68px] rounded-xl overflow-hidden border border-border text-center bg-background shadow-sm">
-            <div className={cn("text-[10px] font-bold py-1.5 text-white tracking-wider", isToday ? "bg-primary" : "bg-muted-foreground/70")}>
-              {monthName}
-            </div>
-            <div className="text-3xl font-bold text-foreground py-2 tabular-nums leading-none">{dayNum}</div>
-            <div className="text-[10px] text-muted-foreground pb-1.5 capitalize">{weekday.slice(0, 3)}</div>
-          </div>
-
-          {/* Title + meta */}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-2 flex-wrap">
-              <span className="text-[11px] font-mono text-muted-foreground bg-muted/60 px-1.5 py-0.5 rounded">{atendimento.id}</span>
-              <Badge variant="outline" className={cn("text-[10px] gap-1.5 font-medium", est.color)}>
-                <span className={cn("w-1.5 h-1.5 rounded-full", est.dot)} /> {est.label}
-              </Badge>
-              <Badge variant="outline" className={cn("text-[10px] font-medium", cat.color)}>{cat.label}</Badge>
-              {isToday && atendimento.estado === "agendado" && (
-                <Badge variant="outline" className="text-[10px] border-primary/30 text-primary bg-primary/5 font-medium">Hoje</Badge>
-              )}
-            </div>
-            <h1 className="text-xl font-semibold leading-snug text-foreground tracking-tight">
-              {atendimento.motivo}
-            </h1>
-            <p className="text-xs text-muted-foreground mt-1.5 capitalize flex items-center gap-1.5">
-              <CalendarIcon className="w-3 h-3" />
-              {weekday}, {fullDate}
-              <span className="text-muted-foreground/40">·</span>
-              <Clock className="w-3 h-3" />
-              <span className="tabular-nums font-medium text-foreground/70">{startTime}–{endTime}</span>
-            </p>
-          </div>
+      {/* Header */}
+      <header className="space-y-3">
+        <div className="flex items-center gap-2 flex-wrap">
+          <Badge variant="outline" className={cn("text-[10px] font-medium", cat.color)}>{cat.label}</Badge>
+          {isToday && atendimento.estado === "agendado" && (
+            <Badge variant="outline" className="text-[10px] border-primary/30 text-primary bg-primary/5 font-medium">Hoje</Badge>
+          )}
         </div>
+        <h1 className="text-2xl font-semibold leading-tight tracking-tight text-foreground">
+          {atendimento.motivo}
+        </h1>
+        <p className="text-sm text-muted-foreground capitalize flex items-center gap-2">
+          <CalendarIcon className="w-3.5 h-3.5" />
+          {weekday}, {fullDate}
+          <span className="text-border">·</span>
+          <Clock className="w-3.5 h-3.5" />
+          <span className="tabular-nums">{startTime} – {endTime}</span>
+          <span className="text-border">·</span>
+          <span>{atendimento.duracao}</span>
+        </p>
+      </header>
 
-        {/* Quick metadata row */}
-        <div className="grid grid-cols-3 divide-x divide-border border-b border-border bg-muted/15">
-          <div className="px-5 py-3.5">
-            <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">
-              <Clock className="w-3 h-3" /> Duração
+      {/* Two-column layout */}
+      <div className="grid lg:grid-cols-[1fr_320px] gap-6">
+        {/* Main column */}
+        <div className="space-y-5">
+          {/* Detalhes da Sessão */}
+          <section className="rounded-xl border border-border bg-card overflow-hidden">
+            <div className="px-5 py-3 border-b border-border flex items-center gap-2">
+              <FileText className="w-3.5 h-3.5 text-muted-foreground" />
+              <h2 className="text-sm font-semibold text-foreground">Detalhes da Sessão</h2>
             </div>
-            <p className="text-sm font-semibold text-foreground tabular-nums">{atendimento.duracao}</p>
-          </div>
-          <div className="px-5 py-3.5">
-            <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">
-              <ModalityIcon className="w-3 h-3" /> Local
-            </div>
-            <p className="text-sm font-semibold text-foreground truncate">
-              {atendimento.tipo === "online" ? "Sessão Online" : (atendimento.sala ?? "Presencial")}
-            </p>
-          </div>
-          <div className="px-5 py-3.5">
-            <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">
-              <User className="w-3 h-3" /> Modalidade
-            </div>
-            <p className="text-sm font-semibold text-foreground capitalize">{atendimento.tipo}</p>
-          </div>
-        </div>
-
-        {/* Estudante row */}
-        <div className="px-7 py-5 border-b border-border flex items-center gap-4 flex-wrap">
-          <Link
-            to={`/gap/estudantes/${atendimento.matricula}`}
-            className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary/80 text-primary-foreground flex items-center justify-center shrink-0 font-semibold text-sm hover:scale-105 transition-transform shadow-sm"
-          >
-            {initials}
-          </Link>
-          <div className="min-w-0 flex-1">
-            <Link
-              to={`/gap/estudantes/${atendimento.matricula}`}
-              className="text-sm font-semibold text-foreground hover:text-primary transition-colors block truncate"
-            >
-              {atendimento.estudante}
-            </Link>
-            <div className="flex items-center gap-2 text-[11px] text-muted-foreground mt-1 flex-wrap">
-              <span className="flex items-center gap-1"><Hash className="w-2.5 h-2.5" />{atendimento.matricula}</span>
-              <span className="text-muted-foreground/40">·</span>
-              <span className="flex items-center gap-1"><GraduationCap className="w-2.5 h-2.5" />{atendimento.curso}</span>
-              <span className="text-muted-foreground/40">·</span>
-              <span className="flex items-center gap-1"><Building2 className="w-2.5 h-2.5" />{atendimento.faculdade}</span>
-              <span className="text-muted-foreground/40">·</span>
-              <span>{atendimento.ano}º ano</span>
-            </div>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <button
-              type="button"
-              onClick={() => handleAction("Chat aberto")}
-              className="inline-flex items-center gap-1 text-[11px] font-medium text-muted-foreground hover:text-primary px-2.5 py-1.5 rounded-md border border-border hover:border-primary/30 hover:bg-primary/5 transition-colors"
-            >
-              <MessageSquare className="w-3 h-3" /> Chat
-            </button>
-            <button
-              type="button"
-              onClick={() => handleAction("Email enviado")}
-              className="inline-flex items-center gap-1 text-[11px] font-medium text-muted-foreground hover:text-primary px-2.5 py-1.5 rounded-md border border-border hover:border-primary/30 hover:bg-primary/5 transition-colors"
-            >
-              <Mail className="w-3 h-3" /> Email
-            </button>
-            <button
-              type="button"
-              onClick={() => handleAction("Chamada iniciada")}
-              className="inline-flex items-center gap-1 text-[11px] font-medium text-muted-foreground hover:text-primary px-2.5 py-1.5 rounded-md border border-border hover:border-primary/30 hover:bg-primary/5 transition-colors"
-            >
-              <Phone className="w-3 h-3" /> Ligar
-            </button>
-          </div>
-        </div>
-
-        {/* Sessão — motivo + descrição */}
-        <div className="px-7 py-5 border-b border-border">
-          <h3 className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mb-3 flex items-center gap-1.5">
-            <FileText className="w-3 h-3" /> Detalhes da Sessão
-          </h3>
-          <div className="rounded-lg border border-border/70 bg-muted/15 overflow-hidden">
-            <div className="px-4 py-3 border-b border-border/60 bg-background">
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">Motivo</p>
-              <p className="text-sm font-semibold text-foreground leading-snug">{atendimento.motivo}</p>
-            </div>
-            <div className="px-4 py-3.5">
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5">Descrição</p>
-              {atendimento.descricao ? (
-                <p className="text-sm text-foreground/85 leading-relaxed">{atendimento.descricao}</p>
-              ) : (
-                <p className="text-sm text-muted-foreground/70 italic">Sem descrição adicional.</p>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Notas */}
-        {atendimento.notas && (
-          <div className="px-7 py-5 border-b border-border">
-            <h3 className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mb-2.5">
-              Notas do Profissional
-            </h3>
-            <div className="rounded-lg bg-muted/30 px-4 py-3 border border-border/60">
-              <p className="text-sm text-foreground/80 leading-relaxed italic">
-                "{atendimento.notas}"
-              </p>
-            </div>
-          </div>
-        )}
-
-        {/* Status footer — agendado: only Remarcar / Cancelar (Concluir is automatic) */}
-        {atendimento.estado === "agendado" && (
-          <div className="px-7 py-4 bg-muted/20">
-            <div className="flex items-center justify-between gap-3 flex-wrap">
-              <div className="flex items-start gap-2 text-[11px] text-muted-foreground max-w-md">
-                <AlertCircle className="w-3.5 h-3.5 mt-0.5 shrink-0 text-muted-foreground/70" />
-                <span>A sessão será marcada como concluída automaticamente após o horário previsto.</span>
+            <div className="px-5 py-4 space-y-4">
+              <div>
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">Motivo</p>
+                <p className="text-sm font-medium text-foreground leading-snug">{atendimento.motivo}</p>
               </div>
-              <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" className="gap-1.5 rounded-lg" onClick={() => handleAction("Sessão remarcada")}>
-                  <CalendarIcon className="w-3.5 h-3.5" /> Remarcar
+              <div className="h-px bg-border/70" />
+              <div>
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5">Descrição</p>
+                {atendimento.descricao ? (
+                  <p className="text-sm text-foreground/85 leading-relaxed">{atendimento.descricao}</p>
+                ) : (
+                  <p className="text-sm text-muted-foreground/70 italic">Sem descrição adicional.</p>
+                )}
+              </div>
+            </div>
+          </section>
+
+          {/* Estudante */}
+          <section className="rounded-xl border border-border bg-card overflow-hidden">
+            <div className="px-5 py-3 border-b border-border flex items-center gap-2">
+              <User className="w-3.5 h-3.5 text-muted-foreground" />
+              <h2 className="text-sm font-semibold text-foreground">Estudante</h2>
+            </div>
+            <div className="px-5 py-4 flex items-center gap-4">
+              <Link
+                to={`/gap/estudantes/${atendimento.matricula}`}
+                className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary/80 text-primary-foreground flex items-center justify-center shrink-0 font-semibold text-sm hover:scale-105 transition-transform shadow-sm"
+              >
+                {initials}
+              </Link>
+              <div className="min-w-0 flex-1">
+                <Link
+                  to={`/gap/estudantes/${atendimento.matricula}`}
+                  className="text-sm font-semibold text-foreground hover:text-primary transition-colors block truncate"
+                >
+                  {atendimento.estudante}
+                </Link>
+                <div className="flex items-center gap-2 text-[11px] text-muted-foreground mt-1 flex-wrap">
+                  <span className="flex items-center gap-1"><Hash className="w-2.5 h-2.5" />{atendimento.matricula}</span>
+                  <span className="text-border">·</span>
+                  <span className="flex items-center gap-1"><GraduationCap className="w-2.5 h-2.5" />{atendimento.curso}</span>
+                  <span className="text-border">·</span>
+                  <span className="flex items-center gap-1"><Building2 className="w-2.5 h-2.5" />{atendimento.faculdade}</span>
+                  <span className="text-border">·</span>
+                  <span>{atendimento.ano}º ano</span>
+                </div>
+              </div>
+            </div>
+            <div className="px-5 py-3 border-t border-border bg-muted/20 flex items-center gap-2 flex-wrap">
+              <button
+                type="button"
+                onClick={() => handleAction("Chat aberto")}
+                className="inline-flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground hover:text-primary px-2.5 py-1.5 rounded-md border border-border bg-background hover:border-primary/30 hover:bg-primary/5 transition-colors"
+              >
+                <MessageSquare className="w-3 h-3" /> Chat
+              </button>
+              <button
+                type="button"
+                onClick={() => handleAction("Email enviado")}
+                className="inline-flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground hover:text-primary px-2.5 py-1.5 rounded-md border border-border bg-background hover:border-primary/30 hover:bg-primary/5 transition-colors"
+              >
+                <Mail className="w-3 h-3" /> Email
+              </button>
+              <button
+                type="button"
+                onClick={() => handleAction("Chamada iniciada")}
+                className="inline-flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground hover:text-primary px-2.5 py-1.5 rounded-md border border-border bg-background hover:border-primary/30 hover:bg-primary/5 transition-colors"
+              >
+                <Phone className="w-3 h-3" /> Ligar
+              </button>
+            </div>
+          </section>
+
+          {/* Notas */}
+          {atendimento.notas && (
+            <section className="rounded-xl border border-border bg-card overflow-hidden">
+              <div className="px-5 py-3 border-b border-border flex items-center gap-2">
+                <FileText className="w-3.5 h-3.5 text-muted-foreground" />
+                <h2 className="text-sm font-semibold text-foreground">Notas do Profissional</h2>
+              </div>
+              <div className="px-5 py-4">
+                <p className="text-sm text-foreground/80 leading-relaxed italic">"{atendimento.notas}"</p>
+              </div>
+            </section>
+          )}
+        </div>
+
+        {/* Side column */}
+        <aside className="space-y-5">
+          {/* Quando & Onde */}
+          <section className="rounded-xl border border-border bg-card overflow-hidden">
+            <div className="px-5 py-3 border-b border-border">
+              <h2 className="text-sm font-semibold text-foreground">Informação</h2>
+            </div>
+            <dl className="divide-y divide-border">
+              <div className="px-5 py-3 flex items-start gap-3">
+                <Clock className="w-3.5 h-3.5 text-muted-foreground mt-0.5 shrink-0" />
+                <div className="min-w-0 flex-1">
+                  <dt className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Horário</dt>
+                  <dd className="text-sm font-medium text-foreground tabular-nums mt-0.5">{startTime} – {endTime}</dd>
+                  <dd className="text-[11px] text-muted-foreground">{atendimento.duracao}</dd>
+                </div>
+              </div>
+              <div className="px-5 py-3 flex items-start gap-3">
+                <ModalityIcon className="w-3.5 h-3.5 text-muted-foreground mt-0.5 shrink-0" />
+                <div className="min-w-0 flex-1">
+                  <dt className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Modalidade</dt>
+                  <dd className="text-sm font-medium text-foreground capitalize mt-0.5">{atendimento.tipo}</dd>
+                </div>
+              </div>
+              {(atendimento.tipo === "presencial" && atendimento.sala) && (
+                <div className="px-5 py-3 flex items-start gap-3">
+                  <DoorOpen className="w-3.5 h-3.5 text-muted-foreground mt-0.5 shrink-0" />
+                  <div className="min-w-0 flex-1">
+                    <dt className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Sala</dt>
+                    <dd className="text-sm font-medium text-foreground mt-0.5">{atendimento.sala}</dd>
+                  </div>
+                </div>
+              )}
+              <div className="px-5 py-3 flex items-start gap-3">
+                <User className="w-3.5 h-3.5 text-muted-foreground mt-0.5 shrink-0" />
+                <div className="min-w-0 flex-1">
+                  <dt className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Responsável</dt>
+                  <dd className="text-sm font-medium text-foreground mt-0.5">{atendimento.responsavel}</dd>
+                </div>
+              </div>
+            </dl>
+          </section>
+
+          {/* Status / Actions */}
+          {atendimento.estado === "agendado" && (
+            <section className="rounded-xl border border-border bg-card overflow-hidden">
+              <div className="px-5 py-3 border-b border-border">
+                <h2 className="text-sm font-semibold text-foreground">Acções</h2>
+              </div>
+              <div className="px-5 py-4 space-y-2">
+                <Button variant="outline" size="sm" className="w-full justify-start gap-2 rounded-lg" onClick={() => handleAction("Sessão remarcada")}>
+                  <CalendarIcon className="w-3.5 h-3.5" /> Remarcar sessão
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
-                  className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-300 gap-1.5 rounded-lg"
+                  className="w-full justify-start border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-300 gap-2 rounded-lg"
                   onClick={() => handleAction("Sessão cancelada")}
                 >
-                  <X className="w-3.5 h-3.5" /> Cancelar
+                  <X className="w-3.5 h-3.5" /> Cancelar sessão
                 </Button>
+                <p className="text-[11px] text-muted-foreground leading-relaxed pt-1">
+                  A sessão será concluída automaticamente após o horário previsto.
+                </p>
               </div>
-            </div>
-          </div>
-        )}
+            </section>
+          )}
 
-        {atendimento.estado === "concluido" && (
-          <div className="px-7 py-4 bg-emerald-50/60 flex items-center gap-3 border-t border-emerald-100">
-            <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-emerald-900">Sessão concluída</p>
-              <p className="text-[11px] text-emerald-700/80">{fullDate} · {startTime}–{endTime}</p>
-            </div>
-          </div>
-        )}
+          {atendimento.estado === "concluido" && (
+            <section className="rounded-xl border border-emerald-200 bg-emerald-50/60 px-5 py-4 flex items-center gap-3">
+              <div className="w-9 h-9 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-emerald-900">Sessão concluída</p>
+                <p className="text-[11px] text-emerald-700/80">{startTime}–{endTime}</p>
+              </div>
+            </section>
+          )}
 
-        {atendimento.estado === "cancelado" && (
-          <div className="px-7 py-4 bg-red-50/60 flex items-center gap-3 border-t border-red-100">
-            <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center shrink-0">
-              <X className="w-4 h-4 text-red-600" />
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-red-900">Sessão cancelada</p>
-              <p className="text-[11px] text-red-700/80">Este agendamento não foi realizado.</p>
-            </div>
-          </div>
-        )}
+          {atendimento.estado === "cancelado" && (
+            <section className="rounded-xl border border-red-200 bg-red-50/60 px-5 py-4 flex items-center gap-3">
+              <div className="w-9 h-9 rounded-full bg-red-100 flex items-center justify-center shrink-0">
+                <X className="w-4 h-4 text-red-600" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-red-900">Sessão cancelada</p>
+                <p className="text-[11px] text-red-700/80">Não realizada.</p>
+              </div>
+            </section>
+          )}
+        </aside>
       </div>
     </div>
   );
