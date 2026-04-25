@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import {
   ArrowLeft, Calendar as CalendarIcon, Clock, MapPin, Video,
   CheckCircle2, X, MessageSquare, Mail, Phone,
-  GraduationCap, User, DoorOpen, ChevronRight, MoreHorizontal,
+  User, DoorOpen, ChevronRight, MoreHorizontal,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { gapAtendimentos, ticketCategoriaConfig as categoriaConfig } from "@/data/gapData";
