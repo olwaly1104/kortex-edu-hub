@@ -308,22 +308,6 @@ function FactCell({ icon, label, value, hint }: { icon: React.ReactNode; label: 
   );
 }
 
-function Section({ title, tone, children }: { title: string; tone?: "emerald"; children: React.ReactNode }) {
-  return (
-    <section className={cn(
-      "rounded-xl border bg-card overflow-hidden",
-      tone === "emerald" ? "border-emerald-200/70" : "border-border"
-    )}>
-      <header className={cn(
-        "px-5 py-2.5 border-b text-[11px] uppercase tracking-wider font-semibold",
-        tone === "emerald" ? "border-emerald-200/70 bg-emerald-50/40 text-emerald-800" : "border-border bg-muted/30 text-muted-foreground"
-      )}>
-        {title}
-      </header>
-      <div className="px-5 py-4">{children}</div>
-    </section>
-  );
-}
 
 function Label({ children }: { children: React.ReactNode }) {
   return <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5">{children}</p>;
