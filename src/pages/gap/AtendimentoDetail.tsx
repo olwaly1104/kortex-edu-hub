@@ -96,7 +96,7 @@ export default function GapAtendimentoDetail() {
         {/* Top bar — sessão id + categoria */}
         <div className="flex items-center justify-between gap-3 px-6 py-3 border-b border-border bg-muted/20">
           <div className="flex items-center gap-2 min-w-0">
-            <span className="text-[11px] font-medium text-muted-foreground shrink-0">Sessão</span>
+            <span className="text-[11px] font-medium text-muted-foreground shrink-0">Agendamento</span>
             <span className="text-muted-foreground/40">·</span>
             <span className="text-[11px] font-mono font-semibold text-foreground shrink-0">{atendimento.id}</span>
           </div>
