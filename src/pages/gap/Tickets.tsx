@@ -147,9 +147,6 @@ export default function GapTickets() {
             Pedidos submetidos pelos estudantes no Portal e encaminhados automaticamente ao departamento responsável. O GAP acompanha a execução.
           </p>
         </div>
-        <div className="text-xs text-muted-foreground">
-          <span className="font-medium text-foreground">{filtered.length}</span> de {counts.todos} pedidos
-        </div>
       </div>
 
       {/* KPIs */}
