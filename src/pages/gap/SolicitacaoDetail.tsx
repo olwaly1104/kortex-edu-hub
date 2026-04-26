@@ -151,14 +151,21 @@ export default function GapSolicitacaoDetail() {
 
         {/* Title block */}
         <div className="px-6 pt-5 pb-5 border-b border-border">
-          <div className="flex items-start justify-between gap-4">
-            <h1 className="text-xl font-semibold leading-tight tracking-tight text-foreground min-w-0 flex-1">
-              {tipoCfg?.label ?? selected.tipo}
-            </h1>
-            <div className="flex flex-col items-end gap-1 shrink-0">
-              <span className="text-[10px] uppercase tracking-[0.08em] text-muted-foreground font-semibold">Estado</span>
-              <Badge variant="outline" className={cn("text-[11px] font-medium px-2.5 py-0.5", st.color)}>{st.label}</Badge>
-            </div>
+          <h1 className="text-xl font-semibold leading-tight tracking-tight text-foreground">
+            {tipoCfg?.label ?? selected.tipo}
+          </h1>
+          <div className="mt-2.5 flex items-center gap-1.5 flex-wrap">
+            <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider", st.color)}>
+              {st.label}
+            </Badge>
+            {tipoCfg && (
+              <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider", categoriaConfig[tipoCfg.categoria as Categoria]?.color)}>
+                {tipoCfg.categoria}
+              </Badge>
+            )}
+            <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider", dest.color)}>
+              {dest.label}
+            </Badge>
           </div>
         </div>
 
