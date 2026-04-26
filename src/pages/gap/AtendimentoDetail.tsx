@@ -184,9 +184,25 @@ export default function GapAtendimentoDetail() {
 
             <section className="pt-5 border-t border-border">
               <SectionTitle>Responsável</SectionTitle>
-              <div className="flex items-center gap-2 text-sm font-medium text-foreground">
-                <UserCircle2 className="w-4 h-4 text-muted-foreground" />
-                {atendimento.responsavel}
+              <div className="flex items-center justify-between gap-3 flex-wrap">
+                <button
+                  type="button"
+                  onClick={() => handleAction(`Perfil de ${atendimento.responsavel}`)}
+                  className="flex items-center gap-2.5 text-left hover:bg-muted/40 -mx-2 px-2 py-1 rounded-md transition-colors group"
+                >
+                  <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[11px] font-semibold ring-1 ring-primary/15 shrink-0">
+                    {atendimento.responsavel.split(" ").slice(0, 2).map(n => n[0]).join("")}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-foreground leading-tight group-hover:text-primary transition-colors">{atendimento.responsavel}</p>
+                    <p className="text-[11px] text-muted-foreground mt-0.5">Profissional GAP</p>
+                  </div>
+                </button>
+                <div className="flex items-center gap-1.5">
+                  <ContactBtn icon={<MessageSquare className="w-3 h-3" />} label="Chat" onClick={() => handleAction(`Chat com ${atendimento.responsavel}`)} />
+                  <ContactBtn icon={<Mail className="w-3 h-3" />} label="Email" onClick={() => handleAction(`Email para ${atendimento.responsavel}`)} />
+                  <ContactBtn icon={<Phone className="w-3 h-3" />} label="Ligar" onClick={() => handleAction(`Chamada para ${atendimento.responsavel}`)} />
+                </div>
               </div>
             </section>
 
