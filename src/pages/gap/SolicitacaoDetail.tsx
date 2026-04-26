@@ -142,7 +142,7 @@ export default function GapSolicitacaoDetail() {
 
       <Card className="overflow-hidden p-0 gap-0">
         {/* Top bar — ano lectivo */}
-        <div className="flex items-center justify-end px-6 py-3 border-b border-border bg-muted/20">
+        <div className="flex items-center justify-start px-6 py-3 border-b border-border bg-muted/20">
           <span className="text-[10px] uppercase tracking-[0.12em] font-semibold text-primary">
             Ano Lectivo 2024/2025
           </span>
@@ -154,11 +154,13 @@ export default function GapSolicitacaoDetail() {
             <h1 className="text-xl font-semibold leading-tight tracking-tight text-foreground">
               {tipoCfg?.label ?? selected.tipo}
             </h1>
-            <div className="flex items-center gap-1.5 shrink-0 pt-1">
-              <span className="text-[11px] font-medium text-muted-foreground">Pedido</span>
-              <span className="text-muted-foreground/40">·</span>
-              <span className="text-[11px] font-mono font-semibold text-foreground">{selected.id}</span>
-            </div>
+            <button
+              type="button"
+              onClick={() => { navigator.clipboard?.writeText(selected.id); toast({ title: "ID copiado", description: selected.id }); }}
+              className="shrink-0 inline-flex items-center px-2 py-0.5 rounded-md border border-border bg-background hover:bg-muted text-[11px] font-mono font-semibold text-foreground transition-colors"
+            >
+              {selected.id}
+            </button>
           </div>
           <div className="mt-2.5 flex items-center gap-1.5 flex-wrap">
             <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider gap-1", st.color)}>
@@ -317,9 +319,8 @@ export default function GapSolicitacaoDetail() {
                     <FileText className="w-4 h-4 text-red-600" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-[13px] font-semibold text-foreground leading-tight truncate inline-flex items-center gap-1.5">
-                      <span className="truncate">Pedido-{selected.id}</span>
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                    <p className="text-[13px] font-semibold text-foreground leading-tight truncate">
+                      Pedido-{selected.id}
                     </p>
                     <p className="text-[11px] text-muted-foreground mt-0.5 inline-flex items-center gap-1.5">
                       <span>Gerado automaticamente</span>
