@@ -309,6 +309,74 @@ export default function GapDashboard() {
             </div>
           </div>
         </Card>
+
+        {/* Solicitações por Motivo — top tipos de pedido */}
+        <Card className="p-5">
+          <div className="flex items-center justify-between mb-1">
+            <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
+              <ListChecks className="w-4 h-4 text-primary" /> Solicitações por Motivo
+            </h2>
+            <Link to="/gap/solicitacoes" className="text-[11px] font-medium text-primary hover:underline flex items-center gap-0.5">
+              Ver todas <ArrowRight className="w-3 h-3" />
+            </Link>
+          </div>
+          <p className="text-[11px] text-muted-foreground mb-4">Pedidos mais frequentes registados no GAP</p>
+          <div className="space-y-2.5">
+            {topMotivos.map(m => {
+              const pct = totalMotivos > 0 ? (m.count / totalMotivos) * 100 : 0;
+              const cfg = m.categoria ? categoriaConfig[m.categoria] : undefined;
+              return (
+                <div key={m.tipo} className="flex items-center gap-3">
+                  <Badge variant="outline" className={`text-[10px] shrink-0 w-[110px] justify-center ${cfg?.color ?? ""}`}>{cfg?.label ?? "—"}</Badge>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[11px] text-foreground line-clamp-1 mb-1">{m.label}</p>
+                    <div className="h-2 rounded-full bg-muted overflow-hidden">
+                      <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${(m.count / maxMotivo) * 100}%` }} />
+                    </div>
+                  </div>
+                  <span className="text-xs font-semibold text-foreground tabular-nums w-8 text-right">{m.count}</span>
+                  <span className="text-[10px] text-muted-foreground tabular-nums w-9 text-right">{pct.toFixed(0)}%</span>
+                </div>
+              );
+            })}
+          </div>
+          <div className="mt-4 pt-3 border-t border-border flex items-center justify-between text-xs">
+            <span className="text-muted-foreground">Tipos de pedido distintos</span>
+            <span className="font-semibold text-foreground tabular-nums">{motivoCounts.size}</span>
+          </div>
+        </Card>
+
+        {/* Solicitações por Categoria funcional */}
+        <Card className="p-5">
+          <div className="flex items-center justify-between mb-1">
+            <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
+              <Building2 className="w-4 h-4 text-primary" /> Solicitações por Categoria
+            </h2>
+            <Link to="/gap/solicitacoes" className="text-[11px] font-medium text-primary hover:underline flex items-center gap-0.5">
+              Ver todas <ArrowRight className="w-3 h-3" />
+            </Link>
+          </div>
+          <p className="text-[11px] text-muted-foreground mb-4">Distribuição por área funcional do pedido</p>
+          <div className="space-y-2.5">
+            {destinoPorCategoria.map(c => {
+              const pct = totalCat > 0 ? (c.count / totalCat) * 100 : 0;
+              return (
+                <div key={c.categoria} className="flex items-center gap-3">
+                  <Badge variant="outline" className={`text-[10px] shrink-0 w-[110px] justify-center ${c.color}`}>{c.label}</Badge>
+                  <div className="flex-1 h-2 rounded-full bg-muted overflow-hidden">
+                    <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${(c.count / maxCat) * 100}%` }} />
+                  </div>
+                  <span className="text-xs font-semibold text-foreground tabular-nums w-8 text-right">{c.count}</span>
+                  <span className="text-[10px] text-muted-foreground tabular-nums w-9 text-right">{pct.toFixed(0)}%</span>
+                </div>
+              );
+            })}
+          </div>
+          <div className="mt-4 pt-3 border-t border-border flex items-center justify-between text-xs">
+            <span className="text-muted-foreground">Total registadas</span>
+            <span className="font-semibold text-foreground tabular-nums">{totalCat}</span>
+          </div>
+        </Card>
       </div>
     </div>
   );
