@@ -17,19 +17,15 @@ const TODAY_STR = "2025-12-16";
 
 export default function GapDashboard() {
   const totalSolicitacoes = solicitacoes.length;
-  // Primary KPIs — pipeline de solicitações
-  const primaryKpis = [
-    { label: "Recebidas",    value: gapKpis.recebidas,    icon: Inbox,        iconBg: "bg-orange-50 text-orange-600",   sub: "novas" },
-    { label: "Em Execução",  value: gapKpis.emExecucao,   icon: Clock,        iconBg: "bg-amber-50 text-amber-600",     sub: "no destino" },
-    { label: "Concluídas",   value: gapKpis.concluidas,   icon: CheckCircle,  iconBg: "bg-emerald-50 text-emerald-600", sub: "este mês" },
-    { label: "Total",        value: totalSolicitacoes,    icon: Send,         iconBg: "bg-primary/10 text-primary",     sub: "em circuito" },
+  // Single consolidated KPI row — essentials only
+  const kpis = [
+    { label: "Recebidas",        value: gapKpis.recebidas,       icon: Inbox,        iconBg: "bg-orange-50 text-orange-600",   sub: "novas" },
+    { label: "Em Execução",      value: gapKpis.emExecucao,      icon: Clock,        iconBg: "bg-amber-50 text-amber-600",     sub: "no destino" },
+    { label: "Concluídas",       value: gapKpis.concluidas,      icon: CheckCircle,  iconBg: "bg-emerald-50 text-emerald-600", sub: "este mês" },
+    { label: "Agendamentos Hoje",value: gapKpis.atendimentosHoje,icon: CalendarIcon, iconBg: "bg-primary/10 text-primary",     sub: "sessões" },
+    { label: "Estudantes Activos",value: gapKpis.estudantesAtivos,icon: Users,       iconBg: "bg-pink-50 text-pink-600",       sub: "em seguimento" },
   ];
-  // Secondary — operação GAP
-  const secondaryKpis = [
-    { label: "Agendamentos Hoje", value: gapKpis.atendimentosHoje, icon: CalendarIcon, iconBg: "bg-primary/10 text-primary" },
-    { label: "Estudantes Activos", value: gapKpis.estudantesAtivos, icon: Heart, iconBg: "bg-pink-50 text-pink-600" },
-    { label: "Satisfação", value: `${gapKpis.satisfacao}%`, icon: Smile, iconBg: "bg-emerald-50 text-emerald-600" },
-  ];
+  void totalSolicitacoes;
 
   const maxDest = Math.max(...solicitacoesPorDestino.map(c => c.count), 1);
   const totalSol = solicitacoes.length;
