@@ -75,45 +75,22 @@ export default function GapDashboard() {
         </div>
       </div>
 
-      {/* Primary pipeline — solicitações */}
-      <div>
-        <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-2">Pipeline de solicitações</p>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          {primaryKpis.map(k => (
-            <Card key={k.label} className="p-4 hover:shadow-sm transition-shadow">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">{k.label}</p>
-                  <p className="text-2xl font-bold text-foreground mt-1 tabular-nums">{k.value}</p>
-                  <p className="text-[10px] text-muted-foreground mt-0.5">{k.sub}</p>
-                </div>
-                <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${k.iconBg}`}>
-                  <k.icon className="w-4 h-4" />
-                </div>
+      {/* Single consolidated KPI row */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+        {kpis.map(k => (
+          <Card key={k.label} className="p-4 hover:shadow-sm transition-shadow">
+            <div className="flex items-center justify-between gap-2">
+              <div className="min-w-0">
+                <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider truncate">{k.label}</p>
+                <p className="text-2xl font-bold text-foreground mt-1 tabular-nums">{k.value}</p>
+                <p className="text-[10px] text-muted-foreground mt-0.5">{k.sub}</p>
               </div>
-            </Card>
-          ))}
-        </div>
-      </div>
-
-      {/* Secondary — operação GAP */}
-      <div>
-        <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-2">Operação do GAP</p>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          {secondaryKpis.map(k => (
-            <Card key={k.label} className="p-4 hover:shadow-sm transition-shadow">
-              <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${k.iconBg}`}>
-                  <k.icon className="w-5 h-5" />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-xl font-bold text-foreground tabular-nums">{k.value}</p>
-                  <p className="text-[11px] text-muted-foreground">{k.label}</p>
-                </div>
+              <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${k.iconBg}`}>
+                <k.icon className="w-4 h-4" />
               </div>
-            </Card>
-          ))}
-        </div>
+            </div>
+          </Card>
+        ))}
       </div>
 
       <div className="grid lg:grid-cols-2 gap-6">
