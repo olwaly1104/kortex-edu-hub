@@ -273,8 +273,9 @@ export default function GapSolicitacaoDetail() {
                 <FileText className="w-3.5 h-3.5 text-muted-foreground" />
                 <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Detalhes do Pedido</h3>
               </div>
-              <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-5 gap-y-4">
-                <FactItem label="Submetido" value={`${fmt(dSub)} · ${fmtT(dSub)}`} />
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-5 gap-y-4">
+                <FactItem label="Submetido" value={fmt(dSub)} />
+                <FactItem label="Hora" value={fmtT(dSub)} />
                 <FactItem label="Destino" value={dest.label} />
                 <FactItem label="Concluído" value={dConc ? `${fmt(dConc)} · ${fmtT(dConc)}` : "—"} />
               </div>
