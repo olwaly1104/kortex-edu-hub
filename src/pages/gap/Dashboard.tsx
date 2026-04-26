@@ -66,30 +66,15 @@ export default function GapDashboard() {
   const slaPct = totalSol > 0 ? Math.round((slaConcluidas / totalSol) * 100) : 0;
   const totalDest = solicitacoesPorDestino.reduce((a, c) => a + c.count, 0);
 
-  // Top motivos (tipos de solicitação) — global ranking
-  const motivoCounts = new Map<string, number>();
-  solicitacoes.forEach(s => motivoCounts.set(s.tipo, (motivoCounts.get(s.tipo) ?? 0) + 1));
-  const topMotivos = Array.from(motivoCounts.entries())
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 6)
-    .map(([tipo, count]) => ({
-      tipo,
-      label: tipoConfig[tipo]?.label ?? tipo,
-      categoria: tipoConfig[tipo]?.categoria,
-      count,
-    }));
-  const maxMotivo = Math.max(...topMotivos.map(m => m.count), 1);
-  const totalMotivos = solicitacoes.length;
-
-  // Destinos por categoria funcional
-  const destinoPorCategoria = (Object.keys(categoriaConfig) as (keyof typeof categoriaConfig)[]).map(cat => ({
+  // Solicitações por categoria funcional (Tecnológico / Académico / Financeiro)
+  const solicitacoesPorCategoria = (Object.keys(categoriaConfig) as (keyof typeof categoriaConfig)[]).map(cat => ({
     categoria: cat,
     label: categoriaConfig[cat].label,
     color: categoriaConfig[cat].color,
     count: solicitacoes.filter(s => tipoConfig[s.tipo]?.categoria === cat).length,
   }));
-  const maxCat = Math.max(...destinoPorCategoria.map(c => c.count), 1);
-  const totalCat = destinoPorCategoria.reduce((a, c) => a + c.count, 0);
+  const maxCat = Math.max(...solicitacoesPorCategoria.map(c => c.count), 1);
+  const totalCat = solicitacoesPorCategoria.reduce((a, c) => a + c.count, 0);
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
