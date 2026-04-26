@@ -92,7 +92,7 @@ export default function GapEstudantes() {
         </div>
       </Card>
 
-      {/* Table — same pattern as Agendamentos/Solicitações */}
+      {/* Table — same pattern as Solicitações/Agendamentos */}
       <Card className="overflow-hidden">
         {filtered.length === 0 ? (
           <div className="p-12 text-center">
@@ -103,11 +103,13 @@ export default function GapEstudantes() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-border bg-muted/30 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                  <th className="text-left font-semibold px-4 py-2.5 w-[240px]">Estudante</th>
-                  <th className="text-left font-semibold px-4 py-2.5">Curso</th>
-                  <th className="text-center font-semibold px-4 py-2.5 w-[120px]">Solicitações</th>
-                  <th className="text-center font-semibold px-4 py-2.5 w-[120px]">Agendamentos</th>
+                <tr className="border-b bg-muted/30">
+                  <th className="text-left p-3 font-medium text-muted-foreground">Estudante</th>
+                  <th className="text-left p-3 font-medium text-muted-foreground">Faculdade</th>
+                  <th className="text-left p-3 font-medium text-muted-foreground">Curso</th>
+                  <th className="text-center p-3 font-medium text-muted-foreground whitespace-nowrap">Ano</th>
+                  <th className="text-center p-3 font-medium text-muted-foreground">Solicitações</th>
+                  <th className="text-center p-3 font-medium text-muted-foreground">Agendamentos</th>
                 </tr>
               </thead>
               <tbody>
@@ -115,17 +117,22 @@ export default function GapEstudantes() {
                   <tr
                     key={e.id}
                     onClick={() => navigate(`/gap/estudantes/${e.matricula}`)}
-                    className="group border-b border-border last:border-b-0 hover:bg-muted/40 transition-colors cursor-pointer"
+                    className="border-b last:border-0 hover:bg-muted/30 transition-colors cursor-pointer"
                   >
-                    <td className="px-4 py-3 align-middle">
-                      <p className="text-sm font-semibold text-foreground truncate">{e.nome}</p>
+                    <td className="p-3">
+                      <p className="font-medium text-foreground leading-tight">{e.nome}</p>
                       <p className="text-[11px] text-muted-foreground tabular-nums mt-0.5">{e.matricula}</p>
                     </td>
-                    <td className="px-4 py-3 align-middle">
-                      <p className="text-sm text-foreground/90 truncate">{e.curso}</p>
-                      <p className="text-[11px] text-muted-foreground mt-0.5">{e.ano}º ano</p>
+                    <td className="p-3">
+                      <p className="text-xs text-foreground leading-tight">{e.faculdade}</p>
                     </td>
-                    <td className="px-4 py-3 align-middle text-center">
+                    <td className="p-3">
+                      <p className="text-xs text-foreground leading-tight">{e.curso}</p>
+                    </td>
+                    <td className="p-3 text-center whitespace-nowrap">
+                      <p className="text-xs font-medium text-foreground tabular-nums">{e.ano}º</p>
+                    </td>
+                    <td className="p-3 text-center">
                       <div className="text-sm font-semibold text-foreground tabular-nums">{e.solicitacoes}</div>
                       {e.abertos > 0 && (
                         <div className="text-[10px] text-orange-600 mt-0.5">
@@ -133,7 +140,7 @@ export default function GapEstudantes() {
                         </div>
                       )}
                     </td>
-                    <td className="px-4 py-3 align-middle text-center">
+                    <td className="p-3 text-center">
                       <span className="text-sm font-semibold text-foreground tabular-nums">{e.agendamentos}</span>
                     </td>
                   </tr>
