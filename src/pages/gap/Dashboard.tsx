@@ -227,84 +227,54 @@ export default function GapDashboard() {
         </Card>
       </div>
 
-      {/* Solicitações por Motivo — 3 categorias funcionais */}
-      <div>
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <ListChecks className="w-4 h-4 text-primary" />
-            <h2 className="text-base font-semibold text-foreground">Solicitações por Motivo</h2>
-            <span className="text-[11px] text-muted-foreground">· categoria funcional do pedido</span>
-          </div>
+      {/* Solicitações por Motivo — categorias funcionais lado a lado */}
+      <Card className="p-5">
+        <div className="flex items-center justify-between mb-1">
+          <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
+            <ListChecks className="w-4 h-4 text-primary" /> Solicitações por Motivo
+          </h2>
           <Link to="/gap/solicitacoes" className="text-[11px] font-medium text-primary hover:underline flex items-center gap-0.5">
             Ver todas <ArrowRight className="w-3 h-3" />
           </Link>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <p className="text-[11px] text-muted-foreground mb-4">Categoria funcional do pedido — pedidos mais frequentes em cada área</p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-4">
           {motivoStats.map(m => {
             const Icon = m.cfg.icon;
-            const pct = totalSol > 0 ? Math.round((m.total / totalSol) * 100) : 0;
+            const maxTipo = Math.max(...m.topTipos.map(t => t.count), 1);
             return (
-              <Card key={m.categoria} className="p-5 hover:shadow-md transition-shadow flex flex-col">
-                {/* Header */}
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 border ${m.cfg.color}`}>
-                      <Icon className="w-5 h-5" />
+              <div key={m.categoria} className="flex flex-col">
+                <div className="flex items-center justify-between mb-3 pb-2 border-b border-border">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <div className={`w-7 h-7 rounded-md flex items-center justify-center shrink-0 border ${m.cfg.color}`}>
+                      <Icon className="w-3.5 h-3.5" />
                     </div>
-                    <div className="min-w-0">
-                      <p className="text-sm font-semibold text-foreground leading-tight">{m.cfg.label}</p>
-                      <p className="text-[10px] text-muted-foreground mt-0.5">{pct}% do total</p>
-                    </div>
+                    <p className="text-xs font-semibold text-foreground">{m.cfg.label}</p>
                   </div>
-                  <p className="text-2xl font-bold text-foreground tabular-nums leading-none">{m.total}</p>
+                  <span className="text-sm font-bold text-foreground tabular-nums">{m.total}</span>
                 </div>
-
-                {/* Distribution bar */}
-                <div className="mt-4">
-                  <div className="flex h-1.5 rounded-full overflow-hidden bg-muted">
-                    {m.total > 0 && (
-                      <>
-                        <div className="bg-emerald-500" style={{ width: `${(m.concluidas / m.total) * 100}%` }} />
-                        <div className="bg-sky-500" style={{ width: `${(m.emExecucao / m.total) * 100}%` }} />
-                        <div className="bg-destructive" style={{ width: `${(m.atraso / m.total) * 100}%` }} />
-                      </>
-                    )}
-                  </div>
-                  <div className="grid grid-cols-3 gap-2 mt-2.5 text-center">
-                    <div>
-                      <p className="text-[9px] text-muted-foreground uppercase tracking-wider">Concluídas</p>
-                      <p className="text-xs font-bold text-emerald-600 tabular-nums mt-0.5">{m.concluidas}</p>
-                    </div>
-                    <div className="border-x border-border">
-                      <p className="text-[9px] text-muted-foreground uppercase tracking-wider">Em Curso</p>
-                      <p className="text-xs font-bold text-sky-600 tabular-nums mt-0.5">{m.emExecucao}</p>
-                    </div>
-                    <div>
-                      <p className="text-[9px] text-muted-foreground uppercase tracking-wider">Atraso</p>
-                      <p className="text-xs font-bold text-destructive tabular-nums mt-0.5">{m.atraso}</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Top tipos */}
-                <div className="mt-4 pt-3 border-t border-border flex-1">
-                  <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider mb-2">Pedidos mais frequentes</p>
-                  <div className="space-y-1.5">
-                    {m.topTipos.length === 0 ? (
-                      <p className="text-[11px] text-muted-foreground italic">Sem dados</p>
-                    ) : m.topTipos.map((t, i) => (
-                      <div key={i} className="flex items-center justify-between gap-2">
-                        <p className="text-[11px] text-foreground line-clamp-1 flex-1">{t.label}</p>
-                        <span className="text-[11px] font-semibold text-muted-foreground tabular-nums shrink-0">{t.count}</span>
+                <div className="space-y-2">
+                  {m.topTipos.length === 0 ? (
+                    <p className="text-[11px] text-muted-foreground italic">Sem dados</p>
+                  ) : m.topTipos.map((t, i) => {
+                    const pct = m.total > 0 ? (t.count / m.total) * 100 : 0;
+                    return (
+                      <div key={i} className="flex items-center gap-2">
+                        <p className="text-[11px] text-foreground line-clamp-1 w-[140px] shrink-0">{t.label}</p>
+                        <div className="flex-1 h-1.5 rounded-full bg-muted overflow-hidden">
+                          <div className="h-full bg-primary rounded-full" style={{ width: `${(t.count / maxTipo) * 100}%` }} />
+                        </div>
+                        <span className="text-[11px] font-semibold text-foreground tabular-nums w-6 text-right">{t.count}</span>
+                        <span className="text-[10px] text-muted-foreground tabular-nums w-9 text-right">{pct.toFixed(0)}%</span>
                       </div>
-                    ))}
-                  </div>
+                    );
+                  })}
                 </div>
-              </Card>
+              </div>
             );
           })}
         </div>
-      </div>
+      </Card>
 
       {/* Por Destino + Estado — fim da página */}
       <div className="grid lg:grid-cols-2 gap-6">
