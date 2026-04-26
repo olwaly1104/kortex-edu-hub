@@ -2,7 +2,7 @@ import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Clock, CheckCircle, AlertTriangle, Calendar as CalendarIcon, BarChart3,
   Inbox, Building2, ArrowRight, Users, ListChecks,
