@@ -258,8 +258,3 @@ export default function GapDashboard() {
     </div>
   );
 }
-  const slaCumpridos = solicitacoes.filter(s => s.estado === "concluida").length;
-  const slaAtrasadas = solicitacoesEmAtraso.length;
-  const slaPct = totalSol > 0 ? Math.round((slaCumpridos / totalSol) * 100) : 0;
-  const totalDest = solicitacoesPorDestino.reduce((a, c) => a + c.count, 0);
-
