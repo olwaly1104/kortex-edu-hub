@@ -125,7 +125,7 @@ export default function GapAtendimentoDetail() {
                 <span className={cn("w-1.5 h-1.5 rounded-full mr-1.5 inline-block", est.dot)} />
                 {est.label}
               </Badge>
-              <Badge variant="outline" className="text-[10px] font-medium px-2 py-0.5 uppercase tracking-wider bg-muted/40">
+              <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider", cat.color)}>
                 {cat.label}
               </Badge>
             </div>
