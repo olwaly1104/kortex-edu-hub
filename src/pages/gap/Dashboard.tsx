@@ -66,21 +66,30 @@ export default function GapDashboard() {
   const slaPct = totalSol > 0 ? Math.round((slaConcluidas / totalSol) * 100) : 0;
   const totalDest = solicitacoesPorDestino.reduce((a, c) => a + c.count, 0);
 
-  // Solicitações por motivo (categoria funcional)
-  const motivoStats = (Object.keys(categoriaConfig) as (keyof typeof categoriaConfig)[]).map(cat => {
-    const sols = solicitacoes.filter(s => tipoConfig[s.tipo]?.categoria === cat);
-    const total = sols.length;
-    const concluidas = sols.filter(s => s.estado === "concluida").length;
-    const emExecucao = sols.filter(s => s.estado === "em_execucao" || s.estado === "recebida").length;
-    const atraso = solicitacoesEmAtraso.filter(({ sol }) => tipoConfig[sol.tipo]?.categoria === cat).length;
-    // top 3 tipos
-    const tipoCounts = new Map<string, number>();
-    sols.forEach(s => tipoCounts.set(s.tipo, (tipoCounts.get(s.tipo) ?? 0) + 1));
-    const topTipos = Array.from(tipoCounts.entries())
-      .sort((a, b) => b[1] - a[1]).slice(0, 3)
-      .map(([tipo, count]) => ({ label: tipoConfig[tipo]?.label ?? tipo, count }));
-    return { categoria: cat, cfg: categoriaConfig[cat], total, concluidas, emExecucao, atraso, topTipos };
-  });
+  // Top motivos (tipos de solicitação) — global ranking
+  const motivoCounts = new Map<string, number>();
+  solicitacoes.forEach(s => motivoCounts.set(s.tipo, (motivoCounts.get(s.tipo) ?? 0) + 1));
+  const topMotivos = Array.from(motivoCounts.entries())
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 6)
+    .map(([tipo, count]) => ({
+      tipo,
+      label: tipoConfig[tipo]?.label ?? tipo,
+      categoria: tipoConfig[tipo]?.categoria,
+      count,
+    }));
+  const maxMotivo = Math.max(...topMotivos.map(m => m.count), 1);
+  const totalMotivos = solicitacoes.length;
+
+  // Destinos por categoria funcional
+  const destinoPorCategoria = (Object.keys(categoriaConfig) as (keyof typeof categoriaConfig)[]).map(cat => ({
+    categoria: cat,
+    label: categoriaConfig[cat].label,
+    color: categoriaConfig[cat].color,
+    count: solicitacoes.filter(s => tipoConfig[s.tipo]?.categoria === cat).length,
+  }));
+  const maxCat = Math.max(...destinoPorCategoria.map(c => c.count), 1);
+  const totalCat = destinoPorCategoria.reduce((a, c) => a + c.count, 0);
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
