@@ -116,7 +116,12 @@ export default function GapAtendimentoDetail() {
           </div>
 
           <div className="min-w-0 flex-1 pt-0.5">
-            <p className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground font-semibold mb-1.5">Sessão</p>
+            <Link
+              to="/gap/agendamentos"
+              className="inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.12em] font-semibold text-primary hover:text-primary/80 transition-colors mb-1.5"
+            >
+              Ano Lectivo 2024/2025
+            </Link>
             <h1 className="text-xl font-semibold leading-tight tracking-tight text-foreground">
               {atendimento.motivo}
             </h1>
