@@ -96,7 +96,7 @@ export default function GapAtendimentoDetail() {
         {/* Top bar — sessão id + categoria */}
         <div className="flex items-center justify-between gap-3 px-6 py-3 border-b border-border bg-muted/20">
           <div className="flex items-center gap-2 min-w-0">
-            <span className="text-[11px] font-medium text-muted-foreground shrink-0">Sessão</span>
+            <span className="text-[11px] font-medium text-muted-foreground shrink-0">Agendamento</span>
             <span className="text-muted-foreground/40">·</span>
             <span className="text-[11px] font-mono font-semibold text-foreground shrink-0">{atendimento.id}</span>
           </div>
@@ -130,7 +130,8 @@ export default function GapAtendimentoDetail() {
                 <span className={cn("w-1.5 h-1.5 rounded-full mr-1.5 inline-block", est.dot)} />
                 {est.label}
               </Badge>
-              <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider", cat.color)}>
+              <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider gap-1", cat.color)}>
+                <cat.icon className="w-3 h-3" />
                 {cat.label}
               </Badge>
             </div>

@@ -618,14 +618,16 @@ export interface GapEstudanteSeguimento {
   acompanhamentos: number; ultimoContacto: string; responsavel: string; motivo: string;
 }
 
-export const ticketCategoriaConfig: Record<TicketCategoria, { label: string; color: string }> = {
-  academico:    { label: "Académico",    color: "bg-primary/10 text-primary border-primary/20" },
-  psicologico:  { label: "Psicológico",  color: "bg-purple-100 text-purple-700 border-purple-200" },
-  financeiro:   { label: "Financeiro",   color: "bg-emerald-100 text-emerald-700 border-emerald-200" },
-  documentacao: { label: "Documentação", color: "bg-blue-100 text-blue-700 border-blue-200" },
-  social:       { label: "Social",       color: "bg-pink-100 text-pink-700 border-pink-200" },
-  carreira:     { label: "Carreira",     color: "bg-amber-100 text-amber-700 border-amber-200" },
-  saude:        { label: "Saúde",        color: "bg-red-100 text-red-700 border-red-200" },
+import { GraduationCap, Brain, Wallet, FileText as FileTextIcon, Users as UsersIcon, Briefcase, HeartPulse, type LucideIcon } from "lucide-react";
+
+export const ticketCategoriaConfig: Record<TicketCategoria, { label: string; color: string; icon: LucideIcon }> = {
+  academico:    { label: "Académico",    color: "bg-primary/10 text-primary border-primary/20",            icon: GraduationCap },
+  psicologico:  { label: "Psicológico",  color: "bg-purple-100 text-purple-700 border-purple-200",         icon: Brain },
+  financeiro:   { label: "Financeiro",   color: "bg-emerald-100 text-emerald-700 border-emerald-200",      icon: Wallet },
+  documentacao: { label: "Documentação", color: "bg-blue-100 text-blue-700 border-blue-200",               icon: FileTextIcon },
+  social:       { label: "Social",       color: "bg-pink-100 text-pink-700 border-pink-200",               icon: UsersIcon },
+  carreira:     { label: "Carreira",     color: "bg-amber-100 text-amber-700 border-amber-200",            icon: Briefcase },
+  saude:        { label: "Saúde",        color: "bg-red-100 text-red-700 border-red-200",                  icon: HeartPulse },
 };
 
 export const gapAtendimentos: GapAtendimento[] = [
