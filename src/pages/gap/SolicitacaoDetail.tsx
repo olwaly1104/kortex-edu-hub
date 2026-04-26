@@ -155,7 +155,8 @@ export default function GapSolicitacaoDetail() {
             {tipoCfg?.label ?? selected.tipo}
           </h1>
           <div className="mt-2.5 flex items-center gap-1.5 flex-wrap">
-            <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider", st.color)}>
+            <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider gap-1", st.color)}>
+              <span className={cn("w-1.5 h-1.5 rounded-full", estadoDot[selected.estado])} />
               {st.label}
             </Badge>
             {tipoCfg && (
@@ -163,9 +164,6 @@ export default function GapSolicitacaoDetail() {
                 {tipoCfg.categoria}
               </Badge>
             )}
-            <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider", dest.color)}>
-              {dest.label}
-            </Badge>
           </div>
         </div>
 
