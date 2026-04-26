@@ -153,7 +153,7 @@ export default function GapDashboard() {
         </Card>
 
         {/* Em Atraso */}
-        <Card className="overflow-hidden flex flex-col">
+        <Card className="overflow-hidden flex flex-col h-full">
           <div className="flex items-center justify-between px-5 py-4 border-b">
             <div className="flex items-center gap-2 min-w-0">
               <div className="w-8 h-8 rounded-lg bg-destructive/10 text-destructive flex items-center justify-center shrink-0">
