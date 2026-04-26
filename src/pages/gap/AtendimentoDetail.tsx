@@ -7,7 +7,7 @@ import {
   ArrowLeft, Calendar as CalendarIcon, Clock, MapPin, Video,
   CheckCircle2, X, MessageSquare, Mail, Phone,
   DoorOpen, GraduationCap, BookOpen, Hash, FileText, StickyNote,
-  UserCircle2, Timer, ChevronRight,
+  UserCircle2, Timer, ChevronRight, Download,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { gapAtendimentos, ticketCategoriaConfig as categoriaConfig } from "@/data/gapData";
@@ -213,6 +213,24 @@ export default function GapAtendimentoDetail() {
               ) : (
                 <p className="text-sm text-muted-foreground italic">Sem descrição adicional.</p>
               )}
+
+              {/* Document attachment */}
+              <button
+                type="button"
+                onClick={() => handleAction("Relatório aberto")}
+                className="mt-4 w-full flex items-center gap-3 rounded-lg border border-border bg-muted/20 px-3.5 py-3 text-left hover:border-primary/40 hover:bg-primary/5 transition-colors group"
+              >
+                <div className="w-9 h-9 rounded-md bg-red-50 border border-red-200 flex items-center justify-center shrink-0">
+                  <FileText className="w-4 h-4 text-red-600" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-[13px] font-semibold text-foreground leading-tight group-hover:text-primary transition-colors truncate">
+                    Resumo Da Sessão.pdf
+                  </p>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">Relatório · PDF</p>
+                </div>
+                <Download className="w-3.5 h-3.5 text-muted-foreground shrink-0 group-hover:text-primary transition-colors" />
+              </button>
             </section>
 
             {atendimento.notas && (
