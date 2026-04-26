@@ -43,7 +43,7 @@ export default function GapSolicitacaoDetail() {
   const tipoCfg = tipoConfig[selected.tipo];
   const dSub = new Date(selected.dataSubmissao);
   const dConc = selected.dataConclusao ? new Date(selected.dataConclusao) : null;
-  const fmt = (d: Date) => d.toLocaleDateString("pt-AO", { day: "2-digit", month: "short", year: "numeric" });
+  const fmt = (d: Date) => d.toLocaleDateString("pt-PT", { day: "2-digit", month: "2-digit", year: "numeric" });
   const fmtT = (d: Date) => d.toLocaleTimeString("pt-AO", { hour: "2-digit", minute: "2-digit" });
   const initials = selected.estudante.split(" ").slice(0, 2).map(n => n[0]).join("");
 
@@ -174,6 +174,20 @@ export default function GapSolicitacaoDetail() {
               );
             })()}
           </div>
+
+          {/* Detalhes do Pedido — inline with title */}
+          <div className="mt-5 pt-5 border-t border-border">
+            <div className="flex items-center gap-2 mb-3">
+              <FileText className="w-3.5 h-3.5 text-muted-foreground" />
+              <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Detalhes do Pedido</h3>
+            </div>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-5 gap-y-4">
+              <FactItem label="Submetido" value={fmt(dSub)} />
+              <FactItem label="Hora" value={fmtT(dSub)} />
+              <FactItem label="Destino" value={dest.label} />
+              <FactItem label="Responsável" value={selected.responsavelDestino ? selected.responsavelDestino.split(" · ")[0] : "A atribuir"} />
+            </div>
+          </div>
         </div>
 
         {/* 2-column body */}
@@ -285,22 +299,6 @@ export default function GapSolicitacaoDetail() {
 
           {/* RIGHT — detalhes + descrição + doc + histórico */}
           <main className="p-6 space-y-6 min-w-0">
-            {/* Detalhes do Pedido */}
-            <section>
-              <div className="flex items-center gap-2 mb-3">
-                <FileText className="w-3.5 h-3.5 text-muted-foreground" />
-                <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Detalhes do Pedido</h3>
-              </div>
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-5 gap-y-4">
-                <FactItem label="Submetido" value={fmt(dSub)} />
-                <FactItem label="Hora" value={fmtT(dSub)} />
-                <FactItem label="Destino" value={dest.label} />
-                <FactItem label="Responsável" value={selected.responsavelDestino ? selected.responsavelDestino.split(" · ")[0] : "A atribuir"} />
-              </div>
-            </section>
-
-            <div className="border-t border-border" />
-
             <section>
               <div className="flex items-center gap-2 mb-2.5">
                 <FileText className="w-3.5 h-3.5 text-muted-foreground" />
