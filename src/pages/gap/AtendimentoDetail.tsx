@@ -134,18 +134,24 @@ export default function GapAtendimentoDetail() {
 
         {/* Action bar — below title */}
         {atendimento.estado === "agendado" && (
-          <div className="flex items-center justify-end gap-2 px-6 pb-5">
-            <Button variant="outline" size="sm" className="h-8 px-3 text-[12px] gap-1.5" onClick={() => handleAction("Sessão remarcada")}>
-              <CalendarIcon className="w-3.5 h-3.5" /> Remarcar
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-8 px-3 text-[12px] gap-1.5 border-destructive/25 text-destructive hover:bg-destructive/10 hover:text-destructive"
-              onClick={() => handleAction("Sessão cancelada")}
-            >
-              <X className="w-3.5 h-3.5" /> Cancelar
-            </Button>
+          <div className="flex items-center justify-between gap-3 flex-wrap px-6 pb-5">
+            <div className="inline-flex items-center gap-2 rounded-md border border-border bg-muted/30 px-3 h-8 text-[12px] text-muted-foreground">
+              <Timer className="w-3.5 h-3.5 shrink-0" />
+              <span>Conclusão automática após <span className="font-semibold text-foreground tabular-nums">{endTime}</span></span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" className="h-8 px-3 text-[12px] gap-1.5" onClick={() => handleAction("Sessão remarcada")}>
+                <CalendarIcon className="w-3.5 h-3.5" /> Remarcar
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 px-3 text-[12px] gap-1.5 border-destructive/25 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                onClick={() => handleAction("Sessão cancelada")}
+              >
+                <X className="w-3.5 h-3.5" /> Cancelar
+              </Button>
+            </div>
           </div>
         )}
 
@@ -316,27 +322,23 @@ export default function GapAtendimentoDetail() {
               </section>
             )}
 
-            {/* Status banner */}
-            <section className="pt-5 border-t border-border">
-              {atendimento.estado === "agendado" && (
-                <div className="flex items-start gap-2.5 text-[12.5px] text-muted-foreground bg-muted/30 rounded-lg px-4 py-3 border border-border">
-                  <Timer className="w-3.5 h-3.5 mt-0.5 shrink-0" />
-                  <span>A sessão será marcada como concluída automaticamente após <span className="font-semibold text-foreground tabular-nums">{endTime}</span>.</span>
-                </div>
-              )}
-              {atendimento.estado === "concluido" && (
-                <div className="flex items-center gap-2.5 text-[13px] text-foreground bg-emerald-50 rounded-lg px-4 py-3 border border-emerald-200">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>Sessão concluída em <span className="font-semibold">{fullDate}</span>.</span>
-                </div>
-              )}
-              {atendimento.estado === "cancelado" && (
-                <div className="flex items-center gap-2.5 text-[13px] text-destructive bg-destructive/10 rounded-lg px-4 py-3 border border-destructive/20">
-                  <X className="w-4 h-4 shrink-0" />
-                  <span>Este agendamento foi cancelado e não será realizado.</span>
-                </div>
-              )}
-            </section>
+            {/* Status banner — only for completed/cancelled */}
+            {(atendimento.estado === "concluido" || atendimento.estado === "cancelado") && (
+              <section className="pt-5 border-t border-border">
+                {atendimento.estado === "concluido" && (
+                  <div className="flex items-center gap-2.5 text-[13px] text-foreground bg-emerald-50 rounded-lg px-4 py-3 border border-emerald-200">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span>Sessão concluída em <span className="font-semibold">{fullDate}</span>.</span>
+                  </div>
+                )}
+                {atendimento.estado === "cancelado" && (
+                  <div className="flex items-center gap-2.5 text-[13px] text-destructive bg-destructive/10 rounded-lg px-4 py-3 border border-destructive/20">
+                    <X className="w-4 h-4 shrink-0" />
+                    <span>Este agendamento foi cancelado e não será realizado.</span>
+                  </div>
+                )}
+              </section>
+            )}
           </main>
         </div>
 
