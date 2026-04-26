@@ -5,8 +5,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   ArrowLeft, Clock, FileText, MessageSquare, Mail, Check, X, Hourglass, Send,
+  Eye, Download, Users, Share2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger,
+} from "@/components/ui/dialog";
 import {
   solicitacoes, Categoria,
   estadoSolicitacaoConfig, destinoConfig, tipoConfig, categoriaConfig,
