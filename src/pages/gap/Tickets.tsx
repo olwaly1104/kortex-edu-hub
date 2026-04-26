@@ -9,7 +9,7 @@ import ReportsMenuButton from "@/components/ReportsMenuButton";
 import { BarChart3, TrendingUp, BookOpen, FileBarChart2 } from "lucide-react";
 import {
   Search, X, Calendar as CalendarIcon, Building2,
-  Inbox, Clock, CheckCircle2, AlertCircle, Layers, XCircle, Filter,
+  Inbox, Clock, CheckCircle2, AlertCircle, Layers,
 } from "lucide-react";
 
 const TODAY = "2025-12-16";
