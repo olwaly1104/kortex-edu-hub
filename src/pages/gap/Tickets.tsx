@@ -5,6 +5,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import ReportsMenuButton from "@/components/ReportsMenuButton";
+import { BarChart3, TrendingUp, BookOpen, FileBarChart2 } from "lucide-react";
 import {
   Search, X, Calendar as CalendarIcon, Building2,
   Inbox, Clock, CheckCircle2, AlertCircle, Layers,
