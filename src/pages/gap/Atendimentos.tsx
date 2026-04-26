@@ -13,7 +13,7 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Plus, Calendar as CalendarIcon, Clock, MapPin, Video, Search, FileText,
-  CheckCircle2, X, Filter, User, ArrowRight, ChevronLeft, ChevronRight,
+  CheckCircle2, X, Filter, User, ChevronLeft, ChevronRight,
   LayoutGrid, List as ListIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
