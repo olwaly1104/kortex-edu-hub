@@ -73,6 +73,9 @@ export default function GapDashboard() {
             Gabinete de Apoio ao Estudante — monitorização do pipeline de solicitações encaminhadas e acompanhamento individual.
           </p>
         </div>
+        <Badge variant="outline" className="text-[11px] font-semibold bg-primary/5 text-primary border-primary/20 px-3 py-1.5">
+          Ano Letivo 2024/2025
+        </Badge>
       </div>
 
       {/* Single consolidated KPI row */}
