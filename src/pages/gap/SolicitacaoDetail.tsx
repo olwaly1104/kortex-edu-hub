@@ -43,7 +43,7 @@ export default function GapSolicitacaoDetail() {
   const tipoCfg = tipoConfig[selected.tipo];
   const dSub = new Date(selected.dataSubmissao);
   const dConc = selected.dataConclusao ? new Date(selected.dataConclusao) : null;
-  const fmt = (d: Date) => d.toLocaleDateString("pt-AO", { day: "2-digit", month: "short", year: "numeric" });
+  const fmt = (d: Date) => d.toLocaleDateString("pt-PT", { day: "2-digit", month: "2-digit", year: "numeric" });
   const fmtT = (d: Date) => d.toLocaleTimeString("pt-AO", { hour: "2-digit", minute: "2-digit" });
   const initials = selected.estudante.split(" ").slice(0, 2).map(n => n[0]).join("");
 
