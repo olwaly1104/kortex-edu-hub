@@ -16,6 +16,7 @@ import {
 const TODAY_STR = "2025-12-16";
 
 export default function GapDashboard() {
+  const navigate = useNavigate();
   const totalSolicitacoes = solicitacoes.length;
   // Single consolidated KPI row — essentials only
   const kpis = [
