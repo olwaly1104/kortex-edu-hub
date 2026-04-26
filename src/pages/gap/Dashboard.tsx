@@ -5,12 +5,12 @@ import { Progress } from "@/components/ui/progress";
 import { Link } from "react-router-dom";
 import {
   Clock, CheckCircle, AlertTriangle, Calendar as CalendarIcon, BarChart3,
-  Inbox, Building2, ArrowRight, Users,
+  Inbox, Building2, ArrowRight, Users, ListChecks,
 } from "lucide-react";
 import {
   gapKpis, solicitacoes, gapAtendimentos, gapEstudantesSeguimento,
   solicitacoesPorDestino, destinoConfig, estadoSolicitacaoConfig,
-  ticketCategoriaConfig as categoriaConfig, tipoConfig,
+  ticketCategoriaConfig, tipoConfig, categoriaConfig,
 } from "@/data/gapData";
 
 const TODAY_STR = "2025-12-16";
