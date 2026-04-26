@@ -120,7 +120,7 @@ export default function GapDashboard() {
       {/* Próximos Agendamentos + Em Atraso — topo */}
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Próximos Agendamentos */}
-        <Card className="p-5">
+        <Card className="p-5 flex flex-col h-full">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
               <CalendarIcon className="w-4 h-4 text-primary" /> Próximos Agendamentos
