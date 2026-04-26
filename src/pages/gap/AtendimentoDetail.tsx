@@ -309,6 +309,7 @@ export default function GapAtendimentoDetail() {
                   <X className="w-4 h-4 shrink-0" />
                   <span>Este agendamento foi cancelado e não será realizado.</span>
                 </div>
+              )}
               {atendimento.estado === "agendado" && (
                 <div className="flex items-center justify-end gap-2 mt-3">
                   <Button variant="outline" size="sm" className="h-8 px-3 text-[12px] gap-1.5" onClick={() => handleAction("Sessão remarcada")}>
