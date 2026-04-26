@@ -165,11 +165,16 @@ export default function GapSolicitacaoDetail() {
               <span className={cn("w-1.5 h-1.5 rounded-full", estadoDot[selected.estado])} />
               {st.label}
             </Badge>
-            {tipoCfg && (
-              <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider", categoriaConfig[tipoCfg.categoria as Categoria]?.color)}>
-                {tipoCfg.categoria}
-              </Badge>
-            )}
+            {tipoCfg && (() => {
+              const catCfg = categoriaConfig[tipoCfg.categoria as Categoria];
+              const CatIcon = catCfg?.icon;
+              return (
+                <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider gap-1", catCfg?.color)}>
+                  {CatIcon && <CatIcon className="w-3 h-3" />}
+                  {tipoCfg.categoria}
+                </Badge>
+              );
+            })()}
           </div>
         </div>
 
