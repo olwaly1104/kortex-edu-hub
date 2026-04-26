@@ -131,22 +131,7 @@ export default function GapAtendimentoDetail() {
           </div>
         </div>
 
-        {/* Action bar — below title */}
-        {atendimento.estado === "agendado" && (
-          <div className="flex items-center justify-end gap-2 px-6 pb-4">
-            <Button variant="outline" size="sm" className="h-8 px-3 text-[12px] gap-1.5" onClick={() => handleAction("Sessão remarcada")}>
-              <CalendarIcon className="w-3.5 h-3.5" /> Remarcar
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-8 px-3 text-[12px] gap-1.5 border-destructive/25 text-destructive hover:bg-destructive/10 hover:text-destructive"
-              onClick={() => handleAction("Sessão cancelada")}
-            >
-              <X className="w-3.5 h-3.5" /> Cancelar
-            </Button>
-          </div>
-        )}
+
 
         {/* Body — Estudante left | Sessão right (one continuous card, just a divider) */}
         <div className="grid md:grid-cols-[280px_1fr] divide-y md:divide-y-0 md:divide-x divide-border border-t border-border">
@@ -199,9 +184,25 @@ export default function GapAtendimentoDetail() {
 
             <section className="pt-5 border-t border-border">
               <SectionTitle>Responsável</SectionTitle>
-              <div className="flex items-center gap-2 text-sm font-medium text-foreground">
-                <UserCircle2 className="w-4 h-4 text-muted-foreground" />
-                {atendimento.responsavel}
+              <div className="flex items-center justify-between gap-3 flex-wrap">
+                <button
+                  type="button"
+                  onClick={() => handleAction(`Perfil de ${atendimento.responsavel}`)}
+                  className="flex items-center gap-2.5 text-left hover:bg-muted/40 -mx-2 px-2 py-1 rounded-md transition-colors group"
+                >
+                  <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[11px] font-semibold ring-1 ring-primary/15 shrink-0">
+                    {atendimento.responsavel.split(" ").slice(0, 2).map(n => n[0]).join("")}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-foreground leading-tight group-hover:text-primary transition-colors">{atendimento.responsavel}</p>
+                    <p className="text-[11px] text-muted-foreground mt-0.5">Profissional GAP</p>
+                  </div>
+                </button>
+                <div className="flex items-center gap-1.5">
+                  <ContactBtn icon={<MessageSquare className="w-3 h-3" />} label="Chat" onClick={() => handleAction(`Chat com ${atendimento.responsavel}`)} />
+                  <ContactBtn icon={<Mail className="w-3 h-3" />} label="Email" onClick={() => handleAction(`Email para ${atendimento.responsavel}`)} />
+                  <ContactBtn icon={<Phone className="w-3 h-3" />} label="Ligar" onClick={() => handleAction(`Chamada para ${atendimento.responsavel}`)} />
+                </div>
               </div>
             </section>
 
@@ -307,6 +308,21 @@ export default function GapAtendimentoDetail() {
                 <div className="flex items-center gap-2.5 text-[13px] text-destructive bg-destructive/10 rounded-lg px-4 py-3 border border-destructive/20">
                   <X className="w-4 h-4 shrink-0" />
                   <span>Este agendamento foi cancelado e não será realizado.</span>
+                </div>
+              )}
+              {atendimento.estado === "agendado" && (
+                <div className="flex items-center justify-end gap-2 mt-3">
+                  <Button variant="outline" size="sm" className="h-8 px-3 text-[12px] gap-1.5" onClick={() => handleAction("Sessão remarcada")}>
+                    <CalendarIcon className="w-3.5 h-3.5" /> Remarcar
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-8 px-3 text-[12px] gap-1.5 border-destructive/25 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                    onClick={() => handleAction("Sessão cancelada")}
+                  >
+                    <X className="w-3.5 h-3.5" /> Cancelar
+                  </Button>
                 </div>
               )}
             </section>
