@@ -226,9 +226,9 @@ export default function GapAtendimentos() {
 
             <div className="inline-flex items-center rounded-md border border-input bg-background overflow-hidden">
               {([
-                { v: "todos", label: "Todos", count: counts.todos },
-                { v: "agendado", label: "Próximos", count: counts.agendados },
-                { v: "concluido", label: "Anteriores", count: counts.concluidos },
+              { v: "todos", label: "Todos", count: counts.todos },
+                { v: "agendado", label: "Agendados", count: counts.agendados },
+                { v: "concluido", label: "Concluídos", count: counts.concluidos },
               ] as const).map((opt, i) => (
                 <button
                   key={opt.v}
