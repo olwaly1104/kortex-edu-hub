@@ -232,12 +232,10 @@ export default function GapSolicitacaoDetail() {
               {selected.responsavelDestino ? (() => {
                 const respFull = selected.responsavelDestino;
                 const [respName, respRole] = respFull.split(" · ");
-                // Build a deterministic institutional user id from the name
-                const userId = respName
-                  .toLowerCase()
-                  .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-                  .replace(/^(dra|dr|prof|eng|tec|téc|sr|sra)\.?\s+/i, m => m.trim().replace(/\.$/, "").toLowerCase() + ".")
-                  .replace(/\s+/g, ".");
+                // Numeric institutional user id derived deterministically from name
+                let hash = 0;
+                for (let i = 0; i < respName.length; i++) hash = (hash * 31 + respName.charCodeAt(i)) >>> 0;
+                const userId = String(100000 + (hash % 900000));
                 return (
                   <>
                     <button
@@ -252,7 +250,7 @@ export default function GapSolicitacaoDetail() {
                         <p className="text-sm font-semibold text-foreground leading-tight group-hover:text-primary transition-colors truncate">
                           {respName}
                         </p>
-                        <p className="text-[11px] text-muted-foreground mt-0.5 truncate font-mono">{userId}</p>
+                        <p className="text-[11px] text-muted-foreground mt-0.5 font-mono tabular-nums">{userId}</p>
                       </div>
                     </button>
                     <div className="grid grid-cols-3 gap-2 mt-3">
@@ -267,22 +265,20 @@ export default function GapSolicitacaoDetail() {
                       </Button>
                     </div>
 
-                    {/* Lotação institucional */}
                     <div className="mt-3 pt-3 border-t border-border space-y-1.5">
-                      <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold mb-1.5">Lotação institucional</p>
-                      <div className="flex items-baseline justify-between gap-2">
-                        <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Posição</span>
-                        <span className="text-[11px] font-medium text-foreground text-right truncate max-w-[150px]">{respRole ?? "Profissional"}</span>
-                      </div>
+                      {selected.destino === "Faculdade" && (
+                        <div className="flex items-baseline justify-between gap-2">
+                          <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Faculdade</span>
+                          <span className="text-[11px] font-medium text-foreground text-right truncate max-w-[150px]">{selected.faculdade}</span>
+                        </div>
+                      )}
                       <div className="flex items-baseline justify-between gap-2">
                         <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Departamento</span>
                         <span className="text-[11px] font-medium text-foreground text-right truncate max-w-[150px]">{dest.label}</span>
                       </div>
                       <div className="flex items-baseline justify-between gap-2">
-                        <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Faculdade</span>
-                        <span className="text-[11px] font-medium text-foreground text-right truncate max-w-[150px]">
-                          {selected.destino === "Faculdade" ? selected.faculdade : "Serviços Centrais"}
-                        </span>
+                        <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Posição</span>
+                        <span className="text-[11px] font-medium text-foreground text-right truncate max-w-[150px]">{respRole ?? "Profissional"}</span>
                       </div>
                     </div>
                   </>
