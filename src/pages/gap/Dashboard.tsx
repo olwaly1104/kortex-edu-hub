@@ -4,9 +4,8 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Link } from "react-router-dom";
 import {
-  HelpCircle, Clock, CheckCircle, Heart,
-  Smile, AlertTriangle, Calendar as CalendarIcon, BarChart3,
-  Send, Inbox, Building2, ArrowRight,
+  Clock, CheckCircle, AlertTriangle, Calendar as CalendarIcon, BarChart3,
+  Inbox, Building2, ArrowRight, Users,
 } from "lucide-react";
 import {
   gapKpis, solicitacoes, gapAtendimentos, gapEstudantesSeguimento,
