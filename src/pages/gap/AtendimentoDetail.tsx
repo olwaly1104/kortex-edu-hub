@@ -92,19 +92,15 @@ export default function GapAtendimentoDetail() {
 
       {/* ONE UNIFIED CARD */}
       <article className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
-        {/* Top bar — id + status */}
+        {/* Top bar — sessão id + categoria */}
         <div className="flex items-center justify-between gap-3 px-6 py-3 border-b border-border bg-muted/20">
           <div className="flex items-center gap-2 min-w-0">
+            <span className="text-[11px] font-medium text-muted-foreground shrink-0">Sessão</span>
+            <span className="text-muted-foreground/40">·</span>
             <span className="text-[11px] font-mono font-semibold text-foreground shrink-0">{atendimento.id}</span>
             <span className="text-muted-foreground/40">·</span>
-            <span className="text-[11px] font-medium text-muted-foreground truncate">Agendamento GAP</span>
-            <span className="text-muted-foreground/40">·</span>
-            <span className="text-[11px] font-medium text-muted-foreground">{cat.label}</span>
+            <span className="text-[11px] font-medium text-muted-foreground truncate">{cat.label}</span>
           </div>
-          <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider", est.pill)}>
-            <span className={cn("w-1.5 h-1.5 rounded-full mr-1.5 inline-block", est.dot)} />
-            {est.label}
-          </Badge>
         </div>
 
         {/* Title block with moderate date tile */}
@@ -125,9 +121,12 @@ export default function GapAtendimentoDetail() {
             <h1 className="text-xl font-semibold leading-tight tracking-tight text-foreground">
               {atendimento.motivo}
             </h1>
-            <p className="text-sm text-muted-foreground mt-1.5 capitalize">
-              {weekday}, {fullDate} · {startTime}–{endTime} · {atendimento.duracao}
-            </p>
+            <div className="mt-2.5">
+              <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider", est.pill)}>
+                <span className={cn("w-1.5 h-1.5 rounded-full mr-1.5 inline-block", est.dot)} />
+                {est.label}
+              </Badge>
+            </div>
           </div>
         </div>
 
