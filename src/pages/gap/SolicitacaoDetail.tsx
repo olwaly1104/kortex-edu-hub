@@ -363,3 +363,22 @@ export default function GapSolicitacaoDetail() {
     </div>
   );
 }
+
+function FactItem({ label, value, onClick }: { label: string; value: string; onClick?: () => void }) {
+  return (
+    <div className="min-w-0">
+      <p className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground mb-1">{label}</p>
+      {onClick ? (
+        <button
+          type="button"
+          onClick={onClick}
+          className="text-sm font-semibold text-primary hover:underline leading-tight truncate text-left block max-w-full"
+        >
+          {value}
+        </button>
+      ) : (
+        <p className="text-sm font-semibold text-foreground leading-tight truncate">{value}</p>
+      )}
+    </div>
+  );
+}
