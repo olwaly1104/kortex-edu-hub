@@ -106,25 +106,20 @@ export default function GapSolicitacaoDetail() {
   } else if (selected.estado === "rejeitada") {
     steps.push({ label: "Sem conclusão", actor: "Pedido encerrado por rejeição", tone: "pending" });
   } else {
-    const sla = selected.slaDias ?? tipoCfg?.slaDias;
-    let aside: string | undefined;
-    let labelText = "Conclusão prevista";
-    if (sla) {
-      const base = new Date(selected.dataEncaminhamento ?? selected.dataSubmissao);
-      base.setDate(base.getDate() + sla);
-      const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
-      const diff = Math.ceil((base.getTime() - hoje.getTime()) / 86400000);
-      labelText = `Conclusão prevista · ${fmt(base)}`;
-      if (diff < 0) {
-        aside = `${Math.abs(diff)} ${Math.abs(diff) === 1 ? "dia" : "dias"} em atraso`;
-      } else if (diff === 0) {
-        aside = "Prazo termina hoje";
-      } else {
-        aside = `Faltam ${diff} ${diff === 1 ? "dia" : "dias"}`;
-      }
+    // Conclusão prevista — fixed institutional target
+    const base = new Date("2025-12-15");
+    const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
+    const diff = Math.ceil((base.getTime() - hoje.getTime()) / 86400000);
+    let aside: string;
+    if (diff < 0) {
+      aside = `${Math.abs(diff)} ${Math.abs(diff) === 1 ? "dia" : "dias"} em atraso`;
+    } else if (diff === 0) {
+      aside = "Prazo termina hoje";
+    } else {
+      aside = `Faltam ${diff} ${diff === 1 ? "dia" : "dias"}`;
     }
     steps.push({
-      label: labelText,
+      label: `Conclusão prevista · ${fmt(base)}`,
       actor: selected.responsavelDestino ?? dest.label,
       aside,
       tone: "scheduled",
