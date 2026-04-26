@@ -216,13 +216,94 @@ export default function GapSolicitacaoDetail() {
               <h1 className="text-xl font-semibold leading-tight tracking-tight text-foreground">
                 {tipoCfg?.label ?? selected.tipo}
               </h1>
-              <button
-                type="button"
-                onClick={() => { navigator.clipboard?.writeText(selected.id); toast({ title: "ID copiado", description: selected.id }); }}
-                className="shrink-0 inline-flex items-center px-2 py-0.5 rounded-md border border-border bg-background hover:bg-muted text-[11px] font-mono font-semibold text-foreground transition-colors"
-              >
-                {selected.id}
-              </button>
+              <div className="shrink-0 flex flex-col items-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => { navigator.clipboard?.writeText(selected.id); toast({ title: "ID copiado", description: selected.id }); }}
+                  className="inline-flex items-center px-2 py-0.5 rounded-md border border-border bg-background hover:bg-muted text-[11px] font-mono font-semibold text-foreground transition-colors"
+                >
+                  {selected.id}
+                </button>
+                {(() => {
+                  const gapTeam = [
+                    { name: "Dra. Helena Cabral", role: "Coordenadora GAP", email: "helena.cabral@upra.kor", phone: "+244 923 100 201" },
+                    { name: "Dr. João Tavares", role: "Técnico GAP · Académico", email: "joao.tavares@upra.kor", phone: "+244 923 100 202" },
+                    { name: "Dra. Marta Ribeiro", role: "Técnica GAP · Apoio", email: "marta.ribeiro@upra.kor", phone: "+244 923 100 203" },
+                    { name: "Dr. Nelson Pinto", role: "Técnico GAP · Tecnológico", email: "nelson.pinto@upra.kor", phone: "+244 923 100 204" },
+                    { name: "Dra. Sofia Mendes", role: "Técnica GAP · Financeiro", email: "sofia.mendes@upra.kor", phone: "+244 923 100 205" },
+                    { name: "Sr. Bruno Alves", role: "Assistente GAP", email: "bruno.alves@upra.kor", phone: "+244 923 100 206" },
+                  ];
+                  const initials = (n: string) => n.split(" ").slice(-2).map(p => p[0]).join("");
+                  const avatarTones = [
+                    "bg-emerald-100 text-emerald-700",
+                    "bg-sky-100 text-sky-700",
+                    "bg-amber-100 text-amber-700",
+                    "bg-violet-100 text-violet-700",
+                    "bg-rose-100 text-rose-700",
+                    "bg-teal-100 text-teal-700",
+                  ];
+                  return (
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <button
+                          type="button"
+                          className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full border border-border bg-background hover:bg-muted text-[10px] font-medium text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                          <span className="flex -space-x-1">
+                            {gapTeam.slice(0, 3).map((m, i) => (
+                              <span
+                                key={m.name}
+                                className={cn(
+                                  "w-4 h-4 rounded-full ring-1 ring-background flex items-center justify-center text-[8px] font-semibold",
+                                  avatarTones[i % avatarTones.length]
+                                )}
+                              >
+                                {initials(m.name)[0]}
+                              </span>
+                            ))}
+                          </span>
+                          <span className="uppercase tracking-wider">Acompanhado por:</span>
+                          <span className="font-semibold text-foreground tabular-nums">{gapTeam.length} membros</span>
+                        </button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-md">
+                        <DialogHeader>
+                          <DialogTitle className="text-base flex items-center gap-2">
+                            <Users className="w-4 h-4 text-primary" /> Acompanhamento GAP
+                          </DialogTitle>
+                          <DialogDescription className="text-xs">
+                            Profissionais do Gabinete de Apoio ao Estudante a monitorizar esta solicitação.
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="divide-y divide-border -mx-1">
+                          {gapTeam.map((m, i) => (
+                            <div key={m.name} className="flex items-start gap-3 px-1 py-2.5">
+                              <div className={cn(
+                                "w-9 h-9 rounded-full flex items-center justify-center shrink-0 font-semibold text-[11px]",
+                                avatarTones[i % avatarTones.length]
+                              )}>
+                                {initials(m.name)}
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <p className="text-sm font-semibold text-foreground leading-tight truncate">{m.name}</p>
+                                <p className="text-[11px] text-muted-foreground mt-0.5 truncate">{m.role}</p>
+                                <div className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-[10px] text-muted-foreground">
+                                  <span className="flex items-center gap-1"><Mail className="w-3 h-3" /> {m.email}</span>
+                                  <span className="flex items-center gap-1 tabular-nums"><Phone className="w-3 h-3" /> {m.phone}</span>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-1 shrink-0">
+                                <Button variant="ghost" size="icon" className="h-7 w-7"><MessageSquare className="w-3.5 h-3.5" /></Button>
+                                <Button variant="ghost" size="icon" className="h-7 w-7"><Mail className="w-3.5 h-3.5" /></Button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                  );
+                })()}
+              </div>
             </div>
             <div className="mt-2.5 flex items-center gap-1.5 flex-wrap">
               <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider gap-1", st.color)}>
@@ -239,88 +320,8 @@ export default function GapSolicitacaoDetail() {
                   </Badge>
                 );
               })()}
-              {(() => {
-                const gapTeam = [
-                  { name: "Dra. Helena Cabral", role: "Coordenadora GAP", email: "helena.cabral@upra.kor", phone: "+244 923 100 201" },
-                  { name: "Dr. João Tavares", role: "Técnico GAP · Académico", email: "joao.tavares@upra.kor", phone: "+244 923 100 202" },
-                  { name: "Dra. Marta Ribeiro", role: "Técnica GAP · Apoio", email: "marta.ribeiro@upra.kor", phone: "+244 923 100 203" },
-                  { name: "Dr. Nelson Pinto", role: "Técnico GAP · Tecnológico", email: "nelson.pinto@upra.kor", phone: "+244 923 100 204" },
-                  { name: "Dra. Sofia Mendes", role: "Técnica GAP · Financeiro", email: "sofia.mendes@upra.kor", phone: "+244 923 100 205" },
-                  { name: "Sr. Bruno Alves", role: "Assistente GAP", email: "bruno.alves@upra.kor", phone: "+244 923 100 206" },
-                ];
-                const initials = (n: string) => n.split(" ").slice(-2).map(p => p[0]).join("");
-                const avatarTones = [
-                  "bg-emerald-100 text-emerald-700",
-                  "bg-sky-100 text-sky-700",
-                  "bg-amber-100 text-amber-700",
-                  "bg-violet-100 text-violet-700",
-                  "bg-rose-100 text-rose-700",
-                  "bg-teal-100 text-teal-700",
-                ];
-                return (
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <button
-                        type="button"
-                        className="ml-0.5 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full border border-border bg-background hover:bg-muted text-[10px] font-medium text-muted-foreground hover:text-foreground transition-colors"
-                      >
-                        <span className="flex -space-x-1">
-                          {gapTeam.slice(0, 3).map((m, i) => (
-                            <span
-                              key={m.name}
-                              className={cn(
-                                "w-4 h-4 rounded-full ring-1 ring-background flex items-center justify-center text-[8px] font-semibold",
-                                avatarTones[i % avatarTones.length]
-                              )}
-                            >
-                              {initials(m.name)[0]}
-                            </span>
-                          ))}
-                        </span>
-                        <span className="uppercase tracking-wider">Acompanhado por:</span>
-                        <span className="font-semibold text-foreground tabular-nums">{gapTeam.length} membros</span>
-                      </button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-md">
-                      <DialogHeader>
-                        <DialogTitle className="text-base flex items-center gap-2">
-                          <Users className="w-4 h-4 text-primary" /> Acompanhamento GAP
-                        </DialogTitle>
-                        <DialogDescription className="text-xs">
-                          Profissionais do Gabinete de Apoio ao Estudante a monitorizar esta solicitação.
-                        </DialogDescription>
-                      </DialogHeader>
-                      <div className="divide-y divide-border -mx-1">
-                        {gapTeam.map((m, i) => (
-                          <div key={m.name} className="flex items-start gap-3 px-1 py-2.5">
-                            <div className={cn(
-                              "w-9 h-9 rounded-full flex items-center justify-center shrink-0 font-semibold text-[11px]",
-                              avatarTones[i % avatarTones.length]
-                            )}>
-                              {initials(m.name)}
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              <p className="text-sm font-semibold text-foreground leading-tight truncate">{m.name}</p>
-                              <p className="text-[11px] text-muted-foreground mt-0.5 truncate">{m.role}</p>
-                              <div className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-[10px] text-muted-foreground">
-                                <span className="flex items-center gap-1"><Mail className="w-3 h-3" /> {m.email}</span>
-                                <span className="flex items-center gap-1 tabular-nums"><Phone className="w-3 h-3" /> {m.phone}</span>
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-1 shrink-0">
-                              <Button variant="ghost" size="icon" className="h-7 w-7"><MessageSquare className="w-3.5 h-3.5" /></Button>
-                              <Button variant="ghost" size="icon" className="h-7 w-7"><Mail className="w-3.5 h-3.5" /></Button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </DialogContent>
-                  </Dialog>
-                );
-              })()}
             </div>
           </div>
-        </div>
 
 
         {/* 2-column body */}
