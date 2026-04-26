@@ -78,10 +78,8 @@ export default function GapSolicitacaoDetail() {
     });
     steps.push({ label: "Solicitação aceite", data: aceite?.data, actor: aceite?.actor ?? selected.responsavelDestino, nota: aceite?.nota, tone: "accepted" });
   } else {
-    // Acceptance SLA: 2 working days from forwarding (or submission as fallback)
-    const acceptSlaDias = 2;
-    const baseAccept = new Date(selected.dataEncaminhamento ?? selected.dataSubmissao);
-    baseAccept.setDate(baseAccept.getDate() + acceptSlaDias);
+    // Acceptance prevision — one day before the conclusion target (15/12/2025)
+    const baseAccept = new Date("2025-12-14");
     const hojeA = new Date(); hojeA.setHours(0, 0, 0, 0);
     const diffA = Math.ceil((baseAccept.getTime() - hojeA.getTime()) / 86400000);
     let asideAccept: string;
