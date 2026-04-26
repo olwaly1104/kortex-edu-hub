@@ -7,7 +7,7 @@ import {
   ArrowLeft, Calendar as CalendarIcon, Clock, MapPin, Video,
   CheckCircle2, X, MessageSquare, Mail, Phone,
   DoorOpen, GraduationCap, BookOpen, Hash, FileText, StickyNote,
-  UserCircle2, Timer, ChevronRight,
+  UserCircle2, Timer, ChevronRight, Download,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { gapAtendimentos, ticketCategoriaConfig as categoriaConfig } from "@/data/gapData";
