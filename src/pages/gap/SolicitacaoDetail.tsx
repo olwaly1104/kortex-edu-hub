@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   ArrowLeft, Clock, FileText, MessageSquare, Mail, Phone, Check, X, Hourglass, Send,
-  Eye, Download, Users, Share2, CheckCircle2,
+  Eye, Download, Users, Share2, CheckCircle2, Paperclip, FileImage, FileSpreadsheet,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -46,6 +46,48 @@ export default function GapSolicitacaoDetail() {
   const fmt = (d: Date) => d.toLocaleDateString("pt-PT", { day: "2-digit", month: "2-digit", year: "numeric" });
   const fmtT = (d: Date) => d.toLocaleTimeString("pt-AO", { hour: "2-digit", minute: "2-digit" });
   const initials = selected.estudante.split(" ").slice(0, 2).map(n => n[0]).join("");
+
+  // Anexos do estudante — usa anexos definidos ou deriva do tipo/descrição
+  type Anexo = { nome: string; tamanho: string; tipo: "pdf" | "image" | "doc" | "sheet" };
+  const anexos: Anexo[] = (() => {
+    if (selected.anexos && selected.anexos.length > 0) {
+      return selected.anexos.map(a => ({
+        nome: a.nome,
+        tamanho: "—",
+        tipo: a.nome.toLowerCase().endsWith(".jpg") || a.nome.toLowerCase().endsWith(".png") ? "image"
+          : a.nome.toLowerCase().endsWith(".xlsx") || a.nome.toLowerCase().endsWith(".csv") ? "sheet"
+          : a.nome.toLowerCase().endsWith(".docx") ? "doc"
+          : "pdf",
+      }));
+    }
+    const desc = selected.descricao.toLowerCase();
+    const tipo = selected.tipo;
+    const list: Anexo[] = [];
+    if (desc.includes("comprovativo") || tipo.includes("pagamento") || selected.destino === "Financeiro") {
+      list.push({ nome: `Comprovativo-pagamento-${selected.matricula}.pdf`, tamanho: "184 KB", tipo: "pdf" });
+    }
+    if (desc.includes("atestado") || desc.includes("internad") || tipo.includes("justificacao")) {
+      list.push({ nome: "Atestado-medico.pdf", tamanho: "212 KB", tipo: "pdf" });
+    }
+    if (tipo.includes("declaracao") || tipo.includes("certificado")) {
+      list.push({ nome: `BI-${selected.matricula}.jpg`, tamanho: "356 KB", tipo: "image" });
+    }
+    if (tipo.includes("homologacao") || tipo.includes("transferencia")) {
+      list.push(
+        { nome: "Historico-academico.pdf", tamanho: "498 KB", tipo: "pdf" },
+        { nome: "Plano-curricular.pdf", tamanho: "276 KB", tipo: "pdf" },
+      );
+    }
+    return list;
+  })();
+
+  const anexoIcon = (t: Anexo["tipo"]) => {
+    if (t === "image") return { Icon: FileImage, cls: "bg-violet-50 border-violet-200 text-violet-600" };
+    if (t === "sheet") return { Icon: FileSpreadsheet, cls: "bg-emerald-50 border-emerald-200 text-emerald-600" };
+    if (t === "doc") return { Icon: FileText, cls: "bg-sky-50 border-sky-200 text-sky-600" };
+    return { Icon: FileText, cls: "bg-red-50 border-red-200 text-red-600" };
+  };
+
 
   const submetida = selected.historico.find(h => h.accao.toLowerCase().includes("submetida"));
   const encaminhada = selected.historico.find(h => h.accao.toLowerCase().includes("encaminhada"));
@@ -482,9 +524,59 @@ export default function GapSolicitacaoDetail() {
                   </div>
                 </DialogContent>
               </Dialog>
+
+              {anexos.length > 0 && (
+                <div className="mt-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Paperclip className="w-3.5 h-3.5 text-muted-foreground" />
+                    <h4 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">
+                      Anexos do estudante
+                    </h4>
+                    <span className="text-[10px] text-muted-foreground tabular-nums">({anexos.length})</span>
+                  </div>
+                  <div className="space-y-2">
+                    {anexos.map((a, i) => {
+                      const { Icon, cls } = anexoIcon(a.tipo);
+                      return (
+                        <div
+                          key={i}
+                          className="flex items-center gap-3 rounded-lg border border-border bg-muted/20 px-3.5 py-2.5"
+                        >
+                          <div className={cn("w-9 h-9 rounded-md border flex items-center justify-center shrink-0", cls)}>
+                            <Icon className="w-4 h-4" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-[13px] font-semibold text-foreground leading-tight truncate">{a.nome}</p>
+                            <p className="text-[11px] text-muted-foreground mt-0.5 tabular-nums">{a.tamanho}</p>
+                          </div>
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-7 px-2.5 text-[11px] gap-1"
+                              onClick={() => toast({ title: "A abrir anexo", description: a.nome })}
+                            >
+                              <Eye className="w-3 h-3" /> Ver
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-7 px-2.5 text-[11px] gap-1"
+                              onClick={() => toast({ title: "Anexo descarregado", description: a.nome })}
+                            >
+                              <Download className="w-3 h-3" /> Descarregar
+                            </Button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </section>
 
             <div className="border-t border-border" />
+
 
             <section>
               <div className="flex items-center gap-2 mb-4">
