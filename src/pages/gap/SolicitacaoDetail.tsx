@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  ArrowLeft, Clock, FileText, MessageSquare, Mail, Check, X, Hourglass, Send,
+  ArrowLeft, Clock, FileText, MessageSquare, Mail, Phone, Check, X, Hourglass, Send,
   Eye, Download, Users, Share2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -143,17 +143,16 @@ export default function GapSolicitacaoDetail() {
       </Link>
 
       <Card className="overflow-hidden p-0 gap-0">
-        {/* Top bar — ID + categoria */}
+        {/* Top bar — ID + destino tag */}
         <div className="flex items-center justify-between px-6 py-3 border-b border-border bg-muted/20">
-          <div className="flex items-center gap-2">
-            <span className="text-[11px] font-mono text-muted-foreground">{selected.id}</span>
-            {tipoCfg && (
-              <>
-                <span className="text-muted-foreground/40">·</span>
-                <span className="text-[11px] font-medium text-muted-foreground">{tipoCfg.categoria}</span>
-              </>
-            )}
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="text-[11px] font-medium text-muted-foreground shrink-0">Pedido</span>
+            <span className="text-muted-foreground/40">·</span>
+            <span className="text-[11px] font-mono font-semibold text-foreground shrink-0">{selected.id}</span>
           </div>
+          <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider", dest.color)}>
+            {dest.label}
+          </Badge>
         </div>
 
         {/* Title block */}
@@ -166,11 +165,16 @@ export default function GapSolicitacaoDetail() {
               <span className={cn("w-1.5 h-1.5 rounded-full", estadoDot[selected.estado])} />
               {st.label}
             </Badge>
-            {tipoCfg && (
-              <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider", categoriaConfig[tipoCfg.categoria as Categoria]?.color)}>
-                {tipoCfg.categoria}
-              </Badge>
-            )}
+            {tipoCfg && (() => {
+              const catCfg = categoriaConfig[tipoCfg.categoria as Categoria];
+              const CatIcon = catCfg?.icon;
+              return (
+                <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider gap-1", catCfg?.color)}>
+                  {CatIcon && <CatIcon className="w-3 h-3" />}
+                  {tipoCfg.categoria}
+                </Badge>
+              );
+            })()}
           </div>
         </div>
 
@@ -217,6 +221,43 @@ export default function GapSolicitacaoDetail() {
               </div>
             </div>
 
+            {/* Responsável */}
+            <div className="pt-4 border-t border-border">
+              <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold mb-2">Responsável</p>
+              {selected.responsavelDestino ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => toast({ title: "Perfil do responsável", description: "Abertura do perfil institucional em breve." })}
+                    className="flex items-start gap-3 w-full text-left hover:bg-muted/40 -mx-2 px-2 py-1.5 rounded-md transition-colors group"
+                  >
+                    <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 font-semibold text-xs ring-1 ring-primary/15">
+                      {selected.responsavelDestino.split(" · ")[0].split(" ").slice(0, 2).map(n => n[0]).join("")}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-semibold text-foreground leading-tight group-hover:text-primary transition-colors truncate">
+                        {selected.responsavelDestino.split(" · ")[0]}
+                      </p>
+                      <p className="text-[11px] text-muted-foreground mt-0.5 truncate">{dest.label}</p>
+                    </div>
+                  </button>
+                  <div className="grid grid-cols-3 gap-2 mt-3">
+                    <Button variant="outline" size="sm" className="h-7 px-1 text-[11px] gap-1">
+                      <MessageSquare className="w-3 h-3" /> Chat
+                    </Button>
+                    <Button variant="outline" size="sm" className="h-7 px-1 text-[11px] gap-1">
+                      <Mail className="w-3 h-3" /> Email
+                    </Button>
+                    <Button variant="outline" size="sm" className="h-7 px-1 text-[11px] gap-1">
+                      <Phone className="w-3 h-3" /> Ligar
+                    </Button>
+                  </div>
+                </>
+              ) : (
+                <p className="text-[12px] text-muted-foreground italic">A atribuir</p>
+              )}
+            </div>
+
           </aside>
 
           {/* RIGHT — detalhes + descrição + doc + histórico */}
@@ -227,14 +268,9 @@ export default function GapSolicitacaoDetail() {
                 <FileText className="w-3.5 h-3.5 text-muted-foreground" />
                 <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Detalhes do Pedido</h3>
               </div>
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-5 gap-y-4">
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-5 gap-y-4">
                 <FactItem label="Submetido" value={`${fmt(dSub)} · ${fmtT(dSub)}`} />
                 <FactItem label="Destino" value={dest.label} />
-                <FactItem
-                  label="Responsável"
-                  value={selected.responsavelDestino ? selected.responsavelDestino.split(" · ")[0] : "A atribuir"}
-                  onClick={selected.responsavelDestino ? () => toast({ title: "Perfil do responsável", description: "Abertura do perfil institucional em breve." }) : undefined}
-                />
                 <FactItem label="Concluído" value={dConc ? `${fmt(dConc)} · ${fmtT(dConc)}` : "—"} />
               </div>
             </section>
