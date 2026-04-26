@@ -93,11 +93,18 @@ export default function GapAtendimentoDetail() {
 
       {/* ONE UNIFIED CARD */}
       <article className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
-        {/* Top bar — ano lectivo */}
-        <div className="flex items-center justify-start gap-3 px-6 py-3 border-b border-border bg-muted/20">
+        {/* Top bar — ano lectivo + id */}
+        <div className="flex items-center justify-between gap-3 px-6 py-3 border-b border-border bg-muted/20">
           <span className="text-[10px] uppercase tracking-[0.12em] font-semibold text-primary">
             Ano Lectivo 2024/2025
           </span>
+          <button
+            type="button"
+            onClick={() => { navigator.clipboard?.writeText(atendimento.id); toast({ title: "ID copiado", description: atendimento.id }); }}
+            className="shrink-0 inline-flex items-center px-2 py-0.5 rounded-md border border-border bg-background hover:bg-muted text-[11px] font-mono font-semibold text-foreground transition-colors"
+          >
+            {atendimento.id}
+          </button>
         </div>
 
         {/* Title block with moderate date tile */}
