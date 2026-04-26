@@ -5,6 +5,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import ReportsMenuButton from "@/components/ReportsMenuButton";
+import { BarChart3, TrendingUp, BookOpen, FileBarChart2 } from "lucide-react";
 import {
   Search, X, Calendar as CalendarIcon, Building2,
   Inbox, Clock, CheckCircle2, AlertCircle, Layers,
@@ -20,6 +22,31 @@ const MESES = [
   "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
   "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro",
 ];
+
+// Categorias de relatórios do Histórico do GAP — geridos via ReportsMenuButton
+const gapReportCategories = [
+  { id: "solicitacoes", label: "Pipeline de Solicitações", description: "Recebidas, encaminhadas, executadas e rejeitadas no mês.", icon: <BarChart3 className="w-4 h-4" />, type: "estudantes" as const, prefix: "Histórico do GAP — Pipeline de Solicitações" },
+  { id: "sla",          label: "Cumprimento de SLA",       description: "Prazos cumpridos, em risco e ultrapassados por departamento.", icon: <TrendingUp className="w-4 h-4" />, type: "estudantes" as const, prefix: "Histórico do GAP — Cumprimento de SLA" },
+  { id: "geral",        label: "Relatório Geral do GAP",   description: "Visão consolidada da actividade do gabinete no mês.", icon: <BookOpen className="w-4 h-4" />, type: "estudantes" as const, prefix: "Histórico do GAP — Relatório Geral" },
+];
+
+// Dataset sintético para alimentar o ReportsDialog (uma linha por estudante seguido)
+const gapReportData = solicitacoes.reduce<Array<{ id: string; name: string; code: string; turma: string; media: number | null; presenca: number; tarefasFeitas: number; tarefasTotal: number }>>((acc, s) => {
+  if (acc.find(r => r.id === s.matricula)) return acc;
+  const total = solicitacoes.filter(x => x.matricula === s.matricula).length;
+  const concl = solicitacoes.filter(x => x.matricula === s.matricula && x.estado === "concluida").length;
+  acc.push({
+    id: s.matricula,
+    name: s.estudante,
+    code: s.matricula,
+    turma: `${s.curso} · ${s.ano}º`,
+    media: null,
+    presenca: 0,
+    tarefasFeitas: concl,
+    tarefasTotal: total,
+  });
+  return acc;
+}, []);
 
 export default function GapTickets() {
   const navigate = useNavigate();
@@ -123,16 +150,15 @@ export default function GapTickets() {
       {/* KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {[
-          { label: "Total", value: counts.todos, icon: Inbox, tone: "text-foreground", iconBg: "bg-muted text-muted-foreground" },
-          { label: "Recebidas", value: counts.recebida, icon: AlertCircle, tone: "text-foreground", iconBg: "bg-orange-50 text-orange-600" },
-          { label: "Em Execução", value: counts.em_execucao, icon: Clock, tone: "text-foreground", iconBg: "bg-amber-50 text-amber-600" },
-          { label: "Concluídas", value: counts.concluida, icon: CheckCircle2, tone: "text-foreground", iconBg: "bg-emerald-50 text-emerald-600" },
+          { label: "Total", value: counts.todos, icon: Inbox, iconBg: "bg-muted text-muted-foreground" },
+          { label: "Recebidas", value: counts.recebida, icon: AlertCircle, iconBg: "bg-orange-50 text-orange-600" },
+          { label: "Concluídas", value: counts.concluida, icon: CheckCircle2, iconBg: "bg-emerald-50 text-emerald-600" },
         ].map(k => (
           <Card key={k.label} className="p-4 hover:shadow-sm transition-shadow">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">{k.label}</p>
-                <p className={cn("text-2xl font-bold mt-1", k.tone)}>{k.value}</p>
+                <p className="text-2xl font-bold mt-1 text-foreground tabular-nums">{k.value}</p>
               </div>
               <div className={cn("w-9 h-9 rounded-lg flex items-center justify-center", k.iconBg)}>
                 <k.icon className="w-4 h-4" />
@@ -140,6 +166,22 @@ export default function GapTickets() {
             </div>
           </Card>
         ))}
+
+        {/* Histórico do GAP — substitui "Em Execução" */}
+        <Card className="p-4 hover:shadow-sm transition-shadow border-primary/30 bg-gradient-to-br from-primary/5 to-transparent flex items-center justify-between">
+          <div className="min-w-0">
+            <p className="text-[11px] font-medium text-primary uppercase tracking-wider">Histórico do GAP</p>
+            <p className="text-[11px] text-muted-foreground mt-1 leading-snug">
+              Relatórios mensais de solicitações, encaminhamentos e SLA.
+            </p>
+            <div className="mt-2">
+              <ReportsMenuButton categories={gapReportCategories} data={gapReportData} />
+            </div>
+          </div>
+          <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-primary/10 text-primary shrink-0">
+            <FileBarChart2 className="w-4 h-4" />
+          </div>
+        </Card>
       </div>
 
       {/* Control box */}
