@@ -219,6 +219,16 @@ export default function GapAtendimentoDetail() {
                 <ContactBtn icon={<Mail className="w-3 h-3" />} label="Email" onClick={() => handleAction(`Email para ${atendimento.responsavel}`)} />
                 <ContactBtn icon={<Phone className="w-3 h-3" />} label="Ligar" onClick={() => handleAction(`Chamada para ${atendimento.responsavel}`)} />
               </div>
+              <div className="mt-3 pt-3 border-t border-border space-y-1.5">
+                <div className="flex items-baseline justify-between gap-2">
+                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Posição</span>
+                  <span className="text-[11px] font-medium text-foreground text-right truncate max-w-[150px]">Técnica de Apoio</span>
+                </div>
+                <div className="flex items-baseline justify-between gap-2">
+                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Departamento</span>
+                  <span className="text-[11px] font-medium text-foreground text-right truncate max-w-[150px]">GAP</span>
+                </div>
+              </div>
             </section>
           </aside>
 
