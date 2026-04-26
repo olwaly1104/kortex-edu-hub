@@ -47,6 +47,48 @@ export default function GapSolicitacaoDetail() {
   const fmtT = (d: Date) => d.toLocaleTimeString("pt-AO", { hour: "2-digit", minute: "2-digit" });
   const initials = selected.estudante.split(" ").slice(0, 2).map(n => n[0]).join("");
 
+  // Anexos do estudante — usa anexos definidos ou deriva do tipo/descrição
+  type Anexo = { nome: string; tamanho: string; tipo: "pdf" | "image" | "doc" | "sheet" };
+  const anexos: Anexo[] = (() => {
+    if (selected.anexos && selected.anexos.length > 0) {
+      return selected.anexos.map(a => ({
+        nome: a.nome,
+        tamanho: "—",
+        tipo: a.nome.toLowerCase().endsWith(".jpg") || a.nome.toLowerCase().endsWith(".png") ? "image"
+          : a.nome.toLowerCase().endsWith(".xlsx") || a.nome.toLowerCase().endsWith(".csv") ? "sheet"
+          : a.nome.toLowerCase().endsWith(".docx") ? "doc"
+          : "pdf",
+      }));
+    }
+    const desc = selected.descricao.toLowerCase();
+    const tipo = selected.tipo;
+    const list: Anexo[] = [];
+    if (desc.includes("comprovativo") || tipo.includes("pagamento") || selected.destino === "Financeiro") {
+      list.push({ nome: `Comprovativo-pagamento-${selected.matricula}.pdf`, tamanho: "184 KB", tipo: "pdf" });
+    }
+    if (desc.includes("atestado") || desc.includes("internad") || tipo.includes("justificacao")) {
+      list.push({ nome: "Atestado-medico.pdf", tamanho: "212 KB", tipo: "pdf" });
+    }
+    if (tipo.includes("declaracao") || tipo.includes("certificado")) {
+      list.push({ nome: `BI-${selected.matricula}.jpg`, tamanho: "356 KB", tipo: "image" });
+    }
+    if (tipo.includes("homologacao") || tipo.includes("transferencia")) {
+      list.push(
+        { nome: "Historico-academico.pdf", tamanho: "498 KB", tipo: "pdf" },
+        { nome: "Plano-curricular.pdf", tamanho: "276 KB", tipo: "pdf" },
+      );
+    }
+    return list;
+  })();
+
+  const anexoIcon = (t: Anexo["tipo"]) => {
+    if (t === "image") return { Icon: FileImage, cls: "bg-violet-50 border-violet-200 text-violet-600" };
+    if (t === "sheet") return { Icon: FileSpreadsheet, cls: "bg-emerald-50 border-emerald-200 text-emerald-600" };
+    if (t === "doc") return { Icon: FileText, cls: "bg-sky-50 border-sky-200 text-sky-600" };
+    return { Icon: FileText, cls: "bg-red-50 border-red-200 text-red-600" };
+  };
+
+
   const submetida = selected.historico.find(h => h.accao.toLowerCase().includes("submetida"));
   const encaminhada = selected.historico.find(h => h.accao.toLowerCase().includes("encaminhada"));
   const executada = selected.historico.find(h => {
