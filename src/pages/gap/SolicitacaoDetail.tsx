@@ -346,7 +346,7 @@ export default function GapSolicitacaoDetail() {
                       variant="outline"
                       size="sm"
                       className="h-7 px-2.5 text-[11px] gap-1"
-                      onClick={() => toast({ title: "Documento exportado", description: `Pedido-${selected.id}.pdf` })}
+                      onClick={() => toast({ title: "Documento exportado", description: `Pedido-${selected.id}` })}
                     >
                       <Download className="w-3 h-3" /> Exportar
                     </Button>
