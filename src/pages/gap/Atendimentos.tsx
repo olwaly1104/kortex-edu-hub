@@ -363,7 +363,6 @@ export default function GapAtendimentos() {
                   <th className="text-left font-semibold px-4 py-2.5 w-[140px]">Categoria</th>
                   <th className="text-left font-semibold px-4 py-2.5 w-[140px]">Local</th>
                   <th className="text-left font-semibold px-4 py-2.5 w-[120px]">Estado</th>
-                  <th className="w-8 px-2"></th>
                 </tr>
               </thead>
               <tbody>
