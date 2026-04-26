@@ -306,7 +306,7 @@ export default function GapSolicitacaoDetail() {
                 <FactItem label="Submetido" value={fmt(dSub)} />
                 <FactItem label="Hora" value={fmtT(dSub)} />
                 <FactItem label="Destino" value={dest.label} />
-                <FactItem label="Concluído" value={dConc ? `${fmt(dConc)} · ${fmtT(dConc)}` : "—"} />
+                <FactItem label="Responsável" value={selected.responsavelDestino ? selected.responsavelDestino.split(" · ")[0] : "A atribuir"} />
               </div>
             </section>
 
