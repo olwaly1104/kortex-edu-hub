@@ -65,21 +65,7 @@ export default function GapSolicitacaoDetail() {
     tone: "submitted",
   });
 
-  // 2) Encaminhada
-  if (encaminhada) {
-    steps.push({
-      label: "Encaminhada para destino",
-      data: encaminhada.data,
-      actor: `${encaminhada.actor} → ${dest.label}`,
-      tone: "forwarded",
-    });
-  } else {
-    steps.push({
-      label: "Aguarda encaminhamento",
-      actor: dest.label,
-      tone: "pending",
-    });
-  }
+  // (encaminhamento é automático — omitido do histórico)
 
   // 3) Aceite / rejeitada / aguarda
   if (selected.estado === "rejeitada") {
