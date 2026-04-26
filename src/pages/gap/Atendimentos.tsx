@@ -388,7 +388,7 @@ export default function GapAtendimentos() {
                             "text-sm font-bold tabular-nums",
                             isToday ? "text-primary" : "text-foreground"
                           )}>
-                            {d.toLocaleDateString("pt-AO", { day: "2-digit", month: "short" }).replace(".", "")}
+                            {d.toLocaleDateString("pt-PT", { day: "2-digit", month: "2-digit", year: "numeric" })}
                           </span>
                           {isToday && (
                             <span className="inline-flex items-center px-1.5 h-4 rounded text-[9px] font-bold bg-primary text-primary-foreground">HOJE</span>
