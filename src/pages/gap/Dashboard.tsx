@@ -149,7 +149,7 @@ export default function GapDashboard() {
         </Card>
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-6">
+      
       {/* Próximos atendimentos — full width */}
       <Card className="p-5">
         <div className="flex items-center justify-between mb-4">
