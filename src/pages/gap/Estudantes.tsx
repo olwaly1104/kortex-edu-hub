@@ -15,10 +15,7 @@ export default function GapEstudantes() {
       const tickets = gapTickets.filter(t => t.matricula === e.matricula);
       const ats = gapAtendimentos.filter(a => a.matricula === e.matricula);
       const abertos = tickets.filter(t => t.estado === "aberto" || t.estado === "em_andamento").length;
-      const faculdade =
-        ats.find(a => a.matricula === e.matricula)?.faculdade ??
-        tickets.find(t => t.matricula === e.matricula)?.faculdade ??
-        "—";
+      const faculdade = ats.find(a => a.matricula === e.matricula)?.faculdade ?? "—";
       return { ...e, faculdade, solicitacoes: tickets.length, abertos, agendamentos: ats.length };
     });
   }, []);
