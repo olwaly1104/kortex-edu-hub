@@ -156,8 +156,8 @@ export default function GapTickets() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {[
           { label: "Total", value: counts.todos, icon: Inbox, iconBg: "bg-muted text-muted-foreground" },
-          { label: "Recebidas", value: counts.recebida, icon: AlertCircle, iconBg: "bg-orange-50 text-orange-600" },
-          { label: "Concluídas", value: counts.concluida, icon: CheckCircle2, iconBg: "bg-emerald-50 text-emerald-600" },
+          { label: "Hoje", value: counts.hoje, icon: Clock, iconBg: "bg-primary/10 text-primary" },
+          { label: "Pendentes", value: counts.pendentes, icon: AlertCircle, iconBg: "bg-orange-50 text-orange-600" },
         ].map(k => (
           <Card key={k.label} className="p-4 hover:shadow-sm transition-shadow">
             <div className="flex items-center justify-between">
@@ -172,7 +172,7 @@ export default function GapTickets() {
           </Card>
         ))}
 
-        {/* Histórico do GAP — substitui "Em Execução" */}
+        {/* Histórico do GAP */}
         <Card className="p-4 hover:shadow-sm transition-shadow border-primary/30 bg-gradient-to-br from-primary/5 to-transparent flex items-center justify-between">
           <div className="min-w-0">
             <p className="text-[11px] font-medium text-primary uppercase tracking-wider">Histórico do GAP</p>
@@ -189,51 +189,78 @@ export default function GapTickets() {
         </Card>
       </div>
 
-      {/* Control box */}
-      <div className="rounded-xl border border-border bg-card overflow-hidden">
-        {/* State tabs */}
-        <div className="flex flex-wrap gap-1 p-2 bg-muted/30 border-b border-border">
-          {estadoTabs.map(t => {
-            const active = estado === t.key;
-            return (
-              <button
-                key={t.key}
-                onClick={() => setEstado(t.key)}
-                className={cn(
-                  "inline-flex items-center gap-1.5 px-3 h-8 rounded-md text-xs font-medium transition-all",
-                  active
-                    ? "bg-card text-foreground shadow-sm border border-border"
-                    : "text-muted-foreground hover:text-foreground hover:bg-card/60"
-                )}
-              >
-                <t.icon className="w-3.5 h-3.5" />
-                {t.label}
-                <span className={cn(
-                  "ml-1 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded text-[10px] font-semibold tabular-nums",
-                  active ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
-                )}>
-                  {counts[t.key]}
-                </span>
-              </button>
-            );
-          })}
+      {/* Controls — Agendamentos-style */}
+      <Card className="p-3 space-y-2.5">
+        {/* Line 1: Hoje (pinned) + period segment */}
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <div className="inline-flex items-center gap-2 flex-wrap">
+            <button
+              onClick={() => setEstado("hoje")}
+              className={cn(
+                "inline-flex items-center gap-1.5 h-9 px-3 text-xs font-semibold rounded-md border transition-colors",
+                estado === "hoje"
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "bg-background text-foreground border-input hover:border-primary hover:text-primary"
+              )}
+            >
+              <Clock className="w-3.5 h-3.5" />
+              Hoje
+              <span className={cn(
+                "inline-flex items-center justify-center min-w-[18px] h-[16px] px-1 rounded text-[10px] font-bold tabular-nums",
+                estado === "hoje" ? "bg-primary-foreground/20" : "bg-muted text-muted-foreground"
+              )}>{counts.hoje}</span>
+            </button>
+
+            <div className="h-6 w-px bg-border" />
+
+            <div className="inline-flex items-center rounded-md border border-input bg-background overflow-hidden">
+              {periodoOpts.map((opt, i) => (
+                <button
+                  key={opt.v}
+                  onClick={() => setEstado(opt.v)}
+                  className={cn(
+                    "inline-flex items-center gap-1.5 h-9 px-3 text-xs font-medium transition-colors",
+                    i > 0 && "border-l border-input",
+                    estado === opt.v
+                      ? "bg-muted text-foreground"
+                      : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                  )}
+                >
+                  {opt.label}
+                  <span className={cn(
+                    "inline-flex items-center justify-center min-w-[18px] h-[16px] px-1 rounded text-[10px] font-semibold tabular-nums",
+                    estado === opt.v ? "bg-primary/10 text-primary" : "bg-muted-foreground/15 text-muted-foreground"
+                  )}>{opt.count}</span>
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
 
-        {/* Filters row */}
-        <div className="flex flex-wrap gap-2 items-center p-3">
-          <div className="relative flex-1 min-w-[240px] max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        {/* Line 2: Search + filters */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="relative flex-1 min-w-[220px] max-w-[380px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
             <Input
-              placeholder="Pesquisar por estudante, tipo, matrícula, ID..."
-              value={search} onChange={e => setSearch(e.target.value)}
-              className="pl-9 h-9 text-sm"
+              placeholder="Pesquisar estudante, tipo, matrícula ou ID…"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              className="pl-9 pr-8 h-9 text-xs"
             />
+            {search && (
+              <button
+                onClick={() => setSearch("")}
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 rounded hover:bg-muted text-muted-foreground hover:text-foreground"
+                aria-label="Limpar pesquisa"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            )}
           </div>
-          <div className="flex-1" />
 
           <Select value={categoria} onValueChange={setCategoria}>
-            <SelectTrigger className={cn("w-[160px] h-9 text-xs", isActive.categoria && "border-primary/50 bg-primary/5 text-primary")}>
-              <Layers className="w-3.5 h-3.5 mr-1.5 shrink-0" />
+            <SelectTrigger className={cn("w-[170px] h-9 text-xs", isActive.categoria && "border-primary text-primary")}>
+              <Layers className="w-3 h-3 mr-1.5 shrink-0" />
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -243,8 +270,8 @@ export default function GapTickets() {
           </Select>
 
           <Select value={destino} onValueChange={v => setDestino(v as Destino | "todos")}>
-            <SelectTrigger className={cn("w-[150px] h-9 text-xs", isActive.destino && "border-primary/50 bg-primary/5 text-primary")}>
-              <Building2 className="w-3.5 h-3.5 mr-1.5 shrink-0" />
+            <SelectTrigger className={cn("w-[160px] h-9 text-xs", isActive.destino && "border-primary text-primary")}>
+              <Building2 className="w-3 h-3 mr-1.5 shrink-0" />
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -256,8 +283,8 @@ export default function GapTickets() {
           </Select>
 
           <Select value={mes} onValueChange={setMes}>
-            <SelectTrigger className={cn("w-[140px] h-9 text-xs", isActive.mes && "border-primary/50 bg-primary/5 text-primary")}>
-              <CalendarIcon className="w-3.5 h-3.5 mr-1.5 shrink-0" />
+            <SelectTrigger className={cn("w-[140px] h-9 text-xs", isActive.mes && "border-primary text-primary")}>
+              <CalendarIcon className="w-3 h-3 mr-1.5 shrink-0" />
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -267,43 +294,21 @@ export default function GapTickets() {
           </Select>
 
           {hasActiveControls && (
-            <Button variant="ghost" size="sm" className="h-9 text-xs text-muted-foreground hover:text-destructive gap-1" onClick={resetAll}>
-              <X className="w-3.5 h-3.5" /> Limpar
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={resetAll}
+              className="h-9 px-2.5 text-xs text-muted-foreground hover:text-foreground gap-1"
+            >
+              <X className="w-3 h-3" /> Limpar
             </Button>
           )}
-        </div>
 
-        {/* Active filter chips */}
-        {hasActiveControls && (
-          <div className="flex flex-wrap gap-1.5 px-3 pb-3 -mt-1">
-            {isActive.estado && (
-              <Badge variant="outline" className="text-[10px] gap-1 bg-primary/5 text-primary border-primary/20 cursor-pointer hover:bg-primary/10" onClick={() => setEstado("todos")}>
-                Estado: {estadoSolicitacaoConfig[estado as EstadoSolicitacao].label} <X className="w-2.5 h-2.5" />
-              </Badge>
-            )}
-            {isActive.categoria && (
-              <Badge variant="outline" className="text-[10px] gap-1 bg-primary/5 text-primary border-primary/20 cursor-pointer hover:bg-primary/10" onClick={() => setCategoria("todas")}>
-                Categoria: {categoria} <X className="w-2.5 h-2.5" />
-              </Badge>
-            )}
-            {isActive.destino && (
-              <Badge variant="outline" className="text-[10px] gap-1 bg-primary/5 text-primary border-primary/20 cursor-pointer hover:bg-primary/10" onClick={() => setDestino("todos")}>
-                Destino: {destinoConfig[destino as Destino].label} <X className="w-2.5 h-2.5" />
-              </Badge>
-            )}
-            {isActive.mes && (
-              <Badge variant="outline" className="text-[10px] gap-1 bg-primary/5 text-primary border-primary/20 cursor-pointer hover:bg-primary/10" onClick={() => setMes("todos")}>
-                Mês: {MESES[parseInt(mes)]} <X className="w-2.5 h-2.5" />
-              </Badge>
-            )}
-            {isActive.search && (
-              <Badge variant="outline" className="text-[10px] gap-1 bg-muted text-foreground border-border cursor-pointer hover:bg-muted/70" onClick={() => setSearch("")}>
-                Pesquisa: "{search}" <X className="w-2.5 h-2.5" />
-              </Badge>
-            )}
+          <div className="ml-auto text-[11px] text-muted-foreground tabular-nums whitespace-nowrap">
+            {filtered.length} de {counts.todos}
           </div>
-        )}
-      </div>
+        </div>
+      </Card>
 
       {/* Table */}
       <Card className="overflow-hidden">
