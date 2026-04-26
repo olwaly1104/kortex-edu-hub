@@ -247,10 +247,10 @@ export default function GapAtendimentoDetail() {
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="text-[13px] font-semibold text-foreground leading-tight truncate">
-                      Resumo Da Sessão.pdf
+                      Resumo-{atendimento.id}.pdf
                     </p>
                     <p className="text-[11px] text-muted-foreground mt-0.5 inline-flex items-center gap-1.5">
-                      <span>Relatório · PDF</span>
+                      <span>Gerado automaticamente · PDF</span>
                       <span className="text-muted-foreground/40">·</span>
                       <DialogTrigger asChild>
                         <button type="button" className="inline-flex items-center gap-1 text-primary hover:underline font-medium">
@@ -281,7 +281,7 @@ export default function GapAtendimentoDetail() {
                       <Share2 className="w-4 h-4 text-primary" /> Partilhado com 4 pessoas
                     </DialogTitle>
                     <DialogDescription className="text-[12px]">
-                      Pessoas com acesso ao documento <span className="font-medium text-foreground">Resumo Da Sessão.pdf</span>.
+                      Pessoas com acesso ao documento <span className="font-medium text-foreground">Resumo-{atendimento.id}.pdf</span>.
                     </DialogDescription>
                   </DialogHeader>
                   <div className="space-y-2 mt-2">
