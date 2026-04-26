@@ -193,7 +193,7 @@ export default function GapDashboard() {
               </div>
               <div className="min-w-0">
                 <h2 className="text-base font-semibold text-foreground leading-tight">Em Atraso</h2>
-                <p className="text-[11px] text-muted-foreground truncate">SLA ultrapassado</p>
+                <p className="text-[11px] text-muted-foreground truncate">Solicitações em atraso</p>
               </div>
               {solicitacoesEmAtraso.length > 0 && (
                 <Badge variant="outline" className="ml-1 text-[10px] bg-destructive/10 text-destructive border-destructive/20">
