@@ -647,19 +647,18 @@ const CATEGORIA_HINT: Record<TicketCategoria, string> = {
 
 function NovoAgendamentoDialog() {
   const [open, setOpen] = useState(false);
-  const [step, setStep] = useState<1 | 2>(1);
   const [studentQuery, setStudentQuery] = useState("");
   const [selectedStudent, setSelectedStudent] = useState<GapAtendimento | null>(null);
   const [categoria, setCategoria] = useState<TicketCategoria | null>(null);
   const [responsavel, setResponsavel] = useState<string>("helena");
   const [motivo, setMotivo] = useState("");
+  const [descricao, setDescricao] = useState("");
   const [data, setData] = useState(TODAY);
   const [hora, setHora] = useState("09:00");
   const [duracao, setDuracao] = useState("50 min");
   const [modalidade, setModalidade] = useState<"presencial" | "online">("presencial");
   const [sala, setSala] = useState("Gab. GAP 1");
 
-  // Build a quick student list from existing atendimentos (unique by matrícula)
   const studentOptions = useMemo(() => {
     const map = new Map<string, GapAtendimento>();
     gapAtendimentos.forEach(a => { if (!map.has(a.matricula)) map.set(a.matricula, a); });
@@ -672,9 +671,8 @@ function NovoAgendamentoDialog() {
   }, [studentQuery]);
 
   const reset = () => {
-    setStep(1);
     setStudentQuery(""); setSelectedStudent(null); setCategoria(null);
-    setResponsavel("helena"); setMotivo("");
+    setResponsavel("helena"); setMotivo(""); setDescricao("");
     setData(TODAY); setHora("09:00"); setDuracao("50 min");
     setModalidade("presencial"); setSala("Gab. GAP 1");
   };
@@ -693,186 +691,138 @@ function NovoAgendamentoDialog() {
       <DialogTrigger asChild>
         <Button size="sm" className="gap-1.5"><Plus className="w-4 h-4" /> Novo Agendamento</Button>
       </DialogTrigger>
-      <DialogContent className="max-w-3xl p-0 gap-0 overflow-hidden rounded-2xl border-border">
+      <DialogContent className="max-w-2xl p-0 gap-0 overflow-hidden rounded-2xl border-border">
         {/* Header */}
         <div className="px-6 pt-5 pb-4 border-b border-border bg-card">
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3 min-w-0">
-              <div className="w-10 h-10 rounded-xl bg-primary text-primary-foreground flex items-center justify-center shrink-0">
-                <CalendarIcon className="w-5 h-5" />
-              </div>
-              <div className="min-w-0">
-                <DialogTitle className="text-base font-semibold leading-tight">Novo Agendamento</DialogTitle>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  {step === 1 ? "Passo 1 — Estudante e contexto" : "Passo 2 — Quando e onde"}
-                </p>
-              </div>
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-10 h-10 rounded-xl bg-primary text-primary-foreground flex items-center justify-center shrink-0">
+              <CalendarIcon className="w-5 h-5" />
             </div>
-            {/* Stepper */}
-            <div className="flex items-center gap-2 shrink-0">
-              <StepDot active={step === 1} done={step > 1} n={1} label="Contexto" />
-              <div className="w-8 h-px bg-border" />
-              <StepDot active={step === 2} done={false} n={2} label="Sessão" />
+            <div className="min-w-0">
+              <DialogTitle className="text-base font-semibold leading-tight">Novo Agendamento</DialogTitle>
+              <p className="text-xs text-muted-foreground mt-0.5">Preencha os dados da sessão de apoio</p>
             </div>
           </div>
         </div>
 
-        {/* Body */}
-        <div className="px-6 py-5 max-h-[65vh] overflow-y-auto">
-          {step === 1 && (
-            <div className="space-y-5">
-              {/* Estudante */}
-              <section>
-                <Label className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mb-2 block">
-                  Estudante
-                </Label>
-                {selectedStudent ? (
-                  <div className="flex items-center gap-3 p-3 rounded-lg border border-border bg-muted/30">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-semibold text-sm ring-1 ring-primary/15">
-                      {selectedStudent.estudante.split(" ").slice(0, 2).map(n => n[0]).join("")}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold truncate">{selectedStudent.estudante}</p>
-                      <p className="text-[11px] text-muted-foreground truncate">
-                        {selectedStudent.matricula} · {selectedStudent.curso} · {selectedStudent.ano}º ano
-                      </p>
-                    </div>
-                    <Button variant="ghost" size="sm" className="h-7 text-xs"
-                      onClick={() => { setSelectedStudent(null); setStudentQuery(""); }}>
-                      Alterar
-                    </Button>
-                  </div>
-                ) : (
-                  <>
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                      <Input
-                        autoFocus
-                        placeholder="Pesquisar por nome ou matrícula…"
-                        value={studentQuery}
-                        onChange={e => setStudentQuery(e.target.value)}
-                        className="pl-9 h-10"
-                      />
-                    </div>
-                    <div className="mt-2 grid grid-cols-1 gap-1 max-h-44 overflow-y-auto rounded-lg border border-border bg-card">
-                      {studentOptions.length === 0 ? (
-                        <p className="text-xs text-muted-foreground p-3 text-center">Nenhum estudante encontrado.</p>
-                      ) : studentOptions.map(s => (
-                        <button
-                          key={s.matricula}
-                          onClick={() => setSelectedStudent(s)}
-                          className="flex items-center gap-3 px-3 py-2 text-left hover:bg-muted/50 transition-colors border-b border-border last:border-b-0"
-                        >
-                          <div className="w-8 h-8 rounded-full bg-muted text-muted-foreground flex items-center justify-center text-[10px] font-semibold">
-                            {s.estudante.split(" ").slice(0, 2).map(n => n[0]).join("")}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium truncate">{s.estudante}</p>
-                            <p className="text-[11px] text-muted-foreground truncate tabular-nums">
-                              {s.matricula} · {s.curso}
-                            </p>
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  </>
-                )}
-              </section>
+        {/* Body — single-page form */}
+        <div className="px-6 py-5 max-h-[70vh] overflow-y-auto space-y-5">
 
-              {/* Categoria */}
-              <section>
-                <Label className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mb-2 block">
-                  Categoria de apoio
-                </Label>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                  {(Object.keys(categoriaConfig) as TicketCategoria[]).map(c => {
-                    const cfg = categoriaConfig[c];
-                    const active = categoria === c;
-                    return (
-                      <button
-                        key={c}
-                        onClick={() => setCategoria(c)}
-                        className={cn(
-                          "flex flex-col items-start gap-1.5 p-3 rounded-lg border text-left transition-all",
-                          active
-                            ? "border-primary bg-primary/5 ring-2 ring-primary/15"
-                            : "border-border bg-card hover:border-primary/40 hover:bg-muted/30"
-                        )}
-                      >
-                        <Badge variant="outline" className={cn("text-[10px] border-0", cfg.color)}>
-                          {cfg.label}
-                        </Badge>
-                        <span className="text-[10px] text-muted-foreground leading-snug line-clamp-2">
-                          {CATEGORIA_HINT[c]}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </section>
-
-              {/* Motivo */}
-              <section>
-                <Label className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mb-2 block">
-                  Motivo da sessão
-                </Label>
-                <Textarea
-                  placeholder="Ex: Sessão inicial de avaliação, acompanhamento de progresso…"
-                  value={motivo}
-                  onChange={e => setMotivo(e.target.value)}
-                  rows={3}
-                  className="resize-none text-sm"
-                />
-              </section>
-            </div>
-          )}
-
-          {step === 2 && (
-            <div className="space-y-5">
-              {/* Resumo do passo 1 */}
-              <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/40 border border-border">
-                <div className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center font-semibold text-xs">
-                  {selectedStudent?.estudante.split(" ").slice(0, 2).map(n => n[0]).join("")}
+          {/* 1 · Estudante */}
+          <FieldBlock n={1} title="Estudante">
+            {selectedStudent ? (
+              <div className="flex items-center gap-3 p-3 rounded-lg border border-border bg-muted/30">
+                <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-semibold text-sm ring-1 ring-primary/15">
+                  {selectedStudent.estudante.split(" ").slice(0, 2).map(n => n[0]).join("")}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold truncate">{selectedStudent?.estudante}</p>
+                  <p className="text-sm font-semibold truncate">{selectedStudent.estudante}</p>
                   <p className="text-[11px] text-muted-foreground truncate">
-                    {categoria && categoriaConfig[categoria].label} · {selectedStudent?.curso}
+                    {selectedStudent.matricula} · {selectedStudent.curso} · {selectedStudent.ano}º ano
                   </p>
                 </div>
-                <Button variant="ghost" size="sm" className="h-7 text-xs" onClick={() => setStep(1)}>
-                  Editar
+                <Button variant="ghost" size="sm" className="h-7 text-xs"
+                  onClick={() => { setSelectedStudent(null); setStudentQuery(""); }}>
+                  Alterar
                 </Button>
               </div>
-
-              {/* Data */}
-              <section>
-                <Label className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mb-2 block">
-                  Data
-                </Label>
-                <div className="flex items-center gap-2">
-                  <Input type="date" value={data} onChange={e => setData(e.target.value)} className="h-10 w-44" />
-                  <span className="text-xs text-muted-foreground capitalize">{fmtDate(dateObj)}</span>
+            ) : (
+              <>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Pesquisar por nome ou matrícula…"
+                    value={studentQuery}
+                    onChange={e => setStudentQuery(e.target.value)}
+                    className="pl-9 h-10"
+                  />
                 </div>
-              </section>
+                <div className="mt-2 grid grid-cols-1 gap-1 max-h-40 overflow-y-auto rounded-lg border border-border bg-card">
+                  {studentOptions.length === 0 ? (
+                    <p className="text-xs text-muted-foreground p-3 text-center">Nenhum estudante encontrado.</p>
+                  ) : studentOptions.map(s => (
+                    <button
+                      key={s.matricula}
+                      onClick={() => setSelectedStudent(s)}
+                      className="flex items-center gap-3 px-3 py-2 text-left hover:bg-muted/50 transition-colors border-b border-border last:border-b-0"
+                    >
+                      <div className="w-8 h-8 rounded-full bg-muted text-muted-foreground flex items-center justify-center text-[10px] font-semibold">
+                        {s.estudante.split(" ").slice(0, 2).map(n => n[0]).join("")}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">{s.estudante}</p>
+                        <p className="text-[11px] text-muted-foreground truncate tabular-nums">
+                          {s.matricula} · {s.curso}
+                        </p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+          </FieldBlock>
 
-              {/* Hora + Duração */}
-              <section>
-                <div className="flex items-center justify-between mb-2">
-                  <Label className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">
-                    Hora de início
-                  </Label>
-                  <span className="text-[11px] text-muted-foreground tabular-nums">
+          {/* 2 · Categoria */}
+          <FieldBlock n={2} title="Categoria de apoio">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              {(Object.keys(categoriaConfig) as TicketCategoria[]).map(c => {
+                const cfg = categoriaConfig[c];
+                const active = categoria === c;
+                return (
+                  <button
+                    key={c}
+                    onClick={() => setCategoria(c)}
+                    className={cn(
+                      "flex flex-col items-start gap-1.5 p-2.5 rounded-lg border text-left transition-all",
+                      active
+                        ? "border-primary bg-primary/5 ring-2 ring-primary/15"
+                        : "border-border bg-card hover:border-primary/40 hover:bg-muted/30"
+                    )}
+                  >
+                    <Badge variant="outline" className={cn("text-[10px] border-0", cfg.color)}>
+                      {cfg.label}
+                    </Badge>
+                    <span className="text-[10px] text-muted-foreground leading-snug line-clamp-2">
+                      {CATEGORIA_HINT[c]}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </FieldBlock>
+
+          {/* 3 · Motivo (short title) */}
+          <FieldBlock n={3} title="Motivo da sessão">
+            <Input
+              placeholder="Ex: 1ª sessão de acompanhamento, orientação vocacional…"
+              value={motivo}
+              onChange={e => setMotivo(e.target.value)}
+              className="h-10 text-sm"
+            />
+          </FieldBlock>
+
+          {/* 4 · Data + Hora + Duração */}
+          <FieldBlock n={4} title="Quando">
+            <div className="grid grid-cols-1 sm:grid-cols-[auto_1fr] gap-3">
+              <div>
+                <Label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5 block">Data</Label>
+                <Input type="date" value={data} onChange={e => setData(e.target.value)} className="h-9 w-full sm:w-44 text-sm" />
+                <p className="text-[10px] text-muted-foreground capitalize mt-1">{fmtDate(dateObj)}</p>
+              </div>
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <Label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Hora</Label>
+                  <span className="text-[10px] text-muted-foreground tabular-nums">
                     Termina às <strong className="text-foreground">{endTime}</strong>
                   </span>
                 </div>
-                <div className="flex flex-wrap gap-1.5 mb-2">
+                <div className="flex flex-wrap gap-1.5">
                   {HORAS_SUGERIDAS.map(h => (
                     <button
                       key={h}
                       onClick={() => setHora(h)}
                       className={cn(
-                        "px-2.5 h-8 rounded-md text-xs font-medium tabular-nums border transition-colors",
+                        "px-2 h-8 rounded-md text-xs font-medium tabular-nums border transition-colors",
                         hora === h
                           ? "bg-primary text-primary-foreground border-primary"
                           : "bg-background text-foreground border-input hover:border-primary hover:text-primary"
@@ -883,14 +833,14 @@ function NovoAgendamentoDialog() {
                   ))}
                   <Input type="time" value={hora} onChange={e => setHora(e.target.value)} className="h-8 w-28 text-xs" />
                 </div>
-                <div className="flex flex-wrap gap-1.5 mt-3">
-                  <span className="text-[11px] text-muted-foreground self-center mr-1">Duração:</span>
+                <div className="flex flex-wrap gap-1.5 mt-2 items-center">
+                  <span className="text-[10px] text-muted-foreground mr-1">Duração:</span>
                   {DURACOES.map(d => (
                     <button
                       key={d.v}
                       onClick={() => setDuracao(d.v)}
                       className={cn(
-                        "px-2.5 h-8 rounded-md text-xs font-medium border transition-colors",
+                        "px-2 h-7 rounded-md text-[11px] font-medium border transition-colors",
                         duracao === d.v
                           ? "bg-primary text-primary-foreground border-primary"
                           : "bg-background text-foreground border-input hover:border-primary hover:text-primary"
@@ -900,88 +850,93 @@ function NovoAgendamentoDialog() {
                     </button>
                   ))}
                 </div>
-              </section>
-
-              {/* Modalidade */}
-              <section>
-                <Label className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mb-2 block">
-                  Modalidade
-                </Label>
-                <div className="grid grid-cols-2 gap-2">
-                  {([
-                    { v: "presencial" as const, label: "Presencial", icon: MapPin, hint: "No gabinete GAP" },
-                    { v: "online" as const,     label: "Online",     icon: Video,  hint: "Videochamada" },
-                  ]).map(m => {
-                    const active = modalidade === m.v;
-                    return (
-                      <button
-                        key={m.v}
-                        onClick={() => setModalidade(m.v)}
-                        className={cn(
-                          "flex items-center gap-3 p-3 rounded-lg border text-left transition-all",
-                          active
-                            ? "border-primary bg-primary/5 ring-2 ring-primary/15"
-                            : "border-border bg-card hover:border-primary/40 hover:bg-muted/30"
-                        )}
-                      >
-                        <div className={cn(
-                          "w-9 h-9 rounded-lg flex items-center justify-center shrink-0",
-                          active ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
-                        )}>
-                          <m.icon className="w-4 h-4" />
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-sm font-medium">{m.label}</p>
-                          <p className="text-[11px] text-muted-foreground">{m.hint}</p>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-                <Input
-                  placeholder={modalidade === "presencial" ? "Sala (ex: Gab. GAP 1)" : "Link da videochamada"}
-                  value={sala}
-                  onChange={e => setSala(e.target.value)}
-                  className="h-10 mt-2"
-                />
-              </section>
-
-              {/* Responsável */}
-              <section>
-                <Label className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mb-2 block">
-                  Responsável
-                </Label>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                  {RESPONSAVEIS.map(r => {
-                    const active = responsavel === r.id;
-                    return (
-                      <button
-                        key={r.id}
-                        onClick={() => setResponsavel(r.id)}
-                        className={cn(
-                          "flex items-center gap-2.5 p-2.5 rounded-lg border text-left transition-all",
-                          active
-                            ? "border-primary bg-primary/5 ring-2 ring-primary/15"
-                            : "border-border bg-card hover:border-primary/40 hover:bg-muted/30"
-                        )}
-                      >
-                        <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-semibold text-[11px] ring-1 ring-primary/15">
-                          {r.initials}
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-xs font-semibold truncate">{r.nome}</p>
-                          <p className="text-[10px] text-muted-foreground truncate">{r.role}</p>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              </section>
+              </div>
             </div>
-          )}
+          </FieldBlock>
+
+          {/* 5 · Modalidade + sala */}
+          <FieldBlock n={5} title="Modalidade">
+            <div className="grid grid-cols-2 gap-2">
+              {([
+                { v: "presencial" as const, label: "Presencial", icon: MapPin, hint: "No gabinete GAP" },
+                { v: "online" as const,     label: "Online",     icon: Video,  hint: "Videochamada" },
+              ]).map(m => {
+                const active = modalidade === m.v;
+                return (
+                  <button
+                    key={m.v}
+                    onClick={() => setModalidade(m.v)}
+                    className={cn(
+                      "flex items-center gap-3 p-2.5 rounded-lg border text-left transition-all",
+                      active
+                        ? "border-primary bg-primary/5 ring-2 ring-primary/15"
+                        : "border-border bg-card hover:border-primary/40 hover:bg-muted/30"
+                    )}
+                  >
+                    <div className={cn(
+                      "w-8 h-8 rounded-lg flex items-center justify-center shrink-0",
+                      active ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                    )}>
+                      <m.icon className="w-4 h-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-xs font-medium">{m.label}</p>
+                      <p className="text-[10px] text-muted-foreground">{m.hint}</p>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+            <Input
+              placeholder={modalidade === "presencial" ? "Sala (ex: Gab. GAP 1)" : "Link da videochamada"}
+              value={sala}
+              onChange={e => setSala(e.target.value)}
+              className="h-9 mt-2 text-sm"
+            />
+          </FieldBlock>
+
+          {/* 6 · Responsável */}
+          <FieldBlock n={6} title="Responsável">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              {RESPONSAVEIS.map(r => {
+                const active = responsavel === r.id;
+                return (
+                  <button
+                    key={r.id}
+                    onClick={() => setResponsavel(r.id)}
+                    className={cn(
+                      "flex items-center gap-2.5 p-2.5 rounded-lg border text-left transition-all",
+                      active
+                        ? "border-primary bg-primary/5 ring-2 ring-primary/15"
+                        : "border-border bg-card hover:border-primary/40 hover:bg-muted/30"
+                    )}
+                  >
+                    <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-semibold text-[11px] ring-1 ring-primary/15">
+                      {r.initials}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-xs font-semibold truncate">{r.nome}</p>
+                      <p className="text-[10px] text-muted-foreground truncate">{r.role}</p>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </FieldBlock>
+
+          {/* 7 · Descrição (last) */}
+          <FieldBlock n={7} title="Descrição" optional>
+            <Textarea
+              placeholder="Notas adicionais, contexto da sessão, objectivos…"
+              value={descricao}
+              onChange={e => setDescricao(e.target.value)}
+              rows={3}
+              className="resize-none text-sm"
+            />
+          </FieldBlock>
         </div>
 
-        {/* Footer / Sticky preview */}
+        {/* Footer */}
         <DialogFooter className="px-6 py-4 border-t border-border bg-muted/20 flex-row items-center justify-between gap-3 sm:justify-between">
           <div className="text-[11px] text-muted-foreground tabular-nums hidden sm:flex items-center gap-2 min-w-0 flex-1">
             {selectedStudent && categoria && (
@@ -994,30 +949,14 @@ function NovoAgendamentoDialog() {
             )}
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            {step === 2 && (
-              <Button variant="ghost" size="sm" onClick={() => setStep(1)} className="gap-1">
-                <ChevronLeft className="w-4 h-4" /> Voltar
-              </Button>
-            )}
             <DialogClose asChild>
               <Button variant="outline" size="sm">Cancelar</Button>
             </DialogClose>
-            {step === 1 ? (
-              <Button
-                size="sm"
-                disabled={!selectedStudent || !categoria || motivo.trim().length < 3}
-                onClick={() => setStep(2)}
-                className="gap-1.5"
-              >
-                Continuar <ChevronRight className="w-4 h-4" />
+            <DialogClose asChild>
+              <Button size="sm" disabled={!canConfirm} className="gap-1.5">
+                <CheckCircle2 className="w-4 h-4" /> Confirmar
               </Button>
-            ) : (
-              <DialogClose asChild>
-                <Button size="sm" disabled={!canConfirm} className="gap-1.5">
-                  <CheckCircle2 className="w-4 h-4" /> Confirmar
-                </Button>
-              </DialogClose>
-            )}
+            </DialogClose>
           </div>
         </DialogFooter>
       </DialogContent>
@@ -1025,19 +964,18 @@ function NovoAgendamentoDialog() {
   );
 }
 
-function StepDot({ active, done, n, label }: { active: boolean; done: boolean; n: number; label: string }) {
+function FieldBlock({ n, title, optional, children }: { n: number; title: string; optional?: boolean; children: React.ReactNode }) {
   return (
-    <div className="flex items-center gap-1.5">
-      <div className={cn(
-        "w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold transition-colors",
-        done ? "bg-emerald-500 text-white" : active ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
-      )}>
-        {done ? <CheckCircle2 className="w-3.5 h-3.5" /> : n}
+    <section>
+      <div className="flex items-center gap-2 mb-2">
+        <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-muted text-muted-foreground text-[10px] font-bold">{n}</span>
+        <Label className="text-[11px] uppercase tracking-wider text-foreground font-semibold">
+          {title}
+          {optional && <span className="ml-1.5 normal-case tracking-normal text-muted-foreground font-normal">(opcional)</span>}
+        </Label>
       </div>
-      <span className={cn(
-        "text-[11px] font-medium hidden sm:block",
-        active ? "text-foreground" : "text-muted-foreground"
-      )}>{label}</span>
-    </div>
+      {children}
+    </section>
   );
 }
+
