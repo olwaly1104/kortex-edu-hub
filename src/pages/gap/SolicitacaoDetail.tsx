@@ -65,21 +65,7 @@ export default function GapSolicitacaoDetail() {
     tone: "submitted",
   });
 
-  // 2) Encaminhada
-  if (encaminhada) {
-    steps.push({
-      label: "Encaminhada para destino",
-      data: encaminhada.data,
-      actor: `${encaminhada.actor} → ${dest.label}`,
-      tone: "forwarded",
-    });
-  } else {
-    steps.push({
-      label: "Aguarda encaminhamento",
-      actor: dest.label,
-      tone: "pending",
-    });
-  }
+  // (encaminhamento é automático — omitido do histórico)
 
   // 3) Aceite / rejeitada / aguarda
   if (selected.estado === "rejeitada") {
@@ -243,36 +229,65 @@ export default function GapSolicitacaoDetail() {
             {/* Responsável */}
             <div className="pt-4 border-t border-border">
               <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold mb-2">Responsável</p>
-              {selected.responsavelDestino ? (
-                <>
-                  <button
-                    type="button"
-                    onClick={() => toast({ title: "Perfil do responsável", description: "Abertura do perfil institucional em breve." })}
-                    className="flex items-start gap-3 w-full text-left hover:bg-muted/40 -mx-2 px-2 py-1.5 rounded-md transition-colors group"
-                  >
-                    <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 font-semibold text-xs ring-1 ring-primary/15">
-                      {selected.responsavelDestino.split(" · ")[0].split(" ").slice(0, 2).map(n => n[0]).join("")}
+              {selected.responsavelDestino ? (() => {
+                const respFull = selected.responsavelDestino;
+                const [respName, respRole] = respFull.split(" · ");
+                // Build a deterministic institutional user id from the name
+                const userId = respName
+                  .toLowerCase()
+                  .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                  .replace(/^(dra|dr|prof|eng|tec|téc|sr|sra)\.?\s+/i, m => m.trim().replace(/\.$/, "").toLowerCase() + ".")
+                  .replace(/\s+/g, ".");
+                return (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => toast({ title: "Perfil do responsável", description: "Abertura do perfil institucional em breve." })}
+                      className="flex items-start gap-3 w-full text-left hover:bg-muted/40 -mx-2 px-2 py-1.5 rounded-md transition-colors group"
+                    >
+                      <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 font-semibold text-xs ring-1 ring-primary/15">
+                        {respName.split(" ").slice(0, 2).map(n => n[0]).join("")}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-semibold text-foreground leading-tight group-hover:text-primary transition-colors truncate">
+                          {respName}
+                        </p>
+                        <p className="text-[11px] text-muted-foreground mt-0.5 truncate font-mono">{userId}</p>
+                      </div>
+                    </button>
+                    <div className="grid grid-cols-3 gap-2 mt-3">
+                      <Button variant="outline" size="sm" className="h-7 px-1 text-[11px] gap-1">
+                        <MessageSquare className="w-3 h-3" /> Chat
+                      </Button>
+                      <Button variant="outline" size="sm" className="h-7 px-1 text-[11px] gap-1">
+                        <Mail className="w-3 h-3" /> Email
+                      </Button>
+                      <Button variant="outline" size="sm" className="h-7 px-1 text-[11px] gap-1">
+                        <Phone className="w-3 h-3" /> Ligar
+                      </Button>
                     </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-semibold text-foreground leading-tight group-hover:text-primary transition-colors truncate">
-                        {selected.responsavelDestino.split(" · ")[0]}
-                      </p>
-                      <p className="text-[11px] text-muted-foreground mt-0.5 truncate">{dest.label}</p>
+
+                    {/* Lotação institucional */}
+                    <div className="mt-3 pt-3 border-t border-border space-y-1.5">
+                      <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold mb-1.5">Lotação institucional</p>
+                      <div className="flex items-baseline justify-between gap-2">
+                        <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Posição</span>
+                        <span className="text-[11px] font-medium text-foreground text-right truncate max-w-[150px]">{respRole ?? "Profissional"}</span>
+                      </div>
+                      <div className="flex items-baseline justify-between gap-2">
+                        <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Departamento</span>
+                        <span className="text-[11px] font-medium text-foreground text-right truncate max-w-[150px]">{dest.label}</span>
+                      </div>
+                      <div className="flex items-baseline justify-between gap-2">
+                        <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Faculdade</span>
+                        <span className="text-[11px] font-medium text-foreground text-right truncate max-w-[150px]">
+                          {selected.destino === "Faculdade" ? selected.faculdade : "Serviços Centrais"}
+                        </span>
+                      </div>
                     </div>
-                  </button>
-                  <div className="grid grid-cols-3 gap-2 mt-3">
-                    <Button variant="outline" size="sm" className="h-7 px-1 text-[11px] gap-1">
-                      <MessageSquare className="w-3 h-3" /> Chat
-                    </Button>
-                    <Button variant="outline" size="sm" className="h-7 px-1 text-[11px] gap-1">
-                      <Mail className="w-3 h-3" /> Email
-                    </Button>
-                    <Button variant="outline" size="sm" className="h-7 px-1 text-[11px] gap-1">
-                      <Phone className="w-3 h-3" /> Ligar
-                    </Button>
-                  </div>
-                </>
-              ) : (
+                  </>
+                );
+              })() : (
                 <p className="text-[12px] text-muted-foreground italic">A atribuir</p>
               )}
             </div>
@@ -287,8 +302,9 @@ export default function GapSolicitacaoDetail() {
                 <FileText className="w-3.5 h-3.5 text-muted-foreground" />
                 <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Detalhes do Pedido</h3>
               </div>
-              <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-5 gap-y-4">
-                <FactItem label="Submetido" value={`${fmt(dSub)} · ${fmtT(dSub)}`} />
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-5 gap-y-4">
+                <FactItem label="Submetido" value={fmt(dSub)} />
+                <FactItem label="Hora" value={fmtT(dSub)} />
                 <FactItem label="Destino" value={dest.label} />
                 <FactItem label="Concluído" value={dConc ? `${fmt(dConc)} · ${fmtT(dConc)}` : "—"} />
               </div>
