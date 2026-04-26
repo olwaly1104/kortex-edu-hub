@@ -369,16 +369,27 @@ export default function GapSolicitacaoDetail() {
 
             <div className="border-t border-border" />
 
+            {/* Descrição — texto do pedido */}
             <section>
               <div className="flex items-center gap-2 mb-2.5">
                 <FileText className="w-3.5 h-3.5 text-muted-foreground" />
                 <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Descrição do pedido</h3>
               </div>
-              <p className="text-sm text-foreground/85 leading-relaxed">{selected.descricao}</p>
+              <div className="rounded-lg border border-border bg-muted/15 px-4 py-3.5">
+                <p className="text-sm text-foreground/85 leading-relaxed">{selected.descricao}</p>
+              </div>
+            </section>
 
-              {/* Auto-generated document */}
+            <div className="border-t border-border" />
+
+            {/* Documento institucional gerado */}
+            <section>
+              <div className="flex items-center gap-2 mb-2.5">
+                <FileText className="w-3.5 h-3.5 text-muted-foreground" />
+                <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Documento gerado</h3>
+              </div>
               <Dialog>
-                <div className="mt-4 flex items-center gap-3 rounded-lg border border-border bg-muted/20 px-3.5 py-3">
+                <div className="flex items-center gap-3 rounded-lg border border-border bg-background px-3.5 py-3">
                   <div className="w-9 h-9 rounded-md bg-red-50 border border-red-200 flex items-center justify-center shrink-0">
                     <FileText className="w-4 h-4 text-red-600" />
                   </div>
@@ -445,14 +456,17 @@ export default function GapSolicitacaoDetail() {
                   </div>
                 </DialogContent>
               </Dialog>
+            </section>
 
-              {anexos.length > 0 && (
-                <div className="mt-4">
-                  <div className="flex items-center gap-2 mb-2">
+            {anexos.length > 0 && (
+              <>
+                <div className="border-t border-border" />
+                <section>
+                  <div className="flex items-center gap-2 mb-2.5">
                     <Paperclip className="w-3.5 h-3.5 text-muted-foreground" />
-                    <h4 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">
+                    <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">
                       Anexos do estudante
-                    </h4>
+                    </h3>
                     <span className="text-[10px] text-muted-foreground tabular-nums">({anexos.length})</span>
                   </div>
                   <div className="space-y-2">
@@ -461,7 +475,7 @@ export default function GapSolicitacaoDetail() {
                       return (
                         <div
                           key={i}
-                          className="flex items-center gap-3 rounded-lg border border-border bg-muted/20 px-3.5 py-2.5"
+                          className="flex items-center gap-3 rounded-lg border border-border bg-background px-3.5 py-2.5"
                         >
                           <div className={cn("w-9 h-9 rounded-md border flex items-center justify-center shrink-0", cls)}>
                             <Icon className="w-4 h-4" />
@@ -492,9 +506,9 @@ export default function GapSolicitacaoDetail() {
                       );
                     })}
                   </div>
-                </div>
-              )}
-            </section>
+                </section>
+              </>
+            )}
 
             <div className="border-t border-border" />
 
