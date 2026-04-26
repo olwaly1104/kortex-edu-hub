@@ -212,57 +212,106 @@ export default function GapSolicitacaoDetail() {
               </div>
             </div>
 
-            <div>
-              <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold mb-2">Detalhes do Pedido</p>
-              <div className="space-y-2">
-                <div className="flex items-baseline justify-between gap-2">
-                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Submetido</span>
-                  <span className="text-[11px] font-medium text-foreground tabular-nums">{fmt(dSub)} · {fmtT(dSub)}</span>
-                </div>
-                {tipoCfg && (
-                  <div className="flex items-baseline justify-between gap-2">
-                    <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Categoria</span>
-                    <Badge variant="outline" className={cn("text-[10px]", categoriaConfig[tipoCfg.categoria as Categoria]?.color)}>
-                      {tipoCfg.categoria}
-                    </Badge>
-                  </div>
-                )}
-                <div className="flex items-baseline justify-between gap-2">
-                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Destino</span>
-                  <Badge variant="outline" className={cn("text-[10px]", dest.color)}>{dest.label}</Badge>
-                </div>
-                <div className="flex items-baseline justify-between gap-2">
-                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Responsável</span>
-                  {selected.responsavelDestino ? (
-                    <button
-                      type="button"
-                      className="text-[11px] font-medium text-primary hover:underline text-right truncate max-w-[150px]"
-                      onClick={() => toast({ title: "Perfil do responsável", description: "Abertura do perfil institucional em breve." })}
-                    >
-                      {selected.responsavelDestino.split(" · ")[0]}
-                    </button>
-                  ) : (
-                    <span className="text-[11px] text-muted-foreground italic text-right">a atribuir</span>
-                  )}
-                </div>
-                {dConc && (
-                  <div className="flex items-baseline justify-between gap-2">
-                    <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Concluído</span>
-                    <span className="text-[11px] font-medium text-foreground tabular-nums">{fmt(dConc)} · {fmtT(dConc)}</span>
-                  </div>
-                )}
-              </div>
-            </div>
           </aside>
 
-          {/* RIGHT — descrição + histórico */}
+          {/* RIGHT — detalhes + descrição + doc + histórico */}
           <main className="p-6 space-y-6 min-w-0">
+            {/* Detalhes do Pedido */}
+            <section>
+              <div className="flex items-center gap-2 mb-3">
+                <FileText className="w-3.5 h-3.5 text-muted-foreground" />
+                <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Detalhes do Pedido</h3>
+              </div>
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-5 gap-y-4">
+                <FactItem label="Submetido" value={`${fmt(dSub)} · ${fmtT(dSub)}`} />
+                <FactItem label="Destino" value={dest.label} />
+                <FactItem
+                  label="Responsável"
+                  value={selected.responsavelDestino ? selected.responsavelDestino.split(" · ")[0] : "A atribuir"}
+                  onClick={selected.responsavelDestino ? () => toast({ title: "Perfil do responsável", description: "Abertura do perfil institucional em breve." }) : undefined}
+                />
+                <FactItem label="Concluído" value={dConc ? `${fmt(dConc)} · ${fmtT(dConc)}` : "—"} />
+              </div>
+            </section>
+
+            <div className="border-t border-border" />
+
             <section>
               <div className="flex items-center gap-2 mb-2.5">
                 <FileText className="w-3.5 h-3.5 text-muted-foreground" />
                 <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Descrição do pedido</h3>
               </div>
               <p className="text-sm text-foreground/85 leading-relaxed">{selected.descricao}</p>
+
+              {/* Auto-generated document */}
+              <Dialog>
+                <div className="mt-4 flex items-center gap-3 rounded-lg border border-border bg-muted/20 px-3.5 py-3">
+                  <div className="w-9 h-9 rounded-md bg-red-50 border border-red-200 flex items-center justify-center shrink-0">
+                    <FileText className="w-4 h-4 text-red-600" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[13px] font-semibold text-foreground leading-tight truncate">
+                      Pedido-{selected.id}.pdf
+                    </p>
+                    <p className="text-[11px] text-muted-foreground mt-0.5 inline-flex items-center gap-1.5">
+                      <span>Gerado automaticamente · PDF</span>
+                      <span className="text-muted-foreground/40">·</span>
+                      <DialogTrigger asChild>
+                        <button type="button" className="inline-flex items-center gap-1 text-primary hover:underline font-medium">
+                          <Users className="w-3 h-3" /> 4 partilhas
+                        </button>
+                      </DialogTrigger>
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <DialogTrigger asChild>
+                      <Button variant="outline" size="sm" className="h-7 px-2.5 text-[11px] gap-1">
+                        <Eye className="w-3 h-3" /> Ver
+                      </Button>
+                    </DialogTrigger>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-7 px-2.5 text-[11px] gap-1"
+                      onClick={() => toast({ title: "Documento exportado", description: `Pedido-${selected.id}.pdf` })}
+                    >
+                      <Download className="w-3 h-3" /> Exportar
+                    </Button>
+                  </div>
+                </div>
+                <DialogContent className="max-w-md">
+                  <DialogHeader>
+                    <DialogTitle className="text-base flex items-center gap-2">
+                      <Share2 className="w-4 h-4 text-primary" /> Partilhado com 4 pessoas
+                    </DialogTitle>
+                    <DialogDescription className="text-[12px]">
+                      Pessoas com acesso ao documento <span className="font-medium text-foreground">Pedido-{selected.id}.pdf</span>.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-2 mt-2">
+                    {[
+                      { name: "Prof. Dr. António Mendes", role: "Reitor", access: "Visualizar" },
+                      { name: selected.responsavelDestino?.split(" · ")[0] ?? dest.label, role: `Responsável ${dest.label}`, access: "Editar" },
+                      { name: selected.estudante, role: "Estudante", access: "Visualizar" },
+                      { name: "Coordenação Académica", role: "Equipa", access: "Visualizar" },
+                    ].map((p, i) => {
+                      const ini = p.name.split(" ").slice(0, 2).map(n => n[0]).join("");
+                      return (
+                        <div key={i} className="flex items-center gap-3 px-3 py-2.5 rounded-md border border-border bg-muted/20">
+                          <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[11px] font-semibold ring-1 ring-primary/15 shrink-0">
+                            {ini}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-[13px] font-semibold text-foreground leading-tight truncate">{p.name}</p>
+                            <p className="text-[11px] text-muted-foreground mt-0.5">{p.role}</p>
+                          </div>
+                          <Badge variant="outline" className="text-[10px] font-medium px-2 py-0.5 shrink-0">{p.access}</Badge>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </DialogContent>
+              </Dialog>
             </section>
 
             <div className="border-t border-border" />
