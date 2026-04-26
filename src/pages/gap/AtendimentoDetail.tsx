@@ -99,8 +99,6 @@ export default function GapAtendimentoDetail() {
             <span className="text-[11px] font-medium text-muted-foreground shrink-0">Sessão</span>
             <span className="text-muted-foreground/40">·</span>
             <span className="text-[11px] font-mono font-semibold text-foreground shrink-0">{atendimento.id}</span>
-            <span className="text-muted-foreground/40">·</span>
-            <span className="text-[11px] font-medium text-muted-foreground truncate">{cat.label}</span>
           </div>
         </div>
 
