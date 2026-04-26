@@ -66,21 +66,30 @@ export default function GapDashboard() {
   const slaPct = totalSol > 0 ? Math.round((slaConcluidas / totalSol) * 100) : 0;
   const totalDest = solicitacoesPorDestino.reduce((a, c) => a + c.count, 0);
 
-  // Solicitações por motivo (categoria funcional)
-  const motivoStats = (Object.keys(categoriaConfig) as (keyof typeof categoriaConfig)[]).map(cat => {
-    const sols = solicitacoes.filter(s => tipoConfig[s.tipo]?.categoria === cat);
-    const total = sols.length;
-    const concluidas = sols.filter(s => s.estado === "concluida").length;
-    const emExecucao = sols.filter(s => s.estado === "em_execucao" || s.estado === "recebida").length;
-    const atraso = solicitacoesEmAtraso.filter(({ sol }) => tipoConfig[sol.tipo]?.categoria === cat).length;
-    // top 3 tipos
-    const tipoCounts = new Map<string, number>();
-    sols.forEach(s => tipoCounts.set(s.tipo, (tipoCounts.get(s.tipo) ?? 0) + 1));
-    const topTipos = Array.from(tipoCounts.entries())
-      .sort((a, b) => b[1] - a[1]).slice(0, 3)
-      .map(([tipo, count]) => ({ label: tipoConfig[tipo]?.label ?? tipo, count }));
-    return { categoria: cat, cfg: categoriaConfig[cat], total, concluidas, emExecucao, atraso, topTipos };
-  });
+  // Top motivos (tipos de solicitação) — global ranking
+  const motivoCounts = new Map<string, number>();
+  solicitacoes.forEach(s => motivoCounts.set(s.tipo, (motivoCounts.get(s.tipo) ?? 0) + 1));
+  const topMotivos = Array.from(motivoCounts.entries())
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 6)
+    .map(([tipo, count]) => ({
+      tipo,
+      label: tipoConfig[tipo]?.label ?? tipo,
+      categoria: tipoConfig[tipo]?.categoria,
+      count,
+    }));
+  const maxMotivo = Math.max(...topMotivos.map(m => m.count), 1);
+  const totalMotivos = solicitacoes.length;
+
+  // Destinos por categoria funcional
+  const destinoPorCategoria = (Object.keys(categoriaConfig) as (keyof typeof categoriaConfig)[]).map(cat => ({
+    categoria: cat,
+    label: categoriaConfig[cat].label,
+    color: categoriaConfig[cat].color,
+    count: solicitacoes.filter(s => tipoConfig[s.tipo]?.categoria === cat).length,
+  }));
+  const maxCat = Math.max(...destinoPorCategoria.map(c => c.count), 1);
+  const totalCat = destinoPorCategoria.reduce((a, c) => a + c.count, 0);
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
@@ -227,54 +236,6 @@ export default function GapDashboard() {
         </Card>
       </div>
 
-      {/* Solicitações por Motivo — categorias funcionais lado a lado */}
-      <Card className="p-5">
-        <div className="flex items-center justify-between mb-1">
-          <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
-            <ListChecks className="w-4 h-4 text-primary" /> Solicitações por Motivo
-          </h2>
-          <Link to="/gap/solicitacoes" className="text-[11px] font-medium text-primary hover:underline flex items-center gap-0.5">
-            Ver todas <ArrowRight className="w-3 h-3" />
-          </Link>
-        </div>
-        <p className="text-[11px] text-muted-foreground mb-4">Categoria funcional do pedido — pedidos mais frequentes em cada área</p>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-4">
-          {motivoStats.map(m => {
-            const Icon = m.cfg.icon;
-            const maxTipo = Math.max(...m.topTipos.map(t => t.count), 1);
-            return (
-              <div key={m.categoria} className="flex flex-col">
-                <div className="flex items-center justify-between mb-3 pb-2 border-b border-border">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <div className={`w-7 h-7 rounded-md flex items-center justify-center shrink-0 border ${m.cfg.color}`}>
-                      <Icon className="w-3.5 h-3.5" />
-                    </div>
-                    <p className="text-xs font-semibold text-foreground">{m.cfg.label}</p>
-                  </div>
-                  <span className="text-sm font-bold text-foreground tabular-nums">{m.total}</span>
-                </div>
-                <div className="space-y-2">
-                  {m.topTipos.length === 0 ? (
-                    <p className="text-[11px] text-muted-foreground italic">Sem dados</p>
-                  ) : m.topTipos.map((t, i) => {
-                    const pct = m.total > 0 ? (t.count / m.total) * 100 : 0;
-                    return (
-                      <div key={i} className="flex items-center gap-2">
-                        <p className="text-[11px] text-foreground line-clamp-1 w-[140px] shrink-0">{t.label}</p>
-                        <div className="flex-1 h-1.5 rounded-full bg-muted overflow-hidden">
-                          <div className="h-full bg-primary rounded-full" style={{ width: `${(t.count / maxTipo) * 100}%` }} />
-                        </div>
-                        <span className="text-[11px] font-semibold text-foreground tabular-nums w-6 text-right">{t.count}</span>
-                        <span className="text-[10px] text-muted-foreground tabular-nums w-9 text-right">{pct.toFixed(0)}%</span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </Card>
 
       {/* Por Destino + Estado — fim da página */}
       <div className="grid lg:grid-cols-2 gap-6">
@@ -346,6 +307,74 @@ export default function GapDashboard() {
               <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Em Atraso</p>
               <p className="text-sm font-bold text-destructive tabular-nums mt-0.5">{slaEmAtraso}</p>
             </div>
+          </div>
+        </Card>
+
+        {/* Solicitações por Motivo — top tipos de pedido */}
+        <Card className="p-5">
+          <div className="flex items-center justify-between mb-1">
+            <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
+              <ListChecks className="w-4 h-4 text-primary" /> Solicitações por Motivo
+            </h2>
+            <Link to="/gap/solicitacoes" className="text-[11px] font-medium text-primary hover:underline flex items-center gap-0.5">
+              Ver todas <ArrowRight className="w-3 h-3" />
+            </Link>
+          </div>
+          <p className="text-[11px] text-muted-foreground mb-4">Pedidos mais frequentes registados no GAP</p>
+          <div className="space-y-2.5">
+            {topMotivos.map(m => {
+              const pct = totalMotivos > 0 ? (m.count / totalMotivos) * 100 : 0;
+              const cfg = m.categoria ? categoriaConfig[m.categoria] : undefined;
+              return (
+                <div key={m.tipo} className="flex items-center gap-3">
+                  <Badge variant="outline" className={`text-[10px] shrink-0 w-[110px] justify-center ${cfg?.color ?? ""}`}>{cfg?.label ?? "—"}</Badge>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[11px] text-foreground line-clamp-1 mb-1">{m.label}</p>
+                    <div className="h-2 rounded-full bg-muted overflow-hidden">
+                      <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${(m.count / maxMotivo) * 100}%` }} />
+                    </div>
+                  </div>
+                  <span className="text-xs font-semibold text-foreground tabular-nums w-8 text-right">{m.count}</span>
+                  <span className="text-[10px] text-muted-foreground tabular-nums w-9 text-right">{pct.toFixed(0)}%</span>
+                </div>
+              );
+            })}
+          </div>
+          <div className="mt-4 pt-3 border-t border-border flex items-center justify-between text-xs">
+            <span className="text-muted-foreground">Tipos de pedido distintos</span>
+            <span className="font-semibold text-foreground tabular-nums">{motivoCounts.size}</span>
+          </div>
+        </Card>
+
+        {/* Solicitações por Categoria funcional */}
+        <Card className="p-5">
+          <div className="flex items-center justify-between mb-1">
+            <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
+              <Building2 className="w-4 h-4 text-primary" /> Solicitações por Categoria
+            </h2>
+            <Link to="/gap/solicitacoes" className="text-[11px] font-medium text-primary hover:underline flex items-center gap-0.5">
+              Ver todas <ArrowRight className="w-3 h-3" />
+            </Link>
+          </div>
+          <p className="text-[11px] text-muted-foreground mb-4">Distribuição por área funcional do pedido</p>
+          <div className="space-y-2.5">
+            {destinoPorCategoria.map(c => {
+              const pct = totalCat > 0 ? (c.count / totalCat) * 100 : 0;
+              return (
+                <div key={c.categoria} className="flex items-center gap-3">
+                  <Badge variant="outline" className={`text-[10px] shrink-0 w-[110px] justify-center ${c.color}`}>{c.label}</Badge>
+                  <div className="flex-1 h-2 rounded-full bg-muted overflow-hidden">
+                    <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${(c.count / maxCat) * 100}%` }} />
+                  </div>
+                  <span className="text-xs font-semibold text-foreground tabular-nums w-8 text-right">{c.count}</span>
+                  <span className="text-[10px] text-muted-foreground tabular-nums w-9 text-right">{pct.toFixed(0)}%</span>
+                </div>
+              );
+            })}
+          </div>
+          <div className="mt-4 pt-3 border-t border-border flex items-center justify-between text-xs">
+            <span className="text-muted-foreground">Total registadas</span>
+            <span className="font-semibold text-foreground tabular-nums">{totalCat}</span>
           </div>
         </Card>
       </div>
