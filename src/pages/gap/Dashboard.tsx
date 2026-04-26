@@ -192,7 +192,7 @@ export default function GapDashboard() {
                     return (
                       <tr
                         key={sol.id}
-                        onClick={() => (window.location.href = `/gap/solicitacoes/${sol.id}`)}
+                        onClick={() => navigate(`/gap/solicitacoes/${sol.id}`)}
                         className={cn("border-b last:border-0 hover:bg-muted/30 transition-colors cursor-pointer")}
                       >
                         <td className="px-3 py-2">
