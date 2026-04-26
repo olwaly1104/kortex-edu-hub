@@ -53,7 +53,7 @@ const gapReportData = solicitacoes.reduce<Array<{ id: string; name: string; code
 export default function GapTickets() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
-  const [estado, setEstado] = useState<"todos" | "pendentes" | "em_execucao" | "executadas" | "rejeitadas">("todos");
+  const [estado, setEstado] = useState<"todos" | "hoje" | "pendentes" | "em_execucao" | "executadas" | "rejeitadas">("todos");
   const [destino, setDestino] = useState<Destino | "todos">("todos");
   const [categoria, setCategoria] = useState<string>("todas");
   const [mes, setMes] = useState<string>("todos");
@@ -62,9 +62,11 @@ export default function GapTickets() {
   const isEmExecucao = (s: Solicitacao) => s.estado === "em_execucao";
   const isExecutada = (s: Solicitacao) => s.estado === "concluida";
   const isRejeitada = (s: Solicitacao) => s.estado === "rejeitada";
+  const isHoje = (s: Solicitacao) => s.dataSubmissao === TODAY;
 
   const counts = useMemo(() => ({
     todos: solicitacoes.length,
+    hoje: solicitacoes.filter(isHoje).length,
     pendentes: solicitacoes.filter(isPendente).length,
     em_execucao: solicitacoes.filter(isEmExecucao).length,
     executadas: solicitacoes.filter(isExecutada).length,
