@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   ArrowLeft, Clock, FileText, MessageSquare, Mail, Phone, Check, X, Hourglass, Send,
-  Eye, Download, Users, Share2,
+  Eye, Download, Users, Share2, CheckCircle2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -78,10 +78,8 @@ export default function GapSolicitacaoDetail() {
     });
     steps.push({ label: "Solicitação aceite", data: aceite?.data, actor: aceite?.actor ?? selected.responsavelDestino, nota: aceite?.nota, tone: "accepted" });
   } else {
-    // Acceptance SLA: 2 working days from forwarding (or submission as fallback)
-    const acceptSlaDias = 2;
-    const baseAccept = new Date(selected.dataEncaminhamento ?? selected.dataSubmissao);
-    baseAccept.setDate(baseAccept.getDate() + acceptSlaDias);
+    // Acceptance prevision — one day before the conclusion target (15/12/2025)
+    const baseAccept = new Date("2025-12-14");
     const hojeA = new Date(); hojeA.setHours(0, 0, 0, 0);
     const diffA = Math.ceil((baseAccept.getTime() - hojeA.getTime()) / 86400000);
     let asideAccept: string;
@@ -106,25 +104,20 @@ export default function GapSolicitacaoDetail() {
   } else if (selected.estado === "rejeitada") {
     steps.push({ label: "Sem conclusão", actor: "Pedido encerrado por rejeição", tone: "pending" });
   } else {
-    const sla = selected.slaDias ?? tipoCfg?.slaDias;
-    let aside: string | undefined;
-    let labelText = "Conclusão prevista";
-    if (sla) {
-      const base = new Date(selected.dataEncaminhamento ?? selected.dataSubmissao);
-      base.setDate(base.getDate() + sla);
-      const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
-      const diff = Math.ceil((base.getTime() - hoje.getTime()) / 86400000);
-      labelText = `Conclusão prevista · ${fmt(base)}`;
-      if (diff < 0) {
-        aside = `${Math.abs(diff)} ${Math.abs(diff) === 1 ? "dia" : "dias"} em atraso`;
-      } else if (diff === 0) {
-        aside = "Prazo termina hoje";
-      } else {
-        aside = `Faltam ${diff} ${diff === 1 ? "dia" : "dias"}`;
-      }
+    // Conclusão prevista — fixed institutional target
+    const base = new Date("2025-12-15");
+    const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
+    const diff = Math.ceil((base.getTime() - hoje.getTime()) / 86400000);
+    let aside: string;
+    if (diff < 0) {
+      aside = `${Math.abs(diff)} ${Math.abs(diff) === 1 ? "dia" : "dias"} em atraso`;
+    } else if (diff === 0) {
+      aside = "Prazo termina hoje";
+    } else {
+      aside = `Faltam ${diff} ${diff === 1 ? "dia" : "dias"}`;
     }
     steps.push({
-      label: labelText,
+      label: `Conclusão prevista · ${fmt(base)}`,
       actor: selected.responsavelDestino ?? dest.label,
       aside,
       tone: "scheduled",
@@ -148,16 +141,16 @@ export default function GapSolicitacaoDetail() {
       </Link>
 
       <Card className="overflow-hidden p-0 gap-0">
-        {/* Top bar — ID + destino tag */}
+        {/* Top bar — ID + ano lectivo */}
         <div className="flex items-center justify-between px-6 py-3 border-b border-border bg-muted/20">
           <div className="flex items-center gap-2 min-w-0">
             <span className="text-[11px] font-medium text-muted-foreground shrink-0">Pedido</span>
             <span className="text-muted-foreground/40">·</span>
             <span className="text-[11px] font-mono font-semibold text-foreground shrink-0">{selected.id}</span>
           </div>
-          <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider", dest.color)}>
-            {dest.label}
-          </Badge>
+          <span className="text-[10px] uppercase tracking-[0.12em] font-semibold text-primary">
+            Ano Lectivo 2024/2025
+          </span>
         </div>
 
         {/* Title block */}
@@ -232,12 +225,10 @@ export default function GapSolicitacaoDetail() {
               {selected.responsavelDestino ? (() => {
                 const respFull = selected.responsavelDestino;
                 const [respName, respRole] = respFull.split(" · ");
-                // Build a deterministic institutional user id from the name
-                const userId = respName
-                  .toLowerCase()
-                  .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-                  .replace(/^(dra|dr|prof|eng|tec|téc|sr|sra)\.?\s+/i, m => m.trim().replace(/\.$/, "").toLowerCase() + ".")
-                  .replace(/\s+/g, ".");
+                // Numeric institutional user id derived deterministically from name
+                let hash = 0;
+                for (let i = 0; i < respName.length; i++) hash = (hash * 31 + respName.charCodeAt(i)) >>> 0;
+                const userId = String(100000 + (hash % 900000));
                 return (
                   <>
                     <button
@@ -252,7 +243,7 @@ export default function GapSolicitacaoDetail() {
                         <p className="text-sm font-semibold text-foreground leading-tight group-hover:text-primary transition-colors truncate">
                           {respName}
                         </p>
-                        <p className="text-[11px] text-muted-foreground mt-0.5 truncate font-mono">{userId}</p>
+                        <p className="text-[11px] text-muted-foreground mt-0.5 font-mono tabular-nums">{userId}</p>
                       </div>
                     </button>
                     <div className="grid grid-cols-3 gap-2 mt-3">
@@ -267,22 +258,20 @@ export default function GapSolicitacaoDetail() {
                       </Button>
                     </div>
 
-                    {/* Lotação institucional */}
                     <div className="mt-3 pt-3 border-t border-border space-y-1.5">
-                      <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold mb-1.5">Lotação institucional</p>
-                      <div className="flex items-baseline justify-between gap-2">
-                        <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Posição</span>
-                        <span className="text-[11px] font-medium text-foreground text-right truncate max-w-[150px]">{respRole ?? "Profissional"}</span>
-                      </div>
+                      {selected.destino === "Faculdade" && (
+                        <div className="flex items-baseline justify-between gap-2">
+                          <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Faculdade</span>
+                          <span className="text-[11px] font-medium text-foreground text-right truncate max-w-[150px]">{selected.faculdade}</span>
+                        </div>
+                      )}
                       <div className="flex items-baseline justify-between gap-2">
                         <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Departamento</span>
                         <span className="text-[11px] font-medium text-foreground text-right truncate max-w-[150px]">{dest.label}</span>
                       </div>
                       <div className="flex items-baseline justify-between gap-2">
-                        <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Faculdade</span>
-                        <span className="text-[11px] font-medium text-foreground text-right truncate max-w-[150px]">
-                          {selected.destino === "Faculdade" ? selected.faculdade : "Serviços Centrais"}
-                        </span>
+                        <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Posição</span>
+                        <span className="text-[11px] font-medium text-foreground text-right truncate max-w-[150px]">{respRole ?? "Profissional"}</span>
                       </div>
                     </div>
                   </>
@@ -306,7 +295,7 @@ export default function GapSolicitacaoDetail() {
                 <FactItem label="Submetido" value={fmt(dSub)} />
                 <FactItem label="Hora" value={fmtT(dSub)} />
                 <FactItem label="Destino" value={dest.label} />
-                <FactItem label="Concluído" value={dConc ? `${fmt(dConc)} · ${fmtT(dConc)}` : "—"} />
+                <FactItem label="Responsável" value={selected.responsavelDestino ? selected.responsavelDestino.split(" · ")[0] : "A atribuir"} />
               </div>
             </section>
 
@@ -327,10 +316,11 @@ export default function GapSolicitacaoDetail() {
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="text-[13px] font-semibold text-foreground leading-tight truncate">
-                      Pedido-{selected.id}.pdf
+                      Pedido-{selected.id}
                     </p>
                     <p className="text-[11px] text-muted-foreground mt-0.5 inline-flex items-center gap-1.5">
-                      <span>Gerado automaticamente · PDF</span>
+                      <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                      <span>Gerado automaticamente</span>
                       <span className="text-muted-foreground/40">·</span>
                       <DialogTrigger asChild>
                         <button type="button" className="inline-flex items-center gap-1 text-primary hover:underline font-medium">
@@ -349,7 +339,7 @@ export default function GapSolicitacaoDetail() {
                       variant="outline"
                       size="sm"
                       className="h-7 px-2.5 text-[11px] gap-1"
-                      onClick={() => toast({ title: "Documento exportado", description: `Pedido-${selected.id}.pdf` })}
+                      onClick={() => toast({ title: "Documento exportado", description: `Pedido-${selected.id}` })}
                     >
                       <Download className="w-3 h-3" /> Exportar
                     </Button>
@@ -361,7 +351,7 @@ export default function GapSolicitacaoDetail() {
                       <Share2 className="w-4 h-4 text-primary" /> Partilhado com 4 pessoas
                     </DialogTitle>
                     <DialogDescription className="text-[12px]">
-                      Pessoas com acesso ao documento <span className="font-medium text-foreground">Pedido-{selected.id}.pdf</span>.
+                      Pessoas com acesso ao documento <span className="font-medium text-foreground">Pedido-{selected.id}</span>.
                     </DialogDescription>
                   </DialogHeader>
                   <div className="space-y-2 mt-2">
