@@ -419,7 +419,10 @@ export default function GapAtendimentos() {
                       </td>
 
                       <td className="px-4 py-3 align-middle">
-                        <Badge variant="outline" className={cn("text-[10px] h-5", cat.color)}>{cat.label}</Badge>
+                        <Badge variant="outline" className={cn("text-[10px] h-5 gap-1", cat.color)}>
+                          <cat.icon className="w-3 h-3" />
+                          {cat.label}
+                        </Badge>
                       </td>
 
                       <td className="px-4 py-3 align-middle">
@@ -436,10 +439,6 @@ export default function GapAtendimentos() {
                           <span className={cn("w-1.5 h-1.5 rounded-full", est.dot)} />
                           {est.label}
                         </Badge>
-                      </td>
-
-                      <td className="px-2 py-3 align-middle text-right">
-                        <ArrowRight className="w-3.5 h-3.5 text-muted-foreground/40 group-hover:text-primary group-hover:translate-x-0.5 transition-all inline-block" />
                       </td>
                     </tr>
                   );
