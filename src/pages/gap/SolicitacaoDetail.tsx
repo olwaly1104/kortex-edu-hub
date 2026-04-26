@@ -319,9 +319,8 @@ export default function GapSolicitacaoDetail() {
                     <FileText className="w-4 h-4 text-red-600" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-[13px] font-semibold text-foreground leading-tight truncate inline-flex items-center gap-1.5">
-                      <span className="truncate">Pedido-{selected.id}</span>
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                    <p className="text-[13px] font-semibold text-foreground leading-tight truncate">
+                      Pedido-{selected.id}
                     </p>
                     <p className="text-[11px] text-muted-foreground mt-0.5 inline-flex items-center gap-1.5">
                       <span>Gerado automaticamente</span>
