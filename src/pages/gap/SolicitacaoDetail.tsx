@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   ArrowLeft, Clock, FileText, MessageSquare, Mail, Phone, Check, X, Hourglass, Send,
-  Eye, Download, Users, Share2, CheckCircle2,
+  Eye, Download, Users, Share2, CheckCircle2, Paperclip, FileImage, FileSpreadsheet,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
