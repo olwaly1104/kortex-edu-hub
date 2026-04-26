@@ -323,10 +323,11 @@ export default function GapSolicitacaoDetail() {
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="text-[13px] font-semibold text-foreground leading-tight truncate">
-                      Pedido-{selected.id}.pdf
+                      Pedido-{selected.id}
                     </p>
                     <p className="text-[11px] text-muted-foreground mt-0.5 inline-flex items-center gap-1.5">
-                      <span>Gerado automaticamente · PDF</span>
+                      <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                      <span>Gerado automaticamente</span>
                       <span className="text-muted-foreground/40">·</span>
                       <DialogTrigger asChild>
                         <button type="button" className="inline-flex items-center gap-1 text-primary hover:underline font-medium">
