@@ -129,13 +129,13 @@ export default function GapTickets() {
     setEstado("todos"); setDestino("todos"); setCategoria("todas"); setMes("todos"); setSearch("");
   };
 
-  const estadoTabs: { key: "todos" | "pendentes" | "em_execucao" | "executadas" | "rejeitadas"; label: string; icon: React.ElementType }[] = [
-    { key: "todos", label: "Todas", icon: Inbox },
-    { key: "pendentes", label: "Pendentes", icon: AlertCircle },
-    { key: "em_execucao", label: "Em Execução", icon: Clock },
-    { key: "executadas", label: "Executadas", icon: CheckCircle2 },
-    { key: "rejeitadas", label: "Rejeitadas", icon: X },
-  ];
+  const periodoOpts = [
+    { v: "todos", label: "Todas", count: counts.todos },
+    { v: "pendentes", label: "Pendentes", count: counts.pendentes },
+    { v: "em_execucao", label: "Em Execução", count: counts.em_execucao },
+    { v: "executadas", label: "Executadas", count: counts.executadas },
+    { v: "rejeitadas", label: "Rejeitadas", count: counts.rejeitadas },
+  ] as const;
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
