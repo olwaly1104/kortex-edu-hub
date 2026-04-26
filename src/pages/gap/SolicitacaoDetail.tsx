@@ -150,37 +150,57 @@ export default function GapSolicitacaoDetail() {
           <span className="font-mono text-foreground normal-case tracking-normal">{selected.id}</span>
         </div>
 
-        {/* Title block */}
-        <div className="px-6 pt-5 pb-5 border-b border-border">
-          <div className="flex items-start justify-between gap-4">
-            <h1 className="text-xl font-semibold leading-tight tracking-tight text-foreground">
-              {tipoCfg?.label ?? selected.tipo}
-            </h1>
-            <button
-              type="button"
-              onClick={() => { navigator.clipboard?.writeText(selected.id); toast({ title: "ID copiado", description: selected.id }); }}
-              className="shrink-0 inline-flex items-center px-2 py-0.5 rounded-md border border-border bg-background hover:bg-muted text-[11px] font-mono font-semibold text-foreground transition-colors"
-            >
-              {selected.id}
-            </button>
+        {/* Title block with date tile (mirrors Agendamento detail) */}
+        <div className="px-6 pt-5 pb-5 flex items-start gap-5">
+          {/* Date tile */}
+          <div className="shrink-0 w-[68px] rounded-lg border border-border overflow-hidden bg-background text-center">
+            <div className="bg-primary/90 py-1">
+              <p className="text-[10px] uppercase tracking-[0.15em] text-primary-foreground font-bold">
+                {dSub.toLocaleDateString("pt-PT", { month: "short" }).replace(".", "")}
+              </p>
+            </div>
+            <div className="py-1.5">
+              <p className="text-[28px] leading-none font-bold text-foreground tabular-nums tracking-tight">
+                {String(dSub.getDate()).padStart(2, "0")}
+              </p>
+              <p className="text-[9px] uppercase tracking-wider text-muted-foreground font-semibold mt-1 capitalize">
+                {dSub.toLocaleDateString("pt-PT", { weekday: "short" }).replace(".", "").slice(0, 3)}
+              </p>
+            </div>
           </div>
-          <div className="mt-2.5 flex items-center gap-1.5 flex-wrap">
-            <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider gap-1", st.color)}>
-              <span className={cn("w-1.5 h-1.5 rounded-full", estadoDot[selected.estado])} />
-              {st.label}
-            </Badge>
-            {tipoCfg && (() => {
-              const catCfg = categoriaConfig[tipoCfg.categoria as Categoria];
-              const CatIcon = catCfg?.icon;
-              return (
-                <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider gap-1", catCfg?.color)}>
-                  {CatIcon && <CatIcon className="w-3 h-3" />}
-                  {tipoCfg.categoria}
-                </Badge>
-              );
-            })()}
+
+          <div className="min-w-0 flex-1 pt-0.5">
+            <div className="flex items-start justify-between gap-4">
+              <h1 className="text-xl font-semibold leading-tight tracking-tight text-foreground">
+                {tipoCfg?.label ?? selected.tipo}
+              </h1>
+              <button
+                type="button"
+                onClick={() => { navigator.clipboard?.writeText(selected.id); toast({ title: "ID copiado", description: selected.id }); }}
+                className="shrink-0 inline-flex items-center px-2 py-0.5 rounded-md border border-border bg-background hover:bg-muted text-[11px] font-mono font-semibold text-foreground transition-colors"
+              >
+                {selected.id}
+              </button>
+            </div>
+            <div className="mt-2.5 flex items-center gap-1.5 flex-wrap">
+              <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider gap-1", st.color)}>
+                <span className={cn("w-1.5 h-1.5 rounded-full", estadoDot[selected.estado])} />
+                {st.label}
+              </Badge>
+              {tipoCfg && (() => {
+                const catCfg = categoriaConfig[tipoCfg.categoria as Categoria];
+                const CatIcon = catCfg?.icon;
+                return (
+                  <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider gap-1", catCfg?.color)}>
+                    {CatIcon && <CatIcon className="w-3 h-3" />}
+                    {tipoCfg.categoria}
+                  </Badge>
+                );
+              })()}
+            </div>
           </div>
         </div>
+
 
         {/* 2-column body */}
         <div className="grid md:grid-cols-[280px_1fr] divide-x divide-border">
