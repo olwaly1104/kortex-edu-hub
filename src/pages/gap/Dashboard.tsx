@@ -61,6 +61,11 @@ export default function GapDashboard() {
     .filter((x): x is NonNullable<typeof x> => x !== null && x.diff < 0)
     .sort((a, b) => a.diff - b.diff);
 
+  const slaConcluidas = solicitacoes.filter(s => s.estado === "concluida").length;
+  const slaEmAtraso = solicitacoesEmAtraso.length;
+  const slaPct = totalSol > 0 ? Math.round((slaConcluidas / totalSol) * 100) : 0;
+  const totalDest = solicitacoesPorDestino.reduce((a, c) => a + c.count, 0);
+
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       {/* Header */}
