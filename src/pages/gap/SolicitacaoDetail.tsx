@@ -287,6 +287,22 @@ export default function GapSolicitacaoDetail() {
 
           {/* RIGHT — detalhes + descrição + doc + histórico */}
           <main className="p-6 space-y-6 min-w-0">
+            {/* Detalhes do Pedido */}
+            <section>
+              <div className="flex items-center gap-2 mb-3">
+                <FileText className="w-3.5 h-3.5 text-muted-foreground" />
+                <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Detalhes do Pedido</h3>
+              </div>
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-5 gap-y-4">
+                <FactItem label="Submetido" value={fmt(dSub)} />
+                <FactItem label="Hora" value={fmtT(dSub)} />
+                <FactItem label="Destino" value={dest.label} />
+                <FactItem label="Responsável" value={selected.responsavelDestino ? selected.responsavelDestino.split(" · ")[0] : "A atribuir"} />
+              </div>
+            </section>
+
+            <div className="border-t border-border" />
+
             <section>
               <div className="flex items-center gap-2 mb-2.5">
                 <FileText className="w-3.5 h-3.5 text-muted-foreground" />
@@ -301,11 +317,11 @@ export default function GapSolicitacaoDetail() {
                     <FileText className="w-4 h-4 text-red-600" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-[13px] font-semibold text-foreground leading-tight truncate">
-                      Pedido-{selected.id}
+                    <p className="text-[13px] font-semibold text-foreground leading-tight truncate inline-flex items-center gap-1.5">
+                      <span className="truncate">Pedido-{selected.id}</span>
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                     </p>
                     <p className="text-[11px] text-muted-foreground mt-0.5 inline-flex items-center gap-1.5">
-                      <CheckCircle2 className="w-3 h-3 text-emerald-600" />
                       <span>Gerado automaticamente</span>
                       <span className="text-muted-foreground/40">·</span>
                       <DialogTrigger asChild>
