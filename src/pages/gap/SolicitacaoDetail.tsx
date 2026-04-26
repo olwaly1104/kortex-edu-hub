@@ -148,16 +148,16 @@ export default function GapSolicitacaoDetail() {
       </Link>
 
       <Card className="overflow-hidden p-0 gap-0">
-        {/* Top bar — ID + destino tag */}
+        {/* Top bar — ID + ano lectivo */}
         <div className="flex items-center justify-between px-6 py-3 border-b border-border bg-muted/20">
           <div className="flex items-center gap-2 min-w-0">
             <span className="text-[11px] font-medium text-muted-foreground shrink-0">Pedido</span>
             <span className="text-muted-foreground/40">·</span>
             <span className="text-[11px] font-mono font-semibold text-foreground shrink-0">{selected.id}</span>
           </div>
-          <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider", dest.color)}>
-            {dest.label}
-          </Badge>
+          <span className="text-[10px] uppercase tracking-[0.12em] font-semibold text-primary">
+            Ano Lectivo 2024/2025
+          </span>
         </div>
 
         {/* Title block */}
