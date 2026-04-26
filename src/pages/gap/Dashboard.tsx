@@ -184,10 +184,10 @@ export default function GapDashboard() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b bg-muted/30">
-                    <th className="text-left p-3 font-medium text-muted-foreground text-xs uppercase tracking-wider">Solicitação</th>
-                    <th className="text-left p-3 font-medium text-muted-foreground text-xs uppercase tracking-wider">Estudante</th>
-                    <th className="text-left p-3 font-medium text-muted-foreground text-xs uppercase tracking-wider">Responsável</th>
-                    <th className="text-center p-3 font-medium text-muted-foreground text-xs uppercase tracking-wider whitespace-nowrap">Atraso</th>
+                    <th className="text-left px-3 py-2 font-medium text-muted-foreground text-xs uppercase tracking-wider">Solicitação</th>
+                    <th className="text-left px-3 py-2 font-medium text-muted-foreground text-xs uppercase tracking-wider">Estudante</th>
+                    <th className="text-left px-3 py-2 font-medium text-muted-foreground text-xs uppercase tracking-wider">Responsável</th>
+                    <th className="text-center px-3 py-2 font-medium text-muted-foreground text-xs uppercase tracking-wider whitespace-nowrap">Atraso</th>
                   </tr>
                 </thead>
                 <tbody>
