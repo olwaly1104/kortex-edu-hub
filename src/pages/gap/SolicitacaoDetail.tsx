@@ -358,7 +358,7 @@ export default function GapSolicitacaoDetail() {
                       <Share2 className="w-4 h-4 text-primary" /> Partilhado com 4 pessoas
                     </DialogTitle>
                     <DialogDescription className="text-[12px]">
-                      Pessoas com acesso ao documento <span className="font-medium text-foreground">Pedido-{selected.id}.pdf</span>.
+                      Pessoas com acesso ao documento <span className="font-medium text-foreground">Pedido-{selected.id}</span>.
                     </DialogDescription>
                   </DialogHeader>
                   <div className="space-y-2 mt-2">
