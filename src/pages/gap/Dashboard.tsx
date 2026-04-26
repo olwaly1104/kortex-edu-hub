@@ -66,6 +66,22 @@ export default function GapDashboard() {
   const slaPct = totalSol > 0 ? Math.round((slaConcluidas / totalSol) * 100) : 0;
   const totalDest = solicitacoesPorDestino.reduce((a, c) => a + c.count, 0);
 
+  // Solicitações por motivo (categoria funcional)
+  const motivoStats = (Object.keys(categoriaConfig) as (keyof typeof categoriaConfig)[]).map(cat => {
+    const sols = solicitacoes.filter(s => tipoConfig[s.tipo]?.categoria === cat);
+    const total = sols.length;
+    const concluidas = sols.filter(s => s.estado === "concluida").length;
+    const emExecucao = sols.filter(s => s.estado === "em_execucao" || s.estado === "recebida").length;
+    const atraso = solicitacoesEmAtraso.filter(({ sol }) => tipoConfig[sol.tipo]?.categoria === cat).length;
+    // top 3 tipos
+    const tipoCounts = new Map<string, number>();
+    sols.forEach(s => tipoCounts.set(s.tipo, (tipoCounts.get(s.tipo) ?? 0) + 1));
+    const topTipos = Array.from(tipoCounts.entries())
+      .sort((a, b) => b[1] - a[1]).slice(0, 3)
+      .map(([tipo, count]) => ({ label: tipoConfig[tipo]?.label ?? tipo, count }));
+    return { categoria: cat, cfg: categoriaConfig[cat], total, concluidas, emExecucao, atraso, topTipos };
+  });
+
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       {/* Header */}
