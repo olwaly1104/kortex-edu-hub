@@ -327,21 +327,6 @@ export default function GapAtendimentoDetail() {
                   <span>Este agendamento foi cancelado e não será realizado.</span>
                 </div>
               )}
-              {atendimento.estado === "agendado" && (
-                <div className="flex items-center justify-end gap-2 mt-3">
-                  <Button variant="outline" size="sm" className="h-8 px-3 text-[12px] gap-1.5" onClick={() => handleAction("Sessão remarcada")}>
-                    <CalendarIcon className="w-3.5 h-3.5" /> Remarcar
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="h-8 px-3 text-[12px] gap-1.5 border-destructive/25 text-destructive hover:bg-destructive/10 hover:text-destructive"
-                    onClick={() => handleAction("Sessão cancelada")}
-                  >
-                    <X className="w-3.5 h-3.5" /> Cancelar
-                  </Button>
-                </div>
-              )}
             </section>
           </main>
         </div>
