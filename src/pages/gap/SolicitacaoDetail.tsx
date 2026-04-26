@@ -141,27 +141,20 @@ export default function GapSolicitacaoDetail() {
       </Link>
 
       <Card className="overflow-hidden p-0 gap-0">
-        {/* Top bar — ano lectivo */}
-        <div className="flex items-center justify-start px-6 py-3 border-b border-border bg-muted/20">
-          <span className="text-[10px] uppercase tracking-[0.12em] font-semibold text-primary">
-            Ano Lectivo 2024/2025
-          </span>
+        {/* Top bar — breadcrumb */}
+        <div className="flex items-center gap-2 px-6 py-3 border-b border-border bg-muted/20 text-[10px] uppercase tracking-[0.12em] font-semibold">
+          <span className="text-primary">Ano Lectivo 2024/2025</span>
+          <span className="text-muted-foreground/40">·</span>
+          <Link to="/gap/solicitacoes" className="text-muted-foreground hover:text-foreground transition-colors">Solicitações</Link>
+          <span className="text-muted-foreground/40">·</span>
+          <span className="font-mono text-foreground normal-case tracking-normal">{selected.id}</span>
         </div>
 
         {/* Title block */}
         <div className="px-6 pt-5 pb-5 border-b border-border">
-          <div className="flex items-start justify-between gap-4">
-            <h1 className="text-xl font-semibold leading-tight tracking-tight text-foreground">
-              {tipoCfg?.label ?? selected.tipo}
-            </h1>
-            <button
-              type="button"
-              onClick={() => { navigator.clipboard?.writeText(selected.id); toast({ title: "ID copiado", description: selected.id }); }}
-              className="shrink-0 inline-flex items-center px-2 py-0.5 rounded-md border border-border bg-background hover:bg-muted text-[11px] font-mono font-semibold text-foreground transition-colors"
-            >
-              {selected.id}
-            </button>
-          </div>
+          <h1 className="text-xl font-semibold leading-tight tracking-tight text-foreground">
+            {tipoCfg?.label ?? selected.tipo}
+          </h1>
           <div className="mt-2.5 flex items-center gap-1.5 flex-wrap">
             <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider gap-1", st.color)}>
               <span className={cn("w-1.5 h-1.5 rounded-full", estadoDot[selected.estado])} />
