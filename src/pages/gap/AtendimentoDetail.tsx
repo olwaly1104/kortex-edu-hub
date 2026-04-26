@@ -247,7 +247,7 @@ export default function GapAtendimentoDetail() {
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="text-[13px] font-semibold text-foreground leading-tight truncate">
-                      Resumo Da Sessão.pdf
+                      Resumo-{atendimento.id}.pdf
                     </p>
                     <p className="text-[11px] text-muted-foreground mt-0.5 inline-flex items-center gap-1.5">
                       <span>Relatório · PDF</span>
