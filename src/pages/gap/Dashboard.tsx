@@ -199,8 +199,8 @@ export default function GapDashboard() {
                   <p className="text-[10px] text-muted-foreground line-clamp-1">{a.motivo}</p>
                 </div>
                 <div className="flex flex-col items-end gap-1 shrink-0">
-                  <Badge variant="outline" className={`text-[10px] ${categoriaConfig[a.categoria].color}`}>
-                    {categoriaConfig[a.categoria].label}
+                  <Badge variant="outline" className={`text-[10px] ${ticketCategoriaConfig[a.categoria].color}`}>
+                    {ticketCategoriaConfig[a.categoria].label}
                   </Badge>
                   <span className="text-[10px] text-muted-foreground tabular-nums">{a.hora}</span>
                 </div>
