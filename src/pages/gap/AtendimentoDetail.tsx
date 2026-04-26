@@ -72,7 +72,7 @@ export default function GapAtendimentoDetail() {
   const ModalityIcon = atendimento.tipo === "online" ? Video : MapPin;
 
   const weekday = d.toLocaleDateString("pt-AO", { weekday: "long" });
-  const fullDate = d.toLocaleDateString("pt-AO", { day: "2-digit", month: "long", year: "numeric" });
+  const fullDate = d.toLocaleDateString("pt-PT", { day: "2-digit", month: "2-digit", year: "numeric" });
   const dayNum = d.getDate();
   const monthShort = d.toLocaleDateString("pt-AO", { month: "short" }).replace(".", "").toUpperCase();
 
