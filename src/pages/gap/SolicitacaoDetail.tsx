@@ -16,6 +16,13 @@ import {
   estadoSolicitacaoConfig, destinoConfig, tipoConfig, categoriaConfig,
 } from "@/data/gapData";
 
+const estadoDot: Record<string, string> = {
+  recebida: "bg-amber-500",
+  em_execucao: "bg-sky-500",
+  concluida: "bg-emerald-500",
+  rejeitada: "bg-destructive",
+};
+
 export default function GapSolicitacaoDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
