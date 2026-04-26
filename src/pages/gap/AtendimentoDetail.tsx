@@ -122,15 +122,34 @@ export default function GapAtendimentoDetail() {
             <h1 className="text-xl font-semibold leading-tight tracking-tight text-foreground">
               {atendimento.motivo}
             </h1>
-            <div className="mt-2.5">
+            <div className="mt-2.5 flex items-center gap-1.5 flex-wrap">
               <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider", est.pill)}>
                 <span className={cn("w-1.5 h-1.5 rounded-full mr-1.5 inline-block", est.dot)} />
                 {est.label}
+              </Badge>
+              <Badge variant="outline" className="text-[10px] font-medium px-2 py-0.5 uppercase tracking-wider bg-muted/40">
+                {cat.label}
               </Badge>
             </div>
           </div>
         </div>
 
+        {/* Action bar — below title */}
+        {atendimento.estado === "agendado" && (
+          <div className="flex items-center justify-end gap-2 px-6 pb-5">
+            <Button variant="outline" size="sm" className="h-8 px-3 text-[12px] gap-1.5" onClick={() => handleAction("Sessão remarcada")}>
+              <CalendarIcon className="w-3.5 h-3.5" /> Remarcar
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 px-3 text-[12px] gap-1.5 border-destructive/25 text-destructive hover:bg-destructive/10 hover:text-destructive"
+              onClick={() => handleAction("Sessão cancelada")}
+            >
+              <X className="w-3.5 h-3.5" /> Cancelar
+            </Button>
+          </div>
+        )}
 
 
         {/* Body — Estudante left | Sessão right (one continuous card, just a divider) */}
