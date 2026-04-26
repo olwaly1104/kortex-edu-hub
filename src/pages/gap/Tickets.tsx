@@ -87,6 +87,7 @@ export default function GapTickets() {
 
   const filtered = useMemo(() => {
     return solicitacoes.filter(s => {
+      if (estado === "hoje" && !isHoje(s)) return false;
       if (estado === "pendentes" && !isPendente(s)) return false;
       if (estado === "em_execucao" && !isEmExecucao(s)) return false;
       if (estado === "executadas" && !isExecutada(s)) return false;
