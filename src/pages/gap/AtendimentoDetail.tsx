@@ -93,13 +93,11 @@ export default function GapAtendimentoDetail() {
 
       {/* ONE UNIFIED CARD */}
       <article className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
-        {/* Top bar — sessão id + categoria */}
-        <div className="flex items-center justify-between gap-3 px-6 py-3 border-b border-border bg-muted/20">
-          <div className="flex items-center gap-2 min-w-0">
-            <span className="text-[11px] font-medium text-muted-foreground shrink-0">Agendamento</span>
-            <span className="text-muted-foreground/40">·</span>
-            <span className="text-[11px] font-mono font-semibold text-foreground shrink-0">{atendimento.id}</span>
-          </div>
+        {/* Top bar — ano lectivo */}
+        <div className="flex items-center justify-start gap-3 px-6 py-3 border-b border-border bg-muted/20">
+          <span className="text-[10px] uppercase tracking-[0.12em] font-semibold text-primary">
+            Ano Lectivo 2024/2025
+          </span>
         </div>
 
         {/* Title block with moderate date tile */}
@@ -116,15 +114,18 @@ export default function GapAtendimentoDetail() {
           </div>
 
           <div className="min-w-0 flex-1 pt-0.5">
-            <Link
-              to="/gap/agendamentos"
-              className="inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.12em] font-semibold text-primary hover:text-primary/80 transition-colors mb-1.5"
-            >
-              Ano Lectivo 2024/2025
-            </Link>
-            <h1 className="text-xl font-semibold leading-tight tracking-tight text-foreground">
-              {atendimento.motivo}
-            </h1>
+            <div className="flex items-start justify-between gap-4">
+              <h1 className="text-xl font-semibold leading-tight tracking-tight text-foreground">
+                {atendimento.motivo}
+              </h1>
+              <button
+                type="button"
+                onClick={() => { navigator.clipboard?.writeText(atendimento.id); toast({ title: "ID copiado", description: atendimento.id }); }}
+                className="shrink-0 inline-flex items-center px-2 py-0.5 rounded-md border border-border bg-background hover:bg-muted text-[11px] font-mono font-semibold text-foreground transition-colors"
+              >
+                {atendimento.id}
+              </button>
+            </div>
             <div className="mt-2.5 flex items-center gap-1.5 flex-wrap">
               <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider", est.pill)}>
                 <span className={cn("w-1.5 h-1.5 rounded-full mr-1.5 inline-block", est.dot)} />
