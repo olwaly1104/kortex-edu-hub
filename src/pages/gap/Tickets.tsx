@@ -23,6 +23,31 @@ const MESES = [
   "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro",
 ];
 
+// Categorias de relatórios do Histórico do GAP — geridos via ReportsMenuButton
+const gapReportCategories = [
+  { id: "solicitacoes", label: "Pipeline de Solicitações", description: "Recebidas, encaminhadas, executadas e rejeitadas no mês.", icon: <BarChart3 className="w-4 h-4" />, type: "estudantes" as const, prefix: "Histórico do GAP — Pipeline de Solicitações" },
+  { id: "sla",          label: "Cumprimento de SLA",       description: "Prazos cumpridos, em risco e ultrapassados por departamento.", icon: <TrendingUp className="w-4 h-4" />, type: "estudantes" as const, prefix: "Histórico do GAP — Cumprimento de SLA" },
+  { id: "geral",        label: "Relatório Geral do GAP",   description: "Visão consolidada da actividade do gabinete no mês.", icon: <BookOpen className="w-4 h-4" />, type: "estudantes" as const, prefix: "Histórico do GAP — Relatório Geral" },
+];
+
+// Dataset sintético para alimentar o ReportsDialog (uma linha por estudante seguido)
+const gapReportData = solicitacoes.reduce<Array<{ id: string; name: string; code: string; turma: string; media: number | null; presenca: number; tarefasFeitas: number; tarefasTotal: number }>>((acc, s) => {
+  if (acc.find(r => r.id === s.matricula)) return acc;
+  const total = solicitacoes.filter(x => x.matricula === s.matricula).length;
+  const concl = solicitacoes.filter(x => x.matricula === s.matricula && x.estado === "concluida").length;
+  acc.push({
+    id: s.matricula,
+    name: s.estudante,
+    code: s.matricula,
+    turma: `${s.curso} · ${s.ano}º`,
+    media: null,
+    presenca: 0,
+    tarefasFeitas: concl,
+    tarefasTotal: total,
+  });
+  return acc;
+}, []);
+
 export default function GapTickets() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
