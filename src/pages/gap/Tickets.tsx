@@ -125,16 +125,15 @@ export default function GapTickets() {
       {/* KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {[
-          { label: "Total", value: counts.todos, icon: Inbox, tone: "text-foreground", iconBg: "bg-muted text-muted-foreground" },
-          { label: "Recebidas", value: counts.recebida, icon: AlertCircle, tone: "text-foreground", iconBg: "bg-orange-50 text-orange-600" },
-          { label: "Em Execução", value: counts.em_execucao, icon: Clock, tone: "text-foreground", iconBg: "bg-amber-50 text-amber-600" },
-          { label: "Concluídas", value: counts.concluida, icon: CheckCircle2, tone: "text-foreground", iconBg: "bg-emerald-50 text-emerald-600" },
+          { label: "Total", value: counts.todos, icon: Inbox, iconBg: "bg-muted text-muted-foreground" },
+          { label: "Recebidas", value: counts.recebida, icon: AlertCircle, iconBg: "bg-orange-50 text-orange-600" },
+          { label: "Concluídas", value: counts.concluida, icon: CheckCircle2, iconBg: "bg-emerald-50 text-emerald-600" },
         ].map(k => (
           <Card key={k.label} className="p-4 hover:shadow-sm transition-shadow">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">{k.label}</p>
-                <p className={cn("text-2xl font-bold mt-1", k.tone)}>{k.value}</p>
+                <p className="text-2xl font-bold mt-1 text-foreground tabular-nums">{k.value}</p>
               </div>
               <div className={cn("w-9 h-9 rounded-lg flex items-center justify-center", k.iconBg)}>
                 <k.icon className="w-4 h-4" />
@@ -142,6 +141,22 @@ export default function GapTickets() {
             </div>
           </Card>
         ))}
+
+        {/* Histórico do GAP — substitui "Em Execução" */}
+        <Card className="p-4 hover:shadow-sm transition-shadow border-primary/30 bg-gradient-to-br from-primary/5 to-transparent flex items-center justify-between">
+          <div className="min-w-0">
+            <p className="text-[11px] font-medium text-primary uppercase tracking-wider">Histórico do GAP</p>
+            <p className="text-[11px] text-muted-foreground mt-1 leading-snug">
+              Relatórios mensais de solicitações, encaminhamentos e SLA.
+            </p>
+            <div className="mt-2">
+              <ReportsMenuButton categories={gapReportCategories} data={gapReportData} />
+            </div>
+          </div>
+          <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-primary/10 text-primary shrink-0">
+            <FileBarChart2 className="w-4 h-4" />
+          </div>
+        </Card>
       </div>
 
       {/* Control box */}
