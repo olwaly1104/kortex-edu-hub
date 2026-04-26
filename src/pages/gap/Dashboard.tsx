@@ -61,6 +61,11 @@ export default function GapDashboard() {
     .filter((x): x is NonNullable<typeof x> => x !== null && x.diff < 0)
     .sort((a, b) => a.diff - b.diff);
 
+  const slaConcluidas = solicitacoes.filter(s => s.estado === "concluida").length;
+  const slaEmAtraso = solicitacoesEmAtraso.length;
+  const slaPct = totalSol > 0 ? Math.round((slaConcluidas / totalSol) * 100) : 0;
+  const totalDest = solicitacoesPorDestino.reduce((a, c) => a + c.count, 0);
+
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       {/* Header */}
@@ -73,6 +78,9 @@ export default function GapDashboard() {
             Gabinete de Apoio ao Estudante — monitorização do pipeline de solicitações encaminhadas e acompanhamento individual.
           </p>
         </div>
+        <Badge variant="outline" className="text-[11px] font-semibold bg-primary/5 text-primary border-primary/20 px-3 py-1.5">
+          Ano Letivo 2024/2025
+        </Badge>
       </div>
 
       {/* Single consolidated KPI row */}
@@ -105,18 +113,24 @@ export default function GapDashboard() {
             </Link>
           </div>
           <p className="text-[11px] text-muted-foreground mb-4">Departamento que executa o pedido após o encaminhamento automático</p>
-          <div className="space-y-3">
-            {solicitacoesPorDestino.map(c => (
-              <div key={c.destino}>
-                <div className="flex items-center justify-between mb-1.5">
-                  <Badge variant="outline" className={`text-[10px] ${destinoConfig[c.destino].color}`}>{c.label}</Badge>
-                  <span className="text-xs font-semibold text-foreground">{c.count}</span>
+          <div className="space-y-2.5">
+            {solicitacoesPorDestino.map(c => {
+              const pct = totalDest > 0 ? (c.count / totalDest) * 100 : 0;
+              return (
+                <div key={c.destino} className="flex items-center gap-3">
+                  <Badge variant="outline" className={`text-[10px] shrink-0 w-[110px] justify-center ${destinoConfig[c.destino].color}`}>{c.label}</Badge>
+                  <div className="flex-1 h-2 rounded-full bg-muted overflow-hidden">
+                    <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${(c.count / maxDest) * 100}%` }} />
+                  </div>
+                  <span className="text-xs font-semibold text-foreground tabular-nums w-8 text-right">{c.count}</span>
+                  <span className="text-[10px] text-muted-foreground tabular-nums w-9 text-right">{pct.toFixed(0)}%</span>
                 </div>
-                <div className="h-2 rounded-full bg-muted overflow-hidden">
-                  <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${(c.count / maxDest) * 100}%` }} />
-                </div>
-              </div>
-            ))}
+              );
+            })}
+          </div>
+          <div className="mt-4 pt-3 border-t border-border flex items-center justify-between text-xs">
+            <span className="text-muted-foreground">Total encaminhadas</span>
+            <span className="font-semibold text-foreground tabular-nums">{totalDest}</span>
           </div>
         </Card>
 
@@ -128,23 +142,34 @@ export default function GapDashboard() {
               Ver todos <ArrowRight className="w-3 h-3" />
             </Link>
           </div>
-          <div className="space-y-3">
+          <div className="space-y-2.5">
             {estadoStats.map(s => {
               const pct = totalSol > 0 ? (s.count / totalSol) * 100 : 0;
               return (
-                <div key={s.estado}>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <Badge variant="outline" className={`text-[10px] ${s.color}`}>{s.label}</Badge>
-                    <span className="text-xs font-semibold text-foreground">{s.count} · {pct.toFixed(0)}%</span>
+                <div key={s.estado} className="flex items-center gap-3">
+                  <Badge variant="outline" className={`text-[10px] shrink-0 w-[110px] justify-center ${s.color}`}>{s.label}</Badge>
+                  <div className="flex-1">
+                    <Progress value={pct} className="h-2" />
                   </div>
-                  <Progress value={pct} className="h-2" />
+                  <span className="text-xs font-semibold text-foreground tabular-nums w-8 text-right">{s.count}</span>
+                  <span className="text-[10px] text-muted-foreground tabular-nums w-9 text-right">{pct.toFixed(0)}%</span>
                 </div>
               );
             })}
           </div>
-          <div className="mt-4 pt-4 border-t border-border flex items-center justify-between text-xs">
-            <span className="text-muted-foreground">SLA cumprido (mês)</span>
-            <span className="font-semibold text-emerald-600">87%</span>
+          <div className="mt-4 pt-3 border-t border-border grid grid-cols-3 gap-2 text-center">
+            <div>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">SLA Cumprido</p>
+              <p className="text-sm font-bold text-emerald-600 tabular-nums mt-0.5">{slaPct}%</p>
+            </div>
+            <div className="border-x border-border">
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Concluídas</p>
+              <p className="text-sm font-bold text-foreground tabular-nums mt-0.5">{slaConcluidas}</p>
+            </div>
+            <div>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Em Atraso</p>
+              <p className="text-sm font-bold text-destructive tabular-nums mt-0.5">{slaEmAtraso}</p>
+            </div>
           </div>
         </Card>
       </div>
@@ -218,12 +243,14 @@ export default function GapDashboard() {
                   <tr className="border-b bg-muted/30">
                     <th className="text-left p-3 font-medium text-muted-foreground text-xs uppercase tracking-wider">Solicitação</th>
                     <th className="text-left p-3 font-medium text-muted-foreground text-xs uppercase tracking-wider">Estudante</th>
+                    <th className="text-left p-3 font-medium text-muted-foreground text-xs uppercase tracking-wider">Responsável</th>
                     <th className="text-center p-3 font-medium text-muted-foreground text-xs uppercase tracking-wider whitespace-nowrap">Atraso</th>
                   </tr>
                 </thead>
                 <tbody>
                   {solicitacoesEmAtraso.slice(0, 5).map(({ sol, diff }) => {
                     const tCfg = tipoConfig[sol.tipo];
+                    const dCfg = destinoConfig[sol.destino];
                     return (
                       <tr
                         key={sol.id}
@@ -231,12 +258,16 @@ export default function GapDashboard() {
                         className={cn("border-b last:border-0 hover:bg-muted/30 transition-colors cursor-pointer")}
                       >
                         <td className="p-3">
-                          <p className="font-medium text-foreground leading-tight text-xs">{tCfg?.label ?? sol.tipo}</p>
+                          <p className="font-medium text-foreground leading-tight text-xs line-clamp-1">{tCfg?.label ?? sol.tipo}</p>
                           <p className="text-[11px] text-muted-foreground tabular-nums mt-0.5">{sol.id}</p>
                         </td>
                         <td className="p-3">
                           <p className="text-xs text-foreground leading-tight line-clamp-1">{sol.estudante}</p>
                           <p className="text-[11px] text-muted-foreground tabular-nums mt-0.5">{sol.matricula}</p>
+                        </td>
+                        <td className="p-3">
+                          <p className="text-xs text-foreground leading-tight line-clamp-1">{sol.responsavelDestino ?? "—"}</p>
+                          <Badge variant="outline" className={`mt-0.5 text-[9px] px-1.5 py-0 ${dCfg?.color ?? ""}`}>{dCfg?.label ?? sol.destino}</Badge>
                         </td>
                         <td className="p-3 text-center whitespace-nowrap">
                           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-destructive/10 text-destructive text-xs font-semibold tabular-nums">
@@ -255,4 +286,3 @@ export default function GapDashboard() {
     </div>
   );
 }
-
