@@ -322,6 +322,7 @@ export default function GapSolicitacaoDetail() {
               })()}
             </div>
           </div>
+        </div>
 
 
         {/* 2-column body */}
