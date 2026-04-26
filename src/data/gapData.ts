@@ -72,10 +72,12 @@ export const tipoConfig: Record<string, { label: string; categoria: Categoria; d
   justificacao_faltas:         { label: "Pedido de justificação de faltas", categoria: "Académico", destino: "Faculdade", slaDias: 5 },
 };
 
-export const categoriaConfig: Record<Categoria, { label: string; color: string }> = {
-  Tecnológico: { label: "Tecnológico", color: "bg-blue-50 text-blue-700 border-blue-200" },
-  Académico:   { label: "Académico",   color: "bg-violet-50 text-violet-700 border-violet-200" },
-  Financeiro:  { label: "Financeiro",  color: "bg-emerald-50 text-emerald-700 border-emerald-200" },
+import { Laptop, GraduationCap as GradCap, Wallet as WalletIcon, type LucideIcon as LIcon } from "lucide-react";
+
+export const categoriaConfig: Record<Categoria, { label: string; color: string; icon: LIcon }> = {
+  Tecnológico: { label: "Tecnológico", color: "bg-blue-50 text-blue-700 border-blue-200",       icon: Laptop },
+  Académico:   { label: "Académico",   color: "bg-violet-50 text-violet-700 border-violet-200", icon: GradCap },
+  Financeiro:  { label: "Financeiro",  color: "bg-emerald-50 text-emerald-700 border-emerald-200", icon: WalletIcon },
 };
 
 export const destinoConfig: Record<Destino, { label: string; color: string }> = {
