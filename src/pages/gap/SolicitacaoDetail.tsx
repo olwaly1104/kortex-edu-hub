@@ -141,13 +141,8 @@ export default function GapSolicitacaoDetail() {
       </Link>
 
       <Card className="overflow-hidden p-0 gap-0">
-        {/* Top bar — ID + ano lectivo */}
-        <div className="flex items-center justify-between px-6 py-3 border-b border-border bg-muted/20">
-          <div className="flex items-center gap-2 min-w-0">
-            <span className="text-[11px] font-medium text-muted-foreground shrink-0">Pedido</span>
-            <span className="text-muted-foreground/40">·</span>
-            <span className="text-[11px] font-mono font-semibold text-foreground shrink-0">{selected.id}</span>
-          </div>
+        {/* Top bar — ano lectivo */}
+        <div className="flex items-center justify-end px-6 py-3 border-b border-border bg-muted/20">
           <span className="text-[10px] uppercase tracking-[0.12em] font-semibold text-primary">
             Ano Lectivo 2024/2025
           </span>
@@ -155,9 +150,16 @@ export default function GapSolicitacaoDetail() {
 
         {/* Title block */}
         <div className="px-6 pt-5 pb-5 border-b border-border">
-          <h1 className="text-xl font-semibold leading-tight tracking-tight text-foreground">
-            {tipoCfg?.label ?? selected.tipo}
-          </h1>
+          <div className="flex items-start justify-between gap-4">
+            <h1 className="text-xl font-semibold leading-tight tracking-tight text-foreground">
+              {tipoCfg?.label ?? selected.tipo}
+            </h1>
+            <div className="flex items-center gap-1.5 shrink-0 pt-1">
+              <span className="text-[11px] font-medium text-muted-foreground">Pedido</span>
+              <span className="text-muted-foreground/40">·</span>
+              <span className="text-[11px] font-mono font-semibold text-foreground">{selected.id}</span>
+            </div>
+          </div>
           <div className="mt-2.5 flex items-center gap-1.5 flex-wrap">
             <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider gap-1", st.color)}>
               <span className={cn("w-1.5 h-1.5 rounded-full", estadoDot[selected.estado])} />
@@ -173,20 +175,6 @@ export default function GapSolicitacaoDetail() {
                 </Badge>
               );
             })()}
-          </div>
-
-          {/* Detalhes do Pedido — inline with title */}
-          <div className="mt-5 pt-5 border-t border-border">
-            <div className="flex items-center gap-2 mb-3">
-              <FileText className="w-3.5 h-3.5 text-muted-foreground" />
-              <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Detalhes do Pedido</h3>
-            </div>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-5 gap-y-4">
-              <FactItem label="Submetido" value={fmt(dSub)} />
-              <FactItem label="Hora" value={fmtT(dSub)} />
-              <FactItem label="Destino" value={dest.label} />
-              <FactItem label="Responsável" value={selected.responsavelDestino ? selected.responsavelDestino.split(" · ")[0] : "A atribuir"} />
-            </div>
           </div>
         </div>
 
