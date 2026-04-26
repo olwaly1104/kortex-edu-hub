@@ -92,7 +92,26 @@ export default function GapSolicitacaoDetail() {
     });
     steps.push({ label: "Solicitação aceite", data: aceite?.data, actor: aceite?.actor ?? selected.responsavelDestino, nota: aceite?.nota, tone: "accepted" });
   } else {
-    steps.push({ label: "Aguarda aceitação", actor: selected.responsavelDestino ?? dest.label, tone: "pending" });
+    // Acceptance SLA: 2 working days from forwarding (or submission as fallback)
+    const acceptSlaDias = 2;
+    const baseAccept = new Date(selected.dataEncaminhamento ?? selected.dataSubmissao);
+    baseAccept.setDate(baseAccept.getDate() + acceptSlaDias);
+    const hojeA = new Date(); hojeA.setHours(0, 0, 0, 0);
+    const diffA = Math.ceil((baseAccept.getTime() - hojeA.getTime()) / 86400000);
+    let asideAccept: string;
+    if (diffA < 0) {
+      asideAccept = `${Math.abs(diffA)} ${Math.abs(diffA) === 1 ? "dia" : "dias"} em atraso`;
+    } else if (diffA === 0) {
+      asideAccept = "Prazo termina hoje";
+    } else {
+      asideAccept = `Faltam ${diffA} ${diffA === 1 ? "dia" : "dias"}`;
+    }
+    steps.push({
+      label: `Aguarda aceitação · prevista ${fmt(baseAccept)}`,
+      actor: selected.responsavelDestino ?? dest.label,
+      aside: asideAccept,
+      tone: "scheduled",
+    });
   }
 
   // 4) Concluída / prevista
