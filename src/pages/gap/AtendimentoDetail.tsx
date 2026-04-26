@@ -116,9 +116,18 @@ export default function GapAtendimentoDetail() {
           </div>
 
           <div className="min-w-0 flex-1 pt-0.5">
-            <h1 className="text-xl font-semibold leading-tight tracking-tight text-foreground">
-              {atendimento.motivo}
-            </h1>
+            <div className="flex items-start justify-between gap-4">
+              <h1 className="text-xl font-semibold leading-tight tracking-tight text-foreground">
+                {atendimento.motivo}
+              </h1>
+              <button
+                type="button"
+                onClick={() => { navigator.clipboard?.writeText(atendimento.id); toast({ title: "ID copiado", description: atendimento.id }); }}
+                className="shrink-0 inline-flex items-center px-2 py-0.5 rounded-md border border-border bg-background hover:bg-muted text-[11px] font-mono font-semibold text-foreground transition-colors"
+              >
+                {atendimento.id}
+              </button>
+            </div>
             <div className="mt-2.5 flex items-center gap-1.5 flex-wrap">
               <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider", est.pill)}>
                 <span className={cn("w-1.5 h-1.5 rounded-full mr-1.5 inline-block", est.dot)} />
