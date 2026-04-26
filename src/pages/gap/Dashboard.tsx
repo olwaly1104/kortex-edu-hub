@@ -191,7 +191,7 @@ export default function GapDashboard() {
                   </tr>
                 </thead>
                 <tbody>
-                  {solicitacoesEmAtraso.slice(0, 5).map(({ sol, diff }) => {
+                  {solicitacoesEmAtraso.slice(0, 4).map(({ sol, diff }) => {
                     const tCfg = tipoConfig[sol.tipo];
                     const dCfg = destinoConfig[sol.destino];
                     return (
@@ -200,19 +200,19 @@ export default function GapDashboard() {
                         onClick={() => (window.location.href = `/gap/solicitacoes/${sol.id}`)}
                         className={cn("border-b last:border-0 hover:bg-muted/30 transition-colors cursor-pointer")}
                       >
-                        <td className="p-3">
+                        <td className="px-3 py-2">
                           <p className="font-medium text-foreground leading-tight text-xs line-clamp-1">{tCfg?.label ?? sol.tipo}</p>
                           <p className="text-[11px] text-muted-foreground tabular-nums mt-0.5">{sol.id}</p>
                         </td>
-                        <td className="p-3">
+                        <td className="px-3 py-2">
                           <p className="text-xs text-foreground leading-tight line-clamp-1">{sol.estudante}</p>
                           <p className="text-[11px] text-muted-foreground tabular-nums mt-0.5">{sol.matricula}</p>
                         </td>
-                        <td className="p-3">
+                        <td className="px-3 py-2">
                           <p className="text-xs text-foreground leading-tight line-clamp-1">{sol.responsavelDestino ?? "—"}</p>
                           <Badge variant="outline" className={`mt-0.5 text-[9px] px-1.5 py-0 ${dCfg?.color ?? ""}`}>{dCfg?.label ?? sol.destino}</Badge>
                         </td>
-                        <td className="p-3 text-center whitespace-nowrap">
+                        <td className="px-3 py-2 text-center whitespace-nowrap">
                           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-destructive/10 text-destructive text-xs font-semibold tabular-nums">
                             <Clock className="w-3 h-3" /> {Math.abs(diff)}d
                           </span>
