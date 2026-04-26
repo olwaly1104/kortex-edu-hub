@@ -201,9 +201,8 @@ export default function GapSolicitacaoDetail() {
           </div>
         </div>
 
-
         {/* 2-column body */}
-        <div className="grid md:grid-cols-[280px_1fr] divide-x divide-border">
+        <div className="grid md:grid-cols-[280px_1fr] divide-x divide-border border-t border-border">
           {/* LEFT — estudante + meta */}
           <aside className="p-5 space-y-5 bg-muted/15">
             <div>
