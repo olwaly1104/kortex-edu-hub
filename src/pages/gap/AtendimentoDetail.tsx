@@ -130,7 +130,8 @@ export default function GapAtendimentoDetail() {
                 <span className={cn("w-1.5 h-1.5 rounded-full mr-1.5 inline-block", est.dot)} />
                 {est.label}
               </Badge>
-              <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider", cat.color)}>
+              <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider gap-1", cat.color)}>
+                <cat.icon className="w-3 h-3" />
                 {cat.label}
               </Badge>
             </div>
