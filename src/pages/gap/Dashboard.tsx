@@ -62,8 +62,8 @@ export default function GapDashboard() {
     .sort((a, b) => a.diff - b.diff);
 
   const slaConcluidas = solicitacoes.filter(s => s.estado === "concluida").length;
-  const slaEmAtraso = solicitacoesEmAtraso.length;
   const slaPct = totalSol > 0 ? Math.round((slaConcluidas / totalSol) * 100) : 0;
+  void slaConcluidas;
   const totalDest = solicitacoesPorDestino.reduce((a, c) => a + c.count, 0);
 
   // Solicitações por categoria funcional (Tecnológico / Académico / Financeiro)
