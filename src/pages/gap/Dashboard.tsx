@@ -2,7 +2,7 @@ import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Clock, CheckCircle, AlertTriangle, Calendar as CalendarIcon, BarChart3,
   Inbox, Building2, ArrowRight, Users, ListChecks,
@@ -16,6 +16,7 @@ import {
 const TODAY_STR = "2025-12-16";
 
 export default function GapDashboard() {
+  const navigate = useNavigate();
   const totalSolicitacoes = solicitacoes.length;
   // Single consolidated KPI row — essentials only
   const kpis = [
@@ -191,7 +192,7 @@ export default function GapDashboard() {
                     return (
                       <tr
                         key={sol.id}
-                        onClick={() => (window.location.href = `/gap/solicitacoes/${sol.id}`)}
+                        onClick={() => navigate(`/gap/solicitacoes/${sol.id}`)}
                         className={cn("border-b last:border-0 hover:bg-muted/30 transition-colors cursor-pointer")}
                       >
                         <td className="px-3 py-2">
