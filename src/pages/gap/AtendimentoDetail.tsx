@@ -130,6 +130,23 @@ export default function GapAtendimentoDetail() {
           </div>
         </div>
 
+        {/* Action bar — below title */}
+        {atendimento.estado === "agendado" && (
+          <div className="flex items-center justify-end gap-2 px-6 pb-4">
+            <Button variant="outline" size="sm" className="h-8 px-3 text-[12px] gap-1.5" onClick={() => handleAction("Sessão remarcada")}>
+              <CalendarIcon className="w-3.5 h-3.5" /> Remarcar
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 px-3 text-[12px] gap-1.5 border-destructive/25 text-destructive hover:bg-destructive/10 hover:text-destructive"
+              onClick={() => handleAction("Sessão cancelada")}
+            >
+              <X className="w-3.5 h-3.5" /> Cancelar
+            </Button>
+          </div>
+        )}
+
         {/* Body — Estudante left | Sessão right (one continuous card, just a divider) */}
         <div className="grid md:grid-cols-[280px_1fr] divide-y md:divide-y-0 md:divide-x divide-border border-t border-border">
           {/* LEFT — estudante */}
@@ -234,22 +251,6 @@ export default function GapAtendimentoDetail() {
           </main>
         </div>
 
-        {/* Bottom action bar */}
-        {atendimento.estado === "agendado" && (
-          <footer className="flex items-center justify-end gap-2 px-6 py-3.5 border-t border-border bg-muted/20">
-            <Button variant="outline" size="sm" className="h-8 px-3 text-[12px] gap-1.5" onClick={() => handleAction("Sessão remarcada")}>
-              <CalendarIcon className="w-3.5 h-3.5" /> Remarcar
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-8 px-3 text-[12px] gap-1.5 border-destructive/25 text-destructive hover:bg-destructive/10 hover:text-destructive"
-              onClick={() => handleAction("Sessão cancelada")}
-            >
-              <X className="w-3.5 h-3.5" /> Cancelar
-            </Button>
-          </footer>
-        )}
       </article>
     </div>
   );
