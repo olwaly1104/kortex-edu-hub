@@ -7,7 +7,7 @@ import {
   ArrowLeft, Calendar as CalendarIcon, Clock, MapPin, Video,
   CheckCircle2, X, MessageSquare, Mail, Phone,
   DoorOpen, GraduationCap, BookOpen, Hash, FileText, StickyNote,
-  UserCircle2, Timer, ChevronRight, Download, Eye, Share2,
+  UserCircle2, Timer, ChevronRight, Download, Eye, Share2, Users,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -99,8 +99,6 @@ export default function GapAtendimentoDetail() {
             <span className="text-[11px] font-medium text-muted-foreground shrink-0">Sessão</span>
             <span className="text-muted-foreground/40">·</span>
             <span className="text-[11px] font-mono font-semibold text-foreground shrink-0">{atendimento.id}</span>
-            <span className="text-muted-foreground/40">·</span>
-            <span className="text-[11px] font-medium text-muted-foreground truncate">{cat.label}</span>
           </div>
         </div>
 
@@ -122,15 +120,34 @@ export default function GapAtendimentoDetail() {
             <h1 className="text-xl font-semibold leading-tight tracking-tight text-foreground">
               {atendimento.motivo}
             </h1>
-            <div className="mt-2.5">
+            <div className="mt-2.5 flex items-center gap-1.5 flex-wrap">
               <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider", est.pill)}>
                 <span className={cn("w-1.5 h-1.5 rounded-full mr-1.5 inline-block", est.dot)} />
                 {est.label}
+              </Badge>
+              <Badge variant="outline" className="text-[10px] font-medium px-2 py-0.5 uppercase tracking-wider bg-muted/40">
+                {cat.label}
               </Badge>
             </div>
           </div>
         </div>
 
+        {/* Action bar — below title */}
+        {atendimento.estado === "agendado" && (
+          <div className="flex items-center justify-end gap-2 px-6 pb-5">
+            <Button variant="outline" size="sm" className="h-8 px-3 text-[12px] gap-1.5" onClick={() => handleAction("Sessão remarcada")}>
+              <CalendarIcon className="w-3.5 h-3.5" /> Remarcar
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 px-3 text-[12px] gap-1.5 border-destructive/25 text-destructive hover:bg-destructive/10 hover:text-destructive"
+              onClick={() => handleAction("Sessão cancelada")}
+            >
+              <X className="w-3.5 h-3.5" /> Cancelar
+            </Button>
+          </div>
+        )}
 
 
         {/* Body — Estudante left | Sessão right (one continuous card, just a divider) */}
@@ -217,65 +234,74 @@ export default function GapAtendimentoDetail() {
               )}
 
               {/* Document attachment */}
-              <div className="mt-4 flex items-center gap-3 rounded-lg border border-border bg-muted/20 px-3.5 py-3">
-                <div className="w-9 h-9 rounded-md bg-red-50 border border-red-200 flex items-center justify-center shrink-0">
-                  <FileText className="w-4 h-4 text-red-600" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-[13px] font-semibold text-foreground leading-tight truncate">
-                    Resumo Da Sessão.pdf
-                  </p>
-                  <p className="text-[11px] text-muted-foreground mt-0.5">Relatório · PDF</p>
-                </div>
-                <div className="flex items-center gap-1.5 shrink-0">
-                  <Dialog>
+              <Dialog>
+                <div className="mt-4 flex items-center gap-3 rounded-lg border border-border bg-muted/20 px-3.5 py-3">
+                  <div className="w-9 h-9 rounded-md bg-red-50 border border-red-200 flex items-center justify-center shrink-0">
+                    <FileText className="w-4 h-4 text-red-600" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[13px] font-semibold text-foreground leading-tight truncate">
+                      Resumo Da Sessão.pdf
+                    </p>
+                    <p className="text-[11px] text-muted-foreground mt-0.5 inline-flex items-center gap-1.5">
+                      <span>Relatório · PDF</span>
+                      <span className="text-muted-foreground/40">·</span>
+                      <DialogTrigger asChild>
+                        <button type="button" className="inline-flex items-center gap-1 text-primary hover:underline font-medium">
+                          <Users className="w-3 h-3" /> 4 partilhas
+                        </button>
+                      </DialogTrigger>
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-1.5 shrink-0">
                     <DialogTrigger asChild>
                       <Button variant="outline" size="sm" className="h-7 px-2.5 text-[11px] gap-1">
                         <Eye className="w-3 h-3" /> Ver
                       </Button>
                     </DialogTrigger>
-                    <DialogContent className="max-w-md">
-                      <DialogHeader>
-                        <DialogTitle className="text-base flex items-center gap-2">
-                          <Share2 className="w-4 h-4 text-primary" /> Partilhado com
-                        </DialogTitle>
-                        <DialogDescription className="text-[12px]">
-                          Pessoas com acesso ao documento <span className="font-medium text-foreground">Resumo Da Sessão.pdf</span>.
-                        </DialogDescription>
-                      </DialogHeader>
-                      <div className="space-y-2 mt-2">
-                        {[
-                          { name: atendimento.estudante, role: "Estudante", access: "Visualizar" },
-                          { name: atendimento.responsavel, role: "Responsável GAP", access: "Editar" },
-                          { name: "Coordenação Académica", role: "Equipa", access: "Visualizar" },
-                        ].map((p, i) => {
-                          const ini = p.name.split(" ").slice(0, 2).map(n => n[0]).join("");
-                          return (
-                            <div key={i} className="flex items-center gap-3 px-3 py-2.5 rounded-md border border-border bg-muted/20">
-                              <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[11px] font-semibold ring-1 ring-primary/15 shrink-0">
-                                {ini}
-                              </div>
-                              <div className="min-w-0 flex-1">
-                                <p className="text-[13px] font-semibold text-foreground leading-tight truncate">{p.name}</p>
-                                <p className="text-[11px] text-muted-foreground mt-0.5">{p.role}</p>
-                              </div>
-                              <Badge variant="outline" className="text-[10px] font-medium px-2 py-0.5 shrink-0">{p.access}</Badge>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </DialogContent>
-                  </Dialog>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="h-7 px-2.5 text-[11px] gap-1"
-                    onClick={() => handleAction("Relatório exportado")}
-                  >
-                    <Download className="w-3 h-3" /> Exportar
-                  </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-7 px-2.5 text-[11px] gap-1"
+                      onClick={() => handleAction("Relatório exportado")}
+                    >
+                      <Download className="w-3 h-3" /> Exportar
+                    </Button>
+                  </div>
                 </div>
-              </div>
+                <DialogContent className="max-w-md">
+                  <DialogHeader>
+                    <DialogTitle className="text-base flex items-center gap-2">
+                      <Share2 className="w-4 h-4 text-primary" /> Partilhado com 4 pessoas
+                    </DialogTitle>
+                    <DialogDescription className="text-[12px]">
+                      Pessoas com acesso ao documento <span className="font-medium text-foreground">Resumo Da Sessão.pdf</span>.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-2 mt-2">
+                    {[
+                      { name: "Prof. Dr. António Mendes", role: "Reitor", access: "Visualizar" },
+                      { name: atendimento.responsavel, role: "Responsável GAP", access: "Editar" },
+                      { name: atendimento.estudante, role: "Estudante", access: "Visualizar" },
+                      { name: "Coordenação Académica", role: "Equipa", access: "Visualizar" },
+                    ].map((p, i) => {
+                      const ini = p.name.split(" ").slice(0, 2).map(n => n[0]).join("");
+                      return (
+                        <div key={i} className="flex items-center gap-3 px-3 py-2.5 rounded-md border border-border bg-muted/20">
+                          <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[11px] font-semibold ring-1 ring-primary/15 shrink-0">
+                            {ini}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-[13px] font-semibold text-foreground leading-tight truncate">{p.name}</p>
+                            <p className="text-[11px] text-muted-foreground mt-0.5">{p.role}</p>
+                          </div>
+                          <Badge variant="outline" className="text-[10px] font-medium px-2 py-0.5 shrink-0">{p.access}</Badge>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </DialogContent>
+              </Dialog>
             </section>
 
             {atendimento.notas && (
@@ -308,21 +334,6 @@ export default function GapAtendimentoDetail() {
                 <div className="flex items-center gap-2.5 text-[13px] text-destructive bg-destructive/10 rounded-lg px-4 py-3 border border-destructive/20">
                   <X className="w-4 h-4 shrink-0" />
                   <span>Este agendamento foi cancelado e não será realizado.</span>
-                </div>
-              )}
-              {atendimento.estado === "agendado" && (
-                <div className="flex items-center justify-end gap-2 mt-3">
-                  <Button variant="outline" size="sm" className="h-8 px-3 text-[12px] gap-1.5" onClick={() => handleAction("Sessão remarcada")}>
-                    <CalendarIcon className="w-3.5 h-3.5" /> Remarcar
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="h-8 px-3 text-[12px] gap-1.5 border-destructive/25 text-destructive hover:bg-destructive/10 hover:text-destructive"
-                    onClick={() => handleAction("Sessão cancelada")}
-                  >
-                    <X className="w-3.5 h-3.5" /> Cancelar
-                  </Button>
                 </div>
               )}
             </section>
