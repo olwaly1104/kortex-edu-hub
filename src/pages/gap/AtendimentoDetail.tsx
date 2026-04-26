@@ -7,7 +7,7 @@ import {
   ArrowLeft, Calendar as CalendarIcon, Clock, MapPin, Video,
   CheckCircle2, X, MessageSquare, Mail, Phone,
   DoorOpen, GraduationCap, BookOpen, Hash, FileText, StickyNote,
-  UserCircle2, Timer, ChevronRight, Download, Eye, Share2,
+  UserCircle2, Timer, ChevronRight, Download, Eye, Share2, Users,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
