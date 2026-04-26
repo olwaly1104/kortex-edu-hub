@@ -357,7 +357,7 @@ export default function GapAtendimentos() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border bg-muted/30 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                  <th className="text-left font-semibold px-4 py-2.5 w-[120px]">Data / Hora</th>
+                  <th className="text-left font-semibold px-4 py-2.5 w-[140px]">Data / Hora</th>
                   <th className="text-left font-semibold px-4 py-2.5 w-[200px]">Estudante</th>
                   <th className="text-left font-semibold px-4 py-2.5">Motivo</th>
                   <th className="text-left font-semibold px-4 py-2.5 w-[140px]">Categoria</th>
