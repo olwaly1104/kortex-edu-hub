@@ -125,7 +125,7 @@ export default function GapAtendimentoDetail() {
                 <span className={cn("w-1.5 h-1.5 rounded-full mr-1.5 inline-block", est.dot)} />
                 {est.label}
               </Badge>
-              <Badge variant="outline" className="text-[10px] font-medium px-2 py-0.5 uppercase tracking-wider bg-muted/40">
+              <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider", cat.color)}>
                 {cat.label}
               </Badge>
             </div>
@@ -134,23 +134,25 @@ export default function GapAtendimentoDetail() {
 
         {/* Action bar — below title */}
         {atendimento.estado === "agendado" && (
-          <div className="flex items-center justify-between gap-3 flex-wrap px-6 pb-5">
-            <div className="inline-flex items-center gap-2 rounded-md border border-border bg-muted/30 px-3 h-8 text-[12px] text-muted-foreground">
-              <Timer className="w-3.5 h-3.5 shrink-0" />
-              <span>Conclusão automática após <span className="font-semibold text-foreground tabular-nums">{endTime}</span></span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" className="h-8 px-3 text-[12px] gap-1.5" onClick={() => handleAction("Sessão remarcada")}>
-                <CalendarIcon className="w-3.5 h-3.5" /> Remarcar
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-8 px-3 text-[12px] gap-1.5 border-destructive/25 text-destructive hover:bg-destructive/10 hover:text-destructive"
-                onClick={() => handleAction("Sessão cancelada")}
-              >
-                <X className="w-3.5 h-3.5" /> Cancelar
-              </Button>
+          <div className="px-6 pb-5">
+            <div className="rounded-lg border border-border bg-muted/20 px-4 py-3 flex items-center justify-between gap-3 flex-wrap">
+              <div className="inline-flex items-center gap-2 text-[12px] text-muted-foreground">
+                <Timer className="w-3.5 h-3.5 shrink-0" />
+                <span>Conclusão automática após <span className="font-semibold text-foreground tabular-nums">{endTime}</span></span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm" className="h-8 px-3 text-[12px] gap-1.5 bg-background" onClick={() => handleAction("Sessão remarcada")}>
+                  <CalendarIcon className="w-3.5 h-3.5" /> Remarcar
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 px-3 text-[12px] gap-1.5 bg-background border-destructive/25 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                  onClick={() => handleAction("Sessão cancelada")}
+                >
+                  <X className="w-3.5 h-3.5" /> Cancelar
+                </Button>
+              </div>
             </div>
           </div>
         )}
