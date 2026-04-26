@@ -250,7 +250,7 @@ export default function GapAtendimentoDetail() {
                       Resumo-{atendimento.id}.pdf
                     </p>
                     <p className="text-[11px] text-muted-foreground mt-0.5 inline-flex items-center gap-1.5">
-                      <span>Relatório · PDF</span>
+                      <span>Gerado automaticamente · PDF</span>
                       <span className="text-muted-foreground/40">·</span>
                       <DialogTrigger asChild>
                         <button type="button" className="inline-flex items-center gap-1 text-primary hover:underline font-medium">
