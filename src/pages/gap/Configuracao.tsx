@@ -103,6 +103,30 @@ export default function GapConfiguracao() {
   const removeCategoria = (key: string) => setCategorias(prev => prev.filter(c => c.key !== key));
   const removeMotivo = (key: string) => setMotivos(prev => prev.filter(m => m.key !== key));
 
+  // Edit dialogs
+  const [editEstado, setEditEstado] = useState<EstadoItem | null>(null);
+  const [editCategoria, setEditCategoria] = useState<CategoriaItem | null>(null);
+  const [editMotivo, setEditMotivo] = useState<MotivoItem | null>(null);
+
+  const saveEditEstado = () => {
+    if (!editEstado || !editEstado.label.trim()) return;
+    setEstados(prev => prev.map(e => e.key === editEstado.key ? editEstado : e));
+    toast({ title: "Estado atualizado" });
+    setEditEstado(null);
+  };
+  const saveEditCategoria = () => {
+    if (!editCategoria || !editCategoria.label.trim()) return;
+    setCategorias(prev => prev.map(c => c.key === editCategoria.key ? editCategoria : c));
+    toast({ title: "Categoria atualizada" });
+    setEditCategoria(null);
+  };
+  const saveEditMotivo = () => {
+    if (!editMotivo || !editMotivo.label.trim()) return;
+    setMotivos(prev => prev.map(m => m.key === editMotivo.key ? editMotivo : m));
+    toast({ title: "Motivo atualizado" });
+    setEditMotivo(null);
+  };
+
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       {/* Header */}
