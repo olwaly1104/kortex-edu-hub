@@ -56,6 +56,13 @@ export default function GapDashboard() {
     .filter((x): x is NonNullable<typeof x> => x !== null && x.diff < 0)
     .sort((a, b) => a.diff - b.diff);
 
+  const kpis = [
+    { label: "Solicitações Hoje", value: solicitacoesHoje,           icon: Inbox,        iconBg: "bg-orange-50 text-orange-600",   sub: "submetidas hoje" },
+    { label: "Agendamentos Hoje", value: agendamentosHoje,           icon: CalendarIcon, iconBg: "bg-primary/10 text-primary",     sub: "sessões" },
+    { label: "Pendente Geral",    value: pendentesGeral,             icon: Clock,        iconBg: "bg-amber-50 text-amber-600",     sub: "por concluir" },
+    { label: "Em Atraso Geral",   value: solicitacoesEmAtraso.length,icon: AlertTriangle,iconBg: "bg-destructive/10 text-destructive", sub: "SLA ultrapassado" },
+  ];
+
   const slaConcluidas = solicitacoes.filter(s => s.estado === "concluida").length;
   const slaPct = totalSol > 0 ? Math.round((slaConcluidas / totalSol) * 100) : 0;
   void slaConcluidas;
