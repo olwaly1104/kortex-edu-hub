@@ -92,16 +92,16 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
           <div className="flex-1 px-12 pb-4 space-y-5 overflow-hidden">
             {/* I · Detalhes do Pedido */}
             <Section number="I" title="Detalhes do Pedido">
-              <div className="border border-foreground/25 rounded-sm overflow-hidden">
-                <div className="grid grid-cols-3 bg-foreground/[0.04] border-b border-foreground/25">
-                  <div className="px-3 py-1.5 border-r border-foreground/15">
-                    <p className="text-[7.5px] uppercase tracking-[0.22em] text-foreground/70 font-bold">Discente</p>
+              <div className="border border-primary/25 rounded-sm overflow-hidden">
+                <div className="grid grid-cols-3 bg-primary/[0.06] border-b border-primary/25">
+                  <div className="px-3 py-1.5 border-r border-primary/15">
+                    <p className="text-[7.5px] uppercase tracking-[0.22em] text-primary font-bold">Discente</p>
                   </div>
-                  <div className="px-3 py-1.5 border-r border-foreground/15">
-                    <p className="text-[7.5px] uppercase tracking-[0.22em] text-foreground/70 font-bold">Pedido</p>
+                  <div className="px-3 py-1.5 border-r border-primary/15">
+                    <p className="text-[7.5px] uppercase tracking-[0.22em] text-primary font-bold">Pedido</p>
                   </div>
                   <div className="px-3 py-1.5">
-                    <p className="text-[7.5px] uppercase tracking-[0.22em] text-foreground/70 font-bold">Encaminhamento</p>
+                    <p className="text-[7.5px] uppercase tracking-[0.22em] text-primary font-bold">Encaminhamento</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-3">
@@ -129,42 +129,45 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
 
             {/* II · Motivo + Descrição */}
             <Section number="II" title="Motivo do Pedido">
-              <div className="border border-foreground/25 rounded-sm overflow-hidden">
-                <div className="px-4 py-2.5 bg-foreground/[0.04] border-b border-foreground/25">
-                  <p className="text-[7.5px] uppercase tracking-[0.22em] text-foreground/70 font-bold mb-0.5">Assunto</p>
-                  <h4 className="text-[12.5px] font-bold leading-snug tracking-tight text-foreground">
-                    {s.assunto}
-                  </h4>
-                </div>
-                <div className="px-4 py-2.5 bg-background">
-                  <p className="text-[7.5px] uppercase tracking-[0.22em] text-foreground/55 font-semibold mb-1">Descrição</p>
-                  <p className="text-[10px] leading-relaxed whitespace-pre-line line-clamp-6 text-foreground/85">
-                    {s.descricao}
-                  </p>
-                  {s.notaInterna && (
-                    <div className="mt-2.5 pt-2 border-t border-dashed border-foreground/20">
-                      <p className="text-[7.5px] uppercase tracking-[0.22em] text-foreground/55 font-semibold mb-0.5">
-                        Nota Interna
-                      </p>
-                      <p className="text-[10px] leading-snug whitespace-pre-line line-clamp-2 text-foreground/85 italic">
-                        {s.notaInterna}
-                      </p>
-                    </div>
-                  )}
+              <div className="border border-primary/25 rounded-sm overflow-hidden flex">
+                <div className="w-1 bg-primary shrink-0" />
+                <div className="flex-1">
+                  <div className="px-4 py-2.5 bg-primary/[0.08] border-b border-primary/25">
+                    <p className="text-[7.5px] uppercase tracking-[0.22em] text-primary font-bold mb-1">Assunto</p>
+                    <h4 className="text-[13px] font-bold leading-snug tracking-tight text-primary">
+                      {s.assunto}
+                    </h4>
+                  </div>
+                  <div className="px-4 py-2.5 bg-background">
+                    <p className="text-[7.5px] uppercase tracking-[0.22em] text-primary/80 font-bold mb-1">Descrição</p>
+                    <p className="text-[10px] leading-relaxed whitespace-pre-line line-clamp-6 text-foreground/85">
+                      {s.descricao}
+                    </p>
+                    {s.notaInterna && (
+                      <div className="mt-2.5 pt-2 border-t border-dashed border-primary/25">
+                        <p className="text-[7.5px] uppercase tracking-[0.22em] text-primary/80 font-bold mb-0.5">
+                          Nota Interna
+                        </p>
+                        <p className="text-[10px] leading-snug whitespace-pre-line line-clamp-2 text-foreground/85 italic">
+                          {s.notaInterna}
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </Section>
 
             {/* III · Cronologia */}
             <Section number="III" title="Cronologia">
-              <div className="border border-foreground/25 rounded-sm overflow-hidden">
+              <div className="border border-primary/25 rounded-sm overflow-hidden">
                 <table className="w-full text-[9.5px]">
-                  <thead className="bg-foreground/[0.04]">
-                    <tr className="border-b border-foreground/25">
-                      <th className="text-left px-3 py-1.5 font-bold w-[6%] text-foreground/70 uppercase tracking-[0.16em] text-[7.5px]">#</th>
-                      <th className="text-left px-3 py-1.5 font-bold w-[26%] text-foreground/70 uppercase tracking-[0.16em] text-[7.5px]">Data &amp; Hora</th>
-                      <th className="text-left px-3 py-1.5 font-bold w-[36%] text-foreground/70 uppercase tracking-[0.16em] text-[7.5px]">Acção</th>
-                      <th className="text-left px-3 py-1.5 font-bold text-foreground/70 uppercase tracking-[0.16em] text-[7.5px]">Responsável</th>
+                  <thead className="bg-primary/[0.06]">
+                    <tr className="border-b border-primary/25">
+                      <th className="text-left px-3 py-1.5 font-bold w-[6%] text-primary uppercase tracking-[0.16em] text-[7.5px]">#</th>
+                      <th className="text-left px-3 py-1.5 font-bold w-[26%] text-primary uppercase tracking-[0.16em] text-[7.5px]">Data &amp; Hora</th>
+                      <th className="text-left px-3 py-1.5 font-bold w-[36%] text-primary uppercase tracking-[0.16em] text-[7.5px]">Acção</th>
+                      <th className="text-left px-3 py-1.5 font-bold text-primary uppercase tracking-[0.16em] text-[7.5px]">Responsável</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-foreground/10">
@@ -184,13 +187,13 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
             {/* IV · Anexos */}
             {anexos.length > 0 && (
               <Section number="IV" title="Anexos">
-                <div className="border border-foreground/25 rounded-sm overflow-hidden">
+                <div className="border border-primary/25 rounded-sm overflow-hidden">
                   <table className="w-full text-[9.5px]">
-                    <thead className="bg-foreground/[0.04]">
-                      <tr className="border-b border-foreground/25">
-                        <th className="text-left px-3 py-1.5 font-bold w-[6%] text-foreground/70 uppercase tracking-[0.16em] text-[7.5px]">#</th>
-                        <th className="text-left px-3 py-1.5 font-bold text-foreground/70 uppercase tracking-[0.16em] text-[7.5px]">Ficheiro</th>
-                        <th className="text-right px-3 py-1.5 font-bold w-[18%] text-foreground/70 uppercase tracking-[0.16em] text-[7.5px]">Tamanho</th>
+                    <thead className="bg-primary/[0.06]">
+                      <tr className="border-b border-primary/25">
+                        <th className="text-left px-3 py-1.5 font-bold w-[6%] text-primary uppercase tracking-[0.16em] text-[7.5px]">#</th>
+                        <th className="text-left px-3 py-1.5 font-bold text-primary uppercase tracking-[0.16em] text-[7.5px]">Ficheiro</th>
+                        <th className="text-right px-3 py-1.5 font-bold w-[18%] text-primary uppercase tracking-[0.16em] text-[7.5px]">Tamanho</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-foreground/10">
