@@ -23,14 +23,14 @@ import { useToast } from "@/hooks/use-toast";
 type EstadoItem = { key: string; label: string; color: string };
 type CategoriaItem = { key: string; label: string; color: string };
 type MotivoItem = { key: string; label: string; categoria: string; destino: string; responsavel: string; slaAceitacao: number; slaConclusao: number; multa: string };
-type MultaItem = { key: string; label: string; valor: number; descricao: string };
+type MultaItem = { key: string; label: string; diasAposPrazo: number; descricao: string };
 
 const INITIAL_MULTAS: MultaItem[] = [
-  { key: "atraso_relatorio", label: "Atraso na entrega de relatório", valor: 15000, descricao: "Aplicada quando o relatório obrigatório é entregue após o prazo." },
-  { key: "falta_injustificada", label: "Falta injustificada a sessão", valor: 10000, descricao: "Ausência sem justificação em sessão obrigatória." },
-  { key: "atraso_aula", label: "Atraso superior a 15min na aula", valor: 5000, descricao: "Atrasos repetidos no início das aulas." },
-  { key: "incumprimento_sla", label: "Incumprimento de SLA de solicitação", valor: 8000, descricao: "Solicitação não tratada dentro do prazo definido." },
-  { key: "uso_indevido", label: "Uso indevido de recursos institucionais", valor: 25000, descricao: "Utilização de equipamento ou espaço fora do âmbito autorizado." },
+  { key: "atraso_relatorio", label: "Atraso na entrega de relatório", diasAposPrazo: 5, descricao: "Aplicada quando o relatório obrigatório é entregue após o prazo." },
+  { key: "falta_injustificada", label: "Falta injustificada a sessão", diasAposPrazo: 3, descricao: "Ausência sem justificação em sessão obrigatória." },
+  { key: "atraso_aula", label: "Atraso superior a 15min na aula", diasAposPrazo: 2, descricao: "Atrasos repetidos no início das aulas." },
+  { key: "incumprimento_sla", label: "Incumprimento de SLA de solicitação", diasAposPrazo: 4, descricao: "Solicitação não tratada dentro do prazo definido." },
+  { key: "uso_indevido", label: "Uso indevido de recursos institucionais", diasAposPrazo: 7, descricao: "Utilização de equipamento ou espaço fora do âmbito autorizado." },
 ];
 
 const STAFF_OPTIONS = [
@@ -97,7 +97,7 @@ export default function GapConfiguracao() {
   const [newMotMulta, setNewMotMulta] = useState<string>("__none__");
   // New multa form
   const [newMultaLabel, setNewMultaLabel] = useState("");
-  const [newMultaValor, setNewMultaValor] = useState<number>(5000);
+  const [newMultaDias, setNewMultaDias] = useState<number>(3);
   const [newMultaDesc, setNewMultaDesc] = useState("");
 
   const slugify = (s: string) =>
@@ -154,8 +154,8 @@ export default function GapConfiguracao() {
   const handleAddMulta = () => {
     if (!newMultaLabel.trim()) return;
     const key = slugify(newMultaLabel);
-    setMultas(prev => [...prev, { key, label: newMultaLabel.trim(), valor: newMultaValor, descricao: newMultaDesc.trim() }]);
-    setNewMultaLabel(""); setNewMultaValor(5000); setNewMultaDesc("");
+    setMultas(prev => [...prev, { key, label: newMultaLabel.trim(), diasAposPrazo: Math.max(1, newMultaDias), descricao: newMultaDesc.trim() }]);
+    setNewMultaLabel(""); setNewMultaDias(3); setNewMultaDesc("");
     setMultaOpen(false);
     toast({ title: "Multa criada", description: `“${newMultaLabel}” foi adicionada.` });
   };
@@ -193,6 +193,8 @@ export default function GapConfiguracao() {
 
   const formatKz = (n: number) =>
     new Intl.NumberFormat("pt-AO", { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(n) + " Kz";
+
+  const formatMultaDias = (d: number) => `${d}d após prazo`;
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
@@ -357,7 +359,14 @@ export default function GapConfiguracao() {
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="__none__">Sem multa</SelectItem>
-                      {multas.map(mu => <SelectItem key={mu.key} value={mu.key}>{mu.label} · {formatKz(mu.valor)}</SelectItem>)}
+                      {multas.map(mu => {
+                        const invalid = mu.diasAposPrazo <= newMotSlaConcl;
+                        return (
+                          <SelectItem key={mu.key} value={mu.key} disabled={invalid}>
+                            {mu.label} · {formatMultaDias(mu.diasAposPrazo)}{invalid ? " (≤ conclusão)" : ""}
+                          </SelectItem>
+                        );
+                      })}
                     </SelectContent>
                   </Select>
                   <p className="text-[10px] text-muted-foreground mt-1">Aplicada se o limite de conclusão for excedido</p>
@@ -419,7 +428,7 @@ export default function GapConfiguracao() {
                         return mu ? (
                           <span className="inline-flex items-center gap-1.5">
                             <span className="text-foreground">{mu.label}</span>
-                            <span className="text-destructive font-semibold tabular-nums">· {formatKz(mu.valor)}</span>
+                            <span className="text-destructive font-semibold tabular-nums">· {formatMultaDias(mu.diasAposPrazo)}</span>
                           </span>
                         ) : <span className="text-muted-foreground">—</span>;
                       })()}
@@ -464,8 +473,9 @@ export default function GapConfiguracao() {
                   <Input value={newMultaLabel} onChange={e => setNewMultaLabel(e.target.value)} placeholder="Ex: Atraso na entrega de relatório" />
                 </div>
                 <div>
-                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Valor (Kz)</label>
-                  <Input type="number" min={0} step={500} value={newMultaValor} onChange={e => setNewMultaValor(Number(e.target.value) || 0)} />
+                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Aplicar após (dias do prazo de conclusão)</label>
+                  <Input type="number" min={1} step={1} value={newMultaDias} onChange={e => setNewMultaDias(Math.max(1, Number(e.target.value) || 1))} />
+                  <p className="text-[10px] text-muted-foreground mt-1">Deve ser superior ao limite de conclusão do motivo associado</p>
                 </div>
                 <div>
                   <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Descrição</label>
@@ -485,7 +495,7 @@ export default function GapConfiguracao() {
               <tr className="border-b bg-muted/30">
                 <th className="text-left p-3 font-medium text-muted-foreground text-xs">Motivo</th>
                 <th className="text-left p-3 font-medium text-muted-foreground text-xs">Descrição</th>
-                <th className="text-right p-3 font-medium text-muted-foreground text-xs whitespace-nowrap">Valor</th>
+                <th className="text-right p-3 font-medium text-muted-foreground text-xs whitespace-nowrap">Aplicar após</th>
                 <th className="w-20" />
               </tr>
             </thead>
@@ -494,7 +504,7 @@ export default function GapConfiguracao() {
                 <tr key={m.key} className="border-b last:border-0 hover:bg-muted/20">
                   <td className="p-3 text-xs font-medium text-foreground">{m.label}</td>
                   <td className="p-3 text-xs text-muted-foreground max-w-md">{m.descricao || "—"}</td>
-                  <td className="p-3 text-right text-xs font-semibold text-destructive tabular-nums whitespace-nowrap">{formatKz(m.valor)}</td>
+                  <td className="p-3 text-right text-xs font-semibold text-destructive tabular-nums whitespace-nowrap">{formatMultaDias(m.diasAposPrazo)}</td>
                   <td className="p-3 text-right">
                     <div className="inline-flex items-center gap-2">
                       <button onClick={() => setEditMulta(m)} className="text-muted-foreground hover:text-foreground" aria-label={`Editar ${m.label}`}>
@@ -523,8 +533,9 @@ export default function GapConfiguracao() {
                 <Input value={editMulta.label} onChange={e => setEditMulta({ ...editMulta, label: e.target.value })} />
               </div>
               <div>
-                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Valor (Kz)</label>
-                <Input type="number" min={0} step={500} value={editMulta.valor} onChange={e => setEditMulta({ ...editMulta, valor: Number(e.target.value) || 0 })} />
+                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Aplicar após (dias do prazo de conclusão)</label>
+                <Input type="number" min={1} step={1} value={editMulta.diasAposPrazo} onChange={e => setEditMulta({ ...editMulta, diasAposPrazo: Math.max(1, Number(e.target.value) || 1) })} />
+                <p className="text-[10px] text-muted-foreground mt-1">Deve ser superior ao limite de conclusão do motivo associado</p>
               </div>
               <div>
                 <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Descrição</label>
@@ -636,7 +647,14 @@ export default function GapConfiguracao() {
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="__none__">Sem multa</SelectItem>
-                    {multas.map(mu => <SelectItem key={mu.key} value={mu.key}>{mu.label} · {formatKz(mu.valor)}</SelectItem>)}
+                    {multas.map(mu => {
+                      const invalid = mu.diasAposPrazo <= editMotivo.slaConclusao;
+                      return (
+                        <SelectItem key={mu.key} value={mu.key} disabled={invalid}>
+                          {mu.label} · {formatMultaDias(mu.diasAposPrazo)}{invalid ? " (≤ conclusão)" : ""}
+                        </SelectItem>
+                      );
+                    })}
                   </SelectContent>
                 </Select>
                 <p className="text-[10px] text-muted-foreground mt-1">Aplicada se o limite de conclusão for excedido</p>
