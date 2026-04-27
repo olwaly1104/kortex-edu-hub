@@ -526,8 +526,9 @@ export default function GapConfiguracao() {
                 <Input value={editMulta.label} onChange={e => setEditMulta({ ...editMulta, label: e.target.value })} />
               </div>
               <div>
-                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Valor (Kz)</label>
-                <Input type="number" min={0} step={500} value={editMulta.valor} onChange={e => setEditMulta({ ...editMulta, valor: Number(e.target.value) || 0 })} />
+                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Aplicar após (dias do prazo de conclusão)</label>
+                <Input type="number" min={1} step={1} value={editMulta.diasAposPrazo} onChange={e => setEditMulta({ ...editMulta, diasAposPrazo: Math.max(1, Number(e.target.value) || 1) })} />
+                <p className="text-[10px] text-muted-foreground mt-1">Deve ser superior ao limite de conclusão do motivo associado</p>
               </div>
               <div>
                 <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Descrição</label>
