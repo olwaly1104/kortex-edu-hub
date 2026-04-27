@@ -252,9 +252,7 @@ export default function GapSolicitacaoDetail() {
                       {/* Name + auto label */}
                       <div className="flex flex-col min-w-0 leading-tight">
                         <span className="text-[11.5px] font-semibold text-foreground tabular-nums">Pedido-{selected.id}</span>
-                        <span className="inline-flex items-center gap-1 text-[9.5px] text-emerald-600 font-medium">
-                          <CheckCircle2 className="w-2.5 h-2.5" /> Gerado automaticamente
-                        </span>
+                        <span className="text-[9.5px] text-muted-foreground font-medium">Gerado automaticamente</span>
                       </div>
                       {/* Divider */}
                       <span className="self-stretch w-px bg-border mx-0.5" />
