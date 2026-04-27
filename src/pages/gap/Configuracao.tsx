@@ -497,7 +497,7 @@ export default function GapConfiguracao() {
                 <tr key={m.key} className="border-b last:border-0 hover:bg-muted/20">
                   <td className="p-3 text-xs font-medium text-foreground">{m.label}</td>
                   <td className="p-3 text-xs text-muted-foreground max-w-md">{m.descricao || "—"}</td>
-                  <td className="p-3 text-right text-xs font-semibold text-destructive tabular-nums whitespace-nowrap">{formatKz(m.valor)}</td>
+                  <td className="p-3 text-right text-xs font-semibold text-destructive tabular-nums whitespace-nowrap">{formatMultaDias(m.diasAposPrazo)}</td>
                   <td className="p-3 text-right">
                     <div className="inline-flex items-center gap-2">
                       <button onClick={() => setEditMulta(m)} className="text-muted-foreground hover:text-foreground" aria-label={`Editar ${m.label}`}>
