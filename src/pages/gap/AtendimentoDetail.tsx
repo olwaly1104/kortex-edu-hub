@@ -334,8 +334,9 @@ export default function GapAtendimentoDetail() {
                     const isFamily = p.tipo === "encarregado";
                     const TypeIcon = isFamily ? Home : Briefcase;
                     const initials = p.nome.split(" ").filter(w => w.length > 2).slice(0, 2).map(n => n[0]).join("");
-                    return (
-                      <div key={idx} className="flex items-center gap-3 px-3.5 py-2.5">
+
+                    const content = (
+                      <>
                         <div className={cn(
                           "w-9 h-9 rounded-full flex items-center justify-center shrink-0 font-semibold text-[11px] ring-1",
                           isFamily
@@ -346,7 +347,10 @@ export default function GapAtendimentoDetail() {
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <p className="text-[13px] font-semibold text-foreground leading-tight truncate">{p.nome}</p>
+                            <p className={cn(
+                              "text-[13px] font-semibold leading-tight truncate",
+                              isFamily ? "text-foreground" : "text-foreground group-hover:text-primary transition-colors",
+                            )}>{p.nome}</p>
                             <Badge
                               variant="outline"
                               className={cn(
@@ -370,7 +374,7 @@ export default function GapAtendimentoDetail() {
                             )}
                           </div>
                         </div>
-                        <div className="shrink-0 flex items-center gap-1">
+                        <div className="shrink-0 flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
                           <span className={cn(
                             "inline-flex items-center gap-1 text-[10px] font-medium",
                             p.confirmado ? "text-emerald-700" : "text-amber-700",
@@ -383,7 +387,7 @@ export default function GapAtendimentoDetail() {
                           </span>
                           <button
                             type="button"
-                            onClick={() => handleAction(`Email para ${p.nome}`)}
+                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleAction(`Email para ${p.nome}`); }}
                             className="w-6 h-6 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
                             title="Email"
                           >
@@ -391,14 +395,33 @@ export default function GapAtendimentoDetail() {
                           </button>
                           <button
                             type="button"
-                            onClick={() => handleAction(`Chamada para ${p.nome}`)}
+                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleAction(`Chamada para ${p.nome}`); }}
                             className="w-6 h-6 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
                             title="Ligar"
                           >
                             <Phone className="w-3 h-3" />
                           </button>
                         </div>
-                      </div>
+                      </>
+                    );
+
+                    if (isFamily) {
+                      return (
+                        <div key={idx} className="flex items-center gap-3 px-3.5 py-2.5">
+                          {content}
+                        </div>
+                      );
+                    }
+
+                    return (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => handleAction(`Perfil de ${p.nome}`)}
+                        className="group flex items-center gap-3 px-3.5 py-2.5 w-full text-left hover:bg-muted/40 transition-colors"
+                      >
+                        {content}
+                      </button>
                     );
                   })}
                 </div>
