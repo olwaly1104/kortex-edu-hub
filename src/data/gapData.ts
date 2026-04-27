@@ -9,7 +9,8 @@ export type EstadoSolicitacao =
   | "recebida"        // pendente — submetida pelo discente, aguarda início
   | "em_execucao"     // destino a tratar
   | "concluida"
-  | "rejeitada";
+  | "rejeitada"
+  | "em_atraso";      // SLA ultrapassado (estado virtual derivado)
 
 export type Prioridade = "alta" | "media" | "baixa";
 
