@@ -248,7 +248,7 @@ function GroupCell({ rows, bordered }: { rows: [string, string][]; bordered?: bo
     <dl className={`px-3 py-2 space-y-1 ${bordered ? "border-r border-foreground/15" : ""}`}>
       {rows.map(([k, v], i) => (
         <div key={i} className="flex items-baseline gap-2 text-[10px]">
-          <dt className="text-doc-accent/70 w-[78px] shrink-0 font-medium">{k}</dt>
+          <dt className="text-foreground/55 w-[78px] shrink-0 font-medium">{k}</dt>
           <dd className="font-semibold truncate flex-1 text-foreground">{v}</dd>
         </div>
       ))}
