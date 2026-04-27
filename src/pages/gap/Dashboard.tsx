@@ -17,16 +17,10 @@ const TODAY_STR = "2025-12-16";
 
 export default function GapDashboard() {
   const navigate = useNavigate();
-  const totalSolicitacoes = solicitacoes.length;
-  // Single consolidated KPI row — essentials only
-  const kpis = [
-    { label: "Recebidas",        value: gapKpis.recebidas,       icon: Inbox,        iconBg: "bg-orange-50 text-orange-600",   sub: "novas" },
-    { label: "Em Atraso",      value: gapKpis.emExecucao,      icon: Clock,        iconBg: "bg-amber-50 text-amber-600",     sub: "no destino" },
-    { label: "Concluídas",       value: gapKpis.concluidas,      icon: CheckCircle,  iconBg: "bg-emerald-50 text-emerald-600", sub: "este mês" },
-    { label: "Agendamentos Hoje",value: gapKpis.atendimentosHoje,icon: CalendarIcon, iconBg: "bg-primary/10 text-primary",     sub: "sessões" },
-    { label: "Estudantes Activos",value: gapKpis.estudantesAtivos,icon: Users,       iconBg: "bg-pink-50 text-pink-600",       sub: "em seguimento" },
-  ];
-  void totalSolicitacoes;
+
+  const solicitacoesHoje = solicitacoes.filter(s => s.dataSubmissao === TODAY_STR).length;
+  const agendamentosHoje = gapAtendimentos.filter(a => a.data === TODAY_STR).length;
+  const pendentesGeral = solicitacoes.filter(s => s.estado === "recebida" || s.estado === "em_execucao").length;
 
   const maxDest = Math.max(...solicitacoesPorDestino.map(c => c.count), 1);
   const totalSol = solicitacoes.length;
