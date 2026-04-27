@@ -120,6 +120,7 @@ export default function GapAtendimentoDetail() {
               <div className="py-1">
                 <p className="text-[24px] leading-none font-bold text-foreground tabular-nums tracking-tight">{dayNum}</p>
                 <p className="text-[8.5px] uppercase tracking-wider text-muted-foreground font-semibold mt-0.5 capitalize">{weekday.slice(0, 3)}</p>
+                <p className="text-[9px] font-semibold text-foreground/80 tabular-nums mt-0.5 border-t border-border pt-0.5">{startTime}</p>
               </div>
             </div>
 
