@@ -312,6 +312,15 @@ export default function GapConfiguracao() {
                     <p className="text-[10px] text-muted-foreground mt-1">Em Execução → Concluída</p>
                   </div>
                 </div>
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Responsável</label>
+                  <Select value={newMotResp} onValueChange={setNewMotResp}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {STAFF_OPTIONS.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
               <DialogFooter className="gap-2 sm:gap-2">
                 <DialogClose asChild><Button variant="outline">Cancelar</Button></DialogClose>
