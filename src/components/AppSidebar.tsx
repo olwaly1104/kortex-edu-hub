@@ -192,6 +192,7 @@ const gapSections: NavSection[] = [
     { label: "Solicitações", icon: HelpCircle, path: "/gap/solicitacoes" },
     { label: "Agendamentos", icon: CalendarDays, path: "/gap/agendamentos" },
     { label: "Discentes", icon: Users, path: "/gap/estudantes" },
+    { label: "Configuração", icon: Settings2, path: "/gap/configuracao" },
   ]},
   { title: "Comunicação", items: [
     { label: "Chat", icon: MessageSquare, path: "/gap/chat" },
