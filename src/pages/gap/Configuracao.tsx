@@ -22,7 +22,7 @@ import { useToast } from "@/hooks/use-toast";
 
 type EstadoItem = { key: string; label: string; color: string };
 type CategoriaItem = { key: string; label: string; color: string };
-type MotivoItem = { key: string; label: string; categoria: string; destino: string; slaDias: number };
+type MotivoItem = { key: string; label: string; categoria: string; destino: string; slaAceitacao: number; slaConclusao: number };
 
 export default function GapConfiguracao() {
   const { toast } = useToast();
@@ -35,7 +35,9 @@ export default function GapConfiguracao() {
   );
   const [motivos, setMotivos] = useState<MotivoItem[]>(
     Object.entries(initialTipoConfig).map(([key, v]) => ({
-      key, label: v.label, categoria: v.categoria, destino: v.destino, slaDias: v.slaDias,
+      key, label: v.label, categoria: v.categoria, destino: v.destino,
+      slaAceitacao: Math.max(1, Math.ceil(v.slaDias / 3)),
+      slaConclusao: v.slaDias,
     }))
   );
 
@@ -52,7 +54,8 @@ export default function GapConfiguracao() {
   const [newMotLabel, setNewMotLabel] = useState("");
   const [newMotCat, setNewMotCat] = useState<string>("");
   const [newMotDest, setNewMotDest] = useState<string>("CTI");
-  const [newMotSla, setNewMotSla] = useState<number>(5);
+  const [newMotSlaAceit, setNewMotSlaAceit] = useState<number>(2);
+  const [newMotSlaConcl, setNewMotSlaConcl] = useState<number>(5);
 
   const slugify = (s: string) =>
     s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
@@ -87,9 +90,11 @@ export default function GapConfiguracao() {
     const key = slugify(newMotLabel);
     setMotivos(prev => [...prev, {
       key, label: newMotLabel.trim(),
-      categoria: newMotCat, destino: newMotDest, slaDias: newMotSla,
+      categoria: newMotCat, destino: newMotDest,
+      slaAceitacao: newMotSlaAceit, slaConclusao: newMotSlaConcl,
     }]);
-    setNewMotLabel(""); setNewMotCat(""); setNewMotDest("CTI"); setNewMotSla(5);
+    setNewMotLabel(""); setNewMotCat(""); setNewMotDest("CTI");
+    setNewMotSlaAceit(2); setNewMotSlaConcl(5);
     setMotivoOpen(false);
     toast({ title: "Motivo criado", description: `“${newMotLabel}” foi adicionado.` });
   };
@@ -237,9 +242,17 @@ export default function GapConfiguracao() {
                     </Select>
                   </div>
                 </div>
-                <div>
-                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">SLA (dias)</label>
-                  <Input type="number" min={1} value={newMotSla} onChange={e => setNewMotSla(Number(e.target.value) || 1)} />
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Limite p/ aceitar (dias)</label>
+                    <Input type="number" min={1} value={newMotSlaAceit} onChange={e => setNewMotSlaAceit(Number(e.target.value) || 1)} />
+                    <p className="text-[10px] text-muted-foreground mt-1">Pendente → Em Execução</p>
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Limite p/ concluir (dias)</label>
+                    <Input type="number" min={1} value={newMotSlaConcl} onChange={e => setNewMotSlaConcl(Number(e.target.value) || 1)} />
+                    <p className="text-[10px] text-muted-foreground mt-1">Em Execução → Concluída</p>
+                  </div>
                 </div>
               </div>
               <DialogFooter className="gap-2 sm:gap-2">
@@ -256,7 +269,8 @@ export default function GapConfiguracao() {
                 <th className="text-left p-3 font-medium text-muted-foreground text-xs">Motivo</th>
                 <th className="text-left p-3 font-medium text-muted-foreground text-xs">Categoria</th>
                 <th className="text-left p-3 font-medium text-muted-foreground text-xs">Destino</th>
-                <th className="text-center p-3 font-medium text-muted-foreground text-xs">SLA</th>
+                <th className="text-center p-3 font-medium text-muted-foreground text-xs whitespace-nowrap">Aceitar</th>
+                <th className="text-center p-3 font-medium text-muted-foreground text-xs whitespace-nowrap">Concluir</th>
                 <th className="w-10" />
               </tr>
             </thead>
@@ -277,7 +291,8 @@ export default function GapConfiguracao() {
                         <Badge variant="outline" className={cn("text-[10px]", destCfg.color)}>{destCfg.label}</Badge>
                       ) : <span className="text-xs text-muted-foreground">{m.destino}</span>}
                     </td>
-                    <td className="p-3 text-center text-xs tabular-nums">{m.slaDias}d</td>
+                    <td className="p-3 text-center text-xs tabular-nums text-amber-700">{m.slaAceitacao}d</td>
+                    <td className="p-3 text-center text-xs tabular-nums text-blue-700">{m.slaConclusao}d</td>
                     <td className="p-3 text-right">
                       <button onClick={() => removeMotivo(m.key)} className="text-muted-foreground hover:text-destructive" aria-label={`Remover ${m.label}`}>
                         <Trash2 className="w-3.5 h-3.5" />
