@@ -5,10 +5,10 @@ import { Badge } from "@/components/ui/badge";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Clock, CheckCircle, AlertTriangle, Calendar as CalendarIcon, BarChart3,
-  Inbox, Building2, ArrowRight, Users, ListChecks,
+  Inbox, Building2, ArrowRight, ListChecks,
 } from "lucide-react";
 import {
-  gapKpis, solicitacoes, gapAtendimentos, gapEstudantesSeguimento,
+  solicitacoes, gapAtendimentos, gapEstudantesSeguimento,
   solicitacoesPorDestino, destinoConfig, estadoSolicitacaoConfig,
   ticketCategoriaConfig, tipoConfig, categoriaConfig,
 } from "@/data/gapData";
