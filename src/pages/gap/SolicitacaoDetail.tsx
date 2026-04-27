@@ -15,6 +15,7 @@ import {
   solicitacoes, Categoria,
   estadoSolicitacaoConfig, destinoConfig, tipoConfig, categoriaConfig,
 } from "@/data/gapData";
+import SolicitacaoDocPreview from "./SolicitacaoDocPreview";
 
 const estadoDot: Record<string, string> = {
   recebida: "bg-amber-500",
