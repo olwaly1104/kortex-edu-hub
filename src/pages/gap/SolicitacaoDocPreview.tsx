@@ -69,9 +69,12 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
         </div>
       </div>
 
-      {/* A4 page */}
-      <div className="flex-1 overflow-y-auto py-6 px-4">
-        <div className="mx-auto max-w-[820px] bg-white shadow-sm border border-border print:shadow-none print:border-0">
+      {/* A4 page (210 × 297 mm) */}
+      <div className="flex-1 overflow-y-auto py-8 px-4 bg-muted/30">
+        <div
+          className="mx-auto bg-white shadow-md border border-border print:shadow-none print:border-0"
+          style={{ width: "210mm", minHeight: "297mm" }}
+        >
 
           {/* Header institucional */}
           <div className="px-10 pt-10 pb-6 border-b-2 border-primary">
