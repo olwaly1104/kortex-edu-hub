@@ -334,7 +334,7 @@ export default function GapAtendimentoDetail() {
 /* ────────────── Helpers ────────────── */
 
 function ParticipantRow({
-  onClick, avatarClasses, initials, name, sub, badge, status,
+  onClick, avatarClasses, initials, name, sub, badge, status, contactName, onAction,
 }: {
   onClick?: () => void;
   avatarClasses: string;
@@ -343,6 +343,8 @@ function ParticipantRow({
   sub: string;
   badge: { icon: React.ComponentType<{ className?: string }>; label: string; classes: string };
   status?: "confirmado" | "pendente";
+  contactName?: string;
+  onAction?: (action: string) => void;
 }) {
   const BadgeIcon = badge.icon;
   const inner = (
@@ -365,6 +367,13 @@ function ParticipantRow({
           {status === "confirmado" ? (<><CheckCircle className="w-3 h-3" /> Confirmado</>) : (<><CircleDashed className="w-3 h-3" /> Pendente</>)}
         </span>
       )}
+      {contactName && onAction && (
+        <div className="shrink-0 flex items-center gap-1 ml-2">
+          <ContactIconBtn icon={<MessageSquare className="w-3.5 h-3.5" />} title="Chat" onClick={() => onAction(`Chat com ${contactName}`)} />
+          <ContactIconBtn icon={<Mail className="w-3.5 h-3.5" />} title="Email" onClick={() => onAction(`Email para ${contactName}`)} />
+          <ContactIconBtn icon={<Phone className="w-3.5 h-3.5" />} title="Ligar" onClick={() => onAction(`Chamada para ${contactName}`)} />
+        </div>
+      )}
     </>
   );
   if (!onClick) {
@@ -373,6 +382,19 @@ function ParticipantRow({
   return (
     <button type="button" onClick={onClick} className="group flex items-center gap-3 px-3.5 py-2.5 w-full text-left hover:bg-muted/40 transition-colors">
       {inner}
+    </button>
+  );
+}
+
+function ContactIconBtn({ icon, title, onClick }: { icon: React.ReactNode; title: string; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      title={title}
+      onClick={(e) => { e.stopPropagation(); onClick(); }}
+      className="w-7 h-7 inline-flex items-center justify-center rounded-md border border-border bg-background text-muted-foreground hover:text-primary hover:border-primary/30 hover:bg-primary/5 transition-colors"
+    >
+      {icon}
     </button>
   );
 }
