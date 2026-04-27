@@ -180,8 +180,15 @@ export default function GapConfiguracao() {
     toast({ title: "Motivo atualizado" });
     setEditMotivo(null);
   };
+  const saveEditMulta = () => {
+    if (!editMulta || !editMulta.label.trim()) return;
+    setMultas(prev => prev.map(m => m.key === editMulta.key ? editMulta : m));
+    toast({ title: "Multa atualizada" });
+    setEditMulta(null);
+  };
 
-  return (
+  const formatKz = (n: number) =>
+    new Intl.NumberFormat("pt-AO", { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(n) + " Kz";
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       {/* Header */}
       <div>
