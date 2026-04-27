@@ -279,103 +279,6 @@ export default function GapAtendimentoDetail() {
                 </div>
               </div>
             </section>
-
-            {atendimento.participantes && atendimento.participantes.length > 0 && (
-              <section className="pt-4 border-t border-border">
-                <SectionTitle>
-                  <span className="inline-flex items-center justify-between gap-2 w-full">
-                    <span>Outros Participantes</span>
-                    <span className="text-[10px] text-muted-foreground font-medium tabular-nums normal-case tracking-normal">
-                      {atendimento.participantes.length}
-                    </span>
-                  </span>
-                </SectionTitle>
-                <div className="space-y-4">
-                  {atendimento.participantes.map((p, idx) => {
-                    const isFamily = p.tipo === "encarregado";
-                    const TypeIcon = isFamily ? Home : Briefcase;
-                    const initials = p.nome.split(" ").filter(w => w.length > 2).slice(0, 2).map(n => n[0]).join("");
-
-                    const header = (
-                      <>
-                        <div className={cn(
-                          "w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-semibold ring-1 shrink-0",
-                          isFamily
-                            ? "bg-pink-50 text-pink-700 ring-pink-200"
-                            : "bg-blue-50 text-blue-700 ring-blue-200",
-                        )}>
-                          {initials}
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <p className={cn(
-                            "text-sm font-semibold leading-tight truncate",
-                            isFamily ? "text-foreground" : "text-foreground group-hover:text-primary transition-colors",
-                          )}>
-                            {p.nome}
-                          </p>
-                          <p className="text-[11px] text-muted-foreground mt-0.5 truncate">{p.relacao}</p>
-                        </div>
-                        <Badge
-                          variant="outline"
-                          className={cn(
-                            "text-[9px] font-semibold px-1.5 py-0 h-[16px] uppercase tracking-wider gap-1 shrink-0",
-                            isFamily
-                              ? "bg-pink-50 text-pink-700 border-pink-200"
-                              : "bg-blue-50 text-blue-700 border-blue-200",
-                          )}
-                        >
-                          <TypeIcon className="w-2.5 h-2.5" />
-                          {isFamily ? "Família" : "Escola"}
-                        </Badge>
-                      </>
-                    );
-
-                    return (
-                      <div key={idx} className="space-y-2">
-                        {isFamily ? (
-                          <div className="flex items-center gap-2.5 -mx-2 px-2 py-1">
-                            {header}
-                          </div>
-                        ) : (
-                          <button
-                            type="button"
-                            onClick={() => handleAction(`Perfil de ${p.nome}`)}
-                            className="flex items-center gap-2.5 text-left hover:bg-muted/40 -mx-2 px-2 py-1 rounded-md transition-colors group w-full"
-                          >
-                            {header}
-                          </button>
-                        )}
-                        <div className="grid grid-cols-3 gap-2">
-                          {isFamily ? (
-                            <>
-                              <ContactBtn icon={<Phone className="w-3 h-3" />} label="Ligar" onClick={() => handleAction(`Chamada para ${p.nome}`)} />
-                              <ContactBtn icon={<MessageSquare className="w-3 h-3" />} label="SMS" onClick={() => handleAction(`SMS para ${p.nome}`)} />
-                              <ContactBtn
-                                icon={<CheckCircle className={cn("w-3 h-3", p.confirmado ? "text-emerald-600" : "text-amber-600")} />}
-                                label={p.confirmado ? "Confirmado" : "Pendente"}
-                                onClick={() => handleAction(`Estado de ${p.nome}`)}
-                              />
-                            </>
-                          ) : (
-                            <>
-                              <ContactBtn icon={<MessageSquare className="w-3 h-3" />} label="Chat" onClick={() => handleAction(`Chat com ${p.nome}`)} />
-                              <ContactBtn icon={<Mail className="w-3 h-3" />} label="Email" onClick={() => handleAction(`Email para ${p.nome}`)} />
-                              <ContactBtn icon={<Phone className="w-3 h-3" />} label="Ligar" onClick={() => handleAction(`Chamada para ${p.nome}`)} />
-                            </>
-                          )}
-                        </div>
-                        {p.contacto && isFamily && (
-                          <div className="pt-1 flex items-baseline justify-between gap-2">
-                            <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Contacto</span>
-                            <span className="text-[11px] font-medium text-foreground text-right truncate max-w-[150px] tabular-nums">{p.contacto}</span>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </section>
-            )}
           </aside>
 
           {/* RIGHT — sessão */}
@@ -413,6 +316,119 @@ export default function GapAtendimentoDetail() {
                 </div>
               </div>
             </section>
+
+            {/* Outros participantes */}
+            {atendimento.participantes && atendimento.participantes.length > 0 && (
+              <section>
+                <div className="flex items-center gap-2 mb-3">
+                  <Users className="w-3.5 h-3.5 text-muted-foreground" />
+                  <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">
+                    Outros Participantes
+                  </h3>
+                  <span className="text-[10px] text-muted-foreground font-medium tabular-nums">
+                    · {atendimento.participantes.length}
+                  </span>
+                </div>
+                <div className="rounded-lg border border-border bg-background divide-y divide-border">
+                  {atendimento.participantes.map((p, idx) => {
+                    const isFamily = p.tipo === "encarregado";
+                    const TypeIcon = isFamily ? Home : Briefcase;
+                    const initials = p.nome.split(" ").filter(w => w.length > 2).slice(0, 2).map(n => n[0]).join("");
+
+                    const content = (
+                      <>
+                        <div className={cn(
+                          "w-9 h-9 rounded-full flex items-center justify-center shrink-0 font-semibold text-[11px] ring-1",
+                          isFamily
+                            ? "bg-pink-50 text-pink-700 ring-pink-200"
+                            : "bg-blue-50 text-blue-700 ring-blue-200",
+                        )}>
+                          {initials}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <p className={cn(
+                              "text-[13px] font-semibold leading-tight truncate",
+                              isFamily ? "text-foreground" : "text-foreground group-hover:text-primary transition-colors",
+                            )}>{p.nome}</p>
+                            <Badge
+                              variant="outline"
+                              className={cn(
+                                "text-[9.5px] font-semibold px-1.5 py-0 h-[16px] uppercase tracking-wider gap-1",
+                                isFamily
+                                  ? "bg-pink-50 text-pink-700 border-pink-200"
+                                  : "bg-blue-50 text-blue-700 border-blue-200",
+                              )}
+                            >
+                              <TypeIcon className="w-2.5 h-2.5" />
+                              {isFamily ? "Família" : "Escola"}
+                            </Badge>
+                          </div>
+                          <div className="flex items-center gap-2 mt-0.5 text-[11px] text-muted-foreground">
+                            <span className="truncate">{p.relacao}</span>
+                            {p.contacto && isFamily && (
+                              <>
+                                <span className="text-muted-foreground/40">·</span>
+                                <span className="truncate font-mono text-[10.5px]">{p.contacto}</span>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                        <div className="shrink-0 flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                          <span className={cn(
+                            "inline-flex items-center gap-1 text-[10px] font-medium",
+                            p.confirmado ? "text-emerald-700" : "text-amber-700",
+                          )}>
+                            {p.confirmado ? (
+                              <><CheckCircle className="w-3 h-3" /> Confirmado</>
+                            ) : (
+                              <><CircleDashed className="w-3 h-3" /> Pendente</>
+                            )}
+                          </span>
+                          {!isFamily && (
+                            <button
+                              type="button"
+                              onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleAction(`Email para ${p.nome}`); }}
+                              className="w-6 h-6 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                              title="Email"
+                            >
+                              <Mail className="w-3 h-3" />
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleAction(`Chamada para ${p.nome}`); }}
+                            className="w-6 h-6 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                            title="Ligar"
+                          >
+                            <Phone className="w-3 h-3" />
+                          </button>
+                        </div>
+                      </>
+                    );
+
+                    if (isFamily) {
+                      return (
+                        <div key={idx} className="flex items-center gap-3 px-3.5 py-2.5">
+                          {content}
+                        </div>
+                      );
+                    }
+
+                    return (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => handleAction(`Perfil de ${p.nome}`)}
+                        className="group flex items-center gap-3 px-3.5 py-2.5 w-full text-left hover:bg-muted/40 transition-colors"
+                      >
+                        {content}
+                      </button>
+                    );
+                  })}
+                </div>
+              </section>
+            )}
 
             {atendimento.notas && (
               <section className="pt-5 border-t border-border space-y-2">
