@@ -96,7 +96,7 @@ export default function GapDashboard() {
       </div>
 
       {/* Single consolidated KPI row */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {kpis.map(k => (
           <Card key={k.label} className="p-4 hover:shadow-sm transition-shadow">
             <div className="flex items-center justify-between gap-2">
