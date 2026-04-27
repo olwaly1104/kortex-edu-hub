@@ -439,8 +439,8 @@ export default function GapConfiguracao() {
                         const mu = multas.find(x => x.key === m.multa);
                         return mu ? (
                           <span className="inline-flex items-center gap-1.5">
-                            <span className="text-foreground">{mu.label}</span>
-                            <span className="text-destructive font-semibold tabular-nums">· {formatMultaDias(mu.diasAposPrazo)}</span>
+                            <span className="text-foreground">{formatMultaDias(mu.diasAposPrazo)}</span>
+                            <span className="text-destructive font-semibold tabular-nums">· {formatKz(mu.valor)}</span>
                           </span>
                         ) : <span className="text-muted-foreground">—</span>;
                       })()}
