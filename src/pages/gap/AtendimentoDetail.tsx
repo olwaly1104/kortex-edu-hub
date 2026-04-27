@@ -102,113 +102,114 @@ export default function GapAtendimentoDetail() {
           <span className="font-mono text-foreground normal-case tracking-normal">{atendimento.id}</span>
         </div>
 
-        {/* Title block with moderate date tile */}
-        <div className="px-6 pt-5 pb-5 flex items-start gap-5">
-          {/* Date tile — moderate size */}
-          <div className="shrink-0 w-[68px] rounded-lg border border-border overflow-hidden bg-background text-center">
-            <div className="bg-primary/90 py-1">
-              <p className="text-[10px] uppercase tracking-[0.15em] text-primary-foreground font-bold">{monthShort}</p>
+        {/* Title block — compact outlined box (mirrors Solicitação detail) */}
+        <div className="px-6 pt-4 pb-4 space-y-3">
+          <div className="flex items-start gap-3 rounded-lg border border-border bg-background p-3">
+            {/* Date tile */}
+            <div className="shrink-0 w-[60px] rounded-md border border-border overflow-hidden bg-background text-center">
+              <div className="bg-primary/90 py-0.5">
+                <p className="text-[9px] uppercase tracking-[0.15em] text-primary-foreground font-bold">{monthShort}</p>
+              </div>
+              <div className="py-1">
+                <p className="text-[24px] leading-none font-bold text-foreground tabular-nums tracking-tight">{dayNum}</p>
+                <p className="text-[8.5px] uppercase tracking-wider text-muted-foreground font-semibold mt-0.5 capitalize">{weekday.slice(0, 3)}</p>
+              </div>
             </div>
-            <div className="py-1.5">
-              <p className="text-[28px] leading-none font-bold text-foreground tabular-nums tracking-tight">{dayNum}</p>
-              <p className="text-[9px] uppercase tracking-wider text-muted-foreground font-semibold mt-1 capitalize">{weekday.slice(0, 3)}</p>
-            </div>
-          </div>
 
-          <div className="min-w-0 flex-1 pt-0.5">
-            <div className="flex items-start justify-between gap-4">
+            {/* Title + badges */}
+            <div className="min-w-0 flex-1">
               <h1 className="text-xl font-semibold leading-tight tracking-tight text-foreground">
                 {atendimento.motivo}
               </h1>
-              <div className="shrink-0 flex flex-col items-end gap-1.5">
-                <button
-                  type="button"
-                  onClick={() => { navigator.clipboard?.writeText(atendimento.id); toast({ title: "ID copiado", description: atendimento.id }); }}
-                  className="inline-flex items-center px-2 py-0.5 rounded-md border border-border bg-background hover:bg-muted text-[11px] font-mono font-semibold text-foreground transition-colors"
-                >
-                  {atendimento.id}
-                </button>
-                <Dialog>
-                  <div className="inline-flex items-center gap-2.5 pl-2 pr-1.5 py-1.5 rounded-md border border-border bg-background shadow-sm">
-                    <div className="w-7 h-7 rounded-md bg-red-50 border border-red-200 flex items-center justify-center shrink-0">
-                      <FileText className="w-3.5 h-3.5 text-red-600" />
-                    </div>
-                    <div className="flex flex-col min-w-0 leading-tight">
-                      <span className="text-[11.5px] font-semibold text-foreground tabular-nums">Resumo-{atendimento.id}</span>
-                      <span className="text-[9.5px] tracking-[0.02em] text-muted-foreground font-medium mt-0.5">
-                        Gerado automaticamente
-                      </span>
-                    </div>
-                    <span className="self-stretch w-px bg-border mx-0.5" />
-                    <DialogTrigger asChild>
-                      <button type="button" className="inline-flex items-center gap-1 px-1.5 h-6 rounded text-[10.5px] text-primary hover:bg-muted font-medium transition-colors" title="Partilhas">
-                        <Users className="w-3 h-3" /> 4
-                      </button>
-                    </DialogTrigger>
-                    <DialogTrigger asChild>
-                      <button type="button" className="w-6 h-6 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors" title="Ver">
-                        <Eye className="w-3 h-3" />
-                      </button>
-                    </DialogTrigger>
-                    <button
-                      type="button"
-                      onClick={() => handleAction("Relatório exportado")}
-                      className="w-6 h-6 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-                      title="Exportar"
-                    >
-                      <Download className="w-3 h-3" />
-                    </button>
-                  </div>
-                  <DialogContent className="max-w-md">
-                    <DialogHeader>
-                      <DialogTitle className="text-base flex items-center gap-2">
-                        <Share2 className="w-4 h-4 text-primary" /> Partilhado com 4 pessoas
-                      </DialogTitle>
-                      <DialogDescription className="text-[12px]">
-                        Pessoas com acesso ao documento <span className="font-medium text-foreground">Resumo-{atendimento.id}</span>.
-                      </DialogDescription>
-                    </DialogHeader>
-                  </DialogContent>
-                </Dialog>
+              <div className="mt-1 flex items-center gap-1.5 flex-wrap">
+                <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider", est.pill)}>
+                  <span className={cn("w-1.5 h-1.5 rounded-full mr-1.5 inline-block", est.dot)} />
+                  {est.label}
+                </Badge>
+                <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider gap-1", cat.color)}>
+                  <cat.icon className="w-3 h-3" />
+                  {cat.label}
+                </Badge>
               </div>
             </div>
-            <div className="mt-2.5 flex items-center gap-1.5 flex-wrap">
-              <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider", est.pill)}>
-                <span className={cn("w-1.5 h-1.5 rounded-full mr-1.5 inline-block", est.dot)} />
-                {est.label}
-              </Badge>
-              <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider gap-1", cat.color)}>
-                <cat.icon className="w-3 h-3" />
-                {cat.label}
-              </Badge>
+
+            {/* Right — ID + doc pill */}
+            <div className="shrink-0 flex flex-col items-end gap-1.5">
+              <button
+                type="button"
+                onClick={() => { navigator.clipboard?.writeText(atendimento.id); toast({ title: "ID copiado", description: atendimento.id }); }}
+                className="inline-flex items-center px-2 py-0.5 rounded-md border border-border bg-background hover:bg-muted text-[11px] font-mono font-semibold text-foreground transition-colors"
+              >
+                {atendimento.id}
+              </button>
+              <Dialog>
+                <div className="inline-flex items-center gap-2 pl-1.5 pr-1 py-1 rounded-md border border-border bg-background shadow-sm">
+                  <div className="w-6 h-6 rounded bg-red-50 border border-red-200 flex items-center justify-center shrink-0">
+                    <FileText className="w-3 h-3 text-red-600" />
+                  </div>
+                  <div className="flex flex-col min-w-0 leading-tight">
+                    <span className="text-[11px] font-semibold text-foreground tabular-nums">Resumo-{atendimento.id}</span>
+                    <span className="text-[9px] tracking-[0.02em] text-muted-foreground font-medium">
+                      Gerado automaticamente
+                    </span>
+                  </div>
+                  <span className="self-stretch w-px bg-border mx-0.5" />
+                  <DialogTrigger asChild>
+                    <button type="button" className="inline-flex items-center gap-1 px-1 h-5 rounded text-[10px] text-primary hover:bg-muted font-medium transition-colors" title="Partilhas">
+                      <Users className="w-3 h-3" /> 4
+                    </button>
+                  </DialogTrigger>
+                  <DialogTrigger asChild>
+                    <button type="button" className="w-5 h-5 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors" title="Ver">
+                      <Eye className="w-3 h-3" />
+                    </button>
+                  </DialogTrigger>
+                  <button
+                    type="button"
+                    onClick={() => handleAction("Relatório exportado")}
+                    className="w-5 h-5 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                    title="Exportar"
+                  >
+                    <Download className="w-3 h-3" />
+                  </button>
+                </div>
+                <DialogContent className="max-w-md">
+                  <DialogHeader>
+                    <DialogTitle className="text-base flex items-center gap-2">
+                      <Share2 className="w-4 h-4 text-primary" /> Partilhado com 4 pessoas
+                    </DialogTitle>
+                    <DialogDescription className="text-[12px]">
+                      Pessoas com acesso ao documento <span className="font-medium text-foreground">Resumo-{atendimento.id}</span>.
+                    </DialogDescription>
+                  </DialogHeader>
+                </DialogContent>
+              </Dialog>
             </div>
           </div>
-        </div>
 
-        {/* Action bar — below title */}
-        {atendimento.estado === "agendado" && (
-          <div className="px-6 pb-5">
-            <div className="rounded-lg border border-border bg-muted/20 px-4 py-3 flex items-center justify-between gap-3 flex-wrap">
+          {/* Action bar — pushed up, right under title block */}
+          {atendimento.estado === "agendado" && (
+            <div className="rounded-lg border border-border bg-muted/20 px-3 py-2 flex items-center justify-between gap-3 flex-wrap">
               <div className="inline-flex items-center gap-2 text-[12px] text-muted-foreground">
                 <Timer className="w-3.5 h-3.5 shrink-0" />
                 <span>Conclusão automática após <span className="font-semibold text-foreground tabular-nums">{endTime}</span></span>
               </div>
               <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" className="h-8 px-3 text-[12px] gap-1.5 bg-background" onClick={() => handleAction("Sessão remarcada")}>
+                <Button variant="outline" size="sm" className="h-7 px-2.5 text-[11.5px] gap-1.5 bg-background" onClick={() => handleAction("Sessão remarcada")}>
                   <CalendarIcon className="w-3.5 h-3.5" /> Remarcar
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
-                  className="h-8 px-3 text-[12px] gap-1.5 bg-background border-destructive/25 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                  className="h-7 px-2.5 text-[11.5px] gap-1.5 bg-background border-destructive/25 text-destructive hover:bg-destructive/10 hover:text-destructive"
                   onClick={() => handleAction("Sessão cancelada")}
                 >
                   <X className="w-3.5 h-3.5" /> Cancelar
                 </Button>
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
 
         {/* Body — Estudante left | Sessão right (one continuous card, just a divider) */}
