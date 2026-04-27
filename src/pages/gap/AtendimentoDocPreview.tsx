@@ -68,160 +68,142 @@ export default function AtendimentoDocPreview({ atendimento: a }: Props) {
       </div>
 
       {/* A4 page */}
-      <div className="flex-1 min-h-0 overflow-y-auto py-8 px-4 bg-muted/30">
+      <div className="flex-1 min-h-0 overflow-y-auto py-6 px-4 bg-muted/30">
         <div
-          className="mx-auto bg-white shadow-md border border-border print:shadow-none print:border-0"
-          style={{ width: "210mm", minHeight: "297mm" }}
+          className="mx-auto bg-white shadow-md border border-border print:shadow-none print:border-0 flex flex-col"
+          style={{ width: "210mm", height: "297mm" }}
         >
-          {/* Header institucional */}
-          <div className="px-10 pt-10 pb-6 border-b-2 border-primary">
+          {/* Header */}
+          <div className="px-8 pt-7 pb-3 border-b-2 border-primary">
             <div className="flex items-start justify-between gap-6">
               <div>
-                <p className="text-[10px] uppercase tracking-[0.18em] text-primary font-bold">Universidade Privada</p>
-                <h1 className="text-[20px] font-bold text-foreground tracking-tight mt-0.5 leading-tight">
-                  Gabinete de Apoio Académico
-                </h1>
-                <p className="text-[11px] text-muted-foreground mt-1">{a.faculdade} · {a.curso}</p>
+                <p className="text-[8px] uppercase tracking-[0.18em] text-primary font-bold">Universidade Privada</p>
+                <h1 className="text-[15px] font-bold text-foreground tracking-tight leading-tight">Gabinete de Apoio Académico</h1>
+                <p className="text-[9px] text-muted-foreground">{a.faculdade} · {a.curso}</p>
               </div>
               <div className="text-right shrink-0">
-                <p className="text-[9px] uppercase tracking-[0.15em] text-muted-foreground font-semibold">Documento</p>
-                <p className="font-mono text-[13px] font-bold text-foreground mt-0.5">Resumo-{a.id}</p>
-                <p className="text-[10px] text-muted-foreground mt-1">Emitido a {fmtDataLong(new Date())}</p>
+                <p className="font-mono text-[11px] font-bold text-foreground">Resumo-{a.id}</p>
+                <p className="text-[8.5px] text-muted-foreground">Emitido a {fmtDataLong(new Date())}</p>
               </div>
             </div>
           </div>
 
-          {/* Title block */}
-          <div className="px-10 pt-7 pb-5">
-            <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground font-bold mb-1.5">
-              Relatório de Atendimento
-            </p>
-            <h2 className="text-[22px] font-bold text-foreground leading-tight tracking-tight">{a.motivo}</h2>
-            <div className="mt-3 inline-flex items-center gap-2 flex-wrap">
-              <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border ${tone.bg} ${tone.text} ${tone.border} text-[10.5px] font-semibold uppercase tracking-wider`}>
-                <span className={`w-1.5 h-1.5 rounded-full ${tone.dot}`} />
-                {tone.label}
+          {/* Title */}
+          <div className="px-8 pt-4 pb-3">
+            <p className="text-[8.5px] uppercase tracking-[0.18em] text-muted-foreground font-bold">Relatório de Atendimento</p>
+            <h2 className="text-[16px] font-bold text-foreground leading-tight tracking-tight mt-0.5">{a.motivo}</h2>
+            <div className="mt-2 flex items-center gap-1.5 flex-wrap">
+              <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded border ${tone.bg} ${tone.text} ${tone.border} text-[8.5px] font-semibold uppercase tracking-wider`}>
+                <span className={`w-1 h-1 rounded-full ${tone.dot}`} />{tone.label}
               </span>
-              <span className="text-[11px] text-muted-foreground">
-                Categoria: <span className="font-semibold text-foreground">{cat?.label ?? a.categoria}</span>
-              </span>
+              <span className="text-[8.5px] text-muted-foreground">Categoria <span className="font-semibold text-foreground">{cat?.label ?? a.categoria}</span></span>
+              <span className="text-[8.5px] text-muted-foreground">· {a.tipo === "online" ? "Online" : "Presencial"}</span>
             </div>
           </div>
 
-          {/* 1. Identificação */}
-          <Section title="1. Identificação do Discente">
-            <DocTable rows={[
-              ["Nome", a.discente],
-              ["Matrícula", a.matricula],
-              ["Curso", a.curso],
-              ["Faculdade", a.faculdade],
-              ["Ano curricular", `${a.ano}º ano`],
-            ]}/>
-          </Section>
-
-          {/* 2. Sessão */}
-          <Section title="2. Detalhes da Sessão">
-            <DocTable rows={[
-              ["Referência", a.id],
-              ["Motivo", a.motivo],
-              ["Categoria", cat?.label ?? a.categoria],
-              ["Data", fmtData(a.data)],
-              ["Horário", `${startTime} – ${endTime}`],
-              ["Duração", a.duracao],
-              ["Modalidade", a.tipo === "online" ? "Online" : "Presencial"],
-              ["Local", a.tipo === "presencial" && a.sala ? a.sala : "—"],
-              ["Responsável GAP", a.responsavel],
-              ["Estado actual", tone.label],
-            ]}/>
-          </Section>
-
-          {/* 3. Descrição */}
-          <Section title="3. Descrição do Atendimento">
-            <div className="rounded border border-border bg-muted/20 px-4 py-3">
-              <p className="text-[12.5px] text-foreground leading-[1.7] whitespace-pre-line">
-                {a.descricao || "Sem descrição adicional."}
-              </p>
+          {/* Body */}
+          <div className="flex-1 px-8 pb-3 space-y-3 overflow-hidden">
+            <div className="grid grid-cols-2 gap-3">
+              <Block title="1. Discente">
+                <KV rows={[
+                  ["Nome", a.discente],
+                  ["Matrícula", a.matricula],
+                  ["Curso", a.curso],
+                  ["Ano", `${a.ano}º`],
+                ]} />
+              </Block>
+              <Block title="2. Sessão">
+                <KV rows={[
+                  ["Referência", a.id],
+                  ["Responsável", a.responsavel],
+                  ["Local", a.tipo === "presencial" && a.sala ? a.sala : "—"],
+                  ["Duração", a.duracao],
+                ]} />
+              </Block>
             </div>
-          </Section>
 
-          {/* 4. Participantes */}
-          <Section title="4. Participantes da Sessão">
-            <div className="overflow-hidden rounded border border-border">
-              <table className="w-full text-[11.5px]">
-                <thead>
-                  <tr className="bg-primary/5 border-b border-border">
-                    <th className="text-left px-3 py-2 font-semibold text-foreground w-[8%]">#</th>
-                    <th className="text-left px-3 py-2 font-semibold text-foreground">Nome</th>
-                    <th className="text-left px-3 py-2 font-semibold text-foreground w-[25%]">Função</th>
-                    <th className="text-left px-3 py-2 font-semibold text-foreground w-[28%]">Detalhes</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
-                  <tr>
-                    <td className="px-3 py-2 text-muted-foreground tabular-nums">01</td>
-                    <td className="px-3 py-2 text-foreground font-medium">{a.discente}</td>
-                    <td className="px-3 py-2 text-muted-foreground">Discente</td>
-                    <td className="px-3 py-2 text-muted-foreground">{a.matricula} · {a.ano}º ano</td>
-                  </tr>
-                  <tr className="bg-muted/20">
-                    <td className="px-3 py-2 text-muted-foreground tabular-nums">02</td>
-                    <td className="px-3 py-2 text-foreground font-medium">{a.responsavel}</td>
-                    <td className="px-3 py-2 text-muted-foreground">Responsável GAP</td>
-                    <td className="px-3 py-2 text-muted-foreground">Gabinete de Apoio Académico</td>
-                  </tr>
-                  {extras.map((p, i) => (
-                    <tr key={i} className={(i + 2) % 2 === 0 ? "bg-background" : "bg-muted/20"}>
-                      <td className="px-3 py-2 text-muted-foreground tabular-nums">{String(i + 3).padStart(2, "0")}</td>
-                      <td className="px-3 py-2 text-foreground font-medium">{p.nome}</td>
-                      <td className="px-3 py-2 text-muted-foreground capitalize">
-                        {p.tipo === "encarregado" ? "Encarregado / Família" : "Escola / Externo"}
-                      </td>
-                      <td className="px-3 py-2 text-muted-foreground">
-                        {p.relacao}{p.contacto ? ` · ${p.contacto}` : ""}
-                        {p.tipo !== "encarregado" ? ` · ${p.confirmado ? "Confirmado" : "Pendente"}` : ""}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </Section>
-
-          {/* 5. Notas / Resumo */}
-          {a.notas && (
-            <Section title="5. Notas da Sessão">
-              <div className="rounded border border-border bg-muted/20 px-4 py-3">
-                <p className="text-[12.5px] text-foreground leading-[1.7] whitespace-pre-line">{a.notas}</p>
+            <Block title="3. Datas-Chave">
+              <div className="grid grid-cols-3 border border-border rounded overflow-hidden">
+                {[
+                  ["Data", fmtData(a.data)],
+                  ["Horário", `${startTime} – ${endTime}`],
+                  ["Estado", tone.label],
+                ].map(([k, v], i) => (
+                  <div key={i} className={`px-2.5 py-1.5 ${i < 2 ? "border-r border-border" : ""}`}>
+                    <p className="text-[8px] uppercase tracking-wider text-muted-foreground font-semibold">{k}</p>
+                    <p className="text-[10.5px] font-semibold text-foreground tabular-nums leading-tight mt-0.5">{v}</p>
+                  </div>
+                ))}
               </div>
-            </Section>
-          )}
+            </Block>
 
-          <Section title={`${a.notas ? "6" : "5"}. Resumo do Processo`}>
-            <DocTable rows={[
-              ["Data agendada", fmtData(a.data)],
-              ["Horário previsto", `${startTime} – ${endTime}`],
-              ["Modalidade", a.tipo === "online" ? "Online" : "Presencial"],
-              ["Estado final", tone.label],
-              ["Total de participantes", String(2 + extras.length)],
-            ]}/>
-          </Section>
-
-          {/* Footer */}
-          <div className="px-10 pb-10 pt-6 mt-4 border-t border-border">
-            <div className="flex items-end justify-between gap-6">
-              <div>
-                <p className="text-[10px] text-muted-foreground leading-relaxed max-w-md">
-                  Este documento foi gerado automaticamente pelo Gabinete de Apoio Académico
-                  com base nos registos oficiais da plataforma. Para questões adicionais,
-                  contacte <span className="font-semibold text-foreground">gap@upra.kor</span>.
+            <Block title="4. Descrição">
+              <div className="rounded border border-border bg-muted/20 px-3 py-2">
+                <p className="text-[10px] text-foreground leading-snug whitespace-pre-line line-clamp-4">
+                  {a.descricao || "Sem descrição adicional."}
                 </p>
               </div>
+            </Block>
+
+            <Block title="5. Participantes">
+              <div className="overflow-hidden rounded border border-border">
+                <table className="w-full text-[9.5px]">
+                  <thead>
+                    <tr className="bg-primary/5 border-b border-border">
+                      <th className="text-left px-2 py-1 font-semibold text-foreground w-[6%]">#</th>
+                      <th className="text-left px-2 py-1 font-semibold text-foreground">Nome</th>
+                      <th className="text-left px-2 py-1 font-semibold text-foreground w-[24%]">Função</th>
+                      <th className="text-left px-2 py-1 font-semibold text-foreground w-[30%]">Detalhes</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    <tr>
+                      <td className="px-2 py-1 text-muted-foreground tabular-nums">01</td>
+                      <td className="px-2 py-1 text-foreground font-medium truncate">{a.discente}</td>
+                      <td className="px-2 py-1 text-muted-foreground">Discente</td>
+                      <td className="px-2 py-1 text-muted-foreground truncate">{a.matricula} · {a.ano}º ano</td>
+                    </tr>
+                    <tr className="bg-muted/20">
+                      <td className="px-2 py-1 text-muted-foreground tabular-nums">02</td>
+                      <td className="px-2 py-1 text-foreground font-medium truncate">{a.responsavel}</td>
+                      <td className="px-2 py-1 text-muted-foreground">Responsável GAP</td>
+                      <td className="px-2 py-1 text-muted-foreground truncate">Gabinete de Apoio Académico</td>
+                    </tr>
+                    {extras.slice(0, 3).map((p, i) => (
+                      <tr key={i} className={(i + 2) % 2 === 0 ? "bg-background" : "bg-muted/20"}>
+                        <td className="px-2 py-1 text-muted-foreground tabular-nums">{String(i + 3).padStart(2, "0")}</td>
+                        <td className="px-2 py-1 text-foreground font-medium truncate">{p.nome}</td>
+                        <td className="px-2 py-1 text-muted-foreground">{p.tipo === "encarregado" ? "Encarregado" : "Externo"}</td>
+                        <td className="px-2 py-1 text-muted-foreground truncate">
+                          {p.relacao}{p.contacto ? ` · ${p.contacto}` : ""}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </Block>
+
+            {a.notas && (
+              <Block title="6. Notas">
+                <div className="rounded border border-border bg-muted/20 px-3 py-2">
+                  <p className="text-[10px] text-foreground leading-snug whitespace-pre-line line-clamp-3">{a.notas}</p>
+                </div>
+              </Block>
+            )}
+          </div>
+
+          {/* Footer */}
+          <div className="px-8 pb-6 pt-3 border-t border-border">
+            <div className="flex items-end justify-between gap-6">
+              <p className="text-[8px] text-muted-foreground leading-snug max-w-sm">
+                Documento gerado automaticamente pelo GAP com base nos registos oficiais da plataforma.
+                Contacto: <span className="font-semibold text-foreground">gap@upra.kor</span>.
+              </p>
               <div className="text-right shrink-0">
-                <div className="border-t border-foreground/30 pt-1.5 min-w-[180px]">
-                  <p className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground font-semibold">
-                    Coordenação do GAP
-                  </p>
-                  <p className="text-[11px] font-semibold text-foreground mt-0.5">Dra. Helena Cabral</p>
+                <div className="border-t border-foreground/40 pt-1 min-w-[160px]">
+                  <p className="text-[8px] uppercase tracking-wider text-muted-foreground font-semibold">Coordenação do GAP</p>
+                  <p className="text-[10px] font-semibold text-foreground">Dra. Helena Cabral</p>
                 </div>
               </div>
             </div>
@@ -232,24 +214,24 @@ export default function AtendimentoDocPreview({ atendimento: a }: Props) {
   );
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Block({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="px-10 py-5">
-      <h3 className="text-[11px] uppercase tracking-[0.16em] text-primary font-bold mb-2.5">{title}</h3>
+    <div>
+      <h3 className="text-[9px] uppercase tracking-[0.16em] text-primary font-bold mb-1">{title}</h3>
       {children}
     </div>
   );
 }
 
-function DocTable({ rows }: { rows: [string, string][] }) {
+function KV({ rows }: { rows: [string, string][] }) {
   return (
     <div className="overflow-hidden rounded border border-border">
-      <table className="w-full text-[12px]">
+      <table className="w-full text-[10px]">
         <tbody className="divide-y divide-border">
           {rows.map(([k, v], i) => (
             <tr key={i} className={i % 2 === 0 ? "bg-background" : "bg-muted/20"}>
-              <td className="px-3 py-2 text-muted-foreground font-medium w-[35%] align-top">{k}</td>
-              <td className="px-3 py-2 text-foreground font-semibold">{v}</td>
+              <td className="px-2.5 py-1 text-muted-foreground font-medium w-[38%] align-top">{k}</td>
+              <td className="px-2.5 py-1 text-foreground font-semibold truncate">{v}</td>
             </tr>
           ))}
         </tbody>
