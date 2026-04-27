@@ -270,6 +270,7 @@ export default function GapSolicitacaoDetail() {
                         <Download className="w-3 h-3" />
                       </button>
                     </div>
+                    </div>
                     <DialogContent className="max-w-md">
                       <DialogHeader>
                         <DialogTitle className="text-base flex items-center gap-2">
