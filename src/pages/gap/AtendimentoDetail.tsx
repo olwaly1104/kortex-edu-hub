@@ -422,23 +422,6 @@ export default function GapAtendimentoDetail() {
                 </div>
               </section>
             )}
-            {/* Status banner — only for completed/cancelled */}
-            {(atendimento.estado === "concluido" || atendimento.estado === "cancelado") && (
-              <section className="pt-5 border-t border-border">
-                {atendimento.estado === "concluido" && (
-                  <div className="flex items-center gap-2.5 text-[13px] text-foreground bg-emerald-50 rounded-lg px-4 py-3 border border-emerald-200">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <span>Sessão concluída em <span className="font-semibold">{fullDate}</span>.</span>
-                  </div>
-                )}
-                {atendimento.estado === "cancelado" && (
-                  <div className="flex items-center gap-2.5 text-[13px] text-destructive bg-destructive/10 rounded-lg px-4 py-3 border border-destructive/20">
-                    <X className="w-4 h-4 shrink-0" />
-                    <span>Este agendamento foi cancelado e não será realizado.</span>
-                  </div>
-                )}
-              </section>
-            )}
           </main>
         </div>
 
