@@ -214,10 +214,28 @@ export default function GapSolicitacaoDetail() {
 
             <div className="min-w-0 flex-1 pt-0.5">
               <div className="flex items-start justify-between gap-4">
-                <h1 className="text-xl font-semibold leading-tight tracking-tight text-foreground">
-                  {tipoCfg?.label ?? selected.tipo}
-                </h1>
-                <div className="shrink-0 flex flex-col items-end gap-2">
+                <div className="min-w-0 flex-1">
+                  <h1 className="text-xl font-semibold leading-tight tracking-tight text-foreground">
+                    {tipoCfg?.label ?? selected.tipo}
+                  </h1>
+                  <div className="mt-1.5 flex items-center gap-1.5 flex-wrap">
+                    <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider gap-1", st.color)}>
+                      <span className={cn("w-1.5 h-1.5 rounded-full", estadoDot[selected.estado])} />
+                      {st.label}
+                    </Badge>
+                    {tipoCfg && (() => {
+                      const catCfg = categoriaConfig[tipoCfg.categoria as Categoria];
+                      const CatIcon = catCfg?.icon;
+                      return (
+                        <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider gap-1", catCfg?.color)}>
+                          {CatIcon && <CatIcon className="w-3 h-3" />}
+                          {tipoCfg.categoria}
+                        </Badge>
+                      );
+                    })()}
+                  </div>
+                </div>
+                <div className="shrink-0 flex flex-col items-end gap-1.5">
                   <button
                     type="button"
                     onClick={() => { navigator.clipboard?.writeText(selected.id); toast({ title: "ID copiado", description: selected.id }); }}
@@ -284,22 +302,6 @@ export default function GapSolicitacaoDetail() {
                     </DialogContent>
                   </Dialog>
                 </div>
-              </div>
-              <div className="mt-2.5 flex items-center gap-1.5 flex-wrap">
-                <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider gap-1", st.color)}>
-                  <span className={cn("w-1.5 h-1.5 rounded-full", estadoDot[selected.estado])} />
-                  {st.label}
-                </Badge>
-                {tipoCfg && (() => {
-                  const catCfg = categoriaConfig[tipoCfg.categoria as Categoria];
-                  const CatIcon = catCfg?.icon;
-                  return (
-                    <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider gap-1", catCfg?.color)}>
-                      {CatIcon && <CatIcon className="w-3 h-3" />}
-                      {tipoCfg.categoria}
-                    </Badge>
-                  );
-                })()}
               </div>
             </div>
           </div>
