@@ -132,36 +132,18 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
 
           {/* Body */}
           <div className="flex-1 px-8 pb-3 space-y-4 overflow-hidden">
-            {/* 1 · Identificação (Solicitação · Categoria · Motivo) */}
-            <Block title="1. Identificação">
+            {/* 1 · Resumo do Pedido */}
+            <Block title="1. Resumo do Pedido">
               <KV rows={[
                 ["Solicitação", s.id],
                 ["Categoria", tipoCfg?.categoria ?? "—"],
                 ["Motivo", s.assunto],
+                ["Estado", st.label],
               ]} />
             </Block>
 
-            {/* 2 · Discente | 3 · Encaminhamento */}
-            <div className="grid grid-cols-2 gap-4">
-              <Block title="2. Discente">
-                <KV rows={[
-                  ["Nome", s.discente],
-                  ["Matrícula", s.matricula],
-                  ["Curso", s.curso],
-                  ["Ano", `${s.ano}º`],
-                ]} />
-              </Block>
-              <Block title="3. Encaminhamento">
-                <KV rows={[
-                  ["Destino", dest.label],
-                  ["Responsável", s.responsavelDestino ?? `Equipa ${dest.label}`],
-                  ["Estado", st.label],
-                ]} />
-              </Block>
-            </div>
-
-            {/* 4 · Descrição */}
-            <Block title="4. Descrição">
+            {/* 2 · Descrição */}
+            <Block title="2. Descrição">
               <div className="rounded border border-border bg-background px-3 py-2">
                 <p className="text-[10px] text-foreground leading-relaxed whitespace-pre-line line-clamp-6">{s.descricao}</p>
               </div>
@@ -172,6 +154,24 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
                 </div>
               )}
             </Block>
+
+            {/* 3 · Discente | 4 · Encaminhamento */}
+            <div className="grid grid-cols-2 gap-4">
+              <Block title="3. Discente">
+                <KV rows={[
+                  ["Nome", s.discente],
+                  ["Matrícula", s.matricula],
+                  ["Curso", s.curso],
+                  ["Ano", `${s.ano}º`],
+                ]} />
+              </Block>
+              <Block title="4. Encaminhamento">
+                <KV rows={[
+                  ["Destino", dest.label],
+                  ["Responsável", s.responsavelDestino ?? `Equipa ${dest.label}`],
+                ]} />
+              </Block>
+            </div>
 
             {/* 4 · Cronologia */}
             <Block title="5. Cronologia">
