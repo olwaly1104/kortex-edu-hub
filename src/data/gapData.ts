@@ -91,7 +91,7 @@ export const destinoConfig: Record<Destino, { label: string; color: string }> = 
 
 export const estadoSolicitacaoConfig: Record<EstadoSolicitacao, { label: string; color: string }> = {
   recebida:    { label: "Pendente",    color: "bg-amber-50 text-amber-700 border-amber-200" },
-  em_execucao: { label: "Em Execução", color: "bg-sky-50 text-sky-700 border-sky-200" },
+  em_execucao: { label: "Em Atraso", color: "bg-amber-50 text-amber-700 border-amber-200" },
   concluida:   { label: "Concluída",   color: "bg-emerald-50 text-emerald-700 border-emerald-200" },
   rejeitada:   { label: "Rejeitada",   color: "bg-destructive/10 text-destructive border-destructive/20" },
 };
@@ -800,7 +800,7 @@ export const gapTickets: GapTicket[] = solicitacoes.map(s => ({
 
 export const ticketStatusConfig: Record<GapTicket["estado"], { label: string; color: string }> = {
   aberto:            { label: "Aberta",      color: "bg-orange-100 text-orange-700 border-orange-200" },
-  em_andamento:      { label: "Em Execução", color: "bg-amber-100 text-amber-700 border-amber-200" },
+  em_andamento:      { label: "Em Atraso", color: "bg-amber-100 text-amber-700 border-amber-200" },
   aguarda_estudante: { label: "Aguarda",     color: "bg-blue-100 text-blue-700 border-blue-200" },
   resolvido:         { label: "Concluída",   color: "bg-emerald-100 text-emerald-700 border-emerald-200" },
 };
