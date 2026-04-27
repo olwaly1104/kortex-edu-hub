@@ -2,7 +2,7 @@ import { Printer, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import {
-  type Solicitacao, estadoSolicitacaoConfig, destinoConfig, tipoConfig,
+  type Solicitacao, estadoSolicitacaoConfig, destinoConfig, tipoConfig, prioridadeConfig,
 } from "@/data/gapData";
 
 type Props = {
@@ -12,24 +12,57 @@ type Props = {
 
 const fmtData = (iso?: string) => {
   if (!iso) return "—";
-  const d = new Date(iso);
+  const d = new Date(iso.replace(" ", "T"));
+  if (Number.isNaN(d.getTime())) return iso;
   return d.toLocaleDateString("pt-PT", { day: "2-digit", month: "2-digit", year: "numeric" });
+};
+
+const fmtDataHora = (iso?: string) => {
+  if (!iso) return "—";
+  // Aceita "YYYY-MM-DD HH:mm" ou ISO
+  const d = new Date(iso.replace(" ", "T"));
+  if (Number.isNaN(d.getTime())) return iso;
+  const data = d.toLocaleDateString("pt-PT", { day: "2-digit", month: "2-digit", year: "numeric" });
+  const hora = d.toLocaleTimeString("pt-PT", { hour: "2-digit", minute: "2-digit" });
+  // Mostrar hora apenas se a string original a continha
+  return iso.includes(":") ? `${data} · ${hora}` : data;
 };
 
 const fmtDataLong = (d: Date) =>
   d.toLocaleDateString("pt-PT", { day: "2-digit", month: "long", year: "numeric" });
+
+const diffDias = (start?: string, end?: string) => {
+  if (!start || !end) return null;
+  const a = new Date(start.replace(" ", "T"));
+  const b = new Date(end.replace(" ", "T"));
+  if (Number.isNaN(a.getTime()) || Number.isNaN(b.getTime())) return null;
+  const ms = b.getTime() - a.getTime();
+  const dias = Math.max(0, Math.round(ms / (1000 * 60 * 60 * 24)));
+  return dias;
+};
 
 export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props) {
   const { toast } = useToast();
   const st = estadoSolicitacaoConfig[s.estado];
   const dest = destinoConfig[s.destino];
   const tipoCfg = tipoConfig[s.tipo];
+  const prio = prioridadeConfig[s.prioridade];
 
   const submetida = s.historico.find(h => h.accao.toLowerCase().includes("submetida"));
+  const aceite = s.historico.find(h => {
+    const a = h.accao.toLowerCase();
+    return a.includes("atribuíd") || a.includes("atribuid") || a.includes("aceit") || a.includes("iniciad");
+  });
   const concluida = s.historico.find(h => {
     const a = h.accao.toLowerCase();
-    return a.includes("concluí") || a.includes("conclui") || a.includes("executada");
+    return a.includes("concluí") || a.includes("conclui") || a.includes("executada") || a.includes("resolvida");
   });
+
+  const dataAceite = aceite?.data ?? s.dataEncaminhamento;
+  const dataFim = s.dataConclusao ?? concluida?.data;
+  const dataInicio = submetida?.data ?? s.dataSubmissao;
+  const diasConclusao = diffDias(dataInicio, dataFim);
+  const diasDecorridos = diffDias(dataInicio, new Date().toISOString());
 
   // Estado → cor semântica do badge no doc
   const estadoTone: Record<string, { bg: string; text: string; border: string; dot: string }> = {
@@ -37,6 +70,7 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
     em_execucao: { bg: "bg-sky-50",     text: "text-sky-800",     border: "border-sky-200",     dot: "bg-sky-500" },
     concluida:   { bg: "bg-emerald-50", text: "text-emerald-800", border: "border-emerald-200", dot: "bg-emerald-500" },
     rejeitada:   { bg: "bg-red-50",     text: "text-red-800",     border: "border-red-200",     dot: "bg-red-500" },
+    em_atraso:   { bg: "bg-orange-50",  text: "text-orange-800",  border: "border-orange-200",  dot: "bg-orange-500" },
   };
   const tone = estadoTone[s.estado] ?? estadoTone.recebida;
 
@@ -112,13 +146,20 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
             <h2 className="text-[22px] font-bold text-foreground leading-tight tracking-tight">
               {tipoCfg?.label ?? s.tipo}
             </h2>
-            <div className="mt-3 inline-flex items-center gap-2">
+            <div className="mt-3 flex items-center gap-2 flex-wrap">
               <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border ${tone.bg} ${tone.text} ${tone.border} text-[10.5px] font-semibold uppercase tracking-wider`}>
                 <span className={`w-1.5 h-1.5 rounded-full ${tone.dot}`} />
                 {st.label}
               </span>
+              <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border text-[10.5px] font-semibold uppercase tracking-wider ${dest.color}`}>
+                Destino: {dest.label}
+              </span>
               <span className="text-[11px] text-muted-foreground">
                 Categoria: <span className="font-semibold text-foreground">{tipoCfg?.categoria ?? "—"}</span>
+              </span>
+              <span className="text-[11px] text-muted-foreground">·</span>
+              <span className="text-[11px] text-muted-foreground">
+                Prioridade: <span className="font-semibold text-foreground">{prio?.label ?? s.prioridade}</span>
               </span>
             </div>
           </div>
@@ -129,8 +170,9 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
               rows={[
                 ["Nome", s.discente],
                 ["Matrícula", s.matricula],
-                ["Curso", "Arquitectura"],
-                ["Faculdade", "Ciências Exatas"],
+                ["Curso", s.curso],
+                ["Faculdade", s.faculdade],
+                ["Ano curricular", `${s.ano}º ano`],
               ]}
             />
           </Section>
@@ -140,41 +182,69 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
             <DocTable
               rows={[
                 ["Referência", s.id],
-                ["Tipo", tipoCfg?.label ?? s.tipo],
+                ["Assunto", s.assunto],
+                ["Tipo de pedido", tipoCfg?.label ?? s.tipo],
                 ["Categoria", tipoCfg?.categoria ?? "—"],
-                ["Destino", dest.label],
-                ["Responsável", s.responsavelDestino ?? `Equipa ${dest.label}`],
+                ["Prioridade", prio?.label ?? s.prioridade],
                 ["Estado actual", st.label],
               ]}
             />
           </Section>
 
+          {/* Section: Encaminhamento & SLA */}
+          <Section title="3. Encaminhamento & SLA">
+            <DocTable
+              rows={[
+                ["Destino", dest.label],
+                ["Responsável atribuído", s.responsavelDestino ?? `Equipa ${dest.label}`],
+                ["Data de submissão", fmtDataHora(dataInicio)],
+                ["Hora de aceitação / atribuição", fmtDataHora(dataAceite)],
+                ["SLA contratado", `${s.slaDias} ${s.slaDias === 1 ? "dia útil" : "dias úteis"}`],
+                [
+                  s.estado === "concluida" || s.estado === "rejeitada" ? "Dias até conclusão" : "Dias decorridos",
+                  s.estado === "concluida" || s.estado === "rejeitada"
+                    ? (diasConclusao !== null ? `${diasConclusao} ${diasConclusao === 1 ? "dia" : "dias"}` : "—")
+                    : (diasDecorridos !== null ? `${diasDecorridos} ${diasDecorridos === 1 ? "dia" : "dias"}` : "—"),
+                ],
+              ]}
+            />
+          </Section>
+
           {/* Section: Descrição */}
-          <Section title="3. Descrição do Pedido">
+          <Section title="4. Descrição do Pedido">
             <div className="rounded border border-border bg-muted/20 px-4 py-3">
               <p className="text-[12.5px] text-foreground leading-[1.7] whitespace-pre-line">
                 {s.descricao}
               </p>
             </div>
+            {s.notaInterna && (
+              <div className="mt-3 rounded border border-amber-200 bg-amber-50/60 px-4 py-3">
+                <p className="text-[10px] uppercase tracking-[0.12em] text-amber-800 font-bold mb-1">Nota interna</p>
+                <p className="text-[12.5px] text-foreground leading-[1.7] whitespace-pre-line">{s.notaInterna}</p>
+              </div>
+            )}
           </Section>
 
           {/* Section: Cronologia */}
-          <Section title="4. Cronologia do Processo">
+          <Section title="5. Cronologia do Processo">
             <div className="overflow-hidden rounded border border-border">
               <table className="w-full text-[11.5px]">
                 <thead>
                   <tr className="bg-primary/5 border-b border-border">
-                    <th className="text-left px-3 py-2 font-semibold text-foreground w-[20%]">Data</th>
-                    <th className="text-left px-3 py-2 font-semibold text-foreground w-[35%]">Acção</th>
-                    <th className="text-left px-3 py-2 font-semibold text-foreground">Responsável</th>
+                    <th className="text-left px-3 py-2 font-semibold text-foreground w-[26%]">Data & Hora</th>
+                    <th className="text-left px-3 py-2 font-semibold text-foreground w-[34%]">Acção</th>
+                    <th className="text-left px-3 py-2 font-semibold text-foreground">Responsável / Nota</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
                   {s.historico.map((h, i) => (
-                    <tr key={i} className="hover:bg-muted/20">
-                      <td className="px-3 py-2 text-foreground/80 tabular-nums whitespace-nowrap">{fmtData(h.data)}</td>
+                    <tr key={i} className={i % 2 === 0 ? "bg-background" : "bg-muted/20"}>
+                      <td className="px-3 py-2 text-foreground/80 tabular-nums whitespace-nowrap">{fmtDataHora(h.data)}</td>
                       <td className="px-3 py-2 text-foreground font-medium">{h.accao}</td>
-                      <td className="px-3 py-2 text-muted-foreground">{h.actor || "—"}</td>
+                      <td className="px-3 py-2 text-muted-foreground">
+                        <div>{h.actor || "—"}</div>
+                        {h.nota && <div className="text-[10.5px] text-muted-foreground/80 italic mt-0.5">{h.nota}</div>}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -184,7 +254,7 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
 
           {/* Section: Anexos */}
           {anexos.length > 0 && (
-            <Section title="5. Documentos Anexados">
+            <Section title="6. Documentos Anexados">
               <div className="overflow-hidden rounded border border-border">
                 <table className="w-full text-[11.5px]">
                   <thead>
@@ -196,7 +266,7 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
                   </thead>
                   <tbody className="divide-y divide-border">
                     {anexos.map((a, i) => (
-                      <tr key={i} className="hover:bg-muted/20">
+                      <tr key={i} className={i % 2 === 0 ? "bg-background" : "bg-muted/20"}>
                         <td className="px-3 py-2 text-muted-foreground tabular-nums">{String(i + 1).padStart(2, "0")}</td>
                         <td className="px-3 py-2 text-foreground font-medium">{a.nome}</td>
                         <td className="px-3 py-2 text-right text-muted-foreground tabular-nums">{a.tamanho}</td>
@@ -209,11 +279,19 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
           )}
 
           {/* Section: Resumo Final */}
-          <Section title={`${anexos.length > 0 ? "6" : "5"}. Resumo do Processo`}>
+          <Section title={`${anexos.length > 0 ? "7" : "6"}. Resumo do Processo`}>
             <DocTable
               rows={[
-                ["Data de submissão", fmtData(submetida?.data ?? s.dataSubmissao)],
-                ["Data de conclusão", s.dataConclusao ? fmtData(s.dataConclusao) : (concluida ? fmtData(concluida.data) : "Pendente")],
+                ["Data de submissão", fmtDataHora(dataInicio)],
+                ["Hora de aceitação", fmtDataHora(dataAceite)],
+                ["Data de conclusão", dataFim ? fmtDataHora(dataFim) : "Pendente"],
+                [
+                  "Tempo total de execução",
+                  s.estado === "concluida" || s.estado === "rejeitada"
+                    ? (diasConclusao !== null ? `${diasConclusao} ${diasConclusao === 1 ? "dia" : "dias"}` : "—")
+                    : (diasDecorridos !== null ? `${diasDecorridos} ${diasDecorridos === 1 ? "dia" : "dias"} (em curso)` : "—"),
+                ],
+                ["Cumprimento de SLA", `${s.slaDias} ${s.slaDias === 1 ? "dia útil" : "dias úteis"} contratados`],
                 ["Estado final", st.label],
                 ["Total de movimentos", String(s.historico.length)],
               ]}
