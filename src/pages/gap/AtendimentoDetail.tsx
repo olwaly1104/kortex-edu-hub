@@ -112,21 +112,15 @@ export default function GapAtendimentoDetail() {
         {/* Title block — compact outlined box (mirrors Solicitação detail) */}
         <div className="px-6 pt-4 pb-4 space-y-3">
           <div className="flex items-start gap-3 rounded-lg border border-border bg-background p-3">
-            {/* Date tile + time */}
-            <div className="shrink-0 flex flex-col items-center gap-1">
-              <div className="w-[60px] rounded-md border border-border overflow-hidden bg-background text-center">
-                <div className="bg-primary/90 py-0.5">
-                  <p className="text-[9px] uppercase tracking-[0.15em] text-primary-foreground font-bold">{monthShort}</p>
-                </div>
-                <div className="py-1">
-                  <p className="text-[24px] leading-none font-bold text-foreground tabular-nums tracking-tight">{dayNum}</p>
-                  <p className="text-[8.5px] uppercase tracking-wider text-muted-foreground font-semibold mt-0.5 capitalize">{weekday.slice(0, 3)}</p>
-                </div>
+            {/* Date tile */}
+            <div className="shrink-0 w-[60px] rounded-md border border-border overflow-hidden bg-background text-center">
+              <div className="bg-primary/90 py-0.5">
+                <p className="text-[9px] uppercase tracking-[0.15em] text-primary-foreground font-bold">{monthShort}</p>
               </div>
-              <span className="inline-flex items-center gap-1 text-[9.5px] font-semibold text-foreground/80 tabular-nums">
-                <Clock className="w-2.5 h-2.5 text-muted-foreground" />
-                {startTime}
-              </span>
+              <div className="py-1">
+                <p className="text-[24px] leading-none font-bold text-foreground tabular-nums tracking-tight">{dayNum}</p>
+                <p className="text-[8.5px] uppercase tracking-wider text-muted-foreground font-semibold mt-0.5 capitalize">{weekday.slice(0, 3)}</p>
+              </div>
             </div>
 
             {/* Title + badges */}
