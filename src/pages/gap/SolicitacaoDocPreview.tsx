@@ -210,7 +210,7 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
 
             {/* 5 · Anexos */}
             {anexos.length > 0 && (
-              <Block title="5. Anexos">
+              <Block title="6. Anexos">
                 <div className="overflow-hidden rounded border border-border">
                   <table className="w-full text-[9.5px]">
                     <tbody className="divide-y divide-border">
