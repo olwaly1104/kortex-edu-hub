@@ -72,10 +72,10 @@ export default function GapConfiguracao() {
       const slaConcl = v.slaDias;
       // Mock: atribuir multa por defeito (5 dias) apenas se conclusão < 5d
       const multaDefault = slaConcl < 5
-        ? (v.categoria === "academico" ? "atraso_relatorio"
-          : v.categoria === "presenca" ? "falta_injustificada"
-          : v.categoria === "administrativo" ? "incumprimento_sla"
-          : "uso_indevido")
+        ? (v.categoria === "Académico" ? "atraso_relatorio"
+          : v.categoria === "Tecnológico" ? "incumprimento_sla"
+          : v.categoria === "Financeiro" ? "uso_indevido"
+          : "atraso_relatorio")
         : "";
       return {
         key, label: v.label, categoria: v.categoria, destino: v.destino,
