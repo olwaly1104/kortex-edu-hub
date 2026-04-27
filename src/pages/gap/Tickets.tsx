@@ -59,7 +59,7 @@ export default function GapTickets() {
   const [categoria, setCategoria] = useState<string>("todas");
   const [mes, setMes] = useState<string>("todos");
   const [filterOpen, setFilterOpen] = useState(false);
-  const [filterView, setFilterView] = useState<"root" | "destino" | "categoria" | "motivo">("root");
+  const [filterView, setFilterView] = useState<"root" | "estado" | "destino" | "categoria" | "motivo">("root");
   const [drillCategoria, setDrillCategoria] = useState<string | null>(null);
 
   // Em Atraso — solicitação activa cujo prazo SLA já foi ultrapassado
@@ -283,14 +283,14 @@ export default function GapTickets() {
                 size="sm"
                 className={cn(
                   "h-9 px-3 text-xs gap-1.5",
-                  (isActive.destino || isActive.categoria || isActive.mes) && "border-primary text-primary"
+                  (isActive.estado || isActive.destino || isActive.categoria || isActive.mes) && "border-primary text-primary"
                 )}
               >
                 <SlidersHorizontal className="w-3.5 h-3.5" />
                 Filtros
-                {(isActive.destino || isActive.categoria || isActive.mes) && (
+                {(isActive.estado || isActive.destino || isActive.categoria || isActive.mes) && (
                   <span className="inline-flex items-center justify-center min-w-[16px] h-[16px] px-1 rounded bg-primary/10 text-primary text-[10px] font-bold tabular-nums">
-                    {[isActive.destino, isActive.categoria, isActive.mes].filter(Boolean).length}
+                    {[isActive.estado, isActive.destino, isActive.categoria, isActive.mes].filter(Boolean).length}
                   </span>
                 )}
               </Button>
@@ -309,14 +309,15 @@ export default function GapTickets() {
                     className="inline-flex items-center gap-1 text-xs font-semibold text-foreground hover:text-primary"
                   >
                     <ChevronLeft className="w-3.5 h-3.5" />
+                    {filterView === "estado" && "Estado"}
                     {filterView === "destino" && "Destinos"}
                     {filterView === "categoria" && "Categorias"}
                     {filterView === "motivo" && (drillCategoria ?? "Motivos")}
                   </button>
                 )}
-                {(isActive.destino || isActive.categoria || isActive.mes) && (
+                {(isActive.estado || isActive.destino || isActive.categoria || isActive.mes) && (
                   <button
-                    onClick={() => { setDestino("todos"); setCategoria("todas"); setMes("todos"); }}
+                    onClick={() => { setEstado("todos"); setDestino("todos"); setCategoria("todas"); setMes("todos"); }}
                     className="text-[10px] text-muted-foreground hover:text-foreground"
                   >
                     Limpar
@@ -328,23 +329,58 @@ export default function GapTickets() {
               {filterView === "root" && (
                 <div className="p-1">
                   <FilterRootRow
+                    icon={<AlertCircle className="w-3.5 h-3.5" />}
+                    label="Estado"
+                    value={estado === "todos" ? null : (
+                      estado === "hoje" ? "Hoje" :
+                      estado === "pendentes" ? "Pendentes" :
+                      estado === "em_execucao" ? "Em Execução" :
+                      estado === "executadas" ? "Executadas" :
+                      estado === "rejeitadas" ? "Rejeitadas" :
+                      estado === "em_atraso" ? "Em Atraso" : null
+                    )}
+                    onClick={() => setFilterView("estado")}
+                  />
+                  <FilterRootRow
                     icon={<Building2 className="w-3.5 h-3.5" />}
-                    label="Todos os destinos"
+                    label="Destino"
                     value={destino === "todos" ? null : destinoConfig[destino as Destino]?.label}
                     onClick={() => setFilterView("destino")}
                   />
                   <FilterRootRow
                     icon={<Layers className="w-3.5 h-3.5" />}
-                    label="Todas as categorias"
+                    label="Categoria"
                     value={categoria === "todas" ? null : categoria}
                     onClick={() => setFilterView("categoria")}
                   />
                   <FilterRootRow
                     icon={<Layers className="w-3.5 h-3.5" />}
-                    label="Todos os motivos"
+                    label="Motivo"
                     value={mes === "todos" ? null : tipoConfig[mes as keyof typeof tipoConfig]?.label}
-                    onClick={() => { setFilterView("categoria"); }}
+                    onClick={() => setFilterView("categoria")}
                   />
+                </div>
+              )}
+
+              {/* Estado list */}
+              {filterView === "estado" && (
+                <div className="p-1 max-h-72 overflow-y-auto">
+                  {([
+                    { v: "todos", label: "Todos" },
+                    { v: "hoje", label: "Hoje" },
+                    { v: "pendentes", label: "Pendentes" },
+                    { v: "em_execucao", label: "Em Execução" },
+                    { v: "executadas", label: "Executadas" },
+                    { v: "rejeitadas", label: "Rejeitadas" },
+                    { v: "em_atraso", label: "Em Atraso" },
+                  ] as const).map(opt => (
+                    <FilterOptionRow
+                      key={opt.v}
+                      label={opt.label}
+                      selected={estado === opt.v}
+                      onClick={() => { setEstado(opt.v); setFilterView("root"); }}
+                    />
+                  ))}
                 </div>
               )}
 
