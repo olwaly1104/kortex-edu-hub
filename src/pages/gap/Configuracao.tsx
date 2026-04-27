@@ -291,7 +291,8 @@ export default function GapConfiguracao() {
                         <Badge variant="outline" className={cn("text-[10px]", destCfg.color)}>{destCfg.label}</Badge>
                       ) : <span className="text-xs text-muted-foreground">{m.destino}</span>}
                     </td>
-                    <td className="p-3 text-center text-xs tabular-nums">{m.slaDias}d</td>
+                    <td className="p-3 text-center text-xs tabular-nums text-amber-700">{m.slaAceitacao}d</td>
+                    <td className="p-3 text-center text-xs tabular-nums text-blue-700">{m.slaConclusao}d</td>
                     <td className="p-3 text-right">
                       <button onClick={() => removeMotivo(m.key)} className="text-muted-foreground hover:text-destructive" aria-label={`Remover ${m.label}`}>
                         <Trash2 className="w-3.5 h-3.5" />
