@@ -198,7 +198,7 @@ export default function GapConfiguracao() {
           <Settings2 className="w-6 h-6 text-primary" /> Configuração
         </h1>
         <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
-          Gere os estados, categorias e motivos disponíveis para as solicitações do GAP.
+          Gere os estados, categorias, motivos e multas disponíveis para as solicitações do GAP.
         </p>
       </div>
 
