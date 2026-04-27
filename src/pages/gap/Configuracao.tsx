@@ -421,7 +421,7 @@ export default function GapConfiguracao() {
                         return mu ? (
                           <span className="inline-flex items-center gap-1.5">
                             <span className="text-foreground">{mu.label}</span>
-                            <span className="text-destructive font-semibold tabular-nums">· {formatKz(mu.valor)}</span>
+                            <span className="text-destructive font-semibold tabular-nums">· {formatMultaDias(mu.diasAposPrazo)}</span>
                           </span>
                         ) : <span className="text-muted-foreground">—</span>;
                       })()}
