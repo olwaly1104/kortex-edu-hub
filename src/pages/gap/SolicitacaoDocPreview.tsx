@@ -247,7 +247,7 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
 
           {/* Section: Anexos */}
           {anexos.length > 0 && (
-            <Section title="5. Documentos Anexados">
+            <Section title="6. Documentos Anexados">
               <div className="overflow-hidden rounded border border-border">
                 <table className="w-full text-[11.5px]">
                   <thead>
@@ -259,7 +259,7 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
                   </thead>
                   <tbody className="divide-y divide-border">
                     {anexos.map((a, i) => (
-                      <tr key={i} className="hover:bg-muted/20">
+                      <tr key={i} className={i % 2 === 0 ? "bg-background" : "bg-muted/20"}>
                         <td className="px-3 py-2 text-muted-foreground tabular-nums">{String(i + 1).padStart(2, "0")}</td>
                         <td className="px-3 py-2 text-foreground font-medium">{a.nome}</td>
                         <td className="px-3 py-2 text-right text-muted-foreground tabular-nums">{a.tamanho}</td>
@@ -272,11 +272,19 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
           )}
 
           {/* Section: Resumo Final */}
-          <Section title={`${anexos.length > 0 ? "6" : "5"}. Resumo do Processo`}>
+          <Section title={`${anexos.length > 0 ? "7" : "6"}. Resumo do Processo`}>
             <DocTable
               rows={[
-                ["Data de submissão", fmtData(submetida?.data ?? s.dataSubmissao)],
-                ["Data de conclusão", s.dataConclusao ? fmtData(s.dataConclusao) : (concluida ? fmtData(concluida.data) : "Pendente")],
+                ["Data de submissão", fmtDataHora(dataInicio)],
+                ["Hora de aceitação", fmtDataHora(dataAceite)],
+                ["Data de conclusão", dataFim ? fmtDataHora(dataFim) : "Pendente"],
+                [
+                  "Tempo total de execução",
+                  s.estado === "concluida" || s.estado === "rejeitada"
+                    ? (diasConclusao !== null ? `${diasConclusao} ${diasConclusao === 1 ? "dia" : "dias"}` : "—")
+                    : (diasDecorridos !== null ? `${diasDecorridos} ${diasDecorridos === 1 ? "dia" : "dias"} (em curso)` : "—"),
+                ],
+                ["Cumprimento de SLA", `${s.slaDias} ${s.slaDias === 1 ? "dia útil" : "dias úteis"} contratados`],
                 ["Estado final", st.label],
                 ["Total de movimentos", String(s.historico.length)],
               ]}
