@@ -243,20 +243,15 @@ function Section({ number, title, children }: { number: string; title: string; c
   );
 }
 
-function Group({ label, rows }: { label: string; rows: [string, string][] }) {
+function GroupCell({ rows, bordered }: { rows: [string, string][]; bordered?: boolean }) {
   return (
-    <div>
-      <p className="text-[7.5px] uppercase tracking-[0.22em] text-foreground/55 font-semibold pb-1 mb-1 border-b border-foreground/15">
-        {label}
-      </p>
-      <dl className="space-y-0.5">
-        {rows.map(([k, v], i) => (
-          <div key={i} className="flex items-baseline gap-2 text-[10px]">
-            <dt className="text-foreground/60 w-[78px] shrink-0">{k}</dt>
-            <dd className="font-semibold truncate flex-1">{v}</dd>
-          </div>
-        ))}
-      </dl>
-    </div>
+    <dl className={`px-3 py-2 space-y-1 ${bordered ? "border-r border-foreground/15" : ""}`}>
+      {rows.map(([k, v], i) => (
+        <div key={i} className="flex items-baseline gap-2 text-[10px]">
+          <dt className="text-foreground/60 w-[78px] shrink-0">{k}</dt>
+          <dd className="font-semibold truncate flex-1">{v}</dd>
+        </div>
+      ))}
+    </dl>
   );
 }
