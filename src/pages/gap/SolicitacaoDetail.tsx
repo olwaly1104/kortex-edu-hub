@@ -353,11 +353,11 @@ export default function GapSolicitacaoDetail() {
 
           {/* RIGHT — detalhes + descrição + doc + histórico */}
           <main className="p-6 space-y-6 min-w-0">
-            {/* Detalhes do Pedido */}
+            {/* Resumo */}
             <section>
               <div className="flex items-center gap-2 mb-3">
                 <FileText className="w-3.5 h-3.5 text-muted-foreground" />
-                <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Detalhes do Pedido</h3>
+                <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Resumo</h3>
               </div>
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-5 gap-y-4">
                 <FactItem label="Submetido" value={fmt(dSub)} />
@@ -369,57 +369,111 @@ export default function GapSolicitacaoDetail() {
 
             <div className="border-t border-border" />
 
-            {/* Pedido — descrição + documento institucional integrados */}
+            {/* Detalhes do Pedido — descrição + anexos do estudante */}
             <section>
               <div className="flex items-center gap-2 mb-2.5">
                 <FileText className="w-3.5 h-3.5 text-muted-foreground" />
-                <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Pedido</h3>
+                <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Detalhes do Pedido</h3>
+              </div>
+              <div className="rounded-lg border border-border bg-background overflow-hidden">
+                {/* Descrição */}
+                <div className="px-4 py-3.5 bg-muted/15">
+                  <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold mb-1.5">Descrição submetida</p>
+                  <p className="text-sm text-foreground/85 leading-relaxed">{selected.descricao}</p>
+                </div>
+
+                {anexos.length > 0 && (
+                  <>
+                    <div className="border-t border-border" />
+                    <div className="px-4 py-3">
+                      <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold mb-2.5 inline-flex items-center gap-1.5">
+                        <Paperclip className="w-3 h-3" /> Documentos anexados
+                        <span className="text-muted-foreground/70 tabular-nums normal-case tracking-normal font-medium">({anexos.length})</span>
+                      </p>
+                      <div className="space-y-2">
+                        {anexos.map((a, i) => {
+                          const { Icon, cls } = anexoIcon(a.tipo);
+                          return (
+                            <div
+                              key={i}
+                              className="flex items-center gap-3 rounded-md border border-border bg-background px-3 py-2"
+                            >
+                              <div className={cn("w-9 h-9 rounded-md border flex items-center justify-center shrink-0", cls)}>
+                                <Icon className="w-4 h-4" />
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <p className="text-[13px] font-semibold text-foreground leading-tight truncate">{a.nome}</p>
+                                <p className="text-[11px] text-muted-foreground mt-0.5 tabular-nums">{a.tamanho}</p>
+                              </div>
+                              <div className="flex items-center gap-1.5 shrink-0">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="h-7 px-2.5 text-[11px] gap-1"
+                                  onClick={() => toast({ title: "A abrir anexo", description: a.nome })}
+                                >
+                                  <Eye className="w-3 h-3" /> Ver
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="h-7 px-2.5 text-[11px] gap-1"
+                                  onClick={() => toast({ title: "Anexo descarregado", description: a.nome })}
+                                >
+                                  <Download className="w-3 h-3" /> Descarregar
+                                </Button>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            </section>
+
+            <div className="border-t border-border" />
+
+            {/* Documento Institucional gerado */}
+            <section>
+              <div className="flex items-center gap-2 mb-2.5">
+                <FileText className="w-3.5 h-3.5 text-muted-foreground" />
+                <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Documento Institucional</h3>
               </div>
               <Dialog>
-                <div className="rounded-lg border border-border bg-background overflow-hidden">
-                  {/* Descrição */}
-                  <div className="px-4 py-3.5 bg-muted/15">
-                    <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold mb-1.5">Descrição submetida</p>
-                    <p className="text-sm text-foreground/85 leading-relaxed">{selected.descricao}</p>
+                <div className="flex items-center gap-3 px-4 py-3 rounded-lg border border-border bg-background">
+                  <div className="w-9 h-9 rounded-md bg-red-50 border border-red-200 flex items-center justify-center shrink-0">
+                    <FileText className="w-4 h-4 text-red-600" />
                   </div>
-
-                  {/* Divider */}
-                  <div className="border-t border-border" />
-
-                  {/* Documento gerado */}
-                  <div className="flex items-center gap-3 px-4 py-3">
-                    <div className="w-9 h-9 rounded-md bg-red-50 border border-red-200 flex items-center justify-center shrink-0">
-                      <FileText className="w-4 h-4 text-red-600" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-[13px] font-semibold text-foreground leading-tight truncate">
-                        Pedido-{selected.id}
-                      </p>
-                      <p className="text-[11px] text-muted-foreground mt-0.5 inline-flex items-center gap-1.5">
-                        <span>Documento institucional gerado</span>
-                        <span className="text-muted-foreground/40">·</span>
-                        <DialogTrigger asChild>
-                          <button type="button" className="inline-flex items-center gap-1 text-primary hover:underline font-medium">
-                            <Users className="w-3 h-3" /> 4 partilhas
-                          </button>
-                        </DialogTrigger>
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-1.5 shrink-0">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[13px] font-semibold text-foreground leading-tight truncate">
+                      Pedido-{selected.id}
+                    </p>
+                    <p className="text-[11px] text-muted-foreground mt-0.5 inline-flex items-center gap-1.5">
+                      <span>Gerado automaticamente pelo sistema</span>
+                      <span className="text-muted-foreground/40">·</span>
                       <DialogTrigger asChild>
-                        <Button variant="outline" size="sm" className="h-7 px-2.5 text-[11px] gap-1">
-                          <Eye className="w-3 h-3" /> Ver
-                        </Button>
+                        <button type="button" className="inline-flex items-center gap-1 text-primary hover:underline font-medium">
+                          <Users className="w-3 h-3" /> 4 partilhas
+                        </button>
                       </DialogTrigger>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="h-7 px-2.5 text-[11px] gap-1"
-                        onClick={() => toast({ title: "Documento exportado", description: `Pedido-${selected.id}` })}
-                      >
-                        <Download className="w-3 h-3" /> Exportar
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <DialogTrigger asChild>
+                      <Button variant="outline" size="sm" className="h-7 px-2.5 text-[11px] gap-1">
+                        <Eye className="w-3 h-3" /> Ver
                       </Button>
-                    </div>
+                    </DialogTrigger>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-7 px-2.5 text-[11px] gap-1"
+                      onClick={() => toast({ title: "Documento exportado", description: `Pedido-${selected.id}` })}
+                    >
+                      <Download className="w-3 h-3" /> Exportar
+                    </Button>
                   </div>
                 </div>
 
