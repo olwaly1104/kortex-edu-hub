@@ -246,43 +246,37 @@ export default function GapSolicitacaoDetail() {
 
           {/* Documento Institucional gerado — abaixo do título, em destaque */}
           <Dialog>
-            <div className="flex items-center gap-3 px-3.5 py-2.5 rounded-lg border border-border bg-muted/25">
-              <div className="w-9 h-9 rounded-md bg-red-50 border border-red-200 flex items-center justify-center shrink-0">
-                <FileText className="w-4 h-4 text-red-600" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-1.5">
-                  <p className="text-[13px] font-semibold text-foreground leading-tight truncate">
-                    Pedido-{selected.id}
-                  </p>
-                  <Badge variant="outline" className="text-[9px] font-semibold px-1.5 py-0 h-4 uppercase tracking-wider bg-background">
-                    Documento Institucional
-                  </Badge>
+            <div className="flex justify-end">
+              <div className="inline-flex items-center gap-2 pl-2 pr-1.5 py-1 rounded-md border border-border bg-muted/30">
+                <div className="w-6 h-6 rounded bg-red-50 border border-red-200 flex items-center justify-center shrink-0">
+                  <FileText className="w-3 h-3 text-red-600" />
                 </div>
-                <p className="text-[11px] text-muted-foreground mt-0.5 inline-flex items-center gap-1.5">
-                  <span>Gerado automaticamente</span>
-                  <span className="text-muted-foreground/40">·</span>
+                <div className="flex items-baseline gap-1.5 min-w-0">
+                  <span className="text-[12px] font-semibold text-foreground truncate max-w-[180px]">
+                    Pedido-{selected.id}
+                  </span>
+                  <span className="text-[10px] text-muted-foreground shrink-0">· auto</span>
                   <DialogTrigger asChild>
-                    <button type="button" className="inline-flex items-center gap-1 text-primary hover:underline font-medium">
-                      <Users className="w-3 h-3" /> 4 partilhas
+                    <button type="button" className="text-[10px] text-primary hover:underline font-medium inline-flex items-center gap-0.5 shrink-0">
+                      <Users className="w-2.5 h-2.5" /> 4
                     </button>
                   </DialogTrigger>
-                </p>
-              </div>
-              <div className="flex items-center gap-1.5 shrink-0">
-                <DialogTrigger asChild>
-                  <Button variant="outline" size="sm" className="h-7 px-2.5 text-[11px] gap-1 bg-background">
-                    <Eye className="w-3 h-3" /> Ver
-                  </Button>
-                </DialogTrigger>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-7 px-2.5 text-[11px] gap-1 bg-background"
-                  onClick={() => toast({ title: "Documento exportado", description: `Pedido-${selected.id}` })}
-                >
-                  <Download className="w-3 h-3" /> Exportar
-                </Button>
+                </div>
+                <div className="flex items-center gap-0.5 shrink-0 ml-1">
+                  <DialogTrigger asChild>
+                    <button type="button" className="w-6 h-6 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-background hover:text-foreground transition-colors" title="Ver">
+                      <Eye className="w-3.5 h-3.5" />
+                    </button>
+                  </DialogTrigger>
+                  <button
+                    type="button"
+                    onClick={() => toast({ title: "Documento exportado", description: `Pedido-${selected.id}` })}
+                    className="w-6 h-6 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-background hover:text-foreground transition-colors"
+                    title="Exportar"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                  </button>
+                </div>
               </div>
             </div>
 
