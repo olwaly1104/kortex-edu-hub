@@ -359,6 +359,7 @@ export default function GapConfiguracao() {
                         <Badge variant="outline" className={cn("text-[10px]", destCfg.color)}>{destCfg.label}</Badge>
                       ) : <span className="text-xs text-muted-foreground">{m.destino}</span>}
                     </td>
+                    <td className="p-3 text-xs text-foreground whitespace-nowrap">{m.responsavel}</td>
                     <td className="p-3 text-center text-xs tabular-nums text-amber-700">{m.slaAceitacao}d</td>
                     <td className="p-3 text-center text-xs tabular-nums text-blue-700">{m.slaConclusao}d</td>
                     <td className="p-3 text-right">
