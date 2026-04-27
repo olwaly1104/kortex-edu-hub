@@ -242,9 +242,17 @@ export default function GapConfiguracao() {
                     </Select>
                   </div>
                 </div>
-                <div>
-                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">SLA (dias)</label>
-                  <Input type="number" min={1} value={newMotSla} onChange={e => setNewMotSla(Number(e.target.value) || 1)} />
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Limite p/ aceitar (dias)</label>
+                    <Input type="number" min={1} value={newMotSlaAceit} onChange={e => setNewMotSlaAceit(Number(e.target.value) || 1)} />
+                    <p className="text-[10px] text-muted-foreground mt-1">Pendente → Em Execução</p>
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Limite p/ concluir (dias)</label>
+                    <Input type="number" min={1} value={newMotSlaConcl} onChange={e => setNewMotSlaConcl(Number(e.target.value) || 1)} />
+                    <p className="text-[10px] text-muted-foreground mt-1">Em Execução → Concluída</p>
+                  </div>
                 </div>
               </div>
               <DialogFooter className="gap-2 sm:gap-2">
