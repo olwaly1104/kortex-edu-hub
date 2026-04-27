@@ -185,7 +185,7 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
             </Block>
 
             {/* 4 · Cronologia */}
-            <Block title="4. Cronologia">
+            <Block title="5. Cronologia">
               <div className="overflow-hidden rounded border border-border">
                 <table className="w-full text-[9.5px]">
                   <thead>
