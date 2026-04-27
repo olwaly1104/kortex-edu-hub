@@ -134,22 +134,11 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
           <div className="flex-1 px-8 pb-3 space-y-4 overflow-hidden">
             {/* 1 · Identificação (Solicitação · Categoria · Motivo) */}
             <Block title="1. Identificação">
-              <div className="rounded border border-border overflow-hidden">
-                <div className="grid grid-cols-3 divide-x divide-border bg-primary/5">
-                  <div className="px-3 py-1.5">
-                    <p className="text-[8px] uppercase tracking-wider text-primary font-bold">Solicitação</p>
-                    <p className="text-[10.5px] font-mono font-semibold text-foreground mt-0.5">{s.id}</p>
-                  </div>
-                  <div className="px-3 py-1.5">
-                    <p className="text-[8px] uppercase tracking-wider text-primary font-bold">Categoria</p>
-                    <p className="text-[10.5px] font-semibold text-foreground mt-0.5 truncate">{tipoCfg?.categoria ?? "—"}</p>
-                  </div>
-                  <div className="px-3 py-1.5">
-                    <p className="text-[8px] uppercase tracking-wider text-primary font-bold">Motivo</p>
-                    <p className="text-[10.5px] font-semibold text-foreground mt-0.5 truncate">{s.assunto}</p>
-                  </div>
-                </div>
-              </div>
+              <KV rows={[
+                ["Solicitação", s.id],
+                ["Categoria", tipoCfg?.categoria ?? "—"],
+                ["Motivo", s.assunto],
+              ]} />
             </Block>
 
             {/* 2 · Discente | 3 · Encaminhamento */}
