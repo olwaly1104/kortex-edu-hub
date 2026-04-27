@@ -788,7 +788,7 @@ const destinoToCategoria: Record<Destino, TicketCategoria> = {
 };
 const estadoToTicket: Record<EstadoSolicitacao, GapTicket["estado"]> = {
   recebida: "aberto", em_execucao: "em_andamento",
-  concluida: "resolvido", rejeitada: "resolvido",
+  concluida: "resolvido", rejeitada: "resolvido", em_atraso: "em_andamento",
 };
 export const gapTickets: GapTicket[] = solicitacoes.map(s => ({
   id: s.id, discente: s.discente, matricula: s.matricula, curso: s.curso, ano: s.ano,
