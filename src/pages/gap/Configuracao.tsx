@@ -160,6 +160,7 @@ export default function GapConfiguracao() {
   const [editEstado, setEditEstado] = useState<EstadoItem | null>(null);
   const [editCategoria, setEditCategoria] = useState<CategoriaItem | null>(null);
   const [editMotivo, setEditMotivo] = useState<MotivoItem | null>(null);
+  const [editMulta, setEditMulta] = useState<MultaItem | null>(null);
 
   const saveEditEstado = () => {
     if (!editEstado || !editEstado.label.trim()) return;
