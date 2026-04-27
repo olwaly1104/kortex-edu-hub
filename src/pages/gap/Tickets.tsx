@@ -97,10 +97,7 @@ export default function GapTickets() {
         const cfg = tipoConfig[s.tipo];
         if (!cfg || cfg.categoria !== categoria) return false;
       }
-      if (mes !== "todos") {
-        const m = new Date(s.dataSubmissao).getMonth();
-        if (m !== parseInt(mes)) return false;
-      }
+      if (mes !== "todos" && s.tipo !== mes) return false;
       if (search) {
         const q = search.toLowerCase();
         const tipoLabel = tipoConfig[s.tipo]?.label.toLowerCase() ?? "";
@@ -280,13 +277,15 @@ export default function GapTickets() {
           </Select>
 
           <Select value={mes} onValueChange={setMes}>
-            <SelectTrigger className={cn("w-[140px] h-9 text-xs", isActive.mes && "border-primary text-primary")}>
-              <CalendarIcon className="w-3 h-3 mr-1.5 shrink-0" />
+            <SelectTrigger className={cn("w-[170px] h-9 text-xs", isActive.mes && "border-primary text-primary")}>
+              <Layers className="w-3 h-3 mr-1.5 shrink-0" />
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="todos">Todos os meses</SelectItem>
-              {MESES.map((m, i) => <SelectItem key={m} value={String(i)}>{m}</SelectItem>)}
+              <SelectItem value="todos">Todos os motivos</SelectItem>
+              {Object.keys(tipoConfig).map(t => (
+                <SelectItem key={t} value={t}>{tipoConfig[t as keyof typeof tipoConfig].label}</SelectItem>
+              ))}
             </SelectContent>
           </Select>
 
