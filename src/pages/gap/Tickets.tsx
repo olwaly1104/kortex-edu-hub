@@ -27,9 +27,9 @@ const MESES = [
 
 // Categorias de relatórios do Histórico do GAP — geridos via ReportsMenuButton
 const gapReportCategories = [
-  { id: "solicitacoes", label: "Pipeline de Solicitações", description: "Recebidas, encaminhadas, executadas e rejeitadas no mês.", icon: <BarChart3 className="w-4 h-4" />, type: "discentes" as const, prefix: "Histórico do GAP — Pipeline de Solicitações" },
-  { id: "sla",          label: "Cumprimento de SLA",       description: "Prazos cumpridos, em risco e ultrapassados por departamento.", icon: <TrendingUp className="w-4 h-4" />, type: "discentes" as const, prefix: "Histórico do GAP — Cumprimento de SLA" },
-  { id: "geral",        label: "Relatório Geral do GAP",   description: "Visão consolidada da actividade do gabinete no mês.", icon: <BookOpen className="w-4 h-4" />, type: "discentes" as const, prefix: "Histórico do GAP — Relatório Geral" },
+  { id: "solicitacoes", label: "Pipeline de Solicitações", description: "Recebidas, encaminhadas, executadas e rejeitadas no mês.", icon: <BarChart3 className="w-4 h-4" />, type: "estudantes" as const, prefix: "Histórico do GAP — Pipeline de Solicitações" },
+  { id: "sla",          label: "Cumprimento de SLA",       description: "Prazos cumpridos, em risco e ultrapassados por departamento.", icon: <TrendingUp className="w-4 h-4" />, type: "estudantes" as const, prefix: "Histórico do GAP — Cumprimento de SLA" },
+  { id: "geral",        label: "Relatório Geral do GAP",   description: "Visão consolidada da actividade do gabinete no mês.", icon: <BookOpen className="w-4 h-4" />, type: "estudantes" as const, prefix: "Histórico do GAP — Relatório Geral" },
 ];
 
 // Dataset sintético para alimentar o ReportsDialog (uma linha por discente seguido)
