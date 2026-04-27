@@ -90,9 +90,39 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
 
           {/* ── Body ──────────────────────────────────────────── */}
           <div className="flex-1 px-10 pb-4 space-y-4 overflow-hidden">
-            {/* 1 · Detalhes do Pedido */}
-            <Section number="1" title="Detalhes do Pedido">
-              <div className="grid grid-cols-2 gap-0 border border-border rounded overflow-hidden">
+            {/* 1 · Motivo (title) + Descrição (body) */}
+            <Section number="1" title="Motivo do Pedido">
+              <div className="border border-border rounded overflow-hidden">
+                <div className="px-4 py-2.5 bg-primary/[0.06] border-b border-border">
+                  <p className="text-[8px] uppercase tracking-[0.18em] text-primary font-bold">Motivo</p>
+                  <h4 className="text-[13px] font-bold text-foreground leading-snug tracking-tight mt-0.5">
+                    {s.assunto}
+                  </h4>
+                </div>
+                <div className="px-4 py-2.5 bg-background">
+                  <p className="text-[8px] uppercase tracking-[0.18em] text-muted-foreground font-bold mb-1">
+                    Descrição
+                  </p>
+                  <p className="text-[10px] text-foreground leading-relaxed whitespace-pre-line line-clamp-5">
+                    {s.descricao}
+                  </p>
+                </div>
+                {s.notaInterna && (
+                  <div className="px-4 py-2 bg-amber-50/60 border-t border-amber-200">
+                    <p className="text-[8px] uppercase tracking-[0.18em] text-amber-800 font-bold mb-0.5">
+                      Nota Interna
+                    </p>
+                    <p className="text-[10px] text-foreground leading-snug whitespace-pre-line line-clamp-2">
+                      {s.notaInterna}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </Section>
+
+            {/* 2 · Detalhes do Pedido — Discente | Pedido | Encaminhamento */}
+            <Section number="2" title="Detalhes do Pedido">
+              <div className="grid grid-cols-3 gap-0 border border-border rounded overflow-hidden">
                 <div className="border-r border-border">
                   <SubHeader label="Discente" />
                   <KVList rows={[
@@ -100,8 +130,15 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
                     ["Matrícula", s.matricula],
                     ["Curso", s.curso],
                     ["Ano", `${s.ano}º`],
-                    ["Estado", st.label],
+                  ]} />
+                </div>
+                <div className="border-r border-border">
+                  <SubHeader label="Pedido" />
+                  <KVList rows={[
+                    ["Referência", s.id],
                     ["Categoria", tipoCfg?.categoria ?? "—"],
+                    ["Estado", st.label],
+                    ["Submetido", fmtDataHora(s.dataSubmissao)],
                   ]} />
                 </div>
                 <div>
@@ -109,48 +146,10 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
                   <KVList rows={[
                     ["Destino", dest.label],
                     ["Responsável", s.responsavelDestino ?? `Equipa ${dest.label}`],
-                    ["Submetido", fmtDataHora(s.dataSubmissao)],
                     ["Encaminhado", fmtDataHora(s.dataEncaminhamento)],
                     ["Conclusão", fmtDataHora(s.dataConclusao)],
-                    ["Prazo", fmtDataHora((s as any).prazo)],
                   ]} />
                 </div>
-              </div>
-            </Section>
-
-            {/* 2 · Motivo & Descrição */}
-            <Section number="2" title="Motivo & Descrição">
-              <div className="border border-border rounded overflow-hidden divide-y divide-border">
-                <div className="grid grid-cols-[110px_1fr]">
-                  <div className="px-3 py-2 bg-primary/[0.06] border-r border-border flex items-center">
-                    <p className="text-[8.5px] uppercase tracking-wider text-primary font-bold">Motivo</p>
-                  </div>
-                  <div className="px-3 py-2 bg-background">
-                    <p className="text-[10.5px] text-foreground font-semibold leading-snug">{s.assunto}</p>
-                  </div>
-                </div>
-                <div className="grid grid-cols-[110px_1fr]">
-                  <div className="px-3 py-2 bg-primary/[0.06] border-r border-border flex items-start">
-                    <p className="text-[8.5px] uppercase tracking-wider text-primary font-bold">Descrição</p>
-                  </div>
-                  <div className="px-3 py-2 bg-background">
-                    <p className="text-[10px] text-foreground leading-relaxed whitespace-pre-line line-clamp-5">
-                      {s.descricao}
-                    </p>
-                  </div>
-                </div>
-                {s.notaInterna && (
-                  <div className="grid grid-cols-[110px_1fr]">
-                    <div className="px-3 py-2 bg-amber-50 border-r border-amber-200 flex items-start">
-                      <p className="text-[8.5px] uppercase tracking-wider text-amber-800 font-bold">Nota Interna</p>
-                    </div>
-                    <div className="px-3 py-2 bg-amber-50/40">
-                      <p className="text-[10px] text-foreground leading-snug whitespace-pre-line line-clamp-2">
-                        {s.notaInterna}
-                      </p>
-                    </div>
-                  </div>
-                )}
               </div>
             </Section>
 
