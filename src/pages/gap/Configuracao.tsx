@@ -466,8 +466,9 @@ export default function GapConfiguracao() {
                   <Input value={newMultaLabel} onChange={e => setNewMultaLabel(e.target.value)} placeholder="Ex: Atraso na entrega de relatório" />
                 </div>
                 <div>
-                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Valor (Kz)</label>
-                  <Input type="number" min={0} step={500} value={newMultaValor} onChange={e => setNewMultaValor(Number(e.target.value) || 0)} />
+                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Aplicar após (dias do prazo de conclusão)</label>
+                  <Input type="number" min={1} step={1} value={newMultaDias} onChange={e => setNewMultaDias(Math.max(1, Number(e.target.value) || 1))} />
+                  <p className="text-[10px] text-muted-foreground mt-1">Deve ser superior ao limite de conclusão do motivo associado</p>
                 </div>
                 <div>
                   <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Descrição</label>
