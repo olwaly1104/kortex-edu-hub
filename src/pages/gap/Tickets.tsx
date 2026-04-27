@@ -58,6 +58,9 @@ export default function GapTickets() {
   const [destino, setDestino] = useState<Destino | "todos">("todos");
   const [categoria, setCategoria] = useState<string>("todas");
   const [mes, setMes] = useState<string>("todos");
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [filterView, setFilterView] = useState<"root" | "destino" | "categoria" | "motivo">("root");
+  const [drillCategoria, setDrillCategoria] = useState<string | null>(null);
 
   // Em Atraso — solicitação activa cujo prazo SLA já foi ultrapassado
   const todayDate = useMemo(() => { const d = new Date(TODAY); d.setHours(0, 0, 0, 0); return d; }, []);
