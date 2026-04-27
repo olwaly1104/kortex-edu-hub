@@ -13,6 +13,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { gapAtendimentos, ticketCategoriaConfig as categoriaConfig } from "@/data/gapData";
+import AtendimentoDocPreview from "./AtendimentoDocPreview";
 
 const estadoConfig: Record<string, { label: string; pill: string; dot: string }> = {
   agendado:  { label: "Agendado",  pill: "bg-blue-100 text-blue-800",       dot: "bg-blue-500" },
