@@ -4,7 +4,7 @@ import {
   LayoutDashboard, BookOpen, Calendar, CalendarDays, Megaphone, Users, MessageSquare,
   Mail, Award, User, LogOut, GraduationCap,
   BarChart3, ChevronLeft, ChevronRight, Library, Wallet, Trophy, ClipboardList,
-  CheckSquare, Building2, UserCog, Eye, Layers, FileText, FolderOpen, TrendingUp, HelpCircle,
+  CheckSquare, Building2, UserCog, Eye, Layers, FileText, FolderOpen, TrendingUp, HelpCircle, Settings2,
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -192,6 +192,7 @@ const gapSections: NavSection[] = [
     { label: "Solicitações", icon: HelpCircle, path: "/gap/solicitacoes" },
     { label: "Agendamentos", icon: CalendarDays, path: "/gap/agendamentos" },
     { label: "Discentes", icon: Users, path: "/gap/estudantes" },
+    { label: "Configuração", icon: Settings2, path: "/gap/configuracao" },
   ]},
   { title: "Comunicação", items: [
     { label: "Chat", icon: MessageSquare, path: "/gap/chat" },
