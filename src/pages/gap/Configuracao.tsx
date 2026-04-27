@@ -22,7 +22,7 @@ import { useToast } from "@/hooks/use-toast";
 
 type EstadoItem = { key: string; label: string; color: string };
 type CategoriaItem = { key: string; label: string; color: string };
-type MotivoItem = { key: string; label: string; categoria: string; destino: string; slaDias: number };
+type MotivoItem = { key: string; label: string; categoria: string; destino: string; slaAceitacao: number; slaConclusao: number };
 
 export default function GapConfiguracao() {
   const { toast } = useToast();
