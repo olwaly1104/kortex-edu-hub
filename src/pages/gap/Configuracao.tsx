@@ -23,6 +23,15 @@ import { useToast } from "@/hooks/use-toast";
 type EstadoItem = { key: string; label: string; color: string };
 type CategoriaItem = { key: string; label: string; color: string };
 type MotivoItem = { key: string; label: string; categoria: string; destino: string; responsavel: string; slaAceitacao: number; slaConclusao: number };
+type MultaItem = { key: string; label: string; valor: number; descricao: string };
+
+const INITIAL_MULTAS: MultaItem[] = [
+  { key: "atraso_relatorio", label: "Atraso na entrega de relatório", valor: 15000, descricao: "Aplicada quando o relatório obrigatório é entregue após o prazo." },
+  { key: "falta_injustificada", label: "Falta injustificada a sessão", valor: 10000, descricao: "Ausência sem justificação em sessão obrigatória." },
+  { key: "atraso_aula", label: "Atraso superior a 15min na aula", valor: 5000, descricao: "Atrasos repetidos no início das aulas." },
+  { key: "incumprimento_sla", label: "Incumprimento de SLA de solicitação", valor: 8000, descricao: "Solicitação não tratada dentro do prazo definido." },
+  { key: "uso_indevido", label: "Uso indevido de recursos institucionais", valor: 25000, descricao: "Utilização de equipamento ou espaço fora do âmbito autorizado." },
+];
 
 const STAFF_OPTIONS = [
   "Dra. Helena Cabral · GAP",
