@@ -13,6 +13,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { gapAtendimentos, ticketCategoriaConfig as categoriaConfig } from "@/data/gapData";
+import AtendimentoDocPreview from "./AtendimentoDocPreview";
 
 const estadoConfig: Record<string, { label: string; pill: string; dot: string }> = {
   agendado:  { label: "Agendado",  pill: "bg-blue-100 text-blue-800",       dot: "bg-blue-500" },
@@ -142,48 +143,53 @@ export default function GapAtendimentoDetail() {
 
             {/* Right — Doc pill */}
             <div className="shrink-0 flex flex-col items-end gap-1.5">
-              <Dialog>
-                <div className="inline-flex items-center gap-2 pl-1.5 pr-1 py-1 rounded-md border border-border bg-background shadow-sm">
-                  <div className="w-6 h-6 rounded bg-red-50 border border-red-200 flex items-center justify-center shrink-0">
-                    <FileText className="w-3 h-3 text-red-600" />
-                  </div>
-                  <div className="flex flex-col min-w-0 leading-tight">
-                    <span className="text-[11px] font-semibold text-foreground tabular-nums">Resumo-{atendimento.id}</span>
-                    <span className="text-[9px] tracking-[0.02em] text-muted-foreground font-medium">
-                      Gerado automaticamente
-                    </span>
-                  </div>
-                  <span className="self-stretch w-px bg-border mx-0.5" />
+              <div className="inline-flex items-center gap-2 pl-1.5 pr-1 py-1 rounded-md border border-border bg-background shadow-sm">
+                <div className="w-6 h-6 rounded bg-red-50 border border-red-200 flex items-center justify-center shrink-0">
+                  <FileText className="w-3 h-3 text-red-600" />
+                </div>
+                <div className="flex flex-col min-w-0 leading-tight">
+                  <span className="text-[11px] font-semibold text-foreground tabular-nums">Resumo-{atendimento.id}</span>
+                  <span className="text-[9px] tracking-[0.02em] text-muted-foreground font-medium">
+                    Gerado automaticamente
+                  </span>
+                </div>
+                <span className="self-stretch w-px bg-border mx-0.5" />
+                <Dialog>
                   <DialogTrigger asChild>
                     <button type="button" className="inline-flex items-center gap-1 px-1 h-5 rounded text-[10px] text-primary hover:bg-muted font-medium transition-colors" title="Partilhas">
                       <Users className="w-3 h-3" /> 4
                     </button>
                   </DialogTrigger>
+                  <DialogContent className="max-w-md">
+                    <DialogHeader>
+                      <DialogTitle className="text-base flex items-center gap-2">
+                        <Share2 className="w-4 h-4 text-primary" /> Partilhado com 4 pessoas
+                      </DialogTitle>
+                      <DialogDescription className="text-[12px]">
+                        Pessoas com acesso ao documento <span className="font-medium text-foreground">Resumo-{atendimento.id}</span>.
+                      </DialogDescription>
+                    </DialogHeader>
+                  </DialogContent>
+                </Dialog>
+                <Dialog>
                   <DialogTrigger asChild>
-                    <button type="button" className="w-5 h-5 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors" title="Ver">
+                    <button type="button" className="w-5 h-5 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors" title="Ver documento">
                       <Eye className="w-3 h-3" />
                     </button>
                   </DialogTrigger>
-                  <button
-                    type="button"
-                    onClick={() => handleAction("Relatório exportado")}
-                    className="w-5 h-5 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-                    title="Exportar"
-                  >
-                    <Download className="w-3 h-3" />
-                  </button>
-                </div>
-                <DialogContent className="max-w-md">
-                  <DialogHeader>
-                    <DialogTitle className="text-base flex items-center gap-2">
-                      <Share2 className="w-4 h-4 text-primary" /> Partilhado com 4 pessoas
-                    </DialogTitle>
-                    <DialogDescription className="text-[12px]">
-                      Pessoas com acesso ao documento <span className="font-medium text-foreground">Resumo-{atendimento.id}</span>.
-                    </DialogDescription>
-                  </DialogHeader>
-                </DialogContent>
-              </Dialog>
+                  <DialogContent className="max-w-5xl w-[95vw] h-[92vh] p-0 gap-0 overflow-hidden">
+                    <AtendimentoDocPreview atendimento={atendimento} />
+                  </DialogContent>
+                </Dialog>
+                <button
+                  type="button"
+                  onClick={() => handleAction("Relatório exportado")}
+                  className="w-5 h-5 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                  title="Exportar"
+                >
+                  <Download className="w-3 h-3" />
+                </button>
+              </div>
             </div>
           </div>
 
