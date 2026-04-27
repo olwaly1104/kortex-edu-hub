@@ -41,9 +41,12 @@ function addMinutesToHHMM(hhmm: string, minutes: number): string {
   const nh = Math.floor((total % (24 * 60)) / 60);
   const nm = total % 60;
   return `${String(nh).padStart(2, "0")}:${String(nm).padStart(2, "0")}`;
+function getUserId(name: string): string {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) hash = (hash * 31 + name.charCodeAt(i)) >>> 0;
+  return String(100000 + (hash % 900000));
 }
 
-export default function GapAtendimentoDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
