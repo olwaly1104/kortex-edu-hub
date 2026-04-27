@@ -54,7 +54,8 @@ export default function GapConfiguracao() {
   const [newMotLabel, setNewMotLabel] = useState("");
   const [newMotCat, setNewMotCat] = useState<string>("");
   const [newMotDest, setNewMotDest] = useState<string>("CTI");
-  const [newMotSla, setNewMotSla] = useState<number>(5);
+  const [newMotSlaAceit, setNewMotSlaAceit] = useState<number>(2);
+  const [newMotSlaConcl, setNewMotSlaConcl] = useState<number>(5);
 
   const slugify = (s: string) =>
     s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
