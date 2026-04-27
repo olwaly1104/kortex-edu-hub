@@ -372,7 +372,8 @@ export default function GapSolicitacaoDetail() {
 
             <div className="border-t border-border" />
 
-            {/* Detalhes do Pedido — descrição + anexos integrados */}
+            {/* Detalhes do Pedido — descrição + anexos + documento gerado */}
+            <Dialog>
             <section>
               <div className="flex items-center gap-2 mb-3">
                 <FileText className="w-3.5 h-3.5 text-muted-foreground" />
