@@ -97,10 +97,7 @@ export default function GapTickets() {
         const cfg = tipoConfig[s.tipo];
         if (!cfg || cfg.categoria !== categoria) return false;
       }
-      if (mes !== "todos") {
-        const m = new Date(s.dataSubmissao).getMonth();
-        if (m !== parseInt(mes)) return false;
-      }
+      if (mes !== "todos" && s.tipo !== mes) return false;
       if (search) {
         const q = search.toLowerCase();
         const tipoLabel = tipoConfig[s.tipo]?.label.toLowerCase() ?? "";
