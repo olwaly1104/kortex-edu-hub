@@ -129,7 +129,7 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
 
             {/* II · Motivo + Descrição */}
             <Section number="II" title="Motivo do Pedido">
-              <div className="border border-foreground/20 rounded-sm overflow-hidden">
+              <div className="border border-foreground/20 border-t-2 border-t-doc-accent rounded-sm overflow-hidden">
                 <div className="px-4 py-2.5 bg-foreground/[0.035] border-b border-foreground/20">
                   <p className="text-[7.5px] uppercase tracking-[0.22em] text-doc-accent font-bold mb-1">Assunto</p>
                   <h4 className="text-[13px] font-bold leading-snug tracking-tight text-foreground">
