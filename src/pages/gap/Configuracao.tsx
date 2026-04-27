@@ -97,7 +97,7 @@ export default function GapConfiguracao() {
   const [newMotMulta, setNewMotMulta] = useState<string>("__none__");
   // New multa form
   const [newMultaLabel, setNewMultaLabel] = useState("");
-  const [newMultaValor, setNewMultaValor] = useState<number>(5000);
+  const [newMultaDias, setNewMultaDias] = useState<number>(3);
   const [newMultaDesc, setNewMultaDesc] = useState("");
 
   const slugify = (s: string) =>
