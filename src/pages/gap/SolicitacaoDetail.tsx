@@ -369,60 +369,60 @@ export default function GapSolicitacaoDetail() {
 
             <div className="border-t border-border" />
 
-            {/* Descrição — texto do pedido */}
+            {/* Pedido — descrição + documento institucional integrados */}
             <section>
               <div className="flex items-center gap-2 mb-2.5">
                 <FileText className="w-3.5 h-3.5 text-muted-foreground" />
-                <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Descrição do pedido</h3>
-              </div>
-              <div className="rounded-lg border border-border bg-muted/15 px-4 py-3.5">
-                <p className="text-sm text-foreground/85 leading-relaxed">{selected.descricao}</p>
-              </div>
-            </section>
-
-            <div className="border-t border-border" />
-
-            {/* Documento institucional gerado */}
-            <section>
-              <div className="flex items-center gap-2 mb-2.5">
-                <FileText className="w-3.5 h-3.5 text-muted-foreground" />
-                <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Documento gerado</h3>
+                <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Pedido</h3>
               </div>
               <Dialog>
-                <div className="flex items-center gap-3 rounded-lg border border-border bg-background px-3.5 py-3">
-                  <div className="w-9 h-9 rounded-md bg-red-50 border border-red-200 flex items-center justify-center shrink-0">
-                    <FileText className="w-4 h-4 text-red-600" />
+                <div className="rounded-lg border border-border bg-background overflow-hidden">
+                  {/* Descrição */}
+                  <div className="px-4 py-3.5 bg-muted/15">
+                    <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold mb-1.5">Descrição submetida</p>
+                    <p className="text-sm text-foreground/85 leading-relaxed">{selected.descricao}</p>
                   </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-[13px] font-semibold text-foreground leading-tight truncate">
-                      Pedido-{selected.id}
-                    </p>
-                    <p className="text-[11px] text-muted-foreground mt-0.5 inline-flex items-center gap-1.5">
-                      <span>Gerado automaticamente</span>
-                      <span className="text-muted-foreground/40">·</span>
+
+                  {/* Divider */}
+                  <div className="border-t border-border" />
+
+                  {/* Documento gerado */}
+                  <div className="flex items-center gap-3 px-4 py-3">
+                    <div className="w-9 h-9 rounded-md bg-red-50 border border-red-200 flex items-center justify-center shrink-0">
+                      <FileText className="w-4 h-4 text-red-600" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[13px] font-semibold text-foreground leading-tight truncate">
+                        Pedido-{selected.id}
+                      </p>
+                      <p className="text-[11px] text-muted-foreground mt-0.5 inline-flex items-center gap-1.5">
+                        <span>Documento institucional gerado</span>
+                        <span className="text-muted-foreground/40">·</span>
+                        <DialogTrigger asChild>
+                          <button type="button" className="inline-flex items-center gap-1 text-primary hover:underline font-medium">
+                            <Users className="w-3 h-3" /> 4 partilhas
+                          </button>
+                        </DialogTrigger>
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-1.5 shrink-0">
                       <DialogTrigger asChild>
-                        <button type="button" className="inline-flex items-center gap-1 text-primary hover:underline font-medium">
-                          <Users className="w-3 h-3" /> 4 partilhas
-                        </button>
+                        <Button variant="outline" size="sm" className="h-7 px-2.5 text-[11px] gap-1">
+                          <Eye className="w-3 h-3" /> Ver
+                        </Button>
                       </DialogTrigger>
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-1.5 shrink-0">
-                    <DialogTrigger asChild>
-                      <Button variant="outline" size="sm" className="h-7 px-2.5 text-[11px] gap-1">
-                        <Eye className="w-3 h-3" /> Ver
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-7 px-2.5 text-[11px] gap-1"
+                        onClick={() => toast({ title: "Documento exportado", description: `Pedido-${selected.id}` })}
+                      >
+                        <Download className="w-3 h-3" /> Exportar
                       </Button>
-                    </DialogTrigger>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="h-7 px-2.5 text-[11px] gap-1"
-                      onClick={() => toast({ title: "Documento exportado", description: `Pedido-${selected.id}` })}
-                    >
-                      <Download className="w-3 h-3" /> Exportar
-                    </Button>
+                    </div>
                   </div>
                 </div>
+
                 <DialogContent className="max-w-md">
                   <DialogHeader>
                     <DialogTitle className="text-base flex items-center gap-2">
