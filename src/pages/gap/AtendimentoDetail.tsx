@@ -226,97 +226,96 @@ export default function GapAtendimentoDetail() {
 
         {/* Body — single column */}
         <div className="border-t border-border">
-          <main className="p-6 space-y-5 min-w-0">
-            {/* Detalhes da sessão */}
-            <section className="rounded-lg border border-border bg-background p-4">
-              <div className="flex items-center gap-2 mb-3">
-                <CalendarIcon className="w-3.5 h-3.5 text-muted-foreground" />
-                <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Detalhes da sessão</h3>
-              </div>
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-5 gap-y-4">
-                <FactItem icon={<Clock className="w-3.5 h-3.5" />} label="Horário" value={`${startTime} – ${endTime}`} sub={atendimento.duracao} />
-                <FactItem icon={<CalendarIcon className="w-3.5 h-3.5" />} label="Data" value={fullDate} />
-                <FactItem icon={<ModalityIcon className="w-3.5 h-3.5" />} label="Modalidade" value={atendimento.tipo === "online" ? "Online" : "Presencial"} />
-                <FactItem icon={<DoorOpen className="w-3.5 h-3.5" />} label="Local" value={atendimento.tipo === "presencial" && atendimento.sala ? atendimento.sala : "—"} />
-              </div>
-            </section>
+          <main className="p-6 min-w-0">
+            <div className="rounded-lg border border-border bg-background divide-y divide-border">
+              {/* Detalhes da sessão */}
+              <section className="p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <CalendarIcon className="w-3.5 h-3.5 text-muted-foreground" />
+                  <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Detalhes da sessão</h3>
+                </div>
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-5 gap-y-4">
+                  <FactItem icon={<Clock className="w-3.5 h-3.5" />} label="Horário" value={`${startTime} – ${endTime}`} sub={atendimento.duracao} />
+                  <FactItem icon={<CalendarIcon className="w-3.5 h-3.5" />} label="Data" value={fullDate} />
+                  <FactItem icon={<ModalityIcon className="w-3.5 h-3.5" />} label="Modalidade" value={atendimento.tipo === "online" ? "Online" : "Presencial"} />
+                  <FactItem icon={<DoorOpen className="w-3.5 h-3.5" />} label="Local" value={atendimento.tipo === "presencial" && atendimento.sala ? atendimento.sala : "—"} />
+                </div>
+              </section>
 
-            {/* Descrição */}
-            <section className="rounded-lg border border-border bg-background p-4">
-              <div className="flex items-center gap-2 mb-3">
-                <FileText className="w-3.5 h-3.5 text-muted-foreground" />
-                <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Descrição</h3>
-              </div>
-              {atendimento.descricao ? (
-                <p className="text-[13.5px] text-foreground/90 leading-[1.65] whitespace-pre-line">{atendimento.descricao}</p>
-              ) : (
-                <p className="text-[13px] text-muted-foreground italic">Sem descrição adicional.</p>
-              )}
-            </section>
+              {/* Descrição */}
+              <section className="p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <FileText className="w-3.5 h-3.5 text-muted-foreground" />
+                  <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Descrição</h3>
+                </div>
+                {atendimento.descricao ? (
+                  <p className="text-[13.5px] text-foreground/90 leading-[1.65] whitespace-pre-line">{atendimento.descricao}</p>
+                ) : (
+                  <p className="text-[13px] text-muted-foreground italic">Sem descrição adicional.</p>
+                )}
+              </section>
 
-            {/* Participantes — todos */}
-            {(() => {
-              const extras = atendimento.participantes ?? [];
-              const total = 2 + extras.length; // discente + responsável + extras
-              return (
-                <section className="rounded-lg border border-border bg-background p-4">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Users className="w-3.5 h-3.5 text-muted-foreground" />
-                    <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Participantes</h3>
-                    <span className="text-[10px] text-muted-foreground font-medium tabular-nums">· {total}</span>
-                  </div>
-                  <div className="divide-y divide-border">
-                    {/* Discente */}
-                    <ParticipantRow
-                      onClick={() => navigate(`/gap/estudantes/${atendimento.matricula}`)}
-                      avatarClasses="bg-primary/10 text-primary ring-primary/20"
-                      initials={initials}
-                      name={atendimento.discente}
-                      sub={`${atendimento.matricula} · ${atendimento.curso} · ${atendimento.ano}º ano`}
-                      badge={{ icon: GraduationCap, label: "Discente", classes: "bg-primary/10 text-primary border-primary/20" }}
-                      contactName={atendimento.discente}
-                      onAction={handleAction}
-                    />
-                    {/* Responsável GAP */}
-                    <ParticipantRow
-                      onClick={() => handleAction(`Perfil de ${atendimento.responsavel}`)}
-                      avatarClasses="bg-primary/10 text-primary ring-primary/20"
-                      initials={atendimento.responsavel.split(" ").slice(0, 2).map(n => n[0]).join("")}
-                      name={atendimento.responsavel}
-                      sub={`GAP · ID ${getUserId(atendimento.responsavel)}`}
-                      badge={{ icon: UserCircle2, label: "Responsável", classes: "bg-violet-50 text-violet-700 border-violet-200" }}
-                      contactName={atendimento.responsavel}
-                      onAction={handleAction}
-                    />
-                    {/* Outros participantes existentes */}
-                    {extras.map((p, idx) => {
-                      const isFamily = p.tipo === "encarregado";
-                      const TypeIcon = isFamily ? Home : Briefcase;
-                      const pInitials = p.nome.split(" ").filter(w => w.length > 2).slice(0, 2).map(n => n[0]).join("");
-                      const sub = p.contacto && isFamily ? `${p.relacao} · ${p.contacto}` : p.relacao;
-                      return (
-                        <ParticipantRow
-                          key={idx}
-                          onClick={isFamily ? undefined : () => handleAction(`Perfil de ${p.nome}`)}
-                          avatarClasses={isFamily ? "bg-pink-50 text-pink-700 ring-pink-200" : "bg-blue-50 text-blue-700 ring-blue-200"}
-                          initials={pInitials}
-                          name={p.nome}
-                          sub={sub}
-                          badge={{
-                            icon: TypeIcon,
-                            label: isFamily ? "Família" : "Escola",
-                            classes: isFamily ? "bg-pink-50 text-pink-700 border-pink-200" : "bg-blue-50 text-blue-700 border-blue-200",
-                          }}
-                          status={!isFamily ? (p.confirmado ? "confirmado" : "pendente") : undefined}
-                          contactName={p.nome}
-                          onAction={handleAction}
-                        />
-                      );
-                    })}
-                  </div>
-                </section>
-              );
-            })()}
+              {/* Participantes — todos */}
+              {(() => {
+                const extras = atendimento.participantes ?? [];
+                const total = 2 + extras.length;
+                return (
+                  <section className="p-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Users className="w-3.5 h-3.5 text-muted-foreground" />
+                      <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Participantes</h3>
+                      <span className="text-[10px] text-muted-foreground font-medium tabular-nums">· {total}</span>
+                    </div>
+                    <div className="divide-y divide-border">
+                      <ParticipantRow
+                        onClick={() => navigate(`/gap/estudantes/${atendimento.matricula}`)}
+                        avatarClasses="bg-primary/10 text-primary ring-primary/20"
+                        initials={initials}
+                        name={atendimento.discente}
+                        sub={`${atendimento.matricula} · ${atendimento.curso} · ${atendimento.ano}º ano`}
+                        badge={{ icon: GraduationCap, label: "Discente", classes: "bg-primary/10 text-primary border-primary/20" }}
+                        contactName={atendimento.discente}
+                        onAction={handleAction}
+                      />
+                      <ParticipantRow
+                        onClick={() => handleAction(`Perfil de ${atendimento.responsavel}`)}
+                        avatarClasses="bg-primary/10 text-primary ring-primary/20"
+                        initials={atendimento.responsavel.split(" ").slice(0, 2).map(n => n[0]).join("")}
+                        name={atendimento.responsavel}
+                        sub={`GAP · ID ${getUserId(atendimento.responsavel)}`}
+                        badge={{ icon: UserCircle2, label: "Responsável", classes: "bg-violet-50 text-violet-700 border-violet-200" }}
+                        contactName={atendimento.responsavel}
+                        onAction={handleAction}
+                      />
+                      {extras.map((p, idx) => {
+                        const isFamily = p.tipo === "encarregado";
+                        const TypeIcon = isFamily ? Home : Briefcase;
+                        const pInitials = p.nome.split(" ").filter(w => w.length > 2).slice(0, 2).map(n => n[0]).join("");
+                        const sub = p.contacto && isFamily ? `${p.relacao} · ${p.contacto}` : p.relacao;
+                        return (
+                          <ParticipantRow
+                            key={idx}
+                            onClick={isFamily ? undefined : () => handleAction(`Perfil de ${p.nome}`)}
+                            avatarClasses={isFamily ? "bg-pink-50 text-pink-700 ring-pink-200" : "bg-blue-50 text-blue-700 ring-blue-200"}
+                            initials={pInitials}
+                            name={p.nome}
+                            sub={sub}
+                            badge={{
+                              icon: TypeIcon,
+                              label: isFamily ? "Família" : "Escola",
+                              classes: isFamily ? "bg-pink-50 text-pink-700 border-pink-200" : "bg-blue-50 text-blue-700 border-blue-200",
+                            }}
+                            status={!isFamily ? (p.confirmado ? "confirmado" : "pendente") : undefined}
+                            contactName={p.nome}
+                            onAction={handleAction}
+                          />
+                        );
+                      })}
+                    </div>
+                  </section>
+                );
+              })()}
+            </div>
           </main>
         </div>
 
