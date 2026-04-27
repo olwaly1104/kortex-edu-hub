@@ -90,9 +90,11 @@ export default function GapConfiguracao() {
     const key = slugify(newMotLabel);
     setMotivos(prev => [...prev, {
       key, label: newMotLabel.trim(),
-      categoria: newMotCat, destino: newMotDest, slaDias: newMotSla,
+      categoria: newMotCat, destino: newMotDest,
+      slaAceitacao: newMotSlaAceit, slaConclusao: newMotSlaConcl,
     }]);
-    setNewMotLabel(""); setNewMotCat(""); setNewMotDest("CTI"); setNewMotSla(5);
+    setNewMotLabel(""); setNewMotCat(""); setNewMotDest("CTI");
+    setNewMotSlaAceit(2); setNewMotSlaConcl(5);
     setMotivoOpen(false);
     toast({ title: "Motivo criado", description: `“${newMotLabel}” foi adicionado.` });
   };
