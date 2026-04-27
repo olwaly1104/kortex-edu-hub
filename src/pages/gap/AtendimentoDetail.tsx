@@ -300,6 +300,23 @@ export default function GapAtendimentoDetail() {
             </section>
 
 
+            {/* Descrição */}
+            <section>
+              <div className="flex items-center gap-2 mb-3">
+                <FileText className="w-3.5 h-3.5 text-muted-foreground" />
+                <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Descrição</h3>
+              </div>
+              <div className="rounded-lg border border-border bg-background px-4 py-3">
+                <div className="rounded-md border border-border bg-muted/20 px-3.5 py-2.5">
+                  {atendimento.descricao ? (
+                    <p className="text-[13.5px] text-foreground/90 leading-[1.65] whitespace-pre-line">{atendimento.descricao}</p>
+                  ) : (
+                    <p className="text-[13px] text-muted-foreground italic">Sem descrição adicional.</p>
+                  )}
+                </div>
+              </div>
+            </section>
+
             {/* Outros participantes */}
             {atendimento.participantes && atendimento.participantes.length > 0 && (
               <section>
@@ -387,23 +404,6 @@ export default function GapAtendimentoDetail() {
                 </div>
               </section>
             )}
-
-            {/* Descrição */}
-            <section>
-              <div className="flex items-center gap-2 mb-3">
-                <FileText className="w-3.5 h-3.5 text-muted-foreground" />
-                <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Descrição</h3>
-              </div>
-              <div className="rounded-lg border border-border bg-background px-4 py-3">
-                <div className="rounded-md border border-border bg-muted/20 px-3.5 py-2.5">
-                  {atendimento.descricao ? (
-                    <p className="text-[13.5px] text-foreground/90 leading-[1.65] whitespace-pre-line">{atendimento.descricao}</p>
-                  ) : (
-                    <p className="text-[13px] text-muted-foreground italic">Sem descrição adicional.</p>
-                  )}
-                </div>
-              </div>
-            </section>
 
             {atendimento.notas && (
               <section className="pt-5 border-t border-border space-y-2">
