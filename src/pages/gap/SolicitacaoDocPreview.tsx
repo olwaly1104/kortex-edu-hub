@@ -92,33 +92,46 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
           <div className="flex-1 px-12 pb-4 space-y-5 overflow-hidden">
             {/* I · Detalhes do Pedido */}
             <Section number="I" title="Detalhes do Pedido">
-              <div className="grid grid-cols-3 gap-x-8 gap-y-0">
-                <Group label="Discente" rows={[
-                  ["Nome", s.discente],
-                  ["Matrícula", s.matricula],
-                  ["Curso", s.curso],
-                  ["Ano", `${s.ano}º`],
-                ]} />
-                <Group label="Pedido" rows={[
-                  ["Referência", s.id],
-                  ["Categoria", tipoCfg?.categoria ?? "—"],
-                  ["Estado", st.label],
-                  ["Submetido", fmtDataHora(s.dataSubmissao)],
-                ]} />
-                <Group label="Encaminhamento" rows={[
-                  ["Destino", dest.label],
-                  ["Responsável", s.responsavelDestino ?? `Equipa ${dest.label}`],
-                  ["Encaminhado", fmtDataHora(s.dataEncaminhamento)],
-                  ["Conclusão", fmtDataHora(s.dataConclusao)],
-                ]} />
+              <div className="border border-foreground/25 rounded-sm overflow-hidden">
+                <div className="grid grid-cols-3 bg-foreground/[0.04] border-b border-foreground/25">
+                  <div className="px-3 py-1.5 border-r border-foreground/15">
+                    <p className="text-[7.5px] uppercase tracking-[0.22em] text-foreground/70 font-bold">Discente</p>
+                  </div>
+                  <div className="px-3 py-1.5 border-r border-foreground/15">
+                    <p className="text-[7.5px] uppercase tracking-[0.22em] text-foreground/70 font-bold">Pedido</p>
+                  </div>
+                  <div className="px-3 py-1.5">
+                    <p className="text-[7.5px] uppercase tracking-[0.22em] text-foreground/70 font-bold">Encaminhamento</p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-3">
+                  <GroupCell rows={[
+                    ["Nome", s.discente],
+                    ["Matrícula", s.matricula],
+                    ["Curso", s.curso],
+                    ["Ano", `${s.ano}º`],
+                  ]} bordered />
+                  <GroupCell rows={[
+                    ["Referência", s.id],
+                    ["Categoria", tipoCfg?.categoria ?? "—"],
+                    ["Estado", st.label],
+                    ["Submetido", fmtDataHora(s.dataSubmissao)],
+                  ]} bordered />
+                  <GroupCell rows={[
+                    ["Destino", dest.label],
+                    ["Responsável", s.responsavelDestino ?? `Equipa ${dest.label}`],
+                    ["Encaminhado", fmtDataHora(s.dataEncaminhamento)],
+                    ["Conclusão", fmtDataHora(s.dataConclusao)],
+                  ]} />
+                </div>
               </div>
             </Section>
 
             {/* II · Motivo + Descrição */}
             <Section number="II" title="Motivo do Pedido">
-              <div className="border border-foreground/20 rounded-sm overflow-hidden">
-                <div className="px-4 py-2.5 bg-primary/[0.05] border-b border-foreground/15">
-                  <p className="text-[7.5px] uppercase tracking-[0.22em] text-primary font-bold mb-0.5">Assunto</p>
+              <div className="border border-foreground/25 rounded-sm overflow-hidden">
+                <div className="px-4 py-2.5 bg-foreground/[0.04] border-b border-foreground/25">
+                  <p className="text-[7.5px] uppercase tracking-[0.22em] text-foreground/70 font-bold mb-0.5">Assunto</p>
                   <h4 className="text-[12.5px] font-bold leading-snug tracking-tight text-foreground">
                     {s.assunto}
                   </h4>
@@ -144,42 +157,53 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
 
             {/* III · Cronologia */}
             <Section number="III" title="Cronologia">
-              <table className="w-full text-[9.5px] border-t border-b border-foreground/30">
-                <thead>
-                  <tr className="border-b border-foreground/30">
-                    <th className="text-left py-1.5 font-semibold w-[6%] text-foreground/70 uppercase tracking-wider text-[8px]">#</th>
-                    <th className="text-left py-1.5 font-semibold w-[26%] text-foreground/70 uppercase tracking-wider text-[8px]">Data &amp; Hora</th>
-                    <th className="text-left py-1.5 font-semibold w-[36%] text-foreground/70 uppercase tracking-wider text-[8px]">Acção</th>
-                    <th className="text-left py-1.5 font-semibold text-foreground/70 uppercase tracking-wider text-[8px]">Responsável</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-foreground/10">
-                  {s.historico.slice(0, 6).map((h, i) => (
-                    <tr key={i}>
-                      <td className="py-1 text-foreground/60 tabular-nums">{String(i + 1).padStart(2, "0")}</td>
-                      <td className="py-1 text-foreground/80 tabular-nums whitespace-nowrap">{fmtDataHora(h.data)}</td>
-                      <td className="py-1 font-medium">{h.accao}</td>
-                      <td className="py-1 text-foreground/70 truncate">{h.actor || "—"}</td>
+              <div className="border border-foreground/25 rounded-sm overflow-hidden">
+                <table className="w-full text-[9.5px]">
+                  <thead className="bg-foreground/[0.04]">
+                    <tr className="border-b border-foreground/25">
+                      <th className="text-left px-3 py-1.5 font-bold w-[6%] text-foreground/70 uppercase tracking-[0.16em] text-[7.5px]">#</th>
+                      <th className="text-left px-3 py-1.5 font-bold w-[26%] text-foreground/70 uppercase tracking-[0.16em] text-[7.5px]">Data &amp; Hora</th>
+                      <th className="text-left px-3 py-1.5 font-bold w-[36%] text-foreground/70 uppercase tracking-[0.16em] text-[7.5px]">Acção</th>
+                      <th className="text-left px-3 py-1.5 font-bold text-foreground/70 uppercase tracking-[0.16em] text-[7.5px]">Responsável</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-foreground/10">
+                    {s.historico.slice(0, 6).map((h, i) => (
+                      <tr key={i}>
+                        <td className="px-3 py-1 text-foreground/60 tabular-nums">{String(i + 1).padStart(2, "0")}</td>
+                        <td className="px-3 py-1 text-foreground/80 tabular-nums whitespace-nowrap">{fmtDataHora(h.data)}</td>
+                        <td className="px-3 py-1 font-medium">{h.accao}</td>
+                        <td className="px-3 py-1 text-foreground/70 truncate">{h.actor || "—"}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </Section>
 
             {/* IV · Anexos */}
             {anexos.length > 0 && (
               <Section number="IV" title="Anexos">
-                <table className="w-full text-[9.5px] border-t border-b border-foreground/30">
-                  <tbody className="divide-y divide-foreground/10">
-                    {anexos.slice(0, 4).map((a, i) => (
-                      <tr key={i}>
-                        <td className="py-1 text-foreground/60 tabular-nums w-[6%]">{String(i + 1).padStart(2, "0")}</td>
-                        <td className="py-1 font-medium truncate">{a.nome}</td>
-                        <td className="py-1 text-right text-foreground/60 tabular-nums w-[18%]">{a.tamanho}</td>
+                <div className="border border-foreground/25 rounded-sm overflow-hidden">
+                  <table className="w-full text-[9.5px]">
+                    <thead className="bg-foreground/[0.04]">
+                      <tr className="border-b border-foreground/25">
+                        <th className="text-left px-3 py-1.5 font-bold w-[6%] text-foreground/70 uppercase tracking-[0.16em] text-[7.5px]">#</th>
+                        <th className="text-left px-3 py-1.5 font-bold text-foreground/70 uppercase tracking-[0.16em] text-[7.5px]">Ficheiro</th>
+                        <th className="text-right px-3 py-1.5 font-bold w-[18%] text-foreground/70 uppercase tracking-[0.16em] text-[7.5px]">Tamanho</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-foreground/10">
+                      {anexos.slice(0, 4).map((a, i) => (
+                        <tr key={i}>
+                          <td className="px-3 py-1 text-foreground/60 tabular-nums">{String(i + 1).padStart(2, "0")}</td>
+                          <td className="px-3 py-1 font-medium truncate">{a.nome}</td>
+                          <td className="px-3 py-1 text-right text-foreground/60 tabular-nums">{a.tamanho}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </Section>
             )}
           </div>
@@ -219,20 +243,15 @@ function Section({ number, title, children }: { number: string; title: string; c
   );
 }
 
-function Group({ label, rows }: { label: string; rows: [string, string][] }) {
+function GroupCell({ rows, bordered }: { rows: [string, string][]; bordered?: boolean }) {
   return (
-    <div>
-      <p className="text-[7.5px] uppercase tracking-[0.22em] text-foreground/55 font-semibold pb-1 mb-1 border-b border-foreground/15">
-        {label}
-      </p>
-      <dl className="space-y-0.5">
-        {rows.map(([k, v], i) => (
-          <div key={i} className="flex items-baseline gap-2 text-[10px]">
-            <dt className="text-foreground/60 w-[78px] shrink-0">{k}</dt>
-            <dd className="font-semibold truncate flex-1">{v}</dd>
-          </div>
-        ))}
-      </dl>
-    </div>
+    <dl className={`px-3 py-2 space-y-1 ${bordered ? "border-r border-foreground/15" : ""}`}>
+      {rows.map(([k, v], i) => (
+        <div key={i} className="flex items-baseline gap-2 text-[10px]">
+          <dt className="text-foreground/60 w-[78px] shrink-0">{k}</dt>
+          <dd className="font-semibold truncate flex-1">{v}</dd>
+        </div>
+      ))}
+    </dl>
   );
 }
