@@ -352,6 +352,17 @@ export default function GapConfiguracao() {
                   </div>
                 </div>
                 <div>
+                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Multa associada</label>
+                  <Select value={newMotMulta} onValueChange={setNewMotMulta}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__none__">Sem multa</SelectItem>
+                      {multas.map(mu => <SelectItem key={mu.key} value={mu.key}>{mu.label} · {formatKz(mu.valor)}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-[10px] text-muted-foreground mt-1">Aplicada se o limite de conclusão for excedido</p>
+                </div>
+                <div>
                   <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Responsável</label>
                   <Select value={newMotResp} onValueChange={setNewMotResp}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
