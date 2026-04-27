@@ -54,7 +54,7 @@ const gapReportData = solicitacoes.reduce<Array<{ id: string; name: string; code
 export default function GapTickets() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
-  const [estado, setEstado] = useState<"todos" | "hoje" | "pendentes" | "em_execucao" | "executadas" | "rejeitadas" | "em_atraso">("todos");
+  const [estado, setEstado] = useState<"todos" | "hoje" | "pendentes" | "em_execucao" | "executadas" | "rejeitadas" | "em_atraso">("hoje");
   const [destino, setDestino] = useState<Destino | "todos">("todos");
   const [categoria, setCategoria] = useState<string>("todas");
   const [mes, setMes] = useState<string>("todos");
