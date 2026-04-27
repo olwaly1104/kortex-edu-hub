@@ -172,6 +172,9 @@ export default function GapConfiguracao() {
           {estados.map(e => (
             <div key={e.key} className={cn("inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs", e.color)}>
               <span className="font-medium">{e.label}</span>
+              <button onClick={() => setEditEstado(e)} className="opacity-60 hover:opacity-100" aria-label={`Editar ${e.label}`}>
+                <Pencil className="w-3 h-3" />
+              </button>
               <button onClick={() => removeEstado(e.key)} className="opacity-60 hover:opacity-100" aria-label={`Remover ${e.label}`}>
                 <Trash2 className="w-3 h-3" />
               </button>
