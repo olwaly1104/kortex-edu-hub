@@ -33,7 +33,7 @@ const INITIAL_MULTAS: MultaItem[] = [
   { key: "uso_indevido", label: "Uso indevido de recursos institucionais", diasAposPrazo: 5, valor: 8000, descricao: "Aplicada 5 dias após o prazo de regularização do uso de recursos." },
 ];
 
-const formatKz = (v: number) => new Intl.NumberFormat("pt-AO").format(v) + " Kz";
+
 
 const STAFF_OPTIONS = [
   "Dra. Helena Cabral · GAP",
