@@ -244,6 +244,8 @@ export default function GapSolicitacaoDetail() {
                     {selected.id}
                   </button>
                   <Dialog>
+                    <div className="flex flex-col items-end gap-0.5">
+                      <span className="text-[9px] uppercase tracking-[0.12em] text-muted-foreground font-semibold">Gerado automaticamente</span>
                     <div className="inline-flex items-center gap-1.5 pl-1.5 pr-1 py-1 rounded-md border border-border bg-muted/30">
                       <FileText className="w-3 h-3 text-red-600 shrink-0" />
                       <span className="text-[10.5px] font-semibold text-foreground tabular-nums">Pedido-{selected.id}</span>
@@ -267,6 +269,7 @@ export default function GapSolicitacaoDetail() {
                       >
                         <Download className="w-3 h-3" />
                       </button>
+                    </div>
                     </div>
                     <DialogContent className="max-w-md">
                       <DialogHeader>
