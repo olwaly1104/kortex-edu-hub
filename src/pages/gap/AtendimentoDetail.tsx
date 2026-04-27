@@ -259,7 +259,7 @@ export default function GapAtendimentoDetail() {
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-semibold text-foreground leading-tight group-hover:text-primary transition-colors">{atendimento.responsavel}</p>
-                  <p className="text-[11px] text-muted-foreground mt-0.5">Profissional GAP</p>
+                  <p className="text-[11px] text-muted-foreground mt-0.5 font-mono tabular-nums">{getUserId(atendimento.responsavel)}</p>
                 </div>
               </button>
               <div className="grid grid-cols-3 gap-2 mt-3">
@@ -269,12 +269,12 @@ export default function GapAtendimentoDetail() {
               </div>
               <div className="mt-3 pt-3 border-t border-border space-y-1.5">
                 <div className="flex items-baseline justify-between gap-2">
-                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Posição</span>
-                  <span className="text-[11px] font-medium text-foreground text-right truncate max-w-[150px]">Técnica de Apoio</span>
-                </div>
-                <div className="flex items-baseline justify-between gap-2">
                   <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Departamento</span>
                   <span className="text-[11px] font-medium text-foreground text-right truncate max-w-[150px]">GAP</span>
+                </div>
+                <div className="flex items-baseline justify-between gap-2">
+                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Ano Lectivo</span>
+                  <span className="text-[11px] font-medium text-foreground text-right tabular-nums">2024/2025</span>
                 </div>
               </div>
             </section>
