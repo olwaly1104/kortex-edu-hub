@@ -136,10 +136,12 @@ export default function GapConfiguracao() {
       categoria: newMotCat, destino: newMotDest,
       responsavel: newMotResp,
       slaAceitacao: newMotSlaAceit, slaConclusao: newMotSlaConcl,
+      multa: newMotMulta === "__none__" ? "" : newMotMulta,
     }]);
     setNewMotLabel(""); setNewMotCat(""); setNewMotDest("CTI");
     setNewMotSlaAceit(2); setNewMotSlaConcl(5);
     setNewMotResp(STAFF_OPTIONS[0]);
+    setNewMotMulta("__none__");
     setMotivoOpen(false);
     toast({ title: "Motivo criado", description: `“${newMotLabel}” foi adicionado.` });
   };
