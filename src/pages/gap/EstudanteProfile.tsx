@@ -21,26 +21,26 @@ const riscoConfig = {
 export default function GapEstudanteProfile() {
   const { matricula } = useParams();
   const navigate = useNavigate();
-  const estudante = gapEstudantesSeguimento.find(e => e.matricula === matricula);
+  const discente = gapEstudantesSeguimento.find(e => e.matricula === matricula);
 
-  if (!estudante) {
+  if (!discente) {
     return (
       <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
         <Button variant="ghost" onClick={() => navigate(-1)} className="gap-2"><ArrowLeft className="w-4 h-4" /> Voltar</Button>
-        <p className="text-muted-foreground text-center py-12">Estudante não encontrado.</p>
+        <p className="text-muted-foreground text-center py-12">Discente não encontrado.</p>
       </div>
     );
   }
 
-  const r = riscoConfig[estudante.risco];
-  const sols = solicitacoes.filter(s => s.matricula === estudante.matricula);
-  const atendimentos = gapAtendimentos.filter(a => a.matricula === estudante.matricula);
+  const r = riscoConfig[discente.risco];
+  const sols = solicitacoes.filter(s => s.matricula === discente.matricula);
+  const atendimentos = gapAtendimentos.filter(a => a.matricula === discente.matricula);
 
   const pendentes = sols.filter(s => s.estado === "recebida").length;
   const emExecucao = sols.filter(s => s.estado === "em_execucao").length;
   const concluidas = sols.filter(s => s.estado === "concluida").length;
 
-  const email = `${estudante.nome.toLowerCase().split(" ").slice(0, 2).join(".")}@upra.kor`;
+  const email = `${discente.nome.toLowerCase().split(" ").slice(0, 2).join(".")}@upra.kor`;
 
   return (
     <div className="p-6 lg:p-8 max-w-3xl mx-auto space-y-6 animate-fade-in">
@@ -51,7 +51,7 @@ export default function GapEstudanteProfile() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-          <Users className="w-6 h-6 text-primary" /> Perfil do Estudante
+          <Users className="w-6 h-6 text-primary" /> Perfil do Discente
         </h1>
         <p className="text-sm text-muted-foreground mt-1">Informações pessoais e histórico de solicitações</p>
       </div>
@@ -60,17 +60,17 @@ export default function GapEstudanteProfile() {
       <Card className="px-5 py-4 border-l-4 border-l-primary">
         <div className="flex items-center gap-4">
           <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center text-lg font-bold text-primary shrink-0">
-            {estudante.nome.split(" ").map(n => n[0]).slice(0, 2).join("")}
+            {discente.nome.split(" ").map(n => n[0]).slice(0, 2).join("")}
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <h2 className="text-lg font-bold text-foreground">{estudante.nome}</h2>
+              <h2 className="text-lg font-bold text-foreground">{discente.nome}</h2>
               <Badge variant="outline" className={`text-xs ${r.bg}`}>{r.label}</Badge>
             </div>
             <div className="flex items-center gap-2 flex-wrap mt-1">
-              <Badge variant="outline" className="text-[10px] gap-1"><GraduationCap className="w-3 h-3" /> {estudante.curso}</Badge>
-              <Badge variant="outline" className="text-[10px]">{estudante.ano}º Ano</Badge>
-              <Badge variant="outline" className="text-[10px] font-mono">{estudante.matricula}</Badge>
+              <Badge variant="outline" className="text-[10px] gap-1"><GraduationCap className="w-3 h-3" /> {discente.curso}</Badge>
+              <Badge variant="outline" className="text-[10px]">{discente.ano}º Ano</Badge>
+              <Badge variant="outline" className="text-[10px] font-mono">{discente.matricula}</Badge>
             </div>
             <div className="flex items-center gap-2 mt-2">
               <Button size="sm" variant="outline" className="gap-1.5 text-xs h-7">
@@ -160,7 +160,7 @@ export default function GapEstudanteProfile() {
               <div className="w-8 h-8 rounded-lg bg-secondary/10 flex items-center justify-center"><Heart className="w-4 h-4 text-secondary" /></div>
               <p className="text-sm text-muted-foreground">Acompanhamentos</p>
             </div>
-            <p className="text-sm font-semibold text-foreground">{estudante.acompanhamentos} sessões</p>
+            <p className="text-sm font-semibold text-foreground">{discente.acompanhamentos} sessões</p>
           </div>
           <div className="flex items-center justify-between px-5 py-3.5">
             <div className="flex items-center gap-3">
@@ -168,7 +168,7 @@ export default function GapEstudanteProfile() {
               <p className="text-sm text-muted-foreground">Último Contacto</p>
             </div>
             <p className="text-sm font-semibold text-foreground">
-              {new Date(estudante.ultimoContacto).toLocaleDateString("pt-AO", { day: "2-digit", month: "long", year: "numeric" })}
+              {new Date(discente.ultimoContacto).toLocaleDateString("pt-AO", { day: "2-digit", month: "long", year: "numeric" })}
             </p>
           </div>
         </div>

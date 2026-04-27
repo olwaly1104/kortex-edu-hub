@@ -99,7 +99,7 @@ export default function GapAtendimentos() {
       .filter(a => {
         if (!search) return true;
         const s = search.toLowerCase();
-        return a.estudante.toLowerCase().includes(s) || a.matricula.includes(search) || a.motivo.toLowerCase().includes(s);
+        return a.discente.toLowerCase().includes(s) || a.matricula.includes(search) || a.motivo.toLowerCase().includes(s);
       })
       .sort((a, b) => {
         // Upcoming asc (future first by date asc), past desc — overall: future asc, then past desc
@@ -124,7 +124,7 @@ export default function GapAtendimentos() {
       .filter(a => {
         if (!search) return true;
         const s = search.toLowerCase();
-        return a.estudante.toLowerCase().includes(s) || a.matricula.includes(search) || a.motivo.toLowerCase().includes(s);
+        return a.discente.toLowerCase().includes(s) || a.matricula.includes(search) || a.motivo.toLowerCase().includes(s);
       });
   }, [search, categoria, motivoFilter]);
 
@@ -279,7 +279,7 @@ export default function GapAtendimentos() {
           <div className="relative flex-1 min-w-[220px] max-w-[380px]">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
             <Input
-              placeholder="Pesquisar estudante, matrícula ou motivo…"
+              placeholder="Pesquisar discente, matrícula ou motivo…"
               value={search}
               onChange={e => setSearch(e.target.value)}
               className="pl-9 pr-8 h-9 text-xs"
@@ -358,7 +358,7 @@ export default function GapAtendimentos() {
               <thead>
                 <tr className="border-b border-border bg-muted/30 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
                   <th className="text-left font-semibold px-4 py-2.5 w-[140px]">Data / Hora</th>
-                  <th className="text-left font-semibold px-4 py-2.5 w-[200px]">Estudante</th>
+                  <th className="text-left font-semibold px-4 py-2.5 w-[200px]">Discente</th>
                   <th className="text-left font-semibold px-4 py-2.5">Motivo</th>
                   <th className="text-left font-semibold px-4 py-2.5 w-[140px]">Categoria</th>
                   <th className="text-left font-semibold px-4 py-2.5 w-[140px]">Local</th>
@@ -405,7 +405,7 @@ export default function GapAtendimentos() {
                           onClick={(e) => { e.stopPropagation(); navigate(`/gap/estudantes/${a.matricula}`); }}
                           className="text-sm font-semibold text-foreground hover:text-primary hover:underline truncate text-left block max-w-full"
                         >
-                          {a.estudante}
+                          {a.discente}
                         </button>
                         <p className="text-[11px] text-muted-foreground truncate mt-0.5">
                           <span className="tabular-nums">{a.matricula}</span> · {a.curso}
@@ -506,7 +506,7 @@ export default function GapAtendimentos() {
                         const cat = categoriaConfig[ev.categoria];
                         return (
                           <div key={ev.id} className={cn("text-[9px] font-medium truncate px-1 py-0.5 rounded border", cat.color)}>
-                            {ev.hora} {ev.estudante.split(" ")[0]}
+                            {ev.hora} {ev.discente.split(" ")[0]}
                           </div>
                         );
                       })}
@@ -592,7 +592,7 @@ export default function GapAtendimentos() {
                               onClick={(e) => { e.stopPropagation(); navigate(`/gap/estudantes/${a.matricula}`); }}
                               className="text-[11px] text-muted-foreground hover:text-primary hover:underline truncate text-left block w-full mt-0.5"
                             >
-                              {a.estudante} · <span className="tabular-nums">{a.matricula}</span>
+                              {a.discente} · <span className="tabular-nums">{a.matricula}</span>
                             </button>
                             <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
                               <Badge variant="outline" className={cn("text-[9px] px-1.5 py-0", cat.color)}>{cat.label}</Badge>
@@ -666,7 +666,7 @@ function NovoAgendamentoDialog() {
     if (!studentQuery.trim()) return arr.slice(0, 6);
     const q = studentQuery.toLowerCase();
     return arr.filter(s =>
-      s.estudante.toLowerCase().includes(q) || s.matricula.includes(studentQuery)
+      s.discente.toLowerCase().includes(q) || s.matricula.includes(studentQuery)
     ).slice(0, 8);
   }, [studentQuery]);
 
@@ -774,17 +774,17 @@ function NovoAgendamentoDialog() {
         {/* Body — one step at a time */}
         <div className="px-6 py-5 min-h-[320px] max-h-[60vh] overflow-y-auto">
 
-          {/* STEP 1 — Participantes (Estudante + Responsável) */}
+          {/* STEP 1 — Participantes (Discente + Responsável) */}
           {step === 1 && (
             <div className="space-y-5">
-              <FieldBlock n={1} title="Estudante">
+              <FieldBlock n={1} title="Discente">
                 {selectedStudent ? (
                   <div className="flex items-center gap-3 p-3 rounded-lg border border-border bg-muted/30">
                     <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-semibold text-sm ring-1 ring-primary/15">
-                      {selectedStudent.estudante.split(" ").slice(0, 2).map(n => n[0]).join("")}
+                      {selectedStudent.discente.split(" ").slice(0, 2).map(n => n[0]).join("")}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold truncate">{selectedStudent.estudante}</p>
+                      <p className="text-sm font-semibold truncate">{selectedStudent.discente}</p>
                       <p className="text-[11px] text-muted-foreground truncate">
                         {selectedStudent.matricula} · {selectedStudent.curso} · {selectedStudent.ano}º ano
                       </p>
@@ -808,7 +808,7 @@ function NovoAgendamentoDialog() {
                     </div>
                     <div className="mt-2 grid grid-cols-1 gap-1 max-h-44 overflow-y-auto rounded-lg border border-border bg-card">
                       {studentOptions.length === 0 ? (
-                        <p className="text-xs text-muted-foreground p-3 text-center">Nenhum estudante encontrado.</p>
+                        <p className="text-xs text-muted-foreground p-3 text-center">Nenhum discente encontrado.</p>
                       ) : studentOptions.map(s => (
                         <button
                           key={s.matricula}
@@ -816,10 +816,10 @@ function NovoAgendamentoDialog() {
                           className="flex items-center gap-3 px-3 py-2 text-left hover:bg-muted/50 transition-colors border-b border-border last:border-b-0"
                         >
                           <div className="w-8 h-8 rounded-full bg-muted text-muted-foreground flex items-center justify-center text-[10px] font-semibold">
-                            {s.estudante.split(" ").slice(0, 2).map(n => n[0]).join("")}
+                            {s.discente.split(" ").slice(0, 2).map(n => n[0]).join("")}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium truncate">{s.estudante}</p>
+                            <p className="text-sm font-medium truncate">{s.discente}</p>
                             <p className="text-[11px] text-muted-foreground truncate tabular-nums">
                               {s.matricula} · {s.curso}
                             </p>
@@ -1028,7 +1028,7 @@ function NovoAgendamentoDialog() {
               {/* Resumo final */}
               <div className="mt-4 rounded-lg border border-border bg-muted/20 p-3 space-y-1.5 text-[11px]">
                 <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">Resumo</p>
-                <p><span className="text-muted-foreground">Estudante:</span> <strong>{selectedStudent?.estudante ?? "—"}</strong></p>
+                <p><span className="text-muted-foreground">Discente:</span> <strong>{selectedStudent?.discente ?? "—"}</strong></p>
                 <p><span className="text-muted-foreground">Responsável:</span> <strong>{resp.nome}</strong></p>
                 <p><span className="text-muted-foreground">Categoria:</span> <strong>{categoria ? categoriaConfig[categoria].label : "—"}</strong></p>
                 <p><span className="text-muted-foreground">Motivo:</span> <strong>{motivo || "—"}</strong></p>

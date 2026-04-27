@@ -182,7 +182,7 @@ export default function GapInicio() {
                     <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl border border-border bg-card hover:bg-muted/40 transition-colors cursor-pointer">
                       <div className="flex-1 min-w-0">
                         <p className="text-xs font-semibold text-foreground line-clamp-1">{t.assunto}</p>
-                        <p className="text-[10px] text-muted-foreground">{t.estudante} · {t.curso}</p>
+                        <p className="text-[10px] text-muted-foreground">{t.discente} · {t.curso}</p>
                       </div>
                       <Badge variant="outline" className={`text-[10px] ${cat.color}`}>{cat.label}</Badge>
                       <Badge variant="outline" className={`text-[10px] ${st.color}`}>{st.label}</Badge>
@@ -203,7 +203,7 @@ export default function GapInicio() {
                 { label: "Dashboard GAP", icon: BarChart3, path: "/gap", color: "bg-primary/10 text-primary" },
                 { label: "Solicitações", icon: HelpCircle, path: "/gap/solicitacoes", color: "bg-orange-100 text-orange-600" },
                 { label: "Agendamentos", icon: CalendarDays, path: "/gap/agendamentos", color: "bg-emerald-100 text-emerald-600" },
-                { label: "Estudantes em Seguimento", icon: Heart, path: "/gap/estudantes", color: "bg-pink-100 text-pink-600" },
+                { label: "Discentes em Seguimento", icon: Heart, path: "/gap/estudantes", color: "bg-pink-100 text-pink-600" },
               ].map(a => (
                 <Link key={a.path} to={a.path}>
                   <div className="flex items-center gap-2.5 px-3 py-2 rounded-lg border border-border hover:bg-muted/40 transition-colors cursor-pointer">
@@ -244,7 +244,7 @@ export default function GapInicio() {
                         <p className="text-[10px] text-muted-foreground">{new Date(a.data).toLocaleDateString("pt-AO", { day: "2-digit", month: "short" })}</p>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs font-semibold text-foreground line-clamp-1">{a.estudante}</p>
+                        <p className="text-xs font-semibold text-foreground line-clamp-1">{a.discente}</p>
                         <p className="text-[10px] text-muted-foreground line-clamp-1">{a.motivo}</p>
                       </div>
                     </div>

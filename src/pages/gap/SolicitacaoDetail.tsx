@@ -45,9 +45,9 @@ export default function GapSolicitacaoDetail() {
   const dConc = selected.dataConclusao ? new Date(selected.dataConclusao) : null;
   const fmt = (d: Date) => d.toLocaleDateString("pt-PT", { day: "2-digit", month: "2-digit", year: "numeric" });
   const fmtT = (d: Date) => d.toLocaleTimeString("pt-AO", { hour: "2-digit", minute: "2-digit" });
-  const initials = selected.estudante.split(" ").slice(0, 2).map(n => n[0]).join("");
+  const initials = selected.discente.split(" ").slice(0, 2).map(n => n[0]).join("");
 
-  // Anexos do estudante — usa anexos definidos ou deriva do tipo/descrição
+  // Anexos do discente — usa anexos definidos ou deriva do tipo/descrição
   type Anexo = { nome: string; tamanho: string; tipo: "pdf" | "image" | "doc" | "sheet" };
   const anexos: Anexo[] = (() => {
     if (selected.anexos && selected.anexos.length > 0) {
@@ -103,7 +103,7 @@ export default function GapSolicitacaoDetail() {
   steps.push({
     label: "Solicitação submetida",
     data: submetida?.data,
-    actor: submetida?.actor ?? "Portal do Estudante",
+    actor: submetida?.actor ?? "Portal do Discente",
     tone: "submitted",
   });
 
@@ -292,7 +292,7 @@ export default function GapSolicitacaoDetail() {
                     {[
                       { name: "Prof. Dr. António Mendes", role: "Reitor", access: "Visualizar" },
                       { name: selected.responsavelDestino?.split(" · ")[0] ?? dest.label, role: `Responsável ${dest.label}`, access: "Editar" },
-                      { name: selected.estudante, role: "Estudante", access: "Visualizar" },
+                      { name: selected.discente, role: "Discente", access: "Visualizar" },
                       { name: "Coordenação Académica", role: "Equipa", access: "Visualizar" },
                     ].map((p, i) => {
                       const ini = p.name.split(" ").slice(0, 2).map(n => n[0]).join("");
@@ -320,10 +320,10 @@ export default function GapSolicitacaoDetail() {
 
         {/* 2-column body */}
         <div className="grid md:grid-cols-[280px_1fr] divide-x divide-border border-t border-border">
-          {/* LEFT — estudante + meta */}
+          {/* LEFT — discente + meta */}
           <aside className="p-5 space-y-5 bg-muted/15">
             <div>
-              <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold mb-2">Estudante</p>
+              <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold mb-2">Discente</p>
               <button
                 type="button"
                 onClick={() => navigate(`/gap/estudantes/${selected.matricula}`)}
@@ -333,7 +333,7 @@ export default function GapSolicitacaoDetail() {
                   {initials}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-semibold text-foreground leading-tight hover:text-primary transition-colors">{selected.estudante}</p>
+                  <p className="text-sm font-semibold text-foreground leading-tight hover:text-primary transition-colors">{selected.discente}</p>
                   <p className="text-[11px] text-muted-foreground mt-0.5">{selected.matricula}</p>
                 </div>
               </button>
