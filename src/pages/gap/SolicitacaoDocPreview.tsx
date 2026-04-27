@@ -1,8 +1,8 @@
-import { Printer, Download, FileText, User, GitBranch, Clock, Paperclip, AlignLeft } from "lucide-react";
+import { Printer, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import {
-  type Solicitacao, estadoSolicitacaoConfig, destinoConfig, tipoConfig, prioridadeConfig,
+  type Solicitacao, estadoSolicitacaoConfig, destinoConfig, tipoConfig,
 } from "@/data/gapData";
 
 type Props = {
@@ -27,22 +27,11 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
   const st = estadoSolicitacaoConfig[s.estado];
   const dest = destinoConfig[s.destino];
   const tipoCfg = tipoConfig[s.tipo];
-  const prio = prioridadeConfig[s.prioridade];
-
-  // Estado tone for the header strip badge
-  const estadoTone: Record<string, string> = {
-    recebida:    "bg-amber-50 text-amber-800 border-amber-200",
-    em_execucao: "bg-sky-50 text-sky-800 border-sky-200",
-    concluida:   "bg-emerald-50 text-emerald-800 border-emerald-200",
-    rejeitada:   "bg-red-50 text-red-800 border-red-200",
-    em_atraso:   "bg-orange-50 text-orange-800 border-orange-200",
-  };
-  const tone = estadoTone[s.estado] ?? estadoTone.recebida;
 
   return (
     <div className="flex flex-col h-full min-h-0 bg-muted/30">
       {/* Toolbar */}
-      <div className="flex items-center justify-between px-4 py-2.5 border-b border-border bg-background shrink-0">
+      <div className="flex items-center justify-between px-4 py-2.5 border-b border-border bg-background shrink-0 print:hidden">
         <div className="flex items-center gap-2">
           <span className="text-[11px] font-mono font-semibold text-muted-foreground">Pedido-{s.id}</span>
           <span className="text-muted-foreground/40 text-xs">·</span>
@@ -63,7 +52,7 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
         </div>
       </div>
 
-      {/* A4 page (210 × 297 mm) */}
+      {/* A4 page */}
       <div className="flex-1 min-h-0 overflow-y-auto py-6 px-4 bg-muted/30">
         <div
           className="mx-auto bg-white shadow-md border border-border print:shadow-none print:border-0 flex flex-col"
@@ -97,72 +86,76 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
             <h2 className="text-[18px] font-bold text-foreground leading-tight tracking-tight mt-1">
               {tipoCfg?.label ?? s.tipo}
             </h2>
-            <div className="flex items-center gap-1.5 mt-2">
-              <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-semibold border ${tone}`}>
-                <span className="w-1 h-1 rounded-full bg-current opacity-70" />
-                {st.label}
-              </span>
-              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-semibold border border-border bg-muted/40 text-foreground/80">
-                {tipoCfg?.categoria ?? "—"}
-              </span>
-              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-semibold border border-border bg-muted/40 text-foreground/80">
-                Prioridade · {prio?.label ?? s.prioridade}
-              </span>
-            </div>
           </div>
 
           {/* ── Body ──────────────────────────────────────────── */}
           <div className="flex-1 px-10 pb-4 space-y-4 overflow-hidden">
-            {/* 1 · Detalhes do Pedido (Discente | Encaminhamento) */}
-            <Section icon={FileText} number="1" title="Detalhes do Pedido">
+            {/* 1 · Detalhes do Pedido */}
+            <Section number="1" title="Detalhes do Pedido">
               <div className="grid grid-cols-2 gap-0 border border-border rounded overflow-hidden">
                 <div className="border-r border-border">
-                  <SubHeader icon={User} label="Discente" />
+                  <SubHeader label="Discente" />
                   <KVList rows={[
                     ["Nome", s.discente],
                     ["Matrícula", s.matricula],
                     ["Curso", s.curso],
                     ["Ano", `${s.ano}º`],
+                    ["Estado", st.label],
+                    ["Categoria", tipoCfg?.categoria ?? "—"],
                   ]} />
                 </div>
                 <div>
-                  <SubHeader icon={GitBranch} label="Encaminhamento" />
+                  <SubHeader label="Encaminhamento" />
                   <KVList rows={[
                     ["Destino", dest.label],
                     ["Responsável", s.responsavelDestino ?? `Equipa ${dest.label}`],
                     ["Submetido", fmtDataHora(s.dataSubmissao)],
                     ["Encaminhado", fmtDataHora(s.dataEncaminhamento)],
+                    ["Conclusão", fmtDataHora(s.dataConclusao)],
+                    ["Prazo", fmtDataHora((s as any).prazo)],
                   ]} />
                 </div>
               </div>
             </Section>
 
             {/* 2 · Motivo & Descrição */}
-            <Section icon={AlignLeft} number="2" title="Motivo & Descrição">
-              <div className="border border-border rounded overflow-hidden">
-                <div className="px-3 py-1.5 bg-primary/[0.04] border-b border-border">
-                  <p className="text-[8px] uppercase tracking-wider text-muted-foreground font-bold">Motivo</p>
-                  <p className="text-[10.5px] text-foreground font-semibold leading-snug">{s.assunto}</p>
+            <Section number="2" title="Motivo & Descrição">
+              <div className="border border-border rounded overflow-hidden divide-y divide-border">
+                <div className="grid grid-cols-[110px_1fr]">
+                  <div className="px-3 py-2 bg-primary/[0.06] border-r border-border flex items-center">
+                    <p className="text-[8.5px] uppercase tracking-wider text-primary font-bold">Motivo</p>
+                  </div>
+                  <div className="px-3 py-2 bg-background">
+                    <p className="text-[10.5px] text-foreground font-semibold leading-snug">{s.assunto}</p>
+                  </div>
                 </div>
-                <div className="px-3 py-2 bg-background">
-                  <p className="text-[8px] uppercase tracking-wider text-muted-foreground font-bold mb-0.5">Descrição</p>
-                  <p className="text-[10px] text-foreground leading-relaxed whitespace-pre-line line-clamp-5">
-                    {s.descricao}
-                  </p>
+                <div className="grid grid-cols-[110px_1fr]">
+                  <div className="px-3 py-2 bg-primary/[0.06] border-r border-border flex items-start">
+                    <p className="text-[8.5px] uppercase tracking-wider text-primary font-bold">Descrição</p>
+                  </div>
+                  <div className="px-3 py-2 bg-background">
+                    <p className="text-[10px] text-foreground leading-relaxed whitespace-pre-line line-clamp-5">
+                      {s.descricao}
+                    </p>
+                  </div>
                 </div>
                 {s.notaInterna && (
-                  <div className="px-3 py-1.5 bg-amber-50/60 border-t border-amber-200">
-                    <p className="text-[8px] uppercase tracking-wider text-amber-800 font-bold">Nota interna</p>
-                    <p className="text-[10px] text-foreground leading-snug whitespace-pre-line line-clamp-2">
-                      {s.notaInterna}
-                    </p>
+                  <div className="grid grid-cols-[110px_1fr]">
+                    <div className="px-3 py-2 bg-amber-50 border-r border-amber-200 flex items-start">
+                      <p className="text-[8.5px] uppercase tracking-wider text-amber-800 font-bold">Nota Interna</p>
+                    </div>
+                    <div className="px-3 py-2 bg-amber-50/40">
+                      <p className="text-[10px] text-foreground leading-snug whitespace-pre-line line-clamp-2">
+                        {s.notaInterna}
+                      </p>
+                    </div>
                   </div>
                 )}
               </div>
             </Section>
 
             {/* 3 · Cronologia */}
-            <Section icon={Clock} number="3" title="Cronologia">
+            <Section number="3" title="Cronologia">
               <div className="overflow-hidden rounded border border-border">
                 <table className="w-full text-[9.5px]">
                   <thead>
@@ -189,7 +182,7 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
 
             {/* 4 · Anexos */}
             {anexos.length > 0 && (
-              <Section icon={Paperclip} number="4" title="Anexos">
+              <Section number="4" title="Anexos">
                 <div className="overflow-hidden rounded border border-border">
                   <table className="w-full text-[9.5px]">
                     <tbody className="divide-y divide-border">
@@ -230,29 +223,23 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
 
 /* ── Helpers ─────────────────────────────────────────── */
 
-function Section({
-  icon: Icon, number, title, children,
-}: { icon: React.ElementType; number: string; title: string; children: React.ReactNode }) {
+function Section({ number, title, children }: { number: string; title: string; children: React.ReactNode }) {
   return (
     <div>
-      <div className="flex items-center gap-1.5 mb-1.5">
-        <span className="w-4 h-4 rounded-sm bg-primary/10 text-primary inline-flex items-center justify-center">
-          <Icon className="w-2.5 h-2.5" />
-        </span>
+      <div className="flex items-center gap-2 mb-1.5">
         <span className="text-[8.5px] font-mono font-bold text-primary">{number}</span>
-        <h3 className="text-[10px] uppercase tracking-[0.16em] text-foreground font-bold">{title}</h3>
-        <div className="flex-1 h-px bg-border ml-1" />
+        <h3 className="text-[10px] uppercase tracking-[0.18em] text-foreground font-bold">{title}</h3>
+        <div className="flex-1 h-px bg-border" />
       </div>
       {children}
     </div>
   );
 }
 
-function SubHeader({ icon: Icon, label }: { icon: React.ElementType; label: string }) {
+function SubHeader({ label }: { label: string }) {
   return (
-    <div className="flex items-center gap-1.5 px-2.5 py-1 bg-primary/[0.04] border-b border-border">
-      <Icon className="w-2.5 h-2.5 text-primary" />
-      <p className="text-[8px] uppercase tracking-wider text-primary font-bold">{label}</p>
+    <div className="px-2.5 py-1 bg-primary/[0.06] border-b border-border">
+      <p className="text-[8.5px] uppercase tracking-wider text-primary font-bold">{label}</p>
     </div>
   );
 }
