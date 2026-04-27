@@ -68,13 +68,23 @@ export default function GapConfiguracao() {
   );
   const [multas, setMultas] = useState<MultaItem[]>(INITIAL_MULTAS);
   const [motivos, setMotivos] = useState<MotivoItem[]>(
-    Object.entries(initialTipoConfig).map(([key, v]) => ({
-      key, label: v.label, categoria: v.categoria, destino: v.destino,
-      responsavel: (v as any).responsavelDestino || defaultResponsavelByDestino(v.destino),
-      slaAceitacao: Math.max(1, Math.ceil(v.slaDias / 3)),
-      slaConclusao: v.slaDias,
-      multa: "",
-    }))
+    Object.entries(initialTipoConfig).map(([key, v]) => {
+      const slaConcl = v.slaDias;
+      // Mock: atribuir multa por defeito (5 dias) apenas se conclusão < 5d
+      const multaDefault = slaConcl < 5
+        ? (v.categoria === "academico" ? "atraso_relatorio"
+          : v.categoria === "presenca" ? "falta_injustificada"
+          : v.categoria === "administrativo" ? "incumprimento_sla"
+          : "uso_indevido")
+        : "";
+      return {
+        key, label: v.label, categoria: v.categoria, destino: v.destino,
+        responsavel: (v as any).responsavelDestino || defaultResponsavelByDestino(v.destino),
+        slaAceitacao: Math.max(1, Math.ceil(slaConcl / 3)),
+        slaConclusao: slaConcl,
+        multa: multaDefault,
+      };
+    })
   );
 
   // Dialog states
