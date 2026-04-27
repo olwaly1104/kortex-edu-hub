@@ -132,9 +132,29 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
 
           {/* Body */}
           <div className="flex-1 px-8 pb-3 space-y-4 overflow-hidden">
-            {/* 1 · Discente | 2 · Encaminhamento (side by side, separate sections) */}
+            {/* 1 · Identificação (Solicitação · Categoria · Motivo) */}
+            <Block title="1. Identificação">
+              <div className="rounded border border-border overflow-hidden">
+                <div className="grid grid-cols-3 divide-x divide-border bg-primary/5">
+                  <div className="px-3 py-1.5">
+                    <p className="text-[8px] uppercase tracking-wider text-primary font-bold">Solicitação</p>
+                    <p className="text-[10.5px] font-mono font-semibold text-foreground mt-0.5">{s.id}</p>
+                  </div>
+                  <div className="px-3 py-1.5">
+                    <p className="text-[8px] uppercase tracking-wider text-primary font-bold">Categoria</p>
+                    <p className="text-[10.5px] font-semibold text-foreground mt-0.5 truncate">{tipoCfg?.categoria ?? "—"}</p>
+                  </div>
+                  <div className="px-3 py-1.5">
+                    <p className="text-[8px] uppercase tracking-wider text-primary font-bold">Motivo</p>
+                    <p className="text-[10.5px] font-semibold text-foreground mt-0.5 truncate">{s.assunto}</p>
+                  </div>
+                </div>
+              </div>
+            </Block>
+
+            {/* 2 · Discente | 3 · Encaminhamento */}
             <div className="grid grid-cols-2 gap-4">
-              <Block title="1. Discente">
+              <Block title="2. Discente">
                 <KV rows={[
                   ["Nome", s.discente],
                   ["Matrícula", s.matricula],
@@ -142,9 +162,8 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
                   ["Ano", `${s.ano}º`],
                 ]} />
               </Block>
-              <Block title="2. Encaminhamento">
+              <Block title="3. Encaminhamento">
                 <KV rows={[
-                  ["Solicitação", s.id],
                   ["Destino", dest.label],
                   ["Responsável", s.responsavelDestino ?? `Equipa ${dest.label}`],
                   ["Estado", st.label],
@@ -152,28 +171,17 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
               </Block>
             </div>
 
-            {/* 3 · Motivo & Descrição (together) */}
-            <Block title="3. Motivo & Descrição">
-              <div className="rounded border border-border overflow-hidden">
-                <div className="grid grid-cols-[110px_1fr] bg-primary/5 border-b border-border">
-                  <div className="px-3 py-1.5 text-[8px] uppercase tracking-wider text-primary font-bold border-r border-border">Categoria</div>
-                  <div className="px-3 py-1.5 text-[10px] font-semibold text-foreground">{tipoCfg?.categoria ?? "—"}</div>
-                </div>
-                <div className="grid grid-cols-[110px_1fr] border-b border-border">
-                  <div className="px-3 py-1.5 text-[8px] uppercase tracking-wider text-muted-foreground font-semibold border-r border-border bg-muted/20">Motivo</div>
-                  <div className="px-3 py-1.5 text-[10.5px] font-semibold text-foreground">{s.assunto}</div>
-                </div>
-                <div className="px-3 py-2 bg-background">
-                  <p className="text-[8px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">Descrição</p>
-                  <p className="text-[10px] text-foreground leading-relaxed whitespace-pre-line line-clamp-6">{s.descricao}</p>
-                </div>
-                {s.notaInterna && (
-                  <div className="border-t border-amber-200 bg-amber-50/60 px-3 py-1.5">
-                    <p className="text-[8px] uppercase tracking-wider text-amber-800 font-bold">Nota interna</p>
-                    <p className="text-[10px] text-foreground leading-snug whitespace-pre-line line-clamp-2">{s.notaInterna}</p>
-                  </div>
-                )}
+            {/* 4 · Descrição */}
+            <Block title="4. Descrição">
+              <div className="rounded border border-border bg-background px-3 py-2">
+                <p className="text-[10px] text-foreground leading-relaxed whitespace-pre-line line-clamp-6">{s.descricao}</p>
               </div>
+              {s.notaInterna && (
+                <div className="mt-1.5 rounded border border-amber-200 bg-amber-50/60 px-3 py-1.5">
+                  <p className="text-[8px] uppercase tracking-wider text-amber-800 font-bold">Nota interna</p>
+                  <p className="text-[10px] text-foreground leading-snug whitespace-pre-line line-clamp-2">{s.notaInterna}</p>
+                </div>
+              )}
             </Block>
 
             {/* 4 · Cronologia */}
