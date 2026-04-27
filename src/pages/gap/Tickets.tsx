@@ -365,6 +365,9 @@ export default function GapTickets() {
               {/* Estado list */}
               {filterView === "estado" && (
                 <div className="p-1 max-h-72 overflow-y-auto">
+                  <div className="px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                    Ver todos os estados
+                  </div>
                   {([
                     { v: "todos", label: "Todos" },
                     { v: "hoje", label: "Hoje" },
@@ -387,11 +390,9 @@ export default function GapTickets() {
               {/* Destino list */}
               {filterView === "destino" && (
                 <div className="p-1 max-h-72 overflow-y-auto">
-                  <FilterOptionRow
-                    label="Todos os destinos"
-                    selected={destino === "todos"}
-                    onClick={() => { setDestino("todos"); setFilterView("root"); }}
-                  />
+                  <div className="px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                    Ver todos os destinos
+                  </div>
                   {(Object.keys(destinoConfig) as Destino[]).map(d => (
                     <FilterOptionRow
                       key={d}
@@ -406,11 +407,9 @@ export default function GapTickets() {
               {/* Categoria list (drill into motivos) */}
               {filterView === "categoria" && (
                 <div className="p-1 max-h-72 overflow-y-auto">
-                  <FilterOptionRow
-                    label="Todas as categorias"
-                    selected={categoria === "todas" && mes === "todos"}
-                    onClick={() => { setCategoria("todas"); setMes("todos"); setFilterView("root"); }}
-                  />
+                  <div className="px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                    Ver todas as categorias
+                  </div>
                   {categoriasDisponiveis.map(c => (
                     <button
                       key={c}
