@@ -328,22 +328,35 @@ export default function GapTickets() {
               {filterView === "root" && (
                 <div className="p-1">
                   <FilterRootRow
+                    icon={<AlertCircle className="w-3.5 h-3.5" />}
+                    label="Estado"
+                    value={estado === "todos" ? null : (
+                      estado === "hoje" ? "Hoje" :
+                      estado === "pendentes" ? "Pendentes" :
+                      estado === "em_execucao" ? "Em Execução" :
+                      estado === "executadas" ? "Executadas" :
+                      estado === "rejeitadas" ? "Rejeitadas" :
+                      estado === "em_atraso" ? "Em Atraso" : null
+                    )}
+                    onClick={() => setFilterView("estado")}
+                  />
+                  <FilterRootRow
                     icon={<Building2 className="w-3.5 h-3.5" />}
-                    label="Todos os destinos"
+                    label="Destino"
                     value={destino === "todos" ? null : destinoConfig[destino as Destino]?.label}
                     onClick={() => setFilterView("destino")}
                   />
                   <FilterRootRow
                     icon={<Layers className="w-3.5 h-3.5" />}
-                    label="Todas as categorias"
+                    label="Categoria"
                     value={categoria === "todas" ? null : categoria}
                     onClick={() => setFilterView("categoria")}
                   />
                   <FilterRootRow
                     icon={<Layers className="w-3.5 h-3.5" />}
-                    label="Todos os motivos"
+                    label="Motivo"
                     value={mes === "todos" ? null : tipoConfig[mes as keyof typeof tipoConfig]?.label}
-                    onClick={() => { setFilterView("categoria"); }}
+                    onClick={() => setFilterView("categoria")}
                   />
                 </div>
               )}
