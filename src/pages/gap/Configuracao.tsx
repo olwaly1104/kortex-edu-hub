@@ -73,6 +73,7 @@ export default function GapConfiguracao() {
       responsavel: (v as any).responsavelDestino || defaultResponsavelByDestino(v.destino),
       slaAceitacao: Math.max(1, Math.ceil(v.slaDias / 3)),
       slaConclusao: v.slaDias,
+      multa: "",
     }))
   );
 
