@@ -362,6 +362,28 @@ export default function GapTickets() {
                 </div>
               )}
 
+              {/* Estado list */}
+              {filterView === "estado" && (
+                <div className="p-1 max-h-72 overflow-y-auto">
+                  {([
+                    { v: "todos", label: "Todos" },
+                    { v: "hoje", label: "Hoje" },
+                    { v: "pendentes", label: "Pendentes" },
+                    { v: "em_execucao", label: "Em Execução" },
+                    { v: "executadas", label: "Executadas" },
+                    { v: "rejeitadas", label: "Rejeitadas" },
+                    { v: "em_atraso", label: "Em Atraso" },
+                  ] as const).map(opt => (
+                    <FilterOptionRow
+                      key={opt.v}
+                      label={opt.label}
+                      selected={estado === opt.v}
+                      onClick={() => { setEstado(opt.v); setFilterView("root"); }}
+                    />
+                  ))}
+                </div>
+              )}
+
               {/* Destino list */}
               {filterView === "destino" && (
                 <div className="p-1 max-h-72 overflow-y-auto">
