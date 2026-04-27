@@ -93,6 +93,10 @@ export default function GapConfiguracao() {
   const [newMotSlaAceit, setNewMotSlaAceit] = useState<number>(2);
   const [newMotSlaConcl, setNewMotSlaConcl] = useState<number>(5);
   const [newMotResp, setNewMotResp] = useState<string>(STAFF_OPTIONS[0]);
+  // New multa form
+  const [newMultaLabel, setNewMultaLabel] = useState("");
+  const [newMultaValor, setNewMultaValor] = useState<number>(5000);
+  const [newMultaDesc, setNewMultaDesc] = useState("");
 
   const slugify = (s: string) =>
     s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
