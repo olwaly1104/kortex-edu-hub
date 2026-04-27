@@ -92,16 +92,16 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
           <div className="flex-1 px-12 pb-4 space-y-5 overflow-hidden">
             {/* I · Detalhes do Pedido */}
             <Section number="I" title="Detalhes do Pedido">
-              <div className="border border-success/30 rounded-sm overflow-hidden">
-                <div className="grid grid-cols-3 bg-success/[0.07] border-b border-success/30">
-                  <div className="px-3 py-1.5 border-r border-success/20">
-                    <p className="text-[7.5px] uppercase tracking-[0.22em] text-success font-bold">Discente</p>
+              <div className="border border-foreground/20 rounded-sm overflow-hidden">
+                <div className="grid grid-cols-3 bg-foreground/[0.035] border-b border-foreground/20">
+                  <div className="px-3 py-1.5 border-r border-foreground/15">
+                    <p className="text-[7.5px] uppercase tracking-[0.22em] text-doc-accent font-bold">Discente</p>
                   </div>
-                  <div className="px-3 py-1.5 border-r border-success/20">
-                    <p className="text-[7.5px] uppercase tracking-[0.22em] text-success font-bold">Pedido</p>
+                  <div className="px-3 py-1.5 border-r border-foreground/15">
+                    <p className="text-[7.5px] uppercase tracking-[0.22em] text-doc-accent font-bold">Pedido</p>
                   </div>
                   <div className="px-3 py-1.5">
-                    <p className="text-[7.5px] uppercase tracking-[0.22em] text-success font-bold">Encaminhamento</p>
+                    <p className="text-[7.5px] uppercase tracking-[0.22em] text-doc-accent font-bold">Encaminhamento</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-3">
@@ -129,21 +129,21 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
 
             {/* II · Motivo + Descrição */}
             <Section number="II" title="Motivo do Pedido">
-              <div className="border border-success/30 rounded-sm overflow-hidden">
-                <div className="px-4 py-2.5 bg-success/[0.07] border-b border-success/30">
-                  <p className="text-[7.5px] uppercase tracking-[0.22em] text-success font-bold mb-1">Assunto</p>
+              <div className="border border-foreground/20 rounded-sm overflow-hidden">
+                <div className="px-4 py-2.5 bg-foreground/[0.035] border-b border-foreground/20">
+                  <p className="text-[7.5px] uppercase tracking-[0.22em] text-doc-accent font-bold mb-1">Assunto</p>
                   <h4 className="text-[13px] font-bold leading-snug tracking-tight text-foreground">
                     {s.assunto}
                   </h4>
                 </div>
                 <div className="px-4 py-2.5 bg-background">
-                  <p className="text-[7.5px] uppercase tracking-[0.22em] text-success font-bold mb-1">Descrição</p>
+                  <p className="text-[7.5px] uppercase tracking-[0.22em] text-doc-accent font-bold mb-1">Descrição</p>
                   <p className="text-[10px] leading-relaxed whitespace-pre-line line-clamp-6 text-foreground/85">
                     {s.descricao}
                   </p>
                   {s.notaInterna && (
-                    <div className="mt-2.5 pt-2 border-t border-dashed border-success/30">
-                      <p className="text-[7.5px] uppercase tracking-[0.22em] text-success font-bold mb-0.5">
+                    <div className="mt-2.5 pt-2 border-t border-dashed border-foreground/20">
+                      <p className="text-[7.5px] uppercase tracking-[0.22em] text-doc-accent font-bold mb-0.5">
                         Nota Interna
                       </p>
                       <p className="text-[10px] leading-snug whitespace-pre-line line-clamp-2 text-foreground/85 italic">
@@ -157,14 +157,14 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
 
             {/* III · Cronologia */}
             <Section number="III" title="Cronologia">
-              <div className="border border-success/30 rounded-sm overflow-hidden">
+              <div className="border border-foreground/20 rounded-sm overflow-hidden">
                 <table className="w-full text-[9.5px]">
-                  <thead className="bg-success/[0.07]">
-                    <tr className="border-b border-success/30">
-                      <th className="text-left px-3 py-1.5 font-bold w-[6%] text-success uppercase tracking-[0.16em] text-[7.5px]">#</th>
-                      <th className="text-left px-3 py-1.5 font-bold w-[26%] text-success uppercase tracking-[0.16em] text-[7.5px]">Data &amp; Hora</th>
-                      <th className="text-left px-3 py-1.5 font-bold w-[36%] text-success uppercase tracking-[0.16em] text-[7.5px]">Acção</th>
-                      <th className="text-left px-3 py-1.5 font-bold text-success uppercase tracking-[0.16em] text-[7.5px]">Responsável</th>
+                  <thead className="bg-foreground/[0.035]">
+                    <tr className="border-b border-foreground/20">
+                      <th className="text-left px-3 py-1.5 font-bold w-[6%] text-doc-accent uppercase tracking-[0.16em] text-[7.5px]">#</th>
+                      <th className="text-left px-3 py-1.5 font-bold w-[26%] text-doc-accent uppercase tracking-[0.16em] text-[7.5px]">Data &amp; Hora</th>
+                      <th className="text-left px-3 py-1.5 font-bold w-[36%] text-doc-accent uppercase tracking-[0.16em] text-[7.5px]">Acção</th>
+                      <th className="text-left px-3 py-1.5 font-bold text-doc-accent uppercase tracking-[0.16em] text-[7.5px]">Responsável</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-foreground/10">
@@ -184,13 +184,13 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
             {/* IV · Anexos */}
             {anexos.length > 0 && (
               <Section number="IV" title="Anexos">
-                <div className="border border-success/30 rounded-sm overflow-hidden">
+                <div className="border border-foreground/20 rounded-sm overflow-hidden">
                   <table className="w-full text-[9.5px]">
-                    <thead className="bg-success/[0.07]">
-                      <tr className="border-b border-success/30">
-                        <th className="text-left px-3 py-1.5 font-bold w-[6%] text-success uppercase tracking-[0.16em] text-[7.5px]">#</th>
-                        <th className="text-left px-3 py-1.5 font-bold text-success uppercase tracking-[0.16em] text-[7.5px]">Ficheiro</th>
-                        <th className="text-right px-3 py-1.5 font-bold w-[18%] text-success uppercase tracking-[0.16em] text-[7.5px]">Tamanho</th>
+                    <thead className="bg-foreground/[0.035]">
+                      <tr className="border-b border-foreground/20">
+                        <th className="text-left px-3 py-1.5 font-bold w-[6%] text-doc-accent uppercase tracking-[0.16em] text-[7.5px]">#</th>
+                        <th className="text-left px-3 py-1.5 font-bold text-doc-accent uppercase tracking-[0.16em] text-[7.5px]">Ficheiro</th>
+                        <th className="text-right px-3 py-1.5 font-bold w-[18%] text-doc-accent uppercase tracking-[0.16em] text-[7.5px]">Tamanho</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-foreground/10">
@@ -234,9 +234,9 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
 function Section({ number, title, children }: { number: string; title: string; children: React.ReactNode }) {
   return (
     <section>
-      <div className="flex items-baseline gap-2 mb-2 pb-1 border-b border-success/30">
-        <span className="text-[8.5px] font-mono font-bold text-success tabular-nums">{number}.</span>
-        <h3 className="text-[10px] uppercase tracking-[0.2em] font-bold text-success">{title}</h3>
+      <div className="flex items-baseline gap-2 mb-2 pb-1 border-b border-foreground/20">
+        <span className="text-[8.5px] font-mono font-bold text-doc-accent tabular-nums">{number}.</span>
+        <h3 className="text-[10px] uppercase tracking-[0.2em] font-bold text-doc-accent">{title}</h3>
       </div>
       {children}
     </section>
@@ -245,10 +245,10 @@ function Section({ number, title, children }: { number: string; title: string; c
 
 function GroupCell({ rows, bordered }: { rows: [string, string][]; bordered?: boolean }) {
   return (
-    <dl className={`px-3 py-2 space-y-1 ${bordered ? "border-r border-success/20" : ""}`}>
+    <dl className={`px-3 py-2 space-y-1 ${bordered ? "border-r border-foreground/15" : ""}`}>
       {rows.map(([k, v], i) => (
         <div key={i} className="flex items-baseline gap-2 text-[10px]">
-          <dt className="text-success/70 w-[78px] shrink-0 font-medium">{k}</dt>
+          <dt className="text-doc-accent/70 w-[78px] shrink-0 font-medium">{k}</dt>
           <dd className="font-semibold truncate flex-1 text-foreground">{v}</dd>
         </div>
       ))}
