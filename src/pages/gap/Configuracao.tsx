@@ -22,7 +22,7 @@ import { useToast } from "@/hooks/use-toast";
 
 type EstadoItem = { key: string; label: string; color: string };
 type CategoriaItem = { key: string; label: string; color: string };
-type MotivoItem = { key: string; label: string; categoria: string; destino: string; responsavel: string; slaAceitacao: number; slaConclusao: number };
+type MotivoItem = { key: string; label: string; categoria: string; destino: string; responsavel: string; slaAceitacao: number; slaConclusao: number; multa: string };
 type MultaItem = { key: string; label: string; valor: number; descricao: string };
 
 const INITIAL_MULTAS: MultaItem[] = [
@@ -73,6 +73,7 @@ export default function GapConfiguracao() {
       responsavel: (v as any).responsavelDestino || defaultResponsavelByDestino(v.destino),
       slaAceitacao: Math.max(1, Math.ceil(v.slaDias / 3)),
       slaConclusao: v.slaDias,
+      multa: "",
     }))
   );
 
@@ -93,6 +94,7 @@ export default function GapConfiguracao() {
   const [newMotSlaAceit, setNewMotSlaAceit] = useState<number>(2);
   const [newMotSlaConcl, setNewMotSlaConcl] = useState<number>(5);
   const [newMotResp, setNewMotResp] = useState<string>(STAFF_OPTIONS[0]);
+  const [newMotMulta, setNewMotMulta] = useState<string>("__none__");
   // New multa form
   const [newMultaLabel, setNewMultaLabel] = useState("");
   const [newMultaValor, setNewMultaValor] = useState<number>(5000);
@@ -134,10 +136,12 @@ export default function GapConfiguracao() {
       categoria: newMotCat, destino: newMotDest,
       responsavel: newMotResp,
       slaAceitacao: newMotSlaAceit, slaConclusao: newMotSlaConcl,
+      multa: newMotMulta === "__none__" ? "" : newMotMulta,
     }]);
     setNewMotLabel(""); setNewMotCat(""); setNewMotDest("CTI");
     setNewMotSlaAceit(2); setNewMotSlaConcl(5);
     setNewMotResp(STAFF_OPTIONS[0]);
+    setNewMotMulta("__none__");
     setMotivoOpen(false);
     toast({ title: "Motivo criado", description: `“${newMotLabel}” foi adicionado.` });
   };
@@ -348,6 +352,17 @@ export default function GapConfiguracao() {
                   </div>
                 </div>
                 <div>
+                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Multa associada</label>
+                  <Select value={newMotMulta} onValueChange={setNewMotMulta}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__none__">Sem multa</SelectItem>
+                      {multas.map(mu => <SelectItem key={mu.key} value={mu.key}>{mu.label} · {formatKz(mu.valor)}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-[10px] text-muted-foreground mt-1">Aplicada se o limite de conclusão for excedido</p>
+                </div>
+                <div>
                   <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Responsável</label>
                   <Select value={newMotResp} onValueChange={setNewMotResp}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
@@ -374,6 +389,7 @@ export default function GapConfiguracao() {
                 <th className="text-left p-3 font-medium text-muted-foreground text-xs">Responsável</th>
                 <th className="text-center p-3 font-medium text-muted-foreground text-xs whitespace-nowrap">Aceitar</th>
                 <th className="text-center p-3 font-medium text-muted-foreground text-xs whitespace-nowrap">Concluir</th>
+                <th className="text-left p-3 font-medium text-muted-foreground text-xs whitespace-nowrap">Multa</th>
                 <th className="w-20" />
               </tr>
             </thead>
@@ -397,6 +413,17 @@ export default function GapConfiguracao() {
                     <td className="p-3 text-xs text-foreground whitespace-nowrap">{m.responsavel}</td>
                     <td className="p-3 text-center text-xs tabular-nums text-amber-700">{m.slaAceitacao}d</td>
                     <td className="p-3 text-center text-xs tabular-nums text-blue-700">{m.slaConclusao}d</td>
+                    <td className="p-3 text-xs whitespace-nowrap">
+                      {(() => {
+                        const mu = multas.find(x => x.key === m.multa);
+                        return mu ? (
+                          <span className="inline-flex items-center gap-1.5">
+                            <span className="text-foreground">{mu.label}</span>
+                            <span className="text-destructive font-semibold tabular-nums">· {formatKz(mu.valor)}</span>
+                          </span>
+                        ) : <span className="text-muted-foreground">—</span>;
+                      })()}
+                    </td>
                     <td className="p-3 text-right">
                       <div className="inline-flex items-center gap-2">
                         <button onClick={() => setEditMotivo(m)} className="text-muted-foreground hover:text-foreground" aria-label={`Editar ${m.label}`}>
@@ -602,6 +629,17 @@ export default function GapConfiguracao() {
                     )}
                   </SelectContent>
                 </Select>
+              </div>
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Multa associada</label>
+                <Select value={editMotivo.multa || "__none__"} onValueChange={(v) => setEditMotivo({ ...editMotivo, multa: v === "__none__" ? "" : v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="__none__">Sem multa</SelectItem>
+                    {multas.map(mu => <SelectItem key={mu.key} value={mu.key}>{mu.label} · {formatKz(mu.valor)}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+                <p className="text-[10px] text-muted-foreground mt-1">Aplicada se o limite de conclusão for excedido</p>
               </div>
             </div>
           )}
