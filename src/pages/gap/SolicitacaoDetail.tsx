@@ -212,7 +212,7 @@ export default function GapSolicitacaoDetail() {
               </div>
             </div>
 
-            <div className="min-w-0 flex-1 pt-0.5">
+            <div className="min-w-0 flex-1 rounded-lg border border-border bg-background px-4 py-3">
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0 flex-1">
                   <h1 className="text-xl font-semibold leading-tight tracking-tight text-foreground">
