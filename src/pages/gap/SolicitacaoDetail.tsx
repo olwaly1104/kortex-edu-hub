@@ -447,66 +447,65 @@ export default function GapSolicitacaoDetail() {
 
             <div className="border-t border-border" />
 
-            {/* Detalhes do Pedido — descrição (corpo) + anexos (chips) */}
+            {/* Detalhes do Pedido — descrição + anexos integrados */}
             <section>
               <div className="flex items-center gap-2 mb-3">
                 <FileText className="w-3.5 h-3.5 text-muted-foreground" />
                 <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Detalhes do Pedido</h3>
               </div>
 
-              {/* Descrição — corpo de email, sem caixa */}
-              <p className="text-[13.5px] text-foreground/90 leading-[1.65] whitespace-pre-line">
-                {selected.descricao}
-              </p>
-
-              {/* Anexos — lista discreta tipo email */}
-              {anexos.length > 0 && (
-                <div className="mt-5 pt-4 border-t border-dashed border-border">
-                  <div className="flex items-center gap-1.5 mb-2.5 text-muted-foreground">
-                    <Paperclip className="w-3.5 h-3.5" />
-                    <span className="text-[11px] font-medium">
-                      {anexos.length} {anexos.length === 1 ? "anexo" : "anexos"}
-                    </span>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {anexos.map((a, i) => {
-                      const { Icon, cls } = anexoIcon(a.tipo);
-                      return (
-                        <div
-                          key={i}
-                          className="group inline-flex items-center gap-2 pl-1.5 pr-1 py-1 rounded-md border border-border bg-muted/30 hover:bg-muted/50 transition-colors max-w-full"
-                        >
-                          <div className={cn("w-7 h-7 rounded border flex items-center justify-center shrink-0", cls)}>
-                            <Icon className="w-3.5 h-3.5" />
-                          </div>
-                          <div className="min-w-0 flex items-baseline gap-1.5">
-                            <span className="text-[12px] font-medium text-foreground truncate max-w-[180px]">{a.nome}</span>
-                            <span className="text-[10px] text-muted-foreground tabular-nums shrink-0">{a.tamanho}</span>
-                          </div>
-                          <div className="flex items-center gap-0.5 shrink-0 ml-1">
-                            <button
-                              type="button"
-                              onClick={() => toast({ title: "A abrir anexo", description: a.nome })}
-                              className="w-6 h-6 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-background hover:text-foreground transition-colors"
-                              title="Ver"
-                            >
-                              <Eye className="w-3.5 h-3.5" />
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => toast({ title: "Anexo descarregado", description: a.nome })}
-                              className="w-6 h-6 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-background hover:text-foreground transition-colors"
-                              title="Descarregar"
-                            >
-                              <Download className="w-3.5 h-3.5" />
-                            </button>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
+              <div className="rounded-lg border border-border bg-background overflow-hidden divide-y divide-border">
+                {/* Descrição */}
+                <div className="px-4 py-3">
+                  <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold mb-1.5">Descrição</p>
+                  <p className="text-[13.5px] text-foreground/90 leading-[1.65] whitespace-pre-line">
+                    {selected.descricao}
+                  </p>
                 </div>
-              )}
+
+                {/* Anexos */}
+                {anexos.length > 0 && (
+                  <div className="px-4 py-3">
+                    <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold mb-2">
+                      Anexos <span className="text-muted-foreground/70 normal-case tracking-normal tabular-nums">({anexos.length})</span>
+                    </p>
+                    <ul className="divide-y divide-border/70">
+                      {anexos.map((a, i) => {
+                        const { Icon, cls } = anexoIcon(a.tipo);
+                        return (
+                          <li key={i} className="flex items-center gap-3 py-2 first:pt-0 last:pb-0">
+                            <div className={cn("w-8 h-8 rounded-md border flex items-center justify-center shrink-0", cls)}>
+                              <Icon className="w-4 h-4" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-[13px] font-medium text-foreground leading-tight truncate">{a.nome}</p>
+                              <p className="text-[11px] text-muted-foreground mt-0.5 tabular-nums">{a.tamanho}</p>
+                            </div>
+                            <div className="flex items-center gap-0.5 shrink-0">
+                              <button
+                                type="button"
+                                onClick={() => toast({ title: "A abrir anexo", description: a.nome })}
+                                className="w-7 h-7 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                                title="Ver"
+                              >
+                                <Eye className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => toast({ title: "Anexo descarregado", description: a.nome })}
+                                className="w-7 h-7 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                                title="Descarregar"
+                              >
+                                <Download className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                )}
+              </div>
             </section>
 
             <div className="border-t border-border" />
