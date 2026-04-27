@@ -371,14 +371,6 @@ function ParticipantRow({
   );
 }
 
-function SectionTitle({ children }: { children: React.ReactNode }) {
-  return (
-    <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold mb-2.5">
-      {children}
-    </p>
-  );
-}
-
 function FactItem({ icon, label, value, sub }: { icon: React.ReactNode; label: string; value: string; sub?: string }) {
   return (
     <div className="min-w-0">
@@ -389,28 +381,5 @@ function FactItem({ icon, label, value, sub }: { icon: React.ReactNode; label: s
       <p className="text-sm font-semibold text-foreground leading-tight truncate">{value}</p>
       {sub && <p className="text-[11px] text-muted-foreground mt-0.5 truncate">{sub}</p>}
     </div>
-  );
-}
-
-function SideRow({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
-  return (
-    <div className="flex items-center gap-2.5">
-      <span className="text-muted-foreground shrink-0">{icon}</span>
-      <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium shrink-0 w-16">{label}</span>
-      <span className="text-[12px] font-medium text-foreground text-right truncate flex-1">{value}</span>
-    </div>
-  );
-}
-
-function ContactBtn({ icon, label, onClick }: { icon: React.ReactNode; label: string; onClick: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="inline-flex items-center justify-center gap-1.5 rounded-md border border-border bg-background px-2 py-1.5 text-[11px] font-medium text-foreground hover:text-primary hover:border-primary/25 hover:bg-primary/5 transition-colors"
-    >
-      <span className="text-muted-foreground shrink-0">{icon}</span>
-      {label}
-    </button>
   );
 }
