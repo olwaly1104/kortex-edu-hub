@@ -26,11 +26,11 @@ type MotivoItem = { key: string; label: string; categoria: string; destino: stri
 type MultaItem = { key: string; label: string; diasAposPrazo: number; descricao: string };
 
 const INITIAL_MULTAS: MultaItem[] = [
-  { key: "atraso_relatorio", label: "Atraso na entrega de relatório", diasAposPrazo: 5, descricao: "Aplicada quando o relatório obrigatório é entregue após o prazo." },
-  { key: "falta_injustificada", label: "Falta injustificada a sessão", diasAposPrazo: 3, descricao: "Ausência sem justificação em sessão obrigatória." },
-  { key: "atraso_aula", label: "Atraso superior a 15min na aula", diasAposPrazo: 2, descricao: "Atrasos repetidos no início das aulas." },
-  { key: "incumprimento_sla", label: "Incumprimento de SLA de solicitação", diasAposPrazo: 4, descricao: "Solicitação não tratada dentro do prazo definido." },
-  { key: "uso_indevido", label: "Uso indevido de recursos institucionais", diasAposPrazo: 7, descricao: "Utilização de equipamento ou espaço fora do âmbito autorizado." },
+  { key: "atraso_relatorio", label: "Atraso na entrega de relatório", diasAposPrazo: 5, descricao: "Aplicada 5 dias após o prazo de conclusão do relatório obrigatório." },
+  { key: "falta_injustificada", label: "Falta injustificada a sessão", diasAposPrazo: 5, descricao: "Aplicada 5 dias após o prazo de regularização da ausência." },
+  { key: "atraso_aula", label: "Atraso superior a 15min na aula", diasAposPrazo: 5, descricao: "Aplicada 5 dias após o prazo de justificação dos atrasos repetidos." },
+  { key: "incumprimento_sla", label: "Incumprimento de SLA de solicitação", diasAposPrazo: 5, descricao: "Aplicada 5 dias após o prazo de tratamento da solicitação." },
+  { key: "uso_indevido", label: "Uso indevido de recursos institucionais", diasAposPrazo: 5, descricao: "Aplicada 5 dias após o prazo de regularização do uso de recursos." },
 ];
 
 const STAFF_OPTIONS = [
@@ -68,13 +68,23 @@ export default function GapConfiguracao() {
   );
   const [multas, setMultas] = useState<MultaItem[]>(INITIAL_MULTAS);
   const [motivos, setMotivos] = useState<MotivoItem[]>(
-    Object.entries(initialTipoConfig).map(([key, v]) => ({
-      key, label: v.label, categoria: v.categoria, destino: v.destino,
-      responsavel: (v as any).responsavelDestino || defaultResponsavelByDestino(v.destino),
-      slaAceitacao: Math.max(1, Math.ceil(v.slaDias / 3)),
-      slaConclusao: v.slaDias,
-      multa: "",
-    }))
+    Object.entries(initialTipoConfig).map(([key, v]) => {
+      const slaConcl = v.slaDias;
+      // Mock: atribuir multa por defeito (5 dias) apenas se conclusão < 5d
+      const multaDefault = slaConcl < 5
+        ? (v.categoria === "Académico" ? "atraso_relatorio"
+          : v.categoria === "Tecnológico" ? "incumprimento_sla"
+          : v.categoria === "Financeiro" ? "uso_indevido"
+          : "atraso_relatorio")
+        : "";
+      return {
+        key, label: v.label, categoria: v.categoria, destino: v.destino,
+        responsavel: (v as any).responsavelDestino || defaultResponsavelByDestino(v.destino),
+        slaAceitacao: Math.max(1, Math.ceil(slaConcl / 3)),
+        slaConclusao: slaConcl,
+        multa: multaDefault,
+      };
+    })
   );
 
   // Dialog states
