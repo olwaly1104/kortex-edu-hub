@@ -131,52 +131,42 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
           </div>
 
           {/* Body */}
-          <div className="flex-1 px-8 pb-3 space-y-3 overflow-hidden">
-            {/* 1. Detalhes do Pedido */}
-            <Block title="1. Detalhes do Pedido">
+          <div className="flex-1 px-8 pb-3 space-y-4 overflow-hidden">
+            {/* 1 · Discente | 2 · Encaminhamento (side by side, separate sections) */}
+            <div className="grid grid-cols-2 gap-4">
+              <Block title="1. Discente">
+                <KV rows={[
+                  ["Nome", s.discente],
+                  ["Matrícula", s.matricula],
+                  ["Curso", s.curso],
+                  ["Ano", `${s.ano}º`],
+                ]} />
+              </Block>
+              <Block title="2. Encaminhamento">
+                <KV rows={[
+                  ["Solicitação", s.id],
+                  ["Destino", dest.label],
+                  ["Responsável", s.responsavelDestino ?? `Equipa ${dest.label}`],
+                  ["Estado", st.label],
+                ]} />
+              </Block>
+            </div>
+
+            {/* 3 · Motivo & Descrição (together) */}
+            <Block title="3. Motivo & Descrição">
               <div className="rounded border border-border overflow-hidden">
-                {/* Discente · Responsável (side by side) */}
-                <div className="grid grid-cols-2 divide-x divide-border bg-primary/5">
-                  <div className="px-3 py-1 text-[8px] uppercase tracking-wider text-primary font-bold">Discente</div>
-                  <div className="px-3 py-1 text-[8px] uppercase tracking-wider text-primary font-bold">Responsável</div>
+                <div className="grid grid-cols-[110px_1fr] bg-primary/5 border-b border-border">
+                  <div className="px-3 py-1.5 text-[8px] uppercase tracking-wider text-primary font-bold border-r border-border">Categoria</div>
+                  <div className="px-3 py-1.5 text-[10px] font-semibold text-foreground">{tipoCfg?.categoria ?? "—"}</div>
                 </div>
-                <div className="grid grid-cols-2 divide-x divide-border border-t border-border">
-                  <SubKV rows={[
-                    ["Nome", s.discente],
-                    ["Matrícula", s.matricula],
-                    ["Curso", s.curso],
-                    ["Ano", `${s.ano}º`],
-                  ]} />
-                  <SubKV rows={[
-                    ["Destino", dest.label],
-                    ["Responsável", s.responsavelDestino ?? `Equipa ${dest.label}`],
-                    ["Estado", st.label],
-                    ["Referência", s.id],
-                  ]} />
+                <div className="grid grid-cols-[110px_1fr] border-b border-border">
+                  <div className="px-3 py-1.5 text-[8px] uppercase tracking-wider text-muted-foreground font-semibold border-r border-border bg-muted/20">Motivo</div>
+                  <div className="px-3 py-1.5 text-[10.5px] font-semibold text-foreground">{s.assunto}</div>
                 </div>
-
-                {/* Meta do pedido */}
-                <table className="w-full text-[10px] border-t border-border">
-                  <tbody className="divide-y divide-border">
-                    <tr className="bg-background">
-                      <td className="px-2.5 py-1 text-muted-foreground font-medium w-[18%] align-top">Assunto</td>
-                      <td className="px-2.5 py-1 text-foreground font-semibold" colSpan={3}>{s.assunto}</td>
-                    </tr>
-                    <tr className="bg-muted/20">
-                      <td className="px-2.5 py-1 text-muted-foreground font-medium w-[18%] align-top">Categoria</td>
-                      <td className="px-2.5 py-1 text-foreground font-semibold w-[32%]">{tipoCfg?.categoria ?? "—"}</td>
-                      <td className="px-2.5 py-1 text-muted-foreground font-medium w-[18%] align-top border-l border-border">Tipo</td>
-                      <td className="px-2.5 py-1 text-foreground font-semibold">{tipoCfg?.label ?? s.tipo}</td>
-                    </tr>
-                  </tbody>
-                </table>
-
-                {/* Descrição */}
-                <div className="border-t border-border bg-background px-3 py-2">
+                <div className="px-3 py-2 bg-background">
                   <p className="text-[8px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">Descrição</p>
-                  <p className="text-[10px] text-foreground leading-snug whitespace-pre-line line-clamp-5">{s.descricao}</p>
+                  <p className="text-[10px] text-foreground leading-relaxed whitespace-pre-line line-clamp-6">{s.descricao}</p>
                 </div>
-
                 {s.notaInterna && (
                   <div className="border-t border-amber-200 bg-amber-50/60 px-3 py-1.5">
                     <p className="text-[8px] uppercase tracking-wider text-amber-800 font-bold">Nota interna</p>
@@ -186,8 +176,8 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
               </div>
             </Block>
 
-            {/* 5 Cronologia */}
-            <Block title="2. Cronologia">
+            {/* 4 · Cronologia */}
+            <Block title="4. Cronologia">
               <div className="overflow-hidden rounded border border-border">
                 <table className="w-full text-[9.5px]">
                   <thead>
@@ -210,9 +200,9 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
               </div>
             </Block>
 
-            {/* 6 Anexos */}
+            {/* 5 · Anexos */}
             {anexos.length > 0 && (
-              <Block title="3. Anexos">
+              <Block title="5. Anexos">
                 <div className="overflow-hidden rounded border border-border">
                   <table className="w-full text-[9.5px]">
                     <tbody className="divide-y divide-border">
