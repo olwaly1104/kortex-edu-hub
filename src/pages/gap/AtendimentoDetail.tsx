@@ -209,6 +209,18 @@ export default function GapAtendimentoDetail() {
               </div>
             </div>
           )}
+          {atendimento.estado === "concluido" && (
+            <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 flex items-center gap-2 text-[12px] text-foreground">
+              <CheckCircle2 className="w-3.5 h-3.5 shrink-0 text-emerald-600" />
+              <span>Sessão concluída em <span className="font-semibold tabular-nums">{fullDate}</span></span>
+            </div>
+          )}
+          {atendimento.estado === "cancelado" && (
+            <div className="rounded-lg border border-destructive/20 bg-destructive/10 px-3 py-2 flex items-center gap-2 text-[12px] text-destructive">
+              <X className="w-3.5 h-3.5 shrink-0" />
+              <span>Este agendamento foi cancelado e não será realizado.</span>
+            </div>
+          )}
         </div>
 
 
@@ -408,23 +420,6 @@ export default function GapAtendimentoDetail() {
                     );
                   })}
                 </div>
-              </section>
-            )}
-            {/* Status banner — only for completed/cancelled */}
-            {(atendimento.estado === "concluido" || atendimento.estado === "cancelado") && (
-              <section className="pt-5 border-t border-border">
-                {atendimento.estado === "concluido" && (
-                  <div className="flex items-center gap-2.5 text-[13px] text-foreground bg-emerald-50 rounded-lg px-4 py-3 border border-emerald-200">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <span>Sessão concluída em <span className="font-semibold">{fullDate}</span>.</span>
-                  </div>
-                )}
-                {atendimento.estado === "cancelado" && (
-                  <div className="flex items-center gap-2.5 text-[13px] text-destructive bg-destructive/10 rounded-lg px-4 py-3 border border-destructive/20">
-                    <X className="w-4 h-4 shrink-0" />
-                    <span>Este agendamento foi cancelado e não será realizado.</span>
-                  </div>
-                )}
               </section>
             )}
           </main>
