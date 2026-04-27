@@ -59,7 +59,7 @@ export default function GapTickets() {
   const [categoria, setCategoria] = useState<string>("todas");
   const [mes, setMes] = useState<string>("todos");
   const [filterOpen, setFilterOpen] = useState(false);
-  const [filterView, setFilterView] = useState<"root" | "destino" | "categoria" | "motivo">("root");
+  const [filterView, setFilterView] = useState<"root" | "estado" | "destino" | "categoria" | "motivo">("root");
   const [drillCategoria, setDrillCategoria] = useState<string | null>(null);
 
   // Em Atraso — solicitação activa cujo prazo SLA já foi ultrapassado
