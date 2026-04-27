@@ -686,6 +686,15 @@ export interface GapAtendimento {
   estado: "agendado" | "concluido" | "cancelado" | "remarcar";
   responsavel: string;
   sala?: string; notas?: string; descricao?: string;
+  participantes?: GapParticipante[];
+}
+
+export interface GapParticipante {
+  nome: string;
+  tipo: "encarregado" | "escola";
+  relacao: string; // ex: "Mãe", "Pai", "Encarregado", "Coordenador de Curso", "Professor"
+  contacto?: string; // email ou telefone
+  confirmado?: boolean;
 }
 
 export interface GapEstudanteSeguimento {
