@@ -26,11 +26,11 @@ type MotivoItem = { key: string; label: string; categoria: string; destino: stri
 type MultaItem = { key: string; label: string; diasAposPrazo: number; descricao: string };
 
 const INITIAL_MULTAS: MultaItem[] = [
-  { key: "atraso_relatorio", label: "Atraso na entrega de relatório", diasAposPrazo: 5, descricao: "Aplicada quando o relatório obrigatório é entregue após o prazo." },
-  { key: "falta_injustificada", label: "Falta injustificada a sessão", diasAposPrazo: 3, descricao: "Ausência sem justificação em sessão obrigatória." },
-  { key: "atraso_aula", label: "Atraso superior a 15min na aula", diasAposPrazo: 2, descricao: "Atrasos repetidos no início das aulas." },
-  { key: "incumprimento_sla", label: "Incumprimento de SLA de solicitação", diasAposPrazo: 4, descricao: "Solicitação não tratada dentro do prazo definido." },
-  { key: "uso_indevido", label: "Uso indevido de recursos institucionais", diasAposPrazo: 7, descricao: "Utilização de equipamento ou espaço fora do âmbito autorizado." },
+  { key: "atraso_relatorio", label: "Atraso na entrega de relatório", diasAposPrazo: 5, descricao: "Aplicada 5 dias após o prazo de conclusão do relatório obrigatório." },
+  { key: "falta_injustificada", label: "Falta injustificada a sessão", diasAposPrazo: 5, descricao: "Aplicada 5 dias após o prazo de regularização da ausência." },
+  { key: "atraso_aula", label: "Atraso superior a 15min na aula", diasAposPrazo: 5, descricao: "Aplicada 5 dias após o prazo de justificação dos atrasos repetidos." },
+  { key: "incumprimento_sla", label: "Incumprimento de SLA de solicitação", diasAposPrazo: 5, descricao: "Aplicada 5 dias após o prazo de tratamento da solicitação." },
+  { key: "uso_indevido", label: "Uso indevido de recursos institucionais", diasAposPrazo: 5, descricao: "Aplicada 5 dias após o prazo de regularização do uso de recursos." },
 ];
 
 const STAFF_OPTIONS = [
