@@ -427,11 +427,11 @@ export default function GapSolicitacaoDetail() {
 
           {/* RIGHT — detalhes + descrição + doc + histórico */}
           <main className="p-6 space-y-6 min-w-0">
-            {/* Resumo */}
+            {/* Detalhes do Pedido */}
             <section>
               <div className="flex items-center gap-2 mb-3">
                 <FileText className="w-3.5 h-3.5 text-muted-foreground" />
-                <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Resumo</h3>
+                <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Detalhes do Pedido</h3>
               </div>
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-5 gap-y-4">
                 <FactItem label="Submetido" value={fmt(dSub)} />
@@ -443,11 +443,11 @@ export default function GapSolicitacaoDetail() {
 
             <div className="border-t border-border" />
 
-            {/* Detalhes do Pedido — descrição + anexos */}
+            {/* Descrição do Pedido — descrição + anexos */}
             <section>
               <div className="flex items-center gap-2 mb-3">
                 <FileText className="w-3.5 h-3.5 text-muted-foreground" />
-                <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Detalhes do Pedido</h3>
+                <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Descrição do Pedido</h3>
               </div>
 
               <div className="rounded-lg border border-border bg-background overflow-hidden divide-y divide-border">
