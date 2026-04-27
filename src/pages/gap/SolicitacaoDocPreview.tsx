@@ -95,13 +95,13 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
               <div className="border border-foreground/20 rounded-sm overflow-hidden">
                 <div className="grid grid-cols-3 bg-foreground/[0.035] border-b border-foreground/20">
                   <div className="px-3 py-1.5 border-r border-foreground/15">
-                    <p className="text-[7.5px] uppercase tracking-[0.22em] text-doc-accent font-bold">Discente</p>
+                    <p className="text-[7.5px] uppercase tracking-[0.22em] text-foreground/65 font-bold">Discente</p>
                   </div>
                   <div className="px-3 py-1.5 border-r border-foreground/15">
-                    <p className="text-[7.5px] uppercase tracking-[0.22em] text-doc-accent font-bold">Pedido</p>
+                    <p className="text-[7.5px] uppercase tracking-[0.22em] text-foreground/65 font-bold">Pedido</p>
                   </div>
                   <div className="px-3 py-1.5">
-                    <p className="text-[7.5px] uppercase tracking-[0.22em] text-doc-accent font-bold">Encaminhamento</p>
+                    <p className="text-[7.5px] uppercase tracking-[0.22em] text-foreground/65 font-bold">Encaminhamento</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-3">
@@ -161,10 +161,10 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
                 <table className="w-full text-[9.5px]">
                   <thead className="bg-foreground/[0.035]">
                     <tr className="border-b border-foreground/20">
-                      <th className="text-left px-3 py-1.5 font-bold w-[6%] text-doc-accent uppercase tracking-[0.16em] text-[7.5px]">#</th>
-                      <th className="text-left px-3 py-1.5 font-bold w-[26%] text-doc-accent uppercase tracking-[0.16em] text-[7.5px]">Data &amp; Hora</th>
-                      <th className="text-left px-3 py-1.5 font-bold w-[36%] text-doc-accent uppercase tracking-[0.16em] text-[7.5px]">Acção</th>
-                      <th className="text-left px-3 py-1.5 font-bold text-doc-accent uppercase tracking-[0.16em] text-[7.5px]">Responsável</th>
+                      <th className="text-left px-3 py-1.5 font-bold w-[6%] text-foreground/65 uppercase tracking-[0.16em] text-[7.5px]">#</th>
+                      <th className="text-left px-3 py-1.5 font-bold w-[26%] text-foreground/65 uppercase tracking-[0.16em] text-[7.5px]">Data &amp; Hora</th>
+                      <th className="text-left px-3 py-1.5 font-bold w-[36%] text-foreground/65 uppercase tracking-[0.16em] text-[7.5px]">Acção</th>
+                      <th className="text-left px-3 py-1.5 font-bold text-foreground/65 uppercase tracking-[0.16em] text-[7.5px]">Responsável</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-foreground/10">
@@ -188,9 +188,9 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
                   <table className="w-full text-[9.5px]">
                     <thead className="bg-foreground/[0.035]">
                       <tr className="border-b border-foreground/20">
-                        <th className="text-left px-3 py-1.5 font-bold w-[6%] text-doc-accent uppercase tracking-[0.16em] text-[7.5px]">#</th>
-                        <th className="text-left px-3 py-1.5 font-bold text-doc-accent uppercase tracking-[0.16em] text-[7.5px]">Ficheiro</th>
-                        <th className="text-right px-3 py-1.5 font-bold w-[18%] text-doc-accent uppercase tracking-[0.16em] text-[7.5px]">Tamanho</th>
+                        <th className="text-left px-3 py-1.5 font-bold w-[6%] text-foreground/65 uppercase tracking-[0.16em] text-[7.5px]">#</th>
+                        <th className="text-left px-3 py-1.5 font-bold text-foreground/65 uppercase tracking-[0.16em] text-[7.5px]">Ficheiro</th>
+                        <th className="text-right px-3 py-1.5 font-bold w-[18%] text-foreground/65 uppercase tracking-[0.16em] text-[7.5px]">Tamanho</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-foreground/10">
