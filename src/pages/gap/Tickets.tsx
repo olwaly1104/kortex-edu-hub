@@ -309,6 +309,7 @@ export default function GapTickets() {
                     className="inline-flex items-center gap-1 text-xs font-semibold text-foreground hover:text-primary"
                   >
                     <ChevronLeft className="w-3.5 h-3.5" />
+                    {filterView === "estado" && "Estado"}
                     {filterView === "destino" && "Destinos"}
                     {filterView === "categoria" && "Categorias"}
                     {filterView === "motivo" && (drillCategoria ?? "Motivos")}
