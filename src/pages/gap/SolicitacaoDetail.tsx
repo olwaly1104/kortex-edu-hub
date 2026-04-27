@@ -512,58 +512,6 @@ export default function GapSolicitacaoDetail() {
               </Dialog>
             </section>
 
-            {anexos.length > 0 && (
-              <>
-                <div className="border-t border-border" />
-                <section>
-                  <div className="flex items-center gap-2 mb-2.5">
-                    <Paperclip className="w-3.5 h-3.5 text-muted-foreground" />
-                    <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">
-                      Anexos do estudante
-                    </h3>
-                    <span className="text-[10px] text-muted-foreground tabular-nums">({anexos.length})</span>
-                  </div>
-                  <div className="space-y-2">
-                    {anexos.map((a, i) => {
-                      const { Icon, cls } = anexoIcon(a.tipo);
-                      return (
-                        <div
-                          key={i}
-                          className="flex items-center gap-3 rounded-lg border border-border bg-background px-3.5 py-2.5"
-                        >
-                          <div className={cn("w-9 h-9 rounded-md border flex items-center justify-center shrink-0", cls)}>
-                            <Icon className="w-4 h-4" />
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <p className="text-[13px] font-semibold text-foreground leading-tight truncate">{a.nome}</p>
-                            <p className="text-[11px] text-muted-foreground mt-0.5 tabular-nums">{a.tamanho}</p>
-                          </div>
-                          <div className="flex items-center gap-1.5 shrink-0">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="h-7 px-2.5 text-[11px] gap-1"
-                              onClick={() => toast({ title: "A abrir anexo", description: a.nome })}
-                            >
-                              <Eye className="w-3 h-3" /> Ver
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="h-7 px-2.5 text-[11px] gap-1"
-                              onClick={() => toast({ title: "Anexo descarregado", description: a.nome })}
-                            >
-                              <Download className="w-3 h-3" /> Descarregar
-                            </Button>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </section>
-              </>
-            )}
-
             <div className="border-t border-border" />
 
 
