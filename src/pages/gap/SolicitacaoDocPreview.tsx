@@ -129,37 +129,22 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
 
             {/* II · Motivo + Descrição */}
             <Section number="II" title="Motivo do Pedido">
-              <div className="border-t-[3px] border-doc-accent">
-                {/* Assunto — title block */}
-                <div className="px-5 pt-3 pb-3 bg-doc-accent/[0.04]">
-                  <div className="flex items-baseline gap-2.5">
-                    <p className="text-[7.5px] uppercase tracking-[0.22em] text-doc-accent font-bold shrink-0 pt-[3px]">
-                      Assunto
-                    </p>
-                    <h4 className="text-[14px] font-bold leading-snug tracking-tight text-foreground flex-1">
-                      {s.assunto}
-                    </h4>
-                  </div>
-                </div>
-                {/* Descrição — body block */}
-                <div className="px-5 pt-2.5 pb-3 border-t border-doc-accent/20">
-                  <p className="text-[7.5px] uppercase tracking-[0.22em] text-doc-accent font-bold mb-1.5">
-                    Descrição
+              <div className="border-t-[3px] border-doc-accent bg-doc-accent/[0.035] px-5 py-4">
+                <p className="text-[7.5px] uppercase tracking-[0.22em] text-doc-accent font-bold mb-1.5">
+                  Assunto
+                </p>
+                <h4 className="text-[14px] font-bold leading-snug tracking-tight text-foreground mb-3">
+                  {s.assunto}
+                </h4>
+                <p className="text-[10.5px] leading-[1.6] whitespace-pre-line line-clamp-6 text-foreground/85">
+                  {s.descricao}
+                </p>
+                {s.notaInterna && (
+                  <p className="mt-2.5 text-[10px] leading-snug whitespace-pre-line line-clamp-2 text-foreground/65 italic border-l-2 border-doc-accent/40 pl-2.5">
+                    <span className="not-italic font-bold text-doc-accent text-[7.5px] uppercase tracking-[0.22em] mr-1.5">Nota</span>
+                    {s.notaInterna}
                   </p>
-                  <p className="text-[10.5px] leading-[1.55] whitespace-pre-line line-clamp-6 text-foreground/90">
-                    {s.descricao}
-                  </p>
-                  {s.notaInterna && (
-                    <div className="mt-3 pt-2 border-t border-dashed border-doc-accent/25">
-                      <p className="text-[7.5px] uppercase tracking-[0.22em] text-doc-accent font-bold mb-1">
-                        Nota Interna
-                      </p>
-                      <p className="text-[10px] leading-snug whitespace-pre-line line-clamp-2 text-foreground/75 italic">
-                        {s.notaInterna}
-                      </p>
-                    </div>
-                  )}
-                </div>
+                )}
               </div>
             </Section>
 
