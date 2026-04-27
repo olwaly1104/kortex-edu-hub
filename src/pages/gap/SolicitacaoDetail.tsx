@@ -244,34 +244,35 @@ export default function GapSolicitacaoDetail() {
                     {selected.id}
                   </button>
                   <Dialog>
-                    <div className="flex flex-col items-end gap-1">
-                    <div className="inline-flex items-center gap-1.5 pl-1.5 pr-1 py-1 rounded-md border border-border bg-muted/30">
-                      <FileText className="w-3 h-3 text-red-600 shrink-0" />
-                      <span className="text-[10.5px] font-semibold text-foreground tabular-nums">Pedido-{selected.id}</span>
-                      <span className="text-muted-foreground/40">·</span>
-                      <DialogTrigger asChild>
-                        <button type="button" className="text-[10.5px] text-primary hover:underline font-medium inline-flex items-center gap-0.5" title="Partilhas">
-                          <Users className="w-2.5 h-2.5" /> 4
+                    <div className="rounded-md border border-border bg-muted/30 overflow-hidden">
+                      <div className="inline-flex items-center gap-1.5 pl-1.5 pr-1 py-1">
+                        <FileText className="w-3 h-3 text-red-600 shrink-0" />
+                        <span className="text-[10.5px] font-semibold text-foreground tabular-nums">Pedido-{selected.id}</span>
+                        <span className="text-muted-foreground/40">·</span>
+                        <DialogTrigger asChild>
+                          <button type="button" className="text-[10.5px] text-primary hover:underline font-medium inline-flex items-center gap-0.5" title="Partilhas">
+                            <Users className="w-2.5 h-2.5" /> 4
+                          </button>
+                        </DialogTrigger>
+                        <span className="text-muted-foreground/30 ml-0.5">|</span>
+                        <DialogTrigger asChild>
+                          <button type="button" className="w-5 h-5 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-background hover:text-foreground transition-colors" title="Ver">
+                            <Eye className="w-3 h-3" />
+                          </button>
+                        </DialogTrigger>
+                        <button
+                          type="button"
+                          onClick={() => toast({ title: "Documento exportado", description: `Pedido-${selected.id}` })}
+                          className="w-5 h-5 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-background hover:text-foreground transition-colors"
+                          title="Exportar"
+                        >
+                          <Download className="w-3 h-3" />
                         </button>
-                      </DialogTrigger>
-                      <span className="text-muted-foreground/30 ml-0.5">|</span>
-                      <DialogTrigger asChild>
-                        <button type="button" className="w-5 h-5 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-background hover:text-foreground transition-colors" title="Ver">
-                          <Eye className="w-3 h-3" />
-                        </button>
-                      </DialogTrigger>
-                      <button
-                        type="button"
-                        onClick={() => toast({ title: "Documento exportado", description: `Pedido-${selected.id}` })}
-                        className="w-5 h-5 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-background hover:text-foreground transition-colors"
-                        title="Exportar"
-                      >
-                        <Download className="w-3 h-3" />
-                      </button>
-                    </div>
-                      <span className="inline-flex items-center gap-1 text-[10px] text-emerald-600 font-medium whitespace-nowrap">
-                        <CheckCircle2 className="w-3 h-3" /> Gerado automaticamente
-                      </span>
+                      </div>
+                      <div className="flex items-center justify-end gap-1 px-2 py-1 border-t border-border bg-emerald-50/50">
+                        <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                        <span className="text-[10px] text-emerald-700 font-medium whitespace-nowrap">Gerado automaticamente</span>
+                      </div>
                     </div>
                     <DialogContent className="max-w-md">
                       <DialogHeader>
