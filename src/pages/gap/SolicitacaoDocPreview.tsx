@@ -132,26 +132,7 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
 
           {/* Body */}
           <div className="flex-1 px-8 pb-3 space-y-3 overflow-hidden">
-            {/* Status strip: Estado · Destino · Responsável */}
-            <div className="grid grid-cols-3 border border-border rounded overflow-hidden">
-              <div className="px-3 py-1.5 border-r border-border">
-                <p className="text-[8px] uppercase tracking-wider text-muted-foreground font-semibold">Estado</p>
-                <div className="mt-0.5 flex items-center gap-1.5">
-                  <span className={`w-1.5 h-1.5 rounded-full ${tone.dot}`} />
-                  <p className={`text-[10.5px] font-semibold leading-tight ${tone.text}`}>{st.label}</p>
-                </div>
-              </div>
-              <div className="px-3 py-1.5 border-r border-border">
-                <p className="text-[8px] uppercase tracking-wider text-muted-foreground font-semibold">Destino</p>
-                <p className="text-[10.5px] font-semibold text-foreground leading-tight mt-0.5 truncate">{dest.label}</p>
-              </div>
-              <div className="px-3 py-1.5">
-                <p className="text-[8px] uppercase tracking-wider text-muted-foreground font-semibold">Responsável</p>
-                <p className="text-[10.5px] font-semibold text-foreground leading-tight mt-0.5 truncate">{s.responsavelDestino ?? `Equipa ${dest.label}`}</p>
-              </div>
-            </div>
-
-            {/* 1+2 Identificação & Pedido */}
+            {/* 1. Discente · 2. Pedido (with Estado embedded) */}
             <div className="grid grid-cols-2 gap-3">
               <Block title="1. Discente">
                 <KV rows={[
@@ -171,32 +152,31 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
               </Block>
             </div>
 
-            {/* 3 Datas-chave */}
-            <Block title="3. Datas-Chave">
-              <div className="grid grid-cols-4 border border-border rounded overflow-hidden">
-                {[
-                  ["Submissão", fmtDataHora(dataInicio)],
-                  ["Aceitação", fmtDataHora(dataAceite)],
-                  ["Conclusão", dataFim ? fmtDataHora(dataFim) : "Pendente"],
-                  [
-                    s.estado === "concluida" || s.estado === "rejeitada" ? "Duração" : "Decorridos",
-                    s.estado === "concluida" || s.estado === "rejeitada"
-                      ? (diasConclusao !== null ? `${diasConclusao}d` : "—")
-                      : (diasDecorridos !== null ? `${diasDecorridos}d` : "—"),
-                  ],
-                ].map(([k, v], i) => (
-                  <div key={i} className={`px-2.5 py-1.5 ${i < 3 ? "border-r border-border" : ""}`}>
-                    <p className="text-[8px] uppercase tracking-wider text-muted-foreground font-semibold">{k}</p>
-                    <p className="text-[10.5px] font-semibold text-foreground tabular-nums leading-tight mt-0.5">{v}</p>
+            {/* 3. Encaminhamento (Estado · Destino · Responsável) */}
+            <Block title="3. Encaminhamento">
+              <div className="grid grid-cols-3 border border-border rounded overflow-hidden">
+                <div className="px-3 py-1.5 border-r border-border">
+                  <p className="text-[8px] uppercase tracking-wider text-muted-foreground font-semibold">Estado</p>
+                  <div className="mt-0.5 flex items-center gap-1.5">
+                    <span className={`w-1.5 h-1.5 rounded-full ${tone.dot}`} />
+                    <p className={`text-[10.5px] font-semibold leading-tight ${tone.text}`}>{st.label}</p>
                   </div>
-                ))}
+                </div>
+                <div className="px-3 py-1.5 border-r border-border">
+                  <p className="text-[8px] uppercase tracking-wider text-muted-foreground font-semibold">Destino</p>
+                  <p className="text-[10.5px] font-semibold text-foreground leading-tight mt-0.5 truncate">{dest.label}</p>
+                </div>
+                <div className="px-3 py-1.5">
+                  <p className="text-[8px] uppercase tracking-wider text-muted-foreground font-semibold">Responsável</p>
+                  <p className="text-[10.5px] font-semibold text-foreground leading-tight mt-0.5 truncate">{s.responsavelDestino ?? `Equipa ${dest.label}`}</p>
+                </div>
               </div>
             </Block>
 
-            {/* 4 Descrição */}
+            {/* 4. Descrição */}
             <Block title="4. Descrição">
               <div className="rounded border border-border bg-muted/20 px-3 py-2">
-                <p className="text-[10px] text-foreground leading-snug whitespace-pre-line line-clamp-4">{s.descricao}</p>
+                <p className="text-[10px] text-foreground leading-snug whitespace-pre-line line-clamp-5">{s.descricao}</p>
               </div>
               {s.notaInterna && (
                 <div className="mt-1.5 rounded border border-amber-200 bg-amber-50/60 px-3 py-1.5">
