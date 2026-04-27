@@ -53,11 +53,21 @@ const gapReportData = solicitacoes.reduce<Array<{ id: string; name: string; code
 export default function GapTickets() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
-  const [estado, setEstado] = useState<"todos" | "hoje" | "pendentes" | "em_execucao" | "executadas" | "rejeitadas">("todos");
+  const [estado, setEstado] = useState<"todos" | "hoje" | "pendentes" | "em_execucao" | "executadas" | "rejeitadas" | "em_atraso">("todos");
   const [destino, setDestino] = useState<Destino | "todos">("todos");
   const [categoria, setCategoria] = useState<string>("todas");
   const [mes, setMes] = useState<string>("todos");
 
+  // Em Atraso — solicitação activa cujo prazo SLA já foi ultrapassado
+  const todayDate = useMemo(() => { const d = new Date(TODAY); d.setHours(0, 0, 0, 0); return d; }, []);
+  const isEmAtraso = (s: Solicitacao) => {
+    if (s.estado === "concluida" || s.estado === "rejeitada") return false;
+    const sla = s.slaDias ?? tipoConfig[s.tipo]?.slaDias;
+    if (!sla) return false;
+    const base = new Date(s.dataEncaminhamento ?? s.dataSubmissao);
+    base.setDate(base.getDate() + sla);
+    return base.getTime() < todayDate.getTime();
+  };
   const isPendente = (s: Solicitacao) => s.estado === "recebida";
   const isEmExecucao = (s: Solicitacao) => s.estado === "em_execucao";
   const isExecutada = (s: Solicitacao) => s.estado === "concluida";
@@ -71,8 +81,10 @@ export default function GapTickets() {
     em_execucao: solicitacoes.filter(isEmExecucao).length,
     executadas: solicitacoes.filter(isExecutada).length,
     rejeitadas: solicitacoes.filter(isRejeitada).length,
+    em_atraso: solicitacoes.filter(isEmAtraso).length,
     recebida: solicitacoes.filter(t => t.estado === "recebida").length,
     concluida: solicitacoes.filter(t => t.estado === "concluida").length,
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }), []);
 
 
@@ -92,6 +104,7 @@ export default function GapTickets() {
       if (estado === "em_execucao" && !isEmExecucao(s)) return false;
       if (estado === "executadas" && !isExecutada(s)) return false;
       if (estado === "rejeitadas" && !isRejeitada(s)) return false;
+      if (estado === "em_atraso" && !isEmAtraso(s)) return false;
       if (destino !== "todos" && s.destino !== destino) return false;
       if (categoria !== "todas") {
         const cfg = tipoConfig[s.tipo];
@@ -129,9 +142,10 @@ export default function GapTickets() {
   const periodoOpts = [
     { v: "todos", label: "Todas", count: counts.todos },
     { v: "pendentes", label: "Pendentes", count: counts.pendentes },
-    { v: "em_execucao", label: "Em Atraso", count: counts.em_execucao },
+    { v: "em_execucao", label: "Em Execução", count: counts.em_execucao },
     { v: "executadas", label: "Executadas", count: counts.executadas },
     { v: "rejeitadas", label: "Rejeitadas", count: counts.rejeitadas },
+    { v: "em_atraso", label: "Em Atraso", count: counts.em_atraso },
   ] as const;
 
   return (

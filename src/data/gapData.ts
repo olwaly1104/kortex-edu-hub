@@ -9,7 +9,8 @@ export type EstadoSolicitacao =
   | "recebida"        // pendente — submetida pelo discente, aguarda início
   | "em_execucao"     // destino a tratar
   | "concluida"
-  | "rejeitada";
+  | "rejeitada"
+  | "em_atraso";      // SLA ultrapassado (estado virtual derivado)
 
 export type Prioridade = "alta" | "media" | "baixa";
 
@@ -94,6 +95,7 @@ export const estadoSolicitacaoConfig: Record<EstadoSolicitacao, { label: string;
   em_execucao: { label: "Em Execução", color: "bg-blue-50 text-blue-700 border-blue-200" },
   concluida:   { label: "Concluída",   color: "bg-emerald-50 text-emerald-700 border-emerald-200" },
   rejeitada:   { label: "Rejeitada",   color: "bg-destructive/10 text-destructive border-destructive/20" },
+  em_atraso:   { label: "Em Atraso",   color: "bg-orange-50 text-orange-700 border-orange-200" },
 };
 
 export const prioridadeConfig: Record<Prioridade, { label: string; color: string }> = {
@@ -786,7 +788,7 @@ const destinoToCategoria: Record<Destino, TicketCategoria> = {
 };
 const estadoToTicket: Record<EstadoSolicitacao, GapTicket["estado"]> = {
   recebida: "aberto", em_execucao: "em_andamento",
-  concluida: "resolvido", rejeitada: "resolvido",
+  concluida: "resolvido", rejeitada: "resolvido", em_atraso: "em_andamento",
 };
 export const gapTickets: GapTicket[] = solicitacoes.map(s => ({
   id: s.id, discente: s.discente, matricula: s.matricula, curso: s.curso, ano: s.ano,
