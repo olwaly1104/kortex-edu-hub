@@ -259,13 +259,13 @@ export default function GapAtendimentoDetail() {
               const extras = atendimento.participantes ?? [];
               const total = 2 + extras.length; // discente + responsável + extras
               return (
-                <section>
+                <section className="rounded-lg border border-border bg-background p-4">
                   <div className="flex items-center gap-2 mb-3">
                     <Users className="w-3.5 h-3.5 text-muted-foreground" />
                     <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Participantes</h3>
                     <span className="text-[10px] text-muted-foreground font-medium tabular-nums">· {total}</span>
                   </div>
-                  <div className="rounded-lg border border-border bg-background divide-y divide-border">
+                  <div className="divide-y divide-border">
                     {/* Discente */}
                     <ParticipantRow
                       onClick={() => navigate(`/gap/estudantes/${atendimento.matricula}`)}
