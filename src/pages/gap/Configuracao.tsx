@@ -23,15 +23,17 @@ import { useToast } from "@/hooks/use-toast";
 type EstadoItem = { key: string; label: string; color: string };
 type CategoriaItem = { key: string; label: string; color: string };
 type MotivoItem = { key: string; label: string; categoria: string; destino: string; responsavel: string; slaAceitacao: number; slaConclusao: number; multa: string };
-type MultaItem = { key: string; label: string; diasAposPrazo: number; descricao: string };
+type MultaItem = { key: string; label: string; diasAposPrazo: number; valor: number; descricao: string };
 
 const INITIAL_MULTAS: MultaItem[] = [
-  { key: "atraso_relatorio", label: "Atraso na entrega de relatório", diasAposPrazo: 5, descricao: "Aplicada 5 dias após o prazo de conclusão do relatório obrigatório." },
-  { key: "falta_injustificada", label: "Falta injustificada a sessão", diasAposPrazo: 5, descricao: "Aplicada 5 dias após o prazo de regularização da ausência." },
-  { key: "atraso_aula", label: "Atraso superior a 15min na aula", diasAposPrazo: 5, descricao: "Aplicada 5 dias após o prazo de justificação dos atrasos repetidos." },
-  { key: "incumprimento_sla", label: "Incumprimento de SLA de solicitação", diasAposPrazo: 5, descricao: "Aplicada 5 dias após o prazo de tratamento da solicitação." },
-  { key: "uso_indevido", label: "Uso indevido de recursos institucionais", diasAposPrazo: 5, descricao: "Aplicada 5 dias após o prazo de regularização do uso de recursos." },
+  { key: "atraso_relatorio", label: "Atraso na entrega de relatório", diasAposPrazo: 5, valor: 4000, descricao: "Aplicada 5 dias após o prazo de conclusão do relatório obrigatório." },
+  { key: "falta_injustificada", label: "Falta injustificada a sessão", diasAposPrazo: 5, valor: 6000, descricao: "Aplicada 5 dias após o prazo de regularização da ausência." },
+  { key: "atraso_aula", label: "Atraso superior a 15min na aula", diasAposPrazo: 5, valor: 3000, descricao: "Aplicada 5 dias após o prazo de justificação dos atrasos repetidos." },
+  { key: "incumprimento_sla", label: "Incumprimento de SLA de solicitação", diasAposPrazo: 5, valor: 5000, descricao: "Aplicada 5 dias após o prazo de tratamento da solicitação." },
+  { key: "uso_indevido", label: "Uso indevido de recursos institucionais", diasAposPrazo: 5, valor: 8000, descricao: "Aplicada 5 dias após o prazo de regularização do uso de recursos." },
 ];
+
+
 
 const STAFF_OPTIONS = [
   "Dra. Helena Cabral · GAP",
@@ -159,16 +161,6 @@ export default function GapConfiguracao() {
   const removeEstado = (key: string) => setEstados(prev => prev.filter(e => e.key !== key));
   const removeCategoria = (key: string) => setCategorias(prev => prev.filter(c => c.key !== key));
   const removeMotivo = (key: string) => setMotivos(prev => prev.filter(m => m.key !== key));
-  const removeMulta = (key: string) => setMultas(prev => prev.filter(m => m.key !== key));
-
-  const handleAddMulta = () => {
-    if (!newMultaLabel.trim()) return;
-    const key = slugify(newMultaLabel);
-    setMultas(prev => [...prev, { key, label: newMultaLabel.trim(), diasAposPrazo: Math.max(1, newMultaDias), descricao: newMultaDesc.trim() }]);
-    setNewMultaLabel(""); setNewMultaDias(3); setNewMultaDesc("");
-    setMultaOpen(false);
-    toast({ title: "Multa criada", description: `“${newMultaLabel}” foi adicionada.` });
-  };
 
   // Edit dialogs
   const [editEstado, setEditEstado] = useState<EstadoItem | null>(null);
@@ -437,8 +429,8 @@ export default function GapConfiguracao() {
                         const mu = multas.find(x => x.key === m.multa);
                         return mu ? (
                           <span className="inline-flex items-center gap-1.5">
-                            <span className="text-foreground">{mu.label}</span>
-                            <span className="text-destructive font-semibold tabular-nums">· {formatMultaDias(mu.diasAposPrazo)}</span>
+                            <span className="text-foreground">{formatMultaDias(mu.diasAposPrazo)}</span>
+                            <span className="text-destructive font-semibold tabular-nums">· {formatKz(mu.valor)}</span>
                           </span>
                         ) : <span className="text-muted-foreground">—</span>;
                       })()}
@@ -460,105 +452,6 @@ export default function GapConfiguracao() {
           </table>
         </div>
       </Card>
-
-      {/* Multas */}
-      <Card className="p-5">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 text-destructive" />
-            <h2 className="text-sm font-semibold text-foreground">Multas</h2>
-            <span className="text-[11px] text-muted-foreground tabular-nums">· {multas.length}</span>
-          </div>
-          <Dialog open={multaOpen} onOpenChange={setMultaOpen}>
-            <DialogTrigger asChild>
-              <Button size="sm" variant="outline" className="gap-1.5 h-8 text-xs">
-                <Plus className="w-3.5 h-3.5" /> Nova multa
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-lg">
-              <DialogHeader><DialogTitle>Nova multa</DialogTitle></DialogHeader>
-              <div className="space-y-3 py-2">
-                <div>
-                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Motivo</label>
-                  <Input value={newMultaLabel} onChange={e => setNewMultaLabel(e.target.value)} placeholder="Ex: Atraso na entrega de relatório" />
-                </div>
-                <div>
-                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Aplicar após (dias do prazo de conclusão)</label>
-                  <Input type="number" min={1} step={1} value={newMultaDias} onChange={e => setNewMultaDias(Math.max(1, Number(e.target.value) || 1))} />
-                  <p className="text-[10px] text-muted-foreground mt-1">Deve ser superior ao limite de conclusão do motivo associado</p>
-                </div>
-                <div>
-                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Descrição</label>
-                  <Input value={newMultaDesc} onChange={e => setNewMultaDesc(e.target.value)} placeholder="Quando se aplica esta multa" />
-                </div>
-              </div>
-              <DialogFooter className="gap-2 sm:gap-2">
-                <DialogClose asChild><Button variant="outline">Cancelar</Button></DialogClose>
-                <Button onClick={handleAddMulta} disabled={!newMultaLabel.trim()}>Adicionar</Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        </div>
-        <div className="overflow-x-auto rounded-lg border border-border">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b bg-muted/30">
-                <th className="text-left p-3 font-medium text-muted-foreground text-xs">Motivo</th>
-                <th className="text-left p-3 font-medium text-muted-foreground text-xs">Descrição</th>
-                <th className="text-right p-3 font-medium text-muted-foreground text-xs whitespace-nowrap">Aplicar após</th>
-                <th className="w-20" />
-              </tr>
-            </thead>
-            <tbody>
-              {multas.map(m => (
-                <tr key={m.key} className="border-b last:border-0 hover:bg-muted/20">
-                  <td className="p-3 text-xs font-medium text-foreground">{m.label}</td>
-                  <td className="p-3 text-xs text-muted-foreground max-w-md">{m.descricao || "—"}</td>
-                  <td className="p-3 text-right text-xs font-semibold text-destructive tabular-nums whitespace-nowrap">{formatMultaDias(m.diasAposPrazo)}</td>
-                  <td className="p-3 text-right">
-                    <div className="inline-flex items-center gap-2">
-                      <button onClick={() => setEditMulta(m)} className="text-muted-foreground hover:text-foreground" aria-label={`Editar ${m.label}`}>
-                        <Pencil className="w-3.5 h-3.5" />
-                      </button>
-                      <button onClick={() => removeMulta(m.key)} className="text-muted-foreground hover:text-destructive" aria-label={`Remover ${m.label}`}>
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </Card>
-
-      {/* Edit Multa Dialog */}
-      <Dialog open={!!editMulta} onOpenChange={(o) => !o && setEditMulta(null)}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader><DialogTitle>Editar multa</DialogTitle></DialogHeader>
-          {editMulta && (
-            <div className="space-y-3 py-2">
-              <div>
-                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Motivo</label>
-                <Input value={editMulta.label} onChange={e => setEditMulta({ ...editMulta, label: e.target.value })} />
-              </div>
-              <div>
-                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Aplicar após (dias do prazo de conclusão)</label>
-                <Input type="number" min={1} step={1} value={editMulta.diasAposPrazo} onChange={e => setEditMulta({ ...editMulta, diasAposPrazo: Math.max(1, Number(e.target.value) || 1) })} />
-                <p className="text-[10px] text-muted-foreground mt-1">Deve ser superior ao limite de conclusão do motivo associado</p>
-              </div>
-              <div>
-                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Descrição</label>
-                <Input value={editMulta.descricao} onChange={e => setEditMulta({ ...editMulta, descricao: e.target.value })} />
-              </div>
-            </div>
-          )}
-          <DialogFooter className="gap-2 sm:gap-2">
-            <Button variant="outline" onClick={() => setEditMulta(null)}>Cancelar</Button>
-            <Button onClick={saveEditMulta} disabled={!editMulta?.label.trim()}>Guardar</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
       <Dialog open={!!editEstado} onOpenChange={(o) => !o && setEditEstado(null)}>
         <DialogContent className="max-w-md">
