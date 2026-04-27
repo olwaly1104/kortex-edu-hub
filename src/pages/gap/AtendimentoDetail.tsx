@@ -263,15 +263,19 @@ export default function GapAtendimentoDetail() {
                       name={atendimento.discente}
                       sub={`${atendimento.matricula} · ${atendimento.curso} · ${atendimento.ano}º ano`}
                       badge={{ icon: GraduationCap, label: "Discente", classes: "bg-primary/10 text-primary border-primary/20" }}
+                      contactName={atendimento.discente}
+                      onAction={handleAction}
                     />
                     {/* Responsável GAP */}
                     <ParticipantRow
                       onClick={() => handleAction(`Perfil de ${atendimento.responsavel}`)}
-                      avatarClasses="bg-amber-50 text-amber-700 ring-amber-200"
+                      avatarClasses="bg-primary/10 text-primary ring-primary/20"
                       initials={atendimento.responsavel.split(" ").slice(0, 2).map(n => n[0]).join("")}
                       name={atendimento.responsavel}
                       sub={`GAP · ID ${getUserId(atendimento.responsavel)}`}
-                      badge={{ icon: UserCircle2, label: "Responsável", classes: "bg-amber-50 text-amber-700 border-amber-200" }}
+                      badge={{ icon: UserCircle2, label: "Responsável", classes: "bg-violet-50 text-violet-700 border-violet-200" }}
+                      contactName={atendimento.responsavel}
+                      onAction={handleAction}
                     />
                     {/* Outros participantes existentes */}
                     {extras.map((p, idx) => {
@@ -293,6 +297,8 @@ export default function GapAtendimentoDetail() {
                             classes: isFamily ? "bg-pink-50 text-pink-700 border-pink-200" : "bg-blue-50 text-blue-700 border-blue-200",
                           }}
                           status={!isFamily ? (p.confirmado ? "confirmado" : "pendente") : undefined}
+                          contactName={p.nome}
+                          onAction={handleAction}
                         />
                       );
                     })}
