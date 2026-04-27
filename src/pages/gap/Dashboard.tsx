@@ -87,7 +87,7 @@ export default function GapDashboard() {
             <BarChart3 className="w-6 h-6 text-primary" /> Dashboard GAP
           </h1>
           <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
-            Gabinete de Apoio ao Estudante — monitorização do pipeline de solicitações encaminhadas e acompanhamento individual.
+            Gabinete de Apoio ao Discente — monitorização do pipeline de solicitações encaminhadas e acompanhamento individual.
           </p>
         </div>
         <Badge variant="outline" className="text-[11px] font-semibold bg-primary/5 text-primary border-primary/20 px-3 py-1.5">
@@ -134,7 +134,7 @@ export default function GapDashboard() {
                 </div>
                 <div className="w-px h-9 bg-border shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-semibold text-foreground line-clamp-1">{a.estudante}</p>
+                  <p className="text-xs font-semibold text-foreground line-clamp-1">{a.discente}</p>
                   <p className="text-[10px] text-muted-foreground line-clamp-1">{a.motivo}</p>
                 </div>
                 <div className="flex flex-col items-end gap-1 shrink-0">
@@ -181,7 +181,7 @@ export default function GapDashboard() {
                 <thead>
                   <tr className="border-b bg-muted/30">
                     <th className="text-left px-3 py-2 font-medium text-muted-foreground text-xs uppercase tracking-wider">Solicitação</th>
-                    <th className="text-left px-3 py-2 font-medium text-muted-foreground text-xs uppercase tracking-wider">Estudante</th>
+                    <th className="text-left px-3 py-2 font-medium text-muted-foreground text-xs uppercase tracking-wider">Discente</th>
                     <th className="text-left px-3 py-2 font-medium text-muted-foreground text-xs uppercase tracking-wider">Categoria</th>
                     <th className="text-left px-3 py-2 font-medium text-muted-foreground text-xs uppercase tracking-wider">Destino</th>
                     <th className="text-center px-3 py-2 font-medium text-muted-foreground text-xs uppercase tracking-wider whitespace-nowrap">Atraso</th>
@@ -204,7 +204,7 @@ export default function GapDashboard() {
                           <p className="text-[11px] text-muted-foreground tabular-nums mt-0.5">{sol.id}</p>
                         </td>
                         <td className="px-3 py-2">
-                          <p className="text-xs text-foreground leading-tight line-clamp-1">{sol.estudante}</p>
+                          <p className="text-xs text-foreground leading-tight line-clamp-1">{sol.discente}</p>
                           <p className="text-[11px] text-muted-foreground tabular-nums mt-0.5">{sol.matricula}</p>
                         </td>
                         <td className="px-3 py-2">

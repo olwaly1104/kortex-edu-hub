@@ -38,9 +38,9 @@ export default function GapEstudantes() {
       {/* Header */}
       <div className="flex items-end justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-2xl font-bold text-foreground tracking-tight">Estudantes</h1>
+          <h1 className="text-2xl font-bold text-foreground tracking-tight">Discentes</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Estudantes acompanhados pelo GAP — solicitações e agendamentos.
+            Discentes acompanhados pelo GAP — solicitações e agendamentos.
           </p>
         </div>
       </div>
@@ -48,7 +48,7 @@ export default function GapEstudantes() {
       {/* KPIs — only 2 */}
       <div className="grid grid-cols-2 lg:grid-cols-2 gap-3 max-w-xl">
         {[
-          { label: "Estudantes", value: kpis.total, icon: Users, iconBg: "bg-primary/10 text-primary" },
+          { label: "Discentes", value: kpis.total, icon: Users, iconBg: "bg-primary/10 text-primary" },
           { label: "Risco Alto", value: kpis.risco, icon: AlertTriangle, iconBg: "bg-red-50 text-red-600" },
         ].map(k => (
           <Card key={k.label} className="p-4 hover:shadow-sm transition-shadow">
@@ -71,7 +71,7 @@ export default function GapEstudantes() {
           <div className="relative flex-1 min-w-[220px] max-w-[380px]">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
             <Input
-              placeholder="Pesquisar estudante, matrícula ou curso…"
+              placeholder="Pesquisar discente, matrícula ou curso…"
               value={search}
               onChange={e => setSearch(e.target.value)}
               className="pl-9 pr-8 h-9 text-xs"
@@ -97,14 +97,14 @@ export default function GapEstudantes() {
         {filtered.length === 0 ? (
           <div className="p-12 text-center">
             <Users className="w-10 h-10 text-muted-foreground/40 mx-auto mb-3" />
-            <p className="text-sm text-muted-foreground">Nenhum estudante encontrado</p>
+            <p className="text-sm text-muted-foreground">Nenhum discente encontrado</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b bg-muted/30">
-                  <th className="text-left p-3 font-medium text-muted-foreground">Estudante</th>
+                  <th className="text-left p-3 font-medium text-muted-foreground">Discente</th>
                   <th className="text-left p-3 font-medium text-muted-foreground">Faculdade</th>
                   <th className="text-left p-3 font-medium text-muted-foreground">Curso</th>
                   <th className="text-center p-3 font-medium text-muted-foreground whitespace-nowrap">Ano</th>

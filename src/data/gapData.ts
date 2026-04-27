@@ -1,12 +1,12 @@
-// GAP — Gabinete de Apoio ao Estudante
-// Modelo: pedidos (Solicitações) submetidos pelo estudante no Portal e
+// GAP — Gabinete de Apoio ao Discente
+// Modelo: pedidos (Solicitações) submetidos pelo discente no Portal e
 // encaminhados automaticamente ao departamento responsável (CTI, Académica,
 // Financeiro, GAP, Secretaria). O GAP monitoriza a execução — não responde.
 
 export type Destino = "CTI" | "Académica" | "Financeiro" | "Faculdade" | "GAP" | "Secretaria";
 
 export type EstadoSolicitacao =
-  | "recebida"        // pendente — submetida pelo estudante, aguarda início
+  | "recebida"        // pendente — submetida pelo discente, aguarda início
   | "em_execucao"     // destino a tratar
   | "concluida"
   | "rejeitada";
@@ -23,17 +23,17 @@ export type Categoria = "Tecnológico" | "Académico" | "Financeiro";
 
 export const tipoConfig: Record<string, { label: string; categoria: Categoria; destino: Destino; slaDias: number }> = {
   // ── CTI (Tecnológico) ────────────────────────────────────────────────────
-  actualizacao_dados_portal:   { label: "Actualização de dados — Portal do Estudante", categoria: "Tecnológico", destino: "CTI", slaDias: 2 },
+  actualizacao_dados_portal:   { label: "Actualização de dados — Portal do Discente", categoria: "Tecnológico", destino: "CTI", slaDias: 2 },
   actualizacao_dados_email:    { label: "Actualização de dados — Email institucional", categoria: "Tecnológico", destino: "CTI", slaDias: 2 },
-  actualizacao_dados_canal:    { label: "Actualização de dados — Canal de Estudante", categoria: "Tecnológico", destino: "CTI", slaDias: 3 },
+  actualizacao_dados_canal:    { label: "Actualização de dados — Canal de Discente", categoria: "Tecnológico", destino: "CTI", slaDias: 3 },
   actualizacao_calculo_medias: { label: "Actualização do cálculo de médias no sistema", categoria: "Tecnológico", destino: "CTI", slaDias: 5 },
-  segunda_via_cartao:          { label: "Pedido de 2ª via do cartão de estudante", categoria: "Tecnológico", destino: "CTI", slaDias: 7 },
-  falha_cartao:                { label: "Falha de funcionamento do cartão de estudante", categoria: "Tecnológico", destino: "CTI", slaDias: 5 },
-  anulacao_cartao:             { label: "Pedido de anulação do cartão de estudante", categoria: "Tecnológico", destino: "CTI", slaDias: 3 },
+  segunda_via_cartao:          { label: "Pedido de 2ª via do cartão de discente", categoria: "Tecnológico", destino: "CTI", slaDias: 7 },
+  falha_cartao:                { label: "Falha de funcionamento do cartão de discente", categoria: "Tecnológico", destino: "CTI", slaDias: 5 },
+  anulacao_cartao:             { label: "Pedido de anulação do cartão de discente", categoria: "Tecnológico", destino: "CTI", slaDias: 3 },
 
   // ── Área Académica (Académico) ───────────────────────────────────────────
   inscricao_semestre:          { label: "Inscrição para o Iº/IIº Semestre", categoria: "Académico", destino: "Académica", slaDias: 5 },
-  inscricao_prescritos:        { label: "Inscrição de estudante prescrito", categoria: "Académico", destino: "Académica", slaDias: 5 },
+  inscricao_prescritos:        { label: "Inscrição de discente prescrito", categoria: "Académico", destino: "Académica", slaDias: 5 },
   inscricao_recurso:           { label: "Inscrição para exame de recurso", categoria: "Académico", destino: "Académica", slaDias: 3 },
   inscricao_fora_epoca:        { label: "Inscrição para exame fora de época", categoria: "Académico", destino: "Académica", slaDias: 3 },
   ausencia_lista_disciplina:   { label: "Nome ausente em lista de disciplina", categoria: "Académico", destino: "Académica", slaDias: 4 },
@@ -111,8 +111,8 @@ export interface HistoricoEntry {
 
 export interface Solicitacao {
   id: string;
-  // Estudante
-  estudante: string;
+  // Discente
+  discente: string;
   matricula: string;
   curso: string;
   faculdade: string;
@@ -145,7 +145,7 @@ const CTI_SARA  = "Téc. Sara Domingos · CTI";
 export const solicitacoes: Solicitacao[] = [
   {
     id: "SOL-2025-0142",
-    estudante: "Ana Luísa Ferreira", matricula: "2024001", curso: "Eng. Informática", faculdade: "Faculdade de Ciências Exatas", ano: 2,
+    discente: "Ana Luísa Ferreira", matricula: "2024001", curso: "Eng. Informática", faculdade: "Faculdade de Ciências Exatas", ano: 2,
     tipo: "actualizacao_dados_portal",
     assunto: "Não consigo entrar no Portal — credenciais inválidas",
     descricao: "Após mudança de palavra-passe deixei de aceder. O sistema rejeita as novas credenciais.",
@@ -153,14 +153,14 @@ export const solicitacoes: Solicitacao[] = [
     estado: "em_execucao", prioridade: "alta", slaDias: 2,
     dataSubmissao: "2025-12-14", dataEncaminhamento: "2025-12-14",
     historico: [
-      { data: "2025-12-14 09:12", actor: "Portal do Estudante", accao: "Solicitação submetida pelo estudante" },
+      { data: "2025-12-14 09:12", actor: "Portal do Discente", accao: "Solicitação submetida pelo discente" },
       { data: "2025-12-14 09:13", actor: "Sistema", accao: "Encaminhada automaticamente para CTI" },
       { data: "2025-12-14 14:32", actor: CTI_PAULO, accao: "Atribuída", nota: "A verificar registo no AD." },
     ],
   },
   {
     id: "SOL-2025-0141",
-    estudante: "Carlos Mendes", matricula: "2024015", curso: "Medicina", faculdade: "Faculdade de Medicina", ano: 1,
+    discente: "Carlos Mendes", matricula: "2024015", curso: "Medicina", faculdade: "Faculdade de Medicina", ano: 1,
     tipo: "actualizacao_dados_email",
     assunto: "Email institucional não recebe mensagens externas",
     descricao: "Mensagens enviadas de Gmail não chegam à minha caixa @upra.kor.",
@@ -168,21 +168,21 @@ export const solicitacoes: Solicitacao[] = [
     estado: "recebida", prioridade: "media", slaDias: 2,
     dataSubmissao: "2025-12-15", dataEncaminhamento: "2025-12-15",
     historico: [
-      { data: "2025-12-15 10:04", actor: "Portal do Estudante", accao: "Solicitação submetida" },
+      { data: "2025-12-15 10:04", actor: "Portal do Discente", accao: "Solicitação submetida" },
       { data: "2025-12-15 10:04", actor: "Sistema", accao: "Encaminhada automaticamente para CTI" },
     ],
   },
   {
     id: "SOL-2025-0140",
-    estudante: "Maria João Santos", matricula: "2023042", curso: "Medicina", faculdade: "Faculdade de Medicina", ano: 3,
+    discente: "Maria João Santos", matricula: "2023042", curso: "Medicina", faculdade: "Faculdade de Medicina", ano: 3,
     tipo: "actualizacao_dados_canal",
-    assunto: "Canal de Estudante não regista os meus pedidos",
+    assunto: "Canal de Discente não regista os meus pedidos",
     descricao: "Ao submeter um pedido o sistema mostra erro e não devolve número de protocolo.",
     destino: "CTI", responsavelDestino: CTI_PAULO,
     estado: "em_execucao", prioridade: "alta", slaDias: 3,
     dataSubmissao: "2025-12-12", dataEncaminhamento: "2025-12-12",
     historico: [
-      { data: "2025-12-12 11:21", actor: "Portal do Estudante", accao: "Solicitação submetida" },
+      { data: "2025-12-12 11:21", actor: "Portal do Discente", accao: "Solicitação submetida" },
       { data: "2025-12-12 11:22", actor: "Sistema", accao: "Encaminhada automaticamente para CTI" },
       { data: "2025-12-12 15:40", actor: CTI_PAULO, accao: "Atribuída" },
       { data: "2025-12-13 09:10", actor: CTI_PAULO, accao: "Em diagnóstico", nota: "Erro reproduzido em ambiente de teste." },
@@ -190,7 +190,7 @@ export const solicitacoes: Solicitacao[] = [
   },
   {
     id: "SOL-2025-0139",
-    estudante: "Pedro Almeida", matricula: "2024033", curso: "Eng. Informática", faculdade: "Faculdade de Ciências Exatas", ano: 2,
+    discente: "Pedro Almeida", matricula: "2024033", curso: "Eng. Informática", faculdade: "Faculdade de Ciências Exatas", ano: 2,
     tipo: "actualizacao_calculo_medias",
     assunto: "Média do 1º semestre incorrecta no portal",
     descricao: "A média apresentada no portal não corresponde ao boletim de notas oficial.",
@@ -198,7 +198,7 @@ export const solicitacoes: Solicitacao[] = [
     estado: "em_execucao", prioridade: "media", slaDias: 5,
     dataSubmissao: "2025-12-10", dataEncaminhamento: "2025-12-10",
     historico: [
-      { data: "2025-12-10 08:45", actor: "Portal do Estudante", accao: "Solicitação submetida" },
+      { data: "2025-12-10 08:45", actor: "Portal do Discente", accao: "Solicitação submetida" },
       { data: "2025-12-10 08:45", actor: "Sistema", accao: "Encaminhada automaticamente para CTI" },
       { data: "2025-12-11 10:00", actor: CTI_SARA, accao: "Atribuída" },
       { data: "2025-12-13 16:20", actor: CTI_SARA, accao: "A aguardar dados da Académica", nota: "Pedido de validação enviado à Académica." },
@@ -206,24 +206,24 @@ export const solicitacoes: Solicitacao[] = [
   },
   {
     id: "SOL-2025-0138",
-    estudante: "Sofia Bernardo", matricula: "2023018", curso: "Eng. Civil", faculdade: "Faculdade de Ciências Exatas", ano: 4,
+    discente: "Sofia Bernardo", matricula: "2023018", curso: "Eng. Civil", faculdade: "Faculdade de Ciências Exatas", ano: 4,
     tipo: "segunda_via_cartao",
     assunto: "Pedido de 2ª via — cartão extraviado",
-    descricao: "Perdi o cartão de estudante no transporte público. Necessito de 2ª via.",
+    descricao: "Perdi o cartão de discente no transporte público. Necessito de 2ª via.",
     destino: "CTI", responsavelDestino: CTI_PAULO,
     estado: "concluida", prioridade: "media", slaDias: 7,
     dataSubmissao: "2025-12-02", dataEncaminhamento: "2025-12-02", dataConclusao: "2025-12-08",
     historico: [
-      { data: "2025-12-02 14:10", actor: "Portal do Estudante", accao: "Solicitação submetida" },
+      { data: "2025-12-02 14:10", actor: "Portal do Discente", accao: "Solicitação submetida" },
       { data: "2025-12-02 14:10", actor: "Sistema", accao: "Encaminhada automaticamente para CTI" },
       { data: "2025-12-03 09:30", actor: CTI_PAULO, accao: "Atribuída" },
       { data: "2025-12-05 11:00", actor: CTI_PAULO, accao: "Cartão produzido" },
-      { data: "2025-12-08 10:15", actor: CTI_PAULO, accao: "Concluída", nota: "Cartão entregue ao estudante." },
+      { data: "2025-12-08 10:15", actor: CTI_PAULO, accao: "Concluída", nota: "Cartão entregue ao discente." },
     ],
   },
   {
     id: "SOL-2025-0137",
-    estudante: "João Baptista", matricula: "2024050", curso: "Eng. Civil", faculdade: "Faculdade de Ciências Exatas", ano: 1,
+    discente: "João Baptista", matricula: "2024050", curso: "Eng. Civil", faculdade: "Faculdade de Ciências Exatas", ano: 1,
     tipo: "falha_cartao",
     assunto: "Cartão não funciona nos torniquetes",
     descricao: "Desde sexta-feira o cartão é rejeitado em todas as entradas.",
@@ -231,7 +231,7 @@ export const solicitacoes: Solicitacao[] = [
     estado: "concluida", prioridade: "alta", slaDias: 5,
     dataSubmissao: "2025-12-01", dataEncaminhamento: "2025-12-01", dataConclusao: "2025-12-04",
     historico: [
-      { data: "2025-12-01 16:22", actor: "Portal do Estudante", accao: "Solicitação submetida" },
+      { data: "2025-12-01 16:22", actor: "Portal do Discente", accao: "Solicitação submetida" },
       { data: "2025-12-01 16:22", actor: "Sistema", accao: "Encaminhada automaticamente para CTI" },
       { data: "2025-12-02 08:50", actor: CTI_SARA, accao: "Atribuída" },
       { data: "2025-12-04 14:00", actor: CTI_SARA, accao: "Concluída", nota: "Reprogramação do chip; testado com sucesso." },
@@ -239,7 +239,7 @@ export const solicitacoes: Solicitacao[] = [
   },
   {
     id: "SOL-2025-0136",
-    estudante: "Beatriz Lopes", matricula: "2023089", curso: "Enfermagem", faculdade: "Faculdade de Medicina", ano: 3,
+    discente: "Beatriz Lopes", matricula: "2023089", curso: "Enfermagem", faculdade: "Faculdade de Medicina", ano: 3,
     tipo: "anulacao_cartao",
     assunto: "Anulação de cartão por suspeita de uso indevido",
     descricao: "Suspeito que o meu cartão foi clonado. Solicito anulação imediata.",
@@ -247,7 +247,7 @@ export const solicitacoes: Solicitacao[] = [
     estado: "concluida", prioridade: "alta", slaDias: 3,
     dataSubmissao: "2025-11-28", dataEncaminhamento: "2025-11-28", dataConclusao: "2025-11-29",
     historico: [
-      { data: "2025-11-28 17:40", actor: "Portal do Estudante", accao: "Solicitação submetida" },
+      { data: "2025-11-28 17:40", actor: "Portal do Discente", accao: "Solicitação submetida" },
       { data: "2025-11-28 17:40", actor: "Sistema", accao: "Encaminhada automaticamente para CTI" },
       { data: "2025-11-29 09:00", actor: CTI_PAULO, accao: "Atribuída" },
       { data: "2025-11-29 11:30", actor: CTI_PAULO, accao: "Concluída", nota: "Cartão anulado no sistema. 2ª via deve ser pedida." },
@@ -255,7 +255,7 @@ export const solicitacoes: Solicitacao[] = [
   },
   {
     id: "SOL-2025-0135",
-    estudante: "Tiago Mateus", matricula: "2024077", curso: "Arquitectura", faculdade: "Faculdade de Ciências Exatas", ano: 2,
+    discente: "Tiago Mateus", matricula: "2024077", curso: "Arquitectura", faculdade: "Faculdade de Ciências Exatas", ano: 2,
     tipo: "segunda_via_cartao",
     assunto: "Pedido de 2ª via — cartão danificado",
     descricao: "O cartão partiu-se e deixou de ser lido. Solicito substituição.",
@@ -263,13 +263,13 @@ export const solicitacoes: Solicitacao[] = [
     estado: "recebida", prioridade: "baixa", slaDias: 7,
     dataSubmissao: "2025-12-15",
     historico: [
-      { data: "2025-12-15 11:55", actor: "Portal do Estudante", accao: "Solicitação submetida" },
+      { data: "2025-12-15 11:55", actor: "Portal do Discente", accao: "Solicitação submetida" },
       { data: "2025-12-15 11:55", actor: "Sistema", accao: "Encaminhada automaticamente para CTI" },
     ],
   },
   {
     id: "SOL-2025-0134",
-    estudante: "Helena Costa", matricula: "2024088", curso: "Enfermagem", faculdade: "Faculdade de Medicina", ano: 1,
+    discente: "Helena Costa", matricula: "2024088", curso: "Enfermagem", faculdade: "Faculdade de Medicina", ano: 1,
     tipo: "actualizacao_dados_portal",
     assunto: "Actualização de número de telefone no Portal",
     descricao: "Mudei de operador e o portal não me deixa actualizar o contacto.",
@@ -277,13 +277,13 @@ export const solicitacoes: Solicitacao[] = [
     estado: "recebida", prioridade: "baixa", slaDias: 2,
     dataSubmissao: "2025-12-15",
     historico: [
-      { data: "2025-12-15 13:08", actor: "Portal do Estudante", accao: "Solicitação submetida" },
+      { data: "2025-12-15 13:08", actor: "Portal do Discente", accao: "Solicitação submetida" },
       { data: "2025-12-15 13:08", actor: "Sistema", accao: "Encaminhada automaticamente para CTI" },
     ],
   },
   {
     id: "SOL-2025-0133",
-    estudante: "Rui Vasconcelos", matricula: "2023105", curso: "Eng. Informática", faculdade: "Faculdade de Ciências Exatas", ano: 3,
+    discente: "Rui Vasconcelos", matricula: "2023105", curso: "Eng. Informática", faculdade: "Faculdade de Ciências Exatas", ano: 3,
     tipo: "actualizacao_dados_email",
     assunto: "Reset de palavra-passe do email institucional",
     descricao: "Esqueci a palavra-passe e a recuperação não envia o código.",
@@ -291,27 +291,27 @@ export const solicitacoes: Solicitacao[] = [
     estado: "recebida", prioridade: "media", slaDias: 2,
     dataSubmissao: "2025-12-15", dataEncaminhamento: "2025-12-15",
     historico: [
-      { data: "2025-12-15 08:30", actor: "Portal do Estudante", accao: "Solicitação submetida" },
+      { data: "2025-12-15 08:30", actor: "Portal do Discente", accao: "Solicitação submetida" },
       { data: "2025-12-15 08:30", actor: "Sistema", accao: "Encaminhada automaticamente para CTI" },
     ],
   },
   {
     id: "SOL-2025-0132",
-    estudante: "Lucas Marques", matricula: "2024112", curso: "Medicina", faculdade: "Faculdade de Medicina", ano: 1,
+    discente: "Lucas Marques", matricula: "2024112", curso: "Medicina", faculdade: "Faculdade de Medicina", ano: 1,
     tipo: "actualizacao_dados_canal",
-    assunto: "Não consigo aceder ao Canal de Estudante",
+    assunto: "Não consigo aceder ao Canal de Discente",
     descricao: "O Canal mostra ‘perfil não autorizado’ desde a inscrição.",
     destino: "CTI",
     estado: "recebida", prioridade: "media", slaDias: 3,
     dataSubmissao: "2025-12-14", dataEncaminhamento: "2025-12-14",
     historico: [
-      { data: "2025-12-14 16:10", actor: "Portal do Estudante", accao: "Solicitação submetida" },
+      { data: "2025-12-14 16:10", actor: "Portal do Discente", accao: "Solicitação submetida" },
       { data: "2025-12-14 16:10", actor: "Sistema", accao: "Encaminhada automaticamente para CTI" },
     ],
   },
   {
     id: "SOL-2025-0131",
-    estudante: "Inês Cardoso", matricula: "2023060", curso: "Eng. Informática", faculdade: "Faculdade de Ciências Exatas", ano: 3,
+    discente: "Inês Cardoso", matricula: "2023060", curso: "Eng. Informática", faculdade: "Faculdade de Ciências Exatas", ano: 3,
     tipo: "actualizacao_calculo_medias",
     assunto: "Cadeira em falta no cálculo da média ponderada",
     descricao: "A cadeira de Estatística II não consta no cálculo da minha média do ano.",
@@ -319,14 +319,14 @@ export const solicitacoes: Solicitacao[] = [
     estado: "em_execucao", prioridade: "alta", slaDias: 5,
     dataSubmissao: "2025-12-08", dataEncaminhamento: "2025-12-08",
     historico: [
-      { data: "2025-12-08 09:00", actor: "Portal do Estudante", accao: "Solicitação submetida" },
+      { data: "2025-12-08 09:00", actor: "Portal do Discente", accao: "Solicitação submetida" },
       { data: "2025-12-08 09:00", actor: "Sistema", accao: "Encaminhada automaticamente para CTI" },
       { data: "2025-12-09 10:00", actor: CTI_SARA, accao: "Atribuída" },
     ],
   },
   {
     id: "SOL-2025-0130",
-    estudante: "Filipe Soares", matricula: "2024090", curso: "Eng. Civil", faculdade: "Faculdade de Ciências Exatas", ano: 1,
+    discente: "Filipe Soares", matricula: "2024090", curso: "Eng. Civil", faculdade: "Faculdade de Ciências Exatas", ano: 1,
     tipo: "falha_cartao",
     assunto: "Cartão lê mas não autoriza acesso à biblioteca",
     descricao: "Os torniquetes da biblioteca recusam o cartão; nas entradas principais funciona.",
@@ -334,14 +334,14 @@ export const solicitacoes: Solicitacao[] = [
     estado: "rejeitada", prioridade: "baixa", slaDias: 5,
     dataSubmissao: "2025-12-05", dataEncaminhamento: "2025-12-05", dataConclusao: "2025-12-06",
     historico: [
-      { data: "2025-12-05 10:30", actor: "Portal do Estudante", accao: "Solicitação submetida" },
+      { data: "2025-12-05 10:30", actor: "Portal do Discente", accao: "Solicitação submetida" },
       { data: "2025-12-05 10:30", actor: "Sistema", accao: "Encaminhada automaticamente para CTI" },
-      { data: "2025-12-06 09:15", actor: CTI_PAULO, accao: "Rejeitada", nota: "Estudante sem matrícula activa em Biblioteca; reencaminhado à Académica." },
+      { data: "2025-12-06 09:15", actor: CTI_PAULO, accao: "Rejeitada", nota: "Discente sem matrícula activa em Biblioteca; reencaminhado à Académica." },
     ],
   },
   {
     id: "SOL-2025-0129",
-    estudante: "Marta Pires", matricula: "2023072", curso: "Medicina", faculdade: "Faculdade de Medicina", ano: 4,
+    discente: "Marta Pires", matricula: "2023072", curso: "Medicina", faculdade: "Faculdade de Medicina", ano: 4,
     tipo: "anulacao_cartao",
     assunto: "Anulação por término de matrícula",
     descricao: "Concluí o curso e quero anular o cartão activo.",
@@ -349,7 +349,7 @@ export const solicitacoes: Solicitacao[] = [
     estado: "concluida", prioridade: "baixa", slaDias: 3,
     dataSubmissao: "2025-11-25", dataEncaminhamento: "2025-11-25", dataConclusao: "2025-11-27",
     historico: [
-      { data: "2025-11-25 14:00", actor: "Portal do Estudante", accao: "Solicitação submetida" },
+      { data: "2025-11-25 14:00", actor: "Portal do Discente", accao: "Solicitação submetida" },
       { data: "2025-11-25 14:00", actor: "Sistema", accao: "Encaminhada automaticamente para CTI" },
       { data: "2025-11-26 09:00", actor: CTI_SARA, accao: "Atribuída" },
       { data: "2025-11-27 11:00", actor: CTI_SARA, accao: "Concluída" },
@@ -359,7 +359,7 @@ export const solicitacoes: Solicitacao[] = [
   // ── Área Académica ───────────────────────────────────────────────────────
   {
     id: "SOL-2025-0128",
-    estudante: "Diana Quintas", matricula: "2024021", curso: "Medicina", faculdade: "Faculdade de Medicina", ano: 1,
+    discente: "Diana Quintas", matricula: "2024021", curso: "Medicina", faculdade: "Faculdade de Medicina", ano: 1,
     tipo: "inscricao_semestre",
     assunto: "Inscrição no IIº Semestre — pendente",
     descricao: "Submeti os documentos mas a inscrição continua por confirmar no portal.",
@@ -367,14 +367,14 @@ export const solicitacoes: Solicitacao[] = [
     estado: "em_execucao", prioridade: "alta", slaDias: 5,
     dataSubmissao: "2025-12-13", dataEncaminhamento: "2025-12-13",
     historico: [
-      { data: "2025-12-13 09:00", actor: "Portal do Estudante", accao: "Solicitação submetida" },
+      { data: "2025-12-13 09:00", actor: "Portal do Discente", accao: "Solicitação submetida" },
       { data: "2025-12-13 09:00", actor: "Sistema", accao: "Encaminhada automaticamente para Académica" },
       { data: "2025-12-14 10:30", actor: "Dra. Cita · Secretaria Académica", accao: "Em validação documental" },
     ],
   },
   {
     id: "SOL-2025-0127",
-    estudante: "Hugo Faria", matricula: "2023111", curso: "Medicina", faculdade: "Faculdade de Medicina", ano: 4,
+    discente: "Hugo Faria", matricula: "2023111", curso: "Medicina", faculdade: "Faculdade de Medicina", ano: 4,
     tipo: "declaracao_com_notas",
     assunto: "Declaração com notas para concurso público",
     descricao: "Necessito de declaração com aproveitamento até ao 4º ano.",
@@ -382,14 +382,14 @@ export const solicitacoes: Solicitacao[] = [
     estado: "concluida", prioridade: "media", slaDias: 5,
     dataSubmissao: "2025-12-04", dataEncaminhamento: "2025-12-04", dataConclusao: "2025-12-09",
     historico: [
-      { data: "2025-12-04 11:00", actor: "Portal do Estudante", accao: "Solicitação submetida" },
+      { data: "2025-12-04 11:00", actor: "Portal do Discente", accao: "Solicitação submetida" },
       { data: "2025-12-04 11:00", actor: "Sistema", accao: "Encaminhada automaticamente para Académica" },
-      { data: "2025-12-09 15:00", actor: "Dra. Cita · Secretaria Académica", accao: "Concluída", nota: "Documento entregue ao estudante." },
+      { data: "2025-12-09 15:00", actor: "Dra. Cita · Secretaria Académica", accao: "Concluída", nota: "Documento entregue ao discente." },
     ],
   },
   {
     id: "SOL-2025-0126",
-    estudante: "Patrícia Lima", matricula: "2024055", curso: "Eng. Civil", faculdade: "Faculdade de Ciências Exatas", ano: 1,
+    discente: "Patrícia Lima", matricula: "2024055", curso: "Eng. Civil", faculdade: "Faculdade de Ciências Exatas", ano: 1,
     tipo: "transferencia",
     assunto: "Transferência interna de curso",
     descricao: "Pretendo transferir-me de Gestão para Economia no próximo ano lectivo.",
@@ -397,13 +397,13 @@ export const solicitacoes: Solicitacao[] = [
     estado: "recebida", prioridade: "media", slaDias: 10,
     dataSubmissao: "2025-12-15", dataEncaminhamento: "2025-12-15",
     historico: [
-      { data: "2025-12-15 10:20", actor: "Portal do Estudante", accao: "Solicitação submetida" },
+      { data: "2025-12-15 10:20", actor: "Portal do Discente", accao: "Solicitação submetida" },
       { data: "2025-12-15 10:20", actor: "Sistema", accao: "Encaminhada automaticamente para Académica" },
     ],
   },
   {
     id: "SOL-2025-0125",
-    estudante: "Bruno Sapalo", matricula: "2023030", curso: "Eng. Civil", faculdade: "Faculdade de Ciências Exatas", ano: 4,
+    discente: "Bruno Sapalo", matricula: "2023030", curso: "Eng. Civil", faculdade: "Faculdade de Ciências Exatas", ano: 4,
     tipo: "certificado_diploma",
     assunto: "Pedido de diploma de licenciatura",
     descricao: "Concluí a licenciatura e solicito a emissão do diploma.",
@@ -411,14 +411,14 @@ export const solicitacoes: Solicitacao[] = [
     estado: "em_execucao", prioridade: "media", slaDias: 15,
     dataSubmissao: "2025-12-01", dataEncaminhamento: "2025-12-01",
     historico: [
-      { data: "2025-12-01 14:00", actor: "Portal do Estudante", accao: "Solicitação submetida" },
+      { data: "2025-12-01 14:00", actor: "Portal do Discente", accao: "Solicitação submetida" },
       { data: "2025-12-01 14:00", actor: "Sistema", accao: "Encaminhada automaticamente para Académica" },
       { data: "2025-12-05 09:30", actor: "Dra. Cita · Secretaria Académica", accao: "Em produção" },
     ],
   },
   {
     id: "SOL-2025-0124",
-    estudante: "Tomás Henriques", matricula: "2024099", curso: "Eng. Informática", faculdade: "Faculdade de Ciências Exatas", ano: 1,
+    discente: "Tomás Henriques", matricula: "2024099", curso: "Eng. Informática", faculdade: "Faculdade de Ciências Exatas", ano: 1,
     tipo: "ausencia_lista_disciplina",
     assunto: "Não consto na lista de Programação I",
     descricao: "Após confirmar matrícula, o meu nome não aparece na lista da disciplina.",
@@ -426,7 +426,7 @@ export const solicitacoes: Solicitacao[] = [
     estado: "recebida", prioridade: "alta", slaDias: 4,
     dataSubmissao: "2025-12-15",
     historico: [
-      { data: "2025-12-15 16:45", actor: "Portal do Estudante", accao: "Solicitação submetida" },
+      { data: "2025-12-15 16:45", actor: "Portal do Discente", accao: "Solicitação submetida" },
       { data: "2025-12-15 16:45", actor: "Sistema", accao: "Encaminhada automaticamente para Académica" },
     ],
   },
@@ -434,7 +434,7 @@ export const solicitacoes: Solicitacao[] = [
   // ── Área Financeira ──────────────────────────────────────────────────────
   {
     id: "SOL-2025-0123",
-    estudante: "Vânia Cassule", matricula: "2024066", curso: "Eng. Informática", faculdade: "Faculdade de Ciências Exatas", ano: 2,
+    discente: "Vânia Cassule", matricula: "2024066", curso: "Eng. Informática", faculdade: "Faculdade de Ciências Exatas", ano: 2,
     tipo: "pagamento_nao_reflectido",
     assunto: "Pagamento de propina não reflectido",
     descricao: "Paguei a propina de Novembro mas continua marcada como em dívida.",
@@ -442,14 +442,14 @@ export const solicitacoes: Solicitacao[] = [
     estado: "em_execucao", prioridade: "alta", slaDias: 3,
     dataSubmissao: "2025-12-12", dataEncaminhamento: "2025-12-12",
     historico: [
-      { data: "2025-12-12 08:30", actor: "Portal do Estudante", accao: "Solicitação submetida" },
+      { data: "2025-12-12 08:30", actor: "Portal do Discente", accao: "Solicitação submetida" },
       { data: "2025-12-12 08:30", actor: "Sistema", accao: "Encaminhada automaticamente para Financeiro" },
       { data: "2025-12-12 14:00", actor: "Dra. Lúcia Mateus · Tesouraria", accao: "A conferir comprovativo" },
     ],
   },
   {
     id: "SOL-2025-0122",
-    estudante: "Edmilson Bastos", matricula: "2023044", curso: "Medicina", faculdade: "Faculdade de Medicina", ano: 3,
+    discente: "Edmilson Bastos", matricula: "2023044", curso: "Medicina", faculdade: "Faculdade de Medicina", ano: 3,
     tipo: "calculo_multas",
     assunto: "Cálculo de multas por atraso",
     descricao: "Solicito o cálculo actualizado das multas acumuladas no semestre.",
@@ -457,14 +457,14 @@ export const solicitacoes: Solicitacao[] = [
     estado: "concluida", prioridade: "media", slaDias: 3,
     dataSubmissao: "2025-12-05", dataEncaminhamento: "2025-12-05", dataConclusao: "2025-12-07",
     historico: [
-      { data: "2025-12-05 09:15", actor: "Portal do Estudante", accao: "Solicitação submetida" },
+      { data: "2025-12-05 09:15", actor: "Portal do Discente", accao: "Solicitação submetida" },
       { data: "2025-12-05 09:15", actor: "Sistema", accao: "Encaminhada automaticamente para Financeiro" },
       { data: "2025-12-07 11:40", actor: "Sr. Adriano Paka · Cobranças", accao: "Concluída", nota: "Documento de cálculo entregue." },
     ],
   },
   {
     id: "SOL-2025-0121",
-    estudante: "Iolanda Chivava", matricula: "2024088", curso: "Enfermagem", faculdade: "Faculdade de Medicina", ano: 1,
+    discente: "Iolanda Chivava", matricula: "2024088", curso: "Enfermagem", faculdade: "Faculdade de Medicina", ano: 1,
     tipo: "geracao_referencias",
     assunto: "Não consigo gerar referência de pagamento",
     descricao: "O sistema dá erro ao tentar gerar a referência multicaixa.",
@@ -472,13 +472,13 @@ export const solicitacoes: Solicitacao[] = [
     estado: "recebida", prioridade: "alta", slaDias: 2,
     dataSubmissao: "2025-12-15", dataEncaminhamento: "2025-12-15",
     historico: [
-      { data: "2025-12-15 09:50", actor: "Portal do Estudante", accao: "Solicitação submetida" },
+      { data: "2025-12-15 09:50", actor: "Portal do Discente", accao: "Solicitação submetida" },
       { data: "2025-12-15 09:50", actor: "Sistema", accao: "Encaminhada automaticamente para Financeiro" },
     ],
   },
   {
     id: "SOL-2025-0120",
-    estudante: "Nelson Mukoki", matricula: "2023077", curso: "Arquitectura", faculdade: "Faculdade de Ciências Exatas", ano: 3,
+    discente: "Nelson Mukoki", matricula: "2023077", curso: "Arquitectura", faculdade: "Faculdade de Ciências Exatas", ano: 3,
     tipo: "alteracao_prazo_pagamento",
     assunto: "Alteração do prazo de pagamento da propina",
     descricao: "Solicito acordo para pagar a propina de Dezembro até 15 de Janeiro.",
@@ -486,14 +486,14 @@ export const solicitacoes: Solicitacao[] = [
     estado: "em_execucao", prioridade: "media", slaDias: 7,
     dataSubmissao: "2025-12-10", dataEncaminhamento: "2025-12-10",
     historico: [
-      { data: "2025-12-10 13:20", actor: "Portal do Estudante", accao: "Solicitação submetida" },
+      { data: "2025-12-10 13:20", actor: "Portal do Discente", accao: "Solicitação submetida" },
       { data: "2025-12-10 13:20", actor: "Sistema", accao: "Encaminhada automaticamente para Financeiro" },
       { data: "2025-12-11 10:00", actor: "Dra. Lúcia Mateus · Tesouraria", accao: "Em análise" },
     ],
   },
   {
     id: "SOL-2025-0119",
-    estudante: "Rita Domingos", matricula: "2024112", curso: "Enfermagem", faculdade: "Faculdade de Medicina", ano: 1,
+    discente: "Rita Domingos", matricula: "2024112", curso: "Enfermagem", faculdade: "Faculdade de Medicina", ano: 1,
     tipo: "apoio_bolseiros",
     assunto: "Bolseira INAGBE — actualização de estado",
     descricao: "A minha bolsa não está reflectida no sistema este semestre.",
@@ -501,7 +501,7 @@ export const solicitacoes: Solicitacao[] = [
     estado: "recebida", prioridade: "media", slaDias: 5,
     dataSubmissao: "2025-12-15",
     historico: [
-      { data: "2025-12-15 14:10", actor: "Portal do Estudante", accao: "Solicitação submetida" },
+      { data: "2025-12-15 14:10", actor: "Portal do Discente", accao: "Solicitação submetida" },
       { data: "2025-12-15 14:10", actor: "Sistema", accao: "Encaminhada automaticamente para Financeiro" },
     ],
   },
@@ -509,7 +509,7 @@ export const solicitacoes: Solicitacao[] = [
   // ── Faculdades (Notas e Frequência) ──────────────────────────────────────
   {
     id: "SOL-2025-0118",
-    estudante: "Fábio Tati", matricula: "2023060", curso: "Eng. Informática", faculdade: "Faculdade de Ciências Exatas", ano: 3,
+    discente: "Fábio Tati", matricula: "2023060", curso: "Eng. Informática", faculdade: "Faculdade de Ciências Exatas", ano: 3,
     tipo: "falta_lancamento_notas",
     assunto: "Nota de Macroeconomia (P2) não lançada",
     descricao: "A nota da P2 de Macroeconomia ainda não consta no portal.",
@@ -517,13 +517,13 @@ export const solicitacoes: Solicitacao[] = [
     estado: "recebida", prioridade: "alta", slaDias: 5,
     dataSubmissao: "2025-12-14", dataEncaminhamento: "2025-12-14",
     historico: [
-      { data: "2025-12-14 11:00", actor: "Portal do Estudante", accao: "Solicitação submetida" },
+      { data: "2025-12-14 11:00", actor: "Portal do Discente", accao: "Solicitação submetida" },
       { data: "2025-12-14 11:00", actor: "Sistema", accao: "Encaminhada automaticamente para Faculdade de Ciências Exatas" },
     ],
   },
   {
     id: "SOL-2025-0117",
-    estudante: "Gilda Ngangula", matricula: "2024014", curso: "Medicina", faculdade: "Faculdade de Medicina", ano: 1,
+    discente: "Gilda Ngangula", matricula: "2024014", curso: "Medicina", faculdade: "Faculdade de Medicina", ano: 1,
     tipo: "rectificacao_notas",
     assunto: "Rectificação de nota de Introdução ao Direito",
     descricao: "A nota lançada (8) não corresponde à pauta entregue (12).",
@@ -531,14 +531,14 @@ export const solicitacoes: Solicitacao[] = [
     estado: "em_execucao", prioridade: "alta", slaDias: 7,
     dataSubmissao: "2025-12-09", dataEncaminhamento: "2025-12-09",
     historico: [
-      { data: "2025-12-09 10:30", actor: "Portal do Estudante", accao: "Solicitação submetida" },
+      { data: "2025-12-09 10:30", actor: "Portal do Discente", accao: "Solicitação submetida" },
       { data: "2025-12-09 10:30", actor: "Sistema", accao: "Encaminhada automaticamente para Faculdade de Medicina" },
       { data: "2025-12-11 14:20", actor: "Coord. Faculdade de Medicina", accao: "Em verificação com docente" },
     ],
   },
   {
     id: "SOL-2025-0116",
-    estudante: "Hélder Massano", matricula: "2023095", curso: "Eng. Informática", faculdade: "Faculdade de Ciências Exatas", ano: 3,
+    discente: "Hélder Massano", matricula: "2023095", curso: "Eng. Informática", faculdade: "Faculdade de Ciências Exatas", ano: 3,
     tipo: "revisao_notas",
     assunto: "Revisão de nota — Sistemas Distribuídos",
     descricao: "Discordo da avaliação atribuída no exame final e solicito revisão.",
@@ -546,13 +546,13 @@ export const solicitacoes: Solicitacao[] = [
     estado: "recebida", prioridade: "media", slaDias: 10,
     dataSubmissao: "2025-12-15",
     historico: [
-      { data: "2025-12-15 17:00", actor: "Portal do Estudante", accao: "Solicitação submetida" },
+      { data: "2025-12-15 17:00", actor: "Portal do Discente", accao: "Solicitação submetida" },
       { data: "2025-12-15 17:00", actor: "Sistema", accao: "Encaminhada automaticamente para Faculdade de Ciências Exatas" },
     ],
   },
   {
     id: "SOL-2025-0115",
-    estudante: "Joana Mavinga", matricula: "2024023", curso: "Medicina", faculdade: "Faculdade de Medicina", ano: 1,
+    discente: "Joana Mavinga", matricula: "2024023", curso: "Medicina", faculdade: "Faculdade de Medicina", ano: 1,
     tipo: "justificacao_faltas",
     assunto: "Justificação de faltas por internamento",
     descricao: "Estive internada de 02 a 09 de Dezembro. Anexo atestado médico.",
@@ -560,14 +560,14 @@ export const solicitacoes: Solicitacao[] = [
     estado: "concluida", prioridade: "media", slaDias: 5,
     dataSubmissao: "2025-12-10", dataEncaminhamento: "2025-12-10", dataConclusao: "2025-12-13",
     historico: [
-      { data: "2025-12-10 09:00", actor: "Portal do Estudante", accao: "Solicitação submetida" },
+      { data: "2025-12-10 09:00", actor: "Portal do Discente", accao: "Solicitação submetida" },
       { data: "2025-12-10 09:00", actor: "Sistema", accao: "Encaminhada automaticamente para Faculdade de Medicina" },
       { data: "2025-12-13 11:00", actor: "Coord. Faculdade de Medicina", accao: "Concluída", nota: "Faltas justificadas." },
     ],
   },
   {
     id: "SOL-2025-0114",
-    estudante: "Kátia Mbumba", matricula: "2024140", curso: "Arquitectura", faculdade: "Faculdade de Ciências Exatas", ano: 1,
+    discente: "Kátia Mbumba", matricula: "2024140", curso: "Arquitectura", faculdade: "Faculdade de Ciências Exatas", ano: 1,
     tipo: "melhoria_notas",
     assunto: "Pedido de melhoria — Desenho Técnico",
     descricao: "Solicito melhoria de nota da cadeira de Desenho Técnico (10).",
@@ -575,14 +575,14 @@ export const solicitacoes: Solicitacao[] = [
     estado: "recebida", prioridade: "baixa", slaDias: 10,
     dataSubmissao: "2025-12-13", dataEncaminhamento: "2025-12-13",
     historico: [
-      { data: "2025-12-13 15:30", actor: "Portal do Estudante", accao: "Solicitação submetida" },
+      { data: "2025-12-13 15:30", actor: "Portal do Discente", accao: "Solicitação submetida" },
       { data: "2025-12-13 15:30", actor: "Sistema", accao: "Encaminhada automaticamente para Faculdade de Ciências Exatas" },
     ],
   },
   // ── Solicitações em atraso (SLA ultrapassado) ────────────────────────────
   {
     id: "SOL-2025-0113",
-    estudante: "Rui Vasconcelos", matricula: "2023105", curso: "Eng. Informática", faculdade: "Faculdade de Ciências Exatas", ano: 3,
+    discente: "Rui Vasconcelos", matricula: "2023105", curso: "Eng. Informática", faculdade: "Faculdade de Ciências Exatas", ano: 3,
     tipo: "geracao_referencias",
     assunto: "Não consigo gerar referência de pagamento de propinas",
     descricao: "Ao tentar gerar a referência o sistema devolve erro 500 e não regista o pedido.",
@@ -590,14 +590,14 @@ export const solicitacoes: Solicitacao[] = [
     estado: "em_execucao", prioridade: "alta", slaDias: 2,
     dataSubmissao: "2025-12-05", dataEncaminhamento: "2025-12-05",
     historico: [
-      { data: "2025-12-05 08:30", actor: "Portal do Estudante", accao: "Solicitação submetida" },
+      { data: "2025-12-05 08:30", actor: "Portal do Discente", accao: "Solicitação submetida" },
       { data: "2025-12-05 08:30", actor: "Sistema", accao: "Encaminhada automaticamente para Financeiro" },
       { data: "2025-12-06 10:15", actor: "Dra. Catarina Lopes · Financeiro", accao: "Atribuída" },
     ],
   },
   {
     id: "SOL-2025-0112",
-    estudante: "Inês Cardoso", matricula: "2023060", curso: "Eng. Informática", faculdade: "Faculdade de Ciências Exatas", ano: 3,
+    discente: "Inês Cardoso", matricula: "2023060", curso: "Eng. Informática", faculdade: "Faculdade de Ciências Exatas", ano: 3,
     tipo: "falta_lancamento_notas",
     assunto: "Nota de Recurso de Algoritmos não lançada",
     descricao: "Realizei o exame de recurso há mais de duas semanas e a nota continua em falta no portal.",
@@ -605,13 +605,13 @@ export const solicitacoes: Solicitacao[] = [
     estado: "recebida", prioridade: "alta", slaDias: 5,
     dataSubmissao: "2025-12-03", dataEncaminhamento: "2025-12-03",
     historico: [
-      { data: "2025-12-03 14:20", actor: "Portal do Estudante", accao: "Solicitação submetida" },
+      { data: "2025-12-03 14:20", actor: "Portal do Discente", accao: "Solicitação submetida" },
       { data: "2025-12-03 14:20", actor: "Sistema", accao: "Encaminhada automaticamente para Faculdade de Ciências Exatas" },
     ],
   },
   {
     id: "SOL-2025-0111",
-    estudante: "Hugo Faria", matricula: "2023111", curso: "Medicina", faculdade: "Faculdade de Medicina", ano: 4,
+    discente: "Hugo Faria", matricula: "2023111", curso: "Medicina", faculdade: "Faculdade de Medicina", ano: 4,
     tipo: "declaracao_com_notas",
     assunto: "Declaração com notas para concurso público",
     descricao: "Necessito declaração com notas para concurso público com prazo de entrega esgotado.",
@@ -619,14 +619,14 @@ export const solicitacoes: Solicitacao[] = [
     estado: "em_execucao", prioridade: "alta", slaDias: 5,
     dataSubmissao: "2025-12-01", dataEncaminhamento: "2025-12-01",
     historico: [
-      { data: "2025-12-01 09:50", actor: "Portal do Estudante", accao: "Solicitação submetida" },
+      { data: "2025-12-01 09:50", actor: "Portal do Discente", accao: "Solicitação submetida" },
       { data: "2025-12-01 09:50", actor: "Sistema", accao: "Encaminhada automaticamente para Académica" },
       { data: "2025-12-02 11:00", actor: "Dra. Ana Belmiro · Académica", accao: "Atribuída", nota: "Aguarda emissão pela Secretaria." },
     ],
   },
   {
     id: "SOL-2025-0110",
-    estudante: "Patrícia Lima", matricula: "2024055", curso: "Eng. Civil", faculdade: "Faculdade de Ciências Exatas", ano: 1,
+    discente: "Patrícia Lima", matricula: "2024055", curso: "Eng. Civil", faculdade: "Faculdade de Ciências Exatas", ano: 1,
     tipo: "pagamento_nao_reflectido",
     assunto: "Pagamento de propina efectuado a 25/11 não reflectido",
     descricao: "Realizei o pagamento via Multicaixa Express. Comprovativo anexo. Continua em dívida no sistema.",
@@ -634,14 +634,14 @@ export const solicitacoes: Solicitacao[] = [
     estado: "em_execucao", prioridade: "alta", slaDias: 3,
     dataSubmissao: "2025-11-28", dataEncaminhamento: "2025-11-28",
     historico: [
-      { data: "2025-11-28 16:05", actor: "Portal do Estudante", accao: "Solicitação submetida" },
+      { data: "2025-11-28 16:05", actor: "Portal do Discente", accao: "Solicitação submetida" },
       { data: "2025-11-28 16:05", actor: "Sistema", accao: "Encaminhada automaticamente para Financeiro" },
       { data: "2025-11-30 09:40", actor: "Dra. Catarina Lopes · Financeiro", accao: "Atribuída", nota: "A confirmar com o banco." },
     ],
   },
   {
     id: "SOL-2025-0109",
-    estudante: "Bruno Sapalo", matricula: "2023030", curso: "Eng. Civil", faculdade: "Faculdade de Ciências Exatas", ano: 4,
+    discente: "Bruno Sapalo", matricula: "2023030", curso: "Eng. Civil", faculdade: "Faculdade de Ciências Exatas", ano: 4,
     tipo: "ausencia_lista_disciplina",
     assunto: "Nome ausente na pauta de Estruturas II",
     descricao: "Apesar de estar inscrito não consto da pauta da cadeira. Já não tenho acesso aos materiais.",
@@ -649,7 +649,7 @@ export const solicitacoes: Solicitacao[] = [
     estado: "recebida", prioridade: "alta", slaDias: 4,
     dataSubmissao: "2025-12-04", dataEncaminhamento: "2025-12-04",
     historico: [
-      { data: "2025-12-04 10:15", actor: "Portal do Estudante", accao: "Solicitação submetida" },
+      { data: "2025-12-04 10:15", actor: "Portal do Discente", accao: "Solicitação submetida" },
       { data: "2025-12-04 10:15", actor: "Sistema", accao: "Encaminhada automaticamente para Académica" },
     ],
   },
@@ -673,12 +673,12 @@ export const slaStatusConfig = {
   concluido: { label: "Concluída", color: "bg-muted text-muted-foreground border-border" },
 } as const;
 
-// ─── Atendimentos & Estudantes em seguimento (mantidos do módulo anterior) ──
+// ─── Atendimentos & Discentes em seguimento (mantidos do módulo anterior) ──
 export type TicketCategoria = "academico" | "psicologico" | "financeiro" | "documentacao" | "social" | "carreira" | "saude";
 
 export interface GapAtendimento {
   id: string;
-  estudante: string; matricula: string; curso: string;
+  discente: string; matricula: string; curso: string;
   faculdade: string; ano: number;
   motivo: string; categoria: TicketCategoria;
   data: string; hora: string; duracao: string;
@@ -716,20 +716,20 @@ export const ticketCategoriaConfig: Record<TicketCategoria, { label: string; col
 };
 
 export const gapAtendimentos: GapAtendimento[] = [
-  { id: "AT-001", estudante: "Ana Luísa Ferreira", matricula: "2024001", curso: "Eng. Informática", faculdade: "Faculdade de Ciências Exatas", ano: 2, motivo: "1ª sessão de acompanhamento psicológico", descricao: "Avaliação inicial do quadro de ansiedade reportado pela estudante. Recolha de história académica, identificação de gatilhos relacionados com avaliações e definição conjunta de objectivos terapêuticos para as próximas sessões.", categoria: "psicologico", data: "2025-12-16", hora: "09:00", duracao: "50 min", tipo: "presencial", estado: "agendado", responsavel: "Dra. Helena Cabral", sala: "Gab. GAP 1" },
-  { id: "AT-002", estudante: "Carlos Mendes", matricula: "2024015", curso: "Direito", faculdade: "Faculdade de Medicina", ano: 1, motivo: "Orientação académica — métodos de estudo", descricao: "Análise do plano de estudos actual e dificuldades de organização. Apresentação de técnicas de gestão de tempo (Pomodoro, blocos de concentração) e elaboração de um plano semanal personalizado.", categoria: "academico", data: "2025-12-16", hora: "10:30", duracao: "40 min", tipo: "presencial", estado: "agendado", responsavel: "Dr. João Tavares", sala: "Gab. GAP 2", participantes: [
+  { id: "AT-001", discente: "Ana Luísa Ferreira", matricula: "2024001", curso: "Eng. Informática", faculdade: "Faculdade de Ciências Exatas", ano: 2, motivo: "1ª sessão de acompanhamento psicológico", descricao: "Avaliação inicial do quadro de ansiedade reportado pela discente. Recolha de história académica, identificação de gatilhos relacionados com avaliações e definição conjunta de objectivos terapêuticos para as próximas sessões.", categoria: "psicologico", data: "2025-12-16", hora: "09:00", duracao: "50 min", tipo: "presencial", estado: "agendado", responsavel: "Dra. Helena Cabral", sala: "Gab. GAP 1" },
+  { id: "AT-002", discente: "Carlos Mendes", matricula: "2024015", curso: "Direito", faculdade: "Faculdade de Medicina", ano: 1, motivo: "Orientação académica — métodos de estudo", descricao: "Análise do plano de estudos actual e dificuldades de organização. Apresentação de técnicas de gestão de tempo (Pomodoro, blocos de concentração) e elaboração de um plano semanal personalizado.", categoria: "academico", data: "2025-12-16", hora: "10:30", duracao: "40 min", tipo: "presencial", estado: "agendado", responsavel: "Dr. João Tavares", sala: "Gab. GAP 2", participantes: [
     { nome: "Sr.ª Isabel Mendes", tipo: "encarregado", relacao: "Mãe", contacto: "+244 923 145 678", confirmado: true },
     { nome: "Prof. Rui Carvalho", tipo: "escola", relacao: "Coordenador de Curso", contacto: "rui.carvalho@upra.kor", confirmado: true },
   ] },
-  { id: "AT-003", estudante: "Pedro Almeida", matricula: "2024033", curso: "Economia", faculdade: "Faculdade de Ciências Exatas", ano: 2, motivo: "Orientação vocacional", descricao: "Sessão online para exploração de áreas profissionais de interesse. Aplicação de inventário vocacional e discussão das saídas profissionais do curso de Economia, com foco em mercados financeiros e consultoria.", categoria: "carreira", data: "2025-12-16", hora: "14:00", duracao: "60 min", tipo: "online", estado: "agendado", responsavel: "Dr. João Tavares" },
-  { id: "AT-004", estudante: "Beatriz Lopes", matricula: "2023089", curso: "Psicologia", faculdade: "Faculdade de Medicina", ano: 3, motivo: "Acompanhamento de estágio", descricao: "Ponto de situação do estágio curricular em curso. Revisão das competências desenvolvidas, dificuldades enfrentadas no contexto institucional e preparação do relatório intermédio de estágio.", categoria: "carreira", data: "2025-12-17", hora: "11:00", duracao: "30 min", tipo: "presencial", estado: "agendado", responsavel: "Dra. Helena Cabral", sala: "Gab. GAP 1", participantes: [
+  { id: "AT-003", discente: "Pedro Almeida", matricula: "2024033", curso: "Economia", faculdade: "Faculdade de Ciências Exatas", ano: 2, motivo: "Orientação vocacional", descricao: "Sessão online para exploração de áreas profissionais de interesse. Aplicação de inventário vocacional e discussão das saídas profissionais do curso de Economia, com foco em mercados financeiros e consultoria.", categoria: "carreira", data: "2025-12-16", hora: "14:00", duracao: "60 min", tipo: "online", estado: "agendado", responsavel: "Dr. João Tavares" },
+  { id: "AT-004", discente: "Beatriz Lopes", matricula: "2023089", curso: "Psicologia", faculdade: "Faculdade de Medicina", ano: 3, motivo: "Acompanhamento de estágio", descricao: "Ponto de situação do estágio curricular em curso. Revisão das competências desenvolvidas, dificuldades enfrentadas no contexto institucional e preparação do relatório intermédio de estágio.", categoria: "carreira", data: "2025-12-17", hora: "11:00", duracao: "30 min", tipo: "presencial", estado: "agendado", responsavel: "Dra. Helena Cabral", sala: "Gab. GAP 1", participantes: [
     { nome: "Prof.ª Marta Sousa", tipo: "escola", relacao: "Orientadora de Estágio", contacto: "marta.sousa@upra.kor", confirmado: true },
   ] },
-  { id: "AT-005", estudante: "Sofia Bernardo", matricula: "2023018", curso: "Eng. Civil", faculdade: "Faculdade de Ciências Exatas", ano: 3, motivo: "Encaminhamento médico", descricao: "Pedido de referenciação para consulta especializada externa. Validação dos sintomas reportados e emissão de carta de encaminhamento para a unidade de saúde parceira.", categoria: "saude", data: "2025-12-09", hora: "09:30", duracao: "20 min", tipo: "presencial", estado: "concluido", responsavel: "Dra. Helena Cabral", notas: "Encaminhamento entregue. Estudante satisfeita com a resolução.", participantes: [
+  { id: "AT-005", discente: "Sofia Bernardo", matricula: "2023018", curso: "Eng. Civil", faculdade: "Faculdade de Ciências Exatas", ano: 3, motivo: "Encaminhamento médico", descricao: "Pedido de referenciação para consulta especializada externa. Validação dos sintomas reportados e emissão de carta de encaminhamento para a unidade de saúde parceira.", categoria: "saude", data: "2025-12-09", hora: "09:30", duracao: "20 min", tipo: "presencial", estado: "concluido", responsavel: "Dra. Helena Cabral", notas: "Encaminhamento entregue. Discente satisfeita com a resolução.", participantes: [
     { nome: "Sr. António Bernardo", tipo: "encarregado", relacao: "Pai", contacto: "+244 923 456 789", confirmado: true },
   ] },
-  { id: "AT-006", estudante: "Maria João Santos", matricula: "2023042", curso: "Medicina", faculdade: "Faculdade de Medicina", ano: 3, motivo: "Apoio candidatura bolsa INAGBE", descricao: "Apoio na preparação do dossier de candidatura à bolsa INAGBE: revisão de documentos, redacção da carta de motivação e verificação dos critérios de elegibilidade.", categoria: "financeiro", data: "2025-12-15", hora: "15:00", duracao: "45 min", tipo: "presencial", estado: "concluido", responsavel: "Dra. Helena Cabral" },
-  { id: "AT-007", estudante: "João Baptista", matricula: "2024050", curso: "Gestão", faculdade: "Faculdade de Ciências Exatas", ano: 1, motivo: "Mediação de conflito", descricao: "Sessão de mediação entre estudantes do mesmo grupo de trabalho. Identificação das tensões, escuta activa de ambas as partes e definição de regras de funcionamento até à entrega do projecto final.", categoria: "social", data: "2025-12-17", hora: "16:00", duracao: "60 min", tipo: "presencial", estado: "agendado", responsavel: "Dr. João Tavares", sala: "Gab. GAP 2", participantes: [
+  { id: "AT-006", discente: "Maria João Santos", matricula: "2023042", curso: "Medicina", faculdade: "Faculdade de Medicina", ano: 3, motivo: "Apoio candidatura bolsa INAGBE", descricao: "Apoio na preparação do dossier de candidatura à bolsa INAGBE: revisão de documentos, redacção da carta de motivação e verificação dos critérios de elegibilidade.", categoria: "financeiro", data: "2025-12-15", hora: "15:00", duracao: "45 min", tipo: "presencial", estado: "concluido", responsavel: "Dra. Helena Cabral" },
+  { id: "AT-007", discente: "João Baptista", matricula: "2024050", curso: "Gestão", faculdade: "Faculdade de Ciências Exatas", ano: 1, motivo: "Mediação de conflito", descricao: "Sessão de mediação entre discentes do mesmo grupo de trabalho. Identificação das tensões, escuta activa de ambas as partes e definição de regras de funcionamento até à entrega do projecto final.", categoria: "social", data: "2025-12-17", hora: "16:00", duracao: "60 min", tipo: "presencial", estado: "agendado", responsavel: "Dr. João Tavares", sala: "Gab. GAP 2", participantes: [
     { nome: "Sr.ª Teresa Baptista", tipo: "encarregado", relacao: "Encarregada de Educação", contacto: "+244 924 887 213", confirmado: false },
     { nome: "Prof. Hugo Lima", tipo: "escola", relacao: "Director de Turma", contacto: "hugo.lima@upra.kor", confirmado: true },
   ] },
@@ -771,7 +771,7 @@ export const solicitacoesPorDestino = (Object.keys(destinoConfig) as Destino[]).
 // ─── Compatibilidade com módulos antigos (Inicio/EstudanteProfile) ──────────
 // Mapeia Solicitacao -> formato "ticket-like" para reutilização visual existente.
 export type GapTicket = {
-  id: string; estudante: string; matricula: string; curso: string; ano: number;
+  id: string; discente: string; matricula: string; curso: string; ano: number;
   assunto: string; descricao: string;
   categoria: TicketCategoria;        // derivada do destino
   estado: "aberto" | "em_andamento" | "resolvido" | "aguarda_estudante";
@@ -789,7 +789,7 @@ const estadoToTicket: Record<EstadoSolicitacao, GapTicket["estado"]> = {
   concluida: "resolvido", rejeitada: "resolvido",
 };
 export const gapTickets: GapTicket[] = solicitacoes.map(s => ({
-  id: s.id, estudante: s.estudante, matricula: s.matricula, curso: s.curso, ano: s.ano,
+  id: s.id, discente: s.discente, matricula: s.matricula, curso: s.curso, ano: s.ano,
   assunto: s.assunto, descricao: s.descricao,
   categoria: destinoToCategoria[s.destino],
   estado: estadoToTicket[s.estado],

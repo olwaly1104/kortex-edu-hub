@@ -187,11 +187,11 @@ const gapSections: NavSection[] = [
     { label: "Calendário", icon: Calendar, path: "/gap/calendario" },
     { label: "Anúncios", icon: Megaphone, path: "/gap/anuncios", badge: 4 },
   ]},
-  { title: "Apoio ao Estudante", items: [
+  { title: "Apoio ao Discente", items: [
     { label: "Dashboard", icon: BarChart3, path: "/gap/dashboard" },
     { label: "Solicitações", icon: HelpCircle, path: "/gap/solicitacoes" },
     { label: "Agendamentos", icon: CalendarDays, path: "/gap/agendamentos" },
-    { label: "Estudantes", icon: Users, path: "/gap/estudantes" },
+    { label: "Discentes", icon: Users, path: "/gap/estudantes" },
   ]},
   { title: "Comunicação", items: [
     { label: "Chat", icon: MessageSquare, path: "/gap/chat" },

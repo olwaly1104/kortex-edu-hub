@@ -32,14 +32,14 @@ const gapReportCategories = [
   { id: "geral",        label: "Relatório Geral do GAP",   description: "Visão consolidada da actividade do gabinete no mês.", icon: <BookOpen className="w-4 h-4" />, type: "estudantes" as const, prefix: "Histórico do GAP — Relatório Geral" },
 ];
 
-// Dataset sintético para alimentar o ReportsDialog (uma linha por estudante seguido)
+// Dataset sintético para alimentar o ReportsDialog (uma linha por discente seguido)
 const gapReportData = solicitacoes.reduce<Array<{ id: string; name: string; code: string; turma: string; media: number | null; presenca: number; tarefasFeitas: number; tarefasTotal: number }>>((acc, s) => {
   if (acc.find(r => r.id === s.matricula)) return acc;
   const total = solicitacoes.filter(x => x.matricula === s.matricula).length;
   const concl = solicitacoes.filter(x => x.matricula === s.matricula && x.estado === "concluida").length;
   acc.push({
     id: s.matricula,
-    name: s.estudante,
+    name: s.discente,
     code: s.matricula,
     turma: `${s.curso} · ${s.ano}º`,
     media: null,
@@ -102,7 +102,7 @@ export default function GapTickets() {
         const q = search.toLowerCase();
         const tipoLabel = tipoConfig[s.tipo]?.label.toLowerCase() ?? "";
         return (
-          s.estudante.toLowerCase().includes(q) ||
+          s.discente.toLowerCase().includes(q) ||
           s.assunto.toLowerCase().includes(q) ||
           s.matricula.includes(search) ||
           s.id.toLowerCase().includes(q) ||
@@ -141,7 +141,7 @@ export default function GapTickets() {
         <div>
           <h1 className="text-2xl font-bold text-foreground tracking-tight">Solicitações</h1>
           <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
-            Pedidos submetidos pelos estudantes no Portal e encaminhados automaticamente ao departamento responsável. O GAP acompanha a execução.
+            Pedidos submetidos pelos discentes no Portal e encaminhados automaticamente ao departamento responsável. O GAP acompanha a execução.
           </p>
         </div>
       </div>
@@ -236,7 +236,7 @@ export default function GapTickets() {
           <div className="relative flex-1 min-w-[220px] max-w-[380px]">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
             <Input
-              placeholder="Pesquisar estudante, tipo, matrícula ou ID…"
+              placeholder="Pesquisar discente, tipo, matrícula ou ID…"
               value={search}
               onChange={e => setSearch(e.target.value)}
               className="pl-9 pr-8 h-9 text-xs"
@@ -313,7 +313,7 @@ export default function GapTickets() {
             <thead>
               <tr className="border-b bg-muted/30">
                 <th className="text-left p-3 font-medium text-muted-foreground">ID Pedido</th>
-                <th className="text-left p-3 font-medium text-muted-foreground">Estudante</th>
+                <th className="text-left p-3 font-medium text-muted-foreground">Discente</th>
                 <th className="text-left p-3 font-medium text-muted-foreground">Faculdade</th>
                 <th className="text-left p-3 font-medium text-muted-foreground">Categoria</th>
                 <th className="text-left p-3 font-medium text-muted-foreground">Tipo de pedido</th>
@@ -345,7 +345,7 @@ export default function GapTickets() {
                         onClick={(e) => { e.stopPropagation(); navigate(`/gap/estudantes/${s.matricula}`); }}
                         className="font-medium text-foreground leading-tight hover:text-primary hover:underline text-left"
                       >
-                        {s.estudante}
+                        {s.discente}
                       </button>
                       <p className="text-[11px] text-muted-foreground mt-0.5">{s.matricula} · {s.curso}</p>
                     </td>

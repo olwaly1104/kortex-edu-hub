@@ -75,7 +75,7 @@ export default function GapAtendimentoDetail() {
   const d = new Date(atendimento.data);
   const startTime = atendimento.hora;
   const endTime = addMinutesToHHMM(atendimento.hora, parseDuracaoMin(atendimento.duracao));
-  const initials = atendimento.estudante.split(" ").slice(0, 2).map(n => n[0]).join("");
+  const initials = atendimento.discente.split(" ").slice(0, 2).map(n => n[0]).join("");
   const ModalityIcon = atendimento.tipo === "online" ? Video : MapPin;
 
   const weekday = d.toLocaleDateString("pt-AO", { weekday: "long" });
@@ -224,12 +224,12 @@ export default function GapAtendimentoDetail() {
         </div>
 
 
-        {/* Body — Estudante left | Sessão right (one continuous card, just a divider) */}
+        {/* Body — Discente left | Sessão right (one continuous card, just a divider) */}
         <div className="grid md:grid-cols-[280px_1fr] divide-y md:divide-y-0 md:divide-x divide-border border-t border-border">
-          {/* LEFT — estudante */}
+          {/* LEFT — discente */}
           <aside className="p-5 space-y-5 bg-muted/15">
             <section>
-              <SectionTitle>Estudante</SectionTitle>
+              <SectionTitle>Discente</SectionTitle>
               <Link
                 to={`/gap/estudantes/${atendimento.matricula}`}
                 className="flex items-start gap-3 w-full text-left hover:bg-muted/40 -mx-2 px-2 py-1.5 rounded-md transition-colors group"
@@ -238,7 +238,7 @@ export default function GapAtendimentoDetail() {
                   {initials}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-semibold text-foreground leading-tight group-hover:text-primary transition-colors">{atendimento.estudante}</p>
+                  <p className="text-sm font-semibold text-foreground leading-tight group-hover:text-primary transition-colors">{atendimento.discente}</p>
                   <p className="text-[11px] text-muted-foreground mt-0.5 font-mono">{atendimento.matricula}</p>
                 </div>
               </Link>
