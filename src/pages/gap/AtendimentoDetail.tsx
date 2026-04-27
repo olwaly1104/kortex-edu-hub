@@ -410,19 +410,6 @@ export default function GapAtendimentoDetail() {
                 </div>
               </section>
             )}
-
-            {atendimento.notas && (
-              <section className="pt-5 border-t border-border space-y-2">
-                <SectionTitle>
-                  <span className="inline-flex items-center gap-1.5"><StickyNote className="w-3 h-3" /> Notas do profissional</span>
-                </SectionTitle>
-                <div className="border-l-2 border-primary/40 pl-4 py-1">
-                  <p className="text-sm text-foreground/90 leading-relaxed italic">"{atendimento.notas}"</p>
-                  <p className="text-[11px] text-muted-foreground mt-2 not-italic">— {atendimento.responsavel}</p>
-                </div>
-              </section>
-            )}
-
             {/* Status banner — only for completed/cancelled */}
             {(atendimento.estado === "concluido" || atendimento.estado === "cancelado") && (
               <section className="pt-5 border-t border-border">
