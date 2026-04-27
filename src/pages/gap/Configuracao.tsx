@@ -460,6 +460,18 @@ export default function GapConfiguracao() {
                   <p className="text-[10px] text-muted-foreground mt-1">Em Execução → Concluída</p>
                 </div>
               </div>
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Responsável</label>
+                <Select value={editMotivo.responsavel} onValueChange={(v) => setEditMotivo({ ...editMotivo, responsavel: v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {STAFF_OPTIONS.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                    {editMotivo.responsavel && !STAFF_OPTIONS.includes(editMotivo.responsavel) && (
+                      <SelectItem value={editMotivo.responsavel}>{editMotivo.responsavel}</SelectItem>
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           )}
           <DialogFooter className="gap-2 sm:gap-2">
