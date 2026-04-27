@@ -236,7 +236,7 @@ function Section({ number, title, children }: { number: string; title: string; c
     <section>
       <div className="flex items-baseline gap-2 mb-2 pb-1 border-b border-foreground/20">
         <span className="text-[8.5px] font-mono font-bold text-doc-accent tabular-nums">{number}.</span>
-        <h3 className="text-[10px] uppercase tracking-[0.2em] font-bold text-doc-accent">{title}</h3>
+        <h3 className="text-[10px] uppercase tracking-[0.2em] font-bold text-foreground">{title}</h3>
       </div>
       {children}
     </section>
