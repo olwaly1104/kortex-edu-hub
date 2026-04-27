@@ -66,6 +66,7 @@ export default {
           DEFAULT: "hsl(var(--warning))",
           foreground: "hsl(var(--warning-foreground))",
         },
+        "doc-accent": "hsl(var(--doc-accent))",
         finance: {
           paid: "hsl(var(--finance-paid))",
           pending: "hsl(var(--finance-pending))",
