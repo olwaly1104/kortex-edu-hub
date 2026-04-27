@@ -374,18 +374,26 @@ export default function GapAtendimentoDetail() {
                             )}
                           </div>
                         </div>
-                        <div className="shrink-0 flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-                          <span className={cn(
-                            "inline-flex items-center gap-1 text-[10px] font-medium",
-                            p.confirmado ? "text-emerald-700" : "text-amber-700",
-                          )}>
-                            {p.confirmado ? (
-                              <><CheckCircle className="w-3 h-3" /> Confirmado</>
-                            ) : (
-                              <><CircleDashed className="w-3 h-3" /> Pendente</>
-                            )}
-                          </span>
-                          {!isFamily && (
+                        {!isFamily && (
+                          <div className="shrink-0 flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                            <span className={cn(
+                              "inline-flex items-center gap-1 text-[10px] font-medium",
+                              p.confirmado ? "text-emerald-700" : "text-amber-700",
+                            )}>
+                              {p.confirmado ? (
+                                <><CheckCircle className="w-3 h-3" /> Confirmado</>
+                              ) : (
+                                <><CircleDashed className="w-3 h-3" /> Pendente</>
+                              )}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleAction(`Chat com ${p.nome}`); }}
+                              className="w-6 h-6 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                              title="Chat"
+                            >
+                              <MessageSquare className="w-3 h-3" />
+                            </button>
                             <button
                               type="button"
                               onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleAction(`Email para ${p.nome}`); }}
@@ -394,16 +402,16 @@ export default function GapAtendimentoDetail() {
                             >
                               <Mail className="w-3 h-3" />
                             </button>
-                          )}
-                          <button
-                            type="button"
-                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleAction(`Chamada para ${p.nome}`); }}
-                            className="w-6 h-6 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-                            title="Ligar"
-                          >
-                            <Phone className="w-3 h-3" />
-                          </button>
-                        </div>
+                            <button
+                              type="button"
+                              onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleAction(`Chamada para ${p.nome}`); }}
+                              className="w-6 h-6 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                              title="Ligar"
+                            >
+                              <Phone className="w-3 h-3" />
+                            </button>
+                          </div>
+                        )}
                       </>
                     );
 
