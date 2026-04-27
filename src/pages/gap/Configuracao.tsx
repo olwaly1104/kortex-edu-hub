@@ -22,7 +22,31 @@ import { useToast } from "@/hooks/use-toast";
 
 type EstadoItem = { key: string; label: string; color: string };
 type CategoriaItem = { key: string; label: string; color: string };
-type MotivoItem = { key: string; label: string; categoria: string; destino: string; slaAceitacao: number; slaConclusao: number };
+type MotivoItem = { key: string; label: string; categoria: string; destino: string; responsavel: string; slaAceitacao: number; slaConclusao: number };
+
+const STAFF_OPTIONS = [
+  "Dra. Helena Cabral · GAP",
+  "Dr. João Tavares · GAP",
+  "Eng. Paulo Mendes · CTI",
+  "Eng.ª Sara Lima · CTI",
+  "Dra. Cita · Secretaria Académica",
+  "Dra. Ana Belmiro · Académica",
+  "Dra. Lúcia Mateus · Tesouraria",
+  "Sr. Adriano Paka · Cobranças",
+  "Dra. Catarina Lopes · Financeiro",
+  "Coord. Faculdade de Ciências Exatas",
+  "Coord. Faculdade de Medicina",
+];
+
+const defaultResponsavelByDestino = (destino: string) => {
+  switch (destino) {
+    case "CTI": return "Eng. Paulo Mendes · CTI";
+    case "Académica": return "Dra. Cita · Secretaria Académica";
+    case "Financeiro": return "Dra. Lúcia Mateus · Tesouraria";
+    case "Faculdade": return "Coord. Faculdade de Ciências Exatas";
+    default: return "Dra. Helena Cabral · GAP";
+  }
+};
 
 export default function GapConfiguracao() {
   const { toast } = useToast();
@@ -36,6 +60,7 @@ export default function GapConfiguracao() {
   const [motivos, setMotivos] = useState<MotivoItem[]>(
     Object.entries(initialTipoConfig).map(([key, v]) => ({
       key, label: v.label, categoria: v.categoria, destino: v.destino,
+      responsavel: (v as any).responsavelDestino || defaultResponsavelByDestino(v.destino),
       slaAceitacao: Math.max(1, Math.ceil(v.slaDias / 3)),
       slaConclusao: v.slaDias,
     }))
@@ -56,6 +81,7 @@ export default function GapConfiguracao() {
   const [newMotDest, setNewMotDest] = useState<string>("CTI");
   const [newMotSlaAceit, setNewMotSlaAceit] = useState<number>(2);
   const [newMotSlaConcl, setNewMotSlaConcl] = useState<number>(5);
+  const [newMotResp, setNewMotResp] = useState<string>(STAFF_OPTIONS[0]);
 
   const slugify = (s: string) =>
     s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
@@ -91,10 +117,12 @@ export default function GapConfiguracao() {
     setMotivos(prev => [...prev, {
       key, label: newMotLabel.trim(),
       categoria: newMotCat, destino: newMotDest,
+      responsavel: newMotResp,
       slaAceitacao: newMotSlaAceit, slaConclusao: newMotSlaConcl,
     }]);
     setNewMotLabel(""); setNewMotCat(""); setNewMotDest("CTI");
     setNewMotSlaAceit(2); setNewMotSlaConcl(5);
+    setNewMotResp(STAFF_OPTIONS[0]);
     setMotivoOpen(false);
     toast({ title: "Motivo criado", description: `“${newMotLabel}” foi adicionado.` });
   };
@@ -284,6 +312,15 @@ export default function GapConfiguracao() {
                     <p className="text-[10px] text-muted-foreground mt-1">Em Execução → Concluída</p>
                   </div>
                 </div>
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Responsável</label>
+                  <Select value={newMotResp} onValueChange={setNewMotResp}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {STAFF_OPTIONS.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
               <DialogFooter className="gap-2 sm:gap-2">
                 <DialogClose asChild><Button variant="outline">Cancelar</Button></DialogClose>
@@ -299,6 +336,7 @@ export default function GapConfiguracao() {
                 <th className="text-left p-3 font-medium text-muted-foreground text-xs">Motivo</th>
                 <th className="text-left p-3 font-medium text-muted-foreground text-xs">Categoria</th>
                 <th className="text-left p-3 font-medium text-muted-foreground text-xs">Destino</th>
+                <th className="text-left p-3 font-medium text-muted-foreground text-xs">Responsável</th>
                 <th className="text-center p-3 font-medium text-muted-foreground text-xs whitespace-nowrap">Aceitar</th>
                 <th className="text-center p-3 font-medium text-muted-foreground text-xs whitespace-nowrap">Concluir</th>
                 <th className="w-20" />
@@ -321,6 +359,7 @@ export default function GapConfiguracao() {
                         <Badge variant="outline" className={cn("text-[10px]", destCfg.color)}>{destCfg.label}</Badge>
                       ) : <span className="text-xs text-muted-foreground">{m.destino}</span>}
                     </td>
+                    <td className="p-3 text-xs text-foreground whitespace-nowrap">{m.responsavel}</td>
                     <td className="p-3 text-center text-xs tabular-nums text-amber-700">{m.slaAceitacao}d</td>
                     <td className="p-3 text-center text-xs tabular-nums text-blue-700">{m.slaConclusao}d</td>
                     <td className="p-3 text-right">
@@ -420,6 +459,18 @@ export default function GapConfiguracao() {
                   <Input type="number" min={1} value={editMotivo.slaConclusao} onChange={e => setEditMotivo({ ...editMotivo, slaConclusao: Number(e.target.value) || 1 })} />
                   <p className="text-[10px] text-muted-foreground mt-1">Em Execução → Concluída</p>
                 </div>
+              </div>
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Responsável</label>
+                <Select value={editMotivo.responsavel} onValueChange={(v) => setEditMotivo({ ...editMotivo, responsavel: v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {STAFF_OPTIONS.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                    {editMotivo.responsavel && !STAFF_OPTIONS.includes(editMotivo.responsavel) && (
+                      <SelectItem value={editMotivo.responsavel}>{editMotivo.responsavel}</SelectItem>
+                    )}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           )}
