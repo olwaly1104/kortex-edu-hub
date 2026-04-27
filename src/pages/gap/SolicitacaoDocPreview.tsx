@@ -146,13 +146,20 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
             <h2 className="text-[22px] font-bold text-foreground leading-tight tracking-tight">
               {tipoCfg?.label ?? s.tipo}
             </h2>
-            <div className="mt-3 inline-flex items-center gap-2">
+            <div className="mt-3 flex items-center gap-2 flex-wrap">
               <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border ${tone.bg} ${tone.text} ${tone.border} text-[10.5px] font-semibold uppercase tracking-wider`}>
                 <span className={`w-1.5 h-1.5 rounded-full ${tone.dot}`} />
                 {st.label}
               </span>
+              <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border text-[10.5px] font-semibold uppercase tracking-wider ${dest.color}`}>
+                Destino: {dest.label}
+              </span>
               <span className="text-[11px] text-muted-foreground">
                 Categoria: <span className="font-semibold text-foreground">{tipoCfg?.categoria ?? "—"}</span>
+              </span>
+              <span className="text-[11px] text-muted-foreground">·</span>
+              <span className="text-[11px] text-muted-foreground">
+                Prioridade: <span className="font-semibold text-foreground">{prio?.label ?? s.prioridade}</span>
               </span>
             </div>
           </div>
