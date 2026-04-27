@@ -5,10 +5,10 @@ import { Badge } from "@/components/ui/badge";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Clock, CheckCircle, AlertTriangle, Calendar as CalendarIcon, BarChart3,
-  Inbox, Building2, ArrowRight, Users, ListChecks,
+  Inbox, Building2, ArrowRight, ListChecks,
 } from "lucide-react";
 import {
-  gapKpis, solicitacoes, gapAtendimentos, gapEstudantesSeguimento,
+  solicitacoes, gapAtendimentos, gapEstudantesSeguimento,
   solicitacoesPorDestino, destinoConfig, estadoSolicitacaoConfig,
   ticketCategoriaConfig, tipoConfig, categoriaConfig,
 } from "@/data/gapData";
@@ -17,16 +17,10 @@ const TODAY_STR = "2025-12-16";
 
 export default function GapDashboard() {
   const navigate = useNavigate();
-  const totalSolicitacoes = solicitacoes.length;
-  // Single consolidated KPI row — essentials only
-  const kpis = [
-    { label: "Recebidas",        value: gapKpis.recebidas,       icon: Inbox,        iconBg: "bg-orange-50 text-orange-600",   sub: "novas" },
-    { label: "Em Atraso",      value: gapKpis.emExecucao,      icon: Clock,        iconBg: "bg-amber-50 text-amber-600",     sub: "no destino" },
-    { label: "Concluídas",       value: gapKpis.concluidas,      icon: CheckCircle,  iconBg: "bg-emerald-50 text-emerald-600", sub: "este mês" },
-    { label: "Agendamentos Hoje",value: gapKpis.atendimentosHoje,icon: CalendarIcon, iconBg: "bg-primary/10 text-primary",     sub: "sessões" },
-    { label: "Estudantes Activos",value: gapKpis.estudantesAtivos,icon: Users,       iconBg: "bg-pink-50 text-pink-600",       sub: "em seguimento" },
-  ];
-  void totalSolicitacoes;
+
+  const solicitacoesHoje = solicitacoes.filter(s => s.dataSubmissao === TODAY_STR).length;
+  const agendamentosHoje = gapAtendimentos.filter(a => a.data === TODAY_STR).length;
+  const pendentesGeral = solicitacoes.filter(s => s.estado === "recebida" || s.estado === "em_execucao").length;
 
   const maxDest = Math.max(...solicitacoesPorDestino.map(c => c.count), 1);
   const totalSol = solicitacoes.length;
@@ -62,6 +56,13 @@ export default function GapDashboard() {
     .filter((x): x is NonNullable<typeof x> => x !== null && x.diff < 0)
     .sort((a, b) => a.diff - b.diff);
 
+  const kpis = [
+    { label: "Solicitações Hoje", value: solicitacoesHoje,           icon: Inbox,        iconBg: "bg-orange-50 text-orange-600",   sub: "submetidas hoje" },
+    { label: "Agendamentos Hoje", value: agendamentosHoje,           icon: CalendarIcon, iconBg: "bg-primary/10 text-primary",     sub: "sessões" },
+    { label: "Pendente Geral",    value: pendentesGeral,             icon: Clock,        iconBg: "bg-amber-50 text-amber-600",     sub: "por concluir" },
+    { label: "Em Atraso Geral",   value: solicitacoesEmAtraso.length,icon: AlertTriangle,iconBg: "bg-destructive/10 text-destructive", sub: "SLA ultrapassado" },
+  ];
+
   const slaConcluidas = solicitacoes.filter(s => s.estado === "concluida").length;
   const slaPct = totalSol > 0 ? Math.round((slaConcluidas / totalSol) * 100) : 0;
   void slaConcluidas;
@@ -95,7 +96,7 @@ export default function GapDashboard() {
       </div>
 
       {/* Single consolidated KPI row */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {kpis.map(k => (
           <Card key={k.label} className="p-4 hover:shadow-sm transition-shadow">
             <div className="flex items-center justify-between gap-2">
