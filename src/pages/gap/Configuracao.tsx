@@ -22,7 +22,31 @@ import { useToast } from "@/hooks/use-toast";
 
 type EstadoItem = { key: string; label: string; color: string };
 type CategoriaItem = { key: string; label: string; color: string };
-type MotivoItem = { key: string; label: string; categoria: string; destino: string; slaAceitacao: number; slaConclusao: number };
+type MotivoItem = { key: string; label: string; categoria: string; destino: string; responsavel: string; slaAceitacao: number; slaConclusao: number };
+
+const STAFF_OPTIONS = [
+  "Dra. Helena Cabral · GAP",
+  "Dr. João Tavares · GAP",
+  "Eng. Paulo Mendes · CTI",
+  "Eng.ª Sara Lima · CTI",
+  "Dra. Cita · Secretaria Académica",
+  "Dra. Ana Belmiro · Académica",
+  "Dra. Lúcia Mateus · Tesouraria",
+  "Sr. Adriano Paka · Cobranças",
+  "Dra. Catarina Lopes · Financeiro",
+  "Coord. Faculdade de Ciências Exatas",
+  "Coord. Faculdade de Medicina",
+];
+
+const defaultResponsavelByDestino = (destino: string) => {
+  switch (destino) {
+    case "CTI": return "Eng. Paulo Mendes · CTI";
+    case "Académica": return "Dra. Cita · Secretaria Académica";
+    case "Financeiro": return "Dra. Lúcia Mateus · Tesouraria";
+    case "Faculdade": return "Coord. Faculdade de Ciências Exatas";
+    default: return "Dra. Helena Cabral · GAP";
+  }
+};
 
 export default function GapConfiguracao() {
   const { toast } = useToast();
