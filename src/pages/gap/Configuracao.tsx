@@ -219,6 +219,9 @@ export default function GapConfiguracao() {
               <div key={c.key} className={cn("inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs", c.color)}>
                 <span className="font-medium">{c.label}</span>
                 <span className="opacity-60 tabular-nums">· {count} motivos</span>
+                <button onClick={() => setEditCategoria(c)} className="opacity-60 hover:opacity-100" aria-label={`Editar ${c.label}`}>
+                  <Pencil className="w-3 h-3" />
+                </button>
                 <button onClick={() => removeCategoria(c.key)} className="opacity-60 hover:opacity-100" aria-label={`Remover ${c.label}`}>
                   <Trash2 className="w-3 h-3" />
                 </button>
