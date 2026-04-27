@@ -194,6 +194,8 @@ export default function GapConfiguracao() {
   const formatKz = (n: number) =>
     new Intl.NumberFormat("pt-AO", { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(n) + " Kz";
 
+  const formatMultaDias = (d: number) => `${d}d após prazo`;
+
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       {/* Header */}
