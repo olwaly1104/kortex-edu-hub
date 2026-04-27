@@ -145,6 +145,16 @@ export default function GapConfiguracao() {
   const removeEstado = (key: string) => setEstados(prev => prev.filter(e => e.key !== key));
   const removeCategoria = (key: string) => setCategorias(prev => prev.filter(c => c.key !== key));
   const removeMotivo = (key: string) => setMotivos(prev => prev.filter(m => m.key !== key));
+  const removeMulta = (key: string) => setMultas(prev => prev.filter(m => m.key !== key));
+
+  const handleAddMulta = () => {
+    if (!newMultaLabel.trim()) return;
+    const key = slugify(newMultaLabel);
+    setMultas(prev => [...prev, { key, label: newMultaLabel.trim(), valor: newMultaValor, descricao: newMultaDesc.trim() }]);
+    setNewMultaLabel(""); setNewMultaValor(5000); setNewMultaDesc("");
+    setMultaOpen(false);
+    toast({ title: "Multa criada", description: `“${newMultaLabel}” foi adicionada.` });
+  };
 
   // Edit dialogs
   const [editEstado, setEditEstado] = useState<EstadoItem | null>(null);
