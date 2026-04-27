@@ -336,6 +336,7 @@ export default function GapConfiguracao() {
                 <th className="text-left p-3 font-medium text-muted-foreground text-xs">Motivo</th>
                 <th className="text-left p-3 font-medium text-muted-foreground text-xs">Categoria</th>
                 <th className="text-left p-3 font-medium text-muted-foreground text-xs">Destino</th>
+                <th className="text-left p-3 font-medium text-muted-foreground text-xs">Responsável</th>
                 <th className="text-center p-3 font-medium text-muted-foreground text-xs whitespace-nowrap">Aceitar</th>
                 <th className="text-center p-3 font-medium text-muted-foreground text-xs whitespace-nowrap">Concluir</th>
                 <th className="w-20" />
