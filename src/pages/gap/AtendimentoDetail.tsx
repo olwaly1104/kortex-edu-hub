@@ -5,8 +5,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   ArrowLeft, Calendar as CalendarIcon, Clock, MapPin, Video,
-  CheckCircle2, X, MessageSquare, Mail, Phone,
-  DoorOpen, GraduationCap, BookOpen, Hash, FileText, StickyNote,
+  CheckCircle2, X,
+  DoorOpen, GraduationCap, FileText,
   UserCircle2, Timer, ChevronRight, Download, Eye, Share2, Users,
   Home, Briefcase, CheckCircle, CircleDashed,
 } from "lucide-react";
@@ -224,75 +224,8 @@ export default function GapAtendimentoDetail() {
         </div>
 
 
-        {/* Body — Discente left | Sessão right (one continuous card, just a divider) */}
-        <div className="grid md:grid-cols-[280px_1fr] divide-y md:divide-y-0 md:divide-x divide-border border-t border-border">
-          {/* LEFT — discente */}
-          <aside className="p-5 space-y-5 bg-muted/15">
-            <section>
-              <SectionTitle>Discente</SectionTitle>
-              <Link
-                to={`/gap/estudantes/${atendimento.matricula}`}
-                className="flex items-start gap-3 w-full text-left hover:bg-muted/40 -mx-2 px-2 py-1.5 rounded-md transition-colors group"
-              >
-                <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 font-semibold text-xs ring-1 ring-primary/15">
-                  {initials}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-semibold text-foreground leading-tight group-hover:text-primary transition-colors">{atendimento.discente}</p>
-                  <p className="text-[11px] text-muted-foreground mt-0.5 font-mono">{atendimento.matricula}</p>
-                </div>
-              </Link>
-
-              <div className="grid grid-cols-3 gap-2 mt-3">
-                <ContactBtn icon={<MessageSquare className="w-3 h-3" />} label="Chat" onClick={() => handleAction("Chat aberto")} />
-                <ContactBtn icon={<Mail className="w-3 h-3" />} label="Email" onClick={() => handleAction("Email enviado")} />
-                <ContactBtn icon={<Phone className="w-3 h-3" />} label="Ligar" onClick={() => handleAction("Chamada iniciada")} />
-              </div>
-            </section>
-
-            <section className="pt-4 border-t border-border">
-              <SectionTitle>Dados académicos</SectionTitle>
-              <div className="space-y-2.5">
-                <SideRow icon={<Hash className="w-3.5 h-3.5" />} label="Ano" value={`${atendimento.ano}º`} />
-                <SideRow icon={<BookOpen className="w-3.5 h-3.5" />} label="Curso" value={atendimento.curso} />
-                <SideRow icon={<GraduationCap className="w-3.5 h-3.5" />} label="Faculdade" value={atendimento.faculdade} />
-              </div>
-            </section>
-
-            <section className="pt-4 border-t border-border">
-              <SectionTitle>Responsável</SectionTitle>
-              <button
-                type="button"
-                onClick={() => handleAction(`Perfil de ${atendimento.responsavel}`)}
-                className="flex items-center gap-2.5 text-left hover:bg-muted/40 -mx-2 px-2 py-1 rounded-md transition-colors group w-full"
-              >
-                <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[11px] font-semibold ring-1 ring-primary/15 shrink-0">
-                  {atendimento.responsavel.split(" ").slice(0, 2).map(n => n[0]).join("")}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-semibold text-foreground leading-tight group-hover:text-primary transition-colors">{atendimento.responsavel}</p>
-                  <p className="text-[11px] text-muted-foreground mt-0.5 font-mono tabular-nums">{getUserId(atendimento.responsavel)}</p>
-                </div>
-              </button>
-              <div className="grid grid-cols-3 gap-2 mt-3">
-                <ContactBtn icon={<MessageSquare className="w-3 h-3" />} label="Chat" onClick={() => handleAction(`Chat com ${atendimento.responsavel}`)} />
-                <ContactBtn icon={<Mail className="w-3 h-3" />} label="Email" onClick={() => handleAction(`Email para ${atendimento.responsavel}`)} />
-                <ContactBtn icon={<Phone className="w-3 h-3" />} label="Ligar" onClick={() => handleAction(`Chamada para ${atendimento.responsavel}`)} />
-              </div>
-              <div className="mt-3 pt-3 border-t border-border space-y-1.5">
-                <div className="flex items-baseline justify-between gap-2">
-                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Departamento</span>
-                  <span className="text-[11px] font-medium text-foreground text-right truncate max-w-[150px]">GAP</span>
-                </div>
-                <div className="flex items-baseline justify-between gap-2">
-                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Ano Lectivo</span>
-                  <span className="text-[11px] font-medium text-foreground text-right tabular-nums">2024/2025</span>
-                </div>
-              </div>
-            </section>
-          </aside>
-
-          {/* RIGHT — sessão */}
+        {/* Body — single column */}
+        <div className="border-t border-border">
           <main className="p-6 space-y-5 min-w-0">
             {/* Detalhes da sessão */}
             <section>
@@ -309,7 +242,6 @@ export default function GapAtendimentoDetail() {
                 </div>
               </div>
             </section>
-
 
             {/* Descrição */}
             <section>
@@ -328,100 +260,63 @@ export default function GapAtendimentoDetail() {
               </div>
             </section>
 
-            {/* Outros participantes */}
-            {atendimento.participantes && atendimento.participantes.length > 0 && (
-              <section>
-                <div className="flex items-center gap-2 mb-3">
-                  <Users className="w-3.5 h-3.5 text-muted-foreground" />
-                  <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">
-                    Outros Participantes
-                  </h3>
-                  <span className="text-[10px] text-muted-foreground font-medium tabular-nums">
-                    · {atendimento.participantes.length}
-                  </span>
-                </div>
-                <div className="rounded-lg border border-border bg-background divide-y divide-border">
-                  {atendimento.participantes.map((p, idx) => {
-                    const isFamily = p.tipo === "encarregado";
-                    const TypeIcon = isFamily ? Home : Briefcase;
-                    const initials = p.nome.split(" ").filter(w => w.length > 2).slice(0, 2).map(n => n[0]).join("");
-
-                    const content = (
-                      <>
-                        <div className={cn(
-                          "w-9 h-9 rounded-full flex items-center justify-center shrink-0 font-semibold text-[11px] ring-1",
-                          isFamily
-                            ? "bg-pink-50 text-pink-700 ring-pink-200"
-                            : "bg-blue-50 text-blue-700 ring-blue-200",
-                        )}>
-                          {initials}
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <p className={cn(
-                              "text-[13px] font-semibold leading-tight truncate",
-                              isFamily ? "text-foreground" : "text-foreground group-hover:text-primary transition-colors",
-                            )}>{p.nome}</p>
-                            <Badge
-                              variant="outline"
-                              className={cn(
-                                "text-[9.5px] font-semibold px-1.5 py-0 h-[16px] uppercase tracking-wider gap-1",
-                                isFamily
-                                  ? "bg-pink-50 text-pink-700 border-pink-200"
-                                  : "bg-blue-50 text-blue-700 border-blue-200",
-                              )}
-                            >
-                              <TypeIcon className="w-2.5 h-2.5" />
-                              {isFamily ? "Família" : "Escola"}
-                            </Badge>
-                          </div>
-                          <div className="flex items-center gap-2 mt-0.5 text-[11px] text-muted-foreground">
-                            <span className="truncate">{p.relacao}</span>
-                            {p.contacto && isFamily && (
-                              <>
-                                <span className="text-muted-foreground/40">·</span>
-                                <span className="truncate font-mono text-[10.5px]">{p.contacto}</span>
-                              </>
-                            )}
-                          </div>
-                        </div>
-                        {!isFamily && (
-                          <span className={cn(
-                            "shrink-0 inline-flex items-center gap-1 text-[10px] font-medium",
-                            p.confirmado ? "text-emerald-700" : "text-amber-700",
-                          )}>
-                            {p.confirmado ? (
-                              <><CheckCircle className="w-3 h-3" /> Confirmado</>
-                            ) : (
-                              <><CircleDashed className="w-3 h-3" /> Pendente</>
-                            )}
-                          </span>
-                        )}
-                      </>
-                    );
-
-                    if (isFamily) {
+            {/* Participantes — todos */}
+            {(() => {
+              const extras = atendimento.participantes ?? [];
+              const total = 2 + extras.length; // discente + responsável + extras
+              return (
+                <section>
+                  <div className="flex items-center gap-2 mb-3">
+                    <Users className="w-3.5 h-3.5 text-muted-foreground" />
+                    <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Participantes</h3>
+                    <span className="text-[10px] text-muted-foreground font-medium tabular-nums">· {total}</span>
+                  </div>
+                  <div className="rounded-lg border border-border bg-background divide-y divide-border">
+                    {/* Discente */}
+                    <ParticipantRow
+                      onClick={() => navigate(`/gap/estudantes/${atendimento.matricula}`)}
+                      avatarClasses="bg-primary/10 text-primary ring-primary/20"
+                      initials={initials}
+                      name={atendimento.discente}
+                      sub={`${atendimento.matricula} · ${atendimento.curso} · ${atendimento.ano}º ano`}
+                      badge={{ icon: GraduationCap, label: "Discente", classes: "bg-primary/10 text-primary border-primary/20" }}
+                    />
+                    {/* Responsável GAP */}
+                    <ParticipantRow
+                      onClick={() => handleAction(`Perfil de ${atendimento.responsavel}`)}
+                      avatarClasses="bg-amber-50 text-amber-700 ring-amber-200"
+                      initials={atendimento.responsavel.split(" ").slice(0, 2).map(n => n[0]).join("")}
+                      name={atendimento.responsavel}
+                      sub={`GAP · ID ${getUserId(atendimento.responsavel)}`}
+                      badge={{ icon: UserCircle2, label: "Responsável", classes: "bg-amber-50 text-amber-700 border-amber-200" }}
+                    />
+                    {/* Outros participantes existentes */}
+                    {extras.map((p, idx) => {
+                      const isFamily = p.tipo === "encarregado";
+                      const TypeIcon = isFamily ? Home : Briefcase;
+                      const pInitials = p.nome.split(" ").filter(w => w.length > 2).slice(0, 2).map(n => n[0]).join("");
+                      const sub = p.contacto && isFamily ? `${p.relacao} · ${p.contacto}` : p.relacao;
                       return (
-                        <div key={idx} className="flex items-center gap-3 px-3.5 py-2.5">
-                          {content}
-                        </div>
+                        <ParticipantRow
+                          key={idx}
+                          onClick={isFamily ? undefined : () => handleAction(`Perfil de ${p.nome}`)}
+                          avatarClasses={isFamily ? "bg-pink-50 text-pink-700 ring-pink-200" : "bg-blue-50 text-blue-700 ring-blue-200"}
+                          initials={pInitials}
+                          name={p.nome}
+                          sub={sub}
+                          badge={{
+                            icon: TypeIcon,
+                            label: isFamily ? "Família" : "Escola",
+                            classes: isFamily ? "bg-pink-50 text-pink-700 border-pink-200" : "bg-blue-50 text-blue-700 border-blue-200",
+                          }}
+                          status={!isFamily ? (p.confirmado ? "confirmado" : "pendente") : undefined}
+                        />
                       );
-                    }
-
-                    return (
-                      <button
-                        key={idx}
-                        type="button"
-                        onClick={() => handleAction(`Perfil de ${p.nome}`)}
-                        className="group flex items-center gap-3 px-3.5 py-2.5 w-full text-left hover:bg-muted/40 transition-colors"
-                      >
-                        {content}
-                      </button>
-                    );
-                  })}
-                </div>
-              </section>
-            )}
+                    })}
+                  </div>
+                </section>
+              );
+            })()}
           </main>
         </div>
 
@@ -432,11 +327,47 @@ export default function GapAtendimentoDetail() {
 
 /* ────────────── Helpers ────────────── */
 
-function SectionTitle({ children }: { children: React.ReactNode }) {
+function ParticipantRow({
+  onClick, avatarClasses, initials, name, sub, badge, status,
+}: {
+  onClick?: () => void;
+  avatarClasses: string;
+  initials: string;
+  name: string;
+  sub: string;
+  badge: { icon: React.ComponentType<{ className?: string }>; label: string; classes: string };
+  status?: "confirmado" | "pendente";
+}) {
+  const BadgeIcon = badge.icon;
+  const inner = (
+    <>
+      <div className={cn("w-9 h-9 rounded-full flex items-center justify-center shrink-0 font-semibold text-[11px] ring-1", avatarClasses)}>
+        {initials}
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-2 flex-wrap">
+          <p className={cn("text-[13px] font-semibold leading-tight truncate", onClick && "group-hover:text-primary transition-colors")}>{name}</p>
+          <Badge variant="outline" className={cn("text-[9.5px] font-semibold px-1.5 py-0 h-[16px] uppercase tracking-wider gap-1", badge.classes)}>
+            <BadgeIcon className="w-2.5 h-2.5" />
+            {badge.label}
+          </Badge>
+        </div>
+        <p className="mt-0.5 text-[11px] text-muted-foreground truncate">{sub}</p>
+      </div>
+      {status && (
+        <span className={cn("shrink-0 inline-flex items-center gap-1 text-[10px] font-medium", status === "confirmado" ? "text-emerald-700" : "text-amber-700")}>
+          {status === "confirmado" ? (<><CheckCircle className="w-3 h-3" /> Confirmado</>) : (<><CircleDashed className="w-3 h-3" /> Pendente</>)}
+        </span>
+      )}
+    </>
+  );
+  if (!onClick) {
+    return <div className="flex items-center gap-3 px-3.5 py-2.5">{inner}</div>;
+  }
   return (
-    <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold mb-2.5">
-      {children}
-    </p>
+    <button type="button" onClick={onClick} className="group flex items-center gap-3 px-3.5 py-2.5 w-full text-left hover:bg-muted/40 transition-colors">
+      {inner}
+    </button>
   );
 }
 
@@ -450,28 +381,5 @@ function FactItem({ icon, label, value, sub }: { icon: React.ReactNode; label: s
       <p className="text-sm font-semibold text-foreground leading-tight truncate">{value}</p>
       {sub && <p className="text-[11px] text-muted-foreground mt-0.5 truncate">{sub}</p>}
     </div>
-  );
-}
-
-function SideRow({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
-  return (
-    <div className="flex items-center gap-2.5">
-      <span className="text-muted-foreground shrink-0">{icon}</span>
-      <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium shrink-0 w-16">{label}</span>
-      <span className="text-[12px] font-medium text-foreground text-right truncate flex-1">{value}</span>
-    </div>
-  );
-}
-
-function ContactBtn({ icon, label, onClick }: { icon: React.ReactNode; label: string; onClick: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="inline-flex items-center justify-center gap-1.5 rounded-md border border-border bg-background px-2 py-1.5 text-[11px] font-medium text-foreground hover:text-primary hover:border-primary/25 hover:bg-primary/5 transition-colors"
-    >
-      <span className="text-muted-foreground shrink-0">{icon}</span>
-      {label}
-    </button>
   );
 }
