@@ -281,27 +281,38 @@ export default function GapAtendimentoDetail() {
           </aside>
 
           {/* RIGHT — sessão */}
-          <main className="p-6 space-y-6 min-w-0">
-            {/* Quick facts grid */}
+          <main className="p-6 space-y-5 min-w-0">
+            {/* Detalhes da sessão */}
             <section>
-              <SectionTitle>Detalhes da sessão</SectionTitle>
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-5 gap-y-4">
-                <FactItem icon={<Clock className="w-3.5 h-3.5" />} label="Horário" value={`${startTime} – ${endTime}`} sub={atendimento.duracao} />
-                <FactItem icon={<CalendarIcon className="w-3.5 h-3.5" />} label="Data" value={fullDate} />
-                <FactItem icon={<ModalityIcon className="w-3.5 h-3.5" />} label="Modalidade" value={atendimento.tipo === "online" ? "Online" : "Presencial"} />
-                <FactItem icon={<DoorOpen className="w-3.5 h-3.5" />} label="Local" value={atendimento.tipo === "presencial" && atendimento.sala ? atendimento.sala : "—"} />
+              <div className="flex items-center gap-2 mb-3">
+                <CalendarIcon className="w-3.5 h-3.5 text-muted-foreground" />
+                <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Detalhes da sessão</h3>
+              </div>
+              <div className="rounded-lg border border-border bg-background px-4 py-3.5">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-5 gap-y-4">
+                  <FactItem icon={<Clock className="w-3.5 h-3.5" />} label="Horário" value={`${startTime} – ${endTime}`} sub={atendimento.duracao} />
+                  <FactItem icon={<CalendarIcon className="w-3.5 h-3.5" />} label="Data" value={fullDate} />
+                  <FactItem icon={<ModalityIcon className="w-3.5 h-3.5" />} label="Modalidade" value={atendimento.tipo === "online" ? "Online" : "Presencial"} />
+                  <FactItem icon={<DoorOpen className="w-3.5 h-3.5" />} label="Local" value={atendimento.tipo === "presencial" && atendimento.sala ? atendimento.sala : "—"} />
+                </div>
               </div>
             </section>
 
-            <section className="pt-5 border-t border-border space-y-2">
-              <SectionTitle>
-                <span className="inline-flex items-center gap-1.5"><FileText className="w-3 h-3" /> Descrição</span>
-              </SectionTitle>
-              {atendimento.descricao ? (
-                <p className="text-sm text-foreground/90 leading-relaxed">{atendimento.descricao}</p>
-              ) : (
-                <p className="text-sm text-muted-foreground italic">Sem descrição adicional.</p>
-              )}
+            {/* Descrição */}
+            <section>
+              <div className="flex items-center gap-2 mb-3">
+                <FileText className="w-3.5 h-3.5 text-muted-foreground" />
+                <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Descrição</h3>
+              </div>
+              <div className="rounded-lg border border-border bg-background px-4 py-3">
+                <div className="rounded-md border border-border bg-muted/20 px-3.5 py-2.5">
+                  {atendimento.descricao ? (
+                    <p className="text-[13.5px] text-foreground/90 leading-[1.65] whitespace-pre-line">{atendimento.descricao}</p>
+                  ) : (
+                    <p className="text-[13px] text-muted-foreground italic">Sem descrição adicional.</p>
+                  )}
+                </div>
+              </div>
             </section>
 
             {atendimento.notas && (
