@@ -132,30 +132,31 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
 
           {/* Body */}
           <div className="flex-1 px-8 pb-3 space-y-3 overflow-hidden">
-            {/* 1. Discente · 2. Responsável */}
-            <div className="grid grid-cols-2 gap-3">
-              <Block title="1. Discente">
-                <KV rows={[
-                  ["Nome", s.discente],
-                  ["Matrícula", s.matricula],
-                  ["Curso", s.curso],
-                  ["Ano", `${s.ano}º`],
-                ]} />
-              </Block>
-              <Block title="2. Responsável">
-                <KV rows={[
-                  ["Destino", dest.label],
-                  ["Responsável", s.responsavelDestino ?? `Equipa ${dest.label}`],
-                  ["Estado", st.label],
-                  ["Referência", s.id],
-                ]} />
-              </Block>
-            </div>
+            {/* 1. Detalhes do Pedido */}
+            <Block title="1. Detalhes do Pedido">
+              <div className="rounded border border-border overflow-hidden">
+                {/* Discente · Responsável (side by side) */}
+                <div className="grid grid-cols-2 divide-x divide-border bg-primary/5">
+                  <div className="px-3 py-1 text-[8px] uppercase tracking-wider text-primary font-bold">Discente</div>
+                  <div className="px-3 py-1 text-[8px] uppercase tracking-wider text-primary font-bold">Responsável</div>
+                </div>
+                <div className="grid grid-cols-2 divide-x divide-border border-t border-border">
+                  <SubKV rows={[
+                    ["Nome", s.discente],
+                    ["Matrícula", s.matricula],
+                    ["Curso", s.curso],
+                    ["Ano", `${s.ano}º`],
+                  ]} />
+                  <SubKV rows={[
+                    ["Destino", dest.label],
+                    ["Responsável", s.responsavelDestino ?? `Equipa ${dest.label}`],
+                    ["Estado", st.label],
+                    ["Referência", s.id],
+                  ]} />
+                </div>
 
-            {/* 3. Detalhes do Pedido */}
-            <Block title="3. Detalhes do Pedido">
-              <div className="overflow-hidden rounded border border-border">
-                <table className="w-full text-[10px]">
+                {/* Meta do pedido */}
+                <table className="w-full text-[10px] border-t border-border">
                   <tbody className="divide-y divide-border">
                     <tr className="bg-background">
                       <td className="px-2.5 py-1 text-muted-foreground font-medium w-[18%] align-top">Assunto</td>
@@ -169,24 +170,24 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
                     </tr>
                   </tbody>
                 </table>
-              </div>
-            </Block>
 
-            {/* 4. Descrição */}
-            <Block title="4. Descrição">
-              <div className="rounded border border-border bg-muted/20 px-3 py-2">
-                <p className="text-[10px] text-foreground leading-snug whitespace-pre-line line-clamp-5">{s.descricao}</p>
-              </div>
-              {s.notaInterna && (
-                <div className="mt-1.5 rounded border border-amber-200 bg-amber-50/60 px-3 py-1.5">
-                  <p className="text-[8px] uppercase tracking-wider text-amber-800 font-bold">Nota interna</p>
-                  <p className="text-[10px] text-foreground leading-snug whitespace-pre-line line-clamp-2">{s.notaInterna}</p>
+                {/* Descrição */}
+                <div className="border-t border-border bg-background px-3 py-2">
+                  <p className="text-[8px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">Descrição</p>
+                  <p className="text-[10px] text-foreground leading-snug whitespace-pre-line line-clamp-5">{s.descricao}</p>
                 </div>
-              )}
+
+                {s.notaInterna && (
+                  <div className="border-t border-amber-200 bg-amber-50/60 px-3 py-1.5">
+                    <p className="text-[8px] uppercase tracking-wider text-amber-800 font-bold">Nota interna</p>
+                    <p className="text-[10px] text-foreground leading-snug whitespace-pre-line line-clamp-2">{s.notaInterna}</p>
+                  </div>
+                )}
+              </div>
             </Block>
 
             {/* 5 Cronologia */}
-            <Block title="5. Cronologia">
+            <Block title="2. Cronologia">
               <div className="overflow-hidden rounded border border-border">
                 <table className="w-full text-[9.5px]">
                   <thead>
@@ -211,7 +212,7 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
 
             {/* 6 Anexos */}
             {anexos.length > 0 && (
-              <Block title="6. Anexos">
+              <Block title="3. Anexos">
                 <div className="overflow-hidden rounded border border-border">
                   <table className="w-full text-[9.5px]">
                     <tbody className="divide-y divide-border">
@@ -273,5 +274,20 @@ function KV({ rows }: { rows: [string, string][] }) {
         </tbody>
       </table>
     </div>
+  );
+}
+
+function SubKV({ rows }: { rows: [string, string][] }) {
+  return (
+    <table className="w-full text-[10px]">
+      <tbody className="divide-y divide-border">
+        {rows.map(([k, v], i) => (
+          <tr key={i} className={i % 2 === 0 ? "bg-background" : "bg-muted/20"}>
+            <td className="px-2.5 py-1 text-muted-foreground font-medium w-[38%] align-top">{k}</td>
+            <td className="px-2.5 py-1 text-foreground font-semibold truncate">{v}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
   );
 }
