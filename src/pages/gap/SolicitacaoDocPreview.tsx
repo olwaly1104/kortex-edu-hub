@@ -163,8 +163,9 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
               rows={[
                 ["Nome", s.discente],
                 ["Matrícula", s.matricula],
-                ["Curso", "Arquitectura"],
-                ["Faculdade", "Ciências Exatas"],
+                ["Curso", s.curso],
+                ["Faculdade", s.faculdade],
+                ["Ano curricular", `${s.ano}º ano`],
               ]}
             />
           </Section>
@@ -174,41 +175,69 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
             <DocTable
               rows={[
                 ["Referência", s.id],
-                ["Tipo", tipoCfg?.label ?? s.tipo],
+                ["Assunto", s.assunto],
+                ["Tipo de pedido", tipoCfg?.label ?? s.tipo],
                 ["Categoria", tipoCfg?.categoria ?? "—"],
-                ["Destino", dest.label],
-                ["Responsável", s.responsavelDestino ?? `Equipa ${dest.label}`],
+                ["Prioridade", prio?.label ?? s.prioridade],
                 ["Estado actual", st.label],
               ]}
             />
           </Section>
 
+          {/* Section: Encaminhamento & SLA */}
+          <Section title="3. Encaminhamento & SLA">
+            <DocTable
+              rows={[
+                ["Destino", dest.label],
+                ["Responsável atribuído", s.responsavelDestino ?? `Equipa ${dest.label}`],
+                ["Data de submissão", fmtDataHora(dataInicio)],
+                ["Hora de aceitação / atribuição", fmtDataHora(dataAceite)],
+                ["SLA contratado", `${s.slaDias} ${s.slaDias === 1 ? "dia útil" : "dias úteis"}`],
+                [
+                  s.estado === "concluida" || s.estado === "rejeitada" ? "Dias até conclusão" : "Dias decorridos",
+                  s.estado === "concluida" || s.estado === "rejeitada"
+                    ? (diasConclusao !== null ? `${diasConclusao} ${diasConclusao === 1 ? "dia" : "dias"}` : "—")
+                    : (diasDecorridos !== null ? `${diasDecorridos} ${diasDecorridos === 1 ? "dia" : "dias"}` : "—"),
+                ],
+              ]}
+            />
+          </Section>
+
           {/* Section: Descrição */}
-          <Section title="3. Descrição do Pedido">
+          <Section title="4. Descrição do Pedido">
             <div className="rounded border border-border bg-muted/20 px-4 py-3">
               <p className="text-[12.5px] text-foreground leading-[1.7] whitespace-pre-line">
                 {s.descricao}
               </p>
             </div>
+            {s.notaInterna && (
+              <div className="mt-3 rounded border border-amber-200 bg-amber-50/60 px-4 py-3">
+                <p className="text-[10px] uppercase tracking-[0.12em] text-amber-800 font-bold mb-1">Nota interna</p>
+                <p className="text-[12.5px] text-foreground leading-[1.7] whitespace-pre-line">{s.notaInterna}</p>
+              </div>
+            )}
           </Section>
 
           {/* Section: Cronologia */}
-          <Section title="4. Cronologia do Processo">
+          <Section title="5. Cronologia do Processo">
             <div className="overflow-hidden rounded border border-border">
               <table className="w-full text-[11.5px]">
                 <thead>
                   <tr className="bg-primary/5 border-b border-border">
-                    <th className="text-left px-3 py-2 font-semibold text-foreground w-[20%]">Data</th>
-                    <th className="text-left px-3 py-2 font-semibold text-foreground w-[35%]">Acção</th>
-                    <th className="text-left px-3 py-2 font-semibold text-foreground">Responsável</th>
+                    <th className="text-left px-3 py-2 font-semibold text-foreground w-[26%]">Data & Hora</th>
+                    <th className="text-left px-3 py-2 font-semibold text-foreground w-[34%]">Acção</th>
+                    <th className="text-left px-3 py-2 font-semibold text-foreground">Responsável / Nota</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
                   {s.historico.map((h, i) => (
-                    <tr key={i} className="hover:bg-muted/20">
-                      <td className="px-3 py-2 text-foreground/80 tabular-nums whitespace-nowrap">{fmtData(h.data)}</td>
+                    <tr key={i} className={i % 2 === 0 ? "bg-background" : "bg-muted/20"}>
+                      <td className="px-3 py-2 text-foreground/80 tabular-nums whitespace-nowrap">{fmtDataHora(h.data)}</td>
                       <td className="px-3 py-2 text-foreground font-medium">{h.accao}</td>
-                      <td className="px-3 py-2 text-muted-foreground">{h.actor || "—"}</td>
+                      <td className="px-3 py-2 text-muted-foreground">
+                        <div>{h.actor || "—"}</div>
+                        {h.nota && <div className="text-[10.5px] text-muted-foreground/80 italic mt-0.5">{h.nota}</div>}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
