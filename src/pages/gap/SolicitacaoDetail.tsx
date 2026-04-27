@@ -387,7 +387,7 @@ export default function GapSolicitacaoDetail() {
                     <div className="border-t border-border" />
                     <div className="px-4 py-3">
                       <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold mb-2.5 inline-flex items-center gap-1.5">
-                        <Paperclip className="w-3 h-3" /> Documentos anexados
+                        <Paperclip className="w-3 h-3" /> Anexos da solicitação
                         <span className="text-muted-foreground/70 tabular-nums normal-case tracking-normal font-medium">({anexos.length})</span>
                       </p>
                       <div className="space-y-2">
