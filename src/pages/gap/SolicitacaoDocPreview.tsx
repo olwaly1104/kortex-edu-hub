@@ -92,16 +92,16 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
           <div className="flex-1 px-12 pb-4 space-y-5 overflow-hidden">
             {/* I · Detalhes do Pedido */}
             <Section number="I" title="Detalhes do Pedido">
-              <div className="border border-primary/25 rounded-sm overflow-hidden">
-                <div className="grid grid-cols-3 bg-primary/[0.06] border-b border-primary/25">
-                  <div className="px-3 py-1.5 border-r border-primary/15">
-                    <p className="text-[7.5px] uppercase tracking-[0.22em] text-primary font-bold">Discente</p>
+              <div className="border border-success/30 rounded-sm overflow-hidden">
+                <div className="grid grid-cols-3 bg-success/[0.07] border-b border-success/30">
+                  <div className="px-3 py-1.5 border-r border-success/20">
+                    <p className="text-[7.5px] uppercase tracking-[0.22em] text-success font-bold">Discente</p>
                   </div>
-                  <div className="px-3 py-1.5 border-r border-primary/15">
-                    <p className="text-[7.5px] uppercase tracking-[0.22em] text-primary font-bold">Pedido</p>
+                  <div className="px-3 py-1.5 border-r border-success/20">
+                    <p className="text-[7.5px] uppercase tracking-[0.22em] text-success font-bold">Pedido</p>
                   </div>
                   <div className="px-3 py-1.5">
-                    <p className="text-[7.5px] uppercase tracking-[0.22em] text-primary font-bold">Encaminhamento</p>
+                    <p className="text-[7.5px] uppercase tracking-[0.22em] text-success font-bold">Encaminhamento</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-3">
@@ -129,45 +129,42 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
 
             {/* II · Motivo + Descrição */}
             <Section number="II" title="Motivo do Pedido">
-              <div className="border border-primary/25 rounded-sm overflow-hidden flex">
-                <div className="w-1 bg-primary shrink-0" />
-                <div className="flex-1">
-                  <div className="px-4 py-2.5 bg-primary/[0.08] border-b border-primary/25">
-                    <p className="text-[7.5px] uppercase tracking-[0.22em] text-primary font-bold mb-1">Assunto</p>
-                    <h4 className="text-[13px] font-bold leading-snug tracking-tight text-primary">
-                      {s.assunto}
-                    </h4>
-                  </div>
-                  <div className="px-4 py-2.5 bg-background">
-                    <p className="text-[7.5px] uppercase tracking-[0.22em] text-primary/80 font-bold mb-1">Descrição</p>
-                    <p className="text-[10px] leading-relaxed whitespace-pre-line line-clamp-6 text-foreground/85">
-                      {s.descricao}
-                    </p>
-                    {s.notaInterna && (
-                      <div className="mt-2.5 pt-2 border-t border-dashed border-primary/25">
-                        <p className="text-[7.5px] uppercase tracking-[0.22em] text-primary/80 font-bold mb-0.5">
-                          Nota Interna
-                        </p>
-                        <p className="text-[10px] leading-snug whitespace-pre-line line-clamp-2 text-foreground/85 italic">
-                          {s.notaInterna}
-                        </p>
-                      </div>
-                    )}
-                  </div>
+              <div className="border border-success/30 rounded-sm overflow-hidden">
+                <div className="px-4 py-2.5 bg-success/[0.07] border-b border-success/30">
+                  <p className="text-[7.5px] uppercase tracking-[0.22em] text-success font-bold mb-1">Assunto</p>
+                  <h4 className="text-[13px] font-bold leading-snug tracking-tight text-foreground">
+                    {s.assunto}
+                  </h4>
+                </div>
+                <div className="px-4 py-2.5 bg-background">
+                  <p className="text-[7.5px] uppercase tracking-[0.22em] text-success font-bold mb-1">Descrição</p>
+                  <p className="text-[10px] leading-relaxed whitespace-pre-line line-clamp-6 text-foreground/85">
+                    {s.descricao}
+                  </p>
+                  {s.notaInterna && (
+                    <div className="mt-2.5 pt-2 border-t border-dashed border-success/30">
+                      <p className="text-[7.5px] uppercase tracking-[0.22em] text-success font-bold mb-0.5">
+                        Nota Interna
+                      </p>
+                      <p className="text-[10px] leading-snug whitespace-pre-line line-clamp-2 text-foreground/85 italic">
+                        {s.notaInterna}
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             </Section>
 
             {/* III · Cronologia */}
             <Section number="III" title="Cronologia">
-              <div className="border border-primary/25 rounded-sm overflow-hidden">
+              <div className="border border-success/30 rounded-sm overflow-hidden">
                 <table className="w-full text-[9.5px]">
-                  <thead className="bg-primary/[0.06]">
-                    <tr className="border-b border-primary/25">
-                      <th className="text-left px-3 py-1.5 font-bold w-[6%] text-primary uppercase tracking-[0.16em] text-[7.5px]">#</th>
-                      <th className="text-left px-3 py-1.5 font-bold w-[26%] text-primary uppercase tracking-[0.16em] text-[7.5px]">Data &amp; Hora</th>
-                      <th className="text-left px-3 py-1.5 font-bold w-[36%] text-primary uppercase tracking-[0.16em] text-[7.5px]">Acção</th>
-                      <th className="text-left px-3 py-1.5 font-bold text-primary uppercase tracking-[0.16em] text-[7.5px]">Responsável</th>
+                  <thead className="bg-success/[0.07]">
+                    <tr className="border-b border-success/30">
+                      <th className="text-left px-3 py-1.5 font-bold w-[6%] text-success uppercase tracking-[0.16em] text-[7.5px]">#</th>
+                      <th className="text-left px-3 py-1.5 font-bold w-[26%] text-success uppercase tracking-[0.16em] text-[7.5px]">Data &amp; Hora</th>
+                      <th className="text-left px-3 py-1.5 font-bold w-[36%] text-success uppercase tracking-[0.16em] text-[7.5px]">Acção</th>
+                      <th className="text-left px-3 py-1.5 font-bold text-success uppercase tracking-[0.16em] text-[7.5px]">Responsável</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-foreground/10">
@@ -187,13 +184,13 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
             {/* IV · Anexos */}
             {anexos.length > 0 && (
               <Section number="IV" title="Anexos">
-                <div className="border border-primary/25 rounded-sm overflow-hidden">
+                <div className="border border-success/30 rounded-sm overflow-hidden">
                   <table className="w-full text-[9.5px]">
-                    <thead className="bg-primary/[0.06]">
-                      <tr className="border-b border-primary/25">
-                        <th className="text-left px-3 py-1.5 font-bold w-[6%] text-primary uppercase tracking-[0.16em] text-[7.5px]">#</th>
-                        <th className="text-left px-3 py-1.5 font-bold text-primary uppercase tracking-[0.16em] text-[7.5px]">Ficheiro</th>
-                        <th className="text-right px-3 py-1.5 font-bold w-[18%] text-primary uppercase tracking-[0.16em] text-[7.5px]">Tamanho</th>
+                    <thead className="bg-success/[0.07]">
+                      <tr className="border-b border-success/30">
+                        <th className="text-left px-3 py-1.5 font-bold w-[6%] text-success uppercase tracking-[0.16em] text-[7.5px]">#</th>
+                        <th className="text-left px-3 py-1.5 font-bold text-success uppercase tracking-[0.16em] text-[7.5px]">Ficheiro</th>
+                        <th className="text-right px-3 py-1.5 font-bold w-[18%] text-success uppercase tracking-[0.16em] text-[7.5px]">Tamanho</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-foreground/10">
@@ -237,9 +234,9 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
 function Section({ number, title, children }: { number: string; title: string; children: React.ReactNode }) {
   return (
     <section>
-      <div className="flex items-baseline gap-2 mb-2 pb-1 border-b border-primary/30">
-        <span className="text-[8.5px] font-mono font-bold text-primary tabular-nums">{number}.</span>
-        <h3 className="text-[10px] uppercase tracking-[0.2em] font-bold text-primary">{title}</h3>
+      <div className="flex items-baseline gap-2 mb-2 pb-1 border-b border-success/30">
+        <span className="text-[8.5px] font-mono font-bold text-success tabular-nums">{number}.</span>
+        <h3 className="text-[10px] uppercase tracking-[0.2em] font-bold text-success">{title}</h3>
       </div>
       {children}
     </section>
@@ -248,10 +245,10 @@ function Section({ number, title, children }: { number: string; title: string; c
 
 function GroupCell({ rows, bordered }: { rows: [string, string][]; bordered?: boolean }) {
   return (
-    <dl className={`px-3 py-2 space-y-1 ${bordered ? "border-r border-primary/15" : ""}`}>
+    <dl className={`px-3 py-2 space-y-1 ${bordered ? "border-r border-success/20" : ""}`}>
       {rows.map(([k, v], i) => (
         <div key={i} className="flex items-baseline gap-2 text-[10px]">
-          <dt className="text-primary/70 w-[78px] shrink-0 font-medium">{k}</dt>
+          <dt className="text-success/70 w-[78px] shrink-0 font-medium">{k}</dt>
           <dd className="font-semibold truncate flex-1 text-foreground">{v}</dd>
         </div>
       ))}
