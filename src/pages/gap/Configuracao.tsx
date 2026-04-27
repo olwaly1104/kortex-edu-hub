@@ -301,7 +301,7 @@ export default function GapConfiguracao() {
                 <th className="text-left p-3 font-medium text-muted-foreground text-xs">Destino</th>
                 <th className="text-center p-3 font-medium text-muted-foreground text-xs whitespace-nowrap">Aceitar</th>
                 <th className="text-center p-3 font-medium text-muted-foreground text-xs whitespace-nowrap">Concluir</th>
-                <th className="w-10" />
+                <th className="w-20" />
               </tr>
             </thead>
             <tbody>
