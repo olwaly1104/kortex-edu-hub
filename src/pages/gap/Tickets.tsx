@@ -4,12 +4,13 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import ReportsMenuButton from "@/components/ReportsMenuButton";
 import { BarChart3, TrendingUp, BookOpen, FileBarChart2 } from "lucide-react";
 import {
   Search, X, Calendar as CalendarIcon, Building2,
   Inbox, Clock, CheckCircle2, AlertCircle, Layers,
+  SlidersHorizontal, ChevronRight, ChevronLeft, Check,
 } from "lucide-react";
 
 const TODAY = "2025-12-16";
