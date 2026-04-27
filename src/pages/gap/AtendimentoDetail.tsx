@@ -279,7 +279,6 @@ export default function GapAtendimentoDetail() {
                 </div>
               </div>
             </section>
-            </section>
 
             {atendimento.participantes && atendimento.participantes.length > 0 && (
               <section className="pt-4 border-t border-border">
