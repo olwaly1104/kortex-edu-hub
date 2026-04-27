@@ -23,15 +23,17 @@ import { useToast } from "@/hooks/use-toast";
 type EstadoItem = { key: string; label: string; color: string };
 type CategoriaItem = { key: string; label: string; color: string };
 type MotivoItem = { key: string; label: string; categoria: string; destino: string; responsavel: string; slaAceitacao: number; slaConclusao: number; multa: string };
-type MultaItem = { key: string; label: string; diasAposPrazo: number; descricao: string };
+type MultaItem = { key: string; label: string; diasAposPrazo: number; valor: number; descricao: string };
 
 const INITIAL_MULTAS: MultaItem[] = [
-  { key: "atraso_relatorio", label: "Atraso na entrega de relatório", diasAposPrazo: 5, descricao: "Aplicada 5 dias após o prazo de conclusão do relatório obrigatório." },
-  { key: "falta_injustificada", label: "Falta injustificada a sessão", diasAposPrazo: 5, descricao: "Aplicada 5 dias após o prazo de regularização da ausência." },
-  { key: "atraso_aula", label: "Atraso superior a 15min na aula", diasAposPrazo: 5, descricao: "Aplicada 5 dias após o prazo de justificação dos atrasos repetidos." },
-  { key: "incumprimento_sla", label: "Incumprimento de SLA de solicitação", diasAposPrazo: 5, descricao: "Aplicada 5 dias após o prazo de tratamento da solicitação." },
-  { key: "uso_indevido", label: "Uso indevido de recursos institucionais", diasAposPrazo: 5, descricao: "Aplicada 5 dias após o prazo de regularização do uso de recursos." },
+  { key: "atraso_relatorio", label: "Atraso na entrega de relatório", diasAposPrazo: 5, valor: 4000, descricao: "Aplicada 5 dias após o prazo de conclusão do relatório obrigatório." },
+  { key: "falta_injustificada", label: "Falta injustificada a sessão", diasAposPrazo: 5, valor: 6000, descricao: "Aplicada 5 dias após o prazo de regularização da ausência." },
+  { key: "atraso_aula", label: "Atraso superior a 15min na aula", diasAposPrazo: 5, valor: 3000, descricao: "Aplicada 5 dias após o prazo de justificação dos atrasos repetidos." },
+  { key: "incumprimento_sla", label: "Incumprimento de SLA de solicitação", diasAposPrazo: 5, valor: 5000, descricao: "Aplicada 5 dias após o prazo de tratamento da solicitação." },
+  { key: "uso_indevido", label: "Uso indevido de recursos institucionais", diasAposPrazo: 5, valor: 8000, descricao: "Aplicada 5 dias após o prazo de regularização do uso de recursos." },
 ];
+
+const formatKz = (v: number) => new Intl.NumberFormat("pt-AO").format(v) + " Kz";
 
 const STAFF_OPTIONS = [
   "Dra. Helena Cabral · GAP",
