@@ -193,111 +193,31 @@ export default function GapSolicitacaoDetail() {
         </div>
 
         {/* Title block with date tile (mirrors Agendamento detail) */}
-        <div className="px-6 pt-5 pb-5 space-y-4">
-          <div className="flex items-start gap-4 rounded-lg border border-border bg-background p-3">
+        <div className="px-6 pt-4 pb-4">
+          <div className="flex items-start gap-3 rounded-lg border border-border bg-background p-3">
             {/* Date tile */}
-            <div className="shrink-0 w-[68px] rounded-lg border border-border overflow-hidden bg-background text-center">
-              <div className="bg-primary/90 py-1">
-                <p className="text-[10px] uppercase tracking-[0.15em] text-primary-foreground font-bold">
+            <div className="shrink-0 w-[60px] rounded-md border border-border overflow-hidden bg-background text-center">
+              <div className="bg-primary/90 py-0.5">
+                <p className="text-[9px] uppercase tracking-[0.15em] text-primary-foreground font-bold">
                   {dSub.toLocaleDateString("pt-PT", { month: "short" }).replace(".", "")}
                 </p>
               </div>
-              <div className="py-1.5">
-                <p className="text-[28px] leading-none font-bold text-foreground tabular-nums tracking-tight">
+              <div className="py-1">
+                <p className="text-[24px] leading-none font-bold text-foreground tabular-nums tracking-tight">
                   {String(dSub.getDate()).padStart(2, "0")}
                 </p>
-                <p className="text-[9px] uppercase tracking-wider text-muted-foreground font-semibold mt-1 capitalize">
+                <p className="text-[8.5px] uppercase tracking-wider text-muted-foreground font-semibold mt-0.5 capitalize">
                   {dSub.toLocaleDateString("pt-PT", { weekday: "short" }).replace(".", "").slice(0, 3)}
                 </p>
               </div>
             </div>
 
-            <div className="min-w-0 flex-1 pt-0.5">
-              <div className="flex items-start justify-between gap-4">
-                <div className="min-w-0 flex-1">
-                  <h1 className="text-xl font-semibold leading-tight tracking-tight text-foreground">
-                    {tipoCfg?.label ?? selected.tipo}
-                  </h1>
-                </div>
-                <div className="shrink-0 flex flex-col items-end gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() => { navigator.clipboard?.writeText(selected.id); toast({ title: "ID copiado", description: selected.id }); }}
-                    className="inline-flex items-center px-2 py-0.5 rounded-md border border-border bg-background hover:bg-muted text-[11px] font-mono font-semibold text-foreground transition-colors"
-                  >
-                    {selected.id}
-                  </button>
-                  <Dialog>
-                    <div className="inline-flex items-center gap-2.5 pl-2 pr-1.5 py-1.5 rounded-md border border-border bg-background shadow-sm">
-                      {/* File icon */}
-                      <div className="w-7 h-7 rounded-md bg-red-50 border border-red-200 flex items-center justify-center shrink-0">
-                        <FileText className="w-3.5 h-3.5 text-red-600" />
-                      </div>
-                      {/* Name + auto label */}
-                      <div className="flex flex-col min-w-0 leading-tight">
-                        <span className="text-[11.5px] font-semibold text-foreground tabular-nums">Pedido-{selected.id}</span>
-                        <span className="text-[9.5px] tracking-[0.02em] text-muted-foreground font-medium mt-0.5">
-                          Gerado automaticamente
-                        </span>
-                      </div>
-                      {/* Divider */}
-                      <span className="self-stretch w-px bg-border mx-0.5" />
-                      {/* Actions */}
-                      <DialogTrigger asChild>
-                        <button type="button" className="inline-flex items-center gap-1 px-1.5 h-6 rounded text-[10.5px] text-primary hover:bg-muted font-medium transition-colors" title="Partilhas">
-                          <Users className="w-3 h-3" /> 4
-                        </button>
-                      </DialogTrigger>
-                      <DialogTrigger asChild>
-                        <button type="button" className="w-6 h-6 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors" title="Ver">
-                          <Eye className="w-3 h-3" />
-                        </button>
-                      </DialogTrigger>
-                      <button
-                        type="button"
-                        onClick={() => toast({ title: "Documento exportado", description: `Pedido-${selected.id}` })}
-                        className="w-6 h-6 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-                        title="Exportar"
-                      >
-                        <Download className="w-3 h-3" />
-                      </button>
-                    </div>
-                    <DialogContent className="max-w-md">
-                      <DialogHeader>
-                        <DialogTitle className="text-base flex items-center gap-2">
-                          <Share2 className="w-4 h-4 text-primary" /> Partilhado com 4 pessoas
-                        </DialogTitle>
-                        <DialogDescription className="text-[12px]">
-                          Pessoas com acesso ao documento <span className="font-medium text-foreground">Pedido-{selected.id}</span>.
-                        </DialogDescription>
-                      </DialogHeader>
-                      <div className="space-y-2 mt-2">
-                        {[
-                          { name: "Prof. Dr. António Mendes", role: "Reitor", access: "Visualizar" },
-                          { name: selected.responsavelDestino?.split(" · ")[0] ?? dest.label, role: `Responsável ${dest.label}`, access: "Editar" },
-                          { name: selected.estudante, role: "Estudante", access: "Visualizar" },
-                          { name: "Coordenação Académica", role: "Equipa", access: "Visualizar" },
-                        ].map((p, i) => {
-                          const ini = p.name.split(" ").slice(0, 2).map(n => n[0]).join("");
-                          return (
-                            <div key={i} className="flex items-center gap-3 px-3 py-2.5 rounded-md border border-border bg-muted/20">
-                              <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[11px] font-semibold ring-1 ring-primary/15 shrink-0">
-                                {ini}
-                              </div>
-                              <div className="min-w-0 flex-1">
-                                <p className="text-[13px] font-semibold text-foreground leading-tight truncate">{p.name}</p>
-                                <p className="text-[11px] text-muted-foreground mt-0.5">{p.role}</p>
-                              </div>
-                              <Badge variant="outline" className="text-[10px] font-medium px-2 py-0.5 shrink-0">{p.access}</Badge>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </DialogContent>
-                  </Dialog>
-                </div>
-              </div>
-              <div className="mt-2 flex items-center gap-1.5 flex-wrap">
+            {/* Title + badges */}
+            <div className="min-w-0 flex-1">
+              <h1 className="text-xl font-semibold leading-tight tracking-tight text-foreground">
+                {tipoCfg?.label ?? selected.tipo}
+              </h1>
+              <div className="mt-1 flex items-center gap-1.5 flex-wrap">
                 <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider gap-1", st.color)}>
                   <span className={cn("w-1.5 h-1.5 rounded-full", estadoDot[selected.estado])} />
                   {st.label}
@@ -314,7 +234,87 @@ export default function GapSolicitacaoDetail() {
                 })()}
               </div>
             </div>
+
+            {/* Right — ID + Doc pill */}
+            <div className="shrink-0 flex flex-col items-end gap-1.5">
+              <button
+                type="button"
+                onClick={() => { navigator.clipboard?.writeText(selected.id); toast({ title: "ID copiado", description: selected.id }); }}
+                className="inline-flex items-center px-2 py-0.5 rounded-md border border-border bg-background hover:bg-muted text-[11px] font-mono font-semibold text-foreground transition-colors"
+              >
+                {selected.id}
+              </button>
+              <Dialog>
+                <div className="inline-flex items-center gap-2 pl-1.5 pr-1 py-1 rounded-md border border-border bg-background shadow-sm">
+                  {/* File icon */}
+                  <div className="w-6 h-6 rounded bg-red-50 border border-red-200 flex items-center justify-center shrink-0">
+                    <FileText className="w-3 h-3 text-red-600" />
+                  </div>
+                  {/* Name + auto label */}
+                  <div className="flex flex-col min-w-0 leading-tight">
+                    <span className="text-[11px] font-semibold text-foreground tabular-nums">Pedido-{selected.id}</span>
+                    <span className="text-[9px] tracking-[0.02em] text-muted-foreground font-medium">
+                      Gerado automaticamente
+                    </span>
+                  </div>
+                  {/* Divider */}
+                  <span className="self-stretch w-px bg-border mx-0.5" />
+                  {/* Actions */}
+                  <DialogTrigger asChild>
+                    <button type="button" className="inline-flex items-center gap-1 px-1 h-5 rounded text-[10px] text-primary hover:bg-muted font-medium transition-colors" title="Partilhas">
+                      <Users className="w-3 h-3" /> 4
+                    </button>
+                  </DialogTrigger>
+                  <DialogTrigger asChild>
+                    <button type="button" className="w-5 h-5 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors" title="Ver">
+                      <Eye className="w-3 h-3" />
+                    </button>
+                  </DialogTrigger>
+                  <button
+                    type="button"
+                    onClick={() => toast({ title: "Documento exportado", description: `Pedido-${selected.id}` })}
+                    className="w-5 h-5 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                    title="Exportar"
+                  >
+                    <Download className="w-3 h-3" />
+                  </button>
+                </div>
+                <DialogContent className="max-w-md">
+                  <DialogHeader>
+                    <DialogTitle className="text-base flex items-center gap-2">
+                      <Share2 className="w-4 h-4 text-primary" /> Partilhado com 4 pessoas
+                    </DialogTitle>
+                    <DialogDescription className="text-[12px]">
+                      Pessoas com acesso ao documento <span className="font-medium text-foreground">Pedido-{selected.id}</span>.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-2 mt-2">
+                    {[
+                      { name: "Prof. Dr. António Mendes", role: "Reitor", access: "Visualizar" },
+                      { name: selected.responsavelDestino?.split(" · ")[0] ?? dest.label, role: `Responsável ${dest.label}`, access: "Editar" },
+                      { name: selected.estudante, role: "Estudante", access: "Visualizar" },
+                      { name: "Coordenação Académica", role: "Equipa", access: "Visualizar" },
+                    ].map((p, i) => {
+                      const ini = p.name.split(" ").slice(0, 2).map(n => n[0]).join("");
+                      return (
+                        <div key={i} className="flex items-center gap-3 px-3 py-2.5 rounded-md border border-border bg-muted/20">
+                          <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[11px] font-semibold ring-1 ring-primary/15 shrink-0">
+                            {ini}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-[13px] font-semibold text-foreground leading-tight truncate">{p.name}</p>
+                            <p className="text-[11px] text-muted-foreground mt-0.5">{p.role}</p>
+                          </div>
+                          <Badge variant="outline" className="text-[10px] font-medium px-2 py-0.5 shrink-0">{p.access}</Badge>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
           </div>
+        </div>
 
         </div>
 
