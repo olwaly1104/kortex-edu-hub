@@ -90,30 +90,8 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
 
           {/* ── Body ──────────────────────────────────────────── */}
           <div className="flex-1 px-12 pb-4 space-y-5 overflow-hidden">
-            {/* I · Motivo + Descrição */}
-            <Section number="I" title="Motivo do Pedido">
-              <div>
-                <h4 className="text-[13px] font-semibold leading-snug tracking-tight">
-                  {s.assunto}
-                </h4>
-                <p className="text-[10px] leading-relaxed whitespace-pre-line line-clamp-6 mt-2 text-foreground/85">
-                  {s.descricao}
-                </p>
-                {s.notaInterna && (
-                  <div className="mt-2.5 pt-2 border-t border-dashed border-foreground/25">
-                    <p className="text-[7.5px] uppercase tracking-[0.2em] text-foreground/55 font-semibold mb-0.5">
-                      Nota Interna
-                    </p>
-                    <p className="text-[10px] leading-snug whitespace-pre-line line-clamp-2 text-foreground/85 italic">
-                      {s.notaInterna}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </Section>
-
-            {/* II · Detalhes do Pedido */}
-            <Section number="II" title="Detalhes do Pedido">
+            {/* I · Detalhes do Pedido */}
+            <Section number="I" title="Detalhes do Pedido">
               <div className="grid grid-cols-3 gap-x-8 gap-y-0">
                 <Group label="Discente" rows={[
                   ["Nome", s.discente],
@@ -133,6 +111,34 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
                   ["Encaminhado", fmtDataHora(s.dataEncaminhamento)],
                   ["Conclusão", fmtDataHora(s.dataConclusao)],
                 ]} />
+              </div>
+            </Section>
+
+            {/* II · Motivo + Descrição */}
+            <Section number="II" title="Motivo do Pedido">
+              <div className="border border-foreground/20 rounded-sm overflow-hidden">
+                <div className="px-4 py-2.5 bg-primary/[0.05] border-b border-foreground/15">
+                  <p className="text-[7.5px] uppercase tracking-[0.22em] text-primary font-bold mb-0.5">Assunto</p>
+                  <h4 className="text-[12.5px] font-bold leading-snug tracking-tight text-foreground">
+                    {s.assunto}
+                  </h4>
+                </div>
+                <div className="px-4 py-2.5 bg-background">
+                  <p className="text-[7.5px] uppercase tracking-[0.22em] text-foreground/55 font-semibold mb-1">Descrição</p>
+                  <p className="text-[10px] leading-relaxed whitespace-pre-line line-clamp-6 text-foreground/85">
+                    {s.descricao}
+                  </p>
+                  {s.notaInterna && (
+                    <div className="mt-2.5 pt-2 border-t border-dashed border-foreground/20">
+                      <p className="text-[7.5px] uppercase tracking-[0.22em] text-foreground/55 font-semibold mb-0.5">
+                        Nota Interna
+                      </p>
+                      <p className="text-[10px] leading-snug whitespace-pre-line line-clamp-2 text-foreground/85 italic">
+                        {s.notaInterna}
+                      </p>
+                    </div>
+                  )}
+                </div>
               </div>
             </Section>
 
