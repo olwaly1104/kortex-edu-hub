@@ -183,7 +183,6 @@ export default function GapDashboard() {
                     <th className="text-left px-3 py-2 font-medium text-muted-foreground text-xs uppercase tracking-wider">Estudante</th>
                     <th className="text-left px-3 py-2 font-medium text-muted-foreground text-xs uppercase tracking-wider">Categoria</th>
                     <th className="text-left px-3 py-2 font-medium text-muted-foreground text-xs uppercase tracking-wider">Destino</th>
-                    <th className="text-left px-3 py-2 font-medium text-muted-foreground text-xs uppercase tracking-wider">Responsável</th>
                     <th className="text-center px-3 py-2 font-medium text-muted-foreground text-xs uppercase tracking-wider whitespace-nowrap">Atraso</th>
                   </tr>
                 </thead>
