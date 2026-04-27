@@ -454,11 +454,9 @@ export default function GapSolicitacaoDetail() {
                 {/* Descrição */}
                 <div className="px-4 py-3">
                   <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold mb-1.5">Descrição</p>
-                  <div className="rounded-md border border-border bg-muted/20 px-3.5 py-2.5">
-                    <p className="text-[13.5px] text-foreground/90 leading-[1.65] whitespace-pre-line">
-                      {selected.descricao}
-                    </p>
-                  </div>
+                  <p className="text-[13.5px] text-foreground/90 leading-[1.65] whitespace-pre-line">
+                    {selected.descricao}
+                  </p>
                 </div>
 
                 {/* Anexos */}
