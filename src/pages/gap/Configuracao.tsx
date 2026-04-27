@@ -66,6 +66,7 @@ export default function GapConfiguracao() {
   const [categorias, setCategorias] = useState<CategoriaItem[]>(
     Object.entries(initialCategoriaConfig).map(([key, v]) => ({ key, label: v.label, color: v.color }))
   );
+  const [multas, setMultas] = useState<MultaItem[]>(INITIAL_MULTAS);
   const [motivos, setMotivos] = useState<MotivoItem[]>(
     Object.entries(initialTipoConfig).map(([key, v]) => ({
       key, label: v.label, categoria: v.categoria, destino: v.destino,
