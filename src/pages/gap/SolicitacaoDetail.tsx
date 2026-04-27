@@ -217,7 +217,7 @@ export default function GapSolicitacaoDetail() {
                 <h1 className="text-xl font-semibold leading-tight tracking-tight text-foreground">
                   {tipoCfg?.label ?? selected.tipo}
                 </h1>
-                <div className="shrink-0 flex flex-col items-end gap-2">
+                <div className="shrink-0 flex flex-col items-end gap-1.5">
                   <button
                     type="button"
                     onClick={() => { navigator.clipboard?.writeText(selected.id); toast({ title: "ID copiado", description: selected.id }); }}
