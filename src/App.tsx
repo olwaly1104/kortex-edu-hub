@@ -117,6 +117,7 @@ import GapAtendimentos from "./pages/gap/Atendimentos";
 import GapAtendimentoDetail from "./pages/gap/AtendimentoDetail";
 import GapEstudantes from "./pages/gap/Estudantes";
 import GapEstudanteProfile from "./pages/gap/EstudanteProfile";
+import GapConfiguracao from "./pages/gap/Configuracao";
 import FinancasDashboard from "./pages/financas/Dashboard";
 import FinancasInicio from "./pages/financas/Inicio";
 import FinancasReceitas from "./pages/financas/Receitas";
