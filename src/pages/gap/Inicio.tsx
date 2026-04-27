@@ -22,7 +22,7 @@ export default function GapInicio() {
 
   const stats = [
     { icon: HelpCircle, label: "Recebidas", value: gapKpis.recebidas, color: "text-orange-600 bg-orange-100" },
-    { icon: Clock, label: "Em Execução", value: gapKpis.emExecucao, color: "text-amber-600 bg-amber-100" },
+    { icon: Clock, label: "Em Atraso", value: gapKpis.emExecucao, color: "text-amber-600 bg-amber-100" },
     { icon: CalendarDays, label: "Agendamentos Hoje", value: gapKpis.atendimentosHoje, color: "text-emerald-600 bg-emerald-100" },
     { icon: AlertTriangle, label: "SLA em Risco", value: gapKpis.slaEmRisco, color: "text-destructive bg-destructive/10" },
   ];

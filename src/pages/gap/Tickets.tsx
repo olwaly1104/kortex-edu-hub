@@ -129,7 +129,7 @@ export default function GapTickets() {
   const periodoOpts = [
     { v: "todos", label: "Todas", count: counts.todos },
     { v: "pendentes", label: "Pendentes", count: counts.pendentes },
-    { v: "em_execucao", label: "Em Execução", count: counts.em_execucao },
+    { v: "em_execucao", label: "Em Atraso", count: counts.em_execucao },
     { v: "executadas", label: "Executadas", count: counts.executadas },
     { v: "rejeitadas", label: "Rejeitadas", count: counts.rejeitadas },
   ] as const;
