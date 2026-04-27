@@ -415,7 +415,103 @@ export default function GapConfiguracao() {
         </div>
       </Card>
 
-      {/* Edit Estado Dialog */}
+      {/* Multas */}
+      <Card className="p-5">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-destructive" />
+            <h2 className="text-sm font-semibold text-foreground">Multas</h2>
+            <span className="text-[11px] text-muted-foreground tabular-nums">· {multas.length}</span>
+          </div>
+          <Dialog open={multaOpen} onOpenChange={setMultaOpen}>
+            <DialogTrigger asChild>
+              <Button size="sm" variant="outline" className="gap-1.5 h-8 text-xs">
+                <Plus className="w-3.5 h-3.5" /> Nova multa
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-lg">
+              <DialogHeader><DialogTitle>Nova multa</DialogTitle></DialogHeader>
+              <div className="space-y-3 py-2">
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Motivo</label>
+                  <Input value={newMultaLabel} onChange={e => setNewMultaLabel(e.target.value)} placeholder="Ex: Atraso na entrega de relatório" />
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Valor (Kz)</label>
+                  <Input type="number" min={0} step={500} value={newMultaValor} onChange={e => setNewMultaValor(Number(e.target.value) || 0)} />
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Descrição</label>
+                  <Input value={newMultaDesc} onChange={e => setNewMultaDesc(e.target.value)} placeholder="Quando se aplica esta multa" />
+                </div>
+              </div>
+              <DialogFooter className="gap-2 sm:gap-2">
+                <DialogClose asChild><Button variant="outline">Cancelar</Button></DialogClose>
+                <Button onClick={handleAddMulta} disabled={!newMultaLabel.trim()}>Adicionar</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
+        <div className="overflow-x-auto rounded-lg border border-border">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b bg-muted/30">
+                <th className="text-left p-3 font-medium text-muted-foreground text-xs">Motivo</th>
+                <th className="text-left p-3 font-medium text-muted-foreground text-xs">Descrição</th>
+                <th className="text-right p-3 font-medium text-muted-foreground text-xs whitespace-nowrap">Valor</th>
+                <th className="w-20" />
+              </tr>
+            </thead>
+            <tbody>
+              {multas.map(m => (
+                <tr key={m.key} className="border-b last:border-0 hover:bg-muted/20">
+                  <td className="p-3 text-xs font-medium text-foreground">{m.label}</td>
+                  <td className="p-3 text-xs text-muted-foreground max-w-md">{m.descricao || "—"}</td>
+                  <td className="p-3 text-right text-xs font-semibold text-destructive tabular-nums whitespace-nowrap">{formatKz(m.valor)}</td>
+                  <td className="p-3 text-right">
+                    <div className="inline-flex items-center gap-2">
+                      <button onClick={() => setEditMulta(m)} className="text-muted-foreground hover:text-foreground" aria-label={`Editar ${m.label}`}>
+                        <Pencil className="w-3.5 h-3.5" />
+                      </button>
+                      <button onClick={() => removeMulta(m.key)} className="text-muted-foreground hover:text-destructive" aria-label={`Remover ${m.label}`}>
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Card>
+
+      {/* Edit Multa Dialog */}
+      <Dialog open={!!editMulta} onOpenChange={(o) => !o && setEditMulta(null)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader><DialogTitle>Editar multa</DialogTitle></DialogHeader>
+          {editMulta && (
+            <div className="space-y-3 py-2">
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Motivo</label>
+                <Input value={editMulta.label} onChange={e => setEditMulta({ ...editMulta, label: e.target.value })} />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Valor (Kz)</label>
+                <Input type="number" min={0} step={500} value={editMulta.valor} onChange={e => setEditMulta({ ...editMulta, valor: Number(e.target.value) || 0 })} />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Descrição</label>
+                <Input value={editMulta.descricao} onChange={e => setEditMulta({ ...editMulta, descricao: e.target.value })} />
+              </div>
+            </div>
+          )}
+          <DialogFooter className="gap-2 sm:gap-2">
+            <Button variant="outline" onClick={() => setEditMulta(null)}>Cancelar</Button>
+            <Button onClick={saveEditMulta} disabled={!editMulta?.label.trim()}>Guardar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={!!editEstado} onOpenChange={(o) => !o && setEditEstado(null)}>
         <DialogContent className="max-w-md">
           <DialogHeader><DialogTitle>Editar estado</DialogTitle></DialogHeader>
