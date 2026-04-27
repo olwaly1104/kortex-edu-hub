@@ -253,7 +253,7 @@ export default function GapSolicitacaoDetail() {
                       <div className="flex flex-col min-w-0 leading-tight">
                         <span className="text-[11.5px] font-semibold text-foreground tabular-nums">Pedido-{selected.id}</span>
                         <span className="text-[9.5px] uppercase tracking-[0.08em] text-muted-foreground font-semibold mt-0.5">
-                          Relatório gerado automaticamente
+                          Gerado Automaticamente
                         </span>
                       </div>
                       {/* Divider */}
