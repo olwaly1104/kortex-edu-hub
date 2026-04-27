@@ -194,7 +194,7 @@ export default function GapSolicitacaoDetail() {
 
         {/* Title block with date tile (mirrors Agendamento detail) */}
         <div className="px-6 pt-5 pb-5 space-y-4">
-          <div className="flex items-start gap-5">
+          <div className="flex items-start gap-4 rounded-lg border border-border bg-background p-3">
             {/* Date tile */}
             <div className="shrink-0 w-[68px] rounded-lg border border-border overflow-hidden bg-background text-center">
               <div className="bg-primary/90 py-1">
@@ -212,7 +212,7 @@ export default function GapSolicitacaoDetail() {
               </div>
             </div>
 
-            <div className="min-w-0 flex-1 rounded-lg border border-border bg-background px-4 py-3">
+            <div className="min-w-0 flex-1 pt-0.5">
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0 flex-1">
                   <h1 className="text-xl font-semibold leading-tight tracking-tight text-foreground">
