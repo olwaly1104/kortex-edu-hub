@@ -80,6 +80,7 @@ export default function GapConfiguracao() {
   const [estadoOpen, setEstadoOpen] = useState(false);
   const [catOpen, setCatOpen] = useState(false);
   const [motivoOpen, setMotivoOpen] = useState(false);
+  const [multaOpen, setMultaOpen] = useState(false);
 
   // New estado form
   const [newEstadoLabel, setNewEstadoLabel] = useState("");
