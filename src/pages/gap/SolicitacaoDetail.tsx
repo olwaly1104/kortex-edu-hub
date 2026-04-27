@@ -244,37 +244,40 @@ export default function GapSolicitacaoDetail() {
                     {selected.id}
                   </button>
                   <Dialog>
-                    <div className="inline-flex items-center gap-2.5 pl-2 pr-1.5 py-1.5 rounded-md border border-border bg-background shadow-sm">
-                      {/* File icon */}
-                      <div className="w-7 h-7 rounded-md bg-red-50 border border-red-200 flex items-center justify-center shrink-0">
-                        <FileText className="w-3.5 h-3.5 text-red-600" />
+                    <div className="group inline-flex items-stretch rounded-lg border border-border bg-gradient-to-b from-background to-muted/40 shadow-sm overflow-hidden">
+                      {/* Left — file thumbnail */}
+                      <div className="relative w-10 shrink-0 bg-gradient-to-br from-red-500 to-red-600 flex flex-col items-center justify-center text-white">
+                        <FileText className="w-4 h-4" strokeWidth={2.25} />
+                        <span className="absolute bottom-0.5 text-[7.5px] font-bold tracking-wider">PDF</span>
                       </div>
-                      {/* Name + auto label */}
-                      <div className="flex flex-col min-w-0 leading-tight">
-                        <span className="text-[11.5px] font-semibold text-foreground tabular-nums">Pedido-{selected.id}</span>
-                        <span className="text-[9.5px] text-muted-foreground font-medium">Gerado automaticamente</span>
+                      {/* Middle — name + meta */}
+                      <div className="flex flex-col justify-center px-3 py-1.5 min-w-0 leading-tight">
+                        <span className="text-[12px] font-semibold text-foreground tabular-nums">Pedido-{selected.id}</span>
+                        <span className="text-[9.5px] uppercase tracking-[0.08em] text-muted-foreground font-semibold mt-0.5">
+                          Relatório gerado automaticamente
+                        </span>
                       </div>
-                      {/* Divider */}
-                      <span className="self-stretch w-px bg-border mx-0.5" />
-                      {/* Actions */}
-                      <DialogTrigger asChild>
-                        <button type="button" className="inline-flex items-center gap-1 px-1.5 h-6 rounded text-[10.5px] text-primary hover:bg-muted font-medium transition-colors" title="Partilhas">
-                          <Users className="w-3 h-3" /> 4
+                      {/* Right — actions */}
+                      <div className="flex items-center gap-px pl-1 pr-1 border-l border-border bg-background/50">
+                        <DialogTrigger asChild>
+                          <button type="button" className="inline-flex items-center gap-1 px-1.5 h-7 rounded-md text-[10.5px] text-primary hover:bg-muted font-semibold transition-colors" title="Partilhas">
+                            <Users className="w-3 h-3" /> 4
+                          </button>
+                        </DialogTrigger>
+                        <DialogTrigger asChild>
+                          <button type="button" className="w-7 h-7 rounded-md inline-flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors" title="Ver">
+                            <Eye className="w-3.5 h-3.5" />
+                          </button>
+                        </DialogTrigger>
+                        <button
+                          type="button"
+                          onClick={() => toast({ title: "Documento exportado", description: `Pedido-${selected.id}` })}
+                          className="w-7 h-7 rounded-md inline-flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                          title="Exportar"
+                        >
+                          <Download className="w-3.5 h-3.5" />
                         </button>
-                      </DialogTrigger>
-                      <DialogTrigger asChild>
-                        <button type="button" className="w-6 h-6 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors" title="Ver">
-                          <Eye className="w-3 h-3" />
-                        </button>
-                      </DialogTrigger>
-                      <button
-                        type="button"
-                        onClick={() => toast({ title: "Documento exportado", description: `Pedido-${selected.id}` })}
-                        className="w-6 h-6 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-                        title="Exportar"
-                      >
-                        <Download className="w-3 h-3" />
-                      </button>
+                      </div>
                     </div>
                     <DialogContent className="max-w-md">
                       <DialogHeader>
