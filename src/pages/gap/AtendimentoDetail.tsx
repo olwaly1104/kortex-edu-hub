@@ -430,6 +430,7 @@ export default function GapAtendimentoDetail() {
               </section>
             )}
 
+            {atendimento.notas && (
               <section className="pt-5 border-t border-border space-y-2">
                 <SectionTitle>
                   <span className="inline-flex items-center gap-1.5"><StickyNote className="w-3 h-3" /> Notas do profissional</span>
