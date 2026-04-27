@@ -46,7 +46,7 @@ export default function AtendimentoDocPreview({ atendimento: a }: Props) {
   const extras = a.participantes ?? [];
 
   return (
-    <div className="flex flex-col h-full bg-muted/30">
+    <div className="flex flex-col h-full min-h-0 bg-muted/30">
       {/* Toolbar */}
       <div className="flex items-center justify-between px-4 py-2.5 border-b border-border bg-background shrink-0">
         <div className="flex items-center gap-2">
