@@ -24,11 +24,25 @@ export default function GapDashboard() {
 
   const maxDest = Math.max(...solicitacoesPorDestino.map(c => c.count), 1);
   const totalSol = solicitacoes.length;
+
+  // Em atraso (SLA ultrapassado) — virtual estado
+  const todayDate = new Date(TODAY_STR); todayDate.setHours(0, 0, 0, 0);
+  const isEmAtrasoSol = (s: typeof solicitacoes[number]) => {
+    if (s.estado === "concluida" || s.estado === "rejeitada") return false;
+    const sla = s.slaDias ?? tipoConfig[s.tipo]?.slaDias;
+    if (!sla) return false;
+    const base = new Date(s.dataEncaminhamento ?? s.dataSubmissao);
+    base.setDate(base.getDate() + sla);
+    return base.getTime() < todayDate.getTime();
+  };
+
   const estadoStats = (Object.keys(estadoSolicitacaoConfig) as (keyof typeof estadoSolicitacaoConfig)[]).map(s => ({
     estado: s,
     label: estadoSolicitacaoConfig[s].label,
     color: estadoSolicitacaoConfig[s].color,
-    count: solicitacoes.filter(t => t.estado === s).length,
+    count: s === "em_atraso"
+      ? solicitacoes.filter(isEmAtrasoSol).length
+      : solicitacoes.filter(t => t.estado === s && !isEmAtrasoSol(t)).length,
   }));
 
   const proximosAtendimentos = gapAtendimentos
