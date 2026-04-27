@@ -154,8 +154,8 @@ export default function GapConfiguracao() {
   const handleAddMulta = () => {
     if (!newMultaLabel.trim()) return;
     const key = slugify(newMultaLabel);
-    setMultas(prev => [...prev, { key, label: newMultaLabel.trim(), valor: newMultaValor, descricao: newMultaDesc.trim() }]);
-    setNewMultaLabel(""); setNewMultaValor(5000); setNewMultaDesc("");
+    setMultas(prev => [...prev, { key, label: newMultaLabel.trim(), diasAposPrazo: Math.max(1, newMultaDias), descricao: newMultaDesc.trim() }]);
+    setNewMultaLabel(""); setNewMultaDias(3); setNewMultaDesc("");
     setMultaOpen(false);
     toast({ title: "Multa criada", description: `“${newMultaLabel}” foi adicionada.` });
   };
