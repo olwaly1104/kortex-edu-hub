@@ -129,31 +129,28 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
 
             {/* II · Motivo + Descrição */}
             <Section number="II" title="Motivo do Pedido">
-              <div className="border border-success/30 rounded-sm overflow-hidden flex">
-                <div className="w-1 bg-primary shrink-0" />
-                <div className="flex-1">
-                  <div className="px-4 py-2.5 bg-success/[0.10] border-b border-success/30">
-                    <p className="text-[7.5px] uppercase tracking-[0.22em] text-success font-bold mb-1">Assunto</p>
-                    <h4 className="text-[13px] font-bold leading-snug tracking-tight text-success">
-                      {s.assunto}
-                    </h4>
-                  </div>
-                  <div className="px-4 py-2.5 bg-background">
-                    <p className="text-[7.5px] uppercase tracking-[0.22em] text-success/80 font-bold mb-1">Descrição</p>
-                    <p className="text-[10px] leading-relaxed whitespace-pre-line line-clamp-6 text-foreground/85">
-                      {s.descricao}
-                    </p>
-                    {s.notaInterna && (
-                      <div className="mt-2.5 pt-2 border-t border-dashed border-success/30">
-                        <p className="text-[7.5px] uppercase tracking-[0.22em] text-success/80 font-bold mb-0.5">
-                          Nota Interna
-                        </p>
-                        <p className="text-[10px] leading-snug whitespace-pre-line line-clamp-2 text-foreground/85 italic">
-                          {s.notaInterna}
-                        </p>
-                      </div>
-                    )}
-                  </div>
+              <div className="border border-success/30 rounded-sm overflow-hidden">
+                <div className="px-4 py-2.5 bg-success/[0.07] border-b border-success/30">
+                  <p className="text-[7.5px] uppercase tracking-[0.22em] text-success font-bold mb-1">Assunto</p>
+                  <h4 className="text-[13px] font-bold leading-snug tracking-tight text-foreground">
+                    {s.assunto}
+                  </h4>
+                </div>
+                <div className="px-4 py-2.5 bg-background">
+                  <p className="text-[7.5px] uppercase tracking-[0.22em] text-success font-bold mb-1">Descrição</p>
+                  <p className="text-[10px] leading-relaxed whitespace-pre-line line-clamp-6 text-foreground/85">
+                    {s.descricao}
+                  </p>
+                  {s.notaInterna && (
+                    <div className="mt-2.5 pt-2 border-t border-dashed border-success/30">
+                      <p className="text-[7.5px] uppercase tracking-[0.22em] text-success font-bold mb-0.5">
+                        Nota Interna
+                      </p>
+                      <p className="text-[10px] leading-snug whitespace-pre-line line-clamp-2 text-foreground/85 italic">
+                        {s.notaInterna}
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             </Section>
