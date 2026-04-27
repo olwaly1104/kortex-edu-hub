@@ -413,6 +413,17 @@ export default function GapConfiguracao() {
                     <td className="p-3 text-xs text-foreground whitespace-nowrap">{m.responsavel}</td>
                     <td className="p-3 text-center text-xs tabular-nums text-amber-700">{m.slaAceitacao}d</td>
                     <td className="p-3 text-center text-xs tabular-nums text-blue-700">{m.slaConclusao}d</td>
+                    <td className="p-3 text-xs whitespace-nowrap">
+                      {(() => {
+                        const mu = multas.find(x => x.key === m.multa);
+                        return mu ? (
+                          <span className="inline-flex items-center gap-1.5">
+                            <span className="text-foreground">{mu.label}</span>
+                            <span className="text-destructive font-semibold tabular-nums">· {formatKz(mu.valor)}</span>
+                          </span>
+                        ) : <span className="text-muted-foreground">—</span>;
+                      })()}
+                    </td>
                     <td className="p-3 text-right">
                       <div className="inline-flex items-center gap-2">
                         <button onClick={() => setEditMotivo(m)} className="text-muted-foreground hover:text-foreground" aria-label={`Editar ${m.label}`}>
