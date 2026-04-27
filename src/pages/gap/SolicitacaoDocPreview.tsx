@@ -128,18 +128,29 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
           <div className="px-8 pt-4 pb-3">
             <p className="text-[8.5px] uppercase tracking-[0.18em] text-muted-foreground font-bold">Relatório de Solicitação</p>
             <h2 className="text-[16px] font-bold text-foreground leading-tight tracking-tight mt-0.5">{tipoCfg?.label ?? s.tipo}</h2>
-            <div className="mt-2 flex items-center gap-1.5 flex-wrap">
-              <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded border ${tone.bg} ${tone.text} ${tone.border} text-[8.5px] font-semibold uppercase tracking-wider`}>
-                <span className={`w-1 h-1 rounded-full ${tone.dot}`} />{st.label}
-              </span>
-              <span className={`inline-flex items-center px-2 py-0.5 rounded border text-[8.5px] font-semibold uppercase tracking-wider ${dest.color}`}>{dest.label}</span>
-              <span className="text-[8.5px] text-muted-foreground">Prioridade <span className="font-semibold text-foreground">{prio?.label ?? s.prioridade}</span></span>
-              <span className="text-[8.5px] text-muted-foreground">· SLA <span className="font-semibold text-foreground">{s.slaDias}d</span></span>
-            </div>
           </div>
 
           {/* Body */}
           <div className="flex-1 px-8 pb-3 space-y-3 overflow-hidden">
+            {/* Status strip: Estado · Destino · Responsável */}
+            <div className="grid grid-cols-3 border border-border rounded overflow-hidden">
+              <div className="px-3 py-1.5 border-r border-border">
+                <p className="text-[8px] uppercase tracking-wider text-muted-foreground font-semibold">Estado</p>
+                <div className="mt-0.5 flex items-center gap-1.5">
+                  <span className={`w-1.5 h-1.5 rounded-full ${tone.dot}`} />
+                  <p className={`text-[10.5px] font-semibold leading-tight ${tone.text}`}>{st.label}</p>
+                </div>
+              </div>
+              <div className="px-3 py-1.5 border-r border-border">
+                <p className="text-[8px] uppercase tracking-wider text-muted-foreground font-semibold">Destino</p>
+                <p className="text-[10.5px] font-semibold text-foreground leading-tight mt-0.5 truncate">{dest.label}</p>
+              </div>
+              <div className="px-3 py-1.5">
+                <p className="text-[8px] uppercase tracking-wider text-muted-foreground font-semibold">Responsável</p>
+                <p className="text-[10.5px] font-semibold text-foreground leading-tight mt-0.5 truncate">{s.responsavelDestino ?? `Equipa ${dest.label}`}</p>
+              </div>
+            </div>
+
             {/* 1+2 Identificação & Pedido */}
             <div className="grid grid-cols-2 gap-3">
               <Block title="1. Discente">
@@ -155,7 +166,7 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
                   ["Referência", s.id],
                   ["Assunto", s.assunto],
                   ["Categoria", tipoCfg?.categoria ?? "—"],
-                  ["Responsável", s.responsavelDestino ?? `Equipa ${dest.label}`],
+                  ["Tipo", tipoCfg?.label ?? s.tipo],
                 ]} />
               </Block>
             </div>
