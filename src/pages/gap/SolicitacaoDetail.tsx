@@ -252,8 +252,8 @@ export default function GapSolicitacaoDetail() {
                       {/* Name + auto label */}
                       <div className="flex flex-col min-w-0 leading-tight">
                         <span className="text-[11.5px] font-semibold text-foreground tabular-nums">Pedido-{selected.id}</span>
-                        <span className="text-[9.5px] uppercase tracking-[0.08em] text-muted-foreground font-semibold mt-0.5">
-                          Gerado Automaticamente
+                        <span className="text-[9.5px] tracking-[0.02em] text-muted-foreground font-medium mt-0.5">
+                          Gerado automaticamente
                         </span>
                       </div>
                       {/* Divider */}
