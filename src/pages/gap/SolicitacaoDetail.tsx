@@ -429,6 +429,8 @@ export default function GapSolicitacaoDetail() {
                         );
                       })}
                     </ul>
+                  </div>
+                )}
               </div>
             </section>
 
