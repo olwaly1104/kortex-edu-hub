@@ -5,8 +5,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   ArrowLeft, Calendar as CalendarIcon, Clock, MapPin, Video,
-  CheckCircle2, X, MessageSquare, Mail, Phone,
-  DoorOpen, GraduationCap, BookOpen, Hash, FileText, StickyNote,
+  CheckCircle2, X,
+  DoorOpen, GraduationCap, FileText,
   UserCircle2, Timer, ChevronRight, Download, Eye, Share2, Users,
   Home, Briefcase, CheckCircle, CircleDashed,
 } from "lucide-react";
