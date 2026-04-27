@@ -283,14 +283,14 @@ export default function GapTickets() {
                 size="sm"
                 className={cn(
                   "h-9 px-3 text-xs gap-1.5",
-                  (isActive.destino || isActive.categoria || isActive.mes) && "border-primary text-primary"
+                  (isActive.estado || isActive.destino || isActive.categoria || isActive.mes) && "border-primary text-primary"
                 )}
               >
                 <SlidersHorizontal className="w-3.5 h-3.5" />
                 Filtros
-                {(isActive.destino || isActive.categoria || isActive.mes) && (
+                {(isActive.estado || isActive.destino || isActive.categoria || isActive.mes) && (
                   <span className="inline-flex items-center justify-center min-w-[16px] h-[16px] px-1 rounded bg-primary/10 text-primary text-[10px] font-bold tabular-nums">
-                    {[isActive.destino, isActive.categoria, isActive.mes].filter(Boolean).length}
+                    {[isActive.estado, isActive.destino, isActive.categoria, isActive.mes].filter(Boolean).length}
                   </span>
                 )}
               </Button>
@@ -315,9 +315,9 @@ export default function GapTickets() {
                     {filterView === "motivo" && (drillCategoria ?? "Motivos")}
                   </button>
                 )}
-                {(isActive.destino || isActive.categoria || isActive.mes) && (
+                {(isActive.estado || isActive.destino || isActive.categoria || isActive.mes) && (
                   <button
-                    onClick={() => { setDestino("todos"); setCategoria("todas"); setMes("todos"); }}
+                    onClick={() => { setEstado("todos"); setDestino("todos"); setCategoria("todas"); setMes("todos"); }}
                     className="text-[10px] text-muted-foreground hover:text-foreground"
                   >
                     Limpar
