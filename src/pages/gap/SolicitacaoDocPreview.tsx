@@ -276,3 +276,18 @@ function KV({ rows }: { rows: [string, string][] }) {
     </div>
   );
 }
+
+function SubKV({ rows }: { rows: [string, string][] }) {
+  return (
+    <table className="w-full text-[10px]">
+      <tbody className="divide-y divide-border">
+        {rows.map(([k, v], i) => (
+          <tr key={i} className={i % 2 === 0 ? "bg-background" : "bg-muted/20"}>
+            <td className="px-2.5 py-1 text-muted-foreground font-medium w-[38%] align-top">{k}</td>
+            <td className="px-2.5 py-1 text-foreground font-semibold truncate">{v}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+}
