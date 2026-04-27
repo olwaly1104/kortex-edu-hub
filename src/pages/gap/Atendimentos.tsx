@@ -68,7 +68,7 @@ export default function GapAtendimentos() {
     []
   );
   
-  const [periodo, setPeriodo] = useState<"todos" | "hoje" | "agendado" | "concluido">("todos");
+  const [periodo, setPeriodo] = useState<"todos" | "hoje" | "agendado" | "concluido">("hoje");
   const [view, setView] = useState<"tabela" | "calendario">("tabela");
   
 
