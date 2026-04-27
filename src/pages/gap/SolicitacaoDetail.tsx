@@ -269,6 +269,9 @@ export default function GapSolicitacaoDetail() {
                         <Download className="w-3 h-3" />
                       </button>
                     </div>
+                      <span className="inline-flex items-center gap-1 text-[9px] uppercase tracking-[0.12em] text-emerald-600 font-semibold">
+                        <CheckCircle2 className="w-2.5 h-2.5" /> Gerado automaticamente
+                      </span>
                     </div>
                     <DialogContent className="max-w-md">
                       <DialogHeader>
