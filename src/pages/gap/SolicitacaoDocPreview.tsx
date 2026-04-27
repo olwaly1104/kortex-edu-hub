@@ -132,7 +132,7 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
 
           {/* Body */}
           <div className="flex-1 px-8 pb-3 space-y-3 overflow-hidden">
-            {/* 1. Discente · 2. Pedido (with Estado embedded) */}
+            {/* 1. Discente · 2. Responsável */}
             <div className="grid grid-cols-2 gap-3">
               <Block title="1. Discente">
                 <KV rows={[
@@ -142,34 +142,33 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
                   ["Ano", `${s.ano}º`],
                 ]} />
               </Block>
-              <Block title="2. Pedido">
+              <Block title="2. Responsável">
                 <KV rows={[
+                  ["Destino", dest.label],
+                  ["Responsável", s.responsavelDestino ?? `Equipa ${dest.label}`],
+                  ["Estado", st.label],
                   ["Referência", s.id],
-                  ["Assunto", s.assunto],
-                  ["Categoria", tipoCfg?.categoria ?? "—"],
-                  ["Tipo", tipoCfg?.label ?? s.tipo],
                 ]} />
               </Block>
             </div>
 
-            {/* 3. Encaminhamento (Estado · Destino · Responsável) */}
-            <Block title="3. Encaminhamento">
-              <div className="grid grid-cols-3 border border-border rounded overflow-hidden">
-                <div className="px-3 py-1.5 border-r border-border">
-                  <p className="text-[8px] uppercase tracking-wider text-muted-foreground font-semibold">Estado</p>
-                  <div className="mt-0.5 flex items-center gap-1.5">
-                    <span className={`w-1.5 h-1.5 rounded-full ${tone.dot}`} />
-                    <p className={`text-[10.5px] font-semibold leading-tight ${tone.text}`}>{st.label}</p>
-                  </div>
-                </div>
-                <div className="px-3 py-1.5 border-r border-border">
-                  <p className="text-[8px] uppercase tracking-wider text-muted-foreground font-semibold">Destino</p>
-                  <p className="text-[10.5px] font-semibold text-foreground leading-tight mt-0.5 truncate">{dest.label}</p>
-                </div>
-                <div className="px-3 py-1.5">
-                  <p className="text-[8px] uppercase tracking-wider text-muted-foreground font-semibold">Responsável</p>
-                  <p className="text-[10.5px] font-semibold text-foreground leading-tight mt-0.5 truncate">{s.responsavelDestino ?? `Equipa ${dest.label}`}</p>
-                </div>
+            {/* 3. Detalhes do Pedido */}
+            <Block title="3. Detalhes do Pedido">
+              <div className="overflow-hidden rounded border border-border">
+                <table className="w-full text-[10px]">
+                  <tbody className="divide-y divide-border">
+                    <tr className="bg-background">
+                      <td className="px-2.5 py-1 text-muted-foreground font-medium w-[18%] align-top">Assunto</td>
+                      <td className="px-2.5 py-1 text-foreground font-semibold" colSpan={3}>{s.assunto}</td>
+                    </tr>
+                    <tr className="bg-muted/20">
+                      <td className="px-2.5 py-1 text-muted-foreground font-medium w-[18%] align-top">Categoria</td>
+                      <td className="px-2.5 py-1 text-foreground font-semibold w-[32%]">{tipoCfg?.categoria ?? "—"}</td>
+                      <td className="px-2.5 py-1 text-muted-foreground font-medium w-[18%] align-top border-l border-border">Tipo</td>
+                      <td className="px-2.5 py-1 text-foreground font-semibold">{tipoCfg?.label ?? s.tipo}</td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </Block>
 
