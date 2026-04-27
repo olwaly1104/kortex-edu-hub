@@ -215,10 +215,7 @@ export default function GapSolicitacaoDetail() {
             <div className="min-w-0 flex-1 pt-0.5">
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0 flex-1">
-                  <h1 className="text-xl font-semibold leading-tight tracking-tight text-foreground">
-                    {tipoCfg?.label ?? selected.tipo}
-                  </h1>
-                  <div className="mt-1.5 flex items-center gap-1.5 flex-wrap">
+                  <div className="mb-1.5 flex items-center gap-1.5 flex-wrap">
                     <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider gap-1", st.color)}>
                       <span className={cn("w-1.5 h-1.5 rounded-full", estadoDot[selected.estado])} />
                       {st.label}
@@ -234,6 +231,9 @@ export default function GapSolicitacaoDetail() {
                       );
                     })()}
                   </div>
+                  <h1 className="text-xl font-semibold leading-tight tracking-tight text-foreground">
+                    {tipoCfg?.label ?? selected.tipo}
+                  </h1>
                 </div>
                 <div className="shrink-0 flex flex-col items-end gap-1.5">
                   <button
@@ -455,9 +455,11 @@ export default function GapSolicitacaoDetail() {
                 {/* Descrição */}
                 <div className="px-4 py-3">
                   <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold mb-1.5">Descrição</p>
-                  <p className="text-[13.5px] text-foreground/90 leading-[1.65] whitespace-pre-line">
-                    {selected.descricao}
-                  </p>
+                  <div className="rounded-md border border-border bg-muted/20 px-3.5 py-2.5">
+                    <p className="text-[13.5px] text-foreground/90 leading-[1.65] whitespace-pre-line">
+                      {selected.descricao}
+                    </p>
+                  </div>
                 </div>
 
                 {/* Anexos */}
