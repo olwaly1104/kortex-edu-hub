@@ -2,7 +2,7 @@ import { Printer, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import {
-  type Solicitacao, estadoSolicitacaoConfig, destinoConfig, tipoConfig,
+  type Solicitacao, estadoSolicitacaoConfig, destinoConfig, tipoConfig, prioridadeConfig,
 } from "@/data/gapData";
 
 type Props = {
@@ -12,24 +12,57 @@ type Props = {
 
 const fmtData = (iso?: string) => {
   if (!iso) return "—";
-  const d = new Date(iso);
+  const d = new Date(iso.replace(" ", "T"));
+  if (Number.isNaN(d.getTime())) return iso;
   return d.toLocaleDateString("pt-PT", { day: "2-digit", month: "2-digit", year: "numeric" });
+};
+
+const fmtDataHora = (iso?: string) => {
+  if (!iso) return "—";
+  // Aceita "YYYY-MM-DD HH:mm" ou ISO
+  const d = new Date(iso.replace(" ", "T"));
+  if (Number.isNaN(d.getTime())) return iso;
+  const data = d.toLocaleDateString("pt-PT", { day: "2-digit", month: "2-digit", year: "numeric" });
+  const hora = d.toLocaleTimeString("pt-PT", { hour: "2-digit", minute: "2-digit" });
+  // Mostrar hora apenas se a string original a continha
+  return iso.includes(":") ? `${data} · ${hora}` : data;
 };
 
 const fmtDataLong = (d: Date) =>
   d.toLocaleDateString("pt-PT", { day: "2-digit", month: "long", year: "numeric" });
+
+const diffDias = (start?: string, end?: string) => {
+  if (!start || !end) return null;
+  const a = new Date(start.replace(" ", "T"));
+  const b = new Date(end.replace(" ", "T"));
+  if (Number.isNaN(a.getTime()) || Number.isNaN(b.getTime())) return null;
+  const ms = b.getTime() - a.getTime();
+  const dias = Math.max(0, Math.round(ms / (1000 * 60 * 60 * 24)));
+  return dias;
+};
 
 export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props) {
   const { toast } = useToast();
   const st = estadoSolicitacaoConfig[s.estado];
   const dest = destinoConfig[s.destino];
   const tipoCfg = tipoConfig[s.tipo];
+  const prio = prioridadeConfig[s.prioridade];
 
   const submetida = s.historico.find(h => h.accao.toLowerCase().includes("submetida"));
+  const aceite = s.historico.find(h => {
+    const a = h.accao.toLowerCase();
+    return a.includes("atribuíd") || a.includes("atribuid") || a.includes("aceit") || a.includes("iniciad");
+  });
   const concluida = s.historico.find(h => {
     const a = h.accao.toLowerCase();
-    return a.includes("concluí") || a.includes("conclui") || a.includes("executada");
+    return a.includes("concluí") || a.includes("conclui") || a.includes("executada") || a.includes("resolvida");
   });
+
+  const dataAceite = aceite?.data ?? s.dataEncaminhamento;
+  const dataFim = s.dataConclusao ?? concluida?.data;
+  const dataInicio = submetida?.data ?? s.dataSubmissao;
+  const diasConclusao = diffDias(dataInicio, dataFim);
+  const diasDecorridos = diffDias(dataInicio, new Date().toISOString());
 
   // Estado → cor semântica do badge no doc
   const estadoTone: Record<string, { bg: string; text: string; border: string; dot: string }> = {
@@ -37,6 +70,7 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
     em_execucao: { bg: "bg-sky-50",     text: "text-sky-800",     border: "border-sky-200",     dot: "bg-sky-500" },
     concluida:   { bg: "bg-emerald-50", text: "text-emerald-800", border: "border-emerald-200", dot: "bg-emerald-500" },
     rejeitada:   { bg: "bg-red-50",     text: "text-red-800",     border: "border-red-200",     dot: "bg-red-500" },
+    em_atraso:   { bg: "bg-orange-50",  text: "text-orange-800",  border: "border-orange-200",  dot: "bg-orange-500" },
   };
   const tone = estadoTone[s.estado] ?? estadoTone.recebida;
 
