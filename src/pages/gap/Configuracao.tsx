@@ -340,6 +340,95 @@ export default function GapConfiguracao() {
           </table>
         </div>
       </Card>
+
+      {/* Edit Estado Dialog */}
+      <Dialog open={!!editEstado} onOpenChange={(o) => !o && setEditEstado(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader><DialogTitle>Editar estado</DialogTitle></DialogHeader>
+          {editEstado && (
+            <div className="space-y-3 py-2">
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Designação</label>
+                <Input value={editEstado.label} onChange={e => setEditEstado({ ...editEstado, label: e.target.value })} />
+              </div>
+            </div>
+          )}
+          <DialogFooter className="gap-2 sm:gap-2">
+            <Button variant="outline" onClick={() => setEditEstado(null)}>Cancelar</Button>
+            <Button onClick={saveEditEstado} disabled={!editEstado?.label.trim()}>Guardar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Categoria Dialog */}
+      <Dialog open={!!editCategoria} onOpenChange={(o) => !o && setEditCategoria(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader><DialogTitle>Editar categoria</DialogTitle></DialogHeader>
+          {editCategoria && (
+            <div className="space-y-3 py-2">
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Designação</label>
+                <Input value={editCategoria.label} onChange={e => setEditCategoria({ ...editCategoria, label: e.target.value })} />
+              </div>
+            </div>
+          )}
+          <DialogFooter className="gap-2 sm:gap-2">
+            <Button variant="outline" onClick={() => setEditCategoria(null)}>Cancelar</Button>
+            <Button onClick={saveEditCategoria} disabled={!editCategoria?.label.trim()}>Guardar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Motivo Dialog */}
+      <Dialog open={!!editMotivo} onOpenChange={(o) => !o && setEditMotivo(null)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader><DialogTitle>Editar motivo</DialogTitle></DialogHeader>
+          {editMotivo && (
+            <div className="space-y-3 py-2">
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Designação</label>
+                <Input value={editMotivo.label} onChange={e => setEditMotivo({ ...editMotivo, label: e.target.value })} />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Categoria</label>
+                  <Select value={editMotivo.categoria} onValueChange={(v) => setEditMotivo({ ...editMotivo, categoria: v })}>
+                    <SelectTrigger><SelectValue placeholder="Selecionar..." /></SelectTrigger>
+                    <SelectContent>
+                      {categorias.map(c => <SelectItem key={c.key} value={c.label}>{c.label}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Destino</label>
+                  <Select value={editMotivo.destino} onValueChange={(v) => setEditMotivo({ ...editMotivo, destino: v })}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {Object.entries(destinoConfig).map(([k, v]) => <SelectItem key={k} value={k}>{v.label}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Limite p/ aceitar (dias)</label>
+                  <Input type="number" min={1} value={editMotivo.slaAceitacao} onChange={e => setEditMotivo({ ...editMotivo, slaAceitacao: Number(e.target.value) || 1 })} />
+                  <p className="text-[10px] text-muted-foreground mt-1">Pendente → Em Execução</p>
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Limite p/ concluir (dias)</label>
+                  <Input type="number" min={1} value={editMotivo.slaConclusao} onChange={e => setEditMotivo({ ...editMotivo, slaConclusao: Number(e.target.value) || 1 })} />
+                  <p className="text-[10px] text-muted-foreground mt-1">Em Execução → Concluída</p>
+                </div>
+              </div>
+            </div>
+          )}
+          <DialogFooter className="gap-2 sm:gap-2">
+            <Button variant="outline" onClick={() => setEditMotivo(null)}>Cancelar</Button>
+            <Button onClick={saveEditMotivo} disabled={!editMotivo?.label.trim() || !editMotivo?.categoria}>Guardar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
