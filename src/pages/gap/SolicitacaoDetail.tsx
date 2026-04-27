@@ -434,8 +434,6 @@ export default function GapSolicitacaoDetail() {
               </div>
             </section>
 
-            <div className="border-t border-border" />
-
             {/* Documento gerado automaticamente — secção própria */}
             <section>
               <div className="flex items-center gap-2 mb-3">
