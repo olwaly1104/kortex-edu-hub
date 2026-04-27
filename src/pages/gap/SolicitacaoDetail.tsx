@@ -232,10 +232,6 @@ export default function GapSolicitacaoDetail() {
                     </Badge>
                   );
                 })()}
-                <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground font-medium tabular-nums">
-                  <Clock className="w-3 h-3" />
-                  {fmtT(dSub)}
-                </span>
               </div>
             </div>
 
