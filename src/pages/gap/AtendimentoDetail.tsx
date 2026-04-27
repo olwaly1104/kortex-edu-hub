@@ -120,13 +120,57 @@ export default function GapAtendimentoDetail() {
               <h1 className="text-xl font-semibold leading-tight tracking-tight text-foreground">
                 {atendimento.motivo}
               </h1>
-              <button
-                type="button"
-                onClick={() => { navigator.clipboard?.writeText(atendimento.id); toast({ title: "ID copiado", description: atendimento.id }); }}
-                className="shrink-0 inline-flex items-center px-2 py-0.5 rounded-md border border-border bg-background hover:bg-muted text-[11px] font-mono font-semibold text-foreground transition-colors"
-              >
-                {atendimento.id}
-              </button>
+              <div className="shrink-0 flex flex-col items-end gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => { navigator.clipboard?.writeText(atendimento.id); toast({ title: "ID copiado", description: atendimento.id }); }}
+                  className="inline-flex items-center px-2 py-0.5 rounded-md border border-border bg-background hover:bg-muted text-[11px] font-mono font-semibold text-foreground transition-colors"
+                >
+                  {atendimento.id}
+                </button>
+                <Dialog>
+                  <div className="inline-flex items-center gap-2.5 pl-2 pr-1.5 py-1.5 rounded-md border border-border bg-background shadow-sm">
+                    <div className="w-7 h-7 rounded-md bg-red-50 border border-red-200 flex items-center justify-center shrink-0">
+                      <FileText className="w-3.5 h-3.5 text-red-600" />
+                    </div>
+                    <div className="flex flex-col min-w-0 leading-tight">
+                      <span className="text-[11.5px] font-semibold text-foreground tabular-nums">Resumo-{atendimento.id}</span>
+                      <span className="text-[9.5px] tracking-[0.02em] text-muted-foreground font-medium mt-0.5">
+                        Gerado automaticamente
+                      </span>
+                    </div>
+                    <span className="self-stretch w-px bg-border mx-0.5" />
+                    <DialogTrigger asChild>
+                      <button type="button" className="inline-flex items-center gap-1 px-1.5 h-6 rounded text-[10.5px] text-primary hover:bg-muted font-medium transition-colors" title="Partilhas">
+                        <Users className="w-3 h-3" /> 4
+                      </button>
+                    </DialogTrigger>
+                    <DialogTrigger asChild>
+                      <button type="button" className="w-6 h-6 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors" title="Ver">
+                        <Eye className="w-3 h-3" />
+                      </button>
+                    </DialogTrigger>
+                    <button
+                      type="button"
+                      onClick={() => handleAction("Relatório exportado")}
+                      className="w-6 h-6 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                      title="Exportar"
+                    >
+                      <Download className="w-3 h-3" />
+                    </button>
+                  </div>
+                  <DialogContent className="max-w-md">
+                    <DialogHeader>
+                      <DialogTitle className="text-base flex items-center gap-2">
+                        <Share2 className="w-4 h-4 text-primary" /> Partilhado com 4 pessoas
+                      </DialogTitle>
+                      <DialogDescription className="text-[12px]">
+                        Pessoas com acesso ao documento <span className="font-medium text-foreground">Resumo-{atendimento.id}</span>.
+                      </DialogDescription>
+                    </DialogHeader>
+                  </DialogContent>
+                </Dialog>
+              </div>
             </div>
             <div className="mt-2.5 flex items-center gap-1.5 flex-wrap">
               <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider", est.pill)}>
