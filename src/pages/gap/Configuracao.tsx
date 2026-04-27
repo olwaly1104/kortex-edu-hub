@@ -640,7 +640,14 @@ export default function GapConfiguracao() {
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="__none__">Sem multa</SelectItem>
-                    {multas.map(mu => <SelectItem key={mu.key} value={mu.key}>{mu.label} · {formatKz(mu.valor)}</SelectItem>)}
+                    {multas.map(mu => {
+                      const invalid = mu.diasAposPrazo <= editMotivo.slaConclusao;
+                      return (
+                        <SelectItem key={mu.key} value={mu.key} disabled={invalid}>
+                          {mu.label} · {formatMultaDias(mu.diasAposPrazo)}{invalid ? " (≤ conclusão)" : ""}
+                        </SelectItem>
+                      );
+                    })}
                   </SelectContent>
                 </Select>
                 <p className="text-[10px] text-muted-foreground mt-1">Aplicada se o limite de conclusão for excedido</p>
