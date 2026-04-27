@@ -60,6 +60,7 @@ export default function GapConfiguracao() {
   const [motivos, setMotivos] = useState<MotivoItem[]>(
     Object.entries(initialTipoConfig).map(([key, v]) => ({
       key, label: v.label, categoria: v.categoria, destino: v.destino,
+      responsavel: (v as any).responsavelDestino || defaultResponsavelByDestino(v.destino),
       slaAceitacao: Math.max(1, Math.ceil(v.slaDias / 3)),
       slaConclusao: v.slaDias,
     }))
