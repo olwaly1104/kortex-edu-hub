@@ -9,7 +9,7 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { Settings2, Plus, Layers, AlertCircle, FileText, Trash2 } from "lucide-react";
+import { Settings2, Plus, Layers, AlertCircle, FileText, Trash2, Pencil } from "lucide-react";
 import {
   tipoConfig as initialTipoConfig,
   categoriaConfig as initialCategoriaConfig,
@@ -103,6 +103,30 @@ export default function GapConfiguracao() {
   const removeCategoria = (key: string) => setCategorias(prev => prev.filter(c => c.key !== key));
   const removeMotivo = (key: string) => setMotivos(prev => prev.filter(m => m.key !== key));
 
+  // Edit dialogs
+  const [editEstado, setEditEstado] = useState<EstadoItem | null>(null);
+  const [editCategoria, setEditCategoria] = useState<CategoriaItem | null>(null);
+  const [editMotivo, setEditMotivo] = useState<MotivoItem | null>(null);
+
+  const saveEditEstado = () => {
+    if (!editEstado || !editEstado.label.trim()) return;
+    setEstados(prev => prev.map(e => e.key === editEstado.key ? editEstado : e));
+    toast({ title: "Estado atualizado" });
+    setEditEstado(null);
+  };
+  const saveEditCategoria = () => {
+    if (!editCategoria || !editCategoria.label.trim()) return;
+    setCategorias(prev => prev.map(c => c.key === editCategoria.key ? editCategoria : c));
+    toast({ title: "Categoria atualizada" });
+    setEditCategoria(null);
+  };
+  const saveEditMotivo = () => {
+    if (!editMotivo || !editMotivo.label.trim()) return;
+    setMotivos(prev => prev.map(m => m.key === editMotivo.key ? editMotivo : m));
+    toast({ title: "Motivo atualizado" });
+    setEditMotivo(null);
+  };
+
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       {/* Header */}
@@ -148,6 +172,9 @@ export default function GapConfiguracao() {
           {estados.map(e => (
             <div key={e.key} className={cn("inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs", e.color)}>
               <span className="font-medium">{e.label}</span>
+              <button onClick={() => setEditEstado(e)} className="opacity-60 hover:opacity-100" aria-label={`Editar ${e.label}`}>
+                <Pencil className="w-3 h-3" />
+              </button>
               <button onClick={() => removeEstado(e.key)} className="opacity-60 hover:opacity-100" aria-label={`Remover ${e.label}`}>
                 <Trash2 className="w-3 h-3" />
               </button>
@@ -192,6 +219,9 @@ export default function GapConfiguracao() {
               <div key={c.key} className={cn("inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs", c.color)}>
                 <span className="font-medium">{c.label}</span>
                 <span className="opacity-60 tabular-nums">· {count} motivos</span>
+                <button onClick={() => setEditCategoria(c)} className="opacity-60 hover:opacity-100" aria-label={`Editar ${c.label}`}>
+                  <Pencil className="w-3 h-3" />
+                </button>
                 <button onClick={() => removeCategoria(c.key)} className="opacity-60 hover:opacity-100" aria-label={`Remover ${c.label}`}>
                   <Trash2 className="w-3 h-3" />
                 </button>
@@ -271,7 +301,7 @@ export default function GapConfiguracao() {
                 <th className="text-left p-3 font-medium text-muted-foreground text-xs">Destino</th>
                 <th className="text-center p-3 font-medium text-muted-foreground text-xs whitespace-nowrap">Aceitar</th>
                 <th className="text-center p-3 font-medium text-muted-foreground text-xs whitespace-nowrap">Concluir</th>
-                <th className="w-10" />
+                <th className="w-20" />
               </tr>
             </thead>
             <tbody>
@@ -294,9 +324,14 @@ export default function GapConfiguracao() {
                     <td className="p-3 text-center text-xs tabular-nums text-amber-700">{m.slaAceitacao}d</td>
                     <td className="p-3 text-center text-xs tabular-nums text-blue-700">{m.slaConclusao}d</td>
                     <td className="p-3 text-right">
-                      <button onClick={() => removeMotivo(m.key)} className="text-muted-foreground hover:text-destructive" aria-label={`Remover ${m.label}`}>
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
+                      <div className="inline-flex items-center gap-2">
+                        <button onClick={() => setEditMotivo(m)} className="text-muted-foreground hover:text-foreground" aria-label={`Editar ${m.label}`}>
+                          <Pencil className="w-3.5 h-3.5" />
+                        </button>
+                        <button onClick={() => removeMotivo(m.key)} className="text-muted-foreground hover:text-destructive" aria-label={`Remover ${m.label}`}>
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );
@@ -305,6 +340,95 @@ export default function GapConfiguracao() {
           </table>
         </div>
       </Card>
+
+      {/* Edit Estado Dialog */}
+      <Dialog open={!!editEstado} onOpenChange={(o) => !o && setEditEstado(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader><DialogTitle>Editar estado</DialogTitle></DialogHeader>
+          {editEstado && (
+            <div className="space-y-3 py-2">
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Designação</label>
+                <Input value={editEstado.label} onChange={e => setEditEstado({ ...editEstado, label: e.target.value })} />
+              </div>
+            </div>
+          )}
+          <DialogFooter className="gap-2 sm:gap-2">
+            <Button variant="outline" onClick={() => setEditEstado(null)}>Cancelar</Button>
+            <Button onClick={saveEditEstado} disabled={!editEstado?.label.trim()}>Guardar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Categoria Dialog */}
+      <Dialog open={!!editCategoria} onOpenChange={(o) => !o && setEditCategoria(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader><DialogTitle>Editar categoria</DialogTitle></DialogHeader>
+          {editCategoria && (
+            <div className="space-y-3 py-2">
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Designação</label>
+                <Input value={editCategoria.label} onChange={e => setEditCategoria({ ...editCategoria, label: e.target.value })} />
+              </div>
+            </div>
+          )}
+          <DialogFooter className="gap-2 sm:gap-2">
+            <Button variant="outline" onClick={() => setEditCategoria(null)}>Cancelar</Button>
+            <Button onClick={saveEditCategoria} disabled={!editCategoria?.label.trim()}>Guardar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Motivo Dialog */}
+      <Dialog open={!!editMotivo} onOpenChange={(o) => !o && setEditMotivo(null)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader><DialogTitle>Editar motivo</DialogTitle></DialogHeader>
+          {editMotivo && (
+            <div className="space-y-3 py-2">
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Designação</label>
+                <Input value={editMotivo.label} onChange={e => setEditMotivo({ ...editMotivo, label: e.target.value })} />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Categoria</label>
+                  <Select value={editMotivo.categoria} onValueChange={(v) => setEditMotivo({ ...editMotivo, categoria: v })}>
+                    <SelectTrigger><SelectValue placeholder="Selecionar..." /></SelectTrigger>
+                    <SelectContent>
+                      {categorias.map(c => <SelectItem key={c.key} value={c.label}>{c.label}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Destino</label>
+                  <Select value={editMotivo.destino} onValueChange={(v) => setEditMotivo({ ...editMotivo, destino: v })}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {Object.entries(destinoConfig).map(([k, v]) => <SelectItem key={k} value={k}>{v.label}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Limite p/ aceitar (dias)</label>
+                  <Input type="number" min={1} value={editMotivo.slaAceitacao} onChange={e => setEditMotivo({ ...editMotivo, slaAceitacao: Number(e.target.value) || 1 })} />
+                  <p className="text-[10px] text-muted-foreground mt-1">Pendente → Em Execução</p>
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Limite p/ concluir (dias)</label>
+                  <Input type="number" min={1} value={editMotivo.slaConclusao} onChange={e => setEditMotivo({ ...editMotivo, slaConclusao: Number(e.target.value) || 1 })} />
+                  <p className="text-[10px] text-muted-foreground mt-1">Em Execução → Concluída</p>
+                </div>
+              </div>
+            </div>
+          )}
+          <DialogFooter className="gap-2 sm:gap-2">
+            <Button variant="outline" onClick={() => setEditMotivo(null)}>Cancelar</Button>
+            <Button onClick={saveEditMotivo} disabled={!editMotivo?.label.trim() || !editMotivo?.categoria}>Guardar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
