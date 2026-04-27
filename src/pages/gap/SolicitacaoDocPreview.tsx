@@ -237,9 +237,9 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
 function Section({ number, title, children }: { number: string; title: string; children: React.ReactNode }) {
   return (
     <section>
-      <div className="flex items-baseline gap-2 mb-2 pb-1 border-b border-foreground/30">
-        <span className="text-[8.5px] font-mono font-bold text-foreground/55 tabular-nums">{number}.</span>
-        <h3 className="text-[10px] uppercase tracking-[0.2em] font-bold">{title}</h3>
+      <div className="flex items-baseline gap-2 mb-2 pb-1 border-b border-primary/30">
+        <span className="text-[8.5px] font-mono font-bold text-primary tabular-nums">{number}.</span>
+        <h3 className="text-[10px] uppercase tracking-[0.2em] font-bold text-primary">{title}</h3>
       </div>
       {children}
     </section>
@@ -248,11 +248,11 @@ function Section({ number, title, children }: { number: string; title: string; c
 
 function GroupCell({ rows, bordered }: { rows: [string, string][]; bordered?: boolean }) {
   return (
-    <dl className={`px-3 py-2 space-y-1 ${bordered ? "border-r border-foreground/15" : ""}`}>
+    <dl className={`px-3 py-2 space-y-1 ${bordered ? "border-r border-primary/15" : ""}`}>
       {rows.map(([k, v], i) => (
         <div key={i} className="flex items-baseline gap-2 text-[10px]">
-          <dt className="text-foreground/60 w-[78px] shrink-0">{k}</dt>
-          <dd className="font-semibold truncate flex-1">{v}</dd>
+          <dt className="text-primary/70 w-[78px] shrink-0 font-medium">{k}</dt>
+          <dd className="font-semibold truncate flex-1 text-foreground">{v}</dd>
         </div>
       ))}
     </dl>
