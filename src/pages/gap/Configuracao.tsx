@@ -9,7 +9,7 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { Settings2, Plus, Layers, AlertCircle, FileText, Trash2, Pencil } from "lucide-react";
+import { Settings2, Plus, Layers, AlertCircle, FileText, Trash2, Pencil, AlertTriangle } from "lucide-react";
 import {
   tipoConfig as initialTipoConfig,
   categoriaConfig as initialCategoriaConfig,
@@ -23,6 +23,15 @@ import { useToast } from "@/hooks/use-toast";
 type EstadoItem = { key: string; label: string; color: string };
 type CategoriaItem = { key: string; label: string; color: string };
 type MotivoItem = { key: string; label: string; categoria: string; destino: string; responsavel: string; slaAceitacao: number; slaConclusao: number };
+type MultaItem = { key: string; label: string; valor: number; descricao: string };
+
+const INITIAL_MULTAS: MultaItem[] = [
+  { key: "atraso_relatorio", label: "Atraso na entrega de relatório", valor: 15000, descricao: "Aplicada quando o relatório obrigatório é entregue após o prazo." },
+  { key: "falta_injustificada", label: "Falta injustificada a sessão", valor: 10000, descricao: "Ausência sem justificação em sessão obrigatória." },
+  { key: "atraso_aula", label: "Atraso superior a 15min na aula", valor: 5000, descricao: "Atrasos repetidos no início das aulas." },
+  { key: "incumprimento_sla", label: "Incumprimento de SLA de solicitação", valor: 8000, descricao: "Solicitação não tratada dentro do prazo definido." },
+  { key: "uso_indevido", label: "Uso indevido de recursos institucionais", valor: 25000, descricao: "Utilização de equipamento ou espaço fora do âmbito autorizado." },
+];
 
 const STAFF_OPTIONS = [
   "Dra. Helena Cabral · GAP",
@@ -57,6 +66,7 @@ export default function GapConfiguracao() {
   const [categorias, setCategorias] = useState<CategoriaItem[]>(
     Object.entries(initialCategoriaConfig).map(([key, v]) => ({ key, label: v.label, color: v.color }))
   );
+  const [multas, setMultas] = useState<MultaItem[]>(INITIAL_MULTAS);
   const [motivos, setMotivos] = useState<MotivoItem[]>(
     Object.entries(initialTipoConfig).map(([key, v]) => ({
       key, label: v.label, categoria: v.categoria, destino: v.destino,
@@ -70,6 +80,7 @@ export default function GapConfiguracao() {
   const [estadoOpen, setEstadoOpen] = useState(false);
   const [catOpen, setCatOpen] = useState(false);
   const [motivoOpen, setMotivoOpen] = useState(false);
+  const [multaOpen, setMultaOpen] = useState(false);
 
   // New estado form
   const [newEstadoLabel, setNewEstadoLabel] = useState("");
@@ -82,6 +93,10 @@ export default function GapConfiguracao() {
   const [newMotSlaAceit, setNewMotSlaAceit] = useState<number>(2);
   const [newMotSlaConcl, setNewMotSlaConcl] = useState<number>(5);
   const [newMotResp, setNewMotResp] = useState<string>(STAFF_OPTIONS[0]);
+  // New multa form
+  const [newMultaLabel, setNewMultaLabel] = useState("");
+  const [newMultaValor, setNewMultaValor] = useState<number>(5000);
+  const [newMultaDesc, setNewMultaDesc] = useState("");
 
   const slugify = (s: string) =>
     s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
@@ -130,11 +145,22 @@ export default function GapConfiguracao() {
   const removeEstado = (key: string) => setEstados(prev => prev.filter(e => e.key !== key));
   const removeCategoria = (key: string) => setCategorias(prev => prev.filter(c => c.key !== key));
   const removeMotivo = (key: string) => setMotivos(prev => prev.filter(m => m.key !== key));
+  const removeMulta = (key: string) => setMultas(prev => prev.filter(m => m.key !== key));
+
+  const handleAddMulta = () => {
+    if (!newMultaLabel.trim()) return;
+    const key = slugify(newMultaLabel);
+    setMultas(prev => [...prev, { key, label: newMultaLabel.trim(), valor: newMultaValor, descricao: newMultaDesc.trim() }]);
+    setNewMultaLabel(""); setNewMultaValor(5000); setNewMultaDesc("");
+    setMultaOpen(false);
+    toast({ title: "Multa criada", description: `“${newMultaLabel}” foi adicionada.` });
+  };
 
   // Edit dialogs
   const [editEstado, setEditEstado] = useState<EstadoItem | null>(null);
   const [editCategoria, setEditCategoria] = useState<CategoriaItem | null>(null);
   const [editMotivo, setEditMotivo] = useState<MotivoItem | null>(null);
+  const [editMulta, setEditMulta] = useState<MultaItem | null>(null);
 
   const saveEditEstado = () => {
     if (!editEstado || !editEstado.label.trim()) return;
@@ -154,6 +180,15 @@ export default function GapConfiguracao() {
     toast({ title: "Motivo atualizado" });
     setEditMotivo(null);
   };
+  const saveEditMulta = () => {
+    if (!editMulta || !editMulta.label.trim()) return;
+    setMultas(prev => prev.map(m => m.key === editMulta.key ? editMulta : m));
+    toast({ title: "Multa atualizada" });
+    setEditMulta(null);
+  };
+
+  const formatKz = (n: number) =>
+    new Intl.NumberFormat("pt-AO", { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(n) + " Kz";
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
@@ -163,7 +198,7 @@ export default function GapConfiguracao() {
           <Settings2 className="w-6 h-6 text-primary" /> Configuração
         </h1>
         <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
-          Gere os estados, categorias e motivos disponíveis para as solicitações do GAP.
+          Gere os estados, categorias, motivos e multas disponíveis para as solicitações do GAP.
         </p>
       </div>
 
@@ -380,7 +415,103 @@ export default function GapConfiguracao() {
         </div>
       </Card>
 
-      {/* Edit Estado Dialog */}
+      {/* Multas */}
+      <Card className="p-5">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-destructive" />
+            <h2 className="text-sm font-semibold text-foreground">Multas</h2>
+            <span className="text-[11px] text-muted-foreground tabular-nums">· {multas.length}</span>
+          </div>
+          <Dialog open={multaOpen} onOpenChange={setMultaOpen}>
+            <DialogTrigger asChild>
+              <Button size="sm" variant="outline" className="gap-1.5 h-8 text-xs">
+                <Plus className="w-3.5 h-3.5" /> Nova multa
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-lg">
+              <DialogHeader><DialogTitle>Nova multa</DialogTitle></DialogHeader>
+              <div className="space-y-3 py-2">
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Motivo</label>
+                  <Input value={newMultaLabel} onChange={e => setNewMultaLabel(e.target.value)} placeholder="Ex: Atraso na entrega de relatório" />
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Valor (Kz)</label>
+                  <Input type="number" min={0} step={500} value={newMultaValor} onChange={e => setNewMultaValor(Number(e.target.value) || 0)} />
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Descrição</label>
+                  <Input value={newMultaDesc} onChange={e => setNewMultaDesc(e.target.value)} placeholder="Quando se aplica esta multa" />
+                </div>
+              </div>
+              <DialogFooter className="gap-2 sm:gap-2">
+                <DialogClose asChild><Button variant="outline">Cancelar</Button></DialogClose>
+                <Button onClick={handleAddMulta} disabled={!newMultaLabel.trim()}>Adicionar</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
+        <div className="overflow-x-auto rounded-lg border border-border">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b bg-muted/30">
+                <th className="text-left p-3 font-medium text-muted-foreground text-xs">Motivo</th>
+                <th className="text-left p-3 font-medium text-muted-foreground text-xs">Descrição</th>
+                <th className="text-right p-3 font-medium text-muted-foreground text-xs whitespace-nowrap">Valor</th>
+                <th className="w-20" />
+              </tr>
+            </thead>
+            <tbody>
+              {multas.map(m => (
+                <tr key={m.key} className="border-b last:border-0 hover:bg-muted/20">
+                  <td className="p-3 text-xs font-medium text-foreground">{m.label}</td>
+                  <td className="p-3 text-xs text-muted-foreground max-w-md">{m.descricao || "—"}</td>
+                  <td className="p-3 text-right text-xs font-semibold text-destructive tabular-nums whitespace-nowrap">{formatKz(m.valor)}</td>
+                  <td className="p-3 text-right">
+                    <div className="inline-flex items-center gap-2">
+                      <button onClick={() => setEditMulta(m)} className="text-muted-foreground hover:text-foreground" aria-label={`Editar ${m.label}`}>
+                        <Pencil className="w-3.5 h-3.5" />
+                      </button>
+                      <button onClick={() => removeMulta(m.key)} className="text-muted-foreground hover:text-destructive" aria-label={`Remover ${m.label}`}>
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Card>
+
+      {/* Edit Multa Dialog */}
+      <Dialog open={!!editMulta} onOpenChange={(o) => !o && setEditMulta(null)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader><DialogTitle>Editar multa</DialogTitle></DialogHeader>
+          {editMulta && (
+            <div className="space-y-3 py-2">
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Motivo</label>
+                <Input value={editMulta.label} onChange={e => setEditMulta({ ...editMulta, label: e.target.value })} />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Valor (Kz)</label>
+                <Input type="number" min={0} step={500} value={editMulta.valor} onChange={e => setEditMulta({ ...editMulta, valor: Number(e.target.value) || 0 })} />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Descrição</label>
+                <Input value={editMulta.descricao} onChange={e => setEditMulta({ ...editMulta, descricao: e.target.value })} />
+              </div>
+            </div>
+          )}
+          <DialogFooter className="gap-2 sm:gap-2">
+            <Button variant="outline" onClick={() => setEditMulta(null)}>Cancelar</Button>
+            <Button onClick={saveEditMulta} disabled={!editMulta?.label.trim()}>Guardar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={!!editEstado} onOpenChange={(o) => !o && setEditEstado(null)}>
         <DialogContent className="max-w-md">
           <DialogHeader><DialogTitle>Editar estado</DialogTitle></DialogHeader>
