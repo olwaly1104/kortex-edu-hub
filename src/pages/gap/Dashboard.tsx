@@ -213,8 +213,12 @@ export default function GapDashboard() {
                           ) : <span className="text-xs text-muted-foreground">—</span>}
                         </td>
                         <td className="px-3 py-2">
+                          {dCfg ? (
+                            <Badge variant="outline" className={cn("text-[10px] font-medium", dCfg.color)}>{dCfg.label}</Badge>
+                          ) : <span className="text-xs text-muted-foreground">—</span>}
+                        </td>
+                        <td className="px-3 py-2">
                           <p className="text-xs text-foreground leading-tight line-clamp-1">{sol.responsavelDestino ?? "—"}</p>
-                          <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-1">{dCfg?.label ?? sol.destino}</p>
                         </td>
                         <td className="px-3 py-2 text-center whitespace-nowrap">
                           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-destructive/10 text-destructive text-xs font-semibold tabular-nums">
