@@ -181,6 +181,7 @@ export default function GapDashboard() {
                   <tr className="border-b bg-muted/30">
                     <th className="text-left px-3 py-2 font-medium text-muted-foreground text-xs uppercase tracking-wider">Solicitação</th>
                     <th className="text-left px-3 py-2 font-medium text-muted-foreground text-xs uppercase tracking-wider">Estudante</th>
+                    <th className="text-left px-3 py-2 font-medium text-muted-foreground text-xs uppercase tracking-wider">Categoria</th>
                     <th className="text-left px-3 py-2 font-medium text-muted-foreground text-xs uppercase tracking-wider">Responsável</th>
                     <th className="text-center px-3 py-2 font-medium text-muted-foreground text-xs uppercase tracking-wider whitespace-nowrap">Atraso</th>
                   </tr>
@@ -189,6 +190,8 @@ export default function GapDashboard() {
                   {solicitacoesEmAtraso.slice(0, 4).map(({ sol, diff }) => {
                     const tCfg = tipoConfig[sol.tipo];
                     const dCfg = destinoConfig[sol.destino];
+                    const catKey = tCfg?.categoria as keyof typeof categoriaConfig | undefined;
+                    const catCfg = catKey ? categoriaConfig[catKey] : undefined;
                     return (
                       <tr
                         key={sol.id}
@@ -204,8 +207,13 @@ export default function GapDashboard() {
                           <p className="text-[11px] text-muted-foreground tabular-nums mt-0.5">{sol.matricula}</p>
                         </td>
                         <td className="px-3 py-2">
+                          {catCfg ? (
+                            <Badge variant="outline" className={cn("text-[10px] font-medium", catCfg.color)}>{catCfg.label}</Badge>
+                          ) : <span className="text-xs text-muted-foreground">—</span>}
+                        </td>
+                        <td className="px-3 py-2">
                           <p className="text-xs text-foreground leading-tight line-clamp-1">{sol.responsavelDestino ?? "—"}</p>
-                          <Badge variant="outline" className={`mt-0.5 text-[9px] px-1.5 py-0 ${dCfg?.color ?? ""}`}>{dCfg?.label ?? sol.destino}</Badge>
+                          <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-1">{dCfg?.label ?? sol.destino}</p>
                         </td>
                         <td className="px-3 py-2 text-center whitespace-nowrap">
                           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-destructive/10 text-destructive text-xs font-semibold tabular-nums">
