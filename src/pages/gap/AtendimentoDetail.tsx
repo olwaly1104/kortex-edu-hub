@@ -191,7 +191,7 @@ export default function GapAtendimentoDetail() {
           {atendimento.estado === "agendado" && (
             <div className="rounded-lg border border-border bg-muted/20 px-3 py-2 flex items-center justify-between gap-3 flex-wrap">
               <div className="inline-flex items-center gap-2 text-[12px] text-muted-foreground">
-                <Timer className="w-3.5 h-3.5 shrink-0" />
+                <Timer className="w-3.5 h-3.5 shrink-0 text-amber-600" />
                 <span>Conclusão automática após <span className="font-semibold text-foreground tabular-nums">{endTime}</span></span>
               </div>
               <div className="flex items-center gap-2">
