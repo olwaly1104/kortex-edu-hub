@@ -129,20 +129,20 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
 
             {/* II · Motivo + Descrição */}
             <Section number="II" title="Motivo do Pedido">
-              <div className="border border-doc-accent/35 border-t-2 border-t-doc-accent rounded-sm overflow-hidden">
-                <div className="px-4 py-2.5 bg-doc-accent/[0.06] border-b border-doc-accent/35">
+              <div className="border-t-[3px] border-doc-accent overflow-hidden">
+                <div className="px-4 pt-3 pb-2.5 bg-doc-accent/[0.05]">
                   <p className="text-[7.5px] uppercase tracking-[0.22em] text-doc-accent font-bold mb-1">Assunto</p>
                   <h4 className="text-[13px] font-bold leading-snug tracking-tight text-foreground">
                     {s.assunto}
                   </h4>
                 </div>
-                <div className="px-4 py-2.5 bg-background">
+                <div className="px-4 py-2.5">
                   <p className="text-[7.5px] uppercase tracking-[0.22em] text-doc-accent font-bold mb-1">Descrição</p>
                   <p className="text-[10px] leading-relaxed whitespace-pre-line line-clamp-6 text-foreground/85">
                     {s.descricao}
                   </p>
                   {s.notaInterna && (
-                    <div className="mt-2.5 pt-2 border-t border-dashed border-doc-accent/35">
+                    <div className="mt-2.5 pt-2 border-t border-dashed border-doc-accent/30">
                       <p className="text-[7.5px] uppercase tracking-[0.22em] text-doc-accent font-bold mb-0.5">
                         Nota Interna
                       </p>
