@@ -85,53 +85,23 @@ export default function DisciplineDetail() {
           </div>
         </div>
 
-        {/* Professor strip — structured: avatar + labelled fields + uniform actions */}
-        <div className="px-5 py-3 border-b border-border bg-muted/20 flex items-center gap-5">
-          {/* Identity */}
-          <div className="flex items-center gap-3 min-w-0 shrink-0">
-            <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 text-[12px] font-bold">
-              {disc.professor.replace("Prof. ", "").split(" ").slice(0, 2).map(n => n[0]).join("")}
-            </div>
-            <div className="min-w-0">
-              <p className="text-[9px] uppercase tracking-[0.14em] text-muted-foreground font-semibold leading-none mb-1">
-                Regente
-              </p>
-              <Link
-                to="/student/contacts"
-                className="text-[13.5px] font-semibold text-foreground hover:text-primary transition-colors truncate block leading-tight"
-              >
-                {disc.professor}
-              </Link>
-            </div>
+        {/* Professor strip — clean, single-line identity + actions */}
+        <div className="px-5 py-3 border-b border-border bg-muted/20 flex items-center gap-3">
+          <div className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 text-[11px] font-bold">
+            {disc.professor.replace("Prof. ", "").split(" ").slice(0, 2).map(n => n[0]).join("")}
           </div>
-
-          {/* Divider */}
-          <div className="h-9 w-px bg-border shrink-0 hidden md:block" />
-
-          {/* Meta fields */}
-          <div className="hidden md:flex items-center gap-6 min-w-0 flex-1">
-            <div className="min-w-0">
-              <p className="text-[9px] uppercase tracking-[0.14em] text-muted-foreground font-semibold leading-none mb-1">
-                Categoria
-              </p>
-              <p className="text-[12.5px] font-medium text-foreground truncate leading-tight">Professor Auxiliar</p>
-            </div>
-            <div className="min-w-0">
-              <p className="text-[9px] uppercase tracking-[0.14em] text-muted-foreground font-semibold leading-none mb-1">
-                Gabinete
-              </p>
-              <p className="text-[12.5px] font-medium text-foreground truncate leading-tight">Bloco B · Sala 214</p>
-            </div>
-            <div className="min-w-0">
-              <p className="text-[9px] uppercase tracking-[0.14em] text-muted-foreground font-semibold leading-none mb-1">
-                Atendimento
-              </p>
-              <p className="text-[12.5px] font-medium text-foreground truncate leading-tight">Quartas · 14h–16h</p>
-            </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-[9px] uppercase tracking-[0.14em] text-muted-foreground font-semibold leading-none mb-1">
+              Regente da Cadeira
+            </p>
+            <Link
+              to="/student/contacts"
+              className="text-[13.5px] font-semibold text-foreground hover:text-primary transition-colors truncate block leading-tight"
+            >
+              {disc.professor}
+            </Link>
           </div>
-
-          {/* Actions — uniform with Contacts/Chat pattern */}
-          <div className="flex items-center gap-1.5 shrink-0 ml-auto">
+          <div className="flex items-center gap-1.5 shrink-0">
             <Link to="/student/chat">
               <Button variant="outline" size="sm" className="h-8 px-3 text-[11px] gap-1.5 font-medium">
                 <MessageSquare className="w-3.5 h-3.5" /> Chat
