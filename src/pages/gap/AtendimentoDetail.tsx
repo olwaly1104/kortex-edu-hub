@@ -9,10 +9,11 @@ import {
   DoorOpen, GraduationCap, FileText,
   UserCircle2, Timer, ChevronRight, Download, Eye, Share2, Users,
   Home, Briefcase, CheckCircle, CircleDashed,
+  Paperclip, FileImage, FileSpreadsheet,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { gapAtendimentos, ticketCategoriaConfig as categoriaConfig } from "@/data/gapData";
+import { gapAtendimentos, ticketCategoriaConfig as categoriaConfig, getComentariosAtendimento } from "@/data/gapData";
 import AtendimentoDocPreview from "./AtendimentoDocPreview";
 
 const estadoConfig: Record<string, { label: string; pill: string; dot: string }> = {
