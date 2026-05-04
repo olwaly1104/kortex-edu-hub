@@ -16,6 +16,7 @@ import TaskDetail from "./pages/student/TaskDetail";
 import StudentTasks from "./pages/student/Tasks";
 import StudentCalendar from "./pages/student/Calendar";
 import StudentAnnouncements from "./pages/student/Announcements";
+import StudentSolicitacoes from "./pages/student/Solicitacoes";
 import StudentContacts from "./pages/student/Contacts";
 import StudentChat from "./pages/student/Chat";
 import StudentEmail from "./pages/student/Email";
