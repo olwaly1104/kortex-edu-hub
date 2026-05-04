@@ -297,6 +297,3 @@ export default function GapEstudanteProfile() {
     </div>
   );
 }
-    </div>
-  );
-}
