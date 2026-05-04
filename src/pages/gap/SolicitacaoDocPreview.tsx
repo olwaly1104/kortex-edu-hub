@@ -203,7 +203,7 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
 
             {/* V · Notas & Comentários */}
             {(() => {
-              const comentarios = getComentarios(s.id, s.responsavelDestino ?? `Equipa ${dest.label}`);
+              const comentarios = getComentariosSolicitacao(s.id, s.responsavelDestino ?? `Equipa ${dest.label}`);
               if (comentarios.length === 0) return null;
               return (
                 <Section number={anexos.length > 0 ? "V" : "IV"} title="Notas & Comentários">
