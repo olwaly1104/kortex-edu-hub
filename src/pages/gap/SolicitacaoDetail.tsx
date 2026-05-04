@@ -519,6 +519,50 @@ export default function GapSolicitacaoDetail() {
 
             <div className="border-t border-border" />
 
+            {/* Notas & Comentários */}
+            {(() => {
+              const comentarios = getComentariosSolicitacao(selected.id, selected.responsavelDestino ?? `Equipa ${dest.label}`);
+              if (comentarios.length === 0) return null;
+              return (
+                <>
+                  <section>
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <MessageSquare className="w-3.5 h-3.5 text-muted-foreground" />
+                        <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">
+                          Notas &amp; Comentários
+                        </h3>
+                        <Badge variant="outline" className="text-[10px] font-mono">{comentarios.length}</Badge>
+                      </div>
+                    </div>
+                    <div className="rounded-lg border border-border bg-background divide-y divide-border">
+                      {comentarios.map((c, i) => {
+                        const ini = c.actor.split(" ").slice(-2).map(n => n[0]).join("").toUpperCase();
+                        return (
+                          <div key={i} className="flex gap-3 px-4 py-3">
+                            <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 font-semibold text-[10px] ring-1 ring-primary/15">
+                              {ini}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-baseline justify-between gap-2 flex-wrap">
+                                <p className="text-[12.5px] font-semibold text-foreground leading-tight">{c.actor}</p>
+                                <span className="text-[10px] text-muted-foreground tabular-nums whitespace-nowrap">{c.data}</span>
+                              </div>
+                              <p className="text-[12.5px] text-foreground/85 leading-[1.55] mt-1 whitespace-pre-line">
+                                {c.texto}
+                              </p>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </section>
+
+                  <div className="border-t border-border" />
+                </>
+              );
+            })()}
+
             <section>
               <div className="flex items-center gap-2 mb-4">
                 <Clock className="w-3.5 h-3.5 text-muted-foreground" />
