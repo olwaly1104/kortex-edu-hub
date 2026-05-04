@@ -242,7 +242,7 @@ export default function GapInicio() {
           ) : (
             <div className="space-y-2.5">
               {proxAgendamentos.map(a => {
-                const cat = categoriaConfig[a.categoria];
+                const cat = ticketCategoriaConfig[a.categoria];
                 return (
                   <div key={a.id} className="px-3.5 py-3 rounded-xl border border-border bg-card hover:bg-muted/40 transition-colors space-y-2">
                     <div className="flex items-center gap-2">
