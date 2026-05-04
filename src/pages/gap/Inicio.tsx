@@ -8,10 +8,10 @@ import {
   HelpCircle, CalendarDays, Users,
   AlertTriangle,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { gapTickets, gapAtendimentos, gapKpis, ticketCategoriaConfig as categoriaConfig } from "@/data/gapData";
-import { solicitacoes, estadoSolicitacaoConfig, destinoConfig, tipoConfig } from "@/data/gapData";
+import { gapTickets, gapAtendimentos, gapKpis, ticketCategoriaConfig } from "@/data/gapData";
+import { solicitacoes, estadoSolicitacaoConfig, destinoConfig, tipoConfig, categoriaConfig as solCategoriaConfig, type Categoria } from "@/data/gapData";
 
 const estadoDot: Record<string, string> = {
   recebida: "bg-amber-500",
