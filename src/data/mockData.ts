@@ -232,7 +232,7 @@ export const disciplines: Discipline[] = [
     professorEmail: "prof.silva@upra.kor",
     schedule: "Seg/Qua/Sex 08:00-09:30",
     room: "Sala 101",
-    summary: "Cálculo integral, séries numéricas, equações diferenciais ordinárias e transformadas de Laplace. Aplicações à engenharia.",
+    summary: "Cadeira focada em cálculo integral, séries numéricas e equações diferenciais ordinárias, com aplicações em engenharia e métodos de Laplace.",
     attendance: { present: 28, absent: 4, justified: 2 },
     progress: { watched: 12, total: 18 },
     color: "hsl(224, 64%, 33%)",
