@@ -488,7 +488,7 @@ export default function GapSolicitacaoDetail() {
                             </div>
                             <div className="min-w-0 flex-1">
                               <p className="text-[13px] font-medium text-foreground leading-tight truncate">{a.nome}</p>
-                              <p className="text-[11px] text-muted-foreground mt-0.5 tabular-nums">{a.tamanho}</p>
+                              <p className="text-[11px] text-muted-foreground mt-0.5 truncate">{selected.discente}</p>
                             </div>
                             <div className="flex items-center gap-0.5 shrink-0">
                               <button
