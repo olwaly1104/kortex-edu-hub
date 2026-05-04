@@ -322,6 +322,59 @@ export default function GapAtendimentoDetail() {
                   </section>
                 );
               })()}
+
+              {/* Notas & Comentários */}
+              {(() => {
+                const comentarios = getComentariosAtendimento(atendimento.id, atendimento.responsavel);
+                if (comentarios.length === 0) return null;
+                return (
+                  <section className="p-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <MessageSquare className="w-3.5 h-3.5 text-muted-foreground" />
+                      <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Notas &amp; Comentários</h3>
+                      <span className="text-[10px] text-muted-foreground font-medium tabular-nums">· {comentarios.length}</span>
+                    </div>
+                    <div className="divide-y divide-border">
+                      {comentarios.map((c, i) => {
+                        const ini = c.actor.split(" ").slice(-2).map(n => n[0]).join("").toUpperCase();
+                        return (
+                          <div key={i} className="flex gap-3 px-1 py-3 first:pt-0 last:pb-0">
+                            <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 font-semibold text-[10px] ring-1 ring-primary/15">
+                              {ini}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-baseline justify-between gap-2 flex-wrap">
+                                <p className="text-[12.5px] font-semibold text-foreground leading-tight">{c.actor}</p>
+                                <span className="text-[10px] text-muted-foreground tabular-nums whitespace-nowrap">{c.data}</span>
+                              </div>
+                              <p className="text-[12.5px] text-foreground/85 leading-[1.55] mt-1 whitespace-pre-line">{c.texto}</p>
+                              {c.anexo && (() => {
+                                const ic = atAnexoIcon(c.anexo.tipo);
+                                return (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleAction(`A abrir ${c.anexo!.nome}`)}
+                                    className="mt-2 inline-flex items-center gap-2 px-2.5 py-1.5 rounded-md border border-border bg-muted/30 hover:bg-muted/60 transition-colors max-w-full"
+                                  >
+                                    <div className={cn("w-7 h-7 rounded-md border flex items-center justify-center shrink-0", ic.cls)}>
+                                      <ic.Icon className="w-3.5 h-3.5" />
+                                    </div>
+                                    <div className="min-w-0 text-left">
+                                      <p className="text-[11.5px] font-semibold text-foreground leading-tight truncate">{c.anexo.nome}</p>
+                                      <p className="text-[10px] text-muted-foreground tabular-nums">{c.anexo.tamanho}</p>
+                                    </div>
+                                    <Paperclip className="w-3 h-3 text-muted-foreground ml-1 shrink-0" />
+                                  </button>
+                                );
+                              })()}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </section>
+                );
+              })()}
             </div>
           </main>
         </div>
