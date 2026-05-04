@@ -28,10 +28,13 @@ const riscoConfig = {
   baixo: { label: "Risco Baixo", bg: "bg-emerald-100 text-emerald-700 border-emerald-200" },
 };
 
+type ReportKind = "solicitacoes" | "agendamentos" | "bilhete" | "notas";
+
 export default function GapEstudanteProfile() {
   const { matricula } = useParams();
   const navigate = useNavigate();
   const discente = gapEstudantesSeguimento.find(e => e.matricula === matricula);
+  const [report, setReport] = useState<ReportKind | null>(null);
 
   if (!discente) {
     return (
