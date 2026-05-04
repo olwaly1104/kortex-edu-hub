@@ -17,6 +17,7 @@ import StudentTasks from "./pages/student/Tasks";
 import StudentCalendar from "./pages/student/Calendar";
 import StudentAnnouncements from "./pages/student/Announcements";
 import StudentSolicitacoes from "./pages/student/Solicitacoes";
+import StudentSolicitacaoDetail from "./pages/student/SolicitacaoDetail";
 import StudentContacts from "./pages/student/Contacts";
 import StudentChat from "./pages/student/Chat";
 import StudentEmail from "./pages/student/Email";
@@ -162,6 +163,7 @@ function AppRoutes() {
         <Route path="/student/calendar" element={<StudentCalendar />} />
         <Route path="/student/announcements" element={<StudentAnnouncements />} />
         <Route path="/student/solicitacoes" element={<StudentSolicitacoes />} />
+        <Route path="/student/solicitacoes/:id" element={<StudentSolicitacaoDetail />} />
         <Route path="/student/contacts" element={<StudentContacts />} />
         <Route path="/student/chat" element={<StudentChat />} />
         <Route path="/student/email" element={<StudentEmail />} />
