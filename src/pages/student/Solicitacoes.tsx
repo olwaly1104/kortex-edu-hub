@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -10,15 +11,14 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import {
-  HelpCircle, Plus, Search, X, Inbox, Clock, CheckCircle2, AlertCircle, Send, ChevronRight, ChevronLeft, Eye,
-  Building2, Timer, FileText,
+  HelpCircle, Plus, Search, X, Inbox, Clock, CheckCircle2, AlertCircle, Send, ChevronRight, ChevronLeft,
+  Building2, Timer, FileText, ArrowUpRight, Calendar,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   solicitacoes as gapSolicitacoes, Solicitacao, EstadoSolicitacao,
   estadoSolicitacaoConfig, destinoConfig, tipoConfig, categoriaConfig, Categoria,
 } from "@/data/gapData";
-import SolicitacaoDocPreview from "@/pages/gap/SolicitacaoDocPreview";
 
 const STUDENT_MATRICULA = "2024001"; // Ana Luísa Ferreira (logged in)
 const TODAY = "2025-12-16";
