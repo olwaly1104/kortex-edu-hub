@@ -613,3 +613,24 @@ function FieldBlock({ n, title, optional, children }: { n: number; title: string
     </section>
   );
 }
+
+function StatCell({ icon: Icon, label, value, tone }: { icon: any; label: string; value: number; tone: "primary" | "amber" | "sky" | "emerald" }) {
+  const toneCls: Record<string, string> = {
+    primary: "bg-primary/10 text-primary",
+    amber: "bg-amber-100 text-amber-700",
+    sky: "bg-sky-100 text-sky-700",
+    emerald: "bg-emerald-100 text-emerald-700",
+  };
+  return (
+    <div className="px-4 py-4 flex items-center gap-3">
+      <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${toneCls[tone]}`}>
+        <Icon className="w-4 h-4" />
+      </div>
+      <div className="min-w-0">
+        <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold leading-tight">{label}</p>
+        <p className="text-xl font-bold text-foreground tabular-nums leading-tight mt-0.5">{value}</p>
+      </div>
+    </div>
+  );
+}
+
