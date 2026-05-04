@@ -70,7 +70,7 @@ export default function DisciplineDetail() {
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2.5 mb-1.5">
                 <div className="w-9 h-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                  <BookOpen className="w-4.5 h-4.5" />
+                  <BookOpen className="w-4 h-4" />
                 </div>
                 <div className="min-w-0">
                   <h1 className="text-xl font-bold text-foreground tracking-tight leading-tight truncate">{disc.name}</h1>
@@ -98,12 +98,12 @@ export default function DisciplineDetail() {
               </div>
               <div className="flex gap-1.5 mt-2">
                 <Link to="/student/chat" className="flex-1">
-                  <Button variant="outline" size="sm" className="h-6.5 px-2 text-[10px] gap-1 w-full">
+                  <Button variant="outline" size="sm" className="h-7 px-2 text-[10px] gap-1 w-full">
                     <MessageSquare className="w-3 h-3" /> Chat
                   </Button>
                 </Link>
                 <Link to="/student/email" className="flex-1">
-                  <Button variant="outline" size="sm" className="h-6.5 px-2 text-[10px] gap-1 w-full">
+                  <Button variant="outline" size="sm" className="h-7 px-2 text-[10px] gap-1 w-full">
                     <Mail className="w-3 h-3" /> Email
                   </Button>
                 </Link>
