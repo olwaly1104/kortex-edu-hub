@@ -1,13 +1,18 @@
+import { useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger,
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
 } from "@/components/ui/dialog";
 import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem,
+  DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   ArrowLeft, Mail, MessageCircle, Users, Phone, MapPin, UserCheck, Calendar, GraduationCap,
-  HelpCircle, CalendarDays, Heart, Inbox, FileText,
+  HelpCircle, CalendarDays, Heart, Inbox, FileText, ChevronDown, IdCard, Award, ClipboardList,
 } from "lucide-react";
 import {
   gapEstudantesSeguimento, solicitacoes, gapAtendimentos,
@@ -15,6 +20,7 @@ import {
 } from "@/data/gapData";
 import { cn } from "@/lib/utils";
 import EstudanteRelatorioDoc from "./EstudanteRelatorioDoc";
+import EstudanteAgendamentosDoc from "./EstudanteAgendamentosDoc";
 
 const riscoConfig = {
   alto:  { label: "Risco Alto",  bg: "bg-destructive/10 text-destructive border-destructive/30" },
