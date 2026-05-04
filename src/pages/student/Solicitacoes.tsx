@@ -309,7 +309,7 @@ export default function StudentSolicitacoes() {
                 <button
                   key={s.id}
                   type="button"
-                  onClick={() => navigate(`/student/solicitacoes/${s.id}`)}
+                  onClick={() => setPreviewId(s.id)}
                   className="w-full text-left px-5 py-4 hover:bg-muted/40 transition-colors flex items-start gap-4"
                 >
                   <span className={cn("w-2 h-2 rounded-full mt-2 shrink-0", estadoDot[s.estado])} />
