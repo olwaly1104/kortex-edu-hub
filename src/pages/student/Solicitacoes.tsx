@@ -189,11 +189,12 @@ export default function StudentSolicitacoes() {
         </div>
 
         {/* Table-style header */}
-        <div className="hidden md:grid grid-cols-[110px_1fr_120px_120px_110px_28px] gap-3 px-5 py-2 bg-muted/10 border-b border-border text-[10px] uppercase tracking-[0.08em] font-semibold text-muted-foreground">
+        <div className="hidden md:grid grid-cols-[110px_1fr_115px_115px_110px_110px_28px] gap-3 px-5 py-2 bg-muted/10 border-b border-border text-[10px] uppercase tracking-[0.08em] font-semibold text-muted-foreground">
           <div>ID</div>
           <div>Assunto</div>
           <div>Categoria</div>
           <div>Destino</div>
+          <div>Estado</div>
           <div className="text-right">Submetido</div>
           <div></div>
         </div>
