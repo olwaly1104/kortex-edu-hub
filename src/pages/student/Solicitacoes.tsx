@@ -189,11 +189,12 @@ export default function StudentSolicitacoes() {
         </div>
 
         {/* Table-style header */}
-        <div className="hidden md:grid grid-cols-[110px_1fr_120px_120px_110px_28px] gap-3 px-5 py-2 bg-muted/10 border-b border-border text-[10px] uppercase tracking-[0.08em] font-semibold text-muted-foreground">
+        <div className="hidden md:grid grid-cols-[110px_1fr_115px_115px_110px_110px_28px] gap-3 px-5 py-2 bg-muted/10 border-b border-border text-[10px] uppercase tracking-[0.08em] font-semibold text-muted-foreground">
           <div>ID</div>
           <div>Assunto</div>
           <div>Categoria</div>
           <div>Destino</div>
+          <div>Estado</div>
           <div className="text-right">Submetido</div>
           <div></div>
         </div>
@@ -223,19 +224,14 @@ export default function StudentSolicitacoes() {
                   className="w-full text-left hover:bg-muted/40 transition-colors group"
                 >
                   {/* Desktop row */}
-                  <div className="hidden md:grid grid-cols-[110px_1fr_120px_120px_110px_28px] gap-3 px-5 py-3 items-center">
+                  <div className="hidden md:grid grid-cols-[110px_1fr_115px_115px_110px_110px_28px] gap-3 px-5 py-3 items-center">
                     <div className="flex items-center gap-2 min-w-0">
                       <span className={cn("w-1.5 h-1.5 rounded-full shrink-0", estadoDot[s.estado])} />
                       <span className="font-mono text-[11px] text-muted-foreground truncate">{s.id}</span>
                     </div>
                     <div className="min-w-0">
                       <p className="text-[13px] font-semibold text-foreground leading-tight truncate">{s.assunto}</p>
-                      <div className="flex items-center gap-1.5 mt-0.5">
-                        <Badge variant="outline" className={cn("text-[10px] py-0 h-4 border font-medium", st.color)}>
-                          {st.label}
-                        </Badge>
-                        <span className="text-[11px] text-muted-foreground truncate">{tipoCfg?.label ?? s.tipo}</span>
-                      </div>
+                      <p className="text-[11px] text-muted-foreground truncate mt-0.5">{tipoCfg?.label ?? s.tipo}</p>
                     </div>
                     <div className="min-w-0">
                       {catCfg && (
@@ -247,6 +243,11 @@ export default function StudentSolicitacoes() {
                     <div className="min-w-0">
                       <Badge variant="outline" className={cn("text-[10px] py-0 h-5 border", destCfg.color)}>
                         {destCfg.label}
+                      </Badge>
+                    </div>
+                    <div className="min-w-0">
+                      <Badge variant="outline" className={cn("text-[10px] py-0 h-5 border font-medium", st.color)}>
+                        {st.label}
                       </Badge>
                     </div>
                     <div className="text-right text-[11px] text-muted-foreground tabular-nums flex items-center justify-end gap-1">
