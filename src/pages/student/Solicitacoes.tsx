@@ -79,13 +79,15 @@ export default function StudentSolicitacoes() {
     return d.toLocaleDateString("pt-PT", { day: "2-digit", month: "2-digit", year: "numeric" });
   };
 
-  const tabs: { key: EstadoFilter; label: string; icon: typeof Inbox; count: number }[] = [
-    { key: "todos",       label: "Todas",       icon: Inbox,         count: counts.todos },
-    { key: "pendentes",   label: "Pendentes",   icon: Clock,         count: counts.pendentes },
-    { key: "em_execucao", label: "Em Execução", icon: Send,          count: counts.em_execucao },
-    { key: "concluidas",  label: "Concluídas",  icon: CheckCircle2,  count: counts.concluidas },
-    { key: "rejeitadas",  label: "Rejeitadas",  icon: AlertCircle,   count: counts.rejeitadas },
+  const tabs: { key: EstadoFilter; label: string; count: number }[] = [
+    { key: "todos",       label: "Todas",       count: counts.todos },
+    { key: "pendentes",   label: "Pendentes",   count: counts.pendentes },
+    { key: "em_execucao", label: "Em Execução", count: counts.em_execucao },
+    { key: "concluidas",  label: "Concluídas",  count: counts.concluidas },
+    { key: "rejeitadas",  label: "Rejeitadas",  count: counts.rejeitadas },
   ];
+
+  const anoLetivo = "2025/2026";
 
   const onCreate = (nova: Solicitacao) => {
     setExtras(prev => [nova, ...prev]);
