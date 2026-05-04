@@ -162,7 +162,6 @@ function AppRoutes() {
         <Route path="/student/calendar" element={<StudentCalendar />} />
         <Route path="/student/announcements" element={<StudentAnnouncements />} />
         <Route path="/student/solicitacoes" element={<StudentSolicitacoes />} />
-        <Route path="/student/solicitacoes/:id" element={<GapSolicitacaoDetail />} />
         <Route path="/student/contacts" element={<StudentContacts />} />
         <Route path="/student/chat" element={<StudentChat />} />
         <Route path="/student/email" element={<StudentEmail />} />
