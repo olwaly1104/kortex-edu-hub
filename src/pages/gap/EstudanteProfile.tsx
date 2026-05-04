@@ -180,10 +180,24 @@ export default function GapEstudanteProfile() {
 
       {/* Histórico de Solicitações */}
       <Card className="overflow-hidden">
-        <div className="p-4 border-b bg-muted/30">
+        <div className="p-4 border-b bg-muted/30 flex items-center justify-between gap-3">
           <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
             <HelpCircle className="w-4 h-4" /> Histórico de Solicitações
           </h3>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button size="sm" variant="outline" className="gap-1.5 text-xs h-7">
+                <FileText className="w-3.5 h-3.5" /> Relatório Anual
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-5xl w-[95vw] h-[92vh] p-0 gap-0 overflow-hidden">
+              <DialogHeader className="sr-only">
+                <DialogTitle>Relatório anual de solicitações — {discente.nome}</DialogTitle>
+                <DialogDescription>Documento institucional com todas as solicitações do ano letivo.</DialogDescription>
+              </DialogHeader>
+              <EstudanteRelatorioDoc discente={discente} solicitacoes={sols} />
+            </DialogContent>
+          </Dialog>
         </div>
         <div className="divide-y divide-border">
           {sols.length > 0 ? sols.map(s => {
