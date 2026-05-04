@@ -194,8 +194,8 @@ export default function StudentSolicitacoes() {
           <div>Assunto</div>
           <div>Categoria</div>
           <div>Destino</div>
+          <div>Submetido</div>
           <div>Estado</div>
-          <div className="text-right">Submetido</div>
           <div></div>
         </div>
 
