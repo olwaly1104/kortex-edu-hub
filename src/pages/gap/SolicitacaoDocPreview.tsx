@@ -199,6 +199,27 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
                 </div>
               </Section>
             )}
+
+            {/* V · Notas & Comentários */}
+            {(() => {
+              const comentarios = getComentarios(s.id, s.responsavelDestino ?? `Equipa ${dest.label}`);
+              if (comentarios.length === 0) return null;
+              return (
+                <Section number={anexos.length > 0 ? "V" : "IV"} title="Notas & Comentários">
+                  <div className="border border-doc-accent/35 rounded-sm overflow-hidden divide-y divide-foreground/10">
+                    {comentarios.map((c, i) => (
+                      <div key={i} className="px-3 py-2 bg-doc-accent/[0.02]">
+                        <div className="flex items-baseline justify-between gap-3 mb-0.5">
+                          <p className="text-[9.5px] font-bold text-foreground">{c.actor}</p>
+                          <p className="text-[8px] text-foreground/55 tabular-nums whitespace-nowrap">{fmtDataHora(c.data)}</p>
+                        </div>
+                        <p className="text-[9.5px] leading-[1.55] text-foreground/85 whitespace-pre-line">{c.texto}</p>
+                      </div>
+                    ))}
+                  </div>
+                </Section>
+              );
+            })()}
           </div>
 
           {/* ── Footer ───────────────────────────────────────── */}
