@@ -53,13 +53,13 @@ export default function GapInicio() {
     agendada: { label: "Agendada", icon: Clock, variant: "outline" },
   };
 
-  const recentes = gapTickets
-    .filter(t => t.estado === "aberto" || t.estado === "em_andamento")
-    .slice(0, 4);
+  const recentes = solicitacoes
+    .filter(s => s.estado === "recebida" || s.estado === "em_execucao")
+    .slice(0, 6);
 
   const proxAgendamentos = gapAtendimentos
     .filter(a => a.estado === "agendado")
-    .slice(0, 4);
+    .slice(0, 5);
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
