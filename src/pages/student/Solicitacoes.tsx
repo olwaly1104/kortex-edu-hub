@@ -37,7 +37,7 @@ const estadoDot: Record<EstadoSolicitacao, string> = {
 type EstadoFilter = "todos" | "pendentes" | "em_execucao" | "concluidas" | "rejeitadas";
 
 export default function StudentSolicitacoes() {
-  const navigate = useNavigate();
+  const [previewId, setPreviewId] = useState<string | null>(null);
   const { toast } = useToast();
 
   // Local state for newly-created (in-session) solicitações.
