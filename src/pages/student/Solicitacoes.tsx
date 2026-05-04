@@ -336,13 +336,29 @@ export default function StudentSolicitacoes() {
                     </Badge>
                     <p className="text-[11px] text-muted-foreground mt-1 tabular-nums">{fmt(s.dataSubmissao)}</p>
                   </div>
-                  <ChevronRight className="w-4 h-4 text-muted-foreground/50 mt-2 shrink-0" />
+                  <Eye className="w-4 h-4 text-muted-foreground/50 mt-2 shrink-0" />
                 </button>
               );
             })}
           </div>
         )}
       </Card>
+
+      {/* Document preview dialog */}
+      <Dialog open={!!previewId} onOpenChange={(v) => { if (!v) setPreviewId(null); }}>
+        <DialogContent className="max-w-5xl w-[95vw] h-[92vh] p-0 gap-0 overflow-hidden">
+          <DialogHeader className="sr-only">
+            <DialogTitle>Documento Pedido-{previewId}</DialogTitle>
+            <DialogDescription>Pré-visualização do documento institucional gerado.</DialogDescription>
+          </DialogHeader>
+          {previewId && (() => {
+            const s = own.find(x => x.id === previewId);
+            if (!s) return null;
+            const anexos = (s.anexos ?? []).map(a => ({ nome: a.nome, tamanho: "—" }));
+            return <SolicitacaoDocPreview solicitacao={s} anexos={anexos} />;
+          })()}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
