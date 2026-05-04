@@ -85,28 +85,33 @@ export default function DisciplineDetail() {
           </div>
         </div>
 
-        {/* Professor strip — clear field with Chat + Email actions */}
-        <div className="px-5 py-3 border-b border-border bg-muted/15 flex items-center gap-3 flex-wrap">
-          <p className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground font-semibold flex items-center gap-1 shrink-0">
-            <GraduationCap className="w-3 h-3" /> Professor
-          </p>
-          <div className="flex items-center gap-2 min-w-0 flex-1">
-            <div className="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 text-[10px] font-semibold ring-1 ring-primary/15">
+        {/* Professor strip — refined: regente field, avatar, name + role, actions */}
+        <div className="px-5 py-3.5 border-b border-border bg-muted/20 flex items-center gap-4">
+          <div className="flex items-center gap-3 min-w-0 flex-1">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/15 to-primary/5 text-primary flex items-center justify-center shrink-0 text-[12px] font-bold ring-2 ring-primary/10">
               {disc.professor.replace("Prof. ", "").split(" ").slice(0, 2).map(n => n[0]).join("")}
             </div>
-            <Link to="/student/contacts" className="text-[13px] font-semibold text-foreground hover:text-primary transition-colors truncate">
-              {disc.professor}
-            </Link>
+            <div className="min-w-0 flex-1">
+              <p className="text-[9px] uppercase tracking-[0.14em] text-muted-foreground font-semibold leading-none mb-1">
+                Regente da Cadeira
+              </p>
+              <Link
+                to="/student/contacts"
+                className="text-[14px] font-semibold text-foreground hover:text-primary transition-colors truncate block leading-tight"
+              >
+                {disc.professor}
+              </Link>
+            </div>
           </div>
           <div className="flex items-center gap-1.5 shrink-0">
             <Link to="/student/chat">
-              <Button variant="outline" size="sm" className="h-7 px-2.5 text-[11px] gap-1.5">
-                <MessageSquare className="w-3 h-3" /> Chat
+              <Button variant="outline" size="sm" className="h-8 px-3 text-[11px] gap-1.5 font-medium">
+                <MessageSquare className="w-3.5 h-3.5" /> Chat
               </Button>
             </Link>
             <Link to="/student/email">
-              <Button variant="outline" size="sm" className="h-7 px-2.5 text-[11px] gap-1.5">
-                <Mail className="w-3 h-3" /> Email
+              <Button size="sm" className="h-8 px-3 text-[11px] gap-1.5 font-medium">
+                <Mail className="w-3.5 h-3.5" /> Email
               </Button>
             </Link>
           </div>
