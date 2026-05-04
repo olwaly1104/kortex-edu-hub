@@ -215,6 +215,19 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
                           <p className="text-[8px] text-foreground/55 tabular-nums whitespace-nowrap">{fmtDataHora(c.data)}</p>
                         </div>
                         <p className="text-[9.5px] leading-[1.55] text-foreground/85 whitespace-pre-line">{c.texto}</p>
+                        {c.anexo && (() => {
+                          const ic = anexoIcon(c.anexo.tipo);
+                          return (
+                            <div className="mt-1.5 inline-flex items-center gap-1.5 px-1.5 py-0.5 rounded-sm border border-doc-accent/30 bg-white">
+                              <div className={`w-4 h-4 rounded-sm border flex items-center justify-center ${ic.cls}`}>
+                                <ic.Icon className="w-2.5 h-2.5" />
+                              </div>
+                              <span className="text-[8.5px] font-semibold text-foreground/85 truncate max-w-[200px]">{c.anexo.nome}</span>
+                              <span className="text-[8px] text-foreground/55 tabular-nums">{c.anexo.tamanho}</span>
+                              <Paperclip className="w-2.5 h-2.5 text-doc-accent ml-0.5" />
+                            </div>
+                          );
+                        })()}
                       </div>
                     ))}
                   </div>
