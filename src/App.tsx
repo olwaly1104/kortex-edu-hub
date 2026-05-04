@@ -118,6 +118,7 @@ import GapAtendimentoDetail from "./pages/gap/AtendimentoDetail";
 import GapEstudantes from "./pages/gap/Estudantes";
 import GapEstudanteProfile from "./pages/gap/EstudanteProfile";
 import GapConfiguracao from "./pages/gap/Configuracao";
+import GapAnuncios from "./pages/gap/Anuncios";
 import FinancasDashboard from "./pages/financas/Dashboard";
 import FinancasInicio from "./pages/financas/Inicio";
 import FinancasReceitas from "./pages/financas/Receitas";
@@ -301,7 +302,7 @@ function AppRoutes() {
         <Route path="/gap/estudantes/:matricula" element={<GapEstudanteProfile />} />
         <Route path="/gap/configuracao" element={<GapConfiguracao />} />
         <Route path="/gap/calendario" element={<StudentCalendar />} />
-        <Route path="/gap/anuncios" element={<StudentAnnouncements />} />
+        <Route path="/gap/anuncios" element={<GapAnuncios />} />
         <Route path="/gap/chat" element={<StudentChat />} />
         <Route path="/gap/email" element={<StudentEmail />} />
         <Route path="/gap/contactos" element={<StudentContacts />} />

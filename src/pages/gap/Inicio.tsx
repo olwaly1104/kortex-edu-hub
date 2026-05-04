@@ -55,11 +55,11 @@ export default function GapInicio() {
 
   const recentes = solicitacoes
     .filter(s => s.estado === "recebida" || s.estado === "em_execucao")
-    .slice(0, 6);
+    .slice(0, 4);
 
   const proxAgendamentos = gapAtendimentos
     .filter(a => a.estado === "agendado")
-    .slice(0, 5);
+    .slice(0, 3);
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">

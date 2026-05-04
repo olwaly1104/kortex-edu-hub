@@ -3,14 +3,18 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger,
+} from "@/components/ui/dialog";
+import {
   ArrowLeft, Mail, MessageCircle, Users, Phone, MapPin, UserCheck, Calendar, GraduationCap,
-  HelpCircle, Clock, CheckCircle2, AlertCircle, CalendarDays, Heart, Inbox, BookOpen,
+  HelpCircle, CalendarDays, Heart, Inbox, FileText,
 } from "lucide-react";
 import {
   gapEstudantesSeguimento, solicitacoes, gapAtendimentos,
   estadoSolicitacaoConfig, tipoConfig, destinoConfig,
 } from "@/data/gapData";
 import { cn } from "@/lib/utils";
+import EstudanteRelatorioDoc from "./EstudanteRelatorioDoc";
 
 const riscoConfig = {
   alto:  { label: "Risco Alto",  bg: "bg-destructive/10 text-destructive border-destructive/30" },
@@ -36,9 +40,7 @@ export default function GapEstudanteProfile() {
   const sols = solicitacoes.filter(s => s.matricula === discente.matricula);
   const atendimentos = gapAtendimentos.filter(a => a.matricula === discente.matricula);
 
-  const pendentes = sols.filter(s => s.estado === "recebida").length;
-  const emExecucao = sols.filter(s => s.estado === "em_execucao").length;
-  const concluidas = sols.filter(s => s.estado === "concluida").length;
+
 
   const email = `${discente.nome.toLowerCase().split(" ").slice(0, 2).join(".")}@upra.kor`;
 
@@ -176,10 +178,24 @@ export default function GapEstudanteProfile() {
 
       {/* Histórico de Solicitações */}
       <Card className="overflow-hidden">
-        <div className="p-4 border-b bg-muted/30">
+        <div className="p-4 border-b bg-muted/30 flex items-center justify-between gap-3">
           <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
             <HelpCircle className="w-4 h-4" /> Histórico de Solicitações
           </h3>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button size="sm" variant="outline" className="gap-1.5 text-xs h-7">
+                <FileText className="w-3.5 h-3.5" /> Relatório Anual
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-5xl w-[95vw] h-[92vh] p-0 gap-0 overflow-hidden">
+              <DialogHeader className="sr-only">
+                <DialogTitle>Relatório anual de solicitações — {discente.nome}</DialogTitle>
+                <DialogDescription>Documento institucional com todas as solicitações do ano letivo.</DialogDescription>
+              </DialogHeader>
+              <EstudanteRelatorioDoc discente={discente} solicitacoes={sols} />
+            </DialogContent>
+          </Dialog>
         </div>
         <div className="divide-y divide-border">
           {sols.length > 0 ? sols.map(s => {
