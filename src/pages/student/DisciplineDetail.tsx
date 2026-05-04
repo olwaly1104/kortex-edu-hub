@@ -53,80 +53,62 @@ export default function DisciplineDetail() {
         <ArrowLeft className="w-4 h-4" /> Voltar às cadeiras
       </Link>
 
-      {/* Redesigned professional header */}
-      <Card className="overflow-hidden p-0 gap-0">
-        {/* Top breadcrumb strip */}
-        <div className="flex items-center gap-2 px-5 py-2.5 border-b border-border bg-muted/20 text-[10px] uppercase tracking-[0.12em] font-semibold">
-          <span className="text-primary">Ano Lectivo 2024/2025</span>
-          <span className="text-muted-foreground/40">·</span>
-          <Link to="/student/disciplines" className="text-muted-foreground hover:text-foreground transition-colors">Cadeiras</Link>
-          <span className="text-muted-foreground/40">·</span>
-          <span className="font-mono text-foreground normal-case tracking-normal">{disc.code}</span>
-        </div>
+      {/* Unified Card — matches Coordenador / Professor pattern */}
+      <Card className="overflow-hidden">
+        {/* Hero Header */}
+        <div className="relative border-b border-border">
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/6 via-primary/3 to-transparent" />
+          <div className="relative px-5 py-4">
+            {/* Title row */}
+            <div className="flex items-center gap-2.5 mb-2">
+              <h1 className="text-xl font-bold text-foreground tracking-tight leading-tight">{disc.name}</h1>
+              <Badge variant="outline" className="text-[10px] font-mono shrink-0">{disc.code}</Badge>
+            </div>
 
-        {/* Title + summary */}
-        <div className="px-5 pt-5 pb-4 border-b border-border">
-          <div className="flex items-start justify-between gap-4 flex-wrap">
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-2.5 mb-1.5">
-                <div className="w-9 h-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                  <BookOpen className="w-4 h-4" />
-                </div>
-                <div className="min-w-0">
-                  <h1 className="text-xl font-bold text-foreground tracking-tight leading-tight truncate">{disc.name}</h1>
-                  <p className="text-[11px] text-muted-foreground font-mono mt-0.5">{disc.code} · 2.º Ano · Engenharia Informática</p>
-                </div>
-              </div>
-              <p className="text-[13px] text-foreground/75 leading-relaxed mt-2 max-w-3xl">{disc.summary}</p>
+            {/* Description */}
+            <p className="text-[13px] text-muted-foreground leading-relaxed max-w-3xl">
+              {disc.summary}
+            </p>
+
+            {/* Meta badges row */}
+            <div className="flex items-center gap-2 flex-wrap mt-3">
+              <Badge variant="outline" className="text-[11px] bg-background/80 gap-1">
+                <Users className="w-3 h-3" /> 2.º Ano · Engenharia Informática
+              </Badge>
+              <Badge variant="outline" className="text-[11px] bg-background/80 gap-1">
+                <MapPin className="w-3 h-3" /> {disc.room}
+              </Badge>
+              <Badge variant="outline" className="text-[11px] bg-background/80 gap-1">
+                <Clock className="w-3 h-3" /> {disc.schedule}
+              </Badge>
             </div>
           </div>
+        </div>
 
-          {/* Metadata row — Professor / Local / Horário */}
-          <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
-            {/* Professor */}
-            <div className="rounded-md border border-border bg-background px-3 py-2.5">
-              <p className="text-[9px] uppercase tracking-[0.12em] text-muted-foreground font-semibold mb-1.5 flex items-center gap-1">
-                <GraduationCap className="w-3 h-3" /> Professor
-              </p>
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 text-[10px] font-semibold ring-1 ring-primary/15">
-                  {disc.professor.replace("Prof. ", "").split(" ").slice(0, 2).map(n => n[0]).join("")}
-                </div>
-                <Link to="/student/contacts" className="text-[12.5px] font-semibold text-foreground hover:text-primary transition-colors truncate">
-                  {disc.professor}
-                </Link>
-              </div>
-              <div className="flex gap-1.5 mt-2">
-                <Link to="/student/chat" className="flex-1">
-                  <Button variant="outline" size="sm" className="h-7 px-2 text-[10px] gap-1 w-full">
-                    <MessageSquare className="w-3 h-3" /> Chat
-                  </Button>
-                </Link>
-                <Link to="/student/email" className="flex-1">
-                  <Button variant="outline" size="sm" className="h-7 px-2 text-[10px] gap-1 w-full">
-                    <Mail className="w-3 h-3" /> Email
-                  </Button>
-                </Link>
-              </div>
+        {/* Professor strip — clear field with Chat + Email actions */}
+        <div className="px-5 py-3 border-b border-border bg-muted/15 flex items-center gap-3 flex-wrap">
+          <p className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground font-semibold flex items-center gap-1 shrink-0">
+            <GraduationCap className="w-3 h-3" /> Professor
+          </p>
+          <div className="flex items-center gap-2 min-w-0 flex-1">
+            <div className="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 text-[10px] font-semibold ring-1 ring-primary/15">
+              {disc.professor.replace("Prof. ", "").split(" ").slice(0, 2).map(n => n[0]).join("")}
             </div>
-
-            {/* Local */}
-            <div className="rounded-md border border-border bg-background px-3 py-2.5">
-              <p className="text-[9px] uppercase tracking-[0.12em] text-muted-foreground font-semibold mb-1.5 flex items-center gap-1">
-                <MapPin className="w-3 h-3" /> Local
-              </p>
-              <p className="text-[13px] font-semibold text-foreground leading-tight">{disc.room}</p>
-              <p className="text-[10.5px] text-muted-foreground mt-1">Faculdade de Ciências Exatas</p>
-            </div>
-
-            {/* Horário */}
-            <div className="rounded-md border border-border bg-background px-3 py-2.5">
-              <p className="text-[9px] uppercase tracking-[0.12em] text-muted-foreground font-semibold mb-1.5 flex items-center gap-1">
-                <Clock className="w-3 h-3" /> Horário
-              </p>
-              <p className="text-[13px] font-semibold text-foreground leading-tight">{disc.schedule}</p>
-              <p className="text-[10.5px] text-muted-foreground mt-1">Semestre em curso</p>
-            </div>
+            <Link to="/student/contacts" className="text-[13px] font-semibold text-foreground hover:text-primary transition-colors truncate">
+              {disc.professor}
+            </Link>
+          </div>
+          <div className="flex items-center gap-1.5 shrink-0">
+            <Link to="/student/chat">
+              <Button variant="outline" size="sm" className="h-7 px-2.5 text-[11px] gap-1.5">
+                <MessageSquare className="w-3 h-3" /> Chat
+              </Button>
+            </Link>
+            <Link to="/student/email">
+              <Button variant="outline" size="sm" className="h-7 px-2.5 text-[11px] gap-1.5">
+                <Mail className="w-3 h-3" /> Email
+              </Button>
+            </Link>
           </div>
         </div>
 
