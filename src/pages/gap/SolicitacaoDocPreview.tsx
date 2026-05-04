@@ -140,6 +140,27 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
                 <p className="text-[10.5px] leading-[1.6] whitespace-pre-line line-clamp-6 text-foreground/85">
                   {s.descricao}
                 </p>
+                {anexos.length > 0 && (
+                  <div className="mt-2.5 flex flex-wrap gap-1.5">
+                    {anexos.slice(0, 4).map((a, i) => {
+                      const ext = (a.nome.split(".").pop() || "").toLowerCase();
+                      const tipo: "pdf" | "doc" | "image" | "sheet" =
+                        ["png","jpg","jpeg","gif","webp"].includes(ext) ? "image" :
+                        ["xls","xlsx","csv"].includes(ext) ? "sheet" :
+                        ["doc","docx"].includes(ext) ? "doc" : "pdf";
+                      const ic = anexoIcon(tipo);
+                      return (
+                        <div key={i} className="inline-flex items-center gap-1.5 px-1.5 py-0.5 rounded-sm border border-doc-accent/30 bg-white">
+                          <div className={`w-4 h-4 rounded-sm border flex items-center justify-center ${ic.cls}`}>
+                            <ic.Icon className="w-2.5 h-2.5" />
+                          </div>
+                          <span className="text-[8.5px] font-semibold text-foreground/85 truncate max-w-[180px]">{a.nome}</span>
+                          <Paperclip className="w-2.5 h-2.5 text-doc-accent ml-0.5" />
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
                 {s.notaInterna && (
                   <p className="mt-2.5 text-[10px] leading-snug whitespace-pre-line line-clamp-2 text-foreground/65 italic border-l-2 border-doc-accent/40 pl-2.5">
                     <span className="not-italic font-bold text-doc-accent text-[7.5px] uppercase tracking-[0.22em] mr-1.5">Nota</span>
@@ -175,38 +196,12 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
               </div>
             </Section>
 
-            {/* IV · Anexos */}
-            {anexos.length > 0 && (
-              <Section number="IV" title="Anexos">
-                <div className="border border-doc-accent/35 rounded-sm overflow-hidden">
-                  <table className="w-full text-[9.5px]">
-                    <thead className="bg-doc-accent/[0.06]">
-                      <tr className="border-b border-doc-accent/35">
-                        <th className="text-left px-3 py-1.5 font-bold w-[6%] text-doc-accent uppercase tracking-[0.16em] text-[7.5px]">#</th>
-                        <th className="text-left px-3 py-1.5 font-bold text-doc-accent uppercase tracking-[0.16em] text-[7.5px]">Ficheiro</th>
-                        <th className="text-right px-3 py-1.5 font-bold w-[18%] text-doc-accent uppercase tracking-[0.16em] text-[7.5px]">Tamanho</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-foreground/10">
-                      {anexos.slice(0, 4).map((a, i) => (
-                        <tr key={i}>
-                          <td className="px-3 py-1 text-foreground/60 tabular-nums">{String(i + 1).padStart(2, "0")}</td>
-                          <td className="px-3 py-1 font-medium truncate">{a.nome}</td>
-                          <td className="px-3 py-1 text-right text-foreground/60 tabular-nums">{a.tamanho}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </Section>
-            )}
-
-            {/* V · Notas & Comentários */}
+            {/* IV · Notas & Comentários */}
             {(() => {
               const comentarios = getComentariosSolicitacao(s.id, s.responsavelDestino ?? `Equipa ${dest.label}`);
               if (comentarios.length === 0) return null;
               return (
-                <Section number={anexos.length > 0 ? "V" : "IV"} title="Notas & Comentários">
+                <Section number="IV" title="Notas & Comentários">
                   <div className="border border-doc-accent/35 rounded-sm overflow-hidden divide-y divide-foreground/10">
                     {comentarios.map((c, i) => (
                       <div key={i} className="px-3 py-2 bg-doc-accent/[0.02]">

@@ -130,7 +130,7 @@ export default function AtendimentoDocPreview({ atendimento: a }: Props) {
                     <p className="text-[7.5px] uppercase tracking-[0.22em] font-bold" style={{ color: ACCENT }}>Sessão</p>
                   </div>
                   <div className="px-3 py-1.5">
-                    <p className="text-[7.5px] uppercase tracking-[0.22em] font-bold" style={{ color: ACCENT }}>Calendarização</p>
+                    <p className="text-[7.5px] uppercase tracking-[0.22em] font-bold" style={{ color: ACCENT }}>Responsável</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-3">
