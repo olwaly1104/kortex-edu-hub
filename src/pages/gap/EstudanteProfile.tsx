@@ -40,9 +40,7 @@ export default function GapEstudanteProfile() {
   const sols = solicitacoes.filter(s => s.matricula === discente.matricula);
   const atendimentos = gapAtendimentos.filter(a => a.matricula === discente.matricula);
 
-  const pendentes = sols.filter(s => s.estado === "recebida").length;
-  const emExecucao = sols.filter(s => s.estado === "em_execucao").length;
-  const concluidas = sols.filter(s => s.estado === "concluida").length;
+
 
   const email = `${discente.nome.toLowerCase().split(" ").slice(0, 2).join(".")}@upra.kor`;
 
