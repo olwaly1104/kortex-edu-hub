@@ -3,14 +3,18 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger,
+} from "@/components/ui/dialog";
+import {
   ArrowLeft, Mail, MessageCircle, Users, Phone, MapPin, UserCheck, Calendar, GraduationCap,
-  HelpCircle, Clock, CheckCircle2, AlertCircle, CalendarDays, Heart, Inbox, BookOpen,
+  HelpCircle, CalendarDays, Heart, Inbox, FileText,
 } from "lucide-react";
 import {
   gapEstudantesSeguimento, solicitacoes, gapAtendimentos,
   estadoSolicitacaoConfig, tipoConfig, destinoConfig,
 } from "@/data/gapData";
 import { cn } from "@/lib/utils";
+import EstudanteRelatorioDoc from "./EstudanteRelatorioDoc";
 
 const riscoConfig = {
   alto:  { label: "Risco Alto",  bg: "bg-destructive/10 text-destructive border-destructive/30" },
