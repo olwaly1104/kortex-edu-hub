@@ -245,13 +245,13 @@ export default function StudentSolicitacoes() {
                         {destCfg.label}
                       </Badge>
                     </div>
+                    <div className="text-[11px] text-muted-foreground tabular-nums flex items-center gap-1">
+                      <Calendar className="w-3 h-3" /> {fmt(s.dataSubmissao)}
+                    </div>
                     <div className="min-w-0">
                       <Badge variant="outline" className={cn("text-[10px] py-0 h-5 border font-medium", st.color)}>
                         {st.label}
                       </Badge>
-                    </div>
-                    <div className="text-right text-[11px] text-muted-foreground tabular-nums flex items-center justify-end gap-1">
-                      <Calendar className="w-3 h-3" /> {fmt(s.dataSubmissao)}
                     </div>
                     <ArrowUpRight className="w-3.5 h-3.5 text-muted-foreground/40 group-hover:text-primary transition-colors" />
                   </div>
