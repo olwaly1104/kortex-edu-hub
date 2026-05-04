@@ -14,13 +14,14 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import {
-  HelpCircle, Plus, Search, X, Inbox, Clock, CheckCircle2, AlertCircle, Send, ChevronRight,
+  HelpCircle, Plus, Search, X, Inbox, Clock, CheckCircle2, AlertCircle, Send, ChevronRight, Eye,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   solicitacoes as gapSolicitacoes, Solicitacao, EstadoSolicitacao,
   estadoSolicitacaoConfig, destinoConfig, tipoConfig, categoriaConfig, Categoria,
 } from "@/data/gapData";
+import SolicitacaoDocPreview from "@/pages/gap/SolicitacaoDocPreview";
 
 const STUDENT_MATRICULA = "2024001"; // Ana Luísa Ferreira (logged in)
 const TODAY = "2025-12-16";
