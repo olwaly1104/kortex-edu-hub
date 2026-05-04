@@ -808,3 +808,41 @@ export const ticketStatusConfig: Record<GapTicket["estado"], { label: string; co
 };
 
 export type TicketStatus = GapTicket["estado"];
+
+// ─── Notas & Comentários (mock determinístico por solicitação) ──────────────
+export interface ComentarioSolicitacao {
+  data: string;
+  actor: string;
+  texto: string;
+}
+
+const COMENTARIOS_POOL: string[] = [
+  "Solicitação revista. Toda a documentação está conforme — a aguardar validação interna.",
+  "Confirmado o histórico do discente no sistema. Procedo com o encaminhamento.",
+  "Pedido em análise. Necessária verificação adicional junto da Tesouraria.",
+  "Discente contactado por email para clarificação dos dados submetidos.",
+  "Documento processado e validado. A preparar resposta formal.",
+  "Caso atribuído. Prazo interno definido para os próximos 2 dias úteis.",
+  "Verificação concluída. Sem inconformidades detectadas no registo.",
+  "Encaminhado para confirmação do supervisor antes da execução final.",
+];
+
+export function getComentariosSolicitacao(id: string, responsavel: string): ComentarioSolicitacao[] {
+  // Deterministic pseudo-random based on id
+  let h = 0;
+  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
+  const count = 2 + (h % 2); // 2-3 comments
+  const baseDate = new Date("2025-12-13T08:30:00");
+  const out: ComentarioSolicitacao[] = [];
+  for (let i = 0; i < count; i++) {
+    const idx = (h + i * 17) % COMENTARIOS_POOL.length;
+    const d = new Date(baseDate.getTime() + i * 26 * 3600 * 1000 + ((h >> (i + 1)) % 7) * 3600 * 1000);
+    const dStr = d.toISOString().slice(0, 16).replace("T", " ");
+    out.push({
+      data: dStr,
+      actor: i % 2 === 0 ? responsavel : "Coord. GAP · Dra. Helena Cabral",
+      texto: COMENTARIOS_POOL[idx],
+    });
+  }
+  return out;
+}
