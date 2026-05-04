@@ -169,67 +169,65 @@ export default function GapInicio() {
         </Card>
       </div>
 
-      {/* Row 2: Solicitações Recentes + Próximos Agendamentos + Acções */}
-      <div className="grid lg:grid-cols-5 gap-6">
-        <div className="lg:col-span-3 space-y-4 flex flex-col">
-          <Card className="p-5">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
-                <HelpCircle className="w-5 h-5 text-primary" /> Solicitações Recentes
-              </h2>
-              <Link to="/gap/solicitacoes" className="text-sm text-primary hover:underline flex items-center gap-1">
-                Ver todas <ChevronRight className="w-4 h-4" />
-              </Link>
-            </div>
-            <div className="space-y-2">
-              {recentes.map(t => {
-                const cat = categoriaConfig[t.categoria];
-                const st = ticketStatusConfig[t.estado];
-                const pr = prioridadeConfig[t.prioridade];
-                return (
-                  <Link key={t.id} to="/gap/solicitacoes">
-                    <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl border border-border bg-card hover:bg-muted/40 transition-colors cursor-pointer">
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-semibold text-foreground line-clamp-1">{t.assunto}</p>
-                        <p className="text-[10px] text-muted-foreground">{t.discente} · {t.curso}</p>
-                      </div>
-                      <Badge variant="outline" className={`text-[10px] ${cat.color}`}>{cat.label}</Badge>
-                      <Badge variant="outline" className={`text-[10px] ${st.color}`}>{st.label}</Badge>
-                      <Badge variant="outline" className={`text-[9px] ${pr.color}`}>{pr.label}</Badge>
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-          </Card>
-
-          <Card className="p-5 flex-1">
-            <h2 className="text-base font-semibold text-foreground mb-3 flex items-center gap-2">
-              <Play className="w-4 h-4 text-primary" /> Acções Rápidas
+      {/* Row 2: Solicitações Recentes (main) + Próximos Agendamentos (side) */}
+      <div className="grid lg:grid-cols-3 gap-6">
+        <Card className="p-5 lg:col-span-2">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
+              <HelpCircle className="w-5 h-5 text-primary" /> Solicitações Recentes
+              <Badge variant="outline" className="text-[10px] font-mono">{recentes.length}</Badge>
             </h2>
-            <div className="flex flex-col gap-1.5">
-              {[
-                { label: "Dashboard GAP", icon: BarChart3, path: "/gap", color: "bg-primary/10 text-primary" },
-                { label: "Solicitações", icon: HelpCircle, path: "/gap/solicitacoes", color: "bg-orange-100 text-orange-600" },
-                { label: "Agendamentos", icon: CalendarDays, path: "/gap/agendamentos", color: "bg-emerald-100 text-emerald-600" },
-                { label: "Discentes em Seguimento", icon: Heart, path: "/gap/estudantes", color: "bg-pink-100 text-pink-600" },
-              ].map(a => (
-                <Link key={a.path} to={a.path}>
-                  <div className="flex items-center gap-2.5 px-3 py-2 rounded-lg border border-border hover:bg-muted/40 transition-colors cursor-pointer">
-                    <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${a.color}`}>
-                      <a.icon className="w-3.5 h-3.5" />
+            <Link to="/gap/solicitacoes" className="text-sm text-primary hover:underline flex items-center gap-1">
+              Ver todas <ChevronRight className="w-4 h-4" />
+            </Link>
+          </div>
+          <div className="divide-y divide-border">
+            {recentes.map(s => {
+              const st = estadoSolicitacaoConfig[s.estado];
+              const dest = destinoConfig[s.destino];
+              const tipoCfg = tipoConfig[s.tipo];
+              const dSub = new Date(s.dataSubmissao);
+              return (
+                <Link key={s.id} to={`/gap/solicitacoes/${s.id}`}>
+                  <div className="flex items-center gap-3 px-2 py-3 hover:bg-muted/40 transition-colors cursor-pointer">
+                    {/* Date tile */}
+                    <div className="shrink-0 w-11 text-center">
+                      <p className="text-[9px] uppercase tracking-wider text-muted-foreground font-semibold">
+                        {dSub.toLocaleDateString("pt-PT", { month: "short" }).replace(".", "")}
+                      </p>
+                      <p className="text-base font-bold text-foreground tabular-nums leading-none mt-0.5">
+                        {String(dSub.getDate()).padStart(2, "0")}
+                      </p>
                     </div>
-                    <p className="text-xs font-medium text-foreground">{a.label}</p>
-                    <ChevronRight className="w-3.5 h-3.5 text-muted-foreground ml-auto" />
+                    <div className="w-px h-9 bg-border shrink-0" />
+                    {/* Body */}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-foreground line-clamp-1 leading-tight">
+                        {tipoCfg?.label ?? s.tipo}
+                      </p>
+                      <p className="text-[11px] text-muted-foreground mt-0.5 truncate">
+                        {s.discente} · <span className="font-mono">{s.id}</span>
+                      </p>
+                    </div>
+                    {/* Badges */}
+                    <div className="hidden md:flex items-center gap-1.5 shrink-0">
+                      <Badge variant="outline" className="text-[10px] font-medium">
+                        {dest.label}
+                      </Badge>
+                      <Badge variant="outline" className={cn("text-[10px] font-semibold gap-1", st.color)}>
+                        <span className={cn("w-1.5 h-1.5 rounded-full", estadoDot[s.estado])} />
+                        {st.label}
+                      </Badge>
+                    </div>
                   </div>
                 </Link>
-              ))}
-            </div>
-          </Card>
-        </div>
+              );
+            })}
+          </div>
+        </Card>
 
         {/* Próximos Agendamentos */}
-        <Card className="p-5 lg:col-span-2">
+        <Card className="p-5">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
               <CalendarDays className="w-5 h-5 text-secondary" /> Próximos Agendamentos
