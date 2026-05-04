@@ -421,6 +421,89 @@ export default function DisciplineDetail() {
             <p className="text-sm text-muted-foreground py-8 text-center">Sem informação de avaliação.</p>
           )}
         </TabsContent>
+
+        {/* Anúncios */}
+        <TabsContent value="anuncios" className="space-y-3">
+          {announcements.length > 0 ? announcements.map((ann) => {
+            const typeCfg: Record<string, { cls: string; label: string }> = {
+              urgente:   { cls: "bg-destructive/10 text-destructive border-destructive/20", label: "Urgente" },
+              evento:    { cls: "bg-primary/10 text-primary border-primary/20", label: "Evento" },
+              academico: { cls: "bg-amber-50 text-amber-700 border-amber-200", label: "Académico" },
+              geral:     { cls: "bg-muted text-muted-foreground border-border", label: "Geral" },
+            };
+            const tc = typeCfg[ann.type];
+            return (
+              <Card key={ann.id} className="p-4 border-l-[3px] hover:shadow-md transition-all"
+                style={{ borderLeftColor: ann.type === "urgente" ? "hsl(var(--destructive))" : "hsl(var(--primary))" }}>
+                <div className="flex items-start gap-3">
+                  <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center shrink-0", tc.cls)}>
+                    <Megaphone className="w-4 h-4" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                      <Badge variant="outline" className={cn("text-[10px]", tc.cls)}>{tc.label}</Badge>
+                      <span className="text-[10px] text-muted-foreground tabular-nums">{ann.date}</span>
+                    </div>
+                    <p className="text-sm font-semibold text-foreground leading-snug">{ann.title}</p>
+                    <p className="text-[12.5px] text-muted-foreground mt-1 leading-relaxed">{ann.content}</p>
+                    <p className="text-[11px] text-muted-foreground/80 mt-2 italic">— {ann.author}</p>
+                  </div>
+                </div>
+              </Card>
+            );
+          }) : (
+            <p className="text-sm text-muted-foreground py-8 text-center">Sem anúncios para esta cadeira.</p>
+          )}
+        </TabsContent>
+
+        {/* Recursos */}
+        <TabsContent value="recursos" className="space-y-3">
+          {(() => {
+            const recursos = [
+              { id: "r1", name: "Manual de Cálculo Integral — Volume I", type: "Manual", format: "pdf", size: "8.4 MB", author: "James Stewart", year: "2020" },
+              { id: "r2", name: "Tabela de Integrais e Derivadas", type: "Formulário", format: "pdf", size: "320 KB", author: "Departamento de Matemática", year: "2024" },
+              { id: "r3", name: "Exercícios Resolvidos — Séries Numéricas", type: "Exercícios", format: "pdf", size: "1.2 MB", author: "Prof. António Silva", year: "2024" },
+              { id: "r4", name: "Vídeo-aulas Khan Academy — Integrais", type: "Vídeo Externo", format: "link", size: "—", author: "Khan Academy", year: "2023" },
+              { id: "r5", name: "Equações Diferenciais Ordinárias — Notas de Apoio", type: "Apontamentos", format: "pdf", size: "2.1 MB", author: "Prof. António Silva", year: "2024" },
+              { id: "r6", name: "Transformadas de Laplace — Aplicações", type: "Capítulo de Livro", format: "pdf", size: "3.6 MB", author: "Erwin Kreyszig", year: "2019" },
+            ];
+            return (
+              <Card className="overflow-hidden">
+                <div className="px-4 py-3 border-b bg-muted/20 flex items-center justify-between">
+                  <p className="text-sm font-semibold text-foreground flex items-center gap-2">
+                    <BookMarked className="w-4 h-4 text-primary" /> Bibliografia & Recursos
+                  </p>
+                  <span className="text-[11px] text-muted-foreground tabular-nums">{recursos.length} recursos</span>
+                </div>
+                <div className="divide-y divide-border">
+                  {recursos.map(r => (
+                    <div key={r.id} className="px-4 py-3 flex items-center gap-3 hover:bg-muted/30 transition-colors">
+                      <div className={cn("w-9 h-9 rounded-lg border flex items-center justify-center shrink-0",
+                        r.format === "link" ? "bg-violet-50 border-violet-200 text-violet-600" : "bg-red-50 border-red-200 text-red-600")}>
+                        <FileText className="w-4 h-4" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-foreground truncate">{r.name}</p>
+                        <div className="flex items-center gap-2 text-[11px] text-muted-foreground mt-0.5 flex-wrap">
+                          <Badge variant="outline" className="text-[9px] h-4 py-0 px-1.5">{r.type}</Badge>
+                          <span>{r.author}</span>
+                          <span className="text-muted-foreground/40">·</span>
+                          <span>{r.year}</span>
+                          <span className="text-muted-foreground/40">·</span>
+                          <span className="tabular-nums">{r.size}</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1 shrink-0">
+                        <button className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground" title="Ver"><Eye className="w-4 h-4" /></button>
+                        <button className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground" title="Descarregar"><Download className="w-4 h-4" /></button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            );
+          })()}
+        </TabsContent>
       </Tabs>
     </div>
   );
