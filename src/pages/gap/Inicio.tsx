@@ -172,59 +172,86 @@ export default function GapInicio() {
 
       {/* Row 2: Solicitações Recentes (main) + Próximos Agendamentos (side) */}
       <div className="grid lg:grid-cols-3 gap-6">
-        <Card className="p-5 lg:col-span-2">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
-              <HelpCircle className="w-5 h-5 text-primary" /> Solicitações Recentes
-              <Badge variant="outline" className="text-[10px] font-mono">{recentes.length}</Badge>
-            </h2>
-            <Link to="/gap/solicitacoes" className="text-sm text-primary hover:underline flex items-center gap-1">
-              Ver todas <ChevronRight className="w-4 h-4" />
+        <Card className="overflow-hidden lg:col-span-2 flex flex-col">
+          <div className="flex items-center justify-between px-5 py-4 border-b">
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                <HelpCircle className="w-4 h-4" />
+              </div>
+              <div className="min-w-0">
+                <h2 className="text-base font-semibold text-foreground leading-tight">Solicitações Recentes</h2>
+                <p className="text-[11px] text-muted-foreground truncate">Pedidos por encaminhar ou em execução</p>
+              </div>
+              {recentes.length > 0 && (
+                <Badge variant="outline" className="ml-1 text-[10px] bg-primary/10 text-primary border-primary/20">
+                  {recentes.length}
+                </Badge>
+              )}
+            </div>
+            <Link to="/gap/solicitacoes" className="text-[11px] font-medium text-primary hover:underline inline-flex items-center gap-1 shrink-0">
+              Ver todas <ChevronRight className="w-3 h-3" />
             </Link>
           </div>
-          <div className="divide-y divide-border">
-            {recentes.map(s => {
-              const st = estadoSolicitacaoConfig[s.estado];
-              const dest = destinoConfig[s.destino];
-              const tipoCfg = tipoConfig[s.tipo];
-              const dSub = new Date(s.dataSubmissao);
-              return (
-                <Link key={s.id} to={`/gap/solicitacoes/${s.id}`}>
-                  <div className="flex items-center gap-3 px-2 py-3 hover:bg-muted/40 transition-colors cursor-pointer">
-                    {/* Date tile */}
-                    <div className="shrink-0 w-11 text-center">
-                      <p className="text-[9px] uppercase tracking-wider text-muted-foreground font-semibold">
-                        {dSub.toLocaleDateString("pt-PT", { month: "short" }).replace(".", "")}
-                      </p>
-                      <p className="text-base font-bold text-foreground tabular-nums leading-none mt-0.5">
-                        {String(dSub.getDate()).padStart(2, "0")}
-                      </p>
-                    </div>
-                    <div className="w-px h-9 bg-border shrink-0" />
-                    {/* Body */}
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-foreground line-clamp-1 leading-tight">
-                        {tipoCfg?.label ?? s.tipo}
-                      </p>
-                      <p className="text-[11px] text-muted-foreground mt-0.5 truncate">
-                        {s.discente} · <span className="font-mono">{s.id}</span>
-                      </p>
-                    </div>
-                    {/* Badges */}
-                    <div className="hidden md:flex items-center gap-1.5 shrink-0">
-                      <Badge variant="outline" className="text-[10px] font-medium">
-                        {dest.label}
-                      </Badge>
-                      <Badge variant="outline" className={cn("text-[10px] font-semibold gap-1", st.color)}>
-                        <span className={cn("w-1.5 h-1.5 rounded-full", estadoDot[s.estado])} />
-                        {st.label}
-                      </Badge>
-                    </div>
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
+
+          {recentes.length === 0 ? (
+            <div className="py-12 text-center">
+              <CheckCircle className="w-10 h-10 text-emerald-500/50 mx-auto mb-2" />
+              <p className="text-sm text-muted-foreground">Sem solicitações pendentes.</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b bg-muted/30">
+                    <th className="text-left px-3 py-2 font-medium text-muted-foreground text-xs uppercase tracking-wider">Solicitação</th>
+                    <th className="text-left px-3 py-2 font-medium text-muted-foreground text-xs uppercase tracking-wider">Discente</th>
+                    <th className="text-left px-3 py-2 font-medium text-muted-foreground text-xs uppercase tracking-wider">Categoria</th>
+                    <th className="text-left px-3 py-2 font-medium text-muted-foreground text-xs uppercase tracking-wider">Destino</th>
+                    <th className="text-center px-3 py-2 font-medium text-muted-foreground text-xs uppercase tracking-wider whitespace-nowrap">Estado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {recentes.map(s => {
+                    const st = estadoSolicitacaoConfig[s.estado];
+                    const dest = destinoConfig[s.destino];
+                    const tCfg = tipoConfig[s.tipo];
+                    const catKey = tCfg?.categoria as Categoria | undefined;
+                    const catCfg = catKey ? solCategoriaConfig[catKey] : undefined;
+                    return (
+                      <tr
+                        key={s.id}
+                        onClick={() => navigate(`/gap/solicitacoes/${s.id}`)}
+                        className="border-b last:border-0 hover:bg-muted/30 transition-colors cursor-pointer"
+                      >
+                        <td className="px-3 py-2">
+                          <p className="font-medium text-foreground leading-tight text-xs line-clamp-1">{tCfg?.label ?? s.tipo}</p>
+                          <p className="text-[11px] text-muted-foreground tabular-nums mt-0.5">{s.id}</p>
+                        </td>
+                        <td className="px-3 py-2">
+                          <p className="text-xs text-foreground leading-tight line-clamp-1">{s.discente}</p>
+                          <p className="text-[11px] text-muted-foreground tabular-nums mt-0.5">{s.matricula}</p>
+                        </td>
+                        <td className="px-3 py-2">
+                          {catCfg ? (
+                            <Badge variant="outline" className={cn("text-[10px] font-medium", catCfg.color)}>{catCfg.label}</Badge>
+                          ) : <span className="text-xs text-muted-foreground">—</span>}
+                        </td>
+                        <td className="px-3 py-2">
+                          <Badge variant="outline" className={cn("text-[10px] font-medium", dest.color)}>{dest.label}</Badge>
+                        </td>
+                        <td className="px-3 py-2 text-center">
+                          <span className={cn("inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[10px] font-semibold", st.color)}>
+                            <span className={cn("w-1.5 h-1.5 rounded-full", estadoDot[s.estado])} />
+                            {st.label}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
         </Card>
 
         {/* Próximos Agendamentos */}
