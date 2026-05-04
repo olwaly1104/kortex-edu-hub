@@ -189,16 +189,6 @@ export default function EstudanteRelatorioDoc({ discente, solicitacoes: sols, an
               )}
             </Section>
 
-            {/* IV · Observações */}
-            <Section number="IV" title="Observações">
-              <div className="border-t-[3px] border-doc-accent bg-doc-accent/[0.035] px-5 py-3">
-                <p className="text-[10px] leading-[1.6] text-foreground/85">
-                  O presente relatório consolida todas as solicitações submetidas pelo(a) discente
-                  durante o ano letivo {anoLetivo}, tal como registadas na plataforma institucional.
-                  As taxas de conclusão e estado refletem o estado atual no sistema à data de emissão deste documento.
-                </p>
-              </div>
-            </Section>
           </div>
 
           {/* ── Footer ───────────────────────────────────────── */}
