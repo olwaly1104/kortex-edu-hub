@@ -5,11 +5,20 @@ import { Badge } from "@/components/ui/badge";
 import {
   ChevronRight, Clock, CheckCircle, Play,
   Calendar as CalendarIcon, Megaphone, MapPin,
-  HelpCircle, CalendarDays, Users, Heart,
-  AlertTriangle, BarChart3,
+  HelpCircle, CalendarDays, Users,
+  AlertTriangle,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { gapTickets, gapAtendimentos, gapKpis, ticketStatusConfig, ticketCategoriaConfig as categoriaConfig, prioridadeConfig } from "@/data/gapData";
+import { cn } from "@/lib/utils";
+import { gapTickets, gapAtendimentos, gapKpis, ticketCategoriaConfig as categoriaConfig } from "@/data/gapData";
+import { solicitacoes, estadoSolicitacaoConfig, destinoConfig, tipoConfig } from "@/data/gapData";
+
+const estadoDot: Record<string, string> = {
+  recebida: "bg-amber-500",
+  em_execucao: "bg-sky-500",
+  concluida: "bg-emerald-500",
+  rejeitada: "bg-destructive",
+};
 
 const typeStyles: Record<string, { bg: string; label: string }> = {
   urgente: { bg: "bg-destructive text-destructive-foreground", label: "Urgente" },
