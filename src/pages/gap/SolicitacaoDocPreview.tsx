@@ -140,6 +140,27 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
                 <p className="text-[10.5px] leading-[1.6] whitespace-pre-line line-clamp-6 text-foreground/85">
                   {s.descricao}
                 </p>
+                {anexos.length > 0 && (
+                  <div className="mt-2.5 flex flex-wrap gap-1.5">
+                    {anexos.slice(0, 4).map((a, i) => {
+                      const ext = (a.nome.split(".").pop() || "").toLowerCase();
+                      const tipo: "pdf" | "doc" | "image" | "sheet" =
+                        ["png","jpg","jpeg","gif","webp"].includes(ext) ? "image" :
+                        ["xls","xlsx","csv"].includes(ext) ? "sheet" :
+                        ["doc","docx"].includes(ext) ? "doc" : "pdf";
+                      const ic = anexoIcon(tipo);
+                      return (
+                        <div key={i} className="inline-flex items-center gap-1.5 px-1.5 py-0.5 rounded-sm border border-doc-accent/30 bg-white">
+                          <div className={`w-4 h-4 rounded-sm border flex items-center justify-center ${ic.cls}`}>
+                            <ic.Icon className="w-2.5 h-2.5" />
+                          </div>
+                          <span className="text-[8.5px] font-semibold text-foreground/85 truncate max-w-[180px]">{a.nome}</span>
+                          <Paperclip className="w-2.5 h-2.5 text-doc-accent ml-0.5" />
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
                 {s.notaInterna && (
                   <p className="mt-2.5 text-[10px] leading-snug whitespace-pre-line line-clamp-2 text-foreground/65 italic border-l-2 border-doc-accent/40 pl-2.5">
                     <span className="not-italic font-bold text-doc-accent text-[7.5px] uppercase tracking-[0.22em] mr-1.5">Nota</span>
