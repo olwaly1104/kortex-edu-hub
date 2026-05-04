@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -10,15 +11,14 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import {
-  HelpCircle, Plus, Search, X, Inbox, Clock, CheckCircle2, AlertCircle, Send, ChevronRight, ChevronLeft, Eye,
-  Building2, Timer, FileText,
+  HelpCircle, Plus, Search, X, Inbox, Clock, CheckCircle2, AlertCircle, Send, ChevronRight, ChevronLeft,
+  Building2, Timer, FileText, ArrowUpRight, Calendar,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   solicitacoes as gapSolicitacoes, Solicitacao, EstadoSolicitacao,
   estadoSolicitacaoConfig, destinoConfig, tipoConfig, categoriaConfig, Categoria,
 } from "@/data/gapData";
-import SolicitacaoDocPreview from "@/pages/gap/SolicitacaoDocPreview";
 
 const STUDENT_MATRICULA = "2024001"; // Ana Luísa Ferreira (logged in)
 const TODAY = "2025-12-16";
@@ -41,7 +41,7 @@ type EstadoFilter = "todos" | "pendentes" | "em_execucao" | "concluidas" | "reje
 
 export default function StudentSolicitacoes() {
   const { toast } = useToast();
-  const [previewId, setPreviewId] = useState<string | null>(null);
+  const navigate = useNavigate();
   const [extras, setExtras] = useState<Solicitacao[]>([]);
   const [estado, setEstado] = useState<EstadoFilter>("todos");
   const [search, setSearch] = useState("");
@@ -99,7 +99,7 @@ export default function StudentSolicitacoes() {
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
-      {/* Header */}
+      {/* Page Header */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
@@ -112,27 +112,40 @@ export default function StudentSolicitacoes() {
         <NovaSolicitacaoDialog onCreate={onCreate} totalCount={extras.length} />
       </div>
 
+      {/* Hero stat strip */}
+      <Card className="overflow-hidden p-0 gap-0 border-border">
+        <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-border bg-gradient-to-r from-primary/[0.04] via-transparent to-transparent">
+          <StatCell icon={Inbox}        label="Total"       value={counts.todos}       tone="primary" />
+          <StatCell icon={Clock}        label="Pendentes"   value={counts.pendentes}   tone="amber" />
+          <StatCell icon={Send}         label="Em Execução" value={counts.em_execucao} tone="sky" />
+          <StatCell icon={CheckCircle2} label="Concluídas"  value={counts.concluidas}  tone="emerald" />
+        </div>
+      </Card>
+
       {/* Minhas Solicitações */}
-      <Card className="overflow-hidden border-border">
+      <Card className="overflow-hidden border-border p-0 gap-0">
         {/* Section header */}
-        <div className="px-5 py-4 border-b border-border bg-muted/20 flex items-center justify-between gap-4 flex-wrap">
+        <div className="px-5 py-3.5 border-b border-border bg-card flex items-center justify-between gap-4 flex-wrap">
           <div className="min-w-0">
-            <h2 className="text-[15px] font-semibold text-foreground flex items-center gap-2">
+            <h2 className="text-[14px] font-semibold text-foreground flex items-center gap-2">
               <Inbox className="w-4 h-4 text-primary" />
               Minhas Solicitações
+              <span className="text-[10px] font-medium text-muted-foreground tabular-nums px-1.5 py-0.5 rounded-md bg-muted ml-1">
+                {filtered.length}
+              </span>
             </h2>
             <p className="text-[11px] text-muted-foreground mt-0.5">
-              Histórico completo do ano lectivo {anoLetivo} · {counts.todos} {counts.todos === 1 ? "pedido" : "pedidos"}
+              Ano lectivo {anoLetivo}
             </p>
           </div>
 
-          {/* Compact search */}
-          <div className="relative w-full sm:w-64">
+          {/* Search */}
+          <div className="relative w-full sm:w-72">
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
             <Input
               value={search}
               onChange={e => setSearch(e.target.value)}
-              placeholder="Procurar pedido…"
+              placeholder="Procurar por assunto, tipo ou ID…"
               className="pl-8 h-8 text-xs bg-background"
             />
             {search && (
@@ -147,8 +160,8 @@ export default function StudentSolicitacoes() {
           </div>
         </div>
 
-        {/* Compact filter chips */}
-        <div className="px-5 py-2.5 border-b border-border bg-background flex items-center gap-1.5 flex-wrap">
+        {/* Filter chips */}
+        <div className="px-5 py-2 border-b border-border bg-muted/15 flex items-center gap-1.5 flex-wrap">
           {tabs.map(t => {
             const active = estado === t.key;
             return (
@@ -159,7 +172,7 @@ export default function StudentSolicitacoes() {
                 className={cn(
                   "inline-flex items-center gap-1.5 h-7 px-2.5 rounded-full border text-[11px] font-medium transition-colors",
                   active
-                    ? "bg-primary text-primary-foreground border-primary"
+                    ? "bg-primary text-primary-foreground border-primary shadow-sm"
                     : "bg-background text-muted-foreground border-border hover:bg-muted/60 hover:text-foreground"
                 )}
               >
@@ -173,6 +186,16 @@ export default function StudentSolicitacoes() {
               </button>
             );
           })}
+        </div>
+
+        {/* Table-style header */}
+        <div className="hidden md:grid grid-cols-[110px_1fr_120px_120px_110px_28px] gap-3 px-5 py-2 bg-muted/10 border-b border-border text-[10px] uppercase tracking-[0.08em] font-semibold text-muted-foreground">
+          <div>ID</div>
+          <div>Assunto</div>
+          <div>Categoria</div>
+          <div>Destino</div>
+          <div className="text-right">Submetido</div>
+          <div></div>
         </div>
 
         {/* Lista */}
@@ -196,56 +219,73 @@ export default function StudentSolicitacoes() {
                 <button
                   key={s.id}
                   type="button"
-                  onClick={() => setPreviewId(s.id)}
-                  className="w-full text-left px-5 py-4 hover:bg-muted/40 transition-colors flex items-start gap-4"
+                  onClick={() => navigate(`/student/solicitacoes/${s.id}`)}
+                  className="w-full text-left hover:bg-muted/40 transition-colors group"
                 >
-                  <span className={cn("w-2 h-2 rounded-full mt-2 shrink-0", estadoDot[s.estado])} />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1 flex-wrap">
-                      <span className="font-mono text-[11px] text-muted-foreground">{s.id}</span>
+                  {/* Desktop row */}
+                  <div className="hidden md:grid grid-cols-[110px_1fr_120px_120px_110px_28px] gap-3 px-5 py-3 items-center">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className={cn("w-1.5 h-1.5 rounded-full shrink-0", estadoDot[s.estado])} />
+                      <span className="font-mono text-[11px] text-muted-foreground truncate">{s.id}</span>
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[13px] font-semibold text-foreground leading-tight truncate">{s.assunto}</p>
+                      <div className="flex items-center gap-1.5 mt-0.5">
+                        <Badge variant="outline" className={cn("text-[10px] py-0 h-4 border font-medium", st.color)}>
+                          {st.label}
+                        </Badge>
+                        <span className="text-[11px] text-muted-foreground truncate">{tipoCfg?.label ?? s.tipo}</span>
+                      </div>
+                    </div>
+                    <div className="min-w-0">
                       {catCfg && (
-                        <Badge variant="outline" className={cn("text-[10px] py-0 h-4 border", catCfg.color)}>
+                        <Badge variant="outline" className={cn("text-[10px] py-0 h-5 border", catCfg.color)}>
                           {catCfg.label}
                         </Badge>
                       )}
-                      <Badge variant="outline" className={cn("text-[10px] py-0 h-4 border", destCfg.color)}>
+                    </div>
+                    <div className="min-w-0">
+                      <Badge variant="outline" className={cn("text-[10px] py-0 h-5 border", destCfg.color)}>
                         {destCfg.label}
                       </Badge>
                     </div>
-                    <p className="text-[14px] font-semibold text-foreground leading-snug truncate">{s.assunto}</p>
-                    <p className="text-[12px] text-muted-foreground mt-0.5 truncate">
-                      {tipoCfg?.label ?? s.tipo}
-                    </p>
+                    <div className="text-right text-[11px] text-muted-foreground tabular-nums flex items-center justify-end gap-1">
+                      <Calendar className="w-3 h-3" /> {fmt(s.dataSubmissao)}
+                    </div>
+                    <ArrowUpRight className="w-3.5 h-3.5 text-muted-foreground/40 group-hover:text-primary transition-colors" />
                   </div>
-                  <div className="text-right shrink-0">
-                    <Badge variant="outline" className={cn("text-[10px] py-0 h-5 border", st.color)}>
-                      {st.label}
-                    </Badge>
-                    <p className="text-[11px] text-muted-foreground mt-1 tabular-nums">{fmt(s.dataSubmissao)}</p>
+
+                  {/* Mobile row */}
+                  <div className="md:hidden px-5 py-3 flex items-start gap-3">
+                    <span className={cn("w-2 h-2 rounded-full mt-1.5 shrink-0", estadoDot[s.estado])} />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5 mb-1 flex-wrap">
+                        <span className="font-mono text-[10.5px] text-muted-foreground">{s.id}</span>
+                        <Badge variant="outline" className={cn("text-[10px] py-0 h-4 border", st.color)}>
+                          {st.label}
+                        </Badge>
+                      </div>
+                      <p className="text-[13px] font-semibold text-foreground leading-snug">{s.assunto}</p>
+                      <p className="text-[11px] text-muted-foreground mt-0.5 truncate">{tipoCfg?.label ?? s.tipo}</p>
+                      <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+                        {catCfg && (
+                          <Badge variant="outline" className={cn("text-[10px] py-0 h-4 border", catCfg.color)}>
+                            {catCfg.label}
+                          </Badge>
+                        )}
+                        <Badge variant="outline" className={cn("text-[10px] py-0 h-4 border", destCfg.color)}>
+                          {destCfg.label}
+                        </Badge>
+                        <span className="text-[10.5px] text-muted-foreground tabular-nums ml-auto">{fmt(s.dataSubmissao)}</span>
+                      </div>
+                    </div>
                   </div>
-                  <Eye className="w-4 h-4 text-muted-foreground/50 mt-2 shrink-0" />
                 </button>
               );
             })}
           </div>
         )}
       </Card>
-
-      {/* Document preview dialog */}
-      <Dialog open={!!previewId} onOpenChange={(v) => { if (!v) setPreviewId(null); }}>
-        <DialogContent className="max-w-5xl w-[95vw] h-[92vh] p-0 gap-0 overflow-hidden">
-          <DialogHeader className="sr-only">
-            <DialogTitle>Documento Pedido-{previewId}</DialogTitle>
-            <DialogDescription>Pré-visualização do documento institucional gerado.</DialogDescription>
-          </DialogHeader>
-          {previewId && (() => {
-            const s = own.find(x => x.id === previewId);
-            if (!s) return null;
-            const anexos = (s.anexos ?? []).map(a => ({ nome: a.nome, tamanho: "—" }));
-            return <SolicitacaoDocPreview solicitacao={s} anexos={anexos} />;
-          })()}
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
@@ -573,3 +613,24 @@ function FieldBlock({ n, title, optional, children }: { n: number; title: string
     </section>
   );
 }
+
+function StatCell({ icon: Icon, label, value, tone }: { icon: any; label: string; value: number; tone: "primary" | "amber" | "sky" | "emerald" }) {
+  const toneCls: Record<string, string> = {
+    primary: "bg-primary/10 text-primary",
+    amber: "bg-amber-100 text-amber-700",
+    sky: "bg-sky-100 text-sky-700",
+    emerald: "bg-emerald-100 text-emerald-700",
+  };
+  return (
+    <div className="px-4 py-4 flex items-center gap-3">
+      <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${toneCls[tone]}`}>
+        <Icon className="w-4 h-4" />
+      </div>
+      <div className="min-w-0">
+        <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold leading-tight">{label}</p>
+        <p className="text-xl font-bold text-foreground tabular-nums leading-tight mt-0.5">{value}</p>
+      </div>
+    </div>
+  );
+}
+

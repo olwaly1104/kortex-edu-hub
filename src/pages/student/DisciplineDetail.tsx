@@ -1,6 +1,6 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { disciplines, lessons, grades, calendarEvents } from "@/data/mockData";
+import { disciplines, lessons, grades, calendarEvents, announcements } from "@/data/mockData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -9,7 +9,7 @@ import {
   ArrowLeft, BookOpen, User, Users, Clock, MapPin, Video, FileText,
   GraduationCap, ClipboardList, Play, Download, ChevronDown, ChevronRight,
   Eye, Calendar, CheckCircle, AlertCircle, TrendingUp, FolderOpen,
-  Mail, LogIn, Award,
+  Mail, MessageSquare, LogIn, Award, Megaphone, BookMarked, Hash,
 } from "lucide-react";
 import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
@@ -53,31 +53,79 @@ export default function DisciplineDetail() {
         <ArrowLeft className="w-4 h-4" /> Voltar às cadeiras
       </Link>
 
-      {/* Unified Card Header — matching coordenador CadeiraDetail */}
-      <Card className="overflow-hidden">
-        <div className="relative border-b border-border">
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/6 via-primary/3 to-transparent" />
-          <div className="relative px-5 py-4">
-            <div className="flex items-center gap-2.5 mb-2">
-              <h1 className="text-xl font-bold text-foreground tracking-tight leading-tight">{disc.name}</h1>
-              <Badge variant="outline" className="text-[10px] font-mono shrink-0">{disc.code}</Badge>
+      {/* Redesigned professional header */}
+      <Card className="overflow-hidden p-0 gap-0">
+        {/* Top breadcrumb strip */}
+        <div className="flex items-center gap-2 px-5 py-2.5 border-b border-border bg-muted/20 text-[10px] uppercase tracking-[0.12em] font-semibold">
+          <span className="text-primary">Ano Lectivo 2024/2025</span>
+          <span className="text-muted-foreground/40">·</span>
+          <Link to="/student/disciplines" className="text-muted-foreground hover:text-foreground transition-colors">Cadeiras</Link>
+          <span className="text-muted-foreground/40">·</span>
+          <span className="font-mono text-foreground normal-case tracking-normal">{disc.code}</span>
+        </div>
+
+        {/* Title + summary */}
+        <div className="px-5 pt-5 pb-4 border-b border-border">
+          <div className="flex items-start justify-between gap-4 flex-wrap">
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2.5 mb-1.5">
+                <div className="w-9 h-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                  <BookOpen className="w-4 h-4" />
+                </div>
+                <div className="min-w-0">
+                  <h1 className="text-xl font-bold text-foreground tracking-tight leading-tight truncate">{disc.name}</h1>
+                  <p className="text-[11px] text-muted-foreground font-mono mt-0.5">{disc.code} · 2.º Ano · Engenharia Informática</p>
+                </div>
+              </div>
+              <p className="text-[13px] text-foreground/75 leading-relaxed mt-2 max-w-3xl">{disc.summary}</p>
             </div>
-            <p className="text-sm text-muted-foreground leading-relaxed mt-2 max-w-3xl">{disc.summary}</p>
-            <div className="flex items-center gap-2 flex-wrap mt-3">
-              <Link to="/student/contacts" onClick={e => e.stopPropagation()}>
-                <Badge variant="outline" className="text-[11px] bg-background/80 gap-1 hover:bg-muted cursor-pointer">
-                  <GraduationCap className="w-3 h-3" /> {disc.professor}
-                </Badge>
-              </Link>
-              <Badge variant="outline" className="text-[11px] bg-background/80 gap-1">
-                <Clock className="w-3 h-3" /> {disc.schedule}
-              </Badge>
-              <Badge variant="outline" className="text-[11px] bg-background/80 gap-1">
-                <MapPin className="w-3 h-3" /> {disc.room}
-              </Badge>
-              <Badge variant="outline" className="text-[11px] bg-background/80 gap-1">
-                <Mail className="w-3 h-3" /> {disc.professorEmail}
-              </Badge>
+          </div>
+
+          {/* Metadata row — Professor / Local / Horário */}
+          <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {/* Professor */}
+            <div className="rounded-md border border-border bg-background px-3 py-2.5">
+              <p className="text-[9px] uppercase tracking-[0.12em] text-muted-foreground font-semibold mb-1.5 flex items-center gap-1">
+                <GraduationCap className="w-3 h-3" /> Professor
+              </p>
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 text-[10px] font-semibold ring-1 ring-primary/15">
+                  {disc.professor.replace("Prof. ", "").split(" ").slice(0, 2).map(n => n[0]).join("")}
+                </div>
+                <Link to="/student/contacts" className="text-[12.5px] font-semibold text-foreground hover:text-primary transition-colors truncate">
+                  {disc.professor}
+                </Link>
+              </div>
+              <div className="flex gap-1.5 mt-2">
+                <Link to="/student/chat" className="flex-1">
+                  <Button variant="outline" size="sm" className="h-7 px-2 text-[10px] gap-1 w-full">
+                    <MessageSquare className="w-3 h-3" /> Chat
+                  </Button>
+                </Link>
+                <Link to="/student/email" className="flex-1">
+                  <Button variant="outline" size="sm" className="h-7 px-2 text-[10px] gap-1 w-full">
+                    <Mail className="w-3 h-3" /> Email
+                  </Button>
+                </Link>
+              </div>
+            </div>
+
+            {/* Local */}
+            <div className="rounded-md border border-border bg-background px-3 py-2.5">
+              <p className="text-[9px] uppercase tracking-[0.12em] text-muted-foreground font-semibold mb-1.5 flex items-center gap-1">
+                <MapPin className="w-3 h-3" /> Local
+              </p>
+              <p className="text-[13px] font-semibold text-foreground leading-tight">{disc.room}</p>
+              <p className="text-[10.5px] text-muted-foreground mt-1">Faculdade de Ciências Exatas</p>
+            </div>
+
+            {/* Horário */}
+            <div className="rounded-md border border-border bg-background px-3 py-2.5">
+              <p className="text-[9px] uppercase tracking-[0.12em] text-muted-foreground font-semibold mb-1.5 flex items-center gap-1">
+                <Clock className="w-3 h-3" /> Horário
+              </p>
+              <p className="text-[13px] font-semibold text-foreground leading-tight">{disc.schedule}</p>
+              <p className="text-[10.5px] text-muted-foreground mt-1">Semestre em curso</p>
             </div>
           </div>
         </div>
@@ -141,7 +189,8 @@ export default function DisciplineDetail() {
               { value: "materials", icon: FolderOpen, label: "Conteúdos" },
               { value: "tasks", icon: ClipboardList, label: "Tarefas" },
               { value: "exams", icon: Award, label: "Avaliações" },
-              
+              { value: "anuncios", icon: Megaphone, label: "Anúncios" },
+              { value: "recursos", icon: BookMarked, label: "Recursos" },
             ].map(tab => (
               <TabsTrigger
                 key={tab.value}
@@ -371,6 +420,89 @@ export default function DisciplineDetail() {
           ) : (
             <p className="text-sm text-muted-foreground py-8 text-center">Sem informação de avaliação.</p>
           )}
+        </TabsContent>
+
+        {/* Anúncios */}
+        <TabsContent value="anuncios" className="space-y-3">
+          {announcements.length > 0 ? announcements.map((ann) => {
+            const typeCfg: Record<string, { cls: string; label: string }> = {
+              urgente:   { cls: "bg-destructive/10 text-destructive border-destructive/20", label: "Urgente" },
+              evento:    { cls: "bg-primary/10 text-primary border-primary/20", label: "Evento" },
+              academico: { cls: "bg-amber-50 text-amber-700 border-amber-200", label: "Académico" },
+              geral:     { cls: "bg-muted text-muted-foreground border-border", label: "Geral" },
+            };
+            const tc = typeCfg[ann.type];
+            return (
+              <Card key={ann.id} className="p-4 border-l-[3px] hover:shadow-md transition-all"
+                style={{ borderLeftColor: ann.type === "urgente" ? "hsl(var(--destructive))" : "hsl(var(--primary))" }}>
+                <div className="flex items-start gap-3">
+                  <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center shrink-0", tc.cls)}>
+                    <Megaphone className="w-4 h-4" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                      <Badge variant="outline" className={cn("text-[10px]", tc.cls)}>{tc.label}</Badge>
+                      <span className="text-[10px] text-muted-foreground tabular-nums">{ann.date}</span>
+                    </div>
+                    <p className="text-sm font-semibold text-foreground leading-snug">{ann.title}</p>
+                    <p className="text-[12.5px] text-muted-foreground mt-1 leading-relaxed">{ann.content}</p>
+                    <p className="text-[11px] text-muted-foreground/80 mt-2 italic">— {ann.author}</p>
+                  </div>
+                </div>
+              </Card>
+            );
+          }) : (
+            <p className="text-sm text-muted-foreground py-8 text-center">Sem anúncios para esta cadeira.</p>
+          )}
+        </TabsContent>
+
+        {/* Recursos */}
+        <TabsContent value="recursos" className="space-y-3">
+          {(() => {
+            const recursos = [
+              { id: "r1", name: "Manual de Cálculo Integral — Volume I", type: "Manual", format: "pdf", size: "8.4 MB", author: "James Stewart", year: "2020" },
+              { id: "r2", name: "Tabela de Integrais e Derivadas", type: "Formulário", format: "pdf", size: "320 KB", author: "Departamento de Matemática", year: "2024" },
+              { id: "r3", name: "Exercícios Resolvidos — Séries Numéricas", type: "Exercícios", format: "pdf", size: "1.2 MB", author: "Prof. António Silva", year: "2024" },
+              { id: "r4", name: "Vídeo-aulas Khan Academy — Integrais", type: "Vídeo Externo", format: "link", size: "—", author: "Khan Academy", year: "2023" },
+              { id: "r5", name: "Equações Diferenciais Ordinárias — Notas de Apoio", type: "Apontamentos", format: "pdf", size: "2.1 MB", author: "Prof. António Silva", year: "2024" },
+              { id: "r6", name: "Transformadas de Laplace — Aplicações", type: "Capítulo de Livro", format: "pdf", size: "3.6 MB", author: "Erwin Kreyszig", year: "2019" },
+            ];
+            return (
+              <Card className="overflow-hidden">
+                <div className="px-4 py-3 border-b bg-muted/20 flex items-center justify-between">
+                  <p className="text-sm font-semibold text-foreground flex items-center gap-2">
+                    <BookMarked className="w-4 h-4 text-primary" /> Bibliografia & Recursos
+                  </p>
+                  <span className="text-[11px] text-muted-foreground tabular-nums">{recursos.length} recursos</span>
+                </div>
+                <div className="divide-y divide-border">
+                  {recursos.map(r => (
+                    <div key={r.id} className="px-4 py-3 flex items-center gap-3 hover:bg-muted/30 transition-colors">
+                      <div className={cn("w-9 h-9 rounded-lg border flex items-center justify-center shrink-0",
+                        r.format === "link" ? "bg-violet-50 border-violet-200 text-violet-600" : "bg-red-50 border-red-200 text-red-600")}>
+                        <FileText className="w-4 h-4" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-foreground truncate">{r.name}</p>
+                        <div className="flex items-center gap-2 text-[11px] text-muted-foreground mt-0.5 flex-wrap">
+                          <Badge variant="outline" className="text-[9px] h-4 py-0 px-1.5">{r.type}</Badge>
+                          <span>{r.author}</span>
+                          <span className="text-muted-foreground/40">·</span>
+                          <span>{r.year}</span>
+                          <span className="text-muted-foreground/40">·</span>
+                          <span className="tabular-nums">{r.size}</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1 shrink-0">
+                        <button className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground" title="Ver"><Eye className="w-4 h-4" /></button>
+                        <button className="p-2 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground" title="Descarregar"><Download className="w-4 h-4" /></button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            );
+          })()}
         </TabsContent>
       </Tabs>
     </div>
