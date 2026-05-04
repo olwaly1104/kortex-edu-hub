@@ -1,6 +1,6 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { disciplines, lessons, grades, calendarEvents } from "@/data/mockData";
+import { disciplines, lessons, grades, calendarEvents, announcements } from "@/data/mockData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -9,7 +9,7 @@ import {
   ArrowLeft, BookOpen, User, Users, Clock, MapPin, Video, FileText,
   GraduationCap, ClipboardList, Play, Download, ChevronDown, ChevronRight,
   Eye, Calendar, CheckCircle, AlertCircle, TrendingUp, FolderOpen,
-  Mail, LogIn, Award,
+  Mail, MessageSquare, LogIn, Award, Megaphone, BookMarked, Hash,
 } from "lucide-react";
 import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
