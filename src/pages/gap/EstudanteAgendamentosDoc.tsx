@@ -2,15 +2,21 @@ import { Printer, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import {
-  type Solicitacao, estadoSolicitacaoConfig, destinoConfig, tipoConfig,
+  type GapAtendimento, ticketCategoriaConfig,
   type GapEstudanteSeguimento,
 } from "@/data/gapData";
 
 type Props = {
   discente: GapEstudanteSeguimento;
-  solicitacoes: Solicitacao[];
+  atendimentos: GapAtendimento[];
   anoLetivo?: string;
 };
+
+const ACCENT = "hsl(28 75% 32%)";
+const ACCENT_BG_06 = "hsl(28 75% 32% / 0.06)";
+const ACCENT_BG_03 = "hsl(28 75% 32% / 0.03)";
+const ACCENT_BORDER_35 = "hsl(28 75% 32% / 0.35)";
+const ACCENT_BORDER_25 = "hsl(28 75% 32% / 0.25)";
 
 const fmtData = (iso?: string) => {
   if (!iso) return "—";
@@ -18,23 +24,28 @@ const fmtData = (iso?: string) => {
   if (Number.isNaN(d.getTime())) return iso;
   return d.toLocaleDateString("pt-PT", { day: "2-digit", month: "2-digit", year: "numeric" });
 };
-
 const fmtDataLong = (d: Date) =>
   d.toLocaleDateString("pt-PT", { day: "2-digit", month: "long", year: "numeric" });
 
-export default function EstudanteRelatorioDoc({ discente, solicitacoes: sols, anoLetivo = "2023/2024" }: Props) {
+const estadoLabel: Record<string, string> = {
+  agendado: "Agendado", concluido: "Concluído",
+  cancelado: "Cancelado", remarcar: "Remarcar",
+};
+const estadoDot: Record<string, string> = {
+  agendado: "bg-sky-500", concluido: "bg-emerald-500",
+  cancelado: "bg-destructive", remarcar: "bg-amber-500",
+};
+
+export default function EstudanteAgendamentosDoc({ discente, atendimentos, anoLetivo = "2023/2024" }: Props) {
   const { toast } = useToast();
 
-  const recebidas = sols.filter(s => s.estado === "recebida").length;
-  const emExec = sols.filter(s => s.estado === "em_execucao").length;
-  const concluidas = sols.filter(s => s.estado === "concluida").length;
-  const rejeitadas = sols.filter(s => s.estado === "rejeitada").length;
-  const total = sols.length;
+  const total = atendimentos.length;
+  const agendados = atendimentos.filter(a => a.estado === "agendado").length;
+  const concluidos = atendimentos.filter(a => a.estado === "concluido").length;
+  const cancelados = atendimentos.filter(a => a.estado === "cancelado").length;
+  const remarcar = atendimentos.filter(a => a.estado === "remarcar").length;
 
-  // sort chronologically (oldest first → reads as a timeline)
-  const ordered = [...sols].sort((a, b) =>
-    a.dataSubmissao.localeCompare(b.dataSubmissao)
-  );
+  const ordered = [...atendimentos].sort((a, b) => a.data.localeCompare(b.data));
 
   return (
     <div className="flex flex-col h-full min-h-0 bg-muted/30">
@@ -42,20 +53,18 @@ export default function EstudanteRelatorioDoc({ discente, solicitacoes: sols, an
       <div className="flex items-center justify-between px-4 py-2.5 border-b border-border bg-background shrink-0 print:hidden">
         <div className="flex items-center gap-2">
           <span className="text-[11px] font-mono font-semibold text-muted-foreground">
-            Relatório-{discente.matricula}
+            Agendamentos-{discente.matricula}
           </span>
           <span className="text-muted-foreground/40 text-xs">·</span>
-          <span className="text-[11px] text-muted-foreground">Histórico anual de solicitações</span>
+          <span className="text-[11px] text-muted-foreground">Histórico anual de agendamentos</span>
         </div>
         <div className="flex items-center gap-1.5">
           <Button variant="outline" size="sm" className="h-7 text-[11px] gap-1.5" onClick={() => window.print()}>
             <Printer className="w-3 h-3" /> Imprimir
           </Button>
           <Button
-            variant="outline"
-            size="sm"
-            className="h-7 text-[11px] gap-1.5"
-            onClick={() => toast({ title: "Documento exportado", description: `Relatório-${discente.matricula}.pdf` })}
+            variant="outline" size="sm" className="h-7 text-[11px] gap-1.5"
+            onClick={() => toast({ title: "Documento exportado", description: `Agendamentos-${discente.matricula}.pdf` })}
           >
             <Download className="w-3 h-3" /> Descarregar
           </Button>
@@ -68,7 +77,7 @@ export default function EstudanteRelatorioDoc({ discente, solicitacoes: sols, an
           className="mx-auto bg-white shadow-md border border-border print:shadow-none print:border-0 flex flex-col text-foreground"
           style={{ width: "210mm", minHeight: "297mm" }}
         >
-          {/* ── Header ─────────────────────────────────────────── */}
+          {/* Header */}
           <div className="px-12 pt-9 pb-4">
             <div className="flex items-start justify-between gap-6 pb-3 border-b border-foreground">
               <div>
@@ -81,34 +90,32 @@ export default function EstudanteRelatorioDoc({ discente, solicitacoes: sols, an
                 </p>
               </div>
               <div className="text-right shrink-0">
-                <p className="font-mono text-[11px] font-semibold tracking-tight">Relatório-{discente.matricula}</p>
+                <p className="font-mono text-[11px] font-semibold tracking-tight">Agendamentos-{discente.matricula}</p>
                 <p className="text-[8.5px] text-foreground/60 mt-0.5">{fmtDataLong(new Date())}</p>
               </div>
             </div>
             <div className="h-px bg-foreground/40 mt-[2px]" />
           </div>
 
-          {/* ── Document title ─────────────────────────────────── */}
+          {/* Title */}
           <div className="px-12 pt-3 pb-5">
-            <p className="text-[8.5px] uppercase tracking-[0.24em] text-foreground/55 font-semibold">
-              Histórico Anual de Solicitações · Ano Letivo {anoLetivo}
+            <p className="text-[8.5px] uppercase tracking-[0.24em] font-semibold" style={{ color: ACCENT }}>
+              Histórico Anual de Agendamentos · Ano Letivo {anoLetivo}
             </p>
-            <h2 className="text-[17px] font-bold leading-tight tracking-tight mt-1">
-              {discente.nome}
-            </h2>
+            <h2 className="text-[17px] font-bold leading-tight tracking-tight mt-1">{discente.nome}</h2>
           </div>
 
-          {/* ── Body ──────────────────────────────────────────── */}
+          {/* Body */}
           <div className="flex-1 px-12 pb-6 space-y-5">
             {/* I · Identificação */}
             <Section number="I" title="Identificação do Discente">
-              <div className="border border-doc-accent/35 rounded-sm overflow-hidden">
-                <div className="grid grid-cols-2 bg-doc-accent/[0.06] border-b border-doc-accent/35">
-                  <div className="px-3 py-1.5 border-r border-doc-accent/25">
-                    <p className="text-[7.5px] uppercase tracking-[0.22em] text-doc-accent font-bold">Dados Académicos</p>
+              <div className="rounded-sm overflow-hidden" style={{ border: `1px solid ${ACCENT_BORDER_35}` }}>
+                <div className="grid grid-cols-2" style={{ background: ACCENT_BG_06, borderBottom: `1px solid ${ACCENT_BORDER_35}` }}>
+                  <div className="px-3 py-1.5" style={{ borderRight: `1px solid ${ACCENT_BORDER_25}` }}>
+                    <p className="text-[7.5px] uppercase tracking-[0.22em] font-bold" style={{ color: ACCENT }}>Dados Académicos</p>
                   </div>
                   <div className="px-3 py-1.5">
-                    <p className="text-[7.5px] uppercase tracking-[0.22em] text-doc-accent font-bold">Acompanhamento</p>
+                    <p className="text-[7.5px] uppercase tracking-[0.22em] font-bold" style={{ color: ACCENT }}>Acompanhamento</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-2">
@@ -130,54 +137,52 @@ export default function EstudanteRelatorioDoc({ discente, solicitacoes: sols, an
 
             {/* II · Resumo */}
             <Section number="II" title="Resumo do Período">
-              <div className="border-t-[3px] border-doc-accent bg-doc-accent/[0.035] px-5 py-3.5">
+              <div className="px-5 py-3.5" style={{ borderTop: `3px solid ${ACCENT}`, background: ACCENT_BG_03 }}>
                 <div className="grid grid-cols-5 gap-4">
                   <Stat label="Total" value={total} />
-                  <Stat label="Recebidas" value={recebidas} />
-                  <Stat label="Em Execução" value={emExec} />
-                  <Stat label="Concluídas" value={concluidas} />
-                  <Stat label="Rejeitadas" value={rejeitadas} />
+                  <Stat label="Agendados" value={agendados} />
+                  <Stat label="Concluídos" value={concluidos} />
+                  <Stat label="Cancelados" value={cancelados} />
+                  <Stat label="Remarcar" value={remarcar} />
                 </div>
               </div>
             </Section>
 
-            {/* III · Listagem de Solicitações */}
-            <Section number="III" title="Solicitações Registadas">
+            {/* III · Listagem */}
+            <Section number="III" title="Agendamentos Registados">
               {ordered.length === 0 ? (
-                <div className="border border-doc-accent/35 rounded-sm px-4 py-6 text-center">
-                  <p className="text-[10px] text-foreground/60">
-                    Nenhuma solicitação registada neste período.
-                  </p>
+                <div className="rounded-sm px-4 py-6 text-center" style={{ border: `1px solid ${ACCENT_BORDER_35}` }}>
+                  <p className="text-[10px] text-foreground/60">Nenhum agendamento registado neste período.</p>
                 </div>
               ) : (
-                <div className="border border-doc-accent/35 rounded-sm overflow-hidden">
+                <div className="rounded-sm overflow-hidden" style={{ border: `1px solid ${ACCENT_BORDER_35}` }}>
                   <table className="w-full text-[9.5px]">
-                    <thead className="bg-doc-accent/[0.06]">
-                      <tr className="border-b border-doc-accent/35">
-                        <th className="text-left px-3 py-1.5 font-bold w-[6%] text-doc-accent uppercase tracking-[0.16em] text-[7.5px]">#</th>
-                        <th className="text-left px-3 py-1.5 font-bold w-[14%] text-doc-accent uppercase tracking-[0.16em] text-[7.5px]">Referência</th>
-                        <th className="text-left px-3 py-1.5 font-bold w-[12%] text-doc-accent uppercase tracking-[0.16em] text-[7.5px]">Submetido</th>
-                        <th className="text-left px-3 py-1.5 font-bold text-doc-accent uppercase tracking-[0.16em] text-[7.5px]">Tipo de Pedido</th>
-                        <th className="text-left px-3 py-1.5 font-bold w-[18%] text-doc-accent uppercase tracking-[0.16em] text-[7.5px]">Encaminhamento</th>
-                        <th className="text-left px-3 py-1.5 font-bold w-[14%] text-doc-accent uppercase tracking-[0.16em] text-[7.5px]">Estado</th>
+                    <thead style={{ background: ACCENT_BG_06 }}>
+                      <tr style={{ borderBottom: `1px solid ${ACCENT_BORDER_35}` }}>
+                        <th className="text-left px-3 py-1.5 font-bold w-[5%] uppercase tracking-[0.16em] text-[7.5px]" style={{ color: ACCENT }}>#</th>
+                        <th className="text-left px-3 py-1.5 font-bold w-[12%] uppercase tracking-[0.16em] text-[7.5px]" style={{ color: ACCENT }}>Ref.</th>
+                        <th className="text-left px-3 py-1.5 font-bold w-[14%] uppercase tracking-[0.16em] text-[7.5px]" style={{ color: ACCENT }}>Data · Hora</th>
+                        <th className="text-left px-3 py-1.5 font-bold uppercase tracking-[0.16em] text-[7.5px]" style={{ color: ACCENT }}>Motivo</th>
+                        <th className="text-left px-3 py-1.5 font-bold w-[14%] uppercase tracking-[0.16em] text-[7.5px]" style={{ color: ACCENT }}>Categoria</th>
+                        <th className="text-left px-3 py-1.5 font-bold w-[18%] uppercase tracking-[0.16em] text-[7.5px]" style={{ color: ACCENT }}>Responsável</th>
+                        <th className="text-left px-3 py-1.5 font-bold w-[12%] uppercase tracking-[0.16em] text-[7.5px]" style={{ color: ACCENT }}>Estado</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-foreground/10">
-                      {ordered.map((s, i) => {
-                        const st = estadoSolicitacaoConfig[s.estado];
-                        const dest = destinoConfig[s.destino];
-                        const tipoCfg = tipoConfig[s.tipo];
+                      {ordered.map((a, i) => {
+                        const cat = ticketCategoriaConfig[a.categoria];
                         return (
-                          <tr key={s.id}>
+                          <tr key={a.id}>
                             <td className="px-3 py-1 text-foreground/60 tabular-nums">{String(i + 1).padStart(2, "0")}</td>
-                            <td className="px-3 py-1 font-mono font-semibold tabular-nums">{s.id}</td>
-                            <td className="px-3 py-1 text-foreground/80 tabular-nums whitespace-nowrap">{fmtData(s.dataSubmissao)}</td>
-                            <td className="px-3 py-1 font-medium">{tipoCfg?.label ?? s.tipo}</td>
-                            <td className="px-3 py-1 text-foreground/70 truncate">{dest.label}</td>
+                            <td className="px-3 py-1 font-mono font-semibold tabular-nums">{a.id}</td>
+                            <td className="px-3 py-1 text-foreground/80 tabular-nums whitespace-nowrap">{fmtData(a.data)} · {a.hora}</td>
+                            <td className="px-3 py-1 font-medium truncate">{a.motivo}</td>
+                            <td className="px-3 py-1 text-foreground/70">{cat?.label ?? a.categoria}</td>
+                            <td className="px-3 py-1 text-foreground/70 truncate">{a.responsavel}</td>
                             <td className="px-3 py-1">
                               <span className="inline-flex items-center gap-1.5 text-[9px] font-semibold uppercase tracking-wider text-foreground/80">
-                                <span className={`w-1.5 h-1.5 rounded-full ${dotForEstado(s.estado)}`} />
-                                {st.label}
+                                <span className={`w-1.5 h-1.5 rounded-full ${estadoDot[a.estado] ?? "bg-muted-foreground"}`} />
+                                {estadoLabel[a.estado] ?? a.estado}
                               </span>
                             </td>
                           </tr>
@@ -188,10 +193,9 @@ export default function EstudanteRelatorioDoc({ discente, solicitacoes: sols, an
                 </div>
               )}
             </Section>
-
           </div>
 
-          {/* ── Footer ───────────────────────────────────────── */}
+          {/* Footer */}
           <div className="px-12 pb-8 pt-3 border-t border-foreground/30 mt-auto">
             <div className="flex items-end justify-between gap-6">
               <p className="text-[8px] text-foreground/60 leading-snug max-w-sm">
@@ -212,13 +216,11 @@ export default function EstudanteRelatorioDoc({ discente, solicitacoes: sols, an
   );
 }
 
-/* ── Helpers ─────────────────────────────────────────── */
-
 function Section({ number, title, children }: { number: string; title: string; children: React.ReactNode }) {
   return (
     <section>
-      <div className="flex items-baseline gap-2 mb-2 pb-1 border-b border-doc-accent/35">
-        <span className="text-[8.5px] font-mono font-bold text-doc-accent tabular-nums">{number}.</span>
+      <div className="flex items-baseline gap-2 mb-2 pb-1" style={{ borderBottom: `1px solid ${ACCENT_BORDER_35}` }}>
+        <span className="text-[8.5px] font-mono font-bold tabular-nums" style={{ color: ACCENT }}>{number}.</span>
         <h3 className="text-[10px] uppercase tracking-[0.2em] font-bold text-foreground">{title}</h3>
       </div>
       {children}
@@ -228,7 +230,7 @@ function Section({ number, title, children }: { number: string; title: string; c
 
 function GroupCell({ rows, bordered }: { rows: [string, string][]; bordered?: boolean }) {
   return (
-    <dl className={`px-3 py-2 space-y-1 ${bordered ? "border-r border-doc-accent/25" : ""}`}>
+    <dl className="px-3 py-2 space-y-1" style={bordered ? { borderRight: `1px solid ${ACCENT_BORDER_25}` } : undefined}>
       {rows.map(([k, v], i) => (
         <div key={i} className="flex items-baseline gap-2 text-[10px]">
           <dt className="text-foreground/55 w-[100px] shrink-0 font-medium">{k}</dt>
@@ -242,17 +244,10 @@ function GroupCell({ rows, bordered }: { rows: [string, string][]; bordered?: bo
 function Stat({ label, value }: { label: string; value: number }) {
   return (
     <div className="text-center">
-      <p className="text-[18px] font-bold tabular-nums leading-none text-doc-accent">{value}</p>
+      <p className="text-[18px] font-bold tabular-nums leading-none" style={{ color: ACCENT }}>{value}</p>
       <p className="text-[7.5px] uppercase tracking-[0.18em] text-foreground/60 font-bold mt-1">{label}</p>
     </div>
   );
-}
-
-function dotForEstado(e: Solicitacao["estado"]) {
-  if (e === "recebida") return "bg-amber-500";
-  if (e === "em_execucao") return "bg-sky-500";
-  if (e === "concluida") return "bg-emerald-500";
-  return "bg-destructive";
 }
 
 function riscoLabel(r: "alto" | "medio" | "baixo") {

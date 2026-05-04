@@ -1,13 +1,18 @@
+import { useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger,
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
 } from "@/components/ui/dialog";
 import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem,
+  DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   ArrowLeft, Mail, MessageCircle, Users, Phone, MapPin, UserCheck, Calendar, GraduationCap,
-  HelpCircle, CalendarDays, Heart, Inbox, FileText,
+  HelpCircle, CalendarDays, Heart, Inbox, FileText, ChevronDown, IdCard, Award, ClipboardList,
 } from "lucide-react";
 import {
   gapEstudantesSeguimento, solicitacoes, gapAtendimentos,
@@ -15,6 +20,7 @@ import {
 } from "@/data/gapData";
 import { cn } from "@/lib/utils";
 import EstudanteRelatorioDoc from "./EstudanteRelatorioDoc";
+import EstudanteAgendamentosDoc from "./EstudanteAgendamentosDoc";
 
 const riscoConfig = {
   alto:  { label: "Risco Alto",  bg: "bg-destructive/10 text-destructive border-destructive/30" },
@@ -22,10 +28,13 @@ const riscoConfig = {
   baixo: { label: "Risco Baixo", bg: "bg-emerald-100 text-emerald-700 border-emerald-200" },
 };
 
+type ReportKind = "solicitacoes" | "agendamentos" | "bilhete" | "notas";
+
 export default function GapEstudanteProfile() {
   const { matricula } = useParams();
   const navigate = useNavigate();
   const discente = gapEstudantesSeguimento.find(e => e.matricula === matricula);
+  const [report, setReport] = useState<ReportKind | null>(null);
 
   if (!discente) {
     return (
@@ -182,20 +191,49 @@ export default function GapEstudanteProfile() {
           <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
             <HelpCircle className="w-4 h-4" /> Histórico de Solicitações
           </h3>
-          <Dialog>
-            <DialogTrigger asChild>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
               <Button size="sm" variant="outline" className="gap-1.5 text-xs h-7">
-                <FileText className="w-3.5 h-3.5" /> Relatório Anual
+                <FileText className="w-3.5 h-3.5" /> Ver Relatórios
+                <ChevronDown className="w-3 h-3 opacity-60" />
               </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-5xl w-[95vw] h-[92vh] p-0 gap-0 overflow-hidden">
-              <DialogHeader className="sr-only">
-                <DialogTitle>Relatório anual de solicitações — {discente.nome}</DialogTitle>
-                <DialogDescription>Documento institucional com todas as solicitações do ano letivo.</DialogDescription>
-              </DialogHeader>
-              <EstudanteRelatorioDoc discente={discente} solicitacoes={sols} />
-            </DialogContent>
-          </Dialog>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-64">
+              <DropdownMenuLabel className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                Documentos do Discente
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => setReport("solicitacoes")} className="gap-2 cursor-pointer">
+                <ClipboardList className="w-4 h-4 text-doc-accent" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-semibold">Registo de Solicitações</p>
+                  <p className="text-[10px] text-muted-foreground">Histórico anual GAP</p>
+                </div>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setReport("agendamentos")} className="gap-2 cursor-pointer">
+                <CalendarDays className="w-4 h-4" style={{ color: "hsl(28 75% 32%)" }} />
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-semibold">Registo de Agendamentos</p>
+                  <p className="text-[10px] text-muted-foreground">Sessões e atendimentos</p>
+                </div>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => setReport("bilhete")} className="gap-2 cursor-pointer">
+                <IdCard className="w-4 h-4 text-primary" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-semibold">Bilhete de Identidade Académico</p>
+                  <p className="text-[10px] text-muted-foreground">Cartão institucional</p>
+                </div>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setReport("notas")} className="gap-2 cursor-pointer">
+                <Award className="w-4 h-4 text-emerald-600" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-semibold">Declaração de Notas</p>
+                  <p className="text-[10px] text-muted-foreground">Pauta global do ano</p>
+                </div>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
         <div className="divide-y divide-border">
           {sols.length > 0 ? sols.map(s => {
@@ -225,6 +263,37 @@ export default function GapEstudanteProfile() {
           )}
         </div>
       </Card>
+
+      {/* Reports dialog */}
+      <Dialog open={report !== null} onOpenChange={(o) => !o && setReport(null)}>
+        <DialogContent className="max-w-5xl w-[95vw] h-[92vh] p-0 gap-0 overflow-hidden">
+          <DialogHeader className="sr-only">
+            <DialogTitle>Relatório institucional — {discente.nome}</DialogTitle>
+            <DialogDescription>Documento institucional do discente.</DialogDescription>
+          </DialogHeader>
+          {report === "solicitacoes" && (
+            <EstudanteRelatorioDoc discente={discente} solicitacoes={sols} />
+          )}
+          {report === "agendamentos" && (
+            <EstudanteAgendamentosDoc discente={discente} atendimentos={atendimentos} />
+          )}
+          {(report === "bilhete" || report === "notas") && (
+            <div className="flex-1 flex items-center justify-center bg-muted/30">
+              <div className="text-center max-w-md p-8">
+                <div className="w-14 h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto mb-4">
+                  {report === "bilhete" ? <IdCard className="w-7 h-7" /> : <Award className="w-7 h-7" />}
+                </div>
+                <h3 className="text-lg font-bold text-foreground">
+                  {report === "bilhete" ? "Bilhete de Identidade Académico" : "Declaração de Notas"}
+                </h3>
+                <p className="text-sm text-muted-foreground mt-2">
+                  Documento em preparação. Disponível brevemente através da Secretaria Académica.
+                </p>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
