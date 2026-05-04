@@ -79,13 +79,15 @@ export default function StudentSolicitacoes() {
     return d.toLocaleDateString("pt-PT", { day: "2-digit", month: "2-digit", year: "numeric" });
   };
 
-  const tabs: { key: EstadoFilter; label: string; icon: typeof Inbox; count: number }[] = [
-    { key: "todos",       label: "Todas",       icon: Inbox,         count: counts.todos },
-    { key: "pendentes",   label: "Pendentes",   icon: Clock,         count: counts.pendentes },
-    { key: "em_execucao", label: "Em Execução", icon: Send,          count: counts.em_execucao },
-    { key: "concluidas",  label: "Concluídas",  icon: CheckCircle2,  count: counts.concluidas },
-    { key: "rejeitadas",  label: "Rejeitadas",  icon: AlertCircle,   count: counts.rejeitadas },
+  const tabs: { key: EstadoFilter; label: string; count: number }[] = [
+    { key: "todos",       label: "Todas",       count: counts.todos },
+    { key: "pendentes",   label: "Pendentes",   count: counts.pendentes },
+    { key: "em_execucao", label: "Em Execução", count: counts.em_execucao },
+    { key: "concluidas",  label: "Concluídas",  count: counts.concluidas },
+    { key: "rejeitadas",  label: "Rejeitadas",  count: counts.rejeitadas },
   ];
+
+  const anoLetivo = "2025/2026";
 
   const onCreate = (nova: Solicitacao) => {
     setExtras(prev => [nova, ...prev]);
@@ -110,51 +112,70 @@ export default function StudentSolicitacoes() {
         <NovaSolicitacaoDialog onCreate={onCreate} totalCount={extras.length} />
       </div>
 
-      {/* KPI tabs */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-        {tabs.map(t => {
-          const Icon = t.icon;
-          const active = estado === t.key;
-          return (
-            <button
-              key={t.key}
-              type="button"
-              onClick={() => setEstado(t.key)}
-              className={cn(
-                "flex items-center justify-between gap-3 px-4 py-3 rounded-lg border bg-background transition-colors text-left",
-                active ? "border-primary bg-primary/5" : "border-border hover:bg-muted/40"
-              )}
-            >
-              <div className="flex items-center gap-2.5 min-w-0">
-                <Icon className={cn("w-4 h-4 shrink-0", active ? "text-primary" : "text-muted-foreground")} />
-                <span className={cn("text-xs font-semibold truncate", active ? "text-primary" : "text-foreground")}>{t.label}</span>
-              </div>
-              <span className={cn("text-base font-bold tabular-nums", active ? "text-primary" : "text-foreground")}>{t.count}</span>
-            </button>
-          );
-        })}
-      </div>
+      {/* Minhas Solicitações */}
+      <Card className="overflow-hidden border-border">
+        {/* Section header */}
+        <div className="px-5 py-4 border-b border-border bg-muted/20 flex items-center justify-between gap-4 flex-wrap">
+          <div className="min-w-0">
+            <h2 className="text-[15px] font-semibold text-foreground flex items-center gap-2">
+              <Inbox className="w-4 h-4 text-primary" />
+              Minhas Solicitações
+            </h2>
+            <p className="text-[11px] text-muted-foreground mt-0.5">
+              Histórico completo do ano lectivo {anoLetivo} · {counts.todos} {counts.todos === 1 ? "pedido" : "pedidos"}
+            </p>
+          </div>
 
-      {/* Search */}
-      <div className="flex items-center gap-2">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
-          <Input
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder="Procurar por assunto, motivo ou referência…"
-            className="pl-9 h-9 text-sm"
-          />
+          {/* Compact search */}
+          <div className="relative w-full sm:w-64">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+            <Input
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Procurar pedido…"
+              className="pl-8 h-8 text-xs bg-background"
+            />
+            {search && (
+              <button
+                type="button"
+                onClick={() => setSearch("")}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
         </div>
-        {(search || estado !== "todos") && (
-          <Button size="sm" variant="ghost" onClick={() => { setSearch(""); setEstado("todos"); }} className="gap-1.5 text-xs">
-            <X className="w-3.5 h-3.5" /> Limpar
-          </Button>
-        )}
-      </div>
 
-      {/* Lista */}
-      <Card className="overflow-hidden">
+        {/* Compact filter chips */}
+        <div className="px-5 py-2.5 border-b border-border bg-background flex items-center gap-1.5 flex-wrap">
+          {tabs.map(t => {
+            const active = estado === t.key;
+            return (
+              <button
+                key={t.key}
+                type="button"
+                onClick={() => setEstado(t.key)}
+                className={cn(
+                  "inline-flex items-center gap-1.5 h-7 px-2.5 rounded-full border text-[11px] font-medium transition-colors",
+                  active
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-background text-muted-foreground border-border hover:bg-muted/60 hover:text-foreground"
+                )}
+              >
+                <span>{t.label}</span>
+                <span className={cn(
+                  "tabular-nums text-[10px] font-bold px-1.5 rounded-full",
+                  active ? "bg-primary-foreground/20 text-primary-foreground" : "bg-muted text-foreground/70"
+                )}>
+                  {t.count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Lista */}
         {filtered.length === 0 ? (
           <div className="p-12 text-center">
             <Inbox className="w-10 h-10 mx-auto text-muted-foreground/40 mb-3" />
