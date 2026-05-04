@@ -41,7 +41,7 @@ type EstadoFilter = "todos" | "pendentes" | "em_execucao" | "concluidas" | "reje
 
 export default function StudentSolicitacoes() {
   const { toast } = useToast();
-  const [previewId, setPreviewId] = useState<string | null>(null);
+  const navigate = useNavigate();
   const [extras, setExtras] = useState<Solicitacao[]>([]);
   const [estado, setEstado] = useState<EstadoFilter>("todos");
   const [search, setSearch] = useState("");
