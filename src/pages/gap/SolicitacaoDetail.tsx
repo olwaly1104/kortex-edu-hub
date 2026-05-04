@@ -551,6 +551,25 @@ export default function GapSolicitacaoDetail() {
                               <p className="text-[12.5px] text-foreground/85 leading-[1.55] mt-1 whitespace-pre-line">
                                 {c.texto}
                               </p>
+                              {c.anexo && (() => {
+                                const ic = anexoIcon(c.anexo.tipo);
+                                return (
+                                  <button
+                                    type="button"
+                                    onClick={() => toast({ title: "A abrir anexo", description: c.anexo!.nome })}
+                                    className="mt-2 inline-flex items-center gap-2 px-2.5 py-1.5 rounded-md border border-border bg-muted/30 hover:bg-muted/60 transition-colors max-w-full"
+                                  >
+                                    <div className={cn("w-7 h-7 rounded-md border flex items-center justify-center shrink-0", ic.cls)}>
+                                      <ic.Icon className="w-3.5 h-3.5" />
+                                    </div>
+                                    <div className="min-w-0 text-left">
+                                      <p className="text-[11.5px] font-semibold text-foreground leading-tight truncate">{c.anexo.nome}</p>
+                                      <p className="text-[10px] text-muted-foreground tabular-nums">{c.anexo.tamanho}</p>
+                                    </div>
+                                    <Paperclip className="w-3 h-3 text-muted-foreground ml-1 shrink-0" />
+                                  </button>
+                                );
+                              })()}
                             </div>
                           </div>
                         );
