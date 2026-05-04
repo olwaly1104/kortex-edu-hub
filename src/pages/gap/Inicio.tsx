@@ -28,6 +28,7 @@ const typeStyles: Record<string, { bg: string; label: string }> = {
 
 export default function GapInicio() {
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const stats = [
     { icon: HelpCircle, label: "Recebidas", value: gapKpis.recebidas, color: "text-orange-600 bg-orange-100" },
