@@ -14,6 +14,7 @@ import {
 import {
   solicitacoes, Categoria,
   estadoSolicitacaoConfig, destinoConfig, tipoConfig, categoriaConfig,
+  getComentariosSolicitacao,
 } from "@/data/gapData";
 import SolicitacaoDocPreview from "./SolicitacaoDocPreview";
 
