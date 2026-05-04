@@ -1,5 +1,4 @@
 import { useMemo, useState } from "react";
-// no router navigate needed — detail opens in a dialog
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -7,14 +6,12 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from "@/components/ui/select";
-import {
-  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger,
+  Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger,
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import {
-  HelpCircle, Plus, Search, X, Inbox, Clock, CheckCircle2, AlertCircle, Send, ChevronRight, Eye,
+  HelpCircle, Plus, Search, X, Inbox, Clock, CheckCircle2, AlertCircle, Send, ChevronRight, ChevronLeft, Eye,
+  Building2, Timer, FileText,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -34,23 +31,20 @@ const estadoDot: Record<EstadoSolicitacao, string> = {
   em_atraso: "bg-orange-500",
 };
 
+const CATEGORIA_HINT: Record<Categoria, string> = {
+  Tecnológico: "Portal, email, cartão de discente, sistemas.",
+  Académico:   "Inscrições, declarações, certificados, notas.",
+  Financeiro:  "Pagamentos, propinas, multas, bolsas.",
+};
+
 type EstadoFilter = "todos" | "pendentes" | "em_execucao" | "concluidas" | "rejeitadas";
 
 export default function StudentSolicitacoes() {
-  const [previewId, setPreviewId] = useState<string | null>(null);
   const { toast } = useToast();
-
-  // Local state for newly-created (in-session) solicitações.
+  const [previewId, setPreviewId] = useState<string | null>(null);
   const [extras, setExtras] = useState<Solicitacao[]>([]);
   const [estado, setEstado] = useState<EstadoFilter>("todos");
   const [search, setSearch] = useState("");
-  const [open, setOpen] = useState(false);
-
-  // Form state
-  const [fCategoria, setFCategoria] = useState<Categoria | "">("");
-  const [fTipo, setFTipo] = useState<string>("");
-  const [fAssunto, setFAssunto] = useState("");
-  const [fDescricao, setFDescricao] = useState("");
 
   const own = useMemo(() => {
     const baseline = gapSolicitacoes.filter(s => s.matricula === STUDENT_MATRICULA);
@@ -80,52 +74,6 @@ export default function StudentSolicitacoes() {
     });
   }, [own, estado, search]);
 
-  const tiposByCategoria = useMemo(() => {
-    const map: Record<string, { key: string; label: string }[]> = { Tecnológico: [], Académico: [], Financeiro: [] };
-    Object.entries(tipoConfig).forEach(([key, cfg]) => {
-      map[cfg.categoria].push({ key, label: cfg.label });
-    });
-    Object.values(map).forEach(arr => arr.sort((a, b) => a.label.localeCompare(b.label)));
-    return map;
-  }, []);
-
-  const resetForm = () => {
-    setFCategoria(""); setFTipo(""); setFAssunto(""); setFDescricao("");
-  };
-
-  const submitNova = () => {
-    if (!fCategoria || !fTipo || !fAssunto.trim() || !fDescricao.trim()) {
-      toast({ title: "Campos em falta", description: "Preencha categoria, motivo, assunto e descrição." });
-      return;
-    }
-    const cfg = tipoConfig[fTipo];
-    const id = `SOL-2025-${String(9000 + extras.length + 1).padStart(4, "0")}`;
-    const nova: Solicitacao = {
-      id,
-      discente: "Ana Luísa Ferreira",
-      matricula: STUDENT_MATRICULA,
-      curso: "Eng. Informática",
-      faculdade: "Faculdade de Ciências Exatas",
-      ano: 2,
-      tipo: fTipo,
-      assunto: fAssunto.trim(),
-      descricao: fDescricao.trim(),
-      destino: cfg.destino,
-      estado: "recebida",
-      prioridade: "media",
-      slaDias: cfg.slaDias,
-      dataSubmissao: TODAY,
-      historico: [
-        { data: `${TODAY} 08:00`, actor: "Portal do Discente", accao: "Solicitação submetida pelo discente" },
-        { data: `${TODAY} 08:01`, actor: "Sistema", accao: `Encaminhada automaticamente para ${destinoConfig[cfg.destino].label}` },
-      ],
-    };
-    setExtras(prev => [nova, ...prev]);
-    toast({ title: "Solicitação submetida", description: `${id} encaminhada para ${destinoConfig[cfg.destino].label}.` });
-    resetForm();
-    setOpen(false);
-  };
-
   const fmt = (iso: string) => {
     const d = new Date(iso);
     return d.toLocaleDateString("pt-PT", { day: "2-digit", month: "2-digit", year: "numeric" });
@@ -139,6 +87,14 @@ export default function StudentSolicitacoes() {
     { key: "rejeitadas",  label: "Rejeitadas",  icon: AlertCircle,   count: counts.rejeitadas },
   ];
 
+  const onCreate = (nova: Solicitacao) => {
+    setExtras(prev => [nova, ...prev]);
+    toast({
+      title: "Solicitação submetida",
+      description: `${nova.id} encaminhada para ${destinoConfig[nova.destino].label}.`,
+    });
+  };
+
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       {/* Header */}
@@ -151,97 +107,7 @@ export default function StudentSolicitacoes() {
             Submeta pedidos académicos, financeiros e tecnológicos ao Gabinete de Apoio ao Discente.
           </p>
         </div>
-
-        <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) resetForm(); }}>
-          <DialogTrigger asChild>
-            <Button className="gap-2"><Plus className="w-4 h-4" /> Nova Solicitação</Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-xl">
-            <DialogHeader>
-              <DialogTitle>Nova Solicitação</DialogTitle>
-              <DialogDescription>
-                Será encaminhada automaticamente ao departamento responsável.
-              </DialogDescription>
-            </DialogHeader>
-
-            <div className="space-y-4 py-2">
-              {/* Categoria */}
-              <div className="space-y-1.5">
-                <Label className="text-xs">Categoria</Label>
-                <div className="grid grid-cols-3 gap-2">
-                  {(Object.keys(categoriaConfig) as Categoria[]).map(c => {
-                    const cfg = categoriaConfig[c];
-                    const Icon = cfg.icon;
-                    const active = fCategoria === c;
-                    return (
-                      <button
-                        key={c}
-                        type="button"
-                        onClick={() => { setFCategoria(c); setFTipo(""); }}
-                        className={cn(
-                          "flex flex-col items-center gap-1.5 px-3 py-2.5 rounded-md border text-xs font-medium transition-colors",
-                          active ? "border-primary bg-primary/5 text-primary" : "border-border bg-background hover:bg-muted text-foreground"
-                        )}
-                      >
-                        <Icon className="w-4 h-4" />
-                        {cfg.label}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Motivo */}
-              <div className="space-y-1.5">
-                <Label className="text-xs">Motivo</Label>
-                <Select value={fTipo} onValueChange={setFTipo} disabled={!fCategoria}>
-                  <SelectTrigger>
-                    <SelectValue placeholder={fCategoria ? "Selecione o motivo" : "Selecione primeiro a categoria"} />
-                  </SelectTrigger>
-                  <SelectContent className="max-h-72">
-                    {fCategoria && tiposByCategoria[fCategoria].map(t => (
-                      <SelectItem key={t.key} value={t.key}>{t.label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {fTipo && (
-                  <p className="text-[11px] text-muted-foreground flex items-center gap-1.5 mt-1">
-                    <ChevronRight className="w-3 h-3" />
-                    Encaminhada para <span className="font-semibold text-foreground">{destinoConfig[tipoConfig[fTipo].destino].label}</span>
-                    <span>· prazo SLA: {tipoConfig[fTipo].slaDias} dia{tipoConfig[fTipo].slaDias > 1 ? "s" : ""}</span>
-                  </p>
-                )}
-              </div>
-
-              {/* Assunto */}
-              <div className="space-y-1.5">
-                <Label className="text-xs">Assunto</Label>
-                <Input
-                  value={fAssunto}
-                  onChange={e => setFAssunto(e.target.value)}
-                  placeholder="Resumo curto do pedido"
-                  maxLength={120}
-                />
-              </div>
-
-              {/* Descrição */}
-              <div className="space-y-1.5">
-                <Label className="text-xs">Descrição</Label>
-                <Textarea
-                  value={fDescricao}
-                  onChange={e => setFDescricao(e.target.value)}
-                  placeholder="Descreva o pedido com o máximo de detalhe possível."
-                  className="min-h-[110px]"
-                />
-              </div>
-            </div>
-
-            <DialogFooter>
-              <Button variant="outline" onClick={() => { resetForm(); setOpen(false); }}>Cancelar</Button>
-              <Button onClick={submitNova} className="gap-1.5"><Send className="w-3.5 h-3.5" /> Submeter</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <NovaSolicitacaoDialog onCreate={onCreate} totalCount={extras.length} />
       </div>
 
       {/* KPI tabs */}
@@ -360,5 +226,329 @@ export default function StudentSolicitacoes() {
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+/* ───────────────── Nova Solicitação Dialog (wizard) ───────────────── */
+
+function NovaSolicitacaoDialog({ onCreate, totalCount }: { onCreate: (s: Solicitacao) => void; totalCount: number }) {
+  const [open, setOpen] = useState(false);
+  const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
+
+  const [categoria, setCategoria] = useState<Categoria | null>(null);
+  const [tipo, setTipo] = useState<string>("");
+  const [tipoQuery, setTipoQuery] = useState("");
+  const [assunto, setAssunto] = useState("");
+  const [descricao, setDescricao] = useState("");
+
+  const reset = () => {
+    setStep(1);
+    setCategoria(null); setTipo(""); setTipoQuery("");
+    setAssunto(""); setDescricao("");
+  };
+
+  const onOpenChange = (o: boolean) => {
+    setOpen(o);
+    if (!o) setTimeout(reset, 200);
+  };
+
+  const tiposDaCategoria = useMemo(() => {
+    if (!categoria) return [];
+    const list = Object.entries(tipoConfig)
+      .filter(([, cfg]) => cfg.categoria === categoria)
+      .map(([key, cfg]) => ({ key, ...cfg }))
+      .sort((a, b) => a.label.localeCompare(b.label));
+    if (!tipoQuery.trim()) return list;
+    const q = tipoQuery.toLowerCase();
+    return list.filter(t => t.label.toLowerCase().includes(q));
+  }, [categoria, tipoQuery]);
+
+  const tipoCfg = tipo ? tipoConfig[tipo] : null;
+
+  const stepValid: Record<number, boolean> = {
+    1: !!categoria,
+    2: !!tipo,
+    3: assunto.trim().length > 2,
+    4: descricao.trim().length > 5,
+  };
+  const canConfirm = stepValid[1] && stepValid[2] && stepValid[3] && stepValid[4];
+
+  const STEPS = [
+    { n: 1, label: "Categoria" },
+    { n: 2, label: "Motivo" },
+    { n: 3, label: "Assunto" },
+    { n: 4, label: "Descrição" },
+  ] as const;
+
+  const goNext = () => setStep(s => (s < 4 ? ((s + 1) as typeof s) : s));
+  const goPrev = () => setStep(s => (s > 1 ? ((s - 1) as typeof s) : s));
+
+  const submit = () => {
+    if (!canConfirm || !tipoCfg) return;
+    const id = `SOL-2025-${String(9000 + totalCount + 1).padStart(4, "0")}`;
+    const nova: Solicitacao = {
+      id,
+      discente: "Ana Luísa Ferreira",
+      matricula: STUDENT_MATRICULA,
+      curso: "Eng. Informática",
+      faculdade: "Faculdade de Ciências Exatas",
+      ano: 2,
+      tipo,
+      assunto: assunto.trim(),
+      descricao: descricao.trim(),
+      destino: tipoCfg.destino,
+      estado: "recebida",
+      prioridade: "media",
+      slaDias: tipoCfg.slaDias,
+      dataSubmissao: TODAY,
+      historico: [
+        { data: `${TODAY} 08:00`, actor: "Portal do Discente", accao: "Solicitação submetida pelo discente" },
+        { data: `${TODAY} 08:01`, actor: "Sistema", accao: `Encaminhada automaticamente para ${destinoConfig[tipoCfg.destino].label}` },
+      ],
+    };
+    onCreate(nova);
+    setOpen(false);
+    setTimeout(reset, 200);
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogTrigger asChild>
+        <Button size="sm" className="gap-1.5"><Plus className="w-4 h-4" /> Nova Solicitação</Button>
+      </DialogTrigger>
+      <DialogContent className="max-w-2xl p-0 gap-0 overflow-hidden rounded-2xl border-border">
+        {/* Header */}
+        <div className="px-6 pt-5 pb-4 border-b border-border bg-card">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-10 h-10 rounded-xl bg-primary text-primary-foreground flex items-center justify-center shrink-0">
+              <HelpCircle className="w-5 h-5" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <DialogTitle className="text-base font-semibold leading-tight">Nova Solicitação</DialogTitle>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Passo {step} de {STEPS.length} — {STEPS[step - 1].label}
+              </p>
+            </div>
+          </div>
+
+          {/* Numbered stepper */}
+          <div className="mt-4 flex items-center gap-1 overflow-x-auto">
+            {STEPS.map((s, i) => {
+              const isActive = step === s.n;
+              const isDone = step > s.n;
+              const reachable = isDone || isActive || (s.n > 1 && stepValid[s.n - 1]);
+              return (
+                <div key={s.n} className="flex items-center gap-1 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => { if (reachable) setStep(s.n as typeof step); }}
+                    className={cn(
+                      "flex items-center gap-1.5 h-7 pl-1 pr-2 rounded-full border transition-colors",
+                      isActive
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : isDone
+                          ? "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100"
+                          : "bg-muted/40 text-muted-foreground border-border hover:bg-muted"
+                    )}
+                  >
+                    <span className={cn(
+                      "w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold",
+                      isActive ? "bg-primary-foreground/20" : isDone ? "bg-emerald-200/70" : "bg-background"
+                    )}>
+                      {isDone ? <CheckCircle2 className="w-3 h-3" /> : s.n}
+                    </span>
+                    <span className="text-[10px] font-semibold whitespace-nowrap hidden sm:inline">
+                      {s.label}
+                    </span>
+                  </button>
+                  {i < STEPS.length - 1 && <div className="w-3 h-px bg-border" />}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Body */}
+        <div className="px-6 py-5 min-h-[340px] max-h-[60vh] overflow-y-auto">
+
+          {/* STEP 1 — Categoria */}
+          {step === 1 && (
+            <FieldBlock n={1} title="Categoria do pedido">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                {(Object.keys(categoriaConfig) as Categoria[]).map(c => {
+                  const cfg = categoriaConfig[c];
+                  const Icon = cfg.icon;
+                  const active = categoria === c;
+                  return (
+                    <button
+                      key={c}
+                      type="button"
+                      onClick={() => { setCategoria(c); setTipo(""); setTipoQuery(""); }}
+                      className={cn(
+                        "flex flex-col items-start gap-2 p-3.5 rounded-lg border text-left transition-all",
+                        active
+                          ? "border-primary bg-primary/5 ring-2 ring-primary/15"
+                          : "border-border bg-card hover:border-primary/40 hover:bg-muted/30"
+                      )}
+                    >
+                      <div className={cn(
+                        "w-9 h-9 rounded-lg flex items-center justify-center",
+                        active ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                      )}>
+                        <Icon className="w-4.5 h-4.5" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-foreground">{cfg.label}</p>
+                        <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">
+                          {CATEGORIA_HINT[c]}
+                        </p>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </FieldBlock>
+          )}
+
+          {/* STEP 2 — Motivo */}
+          {step === 2 && categoria && (
+            <FieldBlock n={2} title={`Motivo do pedido — ${categoriaConfig[categoria].label}`}>
+              <div className="relative mb-2">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                <Input
+                  autoFocus
+                  placeholder="Procurar motivo…"
+                  value={tipoQuery}
+                  onChange={e => setTipoQuery(e.target.value)}
+                  className="pl-9 h-9 text-sm"
+                />
+              </div>
+              <div className="grid grid-cols-1 gap-1.5 max-h-[300px] overflow-y-auto pr-0.5">
+                {tiposDaCategoria.length === 0 ? (
+                  <p className="text-xs text-muted-foreground p-4 text-center">Nenhum motivo encontrado.</p>
+                ) : tiposDaCategoria.map(t => {
+                  const active = tipo === t.key;
+                  const destCfg = destinoConfig[t.destino];
+                  return (
+                    <button
+                      key={t.key}
+                      type="button"
+                      onClick={() => setTipo(t.key)}
+                      className={cn(
+                        "flex items-center gap-3 px-3 py-2.5 rounded-md border text-left transition-all",
+                        active
+                          ? "border-primary bg-primary/5 ring-2 ring-primary/15"
+                          : "border-border bg-card hover:border-primary/40 hover:bg-muted/30"
+                      )}
+                    >
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[13px] font-semibold text-foreground leading-snug">{t.label}</p>
+                        <div className="flex items-center gap-2 mt-1 flex-wrap">
+                          <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground">
+                            <Building2 className="w-2.5 h-2.5" /> {destCfg.label}
+                          </span>
+                          <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground">
+                            <Timer className="w-2.5 h-2.5" /> Prazo {t.slaDias} dia{t.slaDias > 1 ? "s" : ""}
+                          </span>
+                        </div>
+                      </div>
+                      {active && <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />}
+                    </button>
+                  );
+                })}
+              </div>
+            </FieldBlock>
+          )}
+
+          {/* STEP 3 — Assunto */}
+          {step === 3 && (
+            <FieldBlock n={3} title="Assunto">
+              <Input
+                autoFocus
+                placeholder="Resumo curto e claro do pedido"
+                value={assunto}
+                onChange={e => setAssunto(e.target.value)}
+                maxLength={120}
+                className="h-10 text-sm"
+              />
+              <p className="text-[10px] text-muted-foreground mt-2">
+                {assunto.length}/120 caracteres.
+              </p>
+            </FieldBlock>
+          )}
+
+          {/* STEP 4 — Descrição + Resumo */}
+          {step === 4 && tipoCfg && (
+            <FieldBlock n={4} title="Descrição detalhada">
+              <Textarea
+                autoFocus
+                placeholder="Descreva o pedido com o máximo de detalhe possível, incluindo datas, referências e contexto."
+                value={descricao}
+                onChange={e => setDescricao(e.target.value)}
+                rows={6}
+                className="resize-none text-sm"
+              />
+
+              {/* Resumo final */}
+              <div className="mt-4 rounded-lg border border-border bg-muted/20 p-3.5 space-y-1.5 text-[11.5px]">
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5 flex items-center gap-1.5">
+                  <FileText className="w-3 h-3" /> Resumo da solicitação
+                </p>
+                <p><span className="text-muted-foreground">Categoria:</span> <strong>{categoria}</strong></p>
+                <p><span className="text-muted-foreground">Motivo:</span> <strong>{tipoCfg.label}</strong></p>
+                <p><span className="text-muted-foreground">Assunto:</span> <strong>{assunto || "—"}</strong></p>
+                <p><span className="text-muted-foreground">Encaminhamento:</span> <strong>{destinoConfig[tipoCfg.destino].label}</strong> · prazo SLA <strong>{tipoCfg.slaDias} dia{tipoCfg.slaDias > 1 ? "s" : ""}</strong></p>
+              </div>
+            </FieldBlock>
+          )}
+        </div>
+
+        {/* Footer */}
+        <DialogFooter className="px-6 py-4 border-t border-border bg-muted/20 flex-row items-center justify-between gap-3 sm:justify-between">
+          <div className="text-[11px] text-muted-foreground tabular-nums">
+            Passo <strong className="text-foreground">{step}</strong> de {STEPS.length}
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <DialogClose asChild>
+              <Button variant="outline" size="sm">Cancelar</Button>
+            </DialogClose>
+            {step > 1 && (
+              <Button variant="ghost" size="sm" onClick={goPrev} className="gap-1">
+                <ChevronLeft className="w-4 h-4" /> Voltar
+              </Button>
+            )}
+            {step < 4 ? (
+              <Button
+                size="sm"
+                disabled={!stepValid[step]}
+                onClick={goNext}
+                className="gap-1.5"
+              >
+                Continuar <ChevronRight className="w-4 h-4" />
+              </Button>
+            ) : (
+              <Button size="sm" disabled={!canConfirm} onClick={submit} className="gap-1.5">
+                <Send className="w-4 h-4" /> Submeter
+              </Button>
+            )}
+          </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function FieldBlock({ n, title, optional, children }: { n: number; title: string; optional?: boolean; children: React.ReactNode }) {
+  return (
+    <section>
+      <div className="flex items-center gap-2 mb-3">
+        <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-muted text-muted-foreground text-[10px] font-bold">{n}</span>
+        <Label className="text-[11px] uppercase tracking-wider text-foreground font-semibold">
+          {title}
+          {optional && <span className="ml-1.5 normal-case tracking-normal text-muted-foreground font-normal">(opcional)</span>}
+        </Label>
+      </div>
+      {children}
+    </section>
   );
 }
