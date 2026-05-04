@@ -1,4 +1,4 @@
-import { Printer, Download } from "lucide-react";
+import { Printer, Download, FileText, FileImage, FileSpreadsheet, Paperclip } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -215,6 +215,19 @@ export default function SolicitacaoDocPreview({ solicitacao: s, anexos }: Props)
                           <p className="text-[8px] text-foreground/55 tabular-nums whitespace-nowrap">{fmtDataHora(c.data)}</p>
                         </div>
                         <p className="text-[9.5px] leading-[1.55] text-foreground/85 whitespace-pre-line">{c.texto}</p>
+                        {c.anexo && (() => {
+                          const ic = anexoIcon(c.anexo.tipo);
+                          return (
+                            <div className="mt-1.5 inline-flex items-center gap-1.5 px-1.5 py-0.5 rounded-sm border border-doc-accent/30 bg-white">
+                              <div className={`w-4 h-4 rounded-sm border flex items-center justify-center ${ic.cls}`}>
+                                <ic.Icon className="w-2.5 h-2.5" />
+                              </div>
+                              <span className="text-[8.5px] font-semibold text-foreground/85 truncate max-w-[200px]">{c.anexo.nome}</span>
+                              <span className="text-[8px] text-foreground/55 tabular-nums">{c.anexo.tamanho}</span>
+                              <Paperclip className="w-2.5 h-2.5 text-doc-accent ml-0.5" />
+                            </div>
+                          );
+                        })()}
                       </div>
                     ))}
                   </div>
@@ -269,4 +282,11 @@ function GroupCell({ rows, bordered }: { rows: [string, string][]; bordered?: bo
       ))}
     </dl>
   );
+}
+
+function anexoIcon(t: "pdf" | "doc" | "image" | "sheet") {
+  if (t === "image") return { Icon: FileImage, cls: "bg-violet-50 border-violet-200 text-violet-600" };
+  if (t === "sheet") return { Icon: FileSpreadsheet, cls: "bg-emerald-50 border-emerald-200 text-emerald-600" };
+  if (t === "doc")   return { Icon: FileText, cls: "bg-sky-50 border-sky-200 text-sky-600" };
+  return { Icon: FileText, cls: "bg-red-50 border-red-200 text-red-600" };
 }

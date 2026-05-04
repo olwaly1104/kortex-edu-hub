@@ -809,40 +809,67 @@ export const ticketStatusConfig: Record<GapTicket["estado"], { label: string; co
 
 export type TicketStatus = GapTicket["estado"];
 
-// ─── Notas & Comentários (mock determinístico por solicitação) ──────────────
+// ─── Notas & Comentários (mock determinístico) ─────────────────────────────
+export interface ComentarioAnexo {
+  nome: string;
+  tamanho: string;
+  tipo: "pdf" | "doc" | "image" | "sheet";
+}
 export interface ComentarioSolicitacao {
   data: string;
   actor: string;
   texto: string;
+  anexo?: ComentarioAnexo;
 }
 
 const COMENTARIOS_POOL: string[] = [
-  "Solicitação revista. Toda a documentação está conforme — a aguardar validação interna.",
-  "Confirmado o histórico do discente no sistema. Procedo com o encaminhamento.",
-  "Pedido em análise. Necessária verificação adicional junto da Tesouraria.",
-  "Discente contactado por email para clarificação dos dados submetidos.",
-  "Documento processado e validado. A preparar resposta formal.",
-  "Caso atribuído. Prazo interno definido para os próximos 2 dias úteis.",
-  "Verificação concluída. Sem inconformidades detectadas no registo.",
-  "Encaminhado para confirmação do supervisor antes da execução final.",
+  "Solicitação revista em detalhe. A documentação enviada pelo discente está conforme as exigências regulamentares e os dados batem com o registo histórico no sistema. Procedo com a validação interna e o despacho será emitido até ao final do dia útil de amanhã, conforme o SLA institucional. Caso surja qualquer incidente durante o processamento, o discente será contactado de imediato pelos canais oficiais.",
+  "Confirmado o historial académico do discente junto da Secretaria. Não foram detectadas pendências curriculares ou disciplinares que impeçam o seguimento do pedido. O caso está em condições de avançar para a fase de execução, ficando à responsabilidade do departamento competente concluir a operação técnica no sistema. Aguardamos confirmação para encerrar o processo formalmente.",
+  "Pedido em análise técnica. Foi necessária verificação adicional junto da Tesouraria para validar a regularidade financeira do discente no semestre corrente. A informação foi cruzada com o módulo de propinas e identificou-se uma divergência menor que está a ser corrigida pela equipa financeira. O processo retoma assim que a rectificação for concluída.",
+  "Discente contactado por email institucional e por chamada para clarificar pontos da descrição apresentada. Foram solicitadas duas evidências complementares para sustentar o pedido: comprovativo actualizado e declaração assinada. Aguardo resposta nas próximas 48 horas. Em caso de ausência de resposta, o pedido será reavaliado e poderá ser arquivado por falta de elementos.",
+  "Documento processado e validado pelos serviços competentes. A resposta formal foi preparada em coordenação com a chefia de departamento e contempla todos os requisitos solicitados pelo discente. O documento final será disponibilizado no Portal do Discente para descarga assim que a assinatura electrónica for aplicada pelo responsável da área. Notificação automática activa.",
+  "Caso atribuído à equipa de execução. O prazo interno foi definido para os próximos dois dias úteis, dentro do SLA contratualizado. A complexidade do pedido foi avaliada como moderada e não exige escalonamento adicional. Será produzida documentação de suporte para arquivo institucional e cópia entregue ao discente conforme o procedimento padrão da unidade.",
+  "Verificação concluída. Sem inconformidades detectadas no registo do discente nem no histórico de pedidos anteriores. O processo está limpo do ponto de vista administrativo e cumpre todos os critérios formais para aprovação. Recomendo a passagem imediata à fase de execução técnica para evitar o consumo desnecessário do tempo restante de SLA.",
+  "Encaminhado para confirmação do supervisor antes da execução final. Trata-se de um pedido com impacto cruzado em duas áreas (Académica e Financeira), pelo que a validação dupla é exigida pelo regulamento interno. Aguardo despacho do responsável de turno. Toda a documentação de suporte foi anexada ao processo para facilitar a tomada de decisão.",
+  "Realizei uma reunião informal com o coordenador da cadeira para alinhar o entendimento sobre o caso. Ficou acordado que o pedido segue por via excepcional, dado o histórico irrepreensível do discente e a justificação documentada apresentada. A decisão será formalizada em despacho na próxima reunião de coordenação. Discente avisado da previsão.",
 ];
 
-export function getComentariosSolicitacao(id: string, responsavel: string): ComentarioSolicitacao[] {
-  // Deterministic pseudo-random based on id
+const ANEXO_POOL: ComentarioAnexo[] = [
+  { nome: "Despacho-interno-validacao.pdf", tamanho: "184 KB", tipo: "pdf" },
+  { nome: "Verificacao-tesouraria.pdf", tamanho: "98 KB", tipo: "pdf" },
+  { nome: "Email-contacto-discente.pdf", tamanho: "62 KB", tipo: "pdf" },
+  { nome: "Mapa-cruzamento-dados.xlsx", tamanho: "212 KB", tipo: "sheet" },
+  { nome: "Acta-coordenacao.docx", tamanho: "144 KB", tipo: "doc" },
+  { nome: "Comprovativo-anexo.jpg", tamanho: "356 KB", tipo: "image" },
+];
+
+function buildComentarios(seedId: string, responsavel: string, baseDateISO: string): ComentarioSolicitacao[] {
   let h = 0;
-  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
-  const count = 2 + (h % 2); // 2-3 comments
-  const baseDate = new Date("2025-12-13T08:30:00");
+  for (let i = 0; i < seedId.length; i++) h = (h * 31 + seedId.charCodeAt(i)) >>> 0;
+  const count = 3 + (h % 2); // 3-4 comments
+  const baseDate = new Date(baseDateISO);
   const out: ComentarioSolicitacao[] = [];
   for (let i = 0; i < count; i++) {
     const idx = (h + i * 17) % COMENTARIOS_POOL.length;
     const d = new Date(baseDate.getTime() + i * 26 * 3600 * 1000 + ((h >> (i + 1)) % 7) * 3600 * 1000);
     const dStr = d.toISOString().slice(0, 16).replace("T", " ");
+    // ~40% of comments have an attachment
+    const hasAnexo = ((h >> (i * 3 + 2)) & 0b11) >= 2;
+    const anexo = hasAnexo ? ANEXO_POOL[(h + i * 11) % ANEXO_POOL.length] : undefined;
     out.push({
       data: dStr,
       actor: i % 2 === 0 ? responsavel : "Coord. GAP · Dra. Helena Cabral",
       texto: COMENTARIOS_POOL[idx],
+      anexo,
     });
   }
   return out;
+}
+
+export function getComentariosSolicitacao(id: string, responsavel: string): ComentarioSolicitacao[] {
+  return buildComentarios(id, responsavel, "2025-12-13T08:30:00");
+}
+
+export function getComentariosAtendimento(id: string, responsavel: string): ComentarioSolicitacao[] {
+  return buildComentarios(id + "-AT", responsavel, "2025-12-12T09:15:00");
 }

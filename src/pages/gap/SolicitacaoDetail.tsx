@@ -551,6 +551,25 @@ export default function GapSolicitacaoDetail() {
                               <p className="text-[12.5px] text-foreground/85 leading-[1.55] mt-1 whitespace-pre-line">
                                 {c.texto}
                               </p>
+                              {c.anexo && (() => {
+                                const ic = anexoIcon(c.anexo.tipo);
+                                return (
+                                  <button
+                                    type="button"
+                                    onClick={() => toast({ title: "A abrir anexo", description: c.anexo!.nome })}
+                                    className="mt-2 inline-flex items-center gap-2 px-2.5 py-1.5 rounded-md border border-border bg-muted/30 hover:bg-muted/60 transition-colors max-w-full"
+                                  >
+                                    <div className={cn("w-7 h-7 rounded-md border flex items-center justify-center shrink-0", ic.cls)}>
+                                      <ic.Icon className="w-3.5 h-3.5" />
+                                    </div>
+                                    <div className="min-w-0 text-left">
+                                      <p className="text-[11.5px] font-semibold text-foreground leading-tight truncate">{c.anexo.nome}</p>
+                                      <p className="text-[10px] text-muted-foreground tabular-nums">{c.anexo.tamanho}</p>
+                                    </div>
+                                    <Paperclip className="w-3 h-3 text-muted-foreground ml-1 shrink-0" />
+                                  </button>
+                                );
+                              })()}
                             </div>
                           </div>
                         );
@@ -628,4 +647,11 @@ function FactItem({ label, value, onClick }: { label: string; value: string; onC
       )}
     </div>
   );
+}
+
+function anexoIcon(t: "pdf" | "doc" | "image" | "sheet") {
+  if (t === "image") return { Icon: FileImage, cls: "bg-violet-50 border-violet-200 text-violet-600" };
+  if (t === "sheet") return { Icon: FileSpreadsheet, cls: "bg-emerald-50 border-emerald-200 text-emerald-600" };
+  if (t === "doc")   return { Icon: FileText, cls: "bg-sky-50 border-sky-200 text-sky-600" };
+  return { Icon: FileText, cls: "bg-red-50 border-red-200 text-red-600" };
 }
