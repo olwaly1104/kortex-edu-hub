@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import {
   type Solicitacao, estadoSolicitacaoConfig, destinoConfig, tipoConfig,
+  getComentariosSolicitacao,
 } from "@/data/gapData";
 
 type Props = {
