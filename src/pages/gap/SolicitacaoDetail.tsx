@@ -648,3 +648,10 @@ function FactItem({ label, value, onClick }: { label: string; value: string; onC
     </div>
   );
 }
+
+function anexoIcon(t: "pdf" | "doc" | "image" | "sheet") {
+  if (t === "image") return { Icon: FileImage, cls: "bg-violet-50 border-violet-200 text-violet-600" };
+  if (t === "sheet") return { Icon: FileSpreadsheet, cls: "bg-emerald-50 border-emerald-200 text-emerald-600" };
+  if (t === "doc")   return { Icon: FileText, cls: "bg-sky-50 border-sky-200 text-sky-600" };
+  return { Icon: FileText, cls: "bg-red-50 border-red-200 text-red-600" };
+}
