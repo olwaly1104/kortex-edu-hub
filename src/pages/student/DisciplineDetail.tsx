@@ -72,6 +72,11 @@ export default function DisciplineDetail() {
 
             {/* Meta badges row */}
             <div className="flex items-center gap-2 flex-wrap mt-3">
+              <Link to="/student/contacts">
+                <Badge variant="outline" className="text-[11px] bg-background/80 gap-1.5 hover:border-primary hover:text-primary transition-colors cursor-pointer">
+                  <User className="w-3 h-3" /> {disc.professor}
+                </Badge>
+              </Link>
               <Badge variant="outline" className="text-[11px] bg-background/80 gap-1">
                 <Users className="w-3 h-3" /> 2.º Ano · Engenharia Informática
               </Badge>
@@ -85,31 +90,21 @@ export default function DisciplineDetail() {
           </div>
         </div>
 
-        {/* Professor strip — clean, single-line identity + actions */}
-        <div className="px-5 py-3 border-b border-border bg-muted/20 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 text-[11px] font-bold">
-            {disc.professor.replace("Prof. ", "").split(" ").slice(0, 2).map(n => n[0]).join("")}
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="text-[9px] uppercase tracking-[0.14em] text-muted-foreground font-semibold leading-none mb-1">
-              Regente da Cadeira
-            </p>
-            <Link
-              to="/student/contacts"
-              className="text-[13.5px] font-semibold text-foreground hover:text-primary transition-colors truncate block leading-tight"
-            >
-              {disc.professor}
-            </Link>
-          </div>
+        {/* Contact actions strip */}
+        <div className="px-5 py-2.5 border-b border-border bg-muted/20 flex items-center justify-between gap-3">
+          <p className="text-[11px] text-muted-foreground">
+            <span className="text-[9px] uppercase tracking-[0.14em] font-semibold mr-2">Regente</span>
+            Contacte o professor para esclarecimentos
+          </p>
           <div className="flex items-center gap-1.5 shrink-0">
             <Link to="/student/chat">
-              <Button variant="outline" size="sm" className="h-8 px-3 text-[11px] gap-1.5 font-medium">
-                <MessageSquare className="w-3.5 h-3.5" /> Chat
+              <Button variant="outline" size="sm" className="h-7 px-2.5 text-[11px] gap-1.5 font-medium">
+                <MessageSquare className="w-3 h-3" /> Chat
               </Button>
             </Link>
             <Link to="/student/email">
-              <Button variant="outline" size="sm" className="h-8 px-3 text-[11px] gap-1.5 font-medium">
-                <Mail className="w-3.5 h-3.5" /> Email
+              <Button variant="outline" size="sm" className="h-7 px-2.5 text-[11px] gap-1.5 font-medium">
+                <Mail className="w-3 h-3" /> Email
               </Button>
             </Link>
           </div>
