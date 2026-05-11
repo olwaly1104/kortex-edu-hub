@@ -218,10 +218,10 @@ export default function InscricoesRegistar() {
                   <th className="text-left px-4 py-2.5 font-medium">Referência</th>
                   <th className="text-left px-4 py-2.5 font-medium">Candidato</th>
                   <th className="text-left px-4 py-2.5 font-medium">Curso (1ª opção)</th>
+                  <th className="text-left px-4 py-2.5 font-medium">Preparatório</th>
                   <th className="text-left px-4 py-2.5 font-medium">Sessão</th>
                   <th className="text-left px-4 py-2.5 font-medium">Submetida em</th>
                   <th className="text-left px-4 py-2.5 font-medium">Docs</th>
-                  <th className="text-left px-4 py-2.5 font-medium">Preparatório</th>
                   <th className="text-left px-4 py-2.5 font-medium">Nota</th>
                   <th className="text-left px-4 py-2.5 font-medium">Estado</th>
                   <th className="w-8"></th>
