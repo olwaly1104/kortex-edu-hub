@@ -281,12 +281,9 @@ export default function InscricoesRegistar() {
               <div key={s.key} className="flex items-center flex-1 min-w-0">
                 <button
                   type="button"
-                  onClick={() => { if (s.n < step) { setErrors(new Set()); setStep(s.n); } }}
-                  disabled={s.n > step}
+                  onClick={() => { setErrors(new Set()); setStep(s.n); }}
                   className={cn(
-                    "flex flex-col items-center gap-1.5 shrink-0",
-                    s.n < step && "cursor-pointer",
-                    s.n > step && "cursor-not-allowed"
+                    "flex flex-col items-center gap-1.5 shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
                   )}
                 >
                   <div className={cn(
