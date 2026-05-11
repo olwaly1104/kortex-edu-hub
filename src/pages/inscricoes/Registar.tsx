@@ -218,11 +218,16 @@ export default function InscricoesRegistar() {
                   <th className="text-left px-4 py-2.5 font-medium">Sessão</th>
                   <th className="text-left px-4 py-2.5 font-medium">Submetida em</th>
                   <th className="text-left px-4 py-2.5 font-medium">Estado</th>
+                  <th className="w-8"></th>
                 </tr>
               </thead>
               <tbody>
                 {filteredRecent.map(r => (
-                  <tr key={r.ref} className="border-t hover:bg-muted/30">
+                  <tr
+                    key={r.ref}
+                    onClick={() => navigate(`/inscricoes/candidato/${r.ref}`)}
+                    className="border-t hover:bg-muted/40 cursor-pointer transition-colors"
+                  >
                     <td className="px-4 py-2.5 font-mono text-[12px] text-foreground">{r.ref}</td>
                     <td className="px-4 py-2.5 font-medium text-foreground">{r.nome}</td>
                     <td className="px-4 py-2.5 text-muted-foreground">{r.curso}</td>
@@ -233,6 +238,7 @@ export default function InscricoesRegistar() {
                         {r.estado}
                       </Badge>
                     </td>
+                    <td className="px-2 text-muted-foreground"><ChevronRight className="w-4 h-4" /></td>
                   </tr>
                 ))}
                 {!filteredRecent.length && (
