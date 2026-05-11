@@ -50,7 +50,8 @@ export const inscricoesRecent: InscricaoRecord[] = [
     escola: "Colégio São José de Cluny", tipoEnsino: "Ensino Médio",
     anoConclusao: "2025", mediaFinal: "16.4",
     faculdade: "Faculdade de Ciências Exatas", curso: "Arquitectura", curso2: "Engenharia Civil",
-    sessao: "1ª Sessão", data: "2026-05-11 09:42", estado: "Submetida",
+    sessao: "1ª Sessão", data: "2026-05-11 09:42", estado: "Aprovada",
+    notaSessao: 16.5, dataProva: "2026-05-09",
     documentos: baseDocs(true),
   },
   {
@@ -63,7 +64,8 @@ export const inscricoesRecent: InscricaoRecord[] = [
     escola: "Instituto Médio Politécnico do Lobito", tipoEnsino: "Ensino Técnico",
     anoConclusao: "2025", mediaFinal: "15.2",
     faculdade: "Faculdade de Ciências Exatas", curso: "Engenharia Informática",
-    sessao: "1ª Sessão", data: "2026-05-11 09:18", estado: "Submetida",
+    sessao: "1ª Sessão", data: "2026-05-11 09:18", estado: "Aprovada",
+    notaSessao: 14.2, dataProva: "2026-05-09",
     documentos: baseDocs(true),
   },
   {
@@ -76,7 +78,7 @@ export const inscricoesRecent: InscricaoRecord[] = [
     escola: "Liceu Diogo Cão", tipoEnsino: "Ensino Médio",
     anoConclusao: "2025", mediaFinal: "14.8",
     faculdade: "Faculdade de Ciências Sociais", curso: "Direito",
-    sessao: "2ª Sessão", data: "2026-05-11 08:55", estado: "Submetida",
+    sessao: "2ª Sessão", data: "2026-05-11 08:55", estado: "Em análise",
     documentos: baseDocs(true),
   },
   {
