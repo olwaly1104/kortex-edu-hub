@@ -28,6 +28,7 @@ export interface InscricaoRecord {
   estado: "Submetida" | "Em análise" | "Aprovada" | "Reprovada";
   notaSessao?: number;
   dataProva?: string;
+  preparatorio: boolean;
   documentos: { key: string; label: string; entregue: boolean; ficheiro?: string }[];
 }
 
