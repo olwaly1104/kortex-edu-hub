@@ -245,6 +245,18 @@ export default function InscricoesRegistar() {
                       <td className="px-4 py-2.5 text-muted-foreground">{r.curso}</td>
                       <td className="px-4 py-2.5 text-muted-foreground">{r.sessao}</td>
                       <td className="px-4 py-2.5 text-muted-foreground">{r.data}</td>
+                      <td className="px-4 py-2.5 tabular-nums text-muted-foreground">
+                        <span className={cn("font-medium", r.docsEntregues === r.docsTotal ? "text-emerald-700" : "text-amber-700")}>
+                          {r.docsEntregues}/{r.docsTotal}
+                        </span>
+                      </td>
+                      <td className="px-4 py-2.5">
+                        <Badge variant="outline" className={cn("text-[11px]", r.preparatorio
+                          ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                          : "bg-muted text-muted-foreground border-border")}>
+                          {r.preparatorio ? "Sim" : "Não"}
+                        </Badge>
+                      </td>
                       <td className="px-4 py-2.5 tabular-nums">
                         {typeof r.notaSessao === "number"
                           ? <span className={cn(
