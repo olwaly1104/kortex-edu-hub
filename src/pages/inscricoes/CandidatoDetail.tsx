@@ -4,9 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { inscricoesRecent } from "@/data/inscricoesData";
 import {
-  ArrowLeft, User, MapPin, ShieldCheck, GraduationCap, BookOpen, FileText,
-  Phone, Mail, Calendar, IdCard, Eye, CheckCircle2, XCircle, Printer,
+  ArrowLeft, User, MapPin, ShieldCheck, BookOpen, FileText,
+  Phone, Mail, Calendar, IdCard, Eye, CheckCircle2, XCircle, FileSearch, Share2, Award,
 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 function Row({ label, value }: { label: string; value?: string }) {
   return (
