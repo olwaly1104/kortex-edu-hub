@@ -316,6 +316,10 @@ function AppRoutes() {
         <Route path="/gap/financas" element={<StudentFinances />} />
         <Route path="/gap/perfil" element={<StudentProfile />} />
       </Route>
+      {/* Inscrições — minimal single-page portal */}
+      <Route element={<InscricoesLayout />}>
+        <Route path="/inscricoes" element={<InscricoesRegistar />} />
+      </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
