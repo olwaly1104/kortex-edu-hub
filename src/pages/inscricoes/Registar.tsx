@@ -275,7 +275,7 @@ export default function InscricoesRegistar() {
                   );
                 })}
                 {!filteredRecent.length && (
-                  <tr><td colSpan={8} className="px-4 py-8 text-center text-muted-foreground text-[13px]">Sem resultados.</td></tr>
+                  <tr><td colSpan={10} className="px-4 py-8 text-center text-muted-foreground text-[13px]">Sem resultados.</td></tr>
                 )}
               </tbody>
             </table>
