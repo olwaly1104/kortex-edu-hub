@@ -1,4 +1,5 @@
 import { useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,10 +9,11 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { inscricoesRecent } from "@/data/inscricoesData";
 import {
   User, MapPin, ShieldCheck, GraduationCap, BookOpen, FileText,
-  Upload, CheckCircle2, RotateCcw, Send, Plus, ArrowLeft, ArrowRight,
-  Users, CalendarDays, Clock, TrendingUp, Search, X, Check,
+  Upload, CheckCircle2, Send, Plus, ArrowLeft, ArrowRight,
+  Users, CalendarDays, Clock, TrendingUp, Search, X, Check, ChevronRight,
 } from "lucide-react";
 
 /* ─────────────────────────── data ─────────────────────────── */
