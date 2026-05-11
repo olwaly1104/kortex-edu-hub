@@ -1,4 +1,5 @@
 import { useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,10 +9,11 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { inscricoesRecent } from "@/data/inscricoesData";
 import {
   User, MapPin, ShieldCheck, GraduationCap, BookOpen, FileText,
-  Upload, CheckCircle2, RotateCcw, Send, Plus, ArrowLeft, ArrowRight,
-  Users, CalendarDays, Clock, TrendingUp, Search, X, Check,
+  Upload, CheckCircle2, Send, Plus, ArrowLeft, ArrowRight,
+  Users, CalendarDays, Clock, TrendingUp, Search, X, Check, ChevronRight,
 } from "lucide-react";
 
 /* ─────────────────────────── data ─────────────────────────── */
@@ -70,15 +72,11 @@ const STEP_FIELDS: Record<number, (keyof FormState)[]> = {
   7: [],
 };
 
-/* mock recent candidaturas */
-const RECENT_SEED = [
-  { ref: "CAND-2026-1042", nome: "Joana Pedro Lopes",     curso: "Arquitectura",            sessao: "1ª Sessão", data: "2026-05-11 09:42", estado: "Submetida" },
-  { ref: "CAND-2026-1041", nome: "Miguel António Silva",  curso: "Engenharia Informática",  sessao: "1ª Sessão", data: "2026-05-11 09:18", estado: "Submetida" },
-  { ref: "CAND-2026-1040", nome: "Carla Manuel Sebastião",curso: "Direito",                 sessao: "2ª Sessão", data: "2026-05-11 08:55", estado: "Submetida" },
-  { ref: "CAND-2026-1039", nome: "Rui Domingos Cardoso",  curso: "Medicina",                sessao: "1ª Sessão", data: "2026-05-10 17:31", estado: "Submetida" },
-  { ref: "CAND-2026-1038", nome: "Ana Clara Vunge",       curso: "Economia",                sessao: "2ª Sessão", data: "2026-05-10 16:04", estado: "Submetida" },
-  { ref: "CAND-2026-1037", nome: "Pedro Manuel Nzinga",   curso: "Gestão",                  sessao: "3ª Sessão", data: "2026-05-10 15:22", estado: "Submetida" },
-];
+/* mock recent candidaturas (sourced from shared module) */
+const RECENT_SEED = inscricoesRecent.map(r => ({
+  ref: r.ref, nome: r.nome, curso: r.curso, sessao: r.sessao, data: r.data, estado: r.estado,
+}));
+
 
 /* ─────────────────────────── helpers ─────────────────────────── */
 
@@ -97,6 +95,7 @@ function Field({ label, required, children }: { label: string; required?: boolea
 
 export default function InscricoesRegistar() {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [view, setView] = useState<"dashboard" | "wizard">("dashboard");
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<FormState>(empty);
@@ -219,11 +218,16 @@ export default function InscricoesRegistar() {
                   <th className="text-left px-4 py-2.5 font-medium">Sessão</th>
                   <th className="text-left px-4 py-2.5 font-medium">Submetida em</th>
                   <th className="text-left px-4 py-2.5 font-medium">Estado</th>
+                  <th className="w-8"></th>
                 </tr>
               </thead>
               <tbody>
                 {filteredRecent.map(r => (
-                  <tr key={r.ref} className="border-t hover:bg-muted/30">
+                  <tr
+                    key={r.ref}
+                    onClick={() => navigate(`/inscricoes/candidato/${r.ref}`)}
+                    className="border-t hover:bg-muted/40 cursor-pointer transition-colors"
+                  >
                     <td className="px-4 py-2.5 font-mono text-[12px] text-foreground">{r.ref}</td>
                     <td className="px-4 py-2.5 font-medium text-foreground">{r.nome}</td>
                     <td className="px-4 py-2.5 text-muted-foreground">{r.curso}</td>
@@ -234,10 +238,11 @@ export default function InscricoesRegistar() {
                         {r.estado}
                       </Badge>
                     </td>
+                    <td className="px-2 text-muted-foreground"><ChevronRight className="w-4 h-4" /></td>
                   </tr>
                 ))}
                 {!filteredRecent.length && (
-                  <tr><td colSpan={6} className="px-4 py-8 text-center text-muted-foreground text-[13px]">Sem resultados.</td></tr>
+                  <tr><td colSpan={7} className="px-4 py-8 text-center text-muted-foreground text-[13px]">Sem resultados.</td></tr>
                 )}
               </tbody>
             </table>
@@ -276,12 +281,9 @@ export default function InscricoesRegistar() {
               <div key={s.key} className="flex items-center flex-1 min-w-0">
                 <button
                   type="button"
-                  onClick={() => { if (s.n < step) { setErrors(new Set()); setStep(s.n); } }}
-                  disabled={s.n > step}
+                  onClick={() => { setErrors(new Set()); setStep(s.n); }}
                   className={cn(
-                    "flex flex-col items-center gap-1.5 shrink-0",
-                    s.n < step && "cursor-pointer",
-                    s.n > step && "cursor-not-allowed"
+                    "flex flex-col items-center gap-1.5 shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
                   )}
                 >
                   <div className={cn(
