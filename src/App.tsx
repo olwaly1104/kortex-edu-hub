@@ -131,6 +131,7 @@ import FinancasSolicitacoes from "./pages/financas/Solicitacoes";
 import FinancasPessoalFinancas from "./pages/financas/PessoalFinancas";
 import InscricoesLayout from "./layouts/InscricoesLayout";
 import InscricoesRegistar from "./pages/inscricoes/Registar";
+import InscricoesCandidatoDetail from "./pages/inscricoes/CandidatoDetail";
 
 const queryClient = new QueryClient();
 
