@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback } from "react";
-import { User, UserRole, detectRole, currentStudent, currentProfessor, currentCoordenadorCurso, currentDecano, currentReitor, currentSecretaria, currentFinancas, currentGap } from "@/data/mockData";
+import { User, UserRole, detectRole, currentStudent, currentProfessor, currentCoordenadorCurso, currentDecano, currentReitor, currentSecretaria, currentFinancas, currentGap, currentInscricoes } from "@/data/mockData";
 
 interface AuthContextType {
   user: User | null;
@@ -24,6 +24,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       secretaria: currentSecretaria,
       financas: currentFinancas,
       gap: currentGap,
+      inscricoes: currentInscricoes,
     };
     setUser({ ...mockUsers[role], email });
     return true;

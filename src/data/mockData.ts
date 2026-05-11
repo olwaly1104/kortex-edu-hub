@@ -1,4 +1,4 @@
-export type UserRole = "professor" | "student" | "coordenador_curso" | "decano" | "reitor" | "secretaria" | "financas" | "gap";
+export type UserRole = "professor" | "student" | "coordenador_curso" | "decano" | "reitor" | "secretaria" | "financas" | "gap" | "inscricoes";
 
 export interface User {
   id: string;
@@ -220,6 +220,13 @@ export const currentGap: User = {
   name: "Dra. Helena Cabral",
   email: "gap@upra.kor",
   role: "gap",
+};
+
+export const currentInscricoes: User = {
+  id: "10",
+  name: "Portal de Inscrições",
+  email: "inscricoes@upra.kor",
+  role: "inscricoes",
 };
 
 // Disciplines
@@ -492,6 +499,7 @@ export const emailMessages: EmailMessage[] = [
 
 // Helper function
 export function detectRole(email: string): UserRole {
+  if (email.startsWith("inscricoes")) return "inscricoes";
   if (email.startsWith("gap")) return "gap";
   if (email.startsWith("financas")) return "financas";
   if (email.startsWith("academica")) return "secretaria";
