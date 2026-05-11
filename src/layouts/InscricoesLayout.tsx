@@ -21,7 +21,7 @@ export default function InscricoesLayout() {
           <LogOut className="w-3.5 h-3.5" /> Sair
         </Button>
       </header>
-      <main className="flex-1">
+      <main className="flex-1 flex flex-col min-h-0">
         <Outlet />
       </main>
     </div>
