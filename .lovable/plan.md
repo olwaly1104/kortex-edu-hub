@@ -1,75 +1,107 @@
+## Inscrições Portal — Single-Page Student Registration
 
+A new login `inscricoes@upra.kor` opens a **single page** (no sidebar, no dashboard, no other menus) where the operator registers a new student. Submitting the form is what originates a student account/candidatura.
 
-User uploaded the CTI solicitações PDF. They confirm: each PDF lists requests for one destination department. CTI is just the first — Financeiro and others will follow. For now, I should:
+### 1. Role & Auth
 
-1. Parse the CTI PDF to extract the exact list of request types CTI handles.
-2. Build out the `Solicitacao` model with proper categories.
-3. Seed CTI requests using the real types from the document.
-4. Leave the data structure ready to receive Académica, Financeiro, GAP requests in future uploads.
+- Add `"inscricoes"` to `UserRole` in `src/data/mockData.ts`.
+- Add `currentInscricoes` mock user (`inscricoes@upra.kor`, name "Portal de Inscrições").
+- `detectRole()`: `inscricoes*` → `inscricoes`.
+- `AuthContext.tsx`: register the new mock user.
+- `App.tsx`: `homeRedirectMap.inscricoes = "/inscricoes"`.
+- `Login.tsx`: add seed-credentials hint line.
 
-I already have the model design from the previous plan. This iteration just narrows the seed data to CTI only (with realistic types from the PDF), and prepares the routing map so additional departments slot in cleanly.
+### 2. Layout — Minimal Shell
 
-I cannot parse the PDF in plan mode (read-only), so I'll do that as the first step once approved.
+`src/layouts/InscricoesLayout.tsx` (does **not** use `AppSidebar`).
 
-## Plan: seed CTI solicitações from the uploaded document
-
-### Step 1 — Parse the PDF
-Use `document--parse_document` on `user-uploads://CENTRO_DE_TECNOLOGIAS_DE_INFORMAÇÃO_-_CTI_solicitacoes.pdf` to extract the official CTI request types and their categories/subcategories.
-
-### Step 2 — Update `src/data/gapData.ts`
-
-**Replace the ticket model** with the request-tracking model (already designed in the previous plan):
-
-```ts
-type Destino = "CTI" | "Académica" | "Financeiro" | "GAP" | "Secretaria";
-
-type EstadoSolicitacao =
-  | "recebida" | "encaminhada" | "em_execucao" | "concluida" | "rejeitada";
-
-interface Solicitacao {
-  id; estudante; matricula; curso; ano;
-  tipo;                    // exact label from PDF, e.g. "Segunda via de cartão"
-  categoria;               // sub-grouping from PDF (e.g. "Cartão de estudante")
-  destino;                 // auto = "CTI" for all in this batch
-  assunto; descricao;
-  estado; prioridade;
-  dataSubmissao; dataEncaminhamento; dataConclusao?;
-  responsavelDestino?;     // e.g. "Eng. Paulo Neto · CTI"
-  slaDias;
-  historico: { data; actor; accao; nota? }[];
-  anexos?;
-}
+```text
+┌─────────────────────────────────────────────────────────┐
+│ [Kortex Educação]    Portal de Inscrições · UPRA   Sair │
+├─────────────────────────────────────────────────────────┤
+│                                                         │
+│            < single registration page >                 │
+│                                                         │
+└─────────────────────────────────────────────────────────┘
 ```
 
-**Add a routing map** `tipoToDestino` so future Financeiro/Académica types route correctly. For now, all entries point to CTI.
+- Top bar only: logo + title + Logout.
+- White background, `Inter`, primary `#1B3A6B`, same UI kit as the rest of the app.
+- No navigation, no Início, no Calendário, nothing else.
 
-**Seed ~12–15 solicitações** using the actual types from the PDF, distributed across:
-- Estados: 3 recebida, 3 encaminhada, 4 em_execucao, 4 concluida, 1 rejeitada
-- Prioridades: mix
-- Realistic CTI staff: "Eng. Paulo Neto", "Téc. Sara Domingos"
-- Each with a 2–4 step `historico` audit trail (submissão → encaminhamento CTI → execução → conclusão)
+### 3. The Single Page — `Registar Estudante`
 
-### Step 3 — `Solicitacoes.tsx` (route `/gap/solicitacoes`)
-Already restructured in the previous turn. Adjust to:
-- Replace **chat dialog** with a **tracking dialog** (audit timeline, no message composer).
-- Add **Destino** column + filter (currently only "CTI" — but the filter is ready).
-- Add **Categoria** filter (CTI sub-categories from the PDF).
-- Add **SLA badge** column (no prazo / em risco / atrasado, computed from `slaDias` vs `dataEncaminhamento`).
-- GAP actions (monitor role): "Adicionar nota interna", "Marcar urgente", "Pedir actualização" — no responder.
-- Helper text: *"As solicitações são submetidas pelo estudante no Portal e encaminhadas automaticamente ao departamento responsável. O GAP acompanha a execução."*
+Route: `/inscricoes` (index). One page, structured into clearly labeled sections inside one `Card`. All fields visible at once; the user fills top-to-bottom and submits.
 
-### Step 4 — `Dashboard.tsx`, `Inicio.tsx`, `EstudanteProfile.tsx`
-- Dashboard: rename "por Categoria" widget → **"Solicitações por Destino"** (CTI dominante por agora). Add **SLA em Risco** KPI.
-- Início: "Pedidos Recentes" reframed as "Últimas solicitações encaminhadas" (sem CTAs de criação).
-- EstudanteProfile: lista de solicitações mostra Destino + Estado de execução (sem "última mensagem").
+```text
+┌──────────────────────────────────────────────────────────┐
+│ Registar Novo Estudante                                  │
+│ Preencha os dados abaixo para criar a candidatura.       │
+├──────────────────────────────────────────────────────────┤
+│ ▸ Dados Pessoais                                         │
+│   Nome completo · Nº BI · Data nasc. · Género ·          │
+│   Naturalidade · Nacionalidade · Foto tipo passe         │
+│                                                          │
+│ ▸ Contactos & Morada                                     │
+│   Email pessoal · Telemóvel · Província · Município ·    │
+│   Bairro / Endereço                                      │
+│                                                          │
+│ ▸ Encarregado de Educação                                │
+│   Nome · Nº BI · Parentesco · Telefone · Email           │
+│                                                          │
+│ ▸ Formação Académica                                     │
+│   Escola anterior · Tipo de ensino · Ano de conclusão ·  │
+│   Média final                                            │
+│                                                          │
+│ ▸ Curso Pretendido                                       │
+│   Faculdade · Curso (1ª opção) · Curso (2ª opção) ·      │
+│   Sessão de Prova (1ª / 2ª / 3ª)                         │
+│                                                          │
+│ ▸ Documentos (upload)                                    │
+│   [BI]  [Declaração de Notas]  [Certidão Habilitações]   │
+│   [Foto tipo passe]  [Comprovativo de pagamento]         │
+│                                                          │
+│ ☐ Confirmo que os dados são verdadeiros                  │
+│                                  [ Limpar ]  [ Submeter ]│
+└──────────────────────────────────────────────────────────┘
+```
 
-### Files touched
-- `src/data/gapData.ts` — model + CTI seed data
-- `src/pages/gap/Tickets.tsx` — tracking dialog, Destino/Categoria filters, SLA
-- `src/pages/gap/Dashboard.tsx` — Destino widget, SLA KPI
-- `src/pages/gap/Inicio.tsx` — copy
-- `src/pages/gap/EstudanteProfile.tsx` — request list reframe
+- Each section is a labeled group with a thin divider — visual hierarchy only, **not** steps.
+- Inputs use the existing `Input`, `Label`, `Select`, `Textarea`, `Checkbox` from `@/components/ui/*`.
+- Document uploads: drop-card with state `Em falta` / `Carregado` (filename), simulated (no Cloud upload — mock data).
+- Required-field validation client-side; invalid → red border + small message.
+- **Submit** → toast success + reset form to blank and show small inline confirmation strip ("✓ Candidatura CAND-2026-0142 criada — pronto para registar outro estudante.").
 
-### Ready for next uploads
-When you upload Financeiro/Académica PDFs, I'll just append types to `tipoToDestino` and add seed entries — no structural changes needed.
+### 4. Routing
 
+In `App.tsx`:
+
+```tsx
+<Route element={<InscricoesLayout />}>
+  <Route path="/inscricoes" element={<InscricoesRegistar />} />
+</Route>
+```
+
+Inscrições users redirect to `/inscricoes`; any other path falls back there.
+
+### 5. Files
+
+- **Add**
+  - `src/layouts/InscricoesLayout.tsx`
+  - `src/pages/inscricoes/Registar.tsx` (the single page)
+  - `src/data/inscricoesData.ts` (faculdade/curso/sessão options + types)
+- **Change**
+  - `src/data/mockData.ts` — role + mock user + detectRole
+  - `src/contexts/AuthContext.tsx` — register mock user
+  - `src/App.tsx` — homeRedirectMap + route
+  - `src/pages/Login.tsx` — seed credential hint
+
+### 6. Memory
+
+Add `mem://features/inscricoes/portal-overview` and a Core line:
+> Inscrições role (`inscricoes@upra.kor`) is a single-page student-registration portal — no sidebar, no other menus; submitting the form originates a candidatura.
+
+### Notes
+
+- Terminology aligned with project memory: "Cadeira", "Sessão" (1ª/2ª/3ª), "Por regularizar", semantic colors.
+- Visual language identical to the rest of the app (OneDrive-inspired card, Inter, primary `#1B3A6B`).

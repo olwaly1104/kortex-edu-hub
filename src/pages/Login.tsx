@@ -150,6 +150,9 @@ export default function Login() {
             <p className="text-xs text-muted-foreground">
               <span className="font-medium">financas@upra.kor</span> (Finanças) · <span className="font-medium">gap@upra.kor</span> (GAP)
             </p>
+            <p className="text-xs text-muted-foreground">
+              <span className="font-medium">inscricoes@upra.kor</span> (Inscrições)
+            </p>
           </div>
         </div>
       </div>

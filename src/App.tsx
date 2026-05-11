@@ -129,6 +129,8 @@ import FinancasSalarios from "./pages/financas/Salarios";
 import FinancasOrcamentos from "./pages/financas/Orcamentos";
 import FinancasSolicitacoes from "./pages/financas/Solicitacoes";
 import FinancasPessoalFinancas from "./pages/financas/PessoalFinancas";
+import InscricoesLayout from "./layouts/InscricoesLayout";
+import InscricoesRegistar from "./pages/inscricoes/Registar";
 
 const queryClient = new QueryClient();
 
@@ -141,6 +143,7 @@ const homeRedirectMap: Record<string, string> = {
   secretaria: "/secretaria",
   financas: "/financas",
   gap: "/gap",
+  inscricoes: "/inscricoes",
 };
 
 function AppRoutes() {
@@ -312,6 +315,10 @@ function AppRoutes() {
         <Route path="/gap/contactos" element={<StudentContacts />} />
         <Route path="/gap/financas" element={<StudentFinances />} />
         <Route path="/gap/perfil" element={<StudentProfile />} />
+      </Route>
+      {/* Inscrições — minimal single-page portal */}
+      <Route element={<InscricoesLayout />}>
+        <Route path="/inscricoes" element={<InscricoesRegistar />} />
       </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>
