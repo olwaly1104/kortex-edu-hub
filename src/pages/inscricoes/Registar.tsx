@@ -75,6 +75,9 @@ const STEP_FIELDS: Record<number, (keyof FormState)[]> = {
 /* mock recent candidaturas (sourced from shared module) */
 const RECENT_SEED = inscricoesRecent.map(r => ({
   ref: r.ref, nome: r.nome, curso: r.curso, sessao: r.sessao, data: r.data, estado: r.estado, notaSessao: r.notaSessao,
+  docsEntregues: r.documentos.filter(d => d.entregue).length,
+  docsTotal: r.documentos.length,
+  preparatorio: r.preparatorio,
 }));
 
 
