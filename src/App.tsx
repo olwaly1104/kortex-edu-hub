@@ -320,6 +320,7 @@ function AppRoutes() {
       {/* Inscrições — minimal single-page portal */}
       <Route element={<InscricoesLayout />}>
         <Route path="/inscricoes" element={<InscricoesRegistar />} />
+        <Route path="/inscricoes/candidato/:ref" element={<InscricoesCandidatoDetail />} />
       </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>
