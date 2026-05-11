@@ -153,7 +153,7 @@ export default function InscricoesRegistar() {
     const ref = `CAND-2026-${String(Math.floor(Math.random() * 9000) + 1000)}`;
     const now = new Date();
     const data = `${now.toISOString().slice(0,10)} ${String(now.getHours()).padStart(2,"0")}:${String(now.getMinutes()).padStart(2,"0")}`;
-    setRecent(r => [{ ref, nome: form.nome, curso: form.curso1, sessao: form.sessao, data, estado: "Submetida", notaSessao: undefined }, ...r]);
+    setRecent(r => [{ ref, nome: form.nome, curso: form.curso1, sessao: form.sessao, data, estado: "Submetida", notaSessao: undefined, docsEntregues: Object.values(docs).filter(Boolean).length, docsTotal: DOCS.length, preparatorio: false }, ...r]);
     toast({ title: "Candidatura criada", description: `${ref} — ${form.nome} registado(a) com sucesso.` });
     setForm(empty); setDocs({}); setErrors(new Set()); setStep(1); setView("dashboard");
   };
