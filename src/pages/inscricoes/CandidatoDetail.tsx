@@ -121,6 +121,11 @@ export default function CandidatoDetail() {
           <div>
             <p className="text-[10.5px] uppercase tracking-wide text-muted-foreground font-medium">Sessão</p>
             <p className="text-[13px] font-semibold text-foreground mt-1">{c.sessao}</p>
+            {c.dataProva && (
+              <p className="text-[11px] text-muted-foreground mt-0.5 flex items-center gap-1">
+                <Calendar className="w-3 h-3" /> {new Date(c.dataProva).toLocaleDateString("pt-PT", { day: "2-digit", month: "short", year: "numeric" })}
+              </p>
+            )}
           </div>
           <div>
             <p className="text-[10.5px] uppercase tracking-wide text-muted-foreground font-medium">Submetida em</p>
