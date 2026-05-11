@@ -222,7 +222,6 @@ export default function InscricoesRegistar() {
                   <th className="text-left px-4 py-2.5 font-medium">Sessão</th>
                   <th className="text-left px-4 py-2.5 font-medium">Submetida em</th>
                   <th className="text-left px-4 py-2.5 font-medium">Docs</th>
-                  <th className="text-left px-4 py-2.5 font-medium">Nota</th>
                   <th className="text-left px-4 py-2.5 font-medium">Estado</th>
                   <th className="w-8"></th>
                 </tr>
@@ -256,14 +255,6 @@ export default function InscricoesRegistar() {
                         <span className={cn("font-medium", r.docsEntregues === r.docsTotal ? "text-emerald-700" : "text-amber-700")}>
                           {r.docsEntregues}/{r.docsTotal}
                         </span>
-                      </td>
-                      <td className="px-4 py-2.5 tabular-nums">
-                        {typeof r.notaSessao === "number"
-                          ? <span className={cn(
-                              "font-semibold",
-                              r.notaSessao >= 10 ? "text-emerald-700" : "text-red-700"
-                            )}>{r.notaSessao.toFixed(1)}</span>
-                          : <span className="text-muted-foreground/60">—</span>}
                       </td>
                       <td className="px-4 py-2.5">
                         <Badge variant="outline" className={cn("text-[11px]", estadoCls)}>
