@@ -4,9 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { inscricoesRecent } from "@/data/inscricoesData";
 import {
-  ArrowLeft, User, MapPin, ShieldCheck, GraduationCap, BookOpen, FileText,
-  Phone, Mail, Calendar, IdCard, Eye, CheckCircle2, XCircle, Printer,
+  ArrowLeft, User, MapPin, ShieldCheck, BookOpen, FileText,
+  Phone, Mail, Calendar, IdCard, Eye, CheckCircle2, XCircle, FileSearch, Share2, Award,
 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 function Row({ label, value }: { label: string; value?: string }) {
   return (
@@ -32,6 +33,7 @@ function Section({ icon: Icon, title, children }: { icon: any; title: string; ch
 export default function CandidatoDetail() {
   const { ref } = useParams();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const c = inscricoesRecent.find(x => x.ref === ref);
 
   if (!c) {
@@ -47,6 +49,24 @@ export default function CandidatoDetail() {
 
   const docsEntregues = c.documentos.filter(d => d.entregue).length;
   const initials = c.nome.split(" ").map(n => n[0]).slice(0, 2).join("");
+  const aprovado = c.notaSessao !== undefined && c.notaSessao >= 10;
+  const estadoCls =
+    c.estado === "Aprovada"  ? "bg-emerald-50 text-emerald-700 border-emerald-200" :
+    c.estado === "Reprovada" ? "bg-red-50 text-red-700 border-red-200" :
+    c.estado === "Em análise"? "bg-amber-50 text-amber-700 border-amber-200" :
+                               "bg-blue-50 text-blue-700 border-blue-200";
+
+  const partilhar = async () => {
+    const url = `${window.location.origin}/inscricoes/candidato/${c.ref}`;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: `Candidato ${c.ref}`, text: c.nome, url });
+      } else {
+        await navigator.clipboard.writeText(url);
+        toast({ title: "Link copiado", description: "Ligação para o candidato copiada." });
+      }
+    } catch { /* noop */ }
+  };
 
   return (
     <div className="max-w-5xl mx-auto p-6 lg:p-8 space-y-6">
@@ -73,14 +93,23 @@ export default function CandidatoDetail() {
             </div>
           </div>
           <div className="flex flex-col items-end gap-2">
-            <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 border">{c.estado}</Badge>
-            <Button variant="outline" size="sm" className="h-8 text-[12px] gap-1.5">
-              <Printer className="w-3.5 h-3.5" /> Imprimir ficha
-            </Button>
+            <Badge variant="outline" className={`border ${estadoCls}`}>{c.estado}</Badge>
+            <div className="flex items-center gap-1.5">
+              <Button variant="outline" size="sm" className="h-8 text-[12px] gap-1.5" onClick={partilhar}>
+                <Share2 className="w-3.5 h-3.5" /> Partilhar
+              </Button>
+              <Button
+                size="sm"
+                className="h-8 text-[12px] gap-1.5"
+                onClick={() => navigate(`/inscricoes/candidato/${c.ref}/documento`)}
+              >
+                <FileSearch className="w-3.5 h-3.5" /> Ver documento
+              </Button>
+            </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-6 pt-5 border-t">
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 mt-6 pt-5 border-t">
           <div>
             <p className="text-[10.5px] uppercase tracking-wide text-muted-foreground font-medium">Curso (1ª opção)</p>
             <p className="text-[13px] font-semibold text-foreground mt-1">{c.curso}</p>
@@ -98,6 +127,18 @@ export default function CandidatoDetail() {
             <p className="text-[13px] font-semibold text-foreground mt-1 flex items-center gap-1.5">
               <Calendar className="w-3.5 h-3.5 text-muted-foreground" /> {c.data}
             </p>
+          </div>
+          <div>
+            <p className="text-[10.5px] uppercase tracking-wide text-muted-foreground font-medium flex items-center gap-1">
+              <Award className="w-3 h-3" /> Nota da Sessão
+            </p>
+            {c.notaSessao !== undefined ? (
+              <p className={`text-[15px] font-bold mt-1 tabular-nums ${aprovado ? "text-emerald-700" : "text-red-700"}`}>
+                {c.notaSessao.toFixed(1)}<span className="text-[11px] text-muted-foreground font-medium"> / 20</span>
+              </p>
+            ) : (
+              <p className="text-[12px] text-muted-foreground/60 italic mt-1.5">Por realizar</p>
+            )}
           </div>
         </div>
       </Card>
@@ -129,18 +170,13 @@ export default function CandidatoDetail() {
           <Row label="Email" value={c.encEmail} />
         </Section>
 
-        <Section icon={GraduationCap} title="Formação Académica">
-          <Row label="Escola de proveniência" value={c.escola} />
-          <Row label="Tipo de ensino" value={c.tipoEnsino} />
-          <Row label="Ano de conclusão" value={c.anoConclusao} />
-          <Row label="Média final" value={`${c.mediaFinal} / 20`} />
-        </Section>
-
         <Section icon={BookOpen} title="Curso & Sessão">
           <Row label="Faculdade" value={c.faculdade} />
           <Row label="1ª opção" value={c.curso} />
           <Row label="2ª opção" value={c.curso2} />
           <Row label="Sessão de prova" value={c.sessao} />
+          <Row label="Data da prova" value={c.dataProva} />
+          <Row label="Nota obtida" value={c.notaSessao !== undefined ? `${c.notaSessao.toFixed(1)} / 20` : undefined} />
         </Section>
 
         <Section icon={FileText} title={`Documentos (${docsEntregues}/${c.documentos.length})`}>

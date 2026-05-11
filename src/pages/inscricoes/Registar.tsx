@@ -74,7 +74,7 @@ const STEP_FIELDS: Record<number, (keyof FormState)[]> = {
 
 /* mock recent candidaturas (sourced from shared module) */
 const RECENT_SEED = inscricoesRecent.map(r => ({
-  ref: r.ref, nome: r.nome, curso: r.curso, sessao: r.sessao, data: r.data, estado: r.estado,
+  ref: r.ref, nome: r.nome, curso: r.curso, sessao: r.sessao, data: r.data, estado: r.estado, notaSessao: r.notaSessao,
 }));
 
 
@@ -150,7 +150,7 @@ export default function InscricoesRegistar() {
     const ref = `CAND-2026-${String(Math.floor(Math.random() * 9000) + 1000)}`;
     const now = new Date();
     const data = `${now.toISOString().slice(0,10)} ${String(now.getHours()).padStart(2,"0")}:${String(now.getMinutes()).padStart(2,"0")}`;
-    setRecent(r => [{ ref, nome: form.nome, curso: form.curso1, sessao: form.sessao, data, estado: "Submetida" }, ...r]);
+    setRecent(r => [{ ref, nome: form.nome, curso: form.curso1, sessao: form.sessao, data, estado: "Submetida", notaSessao: undefined }, ...r]);
     toast({ title: "Candidatura criada", description: `${ref} — ${form.nome} registado(a) com sucesso.` });
     setForm(empty); setDocs({}); setErrors(new Set()); setStep(1); setView("dashboard");
   };
@@ -217,32 +217,48 @@ export default function InscricoesRegistar() {
                   <th className="text-left px-4 py-2.5 font-medium">Curso (1ª opção)</th>
                   <th className="text-left px-4 py-2.5 font-medium">Sessão</th>
                   <th className="text-left px-4 py-2.5 font-medium">Submetida em</th>
+                  <th className="text-left px-4 py-2.5 font-medium">Nota</th>
                   <th className="text-left px-4 py-2.5 font-medium">Estado</th>
                   <th className="w-8"></th>
                 </tr>
               </thead>
               <tbody>
-                {filteredRecent.map(r => (
-                  <tr
-                    key={r.ref}
-                    onClick={() => navigate(`/inscricoes/candidato/${r.ref}`)}
-                    className="border-t hover:bg-muted/40 cursor-pointer transition-colors"
-                  >
-                    <td className="px-4 py-2.5 font-mono text-[12px] text-foreground">{r.ref}</td>
-                    <td className="px-4 py-2.5 font-medium text-foreground">{r.nome}</td>
-                    <td className="px-4 py-2.5 text-muted-foreground">{r.curso}</td>
-                    <td className="px-4 py-2.5 text-muted-foreground">{r.sessao}</td>
-                    <td className="px-4 py-2.5 text-muted-foreground">{r.data}</td>
-                    <td className="px-4 py-2.5">
-                      <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200 text-[11px]">
-                        {r.estado}
-                      </Badge>
-                    </td>
-                    <td className="px-2 text-muted-foreground"><ChevronRight className="w-4 h-4" /></td>
-                  </tr>
-                ))}
+                {filteredRecent.map(r => {
+                  const estadoCls =
+                    r.estado === "Aprovada"  ? "bg-emerald-50 text-emerald-700 border-emerald-200" :
+                    r.estado === "Reprovada" ? "bg-red-50 text-red-700 border-red-200" :
+                    r.estado === "Em análise"? "bg-amber-50 text-amber-700 border-amber-200" :
+                                               "bg-blue-50 text-blue-700 border-blue-200";
+                  return (
+                    <tr
+                      key={r.ref}
+                      onClick={() => navigate(`/inscricoes/candidato/${r.ref}`)}
+                      className="border-t hover:bg-muted/40 cursor-pointer transition-colors"
+                    >
+                      <td className="px-4 py-2.5 font-mono text-[12px] text-foreground">{r.ref}</td>
+                      <td className="px-4 py-2.5 font-medium text-foreground">{r.nome}</td>
+                      <td className="px-4 py-2.5 text-muted-foreground">{r.curso}</td>
+                      <td className="px-4 py-2.5 text-muted-foreground">{r.sessao}</td>
+                      <td className="px-4 py-2.5 text-muted-foreground">{r.data}</td>
+                      <td className="px-4 py-2.5 tabular-nums">
+                        {typeof r.notaSessao === "number"
+                          ? <span className={cn(
+                              "font-semibold",
+                              r.notaSessao >= 10 ? "text-emerald-700" : "text-red-700"
+                            )}>{r.notaSessao.toFixed(1)}</span>
+                          : <span className="text-muted-foreground/60">—</span>}
+                      </td>
+                      <td className="px-4 py-2.5">
+                        <Badge variant="outline" className={cn("text-[11px]", estadoCls)}>
+                          {r.estado}
+                        </Badge>
+                      </td>
+                      <td className="px-2 text-muted-foreground"><ChevronRight className="w-4 h-4" /></td>
+                    </tr>
+                  );
+                })}
                 {!filteredRecent.length && (
-                  <tr><td colSpan={7} className="px-4 py-8 text-center text-muted-foreground text-[13px]">Sem resultados.</td></tr>
+                  <tr><td colSpan={8} className="px-4 py-8 text-center text-muted-foreground text-[13px]">Sem resultados.</td></tr>
                 )}
               </tbody>
             </table>

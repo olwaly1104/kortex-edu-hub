@@ -132,6 +132,7 @@ import FinancasPessoalFinancas from "./pages/financas/PessoalFinancas";
 import InscricoesLayout from "./layouts/InscricoesLayout";
 import InscricoesRegistar from "./pages/inscricoes/Registar";
 import InscricoesCandidatoDetail from "./pages/inscricoes/CandidatoDetail";
+import InscricoesDoc from "./pages/inscricoes/InscricaoDoc";
 
 const queryClient = new QueryClient();
 
@@ -321,6 +322,7 @@ function AppRoutes() {
       <Route element={<InscricoesLayout />}>
         <Route path="/inscricoes" element={<InscricoesRegistar />} />
         <Route path="/inscricoes/candidato/:ref" element={<InscricoesCandidatoDetail />} />
+        <Route path="/inscricoes/candidato/:ref/documento" element={<InscricoesDoc />} />
       </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>
