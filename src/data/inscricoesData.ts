@@ -80,7 +80,7 @@ export const inscricoesRecent: InscricaoRecord[] = [
     anoConclusao: "2025", mediaFinal: "14.8",
     faculdade: "Faculdade de Ciências Sociais", curso: "Direito",
     sessao: "2ª Sessão", data: "2026-05-11 08:55", estado: "Em análise",
-    documentos: baseDocs(true), preparatorio: true,
+    documentos: baseDocs(true), preparatorio: false,
   },
   {
     ref: "CAND-2026-1039", nome: "Rui Domingos Cardoso", bi: "009345678LA044", nascimento: "2006-02-18",
@@ -121,6 +121,6 @@ export const inscricoesRecent: InscricaoRecord[] = [
     anoConclusao: "2024", mediaFinal: "12.7",
     faculdade: "Faculdade de Ciências Sociais", curso: "Gestão",
     sessao: "3ª Sessão", data: "2026-05-10 15:22", estado: "Submetida",
-    documentos: baseDocs(true), preparatorio: true,
+    documentos: baseDocs(true), preparatorio: false,
   },
 ];
