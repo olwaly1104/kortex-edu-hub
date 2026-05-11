@@ -72,15 +72,11 @@ const STEP_FIELDS: Record<number, (keyof FormState)[]> = {
   7: [],
 };
 
-/* mock recent candidaturas */
-const RECENT_SEED = [
-  { ref: "CAND-2026-1042", nome: "Joana Pedro Lopes",     curso: "Arquitectura",            sessao: "1ª Sessão", data: "2026-05-11 09:42", estado: "Submetida" },
-  { ref: "CAND-2026-1041", nome: "Miguel António Silva",  curso: "Engenharia Informática",  sessao: "1ª Sessão", data: "2026-05-11 09:18", estado: "Submetida" },
-  { ref: "CAND-2026-1040", nome: "Carla Manuel Sebastião",curso: "Direito",                 sessao: "2ª Sessão", data: "2026-05-11 08:55", estado: "Submetida" },
-  { ref: "CAND-2026-1039", nome: "Rui Domingos Cardoso",  curso: "Medicina",                sessao: "1ª Sessão", data: "2026-05-10 17:31", estado: "Submetida" },
-  { ref: "CAND-2026-1038", nome: "Ana Clara Vunge",       curso: "Economia",                sessao: "2ª Sessão", data: "2026-05-10 16:04", estado: "Submetida" },
-  { ref: "CAND-2026-1037", nome: "Pedro Manuel Nzinga",   curso: "Gestão",                  sessao: "3ª Sessão", data: "2026-05-10 15:22", estado: "Submetida" },
-];
+/* mock recent candidaturas (sourced from shared module) */
+const RECENT_SEED = inscricoesRecent.map(r => ({
+  ref: r.ref, nome: r.nome, curso: r.curso, sessao: r.sessao, data: r.data, estado: r.estado,
+}));
+
 
 /* ─────────────────────────── helpers ─────────────────────────── */
 
