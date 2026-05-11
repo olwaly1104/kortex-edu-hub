@@ -91,7 +91,8 @@ export const inscricoesRecent: InscricaoRecord[] = [
     escola: "Colégio Externato São José", tipoEnsino: "Ensino Médio",
     anoConclusao: "2024", mediaFinal: "17.1",
     faculdade: "Faculdade de Saúde", curso: "Medicina", curso2: "Enfermagem",
-    sessao: "1ª Sessão", data: "2026-05-10 17:31", estado: "Submetida",
+    sessao: "1ª Sessão", data: "2026-05-10 17:31", estado: "Aprovada",
+    notaSessao: 17.8, dataProva: "2026-05-09",
     documentos: baseDocs(true),
   },
   {
@@ -104,7 +105,8 @@ export const inscricoesRecent: InscricaoRecord[] = [
     escola: "Colégio Esperança", tipoEnsino: "Ensino Médio",
     anoConclusao: "2025", mediaFinal: "13.9",
     faculdade: "Faculdade de Ciências Sociais", curso: "Economia", curso2: "Gestão",
-    sessao: "2ª Sessão", data: "2026-05-10 16:04", estado: "Submetida",
+    sessao: "2ª Sessão", data: "2026-05-10 16:04", estado: "Reprovada",
+    notaSessao: 8.4, dataProva: "2026-05-08",
     documentos: baseDocs(true),
   },
   {
