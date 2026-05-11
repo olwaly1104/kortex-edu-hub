@@ -53,7 +53,7 @@ export const inscricoesRecent: InscricaoRecord[] = [
     faculdade: "Faculdade de Ciências Exatas", curso: "Arquitectura", curso2: "Engenharia Civil",
     sessao: "1ª Sessão", data: "2026-05-11 09:42", estado: "Aprovada",
     notaSessao: 16.5, dataProva: "2026-05-09",
-    documentos: baseDocs(true),
+    documentos: baseDocs(true), preparatorio: true,
   },
   {
     ref: "CAND-2026-1041", nome: "Miguel António Silva", bi: "007123456LA042", nascimento: "2006-11-04",
@@ -67,7 +67,7 @@ export const inscricoesRecent: InscricaoRecord[] = [
     faculdade: "Faculdade de Ciências Exatas", curso: "Engenharia Informática",
     sessao: "1ª Sessão", data: "2026-05-11 09:18", estado: "Aprovada",
     notaSessao: 14.2, dataProva: "2026-05-09",
-    documentos: baseDocs(true),
+    documentos: baseDocs(true), preparatorio: true,
   },
   {
     ref: "CAND-2026-1040", nome: "Carla Manuel Sebastião", bi: "008234567LA043", nascimento: "2007-07-22",
@@ -80,7 +80,7 @@ export const inscricoesRecent: InscricaoRecord[] = [
     anoConclusao: "2025", mediaFinal: "14.8",
     faculdade: "Faculdade de Ciências Sociais", curso: "Direito",
     sessao: "2ª Sessão", data: "2026-05-11 08:55", estado: "Em análise",
-    documentos: baseDocs(true),
+    documentos: baseDocs(true), preparatorio: true,
   },
   {
     ref: "CAND-2026-1039", nome: "Rui Domingos Cardoso", bi: "009345678LA044", nascimento: "2006-02-18",
@@ -94,7 +94,7 @@ export const inscricoesRecent: InscricaoRecord[] = [
     faculdade: "Faculdade de Saúde", curso: "Medicina", curso2: "Enfermagem",
     sessao: "1ª Sessão", data: "2026-05-10 17:31", estado: "Aprovada",
     notaSessao: 17.8, dataProva: "2026-05-09",
-    documentos: baseDocs(true),
+    documentos: baseDocs(true), preparatorio: true,
   },
   {
     ref: "CAND-2026-1038", nome: "Ana Clara Vunge", bi: "010456789LA045", nascimento: "2007-09-30",
@@ -108,7 +108,7 @@ export const inscricoesRecent: InscricaoRecord[] = [
     faculdade: "Faculdade de Ciências Sociais", curso: "Economia", curso2: "Gestão",
     sessao: "2ª Sessão", data: "2026-05-10 16:04", estado: "Reprovada",
     notaSessao: 8.4, dataProva: "2026-05-08",
-    documentos: baseDocs(true),
+    documentos: baseDocs(true), preparatorio: true,
   },
   {
     ref: "CAND-2026-1037", nome: "Pedro Manuel Nzinga", bi: "011567890LA046", nascimento: "2006-05-14",
@@ -121,6 +121,6 @@ export const inscricoesRecent: InscricaoRecord[] = [
     anoConclusao: "2024", mediaFinal: "12.7",
     faculdade: "Faculdade de Ciências Sociais", curso: "Gestão",
     sessao: "3ª Sessão", data: "2026-05-10 15:22", estado: "Submetida",
-    documentos: baseDocs(true),
+    documentos: baseDocs(true), preparatorio: true,
   },
 ];
