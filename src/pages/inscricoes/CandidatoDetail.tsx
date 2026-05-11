@@ -109,7 +109,7 @@ export default function CandidatoDetail() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 mt-6 pt-5 border-t">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-6 pt-5 border-t">
           <div>
             <p className="text-[10.5px] uppercase tracking-wide text-muted-foreground font-medium">Curso (1ª opção)</p>
             <p className="text-[13px] font-semibold text-foreground mt-1">{c.curso}</p>
@@ -132,18 +132,6 @@ export default function CandidatoDetail() {
             <p className="text-[13px] font-semibold text-foreground mt-1 flex items-center gap-1.5">
               <Calendar className="w-3.5 h-3.5 text-muted-foreground" /> {c.data}
             </p>
-          </div>
-          <div>
-            <p className="text-[10.5px] uppercase tracking-wide text-muted-foreground font-medium flex items-center gap-1">
-              <Award className="w-3 h-3" /> Nota da Sessão
-            </p>
-            {c.notaSessao !== undefined ? (
-              <p className={`text-[15px] font-bold mt-1 tabular-nums ${aprovado ? "text-emerald-700" : "text-red-700"}`}>
-                {c.notaSessao.toFixed(1)}<span className="text-[11px] text-muted-foreground font-medium"> / 20</span>
-              </p>
-            ) : (
-              <p className="text-[12px] text-muted-foreground/60 italic mt-1.5">Por realizar</p>
-            )}
           </div>
         </div>
       </Card>
@@ -175,10 +163,13 @@ export default function CandidatoDetail() {
           <Row label="Email" value={c.encEmail} />
         </Section>
 
-        <Section icon={BookOpen} title="Curso & Sessão">
+        <Section icon={BookOpen} title="Curso">
           <Row label="Faculdade" value={c.faculdade} />
           <Row label="1ª opção" value={c.curso} />
           <Row label="2ª opção" value={c.curso2} />
+        </Section>
+
+        <Section icon={Award} title="Sessão">
           <Row label="Sessão de prova" value={c.sessao} />
           <Row label="Preparatório" value={c.preparatorio ? "Sim" : "Não"} />
           <Row label="Data da prova" value={c.dataProva} />
