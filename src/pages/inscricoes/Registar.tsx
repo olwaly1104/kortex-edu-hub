@@ -75,6 +75,9 @@ const STEP_FIELDS: Record<number, (keyof FormState)[]> = {
 /* mock recent candidaturas (sourced from shared module) */
 const RECENT_SEED = inscricoesRecent.map(r => ({
   ref: r.ref, nome: r.nome, curso: r.curso, sessao: r.sessao, data: r.data, estado: r.estado, notaSessao: r.notaSessao,
+  docsEntregues: r.documentos.filter(d => d.entregue).length,
+  docsTotal: r.documentos.length,
+  preparatorio: r.preparatorio,
 }));
 
 
@@ -150,7 +153,7 @@ export default function InscricoesRegistar() {
     const ref = `CAND-2026-${String(Math.floor(Math.random() * 9000) + 1000)}`;
     const now = new Date();
     const data = `${now.toISOString().slice(0,10)} ${String(now.getHours()).padStart(2,"0")}:${String(now.getMinutes()).padStart(2,"0")}`;
-    setRecent(r => [{ ref, nome: form.nome, curso: form.curso1, sessao: form.sessao, data, estado: "Submetida", notaSessao: undefined }, ...r]);
+    setRecent(r => [{ ref, nome: form.nome, curso: form.curso1, sessao: form.sessao, data, estado: "Submetida", notaSessao: undefined, docsEntregues: Object.values(docs).filter(Boolean).length, docsTotal: DOCS.length, preparatorio: false }, ...r]);
     toast({ title: "Candidatura criada", description: `${ref} — ${form.nome} registado(a) com sucesso.` });
     setForm(empty); setDocs({}); setErrors(new Set()); setStep(1); setView("dashboard");
   };
@@ -217,6 +220,8 @@ export default function InscricoesRegistar() {
                   <th className="text-left px-4 py-2.5 font-medium">Curso (1ª opção)</th>
                   <th className="text-left px-4 py-2.5 font-medium">Sessão</th>
                   <th className="text-left px-4 py-2.5 font-medium">Submetida em</th>
+                  <th className="text-left px-4 py-2.5 font-medium">Docs</th>
+                  <th className="text-left px-4 py-2.5 font-medium">Preparatório</th>
                   <th className="text-left px-4 py-2.5 font-medium">Nota</th>
                   <th className="text-left px-4 py-2.5 font-medium">Estado</th>
                   <th className="w-8"></th>
@@ -240,6 +245,18 @@ export default function InscricoesRegistar() {
                       <td className="px-4 py-2.5 text-muted-foreground">{r.curso}</td>
                       <td className="px-4 py-2.5 text-muted-foreground">{r.sessao}</td>
                       <td className="px-4 py-2.5 text-muted-foreground">{r.data}</td>
+                      <td className="px-4 py-2.5 tabular-nums text-muted-foreground">
+                        <span className={cn("font-medium", r.docsEntregues === r.docsTotal ? "text-emerald-700" : "text-amber-700")}>
+                          {r.docsEntregues}/{r.docsTotal}
+                        </span>
+                      </td>
+                      <td className="px-4 py-2.5">
+                        <Badge variant="outline" className={cn("text-[11px]", r.preparatorio
+                          ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                          : "bg-muted text-muted-foreground border-border")}>
+                          {r.preparatorio ? "Sim" : "Não"}
+                        </Badge>
+                      </td>
                       <td className="px-4 py-2.5 tabular-nums">
                         {typeof r.notaSessao === "number"
                           ? <span className={cn(
@@ -258,7 +275,7 @@ export default function InscricoesRegistar() {
                   );
                 })}
                 {!filteredRecent.length && (
-                  <tr><td colSpan={8} className="px-4 py-8 text-center text-muted-foreground text-[13px]">Sem resultados.</td></tr>
+                  <tr><td colSpan={10} className="px-4 py-8 text-center text-muted-foreground text-[13px]">Sem resultados.</td></tr>
                 )}
               </tbody>
             </table>

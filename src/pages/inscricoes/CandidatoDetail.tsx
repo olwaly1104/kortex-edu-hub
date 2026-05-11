@@ -121,6 +121,11 @@ export default function CandidatoDetail() {
           <div>
             <p className="text-[10.5px] uppercase tracking-wide text-muted-foreground font-medium">Sessão</p>
             <p className="text-[13px] font-semibold text-foreground mt-1">{c.sessao}</p>
+            {c.dataProva && (
+              <p className="text-[11px] text-muted-foreground mt-0.5 flex items-center gap-1">
+                <Calendar className="w-3 h-3" /> {new Date(c.dataProva).toLocaleDateString("pt-PT", { day: "2-digit", month: "short", year: "numeric" })}
+              </p>
+            )}
           </div>
           <div>
             <p className="text-[10.5px] uppercase tracking-wide text-muted-foreground font-medium">Submetida em</p>
@@ -175,6 +180,7 @@ export default function CandidatoDetail() {
           <Row label="1ª opção" value={c.curso} />
           <Row label="2ª opção" value={c.curso2} />
           <Row label="Sessão de prova" value={c.sessao} />
+          <Row label="Preparatório" value={c.preparatorio ? "Sim" : "Não"} />
           <Row label="Data da prova" value={c.dataProva} />
           <Row label="Nota obtida" value={c.notaSessao !== undefined ? `${c.notaSessao.toFixed(1)} / 20` : undefined} />
         </Section>
