@@ -180,6 +180,7 @@ export default function CandidatoDetail() {
           <Row label="1ª opção" value={c.curso} />
           <Row label="2ª opção" value={c.curso2} />
           <Row label="Sessão de prova" value={c.sessao} />
+          <Row label="Preparatório" value={c.preparatorio ? "Sim" : "Não"} />
           <Row label="Data da prova" value={c.dataProva} />
           <Row label="Nota obtida" value={c.notaSessao !== undefined ? `${c.notaSessao.toFixed(1)} / 20` : undefined} />
         </Section>
