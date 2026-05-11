@@ -186,9 +186,9 @@ export default function InscricoesRegistar() {
 
         {/* KPIs */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <KpiCard icon={CalendarDays} label="Data de hoje"     value={new Date().toLocaleDateString("pt-PT", { day: "2-digit", month: "short", year: "numeric" })} tone="emerald" />
           <KpiCard icon={CalendarDays} label="Inscrições hoje"  value={kpis.hoje}    tone="blue" />
           <KpiCard icon={Users}        label="Total candidatos" value={kpis.total}   tone="primary" />
-          <KpiCard icon={CalendarDays} label="Data de hoje"     value={new Date().toLocaleDateString("pt-PT", { day: "2-digit", month: "short", year: "numeric" })} tone="emerald" />
           <KpiCard icon={Clock}        label="Sessão activa"    value="1ª"           tone="amber" suffix="Sessão" />
         </div>
 
