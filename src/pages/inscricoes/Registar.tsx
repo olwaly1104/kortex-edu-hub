@@ -95,6 +95,7 @@ function Field({ label, required, children }: { label: string; required?: boolea
 
 export default function InscricoesRegistar() {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [view, setView] = useState<"dashboard" | "wizard">("dashboard");
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<FormState>(empty);
