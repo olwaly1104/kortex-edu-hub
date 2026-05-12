@@ -136,8 +136,8 @@ export default function CandidatoDetail() {
         </div>
       </Card>
 
-      {/* Two-column data */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      {/* 3-column data grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 items-start">
         <Section icon={User} title="Dados Pessoais">
           <Row label="Nome completo" value={c.nome} />
           <Row label="Bilhete de Identidade" value={c.bi} />
