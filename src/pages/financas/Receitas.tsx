@@ -262,7 +262,19 @@ export default function Receitas() {
                 </td>
                 <td className="p-3 text-xs text-muted-foreground">{r.course || "—"}</td>
                 <td className="p-3 text-center"><Badge variant="outline" className="text-[10px]">{r.category}</Badge></td>
-                <td className="p-3 text-right text-xs font-semibold text-accent">+{formatCurrency(r.amount)}</td>
+                <td className="p-3 text-right">
+                  {editingId === r.id ? (
+                    <div className="flex items-center gap-1 justify-end">
+                      <Input type="number" value={editValue} onChange={e => setEditValue(e.target.value)} onKeyDown={e => { if (e.key === "Enter") commitEdit(r.id); if (e.key === "Escape") setEditingId(null); }} autoFocus className="h-7 w-28 text-xs text-right" />
+                      <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => commitEdit(r.id)}><Check className="w-3.5 h-3.5 text-accent" /></Button>
+                    </div>
+                  ) : (
+                    <button onClick={() => startEdit(r.id, r.amount)} className="inline-flex items-center gap-1 text-xs font-semibold text-accent hover:underline group">
+                      +{formatCurrency(r.amount)}
+                      <Pencil className="w-3 h-3 opacity-0 group-hover:opacity-60 transition-opacity" />
+                    </button>
+                  )}
+                </td>
                 <td className="p-3 text-center"><Badge variant="outline" className={cn("text-[10px]", statusColors[r.status])}>{statusLabels[r.status]}</Badge></td>
                 <td className="p-3 text-center">
                   <div className="flex gap-1 justify-center">
