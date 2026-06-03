@@ -22,8 +22,6 @@ const statusColors: Record<string, string> = {
 };
 const statusLabels: Record<string, string> = { aprovada: "Aprovada", pendente: "Pendente", rejeitada: "Rejeitada" };
 
-const periodoMultiplier: Record<Periodo, number> = { mensal: 1, semestral: 6, anual: 12 };
-const periodoLabels: Record<Periodo, string> = { mensal: "Mensal", semestral: "Semestral", anual: "Anual" };
 
 const despesaCategories = ["Salários", "Infraestrutura", "Material Didáctico", "Serviços e Utilities", "Investigação", "Bolsas e Apoios"];
 
