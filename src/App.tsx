@@ -295,6 +295,7 @@ function AppRoutes() {
         <Route path="/financas/dashboard" element={<FinancasDashboard />} />
         <Route path="/financas/receitas" element={<FinancasReceitas />} />
         <Route path="/financas/despesas" element={<FinancasDespesas />} />
+        <Route path="/financas/despesas/:id" element={<FinancasDespesaDetail />} />
         <Route path="/financas/configurar-receitas" element={<FinancasConfigurarReceitas />} />
         <Route path="/financas/salarios" element={<FinancasSalarios />} />
         <Route path="/financas/orcamentos" element={<FinancasOrcamentos />} />
