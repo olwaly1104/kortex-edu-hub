@@ -39,8 +39,8 @@ const despesaAprovadas = catData.reduce((s, c) => s + c.value, 0);
 
 /* all transactions merged */
 const allTx = [
-  ...receitas.map(r => ({ id: r.id, desc: r.description, date: r.date, amount: r.amount, type: "receita" as const, category: r.category, status: r.status })),
-  ...despesas.map(d => ({ id: d.id, desc: d.description, date: d.date, amount: d.amount, type: "despesa" as const, category: d.category, status: d.status })),
+  ...receitas.map(r => ({ id: r.id, desc: r.description, date: r.date, amount: r.amount, type: "receita" as const, category: r.category, status: r.status, entity: r.payer || "—" })),
+  ...despesas.map(d => ({ id: d.id, desc: d.description, date: d.date, amount: d.amount, type: "despesa" as const, category: d.category, status: d.status, entity: d.requestedBy || "—" })),
 ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
 const txCategories = Array.from(new Set(allTx.map(t => t.category)));
