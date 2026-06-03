@@ -99,7 +99,7 @@ export default function Despesas() {
         <div className="flex gap-2 items-center flex-wrap">
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input placeholder="Pesquisar despesa, departamento..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9 h-9" />
+            <Input placeholder="Pesquisar despesa, responsável..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9 h-9" />
           </div>
           <div className="flex-1" />
           {hasActiveControls && (
