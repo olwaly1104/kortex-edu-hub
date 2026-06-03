@@ -151,23 +151,23 @@ export default function Despesas() {
             <th className="text-left p-3 font-medium text-muted-foreground">Data</th>
             <th className="text-left p-3 font-medium text-muted-foreground">Descrição</th>
             <th className="text-left p-3 font-medium text-muted-foreground">Categoria</th>
-            <th className="text-left p-3 font-medium text-muted-foreground">Departamento</th>
             <th className="text-right p-3 font-medium text-muted-foreground">Valor</th>
             <th className="text-left p-3 font-medium text-muted-foreground">Solicitado por</th>
+            <th className="text-left p-3 font-medium text-muted-foreground">Responsável</th>
             <th className="text-center p-3 font-medium text-muted-foreground">Estado</th>
             <th className="text-center p-3 font-medium text-muted-foreground">Comprovativo</th>
             <th className="text-center p-3 font-medium text-muted-foreground">Ações</th>
           </tr></thead>
           <tbody>{filtered.map(d => (
-            <tr key={d.id} className="border-b last:border-0 hover:bg-muted/20 transition-colors">
+            <tr key={d.id} className="border-b last:border-0 hover:bg-muted/20 transition-colors cursor-pointer" onClick={() => navigate(`/financas/despesas/${d.id}`)}>
               <td className="p-3 text-xs text-muted-foreground">{new Date(d.date).toLocaleDateString("pt-PT", { day: "2-digit", month: "short" })}</td>
               <td className="p-3 text-xs font-medium text-foreground">{d.description}</td>
               <td className="p-3"><Badge variant="outline" className="text-[10px]">{d.category}</Badge></td>
-              <td className="p-3 text-xs text-muted-foreground">{d.department || "—"}</td>
               <td className="p-3 text-right text-xs font-semibold text-destructive">-{formatCurrency(d.amount)}</td>
               <td className="p-3 text-xs text-muted-foreground">{d.requestedBy || "—"}</td>
+              <td className="p-3 text-xs text-foreground">{d.responsavel || "—"}</td>
               <td className="p-3 text-center"><Badge variant="outline" className={cn("text-[10px]", statusColors[d.status])}>{statusLabels[d.status] || d.status}</Badge></td>
-              <td className="p-3 text-center">
+              <td className="p-3 text-center" onClick={e => e.stopPropagation()}>
                 {d.status === "aprovada" ? (
                   <Button variant="ghost" size="sm" className="h-7 px-2 text-[10px] gap-1 text-muted-foreground hover:text-primary" onClick={() => toast({ title: "Comprovativo aberto" })}>
                     <FileText className="w-3 h-3" /> Comprovativo
@@ -176,7 +176,7 @@ export default function Despesas() {
                   <span className="text-[10px] text-muted-foreground/60">—</span>
                 )}
               </td>
-              <td className="p-3 text-center">
+              <td className="p-3 text-center" onClick={e => e.stopPropagation()}>
                 {d.status === "pendente" && (
                   <div className="flex gap-1 justify-center">
                     <Button variant="ghost" size="icon" className="h-7 w-7 text-accent hover:bg-accent/10" onClick={() => toast({ title: "Despesa aprovada" })}><Check className="w-3.5 h-3.5" /></Button>
