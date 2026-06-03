@@ -153,7 +153,7 @@ export default function Despesas() {
             <th className="text-right p-3 font-medium text-muted-foreground">Valor</th>
             <th className="text-left p-3 font-medium text-muted-foreground">Solicitado por</th>
             <th className="text-center p-3 font-medium text-muted-foreground">Estado</th>
-            <th className="text-center p-3 font-medium text-muted-foreground">Documentos</th>
+            <th className="text-center p-3 font-medium text-muted-foreground">Comprovativo</th>
             <th className="text-center p-3 font-medium text-muted-foreground">Ações</th>
           </tr></thead>
           <tbody>{filtered.map(d => (
