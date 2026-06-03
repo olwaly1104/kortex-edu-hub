@@ -125,7 +125,7 @@ import FinancasDashboard from "./pages/financas/Dashboard";
 import FinancasInicio from "./pages/financas/Inicio";
 import FinancasReceitas from "./pages/financas/Receitas";
 import FinancasDespesas from "./pages/financas/Despesas";
-import FinancasConfigurarDespesas from "./pages/financas/ConfigurarDespesas";
+import FinancasConfigurarReceitas from "./pages/financas/ConfigurarReceitas";
 import FinancasSalarios from "./pages/financas/Salarios";
 import FinancasOrcamentos from "./pages/financas/Orcamentos";
 import FinancasSolicitacoes from "./pages/financas/Solicitacoes";
@@ -294,7 +294,7 @@ function AppRoutes() {
         <Route path="/financas/dashboard" element={<FinancasDashboard />} />
         <Route path="/financas/receitas" element={<FinancasReceitas />} />
         <Route path="/financas/despesas" element={<FinancasDespesas />} />
-        <Route path="/financas/configurar-despesas" element={<FinancasConfigurarDespesas />} />
+        <Route path="/financas/configurar-receitas" element={<FinancasConfigurarReceitas />} />
         <Route path="/financas/salarios" element={<FinancasSalarios />} />
         <Route path="/financas/orcamentos" element={<FinancasOrcamentos />} />
         <Route path="/financas/chat" element={<StudentChat />} />

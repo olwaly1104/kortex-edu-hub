@@ -11,12 +11,12 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { Settings2, Plus, Trash2, Pencil, ArrowLeft, TrendingDown } from "lucide-react";
+import { Settings2, Plus, Trash2, Pencil, ArrowLeft, TrendingUp } from "lucide-react";
 import { formatCurrency } from "@/data/financeModuleData";
 import { useToast } from "@/hooks/use-toast";
 
 type Periodicidade = "mensal" | "trimestral" | "semestral" | "anual" | "pontual";
-type DespesaConfig = {
+type ReceitaConfig = {
   key: string;
   label: string;
   categoria: string;
@@ -25,7 +25,7 @@ type DespesaConfig = {
   descricao: string;
 };
 
-const CATEGORIAS = ["Salários", "Infraestrutura", "Material Didáctico", "Serviços e Utilities", "Investigação", "Bolsas e Apoios"];
+const CATEGORIAS = ["Propinas", "Emolumentos", "Taxas", "Candidaturas", "Serviços Académicos", "Outros"];
 
 const periodicidadeLabels: Record<Periodicidade, string> = {
   mensal: "Mensal",
@@ -35,22 +35,20 @@ const periodicidadeLabels: Record<Periodicidade, string> = {
   pontual: "Pontual",
 };
 
-const INITIAL: DespesaConfig[] = [
-  { key: "salarios_docentes", label: "Salários docentes", categoria: "Salários", valor: 18500000, periodicidade: "mensal", descricao: "Folha mensal de remunerações do corpo docente." },
-  { key: "salarios_admin", label: "Salários pessoal administrativo", categoria: "Salários", valor: 7200000, periodicidade: "mensal", descricao: "Folha mensal do pessoal não docente." },
-  { key: "energia_agua", label: "Energia e água", categoria: "Serviços e Utilities", valor: 1450000, periodicidade: "mensal", descricao: "Consumos das instalações centrais e faculdades." },
-  { key: "internet_telecom", label: "Internet e telecomunicações", categoria: "Serviços e Utilities", valor: 680000, periodicidade: "mensal", descricao: "Ligações dedicadas, telefonia e cloud." },
-  { key: "manutencao", label: "Manutenção de instalações", categoria: "Infraestrutura", valor: 950000, periodicidade: "trimestral", descricao: "Manutenção preventiva e correctiva de edifícios." },
-  { key: "material_lab", label: "Material de laboratório", categoria: "Material Didáctico", valor: 1200000, periodicidade: "semestral", descricao: "Reposição de consumíveis e equipamento didáctico." },
-  { key: "bolsas_merito", label: "Bolsas de mérito", categoria: "Bolsas e Apoios", valor: 4500000, periodicidade: "semestral", descricao: "Apoios a estudantes com desempenho excepcional." },
-  { key: "projetos_invest", label: "Projectos de investigação", categoria: "Investigação", valor: 3200000, periodicidade: "anual", descricao: "Financiamento de linhas de investigação aprovadas." },
+const INITIAL: ReceitaConfig[] = [
+  { key: "propina_mensal", label: "Propina mensal", categoria: "Propinas", valor: 45000, periodicidade: "mensal", descricao: "Valor mensal da propina por estudante." },
+  { key: "matricula", label: "Taxa de matrícula", categoria: "Taxas", valor: 25000, periodicidade: "anual", descricao: "Taxa cobrada no início de cada ano lectivo." },
+  { key: "candidatura", label: "Candidatura", categoria: "Candidaturas", valor: 15000, periodicidade: "pontual", descricao: "Taxa de candidatura ao processo de admissão." },
+  { key: "certificado", label: "Emissão de certificado", categoria: "Serviços Académicos", valor: 8000, periodicidade: "pontual", descricao: "Emissão de certificado de habilitações." },
+  { key: "declaracao", label: "Declaração", categoria: "Serviços Académicos", valor: 3500, periodicidade: "pontual", descricao: "Declaração simples ou com nota." },
+  { key: "exame_especial", label: "Exame especial", categoria: "Emolumentos", valor: 12000, periodicidade: "pontual", descricao: "Inscrição em época especial de exame." },
 ];
 
-export default function ConfigurarDespesas() {
+export default function ConfigurarReceitas() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const [items, setItems] = useState<DespesaConfig[]>(INITIAL);
+  const [items, setItems] = useState<ReceitaConfig[]>(INITIAL);
 
   // Create
   const [createOpen, setCreateOpen] = useState(false);
@@ -61,7 +59,7 @@ export default function ConfigurarDespesas() {
   const [nDesc, setNDesc] = useState("");
 
   // Edit
-  const [edit, setEdit] = useState<DespesaConfig | null>(null);
+  const [edit, setEdit] = useState<ReceitaConfig | null>(null);
 
   const resetCreate = () => { setNLabel(""); setNCat(CATEGORIAS[0]); setNValor(0); setNPer("mensal"); setNDesc(""); };
 
@@ -69,7 +67,7 @@ export default function ConfigurarDespesas() {
     if (!nLabel.trim()) return;
     const key = nLabel.toLowerCase().replace(/[^a-z0-9]+/g, "_").slice(0, 40) + "_" + Date.now().toString(36).slice(-4);
     setItems(prev => [...prev, { key, label: nLabel.trim(), categoria: nCat, valor: nValor, periodicidade: nPer, descricao: nDesc.trim() }]);
-    toast({ title: "Despesa configurada" });
+    toast({ title: "Receita configurada" });
     resetCreate();
     setCreateOpen(false);
   };
@@ -77,13 +75,13 @@ export default function ConfigurarDespesas() {
   const saveEdit = () => {
     if (!edit || !edit.label.trim()) return;
     setItems(prev => prev.map(i => i.key === edit.key ? edit : i));
-    toast({ title: "Despesa atualizada" });
+    toast({ title: "Receita atualizada" });
     setEdit(null);
   };
 
   const removeItem = (key: string) => {
     setItems(prev => prev.filter(i => i.key !== key));
-    toast({ title: "Despesa removida" });
+    toast({ title: "Receita removida" });
   };
 
   const totalMensalEquiv = items.reduce((s, i) => {
@@ -100,42 +98,39 @@ export default function ConfigurarDespesas() {
             <ArrowLeft className="w-4 h-4" /> Receitas
           </Button>
           <h1 className="text-2xl font-bold text-foreground tracking-tight flex items-center gap-2">
-            <Settings2 className="w-6 h-6 text-primary" /> Configurar Despesas
+            <Settings2 className="w-6 h-6 text-primary" /> Configurar Receitas
           </h1>
           <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
-            Defina as categorias de despesa recorrentes da instituição, com o respectivo valor e periodicidade.
+            Defina as categorias de receita da instituição, com o respectivo valor e periodicidade.
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="text-right">
-            <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Equivalente mensal</p>
-            <p className="text-lg font-bold text-destructive flex items-center gap-1 justify-end">
-              <TrendingDown className="w-4 h-4" /> -{formatCurrency(totalMensalEquiv)}
-            </p>
-          </div>
+        <div className="text-right">
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Equivalente mensal</p>
+          <p className="text-lg font-bold text-accent flex items-center gap-1 justify-end">
+            <TrendingUp className="w-4 h-4" /> +{formatCurrency(totalMensalEquiv)}
+          </p>
         </div>
       </div>
 
-      {/* Despesas */}
       <Card className="p-5">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <TrendingDown className="w-4 h-4 text-muted-foreground" />
-            <h2 className="text-sm font-semibold text-foreground">Despesas configuradas</h2>
+            <TrendingUp className="w-4 h-4 text-muted-foreground" />
+            <h2 className="text-sm font-semibold text-foreground">Receitas configuradas</h2>
             <span className="text-[11px] text-muted-foreground tabular-nums">· {items.length}</span>
           </div>
           <Dialog open={createOpen} onOpenChange={(o) => { setCreateOpen(o); if (!o) resetCreate(); }}>
             <DialogTrigger asChild>
               <Button size="sm" variant="outline" className="gap-1.5 h-8 text-xs">
-                <Plus className="w-3.5 h-3.5" /> Nova despesa
+                <Plus className="w-3.5 h-3.5" /> Nova receita
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-lg">
-              <DialogHeader><DialogTitle>Nova despesa</DialogTitle></DialogHeader>
+              <DialogHeader><DialogTitle>Nova receita</DialogTitle></DialogHeader>
               <div className="space-y-3 py-2">
                 <div>
                   <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Designação</label>
-                  <Input value={nLabel} onChange={e => setNLabel(e.target.value)} placeholder="Ex: Limpeza de instalações" />
+                  <Input value={nLabel} onChange={e => setNLabel(e.target.value)} placeholder="Ex: Taxa de equivalência" />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
@@ -163,7 +158,7 @@ export default function ConfigurarDespesas() {
                 </div>
                 <div>
                   <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Descrição</label>
-                  <Textarea value={nDesc} onChange={e => setNDesc(e.target.value)} placeholder="Notas sobre a despesa…" className="min-h-[70px]" />
+                  <Textarea value={nDesc} onChange={e => setNDesc(e.target.value)} placeholder="Notas sobre a receita…" className="min-h-[70px]" />
                 </div>
               </div>
               <DialogFooter className="gap-2 sm:gap-2">
@@ -194,7 +189,7 @@ export default function ConfigurarDespesas() {
                     <Badge variant="outline" className="text-[10px]">{i.categoria}</Badge>
                   </td>
                   <td className="p-3 text-xs text-muted-foreground">{periodicidadeLabels[i.periodicidade]}</td>
-                  <td className="p-3 text-right text-xs font-semibold text-destructive tabular-nums whitespace-nowrap">-{formatCurrency(i.valor)}</td>
+                  <td className="p-3 text-right text-xs font-semibold text-accent tabular-nums whitespace-nowrap">+{formatCurrency(i.valor)}</td>
                   <td className="p-3 text-xs text-muted-foreground max-w-md truncate" title={i.descricao}>{i.descricao || "—"}</td>
                   <td className="p-3 text-right">
                     <div className="inline-flex items-center gap-2">
@@ -209,7 +204,7 @@ export default function ConfigurarDespesas() {
                 </tr>
               ))}
               {items.length === 0 && (
-                <tr><td colSpan={6} className="p-6 text-center text-xs text-muted-foreground">Nenhuma despesa configurada.</td></tr>
+                <tr><td colSpan={6} className="p-6 text-center text-xs text-muted-foreground">Nenhuma receita configurada.</td></tr>
               )}
             </tbody>
           </table>
@@ -219,7 +214,7 @@ export default function ConfigurarDespesas() {
       {/* Edit dialog */}
       <Dialog open={!!edit} onOpenChange={(o) => !o && setEdit(null)}>
         <DialogContent className="max-w-lg">
-          <DialogHeader><DialogTitle>Editar despesa</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>Editar receita</DialogTitle></DialogHeader>
           {edit && (
             <div className="space-y-3 py-2">
               <div>
