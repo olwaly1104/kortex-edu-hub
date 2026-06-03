@@ -69,24 +69,7 @@ export default function Receitas() {
     setEditingId(null);
   };
 
-  const addReceita = () => {
-    const amt = Number(novaValor);
-    if (!novaDesc.trim() || isNaN(amt) || amt <= 0) { toast({ title: "Preencha descrição e valor válido", variant: "destructive" }); return; }
-    const id = `t-new-${Date.now()}`;
-    setReceitas(prev => [{
-      id, date: new Date().toISOString().slice(0, 10), description: novaDesc.trim(),
-      category: "Propinas", amount: amt, type: "receita", status: "pendente",
-      source: "Manual", payer: novaDesc.trim(), studentId: "—", course: "—",
-    } as any, ...prev]);
-    setNovaDesc("");
-    setNovaValor("");
-    toast({ title: "Receita adicionada" });
-  };
-
-  const removeReceita = (id: string) => {
-    setReceitas(prev => prev.filter(r => r.id !== id));
-    toast({ title: "Receita removida" });
-  };
+  const navigate = useNavigate();
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
