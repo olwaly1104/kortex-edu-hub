@@ -98,35 +98,6 @@ export default function Receitas() {
         </h1>
       </div>
 
-      {/* Adicionar Receita — tabela simples */}
-      <Card className="overflow-hidden border border-border">
-        <div className="bg-muted/30 px-4 py-2.5 border-b border-border flex items-center gap-2">
-          <Plus className="w-4 h-4 text-primary" />
-          <span className="text-sm font-semibold text-foreground">Adicionar Receita</span>
-        </div>
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b bg-muted/20">
-              <th className="text-left p-3 font-medium text-muted-foreground">Descrição</th>
-              <th className="text-right p-3 font-medium text-muted-foreground w-40">Valor (AOA)</th>
-              <th className="text-center p-3 font-medium text-muted-foreground w-24"></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td className="p-3">
-                <Input value={novaDesc} onChange={e => setNovaDesc(e.target.value)} placeholder="Descrição da receita..." className="h-9 text-sm" />
-              </td>
-              <td className="p-3">
-                <Input type="number" value={novaValor} onChange={e => setNovaValor(e.target.value)} placeholder="0" className="h-9 text-sm text-right" onKeyDown={e => { if (e.key === "Enter") addReceita(); }} />
-              </td>
-              <td className="p-3 text-center">
-                <Button size="sm" className="gap-1" onClick={addReceita}><Plus className="w-3.5 h-3.5" /> Adicionar</Button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </Card>
 
       {/* KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
