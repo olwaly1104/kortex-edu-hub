@@ -201,6 +201,7 @@ export default function FinancasDashboard() {
                 </div>
               </td>
               <td className="p-3 text-xs font-medium text-foreground">{t.desc}</td>
+              <td className="p-3 text-xs text-muted-foreground">{(t as any).entity || "—"}</td>
               <td className="p-3"><Badge variant="outline" className="text-[10px]">{t.category}</Badge></td>
               <td className={cn("p-3 text-right text-xs font-semibold", t.type === "receita" ? "text-accent" : "text-destructive")}>
                 {t.type === "receita" ? "+" : "-"}{formatCurrency(t.amount)}
