@@ -62,23 +62,16 @@ export default function Despesas() {
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-foreground flex items-center gap-2"><TrendingDown className="w-6 h-6 text-primary" /> Despesas</h1>
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1 rounded-lg border border-border bg-muted/30 p-0.5">
-            {(["mensal", "semestral", "anual"] as Periodo[]).map(p => (
-              <Button key={p} size="sm" variant={periodo === p ? "default" : "ghost"} onClick={() => setPeriodo(p)} className="text-xs h-8 px-3">{periodoLabels[p]}</Button>
-            ))}
-          </div>
-          <Button size="sm" onClick={() => setSheetOpen(true)} className="gap-1.5"><Plus className="w-4 h-4" /> Nova Despesa</Button>
-        </div>
+        <Button size="sm" onClick={() => setSheetOpen(true)} className="gap-1.5"><Plus className="w-4 h-4" /> Nova Despesa</Button>
       </div>
 
       {/* KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: "Despesas Total do Mês", value: formatCurrency(totalMes * mult), icon: TrendingDown, color: "text-foreground" },
-          { label: "Aprovadas", value: formatCurrency(aprovadas * mult), icon: Wallet, color: "text-accent" },
-          { label: "Pendentes", value: formatCurrency(pendentes * mult), icon: Clock, color: "text-amber-600" },
-          { label: "Rejeitadas", value: formatCurrency(rejeitadas * mult), icon: Ban, color: "text-destructive" },
+          { label: "Despesas Total do Mês", value: formatCurrency(totalMes), icon: TrendingDown, color: "text-foreground" },
+          { label: "Aprovadas", value: formatCurrency(aprovadas), icon: Wallet, color: "text-accent" },
+          { label: "Pendentes", value: formatCurrency(pendentes), icon: Clock, color: "text-amber-600" },
+          { label: "Rejeitadas", value: formatCurrency(rejeitadas), icon: Ban, color: "text-destructive" },
         ].map(kpi => (
           <Card key={kpi.label} className="p-4">
             <div className="flex items-center gap-2 mb-3">
