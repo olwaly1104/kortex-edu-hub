@@ -196,7 +196,7 @@ export default function Despesas() {
         <SheetContent>
           <SheetHeader><SheetTitle>Nova Despesa</SheetTitle></SheetHeader>
           <div className="space-y-4 mt-6">
-            {["Descrição", "Departamento", "Valor (Kz)", "Data"].map(f => (
+            {["Descrição", "Categoria", "Solicitado por", "Responsável", "Valor (Kz)", "Data"].map(f => (
               <div key={f} className="space-y-1.5">
                 <Label className="text-xs">{f}</Label>
                 <Input placeholder={f} className="h-9" />
