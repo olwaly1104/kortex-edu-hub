@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Plus, Search, ArrowUpDown, X, Check, Wallet, Clock, Ban, TrendingDown, FileText, Receipt } from "lucide-react";
+import { Plus, Search, ArrowUpDown, X, Check, Wallet, Clock, Ban, TrendingDown, FileText } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,6 @@ import { cn } from "@/lib/utils";
 
 type SortField = "amount";
 type SortDir = "asc" | "desc";
-type Periodo = "mensal" | "semestral" | "anual";
 
 const statusColors: Record<string, string> = {
   aprovada: "bg-accent/15 text-accent border-accent/30",
