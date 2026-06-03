@@ -95,49 +95,37 @@ export default function Receitas() {
         <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
           <TrendingUp className="w-6 h-6 text-primary" /> Receitas
         </h1>
-        <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-          <DialogTrigger asChild>
-            <Button size="sm" className="gap-1.5"><Plus className="w-4 h-4" /> Nova Receita</Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader><DialogTitle>Nova Receita</DialogTitle></DialogHeader>
-            <div className="grid gap-3 py-2">
-              <div className="grid gap-1.5"><Label>Estudante / Pagador *</Label><Input value={newR.payer} onChange={e => setNewR({ ...newR, payer: e.target.value })} placeholder="Nome completo" /></div>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="grid gap-1.5"><Label>ID Estudante</Label><Input value={newR.studentId} onChange={e => setNewR({ ...newR, studentId: e.target.value })} placeholder="EST-0000" /></div>
-                <div className="grid gap-1.5"><Label>Curso</Label><Input value={newR.course} onChange={e => setNewR({ ...newR, course: e.target.value })} placeholder="Curso" /></div>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="grid gap-1.5"><Label>Categoria</Label>
-                  <Select value={newR.category} onValueChange={v => setNewR({ ...newR, category: v })}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Propinas">Propinas</SelectItem>
-                      <SelectItem value="Emolumentos">Emolumentos</SelectItem>
-                      <SelectItem value="Taxas">Taxas</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="grid gap-1.5"><Label>Estado</Label>
-                  <Select value={newR.status} onValueChange={(v: any) => setNewR({ ...newR, status: v })}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="pendente">Pendente</SelectItem>
-                      <SelectItem value="pago">Recebido</SelectItem>
-                      <SelectItem value="em_atraso">Em Atraso</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              <div className="grid gap-1.5"><Label>Valor (AOA) *</Label><Input type="number" value={newR.amount} onChange={e => setNewR({ ...newR, amount: e.target.value })} placeholder="0" /></div>
-            </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setCreateOpen(false)}>Cancelar</Button>
-              <Button onClick={createReceita}>Criar</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
       </div>
+
+      {/* Adicionar Receita — tabela simples */}
+      <Card className="overflow-hidden border border-border">
+        <div className="bg-muted/30 px-4 py-2.5 border-b border-border flex items-center gap-2">
+          <Plus className="w-4 h-4 text-primary" />
+          <span className="text-sm font-semibold text-foreground">Adicionar Receita</span>
+        </div>
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b bg-muted/20">
+              <th className="text-left p-3 font-medium text-muted-foreground">Descrição</th>
+              <th className="text-right p-3 font-medium text-muted-foreground w-40">Valor (AOA)</th>
+              <th className="text-center p-3 font-medium text-muted-foreground w-24"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td className="p-3">
+                <Input value={novaDesc} onChange={e => setNovaDesc(e.target.value)} placeholder="Descrição da receita..." className="h-9 text-sm" />
+              </td>
+              <td className="p-3">
+                <Input type="number" value={novaValor} onChange={e => setNovaValor(e.target.value)} placeholder="0" className="h-9 text-sm text-right" onKeyDown={e => { if (e.key === "Enter") addReceita(); }} />
+              </td>
+              <td className="p-3 text-center">
+                <Button size="sm" className="gap-1" onClick={addReceita}><Plus className="w-3.5 h-3.5" /> Adicionar</Button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </Card>
 
       {/* KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
