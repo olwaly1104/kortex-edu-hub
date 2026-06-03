@@ -32,8 +32,8 @@ export default function Receitas() {
   const [periodo, setPeriodo] = useState("mes");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editValue, setEditValue] = useState<string>("");
-  const [createOpen, setCreateOpen] = useState(false);
-  const [newR, setNewR] = useState({ payer: "", studentId: "", course: "", category: "Propinas", amount: "", status: "pendente" as "pago" | "pendente" | "em_atraso" });
+  const [novaDesc, setNovaDesc] = useState("");
+  const [novaValor, setNovaValor] = useState("");
 
   const mult = periodo === "ano" ? 12 : periodo === "semestre" ? 6 : 1;
 
@@ -45,7 +45,7 @@ export default function Receitas() {
 
   const filtered = useMemo(() => {
     let list = receitas
-      .filter(r => !search || (r.payer || "").toLowerCase().includes(search.toLowerCase()) || (r.studentId || "").toLowerCase().includes(search.toLowerCase()) || (r.course || "").toLowerCase().includes(search.toLowerCase()))
+      .filter(r => !search || (r.payer || "").toLowerCase().includes(search.toLowerCase()) || (r.studentId || "").toLowerCase().includes(search.toLowerCase()) || (r.course || "").toLowerCase().includes(search.toLowerCase()) || (r.description || "").toLowerCase().includes(search.toLowerCase()))
       .filter(r => filterStatus === "todos" || r.status === filterStatus)
       .filter(r => filterCategory === "todos" || r.category === filterCategory);
     if (sortField) {
@@ -70,18 +70,23 @@ export default function Receitas() {
     setEditingId(null);
   };
 
-  const createReceita = () => {
-    const amt = Number(newR.amount);
-    if (!newR.payer || isNaN(amt) || amt <= 0) { toast({ title: "Preencha estudante e valor válido", variant: "destructive" }); return; }
+  const addReceita = () => {
+    const amt = Number(novaValor);
+    if (!novaDesc.trim() || isNaN(amt) || amt <= 0) { toast({ title: "Preencha descrição e valor válido", variant: "destructive" }); return; }
     const id = `t-new-${Date.now()}`;
     setReceitas(prev => [{
-      id, date: new Date().toISOString().slice(0, 10), description: `${newR.category} — Nova`,
-      category: newR.category, amount: amt, type: "receita", status: newR.status,
-      source: newR.category, payer: newR.payer, studentId: newR.studentId || "—", course: newR.course || "—",
+      id, date: new Date().toISOString().slice(0, 10), description: novaDesc.trim(),
+      category: "Propinas", amount: amt, type: "receita", status: "pendente",
+      source: "Manual", payer: novaDesc.trim(), studentId: "—", course: "—",
     } as any, ...prev]);
-    setCreateOpen(false);
-    setNewR({ payer: "", studentId: "", course: "", category: "Propinas", amount: "", status: "pendente" });
-    toast({ title: "Receita criada" });
+    setNovaDesc("");
+    setNovaValor("");
+    toast({ title: "Receita adicionada" });
+  };
+
+  const removeReceita = (id: string) => {
+    setReceitas(prev => prev.filter(r => r.id !== id));
+    toast({ title: "Receita removida" });
   };
 
   return (
