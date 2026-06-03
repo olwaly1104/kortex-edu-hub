@@ -10,8 +10,21 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
+const STORAGE_KEY = "upra_mock_user";
+
+function loadStoredUser(): User | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw) as User;
+  } catch {
+    return null;
+  }
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(() => loadStoredUser());
 
   const login = useCallback((email: string, _password: string) => {
     const role = detectRole(email);
@@ -26,11 +39,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       gap: currentGap,
       inscricoes: currentInscricoes,
     };
-    setUser({ ...mockUsers[role], email });
+    const nextUser = { ...mockUsers[role], email };
+    setUser(nextUser);
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(nextUser));
+    } catch {
+      // ignore storage errors (private mode, quota, etc.)
+    }
     return true;
   }, []);
 
-  const logout = useCallback(() => setUser(null), []);
+  const logout = useCallback(() => {
+    try {
+      window.localStorage.removeItem(STORAGE_KEY);
+    } catch {
+      // ignore
+    }
+    setUser(null);
+  }, []);
 
   return (
     <AuthContext.Provider value={{ user, isAuthenticated: !!user, login, logout }}>
