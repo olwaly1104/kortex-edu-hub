@@ -186,6 +186,7 @@ export default function FinancasDashboard() {
             <th className="text-left p-3 font-medium text-muted-foreground">Data</th>
             <th className="text-left p-3 font-medium text-muted-foreground">Tipo</th>
             <th className="text-left p-3 font-medium text-muted-foreground">Descrição</th>
+            <th className="text-left p-3 font-medium text-muted-foreground">Estudante</th>
             <th className="text-left p-3 font-medium text-muted-foreground">Categoria</th>
             <th className="text-right p-3 font-medium text-muted-foreground">Valor</th>
             <th className="text-center p-3 font-medium text-muted-foreground">Estado</th>
