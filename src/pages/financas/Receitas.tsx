@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
-import { TrendingUp, Search, ArrowUpDown, X, Wallet, Clock, AlertTriangle, FileText, Receipt, Plus, Pencil, Check } from "lucide-react";
+import { TrendingUp, Search, ArrowUpDown, X, Wallet, Clock, AlertTriangle, FileText, Receipt, Pencil, Check } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -32,8 +33,6 @@ export default function Receitas() {
   const [periodo, setPeriodo] = useState("mes");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editValue, setEditValue] = useState<string>("");
-  const [novaDesc, setNovaDesc] = useState("");
-  const [novaValor, setNovaValor] = useState("");
 
   const mult = periodo === "ano" ? 12 : periodo === "semestre" ? 6 : 1;
 
@@ -70,24 +69,7 @@ export default function Receitas() {
     setEditingId(null);
   };
 
-  const addReceita = () => {
-    const amt = Number(novaValor);
-    if (!novaDesc.trim() || isNaN(amt) || amt <= 0) { toast({ title: "Preencha descrição e valor válido", variant: "destructive" }); return; }
-    const id = `t-new-${Date.now()}`;
-    setReceitas(prev => [{
-      id, date: new Date().toISOString().slice(0, 10), description: novaDesc.trim(),
-      category: "Propinas", amount: amt, type: "receita", status: "pendente",
-      source: "Manual", payer: novaDesc.trim(), studentId: "—", course: "—",
-    } as any, ...prev]);
-    setNovaDesc("");
-    setNovaValor("");
-    toast({ title: "Receita adicionada" });
-  };
-
-  const removeReceita = (id: string) => {
-    setReceitas(prev => prev.filter(r => r.id !== id));
-    toast({ title: "Receita removida" });
-  };
+  const navigate = useNavigate();
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
@@ -95,37 +77,11 @@ export default function Receitas() {
         <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
           <TrendingUp className="w-6 h-6 text-primary" /> Receitas
         </h1>
+        <Button variant="outline" size="sm" onClick={() => navigate("/financas/despesas")}>
+          Tabela de Despesas
+        </Button>
       </div>
 
-      {/* Adicionar Receita — tabela simples */}
-      <Card className="overflow-hidden border border-border">
-        <div className="bg-muted/30 px-4 py-2.5 border-b border-border flex items-center gap-2">
-          <Plus className="w-4 h-4 text-primary" />
-          <span className="text-sm font-semibold text-foreground">Adicionar Receita</span>
-        </div>
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b bg-muted/20">
-              <th className="text-left p-3 font-medium text-muted-foreground">Descrição</th>
-              <th className="text-right p-3 font-medium text-muted-foreground w-40">Valor (AOA)</th>
-              <th className="text-center p-3 font-medium text-muted-foreground w-24"></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td className="p-3">
-                <Input value={novaDesc} onChange={e => setNovaDesc(e.target.value)} placeholder="Descrição da receita..." className="h-9 text-sm" />
-              </td>
-              <td className="p-3">
-                <Input type="number" value={novaValor} onChange={e => setNovaValor(e.target.value)} placeholder="0" className="h-9 text-sm text-right" onKeyDown={e => { if (e.key === "Enter") addReceita(); }} />
-              </td>
-              <td className="p-3 text-center">
-                <Button size="sm" className="gap-1" onClick={addReceita}><Plus className="w-3.5 h-3.5" /> Adicionar</Button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </Card>
 
       {/* KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
