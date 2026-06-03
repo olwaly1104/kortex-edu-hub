@@ -39,8 +39,8 @@ const despesaAprovadas = catData.reduce((s, c) => s + c.value, 0);
 
 /* all transactions merged */
 const allTx = [
-  ...receitas.map(r => ({ id: r.id, desc: r.description, date: r.date, amount: r.amount, type: "receita" as const, category: r.category, status: r.status })),
-  ...despesas.map(d => ({ id: d.id, desc: d.description, date: d.date, amount: d.amount, type: "despesa" as const, category: d.category, status: d.status })),
+  ...receitas.map(r => ({ id: r.id, desc: r.description, date: r.date, amount: r.amount, type: "receita" as const, category: r.category, status: r.status, entity: r.payer || "—" })),
+  ...despesas.map(d => ({ id: d.id, desc: d.description, date: d.date, amount: d.amount, type: "despesa" as const, category: d.category, status: d.status, entity: d.requestedBy || "—" })),
 ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
 const txCategories = Array.from(new Set(allTx.map(t => t.category)));
@@ -186,6 +186,7 @@ export default function FinancasDashboard() {
             <th className="text-left p-3 font-medium text-muted-foreground">Data</th>
             <th className="text-left p-3 font-medium text-muted-foreground">Tipo</th>
             <th className="text-left p-3 font-medium text-muted-foreground">Descrição</th>
+            <th className="text-left p-3 font-medium text-muted-foreground">Estudante</th>
             <th className="text-left p-3 font-medium text-muted-foreground">Categoria</th>
             <th className="text-right p-3 font-medium text-muted-foreground">Valor</th>
             <th className="text-center p-3 font-medium text-muted-foreground">Estado</th>
@@ -200,6 +201,7 @@ export default function FinancasDashboard() {
                 </div>
               </td>
               <td className="p-3 text-xs font-medium text-foreground">{t.desc}</td>
+              <td className="p-3 text-xs text-muted-foreground">{(t as any).entity || "—"}</td>
               <td className="p-3"><Badge variant="outline" className="text-[10px]">{t.category}</Badge></td>
               <td className={cn("p-3 text-right text-xs font-semibold", t.type === "receita" ? "text-accent" : "text-destructive")}>
                 {t.type === "receita" ? "+" : "-"}{formatCurrency(t.amount)}
