@@ -166,14 +166,13 @@ export default function Despesas() {
               <td className="p-3 text-xs text-muted-foreground">{d.requestedBy || "—"}</td>
               <td className="p-3 text-center"><Badge variant="outline" className={cn("text-[10px]", statusColors[d.status])}>{statusLabels[d.status] || d.status}</Badge></td>
               <td className="p-3 text-center">
-                <div className="flex gap-1 justify-center">
+                {d.status === "aprovada" ? (
                   <Button variant="ghost" size="sm" className="h-7 px-2 text-[10px] gap-1 text-muted-foreground hover:text-primary" onClick={() => toast({ title: "Comprovativo aberto" })}>
                     <FileText className="w-3 h-3" /> Comprovativo
                   </Button>
-                  <Button variant="ghost" size="sm" className="h-7 px-2 text-[10px] gap-1 text-muted-foreground hover:text-primary" onClick={() => toast({ title: "Factura aberta" })}>
-                    <Receipt className="w-3 h-3" /> Factura
-                  </Button>
-                </div>
+                ) : (
+                  <span className="text-[10px] text-muted-foreground/60">—</span>
+                )}
               </td>
               <td className="p-3 text-center">
                 {d.status === "pendente" && (
