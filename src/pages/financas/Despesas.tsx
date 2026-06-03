@@ -44,7 +44,7 @@ export default function Despesas() {
 
   const filtered = useMemo(() => {
     let list = despesas
-      .filter(d => !search || d.description.toLowerCase().includes(search.toLowerCase()) || (d.department || "").toLowerCase().includes(search.toLowerCase()) || (d.requestedBy || "").toLowerCase().includes(search.toLowerCase()))
+      .filter(d => !search || d.description.toLowerCase().includes(search.toLowerCase()) || (d.responsavel || "").toLowerCase().includes(search.toLowerCase()) || (d.requestedBy || "").toLowerCase().includes(search.toLowerCase()))
       .filter(d => filterStatus === "todos" || d.status === filterStatus)
       .filter(d => filterCategory === "todos" || d.category === filterCategory);
     if (sortField) {
