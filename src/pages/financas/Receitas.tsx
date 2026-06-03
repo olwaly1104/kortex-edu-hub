@@ -77,8 +77,8 @@ export default function Receitas() {
         <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
           <TrendingUp className="w-6 h-6 text-primary" /> Receitas
         </h1>
-        <Button variant="outline" size="sm" onClick={() => navigate("/financas/despesas")}>
-          Tabela de Despesas
+        <Button variant="outline" size="sm" onClick={() => navigate("/financas/configurar-despesas")}>
+          Configurar Despesas
         </Button>
       </div>
 
