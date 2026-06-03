@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { TrendingUp, Search, ArrowUpDown, X, Wallet, Clock, AlertTriangle, FileText, Receipt, Plus, Pencil, Check, Trash2 } from "lucide-react";
+import { TrendingUp, Search, ArrowUpDown, X, Wallet, Clock, AlertTriangle, FileText, Receipt, Plus, Pencil, Check } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
