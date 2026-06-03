@@ -28,6 +28,7 @@ const despesaCategories = ["Salários", "Infraestrutura", "Material Didáctico",
 
 export default function Despesas() {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("todos");
   const [filterCategory, setFilterCategory] = useState("todos");
