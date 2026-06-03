@@ -26,12 +26,17 @@ const estimativaMensal = 4800000;
 
 export default function Receitas() {
   const { toast } = useToast();
+  const [receitas, setReceitas] = useState(receitasSeed);
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("todos");
   const [filterCategory, setFilterCategory] = useState("todos");
   const [sortField, setSortField] = useState<SortField | null>(null);
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [periodo, setPeriodo] = useState("mes");
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editValue, setEditValue] = useState<string>("");
+  const [createOpen, setCreateOpen] = useState(false);
+  const [newR, setNewR] = useState({ payer: "", studentId: "", course: "", category: "Propinas", amount: "", status: "pendente" as "pago" | "pendente" | "em_atraso" });
 
   const mult = periodo === "ano" ? 12 : periodo === "semestre" ? 6 : 1;
 
