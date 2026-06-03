@@ -89,9 +89,53 @@ export default function Receitas() {
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
-      <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-        <TrendingUp className="w-6 h-6 text-primary" /> Receitas
-      </h1>
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+          <TrendingUp className="w-6 h-6 text-primary" /> Receitas
+        </h1>
+        <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+          <DialogTrigger asChild>
+            <Button size="sm" className="gap-1.5"><Plus className="w-4 h-4" /> Nova Receita</Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader><DialogTitle>Nova Receita</DialogTitle></DialogHeader>
+            <div className="grid gap-3 py-2">
+              <div className="grid gap-1.5"><Label>Estudante / Pagador *</Label><Input value={newR.payer} onChange={e => setNewR({ ...newR, payer: e.target.value })} placeholder="Nome completo" /></div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="grid gap-1.5"><Label>ID Estudante</Label><Input value={newR.studentId} onChange={e => setNewR({ ...newR, studentId: e.target.value })} placeholder="EST-0000" /></div>
+                <div className="grid gap-1.5"><Label>Curso</Label><Input value={newR.course} onChange={e => setNewR({ ...newR, course: e.target.value })} placeholder="Curso" /></div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="grid gap-1.5"><Label>Categoria</Label>
+                  <Select value={newR.category} onValueChange={v => setNewR({ ...newR, category: v })}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Propinas">Propinas</SelectItem>
+                      <SelectItem value="Emolumentos">Emolumentos</SelectItem>
+                      <SelectItem value="Taxas">Taxas</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid gap-1.5"><Label>Estado</Label>
+                  <Select value={newR.status} onValueChange={(v: any) => setNewR({ ...newR, status: v })}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="pendente">Pendente</SelectItem>
+                      <SelectItem value="pago">Recebido</SelectItem>
+                      <SelectItem value="em_atraso">Em Atraso</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="grid gap-1.5"><Label>Valor (AOA) *</Label><Input type="number" value={newR.amount} onChange={e => setNewR({ ...newR, amount: e.target.value })} placeholder="0" /></div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setCreateOpen(false)}>Cancelar</Button>
+              <Button onClick={createReceita}>Criar</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
 
       {/* KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
