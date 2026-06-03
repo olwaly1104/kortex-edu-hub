@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Plus, Search, ArrowUpDown, X, Check, Wallet, Clock, Ban, TrendingDown, FileText, Receipt } from "lucide-react";
+import { Plus, Search, ArrowUpDown, X, Check, Wallet, Clock, Ban, TrendingDown, FileText } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,6 @@ import { cn } from "@/lib/utils";
 
 type SortField = "amount";
 type SortDir = "asc" | "desc";
-type Periodo = "mensal" | "semestral" | "anual";
 
 const statusColors: Record<string, string> = {
   aprovada: "bg-accent/15 text-accent border-accent/30",
@@ -23,8 +22,6 @@ const statusColors: Record<string, string> = {
 };
 const statusLabels: Record<string, string> = { aprovada: "Aprovada", pendente: "Pendente", rejeitada: "Rejeitada" };
 
-const periodoMultiplier: Record<Periodo, number> = { mensal: 1, semestral: 6, anual: 12 };
-const periodoLabels: Record<Periodo, string> = { mensal: "Mensal", semestral: "Semestral", anual: "Anual" };
 
 const despesaCategories = ["Salários", "Infraestrutura", "Material Didáctico", "Serviços e Utilities", "Investigação", "Bolsas e Apoios"];
 
@@ -36,9 +33,6 @@ export default function Despesas() {
   const [sortField, setSortField] = useState<SortField | null>(null);
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [sheetOpen, setSheetOpen] = useState(false);
-  const [periodo, setPeriodo] = useState<Periodo>("mensal");
-
-  const mult = periodoMultiplier[periodo];
 
   const isSortActive = sortField !== null;
   const isStatusActive = filterStatus !== "todos";
@@ -68,23 +62,16 @@ export default function Despesas() {
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-foreground flex items-center gap-2"><TrendingDown className="w-6 h-6 text-primary" /> Despesas</h1>
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1 rounded-lg border border-border bg-muted/30 p-0.5">
-            {(["mensal", "semestral", "anual"] as Periodo[]).map(p => (
-              <Button key={p} size="sm" variant={periodo === p ? "default" : "ghost"} onClick={() => setPeriodo(p)} className="text-xs h-8 px-3">{periodoLabels[p]}</Button>
-            ))}
-          </div>
-          <Button size="sm" onClick={() => setSheetOpen(true)} className="gap-1.5"><Plus className="w-4 h-4" /> Nova Despesa</Button>
-        </div>
+        <Button size="sm" onClick={() => setSheetOpen(true)} className="gap-1.5"><Plus className="w-4 h-4" /> Nova Despesa</Button>
       </div>
 
       {/* KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: "Despesas Total do Mês", value: formatCurrency(totalMes * mult), icon: TrendingDown, color: "text-foreground" },
-          { label: "Aprovadas", value: formatCurrency(aprovadas * mult), icon: Wallet, color: "text-accent" },
-          { label: "Pendentes", value: formatCurrency(pendentes * mult), icon: Clock, color: "text-amber-600" },
-          { label: "Rejeitadas", value: formatCurrency(rejeitadas * mult), icon: Ban, color: "text-destructive" },
+          { label: "Despesas Total do Mês", value: formatCurrency(totalMes), icon: TrendingDown, color: "text-foreground" },
+          { label: "Aprovadas", value: formatCurrency(aprovadas), icon: Wallet, color: "text-accent" },
+          { label: "Pendentes", value: formatCurrency(pendentes), icon: Clock, color: "text-amber-600" },
+          { label: "Rejeitadas", value: formatCurrency(rejeitadas), icon: Ban, color: "text-destructive" },
         ].map(kpi => (
           <Card key={kpi.label} className="p-4">
             <div className="flex items-center gap-2 mb-3">
@@ -166,7 +153,7 @@ export default function Despesas() {
             <th className="text-right p-3 font-medium text-muted-foreground">Valor</th>
             <th className="text-left p-3 font-medium text-muted-foreground">Solicitado por</th>
             <th className="text-center p-3 font-medium text-muted-foreground">Estado</th>
-            <th className="text-center p-3 font-medium text-muted-foreground">Documentos</th>
+            <th className="text-center p-3 font-medium text-muted-foreground">Comprovativo</th>
             <th className="text-center p-3 font-medium text-muted-foreground">Ações</th>
           </tr></thead>
           <tbody>{filtered.map(d => (
@@ -179,14 +166,13 @@ export default function Despesas() {
               <td className="p-3 text-xs text-muted-foreground">{d.requestedBy || "—"}</td>
               <td className="p-3 text-center"><Badge variant="outline" className={cn("text-[10px]", statusColors[d.status])}>{statusLabels[d.status] || d.status}</Badge></td>
               <td className="p-3 text-center">
-                <div className="flex gap-1 justify-center">
+                {d.status === "aprovada" ? (
                   <Button variant="ghost" size="sm" className="h-7 px-2 text-[10px] gap-1 text-muted-foreground hover:text-primary" onClick={() => toast({ title: "Comprovativo aberto" })}>
                     <FileText className="w-3 h-3" /> Comprovativo
                   </Button>
-                  <Button variant="ghost" size="sm" className="h-7 px-2 text-[10px] gap-1 text-muted-foreground hover:text-primary" onClick={() => toast({ title: "Factura aberta" })}>
-                    <Receipt className="w-3 h-3" /> Factura
-                  </Button>
-                </div>
+                ) : (
+                  <span className="text-[10px] text-muted-foreground/60">—</span>
+                )}
               </td>
               <td className="p-3 text-center">
                 {d.status === "pendente" && (
