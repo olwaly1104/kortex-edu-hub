@@ -33,8 +33,6 @@ export default function Receitas() {
   const [periodo, setPeriodo] = useState("mes");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editValue, setEditValue] = useState<string>("");
-  const [novaDesc, setNovaDesc] = useState("");
-  const [novaValor, setNovaValor] = useState("");
 
   const mult = periodo === "ano" ? 12 : periodo === "semestre" ? 6 : 1;
 
