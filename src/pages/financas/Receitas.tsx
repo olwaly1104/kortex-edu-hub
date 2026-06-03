@@ -63,6 +63,30 @@ export default function Receitas() {
 
   const resetAll = () => { setFilterStatus("todos"); setFilterCategory("todos"); setSortField(null); setSortDir("desc"); setSearch(""); };
 
+  const startEdit = (id: string, current: number) => { setEditingId(id); setEditValue(String(current)); };
+  const commitEdit = (id: string) => {
+    const n = Number(editValue);
+    if (!isNaN(n) && n >= 0) {
+      setReceitas(prev => prev.map(r => r.id === id ? { ...r, amount: n } : r));
+      toast({ title: "Valor actualizado" });
+    }
+    setEditingId(null);
+  };
+
+  const createReceita = () => {
+    const amt = Number(newR.amount);
+    if (!newR.payer || isNaN(amt) || amt <= 0) { toast({ title: "Preencha estudante e valor válido", variant: "destructive" }); return; }
+    const id = `t-new-${Date.now()}`;
+    setReceitas(prev => [{
+      id, date: new Date().toISOString().slice(0, 10), description: `${newR.category} — Nova`,
+      category: newR.category, amount: amt, type: "receita", status: newR.status,
+      source: newR.category, payer: newR.payer, studentId: newR.studentId || "—", course: newR.course || "—",
+    } as any, ...prev]);
+    setCreateOpen(false);
+    setNewR({ payer: "", studentId: "", course: "", category: "Propinas", amount: "", status: "pendente" });
+    toast({ title: "Receita criada" });
+  };
+
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
