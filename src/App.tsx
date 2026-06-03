@@ -125,6 +125,7 @@ import FinancasDashboard from "./pages/financas/Dashboard";
 import FinancasInicio from "./pages/financas/Inicio";
 import FinancasReceitas from "./pages/financas/Receitas";
 import FinancasDespesas from "./pages/financas/Despesas";
+import FinancasConfigurarDespesas from "./pages/financas/ConfigurarDespesas";
 import FinancasSalarios from "./pages/financas/Salarios";
 import FinancasOrcamentos from "./pages/financas/Orcamentos";
 import FinancasSolicitacoes from "./pages/financas/Solicitacoes";
