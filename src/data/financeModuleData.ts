@@ -13,6 +13,13 @@ export interface Transaction {
   source?: string;
   department?: string;
   requestedBy?: string;
+  requesterRole?: string;
+  responsavel?: string;
+  responsavelRole?: string;
+  justification?: string;
+  approvedBy?: string;
+  approvedDate?: string;
+  paidDate?: string;
   payer?: string;
   studentId?: string;
   course?: string;
