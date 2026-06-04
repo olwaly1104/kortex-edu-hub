@@ -288,35 +288,45 @@ export default function AppSidebar() {
         ))}
       </nav>
 
-      <div className="border-t border-sidebar-border p-3 space-y-1">
+      <div className="border-t border-sidebar-border">
         {!collapsed && (
-          <div className="flex items-center gap-3 px-1 pb-2">
-            <div className="w-9 h-9 rounded-full bg-sidebar-accent flex items-center justify-center text-xs font-bold text-sidebar-accent-foreground shrink-0">
+          <div className="px-3 py-2.5 flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-full bg-sidebar-accent flex items-center justify-center text-[10px] font-bold text-sidebar-accent-foreground shrink-0">
               {user.name.split(" ").map(n => n[0]).slice(0, 2).join("")}
             </div>
-            <div className="overflow-hidden flex-1">
-              <p className="text-sm font-medium text-sidebar-primary truncate">{user.name}</p>
-              <p className="text-[11px] text-sidebar-muted truncate">{roleLabel}</p>
+            <div className="overflow-hidden flex-1 min-w-0">
+              <p className="text-[12px] font-semibold text-sidebar-primary truncate leading-tight">{user.name}</p>
+              <p className="text-[10px] text-sidebar-muted truncate leading-tight">{roleLabel}</p>
             </div>
+            <button onClick={logout} className="shrink-0 w-7 h-7 rounded-md flex items-center justify-center text-sidebar-foreground/40 hover:text-destructive hover:bg-destructive/10 transition-colors" title="Sair">
+              <LogOut className="w-[15px] h-[15px]" />
+            </button>
           </div>
         )}
-        <button onClick={logout} className="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm text-destructive/70 hover:bg-destructive/10 hover:text-destructive transition-colors" title="Sair">
-          <LogOut className="w-[18px] h-[18px] shrink-0" />
-          {!collapsed && <span>Sair</span>}
-        </button>
-      </div>
 
-      <div className="px-3 py-2 border-t border-sidebar-border/60 bg-sidebar-accent/20">
-        {collapsed ? (
-          <div className="flex justify-center">
-            <span className="w-1 h-1 rounded-full bg-emerald-400" />
-          </div>
-        ) : (
-          <div className="flex items-center justify-center gap-1.5">
-            <span className="w-1 h-1 rounded-full bg-emerald-400 shrink-0" />
-            <p className="text-[9px] font-semibold tracking-[0.14em] uppercase text-sidebar-foreground/40">Powered by Kortex</p>
+        {collapsed && (
+          <div className="flex flex-col items-center gap-1.5 py-2">
+            <div className="w-7 h-7 rounded-full bg-sidebar-accent flex items-center justify-center text-[9px] font-bold text-sidebar-accent-foreground">
+              {user.name.split(" ").map(n => n[0]).slice(0, 2).join("")}
+            </div>
+            <button onClick={logout} className="w-7 h-7 rounded-md flex items-center justify-center text-sidebar-foreground/40 hover:text-destructive hover:bg-destructive/10 transition-colors" title="Sair">
+              <LogOut className="w-[14px] h-[14px]" />
+            </button>
           </div>
         )}
+
+        <div className="px-3 py-1.5 border-t border-sidebar-border/50 bg-sidebar-accent/20">
+          {collapsed ? (
+            <div className="flex justify-center">
+              <span className="w-1 h-1 rounded-full bg-emerald-400" />
+            </div>
+          ) : (
+            <div className="flex items-center justify-center gap-1.5">
+              <span className="w-1 h-1 rounded-full bg-emerald-400 shrink-0" />
+              <p className="text-[9px] font-medium tracking-[0.12em] uppercase text-sidebar-foreground/40">Powered by Kortex</p>
+            </div>
+          )}
+        </div>
       </div>
 
       <button onClick={() => setCollapsed(!collapsed)} className="absolute -right-3 top-20 w-6 h-6 rounded-full bg-card border border-border shadow-sm flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
