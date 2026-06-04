@@ -243,13 +243,13 @@ export default function AppSidebar() {
   return (
     <aside className={cn("h-screen bg-sidebar text-sidebar-foreground flex flex-col transition-all duration-300 sticky top-0 shrink-0", collapsed ? "w-[68px]" : "w-[260px]")}>
       <div className="flex items-center gap-3 px-4 py-5 border-b border-sidebar-border">
-        <div className="w-9 h-9 rounded-lg bg-secondary flex items-center justify-center shrink-0">
-          <GraduationCap className="w-5 h-5 text-secondary-foreground" />
+        <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center shrink-0 p-1 shadow-sm">
+          <img src={logoUpra.url} alt="UPRA" className="w-full h-full object-contain" />
         </div>
         {!collapsed && (
-          <div className="overflow-hidden">
-            <h1 className="text-base font-bold text-sidebar-primary">Kortex</h1>
-            <p className="text-[11px] text-sidebar-muted">Educação</p>
+          <div className="overflow-hidden leading-tight">
+            <h1 className="text-base font-bold text-sidebar-primary tracking-wide">UPRA</h1>
+            <p className="text-[10px] text-sidebar-muted uppercase tracking-wider">Portal Académico</p>
           </div>
         )}
       </div>
