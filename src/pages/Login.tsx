@@ -1,10 +1,11 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { GraduationCap, Eye, EyeOff } from "lucide-react";
+import { GraduationCap, Eye, EyeOff, Globe } from "lucide-react";
 
 export default function Login() {
   const { login } = useAuth();
@@ -53,6 +54,11 @@ export default function Login() {
           <p className="mt-6 text-primary-foreground/60 max-w-sm">
             Plataforma completa para escolas e universidades angolanas. Tudo num só lugar.
           </p>
+          <Link to="/site" className="inline-block mt-8">
+            <Button variant="outline" size="lg" className="bg-transparent border-primary-foreground/40 text-primary-foreground hover:bg-primary-foreground/10 gap-2">
+              <Globe className="w-4 h-4" /> Visitar website da UPRA
+            </Button>
+          </Link>
         </div>
       </div>
 
