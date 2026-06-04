@@ -6,7 +6,7 @@ import {
   GraduationCap, LogIn, ArrowRight, MapPin, Phone, Mail, Globe,
   BookOpen, Users, Award, Building2, Microscope, Palette, Scale,
   Stethoscope, Cpu, Briefcase, Calendar, Newspaper, ChevronRight,
-  Facebook, Instagram, Linkedin, Youtube, CheckCircle2, Quote,
+  Facebook, Instagram, Linkedin, Youtube, CheckCircle2, Quote, Sparkles,
 } from "lucide-react";
 
 const faculdades = [
