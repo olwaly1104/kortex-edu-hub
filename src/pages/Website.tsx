@@ -3,11 +3,12 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
-  GraduationCap, LogIn, ArrowRight, MapPin, Phone, Mail, Globe,
+  LogIn, ArrowRight, MapPin, Phone, Mail, Globe,
   BookOpen, Users, Award, Building2, Microscope, Palette, Scale,
   Stethoscope, Cpu, Briefcase, Calendar, Newspaper, ChevronRight,
   Facebook, Instagram, Linkedin, Youtube, CheckCircle2, Quote, Sparkles,
 } from "lucide-react";
+import logoUpra from "@/assets/logo-upra.asset.json";
 
 const faculdades = [
   { icon: Building2, name: "Ciências Exatas", desc: "Arquitectura, Engenharia Civil, Informática", cursos: 6 },
@@ -66,8 +67,8 @@ export default function Website() {
       <header className="sticky top-0 z-40 bg-background/90 backdrop-blur border-b border-border">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link to="/site" className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
-              <GraduationCap className="w-5 h-5 text-primary-foreground" />
+            <div className="w-11 h-11 rounded-xl bg-muted flex items-center justify-center p-1">
+              <img src={logoUpra.url} alt="UPRA" className="w-full h-full object-contain" />
             </div>
             <div className="leading-tight">
               <p className="text-sm font-bold text-foreground">UPRA</p>
@@ -332,8 +333,8 @@ export default function Website() {
         <div className="max-w-7xl mx-auto px-6 py-14 grid md:grid-cols-2 lg:grid-cols-4 gap-10">
           <div>
             <div className="flex items-center gap-2.5 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
-                <GraduationCap className="w-5 h-5 text-primary-foreground" />
+              <div className="w-11 h-11 rounded-xl bg-background flex items-center justify-center p-1">
+                <img src={logoUpra.url} alt="UPRA" className="w-full h-full object-contain" />
               </div>
               <div className="leading-tight">
                 <p className="font-bold">UPRA</p>

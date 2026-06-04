@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { GraduationCap, Eye, EyeOff, Globe } from "lucide-react";
+import { Eye, EyeOff, Globe } from "lucide-react";
+import logoUpra from "@/assets/logo-upra.asset.json";
 
 export default function Login() {
   const { login } = useAuth();
@@ -39,20 +40,20 @@ export default function Login() {
           <div className="absolute top-1/2 left-1/3 w-40 h-40 rounded-full bg-secondary" />
         </div>
         <div className="relative z-10 text-center">
-          <div className="flex items-center justify-center gap-3 mb-8">
-            <div className="w-16 h-16 rounded-2xl bg-secondary flex items-center justify-center">
-              <GraduationCap className="w-9 h-9 text-secondary-foreground" />
+          <div className="flex flex-col items-center gap-4 mb-8">
+            <div className="w-28 h-28 rounded-2xl bg-primary-foreground flex items-center justify-center p-3 shadow-xl">
+              <img src={logoUpra.url} alt="UPRA" className="w-full h-full object-contain" />
             </div>
-            <div className="text-left">
-              <h1 className="text-3xl font-bold text-primary-foreground">Kortex</h1>
-              <p className="text-lg text-primary-foreground/80">Educação</p>
+            <div className="text-center">
+              <h1 className="text-3xl font-bold text-primary-foreground tracking-wide">UPRA</h1>
+              <p className="text-sm text-primary-foreground/80 uppercase tracking-[0.2em] mt-1">Universidade Privada de Angola</p>
             </div>
           </div>
           <p className="text-xl text-primary-foreground/90 max-w-md leading-relaxed">
-            A sua sala de aula digital
+            Portal Académico
           </p>
-          <p className="mt-6 text-primary-foreground/60 max-w-sm">
-            Plataforma completa para escolas e universidades angolanas. Tudo num só lugar.
+          <p className="mt-4 text-primary-foreground/70 max-w-sm mx-auto">
+            Acesso integrado para estudantes, docentes e gestão institucional.
           </p>
           <Link to="/site" className="inline-block mt-8">
             <Button variant="outline" size="lg" className="bg-transparent border-primary-foreground/40 text-primary-foreground hover:bg-primary-foreground/10 gap-2">
@@ -67,12 +68,12 @@ export default function Login() {
         <div className="w-full max-w-md">
           {/* Mobile logo */}
           <div className="flex items-center gap-3 mb-10 lg:hidden">
-            <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center">
-              <GraduationCap className="w-7 h-7 text-primary-foreground" />
+            <div className="w-14 h-14 rounded-xl bg-muted flex items-center justify-center p-1.5">
+              <img src={logoUpra.url} alt="UPRA" className="w-full h-full object-contain" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-foreground">Kortex</h1>
-              <p className="text-sm text-muted-foreground">Educação</p>
+              <h1 className="text-2xl font-bold text-foreground">UPRA</h1>
+              <p className="text-xs text-muted-foreground uppercase tracking-wider">Portal Académico</p>
             </div>
           </div>
 
