@@ -82,8 +82,8 @@ export default function Website() {
             <a href="#contacto" className="text-foreground/80 hover:text-primary">Contacto</a>
           </nav>
           <div className="flex items-center gap-2">
-            <Link to="/inscricoes">
-              <Button variant="outline" size="sm" className="h-9">Inscrever-se</Button>
+            <Link to="/candidatar">
+              <Button variant="outline" size="sm" className="h-9">Candidatar-me</Button>
             </Link>
             <Link to="/">
               <Button size="sm" className="h-9 gap-1.5">
@@ -111,7 +111,7 @@ export default function Website() {
               campus moderno e ligação directa ao mercado de trabalho.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link to="/inscricoes">
+              <Link to="/candidatar">
                 <Button size="lg" className="bg-secondary text-secondary-foreground hover:bg-secondary/90 gap-2">
                   Candidatar-me agora <ArrowRight className="w-4 h-4" />
                 </Button>
@@ -230,7 +230,7 @@ export default function Website() {
               <Badge variant="outline" className="mb-3">Cursos em destaque</Badge>
               <h2 className="text-3xl lg:text-4xl font-bold text-foreground">Programas mais procurados</h2>
             </div>
-            <Link to="/inscricoes">
+            <Link to="/candidatar">
               <Button variant="outline" className="gap-2">Ver todos os cursos <ArrowRight className="w-4 h-4" /></Button>
             </Link>
           </div>
@@ -311,7 +311,7 @@ export default function Website() {
             Candidate-se ao ano lectivo 2026/2027 ou aceda ao portal para acompanhar a sua vida académica.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <Link to="/inscricoes">
+            <Link to="/candidatar">
               <Button size="lg" className="bg-secondary text-secondary-foreground hover:bg-secondary/90 gap-2">
                 Iniciar candidatura <ArrowRight className="w-4 h-4" />
               </Button>
