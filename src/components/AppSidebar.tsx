@@ -315,18 +315,6 @@ export default function AppSidebar() {
           </div>
         )}
 
-        <div className="px-3 py-1.5 border-t border-sidebar-border bg-sidebar-accent/20">
-          {collapsed ? (
-            <div className="flex justify-center">
-              <span className="w-1 h-1 rounded-full bg-emerald-400" />
-            </div>
-          ) : (
-            <div className="flex items-center justify-center gap-1.5">
-              <span className="w-1 h-1 rounded-full bg-emerald-400 shrink-0" />
-              <p className="text-[9px] font-medium tracking-[0.12em] uppercase text-sidebar-foreground/40">Powered by Kortex</p>
-            </div>
-          )}
-        </div>
       </div>
 
       <button onClick={() => setCollapsed(!collapsed)} className="absolute -right-3 top-20 w-6 h-6 rounded-full bg-card border border-border shadow-sm flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
