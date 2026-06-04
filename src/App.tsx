@@ -154,7 +154,7 @@ const homeRedirectMap: Record<string, string> = {
 
 function AppRoutes() {
   const { isAuthenticated, user } = useAuth();
-  if (!isAuthenticated) return <Routes><Route path="/site" element={<Website />} /><Route path="*" element={<Login />} /></Routes>;
+  if (!isAuthenticated) return <Routes><Route path="/site" element={<Website />} /><Route path="/candidatar" element={<Candidatar />} /><Route path="*" element={<Login />} /></Routes>;
   const homeRedirect = homeRedirectMap[user?.role || "student"] || "/student";
 
   return (
@@ -331,6 +331,7 @@ function AppRoutes() {
         <Route path="/inscricoes/candidato/:ref/documento" element={<InscricoesDoc />} />
       </Route>
       <Route path="/site" element={<Website />} />
+      <Route path="/candidatar" element={<Candidatar />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
