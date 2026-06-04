@@ -288,7 +288,7 @@ export default function AppSidebar() {
         ))}
       </nav>
 
-      <div className="border-t border-sidebar-border p-3 space-y-2">
+      <div className="border-t border-sidebar-border p-3 space-y-1">
         {!collapsed && (
           <div className="flex items-center gap-3 px-1 pb-2">
             <div className="w-9 h-9 rounded-full bg-sidebar-accent flex items-center justify-center text-xs font-bold text-sidebar-accent-foreground shrink-0">
@@ -300,18 +300,23 @@ export default function AppSidebar() {
             </div>
           </div>
         )}
-        {!collapsed && (
-          <div className="px-3 py-2 rounded-lg bg-sidebar-accent/30 flex items-center justify-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
-            <p className="text-[10px] font-semibold tracking-wide uppercase text-sidebar-foreground/60 truncate">Powered by Kortex</p>
+        <button onClick={logout} className="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm text-destructive/70 hover:bg-destructive/10 hover:text-destructive transition-colors" title="Sair">
+          <LogOut className="w-[18px] h-[18px] shrink-0" />
+          {!collapsed && <span>Sair</span>}
+        </button>
+      </div>
+
+      <div className="px-3 py-2 border-t border-sidebar-border/60 bg-sidebar-accent/20">
+        {collapsed ? (
+          <div className="flex justify-center">
+            <span className="w-1 h-1 rounded-full bg-emerald-400" />
+          </div>
+        ) : (
+          <div className="flex items-center justify-center gap-1.5">
+            <span className="w-1 h-1 rounded-full bg-emerald-400 shrink-0" />
+            <p className="text-[9px] font-semibold tracking-[0.14em] uppercase text-sidebar-foreground/40">Powered by Kortex</p>
           </div>
         )}
-        <div className="border-t border-sidebar-border pt-2 mt-2">
-          <button onClick={logout} className="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm text-destructive/70 hover:bg-destructive/10 hover:text-destructive transition-colors" title="Sair">
-            <LogOut className="w-[18px] h-[18px] shrink-0" />
-            {!collapsed && <span>Sair</span>}
-          </button>
-        </div>
       </div>
 
       <button onClick={() => setCollapsed(!collapsed)} className="absolute -right-3 top-20 w-6 h-6 rounded-full bg-card border border-border shadow-sm flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
