@@ -15,7 +15,7 @@ export default function InscricoesLayout() {
           </div>
           <div className="leading-tight">
             <p className="text-sm font-semibold text-foreground">Portal de Inscrições</p>
-            <p className="text-[10px] text-muted-foreground uppercase tracking-wider">UPRA · Universidade Privada de Angola</p>
+            <p className="text-[10px] text-muted-foreground uppercase tracking-wider">UPRA</p>
           </div>
         </div>
         <Button variant="outline" size="sm" onClick={logout} className="h-8 text-[12px] gap-1.5">

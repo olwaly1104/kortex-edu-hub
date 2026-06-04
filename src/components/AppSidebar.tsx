@@ -302,7 +302,7 @@ export default function AppSidebar() {
         )}
         {!collapsed && (
           <div className="px-3 py-1.5 rounded-lg border border-sidebar-border">
-            <p className="text-[11px] font-medium text-sidebar-foreground/70 truncate">Universidade Privada de Angola</p>
+            <p className="text-[10px] font-medium text-sidebar-foreground/50 truncate text-center">Powered by Kortex</p>
           </div>
         )}
         <div className="border-t border-sidebar-border pt-2 mt-2">

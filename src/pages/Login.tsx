@@ -46,7 +46,6 @@ export default function Login() {
             </div>
             <div className="text-center">
               <h1 className="text-3xl font-bold text-primary-foreground tracking-wide">UPRA</h1>
-              <p className="text-sm text-primary-foreground/80 uppercase tracking-[0.2em] mt-1">Universidade Privada de Angola</p>
             </div>
           </div>
           <p className="text-xl text-primary-foreground/90 max-w-md leading-relaxed">

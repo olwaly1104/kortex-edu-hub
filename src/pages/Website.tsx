@@ -72,7 +72,6 @@ export default function Website() {
             </div>
             <div className="leading-tight">
               <p className="text-sm font-bold text-foreground">UPRA</p>
-              <p className="text-[10px] text-muted-foreground">Universidade Privada de Angola</p>
             </div>
           </Link>
           <nav className="hidden lg:flex items-center gap-7 text-sm font-medium">
@@ -338,7 +337,6 @@ export default function Website() {
               </div>
               <div className="leading-tight">
                 <p className="font-bold">UPRA</p>
-                <p className="text-[10px] opacity-70">Universidade Privada de Angola</p>
               </div>
             </div>
             <p className="text-xs opacity-70 leading-relaxed">
@@ -385,6 +383,7 @@ export default function Website() {
           <div className="max-w-7xl mx-auto px-6 py-5 flex flex-wrap items-center justify-between gap-3 text-[11px] opacity-70">
             <p>© 2026 Universidade Privada de Angola. Todos os direitos reservados.</p>
             <div className="flex items-center gap-4">
+              <span className="opacity-60">Powered by Kortex</span>
               <a href="#" className="hover:opacity-100">Termos</a>
               <a href="#" className="hover:opacity-100">Privacidade</a>
               <a href="#" className="hover:opacity-100">Cookies</a>
