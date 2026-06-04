@@ -243,14 +243,6 @@ export default function AppSidebar() {
 
   return (
     <aside className={cn("h-screen bg-sidebar text-sidebar-foreground flex flex-col transition-all duration-300 sticky top-0 shrink-0", collapsed ? "w-[68px]" : "w-[260px]")}>
-      {!collapsed && (
-        <div className="px-4 pt-3 pb-2.5 border-b border-sidebar-border/60">
-          <div className="flex items-center justify-center gap-1.5">
-            <span className="w-1 h-1 rounded-full bg-emerald-400 shrink-0" />
-            <p className="text-[9px] font-medium tracking-[0.14em] uppercase text-sidebar-muted">Powered by Kortex</p>
-          </div>
-        </div>
-      )}
       <div className="flex flex-col px-4 pt-4 pb-4 border-b border-sidebar-border">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center shrink-0 p-1 shadow-sm">
