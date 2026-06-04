@@ -83,10 +83,12 @@ export default function Website() {
           </nav>
           <div className="flex items-center gap-2">
             <Link to="/candidatar">
-              <Button variant="outline" size="sm" className="h-9">Candidatar-me</Button>
+              <Button size="sm" className="h-9 gap-1.5 bg-secondary text-secondary-foreground hover:bg-secondary/90 shadow-sm">
+                <Sparkles className="w-4 h-4" /> Candidatar-me
+              </Button>
             </Link>
             <Link to="/">
-              <Button size="sm" className="h-9 gap-1.5">
+              <Button size="sm" variant="outline" className="h-9 gap-1.5">
                 <LogIn className="w-4 h-4" /> Portal
               </Button>
             </Link>
