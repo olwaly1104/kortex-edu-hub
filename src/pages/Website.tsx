@@ -3,11 +3,12 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
-  GraduationCap, LogIn, ArrowRight, MapPin, Phone, Mail, Globe,
+  LogIn, ArrowRight, MapPin, Phone, Mail, Globe,
   BookOpen, Users, Award, Building2, Microscope, Palette, Scale,
   Stethoscope, Cpu, Briefcase, Calendar, Newspaper, ChevronRight,
   Facebook, Instagram, Linkedin, Youtube, CheckCircle2, Quote, Sparkles,
 } from "lucide-react";
+import logoUpra from "@/assets/logo-upra.asset.json";
 
 const faculdades = [
   { icon: Building2, name: "Ciências Exatas", desc: "Arquitectura, Engenharia Civil, Informática", cursos: 6 },
