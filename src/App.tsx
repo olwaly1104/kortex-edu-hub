@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import Login from "./pages/Login";
 import Website from "./pages/Website";
+import Candidatar from "./pages/Candidatar";
 import AppLayout from "./layouts/AppLayout";
 import ComingSoon from "./components/ComingSoon";
 import StudentDashboard from "./pages/student/Dashboard";
@@ -153,7 +154,7 @@ const homeRedirectMap: Record<string, string> = {
 
 function AppRoutes() {
   const { isAuthenticated, user } = useAuth();
-  if (!isAuthenticated) return <Routes><Route path="/site" element={<Website />} /><Route path="*" element={<Login />} /></Routes>;
+  if (!isAuthenticated) return <Routes><Route path="/site" element={<Website />} /><Route path="/candidatar" element={<Candidatar />} /><Route path="*" element={<Login />} /></Routes>;
   const homeRedirect = homeRedirectMap[user?.role || "student"] || "/student";
 
   return (
@@ -330,6 +331,7 @@ function AppRoutes() {
         <Route path="/inscricoes/candidato/:ref/documento" element={<InscricoesDoc />} />
       </Route>
       <Route path="/site" element={<Website />} />
+      <Route path="/candidatar" element={<Candidatar />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
