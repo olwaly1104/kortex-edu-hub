@@ -298,7 +298,7 @@ export default function AppSidebar() {
               <p className="text-[12px] font-semibold text-sidebar-primary truncate leading-tight">{user.name}</p>
               <p className="text-[10px] text-sidebar-muted truncate leading-tight">{roleLabel}</p>
             </div>
-            <button onClick={logout} className="shrink-0 w-7 h-7 rounded-md flex items-center justify-center text-sidebar-foreground/40 hover:text-destructive hover:bg-destructive/10 transition-colors" title="Sair">
+            <button onClick={logout} className="shrink-0 w-7 h-7 rounded-md flex items-center justify-center text-red-500 hover:text-red-600 hover:bg-red-50 transition-colors" title="Sair">
               <LogOut className="w-[15px] h-[15px]" />
             </button>
           </div>
@@ -309,7 +309,7 @@ export default function AppSidebar() {
             <div className="w-7 h-7 rounded-full bg-sidebar-accent flex items-center justify-center text-[9px] font-bold text-sidebar-accent-foreground">
               {user.name.split(" ").map(n => n[0]).slice(0, 2).join("")}
             </div>
-            <button onClick={logout} className="w-7 h-7 rounded-md flex items-center justify-center text-sidebar-foreground/40 hover:text-destructive hover:bg-destructive/10 transition-colors" title="Sair">
+            <button onClick={logout} className="w-7 h-7 rounded-md flex items-center justify-center text-red-500 hover:text-red-600 hover:bg-red-50 transition-colors" title="Sair">
               <LogOut className="w-[14px] h-[14px]" />
             </button>
           </div>
