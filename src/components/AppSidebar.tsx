@@ -301,8 +301,9 @@ export default function AppSidebar() {
           </div>
         )}
         {!collapsed && (
-          <div className="px-3 py-1.5 rounded-lg border border-sidebar-border">
-            <p className="text-[10px] font-medium text-sidebar-foreground/50 truncate text-center">Powered by Kortex</p>
+          <div className="px-3 py-2 rounded-lg bg-sidebar-accent/30 flex items-center justify-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
+            <p className="text-[10px] font-semibold tracking-wide uppercase text-sidebar-foreground/60 truncate">Powered by Kortex</p>
           </div>
         )}
         <div className="border-t border-sidebar-border pt-2 mt-2">

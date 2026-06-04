@@ -383,7 +383,10 @@ export default function Website() {
           <div className="max-w-7xl mx-auto px-6 py-5 flex flex-wrap items-center justify-between gap-3 text-[11px] opacity-70">
             <p>© 2026 Universidade Privada de Angola. Todos os direitos reservados.</p>
             <div className="flex items-center gap-4">
-              <span className="opacity-60">Powered by Kortex</span>
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/10 text-[10px] font-medium tracking-wide uppercase opacity-80 hover:opacity-100 transition-opacity">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                Powered by Kortex
+              </span>
               <a href="#" className="hover:opacity-100">Termos</a>
               <a href="#" className="hover:opacity-100">Privacidade</a>
               <a href="#" className="hover:opacity-100">Cookies</a>
