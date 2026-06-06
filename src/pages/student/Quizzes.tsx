@@ -20,8 +20,13 @@ type MCQ = { q: string; options: string[]; answer: number; explain: string };
 type Written = { q: string; keywords: string[]; sample: string };
 type Fill = { sentence: string; answer: string; hint: string };
 type Flash = { front: string; back: string };
-type QuizType = "mcq" | "written" | "fill" | "flash";
+type QuizType = "mcq" | "written" | "fill" | "flash" | "exam";
 type Difficulty = "Introdutório" | "Intermédio" | "Avançado";
+
+type ExamQ =
+  | { kind: "mcq"; q: string; options: string[]; answer: number; points?: number }
+  | { kind: "fill"; sentence: string; answer: string; points?: number }
+  | { kind: "written"; q: string; keywords: string[]; sample: string; points?: number };
 
 type Base = {
   id: string;
@@ -38,7 +43,8 @@ type AnyQuiz =
   | (Base & { type: "mcq";     items: MCQ[] })
   | (Base & { type: "written"; items: Written[] })
   | (Base & { type: "fill";    items: Fill[] })
-  | (Base & { type: "flash";   items: Flash[] });
+  | (Base & { type: "flash";   items: Flash[] })
+  | (Base & { type: "exam";    items: ExamQ[]; passingScore?: number });
 
 /* ------------------------------------------------------------------ */
 /*  Content — Curso de Arquitectura (ARQ)                              */
