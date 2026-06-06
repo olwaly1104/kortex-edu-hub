@@ -519,8 +519,8 @@ function QuizHeader({ quiz }: { quiz: AnyQuiz }) {
         <div className="flex-1 min-w-[200px]">
           <div className="flex items-center gap-2 flex-wrap">
             <Badge variant="outline" className={cn("text-[10px] font-semibold border", meta.tag)}>{meta.label}</Badge>
-            <span className="text-[10px] uppercase tracking-wider font-semibold text-primary">{quiz.cadeira}</span>
-            <span className="text-[10px] text-muted-foreground">· {quiz.ano}º ano</span>
+            <Badge variant="outline" className={cn("text-[10px] font-semibold border", cadeiraStyle(quiz.cadeira).tag)}>{quiz.cadeira}</Badge>
+            <span className="text-[10px] text-muted-foreground">{quiz.ano}º ano</span>
           </div>
           <h2 className="text-2xl font-bold text-foreground leading-tight mt-1">{quiz.title}</h2>
           <p className="text-sm text-muted-foreground mt-1.5 max-w-2xl">{quiz.description}</p>
