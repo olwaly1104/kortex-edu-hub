@@ -122,20 +122,25 @@ export default function LessonDetail() {
       <Tabs defaultValue="transcript" className="space-y-5">
         <div className="border-b">
           <TabsList className="bg-transparent h-auto p-0 gap-0">
-            {[
-              { value: "transcript", label: "Transcrição" },
-              { value: "content", label: `Conteúdos (${lesson.materials.length})` },
-              { value: "participants", label: `Participantes (${lesson.participants.length})` },
-              { value: "tasks", label: `Tarefas (${lesson.tasks.length})` },
-            ].map(tab => (
-              <TabsTrigger
-                key={tab.value}
-                value={tab.value}
-                className="rounded-none border-b-2 border-transparent data-[state=active]:border-current data-[state=active]:shadow-none data-[state=active]:bg-transparent px-4 py-3 text-sm"
-              >
-                {tab.label}
-              </TabsTrigger>
-            ))}
+            {(() => {
+              const quizzes = generateLessonQuizzes(lesson.id, lesson.title, lessonStatus);
+              const tabs = [
+                { value: "transcript", label: "Transcrição" },
+                { value: "content", label: `Conteúdos (${lesson.materials.length})` },
+                { value: "quizzes", label: `Quizzes (${quizzes.length})` },
+                { value: "participants", label: `Participantes (${lesson.participants.length})` },
+                { value: "tasks", label: `Tarefas (${lesson.tasks.length})` },
+              ];
+              return tabs.map(tab => (
+                <TabsTrigger
+                  key={tab.value}
+                  value={tab.value}
+                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-current data-[state=active]:shadow-none data-[state=active]:bg-transparent px-4 py-3 text-sm"
+                >
+                  {tab.label}
+                </TabsTrigger>
+              ));
+            })()}
           </TabsList>
         </div>
 
