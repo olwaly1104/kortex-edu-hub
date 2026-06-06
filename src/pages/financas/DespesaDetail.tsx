@@ -429,13 +429,13 @@ export default function DespesaDetail() {
                 );
               })()}
               <div>
-                <dt className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Categoria</dt>
-                <dd className="font-medium text-foreground">{despesa.category}</dd>
+                <dt className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Data do pedido</dt>
+                <dd className="font-medium text-foreground">{fmtDateLong(despesa.date)}</dd>
               </div>
               <Separator />
               <div>
-                <dt className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Data do pedido</dt>
-                <dd className="font-medium text-foreground">{fmtDateLong(despesa.date)}</dd>
+                <dt className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Categoria</dt>
+                <dd className="font-medium text-foreground">{despesa.category}</dd>
               </div>
               <Separator />
               {(() => {
