@@ -5,6 +5,10 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   Sparkles, CheckCircle2, XCircle, RotateCcw, ArrowRight, ArrowLeft,
   Brain, Pencil, Type, Layers, Trophy, Timer, Play, Search, Filter, BookOpen,
   ClipboardCheck, AlertTriangle, Flame, Zap, Gauge,
