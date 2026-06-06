@@ -423,7 +423,7 @@ export default function StudentQuizzes() {
           <Card className="divide-y divide-border overflow-hidden">
             {filtered.length === 0 ? (
               <div className="p-12 text-center text-sm text-muted-foreground">
-                Nenhum quiz corresponde aos filtros aplicados.
+                Nenhuma actividade corresponde aos filtros aplicados.
               </div>
             ) : (
               filtered.map(q => <QuizRow key={q.id} quiz={q} onStart={() => setActiveId(q.id)} />)
