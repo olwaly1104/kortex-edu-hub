@@ -321,6 +321,11 @@ export default function DespesaDetail() {
             </h3>
             <dl className="space-y-3 text-sm">
               <div>
+                <dt className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Data do pedido</dt>
+                <dd className="font-medium text-foreground">{fmtDateLong(despesa.date)}</dd>
+              </div>
+              <Separator />
+              <div>
                 <dt className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Solicitado por</dt>
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
@@ -382,11 +387,6 @@ export default function DespesaDetail() {
                     </div>
                   )}
                 </div>
-              </div>
-              <Separator />
-              <div>
-                <dt className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Data do pedido</dt>
-                <dd className="font-medium text-foreground">{fmtDateLong(despesa.date)}</dd>
               </div>
               <Separator />
               <div>
