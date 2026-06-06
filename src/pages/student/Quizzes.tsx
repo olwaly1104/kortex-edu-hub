@@ -356,6 +356,7 @@ export default function StudentQuizzes() {
                   onClick={() => setCadeiraFilter(c)}
                   label={c}
                   count={QUIZZES.filter(q => q.cadeira === c).length}
+                  dot={cadeiraColor(c).dot}
                 />
               ))}
             </div>
