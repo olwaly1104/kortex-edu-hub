@@ -323,6 +323,16 @@ export default function StudentQuizzes() {
       <div className="grid lg:grid-cols-[260px_1fr] gap-6">
         {/* Sidebar filters */}
         <aside className="space-y-5">
+          <div className="relative">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Procurar..."
+              className="pl-9 h-9"
+            />
+          </div>
+
           <div>
             <p className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground mb-2 flex items-center gap-1.5">
               <Filter className="w-3 h-3" /> Tipologia
@@ -350,51 +360,65 @@ export default function StudentQuizzes() {
             </p>
             <div className="space-y-1">
               <FilterRow active={cadeiraFilter === "all"} onClick={() => setCadeiraFilter("all")} label="Todas as cadeiras" count={QUIZZES.length} />
-              {cadeiras.map(c => (
-                <FilterRow
-                  key={c}
-                  active={cadeiraFilter === c}
-                  onClick={() => setCadeiraFilter(c)}
-                  label={c}
-                  count={QUIZZES.filter(q => q.cadeira === c).length}
-                />
-              ))}
+              {cadeiras.map(c => {
+                const s = cadeiraStyle(c);
+                return (
+                  <FilterRow
+                    key={c}
+                    active={cadeiraFilter === c}
+                    onClick={() => setCadeiraFilter(c)}
+                    label={c}
+                    count={QUIZZES.filter(q => q.cadeira === c).length}
+                    dot={s.dot}
+                    activeClasses={s.active}
+                  />
+                );
+              })}
             </div>
           </div>
+
+          {(typeFilter !== "all" || cadeiraFilter !== "all" || search) && (
+            <button
+              onClick={() => { setTypeFilter("all"); setCadeiraFilter("all"); setSearch(""); }}
+              className="text-xs text-primary hover:underline"
+            >Limpar filtros</button>
+          )}
         </aside>
 
-        {/* Main list */}
-        <main className="space-y-3">
-          <div className="flex items-center justify-between gap-3 flex-wrap">
-            <div className="relative flex-1 min-w-[200px] max-w-md">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Procurar por título, cadeira ou tópico..."
-                className="pl-9 h-9"
-              />
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {filtered.length} {filtered.length === 1 ? "actividade" : "actividades"}
-              {(typeFilter !== "all" || cadeiraFilter !== "all" || search) && (
-                <button
-                  onClick={() => { setTypeFilter("all"); setCadeiraFilter("all"); setSearch(""); }}
-                  className="ml-2 text-primary hover:underline"
-                >limpar filtros</button>
-              )}
-            </p>
-          </div>
-
-          <Card className="divide-y divide-border overflow-hidden">
-            {filtered.length === 0 ? (
-              <div className="p-12 text-center text-sm text-muted-foreground">
-                Nenhuma actividade corresponde aos filtros aplicados.
-              </div>
-            ) : (
-              filtered.map(q => <QuizRow key={q.id} quiz={q} onStart={() => setActiveId(q.id)} />)
-            )}
-          </Card>
+        {/* Main grouped list */}
+        <main className="space-y-6">
+          {filtered.length === 0 ? (
+            <Card className="p-12 text-center text-sm text-muted-foreground">
+              Nenhuma actividade corresponde aos filtros aplicados.
+            </Card>
+          ) : (
+            (Object.keys(TYPE_META) as QuizType[])
+              .map(t => ({ t, items: filtered.filter(q => q.type === t) }))
+              .filter(g => g.items.length > 0)
+              .map(({ t, items }) => {
+                const meta = TYPE_META[t];
+                const Icon = meta.icon;
+                return (
+                  <section key={t} className="rounded-xl border border-border bg-card overflow-hidden">
+                    <header className={cn("flex items-center gap-3 px-5 py-3 border-b", meta.tag)}>
+                      <div className="w-9 h-9 rounded-lg bg-white/70 border border-current/10 flex items-center justify-center shrink-0">
+                        <Icon className="w-4.5 h-4.5" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <h2 className="font-bold text-sm tracking-tight">{meta.label}</h2>
+                          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white/70 tabular-nums">{items.length}</span>
+                        </div>
+                        <p className="text-[11px] opacity-80 leading-tight">{meta.description}</p>
+                      </div>
+                    </header>
+                    <div className="divide-y divide-border">
+                      {items.map(q => <QuizRow key={q.id} quiz={q} onStart={() => setActiveId(q.id)} />)}
+                    </div>
+                  </section>
+                );
+              })
+          )}
         </main>
       </div>
     </div>
