@@ -425,7 +425,7 @@ export default function StudentQuizzes() {
               />
             </div>
             <p className="text-xs text-muted-foreground">
-              {filtered.length} {filtered.length === 1 ? "actividade" : "actividades"}
+              {filtered.length} {filtered.length === 1 ? "pergunta" : "perguntas"}
               {(typeFilter !== "all" || cadeiraFilter !== "all" || search) && (
                 <button
                   onClick={() => { setTypeFilter("all"); setCadeiraFilter("all"); setSearch(""); }}
@@ -438,7 +438,7 @@ export default function StudentQuizzes() {
           <Card className="divide-y divide-border overflow-hidden">
             {filtered.length === 0 ? (
               <div className="p-12 text-center text-sm text-muted-foreground">
-                Nenhuma actividade corresponde aos filtros aplicados.
+                Nenhuma pergunta corresponde aos filtros aplicados.
               </div>
             ) : (
               filtered.map(q => <QuizRow key={q.id} quiz={q} onStart={() => setPendingId(q.id)} />)
@@ -452,7 +452,7 @@ export default function StudentQuizzes() {
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
               <AlertTriangle className="w-5 h-5 text-amber-500" />
-              Iniciar actividade?
+              Iniciar pergunta?
             </AlertDialogTitle>
             <AlertDialogDescription asChild>
               <div className="space-y-3 pt-1">
