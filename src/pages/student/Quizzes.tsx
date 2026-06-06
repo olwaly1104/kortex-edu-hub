@@ -410,7 +410,7 @@ export default function StudentQuizzes() {
               />
             </div>
             <p className="text-xs text-muted-foreground">
-              {filtered.length} {filtered.length === 1 ? "quiz" : "quizzes"}
+              {filtered.length} {filtered.length === 1 ? "actividade" : "actividades"}
               {(typeFilter !== "all" || cadeiraFilter !== "all" || search) && (
                 <button
                   onClick={() => { setTypeFilter("all"); setCadeiraFilter("all"); setSearch(""); }}
