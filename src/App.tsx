@@ -16,6 +16,7 @@ import LessonDetail from "./pages/student/LessonDetail";
 import EvaluationDetail from "./pages/student/EvaluationDetail";
 import TaskDetail from "./pages/student/TaskDetail";
 import StudentTasks from "./pages/student/Tasks";
+import StudentQuizzes from "./pages/student/Quizzes";
 import StudentCalendar from "./pages/student/Calendar";
 import StudentAnnouncements from "./pages/student/Announcements";
 import StudentSolicitacoes from "./pages/student/Solicitacoes";
@@ -169,6 +170,7 @@ function AppRoutes() {
         <Route path="/student/disciplines/:disciplineId/evaluation" element={<EvaluationDetail />} />
         <Route path="/student/disciplines/:disciplineId/tasks" element={<TaskDetail />} />
         <Route path="/student/tasks" element={<StudentTasks />} />
+        <Route path="/student/quizzes" element={<StudentQuizzes />} />
         <Route path="/student/calendar" element={<StudentCalendar />} />
         <Route path="/student/announcements" element={<StudentAnnouncements />} />
         <Route path="/student/solicitacoes" element={<StudentSolicitacoes />} />

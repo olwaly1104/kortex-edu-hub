@@ -235,18 +235,6 @@ export default function StudentDashboard() {
             </>
           )}
 
-          {/* Ações Rápidas */}
-          <h2 className="text-lg font-semibold text-foreground mt-2">Ações Rápidas</h2>
-          <div className="space-y-2">
-            {quickSuggestions.map((s, i) => (
-              <Link key={i} to={s.to}>
-                <Card className="px-4 py-3 flex items-center justify-between hover:bg-muted/30 transition-colors cursor-pointer group">
-                  <p className="text-sm text-foreground">{s.label}</p>
-                  <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
-                </Card>
-              </Link>
-            ))}
-          </div>
         </div>
 
         {/* Right column */}
@@ -273,32 +261,34 @@ export default function StudentDashboard() {
             ))}
           </div>
 
-          {/* Attendance */}
-          <h2 className="text-lg font-semibold text-foreground mt-6">Presenças</h2>
-          <Card className="p-4 border-2 border-primary/20">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-sm font-semibold text-foreground">Presença Geral</p>
-              <span className={`text-lg font-bold ${generalPct >= 75 ? "text-accent" : "text-destructive"}`}>{generalPct}%</span>
-            </div>
-            <Progress value={generalPct} className="h-2" />
-            <p className="text-[11px] text-muted-foreground mt-1.5">{totalPresent}P / {totalAbsent}F / {totalJustified}J</p>
-          </Card>
-          <div className="space-y-3">
-            {disciplines.map((disc) => {
-              const total = disc.attendance.present + disc.attendance.absent + disc.attendance.justified;
-              const pct = Math.round((disc.attendance.present / total) * 100);
-              return (
-                <Card key={disc.id} className="p-3">
-                  <div className="flex items-center justify-between mb-1.5">
-                    <p className="text-sm font-medium text-foreground truncate">{disc.name}</p>
-                    <span className={`text-sm font-bold ${pct >= 75 ? "text-accent" : "text-destructive"}`}>{pct}%</span>
-                  </div>
-                  <Progress value={pct} className="h-1.5" />
-                  <p className="text-[10px] text-muted-foreground mt-1">{disc.attendance.present}P / {disc.attendance.absent}F / {disc.attendance.justified}J</p>
-                </Card>
-              );
-            })}
-          </div>
+        </div>
+      </div>
+
+      {/* Presenças — horizontal */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+            <BarChart3 className="w-5 h-5 text-primary" /> Presenças
+          </h2>
+          <span className={`text-sm font-bold ${generalPct >= 75 ? "text-accent" : "text-destructive"}`}>
+            Geral: {generalPct}% · {totalPresent}P / {totalAbsent}F / {totalJustified}J
+          </span>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+          {disciplines.map((disc) => {
+            const total = disc.attendance.present + disc.attendance.absent + disc.attendance.justified;
+            const pct = Math.round((disc.attendance.present / total) * 100);
+            return (
+              <Card key={disc.id} className="p-3">
+                <p className="text-xs font-medium text-foreground truncate">{disc.name}</p>
+                <div className="flex items-baseline justify-between mt-1">
+                  <span className={`text-lg font-bold ${pct >= 75 ? "text-accent" : "text-destructive"}`}>{pct}%</span>
+                  <span className="text-[10px] text-muted-foreground">{disc.attendance.present}P/{disc.attendance.absent}F/{disc.attendance.justified}J</span>
+                </div>
+                <Progress value={pct} className="h-1.5 mt-1.5" />
+              </Card>
+            );
+          })}
         </div>
       </div>
     </div>
