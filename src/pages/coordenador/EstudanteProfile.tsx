@@ -110,12 +110,6 @@ export default function CoordenadorEstudanteProfile() {
                   <span className="mx-1.5 text-muted-foreground/40">·</span>
                   {student.year}º Ano · Turma {student.turma}
                 </p>
-                <div className="flex items-center gap-1.5 flex-wrap mt-3">
-                  <Badge variant="outline" className={cn("text-[10px]", sc.bg)}>{sc.label}</Badge>
-                  <Badge variant="outline" className={cn("text-[10px]", fs.cls)}>
-                    <Wallet className="w-2.5 h-2.5 mr-1" /> {fs.label}
-                  </Badge>
-                </div>
                 <div className="flex items-center gap-2 mt-4">
                   <Button size="sm" variant="outline" className="gap-1.5 text-xs h-7">
                     <MessageCircle className="w-3.5 h-3.5" /> Chat
