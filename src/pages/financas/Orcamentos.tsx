@@ -122,24 +122,24 @@ export default function Orcamentos() {
         </div>
 
         {/* KPI grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 mb-5">
-          <div>
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 mb-5">
+          <div className="rounded-lg border border-border/70 bg-muted/20 p-3">
             <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5">Total Orçamentado</p>
             <p className="text-lg font-bold text-foreground tabular-nums leading-none">{formatCurrency(totalBudget)}</p>
           </div>
-          <div>
+          <div className="rounded-lg border border-border/70 bg-muted/20 p-3">
             <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5">Total Gasto</p>
             <p className={cn("text-lg font-bold tabular-nums leading-none", usageColor(pctUsed))}>{formatCurrency(totalSpent)}</p>
           </div>
-          <div>
+          <div className="rounded-lg border border-border/70 bg-muted/20 p-3">
             <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5">Disponível</p>
             <p className="text-lg font-bold text-foreground tabular-nums leading-none">{formatCurrency(available)}</p>
           </div>
-          <div>
+          <div className="rounded-lg border border-border/70 bg-muted/20 p-3">
             <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5">Em Alerta</p>
             <p className={cn("text-lg font-bold tabular-nums leading-none", numAlerta > 0 ? "text-amber-600" : "text-foreground")}>{numAlerta}</p>
           </div>
-          <div>
+          <div className="rounded-lg border border-border/70 bg-muted/20 p-3">
             <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5">Estado</p>
             <p className={cn("text-lg font-bold leading-none", usageColor(pctUsed))}>
               {pctUsed >= 90 ? "Crítico" : pctUsed >= 75 ? "Atenção" : "Saudável"}
@@ -149,14 +149,8 @@ export default function Orcamentos() {
 
         {/* Progress bar — structured & professional */}
         <div className="rounded-lg border border-border/70 bg-muted/20 p-4">
-          <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
-            <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Utilização Global</p>
-            <div className="flex items-center gap-3 text-[10px] text-muted-foreground">
-              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-sm bg-accent" />Saudável</span>
-              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-sm bg-amber-500" />Atenção</span>
-              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-sm bg-destructive" />Crítico</span>
-            </div>
-          </div>
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-3">Utilização Global</p>
+
 
           <div className="relative pb-6">
             {/* Track with zone backgrounds */}
