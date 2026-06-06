@@ -7,7 +7,9 @@ import { Progress } from "@/components/ui/progress";
 import {
   Sparkles, CheckCircle2, XCircle, RotateCcw, ArrowRight, ArrowLeft,
   Brain, Pencil, Type, Layers, Trophy, Timer, Play, Search, Filter, BookOpen,
+  ClipboardCheck, AlertTriangle,
 } from "lucide-react";
+import { useEffect } from "react";
 import { cn } from "@/lib/utils";
 
 /* ------------------------------------------------------------------ */
@@ -18,8 +20,13 @@ type MCQ = { q: string; options: string[]; answer: number; explain: string };
 type Written = { q: string; keywords: string[]; sample: string };
 type Fill = { sentence: string; answer: string; hint: string };
 type Flash = { front: string; back: string };
-type QuizType = "mcq" | "written" | "fill" | "flash";
+type QuizType = "mcq" | "written" | "fill" | "flash" | "exam";
 type Difficulty = "Introdutório" | "Intermédio" | "Avançado";
+
+type ExamQ =
+  | { kind: "mcq"; q: string; options: string[]; answer: number; points?: number }
+  | { kind: "fill"; sentence: string; answer: string; points?: number }
+  | { kind: "written"; q: string; keywords: string[]; sample: string; points?: number };
 
 type Base = {
   id: string;
@@ -36,7 +43,8 @@ type AnyQuiz =
   | (Base & { type: "mcq";     items: MCQ[] })
   | (Base & { type: "written"; items: Written[] })
   | (Base & { type: "fill";    items: Fill[] })
-  | (Base & { type: "flash";   items: Flash[] });
+  | (Base & { type: "flash";   items: Flash[] })
+  | (Base & { type: "exam";    items: ExamQ[]; passingScore?: number });
 
 /* ------------------------------------------------------------------ */
 /*  Content — Curso de Arquitectura (ARQ)                              */
@@ -168,6 +176,50 @@ const QUIZZES: AnyQuiz[] = [
       { front: "Perspectiva cónica", back: "Projecção central com ponto(s) de fuga, imita a visão humana." },
     ],
   },
+  {
+    id: "qz-011", code: "QZ-011", type: "exam",
+    title: "Exame de Treino — História da Arquitectura",
+    cadeira: "História da Arquitectura", ano: 2,
+    description: "Simulação cronometrada cobrindo movimentos do séc. XX, vocabulário clássico e autores fundamentais.",
+    difficulty: "Intermédio", minutes: 20, passingScore: 50,
+    items: [
+      { kind: "mcq", q: "A Bauhaus foi fundada em:", options: ["1909", "1919", "1929", "1945"], answer: 1, points: 10 },
+      { kind: "mcq", q: "A frase «a forma segue a função» é de:", options: ["Le Corbusier", "Louis Sullivan", "Mies van der Rohe", "Adolf Loos"], answer: 1, points: 10 },
+      { kind: "mcq", q: "Brasília foi planeada por:", options: ["Niemeyer e Costa", "Niemeyer e Le Corbusier", "Costa e Kahn", "Aalto e Niemeyer"], answer: 0, points: 10 },
+      { kind: "fill", sentence: "A ordem grega mais antiga e robusta é a ___.", answer: "dórica", points: 10 },
+      { kind: "fill", sentence: "O edifício circular romano coberto por cúpula chama-se ___.", answer: "panteão", points: 10 },
+      { kind: "written", q: "Explica brevemente o conceito de «planta livre» em Le Corbusier.",
+        keywords: ["pilares", "paredes", "estrutura", "liberdade", "flexível", "Corbusier"],
+        sample: "A planta livre é possível porque a estrutura é transferida para pilares (pilotis), libertando as paredes interiores de funções portantes e permitindo divisões flexíveis adaptáveis ao programa.",
+        points: 25 },
+      { kind: "written", q: "Define «pós-modernismo» em arquitectura com pelo menos um autor de referência.",
+        keywords: ["pós-modernismo", "Venturi", "história", "ornamento", "ecletismo", "Jencks"],
+        sample: "Reacção ao Movimento Moderno (anos 70-80) que reabilita ornamento, citações históricas e ecletismo. Robert Venturi («Less is a bore») e Charles Jencks são referências centrais.",
+        points: 25 },
+    ],
+  },
+  {
+    id: "qz-012", code: "QZ-012", type: "exam",
+    title: "Exame de Treino — Construção e Estrutura",
+    cadeira: "Construção II", ano: 3,
+    description: "Simulação focada em materiais, sistemas estruturais e fundações. Cronometrado.",
+    difficulty: "Avançado", minutes: 25, passingScore: 60,
+    items: [
+      { kind: "mcq", q: "Resistência característica do betão C25/30 (compressão) é:", options: ["20 MPa", "25 MPa", "30 MPa", "35 MPa"], answer: 1, points: 10 },
+      { kind: "mcq", q: "Numa viga simplesmente apoiada com carga uniforme, o momento máximo é em:", options: ["Apoios", "Meio vão", "1/3 do vão", "1/4 do vão"], answer: 1, points: 10 },
+      { kind: "mcq", q: "Uma sapata corrida usa-se sob:", options: ["Pilar isolado", "Parede contínua", "Laje fungiforme", "Pavimento térreo"], answer: 1, points: 10 },
+      { kind: "fill", sentence: "O elemento horizontal que vence o vão entre dois apoios chama-se ___.", answer: "viga", points: 10 },
+      { kind: "fill", sentence: "O aço é forte à tracção; o betão é forte à ___.", answer: "compressão", points: 10 },
+      { kind: "written", q: "Descreve a função do recobrimento de armaduras no betão armado.",
+        keywords: ["recobrimento", "corrosão", "aderência", "fogo", "armaduras", "durabilidade"],
+        sample: "O recobrimento protege as armaduras da corrosão (penetração de cloretos/carbonatação), garante aderência aço-betão, oferece resistência ao fogo e contribui para a durabilidade do elemento estrutural.",
+        points: 25 },
+      { kind: "written", q: "Quando se opta por fundações profundas (estacas) em vez de directas?",
+        keywords: ["solo", "competente", "estacas", "cargas", "freático", "profundidade"],
+        sample: "Quando o solo superficial não tem capacidade portante adequada, há cargas muito elevadas, presença de nível freático elevado, ou quando o terreno competente está a profundidade significativa.",
+        points: 25 },
+    ],
+  },
 ];
 
 /* ------------------------------------------------------------------ */
@@ -175,10 +227,11 @@ const QUIZZES: AnyQuiz[] = [
 /* ------------------------------------------------------------------ */
 
 const TYPE_META: Record<QuizType, { label: string; icon: React.ElementType; description: string }> = {
-  mcq:     { label: "Múltipla Escolha",  icon: Brain,  description: "Selecciona a resposta correcta entre opções." },
-  written: { label: "Resposta Escrita",  icon: Pencil, description: "Resposta aberta avaliada por palavras-chave." },
-  fill:    { label: "Preencher Espaço",  icon: Type,   description: "Completa uma frase com o termo em falta." },
-  flash:   { label: "Flashcards",        icon: Layers, description: "Cartões de revisão rápida — frente e verso." },
+  mcq:     { label: "Múltipla Escolha",  icon: Brain,           description: "Selecciona a resposta correcta entre opções." },
+  written: { label: "Resposta Escrita",  icon: Pencil,          description: "Resposta aberta avaliada por palavras-chave." },
+  fill:    { label: "Preencher Espaço",  icon: Type,            description: "Completa uma frase com o termo em falta." },
+  flash:   { label: "Flashcards",        icon: Layers,          description: "Cartões de revisão rápida — frente e verso." },
+  exam:    { label: "Exame de Treino",   icon: ClipboardCheck,  description: "Simulação cronometrada com perguntas mistas." },
 };
 
 const DIFF_STYLE: Record<Difficulty, string> = {
@@ -222,6 +275,7 @@ export default function StudentQuizzes() {
         {active.type === "written" && <WrittenGame quiz={active} />}
         {active.type === "fill"    && <FillGame quiz={active} />}
         {active.type === "flash"   && <FlashGame quiz={active} />}
+        {active.type === "exam"    && <ExamGame quiz={active} />}
       </div>
     );
   }
@@ -234,6 +288,7 @@ export default function StudentQuizzes() {
     written: QUIZZES.filter(q => q.type === "written").length,
     fill: QUIZZES.filter(q => q.type === "fill").length,
     flash: QUIZZES.filter(q => q.type === "flash").length,
+    exam: QUIZZES.filter(q => q.type === "exam").length,
   };
 
   return (
@@ -721,6 +776,269 @@ function FlashGame({ quiz }: { quiz: Extract<AnyQuiz, { type: "flash" }> }) {
         </div>
         <Button variant="outline" size="sm" onClick={next} className="gap-1">Próximo<ArrowRight className="w-4 h-4" /></Button>
       </div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Exam Game — timed, mixed-question simulation                       */
+/* ------------------------------------------------------------------ */
+
+function ExamGame({ quiz }: { quiz: Extract<AnyQuiz, { type: "exam" }> }) {
+  const total = quiz.items.length;
+  const totalPoints = quiz.items.reduce((s, it) => s + (it.points ?? 10), 0);
+  const passing = quiz.passingScore ?? 50;
+
+  const [started, setStarted] = useState(false);
+  const [idx, setIdx] = useState(0);
+  const [answers, setAnswers] = useState<Record<number, string | number>>({});
+  const [submitted, setSubmitted] = useState(false);
+  const [remaining, setRemaining] = useState(quiz.minutes * 60);
+
+  useEffect(() => {
+    if (!started || submitted) return;
+    if (remaining <= 0) { setSubmitted(true); return; }
+    const t = setTimeout(() => setRemaining(r => r - 1), 1000);
+    return () => clearTimeout(t);
+  }, [started, submitted, remaining]);
+
+  const mm = String(Math.floor(remaining / 60)).padStart(2, "0");
+  const ss = String(remaining % 60).padStart(2, "0");
+  const timeLow = remaining <= 60;
+
+  const scoreFor = (i: number): number => {
+    const it = quiz.items[i];
+    const pts = it.points ?? 10;
+    const a = answers[i];
+    if (a === undefined || a === "") return 0;
+    if (it.kind === "mcq") return a === it.answer ? pts : 0;
+    if (it.kind === "fill") return String(a).trim().toLowerCase() === it.answer.toLowerCase() ? pts : 0;
+    // written: keyword ratio
+    const text = String(a).toLowerCase();
+    const hits = it.keywords.filter(k => text.includes(k.toLowerCase())).length;
+    return Math.round((hits / it.keywords.length) * pts);
+  };
+
+  const totalScore = quiz.items.reduce((s, _, i) => s + scoreFor(i), 0);
+  const pct = Math.round((totalScore / totalPoints) * 100);
+  const passed = pct >= passing;
+
+  const restart = () => {
+    setStarted(false); setIdx(0); setAnswers({}); setSubmitted(false);
+    setRemaining(quiz.minutes * 60);
+  };
+
+  /* ------ Pre-start briefing ------ */
+  if (!started) {
+    const counts = {
+      mcq: quiz.items.filter(i => i.kind === "mcq").length,
+      fill: quiz.items.filter(i => i.kind === "fill").length,
+      written: quiz.items.filter(i => i.kind === "written").length,
+    };
+    return (
+      <Card className="p-8 space-y-6">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+            <ClipboardCheck className="w-6 h-6 text-primary" />
+          </div>
+          <div>
+            <h3 className="text-xl font-bold text-foreground">Briefing do Exame</h3>
+            <p className="text-sm text-muted-foreground">Lê com atenção antes de iniciar.</p>
+          </div>
+        </div>
+
+        <div className="grid sm:grid-cols-4 gap-3">
+          <BriefStat label="Duração" value={`${quiz.minutes} min`} />
+          <BriefStat label="Questões" value={total} />
+          <BriefStat label="Pontos" value={totalPoints} />
+          <BriefStat label="Aprovação" value={`${passing}%`} />
+        </div>
+
+        <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-2 text-sm">
+          <p className="font-semibold text-foreground">Composição</p>
+          <ul className="text-muted-foreground space-y-1">
+            <li>• {counts.mcq} perguntas de múltipla escolha</li>
+            <li>• {counts.fill} perguntas de preenchimento</li>
+            <li>• {counts.written} perguntas de resposta aberta</li>
+          </ul>
+        </div>
+
+        <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 flex gap-3 text-sm">
+          <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+          <p className="text-amber-900">
+            O cronómetro começa ao iniciar e <strong>não pode ser pausado</strong>. Ao terminar o tempo, o exame é submetido automaticamente.
+          </p>
+        </div>
+
+        <Button onClick={() => setStarted(true)} className="w-full gap-2" size="lg">
+          <Play className="w-4 h-4" /> Iniciar Exame
+        </Button>
+      </Card>
+    );
+  }
+
+  /* ------ Result screen ------ */
+  if (submitted) {
+    return (
+      <Card className="p-8 space-y-6">
+        <div className="text-center space-y-3">
+          <Trophy className={cn("w-14 h-14 mx-auto", passed ? "text-emerald-600" : "text-amber-500")} />
+          <h3 className="text-3xl font-bold text-foreground">{pct}%</h3>
+          <p className="text-muted-foreground">{totalScore} de {totalPoints} pontos</p>
+          <Badge variant="outline" className={cn("text-xs", passed ? "border-emerald-500 text-emerald-700 bg-emerald-50" : "border-amber-500 text-amber-700 bg-amber-50")}>
+            {passed ? "Aprovado" : "Reprovado"} · mínimo {passing}%
+          </Badge>
+        </div>
+        <Progress value={pct} className="h-2" />
+
+        <div className="space-y-2">
+          <p className="text-xs uppercase tracking-wider font-bold text-muted-foreground">Revisão por questão</p>
+          {quiz.items.map((it, i) => {
+            const s = scoreFor(i);
+            const p = it.points ?? 10;
+            const full = s === p;
+            const none = s === 0;
+            return (
+              <div key={i} className="flex items-center justify-between border border-border rounded-lg p-3 text-sm">
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="text-[10px] font-mono text-muted-foreground">#{i + 1}</span>
+                  <Badge variant="outline" className="text-[10px]">{TYPE_META[it.kind === "mcq" ? "mcq" : it.kind === "fill" ? "fill" : "written"].label}</Badge>
+                  <span className="truncate text-foreground/80">{it.kind === "fill" ? it.sentence : it.q}</span>
+                </div>
+                <span className={cn("font-bold text-xs shrink-0 ml-3", full ? "text-emerald-700" : none ? "text-destructive" : "text-amber-700")}>
+                  {s} / {p}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+
+        <Button onClick={restart} className="w-full gap-2" variant="outline">
+          <RotateCcw className="w-4 h-4" /> Repetir Exame
+        </Button>
+      </Card>
+    );
+  }
+
+  /* ------ Active exam ------ */
+  const current = quiz.items[idx];
+  const answered = Object.keys(answers).length;
+
+  return (
+    <div className="space-y-4">
+      <Card className="p-4 flex items-center justify-between gap-4 flex-wrap sticky top-0 z-10 bg-card/95 backdrop-blur">
+        <div className="flex items-center gap-4 text-sm">
+          <span className="font-semibold text-foreground">Questão {idx + 1} / {total}</span>
+          <span className="text-muted-foreground">Respondidas: {answered}/{total}</span>
+        </div>
+        <div className={cn(
+          "flex items-center gap-2 px-3 py-1.5 rounded-md font-mono font-bold text-sm",
+          timeLow ? "bg-destructive/10 text-destructive animate-pulse" : "bg-muted text-foreground"
+        )}>
+          <Timer className="w-4 h-4" /> {mm}:{ss}
+        </div>
+      </Card>
+
+      <Card className="p-6 space-y-5">
+        <div className="flex items-center gap-2">
+          <Badge variant="outline" className="text-[10px]">{TYPE_META[current.kind === "mcq" ? "mcq" : current.kind === "fill" ? "fill" : "written"].label}</Badge>
+          <Badge variant="outline" className="text-[10px]">{current.points ?? 10} pts</Badge>
+        </div>
+
+        {current.kind === "mcq" && (
+          <>
+            <h3 className="text-lg font-semibold text-foreground">{current.q}</h3>
+            <div className="grid sm:grid-cols-2 gap-2">
+              {current.options.map((opt, i) => {
+                const picked = answers[idx] === i;
+                return (
+                  <button
+                    key={i}
+                    onClick={() => setAnswers(a => ({ ...a, [idx]: i }))}
+                    className={cn(
+                      "text-left p-3 rounded-lg border-2 transition-all flex items-center gap-2",
+                      picked ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"
+                    )}
+                  >
+                    <span className={cn("w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold shrink-0",
+                      picked ? "bg-primary text-primary-foreground" : "bg-muted")}>
+                      {String.fromCharCode(65 + i)}
+                    </span>
+                    <span className="text-sm flex-1">{opt}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </>
+        )}
+
+        {current.kind === "fill" && (
+          <>
+            <h3 className="text-lg font-semibold text-foreground">Preenche o espaço:</h3>
+            <div className="text-base text-foreground leading-relaxed flex items-center flex-wrap gap-2">
+              <span>{current.sentence.split("___")[0]}</span>
+              <Input
+                value={(answers[idx] as string) ?? ""}
+                onChange={(e) => setAnswers(a => ({ ...a, [idx]: e.target.value }))}
+                placeholder="..."
+                className="inline-flex w-44 h-9 text-center font-bold"
+              />
+              <span>{current.sentence.split("___")[1]}</span>
+            </div>
+          </>
+        )}
+
+        {current.kind === "written" && (
+          <>
+            <h3 className="text-lg font-semibold text-foreground">{current.q}</h3>
+            <textarea
+              value={(answers[idx] as string) ?? ""}
+              onChange={(e) => setAnswers(a => ({ ...a, [idx]: e.target.value }))}
+              placeholder="Escreve a tua resposta..."
+              className="w-full min-h-[160px] rounded-lg border border-input bg-background p-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            />
+            <p className="text-xs text-muted-foreground">A pontuação é atribuída pela cobertura de conceitos-chave.</p>
+          </>
+        )}
+      </Card>
+
+      <div className="flex items-center justify-between gap-2">
+        <Button variant="outline" onClick={() => setIdx(i => Math.max(0, i - 1))} disabled={idx === 0} className="gap-1">
+          <ArrowLeft className="w-4 h-4" /> Anterior
+        </Button>
+
+        <div className="flex flex-wrap gap-1 max-w-md justify-center">
+          {quiz.items.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setIdx(i)}
+              className={cn(
+                "w-7 h-7 rounded text-[10px] font-bold border transition-colors",
+                i === idx ? "border-primary bg-primary text-primary-foreground" :
+                answers[i] !== undefined ? "border-emerald-500 bg-emerald-50 text-emerald-700" :
+                "border-border bg-card text-muted-foreground hover:border-primary/50"
+              )}
+            >{i + 1}</button>
+          ))}
+        </div>
+
+        {idx + 1 < total ? (
+          <Button onClick={() => setIdx(i => i + 1)} className="gap-1">Próxima <ArrowRight className="w-4 h-4" /></Button>
+        ) : (
+          <Button onClick={() => setSubmitted(true)} className="gap-1 bg-emerald-600 hover:bg-emerald-700 text-white">
+            <CheckCircle2 className="w-4 h-4" /> Submeter
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function BriefStat({ label, value }: { label: string; value: string | number }) {
+  return (
+    <div className="rounded-lg border border-border bg-card p-3 text-center">
+      <p className="text-xl font-bold text-foreground leading-tight">{value}</p>
+      <p className="text-[10px] uppercase tracking-wider text-muted-foreground mt-0.5">{label}</p>
     </div>
   );
 }
