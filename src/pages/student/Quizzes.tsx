@@ -316,6 +316,10 @@ export default function StudentQuizzes() {
   const pending = useMemo(() => QUIZZES.find(q => q.id === pendingId) ?? null, [pendingId]);
 
   const cadeiras = useMemo(() => Array.from(new Set(QUIZZES.map(q => q.cadeira))).sort(), []);
+  const notaGeral = useMemo(
+    () => QUIZZES.reduce((s, q) => s + quizStats(q.id).nota, 0) / Math.max(1, QUIZZES.length),
+    [],
+  );
 
   const filtered = useMemo(() => QUIZZES.filter(q => {
     if (typeFilter !== "all" && q.type !== typeFilter) return false;
