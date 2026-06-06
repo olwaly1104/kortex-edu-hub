@@ -221,35 +221,40 @@ export default function Orcamentos() {
 
         <Card className="p-4 border-border/70">
           <div className="flex items-center justify-between mb-3">
-            <p className="text-xs font-semibold text-foreground">Por responsável</p>
+            <div className="flex items-center gap-1.5">
+              <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
+              <p className="text-xs font-semibold text-foreground">Em alerta</p>
+              <span className="text-[10px] text-muted-foreground tabular-nums">({alertaList.length})</span>
+            </div>
             <ArrowUpRight className="w-3.5 h-3.5 text-muted-foreground" />
           </div>
-          <div className="space-y-2.5">
-            {responsavelBreakdown.map(r => {
-              const pct = Math.round((r.spent / r.budget) * 100);
-              const share = Math.round((r.budget / totalBudget) * 100);
-              const initials = r.name.split(" ").slice(-2).map(n => n[0]).join("");
-              return (
-                <div key={r.name} className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                    <span className="text-[9px] font-semibold text-primary">{initials}</span>
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center justify-between gap-2 mb-1">
-                      <p className="text-[11px] font-medium text-foreground truncate">{r.name}</p>
-                      <div className="flex items-center gap-1.5 shrink-0">
-                        <span className="text-[10px] text-muted-foreground tabular-nums">{share}%</span>
-                        <span className={cn("text-[10px] font-semibold tabular-nums w-8 text-right", usageColor(pct))}>{pct}%</span>
+          {alertaList.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-6 text-center gap-1.5">
+              <CheckCircle2 className="w-6 h-6 text-accent" />
+              <p className="text-[11px] text-muted-foreground">Sem orçamentos em alerta</p>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {alertaList.map(o => {
+                const remaining = Math.max(0, o.totalBudget - o.spent);
+                const sev = o.pct >= 90 ? "destructive" : "amber";
+                return (
+                  <div key={o.id} className={cn("rounded-md border p-2 flex items-center gap-2", sev === "destructive" ? "border-destructive/30 bg-destructive/5" : "border-amber-200 bg-amber-50/60")}>
+                    <span className={cn("w-1 self-stretch rounded-full", sev === "destructive" ? "bg-destructive" : "bg-amber-500")} />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="text-[11px] font-semibold text-foreground truncate">{o.name.replace("Orçamento Geral — ", "")}</p>
+                        <span className={cn("text-[11px] font-bold tabular-nums shrink-0", usageColor(o.pct))}>{o.pct}%</span>
                       </div>
-                    </div>
-                    <div className="relative h-1 w-full rounded-full bg-muted overflow-hidden">
-                      <div className={cn("h-full rounded-full", pct >= 90 ? "bg-destructive" : pct >= 75 ? "bg-amber-500" : "bg-accent")} style={{ width: `${pct}%` }} />
+                      <p className="text-[10px] text-muted-foreground tabular-nums truncate">
+                        {formatCurrency(remaining)} disponível · {o.responsavel}
+                      </p>
                     </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          )}
         </Card>
       </div>
 
