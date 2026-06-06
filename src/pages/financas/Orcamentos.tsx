@@ -141,9 +141,19 @@ export default function Orcamentos() {
           </div>
           <div className="rounded-lg border border-border/70 bg-muted/20 p-3">
             <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5">Estado</p>
-            <p className={cn("text-lg font-bold leading-none", usageColor(pctUsed))}>
+            <Badge
+              variant="outline"
+              className={cn(
+                "text-[11px] font-bold",
+                pctUsed >= 90
+                  ? "bg-destructive/10 text-destructive border-destructive/30"
+                  : pctUsed >= 75
+                    ? "bg-amber-100 text-amber-700 border-amber-200"
+                    : "bg-accent/10 text-accent border-accent/20"
+              )}
+            >
               {pctUsed >= 90 ? "Crítico" : pctUsed >= 75 ? "Atenção" : "Saudável"}
-            </p>
+            </Badge>
           </div>
         </div>
 
@@ -167,17 +177,16 @@ export default function Orcamentos() {
               />
             </div>
 
-            {/* Threshold ticks */}
+            {/* Threshold ticks with inline labels */}
+            <div className="absolute -top-2 left-0 right-0 h-5 flex items-end justify-between text-[10px] tabular-nums">
+              <span className="text-muted-foreground">0%</span>
+              <span className="font-semibold text-amber-600">75%</span>
+              <span className="font-semibold text-destructive">90%</span>
+              <span className="text-muted-foreground">100%</span>
+            </div>
+
             <div className="absolute top-0 h-3 border-l border-dashed border-amber-500/70" style={{ left: "75%" }} />
             <div className="absolute top-0 h-3 border-l border-dashed border-destructive/70" style={{ left: "90%" }} />
-
-            {/* Labels */}
-            <div className="absolute left-0 right-0 top-5 text-[10px] tabular-nums">
-              <span className="absolute left-0 text-muted-foreground">0%</span>
-              <span className="absolute -translate-x-1/2 font-semibold text-amber-600" style={{ left: "75%" }}>75%</span>
-              <span className="absolute -translate-x-1/2 font-semibold text-destructive" style={{ left: "90%" }}>90%</span>
-              <span className="absolute right-0 text-muted-foreground">100%</span>
-            </div>
           </div>
         </div>
       </Card>
