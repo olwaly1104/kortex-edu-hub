@@ -226,12 +226,59 @@ const QUIZZES: AnyQuiz[] = [
 /*  Type metadata                                                      */
 /* ------------------------------------------------------------------ */
 
-const TYPE_META: Record<QuizType, { label: string; icon: React.ElementType; description: string }> = {
-  mcq:     { label: "Múltipla Escolha",  icon: Brain,           description: "Selecciona a resposta correcta entre opções." },
-  written: { label: "Resposta Escrita",  icon: Pencil,          description: "Resposta aberta avaliada por palavras-chave." },
-  fill:    { label: "Preencher Espaço",  icon: Type,            description: "Completa uma frase com o termo em falta." },
-  flash:   { label: "Flashcards",        icon: Layers,          description: "Cartões de revisão rápida — frente e verso." },
-  exam:    { label: "Exame de Treino",   icon: ClipboardCheck,  description: "Simulação cronometrada com perguntas mistas." },
+const TYPE_META: Record<QuizType, {
+  label: string;
+  icon: React.ElementType;
+  description: string;
+  /** Tailwind classes for the colored category tag */
+  tag: string;
+  /** Tailwind classes for the colored icon tile */
+  tile: string;
+  /** Active-filter row classes */
+  active: string;
+  /** Dot color for the filter row indicator */
+  dot: string;
+}> = {
+  mcq: {
+    label: "Múltipla Escolha", icon: Brain,
+    description: "Selecciona a resposta correcta entre opções.",
+    tag:    "bg-blue-50 text-blue-700 border-blue-200",
+    tile:   "bg-blue-50 text-blue-600 border-blue-200",
+    active: "bg-blue-50 text-blue-700 border-blue-200",
+    dot:    "bg-blue-500",
+  },
+  written: {
+    label: "Resposta Escrita", icon: Pencil,
+    description: "Resposta aberta avaliada por palavras-chave.",
+    tag:    "bg-violet-50 text-violet-700 border-violet-200",
+    tile:   "bg-violet-50 text-violet-600 border-violet-200",
+    active: "bg-violet-50 text-violet-700 border-violet-200",
+    dot:    "bg-violet-500",
+  },
+  fill: {
+    label: "Preencher Espaço", icon: Type,
+    description: "Completa uma frase com o termo em falta.",
+    tag:    "bg-amber-50 text-amber-700 border-amber-200",
+    tile:   "bg-amber-50 text-amber-600 border-amber-200",
+    active: "bg-amber-50 text-amber-700 border-amber-200",
+    dot:    "bg-amber-500",
+  },
+  flash: {
+    label: "Flashcards", icon: Layers,
+    description: "Cartões de revisão rápida — frente e verso.",
+    tag:    "bg-emerald-50 text-emerald-700 border-emerald-200",
+    tile:   "bg-emerald-50 text-emerald-600 border-emerald-200",
+    active: "bg-emerald-50 text-emerald-700 border-emerald-200",
+    dot:    "bg-emerald-500",
+  },
+  exam: {
+    label: "Exame de Treino", icon: ClipboardCheck,
+    description: "Simulação cronometrada com perguntas mistas.",
+    tag:    "bg-rose-50 text-rose-700 border-rose-200",
+    tile:   "bg-rose-50 text-rose-600 border-rose-200",
+    active: "bg-rose-50 text-rose-700 border-rose-200",
+    dot:    "bg-rose-500",
+  },
 };
 
 const DIFF_STYLE: Record<Difficulty, string> = {
@@ -268,7 +315,7 @@ export default function StudentQuizzes() {
           onClick={() => setActiveId(null)}
           className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
         >
-          <ArrowLeft className="w-4 h-4" /> Voltar ao Centro de Quizzes
+          <ArrowLeft className="w-4 h-4" /> Voltar ao Centro de Estudo
         </button>
         <QuizHeader quiz={active} />
         {active.type === "mcq"     && <MCQGame quiz={active} />}
@@ -281,7 +328,6 @@ export default function StudentQuizzes() {
   }
 
   const total = QUIZZES.length;
-  const totalItems = QUIZZES.reduce((s, q) => s + q.items.length, 0);
   const typeCounts: Record<QuizType | "all", number> = {
     all: total,
     mcq: QUIZZES.filter(q => q.type === "mcq").length,
@@ -296,15 +342,14 @@ export default function StudentQuizzes() {
       {/* Editorial header */}
       <div className="flex items-start justify-between gap-4 flex-wrap border-b border-border pb-5">
         <div>
-          <p className="text-[11px] uppercase tracking-[0.18em] font-semibold text-primary mb-1.5">Centro de Estudo · Arquitectura</p>
-          <h1 className="text-3xl font-bold text-foreground tracking-tight">Quizzes & Flashcards</h1>
+          <p className="text-[11px] uppercase tracking-[0.18em] font-semibold text-primary mb-1.5">UPRA · Arquitectura</p>
+          <h1 className="text-3xl font-bold text-foreground tracking-tight">Centro de Estudo</h1>
           <p className="text-sm text-muted-foreground mt-1.5 max-w-2xl">
-            Treino dirigido às cadeiras do Curso de Arquitectura. Escolhe a tipologia, a cadeira e o quiz que pretendes realizar — cada exercício tem duração estimada, dificuldade e número de questões.
+            Treino dirigido às cadeiras do Curso de Arquitectura. Escolhe a tipologia, a cadeira e o exercício — cada actividade tem duração estimada e nível de dificuldade.
           </p>
         </div>
-        <div className="grid grid-cols-3 gap-3 min-w-[280px]">
-          <KpiStat label="Quizzes" value={total} />
-          <KpiStat label="Questões" value={totalItems} />
+        <div className="grid grid-cols-2 gap-3 min-w-[220px]">
+          <KpiStat label="Actividades" value={total} />
           <KpiStat label="Cadeiras" value={cadeiras.length} />
         </div>
       </div>
@@ -326,6 +371,8 @@ export default function StudentQuizzes() {
                   icon={TYPE_META[t].icon}
                   label={TYPE_META[t].label}
                   count={typeCounts[t]}
+                  dot={TYPE_META[t].dot}
+                  activeClasses={TYPE_META[t].active}
                 />
               ))}
             </div>
@@ -363,7 +410,7 @@ export default function StudentQuizzes() {
               />
             </div>
             <p className="text-xs text-muted-foreground">
-              {filtered.length} {filtered.length === 1 ? "quiz" : "quizzes"}
+              {filtered.length} {filtered.length === 1 ? "actividade" : "actividades"}
               {(typeFilter !== "all" || cadeiraFilter !== "all" || search) && (
                 <button
                   onClick={() => { setTypeFilter("all"); setCadeiraFilter("all"); setSearch(""); }}
@@ -376,7 +423,7 @@ export default function StudentQuizzes() {
           <Card className="divide-y divide-border overflow-hidden">
             {filtered.length === 0 ? (
               <div className="p-12 text-center text-sm text-muted-foreground">
-                Nenhum quiz corresponde aos filtros aplicados.
+                Nenhuma actividade corresponde aos filtros aplicados.
               </div>
             ) : (
               filtered.map(q => <QuizRow key={q.id} quiz={q} onStart={() => setActiveId(q.id)} />)
@@ -402,21 +449,36 @@ function KpiStat({ label, value }: { label: string; value: number }) {
 }
 
 function FilterRow({
-  active, onClick, icon: Icon, label, count,
-}: { active: boolean; onClick: () => void; icon?: React.ElementType; label: string; count: number }) {
+  active, onClick, icon: Icon, label, count, dot, activeClasses,
+}: {
+  active: boolean;
+  onClick: () => void;
+  icon?: React.ElementType;
+  label: string;
+  count: number;
+  dot?: string;
+  activeClasses?: string;
+}) {
   return (
     <button
       onClick={onClick}
       className={cn(
-        "w-full flex items-center gap-2 px-2.5 py-1.5 rounded-md text-sm transition-colors text-left",
+        "w-full flex items-center gap-2 px-2.5 py-1.5 rounded-md text-sm transition-colors text-left border border-transparent",
         active
-          ? "bg-primary/10 text-primary font-semibold"
+          ? activeClasses
+            ? cn(activeClasses, "font-semibold")
+            : "bg-primary/10 text-primary border-primary/20 font-semibold"
           : "text-foreground/80 hover:bg-muted hover:text-foreground"
       )}
     >
-      {Icon && <Icon className="w-3.5 h-3.5 shrink-0" />}
+      {dot
+        ? <span className={cn("w-2 h-2 rounded-full shrink-0", dot)} />
+        : Icon && <Icon className="w-3.5 h-3.5 shrink-0" />}
       <span className="flex-1 truncate">{label}</span>
-      <span className={cn("text-[10px] font-bold px-1.5 py-0.5 rounded", active ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground")}>{count}</span>
+      <span className={cn(
+        "text-[10px] font-bold px-1.5 py-0.5 rounded tabular-nums",
+        active ? "bg-white/70 text-current" : "bg-muted text-muted-foreground"
+      )}>{count}</span>
     </button>
   );
 }
@@ -426,13 +488,13 @@ function QuizRow({ quiz, onStart }: { quiz: AnyQuiz; onStart: () => void }) {
   const Icon = meta.icon;
   return (
     <div className="flex items-center gap-4 p-4 hover:bg-muted/30 transition-colors group">
-      <div className="w-10 h-10 rounded-lg border border-border bg-muted/30 flex items-center justify-center shrink-0">
-        <Icon className="w-4 h-4 text-foreground/70" />
+      <div className={cn("w-11 h-11 rounded-lg border flex items-center justify-center shrink-0", meta.tile)}>
+        <Icon className="w-5 h-5" />
       </div>
 
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-[10px] font-mono font-semibold text-muted-foreground">{quiz.code}</span>
+          <Badge variant="outline" className={cn("text-[10px] font-semibold border", meta.tag)}>{meta.label}</Badge>
           <span className="text-[10px] uppercase tracking-wider font-semibold text-primary">{quiz.cadeira}</span>
           <span className="text-[10px] text-muted-foreground">· {quiz.ano}º ano</span>
         </div>
@@ -441,12 +503,10 @@ function QuizRow({ quiz, onStart }: { quiz: AnyQuiz; onStart: () => void }) {
       </div>
 
       <div className="hidden md:flex items-center gap-1.5 shrink-0">
-        <Badge variant="outline" className="text-[10px] font-medium">{meta.label}</Badge>
         <Badge variant="outline" className={cn("text-[10px] font-medium", DIFF_STYLE[quiz.difficulty])}>{quiz.difficulty}</Badge>
       </div>
 
-      <div className="hidden lg:flex items-center gap-4 text-[11px] text-muted-foreground shrink-0 min-w-[110px]">
-        <span className="flex items-center gap-1"><Layers className="w-3 h-3" />{quiz.items.length}</span>
+      <div className="hidden lg:flex items-center text-[11px] text-muted-foreground shrink-0">
         <span className="flex items-center gap-1"><Timer className="w-3 h-3" />{quiz.minutes} min</span>
       </div>
 
@@ -467,12 +527,12 @@ function QuizHeader({ quiz }: { quiz: AnyQuiz }) {
   return (
     <div className="border-b border-border pb-5">
       <div className="flex items-start gap-4 flex-wrap">
-        <div className="w-12 h-12 rounded-lg border border-border bg-muted/30 flex items-center justify-center shrink-0">
-          <Icon className="w-5 h-5 text-foreground/70" />
+        <div className={cn("w-12 h-12 rounded-lg border flex items-center justify-center shrink-0", meta.tile)}>
+          <Icon className="w-5 h-5" />
         </div>
         <div className="flex-1 min-w-[200px]">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-[10px] font-mono font-semibold text-muted-foreground">{quiz.code}</span>
+            <Badge variant="outline" className={cn("text-[10px] font-semibold border", meta.tag)}>{meta.label}</Badge>
             <span className="text-[10px] uppercase tracking-wider font-semibold text-primary">{quiz.cadeira}</span>
             <span className="text-[10px] text-muted-foreground">· {quiz.ano}º ano</span>
           </div>
@@ -480,9 +540,7 @@ function QuizHeader({ quiz }: { quiz: AnyQuiz }) {
           <p className="text-sm text-muted-foreground mt-1.5 max-w-2xl">{quiz.description}</p>
         </div>
         <div className="flex gap-2 flex-wrap">
-          <Badge variant="outline" className="text-[10px]">{meta.label}</Badge>
           <Badge variant="outline" className={cn("text-[10px]", DIFF_STYLE[quiz.difficulty])}>{quiz.difficulty}</Badge>
-          <Badge variant="outline" className="text-[10px] gap-1"><Layers className="w-3 h-3" />{quiz.items.length}</Badge>
           <Badge variant="outline" className="text-[10px] gap-1"><Timer className="w-3 h-3" />{quiz.minutes} min</Badge>
         </div>
       </div>
@@ -531,7 +589,7 @@ function MCQGame({ quiz }: { quiz: Extract<AnyQuiz, { type: "mcq" }> }) {
     <Card className="p-6 space-y-5">
       <div className="flex items-center justify-between text-xs text-muted-foreground">
         <span>Pergunta {idx + 1} / {total}</span>
-        <span className="flex items-center gap-1"><Trophy className="w-3.5 h-3.5 text-primary" />{score} pts</span>
+        <span className="flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />{score} certas</span>
       </div>
       <Progress value={((idx + (selected !== null ? 1 : 0)) / total) * 100} className="h-1.5" />
       <h3 className="text-lg font-semibold text-foreground">{current.q}</h3>
@@ -679,7 +737,7 @@ function FillGame({ quiz }: { quiz: Extract<AnyQuiz, { type: "fill" }> }) {
     <Card className="p-6 space-y-5">
       <div className="flex items-center justify-between text-xs text-muted-foreground">
         <span>Preenche {idx + 1} / {quiz.items.length}</span>
-        <span className="flex items-center gap-1"><Trophy className="w-3.5 h-3.5 text-primary" />{score} pts</span>
+        <span className="flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />{score} certas</span>
       </div>
       <div className="text-lg text-foreground leading-relaxed flex items-center flex-wrap gap-2">
         <span>{before}</span>
@@ -847,10 +905,9 @@ function ExamGame({ quiz }: { quiz: Extract<AnyQuiz, { type: "exam" }> }) {
           </div>
         </div>
 
-        <div className="grid sm:grid-cols-4 gap-3">
+        <div className="grid sm:grid-cols-3 gap-3">
           <BriefStat label="Duração" value={`${quiz.minutes} min`} />
-          <BriefStat label="Questões" value={total} />
-          <BriefStat label="Pontos" value={totalPoints} />
+          <BriefStat label="Secções" value={3} />
           <BriefStat label="Aprovação" value={`${passing}%`} />
         </div>
 
@@ -884,7 +941,7 @@ function ExamGame({ quiz }: { quiz: Extract<AnyQuiz, { type: "exam" }> }) {
         <div className="text-center space-y-3">
           <Trophy className={cn("w-14 h-14 mx-auto", passed ? "text-emerald-600" : "text-amber-500")} />
           <h3 className="text-3xl font-bold text-foreground">{pct}%</h3>
-          <p className="text-muted-foreground">{totalScore} de {totalPoints} pontos</p>
+          <p className="text-muted-foreground">Resultado da simulação</p>
           <Badge variant="outline" className={cn("text-xs", passed ? "border-emerald-500 text-emerald-700 bg-emerald-50" : "border-amber-500 text-amber-700 bg-amber-50")}>
             {passed ? "Aprovado" : "Reprovado"} · mínimo {passing}%
           </Badge>
@@ -898,15 +955,23 @@ function ExamGame({ quiz }: { quiz: Extract<AnyQuiz, { type: "exam" }> }) {
             const p = it.points ?? 10;
             const full = s === p;
             const none = s === 0;
+            const k = it.kind === "mcq" ? "mcq" : it.kind === "fill" ? "fill" : "written";
+            const m = TYPE_META[k];
+            const label = full ? "Correcto" : none ? "Incorrecto" : "Parcial";
             return (
               <div key={i} className="flex items-center justify-between border border-border rounded-lg p-3 text-sm">
                 <div className="flex items-center gap-2 min-w-0">
                   <span className="text-[10px] font-mono text-muted-foreground">#{i + 1}</span>
-                  <Badge variant="outline" className="text-[10px]">{TYPE_META[it.kind === "mcq" ? "mcq" : it.kind === "fill" ? "fill" : "written"].label}</Badge>
+                  <Badge variant="outline" className={cn("text-[10px] font-semibold border", m.tag)}>{m.label}</Badge>
                   <span className="truncate text-foreground/80">{it.kind === "fill" ? it.sentence : it.q}</span>
                 </div>
-                <span className={cn("font-bold text-xs shrink-0 ml-3", full ? "text-emerald-700" : none ? "text-destructive" : "text-amber-700")}>
-                  {s} / {p}
+                <span className={cn(
+                  "font-bold text-[11px] shrink-0 ml-3 px-2 py-0.5 rounded-full border",
+                  full ? "text-emerald-700 bg-emerald-50 border-emerald-200" :
+                  none ? "text-destructive bg-destructive/10 border-destructive/20" :
+                  "text-amber-700 bg-amber-50 border-amber-200"
+                )}>
+                  {label}
                 </span>
               </div>
             );
@@ -941,8 +1006,11 @@ function ExamGame({ quiz }: { quiz: Extract<AnyQuiz, { type: "exam" }> }) {
 
       <Card className="p-6 space-y-5">
         <div className="flex items-center gap-2">
-          <Badge variant="outline" className="text-[10px]">{TYPE_META[current.kind === "mcq" ? "mcq" : current.kind === "fill" ? "fill" : "written"].label}</Badge>
-          <Badge variant="outline" className="text-[10px]">{current.points ?? 10} pts</Badge>
+          {(() => {
+            const k = current.kind === "mcq" ? "mcq" : current.kind === "fill" ? "fill" : "written";
+            const m = TYPE_META[k];
+            return <Badge variant="outline" className={cn("text-[10px] font-semibold border", m.tag)}>{m.label}</Badge>;
+          })()}
         </div>
 
         {current.kind === "mcq" && (
