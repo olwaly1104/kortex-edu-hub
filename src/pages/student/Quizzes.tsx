@@ -462,6 +462,12 @@ export default function StudentQuizzes() {
                   <div className="flex justify-between"><span className="text-muted-foreground">Itens</span><span className="font-medium text-foreground tabular-nums">{pending?.items.length}</span></div>
                   <div className="flex justify-between"><span className="text-muted-foreground">Duração</span><span className="font-medium text-foreground tabular-nums">{pending?.minutes} min</span></div>
                   <div className="flex justify-between"><span className="text-muted-foreground">Dificuldade</span><span className="font-medium text-foreground">{pending?.difficulty}</span></div>
+                  {pending && (
+                    <>
+                      <div className="flex justify-between border-t border-border pt-1.5"><span className="text-muted-foreground">Tentativas anteriores</span><span className="font-medium text-foreground tabular-nums">{quizStats(pending.id).attempts}</span></div>
+                      <div className="flex justify-between"><span className="text-muted-foreground">Nota Geral</span><span className={cn("font-bold tabular-nums", notaColor(quizStats(pending.id).nota).text)}>{quizStats(pending.id).nota.toFixed(1)} / 20</span></div>
+                    </>
+                  )}
                 </div>
                 <p className="text-xs text-muted-foreground leading-relaxed">
                   Uma vez iniciada, só poderás sair depois de terminar. O cronómetro arranca de imediato.
