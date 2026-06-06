@@ -941,7 +941,7 @@ function ExamGame({ quiz }: { quiz: Extract<AnyQuiz, { type: "exam" }> }) {
         <div className="text-center space-y-3">
           <Trophy className={cn("w-14 h-14 mx-auto", passed ? "text-emerald-600" : "text-amber-500")} />
           <h3 className="text-3xl font-bold text-foreground">{pct}%</h3>
-          <p className="text-muted-foreground">{totalScore} de {totalPoints} pontos</p>
+          <p className="text-muted-foreground">Resultado da simulação</p>
           <Badge variant="outline" className={cn("text-xs", passed ? "border-emerald-500 text-emerald-700 bg-emerald-50" : "border-amber-500 text-amber-700 bg-amber-50")}>
             {passed ? "Aprovado" : "Reprovado"} · mínimo {passing}%
           </Badge>
