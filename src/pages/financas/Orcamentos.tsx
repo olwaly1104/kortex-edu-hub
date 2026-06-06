@@ -107,87 +107,68 @@ export default function Orcamentos() {
         <p className="text-[11px] text-muted-foreground">Todos os dados abaixo referem-se a este ano letivo</p>
       </div>
 
-      {/* Dados + Utilização global — unified card */}
-      <Card className="p-5 border-border/70">
-        {/* Header */}
-        <div className="flex items-end justify-between gap-4 mb-5">
-          <div>
-            <p className="text-sm font-semibold text-foreground">Resumo do Orçamento</p>
-            <p className="text-[11px] text-muted-foreground mt-0.5">{orcamentos.length} orçamentos · {numAlerta} em alerta</p>
+      {/* KPIs */}
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+        <Card className="p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><Wallet className="w-4 h-4 text-primary" /></div>
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Total Orçamentado</span>
           </div>
-          <div className="flex items-baseline gap-0.5 shrink-0">
-            <p className={cn("text-4xl font-bold tabular-nums leading-none", usageColor(pctUsed))}>{pctUsed}</p>
-            <span className={cn("text-lg font-semibold", usageColor(pctUsed))}>%</span>
+          <p className="text-2xl font-bold text-foreground tabular-nums">{formatCurrency(totalBudget)}</p>
+        </Card>
+        <Card className="p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><TrendingDown className="w-4 h-4 text-primary" /></div>
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Total Gasto</span>
           </div>
+          <p className={cn("text-2xl font-bold tabular-nums", usageColor(pctUsed))}>{formatCurrency(totalSpent)}</p>
+        </Card>
+        <Card className="p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><CheckCircle2 className="w-4 h-4 text-primary" /></div>
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Disponível</span>
+          </div>
+          <p className="text-2xl font-bold text-primary tabular-nums">{formatCurrency(available)}</p>
+        </Card>
+        <Card className="p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><AlertTriangle className="w-4 h-4 text-primary" /></div>
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Em Alerta</span>
+          </div>
+          <p className={cn("text-2xl font-bold tabular-nums", numAlerta > 0 ? "text-amber-600" : "text-foreground")}>{numAlerta}</p>
+        </Card>
+        <Card className="p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><ArrowUpRight className="w-4 h-4 text-primary" /></div>
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Estado</span>
+          </div>
+          <Badge
+            variant="outline"
+            className={cn(
+              "text-xs font-bold",
+              pctUsed >= 90
+                ? "bg-destructive/10 text-destructive border-destructive/30"
+                : pctUsed >= 75
+                  ? "bg-amber-100 text-amber-700 border-amber-200"
+                  : "bg-accent/10 text-accent border-accent/20"
+            )}
+          >
+            {pctUsed >= 90 ? "Crítico" : pctUsed >= 75 ? "Atenção" : "Saudável"}
+          </Badge>
+        </Card>
+      </div>
+
+      {/* Utilização Global */}
+      <Card className="p-4">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Utilização Global do Orçamento</span>
+          <span className={cn("text-xs font-semibold", usageColor(pctUsed))}>{pctUsed}% utilizado</span>
         </div>
-
-        {/* KPI grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 mb-5">
-          <div className="rounded-lg border border-border/70 bg-muted/20 p-3">
-            <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5">Total Orçamentado</p>
-            <p className="text-lg font-bold text-foreground tabular-nums leading-none">{formatCurrency(totalBudget)}</p>
-          </div>
-          <div className="rounded-lg border border-border/70 bg-muted/20 p-3">
-            <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5">Total Gasto</p>
-            <p className={cn("text-lg font-bold tabular-nums leading-none", usageColor(pctUsed))}>{formatCurrency(totalSpent)}</p>
-          </div>
-          <div className="rounded-lg border border-border/70 bg-muted/20 p-3">
-            <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5">Disponível</p>
-            <p className="text-lg font-bold text-foreground tabular-nums leading-none">{formatCurrency(available)}</p>
-          </div>
-          <div className="rounded-lg border border-border/70 bg-muted/20 p-3">
-            <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5">Em Alerta</p>
-            <p className={cn("text-lg font-bold tabular-nums leading-none", numAlerta > 0 ? "text-amber-600" : "text-foreground")}>{numAlerta}</p>
-          </div>
-          <div className="rounded-lg border border-border/70 bg-muted/20 p-3">
-            <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5">Estado</p>
-            <Badge
-              variant="outline"
-              className={cn(
-                "text-[11px] font-bold",
-                pctUsed >= 90
-                  ? "bg-destructive/10 text-destructive border-destructive/30"
-                  : pctUsed >= 75
-                    ? "bg-amber-100 text-amber-700 border-amber-200"
-                    : "bg-accent/10 text-accent border-accent/20"
-              )}
-            >
-              {pctUsed >= 90 ? "Crítico" : pctUsed >= 75 ? "Atenção" : "Saudável"}
-            </Badge>
-          </div>
-        </div>
-
-        {/* Progress bar — structured & professional */}
-        <div className="rounded-lg border border-border/70 bg-muted/20 p-4">
-          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-3">Utilização Global</p>
-
-
-          <div className="relative pb-6">
-            {/* Track with zone backgrounds */}
-            <div className="relative h-3 w-full rounded-md bg-background border border-border overflow-hidden">
-              <div className="absolute inset-y-0 left-0 bg-accent/5" style={{ width: "75%" }} />
-              <div className="absolute inset-y-0 bg-amber-500/10" style={{ left: "75%", width: "15%" }} />
-              <div className="absolute inset-y-0 bg-destructive/10" style={{ left: "90%", width: "10%" }} />
-              <div
-                className={cn(
-                  "relative h-full transition-all",
-                  pctUsed >= 90 ? "bg-destructive" : pctUsed >= 75 ? "bg-amber-500" : "bg-accent"
-                )}
-                style={{ width: `${Math.min(pctUsed, 100)}%` }}
-              />
-            </div>
-
-            {/* Threshold ticks with inline labels */}
-            <div className="absolute -top-2 left-0 right-0 h-5 flex items-end justify-between text-[10px] tabular-nums">
-              <span className="text-muted-foreground">0%</span>
-              <span className="font-semibold text-amber-600">75%</span>
-              <span className="font-semibold text-destructive">90%</span>
-              <span className="text-muted-foreground">100%</span>
-            </div>
-
-            <div className="absolute top-0 h-3 border-l border-dashed border-amber-500/70" style={{ left: "75%" }} />
-            <div className="absolute top-0 h-3 border-l border-dashed border-destructive/70" style={{ left: "90%" }} />
-          </div>
+        <Progress value={Math.min(pctUsed, 100)} className={cn("h-2 mb-2", usageBar(pctUsed))} />
+        <div className="flex justify-between text-[11px] text-muted-foreground tabular-nums">
+          <span>Utilizado: {formatCurrency(totalSpent)}</span>
+          <span>Disponível: {formatCurrency(available)}</span>
+          <span>Total: {formatCurrency(totalBudget)}</span>
         </div>
       </Card>
 
