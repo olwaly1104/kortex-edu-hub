@@ -362,10 +362,10 @@ export default function StudentQuizzes() {
                     key={c}
                     active={cadeiraFilter === c}
                     onClick={() => setCadeiraFilter(c)}
-                    icon={BookOpen}
                     label={c}
                     count={QUIZZES.filter(q => q.cadeira === c).length}
                     tag={cc.tag}
+                    dot={cc.dot}
                   />
                 );
               })}
@@ -457,7 +457,7 @@ function FilterRow({
       />
       {tag ? (
         <span className={cn("inline-flex items-center justify-center w-5 h-5 rounded-md border shrink-0", tag)}>
-          {Icon && <Icon className="w-3 h-3" />}
+          {Icon ? <Icon className="w-3 h-3" /> : dot ? <span className={cn("w-1.5 h-1.5 rounded-full", dot)} /> : null}
         </span>
       ) : Icon ? (
         <Icon className={cn("w-3.5 h-3.5 shrink-0", active ? "" : "text-muted-foreground group-hover:text-foreground")} />
