@@ -521,33 +521,87 @@ function QuizRow({ quiz, onStart }: { quiz: AnyQuiz; onStart: () => void }) {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Active quiz header                                                 */
+/*  Shared chrome for active quizzes                                   */
 /* ------------------------------------------------------------------ */
 
-function QuizHeader({ quiz }: { quiz: AnyQuiz }) {
+/** Extracts the accent hue used across the active-quiz UI. */
+function accent(quiz: AnyQuiz) {
   const meta = TYPE_META[quiz.type];
+  const cad  = cadeiraColor(quiz.cadeira);
+  return { meta, cad };
+}
+
+function QuizHeader({ quiz }: { quiz: AnyQuiz }) {
+  const { meta, cad } = accent(quiz);
   const Icon = meta.icon;
   return (
-    <div className="border-b border-border pb-5">
-      <div className="flex items-start gap-4 flex-wrap">
-        <div className={cn("w-12 h-12 rounded-lg border flex items-center justify-center shrink-0", meta.tile)}>
-          <Icon className="w-5 h-5" />
+    <Card className="overflow-hidden">
+      {/* color rail */}
+      <div className={cn("h-1 w-full", meta.dot)} />
+      <div className="p-6 flex items-start gap-5 flex-wrap">
+        <div className={cn("w-14 h-14 rounded-xl border flex items-center justify-center shrink-0", meta.tile)}>
+          <Icon className="w-7 h-7" />
         </div>
-        <div className="flex-1 min-w-[200px]">
-          <div className="flex items-center gap-2 flex-wrap">
-            <Badge variant="outline" className={cn("text-[10px] font-semibold border", meta.tag)}>{meta.label}</Badge>
-            <span className="text-[10px] uppercase tracking-wider font-semibold text-primary">{quiz.cadeira}</span>
-            <span className="text-[10px] text-muted-foreground">· {quiz.ano}º ano</span>
+        <div className="flex-1 min-w-[240px]">
+          <div className="flex items-center gap-1.5 flex-wrap mb-1.5">
+            <span className={cn("inline-flex items-center text-[10px] font-semibold px-2 py-0.5 rounded-md border", meta.tag)}>
+              {meta.label}
+            </span>
+            <span className={cn("inline-flex items-center gap-1.5 text-[10px] font-semibold px-2 py-0.5 rounded-md border", cad.tag)}>
+              <span className={cn("w-1.5 h-1.5 rounded-full", cad.dot)} />
+              {quiz.cadeira}
+            </span>
+            <span className="text-[10px] text-muted-foreground font-medium">{quiz.ano}º ano</span>
+            <span className="text-[10px] font-mono text-muted-foreground">· {quiz.code}</span>
           </div>
-          <h2 className="text-2xl font-bold text-foreground leading-tight mt-1">{quiz.title}</h2>
-          <p className="text-sm text-muted-foreground mt-1.5 max-w-2xl">{quiz.description}</p>
+          <h2 className="text-2xl font-bold text-foreground leading-tight tracking-tight">{quiz.title}</h2>
+          <p className="text-sm text-muted-foreground mt-1.5 max-w-2xl leading-relaxed">{quiz.description}</p>
         </div>
-        <div className="flex gap-2 flex-wrap">
-          <Badge variant="outline" className={cn("text-[10px]", DIFF_STYLE[quiz.difficulty])}>{quiz.difficulty}</Badge>
-          <Badge variant="outline" className="text-[10px] gap-1"><Timer className="w-3 h-3" />{quiz.minutes} min</Badge>
+        <div className="flex flex-col items-end gap-1.5 shrink-0">
+          <Badge variant="outline" className={cn("text-[10px] font-semibold", DIFF_STYLE[quiz.difficulty])}>
+            {quiz.difficulty}
+          </Badge>
+          <Badge variant="outline" className="text-[10px] gap-1 font-medium">
+            <Timer className="w-3 h-3" />{quiz.minutes} min
+          </Badge>
+          <Badge variant="outline" className="text-[10px] gap-1 font-medium">
+            <Layers className="w-3 h-3" />{quiz.items.length} {quiz.items.length === 1 ? "item" : "itens"}
+          </Badge>
         </div>
       </div>
+    </Card>
+  );
+}
+
+/** Unified progress strip used by every game type. */
+function ProgressStrip({
+  quiz, position, total, scoreLabel,
+}: { quiz: AnyQuiz; position: number; total: number; scoreLabel?: React.ReactNode }) {
+  const { meta } = accent(quiz);
+  const pct = Math.round((position / total) * 100);
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between text-[11px]">
+        <span className="font-semibold text-foreground tabular-nums">
+          {position} <span className="text-muted-foreground font-normal">de {total}</span>
+        </span>
+        {scoreLabel}
+      </div>
+      <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+        <div
+          className={cn("h-full rounded-full transition-all duration-300", meta.dot)}
+          style={{ width: `${pct}%` }}
+        />
+      </div>
     </div>
+  );
+}
+
+function ScoreChip({ correct, total }: { correct: number; total: number }) {
+  return (
+    <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md">
+      <CheckCircle2 className="w-3 h-3" /> {correct}<span className="text-emerald-600/70 font-normal">/{total}</span>
+    </span>
   );
 }
 
@@ -563,6 +617,7 @@ function MCQGame({ quiz }: { quiz: Extract<AnyQuiz, { type: "mcq" }> }) {
 
   const total = quiz.items.length;
   const current = quiz.items[idx];
+  const { meta } = accent(quiz);
 
   const choose = (i: number) => {
     if (selected !== null) return;
@@ -575,60 +630,65 @@ function MCQGame({ quiz }: { quiz: Extract<AnyQuiz, { type: "mcq" }> }) {
   };
   const restart = () => { setIdx(0); setSelected(null); setScore(0); setDone(false); };
 
-  if (done) {
-    const pct = Math.round((score / total) * 100);
-    return (
-      <Card className="p-8 text-center space-y-4">
-        <Trophy className="w-14 h-14 mx-auto text-primary" />
-        <h3 className="text-2xl font-bold text-foreground">{pct}% acertaste</h3>
-        <p className="text-muted-foreground">{score} de {total} respostas correctas</p>
-        <Progress value={pct} className="h-2 max-w-sm mx-auto" />
-        <Button onClick={restart} className="gap-2"><RotateCcw className="w-4 h-4" />Repetir quiz</Button>
-      </Card>
-    );
-  }
+  if (done) return <ResultsCard quiz={quiz} score={score} total={total} onRestart={restart} />;
 
   return (
-    <Card className="p-6 space-y-5">
-      <div className="flex items-center justify-between text-xs text-muted-foreground">
-        <span>Pergunta {idx + 1} / {total}</span>
-        <span className="flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />{score} certas</span>
+    <Card className="overflow-hidden">
+      <div className="px-6 pt-5 pb-4 border-b border-border bg-muted/30">
+        <ProgressStrip quiz={quiz} position={idx + (selected !== null ? 1 : 0)} total={total}
+          scoreLabel={<ScoreChip correct={score} total={total} />} />
       </div>
-      <Progress value={((idx + (selected !== null ? 1 : 0)) / total) * 100} className="h-1.5" />
-      <h3 className="text-lg font-semibold text-foreground">{current.q}</h3>
-      <div className="grid sm:grid-cols-2 gap-2">
-        {current.options.map((opt, i) => {
-          const isCorrect = i === current.answer;
-          const isPicked = i === selected;
-          const show = selected !== null;
-          return (
-            <button
-              key={i}
-              onClick={() => choose(i)}
-              disabled={selected !== null}
-              className={cn(
-                "text-left p-3 rounded-lg border-2 transition-all flex items-center gap-2",
-                !show && "border-border hover:border-primary hover:bg-primary/5",
-                show && isCorrect && "border-emerald-500 bg-emerald-50 text-emerald-900",
-                show && isPicked && !isCorrect && "border-destructive bg-destructive/10 text-destructive",
-                show && !isCorrect && !isPicked && "border-border opacity-50"
-              )}
-            >
-              <span className="w-6 h-6 rounded-md bg-muted flex items-center justify-center text-xs font-bold shrink-0">{String.fromCharCode(65 + i)}</span>
-              <span className="text-sm flex-1">{opt}</span>
-              {show && isCorrect && <CheckCircle2 className="w-4 h-4" />}
-              {show && isPicked && !isCorrect && <XCircle className="w-4 h-4" />}
-            </button>
-          );
-        })}
-      </div>
-      {selected !== null && (
-        <div className="rounded-lg bg-muted/50 p-3 text-sm text-foreground border-l-4 border-primary">
-          <p className="font-semibold mb-1">Explicação</p>
-          <p className="text-muted-foreground">{current.explain}</p>
+
+      <div className="p-6 space-y-5">
+        <h3 className="text-lg font-semibold text-foreground leading-snug">{current.q}</h3>
+
+        <div className="grid sm:grid-cols-2 gap-2.5">
+          {current.options.map((opt, i) => {
+            const isCorrect = i === current.answer;
+            const isPicked = i === selected;
+            const show = selected !== null;
+            return (
+              <button
+                key={i}
+                onClick={() => choose(i)}
+                disabled={selected !== null}
+                className={cn(
+                  "text-left p-3.5 rounded-lg border-2 transition-all flex items-center gap-3 group/opt",
+                  !show && "border-border hover:border-primary/60 hover:bg-primary/5",
+                  show && isCorrect && "border-emerald-500 bg-emerald-50 text-emerald-900",
+                  show && isPicked && !isCorrect && "border-destructive bg-destructive/10 text-destructive",
+                  show && !isCorrect && !isPicked && "border-border opacity-50"
+                )}
+              >
+                <span className={cn(
+                  "w-7 h-7 rounded-md flex items-center justify-center text-xs font-bold shrink-0 border transition-colors",
+                  !show && "bg-muted border-border group-hover/opt:bg-primary group-hover/opt:text-primary-foreground group-hover/opt:border-primary",
+                  show && isCorrect && "bg-emerald-500 text-white border-emerald-500",
+                  show && isPicked && !isCorrect && "bg-destructive text-destructive-foreground border-destructive",
+                  show && !isCorrect && !isPicked && "bg-muted border-border"
+                )}>{String.fromCharCode(65 + i)}</span>
+                <span className="text-sm flex-1 font-medium">{opt}</span>
+                {show && isCorrect && <CheckCircle2 className="w-4 h-4 shrink-0" />}
+                {show && isPicked && !isCorrect && <XCircle className="w-4 h-4 shrink-0" />}
+              </button>
+            );
+          })}
         </div>
-      )}
-      <div className="flex justify-end">
+
+        {selected !== null && (
+          <div className={cn("rounded-lg p-4 text-sm border-l-4", meta.tile.replace("border-", "border-l-").replace("text-", "text-"), "bg-muted/40")}>
+            <p className="font-semibold mb-1 text-foreground flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5" /> Explicação
+            </p>
+            <p className="text-muted-foreground leading-relaxed">{current.explain}</p>
+          </div>
+        )}
+      </div>
+
+      <div className="px-6 py-4 border-t border-border bg-muted/20 flex items-center justify-between">
+        <span className="text-[11px] text-muted-foreground">
+          {selected === null ? "Selecciona uma opção para continuar." : "Resposta registada."}
+        </span>
         <Button onClick={next} disabled={selected === null} className="gap-2">
           {idx + 1 >= total ? "Terminar" : "Próxima"} <ArrowRight className="w-4 h-4" />
         </Button>
@@ -646,55 +706,91 @@ function WrittenGame({ quiz }: { quiz: Extract<AnyQuiz, { type: "written" }> }) 
   const [answer, setAnswer] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const current = quiz.items[idx];
+  const total = quiz.items.length;
+  const { meta } = accent(quiz);
 
   const matches = current.keywords.filter(k => answer.toLowerCase().includes(k.toLowerCase()));
-  const pct = Math.round((matches.length / current.keywords.length) * 100);
+  const pct = current.keywords.length ? Math.round((matches.length / current.keywords.length) * 100) : 0;
 
   const next = () => {
-    setIdx((idx + 1) % quiz.items.length);
+    setIdx((idx + 1) % total);
     setAnswer(""); setSubmitted(false);
   };
 
   return (
-    <Card className="p-6 space-y-5">
-      <div className="flex items-center justify-between text-xs text-muted-foreground">
-        <span>Resposta {idx + 1} / {quiz.items.length}</span>
-        <Badge variant="outline" className="gap-1"><Pencil className="w-3 h-3" />Aberto</Badge>
+    <Card className="overflow-hidden">
+      <div className="px-6 pt-5 pb-4 border-b border-border bg-muted/30">
+        <ProgressStrip quiz={quiz} position={idx + 1} total={total}
+          scoreLabel={
+            <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground">
+              <Pencil className="w-3 h-3" /> Resposta aberta
+            </span>
+          } />
       </div>
-      <h3 className="text-lg font-semibold text-foreground">{current.q}</h3>
-      <textarea
-        value={answer}
-        onChange={(e) => setAnswer(e.target.value)}
-        disabled={submitted}
-        placeholder="Escreve a tua resposta..."
-        className="w-full min-h-[140px] rounded-lg border border-input bg-background p-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-      />
-      {submitted && (
-        <div className="space-y-3">
-          <div className="flex items-center gap-3">
-            <Progress value={pct} className="h-2 flex-1" />
-            <span className="text-sm font-bold text-foreground">{pct}%</span>
-          </div>
-          <div className="flex flex-wrap gap-1.5">
-            {current.keywords.map(k => {
-              const hit = matches.includes(k);
-              return (
-                <Badge key={k} variant="outline" className={cn("text-[10px]", hit ? "border-emerald-500 text-emerald-700 bg-emerald-50" : "border-destructive/30 text-muted-foreground")}>
-                  {hit ? <CheckCircle2 className="w-3 h-3 mr-1" /> : <XCircle className="w-3 h-3 mr-1" />}{k}
-                </Badge>
-              );
-            })}
-          </div>
-          <div className="rounded-lg bg-muted/50 p-3 text-sm border-l-4 border-primary">
-            <p className="font-semibold mb-1 text-foreground">Resposta-modelo</p>
-            <p className="text-muted-foreground">{current.sample}</p>
-          </div>
+
+      <div className="p-6 space-y-4">
+        <h3 className="text-lg font-semibold text-foreground leading-snug">{current.q}</h3>
+        <div className="relative">
+          <textarea
+            value={answer}
+            onChange={(e) => setAnswer(e.target.value)}
+            disabled={submitted}
+            placeholder="Escreve a tua resposta..."
+            className="w-full min-h-[160px] rounded-lg border border-input bg-background p-4 text-sm leading-relaxed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-y"
+          />
+          <span className="absolute bottom-2 right-3 text-[10px] text-muted-foreground tabular-nums">
+            {answer.trim().length} caracteres
+          </span>
         </div>
-      )}
-      <div className="flex justify-end gap-2">
-        {!submitted
-          ? <Button onClick={() => setSubmitted(true)} disabled={answer.trim().length < 10} className="gap-2"><CheckCircle2 className="w-4 h-4" />Submeter</Button>
-          : <Button onClick={next} className="gap-2">Próxima <ArrowRight className="w-4 h-4" /></Button>}
+
+        {submitted && (
+          <div className="space-y-4 pt-2">
+            <div className="rounded-lg border border-border bg-card p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <p className="text-xs uppercase tracking-wider font-bold text-muted-foreground">Cobertura de conceitos</p>
+                <span className="text-sm font-bold tabular-nums text-foreground">{matches.length}/{current.keywords.length} · {pct}%</span>
+              </div>
+              <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+                <div className={cn("h-full rounded-full transition-all", meta.dot)} style={{ width: `${pct}%` }} />
+              </div>
+              <div className="flex flex-wrap gap-1.5 pt-1">
+                {current.keywords.map(k => {
+                  const hit = matches.includes(k);
+                  return (
+                    <span key={k} className={cn(
+                      "inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-md border",
+                      hit ? "border-emerald-300 text-emerald-700 bg-emerald-50" : "border-border text-muted-foreground bg-muted/40"
+                    )}>
+                      {hit ? <CheckCircle2 className="w-3 h-3" /> : <XCircle className="w-3 h-3 opacity-50" />}{k}
+                    </span>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="rounded-lg border border-border bg-muted/30 p-4">
+              <p className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground mb-1.5 flex items-center gap-1.5">
+                <Sparkles className="w-3 h-3" /> Resposta-modelo
+              </p>
+              <p className="text-sm text-foreground/85 leading-relaxed">{current.sample}</p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="px-6 py-4 border-t border-border bg-muted/20 flex items-center justify-between gap-2">
+        <span className="text-[11px] text-muted-foreground">
+          {submitted ? "Avaliação baseada em palavras-chave." : "Mínimo 10 caracteres para submeter."}
+        </span>
+        {!submitted ? (
+          <Button onClick={() => setSubmitted(true)} disabled={answer.trim().length < 10} className="gap-2">
+            <CheckCircle2 className="w-4 h-4" /> Submeter
+          </Button>
+        ) : (
+          <Button onClick={next} className="gap-2">
+            Próxima <ArrowRight className="w-4 h-4" />
+          </Button>
+        )}
       </div>
     </Card>
   );
@@ -711,6 +807,7 @@ function FillGame({ quiz }: { quiz: Extract<AnyQuiz, { type: "fill" }> }) {
   const [score, setScore] = useState(0);
   const [done, setDone] = useState(false);
   const current = quiz.items[idx];
+  const total = quiz.items.length;
 
   const isRight = value.trim().toLowerCase() === current.answer.toLowerCase();
   const [before, after] = current.sentence.split("___");
@@ -720,59 +817,115 @@ function FillGame({ quiz }: { quiz: Extract<AnyQuiz, { type: "fill" }> }) {
     if (isRight) setScore(s => s + 1);
   };
   const next = () => {
-    if (idx + 1 >= quiz.items.length) setDone(true);
+    if (idx + 1 >= total) setDone(true);
     else { setIdx(idx + 1); setValue(""); setChecked(false); }
   };
   const restart = () => { setIdx(0); setValue(""); setChecked(false); setScore(0); setDone(false); };
 
-  if (done) {
-    return (
-      <Card className="p-8 text-center space-y-4">
-        <Trophy className="w-14 h-14 mx-auto text-primary" />
-        <h3 className="text-2xl font-bold text-foreground">{score} / {quiz.items.length}</h3>
-        <p className="text-muted-foreground">Espaços preenchidos correctamente</p>
-        <Button onClick={restart} className="gap-2"><RotateCcw className="w-4 h-4" />Repetir</Button>
-      </Card>
-    );
-  }
+  if (done) return <ResultsCard quiz={quiz} score={score} total={total} onRestart={restart} />;
 
   return (
-    <Card className="p-6 space-y-5">
-      <div className="flex items-center justify-between text-xs text-muted-foreground">
-        <span>Preenche {idx + 1} / {quiz.items.length}</span>
-        <span className="flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />{score} certas</span>
+    <Card className="overflow-hidden">
+      <div className="px-6 pt-5 pb-4 border-b border-border bg-muted/30">
+        <ProgressStrip quiz={quiz} position={idx + (checked ? 1 : 0)} total={total}
+          scoreLabel={<ScoreChip correct={score} total={total} />} />
       </div>
-      <div className="text-lg text-foreground leading-relaxed flex items-center flex-wrap gap-2">
-        <span>{before}</span>
-        <Input
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-          disabled={checked}
-          placeholder="..."
-          className={cn(
-            "inline-flex w-40 h-9 text-center font-bold",
-            checked && isRight && "border-emerald-500 bg-emerald-50 text-emerald-700",
-            checked && !isRight && "border-destructive bg-destructive/10 text-destructive"
-          )}
-        />
-        <span>{after}</span>
-      </div>
-      <p className="text-xs text-muted-foreground flex items-center gap-1.5"><Sparkles className="w-3 h-3" />Dica: {current.hint}</p>
-      {checked && (
-        <div className={cn("rounded-lg p-3 text-sm flex items-center gap-2", isRight ? "bg-emerald-50 text-emerald-800" : "bg-destructive/10 text-destructive")}>
-          {isRight ? <CheckCircle2 className="w-4 h-4" /> : <XCircle className="w-4 h-4" />}
-          {isRight ? "Correcto!" : <>Resposta certa: <span className="font-bold">{current.answer}</span></>}
+
+      <div className="p-6 space-y-5">
+        <div className="text-xl text-foreground leading-relaxed flex items-baseline flex-wrap gap-x-2 gap-y-3 font-medium">
+          <span>{before}</span>
+          <Input
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            disabled={checked}
+            placeholder="..."
+            className={cn(
+              "inline-flex w-44 h-10 text-center font-bold text-base border-2",
+              !checked && "border-primary/30 focus-visible:border-primary",
+              checked && isRight && "border-emerald-500 bg-emerald-50 text-emerald-700",
+              checked && !isRight && "border-destructive bg-destructive/10 text-destructive"
+            )}
+          />
+          <span>{after}</span>
         </div>
-      )}
-      <div className="flex justify-end">
+
+        <div className="flex items-center gap-2 text-xs text-muted-foreground border-l-2 border-amber-300 pl-3 py-1">
+          <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+          <span><span className="font-semibold text-foreground/70">Dica:</span> {current.hint}</span>
+        </div>
+
+        {checked && (
+          <div className={cn(
+            "rounded-lg p-4 text-sm flex items-start gap-3 border",
+            isRight
+              ? "bg-emerald-50 border-emerald-200 text-emerald-900"
+              : "bg-destructive/5 border-destructive/30 text-destructive"
+          )}>
+            {isRight
+              ? <CheckCircle2 className="w-5 h-5 shrink-0 mt-0.5" />
+              : <XCircle className="w-5 h-5 shrink-0 mt-0.5" />}
+            <div className="leading-relaxed">
+              {isRight ? (
+                <p><span className="font-bold">Correcto.</span> Boa memória.</p>
+              ) : (
+                <p><span className="font-bold">Não é desta.</span> Resposta certa: <span className="font-bold underline underline-offset-2">{current.answer}</span></p>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="px-6 py-4 border-t border-border bg-muted/20 flex items-center justify-between">
+        <span className="text-[11px] text-muted-foreground">
+          {checked ? (isRight ? "+1 ponto" : "Sem ponto nesta") : "Escreve o termo em falta."}
+        </span>
         {!checked
           ? <Button onClick={check} disabled={!value.trim()} className="gap-2"><CheckCircle2 className="w-4 h-4" />Verificar</Button>
-          : <Button onClick={next} className="gap-2">{idx + 1 >= quiz.items.length ? "Terminar" : "Próxima"} <ArrowRight className="w-4 h-4" /></Button>}
+          : <Button onClick={next} className="gap-2">{idx + 1 >= total ? "Terminar" : "Próxima"} <ArrowRight className="w-4 h-4" /></Button>}
       </div>
     </Card>
   );
 }
 
+/* ------------------------------------------------------------------ */
+/*  Shared end-of-quiz results card                                    */
+/* ------------------------------------------------------------------ */
+
+function ResultsCard({
+  quiz, score, total, onRestart,
+}: { quiz: AnyQuiz; score: number; total: number; onRestart: () => void }) {
+  const pct = Math.round((score / total) * 100);
+  const tier =
+    pct >= 80 ? { label: "Excelente", color: "text-emerald-700 bg-emerald-50 border-emerald-200" } :
+    pct >= 50 ? { label: "Bom progresso", color: "text-amber-700 bg-amber-50 border-amber-200" } :
+                { label: "Continua a treinar", color: "text-rose-700 bg-rose-50 border-rose-200" };
+  const { meta } = accent(quiz);
+
+  return (
+    <Card className="overflow-hidden">
+      <div className={cn("h-1 w-full", meta.dot)} />
+      <div className="p-8 text-center space-y-5">
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mx-auto">
+          <Trophy className="w-8 h-8 text-primary" />
+        </div>
+        <div>
+          <p className="text-[11px] uppercase tracking-[0.18em] font-semibold text-muted-foreground">Resultado</p>
+          <h3 className="text-5xl font-bold text-foreground tracking-tight tabular-nums mt-1">{pct}<span className="text-2xl text-muted-foreground">%</span></h3>
+          <p className="text-sm text-muted-foreground mt-1">{score} de {total} respostas correctas</p>
+        </div>
+        <Badge variant="outline" className={cn("text-[11px] font-semibold", tier.color)}>{tier.label}</Badge>
+        <div className="max-w-sm mx-auto">
+          <div className="h-2 rounded-full bg-muted overflow-hidden">
+            <div className={cn("h-full transition-all duration-500", meta.dot)} style={{ width: `${pct}%` }} />
+          </div>
+        </div>
+        <div className="flex items-center justify-center gap-2 pt-2">
+          <Button onClick={onRestart} variant="outline" className="gap-2"><RotateCcw className="w-4 h-4" /> Repetir</Button>
+        </div>
+      </div>
+    </Card>
+  );
+}
 
 /* ------------------------------------------------------------------ */
 /*  Exam Game — timed, mixed-question simulation                       */
@@ -782,6 +935,7 @@ function ExamGame({ quiz }: { quiz: Extract<AnyQuiz, { type: "exam" }> }) {
   const total = quiz.items.length;
   const totalPoints = quiz.items.reduce((s, it) => s + (it.points ?? 10), 0);
   const passing = quiz.passingScore ?? 50;
+  const { meta } = accent(quiz);
 
   const [started, setStarted] = useState(false);
   const [idx, setIdx] = useState(0);
@@ -807,7 +961,6 @@ function ExamGame({ quiz }: { quiz: Extract<AnyQuiz, { type: "exam" }> }) {
     if (a === undefined || a === "") return 0;
     if (it.kind === "mcq") return a === it.answer ? pts : 0;
     if (it.kind === "fill") return String(a).trim().toLowerCase() === it.answer.toLowerCase() ? pts : 0;
-    // written: keyword ratio
     const text = String(a).toLowerCase();
     const hits = it.keywords.filter(k => text.includes(k.toLowerCase())).length;
     return Math.round((hits / it.keywords.length) * pts);
@@ -830,42 +983,45 @@ function ExamGame({ quiz }: { quiz: Extract<AnyQuiz, { type: "exam" }> }) {
       written: quiz.items.filter(i => i.kind === "written").length,
     };
     return (
-      <Card className="p-8 space-y-6">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-            <ClipboardCheck className="w-6 h-6 text-primary" />
+      <Card className="overflow-hidden">
+        <div className={cn("h-1 w-full", meta.dot)} />
+        <div className="p-8 space-y-6">
+          <div className="flex items-center gap-4">
+            <div className={cn("w-14 h-14 rounded-xl border flex items-center justify-center shrink-0", meta.tile)}>
+              <ClipboardCheck className="w-7 h-7" />
+            </div>
+            <div>
+              <p className="text-[11px] uppercase tracking-[0.18em] font-semibold text-muted-foreground">Briefing</p>
+              <h3 className="text-2xl font-bold text-foreground tracking-tight">Antes de começares</h3>
+            </div>
           </div>
-          <div>
-            <h3 className="text-xl font-bold text-foreground">Briefing do Exame</h3>
-            <p className="text-sm text-muted-foreground">Lê com atenção antes de iniciar.</p>
+
+          <div className="grid sm:grid-cols-3 gap-3">
+            <BriefStat label="Duração"   value={`${quiz.minutes} min`} />
+            <BriefStat label="Questões"  value={total} />
+            <BriefStat label="Aprovação" value={`${passing}%`} />
           </div>
-        </div>
 
-        <div className="grid sm:grid-cols-3 gap-3">
-          <BriefStat label="Duração" value={`${quiz.minutes} min`} />
-          <BriefStat label="Secções" value={3} />
-          <BriefStat label="Aprovação" value={`${passing}%`} />
-        </div>
+          <div className="rounded-lg border border-border bg-muted/30 p-4">
+            <p className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground mb-3">Composição</p>
+            <div className="grid sm:grid-cols-3 gap-2.5">
+              <CompPill type="mcq"     count={counts.mcq} />
+              <CompPill type="fill"    count={counts.fill} />
+              <CompPill type="written" count={counts.written} />
+            </div>
+          </div>
 
-        <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-2 text-sm">
-          <p className="font-semibold text-foreground">Composição</p>
-          <ul className="text-muted-foreground space-y-1">
-            <li>• {counts.mcq} perguntas de múltipla escolha</li>
-            <li>• {counts.fill} perguntas de preenchimento</li>
-            <li>• {counts.written} perguntas de resposta aberta</li>
-          </ul>
-        </div>
+          <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 flex gap-3 text-sm">
+            <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+            <p className="text-amber-900 leading-relaxed">
+              O cronómetro começa ao iniciar e <strong>não pode ser pausado</strong>. Ao terminar o tempo, o exame é submetido automaticamente.
+            </p>
+          </div>
 
-        <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 flex gap-3 text-sm">
-          <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-          <p className="text-amber-900">
-            O cronómetro começa ao iniciar e <strong>não pode ser pausado</strong>. Ao terminar o tempo, o exame é submetido automaticamente.
-          </p>
+          <Button onClick={() => setStarted(true)} className="w-full gap-2" size="lg">
+            <Play className="w-4 h-4" /> Iniciar Exame
+          </Button>
         </div>
-
-        <Button onClick={() => setStarted(true)} className="w-full gap-2" size="lg">
-          <Play className="w-4 h-4" /> Iniciar Exame
-        </Button>
       </Card>
     );
   }
@@ -873,50 +1029,70 @@ function ExamGame({ quiz }: { quiz: Extract<AnyQuiz, { type: "exam" }> }) {
   /* ------ Result screen ------ */
   if (submitted) {
     return (
-      <Card className="p-8 space-y-6">
-        <div className="text-center space-y-3">
-          <Trophy className={cn("w-14 h-14 mx-auto", passed ? "text-emerald-600" : "text-amber-500")} />
-          <h3 className="text-3xl font-bold text-foreground">{pct}%</h3>
-          <p className="text-muted-foreground">Resultado da simulação</p>
-          <Badge variant="outline" className={cn("text-xs", passed ? "border-emerald-500 text-emerald-700 bg-emerald-50" : "border-amber-500 text-amber-700 bg-amber-50")}>
-            {passed ? "Aprovado" : "Reprovado"} · mínimo {passing}%
-          </Badge>
-        </div>
-        <Progress value={pct} className="h-2" />
-
-        <div className="space-y-2">
-          <p className="text-xs uppercase tracking-wider font-bold text-muted-foreground">Revisão por questão</p>
-          {quiz.items.map((it, i) => {
-            const s = scoreFor(i);
-            const p = it.points ?? 10;
-            const full = s === p;
-            const none = s === 0;
-            const k = it.kind === "mcq" ? "mcq" : it.kind === "fill" ? "fill" : "written";
-            const m = TYPE_META[k];
-            const label = full ? "Correcto" : none ? "Incorrecto" : "Parcial";
-            return (
-              <div key={i} className="flex items-center justify-between border border-border rounded-lg p-3 text-sm">
-                <div className="flex items-center gap-2 min-w-0">
-                  <span className="text-[10px] font-mono text-muted-foreground">#{i + 1}</span>
-                  <Badge variant="outline" className={cn("text-[10px] font-semibold border", m.tag)}>{m.label}</Badge>
-                  <span className="truncate text-foreground/80">{it.kind === "fill" ? it.sentence : it.q}</span>
-                </div>
-                <span className={cn(
-                  "font-bold text-[11px] shrink-0 ml-3 px-2 py-0.5 rounded-full border",
-                  full ? "text-emerald-700 bg-emerald-50 border-emerald-200" :
-                  none ? "text-destructive bg-destructive/10 border-destructive/20" :
-                  "text-amber-700 bg-amber-50 border-amber-200"
-                )}>
-                  {label}
-                </span>
+      <Card className="overflow-hidden">
+        <div className={cn("h-1 w-full", passed ? "bg-emerald-500" : "bg-amber-500")} />
+        <div className="p-8 space-y-6">
+          <div className="text-center space-y-3">
+            <div className={cn(
+              "inline-flex items-center justify-center w-16 h-16 rounded-full mx-auto",
+              passed ? "bg-emerald-50" : "bg-amber-50"
+            )}>
+              <Trophy className={cn("w-8 h-8", passed ? "text-emerald-600" : "text-amber-500")} />
+            </div>
+            <p className="text-[11px] uppercase tracking-[0.18em] font-semibold text-muted-foreground">Resultado da simulação</p>
+            <h3 className="text-5xl font-bold text-foreground tracking-tight tabular-nums">
+              {pct}<span className="text-2xl text-muted-foreground">%</span>
+            </h3>
+            <p className="text-sm text-muted-foreground tabular-nums">{totalScore} / {totalPoints} pontos</p>
+            <Badge variant="outline" className={cn(
+              "text-[11px] font-semibold",
+              passed ? "border-emerald-300 text-emerald-700 bg-emerald-50"
+                     : "border-amber-300 text-amber-700 bg-amber-50"
+            )}>
+              {passed ? "Aprovado" : "Reprovado"} · mínimo {passing}%
+            </Badge>
+            <div className="max-w-md mx-auto pt-2">
+              <div className="h-2 rounded-full bg-muted overflow-hidden">
+                <div className={cn("h-full transition-all", passed ? "bg-emerald-500" : "bg-amber-500")} style={{ width: `${pct}%` }} />
               </div>
-            );
-          })}
-        </div>
+            </div>
+          </div>
 
-        <Button onClick={restart} className="w-full gap-2" variant="outline">
-          <RotateCcw className="w-4 h-4" /> Repetir Exame
-        </Button>
+          <div className="space-y-2 pt-2">
+            <p className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Revisão por questão</p>
+            {quiz.items.map((it, i) => {
+              const s = scoreFor(i);
+              const p = it.points ?? 10;
+              const full = s === p;
+              const none = s === 0;
+              const k = it.kind === "mcq" ? "mcq" : it.kind === "fill" ? "fill" : "written";
+              const m = TYPE_META[k];
+              const label = full ? "Correcto" : none ? "Incorrecto" : "Parcial";
+              return (
+                <div key={i} className="flex items-center justify-between gap-3 border border-border rounded-lg p-3 text-sm hover:bg-muted/30 transition-colors">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <span className="text-[10px] font-mono text-muted-foreground tabular-nums w-6">#{String(i + 1).padStart(2, "0")}</span>
+                    <span className={cn("inline-flex items-center text-[10px] font-semibold px-2 py-0.5 rounded-md border shrink-0", m.tag)}>{m.label}</span>
+                    <span className="truncate text-foreground/85">{it.kind === "fill" ? it.sentence : it.q}</span>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className="text-[11px] text-muted-foreground tabular-nums">{s}/{p}</span>
+                    <span className={cn(
+                      "font-semibold text-[10px] px-2 py-0.5 rounded-md border",
+                      full ? "text-emerald-700 bg-emerald-50 border-emerald-200" :
+                      none ? "text-destructive bg-destructive/10 border-destructive/20" :
+                      "text-amber-700 bg-amber-50 border-amber-200"
+                    )}>{label}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          <Button onClick={restart} className="w-full gap-2" variant="outline">
+            <RotateCcw className="w-4 h-4" /> Repetir Exame
+          </Button>
+        </div>
       </Card>
     );
   }
@@ -924,125 +1100,171 @@ function ExamGame({ quiz }: { quiz: Extract<AnyQuiz, { type: "exam" }> }) {
   /* ------ Active exam ------ */
   const current = quiz.items[idx];
   const answered = Object.keys(answers).length;
+  const k = current.kind === "mcq" ? "mcq" : current.kind === "fill" ? "fill" : "written";
+  const qMeta = TYPE_META[k];
+  const QIcon = qMeta.icon;
 
   return (
     <div className="space-y-4">
-      <Card className="p-4 flex items-center justify-between gap-4 flex-wrap sticky top-0 z-10 bg-card/95 backdrop-blur">
-        <div className="flex items-center gap-4 text-sm">
-          <span className="font-semibold text-foreground">Questão {idx + 1} / {total}</span>
-          <span className="text-muted-foreground">Respondidas: {answered}/{total}</span>
+      {/* Sticky cockpit */}
+      <Card className="p-4 flex items-center justify-between gap-4 flex-wrap sticky top-0 z-10 bg-card/95 backdrop-blur border-b-2 border-border">
+        <div className="flex items-center gap-4 flex-1 min-w-[220px]">
+          <div className="flex flex-col">
+            <span className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground">Questão</span>
+            <span className="text-sm font-bold text-foreground tabular-nums">{idx + 1} / {total}</span>
+          </div>
+          <div className="h-8 w-px bg-border" />
+          <div className="flex flex-col">
+            <span className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground">Respondidas</span>
+            <span className="text-sm font-bold text-foreground tabular-nums">{answered} / {total}</span>
+          </div>
+          <div className="flex-1 max-w-[200px] hidden sm:block">
+            <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+              <div className={cn("h-full transition-all", meta.dot)} style={{ width: `${(answered / total) * 100}%` }} />
+            </div>
+          </div>
         </div>
         <div className={cn(
-          "flex items-center gap-2 px-3 py-1.5 rounded-md font-mono font-bold text-sm",
-          timeLow ? "bg-destructive/10 text-destructive animate-pulse" : "bg-muted text-foreground"
+          "flex items-center gap-2 px-3 py-2 rounded-md font-mono font-bold text-base border-2",
+          timeLow ? "bg-destructive/10 text-destructive border-destructive/40 animate-pulse"
+                  : "bg-muted text-foreground border-transparent"
         )}>
           <Timer className="w-4 h-4" /> {mm}:{ss}
         </div>
       </Card>
 
-      <Card className="p-6 space-y-5">
-        <div className="flex items-center gap-2">
-          {(() => {
-            const k = current.kind === "mcq" ? "mcq" : current.kind === "fill" ? "fill" : "written";
-            const m = TYPE_META[k];
-            return <Badge variant="outline" className={cn("text-[10px] font-semibold border", m.tag)}>{m.label}</Badge>;
-          })()}
+      {/* Question card */}
+      <Card className="overflow-hidden">
+        <div className={cn("h-0.5 w-full", qMeta.dot)} />
+        <div className="px-6 pt-5 pb-2 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className={cn("inline-flex items-center justify-center w-7 h-7 rounded-md border", qMeta.tile)}>
+              <QIcon className="w-3.5 h-3.5" />
+            </span>
+            <span className={cn("inline-flex items-center text-[10px] font-semibold px-2 py-0.5 rounded-md border", qMeta.tag)}>{qMeta.label}</span>
+            <span className="text-[10px] text-muted-foreground">· {current.points ?? 10} pts</span>
+          </div>
         </div>
 
-        {current.kind === "mcq" && (
-          <>
-            <h3 className="text-lg font-semibold text-foreground">{current.q}</h3>
-            <div className="grid sm:grid-cols-2 gap-2">
-              {current.options.map((opt, i) => {
-                const picked = answers[idx] === i;
-                return (
-                  <button
-                    key={i}
-                    onClick={() => setAnswers(a => ({ ...a, [idx]: i }))}
-                    className={cn(
-                      "text-left p-3 rounded-lg border-2 transition-all flex items-center gap-2",
-                      picked ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"
-                    )}
-                  >
-                    <span className={cn("w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold shrink-0",
-                      picked ? "bg-primary text-primary-foreground" : "bg-muted")}>
-                      {String.fromCharCode(65 + i)}
-                    </span>
-                    <span className="text-sm flex-1">{opt}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </>
-        )}
+        <div className="p-6 pt-3 space-y-5">
+          {current.kind === "mcq" && (
+            <>
+              <h3 className="text-lg font-semibold text-foreground leading-snug">{current.q}</h3>
+              <div className="grid sm:grid-cols-2 gap-2.5">
+                {current.options.map((opt, i) => {
+                  const picked = answers[idx] === i;
+                  return (
+                    <button
+                      key={i}
+                      onClick={() => setAnswers(a => ({ ...a, [idx]: i }))}
+                      className={cn(
+                        "text-left p-3.5 rounded-lg border-2 transition-all flex items-center gap-3 group/opt",
+                        picked ? "border-primary bg-primary/5" : "border-border hover:border-primary/50 hover:bg-muted/40"
+                      )}
+                    >
+                      <span className={cn(
+                        "w-7 h-7 rounded-md flex items-center justify-center text-xs font-bold shrink-0 border transition-colors",
+                        picked ? "bg-primary text-primary-foreground border-primary" : "bg-muted border-border group-hover/opt:border-primary/50"
+                      )}>{String.fromCharCode(65 + i)}</span>
+                      <span className="text-sm flex-1 font-medium">{opt}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </>
+          )}
 
-        {current.kind === "fill" && (
-          <>
-            <h3 className="text-lg font-semibold text-foreground">Preenche o espaço:</h3>
-            <div className="text-base text-foreground leading-relaxed flex items-center flex-wrap gap-2">
-              <span>{current.sentence.split("___")[0]}</span>
-              <Input
+          {current.kind === "fill" && (
+            <>
+              <h3 className="text-base font-semibold text-muted-foreground uppercase tracking-wider">Preenche o espaço</h3>
+              <div className="text-xl text-foreground leading-relaxed flex items-baseline flex-wrap gap-x-2 gap-y-3 font-medium">
+                <span>{current.sentence.split("___")[0]}</span>
+                <Input
+                  value={(answers[idx] as string) ?? ""}
+                  onChange={(e) => setAnswers(a => ({ ...a, [idx]: e.target.value }))}
+                  placeholder="..."
+                  className="inline-flex w-48 h-10 text-center font-bold text-base border-2 border-primary/30 focus-visible:border-primary"
+                />
+                <span>{current.sentence.split("___")[1]}</span>
+              </div>
+            </>
+          )}
+
+          {current.kind === "written" && (
+            <>
+              <h3 className="text-lg font-semibold text-foreground leading-snug">{current.q}</h3>
+              <textarea
                 value={(answers[idx] as string) ?? ""}
                 onChange={(e) => setAnswers(a => ({ ...a, [idx]: e.target.value }))}
-                placeholder="..."
-                className="inline-flex w-44 h-9 text-center font-bold"
+                placeholder="Escreve a tua resposta..."
+                className="w-full min-h-[180px] rounded-lg border border-input bg-background p-4 text-sm leading-relaxed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-y"
               />
-              <span>{current.sentence.split("___")[1]}</span>
-            </div>
-          </>
-        )}
-
-        {current.kind === "written" && (
-          <>
-            <h3 className="text-lg font-semibold text-foreground">{current.q}</h3>
-            <textarea
-              value={(answers[idx] as string) ?? ""}
-              onChange={(e) => setAnswers(a => ({ ...a, [idx]: e.target.value }))}
-              placeholder="Escreve a tua resposta..."
-              className="w-full min-h-[160px] rounded-lg border border-input bg-background p-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            />
-            <p className="text-xs text-muted-foreground">A pontuação é atribuída pela cobertura de conceitos-chave.</p>
-          </>
-        )}
+              <p className="text-[11px] text-muted-foreground flex items-center gap-1.5">
+                <Sparkles className="w-3 h-3" /> Pontuação atribuída pela cobertura de conceitos-chave.
+              </p>
+            </>
+          )}
+        </div>
       </Card>
 
-      <div className="flex items-center justify-between gap-2">
-        <Button variant="outline" onClick={() => setIdx(i => Math.max(0, i - 1))} disabled={idx === 0} className="gap-1">
-          <ArrowLeft className="w-4 h-4" /> Anterior
-        </Button>
-
-        <div className="flex flex-wrap gap-1 max-w-md justify-center">
+      {/* Navigation footer */}
+      <Card className="p-4 space-y-3">
+        <div className="flex flex-wrap gap-1.5 justify-center">
           {quiz.items.map((_, i) => (
             <button
               key={i}
               onClick={() => setIdx(i)}
               className={cn(
-                "w-7 h-7 rounded text-[10px] font-bold border transition-colors",
-                i === idx ? "border-primary bg-primary text-primary-foreground" :
-                answers[i] !== undefined ? "border-emerald-500 bg-emerald-50 text-emerald-700" :
-                "border-border bg-card text-muted-foreground hover:border-primary/50"
+                "w-8 h-8 rounded-md text-[11px] font-bold border-2 transition-all tabular-nums",
+                i === idx
+                  ? "border-primary bg-primary text-primary-foreground scale-110 shadow-sm"
+                  : answers[i] !== undefined
+                    ? "border-emerald-300 bg-emerald-50 text-emerald-700 hover:border-emerald-500"
+                    : "border-border bg-card text-muted-foreground hover:border-primary/50 hover:bg-muted"
               )}
+              aria-label={`Ir para questão ${i + 1}`}
             >{i + 1}</button>
           ))}
         </div>
-
-        {idx + 1 < total ? (
-          <Button onClick={() => setIdx(i => i + 1)} className="gap-1">Próxima <ArrowRight className="w-4 h-4" /></Button>
-        ) : (
-          <Button onClick={() => setSubmitted(true)} className="gap-1 bg-emerald-600 hover:bg-emerald-700 text-white">
-            <CheckCircle2 className="w-4 h-4" /> Submeter
+        <div className="flex items-center justify-between gap-2 pt-1 border-t border-border">
+          <Button variant="outline" size="sm" onClick={() => setIdx(i => Math.max(0, i - 1))} disabled={idx === 0} className="gap-1">
+            <ArrowLeft className="w-4 h-4" /> Anterior
           </Button>
-        )}
-      </div>
+          <span className="text-[11px] text-muted-foreground">
+            {answered === total ? "Tudo respondido — podes submeter." : `${total - answered} por responder`}
+          </span>
+          {idx + 1 < total ? (
+            <Button size="sm" onClick={() => setIdx(i => i + 1)} className="gap-1">Próxima <ArrowRight className="w-4 h-4" /></Button>
+          ) : (
+            <Button size="sm" onClick={() => setSubmitted(true)} className="gap-1 bg-emerald-600 hover:bg-emerald-700 text-white">
+              <CheckCircle2 className="w-4 h-4" /> Submeter
+            </Button>
+          )}
+        </div>
+      </Card>
     </div>
   );
 }
 
 function BriefStat({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="rounded-lg border border-border bg-card p-3 text-center">
-      <p className="text-xl font-bold text-foreground leading-tight">{value}</p>
-      <p className="text-[10px] uppercase tracking-wider text-muted-foreground mt-0.5">{label}</p>
+    <div className="rounded-lg border border-border bg-card p-4 text-center">
+      <p className="text-2xl font-bold text-foreground leading-tight tabular-nums">{value}</p>
+      <p className="text-[10px] uppercase tracking-wider text-muted-foreground mt-1 font-semibold">{label}</p>
+    </div>
+  );
+}
+
+function CompPill({ type, count }: { type: QuizType; count: number }) {
+  const m = TYPE_META[type];
+  const Icon = m.icon;
+  return (
+    <div className={cn("flex items-center gap-2.5 rounded-md border px-3 py-2", m.tile)}>
+      <Icon className="w-4 h-4 shrink-0" />
+      <div className="min-w-0 flex-1">
+        <p className="text-[10px] font-semibold uppercase tracking-wider opacity-80 truncate">{m.label}</p>
+        <p className="text-sm font-bold tabular-nums">{count}</p>
+      </div>
     </div>
   );
 }
