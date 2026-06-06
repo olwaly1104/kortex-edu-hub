@@ -23,7 +23,7 @@ const studentSections: NavSection[] = [
   { title: "Académico", items: [
     { label: "As Minhas Cadeiras", icon: BookOpen, path: "/student/disciplines" },
     { label: "Tarefas", icon: ClipboardList, path: "/student/tasks" },
-    { label: "Centro de Estudo", icon: Sparkles, path: "/student/quizzes" },
+    { label: "Centro de Estudo", icon: BrainCircuit, path: "/student/quizzes" },
     { label: "Notas", icon: Award, path: "/student/grades" },
     { label: "Biblioteca Virtual", icon: Library, path: "/student/library" },
   ]},
