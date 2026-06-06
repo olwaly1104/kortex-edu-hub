@@ -341,9 +341,13 @@ export default function DespesaDetail() {
                 <dd className="font-medium text-foreground">{despesa.category}</dd>
               </div>
               <Separator />
+              <div>
+                <dt className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Data do pedido</dt>
+                <dd className="font-medium text-foreground">{fmtDateLong(despesa.date)}</dd>
+              </div>
+              <Separator />
               {(() => {
                 const endDate = despesa.paidDate || despesa.approvedDate;
-                const endLabel = endDate ? fmtDateShort(endDate) : "em curso";
                 let duration = "—";
                 if (despesa.date) {
                   const end = endDate ? new Date(endDate) : new Date();
@@ -355,12 +359,16 @@ export default function DespesaDetail() {
                 }
                 return (
                   <div>
-                    <dt className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Data do pedido</dt>
-                    <dd className="font-medium text-foreground">{fmtDateLong(despesa.date)}</dd>
+                    <dt className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Estado</dt>
+                    <dd className="flex items-center gap-2">
+                      <span className={cn("inline-flex items-center gap-1.5 text-xs font-medium px-2 py-0.5 rounded-full border", sc.cls)}>
+                        <StatusIcon className="w-3 h-3" />
+                        {sc.label}
+                      </span>
+                    </dd>
                     <dd className="text-xs text-muted-foreground mt-1.5 flex items-center gap-1.5">
                       <Clock className="w-3 h-3" />
                       <span>Duração: <span className="text-foreground font-medium">{duration}</span></span>
-                      <span className="text-muted-foreground/70">· até {endLabel}</span>
                     </dd>
                   </div>
                 );
