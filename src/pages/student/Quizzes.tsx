@@ -275,22 +275,7 @@ export default function StudentQuizzes() {
   }), [typeFilter, cadeiraFilter, search]);
 
   if (active) {
-    return (
-      <div className="p-6 lg:p-8 space-y-5 animate-fade-in">
-        <button
-          onClick={() => setActiveId(null)}
-          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
-        >
-          <ArrowLeft className="w-4 h-4" /> Voltar ao Centro de Estudo
-        </button>
-        <QuizHeader quiz={active} />
-        {active.type === "mcq"     && <MCQGame quiz={active} />}
-        {active.type === "written" && <WrittenGame quiz={active} />}
-        {active.type === "fill"    && <FillGame quiz={active} />}
-        
-        {active.type === "exam"    && <ExamGame quiz={active} />}
-      </div>
-    );
+    return <ActiveQuizView quiz={active} onExit={() => setActiveId(null)} />;
   }
 
   const total = QUIZZES.length;
