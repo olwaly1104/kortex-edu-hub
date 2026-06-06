@@ -474,19 +474,15 @@ function FilterRow({
 }
 
 function QuizRow({ quiz, onStart }: { quiz: AnyQuiz; onStart: () => void }) {
-  const meta = TYPE_META[quiz.type];
-  const Icon = meta.icon;
+  const cs = cadeiraStyle(quiz.cadeira);
   return (
     <div className="flex items-center gap-4 p-4 hover:bg-muted/30 transition-colors group">
-      <div className={cn("w-11 h-11 rounded-lg border flex items-center justify-center shrink-0", meta.tile)}>
-        <Icon className="w-5 h-5" />
-      </div>
+      <span className={cn("w-1 self-stretch rounded-full shrink-0", cs.dot)} />
 
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
-          <Badge variant="outline" className={cn("text-[10px] font-semibold border", meta.tag)}>{meta.label}</Badge>
-          <span className="text-[10px] uppercase tracking-wider font-semibold text-primary">{quiz.cadeira}</span>
-          <span className="text-[10px] text-muted-foreground">· {quiz.ano}º ano</span>
+          <Badge variant="outline" className={cn("text-[10px] font-semibold border", cs.tag)}>{quiz.cadeira}</Badge>
+          <span className="text-[10px] text-muted-foreground">{quiz.ano}º ano</span>
         </div>
         <h3 className="font-semibold text-foreground leading-tight mt-1 truncate">{quiz.title}</h3>
         <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{quiz.description}</p>
