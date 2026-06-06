@@ -80,6 +80,18 @@ export default function Orcamentos() {
     .sort((a, b) => b.budget - a.budget);
   const maxFacBudget = Math.max(...faculdadeBreakdown.map(f => f.budget), 1);
 
+  const responsavelBreakdown = Object.entries(
+    orcamentos.reduce<Record<string, { budget: number; spent: number; role: string }>>((acc, o) => {
+      acc[o.responsavel] = acc[o.responsavel] ?? { budget: 0, spent: 0, role: o.responsavelRole };
+      acc[o.responsavel].budget += o.totalBudget;
+      acc[o.responsavel].spent += o.spent;
+      return acc;
+    }, {})
+  )
+    .map(([name, v]) => ({ name, ...v }))
+    .sort((a, b) => b.budget - a.budget);
+
+
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
@@ -94,144 +106,145 @@ export default function Orcamentos() {
         <Button size="sm" className="gap-1.5 h-9"><Plus className="w-4 h-4" /> Novo Orçamento</Button>
       </div>
 
-      {/* KPIs */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        {[
-          { label: "Total Orçamentado", value: formatCurrency(totalBudget), icon: Wallet, color: "text-foreground" },
-          { label: "Total Gasto", value: formatCurrency(totalSpent), icon: TrendingDown, color: "text-destructive" },
-          { label: "Disponível", value: formatCurrency(available), icon: CheckCircle2, color: "text-accent" },
-          { label: "Em Alerta", value: `${numAlerta} ${numAlerta === 1 ? "orçamento" : "orçamentos"}`, icon: AlertTriangle, color: numAlerta > 0 ? "text-amber-600" : "text-foreground" },
-        ].map(k => (
-          <Card key={k.label} className="p-4 border-border/70">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-7 h-7 rounded-md bg-primary/10 flex items-center justify-center">
-                <k.icon className="w-3.5 h-3.5 text-primary" />
-              </div>
-              <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">{k.label}</span>
-            </div>
-            <p className={cn("text-xl font-bold tabular-nums", k.color)}>{k.value}</p>
-          </Card>
-        ))}
-      </div>
-
-      {/* Global utilization — visual */}
+      {/* Combined: KPIs + Utilização global */}
       <Card className="p-5 border-border/70 overflow-hidden">
-        <div className="flex items-start justify-between gap-4 flex-wrap mb-4">
-          <div>
-            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Utilização global</p>
-            <p className="text-xs text-muted-foreground mt-1 tabular-nums">
-              {numActivos} orçamentos activos · período 2025
-            </p>
-          </div>
-          <div className="text-right">
-            <p className={cn("text-4xl font-bold tabular-nums leading-none", usageColor(pctUsed))}>{pctUsed}<span className="text-xl">%</span></p>
-            <p className="text-[10px] text-muted-foreground uppercase tracking-wider mt-1">do orçamento total</p>
-          </div>
-        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-5 items-start">
+          {/* Left: 3 KPI tiles + bar */}
+          <div className="space-y-4">
+            <div className="grid grid-cols-3 gap-3">
+              <div>
+                <div className="flex items-center gap-1.5 mb-1">
+                  <span className="w-2 h-2 rounded-full bg-foreground" />
+                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Total Orçamentado</p>
+                </div>
+                <p className="text-lg font-bold text-foreground tabular-nums">{formatCurrency(totalBudget)}</p>
+              </div>
+              <div>
+                <div className="flex items-center gap-1.5 mb-1">
+                  <span className={cn("w-2 h-2 rounded-full", pctUsed >= 90 ? "bg-destructive" : pctUsed >= 75 ? "bg-amber-500" : "bg-accent")} />
+                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Total Gasto</p>
+                </div>
+                <p className={cn("text-lg font-bold tabular-nums", usageColor(pctUsed))}>{formatCurrency(totalSpent)}</p>
+              </div>
+              <div>
+                <div className="flex items-center gap-1.5 mb-1">
+                  <span className="w-2 h-2 rounded-full bg-primary/30" />
+                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Disponível</p>
+                </div>
+                <p className="text-lg font-bold text-foreground tabular-nums">{formatCurrency(available)}</p>
+              </div>
+            </div>
 
-        {/* Segmented stacked bar */}
-        <div className="relative h-3 w-full rounded-full bg-muted overflow-hidden flex">
-          <div className={cn("h-full transition-all", pctUsed >= 90 ? "bg-destructive" : pctUsed >= 75 ? "bg-amber-500" : "bg-accent")} style={{ width: `${pctUsed}%` }} />
-          <div className="h-full bg-primary/10 flex-1" />
-        </div>
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Utilização global</p>
+                <p className="text-[11px] text-muted-foreground tabular-nums">{numActivos} activos · {numAlerta > 0 && <span className="text-amber-600 font-medium">{numAlerta} em alerta</span>}</p>
+              </div>
+              <div className="relative h-3 w-full rounded-full bg-muted overflow-hidden flex">
+                <div className={cn("h-full transition-all", pctUsed >= 90 ? "bg-destructive" : pctUsed >= 75 ? "bg-amber-500" : "bg-accent")} style={{ width: `${pctUsed}%` }} />
+                <div className="h-full bg-primary/10 flex-1" />
+              </div>
+            </div>
+          </div>
 
-        {/* Legend tiles */}
-        <div className="grid grid-cols-3 gap-3 mt-4">
-          <div className="rounded-lg border border-border/70 p-3">
-            <div className="flex items-center gap-1.5 mb-1">
-              <span className="w-2 h-2 rounded-full bg-foreground" />
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Orçamentado</p>
-            </div>
-            <p className="text-sm font-bold text-foreground tabular-nums">{formatCurrency(totalBudget)}</p>
-          </div>
-          <div className="rounded-lg border border-border/70 p-3">
-            <div className="flex items-center gap-1.5 mb-1">
-              <span className={cn("w-2 h-2 rounded-full", pctUsed >= 90 ? "bg-destructive" : pctUsed >= 75 ? "bg-amber-500" : "bg-accent")} />
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Gasto</p>
-            </div>
-            <p className={cn("text-sm font-bold tabular-nums", usageColor(pctUsed))}>{formatCurrency(totalSpent)}</p>
-          </div>
-          <div className="rounded-lg border border-border/70 p-3">
-            <div className="flex items-center gap-1.5 mb-1">
-              <span className="w-2 h-2 rounded-full bg-primary/30" />
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Disponível</p>
-            </div>
-            <p className="text-sm font-bold text-foreground tabular-nums">{formatCurrency(available)}</p>
+          {/* Right: percentage */}
+          <div className="lg:border-l lg:border-border lg:pl-5 text-center lg:text-right shrink-0">
+            <p className={cn("text-5xl font-bold tabular-nums leading-none", usageColor(pctUsed))}>{pctUsed}<span className="text-2xl">%</span></p>
+            <p className="text-[10px] text-muted-foreground uppercase tracking-wider mt-1.5">do orçamento total</p>
           </div>
         </div>
       </Card>
 
-      {/* Infographics: por categoria + por faculdade */}
-      <div className="grid gap-3 lg:grid-cols-2">
-        <Card className="p-5 border-border/70">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <p className="text-sm font-semibold text-foreground">Orçamento por categoria</p>
-              <p className="text-[11px] text-muted-foreground mt-0.5">Distribuição e utilização</p>
-            </div>
-            <ArrowUpRight className="w-4 h-4 text-muted-foreground" />
+      {/* Infographics: por categoria + por faculdade + por responsável */}
+      <div className="grid gap-3 lg:grid-cols-3">
+        <Card className="p-4 border-border/70">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-xs font-semibold text-foreground">Por categoria</p>
+            <ArrowUpRight className="w-3.5 h-3.5 text-muted-foreground" />
           </div>
-          <div className="space-y-3.5">
+          <div className="space-y-2.5">
             {categoryBreakdown.map(c => {
               const pct = Math.round((c.spent / c.budget) * 100);
               const share = Math.round((c.budget / totalBudget) * 100);
               return (
                 <div key={c.label}>
-                  <div className="flex items-center justify-between mb-1.5 gap-2">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <span className={cn("w-2.5 h-2.5 rounded-sm shrink-0", c.swatch)} />
-                      <p className="text-xs font-medium text-foreground truncate">{c.label}</p>
-                      <span className="text-[10px] text-muted-foreground tabular-nums">{share}%</span>
+                  <div className="flex items-center justify-between mb-1 gap-2">
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <span className={cn("w-2 h-2 rounded-sm shrink-0", c.swatch)} />
+                      <p className="text-[11px] font-medium text-foreground truncate">{c.label}</p>
+                      <span className="text-[10px] text-muted-foreground tabular-nums shrink-0">{share}%</span>
                     </div>
-                    <span className={cn("text-[11px] font-semibold tabular-nums shrink-0", usageColor(pct))}>{pct}%</span>
+                    <span className={cn("text-[10px] font-semibold tabular-nums shrink-0", usageColor(pct))}>{pct}%</span>
                   </div>
-                  <div className="relative h-1.5 w-full rounded-full bg-muted overflow-hidden">
+                  <div className="relative h-1 w-full rounded-full bg-muted overflow-hidden">
                     <div className={cn("h-full rounded-full", pct >= 90 ? "bg-destructive" : pct >= 75 ? "bg-amber-500" : "bg-accent")} style={{ width: `${pct}%` }} />
                   </div>
-                  <p className="text-[10px] text-muted-foreground tabular-nums mt-1">{formatCurrency(c.spent)} de {formatCurrency(c.budget)}</p>
                 </div>
               );
             })}
           </div>
         </Card>
 
-        <Card className="p-5 border-border/70">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <p className="text-sm font-semibold text-foreground">Orçamento por faculdade</p>
-              <p className="text-[11px] text-muted-foreground mt-0.5">Comparativo gasto vs. orçamento</p>
-            </div>
-            <ArrowUpRight className="w-4 h-4 text-muted-foreground" />
+        <Card className="p-4 border-border/70">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-xs font-semibold text-foreground">Por faculdade</p>
+            <ArrowUpRight className="w-3.5 h-3.5 text-muted-foreground" />
           </div>
-          <div className="space-y-4">
+          <div className="space-y-2.5">
             {faculdadeBreakdown.map(f => {
               const pct = Math.round((f.spent / f.budget) * 100);
               const widthBudget = (f.budget / maxFacBudget) * 100;
               const widthSpent = (f.spent / maxFacBudget) * 100;
               return (
                 <div key={f.label}>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <p className="text-xs font-medium text-foreground truncate">{f.label}</p>
-                    <span className={cn("text-[11px] font-semibold tabular-nums", usageColor(pct))}>{pct}%</span>
+                  <div className="flex items-center justify-between mb-1">
+                    <p className="text-[11px] font-medium text-foreground truncate">{f.label}</p>
+                    <span className={cn("text-[10px] font-semibold tabular-nums", usageColor(pct))}>{pct}%</span>
                   </div>
-                  <div className="relative h-6 w-full rounded-md bg-muted/60 overflow-hidden">
+                  <div className="relative h-4 w-full rounded bg-muted/60 overflow-hidden">
                     <div className="absolute inset-y-0 left-0 bg-primary/15" style={{ width: `${widthBudget}%` }} />
                     <div className={cn("absolute inset-y-0 left-0", pct >= 90 ? "bg-destructive" : pct >= 75 ? "bg-amber-500" : "bg-primary")} style={{ width: `${widthSpent}%` }} />
                   </div>
-                  <p className="text-[10px] text-muted-foreground tabular-nums mt-1">{formatCurrency(f.spent)} de {formatCurrency(f.budget)}</p>
                 </div>
               );
             })}
           </div>
-          <div className="flex items-center gap-4 mt-4 pt-3 border-t border-border">
-            <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-sm bg-primary" />
-              <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Gasto</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-sm bg-primary/15" />
-              <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Orçamento</span>
-            </div>
+          <div className="flex items-center gap-3 mt-3 pt-2.5 border-t border-border">
+            <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-primary" /><span className="text-[9px] text-muted-foreground uppercase tracking-wider">Gasto</span></div>
+            <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-primary/15" /><span className="text-[9px] text-muted-foreground uppercase tracking-wider">Orçamento</span></div>
+          </div>
+        </Card>
+
+        <Card className="p-4 border-border/70">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-xs font-semibold text-foreground">Por responsável</p>
+            <ArrowUpRight className="w-3.5 h-3.5 text-muted-foreground" />
+          </div>
+          <div className="space-y-2.5">
+            {responsavelBreakdown.map(r => {
+              const pct = Math.round((r.spent / r.budget) * 100);
+              const share = Math.round((r.budget / totalBudget) * 100);
+              const initials = r.name.split(" ").slice(-2).map(n => n[0]).join("");
+              return (
+                <div key={r.name} className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                    <span className="text-[9px] font-semibold text-primary">{initials}</span>
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between gap-2 mb-1">
+                      <p className="text-[11px] font-medium text-foreground truncate">{r.name}</p>
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        <span className="text-[10px] text-muted-foreground tabular-nums">{share}%</span>
+                        <span className={cn("text-[10px] font-semibold tabular-nums w-8 text-right", usageColor(pct))}>{pct}%</span>
+                      </div>
+                    </div>
+                    <div className="relative h-1 w-full rounded-full bg-muted overflow-hidden">
+                      <div className={cn("h-full rounded-full", pct >= 90 ? "bg-destructive" : pct >= 75 ? "bg-amber-500" : "bg-accent")} style={{ width: `${pct}%` }} />
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </Card>
       </div>
