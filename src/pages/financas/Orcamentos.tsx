@@ -118,28 +118,28 @@ export default function Orcamentos() {
         </Card>
         <Card className="p-4">
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-rose-50 flex items-center justify-center"><TrendingDown className="w-4 h-4 text-rose-600" /></div>
+            <div className="w-8 h-8 rounded-lg bg-destructive/10 flex items-center justify-center"><TrendingDown className="w-4 h-4 text-destructive" /></div>
             <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Total Gasto</span>
           </div>
           <p className="text-2xl font-bold text-foreground tabular-nums">{formatCurrency(totalSpent)}</p>
         </Card>
         <Card className="p-4">
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center"><CheckCircle2 className="w-4 h-4 text-emerald-600" /></div>
+            <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center"><CheckCircle2 className="w-4 h-4 text-accent" /></div>
             <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Disponível</span>
           </div>
           <p className="text-2xl font-bold text-foreground tabular-nums">{formatCurrency(available)}</p>
         </Card>
         <Card className="p-4">
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center"><AlertTriangle className="w-4 h-4 text-amber-600" /></div>
+            <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center"><AlertTriangle className="w-4 h-4 text-muted-foreground" /></div>
             <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Em Alerta</span>
           </div>
-          <p className={cn("text-2xl font-bold tabular-nums", numAlerta > 0 ? "text-amber-600" : "text-foreground")}>{numAlerta}</p>
+          <p className={cn("text-2xl font-bold tabular-nums", numAlerta > 0 ? "text-destructive" : "text-foreground")}>{numAlerta}</p>
         </Card>
         <Card className="p-4">
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center"><ArrowUpRight className="w-4 h-4 text-slate-600" /></div>
+            <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center"><ArrowUpRight className="w-4 h-4 text-muted-foreground" /></div>
             <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Estado</span>
           </div>
           <Badge
