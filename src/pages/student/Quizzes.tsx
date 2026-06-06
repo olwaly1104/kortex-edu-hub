@@ -678,35 +678,39 @@ function StripStat({ label, value }: { label: string; value: React.ReactNode }) 
 
 function MCQGame({ quiz, onLockChange }: { quiz: Extract<AnyQuiz, { type: "mcq" }>; onLockChange?: (locked: boolean) => void }) {
   const [idx, setIdx] = useState(0);
-  const [selected, setSelected] = useState<number | null>(null);
-  const [score, setScore] = useState(0);
+  const [answers, setAnswers] = useState<Record<number, number>>({});
   const [done, setDone] = useState(false);
 
   const total = quiz.items.length;
   const current = quiz.items[idx];
-  const { meta } = accent(quiz);
   const time = useTimer(!done);
 
   useEffect(() => { onLockChange?.(!done); }, [done, onLockChange]);
   useEffect(() => () => onLockChange?.(false), [onLockChange]);
 
-  const choose = (i: number) => {
-    if (selected !== null) return;
-    setSelected(i);
-    if (i === current.answer) setScore(s => s + 1);
-  };
-  const next = () => {
-    if (idx + 1 >= total) setDone(true);
-    else { setIdx(idx + 1); setSelected(null); }
-  };
-  const restart = () => { setIdx(0); setSelected(null); setScore(0); setDone(false); };
+  const picked = answers[idx];
+  const score = quiz.items.reduce((s, it, i) => s + (answers[i] === it.answer ? 1 : 0), 0);
 
-  if (done) return <ResultsCard quiz={quiz} score={score} total={total} time={time} onRestart={restart} />;
+  const next = () => { if (idx + 1 >= total) setDone(true); else setIdx(idx + 1); };
+  const prev = () => setIdx(i => Math.max(0, i - 1));
+  const restart = () => { setIdx(0); setAnswers({}); setDone(false); };
+
+  if (done) {
+    const review: ReviewItem[] = quiz.items.map((it, i) => ({
+      n: i + 1,
+      question: it.q,
+      correct: answers[i] === it.answer,
+      userAnswer: answers[i] !== undefined ? it.options[answers[i]] : null,
+      correctAnswer: it.options[it.answer],
+      explain: it.explain,
+    }));
+    return <ResultsCard quiz={quiz} score={score} total={total} time={time} onRestart={restart} review={review} />;
+  }
 
   return (
     <Card className="overflow-hidden">
       <div className="px-6 pt-5 pb-4 border-b border-border bg-muted/30">
-        <ProgressStrip quiz={quiz} position={idx + (selected !== null ? 1 : 0)} total={total} score={score} time={time} />
+        <ProgressStrip quiz={quiz} position={idx + 1} total={total} time={time} />
       </div>
 
       <div className="p-6 space-y-5">
@@ -714,52 +718,39 @@ function MCQGame({ quiz, onLockChange }: { quiz: Extract<AnyQuiz, { type: "mcq" 
 
         <div className="grid sm:grid-cols-2 gap-2.5">
           {current.options.map((opt, i) => {
-            const isCorrect = i === current.answer;
-            const isPicked = i === selected;
-            const show = selected !== null;
+            const isPicked = picked === i;
             return (
               <button
                 key={i}
-                onClick={() => choose(i)}
-                disabled={selected !== null}
+                onClick={() => setAnswers(a => ({ ...a, [idx]: i }))}
                 className={cn(
                   "text-left p-3.5 rounded-lg border-2 transition-all flex items-center gap-3 group/opt",
-                  !show && "border-border hover:border-primary/60 hover:bg-primary/5",
-                  show && isCorrect && "border-emerald-500 bg-emerald-50 text-emerald-900",
-                  show && isPicked && !isCorrect && "border-destructive bg-destructive/10 text-destructive",
-                  show && !isCorrect && !isPicked && "border-border opacity-50"
+                  isPicked
+                    ? "border-primary bg-primary/5"
+                    : "border-border hover:border-primary/50 hover:bg-muted/40",
                 )}
               >
                 <span className={cn(
                   "w-7 h-7 rounded-md flex items-center justify-center text-xs font-bold shrink-0 border transition-colors",
-                  !show && "bg-muted border-border group-hover/opt:bg-primary group-hover/opt:text-primary-foreground group-hover/opt:border-primary",
-                  show && isCorrect && "bg-emerald-500 text-white border-emerald-500",
-                  show && isPicked && !isCorrect && "bg-destructive text-destructive-foreground border-destructive",
-                  show && !isCorrect && !isPicked && "bg-muted border-border"
+                  isPicked
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-muted border-border group-hover/opt:border-primary/50",
                 )}>{String.fromCharCode(65 + i)}</span>
                 <span className="text-sm flex-1 font-medium">{opt}</span>
-                {show && isCorrect && <CheckCircle2 className="w-4 h-4 shrink-0" />}
-                {show && isPicked && !isCorrect && <XCircle className="w-4 h-4 shrink-0" />}
               </button>
             );
           })}
         </div>
-
-        {selected !== null && (
-          <div className={cn("rounded-lg p-4 text-sm border-l-4", meta.tile.replace("border-", "border-l-").replace("text-", "text-"), "bg-muted/40")}>
-            <p className="font-semibold mb-1 text-foreground flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5" /> Explicação
-            </p>
-            <p className="text-muted-foreground leading-relaxed">{current.explain}</p>
-          </div>
-        )}
       </div>
 
-      <div className="px-6 py-4 border-t border-border bg-muted/20 flex items-center justify-between">
-        <span className="text-[11px] text-muted-foreground">
-          {selected === null ? "Selecciona uma opção para continuar." : "Resposta registada."}
+      <div className="px-6 py-4 border-t border-border bg-muted/20 flex items-center justify-between gap-2">
+        <Button variant="outline" size="sm" onClick={prev} disabled={idx === 0} className="gap-1.5">
+          <ArrowLeft className="w-4 h-4" /> Anterior
+        </Button>
+        <span className="text-[11px] text-muted-foreground hidden sm:block">
+          {picked === undefined ? "Selecciona uma opção." : "Resposta registada — podes alterar."}
         </span>
-        <Button onClick={next} disabled={selected === null} className="gap-2">
+        <Button onClick={next} disabled={picked === undefined} className="gap-2">
           {idx + 1 >= total ? "Terminar" : "Próxima"} <ArrowRight className="w-4 h-4" />
         </Button>
       </div>
