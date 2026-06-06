@@ -387,7 +387,6 @@ export default function DespesaDetail() {
               {(() => {
                 const approver = despesa.approvedBy || "Dr. Manuel Tavares";
                 const approverRole = "Director Financeiro";
-                const isDecided = despesa.status === "aprovada" || despesa.status === "rejeitada";
                 return (
                   <>
                     <div>
@@ -398,30 +397,28 @@ export default function DespesaDetail() {
                         <div className="min-w-0">
                           <dd className="font-medium text-foreground truncate flex items-center gap-1.5">
                             <ShieldCheck className="w-3.5 h-3.5 text-primary shrink-0" />
-                            {isDecided ? approver : <span className="text-muted-foreground italic font-normal">Aguarda decisão</span>}
+                            {approver}
                           </dd>
                           <dd className="text-xs text-muted-foreground truncate">{approverRole}</dd>
                         </div>
-                        {isDecided && (
-                          <div className="flex items-center gap-1 shrink-0">
-                            <button
-                              type="button"
-                              onClick={() => toast({ title: "Conversa aberta", description: `Chat com ${approver}` })}
-                              className="w-7 h-7 rounded-md inline-flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-                              title={`Chat com ${approver}`}
-                            >
-                              <MessageSquare className="w-3.5 h-3.5" />
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => toast({ title: "Email", description: `Compor email para ${approver}` })}
-                              className="w-7 h-7 rounded-md inline-flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-                              title={`Email a ${approver}`}
-                            >
-                              <Mail className="w-3.5 h-3.5" />
-                            </button>
-                          </div>
-                        )}
+                        <div className="flex items-center gap-1 shrink-0">
+                          <button
+                            type="button"
+                            onClick={() => toast({ title: "Conversa aberta", description: `Chat com ${approver}` })}
+                            className="w-7 h-7 rounded-md inline-flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                            title={`Chat com ${approver}`}
+                          >
+                            <MessageSquare className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => toast({ title: "Email", description: `Compor email para ${approver}` })}
+                            className="w-7 h-7 rounded-md inline-flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                            title={`Email a ${approver}`}
+                          >
+                            <Mail className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
                       </div>
                     </div>
                     <Separator />
