@@ -90,25 +90,6 @@ export default function DisciplineDetail() {
           </div>
         </div>
 
-        {/* Contact actions strip */}
-        <div className="px-5 py-2.5 border-b border-border bg-muted/20 flex items-center justify-between gap-3">
-          <p className="text-[11px] text-muted-foreground">
-            <span className="text-[9px] uppercase tracking-[0.14em] font-semibold mr-2">Regente</span>
-            Contacte o professor para esclarecimentos
-          </p>
-          <div className="flex items-center gap-1.5 shrink-0">
-            <Link to="/student/chat">
-              <Button variant="outline" size="sm" className="h-7 px-2.5 text-[11px] gap-1.5 font-medium">
-                <MessageSquare className="w-3 h-3" /> Chat
-              </Button>
-            </Link>
-            <Link to="/student/email">
-              <Button variant="outline" size="sm" className="h-7 px-2.5 text-[11px] gap-1.5 font-medium">
-                <Mail className="w-3 h-3" /> Email
-              </Button>
-            </Link>
-          </div>
-        </div>
 
         {/* KPIs */}
         <div className="px-5 py-4 grid grid-cols-2 lg:grid-cols-5 gap-4">
