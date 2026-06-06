@@ -628,12 +628,11 @@ function ActiveQuizView({ quiz, onExit }: { quiz: AnyQuiz; onExit: () => void })
 /** Unified progress strip used by every game type. */
 /** Clean cockpit strip used by every active game. */
 function ProgressStrip({
-  quiz, position, total, score, time,
+  quiz, position, total, time,
 }: {
   quiz: AnyQuiz;
   position: number;
   total: number;
-  score?: number;
   time?: number;
 }) {
   const { meta } = accent(quiz);
@@ -647,20 +646,12 @@ function ProgressStrip({
             <span className="text-muted-foreground/60 font-normal"> / {total}</span>
           </>
         } />
-        <div className="flex items-end gap-7">
-          {score !== undefined && (
-            <StripStat
-              label="Acertos"
-              value={<span className="text-emerald-600">{score}</span>}
-            />
-          )}
-          {time !== undefined && (
-            <StripStat
-              label="Tempo"
-              value={<span className="font-mono tracking-tight text-foreground">{fmtTime(time)}</span>}
-            />
-          )}
-        </div>
+        {time !== undefined && (
+          <StripStat
+            label="Tempo"
+            value={<span className="font-mono tracking-tight text-foreground">{fmtTime(time)}</span>}
+          />
+        )}
       </div>
       <div className="relative h-1 rounded-full bg-muted overflow-hidden">
         <div
