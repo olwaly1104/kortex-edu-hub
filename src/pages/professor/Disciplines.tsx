@@ -182,35 +182,6 @@ export default function ProfessorDisciplines() {
                     </div>
                   </div>
 
-                  {/* Activity */}
-                  <div className="space-y-2.5 mb-3 pb-3 border-b border-border/50">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-muted-foreground flex items-center gap-1.5">
-                        <ClipboardList className="w-3.5 h-3.5 text-primary" /> Tarefas
-                      </span>
-                      <span className="font-semibold text-foreground">{turmaTasks.filter(t => t.type === "tarefa" || t.type === "quiz").filter(t => t.status === "encerrada").length}/{turmaTasks.filter(t => t.type === "tarefa" || t.type === "quiz").length}</span>
-                    </div>
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-muted-foreground flex items-center gap-1.5">
-                        <UserCheck className="w-3.5 h-3.5 text-secondary" /> Taxa de Entrega
-                      </span>
-                      <span className={`font-semibold ${(() => { const totalSub = turmaTasks.reduce((s, t) => s + t.submissions, 0); const totalStu = turmaTasks.reduce((s, t) => s + t.totalStudents, 0); return totalStu > 0 ? Math.round((totalSub / totalStu) * 100) : 0; })() >= 80 ? "text-accent" : "text-destructive"}`}>
-                        {(() => { const totalSub = turmaTasks.reduce((s, t) => s + t.submissions, 0); const totalStu = turmaTasks.reduce((s, t) => s + t.totalStudents, 0); return totalStu > 0 ? Math.round((totalSub / totalStu) * 100) : 0; })()}%
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-muted-foreground flex items-center gap-1.5">
-                        <BarChart3 className="w-3.5 h-3.5 text-secondary" /> Avaliações
-                      </span>
-                      <span className="font-semibold text-foreground">{turmaTasks.filter(t => t.type === "exame").filter(t => t.status === "encerrada").length}/{turmaTasks.filter(t => t.type === "exame").length}</span>
-                    </div>
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-muted-foreground flex items-center gap-1.5">
-                        <CheckCircle className="w-3.5 h-3.5 text-secondary" /> Taxa de Conclusão
-                      </span>
-                      <span className="font-semibold text-foreground">{turmaConclusaoPct}%</span>
-                    </div>
-                  </div>
 
                   {/* Resources */}
                   <div className="space-y-2.5">
