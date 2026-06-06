@@ -321,12 +321,15 @@ export default function StudentQuizzes() {
 
       <div className="grid lg:grid-cols-[260px_1fr] gap-6">
         {/* Sidebar filters */}
-        <aside className="space-y-5">
+        <aside className="lg:sticky lg:top-4 lg:self-start space-y-4 rounded-xl border border-border bg-card p-3">
           <div>
-            <p className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground mb-2 flex items-center gap-1.5">
-              <Filter className="w-3 h-3" /> Tipologia
-            </p>
-            <div className="space-y-1">
+            <div className="flex items-center justify-between px-1.5 mb-2">
+              <p className="text-[10px] uppercase tracking-[0.08em] font-bold text-muted-foreground flex items-center gap-1.5">
+                <Filter className="w-3 h-3" /> Tipologia
+              </p>
+              <span className="text-[10px] text-muted-foreground tabular-nums">{typeCounts.all}</span>
+            </div>
+            <div className="space-y-0.5">
               <FilterRow active={typeFilter === "all"} onClick={() => setTypeFilter("all")} icon={Sparkles} label="Todos os tipos" count={typeCounts.all} />
               {(Object.keys(TYPE_META) as QuizType[]).map(t => (
                 <FilterRow
@@ -343,18 +346,20 @@ export default function StudentQuizzes() {
             </div>
           </div>
 
-          <div>
-            <p className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground mb-2 flex items-center gap-1.5">
-              <BookOpen className="w-3 h-3" /> Cadeira
-            </p>
-            <div className="space-y-1">
+          <div className="border-t border-border pt-3">
+            <div className="flex items-center justify-between px-1.5 mb-2">
+              <p className="text-[10px] uppercase tracking-[0.08em] font-bold text-muted-foreground flex items-center gap-1.5">
+                <BookOpen className="w-3 h-3" /> Cadeira
+              </p>
+              <span className="text-[10px] text-muted-foreground tabular-nums">{cadeiras.length}</span>
+            </div>
+            <div className="space-y-0.5">
               <FilterRow active={cadeiraFilter === "all"} onClick={() => setCadeiraFilter("all")} icon={BookOpen} label="Todas as cadeiras" count={QUIZZES.length} />
               {cadeiras.map(c => (
                 <FilterRow
                   key={c}
                   active={cadeiraFilter === c}
                   onClick={() => setCadeiraFilter(c)}
-                  icon={BookOpen}
                   label={c}
                   count={QUIZZES.filter(q => q.cadeira === c).length}
                   dot={cadeiraColor(c).dot}
@@ -363,6 +368,7 @@ export default function StudentQuizzes() {
             </div>
           </div>
         </aside>
+
 
         {/* Main list */}
         <main className="space-y-3">
