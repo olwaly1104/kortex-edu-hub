@@ -19,10 +19,6 @@ export default function ProfessorDisciplines() {
   const overallAttendance = allStudentsUnique.length > 0
     ? Math.round(allStudentsUnique.reduce((s, st) => s + st.attendance, 0) / allStudentsUnique.length)
     : 0;
-  const totalTarefas = profTasks.filter(t => t.type === "tarefa" || t.type === "quiz").length;
-  const totalTarefasEncerradas = profTasks.filter(t => t.type === "tarefa" || t.type === "quiz").filter(t => t.status === "encerrada").length;
-  const totalAvaliacoes = profTasks.filter(t => t.type === "exame").length;
-  const totalAvaliacoesEncerradas = profTasks.filter(t => t.type === "exame").filter(t => t.status === "encerrada").length;
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
