@@ -82,19 +82,127 @@ export default function Orcamentos() {
         ))}
       </div>
 
-      {/* Global utilization bar */}
-      <Card className="p-4 border-border/70">
-        <div className="flex items-center justify-between mb-2">
+      {/* Global utilization — visual */}
+      <Card className="p-5 border-border/70 overflow-hidden">
+        <div className="flex items-start justify-between gap-4 flex-wrap mb-4">
           <div>
-            <p className="text-xs font-semibold text-foreground">Utilização global</p>
-            <p className="text-[11px] text-muted-foreground tabular-nums">
-              {formatCurrency(totalSpent)} de {formatCurrency(totalBudget)} · {numActivos} orçamentos activos
+            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Utilização global</p>
+            <p className="text-xs text-muted-foreground mt-1 tabular-nums">
+              {numActivos} orçamentos activos · período 2025
             </p>
           </div>
-          <p className={cn("text-2xl font-bold tabular-nums", usageColor(pctUsed))}>{pctUsed}%</p>
+          <div className="text-right">
+            <p className={cn("text-4xl font-bold tabular-nums leading-none", usageColor(pctUsed))}>{pctUsed}<span className="text-xl">%</span></p>
+            <p className="text-[10px] text-muted-foreground uppercase tracking-wider mt-1">do orçamento total</p>
+          </div>
         </div>
-        <Progress value={pctUsed} className={cn("h-2", usageBar(pctUsed))} />
+
+        {/* Segmented stacked bar */}
+        <div className="relative h-3 w-full rounded-full bg-muted overflow-hidden flex">
+          <div className={cn("h-full transition-all", pctUsed >= 90 ? "bg-destructive" : pctUsed >= 75 ? "bg-amber-500" : "bg-accent")} style={{ width: `${pctUsed}%` }} />
+          <div className="h-full bg-primary/10 flex-1" />
+        </div>
+
+        {/* Legend tiles */}
+        <div className="grid grid-cols-3 gap-3 mt-4">
+          <div className="rounded-lg border border-border/70 p-3">
+            <div className="flex items-center gap-1.5 mb-1">
+              <span className="w-2 h-2 rounded-full bg-foreground" />
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Orçamentado</p>
+            </div>
+            <p className="text-sm font-bold text-foreground tabular-nums">{formatCurrency(totalBudget)}</p>
+          </div>
+          <div className="rounded-lg border border-border/70 p-3">
+            <div className="flex items-center gap-1.5 mb-1">
+              <span className={cn("w-2 h-2 rounded-full", pctUsed >= 90 ? "bg-destructive" : pctUsed >= 75 ? "bg-amber-500" : "bg-accent")} />
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Gasto</p>
+            </div>
+            <p className={cn("text-sm font-bold tabular-nums", usageColor(pctUsed))}>{formatCurrency(totalSpent)}</p>
+          </div>
+          <div className="rounded-lg border border-border/70 p-3">
+            <div className="flex items-center gap-1.5 mb-1">
+              <span className="w-2 h-2 rounded-full bg-primary/30" />
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Disponível</p>
+            </div>
+            <p className="text-sm font-bold text-foreground tabular-nums">{formatCurrency(available)}</p>
+          </div>
+        </div>
       </Card>
+
+      {/* Infographics: por categoria + por faculdade */}
+      <div className="grid gap-3 lg:grid-cols-2">
+        <Card className="p-5 border-border/70">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <p className="text-sm font-semibold text-foreground">Orçamento por categoria</p>
+              <p className="text-[11px] text-muted-foreground mt-0.5">Distribuição e utilização</p>
+            </div>
+            <ArrowUpRight className="w-4 h-4 text-muted-foreground" />
+          </div>
+          <div className="space-y-3.5">
+            {categoryBreakdown.map(c => {
+              const pct = Math.round((c.spent / c.budget) * 100);
+              const share = Math.round((c.budget / totalBudget) * 100);
+              return (
+                <div key={c.label}>
+                  <div className="flex items-center justify-between mb-1.5 gap-2">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className={cn("w-2.5 h-2.5 rounded-sm shrink-0", c.swatch)} />
+                      <p className="text-xs font-medium text-foreground truncate">{c.label}</p>
+                      <span className="text-[10px] text-muted-foreground tabular-nums">{share}%</span>
+                    </div>
+                    <span className={cn("text-[11px] font-semibold tabular-nums shrink-0", usageColor(pct))}>{pct}%</span>
+                  </div>
+                  <div className="relative h-1.5 w-full rounded-full bg-muted overflow-hidden">
+                    <div className={cn("h-full rounded-full", pct >= 90 ? "bg-destructive" : pct >= 75 ? "bg-amber-500" : "bg-accent")} style={{ width: `${pct}%` }} />
+                  </div>
+                  <p className="text-[10px] text-muted-foreground tabular-nums mt-1">{formatCurrency(c.spent)} de {formatCurrency(c.budget)}</p>
+                </div>
+              );
+            })}
+          </div>
+        </Card>
+
+        <Card className="p-5 border-border/70">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <p className="text-sm font-semibold text-foreground">Orçamento por faculdade</p>
+              <p className="text-[11px] text-muted-foreground mt-0.5">Comparativo gasto vs. orçamento</p>
+            </div>
+            <ArrowUpRight className="w-4 h-4 text-muted-foreground" />
+          </div>
+          <div className="space-y-4">
+            {faculdadeBreakdown.map(f => {
+              const pct = Math.round((f.spent / f.budget) * 100);
+              const widthBudget = (f.budget / maxFacBudget) * 100;
+              const widthSpent = (f.spent / maxFacBudget) * 100;
+              return (
+                <div key={f.label}>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <p className="text-xs font-medium text-foreground truncate">{f.label}</p>
+                    <span className={cn("text-[11px] font-semibold tabular-nums", usageColor(pct))}>{pct}%</span>
+                  </div>
+                  <div className="relative h-6 w-full rounded-md bg-muted/60 overflow-hidden">
+                    <div className="absolute inset-y-0 left-0 bg-primary/15" style={{ width: `${widthBudget}%` }} />
+                    <div className={cn("absolute inset-y-0 left-0", pct >= 90 ? "bg-destructive" : pct >= 75 ? "bg-amber-500" : "bg-primary")} style={{ width: `${widthSpent}%` }} />
+                  </div>
+                  <p className="text-[10px] text-muted-foreground tabular-nums mt-1">{formatCurrency(f.spent)} de {formatCurrency(f.budget)}</p>
+                </div>
+              );
+            })}
+          </div>
+          <div className="flex items-center gap-4 mt-4 pt-3 border-t border-border">
+            <div className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-sm bg-primary" />
+              <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Gasto</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-sm bg-primary/15" />
+              <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Orçamento</span>
+            </div>
+          </div>
+        </Card>
+      </div>
 
       {/* Controls */}
       <div className="rounded-xl border border-border bg-card p-3 flex gap-2 items-center flex-wrap">
