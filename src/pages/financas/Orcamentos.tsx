@@ -160,10 +160,10 @@ export default function Orcamentos() {
 
       {/* Utilização global */}
       <Card className="p-5 border-border/70">
-        <div className="flex items-end justify-between gap-4 mb-4">
+        <div className="flex items-end justify-between gap-4 mb-5">
           <div>
             <p className="text-sm font-semibold text-foreground">Utilização global do orçamento</p>
-            <p className="text-[11px] text-muted-foreground mt-0.5">{formatCurrency(totalSpent)} de {formatCurrency(totalBudget)} executados</p>
+            <p className="text-[11px] text-muted-foreground mt-0.5">{orcamentos.length} orçamentos · {numAlerta} em alerta</p>
           </div>
           <div className="flex items-baseline gap-0.5 shrink-0">
             <p className={cn("text-4xl font-bold tabular-nums leading-none", usageColor(pctUsed))}>{pctUsed}</p>
@@ -171,9 +171,9 @@ export default function Orcamentos() {
           </div>
         </div>
 
-        {/* Progress bar with thresholds */}
+        {/* Modern bar with threshold markers */}
         <div className="relative">
-          <div className="relative h-3 w-full rounded-full bg-muted overflow-hidden">
+          <div className="relative h-2 w-full rounded-full bg-muted/70 overflow-hidden">
             <div
               className={cn(
                 "h-full rounded-full transition-all",
@@ -181,24 +181,15 @@ export default function Orcamentos() {
               )}
               style={{ width: `${Math.min(pctUsed, 100)}%` }}
             />
-            <div className="absolute top-0 h-3 w-px bg-background/80" style={{ left: "75%" }} />
-            <div className="absolute top-0 h-3 w-px bg-background/80" style={{ left: "90%" }} />
           </div>
-          <div className="relative mt-1.5 h-3 text-[9px] text-muted-foreground tabular-nums">
-            {[0, 25, 50, 75, 90, 100].map(m => (
-              <span key={m} className="absolute -translate-x-1/2" style={{ left: `${m}%` }}>{m}%</span>
-            ))}
+          <div className="absolute top-1/2 -translate-y-1/2 w-0.5 h-3.5 bg-background ring-1 ring-amber-500/60 rounded-sm" style={{ left: "75%" }} />
+          <div className="absolute top-1/2 -translate-y-1/2 w-0.5 h-3.5 bg-background ring-1 ring-destructive/60 rounded-sm" style={{ left: "90%" }} />
+          <div className="relative mt-2 h-3 text-[9px] text-muted-foreground tabular-nums">
+            <span className="absolute left-0">0%</span>
+            <span className="absolute -translate-x-1/2 font-medium text-amber-600" style={{ left: "75%" }}>75%</span>
+            <span className="absolute -translate-x-1/2 font-medium text-destructive" style={{ left: "90%" }}>90%</span>
+            <span className="absolute right-0">100%</span>
           </div>
-        </div>
-
-        {/* Footer summary */}
-        <div className="flex items-center justify-between gap-3 mt-5 pt-3 border-t border-border/70 text-[11px] tabular-nums">
-          <div className="flex items-center gap-4 text-muted-foreground">
-            <span><span className={cn("font-semibold", usageColor(pctUsed))}>{formatCurrency(totalSpent)}</span> gasto</span>
-            <span className="text-border">·</span>
-            <span><span className="font-semibold text-foreground">{formatCurrency(available)}</span> disponível</span>
-          </div>
-          <p className="text-muted-foreground">{orcamentos.length} orçamentos · {numAlerta} em alerta</p>
         </div>
       </Card>
 
