@@ -221,14 +221,6 @@ const TYPE_META: Record<QuizType, {
     active: "bg-amber-50 text-amber-700 border-amber-200",
     dot:    "bg-amber-500",
   },
-  flash: {
-    label: "Flashcards", icon: Layers,
-    description: "Cartões de revisão rápida — frente e verso.",
-    tag:    "bg-emerald-50 text-emerald-700 border-emerald-200",
-    tile:   "bg-emerald-50 text-emerald-600 border-emerald-200",
-    active: "bg-emerald-50 text-emerald-700 border-emerald-200",
-    dot:    "bg-emerald-500",
-  },
   exam: {
     label: "Exame de Treino", icon: ClipboardCheck,
     description: "Simulação cronometrada com perguntas mistas.",
