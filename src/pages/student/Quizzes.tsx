@@ -438,8 +438,8 @@ function QuizRow({ quiz, onStart }: { quiz: AnyQuiz; onStart: () => void }) {
     <div className="flex items-stretch hover:bg-muted/20 transition-colors group">
       {/* Left rail — Cadeira (the dominant evidence) */}
       <div className={cn(
-        "w-[220px] shrink-0 hidden sm:flex flex-col justify-center px-5 py-4 border-r border-border",
-        meta.tile.replace("border-", "border-l-4 border-l-").split(" ").slice(0, 2).join(" "),
+        "w-[220px] shrink-0 hidden sm:flex flex-col justify-center px-5 py-4 border-r border-border border-l-4",
+        meta.tile,
       )}>
         <p className="text-[9px] uppercase tracking-[0.14em] font-bold text-muted-foreground mb-1">Cadeira</p>
         <p className="text-sm font-bold text-foreground leading-tight line-clamp-2">{quiz.cadeira}</p>
