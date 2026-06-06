@@ -532,7 +532,6 @@ export default function DespesaDetail() {
                   </div>
                 </div>
               )}
-              )}
             </div>
           </Card>
         </div>
