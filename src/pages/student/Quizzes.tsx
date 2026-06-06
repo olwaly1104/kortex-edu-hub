@@ -339,7 +339,7 @@ export default function StudentQuizzes() {
                   icon={TYPE_META[t].icon}
                   label={TYPE_META[t].label}
                   count={typeCounts[t]}
-                  dot={TYPE_META[t].dot}
+                  tag={TYPE_META[t].tile}
                   activeClasses={TYPE_META[t].active}
                 />
               ))}
