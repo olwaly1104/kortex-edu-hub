@@ -42,7 +42,7 @@ type AnyQuiz =
   | (Base & { type: "mcq";     items: MCQ[] })
   | (Base & { type: "written"; items: Written[] })
   | (Base & { type: "fill";    items: Fill[] })
-  | (Base & { type: "flash";   items: Flash[] })
+  
   | (Base & { type: "exam";    items: ExamQ[]; passingScore?: number });
 
 /* ------------------------------------------------------------------ */
