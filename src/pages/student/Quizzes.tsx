@@ -321,12 +321,15 @@ export default function StudentQuizzes() {
 
       <div className="grid lg:grid-cols-[260px_1fr] gap-6">
         {/* Sidebar filters */}
-        <aside className="space-y-5">
+        <aside className="lg:sticky lg:top-4 lg:self-start space-y-4 rounded-xl border border-border bg-card p-3">
           <div>
-            <p className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground mb-2 flex items-center gap-1.5">
-              <Filter className="w-3 h-3" /> Tipologia
-            </p>
-            <div className="space-y-1">
+            <div className="flex items-center justify-between px-1.5 mb-2">
+              <p className="text-[10px] uppercase tracking-[0.08em] font-bold text-muted-foreground flex items-center gap-1.5">
+                <Filter className="w-3 h-3" /> Tipologia
+              </p>
+              <span className="text-[10px] text-muted-foreground tabular-nums">{typeCounts.all}</span>
+            </div>
+            <div className="space-y-0.5">
               <FilterRow active={typeFilter === "all"} onClick={() => setTypeFilter("all")} icon={Sparkles} label="Todos os tipos" count={typeCounts.all} />
               {(Object.keys(TYPE_META) as QuizType[]).map(t => (
                 <FilterRow
@@ -343,18 +346,20 @@ export default function StudentQuizzes() {
             </div>
           </div>
 
-          <div>
-            <p className="text-[10px] uppercase tracking-wider font-bold text-muted-foreground mb-2 flex items-center gap-1.5">
-              <BookOpen className="w-3 h-3" /> Cadeira
-            </p>
-            <div className="space-y-1">
+          <div className="border-t border-border pt-3">
+            <div className="flex items-center justify-between px-1.5 mb-2">
+              <p className="text-[10px] uppercase tracking-[0.08em] font-bold text-muted-foreground flex items-center gap-1.5">
+                <BookOpen className="w-3 h-3" /> Cadeira
+              </p>
+              <span className="text-[10px] text-muted-foreground tabular-nums">{cadeiras.length}</span>
+            </div>
+            <div className="space-y-0.5">
               <FilterRow active={cadeiraFilter === "all"} onClick={() => setCadeiraFilter("all")} icon={BookOpen} label="Todas as cadeiras" count={QUIZZES.length} />
               {cadeiras.map(c => (
                 <FilterRow
                   key={c}
                   active={cadeiraFilter === c}
                   onClick={() => setCadeiraFilter(c)}
-                  icon={BookOpen}
                   label={c}
                   count={QUIZZES.filter(q => q.cadeira === c).length}
                   dot={cadeiraColor(c).dot}
@@ -363,6 +368,7 @@ export default function StudentQuizzes() {
             </div>
           </div>
         </aside>
+
 
         {/* Main list */}
         <main className="space-y-3">
@@ -430,20 +436,29 @@ function FilterRow({
     <button
       onClick={onClick}
       className={cn(
-        "w-full flex items-center gap-2 px-2.5 py-1.5 rounded-md text-sm transition-colors text-left border border-transparent",
+        "group relative w-full flex items-center gap-2.5 pl-3 pr-2 py-2 rounded-md text-[13px] transition-all text-left",
         active
           ? activeClasses
-            ? cn(activeClasses, "font-semibold")
-            : "bg-primary/10 text-primary border-primary/20 font-semibold"
-          : "text-foreground/80 hover:bg-muted hover:text-foreground"
+            ? cn(activeClasses, "font-semibold shadow-sm")
+            : "bg-primary/10 text-primary font-semibold shadow-sm"
+          : "text-foreground/75 hover:bg-muted hover:text-foreground hover:translate-x-0.5"
       )}
     >
-      {Icon && <Icon className="w-3.5 h-3.5 shrink-0" />}
-      {dot && <span className={cn("w-2 h-2 rounded-full shrink-0", dot)} />}
+      <span
+        className={cn(
+          "absolute left-0 top-1.5 bottom-1.5 w-0.5 rounded-r-full transition-all",
+          active ? "bg-current opacity-90" : "opacity-0"
+        )}
+      />
+      {dot ? (
+        <span className={cn("w-2.5 h-2.5 rounded-sm shrink-0 ring-1 ring-black/5", dot)} />
+      ) : Icon ? (
+        <Icon className={cn("w-3.5 h-3.5 shrink-0", active ? "" : "text-muted-foreground group-hover:text-foreground")} />
+      ) : null}
       <span className="flex-1 truncate">{label}</span>
       <span className={cn(
-        "text-[10px] font-bold px-1.5 py-0.5 rounded tabular-nums",
-        active ? "bg-white/70 text-current" : "bg-muted text-muted-foreground"
+        "text-[10px] font-semibold px-1.5 py-0.5 rounded tabular-nums min-w-[22px] text-center",
+        active ? "bg-white/70 text-current" : "bg-muted/70 text-muted-foreground group-hover:bg-background"
       )}>{count}</span>
     </button>
   );
