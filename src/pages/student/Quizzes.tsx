@@ -294,8 +294,10 @@ export default function StudentQuizzes() {
   const [typeFilter, setTypeFilter] = useState<"all" | QuizType>("all");
   const [cadeiraFilter, setCadeiraFilter] = useState<string>("all");
   const [search, setSearch] = useState("");
+  const [pendingId, setPendingId] = useState<string | null>(null);
 
   const active = useMemo(() => QUIZZES.find(q => q.id === activeId) ?? null, [activeId]);
+  const pending = useMemo(() => QUIZZES.find(q => q.id === pendingId) ?? null, [pendingId]);
 
   const cadeiras = useMemo(() => Array.from(new Set(QUIZZES.map(q => q.cadeira))).sort(), []);
 
