@@ -5,6 +5,10 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   Sparkles, CheckCircle2, XCircle, RotateCcw, ArrowRight, ArrowLeft,
   Brain, Pencil, Type, Layers, Trophy, Timer, Play, Search, Filter, BookOpen,
   ClipboardCheck, AlertTriangle, Flame, Zap, Gauge,
@@ -290,8 +294,10 @@ export default function StudentQuizzes() {
   const [typeFilter, setTypeFilter] = useState<"all" | QuizType>("all");
   const [cadeiraFilter, setCadeiraFilter] = useState<string>("all");
   const [search, setSearch] = useState("");
+  const [pendingId, setPendingId] = useState<string | null>(null);
 
   const active = useMemo(() => QUIZZES.find(q => q.id === activeId) ?? null, [activeId]);
+  const pending = useMemo(() => QUIZZES.find(q => q.id === pendingId) ?? null, [pendingId]);
 
   const cadeiras = useMemo(() => Array.from(new Set(QUIZZES.map(q => q.cadeira))).sort(), []);
 
@@ -415,11 +421,42 @@ export default function StudentQuizzes() {
                 Nenhuma actividade corresponde aos filtros aplicados.
               </div>
             ) : (
-              filtered.map(q => <QuizRow key={q.id} quiz={q} onStart={() => setActiveId(q.id)} />)
+              filtered.map(q => <QuizRow key={q.id} quiz={q} onStart={() => setPendingId(q.id)} />)
             )}
           </Card>
         </main>
       </div>
+
+      <AlertDialog open={!!pending} onOpenChange={(o) => { if (!o) setPendingId(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5 text-amber-500" />
+              Iniciar actividade?
+            </AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-3 pt-1">
+                <p className="text-sm text-foreground font-medium">{pending?.title}</p>
+                <div className="rounded-md border border-border bg-muted/40 p-3 text-xs space-y-1.5">
+                  <div className="flex justify-between"><span className="text-muted-foreground">Cadeira</span><span className="font-medium text-foreground">{pending?.cadeira}</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">Itens</span><span className="font-medium text-foreground tabular-nums">{pending?.items.length}</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">Duração</span><span className="font-medium text-foreground tabular-nums">{pending?.minutes} min</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">Dificuldade</span><span className="font-medium text-foreground">{pending?.difficulty}</span></div>
+                </div>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  Uma vez iniciada, só poderás sair depois de terminar. O cronómetro arranca de imediato.
+                </p>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={() => { if (pendingId) { setActiveId(pendingId); setPendingId(null); } }} className="gap-1.5">
+              <Play className="w-3.5 h-3.5" /> Confirmar e iniciar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
