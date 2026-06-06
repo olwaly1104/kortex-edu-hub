@@ -348,12 +348,13 @@ export default function StudentQuizzes() {
               <BookOpen className="w-3 h-3" /> Cadeira
             </p>
             <div className="space-y-1">
-              <FilterRow active={cadeiraFilter === "all"} onClick={() => setCadeiraFilter("all")} label="Todas as cadeiras" count={QUIZZES.length} />
+              <FilterRow active={cadeiraFilter === "all"} onClick={() => setCadeiraFilter("all")} icon={BookOpen} label="Todas as cadeiras" count={QUIZZES.length} />
               {cadeiras.map(c => (
                 <FilterRow
                   key={c}
                   active={cadeiraFilter === c}
                   onClick={() => setCadeiraFilter(c)}
+                  icon={BookOpen}
                   label={c}
                   count={QUIZZES.filter(q => q.cadeira === c).length}
                   dot={cadeiraColor(c).dot}
@@ -437,9 +438,8 @@ function FilterRow({
           : "text-foreground/80 hover:bg-muted hover:text-foreground"
       )}
     >
-      {dot
-        ? <span className={cn("w-2 h-2 rounded-full shrink-0", dot)} />
-        : Icon && <Icon className="w-3.5 h-3.5 shrink-0" />}
+      {Icon && <Icon className="w-3.5 h-3.5 shrink-0" />}
+      {dot && <span className={cn("w-2 h-2 rounded-full shrink-0", dot)} />}
       <span className="flex-1 truncate">{label}</span>
       <span className={cn(
         "text-[10px] font-bold px-1.5 py-0.5 rounded tabular-nums",
@@ -456,17 +456,16 @@ function QuizRow({ quiz, onStart }: { quiz: AnyQuiz; onStart: () => void }) {
   return (
     <div className="group flex items-center gap-4 px-5 py-3.5 hover:bg-muted/30 transition-colors">
       <div className="flex-1 min-w-0">
-        {/* Meta bar — cadeira tag + categoria together */}
+        {/* Meta bar — categoria first, then cadeira */}
         <div className="flex items-center gap-1.5 mb-1.5 flex-wrap">
-          <span className={cn("inline-flex items-center gap-1.5 text-[10px] font-semibold px-2 py-0.5 rounded-md border", cad.tag)}>
-            <span className={cn("w-1.5 h-1.5 rounded-full", cad.dot)} />
-            {quiz.cadeira}
-          </span>
           <span className={cn("inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-md border", meta.tag)}>
             <Icon className="w-2.5 h-2.5" />
             {meta.label}
           </span>
-          
+          <span className={cn("inline-flex items-center gap-1.5 text-[10px] font-semibold px-2 py-0.5 rounded-md border", cad.tag)}>
+            <span className={cn("w-1.5 h-1.5 rounded-full", cad.dot)} />
+            {quiz.cadeira}
+          </span>
         </div>
         <h3 className="text-sm font-semibold text-foreground leading-tight truncate">{quiz.title}</h3>
         <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-1">{quiz.description}</p>
