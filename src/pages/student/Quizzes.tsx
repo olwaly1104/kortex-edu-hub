@@ -500,11 +500,14 @@ function QuizRow({ quiz, onStart }: { quiz: AnyQuiz; onStart: () => void }) {
       </div>
 
       <div className="flex-1 min-w-0">
-        {/* Meta bar — cadeira only */}
+        {/* Meta bar — cadeira + duração */}
         <div className="flex items-center gap-1.5 mb-1.5 flex-wrap">
           <span className={cn("inline-flex items-center gap-1.5 text-[10px] font-semibold px-2 py-0.5 rounded-md border", cad.tag)}>
             <span className={cn("w-1.5 h-1.5 rounded-full", cad.dot)} />
             {quiz.cadeira}
+          </span>
+          <span className="inline-flex items-center gap-1.5 text-[10px] font-medium text-muted-foreground px-2 py-0.5 rounded-md border border-border bg-muted/40">
+            <Timer className="w-3 h-3" /> {quiz.minutes} min
           </span>
         </div>
         <h3 className="text-sm font-semibold text-foreground leading-tight truncate">{quiz.title}</h3>
