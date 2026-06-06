@@ -455,18 +455,17 @@ function QuizRow({ quiz, onStart }: { quiz: AnyQuiz; onStart: () => void }) {
   const cad = cadeiraColor(quiz.cadeira);
   return (
     <div className="group flex items-center gap-4 px-5 py-3.5 hover:bg-muted/30 transition-colors">
-      {/* Large category icon tile */}
-      <div className={cn("shrink-0 w-12 h-12 rounded-lg border flex items-center justify-center", meta.tile)}>
-        <Icon className="w-6 h-6" />
+      {/* Large category icon tile + label */}
+      <div className="shrink-0 flex flex-col items-center gap-1 w-14">
+        <div className={cn("w-12 h-12 rounded-lg border flex items-center justify-center", meta.tile)}>
+          <Icon className="w-6 h-6" />
+        </div>
+        <span className="text-[9px] font-semibold text-foreground/80 text-center leading-tight">{meta.label}</span>
       </div>
 
       <div className="flex-1 min-w-0">
-        {/* Meta bar — categoria first, then cadeira */}
+        {/* Meta bar — cadeira only */}
         <div className="flex items-center gap-1.5 mb-1.5 flex-wrap">
-          <span className={cn("inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-md border", meta.tag)}>
-            <Icon className="w-2.5 h-2.5" />
-            {meta.label}
-          </span>
           <span className={cn("inline-flex items-center gap-1.5 text-[10px] font-semibold px-2 py-0.5 rounded-md border", cad.tag)}>
             <span className={cn("w-1.5 h-1.5 rounded-full", cad.dot)} />
             {quiz.cadeira}
