@@ -285,6 +285,22 @@ function cadeiraColor(name: string) {
   return CADEIRA_PALETTE[h % CADEIRA_PALETTE.length];
 }
 
+/** Deterministic mock for per-quiz Nota Geral (12.0–18.5) and Tentativas (1–6). */
+function quizStats(id: string): { nota: number; attempts: number } {
+  let h = 0;
+  for (let i = 0; i < id.length; i++) h = (h * 33 + id.charCodeAt(i)) >>> 0;
+  const nota = Math.round((12 + (h % 65) / 10) * 10) / 10; // 12.0 .. 18.4
+  const attempts = (h % 6) + 1;
+  return { nota, attempts };
+}
+
+function notaColor(n: number) {
+  if (n >= 16) return { text: "text-emerald-700", bg: "bg-emerald-50", border: "border-emerald-200", dot: "bg-emerald-500" };
+  if (n >= 12) return { text: "text-amber-700",   bg: "bg-amber-50",   border: "border-amber-200",   dot: "bg-amber-500"   };
+  return         { text: "text-rose-700",    bg: "bg-rose-50",    border: "border-rose-200",    dot: "bg-rose-500"    };
+}
+
+
 /* ------------------------------------------------------------------ */
 /*  Page                                                               */
 /* ------------------------------------------------------------------ */
@@ -300,6 +316,10 @@ export default function StudentQuizzes() {
   const pending = useMemo(() => QUIZZES.find(q => q.id === pendingId) ?? null, [pendingId]);
 
   const cadeiras = useMemo(() => Array.from(new Set(QUIZZES.map(q => q.cadeira))).sort(), []);
+  const notaGeral = useMemo(
+    () => QUIZZES.reduce((s, q) => s + quizStats(q.id).nota, 0) / Math.max(1, QUIZZES.length),
+    [],
+  );
 
   const filtered = useMemo(() => QUIZZES.filter(q => {
     if (typeFilter !== "all" && q.type !== typeFilter) return false;
@@ -329,12 +349,12 @@ export default function StudentQuizzes() {
           <p className="text-[11px] uppercase tracking-[0.18em] font-semibold text-primary mb-1.5">UPRA · Arquitectura</p>
           <h1 className="text-3xl font-bold text-foreground tracking-tight">Centro de Estudo</h1>
           <p className="text-sm text-muted-foreground mt-1.5 max-w-2xl">
-            Treino dirigido às cadeiras do Curso de Arquitectura. Escolhe a tipologia, a cadeira e o exercício — cada actividade tem duração estimada e nível de dificuldade.
+            Treino dirigido às cadeiras do Curso de Arquitectura. Escolhe a tipologia, a cadeira e o exercício — cada pergunta tem duração estimada e nível de dificuldade.
           </p>
         </div>
-        <div className="grid grid-cols-2 gap-3 min-w-[220px]">
-          <KpiStat label="Actividades" value={total} />
+        <div className="grid grid-cols-2 gap-3 min-w-[260px]">
           <KpiStat label="Cadeiras" value={cadeiras.length} />
+          <KpiStat label="Nota Geral" value={notaGeral.toFixed(1)} accent={notaColor(notaGeral).text} />
         </div>
       </div>
 
@@ -405,7 +425,7 @@ export default function StudentQuizzes() {
               />
             </div>
             <p className="text-xs text-muted-foreground">
-              {filtered.length} {filtered.length === 1 ? "actividade" : "actividades"}
+              {filtered.length} {filtered.length === 1 ? "pergunta" : "perguntas"}
               {(typeFilter !== "all" || cadeiraFilter !== "all" || search) && (
                 <button
                   onClick={() => { setTypeFilter("all"); setCadeiraFilter("all"); setSearch(""); }}
@@ -418,7 +438,7 @@ export default function StudentQuizzes() {
           <Card className="divide-y divide-border overflow-hidden">
             {filtered.length === 0 ? (
               <div className="p-12 text-center text-sm text-muted-foreground">
-                Nenhuma actividade corresponde aos filtros aplicados.
+                Nenhuma pergunta corresponde aos filtros aplicados.
               </div>
             ) : (
               filtered.map(q => <QuizRow key={q.id} quiz={q} onStart={() => setPendingId(q.id)} />)
@@ -432,7 +452,7 @@ export default function StudentQuizzes() {
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
               <AlertTriangle className="w-5 h-5 text-amber-500" />
-              Iniciar actividade?
+              Iniciar pergunta?
             </AlertDialogTitle>
             <AlertDialogDescription asChild>
               <div className="space-y-3 pt-1">
@@ -442,6 +462,12 @@ export default function StudentQuizzes() {
                   <div className="flex justify-between"><span className="text-muted-foreground">Itens</span><span className="font-medium text-foreground tabular-nums">{pending?.items.length}</span></div>
                   <div className="flex justify-between"><span className="text-muted-foreground">Duração</span><span className="font-medium text-foreground tabular-nums">{pending?.minutes} min</span></div>
                   <div className="flex justify-between"><span className="text-muted-foreground">Dificuldade</span><span className="font-medium text-foreground">{pending?.difficulty}</span></div>
+                  {pending && (
+                    <>
+                      <div className="flex justify-between border-t border-border pt-1.5"><span className="text-muted-foreground">Tentativas anteriores</span><span className="font-medium text-foreground tabular-nums">{quizStats(pending.id).attempts}</span></div>
+                      <div className="flex justify-between"><span className="text-muted-foreground">Nota Geral</span><span className={cn("font-bold tabular-nums", notaColor(quizStats(pending.id).nota).text)}>{quizStats(pending.id).nota.toFixed(1)} / 20</span></div>
+                    </>
+                  )}
                 </div>
                 <p className="text-xs text-muted-foreground leading-relaxed">
                   Uma vez iniciada, só poderás sair depois de terminar. O cronómetro arranca de imediato.
@@ -465,10 +491,10 @@ export default function StudentQuizzes() {
 /*  Subcomponents — menu                                               */
 /* ------------------------------------------------------------------ */
 
-function KpiStat({ label, value }: { label: string; value: number }) {
+function KpiStat({ label, value, accent }: { label: string; value: React.ReactNode; accent?: string }) {
   return (
     <div className="rounded-lg border border-border bg-card px-3 py-2 text-center">
-      <p className="text-xl font-bold text-foreground leading-tight">{value}</p>
+      <p className={cn("text-xl font-bold leading-tight tabular-nums", accent ?? "text-foreground")}>{value}</p>
       <p className="text-[10px] uppercase tracking-wider text-muted-foreground mt-0.5">{label}</p>
     </div>
   );
@@ -526,6 +552,8 @@ function QuizRow({ quiz, onStart }: { quiz: AnyQuiz; onStart: () => void }) {
   const meta = TYPE_META[quiz.type];
   const Icon = meta.icon;
   const cad = cadeiraColor(quiz.cadeira);
+  const stats = quizStats(quiz.id);
+  const nc = notaColor(stats.nota);
   return (
     <button
       type="button"
@@ -555,8 +583,12 @@ function QuizRow({ quiz, onStart }: { quiz: AnyQuiz; onStart: () => void }) {
         <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-1">{quiz.description}</p>
       </div>
 
-      <div className="hidden md:flex items-center shrink-0 pr-2">
+      <div className="hidden md:flex flex-col items-end gap-1 shrink-0 pr-2">
         <DiffPill d={quiz.difficulty} />
+        <span className={cn("inline-flex items-center gap-1.5 text-[10px] font-bold px-2 py-0.5 rounded-md border tabular-nums", nc.bg, nc.text, nc.border)}>
+          <span className={cn("w-1.5 h-1.5 rounded-full", nc.dot)} />
+          Nota {stats.nota.toFixed(1)}
+        </span>
       </div>
 
       <span className="inline-flex items-center gap-1.5 shrink-0 h-8 px-3 rounded-md border border-input bg-background text-xs font-medium group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-colors">
@@ -693,12 +725,22 @@ function ProgressStrip({
             <span className="text-muted-foreground/60 font-normal"> / {total}</span>
           </>
         } />
-        {time !== undefined && (
-          <StripStat
-            label="Tempo"
-            value={<span className="font-mono tracking-tight text-foreground">{fmtTime(time)}</span>}
-          />
-        )}
+        {time !== undefined && (() => {
+          const limit = quiz.minutes * 60;
+          const remaining = Math.max(0, limit - time);
+          const danger = remaining <= 30;
+          return (
+            <StripStat
+              label="Tempo"
+              value={
+                <span className="font-mono tracking-tight">
+                  <span className={cn(danger ? "text-rose-600" : "text-foreground")}>{fmtTime(time)}</span>
+                  <span className="text-muted-foreground/60 font-normal"> / {fmtTime(limit)}</span>
+                </span>
+              }
+            />
+          );
+        })()}
       </div>
       <div className="relative h-1 rounded-full bg-muted overflow-hidden">
         <div
