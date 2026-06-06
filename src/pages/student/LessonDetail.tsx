@@ -3,7 +3,7 @@ import { lessons, disciplines } from "@/data/mockData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Video, Clock, Calendar, User, FileText, ClipboardList, Users, Play, Download, Eye, CheckCircle, AlertCircle, Monitor, MapPin, Mail, MessageSquare, Upload, Maximize2, Minimize2, BookOpen, Loader2 } from "lucide-react";
+import { ArrowLeft, Video, Clock, Calendar, User, FileText, ClipboardList, Users, Play, Download, Eye, CheckCircle, AlertCircle, Monitor, MapPin, Mail, MessageSquare, Upload, Maximize2, Minimize2, BookOpen, Loader2, Brain, HelpCircle, Trophy, ChevronRight, Timer, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useMemo } from "react";
 
@@ -122,20 +122,25 @@ export default function LessonDetail() {
       <Tabs defaultValue="transcript" className="space-y-5">
         <div className="border-b">
           <TabsList className="bg-transparent h-auto p-0 gap-0">
-            {[
-              { value: "transcript", label: "Transcrição" },
-              { value: "content", label: `Conteúdos (${lesson.materials.length})` },
-              { value: "participants", label: `Participantes (${lesson.participants.length})` },
-              { value: "tasks", label: `Tarefas (${lesson.tasks.length})` },
-            ].map(tab => (
-              <TabsTrigger
-                key={tab.value}
-                value={tab.value}
-                className="rounded-none border-b-2 border-transparent data-[state=active]:border-current data-[state=active]:shadow-none data-[state=active]:bg-transparent px-4 py-3 text-sm"
-              >
-                {tab.label}
-              </TabsTrigger>
-            ))}
+            {(() => {
+              const quizzes = generateLessonQuizzes(lesson.id, lesson.title, lessonStatus);
+              const tabs = [
+                { value: "transcript", label: "Transcrição" },
+                { value: "content", label: `Conteúdos (${lesson.materials.length})` },
+                { value: "quizzes", label: `Quizzes (${quizzes.length})` },
+                { value: "participants", label: `Participantes (${lesson.participants.length})` },
+                { value: "tasks", label: `Tarefas (${lesson.tasks.length})` },
+              ];
+              return tabs.map(tab => (
+                <TabsTrigger
+                  key={tab.value}
+                  value={tab.value}
+                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-current data-[state=active]:shadow-none data-[state=active]:bg-transparent px-4 py-3 text-sm"
+                >
+                  {tab.label}
+                </TabsTrigger>
+              ));
+            })()}
           </TabsList>
         </div>
 
@@ -184,6 +189,105 @@ export default function LessonDetail() {
               <p className="text-sm text-muted-foreground">Nenhum conteúdo associado a esta aula.</p>
             </Card>
           )}
+        </TabsContent>
+
+        <TabsContent value="quizzes" className="space-y-3">
+          {(() => {
+            const quizzes = generateLessonQuizzes(lesson.id, lesson.title, lessonStatus);
+            if (quizzes.length === 0) {
+              return (
+                <Card className="p-8 text-center">
+                  <Brain className="w-10 h-10 text-muted-foreground/30 mx-auto mb-2" />
+                  <p className="text-sm text-muted-foreground">Nenhum quiz disponível para esta aula.</p>
+                </Card>
+              );
+            }
+            const completed = quizzes.filter(q => q.status === "concluido").length;
+            const avg = completed > 0
+              ? Math.round(quizzes.filter(q => q.status === "concluido").reduce((s, q) => s + (q.score || 0), 0) / completed)
+              : 0;
+            return (
+              <>
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="flex items-center gap-3 rounded-xl border border-border bg-card p-3">
+                    <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                      <Brain className="w-4 h-4 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-lg font-bold text-foreground">{quizzes.length}</p>
+                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Total</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 rounded-xl border border-border bg-card p-3">
+                    <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center">
+                      <CheckCircle className="w-4 h-4 text-accent" />
+                    </div>
+                    <div>
+                      <p className="text-lg font-bold text-foreground">{completed}/{quizzes.length}</p>
+                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Concluídos</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 rounded-xl border border-border bg-card p-3">
+                    <div className="w-8 h-8 rounded-lg bg-[hsl(38,92%,50%)]/10 flex items-center justify-center">
+                      <Trophy className="w-4 h-4 text-[hsl(38,92%,50%)]" />
+                    </div>
+                    <div>
+                      <p className="text-lg font-bold text-foreground">{completed > 0 ? `${avg}%` : "—"}</p>
+                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Média</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  {quizzes.map(q => {
+                    const cfg = q.status === "concluido"
+                      ? { label: "Concluído", icon: CheckCircle, color: "hsl(var(--accent))", bg: "hsl(var(--accent) / 0.1)" }
+                      : q.status === "expirado"
+                      ? { label: "Expirado", icon: XCircle, color: "hsl(var(--destructive))", bg: "hsl(var(--destructive) / 0.1)" }
+                      : { label: "Disponível", icon: HelpCircle, color: disc.color, bg: disc.color + "12" };
+                    const StatusIcon = cfg.icon;
+                    const passed = q.score !== undefined && q.score >= 50;
+                    return (
+                      <Card
+                        key={q.id}
+                        className="p-4 cursor-pointer hover:shadow-md transition-all border-l-[3px]"
+                        style={{ borderLeftColor: cfg.color }}
+                        onClick={() => navigate(`/student/quizzes`)}
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: cfg.bg }}>
+                            <Brain className="w-5 h-5" style={{ color: cfg.color }} />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-semibold text-foreground">{q.title}</p>
+                            <div className="flex items-center gap-3 mt-1.5 text-xs text-muted-foreground flex-wrap">
+                              <span className="inline-flex items-center gap-1"><HelpCircle className="w-3 h-3" /> {q.questions} perguntas</span>
+                              <span className="inline-flex items-center gap-1"><Timer className="w-3 h-3" /> {q.duration} min</span>
+                              <span className="inline-flex items-center gap-1"><Trophy className="w-3 h-3" /> {q.points} pts</span>
+                              {q.status === "concluido" && q.score !== undefined && (
+                                <span className={`font-semibold ${passed ? "text-accent" : "text-destructive"}`}>
+                                  Nota: {q.score}%
+                                </span>
+                              )}
+                              {q.status === "disponivel" && (
+                                <span>Prazo: {q.deadline}</span>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2 shrink-0">
+                            <Badge className="text-[10px] gap-1 border-0" style={{ background: cfg.bg, color: cfg.color }}>
+                              <StatusIcon className="w-3 h-3" /> {cfg.label}
+                            </Badge>
+                            <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                          </div>
+                        </div>
+                      </Card>
+                    );
+                  })}
+                </div>
+              </>
+            );
+          })()}
         </TabsContent>
 
         <TabsContent value="participants" className="space-y-4">
@@ -342,6 +446,43 @@ export default function LessonDetail() {
       </Tabs>
     </div>
   );
+}
+
+interface LessonQuiz {
+  id: string;
+  title: string;
+  questions: number;
+  duration: number;
+  points: number;
+  status: "disponivel" | "concluido" | "expirado";
+  score?: number;
+  deadline?: string;
+}
+
+function generateLessonQuizzes(lessonId: string, lessonTitle: string, lessonStatus: string): LessonQuiz[] {
+  // Seed based on lessonId for stable mock data
+  const seed = lessonId.split("").reduce((s, c) => s + c.charCodeAt(0), 0);
+  const count = lessonStatus === "agendada" ? 0 : (seed % 2) + 1;
+  const quizzes: LessonQuiz[] = [];
+  const titles = [
+    `Quiz introdutório: ${lessonTitle}`,
+    `Revisão de conceitos — ${lessonTitle}`,
+  ];
+  for (let i = 0; i < count; i++) {
+    const isCompleted = lessonStatus === "concluída" && (seed + i) % 3 !== 0;
+    const score = isCompleted ? 50 + ((seed + i * 7) % 50) : undefined;
+    quizzes.push({
+      id: `${lessonId}-q${i + 1}`,
+      title: titles[i] || `Quiz ${i + 1}`,
+      questions: 5 + ((seed + i) % 6),
+      duration: 10 + ((seed + i) % 11),
+      points: 10 + ((seed + i) % 16),
+      status: isCompleted ? "concluido" : "disponivel",
+      score,
+      deadline: !isCompleted ? "Até próxima aula" : undefined,
+    });
+  }
+  return quizzes;
 }
 
 function parseTranscript(transcript: string, professor: string): { speaker: string; text: string }[] {
