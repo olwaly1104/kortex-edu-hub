@@ -248,6 +248,144 @@ export default function DespesaDetail() {
 
       </Card>
 
+      {/* Documentos Obrigatórios — Factura & Comprovativo */}
+      {(() => {
+        const facturaPresent = despesa.status !== "pendente";
+        const comprovativoPresent = despesa.status === "aprovada" && !!despesa.paidDate;
+        const missingCount = (facturaPresent ? 0 : 1) + (comprovativoPresent ? 0 : 1);
+        const hasAlert =
+          !facturaPresent ||
+          (despesa.status === "aprovada" && !comprovativoPresent);
+
+        return (
+          <Card className="p-5 border-border/70">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-semibold text-foreground flex items-center gap-2 text-sm">
+                <FileText className="w-4 h-4 text-primary" /> Documentos Obrigatórios
+              </h2>
+              {missingCount > 0 ? (
+                <Badge variant="outline" className="text-[10.5px] gap-1 bg-amber-50 text-amber-700 border-amber-200">
+                  <AlertTriangle className="w-3 h-3" /> {missingCount} em falta
+                </Badge>
+              ) : (
+                <Badge variant="outline" className="text-[10.5px] gap-1 bg-accent/15 text-accent border-accent/30">
+                  <CheckCircle2 className="w-3 h-3" /> Completo
+                </Badge>
+              )}
+            </div>
+
+            {hasAlert && (
+              <div className={cn(
+                "flex items-start gap-2.5 p-3 rounded-md border mb-4",
+                "bg-amber-50 border-amber-200"
+              )}>
+                <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                <div className="text-[12px] leading-snug text-amber-900">
+                  <p className="font-semibold mb-0.5">Documentos em falta</p>
+                  <p className="text-amber-800/90">
+                    {!facturaPresent && despesa.status === "aprovada" && comprovativoPresent
+                      ? "Esta despesa não tem factura associada. Solicite o ficheiro ao requerente."
+                      : !facturaPresent
+                        ? "Esta despesa ainda não tem factura. O ficheiro deve ser carregado pelo requerente para validar o pedido."
+                        : "A despesa está aprovada mas o comprovativo de pagamento ainda não foi carregado."}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            <div className="grid sm:grid-cols-2 gap-3">
+              {/* Factura */}
+              {facturaPresent ? (
+                <button
+                  type="button"
+                  onClick={() => toast({ title: "Factura aberta", description: `FAC-${despesa.id.toUpperCase()}.pdf` })}
+                  className="flex items-center gap-3 px-3 py-3 rounded-md border border-border bg-background hover:bg-muted/40 transition-colors text-left"
+                >
+                  <div className="w-10 h-10 rounded bg-red-50 border border-red-200 flex items-center justify-center shrink-0">
+                    <FileText className="w-5 h-5 text-red-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-0.5">Factura</p>
+                    <p className="text-[12px] font-semibold text-foreground truncate font-mono">
+                      FAC-{despesa.id.toUpperCase()}.pdf
+                    </p>
+                  </div>
+                  <Download className="w-4 h-4 text-muted-foreground shrink-0" />
+                </button>
+              ) : (
+                <div className="flex items-center gap-3 px-3 py-3 rounded-md border-2 border-dashed border-amber-300 bg-amber-50/40">
+                  <div className="w-10 h-10 rounded bg-amber-100 border border-amber-200 flex items-center justify-center shrink-0">
+                    <AlertTriangle className="w-5 h-5 text-amber-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] uppercase tracking-wider text-amber-700 font-semibold mb-0.5">Factura</p>
+                    <p className="text-[12px] font-semibold text-amber-900">Em falta</p>
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-7 text-[11px] gap-1 border-amber-300 text-amber-800 hover:bg-amber-100"
+                    onClick={() => toast({ title: "Carregar factura" })}
+                  >
+                    <Upload className="w-3 h-3" /> Carregar
+                  </Button>
+                </div>
+              )}
+
+              {/* Comprovativo */}
+              {comprovativoPresent ? (
+                <button
+                  type="button"
+                  onClick={() => toast({ title: "Comprovativo aberto", description: `COMP-${despesa.id.toUpperCase()}.pdf` })}
+                  className="flex items-center gap-3 px-3 py-3 rounded-md border border-border bg-background hover:bg-muted/40 transition-colors text-left"
+                >
+                  <div className="w-10 h-10 rounded bg-accent/15 border border-accent/30 flex items-center justify-center shrink-0">
+                    <CheckCircle2 className="w-5 h-5 text-accent" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-0.5">Comprovativo</p>
+                    <p className="text-[12px] font-semibold text-foreground truncate font-mono">
+                      COMP-{despesa.id.toUpperCase()}.pdf
+                    </p>
+                  </div>
+                  <Download className="w-4 h-4 text-muted-foreground shrink-0" />
+                </button>
+              ) : despesa.status === "aprovada" ? (
+                <div className="flex items-center gap-3 px-3 py-3 rounded-md border-2 border-dashed border-amber-300 bg-amber-50/40">
+                  <div className="w-10 h-10 rounded bg-amber-100 border border-amber-200 flex items-center justify-center shrink-0">
+                    <AlertTriangle className="w-5 h-5 text-amber-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] uppercase tracking-wider text-amber-700 font-semibold mb-0.5">Comprovativo</p>
+                    <p className="text-[12px] font-semibold text-amber-900">Em falta</p>
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-7 text-[11px] gap-1 border-amber-300 text-amber-800 hover:bg-amber-100"
+                    onClick={() => toast({ title: "Carregar comprovativo" })}
+                  >
+                    <Upload className="w-3 h-3" /> Carregar
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-3 px-3 py-3 rounded-md border border-dashed border-border bg-muted/20">
+                  <div className="w-10 h-10 rounded bg-muted border border-border flex items-center justify-center shrink-0">
+                    <Clock className="w-5 h-5 text-muted-foreground" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-0.5">Comprovativo</p>
+                    <p className="text-[12px] font-semibold text-muted-foreground">Disponível após pagamento</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </Card>
+        );
+      })()}
+
+
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Timeline */}
         <Card className="lg:col-span-2 p-6">
