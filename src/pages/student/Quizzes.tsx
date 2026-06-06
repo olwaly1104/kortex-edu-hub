@@ -7,7 +7,9 @@ import { Progress } from "@/components/ui/progress";
 import {
   Sparkles, CheckCircle2, XCircle, RotateCcw, ArrowRight, ArrowLeft,
   Brain, Pencil, Type, Layers, Trophy, Timer, Play, Search, Filter, BookOpen,
+  ClipboardCheck, AlertTriangle,
 } from "lucide-react";
+import { useEffect } from "react";
 import { cn } from "@/lib/utils";
 
 /* ------------------------------------------------------------------ */
