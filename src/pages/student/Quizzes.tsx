@@ -362,10 +362,10 @@ export default function StudentQuizzes() {
                     key={c}
                     active={cadeiraFilter === c}
                     onClick={() => setCadeiraFilter(c)}
-                    icon={BookOpen}
                     label={c}
                     count={QUIZZES.filter(q => q.cadeira === c).length}
                     tag={cc.tag}
+                    dot={cc.dot}
                   />
                 );
               })}
