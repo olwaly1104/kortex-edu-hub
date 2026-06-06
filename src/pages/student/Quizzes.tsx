@@ -348,12 +348,13 @@ export default function StudentQuizzes() {
               <BookOpen className="w-3 h-3" /> Cadeira
             </p>
             <div className="space-y-1">
-              <FilterRow active={cadeiraFilter === "all"} onClick={() => setCadeiraFilter("all")} label="Todas as cadeiras" count={QUIZZES.length} />
+              <FilterRow active={cadeiraFilter === "all"} onClick={() => setCadeiraFilter("all")} icon={BookOpen} label="Todas as cadeiras" count={QUIZZES.length} />
               {cadeiras.map(c => (
                 <FilterRow
                   key={c}
                   active={cadeiraFilter === c}
                   onClick={() => setCadeiraFilter(c)}
+                  icon={BookOpen}
                   label={c}
                   count={QUIZZES.filter(q => q.cadeira === c).length}
                   dot={cadeiraColor(c).dot}
