@@ -110,12 +110,6 @@ export default function CoordenadorEstudanteProfile() {
                   <span className="mx-1.5 text-muted-foreground/40">·</span>
                   {student.year}º Ano · Turma {student.turma}
                 </p>
-                <div className="flex items-center gap-1.5 flex-wrap mt-3">
-                  <Badge variant="outline" className={cn("text-[10px]", sc.bg)}>{sc.label}</Badge>
-                  <Badge variant="outline" className={cn("text-[10px]", fs.cls)}>
-                    <Wallet className="w-2.5 h-2.5 mr-1" /> {fs.label}
-                  </Badge>
-                </div>
                 <div className="flex items-center gap-2 mt-4">
                   <Button size="sm" variant="outline" className="gap-1.5 text-xs h-7">
                     <MessageCircle className="w-3.5 h-3.5" /> Chat
@@ -142,16 +136,18 @@ export default function CoordenadorEstudanteProfile() {
               </p>
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Taxa de Entrega</p>
-              <p className={cn("text-2xl font-bold tabular-nums mt-1", student.taxaEntrega >= 80 ? "text-accent" : "text-destructive")}>
-                {student.taxaEntrega}<span className="text-sm text-muted-foreground font-normal">%</span>
-              </p>
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Estado</p>
+              <div className="mt-1.5">
+                <Badge variant="outline" className={cn("text-xs px-2 py-0.5", sc.bg)}>{sc.label}</Badge>
+              </div>
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Avaliações</p>
-              <p className="text-2xl font-bold tabular-nums text-foreground mt-1">
-                {student.avaliacoesFeitas}<span className="text-sm text-muted-foreground font-normal">/{student.avaliacoesTotal}</span>
-              </p>
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Situação Financeira</p>
+              <div className="mt-1.5">
+                <Badge variant="outline" className={cn("text-xs px-2 py-0.5", fs.cls)}>
+                  <Wallet className="w-3 h-3 mr-1" /> {fs.label}
+                </Badge>
+              </div>
             </div>
           </div>
         </div>
