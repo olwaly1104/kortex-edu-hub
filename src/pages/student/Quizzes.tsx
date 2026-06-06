@@ -589,22 +589,45 @@ function ActiveQuizView({ quiz, onExit }: { quiz: AnyQuiz; onExit: () => void })
 }
 
 /** Unified progress strip used by every game type. */
+/** Clean cockpit strip used by every active game. */
 function ProgressStrip({
-  quiz, position, total, scoreLabel,
-}: { quiz: AnyQuiz; position: number; total: number; scoreLabel?: React.ReactNode }) {
+  quiz, position, total, score, time,
+}: {
+  quiz: AnyQuiz;
+  position: number;
+  total: number;
+  score?: number;
+  time?: number;
+}) {
   const { meta } = accent(quiz);
-  const pct = Math.round((position / total) * 100);
+  const pct = Math.max(0, Math.min(100, Math.round((position / total) * 100)));
   return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between text-[11px]">
-        <span className="font-semibold text-foreground tabular-nums">
-          {position} <span className="text-muted-foreground font-normal">de {total}</span>
-        </span>
-        {scoreLabel}
+    <div className="space-y-3">
+      <div className="flex items-end justify-between gap-6 flex-wrap">
+        <StripStat label="Questão" value={
+          <>
+            <span className="text-foreground">{position}</span>
+            <span className="text-muted-foreground/60 font-normal"> / {total}</span>
+          </>
+        } />
+        <div className="flex items-end gap-7">
+          {score !== undefined && (
+            <StripStat
+              label="Acertos"
+              value={<span className="text-emerald-600">{score}</span>}
+            />
+          )}
+          {time !== undefined && (
+            <StripStat
+              label="Tempo"
+              value={<span className="font-mono tracking-tight text-foreground">{fmtTime(time)}</span>}
+            />
+          )}
+        </div>
       </div>
-      <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+      <div className="relative h-1 rounded-full bg-muted overflow-hidden">
         <div
-          className={cn("h-full rounded-full transition-all duration-300", meta.dot)}
+          className={cn("absolute inset-y-0 left-0 rounded-full transition-all duration-500 ease-out", meta.dot)}
           style={{ width: `${pct}%` }}
         />
       </div>
@@ -612,11 +635,12 @@ function ProgressStrip({
   );
 }
 
-function ScoreChip({ correct, total }: { correct: number; total: number }) {
+function StripStat({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md">
-      <CheckCircle2 className="w-3 h-3" /> {correct}<span className="text-emerald-600/70 font-normal">/{total}</span>
-    </span>
+    <div className="flex flex-col gap-0.5">
+      <span className="text-[9px] uppercase tracking-[0.16em] font-semibold text-muted-foreground">{label}</span>
+      <span className="text-base font-bold tabular-nums leading-none">{value}</span>
+    </div>
   );
 }
 
