@@ -567,6 +567,10 @@ function QuizHeader({ quiz }: { quiz: AnyQuiz }) {
             <span className="inline-flex items-center gap-1.5 text-[10px] font-medium text-muted-foreground px-2 py-0.5 rounded-md border border-border bg-muted/40">
               <Layers className="w-3 h-3" /> {quiz.items.length} {quiz.items.length === 1 ? "item" : "itens"}
             </span>
+            <DiffPill d={quiz.difficulty} />
+            <span className="inline-flex items-center gap-1.5 text-[10px] font-medium text-muted-foreground px-2 py-0.5 rounded-md border border-border bg-muted/40">
+              <Timer className="w-3 h-3" /> {quiz.minutes} min
+            </span>
           </div>
           <h2 className="text-[26px] font-bold text-foreground leading-[1.15] tracking-tight">{quiz.title}</h2>
           <p className="text-sm text-muted-foreground max-w-2xl leading-relaxed">{quiz.description}</p>
