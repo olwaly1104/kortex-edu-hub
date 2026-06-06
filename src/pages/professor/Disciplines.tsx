@@ -19,10 +19,6 @@ export default function ProfessorDisciplines() {
   const overallAttendance = allStudentsUnique.length > 0
     ? Math.round(allStudentsUnique.reduce((s, st) => s + st.attendance, 0) / allStudentsUnique.length)
     : 0;
-  const totalTarefas = profTasks.filter(t => t.type === "tarefa" || t.type === "quiz").length;
-  const totalTarefasEncerradas = profTasks.filter(t => t.type === "tarefa" || t.type === "quiz").filter(t => t.status === "encerrada").length;
-  const totalAvaliacoes = profTasks.filter(t => t.type === "exame").length;
-  const totalAvaliacoesEncerradas = profTasks.filter(t => t.type === "exame").filter(t => t.status === "encerrada").length;
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
@@ -30,7 +26,7 @@ export default function ProfessorDisciplines() {
         <GraduationCap className="w-6 h-6 text-primary" /> As Minhas Turmas
       </h1>
 
-      <div className="grid grid-cols-2 lg:grid-cols-7 gap-3">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
         <div className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4">
           <div className="flex items-center justify-between">
             <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Estudantes</p>
@@ -78,25 +74,8 @@ export default function ProfessorDisciplines() {
             {taxaAprovacao >= 85 ? "Excelente" : taxaAprovacao < 60 ? "Em Risco" : "Normal"}
           </Badge>
         </div>
-        <div className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4">
-          <div className="flex items-center justify-between">
-            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Tarefas</p>
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-primary/10">
-              <ClipboardList className="w-4 h-4 text-primary" />
-            </div>
-          </div>
-          <p className="text-2xl font-bold text-foreground">{totalTarefasEncerradas}/{totalTarefas}</p>
-        </div>
-        <div className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4">
-          <div className="flex items-center justify-between">
-            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Avaliações</p>
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-secondary/10">
-              <BarChart3 className="w-4 h-4 text-secondary" />
-            </div>
-          </div>
-          <p className="text-2xl font-bold text-foreground">{totalAvaliacoesEncerradas}/{totalAvaliacoes}</p>
-        </div>
       </div>
+
 
       <div className="grid md:grid-cols-2 gap-5">
         {allTurmas.map(turma => {
@@ -203,35 +182,6 @@ export default function ProfessorDisciplines() {
                     </div>
                   </div>
 
-                  {/* Activity */}
-                  <div className="space-y-2.5 mb-3 pb-3 border-b border-border/50">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-muted-foreground flex items-center gap-1.5">
-                        <ClipboardList className="w-3.5 h-3.5 text-primary" /> Tarefas
-                      </span>
-                      <span className="font-semibold text-foreground">{turmaTasks.filter(t => t.type === "tarefa" || t.type === "quiz").filter(t => t.status === "encerrada").length}/{turmaTasks.filter(t => t.type === "tarefa" || t.type === "quiz").length}</span>
-                    </div>
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-muted-foreground flex items-center gap-1.5">
-                        <UserCheck className="w-3.5 h-3.5 text-secondary" /> Taxa de Entrega
-                      </span>
-                      <span className={`font-semibold ${(() => { const totalSub = turmaTasks.reduce((s, t) => s + t.submissions, 0); const totalStu = turmaTasks.reduce((s, t) => s + t.totalStudents, 0); return totalStu > 0 ? Math.round((totalSub / totalStu) * 100) : 0; })() >= 80 ? "text-accent" : "text-destructive"}`}>
-                        {(() => { const totalSub = turmaTasks.reduce((s, t) => s + t.submissions, 0); const totalStu = turmaTasks.reduce((s, t) => s + t.totalStudents, 0); return totalStu > 0 ? Math.round((totalSub / totalStu) * 100) : 0; })()}%
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-muted-foreground flex items-center gap-1.5">
-                        <BarChart3 className="w-3.5 h-3.5 text-secondary" /> Avaliações
-                      </span>
-                      <span className="font-semibold text-foreground">{turmaTasks.filter(t => t.type === "exame").filter(t => t.status === "encerrada").length}/{turmaTasks.filter(t => t.type === "exame").length}</span>
-                    </div>
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-muted-foreground flex items-center gap-1.5">
-                        <CheckCircle className="w-3.5 h-3.5 text-secondary" /> Taxa de Conclusão
-                      </span>
-                      <span className="font-semibold text-foreground">{turmaConclusaoPct}%</span>
-                    </div>
-                  </div>
 
                   {/* Resources */}
                   <div className="space-y-2.5">
