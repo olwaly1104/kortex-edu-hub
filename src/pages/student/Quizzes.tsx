@@ -7,7 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import {
   Sparkles, CheckCircle2, XCircle, RotateCcw, ArrowRight, ArrowLeft,
   Brain, Pencil, Type, Layers, Trophy, Timer, Play, Search, Filter, BookOpen,
-  ClipboardCheck, AlertTriangle,
+  ClipboardCheck, AlertTriangle, Flame, Zap, Gauge,
 } from "lucide-react";
 import { useEffect } from "react";
 import { cn } from "@/lib/utils";
@@ -230,11 +230,40 @@ const TYPE_META: Record<QuizType, {
   },
 };
 
-const DIFF_STYLE: Record<Difficulty, string> = {
-  "Introdutório": "bg-emerald-50 text-emerald-700 border-emerald-200",
-  "Intermédio":   "bg-amber-50 text-amber-700 border-amber-200",
-  "Avançado":     "bg-rose-50 text-rose-700 border-rose-200",
+const DIFF_META: Record<Difficulty, {
+  label: string; bangs: string; level: 1 | 2 | 3;
+  icon: React.ElementType; pill: string; bar: string;
+}> = {
+  "Introdutório": { label: "Introdutório", bangs: "!",   level: 1, icon: Gauge, pill: "bg-emerald-50 text-emerald-700 border-emerald-200", bar: "bg-emerald-500" },
+  "Intermédio":   { label: "Intermédio",   bangs: "!!",  level: 2, icon: Flame, pill: "bg-amber-50 text-amber-700 border-amber-200",       bar: "bg-amber-500"   },
+  "Avançado":     { label: "Avançado",     bangs: "!!!", level: 3, icon: Zap,   pill: "bg-rose-50 text-rose-700 border-rose-200",           bar: "bg-rose-500"    },
 };
+
+function DiffPill({ d, size = "sm" }: { d: Difficulty; size?: "sm" | "md" }) {
+  const m = DIFF_META[d];
+  const Icon = m.icon;
+  const isMd = size === "md";
+  return (
+    <span className={cn(
+      "inline-flex items-center gap-2 rounded-md border font-bold uppercase tracking-wider shrink-0",
+      isMd ? "px-2.5 py-1.5 text-[11px]" : "px-2 py-1 text-[10px]",
+      m.pill,
+    )}>
+      <Icon className={isMd ? "w-3.5 h-3.5" : "w-3 h-3"} />
+      <span>{m.label}</span>
+      <span className="font-black tracking-tight">{m.bangs}</span>
+      <span className="flex items-end gap-0.5 ml-0.5">
+        {[1, 2, 3].map(n => (
+          <span key={n} className={cn(
+            "w-1 rounded-sm",
+            n === 1 ? "h-1.5" : n === 2 ? "h-2.5" : "h-3.5",
+            n <= m.level ? m.bar : "bg-current opacity-20",
+          )} />
+        ))}
+      </span>
+    </span>
+  );
+}
 
 /* Color per Cadeira — used as a tag in rows and as a dot in the filter menu */
 const CADEIRA_PALETTE = [
@@ -483,13 +512,8 @@ function QuizRow({ quiz, onStart }: { quiz: AnyQuiz; onStart: () => void }) {
         <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-1">{quiz.description}</p>
       </div>
 
-      <div className="hidden md:flex items-center gap-6 shrink-0 pr-2">
-        <div className="flex flex-col items-end gap-1 min-w-[80px]">
-          <span className="text-[9px] uppercase tracking-wider text-muted-foreground font-medium">Dificuldade</span>
-          <span className={cn("text-[10px] font-semibold px-2 py-0.5 rounded-md border", DIFF_STYLE[quiz.difficulty])}>
-            {quiz.difficulty}
-          </span>
-        </div>
+      <div className="hidden md:flex items-center shrink-0 pr-2">
+        <DiffPill d={quiz.difficulty} />
       </div>
 
       <Button size="sm" variant="outline" onClick={onStart} className="gap-1.5 shrink-0 h-8 group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-colors">
@@ -514,32 +538,45 @@ function QuizHeader({ quiz }: { quiz: AnyQuiz }) {
   const { meta, cad } = accent(quiz);
   const Icon = meta.icon;
   return (
-    <Card className="overflow-hidden">
-      <div className={cn("h-1 w-full", meta.dot)} />
-      <div className="p-6 flex items-start gap-5 flex-wrap">
-        <div className={cn("w-14 h-14 rounded-xl border flex items-center justify-center shrink-0", meta.tile)}>
-          <Icon className="w-7 h-7" />
+    <Card className="relative overflow-hidden border-2 shadow-sm">
+      {/* Side accent rail (category colour) */}
+      <div className={cn("absolute left-0 top-0 bottom-0 w-1.5", meta.dot)} />
+      {/* Faint radial glow on the right */}
+      <div
+        aria-hidden
+        className={cn("absolute -right-24 -top-24 w-80 h-80 rounded-full opacity-[0.10] blur-2xl pointer-events-none", meta.dot)}
+      />
+
+      <div className="relative p-6 pl-8 grid gap-6 md:grid-cols-[auto_1fr_auto] items-stretch">
+        {/* Icon block */}
+        <div className="flex flex-col items-center gap-2 shrink-0">
+          <div className={cn("w-20 h-20 rounded-2xl border-2 flex items-center justify-center shadow-sm", meta.tile)}>
+            <Icon className="w-10 h-10" />
+          </div>
+          <span className="text-[10px] font-bold uppercase tracking-wider text-foreground/70 text-center leading-tight max-w-[5rem]">
+            {meta.label}
+          </span>
         </div>
-        <div className="flex-1 min-w-[240px]">
-          <div className="flex items-center gap-1.5 flex-wrap mb-1.5">
-            <span className={cn("inline-flex items-center text-[10px] font-semibold px-2 py-0.5 rounded-md border", meta.tag)}>
-              {meta.label}
-            </span>
+
+        {/* Title + meta */}
+        <div className="min-w-0 flex flex-col gap-2 justify-center">
+          <div className="flex items-center gap-1.5 flex-wrap">
             <span className={cn("inline-flex items-center gap-1.5 text-[10px] font-semibold px-2 py-0.5 rounded-md border", cad.tag)}>
               <span className={cn("w-1.5 h-1.5 rounded-full", cad.dot)} />
               {quiz.cadeira}
             </span>
+            <span className="inline-flex items-center gap-1.5 text-[10px] font-medium text-muted-foreground px-2 py-0.5 rounded-md border border-border bg-muted/40">
+              <Layers className="w-3 h-3" /> {quiz.items.length} {quiz.items.length === 1 ? "item" : "itens"}
+            </span>
           </div>
-          <h2 className="text-2xl font-bold text-foreground leading-tight tracking-tight">{quiz.title}</h2>
-          <p className="text-sm text-muted-foreground mt-1.5 max-w-2xl leading-relaxed">{quiz.description}</p>
+          <h2 className="text-[26px] font-bold text-foreground leading-[1.15] tracking-tight">{quiz.title}</h2>
+          <p className="text-sm text-muted-foreground max-w-2xl leading-relaxed">{quiz.description}</p>
         </div>
-        <div className="flex flex-col items-end gap-1.5 shrink-0">
-          <Badge variant="outline" className={cn("text-[10px] font-semibold", DIFF_STYLE[quiz.difficulty])}>
-            {quiz.difficulty}
-          </Badge>
-          <Badge variant="outline" className="text-[10px] gap-1 font-medium">
-            <Layers className="w-3 h-3" />{quiz.items.length} {quiz.items.length === 1 ? "item" : "itens"}
-          </Badge>
+
+        {/* Difficulty rail — distinctive vertical block */}
+        <div className="shrink-0 flex md:flex-col items-start md:items-end gap-2 md:border-l md:border-border md:pl-5">
+          <span className="text-[9px] uppercase tracking-[0.18em] font-bold text-muted-foreground">Dificuldade</span>
+          <DiffPill d={quiz.difficulty} size="md" />
         </div>
       </div>
     </Card>
@@ -591,12 +628,11 @@ function ActiveQuizView({ quiz, onExit }: { quiz: AnyQuiz; onExit: () => void })
 /** Unified progress strip used by every game type. */
 /** Clean cockpit strip used by every active game. */
 function ProgressStrip({
-  quiz, position, total, score, time,
+  quiz, position, total, time,
 }: {
   quiz: AnyQuiz;
   position: number;
   total: number;
-  score?: number;
   time?: number;
 }) {
   const { meta } = accent(quiz);
@@ -610,20 +646,12 @@ function ProgressStrip({
             <span className="text-muted-foreground/60 font-normal"> / {total}</span>
           </>
         } />
-        <div className="flex items-end gap-7">
-          {score !== undefined && (
-            <StripStat
-              label="Acertos"
-              value={<span className="text-emerald-600">{score}</span>}
-            />
-          )}
-          {time !== undefined && (
-            <StripStat
-              label="Tempo"
-              value={<span className="font-mono tracking-tight text-foreground">{fmtTime(time)}</span>}
-            />
-          )}
-        </div>
+        {time !== undefined && (
+          <StripStat
+            label="Tempo"
+            value={<span className="font-mono tracking-tight text-foreground">{fmtTime(time)}</span>}
+          />
+        )}
       </div>
       <div className="relative h-1 rounded-full bg-muted overflow-hidden">
         <div
@@ -650,35 +678,39 @@ function StripStat({ label, value }: { label: string; value: React.ReactNode }) 
 
 function MCQGame({ quiz, onLockChange }: { quiz: Extract<AnyQuiz, { type: "mcq" }>; onLockChange?: (locked: boolean) => void }) {
   const [idx, setIdx] = useState(0);
-  const [selected, setSelected] = useState<number | null>(null);
-  const [score, setScore] = useState(0);
+  const [answers, setAnswers] = useState<Record<number, number>>({});
   const [done, setDone] = useState(false);
 
   const total = quiz.items.length;
   const current = quiz.items[idx];
-  const { meta } = accent(quiz);
   const time = useTimer(!done);
 
   useEffect(() => { onLockChange?.(!done); }, [done, onLockChange]);
   useEffect(() => () => onLockChange?.(false), [onLockChange]);
 
-  const choose = (i: number) => {
-    if (selected !== null) return;
-    setSelected(i);
-    if (i === current.answer) setScore(s => s + 1);
-  };
-  const next = () => {
-    if (idx + 1 >= total) setDone(true);
-    else { setIdx(idx + 1); setSelected(null); }
-  };
-  const restart = () => { setIdx(0); setSelected(null); setScore(0); setDone(false); };
+  const picked = answers[idx];
+  const score = quiz.items.reduce((s, it, i) => s + (answers[i] === it.answer ? 1 : 0), 0);
 
-  if (done) return <ResultsCard quiz={quiz} score={score} total={total} time={time} onRestart={restart} />;
+  const next = () => { if (idx + 1 >= total) setDone(true); else setIdx(idx + 1); };
+  const prev = () => setIdx(i => Math.max(0, i - 1));
+  const restart = () => { setIdx(0); setAnswers({}); setDone(false); };
+
+  if (done) {
+    const review: ReviewItem[] = quiz.items.map((it, i) => ({
+      n: i + 1,
+      question: it.q,
+      correct: answers[i] === it.answer,
+      userAnswer: answers[i] !== undefined ? it.options[answers[i]] : null,
+      correctAnswer: it.options[it.answer],
+      explain: it.explain,
+    }));
+    return <ResultsCard quiz={quiz} score={score} total={total} time={time} onRestart={restart} review={review} />;
+  }
 
   return (
     <Card className="overflow-hidden">
       <div className="px-6 pt-5 pb-4 border-b border-border bg-muted/30">
-        <ProgressStrip quiz={quiz} position={idx + (selected !== null ? 1 : 0)} total={total} score={score} time={time} />
+        <ProgressStrip quiz={quiz} position={idx + 1} total={total} time={time} />
       </div>
 
       <div className="p-6 space-y-5">
@@ -686,52 +718,39 @@ function MCQGame({ quiz, onLockChange }: { quiz: Extract<AnyQuiz, { type: "mcq" 
 
         <div className="grid sm:grid-cols-2 gap-2.5">
           {current.options.map((opt, i) => {
-            const isCorrect = i === current.answer;
-            const isPicked = i === selected;
-            const show = selected !== null;
+            const isPicked = picked === i;
             return (
               <button
                 key={i}
-                onClick={() => choose(i)}
-                disabled={selected !== null}
+                onClick={() => setAnswers(a => ({ ...a, [idx]: i }))}
                 className={cn(
                   "text-left p-3.5 rounded-lg border-2 transition-all flex items-center gap-3 group/opt",
-                  !show && "border-border hover:border-primary/60 hover:bg-primary/5",
-                  show && isCorrect && "border-emerald-500 bg-emerald-50 text-emerald-900",
-                  show && isPicked && !isCorrect && "border-destructive bg-destructive/10 text-destructive",
-                  show && !isCorrect && !isPicked && "border-border opacity-50"
+                  isPicked
+                    ? "border-primary bg-primary/5"
+                    : "border-border hover:border-primary/50 hover:bg-muted/40",
                 )}
               >
                 <span className={cn(
                   "w-7 h-7 rounded-md flex items-center justify-center text-xs font-bold shrink-0 border transition-colors",
-                  !show && "bg-muted border-border group-hover/opt:bg-primary group-hover/opt:text-primary-foreground group-hover/opt:border-primary",
-                  show && isCorrect && "bg-emerald-500 text-white border-emerald-500",
-                  show && isPicked && !isCorrect && "bg-destructive text-destructive-foreground border-destructive",
-                  show && !isCorrect && !isPicked && "bg-muted border-border"
+                  isPicked
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-muted border-border group-hover/opt:border-primary/50",
                 )}>{String.fromCharCode(65 + i)}</span>
                 <span className="text-sm flex-1 font-medium">{opt}</span>
-                {show && isCorrect && <CheckCircle2 className="w-4 h-4 shrink-0" />}
-                {show && isPicked && !isCorrect && <XCircle className="w-4 h-4 shrink-0" />}
               </button>
             );
           })}
         </div>
-
-        {selected !== null && (
-          <div className={cn("rounded-lg p-4 text-sm border-l-4", meta.tile.replace("border-", "border-l-").replace("text-", "text-"), "bg-muted/40")}>
-            <p className="font-semibold mb-1 text-foreground flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5" /> Explicação
-            </p>
-            <p className="text-muted-foreground leading-relaxed">{current.explain}</p>
-          </div>
-        )}
       </div>
 
-      <div className="px-6 py-4 border-t border-border bg-muted/20 flex items-center justify-between">
-        <span className="text-[11px] text-muted-foreground">
-          {selected === null ? "Selecciona uma opção para continuar." : "Resposta registada."}
+      <div className="px-6 py-4 border-t border-border bg-muted/20 flex items-center justify-between gap-2">
+        <Button variant="outline" size="sm" onClick={prev} disabled={idx === 0} className="gap-1.5">
+          <ArrowLeft className="w-4 h-4" /> Anterior
+        </Button>
+        <span className="text-[11px] text-muted-foreground hidden sm:block">
+          {picked === undefined ? "Selecciona uma opção." : "Resposta registada — podes alterar."}
         </span>
-        <Button onClick={next} disabled={selected === null} className="gap-2">
+        <Button onClick={next} disabled={picked === undefined} className="gap-2">
           {idx + 1 >= total ? "Terminar" : "Próxima"} <ArrowRight className="w-4 h-4" />
         </Button>
       </div>
@@ -843,9 +862,7 @@ function WrittenGame({ quiz, onLockChange }: { quiz: Extract<AnyQuiz, { type: "w
 
 function FillGame({ quiz, onLockChange }: { quiz: Extract<AnyQuiz, { type: "fill" }>; onLockChange?: (locked: boolean) => void }) {
   const [idx, setIdx] = useState(0);
-  const [value, setValue] = useState("");
-  const [checked, setChecked] = useState(false);
-  const [score, setScore] = useState(0);
+  const [answers, setAnswers] = useState<Record<number, string>>({});
   const [done, setDone] = useState(false);
   const current = quiz.items[idx];
   const total = quiz.items.length;
@@ -854,25 +871,33 @@ function FillGame({ quiz, onLockChange }: { quiz: Extract<AnyQuiz, { type: "fill
   useEffect(() => { onLockChange?.(!done); }, [done, onLockChange]);
   useEffect(() => () => onLockChange?.(false), [onLockChange]);
 
-  const isRight = value.trim().toLowerCase() === current.answer.toLowerCase();
+  const value = answers[idx] ?? "";
+  const score = quiz.items.reduce((s, it, i) => s + ((answers[i] ?? "").trim().toLowerCase() === it.answer.toLowerCase() ? 1 : 0), 0);
   const [before, after] = current.sentence.split("___");
 
-  const check = () => {
-    setChecked(true);
-    if (isRight) setScore(s => s + 1);
-  };
-  const next = () => {
-    if (idx + 1 >= total) setDone(true);
-    else { setIdx(idx + 1); setValue(""); setChecked(false); }
-  };
-  const restart = () => { setIdx(0); setValue(""); setChecked(false); setScore(0); setDone(false); };
+  const next = () => { if (idx + 1 >= total) setDone(true); else setIdx(idx + 1); };
+  const prev = () => setIdx(i => Math.max(0, i - 1));
+  const restart = () => { setIdx(0); setAnswers({}); setDone(false); };
 
-  if (done) return <ResultsCard quiz={quiz} score={score} total={total} time={time} onRestart={restart} />;
+  if (done) {
+    const review: ReviewItem[] = quiz.items.map((it, i) => {
+      const ua = (answers[i] ?? "").trim();
+      return {
+        n: i + 1,
+        question: it.sentence.replace("___", "_____"),
+        correct: ua.toLowerCase() === it.answer.toLowerCase(),
+        userAnswer: ua || null,
+        correctAnswer: it.answer,
+        explain: it.hint,
+      };
+    });
+    return <ResultsCard quiz={quiz} score={score} total={total} time={time} onRestart={restart} review={review} />;
+  }
 
   return (
     <Card className="overflow-hidden">
       <div className="px-6 pt-5 pb-4 border-b border-border bg-muted/30">
-        <ProgressStrip quiz={quiz} position={idx + (checked ? 1 : 0)} total={total} score={score} time={time} />
+        <ProgressStrip quiz={quiz} position={idx + 1} total={total} time={time} />
       </div>
 
       <div className="p-6 space-y-5">
@@ -880,15 +905,9 @@ function FillGame({ quiz, onLockChange }: { quiz: Extract<AnyQuiz, { type: "fill
           <span>{before}</span>
           <Input
             value={value}
-            onChange={(e) => setValue(e.target.value)}
-            disabled={checked}
+            onChange={(e) => setAnswers(a => ({ ...a, [idx]: e.target.value }))}
             placeholder="..."
-            className={cn(
-              "inline-flex w-44 h-10 text-center font-bold text-base border-2",
-              !checked && "border-primary/30 focus-visible:border-primary",
-              checked && isRight && "border-emerald-500 bg-emerald-50 text-emerald-700",
-              checked && !isRight && "border-destructive bg-destructive/10 text-destructive"
-            )}
+            className="inline-flex w-44 h-10 text-center font-bold text-base border-2 border-primary/30 focus-visible:border-primary"
           />
           <span>{after}</span>
         </div>
@@ -897,35 +916,18 @@ function FillGame({ quiz, onLockChange }: { quiz: Extract<AnyQuiz, { type: "fill
           <Sparkles className="w-3.5 h-3.5 text-amber-500" />
           <span><span className="font-semibold text-foreground/70">Dica:</span> {current.hint}</span>
         </div>
-
-        {checked && (
-          <div className={cn(
-            "rounded-lg p-4 text-sm flex items-start gap-3 border",
-            isRight
-              ? "bg-emerald-50 border-emerald-200 text-emerald-900"
-              : "bg-destructive/5 border-destructive/30 text-destructive"
-          )}>
-            {isRight
-              ? <CheckCircle2 className="w-5 h-5 shrink-0 mt-0.5" />
-              : <XCircle className="w-5 h-5 shrink-0 mt-0.5" />}
-            <div className="leading-relaxed">
-              {isRight ? (
-                <p><span className="font-bold">Correcto.</span> Boa memória.</p>
-              ) : (
-                <p><span className="font-bold">Não é desta.</span> Resposta certa: <span className="font-bold underline underline-offset-2">{current.answer}</span></p>
-              )}
-            </div>
-          </div>
-        )}
       </div>
 
-      <div className="px-6 py-4 border-t border-border bg-muted/20 flex items-center justify-between">
-        <span className="text-[11px] text-muted-foreground">
-          {checked ? (isRight ? "+1 ponto" : "Sem ponto nesta") : "Escreve o termo em falta."}
+      <div className="px-6 py-4 border-t border-border bg-muted/20 flex items-center justify-between gap-2">
+        <Button variant="outline" size="sm" onClick={prev} disabled={idx === 0} className="gap-1.5">
+          <ArrowLeft className="w-4 h-4" /> Anterior
+        </Button>
+        <span className="text-[11px] text-muted-foreground hidden sm:block">
+          {value.trim() ? "Resposta registada — podes alterar." : "Escreve o termo em falta."}
         </span>
-        {!checked
-          ? <Button onClick={check} disabled={!value.trim()} className="gap-2"><CheckCircle2 className="w-4 h-4" />Verificar</Button>
-          : <Button onClick={next} className="gap-2">{idx + 1 >= total ? "Terminar" : "Próxima"} <ArrowRight className="w-4 h-4" /></Button>}
+        <Button onClick={next} disabled={!value.trim()} className="gap-2">
+          {idx + 1 >= total ? "Terminar" : "Próxima"} <ArrowRight className="w-4 h-4" />
+        </Button>
       </div>
     </Card>
   );
@@ -935,9 +937,21 @@ function FillGame({ quiz, onLockChange }: { quiz: Extract<AnyQuiz, { type: "fill
 /*  Shared end-of-quiz results card                                    */
 /* ------------------------------------------------------------------ */
 
+type ReviewItem = {
+  n: number;
+  question: string;
+  correct: boolean;
+  userAnswer: string | null;
+  correctAnswer: string;
+  explain?: string;
+};
+
 function ResultsCard({
-  quiz, score, total, time, onRestart,
-}: { quiz: AnyQuiz; score: number; total: number; time?: number; onRestart: () => void }) {
+  quiz, score, total, time, onRestart, review,
+}: {
+  quiz: AnyQuiz; score: number; total: number; time?: number;
+  onRestart: () => void; review?: ReviewItem[];
+}) {
   const pct = Math.round((score / total) * 100);
   const tier =
     pct >= 80 ? { label: "Excelente", color: "text-emerald-700 bg-emerald-50 border-emerald-200" } :
@@ -948,24 +962,76 @@ function ResultsCard({
   return (
     <Card className="overflow-hidden">
       <div className={cn("h-1 w-full", meta.dot)} />
-      <div className="p-8 text-center space-y-5">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mx-auto">
-          <Trophy className="w-8 h-8 text-primary" />
-        </div>
-        <div>
-          <p className="text-[11px] uppercase tracking-[0.18em] font-semibold text-muted-foreground">Resultado</p>
-          <h3 className="text-5xl font-bold text-foreground tracking-tight tabular-nums mt-1">{pct}<span className="text-2xl text-muted-foreground">%</span></h3>
-          <p className="text-sm text-muted-foreground mt-1">{score} de {total} respostas correctas{time !== undefined && <> · <span className="font-mono">{fmtTime(time)}</span></>}</p>
-        </div>
-        <Badge variant="outline" className={cn("text-[11px] font-semibold", tier.color)}>{tier.label}</Badge>
-        <div className="max-w-sm mx-auto">
-          <div className="h-2 rounded-full bg-muted overflow-hidden">
-            <div className={cn("h-full transition-all duration-500", meta.dot)} style={{ width: `${pct}%` }} />
+      <div className="p-8 space-y-5">
+        <div className="text-center space-y-5">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mx-auto">
+            <Trophy className="w-8 h-8 text-primary" />
+          </div>
+          <div>
+            <p className="text-[11px] uppercase tracking-[0.18em] font-semibold text-muted-foreground">Resultado</p>
+            <h3 className="text-5xl font-bold text-foreground tracking-tight tabular-nums mt-1">{pct}<span className="text-2xl text-muted-foreground">%</span></h3>
+            <p className="text-sm text-muted-foreground mt-1">{score} de {total} respostas correctas{time !== undefined && <> · <span className="font-mono">{fmtTime(time)}</span></>}</p>
+          </div>
+          <Badge variant="outline" className={cn("text-[11px] font-semibold", tier.color)}>{tier.label}</Badge>
+          <div className="max-w-sm mx-auto">
+            <div className="h-2 rounded-full bg-muted overflow-hidden">
+              <div className={cn("h-full transition-all duration-500", meta.dot)} style={{ width: `${pct}%` }} />
+            </div>
+          </div>
+          <div className="flex items-center justify-center gap-2 pt-2">
+            <Button onClick={onRestart} variant="outline" className="gap-2"><RotateCcw className="w-4 h-4" /> Repetir</Button>
           </div>
         </div>
-        <div className="flex items-center justify-center gap-2 pt-2">
-          <Button onClick={onRestart} variant="outline" className="gap-2"><RotateCcw className="w-4 h-4" /> Repetir</Button>
-        </div>
+
+        {review && review.length > 0 && (
+          <div className="pt-4 border-t border-border space-y-3 text-left">
+            <p className="text-[11px] uppercase tracking-[0.16em] font-bold text-muted-foreground">Revisão · respostas e explicações</p>
+            {review.map(r => (
+              <div key={r.n} className={cn(
+                "rounded-lg border p-4 space-y-3",
+                r.correct ? "border-emerald-200 bg-emerald-50/40" : "border-rose-200 bg-rose-50/40",
+              )}>
+                <div className="flex items-start gap-3">
+                  <span className={cn(
+                    "shrink-0 w-7 h-7 rounded-md flex items-center justify-center text-[11px] font-bold tabular-nums text-white",
+                    r.correct ? "bg-emerald-500" : "bg-rose-500",
+                  )}>{r.n}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-foreground leading-snug">{r.question}</p>
+                    <div className="mt-2.5 grid sm:grid-cols-2 gap-2 text-xs">
+                      <div className={cn(
+                        "rounded-md border px-2.5 py-1.5 bg-card",
+                        r.correct ? "border-emerald-200" : "border-rose-200",
+                      )}>
+                        <p className="text-[9px] uppercase tracking-wider font-bold text-muted-foreground mb-0.5 flex items-center gap-1">
+                          {r.correct ? <CheckCircle2 className="w-3 h-3 text-emerald-600" /> : <XCircle className="w-3 h-3 text-rose-600" />}
+                          Tua resposta
+                        </p>
+                        <p className={cn("font-semibold", r.correct ? "text-emerald-700" : "text-rose-700")}>
+                          {r.userAnswer ?? "— sem resposta —"}
+                        </p>
+                      </div>
+                      {!r.correct && (
+                        <div className="rounded-md border border-emerald-200 bg-card px-2.5 py-1.5">
+                          <p className="text-[9px] uppercase tracking-wider font-bold text-muted-foreground mb-0.5 flex items-center gap-1">
+                            <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Resposta correcta
+                          </p>
+                          <p className="font-semibold text-emerald-700">{r.correctAnswer}</p>
+                        </div>
+                      )}
+                    </div>
+                    {r.explain && (
+                      <p className="mt-2.5 text-xs text-muted-foreground leading-relaxed flex gap-1.5">
+                        <Sparkles className="w-3 h-3 mt-0.5 shrink-0 text-primary" />
+                        <span>{r.explain}</span>
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </Card>
   );
