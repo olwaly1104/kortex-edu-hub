@@ -226,12 +226,59 @@ const QUIZZES: AnyQuiz[] = [
 /*  Type metadata                                                      */
 /* ------------------------------------------------------------------ */
 
-const TYPE_META: Record<QuizType, { label: string; icon: React.ElementType; description: string }> = {
-  mcq:     { label: "Múltipla Escolha",  icon: Brain,           description: "Selecciona a resposta correcta entre opções." },
-  written: { label: "Resposta Escrita",  icon: Pencil,          description: "Resposta aberta avaliada por palavras-chave." },
-  fill:    { label: "Preencher Espaço",  icon: Type,            description: "Completa uma frase com o termo em falta." },
-  flash:   { label: "Flashcards",        icon: Layers,          description: "Cartões de revisão rápida — frente e verso." },
-  exam:    { label: "Exame de Treino",   icon: ClipboardCheck,  description: "Simulação cronometrada com perguntas mistas." },
+const TYPE_META: Record<QuizType, {
+  label: string;
+  icon: React.ElementType;
+  description: string;
+  /** Tailwind classes for the colored category tag */
+  tag: string;
+  /** Tailwind classes for the colored icon tile */
+  tile: string;
+  /** Active-filter row classes */
+  active: string;
+  /** Dot color for the filter row indicator */
+  dot: string;
+}> = {
+  mcq: {
+    label: "Múltipla Escolha", icon: Brain,
+    description: "Selecciona a resposta correcta entre opções.",
+    tag:    "bg-blue-50 text-blue-700 border-blue-200",
+    tile:   "bg-blue-50 text-blue-600 border-blue-200",
+    active: "bg-blue-50 text-blue-700 border-blue-200",
+    dot:    "bg-blue-500",
+  },
+  written: {
+    label: "Resposta Escrita", icon: Pencil,
+    description: "Resposta aberta avaliada por palavras-chave.",
+    tag:    "bg-violet-50 text-violet-700 border-violet-200",
+    tile:   "bg-violet-50 text-violet-600 border-violet-200",
+    active: "bg-violet-50 text-violet-700 border-violet-200",
+    dot:    "bg-violet-500",
+  },
+  fill: {
+    label: "Preencher Espaço", icon: Type,
+    description: "Completa uma frase com o termo em falta.",
+    tag:    "bg-amber-50 text-amber-700 border-amber-200",
+    tile:   "bg-amber-50 text-amber-600 border-amber-200",
+    active: "bg-amber-50 text-amber-700 border-amber-200",
+    dot:    "bg-amber-500",
+  },
+  flash: {
+    label: "Flashcards", icon: Layers,
+    description: "Cartões de revisão rápida — frente e verso.",
+    tag:    "bg-emerald-50 text-emerald-700 border-emerald-200",
+    tile:   "bg-emerald-50 text-emerald-600 border-emerald-200",
+    active: "bg-emerald-50 text-emerald-700 border-emerald-200",
+    dot:    "bg-emerald-500",
+  },
+  exam: {
+    label: "Exame de Treino", icon: ClipboardCheck,
+    description: "Simulação cronometrada com perguntas mistas.",
+    tag:    "bg-rose-50 text-rose-700 border-rose-200",
+    tile:   "bg-rose-50 text-rose-600 border-rose-200",
+    active: "bg-rose-50 text-rose-700 border-rose-200",
+    dot:    "bg-rose-500",
+  },
 };
 
 const DIFF_STYLE: Record<Difficulty, string> = {
