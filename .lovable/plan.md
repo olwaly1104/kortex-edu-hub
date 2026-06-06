@@ -1,20 +1,23 @@
-# Corrigir logout automático nas páginas de Finanças
+# Add Quizzes tab to Cadeira page (student)
 
-## Causa
-`src/contexts/AuthContext.tsx` guarda o utilizador apenas em `useState`. Qualquer hot-reload do Vite (frequente enquanto editamos páginas), refresh ou erro de runtime esvazia o estado → `App.tsx` cai no `<Login />`. Não é um bug específico de Finanças, é a falta de persistência da sessão mock.
+Scope: `src/pages/student/DisciplineDetail.tsx`
 
-## Alteração
-Editar **apenas** `src/contexts/AuthContext.tsx`:
+## Changes
 
-1. Inicializar `useState<User | null>` a partir de `localStorage.getItem("upra_mock_user")` (parse seguro com try/catch; fallback `null`).
-2. No `login(email, password)`: depois de calcular o user, gravar `localStorage.setItem("upra_mock_user", JSON.stringify(user))`.
-3. No `logout()`: `localStorage.removeItem("upra_mock_user")` antes do `setUser(null)`.
-4. Manter a API do contexto exactamente igual (`user`, `isAuthenticated`, `login`, `logout`) — nenhum outro ficheiro precisa de mudar.
+1. **Remove the "Regente / Contacte o professor" strip** (lines 93-111) — including the Chat/Email contact buttons and `MessageSquare`/`Mail` imports if unused.
 
-## Fora de âmbito
-- Não mexer em rotas, sidebar, nem nas páginas de Finanças (Solicitações, Despesas, DespesaDetail, etc.).
-- Não introduzir Supabase Auth — a app continua com o login mock por email/role.
-- Não alterar `App.tsx`.
+2. **Add "Quizzes" tab** in the tabs list (after Avaliações, before Anúncios):
+   - Icon: `Brain` from lucide-react
+   - Label: "Quizzes"
 
-## Resultado esperado
-Depois disto, fazer login como `financas@upra.kor` mantém a sessão através de hot-reloads, refreshes e navegações dentro de `/financas/*`. Só o botão "Sair" no sidebar termina a sessão.
+3. **Add `TabsContent value="quizzes"`** with the same visual pattern already used in `student/LessonDetail.tsx` quiz section:
+   - 3 KPI mini-cards: Total, Concluídos, Média
+   - List of quiz cards (title, nº de questões, duração, pontos, status badge — Disponível / Concluído / Expirado, with score when concluded)
+   - Clicking a card navigates to `/student/quizzes`
+   - Mock data generated per cadeira via a helper `generateDisciplineQuizzes(disciplineId, disciplineTitle)` returning ~4–5 quizzes (seeded so results are stable per cadeira). Some marked `concluido` with score, some `disponivel` with deadline.
+
+4. **Add a Quizzes KPI** to the header KPI grid is NOT requested — leave the 5 existing KPIs as-is (only swap layout if needed to keep grid balanced — keep `lg:grid-cols-5`).
+
+## Out of scope
+- No changes to other roles or other pages.
+- No business logic / backend — purely presentational mock data, consistent with existing mock patterns.
