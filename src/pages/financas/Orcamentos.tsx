@@ -98,15 +98,24 @@ export default function Orcamentos() {
         <Button size="sm" className="gap-1.5 h-9"><Plus className="w-4 h-4" /> Novo Orçamento</Button>
       </div>
 
+      {/* Ano Letivo banner */}
+      <div className="flex items-center justify-between gap-3 rounded-lg border border-border/70 bg-muted/30 px-4 py-2.5">
+        <div className="flex items-center gap-2">
+          <span className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground font-semibold">Ano Letivo</span>
+          <span className="text-sm font-semibold text-foreground tabular-nums">{orcamentos[0]?.period ?? "2025"}</span>
+        </div>
+        <p className="text-[11px] text-muted-foreground">Todos os dados abaixo referem-se a este ano letivo</p>
+      </div>
+
       {/* KPIs — separate tiles */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
         <Card className="p-4 border-border/70">
           <div className="flex items-center gap-1.5 mb-2">
             <Wallet className="w-3.5 h-3.5 text-foreground" />
             <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Total Orçamentado</p>
           </div>
-          <p className="text-2xl font-bold text-foreground tabular-nums leading-none">{formatCurrency(totalBudget)}</p>
-          <p className="text-[11px] text-muted-foreground mt-2">{orcamentos.length} orçamentos · {orcamentos[0]?.period ?? "2025"}</p>
+          <p className="text-xl font-bold text-foreground tabular-nums leading-none">{formatCurrency(totalBudget)}</p>
+          <p className="text-[11px] text-muted-foreground mt-2">{orcamentos.length} orçamentos</p>
         </Card>
 
         <Card className="p-4 border-border/70">
@@ -114,8 +123,8 @@ export default function Orcamentos() {
             <TrendingDown className={cn("w-3.5 h-3.5", usageColor(pctUsed))} />
             <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Total Gasto</p>
           </div>
-          <p className={cn("text-2xl font-bold tabular-nums leading-none", usageColor(pctUsed))}>{formatCurrency(totalSpent)}</p>
-          <p className="text-[11px] text-muted-foreground mt-2">{pctUsed}% do orçamento executado</p>
+          <p className={cn("text-xl font-bold tabular-nums leading-none", usageColor(pctUsed))}>{formatCurrency(totalSpent)}</p>
+          <p className="text-[11px] text-muted-foreground mt-2">{pctUsed}% executado</p>
         </Card>
 
         <Card className="p-4 border-border/70">
@@ -123,10 +132,31 @@ export default function Orcamentos() {
             <CheckCircle2 className="w-3.5 h-3.5 text-accent" />
             <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Disponível</p>
           </div>
-          <p className="text-2xl font-bold text-foreground tabular-nums leading-none">{formatCurrency(available)}</p>
+          <p className="text-xl font-bold text-foreground tabular-nums leading-none">{formatCurrency(available)}</p>
           <p className="text-[11px] text-muted-foreground mt-2">{100 - pctUsed}% por executar</p>
         </Card>
+
+        <Card className={cn("p-4 border-border/70", numAlerta > 0 && "border-amber-200 bg-amber-50/40")}>
+          <div className="flex items-center gap-1.5 mb-2">
+            <AlertTriangle className={cn("w-3.5 h-3.5", numAlerta > 0 ? "text-amber-600" : "text-muted-foreground")} />
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Em Alerta</p>
+          </div>
+          <p className={cn("text-xl font-bold tabular-nums leading-none", numAlerta > 0 ? "text-amber-600" : "text-foreground")}>{numAlerta}</p>
+          <p className="text-[11px] text-muted-foreground mt-2">{numAlerta === 1 ? "orçamento" : "orçamentos"} ≥ 90%</p>
+        </Card>
+
+        <Card className="p-4 border-border/70">
+          <div className="flex items-center gap-1.5 mb-2">
+            <span className={cn("w-2 h-2 rounded-full", pctUsed >= 90 ? "bg-destructive" : pctUsed >= 75 ? "bg-amber-500" : "bg-accent")} />
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Estado</p>
+          </div>
+          <p className={cn("text-xl font-bold leading-none", usageColor(pctUsed))}>
+            {pctUsed >= 90 ? "Crítico" : pctUsed >= 75 ? "Atenção" : "Saudável"}
+          </p>
+          <p className="text-[11px] text-muted-foreground mt-2">{numActivos} activos · {counts.esgotado} esgotados</p>
+        </Card>
       </div>
+
 
       {/* Utilização global */}
       <Card className="p-5 border-border/70">
