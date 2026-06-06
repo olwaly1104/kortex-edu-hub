@@ -583,8 +583,8 @@ function QuizRow({ quiz, onStart }: { quiz: AnyQuiz; onStart: () => void }) {
         <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-1">{quiz.description}</p>
 
         {/* Stats row — below title */}
-        <div className="mt-2.5 flex items-center gap-6">
-          <div className="flex flex-col gap-0.5">
+        <div className="mt-2.5 inline-flex items-stretch rounded-lg border bg-muted/30 overflow-hidden">
+          <div className="flex flex-col items-center justify-center gap-0.5 px-3 py-1.5 min-w-[72px]">
             <span className="text-[9px] uppercase tracking-wider font-semibold text-muted-foreground">Nota Geral</span>
             <div className="flex items-baseline gap-1 leading-none">
               <div className={cn("w-1.5 h-4 rounded-full self-center", nc.bg)} />
@@ -594,8 +594,8 @@ function QuizRow({ quiz, onStart }: { quiz: AnyQuiz; onStart: () => void }) {
               <span className="text-[10px] font-medium text-muted-foreground/60">/20</span>
             </div>
           </div>
-          <div className="w-px h-8 bg-border" />
-          <div className="flex flex-col gap-0.5">
+          <div className="w-px bg-border self-stretch my-1" />
+          <div className="flex flex-col items-center justify-center gap-0.5 px-3 py-1.5 min-w-[72px]">
             <span className="text-[9px] uppercase tracking-wider font-semibold text-muted-foreground">Tentativas</span>
             <div className="flex items-baseline gap-1 leading-none">
               <span className="text-sm font-bold tabular-nums text-foreground">{stats.attempts}</span>
@@ -606,10 +606,7 @@ function QuizRow({ quiz, onStart }: { quiz: AnyQuiz; onStart: () => void }) {
       </div>
 
       <div className="shrink-0 flex items-center gap-3">
-        <div className="flex flex-col items-center gap-0.5">
-          <span className="text-[9px] uppercase tracking-wider font-semibold text-muted-foreground">Dificuldade</span>
-          <DiffPill d={quiz.difficulty} />
-        </div>
+        <DiffPill d={quiz.difficulty} />
         <span className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md border border-input bg-background text-xs font-medium group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-colors">
           <Play className="w-3 h-3" /> Iniciar
         </span>
