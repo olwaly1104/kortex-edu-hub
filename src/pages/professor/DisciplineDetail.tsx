@@ -390,7 +390,7 @@ export default function ProfessorDisciplineDetail() {
                       <p className="text-sm font-bold text-foreground">{student.submittedTasks}/{student.totalTasks}</p>
                     </div>
                     <div>
-                      <p className="text-[10px] text-muted-foreground uppercase">Última</p>
+                      <p className="text-[10px] text-muted-foreground uppercase">Aval.</p>
                       <p className="text-xs text-muted-foreground">{student.lastActive}</p>
                     </div>
                   </div>
