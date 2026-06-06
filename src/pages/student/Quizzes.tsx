@@ -937,9 +937,21 @@ function FillGame({ quiz, onLockChange }: { quiz: Extract<AnyQuiz, { type: "fill
 /*  Shared end-of-quiz results card                                    */
 /* ------------------------------------------------------------------ */
 
+type ReviewItem = {
+  n: number;
+  question: string;
+  correct: boolean;
+  userAnswer: string | null;
+  correctAnswer: string;
+  explain?: string;
+};
+
 function ResultsCard({
-  quiz, score, total, time, onRestart,
-}: { quiz: AnyQuiz; score: number; total: number; time?: number; onRestart: () => void }) {
+  quiz, score, total, time, onRestart, review,
+}: {
+  quiz: AnyQuiz; score: number; total: number; time?: number;
+  onRestart: () => void; review?: ReviewItem[];
+}) {
   const pct = Math.round((score / total) * 100);
   const tier =
     pct >= 80 ? { label: "Excelente", color: "text-emerald-700 bg-emerald-50 border-emerald-200" } :
@@ -950,24 +962,76 @@ function ResultsCard({
   return (
     <Card className="overflow-hidden">
       <div className={cn("h-1 w-full", meta.dot)} />
-      <div className="p-8 text-center space-y-5">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mx-auto">
-          <Trophy className="w-8 h-8 text-primary" />
-        </div>
-        <div>
-          <p className="text-[11px] uppercase tracking-[0.18em] font-semibold text-muted-foreground">Resultado</p>
-          <h3 className="text-5xl font-bold text-foreground tracking-tight tabular-nums mt-1">{pct}<span className="text-2xl text-muted-foreground">%</span></h3>
-          <p className="text-sm text-muted-foreground mt-1">{score} de {total} respostas correctas{time !== undefined && <> · <span className="font-mono">{fmtTime(time)}</span></>}</p>
-        </div>
-        <Badge variant="outline" className={cn("text-[11px] font-semibold", tier.color)}>{tier.label}</Badge>
-        <div className="max-w-sm mx-auto">
-          <div className="h-2 rounded-full bg-muted overflow-hidden">
-            <div className={cn("h-full transition-all duration-500", meta.dot)} style={{ width: `${pct}%` }} />
+      <div className="p-8 space-y-5">
+        <div className="text-center space-y-5">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mx-auto">
+            <Trophy className="w-8 h-8 text-primary" />
+          </div>
+          <div>
+            <p className="text-[11px] uppercase tracking-[0.18em] font-semibold text-muted-foreground">Resultado</p>
+            <h3 className="text-5xl font-bold text-foreground tracking-tight tabular-nums mt-1">{pct}<span className="text-2xl text-muted-foreground">%</span></h3>
+            <p className="text-sm text-muted-foreground mt-1">{score} de {total} respostas correctas{time !== undefined && <> · <span className="font-mono">{fmtTime(time)}</span></>}</p>
+          </div>
+          <Badge variant="outline" className={cn("text-[11px] font-semibold", tier.color)}>{tier.label}</Badge>
+          <div className="max-w-sm mx-auto">
+            <div className="h-2 rounded-full bg-muted overflow-hidden">
+              <div className={cn("h-full transition-all duration-500", meta.dot)} style={{ width: `${pct}%` }} />
+            </div>
+          </div>
+          <div className="flex items-center justify-center gap-2 pt-2">
+            <Button onClick={onRestart} variant="outline" className="gap-2"><RotateCcw className="w-4 h-4" /> Repetir</Button>
           </div>
         </div>
-        <div className="flex items-center justify-center gap-2 pt-2">
-          <Button onClick={onRestart} variant="outline" className="gap-2"><RotateCcw className="w-4 h-4" /> Repetir</Button>
-        </div>
+
+        {review && review.length > 0 && (
+          <div className="pt-4 border-t border-border space-y-3 text-left">
+            <p className="text-[11px] uppercase tracking-[0.16em] font-bold text-muted-foreground">Revisão · respostas e explicações</p>
+            {review.map(r => (
+              <div key={r.n} className={cn(
+                "rounded-lg border p-4 space-y-3",
+                r.correct ? "border-emerald-200 bg-emerald-50/40" : "border-rose-200 bg-rose-50/40",
+              )}>
+                <div className="flex items-start gap-3">
+                  <span className={cn(
+                    "shrink-0 w-7 h-7 rounded-md flex items-center justify-center text-[11px] font-bold tabular-nums text-white",
+                    r.correct ? "bg-emerald-500" : "bg-rose-500",
+                  )}>{r.n}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-foreground leading-snug">{r.question}</p>
+                    <div className="mt-2.5 grid sm:grid-cols-2 gap-2 text-xs">
+                      <div className={cn(
+                        "rounded-md border px-2.5 py-1.5 bg-card",
+                        r.correct ? "border-emerald-200" : "border-rose-200",
+                      )}>
+                        <p className="text-[9px] uppercase tracking-wider font-bold text-muted-foreground mb-0.5 flex items-center gap-1">
+                          {r.correct ? <CheckCircle2 className="w-3 h-3 text-emerald-600" /> : <XCircle className="w-3 h-3 text-rose-600" />}
+                          Tua resposta
+                        </p>
+                        <p className={cn("font-semibold", r.correct ? "text-emerald-700" : "text-rose-700")}>
+                          {r.userAnswer ?? "— sem resposta —"}
+                        </p>
+                      </div>
+                      {!r.correct && (
+                        <div className="rounded-md border border-emerald-200 bg-card px-2.5 py-1.5">
+                          <p className="text-[9px] uppercase tracking-wider font-bold text-muted-foreground mb-0.5 flex items-center gap-1">
+                            <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Resposta correcta
+                          </p>
+                          <p className="font-semibold text-emerald-700">{r.correctAnswer}</p>
+                        </div>
+                      )}
+                    </div>
+                    {r.explain && (
+                      <p className="mt-2.5 text-xs text-muted-foreground leading-relaxed flex gap-1.5">
+                        <Sparkles className="w-3 h-3 mt-0.5 shrink-0 text-primary" />
+                        <span>{r.explain}</span>
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </Card>
   );
