@@ -297,7 +297,7 @@ export default function ProfessorDisciplineDetail() {
           </div>
           <div className="space-y-3">
             {discTasks.map(task => {
-              const tcfg = taskStatusConfig[task.status];
+              const tcfg = taskStatusConfig[task.status] || { label: task.status, color: "bg-muted text-muted-foreground" };
               const submPct = Math.round((task.submissions / task.totalStudents) * 100);
               return (
                 <Card key={task.id} className="p-4 border-l-[3px] cursor-pointer hover:shadow-md transition-shadow" style={{ borderLeftColor: disc.color }} onClick={() => navigate(`/professor/tasks/${task.id}`)}>
