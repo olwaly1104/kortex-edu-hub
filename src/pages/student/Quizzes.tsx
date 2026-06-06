@@ -743,13 +743,17 @@ function MCQGame({ quiz, onLockChange }: { quiz: Extract<AnyQuiz, { type: "mcq" 
 /*  Written Game                                                       */
 /* ------------------------------------------------------------------ */
 
-function WrittenGame({ quiz }: { quiz: Extract<AnyQuiz, { type: "written" }> }) {
+function WrittenGame({ quiz, onLockChange }: { quiz: Extract<AnyQuiz, { type: "written" }>; onLockChange?: (locked: boolean) => void }) {
   const [idx, setIdx] = useState(0);
   const [answer, setAnswer] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const current = quiz.items[idx];
   const total = quiz.items.length;
   const { meta } = accent(quiz);
+  const time = useTimer(true);
+
+  // Written game has no terminal "done" state — lock while mounted, release on unmount.
+  useEffect(() => { onLockChange?.(true); return () => onLockChange?.(false); }, [onLockChange]);
 
   const matches = current.keywords.filter(k => answer.toLowerCase().includes(k.toLowerCase()));
   const pct = current.keywords.length ? Math.round((matches.length / current.keywords.length) * 100) : 0;
@@ -762,12 +766,7 @@ function WrittenGame({ quiz }: { quiz: Extract<AnyQuiz, { type: "written" }> }) 
   return (
     <Card className="overflow-hidden">
       <div className="px-6 pt-5 pb-4 border-b border-border bg-muted/30">
-        <ProgressStrip quiz={quiz} position={idx + 1} total={total}
-          scoreLabel={
-            <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground">
-              <Pencil className="w-3 h-3" /> Resposta aberta
-            </span>
-          } />
+        <ProgressStrip quiz={quiz} position={idx + 1} total={total} time={time} />
       </div>
 
       <div className="p-6 space-y-4">
