@@ -737,7 +737,7 @@ function FillGame({ quiz }: { quiz: Extract<AnyQuiz, { type: "fill" }> }) {
     <Card className="p-6 space-y-5">
       <div className="flex items-center justify-between text-xs text-muted-foreground">
         <span>Preenche {idx + 1} / {quiz.items.length}</span>
-        <span className="flex items-center gap-1"><Trophy className="w-3.5 h-3.5 text-primary" />{score} pts</span>
+        <span className="flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />{score} certas</span>
       </div>
       <div className="text-lg text-foreground leading-relaxed flex items-center flex-wrap gap-2">
         <span>{before}</span>
