@@ -648,7 +648,7 @@ function StripStat({ label, value }: { label: string; value: React.ReactNode }) 
 /*  MCQ Game                                                           */
 /* ------------------------------------------------------------------ */
 
-function MCQGame({ quiz }: { quiz: Extract<AnyQuiz, { type: "mcq" }> }) {
+function MCQGame({ quiz, onLockChange }: { quiz: Extract<AnyQuiz, { type: "mcq" }>; onLockChange?: (locked: boolean) => void }) {
   const [idx, setIdx] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [score, setScore] = useState(0);
@@ -657,6 +657,10 @@ function MCQGame({ quiz }: { quiz: Extract<AnyQuiz, { type: "mcq" }> }) {
   const total = quiz.items.length;
   const current = quiz.items[idx];
   const { meta } = accent(quiz);
+  const time = useTimer(!done);
+
+  useEffect(() => { onLockChange?.(!done); }, [done, onLockChange]);
+  useEffect(() => () => onLockChange?.(false), [onLockChange]);
 
   const choose = (i: number) => {
     if (selected !== null) return;
@@ -669,13 +673,12 @@ function MCQGame({ quiz }: { quiz: Extract<AnyQuiz, { type: "mcq" }> }) {
   };
   const restart = () => { setIdx(0); setSelected(null); setScore(0); setDone(false); };
 
-  if (done) return <ResultsCard quiz={quiz} score={score} total={total} onRestart={restart} />;
+  if (done) return <ResultsCard quiz={quiz} score={score} total={total} time={time} onRestart={restart} />;
 
   return (
     <Card className="overflow-hidden">
       <div className="px-6 pt-5 pb-4 border-b border-border bg-muted/30">
-        <ProgressStrip quiz={quiz} position={idx + (selected !== null ? 1 : 0)} total={total}
-          scoreLabel={<ScoreChip correct={score} total={total} />} />
+        <ProgressStrip quiz={quiz} position={idx + (selected !== null ? 1 : 0)} total={total} score={score} time={time} />
       </div>
 
       <div className="p-6 space-y-5">
