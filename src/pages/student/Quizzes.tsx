@@ -231,6 +231,7 @@ export default function StudentQuizzes() {
         {active.type === "written" && <WrittenGame quiz={active} />}
         {active.type === "fill"    && <FillGame quiz={active} />}
         {active.type === "flash"   && <FlashGame quiz={active} />}
+        {active.type === "exam"    && <ExamGame quiz={active} />}
       </div>
     );
   }
