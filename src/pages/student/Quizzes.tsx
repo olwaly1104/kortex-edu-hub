@@ -527,12 +527,12 @@ function QuizHeader({ quiz }: { quiz: AnyQuiz }) {
   return (
     <div className="border-b border-border pb-5">
       <div className="flex items-start gap-4 flex-wrap">
-        <div className="w-12 h-12 rounded-lg border border-border bg-muted/30 flex items-center justify-center shrink-0">
-          <Icon className="w-5 h-5 text-foreground/70" />
+        <div className={cn("w-12 h-12 rounded-lg border flex items-center justify-center shrink-0", meta.tile)}>
+          <Icon className="w-5 h-5" />
         </div>
         <div className="flex-1 min-w-[200px]">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-[10px] font-mono font-semibold text-muted-foreground">{quiz.code}</span>
+            <Badge variant="outline" className={cn("text-[10px] font-semibold border", meta.tag)}>{meta.label}</Badge>
             <span className="text-[10px] uppercase tracking-wider font-semibold text-primary">{quiz.cadeira}</span>
             <span className="text-[10px] text-muted-foreground">· {quiz.ano}º ano</span>
           </div>
@@ -540,9 +540,7 @@ function QuizHeader({ quiz }: { quiz: AnyQuiz }) {
           <p className="text-sm text-muted-foreground mt-1.5 max-w-2xl">{quiz.description}</p>
         </div>
         <div className="flex gap-2 flex-wrap">
-          <Badge variant="outline" className="text-[10px]">{meta.label}</Badge>
           <Badge variant="outline" className={cn("text-[10px]", DIFF_STYLE[quiz.difficulty])}>{quiz.difficulty}</Badge>
-          <Badge variant="outline" className="text-[10px] gap-1"><Layers className="w-3 h-3" />{quiz.items.length}</Badge>
           <Badge variant="outline" className="text-[10px] gap-1"><Timer className="w-3 h-3" />{quiz.minutes} min</Badge>
         </div>
       </div>
