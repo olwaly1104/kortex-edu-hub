@@ -80,18 +80,10 @@ export default function Orcamentos() {
     .sort((a, b) => b.budget - a.budget);
   const maxFacBudget = Math.max(...faculdadeBreakdown.map(f => f.budget), 1);
 
-  const responsavelBreakdown = Object.entries(
-    orcamentos.reduce<Record<string, { budget: number; spent: number; role: string }>>((acc, o) => {
-      acc[o.responsavel] = acc[o.responsavel] ?? { budget: 0, spent: 0, role: o.responsavelRole };
-      acc[o.responsavel].budget += o.totalBudget;
-      acc[o.responsavel].spent += o.spent;
-      return acc;
-    }, {})
-  )
-    .map(([name, v]) => ({ name, ...v }))
-    .sort((a, b) => b.budget - a.budget);
-
-
+  const alertaList = orcamentos
+    .map(o => ({ ...o, pct: Math.round((o.spent / o.totalBudget) * 100) }))
+    .filter(o => o.pct >= 75 || o.status === "esgotado")
+    .sort((a, b) => b.pct - a.pct);
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
@@ -106,51 +98,63 @@ export default function Orcamentos() {
         <Button size="sm" className="gap-1.5 h-9"><Plus className="w-4 h-4" /> Novo Orçamento</Button>
       </div>
 
-      {/* Combined: KPIs + Utilização global */}
-      <Card className="p-5 border-border/70 overflow-hidden">
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-5 items-start">
-          {/* Left: 3 KPI tiles + bar */}
-          <div className="space-y-4">
-            <div className="grid grid-cols-3 gap-3">
+      {/* Executive summary */}
+      <Card className="border-border/70 overflow-hidden">
+        <div className="grid grid-cols-1 lg:grid-cols-[1.5fr_auto_1fr]">
+          <div className="p-5 lg:p-6 space-y-5">
+            <div className="flex items-center justify-between">
+              <p className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground font-semibold">Resumo orçamental · {orcamentos[0]?.period ?? "2025"}</p>
+              <Badge variant="outline" className="text-[10px] gap-1 bg-muted/40 border-border/70">
+                <span className={cn("w-1.5 h-1.5 rounded-full", pctUsed >= 90 ? "bg-destructive" : pctUsed >= 75 ? "bg-amber-500" : "bg-accent")} />
+                {pctUsed >= 90 ? "Crítico" : pctUsed >= 75 ? "Atenção" : "Saudável"}
+              </Badge>
+            </div>
+
+            <div className="grid grid-cols-3 gap-4">
               <div>
-                <div className="flex items-center gap-1.5 mb-1">
-                  <span className="w-2 h-2 rounded-full bg-foreground" />
-                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Total Orçamentado</p>
-                </div>
-                <p className="text-lg font-bold text-foreground tabular-nums">{formatCurrency(totalBudget)}</p>
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Orçamentado</p>
+                <p className="text-xl font-bold text-foreground tabular-nums mt-1 leading-tight">{formatCurrency(totalBudget)}</p>
+                <p className="text-[10px] text-muted-foreground mt-0.5">{orcamentos.length} orçamentos</p>
               </div>
-              <div>
-                <div className="flex items-center gap-1.5 mb-1">
-                  <span className={cn("w-2 h-2 rounded-full", pctUsed >= 90 ? "bg-destructive" : pctUsed >= 75 ? "bg-amber-500" : "bg-accent")} />
-                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Total Gasto</p>
-                </div>
-                <p className={cn("text-lg font-bold tabular-nums", usageColor(pctUsed))}>{formatCurrency(totalSpent)}</p>
+              <div className="border-l border-border/70 pl-4">
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Gasto</p>
+                <p className={cn("text-xl font-bold tabular-nums mt-1 leading-tight", usageColor(pctUsed))}>{formatCurrency(totalSpent)}</p>
+                <p className="text-[10px] text-muted-foreground mt-0.5">{pctUsed}% executado</p>
               </div>
-              <div>
-                <div className="flex items-center gap-1.5 mb-1">
-                  <span className="w-2 h-2 rounded-full bg-primary/30" />
-                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Disponível</p>
-                </div>
-                <p className="text-lg font-bold text-foreground tabular-nums">{formatCurrency(available)}</p>
+              <div className="border-l border-border/70 pl-4">
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Disponível</p>
+                <p className="text-xl font-bold text-foreground tabular-nums mt-1 leading-tight">{formatCurrency(available)}</p>
+                <p className="text-[10px] text-muted-foreground mt-0.5">{100 - pctUsed}% restante</p>
               </div>
             </div>
 
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Utilização global</p>
-                <p className="text-[11px] text-muted-foreground tabular-nums">{numActivos} activos · {numAlerta > 0 && <span className="text-amber-600 font-medium">{numAlerta} em alerta</span>}</p>
+                <p className="text-[11px] text-muted-foreground tabular-nums">
+                  <span className="text-accent font-medium">{numActivos} activos</span>
+                  {numAlerta > 0 && <> · <span className="text-amber-600 font-medium">{numAlerta} em alerta</span></>}
+                </p>
               </div>
-              <div className="relative h-3 w-full rounded-full bg-muted overflow-hidden flex">
+              <div className="relative h-2.5 w-full rounded-full bg-muted overflow-hidden">
                 <div className={cn("h-full transition-all", pctUsed >= 90 ? "bg-destructive" : pctUsed >= 75 ? "bg-amber-500" : "bg-accent")} style={{ width: `${pctUsed}%` }} />
-                <div className="h-full bg-primary/10 flex-1" />
+              </div>
+              <div className="flex items-center justify-between mt-1.5 text-[10px] text-muted-foreground tabular-nums">
+                <span>0 Kz</span>
+                <span>{formatCurrency(totalBudget)}</span>
               </div>
             </div>
           </div>
 
-          {/* Right: percentage */}
-          <div className="lg:border-l lg:border-border lg:pl-5 text-center lg:text-right shrink-0">
-            <p className={cn("text-5xl font-bold tabular-nums leading-none", usageColor(pctUsed))}>{pctUsed}<span className="text-2xl">%</span></p>
-            <p className="text-[10px] text-muted-foreground uppercase tracking-wider mt-1.5">do orçamento total</p>
+          <div className="hidden lg:block w-px bg-border/70" />
+
+          <div className="p-5 lg:p-6 flex flex-col justify-center items-center lg:items-start gap-1 bg-muted/20">
+            <p className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground font-semibold">Execução</p>
+            <div className="flex items-baseline gap-1">
+              <p className={cn("text-6xl font-bold tabular-nums leading-none", usageColor(pctUsed))}>{pctUsed}</p>
+              <span className={cn("text-2xl font-semibold", usageColor(pctUsed))}>%</span>
+            </div>
+            <p className="text-[11px] text-muted-foreground">do orçamento total</p>
           </div>
         </div>
       </Card>
