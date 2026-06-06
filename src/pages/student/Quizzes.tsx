@@ -936,8 +936,8 @@ function FillGame({ quiz, onLockChange }: { quiz: Extract<AnyQuiz, { type: "fill
 /* ------------------------------------------------------------------ */
 
 function ResultsCard({
-  quiz, score, total, onRestart,
-}: { quiz: AnyQuiz; score: number; total: number; onRestart: () => void }) {
+  quiz, score, total, time, onRestart,
+}: { quiz: AnyQuiz; score: number; total: number; time?: number; onRestart: () => void }) {
   const pct = Math.round((score / total) * 100);
   const tier =
     pct >= 80 ? { label: "Excelente", color: "text-emerald-700 bg-emerald-50 border-emerald-200" } :
