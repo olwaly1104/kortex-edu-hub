@@ -345,12 +345,12 @@ export default function StudentQuizzes() {
           <p className="text-[11px] uppercase tracking-[0.18em] font-semibold text-primary mb-1.5">UPRA · Arquitectura</p>
           <h1 className="text-3xl font-bold text-foreground tracking-tight">Centro de Estudo</h1>
           <p className="text-sm text-muted-foreground mt-1.5 max-w-2xl">
-            Treino dirigido às cadeiras do Curso de Arquitectura. Escolhe a tipologia, a cadeira e o exercício — cada actividade tem duração estimada e nível de dificuldade.
+            Treino dirigido às cadeiras do Curso de Arquitectura. Escolhe a tipologia, a cadeira e o exercício — cada pergunta tem duração estimada e nível de dificuldade.
           </p>
         </div>
-        <div className="grid grid-cols-2 gap-3 min-w-[220px]">
-          <KpiStat label="Actividades" value={total} />
+        <div className="grid grid-cols-2 gap-3 min-w-[260px]">
           <KpiStat label="Cadeiras" value={cadeiras.length} />
+          <KpiStat label="Nota Geral" value={notaGeral.toFixed(1)} accent={notaColor(notaGeral).text} />
         </div>
       </div>
 
