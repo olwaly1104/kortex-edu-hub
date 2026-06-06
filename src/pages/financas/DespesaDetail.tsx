@@ -246,28 +246,6 @@ export default function DespesaDetail() {
           </div>
         </div>
 
-        {despesa.status === "pendente" && (
-          <>
-            <Separator className="my-5" />
-            <div className="flex items-center justify-end gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                className="gap-1.5 border-destructive/30 text-destructive hover:bg-destructive/10 hover:text-destructive"
-                onClick={() => toast({ title: "Despesa rejeitada" })}
-              >
-                <X className="w-4 h-4" /> Rejeitar
-              </Button>
-              <Button
-                size="sm"
-                className="gap-1.5 bg-accent text-accent-foreground hover:bg-accent/90"
-                onClick={() => toast({ title: "Despesa aprovada" })}
-              >
-                <Check className="w-4 h-4" /> Aprovar
-              </Button>
-            </div>
-          </>
-        )}
       </Card>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
