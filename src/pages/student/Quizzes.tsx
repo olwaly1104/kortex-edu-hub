@@ -328,7 +328,6 @@ export default function StudentQuizzes() {
   }
 
   const total = QUIZZES.length;
-  const totalItems = QUIZZES.reduce((s, q) => s + q.items.length, 0);
   const typeCounts: Record<QuizType | "all", number> = {
     all: total,
     mcq: QUIZZES.filter(q => q.type === "mcq").length,
@@ -343,15 +342,14 @@ export default function StudentQuizzes() {
       {/* Editorial header */}
       <div className="flex items-start justify-between gap-4 flex-wrap border-b border-border pb-5">
         <div>
-          <p className="text-[11px] uppercase tracking-[0.18em] font-semibold text-primary mb-1.5">Centro de Estudo · Arquitectura</p>
-          <h1 className="text-3xl font-bold text-foreground tracking-tight">Quizzes & Flashcards</h1>
+          <p className="text-[11px] uppercase tracking-[0.18em] font-semibold text-primary mb-1.5">UPRA · Arquitectura</p>
+          <h1 className="text-3xl font-bold text-foreground tracking-tight">Centro de Estudo</h1>
           <p className="text-sm text-muted-foreground mt-1.5 max-w-2xl">
-            Treino dirigido às cadeiras do Curso de Arquitectura. Escolhe a tipologia, a cadeira e o quiz que pretendes realizar — cada exercício tem duração estimada, dificuldade e número de questões.
+            Treino dirigido às cadeiras do Curso de Arquitectura. Escolhe a tipologia, a cadeira e o exercício — cada actividade tem duração estimada e nível de dificuldade.
           </p>
         </div>
-        <div className="grid grid-cols-3 gap-3 min-w-[280px]">
-          <KpiStat label="Quizzes" value={total} />
-          <KpiStat label="Questões" value={totalItems} />
+        <div className="grid grid-cols-2 gap-3 min-w-[220px]">
+          <KpiStat label="Actividades" value={total} />
           <KpiStat label="Cadeiras" value={cadeiras.length} />
         </div>
       </div>
