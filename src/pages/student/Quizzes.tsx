@@ -433,33 +433,30 @@ function FilterRow({
 
 function QuizRow({ quiz, onStart }: { quiz: AnyQuiz; onStart: () => void }) {
   const meta = TYPE_META[quiz.type];
+  const Icon = meta.icon;
   return (
-    <div className={cn("flex items-center gap-4 px-4 py-3 hover:bg-muted/30 transition-colors border-l-[3px]", meta.tile.split(" ").find(c => c.startsWith("border-")) ?? "border-l-transparent")}>
-      {/* Cadeira column — the dominant identifier */}
-      <div className="w-[180px] shrink-0 hidden md:block">
-        <p className="text-[13px] font-semibold text-foreground leading-tight truncate">{quiz.cadeira}</p>
-        <p className="text-[10px] text-muted-foreground mt-0.5 font-medium tabular-nums">{quiz.ano}º ano</p>
-      </div>
-
-      <div className="w-px h-8 bg-border hidden md:block shrink-0" />
-
-      {/* Title + description */}
+    <div className="group flex items-center gap-4 px-5 py-3.5 hover:bg-muted/30 transition-colors">
       <div className="flex-1 min-w-0">
-        <h3 className="text-[13px] font-semibold text-foreground leading-tight truncate">{quiz.title}</h3>
+        {/* Meta bar — cadeira + categoria together */}
+        <div className="flex items-center gap-2 mb-1.5">
+          <span className={cn("inline-flex items-center gap-1.5 text-[10px] font-semibold px-2 py-0.5 rounded-md border", meta.tag)}>
+            <Icon className="w-3 h-3" />
+            {meta.label}
+          </span>
+          <span className="text-muted-foreground/40 text-[10px]">/</span>
+          <span className="text-[11px] font-semibold text-foreground/80 truncate">{quiz.cadeira}</span>
+          <span className="text-muted-foreground/40 text-[10px]">·</span>
+          <span className="text-[10px] text-muted-foreground tabular-nums">{quiz.ano}º ano</span>
+        </div>
+        <h3 className="text-sm font-semibold text-foreground leading-tight truncate">{quiz.title}</h3>
         <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-1">{quiz.description}</p>
       </div>
 
-      {/* Type tag */}
-      <Badge variant="outline" className={cn("text-[10px] font-medium border shrink-0 hidden sm:inline-flex", meta.tag)}>
-        {meta.label}
-      </Badge>
-
-      {/* Duration */}
-      <span className="text-[11px] text-muted-foreground hidden lg:flex items-center gap-1 shrink-0 tabular-nums">
+      <span className="text-[11px] text-muted-foreground hidden md:flex items-center gap-1 shrink-0 tabular-nums">
         <Timer className="w-3 h-3" />{quiz.minutes}m
       </span>
 
-      <Button size="sm" variant="outline" onClick={onStart} className="gap-1.5 shrink-0 h-8">
+      <Button size="sm" variant="outline" onClick={onStart} className="gap-1.5 shrink-0 h-8 group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-colors">
         <Play className="w-3 h-3" /> Iniciar
       </Button>
     </div>
