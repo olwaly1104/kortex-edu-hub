@@ -552,7 +552,7 @@ function QuizHeader({ quiz }: { quiz: AnyQuiz }) {
           <div className={cn("w-20 h-20 rounded-2xl border-2 flex items-center justify-center shadow-sm", meta.tile)}>
             <Icon className="w-10 h-10" />
           </div>
-          <span className="text-[10px] font-bold uppercase tracking-wider text-foreground/70 text-center leading-tight max-w-[5rem]">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-foreground/70 text-center leading-tight max-w-[5rem] px-2 py-0.5 rounded-md border border-border bg-muted/30">
             {meta.label}
           </span>
         </div>
