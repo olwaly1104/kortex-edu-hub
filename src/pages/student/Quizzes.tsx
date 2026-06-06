@@ -512,13 +512,8 @@ function QuizRow({ quiz, onStart }: { quiz: AnyQuiz; onStart: () => void }) {
         <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-1">{quiz.description}</p>
       </div>
 
-      <div className="hidden md:flex items-center gap-6 shrink-0 pr-2">
-        <div className="flex flex-col items-end gap-1 min-w-[80px]">
-          <span className="text-[9px] uppercase tracking-wider text-muted-foreground font-medium">Dificuldade</span>
-          <span className={cn("text-[10px] font-semibold px-2 py-0.5 rounded-md border", DIFF_STYLE[quiz.difficulty])}>
-            {quiz.difficulty}
-          </span>
-        </div>
+      <div className="hidden md:flex items-center shrink-0 pr-2">
+        <DiffPill d={quiz.difficulty} />
       </div>
 
       <Button size="sm" variant="outline" onClick={onStart} className="gap-1.5 shrink-0 h-8 group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-colors">
