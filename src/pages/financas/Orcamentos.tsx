@@ -249,9 +249,6 @@ export default function Orcamentos() {
         </Card>
       </div>
 
-        </Card>
-      </div>
-
       {/* Controls */}
       <div className="rounded-xl border border-border bg-card p-3 flex gap-2 items-center flex-wrap">
         <div className="relative flex-1 min-w-[220px] max-w-sm">
