@@ -220,9 +220,10 @@ export default function ProfessorDisciplineDetail() {
           </div>
           <div className="space-y-3">
             {discLessons.map(lesson => {
-              const cfg = statusConfig[lesson.status];
+              const cfg = statusConfig[lesson.status] || fallbackStatus;
               const StatusIcon = cfg.icon;
               const turma = allTurmas.find(t => t.id === lesson.turmaId);
+
               return (
                 <Card key={lesson.id} className="p-4 flex items-center gap-4 border-l-[3px]" style={{ borderLeftColor: lesson.status === "publicada" ? "hsl(var(--accent))" : lesson.status === "agendada" ? disc.color : "hsl(var(--muted))" }}>
                   <div className="w-20 h-14 rounded-xl bg-muted/50 flex items-center justify-center shrink-0">
