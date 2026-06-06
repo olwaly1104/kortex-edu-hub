@@ -605,10 +605,10 @@ function QuizRow({ quiz, onStart }: { quiz: AnyQuiz; onStart: () => void }) {
         </div>
       </div>
 
-      <div className="shrink-0 flex items-center gap-3">
-        <DiffPill d={quiz.difficulty} />
-        <span className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md border border-input bg-background text-xs font-medium group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-colors">
-          <Play className="w-3 h-3" /> Iniciar
+      <div className="shrink-0 flex flex-col items-center gap-2">
+        <DiffPill d={quiz.difficulty} size="md" />
+        <span className="inline-flex items-center gap-2 h-10 px-5 rounded-lg border border-input bg-background text-sm font-semibold group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-colors shadow-sm">
+          <Play className="w-4 h-4" /> Iniciar
         </span>
       </div>
 
