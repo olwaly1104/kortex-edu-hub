@@ -275,22 +275,7 @@ export default function StudentQuizzes() {
   }), [typeFilter, cadeiraFilter, search]);
 
   if (active) {
-    return (
-      <div className="p-6 lg:p-8 space-y-5 animate-fade-in">
-        <button
-          onClick={() => setActiveId(null)}
-          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
-        >
-          <ArrowLeft className="w-4 h-4" /> Voltar ao Centro de Estudo
-        </button>
-        <QuizHeader quiz={active} />
-        {active.type === "mcq"     && <MCQGame quiz={active} />}
-        {active.type === "written" && <WrittenGame quiz={active} />}
-        {active.type === "fill"    && <FillGame quiz={active} />}
-        
-        {active.type === "exam"    && <ExamGame quiz={active} />}
-      </div>
-    );
+    return <ActiveQuizView quiz={active} onExit={() => setActiveId(null)} />;
   }
 
   const total = QUIZZES.length;
@@ -499,12 +484,6 @@ function QuizRow({ quiz, onStart }: { quiz: AnyQuiz; onStart: () => void }) {
       </div>
 
       <div className="hidden md:flex items-center gap-6 shrink-0 pr-2">
-        <div className="flex flex-col items-end gap-1 min-w-[64px]">
-          <span className="text-[9px] uppercase tracking-wider text-muted-foreground font-medium">Duração</span>
-          <span className="text-xs font-semibold text-foreground flex items-center gap-1 tabular-nums">
-            <Timer className="w-3 h-3 text-muted-foreground" />{quiz.minutes} min
-          </span>
-        </div>
         <div className="flex flex-col items-end gap-1 min-w-[80px]">
           <span className="text-[9px] uppercase tracking-wider text-muted-foreground font-medium">Dificuldade</span>
           <span className={cn("text-[10px] font-semibold px-2 py-0.5 rounded-md border", DIFF_STYLE[quiz.difficulty])}>
@@ -536,7 +515,6 @@ function QuizHeader({ quiz }: { quiz: AnyQuiz }) {
   const Icon = meta.icon;
   return (
     <Card className="overflow-hidden">
-      {/* color rail */}
       <div className={cn("h-1 w-full", meta.dot)} />
       <div className="p-6 flex items-start gap-5 flex-wrap">
         <div className={cn("w-14 h-14 rounded-xl border flex items-center justify-center shrink-0", meta.tile)}>
@@ -551,8 +529,6 @@ function QuizHeader({ quiz }: { quiz: AnyQuiz }) {
               <span className={cn("w-1.5 h-1.5 rounded-full", cad.dot)} />
               {quiz.cadeira}
             </span>
-            <span className="text-[10px] text-muted-foreground font-medium">{quiz.ano}º ano</span>
-            <span className="text-[10px] font-mono text-muted-foreground">· {quiz.code}</span>
           </div>
           <h2 className="text-2xl font-bold text-foreground leading-tight tracking-tight">{quiz.title}</h2>
           <p className="text-sm text-muted-foreground mt-1.5 max-w-2xl leading-relaxed">{quiz.description}</p>
@@ -560,9 +536,6 @@ function QuizHeader({ quiz }: { quiz: AnyQuiz }) {
         <div className="flex flex-col items-end gap-1.5 shrink-0">
           <Badge variant="outline" className={cn("text-[10px] font-semibold", DIFF_STYLE[quiz.difficulty])}>
             {quiz.difficulty}
-          </Badge>
-          <Badge variant="outline" className="text-[10px] gap-1 font-medium">
-            <Timer className="w-3 h-3" />{quiz.minutes} min
           </Badge>
           <Badge variant="outline" className="text-[10px] gap-1 font-medium">
             <Layers className="w-3 h-3" />{quiz.items.length} {quiz.items.length === 1 ? "item" : "itens"}
@@ -573,23 +546,88 @@ function QuizHeader({ quiz }: { quiz: AnyQuiz }) {
   );
 }
 
-/** Unified progress strip used by every game type. */
-function ProgressStrip({
-  quiz, position, total, scoreLabel,
-}: { quiz: AnyQuiz; position: number; total: number; scoreLabel?: React.ReactNode }) {
-  const { meta } = accent(quiz);
-  const pct = Math.round((position / total) * 100);
+/** Hook: monotonic seconds counter that runs while `running` is true. */
+function useTimer(running: boolean) {
+  const [s, setS] = useState(0);
+  useEffect(() => {
+    if (!running) return;
+    const t = setInterval(() => setS(x => x + 1), 1000);
+    return () => clearInterval(t);
+  }, [running]);
+  return s;
+}
+
+function fmtTime(s: number) {
+  return `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
+}
+
+/** Wrapper that locks the "Voltar" exit while a game is in progress. */
+function ActiveQuizView({ quiz, onExit }: { quiz: AnyQuiz; onExit: () => void }) {
+  const [locked, setLocked] = useState(false);
   return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between text-[11px]">
-        <span className="font-semibold text-foreground tabular-nums">
-          {position} <span className="text-muted-foreground font-normal">de {total}</span>
-        </span>
-        {scoreLabel}
+    <div className="p-6 lg:p-8 space-y-5 animate-fade-in">
+      {locked ? (
+        <div className="inline-flex items-center gap-2 text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-md">
+          <AlertTriangle className="w-3.5 h-3.5" />
+          Quiz em curso — termina para poderes sair.
+        </div>
+      ) : (
+        <button
+          onClick={onExit}
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" /> Voltar ao Centro de Estudo
+        </button>
+      )}
+      <QuizHeader quiz={quiz} />
+      {quiz.type === "mcq"     && <MCQGame     quiz={quiz} onLockChange={setLocked} />}
+      {quiz.type === "written" && <WrittenGame quiz={quiz} onLockChange={setLocked} />}
+      {quiz.type === "fill"    && <FillGame    quiz={quiz} onLockChange={setLocked} />}
+      {quiz.type === "exam"    && <ExamGame    quiz={quiz} onLockChange={setLocked} />}
+    </div>
+  );
+}
+
+/** Unified progress strip used by every game type. */
+/** Clean cockpit strip used by every active game. */
+function ProgressStrip({
+  quiz, position, total, score, time,
+}: {
+  quiz: AnyQuiz;
+  position: number;
+  total: number;
+  score?: number;
+  time?: number;
+}) {
+  const { meta } = accent(quiz);
+  const pct = Math.max(0, Math.min(100, Math.round((position / total) * 100)));
+  return (
+    <div className="space-y-3">
+      <div className="flex items-end justify-between gap-6 flex-wrap">
+        <StripStat label="Questão" value={
+          <>
+            <span className="text-foreground">{position}</span>
+            <span className="text-muted-foreground/60 font-normal"> / {total}</span>
+          </>
+        } />
+        <div className="flex items-end gap-7">
+          {score !== undefined && (
+            <StripStat
+              label="Acertos"
+              value={<span className="text-emerald-600">{score}</span>}
+            />
+          )}
+          {time !== undefined && (
+            <StripStat
+              label="Tempo"
+              value={<span className="font-mono tracking-tight text-foreground">{fmtTime(time)}</span>}
+            />
+          )}
+        </div>
       </div>
-      <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+      <div className="relative h-1 rounded-full bg-muted overflow-hidden">
         <div
-          className={cn("h-full rounded-full transition-all duration-300", meta.dot)}
+          className={cn("absolute inset-y-0 left-0 rounded-full transition-all duration-500 ease-out", meta.dot)}
           style={{ width: `${pct}%` }}
         />
       </div>
@@ -597,11 +635,12 @@ function ProgressStrip({
   );
 }
 
-function ScoreChip({ correct, total }: { correct: number; total: number }) {
+function StripStat({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md">
-      <CheckCircle2 className="w-3 h-3" /> {correct}<span className="text-emerald-600/70 font-normal">/{total}</span>
-    </span>
+    <div className="flex flex-col gap-0.5">
+      <span className="text-[9px] uppercase tracking-[0.16em] font-semibold text-muted-foreground">{label}</span>
+      <span className="text-base font-bold tabular-nums leading-none">{value}</span>
+    </div>
   );
 }
 
@@ -609,7 +648,7 @@ function ScoreChip({ correct, total }: { correct: number; total: number }) {
 /*  MCQ Game                                                           */
 /* ------------------------------------------------------------------ */
 
-function MCQGame({ quiz }: { quiz: Extract<AnyQuiz, { type: "mcq" }> }) {
+function MCQGame({ quiz, onLockChange }: { quiz: Extract<AnyQuiz, { type: "mcq" }>; onLockChange?: (locked: boolean) => void }) {
   const [idx, setIdx] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [score, setScore] = useState(0);
@@ -618,6 +657,10 @@ function MCQGame({ quiz }: { quiz: Extract<AnyQuiz, { type: "mcq" }> }) {
   const total = quiz.items.length;
   const current = quiz.items[idx];
   const { meta } = accent(quiz);
+  const time = useTimer(!done);
+
+  useEffect(() => { onLockChange?.(!done); }, [done, onLockChange]);
+  useEffect(() => () => onLockChange?.(false), [onLockChange]);
 
   const choose = (i: number) => {
     if (selected !== null) return;
@@ -630,13 +673,12 @@ function MCQGame({ quiz }: { quiz: Extract<AnyQuiz, { type: "mcq" }> }) {
   };
   const restart = () => { setIdx(0); setSelected(null); setScore(0); setDone(false); };
 
-  if (done) return <ResultsCard quiz={quiz} score={score} total={total} onRestart={restart} />;
+  if (done) return <ResultsCard quiz={quiz} score={score} total={total} time={time} onRestart={restart} />;
 
   return (
     <Card className="overflow-hidden">
       <div className="px-6 pt-5 pb-4 border-b border-border bg-muted/30">
-        <ProgressStrip quiz={quiz} position={idx + (selected !== null ? 1 : 0)} total={total}
-          scoreLabel={<ScoreChip correct={score} total={total} />} />
+        <ProgressStrip quiz={quiz} position={idx + (selected !== null ? 1 : 0)} total={total} score={score} time={time} />
       </div>
 
       <div className="p-6 space-y-5">
@@ -701,13 +743,17 @@ function MCQGame({ quiz }: { quiz: Extract<AnyQuiz, { type: "mcq" }> }) {
 /*  Written Game                                                       */
 /* ------------------------------------------------------------------ */
 
-function WrittenGame({ quiz }: { quiz: Extract<AnyQuiz, { type: "written" }> }) {
+function WrittenGame({ quiz, onLockChange }: { quiz: Extract<AnyQuiz, { type: "written" }>; onLockChange?: (locked: boolean) => void }) {
   const [idx, setIdx] = useState(0);
   const [answer, setAnswer] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const current = quiz.items[idx];
   const total = quiz.items.length;
   const { meta } = accent(quiz);
+  const time = useTimer(true);
+
+  // Written game has no terminal "done" state — lock while mounted, release on unmount.
+  useEffect(() => { onLockChange?.(true); return () => onLockChange?.(false); }, [onLockChange]);
 
   const matches = current.keywords.filter(k => answer.toLowerCase().includes(k.toLowerCase()));
   const pct = current.keywords.length ? Math.round((matches.length / current.keywords.length) * 100) : 0;
@@ -720,12 +766,7 @@ function WrittenGame({ quiz }: { quiz: Extract<AnyQuiz, { type: "written" }> }) 
   return (
     <Card className="overflow-hidden">
       <div className="px-6 pt-5 pb-4 border-b border-border bg-muted/30">
-        <ProgressStrip quiz={quiz} position={idx + 1} total={total}
-          scoreLabel={
-            <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground">
-              <Pencil className="w-3 h-3" /> Resposta aberta
-            </span>
-          } />
+        <ProgressStrip quiz={quiz} position={idx + 1} total={total} time={time} />
       </div>
 
       <div className="p-6 space-y-4">
@@ -800,7 +841,7 @@ function WrittenGame({ quiz }: { quiz: Extract<AnyQuiz, { type: "written" }> }) 
 /*  Fill Game                                                          */
 /* ------------------------------------------------------------------ */
 
-function FillGame({ quiz }: { quiz: Extract<AnyQuiz, { type: "fill" }> }) {
+function FillGame({ quiz, onLockChange }: { quiz: Extract<AnyQuiz, { type: "fill" }>; onLockChange?: (locked: boolean) => void }) {
   const [idx, setIdx] = useState(0);
   const [value, setValue] = useState("");
   const [checked, setChecked] = useState(false);
@@ -808,6 +849,10 @@ function FillGame({ quiz }: { quiz: Extract<AnyQuiz, { type: "fill" }> }) {
   const [done, setDone] = useState(false);
   const current = quiz.items[idx];
   const total = quiz.items.length;
+  const time = useTimer(!done);
+
+  useEffect(() => { onLockChange?.(!done); }, [done, onLockChange]);
+  useEffect(() => () => onLockChange?.(false), [onLockChange]);
 
   const isRight = value.trim().toLowerCase() === current.answer.toLowerCase();
   const [before, after] = current.sentence.split("___");
@@ -822,13 +867,12 @@ function FillGame({ quiz }: { quiz: Extract<AnyQuiz, { type: "fill" }> }) {
   };
   const restart = () => { setIdx(0); setValue(""); setChecked(false); setScore(0); setDone(false); };
 
-  if (done) return <ResultsCard quiz={quiz} score={score} total={total} onRestart={restart} />;
+  if (done) return <ResultsCard quiz={quiz} score={score} total={total} time={time} onRestart={restart} />;
 
   return (
     <Card className="overflow-hidden">
       <div className="px-6 pt-5 pb-4 border-b border-border bg-muted/30">
-        <ProgressStrip quiz={quiz} position={idx + (checked ? 1 : 0)} total={total}
-          scoreLabel={<ScoreChip correct={score} total={total} />} />
+        <ProgressStrip quiz={quiz} position={idx + (checked ? 1 : 0)} total={total} score={score} time={time} />
       </div>
 
       <div className="p-6 space-y-5">
@@ -892,8 +936,8 @@ function FillGame({ quiz }: { quiz: Extract<AnyQuiz, { type: "fill" }> }) {
 /* ------------------------------------------------------------------ */
 
 function ResultsCard({
-  quiz, score, total, onRestart,
-}: { quiz: AnyQuiz; score: number; total: number; onRestart: () => void }) {
+  quiz, score, total, time, onRestart,
+}: { quiz: AnyQuiz; score: number; total: number; time?: number; onRestart: () => void }) {
   const pct = Math.round((score / total) * 100);
   const tier =
     pct >= 80 ? { label: "Excelente", color: "text-emerald-700 bg-emerald-50 border-emerald-200" } :
@@ -911,7 +955,7 @@ function ResultsCard({
         <div>
           <p className="text-[11px] uppercase tracking-[0.18em] font-semibold text-muted-foreground">Resultado</p>
           <h3 className="text-5xl font-bold text-foreground tracking-tight tabular-nums mt-1">{pct}<span className="text-2xl text-muted-foreground">%</span></h3>
-          <p className="text-sm text-muted-foreground mt-1">{score} de {total} respostas correctas</p>
+          <p className="text-sm text-muted-foreground mt-1">{score} de {total} respostas correctas{time !== undefined && <> · <span className="font-mono">{fmtTime(time)}</span></>}</p>
         </div>
         <Badge variant="outline" className={cn("text-[11px] font-semibold", tier.color)}>{tier.label}</Badge>
         <div className="max-w-sm mx-auto">
@@ -931,7 +975,7 @@ function ResultsCard({
 /*  Exam Game — timed, mixed-question simulation                       */
 /* ------------------------------------------------------------------ */
 
-function ExamGame({ quiz }: { quiz: Extract<AnyQuiz, { type: "exam" }> }) {
+function ExamGame({ quiz, onLockChange }: { quiz: Extract<AnyQuiz, { type: "exam" }>; onLockChange?: (locked: boolean) => void }) {
   const total = quiz.items.length;
   const totalPoints = quiz.items.reduce((s, it) => s + (it.points ?? 10), 0);
   const passing = quiz.passingScore ?? 50;
@@ -942,6 +986,9 @@ function ExamGame({ quiz }: { quiz: Extract<AnyQuiz, { type: "exam" }> }) {
   const [answers, setAnswers] = useState<Record<number, string | number>>({});
   const [submitted, setSubmitted] = useState(false);
   const [remaining, setRemaining] = useState(quiz.minutes * 60);
+
+  useEffect(() => { onLockChange?.(started && !submitted); }, [started, submitted, onLockChange]);
+  useEffect(() => () => onLockChange?.(false), [onLockChange]);
 
   useEffect(() => {
     if (!started || submitted) return;
