@@ -236,6 +236,23 @@ const DIFF_STYLE: Record<Difficulty, string> = {
   "Avançado":     "bg-rose-50 text-rose-700 border-rose-200",
 };
 
+/* Color per Cadeira — used as a tag in rows and as a dot in the filter menu */
+const CADEIRA_PALETTE = [
+  { tag: "bg-indigo-50 text-indigo-700 border-indigo-200", dot: "bg-indigo-500" },
+  { tag: "bg-orange-50 text-orange-700 border-orange-200", dot: "bg-orange-500" },
+  { tag: "bg-sky-50 text-sky-700 border-sky-200", dot: "bg-sky-500" },
+  { tag: "bg-fuchsia-50 text-fuchsia-700 border-fuchsia-200", dot: "bg-fuchsia-500" },
+  { tag: "bg-teal-50 text-teal-700 border-teal-200", dot: "bg-teal-500" },
+  { tag: "bg-cyan-50 text-cyan-700 border-cyan-200", dot: "bg-cyan-500" },
+  { tag: "bg-lime-50 text-lime-700 border-lime-200", dot: "bg-lime-500" },
+  { tag: "bg-pink-50 text-pink-700 border-pink-200", dot: "bg-pink-500" },
+];
+function cadeiraColor(name: string) {
+  let h = 0;
+  for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0;
+  return CADEIRA_PALETTE[h % CADEIRA_PALETTE.length];
+}
+
 /* ------------------------------------------------------------------ */
 /*  Page                                                               */
 /* ------------------------------------------------------------------ */
@@ -339,6 +356,7 @@ export default function StudentQuizzes() {
                   onClick={() => setCadeiraFilter(c)}
                   label={c}
                   count={QUIZZES.filter(q => q.cadeira === c).length}
+                  dot={cadeiraColor(c).dot}
                 />
               ))}
             </div>
@@ -434,27 +452,34 @@ function FilterRow({
 function QuizRow({ quiz, onStart }: { quiz: AnyQuiz; onStart: () => void }) {
   const meta = TYPE_META[quiz.type];
   const Icon = meta.icon;
+  const cad = cadeiraColor(quiz.cadeira);
   return (
     <div className="group flex items-center gap-4 px-5 py-3.5 hover:bg-muted/30 transition-colors">
       <div className="flex-1 min-w-0">
-        {/* Meta bar — cadeira + categoria together */}
-        <div className="flex items-center gap-2 mb-1.5">
-          <span className={cn("inline-flex items-center gap-1.5 text-[10px] font-semibold px-2 py-0.5 rounded-md border", meta.tag)}>
-            <Icon className="w-3 h-3" />
+        {/* Meta bar — cadeira tag + categoria together */}
+        <div className="flex items-center gap-1.5 mb-1.5 flex-wrap">
+          <span className={cn("inline-flex items-center gap-1.5 text-[10px] font-semibold px-2 py-0.5 rounded-md border", cad.tag)}>
+            <span className={cn("w-1.5 h-1.5 rounded-full", cad.dot)} />
+            {quiz.cadeira}
+          </span>
+          <span className={cn("inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-md border", meta.tag)}>
+            <Icon className="w-2.5 h-2.5" />
             {meta.label}
           </span>
-          <span className="text-muted-foreground/40 text-[10px]">/</span>
-          <span className="text-[11px] font-semibold text-foreground/80 truncate">{quiz.cadeira}</span>
-          <span className="text-muted-foreground/40 text-[10px]">·</span>
-          <span className="text-[10px] text-muted-foreground tabular-nums">{quiz.ano}º ano</span>
+          <span className="text-[10px] text-muted-foreground tabular-nums ml-0.5">{quiz.ano}º ano</span>
         </div>
         <h3 className="text-sm font-semibold text-foreground leading-tight truncate">{quiz.title}</h3>
         <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-1">{quiz.description}</p>
       </div>
 
-      <span className="text-[11px] text-muted-foreground hidden md:flex items-center gap-1 shrink-0 tabular-nums">
-        <Timer className="w-3 h-3" />{quiz.minutes}m
-      </span>
+      <div className="hidden md:flex items-center gap-2 shrink-0">
+        <span className="text-[11px] text-muted-foreground flex items-center gap-1 tabular-nums">
+          <Timer className="w-3 h-3" />{quiz.minutes}m
+        </span>
+        <span className={cn("text-[10px] font-medium px-2 py-0.5 rounded-md border", DIFF_STYLE[quiz.difficulty])}>
+          {quiz.difficulty}
+        </span>
+      </div>
 
       <Button size="sm" variant="outline" onClick={onStart} className="gap-1.5 shrink-0 h-8 group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-colors">
         <Play className="w-3 h-3" /> Iniciar
