@@ -313,14 +313,86 @@ export default function DespesaDetail() {
           </ol>
         </Card>
 
-        {/* Right column — metadata + comprovativo */}
+        {/* Right column — detalhes + documentos unificados */}
         <div className="space-y-6">
-          <Card className="p-4">
-            <h3 className="font-semibold text-xs uppercase tracking-wider text-muted-foreground mb-3 flex items-center gap-1.5">
-              <FileText className="w-3.5 h-3.5 text-primary" /> Documentos
+          <Card className="p-6">
+            <h3 className="font-semibold text-sm text-foreground mb-4 flex items-center gap-2">
+              <FileText className="w-4 h-4 text-primary" /> Detalhes da Despesa
             </h3>
+            <dl className="space-y-3 text-sm">
+              <div>
+                <dt className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Solicitado por</dt>
+                <dd className="font-medium text-foreground">{despesa.requestedBy || "—"}</dd>
+                {despesa.requesterRole && (
+                  <dd className="text-xs text-muted-foreground">{despesa.requesterRole}</dd>
+                )}
+              </div>
+              <Separator />
+              <div>
+                <dt className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Responsável</dt>
+                <dd className="font-medium text-foreground">{despesa.responsavel || "—"}</dd>
+                {despesa.responsavelRole && (
+                  <dd className="text-xs text-muted-foreground">{despesa.responsavelRole}</dd>
+                )}
+              </div>
+              <Separator />
+              <div>
+                <dt className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Categoria</dt>
+                <dd className="font-medium text-foreground">{despesa.category}</dd>
+              </div>
+              <Separator />
+              {(() => {
+                const endDate = despesa.paidDate || despesa.approvedDate;
+                const endLabel = endDate ? fmtDateShort(endDate) : "em curso";
+                let duration = "—";
+                if (despesa.date) {
+                  const end = endDate ? new Date(endDate) : new Date();
+                  const start = new Date(despesa.date);
+                  const days = Math.max(0, Math.round((end.getTime() - start.getTime()) / 86400000));
+                  duration = endDate
+                    ? `${days} ${days === 1 ? "dia" : "dias"}`
+                    : `${days} ${days === 1 ? "dia" : "dias"} (em curso)`;
+                }
+                return (
+                  <div>
+                    <dt className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Data do pedido</dt>
+                    <dd className="font-medium text-foreground">{fmtDateLong(despesa.date)}</dd>
+                    <dd className="text-xs text-muted-foreground mt-1.5 flex items-center gap-1.5">
+                      <Clock className="w-3 h-3" />
+                      <span>Duração: <span className="text-foreground font-medium">{duration}</span></span>
+                      <span className="text-muted-foreground/70">· até {endLabel}</span>
+                    </dd>
+                  </div>
+                );
+              })()}
+              {despesa.approvedDate && (
+                <>
+                  <Separator />
+                  <div>
+                    <dt className="text-xs text-muted-foreground uppercase tracking-wider mb-1">
+                      {despesa.status === "rejeitada" ? "Rejeitada em" : "Aprovada em"}
+                    </dt>
+                    <dd className="font-medium text-foreground">{fmtDateLong(despesa.approvedDate)}</dd>
+                  </div>
+                </>
+              )}
+              {despesa.paidDate && (
+                <>
+                  <Separator />
+                  <div>
+                    <dt className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Paga em</dt>
+                    <dd className="font-medium text-foreground">{fmtDateLong(despesa.paidDate)}</dd>
+                  </div>
+                </>
+              )}
+            </dl>
+
+            {/* Documentos — secção inferior */}
+            <Separator className="my-5" />
+            <h4 className="font-semibold text-xs uppercase tracking-wider text-muted-foreground mb-3 flex items-center gap-1.5">
+              <FileText className="w-3.5 h-3.5 text-primary" /> Documentos
+            </h4>
             <div className="space-y-2">
-              {/* Factura */}
               <button
                 type="button"
                 onClick={() => toast({ title: "Factura aberta", description: `FAC-${despesa.id.toUpperCase()}.pdf` })}
@@ -336,7 +408,6 @@ export default function DespesaDetail() {
                 <Download className="w-3 h-3 text-muted-foreground shrink-0" />
               </button>
 
-              {/* Comprovativo */}
               {despesa.status === "aprovada" ? (
                 <button
                   type="button"
@@ -364,76 +435,6 @@ export default function DespesaDetail() {
                 </div>
               )}
             </div>
-          </Card>
-
-          <Card className="p-6">
-            <h3 className="font-semibold text-sm text-foreground mb-4 flex items-center gap-2">
-              <FileText className="w-4 h-4 text-primary" /> Detalhes
-            </h3>
-            <dl className="space-y-3 text-sm">
-              <div>
-                <dt className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Solicitado por</dt>
-                <dd className="font-medium text-foreground">{despesa.requestedBy || "—"}</dd>
-                {despesa.requesterRole && (
-                  <dd className="text-xs text-muted-foreground">{despesa.requesterRole}</dd>
-                )}
-              </div>
-              <Separator />
-              <div>
-                <dt className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Responsável</dt>
-                <dd className="font-medium text-foreground">{despesa.responsavel || "—"}</dd>
-                {despesa.responsavelRole && (
-                  <dd className="text-xs text-muted-foreground">{despesa.responsavelRole}</dd>
-                )}
-              </div>
-              <Separator />
-              <div>
-                <dt className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Categoria</dt>
-                <dd className="font-medium text-foreground">{despesa.category}</dd>
-              </div>
-              <Separator />
-              {(() => {
-                const endDate = despesa.paidDate || despesa.approvedDate;
-                const startLabel = fmtDateShort(despesa.date);
-                const endLabel = endDate ? fmtDateShort(endDate) : "em curso";
-                let duration = "—";
-                if (despesa.date) {
-                  const end = endDate ? new Date(endDate) : new Date();
-                  const start = new Date(despesa.date);
-                  const days = Math.max(0, Math.round((end.getTime() - start.getTime()) / 86400000));
-                  duration = endDate
-                    ? `${days} ${days === 1 ? "dia" : "dias"}`
-                    : `${days} ${days === 1 ? "dia" : "dias"} (em curso)`;
-                }
-                return (
-                  <div>
-                    <dt className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Duração do pedido</dt>
-                    <dd className="font-medium text-foreground">{duration}</dd>
-                    <dd className="text-xs text-muted-foreground mt-0.5">{startLabel} → {endLabel}</dd>
-                  </div>
-                );
-              })()}
-              {despesa.approvedDate && (
-                <>
-                  <Separator />
-                  <div>
-                    <dt className="text-xs text-muted-foreground uppercase tracking-wider mb-1">
-                      {despesa.status === "rejeitada" ? "Rejeitada em" : "Aprovada em"}
-                    </dt>
-                    <dd className="font-medium text-foreground">{fmtDateLong(despesa.approvedDate)}</dd>
-                  </div>
-                </>
-              )}
-              {despesa.paidDate && (
-                <>
-                  <Separator />
-                  <div>
-                    <dt className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Paga em</dt>
-                    <dd className="font-medium text-foreground">{fmtDateLong(despesa.paidDate)}</dd>
-                  </div>
-                </>
-              )}
-            </dl>
           </Card>
         </div>
       </div>
