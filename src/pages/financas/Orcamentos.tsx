@@ -107,57 +107,38 @@ export default function Orcamentos() {
         <p className="text-[11px] text-muted-foreground">Todos os dados abaixo referem-se a este ano letivo</p>
       </div>
 
-      {/* Utilização Global + KPIs */}
-      <div className="space-y-0">
-        <Card className="p-4 rounded-b-none border-b-0">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Utilização Global do Orçamento</span>
-            <span className="text-xs font-semibold text-foreground tabular-nums">{pctUsed}% utilizado</span>
-          </div>
-          <Progress
-            value={Math.min(pctUsed, 100)}
-            className={cn(
-              "h-2 mb-2 bg-muted",
-              pctUsed >= 90 ? "[&>div]:bg-destructive" : pctUsed >= 75 ? "[&>div]:bg-muted-foreground/60" : "[&>div]:bg-accent"
-            )}
-          />
-          <div className="flex justify-between text-[11px] text-muted-foreground tabular-nums">
-            <span>Utilizado: {formatCurrency(totalSpent)}</span>
-            <span>Disponível: {formatCurrency(available)}</span>
-            <span>Total: {formatCurrency(totalBudget)}</span>
-          </div>
-        </Card>
-
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-px bg-border border border-border rounded-b-lg overflow-hidden">
-          <Card className="p-4 rounded-none border-0 shadow-none">
+      {/* KPIs + Utilização Global */}
+      <Card className="overflow-hidden p-0">
+        <div className="grid grid-cols-2 lg:grid-cols-5 divide-x divide-y lg:divide-y-0 divide-border">
+          <div className="p-4">
             <div className="flex items-center gap-2 mb-3">
               <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><Wallet className="w-4 h-4 text-primary" /></div>
               <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Total Orçamentado</span>
             </div>
             <p className="text-2xl font-bold text-foreground tabular-nums">{formatCurrency(totalBudget)}</p>
-          </Card>
-          <Card className="p-4 rounded-none border-0 shadow-none">
+          </div>
+          <div className="p-4">
             <div className="flex items-center gap-2 mb-3">
               <div className="w-8 h-8 rounded-lg bg-destructive/10 flex items-center justify-center"><TrendingDown className="w-4 h-4 text-destructive" /></div>
               <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Total Gasto</span>
             </div>
             <p className="text-2xl font-bold text-foreground tabular-nums">{formatCurrency(totalSpent)}</p>
-          </Card>
-          <Card className="p-4 rounded-none border-0 shadow-none">
+          </div>
+          <div className="p-4">
             <div className="flex items-center gap-2 mb-3">
               <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center"><CheckCircle2 className="w-4 h-4 text-accent" /></div>
               <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Disponível</span>
             </div>
             <p className="text-2xl font-bold text-foreground tabular-nums">{formatCurrency(available)}</p>
-          </Card>
-          <Card className="p-4 rounded-none border-0 shadow-none">
+          </div>
+          <div className="p-4">
             <div className="flex items-center gap-2 mb-3">
               <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center"><AlertTriangle className="w-4 h-4 text-muted-foreground" /></div>
               <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Em Alerta</span>
             </div>
             <p className={cn("text-2xl font-bold tabular-nums", numAlerta > 0 ? "text-destructive" : "text-foreground")}>{numAlerta}</p>
-          </Card>
-          <Card className="p-4 rounded-none border-0 shadow-none">
+          </div>
+          <div className="p-4">
             <div className="flex items-center gap-2 mb-3">
               <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center"><ArrowUpRight className="w-4 h-4 text-muted-foreground" /></div>
               <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Estado</span>
@@ -175,9 +156,30 @@ export default function Orcamentos() {
             >
               {pctUsed >= 90 ? "Em Risco" : pctUsed >= 75 ? "Atenção" : "Excelente"}
             </Badge>
-          </Card>
+          </div>
         </div>
-      </div>
+
+        {/* Utilização Global — attached footer */}
+        <div className="px-4 py-3 border-t border-border bg-muted/30">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Utilização Global do Orçamento</span>
+            <span className="text-xs font-semibold text-foreground tabular-nums">{pctUsed}% utilizado</span>
+          </div>
+          <Progress
+            value={Math.min(pctUsed, 100)}
+            className={cn(
+              "h-2 mb-2 bg-background",
+              pctUsed >= 90 ? "[&>div]:bg-destructive" : pctUsed >= 75 ? "[&>div]:bg-muted-foreground/60" : "[&>div]:bg-accent"
+            )}
+          />
+          <div className="flex justify-between text-[11px] text-muted-foreground tabular-nums">
+            <span>Utilizado: <span className="font-medium text-foreground">{formatCurrency(totalSpent)}</span></span>
+            <span>Disponível: <span className="font-medium text-foreground">{formatCurrency(available)}</span></span>
+            <span>Total: <span className="font-medium text-foreground">{formatCurrency(totalBudget)}</span></span>
+          </div>
+        </div>
+      </Card>
+
 
 
 
