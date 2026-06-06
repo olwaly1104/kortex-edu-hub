@@ -107,62 +107,12 @@ export default function Orcamentos() {
         <p className="text-[11px] text-muted-foreground">Todos os dados abaixo referem-se a este ano letivo</p>
       </div>
 
-      {/* KPIs — separate tiles */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
-        <Card className="p-4 border-border/70">
-          <div className="flex items-center gap-1.5 mb-2">
-            <Wallet className="w-3.5 h-3.5 text-foreground" />
-            <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Total Orçamentado</p>
-          </div>
-          <p className="text-xl font-bold text-foreground tabular-nums leading-none">{formatCurrency(totalBudget)}</p>
-          <p className="text-[11px] text-muted-foreground mt-2">{orcamentos.length} orçamentos</p>
-        </Card>
-
-        <Card className="p-4 border-border/70">
-          <div className="flex items-center gap-1.5 mb-2">
-            <TrendingDown className={cn("w-3.5 h-3.5", usageColor(pctUsed))} />
-            <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Total Gasto</p>
-          </div>
-          <p className={cn("text-xl font-bold tabular-nums leading-none", usageColor(pctUsed))}>{formatCurrency(totalSpent)}</p>
-          <p className="text-[11px] text-muted-foreground mt-2">{pctUsed}% executado</p>
-        </Card>
-
-        <Card className="p-4 border-border/70">
-          <div className="flex items-center gap-1.5 mb-2">
-            <CheckCircle2 className="w-3.5 h-3.5 text-accent" />
-            <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Disponível</p>
-          </div>
-          <p className="text-xl font-bold text-foreground tabular-nums leading-none">{formatCurrency(available)}</p>
-          <p className="text-[11px] text-muted-foreground mt-2">{100 - pctUsed}% por executar</p>
-        </Card>
-
-        <Card className={cn("p-4 border-border/70", numAlerta > 0 && "border-amber-200 bg-amber-50/40")}>
-          <div className="flex items-center gap-1.5 mb-2">
-            <AlertTriangle className={cn("w-3.5 h-3.5", numAlerta > 0 ? "text-amber-600" : "text-muted-foreground")} />
-            <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Em Alerta</p>
-          </div>
-          <p className={cn("text-xl font-bold tabular-nums leading-none", numAlerta > 0 ? "text-amber-600" : "text-foreground")}>{numAlerta}</p>
-          <p className="text-[11px] text-muted-foreground mt-2">{numAlerta === 1 ? "orçamento" : "orçamentos"} ≥ 90%</p>
-        </Card>
-
-        <Card className="p-4 border-border/70">
-          <div className="flex items-center gap-1.5 mb-2">
-            <span className={cn("w-2 h-2 rounded-full", pctUsed >= 90 ? "bg-destructive" : pctUsed >= 75 ? "bg-amber-500" : "bg-accent")} />
-            <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Estado</p>
-          </div>
-          <p className={cn("text-xl font-bold leading-none", usageColor(pctUsed))}>
-            {pctUsed >= 90 ? "Crítico" : pctUsed >= 75 ? "Atenção" : "Saudável"}
-          </p>
-          <p className="text-[11px] text-muted-foreground mt-2">{numActivos} activos · {counts.esgotado} esgotados</p>
-        </Card>
-      </div>
-
-
-      {/* Utilização global */}
+      {/* Dados + Utilização global — unified card */}
       <Card className="p-5 border-border/70">
+        {/* Header */}
         <div className="flex items-end justify-between gap-4 mb-5">
           <div>
-            <p className="text-sm font-semibold text-foreground">Utilização global do orçamento</p>
+            <p className="text-sm font-semibold text-foreground">Resumo do Orçamento</p>
             <p className="text-[11px] text-muted-foreground mt-0.5">{orcamentos.length} orçamentos · {numAlerta} em alerta</p>
           </div>
           <div className="flex items-baseline gap-0.5 shrink-0">
@@ -171,7 +121,33 @@ export default function Orcamentos() {
           </div>
         </div>
 
-        {/* Modern bar with threshold markers */}
+        {/* KPI grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 mb-5">
+          <div>
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5">Total Orçamentado</p>
+            <p className="text-lg font-bold text-foreground tabular-nums leading-none">{formatCurrency(totalBudget)}</p>
+          </div>
+          <div>
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5">Total Gasto</p>
+            <p className={cn("text-lg font-bold tabular-nums leading-none", usageColor(pctUsed))}>{formatCurrency(totalSpent)}</p>
+          </div>
+          <div>
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5">Disponível</p>
+            <p className="text-lg font-bold text-foreground tabular-nums leading-none">{formatCurrency(available)}</p>
+          </div>
+          <div>
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5">Em Alerta</p>
+            <p className={cn("text-lg font-bold tabular-nums leading-none", numAlerta > 0 ? "text-amber-600" : "text-foreground")}>{numAlerta}</p>
+          </div>
+          <div>
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5">Estado</p>
+            <p className={cn("text-lg font-bold leading-none", usageColor(pctUsed))}>
+              {pctUsed >= 90 ? "Crítico" : pctUsed >= 75 ? "Atenção" : "Saudável"}
+            </p>
+          </div>
+        </div>
+
+        {/* Progress bar with threshold markers */}
         <div className="relative">
           <div className="relative h-2 w-full rounded-full bg-muted/70 overflow-hidden">
             <div
