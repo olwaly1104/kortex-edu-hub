@@ -167,8 +167,8 @@ export default function Orcamentos() {
         <Progress
           value={Math.min(pctUsed, 100)}
           className={cn(
-            "h-2 mb-2",
-            pctUsed >= 90 ? "[&>div]:bg-rose-500" : pctUsed >= 75 ? "[&>div]:bg-amber-500" : "[&>div]:bg-emerald-500"
+            "h-2 mb-2 bg-muted",
+            pctUsed >= 90 ? "[&>div]:bg-destructive" : pctUsed >= 75 ? "[&>div]:bg-muted-foreground/60" : "[&>div]:bg-accent"
           )}
         />
         <div className="flex justify-between text-[11px] text-muted-foreground tabular-nums">
