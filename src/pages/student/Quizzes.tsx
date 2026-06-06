@@ -484,12 +484,6 @@ function QuizRow({ quiz, onStart }: { quiz: AnyQuiz; onStart: () => void }) {
       </div>
 
       <div className="hidden md:flex items-center gap-6 shrink-0 pr-2">
-        <div className="flex flex-col items-end gap-1 min-w-[64px]">
-          <span className="text-[9px] uppercase tracking-wider text-muted-foreground font-medium">Duração</span>
-          <span className="text-xs font-semibold text-foreground flex items-center gap-1 tabular-nums">
-            <Timer className="w-3 h-3 text-muted-foreground" />{quiz.minutes} min
-          </span>
-        </div>
         <div className="flex flex-col items-end gap-1 min-w-[80px]">
           <span className="text-[9px] uppercase tracking-wider text-muted-foreground font-medium">Dificuldade</span>
           <span className={cn("text-[10px] font-semibold px-2 py-0.5 rounded-md border", DIFF_STYLE[quiz.difficulty])}>
