@@ -449,21 +449,36 @@ function KpiStat({ label, value }: { label: string; value: number }) {
 }
 
 function FilterRow({
-  active, onClick, icon: Icon, label, count,
-}: { active: boolean; onClick: () => void; icon?: React.ElementType; label: string; count: number }) {
+  active, onClick, icon: Icon, label, count, dot, activeClasses,
+}: {
+  active: boolean;
+  onClick: () => void;
+  icon?: React.ElementType;
+  label: string;
+  count: number;
+  dot?: string;
+  activeClasses?: string;
+}) {
   return (
     <button
       onClick={onClick}
       className={cn(
-        "w-full flex items-center gap-2 px-2.5 py-1.5 rounded-md text-sm transition-colors text-left",
+        "w-full flex items-center gap-2 px-2.5 py-1.5 rounded-md text-sm transition-colors text-left border border-transparent",
         active
-          ? "bg-primary/10 text-primary font-semibold"
+          ? activeClasses
+            ? cn(activeClasses, "font-semibold")
+            : "bg-primary/10 text-primary border-primary/20 font-semibold"
           : "text-foreground/80 hover:bg-muted hover:text-foreground"
       )}
     >
-      {Icon && <Icon className="w-3.5 h-3.5 shrink-0" />}
+      {dot
+        ? <span className={cn("w-2 h-2 rounded-full shrink-0", dot)} />
+        : Icon && <Icon className="w-3.5 h-3.5 shrink-0" />}
       <span className="flex-1 truncate">{label}</span>
-      <span className={cn("text-[10px] font-bold px-1.5 py-0.5 rounded", active ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground")}>{count}</span>
+      <span className={cn(
+        "text-[10px] font-bold px-1.5 py-0.5 rounded tabular-nums",
+        active ? "bg-white/70 text-current" : "bg-muted text-muted-foreground"
+      )}>{count}</span>
     </button>
   );
 }
@@ -473,13 +488,13 @@ function QuizRow({ quiz, onStart }: { quiz: AnyQuiz; onStart: () => void }) {
   const Icon = meta.icon;
   return (
     <div className="flex items-center gap-4 p-4 hover:bg-muted/30 transition-colors group">
-      <div className="w-10 h-10 rounded-lg border border-border bg-muted/30 flex items-center justify-center shrink-0">
-        <Icon className="w-4 h-4 text-foreground/70" />
+      <div className={cn("w-11 h-11 rounded-lg border flex items-center justify-center shrink-0", meta.tile)}>
+        <Icon className="w-5 h-5" />
       </div>
 
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-[10px] font-mono font-semibold text-muted-foreground">{quiz.code}</span>
+          <Badge variant="outline" className={cn("text-[10px] font-semibold border", meta.tag)}>{meta.label}</Badge>
           <span className="text-[10px] uppercase tracking-wider font-semibold text-primary">{quiz.cadeira}</span>
           <span className="text-[10px] text-muted-foreground">· {quiz.ano}º ano</span>
         </div>
@@ -488,12 +503,10 @@ function QuizRow({ quiz, onStart }: { quiz: AnyQuiz; onStart: () => void }) {
       </div>
 
       <div className="hidden md:flex items-center gap-1.5 shrink-0">
-        <Badge variant="outline" className="text-[10px] font-medium">{meta.label}</Badge>
         <Badge variant="outline" className={cn("text-[10px] font-medium", DIFF_STYLE[quiz.difficulty])}>{quiz.difficulty}</Badge>
       </div>
 
-      <div className="hidden lg:flex items-center gap-4 text-[11px] text-muted-foreground shrink-0 min-w-[110px]">
-        <span className="flex items-center gap-1"><Layers className="w-3 h-3" />{quiz.items.length}</span>
+      <div className="hidden lg:flex items-center text-[11px] text-muted-foreground shrink-0">
         <span className="flex items-center gap-1"><Timer className="w-3 h-3" />{quiz.minutes} min</span>
       </div>
 
