@@ -308,10 +308,10 @@ export default function StudentQuizzes() {
       {/* Editorial header */}
       <div className="flex items-start justify-between gap-4 flex-wrap border-b border-border pb-5">
         <div>
-          <p className="text-[11px] uppercase tracking-[0.18em] font-semibold text-primary mb-1.5">UPRA · Arquitectura</p>
+          <p className="text-[11px] uppercase tracking-[0.18em] font-semibold text-primary mb-1.5">UPRA · Arquitectura · Ano Letivo 2025/2026</p>
           <h1 className="text-3xl font-bold text-foreground tracking-tight">Centro de Estudo</h1>
           <p className="text-sm text-muted-foreground mt-1.5 max-w-2xl">
-            Treino dirigido às cadeiras do Curso de Arquitectura. Escolhe a tipologia, a cadeira e o exercício — cada actividade tem duração estimada e nível de dificuldade.
+            Treino dirigido às cadeiras inscritas neste ano letivo. Cada actividade está associada a uma cadeira do Curso de Arquitectura — filtra por tipologia ou cadeira e inicia o exercício.
           </p>
         </div>
         <div className="grid grid-cols-2 gap-3 min-w-[220px]">
