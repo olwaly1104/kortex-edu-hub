@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft, TrendingDown, Tag, Calendar, User, UserCheck,
   FileText, Check, X, Clock, CheckCircle2, XCircle, Send, Wallet, MessageSquare,
-  Users, Share2, Eye, Download,
+  Users, Share2, Eye, Download, Mail, ShieldCheck,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
