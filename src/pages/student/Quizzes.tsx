@@ -237,6 +237,23 @@ const DIFF_STYLE: Record<Difficulty, string> = {
   "Avançado":     "bg-rose-50 text-rose-700 border-rose-200",
 };
 
+/* Deterministic palette assigned per cadeira name */
+const CADEIRA_PALETTE: Array<{ tag: string; dot: string; active: string }> = [
+  { tag: "bg-sky-50 text-sky-700 border-sky-200",             dot: "bg-sky-500",       active: "bg-sky-50 text-sky-700 border-sky-200" },
+  { tag: "bg-fuchsia-50 text-fuchsia-700 border-fuchsia-200", dot: "bg-fuchsia-500",   active: "bg-fuchsia-50 text-fuchsia-700 border-fuchsia-200" },
+  { tag: "bg-teal-50 text-teal-700 border-teal-200",          dot: "bg-teal-500",      active: "bg-teal-50 text-teal-700 border-teal-200" },
+  { tag: "bg-orange-50 text-orange-700 border-orange-200",    dot: "bg-orange-500",    active: "bg-orange-50 text-orange-700 border-orange-200" },
+  { tag: "bg-indigo-50 text-indigo-700 border-indigo-200",    dot: "bg-indigo-500",    active: "bg-indigo-50 text-indigo-700 border-indigo-200" },
+  { tag: "bg-lime-50 text-lime-700 border-lime-200",          dot: "bg-lime-500",      active: "bg-lime-50 text-lime-700 border-lime-200" },
+  { tag: "bg-pink-50 text-pink-700 border-pink-200",          dot: "bg-pink-500",      active: "bg-pink-50 text-pink-700 border-pink-200" },
+  { tag: "bg-cyan-50 text-cyan-700 border-cyan-200",          dot: "bg-cyan-500",      active: "bg-cyan-50 text-cyan-700 border-cyan-200" },
+];
+function cadeiraStyle(name: string) {
+  let h = 0;
+  for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0;
+  return CADEIRA_PALETTE[h % CADEIRA_PALETTE.length];
+}
+
 /* ------------------------------------------------------------------ */
 /*  Page                                                               */
 /* ------------------------------------------------------------------ */
