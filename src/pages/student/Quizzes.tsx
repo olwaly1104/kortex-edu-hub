@@ -308,10 +308,10 @@ export default function StudentQuizzes() {
       {/* Editorial header */}
       <div className="flex items-start justify-between gap-4 flex-wrap border-b border-border pb-5">
         <div>
-          <p className="text-[11px] uppercase tracking-[0.18em] font-semibold text-primary mb-1.5">UPRA · Arquitectura</p>
+          <p className="text-[11px] uppercase tracking-[0.18em] font-semibold text-primary mb-1.5">UPRA · Arquitectura · Ano Letivo 2025/2026</p>
           <h1 className="text-3xl font-bold text-foreground tracking-tight">Centro de Estudo</h1>
           <p className="text-sm text-muted-foreground mt-1.5 max-w-2xl">
-            Treino dirigido às cadeiras do Curso de Arquitectura. Escolhe a tipologia, a cadeira e o exercício — cada actividade tem duração estimada e nível de dificuldade.
+            Treino dirigido às cadeiras inscritas neste ano letivo. Cada actividade está associada a uma cadeira do Curso de Arquitectura — filtra por tipologia ou cadeira e inicia o exercício.
           </p>
         </div>
         <div className="grid grid-cols-2 gap-3 min-w-[220px]">
@@ -476,29 +476,34 @@ function FilterRow({
 function QuizRow({ quiz, onStart }: { quiz: AnyQuiz; onStart: () => void }) {
   const cs = cadeiraStyle(quiz.cadeira);
   return (
-    <div className="flex items-center gap-4 p-4 hover:bg-muted/30 transition-colors group">
-      <span className={cn("w-1 self-stretch rounded-full shrink-0", cs.dot)} />
+    <div className="flex items-stretch hover:bg-muted/30 transition-colors group">
+      {/* Cadeira pillar — em evidência */}
+      <div className={cn("flex flex-col justify-center px-4 py-4 border-r border-border min-w-[200px] max-w-[240px]", cs.tag)}>
+        <p className="text-[9px] uppercase tracking-[0.14em] font-bold opacity-70 mb-0.5">Cadeira</p>
+        <p className="font-bold text-sm leading-tight">{quiz.cadeira}</p>
+        <p className="text-[10px] opacity-80 mt-1 flex items-center gap-1">
+          <BookOpen className="w-2.5 h-2.5" /> {quiz.ano}º ano
+        </p>
+      </div>
 
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 flex-wrap">
-          <Badge variant="outline" className={cn("text-[10px] font-semibold border", cs.tag)}>{quiz.cadeira}</Badge>
-          <span className="text-[10px] text-muted-foreground">{quiz.ano}º ano</span>
+      <div className="flex-1 min-w-0 flex items-center gap-4 p-4">
+        <div className="flex-1 min-w-0">
+          <h3 className="font-semibold text-foreground leading-tight truncate">{quiz.title}</h3>
+          <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{quiz.description}</p>
         </div>
-        <h3 className="font-semibold text-foreground leading-tight mt-1 truncate">{quiz.title}</h3>
-        <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{quiz.description}</p>
-      </div>
 
-      <div className="hidden md:flex items-center gap-1.5 shrink-0">
-        <Badge variant="outline" className={cn("text-[10px] font-medium", DIFF_STYLE[quiz.difficulty])}>{quiz.difficulty}</Badge>
-      </div>
+        <div className="hidden md:flex items-center gap-1.5 shrink-0">
+          <Badge variant="outline" className={cn("text-[10px] font-medium", DIFF_STYLE[quiz.difficulty])}>{quiz.difficulty}</Badge>
+        </div>
 
-      <div className="hidden lg:flex items-center text-[11px] text-muted-foreground shrink-0">
-        <span className="flex items-center gap-1"><Timer className="w-3 h-3" />{quiz.minutes} min</span>
-      </div>
+        <div className="hidden lg:flex items-center text-[11px] text-muted-foreground shrink-0">
+          <span className="flex items-center gap-1"><Timer className="w-3 h-3" />{quiz.minutes} min</span>
+        </div>
 
-      <Button size="sm" onClick={onStart} className="gap-1.5 shrink-0">
-        <Play className="w-3.5 h-3.5" /> Iniciar
-      </Button>
+        <Button size="sm" onClick={onStart} className="gap-1.5 shrink-0">
+          <Play className="w-3.5 h-3.5" /> Iniciar
+        </Button>
+      </div>
     </div>
   );
 }
