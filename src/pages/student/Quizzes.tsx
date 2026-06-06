@@ -589,7 +589,7 @@ function MCQGame({ quiz }: { quiz: Extract<AnyQuiz, { type: "mcq" }> }) {
     <Card className="p-6 space-y-5">
       <div className="flex items-center justify-between text-xs text-muted-foreground">
         <span>Pergunta {idx + 1} / {total}</span>
-        <span className="flex items-center gap-1"><Trophy className="w-3.5 h-3.5 text-primary" />{score} pts</span>
+        <span className="flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />{score} certas</span>
       </div>
       <Progress value={((idx + (selected !== null ? 1 : 0)) / total) * 100} className="h-1.5" />
       <h3 className="text-lg font-semibold text-foreground">{current.q}</h3>
