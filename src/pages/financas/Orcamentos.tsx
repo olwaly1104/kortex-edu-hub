@@ -118,28 +118,28 @@ export default function Orcamentos() {
         </Card>
         <Card className="p-4">
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><TrendingDown className="w-4 h-4 text-primary" /></div>
+            <div className="w-8 h-8 rounded-lg bg-rose-50 flex items-center justify-center"><TrendingDown className="w-4 h-4 text-rose-600" /></div>
             <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Total Gasto</span>
           </div>
-          <p className={cn("text-2xl font-bold tabular-nums", usageColor(pctUsed))}>{formatCurrency(totalSpent)}</p>
+          <p className="text-2xl font-bold text-foreground tabular-nums">{formatCurrency(totalSpent)}</p>
         </Card>
         <Card className="p-4">
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><CheckCircle2 className="w-4 h-4 text-primary" /></div>
+            <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center"><CheckCircle2 className="w-4 h-4 text-emerald-600" /></div>
             <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Disponível</span>
           </div>
-          <p className="text-2xl font-bold text-primary tabular-nums">{formatCurrency(available)}</p>
+          <p className="text-2xl font-bold text-foreground tabular-nums">{formatCurrency(available)}</p>
         </Card>
         <Card className="p-4">
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><AlertTriangle className="w-4 h-4 text-primary" /></div>
+            <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center"><AlertTriangle className="w-4 h-4 text-amber-600" /></div>
             <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Em Alerta</span>
           </div>
           <p className={cn("text-2xl font-bold tabular-nums", numAlerta > 0 ? "text-amber-600" : "text-foreground")}>{numAlerta}</p>
         </Card>
         <Card className="p-4">
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><ArrowUpRight className="w-4 h-4 text-primary" /></div>
+            <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center"><ArrowUpRight className="w-4 h-4 text-slate-600" /></div>
             <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Estado</span>
           </div>
           <Badge
@@ -147,10 +147,10 @@ export default function Orcamentos() {
             className={cn(
               "text-xs font-bold",
               pctUsed >= 90
-                ? "bg-destructive/10 text-destructive border-destructive/30"
+                ? "bg-rose-50 text-rose-700 border-rose-200"
                 : pctUsed >= 75
-                  ? "bg-amber-100 text-amber-700 border-amber-200"
-                  : "bg-accent/10 text-accent border-accent/20"
+                  ? "bg-amber-50 text-amber-700 border-amber-200"
+                  : "bg-emerald-50 text-emerald-700 border-emerald-200"
             )}
           >
             {pctUsed >= 90 ? "Crítico" : pctUsed >= 75 ? "Atenção" : "Saudável"}
@@ -162,9 +162,15 @@ export default function Orcamentos() {
       <Card className="p-4">
         <div className="flex items-center justify-between mb-2">
           <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Utilização Global do Orçamento</span>
-          <span className={cn("text-xs font-semibold", usageColor(pctUsed))}>{pctUsed}% utilizado</span>
+          <span className="text-xs font-semibold text-foreground tabular-nums">{pctUsed}% utilizado</span>
         </div>
-        <Progress value={Math.min(pctUsed, 100)} className={cn("h-2 mb-2", usageBar(pctUsed))} />
+        <Progress
+          value={Math.min(pctUsed, 100)}
+          className={cn(
+            "h-2 mb-2",
+            pctUsed >= 90 ? "[&>div]:bg-rose-500" : pctUsed >= 75 ? "[&>div]:bg-amber-500" : "[&>div]:bg-emerald-500"
+          )}
+        />
         <div className="flex justify-between text-[11px] text-muted-foreground tabular-nums">
           <span>Utilizado: {formatCurrency(totalSpent)}</span>
           <span>Disponível: {formatCurrency(available)}</span>
