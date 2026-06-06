@@ -384,6 +384,104 @@ export default function DisciplineDetail() {
           )}
         </TabsContent>
 
+        {/* Quizzes */}
+        <TabsContent value="quizzes" className="space-y-4">
+          {(() => {
+            const seed = (disc.id.charCodeAt(0) || 1) + (disc.name.length || 1);
+            const rng = (n: number) => ((seed * 9301 + n * 49297) % 233280) / 233280;
+            const quizzes = [
+              { n: 1, title: `Quiz 1 — Fundamentos de ${disc.name.split(" ")[0]}`, questions: 10, duration: 15, points: 20 },
+              { n: 2, title: "Quiz 2 — Conceitos Intermédios", questions: 12, duration: 20, points: 20 },
+              { n: 3, title: "Quiz 3 — Aplicações Práticas", questions: 8, duration: 12, points: 20 },
+              { n: 4, title: "Quiz 4 — Revisão Geral", questions: 15, duration: 25, points: 20 },
+            ].map(q => {
+              const r = rng(q.n);
+              const status = r < 0.5 ? "concluido" : r < 0.85 ? "disponivel" : "expirado";
+              const score = status === "concluido" ? Math.round((10 + rng(q.n + 1) * 10) * 10) / 10 : null;
+              const deadline = status === "disponivel" ? `${10 + q.n} Jun 2026` : null;
+              return { ...q, status, score, deadline };
+            });
+
+            const done = quizzes.filter(q => q.status === "concluido");
+            const avgQ = done.length ? Math.round(done.reduce((s, q) => s + (q.score || 0), 0) / done.length * 10) / 10 : null;
+
+            const statusCfg = {
+              concluido:  { cls: "bg-accent/10 text-accent border-accent/20", label: "Concluído", icon: CheckCircle, border: "hsl(var(--accent))" },
+              disponivel: { cls: "bg-primary/10 text-primary border-primary/20", label: "Disponível", icon: HelpCircle, border: "hsl(var(--primary))" },
+              expirado:   { cls: "bg-destructive/10 text-destructive border-destructive/20", label: "Expirado", icon: XCircle, border: "hsl(var(--destructive))" },
+            } as const;
+
+            return (
+              <>
+                <div className="grid grid-cols-3 gap-3">
+                  <Card className="p-3.5 flex items-center gap-2.5">
+                    <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center"><Brain className="w-4 h-4 text-primary" /></div>
+                    <div>
+                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Total</p>
+                      <p className="text-sm font-bold text-foreground tabular-nums">{quizzes.length}</p>
+                    </div>
+                  </Card>
+                  <Card className="p-3.5 flex items-center gap-2.5">
+                    <div className="w-9 h-9 rounded-lg bg-accent/10 flex items-center justify-center"><CheckCircle className="w-4 h-4 text-accent" /></div>
+                    <div>
+                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Concluídos</p>
+                      <p className="text-sm font-bold text-foreground tabular-nums">{done.length}/{quizzes.length}</p>
+                    </div>
+                  </Card>
+                  <Card className="p-3.5 flex items-center gap-2.5">
+                    <div className="w-9 h-9 rounded-lg bg-amber-50 border border-amber-200 flex items-center justify-center"><Trophy className="w-4 h-4 text-amber-600" /></div>
+                    <div>
+                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Média</p>
+                      <p className="text-sm font-bold text-foreground tabular-nums">{avgQ !== null ? `${avgQ}/20` : "—"}</p>
+                    </div>
+                  </Card>
+                </div>
+
+                <div className="space-y-3">
+                  {quizzes.map(q => {
+                    const sc = statusCfg[q.status as keyof typeof statusCfg];
+                    const Icon = sc.icon;
+                    return (
+                      <Card
+                        key={q.n}
+                        onClick={() => navigate("/student/quizzes")}
+                        className="p-4 border-l-[3px] hover:shadow-md transition-all cursor-pointer flex items-center gap-4"
+                        style={{ borderLeftColor: sc.border }}
+                      >
+                        <div className={cn("w-11 h-11 rounded-xl flex items-center justify-center shrink-0", sc.cls)}>
+                          <Brain className="w-5 h-5" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1 flex-wrap">
+                            <p className="text-sm font-semibold text-foreground truncate">{q.title}</p>
+                            <Badge variant="outline" className={cn("text-[10px] gap-1", sc.cls)}>
+                              <Icon className="w-3 h-3" />{sc.label}
+                            </Badge>
+                          </div>
+                          <div className="flex items-center gap-3 text-[11.5px] text-muted-foreground flex-wrap">
+                            <span className="inline-flex items-center gap-1"><HelpCircle className="w-3 h-3" />{q.questions} questões</span>
+                            <span className="inline-flex items-center gap-1"><Timer className="w-3 h-3" />{q.duration} min</span>
+                            <span className="inline-flex items-center gap-1"><Award className="w-3 h-3" />{q.points} pts</span>
+                            {q.score !== null && (
+                              <span className="inline-flex items-center gap-1 text-accent font-semibold">
+                                <Trophy className="w-3 h-3" />{q.score}/20
+                              </span>
+                            )}
+                            {q.deadline && (
+                              <span className="inline-flex items-center gap-1"><Calendar className="w-3 h-3" />Até {q.deadline}</span>
+                            )}
+                          </div>
+                        </div>
+                        <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
+                      </Card>
+                    );
+                  })}
+                </div>
+              </>
+            );
+          })()}
+        </TabsContent>
+
         {/* Anúncios */}
         <TabsContent value="anuncios" className="space-y-3">
           {announcements.length > 0 ? announcements.map((ann) => {
