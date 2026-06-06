@@ -308,6 +308,20 @@ export default function Orcamentos() {
                   </p>
                 </div>
               </div>
+
+              {/* Responsável */}
+              <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border">
+                <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                  <span className="text-[10px] font-semibold text-primary">
+                    {o.responsavel.split(" ").slice(-2).map(n => n[0]).join("")}
+                  </span>
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Responsável</p>
+                  <p className="text-xs font-medium text-foreground truncate">{o.responsavel}</p>
+                </div>
+                <p className="text-[10px] text-muted-foreground truncate max-w-[45%] text-right">{o.responsavelRole}</p>
+              </div>
             </Card>
           );
         })}
