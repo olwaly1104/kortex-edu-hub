@@ -485,10 +485,10 @@ export default function StudentQuizzes() {
 /*  Subcomponents — menu                                               */
 /* ------------------------------------------------------------------ */
 
-function KpiStat({ label, value }: { label: string; value: number }) {
+function KpiStat({ label, value, accent }: { label: string; value: React.ReactNode; accent?: string }) {
   return (
     <div className="rounded-lg border border-border bg-card px-3 py-2 text-center">
-      <p className="text-xl font-bold text-foreground leading-tight">{value}</p>
+      <p className={cn("text-xl font-bold leading-tight tabular-nums", accent ?? "text-foreground")}>{value}</p>
       <p className="text-[10px] uppercase tracking-wider text-muted-foreground mt-0.5">{label}</p>
     </div>
   );
