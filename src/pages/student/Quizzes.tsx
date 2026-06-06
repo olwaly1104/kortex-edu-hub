@@ -285,6 +285,22 @@ function cadeiraColor(name: string) {
   return CADEIRA_PALETTE[h % CADEIRA_PALETTE.length];
 }
 
+/** Deterministic mock for per-quiz Nota Geral (12.0–18.5) and Tentativas (1–6). */
+function quizStats(id: string): { nota: number; attempts: number } {
+  let h = 0;
+  for (let i = 0; i < id.length; i++) h = (h * 33 + id.charCodeAt(i)) >>> 0;
+  const nota = Math.round((12 + (h % 65) / 10) * 10) / 10; // 12.0 .. 18.4
+  const attempts = (h % 6) + 1;
+  return { nota, attempts };
+}
+
+function notaColor(n: number) {
+  if (n >= 16) return { text: "text-emerald-700", bg: "bg-emerald-50", border: "border-emerald-200", dot: "bg-emerald-500" };
+  if (n >= 12) return { text: "text-amber-700",   bg: "bg-amber-50",   border: "border-amber-200",   dot: "bg-amber-500"   };
+  return         { text: "text-rose-700",    bg: "bg-rose-50",    border: "border-rose-200",    dot: "bg-rose-500"    };
+}
+
+
 /* ------------------------------------------------------------------ */
 /*  Page                                                               */
 /* ------------------------------------------------------------------ */
