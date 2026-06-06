@@ -233,15 +233,18 @@ export interface Budget {
   spent: number;
   period: string;
   status: 'activo' | 'esgotado' | 'em_revisao';
+  responsavel: string;
+  responsavelRole: string;
 }
 
 export const orcamentos: Budget[] = [
-  { id: "o1", name: "Orçamento Geral — Fac. Engenharia", department: "Fac. Engenharia", totalBudget: 120000000, spent: 78000000, period: "2025", status: "activo" },
-  { id: "o2", name: "Orçamento Geral — Fac. Direito", department: "Fac. Direito", totalBudget: 85000000, spent: 52000000, period: "2025", status: "activo" },
-  { id: "o3", name: "Orçamento Geral — Fac. Medicina", department: "Fac. Medicina", totalBudget: 200000000, spent: 185000000, period: "2025", status: "em_revisao" },
-  { id: "o4", name: "Infraestrutura e Manutenção", department: "Administração", totalBudget: 50000000, spent: 46000000, period: "2025", status: "em_revisao" },
-  { id: "o5", name: "Tecnologias de Informação", department: "TI", totalBudget: 30000000, spent: 18500000, period: "2025", status: "activo" },
-  { id: "o6", name: "Investigação e Desenvolvimento", department: "Reitoria", totalBudget: 40000000, spent: 12000000, period: "2025", status: "activo" },
-  { id: "o7", name: "Bolsas de Estudo", department: "Reitoria", totalBudget: 25000000, spent: 25000000, period: "2025", status: "esgotado" },
-  { id: "o8", name: "Eventos e Conferências", department: "Administração", totalBudget: 15000000, spent: 8200000, period: "2025", status: "activo" },
+  { id: "o1", name: "Orçamento Geral — Fac. Engenharia", department: "Fac. Engenharia", totalBudget: 120000000, spent: 78000000, period: "2025", status: "activo", responsavel: "Dr. Manuel Carvalho", responsavelRole: "Decano Fac. Engenharia" },
+  { id: "o2", name: "Orçamento Geral — Fac. Direito", department: "Fac. Direito", totalBudget: 85000000, spent: 52000000, period: "2025", status: "activo", responsavel: "Dra. Teresa Lopes", responsavelRole: "Decana Fac. Direito" },
+  { id: "o3", name: "Orçamento Geral — Fac. Medicina", department: "Fac. Medicina", totalBudget: 200000000, spent: 185000000, period: "2025", status: "em_revisao", responsavel: "Dr. Rui Andrade", responsavelRole: "Decano Fac. Medicina" },
+  { id: "o4", name: "Infraestrutura e Manutenção", department: "Administração", totalBudget: 50000000, spent: 46000000, period: "2025", status: "em_revisao", responsavel: "Arq. Sofia Mendes", responsavelRole: "Gestora de Infraestruturas" },
+  { id: "o5", name: "Tecnologias de Informação", department: "TI", totalBudget: 30000000, spent: 18500000, period: "2025", status: "activo", responsavel: "Dr. Luís Campos", responsavelRole: "Director de TI" },
+  { id: "o6", name: "Investigação e Desenvolvimento", department: "Reitoria", totalBudget: 40000000, spent: 12000000, period: "2025", status: "activo", responsavel: "Prof. Joaquim Silva", responsavelRole: "Vice-Reitor para I&D" },
+  { id: "o7", name: "Bolsas de Estudo", department: "Reitoria", totalBudget: 25000000, spent: 25000000, period: "2025", status: "esgotado", responsavel: "Dra. Inês Carvalho", responsavelRole: "Secretária Geral" },
+  { id: "o8", name: "Eventos e Conferências", department: "Administração", totalBudget: 15000000, spent: 8200000, period: "2025", status: "activo", responsavel: "Dr. António Cunha", responsavelRole: "Director Administrativo" },
 ];
+
