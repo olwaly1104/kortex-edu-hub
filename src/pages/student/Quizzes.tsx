@@ -522,10 +522,10 @@ function QuizRow({ quiz, onStart }: { quiz: AnyQuiz; onStart: () => void }) {
         <DiffPill d={quiz.difficulty} />
       </div>
 
-      <Button size="sm" variant="outline" onClick={onStart} className="gap-1.5 shrink-0 h-8 group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-colors">
+      <span className="inline-flex items-center gap-1.5 shrink-0 h-8 px-3 rounded-md border border-input bg-background text-xs font-medium group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-colors">
         <Play className="w-3 h-3" /> Iniciar
-      </Button>
-    </div>
+      </span>
+    </button>
   );
 }
 
