@@ -448,87 +448,67 @@ export default function DespesaDetail() {
             <h4 className="font-semibold text-xs uppercase tracking-wider text-muted-foreground mb-3 flex items-center gap-1.5">
               <FileText className="w-3.5 h-3.5 text-primary" /> Documentos
             </h4>
-            <div className="space-y-2">
-              {/* Factura — sempre disponível */}
-              <div className="group flex items-center gap-3 px-3 py-2.5 rounded-lg border border-border bg-background hover:border-primary/40 hover:bg-muted/20 transition-all">
-                <div className="w-9 h-9 rounded-md bg-red-50 border border-red-200 flex items-center justify-center shrink-0">
-                  <FileText className="w-4 h-4 text-red-600" />
+            <div className="space-y-1">
+              {/* Factura */}
+              <div className="flex items-center gap-2.5 px-2.5 py-2 rounded-md hover:bg-muted/30 transition-colors">
+                <FileText className="w-4 h-4 text-muted-foreground shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-[13px] font-medium text-foreground truncate">Factura</p>
+                  <p className="text-[11px] text-muted-foreground font-mono truncate">FAC-{despesa.id.toUpperCase()}.pdf</p>
                 </div>
-                <div className="flex-1 min-w-0 leading-tight">
-                  <div className="flex items-center gap-1.5">
-                    <p className="text-[12px] font-semibold text-foreground truncate">Factura</p>
-                    <CheckCircle2 className="w-3 h-3 text-accent shrink-0" />
-                  </div>
-                  <p className="text-[10px] text-muted-foreground font-mono truncate">FAC-{despesa.id.toUpperCase()}.pdf</p>
-                </div>
-                <div className="flex items-center gap-0.5 shrink-0">
+                <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
                     type="button"
                     onClick={() => toast({ title: "Factura aberta", description: `FAC-${despesa.id.toUpperCase()}.pdf` })}
-                    className="w-7 h-7 rounded-md inline-flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                    className="p-1.5 rounded hover:bg-muted transition-colors"
                     title="Ver"
                   >
-                    <Eye className="w-3.5 h-3.5" />
+                    <Eye className="w-3.5 h-3.5 text-muted-foreground" />
                   </button>
                   <button
                     type="button"
                     onClick={() => toast({ title: "Download iniciado", description: `FAC-${despesa.id.toUpperCase()}.pdf` })}
-                    className="w-7 h-7 rounded-md inline-flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                    className="p-1.5 rounded hover:bg-muted transition-colors"
                     title="Download"
                   >
-                    <Download className="w-3.5 h-3.5" />
+                    <Download className="w-3.5 h-3.5 text-muted-foreground" />
                   </button>
                 </div>
               </div>
 
-              {/* Comprovativo — disponível só quando aprovada */}
+              {/* Comprovativo */}
               {despesa.status === "aprovada" ? (
-                <div className="group flex items-center gap-3 px-3 py-2.5 rounded-lg border border-border bg-background hover:border-primary/40 hover:bg-muted/20 transition-all">
-                  <div className="w-9 h-9 rounded-md bg-accent/15 border border-accent/30 flex items-center justify-center shrink-0">
-                    <CheckCircle2 className="w-4 h-4 text-accent" />
+                <div className="flex items-center gap-2.5 px-2.5 py-2 rounded-md hover:bg-muted/30 transition-colors">
+                  <CheckCircle2 className="w-4 h-4 text-accent shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[13px] font-medium text-foreground truncate">Comprovativo</p>
+                    <p className="text-[11px] text-muted-foreground font-mono truncate">COMP-{despesa.id.toUpperCase()}.pdf</p>
                   </div>
-                  <div className="flex-1 min-w-0 leading-tight">
-                    <div className="flex items-center gap-1.5">
-                      <p className="text-[12px] font-semibold text-foreground truncate">Comprovativo</p>
-                      <CheckCircle2 className="w-3 h-3 text-accent shrink-0" />
-                    </div>
-                    <p className="text-[10px] text-muted-foreground font-mono truncate">COMP-{despesa.id.toUpperCase()}.pdf</p>
-                  </div>
-                  <div className="flex items-center gap-0.5 shrink-0">
+                  <div className="flex items-center gap-1 shrink-0">
                     <button
                       type="button"
                       onClick={() => toast({ title: "Comprovativo aberto", description: `COMP-${despesa.id.toUpperCase()}.pdf` })}
-                      className="w-7 h-7 rounded-md inline-flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                      className="p-1.5 rounded hover:bg-muted transition-colors"
                       title="Ver"
                     >
-                      <Eye className="w-3.5 h-3.5" />
+                      <Eye className="w-3.5 h-3.5 text-muted-foreground" />
                     </button>
                     <button
                       type="button"
                       onClick={() => toast({ title: "Download iniciado", description: `COMP-${despesa.id.toUpperCase()}.pdf` })}
-                      className="w-7 h-7 rounded-md inline-flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                      className="p-1.5 rounded hover:bg-muted transition-colors"
                       title="Download"
                     >
-                      <Download className="w-3.5 h-3.5" />
+                      <Download className="w-3.5 h-3.5 text-muted-foreground" />
                     </button>
                   </div>
                 </div>
               ) : (
-                <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg border border-dashed border-border bg-muted/15">
-                  <div className="w-9 h-9 rounded-md bg-muted/60 border border-border flex items-center justify-center shrink-0">
-                    <FileText className="w-4 h-4 text-muted-foreground/70" />
-                  </div>
-                  <div className="flex-1 min-w-0 leading-tight">
-                    <div className="flex items-center gap-1.5">
-                      <p className="text-[12px] font-semibold text-muted-foreground truncate">Comprovativo</p>
-                      <span className="inline-flex items-center gap-0.5 text-[9px] font-semibold uppercase tracking-wide text-destructive/80 bg-destructive/10 border border-destructive/20 px-1.5 py-px rounded">
-                        <X className="w-2.5 h-2.5" /> Pendente
-                      </span>
-                    </div>
-                    <p className="text-[10px] text-muted-foreground/80 font-mono truncate">COMP-{despesa.id.toUpperCase()}.pdf</p>
-                  </div>
-                  <div className="flex items-center shrink-0">
-                    <span className="text-[10px] text-muted-foreground/70 italic pr-1">Após pagamento</span>
+                <div className="flex items-center gap-2.5 px-2.5 py-2 rounded-md">
+                  <FileText className="w-4 h-4 text-muted-foreground/50 shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[13px] font-medium text-muted-foreground truncate">Comprovativo</p>
+                    <p className="text-[11px] text-muted-foreground/60">Disponível após pagamento</p>
                   </div>
                 </div>
               )}
