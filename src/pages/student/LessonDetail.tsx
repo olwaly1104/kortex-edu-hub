@@ -191,6 +191,105 @@ export default function LessonDetail() {
           )}
         </TabsContent>
 
+        <TabsContent value="quizzes" className="space-y-3">
+          {(() => {
+            const quizzes = generateLessonQuizzes(lesson.id, lesson.title, lessonStatus);
+            if (quizzes.length === 0) {
+              return (
+                <Card className="p-8 text-center">
+                  <Brain className="w-10 h-10 text-muted-foreground/30 mx-auto mb-2" />
+                  <p className="text-sm text-muted-foreground">Nenhum quiz disponível para esta aula.</p>
+                </Card>
+              );
+            }
+            const completed = quizzes.filter(q => q.status === "concluido").length;
+            const avg = completed > 0
+              ? Math.round(quizzes.filter(q => q.status === "concluido").reduce((s, q) => s + (q.score || 0), 0) / completed)
+              : 0;
+            return (
+              <>
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="flex items-center gap-3 rounded-xl border border-border bg-card p-3">
+                    <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                      <Brain className="w-4 h-4 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-lg font-bold text-foreground">{quizzes.length}</p>
+                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Total</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 rounded-xl border border-border bg-card p-3">
+                    <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center">
+                      <CheckCircle className="w-4 h-4 text-accent" />
+                    </div>
+                    <div>
+                      <p className="text-lg font-bold text-foreground">{completed}/{quizzes.length}</p>
+                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Concluídos</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 rounded-xl border border-border bg-card p-3">
+                    <div className="w-8 h-8 rounded-lg bg-[hsl(38,92%,50%)]/10 flex items-center justify-center">
+                      <Trophy className="w-4 h-4 text-[hsl(38,92%,50%)]" />
+                    </div>
+                    <div>
+                      <p className="text-lg font-bold text-foreground">{completed > 0 ? `${avg}%` : "—"}</p>
+                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Média</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  {quizzes.map(q => {
+                    const cfg = q.status === "concluido"
+                      ? { label: "Concluído", icon: CheckCircle, color: "hsl(var(--accent))", bg: "hsl(var(--accent) / 0.1)" }
+                      : q.status === "expirado"
+                      ? { label: "Expirado", icon: XCircle, color: "hsl(var(--destructive))", bg: "hsl(var(--destructive) / 0.1)" }
+                      : { label: "Disponível", icon: HelpCircle, color: disc.color, bg: disc.color + "12" };
+                    const StatusIcon = cfg.icon;
+                    const passed = q.score !== undefined && q.score >= 50;
+                    return (
+                      <Card
+                        key={q.id}
+                        className="p-4 cursor-pointer hover:shadow-md transition-all border-l-[3px]"
+                        style={{ borderLeftColor: cfg.color }}
+                        onClick={() => navigate(`/student/quizzes`)}
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: cfg.bg }}>
+                            <Brain className="w-5 h-5" style={{ color: cfg.color }} />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-semibold text-foreground">{q.title}</p>
+                            <div className="flex items-center gap-3 mt-1.5 text-xs text-muted-foreground flex-wrap">
+                              <span className="inline-flex items-center gap-1"><HelpCircle className="w-3 h-3" /> {q.questions} perguntas</span>
+                              <span className="inline-flex items-center gap-1"><Timer className="w-3 h-3" /> {q.duration} min</span>
+                              <span className="inline-flex items-center gap-1"><Trophy className="w-3 h-3" /> {q.points} pts</span>
+                              {q.status === "concluido" && q.score !== undefined && (
+                                <span className={`font-semibold ${passed ? "text-accent" : "text-destructive"}`}>
+                                  Nota: {q.score}%
+                                </span>
+                              )}
+                              {q.status === "disponivel" && (
+                                <span>Prazo: {q.deadline}</span>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2 shrink-0">
+                            <Badge className="text-[10px] gap-1 border-0" style={{ background: cfg.bg, color: cfg.color }}>
+                              <StatusIcon className="w-3 h-3" /> {cfg.label}
+                            </Badge>
+                            <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                          </div>
+                        </div>
+                      </Card>
+                    );
+                  })}
+                </div>
+              </>
+            );
+          })()}
+        </TabsContent>
+
         <TabsContent value="participants" className="space-y-4">
           {/* Stats */}
           {(() => {
