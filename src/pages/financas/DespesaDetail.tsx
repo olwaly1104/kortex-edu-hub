@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft, TrendingDown, Tag, Calendar, User, UserCheck,
   FileText, Check, X, Clock, CheckCircle2, XCircle, Send, Wallet, MessageSquare,
-  Users, Share2, Eye, Download,
+  Users, Share2, Eye, Download, Mail, ShieldCheck,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -322,20 +322,112 @@ export default function DespesaDetail() {
             <dl className="space-y-3 text-sm">
               <div>
                 <dt className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Solicitado por</dt>
-                <dd className="font-medium text-foreground">{despesa.requestedBy || "—"}</dd>
-                {despesa.requesterRole && (
-                  <dd className="text-xs text-muted-foreground">{despesa.requesterRole}</dd>
-                )}
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <dd className="font-medium text-foreground truncate">{despesa.requestedBy || "—"}</dd>
+                    {despesa.requesterRole && (
+                      <dd className="text-xs text-muted-foreground truncate">{despesa.requesterRole}</dd>
+                    )}
+                  </div>
+                  {despesa.requestedBy && (
+                    <div className="flex items-center gap-1 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => toast({ title: "Conversa aberta", description: `Chat com ${despesa.requestedBy}` })}
+                        className="w-7 h-7 rounded-md inline-flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                        title={`Chat com ${despesa.requestedBy}`}
+                      >
+                        <MessageSquare className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => toast({ title: "Email", description: `Compor email para ${despesa.requestedBy}` })}
+                        className="w-7 h-7 rounded-md inline-flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                        title={`Email a ${despesa.requestedBy}`}
+                      >
+                        <Mail className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
               <Separator />
               <div>
                 <dt className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Responsável</dt>
-                <dd className="font-medium text-foreground">{despesa.responsavel || "—"}</dd>
-                {despesa.responsavelRole && (
-                  <dd className="text-xs text-muted-foreground">{despesa.responsavelRole}</dd>
-                )}
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <dd className="font-medium text-foreground truncate">{despesa.responsavel || "—"}</dd>
+                    {despesa.responsavelRole && (
+                      <dd className="text-xs text-muted-foreground truncate">{despesa.responsavelRole}</dd>
+                    )}
+                  </div>
+                  {despesa.responsavel && (
+                    <div className="flex items-center gap-1 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => toast({ title: "Conversa aberta", description: `Chat com ${despesa.responsavel}` })}
+                        className="w-7 h-7 rounded-md inline-flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                        title={`Chat com ${despesa.responsavel}`}
+                      >
+                        <MessageSquare className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => toast({ title: "Email", description: `Compor email para ${despesa.responsavel}` })}
+                        className="w-7 h-7 rounded-md inline-flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                        title={`Email a ${despesa.responsavel}`}
+                      >
+                        <Mail className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
               <Separator />
+              {(() => {
+                const approver = despesa.approvedBy || "Dr. Manuel Tavares";
+                const approverRole = "Director Financeiro";
+                const isDecided = despesa.status === "aprovada" || despesa.status === "rejeitada";
+                return (
+                  <>
+                    <div>
+                      <dt className="text-xs text-muted-foreground uppercase tracking-wider mb-1">
+                        {despesa.status === "rejeitada" ? "Rejeitado por" : "Aprovado por"}
+                      </dt>
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <dd className="font-medium text-foreground truncate flex items-center gap-1.5">
+                            <ShieldCheck className="w-3.5 h-3.5 text-primary shrink-0" />
+                            {isDecided ? approver : <span className="text-muted-foreground italic font-normal">Aguarda decisão</span>}
+                          </dd>
+                          <dd className="text-xs text-muted-foreground truncate">{approverRole}</dd>
+                        </div>
+                        {isDecided && (
+                          <div className="flex items-center gap-1 shrink-0">
+                            <button
+                              type="button"
+                              onClick={() => toast({ title: "Conversa aberta", description: `Chat com ${approver}` })}
+                              className="w-7 h-7 rounded-md inline-flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                              title={`Chat com ${approver}`}
+                            >
+                              <MessageSquare className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => toast({ title: "Email", description: `Compor email para ${approver}` })}
+                              className="w-7 h-7 rounded-md inline-flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                              title={`Email a ${approver}`}
+                            >
+                              <Mail className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <Separator />
+                  </>
+                );
+              })()}
               <div>
                 <dt className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Categoria</dt>
                 <dd className="font-medium text-foreground">{despesa.category}</dd>
