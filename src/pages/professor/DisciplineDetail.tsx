@@ -53,17 +53,24 @@ export default function ProfessorDisciplineDetail() {
       : null;
   })();
 
-  const statusConfig = {
+  const statusConfig: Record<string, { label: string; color: string; icon: typeof CheckCircle }> = {
     publicada: { label: "Publicada", color: "bg-accent/10 text-accent", icon: CheckCircle },
     agendada: { label: "Agendada", color: "bg-secondary/10 text-secondary", icon: Clock },
     rascunho: { label: "Rascunho", color: "bg-muted text-muted-foreground", icon: Edit },
+    pendente: { label: "Pendente", color: "bg-amber-100 text-amber-700", icon: Clock },
+    encerrada: { label: "Encerrada", color: "bg-muted text-muted-foreground", icon: CheckCircle },
   };
 
-  const taskStatusConfig = {
+  const taskStatusConfig: Record<string, { label: string; color: string }> = {
     publicada: { label: "Activa", color: "bg-secondary/10 text-secondary" },
     encerrada: { label: "Encerrada", color: "bg-accent/10 text-accent" },
     rascunho: { label: "Rascunho", color: "bg-muted text-muted-foreground" },
+    agendada: { label: "Agendada", color: "bg-secondary/10 text-secondary" },
+    pendente: { label: "Pendente", color: "bg-amber-100 text-amber-700" },
   };
+
+  const fallbackStatus = { label: "—", color: "bg-muted text-muted-foreground", icon: AlertCircle };
+
 
   const filteredStudents = discStudents.filter(s =>
     s.name.toLowerCase().includes(studentSearch.toLowerCase())
