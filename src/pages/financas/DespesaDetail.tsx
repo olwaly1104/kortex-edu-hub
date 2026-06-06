@@ -3,14 +3,19 @@ import { useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft, TrendingDown, Tag, Calendar, User, UserCheck,
   FileText, Check, X, Clock, CheckCircle2, XCircle, Send, Wallet, MessageSquare,
+  Users, Share2, Eye, Download,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger,
+} from "@/components/ui/dialog";
 import { despesas, formatCurrency } from "@/data/financeModuleData";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import DespesaDocPreview from "./DespesaDocPreview";
 
 const statusConfig: Record<string, { label: string; cls: string; icon: any }> = {
   aprovada: { label: "Aprovada", cls: "bg-accent/15 text-accent border-accent/30", icon: CheckCircle2 },
@@ -160,9 +165,82 @@ export default function DespesaDetail() {
                   </Badge>
                 </div>
               </div>
-              <div className="text-right">
-                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Valor</p>
-                <p className="text-3xl font-bold text-destructive">-{formatCurrency(despesa.amount)}</p>
+              <div className="shrink-0 flex flex-col items-end gap-3">
+                <div className="text-right">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Valor</p>
+                  <p className="text-3xl font-bold text-destructive">-{formatCurrency(despesa.amount)}</p>
+                </div>
+                <div className="inline-flex items-center gap-2 pl-1.5 pr-1 py-1 rounded-md border border-border bg-background shadow-sm">
+                  <div className="w-6 h-6 rounded bg-red-50 border border-red-200 flex items-center justify-center shrink-0">
+                    <FileText className="w-3 h-3 text-red-600" />
+                  </div>
+                  <div className="flex flex-col min-w-0 leading-tight">
+                    <span className="text-[11px] font-semibold text-foreground tabular-nums">Despesa-{despesa.id.toUpperCase()}</span>
+                    <span className="text-[9px] tracking-[0.02em] text-muted-foreground font-medium">Gerado automaticamente</span>
+                  </div>
+                  <span className="self-stretch w-px bg-border mx-0.5" />
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <button type="button" className="inline-flex items-center gap-1 px-1 h-5 rounded text-[10px] text-primary hover:bg-muted font-medium transition-colors" title="Partilhas">
+                        <Users className="w-3 h-3" /> 4
+                      </button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-md">
+                      <DialogHeader>
+                        <DialogTitle className="text-base flex items-center gap-2">
+                          <Share2 className="w-4 h-4 text-primary" /> Partilhado com 4 pessoas
+                        </DialogTitle>
+                        <DialogDescription className="text-[12px]">
+                          Pessoas com acesso ao documento <span className="font-medium text-foreground">Despesa-{despesa.id.toUpperCase()}</span>.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="space-y-2 mt-2">
+                        {[
+                          { name: "Dr. Manuel Tavares", role: "Director Financeiro", access: "Editar" },
+                          { name: despesa.responsavel || "Responsável Financeiro", role: despesa.responsavelRole || "Tesouraria", access: "Editar" },
+                          { name: despesa.requestedBy || "Solicitante", role: despesa.requesterRole || "Departamento", access: "Visualizar" },
+                          { name: "Reitoria", role: "Auditoria", access: "Visualizar" },
+                        ].map((p, i) => {
+                          const ini = p.name.split(" ").slice(0, 2).map(n => n[0]).join("");
+                          return (
+                            <div key={i} className="flex items-center gap-3 px-3 py-2.5 rounded-md border border-border bg-muted/20">
+                              <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[11px] font-semibold ring-1 ring-primary/15 shrink-0">
+                                {ini}
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <p className="text-[13px] font-semibold text-foreground leading-tight truncate">{p.name}</p>
+                                <p className="text-[11px] text-muted-foreground mt-0.5">{p.role}</p>
+                              </div>
+                              <Badge variant="outline" className="text-[10px] font-medium px-2 py-0.5 shrink-0">{p.access}</Badge>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <button type="button" className="w-5 h-5 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors" title="Ver documento">
+                        <Eye className="w-3 h-3" />
+                      </button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-5xl w-[95vw] h-[92vh] p-0 gap-0 overflow-hidden">
+                      <DialogHeader className="sr-only">
+                        <DialogTitle>Documento Despesa-{despesa.id.toUpperCase()}</DialogTitle>
+                        <DialogDescription>Pré-visualização do documento financeiro gerado.</DialogDescription>
+                      </DialogHeader>
+                      <DespesaDocPreview despesa={despesa} />
+                    </DialogContent>
+                  </Dialog>
+                  <button
+                    type="button"
+                    onClick={() => toast({ title: "Documento exportado", description: `Despesa-${despesa.id.toUpperCase()}.pdf` })}
+                    className="w-5 h-5 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                    title="Exportar"
+                  >
+                    <Download className="w-3 h-3" />
+                  </button>
+                </div>
               </div>
             </div>
           </div>
