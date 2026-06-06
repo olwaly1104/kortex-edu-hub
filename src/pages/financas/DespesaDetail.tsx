@@ -3,14 +3,19 @@ import { useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft, TrendingDown, Tag, Calendar, User, UserCheck,
   FileText, Check, X, Clock, CheckCircle2, XCircle, Send, Wallet, MessageSquare,
+  Users, Share2, Eye, Download,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger,
+} from "@/components/ui/dialog";
 import { despesas, formatCurrency } from "@/data/financeModuleData";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import DespesaDocPreview from "./DespesaDocPreview";
 
 const statusConfig: Record<string, { label: string; cls: string; icon: any }> = {
   aprovada: { label: "Aprovada", cls: "bg-accent/15 text-accent border-accent/30", icon: CheckCircle2 },
