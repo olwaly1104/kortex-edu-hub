@@ -466,7 +466,7 @@ function QuizRow({ quiz, onStart }: { quiz: AnyQuiz; onStart: () => void }) {
             <Icon className="w-2.5 h-2.5" />
             {meta.label}
           </span>
-          <span className="text-[10px] text-muted-foreground tabular-nums ml-0.5">{quiz.ano}º ano</span>
+          
         </div>
         <h3 className="text-sm font-semibold text-foreground leading-tight truncate">{quiz.title}</h3>
         <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-1">{quiz.description}</p>
