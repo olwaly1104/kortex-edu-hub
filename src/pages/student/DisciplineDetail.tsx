@@ -9,7 +9,7 @@ import {
   ArrowLeft, BookOpen, User, Users, Clock, MapPin, Video, FileText,
   GraduationCap, ClipboardList, Play, Download, ChevronDown, ChevronRight,
   Eye, Calendar, CheckCircle, AlertCircle, TrendingUp, FolderOpen,
-  Mail, MessageSquare, LogIn, Award, Megaphone, BookMarked, Hash,
+  LogIn, Award, Megaphone, BookMarked, Hash, Brain, HelpCircle, Trophy, Timer, XCircle,
 } from "lucide-react";
 import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
