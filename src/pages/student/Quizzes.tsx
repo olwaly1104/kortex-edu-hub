@@ -455,17 +455,16 @@ function QuizRow({ quiz, onStart }: { quiz: AnyQuiz; onStart: () => void }) {
   return (
     <div className="group flex items-center gap-4 px-5 py-3.5 hover:bg-muted/30 transition-colors">
       <div className="flex-1 min-w-0">
-        {/* Meta bar — cadeira tag + categoria together */}
+        {/* Meta bar — categoria first, then cadeira */}
         <div className="flex items-center gap-1.5 mb-1.5 flex-wrap">
-          <span className={cn("inline-flex items-center gap-1.5 text-[10px] font-semibold px-2 py-0.5 rounded-md border", cad.tag)}>
-            <span className={cn("w-1.5 h-1.5 rounded-full", cad.dot)} />
-            {quiz.cadeira}
-          </span>
           <span className={cn("inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-md border", meta.tag)}>
             <Icon className="w-2.5 h-2.5" />
             {meta.label}
           </span>
-          
+          <span className={cn("inline-flex items-center gap-1.5 text-[10px] font-semibold px-2 py-0.5 rounded-md border", cad.tag)}>
+            <span className={cn("w-1.5 h-1.5 rounded-full", cad.dot)} />
+            {quiz.cadeira}
+          </span>
         </div>
         <h3 className="text-sm font-semibold text-foreground leading-tight truncate">{quiz.title}</h3>
         <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-1">{quiz.description}</p>
