@@ -231,12 +231,12 @@ const TYPE_META: Record<QuizType, {
 };
 
 const DIFF_META: Record<Difficulty, {
-  label: string; bangs: string; level: 1 | 2 | 3;
+  label: string; level: 1 | 2 | 3;
   icon: React.ElementType; pill: string; bar: string;
 }> = {
-  "Introdutório": { label: "Introdutório", bangs: "!",   level: 1, icon: Gauge, pill: "bg-emerald-50 text-emerald-700 border-emerald-200", bar: "bg-emerald-500" },
-  "Intermédio":   { label: "Intermédio",   bangs: "!!",  level: 2, icon: Flame, pill: "bg-amber-50 text-amber-700 border-amber-200",       bar: "bg-amber-500"   },
-  "Avançado":     { label: "Avançado",     bangs: "!!!", level: 3, icon: Zap,   pill: "bg-rose-50 text-rose-700 border-rose-200",           bar: "bg-rose-500"    },
+  "Introdutório": { label: "Introdutório", level: 1, icon: Gauge, pill: "bg-emerald-50 text-emerald-700 border-emerald-200", bar: "bg-emerald-500" },
+  "Intermédio":   { label: "Intermédio",   level: 2, icon: Flame, pill: "bg-amber-50 text-amber-700 border-amber-200",       bar: "bg-amber-500"   },
+  "Avançado":     { label: "Avançado",     level: 3, icon: Zap,   pill: "bg-rose-50 text-rose-700 border-rose-200",           bar: "bg-rose-500"    },
 };
 
 function DiffPill({ d, size = "sm" }: { d: Difficulty; size?: "sm" | "md" }) {
@@ -251,7 +251,6 @@ function DiffPill({ d, size = "sm" }: { d: Difficulty; size?: "sm" | "md" }) {
     )}>
       <Icon className={isMd ? "w-3.5 h-3.5" : "w-3 h-3"} />
       <span>{m.label}</span>
-      <span className="font-black tracking-tight">{m.bangs}</span>
       <span className="flex items-end gap-0.5 ml-0.5">
         {[1, 2, 3].map(n => (
           <span key={n} className={cn(
