@@ -581,26 +581,26 @@ function QuizRow({ quiz, onStart }: { quiz: AnyQuiz; onStart: () => void }) {
         </div>
         <h3 className="text-sm font-semibold text-foreground leading-tight truncate">{quiz.title}</h3>
         <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-1">{quiz.description}</p>
-      </div>
 
-      <div className="hidden md:flex items-stretch shrink-0 pr-2">
-        <DiffPill d={quiz.difficulty} />
-        <div className="ml-4 pl-4 border-l border-border flex items-center gap-5">
-          {/* Nota Geral — numeric, no tag */}
-          <div className="flex flex-col items-end leading-none">
-            <span className={cn("text-lg font-bold tabular-nums", nc.text)}>
-              {stats.nota.toFixed(1)}
-              <span className="text-[10px] font-medium text-muted-foreground/70 ml-0.5">/20</span>
-            </span>
-            <span className="text-[9px] uppercase tracking-[0.12em] font-semibold text-muted-foreground mt-1">Nota Geral</span>
+        {/* Stats row — below title */}
+        <div className="mt-2.5 flex items-center gap-5">
+          <div className="flex items-center gap-1.5">
+            <div className={cn("w-1.5 h-4 rounded-full", nc.bg)} />
+            <div className="leading-none">
+              <span className={cn("text-sm font-bold tabular-nums", nc.text)}>
+                {stats.nota.toFixed(1)}
+              </span>
+              <span className="text-[10px] font-medium text-muted-foreground/60 ml-0.5">/20</span>
+              <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground ml-1.5">Nota Geral</span>
+            </div>
           </div>
-          {/* Tentativas — numeric, no tag */}
-          <div className="flex flex-col items-end leading-none">
-            <span className="text-lg font-bold tabular-nums text-foreground">
-              {stats.attempts}<span className="text-[10px] font-medium text-muted-foreground/70">×</span>
-            </span>
-            <span className="text-[9px] uppercase tracking-[0.12em] font-semibold text-muted-foreground mt-1">Tentativas</span>
+          <div className="w-px h-5 bg-border" />
+          <div className="flex items-center gap-1.5 leading-none">
+            <span className="text-sm font-bold tabular-nums text-foreground">{stats.attempts}</span>
+            <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">Tentativas</span>
           </div>
+          <div className="w-px h-5 bg-border" />
+          <DiffPill d={quiz.difficulty} />
         </div>
       </div>
 
