@@ -905,10 +905,9 @@ function ExamGame({ quiz }: { quiz: Extract<AnyQuiz, { type: "exam" }> }) {
           </div>
         </div>
 
-        <div className="grid sm:grid-cols-4 gap-3">
+        <div className="grid sm:grid-cols-3 gap-3">
           <BriefStat label="Duração" value={`${quiz.minutes} min`} />
-          <BriefStat label="Questões" value={total} />
-          <BriefStat label="Pontos" value={totalPoints} />
+          <BriefStat label="Secções" value={3} />
           <BriefStat label="Aprovação" value={`${passing}%`} />
         </div>
 
