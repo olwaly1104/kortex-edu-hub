@@ -426,6 +426,37 @@ export default function StudentQuizzes() {
           </Card>
         </main>
       </div>
+
+      <AlertDialog open={!!pending} onOpenChange={(o) => { if (!o) setPendingId(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5 text-amber-500" />
+              Iniciar actividade?
+            </AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-3 pt-1">
+                <p className="text-sm text-foreground font-medium">{pending?.title}</p>
+                <div className="rounded-md border border-border bg-muted/40 p-3 text-xs space-y-1.5">
+                  <div className="flex justify-between"><span className="text-muted-foreground">Cadeira</span><span className="font-medium text-foreground">{pending?.cadeira}</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">Itens</span><span className="font-medium text-foreground tabular-nums">{pending?.items.length}</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">Duração</span><span className="font-medium text-foreground tabular-nums">{pending?.minutes} min</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">Dificuldade</span><span className="font-medium text-foreground">{pending?.difficulty}</span></div>
+                </div>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  Uma vez iniciada, só poderás sair depois de terminar. O cronómetro arranca de imediato.
+                </p>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={() => { if (pendingId) { setActiveId(pendingId); setPendingId(null); } }} className="gap-1.5">
+              <Play className="w-3.5 h-3.5" /> Confirmar e iniciar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
