@@ -355,16 +355,20 @@ export default function StudentQuizzes() {
             </div>
             <div className="space-y-0.5">
               <FilterRow active={cadeiraFilter === "all"} onClick={() => setCadeiraFilter("all")} icon={BookOpen} label="Todas as cadeiras" count={QUIZZES.length} />
-              {cadeiras.map(c => (
-                <FilterRow
-                  key={c}
-                  active={cadeiraFilter === c}
-                  onClick={() => setCadeiraFilter(c)}
-                  label={c}
-                  count={QUIZZES.filter(q => q.cadeira === c).length}
-                  dot={cadeiraColor(c).dot}
-                />
-              ))}
+              {cadeiras.map(c => {
+                const cc = cadeiraColor(c);
+                return (
+                  <FilterRow
+                    key={c}
+                    active={cadeiraFilter === c}
+                    onClick={() => setCadeiraFilter(c)}
+                    label={c}
+                    count={QUIZZES.filter(q => q.cadeira === c).length}
+                    tag={cc.tag}
+                    dot={cc.dot}
+                  />
+                );
+              })}
             </div>
           </div>
         </aside>
@@ -422,7 +426,7 @@ function KpiStat({ label, value }: { label: string; value: number }) {
 }
 
 function FilterRow({
-  active, onClick, icon: Icon, label, count, dot, activeClasses,
+  active, onClick, icon: Icon, label, count, dot, tag, activeClasses,
 }: {
   active: boolean;
   onClick: () => void;
@@ -430,6 +434,7 @@ function FilterRow({
   label: string;
   count: number;
   dot?: string;
+  tag?: string;
   activeClasses?: string;
 }) {
   return (
@@ -450,7 +455,11 @@ function FilterRow({
           active ? "bg-current opacity-90" : "opacity-0"
         )}
       />
-      {dot ? (
+      {tag ? (
+        <span className={cn("inline-flex items-center justify-center w-5 h-5 rounded-md border shrink-0", tag)}>
+          {dot && <span className={cn("w-1.5 h-1.5 rounded-full", dot)} />}
+        </span>
+      ) : dot ? (
         <span className={cn("w-2.5 h-2.5 rounded-sm shrink-0 ring-1 ring-black/5", dot)} />
       ) : Icon ? (
         <Icon className={cn("w-3.5 h-3.5 shrink-0", active ? "" : "text-muted-foreground group-hover:text-foreground")} />
