@@ -490,7 +490,11 @@ function QuizRow({ quiz, onStart }: { quiz: AnyQuiz; onStart: () => void }) {
   const Icon = meta.icon;
   const cad = cadeiraColor(quiz.cadeira);
   return (
-    <div className="group flex items-center gap-4 px-5 py-3.5 hover:bg-muted/30 transition-colors">
+    <button
+      type="button"
+      onClick={onStart}
+      className="group w-full text-left flex items-center gap-4 px-5 py-3.5 hover:bg-muted/30 transition-colors focus:outline-none focus-visible:bg-muted/40"
+    >
       {/* Large category icon tile + label below */}
       <div className="shrink-0 flex flex-col items-center gap-1 w-14">
         <div className={cn("w-12 h-12 rounded-lg border flex items-center justify-center", meta.tile)}>
@@ -518,10 +522,10 @@ function QuizRow({ quiz, onStart }: { quiz: AnyQuiz; onStart: () => void }) {
         <DiffPill d={quiz.difficulty} />
       </div>
 
-      <Button size="sm" variant="outline" onClick={onStart} className="gap-1.5 shrink-0 h-8 group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-colors">
+      <span className="inline-flex items-center gap-1.5 shrink-0 h-8 px-3 rounded-md border border-input bg-background text-xs font-medium group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-colors">
         <Play className="w-3 h-3" /> Iniciar
-      </Button>
-    </div>
+      </span>
+    </button>
   );
 }
 
