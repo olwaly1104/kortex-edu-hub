@@ -282,7 +282,7 @@ export default function StudentQuizzes() {
     mcq: QUIZZES.filter(q => q.type === "mcq").length,
     written: QUIZZES.filter(q => q.type === "written").length,
     fill: QUIZZES.filter(q => q.type === "fill").length,
-    flash: QUIZZES.filter(q => q.type === "flash").length,
+    
     exam: QUIZZES.filter(q => q.type === "exam").length,
   };
 
