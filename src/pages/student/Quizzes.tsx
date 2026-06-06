@@ -456,28 +456,30 @@ function QuizRow({ quiz, onStart }: { quiz: AnyQuiz; onStart: () => void }) {
   return (
     <div className="group flex items-center gap-4 px-5 py-3.5 hover:bg-muted/30 transition-colors">
       <div className="flex-1 min-w-0">
-        {/* Meta bar — categoria first, then cadeira */}
-        <div className="flex items-center gap-1.5 mb-1.5 flex-wrap">
+        {/* Cadeira — big, first, coloured */}
+        <div className="flex items-center gap-2 mb-1">
+          <span className={cn("w-2.5 h-2.5 rounded-full shrink-0", cad.dot)} />
+          <span className={cn("text-sm font-bold tracking-tight", cad.tag.split(" ").find(c => c.startsWith("text-")) || "text-foreground")}>
+            {quiz.cadeira}
+          </span>
+        </div>
+
+        <h3 className="text-sm font-semibold text-foreground leading-tight truncate">{quiz.title}</h3>
+        <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-1">{quiz.description}</p>
+
+        {/* Meta bar — categoria, difficulty, time */}
+        <div className="flex items-center gap-2 mt-1.5 flex-wrap">
           <span className={cn("inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-md border", meta.tag)}>
             <Icon className="w-2.5 h-2.5" />
             {meta.label}
           </span>
-          <span className={cn("inline-flex items-center gap-1.5 text-[10px] font-semibold px-2 py-0.5 rounded-md border", cad.tag)}>
-            <span className={cn("w-1.5 h-1.5 rounded-full", cad.dot)} />
-            {quiz.cadeira}
+          <span className={cn("text-[10px] font-medium px-2 py-0.5 rounded-md border", DIFF_STYLE[quiz.difficulty])}>
+            {quiz.difficulty}
+          </span>
+          <span className="text-[11px] text-muted-foreground flex items-center gap-1 tabular-nums">
+            <Timer className="w-3 h-3" />{quiz.minutes}m
           </span>
         </div>
-        <h3 className="text-sm font-semibold text-foreground leading-tight truncate">{quiz.title}</h3>
-        <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-1">{quiz.description}</p>
-      </div>
-
-      <div className="hidden md:flex items-center gap-2 shrink-0">
-        <span className="text-[11px] text-muted-foreground flex items-center gap-1 tabular-nums">
-          <Timer className="w-3 h-3" />{quiz.minutes}m
-        </span>
-        <span className={cn("text-[10px] font-medium px-2 py-0.5 rounded-md border", DIFF_STYLE[quiz.difficulty])}>
-          {quiz.difficulty}
-        </span>
       </div>
 
       <Button size="sm" variant="outline" onClick={onStart} className="gap-1.5 shrink-0 h-8 group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-colors">
