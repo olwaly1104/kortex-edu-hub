@@ -19,8 +19,7 @@ import { cn } from "@/lib/utils";
 type MCQ = { q: string; options: string[]; answer: number; explain: string };
 type Written = { q: string; keywords: string[]; sample: string };
 type Fill = { sentence: string; answer: string; hint: string };
-type Flash = { front: string; back: string };
-type QuizType = "mcq" | "written" | "fill" | "flash" | "exam";
+type QuizType = "mcq" | "written" | "fill" | "exam";
 type Difficulty = "Introdutório" | "Intermédio" | "Avançado";
 
 type ExamQ =
