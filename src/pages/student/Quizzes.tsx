@@ -862,9 +862,7 @@ function WrittenGame({ quiz, onLockChange }: { quiz: Extract<AnyQuiz, { type: "w
 
 function FillGame({ quiz, onLockChange }: { quiz: Extract<AnyQuiz, { type: "fill" }>; onLockChange?: (locked: boolean) => void }) {
   const [idx, setIdx] = useState(0);
-  const [value, setValue] = useState("");
-  const [checked, setChecked] = useState(false);
-  const [score, setScore] = useState(0);
+  const [answers, setAnswers] = useState<Record<number, string>>({});
   const [done, setDone] = useState(false);
   const current = quiz.items[idx];
   const total = quiz.items.length;
@@ -873,25 +871,33 @@ function FillGame({ quiz, onLockChange }: { quiz: Extract<AnyQuiz, { type: "fill
   useEffect(() => { onLockChange?.(!done); }, [done, onLockChange]);
   useEffect(() => () => onLockChange?.(false), [onLockChange]);
 
-  const isRight = value.trim().toLowerCase() === current.answer.toLowerCase();
+  const value = answers[idx] ?? "";
+  const score = quiz.items.reduce((s, it, i) => s + ((answers[i] ?? "").trim().toLowerCase() === it.answer.toLowerCase() ? 1 : 0), 0);
   const [before, after] = current.sentence.split("___");
 
-  const check = () => {
-    setChecked(true);
-    if (isRight) setScore(s => s + 1);
-  };
-  const next = () => {
-    if (idx + 1 >= total) setDone(true);
-    else { setIdx(idx + 1); setValue(""); setChecked(false); }
-  };
-  const restart = () => { setIdx(0); setValue(""); setChecked(false); setScore(0); setDone(false); };
+  const next = () => { if (idx + 1 >= total) setDone(true); else setIdx(idx + 1); };
+  const prev = () => setIdx(i => Math.max(0, i - 1));
+  const restart = () => { setIdx(0); setAnswers({}); setDone(false); };
 
-  if (done) return <ResultsCard quiz={quiz} score={score} total={total} time={time} onRestart={restart} />;
+  if (done) {
+    const review: ReviewItem[] = quiz.items.map((it, i) => {
+      const ua = (answers[i] ?? "").trim();
+      return {
+        n: i + 1,
+        question: it.sentence.replace("___", "_____"),
+        correct: ua.toLowerCase() === it.answer.toLowerCase(),
+        userAnswer: ua || null,
+        correctAnswer: it.answer,
+        explain: it.hint,
+      };
+    });
+    return <ResultsCard quiz={quiz} score={score} total={total} time={time} onRestart={restart} review={review} />;
+  }
 
   return (
     <Card className="overflow-hidden">
       <div className="px-6 pt-5 pb-4 border-b border-border bg-muted/30">
-        <ProgressStrip quiz={quiz} position={idx + (checked ? 1 : 0)} total={total} score={score} time={time} />
+        <ProgressStrip quiz={quiz} position={idx + 1} total={total} time={time} />
       </div>
 
       <div className="p-6 space-y-5">
@@ -899,15 +905,9 @@ function FillGame({ quiz, onLockChange }: { quiz: Extract<AnyQuiz, { type: "fill
           <span>{before}</span>
           <Input
             value={value}
-            onChange={(e) => setValue(e.target.value)}
-            disabled={checked}
+            onChange={(e) => setAnswers(a => ({ ...a, [idx]: e.target.value }))}
             placeholder="..."
-            className={cn(
-              "inline-flex w-44 h-10 text-center font-bold text-base border-2",
-              !checked && "border-primary/30 focus-visible:border-primary",
-              checked && isRight && "border-emerald-500 bg-emerald-50 text-emerald-700",
-              checked && !isRight && "border-destructive bg-destructive/10 text-destructive"
-            )}
+            className="inline-flex w-44 h-10 text-center font-bold text-base border-2 border-primary/30 focus-visible:border-primary"
           />
           <span>{after}</span>
         </div>
@@ -916,35 +916,18 @@ function FillGame({ quiz, onLockChange }: { quiz: Extract<AnyQuiz, { type: "fill
           <Sparkles className="w-3.5 h-3.5 text-amber-500" />
           <span><span className="font-semibold text-foreground/70">Dica:</span> {current.hint}</span>
         </div>
-
-        {checked && (
-          <div className={cn(
-            "rounded-lg p-4 text-sm flex items-start gap-3 border",
-            isRight
-              ? "bg-emerald-50 border-emerald-200 text-emerald-900"
-              : "bg-destructive/5 border-destructive/30 text-destructive"
-          )}>
-            {isRight
-              ? <CheckCircle2 className="w-5 h-5 shrink-0 mt-0.5" />
-              : <XCircle className="w-5 h-5 shrink-0 mt-0.5" />}
-            <div className="leading-relaxed">
-              {isRight ? (
-                <p><span className="font-bold">Correcto.</span> Boa memória.</p>
-              ) : (
-                <p><span className="font-bold">Não é desta.</span> Resposta certa: <span className="font-bold underline underline-offset-2">{current.answer}</span></p>
-              )}
-            </div>
-          </div>
-        )}
       </div>
 
-      <div className="px-6 py-4 border-t border-border bg-muted/20 flex items-center justify-between">
-        <span className="text-[11px] text-muted-foreground">
-          {checked ? (isRight ? "+1 ponto" : "Sem ponto nesta") : "Escreve o termo em falta."}
+      <div className="px-6 py-4 border-t border-border bg-muted/20 flex items-center justify-between gap-2">
+        <Button variant="outline" size="sm" onClick={prev} disabled={idx === 0} className="gap-1.5">
+          <ArrowLeft className="w-4 h-4" /> Anterior
+        </Button>
+        <span className="text-[11px] text-muted-foreground hidden sm:block">
+          {value.trim() ? "Resposta registada — podes alterar." : "Escreve o termo em falta."}
         </span>
-        {!checked
-          ? <Button onClick={check} disabled={!value.trim()} className="gap-2"><CheckCircle2 className="w-4 h-4" />Verificar</Button>
-          : <Button onClick={next} className="gap-2">{idx + 1 >= total ? "Terminar" : "Próxima"} <ArrowRight className="w-4 h-4" /></Button>}
+        <Button onClick={next} disabled={!value.trim()} className="gap-2">
+          {idx + 1 >= total ? "Terminar" : "Próxima"} <ArrowRight className="w-4 h-4" />
+        </Button>
       </div>
     </Card>
   );
