@@ -355,16 +355,20 @@ export default function StudentQuizzes() {
             </div>
             <div className="space-y-0.5">
               <FilterRow active={cadeiraFilter === "all"} onClick={() => setCadeiraFilter("all")} icon={BookOpen} label="Todas as cadeiras" count={QUIZZES.length} />
-              {cadeiras.map(c => (
-                <FilterRow
-                  key={c}
-                  active={cadeiraFilter === c}
-                  onClick={() => setCadeiraFilter(c)}
-                  label={c}
-                  count={QUIZZES.filter(q => q.cadeira === c).length}
-                  dot={cadeiraColor(c).dot}
-                />
-              ))}
+              {cadeiras.map(c => {
+                const cc = cadeiraColor(c);
+                return (
+                  <FilterRow
+                    key={c}
+                    active={cadeiraFilter === c}
+                    onClick={() => setCadeiraFilter(c)}
+                    label={c}
+                    count={QUIZZES.filter(q => q.cadeira === c).length}
+                    tag={cc.tag}
+                    dot={cc.dot}
+                  />
+                );
+              })}
             </div>
           </div>
         </aside>
