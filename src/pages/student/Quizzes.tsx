@@ -693,12 +693,22 @@ function ProgressStrip({
             <span className="text-muted-foreground/60 font-normal"> / {total}</span>
           </>
         } />
-        {time !== undefined && (
-          <StripStat
-            label="Tempo"
-            value={<span className="font-mono tracking-tight text-foreground">{fmtTime(time)}</span>}
-          />
-        )}
+        {time !== undefined && (() => {
+          const limit = quiz.minutes * 60;
+          const remaining = Math.max(0, limit - time);
+          const danger = remaining <= 30;
+          return (
+            <StripStat
+              label="Tempo"
+              value={
+                <span className="font-mono tracking-tight">
+                  <span className={cn(danger ? "text-rose-600" : "text-foreground")}>{fmtTime(time)}</span>
+                  <span className="text-muted-foreground/60 font-normal"> / {fmtTime(limit)}</span>
+                </span>
+              }
+            />
+          );
+        })()}
       </div>
       <div className="relative h-1 rounded-full bg-muted overflow-hidden">
         <div
