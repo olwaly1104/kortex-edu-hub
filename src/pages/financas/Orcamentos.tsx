@@ -80,6 +80,18 @@ export default function Orcamentos() {
     .sort((a, b) => b.budget - a.budget);
   const maxFacBudget = Math.max(...faculdadeBreakdown.map(f => f.budget), 1);
 
+  const responsavelBreakdown = Object.entries(
+    orcamentos.reduce<Record<string, { budget: number; spent: number; role: string }>>((acc, o) => {
+      acc[o.responsavel] = acc[o.responsavel] ?? { budget: 0, spent: 0, role: o.responsavelRole };
+      acc[o.responsavel].budget += o.totalBudget;
+      acc[o.responsavel].spent += o.spent;
+      return acc;
+    }, {})
+  )
+    .map(([name, v]) => ({ name, ...v }))
+    .sort((a, b) => b.budget - a.budget);
+
+
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
