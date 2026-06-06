@@ -599,14 +599,15 @@ function QuizRow({ quiz, onStart }: { quiz: AnyQuiz; onStart: () => void }) {
             <span className="text-sm font-bold tabular-nums text-foreground">{stats.attempts}</span>
             <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">Tentativas</span>
           </div>
-          <div className="w-px h-5 bg-border" />
-          <DiffPill d={quiz.difficulty} />
         </div>
       </div>
 
-      <span className="inline-flex items-center gap-1.5 shrink-0 h-8 px-3 rounded-md border border-input bg-background text-xs font-medium group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-colors">
-        <Play className="w-3 h-3" /> Iniciar
-      </span>
+      <div className="shrink-0 flex items-center gap-3">
+        <DiffPill d={quiz.difficulty} />
+        <span className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md border border-input bg-background text-xs font-medium group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-colors">
+          <Play className="w-3 h-3" /> Iniciar
+        </span>
+      </div>
     </button>
   );
 }
