@@ -183,10 +183,11 @@ const QUIZZES: AnyQuiz[] = [
 /* ------------------------------------------------------------------ */
 
 const TYPE_META: Record<QuizType, { label: string; icon: React.ElementType; description: string }> = {
-  mcq:     { label: "Múltipla Escolha",  icon: Brain,  description: "Selecciona a resposta correcta entre opções." },
-  written: { label: "Resposta Escrita",  icon: Pencil, description: "Resposta aberta avaliada por palavras-chave." },
-  fill:    { label: "Preencher Espaço",  icon: Type,   description: "Completa uma frase com o termo em falta." },
-  flash:   { label: "Flashcards",        icon: Layers, description: "Cartões de revisão rápida — frente e verso." },
+  mcq:     { label: "Múltipla Escolha",  icon: Brain,           description: "Selecciona a resposta correcta entre opções." },
+  written: { label: "Resposta Escrita",  icon: Pencil,          description: "Resposta aberta avaliada por palavras-chave." },
+  fill:    { label: "Preencher Espaço",  icon: Type,            description: "Completa uma frase com o termo em falta." },
+  flash:   { label: "Flashcards",        icon: Layers,          description: "Cartões de revisão rápida — frente e verso." },
+  exam:    { label: "Exame de Treino",   icon: ClipboardCheck,  description: "Simulação cronometrada com perguntas mistas." },
 };
 
 const DIFF_STYLE: Record<Difficulty, string> = {
