@@ -955,7 +955,7 @@ function ResultsCard({
         <div>
           <p className="text-[11px] uppercase tracking-[0.18em] font-semibold text-muted-foreground">Resultado</p>
           <h3 className="text-5xl font-bold text-foreground tracking-tight tabular-nums mt-1">{pct}<span className="text-2xl text-muted-foreground">%</span></h3>
-          <p className="text-sm text-muted-foreground mt-1">{score} de {total} respostas correctas</p>
+          <p className="text-sm text-muted-foreground mt-1">{score} de {total} respostas correctas{time !== undefined && <> · <span className="font-mono">{fmtTime(time)}</span></>}</p>
         </div>
         <Badge variant="outline" className={cn("text-[11px] font-semibold", tier.color)}>{tier.label}</Badge>
         <div className="max-w-sm mx-auto">
