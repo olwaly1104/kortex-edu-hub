@@ -455,34 +455,35 @@ function QuizRow({ quiz, onStart }: { quiz: AnyQuiz; onStart: () => void }) {
   const cad = cadeiraColor(quiz.cadeira);
   return (
     <div className="group flex items-center gap-4 px-5 py-3.5 hover:bg-muted/30 transition-colors">
-      {/* Large category icon tile + label */}
-      <div className="shrink-0 flex flex-col items-center gap-1 w-14">
-        <div className={cn("w-12 h-12 rounded-lg border flex items-center justify-center", meta.tile)}>
-          <Icon className="w-6 h-6" />
-        </div>
-        <span className="text-[9px] font-semibold text-foreground/80 text-center leading-tight">{meta.label}</span>
+      {/* Large category icon tile */}
+      <div className={cn("shrink-0 w-12 h-12 rounded-lg border flex items-center justify-center", meta.tile)}>
+        <Icon className="w-6 h-6" />
       </div>
 
       <div className="flex-1 min-w-0">
-        {/* Meta bar — cadeira only */}
+        {/* Meta bar — cadeira + category */}
         <div className="flex items-center gap-1.5 mb-1.5 flex-wrap">
           <span className={cn("inline-flex items-center gap-1.5 text-[10px] font-semibold px-2 py-0.5 rounded-md border", cad.tag)}>
             <span className={cn("w-1.5 h-1.5 rounded-full", cad.dot)} />
             {quiz.cadeira}
+          </span>
+          <span className={cn("inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-md border", meta.tile)}>
+            <Icon className="w-3 h-3" />
+            {meta.label}
           </span>
         </div>
         <h3 className="text-sm font-semibold text-foreground leading-tight truncate">{quiz.title}</h3>
         <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-1">{quiz.description}</p>
       </div>
 
-      <div className="hidden md:flex items-center gap-4 shrink-0">
-        <div className="flex flex-col items-end">
+      <div className="hidden md:flex items-center gap-6 shrink-0 pr-2">
+        <div className="flex flex-col items-end gap-1 min-w-[64px]">
           <span className="text-[9px] uppercase tracking-wider text-muted-foreground font-medium">Duração</span>
           <span className="text-xs font-semibold text-foreground flex items-center gap-1 tabular-nums">
-            <Timer className="w-3 h-3 text-muted-foreground" />{quiz.minutes}m
+            <Timer className="w-3 h-3 text-muted-foreground" />{quiz.minutes} min
           </span>
         </div>
-        <div className="flex flex-col items-end">
+        <div className="flex flex-col items-end gap-1 min-w-[80px]">
           <span className="text-[9px] uppercase tracking-wider text-muted-foreground font-medium">Dificuldade</span>
           <span className={cn("text-[10px] font-semibold px-2 py-0.5 rounded-md border", DIFF_STYLE[quiz.difficulty])}>
             {quiz.difficulty}
