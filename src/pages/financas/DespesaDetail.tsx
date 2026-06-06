@@ -448,67 +448,73 @@ export default function DespesaDetail() {
             <h4 className="font-semibold text-xs uppercase tracking-wider text-muted-foreground mb-3 flex items-center gap-1.5">
               <FileText className="w-3.5 h-3.5 text-primary" /> Documentos
             </h4>
-            <div className="space-y-1">
+            <div className="grid grid-cols-1 gap-2">
               {/* Factura */}
-              <div className="flex items-center gap-2.5 px-2.5 py-2 rounded-md hover:bg-muted/30 transition-colors">
-                <FileText className="w-4 h-4 text-muted-foreground shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-[13px] font-medium text-foreground truncate">Factura</p>
-                  <p className="text-[11px] text-muted-foreground font-mono truncate">FAC-{despesa.id.toUpperCase()}.pdf</p>
+              <div className="group flex items-center gap-3 p-2.5 rounded-lg border border-border bg-card hover:border-primary/40 hover:shadow-sm transition-all">
+                <div className="w-9 h-11 rounded-md bg-gradient-to-br from-primary/15 to-primary/5 border border-primary/20 flex items-center justify-center shrink-0">
+                  <FileText className="w-4 h-4 text-primary" strokeWidth={2.2} />
                 </div>
-                <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="flex-1 min-w-0">
+                  <p className="text-[13px] font-semibold text-foreground truncate leading-tight">Factura</p>
+                  <p className="text-[11px] text-muted-foreground font-mono truncate mt-0.5">FAC-{despesa.id.toUpperCase()}.pdf</p>
+                </div>
+                <div className="flex items-center gap-0.5 shrink-0">
                   <button
                     type="button"
                     onClick={() => toast({ title: "Factura aberta", description: `FAC-${despesa.id.toUpperCase()}.pdf` })}
-                    className="p-1.5 rounded hover:bg-muted transition-colors"
+                    className="w-7 h-7 rounded-md inline-flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
                     title="Ver"
                   >
-                    <Eye className="w-3.5 h-3.5 text-muted-foreground" />
+                    <Eye className="w-3.5 h-3.5" />
                   </button>
                   <button
                     type="button"
                     onClick={() => toast({ title: "Download iniciado", description: `FAC-${despesa.id.toUpperCase()}.pdf` })}
-                    className="p-1.5 rounded hover:bg-muted transition-colors"
+                    className="w-7 h-7 rounded-md inline-flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
                     title="Download"
                   >
-                    <Download className="w-3.5 h-3.5 text-muted-foreground" />
+                    <Download className="w-3.5 h-3.5" />
                   </button>
                 </div>
               </div>
 
               {/* Comprovativo */}
               {despesa.status === "aprovada" ? (
-                <div className="flex items-center gap-2.5 px-2.5 py-2 rounded-md hover:bg-muted/30 transition-colors">
-                  <CheckCircle2 className="w-4 h-4 text-accent shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[13px] font-medium text-foreground truncate">Comprovativo</p>
-                    <p className="text-[11px] text-muted-foreground font-mono truncate">COMP-{despesa.id.toUpperCase()}.pdf</p>
+                <div className="group flex items-center gap-3 p-2.5 rounded-lg border border-border bg-card hover:border-accent/40 hover:shadow-sm transition-all">
+                  <div className="w-9 h-11 rounded-md bg-gradient-to-br from-accent/15 to-accent/5 border border-accent/20 flex items-center justify-center shrink-0">
+                    <CheckCircle2 className="w-4 h-4 text-accent" strokeWidth={2.2} />
                   </div>
-                  <div className="flex items-center gap-1 shrink-0">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[13px] font-semibold text-foreground truncate leading-tight">Comprovativo</p>
+                    <p className="text-[11px] text-muted-foreground font-mono truncate mt-0.5">COMP-{despesa.id.toUpperCase()}.pdf</p>
+                  </div>
+                  <div className="flex items-center gap-0.5 shrink-0">
                     <button
                       type="button"
                       onClick={() => toast({ title: "Comprovativo aberto", description: `COMP-${despesa.id.toUpperCase()}.pdf` })}
-                      className="p-1.5 rounded hover:bg-muted transition-colors"
+                      className="w-7 h-7 rounded-md inline-flex items-center justify-center text-muted-foreground hover:text-accent hover:bg-accent/10 transition-colors"
                       title="Ver"
                     >
-                      <Eye className="w-3.5 h-3.5 text-muted-foreground" />
+                      <Eye className="w-3.5 h-3.5" />
                     </button>
                     <button
                       type="button"
                       onClick={() => toast({ title: "Download iniciado", description: `COMP-${despesa.id.toUpperCase()}.pdf` })}
-                      className="p-1.5 rounded hover:bg-muted transition-colors"
+                      className="w-7 h-7 rounded-md inline-flex items-center justify-center text-muted-foreground hover:text-accent hover:bg-accent/10 transition-colors"
                       title="Download"
                     >
-                      <Download className="w-3.5 h-3.5 text-muted-foreground" />
+                      <Download className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 </div>
               ) : (
-                <div className="flex items-center gap-2.5 px-2.5 py-2 rounded-md">
-                  <FileText className="w-4 h-4 text-muted-foreground/50 shrink-0" />
+                <div className="flex items-center gap-3 p-2.5 rounded-lg border border-dashed border-border bg-muted/20">
+                  <div className="w-9 h-11 rounded-md border border-dashed border-border bg-background/50 flex items-center justify-center shrink-0">
+                    <FileText className="w-4 h-4 text-muted-foreground/40" />
+                  </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[13px] font-medium text-muted-foreground truncate">Comprovativo</p>
-                    <p className="text-[11px] text-muted-foreground/60">Disponível após pagamento</p>
+                    <p className="text-[13px] font-medium text-muted-foreground truncate leading-tight">Comprovativo</p>
+                    <p className="text-[11px] text-muted-foreground/70 truncate mt-0.5">Disponível após pagamento</p>
                   </div>
                 </div>
               )}
