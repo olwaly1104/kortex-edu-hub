@@ -515,7 +515,6 @@ function QuizHeader({ quiz }: { quiz: AnyQuiz }) {
   const Icon = meta.icon;
   return (
     <Card className="overflow-hidden">
-      {/* color rail */}
       <div className={cn("h-1 w-full", meta.dot)} />
       <div className="p-6 flex items-start gap-5 flex-wrap">
         <div className={cn("w-14 h-14 rounded-xl border flex items-center justify-center shrink-0", meta.tile)}>
@@ -530,8 +529,6 @@ function QuizHeader({ quiz }: { quiz: AnyQuiz }) {
               <span className={cn("w-1.5 h-1.5 rounded-full", cad.dot)} />
               {quiz.cadeira}
             </span>
-            <span className="text-[10px] text-muted-foreground font-medium">{quiz.ano}º ano</span>
-            <span className="text-[10px] font-mono text-muted-foreground">· {quiz.code}</span>
           </div>
           <h2 className="text-2xl font-bold text-foreground leading-tight tracking-tight">{quiz.title}</h2>
           <p className="text-sm text-muted-foreground mt-1.5 max-w-2xl leading-relaxed">{quiz.description}</p>
@@ -541,14 +538,53 @@ function QuizHeader({ quiz }: { quiz: AnyQuiz }) {
             {quiz.difficulty}
           </Badge>
           <Badge variant="outline" className="text-[10px] gap-1 font-medium">
-            <Timer className="w-3 h-3" />{quiz.minutes} min
-          </Badge>
-          <Badge variant="outline" className="text-[10px] gap-1 font-medium">
             <Layers className="w-3 h-3" />{quiz.items.length} {quiz.items.length === 1 ? "item" : "itens"}
           </Badge>
         </div>
       </div>
     </Card>
+  );
+}
+
+/** Hook: monotonic seconds counter that runs while `running` is true. */
+function useTimer(running: boolean) {
+  const [s, setS] = useState(0);
+  useEffect(() => {
+    if (!running) return;
+    const t = setInterval(() => setS(x => x + 1), 1000);
+    return () => clearInterval(t);
+  }, [running]);
+  return s;
+}
+
+function fmtTime(s: number) {
+  return `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
+}
+
+/** Wrapper that locks the "Voltar" exit while a game is in progress. */
+function ActiveQuizView({ quiz, onExit }: { quiz: AnyQuiz; onExit: () => void }) {
+  const [locked, setLocked] = useState(false);
+  return (
+    <div className="p-6 lg:p-8 space-y-5 animate-fade-in">
+      {locked ? (
+        <div className="inline-flex items-center gap-2 text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-md">
+          <AlertTriangle className="w-3.5 h-3.5" />
+          Quiz em curso — termina para poderes sair.
+        </div>
+      ) : (
+        <button
+          onClick={onExit}
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" /> Voltar ao Centro de Estudo
+        </button>
+      )}
+      <QuizHeader quiz={quiz} />
+      {quiz.type === "mcq"     && <MCQGame     quiz={quiz} onLockChange={setLocked} />}
+      {quiz.type === "written" && <WrittenGame quiz={quiz} onLockChange={setLocked} />}
+      {quiz.type === "fill"    && <FillGame    quiz={quiz} onLockChange={setLocked} />}
+      {quiz.type === "exam"    && <ExamGame    quiz={quiz} onLockChange={setLocked} />}
+    </div>
   );
 }
 
