@@ -147,24 +147,43 @@ export default function Orcamentos() {
           </div>
         </div>
 
-        {/* Progress bar with threshold markers */}
-        <div className="relative">
-          <div className="relative h-2 w-full rounded-full bg-muted/70 overflow-hidden">
-            <div
-              className={cn(
-                "h-full rounded-full transition-all",
-                pctUsed >= 90 ? "bg-destructive" : pctUsed >= 75 ? "bg-amber-500" : "bg-accent"
-              )}
-              style={{ width: `${Math.min(pctUsed, 100)}%` }}
-            />
+        {/* Progress bar — structured & professional */}
+        <div className="rounded-lg border border-border/70 bg-muted/20 p-4">
+          <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Utilização Global</p>
+            <div className="flex items-center gap-3 text-[10px] text-muted-foreground">
+              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-sm bg-accent" />Saudável</span>
+              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-sm bg-amber-500" />Atenção</span>
+              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-sm bg-destructive" />Crítico</span>
+            </div>
           </div>
-          <div className="absolute top-1/2 -translate-y-1/2 w-0.5 h-3.5 bg-background ring-1 ring-amber-500/60 rounded-sm" style={{ left: "75%" }} />
-          <div className="absolute top-1/2 -translate-y-1/2 w-0.5 h-3.5 bg-background ring-1 ring-destructive/60 rounded-sm" style={{ left: "90%" }} />
-          <div className="relative mt-2 h-3 text-[9px] text-muted-foreground tabular-nums">
-            <span className="absolute left-0">0%</span>
-            <span className="absolute -translate-x-1/2 font-medium text-amber-600" style={{ left: "75%" }}>75%</span>
-            <span className="absolute -translate-x-1/2 font-medium text-destructive" style={{ left: "90%" }}>90%</span>
-            <span className="absolute right-0">100%</span>
+
+          <div className="relative pb-6">
+            {/* Track with zone backgrounds */}
+            <div className="relative h-3 w-full rounded-md bg-background border border-border overflow-hidden">
+              <div className="absolute inset-y-0 left-0 bg-accent/5" style={{ width: "75%" }} />
+              <div className="absolute inset-y-0 bg-amber-500/10" style={{ left: "75%", width: "15%" }} />
+              <div className="absolute inset-y-0 bg-destructive/10" style={{ left: "90%", width: "10%" }} />
+              <div
+                className={cn(
+                  "relative h-full transition-all",
+                  pctUsed >= 90 ? "bg-destructive" : pctUsed >= 75 ? "bg-amber-500" : "bg-accent"
+                )}
+                style={{ width: `${Math.min(pctUsed, 100)}%` }}
+              />
+            </div>
+
+            {/* Threshold ticks */}
+            <div className="absolute top-0 h-3 border-l border-dashed border-amber-500/70" style={{ left: "75%" }} />
+            <div className="absolute top-0 h-3 border-l border-dashed border-destructive/70" style={{ left: "90%" }} />
+
+            {/* Labels */}
+            <div className="absolute left-0 right-0 top-5 text-[10px] tabular-nums">
+              <span className="absolute left-0 text-muted-foreground">0%</span>
+              <span className="absolute -translate-x-1/2 font-semibold text-amber-600" style={{ left: "75%" }}>75%</span>
+              <span className="absolute -translate-x-1/2 font-semibold text-destructive" style={{ left: "90%" }}>90%</span>
+              <span className="absolute right-0 text-muted-foreground">100%</span>
+            </div>
           </div>
         </div>
       </Card>
