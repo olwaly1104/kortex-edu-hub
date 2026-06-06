@@ -538,32 +538,45 @@ function QuizHeader({ quiz }: { quiz: AnyQuiz }) {
   const { meta, cad } = accent(quiz);
   const Icon = meta.icon;
   return (
-    <Card className="overflow-hidden">
-      <div className={cn("h-1 w-full", meta.dot)} />
-      <div className="p-6 flex items-start gap-5 flex-wrap">
-        <div className={cn("w-14 h-14 rounded-xl border flex items-center justify-center shrink-0", meta.tile)}>
-          <Icon className="w-7 h-7" />
+    <Card className="relative overflow-hidden border-2 shadow-sm">
+      {/* Side accent rail (category colour) */}
+      <div className={cn("absolute left-0 top-0 bottom-0 w-1.5", meta.dot)} />
+      {/* Faint radial glow on the right */}
+      <div
+        aria-hidden
+        className={cn("absolute -right-24 -top-24 w-80 h-80 rounded-full opacity-[0.10] blur-2xl pointer-events-none", meta.dot)}
+      />
+
+      <div className="relative p-6 pl-8 grid gap-6 md:grid-cols-[auto_1fr_auto] items-stretch">
+        {/* Icon block */}
+        <div className="flex flex-col items-center gap-2 shrink-0">
+          <div className={cn("w-20 h-20 rounded-2xl border-2 flex items-center justify-center shadow-sm", meta.tile)}>
+            <Icon className="w-10 h-10" />
+          </div>
+          <span className="text-[10px] font-bold uppercase tracking-wider text-foreground/70 text-center leading-tight max-w-[5rem]">
+            {meta.label}
+          </span>
         </div>
-        <div className="flex-1 min-w-[240px]">
-          <div className="flex items-center gap-1.5 flex-wrap mb-1.5">
-            <span className={cn("inline-flex items-center text-[10px] font-semibold px-2 py-0.5 rounded-md border", meta.tag)}>
-              {meta.label}
-            </span>
+
+        {/* Title + meta */}
+        <div className="min-w-0 flex flex-col gap-2 justify-center">
+          <div className="flex items-center gap-1.5 flex-wrap">
             <span className={cn("inline-flex items-center gap-1.5 text-[10px] font-semibold px-2 py-0.5 rounded-md border", cad.tag)}>
               <span className={cn("w-1.5 h-1.5 rounded-full", cad.dot)} />
               {quiz.cadeira}
             </span>
+            <span className="inline-flex items-center gap-1.5 text-[10px] font-medium text-muted-foreground px-2 py-0.5 rounded-md border border-border bg-muted/40">
+              <Layers className="w-3 h-3" /> {quiz.items.length} {quiz.items.length === 1 ? "item" : "itens"}
+            </span>
           </div>
-          <h2 className="text-2xl font-bold text-foreground leading-tight tracking-tight">{quiz.title}</h2>
-          <p className="text-sm text-muted-foreground mt-1.5 max-w-2xl leading-relaxed">{quiz.description}</p>
+          <h2 className="text-[26px] font-bold text-foreground leading-[1.15] tracking-tight">{quiz.title}</h2>
+          <p className="text-sm text-muted-foreground max-w-2xl leading-relaxed">{quiz.description}</p>
         </div>
-        <div className="flex flex-col items-end gap-1.5 shrink-0">
-          <Badge variant="outline" className={cn("text-[10px] font-semibold", DIFF_STYLE[quiz.difficulty])}>
-            {quiz.difficulty}
-          </Badge>
-          <Badge variant="outline" className="text-[10px] gap-1 font-medium">
-            <Layers className="w-3 h-3" />{quiz.items.length} {quiz.items.length === 1 ? "item" : "itens"}
-          </Badge>
+
+        {/* Difficulty rail — distinctive vertical block */}
+        <div className="shrink-0 flex md:flex-col items-start md:items-end gap-2 md:border-l md:border-border md:pl-5">
+          <span className="text-[9px] uppercase tracking-[0.18em] font-bold text-muted-foreground">Dificuldade</span>
+          <DiffPill d={quiz.difficulty} size="md" />
         </div>
       </div>
     </Card>
