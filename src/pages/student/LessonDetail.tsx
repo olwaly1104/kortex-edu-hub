@@ -448,6 +448,43 @@ export default function LessonDetail() {
   );
 }
 
+interface LessonQuiz {
+  id: string;
+  title: string;
+  questions: number;
+  duration: number;
+  points: number;
+  status: "disponivel" | "concluido" | "expirado";
+  score?: number;
+  deadline?: string;
+}
+
+function generateLessonQuizzes(lessonId: string, lessonTitle: string, lessonStatus: string): LessonQuiz[] {
+  // Seed based on lessonId for stable mock data
+  const seed = lessonId.split("").reduce((s, c) => s + c.charCodeAt(0), 0);
+  const count = lessonStatus === "agendada" ? 0 : (seed % 2) + 1;
+  const quizzes: LessonQuiz[] = [];
+  const titles = [
+    `Quiz introdutório: ${lessonTitle}`,
+    `Revisão de conceitos — ${lessonTitle}`,
+  ];
+  for (let i = 0; i < count; i++) {
+    const isCompleted = lessonStatus === "concluída" && (seed + i) % 3 !== 0;
+    const score = isCompleted ? 50 + ((seed + i * 7) % 50) : undefined;
+    quizzes.push({
+      id: `${lessonId}-q${i + 1}`,
+      title: titles[i] || `Quiz ${i + 1}`,
+      questions: 5 + ((seed + i) % 6),
+      duration: 10 + ((seed + i) % 11),
+      points: 10 + ((seed + i) % 16),
+      status: isCompleted ? "concluido" : "disponivel",
+      score,
+      deadline: !isCompleted ? "Até próxima aula" : undefined,
+    });
+  }
+  return quizzes;
+}
+
 function parseTranscript(transcript: string, professor: string): { speaker: string; text: string }[] {
   const sentences = transcript.split(/(?<=[.!?])\s+/).filter(Boolean);
   const segments: { speaker: string; text: string }[] = [];
