@@ -583,12 +583,25 @@ function QuizRow({ quiz, onStart }: { quiz: AnyQuiz; onStart: () => void }) {
         <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-1">{quiz.description}</p>
       </div>
 
-      <div className="hidden md:flex flex-col items-end gap-1 shrink-0 pr-2">
+      <div className="hidden md:flex items-stretch shrink-0 pr-2">
         <DiffPill d={quiz.difficulty} />
-        <span className={cn("inline-flex items-center gap-1.5 text-[10px] font-bold px-2 py-0.5 rounded-md border tabular-nums", nc.bg, nc.text, nc.border)}>
-          <span className={cn("w-1.5 h-1.5 rounded-full", nc.dot)} />
-          Nota {stats.nota.toFixed(1)}
-        </span>
+        <div className="ml-4 pl-4 border-l border-border flex items-center gap-5">
+          {/* Nota Geral — numeric, no tag */}
+          <div className="flex flex-col items-end leading-none">
+            <span className={cn("text-lg font-bold tabular-nums", nc.text)}>
+              {stats.nota.toFixed(1)}
+              <span className="text-[10px] font-medium text-muted-foreground/70 ml-0.5">/20</span>
+            </span>
+            <span className="text-[9px] uppercase tracking-[0.12em] font-semibold text-muted-foreground mt-1">Nota Geral</span>
+          </div>
+          {/* Tentativas — numeric, no tag */}
+          <div className="flex flex-col items-end leading-none">
+            <span className="text-lg font-bold tabular-nums text-foreground">
+              {stats.attempts}<span className="text-[10px] font-medium text-muted-foreground/70">×</span>
+            </span>
+            <span className="text-[9px] uppercase tracking-[0.12em] font-semibold text-muted-foreground mt-1">Tentativas</span>
+          </div>
+        </div>
       </div>
 
       <span className="inline-flex items-center gap-1.5 shrink-0 h-8 px-3 rounded-md border border-input bg-background text-xs font-medium group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-colors">
