@@ -4,7 +4,7 @@ import {
   LayoutDashboard, BookOpen, Calendar, CalendarDays, Megaphone, Users, MessageSquare,
   Mail, Award, User, LogOut, GraduationCap,
   BarChart3, ChevronLeft, ChevronRight, Library, Wallet, Trophy, ClipboardList,
-  CheckSquare, Building2, UserCog, Eye, Layers, FileText, FolderOpen, TrendingUp, HelpCircle, Settings2, Sparkles,
+  CheckSquare, Building2, UserCog, Eye, Layers, FileText, FolderOpen, TrendingUp, HelpCircle, Settings2, BrainCircuit,
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -23,7 +23,7 @@ const studentSections: NavSection[] = [
   { title: "Académico", items: [
     { label: "As Minhas Cadeiras", icon: BookOpen, path: "/student/disciplines" },
     { label: "Tarefas", icon: ClipboardList, path: "/student/tasks" },
-    { label: "Centro de Estudo", icon: Sparkles, path: "/student/quizzes" },
+    { label: "Centro de Estudo", icon: BrainCircuit, path: "/student/quizzes" },
     { label: "Notas", icon: Award, path: "/student/grades" },
     { label: "Biblioteca Virtual", icon: Library, path: "/student/library" },
   ]},

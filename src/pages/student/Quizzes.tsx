@@ -19,8 +19,7 @@ import { cn } from "@/lib/utils";
 type MCQ = { q: string; options: string[]; answer: number; explain: string };
 type Written = { q: string; keywords: string[]; sample: string };
 type Fill = { sentence: string; answer: string; hint: string };
-type Flash = { front: string; back: string };
-type QuizType = "mcq" | "written" | "fill" | "flash" | "exam";
+type QuizType = "mcq" | "written" | "fill" | "exam";
 type Difficulty = "Introdutório" | "Intermédio" | "Avançado";
 
 type ExamQ =
@@ -43,7 +42,6 @@ type AnyQuiz =
   | (Base & { type: "mcq";     items: MCQ[] })
   | (Base & { type: "written"; items: Written[] })
   | (Base & { type: "fill";    items: Fill[] })
-  | (Base & { type: "flash";   items: Flash[] })
   | (Base & { type: "exam";    items: ExamQ[]; passingScore?: number });
 
 /* ------------------------------------------------------------------ */
@@ -136,47 +134,6 @@ const QUIZZES: AnyQuiz[] = [
     ],
   },
   {
-    id: "qz-008", code: "QZ-008", type: "flash",
-    title: "Mestres da Arquitectura",
-    cadeira: "História da Arquitectura", ano: 2,
-    description: "Cartões com os arquitectos fundamentais dos sécs. XX e XXI.",
-    difficulty: "Intermédio", minutes: 6,
-    items: [
-      { front: "Le Corbusier", back: "Suíço-francês (1887–1965). Cinco pontos da nova arquitectura, Unité d'Habitation, Villa Savoye, Ronchamp." },
-      { front: "Mies van der Rohe", back: "Alemão-americano (1886–1969). «Less is more». Pavilhão de Barcelona, Seagram Building, Farnsworth House." },
-      { front: "Frank Lloyd Wright", back: "Americano (1867–1959). Arquitectura orgânica. Casa da Cascata, Guggenheim NY, Robie House." },
-      { front: "Álvaro Siza", back: "Português (n. 1933). Pritzker 1992. Piscinas de Leça, Faculdade de Arquitectura do Porto, Pavilhão de Portugal." },
-      { front: "Zaha Hadid", back: "Iraquiano-britânica (1950–2016). Pritzker 2004. Fluidez, parametricismo. MAXXI Roma, Heydar Aliyev." },
-      { front: "Tadao Ando", back: "Japonês (n. 1941). Betão à vista, luz, vazio. Igreja da Luz, Naoshima, Church on the Water." },
-    ],
-  },
-  {
-    id: "qz-009", code: "QZ-009", type: "flash",
-    title: "Glossário de Construção",
-    cadeira: "Construção I", ano: 2,
-    description: "Elementos construtivos: paredes, lajes, coberturas, vãos.",
-    difficulty: "Introdutório", minutes: 4,
-    items: [
-      { front: "Lintel", back: "Elemento estrutural horizontal sobre um vão (porta ou janela) que suporta a carga acima." },
-      { front: "Padieira", back: "O mesmo que lintel — viga sobre um vão de porta ou janela." },
-      { front: "Pano de parede", back: "Superfície contínua de parede entre dois elementos estruturais (pilares, paredes-mestras)." },
-      { front: "Cota de soleira", back: "Altura do pavimento da entrada de um edifício em relação ao terreno." },
-      { front: "Beirado", back: "Extremidade inferior de uma cobertura inclinada, que sobressai sobre a parede." },
-    ],
-  },
-  {
-    id: "qz-010", code: "QZ-010", type: "flash",
-    title: "Geometria Descritiva",
-    cadeira: "Geometria Descritiva", ano: 1,
-    description: "Conceitos de projecção, vistas e representação no espaço.",
-    difficulty: "Introdutório", minutes: 4,
-    items: [
-      { front: "Projecção ortogonal", back: "Representação de um objecto através das suas projecções perpendiculares aos planos horizontal e vertical." },
-      { front: "Axonometria", back: "Projecção paralela que mantém medidas em três eixos; permite ler o objecto tridimensionalmente." },
-      { front: "Perspectiva cónica", back: "Projecção central com ponto(s) de fuga, imita a visão humana." },
-    ],
-  },
-  {
     id: "qz-011", code: "QZ-011", type: "exam",
     title: "Exame de Treino — História da Arquitectura",
     cadeira: "História da Arquitectura", ano: 2,
@@ -263,14 +220,6 @@ const TYPE_META: Record<QuizType, {
     active: "bg-amber-50 text-amber-700 border-amber-200",
     dot:    "bg-amber-500",
   },
-  flash: {
-    label: "Flashcards", icon: Layers,
-    description: "Cartões de revisão rápida — frente e verso.",
-    tag:    "bg-emerald-50 text-emerald-700 border-emerald-200",
-    tile:   "bg-emerald-50 text-emerald-600 border-emerald-200",
-    active: "bg-emerald-50 text-emerald-700 border-emerald-200",
-    dot:    "bg-emerald-500",
-  },
   exam: {
     label: "Exame de Treino", icon: ClipboardCheck,
     description: "Simulação cronometrada com perguntas mistas.",
@@ -321,7 +270,7 @@ export default function StudentQuizzes() {
         {active.type === "mcq"     && <MCQGame quiz={active} />}
         {active.type === "written" && <WrittenGame quiz={active} />}
         {active.type === "fill"    && <FillGame quiz={active} />}
-        {active.type === "flash"   && <FlashGame quiz={active} />}
+        
         {active.type === "exam"    && <ExamGame quiz={active} />}
       </div>
     );
@@ -333,7 +282,6 @@ export default function StudentQuizzes() {
     mcq: QUIZZES.filter(q => q.type === "mcq").length,
     written: QUIZZES.filter(q => q.type === "written").length,
     fill: QUIZZES.filter(q => q.type === "fill").length,
-    flash: QUIZZES.filter(q => q.type === "flash").length,
     exam: QUIZZES.filter(q => q.type === "exam").length,
   };
 
@@ -487,32 +435,37 @@ function QuizRow({ quiz, onStart }: { quiz: AnyQuiz; onStart: () => void }) {
   const meta = TYPE_META[quiz.type];
   const Icon = meta.icon;
   return (
-    <div className="flex items-center gap-4 p-4 hover:bg-muted/30 transition-colors group">
-      <div className={cn("w-11 h-11 rounded-lg border flex items-center justify-center shrink-0", meta.tile)}>
-        <Icon className="w-5 h-5" />
+    <div className="flex items-stretch hover:bg-muted/20 transition-colors group">
+      {/* Left rail — Cadeira (the dominant evidence) */}
+      <div className={cn(
+        "w-[220px] shrink-0 hidden sm:flex flex-col justify-center px-5 py-4 border-r border-border border-l-4",
+        meta.tile,
+      )}>
+        <p className="text-[9px] uppercase tracking-[0.14em] font-bold text-muted-foreground mb-1">Cadeira</p>
+        <p className="text-sm font-bold text-foreground leading-tight line-clamp-2">{quiz.cadeira}</p>
+        <p className="text-[10px] text-muted-foreground mt-1.5 font-medium">{quiz.ano}º ano · ARQ</p>
       </div>
 
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 flex-wrap">
-          <Badge variant="outline" className={cn("text-[10px] font-semibold border", meta.tag)}>{meta.label}</Badge>
-          <span className="text-[10px] uppercase tracking-wider font-semibold text-primary">{quiz.cadeira}</span>
-          <span className="text-[10px] text-muted-foreground">· {quiz.ano}º ano</span>
+      {/* Main */}
+      <div className="flex-1 flex items-center gap-4 p-4 min-w-0">
+        <div className={cn("w-10 h-10 rounded-lg border flex items-center justify-center shrink-0", meta.tile)}>
+          <Icon className="w-[18px] h-[18px]" />
         </div>
-        <h3 className="font-semibold text-foreground leading-tight mt-1 truncate">{quiz.title}</h3>
-        <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{quiz.description}</p>
-      </div>
 
-      <div className="hidden md:flex items-center gap-1.5 shrink-0">
-        <Badge variant="outline" className={cn("text-[10px] font-medium", DIFF_STYLE[quiz.difficulty])}>{quiz.difficulty}</Badge>
-      </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <Badge variant="outline" className={cn("text-[10px] font-semibold border", meta.tag)}>{meta.label}</Badge>
+            <Badge variant="outline" className={cn("text-[10px] font-medium", DIFF_STYLE[quiz.difficulty])}>{quiz.difficulty}</Badge>
+            <span className="text-[10px] text-muted-foreground flex items-center gap-1"><Timer className="w-3 h-3" />{quiz.minutes} min</span>
+          </div>
+          <h3 className="font-semibold text-foreground leading-tight mt-1 truncate">{quiz.title}</h3>
+          <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{quiz.description}</p>
+        </div>
 
-      <div className="hidden lg:flex items-center text-[11px] text-muted-foreground shrink-0">
-        <span className="flex items-center gap-1"><Timer className="w-3 h-3" />{quiz.minutes} min</span>
+        <Button size="sm" onClick={onStart} className="gap-1.5 shrink-0">
+          <Play className="w-3.5 h-3.5" /> Iniciar
+        </Button>
       </div>
-
-      <Button size="sm" onClick={onStart} className="gap-1.5 shrink-0">
-        <Play className="w-3.5 h-3.5" /> Iniciar
-      </Button>
     </div>
   );
 }
@@ -770,73 +723,6 @@ function FillGame({ quiz }: { quiz: Extract<AnyQuiz, { type: "fill" }> }) {
   );
 }
 
-/* ------------------------------------------------------------------ */
-/*  Flash Game                                                         */
-/* ------------------------------------------------------------------ */
-
-function FlashGame({ quiz }: { quiz: Extract<AnyQuiz, { type: "flash" }> }) {
-  const [idx, setIdx] = useState(0);
-  const [flipped, setFlipped] = useState(false);
-  const [known, setKnown] = useState<Set<number>>(new Set());
-  const card = quiz.items[idx];
-
-  const prev = () => { setIdx((idx - 1 + quiz.items.length) % quiz.items.length); setFlipped(false); };
-  const next = () => { setIdx((idx + 1) % quiz.items.length); setFlipped(false); };
-  const mark = (yes: boolean) => {
-    setKnown(s => {
-      const n = new Set(s);
-      if (yes) n.add(idx); else n.delete(idx);
-      return n;
-    });
-    next();
-  };
-
-  return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between text-xs text-muted-foreground">
-        <span>Cartão {idx + 1} / {quiz.items.length}</span>
-        <span className="flex items-center gap-1"><Timer className="w-3.5 h-3.5" /> Dominados: {known.size} / {quiz.items.length}</span>
-      </div>
-      <Progress value={(known.size / quiz.items.length) * 100} className="h-1.5" />
-
-      <button onClick={() => setFlipped(f => !f)} className="w-full" style={{ perspective: "1000px" }}>
-        <div
-          className="relative w-full h-[280px] transition-transform duration-500"
-          style={{ transformStyle: "preserve-3d", transform: flipped ? "rotateY(180deg)" : "rotateY(0deg)" }}
-        >
-          <div
-            className="absolute inset-0 rounded-2xl border border-border bg-card flex flex-col items-center justify-center p-8 shadow-sm"
-            style={{ backfaceVisibility: "hidden" }}
-          >
-            <Badge variant="outline" className="mb-4 gap-1"><Layers className="w-3 h-3" />Conceito</Badge>
-            <p className="text-3xl font-bold text-foreground text-center">{card.front}</p>
-            <p className="text-xs text-muted-foreground mt-6">Clica para revelar</p>
-          </div>
-          <div
-            className="absolute inset-0 rounded-2xl border border-primary bg-primary text-primary-foreground flex flex-col items-center justify-center p-8 shadow-sm"
-            style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
-          >
-            <Badge variant="outline" className="mb-4 gap-1 border-primary-foreground/40 text-primary-foreground"><CheckCircle2 className="w-3 h-3" />Definição</Badge>
-            <p className="text-lg font-medium text-center leading-relaxed">{card.back}</p>
-          </div>
-        </div>
-      </button>
-
-      <div className="flex items-center justify-between gap-2">
-        <Button variant="outline" size="sm" onClick={prev} className="gap-1"><ArrowLeft className="w-4 h-4" />Anterior</Button>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={() => mark(false)} className="gap-1 text-destructive border-destructive/30 hover:bg-destructive/10">
-            <XCircle className="w-4 h-4" />Rever
-          </Button>
-          <Button size="sm" onClick={() => mark(true)} className="gap-1 bg-emerald-600 hover:bg-emerald-700 text-white">
-            <CheckCircle2 className="w-4 h-4" />Sei!
-          </Button>
-        </div>
-        <Button variant="outline" size="sm" onClick={next} className="gap-1">Próximo<ArrowRight className="w-4 h-4" /></Button>
-      </div>
-    </div>
-  );
-}
 
 /* ------------------------------------------------------------------ */
 /*  Exam Game — timed, mixed-question simulation                       */
