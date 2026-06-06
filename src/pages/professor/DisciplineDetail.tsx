@@ -53,17 +53,24 @@ export default function ProfessorDisciplineDetail() {
       : null;
   })();
 
-  const statusConfig = {
+  const statusConfig: Record<string, { label: string; color: string; icon: typeof CheckCircle }> = {
     publicada: { label: "Publicada", color: "bg-accent/10 text-accent", icon: CheckCircle },
     agendada: { label: "Agendada", color: "bg-secondary/10 text-secondary", icon: Clock },
     rascunho: { label: "Rascunho", color: "bg-muted text-muted-foreground", icon: Edit },
+    pendente: { label: "Pendente", color: "bg-amber-100 text-amber-700", icon: Clock },
+    encerrada: { label: "Encerrada", color: "bg-muted text-muted-foreground", icon: CheckCircle },
   };
 
-  const taskStatusConfig = {
+  const taskStatusConfig: Record<string, { label: string; color: string }> = {
     publicada: { label: "Activa", color: "bg-secondary/10 text-secondary" },
     encerrada: { label: "Encerrada", color: "bg-accent/10 text-accent" },
     rascunho: { label: "Rascunho", color: "bg-muted text-muted-foreground" },
+    agendada: { label: "Agendada", color: "bg-secondary/10 text-secondary" },
+    pendente: { label: "Pendente", color: "bg-amber-100 text-amber-700" },
   };
+
+  const fallbackStatus = { label: "—", color: "bg-muted text-muted-foreground", icon: AlertCircle };
+
 
   const filteredStudents = discStudents.filter(s =>
     s.name.toLowerCase().includes(studentSearch.toLowerCase())
@@ -213,9 +220,10 @@ export default function ProfessorDisciplineDetail() {
           </div>
           <div className="space-y-3">
             {discLessons.map(lesson => {
-              const cfg = statusConfig[lesson.status];
+              const cfg = statusConfig[lesson.status] || fallbackStatus;
               const StatusIcon = cfg.icon;
               const turma = allTurmas.find(t => t.id === lesson.turmaId);
+
               return (
                 <Card key={lesson.id} className="p-4 flex items-center gap-4 border-l-[3px]" style={{ borderLeftColor: lesson.status === "publicada" ? "hsl(var(--accent))" : lesson.status === "agendada" ? disc.color : "hsl(var(--muted))" }}>
                   <div className="w-20 h-14 rounded-xl bg-muted/50 flex items-center justify-center shrink-0">
@@ -289,7 +297,7 @@ export default function ProfessorDisciplineDetail() {
           </div>
           <div className="space-y-3">
             {discTasks.map(task => {
-              const tcfg = taskStatusConfig[task.status];
+              const tcfg = taskStatusConfig[task.status] || { label: task.status, color: "bg-muted text-muted-foreground" };
               const submPct = Math.round((task.submissions / task.totalStudents) * 100);
               return (
                 <Card key={task.id} className="p-4 border-l-[3px] cursor-pointer hover:shadow-md transition-shadow" style={{ borderLeftColor: disc.color }} onClick={() => navigate(`/professor/tasks/${task.id}`)}>
