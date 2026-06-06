@@ -433,39 +433,35 @@ function FilterRow({
 
 function QuizRow({ quiz, onStart }: { quiz: AnyQuiz; onStart: () => void }) {
   const meta = TYPE_META[quiz.type];
-  const Icon = meta.icon;
   return (
-    <div className="flex items-stretch hover:bg-muted/20 transition-colors group">
-      {/* Left rail — Cadeira (the dominant evidence) */}
-      <div className={cn(
-        "w-[220px] shrink-0 hidden sm:flex flex-col justify-center px-5 py-4 border-r border-border border-l-4",
-        meta.tile,
-      )}>
-        <p className="text-[9px] uppercase tracking-[0.14em] font-bold text-muted-foreground mb-1">Cadeira</p>
-        <p className="text-sm font-bold text-foreground leading-tight line-clamp-2">{quiz.cadeira}</p>
-        <p className="text-[10px] text-muted-foreground mt-1.5 font-medium">{quiz.ano}º ano · ARQ</p>
+    <div className={cn("flex items-center gap-4 px-4 py-3 hover:bg-muted/30 transition-colors border-l-[3px]", meta.tile.split(" ").find(c => c.startsWith("border-")) ?? "border-l-transparent")}>
+      {/* Cadeira column — the dominant identifier */}
+      <div className="w-[180px] shrink-0 hidden md:block">
+        <p className="text-[13px] font-semibold text-foreground leading-tight truncate">{quiz.cadeira}</p>
+        <p className="text-[10px] text-muted-foreground mt-0.5 font-medium tabular-nums">{quiz.ano}º ano</p>
       </div>
 
-      {/* Main */}
-      <div className="flex-1 flex items-center gap-4 p-4 min-w-0">
-        <div className={cn("w-10 h-10 rounded-lg border flex items-center justify-center shrink-0", meta.tile)}>
-          <Icon className="w-[18px] h-[18px]" />
-        </div>
+      <div className="w-px h-8 bg-border hidden md:block shrink-0" />
 
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
-            <Badge variant="outline" className={cn("text-[10px] font-semibold border", meta.tag)}>{meta.label}</Badge>
-            <Badge variant="outline" className={cn("text-[10px] font-medium", DIFF_STYLE[quiz.difficulty])}>{quiz.difficulty}</Badge>
-            <span className="text-[10px] text-muted-foreground flex items-center gap-1"><Timer className="w-3 h-3" />{quiz.minutes} min</span>
-          </div>
-          <h3 className="font-semibold text-foreground leading-tight mt-1 truncate">{quiz.title}</h3>
-          <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{quiz.description}</p>
-        </div>
-
-        <Button size="sm" onClick={onStart} className="gap-1.5 shrink-0">
-          <Play className="w-3.5 h-3.5" /> Iniciar
-        </Button>
+      {/* Title + description */}
+      <div className="flex-1 min-w-0">
+        <h3 className="text-[13px] font-semibold text-foreground leading-tight truncate">{quiz.title}</h3>
+        <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-1">{quiz.description}</p>
       </div>
+
+      {/* Type tag */}
+      <Badge variant="outline" className={cn("text-[10px] font-medium border shrink-0 hidden sm:inline-flex", meta.tag)}>
+        {meta.label}
+      </Badge>
+
+      {/* Duration */}
+      <span className="text-[11px] text-muted-foreground hidden lg:flex items-center gap-1 shrink-0 tabular-nums">
+        <Timer className="w-3 h-3" />{quiz.minutes}m
+      </span>
+
+      <Button size="sm" variant="outline" onClick={onStart} className="gap-1.5 shrink-0 h-8">
+        <Play className="w-3 h-3" /> Iniciar
+      </Button>
     </div>
   );
 }
