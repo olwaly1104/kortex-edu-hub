@@ -461,7 +461,7 @@ function FilterRow({
       ) : Icon ? (
         <Icon className={cn("w-3.5 h-3.5 shrink-0", active ? "" : "text-muted-foreground group-hover:text-foreground")} />
       ) : dot ? (
-        <span className={cn("w-2.5 h-2.5 rounded-sm shrink-0 ring-1 ring-black/5", dot)} />
+        <span className={cn("w-2 h-2 rounded-full shrink-0", dot)} />
       ) : null}
       <span className="flex-1 truncate">{label}</span>
       <span className={cn(
