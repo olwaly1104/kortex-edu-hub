@@ -998,8 +998,11 @@ function ExamGame({ quiz }: { quiz: Extract<AnyQuiz, { type: "exam" }> }) {
 
       <Card className="p-6 space-y-5">
         <div className="flex items-center gap-2">
-          <Badge variant="outline" className="text-[10px]">{TYPE_META[current.kind === "mcq" ? "mcq" : current.kind === "fill" ? "fill" : "written"].label}</Badge>
-          <Badge variant="outline" className="text-[10px]">{current.points ?? 10} pts</Badge>
+          {(() => {
+            const k = current.kind === "mcq" ? "mcq" : current.kind === "fill" ? "fill" : "written";
+            const m = TYPE_META[k];
+            return <Badge variant="outline" className={cn("text-[10px] font-semibold border", m.tag)}>{m.label}</Badge>;
+          })()}
         </div>
 
         {current.kind === "mcq" && (
