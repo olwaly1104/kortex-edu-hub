@@ -159,34 +159,99 @@ export default function Orcamentos() {
 
 
       {/* Utilização global */}
-      <Card className="p-5 border-border/70">
-        <div className="flex items-start justify-between gap-4 mb-3">
-          <div>
-            <div className="flex items-center gap-2">
-              <p className="text-sm font-semibold text-foreground">Utilização global</p>
-              <Badge variant="outline" className="text-[10px] gap-1 bg-muted/40 border-border/70">
-                <span className={cn("w-1.5 h-1.5 rounded-full", pctUsed >= 90 ? "bg-destructive" : pctUsed >= 75 ? "bg-amber-500" : "bg-accent")} />
-                {pctUsed >= 90 ? "Crítico" : pctUsed >= 75 ? "Atenção" : "Saudável"}
-              </Badge>
+      {(() => {
+        const buckets = orcamentos.reduce(
+          (acc, o) => {
+            const p = Math.round((o.spent / o.totalBudget) * 100);
+            const key = p >= 90 ? "critico" : p >= 75 ? "atencao" : "saudavel";
+            acc[key].count += 1;
+            acc[key].spent += o.spent;
+            acc[key].budget += o.totalBudget;
+            return acc;
+          },
+          {
+            saudavel: { count: 0, spent: 0, budget: 0 },
+            atencao: { count: 0, spent: 0, budget: 0 },
+            critico: { count: 0, spent: 0, budget: 0 },
+          }
+        );
+        const segSaudavel = (buckets.saudavel.spent / totalBudget) * 100;
+        const segAtencao = (buckets.atencao.spent / totalBudget) * 100;
+        const segCritico = (buckets.critico.spent / totalBudget) * 100;
+        const milestones = [25, 50, 75, 90];
+        return (
+          <Card className="p-5 border-border/70">
+            {/* Header */}
+            <div className="flex items-start justify-between gap-4 mb-4">
+              <div>
+                <p className="text-sm font-semibold text-foreground">Utilização global do orçamento</p>
+                <p className="text-[11px] text-muted-foreground mt-0.5">Como os {formatCurrency(totalBudget)} orçamentados estão a ser executados</p>
+              </div>
+              <div className="flex items-center gap-3 shrink-0">
+                <Badge variant="outline" className="text-[10px] gap-1 bg-muted/40 border-border/70">
+                  <span className={cn("w-1.5 h-1.5 rounded-full", pctUsed >= 90 ? "bg-destructive" : pctUsed >= 75 ? "bg-amber-500" : "bg-accent")} />
+                  {pctUsed >= 90 ? "Crítico" : pctUsed >= 75 ? "Atenção" : "Saudável"}
+                </Badge>
+                <div className="flex items-baseline gap-0.5">
+                  <p className={cn("text-3xl font-bold tabular-nums leading-none", usageColor(pctUsed))}>{pctUsed}</p>
+                  <span className={cn("text-base font-semibold", usageColor(pctUsed))}>%</span>
+                </div>
+              </div>
             </div>
-            <p className="text-[11px] text-muted-foreground mt-0.5 tabular-nums">
-              <span className="text-accent font-medium">{numActivos} activos</span>
-              {numAlerta > 0 && <> · <span className="text-amber-600 font-medium">{numAlerta} em alerta</span></>}
-            </p>
-          </div>
-          <div className="flex items-baseline gap-0.5 shrink-0">
-            <p className={cn("text-3xl font-bold tabular-nums leading-none", usageColor(pctUsed))}>{pctUsed}</p>
-            <span className={cn("text-base font-semibold", usageColor(pctUsed))}>%</span>
-          </div>
-        </div>
-        <div className="relative h-2.5 w-full rounded-full bg-muted overflow-hidden">
-          <div className={cn("h-full transition-all", pctUsed >= 90 ? "bg-destructive" : pctUsed >= 75 ? "bg-amber-500" : "bg-accent")} style={{ width: `${pctUsed}%` }} />
-        </div>
-        <div className="flex items-center justify-between mt-1.5 text-[10px] text-muted-foreground tabular-nums">
-          <span>0 Kz</span>
-          <span>{formatCurrency(totalBudget)}</span>
-        </div>
-      </Card>
+
+            {/* Stacked segmented bar with milestone markers */}
+            <div className="relative">
+              <div className="relative h-5 w-full rounded-md bg-muted overflow-hidden flex">
+                <div className="h-full bg-accent transition-all" style={{ width: `${segSaudavel}%` }} title="Saudável" />
+                <div className="h-full bg-amber-500 transition-all" style={{ width: `${segAtencao}%` }} title="Atenção" />
+                <div className="h-full bg-destructive transition-all" style={{ width: `${segCritico}%` }} title="Crítico" />
+              </div>
+              {/* Milestone ticks */}
+              {milestones.map(m => (
+                <div key={m} className="absolute top-0 h-5 w-px bg-background/70" style={{ left: `${m}%` }} />
+              ))}
+              <div className="relative mt-1 h-3 text-[9px] text-muted-foreground tabular-nums">
+                {[0, 25, 50, 75, 100].map(m => (
+                  <span key={m} className="absolute -translate-x-1/2" style={{ left: `${m}%` }}>{m}%</span>
+                ))}
+              </div>
+            </div>
+
+            {/* Breakdown legend — 3 buckets */}
+            <div className="grid grid-cols-3 gap-3 mt-5">
+              {[
+                { key: "saudavel", label: "Saudável", sub: "< 75%", color: "bg-accent", textColor: "text-accent", data: buckets.saudavel },
+                { key: "atencao", label: "Atenção", sub: "75–89%", color: "bg-amber-500", textColor: "text-amber-600", data: buckets.atencao },
+                { key: "critico", label: "Crítico", sub: "≥ 90%", color: "bg-destructive", textColor: "text-destructive", data: buckets.critico },
+              ].map(b => (
+                <div key={b.key} className="rounded-md border border-border/70 bg-muted/20 p-3">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <span className={cn("w-2 h-2 rounded-sm shrink-0", b.color)} />
+                      <p className="text-[11px] font-semibold text-foreground truncate">{b.label}</p>
+                      <span className="text-[9px] text-muted-foreground tabular-nums">{b.sub}</span>
+                    </div>
+                    <p className={cn("text-sm font-bold tabular-nums", b.textColor)}>{b.data.count}</p>
+                  </div>
+                  <p className="text-[10px] text-muted-foreground tabular-nums">
+                    {formatCurrency(b.data.spent)} <span className="opacity-60">/ {formatCurrency(b.data.budget)}</span>
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            {/* Footer summary */}
+            <div className="flex items-center justify-between gap-3 mt-4 pt-3 border-t border-border/70 text-[11px]">
+              <div className="flex items-center gap-4 text-muted-foreground tabular-nums">
+                <span><span className={cn("font-semibold", usageColor(pctUsed))}>{formatCurrency(totalSpent)}</span> gasto</span>
+                <span className="text-border">·</span>
+                <span><span className="font-semibold text-foreground">{formatCurrency(available)}</span> disponível</span>
+              </div>
+              <p className="text-muted-foreground tabular-nums">{orcamentos.length} orçamentos no total</p>
+            </div>
+          </Card>
+        );
+      })()}
 
       {/* Infographics: por categoria + por faculdade + por responsável */}
       <div className="grid gap-3 lg:grid-cols-3">
