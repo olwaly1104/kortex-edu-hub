@@ -955,15 +955,23 @@ function ExamGame({ quiz }: { quiz: Extract<AnyQuiz, { type: "exam" }> }) {
             const p = it.points ?? 10;
             const full = s === p;
             const none = s === 0;
+            const k = it.kind === "mcq" ? "mcq" : it.kind === "fill" ? "fill" : "written";
+            const m = TYPE_META[k];
+            const label = full ? "Correcto" : none ? "Incorrecto" : "Parcial";
             return (
               <div key={i} className="flex items-center justify-between border border-border rounded-lg p-3 text-sm">
                 <div className="flex items-center gap-2 min-w-0">
                   <span className="text-[10px] font-mono text-muted-foreground">#{i + 1}</span>
-                  <Badge variant="outline" className="text-[10px]">{TYPE_META[it.kind === "mcq" ? "mcq" : it.kind === "fill" ? "fill" : "written"].label}</Badge>
+                  <Badge variant="outline" className={cn("text-[10px] font-semibold border", m.tag)}>{m.label}</Badge>
                   <span className="truncate text-foreground/80">{it.kind === "fill" ? it.sentence : it.q}</span>
                 </div>
-                <span className={cn("font-bold text-xs shrink-0 ml-3", full ? "text-emerald-700" : none ? "text-destructive" : "text-amber-700")}>
-                  {s} / {p}
+                <span className={cn(
+                  "font-bold text-[11px] shrink-0 ml-3 px-2 py-0.5 rounded-full border",
+                  full ? "text-emerald-700 bg-emerald-50 border-emerald-200" :
+                  none ? "text-destructive bg-destructive/10 border-destructive/20" :
+                  "text-amber-700 bg-amber-50 border-amber-200"
+                )}>
+                  {label}
                 </span>
               </div>
             );
