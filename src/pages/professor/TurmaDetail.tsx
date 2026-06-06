@@ -246,7 +246,7 @@ export default function ProfessorTurmaDetail() {
                   <div><p className="text-[10px] text-muted-foreground uppercase">Presença</p><p className={`text-sm font-bold ${student.attendance >= 75 ? "text-accent" : "text-destructive"}`}>{student.attendance}%</p></div>
                   <div><p className="text-[10px] text-muted-foreground uppercase">Média</p><p className={`text-sm font-bold ${student.avgGrade && student.avgGrade >= 10 ? "text-accent" : "text-destructive"}`}>{student.avgGrade ?? "—"}</p></div>
                   <div><p className="text-[10px] text-muted-foreground uppercase">Entregas</p><p className="text-sm font-bold text-foreground">{student.submittedTasks}/{student.totalTasks}</p></div>
-                  <div><p className="text-[10px] text-muted-foreground uppercase">Última</p><p className="text-xs text-muted-foreground">{student.lastActive}</p></div>
+                  <div><p className="text-[10px] text-muted-foreground uppercase">Aval.</p><p className="text-xs text-muted-foreground">{student.lastActive}</p></div>
                 </div>
               </Card>
             ))}
