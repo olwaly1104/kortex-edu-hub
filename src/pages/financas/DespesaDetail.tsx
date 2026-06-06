@@ -384,47 +384,6 @@ export default function DespesaDetail() {
                 </div>
               </div>
               <Separator />
-              {(() => {
-                const approver = despesa.approvedBy || "Dr. Manuel Tavares";
-                const approverRole = "Director Financeiro";
-                return (
-                  <>
-                    <div>
-                      <dt className="text-xs text-muted-foreground uppercase tracking-wider mb-1">
-                        {despesa.status === "rejeitada" ? "Rejeitado por" : "Aprovado por"}
-                      </dt>
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="min-w-0">
-                          <dd className="font-medium text-foreground truncate flex items-center gap-1.5">
-                            <ShieldCheck className="w-3.5 h-3.5 text-primary shrink-0" />
-                            {approver}
-                          </dd>
-                          <dd className="text-xs text-muted-foreground truncate">{approverRole}</dd>
-                        </div>
-                        <div className="flex items-center gap-1 shrink-0">
-                          <button
-                            type="button"
-                            onClick={() => toast({ title: "Conversa aberta", description: `Chat com ${approver}` })}
-                            className="w-7 h-7 rounded-md inline-flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-                            title={`Chat com ${approver}`}
-                          >
-                            <MessageSquare className="w-3.5 h-3.5" />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => toast({ title: "Email", description: `Compor email para ${approver}` })}
-                            className="w-7 h-7 rounded-md inline-flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-                            title={`Email a ${approver}`}
-                          >
-                            <Mail className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                    <Separator />
-                  </>
-                );
-              })()}
               <div>
                 <dt className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Data do pedido</dt>
                 <dd className="font-medium text-foreground">{fmtDateLong(despesa.date)}</dd>
