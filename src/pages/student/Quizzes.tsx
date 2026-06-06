@@ -546,6 +546,8 @@ function QuizRow({ quiz, onStart }: { quiz: AnyQuiz; onStart: () => void }) {
   const meta = TYPE_META[quiz.type];
   const Icon = meta.icon;
   const cad = cadeiraColor(quiz.cadeira);
+  const stats = quizStats(quiz.id);
+  const nc = notaColor(stats.nota);
   return (
     <button
       type="button"
@@ -575,8 +577,12 @@ function QuizRow({ quiz, onStart }: { quiz: AnyQuiz; onStart: () => void }) {
         <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-1">{quiz.description}</p>
       </div>
 
-      <div className="hidden md:flex items-center shrink-0 pr-2">
+      <div className="hidden md:flex flex-col items-end gap-1 shrink-0 pr-2">
         <DiffPill d={quiz.difficulty} />
+        <span className={cn("inline-flex items-center gap-1.5 text-[10px] font-bold px-2 py-0.5 rounded-md border tabular-nums", nc.bg, nc.text, nc.border)}>
+          <span className={cn("w-1.5 h-1.5 rounded-full", nc.dot)} />
+          Nota {stats.nota.toFixed(1)}
+        </span>
       </div>
 
       <span className="inline-flex items-center gap-1.5 shrink-0 h-8 px-3 rounded-md border border-input bg-background text-xs font-medium group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-colors">
