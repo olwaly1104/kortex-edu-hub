@@ -370,23 +370,67 @@ export default function DespesaDetail() {
 
           <Card className="p-6">
             <h3 className="font-semibold text-sm text-foreground mb-3 flex items-center gap-2">
-              <FileText className="w-4 h-4 text-primary" /> Comprovativo
+              <FileText className="w-4 h-4 text-primary" /> Documentos
             </h3>
-            {despesa.status === "aprovada" ? (
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full gap-2"
-                onClick={() => toast({ title: "Comprovativo aberto" })}
+            <div className="space-y-2">
+              {/* Factura — always present */}
+              <button
+                type="button"
+                onClick={() => toast({ title: "Factura aberta", description: `FAC-${despesa.id.toUpperCase()}.pdf` })}
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md border border-border bg-background hover:bg-muted/40 transition-colors text-left"
               >
-                <FileText className="w-4 h-4" /> Abrir comprovativo
-              </Button>
-            ) : (
-              <p className="text-xs text-muted-foreground">
-                Não tem. Comprovativo é gerado após aprovação e pagamento.
-              </p>
-            )}
+                <div className="w-9 h-9 rounded bg-red-50 border border-red-200 flex items-center justify-center shrink-0">
+                  <FileText className="w-4 h-4 text-red-600" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[12.5px] font-semibold text-foreground leading-tight truncate">
+                    Factura
+                  </p>
+                  <p className="text-[10.5px] text-muted-foreground mt-0.5 font-mono truncate">
+                    FAC-{despesa.id.toUpperCase()}.pdf
+                  </p>
+                </div>
+                <Download className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+              </button>
+
+              {/* Comprovativo — only when paid/approved */}
+              {despesa.status === "aprovada" ? (
+                <button
+                  type="button"
+                  onClick={() => toast({ title: "Comprovativo aberto", description: `COMP-${despesa.id.toUpperCase()}.pdf` })}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md border border-border bg-background hover:bg-muted/40 transition-colors text-left"
+                >
+                  <div className="w-9 h-9 rounded bg-accent/15 border border-accent/30 flex items-center justify-center shrink-0">
+                    <CheckCircle2 className="w-4 h-4 text-accent" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[12.5px] font-semibold text-foreground leading-tight truncate">
+                      Comprovativo de Pagamento
+                    </p>
+                    <p className="text-[10.5px] text-muted-foreground mt-0.5 font-mono truncate">
+                      COMP-{despesa.id.toUpperCase()}.pdf
+                    </p>
+                  </div>
+                  <Download className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                </button>
+              ) : (
+                <div className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md border border-dashed border-border bg-muted/20">
+                  <div className="w-9 h-9 rounded bg-muted border border-border flex items-center justify-center shrink-0">
+                    <Clock className="w-4 h-4 text-muted-foreground" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[12.5px] font-semibold text-muted-foreground leading-tight">
+                      Comprovativo de Pagamento
+                    </p>
+                    <p className="text-[10.5px] text-muted-foreground mt-0.5">
+                      Disponível após pagamento
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
           </Card>
+
 
           <Card className="p-6">
             <h3 className="font-semibold text-sm text-foreground mb-3 flex items-center gap-2">
