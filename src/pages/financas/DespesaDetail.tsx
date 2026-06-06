@@ -452,42 +452,51 @@ export default function DespesaDetail() {
               <button
                 type="button"
                 onClick={() => toast({ title: "Factura aberta", description: `FAC-${despesa.id.toUpperCase()}.pdf` })}
-                className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md border border-border/80 bg-background hover:bg-muted/40 transition-colors text-left"
+                className="group w-full flex items-center gap-3 px-3 py-2.5 rounded-lg border border-border bg-background hover:border-primary/40 hover:bg-muted/30 transition-all text-left"
               >
-                <div className="w-7 h-7 rounded bg-red-50 border border-red-200 flex items-center justify-center shrink-0">
-                  <FileText className="w-3.5 h-3.5 text-red-600" />
+                <div className="w-8 h-8 rounded-md bg-red-50 border border-red-200 flex items-center justify-center shrink-0">
+                  <FileText className="w-4 h-4 text-red-600" />
                 </div>
                 <div className="flex-1 min-w-0 leading-tight">
-                  <p className="text-[11.5px] font-medium text-foreground truncate">Factura</p>
-                  <p className="text-[9.5px] text-muted-foreground font-mono truncate">FAC-{despesa.id.toUpperCase()}.pdf</p>
+                  <p className="text-[12px] font-semibold text-foreground truncate">Factura</p>
+                  <p className="text-[10px] text-muted-foreground font-mono truncate">FAC-{despesa.id.toUpperCase()}.pdf</p>
                 </div>
-                <Download className="w-3 h-3 text-muted-foreground shrink-0" />
+                <span className="inline-flex items-center gap-1 text-[10px] font-medium text-accent shrink-0">
+                  <CheckCircle2 className="w-3 h-3" />
+                </span>
+                <Download className="w-3.5 h-3.5 text-muted-foreground group-hover:text-primary shrink-0 transition-colors" />
               </button>
 
               {despesa.status === "aprovada" ? (
                 <button
                   type="button"
                   onClick={() => toast({ title: "Comprovativo aberto", description: `COMP-${despesa.id.toUpperCase()}.pdf` })}
-                  className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md border border-border/80 bg-background hover:bg-muted/40 transition-colors text-left"
+                  className="group w-full flex items-center gap-3 px-3 py-2.5 rounded-lg border border-border bg-background hover:border-primary/40 hover:bg-muted/30 transition-all text-left"
                 >
-                  <div className="w-7 h-7 rounded bg-accent/15 border border-accent/30 flex items-center justify-center shrink-0">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-accent" />
+                  <div className="w-8 h-8 rounded-md bg-accent/15 border border-accent/30 flex items-center justify-center shrink-0">
+                    <CheckCircle2 className="w-4 h-4 text-accent" />
                   </div>
                   <div className="flex-1 min-w-0 leading-tight">
-                    <p className="text-[11.5px] font-medium text-foreground truncate">Comprovativo</p>
-                    <p className="text-[9.5px] text-muted-foreground font-mono truncate">COMP-{despesa.id.toUpperCase()}.pdf</p>
+                    <p className="text-[12px] font-semibold text-foreground truncate">Comprovativo</p>
+                    <p className="text-[10px] text-muted-foreground font-mono truncate">COMP-{despesa.id.toUpperCase()}.pdf</p>
                   </div>
-                  <Download className="w-3 h-3 text-muted-foreground shrink-0" />
+                  <span className="inline-flex items-center gap-1 text-[10px] font-medium text-accent shrink-0">
+                    <CheckCircle2 className="w-3 h-3" />
+                  </span>
+                  <Download className="w-3.5 h-3.5 text-muted-foreground group-hover:text-primary shrink-0 transition-colors" />
                 </button>
               ) : (
-                <div className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md border border-dashed border-border/80 bg-muted/20">
-                  <div className="w-7 h-7 rounded bg-muted border border-border flex items-center justify-center shrink-0">
-                    <Clock className="w-3.5 h-3.5 text-muted-foreground" />
+                <div className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg border border-dashed border-border bg-muted/20">
+                  <div className="w-8 h-8 rounded-md bg-muted border border-border flex items-center justify-center shrink-0">
+                    <FileText className="w-4 h-4 text-muted-foreground" />
                   </div>
                   <div className="flex-1 min-w-0 leading-tight">
-                    <p className="text-[11.5px] font-medium text-muted-foreground">Comprovativo</p>
-                    <p className="text-[9.5px] text-muted-foreground">Após pagamento</p>
+                    <p className="text-[12px] font-semibold text-muted-foreground truncate">Comprovativo</p>
+                    <p className="text-[10px] text-muted-foreground truncate">Após pagamento</p>
                   </div>
+                  <span className="w-5 h-5 rounded-full bg-destructive/10 border border-destructive/30 flex items-center justify-center shrink-0" title="Não carregado">
+                    <X className="w-3 h-3 text-destructive" />
+                  </span>
                 </div>
               )}
             </div>
