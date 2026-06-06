@@ -841,7 +841,7 @@ function WrittenGame({ quiz, onLockChange }: { quiz: Extract<AnyQuiz, { type: "w
 /*  Fill Game                                                          */
 /* ------------------------------------------------------------------ */
 
-function FillGame({ quiz }: { quiz: Extract<AnyQuiz, { type: "fill" }> }) {
+function FillGame({ quiz, onLockChange }: { quiz: Extract<AnyQuiz, { type: "fill" }>; onLockChange?: (locked: boolean) => void }) {
   const [idx, setIdx] = useState(0);
   const [value, setValue] = useState("");
   const [checked, setChecked] = useState(false);
@@ -849,6 +849,10 @@ function FillGame({ quiz }: { quiz: Extract<AnyQuiz, { type: "fill" }> }) {
   const [done, setDone] = useState(false);
   const current = quiz.items[idx];
   const total = quiz.items.length;
+  const time = useTimer(!done);
+
+  useEffect(() => { onLockChange?.(!done); }, [done, onLockChange]);
+  useEffect(() => () => onLockChange?.(false), [onLockChange]);
 
   const isRight = value.trim().toLowerCase() === current.answer.toLowerCase();
   const [before, after] = current.sentence.split("___");
@@ -863,13 +867,12 @@ function FillGame({ quiz }: { quiz: Extract<AnyQuiz, { type: "fill" }> }) {
   };
   const restart = () => { setIdx(0); setValue(""); setChecked(false); setScore(0); setDone(false); };
 
-  if (done) return <ResultsCard quiz={quiz} score={score} total={total} onRestart={restart} />;
+  if (done) return <ResultsCard quiz={quiz} score={score} total={total} time={time} onRestart={restart} />;
 
   return (
     <Card className="overflow-hidden">
       <div className="px-6 pt-5 pb-4 border-b border-border bg-muted/30">
-        <ProgressStrip quiz={quiz} position={idx + (checked ? 1 : 0)} total={total}
-          scoreLabel={<ScoreChip correct={score} total={total} />} />
+        <ProgressStrip quiz={quiz} position={idx + (checked ? 1 : 0)} total={total} score={score} time={time} />
       </div>
 
       <div className="p-6 space-y-5">
