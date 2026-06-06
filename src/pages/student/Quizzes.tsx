@@ -437,9 +437,8 @@ function FilterRow({
           : "text-foreground/80 hover:bg-muted hover:text-foreground"
       )}
     >
-      {dot
-        ? <span className={cn("w-2 h-2 rounded-full shrink-0", dot)} />
-        : Icon && <Icon className="w-3.5 h-3.5 shrink-0" />}
+      {Icon && <Icon className="w-3.5 h-3.5 shrink-0" />}
+      {dot && <span className={cn("w-2 h-2 rounded-full shrink-0", dot)} />}
       <span className="flex-1 truncate">{label}</span>
       <span className={cn(
         "text-[10px] font-bold px-1.5 py-0.5 rounded tabular-nums",
