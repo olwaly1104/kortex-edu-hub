@@ -49,6 +49,38 @@ export default function Orcamentos() {
     esgotado: orcamentos.filter(o => o.status === "esgotado").length,
   };
 
+  // Categorias derivadas (mapeamento por id)
+  const categoryMap: Record<string, string> = {
+    o1: "Académico", o2: "Académico", o3: "Académico",
+    o4: "Infraestrutura", o5: "Infraestrutura",
+    o6: "Investigação", o7: "Bolsas e Apoio", o8: "Operacional",
+  };
+  const categorySwatch: Record<string, string> = {
+    "Académico": "bg-primary",
+    "Infraestrutura": "bg-amber-500",
+    "Investigação": "bg-sky-500",
+    "Bolsas e Apoio": "bg-violet-500",
+    "Operacional": "bg-accent",
+  };
+  const categoryBreakdown = Object.entries(
+    orcamentos.reduce<Record<string, { budget: number; spent: number }>>((acc, o) => {
+      const k = categoryMap[o.id] ?? "Outros";
+      acc[k] = acc[k] ?? { budget: 0, spent: 0 };
+      acc[k].budget += o.totalBudget;
+      acc[k].spent += o.spent;
+      return acc;
+    }, {})
+  )
+    .map(([label, v]) => ({ label, ...v, swatch: categorySwatch[label] ?? "bg-muted-foreground" }))
+    .sort((a, b) => b.budget - a.budget);
+
+  const faculdadeBreakdown = orcamentos
+    .filter(o => o.department.startsWith("Fac."))
+    .map(o => ({ label: o.department.replace("Fac. ", "Faculdade de "), budget: o.totalBudget, spent: o.spent }))
+    .sort((a, b) => b.budget - a.budget);
+  const maxFacBudget = Math.max(...faculdadeBreakdown.map(f => f.budget), 1);
+
+
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       {/* Header */}
