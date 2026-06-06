@@ -975,7 +975,7 @@ function ResultsCard({
 /*  Exam Game — timed, mixed-question simulation                       */
 /* ------------------------------------------------------------------ */
 
-function ExamGame({ quiz }: { quiz: Extract<AnyQuiz, { type: "exam" }> }) {
+function ExamGame({ quiz, onLockChange }: { quiz: Extract<AnyQuiz, { type: "exam" }>; onLockChange?: (locked: boolean) => void }) {
   const total = quiz.items.length;
   const totalPoints = quiz.items.reduce((s, it) => s + (it.points ?? 10), 0);
   const passing = quiz.passingScore ?? 50;
@@ -986,6 +986,9 @@ function ExamGame({ quiz }: { quiz: Extract<AnyQuiz, { type: "exam" }> }) {
   const [answers, setAnswers] = useState<Record<number, string | number>>({});
   const [submitted, setSubmitted] = useState(false);
   const [remaining, setRemaining] = useState(quiz.minutes * 60);
+
+  useEffect(() => { onLockChange?.(started && !submitted); }, [started, submitted, onLockChange]);
+  useEffect(() => () => onLockChange?.(false), [onLockChange]);
 
   useEffect(() => {
     if (!started || submitted) return;
