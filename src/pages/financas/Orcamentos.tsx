@@ -98,64 +98,63 @@ export default function Orcamentos() {
         <Button size="sm" className="gap-1.5 h-9"><Plus className="w-4 h-4" /> Novo Orçamento</Button>
       </div>
 
-      {/* Executive summary */}
-      <Card className="border-border/70 overflow-hidden">
-        <div className="grid grid-cols-1 lg:grid-cols-[1.5fr_auto_1fr]">
-          <div className="p-5 lg:p-6 space-y-5">
-            <div className="flex items-center justify-between">
-              <p className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground font-semibold">Resumo orçamental · {orcamentos[0]?.period ?? "2025"}</p>
+      {/* KPIs — separate tiles */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <Card className="p-4 border-border/70">
+          <div className="flex items-center gap-1.5 mb-2">
+            <Wallet className="w-3.5 h-3.5 text-foreground" />
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Total Orçamentado</p>
+          </div>
+          <p className="text-2xl font-bold text-foreground tabular-nums leading-none">{formatCurrency(totalBudget)}</p>
+          <p className="text-[11px] text-muted-foreground mt-2">{orcamentos.length} orçamentos · {orcamentos[0]?.period ?? "2025"}</p>
+        </Card>
+
+        <Card className="p-4 border-border/70">
+          <div className="flex items-center gap-1.5 mb-2">
+            <TrendingDown className={cn("w-3.5 h-3.5", usageColor(pctUsed))} />
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Total Gasto</p>
+          </div>
+          <p className={cn("text-2xl font-bold tabular-nums leading-none", usageColor(pctUsed))}>{formatCurrency(totalSpent)}</p>
+          <p className="text-[11px] text-muted-foreground mt-2">{pctUsed}% do orçamento executado</p>
+        </Card>
+
+        <Card className="p-4 border-border/70">
+          <div className="flex items-center gap-1.5 mb-2">
+            <CheckCircle2 className="w-3.5 h-3.5 text-accent" />
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Disponível</p>
+          </div>
+          <p className="text-2xl font-bold text-foreground tabular-nums leading-none">{formatCurrency(available)}</p>
+          <p className="text-[11px] text-muted-foreground mt-2">{100 - pctUsed}% por executar</p>
+        </Card>
+      </div>
+
+      {/* Utilização global */}
+      <Card className="p-5 border-border/70">
+        <div className="flex items-start justify-between gap-4 mb-3">
+          <div>
+            <div className="flex items-center gap-2">
+              <p className="text-sm font-semibold text-foreground">Utilização global</p>
               <Badge variant="outline" className="text-[10px] gap-1 bg-muted/40 border-border/70">
                 <span className={cn("w-1.5 h-1.5 rounded-full", pctUsed >= 90 ? "bg-destructive" : pctUsed >= 75 ? "bg-amber-500" : "bg-accent")} />
                 {pctUsed >= 90 ? "Crítico" : pctUsed >= 75 ? "Atenção" : "Saudável"}
               </Badge>
             </div>
-
-            <div className="grid grid-cols-3 gap-4">
-              <div>
-                <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Orçamentado</p>
-                <p className="text-xl font-bold text-foreground tabular-nums mt-1 leading-tight">{formatCurrency(totalBudget)}</p>
-                <p className="text-[10px] text-muted-foreground mt-0.5">{orcamentos.length} orçamentos</p>
-              </div>
-              <div className="border-l border-border/70 pl-4">
-                <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Gasto</p>
-                <p className={cn("text-xl font-bold tabular-nums mt-1 leading-tight", usageColor(pctUsed))}>{formatCurrency(totalSpent)}</p>
-                <p className="text-[10px] text-muted-foreground mt-0.5">{pctUsed}% executado</p>
-              </div>
-              <div className="border-l border-border/70 pl-4">
-                <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Disponível</p>
-                <p className="text-xl font-bold text-foreground tabular-nums mt-1 leading-tight">{formatCurrency(available)}</p>
-                <p className="text-[10px] text-muted-foreground mt-0.5">{100 - pctUsed}% restante</p>
-              </div>
-            </div>
-
-            <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Utilização global</p>
-                <p className="text-[11px] text-muted-foreground tabular-nums">
-                  <span className="text-accent font-medium">{numActivos} activos</span>
-                  {numAlerta > 0 && <> · <span className="text-amber-600 font-medium">{numAlerta} em alerta</span></>}
-                </p>
-              </div>
-              <div className="relative h-2.5 w-full rounded-full bg-muted overflow-hidden">
-                <div className={cn("h-full transition-all", pctUsed >= 90 ? "bg-destructive" : pctUsed >= 75 ? "bg-amber-500" : "bg-accent")} style={{ width: `${pctUsed}%` }} />
-              </div>
-              <div className="flex items-center justify-between mt-1.5 text-[10px] text-muted-foreground tabular-nums">
-                <span>0 Kz</span>
-                <span>{formatCurrency(totalBudget)}</span>
-              </div>
-            </div>
+            <p className="text-[11px] text-muted-foreground mt-0.5 tabular-nums">
+              <span className="text-accent font-medium">{numActivos} activos</span>
+              {numAlerta > 0 && <> · <span className="text-amber-600 font-medium">{numAlerta} em alerta</span></>}
+            </p>
           </div>
-
-          <div className="hidden lg:block w-px bg-border/70" />
-
-          <div className="p-5 lg:p-6 flex flex-col justify-center items-center lg:items-start gap-1 bg-muted/20">
-            <p className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground font-semibold">Execução</p>
-            <div className="flex items-baseline gap-1">
-              <p className={cn("text-6xl font-bold tabular-nums leading-none", usageColor(pctUsed))}>{pctUsed}</p>
-              <span className={cn("text-2xl font-semibold", usageColor(pctUsed))}>%</span>
-            </div>
-            <p className="text-[11px] text-muted-foreground">do orçamento total</p>
+          <div className="flex items-baseline gap-0.5 shrink-0">
+            <p className={cn("text-3xl font-bold tabular-nums leading-none", usageColor(pctUsed))}>{pctUsed}</p>
+            <span className={cn("text-base font-semibold", usageColor(pctUsed))}>%</span>
           </div>
+        </div>
+        <div className="relative h-2.5 w-full rounded-full bg-muted overflow-hidden">
+          <div className={cn("h-full transition-all", pctUsed >= 90 ? "bg-destructive" : pctUsed >= 75 ? "bg-amber-500" : "bg-accent")} style={{ width: `${pctUsed}%` }} />
+        </div>
+        <div className="flex items-center justify-between mt-1.5 text-[10px] text-muted-foreground tabular-nums">
+          <span>0 Kz</span>
+          <span>{formatCurrency(totalBudget)}</span>
         </div>
       </Card>
 
