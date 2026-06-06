@@ -421,7 +421,7 @@ export default function StudentQuizzes() {
                 Nenhuma actividade corresponde aos filtros aplicados.
               </div>
             ) : (
-              filtered.map(q => <QuizRow key={q.id} quiz={q} onStart={() => setActiveId(q.id)} />)
+              filtered.map(q => <QuizRow key={q.id} quiz={q} onStart={() => setPendingId(q.id)} />)
             )}
           </Card>
         </main>
