@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cursoTemplates } from "@/data/academica2Data";
-import { GraduationCap, CheckCircle2, Check, Pencil, UserCog, Building2, ArrowLeft, Search } from "lucide-react";
+import { GraduationCap, CheckCircle2, Check, UserCog, Building2, ArrowLeft, Search } from "lucide-react";
 import { toast } from "sonner";
 
 const coordenadoresPool = [
