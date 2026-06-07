@@ -253,181 +253,50 @@ export default function CourseCreator() {
             </div>
           </Card>
 
-          {/* Detail panel per step */}
-          <Card className="p-5">
-            <div className="flex items-center gap-2 mb-4">
-              <activeStep.icon className="w-5 h-5 text-primary" />
-              <h2 className="text-base font-semibold">{activeStep.label}</h2>
-              <Badge variant="outline" className="ml-auto">{statuses[active] === "done" ? "Concluído" : statuses[active] === "running" ? "A executar" : "Pendente"}</Badge>
-            </div>
-
-            {active === "cursos" && (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between flex-wrap gap-2">
-                  <div className="flex items-center gap-3 text-sm">
-                    <Badge variant="outline" className="gap-1"><GraduationCap className="w-3 h-3" /> {cursoTemplates.length} cursos</Badge>
-                    <Badge className="bg-emerald-100 text-emerald-700 gap-1"><CheckCircle2 className="w-3 h-3" /> {confirmedCount} confirmados</Badge>
-                  </div>
-                  <Button size="sm" onClick={confirmAllCursos} className="gap-2"><Check className="w-4 h-4" /> Confirmar Todos</Button>
-                </div>
-
-                <div className="grid sm:grid-cols-2 gap-3">
-                  {cursoTemplates.map(c => {
-                    const s = cursosState[c.id];
-                    return (
-                      <div key={c.id} className={`border rounded-lg p-4 transition ${s.confirmed ? "border-emerald-300 bg-emerald-50/40" : "bg-card"}`}>
-                        <div className="flex items-start justify-between gap-2 mb-3">
-                          <div className="min-w-0">
-                            {s.editing ? (
-                              <Input value={s.name} onChange={e => updateCurso(c.id, { name: e.target.value })} className="h-8 text-sm font-semibold mb-1" />
-                            ) : (
-                              <p className="text-sm font-semibold truncate">{s.name}</p>
-                            )}
-                            <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
-                              <Building2 className="w-3 h-3" /> {c.faculty}
-                            </div>
-                          </div>
-                          <Badge variant="outline" className="text-[10px] shrink-0">{c.code}</Badge>
-                        </div>
-
-                        <div className="space-y-2">
-                          <div>
-                            <Label className="text-[10px] uppercase tracking-wide text-muted-foreground flex items-center gap-1"><UserCog className="w-3 h-3" /> Coordenador</Label>
-                            {s.editing ? (
-                              <Select value={s.coordenador} onValueChange={v => updateCurso(c.id, { coordenador: v })}>
-                                <SelectTrigger className="h-8 text-xs mt-1"><SelectValue /></SelectTrigger>
-                                <SelectContent>{coordenadoresPool.map(co => <SelectItem key={co} value={co}>{co}</SelectItem>)}</SelectContent>
-                              </Select>
-                            ) : (
-                              <p className="text-sm font-medium mt-0.5">{s.coordenador}</p>
-                            )}
-                          </div>
-                          <div className="grid grid-cols-2 gap-2">
-                            <div>
-                              <Label className="text-[10px] uppercase tracking-wide text-muted-foreground">Anos</Label>
-                              {s.editing ? (
-                                <Input type="number" value={s.years} onChange={e => updateCurso(c.id, { years: +e.target.value })} className="h-8 text-xs mt-1" />
-                              ) : <p className="text-sm mt-0.5">{s.years}</p>}
-                            </div>
-                            <div>
-                              <Label className="text-[10px] uppercase tracking-wide text-muted-foreground">Vagas est.</Label>
-                              {s.editing ? (
-                                <Input type="number" value={s.estudantesEsperados} onChange={e => updateCurso(c.id, { estudantesEsperados: +e.target.value })} className="h-8 text-xs mt-1" />
-                              ) : <p className="text-sm mt-0.5">~{s.estudantesEsperados}</p>}
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="flex gap-2 mt-3 pt-3 border-t">
-                          <Button size="sm" variant="outline" className="flex-1 gap-1 h-8 text-xs"
-                            onClick={() => updateCurso(c.id, { editing: !s.editing })}>
-                            <Pencil className="w-3 h-3" /> {s.editing ? "Concluir" : "Editar"}
-                          </Button>
-                          <Button size="sm" className={`flex-1 gap-1 h-8 text-xs ${s.confirmed ? "bg-emerald-600 hover:bg-emerald-700" : ""}`}
-                            onClick={() => updateCurso(c.id, { confirmed: !s.confirmed, editing: false })}>
-                            <Check className="w-3 h-3" /> {s.confirmed ? "Confirmado" : "Confirmar"}
-                          </Button>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
+          {/* Detail panel — only shown for non-routable steps */}
+          {!stepRoute[active] && (
+            <Card className="p-5">
+              <div className="flex items-center gap-2 mb-4">
+                <activeStep.icon className="w-5 h-5 text-primary" />
+                <h2 className="text-base font-semibold">{activeStep.label}</h2>
+                <Badge variant="outline" className="ml-auto">{statuses[active] === "done" ? "Concluído" : statuses[active] === "running" ? "A executar" : "Pendente"}</Badge>
               </div>
-            )}
 
-            {active === "cadeiras" && (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between flex-wrap gap-2">
-                  <div className="flex items-center gap-3 text-sm">
-                    <Badge variant="outline" className="gap-1"><BookOpen className="w-3 h-3" /> {totalCadeiras} cadeiras</Badge>
-                    <Badge variant="outline">{Object.keys(cadeirasAlloc).length} cursos</Badge>
-                  </div>
-                  <Button size="sm" onClick={confirmCadeiras} className="gap-2"><Check className="w-4 h-4" /> Confirmar Alocação</Button>
-                </div>
-
-                <div className="grid md:grid-cols-[200px_1fr] gap-4">
-                  {/* Course selector */}
-                  <div className="border rounded-lg p-1 h-fit">
-                    {Object.keys(cadeirasAlloc).map(cid => {
-                      const curso = cursoTemplates.find(c => c.id === cid);
-                      const isSel = cadeiraCurso === cid;
-                      const count = cadeirasAlloc[cid].reduce((a, r) => a + r.length, 0);
-                      return (
-                        <button key={cid} onClick={() => setCadeiraCurso(cid)}
-                          className={`w-full text-left px-3 py-2 rounded-md text-sm flex items-center justify-between transition ${
-                            isSel ? "bg-primary text-primary-foreground" : "hover:bg-muted/50"
-                          }`}>
-                          <span className="truncate font-medium">{curso?.name}</span>
-                          <span className={`text-[10px] ${isSel ? "opacity-80" : "text-muted-foreground"}`}>{count}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-
-                  {/* Allocation per year */}
-                  <div className="space-y-3 min-w-0">
-                    {cadeirasAlloc[cadeiraCurso].map((cadeiras, ano) => (
-                      <div key={ano} className="border rounded-lg overflow-hidden">
-                        <div className="bg-primary/10 px-3 py-2 border-b flex items-center justify-between">
-                          <p className="text-xs font-bold text-primary">{ano + 1}º Ano</p>
-                          <Badge variant="outline" className="text-[10px]">{cadeiras.length} cadeiras</Badge>
+              {active === "turmas" && (
+                <div className="space-y-3">
+                  <p className="text-xs text-muted-foreground">Candidatos aprovados a alocar automaticamente a turmas do 1º ano:</p>
+                  <div className="border rounded-lg divide-y">
+                    {alocacaoCandidatos.map(c => (
+                      <div key={c.id} className="flex items-center gap-3 p-3 text-sm">
+                        <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold">{c.name.split(" ").map(n => n[0]).slice(0, 2).join("")}</div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold truncate">{c.name}</p>
+                          <p className="text-[11px] text-muted-foreground truncate">{c.email} · {c.curso}</p>
                         </div>
-                        <div className="divide-y">
-                          {cadeiras.map((c, idx) => (
-                            <div key={idx} className="grid grid-cols-[1fr_180px_70px] gap-2 p-2 items-center">
-                              <Input value={c.name} onChange={e => updateCadeira(cadeiraCurso, ano, idx, { name: e.target.value })} className="h-8 text-xs" />
-                              <Select value={c.docente} onValueChange={v => updateCadeira(cadeiraCurso, ano, idx, { docente: v })}>
-                                <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                                <SelectContent>{docentesPool.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent>
-                              </Select>
-                              <Input type="number" value={c.ects} onChange={e => updateCadeira(cadeiraCurso, ano, idx, { ects: +e.target.value })} className="h-8 text-xs" />
-                            </div>
-                          ))}
-                        </div>
-                        <div className="grid grid-cols-[1fr_180px_70px] gap-2 px-2 pb-1 text-[10px] uppercase tracking-wide text-muted-foreground">
-                          <span>Cadeira</span><span>Docente</span><span>ECTS</span>
-                        </div>
+                        <Badge variant="outline" className="text-[10px]">{c.turmaSugerida}</Badge>
+                        <Badge className={`text-[10px] ${
+                          c.estado === "alocado" ? "bg-emerald-500" :
+                          c.estado === "pendente" ? "bg-amber-500" : "bg-red-500"
+                        }`}>{c.estado}</Badge>
                       </div>
                     ))}
                   </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {active === "turmas" && (
-              <div className="space-y-3">
-                <p className="text-xs text-muted-foreground">Candidatos aprovados a alocar automaticamente a turmas do 1º ano:</p>
-                <div className="border rounded-lg divide-y">
-                  {alocacaoCandidatos.map(c => (
-                    <div key={c.id} className="flex items-center gap-3 p-3 text-sm">
-                      <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold">{c.name.split(" ").map(n => n[0]).slice(0, 2).join("")}</div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-semibold truncate">{c.name}</p>
-                        <p className="text-[11px] text-muted-foreground truncate">{c.email} · {c.curso}</p>
-                      </div>
-                      <Badge variant="outline" className="text-[10px]">{c.turmaSugerida}</Badge>
-                      <Badge className={`text-[10px] ${
-                        c.estado === "alocado" ? "bg-emerald-500" :
-                        c.estado === "pendente" ? "bg-amber-500" : "bg-red-500"
-                      }`}>{c.estado}</Badge>
-                    </div>
-                  ))}
+              {active === "calendario" && (
+                <div className="text-sm space-y-2">
+                  <p><strong>Ano:</strong> {startDate} → {endDate}</p>
+                  <p><strong>1º Semestre:</strong> {sem1Start} → {sem1End}</p>
+                  <p><strong>2º Semestre:</strong> {sem2Start} → {sem2End}</p>
+                  <p className="text-muted-foreground pt-2 border-t mt-2">Mapa de exames presenciais (1ª e 2ª época) gerado automaticamente com salas atribuídas por capacidade.</p>
                 </div>
-              </div>
-            )}
-
-            {active === "calendario" && (
-              <div className="text-sm space-y-2">
-                <p><strong>Ano:</strong> {startDate} → {endDate}</p>
-                <p><strong>1º Semestre:</strong> {sem1Start} → {sem1End}</p>
-                <p><strong>2º Semestre:</strong> {sem2Start} → {sem2End}</p>
-                <p className="text-muted-foreground pt-2 border-t mt-2">Mapa de exames presenciais (1ª e 2ª época) gerado automaticamente com salas atribuídas por capacidade.</p>
-              </div>
-            )}
-            {active === "publicar" && (
-              <p className="text-sm text-muted-foreground">Ao publicar, o ano letivo {anoLabel} fica activo e visível para todos os perfis (estudantes, docentes, coordenadores).</p>
-            )}
-          </Card>
+              )}
+              {active === "publicar" && (
+                <p className="text-sm text-muted-foreground">Ao publicar, o ano letivo {anoLabel} fica activo e visível para todos os perfis (estudantes, docentes, coordenadores).</p>
+              )}
+            </Card>
+          )}
         </div>
       </div>
     </div>
