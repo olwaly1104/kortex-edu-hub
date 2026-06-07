@@ -12,7 +12,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Switch } from "@/components/ui/switch";
 import { cadeirasAcad, anosLetivos, cursoTemplates } from "@/data/academica2Data";
 import { getCadeiraContent, setCadeiraContent, uid, type Aula, type Conteudo, type Quiz, type Evento, type Attachment } from "@/data/cadeiraContentData";
-import { ArrowLeft, BookOpen, PlayCircle, FileText, ListChecks, CalendarDays, UserCog, Plus, Trash2, Save, Pencil, GraduationCap, Eye, Download, FileType, Film, Image as ImageIcon, Link2 } from "lucide-react";
+import { ArrowLeft, BookOpen, PlayCircle, FileText, ListChecks, CalendarDays, UserCog, Plus, Trash2, Save, Pencil, GraduationCap, Eye, Download, FileType, Film, Image as ImageIcon, Link2, Scale } from "lucide-react";
 import { toast } from "sonner";
 
 const docentesPool = [
@@ -43,6 +43,16 @@ export default function CadeiraDetail() {
     docente: cadeira.docente,
     descricao: `Cadeira de ${cadeira.cadeira} do ${cadeira.ano}º ano do curso ${cadeira.curso}.`,
     publicada: cadeira.publicada,
+  });
+
+  const [criterio, setCriterio] = useState({
+    avaliacaoContinua: 40,
+    trabalhosPraticos: 20,
+    examesFinais: 40,
+    notaMinimaExame: 8,
+    notaAprovacao: 10,
+    presencaMinima: 75,
+    observacoes: "Os alunos devem obter nota mínima de 8 em cada exame e cumprir a presença mínima de 75% para aprovação. A média final resulta da ponderação dos componentes de avaliação contínua, trabalhos práticos e exames finais.",
   });
 
   const initial = getCadeiraContent(cadeira.id, cadeira.cadeira);
@@ -135,6 +145,7 @@ export default function CadeiraDetail() {
           <TabsTrigger value="recursos"><FileType className="w-4 h-4 mr-1" /> Recursos</TabsTrigger>
           <TabsTrigger value="quizzes"><ListChecks className="w-4 h-4 mr-1" /> Quizzes</TabsTrigger>
           <TabsTrigger value="calendario"><CalendarDays className="w-4 h-4 mr-1" /> Calendário</TabsTrigger>
+          <TabsTrigger value="criterio"><Scale className="w-4 h-4 mr-1" /> Critério</TabsTrigger>
         </TabsList>
 
         <TabsContent value="info" className="mt-4">
@@ -262,41 +273,17 @@ export default function CadeiraDetail() {
                     {a.attachments.length === 0 ? (
                       <p className="text-xs text-muted-foreground italic pl-2">Sem conteúdos para esta aula.</p>
                     ) : (
-                      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                      <div className="divide-y rounded-md border">
                         {a.attachments.map(at => (
-                          <Card key={at.id} className="overflow-hidden border hover:border-primary/40 transition">
-                            <div className="aspect-[16/9] bg-muted border-b flex items-center justify-center overflow-hidden">
-                              {at.tipo === "Vídeo" ? (
-                                <video src={at.url} className="w-full h-full object-cover" muted />
-                              ) : at.tipo === "Imagem" ? (
-                                <img src={at.url} alt={at.name} className="w-full h-full object-cover" />
-                              ) : at.tipo === "PDF" || at.tipo === "Slides" ? (
-                                <iframe src={at.url} className="w-full h-full pointer-events-none" title={at.name} />
-                              ) : (
-                                <div className="flex flex-col items-center gap-1 text-muted-foreground">
-                                  {typeIcon(at.tipo)}
-                                  <span className="text-[10px] uppercase">{at.tipo}</span>
-                                </div>
-                              )}
-                            </div>
-                            <div className="p-2.5 space-y-2">
-                              <div className="flex items-center gap-2">
-                                {typeIcon(at.tipo)}
-                                <Select value={at.tipo} onValueChange={v => updAttach(at.id, { tipo: v as Attachment["tipo"] })}>
-                                  <SelectTrigger className="h-7 text-[11px] w-24"><SelectValue /></SelectTrigger>
-                                  <SelectContent>{(["PDF", "Slides", "DOCX", "Vídeo", "Imagem", "Link"] as const).map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
-                                </Select>
-                                <span className="text-[10px] text-muted-foreground ml-auto">{at.size || "—"}</span>
-                              </div>
-                              <Input value={at.name} onChange={e => updAttach(at.id, { name: e.target.value })} className="h-8 text-xs" placeholder="Nome do ficheiro" />
-                              <div className="flex items-center gap-1">
-                                <Button size="icon" variant="ghost" className="h-7 w-7" asChild><a href={at.url} target="_blank" rel="noreferrer" title="Abrir"><Eye className="w-3.5 h-3.5" /></a></Button>
-                                <Button size="icon" variant="ghost" className="h-7 w-7" asChild><a href={at.url} download={at.name} title="Descarregar"><Download className="w-3.5 h-3.5" /></a></Button>
-                                <div className="flex-1" />
-                                <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => delAttach(at.id)}><Trash2 className="w-3.5 h-3.5 text-destructive" /></Button>
-                              </div>
-                            </div>
-                          </Card>
+                          <div key={at.id} className="flex items-center gap-2 px-3 py-2 hover:bg-muted/40">
+                            <span className="shrink-0">{typeIcon(at.tipo)}</span>
+                            <Input value={at.name} onChange={e => updAttach(at.id, { name: e.target.value })} className="h-7 text-xs border-none shadow-none px-1 focus-visible:ring-1" placeholder="Nome do ficheiro" />
+                            <Badge variant="outline" className="text-[10px] h-5 shrink-0">{at.tipo}</Badge>
+                            <span className="text-[10px] text-muted-foreground shrink-0 w-16 text-right">{at.size || "—"}</span>
+                            <Button size="icon" variant="ghost" className="h-7 w-7 shrink-0" asChild><a href={at.url} target="_blank" rel="noreferrer" title="Abrir"><Eye className="w-3.5 h-3.5" /></a></Button>
+                            <Button size="icon" variant="ghost" className="h-7 w-7 shrink-0" asChild><a href={at.url} download={at.name} title="Descarregar"><Download className="w-3.5 h-3.5" /></a></Button>
+                            <Button size="icon" variant="ghost" className="h-7 w-7 shrink-0" onClick={() => delAttach(at.id)}><Trash2 className="w-3.5 h-3.5 text-destructive" /></Button>
+                          </div>
                         ))}
                       </div>
                     )}
@@ -344,45 +331,25 @@ export default function CadeiraDetail() {
                 <Button size="sm" onClick={addConteudo} className="gap-1"><Plus className="w-4 h-4" /> Adicionar</Button>
               </div>
             </div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
-              {conteudos.map(c => (
-                <Card key={c.id} className="overflow-hidden border hover:border-primary/40 transition">
-                  <div className="aspect-[4/3] bg-muted border-b flex items-center justify-center overflow-hidden">
-                    {c.tipo === "Vídeo" ? (
-                      <video src={c.url} className="w-full h-full object-cover" controls={false} muted />
-                    ) : c.tipo === "Imagem" ? (
-                      <img src={c.url} alt={c.titulo} className="w-full h-full object-cover" />
-                    ) : c.tipo === "PDF" || c.tipo === "Slides" ? (
-                      <iframe src={c.url} className="w-full h-full pointer-events-none" title={c.titulo} />
-                    ) : (
-                      <div className="flex flex-col items-center gap-1 text-muted-foreground">
-                        {typeIcon(c.tipo)}
-                        <span className="text-[10px] uppercase">{c.tipo}</span>
-                      </div>
-                    )}
-                  </div>
-                  <div className="p-3 space-y-2">
-                    <div className="flex items-center gap-2">
-                      {typeIcon(c.tipo)}
-                      <Select value={c.tipo} onValueChange={v => updConteudo(c.id, { tipo: v as Conteudo["tipo"] })}>
-                        <SelectTrigger className="h-7 text-[11px] w-24"><SelectValue /></SelectTrigger>
-                        <SelectContent>{(["PDF", "Slides", "DOCX", "Vídeo", "Imagem", "Link"] as const).map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
-                      </Select>
-                      <span className="text-[10px] text-muted-foreground ml-auto">{c.size || "—"}</span>
+            <div className="p-4">
+              <div className="divide-y rounded-md border">
+                {conteudos.map(c => (
+                  <div key={c.id} className="flex items-center gap-2 px-3 py-2 hover:bg-muted/40">
+                    <span className="shrink-0">{typeIcon(c.tipo)}</span>
+                    <Input value={c.titulo} onChange={e => updConteudo(c.id, { titulo: e.target.value })} className="h-7 text-xs border-none shadow-none px-1 focus-visible:ring-1" placeholder="Título" />
+                    <Badge variant="outline" className="text-[10px] h-5 shrink-0">{c.tipo}</Badge>
+                    <div className="flex items-center gap-1 shrink-0">
+                      <Label className="text-[10px] text-muted-foreground">Sem.</Label>
+                      <Input type="number" value={c.semana} onChange={e => updConteudo(c.id, { semana: +e.target.value })} className="h-6 text-xs w-12 px-1" />
                     </div>
-                    <Input value={c.titulo} onChange={e => updConteudo(c.id, { titulo: e.target.value })} className="h-8 text-xs" placeholder="Título" />
-                    <div className="flex items-center gap-2">
-                      <Label className="text-[10px] text-muted-foreground shrink-0">Semana</Label>
-                      <Input type="number" value={c.semana} onChange={e => updConteudo(c.id, { semana: +e.target.value })} className="h-7 text-xs w-16" />
-                      <div className="flex-1" />
-                      <Button size="icon" variant="ghost" className="h-7 w-7" asChild><a href={c.url} target="_blank" rel="noreferrer" title="Pré-visualizar"><Eye className="w-3.5 h-3.5" /></a></Button>
-                      <Button size="icon" variant="ghost" className="h-7 w-7" asChild><a href={c.url} download={c.titulo} title="Descarregar"><Download className="w-3.5 h-3.5" /></a></Button>
-                      <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => delConteudo(c.id)}><Trash2 className="w-3.5 h-3.5 text-destructive" /></Button>
-                    </div>
+                    <span className="text-[10px] text-muted-foreground shrink-0 w-16 text-right">{c.size || "—"}</span>
+                    <Button size="icon" variant="ghost" className="h-7 w-7 shrink-0" asChild><a href={c.url} target="_blank" rel="noreferrer" title="Pré-visualizar"><Eye className="w-3.5 h-3.5" /></a></Button>
+                    <Button size="icon" variant="ghost" className="h-7 w-7 shrink-0" asChild><a href={c.url} download={c.titulo} title="Descarregar"><Download className="w-3.5 h-3.5" /></a></Button>
+                    <Button size="icon" variant="ghost" className="h-7 w-7 shrink-0" onClick={() => delConteudo(c.id)}><Trash2 className="w-3.5 h-3.5 text-destructive" /></Button>
                   </div>
-                </Card>
-              ))}
-              {conteudos.length === 0 && <p className="text-sm text-muted-foreground col-span-full text-center py-8">Sem recursos. Carregue ficheiros transversais à cadeira.</p>}
+                ))}
+                {conteudos.length === 0 && <p className="text-sm text-muted-foreground text-center py-8">Sem recursos. Carregue ficheiros transversais à cadeira.</p>}
+              </div>
             </div>
           </Card>
         </TabsContent>
@@ -451,6 +418,56 @@ export default function CadeiraDetail() {
                 ))}
               </TableBody>
             </Table>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="criterio" className="mt-4">
+          <Card className="p-6 space-y-5">
+            <div>
+              <p className="text-sm font-semibold flex items-center gap-2"><Scale className="w-4 h-4 text-primary" /> Critério de Avaliação</p>
+              <p className="text-xs text-muted-foreground mt-1">Defina a ponderação de cada componente e os requisitos de aprovação. O total dos pesos deve somar 100%.</p>
+            </div>
+            <div className="grid md:grid-cols-3 gap-4">
+              <div>
+                <Label className="text-xs">Avaliação Contínua (%)</Label>
+                <Input type="number" min={0} max={100} value={criterio.avaliacaoContinua} onChange={e => setCriterio(c => ({ ...c, avaliacaoContinua: +e.target.value }))} className="mt-1" />
+              </div>
+              <div>
+                <Label className="text-xs">Trabalhos Práticos (%)</Label>
+                <Input type="number" min={0} max={100} value={criterio.trabalhosPraticos} onChange={e => setCriterio(c => ({ ...c, trabalhosPraticos: +e.target.value }))} className="mt-1" />
+              </div>
+              <div>
+                <Label className="text-xs">Exames Finais (%)</Label>
+                <Input type="number" min={0} max={100} value={criterio.examesFinais} onChange={e => setCriterio(c => ({ ...c, examesFinais: +e.target.value }))} className="mt-1" />
+              </div>
+            </div>
+            <div className="flex items-center justify-between rounded-md border bg-muted/30 px-4 py-2">
+              <span className="text-xs text-muted-foreground">Total dos pesos</span>
+              <Badge className={criterio.avaliacaoContinua + criterio.trabalhosPraticos + criterio.examesFinais === 100 ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}>
+                {criterio.avaliacaoContinua + criterio.trabalhosPraticos + criterio.examesFinais}%
+              </Badge>
+            </div>
+            <div className="grid md:grid-cols-3 gap-4 border-t pt-4">
+              <div>
+                <Label className="text-xs">Nota Mínima por Exame (0-20)</Label>
+                <Input type="number" min={0} max={20} value={criterio.notaMinimaExame} onChange={e => setCriterio(c => ({ ...c, notaMinimaExame: +e.target.value }))} className="mt-1" />
+              </div>
+              <div>
+                <Label className="text-xs">Nota de Aprovação (0-20)</Label>
+                <Input type="number" min={0} max={20} value={criterio.notaAprovacao} onChange={e => setCriterio(c => ({ ...c, notaAprovacao: +e.target.value }))} className="mt-1" />
+              </div>
+              <div>
+                <Label className="text-xs">Presença Mínima (%)</Label>
+                <Input type="number" min={0} max={100} value={criterio.presencaMinima} onChange={e => setCriterio(c => ({ ...c, presencaMinima: +e.target.value }))} className="mt-1" />
+              </div>
+            </div>
+            <div>
+              <Label className="text-xs">Observações</Label>
+              <Textarea rows={5} value={criterio.observacoes} onChange={e => setCriterio(c => ({ ...c, observacoes: e.target.value }))} className="mt-1" />
+            </div>
+            <div className="flex justify-end border-t pt-4">
+              <Button onClick={() => toast.success("Critério de avaliação guardado")} className="gap-2"><Save className="w-4 h-4" /> Guardar Critério</Button>
+            </div>
           </Card>
         </TabsContent>
       </Tabs>
