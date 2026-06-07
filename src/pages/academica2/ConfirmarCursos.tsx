@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cursoTemplates } from "@/data/academica2Data";
-import { GraduationCap, CheckCircle2, Check, Pencil, UserCog, Building2, ArrowLeft, Search } from "lucide-react";
+import { GraduationCap, CheckCircle2, Check, UserCog, Building2, ArrowLeft, Search } from "lucide-react";
 import { toast } from "sonner";
 
 const coordenadoresPool = [
@@ -84,11 +84,11 @@ export default function ConfirmarCursos() {
             <Card key={c.id} className={`p-4 transition ${s.confirmed ? "border-emerald-300 bg-emerald-50/40" : ""}`}>
               <div className="flex items-start justify-between gap-2 mb-3">
                 <div className="min-w-0 flex-1">
-                  {s.editing ? (
-                    <Input value={s.name} onChange={e => update(c.id, { name: e.target.value })} className="h-8 text-sm font-semibold mb-1" />
-                  ) : (
-                    <p className="text-sm font-semibold truncate">{s.name}</p>
-                  )}
+                  <Input
+                    value={s.name}
+                    onChange={e => update(c.id, { name: e.target.value })}
+                    className="h-8 text-sm font-semibold mb-1 border-transparent hover:border-input focus:border-input px-2 -mx-2"
+                  />
                   <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
                     <Building2 className="w-3 h-3" /> {c.faculty}
                   </div>
@@ -101,41 +101,31 @@ export default function ConfirmarCursos() {
 
               <div className="space-y-2">
                 <div>
-                  <Label className="text-[10px] uppercase tracking-wide text-muted-foreground flex items-center gap-1">
+                  <Label className="text-[10px] uppercase tracking-wide text-muted-foreground flex items-center gap-1 mb-1">
                     <UserCog className="w-3 h-3" /> Coordenador
                   </Label>
-                  {s.editing ? (
-                    <Select value={s.coordenador} onValueChange={v => update(c.id, { coordenador: v })}>
-                      <SelectTrigger className="h-8 text-xs mt-1"><SelectValue /></SelectTrigger>
-                      <SelectContent>{coordenadoresPool.map(co => <SelectItem key={co} value={co}>{co}</SelectItem>)}</SelectContent>
-                    </Select>
-                  ) : (
-                    <p className="text-sm font-medium mt-0.5">{s.coordenador}</p>
-                  )}
+                  <Select value={s.coordenador} onValueChange={v => update(c.id, { coordenador: v })}>
+                    <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                    <SelectContent>{coordenadoresPool.map(co => <SelectItem key={co} value={co}>{co}</SelectItem>)}</SelectContent>
+                  </Select>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <div>
                     <Label className="text-[10px] uppercase tracking-wide text-muted-foreground">Anos</Label>
-                    {s.editing ? (
-                      <Input type="number" value={s.years} onChange={e => update(c.id, { years: +e.target.value })} className="h-8 text-xs mt-1" />
-                    ) : <p className="text-sm mt-0.5">{s.years}</p>}
+                    <Input type="number" min={1} max={8} value={s.years}
+                      onChange={e => update(c.id, { years: +e.target.value })} className="h-8 text-xs mt-1" />
                   </div>
                   <div>
-                    <Label className="text-[10px] uppercase tracking-wide text-muted-foreground">Vagas est.</Label>
-                    {s.editing ? (
-                      <Input type="number" value={s.estudantesEsperados} onChange={e => update(c.id, { estudantesEsperados: +e.target.value })} className="h-8 text-xs mt-1" />
-                    ) : <p className="text-sm mt-0.5">~{s.estudantesEsperados}</p>}
+                    <Label className="text-[10px] uppercase tracking-wide text-muted-foreground">Vagas</Label>
+                    <Input type="number" value={s.estudantesEsperados}
+                      onChange={e => update(c.id, { estudantesEsperados: +e.target.value })} className="h-8 text-xs mt-1" />
                   </div>
                 </div>
               </div>
 
               <div className="flex gap-2 mt-3 pt-3 border-t">
-                <Button size="sm" variant="outline" className="flex-1 gap-1 h-8 text-xs"
-                  onClick={() => update(c.id, { editing: !s.editing })}>
-                  <Pencil className="w-3 h-3" /> {s.editing ? "Concluir" : "Editar"}
-                </Button>
                 <Button size="sm" className={`flex-1 gap-1 h-8 text-xs ${s.confirmed ? "bg-emerald-600 hover:bg-emerald-700" : ""}`}
-                  onClick={() => update(c.id, { confirmed: !s.confirmed, editing: false })}>
+                  onClick={() => { update(c.id, { confirmed: !s.confirmed }); toast.success(s.confirmed ? "Confirmação removida" : `${s.name} confirmado`); }}>
                   <Check className="w-3 h-3" /> {s.confirmed ? "Confirmado" : "Confirmar"}
                 </Button>
               </div>
