@@ -103,7 +103,7 @@ export default function Cadeiras() {
             {rows.map(c => (
               <TableRow key={c.id} className="cursor-pointer hover:bg-muted/50" onClick={() => navigate(`/areaacademica/cadeiras/${c.id}`)}>
                 <TableCell className="font-medium">{c.cadeira}</TableCell>
-                <TableCell><Badge variant="secondary" className="font-normal">{acronymMap[c.faculdade] || c.faculdade}</Badge></TableCell>
+                <TableCell><span className="inline-flex items-center rounded px-2 py-0.5 text-[11px] font-semibold tracking-wide text-muted-foreground ring-1 ring-inset ring-border bg-muted/30">{acronymMap[c.faculdade] || c.faculdade}</span></TableCell>
                 <TableCell><Badge variant="outline">{c.curso}</Badge></TableCell>
                 <TableCell>{c.ano}º</TableCell>
                 <TableCell className="text-sm">{c.docente}</TableCell>
