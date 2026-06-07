@@ -5,10 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { alocacaoCandidatos, cursoTemplates, anosLetivos } from "@/data/academica2Data";
+import { cursoTemplates, anosLetivos } from "@/data/academica2Data";
 import {
   Layers, Sparkles, Users, AlertTriangle, CheckCircle2, Clock, Search, ChevronRight,
-  ArrowLeft, GraduationCap, Building2, BookOpen, CalendarRange, UserCheck, Wallet, Download,
+  ArrowLeft, GraduationCap, Building2, BookOpen, CalendarRange, UserCheck, UserPlus, Download,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -29,22 +29,20 @@ interface TurmaItem {
   ocupacao: number;
 }
 
-interface Discente {
+interface Pessoa {
   id: string;
   nome: string;
   email: string;
-  codigo: string;     // course code
+  codigo: string;
   curso: string;
   faculdade: string;
   ano: number;
-  turma: string;      // e.g. ARQ-1A
-  mediaAdmissao: number;
-  propinaPaga: number;
-  propinaTotal: number;
-  estado: "ativo" | "novo";
+  turma: string;          // only for discentes (alocados)
+  media: number;
+  estado: string;         // discente: "Novo"/"Ativo"; candidato: "Alocado"/"Pendente"/"Conflito"
+  sessao?: "1ª" | "2ª" | "3ª"; // candidatos only
 }
 
-// ---- Synthesised "approved + paid" student roster (deterministic) ----
 const NOMES = [
   "Sofia Andrade","Bernardo Sá","Mariana Reis","Tiago Mendes","Inês Pacheco","Rafael Cunha","Beatriz Lopes","Henrique Rocha",
   "Carolina Vaz","Diogo Pinto","Eva Marques","Francisco Neves","Gabriela Sousa","Hugo Tavares","Isabel Faria","João Cardoso",
@@ -52,34 +50,26 @@ const NOMES = [
   "Teresa Coelho","Vasco Henriques","Xénia Matos","Yara Borges","Zacarias Fonte","Adriana Melo","Bruno Carvalho","Clara Vieira",
   "Daniel Antunes","Elsa Quintas","Fábio Nunes","Gisela Roque","Heitor Bastos","Iva Correia","José Pacheco","Kátia Lourenço",
 ];
+const SUFIX = ["Jr.","II","de Almeida","Soares","Lopes","Pinto","Tavares",""];
 
-function makeDiscentes(anoLetivoFactor: number): Discente[] {
-  const list: Discente[] = [];
-  let i = 0;
+function makeDiscentes(factor: number): Pessoa[] {
+  const list: Pessoa[] = []; let i = 0;
   cursoTemplates.forEach(c => {
-    // each course: ~ estudantesEsperados scaled by factor, distributed across years
-    const target = Math.round(c.estudantesEsperados * anoLetivoFactor);
+    const target = Math.round(c.estudantesEsperados * factor);
     const perAno = Math.max(1, Math.floor(target / c.years));
     for (let ano = 1; ano <= c.years; ano++) {
       for (let k = 0; k < perAno; k++) {
         const letra = ["A","B","C","D","E"][k % 5];
-        const nome = NOMES[(i * 7) % NOMES.length] + " " + ["Jr.","II","III","de Almeida","Soares","Lopes","Pinto",""][i % 8];
-        const media = 11 + ((i * 13) % 90) / 10; // 11.0 - 19.9
-        const propinaTotal = 1200;
-        const pago = 600 + ((i * 47) % 7) * 100; // varies but all "paid in" — they're enrolled
+        const nome = (NOMES[(i * 7) % NOMES.length] + " " + SUFIX[i % SUFIX.length]).trim();
+        const media = Math.round((11 + ((i * 13) % 90) / 10) * 10) / 10;
         list.push({
           id: `D${(i + 1).toString().padStart(4, "0")}`,
-          nome: nome.trim(),
-          email: nome.toLowerCase().replace(/[^a-z]+/g, ".").replace(/^\.|\.$/g,"") + "@upra.kor",
-          codigo: c.code,
-          curso: c.name,
-          faculdade: c.faculty,
-          ano,
-          turma: `${c.code}-${ano}${letra}`,
-          mediaAdmissao: Math.round(media * 10) / 10,
-          propinaPaga: Math.min(propinaTotal, pago),
-          propinaTotal,
-          estado: ano === 1 ? "novo" : "ativo",
+          nome,
+          email: nome.toLowerCase().replace(/[^a-z]+/g, ".").replace(/^\.|\.$/g, "") + "@upra.kor",
+          codigo: c.code, curso: c.name, faculdade: c.faculty,
+          ano, turma: `${c.code}-${ano}${letra}`,
+          media,
+          estado: ano === 1 ? "Novo" : "Ativo",
         });
         i++;
       }
@@ -88,29 +78,64 @@ function makeDiscentes(anoLetivoFactor: number): Discente[] {
   return list;
 }
 
+function makeCandidatos(factor: number): Pessoa[] {
+  const list: Pessoa[] = []; let i = 100;
+  const estados = ["Alocado","Alocado","Alocado","Pendente","Pendente","Conflito"];
+  const sessoes: ("1ª"|"2ª"|"3ª")[] = ["1ª","1ª","2ª","2ª","3ª"];
+  cursoTemplates.forEach(c => {
+    // candidatos = ~25% of cohort, all aim 1º ano
+    const target = Math.max(4, Math.round(c.estudantesEsperados * factor * 0.25));
+    for (let k = 0; k < target; k++) {
+      const letra = ["A","B","C"][k % 3];
+      const nome = (NOMES[(i * 11) % NOMES.length] + " " + SUFIX[(i + 3) % SUFIX.length]).trim();
+      const media = Math.round((10 + ((i * 17) % 100) / 10) * 10) / 10;
+      const estado = estados[i % estados.length];
+      list.push({
+        id: `C${(i + 1).toString().padStart(4, "0")}`,
+        nome,
+        email: nome.toLowerCase().replace(/[^a-z]+/g, ".").replace(/^\.|\.$/g, "") + "@candidato.kor",
+        codigo: c.code, curso: c.name, faculdade: c.faculty,
+        ano: 1, turma: estado === "Alocado" ? `${c.code}-1${letra}` : "—",
+        media,
+        estado,
+        sessao: sessoes[i % sessoes.length],
+      });
+      i++;
+    }
+  });
+  return list;
+}
+
+const estadoBadge = (e: string) => {
+  switch (e) {
+    case "Alocado": return "bg-emerald-100 text-emerald-700";
+    case "Pendente": return "bg-amber-100 text-amber-700";
+    case "Conflito": return "bg-red-100 text-red-700";
+    case "Novo": return "bg-blue-100 text-blue-700";
+    default: return "bg-emerald-100 text-emerald-700";
+  }
+};
+
 export default function Turmas() {
   const [running, setRunning] = useState(false);
   const [search, setSearch] = useState("");
   const [view, setView] = useState<"faculdades" | "cursos" | "anos">("faculdades");
   const [selectedFac, setSelectedFac] = useState<string | null>(null);
   const [selectedCurso, setSelectedCurso] = useState<string | null>(null);
-  const [mode, setMode] = useState<"estrutura" | "discentes">("estrutura");
+  const [mode, setMode] = useState<"estrutura" | "discentes" | "candidatos">("estrutura");
   const [anoLetivo, setAnoLetivo] = useState(anosLetivos.find(a => a.status === "ativo")?.id || "2024-2025");
 
-  // discente filters
-  const [dFac, setDFac] = useState("all");
-  const [dCurso, setDCurso] = useState("all");
-  const [dAno, setDAno] = useState("all");
-  const [dTurma, setDTurma] = useState("all");
-  const [dSearch, setDSearch] = useState("");
+  // person filters (shared between discentes & candidatos)
+  const [pFac, setPFac] = useState("all");
+  const [pCurso, setPCurso] = useState("all");
+  const [pAno, setPAno] = useState("all");
+  const [pSearch, setPSearch] = useState("");
 
   const yl = anosLetivos.find(a => a.id === anoLetivo)!;
   const factor = yl.status === "planeado" ? 0.4 : yl.status === "arquivado" ? 0.9 : 1;
-  const discentes = useMemo(() => makeDiscentes(factor), [factor]);
 
-  const alocados = alocacaoCandidatos.filter(c => c.estado === "alocado").length;
-  const pendentes = alocacaoCandidatos.filter(c => c.estado === "pendente").length;
-  const conflitos = alocacaoCandidatos.filter(c => c.estado === "conflito").length;
+  const discentes = useMemo(() => makeDiscentes(factor), [factor]);
+  const candidatos = useMemo(() => makeCandidatos(factor), [factor]);
 
   const runAlloc = async () => {
     setRunning(true);
@@ -123,11 +148,8 @@ export default function Turmas() {
     Array.from({ length: c.years }, (_, ano) =>
       ["A", "B", "C"].map(letra => ({
         id: `${c.code}-${ano + 1}${letra}`,
-        curso: c.name,
-        codigo: c.code,
-        faculdade: c.faculty,
-        ano: ano + 1,
-        turma: letra,
+        curso: c.name, codigo: c.code, faculdade: c.faculty,
+        ano: ano + 1, turma: letra,
         capacidade: 32,
         ocupacao: Math.round((20 + ((ano + letra.charCodeAt(0)) % 12)) * factor),
       }))
@@ -170,32 +192,24 @@ export default function Turmas() {
   const facObj = faculties.find(f => f.name === selectedFac);
   const cursoObj = cursoTemplates.find(c => c.code === selectedCurso);
 
-  // ---- Discentes view: filters & derived data ----
-  const filteredDiscentes = useMemo(() => {
-    return discentes.filter(d =>
-      (dFac === "all" || d.faculdade === dFac) &&
-      (dCurso === "all" || d.codigo === dCurso) &&
-      (dAno === "all" || d.ano === Number(dAno)) &&
-      (dTurma === "all" || d.turma === dTurma) &&
-      (dSearch === "" || d.nome.toLowerCase().includes(dSearch.toLowerCase()) || d.id.toLowerCase().includes(dSearch.toLowerCase()) || d.email.toLowerCase().includes(dSearch.toLowerCase()))
-    );
-  }, [discentes, dFac, dCurso, dAno, dTurma, dSearch]);
+  // ---- Pessoas filtering (discentes / candidatos) ----
+  const source = mode === "discentes" ? discentes : candidatos;
+  const filtered = useMemo(() => source.filter(p =>
+    (pFac === "all" || p.faculdade === pFac) &&
+    (pCurso === "all" || p.codigo === pCurso) &&
+    (pAno === "all" || p.ano === Number(pAno)) &&
+    (pSearch === "" || p.nome.toLowerCase().includes(pSearch.toLowerCase()) || p.id.toLowerCase().includes(pSearch.toLowerCase()) || p.email.toLowerCase().includes(pSearch.toLowerCase()))
+  ), [source, pFac, pCurso, pAno, pSearch]);
 
-  const totalPropinasPagas = filteredDiscentes.reduce((s, d) => s + d.propinaPaga, 0);
-  const totalPropinasDevidas = filteredDiscentes.reduce((s, d) => s + (d.propinaTotal - d.propinaPaga), 0);
-
-  const cursosForFilter = dFac === "all" ? cursoTemplates : cursoTemplates.filter(c => c.faculty === dFac);
-  const anosForFilter = dCurso === "all" ? [1,2,3,4,5,6] : Array.from({ length: cursoTemplates.find(c => c.code === dCurso)?.years || 1 }, (_, i) => i + 1);
-  const turmasForFilter = useMemo(() => Array.from(new Set(discentes
-    .filter(d => (dCurso === "all" || d.codigo === dCurso) && (dAno === "all" || d.ano === Number(dAno)))
-    .map(d => d.turma))).sort(), [discentes, dCurso, dAno]);
+  const cursosForFilter = pFac === "all" ? cursoTemplates : cursoTemplates.filter(c => c.faculty === pFac);
+  const anosForFilter = pCurso === "all" ? [1,2,3,4,5,6] : Array.from({ length: cursoTemplates.find(c => c.code === pCurso)?.years || 1 }, (_, i) => i + 1);
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2"><Layers className="w-6 h-6 text-primary" /> Turmas & Alocação</h1>
-          <p className="text-sm text-muted-foreground mt-1">Estrutura de turmas e roster completo dos discentes aprovados e regularizados.</p>
+          <p className="text-sm text-muted-foreground mt-1">Estrutura de turmas, discentes ativos e candidatos por alocar.</p>
         </div>
         <Button className="gap-2" onClick={runAlloc} disabled={running}>
           <Sparkles className="w-4 h-4" /> {running ? "A alocar…" : "Re-alocar Automaticamente"}
@@ -213,11 +227,11 @@ export default function Turmas() {
           </Select>
           <Badge variant="outline">{yl.startDate} → {yl.endDate}</Badge>
           <Badge className="bg-primary/10 text-primary capitalize">{yl.status}</Badge>
-          <span className="text-xs text-muted-foreground ml-auto">{discentes.length} discentes elegíveis (aprovados + regularizados)</span>
+          <span className="text-xs text-muted-foreground ml-auto">{discentes.length} discentes · {candidatos.length} candidatos</span>
         </div>
       </Card>
 
-      {/* Mode toggle */}
+      {/* Mode toggle: 3 tabs */}
       <div className="inline-flex rounded-lg border bg-muted/40 p-1">
         <button
           onClick={() => setMode("estrutura")}
@@ -229,15 +243,20 @@ export default function Turmas() {
           className={`px-4 py-1.5 text-sm rounded-md inline-flex items-center gap-2 transition ${mode === "discentes" ? "bg-background shadow-sm font-medium" : "text-muted-foreground hover:text-foreground"}`}>
           <UserCheck className="w-4 h-4" /> Discentes
         </button>
+        <button
+          onClick={() => setMode("candidatos")}
+          className={`px-4 py-1.5 text-sm rounded-md inline-flex items-center gap-2 transition ${mode === "candidatos" ? "bg-background shadow-sm font-medium" : "text-muted-foreground hover:text-foreground"}`}>
+          <UserPlus className="w-4 h-4" /> Candidatos
+        </button>
       </div>
 
       {mode === "estrutura" && (
         <>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card className="p-4 flex items-center gap-4"><Users className="w-10 h-10 p-2 bg-primary/10 text-primary rounded-lg" /><div><p className="text-2xl font-bold">{alocacaoCandidatos.length}</p><p className="text-xs text-muted-foreground">Candidatos</p></div></Card>
-            <Card className="p-4 flex items-center gap-4"><CheckCircle2 className="w-10 h-10 p-2 bg-emerald-100 text-emerald-600 rounded-lg" /><div><p className="text-2xl font-bold">{alocados}</p><p className="text-xs text-muted-foreground">Alocados</p></div></Card>
-            <Card className="p-4 flex items-center gap-4"><Clock className="w-10 h-10 p-2 bg-amber-100 text-amber-600 rounded-lg" /><div><p className="text-2xl font-bold">{pendentes}</p><p className="text-xs text-muted-foreground">Pendentes</p></div></Card>
-            <Card className="p-4 flex items-center gap-4"><AlertTriangle className="w-10 h-10 p-2 bg-red-100 text-red-600 rounded-lg" /><div><p className="text-2xl font-bold">{conflitos}</p><p className="text-xs text-muted-foreground">Conflitos</p></div></Card>
+            <Card className="p-4 flex items-center gap-4"><Building2 className="w-10 h-10 p-2 bg-primary/10 text-primary rounded-lg" /><div><p className="text-2xl font-bold">{faculties.length}</p><p className="text-xs text-muted-foreground">Faculdades</p></div></Card>
+            <Card className="p-4 flex items-center gap-4"><GraduationCap className="w-10 h-10 p-2 bg-blue-100 text-blue-600 rounded-lg" /><div><p className="text-2xl font-bold">{cursoTemplates.length}</p><p className="text-xs text-muted-foreground">Cursos</p></div></Card>
+            <Card className="p-4 flex items-center gap-4"><Layers className="w-10 h-10 p-2 bg-emerald-100 text-emerald-600 rounded-lg" /><div><p className="text-2xl font-bold">{allTurmas.length}</p><p className="text-xs text-muted-foreground">Turmas</p></div></Card>
+            <Card className="p-4 flex items-center gap-4"><Users className="w-10 h-10 p-2 bg-amber-100 text-amber-600 rounded-lg" /><div><p className="text-2xl font-bold">{allTurmas.reduce((s,t)=>s+t.ocupacao,0)}</p><p className="text-xs text-muted-foreground">Estudantes</p></div></Card>
           </div>
 
           <Card className="p-3 flex items-center gap-2 flex-wrap text-sm">
@@ -342,52 +361,54 @@ export default function Turmas() {
         </>
       )}
 
-      {mode === "discentes" && (
+      {(mode === "discentes" || mode === "candidatos") && (
         <>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card className="p-4 flex items-center gap-4"><UserCheck className="w-10 h-10 p-2 bg-primary/10 text-primary rounded-lg" /><div><p className="text-2xl font-bold">{filteredDiscentes.length}</p><p className="text-xs text-muted-foreground">Discentes</p></div></Card>
-            <Card className="p-4 flex items-center gap-4"><Building2 className="w-10 h-10 p-2 bg-blue-100 text-blue-600 rounded-lg" /><div><p className="text-2xl font-bold">{new Set(filteredDiscentes.map(d => d.codigo)).size}</p><p className="text-xs text-muted-foreground">Cursos</p></div></Card>
-            <Card className="p-4 flex items-center gap-4"><Layers className="w-10 h-10 p-2 bg-emerald-100 text-emerald-600 rounded-lg" /><div><p className="text-2xl font-bold">{new Set(filteredDiscentes.map(d => d.turma)).size}</p><p className="text-xs text-muted-foreground">Turmas</p></div></Card>
-            <Card className="p-4 flex items-center gap-4"><Wallet className="w-10 h-10 p-2 bg-amber-100 text-amber-600 rounded-lg" /><div><p className="text-2xl font-bold">{(totalPropinasPagas/1000).toFixed(1)}k</p><p className="text-xs text-muted-foreground">Propinas pagas (Kz)</p></div></Card>
+            <Card className="p-4 flex items-center gap-4">
+              {mode === "discentes"
+                ? <UserCheck className="w-10 h-10 p-2 bg-primary/10 text-primary rounded-lg" />
+                : <UserPlus className="w-10 h-10 p-2 bg-primary/10 text-primary rounded-lg" />}
+              <div><p className="text-2xl font-bold">{filtered.length}</p><p className="text-xs text-muted-foreground">{mode === "discentes" ? "Discentes" : "Candidatos"}</p></div>
+            </Card>
+            <Card className="p-4 flex items-center gap-4"><Building2 className="w-10 h-10 p-2 bg-blue-100 text-blue-600 rounded-lg" /><div><p className="text-2xl font-bold">{new Set(filtered.map(p => p.faculdade)).size}</p><p className="text-xs text-muted-foreground">Faculdades</p></div></Card>
+            <Card className="p-4 flex items-center gap-4"><GraduationCap className="w-10 h-10 p-2 bg-emerald-100 text-emerald-600 rounded-lg" /><div><p className="text-2xl font-bold">{new Set(filtered.map(p => p.codigo)).size}</p><p className="text-xs text-muted-foreground">Cursos</p></div></Card>
+            <Card className="p-4 flex items-center gap-4">
+              {mode === "discentes"
+                ? <><Layers className="w-10 h-10 p-2 bg-amber-100 text-amber-600 rounded-lg" /><div><p className="text-2xl font-bold">{new Set(filtered.map(p => p.turma)).size}</p><p className="text-xs text-muted-foreground">Turmas</p></div></>
+                : <><Clock className="w-10 h-10 p-2 bg-amber-100 text-amber-600 rounded-lg" /><div><p className="text-2xl font-bold">{filtered.filter(p => p.estado !== "Alocado").length}</p><p className="text-xs text-muted-foreground">Por alocar</p></div></>}
+            </Card>
           </div>
 
           <Card className="p-4 space-y-3">
             <div className="flex items-center gap-2 flex-wrap">
               <div className="relative flex-1 min-w-[220px]">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input className="pl-9" placeholder="Pesquisar por nome, ID ou email…" value={dSearch} onChange={e => setDSearch(e.target.value)} />
+                <Input className="pl-9" placeholder="Pesquisar por nome, ID ou email…" value={pSearch} onChange={e => setPSearch(e.target.value)} />
               </div>
               <Button variant="outline" size="sm" className="gap-2" onClick={() => toast.success("Exportação CSV iniciada.")}>
                 <Download className="w-4 h-4" /> Exportar
               </Button>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-              <Select value={dFac} onValueChange={v => { setDFac(v); setDCurso("all"); setDAno("all"); setDTurma("all"); }}>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+              <Select value={pFac} onValueChange={v => { setPFac(v); setPCurso("all"); setPAno("all"); }}>
                 <SelectTrigger><SelectValue placeholder="Faculdade" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Todas as Faculdades</SelectItem>
                   {Object.keys(acronymMap).map(f => <SelectItem key={f} value={f}>{acronymMap[f]} — {f}</SelectItem>)}
                 </SelectContent>
               </Select>
-              <Select value={dCurso} onValueChange={v => { setDCurso(v); setDAno("all"); setDTurma("all"); }}>
+              <Select value={pCurso} onValueChange={v => { setPCurso(v); setPAno("all"); }}>
                 <SelectTrigger><SelectValue placeholder="Curso" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Todos os Cursos</SelectItem>
                   {cursosForFilter.map(c => <SelectItem key={c.code} value={c.code}>{c.code} — {c.name}</SelectItem>)}
                 </SelectContent>
               </Select>
-              <Select value={dAno} onValueChange={v => { setDAno(v); setDTurma("all"); }}>
+              <Select value={pAno} onValueChange={setPAno} disabled={mode === "candidatos"}>
                 <SelectTrigger><SelectValue placeholder="Ano" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Todos os Anos</SelectItem>
                   {anosForFilter.map(a => <SelectItem key={a} value={String(a)}>{a}º Ano</SelectItem>)}
-                </SelectContent>
-              </Select>
-              <Select value={dTurma} onValueChange={setDTurma}>
-                <SelectTrigger><SelectValue placeholder="Turma" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todas as Turmas</SelectItem>
-                  {turmasForFilter.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
@@ -395,8 +416,8 @@ export default function Turmas() {
 
           <Card>
             <div className="flex items-center justify-between px-4 py-3 border-b bg-muted/30">
-              <p className="text-sm font-semibold">Discentes — {yl.label}</p>
-              <span className="text-xs text-muted-foreground">{filteredDiscentes.length} resultados · Por regularizar: {(totalPropinasDevidas/1000).toFixed(1)}k Kz</span>
+              <p className="text-sm font-semibold">{mode === "discentes" ? "Discentes (Aprovados)" : "Candidatos"} — {yl.label}</p>
+              <span className="text-xs text-muted-foreground">{filtered.length} resultados</span>
             </div>
             <Table>
               <TableHeader>
@@ -406,44 +427,36 @@ export default function Turmas() {
                   <TableHead>Email</TableHead>
                   <TableHead>Faculdade</TableHead>
                   <TableHead>Curso</TableHead>
-                  <TableHead>Ano</TableHead>
+                  {mode === "discentes" ? <TableHead>Ano</TableHead> : <TableHead>Sessão</TableHead>}
                   <TableHead>Turma</TableHead>
                   <TableHead className="text-right">Média</TableHead>
-                  <TableHead>Propina</TableHead>
                   <TableHead>Estado</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredDiscentes.slice(0, 200).map(d => {
-                  const pct = (d.propinaPaga / d.propinaTotal) * 100;
-                  return (
-                    <TableRow key={d.id}>
-                      <TableCell className="font-mono text-xs">{d.id}</TableCell>
-                      <TableCell className="font-medium">{d.nome}</TableCell>
-                      <TableCell className="text-xs text-muted-foreground">{d.email}</TableCell>
-                      <TableCell><Badge variant="outline" className="font-mono text-[10px]">{acronymMap[d.faculdade]}</Badge></TableCell>
-                      <TableCell className="text-xs">{d.curso}</TableCell>
-                      <TableCell>{d.ano}º</TableCell>
-                      <TableCell><Badge variant="outline" className="font-mono text-[10px]">{d.turma}</Badge></TableCell>
-                      <TableCell className="text-right font-medium">{d.mediaAdmissao.toFixed(1)}</TableCell>
-                      <TableCell>
-                        <div className="w-24">
-                          <div className="flex justify-between text-[10px] text-muted-foreground"><span>{Math.round(pct)}%</span></div>
-                          <div className="w-full h-1.5 bg-muted rounded overflow-hidden"><div className={`h-full ${pct === 100 ? "bg-emerald-500" : "bg-amber-500"}`} style={{ width: `${pct}%` }} /></div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge className={d.estado === "novo" ? "bg-blue-100 text-blue-700" : "bg-emerald-100 text-emerald-700"}>
-                          {d.estado === "novo" ? "Novo" : "Ativo"}
-                        </Badge>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
+                {filtered.slice(0, 200).map(p => (
+                  <TableRow key={p.id}>
+                    <TableCell className="font-mono text-xs">{p.id}</TableCell>
+                    <TableCell className="font-medium">{p.nome}</TableCell>
+                    <TableCell className="text-xs text-muted-foreground">{p.email}</TableCell>
+                    <TableCell><Badge variant="outline" className="font-mono text-[10px]">{acronymMap[p.faculdade]}</Badge></TableCell>
+                    <TableCell className="text-xs">{p.curso}</TableCell>
+                    {mode === "discentes"
+                      ? <TableCell>{p.ano}º</TableCell>
+                      : <TableCell><Badge variant="outline" className="text-[10px]">{p.sessao}</Badge></TableCell>}
+                    <TableCell>
+                      {p.turma === "—"
+                        ? <span className="text-xs text-muted-foreground">—</span>
+                        : <Badge variant="outline" className="font-mono text-[10px]">{p.turma}</Badge>}
+                    </TableCell>
+                    <TableCell className="text-right font-medium">{p.media.toFixed(1)}</TableCell>
+                    <TableCell><Badge className={estadoBadge(p.estado)}>{p.estado}</Badge></TableCell>
+                  </TableRow>
+                ))}
               </TableBody>
             </Table>
-            {filteredDiscentes.length > 200 && (
-              <div className="px-4 py-2 text-xs text-muted-foreground border-t bg-muted/20">A mostrar primeiros 200 de {filteredDiscentes.length}. Refine os filtros para ver mais.</div>
+            {filtered.length > 200 && (
+              <div className="px-4 py-2 text-xs text-muted-foreground border-t bg-muted/20">A mostrar primeiros 200 de {filtered.length}. Refine os filtros para ver mais.</div>
             )}
           </Card>
         </>
