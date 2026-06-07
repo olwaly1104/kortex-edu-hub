@@ -27,6 +27,11 @@ export default function Cadeiras() {
   const aulasNoAno = useMemo(() => weeksBetween(yl.startDate, yl.endDate), [yl]);
 
   const facultyByCode = useMemo(() => Object.fromEntries(cursoTemplates.map(c => [c.code, c.faculty])), []);
+  const acronymMap: Record<string, string> = {
+    "Faculdade de Ciências Exatas": "FCE",
+    "Faculdade de Ciências da Saúde": "FCS",
+    "Faculdade de Ciências Sociais": "FCSO",
+  };
 
   const rows = useMemo(() => cadeirasAcad
     .filter(c => (cursoFilter === "all" || c.curso === cursoFilter) && (search === "" || c.cadeira.toLowerCase().includes(search.toLowerCase())))
