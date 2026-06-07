@@ -273,41 +273,17 @@ export default function CadeiraDetail() {
                     {a.attachments.length === 0 ? (
                       <p className="text-xs text-muted-foreground italic pl-2">Sem conteúdos para esta aula.</p>
                     ) : (
-                      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                      <div className="divide-y rounded-md border">
                         {a.attachments.map(at => (
-                          <Card key={at.id} className="overflow-hidden border hover:border-primary/40 transition">
-                            <div className="aspect-[16/9] bg-muted border-b flex items-center justify-center overflow-hidden">
-                              {at.tipo === "Vídeo" ? (
-                                <video src={at.url} className="w-full h-full object-cover" muted />
-                              ) : at.tipo === "Imagem" ? (
-                                <img src={at.url} alt={at.name} className="w-full h-full object-cover" />
-                              ) : at.tipo === "PDF" || at.tipo === "Slides" ? (
-                                <iframe src={at.url} className="w-full h-full pointer-events-none" title={at.name} />
-                              ) : (
-                                <div className="flex flex-col items-center gap-1 text-muted-foreground">
-                                  {typeIcon(at.tipo)}
-                                  <span className="text-[10px] uppercase">{at.tipo}</span>
-                                </div>
-                              )}
-                            </div>
-                            <div className="p-2.5 space-y-2">
-                              <div className="flex items-center gap-2">
-                                {typeIcon(at.tipo)}
-                                <Select value={at.tipo} onValueChange={v => updAttach(at.id, { tipo: v as Attachment["tipo"] })}>
-                                  <SelectTrigger className="h-7 text-[11px] w-24"><SelectValue /></SelectTrigger>
-                                  <SelectContent>{(["PDF", "Slides", "DOCX", "Vídeo", "Imagem", "Link"] as const).map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
-                                </Select>
-                                <span className="text-[10px] text-muted-foreground ml-auto">{at.size || "—"}</span>
-                              </div>
-                              <Input value={at.name} onChange={e => updAttach(at.id, { name: e.target.value })} className="h-8 text-xs" placeholder="Nome do ficheiro" />
-                              <div className="flex items-center gap-1">
-                                <Button size="icon" variant="ghost" className="h-7 w-7" asChild><a href={at.url} target="_blank" rel="noreferrer" title="Abrir"><Eye className="w-3.5 h-3.5" /></a></Button>
-                                <Button size="icon" variant="ghost" className="h-7 w-7" asChild><a href={at.url} download={at.name} title="Descarregar"><Download className="w-3.5 h-3.5" /></a></Button>
-                                <div className="flex-1" />
-                                <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => delAttach(at.id)}><Trash2 className="w-3.5 h-3.5 text-destructive" /></Button>
-                              </div>
-                            </div>
-                          </Card>
+                          <div key={at.id} className="flex items-center gap-2 px-3 py-2 hover:bg-muted/40">
+                            <span className="shrink-0">{typeIcon(at.tipo)}</span>
+                            <Input value={at.name} onChange={e => updAttach(at.id, { name: e.target.value })} className="h-7 text-xs border-none shadow-none px-1 focus-visible:ring-1" placeholder="Nome do ficheiro" />
+                            <Badge variant="outline" className="text-[10px] h-5 shrink-0">{at.tipo}</Badge>
+                            <span className="text-[10px] text-muted-foreground shrink-0 w-16 text-right">{at.size || "—"}</span>
+                            <Button size="icon" variant="ghost" className="h-7 w-7 shrink-0" asChild><a href={at.url} target="_blank" rel="noreferrer" title="Abrir"><Eye className="w-3.5 h-3.5" /></a></Button>
+                            <Button size="icon" variant="ghost" className="h-7 w-7 shrink-0" asChild><a href={at.url} download={at.name} title="Descarregar"><Download className="w-3.5 h-3.5" /></a></Button>
+                            <Button size="icon" variant="ghost" className="h-7 w-7 shrink-0" onClick={() => delAttach(at.id)}><Trash2 className="w-3.5 h-3.5 text-destructive" /></Button>
+                          </div>
                         ))}
                       </div>
                     )}
