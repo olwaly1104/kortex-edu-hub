@@ -26,13 +26,15 @@ export default function Cadeiras() {
   const yl = anosLetivos.find(a => a.id === anoLetivo)!;
   const aulasNoAno = useMemo(() => weeksBetween(yl.startDate, yl.endDate), [yl]);
 
+  const facultyByCode = useMemo(() => Object.fromEntries(cursoTemplates.map(c => [c.code, c.faculty])), []);
+
   const rows = useMemo(() => cadeirasAcad
     .filter(c => (cursoFilter === "all" || c.curso === cursoFilter) && (search === "" || c.cadeira.toLowerCase().includes(search.toLowerCase())))
     .map(c => {
       const content = getCadeiraContent(c.id, c.cadeira);
       const recursos = content.aulas.reduce((s, a) => s + a.attachments.length, 0);
-      return { ...c, conteudos: content.conteudos.length, quizzes: content.quizzes.length, recursos, aulasPlaneadas: aulasNoAno };
-    }), [cursoFilter, search, aulasNoAno]);
+      return { ...c, faculdade: facultyByCode[c.curso] || "—", conteudos: content.conteudos.length, quizzes: content.quizzes.length, recursos, aulasPlaneadas: aulasNoAno };
+    }), [cursoFilter, search, aulasNoAno, facultyByCode]);
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
@@ -79,9 +81,9 @@ export default function Cadeiras() {
           <TableHeader>
             <TableRow>
               <TableHead>Cadeira</TableHead>
+              <TableHead>Faculdade</TableHead>
               <TableHead>Curso</TableHead>
               <TableHead>Ano</TableHead>
-              <TableHead>ECTS</TableHead>
               <TableHead>Docente</TableHead>
               <TableHead className="text-center"><span className="inline-flex items-center gap-1"><PlayCircle className="w-3 h-3" /> Aulas</span></TableHead>
               <TableHead className="text-center"><span className="inline-flex items-center gap-1"><FileText className="w-3 h-3" /> Conteúdos</span></TableHead>
@@ -94,9 +96,9 @@ export default function Cadeiras() {
             {rows.map(c => (
               <TableRow key={c.id} className="cursor-pointer hover:bg-muted/50" onClick={() => navigate(`/areaacademica/cadeiras/${c.id}`)}>
                 <TableCell className="font-medium">{c.cadeira}</TableCell>
+                <TableCell className="text-xs text-muted-foreground">{c.faculdade}</TableCell>
                 <TableCell><Badge variant="outline">{c.curso}</Badge></TableCell>
                 <TableCell>{c.ano}º</TableCell>
-                <TableCell className="font-mono text-xs">{c.ects}</TableCell>
                 <TableCell className="text-sm">{c.docente}</TableCell>
                 <TableCell className="text-center font-mono text-xs">{c.aulasPlaneadas}</TableCell>
                 <TableCell className="text-center font-mono text-xs">{c.conteudos}</TableCell>
