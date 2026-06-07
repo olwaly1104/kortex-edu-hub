@@ -10,6 +10,7 @@ import { BookOpen, Search, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function Cadeiras() {
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [cursoFilter, setCursoFilter] = useState("all");
 
