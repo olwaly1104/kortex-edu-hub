@@ -25,6 +25,7 @@ interface Step {
 }
 
 const steps: Step[] = [
+  { id: "faculdades", label: "Confirmar Faculdades", description: "Validar faculdades, decanos e cursos de cada uma.", icon: Building2 },
   { id: "cursos", label: "Confirmar Cursos", description: "Validar catálogo de cursos e coordenadores.", icon: GraduationCap },
   { id: "cadeiras", label: "Confirmar Cadeiras", description: "Alocar cadeiras, docentes e banco de quizzes por curso.", icon: BookOpen },
   { id: "turmas", label: "Criar Turmas", description: "Alocar candidatos aprovados a turmas do 1º ano.", icon: ClipboardList },
@@ -58,9 +59,10 @@ export default function CourseCreator() {
     Object.fromEntries(steps.map(s => [s.id, "pending"])) as Record<string, StepStatus>
   );
   const [running, setRunning] = useState(false);
-  const [active, setActive] = useState<string>("cursos");
+  const [active, setActive] = useState<string>("faculdades");
   const navigate = useNavigate();
   const stepRoute: Record<string, string> = {
+    faculdades: "/areaacademica/criador/faculdades",
     cursos: "/areaacademica/criador/cursos",
     cadeiras: "/areaacademica/criador/cadeiras",
   };
@@ -130,7 +132,7 @@ export default function CourseCreator() {
 
   const reset = () => {
     setStatuses(Object.fromEntries(steps.map(s => [s.id, "pending"])) as Record<string, StepStatus>);
-    setActive("cursos");
+    setActive("faculdades");
   };
 
   const doneCount = Object.values(statuses).filter(s => s === "done").length;
