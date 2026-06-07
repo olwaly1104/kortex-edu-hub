@@ -33,7 +33,7 @@ export default function Cadeiras() {
     "Faculdade de Ciências Sociais": "FCSO",
   };
 
-  const isFuture = yl.status === "planeado" || yl.status === "futuro";
+  const isFuture = yl.status !== "ativo" && yl.status !== "arquivado";
 
   const rows = useMemo(() => cadeirasAcad
     .filter(c => (cursoFilter === "all" || c.curso === cursoFilter) && (search === "" || c.cadeira.toLowerCase().includes(search.toLowerCase())))
