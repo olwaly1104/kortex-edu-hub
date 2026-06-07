@@ -157,6 +157,33 @@ export default function CourseCreator() {
         </div>
       </div>
 
+      {/* Top progress bar */}
+      <Card className="p-4">
+        <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
+          <div className="flex items-center gap-2 text-sm">
+            <span className="font-semibold">Progresso do Ano Letivo</span>
+            <Badge variant="outline" className="text-xs">{anoLabel}</Badge>
+          </div>
+          <span className="text-xs text-muted-foreground">{doneCount} de {steps.length} passos concluídos</span>
+        </div>
+        <Progress value={progress} className="h-2" />
+        <div className="grid grid-cols-3 sm:grid-cols-6 gap-1 mt-3">
+          {steps.map((s, i) => {
+            const st = statuses[s.id];
+            return (
+              <div key={s.id} className="flex items-center gap-1.5 text-[10px] truncate">
+                <span className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 text-[9px] font-bold ${
+                  st === "done" ? "bg-emerald-500 text-white" :
+                  st === "running" ? "bg-primary text-primary-foreground" :
+                  "bg-muted text-muted-foreground"
+                }`}>{st === "done" ? "✓" : i + 1}</span>
+                <span className="truncate text-muted-foreground">{s.label}</span>
+              </div>
+            );
+          })}
+        </div>
+      </Card>
+
       <div className="grid lg:grid-cols-[320px_1fr] gap-6">
         {/* LEFT: Parameters */}
         <Card className="p-5 space-y-4 h-fit">
@@ -187,12 +214,8 @@ export default function CourseCreator() {
               <div className="space-y-1"><Label className="text-[10px]">Fim</Label><Input value={sem2End} onChange={e => setSem2End(e.target.value)} className="h-8 text-xs" /></div>
             </div>
           </div>
-
-          <div className="pt-3 border-t">
-            <div className="flex justify-between text-xs mb-2"><span className="text-muted-foreground">Progresso</span><span className="font-semibold">{doneCount}/{steps.length}</span></div>
-            <Progress value={progress} className="h-2" />
-          </div>
         </Card>
+
 
         {/* RIGHT: Steps + Detail */}
         <div className="space-y-4">
