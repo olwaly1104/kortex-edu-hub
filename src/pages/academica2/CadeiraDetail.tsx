@@ -214,45 +214,80 @@ export default function CadeiraDetail() {
         <TabsContent value="conteudos" className="mt-4">
           <Card>
             <div className="flex items-center justify-between p-4 border-b">
-              <p className="text-sm font-semibold">Recursos & Conteúdos</p>
-              <Button size="sm" onClick={addConteudo} className="gap-1"><Plus className="w-4 h-4" /> Adicionar</Button>
+              <p className="text-sm font-semibold">Recursos & Conteúdos ({conteudos.length})</p>
+              <div className="flex gap-2">
+                <input
+                  id="conteudo-upload"
+                  type="file"
+                  multiple
+                  className="hidden"
+                  onChange={e => {
+                    const files = Array.from(e.target.files || []);
+                    if (!files.length) return;
+                    const novos: Conteudo[] = files.map(f => {
+                      const ext = f.name.split(".").pop()?.toLowerCase() || "";
+                      const tipo: Conteudo["tipo"] =
+                        ["mp4", "mov", "webm"].includes(ext) ? "Vídeo" :
+                        ["png", "jpg", "jpeg", "gif", "webp"].includes(ext) ? "Imagem" :
+                        ["ppt", "pptx"].includes(ext) ? "Slides" :
+                        ["doc", "docx"].includes(ext) ? "DOCX" : "PDF";
+                      return { id: uid("c"), tipo, titulo: f.name.replace(/\.[^/.]+$/, ""), semana: 1, size: `${(f.size / 1024).toFixed(0)} KB`, url: URL.createObjectURL(f) };
+                    });
+                    const next = [...conteudos, ...novos];
+                    setConteudos(next); persist({ conteudos: next });
+                    toast.success(`${files.length} ficheiro(s) carregado(s)`);
+                    e.target.value = "";
+                  }}
+                />
+                <Button size="sm" variant="outline" className="gap-1" onClick={() => document.getElementById("conteudo-upload")?.click()}>
+                  <FileText className="w-4 h-4" /> Carregar Ficheiros
+                </Button>
+                <Button size="sm" onClick={addConteudo} className="gap-1"><Plus className="w-4 h-4" /> Adicionar</Button>
+              </div>
             </div>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-32">Tipo</TableHead>
-                  <TableHead>Título</TableHead>
-                  <TableHead className="w-24">Semana</TableHead>
-                  <TableHead className="w-24">Tamanho</TableHead>
-                  <TableHead className="w-32">Acções</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {conteudos.map(c => (
-                  <TableRow key={c.id}>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+              {conteudos.map(c => (
+                <Card key={c.id} className="overflow-hidden border hover:border-primary/40 transition">
+                  <div className="aspect-[4/3] bg-muted border-b flex items-center justify-center overflow-hidden">
+                    {c.tipo === "Vídeo" ? (
+                      <video src={c.url} className="w-full h-full object-cover" controls={false} muted />
+                    ) : c.tipo === "Imagem" ? (
+                      <img src={c.url} alt={c.titulo} className="w-full h-full object-cover" />
+                    ) : c.tipo === "PDF" || c.tipo === "Slides" ? (
+                      <iframe src={c.url} className="w-full h-full pointer-events-none" title={c.titulo} />
+                    ) : (
+                      <div className="flex flex-col items-center gap-1 text-muted-foreground">
                         {typeIcon(c.tipo)}
-                        <Select value={c.tipo} onValueChange={v => updConteudo(c.id, { tipo: v as Conteudo["tipo"] })}>
-                          <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                          <SelectContent>{(["PDF", "Slides", "DOCX", "Vídeo", "Imagem", "Link"] as const).map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
-                        </Select>
+                        <span className="text-[10px] uppercase">{c.tipo}</span>
                       </div>
-                    </TableCell>
-                    <TableCell><Input value={c.titulo} onChange={e => updConteudo(c.id, { titulo: e.target.value })} className="h-8 text-xs" /></TableCell>
-                    <TableCell><Input type="number" value={c.semana} onChange={e => updConteudo(c.id, { semana: +e.target.value })} className="h-8 text-xs" /></TableCell>
-                    <TableCell className="text-xs text-muted-foreground">{c.size || "—"}</TableCell>
-                    <TableCell className="flex gap-1">
-                      <Button size="icon" variant="ghost" asChild><a href={c.url} target="_blank" rel="noreferrer" title="Pré-visualizar"><Eye className="w-4 h-4" /></a></Button>
-                      <Button size="icon" variant="ghost" asChild><a href={c.url} download title="Descarregar"><Download className="w-4 h-4" /></a></Button>
-                      <Button size="icon" variant="ghost" onClick={() => delConteudo(c.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                    )}
+                  </div>
+                  <div className="p-3 space-y-2">
+                    <div className="flex items-center gap-2">
+                      {typeIcon(c.tipo)}
+                      <Select value={c.tipo} onValueChange={v => updConteudo(c.id, { tipo: v as Conteudo["tipo"] })}>
+                        <SelectTrigger className="h-7 text-[11px] w-24"><SelectValue /></SelectTrigger>
+                        <SelectContent>{(["PDF", "Slides", "DOCX", "Vídeo", "Imagem", "Link"] as const).map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
+                      </Select>
+                      <span className="text-[10px] text-muted-foreground ml-auto">{c.size || "—"}</span>
+                    </div>
+                    <Input value={c.titulo} onChange={e => updConteudo(c.id, { titulo: e.target.value })} className="h-8 text-xs" placeholder="Título" />
+                    <div className="flex items-center gap-2">
+                      <Label className="text-[10px] text-muted-foreground shrink-0">Semana</Label>
+                      <Input type="number" value={c.semana} onChange={e => updConteudo(c.id, { semana: +e.target.value })} className="h-7 text-xs w-16" />
+                      <div className="flex-1" />
+                      <Button size="icon" variant="ghost" className="h-7 w-7" asChild><a href={c.url} target="_blank" rel="noreferrer" title="Pré-visualizar"><Eye className="w-3.5 h-3.5" /></a></Button>
+                      <Button size="icon" variant="ghost" className="h-7 w-7" asChild><a href={c.url} download={c.titulo} title="Descarregar"><Download className="w-3.5 h-3.5" /></a></Button>
+                      <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => delConteudo(c.id)}><Trash2 className="w-3.5 h-3.5 text-destructive" /></Button>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+              {conteudos.length === 0 && <p className="text-sm text-muted-foreground col-span-full text-center py-8">Sem conteúdos. Carregue PDFs, slides, vídeos ou docs.</p>}
+            </div>
           </Card>
         </TabsContent>
+
 
         <TabsContent value="quizzes" className="mt-4">
           <Card>
