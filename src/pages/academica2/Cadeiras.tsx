@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { cadeirasAcad, cursoTemplates, anosLetivos } from "@/data/academica2Data";
 import { getCadeiraContent } from "@/data/cadeiraContentData";
-import { BookOpen, Search, Plus, PlayCircle, FileText, ListChecks, Paperclip, CalendarRange, GraduationCap } from "lucide-react";
+import { BookOpen, Search, Plus, PlayCircle, FileText, CalendarRange, GraduationCap, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const parseDate = (s: string) => { const [d, m, y] = s.split("/").map(Number); return new Date(y, m - 1, d); };
