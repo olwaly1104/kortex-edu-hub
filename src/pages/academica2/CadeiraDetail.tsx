@@ -406,10 +406,10 @@ export default function CadeiraDetail() {
                   <TableHead className="w-28">Data</TableHead>
                   <TableHead className="w-20">Hora</TableHead>
                   <TableHead className="w-20">Duração</TableHead>
+                  <TableHead>Docente</TableHead>
                   <TableHead className="w-24">Sala</TableHead>
                   <TableHead className="w-20">Peso</TableHead>
                   <TableHead className="w-24">Estado</TableHead>
-                  <TableHead className="w-16">Anexos</TableHead>
                   <TableHead className="w-24"></TableHead>
                 </TableRow>
               </TableHeader>
@@ -428,6 +428,7 @@ export default function CadeiraDetail() {
                     <TableCell className="text-xs">{ex.data || "—"}</TableCell>
                     <TableCell className="text-xs">{ex.hora}</TableCell>
                     <TableCell className="text-xs">{ex.duracao} min</TableCell>
+                    <TableCell className="text-xs">{ex.responsavel}</TableCell>
                     <TableCell className="text-xs">{ex.sala || "—"}</TableCell>
                     <TableCell className="text-xs font-medium">{ex.peso}%</TableCell>
                     <TableCell>
@@ -437,7 +438,6 @@ export default function CadeiraDetail() {
                         "bg-zinc-200 text-zinc-700"
                       }>{ex.estado === "publicado" ? "Publicado" : ex.estado === "agendado" ? "Agendado" : "Encerrado"}</Badge>
                     </TableCell>
-                    <TableCell className="text-xs">{ex.attachments.length}</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
                         <Button size="icon" variant="ghost" className="h-8 w-8" disabled={locked} onClick={() => { updExame(ex.id, { estado: ex.estado === "publicado" ? "agendado" : "publicado" }); toast.success(ex.estado === "publicado" ? "Despublicado" : "Publicado"); }} title="Publicar/Despublicar">
@@ -449,7 +449,7 @@ export default function CadeiraDetail() {
                   </TableRow>
                 ))}
                 {exames.length === 0 && (
-                  <TableRow><TableCell colSpan={10} className="text-center text-sm text-muted-foreground py-8">Sem exames. Adicione o primeiro.</TableCell></TableRow>
+                  <TableRow><TableCell colSpan={9} className="text-center text-sm text-muted-foreground py-8">Sem exames. Adicione o primeiro.</TableCell></TableRow>
                 )}
               </TableBody>
             </Table>
