@@ -185,7 +185,7 @@ export default function CadeiraDetail() {
           <Card>
             <div className="flex items-center justify-between p-4 border-b">
               <p className="text-sm font-semibold">Plano de Aulas — {anosLetivos.find(a => a.id === anoLetivo)?.label}</p>
-              <Button size="sm" onClick={addAula} className="gap-1"><Plus className="w-4 h-4" /> Nova Aula</Button>
+              {!locked && <Button size="sm" onClick={addAula} className="gap-1"><Plus className="w-4 h-4" /> Nova Aula</Button>}
             </div>
             <Table>
               <TableHeader>
