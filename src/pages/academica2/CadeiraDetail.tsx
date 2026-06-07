@@ -171,7 +171,8 @@ export default function CadeiraDetail() {
                   <TableHead>Título</TableHead>
                   <TableHead className="w-28">Data</TableHead>
                   <TableHead className="w-20">Min</TableHead>
-                  <TableHead className="w-24">Recursos</TableHead>
+                  <TableHead className="w-24">Conteúdos</TableHead>
+                  <TableHead className="w-32">Quiz</TableHead>
                   <TableHead className="w-24">Estado</TableHead>
                   <TableHead className="w-24"></TableHead>
                 </TableRow>
