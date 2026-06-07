@@ -148,7 +148,8 @@ const seedDefault = (cadeira: string): CadeiraContent => {
     { id: "e3", data: "10/11/2025", titulo: "Entrega Trabalho Prático", tipo: "entrega" },
     { id: "e4", data: "15/01/2026", titulo: "Exame 1ª Época", tipo: "avaliacao" },
   ],
-});
+  };
+};
 
 const store: Record<string, CadeiraContent> = {};
 
