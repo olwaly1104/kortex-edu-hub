@@ -21,12 +21,14 @@ export default function Cadeiras() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [cursoFilter, setCursoFilter] = useState("all");
+  const [faculdadeFilter, setFaculdadeFilter] = useState("all");
   const [anoLetivo, setAnoLetivo] = useState(anosLetivos.find(a => a.status === "ativo")?.id || "2025-2026");
 
   const yl = anosLetivos.find(a => a.id === anoLetivo)!;
   const aulasNoAno = useMemo(() => weeksBetween(yl.startDate, yl.endDate), [yl]);
 
   const facultyByCode = useMemo(() => Object.fromEntries(cursoTemplates.map(c => [c.code, c.faculty])), []);
+  const faculties = useMemo(() => Array.from(new Set(cursoTemplates.map(c => c.faculty))), []);
   const acronymMap: Record<string, string> = {
     "Faculdade de Ciências Exatas": "FCE",
     "Faculdade de Ciências da Saúde": "FCS",
@@ -36,12 +38,23 @@ export default function Cadeiras() {
   const isFuture = yl.status !== "ativo" && yl.status !== "arquivado";
 
   const rows = useMemo(() => cadeirasAcad
-    .filter(c => (cursoFilter === "all" || c.curso === cursoFilter) && (search === "" || c.cadeira.toLowerCase().includes(search.toLowerCase())))
+    .filter(c => {
+      const fac = facultyByCode[c.curso] || "—";
+      return (cursoFilter === "all" || c.curso === cursoFilter)
+        && (faculdadeFilter === "all" || fac === faculdadeFilter)
+        && (search === "" || c.cadeira.toLowerCase().includes(search.toLowerCase()));
+    })
     .map(c => {
       const content = getCadeiraContent(c.id, c.cadeira);
       const exames = content.calendario.filter(e => e.tipo === "avaliacao").length;
       return { ...c, faculdade: facultyByCode[c.curso] || "—", conteudos: content.conteudos.length, exames, aulasPlaneadas: aulasNoAno };
-    }), [cursoFilter, search, aulasNoAno, facultyByCode]);
+    }), [cursoFilter, faculdadeFilter, search, aulasNoAno, facultyByCode]);
+
+  const grouped = useMemo(() => {
+    const g: Record<string, typeof rows> = {};
+    rows.forEach(r => { (g[r.faculdade] ||= []).push(r); });
+    return g;
+  }, [rows]);
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
