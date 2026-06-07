@@ -81,9 +81,9 @@ export default function Cadeiras() {
           <TableHeader>
             <TableRow>
               <TableHead>Cadeira</TableHead>
+              <TableHead>Faculdade</TableHead>
               <TableHead>Curso</TableHead>
               <TableHead>Ano</TableHead>
-              <TableHead>ECTS</TableHead>
               <TableHead>Docente</TableHead>
               <TableHead className="text-center"><span className="inline-flex items-center gap-1"><PlayCircle className="w-3 h-3" /> Aulas</span></TableHead>
               <TableHead className="text-center"><span className="inline-flex items-center gap-1"><FileText className="w-3 h-3" /> Conteúdos</span></TableHead>
