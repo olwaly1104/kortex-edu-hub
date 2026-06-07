@@ -364,7 +364,7 @@ export default function CadeiraDetail() {
                     <span className="text-[10px] text-muted-foreground shrink-0 w-16 text-right">{c.size || "—"}</span>
                     <Button size="icon" variant="ghost" className="h-7 w-7 shrink-0" asChild><a href={c.url} target="_blank" rel="noreferrer" title="Pré-visualizar"><Eye className="w-3.5 h-3.5" /></a></Button>
                     <Button size="icon" variant="ghost" className="h-7 w-7 shrink-0" asChild><a href={c.url} download={c.titulo} title="Descarregar"><Download className="w-3.5 h-3.5" /></a></Button>
-                    <Button size="icon" variant="ghost" className="h-7 w-7 shrink-0" onClick={() => delConteudo(c.id)}><Trash2 className="w-3.5 h-3.5 text-destructive" /></Button>
+                    {!locked && <Button size="icon" variant="ghost" className="h-7 w-7 shrink-0" onClick={() => delConteudo(c.id)}><Trash2 className="w-3.5 h-3.5 text-destructive" /></Button>}
                   </div>
                 ))}
                 {conteudos.length === 0 && <p className="text-sm text-muted-foreground text-center py-8">Sem recursos. Carregue ficheiros transversais à cadeira.</p>}
