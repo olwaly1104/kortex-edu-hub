@@ -145,6 +145,7 @@ import Academica2GerarCadeiras from "./pages/academica2/GerarCadeiras";
 import Academica2AnosLetivos from "./pages/academica2/AnosLetivos";
 import Academica2Cadeiras from "./pages/academica2/Cadeiras";
 import Academica2Turmas from "./pages/academica2/Turmas";
+import Academica2Docentes from "./pages/academica2/Docentes";
 import Academica2CalendarioAcad from "./pages/academica2/CalendarioAcad";
 import Academica2Exames from "./pages/academica2/Exames";
 import Academica2Quizzes from "./pages/academica2/Quizzes";
@@ -346,6 +347,7 @@ function AppRoutes() {
         <Route path="/areaacademica/anos-letivos" element={<Academica2AnosLetivos />} />
         <Route path="/areaacademica/cadeiras" element={<Academica2Cadeiras />} />
         <Route path="/areaacademica/turmas" element={<Academica2Turmas />} />
+        <Route path="/areaacademica/docentes" element={<Academica2Docentes />} />
         <Route path="/areaacademica/calendario-academico" element={<Academica2CalendarioAcad />} />
         <Route path="/areaacademica/exames" element={<Academica2Exames />} />
         <Route path="/areaacademica/quizzes" element={<Academica2Quizzes />} />

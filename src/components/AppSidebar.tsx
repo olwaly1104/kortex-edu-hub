@@ -221,6 +221,7 @@ const academica2Sections: NavSection[] = [
     { label: "Anos Letivos", icon: CalendarDays, path: "/areaacademica/anos-letivos" },
     { label: "Cadeiras", icon: BookOpen, path: "/areaacademica/cadeiras" },
     { label: "Turmas & Alocação", icon: Layers, path: "/areaacademica/turmas" },
+    { label: "Docentes", icon: GraduationCap, path: "/areaacademica/docentes" },
     { label: "Calendário Académico", icon: Calendar, path: "/areaacademica/calendario-academico" },
     { label: "Exames", icon: ClipboardCheck, path: "/areaacademica/exames" },
     { label: "Quizzes", icon: BrainCircuit, path: "/areaacademica/quizzes" },
