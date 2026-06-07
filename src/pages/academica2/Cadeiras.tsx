@@ -33,7 +33,8 @@ export default function Cadeiras() {
     .map(c => {
       const content = getCadeiraContent(c.id, c.cadeira);
       const recursos = content.aulas.reduce((s, a) => s + a.attachments.length, 0);
-      return { ...c, faculdade: facultyByCode[c.curso] || "—", conteudos: content.conteudos.length, quizzes: content.quizzes.length, recursos, aulasPlaneadas: aulasNoAno };
+      const exames = content.calendario.filter(e => e.tipo === "avaliacao").length;
+      return { ...c, faculdade: facultyByCode[c.curso] || "—", conteudos: content.conteudos.length, quizzes: content.quizzes.length, recursos, exames, aulasPlaneadas: aulasNoAno };
     }), [cursoFilter, search, aulasNoAno, facultyByCode]);
 
   return (
