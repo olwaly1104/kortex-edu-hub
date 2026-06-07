@@ -136,7 +136,7 @@ export default function AulaDetail() {
             )
           ) : (
             <div className="h-72 rounded-md border border-dashed flex items-center justify-center text-xs text-muted-foreground text-center px-4">
-              Sem recurso para pré-visualizar. Adicione um PDF, vídeo ou imagem.
+              Sem conteúdo para pré-visualizar. Adicione um PDF, vídeo ou imagem.
             </div>
           )}
         </Card>
