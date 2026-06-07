@@ -62,6 +62,11 @@ export default function CourseCreator() {
   );
   const [running, setRunning] = useState(false);
   const [active, setActive] = useState<string>("cursos");
+  const navigate = useNavigate();
+  const stepRoute: Record<string, string> = {
+    cursos: "/areaacademica/criador/cursos",
+    cadeiras: "/areaacademica/criador/cadeiras",
+  };
 
   // Course confirmation state
   type CursoState = {
