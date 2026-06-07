@@ -5,6 +5,7 @@ import {
   Mail, Award, User, LogOut, GraduationCap,
   BarChart3, ChevronLeft, ChevronRight, Library, Wallet, Trophy, ClipboardList,
   CheckSquare, Building2, UserCog, Eye, Layers, FileText, FolderOpen, TrendingUp, HelpCircle, Settings2, BrainCircuit,
+  Sparkles, Wand2, ClipboardCheck,
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -208,6 +209,35 @@ const gapSections: NavSection[] = [
   ]},
 ];
 
+const academica2Sections: NavSection[] = [
+  { title: "Geral", items: [
+    { label: "Início", icon: LayoutDashboard, path: "/areaacademica" },
+    { label: "Calendário", icon: Calendar, path: "/areaacademica/calendario" },
+    { label: "Anúncios", icon: Megaphone, path: "/areaacademica/anuncios", badge: 4 },
+    { label: "Solicitações", icon: CheckSquare, path: "/areaacademica/solicitacoes" },
+  ]},
+  { title: "Área Académica", items: [
+    { label: "Criador de Curso", icon: Wand2, path: "/areaacademica/criador" },
+    { label: "Anos Letivos", icon: CalendarDays, path: "/areaacademica/anos-letivos" },
+    { label: "Cadeiras", icon: BookOpen, path: "/areaacademica/cadeiras" },
+    { label: "Turmas & Alocação", icon: Layers, path: "/areaacademica/turmas" },
+    { label: "Calendário Académico", icon: Calendar, path: "/areaacademica/calendario-academico" },
+    { label: "Exames", icon: ClipboardCheck, path: "/areaacademica/exames" },
+    { label: "Quizzes", icon: BrainCircuit, path: "/areaacademica/quizzes" },
+    { label: "Notas", icon: Award, path: "/areaacademica/notas" },
+    { label: "Relatórios", icon: BarChart3, path: "/areaacademica/relatorios" },
+  ]},
+  { title: "Comunicação", items: [
+    { label: "Chat", icon: MessageSquare, path: "/areaacademica/chat" },
+    { label: "Email", icon: Mail, path: "/areaacademica/email" },
+    { label: "Contactos", icon: Users, path: "/areaacademica/contactos" },
+  ]},
+  { title: "Pessoal", items: [
+    { label: "Finanças", icon: Wallet, path: "/areaacademica/financas" },
+    { label: "Perfil", icon: User, path: "/areaacademica/perfil" },
+  ]},
+];
+
 const roleSectionsMap: Record<string, NavSection[]> = {
   student: studentSections,
   professor: professorSections,
@@ -217,6 +247,7 @@ const roleSectionsMap: Record<string, NavSection[]> = {
   secretaria: secretariaSections,
   financas: financasSections,
   gap: gapSections,
+  academica2: academica2Sections,
 };
 
 const roleLabelMap: Record<string, string> = {
@@ -228,9 +259,10 @@ const roleLabelMap: Record<string, string> = {
   secretaria: "Secretaria",
   financas: "Finanças",
   gap: "GAP — Apoio ao Estudante",
+  academica2: "Área Académica II",
 };
 
-const roleBasePaths = ["/student", "/professor", "/coordenador", "/decano", "/reitor", "/secretaria", "/financas", "/gap"];
+const roleBasePaths = ["/student", "/professor", "/coordenador", "/decano", "/reitor", "/secretaria", "/financas", "/gap", "/areaacademica"];
 
 export default function AppSidebar() {
   const { user, logout } = useAuth();
