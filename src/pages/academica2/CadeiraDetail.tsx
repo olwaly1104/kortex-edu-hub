@@ -12,7 +12,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Switch } from "@/components/ui/switch";
 import { cadeirasAcad, anosLetivos, cursoTemplates } from "@/data/academica2Data";
 import { getCadeiraContent, setCadeiraContent, uid, type Aula, type Conteudo, type Quiz, type Evento, type Attachment } from "@/data/cadeiraContentData";
-import { ArrowLeft, BookOpen, PlayCircle, FileText, ListChecks, CalendarDays, UserCog, Plus, Trash2, Save, Pencil, GraduationCap, Eye, Download, FileType, Film, Image as ImageIcon, Link2, Scale } from "lucide-react";
+import { ArrowLeft, BookOpen, PlayCircle, FileText, ListChecks, CalendarDays, UserCog, Plus, Trash2, Save, Pencil, GraduationCap, Eye, Download, FileType, Film, Image as ImageIcon, Link2, Scale, Lock, Unlock } from "lucide-react";
 import { toast } from "sonner";
 
 const docentesPool = [
@@ -60,6 +60,7 @@ export default function CadeiraDetail() {
   const [conteudos, setConteudos] = useState<Conteudo[]>(initial.conteudos);
   const [quizzes, setQuizzes] = useState<Quiz[]>(initial.quizzes);
   const [calendario, setCalendario] = useState<Evento[]>(initial.calendario);
+  const [locked, setLocked] = useState(true);
 
   const persist = (patch: Partial<ReturnType<typeof getCadeiraContent>>) => {
     setCadeiraContent(cadeira.id, { aulas, conteudos, quizzes, calendario, ...patch });
@@ -122,10 +123,20 @@ export default function CadeiraDetail() {
               <UserCog className="w-4 h-4" /> Docente: <span className="font-medium text-foreground">{meta.docente}</span>
             </div>
           </div>
-          <Select value={anoLetivo} onValueChange={setAnoLetivo}>
-            <SelectTrigger className="w-44 h-9"><SelectValue /></SelectTrigger>
-            <SelectContent>{anosLetivos.map(a => <SelectItem key={a.id} value={a.id}>{a.label}</SelectItem>)}</SelectContent>
-          </Select>
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              variant={locked ? "outline" : "default"}
+              onClick={() => { setLocked(l => !l); toast.success(locked ? "Edição desbloqueada" : "Conteúdo bloqueado"); }}
+              className="gap-2 h-9"
+            >
+              {locked ? <><Lock className="w-4 h-4" /> Bloqueado</> : <><Unlock className="w-4 h-4" /> A editar</>}
+            </Button>
+            <Select value={anoLetivo} onValueChange={setAnoLetivo}>
+              <SelectTrigger className="w-44 h-9"><SelectValue /></SelectTrigger>
+              <SelectContent>{anosLetivos.map(a => <SelectItem key={a.id} value={a.id}>{a.label}</SelectItem>)}</SelectContent>
+            </Select>
+          </div>
         </div>
       </div>
 
@@ -151,21 +162,21 @@ export default function CadeiraDetail() {
         <TabsContent value="info" className="mt-4">
           <Card className="p-6 space-y-4">
             <div className="grid md:grid-cols-3 gap-4">
-              <div><Label>Nome</Label><Input value={meta.nome} onChange={e => setMeta(m => ({ ...m, nome: e.target.value }))} className="mt-1" /></div>
-              <div><Label>ECTS</Label><Input type="number" value={meta.ects} onChange={e => setMeta(m => ({ ...m, ects: +e.target.value }))} className="mt-1" /></div>
-              <div><Label>Ano</Label><Input type="number" min={1} max={6} value={meta.ano} onChange={e => setMeta(m => ({ ...m, ano: +e.target.value }))} className="mt-1" /></div>
+              <div><Label>Nome</Label><Input disabled={locked} value={meta.nome} onChange={e => setMeta(m => ({ ...m, nome: e.target.value }))} className="mt-1" /></div>
+              <div><Label>ECTS</Label><Input disabled={locked} type="number" value={meta.ects} onChange={e => setMeta(m => ({ ...m, ects: +e.target.value }))} className="mt-1" /></div>
+              <div><Label>Ano</Label><Input disabled={locked} type="number" min={1} max={6} value={meta.ano} onChange={e => setMeta(m => ({ ...m, ano: +e.target.value }))} className="mt-1" /></div>
               <div className="md:col-span-3">
                 <Label>Docente</Label>
-                <Select value={meta.docente} onValueChange={v => setMeta(m => ({ ...m, docente: v }))}>
+                <Select value={meta.docente} onValueChange={v => setMeta(m => ({ ...m, docente: v }))} disabled={locked}>
                   <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
                   <SelectContent>{docentesPool.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent>
                 </Select>
               </div>
             </div>
-            <div><Label>Descrição / Ementa</Label><Textarea rows={5} value={meta.descricao} onChange={e => setMeta(m => ({ ...m, descricao: e.target.value }))} className="mt-1" /></div>
+            <div><Label>Descrição / Ementa</Label><Textarea disabled={locked} rows={5} value={meta.descricao} onChange={e => setMeta(m => ({ ...m, descricao: e.target.value }))} className="mt-1" /></div>
             <div className="flex items-center justify-between border-t pt-4">
-              <div className="flex items-center gap-2"><Switch checked={meta.publicada} onCheckedChange={v => setMeta(m => ({ ...m, publicada: v }))} /><Label>Publicar no ano letivo {anosLetivos.find(a => a.id === anoLetivo)?.label}</Label></div>
-              <Button onClick={() => toast.success("Cadeira guardada")} className="gap-2"><Save className="w-4 h-4" /> Guardar</Button>
+              <div className="flex items-center gap-2"><Switch disabled={locked} checked={meta.publicada} onCheckedChange={v => setMeta(m => ({ ...m, publicada: v }))} /><Label>Publicar no ano letivo {anosLetivos.find(a => a.id === anoLetivo)?.label}</Label></div>
+              <Button onClick={() => toast.success("Cadeira guardada")} className="gap-2" disabled={locked}><Save className="w-4 h-4" /> Guardar</Button>
             </div>
           </Card>
         </TabsContent>
@@ -174,7 +185,7 @@ export default function CadeiraDetail() {
           <Card>
             <div className="flex items-center justify-between p-4 border-b">
               <p className="text-sm font-semibold">Plano de Aulas — {anosLetivos.find(a => a.id === anoLetivo)?.label}</p>
-              <Button size="sm" onClick={addAula} className="gap-1"><Plus className="w-4 h-4" /> Nova Aula</Button>
+              {!locked && <Button size="sm" onClick={addAula} className="gap-1"><Plus className="w-4 h-4" /> Nova Aula</Button>}
             </div>
             <Table>
               <TableHeader>
@@ -205,7 +216,7 @@ export default function CadeiraDetail() {
                     </TableCell>
                     <TableCell className="flex gap-1">
                       <Button size="icon" variant="ghost" onClick={() => navigate(`/areaacademica/cadeiras/${cadeira.id}/aula/${a.id}`)}><Pencil className="w-4 h-4" /></Button>
-                      <Button size="icon" variant="ghost" onClick={() => delAula(a.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>
+                      {!locked && <Button size="icon" variant="ghost" onClick={() => delAula(a.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -262,12 +273,16 @@ export default function CadeiraDetail() {
                       <div className="flex gap-2">
                         <input id={inputId} type="file" multiple className="hidden"
                           onChange={e => { addAttachs(Array.from(e.target.files || [])); e.target.value = ""; }} />
-                        <Button size="sm" variant="outline" className="h-8 gap-1" onClick={() => document.getElementById(inputId)?.click()}>
-                          <Plus className="w-3.5 h-3.5" /> Ficheiro
-                        </Button>
-                        <Button size="sm" variant="outline" className="h-8 gap-1" onClick={addLink}>
-                          <Link2 className="w-3.5 h-3.5" /> Link
-                        </Button>
+                        {!locked && (
+                          <>
+                            <Button size="sm" variant="outline" className="h-8 gap-1" onClick={() => document.getElementById(inputId)?.click()}>
+                              <Plus className="w-3.5 h-3.5" /> Ficheiro
+                            </Button>
+                            <Button size="sm" variant="outline" className="h-8 gap-1" onClick={addLink}>
+                              <Link2 className="w-3.5 h-3.5" /> Link
+                            </Button>
+                          </>
+                        )}
                       </div>
                     </div>
                     {a.attachments.length === 0 ? (
@@ -277,12 +292,12 @@ export default function CadeiraDetail() {
                         {a.attachments.map(at => (
                           <div key={at.id} className="flex items-center gap-2 px-3 py-2 hover:bg-muted/40">
                             <span className="shrink-0">{typeIcon(at.tipo)}</span>
-                            <Input value={at.name} onChange={e => updAttach(at.id, { name: e.target.value })} className="h-7 text-xs border-none shadow-none px-1 focus-visible:ring-1" placeholder="Nome do ficheiro" />
+                            <Input disabled={locked} value={at.name} onChange={e => updAttach(at.id, { name: e.target.value })} className="h-7 text-xs border-none shadow-none px-1 focus-visible:ring-1" placeholder="Nome do ficheiro" />
                             <Badge variant="outline" className="text-[10px] h-5 shrink-0">{at.tipo}</Badge>
                             <span className="text-[10px] text-muted-foreground shrink-0 w-16 text-right">{at.size || "—"}</span>
                             <Button size="icon" variant="ghost" className="h-7 w-7 shrink-0" asChild><a href={at.url} target="_blank" rel="noreferrer" title="Abrir"><Eye className="w-3.5 h-3.5" /></a></Button>
                             <Button size="icon" variant="ghost" className="h-7 w-7 shrink-0" asChild><a href={at.url} download={at.name} title="Descarregar"><Download className="w-3.5 h-3.5" /></a></Button>
-                            <Button size="icon" variant="ghost" className="h-7 w-7 shrink-0" onClick={() => delAttach(at.id)}><Trash2 className="w-3.5 h-3.5 text-destructive" /></Button>
+                            {!locked && <Button size="icon" variant="ghost" className="h-7 w-7 shrink-0" onClick={() => delAttach(at.id)}><Trash2 className="w-3.5 h-3.5 text-destructive" /></Button>}
                           </div>
                         ))}
                       </div>
@@ -325,10 +340,14 @@ export default function CadeiraDetail() {
                     e.target.value = "";
                   }}
                 />
-                <Button size="sm" variant="outline" className="gap-1" onClick={() => document.getElementById("conteudo-upload")?.click()}>
-                  <FileText className="w-4 h-4" /> Carregar Ficheiros
-                </Button>
-                <Button size="sm" onClick={addConteudo} className="gap-1"><Plus className="w-4 h-4" /> Adicionar</Button>
+                {!locked && (
+                  <>
+                    <Button size="sm" variant="outline" className="gap-1" onClick={() => document.getElementById("conteudo-upload")?.click()}>
+                      <FileText className="w-4 h-4" /> Carregar Ficheiros
+                    </Button>
+                    <Button size="sm" onClick={addConteudo} className="gap-1"><Plus className="w-4 h-4" /> Adicionar</Button>
+                  </>
+                )}
               </div>
             </div>
             <div className="p-4">
@@ -336,16 +355,16 @@ export default function CadeiraDetail() {
                 {conteudos.map(c => (
                   <div key={c.id} className="flex items-center gap-2 px-3 py-2 hover:bg-muted/40">
                     <span className="shrink-0">{typeIcon(c.tipo)}</span>
-                    <Input value={c.titulo} onChange={e => updConteudo(c.id, { titulo: e.target.value })} className="h-7 text-xs border-none shadow-none px-1 focus-visible:ring-1" placeholder="Título" />
+                    <Input disabled={locked} value={c.titulo} onChange={e => updConteudo(c.id, { titulo: e.target.value })} className="h-7 text-xs border-none shadow-none px-1 focus-visible:ring-1" placeholder="Título" />
                     <Badge variant="outline" className="text-[10px] h-5 shrink-0">{c.tipo}</Badge>
                     <div className="flex items-center gap-1 shrink-0">
                       <Label className="text-[10px] text-muted-foreground">Sem.</Label>
-                      <Input type="number" value={c.semana} onChange={e => updConteudo(c.id, { semana: +e.target.value })} className="h-6 text-xs w-12 px-1" />
+                      <Input disabled={locked} type="number" value={c.semana} onChange={e => updConteudo(c.id, { semana: +e.target.value })} className="h-6 text-xs w-12 px-1" />
                     </div>
                     <span className="text-[10px] text-muted-foreground shrink-0 w-16 text-right">{c.size || "—"}</span>
                     <Button size="icon" variant="ghost" className="h-7 w-7 shrink-0" asChild><a href={c.url} target="_blank" rel="noreferrer" title="Pré-visualizar"><Eye className="w-3.5 h-3.5" /></a></Button>
                     <Button size="icon" variant="ghost" className="h-7 w-7 shrink-0" asChild><a href={c.url} download={c.titulo} title="Descarregar"><Download className="w-3.5 h-3.5" /></a></Button>
-                    <Button size="icon" variant="ghost" className="h-7 w-7 shrink-0" onClick={() => delConteudo(c.id)}><Trash2 className="w-3.5 h-3.5 text-destructive" /></Button>
+                    {!locked && <Button size="icon" variant="ghost" className="h-7 w-7 shrink-0" onClick={() => delConteudo(c.id)}><Trash2 className="w-3.5 h-3.5 text-destructive" /></Button>}
                   </div>
                 ))}
                 {conteudos.length === 0 && <p className="text-sm text-muted-foreground text-center py-8">Sem recursos. Carregue ficheiros transversais à cadeira.</p>}
@@ -360,7 +379,7 @@ export default function CadeiraDetail() {
           <Card>
             <div className="flex items-center justify-between p-4 border-b">
               <p className="text-sm font-semibold">Quizzes</p>
-              <Button size="sm" onClick={addQuiz} className="gap-1"><Plus className="w-4 h-4" /> Novo Quiz</Button>
+              {!locked && <Button size="sm" onClick={addQuiz} className="gap-1"><Plus className="w-4 h-4" /> Novo Quiz</Button>}
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 p-4">
               {quizzes.map(q => (
@@ -378,10 +397,10 @@ export default function CadeiraDetail() {
                     <Button size="sm" variant="outline" className="flex-1 h-8 text-xs gap-1" onClick={() => navigate(`/areaacademica/cadeiras/${cadeira.id}/quiz/${q.id}`)}>
                       <Pencil className="w-3 h-3" /> Abrir
                     </Button>
-                    <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => { updQuiz(q.id, { publicado: !q.publicado }); toast.success(q.publicado ? "Despublicado" : "Publicado"); }}>
+                    <Button size="icon" variant="ghost" className="h-8 w-8" disabled={locked} onClick={() => { updQuiz(q.id, { publicado: !q.publicado }); toast.success(q.publicado ? "Despublicado" : "Publicado"); }}>
                       <Eye className="w-4 h-4" />
                     </Button>
-                    <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => delQuiz(q.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>
+                    {!locked && <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => delQuiz(q.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>}
                   </div>
                 </Card>
               ))}
@@ -394,17 +413,17 @@ export default function CadeiraDetail() {
           <Card>
             <div className="flex items-center justify-between p-4 border-b">
               <p className="text-sm font-semibold">Calendário da Cadeira</p>
-              <Button size="sm" onClick={addEvento} className="gap-1"><Plus className="w-4 h-4" /> Novo Evento</Button>
+              {!locked && <Button size="sm" onClick={addEvento} className="gap-1"><Plus className="w-4 h-4" /> Novo Evento</Button>}
             </div>
             <Table>
               <TableHeader><TableRow><TableHead className="w-32">Data</TableHead><TableHead>Título</TableHead><TableHead className="w-36">Tipo</TableHead><TableHead className="w-12"></TableHead></TableRow></TableHeader>
               <TableBody>
                 {calendario.map(e => (
                   <TableRow key={e.id}>
-                    <TableCell><Input value={e.data} onChange={ev => updEvento(e.id, { data: ev.target.value })} className="h-8 text-xs" placeholder="dd/mm/aaaa" /></TableCell>
-                    <TableCell><Input value={e.titulo} onChange={ev => updEvento(e.id, { titulo: ev.target.value })} className="h-8 text-xs" /></TableCell>
+                    <TableCell><Input disabled={locked} value={e.data} onChange={ev => updEvento(e.id, { data: ev.target.value })} className="h-8 text-xs" placeholder="dd/mm/aaaa" /></TableCell>
+                    <TableCell><Input disabled={locked} value={e.titulo} onChange={ev => updEvento(e.id, { titulo: ev.target.value })} className="h-8 text-xs" /></TableCell>
                     <TableCell>
-                      <Select value={e.tipo} onValueChange={v => updEvento(e.id, { tipo: v as Evento["tipo"] })}>
+                      <Select value={e.tipo} onValueChange={v => updEvento(e.id, { tipo: v as Evento["tipo"] })} disabled={locked}>
                         <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
                         <SelectContent>
                           <SelectItem value="aula">Aula</SelectItem>
@@ -413,7 +432,7 @@ export default function CadeiraDetail() {
                         </SelectContent>
                       </Select>
                     </TableCell>
-                    <TableCell><Button size="icon" variant="ghost" onClick={() => delEvento(e.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button></TableCell>
+                    <TableCell>{!locked && <Button size="icon" variant="ghost" onClick={() => delEvento(e.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -430,15 +449,15 @@ export default function CadeiraDetail() {
             <div className="grid md:grid-cols-3 gap-4">
               <div>
                 <Label className="text-xs">Avaliação Contínua (%)</Label>
-                <Input type="number" min={0} max={100} value={criterio.avaliacaoContinua} onChange={e => setCriterio(c => ({ ...c, avaliacaoContinua: +e.target.value }))} className="mt-1" />
+                <Input disabled={locked} type="number" min={0} max={100} value={criterio.avaliacaoContinua} onChange={e => setCriterio(c => ({ ...c, avaliacaoContinua: +e.target.value }))} className="mt-1" />
               </div>
               <div>
                 <Label className="text-xs">Trabalhos Práticos (%)</Label>
-                <Input type="number" min={0} max={100} value={criterio.trabalhosPraticos} onChange={e => setCriterio(c => ({ ...c, trabalhosPraticos: +e.target.value }))} className="mt-1" />
+                <Input disabled={locked} type="number" min={0} max={100} value={criterio.trabalhosPraticos} onChange={e => setCriterio(c => ({ ...c, trabalhosPraticos: +e.target.value }))} className="mt-1" />
               </div>
               <div>
                 <Label className="text-xs">Exames Finais (%)</Label>
-                <Input type="number" min={0} max={100} value={criterio.examesFinais} onChange={e => setCriterio(c => ({ ...c, examesFinais: +e.target.value }))} className="mt-1" />
+                <Input disabled={locked} type="number" min={0} max={100} value={criterio.examesFinais} onChange={e => setCriterio(c => ({ ...c, examesFinais: +e.target.value }))} className="mt-1" />
               </div>
             </div>
             <div className="flex items-center justify-between rounded-md border bg-muted/30 px-4 py-2">
@@ -450,23 +469,23 @@ export default function CadeiraDetail() {
             <div className="grid md:grid-cols-3 gap-4 border-t pt-4">
               <div>
                 <Label className="text-xs">Nota Mínima por Exame (0-20)</Label>
-                <Input type="number" min={0} max={20} value={criterio.notaMinimaExame} onChange={e => setCriterio(c => ({ ...c, notaMinimaExame: +e.target.value }))} className="mt-1" />
+                <Input disabled={locked} type="number" min={0} max={20} value={criterio.notaMinimaExame} onChange={e => setCriterio(c => ({ ...c, notaMinimaExame: +e.target.value }))} className="mt-1" />
               </div>
               <div>
                 <Label className="text-xs">Nota de Aprovação (0-20)</Label>
-                <Input type="number" min={0} max={20} value={criterio.notaAprovacao} onChange={e => setCriterio(c => ({ ...c, notaAprovacao: +e.target.value }))} className="mt-1" />
+                <Input disabled={locked} type="number" min={0} max={20} value={criterio.notaAprovacao} onChange={e => setCriterio(c => ({ ...c, notaAprovacao: +e.target.value }))} className="mt-1" />
               </div>
               <div>
                 <Label className="text-xs">Presença Mínima (%)</Label>
-                <Input type="number" min={0} max={100} value={criterio.presencaMinima} onChange={e => setCriterio(c => ({ ...c, presencaMinima: +e.target.value }))} className="mt-1" />
+                <Input disabled={locked} type="number" min={0} max={100} value={criterio.presencaMinima} onChange={e => setCriterio(c => ({ ...c, presencaMinima: +e.target.value }))} className="mt-1" />
               </div>
             </div>
             <div>
               <Label className="text-xs">Observações</Label>
-              <Textarea rows={5} value={criterio.observacoes} onChange={e => setCriterio(c => ({ ...c, observacoes: e.target.value }))} className="mt-1" />
+              <Textarea disabled={locked} rows={5} value={criterio.observacoes} onChange={e => setCriterio(c => ({ ...c, observacoes: e.target.value }))} className="mt-1" />
             </div>
             <div className="flex justify-end border-t pt-4">
-              <Button onClick={() => toast.success("Critério de avaliação guardado")} className="gap-2"><Save className="w-4 h-4" /> Guardar Critério</Button>
+              <Button disabled={locked} onClick={() => toast.success("Critério de avaliação guardado")} className="gap-2"><Save className="w-4 h-4" /> Guardar Critério</Button>
             </div>
           </Card>
         </TabsContent>
