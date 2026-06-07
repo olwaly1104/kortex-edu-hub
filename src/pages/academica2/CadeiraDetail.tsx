@@ -379,7 +379,7 @@ export default function CadeiraDetail() {
           <Card>
             <div className="flex items-center justify-between p-4 border-b">
               <p className="text-sm font-semibold">Quizzes</p>
-              <Button size="sm" onClick={addQuiz} className="gap-1"><Plus className="w-4 h-4" /> Novo Quiz</Button>
+              {!locked && <Button size="sm" onClick={addQuiz} className="gap-1"><Plus className="w-4 h-4" /> Novo Quiz</Button>}
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 p-4">
               {quizzes.map(q => (
