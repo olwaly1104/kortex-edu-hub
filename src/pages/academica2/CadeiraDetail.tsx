@@ -302,88 +302,93 @@ export default function CadeiraDetail() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="conteudos" className="mt-4">
-          <Card>
-            <div className="flex items-center justify-between p-4 border-b">
-              <div>
-                <p className="text-sm font-semibold">Conteúdos organizados por Aula</p>
-                <p className="text-xs text-muted-foreground mt-0.5">Ficheiros (PDF, DOCX, vídeo) e links associados a cada aula.</p>
-              </div>
-              <Badge variant="outline" className="gap-1"><FileText className="w-3 h-3" /> {aulas.reduce((s, a) => s + a.attachments.length, 0)} ficheiros</Badge>
+        <TabsContent value="conteudos" className="mt-4 space-y-4">
+          <Card className="p-4 flex items-center justify-between">
+            <div>
+              <p className="text-sm font-semibold">Conteúdos organizados por Aula</p>
+              <p className="text-xs text-muted-foreground mt-0.5">Ficheiros (PDF, DOCX, vídeo) e links associados a cada aula.</p>
             </div>
-            <div className="divide-y">
-              {aulas.map(a => {
-                const inputId = `aula-up-${a.id}`;
-                const addAttachs = (files: File[]) => {
-                  if (!files.length) return;
-                  const novos: Attachment[] = files.map(f => {
-                    const ext = f.name.split(".").pop()?.toLowerCase() || "";
-                    const tipo: Attachment["tipo"] =
-                      ["mp4", "mov", "webm"].includes(ext) ? "Vídeo" :
-                      ["png", "jpg", "jpeg", "gif", "webp"].includes(ext) ? "Imagem" :
-                      ["ppt", "pptx"].includes(ext) ? "Slides" :
-                      ["doc", "docx"].includes(ext) ? "DOCX" : "PDF";
-                    return { id: uid("at"), name: f.name, tipo, size: `${(f.size / 1024).toFixed(0)} KB`, url: URL.createObjectURL(f) };
-                  });
-                  updAula(a.id, { attachments: [...a.attachments, ...novos] });
-                  toast.success(`${files.length} ficheiro(s) adicionado(s) à ${a.titulo}`);
-                };
-                const addLink = () => {
-                  const url = window.prompt("URL do link:");
-                  if (!url) return;
-                  const name = window.prompt("Título:", url) || url;
-                  updAula(a.id, { attachments: [...a.attachments, { id: uid("at"), name, tipo: "Link", url }] });
-                };
-                const updAttach = (atId: string, p: Partial<Attachment>) =>
-                  updAula(a.id, { attachments: a.attachments.map(x => x.id === atId ? { ...x, ...p } : x) });
-                const delAttach = (atId: string) =>
-                  updAula(a.id, { attachments: a.attachments.filter(x => x.id !== atId) });
+            <Badge variant="outline" className="gap-1"><FileText className="w-3 h-3" /> {aulas.reduce((s, a) => s + a.attachments.length, 0)} ficheiros</Badge>
+          </Card>
 
-                return (
-                  <div key={a.id} className="p-4 space-y-3">
-                    <div className="flex items-center justify-between flex-wrap gap-2">
-                      <div className="flex items-center gap-2 min-w-0">
-                        <Badge variant="outline" className="font-mono text-[10px]">Aula {a.n}</Badge>
-                        <Link to={`/areaacademica/cadeiras/${cadeira.id}/aula/${a.id}`} className="font-medium text-sm hover:text-primary truncate">{a.titulo}</Link>
-                        <span className="text-xs text-muted-foreground">· {a.data || "—"}</span>
-                      </div>
-                      <div className="flex gap-2">
-                        <input id={inputId} type="file" multiple className="hidden"
-                          onChange={e => { addAttachs(Array.from(e.target.files || [])); e.target.value = ""; }} />
-                        {!locked && (
-                          <>
-                            <Button size="sm" variant="outline" className="h-8 gap-1" onClick={() => document.getElementById(inputId)?.click()}>
-                              <Plus className="w-3.5 h-3.5" /> Ficheiro
-                            </Button>
-                            <Button size="sm" variant="outline" className="h-8 gap-1" onClick={addLink}>
-                              <Link2 className="w-3.5 h-3.5" /> Link
-                            </Button>
-                          </>
-                        )}
-                      </div>
+          {aulas.map(a => {
+            const inputId = `aula-up-${a.id}`;
+            const addAttachs = (files: File[]) => {
+              if (!files.length) return;
+              const novos: Attachment[] = files.map(f => {
+                const ext = f.name.split(".").pop()?.toLowerCase() || "";
+                const tipo: Attachment["tipo"] =
+                  ["mp4", "mov", "webm"].includes(ext) ? "Vídeo" :
+                  ["png", "jpg", "jpeg", "gif", "webp"].includes(ext) ? "Imagem" :
+                  ["ppt", "pptx"].includes(ext) ? "Slides" :
+                  ["doc", "docx"].includes(ext) ? "DOCX" : "PDF";
+                return { id: uid("at"), name: f.name, tipo, size: `${(f.size / 1024).toFixed(0)} KB`, url: URL.createObjectURL(f) };
+              });
+              updAula(a.id, { attachments: [...a.attachments, ...novos] });
+              toast.success(`${files.length} ficheiro(s) adicionado(s) à ${a.titulo}`);
+            };
+            const addLink = () => {
+              const url = window.prompt("URL do link:");
+              if (!url) return;
+              const name = window.prompt("Título:", url) || url;
+              updAula(a.id, { attachments: [...a.attachments, { id: uid("at"), name, tipo: "Link", url }] });
+            };
+            const updAttach = (atId: string, p: Partial<Attachment>) =>
+              updAula(a.id, { attachments: a.attachments.map(x => x.id === atId ? { ...x, ...p } : x) });
+            const delAttach = (atId: string) =>
+              updAula(a.id, { attachments: a.attachments.filter(x => x.id !== atId) });
+
+            return (
+              <Card key={a.id} className="overflow-hidden border-l-4 border-l-primary">
+                <div className="flex items-center justify-between flex-wrap gap-2 px-4 py-3 bg-muted/40 border-b">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="flex items-center justify-center w-9 h-9 rounded-md bg-primary text-primary-foreground font-bold text-sm shrink-0">
+                      {a.n}
                     </div>
-                    {a.attachments.length === 0 ? (
-                      <p className="text-xs text-muted-foreground italic pl-2">Sem conteúdos para esta aula.</p>
-                    ) : (
-                      <div className="divide-y rounded-md border">
-                        {a.attachments.map(at => (
-                          <div key={at.id} className="flex items-center gap-2 px-3 py-2 hover:bg-muted/40">
-                            <span className="shrink-0">{typeIcon(at.tipo)}</span>
-                            <Input disabled={locked} value={at.name} onChange={e => updAttach(at.id, { name: e.target.value })} className="h-7 text-xs border-none shadow-none px-1 focus-visible:ring-1" placeholder="Nome do ficheiro" />
-                            <Badge variant="outline" className="text-[10px] h-5 shrink-0">{at.tipo}</Badge>
-                            <span className="text-[10px] text-muted-foreground shrink-0 w-16 text-right">{at.size || "—"}</span>
-                            <Button size="icon" variant="ghost" className="h-7 w-7 shrink-0" asChild><a href={at.url} target="_blank" rel="noreferrer" title="Abrir"><Eye className="w-3.5 h-3.5" /></a></Button>
-                            <Button size="icon" variant="ghost" className="h-7 w-7 shrink-0" asChild><a href={at.url} download={at.name} title="Descarregar"><Download className="w-3.5 h-3.5" /></a></Button>
-                            {!locked && <Button size="icon" variant="ghost" className="h-7 w-7 shrink-0" onClick={() => delAttach(at.id)}><Trash2 className="w-3.5 h-3.5 text-destructive" /></Button>}
-                          </div>
-                        ))}
-                      </div>
+                    <div className="min-w-0">
+                      <Link to={`/areaacademica/cadeiras/${cadeira.id}/aula/${a.id}`} className="font-semibold text-sm hover:text-primary truncate block">
+                        Aula {a.n} · {a.titulo}
+                      </Link>
+                      <p className="text-[11px] text-muted-foreground">{a.data || "Sem data"} · {a.duracao} min · {a.attachments.length} ficheiros</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <input id={inputId} type="file" multiple className="hidden"
+                      onChange={e => { addAttachs(Array.from(e.target.files || [])); e.target.value = ""; }} />
+                    {!locked && (
+                      <>
+                        <Button size="sm" variant="outline" className="h-8 gap-1" onClick={() => document.getElementById(inputId)?.click()}>
+                          <Plus className="w-3.5 h-3.5" /> Ficheiro
+                        </Button>
+                        <Button size="sm" variant="outline" className="h-8 gap-1" onClick={addLink}>
+                          <Link2 className="w-3.5 h-3.5" /> Link
+                        </Button>
+                      </>
                     )}
                   </div>
-                );
-              })}
-            </div>
-          </Card>
+                </div>
+                <div className="p-3">
+                  {a.attachments.length === 0 ? (
+                    <p className="text-xs text-muted-foreground italic px-2 py-4 text-center">Sem conteúdos para esta aula.</p>
+                  ) : (
+                    <div className="divide-y rounded-md border">
+                      {a.attachments.map(at => (
+                        <div key={at.id} className="flex items-center gap-2 px-3 py-2 hover:bg-muted/40">
+                          <span className="shrink-0">{typeIcon(at.tipo)}</span>
+                          <Input disabled={locked} value={at.name} onChange={e => updAttach(at.id, { name: e.target.value })} className="h-7 text-xs border-none shadow-none px-1 focus-visible:ring-1" placeholder="Nome do ficheiro" />
+                          <Badge variant="outline" className="text-[10px] h-5 shrink-0">{at.tipo}</Badge>
+                          <span className="text-[10px] text-muted-foreground shrink-0 w-16 text-right">{at.size || "—"}</span>
+                          <Button size="icon" variant="ghost" className="h-7 w-7 shrink-0" asChild><a href={at.url} target="_blank" rel="noreferrer" title="Abrir"><Eye className="w-3.5 h-3.5" /></a></Button>
+                          <Button size="icon" variant="ghost" className="h-7 w-7 shrink-0" asChild><a href={at.url} download={at.name} title="Descarregar"><Download className="w-3.5 h-3.5" /></a></Button>
+                          {!locked && <Button size="icon" variant="ghost" className="h-7 w-7 shrink-0" onClick={() => delAttach(at.id)}><Trash2 className="w-3.5 h-3.5 text-destructive" /></Button>}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </Card>
+            );
+          })}
         </TabsContent>
 
         <TabsContent value="exames" className="mt-4">
