@@ -420,10 +420,10 @@ export default function CadeiraDetail() {
               <TableBody>
                 {calendario.map(e => (
                   <TableRow key={e.id}>
-                    <TableCell><Input value={e.data} onChange={ev => updEvento(e.id, { data: ev.target.value })} className="h-8 text-xs" placeholder="dd/mm/aaaa" /></TableCell>
-                    <TableCell><Input value={e.titulo} onChange={ev => updEvento(e.id, { titulo: ev.target.value })} className="h-8 text-xs" /></TableCell>
+                    <TableCell><Input disabled={locked} value={e.data} onChange={ev => updEvento(e.id, { data: ev.target.value })} className="h-8 text-xs" placeholder="dd/mm/aaaa" /></TableCell>
+                    <TableCell><Input disabled={locked} value={e.titulo} onChange={ev => updEvento(e.id, { titulo: ev.target.value })} className="h-8 text-xs" /></TableCell>
                     <TableCell>
-                      <Select value={e.tipo} onValueChange={v => updEvento(e.id, { tipo: v as Evento["tipo"] })}>
+                      <Select value={e.tipo} onValueChange={v => updEvento(e.id, { tipo: v as Evento["tipo"] })} disabled={locked}>
                         <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
                         <SelectContent>
                           <SelectItem value="aula">Aula</SelectItem>
@@ -432,7 +432,7 @@ export default function CadeiraDetail() {
                         </SelectContent>
                       </Select>
                     </TableCell>
-                    <TableCell><Button size="icon" variant="ghost" onClick={() => delEvento(e.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button></TableCell>
+                    <TableCell>{!locked && <Button size="icon" variant="ghost" onClick={() => delEvento(e.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
