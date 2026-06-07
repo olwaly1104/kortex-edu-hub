@@ -33,13 +33,14 @@ export default function Cadeiras() {
     "Faculdade de Ciências Sociais": "FCSO",
   };
 
+  const isFuture = yl.status === "planeado" || yl.status === "futuro";
+
   const rows = useMemo(() => cadeirasAcad
     .filter(c => (cursoFilter === "all" || c.curso === cursoFilter) && (search === "" || c.cadeira.toLowerCase().includes(search.toLowerCase())))
     .map(c => {
       const content = getCadeiraContent(c.id, c.cadeira);
-      const recursos = content.aulas.reduce((s, a) => s + a.attachments.length, 0);
       const exames = content.calendario.filter(e => e.tipo === "avaliacao").length;
-      return { ...c, faculdade: facultyByCode[c.curso] || "—", conteudos: content.conteudos.length, quizzes: content.quizzes.length, recursos, exames, aulasPlaneadas: aulasNoAno };
+      return { ...c, faculdade: facultyByCode[c.curso] || "—", conteudos: content.conteudos.length, exames, aulasPlaneadas: aulasNoAno };
     }), [cursoFilter, search, aulasNoAno, facultyByCode]);
 
   return (
