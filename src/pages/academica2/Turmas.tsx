@@ -232,7 +232,7 @@ export default function Turmas() {
         <button
           onClick={() => setMode("estrutura")}
           className={`px-4 py-1.5 text-sm rounded-md inline-flex items-center gap-2 transition ${mode === "estrutura" ? "bg-background shadow-sm font-medium" : "text-muted-foreground hover:text-foreground"}`}>
-          <Building2 className="w-4 h-4" /> Faculdades
+          <Building2 className="w-4 h-4" /> Turmas por Faculdade
         </button>
         <button
           onClick={() => setMode("discentes")}
