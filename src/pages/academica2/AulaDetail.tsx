@@ -156,7 +156,17 @@ export default function AulaDetail() {
         <div className="divide-y">
           {aula.attachments.map(at => (
             <div key={at.id} className="p-3 flex items-center gap-3 hover:bg-muted/40">
-              <div className="w-9 h-9 rounded-md bg-muted flex items-center justify-center shrink-0">{typeIcon(at.tipo)}</div>
+              <div className="w-16 h-16 rounded-md bg-muted flex items-center justify-center shrink-0 overflow-hidden border">
+                {at.tipo === "Imagem" ? (
+                  <img src={at.url} alt={at.name} className="w-full h-full object-cover" />
+                ) : at.tipo === "Vídeo" ? (
+                  <video src={at.url} className="w-full h-full object-cover" muted />
+                ) : (at.tipo === "PDF" || at.tipo === "Slides") ? (
+                  <iframe src={at.url} className="w-full h-full pointer-events-none scale-50 origin-top-left" title={at.name} />
+                ) : (
+                  typeIcon(at.tipo)
+                )}
+              </div>
               <div className="flex-1 min-w-0 grid sm:grid-cols-3 gap-2">
                 <Input value={at.name} onChange={e => updAttachment(at.id, { name: e.target.value })} className="h-8 text-xs sm:col-span-2" />
                 <Select value={at.tipo} onValueChange={v => updAttachment(at.id, { tipo: v as Attachment["tipo"] })}>
