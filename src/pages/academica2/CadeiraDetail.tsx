@@ -80,7 +80,61 @@ export default function CadeiraDetail() {
   const [conteudos, setConteudos] = useState<Conteudo[]>(initial.conteudos);
   const [quizzes, setQuizzes] = useState<Quiz[]>(initial.quizzes);
   const [calendario, setCalendario] = useState<Evento[]>(initial.calendario);
+  const [exames, setExames] = useState<Exame[]>([
+    {
+      id: uid("ex"), titulo: `${cadeira.cadeira} — Exame 1ª Época`, tipo: "1ª Época",
+      data: "15/01/2026", hora: "09:00", duracao: 120, sala: "Anfiteatro 1",
+      peso: 40, notaMinima: 8,
+      conteudos: "Capítulos 1 a 5 — toda a matéria leccionada no 1º semestre, incluindo exercícios das fichas práticas e conteúdos das aulas teóricas.",
+      bibliografia: "Manual da cadeira (Cap. 1–5); Slides das aulas; Fichas de exercícios 1 a 4.",
+      observacoes: "Exame presencial. Material permitido: máquina de calcular não programável e formulário oficial. Duração: 2h.",
+      responsavel: cadeira.docente, estado: "publicado",
+      attachments: [
+        { id: uid("at"), name: "Guia do Exame — 1ª Época.pdf", tipo: "PDF", size: "420 KB", url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" },
+        { id: uid("at"), name: "Formulário Oficial.pdf", tipo: "PDF", size: "180 KB", url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" },
+      ],
+    },
+    {
+      id: uid("ex"), titulo: `${cadeira.cadeira} — Exame 2ª Época`, tipo: "2ª Época",
+      data: "12/02/2026", hora: "09:00", duracao: 120, sala: "Anfiteatro 1",
+      peso: 40, notaMinima: 8,
+      conteudos: "Toda a matéria do semestre (Cap. 1 a 5).",
+      bibliografia: "Manual da cadeira; Slides das aulas.",
+      observacoes: "Para estudantes reprovados ou faltosos à 1ª época.",
+      responsavel: cadeira.docente, estado: "agendado",
+      attachments: [
+        { id: uid("at"), name: "Guia do Exame — 2ª Época.pdf", tipo: "PDF", size: "410 KB", url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" },
+      ],
+    },
+  ]);
   const [locked, setLocked] = useState(true);
+
+  const updExame = (id: string, p: Partial<Exame>) => setExames(xs => xs.map(x => x.id === id ? { ...x, ...p } : x));
+  const delExame = (id: string) => setExames(xs => xs.filter(x => x.id !== id));
+  const addExame = () => setExames(xs => [...xs, {
+    id: uid("ex"), titulo: "Novo Exame", tipo: "1ª Época",
+    data: "", hora: "09:00", duracao: 120, sala: "",
+    peso: 40, notaMinima: 8, conteudos: "", bibliografia: "", observacoes: "",
+    responsavel: meta.docente, estado: "agendado", attachments: [],
+  }]);
+  const addExameAttachs = (id: string, files: File[]) => {
+    const ex = exames.find(x => x.id === id); if (!ex || !files.length) return;
+    const novos: Attachment[] = files.map(f => {
+      const ext = f.name.split(".").pop()?.toLowerCase() || "";
+      const tipo: Attachment["tipo"] =
+        ["mp4", "mov", "webm"].includes(ext) ? "Vídeo" :
+        ["png", "jpg", "jpeg", "gif", "webp"].includes(ext) ? "Imagem" :
+        ["ppt", "pptx"].includes(ext) ? "Slides" :
+        ["doc", "docx"].includes(ext) ? "DOCX" : "PDF";
+      return { id: uid("at"), name: f.name, tipo, size: `${(f.size / 1024).toFixed(0)} KB`, url: URL.createObjectURL(f) };
+    });
+    updExame(id, { attachments: [...ex.attachments, ...novos] });
+    toast.success(`${files.length} ficheiro(s) anexado(s) ao exame`);
+  };
+  const delExameAttach = (exId: string, atId: string) => {
+    const ex = exames.find(x => x.id === exId); if (!ex) return;
+    updExame(exId, { attachments: ex.attachments.filter(a => a.id !== atId) });
+  };
 
   const persist = (patch: Partial<ReturnType<typeof getCadeiraContent>>) => {
     setCadeiraContent(cadeira.id, { aulas, conteudos, quizzes, calendario, ...patch });
