@@ -145,6 +145,7 @@ export default function CadeiraDetail() {
           <TabsTrigger value="recursos"><FileType className="w-4 h-4 mr-1" /> Recursos</TabsTrigger>
           <TabsTrigger value="quizzes"><ListChecks className="w-4 h-4 mr-1" /> Quizzes</TabsTrigger>
           <TabsTrigger value="calendario"><CalendarDays className="w-4 h-4 mr-1" /> Calendário</TabsTrigger>
+          <TabsTrigger value="criterio"><Scale className="w-4 h-4 mr-1" /> Critério</TabsTrigger>
         </TabsList>
 
         <TabsContent value="info" className="mt-4">
