@@ -19,6 +19,7 @@ const yearFactor: Record<string, number> = {
 export default function Notas() {
   const [anoLetivo, setAnoLetivo] = useState(anosLetivos.find(a => a.status === "ativo")?.id || "2024-2025");
   const [cursoFilter, setCursoFilter] = useState("all");
+  const [faculdadeFilter, setFaculdadeFilter] = useState("all");
   const [criterios, setCriterios] = useState({
     aprovacao: 10,    // nota mínima aprovação (escala 0–20)
     excelencia: 16,   // limiar excelente
@@ -29,19 +30,35 @@ export default function Notas() {
   const yl = anosLetivos.find(a => a.id === anoLetivo)!;
   const factor = yearFactor[anoLetivo] ?? 1;
 
+  const facultyByName = useMemo(() => Object.fromEntries(cursoTemplates.map(c => [c.name, c.faculty])), []);
+  const faculties = useMemo(() => Array.from(new Set(cursoTemplates.map(c => c.faculty))), []);
+
   const rows = useMemo(() => notasResumo
-    .filter(n => cursoFilter === "all" || n.curso === cursoFilter)
+    .filter(n => (cursoFilter === "all" || n.curso === cursoFilter)
+      && (faculdadeFilter === "all" || facultyByName[n.curso] === faculdadeFilter))
     .map(n => {
       const media = +(n.mediaGeral * factor).toFixed(1);
       const aprovados = Math.round(n.aprovados * factor);
-      return { ...n, mediaGeral: media, aprovados };
-    }), [cursoFilter, factor]);
+      return { ...n, faculdade: facultyByName[n.curso] || "—", mediaGeral: media, aprovados };
+    }), [cursoFilter, faculdadeFilter, factor, facultyByName]);
+
+  const grouped = useMemo(() => {
+    const g: Record<string, typeof rows> = {};
+    rows.forEach(r => { (g[r.faculdade] ||= []).push(r); });
+    return g;
+  }, [rows]);
 
   const totalAprov = rows.reduce((a, n) => a + n.aprovados, 0);
   const totalEst = rows.reduce((a, n) => a + n.total, 0);
   const mediaGlobal = rows.length ? (rows.reduce((a, n) => a + n.mediaGeral, 0) / rows.length).toFixed(1) : "0";
   const taxa = totalEst ? ((totalAprov / totalEst) * 100).toFixed(0) : "0";
   const emRisco = rows.filter(r => r.mediaGeral < criterios.risco).length;
+
+  const acronymMap: Record<string, string> = {
+    "Faculdade de Ciências Exatas": "FCE",
+    "Faculdade de Ciências da Saúde": "FCS",
+    "Faculdade de Ciências Sociais": "FCSO",
+  };
 
   const stateOf = (m: number) =>
     m >= criterios.excelencia ? { label: "Excelente", cls: "bg-emerald-100 text-emerald-700" } :
@@ -112,52 +129,75 @@ export default function Notas() {
       </div>
 
       <Card className="p-4">
-        <Select value={cursoFilter} onValueChange={setCursoFilter}>
-          <SelectTrigger className="w-60"><SelectValue placeholder="Curso" /></SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todos os Cursos</SelectItem>
-            {cursoTemplates.map(c => <SelectItem key={c.id} value={c.name}>{c.name}</SelectItem>)}
-          </SelectContent>
-        </Select>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <Select value={faculdadeFilter} onValueChange={setFaculdadeFilter}>
+            <SelectTrigger className="w-72"><SelectValue placeholder="Faculdade" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todas as Faculdades</SelectItem>
+              {faculties.map(f => <SelectItem key={f} value={f}>{f}</SelectItem>)}
+            </SelectContent>
+          </Select>
+          <Select value={cursoFilter} onValueChange={setCursoFilter}>
+            <SelectTrigger className="w-60"><SelectValue placeholder="Curso" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos os Cursos</SelectItem>
+              {cursoTemplates.map(c => <SelectItem key={c.id} value={c.name}>{c.name}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </div>
       </Card>
 
-      <Card>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Curso</TableHead>
-              <TableHead>Ano</TableHead>
-              <TableHead>Média Geral</TableHead>
-              <TableHead>Estado</TableHead>
-              <TableHead>Aprovados</TableHead>
-              <TableHead>Total</TableHead>
-              <TableHead className="w-64">Taxa</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {rows.map((n, i) => {
-              const pct = (n.aprovados / n.total) * 100;
-              const st = stateOf(n.mediaGeral);
-              return (
-                <TableRow key={i}>
-                  <TableCell className="font-medium">{n.curso}</TableCell>
-                  <TableCell>{n.ano}º</TableCell>
-                  <TableCell><span className="font-mono font-semibold">{n.mediaGeral.toFixed(1)}</span></TableCell>
-                  <TableCell><Badge className={st.cls}>{st.label}</Badge></TableCell>
-                  <TableCell>{n.aprovados}</TableCell>
-                  <TableCell>{n.total}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Progress value={pct} className="h-2 flex-1" />
-                      <span className="text-xs font-mono w-10">{pct.toFixed(0)}%</span>
-                    </div>
-                  </TableCell>
+      {Object.entries(grouped).map(([fac, items]) => {
+        const facMedia = items.length ? (items.reduce((a, n) => a + n.mediaGeral, 0) / items.length).toFixed(1) : "0";
+        const facAprov = items.reduce((a, n) => a + n.aprovados, 0);
+        const facTotal = items.reduce((a, n) => a + n.total, 0);
+        return (
+          <Card key={fac}>
+            <div className="flex items-center justify-between px-4 py-3 border-b bg-muted/30">
+              <div className="flex items-center gap-2">
+                <span className="inline-flex items-center rounded px-2 py-0.5 text-[11px] font-semibold tracking-wide text-muted-foreground ring-1 ring-inset ring-border bg-background">{acronymMap[fac] || fac}</span>
+                <h2 className="text-sm font-semibold">{fac}</h2>
+              </div>
+              <span className="text-xs text-muted-foreground">Média {facMedia} · {facAprov}/{facTotal} aprovados</span>
+            </div>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Curso</TableHead>
+                  <TableHead>Ano</TableHead>
+                  <TableHead>Média Geral</TableHead>
+                  <TableHead>Estado</TableHead>
+                  <TableHead>Aprovados</TableHead>
+                  <TableHead>Total</TableHead>
+                  <TableHead className="w-64">Taxa</TableHead>
                 </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </Card>
+              </TableHeader>
+              <TableBody>
+                {items.map((n, i) => {
+                  const pct = (n.aprovados / n.total) * 100;
+                  const st = stateOf(n.mediaGeral);
+                  return (
+                    <TableRow key={i}>
+                      <TableCell className="font-medium">{n.curso}</TableCell>
+                      <TableCell>{n.ano}º</TableCell>
+                      <TableCell><span className="font-mono font-semibold">{n.mediaGeral.toFixed(1)}</span></TableCell>
+                      <TableCell><Badge className={st.cls}>{st.label}</Badge></TableCell>
+                      <TableCell>{n.aprovados}</TableCell>
+                      <TableCell>{n.total}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Progress value={pct} className="h-2 flex-1" />
+                          <span className="text-xs font-mono w-10">{pct.toFixed(0)}%</span>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </Card>
+        );
+      })}
     </div>
   );
 }

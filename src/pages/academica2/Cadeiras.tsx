@@ -21,12 +21,14 @@ export default function Cadeiras() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [cursoFilter, setCursoFilter] = useState("all");
+  const [faculdadeFilter, setFaculdadeFilter] = useState("all");
   const [anoLetivo, setAnoLetivo] = useState(anosLetivos.find(a => a.status === "ativo")?.id || "2025-2026");
 
   const yl = anosLetivos.find(a => a.id === anoLetivo)!;
   const aulasNoAno = useMemo(() => weeksBetween(yl.startDate, yl.endDate), [yl]);
 
   const facultyByCode = useMemo(() => Object.fromEntries(cursoTemplates.map(c => [c.code, c.faculty])), []);
+  const faculties = useMemo(() => Array.from(new Set(cursoTemplates.map(c => c.faculty))), []);
   const acronymMap: Record<string, string> = {
     "Faculdade de Ciências Exatas": "FCE",
     "Faculdade de Ciências da Saúde": "FCS",
@@ -36,12 +38,23 @@ export default function Cadeiras() {
   const isFuture = yl.status !== "ativo" && yl.status !== "arquivado";
 
   const rows = useMemo(() => cadeirasAcad
-    .filter(c => (cursoFilter === "all" || c.curso === cursoFilter) && (search === "" || c.cadeira.toLowerCase().includes(search.toLowerCase())))
+    .filter(c => {
+      const fac = facultyByCode[c.curso] || "—";
+      return (cursoFilter === "all" || c.curso === cursoFilter)
+        && (faculdadeFilter === "all" || fac === faculdadeFilter)
+        && (search === "" || c.cadeira.toLowerCase().includes(search.toLowerCase()));
+    })
     .map(c => {
       const content = getCadeiraContent(c.id, c.cadeira);
       const exames = content.calendario.filter(e => e.tipo === "avaliacao").length;
       return { ...c, faculdade: facultyByCode[c.curso] || "—", conteudos: content.conteudos.length, exames, aulasPlaneadas: aulasNoAno };
-    }), [cursoFilter, search, aulasNoAno, facultyByCode]);
+    }), [cursoFilter, faculdadeFilter, search, aulasNoAno, facultyByCode]);
+
+  const grouped = useMemo(() => {
+    const g: Record<string, typeof rows> = {};
+    rows.forEach(r => { (g[r.faculdade] ||= []).push(r); });
+    return g;
+  }, [rows]);
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
@@ -73,6 +86,13 @@ export default function Cadeiras() {
             <SelectTrigger className="w-44"><SelectValue /></SelectTrigger>
             <SelectContent>{anosLetivos.map(a => <SelectItem key={a.id} value={a.id}>{a.label}</SelectItem>)}</SelectContent>
           </Select>
+          <Select value={faculdadeFilter} onValueChange={setFaculdadeFilter}>
+            <SelectTrigger className="w-60"><SelectValue placeholder="Faculdade" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todas as Faculdades</SelectItem>
+              {faculties.map(f => <SelectItem key={f} value={f}>{f}</SelectItem>)}
+            </SelectContent>
+          </Select>
           <Select value={cursoFilter} onValueChange={setCursoFilter}>
             <SelectTrigger className="w-52"><SelectValue placeholder="Curso" /></SelectTrigger>
             <SelectContent>
@@ -83,48 +103,55 @@ export default function Cadeiras() {
         </div>
       </Card>
 
-      <Card>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Cadeira</TableHead>
-              <TableHead>Faculdade</TableHead>
-              <TableHead>Curso</TableHead>
-              <TableHead>Ano</TableHead>
-              <TableHead>Docente</TableHead>
-              <TableHead className="text-center"><span className="inline-flex items-center gap-1"><Users className="w-3 h-3" /> Disc.</span></TableHead>
-              <TableHead className="text-center"><span className="inline-flex items-center gap-1"><PlayCircle className="w-3 h-3" /> Aulas</span></TableHead>
-              <TableHead className="text-center"><span className="inline-flex items-center gap-1"><FileText className="w-3 h-3" /> Conteúdos</span></TableHead>
-              <TableHead className="text-center"><span className="inline-flex items-center gap-1"><GraduationCap className="w-3 h-3" /> Exames</span></TableHead>
-              <TableHead>Estado</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {rows.map(c => (
-              <TableRow key={c.id} className="cursor-pointer hover:bg-muted/50" onClick={() => navigate(`/areaacademica/cadeiras/${c.id}`)}>
-                <TableCell className="font-medium">{c.cadeira}</TableCell>
-                <TableCell><span className="inline-flex items-center rounded px-2 py-0.5 text-[11px] font-semibold tracking-wide text-muted-foreground ring-1 ring-inset ring-border bg-muted/30">{acronymMap[c.faculdade] || c.faculdade}</span></TableCell>
-                <TableCell><Badge variant="outline">{c.curso}</Badge></TableCell>
-                <TableCell>{c.ano}º</TableCell>
-                <TableCell className="text-sm">{isFuture ? <span className="text-muted-foreground/50">—</span> : c.docente}</TableCell>
-                <TableCell className="text-center font-mono text-xs">{isFuture ? <span className="text-muted-foreground/50">—</span> : c.estudantes}</TableCell>
-                <TableCell className="text-center font-mono text-xs">{isFuture ? <span className="text-muted-foreground/50">—</span> : c.aulasPlaneadas}</TableCell>
-                <TableCell className="text-center font-mono text-xs">{isFuture ? <span className="text-muted-foreground/50">—</span> : c.conteudos}</TableCell>
-                <TableCell className="text-center font-mono text-xs">{isFuture ? <span className="text-muted-foreground/50">—</span> : c.exames}</TableCell>
-                <TableCell>
-                  {isFuture ? (
-                    <Badge variant="outline" className="text-muted-foreground">Planeado</Badge>
-                  ) : (
-                    <Badge className={c.publicada ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}>
-                      {c.publicada ? "Publicada" : "Rascunho"}
-                    </Badge>
-                  )}
-                </TableCell>
+      {Object.entries(grouped).map(([fac, items]) => (
+        <Card key={fac}>
+          <div className="flex items-center justify-between px-4 py-3 border-b bg-muted/30">
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center rounded px-2 py-0.5 text-[11px] font-semibold tracking-wide text-muted-foreground ring-1 ring-inset ring-border bg-background">{acronymMap[fac] || fac}</span>
+              <h2 className="text-sm font-semibold">{fac}</h2>
+            </div>
+            <span className="text-xs text-muted-foreground">{items.length} cadeiras</span>
+          </div>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Cadeira</TableHead>
+                <TableHead>Curso</TableHead>
+                <TableHead>Ano</TableHead>
+                <TableHead>Docente</TableHead>
+                <TableHead className="text-center"><span className="inline-flex items-center gap-1"><Users className="w-3 h-3" /> Disc.</span></TableHead>
+                <TableHead className="text-center"><span className="inline-flex items-center gap-1"><PlayCircle className="w-3 h-3" /> Aulas</span></TableHead>
+                <TableHead className="text-center"><span className="inline-flex items-center gap-1"><FileText className="w-3 h-3" /> Conteúdos</span></TableHead>
+                <TableHead className="text-center"><span className="inline-flex items-center gap-1"><GraduationCap className="w-3 h-3" /> Exames</span></TableHead>
+                <TableHead>Estado</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </Card>
+            </TableHeader>
+            <TableBody>
+              {items.map(c => (
+                <TableRow key={c.id} className="cursor-pointer hover:bg-muted/50" onClick={() => navigate(`/areaacademica/cadeiras/${c.id}`)}>
+                  <TableCell className="font-medium">{c.cadeira}</TableCell>
+                  <TableCell><Badge variant="outline">{c.curso}</Badge></TableCell>
+                  <TableCell>{c.ano}º</TableCell>
+                  <TableCell className="text-sm">{isFuture ? <span className="text-muted-foreground/50">—</span> : c.docente}</TableCell>
+                  <TableCell className="text-center font-mono text-xs">{isFuture ? <span className="text-muted-foreground/50">—</span> : c.estudantes}</TableCell>
+                  <TableCell className="text-center font-mono text-xs">{isFuture ? <span className="text-muted-foreground/50">—</span> : c.aulasPlaneadas}</TableCell>
+                  <TableCell className="text-center font-mono text-xs">{isFuture ? <span className="text-muted-foreground/50">—</span> : c.conteudos}</TableCell>
+                  <TableCell className="text-center font-mono text-xs">{isFuture ? <span className="text-muted-foreground/50">—</span> : c.exames}</TableCell>
+                  <TableCell>
+                    {isFuture ? (
+                      <Badge variant="outline" className="text-muted-foreground">Planeado</Badge>
+                    ) : (
+                      <Badge className={c.publicada ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}>
+                        {c.publicada ? "Publicada" : "Rascunho"}
+                      </Badge>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Card>
+      ))}
     </div>
   );
 }
