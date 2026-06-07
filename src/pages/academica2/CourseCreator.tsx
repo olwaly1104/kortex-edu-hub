@@ -1,12 +1,17 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cursoTemplates, cadeirasTemplate, alocacaoCandidatos } from "@/data/academica2Data";
-import { Sparkles, CheckCircle2, Loader2, Wand2, BookOpen, Users, Calendar, Rocket, RefreshCw, GraduationCap, ClipboardList, FileCheck2, CalendarDays, BrainCircuit, Megaphone, ChevronRight } from "lucide-react";
+import {
+  Sparkles, CheckCircle2, Loader2, Wand2, BookOpen, Users, Calendar, Rocket, RefreshCw,
+  GraduationCap, ClipboardList, FileCheck2, CalendarDays, BrainCircuit, Megaphone, ChevronRight,
+  UserCog, Check, Pencil, Building2,
+} from "lucide-react";
 import { toast } from "sonner";
 
 type StepStatus = "pending" | "running" | "done";
@@ -19,14 +24,26 @@ interface Step {
 }
 
 const steps: Step[] = [
-  { id: "cursos", label: "Criar Cursos", description: "Importar catálogo de cursos da universidade.", icon: GraduationCap },
-  { id: "cadeiras", label: "Gerar Cadeiras", description: "Criar cadeiras por curso e ano com ementa base.", icon: BookOpen },
+  { id: "cursos", label: "Confirmar Cursos", description: "Validar catálogo de cursos e coordenadores.", icon: GraduationCap },
+  { id: "cadeiras", label: "Gerar Cadeiras", description: "Alocar cadeiras e docentes por curso.", icon: BookOpen },
   { id: "docentes", label: "Atribuir Docentes", description: "Distribuir docentes pelas cadeiras.", icon: Users },
   { id: "turmas", label: "Criar Turmas", description: "Alocar candidatos aprovados a turmas do 1º ano.", icon: ClipboardList },
   { id: "calendario", label: "Calendário Académico", description: "Semestres, feriados e épocas de exames.", icon: CalendarDays },
   { id: "exames", label: "Agendar Exames", description: "Mapa de exames presenciais (1ª e 2ª época).", icon: FileCheck2 },
   { id: "quizzes", label: "Quizzes", description: "Banco de quizzes por cadeira.", icon: BrainCircuit },
   { id: "publicar", label: "Publicar Ano Letivo", description: "Activar ano e notificar todos os perfis.", icon: Megaphone },
+];
+
+const coordenadoresPool = [
+  "Dr. Fábio Costa", "Dra. Marta Lopes", "Dr. Hugo Faria", "Dra. Sílvia Antunes",
+  "Dr. Tomás Henriques", "Dra. Sara Quintas", "Dr. Rui Pinto", "Dra. Helena Vaz",
+];
+
+const docentesPool = [
+  "Prof. Sofia Martins", "Prof. Carlos Mendes", "Prof. Ana Costa", "Prof. António Silva",
+  "Prof. Pedro Ferreira", "Prof. Hugo Faria", "Prof. Sílvia Antunes", "Prof. Tomás Henriques",
+  "Prof. Luísa Brito", "Prof. João Almeida", "Prof. Inês Carvalho", "Prof. Rui Santos",
+  "Prof. Margarida Sá", "Prof. Bruno Tavares", "Prof. Cláudia Nunes",
 ];
 
 export default function CourseCreator() {
@@ -44,6 +61,57 @@ export default function CourseCreator() {
   );
   const [running, setRunning] = useState(false);
   const [active, setActive] = useState<string>("cursos");
+
+  // Course confirmation state
+  type CursoState = {
+    confirmed: boolean;
+    editing: boolean;
+    name: string;
+    coordenador: string;
+    estudantesEsperados: number;
+    years: number;
+  };
+  const [cursosState, setCursosState] = useState<Record<string, CursoState>>(() =>
+    Object.fromEntries(cursoTemplates.map(c => [c.id, {
+      confirmed: false, editing: false, name: c.name,
+      coordenador: c.coordenador, estudantesEsperados: c.estudantesEsperados, years: c.years,
+    }])) as Record<string, CursoState>
+  );
+  const updateCurso = (id: string, patch: Partial<CursoState>) =>
+    setCursosState(prev => ({ ...prev, [id]: { ...prev[id], ...patch } }));
+  const confirmAllCursos = () => {
+    setCursosState(prev => Object.fromEntries(Object.entries(prev).map(([k, v]) => [k, { ...v, confirmed: true, editing: false }])) as Record<string, CursoState>);
+    setStatuses(prev => ({ ...prev, cursos: "done" }));
+    toast.success("Todos os cursos confirmados");
+  };
+  const confirmedCount = Object.values(cursosState).filter(c => c.confirmed).length;
+
+  // Cadeiras allocation state
+  const [cadeiraCurso, setCadeiraCurso] = useState<string>(Object.keys(cadeirasTemplate)[0]);
+  type CadeiraAlloc = { name: string; docente: string; ects: number };
+  const [cadeirasAlloc, setCadeirasAlloc] = useState<Record<string, CadeiraAlloc[][]>>(() => {
+    const out: Record<string, CadeiraAlloc[][]> = {};
+    Object.entries(cadeirasTemplate).forEach(([cid, anos]) => {
+      out[cid] = anos.map(arr => arr.map((n, i) => ({
+        name: n, docente: docentesPool[(i + cid.length) % docentesPool.length], ects: 6,
+      })));
+    });
+    return out;
+  });
+  const updateCadeira = (cid: string, ano: number, idx: number, patch: Partial<CadeiraAlloc>) => {
+    setCadeirasAlloc(prev => {
+      const copy = { ...prev };
+      copy[cid] = copy[cid].map((row, i) => i !== ano ? row : row.map((c, j) => j === idx ? { ...c, ...patch } : c));
+      return copy;
+    });
+  };
+  const confirmCadeiras = () => {
+    setStatuses(prev => ({ ...prev, cadeiras: "done" }));
+    toast.success("Cadeiras alocadas para todos os cursos");
+  };
+  const totalCadeiras = useMemo(() =>
+    Object.values(cadeirasAlloc).reduce((acc, anos) => acc + anos.reduce((a, r) => a + r.length, 0), 0)
+  , [cadeirasAlloc]);
 
   const runAll = async () => {
     setRunning(true);
@@ -166,39 +234,135 @@ export default function CourseCreator() {
             </div>
 
             {active === "cursos" && (
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {cursoTemplates.map(c => (
-                  <div key={c.id} className="border rounded-lg p-3">
-                    <div className="flex items-center justify-between mb-1"><p className="text-sm font-semibold">{c.name}</p><Badge variant="outline" className="text-[10px]">{c.code}</Badge></div>
-                    <p className="text-[11px] text-muted-foreground">{c.faculty}</p>
-                    <div className="flex gap-3 mt-2 text-[11px] text-muted-foreground">
-                      <span>{c.years} anos</span><span>·</span><span>~{c.estudantesEsperados} est.</span>
-                    </div>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <div className="flex items-center gap-3 text-sm">
+                    <Badge variant="outline" className="gap-1"><GraduationCap className="w-3 h-3" /> {cursoTemplates.length} cursos</Badge>
+                    <Badge className="bg-emerald-100 text-emerald-700 gap-1"><CheckCircle2 className="w-3 h-3" /> {confirmedCount} confirmados</Badge>
                   </div>
-                ))}
+                  <Button size="sm" onClick={confirmAllCursos} className="gap-2"><Check className="w-4 h-4" /> Confirmar Todos</Button>
+                </div>
+
+                <div className="grid sm:grid-cols-2 gap-3">
+                  {cursoTemplates.map(c => {
+                    const s = cursosState[c.id];
+                    return (
+                      <div key={c.id} className={`border rounded-lg p-4 transition ${s.confirmed ? "border-emerald-300 bg-emerald-50/40" : "bg-card"}`}>
+                        <div className="flex items-start justify-between gap-2 mb-3">
+                          <div className="min-w-0">
+                            {s.editing ? (
+                              <Input value={s.name} onChange={e => updateCurso(c.id, { name: e.target.value })} className="h-8 text-sm font-semibold mb-1" />
+                            ) : (
+                              <p className="text-sm font-semibold truncate">{s.name}</p>
+                            )}
+                            <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                              <Building2 className="w-3 h-3" /> {c.faculty}
+                            </div>
+                          </div>
+                          <Badge variant="outline" className="text-[10px] shrink-0">{c.code}</Badge>
+                        </div>
+
+                        <div className="space-y-2">
+                          <div>
+                            <Label className="text-[10px] uppercase tracking-wide text-muted-foreground flex items-center gap-1"><UserCog className="w-3 h-3" /> Coordenador</Label>
+                            {s.editing ? (
+                              <Select value={s.coordenador} onValueChange={v => updateCurso(c.id, { coordenador: v })}>
+                                <SelectTrigger className="h-8 text-xs mt-1"><SelectValue /></SelectTrigger>
+                                <SelectContent>{coordenadoresPool.map(co => <SelectItem key={co} value={co}>{co}</SelectItem>)}</SelectContent>
+                              </Select>
+                            ) : (
+                              <p className="text-sm font-medium mt-0.5">{s.coordenador}</p>
+                            )}
+                          </div>
+                          <div className="grid grid-cols-2 gap-2">
+                            <div>
+                              <Label className="text-[10px] uppercase tracking-wide text-muted-foreground">Anos</Label>
+                              {s.editing ? (
+                                <Input type="number" value={s.years} onChange={e => updateCurso(c.id, { years: +e.target.value })} className="h-8 text-xs mt-1" />
+                              ) : <p className="text-sm mt-0.5">{s.years}</p>}
+                            </div>
+                            <div>
+                              <Label className="text-[10px] uppercase tracking-wide text-muted-foreground">Vagas est.</Label>
+                              {s.editing ? (
+                                <Input type="number" value={s.estudantesEsperados} onChange={e => updateCurso(c.id, { estudantesEsperados: +e.target.value })} className="h-8 text-xs mt-1" />
+                              ) : <p className="text-sm mt-0.5">~{s.estudantesEsperados}</p>}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex gap-2 mt-3 pt-3 border-t">
+                          <Button size="sm" variant="outline" className="flex-1 gap-1 h-8 text-xs"
+                            onClick={() => updateCurso(c.id, { editing: !s.editing })}>
+                            <Pencil className="w-3 h-3" /> {s.editing ? "Concluir" : "Editar"}
+                          </Button>
+                          <Button size="sm" className={`flex-1 gap-1 h-8 text-xs ${s.confirmed ? "bg-emerald-600 hover:bg-emerald-700" : ""}`}
+                            onClick={() => updateCurso(c.id, { confirmed: !s.confirmed, editing: false })}>
+                            <Check className="w-3 h-3" /> {s.confirmed ? "Confirmado" : "Confirmar"}
+                          </Button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             )}
 
             {active === "cadeiras" && (
               <div className="space-y-4">
-                {Object.entries(cadeirasTemplate).map(([cid, anos]) => {
-                  const curso = cursoTemplates.find(c => c.id === cid);
-                  return (
-                    <div key={cid}>
-                      <p className="text-sm font-semibold mb-2">{curso?.name}</p>
-                      <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-2">
-                        {anos.map((cadeiras, ano) => (
-                          <div key={ano} className="border rounded-lg overflow-hidden">
-                            <div className="bg-primary/10 px-2 py-1 border-b"><p className="text-[10px] font-bold text-primary">{ano + 1}º Ano</p></div>
-                            <div className="p-1.5 space-y-1">
-                              {cadeiras.map(c => <div key={c} className="text-[10px] px-1.5 py-1 rounded bg-muted/40 truncate">{c}</div>)}
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <div className="flex items-center gap-3 text-sm">
+                    <Badge variant="outline" className="gap-1"><BookOpen className="w-3 h-3" /> {totalCadeiras} cadeiras</Badge>
+                    <Badge variant="outline">{Object.keys(cadeirasAlloc).length} cursos</Badge>
+                  </div>
+                  <Button size="sm" onClick={confirmCadeiras} className="gap-2"><Check className="w-4 h-4" /> Confirmar Alocação</Button>
+                </div>
+
+                <div className="grid md:grid-cols-[200px_1fr] gap-4">
+                  {/* Course selector */}
+                  <div className="border rounded-lg p-1 h-fit">
+                    {Object.keys(cadeirasAlloc).map(cid => {
+                      const curso = cursoTemplates.find(c => c.id === cid);
+                      const isSel = cadeiraCurso === cid;
+                      const count = cadeirasAlloc[cid].reduce((a, r) => a + r.length, 0);
+                      return (
+                        <button key={cid} onClick={() => setCadeiraCurso(cid)}
+                          className={`w-full text-left px-3 py-2 rounded-md text-sm flex items-center justify-between transition ${
+                            isSel ? "bg-primary text-primary-foreground" : "hover:bg-muted/50"
+                          }`}>
+                          <span className="truncate font-medium">{curso?.name}</span>
+                          <span className={`text-[10px] ${isSel ? "opacity-80" : "text-muted-foreground"}`}>{count}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Allocation per year */}
+                  <div className="space-y-3 min-w-0">
+                    {cadeirasAlloc[cadeiraCurso].map((cadeiras, ano) => (
+                      <div key={ano} className="border rounded-lg overflow-hidden">
+                        <div className="bg-primary/10 px-3 py-2 border-b flex items-center justify-between">
+                          <p className="text-xs font-bold text-primary">{ano + 1}º Ano</p>
+                          <Badge variant="outline" className="text-[10px]">{cadeiras.length} cadeiras</Badge>
+                        </div>
+                        <div className="divide-y">
+                          {cadeiras.map((c, idx) => (
+                            <div key={idx} className="grid grid-cols-[1fr_180px_70px] gap-2 p-2 items-center">
+                              <Input value={c.name} onChange={e => updateCadeira(cadeiraCurso, ano, idx, { name: e.target.value })} className="h-8 text-xs" />
+                              <Select value={c.docente} onValueChange={v => updateCadeira(cadeiraCurso, ano, idx, { docente: v })}>
+                                <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                                <SelectContent>{docentesPool.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent>
+                              </Select>
+                              <Input type="number" value={c.ects} onChange={e => updateCadeira(cadeiraCurso, ano, idx, { ects: +e.target.value })} className="h-8 text-xs" />
                             </div>
-                          </div>
-                        ))}
+                          ))}
+                        </div>
+                        <div className="grid grid-cols-[1fr_180px_70px] gap-2 px-2 pb-1 text-[10px] uppercase tracking-wide text-muted-foreground">
+                          <span>Cadeira</span><span>Docente</span><span>ECTS</span>
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    ))}
+                  </div>
+                </div>
               </div>
             )}
 
