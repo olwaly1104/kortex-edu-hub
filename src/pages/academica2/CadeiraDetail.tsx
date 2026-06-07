@@ -406,10 +406,10 @@ export default function CadeiraDetail() {
                   <TableHead className="w-28">Data</TableHead>
                   <TableHead className="w-20">Hora</TableHead>
                   <TableHead className="w-20">Duração</TableHead>
+                  <TableHead>Docente</TableHead>
                   <TableHead className="w-24">Sala</TableHead>
                   <TableHead className="w-20">Peso</TableHead>
                   <TableHead className="w-24">Estado</TableHead>
-                  <TableHead className="w-16">Anexos</TableHead>
                   <TableHead className="w-24"></TableHead>
                 </TableRow>
               </TableHeader>
