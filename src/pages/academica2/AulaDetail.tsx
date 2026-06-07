@@ -144,7 +144,7 @@ export default function AulaDetail() {
 
       <Card>
         <div className="flex items-center justify-between p-4 border-b">
-          <p className="text-sm font-semibold">Materiais da Aula ({aula.attachments.length})</p>
+          <p className="text-sm font-semibold">Conteúdo da Aula ({aula.attachments.length})</p>
           <div className="flex gap-2">
             <input id={fileInputId} type="file" multiple className="hidden" onChange={handleUpload} />
             <Button size="sm" variant="outline" className="gap-1" onClick={() => document.getElementById(fileInputId)?.click()}>
