@@ -10,7 +10,8 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cadeirasAcad } from "@/data/academica2Data";
 import { getCadeiraContent, setCadeiraContent, uid, type Aula, type Attachment } from "@/data/cadeiraContentData";
-import { ArrowLeft, PlayCircle, Plus, Save, Trash2, Download, Eye, Upload, FileText, FileType, Film, Image as ImageIcon, Link2 } from "lucide-react";
+import { ArrowLeft, PlayCircle, Plus, Save, Trash2, Download, Eye, Upload, FileText, FileType, Film, Image as ImageIcon, Link2, CalendarDays, Clock, ListChecks } from "lucide-react";
+import { Link as RouterLink } from "react-router-dom";
 import { toast } from "sonner";
 
 const typeIcon = (t: Attachment["tipo"]) => {
