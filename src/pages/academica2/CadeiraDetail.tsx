@@ -397,10 +397,10 @@ export default function CadeiraDetail() {
                     <Button size="sm" variant="outline" className="flex-1 h-8 text-xs gap-1" onClick={() => navigate(`/areaacademica/cadeiras/${cadeira.id}/quiz/${q.id}`)}>
                       <Pencil className="w-3 h-3" /> Abrir
                     </Button>
-                    <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => { updQuiz(q.id, { publicado: !q.publicado }); toast.success(q.publicado ? "Despublicado" : "Publicado"); }}>
+                    <Button size="icon" variant="ghost" className="h-8 w-8" disabled={locked} onClick={() => { updQuiz(q.id, { publicado: !q.publicado }); toast.success(q.publicado ? "Despublicado" : "Publicado"); }}>
                       <Eye className="w-4 h-4" />
                     </Button>
-                    <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => delQuiz(q.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>
+                    {!locked && <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => delQuiz(q.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>}
                   </div>
                 </Card>
               ))}
