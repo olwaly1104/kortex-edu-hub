@@ -90,6 +90,7 @@ export default function Cadeiras() {
               <TableHead className="text-center"><span className="inline-flex items-center gap-1"><FileText className="w-3 h-3" /> Conteúdos</span></TableHead>
               <TableHead className="text-center"><span className="inline-flex items-center gap-1"><ListChecks className="w-3 h-3" /> Quizzes</span></TableHead>
               <TableHead className="text-center"><span className="inline-flex items-center gap-1"><Paperclip className="w-3 h-3" /> Recursos</span></TableHead>
+              <TableHead className="text-center"><span className="inline-flex items-center gap-1"><GraduationCap className="w-3 h-3" /> Exames</span></TableHead>
               <TableHead>Estado</TableHead>
             </TableRow>
           </TableHeader>
