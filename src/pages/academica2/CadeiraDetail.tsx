@@ -131,7 +131,8 @@ export default function CadeiraDetail() {
         <TabsList className="flex-wrap h-auto">
           <TabsTrigger value="info"><BookOpen className="w-4 h-4 mr-1" /> Informação</TabsTrigger>
           <TabsTrigger value="aulas"><PlayCircle className="w-4 h-4 mr-1" /> Aulas</TabsTrigger>
-          <TabsTrigger value="conteudos"><FileText className="w-4 h-4 mr-1" /> Conteúdos</TabsTrigger>
+          <TabsTrigger value="conteudos"><FileText className="w-4 h-4 mr-1" /> Conteúdos por Aula</TabsTrigger>
+          <TabsTrigger value="recursos"><FileType className="w-4 h-4 mr-1" /> Recursos</TabsTrigger>
           <TabsTrigger value="quizzes"><ListChecks className="w-4 h-4 mr-1" /> Quizzes</TabsTrigger>
           <TabsTrigger value="calendario"><CalendarDays className="w-4 h-4 mr-1" /> Calendário</TabsTrigger>
         </TabsList>
