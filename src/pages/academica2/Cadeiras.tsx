@@ -26,13 +26,15 @@ export default function Cadeiras() {
   const yl = anosLetivos.find(a => a.id === anoLetivo)!;
   const aulasNoAno = useMemo(() => weeksBetween(yl.startDate, yl.endDate), [yl]);
 
+  const facultyByCode = useMemo(() => Object.fromEntries(cursoTemplates.map(c => [c.code, c.faculty])), []);
+
   const rows = useMemo(() => cadeirasAcad
     .filter(c => (cursoFilter === "all" || c.curso === cursoFilter) && (search === "" || c.cadeira.toLowerCase().includes(search.toLowerCase())))
     .map(c => {
       const content = getCadeiraContent(c.id, c.cadeira);
       const recursos = content.aulas.reduce((s, a) => s + a.attachments.length, 0);
-      return { ...c, conteudos: content.conteudos.length, quizzes: content.quizzes.length, recursos, aulasPlaneadas: aulasNoAno };
-    }), [cursoFilter, search, aulasNoAno]);
+      return { ...c, faculdade: facultyByCode[c.curso] || "—", conteudos: content.conteudos.length, quizzes: content.quizzes.length, recursos, aulasPlaneadas: aulasNoAno };
+    }), [cursoFilter, search, aulasNoAno, facultyByCode]);
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
