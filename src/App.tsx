@@ -140,6 +140,7 @@ import InscricoesCandidatoDetail from "./pages/inscricoes/CandidatoDetail";
 import InscricoesDoc from "./pages/inscricoes/InscricaoDoc";
 import Academica2Inicio from "./pages/academica2/Inicio";
 import Academica2CourseCreator from "./pages/academica2/CourseCreator";
+import Academica2ConfirmarFaculdades from "./pages/academica2/ConfirmarFaculdades";
 import Academica2ConfirmarCursos from "./pages/academica2/ConfirmarCursos";
 import Academica2GerarCadeiras from "./pages/academica2/GerarCadeiras";
 import Academica2AnosLetivos from "./pages/academica2/AnosLetivos";
@@ -342,6 +343,7 @@ function AppRoutes() {
         {/* Área Académica II — Criador / Planeador Curricular */}
         <Route path="/areaacademica" element={<Academica2Inicio />} />
         <Route path="/areaacademica/criador" element={<Academica2CourseCreator />} />
+        <Route path="/areaacademica/criador/faculdades" element={<Academica2ConfirmarFaculdades />} />
         <Route path="/areaacademica/criador/cursos" element={<Academica2ConfirmarCursos />} />
         <Route path="/areaacademica/criador/cadeiras" element={<Academica2GerarCadeiras />} />
         <Route path="/areaacademica/anos-letivos" element={<Academica2AnosLetivos />} />

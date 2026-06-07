@@ -77,7 +77,7 @@ export default function GerarCadeiras() {
         </Link>
         <div className="rounded-xl border border-primary/30 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-6 flex items-center justify-between flex-wrap gap-3">
           <div>
-            <Badge className="mb-2 gap-1"><BookOpen className="w-3 h-3" /> Passo 2 de 5</Badge>
+            <Badge className="mb-2 gap-1"><BookOpen className="w-3 h-3" /> Passo 3 de 6</Badge>
             <h1 className="text-2xl font-bold flex items-center gap-2">
               <BookOpen className="w-6 h-6 text-primary" /> Confirmar Cadeiras
             </h1>
