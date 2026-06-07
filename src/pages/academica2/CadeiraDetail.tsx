@@ -12,7 +12,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Switch } from "@/components/ui/switch";
 import { cadeirasAcad, anosLetivos, cursoTemplates } from "@/data/academica2Data";
 import { getCadeiraContent, setCadeiraContent, uid, type Aula, type Conteudo, type Quiz, type Evento, type Attachment } from "@/data/cadeiraContentData";
-import { ArrowLeft, BookOpen, PlayCircle, FileText, ListChecks, CalendarDays, UserCog, Plus, Trash2, Save, Pencil, GraduationCap, Eye, Download, FileType, Film, Image as ImageIcon, Link2, Scale, Lock, Unlock, ClipboardCheck, Clock, MapPin, Percent } from "lucide-react";
+import { ArrowLeft, BookOpen, PlayCircle, FileText, ListChecks, CalendarDays, UserCog, Plus, Trash2, Save, Pencil, GraduationCap, Eye, Download, FileType, Film, Image as ImageIcon, Link2, Scale, Lock, Unlock, ClipboardCheck, Clock, MapPin, Percent, X } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
 
 type ExameTipo = "1ª Época" | "2ª Época" | "Recurso" | "Especial";
