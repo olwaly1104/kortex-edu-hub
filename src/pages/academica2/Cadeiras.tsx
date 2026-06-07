@@ -27,6 +27,11 @@ export default function Cadeiras() {
   const aulasNoAno = useMemo(() => weeksBetween(yl.startDate, yl.endDate), [yl]);
 
   const facultyByCode = useMemo(() => Object.fromEntries(cursoTemplates.map(c => [c.code, c.faculty])), []);
+  const acronymMap: Record<string, string> = {
+    "Faculdade de Ciências Exatas": "FCE",
+    "Faculdade de Ciências da Saúde": "FCS",
+    "Faculdade de Ciências Sociais": "FCSO",
+  };
 
   const rows = useMemo(() => cadeirasAcad
     .filter(c => (cursoFilter === "all" || c.curso === cursoFilter) && (search === "" || c.cadeira.toLowerCase().includes(search.toLowerCase())))
@@ -98,7 +103,7 @@ export default function Cadeiras() {
             {rows.map(c => (
               <TableRow key={c.id} className="cursor-pointer hover:bg-muted/50" onClick={() => navigate(`/areaacademica/cadeiras/${c.id}`)}>
                 <TableCell className="font-medium">{c.cadeira}</TableCell>
-                <TableCell><Badge variant="secondary" className="font-normal">{c.faculdade}</Badge></TableCell>
+                <TableCell><Badge variant="secondary" className="font-normal">{acronymMap[c.faculdade] || c.faculdade}</Badge></TableCell>
                 <TableCell><Badge variant="outline">{c.curso}</Badge></TableCell>
                 <TableCell>{c.ano}º</TableCell>
                 <TableCell className="text-sm">{c.docente}</TableCell>
