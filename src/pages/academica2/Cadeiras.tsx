@@ -96,9 +96,9 @@ export default function Cadeiras() {
             {rows.map(c => (
               <TableRow key={c.id} className="cursor-pointer hover:bg-muted/50" onClick={() => navigate(`/areaacademica/cadeiras/${c.id}`)}>
                 <TableCell className="font-medium">{c.cadeira}</TableCell>
+                <TableCell className="text-xs text-muted-foreground">{c.faculdade}</TableCell>
                 <TableCell><Badge variant="outline">{c.curso}</Badge></TableCell>
                 <TableCell>{c.ano}º</TableCell>
-                <TableCell className="font-mono text-xs">{c.ects}</TableCell>
                 <TableCell className="text-sm">{c.docente}</TableCell>
                 <TableCell className="text-center font-mono text-xs">{c.aulasPlaneadas}</TableCell>
                 <TableCell className="text-center font-mono text-xs">{c.conteudos}</TableCell>
