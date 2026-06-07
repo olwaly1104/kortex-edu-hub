@@ -331,45 +331,25 @@ export default function CadeiraDetail() {
                 <Button size="sm" onClick={addConteudo} className="gap-1"><Plus className="w-4 h-4" /> Adicionar</Button>
               </div>
             </div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
-              {conteudos.map(c => (
-                <Card key={c.id} className="overflow-hidden border hover:border-primary/40 transition">
-                  <div className="aspect-[4/3] bg-muted border-b flex items-center justify-center overflow-hidden">
-                    {c.tipo === "Vídeo" ? (
-                      <video src={c.url} className="w-full h-full object-cover" controls={false} muted />
-                    ) : c.tipo === "Imagem" ? (
-                      <img src={c.url} alt={c.titulo} className="w-full h-full object-cover" />
-                    ) : c.tipo === "PDF" || c.tipo === "Slides" ? (
-                      <iframe src={c.url} className="w-full h-full pointer-events-none" title={c.titulo} />
-                    ) : (
-                      <div className="flex flex-col items-center gap-1 text-muted-foreground">
-                        {typeIcon(c.tipo)}
-                        <span className="text-[10px] uppercase">{c.tipo}</span>
-                      </div>
-                    )}
-                  </div>
-                  <div className="p-3 space-y-2">
-                    <div className="flex items-center gap-2">
-                      {typeIcon(c.tipo)}
-                      <Select value={c.tipo} onValueChange={v => updConteudo(c.id, { tipo: v as Conteudo["tipo"] })}>
-                        <SelectTrigger className="h-7 text-[11px] w-24"><SelectValue /></SelectTrigger>
-                        <SelectContent>{(["PDF", "Slides", "DOCX", "Vídeo", "Imagem", "Link"] as const).map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
-                      </Select>
-                      <span className="text-[10px] text-muted-foreground ml-auto">{c.size || "—"}</span>
+            <div className="p-4">
+              <div className="divide-y rounded-md border">
+                {conteudos.map(c => (
+                  <div key={c.id} className="flex items-center gap-2 px-3 py-2 hover:bg-muted/40">
+                    <span className="shrink-0">{typeIcon(c.tipo)}</span>
+                    <Input value={c.titulo} onChange={e => updConteudo(c.id, { titulo: e.target.value })} className="h-7 text-xs border-none shadow-none px-1 focus-visible:ring-1" placeholder="Título" />
+                    <Badge variant="outline" className="text-[10px] h-5 shrink-0">{c.tipo}</Badge>
+                    <div className="flex items-center gap-1 shrink-0">
+                      <Label className="text-[10px] text-muted-foreground">Sem.</Label>
+                      <Input type="number" value={c.semana} onChange={e => updConteudo(c.id, { semana: +e.target.value })} className="h-6 text-xs w-12 px-1" />
                     </div>
-                    <Input value={c.titulo} onChange={e => updConteudo(c.id, { titulo: e.target.value })} className="h-8 text-xs" placeholder="Título" />
-                    <div className="flex items-center gap-2">
-                      <Label className="text-[10px] text-muted-foreground shrink-0">Semana</Label>
-                      <Input type="number" value={c.semana} onChange={e => updConteudo(c.id, { semana: +e.target.value })} className="h-7 text-xs w-16" />
-                      <div className="flex-1" />
-                      <Button size="icon" variant="ghost" className="h-7 w-7" asChild><a href={c.url} target="_blank" rel="noreferrer" title="Pré-visualizar"><Eye className="w-3.5 h-3.5" /></a></Button>
-                      <Button size="icon" variant="ghost" className="h-7 w-7" asChild><a href={c.url} download={c.titulo} title="Descarregar"><Download className="w-3.5 h-3.5" /></a></Button>
-                      <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => delConteudo(c.id)}><Trash2 className="w-3.5 h-3.5 text-destructive" /></Button>
-                    </div>
+                    <span className="text-[10px] text-muted-foreground shrink-0 w-16 text-right">{c.size || "—"}</span>
+                    <Button size="icon" variant="ghost" className="h-7 w-7 shrink-0" asChild><a href={c.url} target="_blank" rel="noreferrer" title="Pré-visualizar"><Eye className="w-3.5 h-3.5" /></a></Button>
+                    <Button size="icon" variant="ghost" className="h-7 w-7 shrink-0" asChild><a href={c.url} download={c.titulo} title="Descarregar"><Download className="w-3.5 h-3.5" /></a></Button>
+                    <Button size="icon" variant="ghost" className="h-7 w-7 shrink-0" onClick={() => delConteudo(c.id)}><Trash2 className="w-3.5 h-3.5 text-destructive" /></Button>
                   </div>
-                </Card>
-              ))}
-              {conteudos.length === 0 && <p className="text-sm text-muted-foreground col-span-full text-center py-8">Sem recursos. Carregue ficheiros transversais à cadeira.</p>}
+                ))}
+                {conteudos.length === 0 && <p className="text-sm text-muted-foreground text-center py-8">Sem recursos. Carregue ficheiros transversais à cadeira.</p>}
+              </div>
             </div>
           </Card>
         </TabsContent>
