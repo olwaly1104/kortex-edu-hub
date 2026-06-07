@@ -292,12 +292,12 @@ export default function CadeiraDetail() {
                         {a.attachments.map(at => (
                           <div key={at.id} className="flex items-center gap-2 px-3 py-2 hover:bg-muted/40">
                             <span className="shrink-0">{typeIcon(at.tipo)}</span>
-                            <Input value={at.name} onChange={e => updAttach(at.id, { name: e.target.value })} className="h-7 text-xs border-none shadow-none px-1 focus-visible:ring-1" placeholder="Nome do ficheiro" />
+                            <Input disabled={locked} value={at.name} onChange={e => updAttach(at.id, { name: e.target.value })} className="h-7 text-xs border-none shadow-none px-1 focus-visible:ring-1" placeholder="Nome do ficheiro" />
                             <Badge variant="outline" className="text-[10px] h-5 shrink-0">{at.tipo}</Badge>
                             <span className="text-[10px] text-muted-foreground shrink-0 w-16 text-right">{at.size || "—"}</span>
                             <Button size="icon" variant="ghost" className="h-7 w-7 shrink-0" asChild><a href={at.url} target="_blank" rel="noreferrer" title="Abrir"><Eye className="w-3.5 h-3.5" /></a></Button>
                             <Button size="icon" variant="ghost" className="h-7 w-7 shrink-0" asChild><a href={at.url} download={at.name} title="Descarregar"><Download className="w-3.5 h-3.5" /></a></Button>
-                            <Button size="icon" variant="ghost" className="h-7 w-7 shrink-0" onClick={() => delAttach(at.id)}><Trash2 className="w-3.5 h-3.5 text-destructive" /></Button>
+                            {!locked && <Button size="icon" variant="ghost" className="h-7 w-7 shrink-0" onClick={() => delAttach(at.id)}><Trash2 className="w-3.5 h-3.5 text-destructive" /></Button>}
                           </div>
                         ))}
                       </div>
