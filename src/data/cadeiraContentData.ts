@@ -80,8 +80,13 @@ const seedAula = (n: number, titulo: string): Aula => ({
       ],
 });
 
-const seedDefault = (cadeira: string): CadeiraContent => ({
-  aulas: Array.from({ length: 8 }, (_, i) => seedAula(i + 1, `${cadeira} — Aula ${i + 1}`)),
+const seedDefault = (cadeira: string): CadeiraContent => {
+  const aulas = Array.from({ length: 8 }, (_, i) => seedAula(i + 1, `${cadeira} — Aula ${i + 1}`));
+  // Link quizzes to specific aula days
+  aulas[1].quizId = "q1"; // Aula 2 → Quiz Diagnóstico
+  aulas[4].quizId = "q2"; // Aula 5 → Quiz Capítulo 1
+  return {
+  aulas,
   conteudos: [
     { id: "c1", tipo: "PDF", titulo: "Programa da Cadeira", semana: 1, size: "210 KB", url: SAMPLE_PDF },
     { id: "c2", tipo: "PDF", titulo: "Bibliografia Recomendada", semana: 1, size: "180 KB", url: SAMPLE_PDF },
