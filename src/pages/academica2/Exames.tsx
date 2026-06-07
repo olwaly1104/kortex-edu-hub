@@ -101,20 +101,16 @@ export default function Exames() {
         {view !== "faculdades" && (
           <Button size="sm" variant="ghost" onClick={back} className="h-8 gap-1"><ArrowLeft className="w-4 h-4" /> Voltar</Button>
         )}
-        <button onClick={() => { setView("faculdades"); setSelectedFac(null); setSelectedCurso(null); setSelectedAno(null); }} className="font-medium hover:text-primary inline-flex items-center gap-1">
+        <button onClick={() => { setView("faculdades"); setSelectedFac(null); setSelectedCurso(null); }} className="font-medium hover:text-primary inline-flex items-center gap-1">
           <Building2 className="w-4 h-4" /> Faculdades
         </button>
         {selectedFac && <>
           <ChevronRight className="w-4 h-4 text-muted-foreground" />
-          <button onClick={() => { setView("cursos"); setSelectedCurso(null); setSelectedAno(null); }} className="font-medium hover:text-primary">{acronymMap[selectedFac] || selectedFac}</button>
+          <button onClick={() => { setView("cursos"); setSelectedCurso(null); }} className="font-medium hover:text-primary">{acronymMap[selectedFac] || selectedFac}</button>
         </>}
         {cursoObj && <>
           <ChevronRight className="w-4 h-4 text-muted-foreground" />
-          <button onClick={() => { setView("anos"); setSelectedAno(null); }} className="font-medium hover:text-primary">{cursoObj.name}</button>
-        </>}
-        {selectedAno != null && <>
-          <ChevronRight className="w-4 h-4 text-muted-foreground" />
-          <span className="font-medium">{selectedAno}º Ano</span>
+          <span className="font-medium">{cursoObj.name}</span>
         </>}
       </Card>
 
@@ -126,6 +122,7 @@ export default function Exames() {
                 <TableHead className="w-20">Sigla</TableHead>
                 <TableHead>Faculdade</TableHead>
                 <TableHead className="text-right">Cursos</TableHead>
+                <TableHead className="text-right">Cadeiras</TableHead>
                 <TableHead className="text-right">Exames</TableHead>
                 <TableHead className="text-right">Inscritos</TableHead>
                 <TableHead className="w-12"></TableHead>
@@ -137,6 +134,7 @@ export default function Exames() {
                   <TableCell><Badge variant="outline" className="font-mono text-[10px]">{acronymMap[f.name] || "—"}</Badge></TableCell>
                   <TableCell className="font-medium">{f.name}</TableCell>
                   <TableCell className="text-right font-mono text-xs">{f.cursos}</TableCell>
+                  <TableCell className="text-right font-mono text-xs">{f.cadeiras}</TableCell>
                   <TableCell className="text-right font-mono text-xs">{f.exames}</TableCell>
                   <TableCell className="text-right font-mono text-xs">{f.inscritos}</TableCell>
                   <TableCell><ChevronRight className="w-4 h-4 text-muted-foreground" /></TableCell>
@@ -163,6 +161,7 @@ export default function Exames() {
                 <TableHead>Curso</TableHead>
                 <TableHead>Coordenador</TableHead>
                 <TableHead className="text-right">Anos</TableHead>
+                <TableHead className="text-right">Cadeiras</TableHead>
                 <TableHead className="text-right">Exames</TableHead>
                 <TableHead className="text-right">Inscritos</TableHead>
                 <TableHead className="w-12"></TableHead>
@@ -175,6 +174,7 @@ export default function Exames() {
                   <TableCell className="font-medium">{c.name}</TableCell>
                   <TableCell className="text-xs text-muted-foreground">{c.coordenador}</TableCell>
                   <TableCell className="text-right font-mono text-xs">{c.years}</TableCell>
+                  <TableCell className="text-right font-mono text-xs">{c.cadeirasTotal}</TableCell>
                   <TableCell className="text-right font-mono text-xs">{c.examesCount}</TableCell>
                   <TableCell className="text-right font-mono text-xs">{c.inscritos}</TableCell>
                   <TableCell><ChevronRight className="w-4 h-4 text-muted-foreground" /></TableCell>
@@ -185,81 +185,52 @@ export default function Exames() {
         </Card>
       )}
 
-      {view === "anos" && cursoObj && (
-        <Card>
-          <div className="flex items-center justify-between px-4 py-3 border-b bg-muted/30">
-            <div className="flex items-center gap-2">
-              <Badge variant="outline" className="font-mono text-[10px]">{cursoObj.code}</Badge>
-              <h2 className="text-sm font-semibold">{cursoObj.name}</h2>
-            </div>
-            <span className="text-xs text-muted-foreground">{cursoObj.years} anos</span>
-          </div>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-24">Ano</TableHead>
-                <TableHead className="text-right">Exames agendados</TableHead>
-                <TableHead className="text-right">Inscritos</TableHead>
-                <TableHead className="w-12"></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {Array.from({ length: cursoObj.years }, (_, i) => i + 1).map(ano => {
-                const list = (byCurso[cursoObj.code] || []).filter(e => e.ano === ano);
-                const has = list.length > 0;
-                return (
-                  <TableRow key={ano} className={has ? "cursor-pointer hover:bg-muted/50" : "opacity-60"} onClick={() => has && goAno(ano)}>
-                    <TableCell><Badge className="bg-primary/10 text-primary border-0 font-mono">{ano}º Ano</Badge></TableCell>
-                    <TableCell className="text-right font-mono text-xs">{list.length}</TableCell>
-                    <TableCell className="text-right font-mono text-xs">{list.reduce((a, e) => a + e.inscritos, 0)}</TableCell>
-                    <TableCell>{has && <ChevronRight className="w-4 h-4 text-muted-foreground" />}</TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </Card>
-      )}
-
-      {view === "exames" && cursoObj && selectedAno != null && (
-        <Card>
-          <div className="flex items-center justify-between px-4 py-3 border-b bg-muted/30">
-            <div className="flex items-center gap-2">
-              <Badge className="bg-primary/10 text-primary border-0 font-mono">{cursoObj.code} · {selectedAno}º Ano</Badge>
-              <h2 className="text-sm font-semibold">{cursoObj.name}</h2>
-            </div>
-            <span className="text-xs text-muted-foreground">{examesOfAno.length} exames · {examesOfAno.reduce((a, e) => a + e.inscritos, 0)} inscritos</span>
-          </div>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Data</TableHead>
-                <TableHead>Hora</TableHead>
-                <TableHead>Cadeira</TableHead>
-                <TableHead>Turma</TableHead>
-                <TableHead>Sala</TableHead>
-                <TableHead>Época</TableHead>
-                <TableHead className="text-right">Inscritos</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {examesOfAno.map(e => (
-                <TableRow key={e.id} className="cursor-pointer hover:bg-muted/50">
-                  <TableCell className="font-mono text-xs">{e.date}</TableCell>
-                  <TableCell className="font-mono text-xs">{e.time}</TableCell>
-                  <TableCell className="font-medium">{e.cadeira}</TableCell>
-                  <TableCell>{e.ano}º {e.turma}</TableCell>
-                  <TableCell className="text-sm">{e.sala}</TableCell>
-                  <TableCell><Badge>{e.epoca}</Badge></TableCell>
-                  <TableCell className="text-right">{e.inscritos}</TableCell>
-                </TableRow>
-              ))}
-              {examesOfAno.length === 0 && (
-                <TableRow><TableCell colSpan={7} className="text-center text-xs text-muted-foreground py-6">Sem exames agendados.</TableCell></TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </Card>
+      {view === "curso" && cursoObj && (
+        <div className="space-y-4">
+          {Array.from({ length: cursoObj.years }, (_, i) => i + 1).map(ano => {
+            const list = (byCurso[cursoObj.code] || []).filter(e => e.ano === ano);
+            return (
+              <Card key={ano}>
+                <div className="flex items-center justify-between px-4 py-3 border-b bg-muted/30">
+                  <div className="flex items-center gap-2">
+                    <Badge className="bg-primary/10 text-primary border-0 font-mono">{ano}º Ano</Badge>
+                    <h2 className="text-sm font-semibold">{cursoObj.name}</h2>
+                  </div>
+                  <span className="text-xs text-muted-foreground">{list.length} exames · {list.reduce((a, e) => a + e.inscritos, 0)} inscritos</span>
+                </div>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Data</TableHead>
+                      <TableHead>Hora</TableHead>
+                      <TableHead>Cadeira</TableHead>
+                      <TableHead>Turma</TableHead>
+                      <TableHead>Sala</TableHead>
+                      <TableHead>Época</TableHead>
+                      <TableHead className="text-right">Inscritos</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {list.map(e => (
+                      <TableRow key={e.id} className="cursor-pointer hover:bg-muted/50">
+                        <TableCell className="font-mono text-xs">{e.date}</TableCell>
+                        <TableCell className="font-mono text-xs">{e.time}</TableCell>
+                        <TableCell className="font-medium">{e.cadeira}</TableCell>
+                        <TableCell>{e.ano}º {e.turma}</TableCell>
+                        <TableCell className="text-sm">{e.sala}</TableCell>
+                        <TableCell><Badge>{e.epoca}</Badge></TableCell>
+                        <TableCell className="text-right">{e.inscritos}</TableCell>
+                      </TableRow>
+                    ))}
+                    {list.length === 0 && (
+                      <TableRow><TableCell colSpan={7} className="text-center text-xs text-muted-foreground py-6">Sem exames agendados.</TableCell></TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </Card>
+            );
+          })}
+        </div>
       )}
     </div>
   );
