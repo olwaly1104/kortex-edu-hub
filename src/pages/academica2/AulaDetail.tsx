@@ -172,7 +172,7 @@ export default function AulaDetail() {
               </div>
             </div>
           ))}
-          {aula.attachments.length === 0 && <p className="p-6 text-sm text-muted-foreground text-center">Sem materiais. Carregue PDFs, slides, vídeos ou docs.</p>}
+          {aula.attachments.length === 0 && <p className="p-6 text-sm text-muted-foreground text-center">Sem conteúdo. Carregue PDFs, slides, vídeos ou docs.</p>}
         </div>
       </Card>
     </div>
