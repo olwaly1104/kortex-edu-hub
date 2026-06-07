@@ -138,6 +138,16 @@ import InscricoesLayout from "./layouts/InscricoesLayout";
 import InscricoesRegistar from "./pages/inscricoes/Registar";
 import InscricoesCandidatoDetail from "./pages/inscricoes/CandidatoDetail";
 import InscricoesDoc from "./pages/inscricoes/InscricaoDoc";
+import Academica2Inicio from "./pages/academica2/Inicio";
+import Academica2CourseCreator from "./pages/academica2/CourseCreator";
+import Academica2AnosLetivos from "./pages/academica2/AnosLetivos";
+import Academica2Cadeiras from "./pages/academica2/Cadeiras";
+import Academica2Turmas from "./pages/academica2/Turmas";
+import Academica2CalendarioAcad from "./pages/academica2/CalendarioAcad";
+import Academica2Exames from "./pages/academica2/Exames";
+import Academica2Quizzes from "./pages/academica2/Quizzes";
+import Academica2Notas from "./pages/academica2/Notas";
+import Academica2Relatorios from "./pages/academica2/Relatorios";
 
 const queryClient = new QueryClient();
 
@@ -151,6 +161,7 @@ const homeRedirectMap: Record<string, string> = {
   financas: "/financas",
   gap: "/gap",
   inscricoes: "/inscricoes",
+  academica2: "/areaacademica",
 };
 
 function AppRoutes() {
@@ -325,6 +336,25 @@ function AppRoutes() {
         <Route path="/gap/contactos" element={<StudentContacts />} />
         <Route path="/gap/financas" element={<StudentFinances />} />
         <Route path="/gap/perfil" element={<StudentProfile />} />
+        {/* Área Académica II — Criador / Planeador Curricular */}
+        <Route path="/areaacademica" element={<Academica2Inicio />} />
+        <Route path="/areaacademica/criador" element={<Academica2CourseCreator />} />
+        <Route path="/areaacademica/anos-letivos" element={<Academica2AnosLetivos />} />
+        <Route path="/areaacademica/cadeiras" element={<Academica2Cadeiras />} />
+        <Route path="/areaacademica/turmas" element={<Academica2Turmas />} />
+        <Route path="/areaacademica/calendario-academico" element={<Academica2CalendarioAcad />} />
+        <Route path="/areaacademica/exames" element={<Academica2Exames />} />
+        <Route path="/areaacademica/quizzes" element={<Academica2Quizzes />} />
+        <Route path="/areaacademica/notas" element={<Academica2Notas />} />
+        <Route path="/areaacademica/relatorios" element={<Academica2Relatorios />} />
+        <Route path="/areaacademica/calendario" element={<StudentCalendar />} />
+        <Route path="/areaacademica/anuncios" element={<StudentAnnouncements />} />
+        <Route path="/areaacademica/solicitacoes" element={<CoordenadorSolicitacoes />} />
+        <Route path="/areaacademica/chat" element={<StudentChat />} />
+        <Route path="/areaacademica/email" element={<StudentEmail />} />
+        <Route path="/areaacademica/contactos" element={<StudentContacts />} />
+        <Route path="/areaacademica/financas" element={<StudentFinances />} />
+        <Route path="/areaacademica/perfil" element={<StudentProfile />} />
       </Route>
       {/* Inscrições — minimal single-page portal */}
       <Route element={<InscricoesLayout />}>
