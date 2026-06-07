@@ -26,12 +26,9 @@ interface Step {
 
 const steps: Step[] = [
   { id: "cursos", label: "Confirmar Cursos", description: "Validar catálogo de cursos e coordenadores.", icon: GraduationCap },
-  { id: "cadeiras", label: "Gerar Cadeiras", description: "Alocar cadeiras e docentes por curso.", icon: BookOpen },
-  { id: "docentes", label: "Atribuir Docentes", description: "Distribuir docentes pelas cadeiras.", icon: Users },
+  { id: "cadeiras", label: "Confirmar Cadeiras", description: "Alocar cadeiras, docentes e banco de quizzes por curso.", icon: BookOpen },
   { id: "turmas", label: "Criar Turmas", description: "Alocar candidatos aprovados a turmas do 1º ano.", icon: ClipboardList },
-  { id: "calendario", label: "Calendário Académico", description: "Semestres, feriados e épocas de exames.", icon: CalendarDays },
-  { id: "exames", label: "Agendar Exames", description: "Mapa de exames presenciais (1ª e 2ª época).", icon: FileCheck2 },
-  { id: "quizzes", label: "Quizzes", description: "Banco de quizzes por cadeira.", icon: BrainCircuit },
+  { id: "calendario", label: "Calendário Académico", description: "Semestres, feriados e mapa de exames (1ª e 2ª época).", icon: CalendarDays },
   { id: "publicar", label: "Publicar Ano Letivo", description: "Activar ano e notificar todos os perfis.", icon: Megaphone },
 ];
 
