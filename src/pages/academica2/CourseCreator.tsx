@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -61,6 +62,11 @@ export default function CourseCreator() {
   );
   const [running, setRunning] = useState(false);
   const [active, setActive] = useState<string>("cursos");
+  const navigate = useNavigate();
+  const stepRoute: Record<string, string> = {
+    cursos: "/areaacademica/criador/cursos",
+    cadeiras: "/areaacademica/criador/cadeiras",
+  };
 
   // Course confirmation state
   type CursoState = {
@@ -199,7 +205,7 @@ export default function CourseCreator() {
                 return (
                   <button
                     key={s.id}
-                    onClick={() => setActive(s.id)}
+                    onClick={() => stepRoute[s.id] ? navigate(stepRoute[s.id]) : setActive(s.id)}
                     className={`flex items-center gap-3 p-3 rounded-lg border text-left transition-all ${
                       isActive ? "border-primary bg-primary/5" : "border-transparent hover:bg-muted/40"
                     }`}
