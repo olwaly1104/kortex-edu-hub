@@ -26,12 +26,9 @@ interface Step {
 
 const steps: Step[] = [
   { id: "cursos", label: "Confirmar Cursos", description: "Validar catálogo de cursos e coordenadores.", icon: GraduationCap },
-  { id: "cadeiras", label: "Gerar Cadeiras", description: "Alocar cadeiras e docentes por curso.", icon: BookOpen },
-  { id: "docentes", label: "Atribuir Docentes", description: "Distribuir docentes pelas cadeiras.", icon: Users },
+  { id: "cadeiras", label: "Confirmar Cadeiras", description: "Alocar cadeiras, docentes e banco de quizzes por curso.", icon: BookOpen },
   { id: "turmas", label: "Criar Turmas", description: "Alocar candidatos aprovados a turmas do 1º ano.", icon: ClipboardList },
-  { id: "calendario", label: "Calendário Académico", description: "Semestres, feriados e épocas de exames.", icon: CalendarDays },
-  { id: "exames", label: "Agendar Exames", description: "Mapa de exames presenciais (1ª e 2ª época).", icon: FileCheck2 },
-  { id: "quizzes", label: "Quizzes", description: "Banco de quizzes por cadeira.", icon: BrainCircuit },
+  { id: "calendario", label: "Calendário Académico", description: "Semestres, feriados e mapa de exames (1ª e 2ª época).", icon: CalendarDays },
   { id: "publicar", label: "Publicar Ano Letivo", description: "Activar ano e notificar todos os perfis.", icon: Megaphone },
 ];
 
@@ -394,21 +391,13 @@ export default function CourseCreator() {
               </div>
             )}
 
-            {active === "docentes" && (
-              <p className="text-sm text-muted-foreground">108 docentes serão distribuídos automaticamente pelas cadeiras com base na sua especialidade e carga horária.</p>
-            )}
             {active === "calendario" && (
               <div className="text-sm space-y-2">
                 <p><strong>Ano:</strong> {startDate} → {endDate}</p>
                 <p><strong>1º Semestre:</strong> {sem1Start} → {sem1End}</p>
                 <p><strong>2º Semestre:</strong> {sem2Start} → {sem2End}</p>
+                <p className="text-muted-foreground pt-2 border-t mt-2">Mapa de exames presenciais (1ª e 2ª época) gerado automaticamente com salas atribuídas por capacidade.</p>
               </div>
-            )}
-            {active === "exames" && (
-              <p className="text-sm text-muted-foreground">Mapa de exames presenciais será gerado automaticamente para 1ª e 2ª época, com salas atribuídas por capacidade.</p>
-            )}
-            {active === "quizzes" && (
-              <p className="text-sm text-muted-foreground">Banco inicial de 2 quizzes por cadeira será criado e disponibilizado aos docentes para personalização.</p>
             )}
             {active === "publicar" && (
               <p className="text-sm text-muted-foreground">Ao publicar, o ano letivo {anoLabel} fica activo e visível para todos os perfis (estudantes, docentes, coordenadores).</p>
