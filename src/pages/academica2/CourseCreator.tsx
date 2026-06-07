@@ -205,7 +205,7 @@ export default function CourseCreator() {
                 return (
                   <button
                     key={s.id}
-                    onClick={() => setActive(s.id)}
+                    onClick={() => stepRoute[s.id] ? navigate(stepRoute[s.id]) : setActive(s.id)}
                     className={`flex items-center gap-3 p-3 rounded-lg border text-left transition-all ${
                       isActive ? "border-primary bg-primary/5" : "border-transparent hover:bg-muted/40"
                     }`}
