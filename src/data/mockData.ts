@@ -1,4 +1,4 @@
-export type UserRole = "professor" | "student" | "coordenador_curso" | "decano" | "reitor" | "secretaria" | "financas" | "gap" | "inscricoes";
+export type UserRole = "professor" | "student" | "coordenador_curso" | "decano" | "reitor" | "secretaria" | "financas" | "gap" | "inscricoes" | "academica2";
 
 export interface User {
   id: string;
@@ -227,6 +227,13 @@ export const currentInscricoes: User = {
   name: "Portal de Inscrições",
   email: "inscricoes@upra.kor",
   role: "inscricoes",
+};
+
+export const currentAcademica2: User = {
+  id: "11",
+  name: "Dra. Beatriz Carmona",
+  email: "areaacademica2@upra.kor",
+  role: "academica2",
 };
 
 // Disciplines
@@ -502,6 +509,7 @@ export function detectRole(email: string): UserRole {
   if (email.startsWith("inscricoes")) return "inscricoes";
   if (email.startsWith("gap")) return "gap";
   if (email.startsWith("financas")) return "financas";
+  if (email.startsWith("areaacademica2")) return "academica2";
   if (email.startsWith("academica")) return "secretaria";
   if (email.startsWith("reitor")) return "reitor";
   if (email.startsWith("decano")) return "decano";
