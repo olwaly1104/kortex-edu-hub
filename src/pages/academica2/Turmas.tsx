@@ -371,7 +371,7 @@ export default function Turmas() {
             <Card className="p-4 flex items-center gap-4">
               {mode === "discentes"
                 ? <><Layers className="w-10 h-10 p-2 bg-amber-100 text-amber-600 rounded-lg" /><div><p className="text-2xl font-bold">{new Set(filtered.map(p => p.turma)).size}</p><p className="text-xs text-muted-foreground">Turmas</p></div></>
-                : <><Clock className="w-10 h-10 p-2 bg-amber-100 text-amber-600 rounded-lg" /><div><p className="text-2xl font-bold">{filtered.filter(p => p.estado !== "Alocado").length}</p><p className="text-xs text-muted-foreground">Por alocar</p></div></>}
+                : <><Clock className="w-10 h-10 p-2 bg-amber-100 text-amber-600 rounded-lg" /><div><p className="text-2xl font-bold">{filtered.filter(p => p.estado === "Não atribuído").length}</p><p className="text-xs text-muted-foreground">Não atribuídos</p></div></>}
             </Card>
           </div>
 
