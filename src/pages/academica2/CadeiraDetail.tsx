@@ -273,12 +273,16 @@ export default function CadeiraDetail() {
                       <div className="flex gap-2">
                         <input id={inputId} type="file" multiple className="hidden"
                           onChange={e => { addAttachs(Array.from(e.target.files || [])); e.target.value = ""; }} />
-                        <Button size="sm" variant="outline" className="h-8 gap-1" onClick={() => document.getElementById(inputId)?.click()}>
-                          <Plus className="w-3.5 h-3.5" /> Ficheiro
-                        </Button>
-                        <Button size="sm" variant="outline" className="h-8 gap-1" onClick={addLink}>
-                          <Link2 className="w-3.5 h-3.5" /> Link
-                        </Button>
+                        {!locked && (
+                          <>
+                            <Button size="sm" variant="outline" className="h-8 gap-1" onClick={() => document.getElementById(inputId)?.click()}>
+                              <Plus className="w-3.5 h-3.5" /> Ficheiro
+                            </Button>
+                            <Button size="sm" variant="outline" className="h-8 gap-1" onClick={addLink}>
+                              <Link2 className="w-3.5 h-3.5" /> Link
+                            </Button>
+                          </>
+                        )}
                       </div>
                     </div>
                     {a.attachments.length === 0 ? (
