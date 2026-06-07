@@ -103,6 +103,21 @@ export default function AulaDetail() {
             <div><Label>Duração (min)</Label><Input type="number" value={aula.duracao} onChange={e => upd({ duracao: +e.target.value })} className="mt-1" /></div>
           </div>
           <div><Label>Descrição / Conteúdo da aula</Label><Textarea rows={6} value={aula.descricao} onChange={e => upd({ descricao: e.target.value })} className="mt-1" /></div>
+          <div>
+            <Label>Quiz desta aula (opcional)</Label>
+            <Select value={aula.quizId ?? "none"} onValueChange={v => upd({ quizId: v === "none" ? undefined : v })}>
+              <SelectTrigger className="mt-1"><SelectValue placeholder="Sem quiz" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">Sem quiz</SelectItem>
+                {content.quizzes.map(q => <SelectItem key={q.id} value={q.id}>{q.titulo} · {q.questions.length} perg.</SelectItem>)}
+              </SelectContent>
+            </Select>
+            {aula.quizId && (
+              <Link to={`/areaacademica/cadeiras/${cadeira.id}/quiz/${aula.quizId}`} className="text-xs text-primary hover:underline mt-1 inline-flex items-center gap-1">
+                <ListChecks className="w-3 h-3" /> Abrir quiz
+              </Link>
+            )}
+          </div>
           <div className="flex items-center gap-2 border-t pt-4">
             <Switch checked={aula.publicada} onCheckedChange={v => upd({ publicada: v })} />
             <Label>Publicar aula para estudantes</Label>
