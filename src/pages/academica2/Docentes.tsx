@@ -157,10 +157,27 @@ export default function Docentes() {
                 </TableCell>
                 <TableCell><Badge variant="outline" className="text-xs">{d.especialidade}</Badge></TableCell>
                 <TableCell>
-                  <div className="flex flex-wrap gap-1">
-                    {d.cursos.map(c => <Badge key={c} variant="secondary" className="text-[10px]">{cursoCode(c)}</Badge>)}
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    {d.cursos.slice(0, 3).map(c => (
+                      <span
+                        key={c}
+                        title={cursoName(c)}
+                        className="inline-flex items-center gap-1.5 rounded-md border border-primary/20 bg-primary/5 pl-1 pr-2 py-0.5 text-[11px] font-medium text-foreground"
+                      >
+                        <span className="inline-flex items-center justify-center h-4 min-w-[28px] px-1 rounded bg-primary text-primary-foreground text-[9px] font-bold tracking-wide">
+                          {cursoCode(c)}
+                        </span>
+                        <span className="text-muted-foreground truncate max-w-[90px]">{cursoName(c)}</span>
+                      </span>
+                    ))}
+                    {d.cursos.length > 3 && (
+                      <span className="text-[10px] font-semibold text-muted-foreground px-1.5 py-0.5 rounded bg-muted">
+                        +{d.cursos.length - 3}
+                      </span>
+                    )}
                   </div>
                 </TableCell>
+
                 <TableCell>
                   <div className="flex flex-wrap gap-1">
                     {d.anos.map(a => <Badge key={a} variant="outline" className="text-[10px]">{a}º</Badge>)}
