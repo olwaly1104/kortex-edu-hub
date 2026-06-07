@@ -123,10 +123,20 @@ export default function CadeiraDetail() {
               <UserCog className="w-4 h-4" /> Docente: <span className="font-medium text-foreground">{meta.docente}</span>
             </div>
           </div>
-          <Select value={anoLetivo} onValueChange={setAnoLetivo}>
-            <SelectTrigger className="w-44 h-9"><SelectValue /></SelectTrigger>
-            <SelectContent>{anosLetivos.map(a => <SelectItem key={a.id} value={a.id}>{a.label}</SelectItem>)}</SelectContent>
-          </Select>
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              variant={locked ? "outline" : "default"}
+              onClick={() => { setLocked(l => !l); toast.success(locked ? "Edição desbloqueada" : "Conteúdo bloqueado"); }}
+              className="gap-2 h-9"
+            >
+              {locked ? <><Lock className="w-4 h-4" /> Bloqueado</> : <><Unlock className="w-4 h-4" /> A editar</>}
+            </Button>
+            <Select value={anoLetivo} onValueChange={setAnoLetivo}>
+              <SelectTrigger className="w-44 h-9"><SelectValue /></SelectTrigger>
+              <SelectContent>{anosLetivos.map(a => <SelectItem key={a.id} value={a.id}>{a.label}</SelectItem>)}</SelectContent>
+            </Select>
+          </div>
         </div>
       </div>
 
