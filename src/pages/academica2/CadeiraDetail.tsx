@@ -171,7 +171,8 @@ export default function CadeiraDetail() {
                   <TableHead>Título</TableHead>
                   <TableHead className="w-28">Data</TableHead>
                   <TableHead className="w-20">Min</TableHead>
-                  <TableHead className="w-24">Recursos</TableHead>
+                  <TableHead className="w-24">Conteúdos</TableHead>
+                  <TableHead className="w-32">Quiz</TableHead>
                   <TableHead className="w-24">Estado</TableHead>
                   <TableHead className="w-24"></TableHead>
                 </TableRow>
@@ -184,6 +185,16 @@ export default function CadeiraDetail() {
                     <TableCell className="text-xs">{a.data || "—"}</TableCell>
                     <TableCell className="text-xs">{a.duracao}</TableCell>
                     <TableCell><Badge variant="outline" className="gap-1"><FileText className="w-3 h-3" />{a.attachments.length}</Badge></TableCell>
+                    <TableCell>
+                      {a.quizId ? (() => {
+                        const q = quizzes.find(x => x.id === a.quizId);
+                        return q ? (
+                          <Link to={`/areaacademica/cadeiras/${cadeira.id}/quiz/${q.id}`} onClick={e => e.stopPropagation()} className="inline-flex items-center gap-1 text-xs text-blue-700 hover:underline">
+                            <ListChecks className="w-3 h-3" /> {q.titulo}
+                          </Link>
+                        ) : <span className="text-xs text-muted-foreground">—</span>;
+                      })() : <span className="text-xs text-muted-foreground">—</span>}
+                    </TableCell>
                     <TableCell>
                       <Badge className={a.publicada ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}>
                         {a.publicada ? "Publicada" : "Rascunho"}

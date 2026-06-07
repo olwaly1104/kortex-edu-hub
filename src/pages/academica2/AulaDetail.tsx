@@ -10,7 +10,8 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cadeirasAcad } from "@/data/academica2Data";
 import { getCadeiraContent, setCadeiraContent, uid, type Aula, type Attachment } from "@/data/cadeiraContentData";
-import { ArrowLeft, PlayCircle, Plus, Save, Trash2, Download, Eye, Upload, FileText, FileType, Film, Image as ImageIcon, Link2 } from "lucide-react";
+import { ArrowLeft, PlayCircle, Plus, Save, Trash2, Download, Eye, Upload, FileText, FileType, Film, Image as ImageIcon, Link2, CalendarDays, Clock, ListChecks } from "lucide-react";
+
 import { toast } from "sonner";
 
 const typeIcon = (t: Attachment["tipo"]) => {
@@ -77,9 +78,15 @@ export default function AulaDetail() {
 
       <div className="rounded-xl border border-primary/30 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-6 flex items-start justify-between flex-wrap gap-3">
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2 mb-2">
+          <div className="flex items-center gap-2 mb-2 flex-wrap">
             <Badge variant="outline">Aula {aula.n}</Badge>
             <Badge variant="outline">{cadeira.cadeira}</Badge>
+            <Badge variant="outline" className="gap-1"><CalendarDays className="w-3 h-3" /> {aula.data || "Sem data"}</Badge>
+            <Badge variant="outline" className="gap-1"><Clock className="w-3 h-3" /> {aula.duracao} min</Badge>
+            {aula.quizId && (() => {
+              const q = content.quizzes.find(x => x.id === aula.quizId);
+              return q ? <Badge className="bg-blue-100 text-blue-700 gap-1"><ListChecks className="w-3 h-3" /> Quiz: {q.titulo}</Badge> : null;
+            })()}
             <Badge className={aula.publicada ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}>{aula.publicada ? "Publicada" : "Rascunho"}</Badge>
           </div>
           <h1 className="text-2xl font-bold flex items-center gap-2"><PlayCircle className="w-6 h-6 text-primary" /> {aula.titulo}</h1>
@@ -96,6 +103,21 @@ export default function AulaDetail() {
             <div><Label>Duração (min)</Label><Input type="number" value={aula.duracao} onChange={e => upd({ duracao: +e.target.value })} className="mt-1" /></div>
           </div>
           <div><Label>Descrição / Conteúdo da aula</Label><Textarea rows={6} value={aula.descricao} onChange={e => upd({ descricao: e.target.value })} className="mt-1" /></div>
+          <div>
+            <Label>Quiz desta aula (opcional)</Label>
+            <Select value={aula.quizId ?? "none"} onValueChange={v => upd({ quizId: v === "none" ? undefined : v })}>
+              <SelectTrigger className="mt-1"><SelectValue placeholder="Sem quiz" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">Sem quiz</SelectItem>
+                {content.quizzes.map(q => <SelectItem key={q.id} value={q.id}>{q.titulo} · {q.questions.length} perg.</SelectItem>)}
+              </SelectContent>
+            </Select>
+            {aula.quizId && (
+              <Link to={`/areaacademica/cadeiras/${cadeira.id}/quiz/${aula.quizId}`} className="text-xs text-primary hover:underline mt-1 inline-flex items-center gap-1">
+                <ListChecks className="w-3 h-3" /> Abrir quiz
+              </Link>
+            )}
+          </div>
           <div className="flex items-center gap-2 border-t pt-4">
             <Switch checked={aula.publicada} onCheckedChange={v => upd({ publicada: v })} />
             <Label>Publicar aula para estudantes</Label>
@@ -114,7 +136,7 @@ export default function AulaDetail() {
             )
           ) : (
             <div className="h-72 rounded-md border border-dashed flex items-center justify-center text-xs text-muted-foreground text-center px-4">
-              Sem recurso para pré-visualizar. Adicione um PDF, vídeo ou imagem.
+              Sem conteúdo para pré-visualizar. Adicione um PDF, vídeo ou imagem.
             </div>
           )}
         </Card>
@@ -122,7 +144,7 @@ export default function AulaDetail() {
 
       <Card>
         <div className="flex items-center justify-between p-4 border-b">
-          <p className="text-sm font-semibold">Materiais da Aula ({aula.attachments.length})</p>
+          <p className="text-sm font-semibold">Conteúdo da Aula ({aula.attachments.length})</p>
           <div className="flex gap-2">
             <input id={fileInputId} type="file" multiple className="hidden" onChange={handleUpload} />
             <Button size="sm" variant="outline" className="gap-1" onClick={() => document.getElementById(fileInputId)?.click()}>
@@ -150,7 +172,7 @@ export default function AulaDetail() {
               </div>
             </div>
           ))}
-          {aula.attachments.length === 0 && <p className="p-6 text-sm text-muted-foreground text-center">Sem materiais. Carregue PDFs, slides, vídeos ou docs.</p>}
+          {aula.attachments.length === 0 && <p className="p-6 text-sm text-muted-foreground text-center">Sem conteúdo. Carregue PDFs, slides, vídeos ou docs.</p>}
         </div>
       </Card>
     </div>
