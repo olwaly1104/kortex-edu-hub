@@ -12,7 +12,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Switch } from "@/components/ui/switch";
 import { cadeirasAcad, anosLetivos, cursoTemplates } from "@/data/academica2Data";
 import { getCadeiraContent, setCadeiraContent, uid, type Aula, type Conteudo, type Quiz, type Evento, type Attachment } from "@/data/cadeiraContentData";
-import { ArrowLeft, BookOpen, PlayCircle, FileText, ListChecks, CalendarDays, UserCog, Plus, Trash2, Save, Pencil, GraduationCap, Eye, Download, FileType, Film, Image as ImageIcon, Link2, Scale, Lock, Unlock, ClipboardCheck, Clock, MapPin, Percent } from "lucide-react";
+import { ArrowLeft, BookOpen, PlayCircle, FileText, ListChecks, CalendarDays, UserCog, Plus, Trash2, Save, Pencil, GraduationCap, Eye, Download, FileType, Film, Image as ImageIcon, Link2, Scale, Lock, Unlock, ClipboardCheck, Clock, MapPin, Percent, X } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
 
 type ExameTipo = "1ª Época" | "2ª Época" | "Recurso" | "Especial";
@@ -108,6 +109,7 @@ export default function CadeiraDetail() {
     },
   ]);
   const [locked, setLocked] = useState(true);
+  const [selectedExameId, setSelectedExameId] = useState<string | null>(null);
 
   const updExame = (id: string, p: Partial<Exame>) => setExames(xs => xs.map(x => x.id === id ? { ...x, ...p } : x));
   const delExame = (id: string) => setExames(xs => xs.filter(x => x.id !== id));
@@ -389,47 +391,90 @@ export default function CadeiraDetail() {
             <div className="flex items-center justify-between p-4 border-b">
               <div>
                 <p className="text-sm font-semibold flex items-center gap-2"><ClipboardCheck className="w-4 h-4 text-primary" /> Exames da Cadeira ({exames.length})</p>
-                <p className="text-xs text-muted-foreground mt-0.5">Provas presenciais — data, sala, peso, guia do exame, conteúdos avaliados e bibliografia.</p>
+                <p className="text-xs text-muted-foreground mt-0.5">Provas presenciais — clique numa linha para ver e editar todos os detalhes.</p>
               </div>
               <div className="flex items-center gap-3">
                 <Badge variant="outline" className="gap-1"><Percent className="w-3 h-3" /> Peso total: {exames.reduce((s, e) => s + (e.peso || 0), 0)}%</Badge>
                 {!locked && <Button size="sm" onClick={addExame} className="gap-1"><Plus className="w-4 h-4" /> Novo Exame</Button>}
               </div>
             </div>
-            <div className="divide-y">
-              {exames.map(ex => {
-                const inputId = `ex-up-${ex.id}`;
-                return (
-                  <div key={ex.id} className="p-5 space-y-4">
-                    <div className="flex items-start justify-between flex-wrap gap-3">
-                      <div className="min-w-0 flex-1 space-y-2">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <Badge className={
-                            ex.tipo === "1ª Época" ? "bg-blue-100 text-blue-700" :
-                            ex.tipo === "2ª Época" ? "bg-amber-100 text-amber-700" :
-                            ex.tipo === "Recurso" ? "bg-purple-100 text-purple-700" :
-                            "bg-rose-100 text-rose-700"
-                          }>{ex.tipo}</Badge>
-                          <Badge className={
-                            ex.estado === "publicado" ? "bg-emerald-100 text-emerald-700" :
-                            ex.estado === "agendado" ? "bg-slate-100 text-slate-700" :
-                            "bg-zinc-200 text-zinc-700"
-                          }>{ex.estado === "publicado" ? "Publicado" : ex.estado === "agendado" ? "Agendado" : "Encerrado"}</Badge>
-                          <Badge variant="outline" className="gap-1"><Percent className="w-3 h-3" /> Peso {ex.peso}%</Badge>
-                          <Badge variant="outline" className="gap-1"><CalendarDays className="w-3 h-3" /> {ex.data || "—"}</Badge>
-                          <Badge variant="outline" className="gap-1"><Clock className="w-3 h-3" /> {ex.hora} · {ex.duracao} min</Badge>
-                          <Badge variant="outline" className="gap-1"><MapPin className="w-3 h-3" /> {ex.sala || "—"}</Badge>
-                        </div>
-                        <Input disabled={locked} value={ex.titulo} onChange={e => updExame(ex.id, { titulo: e.target.value })} className="font-semibold h-9" placeholder="Título do exame" />
-                      </div>
-                      <div className="flex items-center gap-1">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-36">Tipo</TableHead>
+                  <TableHead>Título</TableHead>
+                  <TableHead className="w-28">Data</TableHead>
+                  <TableHead className="w-20">Hora</TableHead>
+                  <TableHead className="w-20">Duração</TableHead>
+                  <TableHead className="w-24">Sala</TableHead>
+                  <TableHead className="w-20">Peso</TableHead>
+                  <TableHead className="w-24">Estado</TableHead>
+                  <TableHead className="w-16">Anexos</TableHead>
+                  <TableHead className="w-24"></TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {exames.map(ex => (
+                  <TableRow key={ex.id} className="cursor-pointer hover:bg-muted/40" onClick={() => setSelectedExameId(ex.id)}>
+                    <TableCell>
+                      <Badge className={
+                        ex.tipo === "1ª Época" ? "bg-blue-100 text-blue-700" :
+                        ex.tipo === "2ª Época" ? "bg-amber-100 text-amber-700" :
+                        ex.tipo === "Recurso" ? "bg-purple-100 text-purple-700" :
+                        "bg-rose-100 text-rose-700"
+                      }>{ex.tipo}</Badge>
+                    </TableCell>
+                    <TableCell className="font-medium">{ex.titulo}</TableCell>
+                    <TableCell className="text-xs">{ex.data || "—"}</TableCell>
+                    <TableCell className="text-xs">{ex.hora}</TableCell>
+                    <TableCell className="text-xs">{ex.duracao} min</TableCell>
+                    <TableCell className="text-xs">{ex.sala || "—"}</TableCell>
+                    <TableCell className="text-xs font-medium">{ex.peso}%</TableCell>
+                    <TableCell>
+                      <Badge className={
+                        ex.estado === "publicado" ? "bg-emerald-100 text-emerald-700" :
+                        ex.estado === "agendado" ? "bg-slate-100 text-slate-700" :
+                        "bg-zinc-200 text-zinc-700"
+                      }>{ex.estado === "publicado" ? "Publicado" : ex.estado === "agendado" ? "Agendado" : "Encerrado"}</Badge>
+                    </TableCell>
+                    <TableCell className="text-xs">{ex.attachments.length}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
                         <Button size="icon" variant="ghost" className="h-8 w-8" disabled={locked} onClick={() => { updExame(ex.id, { estado: ex.estado === "publicado" ? "agendado" : "publicado" }); toast.success(ex.estado === "publicado" ? "Despublicado" : "Publicado"); }} title="Publicar/Despublicar">
                           <Eye className="w-4 h-4" />
                         </Button>
                         {!locked && <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => delExame(ex.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>}
                       </div>
-                    </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+                {exames.length === 0 && (
+                  <TableRow><TableCell colSpan={10} className="text-center text-sm text-muted-foreground py-8">Sem exames. Adicione o primeiro.</TableCell></TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </Card>
 
+          <Dialog open={!!selectedExameId} onOpenChange={open => !open && setSelectedExameId(null)}>
+            {(() => {
+              const ex = exames.find(x => x.id === selectedExameId);
+              if (!ex) return null;
+              const dialogInputId = `ex-dlg-up-${ex.id}`;
+              return (
+                <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2 text-base">
+                      <ClipboardCheck className="w-5 h-5 text-primary" />
+                      {ex.titulo}
+                      <Badge className={
+                        ex.tipo === "1ª Época" ? "bg-blue-100 text-blue-700" :
+                        ex.tipo === "2ª Época" ? "bg-amber-100 text-amber-700" :
+                        ex.tipo === "Recurso" ? "bg-purple-100 text-purple-700" :
+                        "bg-rose-100 text-rose-700"
+                      }>{ex.tipo}</Badge>
+                    </DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4 pt-2">
                     <div className="grid md:grid-cols-4 gap-3">
                       <div>
                         <Label className="text-xs">Tipo</Label>
@@ -458,6 +503,8 @@ export default function CadeiraDetail() {
                       </div>
                     </div>
 
+                    <div><Label className="text-xs">Título</Label><Input disabled={locked} value={ex.titulo} onChange={e => updExame(ex.id, { titulo: e.target.value })} className="h-9 mt-1 font-medium" /></div>
+
                     <div className="grid md:grid-cols-2 gap-3">
                       <div>
                         <Label className="text-xs">Conteúdos Avaliados</Label>
@@ -477,9 +524,9 @@ export default function CadeiraDetail() {
                       <div className="flex items-center justify-between px-3 py-2 border-b bg-muted/40">
                         <p className="text-xs font-semibold">Guia do Exame e Anexos ({ex.attachments.length})</p>
                         <div className="flex gap-2">
-                          <input id={inputId} type="file" multiple className="hidden" onChange={e => { addExameAttachs(ex.id, Array.from(e.target.files || [])); e.target.value = ""; }} />
+                          <input id={dialogInputId} type="file" multiple className="hidden" onChange={e => { addExameAttachs(ex.id, Array.from(e.target.files || [])); e.target.value = ""; }} />
                           {!locked && (
-                            <Button size="sm" variant="outline" className="h-7 gap-1" onClick={() => document.getElementById(inputId)?.click()}>
+                            <Button size="sm" variant="outline" className="h-7 gap-1" onClick={() => document.getElementById(dialogInputId)?.click()}>
                               <Plus className="w-3.5 h-3.5" /> Carregar
                             </Button>
                           )}
@@ -503,12 +550,20 @@ export default function CadeiraDetail() {
                         </div>
                       )}
                     </div>
+
+                    <div className="flex items-center justify-between border-t pt-4">
+                      <Badge className={
+                        ex.estado === "publicado" ? "bg-emerald-100 text-emerald-700" :
+                        ex.estado === "agendado" ? "bg-slate-100 text-slate-700" :
+                        "bg-zinc-200 text-zinc-700"
+                      }>{ex.estado === "publicado" ? "Publicado" : ex.estado === "agendado" ? "Agendado" : "Encerrado"}</Badge>
+                      <Button size="sm" variant="outline" onClick={() => setSelectedExameId(null)}>Fechar</Button>
+                    </div>
                   </div>
-                );
-              })}
-              {exames.length === 0 && <p className="text-sm text-muted-foreground text-center py-8">Sem exames. Adicione o primeiro.</p>}
-            </div>
-          </Card>
+                </DialogContent>
+              );
+            })()}
+          </Dialog>
         </TabsContent>
 
         <TabsContent value="recursos" className="mt-4">
