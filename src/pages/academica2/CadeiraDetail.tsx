@@ -131,7 +131,8 @@ export default function CadeiraDetail() {
         <TabsList className="flex-wrap h-auto">
           <TabsTrigger value="info"><BookOpen className="w-4 h-4 mr-1" /> Informação</TabsTrigger>
           <TabsTrigger value="aulas"><PlayCircle className="w-4 h-4 mr-1" /> Aulas</TabsTrigger>
-          <TabsTrigger value="conteudos"><FileText className="w-4 h-4 mr-1" /> Conteúdos</TabsTrigger>
+          <TabsTrigger value="conteudos"><FileText className="w-4 h-4 mr-1" /> Conteúdos por Aula</TabsTrigger>
+          <TabsTrigger value="recursos"><FileType className="w-4 h-4 mr-1" /> Recursos</TabsTrigger>
           <TabsTrigger value="quizzes"><ListChecks className="w-4 h-4 mr-1" /> Quizzes</TabsTrigger>
           <TabsTrigger value="calendario"><CalendarDays className="w-4 h-4 mr-1" /> Calendário</TabsTrigger>
         </TabsList>
@@ -205,7 +206,114 @@ export default function CadeiraDetail() {
         <TabsContent value="conteudos" className="mt-4">
           <Card>
             <div className="flex items-center justify-between p-4 border-b">
-              <p className="text-sm font-semibold">Recursos & Conteúdos ({conteudos.length})</p>
+              <div>
+                <p className="text-sm font-semibold">Conteúdos organizados por Aula</p>
+                <p className="text-xs text-muted-foreground mt-0.5">Ficheiros (PDF, DOCX, vídeo) e links associados a cada aula.</p>
+              </div>
+              <Badge variant="outline" className="gap-1"><FileText className="w-3 h-3" /> {aulas.reduce((s, a) => s + a.attachments.length, 0)} ficheiros</Badge>
+            </div>
+            <div className="divide-y">
+              {aulas.map(a => {
+                const inputId = `aula-up-${a.id}`;
+                const addAttachs = (files: File[]) => {
+                  if (!files.length) return;
+                  const novos: Attachment[] = files.map(f => {
+                    const ext = f.name.split(".").pop()?.toLowerCase() || "";
+                    const tipo: Attachment["tipo"] =
+                      ["mp4", "mov", "webm"].includes(ext) ? "Vídeo" :
+                      ["png", "jpg", "jpeg", "gif", "webp"].includes(ext) ? "Imagem" :
+                      ["ppt", "pptx"].includes(ext) ? "Slides" :
+                      ["doc", "docx"].includes(ext) ? "DOCX" : "PDF";
+                    return { id: uid("at"), name: f.name, tipo, size: `${(f.size / 1024).toFixed(0)} KB`, url: URL.createObjectURL(f) };
+                  });
+                  updAula(a.id, { attachments: [...a.attachments, ...novos] });
+                  toast.success(`${files.length} ficheiro(s) adicionado(s) à ${a.titulo}`);
+                };
+                const addLink = () => {
+                  const url = window.prompt("URL do link:");
+                  if (!url) return;
+                  const name = window.prompt("Título:", url) || url;
+                  updAula(a.id, { attachments: [...a.attachments, { id: uid("at"), name, tipo: "Link", url }] });
+                };
+                const updAttach = (atId: string, p: Partial<Attachment>) =>
+                  updAula(a.id, { attachments: a.attachments.map(x => x.id === atId ? { ...x, ...p } : x) });
+                const delAttach = (atId: string) =>
+                  updAula(a.id, { attachments: a.attachments.filter(x => x.id !== atId) });
+
+                return (
+                  <div key={a.id} className="p-4 space-y-3">
+                    <div className="flex items-center justify-between flex-wrap gap-2">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <Badge variant="outline" className="font-mono text-[10px]">Aula {a.n}</Badge>
+                        <Link to={`/areaacademica/cadeiras/${cadeira.id}/aula/${a.id}`} className="font-medium text-sm hover:text-primary truncate">{a.titulo}</Link>
+                        <span className="text-xs text-muted-foreground">· {a.data || "—"}</span>
+                      </div>
+                      <div className="flex gap-2">
+                        <input id={inputId} type="file" multiple className="hidden"
+                          onChange={e => { addAttachs(Array.from(e.target.files || [])); e.target.value = ""; }} />
+                        <Button size="sm" variant="outline" className="h-8 gap-1" onClick={() => document.getElementById(inputId)?.click()}>
+                          <Plus className="w-3.5 h-3.5" /> Ficheiro
+                        </Button>
+                        <Button size="sm" variant="outline" className="h-8 gap-1" onClick={addLink}>
+                          <Link2 className="w-3.5 h-3.5" /> Link
+                        </Button>
+                      </div>
+                    </div>
+                    {a.attachments.length === 0 ? (
+                      <p className="text-xs text-muted-foreground italic pl-2">Sem conteúdos para esta aula.</p>
+                    ) : (
+                      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                        {a.attachments.map(at => (
+                          <Card key={at.id} className="overflow-hidden border hover:border-primary/40 transition">
+                            <div className="aspect-[16/9] bg-muted border-b flex items-center justify-center overflow-hidden">
+                              {at.tipo === "Vídeo" ? (
+                                <video src={at.url} className="w-full h-full object-cover" muted />
+                              ) : at.tipo === "Imagem" ? (
+                                <img src={at.url} alt={at.name} className="w-full h-full object-cover" />
+                              ) : at.tipo === "PDF" || at.tipo === "Slides" ? (
+                                <iframe src={at.url} className="w-full h-full pointer-events-none" title={at.name} />
+                              ) : (
+                                <div className="flex flex-col items-center gap-1 text-muted-foreground">
+                                  {typeIcon(at.tipo)}
+                                  <span className="text-[10px] uppercase">{at.tipo}</span>
+                                </div>
+                              )}
+                            </div>
+                            <div className="p-2.5 space-y-2">
+                              <div className="flex items-center gap-2">
+                                {typeIcon(at.tipo)}
+                                <Select value={at.tipo} onValueChange={v => updAttach(at.id, { tipo: v as Attachment["tipo"] })}>
+                                  <SelectTrigger className="h-7 text-[11px] w-24"><SelectValue /></SelectTrigger>
+                                  <SelectContent>{(["PDF", "Slides", "DOCX", "Vídeo", "Imagem", "Link"] as const).map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
+                                </Select>
+                                <span className="text-[10px] text-muted-foreground ml-auto">{at.size || "—"}</span>
+                              </div>
+                              <Input value={at.name} onChange={e => updAttach(at.id, { name: e.target.value })} className="h-8 text-xs" placeholder="Nome do ficheiro" />
+                              <div className="flex items-center gap-1">
+                                <Button size="icon" variant="ghost" className="h-7 w-7" asChild><a href={at.url} target="_blank" rel="noreferrer" title="Abrir"><Eye className="w-3.5 h-3.5" /></a></Button>
+                                <Button size="icon" variant="ghost" className="h-7 w-7" asChild><a href={at.url} download={at.name} title="Descarregar"><Download className="w-3.5 h-3.5" /></a></Button>
+                                <div className="flex-1" />
+                                <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => delAttach(at.id)}><Trash2 className="w-3.5 h-3.5 text-destructive" /></Button>
+                              </div>
+                            </div>
+                          </Card>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="recursos" className="mt-4">
+          <Card>
+            <div className="flex items-center justify-between p-4 border-b">
+              <div>
+                <p className="text-sm font-semibold">Recursos da Cadeira ({conteudos.length})</p>
+                <p className="text-xs text-muted-foreground mt-0.5">Material transversal: programa, bibliografia, guiões — não associado a aulas específicas.</p>
+              </div>
               <div className="flex gap-2">
                 <input
                   id="conteudo-upload"
@@ -274,10 +382,11 @@ export default function CadeiraDetail() {
                   </div>
                 </Card>
               ))}
-              {conteudos.length === 0 && <p className="text-sm text-muted-foreground col-span-full text-center py-8">Sem conteúdos. Carregue PDFs, slides, vídeos ou docs.</p>}
+              {conteudos.length === 0 && <p className="text-sm text-muted-foreground col-span-full text-center py-8">Sem recursos. Carregue ficheiros transversais à cadeira.</p>}
             </div>
           </Card>
         </TabsContent>
+
 
 
         <TabsContent value="quizzes" className="mt-4">
