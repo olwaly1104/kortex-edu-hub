@@ -18,10 +18,9 @@ const acronymMap: Record<string, string> = {
 
 export default function Exames() {
   const [epoca, setEpoca] = useState<string>("all");
-  const [view, setView] = useState<"faculdades" | "cursos" | "anos" | "exames">("faculdades");
+  const [view, setView] = useState<"faculdades" | "cursos" | "curso">("faculdades");
   const [selectedFac, setSelectedFac] = useState<string | null>(null);
   const [selectedCurso, setSelectedCurso] = useState<string | null>(null);
-  const [selectedAno, setSelectedAno] = useState<number | null>(null);
 
   const facultyByCode = useMemo(() => Object.fromEntries(cursoTemplates.map(c => [c.code, c.faculty])), []);
 
@@ -34,23 +33,25 @@ export default function Exames() {
   }, [filtered]);
 
   const faculties = useMemo(() => {
-    const map: Record<string, { cursos: Set<string>; exames: number; inscritos: number }> = {};
+    const map: Record<string, { cursos: Set<string>; cadeiras: number; exames: number; inscritos: number }> = {};
     cursoTemplates.forEach(c => {
-      const f = map[c.faculty] ||= { cursos: new Set(), exames: 0, inscritos: 0 };
+      const f = map[c.faculty] ||= { cursos: new Set(), cadeiras: 0, exames: 0, inscritos: 0 };
       f.cursos.add(c.code);
+      f.cadeiras += c.years * c.cadeirasPorAno;
     });
     filtered.forEach(e => {
       const fac = facultyByCode[e.curso]; if (!fac) return;
-      const f = map[fac] ||= { cursos: new Set(), exames: 0, inscritos: 0 };
+      const f = map[fac] ||= { cursos: new Set(), cadeiras: 0, exames: 0, inscritos: 0 };
       f.exames += 1; f.inscritos += e.inscritos;
     });
-    return Object.entries(map).map(([name, v]) => ({ name, cursos: v.cursos.size, exames: v.exames, inscritos: v.inscritos }));
+    return Object.entries(map).map(([name, v]) => ({ name, cursos: v.cursos.size, cadeiras: v.cadeiras, exames: v.exames, inscritos: v.inscritos }));
   }, [filtered, facultyByCode]);
 
   const cursosOfFac = useMemo(() => {
     if (!selectedFac) return [];
     return cursoTemplates.filter(c => c.faculty === selectedFac).map(c => ({
       ...c,
+      cadeirasTotal: c.years * c.cadeirasPorAno,
       examesCount: (byCurso[c.code] || []).length,
       inscritos: (byCurso[c.code] || []).reduce((a, e) => a + e.inscritos, 0),
     }));
@@ -58,17 +59,10 @@ export default function Exames() {
 
   const cursoObj = cursoTemplates.find(c => c.code === selectedCurso);
 
-  const examesOfAno = useMemo(() => {
-    if (!selectedCurso || selectedAno == null) return [];
-    return (byCurso[selectedCurso] || []).filter(e => e.ano === selectedAno);
-  }, [byCurso, selectedCurso, selectedAno]);
-
   const goFac = (f: string) => { setSelectedFac(f); setView("cursos"); };
-  const goCurso = (code: string) => { setSelectedCurso(code); setView("anos"); };
-  const goAno = (a: number) => { setSelectedAno(a); setView("exames"); };
+  const goCurso = (code: string) => { setSelectedCurso(code); setView("curso"); };
   const back = () => {
-    if (view === "exames") { setView("anos"); setSelectedAno(null); }
-    else if (view === "anos") { setView("cursos"); setSelectedCurso(null); }
+    if (view === "curso") { setView("cursos"); setSelectedCurso(null); }
     else if (view === "cursos") { setView("faculdades"); setSelectedFac(null); }
   };
 
