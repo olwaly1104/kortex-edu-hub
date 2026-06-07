@@ -78,9 +78,15 @@ export default function AulaDetail() {
 
       <div className="rounded-xl border border-primary/30 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-6 flex items-start justify-between flex-wrap gap-3">
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2 mb-2">
+          <div className="flex items-center gap-2 mb-2 flex-wrap">
             <Badge variant="outline">Aula {aula.n}</Badge>
             <Badge variant="outline">{cadeira.cadeira}</Badge>
+            <Badge variant="outline" className="gap-1"><CalendarDays className="w-3 h-3" /> {aula.data || "Sem data"}</Badge>
+            <Badge variant="outline" className="gap-1"><Clock className="w-3 h-3" /> {aula.duracao} min</Badge>
+            {aula.quizId && (() => {
+              const q = content.quizzes.find(x => x.id === aula.quizId);
+              return q ? <Badge className="bg-blue-100 text-blue-700 gap-1"><ListChecks className="w-3 h-3" /> Quiz: {q.titulo}</Badge> : null;
+            })()}
             <Badge className={aula.publicada ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}>{aula.publicada ? "Publicada" : "Rascunho"}</Badge>
           </div>
           <h1 className="text-2xl font-bold flex items-center gap-2"><PlayCircle className="w-6 h-6 text-primary" /> {aula.titulo}</h1>
