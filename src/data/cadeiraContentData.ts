@@ -18,6 +18,7 @@ export type Aula = {
   descricao: string;
   publicada: boolean;
   attachments: Attachment[];
+  quizId?: string;
 };
 
 export type Conteudo = {
