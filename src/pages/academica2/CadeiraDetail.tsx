@@ -12,7 +12,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Switch } from "@/components/ui/switch";
 import { cadeirasAcad, anosLetivos, cursoTemplates } from "@/data/academica2Data";
 import { getCadeiraContent, setCadeiraContent, uid, type Aula, type Conteudo, type Quiz, type Evento, type Attachment } from "@/data/cadeiraContentData";
-import { ArrowLeft, BookOpen, PlayCircle, FileText, ListChecks, CalendarDays, UserCog, Plus, Trash2, Save, Pencil, GraduationCap, Eye, Download, FileType, Film, Image as ImageIcon, Link2 } from "lucide-react";
+import { ArrowLeft, BookOpen, PlayCircle, FileText, ListChecks, CalendarDays, UserCog, Plus, Trash2, Save, Pencil, GraduationCap, Eye, Download, FileType, Film, Image as ImageIcon, Link2, Scale } from "lucide-react";
 import { toast } from "sonner";
 
 const docentesPool = [
