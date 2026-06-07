@@ -420,6 +420,56 @@ export default function CadeiraDetail() {
             </Table>
           </Card>
         </TabsContent>
+
+        <TabsContent value="criterio" className="mt-4">
+          <Card className="p-6 space-y-5">
+            <div>
+              <p className="text-sm font-semibold flex items-center gap-2"><Scale className="w-4 h-4 text-primary" /> Critério de Avaliação</p>
+              <p className="text-xs text-muted-foreground mt-1">Defina a ponderação de cada componente e os requisitos de aprovação. O total dos pesos deve somar 100%.</p>
+            </div>
+            <div className="grid md:grid-cols-3 gap-4">
+              <div>
+                <Label className="text-xs">Avaliação Contínua (%)</Label>
+                <Input type="number" min={0} max={100} value={criterio.avaliacaoContinua} onChange={e => setCriterio(c => ({ ...c, avaliacaoContinua: +e.target.value }))} className="mt-1" />
+              </div>
+              <div>
+                <Label className="text-xs">Trabalhos Práticos (%)</Label>
+                <Input type="number" min={0} max={100} value={criterio.trabalhosPraticos} onChange={e => setCriterio(c => ({ ...c, trabalhosPraticos: +e.target.value }))} className="mt-1" />
+              </div>
+              <div>
+                <Label className="text-xs">Exames Finais (%)</Label>
+                <Input type="number" min={0} max={100} value={criterio.examesFinais} onChange={e => setCriterio(c => ({ ...c, examesFinais: +e.target.value }))} className="mt-1" />
+              </div>
+            </div>
+            <div className="flex items-center justify-between rounded-md border bg-muted/30 px-4 py-2">
+              <span className="text-xs text-muted-foreground">Total dos pesos</span>
+              <Badge className={criterio.avaliacaoContinua + criterio.trabalhosPraticos + criterio.examesFinais === 100 ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}>
+                {criterio.avaliacaoContinua + criterio.trabalhosPraticos + criterio.examesFinais}%
+              </Badge>
+            </div>
+            <div className="grid md:grid-cols-3 gap-4 border-t pt-4">
+              <div>
+                <Label className="text-xs">Nota Mínima por Exame (0-20)</Label>
+                <Input type="number" min={0} max={20} value={criterio.notaMinimaExame} onChange={e => setCriterio(c => ({ ...c, notaMinimaExame: +e.target.value }))} className="mt-1" />
+              </div>
+              <div>
+                <Label className="text-xs">Nota de Aprovação (0-20)</Label>
+                <Input type="number" min={0} max={20} value={criterio.notaAprovacao} onChange={e => setCriterio(c => ({ ...c, notaAprovacao: +e.target.value }))} className="mt-1" />
+              </div>
+              <div>
+                <Label className="text-xs">Presença Mínima (%)</Label>
+                <Input type="number" min={0} max={100} value={criterio.presencaMinima} onChange={e => setCriterio(c => ({ ...c, presencaMinima: +e.target.value }))} className="mt-1" />
+              </div>
+            </div>
+            <div>
+              <Label className="text-xs">Observações</Label>
+              <Textarea rows={5} value={criterio.observacoes} onChange={e => setCriterio(c => ({ ...c, observacoes: e.target.value }))} className="mt-1" />
+            </div>
+            <div className="flex justify-end border-t pt-4">
+              <Button onClick={() => toast.success("Critério de avaliação guardado")} className="gap-2"><Save className="w-4 h-4" /> Guardar Critério</Button>
+            </div>
+          </Card>
+        </TabsContent>
       </Tabs>
     </div>
   );
