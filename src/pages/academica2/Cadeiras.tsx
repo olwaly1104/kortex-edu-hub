@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { cadeirasAcad, cursoTemplates, anosLetivos } from "@/data/academica2Data";
 import { getCadeiraContent } from "@/data/cadeiraContentData";
-import { BookOpen, Search, Plus, PlayCircle, FileText, ListChecks, Paperclip, CalendarRange, GraduationCap } from "lucide-react";
+import { BookOpen, Search, Plus, PlayCircle, FileText, CalendarRange, GraduationCap, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const parseDate = (s: string) => { const [d, m, y] = s.split("/").map(Number); return new Date(y, m - 1, d); };
@@ -33,13 +33,14 @@ export default function Cadeiras() {
     "Faculdade de Ciências Sociais": "FCSO",
   };
 
+  const isFuture = yl.status !== "ativo" && yl.status !== "arquivado";
+
   const rows = useMemo(() => cadeirasAcad
     .filter(c => (cursoFilter === "all" || c.curso === cursoFilter) && (search === "" || c.cadeira.toLowerCase().includes(search.toLowerCase())))
     .map(c => {
       const content = getCadeiraContent(c.id, c.cadeira);
-      const recursos = content.aulas.reduce((s, a) => s + a.attachments.length, 0);
       const exames = content.calendario.filter(e => e.tipo === "avaliacao").length;
-      return { ...c, faculdade: facultyByCode[c.curso] || "—", conteudos: content.conteudos.length, quizzes: content.quizzes.length, recursos, exames, aulasPlaneadas: aulasNoAno };
+      return { ...c, faculdade: facultyByCode[c.curso] || "—", conteudos: content.conteudos.length, exames, aulasPlaneadas: aulasNoAno };
     }), [cursoFilter, search, aulasNoAno, facultyByCode]);
 
   return (
@@ -91,10 +92,9 @@ export default function Cadeiras() {
               <TableHead>Curso</TableHead>
               <TableHead>Ano</TableHead>
               <TableHead>Docente</TableHead>
+              <TableHead className="text-center"><span className="inline-flex items-center gap-1"><Users className="w-3 h-3" /> Disc.</span></TableHead>
               <TableHead className="text-center"><span className="inline-flex items-center gap-1"><PlayCircle className="w-3 h-3" /> Aulas</span></TableHead>
               <TableHead className="text-center"><span className="inline-flex items-center gap-1"><FileText className="w-3 h-3" /> Conteúdos</span></TableHead>
-              <TableHead className="text-center"><span className="inline-flex items-center gap-1"><ListChecks className="w-3 h-3" /> Quizzes</span></TableHead>
-              <TableHead className="text-center"><span className="inline-flex items-center gap-1"><Paperclip className="w-3 h-3" /> Recursos</span></TableHead>
               <TableHead className="text-center"><span className="inline-flex items-center gap-1"><GraduationCap className="w-3 h-3" /> Exames</span></TableHead>
               <TableHead>Estado</TableHead>
             </TableRow>
@@ -106,16 +106,19 @@ export default function Cadeiras() {
                 <TableCell><span className="inline-flex items-center rounded px-2 py-0.5 text-[11px] font-semibold tracking-wide text-muted-foreground ring-1 ring-inset ring-border bg-muted/30">{acronymMap[c.faculdade] || c.faculdade}</span></TableCell>
                 <TableCell><Badge variant="outline">{c.curso}</Badge></TableCell>
                 <TableCell>{c.ano}º</TableCell>
-                <TableCell className="text-sm">{c.docente}</TableCell>
-                <TableCell className="text-center font-mono text-xs">{c.aulasPlaneadas}</TableCell>
-                <TableCell className="text-center font-mono text-xs">{c.conteudos}</TableCell>
-                <TableCell className="text-center font-mono text-xs">{c.quizzes}</TableCell>
-                <TableCell className="text-center font-mono text-xs">{c.recursos}</TableCell>
-                <TableCell className="text-center font-mono text-xs">{c.exames}</TableCell>
+                <TableCell className="text-sm">{isFuture ? <span className="text-muted-foreground/50">—</span> : c.docente}</TableCell>
+                <TableCell className="text-center font-mono text-xs">{isFuture ? <span className="text-muted-foreground/50">—</span> : c.estudantes}</TableCell>
+                <TableCell className="text-center font-mono text-xs">{isFuture ? <span className="text-muted-foreground/50">—</span> : c.aulasPlaneadas}</TableCell>
+                <TableCell className="text-center font-mono text-xs">{isFuture ? <span className="text-muted-foreground/50">—</span> : c.conteudos}</TableCell>
+                <TableCell className="text-center font-mono text-xs">{isFuture ? <span className="text-muted-foreground/50">—</span> : c.exames}</TableCell>
                 <TableCell>
-                  <Badge className={c.publicada ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}>
-                    {c.publicada ? "Publicada" : "Rascunho"}
-                  </Badge>
+                  {isFuture ? (
+                    <Badge variant="outline" className="text-muted-foreground">Planeado</Badge>
+                  ) : (
+                    <Badge className={c.publicada ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}>
+                      {c.publicada ? "Publicada" : "Rascunho"}
+                    </Badge>
+                  )}
                 </TableCell>
               </TableRow>
             ))}
