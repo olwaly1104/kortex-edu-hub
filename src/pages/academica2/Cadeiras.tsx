@@ -98,19 +98,19 @@ export default function Cadeiras() {
             {rows.map(c => (
               <TableRow key={c.id} className="cursor-pointer hover:bg-muted/50" onClick={() => navigate(`/areaacademica/cadeiras/${c.id}`)}>
                 <TableCell className="font-medium">{c.cadeira}</TableCell>
-                <TableCell><Badge variant="secondary" className="font-normal">{c.faculdade}</Badge></TableCell>
-                <TableCell><Badge variant="outline">{c.curso}</Badge></TableCell>
-                <TableCell>{c.ano}º</TableCell>
+                <TableCell className="text-sm">{c.faculdade}</TableCell>
+                <TableCell className="text-sm">{c.curso}</TableCell>
+                <TableCell className="text-center">{c.ano}º</TableCell>
                 <TableCell className="text-sm">{c.docente}</TableCell>
-                <TableCell className="text-center font-mono text-xs">{c.aulasPlaneadas}</TableCell>
-                <TableCell className="text-center font-mono text-xs">{c.conteudos}</TableCell>
-                <TableCell className="text-center font-mono text-xs">{c.quizzes}</TableCell>
-                <TableCell className="text-center font-mono text-xs">{c.recursos}</TableCell>
-                <TableCell className="text-center font-mono text-xs">{c.exames}</TableCell>
+                <TableCell className="text-center tabular-nums text-sm">{c.aulasPlaneadas}</TableCell>
+                <TableCell className="text-center tabular-nums text-sm">{c.conteudos}</TableCell>
+                <TableCell className="text-center tabular-nums text-sm">{c.quizzes}</TableCell>
+                <TableCell className="text-center tabular-nums text-sm">{c.recursos}</TableCell>
+                <TableCell className="text-center tabular-nums text-sm">{c.exames}</TableCell>
                 <TableCell>
-                  <Badge className={c.publicada ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}>
+                  <span className={c.publicada ? "text-emerald-600 font-medium text-sm" : "text-amber-600 font-medium text-sm"}>
                     {c.publicada ? "Publicada" : "Rascunho"}
-                  </Badge>
+                  </span>
                 </TableCell>
               </TableRow>
             ))}
