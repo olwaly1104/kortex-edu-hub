@@ -384,6 +384,133 @@ export default function CadeiraDetail() {
           </Card>
         </TabsContent>
 
+        <TabsContent value="exames" className="mt-4">
+          <Card>
+            <div className="flex items-center justify-between p-4 border-b">
+              <div>
+                <p className="text-sm font-semibold flex items-center gap-2"><ClipboardCheck className="w-4 h-4 text-primary" /> Exames da Cadeira ({exames.length})</p>
+                <p className="text-xs text-muted-foreground mt-0.5">Provas presenciais — data, sala, peso, guia do exame, conteúdos avaliados e bibliografia.</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <Badge variant="outline" className="gap-1"><Percent className="w-3 h-3" /> Peso total: {exames.reduce((s, e) => s + (e.peso || 0), 0)}%</Badge>
+                {!locked && <Button size="sm" onClick={addExame} className="gap-1"><Plus className="w-4 h-4" /> Novo Exame</Button>}
+              </div>
+            </div>
+            <div className="divide-y">
+              {exames.map(ex => {
+                const inputId = `ex-up-${ex.id}`;
+                return (
+                  <div key={ex.id} className="p-5 space-y-4">
+                    <div className="flex items-start justify-between flex-wrap gap-3">
+                      <div className="min-w-0 flex-1 space-y-2">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <Badge className={
+                            ex.tipo === "1ª Época" ? "bg-blue-100 text-blue-700" :
+                            ex.tipo === "2ª Época" ? "bg-amber-100 text-amber-700" :
+                            ex.tipo === "Recurso" ? "bg-purple-100 text-purple-700" :
+                            "bg-rose-100 text-rose-700"
+                          }>{ex.tipo}</Badge>
+                          <Badge className={
+                            ex.estado === "publicado" ? "bg-emerald-100 text-emerald-700" :
+                            ex.estado === "agendado" ? "bg-slate-100 text-slate-700" :
+                            "bg-zinc-200 text-zinc-700"
+                          }>{ex.estado === "publicado" ? "Publicado" : ex.estado === "agendado" ? "Agendado" : "Encerrado"}</Badge>
+                          <Badge variant="outline" className="gap-1"><Percent className="w-3 h-3" /> Peso {ex.peso}%</Badge>
+                          <Badge variant="outline" className="gap-1"><CalendarDays className="w-3 h-3" /> {ex.data || "—"}</Badge>
+                          <Badge variant="outline" className="gap-1"><Clock className="w-3 h-3" /> {ex.hora} · {ex.duracao} min</Badge>
+                          <Badge variant="outline" className="gap-1"><MapPin className="w-3 h-3" /> {ex.sala || "—"}</Badge>
+                        </div>
+                        <Input disabled={locked} value={ex.titulo} onChange={e => updExame(ex.id, { titulo: e.target.value })} className="font-semibold h-9" placeholder="Título do exame" />
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Button size="icon" variant="ghost" className="h-8 w-8" disabled={locked} onClick={() => { updExame(ex.id, { estado: ex.estado === "publicado" ? "agendado" : "publicado" }); toast.success(ex.estado === "publicado" ? "Despublicado" : "Publicado"); }} title="Publicar/Despublicar">
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                        {!locked && <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => delExame(ex.id)}><Trash2 className="w-4 h-4 text-destructive" /></Button>}
+                      </div>
+                    </div>
+
+                    <div className="grid md:grid-cols-4 gap-3">
+                      <div>
+                        <Label className="text-xs">Tipo</Label>
+                        <Select value={ex.tipo} onValueChange={v => updExame(ex.id, { tipo: v as ExameTipo })} disabled={locked}>
+                          <SelectTrigger className="h-9 mt-1"><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="1ª Época">1ª Época</SelectItem>
+                            <SelectItem value="2ª Época">2ª Época</SelectItem>
+                            <SelectItem value="Recurso">Recurso</SelectItem>
+                            <SelectItem value="Especial">Especial</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div><Label className="text-xs">Data</Label><Input disabled={locked} value={ex.data} onChange={e => updExame(ex.id, { data: e.target.value })} placeholder="dd/mm/aaaa" className="h-9 mt-1" /></div>
+                      <div><Label className="text-xs">Hora</Label><Input disabled={locked} value={ex.hora} onChange={e => updExame(ex.id, { hora: e.target.value })} placeholder="09:00" className="h-9 mt-1" /></div>
+                      <div><Label className="text-xs">Duração (min)</Label><Input disabled={locked} type="number" value={ex.duracao} onChange={e => updExame(ex.id, { duracao: +e.target.value })} className="h-9 mt-1" /></div>
+                      <div><Label className="text-xs">Sala</Label><Input disabled={locked} value={ex.sala} onChange={e => updExame(ex.id, { sala: e.target.value })} className="h-9 mt-1" /></div>
+                      <div><Label className="text-xs">Peso (%)</Label><Input disabled={locked} type="number" min={0} max={100} value={ex.peso} onChange={e => updExame(ex.id, { peso: +e.target.value })} className="h-9 mt-1" /></div>
+                      <div><Label className="text-xs">Nota Mínima (0-20)</Label><Input disabled={locked} type="number" min={0} max={20} value={ex.notaMinima} onChange={e => updExame(ex.id, { notaMinima: +e.target.value })} className="h-9 mt-1" /></div>
+                      <div>
+                        <Label className="text-xs">Docente Responsável</Label>
+                        <Select value={ex.responsavel} onValueChange={v => updExame(ex.id, { responsavel: v })} disabled={locked}>
+                          <SelectTrigger className="h-9 mt-1"><SelectValue /></SelectTrigger>
+                          <SelectContent>{docentesPool.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    <div className="grid md:grid-cols-2 gap-3">
+                      <div>
+                        <Label className="text-xs">Conteúdos Avaliados</Label>
+                        <Textarea disabled={locked} rows={4} value={ex.conteudos} onChange={e => updExame(ex.id, { conteudos: e.target.value })} className="mt-1 text-sm" placeholder="Capítulos, tópicos e matérias incluídas no exame." />
+                      </div>
+                      <div>
+                        <Label className="text-xs">Bibliografia</Label>
+                        <Textarea disabled={locked} rows={4} value={ex.bibliografia} onChange={e => updExame(ex.id, { bibliografia: e.target.value })} className="mt-1 text-sm" placeholder="Manual, slides, fichas e leituras recomendadas." />
+                      </div>
+                    </div>
+                    <div>
+                      <Label className="text-xs">Observações / Instruções</Label>
+                      <Textarea disabled={locked} rows={3} value={ex.observacoes} onChange={e => updExame(ex.id, { observacoes: e.target.value })} className="mt-1 text-sm" placeholder="Material permitido, duração, regras específicas..." />
+                    </div>
+
+                    <div className="rounded-md border">
+                      <div className="flex items-center justify-between px-3 py-2 border-b bg-muted/40">
+                        <p className="text-xs font-semibold">Guia do Exame e Anexos ({ex.attachments.length})</p>
+                        <div className="flex gap-2">
+                          <input id={inputId} type="file" multiple className="hidden" onChange={e => { addExameAttachs(ex.id, Array.from(e.target.files || [])); e.target.value = ""; }} />
+                          {!locked && (
+                            <Button size="sm" variant="outline" className="h-7 gap-1" onClick={() => document.getElementById(inputId)?.click()}>
+                              <Plus className="w-3.5 h-3.5" /> Carregar
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                      {ex.attachments.length === 0 ? (
+                        <p className="text-xs text-muted-foreground italic px-3 py-3">Sem ficheiros anexados.</p>
+                      ) : (
+                        <div className="divide-y">
+                          {ex.attachments.map(at => (
+                            <div key={at.id} className="flex items-center gap-2 px-3 py-2 hover:bg-muted/40">
+                              <span className="shrink-0">{typeIcon(at.tipo)}</span>
+                              <Input disabled={locked} value={at.name} onChange={e => updExame(ex.id, { attachments: ex.attachments.map(a => a.id === at.id ? { ...a, name: e.target.value } : a) })} className="h-7 text-xs border-none shadow-none px-1 focus-visible:ring-1" />
+                              <Badge variant="outline" className="text-[10px] h-5 shrink-0">{at.tipo}</Badge>
+                              <span className="text-[10px] text-muted-foreground shrink-0 w-16 text-right">{at.size || "—"}</span>
+                              <Button size="icon" variant="ghost" className="h-7 w-7 shrink-0" asChild><a href={at.url} target="_blank" rel="noreferrer" title="Abrir"><Eye className="w-3.5 h-3.5" /></a></Button>
+                              <Button size="icon" variant="ghost" className="h-7 w-7 shrink-0" asChild><a href={at.url} download={at.name} title="Descarregar"><Download className="w-3.5 h-3.5" /></a></Button>
+                              {!locked && <Button size="icon" variant="ghost" className="h-7 w-7 shrink-0" onClick={() => delExameAttach(ex.id, at.id)}><Trash2 className="w-3.5 h-3.5 text-destructive" /></Button>}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+              {exames.length === 0 && <p className="text-sm text-muted-foreground text-center py-8">Sem exames. Adicione o primeiro.</p>}
+            </div>
+          </Card>
+        </TabsContent>
+
         <TabsContent value="recursos" className="mt-4">
           <Card>
             <div className="flex items-center justify-between p-4 border-b">
