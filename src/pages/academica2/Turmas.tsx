@@ -80,24 +80,22 @@ function makeDiscentes(factor: number): Pessoa[] {
 
 function makeCandidatos(factor: number): Pessoa[] {
   const list: Pessoa[] = []; let i = 100;
-  const estados = ["Alocado","Alocado","Alocado","Pendente","Pendente","Conflito"];
   const sessoes: ("1ª"|"2ª"|"3ª")[] = ["1ª","1ª","2ª","2ª","3ª"];
   cursoTemplates.forEach(c => {
-    // candidatos = ~25% of cohort, all aim 1º ano
     const target = Math.max(4, Math.round(c.estudantesEsperados * factor * 0.25));
     for (let k = 0; k < target; k++) {
       const letra = ["A","B","C"][k % 3];
       const nome = (NOMES[(i * 11) % NOMES.length] + " " + SUFIX[(i + 3) % SUFIX.length]).trim();
       const media = Math.round((10 + ((i * 17) % 100) / 10) * 10) / 10;
-      const estado = estados[i % estados.length];
+      const atribuido = i % 3 !== 0; // ~66% atribuídos
       list.push({
         id: `C${(i + 1).toString().padStart(4, "0")}`,
         nome,
         email: nome.toLowerCase().replace(/[^a-z]+/g, ".").replace(/^\.|\.$/g, "") + "@candidato.kor",
         codigo: c.code, curso: c.name, faculdade: c.faculty,
-        ano: 1, turma: estado === "Alocado" ? `${c.code}-1${letra}` : "—",
+        ano: 1, turma: atribuido ? `${c.code}-1${letra}` : "—",
         media,
-        estado,
+        estado: atribuido ? "Atribuído" : "Não atribuído",
         sessao: sessoes[i % sessoes.length],
       });
       i++;
@@ -108,11 +106,9 @@ function makeCandidatos(factor: number): Pessoa[] {
 
 const estadoBadge = (e: string) => {
   switch (e) {
-    case "Alocado": return "bg-emerald-100 text-emerald-700";
-    case "Pendente": return "bg-amber-100 text-amber-700";
-    case "Conflito": return "bg-red-100 text-red-700";
-    case "Novo": return "bg-blue-100 text-blue-700";
-    default: return "bg-emerald-100 text-emerald-700";
+    case "Atribuído": return "bg-emerald-100 text-emerald-700";
+    case "Não atribuído": return "bg-amber-100 text-amber-700";
+    default: return "bg-muted text-muted-foreground";
   }
 };
 
