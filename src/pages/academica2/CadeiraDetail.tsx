@@ -45,6 +45,16 @@ export default function CadeiraDetail() {
     publicada: cadeira.publicada,
   });
 
+  const [criterio, setCriterio] = useState({
+    avaliacaoContinua: 40,
+    trabalhosPraticos: 20,
+    examesFinais: 40,
+    notaMinimaExame: 8,
+    notaAprovacao: 10,
+    presencaMinima: 75,
+    observacoes: "Os alunos devem obter nota mínima de 8 em cada exame e cumprir a presença mínima de 75% para aprovação. A média final resulta da ponderação dos componentes de avaliação contínua, trabalhos práticos e exames finais.",
+  });
+
   const initial = getCadeiraContent(cadeira.id, cadeira.cadeira);
   const [aulas, setAulas] = useState<Aula[]>(initial.aulas);
   const [conteudos, setConteudos] = useState<Conteudo[]>(initial.conteudos);
