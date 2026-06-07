@@ -391,21 +391,13 @@ export default function CourseCreator() {
               </div>
             )}
 
-            {active === "docentes" && (
-              <p className="text-sm text-muted-foreground">108 docentes serão distribuídos automaticamente pelas cadeiras com base na sua especialidade e carga horária.</p>
-            )}
             {active === "calendario" && (
               <div className="text-sm space-y-2">
                 <p><strong>Ano:</strong> {startDate} → {endDate}</p>
                 <p><strong>1º Semestre:</strong> {sem1Start} → {sem1End}</p>
                 <p><strong>2º Semestre:</strong> {sem2Start} → {sem2End}</p>
+                <p className="text-muted-foreground pt-2 border-t mt-2">Mapa de exames presenciais (1ª e 2ª época) gerado automaticamente com salas atribuídas por capacidade.</p>
               </div>
-            )}
-            {active === "exames" && (
-              <p className="text-sm text-muted-foreground">Mapa de exames presenciais será gerado automaticamente para 1ª e 2ª época, com salas atribuídas por capacidade.</p>
-            )}
-            {active === "quizzes" && (
-              <p className="text-sm text-muted-foreground">Banco inicial de 2 quizzes por cadeira será criado e disponibilizado aos docentes para personalização.</p>
             )}
             {active === "publicar" && (
               <p className="text-sm text-muted-foreground">Ao publicar, o ano letivo {anoLabel} fica activo e visível para todos os perfis (estudantes, docentes, coordenadores).</p>
