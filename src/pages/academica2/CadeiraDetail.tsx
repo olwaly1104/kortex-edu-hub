@@ -60,6 +60,7 @@ export default function CadeiraDetail() {
   const [conteudos, setConteudos] = useState<Conteudo[]>(initial.conteudos);
   const [quizzes, setQuizzes] = useState<Quiz[]>(initial.quizzes);
   const [calendario, setCalendario] = useState<Evento[]>(initial.calendario);
+  const [locked, setLocked] = useState(true);
 
   const persist = (patch: Partial<ReturnType<typeof getCadeiraContent>>) => {
     setCadeiraContent(cadeira.id, { aulas, conteudos, quizzes, calendario, ...patch });
