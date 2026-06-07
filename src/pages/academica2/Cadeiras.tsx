@@ -61,7 +61,7 @@ export default function Cadeiras() {
           </TableHeader>
           <TableBody>
             {filtered.map(c => (
-              <TableRow key={c.id}>
+              <TableRow key={c.id} className="cursor-pointer hover:bg-muted/50" onClick={() => navigate(`/areaacademica/cadeiras/${c.id}`)}>
                 <TableCell className="font-medium">{c.cadeira}</TableCell>
                 <TableCell><Badge variant="outline">{c.curso}</Badge></TableCell>
                 <TableCell>{c.ano}º</TableCell>
