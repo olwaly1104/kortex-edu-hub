@@ -162,21 +162,21 @@ export default function CadeiraDetail() {
         <TabsContent value="info" className="mt-4">
           <Card className="p-6 space-y-4">
             <div className="grid md:grid-cols-3 gap-4">
-              <div><Label>Nome</Label><Input value={meta.nome} onChange={e => setMeta(m => ({ ...m, nome: e.target.value }))} className="mt-1" /></div>
-              <div><Label>ECTS</Label><Input type="number" value={meta.ects} onChange={e => setMeta(m => ({ ...m, ects: +e.target.value }))} className="mt-1" /></div>
-              <div><Label>Ano</Label><Input type="number" min={1} max={6} value={meta.ano} onChange={e => setMeta(m => ({ ...m, ano: +e.target.value }))} className="mt-1" /></div>
+              <div><Label>Nome</Label><Input disabled={locked} value={meta.nome} onChange={e => setMeta(m => ({ ...m, nome: e.target.value }))} className="mt-1" /></div>
+              <div><Label>ECTS</Label><Input disabled={locked} type="number" value={meta.ects} onChange={e => setMeta(m => ({ ...m, ects: +e.target.value }))} className="mt-1" /></div>
+              <div><Label>Ano</Label><Input disabled={locked} type="number" min={1} max={6} value={meta.ano} onChange={e => setMeta(m => ({ ...m, ano: +e.target.value }))} className="mt-1" /></div>
               <div className="md:col-span-3">
                 <Label>Docente</Label>
-                <Select value={meta.docente} onValueChange={v => setMeta(m => ({ ...m, docente: v }))}>
+                <Select value={meta.docente} onValueChange={v => setMeta(m => ({ ...m, docente: v }))} disabled={locked}>
                   <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
                   <SelectContent>{docentesPool.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent>
                 </Select>
               </div>
             </div>
-            <div><Label>Descrição / Ementa</Label><Textarea rows={5} value={meta.descricao} onChange={e => setMeta(m => ({ ...m, descricao: e.target.value }))} className="mt-1" /></div>
+            <div><Label>Descrição / Ementa</Label><Textarea disabled={locked} rows={5} value={meta.descricao} onChange={e => setMeta(m => ({ ...m, descricao: e.target.value }))} className="mt-1" /></div>
             <div className="flex items-center justify-between border-t pt-4">
-              <div className="flex items-center gap-2"><Switch checked={meta.publicada} onCheckedChange={v => setMeta(m => ({ ...m, publicada: v }))} /><Label>Publicar no ano letivo {anosLetivos.find(a => a.id === anoLetivo)?.label}</Label></div>
-              <Button onClick={() => toast.success("Cadeira guardada")} className="gap-2"><Save className="w-4 h-4" /> Guardar</Button>
+              <div className="flex items-center gap-2"><Switch disabled={locked} checked={meta.publicada} onCheckedChange={v => setMeta(m => ({ ...m, publicada: v }))} /><Label>Publicar no ano letivo {anosLetivos.find(a => a.id === anoLetivo)?.label}</Label></div>
+              <Button onClick={() => toast.success("Cadeira guardada")} className="gap-2" disabled={locked}><Save className="w-4 h-4" /> Guardar</Button>
             </div>
           </Card>
         </TabsContent>
