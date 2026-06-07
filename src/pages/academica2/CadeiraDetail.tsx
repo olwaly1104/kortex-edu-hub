@@ -413,7 +413,7 @@ export default function CadeiraDetail() {
           <Card>
             <div className="flex items-center justify-between p-4 border-b">
               <p className="text-sm font-semibold">Calendário da Cadeira</p>
-              <Button size="sm" onClick={addEvento} className="gap-1"><Plus className="w-4 h-4" /> Novo Evento</Button>
+              {!locked && <Button size="sm" onClick={addEvento} className="gap-1"><Plus className="w-4 h-4" /> Novo Evento</Button>}
             </div>
             <Table>
               <TableHeader><TableRow><TableHead className="w-32">Data</TableHead><TableHead>Título</TableHead><TableHead className="w-36">Tipo</TableHead><TableHead className="w-12"></TableHead></TableRow></TableHeader>
