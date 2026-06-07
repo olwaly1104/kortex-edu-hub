@@ -69,7 +69,7 @@ function makeDiscentes(factor: number): Pessoa[] {
           codigo: c.code, curso: c.name, faculdade: c.faculty,
           ano, turma: `${c.code}-${ano}${letra}`,
           media,
-          estado: ano === 1 ? "Novo" : "Ativo",
+          estado: "Atribuído",
         });
         i++;
       }
