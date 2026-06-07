@@ -109,6 +109,7 @@ export default function CadeiraDetail() {
     },
   ]);
   const [locked, setLocked] = useState(true);
+  const [selectedExameId, setSelectedExameId] = useState<string | null>(null);
 
   const updExame = (id: string, p: Partial<Exame>) => setExames(xs => xs.map(x => x.id === id ? { ...x, ...p } : x));
   const delExame = (id: string) => setExames(xs => xs.filter(x => x.id !== id));
