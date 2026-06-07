@@ -340,10 +340,14 @@ export default function CadeiraDetail() {
                     e.target.value = "";
                   }}
                 />
-                <Button size="sm" variant="outline" className="gap-1" onClick={() => document.getElementById("conteudo-upload")?.click()}>
-                  <FileText className="w-4 h-4" /> Carregar Ficheiros
-                </Button>
-                <Button size="sm" onClick={addConteudo} className="gap-1"><Plus className="w-4 h-4" /> Adicionar</Button>
+                {!locked && (
+                  <>
+                    <Button size="sm" variant="outline" className="gap-1" onClick={() => document.getElementById("conteudo-upload")?.click()}>
+                      <FileText className="w-4 h-4" /> Carregar Ficheiros
+                    </Button>
+                    <Button size="sm" onClick={addConteudo} className="gap-1"><Plus className="w-4 h-4" /> Adicionar</Button>
+                  </>
+                )}
               </div>
             </div>
             <div className="p-4">
@@ -351,11 +355,11 @@ export default function CadeiraDetail() {
                 {conteudos.map(c => (
                   <div key={c.id} className="flex items-center gap-2 px-3 py-2 hover:bg-muted/40">
                     <span className="shrink-0">{typeIcon(c.tipo)}</span>
-                    <Input value={c.titulo} onChange={e => updConteudo(c.id, { titulo: e.target.value })} className="h-7 text-xs border-none shadow-none px-1 focus-visible:ring-1" placeholder="Título" />
+                    <Input disabled={locked} value={c.titulo} onChange={e => updConteudo(c.id, { titulo: e.target.value })} className="h-7 text-xs border-none shadow-none px-1 focus-visible:ring-1" placeholder="Título" />
                     <Badge variant="outline" className="text-[10px] h-5 shrink-0">{c.tipo}</Badge>
                     <div className="flex items-center gap-1 shrink-0">
                       <Label className="text-[10px] text-muted-foreground">Sem.</Label>
-                      <Input type="number" value={c.semana} onChange={e => updConteudo(c.id, { semana: +e.target.value })} className="h-6 text-xs w-12 px-1" />
+                      <Input disabled={locked} type="number" value={c.semana} onChange={e => updConteudo(c.id, { semana: +e.target.value })} className="h-6 text-xs w-12 px-1" />
                     </div>
                     <span className="text-[10px] text-muted-foreground shrink-0 w-16 text-right">{c.size || "—"}</span>
                     <Button size="icon" variant="ghost" className="h-7 w-7 shrink-0" asChild><a href={c.url} target="_blank" rel="noreferrer" title="Pré-visualizar"><Eye className="w-3.5 h-3.5" /></a></Button>
