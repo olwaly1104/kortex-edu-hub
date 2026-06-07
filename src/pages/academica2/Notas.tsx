@@ -19,6 +19,7 @@ const yearFactor: Record<string, number> = {
 export default function Notas() {
   const [anoLetivo, setAnoLetivo] = useState(anosLetivos.find(a => a.status === "ativo")?.id || "2024-2025");
   const [cursoFilter, setCursoFilter] = useState("all");
+  const [faculdadeFilter, setFaculdadeFilter] = useState("all");
   const [criterios, setCriterios] = useState({
     aprovacao: 10,    // nota mínima aprovação (escala 0–20)
     excelencia: 16,   // limiar excelente
@@ -29,19 +30,35 @@ export default function Notas() {
   const yl = anosLetivos.find(a => a.id === anoLetivo)!;
   const factor = yearFactor[anoLetivo] ?? 1;
 
+  const facultyByName = useMemo(() => Object.fromEntries(cursoTemplates.map(c => [c.name, c.faculty])), []);
+  const faculties = useMemo(() => Array.from(new Set(cursoTemplates.map(c => c.faculty))), []);
+
   const rows = useMemo(() => notasResumo
-    .filter(n => cursoFilter === "all" || n.curso === cursoFilter)
+    .filter(n => (cursoFilter === "all" || n.curso === cursoFilter)
+      && (faculdadeFilter === "all" || facultyByName[n.curso] === faculdadeFilter))
     .map(n => {
       const media = +(n.mediaGeral * factor).toFixed(1);
       const aprovados = Math.round(n.aprovados * factor);
-      return { ...n, mediaGeral: media, aprovados };
-    }), [cursoFilter, factor]);
+      return { ...n, faculdade: facultyByName[n.curso] || "—", mediaGeral: media, aprovados };
+    }), [cursoFilter, faculdadeFilter, factor, facultyByName]);
+
+  const grouped = useMemo(() => {
+    const g: Record<string, typeof rows> = {};
+    rows.forEach(r => { (g[r.faculdade] ||= []).push(r); });
+    return g;
+  }, [rows]);
 
   const totalAprov = rows.reduce((a, n) => a + n.aprovados, 0);
   const totalEst = rows.reduce((a, n) => a + n.total, 0);
   const mediaGlobal = rows.length ? (rows.reduce((a, n) => a + n.mediaGeral, 0) / rows.length).toFixed(1) : "0";
   const taxa = totalEst ? ((totalAprov / totalEst) * 100).toFixed(0) : "0";
   const emRisco = rows.filter(r => r.mediaGeral < criterios.risco).length;
+
+  const acronymMap: Record<string, string> = {
+    "Faculdade de Ciências Exatas": "FCE",
+    "Faculdade de Ciências da Saúde": "FCS",
+    "Faculdade de Ciências Sociais": "FCSO",
+  };
 
   const stateOf = (m: number) =>
     m >= criterios.excelencia ? { label: "Excelente", cls: "bg-emerald-100 text-emerald-700" } :
