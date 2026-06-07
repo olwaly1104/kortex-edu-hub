@@ -449,15 +449,15 @@ export default function CadeiraDetail() {
             <div className="grid md:grid-cols-3 gap-4">
               <div>
                 <Label className="text-xs">Avaliação Contínua (%)</Label>
-                <Input type="number" min={0} max={100} value={criterio.avaliacaoContinua} onChange={e => setCriterio(c => ({ ...c, avaliacaoContinua: +e.target.value }))} className="mt-1" />
+                <Input disabled={locked} type="number" min={0} max={100} value={criterio.avaliacaoContinua} onChange={e => setCriterio(c => ({ ...c, avaliacaoContinua: +e.target.value }))} className="mt-1" />
               </div>
               <div>
                 <Label className="text-xs">Trabalhos Práticos (%)</Label>
-                <Input type="number" min={0} max={100} value={criterio.trabalhosPraticos} onChange={e => setCriterio(c => ({ ...c, trabalhosPraticos: +e.target.value }))} className="mt-1" />
+                <Input disabled={locked} type="number" min={0} max={100} value={criterio.trabalhosPraticos} onChange={e => setCriterio(c => ({ ...c, trabalhosPraticos: +e.target.value }))} className="mt-1" />
               </div>
               <div>
                 <Label className="text-xs">Exames Finais (%)</Label>
-                <Input type="number" min={0} max={100} value={criterio.examesFinais} onChange={e => setCriterio(c => ({ ...c, examesFinais: +e.target.value }))} className="mt-1" />
+                <Input disabled={locked} type="number" min={0} max={100} value={criterio.examesFinais} onChange={e => setCriterio(c => ({ ...c, examesFinais: +e.target.value }))} className="mt-1" />
               </div>
             </div>
             <div className="flex items-center justify-between rounded-md border bg-muted/30 px-4 py-2">
@@ -469,23 +469,23 @@ export default function CadeiraDetail() {
             <div className="grid md:grid-cols-3 gap-4 border-t pt-4">
               <div>
                 <Label className="text-xs">Nota Mínima por Exame (0-20)</Label>
-                <Input type="number" min={0} max={20} value={criterio.notaMinimaExame} onChange={e => setCriterio(c => ({ ...c, notaMinimaExame: +e.target.value }))} className="mt-1" />
+                <Input disabled={locked} type="number" min={0} max={20} value={criterio.notaMinimaExame} onChange={e => setCriterio(c => ({ ...c, notaMinimaExame: +e.target.value }))} className="mt-1" />
               </div>
               <div>
                 <Label className="text-xs">Nota de Aprovação (0-20)</Label>
-                <Input type="number" min={0} max={20} value={criterio.notaAprovacao} onChange={e => setCriterio(c => ({ ...c, notaAprovacao: +e.target.value }))} className="mt-1" />
+                <Input disabled={locked} type="number" min={0} max={20} value={criterio.notaAprovacao} onChange={e => setCriterio(c => ({ ...c, notaAprovacao: +e.target.value }))} className="mt-1" />
               </div>
               <div>
                 <Label className="text-xs">Presença Mínima (%)</Label>
-                <Input type="number" min={0} max={100} value={criterio.presencaMinima} onChange={e => setCriterio(c => ({ ...c, presencaMinima: +e.target.value }))} className="mt-1" />
+                <Input disabled={locked} type="number" min={0} max={100} value={criterio.presencaMinima} onChange={e => setCriterio(c => ({ ...c, presencaMinima: +e.target.value }))} className="mt-1" />
               </div>
             </div>
             <div>
               <Label className="text-xs">Observações</Label>
-              <Textarea rows={5} value={criterio.observacoes} onChange={e => setCriterio(c => ({ ...c, observacoes: e.target.value }))} className="mt-1" />
+              <Textarea disabled={locked} rows={5} value={criterio.observacoes} onChange={e => setCriterio(c => ({ ...c, observacoes: e.target.value }))} className="mt-1" />
             </div>
             <div className="flex justify-end border-t pt-4">
-              <Button onClick={() => toast.success("Critério de avaliação guardado")} className="gap-2"><Save className="w-4 h-4" /> Guardar Critério</Button>
+              <Button disabled={locked} onClick={() => toast.success("Critério de avaliação guardado")} className="gap-2"><Save className="w-4 h-4" /> Guardar Critério</Button>
             </div>
           </Card>
         </TabsContent>
