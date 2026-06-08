@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -33,10 +34,28 @@ const news = [
   { tag: "Eventos", date: "20 Mai 2026", title: "Semana Cultural UPRA reúne mais de 3.000 visitantes", desc: "Cinco dias de conferências, música, exposições e debates no Campus Central." },
 ];
 
-const cursosDestaque = [
-  "Arquitectura", "Medicina", "Engenharia Informática", "Direito",
-  "Gestão de Empresas", "Enfermagem", "Engenharia Civil", "Psicologia",
-];
+const cursosDestaque = {
+  licenciatura: [
+    { name: "Arquitectura", duracao: "5 anos" },
+    { name: "Medicina", duracao: "6 anos" },
+    { name: "Engenharia Informática", duracao: "5 anos" },
+    { name: "Direito", duracao: "4 anos" },
+    { name: "Gestão de Empresas", duracao: "4 anos" },
+    { name: "Enfermagem", duracao: "4 anos" },
+    { name: "Engenharia Civil", duracao: "5 anos" },
+    { name: "Psicologia", duracao: "4 anos" },
+  ],
+  mestrado: [
+    { name: "Arquitectura e Urbanismo", duracao: "2 anos" },
+    { name: "Saúde Pública", duracao: "2 anos" },
+    { name: "Engenharia de Software", duracao: "2 anos" },
+    { name: "Direito Empresarial", duracao: "2 anos" },
+    { name: "Gestão Financeira", duracao: "2 anos" },
+    { name: "Gestão Hospitalar", duracao: "2 anos" },
+    { name: "Estruturas e Construção", duracao: "2 anos" },
+    { name: "Psicologia Clínica", duracao: "2 anos" },
+  ],
+};
 
 const testimonials = [
   { name: "Ana Domingos", course: "Arquitectura · 5º ano", quote: "A UPRA deu-me as ferramentas técnicas e a visão crítica que precisava para construir o meu portfólio profissional." },
@@ -45,6 +64,7 @@ const testimonials = [
 ];
 
 export default function Website() {
+  const [tipoCurso, setTipoCurso] = useState<"licenciatura" | "mestrado">("licenciatura");
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* ===== Top bar ===== */}
@@ -315,7 +335,7 @@ export default function Website() {
       {/* ===== Cursos destaque ===== */}
       <section id="cursos" className="py-20 bg-muted/30">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="flex items-end justify-between mb-10 flex-wrap gap-4">
+          <div className="flex items-end justify-between mb-8 flex-wrap gap-4">
             <div>
               <Badge variant="outline" className="mb-3">Cursos em destaque</Badge>
               <h2 className="text-3xl lg:text-4xl font-bold text-foreground">Programas mais procurados</h2>
@@ -324,12 +344,27 @@ export default function Website() {
               <Button variant="outline" className="gap-2">Ver todos os cursos <ArrowRight className="w-4 h-4" /></Button>
             </Link>
           </div>
+          <div className="mb-8 inline-flex items-center p-1 rounded-lg bg-background border border-border">
+            {(["licenciatura", "mestrado"] as const).map(t => (
+              <button
+                key={t}
+                onClick={() => setTipoCurso(t)}
+                className={`px-5 py-2 text-sm font-medium rounded-md transition-colors capitalize ${
+                  tipoCurso === t
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {t === "licenciatura" ? "Licenciaturas" : "Mestrado"}
+              </button>
+            ))}
+          </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {cursosDestaque.map(c => (
-              <Card key={c} className="p-5 hover:bg-primary hover:text-primary-foreground transition-colors cursor-pointer group">
+            {cursosDestaque[tipoCurso].map(c => (
+              <Card key={c.name} className="p-5 hover:bg-primary hover:text-primary-foreground transition-colors cursor-pointer group">
                 <Cpu className="w-5 h-5 text-primary group-hover:text-primary-foreground mb-3" />
-                <p className="font-semibold">{c}</p>
-                <p className="text-xs opacity-70 mt-1">Licenciatura · 4 anos</p>
+                <p className="font-semibold">{c.name}</p>
+                <p className="text-xs opacity-70 mt-1 capitalize">{tipoCurso} · {c.duracao}</p>
               </Card>
             ))}
           </div>
