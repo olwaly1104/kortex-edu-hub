@@ -5,8 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { cursoTemplates, cadeirasTemplate } from "@/data/academica2Data";
-import { BookOpen, Check, ArrowLeft, Plus, Trash2 } from "lucide-react";
+import { getCadeiraContent } from "@/data/cadeiraContentData";
+import { BookOpen, Check, ArrowLeft, Plus, Trash2, Eye, FileText, Video, ClipboardList, Calendar, User, Clock, GraduationCap } from "lucide-react";
 import { toast } from "sonner";
 
 const docentesPool = [
@@ -69,6 +73,13 @@ export default function GerarCadeiras() {
 
   const confirmAll = () => toast.success("Cadeiras alocadas para todos os cursos");
 
+  const [preview, setPreview] = useState<{ cid: string; ano: number; idx: number } | null>(null);
+  const previewCadeira = preview ? cadeirasAlloc[preview.cid][preview.ano][preview.idx] : null;
+  const previewCurso = preview ? cursoTemplates.find(c => c.id === preview.cid) : null;
+  const previewContent = preview && previewCadeira
+    ? getCadeiraContent(`sim-${preview.cid}-${preview.ano}-${preview.idx}`, previewCadeira.name)
+    : null;
+
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       <div>
@@ -125,12 +136,12 @@ export default function GerarCadeiras() {
                   <Plus className="w-3 h-3" /> Adicionar
                 </Button>
               </div>
-              <div className="grid grid-cols-[1fr_180px_90px_70px_36px] gap-2 px-3 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b">
-                <span>Cadeira</span><span>Docente</span><span>Semestre</span><span>ECTS</span><span></span>
+              <div className="grid grid-cols-[1fr_180px_90px_70px_36px_36px] gap-2 px-3 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b">
+                <span>Cadeira</span><span>Docente</span><span>Semestre</span><span>ECTS</span><span></span><span></span>
               </div>
               <div className="divide-y">
                 {cadeiras.map((c, idx) => (
-                  <div key={idx} className="grid grid-cols-[1fr_180px_90px_70px_36px] gap-2 p-2 items-center">
+                  <div key={idx} className="grid grid-cols-[1fr_180px_90px_70px_36px_36px] gap-2 p-2 items-center">
                     <Input value={c.name} onChange={e => update(cadeiraCurso, ano, idx, { name: e.target.value })} className="h-8 text-xs" />
                     <Select value={c.docente} onValueChange={v => update(cadeiraCurso, ano, idx, { docente: v })}>
                       <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
@@ -144,6 +155,9 @@ export default function GerarCadeiras() {
                       </SelectContent>
                     </Select>
                     <Input type="number" value={c.ects} onChange={e => update(cadeiraCurso, ano, idx, { ects: +e.target.value })} className="h-8 text-xs" />
+                    <Button size="icon" variant="ghost" onClick={() => setPreview({ cid: cadeiraCurso, ano, idx })} className="h-8 w-8 text-muted-foreground hover:text-primary" title="Ver Cadeira">
+                      <Eye className="w-3.5 h-3.5" />
+                    </Button>
                     <Button size="icon" variant="ghost" onClick={() => removeCadeira(cadeiraCurso, ano, idx)} className="h-8 w-8 text-muted-foreground hover:text-destructive">
                       <Trash2 className="w-3.5 h-3.5" />
                     </Button>
@@ -154,6 +168,126 @@ export default function GerarCadeiras() {
           ))}
         </div>
       </div>
+
+      <Dialog open={!!preview} onOpenChange={(o) => !o && setPreview(null)}>
+        <DialogContent className="max-w-5xl p-0 overflow-hidden">
+          {previewCadeira && previewContent && (
+            <>
+              <DialogHeader className="px-6 pt-6 pb-4 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border-b">
+                <div className="flex items-center gap-2 mb-1">
+                  <Badge variant="outline" className="text-[10px]">Pré-visualização</Badge>
+                  <Badge variant="secondary" className="text-[10px]">{previewCurso?.code} · {(preview?.ano ?? 0) + 1}º Ano</Badge>
+                  <Badge variant="outline" className="text-[10px]">{previewCadeira.semestre}º Sem</Badge>
+                </div>
+                <DialogTitle className="flex items-center gap-2 text-xl">
+                  <BookOpen className="w-5 h-5 text-primary" /> {previewCadeira.name}
+                </DialogTitle>
+                <DialogDescription className="flex items-center gap-4 text-xs pt-1">
+                  <span className="inline-flex items-center gap-1"><User className="w-3 h-3" /> {previewCadeira.docente}</span>
+                  <span className="inline-flex items-center gap-1"><GraduationCap className="w-3 h-3" /> {previewCadeira.ects} ECTS</span>
+                  <span className="inline-flex items-center gap-1"><Clock className="w-3 h-3" /> 60h lectivas</span>
+                </DialogDescription>
+              </DialogHeader>
+
+              <Tabs defaultValue="visao" className="w-full">
+                <div className="px-6 border-b">
+                  <TabsList className="h-10 bg-transparent p-0 gap-1">
+                    <TabsTrigger value="visao" className="data-[state=active]:bg-primary/10">Visão Geral</TabsTrigger>
+                    <TabsTrigger value="aulas" className="data-[state=active]:bg-primary/10">Aulas ({previewContent.aulas.length})</TabsTrigger>
+                    <TabsTrigger value="conteudos" className="data-[state=active]:bg-primary/10">Conteúdos ({previewContent.conteudos.length})</TabsTrigger>
+                    <TabsTrigger value="quizzes" className="data-[state=active]:bg-primary/10">Quizzes ({previewContent.quizzes.length})</TabsTrigger>
+                    <TabsTrigger value="calendario" className="data-[state=active]:bg-primary/10">Calendário</TabsTrigger>
+                  </TabsList>
+                </div>
+
+                <ScrollArea className="h-[60vh]">
+                  <div className="p-6">
+                    <TabsContent value="visao" className="mt-0 space-y-4">
+                      <div className="grid grid-cols-4 gap-3">
+                        <Card className="p-3"><p className="text-[10px] text-muted-foreground uppercase">Aulas</p><p className="text-xl font-bold">{previewContent.aulas.length}</p></Card>
+                        <Card className="p-3"><p className="text-[10px] text-muted-foreground uppercase">Conteúdos</p><p className="text-xl font-bold">{previewContent.conteudos.length}</p></Card>
+                        <Card className="p-3"><p className="text-[10px] text-muted-foreground uppercase">Quizzes</p><p className="text-xl font-bold">{previewContent.quizzes.length}</p></Card>
+                        <Card className="p-3"><p className="text-[10px] text-muted-foreground uppercase">Estudantes</p><p className="text-xl font-bold">{previewCurso?.estudantesEsperados ?? 0}</p></Card>
+                      </div>
+                      <Card className="p-4">
+                        <h3 className="text-sm font-semibold mb-2">Descrição</h3>
+                        <p className="text-sm text-muted-foreground">Cadeira de {previewCadeira.name} do curso de {previewCurso?.name}, leccionada por {previewCadeira.docente} no {previewCadeira.semestre}º semestre. Inclui componente teórica e prática, com avaliação contínua através de quizzes e exame final presencial.</p>
+                      </Card>
+                      <Card className="p-4">
+                        <h3 className="text-sm font-semibold mb-2">Plano Pedagógico</h3>
+                        <ul className="text-sm space-y-1 text-muted-foreground list-disc pl-5">
+                          <li>{previewContent.aulas.length} aulas teórico-práticas (90 min cada)</li>
+                          <li>{previewContent.quizzes.length} quizzes de avaliação contínua</li>
+                          <li>1 trabalho prático em grupo</li>
+                          <li>Exame final presencial (1ª e 2ª época)</li>
+                        </ul>
+                      </Card>
+                    </TabsContent>
+
+                    <TabsContent value="aulas" className="mt-0 space-y-2">
+                      {previewContent.aulas.map(a => (
+                        <Card key={a.id} className="p-3 flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-md bg-primary/10 text-primary flex items-center justify-center font-bold text-sm">{a.n}</div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium truncate">{a.titulo}</p>
+                            <p className="text-xs text-muted-foreground">{a.data} · {a.duracao} min · {a.attachments.length} anexos</p>
+                          </div>
+                          <Badge variant={a.publicada ? "default" : "outline"} className="text-[10px]">{a.publicada ? "Publicada" : "Rascunho"}</Badge>
+                        </Card>
+                      ))}
+                    </TabsContent>
+
+                    <TabsContent value="conteudos" className="mt-0 space-y-2">
+                      {previewContent.conteudos.map(c => (
+                        <Card key={c.id} className="p-3 flex items-center gap-3">
+                          <FileText className="w-4 h-4 text-primary" />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium truncate">{c.titulo}</p>
+                            <p className="text-xs text-muted-foreground">Semana {c.semana} · {c.size}</p>
+                          </div>
+                          <Badge variant="outline" className="text-[10px]">{c.tipo}</Badge>
+                        </Card>
+                      ))}
+                    </TabsContent>
+
+                    <TabsContent value="quizzes" className="mt-0 space-y-2">
+                      {previewContent.quizzes.map(q => (
+                        <Card key={q.id} className="p-3">
+                          <div className="flex items-center gap-3">
+                            <ClipboardList className="w-4 h-4 text-primary" />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium">{q.titulo}</p>
+                              <p className="text-xs text-muted-foreground">{q.descricao}</p>
+                            </div>
+                            <Badge variant="outline" className="text-[10px]">{q.questions.length} perguntas · {q.duracao} min</Badge>
+                          </div>
+                        </Card>
+                      ))}
+                    </TabsContent>
+
+                    <TabsContent value="calendario" className="mt-0 space-y-2">
+                      {previewContent.calendario.map(e => (
+                        <Card key={e.id} className="p-3 flex items-center gap-3">
+                          <Calendar className="w-4 h-4 text-primary" />
+                          <div className="flex-1"><p className="text-sm font-medium">{e.titulo}</p><p className="text-xs text-muted-foreground">{e.data}</p></div>
+                          <Badge variant="outline" className="text-[10px] capitalize">{e.tipo}</Badge>
+                        </Card>
+                      ))}
+                    </TabsContent>
+                  </div>
+                </ScrollArea>
+              </Tabs>
+
+              <div className="px-6 py-3 border-t bg-muted/20 flex justify-end gap-2">
+                <Button variant="outline" onClick={() => setPreview(null)}>Fechar</Button>
+                <Button className="gap-2" onClick={() => { toast.success(`Conteúdo de "${previewCadeira.name}" confirmado`); setPreview(null); }}>
+                  <Check className="w-4 h-4" /> Confirmar Conteúdo
+                </Button>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
 
       <div className="flex justify-end gap-2 pt-4">
         <Button variant="outline" asChild><Link to="/areaacademica/criador/cursos">Voltar</Link></Button>
