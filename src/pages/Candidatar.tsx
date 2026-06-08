@@ -722,7 +722,7 @@ export default function Candidatar() {
               </div>
             )}
 
-            {step === 7 && (
+            {step === 6 && (
               <div className="space-y-5">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <ReviewBlock title="Dados Pessoais" stepN={1} onEdit={goTo} rows={[
