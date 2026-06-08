@@ -734,20 +734,19 @@ export default function Candidatar() {
                     ["Província", form.provincia], ["Município", form.municipio],
                     ["Endereço", form.endereco],
                     ["Email", form.email], ["Telemóvel", form.telemovel],
+                    ["Encarregado", form.encNome],
+                    ["Parentesco", form.encParentesco],
+                    ["Tel. encarregado", form.encTelefone],
                   ]} />
-                  <ReviewBlock title="Encarregado" stepN={3} onEdit={goTo} rows={[
-                    ["Nome", form.encNome], ["Parentesco", form.encParentesco],
-                    ["Telefone", form.encTelefone],
-                  ]} />
-                  <ReviewBlock title="Formação" stepN={4} onEdit={goTo} rows={[
+                  <ReviewBlock title="Formação" stepN={3} onEdit={goTo} rows={[
                     ["Escola", form.escola], ["Conclusão", form.anoConclusao],
                     ["Média", form.mediaFinal],
                   ]} />
-                  <ReviewBlock title="Curso" stepN={5} onEdit={goTo} rows={[
+                  <ReviewBlock title="Curso" stepN={4} onEdit={goTo} rows={[
                     ["Faculdade", form.faculdade], ["1ª opção", form.curso1],
                     ["2ª opção", form.curso2 || "—"], ["Sessão", form.sessao],
                   ]} />
-                  <ReviewBlock title="Documentos" stepN={6} onEdit={goTo} rows={DOCS.map(d => [d.label, docs[d.key] ? "✓ Anexado" : "Pendente"])} />
+                  <ReviewBlock title="Documentos" stepN={5} onEdit={goTo} rows={DOCS.map(d => [d.label, docs[d.key] ? "✓ Anexado" : "Pendente"])} />
                 </div>
 
                 <label className={cn("flex items-start gap-3 p-4 rounded-xl border cursor-pointer transition-colors",
