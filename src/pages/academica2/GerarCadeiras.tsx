@@ -256,6 +256,43 @@ export default function GerarCadeiras() {
                         <Card className="p-3"><p className="text-[10px] text-muted-foreground uppercase">Quizzes</p><p className="text-xl font-bold">{previewContent.quizzes.length}</p></Card>
                         <Card className="p-3"><p className="text-[10px] text-muted-foreground uppercase">Estudantes</p><p className="text-xl font-bold">{previewCurso?.estudantesEsperados ?? 0}</p></Card>
                       </div>
+                      <Card className="p-4 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-sm font-semibold">Edição da Cadeira</h3>
+                          {preview && (
+                            <Button size="sm" variant="ghost" onClick={() => { removeCadeira(preview.cid, preview.ano, preview.idx); setPreview(null); toast.success("Cadeira removida"); }} className="h-7 gap-1 text-xs text-destructive hover:text-destructive">
+                              <Trash2 className="w-3 h-3" /> Remover
+                            </Button>
+                          )}
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          <div>
+                            <p className="text-[10px] text-muted-foreground uppercase mb-1">Nome</p>
+                            <Input value={previewCadeira.name} onChange={e => preview && update(preview.cid, preview.ano, preview.idx, { name: e.target.value })} className="h-8 text-xs" />
+                          </div>
+                          <div>
+                            <p className="text-[10px] text-muted-foreground uppercase mb-1">Docente</p>
+                            <Select value={previewCadeira.docente} onValueChange={v => preview && update(preview.cid, preview.ano, preview.idx, { docente: v })}>
+                              <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                              <SelectContent>{docentesPool.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent>
+                            </Select>
+                          </div>
+                          <div>
+                            <p className="text-[10px] text-muted-foreground uppercase mb-1">Semestre</p>
+                            <Select value={String(previewCadeira.semestre)} onValueChange={v => preview && update(preview.cid, preview.ano, preview.idx, { semestre: +v as 1 | 2 })}>
+                              <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="1">1º Semestre</SelectItem>
+                                <SelectItem value="2">2º Semestre</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div>
+                            <p className="text-[10px] text-muted-foreground uppercase mb-1">ECTS</p>
+                            <Input type="number" value={previewCadeira.ects} onChange={e => preview && update(preview.cid, preview.ano, preview.idx, { ects: +e.target.value })} className="h-8 text-xs" />
+                          </div>
+                        </div>
+                      </Card>
                       <Card className="p-4">
                         <h3 className="text-sm font-semibold mb-2">Descrição</h3>
                         <p className="text-sm text-muted-foreground">Cadeira de {previewCadeira.name} do curso de {previewCurso?.name}, leccionada por {previewCadeira.docente} no {previewCadeira.semestre}º semestre. Inclui componente teórica e prática, com avaliação contínua através de quizzes e exame final presencial.</p>
