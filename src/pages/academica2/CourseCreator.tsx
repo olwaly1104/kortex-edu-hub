@@ -165,7 +165,7 @@ export default function CourseCreator() {
           <span className="text-xs text-muted-foreground">{doneCount} de {steps.length} passos concluídos</span>
         </div>
         <Progress value={progress} className="h-2" />
-        <div className="grid grid-cols-3 sm:grid-cols-6 gap-1 mt-3">
+        <div className="grid grid-cols-3 sm:grid-cols-5 gap-1 mt-3">
           {steps.map((s, i) => {
             const st = statuses[s.id];
             return (
