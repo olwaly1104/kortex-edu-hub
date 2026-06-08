@@ -63,6 +63,8 @@ export default function CourseCreator() {
   const stepRoute: Record<string, string> = {
     faculdades: "/areaacademica/criador/faculdades",
     cadeiras: "/areaacademica/criador/cadeiras",
+    turmas: "/areaacademica/criador/turmas",
+    calendario: "/areaacademica/criador/calendario",
   };
 
   // Course confirmation state

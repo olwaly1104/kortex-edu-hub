@@ -142,6 +142,8 @@ import Academica2Inicio from "./pages/academica2/Inicio";
 import Academica2CourseCreator from "./pages/academica2/CourseCreator";
 import Academica2ConfirmarFaculdades from "./pages/academica2/ConfirmarFaculdades";
 import Academica2GerarCadeiras from "./pages/academica2/GerarCadeiras";
+import Academica2CriarTurmas from "./pages/academica2/CriarTurmas";
+import Academica2CalendarioAcademico from "./pages/academica2/CalendarioAcademico";
 import Academica2AnosLetivos from "./pages/academica2/AnosLetivos";
 import Academica2Cadeiras from "./pages/academica2/Cadeiras";
 import Academica2CadeiraDetail from "./pages/academica2/CadeiraDetail";
@@ -347,6 +349,8 @@ function AppRoutes() {
         <Route path="/areaacademica/criador" element={<Academica2CourseCreator />} />
         <Route path="/areaacademica/criador/faculdades" element={<Academica2ConfirmarFaculdades />} />
         <Route path="/areaacademica/criador/cadeiras" element={<Academica2GerarCadeiras />} />
+        <Route path="/areaacademica/criador/turmas" element={<Academica2CriarTurmas />} />
+        <Route path="/areaacademica/criador/calendario" element={<Academica2CalendarioAcademico />} />
         <Route path="/areaacademica/anos-letivos" element={<Academica2AnosLetivos />} />
         <Route path="/areaacademica/cadeiras" element={<Academica2Cadeiras />} />
         <Route path="/areaacademica/cadeiras/:cadeiraId" element={<Academica2CadeiraDetail />} />
