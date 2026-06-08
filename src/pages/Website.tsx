@@ -111,25 +111,25 @@ export default function Website() {
           </div>
         </div>
 
-        {/* Sub-bar: dark announcement strip + Candidatar-me CTA */}
-        <div className="bg-foreground text-background">
+        {/* Sub-bar: light announcement strip + Candidatar-me CTA */}
+        <div className="border-y border-border/40 bg-gradient-to-r from-muted/40 via-background to-muted/40">
           <div className="max-w-7xl mx-auto px-6 h-11 flex items-center gap-3 text-[12px]">
             <span className="inline-flex items-center gap-1.5">
               <span className="relative flex h-1.5 w-1.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75" />
-                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-secondary" />
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75" />
+                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-green-500" />
               </span>
-              <span className="text-[10px] font-bold uppercase tracking-[0.1em] text-secondary">Inscrições abertas</span>
+              <span className="text-[10px] font-bold uppercase tracking-[0.1em] text-green-600">Inscrições abertas</span>
             </span>
-            <span className="hidden sm:block h-3 w-px bg-background/20" />
-            <span className="hidden sm:inline font-semibold tabular-nums">Ano lectivo 2026/2027</span>
-            <span className="hidden md:inline text-background/60 truncate">
-              · Candidaturas até <span className="font-medium text-background/80">30 de Julho</span>
+            <span className="hidden sm:block h-3 w-px bg-border/60" />
+            <span className="hidden sm:inline font-semibold tabular-nums text-foreground/90">Ano lectivo 2026/2027</span>
+            <span className="hidden md:inline text-muted-foreground truncate">
+              · Candidaturas até <span className="font-medium text-foreground/80">30 de Julho</span>
             </span>
             <Link to="/candidatar" className="ml-auto shrink-0">
               <Button
                 size="sm"
-                className="h-7 px-3.5 gap-1.5 rounded-full bg-secondary text-secondary-foreground hover:bg-secondary/90 text-[11px] font-bold uppercase tracking-wider shadow-sm"
+                className="h-7 px-3.5 gap-1.5 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 text-[11px] font-bold uppercase tracking-wider shadow-sm hover:shadow-md transition-all"
               >
                 Candidatar-me <ArrowRight className="w-3.5 h-3.5" />
               </Button>
