@@ -65,7 +65,7 @@ export default function Website() {
       </div>
 
       {/* ===== Header ===== */}
-      <header className="sticky top-0 z-40 bg-background/85 backdrop-blur-md border-b border-border/60">
+      <header className="sticky top-0 z-40 bg-background/60 backdrop-blur-xl border-b border-border/40">
         <div className="max-w-7xl mx-auto px-6 h-[68px] flex items-center gap-8">
           {/* Brand */}
           <Link to="/site" className="flex items-center gap-3 shrink-0">
