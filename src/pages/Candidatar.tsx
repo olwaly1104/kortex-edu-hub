@@ -381,18 +381,80 @@ export default function Candidatar() {
 
           <Card className="p-6 lg:p-8 shadow-sm">
             {step === 1 && (() => {
-              const bi = docs["bi"];
               const isEstrangeiro = form.nacionalidade === "Estrangeira";
               const docOptions: DocTipo[] = isEstrangeiro ? ["passaporte", "residencia"] : ["bi", "passaporte"];
+              const slots = form.docTipo === "bi"
+                ? [{ key: "bi_frente", label: "Frente" }, { key: "bi_verso", label: "Verso" }]
+                : [{ key: "id_doc", label: DOC_TIPO_LABEL[form.docTipo] }];
+
               const setNacionalidade = (v: string) => {
                 update("nacionalidade", v);
-                if (v === "Estrangeira" && form.docTipo === "bi") update("docTipo", "passaporte");
-                if (v === "Angolana" && form.docTipo === "residencia") update("docTipo", "bi");
+                if (v === "Estrangeira" && form.docTipo === "bi") { update("docTipo", "passaporte"); removeDoc("bi_frente"); removeDoc("bi_verso"); }
+                if (v === "Angolana" && form.docTipo === "residencia") { update("docTipo", "bi"); removeDoc("id_doc"); }
               };
+              const setDocTipo = (opt: DocTipo) => {
+                if (opt === form.docTipo) return;
+                update("docTipo", opt);
+                ["bi_frente", "bi_verso", "id_doc"].forEach(removeDoc);
+              };
+
+              const UploadSlot = ({ k, label }: { k: string; label: string }) => {
+                const f = docs[k];
+                return (
+                  <div className={cn(
+                    "rounded-xl border transition-colors",
+                    f ? "border-emerald-500/40 bg-emerald-500/5" : "border-border bg-card hover:border-primary/30"
+                  )}>
+                    <input
+                      ref={el => (fileRefs.current[k] = el)}
+                      type="file"
+                      className="hidden"
+                      accept=".pdf,.jpg,.jpeg,.png"
+                      onChange={e => onFile(k, e.target.files?.[0])}
+                    />
+                    <div className="flex items-center gap-3 p-3">
+                      <div className={cn(
+                        "w-9 h-9 rounded-lg flex items-center justify-center shrink-0",
+                        f ? "bg-emerald-500 text-white" : "bg-muted text-muted-foreground"
+                      )}>
+                        {f ? <Check className="w-4 h-4" strokeWidth={3} /> : <FileText className="w-4 h-4" />}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[12.5px] font-semibold text-foreground leading-tight">{label}</p>
+                        {f ? (
+                          <p className="text-[11px] text-foreground/70 mt-0.5 flex items-center gap-1 truncate">
+                            <Paperclip className="w-3 h-3 shrink-0" />
+                            <span className="truncate">{f.name}</span>
+                            <span className="text-muted-foreground">· {fmtSize(f.size)}</span>
+                          </p>
+                        ) : (
+                          <p className="text-[11px] text-muted-foreground mt-0.5">PDF, JPG ou PNG · máx. 5MB</p>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-1 shrink-0">
+                        {f && (
+                          <Button variant="ghost" size="sm" onClick={() => removeDoc(k)} className="h-7 w-7 p-0 text-muted-foreground hover:text-destructive">
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </Button>
+                        )}
+                        <Button
+                          variant={f ? "outline" : "default"}
+                          size="sm"
+                          onClick={() => fileRefs.current[k]?.click()}
+                          className="h-7 gap-1.5 text-[11.5px]"
+                        >
+                          <Upload className="w-3.5 h-3.5" /> {f ? "Substituir" : "Anexar"}
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              };
+
               return (
                 <div className="space-y-6">
                   {/* Identificação */}
-                  <section className="space-y-3">
+                  <section className="space-y-4">
                     <p className="text-[10.5px] uppercase tracking-[0.12em] text-muted-foreground font-semibold">Identificação</p>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <Field label="Nome completo" required full>
@@ -410,7 +472,7 @@ export default function Candidatar() {
                           </SelectContent>
                         </Select>
                       </Field>
-                      <Field label="Nacionalidade" required full>
+                      <Field label="Nacionalidade" required>
                         <Select value={form.nacionalidade} onValueChange={setNacionalidade}>
                           <SelectTrigger><SelectValue /></SelectTrigger>
                           <SelectContent>
@@ -419,6 +481,51 @@ export default function Candidatar() {
                           </SelectContent>
                         </Select>
                       </Field>
+                    </div>
+
+                    {/* Documento – inline within Identificação */}
+                    <div className="space-y-2.5 pt-1">
+                      <div className="flex items-center justify-between flex-wrap gap-2">
+                        <Label className="text-[12px] font-medium text-foreground">
+                          Documento de identificação <span className="text-destructive">*</span>
+                        </Label>
+                        <p className="text-[10.5px] text-muted-foreground">Escolha apenas <span className="font-semibold text-foreground">um</span></p>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2">
+                        {docOptions.map(opt => {
+                          const active = form.docTipo === opt;
+                          return (
+                            <button
+                              key={opt}
+                              type="button"
+                              onClick={() => setDocTipo(opt)}
+                              className={cn(
+                                "text-left rounded-lg border px-3 py-2.5 transition-all",
+                                active
+                                  ? "border-primary bg-primary/5 ring-1 ring-primary/30"
+                                  : "border-border bg-card hover:border-primary/40 hover:bg-muted/40"
+                              )}
+                            >
+                              <div className="flex items-center gap-2.5">
+                                <div className={cn(
+                                  "w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0",
+                                  active ? "border-primary bg-primary" : "border-border bg-background"
+                                )}>
+                                  {active && <span className="w-1.5 h-1.5 rounded-full bg-primary-foreground" />}
+                                </div>
+                                <p className={cn("text-[12.5px] font-semibold leading-tight truncate", active ? "text-primary" : "text-foreground")}>
+                                  {DOC_TIPO_LABEL[opt]}
+                                </p>
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+
+                      <div className={cn("gap-2 pt-1", form.docTipo === "bi" ? "grid grid-cols-1 md:grid-cols-2" : "grid grid-cols-1")}>
+                        {slots.map(s => <UploadSlot key={s.key} k={s.key} label={s.label} />)}
+                      </div>
                     </div>
                   </section>
 
@@ -440,102 +547,6 @@ export default function Candidatar() {
                       <Field label="Endereço" full hint="Rua, número e bairro de residência">
                         <Input value={form.endereco} onChange={e => update("endereco", e.target.value)} placeholder="Rua, número, bairro" maxLength={200} />
                       </Field>
-                    </div>
-                  </section>
-
-                  {/* Documento de Identificação */}
-                  <section className="space-y-3 pt-1 border-t border-border">
-                    <div className="flex items-center justify-between flex-wrap gap-2 pt-4">
-                      <p className="text-[10.5px] uppercase tracking-[0.12em] text-muted-foreground font-semibold">Documento de Identificação</p>
-                      <p className="text-[10.5px] text-muted-foreground">Escolha apenas <span className="font-semibold text-foreground">um</span> documento</p>
-                    </div>
-
-                    {/* Doc type chooser */}
-                    <div className="grid grid-cols-2 gap-2">
-                      {docOptions.map(opt => {
-                        const active = form.docTipo === opt;
-                        return (
-                          <button
-                            key={opt}
-                            type="button"
-                            onClick={() => { update("docTipo", opt); if (bi) removeDoc("bi"); }}
-                            className={cn(
-                              "text-left rounded-xl border px-3.5 py-3 transition-all",
-                              active
-                                ? "border-primary bg-primary/5 ring-1 ring-primary/30"
-                                : "border-border bg-card hover:border-primary/40 hover:bg-muted/40"
-                            )}
-                          >
-                            <div className="flex items-center gap-2.5">
-                              <div className={cn(
-                                "w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0",
-                                active ? "border-primary bg-primary" : "border-border bg-background"
-                              )}>
-                                {active && <span className="w-1.5 h-1.5 rounded-full bg-primary-foreground" />}
-                              </div>
-                              <div className="min-w-0">
-                                <p className={cn("text-[13px] font-semibold leading-tight", active ? "text-primary" : "text-foreground")}>
-                                  {DOC_TIPO_LABEL[opt]}
-                                </p>
-                                <p className="text-[10.5px] text-muted-foreground mt-0.5">
-                                  {opt === "bi" && "Documento nacional"}
-                                  {opt === "passaporte" && "Documento internacional"}
-                                  {opt === "residencia" && "Para residentes estrangeiros"}
-                                </p>
-                              </div>
-                            </div>
-                          </button>
-                        );
-                      })}
-                    </div>
-
-                    {/* Upload */}
-                    <div className={cn(
-                      "rounded-xl border transition-colors",
-                      bi ? "border-emerald-500/40 bg-emerald-500/5" : "border-border bg-card hover:border-primary/30"
-                    )}>
-                      <input
-                        ref={el => (fileRefs.current["bi"] = el)}
-                        type="file"
-                        className="hidden"
-                        accept=".pdf,.jpg,.jpeg,.png"
-                        onChange={e => onFile("bi", e.target.files?.[0])}
-                      />
-                      <div className="flex items-center gap-3 p-3.5">
-                        <div className={cn(
-                          "w-10 h-10 rounded-lg flex items-center justify-center shrink-0",
-                          bi ? "bg-emerald-500 text-white" : "bg-muted text-muted-foreground"
-                        )}>
-                          {bi ? <Check className="w-5 h-5" strokeWidth={3} /> : <FileText className="w-5 h-5" />}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-semibold text-foreground leading-tight">{DOC_TIPO_LABEL[form.docTipo]}</p>
-                          {bi ? (
-                            <p className="text-[11.5px] text-foreground/70 mt-0.5 flex items-center gap-1.5 truncate">
-                              <Paperclip className="w-3 h-3 shrink-0" />
-                              <span className="truncate">{bi.name}</span>
-                              <span className="text-muted-foreground">· {fmtSize(bi.size)}</span>
-                            </p>
-                          ) : (
-                            <p className="text-[11.5px] text-muted-foreground mt-0.5">{DOC_TIPO_DESC[form.docTipo]}</p>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-1 shrink-0">
-                          {bi && (
-                            <Button variant="ghost" size="sm" onClick={() => removeDoc("bi")} className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive">
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </Button>
-                          )}
-                          <Button
-                            variant={bi ? "outline" : "default"}
-                            size="sm"
-                            onClick={() => fileRefs.current["bi"]?.click()}
-                            className="h-8 gap-1.5 text-[12px]"
-                          >
-                            <Upload className="w-3.5 h-3.5" /> {bi ? "Substituir" : "Anexar"}
-                          </Button>
-                        </div>
-                      </div>
                     </div>
                   </section>
                 </div>
