@@ -248,16 +248,10 @@ export default function Candidatar() {
               <p className="text-[10px] text-muted-foreground">Ano lectivo 2026/2027</p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-full border border-border bg-muted/40">
-              <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-              <span className="text-[11px] text-foreground tabular-nums font-semibold">{step}<span className="text-muted-foreground font-medium">/{STEPS.length}</span></span>
-              <span className="text-[11px] text-muted-foreground">etapas</span>
-            </div>
-            <Button variant="ghost" size="sm" onClick={() => navigate("/site")} className="gap-1.5 h-8 text-[12px]">
-              <ArrowLeft className="w-3.5 h-3.5" /> Sair
-            </Button>
-          </div>
+          <Button variant="outline" size="sm" onClick={() => navigate("/site")} className="gap-1.5 h-8 text-[12px]">
+            <ArrowLeft className="w-3.5 h-3.5" /> Sair
+          </Button>
+
         </div>
       </header>
 
