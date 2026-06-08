@@ -140,7 +140,7 @@ export default function Website() {
             <Link to="/candidatar" className="ml-auto shrink-0">
               <Button
                 size="sm"
-                className="h-7 px-3.5 gap-1.5 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600 text-[11px] font-bold uppercase tracking-wider shadow-md shadow-amber-500/20 hover:shadow-lg hover:shadow-amber-500/30 transition-all"
+                className="h-7 px-3.5 gap-1.5 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 text-[11px] font-bold uppercase tracking-wider shadow-md hover:shadow-lg transition-all"
               >
                 Candidatar-me <ArrowRight className="w-3.5 h-3.5" />
               </Button>
@@ -167,13 +167,8 @@ export default function Website() {
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link to="/candidatar">
-                <Button size="lg" className="gap-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600 shadow-xl shadow-amber-500/25 transition-all">
+                <Button size="lg" className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 shadow-xl transition-all">
                   Candidatar-me agora <ArrowRight className="w-4 h-4" />
-                </Button>
-              </Link>
-              <Link to="/">
-                <Button size="lg" variant="outline" className="bg-transparent border-primary-foreground/40 text-primary-foreground hover:bg-primary-foreground/10 gap-2">
-                  <LogIn className="w-4 h-4" /> Aceder ao Portal
                 </Button>
               </Link>
             </div>
