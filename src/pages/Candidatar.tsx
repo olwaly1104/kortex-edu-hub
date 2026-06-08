@@ -452,7 +452,7 @@ export default function Candidatar() {
                           onClick={() => fileRefs.current[k]?.click()}
                           className="h-7 gap-1.5 text-[11.5px]"
                         >
-                          <Upload className="w-3.5 h-3.5" /> {f ? "Substituir" : "Anexar"}
+                          <ScanLine className="w-3.5 h-3.5" /> {f ? "Substituir" : "Digitalizar"}
                         </Button>
                       </div>
                     </div>
