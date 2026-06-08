@@ -542,6 +542,15 @@ export default function Candidatar() {
                     de acordo com a política de privacidade da instituição.
                   </div>
                 </label>
+
+                <label className={cn("flex items-start gap-3 p-4 rounded-xl border cursor-pointer transition-colors",
+                  errors.has("docAutenticos") ? "border-destructive bg-destructive/5" : "border-border hover:bg-muted/40")}>
+                  <Checkbox checked={form.docAutenticos} onCheckedChange={c => update("docAutenticos", !!c)} className="mt-0.5" />
+                  <div className="text-[12.5px] text-foreground">
+                    Declaro que os documentos anexados são autênticos, legíveis e correspondem à minha identidade real.
+                    Comprometo-me a apresentar os originais quando solicitado pela instituição.
+                  </div>
+                </label>
               </div>
             )}
           </Card>
