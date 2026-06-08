@@ -657,7 +657,7 @@ export default function Candidatar() {
               </div>
             )}
 
-            {step === 6 && (
+            {step === 5 && (
               <div className="space-y-4">
                 <div className="flex items-center justify-between flex-wrap gap-2">
                   <p className="text-[12.5px] text-muted-foreground">
