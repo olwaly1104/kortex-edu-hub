@@ -97,13 +97,36 @@ export default function Website() {
             ))}
           </nav>
 
-          {/* Portal do Aluno — acesso para estudantes */}
-          <div className="ml-auto shrink-0">
+          {/* Right actions */}
+          <div className="ml-auto shrink-0 flex items-center gap-3">
+            {/* Inscrições abertas — status pill */}
+            <a
+              href="#noticias"
+              className="hidden md:inline-flex items-center gap-2 h-9 px-3 rounded-full border border-secondary/40 bg-secondary/10 text-[12px] font-semibold text-secondary-foreground/90 hover:bg-secondary/15 transition-colors"
+            >
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-secondary" />
+              </span>
+              <span className="tracking-wide uppercase text-[11px]">Inscrições abertas · 2026/27</span>
+            </a>
+
+            {/* Candidatar-me — CTA primário */}
+            <Link to="/candidatar">
+              <Button
+                size="sm"
+                className="h-10 px-4 gap-2 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm hover:shadow-md transition-all text-sm font-semibold"
+              >
+                Candidatar-me <ArrowRight className="w-4 h-4" />
+              </Button>
+            </Link>
+
+            {/* Portal do Aluno — outline secundário */}
             <Link to="/">
               <Button
                 size="sm"
-                variant="ghost"
-                className="h-10 gap-2 text-sm font-medium text-foreground/80 hover:text-primary hover:bg-primary/5"
+                variant="outline"
+                className="h-10 gap-2 rounded-full text-sm font-medium border-border hover:border-primary hover:text-primary hover:bg-transparent"
               >
                 <LogIn className="w-4 h-4" /> Portal do Aluno
               </Button>
