@@ -37,7 +37,7 @@ interface FormState {
   encNome: string; encParentesco: string; encTelefone: string;
   escola: string; anoConclusao: string; mediaFinal: string;
   faculdade: string; curso1: string; curso2: string; sessao: string;
-  motivacao: string; confirmar: boolean;
+  motivacao: string; confirmar: boolean; docAutenticos: boolean;
 }
 const empty: FormState = {
   nome: "", nascimento: "", genero: "", nacionalidade: "Angolana",
@@ -45,7 +45,7 @@ const empty: FormState = {
   encNome: "", encParentesco: "", encTelefone: "",
   escola: "", anoConclusao: "", mediaFinal: "",
   faculdade: "", curso1: "", curso2: "", sessao: "",
-  motivacao: "", confirmar: false,
+  motivacao: "", confirmar: false, docAutenticos: false,
 };
 
 const STEPS = [
@@ -124,9 +124,12 @@ export default function Candidatar() {
   const goTo = (n: number) => { setErrors(new Set()); setStep(n); window.scrollTo({ top: 0, behavior: "smooth" }); };
 
   const submit = () => {
-    if (!form.confirmar) {
-      setErrors(new Set(["confirmar"]));
-      toast({ title: "Confirmação necessária", description: "Confirme a veracidade dos dados.", variant: "destructive" });
+    const missing = new Set<string>();
+    if (!form.confirmar) missing.add("confirmar");
+    if (!form.docAutenticos) missing.add("docAutenticos");
+    if (missing.size) {
+      setErrors(missing);
+      toast({ title: "Confirmação necessária", description: "Aceite as declarações para submeter a candidatura.", variant: "destructive" });
       return;
     }
     const ref = `CAND-2026-${String(Math.floor(Math.random() * 9000) + 1000)}`;
@@ -537,6 +540,15 @@ export default function Candidatar() {
                   <div className="text-[12.5px] text-foreground">
                     Confirmo que os dados acima são verdadeiros e autorizo a UPRA a tratar a minha candidatura
                     de acordo com a política de privacidade da instituição.
+                  </div>
+                </label>
+
+                <label className={cn("flex items-start gap-3 p-4 rounded-xl border cursor-pointer transition-colors",
+                  errors.has("docAutenticos") ? "border-destructive bg-destructive/5" : "border-border hover:bg-muted/40")}>
+                  <Checkbox checked={form.docAutenticos} onCheckedChange={c => update("docAutenticos", !!c)} className="mt-0.5" />
+                  <div className="text-[12.5px] text-foreground">
+                    Declaro que os documentos anexados são autênticos, legíveis e correspondem à minha identidade real.
+                    Comprometo-me a apresentar os originais quando solicitado pela instituição.
                   </div>
                 </label>
               </div>
