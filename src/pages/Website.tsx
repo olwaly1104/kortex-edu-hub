@@ -111,25 +111,36 @@ export default function Website() {
           </div>
         </div>
 
-        {/* Sub-bar: light announcement strip + Candidatar-me CTA */}
+        {/* Sub-bar: refined announcement strip + Candidatar-me CTA */}
         <div className="border-y border-border/40 bg-gradient-to-r from-muted/40 via-background to-muted/40">
-          <div className="max-w-7xl mx-auto px-6 h-11 flex items-center gap-3 text-[12px]">
-            <span className="inline-flex items-center gap-1.5">
+          <div className="max-w-7xl mx-auto px-6 h-11 flex items-center gap-3">
+            {/* Status dot + label */}
+            <span className="inline-flex items-center gap-1.5 shrink-0">
               <span className="relative flex h-1.5 w-1.5">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75" />
                 <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-green-500" />
               </span>
               <span className="text-[10px] font-bold uppercase tracking-[0.1em] text-green-600">Inscrições abertas</span>
             </span>
+
             <span className="hidden sm:block h-3 w-px bg-border/60" />
-            <span className="hidden sm:inline font-semibold tabular-nums text-foreground/90">Ano lectivo 2026/2027</span>
-            <span className="hidden md:inline text-muted-foreground truncate">
-              · Candidaturas até <span className="font-medium text-foreground/80">30 de Julho</span>
+
+            {/* Refined info cluster */}
+            <span className="hidden sm:inline-flex items-center gap-1.5 text-[12px]">
+              <span className="text-muted-foreground">Ano lectivo</span>
+              <span className="font-bold tabular-nums text-foreground">2026/2027</span>
             </span>
+
+            <span className="hidden md:inline-flex items-center gap-1.5 text-[12px] pl-2 border-l border-border/40">
+              <Calendar className="w-3 h-3 text-muted-foreground" />
+              <span className="text-muted-foreground">Candidaturas até</span>
+              <span className="font-bold tabular-nums text-foreground">30 de Julho</span>
+            </span>
+
             <Link to="/candidatar" className="ml-auto shrink-0">
               <Button
                 size="sm"
-                className="h-7 px-3.5 gap-1.5 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 text-[11px] font-bold uppercase tracking-wider shadow-sm hover:shadow-md transition-all"
+                className="h-7 px-3.5 gap-1.5 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600 text-[11px] font-bold uppercase tracking-wider shadow-md shadow-amber-500/20 hover:shadow-lg hover:shadow-amber-500/30 transition-all"
               >
                 Candidatar-me <ArrowRight className="w-3.5 h-3.5" />
               </Button>
@@ -146,7 +157,7 @@ export default function Website() {
         </div>
         <div className="relative max-w-7xl mx-auto px-6 py-20 lg:py-28 grid lg:grid-cols-2 gap-10 items-center">
           <div>
-            <Badge className="bg-secondary text-secondary-foreground mb-5">Candidaturas 2026/2027 abertas</Badge>
+            <Badge className="mb-5 bg-white/15 text-white border border-white/25 backdrop-blur-sm hover:bg-white/20">Candidaturas 2026/2027 abertas</Badge>
             <h1 className="text-4xl lg:text-5xl font-bold leading-tight">
               Formamos a próxima geração de líderes angolanos
             </h1>
@@ -156,7 +167,7 @@ export default function Website() {
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link to="/candidatar">
-                <Button size="lg" className="bg-secondary text-secondary-foreground hover:bg-secondary/90 gap-2">
+                <Button size="lg" className="gap-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600 shadow-xl shadow-amber-500/25 transition-all">
                   Candidatar-me agora <ArrowRight className="w-4 h-4" />
                 </Button>
               </Link>
