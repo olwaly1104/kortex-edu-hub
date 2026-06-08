@@ -97,7 +97,7 @@ export default function Website() {
             ))}
           </nav>
 
-          {/* Right action: Portal do Aluno only */}
+          {/* Right action: Portal UPRA only */}
           <div className="ml-auto shrink-0">
             <Link to="/">
               <Button
@@ -105,14 +105,14 @@ export default function Website() {
                 variant="ghost"
                 className="h-10 gap-2 rounded-full px-4 text-sm font-semibold bg-primary/8 text-primary hover:bg-primary/12 hover:text-primary border border-primary/15"
               >
-                <LogIn className="w-4 h-4" /> Portal do Aluno
+                <LogIn className="w-4 h-4" /> Portal UPRA
               </Button>
             </Link>
           </div>
         </div>
 
         {/* Sub-bar: refined announcement strip + Candidatar-me CTA */}
-        <div className="border-y border-border/80 bg-gradient-to-r from-muted/40 via-background to-muted/40">
+        <div className="border-y border-green-600/40 bg-gradient-to-r from-muted/40 via-background to-muted/40">
           <div className="max-w-7xl mx-auto px-6 h-11 flex items-center gap-3">
             {/* Status dot + label */}
             <span className="inline-flex items-center gap-1.5 shrink-0">
