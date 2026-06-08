@@ -153,7 +153,8 @@ export default function Candidatar() {
 
   const current = STEPS[step - 1];
   const progress = Math.round((step / STEPS.length) * 100);
-  const docsCount = Object.values(docs).filter(Boolean).length;
+  const academicDocs = DOCS.filter(d => d.key !== "bi");
+  const docsCount = academicDocs.filter(d => docs[d.key]).length;
 
   /* ───────── Success screen ───────── */
   if (done) {
