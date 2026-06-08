@@ -41,6 +41,10 @@ export const cursoTemplates: CursoTemplate[] = [
   { id: "med", name: "Medicina", code: "MED", faculty: "Faculdade de Ciências da Saúde", years: 6, cadeirasPorAno: 8, estudantesEsperados: 90, coordenador: "Dra. Sílvia Antunes" },
   { id: "dir", name: "Direito", code: "DIR", faculty: "Faculdade de Ciências Sociais", years: 4, cadeirasPorAno: 7, estudantesEsperados: 130, coordenador: "Dr. Tomás Henriques" },
   { id: "econ", name: "Economia", code: "ECN", faculty: "Faculdade de Ciências Sociais", years: 3, cadeirasPorAno: 6, estudantesEsperados: 110, coordenador: "Dra. Sara Quintas" },
+  { id: "letras", name: "Letras e Comunicação", code: "LET", faculty: "Faculdade de Letras", years: 3, cadeirasPorAno: 6, estudantesEsperados: 80, coordenador: "Dra. Helena Vaz" },
+  { id: "hist", name: "História", code: "HIST", faculty: "Faculdade de Letras", years: 3, cadeirasPorAno: 6, estudantesEsperados: 60, coordenador: "Dr. Manuel Pires" },
+  { id: "agro", name: "Agronomia", code: "AGR", faculty: "Faculdade de Ciências Agrárias", years: 4, cadeirasPorAno: 7, estudantesEsperados: 95, coordenador: "Dr. Vasco Lima" },
+  { id: "vet", name: "Medicina Veterinária", code: "VET", faculty: "Faculdade de Ciências Agrárias", years: 5, cadeirasPorAno: 7, estudantesEsperados: 70, coordenador: "Dra. Clara Pinto" },
 ];
 
 // Sample generated curriculum per course (used by Course Creator preview)
