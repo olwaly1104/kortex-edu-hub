@@ -484,7 +484,7 @@ export default function Candidatar() {
                           </SelectContent>
                         </Select>
                       </Field>
-                      <Field label="Nacionalidade" required full>
+                      <Field label="Nacionalidade" required>
                         <Select value={form.nacionalidade} onValueChange={setNacionalidade}>
                           <SelectTrigger className={inputCls("nacionalidade")}><SelectValue /></SelectTrigger>
                           <SelectContent className="max-h-72">
