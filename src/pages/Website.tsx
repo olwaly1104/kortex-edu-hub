@@ -155,7 +155,7 @@ export default function Website() {
           <div className="absolute top-20 left-20 w-96 h-96 rounded-full bg-secondary blur-3xl" />
           <div className="absolute bottom-10 right-20 w-80 h-80 rounded-full bg-accent blur-3xl" />
         </div>
-        <div className="relative max-w-7xl mx-auto px-6 pt-10 pb-12 lg:pt-14 lg:pb-16 grid lg:grid-cols-2 gap-10 items-center">
+        <div className="relative max-w-7xl mx-auto px-6 pt-6 pb-12 lg:pt-8 lg:pb-16 grid lg:grid-cols-2 gap-10 items-start">
           <div>
             <Badge className="mb-5 bg-white/15 text-white border border-white/25 backdrop-blur-sm hover:bg-white/20">Candidaturas 2026/2027 abertas</Badge>
             <h1 className="text-4xl lg:text-5xl font-bold leading-tight">
