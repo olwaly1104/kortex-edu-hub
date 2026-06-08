@@ -63,8 +63,8 @@ const DOC_TIPO_DESC: Record<DocTipo, string> = {
 };
 
 const STEPS = [
-  { n: 1, title: "Dados pessoais",   sub: "Identificação, morada e BI",         icon: User },
-  { n: 2, title: "Contactos",        sub: "Email e telemóvel",                  icon: MapPin },
+  { n: 1, title: "Dados pessoais",   sub: "Identificação e documento",          icon: User },
+  { n: 2, title: "Morada & Contactos", sub: "Endereço, email e telemóvel",      icon: MapPin },
   { n: 3, title: "Encarregado",      sub: "Responsável legal do candidato",     icon: ShieldCheck },
   { n: 4, title: "Formação",         sub: "Histórico do ensino secundário",     icon: GraduationCap },
   { n: 5, title: "Curso",            sub: "Faculdade, curso e sessão de provas",icon: BookOpen },
@@ -73,8 +73,8 @@ const STEPS = [
 ] as const;
 
 const STEP_FIELDS: Record<number, (keyof FormState)[]> = {
-  1: ["nome","nascimento","genero","provincia","municipio"],
-  2: ["email","telemovel"],
+  1: ["nome","nascimento","genero"],
+  2: ["provincia","municipio","email","telemovel"],
   3: ["encNome","encParentesco","encTelefone"],
   4: ["escola","anoConclusao","mediaFinal"],
   5: ["faculdade","curso1","sessao"],
@@ -529,38 +529,45 @@ export default function Candidatar() {
                     </div>
                   </section>
 
-                  {/* Morada */}
-                  <section className="space-y-3 pt-1 border-t border-border">
-                    <p className="text-[10.5px] uppercase tracking-[0.12em] text-muted-foreground font-semibold pt-4">Morada</p>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <Field label="Província" required>
-                        <Select value={form.provincia} onValueChange={v => update("provincia", v)}>
-                          <SelectTrigger className={inputCls("provincia")}><SelectValue placeholder="Selecione" /></SelectTrigger>
-                          <SelectContent>
-                            {PROVINCIAS.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
-                          </SelectContent>
-                        </Select>
-                      </Field>
-                      <Field label="Município" required>
-                        <Input value={form.municipio} onChange={e => update("municipio", e.target.value)} className={inputCls("municipio")} placeholder="Ex.: Maianga" maxLength={50} />
-                      </Field>
-                      <Field label="Endereço" full hint="Rua, número e bairro de residência">
-                        <Input value={form.endereco} onChange={e => update("endereco", e.target.value)} placeholder="Rua, número, bairro" maxLength={200} />
-                      </Field>
-                    </div>
-                  </section>
                 </div>
               );
             })()}
 
             {step === 2 && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Field label="Email" required>
-                  <Input type="email" value={form.email} onChange={e => update("email", e.target.value)} className={inputCls("email")} placeholder="nome@exemplo.com" maxLength={120} />
-                </Field>
-                <Field label="Telemóvel" required>
-                  <Input value={form.telemovel} onChange={e => update("telemovel", e.target.value)} className={inputCls("telemovel")} placeholder="+244 9XX XXX XXX" maxLength={20} />
-                </Field>
+              <div className="space-y-6">
+                {/* Morada */}
+                <section className="space-y-4">
+                  <p className="text-[10.5px] uppercase tracking-[0.12em] text-muted-foreground font-semibold">Morada</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Field label="Província" required>
+                      <Select value={form.provincia} onValueChange={v => update("provincia", v)}>
+                        <SelectTrigger className={inputCls("provincia")}><SelectValue placeholder="Selecione" /></SelectTrigger>
+                        <SelectContent>
+                          {PROVINCIAS.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
+                    </Field>
+                    <Field label="Município" required>
+                      <Input value={form.municipio} onChange={e => update("municipio", e.target.value)} className={inputCls("municipio")} placeholder="Ex.: Maianga" maxLength={50} />
+                    </Field>
+                    <Field label="Endereço" full hint="Rua, número e bairro de residência">
+                      <Input value={form.endereco} onChange={e => update("endereco", e.target.value)} placeholder="Rua, número, bairro" maxLength={200} />
+                    </Field>
+                  </div>
+                </section>
+
+                {/* Contactos */}
+                <section className="space-y-4 border-t border-border pt-4">
+                  <p className="text-[10.5px] uppercase tracking-[0.12em] text-muted-foreground font-semibold">Contactos</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Field label="Email" required>
+                      <Input type="email" value={form.email} onChange={e => update("email", e.target.value)} className={inputCls("email")} placeholder="nome@exemplo.com" maxLength={120} />
+                    </Field>
+                    <Field label="Telemóvel" required>
+                      <Input value={form.telemovel} onChange={e => update("telemovel", e.target.value)} className={inputCls("telemovel")} placeholder="+244 9XX XXX XXX" maxLength={20} />
+                    </Field>
+                  </div>
+                </section>
               </div>
             )}
 
@@ -712,9 +719,10 @@ export default function Candidatar() {
                     ["Nascimento", form.nascimento], ["Género", form.genero],
                     ["Nacionalidade", form.nacionalidade],
                   ]} />
-                  <ReviewBlock title="Contactos" stepN={2} onEdit={goTo} rows={[
-                    ["Email", form.email], ["Telemóvel", form.telemovel],
+                  <ReviewBlock title="Morada & Contactos" stepN={2} onEdit={goTo} rows={[
                     ["Província", form.provincia], ["Município", form.municipio],
+                    ["Endereço", form.endereco],
+                    ["Email", form.email], ["Telemóvel", form.telemovel],
                   ]} />
                   <ReviewBlock title="Encarregado" stepN={3} onEdit={goTo} rows={[
                     ["Nome", form.encNome], ["Parentesco", form.encParentesco],
