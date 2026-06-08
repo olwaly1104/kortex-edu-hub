@@ -5,8 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { cursoTemplates } from "@/data/academica2Data";
-import { Building2, Check, ArrowLeft, UserCog, GraduationCap, Users, ChevronRight, Pencil } from "lucide-react";
+import {
+  Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogDescription,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { cursoTemplates, type CursoTemplate } from "@/data/academica2Data";
+import {
+  Building2, Check, ArrowLeft, UserCog, GraduationCap, Users, ChevronRight, Pencil, Plus, X,
+} from "lucide-react";
 import { toast } from "sonner";
 
 const decanosPool = [
@@ -23,26 +29,21 @@ interface FacState {
   decano: string;
   confirmed: boolean;
   editing: boolean;
+  cursos: CursoTemplate[];
 }
 
 const initialFaculdades: FacState[] = [
-  { id: "exatas", name: "Faculdade de Ciências Exatas", decano: "Dr. Manuel Rebelo", confirmed: false, editing: false },
-  { id: "saude", name: "Faculdade de Ciências da Saúde", decano: "Dra. Helena Vaz", confirmed: false, editing: false },
-  { id: "sociais", name: "Faculdade de Ciências Sociais", decano: "Dr. Eduardo Pinto", confirmed: false, editing: false },
+  { id: "exatas", name: "Faculdade de Ciências Exatas", decano: "Dr. Manuel Rebelo", confirmed: false, editing: false, cursos: cursoTemplates.filter(c => c.faculty === "Faculdade de Ciências Exatas") },
+  { id: "saude", name: "Faculdade de Ciências da Saúde", decano: "Dra. Helena Vaz", confirmed: false, editing: false, cursos: cursoTemplates.filter(c => c.faculty === "Faculdade de Ciências da Saúde") },
+  { id: "sociais", name: "Faculdade de Ciências Sociais", decano: "Dr. Eduardo Pinto", confirmed: false, editing: false, cursos: cursoTemplates.filter(c => c.faculty === "Faculdade de Ciências Sociais") },
 ];
+
+const emptyCurso = { code: "", name: "", coordenador: "", years: 4, cadeirasPorAno: 6, estudantesEsperados: 100 };
 
 export default function ConfirmarFaculdades() {
   const [faculdades, setFaculdades] = useState<FacState[]>(initialFaculdades);
-
-  const cursosPorFaculdade = useMemo(() => {
-    const map: Record<string, typeof cursoTemplates> = {};
-    cursoTemplates.forEach(c => {
-      const key = c.faculty;
-      if (!map[key]) map[key] = [] as any;
-      (map[key] as any).push(c);
-    });
-    return map;
-  }, []);
+  const [addOpenFor, setAddOpenFor] = useState<string | null>(null);
+  const [draft, setDraft] = useState({ ...emptyCurso });
 
   const update = (id: string, patch: Partial<FacState>) =>
     setFaculdades(prev => prev.map(f => f.id === id ? { ...f, ...patch } : f));
@@ -52,8 +53,37 @@ export default function ConfirmarFaculdades() {
     toast.success("Faculdades confirmadas");
   };
 
+  const addCurso = (facId: string) => {
+    if (!draft.code.trim() || !draft.name.trim()) {
+      toast.error("Código e nome do curso são obrigatórios");
+      return;
+    }
+    const fac = faculdades.find(f => f.id === facId);
+    if (!fac) return;
+    const novo: CursoTemplate = {
+      id: `${facId}-${draft.code.toLowerCase()}-${Date.now()}`,
+      name: draft.name.trim(),
+      code: draft.code.trim().toUpperCase(),
+      faculty: fac.name,
+      years: Number(draft.years) || 4,
+      cadeirasPorAno: Number(draft.cadeirasPorAno) || 6,
+      estudantesEsperados: Number(draft.estudantesEsperados) || 100,
+      coordenador: draft.coordenador.trim() || "—",
+    };
+    update(facId, { cursos: [...fac.cursos, novo] });
+    toast.success(`Curso ${novo.code} adicionado a ${fac.name}`);
+    setDraft({ ...emptyCurso });
+    setAddOpenFor(null);
+  };
+
+  const removeCurso = (facId: string, cursoId: string) => {
+    const fac = faculdades.find(f => f.id === facId);
+    if (!fac) return;
+    update(facId, { cursos: fac.cursos.filter(c => c.id !== cursoId) });
+  };
+
   const confirmedCount = faculdades.filter(f => f.confirmed).length;
-  const totalCursos = cursoTemplates.length;
+  const totalCursos = useMemo(() => faculdades.reduce((s, f) => s + f.cursos.length, 0), [faculdades]);
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
@@ -84,7 +114,7 @@ export default function ConfirmarFaculdades() {
 
       <div className="space-y-4">
         {faculdades.map(f => {
-          const cursos = cursosPorFaculdade[f.name] ?? [];
+          const cursos = f.cursos;
           return (
             <Card key={f.id} className={`overflow-hidden transition ${f.confirmed ? "border-emerald-300" : ""}`}>
               <div className={`px-5 py-4 border-b flex items-center justify-between flex-wrap gap-3 ${f.confirmed ? "bg-emerald-50/40" : "bg-muted/20"}`}>
@@ -131,7 +161,57 @@ export default function ConfirmarFaculdades() {
               </div>
 
               <div className="p-4">
-                <p className="text-[10px] uppercase tracking-wide text-muted-foreground mb-2">Cursos da Faculdade</p>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Cursos da Faculdade</p>
+                  {f.editing && (
+                    <Dialog
+                      open={addOpenFor === f.id}
+                      onOpenChange={(o) => { setAddOpenFor(o ? f.id : null); if (!o) setDraft({ ...emptyCurso }); }}
+                    >
+                      <DialogTrigger asChild>
+                        <Button size="sm" variant="outline" className="h-7 gap-1 text-xs">
+                          <Plus className="w-3 h-3" /> Adicionar Curso
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-md">
+                        <DialogHeader>
+                          <DialogTitle>Adicionar Curso</DialogTitle>
+                          <DialogDescription className="text-xs">Novo curso para {f.name}</DialogDescription>
+                        </DialogHeader>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="space-y-1">
+                            <Label className="text-xs">Código</Label>
+                            <Input value={draft.code} onChange={e => setDraft({ ...draft, code: e.target.value })} placeholder="ARQ" className="h-8" />
+                          </div>
+                          <div className="space-y-1 col-span-1">
+                            <Label className="text-xs">Anos</Label>
+                            <Input type="number" min={1} max={8} value={draft.years} onChange={e => setDraft({ ...draft, years: Number(e.target.value) })} className="h-8" />
+                          </div>
+                          <div className="space-y-1 col-span-2">
+                            <Label className="text-xs">Nome do Curso</Label>
+                            <Input value={draft.name} onChange={e => setDraft({ ...draft, name: e.target.value })} placeholder="Arquitectura" className="h-8" />
+                          </div>
+                          <div className="space-y-1 col-span-2">
+                            <Label className="text-xs">Coordenador</Label>
+                            <Input value={draft.coordenador} onChange={e => setDraft({ ...draft, coordenador: e.target.value })} placeholder="Dr. Nome Apelido" className="h-8" />
+                          </div>
+                          <div className="space-y-1">
+                            <Label className="text-xs">Cadeiras/Ano</Label>
+                            <Input type="number" min={1} max={12} value={draft.cadeirasPorAno} onChange={e => setDraft({ ...draft, cadeirasPorAno: Number(e.target.value) })} className="h-8" />
+                          </div>
+                          <div className="space-y-1">
+                            <Label className="text-xs">Estudantes Esp.</Label>
+                            <Input type="number" min={0} value={draft.estudantesEsperados} onChange={e => setDraft({ ...draft, estudantesEsperados: Number(e.target.value) })} className="h-8" />
+                          </div>
+                        </div>
+                        <DialogFooter>
+                          <Button variant="outline" size="sm" onClick={() => { setAddOpenFor(null); setDraft({ ...emptyCurso }); }}>Cancelar</Button>
+                          <Button size="sm" onClick={() => addCurso(f.id)} className="gap-1"><Plus className="w-3 h-3" /> Adicionar</Button>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
+                  )}
+                </div>
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2">
                   {cursos.map(c => (
                     <div key={c.id} className="flex items-center gap-2 px-3 py-2 rounded-md border bg-card hover:bg-muted/30 transition">
@@ -140,9 +220,18 @@ export default function ConfirmarFaculdades() {
                         <p className="text-xs font-medium truncate">{c.name}</p>
                         <p className="text-[10px] text-muted-foreground truncate">{c.years} anos · ~{c.estudantesEsperados} estudantes</p>
                       </div>
-                      <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" />
+                      {f.editing ? (
+                        <Button size="icon" variant="ghost" className="h-6 w-6 text-destructive hover:text-destructive" onClick={() => removeCurso(f.id, c.id)}>
+                          <X className="w-3.5 h-3.5" />
+                        </Button>
+                      ) : (
+                        <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" />
+                      )}
                     </div>
                   ))}
+                  {cursos.length === 0 && (
+                    <p className="text-xs text-muted-foreground italic col-span-full">Sem cursos. {f.editing ? "Clique em \"Adicionar Curso\"." : "Active edição para adicionar."}</p>
+                  )}
                 </div>
               </div>
             </Card>
