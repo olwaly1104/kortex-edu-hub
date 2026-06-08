@@ -529,26 +529,6 @@ export default function Candidatar() {
                     </div>
                   </section>
 
-                  {/* Morada */}
-                  <section className="space-y-3 pt-1 border-t border-border">
-                    <p className="text-[10.5px] uppercase tracking-[0.12em] text-muted-foreground font-semibold pt-4">Morada</p>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <Field label="Província" required>
-                        <Select value={form.provincia} onValueChange={v => update("provincia", v)}>
-                          <SelectTrigger className={inputCls("provincia")}><SelectValue placeholder="Selecione" /></SelectTrigger>
-                          <SelectContent>
-                            {PROVINCIAS.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
-                          </SelectContent>
-                        </Select>
-                      </Field>
-                      <Field label="Município" required>
-                        <Input value={form.municipio} onChange={e => update("municipio", e.target.value)} className={inputCls("municipio")} placeholder="Ex.: Maianga" maxLength={50} />
-                      </Field>
-                      <Field label="Endereço" full hint="Rua, número e bairro de residência">
-                        <Input value={form.endereco} onChange={e => update("endereco", e.target.value)} placeholder="Rua, número, bairro" maxLength={200} />
-                      </Field>
-                    </div>
-                  </section>
                 </div>
               );
             })()}
