@@ -30,7 +30,6 @@ type CadeiraAlloc = { name: string; docente: string; ects: number; semestre: 1 |
 
 export default function GerarCadeiras() {
   const cursosWithCadeiras = Object.keys(cadeirasTemplate);
-  const [cadeiraCurso, setCadeiraCurso] = useState<string>(cursosWithCadeiras[0]);
 
   const [cadeirasAlloc, setCadeirasAlloc] = useState<Record<string, CadeiraAlloc[][]>>(() => {
     const out: Record<string, CadeiraAlloc[][]> = {};
@@ -72,10 +71,6 @@ export default function GerarCadeiras() {
   const total = useMemo(() =>
     Object.values(cadeirasAlloc).reduce((acc, anos) => acc + anos.reduce((a, r) => a + r.length, 0), 0)
   , [cadeirasAlloc]);
-
-  const cursoTotal = useMemo(() =>
-    cadeirasAlloc[cadeiraCurso]?.reduce((a, r) => a + r.length, 0) ?? 0
-  , [cadeirasAlloc, cadeiraCurso]);
 
   const confirmAll = () => toast.success("Cadeiras alocadas para todos os cursos");
 
