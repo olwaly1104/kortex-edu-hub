@@ -94,6 +94,7 @@ interface DocFile { name: string; size: number }
 export default function Candidatar() {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [started, setStarted] = useState(false);
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<FormState>(empty);
   const [docs, setDocs] = useState<Record<string, DocFile | null>>({});
