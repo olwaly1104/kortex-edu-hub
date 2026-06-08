@@ -112,20 +112,33 @@ export default function Website() {
         </div>
 
         {/* Sub-bar: Inscrições abertas + Candidatar-me */}
-        <div className="border-t border-border/60 bg-muted/40">
-          <div className="max-w-7xl mx-auto px-6 h-12 flex items-center justify-between gap-4">
-            <a href="#noticias" className="inline-flex items-center gap-2 text-[12px] font-semibold text-foreground/80 hover:text-primary transition-colors">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-secondary" />
+        <div className="border-t border-border/60 bg-gradient-to-r from-muted/60 via-background to-muted/60">
+          <div className="max-w-7xl mx-auto px-6 h-12 flex items-center justify-between gap-6">
+            {/* Status + meta */}
+            <div className="flex items-center gap-3 min-w-0">
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-secondary/15 border border-secondary/30">
+                <span className="relative flex h-1.5 w-1.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75" />
+                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-secondary" />
+                </span>
+                <span className="text-[10px] font-bold uppercase tracking-[0.08em] text-foreground/85">Inscrições abertas</span>
               </span>
-              <span className="tracking-wide uppercase text-[11px]">Inscrições abertas · Ano lectivo 2026/2027</span>
-              <span className="hidden sm:inline text-muted-foreground font-normal normal-case tracking-normal">— candidaturas até 30 de Julho</span>
-            </a>
-            <Link to="/candidatar">
+
+              <span className="hidden sm:block h-3.5 w-px bg-border" />
+
+              <span className="hidden sm:inline text-[12px] font-semibold text-foreground/85 tabular-nums">
+                Ano lectivo 2026/2027
+              </span>
+              <span className="hidden md:inline text-[12px] text-muted-foreground truncate">
+                Candidaturas até <span className="font-medium text-foreground/75">30 de Julho</span>
+              </span>
+            </div>
+
+            {/* CTA */}
+            <Link to="/candidatar" className="shrink-0">
               <Button
                 size="sm"
-                className="h-8 px-3.5 gap-1.5 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 text-[12px] font-semibold shadow-sm"
+                className="h-8 px-4 gap-1.5 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 text-[12px] font-semibold shadow-sm hover:shadow transition-all"
               >
                 Candidatar-me <ArrowRight className="w-3.5 h-3.5" />
               </Button>
