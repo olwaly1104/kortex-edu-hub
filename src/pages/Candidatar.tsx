@@ -603,25 +603,6 @@ export default function Candidatar() {
 
             {step === 3 && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Field label="Nome do encarregado de educação" required full>
-                  <Input value={form.encNome} onChange={e => update("encNome", e.target.value)} className={inputCls("encNome")} placeholder="Nome completo" maxLength={120} />
-                </Field>
-                <Field label="Parentesco" required>
-                  <Select value={form.encParentesco} onValueChange={v => update("encParentesco", v)}>
-                    <SelectTrigger className={inputCls("encParentesco")}><SelectValue placeholder="Selecione" /></SelectTrigger>
-                    <SelectContent>
-                      {PARENTESCO.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                </Field>
-                <Field label="Telefone" required>
-                  <Input value={form.encTelefone} onChange={e => update("encTelefone", e.target.value)} className={inputCls("encTelefone")} placeholder="+244 9XX XXX XXX" maxLength={20} />
-                </Field>
-              </div>
-            )}
-
-            {step === 4 && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Field label="Escola de origem" required full>
                   <Input value={form.escola} onChange={e => update("escola", e.target.value)} className={inputCls("escola")} placeholder="Ex.: Liceu Mutu-Ya-Kevela" maxLength={120} />
                 </Field>
