@@ -146,43 +146,40 @@ export default function GerarCadeiras() {
       </div>
 
       <div className="grid md:grid-cols-[260px_1fr] gap-4">
-        <Card className="p-2 h-fit space-y-1">
+        <Card className="p-3 h-fit space-y-4">
           {faculdades.map(fac => {
             const cursosOfFac = cursosWithCadeiras.filter(cid => (cursoTemplates.find(c => c.id === cid)?.faculty ?? "—") === fac);
-            const open = openFacs[fac];
             return (
-              <div key={fac} className="rounded-md overflow-hidden">
-                <button
-                  onClick={() => toggleFac(fac)}
-                  className="w-full flex items-center gap-1.5 px-2 py-2 hover:bg-muted/60 transition text-left"
-                >
-                  {open ? <ChevronDown className="w-3.5 h-3.5 text-muted-foreground shrink-0" /> : <ChevronRight className="w-3.5 h-3.5 text-muted-foreground shrink-0" />}
+              <div key={fac} className="space-y-1.5">
+                <div className="flex items-center gap-1.5 px-1.5 pb-1.5 border-b">
                   <Building2 className="w-3.5 h-3.5 text-primary shrink-0" />
-                  <span className="text-xs font-semibold flex-1 truncate">{fac}</span>
+                  <span className="text-[11px] font-bold uppercase tracking-wide flex-1 truncate">{fac}</span>
                   <Badge variant="outline" className="text-[10px]">{cursosOfFac.length}</Badge>
-                </button>
-                {open && (
-                  <div className="space-y-0.5 pl-5 pb-1">
-                    {cursosOfFac.map(cid => {
-                      const curso = cursoTemplates.find(c => c.id === cid);
-                      const isSel = cadeiraCurso === cid;
-                      const count = cadeirasAlloc[cid].reduce((a, r) => a + r.length, 0);
-                      return (
-                        <button key={cid} onClick={() => setCadeiraCurso(cid)}
-                          className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm flex items-center justify-between transition ${
-                            isSel ? "bg-primary text-primary-foreground" : "hover:bg-muted/50"
-                          }`}>
-                          <span className="truncate font-medium">{curso?.name}</span>
-                          <Badge variant={isSel ? "secondary" : "outline"} className="text-[10px] ml-2">{count}</Badge>
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
+                </div>
+                <div className="space-y-0.5">
+                  {cursosOfFac.map(cid => {
+                    const curso = cursoTemplates.find(c => c.id === cid);
+                    const isSel = cadeiraCurso === cid;
+                    const count = cadeirasAlloc[cid].reduce((a, r) => a + r.length, 0);
+                    return (
+                      <button key={cid} onClick={() => setCadeiraCurso(cid)}
+                        className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm flex items-center justify-between transition ${
+                          isSel ? "bg-primary text-primary-foreground" : "hover:bg-muted/50"
+                        }`}>
+                        <span className="truncate font-medium flex items-center gap-1.5">
+                          <GraduationCap className="w-3 h-3 shrink-0 opacity-70" />
+                          {curso?.name}
+                        </span>
+                        <Badge variant={isSel ? "secondary" : "outline"} className="text-[10px] ml-2">{count}</Badge>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             );
           })}
         </Card>
+
 
 
         <div className="space-y-3 min-w-0">
