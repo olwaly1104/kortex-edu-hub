@@ -63,8 +63,8 @@ const DOC_TIPO_DESC: Record<DocTipo, string> = {
 };
 
 const STEPS = [
-  { n: 1, title: "Dados pessoais",   sub: "Identificação, morada e BI",         icon: User },
-  { n: 2, title: "Contactos",        sub: "Email e telemóvel",                  icon: MapPin },
+  { n: 1, title: "Dados pessoais",   sub: "Identificação e documento",          icon: User },
+  { n: 2, title: "Morada & Contactos", sub: "Endereço, email e telemóvel",      icon: MapPin },
   { n: 3, title: "Encarregado",      sub: "Responsável legal do candidato",     icon: ShieldCheck },
   { n: 4, title: "Formação",         sub: "Histórico do ensino secundário",     icon: GraduationCap },
   { n: 5, title: "Curso",            sub: "Faculdade, curso e sessão de provas",icon: BookOpen },
@@ -73,8 +73,8 @@ const STEPS = [
 ] as const;
 
 const STEP_FIELDS: Record<number, (keyof FormState)[]> = {
-  1: ["nome","nascimento","genero","provincia","municipio"],
-  2: ["email","telemovel"],
+  1: ["nome","nascimento","genero"],
+  2: ["provincia","municipio","email","telemovel"],
   3: ["encNome","encParentesco","encTelefone"],
   4: ["escola","anoConclusao","mediaFinal"],
   5: ["faculdade","curso1","sessao"],
