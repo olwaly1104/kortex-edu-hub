@@ -9,6 +9,7 @@ import {
   Facebook, Instagram, Linkedin, Youtube, CheckCircle2, Quote, Sparkles,
 } from "lucide-react";
 import logoUpra from "@/assets/logo-upra.asset.json";
+import heroStudents from "@/assets/hero-students.jpg";
 
 const faculdades = [
   { icon: Building2, name: "Ciências Exatas", desc: "Arquitectura, Engenharia Civil, Informática", cursos: 6 },
@@ -82,17 +83,20 @@ export default function Website() {
             <a href="#contacto" className="text-foreground/80 hover:text-primary">Contacto</a>
           </nav>
           <div className="flex items-center gap-2">
-            <Link to="/candidatar">
-              <Button size="sm" className="h-9 gap-1.5 bg-secondary text-secondary-foreground hover:bg-secondary/90 shadow-sm">
-                <Sparkles className="w-4 h-4" /> Candidatar-me
+            <Link to="/">
+              <Button size="sm" variant="ghost" className="h-9 gap-1.5 text-foreground/80 hover:text-primary hover:bg-primary/5">
+                <LogIn className="w-4 h-4" /> Portal do Aluno
               </Button>
             </Link>
-            <Link to="/">
-              <Button size="sm" variant="outline" className="h-9 gap-1.5">
-                <LogIn className="w-4 h-4" /> Portal
+            <div className="hidden sm:block h-6 w-px bg-border" />
+            <Link to="/candidatar">
+              <Button size="sm" className="h-9 gap-1.5 bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm">
+                <Sparkles className="w-4 h-4" /> Candidatar-me
+                <ArrowRight className="w-3.5 h-3.5" />
               </Button>
             </Link>
           </div>
+
         </div>
       </header>
 
@@ -135,16 +139,39 @@ export default function Website() {
           </div>
           <div className="hidden lg:block">
             <div className="relative">
-              <div className="aspect-[4/5] rounded-3xl bg-gradient-to-br from-secondary/30 to-accent/20 border border-primary-foreground/20 backdrop-blur p-8 flex flex-col justify-end">
-                <Quote className="w-10 h-10 text-secondary mb-3" />
-                <p className="text-lg italic text-primary-foreground/95 leading-relaxed">
-                  "Educar é formar cidadãos completos, capazes de transformar Angola e o mundo."
-                </p>
-                <p className="mt-4 text-sm font-semibold">Prof. Dr. João Mateus</p>
-                <p className="text-xs text-primary-foreground/70">Reitor da UPRA</p>
+              <div className="absolute -inset-4 bg-gradient-to-br from-secondary/30 to-accent/20 rounded-3xl blur-2xl" />
+              <div className="relative aspect-[4/5] rounded-3xl overflow-hidden border border-primary-foreground/20 shadow-2xl">
+                <img
+                  src={heroStudents}
+                  alt="Estudantes da UPRA no campus"
+                  className="absolute inset-0 w-full h-full object-cover"
+                  width={832}
+                  height={1024}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-primary/95 via-primary/40 to-transparent" />
+                <div className="absolute inset-x-0 bottom-0 p-7">
+                  <Quote className="w-9 h-9 text-secondary mb-3" />
+                  <p className="text-base lg:text-lg italic text-primary-foreground leading-relaxed">
+                    "Educar é formar cidadãos completos, capazes de transformar Angola e o mundo."
+                  </p>
+                  <div className="mt-4 pt-4 border-t border-primary-foreground/20">
+                    <p className="text-sm font-semibold text-primary-foreground">Prof. Dr. João Mateus</p>
+                    <p className="text-xs text-primary-foreground/70">Reitor da UPRA</p>
+                  </div>
+                </div>
+              </div>
+              <div className="absolute -bottom-5 -left-5 bg-background text-foreground rounded-2xl shadow-xl px-5 py-3 border border-border hidden xl:flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-secondary/15 text-secondary flex items-center justify-center">
+                  <Award className="w-5 h-5" />
+                </div>
+                <div className="leading-tight">
+                  <p className="text-xs text-muted-foreground">Top 5</p>
+                  <p className="text-sm font-bold">Universidades de Angola</p>
+                </div>
               </div>
             </div>
           </div>
+
         </div>
       </section>
 
