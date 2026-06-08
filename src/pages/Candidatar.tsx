@@ -248,16 +248,10 @@ export default function Candidatar() {
               <p className="text-[10px] text-muted-foreground">Ano lectivo 2026/2027</p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-full border border-border bg-muted/40">
-              <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-              <span className="text-[11px] text-foreground tabular-nums font-semibold">{step}<span className="text-muted-foreground font-medium">/{STEPS.length}</span></span>
-              <span className="text-[11px] text-muted-foreground">etapas</span>
-            </div>
-            <Button variant="ghost" size="sm" onClick={() => navigate("/site")} className="gap-1.5 h-8 text-[12px]">
-              <ArrowLeft className="w-3.5 h-3.5" /> Sair
-            </Button>
-          </div>
+          <Button variant="outline" size="sm" onClick={() => navigate("/site")} className="gap-1.5 h-8 text-[12px]">
+            <ArrowLeft className="w-3.5 h-3.5" /> Sair
+          </Button>
+
         </div>
       </header>
 
@@ -332,16 +326,18 @@ export default function Candidatar() {
                         )}>{s.sub}</p>
                       </div>
                       <div className="shrink-0">
-                        {isDone ? (
-                          <span className="text-[9.5px] font-semibold uppercase tracking-wide text-primary bg-primary/10 px-1.5 py-0.5 rounded">
-                            OK
-                          </span>
-                        ) : isActive ? (
-                          <span className="w-1.5 h-1.5 rounded-full bg-primary block animate-pulse" />
-                        ) : (
-                          <span className="text-[10px] font-mono text-muted-foreground/70 tabular-nums">0{s.n}</span>
-                        )}
+                        <div
+                          className={cn(
+                            "w-5 h-5 rounded-full flex items-center justify-center border transition-colors",
+                            isDone
+                              ? "bg-emerald-500 border-emerald-500 text-white"
+                              : "bg-muted/40 border-border text-muted-foreground/40",
+                          )}
+                        >
+                          <Check className="w-3 h-3" strokeWidth={3} />
+                        </div>
                       </div>
+
                     </button>
                   </li>
                 );
