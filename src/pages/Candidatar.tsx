@@ -388,22 +388,18 @@ export default function Candidatar() {
           <Card className="p-6 lg:p-8 shadow-sm">
             {step === 1 && (() => {
               const isAngolano = form.nacionalidade.trim().toLowerCase() === "angolana";
-              // Angolano: choose BI or Passaporte. Estrangeiro: must upload Passaporte AND Cartão de Residência.
-              const slots = isAngolano
-                ? (form.docTipo === "bi"
-                    ? [{ key: "bi_frente", label: "Bilhete de Identidade — Frente" }, { key: "bi_verso", label: "Bilhete de Identidade — Verso" }]
-                    : [{ key: "id_doc", label: "Passaporte" }])
-                : [{ key: "passaporte_doc", label: "Passaporte" }, { key: "residencia_doc", label: "Cartão de Residência" }];
+              const docOptions: DocTipo[] = isAngolano ? ["bi", "passaporte"] : ["passaporte", "residencia"];
+              // Angolano + BI uses 2 slots (frente/verso). All other doc types use 1 slot.
+              const slots = isAngolano && form.docTipo === "bi"
+                ? [{ key: "bi_frente", label: "Bilhete de Identidade — Frente" }, { key: "bi_verso", label: "Bilhete de Identidade — Verso" }]
+                : [{ key: "id_doc", label: DOC_TIPO_LABEL[form.docTipo] }];
 
               const setNacionalidade = (v: string) => {
                 update("nacionalidade", v);
                 const angolano = v.trim().toLowerCase() === "angolana";
-                if (!angolano) {
-                  ["bi_frente", "bi_verso", "id_doc"].forEach(removeDoc);
-                } else {
-                  ["passaporte_doc", "residencia_doc"].forEach(removeDoc);
-                  if (form.docTipo === "residencia") update("docTipo", "bi");
-                }
+                ["bi_frente", "bi_verso", "id_doc"].forEach(removeDoc);
+                if (!angolano && form.docTipo === "bi") update("docTipo", "passaporte");
+                if (angolano && form.docTipo === "residencia") update("docTipo", "bi");
               };
               const setDocTipo = (opt: DocTipo) => {
                 if (opt === form.docTipo) return;
