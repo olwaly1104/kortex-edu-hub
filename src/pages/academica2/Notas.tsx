@@ -229,8 +229,8 @@ export default function Notas() {
                   <TableCell className="text-right font-mono text-xs">{isFuture ? "—" : f.estudantes}</TableCell>
                   <TableCell className="text-right font-mono text-xs font-semibold">{isFuture ? "—" : f.media || "—"}</TableCell>
                   <TableCell className="text-right font-mono text-xs">{isFuture ? "—" : `${f.taxa}%`}</TableCell>
-                  <TableCell className="text-right font-mono text-xs">
-                    {isFuture ? "—" : f.emRisco > 0 ? <Badge className="bg-red-100 text-red-700">{f.emRisco}</Badge> : <span className="text-muted-foreground">0</span>}
+                  <TableCell>
+                    {isFuture ? <Badge variant="outline" className="text-muted-foreground">Planeado</Badge> : <Badge className={stateOf(f.media).cls}>{stateOf(f.media).label}</Badge>}
                   </TableCell>
                   <TableCell><ChevronRight className="w-4 h-4 text-muted-foreground" /></TableCell>
                 </TableRow>
