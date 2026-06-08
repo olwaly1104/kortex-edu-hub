@@ -124,7 +124,7 @@ export default function Candidatar() {
       const n = new Set(errors); n.delete(k as string); setErrors(n);
     }
   };
-  const cursos = form.faculdade ? FACULDADES[form.faculdade] || [] : [];
+  const cursosFor = (fac: string) => (fac ? FACULDADES[fac] || [] : []);
   const inputCls = (k: string) => cn(errors.has(k) && "border-destructive focus-visible:ring-destructive");
 
   const validateStep = (s: number) => {
