@@ -192,76 +192,97 @@ export default function Candidatar() {
 
   /* ───────── Intro screen ───────── */
   if (!started) {
+    const condicoes = [
+      "Ter concluído o ensino secundário (12.ª classe) ou equivalente reconhecido.",
+      "Apresentar Bilhete de Identidade válido e documentos legíveis e autenticados.",
+      "Submeter a candidatura dentro do prazo da sessão escolhida (1ª, 2ª ou 3ª).",
+      "Pagamento da taxa de candidatura após validação documental pela Académica.",
+      "Aprovação nas provas de admissão presenciais conforme o curso pretendido.",
+    ];
     return (
       <div className="min-h-screen bg-background flex flex-col">
-        <header className="border-b border-border">
+        <header className="border-b border-border bg-background">
           <div className="max-w-3xl mx-auto px-6 h-16 flex items-center justify-between">
+            <Button variant="ghost" size="sm" onClick={() => navigate("/site")} className="gap-1.5 h-9 text-[12px] -ml-2">
+              <ArrowLeft className="w-3.5 h-3.5" /> Voltar
+            </Button>
             <Link to="/site" className="flex items-center gap-2.5">
               <img src={logoUpra.url} alt="UPRA" className="w-9 h-9 rounded-lg object-cover" />
-              <div className="leading-tight">
+              <div className="leading-tight text-right">
                 <p className="text-sm font-bold text-foreground">UPRA</p>
                 <p className="text-[10px] text-muted-foreground">Candidatura 2026/2027</p>
               </div>
             </Link>
-            <Button variant="ghost" size="sm" onClick={() => navigate("/site")} className="gap-1.5 h-9 text-[12px]">
-              <ArrowLeft className="w-3.5 h-3.5" /> Voltar
-            </Button>
           </div>
         </header>
 
-        <main className="flex-1 flex items-center justify-center px-6 py-10">
-          <div className="w-full max-w-xl">
-            <div className="flex flex-col items-center text-center">
-              <img src={logoUpra.url} alt="UPRA" className="w-16 h-16 rounded-2xl object-cover shadow-sm mb-5" />
+        <main className="flex-1 px-6 py-10">
+          <div className="w-full max-w-2xl mx-auto">
+            <div className="text-center mb-8">
               <Badge variant="outline" className="mb-3 border-primary/30 text-primary bg-primary/5 text-[10px]">
                 <Sparkles className="w-3 h-3 mr-1" /> Ano lectivo 2026/2027
               </Badge>
               <h1 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">
                 Candidatura UPRA
               </h1>
-              <p className="mt-3 text-sm text-muted-foreground leading-relaxed max-w-md">
-                Formulário 100% online. Pode pausar e retomar a qualquer momento.
-                Tenha os documentos digitalizados (BI, notas, certidão e foto) prontos antes de começar.
+              <p className="mt-2 text-sm text-muted-foreground max-w-md mx-auto">
+                Reveja as etapas do processo e as condições de admissão antes de iniciar.
               </p>
             </div>
 
-            <div className="mt-7 grid grid-cols-3 gap-2">
-              {[
-                { icon: Clock, label: "10 min", sub: "duração média" },
-                { icon: FileText, label: "7 etapas", sub: "guiadas" },
-                { icon: ShieldCheck, label: "Seguro", sub: "dados protegidos" },
-              ].map(b => (
-                <div key={b.label} className="rounded-xl border border-border bg-card px-3 py-3 text-center">
-                  <b.icon className="w-4 h-4 text-primary mx-auto mb-1.5" />
-                  <p className="text-[12px] font-semibold text-foreground leading-none">{b.label}</p>
-                  <p className="text-[10px] text-muted-foreground mt-1">{b.sub}</p>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-6 rounded-xl border border-border bg-muted/30 p-4">
-              <p className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold mb-2.5">O que vai preencher</p>
-              <div className="grid grid-cols-2 gap-x-4 gap-y-1.5">
+            {/* Etapas */}
+            <section className="rounded-xl border border-border bg-card">
+              <header className="px-5 py-3.5 border-b border-border flex items-center gap-2">
+                <FileText className="w-4 h-4 text-primary" />
+                <h2 className="text-[13px] font-semibold text-foreground">Etapas da candidatura</h2>
+                <span className="ml-auto text-[11px] text-muted-foreground">7 passos · ~10 min</span>
+              </header>
+              <ol className="divide-y divide-border">
                 {STEPS.map(s => (
-                  <div key={s.n} className="flex items-center gap-2 text-[12px] text-foreground">
-                    <span className="w-4 h-4 rounded-full bg-background border border-border flex items-center justify-center text-[10px] font-semibold text-muted-foreground shrink-0">{s.n}</span>
-                    <span>{s.title}</span>
-                  </div>
+                  <li key={s.n} className="flex items-center gap-3 px-5 py-2.5">
+                    <span className="w-6 h-6 rounded-md bg-muted text-foreground/70 flex items-center justify-center text-[11px] font-semibold shrink-0">
+                      {s.n}
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[13px] font-medium text-foreground leading-tight">{s.title}</p>
+                      <p className="text-[11px] text-muted-foreground mt-0.5">{STEP_DESC[s.n]}</p>
+                    </div>
+                    <s.icon className="w-3.5 h-3.5 text-muted-foreground/60 shrink-0" />
+                  </li>
                 ))}
-              </div>
-            </div>
+              </ol>
+            </section>
 
-            <Button size="lg" onClick={() => setStarted(true)} className="w-full mt-6 gap-2 shadow-sm">
-              Iniciar candidatura <ArrowRight className="w-4 h-4" />
-            </Button>
-            <p className="text-[11px] text-muted-foreground text-center mt-3">
-              Dúvidas? <a href="mailto:admissoes@upra.ao" className="text-primary underline-offset-2 hover:underline">admissoes@upra.ao</a>
-            </p>
+            {/* Condições */}
+            <section className="mt-5 rounded-xl border border-border bg-card">
+              <header className="px-5 py-3.5 border-b border-border flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-primary" />
+                <h2 className="text-[13px] font-semibold text-foreground">Condições da candidatura</h2>
+              </header>
+              <ul className="divide-y divide-border">
+                {condicoes.map((c, i) => (
+                  <li key={i} className="flex items-start gap-3 px-5 py-2.5">
+                    <Check className="w-3.5 h-3.5 text-primary mt-0.5 shrink-0" />
+                    <p className="text-[12.5px] text-foreground leading-relaxed">{c}</p>
+                  </li>
+                ))}
+              </ul>
+            </section>
+
+            <div className="mt-6">
+              <Button size="lg" onClick={() => setStarted(true)} className="w-full gap-2 shadow-sm">
+                Iniciar candidatura <ArrowRight className="w-4 h-4" />
+              </Button>
+              <p className="text-[11px] text-muted-foreground text-center mt-3">
+                Dúvidas? <a href="mailto:admissoes@upra.ao" className="text-primary underline-offset-2 hover:underline">admissoes@upra.ao</a>
+              </p>
+            </div>
           </div>
         </main>
       </div>
     );
   }
+
 
 
 
