@@ -73,6 +73,13 @@ export default function GerarCadeiras() {
 
   const confirmAll = () => toast.success("Cadeiras alocadas para todos os cursos");
 
+  const [preview, setPreview] = useState<{ cid: string; ano: number; idx: number } | null>(null);
+  const previewCadeira = preview ? cadeirasAlloc[preview.cid][preview.ano][preview.idx] : null;
+  const previewCurso = preview ? cursoTemplates.find(c => c.id === preview.cid) : null;
+  const previewContent = preview && previewCadeira
+    ? getCadeiraContent(`sim-${preview.cid}-${preview.ano}-${preview.idx}`, previewCadeira.name)
+    : null;
+
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       <div>
