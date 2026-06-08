@@ -124,9 +124,12 @@ export default function Candidatar() {
   const goTo = (n: number) => { setErrors(new Set()); setStep(n); window.scrollTo({ top: 0, behavior: "smooth" }); };
 
   const submit = () => {
-    if (!form.confirmar) {
-      setErrors(new Set(["confirmar"]));
-      toast({ title: "Confirmação necessária", description: "Confirme a veracidade dos dados.", variant: "destructive" });
+    const missing = new Set<string>();
+    if (!form.confirmar) missing.add("confirmar");
+    if (!form.docAutenticos) missing.add("docAutenticos");
+    if (missing.size) {
+      setErrors(missing);
+      toast({ title: "Confirmação necessária", description: "Aceite as declarações para submeter a candidatura.", variant: "destructive" });
       return;
     }
     const ref = `CAND-2026-${String(Math.floor(Math.random() * 9000) + 1000)}`;
