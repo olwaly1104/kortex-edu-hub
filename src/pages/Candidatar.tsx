@@ -470,8 +470,11 @@ export default function Candidatar() {
                   <section className="space-y-4">
                     <p className="text-[10.5px] uppercase tracking-[0.12em] text-muted-foreground font-semibold">Identificação</p>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <Field label="Nome completo" required full>
-                        <Input value={form.nome} onChange={e => update("nome", e.target.value)} className={inputCls("nome")} placeholder="João Miguel Fernandes" maxLength={120} />
+                      <Field label="Primeiro nome" required>
+                        <Input value={form.primeiroNome} onChange={e => update("primeiroNome", e.target.value)} className={inputCls("primeiroNome")} placeholder="João" maxLength={60} />
+                      </Field>
+                      <Field label="Último nome" required>
+                        <Input value={form.ultimoNome} onChange={e => update("ultimoNome", e.target.value)} className={inputCls("ultimoNome")} placeholder="Fernandes" maxLength={60} />
                       </Field>
                       <Field label="Data de nascimento" required>
                         <Input type="date" value={form.nascimento} onChange={e => update("nascimento", e.target.value)} className={inputCls("nascimento")} />
@@ -485,13 +488,13 @@ export default function Candidatar() {
                           </SelectContent>
                         </Select>
                       </Field>
-                      <Field label="Nacionalidade" required hint="Por defeito Angolana — altere se for outra nacionalidade">
-                        <Input
-                          value={form.nacionalidade}
-                          onChange={e => setNacionalidade(e.target.value)}
-                          placeholder="Angolana"
-                          maxLength={40}
-                        />
+                      <Field label="Nacionalidade" required full>
+                        <Select value={form.nacionalidade} onValueChange={setNacionalidade}>
+                          <SelectTrigger className={inputCls("nacionalidade")}><SelectValue /></SelectTrigger>
+                          <SelectContent className="max-h-72">
+                            {NACIONALIDADES.map(n => <SelectItem key={n} value={n}>{n}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
                       </Field>
                     </div>
 
