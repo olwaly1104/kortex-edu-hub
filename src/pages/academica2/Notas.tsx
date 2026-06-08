@@ -216,7 +216,7 @@ export default function Notas() {
                 <TableHead className="text-right">Estudantes</TableHead>
                 <TableHead className="text-right">Média</TableHead>
                 <TableHead className="text-right">Taxa Aprov.</TableHead>
-                <TableHead className="text-right">Em Risco</TableHead>
+                <TableHead>Estado</TableHead>
                 <TableHead className="w-12"></TableHead>
               </TableRow>
             </TableHeader>
