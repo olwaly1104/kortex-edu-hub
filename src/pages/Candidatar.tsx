@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 import {
   ArrowLeft, ArrowRight, Check, User, MapPin,
   BookOpen, FileText, Upload, CheckCircle2, Send, Mail, Trash2, Paperclip, GraduationCap,
+  CalendarDays, Clock, MapPinned,
 } from "lucide-react";
 import logoUpra from "@/assets/logo-upra.asset.json";
 
