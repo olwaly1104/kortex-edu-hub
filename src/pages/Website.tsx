@@ -97,23 +97,15 @@ export default function Website() {
             ))}
           </nav>
 
-          {/* Right actions */}
-          <div className="flex items-center gap-2.5 ml-auto lg:ml-0 shrink-0">
-            <Link to="/" className="hidden sm:inline-flex">
+          {/* Portal do Aluno — acesso para estudantes */}
+          <div className="ml-auto shrink-0">
+            <Link to="/">
               <Button
                 size="sm"
                 variant="ghost"
                 className="h-10 gap-2 text-sm font-medium text-foreground/80 hover:text-primary hover:bg-primary/5"
               >
                 <LogIn className="w-4 h-4" /> Portal do Aluno
-              </Button>
-            </Link>
-            <Link to="/candidatar">
-              <Button
-                size="sm"
-                className="h-10 px-5 gap-2 bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm hover:shadow-md rounded-full font-medium transition-all"
-              >
-                Candidatar-me <ArrowRight className="w-4 h-4" />
               </Button>
             </Link>
           </div>
