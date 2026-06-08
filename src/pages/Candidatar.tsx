@@ -37,7 +37,7 @@ interface FormState {
   encNome: string; encParentesco: string; encTelefone: string;
   escola: string; anoConclusao: string; mediaFinal: string;
   faculdade: string; curso1: string; curso2: string; sessao: string;
-  motivacao: string; confirmar: boolean;
+  motivacao: string; confirmar: boolean; docAutenticos: boolean;
 }
 const empty: FormState = {
   nome: "", nascimento: "", genero: "", nacionalidade: "Angolana",
@@ -45,7 +45,7 @@ const empty: FormState = {
   encNome: "", encParentesco: "", encTelefone: "",
   escola: "", anoConclusao: "", mediaFinal: "",
   faculdade: "", curso1: "", curso2: "", sessao: "",
-  motivacao: "", confirmar: false,
+  motivacao: "", confirmar: false, docAutenticos: false,
 };
 
 const STEPS = [
