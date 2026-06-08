@@ -85,10 +85,7 @@ export default function GerarCadeiras() {
     () => Array.from(new Set(cursosWithCadeiras.map(cid => cursoTemplates.find(c => c.id === cid)?.faculty ?? "—"))),
     [cursosWithCadeiras]
   );
-  const [openFacs, setOpenFacs] = useState<Record<string, boolean>>(() =>
-    Object.fromEntries(faculdades.map(f => [f, true]))
-  );
-  const toggleFac = (f: string) => setOpenFacs(p => ({ ...p, [f]: !p[f] }));
+  const [selectedFac, setSelectedFac] = useState<string>(faculdades[0]);
 
   const docentesUsados = useMemo(() => {
     const s = new Set<string>();
