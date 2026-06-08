@@ -25,8 +25,7 @@ interface Step {
 }
 
 const steps: Step[] = [
-  { id: "faculdades", label: "Confirmar Faculdades", description: "Validar faculdades, decanos e cursos de cada uma.", icon: Building2 },
-  { id: "cursos", label: "Confirmar Cursos", description: "Validar catálogo de cursos e coordenadores.", icon: GraduationCap },
+  { id: "faculdades", label: "Confirmar Faculdades & Cursos", description: "Validar faculdades, decanos e cursos (com coordenador) de cada uma.", icon: Building2 },
   { id: "cadeiras", label: "Confirmar Cadeiras", description: "Alocar cadeiras, docentes e banco de quizzes por curso.", icon: BookOpen },
   { id: "turmas", label: "Criar Turmas", description: "Alocar candidatos aprovados a turmas do 1º ano.", icon: ClipboardList },
   { id: "calendario", label: "Calendário Académico", description: "Semestres, feriados e mapa de exames (1ª e 2ª época).", icon: CalendarDays },
@@ -63,7 +62,6 @@ export default function CourseCreator() {
   const navigate = useNavigate();
   const stepRoute: Record<string, string> = {
     faculdades: "/areaacademica/criador/faculdades",
-    cursos: "/areaacademica/criador/cursos",
     cadeiras: "/areaacademica/criador/cadeiras",
   };
 
@@ -167,7 +165,7 @@ export default function CourseCreator() {
           <span className="text-xs text-muted-foreground">{doneCount} de {steps.length} passos concluídos</span>
         </div>
         <Progress value={progress} className="h-2" />
-        <div className="grid grid-cols-3 sm:grid-cols-6 gap-1 mt-3">
+        <div className="grid grid-cols-3 sm:grid-cols-5 gap-1 mt-3">
           {steps.map((s, i) => {
             const st = statuses[s.id];
             return (
