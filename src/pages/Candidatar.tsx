@@ -726,7 +726,7 @@ export default function Candidatar() {
               <div className="space-y-5">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <ReviewBlock title="Dados Pessoais" stepN={1} onEdit={goTo} rows={[
-                    ["Nome", form.nome],
+                    ["Nome", `${form.primeiroNome} ${form.ultimoNome}`.trim()],
                     ["Nascimento", form.nascimento], ["Género", form.genero],
                     ["Nacionalidade", form.nacionalidade],
                   ]} />
