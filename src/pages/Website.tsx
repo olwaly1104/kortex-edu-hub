@@ -97,31 +97,8 @@ export default function Website() {
             ))}
           </nav>
 
-          {/* Right actions */}
-          <div className="ml-auto shrink-0 flex items-center gap-3">
-            {/* Inscrições abertas — status pill */}
-            <a
-              href="#noticias"
-              className="hidden md:inline-flex items-center gap-2 h-9 px-3 rounded-full border border-secondary/40 bg-secondary/10 text-[12px] font-semibold text-secondary-foreground/90 hover:bg-secondary/15 transition-colors"
-            >
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-secondary" />
-              </span>
-              <span className="tracking-wide uppercase text-[11px]">Inscrições abertas · 2026/27</span>
-            </a>
-
-            {/* Candidatar-me — CTA primário */}
-            <Link to="/candidatar">
-              <Button
-                size="sm"
-                className="h-10 px-4 gap-2 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm hover:shadow-md transition-all text-sm font-semibold"
-              >
-                Candidatar-me <ArrowRight className="w-4 h-4" />
-              </Button>
-            </Link>
-
-            {/* Portal do Aluno — outline secundário */}
+          {/* Portal do Aluno — outline */}
+          <div className="ml-auto shrink-0">
             <Link to="/">
               <Button
                 size="sm"
@@ -134,6 +111,27 @@ export default function Website() {
           </div>
         </div>
 
+        {/* Sub-bar: Inscrições abertas + Candidatar-me */}
+        <div className="border-t border-border/60 bg-muted/40">
+          <div className="max-w-7xl mx-auto px-6 h-12 flex items-center justify-between gap-4">
+            <a href="#noticias" className="inline-flex items-center gap-2 text-[12px] font-semibold text-foreground/80 hover:text-primary transition-colors">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-secondary" />
+              </span>
+              <span className="tracking-wide uppercase text-[11px]">Inscrições abertas · Ano lectivo 2026/2027</span>
+              <span className="hidden sm:inline text-muted-foreground font-normal normal-case tracking-normal">— candidaturas até 30 de Julho</span>
+            </a>
+            <Link to="/candidatar">
+              <Button
+                size="sm"
+                className="h-8 px-3.5 gap-1.5 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 text-[12px] font-semibold shadow-sm"
+              >
+                Candidatar-me <ArrowRight className="w-3.5 h-3.5" />
+              </Button>
+            </Link>
+          </div>
+        </div>
       </header>
 
       {/* ===== Hero ===== */}
