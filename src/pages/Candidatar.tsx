@@ -249,11 +249,10 @@ export default function Candidatar() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <div className="hidden sm:flex items-center gap-2">
-              <div className="w-32 h-1.5 rounded-full bg-muted overflow-hidden">
-                <div className="h-full bg-primary transition-all duration-500" style={{ width: `${progress}%` }} />
-              </div>
-              <span className="text-[11px] text-muted-foreground tabular-nums font-medium">{progress}%</span>
+            <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-full border border-border bg-muted/40">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+              <span className="text-[11px] text-foreground tabular-nums font-semibold">{step}<span className="text-muted-foreground font-medium">/{STEPS.length}</span></span>
+              <span className="text-[11px] text-muted-foreground">etapas</span>
             </div>
             <Button variant="ghost" size="sm" onClick={() => navigate("/site")} className="gap-1.5 h-8 text-[12px]">
               <ArrowLeft className="w-3.5 h-3.5" /> Sair
@@ -265,45 +264,96 @@ export default function Candidatar() {
       <div className="max-w-6xl mx-auto px-6 py-8 grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-8">
         {/* Sidebar stepper */}
         <aside className="lg:sticky lg:top-20 lg:self-start">
-          <div className="rounded-2xl border border-border bg-background p-3">
-            <p className="px-3 pt-2 pb-3 text-[10px] uppercase tracking-[0.12em] text-muted-foreground font-semibold">
-              Etapas da candidatura
-            </p>
-            <ol className="space-y-0.5">
-              {STEPS.map(s => {
+          <div className="rounded-2xl border border-border bg-background overflow-hidden shadow-sm">
+            {/* Header */}
+            <div className="px-5 pt-5 pb-4 border-b border-border bg-muted/30">
+              <p className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground font-semibold">
+                Etapas da candidatura
+              </p>
+              <div className="mt-2 flex items-baseline gap-1.5">
+                <span className="text-2xl font-bold text-foreground tabular-nums leading-none">{step}</span>
+                <span className="text-[13px] text-muted-foreground font-medium">de {STEPS.length}</span>
+              </div>
+              <div className="mt-3 h-1 rounded-full bg-border/70 overflow-hidden">
+                <div className="h-full bg-primary transition-all duration-500" style={{ width: `${progress}%` }} />
+              </div>
+            </div>
+
+            {/* Steps */}
+            <ol className="p-2.5 relative">
+              {STEPS.map((s, idx) => {
                 const isDone = step > s.n && isStepComplete(s.n);
                 const isActive = step === s.n;
+                const isLast = idx === STEPS.length - 1;
+                const StepIcon = s.icon;
                 return (
-                  <li key={s.n}>
+                  <li key={s.n} className="relative">
+                    {/* Connector line */}
+                    {!isLast && (
+                      <span
+                        aria-hidden
+                        className={cn(
+                          "absolute left-[26px] top-[42px] w-px h-[calc(100%-22px)] transition-colors",
+                          isDone ? "bg-primary/50" : "bg-border",
+                        )}
+                      />
+                    )}
                     <button
                       type="button"
                       onClick={() => goTo(s.n)}
                       className={cn(
-                        "w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors",
-                        isActive && "bg-primary/8",
+                        "relative w-full text-left flex items-center gap-3 px-2.5 py-2 rounded-lg transition-all",
+                        isActive && "bg-primary/8 ring-1 ring-primary/20",
                         !isActive && "hover:bg-muted/60",
                       )}
                     >
                       <div className={cn(
-                        "w-7 h-7 rounded-full flex items-center justify-center text-[12px] font-semibold shrink-0 border transition-colors",
+                        "relative w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all border-2",
                         isDone && "bg-primary border-primary text-primary-foreground",
-                        isActive && !isDone && "bg-primary text-primary-foreground border-primary",
+                        isActive && !isDone && "bg-background border-primary text-primary ring-4 ring-primary/15",
                         !isDone && !isActive && "bg-background border-border text-muted-foreground",
                       )}>
-                        {isDone ? <Check className="w-3.5 h-3.5" /> : s.n}
+                        {isDone
+                          ? <Check className="w-4 h-4" strokeWidth={3} />
+                          : <StepIcon className="w-3.5 h-3.5" />}
                       </div>
                       <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <p className={cn(
+                            "text-[12.5px] font-semibold leading-tight truncate",
+                            isActive && "text-primary",
+                            isDone && "text-foreground",
+                            !isActive && !isDone && "text-foreground/70",
+                          )}>{s.title}</p>
+                        </div>
                         <p className={cn(
-                          "text-[13px] font-medium leading-tight truncate",
-                          isActive ? "text-foreground" : "text-foreground/80",
-                        )}>{s.title}</p>
-                        <p className="text-[11px] text-muted-foreground truncate mt-0.5">{s.sub}</p>
+                          "text-[10.5px] truncate mt-0.5",
+                          isActive ? "text-primary/70" : "text-muted-foreground",
+                        )}>{s.sub}</p>
+                      </div>
+                      <div className="shrink-0">
+                        {isDone ? (
+                          <span className="text-[9.5px] font-semibold uppercase tracking-wide text-primary bg-primary/10 px-1.5 py-0.5 rounded">
+                            OK
+                          </span>
+                        ) : isActive ? (
+                          <span className="w-1.5 h-1.5 rounded-full bg-primary block animate-pulse" />
+                        ) : (
+                          <span className="text-[10px] font-mono text-muted-foreground/70 tabular-nums">0{s.n}</span>
+                        )}
                       </div>
                     </button>
                   </li>
                 );
               })}
             </ol>
+
+            {/* Footer */}
+            <div className="px-5 py-3.5 border-t border-border bg-muted/30">
+              <p className="text-[10.5px] text-muted-foreground leading-snug">
+                As suas respostas são guardadas localmente. Pode navegar entre etapas a qualquer momento.
+              </p>
+            </div>
           </div>
         </aside>
 
