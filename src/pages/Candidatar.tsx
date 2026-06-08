@@ -200,14 +200,6 @@ export default function Candidatar() {
     ];
     return (
       <div className="h-screen overflow-hidden bg-muted/30 flex flex-col">
-        <header className="border-b border-border bg-background shrink-0">
-          <div className="max-w-3xl mx-auto px-6 h-14 flex items-center">
-            <Button variant="ghost" size="sm" onClick={() => navigate("/site")} className="gap-1.5 h-8 text-[12px] -ml-2">
-              <ArrowLeft className="w-3.5 h-3.5" /> Voltar
-            </Button>
-          </div>
-        </header>
-
         <main className="flex-1 flex items-center justify-center px-6 py-6 min-h-0">
           <div className="w-full max-w-md rounded-2xl border border-border bg-background shadow-sm overflow-hidden">
             <div className="px-6 pt-6 pb-5 text-center border-b border-border">
