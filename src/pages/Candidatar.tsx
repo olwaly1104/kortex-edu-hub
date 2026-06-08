@@ -622,49 +622,108 @@ export default function Candidatar() {
               </div>
             )}
 
-            {step === 4 && (
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Field label="Faculdade" required>
-                    <Select value={form.faculdade} onValueChange={v => { update("faculdade", v); update("curso1", ""); update("curso2", ""); }}>
-                      <SelectTrigger className={inputCls("faculdade")}><SelectValue placeholder="Selecione" /></SelectTrigger>
-                      <SelectContent>
-                        {Object.keys(FACULDADES).map(f => <SelectItem key={f} value={f}>{f}</SelectItem>)}
-                      </SelectContent>
-                    </Select>
-                  </Field>
-                  <Field label="Sessão de provas" required>
-                    <Select value={form.sessao} onValueChange={v => update("sessao", v)}>
-                      <SelectTrigger className={inputCls("sessao")}><SelectValue placeholder="Selecione" /></SelectTrigger>
-                      <SelectContent>
-                        {SESSOES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-                      </SelectContent>
-                    </Select>
-                  </Field>
-                  <Field label="Curso (1ª opção)" required>
-                    <Select value={form.curso1} onValueChange={v => update("curso1", v)} disabled={!form.faculdade}>
-                      <SelectTrigger className={inputCls("curso1")}><SelectValue placeholder={form.faculdade ? "Selecione" : "Escolha uma faculdade"} /></SelectTrigger>
-                      <SelectContent>
-                        {cursos.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-                      </SelectContent>
-                    </Select>
-                  </Field>
-                  <Field label="Curso (2ª opção)" hint="Opcional · usado se a 1ª opção não estiver disponível">
-                    <Select value={form.curso2} onValueChange={v => update("curso2", v)} disabled={!form.faculdade}>
-                      <SelectTrigger><SelectValue placeholder="Selecione (opcional)" /></SelectTrigger>
-                      <SelectContent>
-                        {cursos.filter(c => c !== form.curso1).map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-                      </SelectContent>
-                    </Select>
+            {step === 4 && (() => {
+              const escolhas = [
+                { n: 1, label: "1ª escolha", facKey: "fac1" as const, cursoKey: "curso1" as const, required: true },
+                { n: 2, label: "2ª escolha", facKey: "fac2" as const, cursoKey: "curso2" as const, required: false },
+                { n: 3, label: "3ª escolha", facKey: "fac3" as const, cursoKey: "curso3" as const, required: false },
+              ];
+              const usedFacs = [form.fac1, form.fac2, form.fac3];
+              return (
+                <div className="space-y-5">
+                  <p className="text-[12.5px] text-muted-foreground">
+                    Indique até três combinações de <span className="font-semibold text-foreground">faculdade + curso</span> por ordem de preferência. Apenas a 1ª escolha é obrigatória.
+                  </p>
+                  <div className="space-y-4">
+                    {escolhas.map(({ n, label, facKey, cursoKey, required }) => {
+                      const facVal = form[facKey];
+                      const cursoVal = form[cursoKey];
+                      const opts = cursosFor(facVal);
+                      return (
+                        <div key={n} className="rounded-xl border border-border bg-card p-4">
+                          <div className="flex items-center gap-2 mb-3">
+                            <div className="w-6 h-6 rounded-full bg-primary/10 text-primary text-[11px] font-bold flex items-center justify-center">{n}</div>
+                            <p className="text-[12.5px] font-semibold text-foreground">{label}{required && <span className="text-destructive ml-0.5">*</span>}</p>
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <Field label="Faculdade" required={required}>
+                              <Select value={facVal} onValueChange={v => { update(facKey, v); update(cursoKey, ""); }}>
+                                <SelectTrigger className={inputCls(facKey)}><SelectValue placeholder={required ? "Selecione" : "Selecione (opcional)"} /></SelectTrigger>
+                                <SelectContent>
+                                  {Object.keys(FACULDADES).map(f => (
+                                    <SelectItem key={f} value={f} disabled={usedFacs.includes(f) && f !== facVal}>{f}</SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </Field>
+                            <Field label="Curso" required={required}>
+                              <Select value={cursoVal} onValueChange={v => update(cursoKey, v)} disabled={!facVal}>
+                                <SelectTrigger className={inputCls(cursoKey)}><SelectValue placeholder={facVal ? "Selecione" : "Escolha uma faculdade"} /></SelectTrigger>
+                                <SelectContent>
+                                  {opts.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                                </SelectContent>
+                              </Select>
+                            </Field>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <Field label="Carta de motivação" hint={`${form.motivacao.length}/500 caracteres`}>
+                    <Textarea value={form.motivacao} onChange={e => update("motivacao", e.target.value.slice(0, 500))} rows={4} placeholder="Conte-nos porque escolheu este curso..." maxLength={500} />
                   </Field>
                 </div>
-                <Field label="Carta de motivação" hint={`${form.motivacao.length}/500 caracteres`}>
-                  <Textarea value={form.motivacao} onChange={e => update("motivacao", e.target.value.slice(0, 500))} rows={4} placeholder="Conte-nos porque escolheu este curso..." maxLength={500} />
-                </Field>
+              );
+            })()}
+
+            {step === 5 && (
+              <div className="space-y-5">
+                <p className="text-[12.5px] text-muted-foreground">
+                  Escolha a sessão da prova de acesso. A data, hora e local são definidos pela instituição.
+                </p>
+                <div className="space-y-3">
+                  {SESSOES_INFO.map(s => {
+                    const active = form.sessao === s.id;
+                    return (
+                      <button
+                        key={s.id}
+                        type="button"
+                        onClick={() => update("sessao", s.id)}
+                        className={cn(
+                          "w-full text-left rounded-xl border p-4 transition-all",
+                          active
+                            ? "border-primary bg-primary/5 ring-1 ring-primary/30"
+                            : "border-border bg-card hover:border-primary/40 hover:bg-muted/40",
+                          errors.has("sessao") && !active && "border-destructive/40"
+                        )}
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className={cn(
+                            "w-4 h-4 rounded-full border-2 mt-1 flex items-center justify-center shrink-0",
+                            active ? "border-primary bg-primary" : "border-border bg-background"
+                          )}>
+                            {active && <span className="w-1.5 h-1.5 rounded-full bg-primary-foreground" />}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className={cn("text-[13.5px] font-semibold leading-tight", active ? "text-primary" : "text-foreground")}>{s.id}</p>
+                            <div className="mt-2 grid grid-cols-1 sm:grid-cols-3 gap-2 text-[12px] text-foreground/80">
+                              <span className="flex items-center gap-1.5"><CalendarDays className="w-3.5 h-3.5 text-muted-foreground" /> {s.data}</span>
+                              <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-muted-foreground" /> {s.hora}</span>
+                              <span className="flex items-center gap-1.5"><MapPinned className="w-3.5 h-3.5 text-muted-foreground" /> {s.sala}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="text-[11px] text-muted-foreground">
+                  A presença é obrigatória. Receberá a convocatória oficial por email após validação da candidatura.
+                </p>
               </div>
             )}
 
-            {step === 5 && (
+            {step === 6 && (
               <div className="space-y-4">
                 <div className="flex items-center justify-between flex-wrap gap-2">
                   <p className="text-[12.5px] text-muted-foreground">
