@@ -189,25 +189,32 @@ export default function QuizzesAcad() {
                       <TableHead className="text-right">Perguntas</TableHead>
                       <TableHead className="text-right">Duração</TableHead>
                       <TableHead className="text-right">Tentativas</TableHead>
+                      <TableHead>Dificuldade</TableHead>
                       <TableHead>Estado</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {list.map(q => (
+                    {list.map(q => {
+                      const dif = q.perguntas <= 15 ? { label: "Fácil", cls: "bg-emerald-100 text-emerald-700" }
+                        : q.perguntas <= 22 ? { label: "Médio", cls: "bg-blue-100 text-blue-700" }
+                        : { label: "Difícil", cls: "bg-red-100 text-red-700" };
+                      return (
                       <TableRow key={q.id} className="cursor-pointer hover:bg-muted/50">
                         <TableCell className="font-medium">{q.cadeira}</TableCell>
                         <TableCell className="text-right font-mono text-xs">{q.perguntas}</TableCell>
                         <TableCell className="text-right font-mono text-xs">{q.duracao} min</TableCell>
                         <TableCell className="text-right font-mono text-xs">{q.tentativas}</TableCell>
+                        <TableCell><Badge className={dif.cls}>{dif.label}</Badge></TableCell>
                         <TableCell>
                           <Badge className={q.publicado ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}>
                             {q.publicado ? "Publicado" : "Rascunho"}
                           </Badge>
                         </TableCell>
                       </TableRow>
-                    ))}
+                      );
+                    })}
                     {list.length === 0 && (
-                      <TableRow><TableCell colSpan={5} className="text-center text-xs text-muted-foreground py-6">Sem quizzes neste ano.</TableCell></TableRow>
+                      <TableRow><TableCell colSpan={6} className="text-center text-xs text-muted-foreground py-6">Sem quizzes neste ano.</TableCell></TableRow>
                     )}
                   </TableBody>
                 </Table>
