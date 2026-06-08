@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 import {
   ArrowLeft, ArrowRight, Check, User, MapPin,
   BookOpen, FileText, Upload, CheckCircle2, Send, Mail, Trash2, Paperclip, GraduationCap,
+  CalendarDays, Clock, MapPinned,
 } from "lucide-react";
 import logoUpra from "@/assets/logo-upra.asset.json";
 
@@ -22,7 +23,11 @@ const FACULDADES: Record<string, string[]> = {
   "Faculdade de Saúde": ["Medicina", "Enfermagem"],
 };
 const PROVINCIAS = ["Luanda", "Benguela", "Huíla", "Huambo", "Cabinda", "Cuanza Sul", "Malanje", "Uíge"];
-const SESSOES = ["1ª Sessão", "2ª Sessão", "3ª Sessão"];
+const SESSOES_INFO = [
+  { id: "1ª Sessão", data: "15 de Julho de 2026", hora: "09:00", sala: "Anfiteatro A — Campus UPRA" },
+  { id: "2ª Sessão", data: "12 de Agosto de 2026", hora: "09:00", sala: "Anfiteatro B — Campus UPRA" },
+  { id: "3ª Sessão", data: "09 de Setembro de 2026", hora: "14:00", sala: "Sala Magna — Campus UPRA" },
+];
 const PARENTESCO = ["Pai", "Mãe", "Tutor(a)", "Avô/Avó", "Outro"];
 const NACIONALIDADES = [
   "Angolana", "Portuguesa", "Brasileira", "Cabo-verdiana", "Moçambicana", "São-tomense",
@@ -32,8 +37,6 @@ const NACIONALIDADES = [
 ];
 const DOCS = [
   { key: "bi", label: "Bilhete de Identidade", desc: "Frente e verso · PDF ou JPG" },
-  { key: "notas", label: "Declaração de Notas", desc: "Emitida pela escola de origem" },
-  { key: "certidao", label: "Certidão de Habilitações", desc: "Documento oficial assinado" },
   { key: "foto", label: "Foto tipo passe", desc: "Fundo branco, formato 35×45mm" },
 ];
 
@@ -44,7 +47,8 @@ interface FormState {
   email: string; telemovel: string; provincia: string; municipio: string; endereco: string;
   encNome: string; encParentesco: string; encTelefone: string;
   escola: string; anoConclusao: string; mediaFinal: string;
-  faculdade: string; curso1: string; curso2: string; sessao: string;
+  fac1: string; curso1: string; fac2: string; curso2: string; fac3: string; curso3: string;
+  sessao: string;
   motivacao: string; confirmar: boolean; docAutenticos: boolean;
 }
 const empty: FormState = {
@@ -53,7 +57,8 @@ const empty: FormState = {
   email: "", telemovel: "", provincia: "", municipio: "", endereco: "",
   encNome: "", encParentesco: "", encTelefone: "",
   escola: "", anoConclusao: "", mediaFinal: "",
-  faculdade: "", curso1: "", curso2: "", sessao: "",
+  fac1: "", curso1: "", fac2: "", curso2: "", fac3: "", curso3: "",
+  sessao: "",
   motivacao: "", confirmar: false, docAutenticos: false,
 };
 
@@ -72,18 +77,20 @@ const STEPS = [
   { n: 1, title: "Dados pessoais",     sub: "Identificação e documento",          icon: User },
   { n: 2, title: "Morada & Contactos", sub: "Endereço, contactos e encarregado",  icon: MapPin },
   { n: 3, title: "Formação",           sub: "Histórico do ensino secundário",     icon: GraduationCap },
-  { n: 4, title: "Curso",              sub: "Faculdade, curso e sessão de provas",icon: BookOpen },
-  { n: 5, title: "Documentos",         sub: "Anexos académicos obrigatórios",     icon: FileText },
-  { n: 6, title: "Revisão",            sub: "Confirmar e submeter",               icon: Check },
+  { n: 4, title: "Curso",              sub: "Faculdades e cursos por ordem de escolha", icon: BookOpen },
+  { n: 5, title: "Prova de Acesso",    sub: "Marcação da sessão de provas",       icon: CalendarDays },
+  { n: 6, title: "Documentos",         sub: "Anexos académicos obrigatórios",     icon: FileText },
+  { n: 7, title: "Revisão",            sub: "Confirmar e submeter",               icon: Check },
 ] as const;
 
 const STEP_FIELDS: Record<number, (keyof FormState)[]> = {
   1: ["primeiroNome","ultimoNome","nascimento","genero","nacionalidade"],
   2: ["provincia","municipio","email","telemovel","encNome","encParentesco","encTelefone"],
   3: ["escola","anoConclusao","mediaFinal"],
-  4: ["faculdade","curso1","sessao"],
-  5: [],
+  4: ["fac1","curso1"],
+  5: ["sessao"],
   6: [],
+  7: [],
 };
 
 function Field({ label, required, children, hint, full }: { label: string; required?: boolean; children: React.ReactNode; hint?: string; full?: boolean }) {
@@ -117,7 +124,7 @@ export default function Candidatar() {
       const n = new Set(errors); n.delete(k as string); setErrors(n);
     }
   };
-  const cursos = form.faculdade ? FACULDADES[form.faculdade] || [] : [];
+  const cursosFor = (fac: string) => (fac ? FACULDADES[fac] || [] : []);
   const inputCls = (k: string) => cn(errors.has(k) && "border-destructive focus-visible:ring-destructive");
 
   const validateStep = (s: number) => {
@@ -223,7 +230,7 @@ export default function Candidatar() {
                 Ano lectivo 2026/2027
               </Badge>
               <h1 className="mt-2.5 text-xl font-bold text-foreground tracking-tight">Candidatura UPRA</h1>
-              <p className="mt-1 text-[12px] text-muted-foreground">Formulário online · 6 etapas guiadas</p>
+              <p className="mt-1 text-[12px] text-muted-foreground">Formulário online · 7 etapas guiadas</p>
             </div>
 
             <div className="px-6 py-5">
@@ -615,49 +622,108 @@ export default function Candidatar() {
               </div>
             )}
 
-            {step === 4 && (
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Field label="Faculdade" required>
-                    <Select value={form.faculdade} onValueChange={v => { update("faculdade", v); update("curso1", ""); update("curso2", ""); }}>
-                      <SelectTrigger className={inputCls("faculdade")}><SelectValue placeholder="Selecione" /></SelectTrigger>
-                      <SelectContent>
-                        {Object.keys(FACULDADES).map(f => <SelectItem key={f} value={f}>{f}</SelectItem>)}
-                      </SelectContent>
-                    </Select>
-                  </Field>
-                  <Field label="Sessão de provas" required>
-                    <Select value={form.sessao} onValueChange={v => update("sessao", v)}>
-                      <SelectTrigger className={inputCls("sessao")}><SelectValue placeholder="Selecione" /></SelectTrigger>
-                      <SelectContent>
-                        {SESSOES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-                      </SelectContent>
-                    </Select>
-                  </Field>
-                  <Field label="Curso (1ª opção)" required>
-                    <Select value={form.curso1} onValueChange={v => update("curso1", v)} disabled={!form.faculdade}>
-                      <SelectTrigger className={inputCls("curso1")}><SelectValue placeholder={form.faculdade ? "Selecione" : "Escolha uma faculdade"} /></SelectTrigger>
-                      <SelectContent>
-                        {cursos.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-                      </SelectContent>
-                    </Select>
-                  </Field>
-                  <Field label="Curso (2ª opção)" hint="Opcional · usado se a 1ª opção não estiver disponível">
-                    <Select value={form.curso2} onValueChange={v => update("curso2", v)} disabled={!form.faculdade}>
-                      <SelectTrigger><SelectValue placeholder="Selecione (opcional)" /></SelectTrigger>
-                      <SelectContent>
-                        {cursos.filter(c => c !== form.curso1).map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-                      </SelectContent>
-                    </Select>
+            {step === 4 && (() => {
+              const escolhas = [
+                { n: 1, label: "1ª escolha", facKey: "fac1" as const, cursoKey: "curso1" as const, required: true },
+                { n: 2, label: "2ª escolha", facKey: "fac2" as const, cursoKey: "curso2" as const, required: false },
+                { n: 3, label: "3ª escolha", facKey: "fac3" as const, cursoKey: "curso3" as const, required: false },
+              ];
+              const usedFacs = [form.fac1, form.fac2, form.fac3];
+              return (
+                <div className="space-y-5">
+                  <p className="text-[12.5px] text-muted-foreground">
+                    Indique até três combinações de <span className="font-semibold text-foreground">faculdade + curso</span> por ordem de preferência. Apenas a 1ª escolha é obrigatória.
+                  </p>
+                  <div className="space-y-4">
+                    {escolhas.map(({ n, label, facKey, cursoKey, required }) => {
+                      const facVal = form[facKey];
+                      const cursoVal = form[cursoKey];
+                      const opts = cursosFor(facVal);
+                      return (
+                        <div key={n} className="rounded-xl border border-border bg-card p-4">
+                          <div className="flex items-center gap-2 mb-3">
+                            <div className="w-6 h-6 rounded-full bg-primary/10 text-primary text-[11px] font-bold flex items-center justify-center">{n}</div>
+                            <p className="text-[12.5px] font-semibold text-foreground">{label}{required && <span className="text-destructive ml-0.5">*</span>}</p>
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <Field label="Faculdade" required={required}>
+                              <Select value={facVal} onValueChange={v => { update(facKey, v); update(cursoKey, ""); }}>
+                                <SelectTrigger className={inputCls(facKey)}><SelectValue placeholder={required ? "Selecione" : "Selecione (opcional)"} /></SelectTrigger>
+                                <SelectContent>
+                                  {Object.keys(FACULDADES).map(f => (
+                                    <SelectItem key={f} value={f} disabled={usedFacs.includes(f) && f !== facVal}>{f}</SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </Field>
+                            <Field label="Curso" required={required}>
+                              <Select value={cursoVal} onValueChange={v => update(cursoKey, v)} disabled={!facVal}>
+                                <SelectTrigger className={inputCls(cursoKey)}><SelectValue placeholder={facVal ? "Selecione" : "Escolha uma faculdade"} /></SelectTrigger>
+                                <SelectContent>
+                                  {opts.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                                </SelectContent>
+                              </Select>
+                            </Field>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <Field label="Carta de motivação" hint={`${form.motivacao.length}/500 caracteres`}>
+                    <Textarea value={form.motivacao} onChange={e => update("motivacao", e.target.value.slice(0, 500))} rows={4} placeholder="Conte-nos porque escolheu este curso..." maxLength={500} />
                   </Field>
                 </div>
-                <Field label="Carta de motivação" hint={`${form.motivacao.length}/500 caracteres`}>
-                  <Textarea value={form.motivacao} onChange={e => update("motivacao", e.target.value.slice(0, 500))} rows={4} placeholder="Conte-nos porque escolheu este curso..." maxLength={500} />
-                </Field>
+              );
+            })()}
+
+            {step === 5 && (
+              <div className="space-y-5">
+                <p className="text-[12.5px] text-muted-foreground">
+                  Escolha a sessão da prova de acesso. A data, hora e local são definidos pela instituição.
+                </p>
+                <div className="space-y-3">
+                  {SESSOES_INFO.map(s => {
+                    const active = form.sessao === s.id;
+                    return (
+                      <button
+                        key={s.id}
+                        type="button"
+                        onClick={() => update("sessao", s.id)}
+                        className={cn(
+                          "w-full text-left rounded-xl border p-4 transition-all",
+                          active
+                            ? "border-primary bg-primary/5 ring-1 ring-primary/30"
+                            : "border-border bg-card hover:border-primary/40 hover:bg-muted/40",
+                          errors.has("sessao") && !active && "border-destructive/40"
+                        )}
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className={cn(
+                            "w-4 h-4 rounded-full border-2 mt-1 flex items-center justify-center shrink-0",
+                            active ? "border-primary bg-primary" : "border-border bg-background"
+                          )}>
+                            {active && <span className="w-1.5 h-1.5 rounded-full bg-primary-foreground" />}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className={cn("text-[13.5px] font-semibold leading-tight", active ? "text-primary" : "text-foreground")}>{s.id}</p>
+                            <div className="mt-2 grid grid-cols-1 sm:grid-cols-3 gap-2 text-[12px] text-foreground/80">
+                              <span className="flex items-center gap-1.5"><CalendarDays className="w-3.5 h-3.5 text-muted-foreground" /> {s.data}</span>
+                              <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-muted-foreground" /> {s.hora}</span>
+                              <span className="flex items-center gap-1.5"><MapPinned className="w-3.5 h-3.5 text-muted-foreground" /> {s.sala}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="text-[11px] text-muted-foreground">
+                  A presença é obrigatória. Receberá a convocatória oficial por email após validação da candidatura.
+                </p>
               </div>
             )}
 
-            {step === 5 && (
+            {step === 6 && (
               <div className="space-y-4">
                 <div className="flex items-center justify-between flex-wrap gap-2">
                   <p className="text-[12.5px] text-muted-foreground">
@@ -722,7 +788,7 @@ export default function Candidatar() {
               </div>
             )}
 
-            {step === 6 && (
+            {step === 7 && (
               <div className="space-y-5">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <ReviewBlock title="Dados Pessoais" stepN={1} onEdit={goTo} rows={[
@@ -743,11 +809,19 @@ export default function Candidatar() {
                     ["Média", form.mediaFinal],
                   ]} />
                   <ReviewBlock title="Curso" stepN={4} onEdit={goTo} rows={[
-                    ["Faculdade", form.faculdade], ["1ª opção", form.curso1],
-                    ["2ª opção", form.curso2 || "—"], ["Sessão", form.sessao],
+                    ["1ª escolha", form.fac1 ? `${form.fac1} — ${form.curso1 || "—"}` : "—"],
+                    ["2ª escolha", form.fac2 ? `${form.fac2} — ${form.curso2 || "—"}` : "—"],
+                    ["3ª escolha", form.fac3 ? `${form.fac3} — ${form.curso3 || "—"}` : "—"],
                   ]} />
-                  <ReviewBlock title="Documentos" stepN={5} onEdit={goTo} rows={DOCS.map(d => [d.label, docs[d.key] ? "✓ Anexado" : "Pendente"])} />
+                  <ReviewBlock title="Prova de Acesso" stepN={5} onEdit={goTo} rows={(() => {
+                    const s = SESSOES_INFO.find(x => x.id === form.sessao);
+                    return s
+                      ? [["Sessão", s.id], ["Data", s.data], ["Hora", s.hora], ["Local", s.sala]]
+                      : [["Sessão", "—"]];
+                  })()} />
+                  <ReviewBlock title="Documentos" stepN={6} onEdit={goTo} rows={DOCS.map(d => [d.label, docs[d.key] ? "✓ Anexado" : "Pendente"])} />
                 </div>
+
 
                 <label className={cn("flex items-start gap-3 p-4 rounded-xl border cursor-pointer transition-colors",
                   errors.has("confirmar") ? "border-destructive bg-destructive/5" : "border-border hover:bg-muted/40")}>
