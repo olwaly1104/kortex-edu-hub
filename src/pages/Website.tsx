@@ -180,6 +180,23 @@ export default function Website() {
                 </div>
               ))}
             </div>
+            <div className="mt-8 pt-6 border-t border-primary-foreground/15 grid sm:grid-cols-3 gap-4 max-w-2xl">
+              {[
+                { icon: Award, title: "Acreditada MES", desc: "Cursos reconhecidos pelo Ministério do Ensino Superior" },
+                { icon: Globe, title: "40+ parcerias", desc: "Universidades parceiras em 4 continentes" },
+                { icon: Sparkles, title: "Bolsas de mérito", desc: "Apoio financeiro para os melhores candidatos" },
+              ].map(item => (
+                <div key={item.title} className="flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-lg bg-white/10 border border-white/15 backdrop-blur-sm flex items-center justify-center shrink-0">
+                    <item.icon className="w-4 h-4 text-secondary" />
+                  </div>
+                  <div className="leading-tight">
+                    <p className="text-sm font-semibold text-primary-foreground">{item.title}</p>
+                    <p className="text-[11px] text-primary-foreground/70 mt-1 leading-snug">{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
           <div className="hidden lg:block">
             <div className="relative">
