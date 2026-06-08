@@ -12,8 +12,9 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import {
   GraduationCap, ArrowLeft, ArrowRight, Check, User, MapPin, ShieldCheck,
-  BookOpen, FileText, Upload, CheckCircle2, Send, Sparkles, Mail, Trash2, Paperclip,
+  BookOpen, FileText, Upload, CheckCircle2, Send, Sparkles, Mail, Trash2, Paperclip, Clock, Calendar,
 } from "lucide-react";
+import logoUpra from "@/assets/logo-upra.asset.json";
 
 const FACULDADES: Record<string, string[]> = {
   "Faculdade de Ciências Exatas": ["Arquitectura", "Engenharia Informática", "Engenharia Civil"],
@@ -192,13 +193,11 @@ export default function Candidatar() {
   /* ───────── Intro screen ───────── */
   if (!started) {
     return (
-      <div className="min-h-screen bg-muted/20">
-        <header className="bg-background border-b border-border">
-          <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div className="min-h-screen bg-background flex flex-col">
+        <header className="border-b border-border">
+          <div className="max-w-3xl mx-auto px-6 h-16 flex items-center justify-between">
             <Link to="/site" className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center">
-                <GraduationCap className="w-5 h-5 text-primary-foreground" />
-              </div>
+              <img src={logoUpra.url} alt="UPRA" className="w-9 h-9 rounded-lg object-cover" />
               <div className="leading-tight">
                 <p className="text-sm font-bold text-foreground">UPRA</p>
                 <p className="text-[10px] text-muted-foreground">Candidatura 2026/2027</p>
@@ -210,59 +209,54 @@ export default function Candidatar() {
           </div>
         </header>
 
-        <main className="max-w-4xl mx-auto px-6 py-12 lg:py-16">
-          <Badge variant="outline" className="mb-4 border-primary/30 text-primary bg-primary/5">
-            <Sparkles className="w-3 h-3 mr-1.5" /> Ano lectivo 2026/2027
-          </Badge>
-          <h1 className="text-3xl lg:text-4xl font-bold text-foreground tracking-tight">
-            Tudo o que precisa de saber antes de começar
-          </h1>
-          <p className="mt-4 text-muted-foreground text-base leading-relaxed max-w-2xl">
-            A candidatura é 100% online e demora cerca de 10 minutos. Pode pausar e retomar a qualquer momento.
-            Antes de avançar, confirme que tem os documentos necessários e leia os pontos abaixo.
-          </p>
+        <main className="flex-1 flex items-center justify-center px-6 py-10">
+          <div className="w-full max-w-xl">
+            <div className="flex flex-col items-center text-center">
+              <img src={logoUpra.url} alt="UPRA" className="w-16 h-16 rounded-2xl object-cover shadow-sm mb-5" />
+              <Badge variant="outline" className="mb-3 border-primary/30 text-primary bg-primary/5 text-[10px]">
+                <Sparkles className="w-3 h-3 mr-1" /> Ano lectivo 2026/2027
+              </Badge>
+              <h1 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">
+                Candidatura UPRA
+              </h1>
+              <p className="mt-3 text-sm text-muted-foreground leading-relaxed max-w-md">
+                Formulário 100% online. Pode pausar e retomar a qualquer momento.
+                Tenha os documentos digitalizados (BI, notas, certidão e foto) prontos antes de começar.
+              </p>
+            </div>
 
-          <div className="mt-10 grid md:grid-cols-3 gap-4">
-            {[
-              { icon: User, title: "7 etapas guiadas", desc: "Dados pessoais, contactos, formação, escolha do curso e documentos." },
-              { icon: FileText, title: "Documentos digitalizados", desc: "BI, declaração de notas, certidão de habilitações e foto tipo passe (PDF/JPG, máx. 5MB cada)." },
-              { icon: ShieldCheck, title: "Dados protegidos", desc: "A informação submetida é confidencial e usada apenas para fins de admissão." },
-            ].map(b => (
-              <Card key={b.title} className="p-5 border-border">
-                <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-3">
-                  <b.icon className="w-5 h-5" />
-                </div>
-                <p className="font-semibold text-foreground text-sm">{b.title}</p>
-                <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">{b.desc}</p>
-              </Card>
-            ))}
-          </div>
-
-          <Card className="mt-8 p-6 border-border">
-            <p className="text-sm font-semibold text-foreground mb-4">Etapas da candidatura</p>
-            <div className="grid sm:grid-cols-2 gap-x-6 gap-y-3">
-              {STEPS.map(s => (
-                <div key={s.n} className="flex items-center gap-3 text-sm">
-                  <div className="w-7 h-7 rounded-lg bg-muted text-foreground/70 flex items-center justify-center text-[12px] font-semibold shrink-0">
-                    {s.n}
-                  </div>
-                  <div className="leading-tight">
-                    <p className="font-medium text-foreground">{s.title}</p>
-                    <p className="text-[11px] text-muted-foreground mt-0.5">{STEP_DESC[s.n]}</p>
-                  </div>
+            <div className="mt-7 grid grid-cols-3 gap-2">
+              {[
+                { icon: Clock, label: "10 min", sub: "duração média" },
+                { icon: FileText, label: "7 etapas", sub: "guiadas" },
+                { icon: ShieldCheck, label: "Seguro", sub: "dados protegidos" },
+              ].map(b => (
+                <div key={b.label} className="rounded-xl border border-border bg-card px-3 py-3 text-center">
+                  <b.icon className="w-4 h-4 text-primary mx-auto mb-1.5" />
+                  <p className="text-[12px] font-semibold text-foreground leading-none">{b.label}</p>
+                  <p className="text-[10px] text-muted-foreground mt-1">{b.sub}</p>
                 </div>
               ))}
             </div>
-          </Card>
 
-          <div className="mt-10 flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
-            <Button size="lg" onClick={() => setStarted(true)} className="gap-2 shadow-md">
+            <div className="mt-6 rounded-xl border border-border bg-muted/30 p-4">
+              <p className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold mb-2.5">O que vai preencher</p>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-1.5">
+                {STEPS.map(s => (
+                  <div key={s.n} className="flex items-center gap-2 text-[12px] text-foreground">
+                    <span className="w-4 h-4 rounded-full bg-background border border-border flex items-center justify-center text-[10px] font-semibold text-muted-foreground shrink-0">{s.n}</span>
+                    <span>{s.title}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <Button size="lg" onClick={() => setStarted(true)} className="w-full mt-6 gap-2 shadow-sm">
               Iniciar candidatura <ArrowRight className="w-4 h-4" />
             </Button>
-            <Link to="/site" className="sm:ml-1">
-              <Button size="lg" variant="ghost" className="w-full sm:w-auto">Voltar ao website</Button>
-            </Link>
-            <p className="text-xs text-muted-foreground sm:ml-auto">Dúvidas? <a href="mailto:admissoes@upra.ao" className="text-primary underline-offset-2 hover:underline">admissoes@upra.ao</a></p>
+            <p className="text-[11px] text-muted-foreground text-center mt-3">
+              Dúvidas? <a href="mailto:admissoes@upra.ao" className="text-primary underline-offset-2 hover:underline">admissoes@upra.ao</a>
+            </p>
           </div>
         </main>
       </div>
