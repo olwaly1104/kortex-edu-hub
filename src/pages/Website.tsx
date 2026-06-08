@@ -65,39 +65,60 @@ export default function Website() {
       </div>
 
       {/* ===== Header ===== */}
-      <header className="sticky top-0 z-40 bg-background/90 backdrop-blur border-b border-border">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link to="/site" className="flex items-center gap-2.5">
-            <div className="w-11 h-11 rounded-xl bg-muted flex items-center justify-center p-1">
+      <header className="sticky top-0 z-40 bg-background/85 backdrop-blur-md border-b border-border/60">
+        <div className="max-w-7xl mx-auto px-6 h-[68px] flex items-center gap-8">
+          {/* Brand */}
+          <Link to="/site" className="flex items-center gap-3 shrink-0">
+            <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center p-1">
               <img src={logoUpra.url} alt="UPRA" className="w-full h-full object-contain" />
             </div>
-            <div className="leading-tight">
-              <p className="text-sm font-bold text-foreground">UPRA</p>
+            <div className="leading-none">
+              <p className="text-[15px] font-bold tracking-tight text-foreground">UPRA</p>
+              <p className="text-[10px] text-muted-foreground mt-1 uppercase tracking-wider">Universidade Privada</p>
             </div>
           </Link>
-          <nav className="hidden lg:flex items-center gap-7 text-sm font-medium">
-            <a href="#sobre" className="text-foreground/80 hover:text-primary">Sobre</a>
-            <a href="#faculdades" className="text-foreground/80 hover:text-primary">Faculdades</a>
-            <a href="#cursos" className="text-foreground/80 hover:text-primary">Cursos</a>
-            <a href="#noticias" className="text-foreground/80 hover:text-primary">Notícias</a>
-            <a href="#contacto" className="text-foreground/80 hover:text-primary">Contacto</a>
+
+          {/* Center nav */}
+          <nav className="hidden lg:flex items-center gap-1 mx-auto">
+            {[
+              { href: "#sobre", label: "Sobre" },
+              { href: "#faculdades", label: "Faculdades" },
+              { href: "#cursos", label: "Cursos" },
+              { href: "#noticias", label: "Notícias" },
+              { href: "#contacto", label: "Contacto" },
+            ].map(item => (
+              <a
+                key={item.href}
+                href={item.href}
+                className="px-3.5 py-2 text-sm font-medium text-foreground/70 hover:text-primary rounded-md hover:bg-primary/5 transition-colors"
+              >
+                {item.label}
+              </a>
+            ))}
           </nav>
-          <div className="flex items-center gap-2">
-            <Link to="/">
-              <Button size="sm" variant="ghost" className="h-9 gap-1.5 text-foreground/80 hover:text-primary hover:bg-primary/5">
+
+          {/* Right actions */}
+          <div className="flex items-center gap-2.5 ml-auto lg:ml-0 shrink-0">
+            <Link to="/" className="hidden sm:inline-flex">
+              <Button
+                size="sm"
+                variant="ghost"
+                className="h-10 gap-2 text-sm font-medium text-foreground/80 hover:text-primary hover:bg-primary/5"
+              >
                 <LogIn className="w-4 h-4" /> Portal do Aluno
               </Button>
             </Link>
-            <div className="hidden sm:block h-6 w-px bg-border" />
             <Link to="/candidatar">
-              <Button size="sm" className="h-9 gap-1.5 bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm">
-                <Sparkles className="w-4 h-4" /> Candidatar-me
-                <ArrowRight className="w-3.5 h-3.5" />
+              <Button
+                size="sm"
+                className="h-10 px-5 gap-2 bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm hover:shadow-md rounded-full font-medium transition-all"
+              >
+                Candidatar-me <ArrowRight className="w-4 h-4" />
               </Button>
             </Link>
           </div>
-
         </div>
+
       </header>
 
       {/* ===== Hero ===== */}
