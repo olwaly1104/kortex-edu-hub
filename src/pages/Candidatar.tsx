@@ -500,45 +500,39 @@ export default function Candidatar() {
                         <Label className="text-[12px] font-medium text-foreground">
                           Documento de identificação <span className="text-destructive">*</span>
                         </Label>
-                        <p className="text-[10.5px] text-muted-foreground">
-                          {isAngolano
-                            ? <>Escolha apenas <span className="font-semibold text-foreground">um</span></>
-                            : <>Anexe <span className="font-semibold text-foreground">ambos</span> os documentos</>}
-                        </p>
+                        <p className="text-[10.5px] text-muted-foreground">Escolha apenas <span className="font-semibold text-foreground">um</span></p>
                       </div>
 
-                      {isAngolano && (
-                        <div className="grid grid-cols-2 gap-2">
-                          {(["bi", "passaporte"] as DocTipo[]).map(opt => {
-                            const active = form.docTipo === opt;
-                            return (
-                              <button
-                                key={opt}
-                                type="button"
-                                onClick={() => setDocTipo(opt)}
-                                className={cn(
-                                  "text-left rounded-lg border px-3 py-2.5 transition-all",
-                                  active
-                                    ? "border-primary bg-primary/5 ring-1 ring-primary/30"
-                                    : "border-border bg-card hover:border-primary/40 hover:bg-muted/40"
-                                )}
-                              >
-                                <div className="flex items-center gap-2.5">
-                                  <div className={cn(
-                                    "w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0",
-                                    active ? "border-primary bg-primary" : "border-border bg-background"
-                                  )}>
-                                    {active && <span className="w-1.5 h-1.5 rounded-full bg-primary-foreground" />}
-                                  </div>
-                                  <p className={cn("text-[12.5px] font-semibold leading-tight truncate", active ? "text-primary" : "text-foreground")}>
-                                    {DOC_TIPO_LABEL[opt]}
-                                  </p>
+                      <div className="grid grid-cols-2 gap-2">
+                        {docOptions.map(opt => {
+                          const active = form.docTipo === opt;
+                          return (
+                            <button
+                              key={opt}
+                              type="button"
+                              onClick={() => setDocTipo(opt)}
+                              className={cn(
+                                "text-left rounded-lg border px-3 py-2.5 transition-all",
+                                active
+                                  ? "border-primary bg-primary/5 ring-1 ring-primary/30"
+                                  : "border-border bg-card hover:border-primary/40 hover:bg-muted/40"
+                              )}
+                            >
+                              <div className="flex items-center gap-2.5">
+                                <div className={cn(
+                                  "w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0",
+                                  active ? "border-primary bg-primary" : "border-border bg-background"
+                                )}>
+                                  {active && <span className="w-1.5 h-1.5 rounded-full bg-primary-foreground" />}
                                 </div>
-                              </button>
-                            );
-                          })}
-                        </div>
-                      )}
+                                <p className={cn("text-[12.5px] font-semibold leading-tight truncate", active ? "text-primary" : "text-foreground")}>
+                                  {DOC_TIPO_LABEL[opt]}
+                                </p>
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
 
                       <div className="grid grid-cols-1 gap-2 pt-1">
                         {slots.map(s => <UploadSlot key={s.key} k={s.key} label={s.label} />)}
