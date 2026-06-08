@@ -10,8 +10,14 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cursoTemplates, cadeirasTemplate } from "@/data/academica2Data";
 import { getCadeiraContent } from "@/data/cadeiraContentData";
-import { BookOpen, Check, ArrowLeft, Plus, Trash2, Eye, FileText, Video, ClipboardList, Calendar, User, Clock, GraduationCap } from "lucide-react";
+import { BookOpen, Check, ArrowLeft, Plus, Trash2, Eye, FileText, Video, ClipboardList, Calendar, User, Clock, GraduationCap, FileSignature, MapPin } from "lucide-react";
 import { toast } from "sonner";
+
+const buildExames = (cadeiraName: string) => ([
+  { id: "ex1", epoca: "1ª Época", data: "12 Jun 2026", hora: "09:00", duracao: 120, sala: "Auditório A", peso: "50%", tipo: "Presencial" },
+  { id: "ex2", epoca: "2ª Época", data: "03 Jul 2026", hora: "14:00", duracao: 120, sala: "Auditório B", peso: "50%", tipo: "Presencial" },
+  { id: "ex3", epoca: "Época Especial", data: "18 Set 2026", hora: "10:00", duracao: 120, sala: "Sala 204", peso: "100%", tipo: "Presencial" },
+]);
 
 const docentesPool = [
   "Prof. Sofia Martins", "Prof. Carlos Mendes", "Prof. Ana Costa", "Prof. António Silva",
