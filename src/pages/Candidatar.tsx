@@ -12,8 +12,9 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import {
   GraduationCap, ArrowLeft, ArrowRight, Check, User, MapPin, ShieldCheck,
-  BookOpen, FileText, Upload, CheckCircle2, Send, Sparkles, Mail, Trash2, Paperclip,
+  BookOpen, FileText, Upload, CheckCircle2, Send, Sparkles, Mail, Trash2, Paperclip, Clock, Calendar,
 } from "lucide-react";
+import logoUpra from "@/assets/logo-upra.asset.json";
 
 const FACULDADES: Record<string, string[]> = {
   "Faculdade de Ciências Exatas": ["Arquitectura", "Engenharia Informática", "Engenharia Civil"],
