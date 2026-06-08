@@ -205,7 +205,14 @@ export default function GerarCadeiras() {
               <div className="divide-y">
                 {cadeiras.map((c, idx) => (
                   <div key={idx} className="grid grid-cols-[1fr_180px_90px_70px_36px_36px] gap-2 p-2 items-center">
-                    <Input value={c.name} onChange={e => update(cadeiraCurso, ano, idx, { name: e.target.value })} className="h-8 text-xs" />
+                    <Select value={c.name} onValueChange={v => update(cadeiraCurso, ano, idx, { name: v })}>
+                      <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {Array.from(new Set([c.name, ...(cadeirasTemplate[cadeiraCurso]?.[ano] ?? [])])).map(n =>
+                          <SelectItem key={n} value={n}>{n}</SelectItem>
+                        )}
+                      </SelectContent>
+                    </Select>
                     <Select value={c.docente} onValueChange={v => update(cadeiraCurso, ano, idx, { docente: v })}>
                       <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
                       <SelectContent>{docentesPool.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent>
@@ -217,7 +224,12 @@ export default function GerarCadeiras() {
                         <SelectItem value="2">2º Sem</SelectItem>
                       </SelectContent>
                     </Select>
-                    <Input type="number" value={c.ects} onChange={e => update(cadeiraCurso, ano, idx, { ects: +e.target.value })} className="h-8 text-xs" />
+                    <Select value={String(c.ects)} onValueChange={v => update(cadeiraCurso, ano, idx, { ects: +v })}>
+                      <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {[3, 4, 5, 6, 7.5, 9, 12].map(v => <SelectItem key={v} value={String(v)}>{v}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
                     <Button size="icon" variant="ghost" onClick={() => setPreview({ cid: cadeiraCurso, ano, idx })} className="h-8 w-8 text-muted-foreground hover:text-primary" title="Ver Cadeira">
                       <Eye className="w-3.5 h-3.5" />
                     </Button>
