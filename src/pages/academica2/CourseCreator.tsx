@@ -62,7 +62,6 @@ export default function CourseCreator() {
   const navigate = useNavigate();
   const stepRoute: Record<string, string> = {
     faculdades: "/areaacademica/criador/faculdades",
-    cursos: "/areaacademica/criador/cursos",
     cadeiras: "/areaacademica/criador/cadeiras",
   };
 
