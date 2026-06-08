@@ -24,6 +24,12 @@ const FACULDADES: Record<string, string[]> = {
 const PROVINCIAS = ["Luanda", "Benguela", "Huíla", "Huambo", "Cabinda", "Cuanza Sul", "Malanje", "Uíge"];
 const SESSOES = ["1ª Sessão", "2ª Sessão", "3ª Sessão"];
 const PARENTESCO = ["Pai", "Mãe", "Tutor(a)", "Avô/Avó", "Outro"];
+const NACIONALIDADES = [
+  "Angolana", "Portuguesa", "Brasileira", "Cabo-verdiana", "Moçambicana", "São-tomense",
+  "Guineense", "Sul-africana", "Namíbia", "Congolesa (RDC)", "Congolesa (Rep.)", "Nigeriana",
+  "Queniana", "Zimbabuana", "Camaronesa", "Marfinense", "Senegalesa", "Espanhola", "Francesa",
+  "Italiana", "Alemã", "Britânica", "Norte-americana", "Canadiana", "Chinesa", "Indiana", "Cubana", "Outra",
+];
 const DOCS = [
   { key: "bi", label: "Bilhete de Identidade", desc: "Frente e verso · PDF ou JPG" },
   { key: "notas", label: "Declaração de Notas", desc: "Emitida pela escola de origem" },
@@ -33,7 +39,7 @@ const DOCS = [
 
 type DocTipo = "bi" | "passaporte" | "residencia";
 interface FormState {
-  nome: string; nascimento: string; genero: string; nacionalidade: string;
+  primeiroNome: string; ultimoNome: string; nascimento: string; genero: string; nacionalidade: string;
   docTipo: DocTipo;
   email: string; telemovel: string; provincia: string; municipio: string; endereco: string;
   encNome: string; encParentesco: string; encTelefone: string;
@@ -42,7 +48,7 @@ interface FormState {
   motivacao: string; confirmar: boolean; docAutenticos: boolean;
 }
 const empty: FormState = {
-  nome: "", nascimento: "", genero: "", nacionalidade: "Angolana",
+  primeiroNome: "", ultimoNome: "", nascimento: "", genero: "", nacionalidade: "Angolana",
   docTipo: "bi",
   email: "", telemovel: "", provincia: "", municipio: "", endereco: "",
   encNome: "", encParentesco: "", encTelefone: "",
@@ -73,7 +79,7 @@ const STEPS = [
 ] as const;
 
 const STEP_FIELDS: Record<number, (keyof FormState)[]> = {
-  1: ["nome","nascimento","genero"],
+  1: ["primeiroNome","ultimoNome","nascimento","genero","nacionalidade"],
   2: ["provincia","municipio","email","telemovel"],
   3: ["encNome","encParentesco","encTelefone"],
   4: ["escola","anoConclusao","mediaFinal"],
@@ -382,22 +388,18 @@ export default function Candidatar() {
           <Card className="p-6 lg:p-8 shadow-sm">
             {step === 1 && (() => {
               const isAngolano = form.nacionalidade.trim().toLowerCase() === "angolana";
-              // Angolano: choose BI or Passaporte. Estrangeiro: must upload Passaporte AND Cartão de Residência.
-              const slots = isAngolano
-                ? (form.docTipo === "bi"
-                    ? [{ key: "bi_frente", label: "Bilhete de Identidade — Frente" }, { key: "bi_verso", label: "Bilhete de Identidade — Verso" }]
-                    : [{ key: "id_doc", label: "Passaporte" }])
-                : [{ key: "passaporte_doc", label: "Passaporte" }, { key: "residencia_doc", label: "Cartão de Residência" }];
+              const docOptions: DocTipo[] = isAngolano ? ["bi", "passaporte"] : ["passaporte", "residencia"];
+              // Angolano + BI uses 2 slots (frente/verso). All other doc types use 1 slot.
+              const slots = isAngolano && form.docTipo === "bi"
+                ? [{ key: "bi_frente", label: "Bilhete de Identidade — Frente" }, { key: "bi_verso", label: "Bilhete de Identidade — Verso" }]
+                : [{ key: "id_doc", label: DOC_TIPO_LABEL[form.docTipo] }];
 
               const setNacionalidade = (v: string) => {
                 update("nacionalidade", v);
                 const angolano = v.trim().toLowerCase() === "angolana";
-                if (!angolano) {
-                  ["bi_frente", "bi_verso", "id_doc"].forEach(removeDoc);
-                } else {
-                  ["passaporte_doc", "residencia_doc"].forEach(removeDoc);
-                  if (form.docTipo === "residencia") update("docTipo", "bi");
-                }
+                ["bi_frente", "bi_verso", "id_doc"].forEach(removeDoc);
+                if (!angolano && form.docTipo === "bi") update("docTipo", "passaporte");
+                if (angolano && form.docTipo === "residencia") update("docTipo", "bi");
               };
               const setDocTipo = (opt: DocTipo) => {
                 if (opt === form.docTipo) return;
@@ -464,8 +466,11 @@ export default function Candidatar() {
                   <section className="space-y-4">
                     <p className="text-[10.5px] uppercase tracking-[0.12em] text-muted-foreground font-semibold">Identificação</p>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <Field label="Nome completo" required full>
-                        <Input value={form.nome} onChange={e => update("nome", e.target.value)} className={inputCls("nome")} placeholder="João Miguel Fernandes" maxLength={120} />
+                      <Field label="Primeiro nome" required>
+                        <Input value={form.primeiroNome} onChange={e => update("primeiroNome", e.target.value)} className={inputCls("primeiroNome")} placeholder="João" maxLength={60} />
+                      </Field>
+                      <Field label="Último nome" required>
+                        <Input value={form.ultimoNome} onChange={e => update("ultimoNome", e.target.value)} className={inputCls("ultimoNome")} placeholder="Fernandes" maxLength={60} />
                       </Field>
                       <Field label="Data de nascimento" required>
                         <Input type="date" value={form.nascimento} onChange={e => update("nascimento", e.target.value)} className={inputCls("nascimento")} />
@@ -479,13 +484,13 @@ export default function Candidatar() {
                           </SelectContent>
                         </Select>
                       </Field>
-                      <Field label="Nacionalidade" required hint="Por defeito Angolana — altere se for outra nacionalidade">
-                        <Input
-                          value={form.nacionalidade}
-                          onChange={e => setNacionalidade(e.target.value)}
-                          placeholder="Angolana"
-                          maxLength={40}
-                        />
+                      <Field label="Nacionalidade" required full>
+                        <Select value={form.nacionalidade} onValueChange={setNacionalidade}>
+                          <SelectTrigger className={inputCls("nacionalidade")}><SelectValue /></SelectTrigger>
+                          <SelectContent className="max-h-72">
+                            {NACIONALIDADES.map(n => <SelectItem key={n} value={n}>{n}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
                       </Field>
                     </div>
 
@@ -495,45 +500,39 @@ export default function Candidatar() {
                         <Label className="text-[12px] font-medium text-foreground">
                           Documento de identificação <span className="text-destructive">*</span>
                         </Label>
-                        <p className="text-[10.5px] text-muted-foreground">
-                          {isAngolano
-                            ? <>Escolha apenas <span className="font-semibold text-foreground">um</span></>
-                            : <>Anexe <span className="font-semibold text-foreground">ambos</span> os documentos</>}
-                        </p>
+                        <p className="text-[10.5px] text-muted-foreground">Escolha apenas <span className="font-semibold text-foreground">um</span></p>
                       </div>
 
-                      {isAngolano && (
-                        <div className="grid grid-cols-2 gap-2">
-                          {(["bi", "passaporte"] as DocTipo[]).map(opt => {
-                            const active = form.docTipo === opt;
-                            return (
-                              <button
-                                key={opt}
-                                type="button"
-                                onClick={() => setDocTipo(opt)}
-                                className={cn(
-                                  "text-left rounded-lg border px-3 py-2.5 transition-all",
-                                  active
-                                    ? "border-primary bg-primary/5 ring-1 ring-primary/30"
-                                    : "border-border bg-card hover:border-primary/40 hover:bg-muted/40"
-                                )}
-                              >
-                                <div className="flex items-center gap-2.5">
-                                  <div className={cn(
-                                    "w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0",
-                                    active ? "border-primary bg-primary" : "border-border bg-background"
-                                  )}>
-                                    {active && <span className="w-1.5 h-1.5 rounded-full bg-primary-foreground" />}
-                                  </div>
-                                  <p className={cn("text-[12.5px] font-semibold leading-tight truncate", active ? "text-primary" : "text-foreground")}>
-                                    {DOC_TIPO_LABEL[opt]}
-                                  </p>
+                      <div className="grid grid-cols-2 gap-2">
+                        {docOptions.map(opt => {
+                          const active = form.docTipo === opt;
+                          return (
+                            <button
+                              key={opt}
+                              type="button"
+                              onClick={() => setDocTipo(opt)}
+                              className={cn(
+                                "text-left rounded-lg border px-3 py-2.5 transition-all",
+                                active
+                                  ? "border-primary bg-primary/5 ring-1 ring-primary/30"
+                                  : "border-border bg-card hover:border-primary/40 hover:bg-muted/40"
+                              )}
+                            >
+                              <div className="flex items-center gap-2.5">
+                                <div className={cn(
+                                  "w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0",
+                                  active ? "border-primary bg-primary" : "border-border bg-background"
+                                )}>
+                                  {active && <span className="w-1.5 h-1.5 rounded-full bg-primary-foreground" />}
                                 </div>
-                              </button>
-                            );
-                          })}
-                        </div>
-                      )}
+                                <p className={cn("text-[12.5px] font-semibold leading-tight truncate", active ? "text-primary" : "text-foreground")}>
+                                  {DOC_TIPO_LABEL[opt]}
+                                </p>
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
 
                       <div className="grid grid-cols-1 gap-2 pt-1">
                         {slots.map(s => <UploadSlot key={s.key} k={s.key} label={s.label} />)}
@@ -727,7 +726,7 @@ export default function Candidatar() {
               <div className="space-y-5">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <ReviewBlock title="Dados Pessoais" stepN={1} onEdit={goTo} rows={[
-                    ["Nome", form.nome],
+                    ["Nome", `${form.primeiroNome} ${form.ultimoNome}`.trim()],
                     ["Nascimento", form.nascimento], ["Género", form.genero],
                     ["Nacionalidade", form.nacionalidade],
                   ]} />
