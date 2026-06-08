@@ -230,7 +230,7 @@ export default function Candidatar() {
                 Ano lectivo 2026/2027
               </Badge>
               <h1 className="mt-2.5 text-xl font-bold text-foreground tracking-tight">Candidatura UPRA</h1>
-              <p className="mt-1 text-[12px] text-muted-foreground">Formulário online · 6 etapas guiadas</p>
+              <p className="mt-1 text-[12px] text-muted-foreground">Formulário online · 7 etapas guiadas</p>
             </div>
 
             <div className="px-6 py-5">
