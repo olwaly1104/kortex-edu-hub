@@ -30,6 +30,7 @@ type CadeiraAlloc = { name: string; docente: string; ects: number; semestre: 1 |
 
 export default function GerarCadeiras() {
   const cursosWithCadeiras = Object.keys(cadeirasTemplate);
+  const [cadeiraCurso, setCadeiraCurso] = useState<string>(cursosWithCadeiras[0]);
 
   const [cadeirasAlloc, setCadeirasAlloc] = useState<Record<string, CadeiraAlloc[][]>>(() => {
     const out: Record<string, CadeiraAlloc[][]> = {};
@@ -72,6 +73,10 @@ export default function GerarCadeiras() {
     Object.values(cadeirasAlloc).reduce((acc, anos) => acc + anos.reduce((a, r) => a + r.length, 0), 0)
   , [cadeirasAlloc]);
 
+  const cursoTotal = useMemo(() =>
+    cadeirasAlloc[cadeiraCurso]?.reduce((a, r) => a + r.length, 0) ?? 0
+  , [cadeirasAlloc, cadeiraCurso]);
+
   const confirmAll = () => toast.success("Cadeiras alocadas para todos os cursos");
 
   const [preview, setPreview] = useState<{ cid: string; ano: number; idx: number } | null>(null);
@@ -85,7 +90,10 @@ export default function GerarCadeiras() {
     () => Array.from(new Set(cursosWithCadeiras.map(cid => cursoTemplates.find(c => c.id === cid)?.faculty ?? "—"))),
     [cursosWithCadeiras]
   );
-  const [selectedFac, setSelectedFac] = useState<string>(faculdades[0]);
+  const [openFacs, setOpenFacs] = useState<Record<string, boolean>>(() =>
+    Object.fromEntries(faculdades.map(f => [f, true]))
+  );
+  const toggleFac = (f: string) => setOpenFacs(p => ({ ...p, [f]: !p[f] }));
 
   const docentesUsados = useMemo(() => {
     const s = new Set<string>();
@@ -138,80 +146,87 @@ export default function GerarCadeiras() {
       </div>
 
       <div className="grid md:grid-cols-[260px_1fr] gap-4">
-        {/* Left: Faculdades list */}
-        <Card className="p-2 h-fit space-y-0.5">
-          <p className="text-[10px] uppercase tracking-wide text-muted-foreground px-2 py-1.5">Faculdades</p>
+        <Card className="p-2 h-fit space-y-1">
           {faculdades.map(fac => {
             const cursosOfFac = cursosWithCadeiras.filter(cid => (cursoTemplates.find(c => c.id === cid)?.faculty ?? "—") === fac);
-            const facCadeiras = cursosOfFac.reduce((a, cid) => a + cadeirasAlloc[cid].reduce((b, r) => b + r.length, 0), 0);
-            const isSel = selectedFac === fac;
+            const open = openFacs[fac];
             return (
-              <button
-                key={fac}
-                onClick={() => setSelectedFac(fac)}
-                className={`w-full text-left px-2.5 py-2 rounded-md transition flex items-start gap-2 ${
-                  isSel ? "bg-primary text-primary-foreground" : "hover:bg-muted/60"
-                }`}
-              >
-                <Building2 className={`w-3.5 h-3.5 mt-0.5 shrink-0 ${isSel ? "" : "text-primary"}`} />
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs font-semibold leading-tight truncate">{fac}</p>
-                  <p className={`text-[10px] mt-0.5 ${isSel ? "opacity-80" : "text-muted-foreground"}`}>
-                    {cursosOfFac.length} cursos · {facCadeiras} cadeiras
-                  </p>
-                </div>
-              </button>
+              <div key={fac} className="rounded-md overflow-hidden">
+                <button
+                  onClick={() => toggleFac(fac)}
+                  className="w-full flex items-center gap-1.5 px-2 py-2 hover:bg-muted/60 transition text-left"
+                >
+                  {open ? <ChevronDown className="w-3.5 h-3.5 text-muted-foreground shrink-0" /> : <ChevronRight className="w-3.5 h-3.5 text-muted-foreground shrink-0" />}
+                  <Building2 className="w-3.5 h-3.5 text-primary shrink-0" />
+                  <span className="text-xs font-semibold flex-1 truncate">{fac}</span>
+                  <Badge variant="outline" className="text-[10px]">{cursosOfFac.length}</Badge>
+                </button>
+                {open && (
+                  <div className="space-y-0.5 pl-5 pb-1">
+                    {cursosOfFac.map(cid => {
+                      const curso = cursoTemplates.find(c => c.id === cid);
+                      const isSel = cadeiraCurso === cid;
+                      const count = cadeirasAlloc[cid].reduce((a, r) => a + r.length, 0);
+                      return (
+                        <button key={cid} onClick={() => setCadeiraCurso(cid)}
+                          className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm flex items-center justify-between transition ${
+                            isSel ? "bg-primary text-primary-foreground" : "hover:bg-muted/50"
+                          }`}>
+                          <span className="truncate font-medium">{curso?.name}</span>
+                          <Badge variant={isSel ? "secondary" : "outline"} className="text-[10px] ml-2">{count}</Badge>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
             );
           })}
         </Card>
 
-        {/* Right: Cursos of selected faculdade, vertical */}
+
         <div className="space-y-3 min-w-0">
-          {cursosWithCadeiras
-            .filter(cid => (cursoTemplates.find(c => c.id === cid)?.faculty ?? "—") === selectedFac)
-            .map(cid => {
-              const curso = cursoTemplates.find(c => c.id === cid);
-              const anos = cadeirasAlloc[cid];
-              const total = anos.reduce((a, r) => a + r.length, 0);
-              return (
-                <Card key={cid} className="overflow-hidden">
-                  <div className="bg-primary/10 px-4 py-3 border-b flex items-center justify-between flex-wrap gap-2">
-                    <div className="flex items-center gap-2">
-                      <GraduationCap className="w-4 h-4 text-primary" />
-                      <p className="text-sm font-bold text-primary">{curso?.name}</p>
-                      <Badge variant="outline" className="text-[10px]">{curso?.code}</Badge>
-                      <Badge variant="outline" className="text-[10px]">{anos.length} anos · {total} cadeiras</Badge>
-                    </div>
+          {cadeirasAlloc[cadeiraCurso].map((cadeiras, ano) => (
+            <Card key={ano} className="overflow-hidden">
+              <div className="bg-primary/10 px-4 py-2.5 border-b flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <p className="text-sm font-bold text-primary">{ano + 1}º Ano</p>
+                  <Badge variant="outline" className="text-[10px]">{cadeiras.length} cadeiras</Badge>
+                </div>
+                <Button size="sm" variant="ghost" onClick={() => addCadeira(cadeiraCurso, ano)} className="h-7 gap-1 text-xs">
+                  <Plus className="w-3 h-3" /> Adicionar
+                </Button>
+              </div>
+              <div className="grid grid-cols-[1fr_180px_90px_70px_36px_36px] gap-2 px-3 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b">
+                <span>Cadeira</span><span>Docente</span><span>Semestre</span><span>ECTS</span><span></span><span></span>
+              </div>
+              <div className="divide-y">
+                {cadeiras.map((c, idx) => (
+                  <div key={idx} className="grid grid-cols-[1fr_180px_90px_70px_36px_36px] gap-2 p-2 items-center">
+                    <Input value={c.name} onChange={e => update(cadeiraCurso, ano, idx, { name: e.target.value })} className="h-8 text-xs" />
+                    <Select value={c.docente} onValueChange={v => update(cadeiraCurso, ano, idx, { docente: v })}>
+                      <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                      <SelectContent>{docentesPool.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent>
+                    </Select>
+                    <Select value={String(c.semestre)} onValueChange={v => update(cadeiraCurso, ano, idx, { semestre: +v as 1 | 2 })}>
+                      <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1">1º Sem</SelectItem>
+                        <SelectItem value="2">2º Sem</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Input type="number" value={c.ects} onChange={e => update(cadeiraCurso, ano, idx, { ects: +e.target.value })} className="h-8 text-xs" />
+                    <Button size="icon" variant="ghost" onClick={() => setPreview({ cid: cadeiraCurso, ano, idx })} className="h-8 w-8 text-muted-foreground hover:text-primary" title="Ver Cadeira">
+                      <Eye className="w-3.5 h-3.5" />
+                    </Button>
+                    <Button size="icon" variant="ghost" onClick={() => removeCadeira(cadeiraCurso, ano, idx)} className="h-8 w-8 text-muted-foreground hover:text-destructive">
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </Button>
                   </div>
-                  <div className="p-3 space-y-2">
-                    {anos.map((cadeiras, ano) => (
-                      <div key={ano}>
-                        <div className="flex items-center justify-between mb-1.5">
-                          <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">{ano + 1}º Ano · {cadeiras.length} cadeiras</p>
-                          <Button size="sm" variant="ghost" onClick={() => addCadeira(cid, ano)} className="h-6 gap-1 text-[11px]">
-                            <Plus className="w-3 h-3" /> Adicionar
-                          </Button>
-                        </div>
-                        <div className="flex flex-wrap gap-1.5">
-                          {cadeiras.map((c, idx) => (
-                            <button
-                              key={idx}
-                              onClick={() => setPreview({ cid, ano, idx })}
-                              className="group inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border bg-card hover:border-primary hover:bg-primary/5 transition text-xs"
-                              title={`${c.docente} · ${c.semestre}º Sem · ${c.ects} ECTS`}
-                            >
-                              <BookOpen className="w-3 h-3 text-primary" />
-                              <span className="font-medium">{c.name}</span>
-                              <span className="text-[10px] text-muted-foreground">· {c.semestre}ºS</span>
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </Card>
-              );
-            })}
+                ))}
+              </div>
+            </Card>
+          ))}
         </div>
       </div>
 
@@ -256,43 +271,6 @@ export default function GerarCadeiras() {
                         <Card className="p-3"><p className="text-[10px] text-muted-foreground uppercase">Quizzes</p><p className="text-xl font-bold">{previewContent.quizzes.length}</p></Card>
                         <Card className="p-3"><p className="text-[10px] text-muted-foreground uppercase">Estudantes</p><p className="text-xl font-bold">{previewCurso?.estudantesEsperados ?? 0}</p></Card>
                       </div>
-                      <Card className="p-4 space-y-3">
-                        <div className="flex items-center justify-between">
-                          <h3 className="text-sm font-semibold">Edição da Cadeira</h3>
-                          {preview && (
-                            <Button size="sm" variant="ghost" onClick={() => { removeCadeira(preview.cid, preview.ano, preview.idx); setPreview(null); toast.success("Cadeira removida"); }} className="h-7 gap-1 text-xs text-destructive hover:text-destructive">
-                              <Trash2 className="w-3 h-3" /> Remover
-                            </Button>
-                          )}
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                          <div>
-                            <p className="text-[10px] text-muted-foreground uppercase mb-1">Nome</p>
-                            <Input value={previewCadeira.name} onChange={e => preview && update(preview.cid, preview.ano, preview.idx, { name: e.target.value })} className="h-8 text-xs" />
-                          </div>
-                          <div>
-                            <p className="text-[10px] text-muted-foreground uppercase mb-1">Docente</p>
-                            <Select value={previewCadeira.docente} onValueChange={v => preview && update(preview.cid, preview.ano, preview.idx, { docente: v })}>
-                              <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                              <SelectContent>{docentesPool.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent>
-                            </Select>
-                          </div>
-                          <div>
-                            <p className="text-[10px] text-muted-foreground uppercase mb-1">Semestre</p>
-                            <Select value={String(previewCadeira.semestre)} onValueChange={v => preview && update(preview.cid, preview.ano, preview.idx, { semestre: +v as 1 | 2 })}>
-                              <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="1">1º Semestre</SelectItem>
-                                <SelectItem value="2">2º Semestre</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          <div>
-                            <p className="text-[10px] text-muted-foreground uppercase mb-1">ECTS</p>
-                            <Input type="number" value={previewCadeira.ects} onChange={e => preview && update(preview.cid, preview.ano, preview.idx, { ects: +e.target.value })} className="h-8 text-xs" />
-                          </div>
-                        </div>
-                      </Card>
                       <Card className="p-4">
                         <h3 className="text-sm font-semibold mb-2">Descrição</h3>
                         <p className="text-sm text-muted-foreground">Cadeira de {previewCadeira.name} do curso de {previewCurso?.name}, leccionada por {previewCadeira.docente} no {previewCadeira.semestre}º semestre. Inclui componente teórica e prática, com avaliação contínua através de quizzes e exame final presencial.</p>
