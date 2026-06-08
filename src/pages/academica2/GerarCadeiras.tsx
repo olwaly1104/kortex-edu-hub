@@ -112,23 +112,35 @@ export default function GerarCadeiras() {
       </div>
 
       <div className="grid md:grid-cols-[240px_1fr] gap-4">
-        <Card className="p-2 h-fit">
-          <p className="text-[10px] uppercase tracking-wide text-muted-foreground px-2 py-1.5">Cursos</p>
-          {cursosWithCadeiras.map(cid => {
-            const curso = cursoTemplates.find(c => c.id === cid);
-            const isSel = cadeiraCurso === cid;
-            const count = cadeirasAlloc[cid].reduce((a, r) => a + r.length, 0);
+        <Card className="p-2 h-fit space-y-3">
+          {Array.from(new Set(cursosWithCadeiras.map(cid => cursoTemplates.find(c => c.id === cid)?.faculty ?? "—"))).map(fac => {
+            const cursosOfFac = cursosWithCadeiras.filter(cid => (cursoTemplates.find(c => c.id === cid)?.faculty ?? "—") === fac);
             return (
-              <button key={cid} onClick={() => setCadeiraCurso(cid)}
-                className={`w-full text-left px-3 py-2 rounded-md text-sm flex items-center justify-between transition ${
-                  isSel ? "bg-primary text-primary-foreground" : "hover:bg-muted/50"
-                }`}>
-                <span className="truncate font-medium">{curso?.name}</span>
-                <Badge variant={isSel ? "secondary" : "outline"} className="text-[10px] ml-2">{count}</Badge>
-              </button>
+              <div key={fac}>
+                <p className="text-[10px] uppercase tracking-wide text-muted-foreground px-2 py-1.5 flex items-center gap-1.5">
+                  <Building2 className="w-3 h-3" /> {fac}
+                </p>
+                <div className="space-y-0.5">
+                  {cursosOfFac.map(cid => {
+                    const curso = cursoTemplates.find(c => c.id === cid);
+                    const isSel = cadeiraCurso === cid;
+                    const count = cadeirasAlloc[cid].reduce((a, r) => a + r.length, 0);
+                    return (
+                      <button key={cid} onClick={() => setCadeiraCurso(cid)}
+                        className={`w-full text-left px-3 py-2 rounded-md text-sm flex items-center justify-between transition ${
+                          isSel ? "bg-primary text-primary-foreground" : "hover:bg-muted/50"
+                        }`}>
+                        <span className="truncate font-medium">{curso?.name}</span>
+                        <Badge variant={isSel ? "secondary" : "outline"} className="text-[10px] ml-2">{count}</Badge>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             );
           })}
         </Card>
+
 
         <div className="space-y-3 min-w-0">
           {cadeirasAlloc[cadeiraCurso].map((cadeiras, ano) => (
