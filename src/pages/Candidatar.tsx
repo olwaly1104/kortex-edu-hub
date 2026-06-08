@@ -12,7 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import {
   ArrowLeft, ArrowRight, Check, User, MapPin, ShieldCheck,
-  BookOpen, FileText, Upload, CheckCircle2, Send, Mail, Trash2, Paperclip, GraduationCap,
+  BookOpen, FileText, Upload, CheckCircle2, Send, Mail, Trash2, Paperclip, GraduationCap, ScanLine,
 } from "lucide-react";
 import logoUpra from "@/assets/logo-upra.asset.json";
 
@@ -452,7 +452,7 @@ export default function Candidatar() {
                           onClick={() => fileRefs.current[k]?.click()}
                           className="h-7 gap-1.5 text-[11.5px]"
                         >
-                          <Upload className="w-3.5 h-3.5" /> {f ? "Substituir" : "Anexar"}
+                          <ScanLine className="w-3.5 h-3.5" /> {f ? "Substituir" : "Digitalizar"}
                         </Button>
                       </div>
                     </div>
@@ -484,7 +484,7 @@ export default function Candidatar() {
                           </SelectContent>
                         </Select>
                       </Field>
-                      <Field label="Nacionalidade" required full>
+                      <Field label="Nacionalidade" required>
                         <Select value={form.nacionalidade} onValueChange={setNacionalidade}>
                           <SelectTrigger className={inputCls("nacionalidade")}><SelectValue /></SelectTrigger>
                           <SelectContent className="max-h-72">
