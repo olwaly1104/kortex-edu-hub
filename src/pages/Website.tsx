@@ -112,7 +112,7 @@ export default function Website() {
         </div>
 
         {/* Sub-bar: refined announcement strip + Candidatar-me CTA */}
-        <div className="border-y border-border/40 bg-gradient-to-r from-muted/40 via-background to-muted/40">
+        <div className="border-y border-border/80 bg-gradient-to-r from-muted/40 via-background to-muted/40">
           <div className="max-w-7xl mx-auto px-6 h-11 flex items-center gap-3">
             {/* Status dot + label */}
             <span className="inline-flex items-center gap-1.5 shrink-0">
