@@ -335,7 +335,7 @@ export default function Website() {
       {/* ===== Cursos destaque ===== */}
       <section id="cursos" className="py-20 bg-muted/30">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="flex items-end justify-between mb-10 flex-wrap gap-4">
+          <div className="flex items-end justify-between mb-8 flex-wrap gap-4">
             <div>
               <Badge variant="outline" className="mb-3">Cursos em destaque</Badge>
               <h2 className="text-3xl lg:text-4xl font-bold text-foreground">Programas mais procurados</h2>
@@ -344,12 +344,27 @@ export default function Website() {
               <Button variant="outline" className="gap-2">Ver todos os cursos <ArrowRight className="w-4 h-4" /></Button>
             </Link>
           </div>
+          <div className="mb-8 inline-flex items-center p-1 rounded-lg bg-background border border-border">
+            {(["licenciatura", "mestrado"] as const).map(t => (
+              <button
+                key={t}
+                onClick={() => setTipoCurso(t)}
+                className={`px-5 py-2 text-sm font-medium rounded-md transition-colors capitalize ${
+                  tipoCurso === t
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {t === "licenciatura" ? "Licenciaturas" : "Mestrado"}
+              </button>
+            ))}
+          </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {cursosDestaque.map(c => (
-              <Card key={c} className="p-5 hover:bg-primary hover:text-primary-foreground transition-colors cursor-pointer group">
+            {cursosDestaque[tipoCurso].map(c => (
+              <Card key={c.name} className="p-5 hover:bg-primary hover:text-primary-foreground transition-colors cursor-pointer group">
                 <Cpu className="w-5 h-5 text-primary group-hover:text-primary-foreground mb-3" />
-                <p className="font-semibold">{c}</p>
-                <p className="text-xs opacity-70 mt-1">Licenciatura · 4 anos</p>
+                <p className="font-semibold">{c.name}</p>
+                <p className="text-xs opacity-70 mt-1 capitalize">{tipoCurso} · {c.duracao}</p>
               </Card>
             ))}
           </div>
