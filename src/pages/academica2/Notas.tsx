@@ -273,6 +273,7 @@ export default function Notas() {
                   <TableCell className="text-right font-mono text-xs">{isFuture ? "—" : c.estudantes || "—"}</TableCell>
                   <TableCell className="text-right font-mono text-xs font-semibold">{isFuture ? "—" : c.media || "—"}</TableCell>
                   <TableCell className="text-right font-mono text-xs">{isFuture ? "—" : c.estudantes ? `${c.taxa}%` : "—"}</TableCell>
+                  <TableCell>{isFuture || !c.estudantes ? <Badge variant="outline" className="text-muted-foreground">{isFuture ? "Planeado" : "—"}</Badge> : <Badge className={stateOf(c.media).cls}>{stateOf(c.media).label}</Badge>}</TableCell>
                   <TableCell><ChevronRight className="w-4 h-4 text-muted-foreground" /></TableCell>
                 </TableRow>
               ))}
