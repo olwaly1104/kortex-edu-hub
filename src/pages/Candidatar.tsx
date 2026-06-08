@@ -47,7 +47,8 @@ interface FormState {
   email: string; telemovel: string; provincia: string; municipio: string; endereco: string;
   encNome: string; encParentesco: string; encTelefone: string;
   escola: string; anoConclusao: string; mediaFinal: string;
-  faculdade: string; curso1: string; curso2: string; sessao: string;
+  fac1: string; curso1: string; fac2: string; curso2: string; fac3: string; curso3: string;
+  sessao: string;
   motivacao: string; confirmar: boolean; docAutenticos: boolean;
 }
 const empty: FormState = {
@@ -56,7 +57,8 @@ const empty: FormState = {
   email: "", telemovel: "", provincia: "", municipio: "", endereco: "",
   encNome: "", encParentesco: "", encTelefone: "",
   escola: "", anoConclusao: "", mediaFinal: "",
-  faculdade: "", curso1: "", curso2: "", sessao: "",
+  fac1: "", curso1: "", fac2: "", curso2: "", fac3: "", curso3: "",
+  sessao: "",
   motivacao: "", confirmar: false, docAutenticos: false,
 };
 
