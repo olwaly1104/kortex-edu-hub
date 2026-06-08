@@ -272,7 +272,28 @@ export default function GerarCadeiras() {
                       ))}
                     </TabsContent>
 
+                    <TabsContent value="exames" className="mt-0 space-y-2">
+                      {buildExames(previewCadeira.name).map(ex => (
+                        <Card key={ex.id} className="p-3 flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-md bg-primary/10 text-primary flex items-center justify-center">
+                            <FileSignature className="w-4 h-4" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium">{ex.epoca} · {previewCadeira.name}</p>
+                            <p className="text-xs text-muted-foreground flex items-center gap-3 mt-0.5">
+                              <span className="inline-flex items-center gap-1"><Calendar className="w-3 h-3" /> {ex.data}</span>
+                              <span className="inline-flex items-center gap-1"><Clock className="w-3 h-3" /> {ex.hora} · {ex.duracao} min</span>
+                              <span className="inline-flex items-center gap-1"><MapPin className="w-3 h-3" /> {ex.sala}</span>
+                            </p>
+                          </div>
+                          <Badge variant="outline" className="text-[10px]">Peso {ex.peso}</Badge>
+                          <Badge variant="secondary" className="text-[10px]">{ex.tipo}</Badge>
+                        </Card>
+                      ))}
+                    </TabsContent>
+
                     <TabsContent value="calendario" className="mt-0 space-y-2">
+
                       {previewContent.calendario.map(e => (
                         <Card key={e.id} className="p-3 flex items-center gap-3">
                           <Calendar className="w-4 h-4 text-primary" />
