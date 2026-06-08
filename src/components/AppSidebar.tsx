@@ -217,7 +217,7 @@ const academica2Sections: NavSection[] = [
     { label: "Solicitações", icon: CheckSquare, path: "/areaacademica/solicitacoes" },
   ]},
   { title: "Área Académica", items: [
-    { label: "Criador de Curso", icon: Wand2, path: "/areaacademica/criador" },
+    { label: "Criador de Ano Letivo", icon: Wand2, path: "/areaacademica/criador" },
     { label: "Anos Letivos", icon: CalendarDays, path: "/areaacademica/anos-letivos" },
     { label: "Cadeiras", icon: BookOpen, path: "/areaacademica/cadeiras" },
     { label: "Turmas & Alocação", icon: Layers, path: "/areaacademica/turmas" },
