@@ -79,7 +79,7 @@ const STEPS = [
 ] as const;
 
 const STEP_FIELDS: Record<number, (keyof FormState)[]> = {
-  1: ["nome","nascimento","genero"],
+  1: ["primeiroNome","ultimoNome","nascimento","genero","nacionalidade"],
   2: ["provincia","municipio","email","telemovel"],
   3: ["encNome","encParentesco","encTelefone"],
   4: ["escola","anoConclusao","mediaFinal"],
