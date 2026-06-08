@@ -326,16 +326,18 @@ export default function Candidatar() {
                         )}>{s.sub}</p>
                       </div>
                       <div className="shrink-0">
-                        {isDone ? (
-                          <span className="text-[9.5px] font-semibold uppercase tracking-wide text-primary bg-primary/10 px-1.5 py-0.5 rounded">
-                            OK
-                          </span>
-                        ) : isActive ? (
-                          <span className="w-1.5 h-1.5 rounded-full bg-primary block animate-pulse" />
-                        ) : (
-                          <span className="text-[10px] font-mono text-muted-foreground/70 tabular-nums">0{s.n}</span>
-                        )}
+                        <div
+                          className={cn(
+                            "w-5 h-5 rounded-full flex items-center justify-center border transition-colors",
+                            isDone
+                              ? "bg-emerald-500 border-emerald-500 text-white"
+                              : "bg-muted/40 border-border text-muted-foreground/40",
+                          )}
+                        >
+                          <Check className="w-3 h-3" strokeWidth={3} />
+                        </div>
                       </div>
+
                     </button>
                   </li>
                 );
