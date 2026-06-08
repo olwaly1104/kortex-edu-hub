@@ -11,8 +11,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import {
-  ArrowLeft, ArrowRight, Check, User, MapPin, ShieldCheck,
-  BookOpen, FileText, Upload, CheckCircle2, Send, Mail, Trash2, Paperclip, GraduationCap, ScanLine,
+  ArrowLeft, ArrowRight, Check, User, MapPin,
+  BookOpen, FileText, Upload, CheckCircle2, Send, Mail, Trash2, Paperclip, GraduationCap,
 } from "lucide-react";
 import logoUpra from "@/assets/logo-upra.asset.json";
 
@@ -69,23 +69,21 @@ const DOC_TIPO_DESC: Record<DocTipo, string> = {
 };
 
 const STEPS = [
-  { n: 1, title: "Dados pessoais",   sub: "Identificação e documento",          icon: User },
-  { n: 2, title: "Morada & Contactos", sub: "Endereço, email e telemóvel",      icon: MapPin },
-  { n: 3, title: "Encarregado",      sub: "Responsável legal do candidato",     icon: ShieldCheck },
-  { n: 4, title: "Formação",         sub: "Histórico do ensino secundário",     icon: GraduationCap },
-  { n: 5, title: "Curso",            sub: "Faculdade, curso e sessão de provas",icon: BookOpen },
-  { n: 6, title: "Documentos",       sub: "Anexos académicos obrigatórios",     icon: FileText },
-  { n: 7, title: "Revisão",          sub: "Confirmar e submeter",               icon: Check },
+  { n: 1, title: "Dados pessoais",     sub: "Identificação e documento",          icon: User },
+  { n: 2, title: "Morada & Contactos", sub: "Endereço, contactos e encarregado",  icon: MapPin },
+  { n: 3, title: "Formação",           sub: "Histórico do ensino secundário",     icon: GraduationCap },
+  { n: 4, title: "Curso",              sub: "Faculdade, curso e sessão de provas",icon: BookOpen },
+  { n: 5, title: "Documentos",         sub: "Anexos académicos obrigatórios",     icon: FileText },
+  { n: 6, title: "Revisão",            sub: "Confirmar e submeter",               icon: Check },
 ] as const;
 
 const STEP_FIELDS: Record<number, (keyof FormState)[]> = {
   1: ["primeiroNome","ultimoNome","nascimento","genero","nacionalidade"],
-  2: ["provincia","municipio","email","telemovel"],
-  3: ["encNome","encParentesco","encTelefone"],
-  4: ["escola","anoConclusao","mediaFinal"],
-  5: ["faculdade","curso1","sessao"],
+  2: ["provincia","municipio","email","telemovel","encNome","encParentesco","encTelefone"],
+  3: ["escola","anoConclusao","mediaFinal"],
+  4: ["faculdade","curso1","sessao"],
+  5: [],
   6: [],
-  7: [],
 };
 
 function Field({ label, required, children, hint, full }: { label: string; required?: boolean; children: React.ReactNode; hint?: string; full?: boolean }) {
@@ -225,7 +223,7 @@ export default function Candidatar() {
                 Ano lectivo 2026/2027
               </Badge>
               <h1 className="mt-2.5 text-xl font-bold text-foreground tracking-tight">Candidatura UPRA</h1>
-              <p className="mt-1 text-[12px] text-muted-foreground">Formulário online · 7 etapas guiadas</p>
+              <p className="mt-1 text-[12px] text-muted-foreground">Formulário online · 6 etapas guiadas</p>
             </div>
 
             <div className="px-6 py-5">
@@ -452,7 +450,7 @@ export default function Candidatar() {
                           onClick={() => fileRefs.current[k]?.click()}
                           className="h-7 gap-1.5 text-[11.5px]"
                         >
-                          <ScanLine className="w-3.5 h-3.5" /> {f ? "Substituir" : "Digitalizar"}
+                          <Upload className="w-3.5 h-3.5" /> {f ? "Substituir" : "Upload"}
                         </Button>
                       </div>
                     </div>
@@ -579,29 +577,31 @@ export default function Candidatar() {
                     </Field>
                   </div>
                 </section>
+
+                {/* Encarregado */}
+                <section className="space-y-4 border-t border-border pt-4">
+                  <p className="text-[10.5px] uppercase tracking-[0.12em] text-muted-foreground font-semibold">Encarregado de educação</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Field label="Nome do encarregado de educação" required full>
+                      <Input value={form.encNome} onChange={e => update("encNome", e.target.value)} className={inputCls("encNome")} placeholder="Nome completo" maxLength={120} />
+                    </Field>
+                    <Field label="Parentesco" required>
+                      <Select value={form.encParentesco} onValueChange={v => update("encParentesco", v)}>
+                        <SelectTrigger className={inputCls("encParentesco")}><SelectValue placeholder="Selecione" /></SelectTrigger>
+                        <SelectContent>
+                          {PARENTESCO.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
+                    </Field>
+                    <Field label="Telefone" required>
+                      <Input value={form.encTelefone} onChange={e => update("encTelefone", e.target.value)} className={inputCls("encTelefone")} placeholder="+244 9XX XXX XXX" maxLength={20} />
+                    </Field>
+                  </div>
+                </section>
               </div>
             )}
 
             {step === 3 && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Field label="Nome do encarregado de educação" required full>
-                  <Input value={form.encNome} onChange={e => update("encNome", e.target.value)} className={inputCls("encNome")} placeholder="Nome completo" maxLength={120} />
-                </Field>
-                <Field label="Parentesco" required>
-                  <Select value={form.encParentesco} onValueChange={v => update("encParentesco", v)}>
-                    <SelectTrigger className={inputCls("encParentesco")}><SelectValue placeholder="Selecione" /></SelectTrigger>
-                    <SelectContent>
-                      {PARENTESCO.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                </Field>
-                <Field label="Telefone" required>
-                  <Input value={form.encTelefone} onChange={e => update("encTelefone", e.target.value)} className={inputCls("encTelefone")} placeholder="+244 9XX XXX XXX" maxLength={20} />
-                </Field>
-              </div>
-            )}
-
-            {step === 4 && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Field label="Escola de origem" required full>
                   <Input value={form.escola} onChange={e => update("escola", e.target.value)} className={inputCls("escola")} placeholder="Ex.: Liceu Mutu-Ya-Kevela" maxLength={120} />
@@ -615,7 +615,7 @@ export default function Candidatar() {
               </div>
             )}
 
-            {step === 5 && (
+            {step === 4 && (
               <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <Field label="Faculdade" required>
@@ -657,7 +657,7 @@ export default function Candidatar() {
               </div>
             )}
 
-            {step === 6 && (
+            {step === 5 && (
               <div className="space-y-4">
                 <div className="flex items-center justify-between flex-wrap gap-2">
                   <p className="text-[12.5px] text-muted-foreground">
@@ -722,7 +722,7 @@ export default function Candidatar() {
               </div>
             )}
 
-            {step === 7 && (
+            {step === 6 && (
               <div className="space-y-5">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <ReviewBlock title="Dados Pessoais" stepN={1} onEdit={goTo} rows={[
@@ -734,20 +734,19 @@ export default function Candidatar() {
                     ["Província", form.provincia], ["Município", form.municipio],
                     ["Endereço", form.endereco],
                     ["Email", form.email], ["Telemóvel", form.telemovel],
+                    ["Encarregado", form.encNome],
+                    ["Parentesco", form.encParentesco],
+                    ["Tel. encarregado", form.encTelefone],
                   ]} />
-                  <ReviewBlock title="Encarregado" stepN={3} onEdit={goTo} rows={[
-                    ["Nome", form.encNome], ["Parentesco", form.encParentesco],
-                    ["Telefone", form.encTelefone],
-                  ]} />
-                  <ReviewBlock title="Formação" stepN={4} onEdit={goTo} rows={[
+                  <ReviewBlock title="Formação" stepN={3} onEdit={goTo} rows={[
                     ["Escola", form.escola], ["Conclusão", form.anoConclusao],
                     ["Média", form.mediaFinal],
                   ]} />
-                  <ReviewBlock title="Curso" stepN={5} onEdit={goTo} rows={[
+                  <ReviewBlock title="Curso" stepN={4} onEdit={goTo} rows={[
                     ["Faculdade", form.faculdade], ["1ª opção", form.curso1],
                     ["2ª opção", form.curso2 || "—"], ["Sessão", form.sessao],
                   ]} />
-                  <ReviewBlock title="Documentos" stepN={6} onEdit={goTo} rows={DOCS.map(d => [d.label, docs[d.key] ? "✓ Anexado" : "Pendente"])} />
+                  <ReviewBlock title="Documentos" stepN={5} onEdit={goTo} rows={DOCS.map(d => [d.label, docs[d.key] ? "✓ Anexado" : "Pendente"])} />
                 </div>
 
                 <label className={cn("flex items-start gap-3 p-4 rounded-xl border cursor-pointer transition-colors",
