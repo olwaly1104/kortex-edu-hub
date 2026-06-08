@@ -88,6 +88,29 @@ export const cadeirasTemplate: Record<string, string[][]> = {
     ["Matemática II", "Microeconomia II", "Macroeconomia II", "Contabilidade II", "Estatística", "Direito Económico"],
     ["Econometria", "Finanças", "Comércio Internacional", "Política Económica", "Tese", "Estágio"],
   ],
+  letras: [
+    ["Linguística", "Literatura Portuguesa I", "Inglês I", "Teoria da Comunicação", "Filosofia", "Latim"],
+    ["Literatura Portuguesa II", "Inglês II", "Jornalismo", "Semiótica", "Cultura Africana", "Retórica"],
+    ["Literatura Comparada", "Media Digitais", "Tese", "Estágio", "Optativa", "Ética"],
+  ],
+  hist: [
+    ["Pré-História", "História Antiga", "Geografia", "Filosofia", "Inglês", "Metodologia"],
+    ["História Medieval", "História Moderna", "Arqueologia", "História de África I", "Antropologia", "Sociologia"],
+    ["História Contemporânea", "História de África II", "Tese", "Estágio", "Optativa", "Património"],
+  ],
+  agro: [
+    ["Botânica", "Química Agrícola", "Matemática", "Solos I", "Inglês", "Introdução à Agronomia", "Biologia"],
+    ["Fisiologia Vegetal", "Solos II", "Zoologia", "Hidráulica Agrícola", "Microbiologia", "Estatística", "Mecanização"],
+    ["Fitotecnia I", "Zootecnia", "Fitopatologia", "Irrigação", "Economia Rural", "Genética", "Pastagens"],
+    ["Fitotecnia II", "Extensão Rural", "Tese", "Estágio", "Optativa I", "Optativa II", "Gestão Agrícola"],
+  ],
+  vet: [
+    ["Anatomia Animal I", "Histologia", "Bioquímica", "Biofísica", "Inglês", "Introdução à Veterinária", "Ética"],
+    ["Anatomia Animal II", "Fisiologia Animal", "Microbiologia", "Parasitologia", "Genética", "Farmacologia I", "Nutrição"],
+    ["Patologia", "Farmacologia II", "Semiologia", "Imagiologia Vet.", "Clínica Pequenos Animais", "Reprodução", "Epidemiologia"],
+    ["Clínica Grandes Animais", "Cirurgia I", "Obstetrícia Vet.", "Saúde Pública", "Inspecção Sanitária", "Doenças Infecciosas", "Optativa"],
+    ["Estágio Clínico", "Cirurgia II", "Tese", "Especialidades", "Optativa II"],
+  ],
 };
 
 
