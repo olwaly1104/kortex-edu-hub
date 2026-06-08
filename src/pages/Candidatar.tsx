@@ -719,9 +719,10 @@ export default function Candidatar() {
                     ["Nascimento", form.nascimento], ["Género", form.genero],
                     ["Nacionalidade", form.nacionalidade],
                   ]} />
-                  <ReviewBlock title="Contactos" stepN={2} onEdit={goTo} rows={[
-                    ["Email", form.email], ["Telemóvel", form.telemovel],
+                  <ReviewBlock title="Morada & Contactos" stepN={2} onEdit={goTo} rows={[
                     ["Província", form.provincia], ["Município", form.municipio],
+                    ["Endereço", form.endereco],
+                    ["Email", form.email], ["Telemóvel", form.telemovel],
                   ]} />
                   <ReviewBlock title="Encarregado" stepN={3} onEdit={goTo} rows={[
                     ["Nome", form.encNome], ["Parentesco", form.encParentesco],
