@@ -158,7 +158,7 @@ export default function GerarCadeiras() {
                 >
                   {isOpen ? <ChevronDown className="w-3.5 h-3.5 shrink-0" /> : <ChevronRight className="w-3.5 h-3.5 shrink-0" />}
                   <Building2 className="w-3.5 h-3.5 text-primary shrink-0" />
-                  <span className="text-[11px] font-bold uppercase tracking-wide flex-1 text-left leading-tight break-words">{fac}</span>
+                  <span className="text-[11px] font-bold uppercase tracking-wide flex-1 text-left leading-tight break-words">{fac.replace("Faculdade de Ciências da Saúde", "Faculdade de Saúde").replace("Faculdade de Ciências Sociais", "Faculdade Sociais")}</span>
                   <Badge variant="outline" className="text-[10px]">{cursosOfFac.length}</Badge>
                 </button>
                 {isOpen && (
