@@ -5,8 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { cursoTemplates, cadeirasTemplate } from "@/data/academica2Data";
-import { BookOpen, Check, ArrowLeft, Plus, Trash2 } from "lucide-react";
+import { getCadeiraContent } from "@/data/cadeiraContentData";
+import { BookOpen, Check, ArrowLeft, Plus, Trash2, Eye, FileText, Video, ClipboardList, Calendar, User, Clock, GraduationCap } from "lucide-react";
 import { toast } from "sonner";
 
 const docentesPool = [
