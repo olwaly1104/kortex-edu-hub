@@ -402,13 +402,8 @@ export default function Website() {
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link to="/candidatar">
-              <Button size="lg" className="bg-secondary text-secondary-foreground hover:bg-secondary/90 gap-2">
-                Iniciar candidatura <ArrowRight className="w-4 h-4" />
-              </Button>
-            </Link>
-            <Link to="/">
-              <Button size="lg" variant="outline" className="bg-transparent border-primary-foreground/40 text-primary-foreground hover:bg-primary-foreground/10 gap-2">
-                <LogIn className="w-4 h-4" /> Portal académico
+              <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold shadow-xl shadow-black/20 gap-2">
+                Candidatar-me agora <ArrowRight className="w-4 h-4" />
               </Button>
             </Link>
           </div>
