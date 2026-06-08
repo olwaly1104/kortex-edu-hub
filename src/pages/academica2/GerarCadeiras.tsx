@@ -10,7 +10,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cursoTemplates, cadeirasTemplate } from "@/data/academica2Data";
 import { getCadeiraContent } from "@/data/cadeiraContentData";
-import { BookOpen, Check, ArrowLeft, Plus, Trash2, Eye, FileText, Video, ClipboardList, Calendar, User, Clock, GraduationCap, FileSignature, MapPin } from "lucide-react";
+import { BookOpen, Check, ArrowLeft, Plus, Trash2, Eye, FileText, Video, ClipboardList, Calendar, User, Clock, GraduationCap, FileSignature, MapPin, Building2 } from "lucide-react";
 import { toast } from "sonner";
 
 const buildExames = (cadeiraName: string) => ([
