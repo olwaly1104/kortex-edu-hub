@@ -167,7 +167,7 @@ export default function Website() {
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link to="/candidatar">
-                <Button size="lg" className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 shadow-xl transition-all">
+                <Button size="lg" className="gap-2 bg-white text-primary hover:bg-white/90 font-semibold shadow-xl shadow-black/20 transition-all">
                   Candidatar-me agora <ArrowRight className="w-4 h-4" />
                 </Button>
               </Link>
