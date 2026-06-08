@@ -141,7 +141,6 @@ import InscricoesDoc from "./pages/inscricoes/InscricaoDoc";
 import Academica2Inicio from "./pages/academica2/Inicio";
 import Academica2CourseCreator from "./pages/academica2/CourseCreator";
 import Academica2ConfirmarFaculdades from "./pages/academica2/ConfirmarFaculdades";
-import Academica2ConfirmarCursos from "./pages/academica2/ConfirmarCursos";
 import Academica2GerarCadeiras from "./pages/academica2/GerarCadeiras";
 import Academica2AnosLetivos from "./pages/academica2/AnosLetivos";
 import Academica2Cadeiras from "./pages/academica2/Cadeiras";
