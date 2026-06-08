@@ -52,14 +52,40 @@ export const cadeirasTemplate: Record<string, string[][]> = {
     ["Projecto III", "Construção II", "Património", "Instalações", "Planeamento", "Legislação", "Ateliers"],
     ["Projecto Final", "Tese", "Profissional I", "Profissional II"],
   ],
-  ec: [
-    ["Matemática I", "Física I", "Química", "Desenho Técnico", "Introdução à Eng.", "Programação", "Inglês"],
-    ["Matemática II", "Física II", "Estática", "Materiais", "Topografia", "Mec. Fluidos", "Geologia"],
-    ["Resistência Materiais", "Estruturas I", "Hidráulica", "Geotecnia I", "Estradas I", "Hidrologia", "Métodos Num."],
-    ["Estruturas II", "Geotecnia II", "Estradas II", "Saneamento", "Pontes", "Gestão Obras", "Ambiente"],
-    ["Projecto Civil", "Tese", "Profissional", "Optativa", "Optativa II"],
+  "eng-civil": [
+    ["Matemática I", "Física I", "Química", "Desenho Técnico", "Introdução à Eng.", "Programação", "Inglês", "Geologia"],
+    ["Matemática II", "Física II", "Estática", "Materiais", "Topografia", "Mec. Fluidos", "Hidrologia", "Métodos Num."],
+    ["Resistência Materiais", "Estruturas I", "Hidráulica", "Geotecnia I", "Estradas I", "Ambiente", "Pontes I", "Optativa"],
+    ["Estruturas II", "Geotecnia II", "Estradas II", "Saneamento", "Pontes II", "Gestão Obras", "Legislação", "Ética"],
+    ["Projecto Civil", "Tese", "Profissional", "Optativa I", "Optativa II"],
+  ],
+  "eng-info": [
+    ["Matemática Discreta", "Programação I", "Lógica", "Arquitectura Comput.", "Inglês Técnico", "Algoritmos I", "Cálculo"],
+    ["Programação II", "Estruturas de Dados", "Bases de Dados", "Sistemas Operativos", "Redes I", "Probabilidades", "Web I"],
+    ["Engenharia Software", "Redes II", "IA Fundamentos", "Web II", "Mobile", "Segurança", "Cloud"],
+    ["Projecto Final", "Tese", "Optativa I", "Optativa II", "Estágio"],
+  ],
+  med: [
+    ["Anatomia I", "Histologia", "Bioquímica I", "Biofísica", "Inglês Médico", "Psicologia", "Introdução Clínica", "Ética"],
+    ["Anatomia II", "Bioquímica II", "Fisiologia I", "Genética", "Microbiologia", "Imunologia", "Farmacologia I", "Epidemiologia"],
+    ["Fisiologia II", "Patologia I", "Farmacologia II", "Semiologia", "Imagiologia", "Saúde Pública", "Estatística", "Optativa"],
+    ["Patologia II", "Clínica Médica I", "Cirurgia I", "Pediatria I", "Obstetrícia", "Psiquiatria", "Neurologia", "Cardiologia"],
+    ["Clínica Médica II", "Cirurgia II", "Pediatria II", "Ginecologia", "Ortopedia", "Dermatologia", "Oncologia", "Optativa II"],
+    ["Estágio Clínico", "Tese", "Especialidades", "Internato"],
+  ],
+  dir: [
+    ["Intro Direito", "Direito Constitucional", "Direito Romano", "Economia Política", "Inglês Jurídico", "Filosofia Direito", "Ciência Política"],
+    ["Direito Civil I", "Direito Penal I", "Direito Administrativo", "Direito Comercial I", "Processo Civil", "Direito Família", "Sociologia Jurídica"],
+    ["Direito Civil II", "Direito Penal II", "Direito Trabalho", "Direito Fiscal", "Processo Penal", "Direito Internacional", "Direito Comunitário"],
+    ["Direito Notarial", "Direito Ambiental", "Arbitragem", "Deontologia", "Tese", "Estágio", "Optativa"],
+  ],
+  econ: [
+    ["Matemática I", "Microeconomia I", "Macroeconomia I", "Contabilidade I", "Inglês", "Introdução à Gestão"],
+    ["Matemática II", "Microeconomia II", "Macroeconomia II", "Contabilidade II", "Estatística", "Direito Económico"],
+    ["Econometria", "Finanças", "Comércio Internacional", "Política Económica", "Tese", "Estágio"],
   ],
 };
+
 
 export interface PlannerStep {
   id: string;
