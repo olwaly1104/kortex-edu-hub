@@ -23,7 +23,11 @@ const FACULDADES: Record<string, string[]> = {
   "Faculdade de Saúde": ["Medicina", "Enfermagem"],
 };
 const PROVINCIAS = ["Luanda", "Benguela", "Huíla", "Huambo", "Cabinda", "Cuanza Sul", "Malanje", "Uíge"];
-const SESSOES = ["1ª Sessão", "2ª Sessão", "3ª Sessão"];
+const SESSOES_INFO = [
+  { id: "1ª Sessão", data: "15 de Julho de 2026", hora: "09:00", sala: "Anfiteatro A — Campus UPRA" },
+  { id: "2ª Sessão", data: "12 de Agosto de 2026", hora: "09:00", sala: "Anfiteatro B — Campus UPRA" },
+  { id: "3ª Sessão", data: "09 de Setembro de 2026", hora: "14:00", sala: "Sala Magna — Campus UPRA" },
+];
 const PARENTESCO = ["Pai", "Mãe", "Tutor(a)", "Avô/Avó", "Outro"];
 const NACIONALIDADES = [
   "Angolana", "Portuguesa", "Brasileira", "Cabo-verdiana", "Moçambicana", "São-tomense",
@@ -33,8 +37,6 @@ const NACIONALIDADES = [
 ];
 const DOCS = [
   { key: "bi", label: "Bilhete de Identidade", desc: "Frente e verso · PDF ou JPG" },
-  { key: "notas", label: "Declaração de Notas", desc: "Emitida pela escola de origem" },
-  { key: "certidao", label: "Certidão de Habilitações", desc: "Documento oficial assinado" },
   { key: "foto", label: "Foto tipo passe", desc: "Fundo branco, formato 35×45mm" },
 ];
 
