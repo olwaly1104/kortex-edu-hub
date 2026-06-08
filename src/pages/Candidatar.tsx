@@ -563,10 +563,10 @@ export default function Candidatar() {
                   <p className="text-[12.5px] text-muted-foreground">
                     Anexe os documentos abaixo. Formatos aceites: PDF, JPG, PNG · máx. 5MB cada.
                   </p>
-                  <Badge variant="outline" className="text-[11px]">{docsCount}/{DOCS.length} anexados</Badge>
+                  <Badge variant="outline" className="text-[11px]">{docsCount}/{academicDocs.length} anexados</Badge>
                 </div>
                 <div className="space-y-2.5">
-                  {DOCS.map(d => {
+                  {academicDocs.map(d => {
                     const file = docs[d.key];
                     return (
                       <div key={d.key} className={cn(
