@@ -69,23 +69,21 @@ const DOC_TIPO_DESC: Record<DocTipo, string> = {
 };
 
 const STEPS = [
-  { n: 1, title: "Dados pessoais",   sub: "Identificação e documento",          icon: User },
-  { n: 2, title: "Morada & Contactos", sub: "Endereço, email e telemóvel",      icon: MapPin },
-  { n: 3, title: "Encarregado",      sub: "Responsável legal do candidato",     icon: ShieldCheck },
-  { n: 4, title: "Formação",         sub: "Histórico do ensino secundário",     icon: GraduationCap },
-  { n: 5, title: "Curso",            sub: "Faculdade, curso e sessão de provas",icon: BookOpen },
-  { n: 6, title: "Documentos",       sub: "Anexos académicos obrigatórios",     icon: FileText },
-  { n: 7, title: "Revisão",          sub: "Confirmar e submeter",               icon: Check },
+  { n: 1, title: "Dados pessoais",     sub: "Identificação e documento",          icon: User },
+  { n: 2, title: "Morada & Contactos", sub: "Endereço, contactos e encarregado",  icon: MapPin },
+  { n: 3, title: "Formação",           sub: "Histórico do ensino secundário",     icon: GraduationCap },
+  { n: 4, title: "Curso",              sub: "Faculdade, curso e sessão de provas",icon: BookOpen },
+  { n: 5, title: "Documentos",         sub: "Anexos académicos obrigatórios",     icon: FileText },
+  { n: 6, title: "Revisão",            sub: "Confirmar e submeter",               icon: Check },
 ] as const;
 
 const STEP_FIELDS: Record<number, (keyof FormState)[]> = {
   1: ["primeiroNome","ultimoNome","nascimento","genero","nacionalidade"],
-  2: ["provincia","municipio","email","telemovel"],
-  3: ["encNome","encParentesco","encTelefone"],
-  4: ["escola","anoConclusao","mediaFinal"],
-  5: ["faculdade","curso1","sessao"],
+  2: ["provincia","municipio","email","telemovel","encNome","encParentesco","encTelefone"],
+  3: ["escola","anoConclusao","mediaFinal"],
+  4: ["faculdade","curso1","sessao"],
+  5: [],
   6: [],
-  7: [],
 };
 
 function Field({ label, required, children, hint, full }: { label: string; required?: boolean; children: React.ReactNode; hint?: string; full?: boolean }) {
