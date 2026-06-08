@@ -365,28 +365,110 @@ export default function Candidatar() {
           </div>
 
           <Card className="p-6 lg:p-8 shadow-sm">
-            {step === 1 && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Field label="Nome completo" required full>
-                  <Input value={form.nome} onChange={e => update("nome", e.target.value)} className={inputCls("nome")} placeholder="João Miguel Fernandes" maxLength={120} />
-                </Field>
-                <Field label="Data de nascimento" required>
-                  <Input type="date" value={form.nascimento} onChange={e => update("nascimento", e.target.value)} className={inputCls("nascimento")} />
-                </Field>
-                <Field label="Género" required>
-                  <Select value={form.genero} onValueChange={v => update("genero", v)}>
-                    <SelectTrigger className={inputCls("genero")}><SelectValue placeholder="Selecione" /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="masculino">Masculino</SelectItem>
-                      <SelectItem value="feminino">Feminino</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </Field>
-                <Field label="Nacionalidade" full>
-                  <Input value={form.nacionalidade} onChange={e => update("nacionalidade", e.target.value)} maxLength={50} />
-                </Field>
-              </div>
-            )}
+            {step === 1 && (() => {
+              const bi = docs["bi"];
+              return (
+                <div className="space-y-6">
+                  {/* Identificação */}
+                  <section className="space-y-3">
+                    <p className="text-[10.5px] uppercase tracking-[0.12em] text-muted-foreground font-semibold">Identificação</p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <Field label="Nome completo" required full>
+                        <Input value={form.nome} onChange={e => update("nome", e.target.value)} className={inputCls("nome")} placeholder="João Miguel Fernandes" maxLength={120} />
+                      </Field>
+                      <Field label="Data de nascimento" required>
+                        <Input type="date" value={form.nascimento} onChange={e => update("nascimento", e.target.value)} className={inputCls("nascimento")} />
+                      </Field>
+                      <Field label="Género" required>
+                        <Select value={form.genero} onValueChange={v => update("genero", v)}>
+                          <SelectTrigger className={inputCls("genero")}><SelectValue placeholder="Selecione" /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="masculino">Masculino</SelectItem>
+                            <SelectItem value="feminino">Feminino</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </Field>
+                      <Field label="Nacionalidade" full>
+                        <Input value={form.nacionalidade} onChange={e => update("nacionalidade", e.target.value)} maxLength={50} />
+                      </Field>
+                    </div>
+                  </section>
+
+                  {/* Morada */}
+                  <section className="space-y-3 pt-1 border-t border-border">
+                    <p className="text-[10.5px] uppercase tracking-[0.12em] text-muted-foreground font-semibold pt-4">Morada</p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <Field label="Província" required>
+                        <Select value={form.provincia} onValueChange={v => update("provincia", v)}>
+                          <SelectTrigger className={inputCls("provincia")}><SelectValue placeholder="Selecione" /></SelectTrigger>
+                          <SelectContent>
+                            {PROVINCIAS.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
+                      </Field>
+                      <Field label="Município" required>
+                        <Input value={form.municipio} onChange={e => update("municipio", e.target.value)} className={inputCls("municipio")} placeholder="Ex.: Maianga" maxLength={50} />
+                      </Field>
+                      <Field label="Endereço" full hint="Rua, número e bairro de residência">
+                        <Input value={form.endereco} onChange={e => update("endereco", e.target.value)} placeholder="Rua, número, bairro" maxLength={200} />
+                      </Field>
+                    </div>
+                  </section>
+
+                  {/* Bilhete de Identidade */}
+                  <section className="space-y-3 pt-1 border-t border-border">
+                    <p className="text-[10.5px] uppercase tracking-[0.12em] text-muted-foreground font-semibold pt-4">Bilhete de Identidade</p>
+                    <div className={cn(
+                      "rounded-xl border transition-colors",
+                      bi ? "border-emerald-500/40 bg-emerald-500/5" : "border-border bg-card hover:border-primary/30"
+                    )}>
+                      <input
+                        ref={el => (fileRefs.current["bi"] = el)}
+                        type="file"
+                        className="hidden"
+                        accept=".pdf,.jpg,.jpeg,.png"
+                        onChange={e => onFile("bi", e.target.files?.[0])}
+                      />
+                      <div className="flex items-center gap-3 p-3.5">
+                        <div className={cn(
+                          "w-10 h-10 rounded-lg flex items-center justify-center shrink-0",
+                          bi ? "bg-emerald-500 text-white" : "bg-muted text-muted-foreground"
+                        )}>
+                          {bi ? <Check className="w-5 h-5" strokeWidth={3} /> : <FileText className="w-5 h-5" />}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold text-foreground leading-tight">Bilhete de Identidade</p>
+                          {bi ? (
+                            <p className="text-[11.5px] text-foreground/70 mt-0.5 flex items-center gap-1.5 truncate">
+                              <Paperclip className="w-3 h-3 shrink-0" />
+                              <span className="truncate">{bi.name}</span>
+                              <span className="text-muted-foreground">· {fmtSize(bi.size)}</span>
+                            </p>
+                          ) : (
+                            <p className="text-[11.5px] text-muted-foreground mt-0.5">Frente e verso · PDF, JPG ou PNG · máx. 5MB</p>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-1 shrink-0">
+                          {bi && (
+                            <Button variant="ghost" size="sm" onClick={() => removeDoc("bi")} className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive">
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </Button>
+                          )}
+                          <Button
+                            variant={bi ? "outline" : "default"}
+                            size="sm"
+                            onClick={() => fileRefs.current["bi"]?.click()}
+                            className="h-8 gap-1.5 text-[12px]"
+                          >
+                            <Upload className="w-3.5 h-3.5" /> {bi ? "Substituir" : "Anexar"}
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </section>
+                </div>
+              );
+            })()}
 
             {step === 2 && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -395,20 +477,6 @@ export default function Candidatar() {
                 </Field>
                 <Field label="Telemóvel" required>
                   <Input value={form.telemovel} onChange={e => update("telemovel", e.target.value)} className={inputCls("telemovel")} placeholder="+244 9XX XXX XXX" maxLength={20} />
-                </Field>
-                <Field label="Província" required>
-                  <Select value={form.provincia} onValueChange={v => update("provincia", v)}>
-                    <SelectTrigger className={inputCls("provincia")}><SelectValue placeholder="Selecione" /></SelectTrigger>
-                    <SelectContent>
-                      {PROVINCIAS.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                </Field>
-                <Field label="Município" required>
-                  <Input value={form.municipio} onChange={e => update("municipio", e.target.value)} className={inputCls("municipio")} placeholder="Ex.: Maianga" maxLength={50} />
-                </Field>
-                <Field label="Morada" full>
-                  <Input value={form.endereco} onChange={e => update("endereco", e.target.value)} placeholder="Rua, número, bairro" maxLength={200} />
                 </Field>
               </div>
             )}
