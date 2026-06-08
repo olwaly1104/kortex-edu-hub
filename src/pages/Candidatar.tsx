@@ -192,27 +192,23 @@ export default function Candidatar() {
 
   /* ───────── Intro screen ───────── */
   if (!started) {
-    const condicoes = [
+    const elegibilidade = [
       "12.ª classe concluída ou equivalente reconhecido",
-      "BI válido e documentos legíveis",
-      "Submissão dentro do prazo da sessão escolhida",
+      "Bilhete de Identidade válido",
+      "Documentos legíveis e autenticados",
       "Aprovação nas provas de admissão presenciais",
     ];
     return (
-      <div className="min-h-screen bg-muted/30 flex flex-col">
-        <header className="border-b border-border bg-background">
-          <div className="max-w-3xl mx-auto px-6 h-14 flex items-center justify-between">
+      <div className="h-screen overflow-hidden bg-muted/30 flex flex-col">
+        <header className="border-b border-border bg-background shrink-0">
+          <div className="max-w-3xl mx-auto px-6 h-14 flex items-center">
             <Button variant="ghost" size="sm" onClick={() => navigate("/site")} className="gap-1.5 h-8 text-[12px] -ml-2">
               <ArrowLeft className="w-3.5 h-3.5" /> Voltar
             </Button>
-            <Link to="/site" className="flex items-center gap-2">
-              <img src={logoUpra.url} alt="UPRA" className="w-7 h-7 rounded-md object-cover" />
-              <p className="text-[12px] font-bold text-foreground">UPRA</p>
-            </Link>
           </div>
         </header>
 
-        <main className="flex-1 flex items-center justify-center px-6 py-8">
+        <main className="flex-1 flex items-center justify-center px-6 py-6 min-h-0">
           <div className="w-full max-w-md rounded-2xl border border-border bg-background shadow-sm overflow-hidden">
             <div className="px-6 pt-6 pb-5 text-center border-b border-border">
               <img src={logoUpra.url} alt="UPRA" className="w-12 h-12 rounded-xl object-cover mx-auto mb-3" />
@@ -220,17 +216,15 @@ export default function Candidatar() {
                 Ano lectivo 2026/2027
               </Badge>
               <h1 className="mt-2.5 text-xl font-bold text-foreground tracking-tight">Candidatura UPRA</h1>
-              <p className="mt-1.5 text-[12px] text-muted-foreground">
-                Formulário online · 7 etapas · ~10 minutos
-              </p>
+              <p className="mt-1 text-[12px] text-muted-foreground">Formulário online · 7 etapas guiadas</p>
             </div>
 
             <div className="px-6 py-5">
               <p className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold mb-2.5">
-                Condições da candidatura
+                Critérios de elegibilidade
               </p>
               <ul className="space-y-2">
-                {condicoes.map((c, i) => (
+                {elegibilidade.map((c, i) => (
                   <li key={i} className="flex items-start gap-2.5">
                     <Check className="w-3.5 h-3.5 text-primary mt-0.5 shrink-0" />
                     <p className="text-[12.5px] text-foreground leading-snug">{c}</p>
@@ -252,6 +246,7 @@ export default function Candidatar() {
       </div>
     );
   }
+
 
 
 
