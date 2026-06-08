@@ -788,7 +788,7 @@ export default function Candidatar() {
               </div>
             )}
 
-            {step === 6 && (
+            {step === 7 && (
               <div className="space-y-5">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <ReviewBlock title="Dados Pessoais" stepN={1} onEdit={goTo} rows={[
@@ -809,11 +809,19 @@ export default function Candidatar() {
                     ["Média", form.mediaFinal],
                   ]} />
                   <ReviewBlock title="Curso" stepN={4} onEdit={goTo} rows={[
-                    ["Faculdade", form.faculdade], ["1ª opção", form.curso1],
-                    ["2ª opção", form.curso2 || "—"], ["Sessão", form.sessao],
+                    ["1ª escolha", form.fac1 ? `${form.fac1} — ${form.curso1 || "—"}` : "—"],
+                    ["2ª escolha", form.fac2 ? `${form.fac2} — ${form.curso2 || "—"}` : "—"],
+                    ["3ª escolha", form.fac3 ? `${form.fac3} — ${form.curso3 || "—"}` : "—"],
                   ]} />
-                  <ReviewBlock title="Documentos" stepN={5} onEdit={goTo} rows={DOCS.map(d => [d.label, docs[d.key] ? "✓ Anexado" : "Pendente"])} />
+                  <ReviewBlock title="Prova de Acesso" stepN={5} onEdit={goTo} rows={(() => {
+                    const s = SESSOES_INFO.find(x => x.id === form.sessao);
+                    return s
+                      ? [["Sessão", s.id], ["Data", s.data], ["Hora", s.hora], ["Local", s.sala]]
+                      : [["Sessão", "—"]];
+                  })()} />
+                  <ReviewBlock title="Documentos" stepN={6} onEdit={goTo} rows={DOCS.map(d => [d.label, docs[d.key] ? "✓ Anexado" : "Pendente"])} />
                 </div>
+
 
                 <label className={cn("flex items-start gap-3 p-4 rounded-xl border cursor-pointer transition-colors",
                   errors.has("confirmar") ? "border-destructive bg-destructive/5" : "border-border hover:bg-muted/40")}>
