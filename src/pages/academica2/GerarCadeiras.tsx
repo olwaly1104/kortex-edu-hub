@@ -86,6 +86,24 @@ export default function GerarCadeiras() {
     ? getCadeiraContent(`sim-${preview.cid}-${preview.ano}-${preview.idx}`, previewCadeira.name)
     : null;
 
+  const faculdades = useMemo(
+    () => Array.from(new Set(cursosWithCadeiras.map(cid => cursoTemplates.find(c => c.id === cid)?.faculty ?? "—"))),
+    [cursosWithCadeiras]
+  );
+  const [openFacs, setOpenFacs] = useState<Record<string, boolean>>(() =>
+    Object.fromEntries(faculdades.map(f => [f, true]))
+  );
+  const toggleFac = (f: string) => setOpenFacs(p => ({ ...p, [f]: !p[f] }));
+
+  const docentesUsados = useMemo(() => {
+    const s = new Set<string>();
+    Object.values(cadeirasAlloc).forEach(anos => anos.forEach(arr => arr.forEach(c => s.add(c.docente))));
+    return s.size;
+  }, [cadeirasAlloc]);
+
+  // Each cadeira ≈ 8 aulas × 90 min
+  const minutosAula = total * 8 * 90;
+
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       <div>
@@ -104,38 +122,63 @@ export default function GerarCadeiras() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <Card className="p-4"><p className="text-xs text-muted-foreground">Total Cadeiras</p><p className="text-2xl font-bold">{total}</p></Card>
-        <Card className="p-4"><p className="text-xs text-muted-foreground">Cursos</p><p className="text-2xl font-bold">{cursosWithCadeiras.length}</p></Card>
-        <Card className="p-4"><p className="text-xs text-muted-foreground">Docentes Disp.</p><p className="text-2xl font-bold">{docentesPool.length}</p></Card>
-        <Card className="p-4"><p className="text-xs text-muted-foreground">Cadeiras do Curso</p><p className="text-2xl font-bold text-primary">{cursoTotal}</p></Card>
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+        <Card className="p-4">
+          <div className="flex items-center gap-1.5 text-muted-foreground mb-1"><Building2 className="w-3.5 h-3.5" /><p className="text-xs">Faculdades</p></div>
+          <p className="text-2xl font-bold">{faculdades.length}</p>
+        </Card>
+        <Card className="p-4">
+          <div className="flex items-center gap-1.5 text-muted-foreground mb-1"><GraduationCap className="w-3.5 h-3.5" /><p className="text-xs">Cursos</p></div>
+          <p className="text-2xl font-bold">{cursosWithCadeiras.length}</p>
+        </Card>
+        <Card className="p-4">
+          <div className="flex items-center gap-1.5 text-muted-foreground mb-1"><BookOpen className="w-3.5 h-3.5" /><p className="text-xs">Cadeiras</p></div>
+          <p className="text-2xl font-bold text-primary">{total}</p>
+        </Card>
+        <Card className="p-4">
+          <div className="flex items-center gap-1.5 text-muted-foreground mb-1"><Users className="w-3.5 h-3.5" /><p className="text-xs">Docentes Disp.</p></div>
+          <p className="text-2xl font-bold">{docentesUsados}<span className="text-sm text-muted-foreground font-normal">/{docentesPool.length}</span></p>
+        </Card>
+        <Card className="p-4">
+          <div className="flex items-center gap-1.5 text-muted-foreground mb-1"><Timer className="w-3.5 h-3.5" /><p className="text-xs">Minutos de Aula</p></div>
+          <p className="text-2xl font-bold">{minutosAula.toLocaleString("pt-PT")}<span className="text-xs text-muted-foreground font-normal ml-1">min</span></p>
+        </Card>
       </div>
 
-      <div className="grid md:grid-cols-[240px_1fr] gap-4">
-        <Card className="p-2 h-fit space-y-3">
-          {Array.from(new Set(cursosWithCadeiras.map(cid => cursoTemplates.find(c => c.id === cid)?.faculty ?? "—"))).map(fac => {
+      <div className="grid md:grid-cols-[260px_1fr] gap-4">
+        <Card className="p-2 h-fit space-y-1">
+          {faculdades.map(fac => {
             const cursosOfFac = cursosWithCadeiras.filter(cid => (cursoTemplates.find(c => c.id === cid)?.faculty ?? "—") === fac);
+            const open = openFacs[fac];
             return (
-              <div key={fac}>
-                <p className="text-[10px] uppercase tracking-wide text-muted-foreground px-2 py-1.5 flex items-center gap-1.5">
-                  <Building2 className="w-3 h-3" /> {fac}
-                </p>
-                <div className="space-y-0.5">
-                  {cursosOfFac.map(cid => {
-                    const curso = cursoTemplates.find(c => c.id === cid);
-                    const isSel = cadeiraCurso === cid;
-                    const count = cadeirasAlloc[cid].reduce((a, r) => a + r.length, 0);
-                    return (
-                      <button key={cid} onClick={() => setCadeiraCurso(cid)}
-                        className={`w-full text-left px-3 py-2 rounded-md text-sm flex items-center justify-between transition ${
-                          isSel ? "bg-primary text-primary-foreground" : "hover:bg-muted/50"
-                        }`}>
-                        <span className="truncate font-medium">{curso?.name}</span>
-                        <Badge variant={isSel ? "secondary" : "outline"} className="text-[10px] ml-2">{count}</Badge>
-                      </button>
-                    );
-                  })}
-                </div>
+              <div key={fac} className="rounded-md overflow-hidden">
+                <button
+                  onClick={() => toggleFac(fac)}
+                  className="w-full flex items-center gap-1.5 px-2 py-2 hover:bg-muted/60 transition text-left"
+                >
+                  {open ? <ChevronDown className="w-3.5 h-3.5 text-muted-foreground shrink-0" /> : <ChevronRight className="w-3.5 h-3.5 text-muted-foreground shrink-0" />}
+                  <Building2 className="w-3.5 h-3.5 text-primary shrink-0" />
+                  <span className="text-xs font-semibold flex-1 truncate">{fac}</span>
+                  <Badge variant="outline" className="text-[10px]">{cursosOfFac.length}</Badge>
+                </button>
+                {open && (
+                  <div className="space-y-0.5 pl-5 pb-1">
+                    {cursosOfFac.map(cid => {
+                      const curso = cursoTemplates.find(c => c.id === cid);
+                      const isSel = cadeiraCurso === cid;
+                      const count = cadeirasAlloc[cid].reduce((a, r) => a + r.length, 0);
+                      return (
+                        <button key={cid} onClick={() => setCadeiraCurso(cid)}
+                          className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm flex items-center justify-between transition ${
+                            isSel ? "bg-primary text-primary-foreground" : "hover:bg-muted/50"
+                          }`}>
+                          <span className="truncate font-medium">{curso?.name}</span>
+                          <Badge variant={isSel ? "secondary" : "outline"} className="text-[10px] ml-2">{count}</Badge>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             );
           })}
