@@ -202,6 +202,7 @@ export default function GerarCadeiras() {
                     <TabsTrigger value="aulas" className="data-[state=active]:bg-primary/10">Aulas ({previewContent.aulas.length})</TabsTrigger>
                     <TabsTrigger value="conteudos" className="data-[state=active]:bg-primary/10">Conteúdos ({previewContent.conteudos.length})</TabsTrigger>
                     <TabsTrigger value="quizzes" className="data-[state=active]:bg-primary/10">Quizzes ({previewContent.quizzes.length})</TabsTrigger>
+                    <TabsTrigger value="exames" className="data-[state=active]:bg-primary/10">Exames (3)</TabsTrigger>
                     <TabsTrigger value="calendario" className="data-[state=active]:bg-primary/10">Calendário</TabsTrigger>
                   </TabsList>
                 </div>
