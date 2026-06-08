@@ -140,7 +140,7 @@ export default function Website() {
             <Link to="/candidatar" className="ml-auto shrink-0">
               <Button
                 size="sm"
-                className="h-7 px-3.5 gap-1.5 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600 text-[11px] font-bold uppercase tracking-wider shadow-md shadow-amber-500/20 hover:shadow-lg hover:shadow-amber-500/30 transition-all"
+                className="h-7 px-3.5 gap-1.5 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 text-[11px] font-bold uppercase tracking-wider shadow-md hover:shadow-lg transition-all"
               >
                 Candidatar-me <ArrowRight className="w-3.5 h-3.5" />
               </Button>
