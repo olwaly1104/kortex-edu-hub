@@ -10,8 +10,14 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cursoTemplates, cadeirasTemplate } from "@/data/academica2Data";
 import { getCadeiraContent } from "@/data/cadeiraContentData";
-import { BookOpen, Check, ArrowLeft, Plus, Trash2, Eye, FileText, Video, ClipboardList, Calendar, User, Clock, GraduationCap } from "lucide-react";
+import { BookOpen, Check, ArrowLeft, Plus, Trash2, Eye, FileText, Video, ClipboardList, Calendar, User, Clock, GraduationCap, FileSignature, MapPin } from "lucide-react";
 import { toast } from "sonner";
+
+const buildExames = (cadeiraName: string) => ([
+  { id: "ex1", epoca: "1ª Época", data: "12 Jun 2026", hora: "09:00", duracao: 120, sala: "Auditório A", peso: "50%", tipo: "Presencial" },
+  { id: "ex2", epoca: "2ª Época", data: "03 Jul 2026", hora: "14:00", duracao: 120, sala: "Auditório B", peso: "50%", tipo: "Presencial" },
+  { id: "ex3", epoca: "Época Especial", data: "18 Set 2026", hora: "10:00", duracao: 120, sala: "Sala 204", peso: "100%", tipo: "Presencial" },
+]);
 
 const docentesPool = [
   "Prof. Sofia Martins", "Prof. Carlos Mendes", "Prof. Ana Costa", "Prof. António Silva",
@@ -196,6 +202,7 @@ export default function GerarCadeiras() {
                     <TabsTrigger value="aulas" className="data-[state=active]:bg-primary/10">Aulas ({previewContent.aulas.length})</TabsTrigger>
                     <TabsTrigger value="conteudos" className="data-[state=active]:bg-primary/10">Conteúdos ({previewContent.conteudos.length})</TabsTrigger>
                     <TabsTrigger value="quizzes" className="data-[state=active]:bg-primary/10">Quizzes ({previewContent.quizzes.length})</TabsTrigger>
+                    <TabsTrigger value="exames" className="data-[state=active]:bg-primary/10">Exames (3)</TabsTrigger>
                     <TabsTrigger value="calendario" className="data-[state=active]:bg-primary/10">Calendário</TabsTrigger>
                   </TabsList>
                 </div>
@@ -265,7 +272,28 @@ export default function GerarCadeiras() {
                       ))}
                     </TabsContent>
 
+                    <TabsContent value="exames" className="mt-0 space-y-2">
+                      {buildExames(previewCadeira.name).map(ex => (
+                        <Card key={ex.id} className="p-3 flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-md bg-primary/10 text-primary flex items-center justify-center">
+                            <FileSignature className="w-4 h-4" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium">{ex.epoca} · {previewCadeira.name}</p>
+                            <p className="text-xs text-muted-foreground flex items-center gap-3 mt-0.5">
+                              <span className="inline-flex items-center gap-1"><Calendar className="w-3 h-3" /> {ex.data}</span>
+                              <span className="inline-flex items-center gap-1"><Clock className="w-3 h-3" /> {ex.hora} · {ex.duracao} min</span>
+                              <span className="inline-flex items-center gap-1"><MapPin className="w-3 h-3" /> {ex.sala}</span>
+                            </p>
+                          </div>
+                          <Badge variant="outline" className="text-[10px]">Peso {ex.peso}</Badge>
+                          <Badge variant="secondary" className="text-[10px]">{ex.tipo}</Badge>
+                        </Card>
+                      ))}
+                    </TabsContent>
+
                     <TabsContent value="calendario" className="mt-0 space-y-2">
+
                       {previewContent.calendario.map(e => (
                         <Card key={e.id} className="p-3 flex items-center gap-3">
                           <Calendar className="w-4 h-4 text-primary" />
