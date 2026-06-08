@@ -31,8 +31,10 @@ const DOCS = [
   { key: "foto", label: "Foto tipo passe", desc: "Fundo branco, formato 35×45mm" },
 ];
 
+type DocTipo = "bi" | "passaporte" | "residencia";
 interface FormState {
   nome: string; nascimento: string; genero: string; nacionalidade: string;
+  docTipo: DocTipo;
   email: string; telemovel: string; provincia: string; municipio: string; endereco: string;
   encNome: string; encParentesco: string; encTelefone: string;
   escola: string; anoConclusao: string; mediaFinal: string;
@@ -41,11 +43,23 @@ interface FormState {
 }
 const empty: FormState = {
   nome: "", nascimento: "", genero: "", nacionalidade: "Angolana",
+  docTipo: "bi",
   email: "", telemovel: "", provincia: "", municipio: "", endereco: "",
   encNome: "", encParentesco: "", encTelefone: "",
   escola: "", anoConclusao: "", mediaFinal: "",
   faculdade: "", curso1: "", curso2: "", sessao: "",
   motivacao: "", confirmar: false, docAutenticos: false,
+};
+
+const DOC_TIPO_LABEL: Record<DocTipo, string> = {
+  bi: "Bilhete de Identidade",
+  passaporte: "Passaporte",
+  residencia: "Cartão de Residência",
+};
+const DOC_TIPO_DESC: Record<DocTipo, string> = {
+  bi: "Frente e verso · PDF, JPG ou PNG · máx. 5MB",
+  passaporte: "Página principal com foto · PDF, JPG ou PNG · máx. 5MB",
+  residencia: "Frente e verso do cartão de residência · PDF, JPG ou PNG · máx. 5MB",
 };
 
 const STEPS = [
