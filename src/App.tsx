@@ -349,6 +349,8 @@ function AppRoutes() {
         <Route path="/areaacademica/criador" element={<Academica2CourseCreator />} />
         <Route path="/areaacademica/criador/faculdades" element={<Academica2ConfirmarFaculdades />} />
         <Route path="/areaacademica/criador/cadeiras" element={<Academica2GerarCadeiras />} />
+        <Route path="/areaacademica/criador/turmas" element={<Academica2CriarTurmas />} />
+        <Route path="/areaacademica/criador/calendario" element={<Academica2CalendarioAcademico />} />
         <Route path="/areaacademica/anos-letivos" element={<Academica2AnosLetivos />} />
         <Route path="/areaacademica/cadeiras" element={<Academica2Cadeiras />} />
         <Route path="/areaacademica/cadeiras/:cadeiraId" element={<Academica2CadeiraDetail />} />
