@@ -24,6 +24,12 @@ const FACULDADES: Record<string, string[]> = {
 const PROVINCIAS = ["Luanda", "Benguela", "Huíla", "Huambo", "Cabinda", "Cuanza Sul", "Malanje", "Uíge"];
 const SESSOES = ["1ª Sessão", "2ª Sessão", "3ª Sessão"];
 const PARENTESCO = ["Pai", "Mãe", "Tutor(a)", "Avô/Avó", "Outro"];
+const NACIONALIDADES = [
+  "Angolana", "Portuguesa", "Brasileira", "Cabo-verdiana", "Moçambicana", "São-tomense",
+  "Guineense", "Sul-africana", "Namíbia", "Congolesa (RDC)", "Congolesa (Rep.)", "Nigeriana",
+  "Queniana", "Zimbabuana", "Camaronesa", "Marfinense", "Senegalesa", "Espanhola", "Francesa",
+  "Italiana", "Alemã", "Britânica", "Norte-americana", "Canadiana", "Chinesa", "Indiana", "Cubana", "Outra",
+];
 const DOCS = [
   { key: "bi", label: "Bilhete de Identidade", desc: "Frente e verso · PDF ou JPG" },
   { key: "notas", label: "Declaração de Notas", desc: "Emitida pela escola de origem" },
@@ -33,7 +39,7 @@ const DOCS = [
 
 type DocTipo = "bi" | "passaporte" | "residencia";
 interface FormState {
-  nome: string; nascimento: string; genero: string; nacionalidade: string;
+  primeiroNome: string; ultimoNome: string; nascimento: string; genero: string; nacionalidade: string;
   docTipo: DocTipo;
   email: string; telemovel: string; provincia: string; municipio: string; endereco: string;
   encNome: string; encParentesco: string; encTelefone: string;
@@ -42,7 +48,7 @@ interface FormState {
   motivacao: string; confirmar: boolean; docAutenticos: boolean;
 }
 const empty: FormState = {
-  nome: "", nascimento: "", genero: "", nacionalidade: "Angolana",
+  primeiroNome: "", ultimoNome: "", nascimento: "", genero: "", nacionalidade: "Angolana",
   docTipo: "bi",
   email: "", telemovel: "", provincia: "", municipio: "", endereco: "",
   encNome: "", encParentesco: "", encTelefone: "",
