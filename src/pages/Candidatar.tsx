@@ -77,18 +77,20 @@ const STEPS = [
   { n: 1, title: "Dados pessoais",     sub: "Identificação e documento",          icon: User },
   { n: 2, title: "Morada & Contactos", sub: "Endereço, contactos e encarregado",  icon: MapPin },
   { n: 3, title: "Formação",           sub: "Histórico do ensino secundário",     icon: GraduationCap },
-  { n: 4, title: "Curso",              sub: "Faculdade, curso e sessão de provas",icon: BookOpen },
-  { n: 5, title: "Documentos",         sub: "Anexos académicos obrigatórios",     icon: FileText },
-  { n: 6, title: "Revisão",            sub: "Confirmar e submeter",               icon: Check },
+  { n: 4, title: "Curso",              sub: "Faculdades e cursos por ordem de escolha", icon: BookOpen },
+  { n: 5, title: "Prova de Acesso",    sub: "Marcação da sessão de provas",       icon: CalendarDays },
+  { n: 6, title: "Documentos",         sub: "Anexos académicos obrigatórios",     icon: FileText },
+  { n: 7, title: "Revisão",            sub: "Confirmar e submeter",               icon: Check },
 ] as const;
 
 const STEP_FIELDS: Record<number, (keyof FormState)[]> = {
   1: ["primeiroNome","ultimoNome","nascimento","genero","nacionalidade"],
   2: ["provincia","municipio","email","telemovel","encNome","encParentesco","encTelefone"],
   3: ["escola","anoConclusao","mediaFinal"],
-  4: ["faculdade","curso1","sessao"],
-  5: [],
+  4: ["fac1","curso1"],
+  5: ["sessao"],
   6: [],
+  7: [],
 };
 
 function Field({ label, required, children, hint, full }: { label: string; required?: boolean; children: React.ReactNode; hint?: string; full?: boolean }) {
