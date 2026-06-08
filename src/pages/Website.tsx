@@ -64,6 +64,7 @@ const testimonials = [
 ];
 
 export default function Website() {
+  const [tipoCurso, setTipoCurso] = useState<"licenciatura" | "mestrado">("licenciatura");
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* ===== Top bar ===== */}
