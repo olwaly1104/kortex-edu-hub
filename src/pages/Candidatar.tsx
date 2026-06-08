@@ -382,6 +382,13 @@ export default function Candidatar() {
           <Card className="p-6 lg:p-8 shadow-sm">
             {step === 1 && (() => {
               const bi = docs["bi"];
+              const isEstrangeiro = form.nacionalidade === "Estrangeira";
+              const docOptions: DocTipo[] = isEstrangeiro ? ["passaporte", "residencia"] : ["bi", "passaporte"];
+              const setNacionalidade = (v: string) => {
+                update("nacionalidade", v);
+                if (v === "Estrangeira" && form.docTipo === "bi") update("docTipo", "passaporte");
+                if (v === "Angolana" && form.docTipo === "residencia") update("docTipo", "bi");
+              };
               return (
                 <div className="space-y-6">
                   {/* Identificação */}
@@ -403,8 +410,14 @@ export default function Candidatar() {
                           </SelectContent>
                         </Select>
                       </Field>
-                      <Field label="Nacionalidade" full>
-                        <Input value={form.nacionalidade} onChange={e => update("nacionalidade", e.target.value)} maxLength={50} />
+                      <Field label="Nacionalidade" required full>
+                        <Select value={form.nacionalidade} onValueChange={setNacionalidade}>
+                          <SelectTrigger><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Angolana">Angolana</SelectItem>
+                            <SelectItem value="Estrangeira">Estrangeira</SelectItem>
+                          </SelectContent>
+                        </Select>
                       </Field>
                     </div>
                   </section>
@@ -430,9 +443,53 @@ export default function Candidatar() {
                     </div>
                   </section>
 
-                  {/* Bilhete de Identidade */}
+                  {/* Documento de Identificação */}
                   <section className="space-y-3 pt-1 border-t border-border">
-                    <p className="text-[10.5px] uppercase tracking-[0.12em] text-muted-foreground font-semibold pt-4">Bilhete de Identidade</p>
+                    <div className="flex items-center justify-between flex-wrap gap-2 pt-4">
+                      <p className="text-[10.5px] uppercase tracking-[0.12em] text-muted-foreground font-semibold">Documento de Identificação</p>
+                      <p className="text-[10.5px] text-muted-foreground">Escolha apenas <span className="font-semibold text-foreground">um</span> documento</p>
+                    </div>
+
+                    {/* Doc type chooser */}
+                    <div className="grid grid-cols-2 gap-2">
+                      {docOptions.map(opt => {
+                        const active = form.docTipo === opt;
+                        return (
+                          <button
+                            key={opt}
+                            type="button"
+                            onClick={() => { update("docTipo", opt); if (bi) removeDoc("bi"); }}
+                            className={cn(
+                              "text-left rounded-xl border px-3.5 py-3 transition-all",
+                              active
+                                ? "border-primary bg-primary/5 ring-1 ring-primary/30"
+                                : "border-border bg-card hover:border-primary/40 hover:bg-muted/40"
+                            )}
+                          >
+                            <div className="flex items-center gap-2.5">
+                              <div className={cn(
+                                "w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0",
+                                active ? "border-primary bg-primary" : "border-border bg-background"
+                              )}>
+                                {active && <span className="w-1.5 h-1.5 rounded-full bg-primary-foreground" />}
+                              </div>
+                              <div className="min-w-0">
+                                <p className={cn("text-[13px] font-semibold leading-tight", active ? "text-primary" : "text-foreground")}>
+                                  {DOC_TIPO_LABEL[opt]}
+                                </p>
+                                <p className="text-[10.5px] text-muted-foreground mt-0.5">
+                                  {opt === "bi" && "Documento nacional"}
+                                  {opt === "passaporte" && "Documento internacional"}
+                                  {opt === "residencia" && "Para residentes estrangeiros"}
+                                </p>
+                              </div>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {/* Upload */}
                     <div className={cn(
                       "rounded-xl border transition-colors",
                       bi ? "border-emerald-500/40 bg-emerald-500/5" : "border-border bg-card hover:border-primary/30"
@@ -452,7 +509,7 @@ export default function Candidatar() {
                           {bi ? <Check className="w-5 h-5" strokeWidth={3} /> : <FileText className="w-5 h-5" />}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-semibold text-foreground leading-tight">Bilhete de Identidade</p>
+                          <p className="text-sm font-semibold text-foreground leading-tight">{DOC_TIPO_LABEL[form.docTipo]}</p>
                           {bi ? (
                             <p className="text-[11.5px] text-foreground/70 mt-0.5 flex items-center gap-1.5 truncate">
                               <Paperclip className="w-3 h-3 shrink-0" />
@@ -460,7 +517,7 @@ export default function Candidatar() {
                               <span className="text-muted-foreground">· {fmtSize(bi.size)}</span>
                             </p>
                           ) : (
-                            <p className="text-[11.5px] text-muted-foreground mt-0.5">Frente e verso · PDF, JPG ou PNG · máx. 5MB</p>
+                            <p className="text-[11.5px] text-muted-foreground mt-0.5">{DOC_TIPO_DESC[form.docTipo]}</p>
                           )}
                         </div>
                         <div className="flex items-center gap-1 shrink-0">
