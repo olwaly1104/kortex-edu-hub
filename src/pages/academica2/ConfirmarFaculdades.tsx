@@ -23,6 +23,11 @@ const decanosPool = [
   "Dr. Joaquim Sousa",
 ];
 
+const coordenadoresPool = [
+  "Dr. Fábio Costa", "Dra. Marta Lopes", "Dr. Hugo Faria", "Dra. Sílvia Antunes",
+  "Dr. Tomás Henriques", "Dra. Sara Quintas", "Dr. Rui Pinto", "Dra. Helena Vaz",
+];
+
 interface FacState {
   id: string;
   name: string;
@@ -38,7 +43,7 @@ const initialFaculdades: FacState[] = [
   { id: "sociais", name: "Faculdade de Ciências Sociais", decano: "Dr. Eduardo Pinto", confirmed: false, editing: false, cursos: cursoTemplates.filter(c => c.faculty === "Faculdade de Ciências Sociais") },
 ];
 
-const emptyCurso = { code: "", name: "", coordenador: "", years: 4, cadeirasPorAno: 6, estudantesEsperados: 100 };
+const emptyCurso = { code: "", name: "", coordenador: coordenadoresPool[0], years: 4, cadeirasPorAno: 6, estudantesEsperados: 100 };
 
 export default function ConfirmarFaculdades() {
   const [faculdades, setFaculdades] = useState<FacState[]>(initialFaculdades);
@@ -48,9 +53,15 @@ export default function ConfirmarFaculdades() {
   const update = (id: string, patch: Partial<FacState>) =>
     setFaculdades(prev => prev.map(f => f.id === id ? { ...f, ...patch } : f));
 
+  const updateCurso = (facId: string, cursoId: string, patch: Partial<CursoTemplate>) => {
+    const fac = faculdades.find(f => f.id === facId);
+    if (!fac) return;
+    update(facId, { cursos: fac.cursos.map(c => c.id === cursoId ? { ...c, ...patch } : c) });
+  };
+
   const confirmAll = () => {
     setFaculdades(prev => prev.map(f => ({ ...f, confirmed: true, editing: false })));
-    toast.success("Faculdades confirmadas");
+    toast.success("Faculdades & cursos confirmados");
   };
 
   const addCurso = (facId: string) => {
@@ -93,12 +104,12 @@ export default function ConfirmarFaculdades() {
         </Link>
         <div className="rounded-xl border border-primary/30 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-6 flex items-center justify-between flex-wrap gap-3">
           <div>
-            <Badge className="mb-2 gap-1"><Building2 className="w-3 h-3" /> Passo 1 de 6</Badge>
+            <Badge className="mb-2 gap-1"><Building2 className="w-3 h-3" /> Passo 1 de 5</Badge>
             <h1 className="text-2xl font-bold flex items-center gap-2">
-              <Building2 className="w-6 h-6 text-primary" /> Confirmar Faculdades
+              <Building2 className="w-6 h-6 text-primary" /> Confirmar Faculdades & Cursos
             </h1>
             <p className="text-muted-foreground mt-1 text-sm">
-              Validar as faculdades da universidade, o decano responsável e os cursos que ficam sob cada uma.
+              Validar faculdades, decanos e os cursos (com respetivos coordenadores) de cada uma.
             </p>
           </div>
           <Button onClick={confirmAll} className="gap-2"><Check className="w-4 h-4" /> Confirmar Todas</Button>
@@ -183,7 +194,7 @@ export default function ConfirmarFaculdades() {
                             <Label className="text-xs">Código</Label>
                             <Input value={draft.code} onChange={e => setDraft({ ...draft, code: e.target.value })} placeholder="ARQ" className="h-8" />
                           </div>
-                          <div className="space-y-1 col-span-1">
+                          <div className="space-y-1">
                             <Label className="text-xs">Anos</Label>
                             <Input type="number" min={1} max={8} value={draft.years} onChange={e => setDraft({ ...draft, years: Number(e.target.value) })} className="h-8" />
                           </div>
@@ -193,7 +204,10 @@ export default function ConfirmarFaculdades() {
                           </div>
                           <div className="space-y-1 col-span-2">
                             <Label className="text-xs">Coordenador</Label>
-                            <Input value={draft.coordenador} onChange={e => setDraft({ ...draft, coordenador: e.target.value })} placeholder="Dr. Nome Apelido" className="h-8" />
+                            <Select value={draft.coordenador} onValueChange={v => setDraft({ ...draft, coordenador: v })}>
+                              <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                              <SelectContent>{coordenadoresPool.map(co => <SelectItem key={co} value={co}>{co}</SelectItem>)}</SelectContent>
+                            </Select>
                           </div>
                           <div className="space-y-1">
                             <Label className="text-xs">Cadeiras/Ano</Label>
@@ -212,13 +226,27 @@ export default function ConfirmarFaculdades() {
                     </Dialog>
                   )}
                 </div>
-                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                <div className="grid sm:grid-cols-2 gap-2">
                   {cursos.map(c => (
                     <div key={c.id} className="flex items-center gap-2 px-3 py-2 rounded-md border bg-card hover:bg-muted/30 transition">
                       <span className="inline-flex items-center justify-center h-5 min-w-[34px] px-1 rounded bg-primary text-primary-foreground text-[10px] font-bold">{c.code}</span>
                       <div className="min-w-0 flex-1">
                         <p className="text-xs font-medium truncate">{c.name}</p>
                         <p className="text-[10px] text-muted-foreground truncate">{c.years} anos · ~{c.estudantesEsperados} estudantes</p>
+                      </div>
+                      <div className="flex items-center gap-1.5 px-2 py-1 rounded border bg-muted/30 shrink-0">
+                        <UserCog className="w-3 h-3 text-muted-foreground" />
+                        <div className="min-w-0">
+                          <p className="text-[9px] uppercase tracking-wide text-muted-foreground leading-tight">Coord.</p>
+                          {f.editing ? (
+                            <Select value={c.coordenador} onValueChange={v => updateCurso(f.id, c.id, { coordenador: v })}>
+                              <SelectTrigger className="h-5 text-[11px] border-0 px-0 shadow-none focus:ring-0 gap-1"><SelectValue /></SelectTrigger>
+                              <SelectContent>{coordenadoresPool.map(co => <SelectItem key={co} value={co}>{co}</SelectItem>)}</SelectContent>
+                            </Select>
+                          ) : (
+                            <p className="text-[11px] font-semibold leading-tight truncate max-w-[140px]">{c.coordenador}</p>
+                          )}
+                        </div>
                       </div>
                       {f.editing ? (
                         <Button size="icon" variant="ghost" className="h-6 w-6 text-destructive hover:text-destructive" onClick={() => removeCurso(f.id, c.id)}>
@@ -241,7 +269,7 @@ export default function ConfirmarFaculdades() {
 
       <div className="flex justify-end gap-2 pt-2">
         <Button variant="outline" asChild><Link to="/areaacademica/criador">Voltar</Link></Button>
-        <Button asChild className="gap-2"><Link to="/areaacademica/criador/cursos">Próximo: Confirmar Cursos <ChevronRight className="w-4 h-4" /></Link></Button>
+        <Button asChild className="gap-2"><Link to="/areaacademica/criador/cadeiras">Próximo: Confirmar Cadeiras <ChevronRight className="w-4 h-4" /></Link></Button>
       </div>
     </div>
   );
