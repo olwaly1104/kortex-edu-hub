@@ -9,6 +9,7 @@ import {
   Facebook, Instagram, Linkedin, Youtube, CheckCircle2, Quote, Sparkles,
 } from "lucide-react";
 import logoUpra from "@/assets/logo-upra.asset.json";
+import heroStudents from "@/assets/hero-students.jpg";
 
 const faculdades = [
   { icon: Building2, name: "Ciências Exatas", desc: "Arquitectura, Engenharia Civil, Informática", cursos: 6 },
