@@ -83,17 +83,20 @@ export default function Website() {
             <a href="#contacto" className="text-foreground/80 hover:text-primary">Contacto</a>
           </nav>
           <div className="flex items-center gap-2">
-            <Link to="/candidatar">
-              <Button size="sm" className="h-9 gap-1.5 bg-secondary text-secondary-foreground hover:bg-secondary/90 shadow-sm">
-                <Sparkles className="w-4 h-4" /> Candidatar-me
+            <Link to="/">
+              <Button size="sm" variant="ghost" className="h-9 gap-1.5 text-foreground/80 hover:text-primary hover:bg-primary/5">
+                <LogIn className="w-4 h-4" /> Portal do Aluno
               </Button>
             </Link>
-            <Link to="/">
-              <Button size="sm" variant="outline" className="h-9 gap-1.5">
-                <LogIn className="w-4 h-4" /> Portal
+            <div className="hidden sm:block h-6 w-px bg-border" />
+            <Link to="/candidatar">
+              <Button size="sm" className="h-9 gap-1.5 bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm">
+                <Sparkles className="w-4 h-4" /> Candidatar-me
+                <ArrowRight className="w-3.5 h-3.5" />
               </Button>
             </Link>
           </div>
+
         </div>
       </header>
 
