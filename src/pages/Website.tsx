@@ -34,10 +34,28 @@ const news = [
   { tag: "Eventos", date: "20 Mai 2026", title: "Semana Cultural UPRA reúne mais de 3.000 visitantes", desc: "Cinco dias de conferências, música, exposições e debates no Campus Central." },
 ];
 
-const cursosDestaque = [
-  "Arquitectura", "Medicina", "Engenharia Informática", "Direito",
-  "Gestão de Empresas", "Enfermagem", "Engenharia Civil", "Psicologia",
-];
+const cursosDestaque = {
+  licenciatura: [
+    { name: "Arquitectura", duracao: "5 anos" },
+    { name: "Medicina", duracao: "6 anos" },
+    { name: "Engenharia Informática", duracao: "5 anos" },
+    { name: "Direito", duracao: "4 anos" },
+    { name: "Gestão de Empresas", duracao: "4 anos" },
+    { name: "Enfermagem", duracao: "4 anos" },
+    { name: "Engenharia Civil", duracao: "5 anos" },
+    { name: "Psicologia", duracao: "4 anos" },
+  ],
+  mestrado: [
+    { name: "Arquitectura e Urbanismo", duracao: "2 anos" },
+    { name: "Saúde Pública", duracao: "2 anos" },
+    { name: "Engenharia de Software", duracao: "2 anos" },
+    { name: "Direito Empresarial", duracao: "2 anos" },
+    { name: "Gestão Financeira", duracao: "2 anos" },
+    { name: "Gestão Hospitalar", duracao: "2 anos" },
+    { name: "Estruturas e Construção", duracao: "2 anos" },
+    { name: "Psicologia Clínica", duracao: "2 anos" },
+  ],
+};
 
 const testimonials = [
   { name: "Ana Domingos", course: "Arquitectura · 5º ano", quote: "A UPRA deu-me as ferramentas técnicas e a visão crítica que precisava para construir o meu portfólio profissional." },
