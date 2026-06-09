@@ -58,25 +58,35 @@ export default function CandidaturaDocPreview({
           className="mx-auto bg-white shadow-md print:shadow-none flex flex-col text-neutral-900"
           style={{ width: "210mm", minHeight: "297mm", fontFamily: "'Inter', system-ui, sans-serif" }}
         >
-          {/* Top bar — institutional, logo centrado */}
-          <div className="px-10 pt-6 pb-3 grid grid-cols-3 items-center">
-            <p className="text-[10px] uppercase tracking-[0.18em] text-neutral-500 font-semibold">
-              Universidade Privada de Angola
-            </p>
-            <div className="flex justify-center">
-              <img src={logoAsset.url} alt="UPRA" className="h-14 w-auto object-contain" />
+          {/* Top bar — logo + institucional à esquerda, ID à direita */}
+          <div className="px-10 pt-6 pb-3 flex items-center justify-between border-b border-neutral-200">
+            <div className="flex items-center gap-3">
+              <img src={logoAsset.url} alt="UPRA" className="h-12 w-auto object-contain" />
+              <div className="leading-tight">
+                <p className="text-[11px] font-bold text-neutral-900">Universidade Privada de Angola</p>
+                <p className="text-[9px] uppercase tracking-[0.2em] text-neutral-500 font-semibold">
+                  Gabinete de Apoio
+                </p>
+              </div>
             </div>
-            <p className="font-mono text-[11px] font-bold text-neutral-700 text-right">{displayId}</p>
+            <div className="text-right leading-tight">
+              <p className="text-[9px] uppercase tracking-[0.18em] text-neutral-500 font-semibold">Processo Nº</p>
+              <p className="font-mono text-[12px] font-bold text-neutral-900 tabular-nums">{displayId}</p>
+            </div>
           </div>
 
           {/* Header — photo + name + estado + submetido + documentos */}
-          <header className="px-10 pb-5 border-b-2 border-neutral-900">
+          <header className="px-10 pt-5 pb-5 border-b-2 border-neutral-900">
             <div className="flex items-start gap-6">
               <img
-                src={`https://i.pravatar.cc/240?img=${photoIdx}`}
+                src={studentPhoto}
                 alt={`Foto — ${c.nome}`}
-                className="w-[110px] h-[140px] object-cover border border-neutral-400 bg-neutral-100 shrink-0"
+                width={512}
+                height={640}
+                loading="lazy"
+                className="w-[150px] h-[190px] object-cover border border-neutral-400 bg-neutral-100 shrink-0"
               />
+
               <div className="flex-1 min-w-0 pt-1">
                 <p className="text-[12px] uppercase tracking-[0.24em] text-neutral-500 font-bold mb-1.5">
                   Ficha de Candidatura
