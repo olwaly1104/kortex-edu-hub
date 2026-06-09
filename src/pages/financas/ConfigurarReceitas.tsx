@@ -10,8 +10,8 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import {
-  Settings2, Plus, Pencil, Trash2, ArrowLeft,
-  GraduationCap, BookOpen, FileText, Receipt, ClipboardCheck, AlertTriangle,
+  Settings2, Plus, Pencil, Trash2, ArrowLeft, ChevronRight,
+  GraduationCap, BookOpen, FileText, Receipt, ClipboardCheck, AlertTriangle, Building2,
 } from "lucide-react";
 import { formatCurrency } from "@/data/financeModuleData";
 import { reitorFaculties } from "@/data/institutionData";
@@ -40,7 +40,7 @@ interface ReceitaRow {
 }
 
 const ALL_COURSES = reitorFaculties.flatMap(f =>
-  f.courses.map(c => ({ id: c.id, code: c.code, name: c.name, facultyName: f.name }))
+  f.courses.map(c => ({ id: c.id, code: c.code, name: c.name, facultyId: f.id, facultyName: f.name }))
 );
 
 const courseLabel = (id: string) => {
@@ -51,14 +51,22 @@ const courseLabel = (id: string) => {
 
 const seedPropina = (f: string) =>
   f.includes("Medicina") ? 65000 : f.includes("Arquitectura") ? 52000 : f.includes("Direito") ? 48000 : f.includes("Economia") ? 45000 : 38000;
-const seedMatricula = (f: string) =>
-  f.includes("Medicina") ? 35000 : (f.includes("Arquitectura") || f.includes("Direito")) ? 30000 : 25000;
 
 const initialRows = (): ReceitaRow[] => {
-  const perCurso: ReceitaRow[] = ALL_COURSES.flatMap(c => [
-    { id: `prop-${c.id}`, nome: `Propina mensal — ${c.name}`, tipo: "Propina mensal", escopo: c.id, valor: seedPropina(c.facultyName) },
-    { id: `matr-${c.id}`, nome: `Matrícula — ${c.name}`, tipo: "Matrícula", escopo: c.id, valor: seedMatricula(c.facultyName) },
-  ]);
+  const perCurso: ReceitaRow[] = ALL_COURSES.map(c => ({
+    id: `prop-${c.id}`,
+    nome: `Propina mensal — ${c.name}`,
+    tipo: "Propina mensal",
+    escopo: c.id,
+    valor: seedPropina(c.facultyName),
+  }));
+  const matriculas: ReceitaRow[] = reitorFaculties.map(f => ({
+    id: `matr-${f.id}`,
+    nome: `Matrícula — ${f.name}`,
+    tipo: "Matrícula",
+    escopo: "geral",
+    valor: f.name.includes("Medicina") ? 35000 : (f.name.includes("Arquitectura") || f.name.includes("Direito")) ? 30000 : 25000,
+  }));
   const gerais: ReceitaRow[] = [
     { id: "emo-1", nome: "Emissão de Declaração", tipo: "Emolumento", escopo: "geral", valor: 2500 },
     { id: "emo-2", nome: "Certificado de Habilitações", tipo: "Emolumento", escopo: "geral", valor: 5000 },
@@ -76,7 +84,7 @@ const initialRows = (): ReceitaRow[] => {
     { id: "mul-4", nome: "Multa por extravio de cartão de estudante", tipo: "Multa", escopo: "geral", valor: 4000 },
     { id: "mul-5", nome: "Multa por danos em equipamento", tipo: "Multa", escopo: "geral", valor: 15000 },
   ];
-  return [...gerais, ...perCurso];
+  return [...gerais, ...matriculas, ...perCurso];
 };
 
 interface SectionDef {
@@ -86,21 +94,21 @@ interface SectionDef {
   tipos: TipoReceita[];
   defaultTipo: TipoReceita;
   icon: typeof GraduationCap;
-  accent: string; // text color
-  chip: string;   // chip bg
+  accent: string;
+  chip: string;
 }
 
 const SECTIONS: SectionDef[] = [
-  { key: "propinas", title: "Propinas e Matrículas", description: "Valores cobrados por curso. Configurável por faculdade.",
-    tipos: ["Propina mensal", "Matrícula"], defaultTipo: "Propina mensal",
+  { key: "propinas", title: "Propinas", description: "Valor mensal por curso, organizado por faculdade.",
+    tipos: ["Propina mensal"], defaultTipo: "Propina mensal",
     icon: GraduationCap, accent: "text-blue-700", chip: "bg-blue-50 border-blue-200 text-blue-700" },
-  { key: "emolumentos", title: "Emolumentos", description: "Documentos e certificados oficiais emitidos pela instituição.",
-    tipos: ["Emolumento"], defaultTipo: "Emolumento",
+  { key: "emolumentos", title: "Emolumentos", description: "Matrícula, documentos e certificados oficiais.",
+    tipos: ["Emolumento", "Matrícula"], defaultTipo: "Emolumento",
     icon: FileText, accent: "text-emerald-700", chip: "bg-emerald-50 border-emerald-200 text-emerald-700" },
   { key: "servicos", title: "Serviços Académicos e Taxas", description: "Pedidos académicos e taxas administrativas pontuais.",
     tipos: ["Serviço Académico", "Taxa"], defaultTipo: "Serviço Académico",
     icon: BookOpen, accent: "text-violet-700", chip: "bg-violet-50 border-violet-200 text-violet-700" },
-  { key: "candidatura", title: "Candidaturas", description: "Taxas de candidatura para os processos de admissão.",
+  { key: "candidatura", title: "Candidaturas", description: "Taxas de candidatura para processos de admissão.",
     tipos: ["Candidatura"], defaultTipo: "Candidatura",
     icon: ClipboardCheck, accent: "text-pink-700", chip: "bg-pink-50 border-pink-200 text-pink-700" },
   { key: "multas", title: "Multas", description: "Penalizações aplicáveis por incumprimento ou atraso.",
@@ -118,23 +126,47 @@ const tipoChip: Record<TipoReceita, string> = {
   "Multa": "bg-red-50 text-red-700 border-red-200",
 };
 
+type SectionFilter = "todos" | "propinas" | "emolumentos" | "servicos" | "candidatura" | "multas";
+
+const FILTERS: { key: SectionFilter; label: string }[] = [
+  { key: "todos", label: "Todos" },
+  { key: "propinas", label: "Propinas" },
+  { key: "emolumentos", label: "Emolumentos" },
+  { key: "servicos", label: "Serviços e Taxas" },
+  { key: "candidatura", label: "Candidaturas" },
+  { key: "multas", label: "Multas" },
+];
+
 export default function ConfigurarReceitas() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [rows, setRows] = useState<ReceitaRow[]>(initialRows);
 
-  type SectionFilter = "todos" | "propina" | "emolumentos" | "servicos";
   const [filter, setFilter] = useState<SectionFilter>("todos");
+  const [selectedFaculty, setSelectedFaculty] = useState<string | null>(null);
 
   const [openSection, setOpenSection] = useState<SectionDef | null>(null);
   const [editing, setEditing] = useState<ReceitaRow | null>(null);
   const [form, setForm] = useState<ReceitaRow>({ id: "", nome: "", tipo: "Taxa", escopo: "geral", valor: 0 });
   const [confirmDel, setConfirmDel] = useState<ReceitaRow | null>(null);
+  const [inlineEdit, setInlineEdit] = useState<{ id: string; valor: string } | null>(null);
 
   const bySection = useMemo(() => {
     const map: Record<string, ReceitaRow[]> = {};
     for (const s of SECTIONS) map[s.key] = rows.filter(r => s.tipos.includes(r.tipo));
     return map;
+  }, [rows]);
+
+  // Propinas drill-down: faculty stats
+  const facultyStats = useMemo(() => {
+    return reitorFaculties.map(f => {
+      const courseIds = new Set(f.courses.map(c => c.id));
+      const propinas = rows.filter(r => r.tipo === "Propina mensal" && courseIds.has(r.escopo));
+      const avg = propinas.length ? Math.round(propinas.reduce((s, r) => s + r.valor, 0) / propinas.length) : 0;
+      const min = propinas.length ? Math.min(...propinas.map(r => r.valor)) : 0;
+      const max = propinas.length ? Math.max(...propinas.map(r => r.valor)) : 0;
+      return { id: f.id, name: f.name, courseCount: f.courses.length, avg, min, max };
+    });
   }, [rows]);
 
   const openNew = (s: SectionDef) => {
@@ -171,6 +203,15 @@ export default function ConfigurarReceitas() {
     setConfirmDel(null);
   };
 
+  const commitInline = () => {
+    if (!inlineEdit) return;
+    const v = Number(inlineEdit.valor) || 0;
+    setRows(rs => rs.map(r => r.id === inlineEdit.id ? { ...r, valor: v } : r));
+    setInlineEdit(null);
+  };
+
+  const visibleSections = filter === "todos" ? SECTIONS : SECTIONS.filter(s => s.key === filter);
+
   return (
     <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6 animate-fade-in">
       {/* Header */}
@@ -183,24 +224,19 @@ export default function ConfigurarReceitas() {
             <Settings2 className="w-6 h-6 text-primary" /> Configurador Financeiro
           </h1>
           <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
-            Gere as propinas, matrículas, emolumentos, serviços, candidaturas e multas cobrados pela instituição.
+            Gere as propinas, emolumentos, serviços, candidaturas e multas cobrados pela instituição.
           </p>
         </div>
       </div>
 
       {/* Toggle */}
-      <div className="flex items-center gap-1 bg-muted/50 rounded-lg p-1 w-fit">
-        {([
-          { key: "todos" as SectionFilter, label: "Todos" },
-          { key: "propina" as SectionFilter, label: "Propina" },
-          { key: "emolumentos" as SectionFilter, label: "Emolumentos" },
-          { key: "servicos" as SectionFilter, label: "Serviços Académicos e Taxas" },
-        ]).map(b => (
+      <div className="flex items-center gap-1 bg-muted/50 rounded-lg p-1 w-fit flex-wrap">
+        {FILTERS.map(b => (
           <Button
             key={b.key}
             variant="ghost"
             size="sm"
-            onClick={() => setFilter(b.key)}
+            onClick={() => { setFilter(b.key); setSelectedFaculty(null); }}
             className={cn(
               "text-xs h-7 px-3 rounded-md",
               filter === b.key ? "bg-background shadow-sm text-foreground font-medium" : "text-muted-foreground hover:text-foreground"
@@ -212,13 +248,101 @@ export default function ConfigurarReceitas() {
       </div>
 
       {/* Sections */}
-      {(filter === "todos" ? SECTIONS : SECTIONS.filter(s =>
-        filter === "propina" ? s.key === "propinas" :
-        filter === "emolumentos" ? s.key === "emolumentos" :
-        filter === "servicos" ? s.key === "servicos" : true
-      )).map(section => {
+      {visibleSections.map(section => {
         const items = bySection[section.key];
         const Icon = section.icon;
+
+        // Special drill-down for Propinas
+        if (section.key === "propinas") {
+          const selected = selectedFaculty ? reitorFaculties.find(f => f.id === selectedFaculty) : null;
+          return (
+            <Card key={section.key} className="p-5">
+              <div className="flex items-center justify-between mb-4 gap-4 flex-wrap">
+                <div className="flex items-center gap-2 min-w-0">
+                  <Icon className={cn("w-4 h-4", section.accent)} />
+                  <h2 className="text-sm font-semibold text-foreground">{section.title}</h2>
+                  <span className="text-[11px] text-muted-foreground tabular-nums">· {items.length} cursos</span>
+                  <span className="text-xs text-muted-foreground truncate hidden md:inline">— {section.description}</span>
+                </div>
+                {selected && (
+                  <Button size="sm" variant="ghost" className="h-7 text-xs gap-1" onClick={() => setSelectedFaculty(null)}>
+                    <ArrowLeft className="w-3.5 h-3.5" /> Faculdades
+                  </Button>
+                )}
+              </div>
+
+              {!selected ? (
+                <div className="grid sm:grid-cols-2 gap-2">
+                  {facultyStats.map(f => (
+                    <button
+                      key={f.id}
+                      onClick={() => setSelectedFaculty(f.id)}
+                      className="flex items-center gap-3 p-3 rounded-lg border border-border hover:border-primary/40 hover:bg-muted/40 transition text-left group"
+                    >
+                      <div className="w-9 h-9 rounded-md bg-blue-50 text-blue-700 flex items-center justify-center flex-shrink-0">
+                        <Building2 className="w-4 h-4" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-foreground truncate">{f.name}</p>
+                        <p className="text-[11px] text-muted-foreground">
+                          {f.courseCount} cursos · {formatCurrency(f.min)} – {formatCurrency(f.max)}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Média</p>
+                        <p className="text-sm font-semibold text-foreground tabular-nums">{formatCurrency(f.avg)}</p>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition" />
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <div className="divide-y divide-border">
+                  <div className="pb-3 mb-1">
+                    <p className="text-xs text-muted-foreground">Faculdade</p>
+                    <p className="text-sm font-semibold text-foreground">{selected.name}</p>
+                  </div>
+                  {selected.courses.map(c => {
+                    const r = rows.find(x => x.tipo === "Propina mensal" && x.escopo === c.id);
+                    if (!r) return null;
+                    const editingInline = inlineEdit?.id === r.id;
+                    return (
+                      <div key={c.id} className="flex items-center gap-3 py-2.5 group">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-foreground truncate">{c.name}</p>
+                          <p className="text-[11px] text-muted-foreground">{c.code} · Propina mensal</p>
+                        </div>
+                        {editingInline ? (
+                          <div className="flex items-center gap-1.5">
+                            <Input
+                              type="number"
+                              autoFocus
+                              value={inlineEdit!.valor}
+                              onChange={e => setInlineEdit({ ...inlineEdit!, valor: e.target.value })}
+                              onKeyDown={e => { if (e.key === "Enter") commitInline(); if (e.key === "Escape") setInlineEdit(null); }}
+                              className="h-8 w-28 text-sm text-right tabular-nums"
+                            />
+                            <Button size="sm" className="h-8" onClick={commitInline}>OK</Button>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => setInlineEdit({ id: r.id, valor: String(r.valor) })}
+                            className="text-sm font-semibold text-foreground tabular-nums whitespace-nowrap px-2 py-1 rounded hover:bg-muted transition"
+                            title="Clique para editar"
+                          >
+                            {formatCurrency(r.valor)}
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </Card>
+          );
+        }
+
+        // Default section rendering
         return (
           <Card key={section.key} className="p-5">
             <div className="flex items-center justify-between mb-4 gap-4 flex-wrap">
@@ -280,7 +404,7 @@ export default function ConfigurarReceitas() {
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-muted-foreground">Designação</label>
               <Input value={form.nome} onChange={e => setForm({ ...form, nome: e.target.value })}
-                placeholder="Ex.: Propina mensal — Engenharia Civil" />
+                placeholder="Ex.: Certificado de Habilitações" />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
@@ -337,7 +461,6 @@ export default function ConfigurarReceitas() {
         </DialogContent>
       </Dialog>
 
-      {/* Receipt icon import keeper */}
       <span className="hidden"><Receipt /></span>
     </div>
   );
