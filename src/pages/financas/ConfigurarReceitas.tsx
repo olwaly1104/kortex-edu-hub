@@ -1,11 +1,8 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import {
-  Table, TableHeader, TableBody, TableHead, TableRow, TableCell,
-} from "@/components/ui/table";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose,
 } from "@/components/ui/dialog";
@@ -13,11 +10,13 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import {
-  Settings2, Plus, Pencil, Trash2, ArrowLeft, Search, Download,
+  Settings2, Plus, Pencil, Trash2, ArrowLeft,
+  GraduationCap, BookOpen, FileText, Receipt, ClipboardCheck, AlertTriangle,
 } from "lucide-react";
 import { formatCurrency } from "@/data/financeModuleData";
 import { reitorFaculties } from "@/data/institutionData";
 import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 
 type TipoReceita =
   | "Propina mensal"
@@ -29,68 +28,36 @@ type TipoReceita =
   | "Multa";
 
 const TIPOS: TipoReceita[] = [
-  "Propina mensal",
-  "Matrícula",
-  "Emolumento",
-  "Taxa",
-  "Serviço Académico",
-  "Candidatura",
-  "Multa",
+  "Propina mensal", "Matrícula", "Emolumento", "Taxa", "Serviço Académico", "Candidatura", "Multa",
 ];
 
 interface ReceitaRow {
   id: string;
   nome: string;
   tipo: TipoReceita;
-  /** "geral" or course id */
-  escopo: string;
+  escopo: string; // "geral" or course id
   valor: number;
 }
 
 const ALL_COURSES = reitorFaculties.flatMap(f =>
-  f.courses.map(c => ({
-    id: c.id,
-    code: c.code,
-    name: c.name,
-    facultyName: f.name,
-  }))
+  f.courses.map(c => ({ id: c.id, code: c.code, name: c.name, facultyName: f.name }))
 );
 
 const courseLabel = (id: string) => {
-  if (id === "geral") return "Geral (todos os cursos)";
+  if (id === "geral") return "Geral — todos os cursos";
   const c = ALL_COURSES.find(x => x.id === id);
   return c ? `${c.code} — ${c.name}` : id;
 };
 
-const seedPropina = (facultyName: string) => {
-  if (facultyName.includes("Medicina")) return 65000;
-  if (facultyName.includes("Arquitectura")) return 52000;
-  if (facultyName.includes("Direito")) return 48000;
-  if (facultyName.includes("Economia")) return 45000;
-  return 38000;
-};
-const seedMatricula = (facultyName: string) => {
-  if (facultyName.includes("Medicina")) return 35000;
-  if (facultyName.includes("Arquitectura") || facultyName.includes("Direito")) return 30000;
-  return 25000;
-};
+const seedPropina = (f: string) =>
+  f.includes("Medicina") ? 65000 : f.includes("Arquitectura") ? 52000 : f.includes("Direito") ? 48000 : f.includes("Economia") ? 45000 : 38000;
+const seedMatricula = (f: string) =>
+  f.includes("Medicina") ? 35000 : (f.includes("Arquitectura") || f.includes("Direito")) ? 30000 : 25000;
 
 const initialRows = (): ReceitaRow[] => {
   const perCurso: ReceitaRow[] = ALL_COURSES.flatMap(c => [
-    {
-      id: `prop-${c.id}`,
-      nome: `Propina mensal — ${c.name}`,
-      tipo: "Propina mensal" as const,
-      escopo: c.id,
-      valor: seedPropina(c.facultyName),
-    },
-    {
-      id: `matr-${c.id}`,
-      nome: `Matrícula — ${c.name}`,
-      tipo: "Matrícula" as const,
-      escopo: c.id,
-      valor: seedMatricula(c.facultyName),
-    },
+    { id: `prop-${c.id}`, nome: `Propina mensal — ${c.name}`, tipo: "Propina mensal", escopo: c.id, valor: seedPropina(c.facultyName) },
+    { id: `matr-${c.id}`, nome: `Matrícula — ${c.name}`, tipo: "Matrícula", escopo: c.id, valor: seedMatricula(c.facultyName) },
   ]);
   const gerais: ReceitaRow[] = [
     { id: "emo-1", nome: "Emissão de Declaração", tipo: "Emolumento", escopo: "geral", valor: 2500 },
@@ -112,7 +79,36 @@ const initialRows = (): ReceitaRow[] => {
   return [...gerais, ...perCurso];
 };
 
-const tipoBadge: Record<TipoReceita, string> = {
+interface SectionDef {
+  key: string;
+  title: string;
+  description: string;
+  tipos: TipoReceita[];
+  defaultTipo: TipoReceita;
+  icon: typeof GraduationCap;
+  accent: string; // text color
+  chip: string;   // chip bg
+}
+
+const SECTIONS: SectionDef[] = [
+  { key: "propinas", title: "Propinas e Matrículas", description: "Valores cobrados por curso. Configurável por faculdade.",
+    tipos: ["Propina mensal", "Matrícula"], defaultTipo: "Propina mensal",
+    icon: GraduationCap, accent: "text-blue-700", chip: "bg-blue-50 border-blue-200 text-blue-700" },
+  { key: "emolumentos", title: "Emolumentos", description: "Documentos e certificados oficiais emitidos pela instituição.",
+    tipos: ["Emolumento"], defaultTipo: "Emolumento",
+    icon: FileText, accent: "text-emerald-700", chip: "bg-emerald-50 border-emerald-200 text-emerald-700" },
+  { key: "servicos", title: "Serviços Académicos e Taxas", description: "Pedidos académicos e taxas administrativas pontuais.",
+    tipos: ["Serviço Académico", "Taxa"], defaultTipo: "Serviço Académico",
+    icon: BookOpen, accent: "text-violet-700", chip: "bg-violet-50 border-violet-200 text-violet-700" },
+  { key: "candidatura", title: "Candidaturas", description: "Taxas de candidatura para os processos de admissão.",
+    tipos: ["Candidatura"], defaultTipo: "Candidatura",
+    icon: ClipboardCheck, accent: "text-pink-700", chip: "bg-pink-50 border-pink-200 text-pink-700" },
+  { key: "multas", title: "Multas", description: "Penalizações aplicáveis por incumprimento ou atraso.",
+    tipos: ["Multa"], defaultTipo: "Multa",
+    icon: AlertTriangle, accent: "text-red-700", chip: "bg-red-50 border-red-200 text-red-700" },
+];
+
+const tipoChip: Record<TipoReceita, string> = {
   "Propina mensal": "bg-blue-50 text-blue-700 border-blue-200",
   "Matrícula": "bg-indigo-50 text-indigo-700 border-indigo-200",
   "Emolumento": "bg-emerald-50 text-emerald-700 border-emerald-200",
@@ -126,62 +122,29 @@ export default function ConfigurarReceitas() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [rows, setRows] = useState<ReceitaRow[]>(initialRows);
-  const [search, setSearch] = useState("");
-  const [tipoFilter, setTipoFilter] = useState<string>("todos");
-  const [escopoFilter, setEscopoFilter] = useState<string>("todos");
 
-  const [open, setOpen] = useState(false);
+  const [openSection, setOpenSection] = useState<SectionDef | null>(null);
   const [editing, setEditing] = useState<ReceitaRow | null>(null);
-  const [form, setForm] = useState<ReceitaRow>({
-    id: "", nome: "", tipo: "Taxa", escopo: "geral", valor: 0,
-  });
-
+  const [form, setForm] = useState<ReceitaRow>({ id: "", nome: "", tipo: "Taxa", escopo: "geral", valor: 0 });
   const [confirmDel, setConfirmDel] = useState<ReceitaRow | null>(null);
 
-  const CATEGORIAS: Record<string, TipoReceita[]> = {
-    propina: ["Propina mensal", "Matrícula"],
-    emolumentos: ["Emolumento", "Taxa", "Serviço Académico"],
-    candidatura: ["Candidatura"],
-    multas: ["Multa"],
-  };
-
-  const filtered = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    return rows.filter(r => {
-      if (tipoFilter !== "todos") {
-        const tipos = CATEGORIAS[tipoFilter];
-        if (!tipos || !tipos.includes(r.tipo)) return false;
-      }
-      if (escopoFilter === "geral" && r.escopo !== "geral") return false;
-      if (escopoFilter === "curso" && r.escopo === "geral") return false;
-      if (!q) return true;
-      return (
-        r.nome.toLowerCase().includes(q) ||
-        r.tipo.toLowerCase().includes(q) ||
-        courseLabel(r.escopo).toLowerCase().includes(q)
-      );
-    });
-  }, [rows, search, tipoFilter, escopoFilter]);
-
-  const totals = useMemo(() => {
-    const total = rows.length;
-    const porCurso = rows.filter(r => r.escopo !== "geral").length;
-    const gerais = rows.filter(r => r.escopo === "geral").length;
-    const cursosAbrangidos = new Set(rows.filter(r => r.escopo !== "geral").map(r => r.escopo)).size;
-    return { total, porCurso, gerais, cursosAbrangidos };
+  const bySection = useMemo(() => {
+    const map: Record<string, ReceitaRow[]> = {};
+    for (const s of SECTIONS) map[s.key] = rows.filter(r => s.tipos.includes(r.tipo));
+    return map;
   }, [rows]);
 
-  const openNew = () => {
+  const openNew = (s: SectionDef) => {
+    setOpenSection(s);
     setEditing(null);
-    setForm({ id: "", nome: "", tipo: "Taxa", escopo: "geral", valor: 0 });
-    setOpen(true);
+    setForm({ id: "", nome: "", tipo: s.defaultTipo, escopo: "geral", valor: 0 });
   };
-
-  const openEdit = (r: ReceitaRow) => {
+  const openEdit = (s: SectionDef, r: ReceitaRow) => {
+    setOpenSection(s);
     setEditing(r);
     setForm({ ...r });
-    setOpen(true);
   };
+  const close = () => { setOpenSection(null); setEditing(null); };
 
   const save = () => {
     if (!form.nome.trim() || form.valor < 0) {
@@ -192,11 +155,10 @@ export default function ConfigurarReceitas() {
       setRows(rs => rs.map(r => r.id === editing.id ? { ...form, id: editing.id } : r));
       toast({ title: "Receita actualizada", description: form.nome });
     } else {
-      const id = `r-${Date.now()}`;
-      setRows(rs => [{ ...form, id }, ...rs]);
+      setRows(rs => [{ ...form, id: `r-${Date.now()}` }, ...rs]);
       toast({ title: "Receita criada", description: form.nome });
     }
-    setOpen(false);
+    close();
   };
 
   const remove = () => {
@@ -207,150 +169,88 @@ export default function ConfigurarReceitas() {
   };
 
   return (
-    <div className="p-6 lg:p-8 max-w-7xl mx-auto space-y-6 animate-fade-in">
+    <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6 animate-fade-in">
       {/* Header */}
-      <div className="flex items-start justify-between gap-4 flex-wrap">
-        <div className="flex items-start gap-3">
-          <Button variant="ghost" size="icon" className="rounded-lg" onClick={() => navigate("/financas/dashboard")}>
-            <ArrowLeft className="w-4 h-4" />
-          </Button>
-          <div>
-            <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-              <Settings2 className="w-6 h-6 text-primary" /> Configurador Financeiro
-            </h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              Defina propinas, matrículas, emolumentos, taxas, candidaturas e multas. Cada item pode ser geral ou específico de um curso de qualquer faculdade.
-            </p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="gap-2 rounded-lg"
-            onClick={() => toast({ title: "Exportado", description: "Tabela de receitas a descarregar..." })}>
-            <Download className="w-4 h-4" /> Exportar
-          </Button>
-          <Button size="sm" className="gap-2 rounded-lg" onClick={openNew}>
-            <Plus className="w-4 h-4" /> Nova Receita
-          </Button>
+      <div className="flex items-start gap-3">
+        <Button variant="ghost" size="icon" className="rounded-lg" onClick={() => navigate("/financas/dashboard")}>
+          <ArrowLeft className="w-4 h-4" />
+        </Button>
+        <div>
+          <h1 className="text-2xl font-bold text-foreground tracking-tight flex items-center gap-2">
+            <Settings2 className="w-6 h-6 text-primary" /> Configurador Financeiro
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
+            Gere as propinas, matrículas, emolumentos, serviços, candidaturas e multas cobrados pela instituição.
+          </p>
         </div>
       </div>
 
-      {/* KPIs */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        {[
-          { label: "Total de receitas", value: totals.total },
-          { label: "Receitas gerais", value: totals.gerais },
-          { label: "Por curso", value: totals.porCurso },
-          { label: "Cursos abrangidos", value: totals.cursosAbrangidos },
-        ].map(k => (
-          <div key={k.label} className="rounded-xl border border-border bg-card p-4">
-            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">{k.label}</p>
-            <p className="text-xl font-bold text-foreground mt-1">{k.value}</p>
-          </div>
-        ))}
-      </div>
+      {/* Sections */}
+      {SECTIONS.map(section => {
+        const items = bySection[section.key];
+        const Icon = section.icon;
+        return (
+          <Card key={section.key} className="p-5">
+            <div className="flex items-center justify-between mb-4 gap-4 flex-wrap">
+              <div className="flex items-center gap-2 min-w-0">
+                <Icon className={cn("w-4 h-4", section.accent)} />
+                <h2 className="text-sm font-semibold text-foreground">{section.title}</h2>
+                <span className="text-[11px] text-muted-foreground tabular-nums">· {items.length}</span>
+                <span className="text-xs text-muted-foreground truncate hidden md:inline">— {section.description}</span>
+              </div>
+              <Button size="sm" variant="outline" className="gap-1.5 h-8 text-xs" onClick={() => openNew(section)}>
+                <Plus className="w-3.5 h-3.5" /> Novo
+              </Button>
+            </div>
 
-      {/* Controls */}
-      <div className="rounded-xl border border-border bg-card p-4 flex flex-wrap items-center gap-3">
-        <div className="relative flex-1 min-w-[220px]">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder="Pesquisar por nome, tipo ou curso..."
-            className="pl-9 h-9 rounded-lg"
-          />
-        </div>
-        <div className="flex items-center gap-1 bg-muted/50 rounded-lg p-1">
-          {[
-            { id: "todos", label: "Todos" },
-            { id: "propina", label: "Propina" },
-            { id: "emolumentos", label: "Emolumentos" },
-            { id: "candidatura", label: "Candidatura" },
-            { id: "multas", label: "Multas" },
-          ].map(t => (
-            <button
-              key={t.id}
-              onClick={() => setTipoFilter(t.id)}
-              className={`px-3 h-7 rounded-md text-xs font-medium transition-colors ${
-                tipoFilter === t.id
-                  ? "bg-card text-foreground shadow-sm border border-border"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {t.label}
-            </button>
-          ))}
-        </div>
-        <Select value={escopoFilter} onValueChange={setEscopoFilter}>
-          <SelectTrigger className="w-[180px] h-9 rounded-lg"><SelectValue placeholder="Âmbito" /></SelectTrigger>
-          <SelectContent>
-            <SelectItem value="todos">Todos os âmbitos</SelectItem>
-            <SelectItem value="geral">Apenas Gerais</SelectItem>
-            <SelectItem value="curso">Apenas por Curso</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* Table */}
-      <div className="rounded-xl border border-border bg-card overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-muted/30 hover:bg-muted/30">
-              <TableHead className="text-xs font-semibold">Nome</TableHead>
-              <TableHead className="text-xs font-semibold w-[170px]">Tipo</TableHead>
-              <TableHead className="text-xs font-semibold">Aplica-se a</TableHead>
-              <TableHead className="text-xs font-semibold text-right w-[160px]">Valor</TableHead>
-              <TableHead className="text-xs font-semibold text-right w-[110px]">Acções</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filtered.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={5} className="text-center text-sm text-muted-foreground py-10">
-                  Sem receitas para os filtros seleccionados.
-                </TableCell>
-              </TableRow>
-            ) : filtered.map(r => (
-              <TableRow key={r.id} className="hover:bg-muted/30">
-                <TableCell className="text-sm font-medium text-foreground">{r.nome}</TableCell>
-                <TableCell>
-                  <Badge className={`text-[10px] border ${tipoBadge[r.tipo]}`}>{r.tipo}</Badge>
-                </TableCell>
-                <TableCell className="text-xs text-muted-foreground">
-                  {r.escopo === "geral" ? (
-                    <span className="text-foreground">Geral — todos os cursos</span>
-                  ) : courseLabel(r.escopo)}
-                </TableCell>
-                <TableCell className="text-sm font-semibold text-foreground text-right whitespace-nowrap">
-                  {formatCurrency(r.valor)}
-                </TableCell>
-                <TableCell className="text-right">
-                  <div className="flex items-center justify-end gap-1">
-                    <Button variant="ghost" size="icon" className="h-7 w-7 rounded-lg" onClick={() => openEdit(r)}>
-                      <Pencil className="w-3.5 h-3.5" />
-                    </Button>
-                    <Button variant="ghost" size="icon" className="h-7 w-7 rounded-lg text-destructive hover:text-destructive"
-                      onClick={() => setConfirmDel(r)}>
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </Button>
+            {items.length === 0 ? (
+              <p className="text-xs text-muted-foreground italic py-3">Sem itens configurados.</p>
+            ) : (
+              <div className="divide-y divide-border">
+                {items.map(r => (
+                  <div key={r.id} className="flex items-center gap-3 py-2.5 group">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-foreground truncate">{r.nome}</p>
+                      <div className="flex items-center gap-1.5 mt-0.5">
+                        <span className={cn("inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] font-medium", tipoChip[r.tipo])}>
+                          {r.tipo}
+                        </span>
+                        <span className="text-[11px] text-muted-foreground truncate">{courseLabel(r.escopo)}</span>
+                      </div>
+                    </div>
+                    <span className="text-sm font-semibold text-foreground tabular-nums whitespace-nowrap">
+                      {formatCurrency(r.valor)}
+                    </span>
+                    <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md" onClick={() => openEdit(section, r)}>
+                        <Pencil className="w-3.5 h-3.5" />
+                      </Button>
+                      <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md text-destructive hover:text-destructive"
+                        onClick={() => setConfirmDel(r)}>
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </Button>
+                    </div>
                   </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+                ))}
+              </div>
+            )}
+          </Card>
+        );
+      })}
 
       {/* Edit / Create dialog */}
-      <Dialog open={open} onOpenChange={setOpen}>
+      <Dialog open={!!openSection} onOpenChange={(o) => !o && close()}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>{editing ? "Editar Receita" : "Nova Receita"}</DialogTitle>
+            <DialogTitle>
+              {editing ? "Editar item" : `Novo item — ${openSection?.title ?? ""}`}
+            </DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
+          <div className="space-y-4 py-2">
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">Nome</label>
-              <Input value={form.nome} onChange={e => setForm({ ...form, nome: e.target.value })} placeholder="Ex.: Propina mensal — Engenharia Civil" />
+              <label className="text-xs font-medium text-muted-foreground">Designação</label>
+              <Input value={form.nome} onChange={e => setForm({ ...form, nome: e.target.value })}
+                placeholder="Ex.: Propina mensal — Engenharia Civil" />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
@@ -358,7 +258,7 @@ export default function ConfigurarReceitas() {
                 <Select value={form.tipo} onValueChange={(v: TipoReceita) => setForm({ ...form, tipo: v })}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    {TIPOS.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                    {(openSection?.tipos ?? TIPOS).map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
@@ -386,9 +286,9 @@ export default function ConfigurarReceitas() {
               </Select>
             </div>
           </div>
-          <DialogFooter>
+          <DialogFooter className="gap-2 sm:gap-2">
             <DialogClose asChild><Button variant="outline">Cancelar</Button></DialogClose>
-            <Button onClick={save}>{editing ? "Guardar" : "Criar"}</Button>
+            <Button onClick={save}>{editing ? "Guardar" : "Adicionar"}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -396,18 +296,19 @@ export default function ConfigurarReceitas() {
       {/* Confirm delete */}
       <Dialog open={!!confirmDel} onOpenChange={(o) => !o && setConfirmDel(null)}>
         <DialogContent className="max-w-sm">
-          <DialogHeader>
-            <DialogTitle>Remover receita?</DialogTitle>
-          </DialogHeader>
+          <DialogHeader><DialogTitle>Remover item?</DialogTitle></DialogHeader>
           <p className="text-sm text-muted-foreground">
             {confirmDel?.nome}. Esta acção não pode ser desfeita.
           </p>
-          <DialogFooter>
+          <DialogFooter className="gap-2 sm:gap-2">
             <DialogClose asChild><Button variant="outline">Cancelar</Button></DialogClose>
             <Button variant="destructive" onClick={remove}>Remover</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Receipt icon import keeper */}
+      <span className="hidden"><Receipt /></span>
     </div>
   );
 }
