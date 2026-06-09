@@ -1,8 +1,7 @@
 import { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { candidaturas, estadoColors, estadoLabels } from "@/data/admissoesData";
@@ -12,6 +11,13 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import CandidaturaDocPreview from "./CandidaturaDocPreview";
+
+const estadoDot: Record<string, string> = {
+  pendente: "bg-amber-500",
+  aprovado: "bg-emerald-500",
+  reprovado: "bg-destructive",
+  incompleto: "bg-amber-500",
+};
 
 interface InfoRow { label: string; value: string }
 interface StepDef {
