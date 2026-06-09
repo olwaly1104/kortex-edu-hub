@@ -1,4 +1,4 @@
-import { Printer, Download, Check } from "lucide-react";
+import { Printer, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { type Candidatura, estadoLabels } from "@/data/admissoesData";
@@ -25,10 +25,6 @@ export default function CandidaturaDocPreview({
 }: Props) {
   const { toast } = useToast();
   const estadoKey = c.estado === "incompleto" ? "pendente" : c.estado;
-
-  // Group sections: identity-related sections go in the left rail summary;
-  // the rest render as main editorial blocks.
-  const mainSteps = steps;
 
   return (
     <div className="flex flex-col h-full min-h-0 bg-neutral-200/70">
@@ -60,131 +56,122 @@ export default function CandidaturaDocPreview({
           className="mx-auto bg-white shadow-md print:shadow-none flex flex-col text-neutral-900"
           style={{ width: "210mm", minHeight: "297mm", fontFamily: "'Inter', system-ui, sans-serif" }}
         >
-          {/* Hairline top accent */}
-          <div className="h-1 bg-[hsl(142_65%_26%)]" />
-
           {/* Header */}
-          <header className="px-12 pt-7 pb-5 flex items-start justify-between gap-8">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-[hsl(142_65%_26%)] text-white flex items-center justify-center text-[13px] font-bold tracking-tight">
-                U
-              </div>
-              <div>
-                <p className="text-[9px] uppercase tracking-[0.3em] text-neutral-500 font-semibold">
-                  Universidade Privada
-                </p>
-                <p className="text-[11px] font-semibold text-neutral-700 mt-0.5">
-                  Gabinete de Apoio ao Processo · GAP
-                </p>
-              </div>
+          <header className="px-10 pt-7 pb-4 border-b-2 border-neutral-900 flex items-start justify-between gap-8">
+            <div>
+              <p className="text-[9px] uppercase tracking-[0.3em] text-neutral-500 font-semibold">
+                Universidade Privada · GAP
+              </p>
+              <h1 className="text-[17px] font-bold tracking-tight mt-1.5 text-neutral-900">
+                Ficha de Candidatura
+              </h1>
             </div>
-            <div className="text-right">
-              <p className="text-[9px] uppercase tracking-[0.28em] text-neutral-500 font-semibold">Documento nº</p>
-              <p className="font-mono text-[13px] font-bold text-neutral-900 mt-0.5">{displayId}</p>
-              <p className="text-[9.5px] text-neutral-500 mt-0.5">Emitido a {fmtDataLong(new Date())}</p>
+            <div className="text-right shrink-0">
+              <p className="font-mono text-[12px] font-bold text-neutral-900">{displayId}</p>
+              <p className="text-[9.5px] text-neutral-500 mt-0.5">Emitido {fmtDataLong(new Date())}</p>
             </div>
           </header>
 
-          {/* Title block */}
-          <div className="px-12 pb-6">
-            <p className="text-[10px] uppercase tracking-[0.26em] text-[hsl(142_65%_26%)] font-bold">
-              Ficha de Candidatura · {c.periodo}
-            </p>
-            <h1 className="text-[34px] leading-[1.05] font-bold tracking-tight text-neutral-900 mt-2">
-              {c.nome}
-            </h1>
-            <div className="mt-3 flex items-center gap-3 text-[11px] text-neutral-600">
-              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[hsl(142_65%_26%)]/10 text-[hsl(142_65%_26%)] font-semibold uppercase tracking-wider text-[10px]">
-                <span className="w-1.5 h-1.5 rounded-full bg-[hsl(142_65%_26%)]" />
-                {estadoLabels[estadoKey]}
-              </span>
-              <span className="text-neutral-300">|</span>
-              <span>BI <span className="font-semibold text-neutral-800">{c.bi}</span></span>
-              <span className="text-neutral-300">|</span>
-              <span>Submetido a <span className="font-semibold text-neutral-800">{fmtDataShort(c.dataSubmissao)}</span></span>
-            </div>
-          </div>
-
-          {/* Body grid: left rail (photo + quick facts) + main */}
-          <div className="px-12 pb-6 grid grid-cols-[160px_1fr] gap-8">
-            {/* Left rail */}
-            <aside className="space-y-4">
+          {/* Identity strip: photo + main facts as a table */}
+          <div className="px-10 pt-4 pb-4 border-b border-neutral-300">
+            <div className="flex gap-4">
               <img
                 src={`https://i.pravatar.cc/240?img=${photoIdx}`}
                 alt={`Foto — ${c.nome}`}
-                className="w-[160px] h-[200px] object-cover rounded-sm border border-neutral-200 bg-neutral-100"
+                className="w-[110px] h-[140px] object-cover border border-neutral-400 bg-neutral-100 shrink-0"
               />
-              <dl className="space-y-2.5 text-[10.5px]">
-                <div>
-                  <dt className="text-[9px] uppercase tracking-[0.16em] text-neutral-500 font-semibold">Email</dt>
-                  <dd className="text-neutral-900 break-all">{c.email}</dd>
-                </div>
-                <div>
-                  <dt className="text-[9px] uppercase tracking-[0.16em] text-neutral-500 font-semibold">Telemóvel</dt>
-                  <dd className="text-neutral-900 tabular-nums">{c.telefone}</dd>
-                </div>
-                <div>
-                  <dt className="text-[9px] uppercase tracking-[0.16em] text-neutral-500 font-semibold">Documentos</dt>
-                  <dd className="text-neutral-900 font-semibold">{c.documentos.length} entregues</dd>
-                </div>
-              </dl>
-            </aside>
+              <table className="flex-1 border-collapse text-[10.5px] self-start">
+                <tbody>
+                  <tr>
+                    <Th2 className="w-28">Candidato</Th2>
+                    <Td2 className="font-bold text-[12px]">{c.nome}</Td2>
+                    <Th2 className="w-24">Estado</Th2>
+                    <Td2 className="uppercase font-bold tracking-wider text-[10px]">
+                      {estadoLabels[estadoKey]}
+                    </Td2>
+                  </tr>
+                  <tr>
+                    <Th2>BI</Th2>
+                    <Td2 className="tabular-nums">{c.bi}</Td2>
+                    <Th2>Período</Th2>
+                    <Td2>{c.periodo}</Td2>
+                  </tr>
+                  <tr>
+                    <Th2>Email</Th2>
+                    <Td2 className="break-all">{c.email}</Td2>
+                    <Th2>Telemóvel</Th2>
+                    <Td2 className="tabular-nums">{c.telefone}</Td2>
+                  </tr>
+                  <tr>
+                    <Th2>Submetido em</Th2>
+                    <Td2 className="tabular-nums">{fmtDataShort(c.dataSubmissao)}</Td2>
+                    <Th2>Documentos</Th2>
+                    <Td2 className="font-semibold">{c.documentos.length} entregues</Td2>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
 
-            {/* Main column */}
-            <main className="space-y-5 min-w-0">
-              {mainSteps.map((s, idx) => (
-                <Block key={s.n} n={idx + 1} title={s.title}>
-                  <DefinitionGrid rows={s.rows} />
-                </Block>
-              ))}
+          <div className="flex-1 px-10 py-5 space-y-4">
+            {/* Sections */}
+            {steps.map((s, idx) => (
+              <Section key={s.n} n={String(idx + 1).padStart(2, "0")} title={s.title}>
+                <XTable rows={s.rows.map(r => [r.label, r.value] as [string, string])} />
+              </Section>
+            ))}
 
-              {/* Cronologia */}
-              <Block n={mainSteps.length + 1} title="Cronologia">
-                <ol className="relative pl-4 border-l border-neutral-200 space-y-2.5">
+            {/* Cronologia */}
+            <Section n={String(steps.length + 1).padStart(2, "0")} title="Cronologia">
+              <table className="w-full border-collapse text-[10.5px]">
+                <thead>
+                  <tr className="bg-neutral-100">
+                    <Th className="w-24">Data</Th>
+                    <Th className="w-52">Acção</Th>
+                    <Th>Detalhe</Th>
+                  </tr>
+                </thead>
+                <tbody>
                   {cronologia.map((h, i) => (
-                    <li key={i} className="relative">
-                      <span className="absolute -left-[21px] top-[3px] w-3 h-3 rounded-full bg-white border-2 border-[hsl(142_65%_26%)] flex items-center justify-center">
-                        {h.done && <Check className="w-2 h-2 text-[hsl(142_65%_26%)]" strokeWidth={4} />}
-                      </span>
-                      <div className="flex items-baseline gap-3">
-                        <span className="font-mono text-[10px] text-neutral-500 tabular-nums shrink-0 w-[68px]">
-                          {fmtDataShort(h.data)}
-                        </span>
-                        <div className="min-w-0">
-                          <p className="text-[11px] font-semibold text-neutral-900 leading-snug">{h.accao}</p>
-                          <p className="text-[10px] text-neutral-500 leading-snug">{h.detalhe}</p>
-                        </div>
-                      </div>
-                    </li>
+                    <tr key={i} className={i % 2 ? "bg-neutral-50/60" : ""}>
+                      <Td className="tabular-nums text-neutral-600">{fmtDataShort(h.data)}</Td>
+                      <Td className="font-semibold">{h.accao}</Td>
+                      <Td className="text-neutral-600">{h.detalhe}</Td>
+                    </tr>
                   ))}
-                </ol>
-              </Block>
+                </tbody>
+              </table>
+            </Section>
 
-              {/* Documentos */}
-              <Block n={mainSteps.length + 2} title="Documentos entregues">
-                <ul className="grid grid-cols-2 gap-x-6 gap-y-1.5">
+            {/* Documentos */}
+            <Section n={String(steps.length + 2).padStart(2, "0")} title="Documentos Entregues">
+              <table className="w-full border-collapse text-[10.5px]">
+                <thead>
+                  <tr className="bg-neutral-100">
+                    <Th className="w-10 text-center">#</Th>
+                    <Th>Documento</Th>
+                    <Th className="w-24 text-center">Estado</Th>
+                  </tr>
+                </thead>
+                <tbody>
                   {c.documentos.map((d, i) => (
-                    <li key={i} className="flex items-center gap-2 text-[10.5px] text-neutral-800">
-                      <span className="w-3.5 h-3.5 rounded-sm bg-[hsl(142_65%_26%)]/10 text-[hsl(142_65%_26%)] flex items-center justify-center shrink-0">
-                        <Check className="w-2.5 h-2.5" strokeWidth={4} />
-                      </span>
-                      <span className="truncate">{d.nome}</span>
-                    </li>
+                    <tr key={i} className={i % 2 ? "bg-neutral-50/60" : ""}>
+                      <Td className="text-center tabular-nums text-neutral-500">{i + 1}</Td>
+                      <Td>{d.nome}</Td>
+                      <Td className="text-center font-semibold text-emerald-700">Entregue</Td>
+                    </tr>
                   ))}
-                </ul>
-              </Block>
-            </main>
+                </tbody>
+              </table>
+            </Section>
           </div>
 
           {/* Footer */}
-          <footer className="mt-auto px-12 pt-4 pb-6 border-t border-neutral-200 flex items-end justify-between gap-8">
-            <div className="text-[9px] text-neutral-500 leading-relaxed max-w-sm">
-              <p className="uppercase tracking-[0.18em] font-semibold text-neutral-600">Sobre este documento</p>
-              <p className="mt-1">
-                Ficha institucional gerada pelo GAP. Para esclarecimentos contacte{" "}
-                <span className="font-semibold text-neutral-700">gap@upra.kor</span>.
-              </p>
-            </div>
+          <footer className="px-10 pb-6 pt-3 mt-auto border-t border-neutral-300 flex items-end justify-between gap-8">
+            <p className="text-[9.5px] text-neutral-500 leading-relaxed max-w-sm">
+              Documento gerado pelo Gabinete de Apoio Académico. Contacto:{" "}
+              <span className="font-semibold text-neutral-700">gap@upra.kor</span>.
+            </p>
             <div className="text-right">
               <div className="border-t border-neutral-400 pt-1 min-w-[200px]">
                 <p className="text-[9px] uppercase tracking-[0.18em] text-neutral-500 font-semibold">
@@ -200,34 +187,94 @@ export default function CandidaturaDocPreview({
   );
 }
 
-function Block({ n, title, children }: { n: number; title: string; children: React.ReactNode }) {
+function Section({ n, title, children }: { n: string; title: string; children: React.ReactNode }) {
   return (
     <section>
-      <div className="flex items-baseline gap-3 mb-2.5 pb-1.5 border-b border-neutral-200">
-        <span className="font-mono text-[10px] font-bold text-[hsl(142_65%_26%)] tabular-nums">
-          {String(n).padStart(2, "0")}
-        </span>
-        <h3 className="text-[11px] uppercase tracking-[0.22em] font-bold text-neutral-900">{title}</h3>
+      <div className="flex items-baseline gap-3 mb-1.5">
+        <span className="font-mono text-[10px] font-bold text-neutral-400 tabular-nums">{n}</span>
+        <h3 className="text-[11px] uppercase tracking-[0.2em] font-bold text-neutral-900">{title}</h3>
       </div>
       {children}
     </section>
   );
 }
 
-function DefinitionGrid({ rows }: { rows: { label: string; value: string }[] }) {
+function Th({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
-    <dl className="grid grid-cols-2 gap-x-8 gap-y-2">
-      {rows.map((r, i) => {
-        const wide = r.value.length > 38 || r.label.length > 26;
-        return (
-          <div key={i} className={wide ? "col-span-2" : ""}>
-            <dt className="text-[9px] uppercase tracking-[0.16em] text-neutral-500 font-semibold">
-              {r.label}
-            </dt>
-            <dd className="text-[11.5px] text-neutral-900 mt-0.5 leading-snug">{r.value}</dd>
-          </div>
-        );
-      })}
-    </dl>
+    <th
+      className={`border border-neutral-400 px-3 py-1.5 text-left text-[10px] uppercase tracking-wider font-semibold text-neutral-700 bg-neutral-100 ${className}`}
+    >
+      {children}
+    </th>
+  );
+}
+
+function Td({ children, className = "", colSpan }: { children: React.ReactNode; className?: string; colSpan?: number }) {
+  return <td colSpan={colSpan} className={`border border-neutral-300 px-2.5 py-1 align-top ${className}`}>{children}</td>;
+}
+
+/** Identity-strip cells (no zebra) */
+function Th2({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  return (
+    <th
+      className={`border border-neutral-400 px-2.5 py-1 text-left text-[9.5px] uppercase tracking-wider font-semibold text-neutral-600 bg-neutral-100 align-middle ${className}`}
+    >
+      {children}
+    </th>
+  );
+}
+function Td2({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  return <td className={`border border-neutral-300 px-2.5 py-1 align-middle text-neutral-900 ${className}`}>{children}</td>;
+}
+
+function XTable({ rows }: { rows: [string, string][] }) {
+  type Cell = { k: string; v: string; full: boolean };
+  const FORCE_FULL = new Set(["Encarregado"]);
+  const cells: Cell[] = rows.map(([k, v]) => ({ k, v, full: v.length > 32 || k.length > 26 || FORCE_FULL.has(k) }));
+  const lines: Cell[][] = [];
+  let buf: Cell[] = [];
+  for (const c of cells) {
+    if (c.full) {
+      if (buf.length) { lines.push(buf); buf = []; }
+      lines.push([c]);
+    } else {
+      buf.push(c);
+      if (buf.length === 2) { lines.push(buf); buf = []; }
+    }
+  }
+  if (buf.length) lines.push(buf);
+
+  const labelCls =
+    "w-[22%] bg-neutral-100 font-semibold text-neutral-700 text-[9.5px] uppercase tracking-wider border-neutral-400";
+
+  return (
+    <table className="w-full border-collapse text-[10.5px] table-fixed">
+      <tbody>
+        {lines.map((line, i) => (
+          <tr key={i}>
+            {line.length === 1 && line[0].full ? (
+              <>
+                <Td className={labelCls}>{line[0].k}</Td>
+                <Td colSpan={3}>{line[0].v}</Td>
+              </>
+            ) : line.length === 2 ? (
+              <>
+                <Td className={labelCls}>{line[0].k}</Td>
+                <Td>{line[0].v}</Td>
+                <Td className={labelCls}>{line[1].k}</Td>
+                <Td>{line[1].v}</Td>
+              </>
+            ) : (
+              <>
+                <Td className={labelCls}>{line[0].k}</Td>
+                <Td>{line[0].v}</Td>
+                <Td className={labelCls + " opacity-0"}>&nbsp;</Td>
+                <Td>&nbsp;</Td>
+              </>
+            )}
+          </tr>
+        ))}
+      </tbody>
+    </table>
   );
 }
