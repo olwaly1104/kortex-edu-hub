@@ -56,51 +56,42 @@ export default function CandidaturaDocPreview({
           className="mx-auto bg-white shadow-md print:shadow-none flex flex-col text-neutral-900"
           style={{ width: "210mm", minHeight: "297mm", fontFamily: "'Inter', system-ui, sans-serif" }}
         >
-          {/* Header */}
-          <header className="px-10 pt-7 pb-4 border-b-2 border-neutral-900 flex items-start justify-between gap-8">
-            <div>
-              <p className="text-[9px] uppercase tracking-[0.3em] text-neutral-500 font-semibold">
-                Universidade Privada · GAP
-              </p>
-              <h1 className="text-[17px] font-bold tracking-tight mt-1.5 text-neutral-900">
-                Ficha de Candidatura
-              </h1>
+          {/* Header — photo + name + estado */}
+          <header className="px-10 pt-7 pb-5 border-b-2 border-neutral-900">
+            <div className="flex items-start justify-between gap-6 mb-4">
+              <div>
+                <p className="text-[9px] uppercase tracking-[0.3em] text-neutral-500 font-semibold">
+                  Universidade Privada · GAP
+                </p>
+                <h1 className="text-[17px] font-bold tracking-tight mt-1.5 text-neutral-900">
+                  Ficha de Candidatura
+                </h1>
+              </div>
+              <div className="text-right shrink-0">
+                <p className="font-mono text-[12px] font-bold text-neutral-900">{displayId}</p>
+                <p className="text-[9.5px] text-neutral-500 mt-0.5">Emitido {fmtDataLong(new Date())}</p>
+              </div>
             </div>
-            <div className="text-right shrink-0">
-              <p className="font-mono text-[12px] font-bold text-neutral-900">{displayId}</p>
-              <p className="text-[9.5px] text-neutral-500 mt-0.5">Emitido {fmtDataLong(new Date())}</p>
-            </div>
-          </header>
 
-          {/* Identity strip: photo + main facts as a table */}
-          <div className="px-10 pt-4 pb-4 border-b border-neutral-300">
-            <div className="flex gap-4">
+            <div className="flex gap-4 items-stretch">
               <img
                 src={`https://i.pravatar.cc/240?img=${photoIdx}`}
                 alt={`Foto — ${c.nome}`}
-                className="w-[110px] h-[140px] object-cover border border-neutral-400 bg-neutral-100 shrink-0"
+                className="w-[96px] h-[120px] object-cover border border-neutral-400 bg-neutral-100 shrink-0"
               />
-              <table className="flex-1 border-collapse text-[10.5px] self-start">
+              <table className="flex-1 border-collapse text-[10.5px]">
                 <tbody>
                   <tr>
                     <Th2 className="w-28">Candidato</Th2>
-                    <Td2 className="font-bold text-[12px]">{c.nome}</Td2>
-                    <Th2 className="w-24">Estado</Th2>
-                    <Td2 className="uppercase font-bold tracking-wider text-[10px]">
-                      {estadoLabels[estadoKey]}
-                    </Td2>
+                    <Td2 className="font-bold text-[12px]" colSpan={3}>{c.nome}</Td2>
                   </tr>
                   <tr>
                     <Th2>BI</Th2>
                     <Td2 className="tabular-nums">{c.bi}</Td2>
-                    <Th2>Período</Th2>
-                    <Td2>{c.periodo}</Td2>
-                  </tr>
-                  <tr>
-                    <Th2>Email</Th2>
-                    <Td2 className="break-all">{c.email}</Td2>
-                    <Th2>Telemóvel</Th2>
-                    <Td2 className="tabular-nums">{c.telefone}</Td2>
+                    <Th2 className="w-28">Estado</Th2>
+                    <Td2 className="uppercase font-bold tracking-wider text-[10px]">
+                      {estadoLabels[estadoKey]}
+                    </Td2>
                   </tr>
                   <tr>
                     <Th2>Submetido em</Th2>
@@ -111,7 +102,8 @@ export default function CandidaturaDocPreview({
                 </tbody>
               </table>
             </div>
-          </div>
+          </header>
+
 
           <div className="flex-1 px-10 py-5 space-y-4">
             {/* Sections */}
@@ -223,8 +215,8 @@ function Th2({ children, className = "" }: { children: React.ReactNode; classNam
     </th>
   );
 }
-function Td2({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  return <td className={`border border-neutral-300 px-2.5 py-1 align-middle text-neutral-900 ${className}`}>{children}</td>;
+function Td2({ children, className = "", colSpan }: { children: React.ReactNode; className?: string; colSpan?: number }) {
+  return <td colSpan={colSpan} className={`border border-neutral-300 px-2.5 py-1 align-middle text-neutral-900 ${className}`}>{children}</td>;
 }
 
 function XTable({ rows }: { rows: [string, string][] }) {
