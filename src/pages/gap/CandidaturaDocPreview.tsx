@@ -53,7 +53,7 @@ export default function CandidaturaDocPreview({
   return (
     <div className="flex flex-col h-full min-h-0 bg-neutral-200/70">
       {/* Toolbar */}
-      <div className="flex items-center justify-between px-5 py-2.5 border-b border-border bg-gradient-to-b from-background to-muted/30 shrink-0 print:hidden">
+      <div className="flex items-center gap-4 px-5 py-2.5 border-b border-border bg-gradient-to-b from-background to-muted/30 shrink-0 print:hidden">
         <div className="flex items-center gap-2.5">
           <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-background border border-border shadow-sm">
             <span className="w-1.5 h-1.5 rounded-full bg-primary" />
