@@ -159,6 +159,7 @@ export default function CandidaturaDocPreview({
                   </ul>
                 </div>
               </div>
+            </div>
           </header>
 
           <div className="flex-1 px-10 py-5 space-y-4">
