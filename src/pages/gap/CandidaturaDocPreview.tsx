@@ -53,7 +53,7 @@ export default function CandidaturaDocPreview({
   return (
     <div className="flex flex-col h-full min-h-0 bg-neutral-200/70">
       {/* Toolbar */}
-      <div className="flex items-center justify-between shrink-0 print:hidden bg-gradient-to-b from-background to-muted/30 pl-5 pr-14 py-2 border-b border-border gap-3">
+      <div className="relative flex items-center shrink-0 print:hidden bg-gradient-to-b from-background to-muted/30 pl-5 pr-14 py-2 border-b border-border">
         <div className="flex items-center gap-2.5 min-w-0">
           <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-background border border-border shadow-sm">
             <span className="w-1.5 h-1.5 rounded-full bg-primary" />
@@ -61,7 +61,9 @@ export default function CandidaturaDocPreview({
           </div>
           <span className="text-[11px] text-muted-foreground truncate">Ficha de Candidatura</span>
         </div>
-        <div className="flex items-center gap-2 shrink-0">
+        {/* Buttons aligned to the right edge of the A4 document (210mm centered) */}
+        <div className="pointer-events-none absolute inset-y-0 left-1/2 -translate-x-1/2 w-[210mm] max-w-[calc(100%-2rem)] flex items-center justify-end">
+          <div className="pointer-events-auto flex items-center gap-2">
           {/* Shared with — uniform with Solicitações */}
           <Dialog>
             <DialogTrigger asChild>
@@ -118,6 +120,7 @@ export default function CandidaturaDocPreview({
           >
             <Download className="w-3.5 h-3.5" /> Descarregar
           </button>
+          </div>
         </div>
       </div>
 
