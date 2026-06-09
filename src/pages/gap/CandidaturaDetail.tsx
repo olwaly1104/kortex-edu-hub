@@ -286,14 +286,16 @@ export default function GapCandidaturaDetail() {
             <FileText className="w-4 h-4" /> Documentos ({docsEntregues})
           </h3>
         </div>
-        <div className="divide-y divide-border border-b border-border">
+        <div className="p-5 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
           {c.documentos.map((d, i) => (
-            <div key={i} className="flex items-center justify-between px-6 py-3">
-              <div className="flex items-center gap-3">
-                <CheckCircle2 className="w-4 h-4 text-green-600" />
-                <span className="text-sm text-foreground">{d.nome}</span>
+            <div key={i} className="flex flex-col items-center justify-center gap-2 p-3 rounded-lg border border-border bg-muted/20 text-center">
+              <div className="w-9 h-9 rounded-md flex items-center justify-center bg-green-50 border border-green-200">
+                <FileText className="w-4 h-4 text-green-600" />
               </div>
-              <Badge variant="outline" className="text-[10px] bg-green-50 text-green-600 border-green-200">Entregue</Badge>
+              <p className="text-[11px] font-medium text-foreground leading-tight">{d.nome}</p>
+              <div className="flex items-center gap-1 text-[10px] font-medium text-green-600">
+                <Check className="w-3 h-3" /> Entregue
+              </div>
             </div>
           ))}
         </div>
@@ -304,31 +306,20 @@ export default function GapCandidaturaDetail() {
             <Clock className="w-4 h-4" /> Linha do Tempo
           </h3>
         </div>
-        <div className="px-6 py-5">
-          <div className="relative pl-8 space-y-4">
+        <div className="p-5">
+          <div className="flex items-stretch gap-2">
             {cronologia.map((h, i) => (
-              <div key={i} className="relative">
+              <div key={i} className="flex-1 flex flex-col items-center gap-2 text-center">
                 <div className={cn(
-                  "absolute -left-8 top-0 w-5 h-5 rounded-full flex items-center justify-center border-2 border-background",
-                  h.done ? "bg-green-600 text-white" : "bg-muted text-muted-foreground border-border"
+                  "w-8 h-8 rounded-md flex items-center justify-center border-2",
+                  h.done
+                    ? "bg-green-600 border-green-600 text-white"
+                    : "bg-background border-muted-foreground/30 text-muted-foreground"
                 )}>
-                  {h.done
-                    ? <CheckCircle2 className="w-3 h-3" strokeWidth={3} />
-                    : <span className="w-2 h-2 rounded-full bg-muted-foreground/40" />}
+                  {h.done ? <Check className="w-4 h-4" strokeWidth={3} /> : <span className="w-2 h-2 rounded-sm bg-muted-foreground/30" />}
                 </div>
-                {i < cronologia.length - 1 && <div className="absolute -left-[22px] top-5 w-px h-[calc(100%+0.5rem)] bg-border" />}
-                <div>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <p className={cn("text-sm font-semibold", h.done ? "text-foreground" : "text-muted-foreground")}>{h.accao}</p>
-                    <span className="text-xs text-muted-foreground tabular-nums">
-                      {new Date(h.data).toLocaleDateString("pt-AO")}
-                    </span>
-                    {!h.done && (
-                      <Badge variant="outline" className="text-[9px] uppercase tracking-wider px-1.5 py-0">Pendente</Badge>
-                    )}
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-0.5">{h.detalhe}</p>
-                </div>
+                <p className={cn("text-[11px] font-semibold leading-tight", h.done ? "text-foreground" : "text-muted-foreground")}>{h.accao}</p>
+                <p className="text-[10px] text-muted-foreground tabular-nums">{new Date(h.data).toLocaleDateString("pt-AO")}</p>
               </div>
             ))}
           </div>
