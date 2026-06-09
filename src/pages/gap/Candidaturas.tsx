@@ -14,8 +14,14 @@ export default function GapCandidaturas() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<StatusFilter>("todas");
 
+  // Sem candidaturas incompletas — qualquer estado "incompleto" é tratado como "pendente"
+  const normalized = useMemo(
+    () => candidaturas.map(c => (c.estado === "incompleto" ? { ...c, estado: "pendente" as const } : c)),
+    [],
+  );
+
   const filtered = useMemo(() => {
-    return candidaturas
+    return normalized
       .filter(c => {
         if (status !== "todas" && c.estado !== status) return false;
         if (!search) return true;
@@ -23,22 +29,22 @@ export default function GapCandidaturas() {
         return c.nome.toLowerCase().includes(s) || c.bi.includes(search) || c.cursoOpcao1.toLowerCase().includes(s);
       })
       .sort((a, b) => new Date(b.dataSubmissao).getTime() - new Date(a.dataSubmissao).getTime());
-  }, [search, status]);
+  }, [normalized, search, status]);
 
   const kpis = {
-    total: candidaturas.length,
-    pendentes: candidaturas.filter(c => c.estado === "pendente").length,
-    aprovados: candidaturas.filter(c => c.estado === "aprovado").length,
-    incompletos: candidaturas.filter(c => c.estado === "incompleto").length,
+    total: normalized.length,
+    pendentes: normalized.filter(c => c.estado === "pendente").length,
+    aprovados: normalized.filter(c => c.estado === "aprovado").length,
+    reprovados: normalized.filter(c => c.estado === "reprovado").length,
   };
 
   const filters: { key: StatusFilter; label: string }[] = [
     { key: "todas", label: "Todas" },
-    { key: "incompleto", label: "Incompleto" },
     { key: "pendente", label: "Pendente" },
     { key: "aprovado", label: "Aprovado" },
     { key: "reprovado", label: "Reprovado" },
   ];
+
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
@@ -54,7 +60,7 @@ export default function GapCandidaturas() {
           { label: "Candidaturas", value: kpis.total, icon: ClipboardList, iconBg: "bg-primary/10 text-primary" },
           { label: "Pendentes", value: kpis.pendentes, icon: Clock, iconBg: "bg-yellow-50 text-yellow-600" },
           { label: "Aprovados", value: kpis.aprovados, icon: CheckCircle, iconBg: "bg-green-50 text-green-600" },
-          { label: "Incompletos", value: kpis.incompletos, icon: AlertCircle, iconBg: "bg-orange-50 text-orange-600" },
+          { label: "Reprovados", value: kpis.reprovados, icon: AlertCircle, iconBg: "bg-red-50 text-red-600" },
         ].map(k => (
           <Card key={k.label} className="p-4 hover:shadow-sm transition-shadow">
             <div className="flex items-center justify-between">
