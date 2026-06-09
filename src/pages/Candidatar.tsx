@@ -29,7 +29,7 @@ const ENTREVISTA_LOCAL = "Sala de Entrevistas — Campus UPRA";
 const ENTREVISTA_SLOTS = ["09:00","09:30","10:00","10:30","11:00","11:30","14:00","14:30","15:00","15:30","16:00","16:30"];
 const formatLongDate = (d: Date) => d.toLocaleDateString("pt-PT", { weekday: "long", day: "2-digit", month: "long", year: "numeric" });
 const PARENTESCO = ["Pai", "Mãe", "Tutor(a)", "Avô/Avó", "Outro"];
-const EXAME_SESSOES = [
+const CURSO_SESSOES = [
   { id: "ep1", label: "1ª Sessão", data: "2026-07-18", hora: "09:00", local: "Anfiteatro A — Campus UPRA" },
   { id: "ep2", label: "2ª Sessão", data: "2026-08-22", hora: "09:00", local: "Anfiteatro A — Campus UPRA" },
 ];
@@ -49,7 +49,7 @@ interface FormState {
   escola: string; anoConclusao: string;
   fac1: string; curso1: string; fac2: string; curso2: string; fac3: string; curso3: string;
   entrevistaData: string; entrevistaHora: string;
-  examePreparatorio: "" | "sim" | "nao"; examePrepSessao: string;
+  cursoPreparatorio: "" | "sim" | "nao"; cursoPrepSessao: string;
   motivacao: string; confirmar: boolean; docAutenticos: boolean;
 }
 const empty: FormState = {
@@ -60,7 +60,7 @@ const empty: FormState = {
   escola: "", anoConclusao: "",
   fac1: "", curso1: "", fac2: "", curso2: "", fac3: "", curso3: "",
   entrevistaData: "", entrevistaHora: "",
-  examePreparatorio: "", examePrepSessao: "",
+  cursoPreparatorio: "", cursoPrepSessao: "",
   motivacao: "", confirmar: false, docAutenticos: false,
 };
 
@@ -81,7 +81,7 @@ const STEPS = [
   { n: 3, title: "Formação",            sub: "Histórico do ensino secundário",         icon: GraduationCap },
   { n: 4, title: "Curso",               sub: "Faculdades e cursos por ordem de escolha", icon: BookOpen },
   { n: 5, title: "Entrevista",          sub: "Marcação da data de entrevista",         icon: CalendarDays },
-  { n: 6, title: "Exame Preparatório",  sub: "Opcional — escolha da sessão",           icon: ClipboardCheck },
+  { n: 6, title: "Curso Preparatório",  sub: "Opcional — escolha da sessão",           icon: ClipboardCheck },
   { n: 7, title: "Revisão",             sub: "Confirmar e submeter",                   icon: Check },
 ] as const;
 
@@ -895,7 +895,7 @@ export default function Candidatar() {
             {step === 6 && (
               <div className="space-y-5">
                 <p className="text-[12.5px] text-muted-foreground">
-                  O exame preparatório é <span className="font-semibold text-foreground">opcional</span> e ajuda na preparação para a entrevista de admissão. Indique se pretende realizar.
+                  O curso preparatório é <span className="font-semibold text-foreground">opcional</span> e ajuda na preparação para a entrevista de admissão. Indique se pretende realizar.
                 </p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -903,14 +903,14 @@ export default function Candidatar() {
                     { v: "sim", t: "Sim, quero realizar", d: "Escolho uma das sessões disponíveis abaixo." },
                     { v: "nao", t: "Não, obrigado", d: "Prefiro avançar directamente para a entrevista." },
                   ] as const).map(opt => {
-                    const active = form.examePreparatorio === opt.v;
+                    const active = form.cursoPreparatorio === opt.v;
                     return (
                       <button
                         key={opt.v}
                         type="button"
                         onClick={() => {
-                          update("examePreparatorio", opt.v);
-                          if (opt.v === "nao") update("examePrepSessao", "");
+                          update("cursoPreparatorio", opt.v);
+                          if (opt.v === "nao") update("cursoPrepSessao", "");
                         }}
                         className={cn(
                           "text-left rounded-xl border px-4 py-3.5 transition-all",
@@ -934,18 +934,18 @@ export default function Candidatar() {
                   })}
                 </div>
 
-                {form.examePreparatorio === "sim" && (
+                {form.cursoPreparatorio === "sim" && (
                   <section className="space-y-3 border-t border-border pt-5">
                     <p className="text-[10.5px] uppercase tracking-[0.12em] text-muted-foreground font-semibold">Escolha a sessão</p>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      {EXAME_SESSOES.map(s => {
-                        const active = form.examePrepSessao === s.id;
+                      {CURSO_SESSOES.map(s => {
+                        const active = form.cursoPrepSessao === s.id;
                         const d = new Date(s.data + "T00:00:00");
                         return (
                           <button
                             key={s.id}
                             type="button"
-                            onClick={() => update("examePrepSessao", s.id)}
+                            onClick={() => update("cursoPrepSessao", s.id)}
                             className={cn(
                               "text-left rounded-xl border p-4 transition-all",
                               active
@@ -1013,10 +1013,10 @@ export default function Candidatar() {
                       ["Local", ENTREVISTA_LOCAL],
                     ];
                   })()} />
-                  <ReviewBlock title="Exame Preparatório" stepN={6} onEdit={goTo} rows={(() => {
-                    if (form.examePreparatorio === "nao") return [["Realizar", "Não"]];
-                    if (form.examePreparatorio !== "sim") return [["Realizar", "—"]];
-                    const s = EXAME_SESSOES.find(x => x.id === form.examePrepSessao);
+                  <ReviewBlock title="Curso Preparatório" stepN={6} onEdit={goTo} rows={(() => {
+                    if (form.cursoPreparatorio === "nao") return [["Realizar", "Não"]];
+                    if (form.cursoPreparatorio !== "sim") return [["Realizar", "—"]];
+                    const s = CURSO_SESSOES.find(x => x.id === form.cursoPrepSessao);
                     if (!s) return [["Realizar", "Sim"], ["Sessão", "Por escolher"]];
                     const d = new Date(s.data + "T00:00:00");
                     return [["Realizar", "Sim"], ["Sessão", s.label], ["Data", formatLongDate(d)], ["Hora", s.hora], ["Local", s.local]];
