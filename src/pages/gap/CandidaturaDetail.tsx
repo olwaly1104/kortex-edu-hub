@@ -275,15 +275,6 @@ export default function GapCandidaturaDetail() {
               <h4 className="text-[11px] font-semibold uppercase tracking-wider text-foreground flex items-center gap-1.5">
                 <Clock className="w-3.5 h-3.5" /> Etapas da Candidatura
               </h4>
-              <div className="flex items-center gap-2">
-                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-background border border-border">
-                  <span className={cn("w-1.5 h-1.5 rounded-full", estadoDot[estadoFinal])} />
-                  <span className="text-[10px] font-medium text-foreground">{estadoLabels[estadoFinal]}</span>
-                </span>
-                <span className="text-[10px] tabular-nums text-muted-foreground font-medium">
-                  {cronologia.filter(h => h.done).length}/{cronologia.length}
-                </span>
-              </div>
             </div>
             <ul className="divide-y divide-border">
               {cronologia.map((h, i) => (
