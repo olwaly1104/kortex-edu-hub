@@ -131,7 +131,7 @@ export default function CandidaturaDocPreview({
             </Section>
 
             {/* Documentos */}
-            <Section n={String(steps.length + 2).padStart(2, "0")} title="Documentos Entregues">
+            <Section title="Documentos Entregues">
               <table className="w-full border-collapse text-[10.5px]">
                 <thead>
                   <tr className="bg-neutral-100">
