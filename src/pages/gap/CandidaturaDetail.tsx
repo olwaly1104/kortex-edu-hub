@@ -108,14 +108,15 @@ function buildSteps(c: typeof candidaturas[number]): StepDef[] {
 
 function buildCronologia(c: typeof candidaturas[number]) {
   const sub = new Date(c.dataSubmissao);
+  const today = new Date();
   const entrevista = new Date(sub.getTime() + 12 * 86400000);
   const cursoPrep = new Date(sub.getTime() + 35 * 86400000);
   const exame = new Date(sub.getTime() + 60 * 86400000);
   return [
-    { data: sub.toISOString(), accao: "Candidatura submetida", detalhe: "Formulário online preenchido pelo candidato" },
-    { data: entrevista.toISOString(), accao: "Entrevista", detalhe: "Realizada — Sala de Entrevistas, Campus UPRA" },
-    { data: cursoPrep.toISOString(), accao: "Curso Preparatório", detalhe: "Inscrito — 1ª Sessão (Anfiteatro A)" },
-    { data: exame.toISOString(), accao: "Exame de Acesso", detalhe: "Marcado — Edifício Central, Sala 04" },
+    { data: sub.toISOString(), accao: "Candidatura submetida", detalhe: "Formulário online preenchido pelo candidato", done: sub <= today },
+    { data: entrevista.toISOString(), accao: "Entrevista", detalhe: "Realizada — Sala de Entrevistas, Campus UPRA", done: entrevista <= today },
+    { data: cursoPrep.toISOString(), accao: "Curso Preparatório", detalhe: "Inscrito — 1ª Sessão (Anfiteatro A)", done: cursoPrep <= today },
+    { data: exame.toISOString(), accao: "Exame de Acesso", detalhe: "Marcado — Edifício Central, Sala 04", done: exame <= today },
   ];
 }
 
@@ -162,20 +163,15 @@ export default function GapCandidaturaDetail() {
         </div>
 
         {/* Title block — photo + name + badges + doc pill */}
-        <div className="px-6 pt-4 pb-4">
-          <div className="flex items-start gap-3 rounded-lg border border-border bg-background p-3">
-            {/* Photo tipo passe */}
+        <div className="px-6 pt-4 pb-4 border-b border-border">
+          <div className="flex items-start gap-3">
             <img
               src={`https://i.pravatar.cc/120?img=${photoIdx}`}
               alt={`Foto tipo passe — ${c.nome}`}
               className="shrink-0 w-[60px] h-[78px] rounded-md object-cover border border-border bg-muted"
             />
-
-            {/* Name + badges */}
             <div className="min-w-0 flex-1">
-              <h1 className="text-xl font-semibold leading-tight tracking-tight text-foreground">
-                {c.nome}
-              </h1>
+              <h1 className="text-xl font-semibold leading-tight tracking-tight text-foreground">{c.nome}</h1>
               <p className="text-[12px] text-muted-foreground mt-0.5">
                 Candidatura submetida em {dSub.toLocaleDateString("pt-PT", { day: "2-digit", month: "long", year: "numeric" })}
               </p>
@@ -190,8 +186,6 @@ export default function GapCandidaturaDetail() {
                 </Badge>
               </div>
             </div>
-
-            {/* Right — ID + Doc pill */}
             <div className="shrink-0 flex flex-col items-end gap-1.5">
               <button
                 type="button"
@@ -206,9 +200,7 @@ export default function GapCandidaturaDetail() {
                 </div>
                 <div className="flex flex-col min-w-0 leading-tight">
                   <span className="text-[11px] font-semibold text-foreground tabular-nums">{displayId}</span>
-                  <span className="text-[9px] tracking-[0.02em] text-muted-foreground font-medium">
-                    Gerado automaticamente
-                  </span>
+                  <span className="text-[9px] tracking-[0.02em] text-muted-foreground font-medium">Gerado automaticamente</span>
                 </div>
                 <span className="self-stretch w-px bg-border mx-0.5" />
                 <Dialog>
@@ -237,23 +229,18 @@ export default function GapCandidaturaDetail() {
             </div>
           </div>
         </div>
-      </Card>
 
-
-      {/* Etapas — clicáveis, expandem para mostrar info (EM CIMA) */}
-      <Card className="overflow-hidden">
-        <div className="p-4 border-b bg-muted/30 flex items-center justify-between">
+        {/* Etapas */}
+        <div className="px-6 py-4 border-b border-border bg-muted/30 flex items-center justify-between">
           <h3 className="text-sm font-semibold text-foreground">Etapas do Processo de Candidatura</h3>
           <div className="flex items-center gap-3">
             <div className="w-32 h-1.5 bg-muted rounded-full overflow-hidden">
               <div className="h-full bg-green-600" style={{ width: "100%" }} />
             </div>
-            <span className="text-xs font-medium text-foreground tabular-nums">
-              {steps.length}/{steps.length}
-            </span>
+            <span className="text-xs font-medium text-foreground tabular-nums">{steps.length}/{steps.length}</span>
           </div>
         </div>
-        <div className="divide-y divide-border">
+        <div className="divide-y divide-border border-b border-border">
           {steps.map(s => {
             const Icon = s.icon;
             const open = openStep === s.n;
@@ -261,7 +248,7 @@ export default function GapCandidaturaDetail() {
               <div key={s.n}>
                 <button
                   onClick={() => setOpenStep(open ? null : s.n)}
-                  className="w-full flex items-center gap-4 px-5 py-3.5 hover:bg-muted/40 transition-colors text-left"
+                  className="w-full flex items-center gap-4 px-6 py-3.5 hover:bg-muted/40 transition-colors text-left"
                 >
                   <div className="w-8 h-8 rounded-full bg-green-50 text-green-600 flex items-center justify-center shrink-0">
                     <CheckCircle2 className="w-4 h-4" />
@@ -273,13 +260,11 @@ export default function GapCandidaturaDetail() {
                     </div>
                     <p className="text-[11px] text-muted-foreground mt-0.5">{s.sub}</p>
                   </div>
-                  <Badge variant="outline" className="text-[10px] bg-green-50 text-green-600 border-green-200">
-                    Completo
-                  </Badge>
+                  <Badge variant="outline" className="text-[10px] bg-green-50 text-green-600 border-green-200">Completo</Badge>
                   <ChevronDown className={cn("w-4 h-4 text-muted-foreground transition-transform", open && "rotate-180")} />
                 </button>
                 {open && (
-                  <div className="px-5 pb-5 pt-1 bg-muted/20">
+                  <div className="px-6 pb-5 pt-1 bg-muted/20">
                     <div className="grid sm:grid-cols-2 gap-x-6 gap-y-3 pl-12">
                       {s.rows.map((r, i) => (
                         <div key={i}>
@@ -294,60 +279,61 @@ export default function GapCandidaturaDetail() {
             );
           })}
         </div>
-      </Card>
 
-      {/* Documentos + Linha do Tempo — agora EM BAIXO */}
-      <div className="grid lg:grid-cols-2 gap-6">
         {/* Documentos */}
-        <Card className="overflow-hidden">
-          <div className="p-4 border-b bg-muted/30">
-            <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
-              <FileText className="w-4 h-4" /> Documentos ({docsEntregues})
-            </h3>
-          </div>
-          <div className="divide-y divide-border">
-            {c.documentos.map((d, i) => (
-              <div key={i} className="flex items-center justify-between px-5 py-3">
-                <div className="flex items-center gap-3">
-                  <CheckCircle2 className="w-4 h-4 text-green-600" />
-                  <span className="text-sm text-foreground">{d.nome}</span>
+        <div className="px-6 py-4 border-b border-border bg-muted/30">
+          <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+            <FileText className="w-4 h-4" /> Documentos ({docsEntregues})
+          </h3>
+        </div>
+        <div className="divide-y divide-border border-b border-border">
+          {c.documentos.map((d, i) => (
+            <div key={i} className="flex items-center justify-between px-6 py-3">
+              <div className="flex items-center gap-3">
+                <CheckCircle2 className="w-4 h-4 text-green-600" />
+                <span className="text-sm text-foreground">{d.nome}</span>
+              </div>
+              <Badge variant="outline" className="text-[10px] bg-green-50 text-green-600 border-green-200">Entregue</Badge>
+            </div>
+          ))}
+        </div>
+
+        {/* Linha do Tempo */}
+        <div className="px-6 py-4 border-b border-border bg-muted/30">
+          <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+            <Clock className="w-4 h-4" /> Linha do Tempo
+          </h3>
+        </div>
+        <div className="px-6 py-5">
+          <div className="relative pl-8 space-y-4">
+            {cronologia.map((h, i) => (
+              <div key={i} className="relative">
+                <div className={cn(
+                  "absolute -left-8 top-0 w-5 h-5 rounded-full flex items-center justify-center border-2 border-background",
+                  h.done ? "bg-green-600 text-white" : "bg-muted text-muted-foreground border-border"
+                )}>
+                  {h.done
+                    ? <CheckCircle2 className="w-3 h-3" strokeWidth={3} />
+                    : <span className="w-2 h-2 rounded-full bg-muted-foreground/40" />}
                 </div>
-                <Badge variant="outline" className="text-[10px] bg-green-50 text-green-600 border-green-200">
-                  Entregue
-                </Badge>
+                {i < cronologia.length - 1 && <div className="absolute -left-[22px] top-5 w-px h-[calc(100%+0.5rem)] bg-border" />}
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <p className={cn("text-sm font-semibold", h.done ? "text-foreground" : "text-muted-foreground")}>{h.accao}</p>
+                    <span className="text-xs text-muted-foreground tabular-nums">
+                      {new Date(h.data).toLocaleDateString("pt-AO")}
+                    </span>
+                    {!h.done && (
+                      <Badge variant="outline" className="text-[9px] uppercase tracking-wider px-1.5 py-0">Pendente</Badge>
+                    )}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-0.5">{h.detalhe}</p>
+                </div>
               </div>
             ))}
           </div>
-        </Card>
-
-        {/* Cronologia */}
-        <Card className="overflow-hidden">
-          <div className="p-4 border-b bg-muted/30">
-            <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
-              <Clock className="w-4 h-4" /> Linha do Tempo
-            </h3>
-          </div>
-          <div className="p-5">
-            <div className="relative pl-6 space-y-4">
-              {cronologia.map((h, i) => (
-                <div key={i} className="relative">
-                  <div className="absolute -left-6 top-1 w-3 h-3 rounded-full bg-primary border-2 border-background" />
-                  {i < cronologia.length - 1 && <div className="absolute -left-[18px] top-4 w-px h-full bg-border" />}
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <p className="text-sm font-semibold text-foreground">{h.accao}</p>
-                      <span className="text-xs text-muted-foreground tabular-nums">
-                        {new Date(h.data).toLocaleDateString("pt-AO")}
-                      </span>
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-0.5">{h.detalhe}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </Card>
-      </div>
+        </div>
+      </Card>
     </div>
   );
 }
