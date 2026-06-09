@@ -893,67 +893,86 @@ export default function Candidatar() {
             })()}
 
             {step === 6 && (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between flex-wrap gap-2">
-                  <p className="text-[12.5px] text-muted-foreground">
-                    Anexe os documentos abaixo. Formatos aceites: PDF, JPG, PNG · máx. 5MB cada.
-                  </p>
-                  <Badge variant="outline" className="text-[11px]">{docsCount}/{academicDocs.length} anexados</Badge>
-                </div>
-                <div className="space-y-2.5">
-                  {academicDocs.map(d => {
-                    const file = docs[d.key];
+              <div className="space-y-5">
+                <p className="text-[12.5px] text-muted-foreground">
+                  O exame preparatório é <span className="font-semibold text-foreground">opcional</span> e ajuda na preparação para a entrevista de admissão. Indique se pretende realizar.
+                </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {([
+                    { v: "sim", t: "Sim, quero realizar", d: "Escolho uma das sessões disponíveis abaixo." },
+                    { v: "nao", t: "Não, obrigado", d: "Prefiro avançar directamente para a entrevista." },
+                  ] as const).map(opt => {
+                    const active = form.examePreparatorio === opt.v;
                     return (
-                      <div key={d.key} className={cn(
-                        "rounded-xl border transition-colors",
-                        file ? "border-accent/40 bg-accent/5" : "border-border bg-card hover:border-primary/30"
-                      )}>
-                        <input
-                          ref={el => (fileRefs.current[d.key] = el)}
-                          type="file"
-                          className="hidden"
-                          accept=".pdf,.jpg,.jpeg,.png"
-                          onChange={e => onFile(d.key, e.target.files?.[0])}
-                        />
-                        <div className="flex items-center gap-3 p-3.5">
+                      <button
+                        key={opt.v}
+                        type="button"
+                        onClick={() => {
+                          update("examePreparatorio", opt.v);
+                          if (opt.v === "nao") update("examePrepSessao", "");
+                        }}
+                        className={cn(
+                          "text-left rounded-xl border px-4 py-3.5 transition-all",
+                          active
+                            ? "border-primary bg-primary/5 ring-1 ring-primary/30"
+                            : "border-border bg-card hover:border-primary/40 hover:bg-muted/40"
+                        )}
+                      >
+                        <div className="flex items-center gap-2.5 mb-1">
                           <div className={cn(
-                            "w-10 h-10 rounded-lg flex items-center justify-center shrink-0",
-                            file ? "bg-accent text-accent-foreground" : "bg-muted text-muted-foreground"
+                            "w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0",
+                            active ? "border-primary bg-primary" : "border-border bg-background"
                           )}>
-                            {file ? <Check className="w-5 h-5" /> : <FileText className="w-5 h-5" />}
+                            {active && <span className="w-1.5 h-1.5 rounded-full bg-primary-foreground" />}
                           </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold text-foreground leading-tight">{d.label}</p>
-                            {file ? (
-                              <p className="text-[11.5px] text-foreground/70 mt-0.5 flex items-center gap-1.5 truncate">
-                                <Paperclip className="w-3 h-3 shrink-0" />
-                                <span className="truncate">{file.name}</span>
-                                <span className="text-muted-foreground">· {fmtSize(file.size)}</span>
-                              </p>
-                            ) : (
-                              <p className="text-[11.5px] text-muted-foreground mt-0.5">{d.desc}</p>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-1 shrink-0">
-                            {file && (
-                              <Button variant="ghost" size="sm" onClick={() => removeDoc(d.key)} className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive">
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </Button>
-                            )}
-                            <Button
-                              variant={file ? "outline" : "default"}
-                              size="sm"
-                              onClick={() => fileRefs.current[d.key]?.click()}
-                              className="h-8 gap-1.5 text-[12px]"
-                            >
-                              <Upload className="w-3.5 h-3.5" /> {file ? "Substituir" : "Anexar"}
-                            </Button>
-                          </div>
+                          <p className={cn("text-[13px] font-semibold leading-tight", active ? "text-primary" : "text-foreground")}>{opt.t}</p>
                         </div>
-                      </div>
+                        <p className="text-[11.5px] text-muted-foreground pl-[26px]">{opt.d}</p>
+                      </button>
                     );
                   })}
                 </div>
+
+                {form.examePreparatorio === "sim" && (
+                  <section className="space-y-3 border-t border-border pt-5">
+                    <p className="text-[10.5px] uppercase tracking-[0.12em] text-muted-foreground font-semibold">Escolha a sessão</p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {EXAME_SESSOES.map(s => {
+                        const active = form.examePrepSessao === s.id;
+                        const d = new Date(s.data + "T00:00:00");
+                        return (
+                          <button
+                            key={s.id}
+                            type="button"
+                            onClick={() => update("examePrepSessao", s.id)}
+                            className={cn(
+                              "text-left rounded-xl border p-4 transition-all",
+                              active
+                                ? "border-primary bg-primary/5 ring-1 ring-primary/30"
+                                : "border-border bg-card hover:border-primary/40 hover:bg-muted/40"
+                            )}
+                          >
+                            <div className="flex items-start justify-between gap-2 mb-2">
+                              <Badge variant="outline" className={cn("text-[10.5px]", active && "border-primary/40 text-primary bg-primary/5")}>{s.label}</Badge>
+                              <ClipboardCheck className={cn("w-4 h-4 shrink-0", active ? "text-primary" : "text-muted-foreground")} />
+                            </div>
+                            <p className={cn("text-[13.5px] font-semibold capitalize leading-tight", active ? "text-primary" : "text-foreground")}>
+                              {formatLongDate(d)}
+                            </p>
+                            <div className="mt-2 space-y-1 text-[11.5px] text-foreground/70">
+                              <p className="flex items-center gap-1.5"><Clock className="w-3 h-3 text-muted-foreground" /> {s.hora}</p>
+                              <p className="flex items-center gap-1.5"><MapPinned className="w-3 h-3 text-muted-foreground" /> {s.local}</p>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <p className="text-[11px] text-muted-foreground">
+                      A presença na sessão escolhida é obrigatória. Será notificado por email com os detalhes.
+                    </p>
+                  </section>
+                )}
               </div>
             )}
 
