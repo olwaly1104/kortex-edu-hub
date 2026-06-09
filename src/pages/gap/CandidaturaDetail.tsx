@@ -128,7 +128,7 @@ export default function GapCandidaturaDetail() {
 
   if (!c) return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
-      <Button variant="ghost" onClick={() => navigate(-1)} className="gap-2"><ArrowLeft className="w-4 h-4" /> Voltar</Button>
+      <button onClick={() => navigate(-1)} className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"><ArrowLeft className="w-4 h-4" /> Voltar</button>
       <p className="text-muted-foreground text-center py-12">Candidatura não encontrada.</p>
     </div>
   );
