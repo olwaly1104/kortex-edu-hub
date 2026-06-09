@@ -983,6 +983,7 @@ export default function Candidatar() {
                     ["Nome", `${form.primeiroNome} ${form.ultimoNome}`.trim()],
                     ["Nascimento", form.nascimento], ["Género", form.genero],
                     ["Nacionalidade", form.nacionalidade],
+                    ["Foto", docs.foto ? "✓ Anexada" : "Pendente"],
                   ]} />
                   <ReviewBlock title="Morada & Contactos" stepN={2} onEdit={goTo} rows={[
                     ["Província", form.provincia], ["Município", form.municipio],
@@ -990,6 +991,7 @@ export default function Candidatar() {
                     ["Email", form.email], ["Telemóvel", form.telemovel],
                     ["Encarregado", form.encNome],
                     ["Parentesco", form.encParentesco],
+                    ["Profissão", form.encProfissao],
                     ["Tel. encarregado", form.encTelefone],
                   ]} />
                   <ReviewBlock title="Formação" stepN={3} onEdit={goTo} rows={[
@@ -1011,7 +1013,14 @@ export default function Candidatar() {
                       ["Local", ENTREVISTA_LOCAL],
                     ];
                   })()} />
-                  <ReviewBlock title="Documentos" stepN={6} onEdit={goTo} rows={DOCS.map(d => [d.label, docs[d.key] ? "✓ Anexado" : "Pendente"])} />
+                  <ReviewBlock title="Exame Preparatório" stepN={6} onEdit={goTo} rows={(() => {
+                    if (form.examePreparatorio === "nao") return [["Realizar", "Não"]];
+                    if (form.examePreparatorio !== "sim") return [["Realizar", "—"]];
+                    const s = EXAME_SESSOES.find(x => x.id === form.examePrepSessao);
+                    if (!s) return [["Realizar", "Sim"], ["Sessão", "Por escolher"]];
+                    const d = new Date(s.data + "T00:00:00");
+                    return [["Realizar", "Sim"], ["Sessão", s.label], ["Data", formatLongDate(d)], ["Hora", s.hora], ["Local", s.local]];
+                  })()} />
                 </div>
 
 
