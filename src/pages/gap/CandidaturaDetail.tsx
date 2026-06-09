@@ -223,8 +223,8 @@ export default function GapCandidaturaDetail() {
         </div>
 
         {/* Documentos + Linha do Tempo — lado a lado, verticais */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-5 border-b border-border bg-muted/10">
-          <div className="border border-border rounded-md bg-background overflow-hidden">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 p-5 border-b border-border bg-muted/10">
+          <div className="md:col-span-2 border border-border rounded-md bg-background overflow-hidden">
             <div className="px-3 py-2 bg-muted/40 border-b border-border flex items-center justify-between">
               <h4 className="text-[11px] font-semibold uppercase tracking-wider text-foreground flex items-center gap-1.5">
                 <FileText className="w-3.5 h-3.5" /> Documentos
@@ -242,14 +242,20 @@ export default function GapCandidaturaDetail() {
               ))}
             </ul>
           </div>
-          <div className="border border-border rounded-md bg-background overflow-hidden">
+          <div className="md:col-span-3 border border-border rounded-md bg-background overflow-hidden">
             <div className="px-3 py-2 bg-muted/40 border-b border-border flex items-center justify-between">
               <h4 className="text-[11px] font-semibold uppercase tracking-wider text-foreground flex items-center gap-1.5">
                 <Clock className="w-3.5 h-3.5" /> Etapas da Candidatura
               </h4>
-              <span className="text-[10px] tabular-nums text-muted-foreground font-medium">
-                {cronologia.filter(h => h.done).length}/{cronologia.length}
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-background border border-border">
+                  <span className={cn("w-1.5 h-1.5 rounded-full", estadoDot[estadoFinal])} />
+                  <span className="text-[10px] font-medium text-foreground">{estadoLabels[estadoFinal]}</span>
+                </span>
+                <span className="text-[10px] tabular-nums text-muted-foreground font-medium">
+                  {cronologia.filter(h => h.done).length}/{cronologia.length}
+                </span>
+              </div>
             </div>
             <ul className="divide-y divide-border">
               {cronologia.map((h, i) => (
