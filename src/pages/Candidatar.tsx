@@ -546,6 +546,60 @@ export default function Candidatar() {
                     </div>
                   </section>
 
+                  {/* Foto tipo passe */}
+                  <section className="space-y-3 border-t border-border pt-5">
+                    <div className="flex items-center justify-between flex-wrap gap-2">
+                      <p className="text-[10.5px] uppercase tracking-[0.12em] text-muted-foreground font-semibold">Foto tipo passe</p>
+                      <p className="text-[10.5px] text-muted-foreground">Fundo branco · 35×45mm · JPG ou PNG</p>
+                    </div>
+                    {(() => {
+                      const f = docs["foto"];
+                      return (
+                        <div className="flex items-start gap-4">
+                          <div
+                            onClick={() => fileRefs.current["foto"]?.click()}
+                            className={cn(
+                              "w-[110px] h-[140px] rounded-lg border-2 border-dashed flex items-center justify-center cursor-pointer shrink-0 overflow-hidden transition-colors",
+                              f ? "border-emerald-500/50 bg-emerald-500/5" : "border-border bg-muted/30 hover:border-primary/40 hover:bg-muted/50"
+                            )}
+                          >
+                            {f
+                              ? <Check className="w-7 h-7 text-emerald-600" strokeWidth={2.5} />
+                              : <Camera className="w-7 h-7 text-muted-foreground" />}
+                          </div>
+                          <input
+                            ref={el => (fileRefs.current["foto"] = el)}
+                            type="file"
+                            className="hidden"
+                            accept=".jpg,.jpeg,.png"
+                            onChange={e => onFile("foto", e.target.files?.[0])}
+                          />
+                          <div className="flex-1 min-w-0 space-y-2">
+                            <p className="text-[12.5px] font-semibold text-foreground">Fotografia recente do candidato</p>
+                            <p className="text-[11.5px] text-muted-foreground leading-snug">
+                              Rosto centrado, expressão neutra, fundo branco uniforme. Sem óculos escuros, chapéu ou filtros.
+                            </p>
+                            {f ? (
+                              <div className="flex items-center gap-1.5 text-[11px] text-foreground/70">
+                                <Paperclip className="w-3 h-3" /><span className="truncate">{f.name}</span>
+                                <span className="text-muted-foreground">· {fmtSize(f.size)}</span>
+                              </div>
+                            ) : null}
+                            <div className="flex items-center gap-1.5 pt-1">
+                              {f && (
+                                <Button variant="ghost" size="sm" onClick={() => removeDoc("foto")} className="h-7 text-[11.5px] text-muted-foreground hover:text-destructive gap-1">
+                                  <Trash2 className="w-3.5 h-3.5" /> Remover
+                                </Button>
+                              )}
+                              <Button variant={f ? "outline" : "default"} size="sm" onClick={() => fileRefs.current["foto"]?.click()} className="h-7 gap-1.5 text-[11.5px]">
+                                <Upload className="w-3.5 h-3.5" /> {f ? "Substituir foto" : "Upload foto"}
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })()}
+                  </section>
                 </div>
               );
             })()}
