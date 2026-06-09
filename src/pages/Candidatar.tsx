@@ -14,7 +14,7 @@ import { Calendar } from "@/components/ui/calendar";
 import {
   ArrowLeft, ArrowRight, Check, User, MapPin,
   BookOpen, FileText, Upload, CheckCircle2, Send, Mail, Trash2, Paperclip, GraduationCap,
-  CalendarDays, Clock, MapPinned,
+  CalendarDays, Clock, MapPinned, Camera, ClipboardCheck,
 } from "lucide-react";
 import logoUpra from "@/assets/logo-upra.asset.json";
 
@@ -29,15 +29,15 @@ const ENTREVISTA_LOCAL = "Sala de Entrevistas — Campus UPRA";
 const ENTREVISTA_SLOTS = ["09:00","09:30","10:00","10:30","11:00","11:30","14:00","14:30","15:00","15:30","16:00","16:30"];
 const formatLongDate = (d: Date) => d.toLocaleDateString("pt-PT", { weekday: "long", day: "2-digit", month: "long", year: "numeric" });
 const PARENTESCO = ["Pai", "Mãe", "Tutor(a)", "Avô/Avó", "Outro"];
+const EXAME_SESSOES = [
+  { id: "ep1", label: "1ª Sessão", data: "2026-07-18", hora: "09:00", local: "Anfiteatro A — Campus UPRA" },
+  { id: "ep2", label: "2ª Sessão", data: "2026-08-22", hora: "09:00", local: "Anfiteatro A — Campus UPRA" },
+];
 const NACIONALIDADES = [
   "Angolana", "Portuguesa", "Brasileira", "Cabo-verdiana", "Moçambicana", "São-tomense",
   "Guineense", "Sul-africana", "Namíbia", "Congolesa (RDC)", "Congolesa (Rep.)", "Nigeriana",
   "Queniana", "Zimbabuana", "Camaronesa", "Marfinense", "Senegalesa", "Espanhola", "Francesa",
   "Italiana", "Alemã", "Britânica", "Norte-americana", "Canadiana", "Chinesa", "Indiana", "Cubana", "Outra",
-];
-const DOCS = [
-  { key: "bi", label: "Bilhete de Identidade", desc: "Frente e verso · PDF ou JPG" },
-  { key: "foto", label: "Foto tipo passe", desc: "Fundo branco, formato 35×45mm" },
 ];
 
 type DocTipo = "bi" | "passaporte" | "residencia";
@@ -45,20 +45,22 @@ interface FormState {
   primeiroNome: string; ultimoNome: string; nascimento: string; genero: string; nacionalidade: string;
   docTipo: DocTipo;
   email: string; telemovel: string; provincia: string; municipio: string; endereco: string;
-  encNome: string; encParentesco: string; encTelefone: string;
+  encNome: string; encParentesco: string; encProfissao: string; encTelefone: string;
   escola: string; anoConclusao: string;
   fac1: string; curso1: string; fac2: string; curso2: string; fac3: string; curso3: string;
   entrevistaData: string; entrevistaHora: string;
+  examePreparatorio: "" | "sim" | "nao"; examePrepSessao: string;
   motivacao: string; confirmar: boolean; docAutenticos: boolean;
 }
 const empty: FormState = {
   primeiroNome: "", ultimoNome: "", nascimento: "", genero: "", nacionalidade: "Angolana",
   docTipo: "bi",
   email: "", telemovel: "", provincia: "", municipio: "", endereco: "",
-  encNome: "", encParentesco: "", encTelefone: "",
+  encNome: "", encParentesco: "", encProfissao: "", encTelefone: "",
   escola: "", anoConclusao: "",
   fac1: "", curso1: "", fac2: "", curso2: "", fac3: "", curso3: "",
   entrevistaData: "", entrevistaHora: "",
+  examePreparatorio: "", examePrepSessao: "",
   motivacao: "", confirmar: false, docAutenticos: false,
 };
 
@@ -74,18 +76,18 @@ const DOC_TIPO_DESC: Record<DocTipo, string> = {
 };
 
 const STEPS = [
-  { n: 1, title: "Dados pessoais",     sub: "Identificação e documento",          icon: User },
-  { n: 2, title: "Morada & Contactos", sub: "Endereço, contactos e encarregado",  icon: MapPin },
-  { n: 3, title: "Formação",           sub: "Histórico do ensino secundário",     icon: GraduationCap },
-  { n: 4, title: "Curso",              sub: "Faculdades e cursos por ordem de escolha", icon: BookOpen },
-  { n: 5, title: "Entrevista",         sub: "Marcação da data de entrevista",     icon: CalendarDays },
-  { n: 6, title: "Documentos",         sub: "Anexos académicos obrigatórios",     icon: FileText },
-  { n: 7, title: "Revisão",            sub: "Confirmar e submeter",               icon: Check },
+  { n: 1, title: "Dados pessoais",      sub: "Identificação, documento e foto",        icon: User },
+  { n: 2, title: "Morada & Contactos",  sub: "Endereço, contactos e encarregado",      icon: MapPin },
+  { n: 3, title: "Formação",            sub: "Histórico do ensino secundário",         icon: GraduationCap },
+  { n: 4, title: "Curso",               sub: "Faculdades e cursos por ordem de escolha", icon: BookOpen },
+  { n: 5, title: "Entrevista",          sub: "Marcação da data de entrevista",         icon: CalendarDays },
+  { n: 6, title: "Exame Preparatório",  sub: "Opcional — escolha da sessão",           icon: ClipboardCheck },
+  { n: 7, title: "Revisão",             sub: "Confirmar e submeter",                   icon: Check },
 ] as const;
 
 const STEP_FIELDS: Record<number, (keyof FormState)[]> = {
   1: ["primeiroNome","ultimoNome","nascimento","genero","nacionalidade"],
-  2: ["provincia","municipio","email","telemovel","encNome","encParentesco","encTelefone"],
+  2: ["provincia","municipio","email","telemovel","encNome","encParentesco","encProfissao","encTelefone"],
   3: ["escola","anoConclusao"],
   4: ["fac1","curso1"],
   5: ["entrevistaData","entrevistaHora"],
