@@ -24,9 +24,9 @@ const FACULDADES: Record<string, string[]> = {
 };
 const PROVINCIAS = ["Luanda", "Benguela", "Huíla", "Huambo", "Cabinda", "Cuanza Sul", "Malanje", "Uíge"];
 const SESSOES_INFO = [
-  { id: "1ª Sessão", data: "15 de Julho de 2026", hora: "09:00", sala: "Anfiteatro A — Campus UPRA" },
-  { id: "2ª Sessão", data: "12 de Agosto de 2026", hora: "09:00", sala: "Anfiteatro B — Campus UPRA" },
-  { id: "3ª Sessão", data: "09 de Setembro de 2026", hora: "14:00", sala: "Sala Magna — Campus UPRA" },
+  { id: "1ª Data", data: "15 de Julho de 2026", hora: "09:00", sala: "Sala de Entrevistas 1 — Campus UPRA" },
+  { id: "2ª Data", data: "12 de Agosto de 2026", hora: "09:00", sala: "Sala de Entrevistas 2 — Campus UPRA" },
+  { id: "3ª Data", data: "09 de Setembro de 2026", hora: "14:00", sala: "Sala de Entrevistas 3 — Campus UPRA" },
 ];
 const PARENTESCO = ["Pai", "Mãe", "Tutor(a)", "Avô/Avó", "Outro"];
 const NACIONALIDADES = [
@@ -78,7 +78,7 @@ const STEPS = [
   { n: 2, title: "Morada & Contactos", sub: "Endereço, contactos e encarregado",  icon: MapPin },
   { n: 3, title: "Formação",           sub: "Histórico do ensino secundário",     icon: GraduationCap },
   { n: 4, title: "Curso",              sub: "Faculdades e cursos por ordem de escolha", icon: BookOpen },
-  { n: 5, title: "Prova de Acesso",    sub: "Marcação da sessão de provas",       icon: CalendarDays },
+  { n: 5, title: "Entrevista",         sub: "Marcação da data de entrevista",     icon: CalendarDays },
   { n: 6, title: "Documentos",         sub: "Anexos académicos obrigatórios",     icon: FileText },
   { n: 7, title: "Revisão",            sub: "Confirmar e submeter",               icon: Check },
 ] as const;
@@ -780,7 +780,7 @@ export default function Candidatar() {
                   })}
                 </div>
                 <p className="text-[11px] text-muted-foreground">
-                  A presença é obrigatória. Receberá a convocatória oficial por email após validação da candidatura.
+                  A presença é obrigatória. Receberá a confirmação oficial por email após validação da candidatura.
                 </p>
               </div>
             )}
@@ -876,11 +876,11 @@ export default function Candidatar() {
                     ["2ª escolha", form.fac2 ? `${form.fac2} — ${form.curso2 || "—"}` : "—"],
                     ["3ª escolha", form.fac3 ? `${form.fac3} — ${form.curso3 || "—"}` : "—"],
                   ]} />
-                  <ReviewBlock title="Prova de Acesso" stepN={5} onEdit={goTo} rows={(() => {
+                  <ReviewBlock title="Entrevista" stepN={5} onEdit={goTo} rows={(() => {
                     const s = SESSOES_INFO.find(x => x.id === form.sessao);
                     return s
-                      ? [["Sessão", s.id], ["Data", s.data], ["Hora", s.hora], ["Local", s.sala]]
-                      : [["Sessão", "—"]];
+                      ? [["Data", s.id], ["Quando", s.data], ["Hora", s.hora], ["Local", s.sala]]
+                      : [["Data", "—"]];
                   })()} />
                   <ReviewBlock title="Documentos" stepN={6} onEdit={goTo} rows={DOCS.map(d => [d.label, docs[d.key] ? "✓ Anexado" : "Pendente"])} />
                 </div>
