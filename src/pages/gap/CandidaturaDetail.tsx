@@ -182,6 +182,17 @@ export default function GapCandidaturaDetail() {
               >
                 {displayId}
               </button>
+              <div className="inline-flex items-center gap-2 pl-1.5 pr-2 py-1 rounded-md border border-border bg-background shadow-sm">
+                <div className="w-6 h-6 rounded bg-blue-50 border border-blue-200 flex items-center justify-center shrink-0">
+                  <Clock className="w-3 h-3 text-blue-600" />
+                </div>
+                <div className="flex flex-col min-w-0 leading-tight">
+                  <span className="text-[11px] font-semibold text-foreground tabular-nums">
+                    {dSub.toLocaleDateString("pt-PT", { day: "2-digit", month: "2-digit", year: "numeric" })}
+                  </span>
+                  <span className="text-[9px] tracking-[0.02em] text-muted-foreground font-medium">Data de submissão</span>
+                </div>
+              </div>
               <div className="inline-flex items-center gap-2 pl-1.5 pr-1 py-1 rounded-md border border-border bg-background shadow-sm">
                 <div className="w-6 h-6 rounded bg-red-50 border border-red-200 flex items-center justify-center shrink-0">
                   <FileText className="w-3 h-3 text-red-600" />
