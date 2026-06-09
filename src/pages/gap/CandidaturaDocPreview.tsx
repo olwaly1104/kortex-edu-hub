@@ -120,6 +120,7 @@ export default function CandidaturaDocPreview({
           >
             <Download className="w-3.5 h-3.5" /> Descarregar
           </button>
+          </div>
         </div>
       </div>
 
