@@ -148,26 +148,24 @@ export default function CandidaturaDocPreview({
               </Section>
             ))}
 
-            {/* Documentos */}
-            <Section title="Documentos">
+            {/* Cronologia */}
+            <Section title="Cronologia">
               <table className="w-full border-collapse text-[10.5px]">
                 <thead>
                   <tr className="bg-neutral-100">
                     <Th className="w-16">Nº</Th>
-                    <Th>Documento</Th>
-                    <Th className="w-32">Estado</Th>
+                    <Th className="w-28">Data</Th>
+                    <Th>Acção</Th>
+                    <Th>Detalhe</Th>
                   </tr>
                 </thead>
                 <tbody>
-                  {c.documentos.map((d, i) => (
+                  {cronologia.map((h, i) => (
                     <tr key={i} className={i % 2 ? "bg-neutral-50/60" : ""}>
                       <Td className="tabular-nums text-neutral-600 text-center">{i + 1}</Td>
-                      <Td className="font-semibold">{d.nome}</Td>
-                      <Td>
-                        <span className="inline-flex items-center gap-1.5 text-emerald-700 font-semibold">
-                          <span className="leading-none">✓</span> Entregue
-                        </span>
-                      </Td>
+                      <Td className="tabular-nums">{fmtDataShort(h.data)}</Td>
+                      <Td className="font-semibold">{h.accao}</Td>
+                      <Td className="text-neutral-700">{h.detalhe}</Td>
                     </tr>
                   ))}
                 </tbody>
