@@ -58,7 +58,7 @@ const empty: FormState = {
   encNome: "", encParentesco: "", encTelefone: "",
   escola: "", anoConclusao: "",
   fac1: "", curso1: "", fac2: "", curso2: "", fac3: "", curso3: "",
-  sessao: "",
+  entrevistaData: "", entrevistaHora: "",
   motivacao: "", confirmar: false, docAutenticos: false,
 };
 
