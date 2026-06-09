@@ -138,10 +138,20 @@ export default function ConfigurarReceitas() {
 
   const [confirmDel, setConfirmDel] = useState<ReceitaRow | null>(null);
 
+  const CATEGORIAS: Record<string, TipoReceita[]> = {
+    propina: ["Propina mensal", "Matrícula"],
+    emolumentos: ["Emolumento", "Taxa", "Serviço Académico"],
+    candidatura: ["Candidatura"],
+    multas: ["Multa"],
+  };
+
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     return rows.filter(r => {
-      if (tipoFilter !== "todos" && r.tipo !== tipoFilter) return false;
+      if (tipoFilter !== "todos") {
+        const tipos = CATEGORIAS[tipoFilter];
+        if (!tipos || !tipos.includes(r.tipo)) return false;
+      }
       if (escopoFilter === "geral" && r.escopo !== "geral") return false;
       if (escopoFilter === "curso" && r.escopo === "geral") return false;
       if (!q) return true;
