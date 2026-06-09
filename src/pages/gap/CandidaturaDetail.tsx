@@ -66,6 +66,7 @@ function buildSteps(c: typeof candidaturas[number]): StepDef[] {
       rows: [
         { label: "Escola de origem", value: "Instituto Médio Politécnico de Luanda" },
         { label: "Ano de conclusão", value: "2025" },
+        { label: "Média final", value: "15,4 valores" },
         { label: "Declaração de finalização", value: "Entregue" },
         { label: "Certificado de habilitações", value: "Entregue" },
       ],
