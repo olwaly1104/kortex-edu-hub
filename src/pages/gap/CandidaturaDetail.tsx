@@ -139,62 +139,62 @@ export default function GapCandidaturaDetail() {
         <ArrowLeft className="w-4 h-4" /> Voltar
       </Button>
 
-      {/* Header limpo */}
+      {/* Header — perfil + estado + documento institucional */}
       <Card className="p-6">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center text-lg font-bold text-primary">
-              {c.nome.split(" ").map(n => n[0]).slice(0, 2).join("")}
-            </div>
-            <div>
-              <h1 className="text-xl font-bold text-foreground">{c.nome}</h1>
-              <p className="text-sm text-muted-foreground mt-0.5">Candidatura submetida em {new Date(c.dataSubmissao).toLocaleDateString("pt-AO")}</p>
+        <div className="flex items-start justify-between gap-6 flex-wrap">
+          <div className="flex items-center gap-4 min-w-0">
+            <img
+              src={`https://i.pravatar.cc/120?img=${(parseInt(c.id.replace(/\D/g, ""), 10) % 70) + 1}`}
+              alt={`Foto tipo passe — ${c.nome}`}
+              className="w-16 h-20 rounded-md object-cover border border-border shadow-sm shrink-0 bg-muted"
+            />
+            <div className="min-w-0">
+              <h1 className="text-xl font-bold text-foreground leading-tight">{c.nome}</h1>
+              <p className="text-sm text-muted-foreground mt-1">
+                Candidatura submetida em {new Date(c.dataSubmissao).toLocaleDateString("pt-AO")}
+              </p>
+              <div className="mt-2">
+                <Badge className={`border-0 ${estadoColors[estadoFinal]}`}>{estadoLabels[estadoFinal]}</Badge>
+              </div>
             </div>
           </div>
-          <Badge className={`border-0 ${estadoColors[estadoFinal]}`}>{estadoLabels[estadoFinal]}</Badge>
+
+          <div className="flex items-center gap-3 ml-auto">
+            <div className="flex items-center gap-2.5 pr-3 border-r border-border">
+              <div className="w-9 h-9 rounded-lg bg-red-50 text-red-600 flex items-center justify-center shrink-0">
+                <FileText className="w-4 h-4" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs font-semibold text-foreground leading-tight">Relatório de Candidatura</p>
+                <p className="text-[11px] text-muted-foreground mt-0.5 font-mono">Cand-{c.id}.pdf</p>
+              </div>
+            </div>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs">
+                  <Eye className="w-3.5 h-3.5" /> Ver
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-5xl w-[95vw] h-[92vh] p-0 gap-0 overflow-hidden">
+                <DialogHeader className="sr-only">
+                  <DialogTitle>Documento Cand-{c.id}</DialogTitle>
+                  <DialogDescription>Pré-visualização do documento institucional gerado.</DialogDescription>
+                </DialogHeader>
+                <CandidaturaDocPreview candidatura={c} steps={steps} cronologia={cronologia} />
+              </DialogContent>
+            </Dialog>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 gap-1.5 text-xs"
+              onClick={() => toast({ title: "Documento exportado", description: `Cand-${c.id}.pdf` })}
+            >
+              <Download className="w-3.5 h-3.5" /> Descarregar
+            </Button>
+          </div>
         </div>
       </Card>
 
-      {/* Documento da Candidatura — em destaque, click para ver/descarregar */}
-      <Card className="p-4 flex items-center justify-between gap-4">
-        <div className="flex items-center gap-3 min-w-0">
-          <div className="w-10 h-10 rounded-lg bg-red-50 text-red-600 flex items-center justify-center shrink-0">
-            <FileText className="w-5 h-5" />
-          </div>
-          <div className="min-w-0">
-            <p className="text-sm font-semibold text-foreground leading-tight truncate">
-              Relatório de Candidatura · Cand-{c.id}.pdf
-            </p>
-            <p className="text-[11px] text-muted-foreground mt-0.5">
-              Documento institucional consolidado com todos os dados do processo
-            </p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2 shrink-0">
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs">
-                <Eye className="w-3.5 h-3.5" /> Ver
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-5xl w-[95vw] h-[92vh] p-0 gap-0 overflow-hidden">
-              <DialogHeader className="sr-only">
-                <DialogTitle>Documento Cand-{c.id}</DialogTitle>
-                <DialogDescription>Pré-visualização do documento institucional gerado.</DialogDescription>
-              </DialogHeader>
-              <CandidaturaDocPreview candidatura={c} steps={steps} cronologia={cronologia} />
-            </DialogContent>
-          </Dialog>
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-8 gap-1.5 text-xs"
-            onClick={() => toast({ title: "Documento exportado", description: `Cand-${c.id}.pdf` })}
-          >
-            <Download className="w-3.5 h-3.5" /> Descarregar
-          </Button>
-        </div>
-      </Card>
 
       {/* Documentos + Linha do Tempo — agora EM CIMA */}
       <div className="grid lg:grid-cols-2 gap-6">
