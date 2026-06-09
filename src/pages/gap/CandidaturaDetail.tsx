@@ -29,19 +29,17 @@ interface StepDef {
 }
 
 function buildSteps(c: typeof candidaturas[number]): StepDef[] {
-  const [first, ...rest] = c.nome.split(" ");
-  const last = rest.join(" ") || "Silva";
+  const last = c.nome.split(" ").slice(1).join(" ") || "Silva";
   const opcoes = [c.cursoOpcao1, c.cursoOpcao2, c.cursoOpcao3].filter(Boolean) as string[];
 
   return [
     {
       n: 1, title: "Dados Pessoais", sub: "Identificação, documento e foto", icon: User,
       rows: [
-        { label: "Primeiro nome", value: first },
-        { label: "Último nome", value: last },
+        { label: "Nome completo", value: c.nome },
         { label: "Data de nascimento", value: "12/03/2006" },
-        { label: "Género", value: "Masculino" },
         { label: "Nacionalidade", value: "Angolana" },
+        { label: "Género", value: "Masculino" },
         { label: "Tipo de documento", value: "Bilhete de Identidade" },
         { label: "Número do documento", value: c.bi },
         { label: "Foto tipo passe", value: "Entregue" },
