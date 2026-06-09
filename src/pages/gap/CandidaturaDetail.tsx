@@ -205,7 +205,7 @@ export default function GapCandidaturaDetail() {
                       <DialogTitle>Documento {displayId}</DialogTitle>
                       <DialogDescription>Pré-visualização do documento institucional gerado.</DialogDescription>
                     </DialogHeader>
-                    <CandidaturaDocPreview candidatura={c} steps={steps} cronologia={cronologia} displayId={displayId} />
+                    <CandidaturaDocPreview candidatura={c} steps={steps} cronologia={cronologia} displayId={displayId} photoIdx={photoIdx} />
                   </DialogContent>
                 </Dialog>
                 <button
