@@ -24,11 +24,10 @@ const FACULDADES: Record<string, string[]> = {
   "Faculdade de Saúde": ["Medicina", "Enfermagem"],
 };
 const PROVINCIAS = ["Luanda", "Benguela", "Huíla", "Huambo", "Cabinda", "Cuanza Sul", "Malanje", "Uíge"];
-const SESSOES_INFO = [
-  { id: "1ª Data", data: "15 de Julho de 2026", hora: "09:00", sala: "Sala de Entrevistas 1 — Campus UPRA" },
-  { id: "2ª Data", data: "12 de Agosto de 2026", hora: "09:00", sala: "Sala de Entrevistas 2 — Campus UPRA" },
-  { id: "3ª Data", data: "09 de Setembro de 2026", hora: "14:00", sala: "Sala de Entrevistas 3 — Campus UPRA" },
-];
+const ENTREVISTA_RANGE = { start: new Date(2026, 5, 1), end: new Date(2026, 8, 10) };
+const ENTREVISTA_LOCAL = "Sala de Entrevistas — Campus UPRA";
+const ENTREVISTA_SLOTS = ["09:00","09:30","10:00","10:30","11:00","11:30","14:00","14:30","15:00","15:30","16:00","16:30"];
+const formatLongDate = (d: Date) => d.toLocaleDateString("pt-PT", { weekday: "long", day: "2-digit", month: "long", year: "numeric" });
 const PARENTESCO = ["Pai", "Mãe", "Tutor(a)", "Avô/Avó", "Outro"];
 const NACIONALIDADES = [
   "Angolana", "Portuguesa", "Brasileira", "Cabo-verdiana", "Moçambicana", "São-tomense",
