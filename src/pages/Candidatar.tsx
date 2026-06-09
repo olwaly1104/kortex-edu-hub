@@ -88,7 +88,7 @@ const STEP_FIELDS: Record<number, (keyof FormState)[]> = {
   2: ["provincia","municipio","email","telemovel","encNome","encParentesco","encTelefone"],
   3: ["escola","anoConclusao"],
   4: ["fac1","curso1"],
-  5: ["sessao"],
+  5: ["entrevistaData","entrevistaHora"],
   6: [],
   7: [],
 };
