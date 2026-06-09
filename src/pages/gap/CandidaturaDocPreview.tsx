@@ -69,22 +69,22 @@ export default function CandidaturaDocPreview({
             <p className="font-mono text-[11px] font-bold text-neutral-700">{displayId}</p>
           </div>
 
-          {/* Header — photo + name + estado + submetido */}
-          <header className="px-10 pb-6 border-b-2 border-neutral-900">
-            <div className="flex items-end gap-5">
+          {/* Header — photo + name + estado + submetido + documentos */}
+          <header className="px-10 pb-5 border-b-2 border-neutral-900">
+            <div className="flex items-start gap-5">
               <img
                 src={`https://i.pravatar.cc/240?img=${photoIdx}`}
                 alt={`Foto — ${c.nome}`}
                 className="w-[88px] h-[110px] object-cover border border-neutral-400 bg-neutral-100 shrink-0"
               />
-              <div className="flex-1 min-w-0">
+              <div className="flex-1 min-w-0 pt-1">
                 <p className="text-[10px] uppercase tracking-[0.22em] text-neutral-500 font-semibold mb-1">
                   Ficha de Candidatura
                 </p>
-                <h1 className="text-[26px] leading-[1.1] font-bold tracking-tight text-neutral-900">
+                <h1 className="text-[24px] leading-[1.1] font-bold tracking-tight text-neutral-900">
                   {c.nome}
                 </h1>
-                <div className="mt-2 flex items-center gap-4 text-[10.5px] text-neutral-600">
+                <div className="mt-2 flex items-center gap-3 text-[10.5px] text-neutral-600">
                   <span className="inline-flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-neutral-900" />
                     <span className="uppercase tracking-[0.14em] font-bold text-neutral-900">
@@ -100,12 +100,32 @@ export default function CandidaturaDocPreview({
                   </span>
                 </div>
               </div>
+
+              {/* Documentos entregues — compacto, canto superior direito */}
+              <div className="w-[220px] shrink-0 border border-neutral-300">
+                <div className="px-2 py-1 bg-neutral-100 border-b border-neutral-300 flex items-center justify-between">
+                  <p className="text-[9px] uppercase tracking-[0.16em] font-bold text-neutral-700">
+                    Documentos
+                  </p>
+                  <p className="text-[9px] tabular-nums text-neutral-600 font-semibold">
+                    {c.documentos.length}/{c.documentos.length}
+                  </p>
+                </div>
+                <ul className="divide-y divide-neutral-200">
+                  {c.documentos.map((d, i) => (
+                    <li key={i} className="flex items-center gap-2 px-2 py-[3px] text-[9.5px] text-neutral-800">
+                      <span className="text-emerald-700 font-bold leading-none">✓</span>
+                      <span className="truncate">{d.nome}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
           </header>
 
 
           <div className="flex-1 px-10 py-5 space-y-4">
-            {/* Sections */}
+            {/* Sections — dados verticais */}
             {steps.map(s => (
               <Section key={s.n} title={s.title}>
                 <XTable rows={s.rows.map(r => [r.label, r.value] as [string, string])} />
@@ -129,28 +149,6 @@ export default function CandidaturaDocPreview({
                       <Td className="tabular-nums text-neutral-600">{fmtDataShort(h.data)}</Td>
                       <Td className="font-semibold">{h.accao}</Td>
                       <Td className="text-neutral-600">{h.detalhe}</Td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </Section>
-
-            {/* Documentos */}
-            <Section title="Documentos Entregues">
-              <table className="w-full border-collapse text-[10.5px]">
-                <thead>
-                  <tr className="bg-neutral-100">
-                    <Th className="w-10 text-center">#</Th>
-                    <Th>Documento</Th>
-                    <Th className="w-24 text-center">Estado</Th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {c.documentos.map((d, i) => (
-                    <tr key={i} className={i % 2 ? "bg-neutral-50/60" : ""}>
-                      <Td className="text-center tabular-nums text-neutral-500">{i + 1}</Td>
-                      <Td>{d.nome}</Td>
-                      <Td className="text-center font-semibold text-emerald-700">Entregue</Td>
                     </tr>
                   ))}
                 </tbody>
