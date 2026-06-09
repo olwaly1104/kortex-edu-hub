@@ -141,6 +141,9 @@ export default function GapCandidaturaDetail() {
 
   const dSub = new Date(c.dataSubmissao);
   const photoIdx = (parseInt(c.id.replace(/\D/g, ""), 10) % 70) + 1;
+  const anoCand = dSub.getFullYear();
+  const numCand = c.id.replace(/\D/g, "").padStart(4, "0");
+  const displayId = `CAND-${anoCand}-${numCand}`;
 
   return (
     <div className="p-6 lg:p-8 max-w-5xl mx-auto space-y-6 animate-fade-in">
