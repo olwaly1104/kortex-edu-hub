@@ -193,7 +193,7 @@ function Td({ children, className = "", colSpan }: { children: React.ReactNode; 
 function XTable({ rows }: { rows: [string, string][] }) {
   // Pack into 2-column layout; long values span both columns
   type Cell = { k: string; v: string; full: boolean };
-  const FORCE_FULL = new Set(["Data de nascimento", "Nacionalidade", "Encarregado"]);
+  const FORCE_FULL = new Set(["Encarregado"]);
   const cells: Cell[] = rows.map(([k, v]) => ({ k, v, full: v.length > 32 || k.length > 26 || FORCE_FULL.has(k) }));
   const lines: Cell[][] = [];
   let buf: Cell[] = [];
