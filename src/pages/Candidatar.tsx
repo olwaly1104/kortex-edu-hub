@@ -876,11 +876,11 @@ export default function Candidatar() {
                     ["2ª escolha", form.fac2 ? `${form.fac2} — ${form.curso2 || "—"}` : "—"],
                     ["3ª escolha", form.fac3 ? `${form.fac3} — ${form.curso3 || "—"}` : "—"],
                   ]} />
-                  <ReviewBlock title="Prova de Acesso" stepN={5} onEdit={goTo} rows={(() => {
+                  <ReviewBlock title="Entrevista" stepN={5} onEdit={goTo} rows={(() => {
                     const s = SESSOES_INFO.find(x => x.id === form.sessao);
                     return s
-                      ? [["Sessão", s.id], ["Data", s.data], ["Hora", s.hora], ["Local", s.sala]]
-                      : [["Sessão", "—"]];
+                      ? [["Data", s.id], ["Quando", s.data], ["Hora", s.hora], ["Local", s.sala]]
+                      : [["Data", "—"]];
                   })()} />
                   <ReviewBlock title="Documentos" stepN={6} onEdit={goTo} rows={DOCS.map(d => [d.label, docs[d.key] ? "✓ Anexado" : "Pendente"])} />
                 </div>
