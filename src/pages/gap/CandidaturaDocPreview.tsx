@@ -131,24 +131,24 @@ export default function CandidaturaDocPreview({
               {/* Right column: Documentos + Etapas */}
               <div className="w-[280px] shrink-0 flex flex-col gap-3">
                 {/* Documentos */}
-                <div className="border border-neutral-300 bg-white">
-                  <div className="px-2 py-1 bg-neutral-100 border-b border-neutral-300 flex items-center justify-between">
-                    <p className="text-[8.5px] uppercase tracking-[0.16em] font-bold text-neutral-700">
-                      Documentos
-                    </p>
-                    <p className="text-[8.5px] tabular-nums text-neutral-600 font-semibold">
-                      {c.documentos.length}/{c.documentos.length}
-                    </p>
+                  <div className="border border-neutral-300 bg-white">
+                    <div className="px-2 py-1 bg-neutral-100 border-b border-neutral-300 flex items-center justify-between">
+                      <p className="text-[10px] uppercase tracking-[0.16em] font-bold text-neutral-700">
+                        Documentos
+                      </p>
+                      <p className="text-[10px] tabular-nums text-neutral-600 font-semibold">
+                        {c.documentos.length}/{c.documentos.length}
+                      </p>
+                    </div>
+                    <ul className="divide-y divide-neutral-200">
+                      {c.documentos.map((d, i) => (
+                        <li key={i} className="flex items-center gap-1.5 px-2 py-[3px] text-[10px] text-neutral-800">
+                          <span className="text-emerald-700 font-bold leading-none">✓</span>
+                          <span className="truncate">{d.nome}</span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                  <ul className="divide-y divide-neutral-200">
-                    {c.documentos.map((d, i) => (
-                      <li key={i} className="flex items-center gap-1.5 px-2 py-[3px] text-[8.5px] text-neutral-800">
-                        <span className="text-emerald-700 font-bold leading-none">✓</span>
-                        <span className="truncate">{d.nome}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
 
                 {/* Etapas da Candidatura */}
                 <div className="border border-neutral-300 bg-white">
