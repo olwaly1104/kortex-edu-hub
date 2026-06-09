@@ -48,7 +48,7 @@ interface FormState {
   encNome: string; encParentesco: string; encTelefone: string;
   escola: string; anoConclusao: string;
   fac1: string; curso1: string; fac2: string; curso2: string; fac3: string; curso3: string;
-  sessao: string;
+  entrevistaData: string; entrevistaHora: string;
   motivacao: string; confirmar: boolean; docAutenticos: boolean;
 }
 const empty: FormState = {
