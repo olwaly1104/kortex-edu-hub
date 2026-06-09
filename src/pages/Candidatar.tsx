@@ -56,7 +56,7 @@ const empty: FormState = {
   docTipo: "bi",
   email: "", telemovel: "", provincia: "", municipio: "", endereco: "",
   encNome: "", encParentesco: "", encTelefone: "",
-  escola: "", anoConclusao: "", mediaFinal: "",
+  escola: "", anoConclusao: "",
   fac1: "", curso1: "", fac2: "", curso2: "", fac3: "", curso3: "",
   sessao: "",
   motivacao: "", confirmar: false, docAutenticos: false,
