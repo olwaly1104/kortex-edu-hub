@@ -260,13 +260,27 @@ export default function ConfigurarReceitas() {
             className="pl-9 h-9 rounded-lg"
           />
         </div>
-        <Select value={tipoFilter} onValueChange={setTipoFilter}>
-          <SelectTrigger className="w-[200px] h-9 rounded-lg"><SelectValue placeholder="Tipo" /></SelectTrigger>
-          <SelectContent>
-            <SelectItem value="todos">Todos os tipos</SelectItem>
-            {TIPOS.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
-          </SelectContent>
-        </Select>
+        <div className="flex items-center gap-1 bg-muted/50 rounded-lg p-1">
+          {[
+            { id: "todos", label: "Todos" },
+            { id: "propina", label: "Propina" },
+            { id: "emolumentos", label: "Emolumentos" },
+            { id: "candidatura", label: "Candidatura" },
+            { id: "multas", label: "Multas" },
+          ].map(t => (
+            <button
+              key={t.id}
+              onClick={() => setTipoFilter(t.id)}
+              className={`px-3 h-7 rounded-md text-xs font-medium transition-colors ${
+                tipoFilter === t.id
+                  ? "bg-card text-foreground shadow-sm border border-border"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
         <Select value={escopoFilter} onValueChange={setEscopoFilter}>
           <SelectTrigger className="w-[180px] h-9 rounded-lg"><SelectValue placeholder="Âmbito" /></SelectTrigger>
           <SelectContent>
