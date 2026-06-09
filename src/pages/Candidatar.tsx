@@ -46,7 +46,7 @@ interface FormState {
   docTipo: DocTipo;
   email: string; telemovel: string; provincia: string; municipio: string; endereco: string;
   encNome: string; encParentesco: string; encTelefone: string;
-  escola: string; anoConclusao: string; mediaFinal: string;
+  escola: string; anoConclusao: string;
   fac1: string; curso1: string; fac2: string; curso2: string; fac3: string; curso3: string;
   sessao: string;
   motivacao: string; confirmar: boolean; docAutenticos: boolean;
