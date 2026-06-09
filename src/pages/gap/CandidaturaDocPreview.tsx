@@ -56,65 +56,60 @@ export default function CandidaturaDocPreview({
           className="mx-auto bg-white shadow-md print:shadow-none flex flex-col text-neutral-900"
           style={{ width: "210mm", minHeight: "297mm", fontFamily: "'Inter', system-ui, sans-serif" }}
         >
-          {/* Header — photo + name + estado */}
-          <header className="px-10 pt-7 pb-5 border-b-2 border-neutral-900">
-            <div className="flex items-start justify-between gap-6 mb-4">
-              <div>
-                <p className="text-[9px] uppercase tracking-[0.3em] text-neutral-500 font-semibold">
-                  Universidade Privada · GAP
-                </p>
-                <h1 className="text-[17px] font-bold tracking-tight mt-1.5 text-neutral-900">
-                  Ficha de Candidatura
-                </h1>
-              </div>
-              <div className="text-right shrink-0">
-                <p className="font-mono text-[12px] font-bold text-neutral-900">{displayId}</p>
-                <p className="text-[9.5px] text-neutral-500 mt-0.5">Emitido {fmtDataLong(new Date())}</p>
-              </div>
-            </div>
+          {/* Top bar — institutional */}
+          <div className="px-10 pt-6 pb-3 flex items-center justify-between">
+            <p className="text-[9px] uppercase tracking-[0.3em] text-neutral-500 font-semibold">
+              Universidade Privada · Gabinete de Apoio ao Processo
+            </p>
+            <p className="font-mono text-[11px] font-bold text-neutral-700">{displayId}</p>
+          </div>
 
-            <div className="flex gap-4 items-stretch">
+          {/* Header — photo + name + estado + submetido */}
+          <header className="px-10 pb-6 border-b-2 border-neutral-900">
+            <div className="flex items-end gap-5">
               <img
                 src={`https://i.pravatar.cc/240?img=${photoIdx}`}
                 alt={`Foto — ${c.nome}`}
-                className="w-[96px] h-[120px] object-cover border border-neutral-400 bg-neutral-100 shrink-0"
+                className="w-[88px] h-[110px] object-cover border border-neutral-400 bg-neutral-100 shrink-0"
               />
-              <table className="flex-1 border-collapse text-[10.5px]">
-                <tbody>
-                  <tr>
-                    <Th2 className="w-28">Candidato</Th2>
-                    <Td2 className="font-bold text-[12px]" colSpan={3}>{c.nome}</Td2>
-                  </tr>
-                  <tr>
-                    <Th2>BI</Th2>
-                    <Td2 className="tabular-nums">{c.bi}</Td2>
-                    <Th2 className="w-28">Estado</Th2>
-                    <Td2 className="uppercase font-bold tracking-wider text-[10px]">
+              <div className="flex-1 min-w-0">
+                <p className="text-[10px] uppercase tracking-[0.22em] text-neutral-500 font-semibold mb-1">
+                  Ficha de Candidatura
+                </p>
+                <h1 className="text-[26px] leading-[1.1] font-bold tracking-tight text-neutral-900">
+                  {c.nome}
+                </h1>
+                <div className="mt-2 flex items-center gap-4 text-[10.5px] text-neutral-600">
+                  <span className="inline-flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-neutral-900" />
+                    <span className="uppercase tracking-[0.14em] font-bold text-neutral-900">
                       {estadoLabels[estadoKey]}
-                    </Td2>
-                  </tr>
-                  <tr>
-                    <Th2>Submetido em</Th2>
-                    <Td2 className="tabular-nums">{fmtDataShort(c.dataSubmissao)}</Td2>
-                    <Th2>Documentos</Th2>
-                    <Td2 className="font-semibold">{c.documentos.length} entregues</Td2>
-                  </tr>
-                </tbody>
-              </table>
+                    </span>
+                  </span>
+                  <span className="text-neutral-300">|</span>
+                  <span>
+                    Submetido a{" "}
+                    <span className="font-semibold text-neutral-900 tabular-nums">
+                      {fmtDataShort(c.dataSubmissao)}
+                    </span>
+                  </span>
+                </div>
+              </div>
             </div>
           </header>
 
 
           <div className="flex-1 px-10 py-5 space-y-4">
             {/* Sections */}
-            {steps.map((s, idx) => (
-              <Section key={s.n} n={String(idx + 1).padStart(2, "0")} title={s.title}>
+            {steps.map(s => (
+              <Section key={s.n} title={s.title}>
                 <XTable rows={s.rows.map(r => [r.label, r.value] as [string, string])} />
               </Section>
             ))}
 
+
             {/* Cronologia */}
-            <Section n={String(steps.length + 1).padStart(2, "0")} title="Cronologia">
+            <Section title="Cronologia">
               <table className="w-full border-collapse text-[10.5px]">
                 <thead>
                   <tr className="bg-neutral-100">
@@ -136,7 +131,7 @@ export default function CandidaturaDocPreview({
             </Section>
 
             {/* Documentos */}
-            <Section n={String(steps.length + 2).padStart(2, "0")} title="Documentos Entregues">
+            <Section title="Documentos Entregues">
               <table className="w-full border-collapse text-[10.5px]">
                 <thead>
                   <tr className="bg-neutral-100">
@@ -179,13 +174,12 @@ export default function CandidaturaDocPreview({
   );
 }
 
-function Section({ n, title, children }: { n: string; title: string; children: React.ReactNode }) {
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section>
-      <div className="flex items-baseline gap-3 mb-1.5">
-        <span className="font-mono text-[10px] font-bold text-neutral-400 tabular-nums">{n}</span>
-        <h3 className="text-[11px] uppercase tracking-[0.2em] font-bold text-neutral-900">{title}</h3>
-      </div>
+      <h3 className="text-[11px] uppercase tracking-[0.2em] font-bold text-neutral-900 mb-1.5 pb-1 border-b border-neutral-300">
+        {title}
+      </h3>
       {children}
     </section>
   );
