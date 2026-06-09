@@ -780,7 +780,7 @@ export default function Candidatar() {
                   })}
                 </div>
                 <p className="text-[11px] text-muted-foreground">
-                  A presença é obrigatória. Receberá a convocatória oficial por email após validação da candidatura.
+                  A presença é obrigatória. Receberá a confirmação oficial por email após validação da candidatura.
                 </p>
               </div>
             )}
