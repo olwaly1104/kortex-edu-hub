@@ -169,30 +169,6 @@ export default function CandidaturaDocPreview({
                 <XTable rows={s.rows.map(r => [r.label, r.value] as [string, string])} />
               </Section>
             ))}
-
-            {/* Cronologia */}
-            <Section title="Cronologia">
-              <table className="w-full border-collapse text-[10.5px]">
-                <thead>
-                  <tr className="bg-neutral-100">
-                    <Th className="w-16">Nº</Th>
-                    <Th className="w-28">Data</Th>
-                    <Th>Acção</Th>
-                    <Th>Detalhe</Th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {cronologia.map((h, i) => (
-                    <tr key={i} className={i % 2 ? "bg-neutral-50/60" : ""}>
-                      <Td className="tabular-nums text-neutral-600 text-center">{i + 1}</Td>
-                      <Td className="tabular-nums">{fmtDataShort(h.data)}</Td>
-                      <Td className="font-semibold">{h.accao}</Td>
-                      <Td className="text-neutral-700">{h.detalhe}</Td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </Section>
           </div>
 
           {/* Footer */}
