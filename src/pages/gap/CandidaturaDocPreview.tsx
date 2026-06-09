@@ -86,7 +86,7 @@ export default function CandidaturaDocPreview({
             </div>
           </div>
 
-          {/* Header — photo + name + estado + submetido + cronologia */}
+          {/* Header — photo + name + estado + submetido + documentos + etapas */}
           <header className="px-10 pt-5 pb-5 border-b-2 border-neutral-900">
             <div className="flex items-start gap-6">
               <img
@@ -128,53 +128,56 @@ export default function CandidaturaDocPreview({
                 </div>
               </div>
 
-              {/* Documentos — compact card, top-right above the bold line */}
-              <div className="w-[210px] shrink-0 border border-neutral-300 bg-white">
-                <div className="px-2 py-1 bg-neutral-100 border-b border-neutral-300 flex items-center justify-between">
-                  <p className="text-[8.5px] uppercase tracking-[0.16em] font-bold text-neutral-700">
-                    Documentos
-                  </p>
-                  <p className="text-[8.5px] tabular-nums text-neutral-600 font-semibold">
-                    {c.documentos.length}/{c.documentos.length}
-                  </p>
+              {/* Right column: Documentos + Etapas */}
+              <div className="w-[210px] shrink-0 flex flex-col gap-3">
+                {/* Documentos */}
+                <div className="border border-neutral-300 bg-white">
+                  <div className="px-2 py-1 bg-neutral-100 border-b border-neutral-300 flex items-center justify-between">
+                    <p className="text-[8.5px] uppercase tracking-[0.16em] font-bold text-neutral-700">
+                      Documentos
+                    </p>
+                    <p className="text-[8.5px] tabular-nums text-neutral-600 font-semibold">
+                      {c.documentos.length}/{c.documentos.length}
+                    </p>
+                  </div>
+                  <ul className="divide-y divide-neutral-200">
+                    {c.documentos.map((d, i) => (
+                      <li key={i} className="flex items-center gap-1.5 px-2 py-[3px] text-[8.5px] text-neutral-800">
+                        <span className="text-emerald-700 font-bold leading-none">✓</span>
+                        <span className="truncate">{d.nome}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-                <ul className="divide-y divide-neutral-200">
-                  {c.documentos.map((d, i) => (
-                    <li key={i} className="flex items-center gap-1.5 px-2 py-[3px] text-[8.5px] text-neutral-800">
-                      <span className="text-emerald-700 font-bold leading-none">✓</span>
-                      <span className="truncate">{d.nome}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
 
-            {/* Etapas da Candidatura — inside header, above the bold line */}
-            <div className="mt-4 border border-neutral-300">
-              <div className="px-2.5 py-1 bg-neutral-100 border-b border-neutral-300 flex items-center justify-between">
-                <p className="text-[9px] uppercase tracking-[0.16em] font-bold text-neutral-700">
-                  Etapas da Candidatura
-                </p>
-                <p className="text-[9px] tabular-nums text-neutral-600 font-semibold">
-                  {cronologia.filter(h => h.done !== false).length}/{cronologia.length}
-                </p>
+                {/* Etapas da Candidatura */}
+                <div className="border border-neutral-300 bg-white">
+                  <div className="px-2.5 py-1 bg-neutral-100 border-b border-neutral-300 flex items-center justify-between">
+                    <p className="text-[9px] uppercase tracking-[0.16em] font-bold text-neutral-700">
+                      Etapas da Candidatura
+                    </p>
+                    <p className="text-[9px] tabular-nums text-neutral-600 font-semibold">
+                      {cronologia.filter(h => h.done !== false).length}/{cronologia.length}
+                    </p>
+                  </div>
+                  <ul className="divide-y divide-neutral-200">
+                    {cronologia.map((h, i) => (
+                      <li key={i} className="flex items-center gap-2 px-2.5 py-[4px] text-[10px]">
+                        <span className={h.done !== false ? "text-emerald-700 font-bold leading-none" : "text-neutral-400 font-bold leading-none"}>
+                          {h.done !== false ? "✓" : "○"}
+                        </span>
+                        <span className={h.done !== false ? "truncate text-neutral-800 font-medium" : "truncate text-neutral-500"}>{h.accao}</span>
+                        {h.estado && (
+                          <span className={`ml-auto inline-flex items-center px-1.5 py-0.5 rounded border text-[8.5px] font-semibold uppercase tracking-wide ${etapaEstadoCls[h.estado]}`}>
+                            {h.estado}
+                          </span>
+                        )}
+                        <span className="text-neutral-500 tabular-nums text-[9.5px] w-[64px] text-right">{fmtDataShort(h.data)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
-              <ul className="divide-y divide-neutral-200">
-                {cronologia.map((h, i) => (
-                  <li key={i} className="flex items-center gap-2 px-2.5 py-[4px] text-[10px]">
-                    <span className={h.done !== false ? "text-emerald-700 font-bold leading-none" : "text-neutral-400 font-bold leading-none"}>
-                      {h.done !== false ? "✓" : "○"}
-                    </span>
-                    <span className={h.done !== false ? "truncate text-neutral-800 font-medium" : "truncate text-neutral-500"}>{h.accao}</span>
-                    {h.estado && (
-                      <span className={`ml-auto inline-flex items-center px-1.5 py-0.5 rounded border text-[8.5px] font-semibold uppercase tracking-wide ${etapaEstadoCls[h.estado]}`}>
-                        {h.estado}
-                      </span>
-                    )}
-                    <span className="text-neutral-500 tabular-nums text-[9.5px] w-[64px] text-right">{fmtDataShort(h.data)}</span>
-                  </li>
-                ))}
-              </ul>
             </div>
           </header>
 
