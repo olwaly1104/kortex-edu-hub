@@ -78,7 +78,7 @@ const STEPS = [
   { n: 2, title: "Morada & Contactos", sub: "Endereço, contactos e encarregado",  icon: MapPin },
   { n: 3, title: "Formação",           sub: "Histórico do ensino secundário",     icon: GraduationCap },
   { n: 4, title: "Curso",              sub: "Faculdades e cursos por ordem de escolha", icon: BookOpen },
-  { n: 5, title: "Prova de Acesso",    sub: "Marcação da sessão de provas",       icon: CalendarDays },
+  { n: 5, title: "Entrevista",         sub: "Marcação da data de entrevista",     icon: CalendarDays },
   { n: 6, title: "Documentos",         sub: "Anexos académicos obrigatórios",     icon: FileText },
   { n: 7, title: "Revisão",            sub: "Confirmar e submeter",               icon: Check },
 ] as const;
