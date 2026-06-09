@@ -24,9 +24,9 @@ const FACULDADES: Record<string, string[]> = {
 };
 const PROVINCIAS = ["Luanda", "Benguela", "Huíla", "Huambo", "Cabinda", "Cuanza Sul", "Malanje", "Uíge"];
 const SESSOES_INFO = [
-  { id: "1ª Sessão", data: "15 de Julho de 2026", hora: "09:00", sala: "Anfiteatro A — Campus UPRA" },
-  { id: "2ª Sessão", data: "12 de Agosto de 2026", hora: "09:00", sala: "Anfiteatro B — Campus UPRA" },
-  { id: "3ª Sessão", data: "09 de Setembro de 2026", hora: "14:00", sala: "Sala Magna — Campus UPRA" },
+  { id: "1ª Data", data: "15 de Julho de 2026", hora: "09:00", sala: "Sala de Entrevistas 1 — Campus UPRA" },
+  { id: "2ª Data", data: "12 de Agosto de 2026", hora: "09:00", sala: "Sala de Entrevistas 2 — Campus UPRA" },
+  { id: "3ª Data", data: "09 de Setembro de 2026", hora: "14:00", sala: "Sala de Entrevistas 3 — Campus UPRA" },
 ];
 const PARENTESCO = ["Pai", "Mãe", "Tutor(a)", "Avô/Avó", "Outro"];
 const NACIONALIDADES = [
