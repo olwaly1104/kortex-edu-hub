@@ -117,27 +117,48 @@ export default function CandidaturaDocPreview({
                 </div>
               </div>
 
-              {/* Documentos — compacto, canto superior direito */}
-              <div className="w-[220px] shrink-0 border border-neutral-300">
-                <div className="px-2 py-1 bg-neutral-100 border-b border-neutral-300 flex items-center justify-between">
-                  <p className="text-[9px] uppercase tracking-[0.16em] font-bold text-neutral-700">
-                    Documentos
-                  </p>
-                  <p className="text-[9px] tabular-nums text-neutral-600 font-semibold">
-                    {c.documentos.length}/{c.documentos.length}
-                  </p>
+              {/* Documentos + Cronologia — side by side, canto superior direito */}
+              <div className="flex gap-3 shrink-0">
+                <div className="w-[200px] border border-neutral-300">
+                  <div className="px-2 py-1 bg-neutral-100 border-b border-neutral-300 flex items-center justify-between">
+                    <p className="text-[9px] uppercase tracking-[0.16em] font-bold text-neutral-700">
+                      Documentos
+                    </p>
+                    <p className="text-[9px] tabular-nums text-neutral-600 font-semibold">
+                      {c.documentos.length}/{c.documentos.length}
+                    </p>
+                  </div>
+                  <ul className="divide-y divide-neutral-200">
+                    {c.documentos.map((d, i) => (
+                      <li key={i} className="flex items-center gap-2 px-2 py-[3px] text-[9.5px] text-neutral-800">
+                        <span className="text-emerald-700 font-bold leading-none">✓</span>
+                        <span className="truncate">{d.nome}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-                <ul className="divide-y divide-neutral-200">
-                  {c.documentos.map((d, i) => (
-                    <li key={i} className="flex items-center gap-2 px-2 py-[3px] text-[9.5px] text-neutral-800">
-                      <span className="text-emerald-700 font-bold leading-none">✓</span>
-                      <span className="truncate">{d.nome}</span>
-                      <span className="text-neutral-400 ml-auto tabular-nums">{String(i + 1).padStart(2, "0")}</span>
-                    </li>
-                  ))}
-                </ul>
+                <div className="w-[220px] border border-neutral-300">
+                  <div className="px-2 py-1 bg-neutral-100 border-b border-neutral-300 flex items-center justify-between">
+                    <p className="text-[9px] uppercase tracking-[0.16em] font-bold text-neutral-700">
+                      Cronologia
+                    </p>
+                    <p className="text-[9px] tabular-nums text-neutral-600 font-semibold">
+                      {cronologia.filter(h => h.done !== false).length}/{cronologia.length}
+                    </p>
+                  </div>
+                  <ul className="divide-y divide-neutral-200">
+                    {cronologia.map((h, i) => (
+                      <li key={i} className="flex items-center gap-2 px-2 py-[3px] text-[9.5px] text-neutral-800">
+                        <span className={h.done !== false ? "text-emerald-700 font-bold leading-none" : "text-neutral-400 font-bold leading-none"}>
+                          {h.done !== false ? "✓" : "○"}
+                        </span>
+                        <span className="truncate">{h.accao}</span>
+                        <span className="text-neutral-400 ml-auto tabular-nums">{fmtDataShort(h.data)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
-            </div>
           </header>
 
           <div className="flex-1 px-10 py-5 space-y-4">
