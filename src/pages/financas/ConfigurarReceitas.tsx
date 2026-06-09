@@ -123,6 +123,9 @@ export default function ConfigurarReceitas() {
   const { toast } = useToast();
   const [rows, setRows] = useState<ReceitaRow[]>(initialRows);
 
+  type SectionFilter = "todos" | "propina" | "emolumentos" | "servicos";
+  const [filter, setFilter] = useState<SectionFilter>("todos");
+
   const [openSection, setOpenSection] = useState<SectionDef | null>(null);
   const [editing, setEditing] = useState<ReceitaRow | null>(null);
   const [form, setForm] = useState<ReceitaRow>({ id: "", nome: "", tipo: "Taxa", escopo: "geral", valor: 0 });
@@ -185,8 +188,35 @@ export default function ConfigurarReceitas() {
         </div>
       </div>
 
+      {/* Toggle */}
+      <div className="flex items-center gap-1 bg-muted/50 rounded-lg p-1 w-fit">
+        {([
+          { key: "todos" as SectionFilter, label: "Todos" },
+          { key: "propina" as SectionFilter, label: "Propina" },
+          { key: "emolumentos" as SectionFilter, label: "Emolumentos" },
+          { key: "servicos" as SectionFilter, label: "Serviços Académicos e Taxas" },
+        ]).map(b => (
+          <Button
+            key={b.key}
+            variant="ghost"
+            size="sm"
+            onClick={() => setFilter(b.key)}
+            className={cn(
+              "text-xs h-7 px-3 rounded-md",
+              filter === b.key ? "bg-background shadow-sm text-foreground font-medium" : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            {b.label}
+          </Button>
+        ))}
+      </div>
+
       {/* Sections */}
-      {SECTIONS.map(section => {
+      {(filter === "todos" ? SECTIONS : SECTIONS.filter(s =>
+        filter === "propina" ? s.key === "propinas" :
+        filter === "emolumentos" ? s.key === "emolumentos" :
+        filter === "servicos" ? s.key === "servicos" : true
+      )).map(section => {
         const items = bySection[section.key];
         const Icon = section.icon;
         return (
