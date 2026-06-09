@@ -66,6 +66,7 @@ function buildSteps(c: typeof candidaturas[number]): StepDef[] {
       rows: [
         { label: "Escola de origem", value: "Instituto Médio Politécnico de Luanda" },
         { label: "Ano de conclusão", value: "2025" },
+        { label: "Média final", value: "15,4 valores" },
         { label: "Declaração de finalização", value: "Entregue" },
         { label: "Certificado de habilitações", value: "Entregue" },
       ],
@@ -93,14 +94,6 @@ function buildSteps(c: typeof candidaturas[number]): StepDef[] {
         { label: "Sessão", value: "1ª Sessão · 18 de julho de 2026" },
         { label: "Hora", value: "09:00" },
         { label: "Local", value: "Anfiteatro A — Campus UPRA" },
-      ],
-    },
-    {
-      n: 7, title: "Revisão & Submissão", sub: "Confirmação final do candidato", icon: Check,
-      rows: [
-        { label: "Confirmação dos dados", value: "Aceite pelo candidato" },
-        { label: "Autenticidade dos documentos", value: "Declarada pelo candidato" },
-        { label: "Data de submissão", value: new Date(c.dataSubmissao).toLocaleDateString("pt-AO") },
       ],
     },
   ];
@@ -266,12 +259,22 @@ export default function GapCandidaturaDetail() {
                 {open && (
                   <div className="px-6 pb-5 pt-1 bg-muted/20">
                     <div className="grid sm:grid-cols-2 gap-x-6 gap-y-3 pl-12">
-                      {s.rows.map((r, i) => (
-                        <div key={i}>
-                          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">{r.label}</p>
-                          <p className="text-sm text-foreground mt-0.5">{r.value}</p>
-                        </div>
-                      ))}
+                      {s.rows.map((r, i) => {
+                        const fullWidth = ["Endereço", "Escola de origem"].includes(r.label);
+                        const breakBefore = ["Encarregado"].includes(r.label);
+                        return (
+                          <div
+                            key={i}
+                            className={cn(
+                              fullWidth && "sm:col-span-2",
+                              breakBefore && "sm:col-start-1 sm:border-t sm:border-border sm:pt-3 sm:mt-1",
+                            )}
+                          >
+                            <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">{r.label}</p>
+                            <p className="text-sm text-foreground mt-0.5">{r.value}</p>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
