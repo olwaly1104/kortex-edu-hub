@@ -59,9 +59,13 @@ export default function CandidaturaDocPreview({
         >
           {/* Top bar — institutional */}
           <div className="px-10 pt-6 pb-3 flex items-center justify-between">
-            <p className="text-[9px] uppercase tracking-[0.3em] text-neutral-500 font-semibold">
-              Universidade Privada · Gabinete de Apoio ao Processo
-            </p>
+            <div className="flex items-center gap-3">
+              <img src={logoAsset.url} alt="UPRA" className="h-10 w-auto object-contain" />
+              <div>
+                <p className="text-[10px] font-bold text-neutral-900 leading-tight">Universidade Privada de Angola</p>
+                <p className="text-[9px] uppercase tracking-[0.2em] text-neutral-500 font-semibold">Gabinete de Apoio ao Processo</p>
+              </div>
+            </div>
             <p className="font-mono text-[11px] font-bold text-neutral-700">{displayId}</p>
           </div>
 
