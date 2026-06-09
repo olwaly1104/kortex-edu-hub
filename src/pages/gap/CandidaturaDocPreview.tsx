@@ -1,5 +1,4 @@
 import { Printer, Download, Users, Share2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import logoAsset from "@/assets/logo-upra.asset.json";
 import studentPhoto from "@/assets/student-id-photo.jpg";
 import { Button } from "@/components/ui/button";
