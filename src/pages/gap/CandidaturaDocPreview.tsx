@@ -53,19 +53,26 @@ export default function CandidaturaDocPreview({
   return (
     <div className="flex flex-col h-full min-h-0 bg-neutral-200/70">
       {/* Toolbar */}
-      <div className="flex items-center justify-between px-4 py-2.5 border-b border-border bg-background shrink-0 print:hidden">
-        <div className="flex items-center gap-2">
-          <span className="text-[11px] font-mono font-semibold text-muted-foreground">{displayId}</span>
-          <span className="text-muted-foreground/40 text-xs">·</span>
+      <div className="flex items-center justify-between px-5 py-2.5 border-b border-border bg-gradient-to-b from-background to-muted/30 shrink-0 print:hidden">
+        <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-background border border-border shadow-sm">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+            <span className="text-[10.5px] font-mono font-semibold text-foreground tabular-nums">{displayId}</span>
+          </div>
           <span className="text-[11px] text-muted-foreground">Ficha de Candidatura</span>
         </div>
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-2">
+          {/* Shared with — uniform with Solicitações */}
           <Dialog>
             <DialogTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-7 text-[11px] gap-1.5 font-medium text-primary hover:text-primary hover:bg-primary/10">
-                <Users className="w-3 h-3" />
+              <button
+                type="button"
+                className="inline-flex items-center gap-1.5 h-8 px-2.5 rounded-md border border-border bg-background hover:bg-muted/60 hover:border-foreground/20 text-[11px] font-medium text-primary transition-all"
+                title="Pessoas com acesso"
+              >
+                <Users className="w-3.5 h-3.5" />
                 <span className="tabular-nums">{sharedWith.length}</span>
-              </Button>
+              </button>
             </DialogTrigger>
             <DialogContent className="max-w-md">
               <DialogHeader>
@@ -95,12 +102,22 @@ export default function CandidaturaDocPreview({
               </div>
             </DialogContent>
           </Dialog>
-          <Button variant="outline" size="sm" className="h-7 text-[11px] gap-1.5" onClick={() => window.print()}>
-            <Printer className="w-3 h-3" /> Imprimir
-          </Button>
-          <Button variant="outline" size="sm" className="h-7 text-[11px] gap-1.5" onClick={() => toast({ title: "Documento exportado", description: `${displayId}.pdf` })}>
-            <Download className="w-3 h-3" /> Descarregar
-          </Button>
+
+          {/* Actions */}
+          <button
+            type="button"
+            onClick={() => window.print()}
+            className="h-8 px-3 inline-flex items-center gap-1.5 text-[11px] font-medium text-foreground bg-background border border-border rounded-md shadow-sm hover:bg-muted/60 hover:border-foreground/20 transition-all"
+          >
+            <Printer className="w-3.5 h-3.5" /> Imprimir
+          </button>
+          <button
+            type="button"
+            onClick={() => toast({ title: "Documento exportado", description: `${displayId}.pdf` })}
+            className="h-8 px-3 inline-flex items-center gap-1.5 text-[11px] font-semibold text-primary-foreground bg-primary rounded-md shadow-sm hover:bg-primary/90 hover:shadow-md transition-all"
+          >
+            <Download className="w-3.5 h-3.5" /> Descarregar
+          </button>
         </div>
       </div>
 
