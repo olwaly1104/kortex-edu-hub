@@ -668,8 +668,8 @@ export default function Candidatar() {
 
             {step === 3 && (() => {
               const formacaoDocs = [
-                { key: "declaracaoEnsino", label: "Declaração de Finalização do Ensino Médio", desc: "Documento oficial emitido pela escola · PDF, JPG ou PNG · máx. 5MB" },
-                { key: "certificadoHabilitacoes", label: "Certificado de Habilitações (Notas)", desc: "Pauta oficial com notas finais · PDF, JPG ou PNG · máx. 5MB" },
+                { key: "declaracaoEnsino", label: "Certificado de Ensino Médio", desc: "Documento oficial emitido pela escola · PDF, JPG ou PNG · máx. 5MB" },
+                { key: "certificadoHabilitacoes", label: "Declaração de Notas", desc: "Pauta oficial com notas finais · PDF, JPG ou PNG · máx. 5MB" },
               ];
               return (
                 <div className="space-y-5">
