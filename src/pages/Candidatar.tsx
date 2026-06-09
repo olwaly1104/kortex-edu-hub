@@ -738,52 +738,101 @@ export default function Candidatar() {
               );
             })()}
 
-            {step === 5 && (
-              <div className="space-y-5">
-                <p className="text-[12.5px] text-muted-foreground">
-                  Escolha a sessão da prova de acesso. A data, hora e local são definidos pela instituição.
-                </p>
-                <div className="space-y-3">
-                  {SESSOES_INFO.map(s => {
-                    const active = form.sessao === s.id;
-                    return (
-                      <button
-                        key={s.id}
-                        type="button"
-                        onClick={() => update("sessao", s.id)}
-                        className={cn(
-                          "w-full text-left rounded-xl border p-4 transition-all",
-                          active
-                            ? "border-primary bg-primary/5 ring-1 ring-primary/30"
-                            : "border-border bg-card hover:border-primary/40 hover:bg-muted/40",
-                          errors.has("sessao") && !active && "border-destructive/40"
+            {step === 5 && (() => {
+              const selected = form.entrevistaData ? new Date(form.entrevistaData + "T00:00:00") : undefined;
+              const disabled = (date: Date) => {
+                const day = date.getDay();
+                if (day === 0 || day === 6) return true;
+                if (date < ENTREVISTA_RANGE.start || date > ENTREVISTA_RANGE.end) return true;
+                return false;
+              };
+              return (
+                <div className="space-y-5">
+                  <p className="text-[12.5px] text-muted-foreground">
+                    Marque a sua entrevista de admissão. Disponível de <span className="font-semibold text-foreground">1 de Junho</span> a <span className="font-semibold text-foreground">10 de Setembro de 2026</span>, dias úteis.
+                  </p>
+                  <div className="grid grid-cols-1 lg:grid-cols-[auto_1fr] gap-5">
+                    {/* Calendar */}
+                    <div className={cn(
+                      "rounded-xl border bg-card overflow-hidden",
+                      errors.has("entrevistaData") ? "border-destructive/50" : "border-border"
+                    )}>
+                      <div className="px-4 py-2.5 border-b border-border bg-muted/30">
+                        <p className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold flex items-center gap-1.5">
+                          <CalendarDays className="w-3.5 h-3.5" /> Escolha a data
+                        </p>
+                      </div>
+                      <Calendar
+                        mode="single"
+                        selected={selected}
+                        onSelect={(d) => {
+                          if (!d) return;
+                          const iso = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+                          update("entrevistaData", iso);
+                          if (form.entrevistaHora) update("entrevistaHora", "");
+                        }}
+                        disabled={disabled}
+                        defaultMonth={selected || ENTREVISTA_RANGE.start}
+                        fromMonth={ENTREVISTA_RANGE.start}
+                        toMonth={ENTREVISTA_RANGE.end}
+                        className="p-3 pointer-events-auto"
+                      />
+                    </div>
+
+                    {/* Time slots */}
+                    <div className={cn(
+                      "rounded-xl border bg-card flex flex-col",
+                      errors.has("entrevistaHora") ? "border-destructive/50" : "border-border"
+                    )}>
+                      <div className="px-4 py-2.5 border-b border-border bg-muted/30 flex items-center justify-between gap-2">
+                        <p className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold flex items-center gap-1.5">
+                          <Clock className="w-3.5 h-3.5" /> Escolha o horário
+                        </p>
+                        {selected && (
+                          <p className="text-[11px] text-foreground/70 capitalize truncate">{formatLongDate(selected)}</p>
                         )}
-                      >
-                        <div className="flex items-start gap-3">
-                          <div className={cn(
-                            "w-4 h-4 rounded-full border-2 mt-1 flex items-center justify-center shrink-0",
-                            active ? "border-primary bg-primary" : "border-border bg-background"
-                          )}>
-                            {active && <span className="w-1.5 h-1.5 rounded-full bg-primary-foreground" />}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className={cn("text-[13.5px] font-semibold leading-tight", active ? "text-primary" : "text-foreground")}>{s.id}</p>
-                            <div className="mt-2 grid grid-cols-1 sm:grid-cols-3 gap-2 text-[12px] text-foreground/80">
-                              <span className="flex items-center gap-1.5"><CalendarDays className="w-3.5 h-3.5 text-muted-foreground" /> {s.data}</span>
-                              <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-muted-foreground" /> {s.hora}</span>
-                              <span className="flex items-center gap-1.5"><MapPinned className="w-3.5 h-3.5 text-muted-foreground" /> {s.sala}</span>
-                            </div>
-                          </div>
+                      </div>
+                      {!selected ? (
+                        <div className="flex-1 flex items-center justify-center p-8 text-center">
+                          <p className="text-[12.5px] text-muted-foreground max-w-[200px]">
+                            Selecione primeiro uma data no calendário para ver os horários disponíveis.
+                          </p>
                         </div>
-                      </button>
-                    );
-                  })}
+                      ) : (
+                        <div className="p-3 grid grid-cols-3 sm:grid-cols-4 gap-2">
+                          {ENTREVISTA_SLOTS.map(h => {
+                            const active = form.entrevistaHora === h;
+                            return (
+                              <button
+                                key={h}
+                                type="button"
+                                onClick={() => update("entrevistaHora", h)}
+                                className={cn(
+                                  "h-9 rounded-lg border text-[12.5px] font-medium tabular-nums transition-all",
+                                  active
+                                    ? "border-primary bg-primary text-primary-foreground shadow-sm"
+                                    : "border-border bg-background text-foreground hover:border-primary/40 hover:bg-muted/40"
+                                )}
+                              >
+                                {h}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
+                      {selected && form.entrevistaHora && (
+                        <div className="mt-auto px-4 py-3 border-t border-border bg-muted/20 flex items-center gap-2 text-[11.5px] text-foreground/80">
+                          <MapPinned className="w-3.5 h-3.5 text-muted-foreground" /> {ENTREVISTA_LOCAL}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">
+                    A presença é obrigatória. Receberá a confirmação oficial por email após validação da candidatura.
+                  </p>
                 </div>
-                <p className="text-[11px] text-muted-foreground">
-                  A presença é obrigatória. Receberá a confirmação oficial por email após validação da candidatura.
-                </p>
-              </div>
-            )}
+              );
+            })()}
 
             {step === 6 && (
               <div className="space-y-4">
