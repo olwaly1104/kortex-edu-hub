@@ -53,15 +53,17 @@ export default function CandidaturaDocPreview({
   return (
     <div className="flex flex-col h-full min-h-0 bg-neutral-200/70">
       {/* Toolbar */}
-      <div className="flex items-center justify-between pl-5 pr-14 py-2.5 border-b border-border bg-gradient-to-b from-background to-muted/30 shrink-0 print:hidden">
-        <div className="flex items-center gap-2.5">
-          <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-background border border-border shadow-sm">
-            <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-            <span className="text-[10.5px] font-mono font-semibold text-foreground tabular-nums">{displayId}</span>
+      <div className="flex flex-col shrink-0 print:hidden bg-gradient-to-b from-background to-muted/30">
+        <div className="flex items-center justify-between pl-5 pr-14 py-2.5 border-b border-border">
+          <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-background border border-border shadow-sm">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+              <span className="text-[10.5px] font-mono font-semibold text-foreground tabular-nums">{displayId}</span>
+            </div>
+            <span className="text-[11px] text-muted-foreground">Ficha de Candidatura</span>
           </div>
-          <span className="text-[11px] text-muted-foreground">Ficha de Candidatura</span>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center justify-end pl-5 pr-14 py-2 border-b border-border gap-2">
           {/* Shared with — uniform with Solicitações */}
           <Dialog>
             <DialogTrigger asChild>
