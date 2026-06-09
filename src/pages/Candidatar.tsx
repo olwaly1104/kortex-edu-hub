@@ -996,8 +996,8 @@ export default function Candidatar() {
                   ]} />
                   <ReviewBlock title="Formação" stepN={3} onEdit={goTo} rows={[
                     ["Escola", form.escola], ["Conclusão", form.anoConclusao],
-                    ["Declaração Ensino Médio", docs.declaracaoEnsino ? docs.declaracaoEnsino.name : "—"],
-                    ["Certificado de Habilitações", docs.certificadoHabilitacoes ? docs.certificadoHabilitacoes.name : "—"],
+                    ["Certificado de Ensino Médio", docs.declaracaoEnsino ? docs.declaracaoEnsino.name : "—"],
+                    ["Declaração de Notas", docs.certificadoHabilitacoes ? docs.certificadoHabilitacoes.name : "—"],
                   ]} />
                   <ReviewBlock title="Curso" stepN={4} onEdit={goTo} rows={[
                     ["1ª escolha", form.fac1 ? `${form.fac1} — ${form.curso1 || "—"}` : "—"],
