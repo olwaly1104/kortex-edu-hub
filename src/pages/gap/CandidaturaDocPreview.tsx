@@ -216,10 +216,14 @@ function XTable({ rows }: { rows: [string, string][] }) {
         {lines.map((line, i) => (
           <tr key={i}>
             {line.length === 1 && line[0].full ? (
-              <>
-                <Td className={labelCls}>{line[0].k}</Td>
-                <Td colSpan={3}>{line[0].v}</Td>
-              </>
+              <Td colSpan={4}>
+                <div className="flex items-baseline gap-3">
+                  <span className="text-[9.5px] uppercase tracking-wider font-semibold text-neutral-500 shrink-0">
+                    {line[0].k}
+                  </span>
+                  <span className="text-neutral-900">{line[0].v}</span>
+                </div>
+              </Td>
             ) : line.length === 2 ? (
               <>
                 <Td className={labelCls}>{line[0].k}</Td>
