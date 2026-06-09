@@ -119,12 +119,26 @@ function buildCronologia(c: typeof candidaturas[number]) {
   const cursoPrep = new Date(sub.getTime() + 35 * 86400000);
   const exame = new Date(sub.getTime() + 60 * 86400000);
   const seed = parseInt(c.id.replace(/\D/g, ""), 10) || 0;
-  const entDone = entrevista <= today;
-  const cpDone = cursoPrep <= today;
-  const exDone = exame <= today;
-  const entrevistaEstado: EtapaEstado = entDone ? pick(seed, ["completo", "remarcado", "falta"] as EtapaEstado[]) : "agendado";
-  const cursoPrepEstado: EtapaEstado = cpDone ? "completo" : "agendado";
-  const exameEstado: EtapaEstado = exDone ? pick(seed + 1, ["aprovado", "reprovado", "remarcado"] as EtapaEstado[]) : "agendado";
+
+  // Sequential gating: each step only advances if the previous one is "completo".
+  // - Entrevista: completo | remarcado | falta (or agendado if date not reached).
+  // - Curso Preparatório: requires Entrevista = completo; otherwise agendado.
+  // - Exame: requires Curso Preparatório = completo; otherwise agendado.
+  const entrevistaEstado: EtapaEstado = entrevista <= today
+    ? pick(seed, ["completo", "completo", "remarcado", "falta"] as EtapaEstado[])
+    : "agendado";
+  const entDone = entrevistaEstado === "completo";
+
+  const cursoPrepEstado: EtapaEstado = entDone && cursoPrep <= today
+    ? pick(seed, ["completo", "completo", "remarcado"] as EtapaEstado[])
+    : "agendado";
+  const cpDone = cursoPrepEstado === "completo";
+
+  const exameEstado: EtapaEstado = cpDone && exame <= today
+    ? pick(seed + 1, ["aprovado", "reprovado", "remarcado"] as EtapaEstado[])
+    : "agendado";
+  const exDone = exameEstado === "aprovado" || exameEstado === "reprovado";
+
   return [
     { data: sub.toISOString(), accao: "Candidatura submetida", detalhe: "Formulário online preenchido pelo candidato", done: sub <= today, estado: "completo" as EtapaEstado },
     { data: entrevista.toISOString(), accao: "Entrevista", detalhe: "Realizada — Sala de Entrevistas, Campus UPRA", done: entDone, estado: entrevistaEstado },
