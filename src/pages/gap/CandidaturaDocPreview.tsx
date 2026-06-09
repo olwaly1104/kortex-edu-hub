@@ -67,7 +67,7 @@ export default function CandidaturaDocPreview({
       <div className="flex-1 min-h-0 overflow-y-auto py-8 px-4">
         <div
           className="mx-auto bg-white shadow-md print:shadow-none flex flex-col text-neutral-900"
-          style={{ width: "210mm", minHeight: "297mm", fontFamily: "'Inter', system-ui, sans-serif" }}
+          style={{ width: "260mm", minHeight: "297mm", fontFamily: "'Inter', system-ui, sans-serif" }}
         >
           {/* Top bar — logo + institucional à esquerda, ID à direita */}
           <div className="px-10 pt-6 pb-3 flex items-center justify-between border-b border-neutral-200">
