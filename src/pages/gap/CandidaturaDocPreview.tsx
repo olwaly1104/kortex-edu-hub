@@ -117,24 +117,22 @@ export default function CandidaturaDocPreview({
                 </div>
               </div>
 
-              {/* Cronologia — compacto, canto superior direito */}
+              {/* Documentos — compacto, canto superior direito */}
               <div className="w-[220px] shrink-0 border border-neutral-300">
                 <div className="px-2 py-1 bg-neutral-100 border-b border-neutral-300 flex items-center justify-between">
                   <p className="text-[9px] uppercase tracking-[0.16em] font-bold text-neutral-700">
-                    Cronologia
+                    Documentos
                   </p>
                   <p className="text-[9px] tabular-nums text-neutral-600 font-semibold">
-                    {cronologia.filter(h => h.done !== false).length}/{cronologia.length}
+                    {c.documentos.length}/{c.documentos.length}
                   </p>
                 </div>
                 <ul className="divide-y divide-neutral-200">
-                  {cronologia.map((h, i) => (
+                  {c.documentos.map((d, i) => (
                     <li key={i} className="flex items-center gap-2 px-2 py-[3px] text-[9.5px] text-neutral-800">
-                      <span className={h.done !== false ? "text-emerald-700 font-bold leading-none" : "text-neutral-400 font-bold leading-none"}>
-                        {h.done !== false ? "✓" : "○"}
-                      </span>
-                      <span className="truncate">{h.accao}</span>
-                      <span className="text-neutral-400 ml-auto tabular-nums">{fmtDataShort(h.data)}</span>
+                      <span className="text-emerald-700 font-bold leading-none">✓</span>
+                      <span className="truncate">{d.nome}</span>
+                      <span className="text-neutral-400 ml-auto tabular-nums">{String(i + 1).padStart(2, "0")}</span>
                     </li>
                   ))}
                 </ul>
@@ -150,26 +148,24 @@ export default function CandidaturaDocPreview({
               </Section>
             ))}
 
-            {/* Documentos */}
-            <Section title="Documentos">
+            {/* Cronologia */}
+            <Section title="Cronologia">
               <table className="w-full border-collapse text-[10.5px]">
                 <thead>
                   <tr className="bg-neutral-100">
                     <Th className="w-16">Nº</Th>
-                    <Th>Documento</Th>
-                    <Th className="w-32">Estado</Th>
+                    <Th className="w-28">Data</Th>
+                    <Th>Acção</Th>
+                    <Th>Detalhe</Th>
                   </tr>
                 </thead>
                 <tbody>
-                  {c.documentos.map((d, i) => (
+                  {cronologia.map((h, i) => (
                     <tr key={i} className={i % 2 ? "bg-neutral-50/60" : ""}>
                       <Td className="tabular-nums text-neutral-600 text-center">{i + 1}</Td>
-                      <Td className="font-semibold">{d.nome}</Td>
-                      <Td>
-                        <span className="inline-flex items-center gap-1.5 text-emerald-700 font-semibold">
-                          <span className="leading-none">✓</span> Entregue
-                        </span>
-                      </Td>
+                      <Td className="tabular-nums">{fmtDataShort(h.data)}</Td>
+                      <Td className="font-semibold">{h.accao}</Td>
+                      <Td className="text-neutral-700">{h.detalhe}</Td>
                     </tr>
                   ))}
                 </tbody>
