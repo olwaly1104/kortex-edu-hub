@@ -116,6 +116,25 @@ export default function CandidaturaDocPreview({
                   </div>
                 </div>
               </div>
+
+              <div className="w-[200px] shrink-0 border border-neutral-300">
+                <div className="px-2 py-1 bg-neutral-100 border-b border-neutral-300 flex items-center justify-between">
+                  <p className="text-[9px] uppercase tracking-[0.16em] font-bold text-neutral-700">
+                    Documentos
+                  </p>
+                  <p className="text-[9px] tabular-nums text-neutral-600 font-semibold">
+                    {c.documentos.length}/{c.documentos.length}
+                  </p>
+                </div>
+                <ul className="divide-y divide-neutral-200">
+                  {c.documentos.map((d, i) => (
+                    <li key={i} className="flex items-center gap-2 px-2 py-[3px] text-[9.5px] text-neutral-800">
+                      <span className="text-emerald-700 font-bold leading-none">✓</span>
+                      <span className="truncate">{d.nome}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
           </header>
 
