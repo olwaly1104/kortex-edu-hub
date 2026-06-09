@@ -60,7 +60,7 @@ export default function GapCandidaturas() {
           { label: "Candidaturas", value: kpis.total, icon: ClipboardList, iconBg: "bg-primary/10 text-primary" },
           { label: "Pendentes", value: kpis.pendentes, icon: Clock, iconBg: "bg-yellow-50 text-yellow-600" },
           { label: "Aprovados", value: kpis.aprovados, icon: CheckCircle, iconBg: "bg-green-50 text-green-600" },
-          { label: "Incompletos", value: kpis.incompletos, icon: AlertCircle, iconBg: "bg-orange-50 text-orange-600" },
+          { label: "Reprovados", value: kpis.reprovados, icon: AlertCircle, iconBg: "bg-red-50 text-red-600" },
         ].map(k => (
           <Card key={k.label} className="p-4 hover:shadow-sm transition-shadow">
             <div className="flex items-center justify-between">
