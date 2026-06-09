@@ -163,18 +163,17 @@ export default function GapCandidaturaDetail() {
             />
             <div className="min-w-0 flex-1">
               <h1 className="text-xl font-semibold leading-tight tracking-tight text-foreground">{c.nome}</h1>
-              <div className="mt-2 flex items-start gap-6">
-                <div className="flex flex-col gap-0.5">
-                  <span className="text-[9px] tracking-[0.12em] uppercase text-muted-foreground font-semibold">Estado</span>
-                  <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider gap-1 w-fit", estadoColors[estadoFinal])}>
-                    <span className={cn("w-1.5 h-1.5 rounded-full", estadoDot[estadoFinal])} />
-                    {estadoLabels[estadoFinal]}
-                  </Badge>
+              <div className="mt-3 inline-flex items-center rounded-lg border border-border bg-muted/30 overflow-hidden">
+                <div className="flex items-center gap-2 px-3 py-1.5">
+                  <span className={cn("w-2 h-2 rounded-full", estadoDot[estadoFinal])} />
+                  <span className="text-[11px] font-medium text-foreground">{estadoLabels[estadoFinal]}</span>
                 </div>
-                <div className="flex flex-col gap-0.5">
-                  <span className="text-[9px] tracking-[0.12em] uppercase text-muted-foreground font-semibold">Data de submissão</span>
-                  <span className="text-[12px] font-medium text-foreground tabular-nums">
-                    {dSub.toLocaleDateString("pt-PT", { day: "2-digit", month: "long", year: "numeric" })}
+                <span className="w-px h-4 bg-border" />
+                <div className="flex items-center gap-2 px-3 py-1.5">
+                  <CalendarDays className="w-3.5 h-3.5 text-muted-foreground" />
+                  <span className="text-[11px] text-muted-foreground">Submetida em</span>
+                  <span className="text-[11px] font-medium text-foreground tabular-nums">
+                    {dSub.toLocaleDateString("pt-PT", { day: "2-digit", month: "short", year: "numeric" })}
                   </span>
                 </div>
               </div>
