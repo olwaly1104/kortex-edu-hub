@@ -97,19 +97,40 @@ function buildSteps(c: typeof candidaturas[number]): StepDef[] {
   ];
 }
 
+type EtapaEstado = "completo" | "agendado" | "remarcado" | "falta" | "aprovado" | "reprovado";
+
+const etapaEstadoStyle: Record<EtapaEstado, string> = {
+  completo: "bg-green-50 text-green-700 border-green-200",
+  aprovado: "bg-green-50 text-green-700 border-green-200",
+  agendado: "bg-blue-50 text-blue-700 border-blue-200",
+  remarcado: "bg-amber-50 text-amber-700 border-amber-200",
+  falta: "bg-red-50 text-red-700 border-red-200",
+  reprovado: "bg-red-50 text-red-700 border-red-200",
+};
+
+function pick<T>(seed: number, arr: T[]): T { return arr[seed % arr.length]; }
+
 function buildCronologia(c: typeof candidaturas[number]) {
   const sub = new Date(c.dataSubmissao);
   const today = new Date();
   const entrevista = new Date(sub.getTime() + 12 * 86400000);
   const cursoPrep = new Date(sub.getTime() + 35 * 86400000);
   const exame = new Date(sub.getTime() + 60 * 86400000);
+  const seed = parseInt(c.id.replace(/\D/g, ""), 10) || 0;
+  const entDone = entrevista <= today;
+  const cpDone = cursoPrep <= today;
+  const exDone = exame <= today;
+  const entrevistaEstado: EtapaEstado = entDone ? pick(seed, ["completo", "remarcado", "falta"] as EtapaEstado[]) : "agendado";
+  const cursoPrepEstado: EtapaEstado = cpDone ? "completo" : "agendado";
+  const exameEstado: EtapaEstado = exDone ? pick(seed + 1, ["aprovado", "reprovado", "remarcado"] as EtapaEstado[]) : "agendado";
   return [
-    { data: sub.toISOString(), accao: "Candidatura submetida", detalhe: "Formulário online preenchido pelo candidato", done: sub <= today },
-    { data: entrevista.toISOString(), accao: "Entrevista", detalhe: "Realizada — Sala de Entrevistas, Campus UPRA", done: entrevista <= today },
-    { data: cursoPrep.toISOString(), accao: "Curso Preparatório", detalhe: "Inscrito — 1ª Sessão (Anfiteatro A)", done: cursoPrep <= today },
-    { data: exame.toISOString(), accao: "Exame de Acesso", detalhe: "Marcado — Edifício Central, Sala 04", done: exame <= today },
+    { data: sub.toISOString(), accao: "Candidatura submetida", detalhe: "Formulário online preenchido pelo candidato", done: sub <= today, estado: "completo" as EtapaEstado },
+    { data: entrevista.toISOString(), accao: "Entrevista", detalhe: "Realizada — Sala de Entrevistas, Campus UPRA", done: entDone, estado: entrevistaEstado },
+    { data: cursoPrep.toISOString(), accao: "Curso Preparatório", detalhe: "Inscrito — 1ª Sessão (Anfiteatro A)", done: cpDone, estado: cursoPrepEstado },
+    { data: exame.toISOString(), accao: "Exame de Acesso", detalhe: "Marcado — Edifício Central, Sala 04", done: exDone, estado: exameEstado },
   ];
 }
+
 
 export default function GapCandidaturaDetail() {
   const { id } = useParams();
