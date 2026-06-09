@@ -5,12 +5,23 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { type Candidatura, estadoLabels } from "@/data/admissoesData";
 
+type EtapaEstado = "completo" | "agendado" | "remarcado" | "falta" | "aprovado" | "reprovado";
+
 type Props = {
   candidatura: Candidatura;
   steps: { n: number; title: string; rows: { label: string; value: string }[] }[];
-  cronologia: { data: string; accao: string; detalhe: string; done?: boolean }[];
+  cronologia: { data: string; accao: string; detalhe: string; done?: boolean; estado?: EtapaEstado }[];
   displayId: string;
   photoIdx?: number;
+};
+
+const etapaEstadoCls: Record<EtapaEstado, string> = {
+  completo: "bg-emerald-50 text-emerald-700 border-emerald-300",
+  aprovado: "bg-emerald-50 text-emerald-700 border-emerald-300",
+  agendado: "bg-sky-50 text-sky-700 border-sky-300",
+  remarcado: "bg-amber-50 text-amber-700 border-amber-300",
+  falta: "bg-red-50 text-red-700 border-red-300",
+  reprovado: "bg-red-50 text-red-700 border-red-300",
 };
 
 const fmtDataLong = (d: Date) =>
