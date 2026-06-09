@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { Calendar } from "@/components/ui/calendar";
 import {
   ArrowLeft, ArrowRight, Check, User, MapPin,
   BookOpen, FileText, Upload, CheckCircle2, Send, Mail, Trash2, Paperclip, GraduationCap,
