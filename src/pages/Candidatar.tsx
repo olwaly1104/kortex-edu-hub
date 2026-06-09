@@ -655,6 +655,9 @@ export default function Candidatar() {
                         </SelectContent>
                       </Select>
                     </Field>
+                    <Field label="Profissão" required>
+                      <Input value={form.encProfissao} onChange={e => update("encProfissao", e.target.value)} className={inputCls("encProfissao")} placeholder="Ex.: Professor, Engenheiro" maxLength={80} />
+                    </Field>
                     <Field label="Telefone" required>
                       <Input value={form.encTelefone} onChange={e => update("encTelefone", e.target.value)} className={inputCls("encTelefone")} placeholder="+244 9XX XXX XXX" maxLength={20} />
                     </Field>
