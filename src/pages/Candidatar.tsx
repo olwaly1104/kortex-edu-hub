@@ -668,8 +668,8 @@ export default function Candidatar() {
 
             {step === 3 && (() => {
               const formacaoDocs = [
-                { key: "declaracaoEnsino", label: "Declaração de Finalização do Ensino Médio", desc: "Documento oficial emitido pela escola · PDF, JPG ou PNG · máx. 5MB" },
-                { key: "certificadoHabilitacoes", label: "Certificado de Habilitações (Notas)", desc: "Pauta oficial com notas finais · PDF, JPG ou PNG · máx. 5MB" },
+                { key: "declaracaoEnsino", label: "Certificado de Ensino Médio", desc: "Documento oficial emitido pela escola · PDF, JPG ou PNG · máx. 5MB" },
+                { key: "certificadoHabilitacoes", label: "Declaração de Notas", desc: "Pauta oficial com notas finais · PDF, JPG ou PNG · máx. 5MB" },
               ];
               return (
                 <div className="space-y-5">
@@ -996,8 +996,8 @@ export default function Candidatar() {
                   ]} />
                   <ReviewBlock title="Formação" stepN={3} onEdit={goTo} rows={[
                     ["Escola", form.escola], ["Conclusão", form.anoConclusao],
-                    ["Declaração Ensino Médio", docs.declaracaoEnsino ? docs.declaracaoEnsino.name : "—"],
-                    ["Certificado de Habilitações", docs.certificadoHabilitacoes ? docs.certificadoHabilitacoes.name : "—"],
+                    ["Certificado de Ensino Médio", docs.declaracaoEnsino ? docs.declaracaoEnsino.name : "—"],
+                    ["Declaração de Notas", docs.certificadoHabilitacoes ? docs.certificadoHabilitacoes.name : "—"],
                   ]} />
                   <ReviewBlock title="Curso" stepN={4} onEdit={goTo} rows={[
                     ["1ª escolha", form.fac1 ? `${form.fac1} — ${form.curso1 || "—"}` : "—"],
