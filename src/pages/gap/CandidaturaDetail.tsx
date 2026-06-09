@@ -221,6 +221,53 @@ export default function GapCandidaturaDetail() {
           </div>
         </div>
 
+        {/* Documentos + Linha do Tempo — lado a lado, verticais */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-5 border-b border-border bg-muted/10">
+          <div className="border border-border rounded-md bg-background overflow-hidden">
+            <div className="px-3 py-2 bg-muted/40 border-b border-border flex items-center justify-between">
+              <h4 className="text-[11px] font-semibold uppercase tracking-wider text-foreground flex items-center gap-1.5">
+                <FileText className="w-3.5 h-3.5" /> Documentos
+              </h4>
+              <span className="text-[10px] tabular-nums text-muted-foreground font-medium">
+                {docsEntregues}/{c.documentos.length}
+              </span>
+            </div>
+            <ul className="divide-y divide-border">
+              {c.documentos.map((d, i) => (
+                <li key={i} className="flex items-center gap-2 px-3 py-1.5 text-[12px] text-foreground">
+                  <Check className="w-3 h-3 text-green-600 shrink-0" strokeWidth={3} />
+                  <span className="truncate">{d.nome}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="border border-border rounded-md bg-background overflow-hidden">
+            <div className="px-3 py-2 bg-muted/40 border-b border-border flex items-center justify-between">
+              <h4 className="text-[11px] font-semibold uppercase tracking-wider text-foreground flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5" /> Linha do Tempo
+              </h4>
+              <span className="text-[10px] tabular-nums text-muted-foreground font-medium">
+                {cronologia.filter(h => h.done).length}/{cronologia.length}
+              </span>
+            </div>
+            <ul className="divide-y divide-border">
+              {cronologia.map((h, i) => (
+                <li key={i} className="flex items-center gap-2 px-3 py-1.5 text-[12px]">
+                  {h.done ? (
+                    <Check className="w-3 h-3 text-green-600 shrink-0" strokeWidth={3} />
+                  ) : (
+                    <span className="w-3 h-3 rounded-full border border-muted-foreground/40 shrink-0" />
+                  )}
+                  <span className={cn("truncate", h.done ? "text-foreground" : "text-muted-foreground")}>{h.accao}</span>
+                  <span className="ml-auto text-[10px] text-muted-foreground tabular-nums">
+                    {new Date(h.data).toLocaleDateString("pt-AO")}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
         {/* Etapas */}
         <div className="px-6 py-4 border-b border-border bg-muted/30 flex items-center justify-between">
           <h3 className="text-sm font-semibold text-foreground">Dados Da Candidatura</h3>
