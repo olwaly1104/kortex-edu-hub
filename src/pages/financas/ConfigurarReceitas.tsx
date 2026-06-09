@@ -25,7 +25,8 @@ type TipoReceita =
   | "Emolumento"
   | "Taxa"
   | "Serviço Académico"
-  | "Candidatura";
+  | "Candidatura"
+  | "Multa";
 
 const TIPOS: TipoReceita[] = [
   "Propina mensal",
@@ -34,6 +35,7 @@ const TIPOS: TipoReceita[] = [
   "Taxa",
   "Serviço Académico",
   "Candidatura",
+  "Multa",
 ];
 
 interface ReceitaRow {
@@ -101,6 +103,11 @@ const initialRows = (): ReceitaRow[] => {
     { id: "tax-2", nome: "Taxa de Emissão de 2ª Via de Cartão", tipo: "Taxa", escopo: "geral", valor: 2000 },
     { id: "can-1", nome: "Candidatura — Licenciatura", tipo: "Candidatura", escopo: "geral", valor: 15000 },
     { id: "can-2", nome: "Candidatura — Mestrado", tipo: "Candidatura", escopo: "geral", valor: 20000 },
+    { id: "mul-1", nome: "Multa por atraso de propina (por mês)", tipo: "Multa", escopo: "geral", valor: 5000 },
+    { id: "mul-2", nome: "Multa por falta a exame sem justificação", tipo: "Multa", escopo: "geral", valor: 7500 },
+    { id: "mul-3", nome: "Multa por entrega tardia de documentos", tipo: "Multa", escopo: "geral", valor: 3000 },
+    { id: "mul-4", nome: "Multa por extravio de cartão de estudante", tipo: "Multa", escopo: "geral", valor: 4000 },
+    { id: "mul-5", nome: "Multa por danos em equipamento", tipo: "Multa", escopo: "geral", valor: 15000 },
   ];
   return [...gerais, ...perCurso];
 };
@@ -112,6 +119,7 @@ const tipoBadge: Record<TipoReceita, string> = {
   "Taxa": "bg-amber-50 text-amber-700 border-amber-200",
   "Serviço Académico": "bg-violet-50 text-violet-700 border-violet-200",
   "Candidatura": "bg-pink-50 text-pink-700 border-pink-200",
+  "Multa": "bg-red-50 text-red-700 border-red-200",
 };
 
 export default function ConfigurarReceitas() {
