@@ -5,12 +5,23 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { type Candidatura, estadoLabels } from "@/data/admissoesData";
 
+type EtapaEstado = "completo" | "agendado" | "remarcado" | "falta" | "aprovado" | "reprovado";
+
 type Props = {
   candidatura: Candidatura;
   steps: { n: number; title: string; rows: { label: string; value: string }[] }[];
-  cronologia: { data: string; accao: string; detalhe: string; done?: boolean }[];
+  cronologia: { data: string; accao: string; detalhe: string; done?: boolean; estado?: EtapaEstado }[];
   displayId: string;
   photoIdx?: number;
+};
+
+const etapaEstadoCls: Record<EtapaEstado, string> = {
+  completo: "bg-emerald-50 text-emerald-700 border-emerald-300",
+  aprovado: "bg-emerald-50 text-emerald-700 border-emerald-300",
+  agendado: "bg-sky-50 text-sky-700 border-sky-300",
+  remarcado: "bg-amber-50 text-amber-700 border-amber-300",
+  falta: "bg-red-50 text-red-700 border-red-300",
+  reprovado: "bg-red-50 text-red-700 border-red-300",
 };
 
 const fmtDataLong = (d: Date) =>
@@ -117,52 +128,58 @@ export default function CandidaturaDocPreview({
                 </div>
               </div>
 
-            </div>
-          </header>
-
-          <div className="flex-1 px-10 py-5 space-y-4">
-            {/* Documentos + Linha do Tempo — verticais, lado a lado, acima das etapas */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="border border-neutral-300">
-                <div className="px-2.5 py-1 bg-neutral-100 border-b border-neutral-300 flex items-center justify-between">
-                  <p className="text-[9px] uppercase tracking-[0.16em] font-bold text-neutral-700">
+              {/* Documentos — compact card, top-right above the bold line */}
+              <div className="w-[210px] shrink-0 border border-neutral-300 bg-white">
+                <div className="px-2 py-1 bg-neutral-100 border-b border-neutral-300 flex items-center justify-between">
+                  <p className="text-[8.5px] uppercase tracking-[0.16em] font-bold text-neutral-700">
                     Documentos
                   </p>
-                  <p className="text-[9px] tabular-nums text-neutral-600 font-semibold">
+                  <p className="text-[8.5px] tabular-nums text-neutral-600 font-semibold">
                     {c.documentos.length}/{c.documentos.length}
                   </p>
                 </div>
                 <ul className="divide-y divide-neutral-200">
                   {c.documentos.map((d, i) => (
-                    <li key={i} className="flex items-center gap-2 px-2.5 py-[4px] text-[9.5px] text-neutral-800">
+                    <li key={i} className="flex items-center gap-1.5 px-2 py-[3px] text-[8.5px] text-neutral-800">
                       <span className="text-emerald-700 font-bold leading-none">✓</span>
                       <span className="truncate">{d.nome}</span>
                     </li>
                   ))}
                 </ul>
               </div>
-              <div className="border border-neutral-300">
-                <div className="px-2.5 py-1 bg-neutral-100 border-b border-neutral-300 flex items-center justify-between">
-                  <p className="text-[9px] uppercase tracking-[0.16em] font-bold text-neutral-700">
-                    Etapas da Candidatura
-                  </p>
-                  <p className="text-[9px] tabular-nums text-neutral-600 font-semibold">
-                    {cronologia.filter(h => h.done !== false).length}/{cronologia.length}
-                  </p>
-                </div>
-                <ul className="divide-y divide-neutral-200">
-                  {cronologia.map((h, i) => (
-                    <li key={i} className="flex items-center gap-2 px-2.5 py-[4px] text-[9.5px]">
-                      <span className={h.done !== false ? "text-emerald-700 font-bold leading-none" : "text-neutral-400 font-bold leading-none"}>
-                        {h.done !== false ? "✓" : "○"}
-                      </span>
-                      <span className={h.done !== false ? "truncate text-neutral-800" : "truncate text-neutral-500"}>{h.accao}</span>
-                      <span className="text-neutral-400 ml-auto tabular-nums">{fmtDataShort(h.data)}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
             </div>
+          </header>
+
+          <div className="flex-1 px-10 py-5 space-y-4">
+            {/* Etapas da Candidatura — full width with estado badges */}
+            <div className="border border-neutral-300">
+              <div className="px-2.5 py-1 bg-neutral-100 border-b border-neutral-300 flex items-center justify-between">
+                <p className="text-[9px] uppercase tracking-[0.16em] font-bold text-neutral-700">
+                  Etapas da Candidatura
+                </p>
+                <p className="text-[9px] tabular-nums text-neutral-600 font-semibold">
+                  {cronologia.filter(h => h.done !== false).length}/{cronologia.length}
+                </p>
+              </div>
+              <ul className="divide-y divide-neutral-200">
+                {cronologia.map((h, i) => (
+                  <li key={i} className="flex items-center gap-2 px-2.5 py-[5px] text-[10px]">
+                    <span className={h.done !== false ? "text-emerald-700 font-bold leading-none" : "text-neutral-400 font-bold leading-none"}>
+                      {h.done !== false ? "✓" : "○"}
+                    </span>
+                    <span className={h.done !== false ? "truncate text-neutral-800 font-medium" : "truncate text-neutral-500"}>{h.accao}</span>
+                    {h.estado && (
+                      <span className={`ml-auto inline-flex items-center px-1.5 py-0.5 rounded border text-[8.5px] font-semibold uppercase tracking-wide ${etapaEstadoCls[h.estado]}`}>
+                        {h.estado}
+                      </span>
+                    )}
+                    <span className="text-neutral-500 tabular-nums text-[9.5px] w-[64px] text-right">{fmtDataShort(h.data)}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+
 
             {/* Sections — dados verticais */}
             {steps.map(s => (
