@@ -1,9 +1,19 @@
-import { Printer, Download, Users } from "lucide-react";
+import { Printer, Download, Users, Mail, Shield } from "lucide-react";
 import logoAsset from "@/assets/logo-upra.asset.json";
 import studentPhoto from "@/assets/student-id-photo.jpg";
 import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useToast } from "@/hooks/use-toast";
 import { type Candidatura, estadoLabels } from "@/data/admissoesData";
+
+const sharedWith = [
+  { name: "Dra. Helena Cabral", role: "Coordenadora GAP", email: "helena.cabral@upra.kor", img: 8 },
+  { name: "Eng. Paulo Mendes", role: "Coordenador ARQ", email: "paulo.mendes@upra.kor", img: 15 },
+  { name: "Dr. Tiago Almeida", role: "Decano Ciências Exatas", email: "tiago.almeida@upra.kor", img: 32 },
+  { name: "Sara Vieira", role: "Académica", email: "sara.vieira@upra.kor", img: 47 },
+  { name: "Mário Lopes", role: "Finanças", email: "mario.lopes@upra.kor", img: 51 },
+  { name: "Inês Costa", role: "Inscrições", email: "ines.costa@upra.kor", img: 23 },
+];
 
 type EtapaEstado = "completo" | "agendado" | "remarcado" | "falta" | "aprovado" | "reprovado";
 
@@ -42,50 +52,91 @@ export default function CandidaturaDocPreview({
   return (
     <div className="flex flex-col h-full min-h-0 bg-neutral-200/70">
       {/* Toolbar */}
-      <div className="flex items-center justify-between px-5 py-2 border-b border-border bg-background shrink-0 print:hidden">
+      <div className="flex items-center justify-between px-5 py-2.5 border-b border-border bg-gradient-to-b from-background to-muted/30 shrink-0 print:hidden">
         <div className="flex items-center gap-2.5">
-          <span className="text-[11px] font-mono font-semibold text-foreground tabular-nums">{displayId}</span>
-          <span className="w-px h-3.5 bg-border" />
+          <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-background border border-border shadow-sm">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+            <span className="text-[10.5px] font-mono font-semibold text-foreground tabular-nums">{displayId}</span>
+          </div>
           <span className="text-[11px] text-muted-foreground">Ficha de Candidatura</span>
         </div>
-        <div className="flex items-center gap-3">
-          {/* Shared with */}
-          <div className="flex items-center gap-2 pr-3 border-r border-border">
-            <div className="flex -space-x-1.5">
-              {[8, 15, 32, 47].map((n, i) => (
-                <img
-                  key={i}
-                  src={`https://i.pravatar.cc/40?img=${n}`}
-                  alt=""
-                  className="w-6 h-6 rounded-full ring-2 ring-background object-cover"
-                />
-              ))}
-              <div className="w-6 h-6 rounded-full ring-2 ring-background bg-muted text-muted-foreground text-[9px] font-semibold flex items-center justify-center tabular-nums">
-                +2
+        <div className="flex items-center gap-2">
+          {/* Shared with — clickable popover */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <button
+                type="button"
+                className="group flex items-center gap-2 h-8 pl-1 pr-2.5 rounded-md border border-border bg-background hover:bg-muted/60 hover:border-foreground/20 transition-all"
+              >
+                <div className="flex -space-x-1.5">
+                  {sharedWith.slice(0, 3).map((p, i) => (
+                    <img
+                      key={i}
+                      src={`https://i.pravatar.cc/40?img=${p.img}`}
+                      alt=""
+                      className="w-6 h-6 rounded-full ring-2 ring-background object-cover"
+                    />
+                  ))}
+                  <div className="w-6 h-6 rounded-full ring-2 ring-background bg-foreground text-background text-[9px] font-semibold flex items-center justify-center tabular-nums">
+                    +{sharedWith.length - 3}
+                  </div>
+                </div>
+                <span className="text-[10.5px] font-medium text-foreground group-hover:text-foreground">Partilhado</span>
+              </button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-80 p-0 overflow-hidden">
+              <div className="px-3.5 py-2.5 border-b border-border bg-muted/40">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <Users className="w-3.5 h-3.5 text-foreground" />
+                    <h4 className="text-[12px] font-semibold text-foreground">Pessoas com acesso</h4>
+                  </div>
+                  <span className="text-[10px] text-muted-foreground tabular-nums font-medium">{sharedWith.length}</span>
+                </div>
+                <p className="mt-0.5 text-[10px] text-muted-foreground flex items-center gap-1">
+                  <Shield className="w-2.5 h-2.5" /> Acesso restrito · só visualização
+                </p>
               </div>
-            </div>
-            <div className="flex items-center gap-1 text-[10.5px] text-muted-foreground">
-              <Users className="w-3 h-3" />
-              <span className="font-medium">Partilhado com 6</span>
-            </div>
-          </div>
+              <ul className="max-h-72 overflow-y-auto divide-y divide-border">
+                {sharedWith.map((p, i) => (
+                  <li key={i} className="flex items-center gap-2.5 px-3.5 py-2 hover:bg-muted/40 transition-colors">
+                    <img
+                      src={`https://i.pravatar.cc/64?img=${p.img}`}
+                      alt={p.name}
+                      className="w-8 h-8 rounded-full object-cover shrink-0"
+                    />
+                    <div className="min-w-0 flex-1 leading-tight">
+                      <p className="text-[11.5px] font-semibold text-foreground truncate">{p.name}</p>
+                      <p className="text-[10px] text-muted-foreground truncate">{p.role}</p>
+                    </div>
+                    <a
+                      href={`mailto:${p.email}`}
+                      title={p.email}
+                      className="w-6 h-6 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-background hover:text-foreground transition-colors shrink-0"
+                    >
+                      <Mail className="w-3 h-3" />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </PopoverContent>
+          </Popover>
+
           {/* Actions */}
-          <div className="flex items-center gap-1 p-0.5 rounded-md bg-muted/60 border border-border">
-            <button
-              type="button"
-              onClick={() => window.print()}
-              className="h-6 px-2 inline-flex items-center gap-1.5 text-[11px] font-medium text-foreground rounded hover:bg-background hover:shadow-sm transition-all"
-            >
-              <Printer className="w-3 h-3" /> Imprimir
-            </button>
-            <button
-              type="button"
-              onClick={() => toast({ title: "Documento exportado", description: `${displayId}.pdf` })}
-              className="h-6 px-2 inline-flex items-center gap-1.5 text-[11px] font-medium text-primary-foreground bg-primary rounded hover:bg-primary/90 transition-all"
-            >
-              <Download className="w-3 h-3" /> Descarregar
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={() => window.print()}
+            className="h-8 px-3 inline-flex items-center gap-1.5 text-[11px] font-medium text-foreground bg-background border border-border rounded-md shadow-sm hover:bg-muted/60 hover:border-foreground/20 transition-all"
+          >
+            <Printer className="w-3.5 h-3.5" /> Imprimir
+          </button>
+          <button
+            type="button"
+            onClick={() => toast({ title: "Documento exportado", description: `${displayId}.pdf` })}
+            className="h-8 px-3 inline-flex items-center gap-1.5 text-[11px] font-semibold text-primary-foreground bg-primary rounded-md shadow-sm hover:bg-primary/90 hover:shadow-md transition-all"
+          >
+            <Download className="w-3.5 h-3.5" /> Descarregar
+          </button>
         </div>
       </div>
 
