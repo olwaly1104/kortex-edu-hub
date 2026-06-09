@@ -165,13 +165,13 @@ export default function CandidaturaDocPreview({
           {/* Footer */}
           <footer className="px-10 pb-6 pt-3 mt-auto border-t border-neutral-300 flex items-end justify-between gap-8">
             <p className="text-[9.5px] text-neutral-500 leading-relaxed max-w-sm">
-              Documento gerado pelo Gabinete de Apoio Académico. Contacto:{" "}
+              Documento gerado pelo Gabinete de Apoio. Contacto:{" "}
               <span className="font-semibold text-neutral-700">gap@upra.kor</span>.
             </p>
             <div className="text-right">
               <div className="border-t border-neutral-400 pt-1 min-w-[200px]">
                 <p className="text-[9px] uppercase tracking-[0.18em] text-neutral-500 font-semibold">
-                  Coordenação do GAP
+                  Coordenação do Gabinete de Apoio
                 </p>
                 <p className="text-[11px] font-semibold text-neutral-900 mt-0.5">Dra. Helena Cabral</p>
               </div>
