@@ -174,13 +174,12 @@ export default function CandidaturaDocPreview({
   );
 }
 
-function Section({ n, title, children }: { n: string; title: string; children: React.ReactNode }) {
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section>
-      <div className="flex items-baseline gap-3 mb-1.5">
-        <span className="font-mono text-[10px] font-bold text-neutral-400 tabular-nums">{n}</span>
-        <h3 className="text-[11px] uppercase tracking-[0.2em] font-bold text-neutral-900">{title}</h3>
-      </div>
+      <h3 className="text-[11px] uppercase tracking-[0.2em] font-bold text-neutral-900 mb-1.5 pb-1 border-b border-neutral-300">
+        {title}
+      </h3>
       {children}
     </section>
   );
