@@ -141,6 +141,9 @@ export default function GapCandidaturaDetail() {
 
   const dSub = new Date(c.dataSubmissao);
   const photoIdx = (parseInt(c.id.replace(/\D/g, ""), 10) % 70) + 1;
+  const anoCand = dSub.getFullYear();
+  const numCand = c.id.replace(/\D/g, "").padStart(4, "0");
+  const displayId = `CAND-${anoCand}-${numCand}`;
 
   return (
     <div className="p-6 lg:p-8 max-w-5xl mx-auto space-y-6 animate-fade-in">
@@ -155,7 +158,7 @@ export default function GapCandidaturaDetail() {
           <span className="text-muted-foreground/40">·</span>
           <Link to="/gap/candidaturas" className="text-muted-foreground hover:text-foreground transition-colors">Candidaturas</Link>
           <span className="text-muted-foreground/40">·</span>
-          <span className="font-mono text-foreground normal-case tracking-normal">{c.id}</span>
+          <span className="font-mono text-foreground normal-case tracking-normal">{displayId}</span>
         </div>
 
         {/* Title block — photo + name + badges + doc pill */}
@@ -192,17 +195,17 @@ export default function GapCandidaturaDetail() {
             <div className="shrink-0 flex flex-col items-end gap-1.5">
               <button
                 type="button"
-                onClick={() => { navigator.clipboard?.writeText(c.id); toast({ title: "ID copiado", description: c.id }); }}
+                onClick={() => { navigator.clipboard?.writeText(displayId); toast({ title: "ID copiado", description: displayId }); }}
                 className="inline-flex items-center px-2 py-0.5 rounded-md border border-border bg-background hover:bg-muted text-[11px] font-mono font-semibold text-foreground transition-colors"
               >
-                {c.id}
+                {displayId}
               </button>
               <div className="inline-flex items-center gap-2 pl-1.5 pr-1 py-1 rounded-md border border-border bg-background shadow-sm">
                 <div className="w-6 h-6 rounded bg-red-50 border border-red-200 flex items-center justify-center shrink-0">
                   <FileText className="w-3 h-3 text-red-600" />
                 </div>
                 <div className="flex flex-col min-w-0 leading-tight">
-                  <span className="text-[11px] font-semibold text-foreground tabular-nums">Cand-{c.id}</span>
+                  <span className="text-[11px] font-semibold text-foreground tabular-nums">{displayId}</span>
                   <span className="text-[9px] tracking-[0.02em] text-muted-foreground font-medium">
                     Gerado automaticamente
                   </span>
@@ -216,15 +219,15 @@ export default function GapCandidaturaDetail() {
                   </DialogTrigger>
                   <DialogContent className="max-w-5xl w-[95vw] h-[92vh] p-0 gap-0 overflow-hidden">
                     <DialogHeader className="sr-only">
-                      <DialogTitle>Documento Cand-{c.id}</DialogTitle>
+                      <DialogTitle>Documento {displayId}</DialogTitle>
                       <DialogDescription>Pré-visualização do documento institucional gerado.</DialogDescription>
                     </DialogHeader>
-                    <CandidaturaDocPreview candidatura={c} steps={steps} cronologia={cronologia} />
+                    <CandidaturaDocPreview candidatura={c} steps={steps} cronologia={cronologia} displayId={displayId} />
                   </DialogContent>
                 </Dialog>
                 <button
                   type="button"
-                  onClick={() => toast({ title: "Documento exportado", description: `Cand-${c.id}.pdf` })}
+                  onClick={() => toast({ title: "Documento exportado", description: `${displayId}.pdf` })}
                   className="w-5 h-5 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
                   title="Exportar"
                 >
