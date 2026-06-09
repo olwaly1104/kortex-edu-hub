@@ -57,49 +57,55 @@ export default function CandidaturaDocPreview({
           className="mx-auto bg-white shadow-md print:shadow-none flex flex-col text-neutral-900"
           style={{ width: "210mm", minHeight: "297mm", fontFamily: "'Inter', system-ui, sans-serif" }}
         >
-          {/* Top bar — institutional */}
-          <div className="px-10 pt-6 pb-3 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <img src={logoAsset.url} alt="UPRA" className="h-10 w-auto object-contain" />
-              <div>
-                <p className="text-[10px] font-bold text-neutral-900 leading-tight">Universidade Privada de Angola</p>
-                <p className="text-[9px] uppercase tracking-[0.2em] text-neutral-500 font-semibold">Gabinete de Apoio ao Processo</p>
-              </div>
+          {/* Top bar — institutional, logo centrado */}
+          <div className="px-10 pt-6 pb-3 grid grid-cols-3 items-center">
+            <p className="text-[10px] uppercase tracking-[0.18em] text-neutral-500 font-semibold">
+              Universidade Privada de Angola
+            </p>
+            <div className="flex justify-center">
+              <img src={logoAsset.url} alt="UPRA" className="h-14 w-auto object-contain" />
             </div>
-            <p className="font-mono text-[11px] font-bold text-neutral-700">{displayId}</p>
+            <p className="font-mono text-[11px] font-bold text-neutral-700 text-right">{displayId}</p>
           </div>
 
           {/* Header — photo + name + estado + submetido + documentos */}
           <header className="px-10 pb-5 border-b-2 border-neutral-900">
-            <div className="flex items-start gap-5">
+            <div className="flex items-start gap-6">
               <img
                 src={`https://i.pravatar.cc/240?img=${photoIdx}`}
                 alt={`Foto — ${c.nome}`}
-                className="w-[88px] h-[110px] object-cover border border-neutral-400 bg-neutral-100 shrink-0"
+                className="w-[110px] h-[140px] object-cover border border-neutral-400 bg-neutral-100 shrink-0"
               />
               <div className="flex-1 min-w-0 pt-1">
-                <p className="text-[10px] uppercase tracking-[0.22em] text-neutral-500 font-semibold mb-1">
+                <p className="text-[12px] uppercase tracking-[0.24em] text-neutral-500 font-bold mb-1.5">
                   Ficha de Candidatura
                 </p>
-                <h1 className="text-[24px] leading-[1.1] font-bold tracking-tight text-neutral-900">
+                <h1 className="text-[28px] leading-[1.1] font-bold tracking-tight text-neutral-900">
                   {c.nome}
                 </h1>
-                <div className="mt-2 flex items-center gap-3 text-[10.5px] text-neutral-600">
-                  <span className="inline-flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-neutral-900" />
-                    <span className="uppercase tracking-[0.14em] font-bold text-neutral-900">
-                      {estadoLabels[estadoKey]}
+                <div className="mt-3 flex items-end gap-6 text-[10.5px] text-neutral-600">
+                  <div>
+                    <p className="text-[9px] uppercase tracking-[0.18em] text-neutral-500 font-semibold mb-0.5">
+                      Estado
+                    </p>
+                    <span className="inline-flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-neutral-900" />
+                      <span className="uppercase tracking-[0.14em] font-bold text-neutral-900 text-[11px]">
+                        {estadoLabels[estadoKey]}
+                      </span>
                     </span>
-                  </span>
-                  <span className="text-neutral-300">|</span>
-                  <span>
-                    Submetido a{" "}
-                    <span className="font-semibold text-neutral-900 tabular-nums">
+                  </div>
+                  <div>
+                    <p className="text-[9px] uppercase tracking-[0.18em] text-neutral-500 font-semibold mb-0.5">
+                      Submetido em
+                    </p>
+                    <span className="font-semibold text-neutral-900 tabular-nums text-[11px]">
                       {fmtDataShort(c.dataSubmissao)}
                     </span>
-                  </span>
+                  </div>
                 </div>
               </div>
+
 
               {/* Documentos entregues — compacto, canto superior direito */}
               <div className="w-[220px] shrink-0 border border-neutral-300">
@@ -159,13 +165,13 @@ export default function CandidaturaDocPreview({
           {/* Footer */}
           <footer className="px-10 pb-6 pt-3 mt-auto border-t border-neutral-300 flex items-end justify-between gap-8">
             <p className="text-[9.5px] text-neutral-500 leading-relaxed max-w-sm">
-              Documento gerado pelo Gabinete de Apoio Académico. Contacto:{" "}
+              Documento gerado pelo Gabinete de Apoio. Contacto:{" "}
               <span className="font-semibold text-neutral-700">gap@upra.kor</span>.
             </p>
             <div className="text-right">
               <div className="border-t border-neutral-400 pt-1 min-w-[200px]">
                 <p className="text-[9px] uppercase tracking-[0.18em] text-neutral-500 font-semibold">
-                  Coordenação do GAP
+                  Coordenação do Gabinete de Apoio
                 </p>
                 <p className="text-[11px] font-semibold text-neutral-900 mt-0.5">Dra. Helena Cabral</p>
               </div>
