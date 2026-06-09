@@ -187,16 +187,16 @@ function Th({ children, className = "" }: { children: React.ReactNode; className
 }
 
 function Td({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  return <td className={`border border-neutral-300 px-3 py-1.5 align-top ${className}`}>{children}</td>;
+  return <td className={`border border-neutral-300 px-2.5 py-1 align-top ${className}`}>{children}</td>;
 }
 
 function XTable({ rows }: { rows: [string, string][] }) {
   return (
-    <table className="w-full border-collapse text-[11px]">
+    <table className="w-full border-collapse text-[10.5px]">
       <tbody>
         {rows.map(([k, v], i) => (
           <tr key={i}>
-            <Td className="w-56 bg-neutral-50 font-semibold text-neutral-700 text-[10px] uppercase tracking-wider">
+            <Td className="w-52 bg-neutral-50 font-semibold text-neutral-700 text-[9.5px] uppercase tracking-wider">
               {k}
             </Td>
             <Td>{v}</Td>
