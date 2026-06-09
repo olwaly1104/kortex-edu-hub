@@ -223,7 +223,7 @@ export default function GapCandidaturaDetail() {
 
         {/* Etapas */}
         <div className="px-6 py-4 border-b border-border bg-muted/30 flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-foreground">Etapas do Processo de Candidatura</h3>
+          <h3 className="text-sm font-semibold text-foreground">Dados Da Candidatura</h3>
           <div className="flex items-center gap-3">
             <div className="w-32 h-1.5 bg-muted rounded-full overflow-hidden">
               <div className="h-full bg-green-600" style={{ width: "100%" }} />
