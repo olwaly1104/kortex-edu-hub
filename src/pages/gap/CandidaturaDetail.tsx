@@ -1,8 +1,7 @@
 import { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { candidaturas, estadoColors, estadoLabels } from "@/data/admissoesData";
@@ -12,6 +11,13 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import CandidaturaDocPreview from "./CandidaturaDocPreview";
+
+const estadoDot: Record<string, string> = {
+  pendente: "bg-amber-500",
+  aprovado: "bg-emerald-500",
+  reprovado: "bg-destructive",
+  incompleto: "bg-amber-500",
+};
 
 interface InfoRow { label: string; value: string }
 interface StepDef {
@@ -122,7 +128,7 @@ export default function GapCandidaturaDetail() {
 
   if (!c) return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
-      <Button variant="ghost" onClick={() => navigate(-1)} className="gap-2"><ArrowLeft className="w-4 h-4" /> Voltar</Button>
+      <button onClick={() => navigate(-1)} className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"><ArrowLeft className="w-4 h-4" /> Voltar</button>
       <p className="text-muted-foreground text-center py-12">Candidatura não encontrada.</p>
     </div>
   );
@@ -133,64 +139,99 @@ export default function GapCandidaturaDetail() {
   // Garantia: nunca exibir "incompleto" — qualquer candidatura é tratada como pelo menos "pendente"
   const estadoFinal = c.estado === "incompleto" ? "pendente" : c.estado;
 
+  const dSub = new Date(c.dataSubmissao);
+  const photoIdx = (parseInt(c.id.replace(/\D/g, ""), 10) % 70) + 1;
+
   return (
-    <div className="p-6 lg:p-8 max-w-4xl mx-auto space-y-6 animate-fade-in">
-      <Button variant="ghost" onClick={() => navigate(-1)} className="gap-2">
-        <ArrowLeft className="w-4 h-4" /> Voltar
-      </Button>
+    <div className="p-6 lg:p-8 max-w-5xl mx-auto space-y-6 animate-fade-in">
+      <Link to="/gap/candidaturas" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
+        <ArrowLeft className="w-4 h-4" /> Voltar a Candidaturas
+      </Link>
 
-      {/* Header — perfil + estado + documento institucional */}
-      <Card className="p-6">
-        <div className="flex items-start justify-between gap-6 flex-wrap">
-          <div className="flex items-center gap-4 min-w-0">
+      <Card className="overflow-hidden p-0 gap-0">
+        {/* Top bar — breadcrumb */}
+        <div className="flex items-center gap-2 px-6 py-3 border-b border-border bg-muted/20 text-[10px] uppercase tracking-[0.12em] font-semibold">
+          <span className="text-primary">Admissões {c.periodo}</span>
+          <span className="text-muted-foreground/40">·</span>
+          <Link to="/gap/candidaturas" className="text-muted-foreground hover:text-foreground transition-colors">Candidaturas</Link>
+          <span className="text-muted-foreground/40">·</span>
+          <span className="font-mono text-foreground normal-case tracking-normal">{c.id}</span>
+        </div>
+
+        {/* Title block — photo + name + badges + doc pill */}
+        <div className="px-6 pt-4 pb-4">
+          <div className="flex items-start gap-3 rounded-lg border border-border bg-background p-3">
+            {/* Photo tipo passe */}
             <img
-              src={`https://i.pravatar.cc/120?img=${(parseInt(c.id.replace(/\D/g, ""), 10) % 70) + 1}`}
+              src={`https://i.pravatar.cc/120?img=${photoIdx}`}
               alt={`Foto tipo passe — ${c.nome}`}
-              className="w-16 h-20 rounded-md object-cover border border-border shadow-sm shrink-0 bg-muted"
+              className="shrink-0 w-[60px] h-[78px] rounded-md object-cover border border-border bg-muted"
             />
-            <div className="min-w-0">
-              <h1 className="text-xl font-bold text-foreground leading-tight">{c.nome}</h1>
-              <p className="text-sm text-muted-foreground mt-1">
-                Candidatura submetida em {new Date(c.dataSubmissao).toLocaleDateString("pt-AO")}
-              </p>
-              <div className="mt-2">
-                <Badge className={`border-0 ${estadoColors[estadoFinal]}`}>{estadoLabels[estadoFinal]}</Badge>
-              </div>
-            </div>
-          </div>
 
-          <div className="flex items-center gap-3 ml-auto">
-            <div className="flex items-center gap-2.5 pr-3 border-r border-border">
-              <div className="w-9 h-9 rounded-lg bg-red-50 text-red-600 flex items-center justify-center shrink-0">
-                <FileText className="w-4 h-4" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-xs font-semibold text-foreground leading-tight">Relatório de Candidatura</p>
-                <p className="text-[11px] text-muted-foreground mt-0.5 font-mono">Cand-{c.id}.pdf</p>
+            {/* Name + badges */}
+            <div className="min-w-0 flex-1">
+              <h1 className="text-xl font-semibold leading-tight tracking-tight text-foreground">
+                {c.nome}
+              </h1>
+              <p className="text-[12px] text-muted-foreground mt-0.5">
+                Candidatura submetida em {dSub.toLocaleDateString("pt-PT", { day: "2-digit", month: "long", year: "numeric" })}
+              </p>
+              <div className="mt-2 flex items-center gap-1.5 flex-wrap">
+                <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider gap-1", estadoColors[estadoFinal])}>
+                  <span className={cn("w-1.5 h-1.5 rounded-full", estadoDot[estadoFinal])} />
+                  {estadoLabels[estadoFinal]}
+                </Badge>
+                <Badge variant="outline" className="text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider gap-1 bg-blue-50 text-blue-700 border-blue-200">
+                  <CheckCircle2 className="w-3 h-3" />
+                  {steps.length}/{steps.length} etapas
+                </Badge>
               </div>
             </div>
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs">
-                  <Eye className="w-3.5 h-3.5" /> Ver
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-5xl w-[95vw] h-[92vh] p-0 gap-0 overflow-hidden">
-                <DialogHeader className="sr-only">
-                  <DialogTitle>Documento Cand-{c.id}</DialogTitle>
-                  <DialogDescription>Pré-visualização do documento institucional gerado.</DialogDescription>
-                </DialogHeader>
-                <CandidaturaDocPreview candidatura={c} steps={steps} cronologia={cronologia} />
-              </DialogContent>
-            </Dialog>
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-8 gap-1.5 text-xs"
-              onClick={() => toast({ title: "Documento exportado", description: `Cand-${c.id}.pdf` })}
-            >
-              <Download className="w-3.5 h-3.5" /> Descarregar
-            </Button>
+
+            {/* Right — ID + Doc pill */}
+            <div className="shrink-0 flex flex-col items-end gap-1.5">
+              <button
+                type="button"
+                onClick={() => { navigator.clipboard?.writeText(c.id); toast({ title: "ID copiado", description: c.id }); }}
+                className="inline-flex items-center px-2 py-0.5 rounded-md border border-border bg-background hover:bg-muted text-[11px] font-mono font-semibold text-foreground transition-colors"
+              >
+                {c.id}
+              </button>
+              <div className="inline-flex items-center gap-2 pl-1.5 pr-1 py-1 rounded-md border border-border bg-background shadow-sm">
+                <div className="w-6 h-6 rounded bg-red-50 border border-red-200 flex items-center justify-center shrink-0">
+                  <FileText className="w-3 h-3 text-red-600" />
+                </div>
+                <div className="flex flex-col min-w-0 leading-tight">
+                  <span className="text-[11px] font-semibold text-foreground tabular-nums">Cand-{c.id}</span>
+                  <span className="text-[9px] tracking-[0.02em] text-muted-foreground font-medium">
+                    Gerado automaticamente
+                  </span>
+                </div>
+                <span className="self-stretch w-px bg-border mx-0.5" />
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <button type="button" className="w-5 h-5 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors" title="Ver documento">
+                      <Eye className="w-3 h-3" />
+                    </button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-5xl w-[95vw] h-[92vh] p-0 gap-0 overflow-hidden">
+                    <DialogHeader className="sr-only">
+                      <DialogTitle>Documento Cand-{c.id}</DialogTitle>
+                      <DialogDescription>Pré-visualização do documento institucional gerado.</DialogDescription>
+                    </DialogHeader>
+                    <CandidaturaDocPreview candidatura={c} steps={steps} cronologia={cronologia} />
+                  </DialogContent>
+                </Dialog>
+                <button
+                  type="button"
+                  onClick={() => toast({ title: "Documento exportado", description: `Cand-${c.id}.pdf` })}
+                  className="w-5 h-5 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                  title="Exportar"
+                >
+                  <Download className="w-3 h-3" />
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </Card>
