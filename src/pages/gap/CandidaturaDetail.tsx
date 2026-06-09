@@ -240,60 +240,7 @@ export default function GapCandidaturaDetail() {
       </Card>
 
 
-      {/* Documentos + Linha do Tempo — agora EM CIMA */}
-      <div className="grid lg:grid-cols-2 gap-6">
-        {/* Documentos */}
-        <Card className="overflow-hidden">
-          <div className="p-4 border-b bg-muted/30">
-            <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
-              <FileText className="w-4 h-4" /> Documentos ({docsEntregues})
-            </h3>
-          </div>
-          <div className="divide-y divide-border">
-            {c.documentos.map((d, i) => (
-              <div key={i} className="flex items-center justify-between px-5 py-3">
-                <div className="flex items-center gap-3">
-                  <CheckCircle2 className="w-4 h-4 text-green-600" />
-                  <span className="text-sm text-foreground">{d.nome}</span>
-                </div>
-                <Badge variant="outline" className="text-[10px] bg-green-50 text-green-600 border-green-200">
-                  Entregue
-                </Badge>
-              </div>
-            ))}
-          </div>
-        </Card>
-
-        {/* Cronologia */}
-        <Card className="overflow-hidden">
-          <div className="p-4 border-b bg-muted/30">
-            <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
-              <Clock className="w-4 h-4" /> Linha do Tempo
-            </h3>
-          </div>
-          <div className="p-5">
-            <div className="relative pl-6 space-y-4">
-              {cronologia.map((h, i) => (
-                <div key={i} className="relative">
-                  <div className="absolute -left-6 top-1 w-3 h-3 rounded-full bg-primary border-2 border-background" />
-                  {i < cronologia.length - 1 && <div className="absolute -left-[18px] top-4 w-px h-full bg-border" />}
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <p className="text-sm font-semibold text-foreground">{h.accao}</p>
-                      <span className="text-xs text-muted-foreground tabular-nums">
-                        {new Date(h.data).toLocaleDateString("pt-AO")}
-                      </span>
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-0.5">{h.detalhe}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </Card>
-      </div>
-
-      {/* Etapas — clicáveis, expandem para mostrar info */}
+      {/* Etapas — clicáveis, expandem para mostrar info (EM CIMA) */}
       <Card className="overflow-hidden">
         <div className="p-4 border-b bg-muted/30 flex items-center justify-between">
           <h3 className="text-sm font-semibold text-foreground">Etapas do Processo de Candidatura</h3>
@@ -348,6 +295,59 @@ export default function GapCandidaturaDetail() {
           })}
         </div>
       </Card>
+
+      {/* Documentos + Linha do Tempo — agora EM BAIXO */}
+      <div className="grid lg:grid-cols-2 gap-6">
+        {/* Documentos */}
+        <Card className="overflow-hidden">
+          <div className="p-4 border-b bg-muted/30">
+            <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+              <FileText className="w-4 h-4" /> Documentos ({docsEntregues})
+            </h3>
+          </div>
+          <div className="divide-y divide-border">
+            {c.documentos.map((d, i) => (
+              <div key={i} className="flex items-center justify-between px-5 py-3">
+                <div className="flex items-center gap-3">
+                  <CheckCircle2 className="w-4 h-4 text-green-600" />
+                  <span className="text-sm text-foreground">{d.nome}</span>
+                </div>
+                <Badge variant="outline" className="text-[10px] bg-green-50 text-green-600 border-green-200">
+                  Entregue
+                </Badge>
+              </div>
+            ))}
+          </div>
+        </Card>
+
+        {/* Cronologia */}
+        <Card className="overflow-hidden">
+          <div className="p-4 border-b bg-muted/30">
+            <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+              <Clock className="w-4 h-4" /> Linha do Tempo
+            </h3>
+          </div>
+          <div className="p-5">
+            <div className="relative pl-6 space-y-4">
+              {cronologia.map((h, i) => (
+                <div key={i} className="relative">
+                  <div className="absolute -left-6 top-1 w-3 h-3 rounded-full bg-primary border-2 border-background" />
+                  {i < cronologia.length - 1 && <div className="absolute -left-[18px] top-4 w-px h-full bg-border" />}
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-semibold text-foreground">{h.accao}</p>
+                      <span className="text-xs text-muted-foreground tabular-nums">
+                        {new Date(h.data).toLocaleDateString("pt-AO")}
+                      </span>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-0.5">{h.detalhe}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </Card>
+      </div>
     </div>
   );
 }
