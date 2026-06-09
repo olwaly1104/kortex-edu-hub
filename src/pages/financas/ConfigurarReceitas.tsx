@@ -123,6 +123,9 @@ export default function ConfigurarReceitas() {
   const { toast } = useToast();
   const [rows, setRows] = useState<ReceitaRow[]>(initialRows);
 
+  type SectionFilter = "todos" | "propina" | "emolumentos" | "servicos";
+  const [filter, setFilter] = useState<SectionFilter>("todos");
+
   const [openSection, setOpenSection] = useState<SectionDef | null>(null);
   const [editing, setEditing] = useState<ReceitaRow | null>(null);
   const [form, setForm] = useState<ReceitaRow>({ id: "", nome: "", tipo: "Taxa", escopo: "geral", valor: 0 });
