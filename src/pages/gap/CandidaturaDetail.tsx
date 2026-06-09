@@ -108,14 +108,15 @@ function buildSteps(c: typeof candidaturas[number]): StepDef[] {
 
 function buildCronologia(c: typeof candidaturas[number]) {
   const sub = new Date(c.dataSubmissao);
+  const today = new Date();
   const entrevista = new Date(sub.getTime() + 12 * 86400000);
   const cursoPrep = new Date(sub.getTime() + 35 * 86400000);
   const exame = new Date(sub.getTime() + 60 * 86400000);
   return [
-    { data: sub.toISOString(), accao: "Candidatura submetida", detalhe: "Formulário online preenchido pelo candidato" },
-    { data: entrevista.toISOString(), accao: "Entrevista", detalhe: "Realizada — Sala de Entrevistas, Campus UPRA" },
-    { data: cursoPrep.toISOString(), accao: "Curso Preparatório", detalhe: "Inscrito — 1ª Sessão (Anfiteatro A)" },
-    { data: exame.toISOString(), accao: "Exame de Acesso", detalhe: "Marcado — Edifício Central, Sala 04" },
+    { data: sub.toISOString(), accao: "Candidatura submetida", detalhe: "Formulário online preenchido pelo candidato", done: sub <= today },
+    { data: entrevista.toISOString(), accao: "Entrevista", detalhe: "Realizada — Sala de Entrevistas, Campus UPRA", done: entrevista <= today },
+    { data: cursoPrep.toISOString(), accao: "Curso Preparatório", detalhe: "Inscrito — 1ª Sessão (Anfiteatro A)", done: cursoPrep <= today },
+    { data: exame.toISOString(), accao: "Exame de Acesso", detalhe: "Marcado — Edifício Central, Sala 04", done: exame <= today },
   ];
 }
 
