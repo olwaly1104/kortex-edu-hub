@@ -7,7 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { candidaturas, estadoColors, estadoLabels } from "@/data/admissoesData";
 import {
   ArrowLeft, CheckCircle2, ChevronDown, FileText, Eye, Download, Clock,
-  User, MapPin, BookOpen, CalendarDays, ClipboardCheck, Check, GraduationCap,
+  User, MapPin, BookOpen, CalendarDays, ClipboardCheck, Check, GraduationCap, Calendar,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import CandidaturaDocPreview from "./CandidaturaDocPreview";
