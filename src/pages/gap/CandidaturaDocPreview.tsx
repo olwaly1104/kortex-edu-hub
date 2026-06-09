@@ -129,7 +129,7 @@ export default function CandidaturaDocPreview({
               </div>
 
               {/* Right column: Documentos + Etapas */}
-              <div className="w-[210px] shrink-0 flex flex-col gap-3">
+              <div className="w-[280px] shrink-0 flex flex-col gap-3">
                 {/* Documentos */}
                 <div className="border border-neutral-300 bg-white">
                   <div className="px-2 py-1 bg-neutral-100 border-b border-neutral-300 flex items-center justify-between">
