@@ -1,4 +1,5 @@
 import { Printer, Download } from "lucide-react";
+import logoAsset from "@/assets/logo-upra.asset.json";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { type Candidatura, estadoLabels } from "@/data/admissoesData";
