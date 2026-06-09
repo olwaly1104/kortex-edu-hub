@@ -259,12 +259,22 @@ export default function GapCandidaturaDetail() {
                 {open && (
                   <div className="px-6 pb-5 pt-1 bg-muted/20">
                     <div className="grid sm:grid-cols-2 gap-x-6 gap-y-3 pl-12">
-                      {s.rows.map((r, i) => (
-                        <div key={i}>
-                          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">{r.label}</p>
-                          <p className="text-sm text-foreground mt-0.5">{r.value}</p>
-                        </div>
-                      ))}
+                      {s.rows.map((r, i) => {
+                        const fullWidth = ["Endereço", "Escola de origem"].includes(r.label);
+                        const breakBefore = ["Encarregado"].includes(r.label);
+                        return (
+                          <div
+                            key={i}
+                            className={cn(
+                              fullWidth && "sm:col-span-2",
+                              breakBefore && "sm:col-start-1 sm:border-t sm:border-border sm:pt-3 sm:mt-1",
+                            )}
+                          >
+                            <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">{r.label}</p>
+                            <p className="text-sm text-foreground mt-0.5">{r.value}</p>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
