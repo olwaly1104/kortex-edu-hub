@@ -96,14 +96,6 @@ function buildSteps(c: typeof candidaturas[number]): StepDef[] {
         { label: "Local", value: "Anfiteatro A — Campus UPRA" },
       ],
     },
-    {
-      n: 7, title: "Revisão & Submissão", sub: "Confirmação final do candidato", icon: Check,
-      rows: [
-        { label: "Confirmação dos dados", value: "Aceite pelo candidato" },
-        { label: "Autenticidade dos documentos", value: "Declarada pelo candidato" },
-        { label: "Data de submissão", value: new Date(c.dataSubmissao).toLocaleDateString("pt-AO") },
-      ],
-    },
   ];
 }
 
