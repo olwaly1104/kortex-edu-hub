@@ -142,7 +142,7 @@ export default function CandidaturaDocPreview({ candidatura: c, steps, cronologi
           </div>
 
           {/* Footer */}
-          <footer className="px-12 pb-10 pt-5 mt-auto border-t border-neutral-300">
+          <footer className="px-12 pb-6 pt-3 mt-auto border-t border-neutral-300">
             <div className="flex items-end justify-between gap-8">
               <p className="text-[9.5px] text-neutral-500 leading-relaxed max-w-sm">
                 Documento gerado pelo Gabinete de Apoio Académico. Contacto:{" "}
