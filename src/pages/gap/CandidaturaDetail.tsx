@@ -7,7 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { candidaturas, estadoColors, estadoLabels } from "@/data/admissoesData";
 import {
   ArrowLeft, CheckCircle2, ChevronDown, FileText, Eye, Download, Clock,
-  User, MapPin, BookOpen, CalendarDays, ClipboardCheck, Check, GraduationCap,
+  User, MapPin, BookOpen, CalendarDays, ClipboardCheck, Check, GraduationCap, Calendar,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import CandidaturaDocPreview from "./CandidaturaDocPreview";
@@ -184,25 +184,24 @@ export default function GapCandidaturaDetail() {
             />
             <div className="min-w-0 flex-1">
               <h1 className="text-xl font-semibold leading-tight tracking-tight text-foreground">{c.nome}</h1>
-              <div className="mt-3 flex items-end gap-6">
-                <div>
-                  <p className="text-[9px] uppercase tracking-[0.18em] text-muted-foreground font-semibold mb-0.5">
-                    Estado
-                  </p>
-                  <span className="inline-flex items-center gap-1.5">
-                    <span className={cn("w-1.5 h-1.5 rounded-full", estadoDot[estadoFinal])} />
+              <div className="mt-3 flex items-stretch gap-2">
+                <div className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-md border border-border bg-muted/40">
+                  <span className={cn("w-2 h-2 rounded-full shrink-0", estadoDot[estadoFinal])} />
+                  <div className="flex flex-col leading-tight">
+                    <span className="text-[8px] uppercase tracking-[0.18em] text-muted-foreground font-semibold">Estado</span>
                     <span className="text-[11px] font-semibold text-foreground uppercase tracking-wide">
                       {estadoLabels[estadoFinal]}
                     </span>
-                  </span>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-[9px] uppercase tracking-[0.18em] text-muted-foreground font-semibold mb-0.5">
-                    Data de submissão
-                  </p>
-                  <span className="text-[11px] font-semibold text-foreground tabular-nums">
-                    {dSub.toLocaleDateString("pt-PT", { day: "2-digit", month: "long", year: "numeric" })}
-                  </span>
+                <div className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-md border border-border bg-muted/40">
+                  <Calendar className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                  <div className="flex flex-col leading-tight">
+                    <span className="text-[8px] uppercase tracking-[0.18em] text-muted-foreground font-semibold">Data de submissão</span>
+                    <span className="text-[11px] font-semibold text-foreground tabular-nums">
+                      {dSub.toLocaleDateString("pt-PT", { day: "2-digit", month: "long", year: "numeric" })}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
