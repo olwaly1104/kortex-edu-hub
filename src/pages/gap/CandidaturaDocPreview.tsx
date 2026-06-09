@@ -186,20 +186,55 @@ function Th({ children, className = "" }: { children: React.ReactNode; className
   );
 }
 
-function Td({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  return <td className={`border border-neutral-300 px-2.5 py-1 align-top ${className}`}>{children}</td>;
+function Td({ children, className = "", colSpan }: { children: React.ReactNode; className?: string; colSpan?: number }) {
+  return <td colSpan={colSpan} className={`border border-neutral-300 px-2.5 py-1 align-top ${className}`}>{children}</td>;
 }
 
 function XTable({ rows }: { rows: [string, string][] }) {
+  // Pack into 2-column layout; long values span both columns
+  type Cell = { k: string; v: string; full: boolean };
+  const cells: Cell[] = rows.map(([k, v]) => ({ k, v, full: v.length > 42 }));
+  const lines: Cell[][] = [];
+  let buf: Cell[] = [];
+  for (const c of cells) {
+    if (c.full) {
+      if (buf.length) { lines.push(buf); buf = []; }
+      lines.push([c]);
+    } else {
+      buf.push(c);
+      if (buf.length === 2) { lines.push(buf); buf = []; }
+    }
+  }
+  if (buf.length) lines.push(buf);
+
+  const labelCls =
+    "w-[22%] bg-neutral-50 font-semibold text-neutral-700 text-[9.5px] uppercase tracking-wider";
+
   return (
-    <table className="w-full border-collapse text-[10.5px]">
+    <table className="w-full border-collapse text-[10.5px] table-fixed">
       <tbody>
-        {rows.map(([k, v], i) => (
+        {lines.map((line, i) => (
           <tr key={i}>
-            <Td className="w-52 bg-neutral-50 font-semibold text-neutral-700 text-[9.5px] uppercase tracking-wider">
-              {k}
-            </Td>
-            <Td>{v}</Td>
+            {line.length === 1 && line[0].full ? (
+              <>
+                <Td className={labelCls}>{line[0].k}</Td>
+                <Td colSpan={3}>{line[0].v}</Td>
+              </>
+            ) : line.length === 2 ? (
+              <>
+                <Td className={labelCls}>{line[0].k}</Td>
+                <Td>{line[0].v}</Td>
+                <Td className={labelCls}>{line[1].k}</Td>
+                <Td>{line[1].v}</Td>
+              </>
+            ) : (
+              <>
+                <Td className={labelCls}>{line[0].k}</Td>
+                <Td>{line[0].v}</Td>
+                <Td className={labelCls + " opacity-0"}>&nbsp;</Td>
+                <Td>&nbsp;</Td>
+              </>
+            )}
           </tr>
         ))}
       </tbody>
