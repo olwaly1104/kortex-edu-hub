@@ -1,4 +1,4 @@
-import { Printer, Download } from "lucide-react";
+import { Printer, Download, Users } from "lucide-react";
 import logoAsset from "@/assets/logo-upra.asset.json";
 import studentPhoto from "@/assets/student-id-photo.jpg";
 import { Button } from "@/components/ui/button";
@@ -42,24 +42,50 @@ export default function CandidaturaDocPreview({
   return (
     <div className="flex flex-col h-full min-h-0 bg-neutral-200/70">
       {/* Toolbar */}
-      <div className="flex items-center justify-between px-5 py-2.5 border-b border-border bg-background shrink-0 print:hidden">
-        <div className="flex items-center gap-2">
-          <span className="text-[11px] font-mono font-semibold text-foreground">{displayId}</span>
-          <span className="text-muted-foreground/40 text-xs">·</span>
+      <div className="flex items-center justify-between px-5 py-2 border-b border-border bg-background shrink-0 print:hidden">
+        <div className="flex items-center gap-2.5">
+          <span className="text-[11px] font-mono font-semibold text-foreground tabular-nums">{displayId}</span>
+          <span className="w-px h-3.5 bg-border" />
           <span className="text-[11px] text-muted-foreground">Ficha de Candidatura</span>
         </div>
-        <div className="flex items-center gap-1.5">
-          <Button variant="outline" size="sm" className="h-7 text-[11px] gap-1.5" onClick={() => window.print()}>
-            <Printer className="w-3 h-3" /> Imprimir
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-7 text-[11px] gap-1.5"
-            onClick={() => toast({ title: "Documento exportado", description: `${displayId}.pdf` })}
-          >
-            <Download className="w-3 h-3" /> Descarregar
-          </Button>
+        <div className="flex items-center gap-3">
+          {/* Shared with */}
+          <div className="flex items-center gap-2 pr-3 border-r border-border">
+            <div className="flex -space-x-1.5">
+              {[8, 15, 32, 47].map((n, i) => (
+                <img
+                  key={i}
+                  src={`https://i.pravatar.cc/40?img=${n}`}
+                  alt=""
+                  className="w-6 h-6 rounded-full ring-2 ring-background object-cover"
+                />
+              ))}
+              <div className="w-6 h-6 rounded-full ring-2 ring-background bg-muted text-muted-foreground text-[9px] font-semibold flex items-center justify-center tabular-nums">
+                +2
+              </div>
+            </div>
+            <div className="flex items-center gap-1 text-[10.5px] text-muted-foreground">
+              <Users className="w-3 h-3" />
+              <span className="font-medium">Partilhado com 6</span>
+            </div>
+          </div>
+          {/* Actions */}
+          <div className="flex items-center gap-1 p-0.5 rounded-md bg-muted/60 border border-border">
+            <button
+              type="button"
+              onClick={() => window.print()}
+              className="h-6 px-2 inline-flex items-center gap-1.5 text-[11px] font-medium text-foreground rounded hover:bg-background hover:shadow-sm transition-all"
+            >
+              <Printer className="w-3 h-3" /> Imprimir
+            </button>
+            <button
+              type="button"
+              onClick={() => toast({ title: "Documento exportado", description: `${displayId}.pdf` })}
+              className="h-6 px-2 inline-flex items-center gap-1.5 text-[11px] font-medium text-primary-foreground bg-primary rounded hover:bg-primary/90 transition-all"
+            >
+              <Download className="w-3 h-3" /> Descarregar
+            </button>
+          </div>
         </div>
       </div>
 
