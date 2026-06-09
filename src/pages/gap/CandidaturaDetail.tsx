@@ -82,6 +82,7 @@ function buildSteps(c: typeof candidaturas[number]): StepDef[] {
         { label: "Data", value: "15 de julho de 2026" },
         { label: "Hora", value: "10:30" },
         { label: "Local", value: "Sala de Entrevistas — Campus UPRA" },
+        { label: "Responsável", value: "Dra. Helena Cabral" },
         { label: "Estado", value: "Realizada" },
       ],
     },
@@ -92,6 +93,7 @@ function buildSteps(c: typeof candidaturas[number]): StepDef[] {
         { label: "Sessão", value: "1ª Sessão · 18 de julho de 2026" },
         { label: "Hora", value: "09:00" },
         { label: "Local", value: "Anfiteatro A — Campus UPRA" },
+        { label: "Estado", value: "Inscrito" },
       ],
     },
   ];
