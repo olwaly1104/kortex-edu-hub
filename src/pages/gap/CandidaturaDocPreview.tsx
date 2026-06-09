@@ -95,7 +95,7 @@ export default function CandidaturaDocPreview({
                 width={512}
                 height={640}
                 loading="lazy"
-                className="w-[130px] h-[165px] object-cover border border-neutral-400 bg-neutral-100 shrink-0"
+                className="w-[95px] h-[120px] object-cover border border-neutral-400 bg-neutral-100 shrink-0"
               />
 
               <div className="flex-1 min-w-0 pt-1">
