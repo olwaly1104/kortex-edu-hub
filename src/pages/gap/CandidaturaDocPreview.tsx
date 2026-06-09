@@ -215,8 +215,8 @@ function Th2({ children, className = "" }: { children: React.ReactNode; classNam
     </th>
   );
 }
-function Td2({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  return <td className={`border border-neutral-300 px-2.5 py-1 align-middle text-neutral-900 ${className}`}>{children}</td>;
+function Td2({ children, className = "", colSpan }: { children: React.ReactNode; className?: string; colSpan?: number }) {
+  return <td colSpan={colSpan} className={`border border-neutral-300 px-2.5 py-1 align-middle text-neutral-900 ${className}`}>{children}</td>;
 }
 
 function XTable({ rows }: { rows: [string, string][] }) {
