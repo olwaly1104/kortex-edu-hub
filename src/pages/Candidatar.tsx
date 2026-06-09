@@ -926,10 +926,13 @@ export default function Candidatar() {
                     ["3ª escolha", form.fac3 ? `${form.fac3} — ${form.curso3 || "—"}` : "—"],
                   ]} />
                   <ReviewBlock title="Entrevista" stepN={5} onEdit={goTo} rows={(() => {
-                    const s = SESSOES_INFO.find(x => x.id === form.sessao);
-                    return s
-                      ? [["Data", s.id], ["Quando", s.data], ["Hora", s.hora], ["Local", s.sala]]
-                      : [["Data", "—"]];
+                    if (!form.entrevistaData) return [["Data", "—"]];
+                    const d = new Date(form.entrevistaData + "T00:00:00");
+                    return [
+                      ["Data", formatLongDate(d)],
+                      ["Hora", form.entrevistaHora || "—"],
+                      ["Local", ENTREVISTA_LOCAL],
+                    ];
                   })()} />
                   <ReviewBlock title="Documentos" stepN={6} onEdit={goTo} rows={DOCS.map(d => [d.label, docs[d.key] ? "✓ Anexado" : "Pendente"])} />
                 </div>
