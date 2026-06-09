@@ -44,7 +44,7 @@ function buildSteps(c: typeof candidaturas[number]): StepDef[] {
         { label: "Nacionalidade", value: "Angolana" },
         { label: "Tipo de documento", value: "Bilhete de Identidade" },
         { label: "Número do documento", value: c.bi },
-        { label: "Foto tipo passe", value: "foto_passe.jpg · entregue" },
+        { label: "Foto tipo passe", value: "Entregue" },
       ],
     },
     {
@@ -52,9 +52,9 @@ function buildSteps(c: typeof candidaturas[number]): StepDef[] {
       rows: [
         { label: "Província", value: "Luanda" },
         { label: "Município", value: "Belas" },
-        { label: "Endereço", value: "Rua Comandante Gika, nº 124, Bairro Maianga" },
         { label: "Email", value: c.email },
         { label: "Telemóvel", value: c.telefone },
+        { label: "Endereço", value: "Rua Comandante Gika, nº 124, Bairro Maianga" },
         { label: "Encarregado", value: "Maria Joana " + last },
         { label: "Parentesco", value: "Mãe" },
         { label: "Profissão", value: "Professora" },
@@ -66,8 +66,8 @@ function buildSteps(c: typeof candidaturas[number]): StepDef[] {
       rows: [
         { label: "Escola de origem", value: "Instituto Médio Politécnico de Luanda" },
         { label: "Ano de conclusão", value: "2025" },
-        { label: "Declaração de finalização do ensino médio", value: "declaracao_finalizacao.pdf · entregue" },
-        { label: "Certificado de habilitações (notas)", value: "certificado_notas.pdf · entregue" },
+        { label: "Declaração de finalização", value: "Entregue" },
+        { label: "Certificado de habilitações", value: "Entregue" },
       ],
     },
     {
