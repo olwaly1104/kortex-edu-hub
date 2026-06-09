@@ -265,7 +265,15 @@ export default function GapCandidaturaDetail() {
               {c.documentos.map((d, i) => (
                 <li key={i} className="flex items-center gap-2 px-3 py-1.5 text-[12px] text-foreground">
                   <Check className="w-3 h-3 text-green-600 shrink-0" strokeWidth={3} />
-                  <span className="truncate">{d.nome}</span>
+                  <span className="truncate flex-1">{d.nome}</span>
+                  <button
+                    type="button"
+                    onClick={() => toast({ title: "Documento", description: d.nome })}
+                    className="w-5 h-5 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors shrink-0"
+                    title="Ver documento"
+                  >
+                    <Eye className="w-3 h-3" />
+                  </button>
                 </li>
               ))}
             </ul>
@@ -275,6 +283,9 @@ export default function GapCandidaturaDetail() {
               <h4 className="text-[11px] font-semibold uppercase tracking-wider text-foreground flex items-center gap-1.5">
                 <Clock className="w-3.5 h-3.5" /> Etapas da Candidatura
               </h4>
+              <span className="text-[10px] tabular-nums text-muted-foreground font-medium">
+                {cronologia.length}/{cronologia.length}
+              </span>
             </div>
             <ul className="divide-y divide-border">
               {cronologia.map((h, i) => (
