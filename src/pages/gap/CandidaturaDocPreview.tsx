@@ -109,7 +109,7 @@ export default function CandidaturaDocPreview({
 
 
             {/* Cronologia */}
-            <Section n={String(steps.length + 1).padStart(2, "0")} title="Cronologia">
+            <Section title="Cronologia">
               <table className="w-full border-collapse text-[10.5px]">
                 <thead>
                   <tr className="bg-neutral-100">
