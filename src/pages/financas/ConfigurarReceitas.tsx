@@ -201,15 +201,15 @@ export default function ConfigurarReceitas() {
       {/* Header */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="flex items-start gap-3">
-          <Button variant="ghost" size="icon" className="rounded-lg" onClick={() => navigate("/financas/receitas")}>
+          <Button variant="ghost" size="icon" className="rounded-lg" onClick={() => navigate("/financas/dashboard")}>
             <ArrowLeft className="w-4 h-4" />
           </Button>
           <div>
             <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-              <Settings2 className="w-6 h-6 text-primary" /> Configurar Receitas
+              <Settings2 className="w-6 h-6 text-primary" /> Configurador Financeiro
             </h1>
             <p className="text-sm text-muted-foreground mt-1">
-              Tabela única de todas as receitas. Cada item pode ser geral ou específico de um curso.
+              Defina propinas, matrículas, emolumentos, taxas, candidaturas e multas. Cada item pode ser geral ou específico de um curso de qualquer faculdade.
             </p>
           </div>
         </div>
