@@ -46,7 +46,7 @@ interface FormState {
   docTipo: DocTipo;
   email: string; telemovel: string; provincia: string; municipio: string; endereco: string;
   encNome: string; encParentesco: string; encTelefone: string;
-  escola: string; anoConclusao: string; mediaFinal: string;
+  escola: string; anoConclusao: string;
   fac1: string; curso1: string; fac2: string; curso2: string; fac3: string; curso3: string;
   sessao: string;
   motivacao: string; confirmar: boolean; docAutenticos: boolean;
@@ -56,7 +56,7 @@ const empty: FormState = {
   docTipo: "bi",
   email: "", telemovel: "", provincia: "", municipio: "", endereco: "",
   encNome: "", encParentesco: "", encTelefone: "",
-  escola: "", anoConclusao: "", mediaFinal: "",
+  escola: "", anoConclusao: "",
   fac1: "", curso1: "", fac2: "", curso2: "", fac3: "", curso3: "",
   sessao: "",
   motivacao: "", confirmar: false, docAutenticos: false,
@@ -86,7 +86,7 @@ const STEPS = [
 const STEP_FIELDS: Record<number, (keyof FormState)[]> = {
   1: ["primeiroNome","ultimoNome","nascimento","genero","nacionalidade"],
   2: ["provincia","municipio","email","telemovel","encNome","encParentesco","encTelefone"],
-  3: ["escola","anoConclusao","mediaFinal"],
+  3: ["escola","anoConclusao"],
   4: ["fac1","curso1"],
   5: ["sessao"],
   6: [],
@@ -608,19 +608,81 @@ export default function Candidatar() {
               </div>
             )}
 
-            {step === 3 && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Field label="Escola de origem" required full>
-                  <Input value={form.escola} onChange={e => update("escola", e.target.value)} className={inputCls("escola")} placeholder="Ex.: Liceu Mutu-Ya-Kevela" maxLength={120} />
-                </Field>
-                <Field label="Ano de conclusão" required>
-                  <Input type="number" value={form.anoConclusao} onChange={e => update("anoConclusao", e.target.value)} className={inputCls("anoConclusao")} placeholder="2025" min={1990} max={2030} />
-                </Field>
-                <Field label="Média final (0-20)" required>
-                  <Input type="number" value={form.mediaFinal} onChange={e => update("mediaFinal", e.target.value)} className={inputCls("mediaFinal")} placeholder="14.5" step={0.1} min={0} max={20} />
-                </Field>
-              </div>
-            )}
+            {step === 3 && (() => {
+              const formacaoDocs = [
+                { key: "declaracaoEnsino", label: "Declaração de Finalização do Ensino Médio", desc: "Documento oficial emitido pela escola · PDF, JPG ou PNG · máx. 5MB" },
+                { key: "certificadoHabilitacoes", label: "Certificado de Habilitações (Notas)", desc: "Pauta oficial com notas finais · PDF, JPG ou PNG · máx. 5MB" },
+              ];
+              return (
+                <div className="space-y-5">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Field label="Escola de origem" required full>
+                      <Input value={form.escola} onChange={e => update("escola", e.target.value)} className={inputCls("escola")} placeholder="Ex.: Liceu Mutu-Ya-Kevela" maxLength={120} />
+                    </Field>
+                    <Field label="Ano de conclusão" required>
+                      <Input type="number" value={form.anoConclusao} onChange={e => update("anoConclusao", e.target.value)} className={inputCls("anoConclusao")} placeholder="2025" min={1990} max={2030} />
+                    </Field>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold">Documentos académicos</p>
+                    <div className="space-y-2.5">
+                      {formacaoDocs.map(d => {
+                        const file = docs[d.key];
+                        return (
+                          <div key={d.key} className={cn(
+                            "rounded-xl border transition-colors",
+                            file ? "border-accent/40 bg-accent/5" : "border-border bg-card hover:border-primary/30"
+                          )}>
+                            <input
+                              ref={el => (fileRefs.current[d.key] = el)}
+                              type="file"
+                              className="hidden"
+                              accept=".pdf,.jpg,.jpeg,.png"
+                              onChange={e => onFile(d.key, e.target.files?.[0])}
+                            />
+                            <div className="flex items-center gap-3 p-3.5">
+                              <div className={cn(
+                                "w-10 h-10 rounded-lg flex items-center justify-center shrink-0",
+                                file ? "bg-accent text-accent-foreground" : "bg-muted text-muted-foreground"
+                              )}>
+                                {file ? <Check className="w-5 h-5" /> : <FileText className="w-5 h-5" />}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-semibold text-foreground leading-tight">{d.label}</p>
+                                {file ? (
+                                  <p className="text-[11.5px] text-foreground/70 mt-0.5 flex items-center gap-1.5 truncate">
+                                    <Paperclip className="w-3 h-3 shrink-0" />
+                                    <span className="truncate">{file.name}</span>
+                                    <span className="text-muted-foreground">· {fmtSize(file.size)}</span>
+                                  </p>
+                                ) : (
+                                  <p className="text-[11.5px] text-muted-foreground mt-0.5">{d.desc}</p>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-1 shrink-0">
+                                {file && (
+                                  <Button variant="ghost" size="sm" onClick={() => removeDoc(d.key)} className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive">
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </Button>
+                                )}
+                                <Button
+                                  variant={file ? "outline" : "default"}
+                                  size="sm"
+                                  onClick={() => fileRefs.current[d.key]?.click()}
+                                  className="h-8 gap-1.5 text-[12px]"
+                                >
+                                  <Upload className="w-3.5 h-3.5" /> {file ? "Substituir" : "Anexar"}
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
 
             {step === 4 && (() => {
               const escolhas = [
@@ -806,7 +868,8 @@ export default function Candidatar() {
                   ]} />
                   <ReviewBlock title="Formação" stepN={3} onEdit={goTo} rows={[
                     ["Escola", form.escola], ["Conclusão", form.anoConclusao],
-                    ["Média", form.mediaFinal],
+                    ["Declaração Ensino Médio", docs.declaracaoEnsino ? docs.declaracaoEnsino.name : "—"],
+                    ["Certificado de Habilitações", docs.certificadoHabilitacoes ? docs.certificadoHabilitacoes.name : "—"],
                   ]} />
                   <ReviewBlock title="Curso" stepN={4} onEdit={goTo} rows={[
                     ["1ª escolha", form.fac1 ? `${form.fac1} — ${form.curso1 || "—"}` : "—"],
