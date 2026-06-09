@@ -1,18 +1,19 @@
-import { Printer, Download, Users, Mail, Shield } from "lucide-react";
+import { Printer, Download, Users, Share2 } from "lucide-react";
 import logoAsset from "@/assets/logo-upra.asset.json";
 import studentPhoto from "@/assets/student-id-photo.jpg";
 import { Button } from "@/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Badge } from "@/components/ui/badge";
+import {
+  Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger,
+} from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { type Candidatura, estadoLabels } from "@/data/admissoesData";
 
-const sharedWith = [
-  { name: "Dra. Helena Cabral", role: "Coordenadora GAP", email: "helena.cabral@upra.kor", img: 8 },
-  { name: "Eng. Paulo Mendes", role: "Coordenador ARQ", email: "paulo.mendes@upra.kor", img: 15 },
-  { name: "Dr. Tiago Almeida", role: "Decano Ciências Exatas", email: "tiago.almeida@upra.kor", img: 32 },
-  { name: "Sara Vieira", role: "Académica", email: "sara.vieira@upra.kor", img: 47 },
-  { name: "Mário Lopes", role: "Finanças", email: "mario.lopes@upra.kor", img: 51 },
-  { name: "Inês Costa", role: "Inscrições", email: "ines.costa@upra.kor", img: 23 },
+const sharedWith: { name: string; role: string; access: "Visualizar" | "Editar" }[] = [
+  { name: "Prof. Dr. António Mendes", role: "Reitor", access: "Visualizar" },
+  { name: "Dra. Helena Cabral", role: "Responsável GAP", access: "Editar" },
+  { name: "Eng. Paulo Mendes", role: "Coordenador ARQ", access: "Visualizar" },
+  { name: "Sara Vieira", role: "Académica", access: "Visualizar" },
 ];
 
 type EtapaEstado = "completo" | "agendado" | "remarcado" | "falta" | "aprovado" | "reprovado";
@@ -61,66 +62,46 @@ export default function CandidaturaDocPreview({
           <span className="text-[11px] text-muted-foreground">Ficha de Candidatura</span>
         </div>
         <div className="flex items-center gap-2">
-          {/* Shared with — clickable popover */}
-          <Popover>
-            <PopoverTrigger asChild>
+          {/* Shared with — uniform with Solicitações */}
+          <Dialog>
+            <DialogTrigger asChild>
               <button
                 type="button"
-                className="group flex items-center gap-2 h-8 pl-1 pr-2.5 rounded-md border border-border bg-background hover:bg-muted/60 hover:border-foreground/20 transition-all"
+                className="inline-flex items-center gap-1.5 h-8 px-2.5 rounded-md border border-border bg-background hover:bg-muted/60 hover:border-foreground/20 text-[11px] font-medium text-primary transition-all"
+                title="Pessoas com acesso"
               >
-                <div className="flex -space-x-1.5">
-                  {sharedWith.slice(0, 3).map((p, i) => (
-                    <img
-                      key={i}
-                      src={`https://i.pravatar.cc/40?img=${p.img}`}
-                      alt=""
-                      className="w-6 h-6 rounded-full ring-2 ring-background object-cover"
-                    />
-                  ))}
-                  <div className="w-6 h-6 rounded-full ring-2 ring-background bg-foreground text-background text-[9px] font-semibold flex items-center justify-center tabular-nums">
-                    +{sharedWith.length - 3}
-                  </div>
-                </div>
-                <span className="text-[10.5px] font-medium text-foreground group-hover:text-foreground">Partilhado</span>
+                <Users className="w-3.5 h-3.5" />
+                <span className="tabular-nums">{sharedWith.length}</span>
               </button>
-            </PopoverTrigger>
-            <PopoverContent align="end" className="w-80 p-0 overflow-hidden">
-              <div className="px-3.5 py-2.5 border-b border-border bg-muted/40">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1.5">
-                    <Users className="w-3.5 h-3.5 text-foreground" />
-                    <h4 className="text-[12px] font-semibold text-foreground">Pessoas com acesso</h4>
-                  </div>
-                  <span className="text-[10px] text-muted-foreground tabular-nums font-medium">{sharedWith.length}</span>
-                </div>
-                <p className="mt-0.5 text-[10px] text-muted-foreground flex items-center gap-1">
-                  <Shield className="w-2.5 h-2.5" /> Acesso restrito · só visualização
-                </p>
-              </div>
-              <ul className="max-h-72 overflow-y-auto divide-y divide-border">
-                {sharedWith.map((p, i) => (
-                  <li key={i} className="flex items-center gap-2.5 px-3.5 py-2 hover:bg-muted/40 transition-colors">
-                    <img
-                      src={`https://i.pravatar.cc/64?img=${p.img}`}
-                      alt={p.name}
-                      className="w-8 h-8 rounded-full object-cover shrink-0"
-                    />
-                    <div className="min-w-0 flex-1 leading-tight">
-                      <p className="text-[11.5px] font-semibold text-foreground truncate">{p.name}</p>
-                      <p className="text-[10px] text-muted-foreground truncate">{p.role}</p>
+            </DialogTrigger>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle className="text-base flex items-center gap-2">
+                  <Share2 className="w-4 h-4 text-primary" /> Partilhado com {sharedWith.length} pessoas
+                </DialogTitle>
+                <DialogDescription className="text-[12px]">
+                  Pessoas com acesso ao documento <span className="font-medium text-foreground">{displayId}</span>.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-2 mt-2">
+                {sharedWith.map((p, i) => {
+                  const ini = p.name.split(" ").slice(0, 2).map(n => n[0]).join("");
+                  return (
+                    <div key={i} className="flex items-center gap-3 px-3 py-2.5 rounded-md border border-border bg-muted/20">
+                      <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[11px] font-semibold ring-1 ring-primary/15 shrink-0">
+                        {ini}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[13px] font-semibold text-foreground leading-tight truncate">{p.name}</p>
+                        <p className="text-[11px] text-muted-foreground mt-0.5">{p.role}</p>
+                      </div>
+                      <Badge variant="outline" className="text-[10px] font-medium px-2 py-0.5 shrink-0">{p.access}</Badge>
                     </div>
-                    <a
-                      href={`mailto:${p.email}`}
-                      title={p.email}
-                      className="w-6 h-6 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-background hover:text-foreground transition-colors shrink-0"
-                    >
-                      <Mail className="w-3 h-3" />
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </PopoverContent>
-          </Popover>
+                  );
+                })}
+              </div>
+            </DialogContent>
+          </Dialog>
 
           {/* Actions */}
           <button
