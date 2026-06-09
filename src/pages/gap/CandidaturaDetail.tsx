@@ -244,7 +244,7 @@ export default function GapCandidaturaDetail() {
           <div className="border border-border rounded-md bg-background overflow-hidden">
             <div className="px-3 py-2 bg-muted/40 border-b border-border flex items-center justify-between">
               <h4 className="text-[11px] font-semibold uppercase tracking-wider text-foreground flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5" /> Linha do Tempo
+                <Clock className="w-3.5 h-3.5" /> Etapas da Candidatura
               </h4>
               <span className="text-[10px] tabular-nums text-muted-foreground font-medium">
                 {cronologia.filter(h => h.done).length}/{cronologia.length}

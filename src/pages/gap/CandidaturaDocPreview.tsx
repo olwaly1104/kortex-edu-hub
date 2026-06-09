@@ -144,7 +144,7 @@ export default function CandidaturaDocPreview({
               <div className="border border-neutral-300">
                 <div className="px-2.5 py-1 bg-neutral-100 border-b border-neutral-300 flex items-center justify-between">
                   <p className="text-[9px] uppercase tracking-[0.16em] font-bold text-neutral-700">
-                    Linha do Tempo
+                    Etapas da Candidatura
                   </p>
                   <p className="text-[9px] tabular-nums text-neutral-600 font-semibold">
                     {cronologia.filter(h => h.done !== false).length}/{cronologia.length}
