@@ -14,7 +14,7 @@ import { Calendar } from "@/components/ui/calendar";
 import {
   ArrowLeft, ArrowRight, Check, User, MapPin,
   BookOpen, FileText, Upload, CheckCircle2, Send, Mail, Trash2, Paperclip, GraduationCap,
-  CalendarDays, Clock, MapPinned,
+  CalendarDays, Clock, MapPinned, Camera, ClipboardCheck,
 } from "lucide-react";
 import logoUpra from "@/assets/logo-upra.asset.json";
 
@@ -29,15 +29,15 @@ const ENTREVISTA_LOCAL = "Sala de Entrevistas — Campus UPRA";
 const ENTREVISTA_SLOTS = ["09:00","09:30","10:00","10:30","11:00","11:30","14:00","14:30","15:00","15:30","16:00","16:30"];
 const formatLongDate = (d: Date) => d.toLocaleDateString("pt-PT", { weekday: "long", day: "2-digit", month: "long", year: "numeric" });
 const PARENTESCO = ["Pai", "Mãe", "Tutor(a)", "Avô/Avó", "Outro"];
+const EXAME_SESSOES = [
+  { id: "ep1", label: "1ª Sessão", data: "2026-07-18", hora: "09:00", local: "Anfiteatro A — Campus UPRA" },
+  { id: "ep2", label: "2ª Sessão", data: "2026-08-22", hora: "09:00", local: "Anfiteatro A — Campus UPRA" },
+];
 const NACIONALIDADES = [
   "Angolana", "Portuguesa", "Brasileira", "Cabo-verdiana", "Moçambicana", "São-tomense",
   "Guineense", "Sul-africana", "Namíbia", "Congolesa (RDC)", "Congolesa (Rep.)", "Nigeriana",
   "Queniana", "Zimbabuana", "Camaronesa", "Marfinense", "Senegalesa", "Espanhola", "Francesa",
   "Italiana", "Alemã", "Britânica", "Norte-americana", "Canadiana", "Chinesa", "Indiana", "Cubana", "Outra",
-];
-const DOCS = [
-  { key: "bi", label: "Bilhete de Identidade", desc: "Frente e verso · PDF ou JPG" },
-  { key: "foto", label: "Foto tipo passe", desc: "Fundo branco, formato 35×45mm" },
 ];
 
 type DocTipo = "bi" | "passaporte" | "residencia";
@@ -45,20 +45,22 @@ interface FormState {
   primeiroNome: string; ultimoNome: string; nascimento: string; genero: string; nacionalidade: string;
   docTipo: DocTipo;
   email: string; telemovel: string; provincia: string; municipio: string; endereco: string;
-  encNome: string; encParentesco: string; encTelefone: string;
+  encNome: string; encParentesco: string; encProfissao: string; encTelefone: string;
   escola: string; anoConclusao: string;
   fac1: string; curso1: string; fac2: string; curso2: string; fac3: string; curso3: string;
   entrevistaData: string; entrevistaHora: string;
+  examePreparatorio: "" | "sim" | "nao"; examePrepSessao: string;
   motivacao: string; confirmar: boolean; docAutenticos: boolean;
 }
 const empty: FormState = {
   primeiroNome: "", ultimoNome: "", nascimento: "", genero: "", nacionalidade: "Angolana",
   docTipo: "bi",
   email: "", telemovel: "", provincia: "", municipio: "", endereco: "",
-  encNome: "", encParentesco: "", encTelefone: "",
+  encNome: "", encParentesco: "", encProfissao: "", encTelefone: "",
   escola: "", anoConclusao: "",
   fac1: "", curso1: "", fac2: "", curso2: "", fac3: "", curso3: "",
   entrevistaData: "", entrevistaHora: "",
+  examePreparatorio: "", examePrepSessao: "",
   motivacao: "", confirmar: false, docAutenticos: false,
 };
 
@@ -74,18 +76,18 @@ const DOC_TIPO_DESC: Record<DocTipo, string> = {
 };
 
 const STEPS = [
-  { n: 1, title: "Dados pessoais",     sub: "Identificação e documento",          icon: User },
-  { n: 2, title: "Morada & Contactos", sub: "Endereço, contactos e encarregado",  icon: MapPin },
-  { n: 3, title: "Formação",           sub: "Histórico do ensino secundário",     icon: GraduationCap },
-  { n: 4, title: "Curso",              sub: "Faculdades e cursos por ordem de escolha", icon: BookOpen },
-  { n: 5, title: "Entrevista",         sub: "Marcação da data de entrevista",     icon: CalendarDays },
-  { n: 6, title: "Documentos",         sub: "Anexos académicos obrigatórios",     icon: FileText },
-  { n: 7, title: "Revisão",            sub: "Confirmar e submeter",               icon: Check },
+  { n: 1, title: "Dados pessoais",      sub: "Identificação, documento e foto",        icon: User },
+  { n: 2, title: "Morada & Contactos",  sub: "Endereço, contactos e encarregado",      icon: MapPin },
+  { n: 3, title: "Formação",            sub: "Histórico do ensino secundário",         icon: GraduationCap },
+  { n: 4, title: "Curso",               sub: "Faculdades e cursos por ordem de escolha", icon: BookOpen },
+  { n: 5, title: "Entrevista",          sub: "Marcação da data de entrevista",         icon: CalendarDays },
+  { n: 6, title: "Exame Preparatório",  sub: "Opcional — escolha da sessão",           icon: ClipboardCheck },
+  { n: 7, title: "Revisão",             sub: "Confirmar e submeter",                   icon: Check },
 ] as const;
 
 const STEP_FIELDS: Record<number, (keyof FormState)[]> = {
   1: ["primeiroNome","ultimoNome","nascimento","genero","nacionalidade"],
-  2: ["provincia","municipio","email","telemovel","encNome","encParentesco","encTelefone"],
+  2: ["provincia","municipio","email","telemovel","encNome","encParentesco","encProfissao","encTelefone"],
   3: ["escola","anoConclusao"],
   4: ["fac1","curso1"],
   5: ["entrevistaData","entrevistaHora"],
@@ -178,8 +180,7 @@ export default function Candidatar() {
 
   const current = STEPS[step - 1];
   const progress = Math.round((step / STEPS.length) * 100);
-  const academicDocs = DOCS.filter(d => d.key !== "bi");
-  const docsCount = academicDocs.filter(d => docs[d.key]).length;
+
 
   /* ───────── Success screen ───────── */
   if (done) {
@@ -545,6 +546,60 @@ export default function Candidatar() {
                     </div>
                   </section>
 
+                  {/* Foto tipo passe */}
+                  <section className="space-y-3 border-t border-border pt-5">
+                    <div className="flex items-center justify-between flex-wrap gap-2">
+                      <p className="text-[10.5px] uppercase tracking-[0.12em] text-muted-foreground font-semibold">Foto tipo passe</p>
+                      <p className="text-[10.5px] text-muted-foreground">Fundo branco · 35×45mm · JPG ou PNG</p>
+                    </div>
+                    {(() => {
+                      const f = docs["foto"];
+                      return (
+                        <div className="flex items-start gap-4">
+                          <div
+                            onClick={() => fileRefs.current["foto"]?.click()}
+                            className={cn(
+                              "w-[110px] h-[140px] rounded-lg border-2 border-dashed flex items-center justify-center cursor-pointer shrink-0 overflow-hidden transition-colors",
+                              f ? "border-emerald-500/50 bg-emerald-500/5" : "border-border bg-muted/30 hover:border-primary/40 hover:bg-muted/50"
+                            )}
+                          >
+                            {f
+                              ? <Check className="w-7 h-7 text-emerald-600" strokeWidth={2.5} />
+                              : <Camera className="w-7 h-7 text-muted-foreground" />}
+                          </div>
+                          <input
+                            ref={el => (fileRefs.current["foto"] = el)}
+                            type="file"
+                            className="hidden"
+                            accept=".jpg,.jpeg,.png"
+                            onChange={e => onFile("foto", e.target.files?.[0])}
+                          />
+                          <div className="flex-1 min-w-0 space-y-2">
+                            <p className="text-[12.5px] font-semibold text-foreground">Fotografia recente do candidato</p>
+                            <p className="text-[11.5px] text-muted-foreground leading-snug">
+                              Rosto centrado, expressão neutra, fundo branco uniforme. Sem óculos escuros, chapéu ou filtros.
+                            </p>
+                            {f ? (
+                              <div className="flex items-center gap-1.5 text-[11px] text-foreground/70">
+                                <Paperclip className="w-3 h-3" /><span className="truncate">{f.name}</span>
+                                <span className="text-muted-foreground">· {fmtSize(f.size)}</span>
+                              </div>
+                            ) : null}
+                            <div className="flex items-center gap-1.5 pt-1">
+                              {f && (
+                                <Button variant="ghost" size="sm" onClick={() => removeDoc("foto")} className="h-7 text-[11.5px] text-muted-foreground hover:text-destructive gap-1">
+                                  <Trash2 className="w-3.5 h-3.5" /> Remover
+                                </Button>
+                              )}
+                              <Button variant={f ? "outline" : "default"} size="sm" onClick={() => fileRefs.current["foto"]?.click()} className="h-7 gap-1.5 text-[11.5px]">
+                                <Upload className="w-3.5 h-3.5" /> {f ? "Substituir foto" : "Upload foto"}
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })()}
+                  </section>
                 </div>
               );
             })()}
@@ -599,6 +654,9 @@ export default function Candidatar() {
                           {PARENTESCO.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
                         </SelectContent>
                       </Select>
+                    </Field>
+                    <Field label="Profissão" required>
+                      <Input value={form.encProfissao} onChange={e => update("encProfissao", e.target.value)} className={inputCls("encProfissao")} placeholder="Ex.: Professor, Engenheiro" maxLength={80} />
                     </Field>
                     <Field label="Telefone" required>
                       <Input value={form.encTelefone} onChange={e => update("encTelefone", e.target.value)} className={inputCls("encTelefone")} placeholder="+244 9XX XXX XXX" maxLength={20} />
@@ -835,67 +893,86 @@ export default function Candidatar() {
             })()}
 
             {step === 6 && (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between flex-wrap gap-2">
-                  <p className="text-[12.5px] text-muted-foreground">
-                    Anexe os documentos abaixo. Formatos aceites: PDF, JPG, PNG · máx. 5MB cada.
-                  </p>
-                  <Badge variant="outline" className="text-[11px]">{docsCount}/{academicDocs.length} anexados</Badge>
-                </div>
-                <div className="space-y-2.5">
-                  {academicDocs.map(d => {
-                    const file = docs[d.key];
+              <div className="space-y-5">
+                <p className="text-[12.5px] text-muted-foreground">
+                  O exame preparatório é <span className="font-semibold text-foreground">opcional</span> e ajuda na preparação para a entrevista de admissão. Indique se pretende realizar.
+                </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {([
+                    { v: "sim", t: "Sim, quero realizar", d: "Escolho uma das sessões disponíveis abaixo." },
+                    { v: "nao", t: "Não, obrigado", d: "Prefiro avançar directamente para a entrevista." },
+                  ] as const).map(opt => {
+                    const active = form.examePreparatorio === opt.v;
                     return (
-                      <div key={d.key} className={cn(
-                        "rounded-xl border transition-colors",
-                        file ? "border-accent/40 bg-accent/5" : "border-border bg-card hover:border-primary/30"
-                      )}>
-                        <input
-                          ref={el => (fileRefs.current[d.key] = el)}
-                          type="file"
-                          className="hidden"
-                          accept=".pdf,.jpg,.jpeg,.png"
-                          onChange={e => onFile(d.key, e.target.files?.[0])}
-                        />
-                        <div className="flex items-center gap-3 p-3.5">
+                      <button
+                        key={opt.v}
+                        type="button"
+                        onClick={() => {
+                          update("examePreparatorio", opt.v);
+                          if (opt.v === "nao") update("examePrepSessao", "");
+                        }}
+                        className={cn(
+                          "text-left rounded-xl border px-4 py-3.5 transition-all",
+                          active
+                            ? "border-primary bg-primary/5 ring-1 ring-primary/30"
+                            : "border-border bg-card hover:border-primary/40 hover:bg-muted/40"
+                        )}
+                      >
+                        <div className="flex items-center gap-2.5 mb-1">
                           <div className={cn(
-                            "w-10 h-10 rounded-lg flex items-center justify-center shrink-0",
-                            file ? "bg-accent text-accent-foreground" : "bg-muted text-muted-foreground"
+                            "w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0",
+                            active ? "border-primary bg-primary" : "border-border bg-background"
                           )}>
-                            {file ? <Check className="w-5 h-5" /> : <FileText className="w-5 h-5" />}
+                            {active && <span className="w-1.5 h-1.5 rounded-full bg-primary-foreground" />}
                           </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold text-foreground leading-tight">{d.label}</p>
-                            {file ? (
-                              <p className="text-[11.5px] text-foreground/70 mt-0.5 flex items-center gap-1.5 truncate">
-                                <Paperclip className="w-3 h-3 shrink-0" />
-                                <span className="truncate">{file.name}</span>
-                                <span className="text-muted-foreground">· {fmtSize(file.size)}</span>
-                              </p>
-                            ) : (
-                              <p className="text-[11.5px] text-muted-foreground mt-0.5">{d.desc}</p>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-1 shrink-0">
-                            {file && (
-                              <Button variant="ghost" size="sm" onClick={() => removeDoc(d.key)} className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive">
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </Button>
-                            )}
-                            <Button
-                              variant={file ? "outline" : "default"}
-                              size="sm"
-                              onClick={() => fileRefs.current[d.key]?.click()}
-                              className="h-8 gap-1.5 text-[12px]"
-                            >
-                              <Upload className="w-3.5 h-3.5" /> {file ? "Substituir" : "Anexar"}
-                            </Button>
-                          </div>
+                          <p className={cn("text-[13px] font-semibold leading-tight", active ? "text-primary" : "text-foreground")}>{opt.t}</p>
                         </div>
-                      </div>
+                        <p className="text-[11.5px] text-muted-foreground pl-[26px]">{opt.d}</p>
+                      </button>
                     );
                   })}
                 </div>
+
+                {form.examePreparatorio === "sim" && (
+                  <section className="space-y-3 border-t border-border pt-5">
+                    <p className="text-[10.5px] uppercase tracking-[0.12em] text-muted-foreground font-semibold">Escolha a sessão</p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {EXAME_SESSOES.map(s => {
+                        const active = form.examePrepSessao === s.id;
+                        const d = new Date(s.data + "T00:00:00");
+                        return (
+                          <button
+                            key={s.id}
+                            type="button"
+                            onClick={() => update("examePrepSessao", s.id)}
+                            className={cn(
+                              "text-left rounded-xl border p-4 transition-all",
+                              active
+                                ? "border-primary bg-primary/5 ring-1 ring-primary/30"
+                                : "border-border bg-card hover:border-primary/40 hover:bg-muted/40"
+                            )}
+                          >
+                            <div className="flex items-start justify-between gap-2 mb-2">
+                              <Badge variant="outline" className={cn("text-[10.5px]", active && "border-primary/40 text-primary bg-primary/5")}>{s.label}</Badge>
+                              <ClipboardCheck className={cn("w-4 h-4 shrink-0", active ? "text-primary" : "text-muted-foreground")} />
+                            </div>
+                            <p className={cn("text-[13.5px] font-semibold capitalize leading-tight", active ? "text-primary" : "text-foreground")}>
+                              {formatLongDate(d)}
+                            </p>
+                            <div className="mt-2 space-y-1 text-[11.5px] text-foreground/70">
+                              <p className="flex items-center gap-1.5"><Clock className="w-3 h-3 text-muted-foreground" /> {s.hora}</p>
+                              <p className="flex items-center gap-1.5"><MapPinned className="w-3 h-3 text-muted-foreground" /> {s.local}</p>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <p className="text-[11px] text-muted-foreground">
+                      A presença na sessão escolhida é obrigatória. Será notificado por email com os detalhes.
+                    </p>
+                  </section>
+                )}
               </div>
             )}
 
@@ -906,6 +983,7 @@ export default function Candidatar() {
                     ["Nome", `${form.primeiroNome} ${form.ultimoNome}`.trim()],
                     ["Nascimento", form.nascimento], ["Género", form.genero],
                     ["Nacionalidade", form.nacionalidade],
+                    ["Foto", docs.foto ? "✓ Anexada" : "Pendente"],
                   ]} />
                   <ReviewBlock title="Morada & Contactos" stepN={2} onEdit={goTo} rows={[
                     ["Província", form.provincia], ["Município", form.municipio],
@@ -913,6 +991,7 @@ export default function Candidatar() {
                     ["Email", form.email], ["Telemóvel", form.telemovel],
                     ["Encarregado", form.encNome],
                     ["Parentesco", form.encParentesco],
+                    ["Profissão", form.encProfissao],
                     ["Tel. encarregado", form.encTelefone],
                   ]} />
                   <ReviewBlock title="Formação" stepN={3} onEdit={goTo} rows={[
@@ -934,7 +1013,14 @@ export default function Candidatar() {
                       ["Local", ENTREVISTA_LOCAL],
                     ];
                   })()} />
-                  <ReviewBlock title="Documentos" stepN={6} onEdit={goTo} rows={DOCS.map(d => [d.label, docs[d.key] ? "✓ Anexado" : "Pendente"])} />
+                  <ReviewBlock title="Exame Preparatório" stepN={6} onEdit={goTo} rows={(() => {
+                    if (form.examePreparatorio === "nao") return [["Realizar", "Não"]];
+                    if (form.examePreparatorio !== "sim") return [["Realizar", "—"]];
+                    const s = EXAME_SESSOES.find(x => x.id === form.examePrepSessao);
+                    if (!s) return [["Realizar", "Sim"], ["Sessão", "Por escolher"]];
+                    const d = new Date(s.data + "T00:00:00");
+                    return [["Realizar", "Sim"], ["Sessão", s.label], ["Data", formatLongDate(d)], ["Hora", s.hora], ["Local", s.local]];
+                  })()} />
                 </div>
 
 
