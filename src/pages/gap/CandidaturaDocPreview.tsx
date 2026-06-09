@@ -86,110 +86,106 @@ export default function CandidaturaDocPreview({
             </div>
           </div>
 
-          {/* Header — photo + name + estado + submetido + documentos + etapas */}
+          {/* Header — photo + name + estado + submetido + documentos */}
           <header className="px-10 pt-5 pb-5 border-b-2 border-neutral-900">
-            <div className="flex items-start gap-6">
+            <div className="flex items-start gap-5">
               <img
                 src={studentPhoto}
                 alt={`Foto — ${c.nome}`}
                 width={512}
                 height={640}
                 loading="lazy"
-                className="w-[150px] h-[190px] object-cover border border-neutral-400 bg-neutral-100 shrink-0"
+                className="w-[130px] h-[165px] object-cover border border-neutral-400 bg-neutral-100 shrink-0"
               />
 
               <div className="flex-1 min-w-0 pt-1">
-                <p className="text-[12px] uppercase tracking-[0.24em] text-neutral-500 font-bold mb-1.5">
+                <p className="text-[10px] uppercase tracking-[0.24em] text-neutral-500 font-bold mb-1.5">
                   Ficha de Candidatura
                 </p>
-                <h1 className="text-[28px] leading-[1.1] font-bold tracking-tight text-neutral-900">
+                <h1 className="text-[22px] leading-[1.1] font-bold tracking-tight text-neutral-900">
                   {c.nome}
                 </h1>
-                <div className="mt-3 flex items-end gap-6 text-[10.5px] text-neutral-600">
+                <div className="mt-3 flex items-end gap-5 text-[10px] text-neutral-600">
                   <div>
-                    <p className="text-[9px] uppercase tracking-[0.18em] text-neutral-500 font-semibold mb-0.5">
+                    <p className="text-[8.5px] uppercase tracking-[0.18em] text-neutral-500 font-semibold mb-0.5">
                       Estado
                     </p>
                     <span className="inline-flex items-center gap-1.5">
                       <span className="w-1.5 h-1.5 rounded-full bg-neutral-900" />
-                      <span className="uppercase tracking-[0.14em] font-bold text-neutral-900 text-[11px]">
+                      <span className="uppercase tracking-[0.14em] font-bold text-neutral-900 text-[10.5px]">
                         {estadoLabels[estadoKey]}
                       </span>
                     </span>
                   </div>
                   <div>
-                    <p className="text-[9px] uppercase tracking-[0.18em] text-neutral-500 font-semibold mb-0.5">
+                    <p className="text-[8.5px] uppercase tracking-[0.18em] text-neutral-500 font-semibold mb-0.5">
                       Submetido em
                     </p>
-                    <span className="font-semibold text-neutral-900 tabular-nums text-[11px]">
+                    <span className="font-semibold text-neutral-900 tabular-nums text-[10.5px]">
                       {fmtDataShort(c.dataSubmissao)}
                     </span>
                   </div>
                 </div>
               </div>
 
-              {/* Right column: Documentos + Etapas */}
-              <div className="w-[280px] shrink-0 flex flex-col gap-3">
-                {/* Documentos */}
-                  <div className="border border-neutral-300 bg-white">
-                    <div className="px-2 py-1 bg-neutral-100 border-b border-neutral-300 flex items-center justify-between">
-                      <p className="text-[10px] uppercase tracking-[0.16em] font-bold text-neutral-700">
-                        Documentos
-                      </p>
-                      <p className="text-[10px] tabular-nums text-neutral-600 font-semibold">
-                        {c.documentos.length}/{c.documentos.length}
-                      </p>
-                    </div>
-                    <ul className="divide-y divide-neutral-200">
-                      {c.documentos.map((d, i) => (
-                        <li key={i} className="flex items-center gap-1.5 px-2 py-[3px] text-[10px] text-neutral-800">
-                          <span className="text-emerald-700 font-bold leading-none">✓</span>
-                          <span className="truncate">{d.nome}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                {/* Etapas da Candidatura */}
-                <div className="border border-neutral-300 bg-white">
-                  <div className="px-2.5 py-1 bg-neutral-100 border-b border-neutral-300 flex items-center justify-between">
-                    <p className="text-[10.5px] uppercase tracking-[0.16em] font-bold text-neutral-700">
-                      Etapas da Candidatura
-                    </p>
-                    <p className="text-[10.5px] tabular-nums text-neutral-600 font-semibold">
-                      {cronologia.filter(h => h.done !== false).length}/{cronologia.length}
-                    </p>
-                  </div>
-                  <ul className="divide-y divide-neutral-200">
-                    {cronologia.map((h, i) => (
-                      <li key={i} className="flex items-center gap-2 px-2.5 py-[4px] text-[11px]">
-                        <span className={h.done !== false ? "truncate text-neutral-800 font-medium" : "truncate text-neutral-500"}>{h.accao}</span>
-                        {h.estado && (
-                          <span className={`ml-auto inline-flex items-center px-1.5 py-0.5 rounded border text-[10px] font-semibold uppercase tracking-wide ${etapaEstadoCls[h.estado]}`}>
-                            {h.estado}
-                          </span>
-                        )}
-                        <span className="text-neutral-500 tabular-nums text-[10.5px] w-[64px] text-right">{fmtDataShort(h.data)}</span>
-                      </li>
-                    ))}
-                  </ul>
+              {/* Documentos */}
+              <div className="w-[200px] shrink-0 border border-neutral-300 bg-white">
+                <div className="px-2 py-1 bg-neutral-100 border-b border-neutral-300 flex items-center justify-between">
+                  <p className="text-[9.5px] uppercase tracking-[0.16em] font-bold text-neutral-700">
+                    Documentos
+                  </p>
+                  <p className="text-[9.5px] tabular-nums text-neutral-600 font-semibold">
+                    {c.documentos.length}/{c.documentos.length}
+                  </p>
                 </div>
+                <ul className="divide-y divide-neutral-200">
+                  {c.documentos.map((d, i) => (
+                    <li key={i} className="flex items-center gap-1.5 px-2 py-[3px] text-[9.5px] text-neutral-800">
+                      <span className="text-emerald-700 font-bold leading-none">✓</span>
+                      <span className="truncate">{d.nome}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
             </div>
           </header>
 
           <div className="flex-1 px-10 py-5 space-y-4">
-
-
-
-
             {/* Sections — dados verticais */}
             {steps.map(s => (
               <Section key={s.n} title={s.title}>
                 <XTable rows={s.rows.map(r => [r.label, r.value] as [string, string])} />
               </Section>
             ))}
+
+            {/* Etapas da Candidatura — full width, after data */}
+            <Section title="Etapas da Candidatura">
+              <div className="border border-neutral-300">
+                <div className="px-3 py-1.5 bg-neutral-100 border-b border-neutral-300 flex items-center justify-between">
+                  <p className="text-[9.5px] uppercase tracking-[0.16em] font-bold text-neutral-700">
+                    Cronologia do processo
+                  </p>
+                  <p className="text-[10px] tabular-nums text-neutral-600 font-semibold">
+                    {cronologia.filter(h => h.done !== false).length}/{cronologia.length}
+                  </p>
+                </div>
+                <ul className="divide-y divide-neutral-200">
+                  {cronologia.map((h, i) => (
+                    <li key={i} className="flex items-center gap-3 px-3 py-1.5 text-[10.5px]">
+                      <span className={h.done !== false ? "flex-1 text-neutral-900 font-medium" : "flex-1 text-neutral-500"}>{h.accao}</span>
+                      {h.estado && (
+                        <span className={`inline-flex items-center px-1.5 py-0.5 rounded border text-[9.5px] font-semibold uppercase tracking-wide ${etapaEstadoCls[h.estado]}`}>
+                          {h.estado}
+                        </span>
+                      )}
+                      <span className="text-neutral-500 tabular-nums text-[10px] w-[80px] text-right">{fmtDataShort(h.data)}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </Section>
           </div>
+
 
           {/* Footer */}
           <footer className="px-10 pb-6 pt-3 mt-auto border-t border-neutral-300 flex items-end justify-between gap-8">
