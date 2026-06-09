@@ -166,14 +166,11 @@ export default function GapCandidaturaDetail() {
               <p className="text-[12px] text-muted-foreground mt-0.5">
                 Candidatura submetida em {dSub.toLocaleDateString("pt-PT", { day: "2-digit", month: "long", year: "numeric" })}
               </p>
-              <div className="mt-2 flex items-center gap-1.5 flex-wrap">
-                <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider gap-1", estadoColors[estadoFinal])}>
+              <div className="mt-2 flex flex-col gap-0.5">
+                <span className="text-[9px] tracking-[0.12em] uppercase text-muted-foreground font-semibold">Estado</span>
+                <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider gap-1 w-fit", estadoColors[estadoFinal])}>
                   <span className={cn("w-1.5 h-1.5 rounded-full", estadoDot[estadoFinal])} />
                   {estadoLabels[estadoFinal]}
-                </Badge>
-                <Badge variant="outline" className="text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider gap-1 bg-blue-50 text-blue-700 border-blue-200">
-                  <CheckCircle2 className="w-3 h-3" />
-                  {steps.length}/{steps.length} etapas
                 </Badge>
               </div>
             </div>
