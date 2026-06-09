@@ -158,7 +158,7 @@ export default function GapCandidaturaDetail() {
           <span className="text-muted-foreground/40">·</span>
           <Link to="/gap/candidaturas" className="text-muted-foreground hover:text-foreground transition-colors">Candidaturas</Link>
           <span className="text-muted-foreground/40">·</span>
-          <span className="font-mono text-foreground normal-case tracking-normal">{c.id}</span>
+          <span className="font-mono text-foreground normal-case tracking-normal">{displayId}</span>
         </div>
 
         {/* Title block — photo + name + badges + doc pill */}
