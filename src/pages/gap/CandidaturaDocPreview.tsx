@@ -55,73 +55,54 @@ export default function CandidaturaDocPreview({ candidatura: c, steps, cronologi
           style={{ width: "210mm", minHeight: "297mm", fontFamily: "'Inter', system-ui, sans-serif" }}
         >
           {/* Header */}
-          <header className="px-12 pt-10 pb-5 border-b-2 border-neutral-900">
+          <header className="px-12 pt-8 pb-3 border-b-2 border-neutral-900">
             <div className="flex items-start justify-between gap-8">
               <div>
                 <p className="text-[9px] uppercase tracking-[0.28em] text-neutral-500 font-semibold">
                   Universidade Privada · GAP
                 </p>
-                <h1 className="text-[20px] font-bold tracking-tight mt-2 text-neutral-900">
+                <h1 className="text-[18px] font-bold tracking-tight mt-1.5 text-neutral-900">
                   Relatório de Candidatura
                 </h1>
               </div>
               <div className="text-right shrink-0">
-                <p className="font-mono text-[12px] font-semibold text-neutral-900">{displayId}</p>
-                <p className="text-[10px] text-neutral-500 mt-0.5">Emitido {fmtDataLong(new Date())}</p>
+                <p className="font-mono text-[11px] font-semibold text-neutral-900">{displayId}</p>
+                <p className="text-[9.5px] text-neutral-500 mt-0.5">Emitido {fmtDataLong(new Date())}</p>
               </div>
             </div>
           </header>
 
-          <div className="flex-1 px-12 py-8 space-y-7">
-            {/* 01 Identificação */}
-            <Section n="01" title="Identificação do Candidato">
-              <XTable
-                rows={[
-                  ["Nome completo", c.nome],
-                  ["BI / Passaporte", c.bi],
-                  ["Telefone", c.telefone],
-                  ["Email", c.email],
-                  ["Período", c.periodo],
-                  ["Data de submissão", fmtDataShort(c.dataSubmissao)],
-                  ["Estado", estadoLabels[estadoKey]],
-                ]}
-              />
-            </Section>
+          {/* Candidate banner */}
+          <div className="px-12 pt-4 pb-3 bg-neutral-50 border-b border-neutral-300">
+            <div className="flex items-end justify-between gap-6">
+              <div>
+                <p className="text-[9px] uppercase tracking-[0.22em] text-neutral-500 font-semibold">Candidato</p>
+                <p className="text-[15px] font-bold text-neutral-900 mt-0.5">{c.nome}</p>
+                <p className="text-[10px] text-neutral-600 mt-0.5">
+                  BI {c.bi} · {c.periodo} · Submetido em {fmtDataShort(c.dataSubmissao)}
+                </p>
+              </div>
+              <span className="inline-flex items-center px-2.5 py-1 rounded border border-neutral-300 bg-white text-[10px] uppercase tracking-wider font-bold text-neutral-800">
+                {estadoLabels[estadoKey]}
+              </span>
+            </div>
+          </div>
 
-            {/* 02 Opções */}
-            <Section n="02" title="Opções de Curso">
-              <table className="w-full border-collapse text-[11px]">
-                <thead>
-                  <tr className="bg-neutral-100">
-                    <Th className="w-16 text-center">Opção</Th>
-                    <Th>Curso</Th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {opcoes.map((o, i) => (
-                    <tr key={i}>
-                      <Td className="text-center font-semibold tabular-nums">{i + 1}ª</Td>
-                      <Td>{o}</Td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </Section>
-
-            {/* 03+ Etapas */}
+          <div className="flex-1 px-12 py-5 space-y-5">
+            {/* Etapas */}
             {steps.map((s, idx) => (
-              <Section key={s.n} n={String(idx + 3).padStart(2, "0")} title={s.title}>
+              <Section key={s.n} n={String(idx + 1).padStart(2, "0")} title={s.title}>
                 <XTable rows={s.rows.map(r => [r.label, r.value] as [string, string])} />
               </Section>
             ))}
 
             {/* Cronologia */}
-            <Section n={String(steps.length + 3).padStart(2, "0")} title="Cronologia">
-              <table className="w-full border-collapse text-[11px]">
+            <Section n={String(steps.length + 1).padStart(2, "0")} title="Cronologia">
+              <table className="w-full border-collapse text-[10.5px]">
                 <thead>
                   <tr className="bg-neutral-100">
-                    <Th className="w-28">Data</Th>
-                    <Th className="w-56">Acção</Th>
+                    <Th className="w-24">Data</Th>
+                    <Th className="w-52">Acção</Th>
                     <Th>Detalhe</Th>
                   </tr>
                 </thead>
@@ -138,13 +119,13 @@ export default function CandidaturaDocPreview({ candidatura: c, steps, cronologi
             </Section>
 
             {/* Documentos */}
-            <Section n={String(steps.length + 4).padStart(2, "0")} title="Documentos Entregues">
-              <table className="w-full border-collapse text-[11px]">
+            <Section n={String(steps.length + 2).padStart(2, "0")} title="Documentos Entregues">
+              <table className="w-full border-collapse text-[10.5px]">
                 <thead>
                   <tr className="bg-neutral-100">
-                    <Th className="w-12 text-center">#</Th>
+                    <Th className="w-10 text-center">#</Th>
                     <Th>Documento</Th>
-                    <Th className="w-28 text-center">Estado</Th>
+                    <Th className="w-24 text-center">Estado</Th>
                   </tr>
                 </thead>
                 <tbody>
@@ -161,7 +142,7 @@ export default function CandidaturaDocPreview({ candidatura: c, steps, cronologi
           </div>
 
           {/* Footer */}
-          <footer className="px-12 pb-10 pt-5 mt-auto border-t border-neutral-300">
+          <footer className="px-12 pb-6 pt-3 mt-auto border-t border-neutral-300">
             <div className="flex items-end justify-between gap-8">
               <p className="text-[9.5px] text-neutral-500 leading-relaxed max-w-sm">
                 Documento gerado pelo Gabinete de Apoio Académico. Contacto:{" "}
@@ -206,16 +187,16 @@ function Th({ children, className = "" }: { children: React.ReactNode; className
 }
 
 function Td({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  return <td className={`border border-neutral-300 px-3 py-1.5 align-top ${className}`}>{children}</td>;
+  return <td className={`border border-neutral-300 px-2.5 py-1 align-top ${className}`}>{children}</td>;
 }
 
 function XTable({ rows }: { rows: [string, string][] }) {
   return (
-    <table className="w-full border-collapse text-[11px]">
+    <table className="w-full border-collapse text-[10.5px]">
       <tbody>
         {rows.map(([k, v], i) => (
           <tr key={i}>
-            <Td className="w-56 bg-neutral-50 font-semibold text-neutral-700 text-[10px] uppercase tracking-wider">
+            <Td className="w-52 bg-neutral-50 font-semibold text-neutral-700 text-[9.5px] uppercase tracking-wider">
               {k}
             </Td>
             <Td>{v}</Td>
