@@ -239,7 +239,7 @@ export default function CandidaturaDocPreview({
                       <span className={h.done !== false ? "flex-1 text-neutral-900 font-medium" : "flex-1 text-neutral-500"}>{h.accao}</span>
                       {h.estado && (
                         <span className={`inline-flex items-center px-1.5 py-0.5 rounded border text-[9.5px] font-semibold uppercase tracking-wide ${etapaEstadoCls[h.estado]}`}>
-                          {h.estado}
+                          {h.estado === "em_progresso" ? "em progresso" : h.estado}
                         </span>
                       )}
                       <span className="text-neutral-500 tabular-nums text-[10px] w-[80px] text-right">{fmtDataShort(h.data)}</span>
