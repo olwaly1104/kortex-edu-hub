@@ -7,7 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { candidaturas, estadoColors, estadoLabels } from "@/data/admissoesData";
 import {
   ArrowLeft, CheckCircle2, ChevronDown, FileText, Eye, Download, Clock,
-  User, MapPin, BookOpen, CalendarDays, ClipboardCheck, Check, GraduationCap, Calendar,
+  User, MapPin, BookOpen, CalendarDays, ClipboardCheck, Check, GraduationCap, Calendar, Wallet,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import CandidaturaDocPreview from "./CandidaturaDocPreview";
@@ -77,7 +77,16 @@ function buildSteps(c: typeof candidaturas[number]): StepDef[] {
       })),
     },
     {
-      n: 5, title: "Entrevista", sub: "Marcação da data de entrevista", icon: CalendarDays,
+      n: 5, title: "Pagamento", sub: "Taxa de candidatura e comprovativo", icon: Wallet,
+      rows: [
+        { label: "Referência", value: c.pagamento?.referencia ?? "—" },
+        { label: "Valor", value: c.pagamento ? `${new Intl.NumberFormat("pt-AO").format(c.pagamento.valor)} Kz` : "—" },
+        { label: "Comprovativo", value: c.pagamento?.comprovativo ? "Entregue" : "Por entregar" },
+        { label: "Estado", value: c.pagamento?.estado === "confirmado" ? "Confirmado" : "Por confirmar" },
+      ],
+    },
+    {
+      n: 6, title: "Entrevista", sub: "Marcação da data de entrevista", icon: CalendarDays,
       rows: [
         { label: "Data", value: "15 de julho de 2026" },
         { label: "Hora", value: "10:30" },
@@ -87,7 +96,7 @@ function buildSteps(c: typeof candidaturas[number]): StepDef[] {
       ],
     },
     {
-      n: 6, title: "Curso Preparatório", sub: "Opcional — escolha da sessão", icon: ClipboardCheck,
+      n: 7, title: "Curso Preparatório", sub: "Opcional — escolha da sessão", icon: ClipboardCheck,
       rows: [
         { label: "Inscrição", value: "Sim" },
         { label: "Sessão", value: "1ª Sessão · 18 de julho de 2026" },
@@ -115,16 +124,26 @@ function pick<T>(seed: number, arr: T[]): T { return arr[seed % arr.length]; }
 function buildCronologia(c: typeof candidaturas[number]) {
   const sub = new Date(c.dataSubmissao);
   const today = new Date();
+  const pagamento = new Date(sub.getTime() + 3 * 86400000);
   const entrevista = new Date(sub.getTime() + 12 * 86400000);
   const cursoPrep = new Date(sub.getTime() + 35 * 86400000);
   const exame = new Date(sub.getTime() + 60 * 86400000);
   const seed = parseInt(c.id.replace(/\D/g, ""), 10) || 0;
 
   // Sequential gating: each step only advances if the previous one is "completo".
-  // - Entrevista: completo | remarcado | falta (or agendado if date not reached).
+  // - Pagamento: completo se o pagamento da candidatura estiver confirmado; senão agendado.
+  // - Entrevista: requer Pagamento = completo; completo | remarcado | falta.
   // - Curso Preparatório: requires Entrevista = completo; otherwise agendado.
   // - Exame: requires Curso Preparatório = completo; otherwise agendado.
-  const entrevistaEstado: EtapaEstado = entrevista <= today
+  const pagEstado: EtapaEstado = c.pagamento?.estado === "confirmado"
+    ? "completo"
+    : "agendado";
+  const pagDone = pagEstado === "completo";
+  const pagDetalhe = c.pagamento?.estado === "confirmado"
+    ? `Pago — ${c.pagamento.referencia} · ${new Intl.NumberFormat("pt-AO").format(c.pagamento.valor)} Kz`
+    : `Por confirmar — ${c.pagamento?.referencia ?? "—"}`;
+
+  const entrevistaEstado: EtapaEstado = pagDone && entrevista <= today
     ? pick(seed, ["completo", "completo", "remarcado", "falta"] as EtapaEstado[])
     : "agendado";
   const entDone = entrevistaEstado === "completo";
@@ -141,6 +160,7 @@ function buildCronologia(c: typeof candidaturas[number]) {
 
   return [
     { data: sub.toISOString(), accao: "Candidatura submetida", detalhe: "Formulário online preenchido pelo candidato", done: sub <= today, estado: "completo" as EtapaEstado },
+    { data: pagamento.toISOString(), accao: "Pagamento da candidatura", detalhe: pagDetalhe, done: pagDone, estado: pagEstado },
     { data: entrevista.toISOString(), accao: "Entrevista", detalhe: "Realizada — Sala de Entrevistas, Campus UPRA", done: entDone, estado: entrevistaEstado },
     { data: cursoPrep.toISOString(), accao: "Curso Preparatório", detalhe: "Inscrito — 1ª Sessão (Anfiteatro A)", done: cpDone, estado: cursoPrepEstado },
     { data: exame.toISOString(), accao: "Exame de Acesso", detalhe: "Marcado — Edifício Central, Sala 04", done: exDone, estado: exameEstado },
