@@ -243,42 +243,90 @@ export default function GapConfiguracao() {
   const [newAgModLabel, setNewAgModLabel] = useState("");
 
   // ===== CANDIDATURAS =====
-  type CdPeriodo = { key: string; label: string; inicio: string; fim: string; ativo: boolean };
-  type CdCurso = { key: string; label: string; vagas: number; faculdade: string };
-  type CdDoc = { key: string; label: string; obrigatorio: boolean };
+  type CdEstado = { key: string; label: string; color: string };
+  type CdEtapa = { key: string; label: string; diasAposSubmissao: number; obrigatoria: boolean; estadosPossiveis: string[] };
+  type CdSessao = { key: string; etapa: string; data: string; hora: string; local: string; capacidade: number };
+  type CdPergunta = { key: string; label: string; tipo: "texto" | "numero" | "data" | "selecao" | "ficheiro"; obrigatoria: boolean };
+  type CdFormStep = { key: string; titulo: string; subtitulo: string; perguntas: CdPergunta[] };
 
-  const [cdPeriodos, setCdPeriodos] = useState<CdPeriodo[]>([
-    { key: "ch1_2025", label: "1ª Chamada 2025", inicio: "2024-12-01", fim: "2025-01-15", ativo: false },
-    { key: "ch2_2025", label: "2ª Chamada 2025", inicio: "2025-02-15", fim: "2025-03-30", ativo: true },
-    { key: "ch3_2025", label: "3ª Chamada 2025", inicio: "2025-05-01", fim: "2025-06-15", ativo: false },
+  const [cdEstados, setCdEstados] = useState<CdEstado[]>([
+    { key: "completo", label: "Completo", color: "bg-green-50 text-green-700 border-green-200" },
+    { key: "aprovado", label: "Aprovado", color: "bg-green-50 text-green-700 border-green-200" },
+    { key: "agendado", label: "Agendado", color: "bg-blue-50 text-blue-700 border-blue-200" },
+    { key: "remarcado", label: "Remarcado", color: "bg-amber-50 text-amber-700 border-amber-200" },
+    { key: "falta", label: "Falta", color: "bg-red-50 text-red-700 border-red-200" },
+    { key: "reprovado", label: "Reprovado", color: "bg-red-50 text-red-700 border-red-200" },
   ]);
-  const [cdCursos, setCdCursos] = useState<CdCurso[]>([
-    { key: "arq", label: "Arquitectura", vagas: 50, faculdade: "Faculdade de Ciências Exatas" },
-    { key: "eng_inf", label: "Engenharia Informática", vagas: 80, faculdade: "Faculdade de Ciências Exatas" },
-    { key: "med", label: "Medicina", vagas: 60, faculdade: "Faculdade de Medicina" },
-    { key: "dir", label: "Direito", vagas: 100, faculdade: "Faculdade de Ciências Sociais" },
-    { key: "gest", label: "Gestão", vagas: 90, faculdade: "Faculdade de Ciências Sociais" },
+  const [cdEtapas, setCdEtapas] = useState<CdEtapa[]>([
+    { key: "submissao", label: "Submissão da candidatura", diasAposSubmissao: 0, obrigatoria: true, estadosPossiveis: ["completo"] },
+    { key: "entrevista", label: "Entrevista", diasAposSubmissao: 12, obrigatoria: true, estadosPossiveis: ["agendado", "completo", "remarcado", "falta"] },
+    { key: "curso_preparatorio", label: "Curso Preparatório", diasAposSubmissao: 35, obrigatoria: false, estadosPossiveis: ["agendado", "completo", "remarcado"] },
+    { key: "exame", label: "Exame de Acesso", diasAposSubmissao: 60, obrigatoria: true, estadosPossiveis: ["agendado", "aprovado", "reprovado", "remarcado"] },
   ]);
-  const [cdDocs, setCdDocs] = useState<CdDoc[]>([
-    { key: "bi", label: "Bilhete de Identidade", obrigatorio: true },
-    { key: "cert_medio", label: "Certificado do Ensino Médio", obrigatorio: true },
-    { key: "decl_notas", label: "Declaração de Notas", obrigatorio: true },
-    { key: "atestado", label: "Atestado Médico", obrigatorio: true },
-    { key: "foto", label: "Fotografia tipo passe", obrigatorio: false },
+  const [cdSessoes, setCdSessoes] = useState<CdSessao[]>([
+    { key: "cp_s1", etapa: "Curso Preparatório", data: "2026-07-18", hora: "09:00", local: "Anfiteatro A — Campus UPRA", capacidade: 80 },
+    { key: "cp_s2", etapa: "Curso Preparatório", data: "2026-07-25", hora: "09:00", local: "Anfiteatro B — Campus UPRA", capacidade: 80 },
+    { key: "ex_s1", etapa: "Exame de Acesso", data: "2026-08-15", hora: "09:00", local: "Edifício Central, Sala 04", capacidade: 60 },
+    { key: "ex_s2", etapa: "Exame de Acesso", data: "2026-08-22", hora: "14:00", local: "Edifício Central, Sala 06", capacidade: 60 },
   ]);
-  const [cdTaxa, setCdTaxa] = useState(15000);
   const [cdNotaMinima, setCdNotaMinima] = useState(10);
-  const [cdCapacidadeSessao, setCdCapacidadeSessao] = useState(50);
+  const [cdTaxa, setCdTaxa] = useState(15000);
   const [cdMaxOpcoes, setCdMaxOpcoes] = useState(3);
 
-  const [newCdPerLabel, setNewCdPerLabel] = useState("");
-  const [newCdPerInicio, setNewCdPerInicio] = useState("");
-  const [newCdPerFim, setNewCdPerFim] = useState("");
-  const [newCdCursoLabel, setNewCdCursoLabel] = useState("");
-  const [newCdCursoVagas, setNewCdCursoVagas] = useState(50);
-  const [newCdCursoFac, setNewCdCursoFac] = useState("Faculdade de Ciências Exatas");
-  const [newCdDocLabel, setNewCdDocLabel] = useState("");
-  const [newCdDocObrig, setNewCdDocObrig] = useState(true);
+  const [cdFormSteps, setCdFormSteps] = useState<CdFormStep[]>([
+    { key: "dados_pessoais", titulo: "Dados Pessoais", subtitulo: "Identificação do candidato", perguntas: [
+      { key: "nome_completo", label: "Nome completo", tipo: "texto", obrigatoria: true },
+      { key: "data_nasc", label: "Data de nascimento", tipo: "data", obrigatoria: true },
+      { key: "bi", label: "Bilhete de Identidade", tipo: "texto", obrigatoria: true },
+      { key: "genero", label: "Género", tipo: "selecao", obrigatoria: true },
+      { key: "naturalidade", label: "Naturalidade", tipo: "texto", obrigatoria: true },
+    ]},
+    { key: "morada_contactos", titulo: "Morada & Contactos", subtitulo: "Contactos e residência", perguntas: [
+      { key: "telefone", label: "Telefone", tipo: "texto", obrigatoria: true },
+      { key: "email", label: "Email", tipo: "texto", obrigatoria: true },
+      { key: "morada", label: "Morada de residência", tipo: "texto", obrigatoria: true },
+      { key: "provincia", label: "Província", tipo: "selecao", obrigatoria: true },
+    ]},
+    { key: "formacao", titulo: "Formação", subtitulo: "Histórico do ensino secundário", perguntas: [
+      { key: "escola", label: "Escola de origem", tipo: "texto", obrigatoria: true },
+      { key: "ano_conclusao", label: "Ano de conclusão", tipo: "numero", obrigatoria: true },
+      { key: "media_final", label: "Média final", tipo: "numero", obrigatoria: true },
+      { key: "cert_medio", label: "Certificado do Ensino Médio", tipo: "ficheiro", obrigatoria: true },
+      { key: "decl_notas", label: "Declaração de Notas", tipo: "ficheiro", obrigatoria: true },
+    ]},
+    { key: "curso", titulo: "Curso", subtitulo: "Faculdades e cursos por ordem de escolha", perguntas: [
+      { key: "opcao1", label: "1ª opção de curso", tipo: "selecao", obrigatoria: true },
+      { key: "opcao2", label: "2ª opção de curso", tipo: "selecao", obrigatoria: false },
+      { key: "opcao3", label: "3ª opção de curso", tipo: "selecao", obrigatoria: false },
+    ]},
+    { key: "entrevista", titulo: "Entrevista", subtitulo: "Marcação da data de entrevista", perguntas: [
+      { key: "disponibilidade", label: "Disponibilidade horária", tipo: "selecao", obrigatoria: true },
+      { key: "observacoes", label: "Observações", tipo: "texto", obrigatoria: false },
+    ]},
+    { key: "curso_prep", titulo: "Curso Preparatório", subtitulo: "Opcional — escolha da sessão", perguntas: [
+      { key: "inscricao", label: "Pretende inscrever-se?", tipo: "selecao", obrigatoria: true },
+      { key: "sessao", label: "Sessão preferida", tipo: "selecao", obrigatoria: false },
+    ]},
+    { key: "revisao", titulo: "Revisão", subtitulo: "Confirmação final da candidatura", perguntas: [
+      { key: "confirma", label: "Confirmo que os dados estão corretos", tipo: "selecao", obrigatoria: true },
+    ]},
+  ]);
+
+  const [cdEstadoOpen, setCdEstadoOpen] = useState(false);
+  const [newCdEstadoLabel, setNewCdEstadoLabel] = useState("");
+  const [newCdEtapaLabel, setNewCdEtapaLabel] = useState("");
+  const [newCdEtapaDias, setNewCdEtapaDias] = useState(7);
+  const [newCdSessEtapa, setNewCdSessEtapa] = useState("Curso Preparatório");
+  const [newCdSessData, setNewCdSessData] = useState("");
+  const [newCdSessHora, setNewCdSessHora] = useState("09:00");
+  const [newCdSessLocal, setNewCdSessLocal] = useState("");
+  const [newCdSessCap, setNewCdSessCap] = useState(60);
+  const [expandedStep, setExpandedStep] = useState<string | null>("dados_pessoais");
+  const [newPergStep, setNewPergStep] = useState<string>("");
+  const [newPergLabel, setNewPergLabel] = useState("");
+  const [newPergTipo, setNewPergTipo] = useState<CdPergunta["tipo"]>("texto");
+  const [newPergObrig, setNewPergObrig] = useState(true);
+
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
@@ -723,21 +771,18 @@ export default function GapConfiguracao() {
           <Card className="p-5">
             <div className="flex items-center gap-2 mb-4">
               <Wallet className="w-4 h-4 text-muted-foreground" />
-              <h2 className="text-sm font-semibold text-foreground">Parâmetros de candidatura</h2>
+              <h2 className="text-sm font-semibold text-foreground">Parâmetros gerais</h2>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               <div>
                 <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Taxa de candidatura (Kz)</label>
                 <Input type="number" min={0} step={500} value={cdTaxa} onChange={e => setCdTaxa(Number(e.target.value) || 0)} />
                 <p className="text-[10px] text-muted-foreground mt-1">{formatKz(cdTaxa)}</p>
               </div>
               <div>
-                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Nota mínima (0–20)</label>
+                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Nota mínima de aprovação</label>
                 <Input type="number" min={0} max={20} step={0.5} value={cdNotaMinima} onChange={e => setCdNotaMinima(Number(e.target.value) || 0)} />
-              </div>
-              <div>
-                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Capacidade por sessão</label>
-                <Input type="number" min={1} value={cdCapacidadeSessao} onChange={e => setCdCapacidadeSessao(Number(e.target.value) || 1)} />
+                <p className="text-[10px] text-muted-foreground mt-1">Escala 0–20</p>
               </div>
               <div>
                 <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Máx. opções de curso</label>
@@ -746,161 +791,290 @@ export default function GapConfiguracao() {
             </div>
           </Card>
 
-          {/* Períodos / Chamadas */}
+          {/* Estados das etapas */}
           <Card className="p-5">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
-                <CalendarClock className="w-4 h-4 text-muted-foreground" />
-                <h2 className="text-sm font-semibold text-foreground">Períodos de candidatura</h2>
-                <span className="text-[11px] text-muted-foreground tabular-nums">· {cdPeriodos.length}</span>
-              </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-[1fr_160px_160px_auto] gap-2 mb-3">
-              <Input value={newCdPerLabel} onChange={e => setNewCdPerLabel(e.target.value)} placeholder="Ex: 4ª Chamada 2025" className="h-9 text-xs" />
-              <Input type="date" value={newCdPerInicio} onChange={e => setNewCdPerInicio(e.target.value)} className="h-9 text-xs" />
-              <Input type="date" value={newCdPerFim} onChange={e => setNewCdPerFim(e.target.value)} className="h-9 text-xs" />
-              <Button size="sm" variant="outline" className="h-9 text-xs gap-1.5" onClick={() => {
-                if (!newCdPerLabel.trim() || !newCdPerInicio || !newCdPerFim) return;
-                setCdPeriodos(prev => [...prev, { key: slugify(newCdPerLabel), label: newCdPerLabel.trim(), inicio: newCdPerInicio, fim: newCdPerFim, ativo: false }]);
-                setNewCdPerLabel(""); setNewCdPerInicio(""); setNewCdPerFim("");
-                toast({ title: "Período adicionado" });
-              }}><Plus className="w-3.5 h-3.5" /> Adicionar</Button>
-            </div>
-            <div className="overflow-x-auto rounded-lg border border-border">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b bg-muted/30">
-                    <th className="text-left p-3 font-medium text-muted-foreground text-xs">Período</th>
-                    <th className="text-left p-3 font-medium text-muted-foreground text-xs">Início</th>
-                    <th className="text-left p-3 font-medium text-muted-foreground text-xs">Fim</th>
-                    <th className="text-center p-3 font-medium text-muted-foreground text-xs">Estado</th>
-                    <th className="w-12" />
-                  </tr>
-                </thead>
-                <tbody>
-                  {cdPeriodos.map(p => (
-                    <tr key={p.key} className="border-b last:border-0 hover:bg-muted/20">
-                      <td className="p-3 text-xs font-medium text-foreground">{p.label}</td>
-                      <td className="p-3 text-xs text-muted-foreground tabular-nums">{p.inicio}</td>
-                      <td className="p-3 text-xs text-muted-foreground tabular-nums">{p.fim}</td>
-                      <td className="p-3 text-center">
-                        <button onClick={() => setCdPeriodos(prev => prev.map(x => x.key === p.key ? { ...x, ativo: !x.ativo } : x))}>
-                          <Badge variant="outline" className={cn("text-[10px] cursor-pointer", p.ativo ? "bg-emerald-100 text-emerald-800 border-emerald-200" : "bg-slate-100 text-slate-600 border-slate-200")}>
-                            {p.ativo ? "Aberto" : "Fechado"}
-                          </Badge>
-                        </button>
-                      </td>
-                      <td className="p-3 text-right">
-                        <button onClick={() => setCdPeriodos(prev => prev.filter(x => x.key !== p.key))} className="text-muted-foreground hover:text-destructive">
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </Card>
-
-          {/* Cursos oferecidos */}
-          <Card className="p-5">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <GraduationCap className="w-4 h-4 text-muted-foreground" />
-                <h2 className="text-sm font-semibold text-foreground">Cursos oferecidos</h2>
-                <span className="text-[11px] text-muted-foreground tabular-nums">· {cdCursos.length}</span>
-              </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-[1fr_220px_100px_auto] gap-2 mb-3">
-              <Input value={newCdCursoLabel} onChange={e => setNewCdCursoLabel(e.target.value)} placeholder="Nome do curso" className="h-9 text-xs" />
-              <Select value={newCdCursoFac} onValueChange={setNewCdCursoFac}>
-                <SelectTrigger className="h-9 text-xs"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Faculdade de Ciências Exatas">Faculdade de Ciências Exatas</SelectItem>
-                  <SelectItem value="Faculdade de Medicina">Faculdade de Medicina</SelectItem>
-                  <SelectItem value="Faculdade de Ciências Sociais">Faculdade de Ciências Sociais</SelectItem>
-                </SelectContent>
-              </Select>
-              <Input type="number" min={1} value={newCdCursoVagas} onChange={e => setNewCdCursoVagas(Number(e.target.value) || 1)} placeholder="Vagas" className="h-9 text-xs" />
-              <Button size="sm" variant="outline" className="h-9 text-xs gap-1.5" onClick={() => {
-                if (!newCdCursoLabel.trim()) return;
-                setCdCursos(prev => [...prev, { key: slugify(newCdCursoLabel), label: newCdCursoLabel.trim(), vagas: newCdCursoVagas, faculdade: newCdCursoFac }]);
-                setNewCdCursoLabel(""); setNewCdCursoVagas(50);
-                toast({ title: "Curso adicionado" });
-              }}><Plus className="w-3.5 h-3.5" /> Adicionar</Button>
-            </div>
-            <div className="overflow-x-auto rounded-lg border border-border">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b bg-muted/30">
-                    <th className="text-left p-3 font-medium text-muted-foreground text-xs">Curso</th>
-                    <th className="text-left p-3 font-medium text-muted-foreground text-xs">Faculdade</th>
-                    <th className="text-center p-3 font-medium text-muted-foreground text-xs">Vagas</th>
-                    <th className="w-12" />
-                  </tr>
-                </thead>
-                <tbody>
-                  {cdCursos.map(c => (
-                    <tr key={c.key} className="border-b last:border-0 hover:bg-muted/20">
-                      <td className="p-3 text-xs font-medium text-foreground">{c.label}</td>
-                      <td className="p-3 text-xs text-muted-foreground">{c.faculdade}</td>
-                      <td className="p-3 text-center text-xs tabular-nums text-blue-700">{c.vagas}</td>
-                      <td className="p-3 text-right">
-                        <button onClick={() => setCdCursos(prev => prev.filter(x => x.key !== c.key))} className="text-muted-foreground hover:text-destructive">
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </Card>
-
-          {/* Documentos exigidos */}
-          <Card className="p-5">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <FileCheck2 className="w-4 h-4 text-muted-foreground" />
-                <h2 className="text-sm font-semibold text-foreground">Documentos exigidos</h2>
-                <span className="text-[11px] text-muted-foreground tabular-nums">· {cdDocs.length}</span>
+                <AlertCircle className="w-4 h-4 text-muted-foreground" />
+                <h2 className="text-sm font-semibold text-foreground">Estados das etapas</h2>
+                <span className="text-[11px] text-muted-foreground tabular-nums">· {cdEstados.length}</span>
               </div>
               <div className="flex items-center gap-2">
-                <Input value={newCdDocLabel} onChange={e => setNewCdDocLabel(e.target.value)} placeholder="Novo documento" className="h-8 w-56 text-xs" />
-                <Select value={newCdDocObrig ? "1" : "0"} onValueChange={v => setNewCdDocObrig(v === "1")}>
-                  <SelectTrigger className="h-8 w-32 text-xs"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="1">Obrigatório</SelectItem>
-                    <SelectItem value="0">Opcional</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Input value={newCdEstadoLabel} onChange={e => setNewCdEstadoLabel(e.target.value)} placeholder="Novo estado" className="h-8 w-44 text-xs" />
                 <Button size="sm" variant="outline" className="h-8 text-xs gap-1.5" onClick={() => {
-                  if (!newCdDocLabel.trim()) return;
-                  setCdDocs(prev => [...prev, { key: slugify(newCdDocLabel), label: newCdDocLabel.trim(), obrigatorio: newCdDocObrig }]);
-                  setNewCdDocLabel("");
+                  if (!newCdEstadoLabel.trim()) return;
+                  setCdEstados(prev => [...prev, { key: slugify(newCdEstadoLabel), label: newCdEstadoLabel.trim(), color: "bg-slate-50 text-slate-700 border-slate-200" }]);
+                  setNewCdEstadoLabel("");
                 }}><Plus className="w-3.5 h-3.5" /> Adicionar</Button>
               </div>
             </div>
             <div className="flex flex-wrap gap-2">
-              {cdDocs.map(d => (
-                <div key={d.key} className={cn(
-                  "inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs",
-                  d.obrigatorio ? "bg-rose-50 text-rose-800 border-rose-200" : "bg-slate-100 text-slate-700 border-slate-200"
-                )}>
-                  <FileCheck2 className="w-3 h-3" />
-                  <span className="font-medium">{d.label}</span>
-                  <span className="opacity-70">· {d.obrigatorio ? "obrigatório" : "opcional"}</span>
-                  <button onClick={() => setCdDocs(prev => prev.map(x => x.key === d.key ? { ...x, obrigatorio: !x.obrigatorio } : x))} className="opacity-60 hover:opacity-100">
-                    <Pencil className="w-3 h-3" />
-                  </button>
-                  <button onClick={() => setCdDocs(prev => prev.filter(x => x.key !== d.key))} className="opacity-60 hover:opacity-100">
+              {cdEstados.map(e => (
+                <div key={e.key} className={cn("inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs", e.color)}>
+                  <span className="font-medium">{e.label}</span>
+                  <button onClick={() => setCdEstados(prev => prev.filter(x => x.key !== e.key))} className="opacity-60 hover:opacity-100">
                     <Trash2 className="w-3 h-3" />
                   </button>
                 </div>
               ))}
             </div>
+            <p className="text-[11px] text-muted-foreground mt-3">
+              Sequência obrigatória: cada etapa só avança quando a anterior está <strong>Completo</strong>. Não é possível Exame ou Curso Preparatório enquanto Entrevista não estiver completa.
+            </p>
+          </Card>
+
+          {/* Etapas do processo */}
+          <Card className="p-5">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <CalendarClock className="w-4 h-4 text-muted-foreground" />
+                <h2 className="text-sm font-semibold text-foreground">Etapas do processo</h2>
+                <span className="text-[11px] text-muted-foreground tabular-nums">· {cdEtapas.length}</span>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-[1fr_180px_auto] gap-2 mb-3">
+              <Input value={newCdEtapaLabel} onChange={e => setNewCdEtapaLabel(e.target.value)} placeholder="Nome da etapa" className="h-9 text-xs" />
+              <Input type="number" min={0} value={newCdEtapaDias} onChange={e => setNewCdEtapaDias(Number(e.target.value) || 0)} placeholder="Dias após submissão" className="h-9 text-xs" />
+              <Button size="sm" variant="outline" className="h-9 text-xs gap-1.5" onClick={() => {
+                if (!newCdEtapaLabel.trim()) return;
+                setCdEtapas(prev => [...prev, { key: slugify(newCdEtapaLabel), label: newCdEtapaLabel.trim(), diasAposSubmissao: newCdEtapaDias, obrigatoria: true, estadosPossiveis: ["agendado", "completo"] }]);
+                setNewCdEtapaLabel(""); setNewCdEtapaDias(7);
+                toast({ title: "Etapa adicionada" });
+              }}><Plus className="w-3.5 h-3.5" /> Adicionar</Button>
+            </div>
+            <div className="overflow-x-auto rounded-lg border border-border">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b bg-muted/30">
+                    <th className="text-left p-3 font-medium text-muted-foreground text-xs">#</th>
+                    <th className="text-left p-3 font-medium text-muted-foreground text-xs">Etapa</th>
+                    <th className="text-center p-3 font-medium text-muted-foreground text-xs">Dias após submissão</th>
+                    <th className="text-left p-3 font-medium text-muted-foreground text-xs">Estados possíveis</th>
+                    <th className="text-center p-3 font-medium text-muted-foreground text-xs">Obrigatória</th>
+                    <th className="w-12" />
+                  </tr>
+                </thead>
+                <tbody>
+                  {cdEtapas.map((e, i) => (
+                    <tr key={e.key} className="border-b last:border-0 hover:bg-muted/20">
+                      <td className="p-3 text-xs text-muted-foreground tabular-nums">{i + 1}</td>
+                      <td className="p-3 text-xs font-medium text-foreground">{e.label}</td>
+                      <td className="p-3 text-center">
+                        <Input type="number" min={0} value={e.diasAposSubmissao} onChange={ev => setCdEtapas(prev => prev.map(x => x.key === e.key ? { ...x, diasAposSubmissao: Number(ev.target.value) || 0 } : x))} className="h-7 w-20 mx-auto text-center text-xs tabular-nums" />
+                      </td>
+                      <td className="p-3">
+                        <div className="flex flex-wrap gap-1">
+                          {e.estadosPossiveis.map(es => {
+                            const cfg = cdEstados.find(x => x.key === es);
+                            return cfg ? <Badge key={es} variant="outline" className={cn("text-[9px]", cfg.color)}>{cfg.label}</Badge> : null;
+                          })}
+                        </div>
+                      </td>
+                      <td className="p-3 text-center">
+                        <button onClick={() => setCdEtapas(prev => prev.map(x => x.key === e.key ? { ...x, obrigatoria: !x.obrigatoria } : x))}>
+                          <Badge variant="outline" className={cn("text-[10px] cursor-pointer", e.obrigatoria ? "bg-rose-50 text-rose-700 border-rose-200" : "bg-slate-100 text-slate-600 border-slate-200")}>
+                            {e.obrigatoria ? "Sim" : "Opcional"}
+                          </Badge>
+                        </button>
+                      </td>
+                      <td className="p-3 text-right">
+                        <button onClick={() => setCdEtapas(prev => prev.filter(x => x.key !== e.key))} className="text-muted-foreground hover:text-destructive">
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+
+          {/* Sessões — Curso Preparatório & Exames */}
+          <Card className="p-5">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-muted-foreground" />
+                <h2 className="text-sm font-semibold text-foreground">Sessões agendadas — Curso Preparatório e Exames</h2>
+                <span className="text-[11px] text-muted-foreground tabular-nums">· {cdSessoes.length}</span>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-[180px_150px_120px_1fr_100px_auto] gap-2 mb-3">
+              <Select value={newCdSessEtapa} onValueChange={setNewCdSessEtapa}>
+                <SelectTrigger className="h-9 text-xs"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {cdEtapas.filter(e => e.key === "curso_preparatorio" || e.key === "exame" || /curso|exame/i.test(e.label)).map(e => (
+                    <SelectItem key={e.key} value={e.label}>{e.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Input type="date" value={newCdSessData} onChange={e => setNewCdSessData(e.target.value)} className="h-9 text-xs" />
+              <Input type="time" value={newCdSessHora} onChange={e => setNewCdSessHora(e.target.value)} className="h-9 text-xs" />
+              <Input value={newCdSessLocal} onChange={e => setNewCdSessLocal(e.target.value)} placeholder="Local" className="h-9 text-xs" />
+              <Input type="number" min={1} value={newCdSessCap} onChange={e => setNewCdSessCap(Number(e.target.value) || 1)} placeholder="Capac." className="h-9 text-xs" />
+              <Button size="sm" variant="outline" className="h-9 text-xs gap-1.5" onClick={() => {
+                if (!newCdSessData || !newCdSessLocal.trim()) return;
+                const key = slugify(newCdSessEtapa + "-" + newCdSessData + "-" + Math.random().toString(36).slice(2, 5));
+                setCdSessoes(prev => [...prev, { key, etapa: newCdSessEtapa, data: newCdSessData, hora: newCdSessHora, local: newCdSessLocal.trim(), capacidade: newCdSessCap }]);
+                setNewCdSessData(""); setNewCdSessLocal("");
+                toast({ title: "Sessão adicionada" });
+              }}><Plus className="w-3.5 h-3.5" /> Adicionar</Button>
+            </div>
+            <div className="overflow-x-auto rounded-lg border border-border">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b bg-muted/30">
+                    <th className="text-left p-3 font-medium text-muted-foreground text-xs">Etapa</th>
+                    <th className="text-left p-3 font-medium text-muted-foreground text-xs">Data</th>
+                    <th className="text-left p-3 font-medium text-muted-foreground text-xs">Hora</th>
+                    <th className="text-left p-3 font-medium text-muted-foreground text-xs">Local</th>
+                    <th className="text-center p-3 font-medium text-muted-foreground text-xs">Capacidade</th>
+                    <th className="w-12" />
+                  </tr>
+                </thead>
+                <tbody>
+                  {[...cdSessoes].sort((a, b) => a.data.localeCompare(b.data)).map(s => (
+                    <tr key={s.key} className="border-b last:border-0 hover:bg-muted/20">
+                      <td className="p-3">
+                        <Badge variant="outline" className={cn("text-[10px]", s.etapa.includes("Exame") ? "bg-purple-50 text-purple-700 border-purple-200" : "bg-blue-50 text-blue-700 border-blue-200")}>
+                          {s.etapa}
+                        </Badge>
+                      </td>
+                      <td className="p-3 text-xs tabular-nums text-foreground">{s.data}</td>
+                      <td className="p-3 text-xs tabular-nums text-muted-foreground">{s.hora}</td>
+                      <td className="p-3 text-xs text-foreground">{s.local}</td>
+                      <td className="p-3 text-center text-xs tabular-nums text-blue-700">{s.capacidade}</td>
+                      <td className="p-3 text-right">
+                        <button onClick={() => setCdSessoes(prev => prev.filter(x => x.key !== s.key))} className="text-muted-foreground hover:text-destructive">
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+
+          {/* Formulário — perguntas por passo */}
+          <Card className="p-5">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <FileCheck2 className="w-4 h-4 text-muted-foreground" />
+                <h2 className="text-sm font-semibold text-foreground">Formulário de candidatura — passos e perguntas</h2>
+                <span className="text-[11px] text-muted-foreground tabular-nums">· {cdFormSteps.length} passos</span>
+              </div>
+            </div>
+            <div className="space-y-2">
+              {cdFormSteps.map((step, idx) => {
+                const expanded = expandedStep === step.key;
+                return (
+                  <div key={step.key} className="rounded-lg border border-border overflow-hidden">
+                    <button
+                      onClick={() => setExpandedStep(expanded ? null : step.key)}
+                      className="w-full flex items-center justify-between p-3 hover:bg-muted/30 transition-colors text-left"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-7 h-7 rounded-full bg-primary/10 text-primary text-xs font-semibold flex items-center justify-center tabular-nums">
+                          {idx + 1}
+                        </div>
+                        <div>
+                          <div className="text-sm font-semibold text-foreground">{step.titulo}</div>
+                          <div className="text-[11px] text-muted-foreground">{step.subtitulo}</div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-[11px] text-muted-foreground tabular-nums">{step.perguntas.length} perguntas</span>
+                        <Pencil className="w-3.5 h-3.5 text-muted-foreground" />
+                      </div>
+                    </button>
+
+                    {expanded && (
+                      <div className="border-t bg-muted/10 p-3 space-y-3">
+                        <div className="grid grid-cols-1 md:grid-cols-[1fr_140px_140px_auto] gap-2">
+                          <Input
+                            value={newPergStep === step.key ? newPergLabel : ""}
+                            onChange={e => { setNewPergStep(step.key); setNewPergLabel(e.target.value); }}
+                            placeholder="Nova pergunta"
+                            className="h-9 text-xs"
+                          />
+                          <Select value={newPergStep === step.key ? newPergTipo : "texto"} onValueChange={(v) => { setNewPergStep(step.key); setNewPergTipo(v as CdPergunta["tipo"]); }}>
+                            <SelectTrigger className="h-9 text-xs"><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="texto">Texto</SelectItem>
+                              <SelectItem value="numero">Número</SelectItem>
+                              <SelectItem value="data">Data</SelectItem>
+                              <SelectItem value="selecao">Seleção</SelectItem>
+                              <SelectItem value="ficheiro">Ficheiro</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <Select value={(newPergStep === step.key ? newPergObrig : true) ? "1" : "0"} onValueChange={(v) => { setNewPergStep(step.key); setNewPergObrig(v === "1"); }}>
+                            <SelectTrigger className="h-9 text-xs"><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="1">Obrigatória</SelectItem>
+                              <SelectItem value="0">Opcional</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <Button size="sm" variant="outline" className="h-9 text-xs gap-1.5" onClick={() => {
+                            if (newPergStep !== step.key || !newPergLabel.trim()) return;
+                            setCdFormSteps(prev => prev.map(s => s.key === step.key ? {
+                              ...s, perguntas: [...s.perguntas, { key: slugify(newPergLabel), label: newPergLabel.trim(), tipo: newPergTipo, obrigatoria: newPergObrig }]
+                            } : s));
+                            setNewPergLabel(""); setNewPergTipo("texto"); setNewPergObrig(true);
+                          }}><Plus className="w-3.5 h-3.5" /> Adicionar</Button>
+                        </div>
+
+                        <div className="rounded-md border border-border bg-background overflow-hidden">
+                          <table className="w-full text-sm">
+                            <thead>
+                              <tr className="border-b bg-muted/30">
+                                <th className="text-left p-2 font-medium text-muted-foreground text-[11px]">#</th>
+                                <th className="text-left p-2 font-medium text-muted-foreground text-[11px]">Pergunta</th>
+                                <th className="text-left p-2 font-medium text-muted-foreground text-[11px]">Tipo</th>
+                                <th className="text-center p-2 font-medium text-muted-foreground text-[11px]">Obrigatória</th>
+                                <th className="w-10" />
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {step.perguntas.map((p, i) => (
+                                <tr key={p.key} className="border-b last:border-0 hover:bg-muted/20">
+                                  <td className="p-2 text-[11px] text-muted-foreground tabular-nums">{i + 1}</td>
+                                  <td className="p-2 text-xs font-medium text-foreground">{p.label}</td>
+                                  <td className="p-2">
+                                    <Badge variant="outline" className="text-[9px] capitalize">{p.tipo}</Badge>
+                                  </td>
+                                  <td className="p-2 text-center">
+                                    <button onClick={() => setCdFormSteps(prev => prev.map(s => s.key === step.key ? {
+                                      ...s, perguntas: s.perguntas.map(q => q.key === p.key ? { ...q, obrigatoria: !q.obrigatoria } : q)
+                                    } : s))}>
+                                      <Badge variant="outline" className={cn("text-[9px] cursor-pointer", p.obrigatoria ? "bg-rose-50 text-rose-700 border-rose-200" : "bg-slate-100 text-slate-600 border-slate-200")}>
+                                        {p.obrigatoria ? "Sim" : "Não"}
+                                      </Badge>
+                                    </button>
+                                  </td>
+                                  <td className="p-2 text-right">
+                                    <button onClick={() => setCdFormSteps(prev => prev.map(s => s.key === step.key ? {
+                                      ...s, perguntas: s.perguntas.filter(q => q.key !== p.key)
+                                    } : s))} className="text-muted-foreground hover:text-destructive">
+                                      <Trash2 className="w-3 h-3" />
+                                    </button>
+                                  </td>
+                                </tr>
+                              ))}
+                              {step.perguntas.length === 0 && (
+                                <tr><td colSpan={5} className="p-3 text-center text-[11px] text-muted-foreground italic">Sem perguntas</td></tr>
+                              )}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </Card>
         </TabsContent>
+
       </Tabs>
 
 
