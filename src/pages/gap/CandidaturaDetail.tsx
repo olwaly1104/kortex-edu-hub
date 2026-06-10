@@ -108,7 +108,7 @@ function buildSteps(c: typeof candidaturas[number]): StepDef[] {
   ];
 }
 
-type EtapaEstado = "completo" | "agendado" | "remarcado" | "falta" | "aprovado" | "reprovado";
+type EtapaEstado = "completo" | "agendado" | "remarcado" | "falta" | "aprovado" | "reprovado" | "pendente";
 
 const etapaEstadoStyle: Record<EtapaEstado, string> = {
   completo: "bg-green-50 text-green-700 border-green-200",
@@ -117,6 +117,7 @@ const etapaEstadoStyle: Record<EtapaEstado, string> = {
   remarcado: "bg-amber-50 text-amber-700 border-amber-200",
   falta: "bg-red-50 text-red-700 border-red-200",
   reprovado: "bg-red-50 text-red-700 border-red-200",
+  pendente: "bg-amber-50 text-amber-700 border-amber-200",
 };
 
 function pick<T>(seed: number, arr: T[]): T { return arr[seed % arr.length]; }
@@ -137,11 +138,11 @@ function buildCronologia(c: typeof candidaturas[number]) {
   // - Exame: requires Curso Preparatório = completo; otherwise agendado.
   const pagEstado: EtapaEstado = c.pagamento?.estado === "confirmado"
     ? "completo"
-    : "agendado";
+    : "pendente";
   const pagDone = pagEstado === "completo";
   const pagDetalhe = c.pagamento?.estado === "confirmado"
     ? `Pago — ${c.pagamento.referencia} · ${new Intl.NumberFormat("pt-AO").format(c.pagamento.valor)} Kz`
-    : `Por confirmar — ${c.pagamento?.referencia ?? "—"}`;
+    : `Pendente — ${c.pagamento?.referencia ?? "—"}`;
 
   const entrevistaEstado: EtapaEstado = pagDone && entrevista <= today
     ? pick(seed, ["completo", "completo", "remarcado", "falta"] as EtapaEstado[])
@@ -161,12 +162,12 @@ function buildCronologia(c: typeof candidaturas[number]) {
 
   const matricula = new Date(sub.getTime() + 75 * 86400000);
   const matriculaEstado: EtapaEstado = exAprovado && matricula <= today
-    ? pick(seed + 2, ["completo", "completo", "agendado"] as EtapaEstado[])
-    : "agendado";
+    ? pick(seed + 2, ["completo", "completo", "pendente"] as EtapaEstado[])
+    : "pendente";
   const matDone = matriculaEstado === "completo";
   const matDetalhe = matDone
     ? "Pago — Taxa de matrícula confirmada"
-    : exAprovado ? "Aguarda pagamento da matrícula" : "Disponível após aprovação no exame";
+    : exAprovado ? "Pendente — Aguarda pagamento da matrícula" : "Pendente — Disponível após aprovação no exame";
 
   return [
     { data: sub.toISOString(), accao: "Candidatura submetida", detalhe: "Formulário online preenchido pelo candidato", done: sub <= today, estado: "completo" as EtapaEstado },
