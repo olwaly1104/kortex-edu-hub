@@ -354,7 +354,7 @@ export default function GapCandidaturaDetail() {
           </div>
         </div>
         <div className="divide-y divide-border border-b border-border">
-          {steps.filter(s => s.title !== "Pagamento").map(s => {
+          {steps.map(s => {
             const Icon = s.icon;
             const open = openStep === s.n;
             return (
