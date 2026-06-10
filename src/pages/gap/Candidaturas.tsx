@@ -8,15 +8,16 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import ReportsMenuButton from "@/components/ReportsMenuButton";
 import {
   Search, X, Clock, Inbox, AlertCircle, GraduationCap, CalendarClock,
-  Wallet, SlidersHorizontal, ChevronRight, ChevronLeft, Check,
+  SlidersHorizontal, ChevronRight, ChevronLeft, Check,
   FileBarChart2, BarChart3, TrendingUp, BookOpen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { candidaturas, estadoLabels, periodos, cursos, type EstadoCandidatura } from "@/data/admissoesData";
+import { buildCronologia, etapaEstadoStyle, etapaEstadoLabel } from "./CandidaturaDetail";
 
 const TODAY = "2025-01-15";
 
-type EstadoFilter = "todos" | "hoje" | "pendentes" | "aprovados" | "reprovados" | "pag_pendente";
+type EstadoFilter = "todos" | "hoje" | "pendentes" | "aprovados" | "reprovados";
 type CursoFilter = string | "todos";
 type PeriodoFilter = string | "todos";
 
@@ -56,7 +57,6 @@ export default function GapCandidaturas() {
   const isPendente = (c: typeof normalized[number]) => c.estado === "pendente";
   const isAprovado = (c: typeof normalized[number]) => c.estado === "aprovado";
   const isReprovado = (c: typeof normalized[number]) => c.estado === "reprovado";
-  const isPagPendente = (c: typeof normalized[number]) => c.pagamento?.estado === "pendente";
 
   const counts = useMemo(() => ({
     todos: normalized.length,
@@ -64,7 +64,6 @@ export default function GapCandidaturas() {
     pendentes: normalized.filter(isPendente).length,
     aprovados: normalized.filter(isAprovado).length,
     reprovados: normalized.filter(isReprovado).length,
-    pag_pendente: normalized.filter(isPagPendente).length,
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }), []);
 
@@ -74,7 +73,6 @@ export default function GapCandidaturas() {
       if (estado === "pendentes" && !isPendente(c)) return false;
       if (estado === "aprovados" && !isAprovado(c)) return false;
       if (estado === "reprovados" && !isReprovado(c)) return false;
-      if (estado === "pag_pendente" && !isPagPendente(c)) return false;
       if (curso !== "todos" && c.cursoOpcao1 !== curso) return false;
       if (periodo !== "todos" && c.periodo !== periodo) return false;
       if (search) {
@@ -104,12 +102,11 @@ export default function GapCandidaturas() {
     { v: "pendentes" as const, label: "Pendentes", count: counts.pendentes },
     { v: "aprovados" as const, label: "Aprovados", count: counts.aprovados },
     { v: "reprovados" as const, label: "Reprovados", count: counts.reprovados },
-    { v: "pag_pendente" as const, label: "Pag. por confirmar", count: counts.pag_pendente },
   ];
 
   const estadoLabel = (v: EstadoFilter) => ({
     todos: "Todos", hoje: "Hoje", pendentes: "Pendentes",
-    aprovados: "Aprovados", reprovados: "Reprovados", pag_pendente: "Pag. por confirmar",
+    aprovados: "Aprovados", reprovados: "Reprovados",
   })[v];
 
   const formatKz = (n: number) => new Intl.NumberFormat("pt-AO").format(n) + " Kz";
@@ -281,7 +278,7 @@ export default function GapCandidaturas() {
               {filterView === "estado" && (
                 <div className="p-1 max-h-72 overflow-y-auto">
                   <div className="px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Ver todos os estados</div>
-                  {(["todos", "hoje", "pendentes", "aprovados", "reprovados", "pag_pendente"] as EstadoFilter[]).map(v => (
+                  {(["todos", "hoje", "pendentes", "aprovados", "reprovados"] as EstadoFilter[]).map(v => (
                     <FilterOptionRow key={v} label={estadoLabel(v)} selected={estado === v} onClick={() => { setEstado(v); setFilterView("root"); }} />
                   ))}
                 </div>
@@ -325,56 +322,49 @@ export default function GapCandidaturas() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b bg-muted/30">
-                <th className="text-left p-3 font-medium text-muted-foreground">ID Candidatura</th>
-                <th className="text-left p-3 font-medium text-muted-foreground">Candidato</th>
+                <th className="text-left p-3 font-medium text-muted-foreground">ID Candidato</th>
+                <th className="text-center p-3 font-medium text-muted-foreground whitespace-nowrap">Data de Submissão</th>
                 <th className="text-left p-3 font-medium text-muted-foreground">1ª Opção</th>
-                <th className="text-left p-3 font-medium text-muted-foreground">Período</th>
-                <th className="text-center p-3 font-medium text-muted-foreground whitespace-nowrap">Submissão</th>
-                <th className="text-center p-3 font-medium text-muted-foreground">Pagamento</th>
+                <th className="text-left p-3 font-medium text-muted-foreground">Etapa</th>
                 <th className="text-center p-3 font-medium text-muted-foreground">Estado</th>
               </tr>
             </thead>
             <tbody>
               {filtered.map(c => {
                 const d = new Date(c.dataSubmissao);
-                const hoje = c.dataSubmissao === TODAY;
                 const numCand = c.id.replace(/\D/g, "").padStart(4, "0");
+                const anoCand = d.getFullYear();
+                const displayId = `CAND-${anoCand}-${numCand}`;
+                const cron = buildCronologia(c);
+                // Current etapa = last entry where done, or first not-done
+                const lastDoneIdx = cron.reduce((acc, h, i) => (h.done ? i : acc), -1);
+                const currentIdx = lastDoneIdx < cron.length - 1 ? lastDoneIdx + 1 : lastDoneIdx;
+                const etapa = cron[Math.max(0, currentIdx)];
                 return (
                   <tr key={c.id}
                     onClick={() => navigate(`/gap/candidaturas/${c.id}`)}
                     className="border-b last:border-0 hover:bg-muted/30 transition-colors cursor-pointer">
                     <td className="p-3">
-                      <span className="text-[10px] font-mono text-primary tabular-nums">#{numCand}</span>
+                      <p className="font-medium text-foreground text-sm leading-tight">{c.nome}</p>
+                      <p className="text-[10px] font-mono text-primary tabular-nums mt-0.5">{displayId}</p>
                     </td>
-                    <td className="p-3">
-                      <div className="flex items-center gap-2">
-                        <p className="font-medium text-foreground leading-tight">{c.nome}</p>
-                        {hoje && <Badge variant="outline" className="text-[9px] bg-blue-50 text-blue-700 border-blue-200">HOJE</Badge>}
-                      </div>
-                      <p className="text-[11px] text-muted-foreground font-mono mt-0.5">{c.bi}</p>
+                    <td className="p-3 text-center whitespace-nowrap">
+                      <p className="text-xs font-medium text-foreground tabular-nums">
+                        {d.toLocaleDateString("pt-AO", { day: "2-digit", month: "short", year: "numeric" })}
+                      </p>
                     </td>
                     <td className="p-3">
                       <p className="text-xs text-foreground leading-tight">{c.cursoOpcao1}</p>
                       {c.cursoOpcao2 && <p className="text-[11px] text-muted-foreground mt-0.5">2ª: {c.cursoOpcao2}</p>}
                     </td>
                     <td className="p-3">
-                      <p className="text-xs text-foreground leading-tight">{c.periodo}</p>
-                    </td>
-                    <td className="p-3 text-center whitespace-nowrap">
-                      <p className="text-xs font-medium text-foreground">
-                        {d.toLocaleDateString("pt-AO", { day: "2-digit", month: "short", year: "numeric" })}
-                      </p>
-                    </td>
-                    <td className="p-3 text-center">
-                      <Badge variant="outline" className={cn(
-                        "text-[10px]",
-                        c.pagamento?.estado === "confirmado"
-                          ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                          : "bg-amber-50 text-amber-700 border-amber-200",
+                      <span className="text-xs text-foreground">{etapa.accao}</span>
+                      <span className={cn(
+                        "ml-2 inline-flex items-center px-1.5 py-0.5 rounded border text-[9px] font-medium uppercase tracking-wide",
+                        etapaEstadoStyle[etapa.estado],
                       )}>
-                        <Wallet className="w-2.5 h-2.5 mr-1" />
-                        {c.pagamento?.estado === "confirmado" ? "Confirmado" : "Pendente"}
-                      </Badge>
+                        {etapaEstadoLabel[etapa.estado]}
+                      </span>
                     </td>
                     <td className="p-3 text-center">
                       <span className={cn(

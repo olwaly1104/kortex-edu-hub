@@ -77,16 +77,7 @@ function buildSteps(c: typeof candidaturas[number]): StepDef[] {
       })),
     },
     {
-      n: 5, title: "Pagamento", sub: "Taxa de candidatura e comprovativo", icon: Wallet,
-      rows: [
-        { label: "Referência", value: c.pagamento?.referencia ?? "—" },
-        { label: "Valor", value: c.pagamento ? `${new Intl.NumberFormat("pt-AO").format(c.pagamento.valor)} Kz` : "—" },
-        { label: "Comprovativo", value: c.pagamento?.comprovativo ? "Entregue" : "Por entregar" },
-        { label: "Estado", value: c.pagamento?.estado === "confirmado" ? "Confirmado" : "Por confirmar" },
-      ],
-    },
-    {
-      n: 6, title: "Entrevista", sub: "Marcação da data de entrevista", icon: CalendarDays,
+      n: 5, title: "Entrevista", sub: "Marcação da data de entrevista", icon: CalendarDays,
       rows: [
         { label: "Data", value: "15 de julho de 2026" },
         { label: "Hora", value: "10:30" },
@@ -96,7 +87,7 @@ function buildSteps(c: typeof candidaturas[number]): StepDef[] {
       ],
     },
     {
-      n: 7, title: "Curso Preparatório", sub: "Opcional — escolha da sessão", icon: ClipboardCheck,
+      n: 6, title: "Curso Preparatório", sub: "Opcional — escolha da sessão", icon: ClipboardCheck,
       rows: [
         { label: "Inscrição", value: "Sim" },
         { label: "Sessão", value: "1ª Sessão · 18 de julho de 2026" },
@@ -108,43 +99,38 @@ function buildSteps(c: typeof candidaturas[number]): StepDef[] {
   ];
 }
 
-type EtapaEstado = "completo" | "agendado" | "remarcado" | "falta" | "aprovado" | "reprovado" | "pendente";
+type EtapaEstado = "completo" | "agendado" | "remarcado" | "falta" | "aprovado" | "reprovado" | "pendente" | "em_progresso" | "pago";
 
-const etapaEstadoStyle: Record<EtapaEstado, string> = {
+export const etapaEstadoStyle: Record<EtapaEstado, string> = {
   completo: "bg-green-50 text-green-700 border-green-200",
   aprovado: "bg-green-50 text-green-700 border-green-200",
+  pago: "bg-green-50 text-green-700 border-green-200",
   agendado: "bg-blue-50 text-blue-700 border-blue-200",
+  em_progresso: "bg-blue-50 text-blue-700 border-blue-200",
   remarcado: "bg-amber-50 text-amber-700 border-amber-200",
   falta: "bg-red-50 text-red-700 border-red-200",
   reprovado: "bg-red-50 text-red-700 border-red-200",
   pendente: "bg-amber-50 text-amber-700 border-amber-200",
 };
 
+export const etapaEstadoLabel: Record<EtapaEstado, string> = {
+  completo: "completo", aprovado: "aprovado", pago: "pago",
+  agendado: "agendado", em_progresso: "em progresso",
+  remarcado: "remarcado", falta: "falta", reprovado: "reprovado", pendente: "pendente",
+};
+
 function pick<T>(seed: number, arr: T[]): T { return arr[seed % arr.length]; }
 
-function buildCronologia(c: typeof candidaturas[number]) {
+export function buildCronologia(c: typeof candidaturas[number]) {
   const sub = new Date(c.dataSubmissao);
   const today = new Date();
-  const pagamento = new Date(sub.getTime() + 3 * 86400000);
   const entrevista = new Date(sub.getTime() + 12 * 86400000);
   const cursoPrep = new Date(sub.getTime() + 35 * 86400000);
   const exame = new Date(sub.getTime() + 60 * 86400000);
   const seed = parseInt(c.id.replace(/\D/g, ""), 10) || 0;
 
   // Sequential gating: each step only advances if the previous one is "completo".
-  // - Pagamento: completo se o pagamento da candidatura estiver confirmado; senão agendado.
-  // - Entrevista: requer Pagamento = completo; completo | remarcado | falta.
-  // - Curso Preparatório: requires Entrevista = completo; otherwise agendado.
-  // - Exame: requires Curso Preparatório = completo; otherwise agendado.
-  const pagEstado: EtapaEstado = c.pagamento?.estado === "confirmado"
-    ? "completo"
-    : "pendente";
-  const pagDone = pagEstado === "completo";
-  const pagDetalhe = c.pagamento?.estado === "confirmado"
-    ? `Pago — ${c.pagamento.referencia} · ${new Intl.NumberFormat("pt-AO").format(c.pagamento.valor)} Kz`
-    : `Pendente — ${c.pagamento?.referencia ?? "—"}`;
-
-  const entrevistaEstado: EtapaEstado = pagDone && entrevista <= today
+  const entrevistaEstado: EtapaEstado = entrevista <= today
     ? pick(seed, ["completo", "completo", "remarcado", "falta"] as EtapaEstado[])
     : "agendado";
   const entDone = entrevistaEstado === "completo";
@@ -162,22 +148,24 @@ function buildCronologia(c: typeof candidaturas[number]) {
 
   const matricula = new Date(sub.getTime() + 75 * 86400000);
   const matriculaEstado: EtapaEstado = exAprovado && matricula <= today
-    ? pick(seed + 2, ["completo", "completo", "pendente"] as EtapaEstado[])
+    ? pick(seed + 2, ["pago", "pago", "em_progresso", "pendente"] as EtapaEstado[])
     : "pendente";
-  const matDone = matriculaEstado === "completo";
-  const matDetalhe = matDone
+  const matDone = matriculaEstado === "pago";
+  const matDetalhe = matriculaEstado === "pago"
     ? "Pago — Taxa de matrícula confirmada"
-    : exAprovado ? "Pendente — Aguarda pagamento da matrícula" : "Pendente — Disponível após aprovação no exame";
+    : matriculaEstado === "em_progresso"
+      ? "Em progresso — Pagamento submetido, aguarda confirmação"
+      : exAprovado ? "Pendente — Aguarda pagamento da matrícula" : "Pendente — Disponível após aprovação no exame";
 
   return [
     { data: sub.toISOString(), accao: "Candidatura submetida", detalhe: "Formulário online preenchido pelo candidato", done: sub <= today, estado: "completo" as EtapaEstado },
-    { data: pagamento.toISOString(), accao: "Pagamento da candidatura", detalhe: pagDetalhe, done: pagDone, estado: pagEstado },
     { data: entrevista.toISOString(), accao: "Entrevista", detalhe: "Realizada — Sala de Entrevistas, Campus UPRA", done: entDone, estado: entrevistaEstado },
     { data: cursoPrep.toISOString(), accao: "Curso Preparatório", detalhe: "Inscrito — 1ª Sessão (Anfiteatro A)", done: cpDone, estado: cursoPrepEstado },
     { data: exame.toISOString(), accao: "Exame de Acesso", detalhe: "Marcado — Edifício Central, Sala 04", done: exDone, estado: exameEstado },
     { data: matricula.toISOString(), accao: "Pagamento da matrícula", detalhe: matDetalhe, done: matDone, estado: matriculaEstado },
   ];
 }
+
 
 
 export default function GapCandidaturaDetail() {
@@ -344,7 +332,7 @@ export default function GapCandidaturaDetail() {
                   )}
                   <span className={cn("truncate", h.done ? "text-foreground" : "text-muted-foreground")}>{h.accao}</span>
                   <span className={cn("ml-auto inline-flex items-center px-1.5 py-0.5 rounded border text-[9px] font-medium uppercase tracking-wide", etapaEstadoStyle[h.estado])}>
-                    {h.estado}
+                    {etapaEstadoLabel[h.estado]}
                   </span>
                   <span className="text-[10px] text-muted-foreground tabular-nums">
                     {new Date(h.data).toLocaleDateString("pt-AO")}
@@ -366,7 +354,7 @@ export default function GapCandidaturaDetail() {
           </div>
         </div>
         <div className="divide-y divide-border border-b border-border">
-          {steps.filter(s => s.title !== "Pagamento").map(s => {
+          {steps.map(s => {
             const Icon = s.icon;
             const open = openStep === s.n;
             return (

@@ -16,7 +16,7 @@ const sharedWith: { name: string; role: string; access: "Visualizar" | "Editar" 
   { name: "Sara Vieira", role: "Académica", access: "Visualizar" },
 ];
 
-type EtapaEstado = "completo" | "agendado" | "remarcado" | "falta" | "aprovado" | "reprovado" | "pendente";
+type EtapaEstado = "completo" | "agendado" | "remarcado" | "falta" | "aprovado" | "reprovado" | "pendente" | "em_progresso" | "pago";
 
 type Props = {
   candidatura: Candidatura;
@@ -29,7 +29,9 @@ type Props = {
 const etapaEstadoCls: Record<EtapaEstado, string> = {
   completo: "bg-emerald-50 text-emerald-700 border-emerald-300",
   aprovado: "bg-emerald-50 text-emerald-700 border-emerald-300",
+  pago: "bg-emerald-50 text-emerald-700 border-emerald-300",
   agendado: "bg-sky-50 text-sky-700 border-sky-300",
+  em_progresso: "bg-sky-50 text-sky-700 border-sky-300",
   remarcado: "bg-amber-50 text-amber-700 border-amber-300",
   falta: "bg-red-50 text-red-700 border-red-300",
   reprovado: "bg-red-50 text-red-700 border-red-300",
@@ -237,7 +239,7 @@ export default function CandidaturaDocPreview({
                       <span className={h.done !== false ? "flex-1 text-neutral-900 font-medium" : "flex-1 text-neutral-500"}>{h.accao}</span>
                       {h.estado && (
                         <span className={`inline-flex items-center px-1.5 py-0.5 rounded border text-[9.5px] font-semibold uppercase tracking-wide ${etapaEstadoCls[h.estado]}`}>
-                          {h.estado}
+                          {h.estado === "em_progresso" ? "em progresso" : h.estado}
                         </span>
                       )}
                       <span className="text-neutral-500 tabular-nums text-[10px] w-[80px] text-right">{fmtDataShort(h.data)}</span>
