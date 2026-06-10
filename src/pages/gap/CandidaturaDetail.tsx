@@ -77,7 +77,16 @@ function buildSteps(c: typeof candidaturas[number]): StepDef[] {
       })),
     },
     {
-      n: 5, title: "Entrevista", sub: "Marcação da data de entrevista", icon: CalendarDays,
+      n: 5, title: "Pagamento", sub: "Taxa de candidatura e comprovativo", icon: Wallet,
+      rows: [
+        { label: "Referência", value: c.pagamento?.referencia ?? "—" },
+        { label: "Valor", value: c.pagamento ? `${new Intl.NumberFormat("pt-AO").format(c.pagamento.valor)} Kz` : "—" },
+        { label: "Comprovativo", value: c.pagamento?.comprovativo ? "Entregue" : "Por entregar" },
+        { label: "Estado", value: c.pagamento?.estado === "confirmado" ? "Confirmado" : "Por confirmar" },
+      ],
+    },
+    {
+      n: 6, title: "Entrevista", sub: "Marcação da data de entrevista", icon: CalendarDays,
       rows: [
         { label: "Data", value: "15 de julho de 2026" },
         { label: "Hora", value: "10:30" },
@@ -87,7 +96,7 @@ function buildSteps(c: typeof candidaturas[number]): StepDef[] {
       ],
     },
     {
-      n: 6, title: "Curso Preparatório", sub: "Opcional — escolha da sessão", icon: ClipboardCheck,
+      n: 7, title: "Curso Preparatório", sub: "Opcional — escolha da sessão", icon: ClipboardCheck,
       rows: [
         { label: "Inscrição", value: "Sim" },
         { label: "Sessão", value: "1ª Sessão · 18 de julho de 2026" },
