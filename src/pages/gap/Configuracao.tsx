@@ -18,6 +18,7 @@ import {
   destinoConfig,
   type Categoria,
 } from "@/data/gapData";
+import { candidaturas as allCandidaturas } from "@/data/admissoesData";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 
