@@ -57,7 +57,6 @@ export default function GapCandidaturas() {
   const isPendente = (c: typeof normalized[number]) => c.estado === "pendente";
   const isAprovado = (c: typeof normalized[number]) => c.estado === "aprovado";
   const isReprovado = (c: typeof normalized[number]) => c.estado === "reprovado";
-  const isPagPendente = (c: typeof normalized[number]) => c.pagamento?.estado === "pendente";
 
   const counts = useMemo(() => ({
     todos: normalized.length,
@@ -65,7 +64,6 @@ export default function GapCandidaturas() {
     pendentes: normalized.filter(isPendente).length,
     aprovados: normalized.filter(isAprovado).length,
     reprovados: normalized.filter(isReprovado).length,
-    pag_pendente: normalized.filter(isPagPendente).length,
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }), []);
 
@@ -75,7 +73,6 @@ export default function GapCandidaturas() {
       if (estado === "pendentes" && !isPendente(c)) return false;
       if (estado === "aprovados" && !isAprovado(c)) return false;
       if (estado === "reprovados" && !isReprovado(c)) return false;
-      if (estado === "pag_pendente" && !isPagPendente(c)) return false;
       if (curso !== "todos" && c.cursoOpcao1 !== curso) return false;
       if (periodo !== "todos" && c.periodo !== periodo) return false;
       if (search) {
@@ -105,12 +102,11 @@ export default function GapCandidaturas() {
     { v: "pendentes" as const, label: "Pendentes", count: counts.pendentes },
     { v: "aprovados" as const, label: "Aprovados", count: counts.aprovados },
     { v: "reprovados" as const, label: "Reprovados", count: counts.reprovados },
-    { v: "pag_pendente" as const, label: "Pag. por confirmar", count: counts.pag_pendente },
   ];
 
   const estadoLabel = (v: EstadoFilter) => ({
     todos: "Todos", hoje: "Hoje", pendentes: "Pendentes",
-    aprovados: "Aprovados", reprovados: "Reprovados", pag_pendente: "Pag. por confirmar",
+    aprovados: "Aprovados", reprovados: "Reprovados",
   })[v];
 
   const formatKz = (n: number) => new Intl.NumberFormat("pt-AO").format(n) + " Kz";
