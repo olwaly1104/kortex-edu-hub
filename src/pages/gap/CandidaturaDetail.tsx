@@ -87,7 +87,7 @@ function buildSteps(c: typeof candidaturas[number]): StepDef[] {
       ],
     },
     {
-      n: 7, title: "Curso Preparatório", sub: "Opcional — escolha da sessão", icon: ClipboardCheck,
+      n: 6, title: "Curso Preparatório", sub: "Opcional — escolha da sessão", icon: ClipboardCheck,
       rows: [
         { label: "Inscrição", value: "Sim" },
         { label: "Sessão", value: "1ª Sessão · 18 de julho de 2026" },
