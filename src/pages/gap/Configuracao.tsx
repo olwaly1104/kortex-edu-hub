@@ -199,6 +199,87 @@ export default function GapConfiguracao() {
 
   const formatMultaDias = (d: number) => `${d}d após prazo`;
 
+  // ===== AGENDAMENTOS =====
+  type AgCategoria = { key: string; label: string; color: string };
+  type AgMotivo = { key: string; label: string; categoria: string; duracao: number };
+  type AgSala = { key: string; label: string; lotacao: number };
+
+  const [agCategorias, setAgCategorias] = useState<AgCategoria[]>([
+    { key: "psicologico", label: "Psicológico", color: "bg-purple-100 text-purple-800 border-purple-200" },
+    { key: "academico", label: "Académico", color: "bg-blue-100 text-blue-800 border-blue-200" },
+    { key: "carreira", label: "Carreira / Vocacional", color: "bg-emerald-100 text-emerald-800 border-emerald-200" },
+    { key: "social", label: "Social", color: "bg-amber-100 text-amber-800 border-amber-200" },
+    { key: "saude", label: "Saúde", color: "bg-rose-100 text-rose-800 border-rose-200" },
+    { key: "financeiro", label: "Financeiro", color: "bg-cyan-100 text-cyan-800 border-cyan-200" },
+    { key: "documentacao", label: "Documentação", color: "bg-slate-100 text-slate-700 border-slate-200" },
+  ]);
+  const [agMotivos, setAgMotivos] = useState<AgMotivo[]>([
+    { key: "acomp_psico", label: "Acompanhamento psicológico", categoria: "Psicológico", duracao: 50 },
+    { key: "metodos_estudo", label: "Orientação académica — métodos de estudo", categoria: "Académico", duracao: 40 },
+    { key: "vocacional", label: "Orientação vocacional", categoria: "Carreira / Vocacional", duracao: 60 },
+    { key: "estagio", label: "Acompanhamento de estágio", categoria: "Carreira / Vocacional", duracao: 30 },
+    { key: "mediacao", label: "Mediação de conflito", categoria: "Social", duracao: 60 },
+  ]);
+  const [agSalas, setAgSalas] = useState<AgSala[]>([
+    { key: "gap1", label: "Gab. GAP 1", lotacao: 4 },
+    { key: "gap2", label: "Gab. GAP 2", lotacao: 4 },
+    { key: "gap3", label: "Sala de Reuniões GAP", lotacao: 8 },
+  ]);
+  const [agModalidades, setAgModalidades] = useState<{ key: string; label: string }[]>([
+    { key: "presencial", label: "Presencial" },
+    { key: "online", label: "Online" },
+  ]);
+  const [agDuracaoPadrao, setAgDuracaoPadrao] = useState(45);
+  const [agAntecedenciaMin, setAgAntecedenciaMin] = useState(24);
+  const [agHoraInicio, setAgHoraInicio] = useState("08:00");
+  const [agHoraFim, setAgHoraFim] = useState("17:00");
+
+  const [newAgCat, setNewAgCat] = useState("");
+  const [newAgMotLabel, setNewAgMotLabel] = useState("");
+  const [newAgMotCat, setNewAgMotCat] = useState("");
+  const [newAgMotDur, setNewAgMotDur] = useState(45);
+  const [newAgSalaLabel, setNewAgSalaLabel] = useState("");
+  const [newAgSalaLot, setNewAgSalaLot] = useState(4);
+  const [newAgModLabel, setNewAgModLabel] = useState("");
+
+  // ===== CANDIDATURAS =====
+  type CdPeriodo = { key: string; label: string; inicio: string; fim: string; ativo: boolean };
+  type CdCurso = { key: string; label: string; vagas: number; faculdade: string };
+  type CdDoc = { key: string; label: string; obrigatorio: boolean };
+
+  const [cdPeriodos, setCdPeriodos] = useState<CdPeriodo[]>([
+    { key: "ch1_2025", label: "1ª Chamada 2025", inicio: "2024-12-01", fim: "2025-01-15", ativo: false },
+    { key: "ch2_2025", label: "2ª Chamada 2025", inicio: "2025-02-15", fim: "2025-03-30", ativo: true },
+    { key: "ch3_2025", label: "3ª Chamada 2025", inicio: "2025-05-01", fim: "2025-06-15", ativo: false },
+  ]);
+  const [cdCursos, setCdCursos] = useState<CdCurso[]>([
+    { key: "arq", label: "Arquitectura", vagas: 50, faculdade: "Faculdade de Ciências Exatas" },
+    { key: "eng_inf", label: "Engenharia Informática", vagas: 80, faculdade: "Faculdade de Ciências Exatas" },
+    { key: "med", label: "Medicina", vagas: 60, faculdade: "Faculdade de Medicina" },
+    { key: "dir", label: "Direito", vagas: 100, faculdade: "Faculdade de Ciências Sociais" },
+    { key: "gest", label: "Gestão", vagas: 90, faculdade: "Faculdade de Ciências Sociais" },
+  ]);
+  const [cdDocs, setCdDocs] = useState<CdDoc[]>([
+    { key: "bi", label: "Bilhete de Identidade", obrigatorio: true },
+    { key: "cert_medio", label: "Certificado do Ensino Médio", obrigatorio: true },
+    { key: "decl_notas", label: "Declaração de Notas", obrigatorio: true },
+    { key: "atestado", label: "Atestado Médico", obrigatorio: true },
+    { key: "foto", label: "Fotografia tipo passe", obrigatorio: false },
+  ]);
+  const [cdTaxa, setCdTaxa] = useState(15000);
+  const [cdNotaMinima, setCdNotaMinima] = useState(10);
+  const [cdCapacidadeSessao, setCdCapacidadeSessao] = useState(50);
+  const [cdMaxOpcoes, setCdMaxOpcoes] = useState(3);
+
+  const [newCdPerLabel, setNewCdPerLabel] = useState("");
+  const [newCdPerInicio, setNewCdPerInicio] = useState("");
+  const [newCdPerFim, setNewCdPerFim] = useState("");
+  const [newCdCursoLabel, setNewCdCursoLabel] = useState("");
+  const [newCdCursoVagas, setNewCdCursoVagas] = useState(50);
+  const [newCdCursoFac, setNewCdCursoFac] = useState("Faculdade de Ciências Exatas");
+  const [newCdDocLabel, setNewCdDocLabel] = useState("");
+  const [newCdDocObrig, setNewCdDocObrig] = useState(true);
+
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       {/* Header */}
@@ -207,11 +288,19 @@ export default function GapConfiguracao() {
           <Settings2 className="w-6 h-6 text-primary" /> Configuração
         </h1>
         <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
-          Gere os estados, categorias, motivos e multas disponíveis para as solicitações do GAP.
+          Configure tudo o que diz respeito a Solicitações, Agendamentos e Candidaturas do GAP.
         </p>
       </div>
 
-      {/* Estados */}
+      <Tabs defaultValue="solicitacoes" className="space-y-6">
+        <TabsList className="grid grid-cols-3 w-full max-w-xl">
+          <TabsTrigger value="solicitacoes" className="gap-1.5"><FileText className="w-3.5 h-3.5" /> Solicitações</TabsTrigger>
+          <TabsTrigger value="agendamentos" className="gap-1.5"><CalendarClock className="w-3.5 h-3.5" /> Agendamentos</TabsTrigger>
+          <TabsTrigger value="candidaturas" className="gap-1.5"><GraduationCap className="w-3.5 h-3.5" /> Candidaturas</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="solicitacoes" className="space-y-6 mt-0">
+
       <Card className="p-5">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
