@@ -18,6 +18,7 @@ import {
   destinoConfig,
   type Categoria,
 } from "@/data/gapData";
+import { candidaturas as allCandidaturas } from "@/data/admissoesData";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 
@@ -767,29 +768,104 @@ export default function GapConfiguracao() {
 
         {/* ============ CANDIDATURAS ============ */}
         <TabsContent value="candidaturas" className="space-y-6 mt-0">
-          {/* Parâmetros gerais */}
-          <Card className="p-5">
-            <div className="flex items-center gap-2 mb-4">
-              <Wallet className="w-4 h-4 text-muted-foreground" />
-              <h2 className="text-sm font-semibold text-foreground">Parâmetros gerais</h2>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              <div>
-                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Taxa de candidatura (Kz)</label>
-                <Input type="number" min={0} step={500} value={cdTaxa} onChange={e => setCdTaxa(Number(e.target.value) || 0)} />
-                <p className="text-[10px] text-muted-foreground mt-1">{formatKz(cdTaxa)}</p>
-              </div>
-              <div>
-                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Nota mínima de aprovação</label>
-                <Input type="number" min={0} max={20} step={0.5} value={cdNotaMinima} onChange={e => setCdNotaMinima(Number(e.target.value) || 0)} />
-                <p className="text-[10px] text-muted-foreground mt-1">Escala 0–20</p>
-              </div>
-              <div>
-                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Máx. opções de curso</label>
-                <Input type="number" min={1} max={5} value={cdMaxOpcoes} onChange={e => setCdMaxOpcoes(Number(e.target.value) || 1)} />
-              </div>
-            </div>
-          </Card>
+          {/* ===== Candidaturas Hoje — visão operacional ===== */}
+          {(() => {
+            const todayKey = new Date().toISOString().slice(0, 10);
+            const hoje = allCandidaturas.filter(c => c.dataSubmissao.slice(0, 10) === todayKey);
+            const total = allCandidaturas.length;
+            const pendentes = allCandidaturas.filter(c => c.estado === "pendente" || c.estado === "incompleto").length;
+            const aprovados = allCandidaturas.filter(c => c.estado === "aprovado").length;
+            const reprovados = allCandidaturas.filter(c => c.estado === "reprovado").length;
+            const pagPendente = allCandidaturas.filter(c => c.pagamento?.estado === "pendente").length;
+            const receita = allCandidaturas.filter(c => c.pagamento?.estado === "confirmado").reduce((s, c) => s + (c.pagamento?.valor || 0), 0);
+
+            // Top cursos
+            const cursoCount = new Map<string, number>();
+            allCandidaturas.forEach(c => {
+              [c.cursoOpcao1, c.cursoOpcao2, c.cursoOpcao3].filter(Boolean).forEach(k => {
+                cursoCount.set(k as string, (cursoCount.get(k as string) || 0) + 1);
+              });
+            });
+            const topCursos = [...cursoCount.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5);
+            const maxCurso = topCursos[0]?.[1] || 1;
+
+            const kpis = [
+              { label: "Submetidas hoje", value: hoje.length, color: "text-blue-700", bg: "bg-blue-50 border-blue-200" },
+              { label: "Total ativas", value: total, color: "text-foreground", bg: "bg-slate-50 border-slate-200" },
+              { label: "Pendentes", value: pendentes, color: "text-amber-700", bg: "bg-amber-50 border-amber-200" },
+              { label: "Aprovados", value: aprovados, color: "text-emerald-700", bg: "bg-emerald-50 border-emerald-200" },
+              { label: "Reprovados", value: reprovados, color: "text-rose-700", bg: "bg-rose-50 border-rose-200" },
+              { label: "Pagamentos por confirmar", value: pagPendente, color: "text-purple-700", bg: "bg-purple-50 border-purple-200" },
+            ];
+
+            return (
+              <Card className="p-5">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <GraduationCap className="w-4 h-4 text-muted-foreground" />
+                    <h2 className="text-sm font-semibold text-foreground">Candidaturas — visão de hoje</h2>
+                    <span className="text-[11px] text-muted-foreground tabular-nums">
+                      · {new Date().toLocaleDateString("pt-PT", { day: "2-digit", month: "long", year: "numeric" })}
+                    </span>
+                  </div>
+                  <Badge variant="outline" className="text-[10px] bg-emerald-50 text-emerald-700 border-emerald-200">
+                    {formatKz(receita)} arrecadados
+                  </Badge>
+                </div>
+
+                <div className="grid grid-cols-2 md:grid-cols-6 gap-2">
+                  {kpis.map(k => (
+                    <div key={k.label} className={cn("rounded-lg border p-3", k.bg)}>
+                      <div className={cn("text-2xl font-bold tabular-nums leading-none", k.color)}>{k.value}</div>
+                      <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mt-1.5">{k.label}</div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Top cursos */}
+                  <div className="rounded-lg border border-border overflow-hidden">
+                    <div className="px-3 py-2 bg-muted/30 border-b border-border flex items-center gap-2">
+                      <Layers className="w-3.5 h-3.5 text-muted-foreground" />
+                      <h3 className="text-[11px] font-semibold uppercase tracking-wider text-foreground">Cursos mais procurados</h3>
+                    </div>
+                    <ul className="divide-y divide-border">
+                      {topCursos.map(([curso, n]) => (
+                        <li key={curso} className="px-3 py-2 flex items-center gap-3">
+                          <span className="text-xs font-medium text-foreground flex-1 truncate">{curso}</span>
+                          <div className="w-32 h-1.5 bg-muted rounded-full overflow-hidden">
+                            <div className="h-full bg-primary" style={{ width: `${(n / maxCurso) * 100}%` }} />
+                          </div>
+                          <span className="text-xs tabular-nums text-muted-foreground w-8 text-right">{n}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Submetidas hoje */}
+                  <div className="rounded-lg border border-border overflow-hidden">
+                    <div className="px-3 py-2 bg-muted/30 border-b border-border flex items-center gap-2">
+                      <Clock className="w-3.5 h-3.5 text-muted-foreground" />
+                      <h3 className="text-[11px] font-semibold uppercase tracking-wider text-foreground">Submetidas hoje</h3>
+                      <span className="ml-auto text-[10px] text-muted-foreground tabular-nums">{hoje.length}</span>
+                    </div>
+                    {hoje.length === 0 ? (
+                      <div className="px-3 py-6 text-center text-[11px] text-muted-foreground italic">Sem candidaturas submetidas hoje</div>
+                    ) : (
+                      <ul className="divide-y divide-border max-h-48 overflow-y-auto">
+                        {hoje.slice(0, 8).map(c => (
+                          <li key={c.id} className="px-3 py-2 flex items-center gap-2 text-xs">
+                            <span className="font-medium text-foreground truncate flex-1">{c.nome}</span>
+                            <Badge variant="outline" className="text-[9px]">{c.cursoOpcao1}</Badge>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                </div>
+              </Card>
+            );
+          })()}
 
           {/* Estados das etapas */}
           <Card className="p-5">
@@ -819,7 +895,7 @@ export default function GapConfiguracao() {
               ))}
             </div>
             <p className="text-[11px] text-muted-foreground mt-3">
-              Sequência obrigatória: cada etapa só avança quando a anterior está <strong>Completo</strong>. Não é possível Exame ou Curso Preparatório enquanto Entrevista não estiver completa.
+              Sequência obrigatória: cada etapa só avança quando a anterior está <strong>Completo</strong>. Não é possível Exame enquanto a Entrevista não estiver completa.
             </p>
           </Card>
 
@@ -889,71 +965,6 @@ export default function GapConfiguracao() {
             </div>
           </Card>
 
-          {/* Sessões — Curso Preparatório & Exames */}
-          <Card className="p-5">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-muted-foreground" />
-                <h2 className="text-sm font-semibold text-foreground">Sessões agendadas — Curso Preparatório e Exames</h2>
-                <span className="text-[11px] text-muted-foreground tabular-nums">· {cdSessoes.length}</span>
-              </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-[180px_150px_120px_1fr_100px_auto] gap-2 mb-3">
-              <Select value={newCdSessEtapa} onValueChange={setNewCdSessEtapa}>
-                <SelectTrigger className="h-9 text-xs"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {cdEtapas.filter(e => e.key === "curso_preparatorio" || e.key === "exame" || /curso|exame/i.test(e.label)).map(e => (
-                    <SelectItem key={e.key} value={e.label}>{e.label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Input type="date" value={newCdSessData} onChange={e => setNewCdSessData(e.target.value)} className="h-9 text-xs" />
-              <Input type="time" value={newCdSessHora} onChange={e => setNewCdSessHora(e.target.value)} className="h-9 text-xs" />
-              <Input value={newCdSessLocal} onChange={e => setNewCdSessLocal(e.target.value)} placeholder="Local" className="h-9 text-xs" />
-              <Input type="number" min={1} value={newCdSessCap} onChange={e => setNewCdSessCap(Number(e.target.value) || 1)} placeholder="Capac." className="h-9 text-xs" />
-              <Button size="sm" variant="outline" className="h-9 text-xs gap-1.5" onClick={() => {
-                if (!newCdSessData || !newCdSessLocal.trim()) return;
-                const key = slugify(newCdSessEtapa + "-" + newCdSessData + "-" + Math.random().toString(36).slice(2, 5));
-                setCdSessoes(prev => [...prev, { key, etapa: newCdSessEtapa, data: newCdSessData, hora: newCdSessHora, local: newCdSessLocal.trim(), capacidade: newCdSessCap }]);
-                setNewCdSessData(""); setNewCdSessLocal("");
-                toast({ title: "Sessão adicionada" });
-              }}><Plus className="w-3.5 h-3.5" /> Adicionar</Button>
-            </div>
-            <div className="overflow-x-auto rounded-lg border border-border">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b bg-muted/30">
-                    <th className="text-left p-3 font-medium text-muted-foreground text-xs">Etapa</th>
-                    <th className="text-left p-3 font-medium text-muted-foreground text-xs">Data</th>
-                    <th className="text-left p-3 font-medium text-muted-foreground text-xs">Hora</th>
-                    <th className="text-left p-3 font-medium text-muted-foreground text-xs">Local</th>
-                    <th className="text-center p-3 font-medium text-muted-foreground text-xs">Capacidade</th>
-                    <th className="w-12" />
-                  </tr>
-                </thead>
-                <tbody>
-                  {[...cdSessoes].sort((a, b) => a.data.localeCompare(b.data)).map(s => (
-                    <tr key={s.key} className="border-b last:border-0 hover:bg-muted/20">
-                      <td className="p-3">
-                        <Badge variant="outline" className={cn("text-[10px]", s.etapa.includes("Exame") ? "bg-purple-50 text-purple-700 border-purple-200" : "bg-blue-50 text-blue-700 border-blue-200")}>
-                          {s.etapa}
-                        </Badge>
-                      </td>
-                      <td className="p-3 text-xs tabular-nums text-foreground">{s.data}</td>
-                      <td className="p-3 text-xs tabular-nums text-muted-foreground">{s.hora}</td>
-                      <td className="p-3 text-xs text-foreground">{s.local}</td>
-                      <td className="p-3 text-center text-xs tabular-nums text-blue-700">{s.capacidade}</td>
-                      <td className="p-3 text-right">
-                        <button onClick={() => setCdSessoes(prev => prev.filter(x => x.key !== s.key))} className="text-muted-foreground hover:text-destructive">
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </Card>
 
           {/* Formulário — perguntas por passo */}
           <Card className="p-5">
