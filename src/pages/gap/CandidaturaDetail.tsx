@@ -101,7 +101,7 @@ function buildSteps(c: typeof candidaturas[number]): StepDef[] {
 
 type EtapaEstado = "completo" | "agendado" | "remarcado" | "falta" | "aprovado" | "reprovado" | "pendente" | "em_progresso" | "pago";
 
-const etapaEstadoStyle: Record<EtapaEstado, string> = {
+export const etapaEstadoStyle: Record<EtapaEstado, string> = {
   completo: "bg-green-50 text-green-700 border-green-200",
   aprovado: "bg-green-50 text-green-700 border-green-200",
   pago: "bg-green-50 text-green-700 border-green-200",
