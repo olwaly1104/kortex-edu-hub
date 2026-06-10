@@ -8,7 +8,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import ReportsMenuButton from "@/components/ReportsMenuButton";
 import {
   Search, X, Clock, Inbox, AlertCircle, GraduationCap, CalendarClock,
-  Wallet, SlidersHorizontal, ChevronRight, ChevronLeft, Check,
+  SlidersHorizontal, ChevronRight, ChevronLeft, Check,
   FileBarChart2, BarChart3, TrendingUp, BookOpen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
