@@ -537,6 +537,372 @@ export default function GapConfiguracao() {
           </table>
         </div>
       </Card>
+        </TabsContent>
+
+        {/* ============ AGENDAMENTOS ============ */}
+        <TabsContent value="agendamentos" className="space-y-6 mt-0">
+          {/* Parâmetros gerais */}
+          <Card className="p-5">
+            <div className="flex items-center gap-2 mb-4">
+              <Clock className="w-4 h-4 text-muted-foreground" />
+              <h2 className="text-sm font-semibold text-foreground">Parâmetros de agendamento</h2>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Duração padrão (min)</label>
+                <Input type="number" min={10} step={5} value={agDuracaoPadrao} onChange={e => setAgDuracaoPadrao(Number(e.target.value) || 30)} />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Antecedência mín. (horas)</label>
+                <Input type="number" min={0} value={agAntecedenciaMin} onChange={e => setAgAntecedenciaMin(Number(e.target.value) || 0)} />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Início atendimento</label>
+                <Input type="time" value={agHoraInicio} onChange={e => setAgHoraInicio(e.target.value)} />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Fim atendimento</label>
+                <Input type="time" value={agHoraFim} onChange={e => setAgHoraFim(e.target.value)} />
+              </div>
+            </div>
+          </Card>
+
+          {/* Categorias de atendimento */}
+          <Card className="p-5">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Layers className="w-4 h-4 text-muted-foreground" />
+                <h2 className="text-sm font-semibold text-foreground">Categorias de atendimento</h2>
+                <span className="text-[11px] text-muted-foreground tabular-nums">· {agCategorias.length}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Input value={newAgCat} onChange={e => setNewAgCat(e.target.value)} placeholder="Nova categoria" className="h-8 w-48 text-xs" />
+                <Button size="sm" variant="outline" className="h-8 text-xs gap-1.5" onClick={() => {
+                  if (!newAgCat.trim()) return;
+                  const key = slugify(newAgCat);
+                  setAgCategorias(prev => [...prev, { key, label: newAgCat.trim(), color: "bg-slate-100 text-slate-700 border-slate-200" }]);
+                  setNewAgCat("");
+                  toast({ title: "Categoria adicionada" });
+                }}><Plus className="w-3.5 h-3.5" /> Adicionar</Button>
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {agCategorias.map(c => (
+                <div key={c.key} className={cn("inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs", c.color)}>
+                  <span className="font-medium">{c.label}</span>
+                  <button onClick={() => setAgCategorias(prev => prev.filter(x => x.key !== c.key))} className="opacity-60 hover:opacity-100">
+                    <Trash2 className="w-3 h-3" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          {/* Motivos de agendamento */}
+          <Card className="p-5">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <FileText className="w-4 h-4 text-muted-foreground" />
+                <h2 className="text-sm font-semibold text-foreground">Motivos de agendamento</h2>
+                <span className="text-[11px] text-muted-foreground tabular-nums">· {agMotivos.length}</span>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-[1fr_220px_120px_auto] gap-2 mb-3">
+              <Input value={newAgMotLabel} onChange={e => setNewAgMotLabel(e.target.value)} placeholder="Designação do motivo" className="h-9 text-xs" />
+              <Select value={newAgMotCat} onValueChange={setNewAgMotCat}>
+                <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Categoria" /></SelectTrigger>
+                <SelectContent>{agCategorias.map(c => <SelectItem key={c.key} value={c.label}>{c.label}</SelectItem>)}</SelectContent>
+              </Select>
+              <Input type="number" min={10} step={5} value={newAgMotDur} onChange={e => setNewAgMotDur(Number(e.target.value) || 30)} placeholder="Duração" className="h-9 text-xs" />
+              <Button size="sm" variant="outline" className="h-9 text-xs gap-1.5" onClick={() => {
+                if (!newAgMotLabel.trim() || !newAgMotCat) return;
+                setAgMotivos(prev => [...prev, { key: slugify(newAgMotLabel), label: newAgMotLabel.trim(), categoria: newAgMotCat, duracao: newAgMotDur }]);
+                setNewAgMotLabel(""); setNewAgMotCat(""); setNewAgMotDur(45);
+                toast({ title: "Motivo adicionado" });
+              }}><Plus className="w-3.5 h-3.5" /> Adicionar</Button>
+            </div>
+            <div className="overflow-x-auto rounded-lg border border-border">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b bg-muted/30">
+                    <th className="text-left p-3 font-medium text-muted-foreground text-xs">Motivo</th>
+                    <th className="text-left p-3 font-medium text-muted-foreground text-xs">Categoria</th>
+                    <th className="text-center p-3 font-medium text-muted-foreground text-xs">Duração</th>
+                    <th className="w-12" />
+                  </tr>
+                </thead>
+                <tbody>
+                  {agMotivos.map(m => {
+                    const catCfg = agCategorias.find(c => c.label === m.categoria);
+                    return (
+                      <tr key={m.key} className="border-b last:border-0 hover:bg-muted/20">
+                        <td className="p-3 text-xs font-medium text-foreground">{m.label}</td>
+                        <td className="p-3">
+                          {catCfg ? <Badge variant="outline" className={cn("text-[10px]", catCfg.color)}>{catCfg.label}</Badge> : <span className="text-xs text-muted-foreground">{m.categoria}</span>}
+                        </td>
+                        <td className="p-3 text-center text-xs tabular-nums text-blue-700">{m.duracao} min</td>
+                        <td className="p-3 text-right">
+                          <button onClick={() => setAgMotivos(prev => prev.filter(x => x.key !== m.key))} className="text-muted-foreground hover:text-destructive">
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+
+          {/* Salas / Gabinetes */}
+          <Card className="p-5">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-muted-foreground" />
+                <h2 className="text-sm font-semibold text-foreground">Salas / Gabinetes</h2>
+                <span className="text-[11px] text-muted-foreground tabular-nums">· {agSalas.length}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Input value={newAgSalaLabel} onChange={e => setNewAgSalaLabel(e.target.value)} placeholder="Nome da sala" className="h-8 w-44 text-xs" />
+                <Input type="number" min={1} value={newAgSalaLot} onChange={e => setNewAgSalaLot(Number(e.target.value) || 1)} placeholder="Lotação" className="h-8 w-24 text-xs" />
+                <Button size="sm" variant="outline" className="h-8 text-xs gap-1.5" onClick={() => {
+                  if (!newAgSalaLabel.trim()) return;
+                  setAgSalas(prev => [...prev, { key: slugify(newAgSalaLabel), label: newAgSalaLabel.trim(), lotacao: newAgSalaLot }]);
+                  setNewAgSalaLabel(""); setNewAgSalaLot(4);
+                  toast({ title: "Sala adicionada" });
+                }}><Plus className="w-3.5 h-3.5" /> Adicionar</Button>
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {agSalas.map(s => (
+                <div key={s.key} className="inline-flex items-center gap-2 rounded-full border border-border bg-muted/30 px-3 py-1 text-xs">
+                  <MapPin className="w-3 h-3 text-muted-foreground" />
+                  <span className="font-medium text-foreground">{s.label}</span>
+                  <span className="text-muted-foreground tabular-nums">· {s.lotacao} lug.</span>
+                  <button onClick={() => setAgSalas(prev => prev.filter(x => x.key !== s.key))} className="opacity-60 hover:opacity-100">
+                    <Trash2 className="w-3 h-3" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          {/* Modalidades */}
+          <Card className="p-5">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 text-muted-foreground" />
+                <h2 className="text-sm font-semibold text-foreground">Modalidades</h2>
+                <span className="text-[11px] text-muted-foreground tabular-nums">· {agModalidades.length}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Input value={newAgModLabel} onChange={e => setNewAgModLabel(e.target.value)} placeholder="Nova modalidade" className="h-8 w-44 text-xs" />
+                <Button size="sm" variant="outline" className="h-8 text-xs gap-1.5" onClick={() => {
+                  if (!newAgModLabel.trim()) return;
+                  setAgModalidades(prev => [...prev, { key: slugify(newAgModLabel), label: newAgModLabel.trim() }]);
+                  setNewAgModLabel("");
+                }}><Plus className="w-3.5 h-3.5" /> Adicionar</Button>
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {agModalidades.map(m => (
+                <div key={m.key} className="inline-flex items-center gap-2 rounded-full border border-border bg-muted/30 px-3 py-1 text-xs">
+                  <span className="font-medium text-foreground">{m.label}</span>
+                  <button onClick={() => setAgModalidades(prev => prev.filter(x => x.key !== m.key))} className="opacity-60 hover:opacity-100">
+                    <Trash2 className="w-3 h-3" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </TabsContent>
+
+        {/* ============ CANDIDATURAS ============ */}
+        <TabsContent value="candidaturas" className="space-y-6 mt-0">
+          {/* Parâmetros gerais */}
+          <Card className="p-5">
+            <div className="flex items-center gap-2 mb-4">
+              <Wallet className="w-4 h-4 text-muted-foreground" />
+              <h2 className="text-sm font-semibold text-foreground">Parâmetros de candidatura</h2>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Taxa de candidatura (Kz)</label>
+                <Input type="number" min={0} step={500} value={cdTaxa} onChange={e => setCdTaxa(Number(e.target.value) || 0)} />
+                <p className="text-[10px] text-muted-foreground mt-1">{formatKz(cdTaxa)}</p>
+              </div>
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Nota mínima (0–20)</label>
+                <Input type="number" min={0} max={20} step={0.5} value={cdNotaMinima} onChange={e => setCdNotaMinima(Number(e.target.value) || 0)} />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Capacidade por sessão</label>
+                <Input type="number" min={1} value={cdCapacidadeSessao} onChange={e => setCdCapacidadeSessao(Number(e.target.value) || 1)} />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Máx. opções de curso</label>
+                <Input type="number" min={1} max={5} value={cdMaxOpcoes} onChange={e => setCdMaxOpcoes(Number(e.target.value) || 1)} />
+              </div>
+            </div>
+          </Card>
+
+          {/* Períodos / Chamadas */}
+          <Card className="p-5">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <CalendarClock className="w-4 h-4 text-muted-foreground" />
+                <h2 className="text-sm font-semibold text-foreground">Períodos de candidatura</h2>
+                <span className="text-[11px] text-muted-foreground tabular-nums">· {cdPeriodos.length}</span>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-[1fr_160px_160px_auto] gap-2 mb-3">
+              <Input value={newCdPerLabel} onChange={e => setNewCdPerLabel(e.target.value)} placeholder="Ex: 4ª Chamada 2025" className="h-9 text-xs" />
+              <Input type="date" value={newCdPerInicio} onChange={e => setNewCdPerInicio(e.target.value)} className="h-9 text-xs" />
+              <Input type="date" value={newCdPerFim} onChange={e => setNewCdPerFim(e.target.value)} className="h-9 text-xs" />
+              <Button size="sm" variant="outline" className="h-9 text-xs gap-1.5" onClick={() => {
+                if (!newCdPerLabel.trim() || !newCdPerInicio || !newCdPerFim) return;
+                setCdPeriodos(prev => [...prev, { key: slugify(newCdPerLabel), label: newCdPerLabel.trim(), inicio: newCdPerInicio, fim: newCdPerFim, ativo: false }]);
+                setNewCdPerLabel(""); setNewCdPerInicio(""); setNewCdPerFim("");
+                toast({ title: "Período adicionado" });
+              }}><Plus className="w-3.5 h-3.5" /> Adicionar</Button>
+            </div>
+            <div className="overflow-x-auto rounded-lg border border-border">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b bg-muted/30">
+                    <th className="text-left p-3 font-medium text-muted-foreground text-xs">Período</th>
+                    <th className="text-left p-3 font-medium text-muted-foreground text-xs">Início</th>
+                    <th className="text-left p-3 font-medium text-muted-foreground text-xs">Fim</th>
+                    <th className="text-center p-3 font-medium text-muted-foreground text-xs">Estado</th>
+                    <th className="w-12" />
+                  </tr>
+                </thead>
+                <tbody>
+                  {cdPeriodos.map(p => (
+                    <tr key={p.key} className="border-b last:border-0 hover:bg-muted/20">
+                      <td className="p-3 text-xs font-medium text-foreground">{p.label}</td>
+                      <td className="p-3 text-xs text-muted-foreground tabular-nums">{p.inicio}</td>
+                      <td className="p-3 text-xs text-muted-foreground tabular-nums">{p.fim}</td>
+                      <td className="p-3 text-center">
+                        <button onClick={() => setCdPeriodos(prev => prev.map(x => x.key === p.key ? { ...x, ativo: !x.ativo } : x))}>
+                          <Badge variant="outline" className={cn("text-[10px] cursor-pointer", p.ativo ? "bg-emerald-100 text-emerald-800 border-emerald-200" : "bg-slate-100 text-slate-600 border-slate-200")}>
+                            {p.ativo ? "Aberto" : "Fechado"}
+                          </Badge>
+                        </button>
+                      </td>
+                      <td className="p-3 text-right">
+                        <button onClick={() => setCdPeriodos(prev => prev.filter(x => x.key !== p.key))} className="text-muted-foreground hover:text-destructive">
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+
+          {/* Cursos oferecidos */}
+          <Card className="p-5">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <GraduationCap className="w-4 h-4 text-muted-foreground" />
+                <h2 className="text-sm font-semibold text-foreground">Cursos oferecidos</h2>
+                <span className="text-[11px] text-muted-foreground tabular-nums">· {cdCursos.length}</span>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-[1fr_220px_100px_auto] gap-2 mb-3">
+              <Input value={newCdCursoLabel} onChange={e => setNewCdCursoLabel(e.target.value)} placeholder="Nome do curso" className="h-9 text-xs" />
+              <Select value={newCdCursoFac} onValueChange={setNewCdCursoFac}>
+                <SelectTrigger className="h-9 text-xs"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Faculdade de Ciências Exatas">Faculdade de Ciências Exatas</SelectItem>
+                  <SelectItem value="Faculdade de Medicina">Faculdade de Medicina</SelectItem>
+                  <SelectItem value="Faculdade de Ciências Sociais">Faculdade de Ciências Sociais</SelectItem>
+                </SelectContent>
+              </Select>
+              <Input type="number" min={1} value={newCdCursoVagas} onChange={e => setNewCdCursoVagas(Number(e.target.value) || 1)} placeholder="Vagas" className="h-9 text-xs" />
+              <Button size="sm" variant="outline" className="h-9 text-xs gap-1.5" onClick={() => {
+                if (!newCdCursoLabel.trim()) return;
+                setCdCursos(prev => [...prev, { key: slugify(newCdCursoLabel), label: newCdCursoLabel.trim(), vagas: newCdCursoVagas, faculdade: newCdCursoFac }]);
+                setNewCdCursoLabel(""); setNewCdCursoVagas(50);
+                toast({ title: "Curso adicionado" });
+              }}><Plus className="w-3.5 h-3.5" /> Adicionar</Button>
+            </div>
+            <div className="overflow-x-auto rounded-lg border border-border">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b bg-muted/30">
+                    <th className="text-left p-3 font-medium text-muted-foreground text-xs">Curso</th>
+                    <th className="text-left p-3 font-medium text-muted-foreground text-xs">Faculdade</th>
+                    <th className="text-center p-3 font-medium text-muted-foreground text-xs">Vagas</th>
+                    <th className="w-12" />
+                  </tr>
+                </thead>
+                <tbody>
+                  {cdCursos.map(c => (
+                    <tr key={c.key} className="border-b last:border-0 hover:bg-muted/20">
+                      <td className="p-3 text-xs font-medium text-foreground">{c.label}</td>
+                      <td className="p-3 text-xs text-muted-foreground">{c.faculdade}</td>
+                      <td className="p-3 text-center text-xs tabular-nums text-blue-700">{c.vagas}</td>
+                      <td className="p-3 text-right">
+                        <button onClick={() => setCdCursos(prev => prev.filter(x => x.key !== c.key))} className="text-muted-foreground hover:text-destructive">
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+
+          {/* Documentos exigidos */}
+          <Card className="p-5">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <FileCheck2 className="w-4 h-4 text-muted-foreground" />
+                <h2 className="text-sm font-semibold text-foreground">Documentos exigidos</h2>
+                <span className="text-[11px] text-muted-foreground tabular-nums">· {cdDocs.length}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Input value={newCdDocLabel} onChange={e => setNewCdDocLabel(e.target.value)} placeholder="Novo documento" className="h-8 w-56 text-xs" />
+                <Select value={newCdDocObrig ? "1" : "0"} onValueChange={v => setNewCdDocObrig(v === "1")}>
+                  <SelectTrigger className="h-8 w-32 text-xs"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1">Obrigatório</SelectItem>
+                    <SelectItem value="0">Opcional</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button size="sm" variant="outline" className="h-8 text-xs gap-1.5" onClick={() => {
+                  if (!newCdDocLabel.trim()) return;
+                  setCdDocs(prev => [...prev, { key: slugify(newCdDocLabel), label: newCdDocLabel.trim(), obrigatorio: newCdDocObrig }]);
+                  setNewCdDocLabel("");
+                }}><Plus className="w-3.5 h-3.5" /> Adicionar</Button>
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {cdDocs.map(d => (
+                <div key={d.key} className={cn(
+                  "inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs",
+                  d.obrigatorio ? "bg-rose-50 text-rose-800 border-rose-200" : "bg-slate-100 text-slate-700 border-slate-200"
+                )}>
+                  <FileCheck2 className="w-3 h-3" />
+                  <span className="font-medium">{d.label}</span>
+                  <span className="opacity-70">· {d.obrigatorio ? "obrigatório" : "opcional"}</span>
+                  <button onClick={() => setCdDocs(prev => prev.map(x => x.key === d.key ? { ...x, obrigatorio: !x.obrigatorio } : x))} className="opacity-60 hover:opacity-100">
+                    <Pencil className="w-3 h-3" />
+                  </button>
+                  <button onClick={() => setCdDocs(prev => prev.filter(x => x.key !== d.key))} className="opacity-60 hover:opacity-100">
+                    <Trash2 className="w-3 h-3" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </TabsContent>
+      </Tabs>
+
 
       <Dialog open={!!editEstado} onOpenChange={(o) => !o && setEditEstado(null)}>
         <DialogContent className="max-w-md">
