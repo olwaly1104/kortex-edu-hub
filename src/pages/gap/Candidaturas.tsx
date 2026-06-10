@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { candidaturas, estadoLabels, periodos, cursos, type EstadoCandidatura } from "@/data/admissoesData";
+import { buildCronologia, etapaEstadoStyle, etapaEstadoLabel } from "./CandidaturaDetail";
 
 const TODAY = "2025-01-15";
 
