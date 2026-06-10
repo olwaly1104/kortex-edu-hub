@@ -243,42 +243,90 @@ export default function GapConfiguracao() {
   const [newAgModLabel, setNewAgModLabel] = useState("");
 
   // ===== CANDIDATURAS =====
-  type CdPeriodo = { key: string; label: string; inicio: string; fim: string; ativo: boolean };
-  type CdCurso = { key: string; label: string; vagas: number; faculdade: string };
-  type CdDoc = { key: string; label: string; obrigatorio: boolean };
+  type CdEstado = { key: string; label: string; color: string };
+  type CdEtapa = { key: string; label: string; diasAposSubmissao: number; obrigatoria: boolean; estadosPossiveis: string[] };
+  type CdSessao = { key: string; etapa: string; data: string; hora: string; local: string; capacidade: number };
+  type CdPergunta = { key: string; label: string; tipo: "texto" | "numero" | "data" | "selecao" | "ficheiro"; obrigatoria: boolean };
+  type CdFormStep = { key: string; titulo: string; subtitulo: string; perguntas: CdPergunta[] };
 
-  const [cdPeriodos, setCdPeriodos] = useState<CdPeriodo[]>([
-    { key: "ch1_2025", label: "1ª Chamada 2025", inicio: "2024-12-01", fim: "2025-01-15", ativo: false },
-    { key: "ch2_2025", label: "2ª Chamada 2025", inicio: "2025-02-15", fim: "2025-03-30", ativo: true },
-    { key: "ch3_2025", label: "3ª Chamada 2025", inicio: "2025-05-01", fim: "2025-06-15", ativo: false },
+  const [cdEstados, setCdEstados] = useState<CdEstado[]>([
+    { key: "completo", label: "Completo", color: "bg-green-50 text-green-700 border-green-200" },
+    { key: "aprovado", label: "Aprovado", color: "bg-green-50 text-green-700 border-green-200" },
+    { key: "agendado", label: "Agendado", color: "bg-blue-50 text-blue-700 border-blue-200" },
+    { key: "remarcado", label: "Remarcado", color: "bg-amber-50 text-amber-700 border-amber-200" },
+    { key: "falta", label: "Falta", color: "bg-red-50 text-red-700 border-red-200" },
+    { key: "reprovado", label: "Reprovado", color: "bg-red-50 text-red-700 border-red-200" },
   ]);
-  const [cdCursos, setCdCursos] = useState<CdCurso[]>([
-    { key: "arq", label: "Arquitectura", vagas: 50, faculdade: "Faculdade de Ciências Exatas" },
-    { key: "eng_inf", label: "Engenharia Informática", vagas: 80, faculdade: "Faculdade de Ciências Exatas" },
-    { key: "med", label: "Medicina", vagas: 60, faculdade: "Faculdade de Medicina" },
-    { key: "dir", label: "Direito", vagas: 100, faculdade: "Faculdade de Ciências Sociais" },
-    { key: "gest", label: "Gestão", vagas: 90, faculdade: "Faculdade de Ciências Sociais" },
+  const [cdEtapas, setCdEtapas] = useState<CdEtapa[]>([
+    { key: "submissao", label: "Submissão da candidatura", diasAposSubmissao: 0, obrigatoria: true, estadosPossiveis: ["completo"] },
+    { key: "entrevista", label: "Entrevista", diasAposSubmissao: 12, obrigatoria: true, estadosPossiveis: ["agendado", "completo", "remarcado", "falta"] },
+    { key: "curso_preparatorio", label: "Curso Preparatório", diasAposSubmissao: 35, obrigatoria: false, estadosPossiveis: ["agendado", "completo", "remarcado"] },
+    { key: "exame", label: "Exame de Acesso", diasAposSubmissao: 60, obrigatoria: true, estadosPossiveis: ["agendado", "aprovado", "reprovado", "remarcado"] },
   ]);
-  const [cdDocs, setCdDocs] = useState<CdDoc[]>([
-    { key: "bi", label: "Bilhete de Identidade", obrigatorio: true },
-    { key: "cert_medio", label: "Certificado do Ensino Médio", obrigatorio: true },
-    { key: "decl_notas", label: "Declaração de Notas", obrigatorio: true },
-    { key: "atestado", label: "Atestado Médico", obrigatorio: true },
-    { key: "foto", label: "Fotografia tipo passe", obrigatorio: false },
+  const [cdSessoes, setCdSessoes] = useState<CdSessao[]>([
+    { key: "cp_s1", etapa: "Curso Preparatório", data: "2026-07-18", hora: "09:00", local: "Anfiteatro A — Campus UPRA", capacidade: 80 },
+    { key: "cp_s2", etapa: "Curso Preparatório", data: "2026-07-25", hora: "09:00", local: "Anfiteatro B — Campus UPRA", capacidade: 80 },
+    { key: "ex_s1", etapa: "Exame de Acesso", data: "2026-08-15", hora: "09:00", local: "Edifício Central, Sala 04", capacidade: 60 },
+    { key: "ex_s2", etapa: "Exame de Acesso", data: "2026-08-22", hora: "14:00", local: "Edifício Central, Sala 06", capacidade: 60 },
   ]);
-  const [cdTaxa, setCdTaxa] = useState(15000);
   const [cdNotaMinima, setCdNotaMinima] = useState(10);
-  const [cdCapacidadeSessao, setCdCapacidadeSessao] = useState(50);
+  const [cdTaxa, setCdTaxa] = useState(15000);
   const [cdMaxOpcoes, setCdMaxOpcoes] = useState(3);
 
-  const [newCdPerLabel, setNewCdPerLabel] = useState("");
-  const [newCdPerInicio, setNewCdPerInicio] = useState("");
-  const [newCdPerFim, setNewCdPerFim] = useState("");
-  const [newCdCursoLabel, setNewCdCursoLabel] = useState("");
-  const [newCdCursoVagas, setNewCdCursoVagas] = useState(50);
-  const [newCdCursoFac, setNewCdCursoFac] = useState("Faculdade de Ciências Exatas");
-  const [newCdDocLabel, setNewCdDocLabel] = useState("");
-  const [newCdDocObrig, setNewCdDocObrig] = useState(true);
+  const [cdFormSteps, setCdFormSteps] = useState<CdFormStep[]>([
+    { key: "dados_pessoais", titulo: "Dados Pessoais", subtitulo: "Identificação do candidato", perguntas: [
+      { key: "nome_completo", label: "Nome completo", tipo: "texto", obrigatoria: true },
+      { key: "data_nasc", label: "Data de nascimento", tipo: "data", obrigatoria: true },
+      { key: "bi", label: "Bilhete de Identidade", tipo: "texto", obrigatoria: true },
+      { key: "genero", label: "Género", tipo: "selecao", obrigatoria: true },
+      { key: "naturalidade", label: "Naturalidade", tipo: "texto", obrigatoria: true },
+    ]},
+    { key: "morada_contactos", titulo: "Morada & Contactos", subtitulo: "Contactos e residência", perguntas: [
+      { key: "telefone", label: "Telefone", tipo: "texto", obrigatoria: true },
+      { key: "email", label: "Email", tipo: "texto", obrigatoria: true },
+      { key: "morada", label: "Morada de residência", tipo: "texto", obrigatoria: true },
+      { key: "provincia", label: "Província", tipo: "selecao", obrigatoria: true },
+    ]},
+    { key: "formacao", titulo: "Formação", subtitulo: "Histórico do ensino secundário", perguntas: [
+      { key: "escola", label: "Escola de origem", tipo: "texto", obrigatoria: true },
+      { key: "ano_conclusao", label: "Ano de conclusão", tipo: "numero", obrigatoria: true },
+      { key: "media_final", label: "Média final", tipo: "numero", obrigatoria: true },
+      { key: "cert_medio", label: "Certificado do Ensino Médio", tipo: "ficheiro", obrigatoria: true },
+      { key: "decl_notas", label: "Declaração de Notas", tipo: "ficheiro", obrigatoria: true },
+    ]},
+    { key: "curso", titulo: "Curso", subtitulo: "Faculdades e cursos por ordem de escolha", perguntas: [
+      { key: "opcao1", label: "1ª opção de curso", tipo: "selecao", obrigatoria: true },
+      { key: "opcao2", label: "2ª opção de curso", tipo: "selecao", obrigatoria: false },
+      { key: "opcao3", label: "3ª opção de curso", tipo: "selecao", obrigatoria: false },
+    ]},
+    { key: "entrevista", titulo: "Entrevista", subtitulo: "Marcação da data de entrevista", perguntas: [
+      { key: "disponibilidade", label: "Disponibilidade horária", tipo: "selecao", obrigatoria: true },
+      { key: "observacoes", label: "Observações", tipo: "texto", obrigatoria: false },
+    ]},
+    { key: "curso_prep", titulo: "Curso Preparatório", subtitulo: "Opcional — escolha da sessão", perguntas: [
+      { key: "inscricao", label: "Pretende inscrever-se?", tipo: "selecao", obrigatoria: true },
+      { key: "sessao", label: "Sessão preferida", tipo: "selecao", obrigatoria: false },
+    ]},
+    { key: "revisao", titulo: "Revisão", subtitulo: "Confirmação final da candidatura", perguntas: [
+      { key: "confirma", label: "Confirmo que os dados estão corretos", tipo: "selecao", obrigatoria: true },
+    ]},
+  ]);
+
+  const [cdEstadoOpen, setCdEstadoOpen] = useState(false);
+  const [newCdEstadoLabel, setNewCdEstadoLabel] = useState("");
+  const [newCdEtapaLabel, setNewCdEtapaLabel] = useState("");
+  const [newCdEtapaDias, setNewCdEtapaDias] = useState(7);
+  const [newCdSessEtapa, setNewCdSessEtapa] = useState("Curso Preparatório");
+  const [newCdSessData, setNewCdSessData] = useState("");
+  const [newCdSessHora, setNewCdSessHora] = useState("09:00");
+  const [newCdSessLocal, setNewCdSessLocal] = useState("");
+  const [newCdSessCap, setNewCdSessCap] = useState(60);
+  const [expandedStep, setExpandedStep] = useState<string | null>("dados_pessoais");
+  const [newPergStep, setNewPergStep] = useState<string>("");
+  const [newPergLabel, setNewPergLabel] = useState("");
+  const [newPergTipo, setNewPergTipo] = useState<CdPergunta["tipo"]>("texto");
+  const [newPergObrig, setNewPergObrig] = useState(true);
+
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
