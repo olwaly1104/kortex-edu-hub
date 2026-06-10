@@ -1,124 +1,143 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import ReportsMenuButton from "@/components/ReportsMenuButton";
 import {
-  Search, ClipboardList, Clock, CheckCircle, AlertCircle, X,
-  CalendarDays, Wallet, Layers, TrendingUp, GraduationCap,
+  Search, X, Clock, Inbox, AlertCircle, GraduationCap, CalendarClock,
+  Wallet, SlidersHorizontal, ChevronRight, ChevronLeft, Check,
+  FileBarChart2, BarChart3, TrendingUp, BookOpen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { candidaturas, estadoColors, estadoLabels, type EstadoCandidatura } from "@/data/admissoesData";
+import { candidaturas, estadoLabels, periodos, cursos, type EstadoCandidatura } from "@/data/admissoesData";
 
-type StatusFilter = "todas" | EstadoCandidatura | "hoje" | "pag_pendente";
+const TODAY = "2025-01-15";
+
+type EstadoFilter = "todos" | "hoje" | "pendentes" | "aprovados" | "reprovados" | "pag_pendente";
+type CursoFilter = string | "todos";
+type PeriodoFilter = string | "todos";
+
+const candidaturaReportCategories = [
+  { id: "funil",     label: "Funil de Candidaturas",  description: "Submetidas, em entrevista, em exame e decididas no período.", icon: <BarChart3 className="w-4 h-4" />, type: "estudantes" as const, prefix: "Histórico do GAP — Funil de Candidaturas" },
+  { id: "aprov",     label: "Taxa de Aprovação",      description: "Aprovados vs reprovados por curso e período.",                 icon: <TrendingUp className="w-4 h-4" />, type: "estudantes" as const, prefix: "Histórico do GAP — Aprovação" },
+  { id: "geral",     label: "Relatório de Admissões", description: "Visão consolidada da actividade de admissões no mês.",         icon: <BookOpen className="w-4 h-4" />, type: "estudantes" as const, prefix: "Histórico do GAP — Admissões" },
+];
+
+const candidaturaReportData = candidaturas.map(c => ({
+  id: c.id,
+  name: c.nome,
+  code: c.bi,
+  turma: `${c.cursoOpcao1} · ${c.periodo}`,
+  media: null,
+  presenca: 0,
+  tarefasFeitas: 0,
+  tarefasTotal: 0,
+}));
 
 export default function GapCandidaturas() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
-  const [status, setStatus] = useState<StatusFilter>("todas");
+  const [estado, setEstado] = useState<EstadoFilter>("hoje");
+  const [curso, setCurso] = useState<CursoFilter>("todos");
+  const [periodo, setPeriodo] = useState<PeriodoFilter>("todos");
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [filterView, setFilterView] = useState<"root" | "estado" | "curso" | "periodo">("root");
 
-  // Sem candidaturas incompletas — qualquer estado "incompleto" é tratado como "pendente"
+  // Normaliza: 'incompleto' tratado como 'pendente'
   const normalized = useMemo(
-    () => candidaturas.map(c => (c.estado === "incompleto" ? { ...c, estado: "pendente" as const } : c)),
+    () => candidaturas.map(c => (c.estado === "incompleto" ? { ...c, estado: "pendente" as EstadoCandidatura } : c)),
     [],
   );
 
-  const todayKey = new Date().toISOString().slice(0, 10);
-  const isToday = (iso: string) => iso.slice(0, 10) === todayKey;
+  const isHoje = (c: typeof normalized[number]) => c.dataSubmissao === TODAY;
+  const isPendente = (c: typeof normalized[number]) => c.estado === "pendente";
+  const isAprovado = (c: typeof normalized[number]) => c.estado === "aprovado";
+  const isReprovado = (c: typeof normalized[number]) => c.estado === "reprovado";
+  const isPagPendente = (c: typeof normalized[number]) => c.pagamento?.estado === "pendente";
+
+  const counts = useMemo(() => ({
+    todos: normalized.length,
+    hoje: normalized.filter(isHoje).length,
+    pendentes: normalized.filter(isPendente).length,
+    aprovados: normalized.filter(isAprovado).length,
+    reprovados: normalized.filter(isReprovado).length,
+    pag_pendente: normalized.filter(isPagPendente).length,
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }), []);
 
   const filtered = useMemo(() => {
-    return normalized
-      .filter(c => {
-        if (status === "hoje" && !isToday(c.dataSubmissao)) return false;
-        if (status === "pag_pendente" && c.pagamento?.estado !== "pendente") return false;
-        if (status !== "todas" && status !== "hoje" && status !== "pag_pendente" && c.estado !== status) return false;
-        if (!search) return true;
-        const s = search.toLowerCase();
-        return c.nome.toLowerCase().includes(s) || c.bi.includes(search) || c.cursoOpcao1.toLowerCase().includes(s);
-      })
-      .sort((a, b) => new Date(b.dataSubmissao).getTime() - new Date(a.dataSubmissao).getTime());
-  }, [normalized, search, status]);
+    return normalized.filter(c => {
+      if (estado === "hoje" && !isHoje(c)) return false;
+      if (estado === "pendentes" && !isPendente(c)) return false;
+      if (estado === "aprovados" && !isAprovado(c)) return false;
+      if (estado === "reprovados" && !isReprovado(c)) return false;
+      if (estado === "pag_pendente" && !isPagPendente(c)) return false;
+      if (curso !== "todos" && c.cursoOpcao1 !== curso) return false;
+      if (periodo !== "todos" && c.periodo !== periodo) return false;
+      if (search) {
+        const q = search.toLowerCase();
+        return (
+          c.nome.toLowerCase().includes(q) ||
+          c.bi.includes(search) ||
+          c.cursoOpcao1.toLowerCase().includes(q) ||
+          c.id.toLowerCase().includes(q)
+        );
+      }
+      return true;
+    }).sort((a, b) => new Date(b.dataSubmissao).getTime() - new Date(a.dataSubmissao).getTime());
+  }, [search, estado, curso, periodo, normalized]);
 
-  const hojeList = normalized.filter(c => isToday(c.dataSubmissao));
-  const pagPendentes = normalized.filter(c => c.pagamento?.estado === "pendente").length;
-  const receita = normalized
-    .filter(c => c.pagamento?.estado === "confirmado")
-    .reduce((s, c) => s + (c.pagamento?.valor || 0), 0);
-  const taxaAprov = (() => {
-    const decididos = normalized.filter(c => c.estado === "aprovado" || c.estado === "reprovado").length;
-    const ap = normalized.filter(c => c.estado === "aprovado").length;
-    return decididos > 0 ? Math.round((ap / decididos) * 100) : 0;
-  })();
-
-  const kpis = {
-    hoje: hojeList.length,
-    total: normalized.length,
-    pendentes: normalized.filter(c => c.estado === "pendente").length,
-    aprovados: normalized.filter(c => c.estado === "aprovado").length,
-    reprovados: normalized.filter(c => c.estado === "reprovado").length,
+  const isActive = {
+    estado: estado !== "todos" && estado !== "hoje",
+    curso: curso !== "todos",
+    periodo: periodo !== "todos",
+    search: search !== "",
   };
+  const hasActiveControls = Object.values(isActive).some(Boolean);
+  const resetAll = () => { setEstado("todos"); setCurso("todos"); setPeriodo("todos"); setSearch(""); };
 
-  // Top cursos (1ª opção)
-  const cursoCount = new Map<string, number>();
-  normalized.forEach(c => {
-    cursoCount.set(c.cursoOpcao1, (cursoCount.get(c.cursoOpcao1) || 0) + 1);
-  });
-  const topCursos = [...cursoCount.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5);
-  const maxCurso = topCursos[0]?.[1] || 1;
-
-  const filters: { key: StatusFilter; label: string }[] = [
-    { key: "todas", label: "Todas" },
-    { key: "hoje", label: `Hoje (${kpis.hoje})` },
-    { key: "pendente", label: "Pendente" },
-    { key: "aprovado", label: "Aprovado" },
-    { key: "reprovado", label: "Reprovado" },
-    { key: "pag_pendente", label: "Pag. por confirmar" },
+  const periodoOpts = [
+    { v: "todos" as const, label: "Todas", count: counts.todos },
+    { v: "pendentes" as const, label: "Pendentes", count: counts.pendentes },
+    { v: "aprovados" as const, label: "Aprovados", count: counts.aprovados },
+    { v: "reprovados" as const, label: "Reprovados", count: counts.reprovados },
+    { v: "pag_pendente" as const, label: "Pag. por confirmar", count: counts.pag_pendente },
   ];
 
-  const formatKz = (n: number) =>
-    new Intl.NumberFormat("pt-AO").format(n) + " Kz";
+  const estadoLabel = (v: EstadoFilter) => ({
+    todos: "Todos", hoje: "Hoje", pendentes: "Pendentes",
+    aprovados: "Aprovados", reprovados: "Reprovados", pag_pendente: "Pag. por confirmar",
+  })[v];
 
-  const todayLabel = new Date().toLocaleDateString("pt-PT", {
-    weekday: "long", day: "2-digit", month: "long", year: "numeric",
-  });
+  const formatKz = (n: number) => new Intl.NumberFormat("pt-AO").format(n) + " Kz";
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
+      {/* Header */}
       <div className="flex items-end justify-between gap-4 flex-wrap">
         <div>
           <h1 className="text-2xl font-bold text-foreground tracking-tight">Candidaturas</h1>
-          <p className="text-sm text-muted-foreground mt-1 capitalize">{todayLabel}</p>
+          <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
+            Candidaturas submetidas ao processo de admissão. O GAP acompanha entrevista, curso preparatório e exame até à decisão final.
+          </p>
         </div>
-        <Badge variant="outline" className="text-[11px] bg-emerald-50 text-emerald-700 border-emerald-200 gap-1.5">
-          <Wallet className="w-3 h-3" /> {formatKz(receita)} arrecadados
-        </Badge>
       </div>
 
-      {/* KPIs principais — Hoje em destaque */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
-        <Card className="p-4 border-blue-200 bg-blue-50/40 hover:shadow-sm transition-shadow">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-[11px] font-semibold text-blue-700 uppercase tracking-wider">Hoje</p>
-              <p className="text-2xl font-bold text-blue-800 mt-1 tabular-nums">{kpis.hoje}</p>
-              <p className="text-[10px] text-blue-600/80 mt-0.5">submetidas</p>
-            </div>
-            <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-blue-100 text-blue-700">
-              <CalendarDays className="w-4 h-4" />
-            </div>
-          </div>
-        </Card>
+      {/* KPIs */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {[
-          { label: "Total", value: kpis.total, icon: ClipboardList, iconBg: "bg-primary/10 text-primary" },
-          { label: "Pendentes", value: kpis.pendentes, icon: Clock, iconBg: "bg-yellow-50 text-yellow-600" },
-          { label: "Aprovados", value: kpis.aprovados, icon: CheckCircle, iconBg: "bg-green-50 text-green-600" },
-          { label: "Reprovados", value: kpis.reprovados, icon: AlertCircle, iconBg: "bg-red-50 text-red-600" },
+          { label: "Total", value: counts.todos, icon: Inbox, iconBg: "bg-muted text-muted-foreground" },
+          { label: "Hoje", value: counts.hoje, icon: Clock, iconBg: "bg-primary/10 text-primary" },
+          { label: "Pendentes", value: counts.pendentes, icon: AlertCircle, iconBg: "bg-orange-50 text-orange-600" },
         ].map(k => (
           <Card key={k.label} className="p-4 hover:shadow-sm transition-shadow">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">{k.label}</p>
-                <p className="text-2xl font-bold text-foreground mt-1 tabular-nums">{k.value}</p>
+                <p className="text-2xl font-bold mt-1 text-foreground tabular-nums">{k.value}</p>
               </div>
               <div className={cn("w-9 h-9 rounded-lg flex items-center justify-center", k.iconBg)}>
                 <k.icon className="w-4 h-4" />
@@ -126,99 +145,78 @@ export default function GapCandidaturas() {
             </div>
           </Card>
         ))}
+
+        {/* Histórico de Admissões */}
+        <Card className="p-4 hover:shadow-sm transition-shadow border-primary/30 bg-gradient-to-br from-primary/5 to-transparent flex items-center justify-between">
+          <div className="min-w-0">
+            <p className="text-[11px] font-medium text-primary uppercase tracking-wider">Histórico de Admissões</p>
+            <p className="text-[11px] text-muted-foreground mt-1 leading-snug">
+              Relatórios mensais do funil de candidaturas e taxa de aprovação.
+            </p>
+            <div className="mt-2">
+              <ReportsMenuButton categories={candidaturaReportCategories} data={candidaturaReportData} />
+            </div>
+          </div>
+          <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-primary/10 text-primary shrink-0">
+            <FileBarChart2 className="w-4 h-4" />
+          </div>
+        </Card>
       </div>
 
-      {/* Linha de insight: Hoje + Top cursos + Indicadores */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Submissões de hoje */}
-        <Card className="overflow-hidden">
-          <div className="px-4 py-2.5 bg-muted/30 border-b border-border flex items-center gap-2">
-            <CalendarDays className="w-3.5 h-3.5 text-blue-600" />
-            <h3 className="text-[11px] font-semibold uppercase tracking-wider text-foreground">Submetidas hoje</h3>
-            <span className="ml-auto text-[10px] text-muted-foreground tabular-nums">{hojeList.length}</span>
-          </div>
-          {hojeList.length === 0 ? (
-            <div className="px-4 py-8 text-center text-[11px] text-muted-foreground italic">
-              Sem candidaturas submetidas hoje
-            </div>
-          ) : (
-            <ul className="divide-y divide-border max-h-56 overflow-y-auto">
-              {hojeList.slice(0, 6).map(c => (
-                <li
-                  key={c.id}
-                  onClick={() => navigate(`/gap/candidaturas/${c.id}`)}
-                  className="px-4 py-2 flex items-center gap-2 text-xs hover:bg-muted/30 cursor-pointer transition-colors"
-                >
-                  <span className="font-medium text-foreground truncate flex-1">{c.nome}</span>
-                  <Badge variant="outline" className="text-[9px]">{c.cursoOpcao1}</Badge>
-                </li>
-              ))}
-            </ul>
-          )}
-        </Card>
-
-        {/* Top cursos */}
-        <Card className="overflow-hidden">
-          <div className="px-4 py-2.5 bg-muted/30 border-b border-border flex items-center gap-2">
-            <Layers className="w-3.5 h-3.5 text-muted-foreground" />
-            <h3 className="text-[11px] font-semibold uppercase tracking-wider text-foreground">Cursos mais procurados</h3>
-          </div>
-          <ul className="divide-y divide-border">
-            {topCursos.map(([curso, n]) => (
-              <li key={curso} className="px-4 py-2 flex items-center gap-3">
-                <GraduationCap className="w-3 h-3 text-muted-foreground shrink-0" />
-                <span className="text-xs font-medium text-foreground flex-1 truncate">{curso}</span>
-                <div className="w-24 h-1.5 bg-muted rounded-full overflow-hidden">
-                  <div className="h-full bg-primary" style={{ width: `${(n / maxCurso) * 100}%` }} />
-                </div>
-                <span className="text-xs tabular-nums text-muted-foreground w-6 text-right">{n}</span>
-              </li>
-            ))}
-          </ul>
-        </Card>
-
-        {/* Indicadores financeiros & aprovação */}
-        <Card className="overflow-hidden">
-          <div className="px-4 py-2.5 bg-muted/30 border-b border-border flex items-center gap-2">
-            <TrendingUp className="w-3.5 h-3.5 text-muted-foreground" />
-            <h3 className="text-[11px] font-semibold uppercase tracking-wider text-foreground">Indicadores</h3>
-          </div>
-          <div className="p-4 space-y-3">
+      {/* Controls */}
+      <Card className="p-3 space-y-2.5">
+        {/* Line 1: Hoje pinned + period segment */}
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <div className="inline-flex items-center gap-2 flex-wrap">
             <button
-              onClick={() => setStatus("pag_pendente")}
-              className="w-full flex items-center justify-between p-2.5 rounded-md border border-purple-200 bg-purple-50/50 hover:bg-purple-50 transition-colors text-left"
+              onClick={() => setEstado("hoje")}
+              className={cn(
+                "inline-flex items-center gap-1.5 h-9 px-3 text-xs font-semibold rounded-md border transition-colors",
+                estado === "hoje"
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "bg-background text-foreground border-input hover:border-primary hover:text-primary"
+              )}
             >
-              <div>
-                <p className="text-[10px] uppercase tracking-wider text-purple-700 font-semibold">Pagamentos por confirmar</p>
-                <p className="text-lg font-bold text-purple-800 tabular-nums leading-tight">{pagPendentes}</p>
-              </div>
-              <Wallet className="w-4 h-4 text-purple-600" />
+              <Clock className="w-3.5 h-3.5" />
+              Hoje
+              <span className={cn(
+                "inline-flex items-center justify-center min-w-[18px] h-[16px] px-1 rounded text-[10px] font-bold tabular-nums",
+                estado === "hoje" ? "bg-primary-foreground/20" : "bg-muted text-muted-foreground"
+              )}>{counts.hoje}</span>
             </button>
-            <div className="flex items-center justify-between p-2.5 rounded-md border border-emerald-200 bg-emerald-50/50">
-              <div>
-                <p className="text-[10px] uppercase tracking-wider text-emerald-700 font-semibold">Taxa de aprovação</p>
-                <p className="text-lg font-bold text-emerald-800 tabular-nums leading-tight">{taxaAprov}%</p>
-              </div>
-              <CheckCircle className="w-4 h-4 text-emerald-600" />
-            </div>
-            <div className="flex items-center justify-between p-2.5 rounded-md border border-slate-200 bg-slate-50/50">
-              <div>
-                <p className="text-[10px] uppercase tracking-wider text-slate-600 font-semibold">Receita confirmada</p>
-                <p className="text-sm font-bold text-slate-800 tabular-nums leading-tight">{formatKz(receita)}</p>
-              </div>
-              <Wallet className="w-4 h-4 text-slate-500" />
+
+            <div className="h-6 w-px bg-border" />
+
+            <div className="inline-flex items-center rounded-md border border-input bg-background overflow-hidden">
+              {periodoOpts.map((opt, i) => (
+                <button
+                  key={opt.v}
+                  onClick={() => setEstado(opt.v)}
+                  className={cn(
+                    "inline-flex items-center gap-1.5 h-9 px-3 text-xs font-medium transition-colors",
+                    i > 0 && "border-l border-input",
+                    estado === opt.v
+                      ? "bg-muted text-foreground"
+                      : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                  )}
+                >
+                  {opt.label}
+                  <span className={cn(
+                    "inline-flex items-center justify-center min-w-[18px] h-[16px] px-1 rounded text-[10px] font-semibold tabular-nums",
+                    estado === opt.v ? "bg-primary/10 text-primary" : "bg-muted-foreground/15 text-muted-foreground"
+                  )}>{opt.count}</span>
+                </button>
+              ))}
             </div>
           </div>
-        </Card>
-      </div>
+        </div>
 
-      {/* Controlo */}
-      <Card className="p-3">
+        {/* Line 2: Search + filters */}
         <div className="flex items-center gap-2 flex-wrap">
           <div className="relative flex-1 min-w-[220px] max-w-[380px]">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
             <Input
-              placeholder="Pesquisar nome, BI ou curso…"
+              placeholder="Pesquisar candidato, BI, curso ou ID…"
               value={search}
               onChange={e => setSearch(e.target.value)}
               className="pl-9 pr-8 h-9 text-xs"
@@ -233,100 +231,202 @@ export default function GapCandidaturas() {
               </button>
             )}
           </div>
-          <div className="flex items-center gap-1 flex-wrap">
-            {filters.map(f => (
-              <button
-                key={f.key}
-                onClick={() => setStatus(f.key)}
+
+          <Popover open={filterOpen} onOpenChange={(o) => { setFilterOpen(o); if (!o) setFilterView("root"); }}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
                 className={cn(
-                  "px-2.5 h-8 text-[11px] font-medium rounded-md border transition-colors",
-                  status === f.key
-                    ? "bg-primary text-primary-foreground border-primary"
-                    : "bg-background border-border text-muted-foreground hover:text-foreground hover:bg-muted",
+                  "h-9 px-3 text-xs gap-1.5",
+                  (isActive.estado || isActive.curso || isActive.periodo) && "border-primary text-primary"
                 )}
               >
-                {f.label}
-              </button>
-            ))}
-          </div>
+                <SlidersHorizontal className="w-3.5 h-3.5" />
+                Filtros
+                {(isActive.estado || isActive.curso || isActive.periodo) && (
+                  <span className="inline-flex items-center justify-center min-w-[16px] h-[16px] px-1 rounded bg-primary/10 text-primary text-[10px] font-bold tabular-nums">
+                    {[isActive.estado, isActive.curso, isActive.periodo].filter(Boolean).length}
+                  </span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent align="start" className="w-72 p-0">
+              <div className="flex items-center justify-between px-3 py-2 border-b">
+                {filterView === "root" ? (
+                  <span className="text-xs font-semibold text-foreground">Filtros</span>
+                ) : (
+                  <button onClick={() => setFilterView("root")} className="inline-flex items-center gap-1 text-xs font-semibold text-foreground hover:text-primary">
+                    <ChevronLeft className="w-3.5 h-3.5" />
+                    {filterView === "estado" && "Estado"}
+                    {filterView === "curso" && "Cursos"}
+                    {filterView === "periodo" && "Períodos"}
+                  </button>
+                )}
+                {(isActive.estado || isActive.curso || isActive.periodo) && (
+                  <button onClick={() => { setEstado("todos"); setCurso("todos"); setPeriodo("todos"); }} className="text-[10px] text-muted-foreground hover:text-foreground">
+                    Limpar
+                  </button>
+                )}
+              </div>
+
+              {filterView === "root" && (
+                <div className="p-1">
+                  <FilterRootRow icon={<AlertCircle className="w-3.5 h-3.5" />} label="Estado" value={isActive.estado ? estadoLabel(estado) : null} onClick={() => setFilterView("estado")} />
+                  <FilterRootRow icon={<GraduationCap className="w-3.5 h-3.5" />} label="Curso" value={curso === "todos" ? null : curso} onClick={() => setFilterView("curso")} />
+                  <FilterRootRow icon={<CalendarClock className="w-3.5 h-3.5" />} label="Período" value={periodo === "todos" ? null : periodo} onClick={() => setFilterView("periodo")} />
+                </div>
+              )}
+
+              {filterView === "estado" && (
+                <div className="p-1 max-h-72 overflow-y-auto">
+                  <div className="px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Ver todos os estados</div>
+                  {(["todos", "hoje", "pendentes", "aprovados", "reprovados", "pag_pendente"] as EstadoFilter[]).map(v => (
+                    <FilterOptionRow key={v} label={estadoLabel(v)} selected={estado === v} onClick={() => { setEstado(v); setFilterView("root"); }} />
+                  ))}
+                </div>
+              )}
+
+              {filterView === "curso" && (
+                <div className="p-1 max-h-72 overflow-y-auto">
+                  <FilterOptionRow label="Todos os cursos" selected={curso === "todos"} onClick={() => { setCurso("todos"); setFilterView("root"); }} />
+                  {cursos.map(c => (
+                    <FilterOptionRow key={c} label={c} selected={curso === c} onClick={() => { setCurso(c); setFilterView("root"); }} />
+                  ))}
+                </div>
+              )}
+
+              {filterView === "periodo" && (
+                <div className="p-1 max-h-72 overflow-y-auto">
+                  <FilterOptionRow label="Todos os períodos" selected={periodo === "todos"} onClick={() => { setPeriodo("todos"); setFilterView("root"); }} />
+                  {periodos.map(p => (
+                    <FilterOptionRow key={p} label={p} selected={periodo === p} onClick={() => { setPeriodo(p); setFilterView("root"); }} />
+                  ))}
+                </div>
+              )}
+            </PopoverContent>
+          </Popover>
+
+          {hasActiveControls && (
+            <Button variant="ghost" size="sm" onClick={resetAll} className="h-9 px-2.5 text-xs text-muted-foreground hover:text-foreground gap-1">
+              <X className="w-3 h-3" /> Limpar
+            </Button>
+          )}
+
           <div className="ml-auto text-[11px] text-muted-foreground tabular-nums whitespace-nowrap">
-            {filtered.length} de {candidaturas.length}
+            {filtered.length} de {counts.todos}
           </div>
         </div>
       </Card>
 
+      {/* Table */}
       <Card className="overflow-hidden">
-        {filtered.length === 0 ? (
-          <div className="p-12 text-center">
-            <ClipboardList className="w-10 h-10 text-muted-foreground/40 mx-auto mb-3" />
-            <p className="text-sm text-muted-foreground">Nenhuma candidatura encontrada</p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b bg-muted/30">
-                  <th className="text-left p-3 font-medium text-muted-foreground">Candidato</th>
-                  <th className="text-left p-3 font-medium text-muted-foreground">1ª Opção</th>
-                  <th className="text-left p-3 font-medium text-muted-foreground">Período</th>
-                  <th className="text-center p-3 font-medium text-muted-foreground">Submissão</th>
-                  <th className="text-center p-3 font-medium text-muted-foreground">Pagamento</th>
-                  <th className="text-center p-3 font-medium text-muted-foreground">Estado</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map(c => {
-                  const hoje = isToday(c.dataSubmissao);
-                  return (
-                    <tr
-                      key={c.id}
-                      onClick={() => navigate(`/gap/candidaturas/${c.id}`)}
-                      className="border-b last:border-0 hover:bg-muted/30 transition-colors cursor-pointer"
-                    >
-                      <td className="p-3">
-                        <div className="flex items-center gap-2">
-                          <p className="font-medium text-foreground leading-tight">{c.nome}</p>
-                          {hoje && <Badge variant="outline" className="text-[9px] bg-blue-50 text-blue-700 border-blue-200">HOJE</Badge>}
-                        </div>
-                        <p className="text-[11px] text-muted-foreground font-mono mt-0.5">{c.bi}</p>
-                      </td>
-                      <td className="p-3">
-                        <p className="text-xs text-foreground leading-tight">{c.cursoOpcao1}</p>
-                        {c.cursoOpcao2 && (
-                          <p className="text-[11px] text-muted-foreground mt-0.5">2ª: {c.cursoOpcao2}</p>
-                        )}
-                      </td>
-                      <td className="p-3">
-                        <p className="text-xs text-foreground leading-tight">{c.periodo}</p>
-                      </td>
-                      <td className="p-3 text-center whitespace-nowrap">
-                        <p className="text-xs text-foreground tabular-nums">
-                          {new Date(c.dataSubmissao).toLocaleDateString("pt-AO")}
-                        </p>
-                      </td>
-                      <td className="p-3 text-center">
-                        <Badge variant="outline" className={cn(
-                          "text-[10px]",
-                          c.pagamento?.estado === "confirmado"
-                            ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                            : "bg-amber-50 text-amber-700 border-amber-200",
-                        )}>
-                          {c.pagamento?.estado === "confirmado" ? "Confirmado" : "Pendente"}
-                        </Badge>
-                      </td>
-                      <td className="p-3 text-center">
-                        <Badge className={cn("border-0 text-[10px]", estadoColors[c.estado])}>
-                          {estadoLabels[c.estado]}
-                        </Badge>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b bg-muted/30">
+                <th className="text-left p-3 font-medium text-muted-foreground">ID Candidatura</th>
+                <th className="text-left p-3 font-medium text-muted-foreground">Candidato</th>
+                <th className="text-left p-3 font-medium text-muted-foreground">1ª Opção</th>
+                <th className="text-left p-3 font-medium text-muted-foreground">Período</th>
+                <th className="text-center p-3 font-medium text-muted-foreground whitespace-nowrap">Submissão</th>
+                <th className="text-center p-3 font-medium text-muted-foreground">Pagamento</th>
+                <th className="text-center p-3 font-medium text-muted-foreground">Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map(c => {
+                const d = new Date(c.dataSubmissao);
+                const hoje = c.dataSubmissao === TODAY;
+                const numCand = c.id.replace(/\D/g, "").padStart(4, "0");
+                return (
+                  <tr key={c.id}
+                    onClick={() => navigate(`/gap/candidaturas/${c.id}`)}
+                    className="border-b last:border-0 hover:bg-muted/30 transition-colors cursor-pointer">
+                    <td className="p-3">
+                      <span className="text-[10px] font-mono text-primary tabular-nums">#{numCand}</span>
+                    </td>
+                    <td className="p-3">
+                      <div className="flex items-center gap-2">
+                        <p className="font-medium text-foreground leading-tight">{c.nome}</p>
+                        {hoje && <Badge variant="outline" className="text-[9px] bg-blue-50 text-blue-700 border-blue-200">HOJE</Badge>}
+                      </div>
+                      <p className="text-[11px] text-muted-foreground font-mono mt-0.5">{c.bi}</p>
+                    </td>
+                    <td className="p-3">
+                      <p className="text-xs text-foreground leading-tight">{c.cursoOpcao1}</p>
+                      {c.cursoOpcao2 && <p className="text-[11px] text-muted-foreground mt-0.5">2ª: {c.cursoOpcao2}</p>}
+                    </td>
+                    <td className="p-3">
+                      <p className="text-xs text-foreground leading-tight">{c.periodo}</p>
+                    </td>
+                    <td className="p-3 text-center whitespace-nowrap">
+                      <p className="text-xs font-medium text-foreground">
+                        {d.toLocaleDateString("pt-AO", { day: "2-digit", month: "short", year: "numeric" })}
+                      </p>
+                    </td>
+                    <td className="p-3 text-center">
+                      <Badge variant="outline" className={cn(
+                        "text-[10px]",
+                        c.pagamento?.estado === "confirmado"
+                          ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                          : "bg-amber-50 text-amber-700 border-amber-200",
+                      )}>
+                        <Wallet className="w-2.5 h-2.5 mr-1" />
+                        {c.pagamento?.estado === "confirmado" ? "Confirmado" : "Pendente"}
+                      </Badge>
+                    </td>
+                    <td className="p-3 text-center">
+                      <span className={cn(
+                        "inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[10px] font-semibold",
+                        c.estado === "aprovado" && "bg-emerald-50 text-emerald-700 border-emerald-200",
+                        c.estado === "reprovado" && "bg-red-50 text-red-700 border-red-200",
+                        c.estado === "pendente" && "bg-amber-50 text-amber-700 border-amber-200",
+                      )}>
+                        <span className="relative flex h-1.5 w-1.5">
+                          {c.estado === "pendente" && <span className="absolute inset-0 rounded-full bg-amber-500 opacity-75 animate-ping" />}
+                          <span className={cn(
+                            "relative inline-flex h-1.5 w-1.5 rounded-full",
+                            c.estado === "aprovado" && "bg-emerald-500",
+                            c.estado === "reprovado" && "bg-destructive",
+                            c.estado === "pendente" && "bg-amber-500",
+                          )} />
+                        </span>
+                        {estadoLabels[c.estado]}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+        {filtered.length === 0 && <p className="text-center text-muted-foreground py-8 text-sm">Nenhuma candidatura encontrada.</p>}
       </Card>
     </div>
+  );
+}
+
+function FilterRootRow({ icon, label, value, onClick }: { icon: React.ReactNode; label: string; value: string | null; onClick: () => void }) {
+  return (
+    <button onClick={onClick} className="w-full flex items-center justify-between gap-2 px-2.5 py-2 rounded-md text-xs hover:bg-muted text-left">
+      <span className="flex items-center gap-2 min-w-0">
+        <span className="text-muted-foreground shrink-0">{icon}</span>
+        <span className="font-medium text-foreground">{label}</span>
+      </span>
+      <span className="flex items-center gap-1 text-muted-foreground shrink-0">
+        {value && <span className="text-[10px] text-primary font-medium truncate max-w-[110px]">{value}</span>}
+        <ChevronRight className="w-3.5 h-3.5" />
+      </span>
+    </button>
+  );
+}
+
+function FilterOptionRow({ label, selected, onClick }: { label: string; selected: boolean; onClick: () => void }) {
+  return (
+    <button onClick={onClick} className={cn("w-full flex items-center gap-2 px-2.5 py-2 rounded-md text-xs hover:bg-muted text-left", selected && "bg-primary/5")}>
+      {selected ? <Check className="w-3 h-3 text-primary shrink-0" /> : <span className="w-3 shrink-0" />}
+      <span className={cn("text-foreground", selected && "font-medium text-primary")}>{label}</span>
+    </button>
   );
 }
