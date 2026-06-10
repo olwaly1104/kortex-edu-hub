@@ -332,7 +332,7 @@ export default function GapCandidaturaDetail() {
                   )}
                   <span className={cn("truncate", h.done ? "text-foreground" : "text-muted-foreground")}>{h.accao}</span>
                   <span className={cn("ml-auto inline-flex items-center px-1.5 py-0.5 rounded border text-[9px] font-medium uppercase tracking-wide", etapaEstadoStyle[h.estado])}>
-                    {h.estado}
+                    {etapaEstadoLabel[h.estado]}
                   </span>
                   <span className="text-[10px] text-muted-foreground tabular-nums">
                     {new Date(h.data).toLocaleDateString("pt-AO")}
