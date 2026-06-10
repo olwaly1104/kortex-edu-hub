@@ -113,7 +113,7 @@ const etapaEstadoStyle: Record<EtapaEstado, string> = {
   pendente: "bg-amber-50 text-amber-700 border-amber-200",
 };
 
-const etapaEstadoLabel: Record<EtapaEstado, string> = {
+export const etapaEstadoLabel: Record<EtapaEstado, string> = {
   completo: "completo", aprovado: "aprovado", pago: "pago",
   agendado: "agendado", em_progresso: "em progresso",
   remarcado: "remarcado", falta: "falta", reprovado: "reprovado", pendente: "pendente",
