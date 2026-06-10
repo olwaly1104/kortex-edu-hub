@@ -278,7 +278,7 @@ export default function GapCandidaturas() {
               {filterView === "estado" && (
                 <div className="p-1 max-h-72 overflow-y-auto">
                   <div className="px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Ver todos os estados</div>
-                  {(["todos", "hoje", "pendentes", "aprovados", "reprovados", "pag_pendente"] as EstadoFilter[]).map(v => (
+                  {(["todos", "hoje", "pendentes", "aprovados", "reprovados"] as EstadoFilter[]).map(v => (
                     <FilterOptionRow key={v} label={estadoLabel(v)} selected={estado === v} onClick={() => { setEstado(v); setFilterView("root"); }} />
                   ))}
                 </div>
