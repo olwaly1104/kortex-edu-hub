@@ -99,16 +99,24 @@ function buildSteps(c: typeof candidaturas[number]): StepDef[] {
   ];
 }
 
-type EtapaEstado = "completo" | "agendado" | "remarcado" | "falta" | "aprovado" | "reprovado" | "pendente";
+type EtapaEstado = "completo" | "agendado" | "remarcado" | "falta" | "aprovado" | "reprovado" | "pendente" | "em_progresso" | "pago";
 
 const etapaEstadoStyle: Record<EtapaEstado, string> = {
   completo: "bg-green-50 text-green-700 border-green-200",
   aprovado: "bg-green-50 text-green-700 border-green-200",
+  pago: "bg-green-50 text-green-700 border-green-200",
   agendado: "bg-blue-50 text-blue-700 border-blue-200",
+  em_progresso: "bg-blue-50 text-blue-700 border-blue-200",
   remarcado: "bg-amber-50 text-amber-700 border-amber-200",
   falta: "bg-red-50 text-red-700 border-red-200",
   reprovado: "bg-red-50 text-red-700 border-red-200",
   pendente: "bg-amber-50 text-amber-700 border-amber-200",
+};
+
+const etapaEstadoLabel: Record<EtapaEstado, string> = {
+  completo: "completo", aprovado: "aprovado", pago: "pago",
+  agendado: "agendado", em_progresso: "em progresso",
+  remarcado: "remarcado", falta: "falta", reprovado: "reprovado", pendente: "pendente",
 };
 
 function pick<T>(seed: number, arr: T[]): T { return arr[seed % arr.length]; }
