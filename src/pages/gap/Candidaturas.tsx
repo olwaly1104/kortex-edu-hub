@@ -326,56 +326,49 @@ export default function GapCandidaturas() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b bg-muted/30">
-                <th className="text-left p-3 font-medium text-muted-foreground">ID Candidatura</th>
-                <th className="text-left p-3 font-medium text-muted-foreground">Candidato</th>
+                <th className="text-left p-3 font-medium text-muted-foreground">ID Candidato</th>
+                <th className="text-center p-3 font-medium text-muted-foreground whitespace-nowrap">Data de Submissão</th>
                 <th className="text-left p-3 font-medium text-muted-foreground">1ª Opção</th>
-                <th className="text-left p-3 font-medium text-muted-foreground">Período</th>
-                <th className="text-center p-3 font-medium text-muted-foreground whitespace-nowrap">Submissão</th>
-                <th className="text-center p-3 font-medium text-muted-foreground">Pagamento</th>
+                <th className="text-left p-3 font-medium text-muted-foreground">Etapa</th>
                 <th className="text-center p-3 font-medium text-muted-foreground">Estado</th>
               </tr>
             </thead>
             <tbody>
               {filtered.map(c => {
                 const d = new Date(c.dataSubmissao);
-                const hoje = c.dataSubmissao === TODAY;
                 const numCand = c.id.replace(/\D/g, "").padStart(4, "0");
+                const anoCand = d.getFullYear();
+                const displayId = `CAND-${anoCand}-${numCand}`;
+                const cron = buildCronologia(c);
+                // Current etapa = last entry where done, or first not-done
+                const lastDoneIdx = cron.reduce((acc, h, i) => (h.done ? i : acc), -1);
+                const currentIdx = lastDoneIdx < cron.length - 1 ? lastDoneIdx + 1 : lastDoneIdx;
+                const etapa = cron[Math.max(0, currentIdx)];
                 return (
                   <tr key={c.id}
                     onClick={() => navigate(`/gap/candidaturas/${c.id}`)}
                     className="border-b last:border-0 hover:bg-muted/30 transition-colors cursor-pointer">
                     <td className="p-3">
-                      <span className="text-[10px] font-mono text-primary tabular-nums">#{numCand}</span>
+                      <p className="font-medium text-foreground text-sm leading-tight">{c.nome}</p>
+                      <p className="text-[10px] font-mono text-primary tabular-nums mt-0.5">{displayId}</p>
                     </td>
-                    <td className="p-3">
-                      <div className="flex items-center gap-2">
-                        <p className="font-medium text-foreground leading-tight">{c.nome}</p>
-                        {hoje && <Badge variant="outline" className="text-[9px] bg-blue-50 text-blue-700 border-blue-200">HOJE</Badge>}
-                      </div>
-                      <p className="text-[11px] text-muted-foreground font-mono mt-0.5">{c.bi}</p>
+                    <td className="p-3 text-center whitespace-nowrap">
+                      <p className="text-xs font-medium text-foreground tabular-nums">
+                        {d.toLocaleDateString("pt-AO", { day: "2-digit", month: "short", year: "numeric" })}
+                      </p>
                     </td>
                     <td className="p-3">
                       <p className="text-xs text-foreground leading-tight">{c.cursoOpcao1}</p>
                       {c.cursoOpcao2 && <p className="text-[11px] text-muted-foreground mt-0.5">2ª: {c.cursoOpcao2}</p>}
                     </td>
                     <td className="p-3">
-                      <p className="text-xs text-foreground leading-tight">{c.periodo}</p>
-                    </td>
-                    <td className="p-3 text-center whitespace-nowrap">
-                      <p className="text-xs font-medium text-foreground">
-                        {d.toLocaleDateString("pt-AO", { day: "2-digit", month: "short", year: "numeric" })}
-                      </p>
-                    </td>
-                    <td className="p-3 text-center">
-                      <Badge variant="outline" className={cn(
-                        "text-[10px]",
-                        c.pagamento?.estado === "confirmado"
-                          ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                          : "bg-amber-50 text-amber-700 border-amber-200",
+                      <span className="text-xs text-foreground">{etapa.accao}</span>
+                      <span className={cn(
+                        "ml-2 inline-flex items-center px-1.5 py-0.5 rounded border text-[9px] font-medium uppercase tracking-wide",
+                        etapaEstadoStyle[etapa.estado],
                       )}>
-                        <Wallet className="w-2.5 h-2.5 mr-1" />
-                        {c.pagamento?.estado === "confirmado" ? "Confirmado" : "Pendente"}
-                      </Badge>
+                        {etapaEstadoLabel[etapa.estado]}
+                      </span>
                     </td>
                     <td className="p-3 text-center">
                       <span className={cn(
