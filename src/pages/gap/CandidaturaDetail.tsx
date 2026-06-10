@@ -157,6 +157,16 @@ function buildCronologia(c: typeof candidaturas[number]) {
     ? pick(seed + 1, ["aprovado", "reprovado", "remarcado"] as EtapaEstado[])
     : "agendado";
   const exDone = exameEstado === "aprovado" || exameEstado === "reprovado";
+  const exAprovado = exameEstado === "aprovado";
+
+  const matricula = new Date(sub.getTime() + 75 * 86400000);
+  const matriculaEstado: EtapaEstado = exAprovado && matricula <= today
+    ? pick(seed + 2, ["completo", "completo", "agendado"] as EtapaEstado[])
+    : "agendado";
+  const matDone = matriculaEstado === "completo";
+  const matDetalhe = matDone
+    ? "Pago — Taxa de matrícula confirmada"
+    : exAprovado ? "Aguarda pagamento da matrícula" : "Disponível após aprovação no exame";
 
   return [
     { data: sub.toISOString(), accao: "Candidatura submetida", detalhe: "Formulário online preenchido pelo candidato", done: sub <= today, estado: "completo" as EtapaEstado },
@@ -164,6 +174,7 @@ function buildCronologia(c: typeof candidaturas[number]) {
     { data: entrevista.toISOString(), accao: "Entrevista", detalhe: "Realizada — Sala de Entrevistas, Campus UPRA", done: entDone, estado: entrevistaEstado },
     { data: cursoPrep.toISOString(), accao: "Curso Preparatório", detalhe: "Inscrito — 1ª Sessão (Anfiteatro A)", done: cpDone, estado: cursoPrepEstado },
     { data: exame.toISOString(), accao: "Exame de Acesso", detalhe: "Marcado — Edifício Central, Sala 04", done: exDone, estado: exameEstado },
+    { data: matricula.toISOString(), accao: "Pagamento da matrícula", detalhe: matDetalhe, done: matDone, estado: matriculaEstado },
   ];
 }
 
