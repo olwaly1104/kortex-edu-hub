@@ -17,7 +17,7 @@ import { buildCronologia, etapaEstadoStyle, etapaEstadoLabel } from "./Candidatu
 
 const TODAY = "2025-01-15";
 
-type EstadoFilter = "todos" | "hoje" | "pendentes" | "aprovados" | "reprovados" | "pag_pendente";
+type EstadoFilter = "todos" | "hoje" | "pendentes" | "aprovados" | "reprovados";
 type CursoFilter = string | "todos";
 type PeriodoFilter = string | "todos";
 
