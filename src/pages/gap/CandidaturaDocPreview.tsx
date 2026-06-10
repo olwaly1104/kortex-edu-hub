@@ -16,7 +16,7 @@ const sharedWith: { name: string; role: string; access: "Visualizar" | "Editar" 
   { name: "Sara Vieira", role: "Académica", access: "Visualizar" },
 ];
 
-type EtapaEstado = "completo" | "agendado" | "remarcado" | "falta" | "aprovado" | "reprovado";
+type EtapaEstado = "completo" | "agendado" | "remarcado" | "falta" | "aprovado" | "reprovado" | "pendente";
 
 type Props = {
   candidatura: Candidatura;
@@ -33,6 +33,7 @@ const etapaEstadoCls: Record<EtapaEstado, string> = {
   remarcado: "bg-amber-50 text-amber-700 border-amber-300",
   falta: "bg-red-50 text-red-700 border-red-300",
   reprovado: "bg-red-50 text-red-700 border-red-300",
+  pendente: "bg-amber-50 text-amber-700 border-amber-300",
 };
 
 const fmtDataLong = (d: Date) =>
