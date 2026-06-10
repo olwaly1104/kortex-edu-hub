@@ -121,7 +121,7 @@ const etapaEstadoLabel: Record<EtapaEstado, string> = {
 
 function pick<T>(seed: number, arr: T[]): T { return arr[seed % arr.length]; }
 
-function buildCronologia(c: typeof candidaturas[number]) {
+export function buildCronologia(c: typeof candidaturas[number]) {
   const sub = new Date(c.dataSubmissao);
   const today = new Date();
   const entrevista = new Date(sub.getTime() + 12 * 86400000);
