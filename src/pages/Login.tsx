@@ -1,13 +1,14 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Eye, EyeOff, Globe, KeyRound } from "lucide-react";
+import { Eye, EyeOff, Globe, KeyRound, UserPlus, Loader2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
 import logoUpra from "@/assets/logo-upra.asset.json";
+import { supabase } from "@/integrations/supabase/client";
 
 const DEMO_PASSWORD = "olwaly";
 const DEMO_ACCOUNTS: { role: string; email: string }[] = [
