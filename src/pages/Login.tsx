@@ -110,35 +110,6 @@ export default function Login() {
                 onChange={(e) => setEmail(e.target.value)}
                 className="h-11"
               />
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button type="button" variant="outline" size="sm" className="w-full gap-2 mt-1">
-                    <KeyRound className="w-4 h-4" /> Ver credenciais de demo
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-md">
-                  <DialogHeader>
-                    <DialogTitle>Credenciais de demonstração</DialogTitle>
-                    <DialogDescription>
-                      Palavra-passe para todos os perfis: <span className="font-mono font-semibold text-foreground">{DEMO_PASSWORD}</span>
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="max-h-80 overflow-y-auto divide-y rounded-md border">
-                    {DEMO_ACCOUNTS.map((a) => (
-                      <button
-                        key={a.email}
-                        type="button"
-                        onClick={() => { setEmail(a.email); setPassword(DEMO_PASSWORD); }}
-                        className="w-full text-left px-3 py-2 hover:bg-muted transition-colors"
-                      >
-                        <div className="text-sm font-medium text-foreground">{a.role}</div>
-                        <div className="text-xs text-muted-foreground font-mono">{a.email}</div>
-                      </button>
-                    ))}
-                  </div>
-                  <p className="text-xs text-muted-foreground">Clique numa conta para preencher automaticamente.</p>
-                </DialogContent>
-              </Dialog>
             </div>
 
             <div className="space-y-2">
@@ -187,11 +158,26 @@ export default function Login() {
             </Button>
           </form>
 
-          <div className="mt-8 text-center">
+          <div className="mt-6 text-center space-y-2">
             <p className="text-xs text-muted-foreground">
               Use o seu email institucional terminado em <span className="font-medium">.kor</span>.
             </p>
-          </div>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button type="button" variant="outline" size="sm" className="gap-2">
+                  <KeyRound className="w-4 h-4" /> Ver credenciais de demo
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Credenciais de demonstração</DialogTitle>
+                  <DialogDescription>
+                    Palavra-passe para todos os perfis: <span className="font-mono font-semibold text-foreground">{DEMO_PASSWORD}</span>
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="max-h-80 overflow-y-auto divide-y rounded-md border">
+                  {DEMO_ACCOUNTS.map((a) => (
+ with your email or password.
         </div>
       </div>
     </div>
