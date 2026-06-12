@@ -38,7 +38,7 @@ export default function StudentChat() {
   const [message, setMessage] = useState("");
   const [tab, setTab] = useState<Tab>("chats");
   const [localMessages, setLocalMessages] = useState<LocalMessage[]>(chatMessages as LocalMessage[]);
-  const [call, setCall] = useState<CallState>({ open: false, name: "", medium: "voice" });
+  const [call, setCall] = useState<CallState>({ open: false, name: "", medium: "voice", phase: "ringing" });
   const [callSeconds, setCallSeconds] = useState(0);
   const [muted, setMuted] = useState(false);
   const [camOff, setCamOff] = useState(false);
