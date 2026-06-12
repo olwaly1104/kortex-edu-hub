@@ -368,38 +368,42 @@ export default function DespesaDetail() {
                 <dd className="font-medium text-foreground">{fmtDateLong(despesa.date)}</dd>
               </div>
               <Separator />
-              <div>
-                <dt className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Solicitado por</dt>
-                <div className="flex items-start justify-between gap-2">
-                  <div className="min-w-0">
-                    <dd className="font-medium text-foreground truncate">{despesa.requestedBy || "—"}</dd>
-                    {despesa.requesterRole && (
-                      <dd className="text-xs text-muted-foreground truncate">{despesa.requesterRole}</dd>
-                    )}
-                  </div>
-                  {despesa.requestedBy && (
-                    <div className="flex items-center gap-1 shrink-0">
-                      <button
-                        type="button"
-                        onClick={() => toast({ title: "Conversa aberta", description: `Chat com ${despesa.requestedBy}` })}
-                        className="w-7 h-7 rounded-md inline-flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-                        title={`Chat com ${despesa.requestedBy}`}
-                      >
-                        <MessageSquare className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => toast({ title: "Email", description: `Compor email para ${despesa.requestedBy}` })}
-                        className="w-7 h-7 rounded-md inline-flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-                        title={`Email a ${despesa.requestedBy}`}
-                      >
-                        <Mail className="w-3.5 h-3.5" />
-                      </button>
+              {despesa.category !== "Salários" && (
+                <>
+                  <div>
+                    <dt className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Solicitado por</dt>
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <dd className="font-medium text-foreground truncate">{despesa.requestedBy || "—"}</dd>
+                        {despesa.requesterRole && (
+                          <dd className="text-xs text-muted-foreground truncate">{despesa.requesterRole}</dd>
+                        )}
+                      </div>
+                      {despesa.requestedBy && (
+                        <div className="flex items-center gap-1 shrink-0">
+                          <button
+                            type="button"
+                            onClick={() => toast({ title: "Conversa aberta", description: `Chat com ${despesa.requestedBy}` })}
+                            className="w-7 h-7 rounded-md inline-flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                            title={`Chat com ${despesa.requestedBy}`}
+                          >
+                            <MessageSquare className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => toast({ title: "Email", description: `Compor email para ${despesa.requestedBy}` })}
+                            className="w-7 h-7 rounded-md inline-flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                            title={`Email a ${despesa.requestedBy}`}
+                          >
+                            <Mail className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-              </div>
-              <Separator />
+                  </div>
+                  <Separator />
+                </>
+              )}
               <div>
                 <dt className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Responsável</dt>
                 <div className="flex items-start justify-between gap-2">
