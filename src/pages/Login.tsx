@@ -26,27 +26,87 @@ const DEMO_ACCOUNTS: { role: string; email: string }[] = [
 
 export default function Login() {
   const { login } = useAuth();
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [remember, setRemember] = useState(false);
   const [error, setError] = useState("");
+  const [info, setInfo] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Signup dialog state
+  const [signupOpen, setSignupOpen] = useState(false);
+  const [suName, setSuName] = useState("");
+  const [suEmail, setSuEmail] = useState("");
+  const [suPassword, setSuPassword] = useState("");
+  const [suError, setSuError] = useState("");
+  const [suLoading, setSuLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setInfo("");
     if (!email || !password) {
       setError("Por favor preencha todos os campos.");
       return;
     }
-    if (!email.endsWith(".kor")) {
-      setError("Email deve terminar em .kor");
+    setSubmitting(true);
+    try {
+      // Demo accounts: .kor emails go through the local mock auth
+      if (email.endsWith(".kor")) {
+        const result = login(email, password);
+        if (!result.ok) {
+          setError(result.error || "Não foi possível iniciar sessão.");
+        }
+        return;
+      }
+      // Cloud accounts: try Supabase
+      const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+      if (signInError) {
+        setError(signInError.message || "Credenciais inválidas.");
+        return;
+      }
+      // Open a local Estudante session so the app shell loads, then jump to chat
+      login("2934@upra.kor", "olwaly");
+      navigate("/student/chat");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleSignup = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSuError("");
+    if (!suName.trim() || !suEmail.trim() || !suPassword) {
+      setSuError("Preencha todos os campos.");
       return;
     }
-    const result = login(email, password);
-    if (!result.ok) {
-      setError(result.error || "Não foi possível iniciar sessão.");
+    if (suPassword.length < 6) {
+      setSuError("Palavra-passe deve ter pelo menos 6 caracteres.");
+      return;
     }
+    setSuLoading(true);
+    const { error: signUpError } = await supabase.auth.signUp({
+      email: suEmail.trim(),
+      password: suPassword,
+      options: {
+        data: { display_name: suName.trim() },
+        emailRedirectTo: `${window.location.origin}/student/chat`,
+      },
+    });
+    setSuLoading(false);
+    if (signUpError) {
+      setSuError(signUpError.message || "Não foi possível criar conta.");
+      return;
+    }
+    setSignupOpen(false);
+    setEmail(suEmail.trim());
+    setPassword(suPassword);
+    setInfo("Conta criada. Inicie sessão para entrar no chat.");
+    setSuName("");
+    setSuEmail("");
+    setSuPassword("");
   };
 
   return (
