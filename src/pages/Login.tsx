@@ -1,13 +1,14 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Eye, EyeOff, Globe, KeyRound } from "lucide-react";
+import { Eye, EyeOff, Globe, KeyRound, UserPlus, Loader2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
 import logoUpra from "@/assets/logo-upra.asset.json";
+import { supabase } from "@/integrations/supabase/client";
 
 const DEMO_PASSWORD = "olwaly";
 const DEMO_ACCOUNTS: { role: string; email: string }[] = [
@@ -25,27 +26,87 @@ const DEMO_ACCOUNTS: { role: string; email: string }[] = [
 
 export default function Login() {
   const { login } = useAuth();
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [remember, setRemember] = useState(false);
   const [error, setError] = useState("");
+  const [info, setInfo] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Signup dialog state
+  const [signupOpen, setSignupOpen] = useState(false);
+  const [suName, setSuName] = useState("");
+  const [suEmail, setSuEmail] = useState("");
+  const [suPassword, setSuPassword] = useState("");
+  const [suError, setSuError] = useState("");
+  const [suLoading, setSuLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setInfo("");
     if (!email || !password) {
       setError("Por favor preencha todos os campos.");
       return;
     }
-    if (!email.endsWith(".kor")) {
-      setError("Email deve terminar em .kor");
+    setSubmitting(true);
+    try {
+      // Demo accounts: .kor emails go through the local mock auth
+      if (email.endsWith(".kor")) {
+        const result = login(email, password);
+        if (!result.ok) {
+          setError(result.error || "Não foi possível iniciar sessão.");
+        }
+        return;
+      }
+      // Cloud accounts: try Supabase
+      const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+      if (signInError) {
+        setError(signInError.message || "Credenciais inválidas.");
+        return;
+      }
+      // Open a local Estudante session so the app shell loads, then jump to chat
+      login("2934@upra.kor", "olwaly");
+      navigate("/student/chat");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleSignup = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSuError("");
+    if (!suName.trim() || !suEmail.trim() || !suPassword) {
+      setSuError("Preencha todos os campos.");
       return;
     }
-    const result = login(email, password);
-    if (!result.ok) {
-      setError(result.error || "Não foi possível iniciar sessão.");
+    if (suPassword.length < 6) {
+      setSuError("Palavra-passe deve ter pelo menos 6 caracteres.");
+      return;
     }
+    setSuLoading(true);
+    const { error: signUpError } = await supabase.auth.signUp({
+      email: suEmail.trim(),
+      password: suPassword,
+      options: {
+        data: { display_name: suName.trim() },
+        emailRedirectTo: `${window.location.origin}/student/chat`,
+      },
+    });
+    setSuLoading(false);
+    if (signUpError) {
+      setSuError(signUpError.message || "Não foi possível criar conta.");
+      return;
+    }
+    setSignupOpen(false);
+    setEmail(suEmail.trim());
+    setPassword(suPassword);
+    setInfo("Conta criada. Inicie sessão para entrar no chat.");
+    setSuName("");
+    setSuEmail("");
+    setSuPassword("");
   };
 
   return (
@@ -152,45 +213,86 @@ export default function Login() {
             {error && (
               <p className="text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-md">{error}</p>
             )}
+            {info && !error && (
+              <p className="text-sm text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-2 rounded-md">{info}</p>
+            )}
 
-            <Button type="submit" className="w-full h-11 text-base font-semibold">
-              Entrar
+            <Button type="submit" disabled={submitting} className="w-full h-11 text-base font-semibold">
+              {submitting ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> A entrar...</> : "Entrar"}
             </Button>
           </form>
 
           <div className="mt-6 text-center space-y-2">
             <p className="text-xs text-muted-foreground">
-              Use o seu email institucional terminado em <span className="font-medium">.kor</span>.
+              Email <span className="font-medium">.kor</span> para perfis demo, ou crie uma conta Cloud para testar o chat em tempo real.
             </p>
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button type="button" variant="outline" size="sm" className="gap-2">
-                  <KeyRound className="w-4 h-4" /> Ver credenciais de demo
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-md">
-                <DialogHeader>
-                  <DialogTitle>Credenciais de demonstração</DialogTitle>
-                  <DialogDescription>
-                    Palavra-passe para todos os perfis: <span className="font-mono font-semibold text-foreground">{DEMO_PASSWORD}</span>
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="max-h-80 overflow-y-auto divide-y rounded-md border">
-                  {DEMO_ACCOUNTS.map((a) => (
-                    <button
-                      key={a.email}
-                      type="button"
-                      onClick={() => { setEmail(a.email); setPassword(DEMO_PASSWORD); }}
-                      className="w-full text-left px-3 py-2 hover:bg-muted transition-colors"
-                    >
-                      <div className="text-sm font-medium text-foreground">{a.role}</div>
-                      <div className="text-xs text-muted-foreground font-mono">{a.email}</div>
-                    </button>
-                  ))}
-                </div>
-                <p className="text-xs text-muted-foreground">Clique numa conta para preencher automaticamente.</p>
-              </DialogContent>
-            </Dialog>
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button type="button" variant="outline" size="sm" className="gap-2">
+                    <KeyRound className="w-4 h-4" /> Ver credenciais de demo
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Credenciais de demonstração</DialogTitle>
+                    <DialogDescription>
+                      Palavra-passe para todos os perfis: <span className="font-mono font-semibold text-foreground">{DEMO_PASSWORD}</span>
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="max-h-80 overflow-y-auto divide-y rounded-md border">
+                    {DEMO_ACCOUNTS.map((a) => (
+                      <button
+                        key={a.email}
+                        type="button"
+                        onClick={() => { setEmail(a.email); setPassword(DEMO_PASSWORD); }}
+                        className="w-full text-left px-3 py-2 hover:bg-muted transition-colors"
+                      >
+                        <div className="text-sm font-medium text-foreground">{a.role}</div>
+                        <div className="text-xs text-muted-foreground font-mono">{a.email}</div>
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-xs text-muted-foreground">Clique numa conta para preencher automaticamente.</p>
+                </DialogContent>
+              </Dialog>
+
+              <Dialog open={signupOpen} onOpenChange={setSignupOpen}>
+                <DialogTrigger asChild>
+                  <Button type="button" variant="default" size="sm" className="gap-2">
+                    <UserPlus className="w-4 h-4" /> Criar conta
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Criar conta Cloud</DialogTitle>
+                    <DialogDescription>
+                      Conta real ligada à Lovable Cloud — usada para testar o chat em tempo real entre 2 utilizadores.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <form onSubmit={handleSignup} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="su-name">Nome a apresentar</Label>
+                      <Input id="su-name" value={suName} onChange={(e) => setSuName(e.target.value)} placeholder="Ex: Maria Santos" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="su-email">Email</Label>
+                      <Input id="su-email" type="email" value={suEmail} onChange={(e) => setSuEmail(e.target.value)} placeholder="exemplo@teste.com" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="su-password">Palavra-passe (mín. 6)</Label>
+                      <Input id="su-password" type="password" value={suPassword} onChange={(e) => setSuPassword(e.target.value)} placeholder="••••••••" />
+                    </div>
+                    {suError && (
+                      <p className="text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-md">{suError}</p>
+                    )}
+                    <Button type="submit" disabled={suLoading} className="w-full">
+                      {suLoading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> A criar...</> : "Criar conta"}
+                    </Button>
+                  </form>
+                </DialogContent>
+              </Dialog>
+            </div>
           </div>
         </div>
       </div>
