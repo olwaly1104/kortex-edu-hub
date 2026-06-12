@@ -16,6 +16,7 @@ import { despesas, formatCurrency } from "@/data/financeModuleData";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import DespesaDocPreview from "./DespesaDocPreview";
+import facturaAsset from "@/assets/fatura-maio-cepou.pdf.asset.json";
 
 const statusConfig: Record<string, { label: string; cls: string; icon: any }> = {
   aprovada: { label: "Aprovada", cls: "bg-accent/15 text-accent border-accent/30", icon: CheckCircle2 },
