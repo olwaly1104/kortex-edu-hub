@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, Outlet, useLocation } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import Login from "./pages/Login";
 import Website from "./pages/Website";
@@ -174,6 +174,30 @@ const homeRedirectMap: Record<string, string> = {
   academica2: "/areaacademica",
 };
 
+// Maps a URL prefix to the role(s) allowed to access it.
+const pathRoleMap: Array<{ prefix: string; roles: string[] }> = [
+  { prefix: "/student", roles: ["student"] },
+  { prefix: "/professor", roles: ["professor"] },
+  { prefix: "/coordenador", roles: ["coordenador_curso"] },
+  { prefix: "/decano", roles: ["decano"] },
+  { prefix: "/reitor", roles: ["reitor"] },
+  { prefix: "/secretaria", roles: ["secretaria"] },
+  { prefix: "/financas", roles: ["financas"] },
+  { prefix: "/gap", roles: ["gap"] },
+  { prefix: "/inscricoes", roles: ["inscricoes"] },
+  { prefix: "/areaacademica", roles: ["academica2"] },
+];
+
+function RoleGuardedLayout({ homeRedirect }: { homeRedirect: string }) {
+  const { user } = useAuth();
+  const location = useLocation();
+  const match = pathRoleMap.find((entry) => location.pathname.startsWith(entry.prefix));
+  if (match && user && !match.roles.includes(user.role)) {
+    return <Navigate to={homeRedirect} replace />;
+  }
+  return <AppLayout />;
+}
+
 function AppRoutes() {
   const { isAuthenticated, user } = useAuth();
   if (!isAuthenticated) return <Routes><Route path="/site" element={<Website />} /><Route path="/candidatar" element={<Candidatar />} /><Route path="*" element={<Login />} /></Routes>;
@@ -182,7 +206,7 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<Navigate to={homeRedirect} replace />} />
-      <Route element={<AppLayout />}>
+      <Route element={<RoleGuardedLayout homeRedirect={homeRedirect} />}>
         {/* Student */}
         <Route path="/student" element={<StudentDashboard />} />
         <Route path="/student/disciplines" element={<StudentDisciplines />} />
