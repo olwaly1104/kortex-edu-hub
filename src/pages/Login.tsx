@@ -213,45 +213,86 @@ export default function Login() {
             {error && (
               <p className="text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-md">{error}</p>
             )}
+            {info && !error && (
+              <p className="text-sm text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-2 rounded-md">{info}</p>
+            )}
 
-            <Button type="submit" className="w-full h-11 text-base font-semibold">
-              Entrar
+            <Button type="submit" disabled={submitting} className="w-full h-11 text-base font-semibold">
+              {submitting ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> A entrar...</> : "Entrar"}
             </Button>
           </form>
 
           <div className="mt-6 text-center space-y-2">
             <p className="text-xs text-muted-foreground">
-              Use o seu email institucional terminado em <span className="font-medium">.kor</span>.
+              Email <span className="font-medium">.kor</span> para perfis demo, ou crie uma conta Cloud para testar o chat em tempo real.
             </p>
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button type="button" variant="outline" size="sm" className="gap-2">
-                  <KeyRound className="w-4 h-4" /> Ver credenciais de demo
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-md">
-                <DialogHeader>
-                  <DialogTitle>Credenciais de demonstração</DialogTitle>
-                  <DialogDescription>
-                    Palavra-passe para todos os perfis: <span className="font-mono font-semibold text-foreground">{DEMO_PASSWORD}</span>
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="max-h-80 overflow-y-auto divide-y rounded-md border">
-                  {DEMO_ACCOUNTS.map((a) => (
-                    <button
-                      key={a.email}
-                      type="button"
-                      onClick={() => { setEmail(a.email); setPassword(DEMO_PASSWORD); }}
-                      className="w-full text-left px-3 py-2 hover:bg-muted transition-colors"
-                    >
-                      <div className="text-sm font-medium text-foreground">{a.role}</div>
-                      <div className="text-xs text-muted-foreground font-mono">{a.email}</div>
-                    </button>
-                  ))}
-                </div>
-                <p className="text-xs text-muted-foreground">Clique numa conta para preencher automaticamente.</p>
-              </DialogContent>
-            </Dialog>
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button type="button" variant="outline" size="sm" className="gap-2">
+                    <KeyRound className="w-4 h-4" /> Ver credenciais de demo
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Credenciais de demonstração</DialogTitle>
+                    <DialogDescription>
+                      Palavra-passe para todos os perfis: <span className="font-mono font-semibold text-foreground">{DEMO_PASSWORD}</span>
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="max-h-80 overflow-y-auto divide-y rounded-md border">
+                    {DEMO_ACCOUNTS.map((a) => (
+                      <button
+                        key={a.email}
+                        type="button"
+                        onClick={() => { setEmail(a.email); setPassword(DEMO_PASSWORD); }}
+                        className="w-full text-left px-3 py-2 hover:bg-muted transition-colors"
+                      >
+                        <div className="text-sm font-medium text-foreground">{a.role}</div>
+                        <div className="text-xs text-muted-foreground font-mono">{a.email}</div>
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-xs text-muted-foreground">Clique numa conta para preencher automaticamente.</p>
+                </DialogContent>
+              </Dialog>
+
+              <Dialog open={signupOpen} onOpenChange={setSignupOpen}>
+                <DialogTrigger asChild>
+                  <Button type="button" variant="default" size="sm" className="gap-2">
+                    <UserPlus className="w-4 h-4" /> Criar conta
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Criar conta Cloud</DialogTitle>
+                    <DialogDescription>
+                      Conta real ligada à Lovable Cloud — usada para testar o chat em tempo real entre 2 utilizadores.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <form onSubmit={handleSignup} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="su-name">Nome a apresentar</Label>
+                      <Input id="su-name" value={suName} onChange={(e) => setSuName(e.target.value)} placeholder="Ex: Maria Santos" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="su-email">Email</Label>
+                      <Input id="su-email" type="email" value={suEmail} onChange={(e) => setSuEmail(e.target.value)} placeholder="exemplo@teste.com" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="su-password">Palavra-passe (mín. 6)</Label>
+                      <Input id="su-password" type="password" value={suPassword} onChange={(e) => setSuPassword(e.target.value)} placeholder="••••••••" />
+                    </div>
+                    {suError && (
+                      <p className="text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-md">{suError}</p>
+                    )}
+                    <Button type="submit" disabled={suLoading} className="w-full">
+                      {suLoading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> A criar...</> : "Criar conta"}
+                    </Button>
+                  </form>
+                </DialogContent>
+              </Dialog>
+            </div>
           </div>
         </div>
       </div>
