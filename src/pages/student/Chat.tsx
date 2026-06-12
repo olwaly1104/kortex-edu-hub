@@ -236,8 +236,8 @@ export default function StudentChat() {
                     onEmojiClick={(e) => { setMessage(m => m + e.emoji); }}
                     emojiStyle={EmojiStyle.NATIVE}
                     theme={Theme.AUTO}
-                    width={320}
-                    height={380}
+                    width={360}
+                    height={420}
                     searchPlaceHolder="Pesquisar emoji..."
                     previewConfig={{ showPreview: false }}
                   />
