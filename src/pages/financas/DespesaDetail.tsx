@@ -16,6 +16,7 @@ import { despesas, formatCurrency } from "@/data/financeModuleData";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import DespesaDocPreview from "./DespesaDocPreview";
+import facturaAsset from "@/assets/fatura-maio-cepou.pdf.asset.json";
 
 const statusConfig: Record<string, { label: string; cls: string; icon: any }> = {
   aprovada: { label: "Aprovada", cls: "bg-accent/15 text-accent border-accent/30", icon: CheckCircle2 },
@@ -250,59 +251,101 @@ export default function DespesaDetail() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Timeline */}
-        <Card className="lg:col-span-2 p-6">
-          <div className="flex items-center justify-between mb-5">
-            <h2 className="font-semibold text-foreground flex items-center gap-2">
-              <Clock className="w-4 h-4 text-primary" /> Histórico do Pedido
-            </h2>
-            <span className="text-xs text-muted-foreground">{steps.length} etapas</span>
+        <Card className="lg:col-span-2 p-0 overflow-hidden">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-gradient-to-r from-primary/[0.04] to-transparent">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                <Clock className="w-4 h-4 text-primary" />
+              </div>
+              <div>
+                <h2 className="font-semibold text-sm text-foreground leading-tight">Histórico do Pedido</h2>
+                <p className="text-[11px] text-muted-foreground mt-0.5">Cronologia completa da despesa</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="text-right">
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Progresso</p>
+                <p className="text-xs font-semibold text-foreground tabular-nums">
+                  {steps.filter(s => s.state === "done").length} / {steps.length} etapas
+                </p>
+              </div>
+              <div className="w-16 h-1.5 rounded-full bg-muted overflow-hidden">
+                <div
+                  className={cn(
+                    "h-full transition-all",
+                    despesa.status === "rejeitada" ? "bg-destructive" : "bg-accent"
+                  )}
+                  style={{ width: `${(steps.filter(s => s.state === "done").length / steps.length) * 100}%` }}
+                />
+              </div>
+            </div>
           </div>
 
-          <ol className="relative">
+          <ol className="relative px-6 py-5">
             {steps.map((step, idx) => {
               const Icon = step.icon;
               const isLast = idx === steps.length - 1;
+              const stateLabel =
+                step.state === "done" ? "Concluído"
+                : step.state === "current" ? "Em curso"
+                : step.state === "rejected" ? "Rejeitado"
+                : "Pendente";
               const palette =
                 step.state === "rejected"
-                  ? "bg-destructive/15 text-destructive border-destructive/30"
+                  ? { ring: "ring-destructive/20", bg: "bg-destructive text-white border-destructive", badge: "bg-destructive/10 text-destructive border-destructive/20", line: "bg-destructive/30" }
                   : step.state === "done"
-                    ? "bg-accent/15 text-accent border-accent/30"
+                    ? { ring: "ring-accent/20", bg: "bg-accent text-white border-accent", badge: "bg-accent/10 text-accent border-accent/20", line: "bg-accent/40" }
                     : step.state === "current"
-                      ? "bg-amber-100 text-amber-700 border-amber-200"
-                      : "bg-muted text-muted-foreground border-border";
-              const linePalette =
-                step.state === "done" ? "bg-accent/40" : "bg-border";
+                      ? { ring: "ring-amber-200", bg: "bg-amber-500 text-white border-amber-500 animate-pulse", badge: "bg-amber-100 text-amber-700 border-amber-200", line: "bg-border" }
+                      : { ring: "ring-transparent", bg: "bg-muted text-muted-foreground border-border", badge: "bg-muted text-muted-foreground border-border", line: "bg-border" };
+
+              // Compute duration since previous step
+              let sinceLabel: string | null = null;
+              if (idx > 0 && step.date && steps[idx - 1].date) {
+                const ms = new Date(step.date).getTime() - new Date(steps[idx - 1].date!).getTime();
+                const days = Math.round(ms / 86400000);
+                if (days > 0) sinceLabel = `+${days} ${days === 1 ? "dia" : "dias"}`;
+                else if (ms >= 0) sinceLabel = "no mesmo dia";
+              }
+
               return (
-                <li key={idx} className="relative pl-12 pb-6 last:pb-0">
-                  {!isLast && (
-                    <span className={cn("absolute left-[19px] top-9 bottom-0 w-px", linePalette)} />
-                  )}
-                  <span
-                    className={cn(
-                      "absolute left-0 top-0 w-10 h-10 rounded-full border-2 flex items-center justify-center",
-                      palette
-                    )}
-                  >
-                    <Icon className="w-4 h-4" />
+                <li key={idx} className="relative pl-14 pb-6 last:pb-0">
+                  {!isLast && <span className={cn("absolute left-[23px] top-12 bottom-0 w-[2px] rounded-full", palette.line)} />}
+                  <span className={cn("absolute left-0 top-0 w-12 h-12 rounded-full border-2 flex items-center justify-center ring-4", palette.ring, palette.bg)}>
+                    <Icon className="w-5 h-5" strokeWidth={2.4} />
                   </span>
-                  <div className="pt-1">
-                    <div className="flex items-center justify-between gap-3 flex-wrap">
-                      <p className="font-semibold text-sm text-foreground">{step.title}</p>
-                      {step.date && (
-                        <span className="text-xs text-muted-foreground flex items-center gap-1">
-                          <Calendar className="w-3 h-3" /> {fmtDateShort(step.date)}
-                        </span>
-                      )}
+                  <div className="pt-1.5">
+                    <div className="flex items-start justify-between gap-3 flex-wrap">
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <p className="font-semibold text-sm text-foreground leading-tight">{step.title}</p>
+                          <span className={cn("inline-flex items-center gap-1 text-[10px] font-semibold px-1.5 py-0.5 rounded border uppercase tracking-wider", palette.badge)}>
+                            {stateLabel}
+                          </span>
+                        </div>
+                        {step.actor && (
+                          <div className="flex items-center gap-2 mt-1.5 text-xs">
+                            <div className="w-5 h-5 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[9px] font-bold ring-1 ring-primary/15">
+                              {step.actor.split(" ").slice(0, 2).map(n => n[0]).join("")}
+                            </div>
+                            <span className="font-medium text-foreground">{step.actor}</span>
+                            {step.actorRole && <span className="text-muted-foreground">· {step.actorRole}</span>}
+                          </div>
+                        )}
+                      </div>
+                      <div className="text-right shrink-0 flex flex-col items-end gap-0.5">
+                        {step.date ? (
+                          <span className="text-xs text-foreground font-medium flex items-center gap-1 tabular-nums">
+                            <Calendar className="w-3 h-3 text-muted-foreground" /> {fmtDateShort(step.date)}
+                          </span>
+                        ) : (
+                          <span className="text-[10px] text-muted-foreground italic">Sem data</span>
+                        )}
+                        {sinceLabel && <span className="text-[10px] text-muted-foreground tabular-nums">{sinceLabel}</span>}
+                      </div>
                     </div>
-                    {step.actor && (
-                      <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1.5">
-                        <User className="w-3 h-3" />
-                        <span className="text-foreground font-medium">{step.actor}</span>
-                        {step.actorRole && <span>· {step.actorRole}</span>}
-                      </p>
-                    )}
                     {step.description && (
-                      <p className="text-sm text-foreground/80 mt-2 leading-relaxed bg-muted/30 rounded-lg p-3 border border-border/50">
+                      <p className="text-[12.5px] text-foreground/80 mt-2.5 leading-relaxed bg-muted/40 rounded-md px-3 py-2 border-l-2 border-border">
                         {step.description}
                       </p>
                     )}
@@ -325,38 +368,42 @@ export default function DespesaDetail() {
                 <dd className="font-medium text-foreground">{fmtDateLong(despesa.date)}</dd>
               </div>
               <Separator />
-              <div>
-                <dt className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Solicitado por</dt>
-                <div className="flex items-start justify-between gap-2">
-                  <div className="min-w-0">
-                    <dd className="font-medium text-foreground truncate">{despesa.requestedBy || "—"}</dd>
-                    {despesa.requesterRole && (
-                      <dd className="text-xs text-muted-foreground truncate">{despesa.requesterRole}</dd>
-                    )}
-                  </div>
-                  {despesa.requestedBy && (
-                    <div className="flex items-center gap-1 shrink-0">
-                      <button
-                        type="button"
-                        onClick={() => toast({ title: "Conversa aberta", description: `Chat com ${despesa.requestedBy}` })}
-                        className="w-7 h-7 rounded-md inline-flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-                        title={`Chat com ${despesa.requestedBy}`}
-                      >
-                        <MessageSquare className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => toast({ title: "Email", description: `Compor email para ${despesa.requestedBy}` })}
-                        className="w-7 h-7 rounded-md inline-flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-                        title={`Email a ${despesa.requestedBy}`}
-                      >
-                        <Mail className="w-3.5 h-3.5" />
-                      </button>
+              {despesa.category !== "Salários" && (
+                <>
+                  <div>
+                    <dt className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Solicitado por</dt>
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <dd className="font-medium text-foreground truncate">{despesa.requestedBy || "—"}</dd>
+                        {despesa.requesterRole && (
+                          <dd className="text-xs text-muted-foreground truncate">{despesa.requesterRole}</dd>
+                        )}
+                      </div>
+                      {despesa.requestedBy && (
+                        <div className="flex items-center gap-1 shrink-0">
+                          <button
+                            type="button"
+                            onClick={() => toast({ title: "Conversa aberta", description: `Chat com ${despesa.requestedBy}` })}
+                            className="w-7 h-7 rounded-md inline-flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                            title={`Chat com ${despesa.requestedBy}`}
+                          >
+                            <MessageSquare className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => toast({ title: "Email", description: `Compor email para ${despesa.requestedBy}` })}
+                            className="w-7 h-7 rounded-md inline-flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                            title={`Email a ${despesa.requestedBy}`}
+                          >
+                            <Mail className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-              </div>
-              <Separator />
+                  </div>
+                  <Separator />
+                </>
+              )}
               <div>
                 <dt className="text-xs text-muted-foreground uppercase tracking-wider mb-1">Responsável</dt>
                 <div className="flex items-start justify-between gap-2">
@@ -459,22 +506,34 @@ export default function DespesaDetail() {
                   <p className="text-[11px] text-muted-foreground font-mono truncate mt-0.5">FAC-{despesa.id.toUpperCase()}.pdf</p>
                 </div>
                 <div className="flex items-center gap-0.5 shrink-0">
-                  <button
-                    type="button"
-                    onClick={() => toast({ title: "Factura aberta", description: `FAC-${despesa.id.toUpperCase()}.pdf` })}
-                    className="w-7 h-7 rounded-md inline-flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-                    title="Ver"
-                  >
-                    <Eye className="w-3.5 h-3.5" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => toast({ title: "Download iniciado", description: `FAC-${despesa.id.toUpperCase()}.pdf` })}
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <button
+                        type="button"
+                        className="w-7 h-7 rounded-md inline-flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                        title="Ver"
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                      </button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-5xl w-[95vw] h-[92vh] p-0 gap-0 overflow-hidden">
+                      <DialogHeader className="px-4 py-2.5 border-b border-border shrink-0">
+                        <DialogTitle className="text-sm font-semibold flex items-center gap-2">
+                          <FileText className="w-4 h-4 text-primary" /> Factura · FAC-{despesa.id.toUpperCase()}.pdf
+                        </DialogTitle>
+                        <DialogDescription className="sr-only">Pré-visualização da factura em PDF.</DialogDescription>
+                      </DialogHeader>
+                      <iframe src={facturaAsset.url} title="Factura" className="w-full h-full bg-muted" />
+                    </DialogContent>
+                  </Dialog>
+                  <a
+                    href={facturaAsset.url}
+                    download={`FAC-${despesa.id.toUpperCase()}.pdf`}
                     className="w-7 h-7 rounded-md inline-flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
                     title="Download"
                   >
                     <Download className="w-3.5 h-3.5" />
-                  </button>
+                  </a>
                 </div>
               </div>
 
