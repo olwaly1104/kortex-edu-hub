@@ -1,44 +1,40 @@
-# Plano: Chat real-time + Email real
+## Problema
 
-Vou ativar duas funcionalidades reais entre utilizadores, mantendo o mock de voz/vídeo como está (sem provider externo).
+O ecrã `/login` (`src/pages/Login.tsx`) é mock: usa `useAuth()` com a lista `DEMO_ACCOUNTS` e bloqueia qualquer email que não termine em `.kor`. As contas que criaste para o chat (`aluno2934@teste.com`, `prof@teste.com`) vivem na Lovable Cloud (Supabase auth), mas o Login nem sequer tenta autenticar contra a Cloud — daí o erro "Email deve terminar em .kor" e a impossibilidade de entrar.
 
-## 1. Chat real-time (Lovable Cloud)
+## O que vou fazer
 
-**Backend (migração SQL):**
-- Tabela `conversations` (id, created_at, is_group, title)
-- Tabela `conversation_participants` (conversation_id, user_id) — define quem vê a conversa
-- Tabela `messages` (id, conversation_id, sender_id, body, created_at, read_at)
-- GRANTs + RLS: utilizador só lê/escreve em conversas onde é participante
-- Adicionar `messages` à publicação `supabase_realtime`
+### 1. Botão "Criar conta" no Login
+Por baixo de **Ver credenciais de demo** adiciono um botão **Criar conta** que abre um `Dialog` com:
+- Nome a apresentar
+- Email (sem restrição `.kor`)
+- Palavra-passe (mín. 6 caracteres)
+- Botão **Criar conta**
 
-**Frontend (`src/pages/student/Chat.tsx`):**
-- Substituir o array mock de mensagens por fetch a `messages` da conversa selecionada
-- Subscrição realtime (`postgres_changes` em `messages`) dentro de `useEffect` com cleanup
-- `handleSend` → `insert` em `messages` em vez de `setState` local
-- Lista de contactos passa a vir de `profiles` (participantes das conversas do user)
-- Indicador "lida" via `read_at` quando o destinatário abre a conversa
+Ao submeter chama `supabase.auth.signUp({ email, password, options: { data: { display_name }, emailRedirectTo: window.location.origin } })`. Em sucesso fecha o diálogo, pré-preenche o formulário de login com o email e mostra "Conta criada — inicie sessão".
 
-**Auth:** chat exige user autenticado. Se ainda não houver login no portal de estudante, adiciono guard mínimo (assumo que já existe sessão Supabase — caso contrário aviso e paramos para configurar auth primeiro).
+### 2. Login passa a aceitar contas Cloud
+Mudo `handleSubmit` para:
+1. Se o email termina em `.kor` → tenta primeiro o login demo (`useAuth().login`) como hoje.
+2. Caso contrário (ou se o demo falhar) → tenta `supabase.auth.signInWithPassword`. Se ok, cria sessão local como **Estudante** via `useAuth().login` com uma conta fictícia ("Conta Cloud") e redireciona para `/student/chat`.
+3. A mensagem "Email deve terminar em .kor" só aparece quando ambos falham.
 
-## 2. Email real (Lovable Email)
+### 3. Sincronizar a sessão Supabase já existente no Chat
+O `AuthGate` interno em `Chat.tsx` mantém-se (continua a funcionar), mas se o utilizador já fez login pela página principal via Supabase, o Chat detecta a sessão automaticamente (já usa `onAuthStateChange`) e salta o gate.
 
-- Configurar domínio de envio (abro o diálogo de setup de email)
-- Após o domínio estar definido, faço scaffold de email transacional
-- Criar 1 template `new-message-notification` (avisa o destinatário quando recebe mensagem offline / via botão "Enviar por email")
-- Wire-up: botão no chat para "Notificar por email" → invoca `send-transactional-email`
+### 4. Texto auxiliar
+Substituo "Use o seu email institucional terminado em .kor" por "Email institucional `.kor` para perfis demo, ou crie uma conta Cloud para testar o chat em tempo real."
 
-Templates auth (signup/recovery) só faço se pedires — por agora foco no transacional ligado ao chat.
+## Detalhes técnicos
 
-## 3. Voz/Vídeo
+- Ficheiro alterado: `src/pages/Login.tsx` (apenas).
+- Import novo: `supabase` de `@/integrations/supabase/client`.
+- O perfil é criado automaticamente pelo trigger `handle_new_user` (já existe), portanto a nova conta aparece de imediato na lista de contactos do Chat para o outro utilizador.
+- Não toco em `AuthContext`, no Chat, nem na base de dados.
 
-Fica como está (mock com "A tocar…" e timer falso). Quando quiseres real, adicionamos LiveKit ou Daily.co.
+## Como vais testar
+1. Janela A: abre `/login` → **Criar conta** → `aluno@teste.com` / `teste1234` → entra → cai em `/student/chat`.
+2. Janela B (anónima): repete com `prof@teste.com` / `teste1234`.
+3. Cada um vê o outro na lista lateral e troca mensagens em tempo real.
 
-## Ordem de execução
-1. Migração SQL (tabelas + RLS + realtime)
-2. Refactor `Chat.tsx` para usar Supabase
-3. Diálogo de setup do domínio de email → aguardo confirmação
-4. Scaffold transacional + template + botão de notificação
-
-## O que preciso de ti antes de avançar
-- Confirmação que queres avançar com este plano
-- Para email: vais precisar de um domínio teu (ex: `notify.upra.example.com`) para configurar no passo 3
+A conta `aluno2934@teste.com` que já criaste passa a poder fazer login normalmente pelo formulário principal.
