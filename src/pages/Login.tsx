@@ -27,7 +27,10 @@ export default function Login() {
       setError("Email deve terminar em .kor");
       return;
     }
-    login(email, password);
+    const result = login(email, password);
+    if (!result.ok) {
+      setError(result.error || "Não foi possível iniciar sessão.");
+    }
   };
 
   return (
@@ -140,24 +143,9 @@ export default function Login() {
             </Button>
           </form>
 
-          <div className="mt-8 text-center space-y-1">
+          <div className="mt-8 text-center">
             <p className="text-xs text-muted-foreground">
-              <span className="font-medium">Dica:</span> Use qualquer palavra-passe com os emails abaixo:
-            </p>
-            <p className="text-xs text-muted-foreground">
-              <span className="font-medium">2934@upra.kor</span> (Estudante) · <span className="font-medium">prof.silva@upra.kor</span> (Professor)
-            </p>
-            <p className="text-xs text-muted-foreground">
-              <span className="font-medium">coordcurso@upra.kor</span> (Coord. Curso) · <span className="font-medium">decano@upra.kor</span> (Decano)
-            </p>
-            <p className="text-xs text-muted-foreground">
-              <span className="font-medium">reitor@upra.kor</span> (Reitor) · <span className="font-medium">academica@upra.kor</span> (Académica)
-            </p>
-            <p className="text-xs text-muted-foreground">
-              <span className="font-medium">financas@upra.kor</span> (Finanças) · <span className="font-medium">gap@upra.kor</span> (GAP)
-            </p>
-            <p className="text-xs text-muted-foreground">
-              <span className="font-medium">inscricoes@upra.kor</span> (Inscrições) · <span className="font-medium">areaacademica2@upra.kor</span> (Área Académica II)
+              Use o seu email institucional terminado em <span className="font-medium">.kor</span>.
             </p>
           </div>
         </div>
