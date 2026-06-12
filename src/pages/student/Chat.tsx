@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { chatConversations, chatMessages } from "@/data/mockData";
-import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Phone, Video, Send, Paperclip, Smile, Mic, PhoneIncoming, PhoneOutgoing, PhoneMissed, VideoIcon, Users, Mail } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Search, Phone, Video, Send, Paperclip, Smile, Mic, MicOff, PhoneIncoming, PhoneOutgoing, PhoneMissed, VideoIcon, VideoOff, Users, Mail, PhoneOff } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 const callLog = [
   { id: "cl1", name: "Prof. António Silva", type: "incoming" as const, medium: "voice" as const, time: "14:20", date: "Hoje", duration: "5:32" },
@@ -18,7 +19,6 @@ const callLog = [
 const callIcons = { incoming: PhoneIncoming, outgoing: PhoneOutgoing, missed: PhoneMissed };
 const callColors = { incoming: "text-accent", outgoing: "text-primary", missed: "text-destructive" };
 
-// Map conversation names to emails for the email button
 const nameToEmail: Record<string, string> = {
   "Prof. António Silva": "prof.silva@upra.kor",
   "Maria Silva": "3012@upra.kor",
@@ -26,18 +26,68 @@ const nameToEmail: Record<string, string> = {
 };
 
 type Tab = "chats" | "calls" | "groups";
+type LocalMessage = { id: string; conversationId: string; content: string; isOwn: boolean; time: string; read: boolean };
+type CallState = { open: boolean; name: string; medium: "voice" | "video" };
+
+function formatTime(date: Date) {
+  return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}
 
 export default function StudentChat() {
   const [selectedId, setSelectedId] = useState(chatConversations[0]?.id || "");
   const [message, setMessage] = useState("");
   const [tab, setTab] = useState<Tab>("chats");
+  const [localMessages, setLocalMessages] = useState<LocalMessage[]>(chatMessages as LocalMessage[]);
+  const [call, setCall] = useState<CallState>({ open: false, name: "", medium: "voice" });
+  const [callSeconds, setCallSeconds] = useState(0);
+  const [muted, setMuted] = useState(false);
+  const [camOff, setCamOff] = useState(false);
   const navigate = useNavigate();
+  const scrollRef = useRef<HTMLDivElement>(null);
+
   const selected = chatConversations.find(c => c.id === selectedId);
-  const messages = chatMessages.filter(m => m.conversationId === selectedId);
+  const messages = useMemo(() => localMessages.filter(m => m.conversationId === selectedId), [localMessages, selectedId]);
 
   const directChats = chatConversations.filter(c => !c.isGroup);
   const groupChats = chatConversations.filter(c => c.isGroup);
   const displayList = tab === "groups" ? groupChats : tab === "chats" ? directChats : [];
+
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
+  }, [messages.length]);
+
+  useEffect(() => {
+    if (!call.open) { setCallSeconds(0); return; }
+    const t = setInterval(() => setCallSeconds(s => s + 1), 1000);
+    return () => clearInterval(t);
+  }, [call.open]);
+
+  const sendMessage = () => {
+    const text = message.trim();
+    if (!text || !selected) return;
+    const newMsg: LocalMessage = {
+      id: `m-${Date.now()}`,
+      conversationId: selectedId,
+      content: text,
+      isOwn: true,
+      time: formatTime(new Date()),
+      read: false,
+    };
+    setLocalMessages(prev => [...prev, newMsg]);
+    setMessage("");
+  };
+
+  const startCall = (name: string, medium: "voice" | "video") => {
+    setMuted(false);
+    setCamOff(false);
+    setCall({ open: true, name, medium });
+    toast.success(medium === "video" ? `A iniciar videochamada com ${name}` : `A iniciar chamada com ${name}`);
+  };
+
+  const endCall = () => {
+    setCall(c => ({ ...c, open: false }));
+    toast(`Chamada terminada · ${Math.floor(callSeconds / 60).toString().padStart(2, "0")}:${(callSeconds % 60).toString().padStart(2, "0")}`);
+  };
 
   const goToEmail = () => {
     if (selected) {
@@ -45,6 +95,8 @@ export default function StudentChat() {
       navigate(`/student/email?to=${encodeURIComponent(email)}`);
     }
   };
+
+  const mmss = `${Math.floor(callSeconds / 60).toString().padStart(2, "0")}:${(callSeconds % 60).toString().padStart(2, "0")}`;
 
   return (
     <div className="h-screen flex animate-fade-in">
@@ -70,25 +122,25 @@ export default function StudentChat() {
         </div>
         <div className="flex-1 overflow-y-auto">
           {tab === "calls" ? (
-            callLog.map(call => {
-              const CallIcon = callIcons[call.type];
+            callLog.map(c => {
+              const CallIcon = callIcons[c.type];
               return (
-                <div key={call.id} className="flex items-center gap-3 px-4 py-3 hover:bg-muted/50 transition-colors">
+                <div key={c.id} className="flex items-center gap-3 px-4 py-3 hover:bg-muted/50 transition-colors">
                   <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary">
-                    {call.name.split(" ").map(n => n[0]).slice(0, 2).join("")}
+                    {c.name.split(" ").map(n => n[0]).slice(0, 2).join("")}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-foreground truncate">{call.name}</p>
+                    <p className="text-sm font-medium text-foreground truncate">{c.name}</p>
                     <div className="flex items-center gap-1.5 text-xs">
-                      <CallIcon className={cn("w-3 h-3", callColors[call.type])} />
-                      <span className={cn(call.type === "missed" ? "text-destructive" : "text-muted-foreground")}>
-                        {call.date}, {call.time}
+                      <CallIcon className={cn("w-3 h-3", callColors[c.type])} />
+                      <span className={cn(c.type === "missed" ? "text-destructive" : "text-muted-foreground")}>
+                        {c.date}, {c.time}
                       </span>
-                      {call.duration && <span className="text-muted-foreground">• {call.duration}</span>}
+                      {c.duration && <span className="text-muted-foreground">• {c.duration}</span>}
                     </div>
                   </div>
-                  <Button variant="ghost" size="icon" className="shrink-0">
-                    {call.medium === "video" ? <VideoIcon className="w-4 h-4 text-muted-foreground" /> : <Phone className="w-4 h-4 text-muted-foreground" />}
+                  <Button variant="ghost" size="icon" className="shrink-0" onClick={() => startCall(c.name, c.medium)}>
+                    {c.medium === "video" ? <VideoIcon className="w-4 h-4 text-muted-foreground" /> : <Phone className="w-4 h-4 text-muted-foreground" />}
                   </Button>
                 </div>
               );
@@ -143,12 +195,12 @@ export default function StudentChat() {
               </div>
               <div className="flex items-center gap-1">
                 <Button variant="ghost" size="icon" onClick={goToEmail}><Mail className="w-4 h-4" /></Button>
-                <Button variant="ghost" size="icon"><Phone className="w-4 h-4" /></Button>
-                <Button variant="ghost" size="icon"><Video className="w-4 h-4" /></Button>
+                <Button variant="ghost" size="icon" onClick={() => startCall(selected.name, "voice")}><Phone className="w-4 h-4" /></Button>
+                <Button variant="ghost" size="icon" onClick={() => startCall(selected.name, "video")}><Video className="w-4 h-4" /></Button>
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-5 space-y-4 bg-muted/30">
+            <div ref={scrollRef} className="flex-1 overflow-y-auto p-5 space-y-4 bg-muted/30">
               {messages.map(msg => (
                 <div key={msg.id} className={cn("flex", msg.isOwn && "justify-end")}>
                   <div className={cn(
@@ -172,10 +224,10 @@ export default function StudentChat() {
                 value={message}
                 onChange={e => setMessage(e.target.value)}
                 className="flex-1"
-                onKeyDown={e => { if (e.key === "Enter" && message.trim()) setMessage(""); }}
+                onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); sendMessage(); } }}
               />
               <Button variant="ghost" size="icon"><Mic className="w-5 h-5 text-muted-foreground" /></Button>
-              <Button size="icon" disabled={!message.trim()}><Send className="w-4 h-4" /></Button>
+              <Button size="icon" disabled={!message.trim()} onClick={sendMessage}><Send className="w-4 h-4" /></Button>
             </div>
           </>
         ) : (
@@ -184,6 +236,60 @@ export default function StudentChat() {
           </div>
         )}
       </div>
+
+      {/* Call dialog */}
+      <Dialog open={call.open} onOpenChange={(o) => { if (!o) endCall(); }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{call.medium === "video" ? "Videochamada" : "Chamada de voz"}</DialogTitle>
+            <DialogDescription>Em curso · {mmss}</DialogDescription>
+          </DialogHeader>
+
+          {call.medium === "video" ? (
+            <div className="relative aspect-video w-full rounded-lg bg-slate-900 overflow-hidden flex items-center justify-center">
+              {camOff ? (
+                <div className="flex flex-col items-center gap-2 text-white/70">
+                  <VideoOff className="w-10 h-10" />
+                  <p className="text-xs">Câmara desligada</p>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center gap-3 text-white">
+                  <div className="w-20 h-20 rounded-full bg-primary/30 flex items-center justify-center text-xl font-bold">
+                    {call.name.split(" ").map(n => n[0]).slice(0, 2).join("")}
+                  </div>
+                  <p className="text-sm font-semibold">{call.name}</p>
+                  <p className="text-xs text-white/60">A ligar…</p>
+                </div>
+              )}
+              <div className="absolute bottom-3 right-3 w-24 aspect-video rounded-md bg-slate-700 border border-white/20 flex items-center justify-center text-[10px] text-white/70">
+                Você
+              </div>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center gap-3 py-6">
+              <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center text-2xl font-bold text-primary">
+                {call.name.split(" ").map(n => n[0]).slice(0, 2).join("")}
+              </div>
+              <p className="text-sm font-semibold text-foreground">{call.name}</p>
+              <p className="text-xs text-muted-foreground">A chamar…</p>
+            </div>
+          )}
+
+          <div className="flex items-center justify-center gap-3 pt-2">
+            <Button variant={muted ? "default" : "outline"} size="icon" className="rounded-full" onClick={() => setMuted(m => !m)}>
+              {muted ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+            </Button>
+            {call.medium === "video" && (
+              <Button variant={camOff ? "default" : "outline"} size="icon" className="rounded-full" onClick={() => setCamOff(c => !c)}>
+                {camOff ? <VideoOff className="w-4 h-4" /> : <VideoIcon className="w-4 h-4" />}
+              </Button>
+            )}
+            <Button variant="destructive" size="icon" className="rounded-full" onClick={endCall}>
+              <PhoneOff className="w-4 h-4" />
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
