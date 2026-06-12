@@ -5,8 +5,23 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Eye, EyeOff, Globe } from "lucide-react";
+import { Eye, EyeOff, Globe, KeyRound } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
 import logoUpra from "@/assets/logo-upra.asset.json";
+
+const DEMO_PASSWORD = "olwaly";
+const DEMO_ACCOUNTS: { role: string; email: string }[] = [
+  { role: "Estudante", email: "2934@upra.kor" },
+  { role: "Professor", email: "prof.silva@upra.kor" },
+  { role: "Coordenador de Curso", email: "coordcurso@upra.kor" },
+  { role: "Decano", email: "decano@upra.kor" },
+  { role: "Reitor", email: "reitor@upra.kor" },
+  { role: "Académica", email: "academica@upra.kor" },
+  { role: "Finanças", email: "financas@upra.kor" },
+  { role: "GAP", email: "gap@upra.kor" },
+  { role: "Inscrições", email: "inscricoes@upra.kor" },
+  { role: "Área Académica 2", email: "areaacademica2@upra.kor" },
+];
 
 export default function Login() {
   const { login } = useAuth();
@@ -95,6 +110,35 @@ export default function Login() {
                 onChange={(e) => setEmail(e.target.value)}
                 className="h-11"
               />
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button type="button" variant="outline" size="sm" className="w-full gap-2 mt-1">
+                    <KeyRound className="w-4 h-4" /> Ver credenciais de demo
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Credenciais de demonstração</DialogTitle>
+                    <DialogDescription>
+                      Palavra-passe para todos os perfis: <span className="font-mono font-semibold text-foreground">{DEMO_PASSWORD}</span>
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="max-h-80 overflow-y-auto divide-y rounded-md border">
+                    {DEMO_ACCOUNTS.map((a) => (
+                      <button
+                        key={a.email}
+                        type="button"
+                        onClick={() => { setEmail(a.email); setPassword(DEMO_PASSWORD); }}
+                        className="w-full text-left px-3 py-2 hover:bg-muted transition-colors"
+                      >
+                        <div className="text-sm font-medium text-foreground">{a.role}</div>
+                        <div className="text-xs text-muted-foreground font-mono">{a.email}</div>
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-xs text-muted-foreground">Clique numa conta para preencher automaticamente.</p>
+                </DialogContent>
+              </Dialog>
             </div>
 
             <div className="space-y-2">
