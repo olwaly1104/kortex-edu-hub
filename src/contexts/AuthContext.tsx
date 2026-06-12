@@ -4,29 +4,26 @@ import { User, UserRole, detectRole, currentStudent, currentProfessor, currentCo
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => boolean;
+  login: (email: string, password: string) => { ok: boolean; error?: string };
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-const STORAGE_KEY = "upra_mock_user";
-
-function loadStoredUser(): User | null {
-  if (typeof window === "undefined") return null;
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
-    return JSON.parse(raw) as User;
-  } catch {
-    return null;
-  }
-}
+const MIN_PASSWORD_LENGTH = 8;
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(() => loadStoredUser());
+  // Session is held in memory only. Role is never persisted to localStorage
+  // so it cannot be tampered with via DevTools.
+  const [user, setUser] = useState<User | null>(null);
 
-  const login = useCallback((email: string, _password: string) => {
+  const login = useCallback((email: string, password: string) => {
+    if (!email || !password) {
+      return { ok: false, error: "Email e palavra-passe são obrigatórios." };
+    }
+    if (password.length < MIN_PASSWORD_LENGTH) {
+      return { ok: false, error: `Palavra-passe deve ter pelo menos ${MIN_PASSWORD_LENGTH} caracteres.` };
+    }
     const role = detectRole(email);
     const mockUsers: Record<UserRole, User> = {
       student: currentStudent,
@@ -40,22 +37,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       inscricoes: currentInscricoes,
       academica2: currentAcademica2,
     };
-    const nextUser = { ...mockUsers[role], email };
-    setUser(nextUser);
-    try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(nextUser));
-    } catch {
-      // ignore storage errors (private mode, quota, etc.)
-    }
-    return true;
+    setUser({ ...mockUsers[role], email });
+    return { ok: true };
   }, []);
 
   const logout = useCallback(() => {
-    try {
-      window.localStorage.removeItem(STORAGE_KEY);
-    } catch {
-      // ignore
-    }
     setUser(null);
   }, []);
 
