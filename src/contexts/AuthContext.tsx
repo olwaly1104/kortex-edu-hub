@@ -10,7 +10,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-const MIN_PASSWORD_LENGTH = 8;
+const MIN_PASSWORD_LENGTH = 6;
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Session is held in memory only. Role is never persisted to localStorage
