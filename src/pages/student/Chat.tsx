@@ -254,7 +254,9 @@ export default function StudentChat() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>{call.medium === "video" ? "Videochamada" : "Chamada de voz"}</DialogTitle>
-            <DialogDescription>Em curso · {mmss}</DialogDescription>
+            <DialogDescription>
+              {call.phase === "ringing" ? "A chamar… (a tocar)" : `Em curso · ${mmss}`}
+            </DialogDescription>
           </DialogHeader>
 
           {call.medium === "video" ? (
@@ -266,11 +268,14 @@ export default function StudentChat() {
                 </div>
               ) : (
                 <div className="flex flex-col items-center gap-3 text-white">
-                  <div className="w-20 h-20 rounded-full bg-primary/30 flex items-center justify-center text-xl font-bold">
+                  <div className={cn(
+                    "w-20 h-20 rounded-full bg-primary/30 flex items-center justify-center text-xl font-bold",
+                    call.phase === "ringing" && "animate-pulse ring-4 ring-primary/40"
+                  )}>
                     {call.name.split(" ").map(n => n[0]).slice(0, 2).join("")}
                   </div>
                   <p className="text-sm font-semibold">{call.name}</p>
-                  <p className="text-xs text-white/60">A ligar…</p>
+                  <p className="text-xs text-white/60">{call.phase === "ringing" ? "A tocar…" : "Em chamada"}</p>
                 </div>
               )}
               <div className="absolute bottom-3 right-3 w-24 aspect-video rounded-md bg-slate-700 border border-white/20 flex items-center justify-center text-[10px] text-white/70">
@@ -279,11 +284,16 @@ export default function StudentChat() {
             </div>
           ) : (
             <div className="flex flex-col items-center gap-3 py-6">
-              <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center text-2xl font-bold text-primary">
+              <div className={cn(
+                "w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center text-2xl font-bold text-primary",
+                call.phase === "ringing" && "animate-pulse ring-4 ring-primary/30"
+              )}>
                 {call.name.split(" ").map(n => n[0]).slice(0, 2).join("")}
               </div>
               <p className="text-sm font-semibold text-foreground">{call.name}</p>
-              <p className="text-xs text-muted-foreground">A chamar…</p>
+              <p className="text-xs text-muted-foreground">
+                {call.phase === "ringing" ? "A tocar…" : `Em chamada · ${mmss}`}
+              </p>
             </div>
           )}
 
