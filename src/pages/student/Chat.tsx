@@ -86,13 +86,19 @@ export default function StudentChat() {
   const startCall = (name: string, medium: "voice" | "video") => {
     setMuted(false);
     setCamOff(false);
-    setCall({ open: true, name, medium });
-    toast.success(medium === "video" ? `A iniciar videochamada com ${name}` : `A iniciar chamada com ${name}`);
+    setCallSeconds(0);
+    setCall({ open: true, name, medium, phase: "ringing" });
+    toast.success(medium === "video" ? `A chamar ${name} (vídeo)...` : `A chamar ${name}...`);
   };
 
   const endCall = () => {
+    const wasRinging = call.phase === "ringing";
     setCall(c => ({ ...c, open: false }));
-    toast(`Chamada terminada · ${Math.floor(callSeconds / 60).toString().padStart(2, "0")}:${(callSeconds % 60).toString().padStart(2, "0")}`);
+    if (wasRinging) {
+      toast(`Chamada cancelada · ${call.name} não atendeu`);
+    } else {
+      toast(`Chamada terminada · ${Math.floor(callSeconds / 60).toString().padStart(2, "0")}:${(callSeconds % 60).toString().padStart(2, "0")}`);
+    }
   };
 
   const goToEmail = () => {
