@@ -27,7 +27,7 @@ const nameToEmail: Record<string, string> = {
 
 type Tab = "chats" | "calls" | "groups";
 type LocalMessage = { id: string; conversationId: string; content: string; isOwn: boolean; time: string; read: boolean };
-type CallState = { open: boolean; name: string; medium: "voice" | "video" };
+type CallState = { open: boolean; name: string; medium: "voice" | "video"; phase: "ringing" | "ongoing" };
 
 function formatTime(date: Date) {
   return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
@@ -38,7 +38,7 @@ export default function StudentChat() {
   const [message, setMessage] = useState("");
   const [tab, setTab] = useState<Tab>("chats");
   const [localMessages, setLocalMessages] = useState<LocalMessage[]>(chatMessages as LocalMessage[]);
-  const [call, setCall] = useState<CallState>({ open: false, name: "", medium: "voice" });
+  const [call, setCall] = useState<CallState>({ open: false, name: "", medium: "voice", phase: "ringing" });
   const [callSeconds, setCallSeconds] = useState(0);
   const [muted, setMuted] = useState(false);
   const [camOff, setCamOff] = useState(false);
@@ -57,10 +57,16 @@ export default function StudentChat() {
   }, [messages.length]);
 
   useEffect(() => {
-    if (!call.open) { setCallSeconds(0); return; }
+    if (!call.open || call.phase !== "ongoing") { return; }
     const t = setInterval(() => setCallSeconds(s => s + 1), 1000);
     return () => clearInterval(t);
-  }, [call.open]);
+  }, [call.open, call.phase]);
+
+  useEffect(() => {
+    if (!call.open || call.phase !== "ringing") return;
+    const t = setTimeout(() => setCall(c => ({ ...c, phase: "ongoing" })), 6000);
+    return () => clearTimeout(t);
+  }, [call.open, call.phase]);
 
   const sendMessage = () => {
     const text = message.trim();
@@ -80,13 +86,19 @@ export default function StudentChat() {
   const startCall = (name: string, medium: "voice" | "video") => {
     setMuted(false);
     setCamOff(false);
-    setCall({ open: true, name, medium });
-    toast.success(medium === "video" ? `A iniciar videochamada com ${name}` : `A iniciar chamada com ${name}`);
+    setCallSeconds(0);
+    setCall({ open: true, name, medium, phase: "ringing" });
+    toast.success(medium === "video" ? `A chamar ${name} (vídeo)...` : `A chamar ${name}...`);
   };
 
   const endCall = () => {
+    const wasRinging = call.phase === "ringing";
     setCall(c => ({ ...c, open: false }));
-    toast(`Chamada terminada · ${Math.floor(callSeconds / 60).toString().padStart(2, "0")}:${(callSeconds % 60).toString().padStart(2, "0")}`);
+    if (wasRinging) {
+      toast(`Chamada cancelada · ${call.name} não atendeu`);
+    } else {
+      toast(`Chamada terminada · ${Math.floor(callSeconds / 60).toString().padStart(2, "0")}:${(callSeconds % 60).toString().padStart(2, "0")}`);
+    }
   };
 
   const goToEmail = () => {
@@ -242,7 +254,9 @@ export default function StudentChat() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>{call.medium === "video" ? "Videochamada" : "Chamada de voz"}</DialogTitle>
-            <DialogDescription>Em curso · {mmss}</DialogDescription>
+            <DialogDescription>
+              {call.phase === "ringing" ? "A chamar… (a tocar)" : `Em curso · ${mmss}`}
+            </DialogDescription>
           </DialogHeader>
 
           {call.medium === "video" ? (
@@ -254,11 +268,14 @@ export default function StudentChat() {
                 </div>
               ) : (
                 <div className="flex flex-col items-center gap-3 text-white">
-                  <div className="w-20 h-20 rounded-full bg-primary/30 flex items-center justify-center text-xl font-bold">
+                  <div className={cn(
+                    "w-20 h-20 rounded-full bg-primary/30 flex items-center justify-center text-xl font-bold",
+                    call.phase === "ringing" && "animate-pulse ring-4 ring-primary/40"
+                  )}>
                     {call.name.split(" ").map(n => n[0]).slice(0, 2).join("")}
                   </div>
                   <p className="text-sm font-semibold">{call.name}</p>
-                  <p className="text-xs text-white/60">A ligar…</p>
+                  <p className="text-xs text-white/60">{call.phase === "ringing" ? "A tocar…" : "Em chamada"}</p>
                 </div>
               )}
               <div className="absolute bottom-3 right-3 w-24 aspect-video rounded-md bg-slate-700 border border-white/20 flex items-center justify-center text-[10px] text-white/70">
@@ -267,11 +284,16 @@ export default function StudentChat() {
             </div>
           ) : (
             <div className="flex flex-col items-center gap-3 py-6">
-              <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center text-2xl font-bold text-primary">
+              <div className={cn(
+                "w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center text-2xl font-bold text-primary",
+                call.phase === "ringing" && "animate-pulse ring-4 ring-primary/30"
+              )}>
                 {call.name.split(" ").map(n => n[0]).slice(0, 2).join("")}
               </div>
               <p className="text-sm font-semibold text-foreground">{call.name}</p>
-              <p className="text-xs text-muted-foreground">A chamar…</p>
+              <p className="text-xs text-muted-foreground">
+                {call.phase === "ringing" ? "A tocar…" : `Em chamada · ${mmss}`}
+              </p>
             </div>
           )}
 
