@@ -506,22 +506,34 @@ export default function DespesaDetail() {
                   <p className="text-[11px] text-muted-foreground font-mono truncate mt-0.5">FAC-{despesa.id.toUpperCase()}.pdf</p>
                 </div>
                 <div className="flex items-center gap-0.5 shrink-0">
-                  <button
-                    type="button"
-                    onClick={() => toast({ title: "Factura aberta", description: `FAC-${despesa.id.toUpperCase()}.pdf` })}
-                    className="w-7 h-7 rounded-md inline-flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-                    title="Ver"
-                  >
-                    <Eye className="w-3.5 h-3.5" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => toast({ title: "Download iniciado", description: `FAC-${despesa.id.toUpperCase()}.pdf` })}
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <button
+                        type="button"
+                        className="w-7 h-7 rounded-md inline-flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                        title="Ver"
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                      </button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-5xl w-[95vw] h-[92vh] p-0 gap-0 overflow-hidden">
+                      <DialogHeader className="px-4 py-2.5 border-b border-border shrink-0">
+                        <DialogTitle className="text-sm font-semibold flex items-center gap-2">
+                          <FileText className="w-4 h-4 text-primary" /> Factura · FAC-{despesa.id.toUpperCase()}.pdf
+                        </DialogTitle>
+                        <DialogDescription className="sr-only">Pré-visualização da factura em PDF.</DialogDescription>
+                      </DialogHeader>
+                      <iframe src={facturaAsset.url} title="Factura" className="w-full h-full bg-muted" />
+                    </DialogContent>
+                  </Dialog>
+                  <a
+                    href={facturaAsset.url}
+                    download={`FAC-${despesa.id.toUpperCase()}.pdf`}
                     className="w-7 h-7 rounded-md inline-flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
                     title="Download"
                   >
                     <Download className="w-3.5 h-3.5" />
-                  </button>
+                  </a>
                 </div>
               </div>
 
