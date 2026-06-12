@@ -57,10 +57,16 @@ export default function StudentChat() {
   }, [messages.length]);
 
   useEffect(() => {
-    if (!call.open) { setCallSeconds(0); return; }
+    if (!call.open || call.phase !== "ongoing") { return; }
     const t = setInterval(() => setCallSeconds(s => s + 1), 1000);
     return () => clearInterval(t);
-  }, [call.open]);
+  }, [call.open, call.phase]);
+
+  useEffect(() => {
+    if (!call.open || call.phase !== "ringing") return;
+    const t = setTimeout(() => setCall(c => ({ ...c, phase: "ongoing" })), 6000);
+    return () => clearTimeout(t);
+  }, [call.open, call.phase]);
 
   const sendMessage = () => {
     const text = message.trim();
