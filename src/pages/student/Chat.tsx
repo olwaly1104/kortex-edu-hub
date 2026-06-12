@@ -27,7 +27,7 @@ const nameToEmail: Record<string, string> = {
 
 type Tab = "chats" | "calls" | "groups";
 type LocalMessage = { id: string; conversationId: string; content: string; isOwn: boolean; time: string; read: boolean };
-type CallState = { open: boolean; name: string; medium: "voice" | "video" };
+type CallState = { open: boolean; name: string; medium: "voice" | "video"; phase: "ringing" | "ongoing" };
 
 function formatTime(date: Date) {
   return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });

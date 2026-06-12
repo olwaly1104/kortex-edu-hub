@@ -1,29 +1,20 @@
-# Fix Chat: Send, Call, Video buttons
+## Diagnóstico
 
-The buttons in `src/pages/student/Chat.tsx` are wired to nothing — Send doesn't append a message, and Phone/Video have no `onClick`. This is a UI-only prototype (no telephony backend), so I'll add local, presentational behavior.
+O envio de mensagens e as chamadas (voz/vídeo) já estão implementados no código actual (`src/pages/student/Chat.tsx`):
+- **Send** adiciona a mensagem à conversa imediatamente.
+- **Call/Video** abre um ecrã de chamada com "A chamar…", contador de tempo, botões de mute/câmara e desligar.
 
-## Changes (single file: `src/pages/student/Chat.tsx`)
+O site publicado (`upra-kortex-teste.lovable.app`) está com uma **versão antiga**, anterior a estas alterações — por isso clicar em Send ou Call não faz nada lá.
 
-1. **Send message (text + Enter key)**
-   - Add local state `localMessages` (seeded from `chatMessages` for the selected conversation).
-   - On Send click or Enter: append `{ id, conversationId, content: message, isOwn: true, time: "agora", read: false }` to `localMessages`, clear input, auto-scroll to bottom.
-   - Render from `localMessages` instead of the static filter.
+## Plano
 
-2. **Voice call button (header Phone icon)**
-   - On click: open a small "call dialog" (shadcn `Dialog`) showing avatar, contact name, "A chamar…" status, mute/end buttons. Closes on End.
-   - Also add a toast confirmation ("A iniciar chamada com {name}").
+1. **Melhorar a experiência de chamada** para parecer mesmo que está a chamar:
+   - Estado "A chamar…" com animação (avatar a pulsar) durante ~6 segundos de toque.
+   - Depois passa a "Em curso" com o contador de tempo (ninguém atende de verdade, mas o toque acontece).
+2. **Verificar o envio de mensagens** no preview (clique no botão Send e tecla Enter).
+3. **Republicar o site** para que a versão publicada fique com todas estas funcionalidades.
 
-3. **Video call button (header Video icon)**
-   - Same pattern as voice, but dialog labeled "Videochamada" with a placeholder video frame (dark rounded box + camera icon + "A ligar…").
-   - Toast confirmation.
+## Detalhe técnico
 
-4. **Call log Phone/Video icons in sidebar (`tab === "calls"`)**
-   - Wire them to the same call/video dialogs so they're consistent.
-
-5. Keep all existing styling/tokens; no new dependencies.
-
-## Out of scope
-
-- Real WebRTC / Twilio / signaling (this is a demo UI).
-- Persisting messages across reloads.
-- Other roles' chat pages (only the one the user is on).
+- Ficheiro único: `src/pages/student/Chat.tsx` — adicionar fase `ringing` ao estado da chamada com transição automática para `ongoing` após alguns segundos.
+- Publicação feita no final para actualizar o site live.
