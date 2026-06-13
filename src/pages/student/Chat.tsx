@@ -31,6 +31,15 @@ type GiphyItem = { id: string; images: { fixed_height_small: { url: string }; or
 
 const GIPHY_KEY = "dc6zaTOxFJmzC"; // public beta key
 
+function isEmojiOnly(str: string): boolean {
+  if (!str) return false;
+  const trimmed = str.trim();
+  if (!trimmed) return false;
+  // Match emoji sequences (including ZWJ, variation selectors, keycaps, flags, skin tones)
+  const emojiRegex = /^(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff]|\ufe0f|\u200d)+$/gu;
+  return emojiRegex.test(trimmed);
+}
+
 export default function StudentChat() {
   const [selectedId, setSelectedId] = useState(chatConversations[0]?.id || "");
   const [message, setMessage] = useState("");
@@ -200,7 +209,7 @@ export default function StudentChat() {
                     "max-w-[70%] rounded-2xl px-4 py-2.5",
                     msg.isOwn ? "bg-primary text-primary-foreground rounded-br-md" : "bg-card text-foreground rounded-bl-md shadow-sm"
                   )}>
-                    <p className="text-sm">{msg.content}</p>
+                    <p className={cn(isEmojiOnly(msg.content) ? "text-3xl" : "text-sm")}>{msg.content}</p>
                     <p className={cn("text-[10px] mt-1", msg.isOwn ? "text-primary-foreground/70" : "text-muted-foreground")}>
                       {msg.time} {msg.isOwn && (msg.read ? "✓✓" : "✓")}
                     </p>
@@ -216,7 +225,7 @@ export default function StudentChat() {
                     {msg.gifUrl ? (
                       <img src={msg.gifUrl} alt="GIF" className="rounded-xl max-h-64 w-auto" />
                     ) : (
-                      <p className="text-sm whitespace-pre-wrap break-words">{msg.content}</p>
+                      <p className={cn("whitespace-pre-wrap break-words", isEmojiOnly(msg.content || "") ? "text-3xl" : "text-sm")}>{msg.content}</p>
                     )}
                     <p className="text-[10px] mt-1 text-primary-foreground/70 px-2 pb-0.5">
                       {msg.time} ✓
@@ -236,8 +245,8 @@ export default function StudentChat() {
                     onEmojiClick={(e) => { setMessage(m => m + e.emoji); }}
                     emojiStyle={EmojiStyle.NATIVE}
                     theme={Theme.AUTO}
-                    width={360}
-                    height={420}
+                    width={400}
+                    height={460}
                     searchPlaceHolder="Pesquisar emoji..."
                     previewConfig={{ showPreview: false }}
                   />
