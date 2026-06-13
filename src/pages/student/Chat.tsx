@@ -31,6 +31,15 @@ type GiphyItem = { id: string; images: { fixed_height_small: { url: string }; or
 
 const GIPHY_KEY = "dc6zaTOxFJmzC"; // public beta key
 
+function isEmojiOnly(str: string): boolean {
+  if (!str) return false;
+  const trimmed = str.trim();
+  if (!trimmed) return false;
+  // Match emoji sequences (including ZWJ, variation selectors, keycaps, flags, skin tones)
+  const emojiRegex = /^(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff]|\ufe0f|\u200d)+$/gu;
+  return emojiRegex.test(trimmed);
+}
+
 export default function StudentChat() {
   const [selectedId, setSelectedId] = useState(chatConversations[0]?.id || "");
   const [message, setMessage] = useState("");
