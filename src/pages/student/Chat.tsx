@@ -225,7 +225,7 @@ export default function StudentChat() {
                     {msg.gifUrl ? (
                       <img src={msg.gifUrl} alt="GIF" className="rounded-xl max-h-64 w-auto" />
                     ) : (
-                      <p className="text-sm whitespace-pre-wrap break-words">{msg.content}</p>
+                      <p className={cn("whitespace-pre-wrap break-words", isEmojiOnly(msg.content || "") ? "text-3xl" : "text-sm")}>{msg.content}</p>
                     )}
                     <p className="text-[10px] mt-1 text-primary-foreground/70 px-2 pb-0.5">
                       {msg.time} ✓
