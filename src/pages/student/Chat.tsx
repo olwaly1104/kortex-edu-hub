@@ -209,7 +209,7 @@ export default function StudentChat() {
                     "max-w-[70%] rounded-2xl px-4 py-2.5",
                     msg.isOwn ? "bg-primary text-primary-foreground rounded-br-md" : "bg-card text-foreground rounded-bl-md shadow-sm"
                   )}>
-                    <p className="text-sm">{msg.content}</p>
+                    <p className={cn(isEmojiOnly(msg.content) ? "text-3xl" : "text-sm")}>{msg.content}</p>
                     <p className={cn("text-[10px] mt-1", msg.isOwn ? "text-primary-foreground/70" : "text-muted-foreground")}>
                       {msg.time} {msg.isOwn && (msg.read ? "✓✓" : "✓")}
                     </p>
