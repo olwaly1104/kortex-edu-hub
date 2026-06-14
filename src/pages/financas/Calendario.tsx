@@ -1093,3 +1093,28 @@ function ParticipantsDialog({ data, onClose }: {
     </Dialog>
   );
 }
+
+/* ── Modality banner (virtual/presencial) ── */
+function ModalityBanner({ modality, location, link }: { modality?: "presencial" | "virtual"; location?: string; link?: string }) {
+  if (!modality) return null;
+  const m = MODALITY_META[modality];
+  const Icon = m.icon;
+  return (
+    <div className={cn("rounded-lg border p-3 flex items-center gap-3", m.cls)}>
+      <div className="w-9 h-9 rounded-lg bg-card flex items-center justify-center shrink-0">
+        <Icon className="w-4 h-4" />
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="text-[10px] uppercase tracking-wider font-semibold opacity-80">Modalidade</p>
+        <p className="text-sm font-bold leading-tight">{m.label}</p>
+        {location && <p className="text-[11px] opacity-80 truncate mt-0.5">{location}</p>}
+      </div>
+      {modality === "virtual" && link && (
+        <a href={link} target="_blank" rel="noreferrer"
+          className="inline-flex items-center gap-1.5 text-[11px] font-semibold px-3 py-1.5 rounded-md bg-card hover:bg-card/80 transition-colors shrink-0">
+          <Link2 className="w-3 h-3" /> Entrar
+        </a>
+      )}
+    </div>
+  );
+}
