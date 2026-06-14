@@ -10,6 +10,7 @@ import { formatCurrency, receitas as receitasSeed } from "@/data/financeModuleDa
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { FinHeader } from "./_FinHeader";
+import { PeriodSelector, PERIODO_MULT, type Periodo, periodoDefaultValue } from "./_PeriodSelector";
 
 type SortField = "amount";
 type SortDir = "asc" | "desc";
