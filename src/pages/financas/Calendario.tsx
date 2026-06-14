@@ -11,11 +11,12 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import {
-  Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger,
+  Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogDescription,
 } from "@/components/ui/dialog";
 import {
   ChevronLeft, ChevronRight, Plus, CalendarDays, Clock, MapPin,
   GraduationCap, Palmtree, Users, FileText, Trash2, Check, X, Bell, UserCircle2,
+  Eye, AlignLeft, Tag, CalendarRange, Info, Briefcase, Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -26,9 +27,6 @@ const ANO_LETIVO = "2024 / 2025";
 const DAYS_SHORT = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
 const DAYS_FULL = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"];
 const MONTH_NAMES = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
-
-const HOURS = Array.from({ length: 13 }, (_, i) => 8 + i); // 08..20
-const HOUR_HEIGHT = 56;
 
 type EventType = "ferias" | "reuniao" | "feriado" | "pessoal" | "prazo";
 type ItemKind = "evento" | "reuniao";
@@ -57,6 +55,8 @@ interface MeetingRequest {
   location: string;
   organizer: string;
   description?: string;
+  participants?: string[];
+  agenda?: string[];
   status: "pending" | "accepted" | "declined";
 }
 
@@ -64,11 +64,10 @@ const TYPE_META: Record<EventType, { label: string; text: string; soft: string; 
   ferias:  { label: "Férias",   text: "text-emerald-700", soft: "bg-emerald-50 border-emerald-200", bar: "bg-emerald-500", icon: Palmtree },
   reuniao: { label: "Reunião",  text: "text-blue-700",    soft: "bg-blue-50 border-blue-200",       bar: "bg-blue-500",    icon: Users },
   feriado: { label: "Feriado",  text: "text-rose-700",    soft: "bg-rose-50 border-rose-200",       bar: "bg-rose-500",    icon: CalendarDays },
-  pessoal: { label: "Pessoal",  text: "text-violet-700",  soft: "bg-violet-50 border-violet-200",   bar: "bg-violet-500",  icon: CalendarDays },
+  pessoal: { label: "Pessoal",  text: "text-violet-700",  soft: "bg-violet-50 border-violet-200",   bar: "bg-violet-500",  icon: Sparkles },
   prazo:   { label: "Prazo",    text: "text-amber-700",   soft: "bg-amber-50 border-amber-200",     bar: "bg-amber-500",   icon: FileText },
 };
 
-/* ── people in the department ───────────────────────── */
 const DEPT_PEOPLE = [
   "Maria Tavares — Contabilidade",
   "João Mendes — Tesouraria",
@@ -79,23 +78,23 @@ const DEPT_PEOPLE = [
   "Decano FCE",
 ];
 
-/* ── pre-set institutional events ──────────────────── */
 const PRESET_EVENTS: AgendaEvent[] = [
-  { id: "p1", title: "Reunião do Departamento Financeiro", type: "reuniao", date: "2024-02-14", startTime: "15:00", endTime: "16:30", location: "Sala de Reuniões — Reitoria", obligatory: true, description: "Revisão do fecho mensal e ponto de situação dos orçamentos." },
-  { id: "p2", title: "Reunião com Reitoria — Orçamento", type: "reuniao", date: "2024-02-15", startTime: "10:00", endTime: "11:30", location: "Gabinete do Reitor", obligatory: true },
+  { id: "p1", title: "Reunião do Departamento Financeiro", type: "reuniao", date: "2024-02-14", startTime: "15:00", endTime: "16:30", location: "Sala de Reuniões — Reitoria", obligatory: true, description: "Revisão do fecho mensal e ponto de situação dos orçamentos.", organizer: "Diretor Financeiro", participants: ["Maria Tavares — Contabilidade","João Mendes — Tesouraria","Ana Lopes — Orçamento","Carla Neto — Folha Salarial"] },
+  { id: "p2", title: "Reunião com Reitoria — Orçamento", type: "reuniao", date: "2024-02-15", startTime: "10:00", endTime: "11:30", location: "Gabinete do Reitor", obligatory: true, organizer: "Reitor — Prof. Manuel Costa", participants: ["Diretor Financeiro","Ana Lopes — Orçamento"] },
   { id: "p3", title: "Encerramento Mensal — Janeiro", type: "prazo", date: "2024-02-13", startTime: "17:00", endTime: "18:00", description: "Prazo para encerramento contabilístico." },
-  { id: "p4", title: "Pagamento de Salários", type: "prazo", date: "2024-02-28", startTime: "23:59", endTime: "23:59", obligatory: true },
-  { id: "p5", title: "Feriado Nacional", type: "feriado", date: "2024-02-04" },
-  { id: "p6", title: "Férias Académicas de Inverno", type: "ferias", date: "2024-02-26", endDate: "2024-03-01" },
-  { id: "p7", title: "Conselho Administrativo", type: "reuniao", date: "2024-02-16", startTime: "09:00", endTime: "12:00", location: "Auditório Principal", obligatory: true },
+  { id: "p4", title: "Pagamento de Salários", type: "prazo", date: "2024-02-28", obligatory: true, description: "Processamento e transferência de salários do mês." },
+  { id: "p5", title: "Feriado Nacional", type: "feriado", date: "2024-02-04", description: "Dia do Início da Luta Armada." },
+  { id: "p6", title: "Férias Académicas de Inverno", type: "ferias", date: "2024-02-26", endDate: "2024-03-01", description: "Pausa académica entre semestres." },
+  { id: "p7", title: "Conselho Administrativo", type: "reuniao", date: "2024-02-16", startTime: "09:00", endTime: "12:00", location: "Auditório Principal", obligatory: true, organizer: "Reitoria", participants: ["Reitor — Prof. Manuel Costa","Decano FCE","Diretor Financeiro"] },
   { id: "p8", title: "Almoço com equipa", type: "pessoal", date: "2024-02-14", startTime: "12:30", endTime: "13:30", location: "Cantina" },
 ];
 
-/* ── meeting requests received ─────────────────────── */
 const INITIAL_REQUESTS: MeetingRequest[] = [
-  { id: "r1", title: "Revisão de Orçamento — Curso de Arquitectura", date: "2024-02-15", startTime: "14:00", endTime: "15:00", location: "Sala 204", organizer: "Coordenação ARQ", description: "Análise de despesas extra-orçamentais do semestre.", status: "pending" },
-  { id: "r2", title: "Reunião de planeamento — GAP", date: "2024-02-19", startTime: "11:00", endTime: "12:00", location: "Sala GAP", organizer: "Gestão Académica de Pessoal", status: "pending" },
-  { id: "r3", title: "Auditoria de processos", date: "2024-02-21", startTime: "09:30", endTime: "11:00", location: "Reitoria", organizer: "Pedro Silva", status: "pending" },
+  { id: "r1", title: "Revisão de Orçamento — Curso de Arquitectura", date: "2024-02-15", startTime: "14:00", endTime: "15:00", location: "Sala 204", organizer: "Coordenação ARQ", description: "Análise de despesas extra-orçamentais do semestre.", participants: ["Coordenador ARQ","Diretor Financeiro","Ana Lopes — Orçamento"], agenda: ["Despesas extra-orçamentais","Projeções Q2","Pedidos pendentes"], status: "pending" },
+  { id: "r2", title: "Reunião de planeamento — GAP", date: "2024-02-19", startTime: "11:00", endTime: "12:00", location: "Sala GAP", organizer: "Gestão Académica de Pessoal", participants: ["Coord. GAP","Diretor Financeiro"], status: "pending" },
+  { id: "r3", title: "Auditoria de processos", date: "2024-02-21", startTime: "09:30", endTime: "11:00", location: "Reitoria", organizer: "Pedro Silva", description: "Revisão dos processos contabilísticos do trimestre.", participants: ["Pedro Silva — Auditoria Interna","Diretor Financeiro","Maria Tavares — Contabilidade"], status: "pending" },
+  { id: "r4", title: "Pagamentos a fornecedores", date: "2024-02-22", startTime: "15:00", endTime: "16:00", location: "Sala Tesouraria", organizer: "João Mendes", participants: ["João Mendes — Tesouraria","Diretor Financeiro"], status: "pending" },
+  { id: "r5", title: "Folha salarial — fecho mês", date: "2024-02-26", startTime: "10:00", endTime: "11:00", location: "Sala 102", organizer: "Carla Neto", participants: ["Carla Neto — Folha Salarial","Diretor Financeiro"], status: "pending" },
 ];
 
 /* ── helpers ───────────────────────────────────────── */
@@ -117,7 +116,10 @@ function fmtLong(s: string) {
   const d = parseISO(s);
   return d.toLocaleDateString("pt-PT", { weekday: "long", day: "2-digit", month: "long", year: "numeric" });
 }
-function timeToMin(t: string) { const [h, m] = t.split(":").map(Number); return h * 60 + m; }
+function fmtShort(s: string) {
+  const d = parseISO(s);
+  return d.toLocaleDateString("pt-PT", { day: "2-digit", month: "short", year: "numeric" });
+}
 
 /* ─────────────────────────────────────────────────── */
 export default function FinancasCalendario() {
@@ -127,6 +129,8 @@ export default function FinancasCalendario() {
   const [openCreate, setOpenCreate] = useState(false);
   const [userEvents, setUserEvents] = useState<AgendaEvent[]>([]);
   const [requests, setRequests] = useState<MeetingRequest[]>(INITIAL_REQUESTS);
+  const [detailEvent, setDetailEvent] = useState<AgendaEvent | null>(null);
+  const [detailRequest, setDetailRequest] = useState<MeetingRequest | null>(null);
 
   const allEvents = useMemo(() => {
     const accepted: AgendaEvent[] = requests
@@ -134,12 +138,11 @@ export default function FinancasCalendario() {
       .map(r => ({
         id: r.id, title: r.title, type: "reuniao" as EventType, date: r.date,
         startTime: r.startTime, endTime: r.endTime, location: r.location,
-        description: r.description, organizer: r.organizer,
+        description: r.description, organizer: r.organizer, participants: r.participants,
       }));
     return [...PRESET_EVENTS, ...userEvents, ...accepted];
   }, [userEvents, requests]);
 
-  /* form */
   const [kind, setKind] = useState<ItemKind>("evento");
   const [form, setForm] = useState<Omit<AgendaEvent, "id">>({
     title: "", type: "pessoal", date: TODAY, startTime: "09:00", endTime: "10:00",
@@ -156,17 +159,21 @@ export default function FinancasCalendario() {
   const handleCreate = () => {
     if (!form.title.trim()) return;
     const finalType: EventType = kind === "reuniao" ? "reuniao" : form.type;
-    setUserEvents(prev => [...prev, { ...form, type: finalType, id: `u-${Date.now()}` }]);
+    setUserEvents(prev => [...prev, { ...form, type: finalType, id: `u-${Date.now()}`, organizer: kind === "reuniao" ? "Diretor Financeiro" : undefined }]);
     setOpenCreate(false);
     setForm({ title: "", type: "pessoal", date: selectedDate, startTime: "09:00", endTime: "10:00", location: "", description: "", participants: [] });
     setKind("evento");
   };
 
-  const handleDelete = (id: string) => setUserEvents(prev => prev.filter(e => e.id !== id));
-  const respondRequest = (id: string, status: "accepted" | "declined") =>
+  const handleDelete = (id: string) => {
+    setUserEvents(prev => prev.filter(e => e.id !== id));
+    setDetailEvent(null);
+  };
+  const respondRequest = (id: string, status: "accepted" | "declined") => {
     setRequests(prev => prev.map(r => r.id === id ? { ...r, status } : r));
+    setDetailRequest(null);
+  };
 
-  /* week navigation */
   const weekStart = startOfWeek(cursor);
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
   const weekLabel = (() => {
@@ -174,7 +181,6 @@ export default function FinancasCalendario() {
     return `${a.getDate()} ${MONTH_NAMES[a.getMonth()].slice(0, 3)} – ${b.getDate()} ${MONTH_NAMES[b.getMonth()].slice(0, 3)} ${b.getFullYear()}`;
   })();
 
-  /* month navigation */
   const cursorD = parseISO(cursor);
   const monthLabel = `${MONTH_NAMES[cursorD.getMonth()]} ${cursorD.getFullYear()}`;
   const firstOfMonth = new Date(cursorD.getFullYear(), cursorD.getMonth(), 1);
@@ -197,18 +203,12 @@ export default function FinancasCalendario() {
 
   return (
     <div className="p-6 lg:p-8 animate-fade-in space-y-6">
-      {/* ── Header card ───────────────────────────── */}
+      {/* ── Header ─────────────────────────────── */}
       <div className="rounded-xl border border-border bg-gradient-to-r from-primary/5 to-transparent p-6">
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div className="min-w-0">
             <div className="flex items-center gap-2 text-[11px] uppercase tracking-wider text-muted-foreground font-medium mb-2">
-              <span className="capitalize flex items-center gap-1">
-                <CalendarDays className="w-3.5 h-3.5" />{fmtLong(TODAY)}
-              </span>
-              <span className="text-border">•</span>
-              <span className="flex items-center gap-1">
-                <GraduationCap className="w-3.5 h-3.5" />Ano Letivo {ANO_LETIVO}
-              </span>
+              <GraduationCap className="w-3.5 h-3.5" />Ano Letivo {ANO_LETIVO}
             </div>
             <h1 className="text-2xl font-bold text-foreground">Calendário</h1>
             <p className="text-sm text-muted-foreground mt-1">Agenda institucional do Departamento Financeiro</p>
@@ -237,110 +237,18 @@ export default function FinancasCalendario() {
                 </button>
               ))}
             </div>
-            <Dialog open={openCreate} onOpenChange={setOpenCreate}>
-              <DialogTrigger asChild>
-                <Button size="sm" className="h-9 gap-1.5 text-xs" onClick={() => setForm(f => ({ ...f, date: selectedDate }))}>
-                  <Plus className="w-4 h-4" /> Adicionar à Agenda
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-lg">
-                <DialogHeader><DialogTitle>Adicionar à agenda</DialogTitle></DialogHeader>
-                <div className="space-y-4">
-                  {/* kind selector */}
-                  <div className="grid grid-cols-2 gap-2">
-                    {([
-                      { v: "evento" as const, label: "Evento / Prazo", desc: "Apenas para si" },
-                      { v: "reuniao" as const, label: "Reunião", desc: "Convidar participantes" },
-                    ]).map(opt => (
-                      <button key={opt.v} type="button" onClick={() => setKind(opt.v)}
-                        className={cn("text-left p-3 rounded-lg border transition-colors",
-                          kind === opt.v ? "border-primary bg-primary/5" : "border-border hover:bg-muted/30"
-                        )}>
-                        <p className="text-sm font-semibold text-foreground">{opt.label}</p>
-                        <p className="text-[11px] text-muted-foreground mt-0.5">{opt.desc}</p>
-                      </button>
-                    ))}
-                  </div>
-
-                  <div>
-                    <Label className="text-xs">Título</Label>
-                    <Input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} placeholder={kind === "reuniao" ? "Ex: Reunião sobre orçamento Q1" : "Ex: Encontro com auditor"} />
-                  </div>
-
-                  {kind === "evento" && (
-                    <div>
-                      <Label className="text-xs">Tipo</Label>
-                      <Select value={form.type} onValueChange={(v: EventType) => setForm({ ...form, type: v })}>
-                        <SelectTrigger><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="pessoal">Pessoal</SelectItem>
-                          <SelectItem value="prazo">Prazo</SelectItem>
-                          <SelectItem value="feriado">Feriado</SelectItem>
-                          <SelectItem value="ferias">Férias</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  )}
-
-                  <div className="grid grid-cols-3 gap-2">
-                    <div className="col-span-3 sm:col-span-1"><Label className="text-xs">Data</Label>
-                      <Input type="date" value={form.date} onChange={e => setForm({ ...form, date: e.target.value })} />
-                    </div>
-                    <div><Label className="text-xs">Início</Label>
-                      <Input type="time" value={form.startTime} onChange={e => setForm({ ...form, startTime: e.target.value })} />
-                    </div>
-                    <div><Label className="text-xs">Fim</Label>
-                      <Input type="time" value={form.endTime} onChange={e => setForm({ ...form, endTime: e.target.value })} />
-                    </div>
-                  </div>
-
-                  <div><Label className="text-xs">Local (opcional)</Label>
-                    <Input value={form.location} onChange={e => setForm({ ...form, location: e.target.value })} placeholder="Sala / Gabinete" />
-                  </div>
-
-                  {kind === "reuniao" && (
-                    <div>
-                      <Label className="text-xs flex items-center gap-1.5"><Users className="w-3 h-3" /> Participantes</Label>
-                      <p className="text-[10px] text-muted-foreground mb-1.5">Todos receberão um pedido de reunião no calendário.</p>
-                      <ScrollArea className="h-32 rounded-md border p-2">
-                        <div className="space-y-1.5">
-                          {DEPT_PEOPLE.map(p => {
-                            const checked = (form.participants ?? []).includes(p);
-                            return (
-                              <label key={p} className="flex items-center gap-2 text-xs cursor-pointer p-1 rounded hover:bg-muted/50">
-                                <Checkbox checked={checked} onCheckedChange={() => toggleParticipant(p)} />
-                                <span className="text-foreground">{p}</span>
-                              </label>
-                            );
-                          })}
-                        </div>
-                      </ScrollArea>
-                      {(form.participants?.length ?? 0) > 0 && (
-                        <p className="text-[10px] text-primary mt-1.5 font-medium">{form.participants?.length} convidado(s) selecionado(s)</p>
-                      )}
-                    </div>
-                  )}
-
-                  <div><Label className="text-xs">Descrição (opcional)</Label>
-                    <Textarea rows={2} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} />
-                  </div>
-                </div>
-                <DialogFooter>
-                  <Button variant="ghost" onClick={() => setOpenCreate(false)}>Cancelar</Button>
-                  <Button onClick={handleCreate}>{kind === "reuniao" ? "Enviar pedido" : "Adicionar"}</Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+            <Button size="sm" className="h-9 gap-1.5 text-xs" onClick={() => { setForm(f => ({ ...f, date: selectedDate })); setOpenCreate(true); }}>
+              <Plus className="w-4 h-4" /> Adicionar à Agenda
+            </Button>
           </div>
         </div>
       </div>
 
-      {/* ── Grid ─────────────────────────────────── */}
+      {/* ── Grid ─────────────────────────────── */}
       <div className="flex gap-6">
         <div className="flex-1 min-w-0">
           {view === "week" ? (
             <Card className="overflow-hidden">
-              {/* Week day pills */}
               <div className="grid grid-cols-7 border-b bg-muted/10">
                 {weekDays.map(d => {
                   const dD = parseISO(d);
@@ -348,19 +256,13 @@ export default function FinancasCalendario() {
                   const isSel = d === selectedDate;
                   const count = eventsOnDate(d).length;
                   return (
-                    <button
-                      key={d}
-                      onClick={() => setSelectedDate(d)}
-                      className={cn(
-                        "relative py-2.5 text-center border-l first:border-l-0 transition-colors group",
-                        isSel ? "bg-primary/10" : "hover:bg-primary/5"
-                      )}
-                    >
+                    <button key={d} onClick={() => setSelectedDate(d)}
+                      className={cn("relative py-2.5 text-center border-l first:border-l-0 transition-colors",
+                        isSel ? "bg-primary/10" : "hover:bg-primary/5")}>
                       <p className="text-[9px] uppercase tracking-wider text-muted-foreground font-medium">
                         {DAYS_SHORT[(dD.getDay() + 6) % 7]}
                       </p>
-                      <p className={cn(
-                        "text-sm font-bold mt-0.5 w-7 h-7 mx-auto flex items-center justify-center rounded-full transition-colors",
+                      <p className={cn("text-sm font-bold mt-0.5 w-7 h-7 mx-auto flex items-center justify-center rounded-full transition-colors",
                         isToday ? "bg-primary text-primary-foreground" :
                         isSel ? "ring-2 ring-primary text-foreground" : "text-foreground"
                       )}>{dD.getDate()}</p>
@@ -376,7 +278,6 @@ export default function FinancasCalendario() {
                 })}
               </div>
 
-              {/* Selected day agenda */}
               <div className="px-4 py-2.5 border-b bg-muted/5 flex items-center justify-between">
                 <div>
                   <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Agenda do dia</p>
@@ -398,53 +299,9 @@ export default function FinancasCalendario() {
                 </div>
               ) : (
                 <div className="divide-y divide-border max-h-[480px] overflow-y-auto">
-                  {selectedEvents.map(ev => {
-                    const m = TYPE_META[ev.type];
-                    const Icon = m.icon;
-                    const hasTime = ev.startTime && ev.startTime !== "23:59";
-                    const isUser = ev.id.startsWith("u-");
-                    return (
-                      <div key={ev.id} className="flex items-center gap-4 px-4 py-3 hover:bg-muted/30 transition-colors group">
-                        <div className="text-center shrink-0 w-14">
-                          {hasTime ? (
-                            <>
-                              <p className="text-sm font-bold text-foreground">{ev.startTime}</p>
-                              <p className="text-[10px] text-muted-foreground">{ev.endTime}</p>
-                            </>
-                          ) : (
-                            <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Dia<br/>todo</p>
-                          )}
-                        </div>
-                        <div className={cn("w-0.5 h-10 rounded-full shrink-0", m.bar)} />
-                        <div className={cn("w-7 h-7 rounded-lg flex items-center justify-center shrink-0", m.soft)}>
-                          <Icon className={cn("w-3.5 h-3.5", m.text)} />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium text-sm leading-tight text-foreground line-clamp-1">{ev.title}</p>
-                          <div className="flex items-center gap-3 mt-1 text-[11px] text-muted-foreground">
-                            {ev.location && (
-                              <span className="flex items-center gap-1 truncate"><MapPin className="w-3 h-3" />{ev.location}</span>
-                            )}
-                            {ev.organizer && (
-                              <span className="flex items-center gap-1 truncate"><UserCircle2 className="w-3 h-3" />{ev.organizer}</span>
-                            )}
-                          </div>
-                        </div>
-                        <Badge variant="outline" className={cn("text-[10px] shrink-0", m.soft, m.text, "border-0")}>
-                          {m.label}
-                        </Badge>
-                        {ev.obligatory && (
-                          <Badge variant="outline" className="text-[9px] bg-red-50 text-red-700 border-red-200 shrink-0">Obrigatório</Badge>
-                        )}
-                        {isUser && (
-                          <Button variant="ghost" size="icon" className="h-7 w-7 opacity-0 group-hover:opacity-100 text-destructive hover:text-destructive hover:bg-destructive/10 shrink-0"
-                            onClick={() => handleDelete(ev.id)}>
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </Button>
-                        )}
-                      </div>
-                    );
-                  })}
+                  {selectedEvents.map(ev => (
+                    <EventRow key={ev.id} ev={ev} onOpen={() => setDetailEvent(ev)} />
+                  ))}
                 </div>
               )}
             </Card>
@@ -475,7 +332,8 @@ export default function FinancasCalendario() {
                         {dayEvents.slice(0, 3).map(ev => {
                           const m = TYPE_META[ev.type];
                           return (
-                            <div key={ev.id} className={cn("text-[9px] px-1.5 py-0.5 rounded truncate border font-medium", m.soft, m.text)}>
+                            <div key={ev.id} onClick={(e) => { e.stopPropagation(); setDetailEvent(ev); }}
+                              className={cn("text-[9px] px-1.5 py-0.5 rounded truncate border font-medium cursor-pointer", m.soft, m.text)}>
                               {ev.title}
                             </div>
                           );
@@ -490,52 +348,502 @@ export default function FinancasCalendario() {
           )}
         </div>
 
-        {/* ── Side panel: Pedidos de Reunião ─────── */}
+        {/* ── Side panel ─────────────────────── */}
         <div className="w-[300px] shrink-0 hidden lg:block">
-          <Card className="overflow-hidden sticky top-6">
-            <div className="px-3.5 py-2.5 border-b bg-blue-50/60 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Bell className="w-4 h-4 text-blue-600" />
-                <p className="text-sm font-semibold text-foreground">Pedidos de Reunião</p>
+          {view === "week" ? (
+            <Card className="overflow-hidden sticky top-6">
+              <div className="px-3.5 py-2.5 border-b bg-blue-50/60 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Bell className="w-4 h-4 text-blue-600" />
+                  <p className="text-sm font-semibold text-foreground">Pedidos de Reunião</p>
+                </div>
+                {pendingRequests.length > 0 && (
+                  <Badge className="bg-blue-600 hover:bg-blue-600 text-white text-[10px] h-5">{pendingRequests.length}</Badge>
+                )}
               </div>
-              {pendingRequests.length > 0 && (
-                <Badge className="bg-blue-600 hover:bg-blue-600 text-white text-[10px] h-5">{pendingRequests.length}</Badge>
-              )}
-            </div>
-            <div className="p-2 space-y-2 max-h-[600px] overflow-y-auto">
               {pendingRequests.length === 0 ? (
                 <div className="text-center py-8">
                   <Bell className="w-6 h-6 text-muted-foreground/40 mx-auto mb-2" />
                   <p className="text-[11px] text-muted-foreground">Sem pedidos pendentes</p>
                 </div>
-              ) : pendingRequests.map(r => (
-                <div key={r.id} className="rounded-md border p-2.5 space-y-2 bg-card hover:border-blue-300 transition-colors">
-                  <div>
-                    <p className="text-xs font-semibold text-foreground leading-tight">{r.title}</p>
-                    <p className="text-[10px] text-muted-foreground mt-0.5 flex items-center gap-1">
-                      <UserCircle2 className="w-3 h-3" />{r.organizer}
-                    </p>
-                  </div>
-                  <div className="space-y-0.5 text-[10px] text-muted-foreground">
-                    <div className="flex items-center gap-1"><CalendarDays className="w-3 h-3" />{r.date} · {r.startTime}–{r.endTime}</div>
-                    <div className="flex items-center gap-1 truncate"><MapPin className="w-3 h-3" />{r.location}</div>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <Button size="sm" className="h-7 flex-1 text-[10px] gap-1 bg-emerald-600 hover:bg-emerald-700"
-                      onClick={() => respondRequest(r.id, "accepted")}>
-                      <Check className="w-3 h-3" /> Aceitar
-                    </Button>
-                    <Button size="sm" variant="outline" className="h-7 flex-1 text-[10px] gap-1 border-red-200 text-red-700 hover:bg-red-50"
-                      onClick={() => respondRequest(r.id, "declined")}>
-                      <X className="w-3 h-3" /> Recusar
-                    </Button>
-                  </div>
+              ) : (
+                <div className="p-2 space-y-2 overflow-y-auto" style={{ maxHeight: 3 * 168 }}>
+                  {pendingRequests.map(r => (
+                    <div key={r.id} className="rounded-md border p-2.5 space-y-2 bg-card hover:border-blue-300 transition-colors">
+                      <div>
+                        <p className="text-xs font-semibold text-foreground leading-tight">{r.title}</p>
+                        <p className="text-[10px] text-muted-foreground mt-0.5 flex items-center gap-1">
+                          <UserCircle2 className="w-3 h-3" />{r.organizer}
+                        </p>
+                      </div>
+                      <div className="space-y-0.5 text-[10px] text-muted-foreground">
+                        <div className="flex items-center gap-1"><CalendarDays className="w-3 h-3" />{r.date} · {r.startTime}–{r.endTime}</div>
+                        <div className="flex items-center gap-1 truncate"><MapPin className="w-3 h-3" />{r.location}</div>
+                        {r.participants && (
+                          <div className="flex items-center gap-1"><Users className="w-3 h-3" />{r.participants.length} participante{r.participants.length !== 1 ? "s" : ""}</div>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <Button size="sm" className="h-7 flex-1 text-[10px] gap-1 bg-emerald-600 hover:bg-emerald-700"
+                          onClick={() => respondRequest(r.id, "accepted")}>
+                          <Check className="w-3 h-3" /> Aceitar
+                        </Button>
+                        <Button size="sm" variant="outline" className="h-7 flex-1 text-[10px] gap-1 border-red-200 text-red-700 hover:bg-red-50"
+                          onClick={() => respondRequest(r.id, "declined")}>
+                          <X className="w-3 h-3" /> Recusar
+                        </Button>
+                      </div>
+                      <Button size="sm" variant="ghost" className="h-7 w-full text-[10px] gap-1 text-blue-700 hover:bg-blue-50"
+                        onClick={() => setDetailRequest(r)}>
+                        <Eye className="w-3 h-3" /> Ver detalhes
+                      </Button>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </Card>
+              )}
+            </Card>
+          ) : (
+            <Card className="overflow-hidden sticky top-6">
+              <div className="px-3.5 py-2.5 border-b bg-muted/10">
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Agenda do dia</p>
+                <h3 className="text-sm font-bold text-foreground capitalize leading-tight mt-0.5">{fmtLong(selectedDate)}</h3>
+              </div>
+              {selectedEvents.length === 0 ? (
+                <div className="text-center py-8">
+                  <CalendarDays className="w-6 h-6 text-muted-foreground/40 mx-auto mb-2" />
+                  <p className="text-[11px] text-muted-foreground">Sem eventos</p>
+                </div>
+              ) : (
+                <div className="divide-y divide-border max-h-[520px] overflow-y-auto">
+                  {selectedEvents.map(ev => {
+                    const m = TYPE_META[ev.type];
+                    const Icon = m.icon;
+                    return (
+                      <button key={ev.id} onClick={() => setDetailEvent(ev)}
+                        className="w-full text-left p-3 flex items-start gap-2.5 hover:bg-muted/30 transition-colors">
+                        <div className={cn("w-7 h-7 rounded-lg flex items-center justify-center shrink-0", m.soft)}>
+                          <Icon className={cn("w-3.5 h-3.5", m.text)} />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-semibold text-foreground leading-tight line-clamp-2">{ev.title}</p>
+                          <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1 text-[10px] text-muted-foreground">
+                            {ev.startTime && <span>{ev.startTime}–{ev.endTime}</span>}
+                            {ev.participants && <span className="flex items-center gap-0.5"><Users className="w-2.5 h-2.5" />{ev.participants.length}</span>}
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </Card>
+          )}
         </div>
       </div>
+
+      {/* ── Adicionar à Agenda (modern full-page modal) ── */}
+      <Dialog open={openCreate} onOpenChange={setOpenCreate}>
+        <DialogContent className="sm:max-w-2xl p-0 gap-0 overflow-hidden">
+          <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent px-6 py-5 border-b">
+            <DialogHeader className="space-y-1">
+              <DialogTitle className="text-lg font-bold">Adicionar à Agenda</DialogTitle>
+              <DialogDescription className="text-xs">
+                Crie um evento pessoal, prazo ou envie um pedido de reunião para a sua equipa.
+              </DialogDescription>
+            </DialogHeader>
+          </div>
+
+          <div className="px-6 py-5 space-y-5 max-h-[70vh] overflow-y-auto">
+            <div className="grid grid-cols-2 gap-3">
+              {([
+                { v: "evento" as const, label: "Evento / Prazo", desc: "Apenas para si", icon: CalendarDays },
+                { v: "reuniao" as const, label: "Reunião", desc: "Convidar participantes", icon: Users },
+              ]).map(opt => {
+                const I = opt.icon;
+                return (
+                  <button key={opt.v} type="button" onClick={() => setKind(opt.v)}
+                    className={cn("text-left p-4 rounded-xl border-2 transition-all",
+                      kind === opt.v ? "border-primary bg-primary/5 shadow-sm" : "border-border hover:border-primary/40 hover:bg-muted/30"
+                    )}>
+                    <div className="flex items-center gap-2.5">
+                      <div className={cn("w-9 h-9 rounded-lg flex items-center justify-center", kind === opt.v ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground")}>
+                        <I className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-foreground">{opt.label}</p>
+                        <p className="text-[11px] text-muted-foreground">{opt.desc}</p>
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="space-y-1.5">
+              <Label className="text-xs flex items-center gap-1.5 text-foreground"><Tag className="w-3 h-3" /> Título</Label>
+              <Input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })}
+                placeholder={kind === "reuniao" ? "Ex: Reunião sobre orçamento Q1" : "Ex: Encontro com auditor"} className="h-10" />
+            </div>
+
+            {kind === "evento" && (
+              <div className="space-y-1.5">
+                <Label className="text-xs text-foreground">Categoria</Label>
+                <div className="grid grid-cols-4 gap-2">
+                  {(["pessoal","prazo","feriado","ferias"] as EventType[]).map(t => {
+                    const m = TYPE_META[t]; const I = m.icon;
+                    return (
+                      <button key={t} type="button" onClick={() => setForm({ ...form, type: t })}
+                        className={cn("p-2.5 rounded-lg border-2 text-center transition-all",
+                          form.type === t ? "border-primary bg-primary/5" : "border-border hover:border-primary/30"
+                        )}>
+                        <I className={cn("w-4 h-4 mx-auto mb-1", m.text)} />
+                        <p className="text-[10px] font-medium text-foreground">{m.label}</p>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            <div className="grid grid-cols-3 gap-3">
+              <div className="space-y-1.5">
+                <Label className="text-xs flex items-center gap-1.5 text-foreground"><CalendarDays className="w-3 h-3" /> Data</Label>
+                <Input type="date" value={form.date} onChange={e => setForm({ ...form, date: e.target.value })} className="h-10" />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs flex items-center gap-1.5 text-foreground"><Clock className="w-3 h-3" /> Início</Label>
+                <Input type="time" value={form.startTime} onChange={e => setForm({ ...form, startTime: e.target.value })} className="h-10" />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs flex items-center gap-1.5 text-foreground"><Clock className="w-3 h-3" /> Fim</Label>
+                <Input type="time" value={form.endTime} onChange={e => setForm({ ...form, endTime: e.target.value })} className="h-10" />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label className="text-xs flex items-center gap-1.5 text-foreground"><MapPin className="w-3 h-3" /> Local <span className="text-muted-foreground font-normal">(opcional)</span></Label>
+              <Input value={form.location} onChange={e => setForm({ ...form, location: e.target.value })} placeholder="Sala / Gabinete" className="h-10" />
+            </div>
+
+            {kind === "reuniao" && (
+              <div className="space-y-1.5 rounded-xl bg-blue-50/40 border border-blue-100 p-4">
+                <Label className="text-xs flex items-center gap-1.5 text-blue-900"><Users className="w-3 h-3" /> Participantes</Label>
+                <p className="text-[11px] text-blue-700/80 mb-2">Todos os selecionados receberão um pedido de reunião no calendário.</p>
+                <ScrollArea className="h-40 rounded-md border bg-card p-2">
+                  <div className="space-y-1">
+                    {DEPT_PEOPLE.map(p => {
+                      const checked = (form.participants ?? []).includes(p);
+                      return (
+                        <label key={p} className={cn("flex items-center gap-2 text-xs cursor-pointer p-2 rounded transition-colors",
+                          checked ? "bg-blue-50" : "hover:bg-muted/50")}>
+                          <Checkbox checked={checked} onCheckedChange={() => toggleParticipant(p)} />
+                          <span className="text-foreground">{p}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </ScrollArea>
+                {(form.participants?.length ?? 0) > 0 && (
+                  <p className="text-[11px] text-blue-700 font-medium pt-1">{form.participants?.length} convidado(s) selecionado(s)</p>
+                )}
+              </div>
+            )}
+
+            <div className="space-y-1.5">
+              <Label className="text-xs flex items-center gap-1.5 text-foreground"><AlignLeft className="w-3 h-3" /> Descrição <span className="text-muted-foreground font-normal">(opcional)</span></Label>
+              <Textarea rows={3} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })}
+                placeholder="Notas, contexto ou agenda da reunião…" />
+            </div>
+          </div>
+
+          <DialogFooter className="px-6 py-4 border-t bg-muted/20">
+            <Button variant="ghost" onClick={() => setOpenCreate(false)}>Cancelar</Button>
+            <Button onClick={handleCreate} className="gap-1.5">
+              <Check className="w-4 h-4" />
+              {kind === "reuniao" ? "Enviar pedido" : "Adicionar à agenda"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ── Event detail ── */}
+      <EventDetailDialog event={detailEvent} onClose={() => setDetailEvent(null)} onDelete={handleDelete} />
+
+      {/* ── Request detail ── */}
+      <RequestDetailDialog request={detailRequest} onClose={() => setDetailRequest(null)} onRespond={respondRequest} />
     </div>
+  );
+}
+
+/* ── Event row in agenda ── */
+function EventRow({ ev, onOpen }: { ev: AgendaEvent; onOpen: () => void }) {
+  const m = TYPE_META[ev.type];
+  const Icon = m.icon;
+  const hasTime = !!ev.startTime;
+  return (
+    <button onClick={onOpen} className="w-full text-left flex items-center gap-4 px-4 py-3 hover:bg-muted/30 transition-colors group">
+      <div className="text-center shrink-0 w-14">
+        {hasTime ? (
+          <>
+            <p className="text-sm font-bold text-foreground">{ev.startTime}</p>
+            <p className="text-[10px] text-muted-foreground">{ev.endTime}</p>
+          </>
+        ) : (
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Dia<br/>todo</p>
+        )}
+      </div>
+      <div className={cn("w-0.5 h-10 rounded-full shrink-0", m.bar)} />
+      <div className={cn("w-7 h-7 rounded-lg flex items-center justify-center shrink-0", m.soft)}>
+        <Icon className={cn("w-3.5 h-3.5", m.text)} />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="font-medium text-sm leading-tight text-foreground line-clamp-1">{ev.title}</p>
+        <div className="flex items-center gap-3 mt-1 text-[11px] text-muted-foreground">
+          {ev.location && <span className="flex items-center gap-1 truncate"><MapPin className="w-3 h-3" />{ev.location}</span>}
+          {ev.participants && ev.participants.length > 0 && (
+            <span className="flex items-center gap-1"><Users className="w-3 h-3" />{ev.participants.length} participante{ev.participants.length !== 1 ? "s" : ""}</span>
+          )}
+        </div>
+      </div>
+      <Badge variant="outline" className={cn("text-[10px] shrink-0 border-0", m.soft, m.text)}>{m.label}</Badge>
+      {ev.obligatory && (
+        <Badge variant="outline" className="text-[9px] bg-red-50 text-red-700 border-red-200 shrink-0">Obrigatório</Badge>
+      )}
+    </button>
+  );
+}
+
+/* ── Event detail dialog (per category) ── */
+function EventDetailDialog({ event, onClose, onDelete }: { event: AgendaEvent | null; onClose: () => void; onDelete: (id: string) => void }) {
+  if (!event) return null;
+  const m = TYPE_META[event.type];
+  const Icon = m.icon;
+  const isUser = event.id.startsWith("u-");
+
+  return (
+    <Dialog open={!!event} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="sm:max-w-2xl p-0 gap-0 overflow-hidden">
+        {/* header band colored by type */}
+        <div className={cn("px-6 py-5 border-b", m.soft)}>
+          <div className="flex items-start gap-4">
+            <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center bg-card shrink-0")}>
+              <Icon className={cn("w-6 h-6", m.text)} />
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2 flex-wrap mb-1">
+                <Badge variant="outline" className={cn("text-[10px] border-0 bg-card", m.text)}>{m.label}</Badge>
+                {event.obligatory && (
+                  <Badge variant="outline" className="text-[10px] bg-red-50 text-red-700 border-red-200">Obrigatório</Badge>
+                )}
+              </div>
+              <DialogHeader className="space-y-0">
+                <DialogTitle className="text-lg font-bold leading-tight">{event.title}</DialogTitle>
+              </DialogHeader>
+              <p className={cn("text-xs mt-1 capitalize", m.text)}>{fmtLong(event.date)}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="px-6 py-5 space-y-5 max-h-[60vh] overflow-y-auto">
+          {/* Common date/time block */}
+          <div className="grid grid-cols-2 gap-3">
+            <InfoTile icon={CalendarDays} label="Data">
+              {event.endDate ? `${fmtShort(event.date)} → ${fmtShort(event.endDate)}` : fmtShort(event.date)}
+            </InfoTile>
+            {event.startTime && (
+              <InfoTile icon={Clock} label="Horário">
+                {event.startTime} – {event.endTime}
+              </InfoTile>
+            )}
+          </div>
+
+          {/* Category-specific blocks */}
+          {event.type === "reuniao" && (
+            <>
+              <div className="grid grid-cols-2 gap-3">
+                {event.location && (
+                  <InfoTile icon={MapPin} label="Local">{event.location}</InfoTile>
+                )}
+                {event.organizer && (
+                  <InfoTile icon={UserCircle2} label="Organizador">{event.organizer}</InfoTile>
+                )}
+              </div>
+              {event.participants && event.participants.length > 0 && (
+                <div>
+                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-2 flex items-center gap-1.5">
+                    <Users className="w-3 h-3" /> Participantes ({event.participants.length})
+                  </p>
+                  <div className="rounded-lg border divide-y">
+                    {event.participants.map(p => (
+                      <div key={p} className="flex items-center gap-2 px-3 py-2 text-xs text-foreground">
+                        <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-[10px] font-semibold">
+                          {p.split(" ").map(s => s[0]).slice(0, 2).join("")}
+                        </div>
+                        {p}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+
+          {event.type === "prazo" && (
+            <div className="rounded-lg border border-amber-200 bg-amber-50/60 p-3 flex items-start gap-2.5">
+              <Info className="w-4 h-4 text-amber-700 mt-0.5 shrink-0" />
+              <div>
+                <p className="text-xs font-semibold text-amber-900">Prazo administrativo</p>
+                <p className="text-[11px] text-amber-800/80 mt-0.5">Esta data marca um prazo institucional que requer cumprimento por parte do Departamento Financeiro.</p>
+              </div>
+            </div>
+          )}
+
+          {event.type === "ferias" && (
+            <div className="rounded-lg border border-emerald-200 bg-emerald-50/60 p-3 flex items-start gap-2.5">
+              <Palmtree className="w-4 h-4 text-emerald-700 mt-0.5 shrink-0" />
+              <div>
+                <p className="text-xs font-semibold text-emerald-900">Período de Férias</p>
+                <p className="text-[11px] text-emerald-800/80 mt-0.5">Suspensão das atividades letivas/administrativas neste intervalo.</p>
+              </div>
+            </div>
+          )}
+
+          {event.type === "feriado" && (
+            <div className="rounded-lg border border-rose-200 bg-rose-50/60 p-3 flex items-start gap-2.5">
+              <CalendarRange className="w-4 h-4 text-rose-700 mt-0.5 shrink-0" />
+              <div>
+                <p className="text-xs font-semibold text-rose-900">Feriado</p>
+                <p className="text-[11px] text-rose-800/80 mt-0.5">Dia não útil — Universidade encerrada.</p>
+              </div>
+            </div>
+          )}
+
+          {event.type === "pessoal" && event.location && (
+            <InfoTile icon={MapPin} label="Local">{event.location}</InfoTile>
+          )}
+
+          {event.description && (
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-1.5 flex items-center gap-1.5">
+                <AlignLeft className="w-3 h-3" /> Descrição
+              </p>
+              <p className="text-sm text-foreground leading-relaxed bg-muted/30 rounded-lg p-3 border">{event.description}</p>
+            </div>
+          )}
+        </div>
+
+        <DialogFooter className="px-6 py-4 border-t bg-muted/20">
+          {isUser && (
+            <Button variant="outline" className="gap-1.5 text-destructive border-destructive/30 hover:bg-destructive/10 hover:text-destructive mr-auto"
+              onClick={() => onDelete(event.id)}>
+              <Trash2 className="w-3.5 h-3.5" /> Eliminar
+            </Button>
+          )}
+          <Button variant="ghost" onClick={onClose}>Fechar</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function InfoTile({ icon: I, label, children }: { icon: typeof Clock; label: string; children: React.ReactNode }) {
+  return (
+    <div className="rounded-lg border bg-card p-3">
+      <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium flex items-center gap-1.5 mb-1">
+        <I className="w-3 h-3" /> {label}
+      </p>
+      <p className="text-sm font-semibold text-foreground">{children}</p>
+    </div>
+  );
+}
+
+/* ── Request detail dialog ── */
+function RequestDetailDialog({ request, onClose, onRespond }: {
+  request: MeetingRequest | null; onClose: () => void;
+  onRespond: (id: string, s: "accepted" | "declined") => void;
+}) {
+  if (!request) return null;
+  return (
+    <Dialog open={!!request} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="sm:max-w-2xl p-0 gap-0 overflow-hidden">
+        <div className="px-6 py-5 border-b bg-blue-50">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-card shrink-0">
+              <Users className="w-6 h-6 text-blue-700" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <Badge variant="outline" className="text-[10px] border-0 bg-card text-blue-700 mb-1">Pedido de Reunião</Badge>
+              <DialogHeader className="space-y-0">
+                <DialogTitle className="text-lg font-bold leading-tight">{request.title}</DialogTitle>
+              </DialogHeader>
+              <p className="text-xs mt-1 text-blue-700 capitalize">{fmtLong(request.date)}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="px-6 py-5 space-y-5 max-h-[60vh] overflow-y-auto">
+          <div className="grid grid-cols-2 gap-3">
+            <InfoTile icon={Clock} label="Horário">{request.startTime} – {request.endTime}</InfoTile>
+            <InfoTile icon={MapPin} label="Local">{request.location}</InfoTile>
+            <InfoTile icon={Briefcase} label="Organizador">{request.organizer}</InfoTile>
+            {request.participants && (
+              <InfoTile icon={Users} label="Participantes">{request.participants.length}</InfoTile>
+            )}
+          </div>
+
+          {request.participants && request.participants.length > 0 && (
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-2 flex items-center gap-1.5">
+                <Users className="w-3 h-3" /> Convidados
+              </p>
+              <div className="rounded-lg border divide-y">
+                {request.participants.map(p => (
+                  <div key={p} className="flex items-center gap-2 px-3 py-2 text-xs text-foreground">
+                    <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-[10px] font-semibold">
+                      {p.split(" ").map(s => s[0]).slice(0, 2).join("")}
+                    </div>
+                    {p}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {request.agenda && request.agenda.length > 0 && (
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-2 flex items-center gap-1.5">
+                <AlignLeft className="w-3 h-3" /> Agenda
+              </p>
+              <ul className="rounded-lg border bg-muted/20 p-3 space-y-1 text-sm text-foreground">
+                {request.agenda.map((a, i) => (
+                  <li key={i} className="flex gap-2"><span className="text-muted-foreground">{i + 1}.</span> {a}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {request.description && (
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-1.5 flex items-center gap-1.5">
+                <AlignLeft className="w-3 h-3" /> Descrição
+              </p>
+              <p className="text-sm text-foreground leading-relaxed bg-muted/30 rounded-lg p-3 border">{request.description}</p>
+            </div>
+          )}
+        </div>
+
+        <DialogFooter className="px-6 py-4 border-t bg-muted/20">
+          <Button variant="outline" className="gap-1.5 border-red-200 text-red-700 hover:bg-red-50 mr-auto"
+            onClick={() => onRespond(request.id, "declined")}>
+            <X className="w-4 h-4" /> Recusar
+          </Button>
+          <Button variant="ghost" onClick={onClose}>Fechar</Button>
+          <Button className="gap-1.5 bg-emerald-600 hover:bg-emerald-700"
+            onClick={() => onRespond(request.id, "accepted")}>
+            <Check className="w-4 h-4" /> Aceitar
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
