@@ -118,8 +118,8 @@ export const finSolicitacoes: FinSolicitacao[] = [
     date: "2025-03-22", status: "executada",
     historico: [
       { data: "2025-03-22 09:00", actor: "Secretaria Geral", accao: "Solicitação submetida" },
-      { data: "2025-03-23 11:30", actor: "Direcção Financeira", accao: "Solicitação aprovada" },
-      { data: "2025-03-24 10:15", actor: "Direcção Financeira", accao: "Solicitação executada", nota: "Pagamento processado por transferência bancária." },
+      { data: "2025-03-23 11:30", actor: "Direcção Financeira", accao: "Solicitação aprovada", anexos: [{ nome: "Autorizacao-pagamento.pdf", tamanho: "54 KB", tipo: "pdf" }] },
+      { data: "2025-03-24 10:15", actor: "Direcção Financeira", accao: "Solicitação executada", nota: "Pagamento processado por transferência bancária.", anexos: [{ nome: "Comprovativo-TRF-BAI.pdf", tamanho: "112 KB", tipo: "pdf" }] },
     ],
   },
   {
