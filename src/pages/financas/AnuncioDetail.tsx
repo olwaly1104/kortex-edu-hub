@@ -221,12 +221,7 @@ export default function FinancasAnuncioDetail() {
               <MetaCell
                 icon={<Tag className="w-3 h-3" />}
                 label="Categoria"
-                value={
-                  <span className="inline-flex items-center gap-1.5">
-                    <span className={cn("w-1.5 h-1.5 rounded-full", m.dot)} />
-                    {m.label}
-                  </span>
-                }
+                value={m.label}
               />
               {ann.ctaDeadline && (
                 <MetaCell
