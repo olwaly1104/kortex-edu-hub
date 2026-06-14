@@ -1067,6 +1067,7 @@ export default function ConfigurarReceitas() {
                               <td className="px-3 py-2.5 hidden sm:table-cell">
                                 <span className={cn("inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-medium", activeSub.chip)}>{activeSub.label}</span>
                               </td>
+                              <td className="px-3 py-2.5 text-right text-sm font-semibold tabular-nums text-foreground">{formatCurrency(r.valor)}</td>
                               <td className="px-2 py-2.5 text-right">
                                 <div className="inline-flex items-center gap-0.5 opacity-60 group-hover:opacity-100 transition">
                                   <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md" onClick={(e) => { e.stopPropagation(); openEditReceita(section, r); }} title="Editar">
