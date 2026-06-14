@@ -111,15 +111,15 @@ const PRESET_EVENTS: AgendaEvent[] = [
   { id: "p4", title: "Pagamento de Salários", type: "prazo", date: "2024-02-28", obligatory: true, description: "Processamento e transferência de salários do mês." },
   { id: "p5", title: "Feriado Nacional", type: "feriado", date: "2024-02-04", description: "Dia do Início da Luta Armada." },
   { id: "p6", title: "Férias Académicas de Inverno", type: "ferias", date: "2024-02-26", endDate: "2024-03-01", description: "Pausa académica entre semestres." },
-  { id: "p7", title: "Conselho Administrativo", type: "reuniao", date: "2024-02-16", startTime: "09:00", endTime: "12:00", location: "Microsoft Teams", obligatory: true, organizer: "Reitoria", modality: "virtual", meetingLink: "https://teams.microsoft.com/l/meetup-join/abc", participants: ["Reitor — Prof. Manuel Costa","Decano FCE","Diretor Financeiro"] },
+  { id: "p7", title: "Conselho Administrativo", type: "reuniao", date: "2024-02-16", startTime: "09:00", endTime: "12:00", location: "Sala Virtual UPRA", obligatory: true, organizer: "Reitoria", modality: "virtual", meetingLink: "https://meet.upra.ao/conselho-admin-feb2024", participants: ["Reitor — Prof. Manuel Costa","Decano FCE","Diretor Financeiro"] },
   { id: "p8", title: "Almoço com equipa", type: "pessoal", date: "2024-02-14", startTime: "12:30", endTime: "13:30", location: "Cantina" },
 ];
 
 const INITIAL_REQUESTS: MeetingRequest[] = [
   { id: "r1", title: "Revisão de Orçamento — Curso de Arquitectura", date: "2024-02-15", startTime: "14:00", endTime: "15:00", location: "Sala 204", organizer: "Coordenação ARQ", description: "Análise de despesas extra-orçamentais do semestre.", participants: ["Coordenador ARQ","Diretor Financeiro","Ana Lopes — Orçamento"], agenda: ["Despesas extra-orçamentais","Projeções Q2","Pedidos pendentes"], status: "pending", requestedAt: "2024-02-09", modality: "presencial" },
-  { id: "r2", title: "Reunião de planeamento — GAP", date: "2024-02-19", startTime: "11:00", endTime: "12:00", location: "Google Meet", organizer: "Gestão Académica de Pessoal", participants: ["Coord. GAP","Diretor Financeiro"], status: "pending", requestedAt: "2024-02-12", modality: "virtual", meetingLink: "https://meet.google.com/abc-defg-hij" },
+  { id: "r2", title: "Reunião de planeamento — GAP", date: "2024-02-19", startTime: "11:00", endTime: "12:00", location: "Sala Virtual UPRA", organizer: "Gestão Académica de Pessoal", participants: ["Coord. GAP","Diretor Financeiro"], status: "pending", requestedAt: "2024-02-12", modality: "virtual", meetingLink: "https://meet.upra.ao/gap-planeamento-feb2024" },
   { id: "r3", title: "Auditoria de processos", date: "2024-02-21", startTime: "09:30", endTime: "11:00", location: "Reitoria", organizer: "Pedro Silva", description: "Revisão dos processos contabilísticos do trimestre.", participants: ["Pedro Silva — Auditoria Interna","Diretor Financeiro","Maria Tavares — Contabilidade"], status: "pending", requestedAt: "2024-02-13", modality: "presencial" },
-  { id: "r4", title: "Pagamentos a fornecedores", date: "2024-02-22", startTime: "15:00", endTime: "16:00", location: "Microsoft Teams", organizer: "João Mendes", participants: ["João Mendes — Tesouraria","Diretor Financeiro"], status: "pending", requestedAt: "2024-02-14", modality: "virtual", meetingLink: "https://teams.microsoft.com/l/meetup-join/xyz" },
+  { id: "r4", title: "Pagamentos a fornecedores", date: "2024-02-22", startTime: "15:00", endTime: "16:00", location: "Sala Virtual UPRA", organizer: "João Mendes", participants: ["João Mendes — Tesouraria","Diretor Financeiro"], status: "pending", requestedAt: "2024-02-14", modality: "virtual", meetingLink: "https://meet.upra.ao/pagamentos-fornec-feb2024" },
   { id: "r5", title: "Folha salarial — fecho mês", date: "2024-02-26", startTime: "10:00", endTime: "11:00", location: "Sala 102", organizer: "Carla Neto", participants: ["Carla Neto — Folha Salarial","Diretor Financeiro"], status: "pending", requestedAt: "2024-02-14", modality: "presencial" },
 ];
 
@@ -145,6 +145,30 @@ function fmtLong(s: string) {
 function fmtShort(s: string) {
   const d = parseISO(s);
   return d.toLocaleDateString("pt-PT", { day: "2-digit", month: "short", year: "numeric" });
+}
+
+/* mock current time for entry state computation on TODAY */
+const NOW_MIN = 10 * 60 + 45;
+type EvState = "agendado" | "decorrer" | "concluido";
+const EV_STATE_META: Record<EvState, { label: string; cls: string }> = {
+  agendado:  { label: "Agendado",   cls: "bg-blue-50 text-blue-700 border-blue-200" },
+  decorrer:  { label: "A decorrer", cls: "bg-amber-50 text-amber-700 border-amber-200" },
+  concluido: { label: "Concluído",  cls: "bg-slate-100 text-slate-600 border-slate-200" },
+};
+function eventState(ev: AgendaEvent): EvState {
+  const end = ev.endDate ?? ev.date;
+  if (ev.date > TODAY) return "agendado";
+  if (end < TODAY) return "concluido";
+  // overlaps today
+  if (ev.date < TODAY || end > TODAY) return "decorrer";
+  // single-day today
+  if (!ev.startTime) return "decorrer";
+  const [sh, sm] = ev.startTime.split(":").map(Number);
+  const [eh, em] = (ev.endTime ?? ev.startTime).split(":").map(Number);
+  const start = sh * 60 + sm, finish = eh * 60 + em;
+  if (NOW_MIN < start) return "agendado";
+  if (NOW_MIN > finish) return "concluido";
+  return "decorrer";
 }
 
 /* ─────────────────────────────────────────────────── */
@@ -500,9 +524,14 @@ export default function FinancasCalendario() {
                               <Icon className={cn("w-3 h-3", m.text)} />
                               <span className={cn("text-[10px] font-semibold uppercase tracking-wide", m.text)}>{m.label}</span>
                             </div>
-                            {ev.obligatory && (
-                              <Badge variant="outline" className="text-[9px] h-4 px-1 bg-red-50 text-red-700 border-red-200">Obrig.</Badge>
-                            )}
+                            <div className="flex items-center gap-1">
+                              {(() => { const s = EV_STATE_META[eventState(ev)]; return (
+                                <Badge variant="outline" className={cn("text-[9px] h-4 px-1.5", s.cls)}>{s.label}</Badge>
+                              ); })()}
+                              {ev.obligatory && (
+                                <Badge variant="outline" className="text-[9px] h-4 px-1 bg-red-50 text-red-700 border-red-200">Obrig.</Badge>
+                              )}
+                            </div>
                           </div>
                           <p className="text-sm font-semibold text-foreground leading-snug line-clamp-2">{ev.title}</p>
                           <div className="pt-2 border-t border-border/60 space-y-1 text-[11px] text-muted-foreground">
@@ -760,17 +789,20 @@ function RequestCard({ r, onAccept, onDecline, onDetail, onParticipants, readOnl
       </div>
       <div className="p-3 space-y-2.5 flex-1">
         <div className="flex items-center justify-between gap-1.5">
-          <Badge variant="outline" className={cn("text-[9px] h-4 px-1.5 font-semibold", st.cls)}>{st.label}</Badge>
           <Badge variant="outline" className={cn("text-[9px] h-4 px-1 gap-0.5", MODALITY_META[r.modality].cls)}>
             {(() => { const I = MODALITY_META[r.modality].icon; return <I className="w-2.5 h-2.5" />; })()}
             {MODALITY_META[r.modality].label}
           </Badge>
+          <Badge variant="outline" className={cn("text-[9px] h-4 px-1.5 font-semibold", st.cls)}>{st.label}</Badge>
         </div>
         <div>
           <p className="text-xs font-semibold text-foreground leading-tight line-clamp-2">{r.title}</p>
-          <p className="text-[10px] text-muted-foreground mt-1 flex items-center gap-1 truncate">
-            <UserCircle2 className="w-3 h-3 shrink-0" />{r.organizer}
-          </p>
+          <div className="mt-1.5">
+            <Badge variant="outline" className="text-[9px] h-4 px-1.5 gap-1 bg-primary/5 text-primary border-primary/20 font-medium max-w-full">
+              <UserCircle2 className="w-2.5 h-2.5 shrink-0" />
+              <span className="truncate">{r.organizer}</span>
+            </Badge>
+          </div>
         </div>
         <div className="space-y-1 text-[10px] text-muted-foreground border-t border-border/60 pt-2">
           <div className="flex items-center gap-1"><CalendarDays className="w-3 h-3 shrink-0" />{fmtShort(r.date)} · {r.startTime}–{r.endTime}</div>
@@ -838,6 +870,9 @@ function EventRow({ ev, onOpen, compact = false, onParticipants }: { ev: AgendaE
           )}
         </div>
       </div>
+      {!compact && (() => { const s = EV_STATE_META[eventState(ev)]; return (
+        <Badge variant="outline" className={cn("text-[10px] shrink-0", s.cls)}>{s.label}</Badge>
+      ); })()}
       {!compact && (
         <Badge variant="outline" className={cn("text-[10px] shrink-0 border-0", m.soft, m.text)}>{m.label}</Badge>
       )}
