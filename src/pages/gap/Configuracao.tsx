@@ -325,7 +325,7 @@ export default function GapConfiguracao() {
         </div>
       </div>
 
-      <Tabs defaultValue="solicitacoes" className="space-y-6">
+      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="space-y-6">
         <TabsList className="grid grid-cols-3 w-full max-w-2xl">
           <TabsTrigger value="solicitacoes" className="gap-1.5"><FileText className="w-3.5 h-3.5" /> Solicitações</TabsTrigger>
           <TabsTrigger value="agendamentos" className="gap-1.5"><CalendarClock className="w-3.5 h-3.5" /> Agendamentos</TabsTrigger>
@@ -333,6 +333,7 @@ export default function GapConfiguracao() {
         </TabsList>
 
         <TabsContent value="solicitacoes" className="space-y-6 mt-0">
+          <div className="flex justify-end"><EditToggle tab="sol" /></div>
           {/* Estados */}
           <Card className="p-5">
             <div className="flex items-center justify-between mb-4">
