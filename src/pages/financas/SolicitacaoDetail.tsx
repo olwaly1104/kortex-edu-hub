@@ -100,7 +100,7 @@ export default function FinancasSolicitacaoDetail() {
       ? `${Math.abs(diff)} ${Math.abs(diff) === 1 ? "dia" : "dias"} em atraso`
       : diff === 0 ? "Prazo termina hoje" : `Faltam ${diff} ${diff === 1 ? "dia" : "dias"}`;
     steps.push({
-      label: "Aguarda decisão",
+      label: "Aguardando decisão",
       actor: decisionActor,
       previsao: `Previsão · ${fmt(decisionForecast)}`,
       aside,
