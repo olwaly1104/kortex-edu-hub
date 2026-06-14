@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
@@ -20,9 +21,10 @@ export default function FinancasSolicitacaoDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const selected = finSolicitacoes.find(s => s.id === id);
+  const baseSelected = finSolicitacoes.find(s => s.id === id);
+  const [statusOverride, setStatusOverride] = useState<null | "em_execucao" | "executada" | "rejeitado">(null);
 
-  if (!selected) {
+  if (!baseSelected) {
     return (
       <div className="p-8 text-center">
         <p className="text-sm text-muted-foreground">Solicitação não encontrada.</p>
@@ -30,6 +32,8 @@ export default function FinancasSolicitacaoDetail() {
       </div>
     );
   }
+
+  const selected = { ...baseSelected, status: (statusOverride ?? baseSelected.status) as typeof baseSelected.status };
 
   const st = finStatusMeta[selected.status];
   const tm = finTypeMeta[selected.type];
@@ -90,11 +94,19 @@ export default function FinancasSolicitacaoDetail() {
     pending:   "bg-background border-2 border-dashed border-border text-muted-foreground",
   };
 
-  const handleAction = (action: "em_execucao" | "rejeitado") => {
-    toast({
-      title: action === "em_execucao" ? "Solicitação em execução" : "Solicitação rejeitada",
-      description: `O pedido ${selected.ref} foi ${action === "em_execucao" ? "colocado em execução" : "rejeitado"}.`,
-    });
+  const handleAction = (action: "em_execucao" | "rejeitado" | "executada") => {
+    setStatusOverride(action);
+    const titles: Record<typeof action, string> = {
+      em_execucao: "Solicitação aprovada",
+      rejeitado: "Solicitação rejeitada",
+      executada: "Solicitação executada",
+    };
+    const descs: Record<typeof action, string> = {
+      em_execucao: `O pedido ${selected.ref} foi aprovado e está em execução.`,
+      rejeitado: `O pedido ${selected.ref} foi rejeitado.`,
+      executada: `O pedido ${selected.ref} foi marcado como executado.`,
+    };
+    toast({ title: titles[action], description: descs[action] });
   };
 
   return (
@@ -142,6 +154,24 @@ export default function FinancasSolicitacaoDetail() {
             </div>
           </div>
         )}
+        {/* Execution bar — after approval */}
+        {isRecebida && selected.status === "em_execucao" && (
+          <div className="px-6 pt-3">
+            <div className="flex items-center justify-between rounded-lg border border-blue-200 bg-blue-50/40 px-4 py-2.5">
+              <div className="flex items-center gap-2.5">
+                <Hourglass className="w-4 h-4 shrink-0 text-blue-600" />
+                <span className="text-sm font-semibold text-foreground">Em execução</span>
+                <span className="text-[11px] text-muted-foreground">Aguarda confirmação de execução</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button size="sm" className="h-7 text-[11px] gap-1.5 bg-blue-600 hover:bg-blue-700 text-white transition-colors" onClick={() => handleAction("executada")}>
+                  <Check className="w-3.5 h-3.5" /> Confirmar execução
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
 
         {/* Title block */}
         <div className="px-6 pt-4 pb-4">
