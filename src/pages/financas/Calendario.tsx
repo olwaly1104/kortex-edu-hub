@@ -434,7 +434,11 @@ export default function FinancasCalendario() {
                               <div className="flex items-center gap-1.5 truncate"><MapPin className="w-3 h-3 shrink-0" />{ev.location}</div>
                             )}
                             {ev.participants && ev.participants.length > 0 && (
-                              <div className="flex items-center gap-1.5"><Users className="w-3 h-3" />{ev.participants.length} participante{ev.participants.length !== 1 ? "s" : ""}</div>
+                              <span role="button" tabIndex={0}
+                                onClick={(e) => { e.stopPropagation(); openParticipants(ev.title, ev.participants, ev.id); }}
+                                className="inline-flex items-center gap-1.5 hover:text-foreground underline-offset-2 hover:underline cursor-pointer">
+                                <Users className="w-3 h-3" />{ev.participants.length} participante{ev.participants.length !== 1 ? "s" : ""}
+                              </span>
                             )}
                           </div>
                         </div>
