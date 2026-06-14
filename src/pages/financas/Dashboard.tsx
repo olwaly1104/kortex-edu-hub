@@ -61,6 +61,16 @@ export default function FinancasDashboard() {
   const [txSearch, setTxSearch] = useState("");
   const [txCategory, setTxCategory] = useState("todos");
   const [txType, setTxType] = useState("todos");
+  const [selectedMonth, setSelectedMonth] = useState<string>(monthlyData[monthlyData.length - 1].month);
+
+  const monthIdx = monthlyData.findIndex(m => m.month === selectedMonth);
+  const cur = monthlyData[monthIdx] ?? monthlyData[monthlyData.length - 1];
+  const prev = monthlyData[Math.max(0, monthIdx - 1)] ?? cur;
+  const receitaVar = prev.receitas ? Math.round(((cur.receitas - prev.receitas) / prev.receitas) * 100) : 0;
+  const despesaVar = prev.despesas ? Math.round(((cur.despesas - prev.despesas) / prev.despesas) * 100) : 0;
+  const saldo = cur.receitas - cur.despesas;
+  const saldoVar = prev.receitas - prev.despesas;
+  const saldoChange = saldoVar !== 0 ? Math.round(((saldo - saldoVar) / Math.abs(saldoVar)) * 100) : 0;
 
   const filteredTx = useMemo(() => {
     return allTx
@@ -73,12 +83,47 @@ export default function FinancasDashboard() {
   const hasFilters = txSearch !== "" || txCategory !== "todos" || txType !== "todos";
   const navigate = useNavigate();
 
+  const todayLabel = new Date().toLocaleDateString("pt-PT", {
+    weekday: "long", day: "2-digit", month: "long", year: "numeric",
+  });
+  const anoLetivo = "2024 / 2025";
+
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">Dashboard Financeiro</h1>
-        <p className="text-sm text-muted-foreground">Abril 2025 — Visão geral das finanças institucionais</p>
+      <div className="rounded-xl border border-border bg-gradient-to-r from-primary/5 to-transparent p-6">
+        <div className="flex items-start justify-between gap-4 flex-wrap">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 text-[11px] uppercase tracking-wider text-muted-foreground font-medium mb-2">
+              <span className="flex items-center gap-1 capitalize">
+                <CalendarIcon className="w-3.5 h-3.5" />
+                {todayLabel}
+              </span>
+              <span className="text-border">•</span>
+              <span className="flex items-center gap-1">
+                <GraduationCap className="w-3.5 h-3.5" />
+                Ano Letivo {anoLetivo}
+              </span>
+            </div>
+            <h1 className="text-2xl font-bold text-foreground">Dashboard Financeiro</h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              {MONTH_FULL[cur.month] ?? cur.month} — Visão geral das finanças institucionais
+            </p>
+          </div>
+          <div className="flex flex-col items-end gap-1">
+            <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Mês de referência</span>
+            <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+              <SelectTrigger className="w-[180px] h-9 text-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {monthlyData.map(m => (
+                  <SelectItem key={m.month} value={m.month}>{MONTH_FULL[m.month] ?? m.month}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
       </div>
 
       {/* ── KPIs ── */}
