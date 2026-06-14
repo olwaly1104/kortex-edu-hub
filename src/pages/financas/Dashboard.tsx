@@ -269,23 +269,6 @@ export default function FinancasDashboard() {
         {filteredTx.length === 0 && <p className="text-center text-muted-foreground py-8">Nenhuma transação encontrada.</p>}
         <div className="border-t bg-muted/20 px-3 py-2 text-xs text-muted-foreground">{filteredTx.length} transações</div>
       </Card>
-
-      {/* ── Alerts ── */}
-      <div className="flex flex-wrap gap-2">
-        {[
-          { type: "error", msg: "Orçamento de Infraestrutura atingiu 92% do limite", icon: AlertTriangle },
-          { type: "warning", msg: `${receitas.filter(r => r.status === "em_atraso").length} pagamentos de propinas em atraso`, icon: Clock },
-          { type: "warning", msg: `${despesas.filter(d => d.status === "pendente").length} despesas pendentes de aprovação`, icon: FileText },
-        ].map((a, i) => (
-          <div key={i} className={cn(
-            "flex items-center gap-2 px-3 py-2 rounded-lg border text-xs",
-            a.type === "error" ? "text-destructive bg-destructive/5 border-destructive/20" : "text-amber-700 bg-amber-50 border-amber-200"
-          )}>
-            <a.icon className="w-3.5 h-3.5 shrink-0" />
-            <span>{a.msg}</span>
-          </div>
-        ))}
-      </div>
     </div>
   );
 }
