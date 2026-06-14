@@ -241,6 +241,22 @@ export default function FinancasCalendario() {
         </div>
       </div>
 
+      {/* ── Period title + Adicionar ─────────────── */}
+      <div className="flex items-end justify-between gap-3 flex-wrap">
+        <div>
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">
+            {view === "week" ? "Semana Atual" : "Mês Atual"}
+          </p>
+          <h2 className="text-lg font-bold text-foreground capitalize leading-tight mt-0.5">
+            {view === "week" ? weekLabel : monthLabel}
+          </h2>
+        </div>
+        <Button size="sm" className="h-9 gap-1.5 text-xs"
+          onClick={() => { setForm(f => ({ ...f, date: selectedDate })); setOpenCreate(true); }}>
+          <Plus className="w-4 h-4" /> Adicionar à Agenda
+        </Button>
+      </div>
+
       {/* ── Grid ─────────────────────────────── */}
       <div className="flex gap-6">
         <div className="flex-1 min-w-0">
