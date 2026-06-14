@@ -99,35 +99,34 @@ export default function FinancasDashboard() {
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       {/* Header */}
-      <div className="rounded-xl border border-border bg-gradient-to-r from-primary/5 to-transparent p-6">
-        <div className="flex items-start justify-between gap-4 flex-wrap">
-          <div className="min-w-0">
-            <div className="flex items-center gap-2 text-[11px] uppercase tracking-wider text-muted-foreground font-medium mb-2">
-              <span className="flex items-center gap-1 capitalize">
-                <CalendarIcon className="w-3.5 h-3.5" />
-                {todayLabel}
-              </span>
-              <span className="text-border">•</span>
-              <span className="flex items-center gap-1">
-                <GraduationCap className="w-3.5 h-3.5" />
-                Ano Letivo {anoLetivo}
-              </span>
-            </div>
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div className="min-w-0 space-y-1">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-[11px] uppercase tracking-wider font-semibold text-primary">
+              <CalendarIcon className="w-3.5 h-3.5" />
+              {todayLabel}
+            </span>
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-[11px] uppercase tracking-wider font-semibold text-primary">
+              <GraduationCap className="w-3.5 h-3.5" />
+              Ano Letivo <span className="font-bold tabular-nums">{anoLetivo}</span>
+            </span>
+          </div>
+          <div>
             <h1 className="text-2xl font-bold text-foreground">Dashboard Financeiro</h1>
           </div>
-          <div className="flex flex-col items-end gap-1">
-            <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Mês de referência</span>
-            <Select value={selectedMonth} onValueChange={setSelectedMonth}>
-              <SelectTrigger className="w-[180px] h-9 text-sm">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {monthlyData.map(m => (
-                  <SelectItem key={m.month} value={m.month}>{MONTH_FULL[m.month] ?? m.month}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+        </div>
+        <div className="flex flex-col items-end gap-1">
+          <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Mês de referência</span>
+          <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+            <SelectTrigger className="w-[180px] h-9 text-sm">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {monthlyData.map(m => (
+                <SelectItem key={m.month} value={m.month}>{MONTH_FULL[m.month] ?? m.month}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
