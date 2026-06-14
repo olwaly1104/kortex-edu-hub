@@ -93,6 +93,8 @@ export default function Receitas() {
         }
       />
 
+      {/* Período toggle + result + selector */}
+      <PeriodSelector periodo={periodo} setPeriodo={setPeriodo} value={periodoValue} setValue={setPeriodoValue} />
 
       {/* KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -128,16 +130,8 @@ export default function Receitas() {
 
       {/* Controls */}
       <div className="rounded-xl border border-border bg-card p-4 space-y-3">
-        {/* Row 1: Period + Category */}
+        {/* Row 1: Category */}
         <div className="flex gap-2 items-center flex-wrap">
-          {[
-            { key: "mes", label: "Este Mês" },
-            { key: "semestre", label: "Semestre" },
-            { key: "ano", label: "Ano" },
-          ].map(p => (
-            <Button key={p.key} size="sm" variant={periodo === p.key ? "default" : "outline"} onClick={() => setPeriodo(p.key)} className="text-xs">{p.label}</Button>
-          ))}
-          <div className="w-px h-6 bg-border" />
           {[
             { key: "todos", label: "Todas" },
             { key: "Propinas", label: "Propina" },
@@ -146,6 +140,7 @@ export default function Receitas() {
             <Button key={s.key} size="sm" variant={filterCategory === s.key ? "default" : "outline"} onClick={() => setFilterCategory(s.key)} className="text-xs">{s.label}</Button>
           ))}
         </div>
+
 
         {/* Row 2: Search + Status + Sort */}
         <div className="flex gap-2 items-center flex-wrap">
