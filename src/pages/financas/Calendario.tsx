@@ -254,27 +254,6 @@ export default function FinancasCalendario() {
               ))}
             </div>
           </div>
-            <div className="flex items-center bg-muted/60 rounded-lg p-0.5">
-              <button onClick={() => navigateBy(-1)} className="p-1.5 rounded-md hover:bg-card transition-colors">
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-              <span className="px-3 text-xs font-medium text-foreground min-w-[150px] text-center">
-                {view === "week" ? weekLabel : monthLabel}
-              </span>
-              <button onClick={() => navigateBy(1)} className="p-1.5 rounded-md hover:bg-card transition-colors">
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
-            <div className="flex bg-muted/60 rounded-lg p-0.5">
-              {(["week", "month"] as const).map(v => (
-                <button key={v} onClick={() => setView(v)}
-                  className={cn("px-3 py-1.5 rounded-md text-xs font-medium transition-colors",
-                    view === v ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground")}>
-                  {v === "week" ? "Semana" : "Mês"}
-                </button>
-              ))}
-            </div>
-          </div>
         </div>
       </div>
 
