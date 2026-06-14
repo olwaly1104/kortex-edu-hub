@@ -1696,7 +1696,7 @@ export default function ConfigurarReceitas() {
                 <Select value={despesaForm.estado} onValueChange={v => setDespesaForm({ ...despesaForm, estado: v })}>
                   <SelectTrigger><SelectValue placeholder="Seleccionar..." /></SelectTrigger>
                   <SelectContent>
-                    {estados.map(e => <SelectItem key={e} value={e}>{e}</SelectItem>)}
+                    {estados.map(e => <SelectItem key={e.id} value={e.label}>{e.label}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
