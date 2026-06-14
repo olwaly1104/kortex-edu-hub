@@ -1521,7 +1521,7 @@ export default function ConfigurarReceitas() {
                 <Select value={despesaForm.categoria} onValueChange={v => setDespesaForm({ ...despesaForm, categoria: v })}>
                   <SelectTrigger><SelectValue placeholder="Seleccionar..." /></SelectTrigger>
                   <SelectContent>
-                    {categorias.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                    {categorias.map(c => <SelectItem key={c.id} value={c.label}>{c.label}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
