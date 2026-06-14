@@ -131,7 +131,7 @@ const FILTERS: { key: SectionFilter; label: string }[] = [
   { key: "todos", label: "Todos" },
   { key: "propinas", label: "Propinas" },
   { key: "emolumentos", label: "Emolumentos" },
-  { key: "servicos", label: "Serviços e Taxas" },
+  { key: "servicos", label: "Serviços" },
   { key: "candidatura", label: "Candidaturas" },
   { key: "multas", label: "Multas" },
 ];
