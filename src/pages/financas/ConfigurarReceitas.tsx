@@ -22,13 +22,12 @@ type TipoReceita =
   | "Propina mensal"
   | "Matrícula"
   | "Emolumento"
-  | "Taxa"
   | "Serviço Académico"
   | "Candidatura"
   | "Multa";
 
 const TIPOS: TipoReceita[] = [
-  "Propina mensal", "Matrícula", "Emolumento", "Taxa", "Serviço Académico", "Candidatura", "Multa",
+  "Propina mensal", "Matrícula", "Emolumento", "Serviço Académico", "Candidatura", "Multa",
 ];
 
 interface ReceitaRow {
@@ -74,8 +73,8 @@ const initialRows = (): ReceitaRow[] => {
     { id: "ser-1", nome: "Requerimento de Exame Especial", tipo: "Serviço Académico", escopo: "geral", valor: 7500 },
     { id: "ser-2", nome: "Pedido de Equivalência", tipo: "Serviço Académico", escopo: "geral", valor: 12000 },
     { id: "ser-3", nome: "Reapreciação de Prova", tipo: "Serviço Académico", escopo: "geral", valor: 8000 },
-    { id: "tax-1", nome: "Taxa de Inscrição em Exame", tipo: "Taxa", escopo: "geral", valor: 3000 },
-    { id: "tax-2", nome: "Taxa de Emissão de 2ª Via de Cartão", tipo: "Taxa", escopo: "geral", valor: 2000 },
+    { id: "tax-1", nome: "Taxa de Inscrição em Exame", tipo: "Emolumento", escopo: "geral", valor: 3000 },
+    { id: "tax-2", nome: "Taxa de Emissão de 2ª Via de Cartão", tipo: "Emolumento", escopo: "geral", valor: 2000 },
     { id: "can-1", nome: "Candidatura — Licenciatura", tipo: "Candidatura", escopo: "geral", valor: 15000 },
     { id: "can-2", nome: "Candidatura — Mestrado", tipo: "Candidatura", escopo: "geral", valor: 20000 },
     { id: "mul-1", nome: "Multa por atraso de propina (por mês)", tipo: "Multa", escopo: "geral", valor: 5000 },
@@ -105,8 +104,8 @@ const SECTIONS: SectionDef[] = [
   { key: "emolumentos", title: "Emolumentos", description: "Matrícula, documentos e certificados oficiais.",
     tipos: ["Emolumento", "Matrícula"], defaultTipo: "Emolumento",
     icon: FileText, accent: "text-emerald-700", chip: "bg-emerald-50 border-emerald-200 text-emerald-700" },
-  { key: "servicos", title: "Serviços Académicos e Taxas", description: "Pedidos académicos e taxas administrativas pontuais.",
-    tipos: ["Serviço Académico", "Taxa"], defaultTipo: "Serviço Académico",
+  { key: "servicos", title: "Serviços Académicos", description: "Pedidos académicos pontuais.",
+    tipos: ["Serviço Académico"], defaultTipo: "Serviço Académico",
     icon: BookOpen, accent: "text-violet-700", chip: "bg-violet-50 border-violet-200 text-violet-700" },
   { key: "candidatura", title: "Candidaturas", description: "Taxas de candidatura para processos de admissão.",
     tipos: ["Candidatura"], defaultTipo: "Candidatura",
@@ -120,7 +119,7 @@ const tipoChip: Record<TipoReceita, string> = {
   "Propina mensal": "bg-blue-50 text-blue-700 border-blue-200",
   "Matrícula": "bg-indigo-50 text-indigo-700 border-indigo-200",
   "Emolumento": "bg-emerald-50 text-emerald-700 border-emerald-200",
-  "Taxa": "bg-amber-50 text-amber-700 border-amber-200",
+  
   "Serviço Académico": "bg-violet-50 text-violet-700 border-violet-200",
   "Candidatura": "bg-pink-50 text-pink-700 border-pink-200",
   "Multa": "bg-red-50 text-red-700 border-red-200",
@@ -132,7 +131,7 @@ const FILTERS: { key: SectionFilter; label: string }[] = [
   { key: "todos", label: "Todos" },
   { key: "propinas", label: "Propinas" },
   { key: "emolumentos", label: "Emolumentos" },
-  { key: "servicos", label: "Serviços e Taxas" },
+  { key: "servicos", label: "Serviços" },
   { key: "candidatura", label: "Candidaturas" },
   { key: "multas", label: "Multas" },
 ];
@@ -147,7 +146,7 @@ export default function ConfigurarReceitas() {
 
   const [openSection, setOpenSection] = useState<SectionDef | null>(null);
   const [editing, setEditing] = useState<ReceitaRow | null>(null);
-  const [form, setForm] = useState<ReceitaRow>({ id: "", nome: "", tipo: "Taxa", escopo: "geral", valor: 0 });
+  const [form, setForm] = useState<ReceitaRow>({ id: "", nome: "", tipo: "Emolumento", escopo: "geral", valor: 0 });
   const [confirmDel, setConfirmDel] = useState<ReceitaRow | null>(null);
   const [inlineEdit, setInlineEdit] = useState<{ id: string; valor: string } | null>(null);
 
