@@ -259,27 +259,6 @@ export default function FinancasAnuncios() {
                     </span>
                   </div>
 
-                  {/* category + department row */}
-                  <div className="flex items-center gap-1.5 flex-wrap mb-3">
-                    <Badge variant="outline" className={cn("text-[10px] font-semibold gap-1 px-1.5", m.chip)}>
-                      <span className={cn("w-1.5 h-1.5 rounded-full", m.dot)} />
-                      {m.label}
-                    </Badge>
-                    <button
-                      type="button"
-                      onClick={() => setScope("todos")}
-                      title={`Ver anúncios de ${a.department}`}
-                      className="inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded-md border border-border bg-muted/40 hover:bg-primary/5 hover:border-primary/30 hover:text-primary transition-colors text-foreground/80"
-                    >
-                      <Building2 className="w-2.5 h-2.5" />{a.department}
-                    </button>
-                    {a.isMine && (
-                      <Badge variant="outline" className="text-[10px] bg-primary/10 text-primary border-primary/20 px-1.5">
-                        Criado por mim
-                      </Badge>
-                    )}
-                  </div>
-
                   {/* divider between meta and body */}
                   <div className="border-t border-border/60 mb-3" />
 
