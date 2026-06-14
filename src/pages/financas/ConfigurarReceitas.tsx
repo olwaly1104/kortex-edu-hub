@@ -1000,7 +1000,8 @@ export default function ConfigurarReceitas() {
                       })}
                       </div>
                     </div>
-                  )}
+                    );
+                  })()}
                 </Card>
               );
             }
