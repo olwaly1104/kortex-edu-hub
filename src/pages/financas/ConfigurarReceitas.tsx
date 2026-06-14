@@ -1107,7 +1107,6 @@ export default function ConfigurarReceitas() {
       {/* ════════════════ DESPESAS ════════════════ */}
       {mode === "despesas" && (
         <div className="space-y-4">
-          {/* 1. Categorias */}
           <Card className="p-5">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
@@ -1116,25 +1115,58 @@ export default function ConfigurarReceitas() {
                 <span className="text-[11px] text-muted-foreground tabular-nums">· {categorias.length}</span>
                 <span className="text-xs text-muted-foreground hidden md:inline">— Classificação principal das despesas</span>
               </div>
-              <div className="flex items-center gap-1.5">
-                <Input value={newCategoria} onChange={e => setNewCategoria(e.target.value)}
-                  onKeyDown={e => { if (e.key === "Enter") addCategoria(); }}
-                  placeholder="Nova categoria" className="h-8 w-48 text-xs" />
-                <Button size="sm" variant="outline" className="h-8 text-xs gap-1.5" onClick={addCategoria}>
-                  <Plus className="w-3.5 h-3.5" /> Adicionar
+              <Dialog open={catDialogOpen} onOpenChange={(o) => { setCatDialogOpen(o); if (!o) { setNewCatLabel(""); setNewCatColor(CAT_PALETTE[0].cls); } }}>
+                <Button size="sm" variant="outline" className="h-8 text-xs gap-1.5" onClick={() => setCatDialogOpen(true)}>
+                  <Plus className="w-3.5 h-3.5" /> Nova categoria
                 </Button>
-              </div>
+                <DialogContent className="max-w-md">
+                  <DialogHeader><DialogTitle>Nova categoria</DialogTitle></DialogHeader>
+                  <div className="space-y-4 py-2">
+                    <div>
+                      <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Designação</label>
+                      <Input value={newCatLabel} onChange={e => setNewCatLabel(e.target.value)}
+                        onKeyDown={e => { if (e.key === "Enter") addCategoria(); }}
+                        placeholder="Ex: Eventos" />
+                    </div>
+                    <div>
+                      <label className="text-xs font-medium text-muted-foreground mb-2 block">Cor</label>
+                      <div className="flex flex-wrap gap-2">
+                        {CAT_PALETTE.map(p => (
+                          <button key={p.cls} type="button" onClick={() => setNewCatColor(p.cls)}
+                            className={cn("h-8 w-8 rounded-full border-2 flex items-center justify-center transition",
+                              newCatColor === p.cls ? "border-foreground" : "border-transparent hover:border-muted-foreground/40")}
+                            title={p.name}>
+                            <span className={cn("h-5 w-5 rounded-full", p.dot)} />
+                          </button>
+                        ))}
+                      </div>
+                      <div className="mt-3">
+                        <span className={cn("inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs", newCatColor)}>
+                          <span className="font-medium">{newCatLabel.trim() || "Pré-visualização"}</span>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <DialogFooter className="gap-2 sm:gap-2">
+                    <DialogClose asChild><Button variant="outline">Cancelar</Button></DialogClose>
+                    <Button onClick={addCategoria} disabled={!newCatLabel.trim()}>Adicionar</Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </div>
             {categorias.length === 0 ? (
               <p className="text-xs text-muted-foreground italic">Crie categorias para classificar as despesas.</p>
             ) : (
               <div className="flex flex-wrap gap-2">
                 {categorias.map(c => {
-                  const count = despesas.filter(d => d.categoria === c).length;
+                  const count = despesas.filter(d => d.categoria === c.label).length;
                   return (
-                    <div key={c} className={cn("inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs", chipFor(c))}>
-                      <span className="font-medium">{c}</span>
+                    <div key={c.id} className={cn("inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs", c.color)}>
+                      <span className="font-medium">{c.label}</span>
                       <span className="opacity-60 tabular-nums">· {count}</span>
+                      <button onClick={() => setEditingCategoria({ ...c })} className="opacity-60 hover:opacity-100" title="Editar">
+                        <Pencil className="w-3 h-3" />
+                      </button>
                       <button onClick={() => removeCategoria(c)} className="opacity-60 hover:opacity-100" title="Remover">
                         <Trash2 className="w-3 h-3" />
                       </button>
@@ -1144,6 +1176,46 @@ export default function ConfigurarReceitas() {
               </div>
             )}
           </Card>
+
+          {/* Edit categoria dialog */}
+          <Dialog open={!!editingCategoria} onOpenChange={(o) => !o && setEditingCategoria(null)}>
+            <DialogContent className="max-w-md">
+              <DialogHeader><DialogTitle>Editar categoria</DialogTitle></DialogHeader>
+              {editingCategoria && (
+                <div className="space-y-4 py-2">
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Designação</label>
+                    <Input value={editingCategoria.label}
+                      onChange={e => setEditingCategoria({ ...editingCategoria, label: e.target.value })} />
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-2 block">Cor</label>
+                    <div className="flex flex-wrap gap-2">
+                      {CAT_PALETTE.map(p => (
+                        <button key={p.cls} type="button"
+                          onClick={() => setEditingCategoria({ ...editingCategoria, color: p.cls })}
+                          className={cn("h-8 w-8 rounded-full border-2 flex items-center justify-center transition",
+                            editingCategoria.color === p.cls ? "border-foreground" : "border-transparent hover:border-muted-foreground/40")}
+                          title={p.name}>
+                          <span className={cn("h-5 w-5 rounded-full", p.dot)} />
+                        </button>
+                      ))}
+                    </div>
+                    <div className="mt-3">
+                      <span className={cn("inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs", editingCategoria.color)}>
+                        <span className="font-medium">{editingCategoria.label.trim() || "Pré-visualização"}</span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+              <DialogFooter className="gap-2 sm:gap-2">
+                <Button variant="outline" onClick={() => setEditingCategoria(null)}>Cancelar</Button>
+                <Button onClick={saveEditCategoria} disabled={!editingCategoria?.label.trim()}>Guardar</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+
 
           {/* 2. Estados */}
           <Card className="p-5">
