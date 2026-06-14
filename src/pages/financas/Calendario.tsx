@@ -561,7 +561,7 @@ export default function FinancasCalendario() {
             <Card className="overflow-hidden sticky top-6">
               <div className="px-3.5 py-2.5 border-b bg-muted/10 flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2 min-w-0">
-                  <Bell className="w-4 h-4 text-muted-foreground shrink-0" />
+<Bell className="w-4 h-4 text-blue-500 shrink-0" />
                   <p className="text-sm font-semibold text-foreground truncate">Pedidos de Reunião</p>
                   {pendingRequests.length > 0 && (
                     <Badge variant="outline" className="text-[10px] h-5">{pendingRequests.length}</Badge>
