@@ -38,9 +38,10 @@ export default function Salarios() {
   const [filterContract, setFilterContract] = useState("todos");
   const [sortField, setSortField] = useState<SortField | null>(null);
   const [sortDir, setSortDir] = useState<SortDir>("desc");
-  const [periodo, setPeriodo] = useState<Periodo>("mensal");
+  const [periodo, setPeriodo] = useState<Periodo>("mes");
+  const [periodoValue, setPeriodoValue] = useState<string>(periodoDefaultValue("mes"));
 
-  const mult = periodoMultiplier[periodo];
+  const mult = PERIODO_MULT[periodo];
 
   const isStatusActive = filterStatus !== "todos";
   const isContractActive = filterContract !== "todos";
