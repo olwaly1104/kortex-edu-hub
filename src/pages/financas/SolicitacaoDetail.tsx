@@ -226,6 +226,18 @@ export default function FinancasSolicitacaoDetail() {
           </div>
         </div>
 
+        {/* Actions */}
+        {isRecebida && selected.status === "pendente" && (
+          <div className="px-6 py-3 border-t border-border bg-muted/10 flex items-center justify-end gap-2">
+            <Button variant="outline" className="h-8 px-3 text-[11px] gap-1.5 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-300 transition-colors" onClick={() => handleAction("rejeitado")}>
+              <XCircle className="w-3.5 h-3.5" /> Rejeitar
+            </Button>
+            <Button className="h-8 px-3 text-[11px] gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white transition-colors" onClick={() => handleAction("aprovado")}>
+              <CheckCircle2 className="w-3.5 h-3.5" /> Aprovar
+            </Button>
+          </div>
+        )}
+
         {/* 2-column body */}
         <div className="grid md:grid-cols-[280px_1fr] divide-x divide-border border-t border-border">
           {/* LEFT */}
