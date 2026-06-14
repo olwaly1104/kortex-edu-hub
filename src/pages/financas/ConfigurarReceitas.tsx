@@ -457,9 +457,7 @@ export default function ConfigurarReceitas() {
     return c.baseSalary - deductions - multasTotal;
   };
 
-  const totalReceitas = receitas.reduce((s, r) => s + r.valor, 0);
-  const totalDespesas = despesas.reduce((s, d) => s + d.valorEstimado, 0);
-  const totalSalarios = Object.values(salaryConfigs).reduce((s, c) => s + c.baseSalary, 0);
+  // (toggle cards intentionally show no values — they are just mode switches)
 
   const visibleReceitaSections = receitaFilter === "todos" ? RECEITA_SECTIONS : RECEITA_SECTIONS.filter(s => s.key === receitaFilter);
   const visibleDespesaSections = despesaFilter === "todos" ? DESPESA_SECTIONS : DESPESA_SECTIONS.filter(s => s.key === despesaFilter);
