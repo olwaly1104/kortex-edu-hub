@@ -118,19 +118,9 @@ export default function FinancasDashboard() {
         <KPICard label={periodo === "mes" ? "Receitas do Mês" : periodo === "semestre" ? "Receitas do Semestre" : "Receitas do Ano"} value={formatCurrency(cur.receitas * mult)} change={receitaVar} icon={TrendingUp} positive />
         <KPICard label="Despesa Orçamentada" value={formatCurrency(despesaOrcamentadaMes * mult)} subtitle={periodo === "mes" ? "Este Mês" : periodo === "semestre" ? "Este Semestre" : "Este Ano"} icon={FileText} accent />
         <KPICard label={periodo === "mes" ? "Despesas do Mês" : periodo === "semestre" ? "Despesas do Semestre" : "Despesas do Ano"} value={formatCurrency(cur.despesas * mult)} change={despesaVar} icon={TrendingDown} positive={false} />
+        <KPICard label="Salários a Processar" value={formatCurrency(totalBruto * mult)} subtitle={`${salariosPagos} pagos · ${salariosPendentes} pendentes`} icon={CreditCard} />
       </div>
-{/* placeholder removed */}
-      <div className="hidden">
 
-
-      {/* ── KPIs ── */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
-        <KPICard label="Receita Esperada" value={formatCurrency(receitaEsperadaMes)} subtitle="Este Mês" icon={Receipt} accent />
-        <KPICard label="Receitas do Mês" value={formatCurrency(cur.receitas)} change={receitaVar} icon={TrendingUp} positive />
-        <KPICard label="Despesa Orçamentada" value={formatCurrency(despesaOrcamentadaMes)} subtitle="Este Mês" icon={FileText} accent />
-        <KPICard label="Despesas do Mês" value={formatCurrency(cur.despesas)} change={despesaVar} icon={TrendingDown} positive={false} />
-        <KPICard label="Salários a Processar" value={formatCurrency(totalBruto)} subtitle={`${salariosPagos} pagos · ${salariosPendentes} pendentes`} icon={CreditCard} />
-      </div>
 
       {/* ── Charts row ── */}
       <div className="grid lg:grid-cols-5 gap-4">
