@@ -274,13 +274,13 @@ export default function FinancasAnuncios() {
 
                   {/* compact CTA */}
                   {a.cta === "inscrever" && (
-                    <div className="mt-3 rounded-lg border border-primary/25 bg-primary/[0.04] px-3 py-2.5">
+                    <div className="mt-2 rounded-lg border border-primary/25 bg-primary/[0.04] px-3 py-2">
                       <div className="flex items-center justify-between gap-3 flex-wrap">
                         <div className="min-w-0">
-                          <p className="text-[10px] uppercase tracking-[0.14em] font-semibold text-primary mb-0.5">Inscrições abertas</p>
+                          <p className="text-[10px] uppercase tracking-[0.14em] font-semibold text-primary">Inscrições abertas</p>
                           <p className="text-[13px] font-bold text-foreground leading-tight truncate">{a.title}</p>
                           {a.ctaDeadline && (
-                            <p className="text-[11px] text-muted-foreground flex items-center gap-1 mt-0.5">
+                            <p className="text-[11px] text-muted-foreground flex items-center gap-1">
                               <Clock className="w-3 h-3" />
                               Data limite:&nbsp;<span className="font-semibold text-foreground tabular-nums">{a.ctaDeadline}{a.ctaDeadlineTime ? ` · ${a.ctaDeadlineTime}` : ""}</span>
                             </p>
