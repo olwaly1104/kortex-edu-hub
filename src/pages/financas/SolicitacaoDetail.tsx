@@ -591,7 +591,7 @@ export default function FinancasSolicitacaoDetail() {
               <div className="px-5 py-3 space-y-3">
 
                 {/* Parecer / Notas */}
-                <section className="space-y-1.5">
+                <section className="space-y-1">
                   <div className="flex items-baseline justify-between">
                     <Label htmlFor="action-notes" className="text-[11px] uppercase tracking-[0.08em] font-semibold text-foreground">
                       Parecer / Notas
@@ -603,13 +603,13 @@ export default function FinancasSolicitacaoDetail() {
                     value={actionNotes}
                     onChange={(e) => setActionNotes(e.target.value)}
                     placeholder={pm.notesPlaceholder}
-                    rows={4}
+                    rows={3}
                     className="resize-none text-sm leading-relaxed"
                   />
                 </section>
 
                 {/* Anexos */}
-                <section className="space-y-1.5">
+                <section className="space-y-1">
                   <div className="flex items-baseline justify-between">
                     <Label className="text-[11px] uppercase tracking-[0.08em] font-semibold text-foreground">
                       Anexos e evidências
@@ -619,9 +619,9 @@ export default function FinancasSolicitacaoDetail() {
                     </span>
                   </div>
 
-                  <label className="group flex items-center gap-2.5 rounded-md border border-dashed border-border bg-muted/10 hover:border-primary/40 hover:bg-primary/[0.03] transition-colors cursor-pointer px-3 py-2">
+                  <label className="group flex items-center gap-2 rounded-md border border-dashed border-border bg-muted/10 hover:border-primary/40 hover:bg-primary/[0.03] transition-colors cursor-pointer px-3 py-1.5">
                     <span className="w-5 h-5 rounded-full border border-border bg-background flex items-center justify-center group-hover:border-primary/50 group-hover:text-primary transition-colors shrink-0">
-                      <Plus className="w-3 h-3 text-muted-foreground group-hover:text-primary transition-colors" />
+                      <Plus className="w-3 h-3 text-muted-foreground group-hover:text-primary transition-colors $" />
                     </span>
                     <span className="text-[12px] text-foreground/80 flex-1 truncate">
                       Carregar anexo <span className="text-muted-foreground">(PDF, DOCX, XLSX, PNG, JPG)</span>
@@ -645,7 +645,7 @@ export default function FinancasSolicitacaoDetail() {
                           : isSheet ? "text-emerald-600"
                           : "text-red-600";
                         return (
-                          <li key={i} className="flex items-center gap-2 pl-2 pr-1.5 py-1.5 rounded-md border border-border bg-background hover:bg-muted/20 transition-colors">
+                          <li key={i} className="flex items-center gap-2 pl-2 pr-1.5 py-1 rounded-md border border-border bg-background hover:bg-muted/20 transition-colors">
                             <Ic className={cn("w-3.5 h-3.5 shrink-0", cls)} />
                             <span className="text-[12px] font-medium text-foreground truncate flex-1 leading-tight">{f.name}</span>
                             <span className="text-[10px] text-muted-foreground tabular-nums shrink-0">
@@ -670,7 +670,7 @@ export default function FinancasSolicitacaoDetail() {
                 {(() => {
                   const toMeta = finStatusMeta[pendingAction!];
                   return (
-                    <div className="flex items-start gap-2.5 rounded-md border border-border bg-muted/10 px-3 py-2.5">
+                    <div className="flex items-start gap-2 rounded-md border border-border bg-muted/10 px-3 py-2">
                       <Checkbox
                         id="declaration"
                         checked={declarationChecked}
@@ -686,13 +686,13 @@ export default function FinancasSolicitacaoDetail() {
               </div>
 
               {/* Footer */}
-              <DialogFooter className="px-5 py-3 border-t border-border bg-muted/20 gap-2 sm:gap-2">
+              <DialogFooter className="px-5 py-2.5 border-t border-border bg-muted/20 gap-2 sm:gap-2">
                 <DialogClose asChild>
-                  <Button variant="outline" size="sm" className="h-8 text-[12px]">Cancelar</Button>
+                  <Button variant="outline" size="sm" className="h-7 text-[12px]">Cancelar</Button>
                 </DialogClose>
                 <Button
                   size="sm"
-                  className={cn("h-8 text-[12px] gap-1.5", pm.tone)}
+                  className={cn("h-7 text-[12px] gap-1.5", pm.tone)}
                   onClick={confirmAction}
                   disabled={!actionNotes.trim() || !declarationChecked}
                 >
