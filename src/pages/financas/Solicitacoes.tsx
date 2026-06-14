@@ -417,21 +417,17 @@ export default function FinancasSolicitacoes() {
         <DialogContent className="max-w-[640px] p-0 gap-0 overflow-hidden">
           {/* Header */}
           <div className="px-6 pt-5 pb-4 border-b border-border bg-gradient-to-br from-primary/[0.06] via-background to-background">
-            <div className="flex items-start justify-between gap-4">
-              <div className="min-w-0">
-                <DialogTitle className="text-[15px] font-semibold flex items-center gap-2 leading-tight">
-                  <Send className="w-4 h-4 text-primary" /> Nova Solicitação Financeira
-                </DialogTitle>
-                <p className="text-[11.5px] text-muted-foreground mt-1">
-                  {wizStep === 1 && "Escolha a categoria — o destinatário é atribuído automaticamente."}
-                  {wizStep === 2 && "Descreva o pedido com clareza e anexe documentos comprovativos."}
-                  {wizStep === 3 && "Reveja os detalhes antes de submeter o pedido."}
-                </p>
-              </div>
-              <span className="font-mono text-[10.5px] tabular-nums font-semibold text-foreground bg-background border border-border px-2 py-0.5 rounded-md shrink-0">
-                {previewRef}
-              </span>
+            <div className="min-w-0">
+              <DialogTitle className="text-[15px] font-semibold flex items-center gap-2 leading-tight">
+                <Send className="w-4 h-4 text-primary" /> Nova Solicitação
+              </DialogTitle>
+              <p className="text-[11.5px] text-muted-foreground mt-1">
+                {wizStep === 1 && "Escolha a categoria — o destinatário é atribuído automaticamente."}
+                {wizStep === 2 && "Descreva o pedido com clareza e anexe documentos comprovativos."}
+                {wizStep === 3 && "Reveja os detalhes antes de submeter o pedido."}
+              </p>
             </div>
+
 
             {/* Stepper */}
             <ol className="mt-4 flex items-center gap-2">
