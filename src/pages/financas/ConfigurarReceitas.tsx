@@ -283,7 +283,7 @@ export default function ConfigurarReceitas() {
   /* ── DESPESAS ── */
   const [despesas, setDespesas] = useState<DespesaRow[]>([]);
   const [categorias, setCategorias] = useState<string[]>([]);
-  const [estados, setEstados] = useState<string[]>(["Activo", "Em revisão", "Suspensa"]);
+  const [estados, setEstados] = useState<string[]>(["Pendente", "Aprovada", "Executada", "Rejeitada"]);
   const [despesaCatFilter, setDespesaCatFilter] = useState<string>("todos");
   const [despesaEstadoFilter, setDespesaEstadoFilter] = useState<string>("todos");
   const [despesaSearch, setDespesaSearch] = useState("");
@@ -1137,18 +1137,28 @@ export default function ConfigurarReceitas() {
                     <tr className="border-b bg-muted/30">
                       <th className="text-left p-3 font-medium text-muted-foreground text-xs">Nome</th>
                       <th className="text-left p-3 font-medium text-muted-foreground text-xs">Cargo</th>
-                      <th className="text-center p-3 font-medium text-muted-foreground text-xs">Regras associadas</th>
+                      <th className="text-left p-3 font-medium text-muted-foreground text-xs">Aprova até</th>
                       <th className="w-12"></th>
                     </tr>
                   </thead>
                   <tbody>
                     {responsaveis.map(r => {
-                      const rulesCount = approvalRules.filter(x => x.responsavelId === r.id).length;
+                      const isReitor = /reitor/i.test(r.nome) || /reitor/i.test(r.cargo);
+                      const respRules = approvalRules.filter(x => x.responsavelId === r.id);
+                      const maxLimit = respRules.length ? Math.max(...respRules.map(x => x.max)) : null;
                       return (
                         <tr key={r.id} className="border-b last:border-0 hover:bg-muted/20">
                           <td className="p-3 text-xs font-medium text-foreground">{r.nome}</td>
                           <td className="p-3 text-xs text-muted-foreground">{r.cargo}</td>
-                          <td className="p-3 text-center text-xs tabular-nums text-foreground">{rulesCount}</td>
+                          <td className="p-3 text-xs">
+                            {isReitor ? (
+                              <span className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 text-emerald-700 px-2 py-0.5 text-[10px] font-medium">Sem limite</span>
+                            ) : maxLimit !== null ? (
+                              <span className="tabular-nums text-foreground font-medium">{formatCurrency(maxLimit)}</span>
+                            ) : (
+                              <span className="text-muted-foreground italic">— sem limite definido</span>
+                            )}
+                          </td>
                           <td className="p-3 text-right">
                             <button onClick={() => removeResponsavel(r.id)} className="text-muted-foreground hover:text-destructive" title="Remover">
                               <Trash2 className="w-3.5 h-3.5" />
@@ -1259,109 +1269,6 @@ export default function ConfigurarReceitas() {
             )}
           </Card>
 
-          {/* 6. Despesas (lista) */}
-          <Card className="p-5">
-            <div className="flex items-center justify-between mb-4 gap-3 flex-wrap">
-              <div className="flex items-center gap-2 min-w-0">
-                <TrendingDown className="w-4 h-4 text-red-700" />
-                <h2 className="text-sm font-semibold text-foreground">Despesas</h2>
-                <span className="text-[11px] text-muted-foreground tabular-nums">· {filteredDespesas.length} de {despesas.length}</span>
-                {despesas.length > 0 && (
-                  <span className="text-xs text-muted-foreground hidden md:inline">
-                    — Total filtrado: <span className="font-semibold text-foreground tabular-nums">{formatCurrency(filteredDespesas.reduce((s, d) => s + d.valorEstimado, 0))}</span>
-                  </span>
-                )}
-              </div>
-              <Button size="sm" className="gap-1.5 h-8 text-xs" onClick={openNewDespesa}>
-                <Plus className="w-3.5 h-3.5" /> Nova despesa
-              </Button>
-            </div>
-
-            <div className="flex items-center gap-2 mb-3 flex-wrap">
-              <div className="relative">
-                <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                <Input value={despesaSearch} onChange={e => setDespesaSearch(e.target.value)}
-                  placeholder="Procurar..." className="h-8 text-xs pl-8 w-[200px]" />
-              </div>
-              <Select value={despesaCatFilter} onValueChange={setDespesaCatFilter}>
-                <SelectTrigger className="h-8 w-[180px] text-xs"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="todos">Todas as categorias</SelectItem>
-                  {categorias.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-                </SelectContent>
-              </Select>
-              <Select value={despesaEstadoFilter} onValueChange={setDespesaEstadoFilter}>
-                <SelectTrigger className="h-8 w-[160px] text-xs"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="todos">Todos os estados</SelectItem>
-                  {estados.map(e => <SelectItem key={e} value={e}>{e}</SelectItem>)}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {despesas.length === 0 ? (
-              <div className="text-center py-10">
-                <p className="text-sm text-muted-foreground">Sem despesas configuradas.</p>
-                <p className="text-[11px] text-muted-foreground mt-1">Comece por criar categorias e estados, depois adicione despesas.</p>
-              </div>
-            ) : filteredDespesas.length === 0 ? (
-              <p className="text-center text-xs text-muted-foreground py-8">Nenhuma despesa corresponde aos filtros.</p>
-            ) : (
-              <div className="overflow-x-auto rounded-lg border border-border">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b bg-muted/30">
-                      <th className="text-left p-3 font-medium text-muted-foreground text-xs">Despesa</th>
-                      <th className="text-left p-3 font-medium text-muted-foreground text-xs">Categoria</th>
-                      <th className="text-left p-3 font-medium text-muted-foreground text-xs">Estado</th>
-                      <th className="text-left p-3 font-medium text-muted-foreground text-xs">Destinatário</th>
-                      <th className="text-left p-3 font-medium text-muted-foreground text-xs">Responsável</th>
-                      <th className="text-right p-3 font-medium text-muted-foreground text-xs">Valor</th>
-                      <th className="w-20"></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredDespesas.map(d => {
-                      const dest = getDestinatarioFor(d.categoria);
-                      const resp = responsavelForValue(d.valorEstimado);
-                      return (
-                        <tr key={d.id} role="button" tabIndex={0}
-                          onClick={() => openEditDespesa(d)}
-                          className="border-b last:border-0 hover:bg-muted/30 cursor-pointer group">
-                          <td className="p-3">
-                            <p className="text-xs font-medium text-foreground">{d.nome}</p>
-                            <span className={cn("inline-flex items-center rounded-full border px-1.5 py-0.5 text-[9px] font-medium capitalize mt-0.5", periodCls[d.periodicidade])}>{d.periodicidade}</span>
-                          </td>
-                          <td className="p-3">
-                            <span className={cn("inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium", chipFor(d.categoria))}>{d.categoria}</span>
-                          </td>
-                          <td className="p-3">
-                            <span className={cn("inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium", chipFor(d.estado))}>{d.estado}</span>
-                          </td>
-                          <td className="p-3 text-xs text-foreground">{dest || <span className="text-muted-foreground italic">—</span>}</td>
-                          <td className="p-3 text-xs">
-                            {resp ? <span className="text-foreground">{resp.nome}</span> : <span className="text-muted-foreground italic">—</span>}
-                          </td>
-                          <td className="p-3 text-right text-sm font-semibold tabular-nums text-foreground whitespace-nowrap">{formatCurrency(d.valorEstimado)}</td>
-                          <td className="p-3 text-right">
-                            <div className="inline-flex items-center gap-0.5 opacity-60 group-hover:opacity-100 transition">
-                              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={(e) => { e.stopPropagation(); openEditDespesa(d); }} title="Editar">
-                                <Pencil className="w-3.5 h-3.5" />
-                              </Button>
-                              <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive"
-                                onClick={(e) => { e.stopPropagation(); setConfirmDelDespesa(d); }} title="Remover">
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </Button>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </Card>
         </div>
       )}
 
