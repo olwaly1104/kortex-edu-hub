@@ -260,64 +260,85 @@ export default function FinancasCalendario() {
         </div>
       </div>
 
-      {/* ── Period title + view toggle + nav ─────────────── */}
-      <div className="flex items-center justify-between gap-3 flex-wrap rounded-lg border border-border bg-card px-4 py-3">
-        <div className="flex items-center gap-3 min-w-0">
-          <div className="flex bg-muted/60 rounded-lg p-0.5">
-            {(["week", "month"] as const).map(v => (
-              <button key={v} onClick={() => setView(v)}
-                className={cn("px-3 py-1.5 rounded-md text-xs font-semibold transition-colors",
-                  view === v ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground")}>
-                {v === "week" ? "Semana" : "Mês"}
-              </button>
-            ))}
-          </div>
-          <div className="h-5 w-px bg-border" />
-          <div className="min-w-0">
-            <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium leading-none">
-              {view === "week" ? "Semana" : "Mês"}
-            </p>
-            <h2 className="text-base font-bold text-foreground capitalize leading-tight mt-1 truncate">
-              {view === "week" ? weekLabel : monthLabel}
-            </h2>
-          </div>
-        </div>
+      {/* ── Period bar: toggle + entries (top), nav title (bottom) ─────────────── */}
+      {(() => {
+        const periodEntries = (view === "week"
+          ? weekDays.flatMap(d => eventsOnDate(d))
+          : allEvents.filter(e => {
+              const dd = parseISO(e.date);
+              return dd.getMonth() === cursorD.getMonth() && dd.getFullYear() === cursorD.getFullYear();
+            })
+        );
+        const totalEntries = periodEntries.length;
+        return (
+          <div className="rounded-lg border border-border bg-card px-4 py-3 space-y-3">
+            {/* top row */}
+            <div className="flex items-center justify-between gap-3 flex-wrap">
+              <div className="flex bg-muted/60 rounded-lg p-0.5">
+                {(["week", "month"] as const).map(v => (
+                  <button key={v} onClick={() => setView(v)}
+                    className={cn("px-3 py-1.5 rounded-md text-xs font-semibold transition-colors",
+                      view === v ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground")}>
+                    {v === "week" ? "Semana" : "Mês"}
+                  </button>
+                ))}
+              </div>
+              <Badge variant="outline" className="h-7 px-2.5 gap-1.5 text-xs font-semibold">
+                <CalendarRange className="w-3.5 h-3.5 text-muted-foreground" />
+                {totalEntries} {totalEntries === 1 ? "entrada" : "entradas"}
+              </Badge>
+            </div>
 
-        {view === "week" ? (
-          <div className="flex items-center bg-muted/60 rounded-lg p-0.5">
-            <button onClick={() => navigateBy(-1)} className="p-1.5 rounded-md hover:bg-card transition-colors" aria-label="Semana anterior">
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-            <span className="px-3 text-xs font-medium text-foreground min-w-[150px] text-center">{weekLabel}</span>
-            <button onClick={() => navigateBy(1)} className="p-1.5 rounded-md hover:bg-card transition-colors" aria-label="Próxima semana">
-              <ChevronRight className="w-4 h-4" />
-            </button>
+            {/* bottom row: arrows + result title */}
+            <div className="flex items-center justify-between gap-2 border-t border-border pt-3">
+              <button onClick={() => navigateBy(-1)}
+                className="h-8 w-8 rounded-md border border-border hover:bg-muted/60 flex items-center justify-center transition-colors shrink-0"
+                aria-label={view === "week" ? "Semana anterior" : "Mês anterior"}>
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+
+              {view === "week" ? (
+                <h2 className="flex-1 text-center text-base font-bold text-foreground capitalize truncate">
+                  {weekLabel}
+                </h2>
+              ) : (
+                <div className="flex-1 flex items-center justify-center gap-2">
+                  <Select value={String(cursorD.getMonth())} onValueChange={(v) => {
+                    const d = parseISO(cursor); d.setMonth(parseInt(v, 10)); setCursor(toISO(d));
+                  }}>
+                    <SelectTrigger className="h-8 w-auto min-w-[120px] gap-1.5 text-base font-bold capitalize border-0 shadow-none hover:bg-muted/60 focus:ring-0 px-2">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {MONTH_NAMES.map((mn, i) => (
+                        <SelectItem key={mn} value={String(i)} className="text-sm">{mn}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Select value={String(cursorD.getFullYear())} onValueChange={(v) => {
+                    const d = parseISO(cursor); d.setFullYear(parseInt(v, 10)); setCursor(toISO(d));
+                  }}>
+                    <SelectTrigger className="h-8 w-auto min-w-[80px] gap-1.5 text-base font-bold border-0 shadow-none hover:bg-muted/60 focus:ring-0 px-2">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {[2023, 2024, 2025, 2026].map(y => (
+                        <SelectItem key={y} value={String(y)} className="text-sm">{y}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
+              <button onClick={() => navigateBy(1)}
+                className="h-8 w-8 rounded-md border border-border hover:bg-muted/60 flex items-center justify-center transition-colors shrink-0"
+                aria-label={view === "week" ? "Próxima semana" : "Próximo mês"}>
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
           </div>
-        ) : (
-          <div className="flex items-center gap-2">
-            <Select value={String(cursorD.getMonth())} onValueChange={(v) => {
-              const d = parseISO(cursor); d.setMonth(parseInt(v, 10)); setCursor(toISO(d));
-            }}>
-              <SelectTrigger className="h-9 w-[140px] text-xs"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                {MONTH_NAMES.map((mn, i) => (
-                  <SelectItem key={mn} value={String(i)} className="text-xs">{mn}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select value={String(cursorD.getFullYear())} onValueChange={(v) => {
-              const d = parseISO(cursor); d.setFullYear(parseInt(v, 10)); setCursor(toISO(d));
-            }}>
-              <SelectTrigger className="h-9 w-[90px] text-xs"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                {[2023, 2024, 2025, 2026].map(y => (
-                  <SelectItem key={y} value={String(y)} className="text-xs">{y}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        )}
-      </div>
+        );
+      })()}
 
       {/* ── Grid ─────────────────────────────── */}
       <div className="flex gap-6">
