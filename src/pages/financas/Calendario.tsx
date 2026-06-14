@@ -349,86 +349,124 @@ export default function FinancasCalendario() {
         </div>
 
         {/* ── Side panel ─────────────────────── */}
-        <div className="w-[320px] shrink-0 hidden lg:block space-y-4">
-          {view === "month" && (
-            <Card className="overflow-hidden">
-              <div className="px-3.5 py-2.5 border-b bg-muted/10 flex items-center justify-between">
+        <div className="w-[320px] shrink-0 hidden lg:block">
+          {view === "month" ? (
+            <Card className="overflow-hidden sticky top-6">
+              <div className="px-3.5 py-3 border-b bg-muted/10 flex items-center justify-between">
                 <div className="min-w-0">
                   <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Agenda do dia</p>
                   <h3 className="text-sm font-bold text-foreground capitalize leading-tight mt-0.5 truncate">{fmtLong(selectedDate)}</h3>
                 </div>
-                <Badge variant="outline" className="text-[10px] shrink-0 ml-2">{selectedEvents.length}</Badge>
+                <Badge variant="outline" className="text-[10px] shrink-0 ml-2">
+                  {selectedEvents.length} evento{selectedEvents.length !== 1 ? "s" : ""}
+                </Badge>
               </div>
               {selectedEvents.length === 0 ? (
-                <div className="text-center py-8">
-                  <CalendarDays className="w-6 h-6 text-muted-foreground/40 mx-auto mb-2" />
-                  <p className="text-[11px] text-muted-foreground">Sem eventos</p>
+                <div className="text-center py-10 px-4">
+                  <CalendarDays className="w-7 h-7 text-muted-foreground/40 mx-auto mb-2" />
+                  <p className="text-xs text-muted-foreground">Sem eventos neste dia</p>
+                  <Button size="sm" variant="outline" className="mt-3 gap-1.5 text-xs"
+                    onClick={() => { setForm(f => ({ ...f, date: selectedDate })); setOpenCreate(true); }}>
+                    <Plus className="w-3.5 h-3.5" /> Adicionar
+                  </Button>
                 </div>
               ) : (
-                <div className="divide-y divide-border max-h-[380px] overflow-y-auto">
-                  {selectedEvents.map(ev => (
-                    <EventRow key={ev.id} ev={ev} onOpen={() => setDetailEvent(ev)} compact />
+                <div className="p-3 space-y-2 max-h-[540px] overflow-y-auto">
+                  {selectedEvents.map(ev => {
+                    const m = TYPE_META[ev.type];
+                    const Icon = m.icon;
+                    const hasTime = !!ev.startTime;
+                    return (
+                      <button key={ev.id} onClick={() => setDetailEvent(ev)}
+                        className="w-full text-left rounded-lg border bg-card hover:border-foreground/20 hover:shadow-sm transition-all overflow-hidden group">
+                        <div className="flex items-stretch">
+                          <div className={cn("w-1 shrink-0", m.bar)} />
+                          <div className="flex-1 min-w-0 p-2.5">
+                            <div className="flex items-start justify-between gap-2 mb-1.5">
+                              <div className="flex items-center gap-1.5 min-w-0">
+                                <div className={cn("w-5 h-5 rounded-md flex items-center justify-center shrink-0", m.soft)}>
+                                  <Icon className={cn("w-3 h-3", m.text)} />
+                                </div>
+                                <span className={cn("text-[10px] font-semibold uppercase tracking-wide", m.text)}>{m.label}</span>
+                              </div>
+                              {ev.obligatory && (
+                                <Badge variant="outline" className="text-[9px] h-4 px-1 bg-red-50 text-red-700 border-red-200">Obrig.</Badge>
+                              )}
+                            </div>
+                            <p className="text-xs font-semibold text-foreground leading-snug line-clamp-2">{ev.title}</p>
+                            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2 text-[10px] text-muted-foreground">
+                              {hasTime && (
+                                <span className="flex items-center gap-1 font-medium text-foreground/80">
+                                  <Clock className="w-3 h-3" />{ev.startTime}–{ev.endTime}
+                                </span>
+                              )}
+                              {ev.location && (
+                                <span className="flex items-center gap-1 truncate"><MapPin className="w-3 h-3" />{ev.location}</span>
+                              )}
+                              {ev.participants && ev.participants.length > 0 && (
+                                <span className="flex items-center gap-1"><Users className="w-3 h-3" />{ev.participants.length}</span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </Card>
+          ) : (
+            <Card className="overflow-hidden sticky top-6">
+              <div className="px-3.5 py-2.5 border-b bg-muted/10 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Bell className="w-4 h-4 text-muted-foreground" />
+                  <p className="text-sm font-semibold text-foreground">Pedidos de Reunião</p>
+                </div>
+                {pendingRequests.length > 0 && (
+                  <Badge variant="outline" className="text-[10px] h-5">{pendingRequests.length}</Badge>
+                )}
+              </div>
+              {pendingRequests.length === 0 ? (
+                <div className="text-center py-8">
+                  <Bell className="w-6 h-6 text-muted-foreground/40 mx-auto mb-2" />
+                  <p className="text-[11px] text-muted-foreground">Sem pedidos pendentes</p>
+                </div>
+              ) : (
+                <div className="p-2 space-y-2 overflow-y-auto" style={{ maxHeight: 3 * 176 }}>
+                  {pendingRequests.map(r => (
+                    <RequestCard key={r.id} r={r} onAccept={() => respondRequest(r.id, "accepted")}
+                      onDecline={() => respondRequest(r.id, "declined")} onDetail={() => setDetailRequest(r)} />
                   ))}
                 </div>
               )}
             </Card>
           )}
-
-          <Card className={cn("overflow-hidden", view === "week" && "sticky top-6")}>
-            <div className="px-3.5 py-2.5 border-b bg-muted/10 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Bell className="w-4 h-4 text-muted-foreground" />
-                <p className="text-sm font-semibold text-foreground">Pedidos de Reunião</p>
-              </div>
-              {pendingRequests.length > 0 && (
-                <Badge variant="outline" className="text-[10px] h-5">{pendingRequests.length}</Badge>
-              )}
-            </div>
-            {pendingRequests.length === 0 ? (
-              <div className="text-center py-8">
-                <Bell className="w-6 h-6 text-muted-foreground/40 mx-auto mb-2" />
-                <p className="text-[11px] text-muted-foreground">Sem pedidos pendentes</p>
-              </div>
-            ) : (
-              <div className="p-2 space-y-2 overflow-y-auto" style={{ maxHeight: 3 * 176 }}>
-                {pendingRequests.map(r => (
-                  <div key={r.id} className="rounded-lg border bg-card hover:border-foreground/20 transition-colors overflow-hidden">
-                    <div className="p-2.5 space-y-2">
-                      <div>
-                        <p className="text-xs font-semibold text-foreground leading-tight line-clamp-2">{r.title}</p>
-                        <p className="text-[10px] text-muted-foreground mt-0.5 flex items-center gap-1">
-                          <UserCircle2 className="w-3 h-3" />{r.organizer}
-                        </p>
-                      </div>
-                      <div className="space-y-0.5 text-[10px] text-muted-foreground">
-                        <div className="flex items-center gap-1"><CalendarDays className="w-3 h-3" />{r.date} · {r.startTime}–{r.endTime}</div>
-                        <div className="flex items-center gap-1 truncate"><MapPin className="w-3 h-3" />{r.location}</div>
-                        {r.participants && (
-                          <div className="flex items-center gap-1"><Users className="w-3 h-3" />{r.participants.length} participante{r.participants.length !== 1 ? "s" : ""}</div>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-1.5 pt-1">
-                        <Button size="sm" className="h-7 flex-1 text-[10px] gap-1 bg-emerald-600 hover:bg-emerald-700"
-                          onClick={() => respondRequest(r.id, "accepted")}>
-                          <Check className="w-3 h-3" /> Aceitar
-                        </Button>
-                        <Button size="sm" variant="outline" className="h-7 flex-1 text-[10px] gap-1 border-red-200 text-red-700 hover:bg-red-50"
-                          onClick={() => respondRequest(r.id, "declined")}>
-                          <X className="w-3 h-3" /> Recusar
-                        </Button>
-                      </div>
-                    </div>
-                    <button onClick={() => setDetailRequest(r)}
-                      className="w-full h-8 text-[10px] font-medium text-foreground/80 hover:text-foreground border-t bg-muted/20 hover:bg-muted/40 transition-colors flex items-center justify-center gap-1.5">
-                      <Eye className="w-3 h-3" /> Ver detalhes
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </Card>
         </div>
       </div>
+
+      {/* ── Horizontal Pedidos (Mês only) ── */}
+      {view === "month" && pendingRequests.length > 0 && (
+        <Card className="overflow-hidden">
+          <div className="px-4 py-2.5 border-b bg-muted/10 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Bell className="w-4 h-4 text-muted-foreground" />
+              <p className="text-sm font-semibold text-foreground">Pedidos de Reunião</p>
+              <Badge variant="outline" className="text-[10px] h-5">{pendingRequests.length}</Badge>
+            </div>
+            <p className="text-[10px] text-muted-foreground hidden sm:block">Desliza horizontalmente para ver mais</p>
+          </div>
+          <div className="overflow-x-auto">
+            <div className="flex gap-3 p-3" style={{ width: "max-content" }}>
+              {pendingRequests.map(r => (
+                <div key={r.id} className="w-[280px] shrink-0">
+                  <RequestCard r={r} onAccept={() => respondRequest(r.id, "accepted")}
+                    onDecline={() => respondRequest(r.id, "declined")} onDetail={() => setDetailRequest(r)} />
+                </div>
+              ))}
+            </div>
+          </div>
+        </Card>
+      )}
 
       {/* ── Adicionar à Agenda (modern full-page modal) ── */}
       <Dialog open={openCreate} onOpenChange={setOpenCreate}>
@@ -565,6 +603,42 @@ export default function FinancasCalendario() {
 }
 
 /* ── Event row in agenda ── */
+function RequestCard({ r, onAccept, onDecline, onDetail }: {
+  r: MeetingRequest; onAccept: () => void; onDecline: () => void; onDetail: () => void;
+}) {
+  return (
+    <div className="rounded-lg border bg-card hover:border-foreground/20 transition-colors overflow-hidden h-full flex flex-col">
+      <div className="p-2.5 space-y-2 flex-1">
+        <div>
+          <p className="text-xs font-semibold text-foreground leading-tight line-clamp-2">{r.title}</p>
+          <p className="text-[10px] text-muted-foreground mt-0.5 flex items-center gap-1">
+            <UserCircle2 className="w-3 h-3" />{r.organizer}
+          </p>
+        </div>
+        <div className="space-y-0.5 text-[10px] text-muted-foreground">
+          <div className="flex items-center gap-1"><CalendarDays className="w-3 h-3" />{r.date} · {r.startTime}–{r.endTime}</div>
+          <div className="flex items-center gap-1 truncate"><MapPin className="w-3 h-3" />{r.location}</div>
+          {r.participants && (
+            <div className="flex items-center gap-1"><Users className="w-3 h-3" />{r.participants.length} participante{r.participants.length !== 1 ? "s" : ""}</div>
+          )}
+        </div>
+        <div className="flex items-center gap-1.5 pt-1">
+          <Button size="sm" className="h-7 flex-1 text-[10px] gap-1 bg-emerald-600 hover:bg-emerald-700" onClick={onAccept}>
+            <Check className="w-3 h-3" /> Aceitar
+          </Button>
+          <Button size="sm" variant="outline" className="h-7 flex-1 text-[10px] gap-1 border-red-200 text-red-700 hover:bg-red-50" onClick={onDecline}>
+            <X className="w-3 h-3" /> Recusar
+          </Button>
+        </div>
+      </div>
+      <button onClick={onDetail}
+        className="w-full h-8 text-[10px] font-medium text-foreground/80 hover:text-foreground border-t bg-muted/20 hover:bg-muted/40 transition-colors flex items-center justify-center gap-1.5">
+        <Eye className="w-3 h-3" /> Ver detalhes
+      </button>
+    </div>
+  );
+}
+
 function EventRow({ ev, onOpen, compact = false }: { ev: AgendaEvent; onOpen: () => void; compact?: boolean }) {
   const m = TYPE_META[ev.type];
   const Icon = m.icon;
