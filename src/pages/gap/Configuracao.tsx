@@ -339,6 +339,7 @@ export default function GapConfiguracao() {
                 <h2 className="text-sm font-semibold text-foreground">Estados</h2>
                 <span className="text-[11px] text-muted-foreground tabular-nums">· {estados.length}</span>
               </div>
+              <div className="flex items-center gap-2">
               {isCardEditing("sol-estados") && (
                 <Dialog open={estadoOpen} onOpenChange={setEstadoOpen}>
                   <DialogTrigger asChild>
@@ -361,6 +362,8 @@ export default function GapConfiguracao() {
                   </DialogContent>
                 </Dialog>
               )}
+                <CardEditToggle id="sol-estados" />
+              </div>
             </div>
             <div className="flex flex-wrap gap-2">
               {estados.map(e => (
@@ -381,6 +384,7 @@ export default function GapConfiguracao() {
                 <h2 className="text-sm font-semibold text-foreground">Categorias</h2>
                 <span className="text-[11px] text-muted-foreground tabular-nums">· {categorias.length}</span>
               </div>
+              <div className="flex items-center gap-2">
               {isCardEditing("sol-categorias") && (
                 <Dialog open={catOpen} onOpenChange={setCatOpen}>
                   <DialogTrigger asChild>
@@ -403,6 +407,8 @@ export default function GapConfiguracao() {
                   </DialogContent>
                 </Dialog>
               )}
+                <CardEditToggle id="sol-categorias" />
+              </div>
             </div>
             <div className="flex flex-wrap gap-2">
               {categorias.map(c => {
@@ -427,6 +433,7 @@ export default function GapConfiguracao() {
                 <h2 className="text-sm font-semibold text-foreground">Motivos</h2>
                 <span className="text-[11px] text-muted-foreground tabular-nums">· {motivos.length}</span>
               </div>
+              <div className="flex items-center gap-2">
               {isCardEditing("sol-motivos") && (
                 <Dialog open={motivoOpen} onOpenChange={setMotivoOpen}>
                   <DialogTrigger asChild>
@@ -499,6 +506,8 @@ export default function GapConfiguracao() {
                   </DialogContent>
                 </Dialog>
               )}
+                <CardEditToggle id="sol-motivos" />
+              </div>
             </div>
             <div className="overflow-x-auto rounded-lg border border-border">
               <table className="w-full text-sm">
@@ -561,9 +570,12 @@ export default function GapConfiguracao() {
         <TabsContent value="agendamentos" className="space-y-6 mt-0">
           {/* Parâmetros gerais — só início e fim */}
           <Card className="p-5">
-            <div className="flex items-center gap-2 mb-4">
-              <Clock className="w-4 h-4 text-muted-foreground" />
-              <h2 className="text-sm font-semibold text-foreground">Parâmetros de agendamento</h2>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4 text-muted-foreground" />
+                <h2 className="text-sm font-semibold text-foreground">Parâmetros de agendamento</h2>
+              </div>
+              <CardEditToggle id="ag-params" />
             </div>
             <div className="grid grid-cols-2 gap-4 max-w-md">
               <div>
@@ -585,6 +597,7 @@ export default function GapConfiguracao() {
                 <h2 className="text-sm font-semibold text-foreground">Categorias de atendimento</h2>
                 <span className="text-[11px] text-muted-foreground tabular-nums">· {agCategorias.length}</span>
               </div>
+              <div className="flex items-center gap-2">
               {isCardEditing("ag-categorias") && (
                 <Dialog open={agCatOpen} onOpenChange={setAgCatOpen}>
                   <DialogTrigger asChild>
@@ -611,6 +624,8 @@ export default function GapConfiguracao() {
                   </DialogContent>
                 </Dialog>
               )}
+                <CardEditToggle id="ag-categorias" />
+              </div>
             </div>
             <div className="flex flex-wrap gap-2">
               {agCategorias.map(c => (
@@ -630,6 +645,7 @@ export default function GapConfiguracao() {
                 <h2 className="text-sm font-semibold text-foreground">Motivos de agendamento</h2>
                 <span className="text-[11px] text-muted-foreground tabular-nums">· {agMotivos.length}</span>
               </div>
+              <div className="flex items-center gap-2">
               {isCardEditing("ag-motivos") && (
                 <Dialog open={agMotOpen} onOpenChange={setAgMotOpen}>
                   <DialogTrigger asChild>
@@ -674,6 +690,8 @@ export default function GapConfiguracao() {
                   </DialogContent>
                 </Dialog>
               )}
+                <CardEditToggle id="ag-motivos" />
+              </div>
             </div>
             <div className="overflow-x-auto rounded-lg border border-border">
               <table className="w-full text-sm">
@@ -720,6 +738,7 @@ export default function GapConfiguracao() {
                 <h2 className="text-sm font-semibold text-foreground">Salas / Gabinetes</h2>
                 <span className="text-[11px] text-muted-foreground tabular-nums">· {agSalas.length}</span>
               </div>
+              <div className="flex items-center gap-2">
               {isCardEditing("ag-salas") && (
                 <Dialog open={agSalaOpen} onOpenChange={setAgSalaOpen}>
                   <DialogTrigger asChild>
@@ -749,6 +768,8 @@ export default function GapConfiguracao() {
                   </DialogContent>
                 </Dialog>
               )}
+                <CardEditToggle id="ag-salas" />
+              </div>
             </div>
             <div className="flex flex-wrap gap-2">
               {agSalas.map(s => (
@@ -768,9 +789,12 @@ export default function GapConfiguracao() {
         <TabsContent value="candidaturas" className="space-y-6 mt-0">
           {/* Parâmetros gerais — período de candidaturas */}
           <Card className="p-5">
-            <div className="flex items-center gap-2 mb-4">
-              <Settings2 className="w-4 h-4 text-muted-foreground" />
-              <h2 className="text-sm font-semibold text-foreground">Parâmetros gerais</h2>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Settings2 className="w-4 h-4 text-muted-foreground" />
+                <h2 className="text-sm font-semibold text-foreground">Parâmetros gerais</h2>
+              </div>
+              <CardEditToggle id="cd-params" />
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-2xl">
               <div>
@@ -795,6 +819,7 @@ export default function GapConfiguracao() {
                 <h2 className="text-sm font-semibold text-foreground">Estados</h2>
                 <span className="text-[11px] text-muted-foreground tabular-nums">· {cdEstados.length}</span>
               </div>
+              <div className="flex items-center gap-2">
               {isCardEditing("cd-estados") && (
                 <Dialog open={cdEstadoOpen} onOpenChange={setCdEstadoOpen}>
                   <DialogTrigger asChild>
@@ -815,6 +840,8 @@ export default function GapConfiguracao() {
                   </DialogContent>
                 </Dialog>
               )}
+                <CardEditToggle id="cd-estados" />
+              </div>
             </div>
             <div className="flex flex-wrap gap-2">
               {cdEstados.map(e => (
@@ -834,6 +861,7 @@ export default function GapConfiguracao() {
                 <h2 className="text-sm font-semibold text-foreground">Etapas do processo</h2>
                 <span className="text-[11px] text-muted-foreground tabular-nums">· {cdEtapas.length}</span>
               </div>
+              <div className="flex items-center gap-2">
               {isCardEditing("cd-etapas") && (
                 <Dialog open={cdEtapaOpen} onOpenChange={setCdEtapaOpen}>
                   <DialogTrigger asChild>
@@ -854,6 +882,8 @@ export default function GapConfiguracao() {
                   </DialogContent>
                 </Dialog>
               )}
+                <CardEditToggle id="cd-etapas" />
+              </div>
             </div>
             <div className="overflow-x-auto rounded-lg border border-border">
               <table className="w-full text-sm">
@@ -911,6 +941,7 @@ export default function GapConfiguracao() {
                 <h2 className="text-sm font-semibold text-foreground">Sessões agendadas</h2>
                 <span className="text-[11px] text-muted-foreground tabular-nums">· {cdSessoes.length}</span>
               </div>
+              <div className="flex items-center gap-2">
               {isCardEditing("cd-sessoes") && (
                 <Dialog open={cdSessOpen} onOpenChange={setCdSessOpen}>
                   <DialogTrigger asChild>
@@ -952,6 +983,8 @@ export default function GapConfiguracao() {
                   </DialogContent>
                 </Dialog>
               )}
+                <CardEditToggle id="cd-sessoes" />
+              </div>
             </div>
             <div className="overflow-x-auto rounded-lg border border-border">
               <table className="w-full text-sm">
