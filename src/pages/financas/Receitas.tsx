@@ -9,6 +9,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { formatCurrency, receitas as receitasSeed } from "@/data/financeModuleData";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { FinHeader } from "./_FinHeader";
 
 type SortField = "amount";
 type SortDir = "asc" | "desc";
