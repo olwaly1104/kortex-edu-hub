@@ -1769,8 +1769,50 @@ export default function ConfigurarReceitas() {
         </DialogContent>
       </Dialog>
 
+      {/* ═══════ Regra de aprovação dialog ═══════ */}
+      <Dialog open={openRuleDialog} onOpenChange={setOpenRuleDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <ClipboardCheck className="w-4 h-4 text-primary" />
+              {ruleForm.id ? "Editar regra" : "Nova regra de aprovação"}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-muted-foreground">De (Kz)</label>
+                <Input type="number" min={0} value={ruleForm.min}
+                  onChange={e => setRuleForm({ ...ruleForm, min: e.target.value })} />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-muted-foreground">Até (Kz)</label>
+                <Input type="number" min={0} value={ruleForm.max}
+                  onChange={e => setRuleForm({ ...ruleForm, max: e.target.value })} />
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground">Responsável</label>
+              <Select value={ruleForm.responsavelId} onValueChange={v => setRuleForm({ ...ruleForm, responsavelId: v })}>
+                <SelectTrigger><SelectValue placeholder="Seleccionar..." /></SelectTrigger>
+                <SelectContent>
+                  {responsaveis.map(r => <SelectItem key={r.id} value={r.id}>{r.nome} · {r.cargo}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <p className="text-[11px] text-muted-foreground">
+              Despesas com valor entre <strong className="text-foreground tabular-nums">{formatCurrency(Number(ruleForm.min) || 0)}</strong> e <strong className="text-foreground tabular-nums">{formatCurrency(Number(ruleForm.max) || 0)}</strong> serão encaminhadas a este responsável.
+            </p>
+          </div>
+          <DialogFooter className="gap-2 sm:gap-2">
+            <DialogClose asChild><Button variant="outline">Cancelar</Button></DialogClose>
+            <Button onClick={saveRule}>Guardar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* unused-import guard */}
-      <span className="hidden"><Popover><PopoverTrigger /><PopoverContent /></Popover><Users /></span>
+      <span className="hidden"><Popover><PopoverTrigger /><PopoverContent /></Popover></span>
     </div>
   );
 }
