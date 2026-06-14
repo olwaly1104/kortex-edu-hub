@@ -770,30 +770,27 @@ export default function GapConfiguracao() {
 
         {/* ============ CANDIDATURAS ============ */}
         <TabsContent value="candidaturas" className="space-y-6 mt-0">
-          {/* Parâmetros gerais */}
+          <div className="flex justify-end"><EditToggle tab="cd" /></div>
+          {/* Parâmetros gerais — período de candidaturas */}
           <Card className="p-5">
             <div className="flex items-center gap-2 mb-4">
               <Settings2 className="w-4 h-4 text-muted-foreground" />
               <h2 className="text-sm font-semibold text-foreground">Parâmetros gerais</h2>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-2xl">
               <div>
-                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Nota mínima de acesso</label>
-                <Input type="number" min={0} max={20} value={cdNotaMinima} disabled={!isEditing} onChange={e => setCdNotaMinima(Number(e.target.value) || 0)} />
-                <p className="text-[10px] text-muted-foreground mt-1">Valor sobre 20 no exame de acesso</p>
+                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Início das candidaturas</label>
+                <Input type="date" value={cdPeriodoInicio} disabled={!isEditing} onChange={e => setCdPeriodoInicio(e.target.value)} />
+                <p className="text-[10px] text-muted-foreground mt-1">Data a partir da qual abre a submissão</p>
               </div>
               <div>
-                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Taxa de candidatura (Kz)</label>
-                <Input type="number" min={0} value={cdTaxa} disabled={!isEditing} onChange={e => setCdTaxa(Number(e.target.value) || 0)} />
-                <p className="text-[10px] text-muted-foreground mt-1">Paga no momento da submissão</p>
-              </div>
-              <div>
-                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Opções de curso (máx.)</label>
-                <Input type="number" min={1} max={5} value={cdMaxOpcoes} disabled={!isEditing} onChange={e => setCdMaxOpcoes(Number(e.target.value) || 1)} />
-                <p className="text-[10px] text-muted-foreground mt-1">Nº de cursos que pode escolher</p>
+                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Fim das candidaturas</label>
+                <Input type="date" value={cdPeriodoFim} disabled={!isEditing} onChange={e => setCdPeriodoFim(e.target.value)} />
+                <p className="text-[10px] text-muted-foreground mt-1">Data limite para submissão</p>
               </div>
             </div>
           </Card>
+
 
           {/* Estados */}
           <Card className="p-5">
