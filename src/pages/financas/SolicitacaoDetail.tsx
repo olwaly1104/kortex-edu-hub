@@ -146,7 +146,7 @@ export default function FinancasSolicitacaoDetail() {
     accepted:  "bg-emerald-500 text-white ring-4 ring-emerald-500/15",
     rejected:  "bg-destructive text-destructive-foreground ring-4 ring-destructive/15",
     executed:  "bg-emerald-500 text-white ring-4 ring-emerald-500/15",
-    scheduled: "bg-amber-500 text-white ring-4 ring-amber-500/15",
+    scheduled: "bg-amber-400 text-white ring-4 ring-amber-400/40 animate-pulse",
     pending:   "bg-background border-2 border-dashed border-border text-muted-foreground",
   };
 
@@ -575,16 +575,16 @@ export default function FinancasSolicitacaoDetail() {
                                 const Ic = a.tipo === "image" ? FileImage : a.tipo === "sheet" ? FileSpreadsheet : FileText;
                                 const cls = a.tipo === "image" ? "text-violet-600" : a.tipo === "sheet" ? "text-emerald-600" : "text-red-600";
                                 return (
-                                  <li key={ai} className="flex items-center gap-2 px-2 py-1 rounded-md border border-border bg-background hover:bg-muted/20 transition-colors">
-                                    <Ic className={cn("w-3.5 h-3.5 shrink-0", cls)} />
-                                    <span className="text-[12px] font-medium text-foreground truncate flex-1 leading-tight">{a.nome}</span>
-                                    <span className="text-[10px] text-muted-foreground tabular-nums shrink-0">{a.tamanho}</span>
-                                    <div className="flex items-center gap-0.5 shrink-0">
-                                      <button type="button" onClick={() => toast({ title: "A abrir anexo", description: a.nome })} className="w-6 h-6 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors" title="Ver">
-                                        <Eye className="w-3 h-3" />
+                                  <li key={ai} className="flex items-center gap-1.5 px-1.5 py-0.5 rounded border border-border bg-background hover:bg-muted/20 transition-colors">
+                                    <Ic className={cn("w-3 h-3 shrink-0", cls)} />
+                                    <span className="text-[11px] font-medium text-foreground truncate flex-1 leading-tight">{a.nome}</span>
+                                    <span className="text-[9.5px] text-muted-foreground tabular-nums shrink-0">{a.tamanho}</span>
+                                    <div className="flex items-center shrink-0">
+                                      <button type="button" onClick={() => toast({ title: "A abrir anexo", description: a.nome })} className="w-5 h-5 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors" title="Ver">
+                                        <Eye className="w-2.5 h-2.5" />
                                       </button>
-                                      <button type="button" onClick={() => toast({ title: "Anexo descarregado", description: a.nome })} className="w-6 h-6 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors" title="Descarregar">
-                                        <Download className="w-3 h-3" />
+                                      <button type="button" onClick={() => toast({ title: "Anexo descarregado", description: a.nome })} className="w-5 h-5 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors" title="Descarregar">
+                                        <Download className="w-2.5 h-2.5" />
                                       </button>
                                     </div>
                                   </li>
