@@ -274,34 +274,34 @@ export default function FinancasAnuncios() {
 
                   {/* compact CTA */}
                   {a.cta === "inscrever" && (
-                    <div className="mt-3 rounded-md border border-border bg-card overflow-hidden shadow-sm">
-                      <div className="px-3 pt-2.5 pb-1.5 border-b border-border/60 bg-muted/20">
-                        <p className="text-[12px] font-semibold text-foreground truncate">{a.title}</p>
-                      </div>
-                      <div className="inline-flex items-stretch">
+                    <div className="mt-3 rounded-lg border border-primary/25 bg-primary/[0.04] px-3 py-2.5">
+                      <div className="flex items-center justify-between gap-3 flex-wrap">
+                        <div className="min-w-0">
+                          <p className="text-[10px] uppercase tracking-[0.14em] font-semibold text-primary mb-0.5">Inscrições abertas</p>
+                          <p className="text-[13px] font-bold text-foreground leading-tight truncate">{a.title}</p>
+                          {a.ctaDeadline && (
+                            <p className="text-[11px] text-muted-foreground flex items-center gap-1 mt-0.5">
+                              <Clock className="w-3 h-3" />
+                              Data limite:&nbsp;<span className="font-semibold text-foreground tabular-nums">{a.ctaDeadline}{a.ctaDeadlineTime ? ` · ${a.ctaDeadlineTime}` : ""}</span>
+                            </p>
+                          )}
+                        </div>
                         {isSub ? (
-                          <span className="inline-flex items-center gap-1.5 bg-emerald-600 text-white px-3 py-1.5 text-xs font-semibold">
-                            <CheckCircle2 className="w-3.5 h-3.5" />
-                            Inscrito
+                          <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-md h-7 px-2.5 text-[11px] font-semibold shrink-0">
+                            <CheckCircle2 className="w-3.5 h-3.5" /> Inscrito
                           </span>
                         ) : (
                           <button
                             onClick={() => setSubscribed(s => new Set(s).add(a.id))}
-                            className="inline-flex items-center gap-1.5 bg-primary text-primary-foreground px-3.5 py-1.5 text-xs font-semibold hover:bg-primary/90 transition-colors"
+                            className="inline-flex items-center gap-1.5 bg-primary text-primary-foreground rounded-md h-7 px-3 text-[11.5px] font-semibold hover:bg-primary/90 transition-colors shrink-0"
                           >
-                            <CheckCircle2 className="w-3.5 h-3.5" />
-                            Inscrever-me
+                            <CheckCircle2 className="w-3.5 h-3.5" /> Inscrever-me
                           </button>
-                        )}
-                        {a.ctaDeadline && (
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] bg-muted/40">
-                            <span className="uppercase tracking-wide font-medium text-muted-foreground">Data limite:</span>
-                            <span className="font-semibold text-foreground tabular-nums">{a.ctaDeadline}{a.ctaDeadlineTime ? ` - ${a.ctaDeadlineTime}` : ""}</span>
-                          </span>
                         )}
                       </div>
                     </div>
                   )}
+
 
                   {/* footer: category + actions */}
                   <div className="flex items-center justify-between gap-1.5 mt-3 pt-2.5 border-t border-border/60">
