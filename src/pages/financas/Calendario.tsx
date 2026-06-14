@@ -632,7 +632,11 @@ export default function FinancasCalendario() {
       <EventDetailDialog event={detailEvent} onClose={() => setDetailEvent(null)} onDelete={handleDelete} />
 
       {/* ── Request detail ── */}
-      <RequestDetailDialog request={detailRequest} onClose={() => setDetailRequest(null)} onRespond={respondRequest} />
+      <RequestDetailDialog request={detailRequest} onClose={() => setDetailRequest(null)} onRespond={respondRequest}
+        onParticipants={(r) => openParticipants(r.title, r.participants, r.id)} />
+
+      {/* ── Participants viewer ── */}
+      <ParticipantsDialog data={participantsView} onClose={() => setParticipantsView(null)} />
     </div>
   );
 }
