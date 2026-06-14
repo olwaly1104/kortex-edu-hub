@@ -468,7 +468,8 @@ export default function FinancasCalendario() {
                 <div className="p-2 space-y-2 overflow-y-auto" style={{ maxHeight: 3 * 176 }}>
                   {pendingRequests.map(r => (
                     <RequestCard key={r.id} r={r} onAccept={() => respondRequest(r.id, "accepted")}
-                      onDecline={() => respondRequest(r.id, "declined")} onDetail={() => setDetailRequest(r)} />
+                      onDecline={() => respondRequest(r.id, "declined")} onDetail={() => setDetailRequest(r)}
+                      onParticipants={() => openParticipants(r.title, r.participants, r.id)} />
                   ))}
                 </div>
               )}
