@@ -562,6 +562,7 @@ export default function GapConfiguracao() {
 
         {/* ============ AGENDAMENTOS ============ */}
         <TabsContent value="agendamentos" className="space-y-6 mt-0">
+          <div className="flex justify-end"><EditToggle tab="ag" /></div>
           {/* Parâmetros gerais — só início e fim */}
           <Card className="p-5">
             <div className="flex items-center gap-2 mb-4">
