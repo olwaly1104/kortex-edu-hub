@@ -285,6 +285,15 @@ export default function FinancasAnuncioDetail() {
                   value={m.label}
                 />
               </div>
+              {ann.cta === "inscrever" && ann.ctaDeadline && (
+                <div className="py-3">
+                  <MetaCell
+                    icon={<Clock className="w-3 h-3" />}
+                    label="Limite de inscrição"
+                    value={<span className="tabular-nums">{ann.ctaDeadline}{ann.ctaDeadlineTime ? ` - ${ann.ctaDeadlineTime}` : ""}</span>}
+                  />
+                </div>
+              )}
             </div>
           </aside>
 
