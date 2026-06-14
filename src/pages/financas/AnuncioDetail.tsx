@@ -221,8 +221,9 @@ export default function FinancasAnuncioDetail() {
               <div className="rounded-lg border border-primary/25 bg-primary/[0.04] p-4">
                 <div className="flex items-center justify-between gap-4 flex-wrap">
                   <div className="space-y-0.5">
-                    <p className="text-[10px] uppercase tracking-wider font-semibold text-primary">Inscrições abertas</p>
-                    <p className="text-sm font-semibold text-foreground">Confirme a sua participação</p>
+                    <p className="text-[10px] uppercase tracking-wider font-semibold text-primary">Inscrições abertas · {ann.title}</p>
+                    <p className="text-sm font-semibold text-foreground">Confirme a sua participação em {ann.title}</p>
+
                     {ann.ctaDeadline && (
                       <p className="text-[12px] text-muted-foreground flex items-center gap-1.5">
                         <Clock className="w-3 h-3" />
