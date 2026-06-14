@@ -497,6 +497,99 @@ export default function FinancasSolicitacaoDetail() {
           </main>
         </div>
       </Card>
+      {/* Action confirmation dialog */}
+      <Dialog open={!!pendingAction} onOpenChange={(o) => !o && setPendingAction(null)}>
+        <DialogContent className="max-w-md">
+          {pm && (
+            <>
+              <DialogHeader>
+                <div className="flex items-center gap-2.5">
+                  <div className={cn("w-9 h-9 rounded-lg flex items-center justify-center shrink-0",
+                    pendingAction === "em_execucao" && "bg-emerald-50 text-emerald-600",
+                    pendingAction === "rejeitado" && "bg-red-50 text-red-600",
+                    pendingAction === "executada" && "bg-blue-50 text-blue-600",
+                  )}>
+                    <pm.icon className="w-5 h-5" />
+                  </div>
+                  <div className="min-w-0">
+                    <DialogTitle className="text-base">{pm.title}</DialogTitle>
+                    <DialogDescription className="text-[12px] mt-0.5">{tm.label} · {selected.title}</DialogDescription>
+                  </div>
+                </div>
+              </DialogHeader>
+
+              <div className="space-y-4 pt-1">
+                <p className="text-[12px] text-muted-foreground leading-relaxed">{pm.desc}</p>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="action-notes" className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground">
+                    {pm.notesLabel}
+                  </Label>
+                  <Textarea
+                    id="action-notes"
+                    value={actionNotes}
+                    onChange={(e) => setActionNotes(e.target.value)}
+                    placeholder={pm.notesPlaceholder}
+                    rows={4}
+                    className="resize-none text-sm"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground">
+                    Evidências e anexos
+                  </Label>
+                  <label className="flex items-center gap-2 px-3 py-2.5 rounded-md border border-dashed border-border bg-muted/20 hover:bg-muted/40 cursor-pointer transition-colors">
+                    <Paperclip className="w-4 h-4 text-muted-foreground shrink-0" />
+                    <span className="text-[12px] text-muted-foreground flex-1">
+                      Anexar comprovativo, fatura ou documento de suporte
+                    </span>
+                    <span className="text-[11px] font-semibold text-primary">Carregar</span>
+                    <input
+                      type="file"
+                      multiple
+                      className="hidden"
+                      onChange={(e) => setActionFiles(prev => [...prev, ...Array.from(e.target.files ?? [])])}
+                    />
+                  </label>
+                  {actionFiles.length > 0 && (
+                    <div className="space-y-1 pt-1">
+                      {actionFiles.map((f, i) => (
+                        <div key={i} className="flex items-center gap-2 px-2.5 py-1.5 rounded-md border border-border bg-background">
+                          <FileText className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                          <span className="text-[12px] text-foreground flex-1 truncate">{f.name}</span>
+                          <span className="text-[10px] text-muted-foreground tabular-nums">{(f.size / 1024).toFixed(0)} KB</span>
+                          <button
+                            type="button"
+                            onClick={() => setActionFiles(prev => prev.filter((_, idx) => idx !== i))}
+                            className="text-muted-foreground hover:text-destructive transition-colors"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <DialogFooter className="gap-2 sm:gap-2">
+                <DialogClose asChild>
+                  <Button variant="outline" size="sm" className="h-9">Cancelar</Button>
+                </DialogClose>
+                <Button
+                  size="sm"
+                  className={cn("h-9 gap-1.5", pm.tone)}
+                  onClick={confirmAction}
+                  disabled={!actionNotes.trim()}
+                >
+                  <pm.icon className="w-4 h-4" /> {pm.cta}
+                </Button>
+              </DialogFooter>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
