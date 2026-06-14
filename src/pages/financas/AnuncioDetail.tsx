@@ -190,14 +190,25 @@ export default function FinancasAnuncioDetail() {
                             <p className="text-[12.5px] font-semibold text-foreground truncate">{f.name}</p>
                             <p className="text-[10.5px] text-muted-foreground tabular-nums">PDF · {f.size}</p>
                           </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-7 px-2 text-[11px] gap-1"
-                            onClick={() => toast({ title: "Download iniciado", description: f.name })}
-                          >
-                            <Download className="w-3 h-3" /> Baixar
-                          </Button>
+                          <div className="flex items-center gap-1">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-7 px-2 text-[11px] gap-1"
+                              onClick={() => toast({ title: "Pré-visualização", description: f.name })}
+                            >
+                              <Eye className="w-3 h-3" /> Ver
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-7 px-2 text-[11px] gap-1"
+                              onClick={() => toast({ title: "Download iniciado", description: f.name })}
+                            >
+                              <Download className="w-3 h-3" /> Descarregar
+                            </Button>
+                          </div>
+
                         </div>
                       ))}
                     </div>
@@ -210,8 +221,9 @@ export default function FinancasAnuncioDetail() {
               <div className="rounded-lg border border-primary/25 bg-primary/[0.04] p-4">
                 <div className="flex items-center justify-between gap-4 flex-wrap">
                   <div className="space-y-0.5">
-                    <p className="text-[10px] uppercase tracking-wider font-semibold text-primary">Inscrições abertas</p>
-                    <p className="text-sm font-semibold text-foreground">Confirme a sua participação</p>
+                    <p className="text-[10px] uppercase tracking-wider font-semibold text-primary">Inscrições abertas · {ann.title}</p>
+                    <p className="text-sm font-semibold text-foreground">Confirme a sua participação em {ann.title}</p>
+
                     {ann.ctaDeadline && (
                       <p className="text-[12px] text-muted-foreground flex items-center gap-1.5">
                         <Clock className="w-3 h-3" />
@@ -272,19 +284,6 @@ export default function FinancasAnuncioDetail() {
                   value={m.label}
                 />
               </div>
-              {ann.ctaDeadline && (
-                <div className="pt-3">
-                  <MetaCell
-                    icon={<Clock className="w-3 h-3" />}
-                    label="Data limite"
-                    value={
-                      <span className="tabular-nums font-semibold">
-                        {ann.ctaDeadline}{ann.ctaDeadlineTime ? ` · ${ann.ctaDeadlineTime}` : ""}
-                      </span>
-                    }
-                  />
-                </div>
-              )}
             </div>
           </aside>
 
