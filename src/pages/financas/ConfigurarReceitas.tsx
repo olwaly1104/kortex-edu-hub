@@ -146,7 +146,7 @@ export default function ConfigurarReceitas() {
 
   const [openSection, setOpenSection] = useState<SectionDef | null>(null);
   const [editing, setEditing] = useState<ReceitaRow | null>(null);
-  const [form, setForm] = useState<ReceitaRow>({ id: "", nome: "", tipo: "Taxa", escopo: "geral", valor: 0 });
+  const [form, setForm] = useState<ReceitaRow>({ id: "", nome: "", tipo: "Emolumento", escopo: "geral", valor: 0 });
   const [confirmDel, setConfirmDel] = useState<ReceitaRow | null>(null);
   const [inlineEdit, setInlineEdit] = useState<{ id: string; valor: string } | null>(null);
 
