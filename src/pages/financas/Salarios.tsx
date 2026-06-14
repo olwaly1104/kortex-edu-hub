@@ -77,18 +77,15 @@ export default function Salarios() {
         subtitle="Processamento salarial, descontos e contratos."
         icon={<CreditCard className="w-5 h-5 text-primary" />}
         right={
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1 rounded-lg border border-border bg-muted/30 p-0.5">
-              {(["mensal", "semestral", "anual"] as Periodo[]).map(p => (
-                <Button key={p} size="sm" variant={periodo === p ? "default" : "ghost"} onClick={() => setPeriodo(p)} className="text-xs h-8 px-3">{periodoLabels[p]}</Button>
-              ))}
-            </div>
-            <Button variant="outline" size="sm" className="gap-1.5" onClick={() => toast({ title: "Relatório exportado" })}>
-              <Download className="w-4 h-4" /> Exportar
-            </Button>
-          </div>
+          <Button variant="outline" size="sm" className="gap-1.5" onClick={() => toast({ title: "Relatório exportado" })}>
+            <Download className="w-4 h-4" /> Exportar
+          </Button>
         }
       />
+
+      {/* Período toggle + result + selector */}
+      <PeriodSelector periodo={periodo} setPeriodo={setPeriodo} value={periodoValue} setValue={setPeriodoValue} />
+
 
       {/* KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
