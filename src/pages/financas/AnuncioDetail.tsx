@@ -67,7 +67,13 @@ export default function FinancasAnuncioDetail() {
         {/* Header: title + ID/Document pill */}
         <div className="px-6 pt-5 pb-5 border-b border-border">
           <div className="flex items-start justify-between gap-4">
-            <h1 className="text-[24px] font-bold text-foreground leading-tight tracking-tight min-w-0 flex-1">{ann.title}</h1>
+            <div className="min-w-0 flex-1 space-y-2">
+              <Badge variant="outline" className="text-[10.5px] font-semibold px-2 py-0.5 gap-1.5 uppercase tracking-wider">
+                <span className={cn("w-1.5 h-1.5 rounded-full", m.dot)} />
+                {m.label}
+              </Badge>
+              <h1 className="text-[24px] font-bold text-foreground leading-tight tracking-tight">{ann.title}</h1>
+            </div>
 
             <div className="flex flex-col items-end gap-1.5 shrink-0">
               <button
