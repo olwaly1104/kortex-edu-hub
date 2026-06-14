@@ -273,11 +273,21 @@ export default function AppSidebar() {
   const { user, logout } = useAuth();
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
+  const { unreadCount: finAnunciosUnread } = useFinAnunciosUnread();
 
   if (!user) return null;
 
-  const sections = roleSectionsMap[user.role] || studentSections;
+  const baseSections = roleSectionsMap[user.role] || studentSections;
+  const sections = user.role === "financas"
+    ? baseSections.map(sec => ({
+        ...sec,
+        items: sec.items.map(it =>
+          it.path === "/financas/anuncios" ? { ...it, badge: finAnunciosUnread } : it
+        ),
+      }))
+    : baseSections;
   const roleLabel = roleLabelMap[user.role] || "Utilizador";
+
 
   return (
     <aside className={cn("h-screen bg-sidebar text-sidebar-foreground flex flex-col transition-all duration-300 sticky top-0 shrink-0", collapsed ? "w-[68px]" : "w-[260px]")}>
