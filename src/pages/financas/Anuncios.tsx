@@ -244,13 +244,21 @@ export default function FinancasAnuncios() {
               <div className="flex">
                 <div className={cn("w-1 shrink-0", m.dot)} />
                 <div className="flex-1 p-4">
-                  {/* meta row: category + date + mine */}
-                  <div className="flex items-center justify-between gap-3 mb-2">
+                  {/* meta row: category + department + mine + date */}
+                  <div className="flex items-center justify-between gap-3 mb-3">
                     <div className="flex items-center gap-1.5 flex-wrap">
                       <Badge variant="outline" className={cn("text-[10px] font-semibold gap-1 px-1.5", m.chip)}>
                         <span className={cn("w-1.5 h-1.5 rounded-full", m.dot)} />
                         {m.label}
                       </Badge>
+                      <button
+                        type="button"
+                        onClick={() => setScope("todos")}
+                        title={`Ver anúncios de ${a.department}`}
+                        className="inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded-md border border-border bg-muted/40 hover:bg-primary/5 hover:border-primary/30 hover:text-primary transition-colors text-foreground/80"
+                      >
+                        <Building2 className="w-2.5 h-2.5" />{a.department}
+                      </button>
                       {a.isMine && (
                         <Badge variant="outline" className="text-[10px] bg-primary/10 text-primary border-primary/20 px-1.5">
                           Criado por mim
@@ -262,6 +270,9 @@ export default function FinancasAnuncios() {
                     </div>
                   </div>
 
+                  {/* divider between meta and body */}
+                  <div className="border-t border-border/60 mb-3" />
+
                   {/* body */}
                   <Link to={`/financas/anuncios/${a.id}`} className="block group/title">
                     <h3 className="text-[15px] font-semibold text-foreground leading-snug mb-1 group-hover/title:text-primary transition-colors">
@@ -272,44 +283,50 @@ export default function FinancasAnuncios() {
                     </p>
                   </Link>
 
-                  {/* inline CTA in body (above footer) */}
+                  {/* inline CTA — refined */}
                   {a.cta === "inscrever" && (
-                    <div className="mt-3 flex items-center justify-between gap-3 rounded-md border border-dashed border-primary/30 bg-primary/5 px-3 py-2">
-                      <p className="text-[11px] text-foreground">
-                        <span className="font-semibold">Inscrições abertas</span> — confirme a sua participação.
-                      </p>
+                    <div className={cn(
+                      "mt-3 flex items-center gap-3 rounded-lg px-3 py-2.5 border transition-colors",
+                      isSub
+                        ? "bg-emerald-50/60 border-emerald-200"
+                        : "bg-gradient-to-r from-primary/[0.07] to-primary/[0.02] border-primary/20"
+                    )}>
+                      <div className={cn(
+                        "w-8 h-8 rounded-md flex items-center justify-center shrink-0",
+                        isSub ? "bg-emerald-100 text-emerald-700" : "bg-primary/10 text-primary"
+                      )}>
+                        <CheckCircle2 className="w-4 h-4" />
+                      </div>
+                      <div className="flex-1 min-w-0 leading-tight">
+                        <p className="text-[12px] font-semibold text-foreground">
+                          {isSub ? "Inscrição confirmada" : "Inscrições abertas"}
+                        </p>
+                        <p className="text-[10.5px] text-muted-foreground">
+                          {isSub ? "Receberá novidades por e-mail." : "Confirme a sua participação neste anúncio."}
+                        </p>
+                      </div>
                       {isSub ? (
-                        <Badge variant="outline" className="text-[10px] gap-1 bg-emerald-50 text-emerald-700 border-emerald-200 h-6 px-2">
+                        <Badge variant="outline" className="text-[10px] gap-1 bg-white text-emerald-700 border-emerald-200 h-7 px-2.5 shrink-0">
                           <CheckCircle2 className="w-3 h-3" /> Inscrito
                         </Badge>
                       ) : (
-                        <Button size="sm" className="h-7 text-[11px] gap-1 px-2.5" onClick={() => setSubscribed(s => new Set(s).add(a.id))}>
-                          <CheckCircle2 className="w-3 h-3" /> Inscrever
+                        <Button size="sm" className="h-7 text-[11px] gap-1.5 px-3 shrink-0 shadow-sm"
+                          onClick={() => setSubscribed(s => new Set(s).add(a.id))}>
+                          Inscrever-me
                         </Button>
                       )}
                     </div>
                   )}
 
-                  {/* footer: author + clickable department + ver detalhes */}
+                  {/* footer: author only + ver detalhes */}
                   <div className="flex items-center justify-between gap-3 mt-3 pt-2.5 border-t border-border/60">
-                    <div className="flex items-center gap-2 min-w-0 flex-wrap">
-                      <div className="flex items-center gap-1.5 min-w-0">
-                        <div className="w-6 h-6 rounded-full bg-primary/10 text-primary text-[10px] font-semibold flex items-center justify-center shrink-0">
-                          {initials || <UserIcon className="w-3 h-3" />}
-                        </div>
-                        <span className="text-[11px] text-muted-foreground truncate">
-                          Por <span className="font-medium text-foreground">{a.author || a.department}</span>
-                        </span>
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className="w-6 h-6 rounded-full bg-primary/10 text-primary text-[10px] font-semibold flex items-center justify-center shrink-0">
+                        {initials || <UserIcon className="w-3 h-3" />}
                       </div>
-                      <span className="text-border">•</span>
-                      <button
-                        type="button"
-                        onClick={() => setScope("todos")}
-                        title={`Ver anúncios de ${a.department}`}
-                        className="inline-flex items-center gap-1 text-[10.5px] font-medium px-1.5 py-0.5 rounded-md border border-border bg-card hover:bg-primary/5 hover:border-primary/30 hover:text-primary transition-colors text-foreground/80"
-                      >
-                        <Building2 className="w-3 h-3" />{a.department}
-                      </button>
+                      <span className="text-[11px] font-medium text-foreground truncate">
+                        {a.author || a.department}
+                      </span>
                     </div>
                     <div className="flex items-center gap-1.5 shrink-0">
                       {a.isMine && (
@@ -324,6 +341,7 @@ export default function FinancasAnuncios() {
                       </Button>
                     </div>
                   </div>
+
                 </div>
               </div>
             </Card>
