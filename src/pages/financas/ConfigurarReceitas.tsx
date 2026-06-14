@@ -152,10 +152,16 @@ const RECEITA_SECTIONS: SectionDef[] = [
     icon: AlertTriangle, accent: "text-red-700", chip: "bg-red-50 border-red-200 text-red-700" },
 ];
 
-const MULTA_SUBTYPES: { key: TipoReceita; label: string; accent: string }[] = [
-  { key: "Multa Estudante", label: "Estudantes", accent: "text-red-700" },
-  { key: "Multa Administrativo", label: "Administrativos", accent: "text-orange-700" },
-  { key: "Multa Docente", label: "Docentes", accent: "text-amber-700" },
+const MULTA_SUBTYPES: {
+  key: TipoReceita; label: string; icon: LucideIcon;
+  ring: string; iconBg: string; iconColor: string; chip: string; bar: string;
+}[] = [
+  { key: "Multa Estudante",       label: "Estudantes",      icon: GraduationCap,
+    ring: "ring-red-500 border-red-200 bg-red-50/40",       iconBg: "bg-red-100",     iconColor: "text-red-700",     chip: "bg-red-100 text-red-700",     bar: "bg-red-500" },
+  { key: "Multa Administrativo",  label: "Administrativos", icon: Briefcase,
+    ring: "ring-orange-500 border-orange-200 bg-orange-50/40", iconBg: "bg-orange-100", iconColor: "text-orange-700", chip: "bg-orange-100 text-orange-700", bar: "bg-orange-500" },
+  { key: "Multa Docente",         label: "Docentes",        icon: UserCog,
+    ring: "ring-amber-500 border-amber-200 bg-amber-50/40", iconBg: "bg-amber-100",   iconColor: "text-amber-700",   chip: "bg-amber-100 text-amber-700",   bar: "bg-amber-500" },
 ];
 
 const tipoChipReceita: Record<TipoReceita, string> = {
