@@ -941,36 +941,49 @@ export default function ConfigurarReceitas() {
                   {filtered.length === 0 ? (
                     <p className="text-xs text-muted-foreground italic py-3">Sem multas configuradas para esta categoria.</p>
                   ) : (
-                    <div className="divide-y divide-border">
-                      {filtered.map(r => (
-                        <div key={r.id} role="button" tabIndex={0}
-                          onClick={() => openEditReceita(section, r)}
-                          onKeyDown={(e) => { if (e.key === "Enter") openEditReceita(section, r); }}
-                          className="flex items-center gap-3 py-2.5 px-2 -mx-2 rounded-md cursor-pointer hover:bg-muted/50 transition group"
-                          title="Clique para editar">
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-foreground truncate">{r.nome}</p>
-                            <div className="flex items-center gap-1.5 mt-0.5">
-                              <span className={cn("inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] font-medium", tipoChipReceita[r.tipo])}>
-                                {r.tipo}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="text-right whitespace-nowrap">
-                            <p className="text-sm font-semibold text-foreground tabular-nums">{formatCurrency(r.valor)}</p>
-                            <p className="text-[10px] text-muted-foreground tabular-nums">Líquido {formatCurrency(liquidoOf(r.valor, r.imposto))}</p>
-                          </div>
-                          <div className="flex items-center gap-0.5">
-                            <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md" onClick={(e) => { e.stopPropagation(); openEditReceita(section, r); }} title="Editar">
-                              <Pencil className="w-3.5 h-3.5" />
-                            </Button>
-                            <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md text-destructive hover:text-destructive opacity-60 hover:opacity-100"
-                              onClick={(e) => { e.stopPropagation(); setConfirmDelReceita(r); }} title="Remover">
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
+                    <div className="overflow-x-auto rounded-lg border border-border">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="text-[10px] uppercase tracking-wider text-muted-foreground border-b border-border bg-muted/30">
+                            <th className="text-left font-semibold px-4 py-2">Multa</th>
+                            <th className="text-left font-semibold px-3 py-2 hidden sm:table-cell">Tipo</th>
+                            <th className="text-right font-semibold px-3 py-2">Bruto</th>
+                            <th className="text-right font-semibold px-3 py-2">Líquido</th>
+                            <th className="text-right font-semibold px-3 py-2 hidden sm:table-cell">Imposto</th>
+                            <th className="w-20"></th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {filtered.map(r => {
+                            const impPct = ((r.imposto ?? DEFAULT_IMPOSTO) * 100);
+                            return (
+                              <tr key={r.id} role="button" tabIndex={0}
+                                onClick={() => openEditReceita(section, r)}
+                                onKeyDown={(e) => { if (e.key === "Enter") openEditReceita(section, r); }}
+                                className="border-b border-border/50 last:border-0 cursor-pointer hover:bg-muted/30 transition group">
+                                <td className="px-4 py-2.5 text-sm font-medium text-foreground">{r.nome}</td>
+                                <td className="px-3 py-2.5 hidden sm:table-cell">
+                                  <span className={cn("inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] font-medium", tipoChipReceita[r.tipo])}>{r.tipo}</span>
+                                </td>
+                                <td className="px-3 py-2.5 text-right text-sm font-semibold tabular-nums text-foreground">{formatCurrency(r.valor)}</td>
+                                <td className="px-3 py-2.5 text-right text-sm font-semibold tabular-nums text-emerald-700">{formatCurrency(liquidoOf(r.valor, r.imposto))}</td>
+                                <td className="px-3 py-2.5 text-right text-xs tabular-nums text-muted-foreground hidden sm:table-cell">{impPct.toFixed(1)}%</td>
+                                <td className="px-2 py-2.5 text-right">
+                                  <div className="inline-flex items-center gap-0.5 opacity-60 group-hover:opacity-100 transition">
+                                    <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md" onClick={(e) => { e.stopPropagation(); openEditReceita(section, r); }} title="Editar">
+                                      <Pencil className="w-3.5 h-3.5" />
+                                    </Button>
+                                    <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md text-destructive hover:text-destructive"
+                                      onClick={(e) => { e.stopPropagation(); setConfirmDelReceita(r); }} title="Remover">
+                                      <Trash2 className="w-3.5 h-3.5" />
+                                    </Button>
+                                  </div>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
                     </div>
                   )}
                 </Card>
@@ -994,37 +1007,51 @@ export default function ConfigurarReceitas() {
                 {items.length === 0 ? (
                   <p className="text-xs text-muted-foreground italic py-3">Sem itens configurados.</p>
                 ) : (
-                  <div className="divide-y divide-border">
-                    {items.map(r => (
-                      <div key={r.id} role="button" tabIndex={0}
-                        onClick={() => openEditReceita(section, r)}
-                        onKeyDown={(e) => { if (e.key === "Enter") openEditReceita(section, r); }}
-                        className="flex items-center gap-3 py-2.5 px-2 -mx-2 rounded-md cursor-pointer hover:bg-muted/50 transition group"
-                        title="Clique para editar">
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-foreground truncate">{r.nome}</p>
-                          <div className="flex items-center gap-1.5 mt-0.5">
-                            <span className={cn("inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] font-medium", tipoChipReceita[r.tipo])}>
-                              {r.tipo}
-                            </span>
-                            <span className="text-[11px] text-muted-foreground truncate">{courseLabel(r.escopo)}</span>
-                          </div>
-                        </div>
-                        <div className="text-right whitespace-nowrap">
-                          <p className="text-sm font-semibold text-foreground tabular-nums">{formatCurrency(r.valor)}</p>
-                          <p className="text-[10px] text-muted-foreground tabular-nums">Líquido {formatCurrency(liquidoOf(r.valor, r.imposto))}</p>
-                        </div>
-                        <div className="flex items-center gap-0.5">
-                          <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md" onClick={(e) => { e.stopPropagation(); openEditReceita(section, r); }} title="Editar">
-                            <Pencil className="w-3.5 h-3.5" />
-                          </Button>
-                          <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md text-destructive hover:text-destructive opacity-60 hover:opacity-100"
-                            onClick={(e) => { e.stopPropagation(); setConfirmDelReceita(r); }} title="Remover">
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
+                  <div className="overflow-x-auto rounded-lg border border-border">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="text-[10px] uppercase tracking-wider text-muted-foreground border-b border-border bg-muted/30">
+                          <th className="text-left font-semibold px-4 py-2">Nome</th>
+                          <th className="text-left font-semibold px-3 py-2 hidden sm:table-cell">Tipo</th>
+                          <th className="text-left font-semibold px-3 py-2 hidden md:table-cell">Âmbito</th>
+                          <th className="text-right font-semibold px-3 py-2">Bruto</th>
+                          <th className="text-right font-semibold px-3 py-2">Líquido</th>
+                          <th className="text-right font-semibold px-3 py-2 hidden sm:table-cell">Imposto</th>
+                          <th className="w-20"></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {items.map(r => {
+                          const impPct = ((r.imposto ?? DEFAULT_IMPOSTO) * 100);
+                          return (
+                            <tr key={r.id} role="button" tabIndex={0}
+                              onClick={() => openEditReceita(section, r)}
+                              onKeyDown={(e) => { if (e.key === "Enter") openEditReceita(section, r); }}
+                              className="border-b border-border/50 last:border-0 cursor-pointer hover:bg-muted/30 transition group">
+                              <td className="px-4 py-2.5 text-sm font-medium text-foreground">{r.nome}</td>
+                              <td className="px-3 py-2.5 hidden sm:table-cell">
+                                <span className={cn("inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] font-medium", tipoChipReceita[r.tipo])}>{r.tipo}</span>
+                              </td>
+                              <td className="px-3 py-2.5 text-xs text-muted-foreground hidden md:table-cell">{courseLabel(r.escopo)}</td>
+                              <td className="px-3 py-2.5 text-right text-sm font-semibold tabular-nums text-foreground">{formatCurrency(r.valor)}</td>
+                              <td className="px-3 py-2.5 text-right text-sm font-semibold tabular-nums text-emerald-700">{formatCurrency(liquidoOf(r.valor, r.imposto))}</td>
+                              <td className="px-3 py-2.5 text-right text-xs tabular-nums text-muted-foreground hidden sm:table-cell">{impPct.toFixed(1)}%</td>
+                              <td className="px-2 py-2.5 text-right">
+                                <div className="inline-flex items-center gap-0.5 opacity-60 group-hover:opacity-100 transition">
+                                  <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md" onClick={(e) => { e.stopPropagation(); openEditReceita(section, r); }} title="Editar">
+                                    <Pencil className="w-3.5 h-3.5" />
+                                  </Button>
+                                  <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md text-destructive hover:text-destructive"
+                                    onClick={(e) => { e.stopPropagation(); setConfirmDelReceita(r); }} title="Remover">
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </Button>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
                   </div>
                 )}
               </Card>
@@ -1173,101 +1200,6 @@ export default function ConfigurarReceitas() {
             )}
           </Card>
 
-          {/* 4. Destinatários por categoria */}
-          <Card className="p-5">
-            <div className="flex items-center gap-2 mb-4">
-              <Building2 className="w-4 h-4 text-muted-foreground" />
-              <h2 className="text-sm font-semibold text-foreground">Destinatários por Categoria</h2>
-              <span className="text-xs text-muted-foreground hidden md:inline">— Departamento que recebe cada pedido de despesa</span>
-            </div>
-            {categorias.length === 0 ? (
-              <p className="text-xs text-muted-foreground italic">Crie categorias primeiro para mapear destinatários.</p>
-            ) : (
-              <div className="overflow-x-auto rounded-lg border border-border">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b bg-muted/30">
-                      <th className="text-left p-3 font-medium text-muted-foreground text-xs">Categoria</th>
-                      <th className="text-left p-3 font-medium text-muted-foreground text-xs">Destinatário</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {categorias.map(c => (
-                      <tr key={c} className="border-b last:border-0 hover:bg-muted/20">
-                        <td className="p-3">
-                          <span className={cn("inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-medium", chipFor(c))}>{c}</span>
-                        </td>
-                        <td className="p-3">
-                          <Select value={getDestinatarioFor(c) || "__none__"} onValueChange={v => setDestinatarioFor(c, v === "__none__" ? "" : v)}>
-                            <SelectTrigger className="h-8 w-[260px] text-xs"><SelectValue placeholder="Sem destinatário" /></SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="__none__">— Sem destinatário —</SelectItem>
-                              {DEPARTAMENTOS.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}
-                            </SelectContent>
-                          </Select>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </Card>
-
-          {/* 5. Regras de Aprovação */}
-          <Card className="p-5">
-            <div className="flex items-center justify-between mb-4 gap-3 flex-wrap">
-              <div className="flex items-center gap-2">
-                <ClipboardCheck className="w-4 h-4 text-muted-foreground" />
-                <h2 className="text-sm font-semibold text-foreground">Regras de Aprovação</h2>
-                <span className="text-[11px] text-muted-foreground tabular-nums">· {approvalRules.length}</span>
-                <span className="text-xs text-muted-foreground hidden md:inline">— De X Kz a Y Kz → Responsável</span>
-              </div>
-              <Button size="sm" variant="outline" className="h-8 text-xs gap-1.5" onClick={openNewRule}>
-                <Plus className="w-3.5 h-3.5" /> Nova regra
-              </Button>
-            </div>
-            {approvalRules.length === 0 ? (
-              <p className="text-xs text-muted-foreground italic">Defina faixas de valor para encaminhar automaticamente as despesas para o responsável certo.</p>
-            ) : (
-              <div className="overflow-x-auto rounded-lg border border-border">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b bg-muted/30">
-                      <th className="text-left p-3 font-medium text-muted-foreground text-xs">De</th>
-                      <th className="text-left p-3 font-medium text-muted-foreground text-xs">Até</th>
-                      <th className="text-left p-3 font-medium text-muted-foreground text-xs">Responsável</th>
-                      <th className="w-24"></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {approvalRules.map(r => {
-                      const resp = responsaveis.find(x => x.id === r.responsavelId);
-                      return (
-                        <tr key={r.id} className="border-b last:border-0 hover:bg-muted/20">
-                          <td className="p-3 text-xs tabular-nums text-foreground">{formatCurrency(r.min)}</td>
-                          <td className="p-3 text-xs tabular-nums text-foreground">{formatCurrency(r.max)}</td>
-                          <td className="p-3 text-xs text-foreground">
-                            {resp ? <><span className="font-medium">{resp.nome}</span> <span className="text-muted-foreground">· {resp.cargo}</span></> : <span className="text-muted-foreground italic">—</span>}
-                          </td>
-                          <td className="p-3 text-right">
-                            <div className="inline-flex items-center gap-2">
-                              <button onClick={() => openEditRule(r)} className="text-muted-foreground hover:text-foreground" title="Editar">
-                                <Pencil className="w-3.5 h-3.5" />
-                              </button>
-                              <button onClick={() => removeRule(r.id)} className="text-muted-foreground hover:text-destructive" title="Remover">
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </Card>
 
         </div>
       )}
