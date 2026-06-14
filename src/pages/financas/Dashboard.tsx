@@ -36,6 +36,14 @@ const PIE_COLORS = ["hsl(var(--primary))", "hsl(210, 70%, 55%)", "hsl(25, 90%, 5
 const catData = Array.from(catMap.entries()).sort((a, b) => b[1] - a[1]).map(([name, value], i) => ({ name, value, color: PIE_COLORS[i % PIE_COLORS.length] }));
 const despesaAprovadas = catData.reduce((s, c) => s + c.value, 0);
 
+/* receitas por categoria */
+const recMap = new Map<string, number>();
+receitas.forEach(r => recMap.set(r.category, (recMap.get(r.category) || 0) + r.amount));
+const REC_COLORS = ["hsl(var(--accent))", "hsl(150, 60%, 40%)", "hsl(200, 70%, 50%)", "hsl(45, 85%, 50%)", "hsl(280, 50%, 55%)", "hsl(var(--muted-foreground))"];
+const recCatData = Array.from(recMap.entries()).sort((a, b) => b[1] - a[1]).map(([name, value], i) => ({ name, value, color: REC_COLORS[i % REC_COLORS.length] }));
+const receitaTotal = recCatData.reduce((s, c) => s + c.value, 0);
+const receitaEsperadaMes = receitas.reduce((s, r) => s + r.amount, 0);
+
 /* all transactions merged */
 const allTx = [
   ...receitas.map(r => ({ id: r.id, desc: r.description, date: r.date, amount: r.amount, type: "receita" as const, category: r.category, status: r.status, entity: r.payer || "—" })),
@@ -170,6 +178,41 @@ export default function FinancasDashboard() {
             <div className="flex-1 space-y-1.5">
               {catData.slice(0, 5).map(c => {
                 const pct = despesaAprovadas > 0 ? Math.round((c.value / despesaAprovadas) * 100) : 0;
+                return (
+                  <div key={c.name} className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full shrink-0" style={{ background: c.color }} />
+                    <span className="text-[11px] text-muted-foreground flex-1 truncate">{c.name}</span>
+                    <span className="text-[11px] font-medium text-foreground">{pct}%</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Divider */}
+          <div className="my-4 border-t border-border" />
+
+          {/* Receita Esperada */}
+          <div className="flex items-center justify-between mb-3 px-1">
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Receita Esperada Este Mês</p>
+              <p className="text-sm font-bold text-foreground mt-0.5">{formatCurrency(receitaEsperadaMes)}</p>
+            </div>
+            <Badge className="bg-accent/15 text-accent border-accent/30 text-[10px]">Previsto</Badge>
+          </div>
+
+          <h3 className="text-sm font-semibold text-foreground mb-3">Receitas por Categoria</h3>
+          <div className="flex items-center gap-4">
+            <ResponsiveContainer width={100} height={100}>
+              <PieChart>
+                <Pie data={recCatData} dataKey="value" cx="50%" cy="50%" outerRadius={45} innerRadius={28} paddingAngle={2} strokeWidth={0}>
+                  {recCatData.map((c, i) => <Cell key={i} fill={c.color} />)}
+                </Pie>
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="flex-1 space-y-1.5">
+              {recCatData.slice(0, 5).map(c => {
+                const pct = receitaTotal > 0 ? Math.round((c.value / receitaTotal) * 100) : 0;
                 return (
                   <div key={c.name} className="flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full shrink-0" style={{ background: c.color }} />
