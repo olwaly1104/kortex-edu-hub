@@ -283,7 +283,7 @@ export default function ConfigurarReceitas() {
   /* ── DESPESAS ── */
   const [despesas, setDespesas] = useState<DespesaRow[]>([]);
   const [categorias, setCategorias] = useState<string[]>([]);
-  const [estados, setEstados] = useState<string[]>(["Activo", "Em revisão", "Suspensa"]);
+  const [estados, setEstados] = useState<string[]>(["Pendente", "Aprovada", "Executada", "Rejeitada"]);
   const [despesaCatFilter, setDespesaCatFilter] = useState<string>("todos");
   const [despesaEstadoFilter, setDespesaEstadoFilter] = useState<string>("todos");
   const [despesaSearch, setDespesaSearch] = useState("");
