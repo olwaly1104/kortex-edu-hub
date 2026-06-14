@@ -18,14 +18,12 @@ import {
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
-/* ── derived data ────────────────────────────────── */
-const cur = monthlyData[monthlyData.length - 1];
-const prev = monthlyData[monthlyData.length - 2];
-const receitaVar = Math.round(((cur.receitas - prev.receitas) / prev.receitas) * 100);
-const despesaVar = Math.round(((cur.despesas - prev.despesas) / prev.despesas) * 100);
-const saldo = cur.receitas - cur.despesas;
-const saldoVar = prev.receitas - prev.despesas;
-const saldoChange = saldoVar !== 0 ? Math.round(((saldo - saldoVar) / Math.abs(saldoVar)) * 100) : 0;
+/* ── month mapping ───────────────────────────────── */
+const MONTH_FULL: Record<string, string> = {
+  Jan: "Janeiro", Fev: "Fevereiro", Mar: "Março", Abr: "Abril",
+  Mai: "Maio", Jun: "Junho", Jul: "Julho", Ago: "Agosto",
+  Set: "Setembro", Out: "Outubro", Nov: "Novembro", Dez: "Dezembro",
+};
 
 const totalBruto = salarios.reduce((s, v) => s + v.grossSalary, 0);
 const salariosPagos = salarios.filter(s => s.status === "pago").length;
