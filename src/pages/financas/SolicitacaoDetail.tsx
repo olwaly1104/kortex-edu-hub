@@ -226,31 +226,6 @@ export default function FinancasSolicitacaoDetail() {
           </div>
         </div>
 
-        {/* Aprovar / Rejeitar */}
-        {isRecebida && selected.status === "pendente" && (
-          <div className="px-6 pb-5 pt-0">
-            <div className="rounded-lg border border-border bg-background p-3 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center shrink-0">
-                  <Hourglass className="w-3.5 h-3.5 text-amber-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-foreground">Aguarda decisão</p>
-                  <p className="text-[11px] text-muted-foreground mt-0.5">Aprovar ou rejeitar esta solicitação</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <Button variant="outline" className="h-9 px-4 text-xs gap-1.5 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-300 transition-colors" onClick={() => handleAction("rejeitado")}>
-                  <XCircle className="w-4 h-4" /> Rejeitar
-                </Button>
-                <Button className="h-9 px-4 text-xs gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white transition-colors" onClick={() => handleAction("aprovado")}>
-                  <CheckCircle2 className="w-4 h-4" /> Aprovar
-                </Button>
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* 2-column body */}
         <div className="grid md:grid-cols-[280px_1fr] divide-x divide-border border-t border-border">
           {/* LEFT */}
