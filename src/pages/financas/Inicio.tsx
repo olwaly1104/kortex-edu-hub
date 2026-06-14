@@ -68,30 +68,10 @@ export default function FinancasInicio() {
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
-      {/* Welcome / Header — slim */}
       <div className="rounded-xl border border-border bg-gradient-to-r from-primary/5 to-transparent px-5 py-4">
-        <div className="flex items-center justify-between gap-4 flex-wrap">
-          {/* Left: identity */}
-          <div className="min-w-0 flex items-center gap-4">
-            <div className="w-11 h-11 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-base shrink-0">
-              {(user?.name ?? "DF").split(" ").map(n => n[0]).slice(0, 2).join("")}
-            </div>
-            <div className="min-w-0">
-              <h1 className="text-lg font-bold text-foreground leading-tight">
-                Bom dia, {user?.name?.split(" ").pop()} 👋
-              </h1>
-              <p className="text-xs text-muted-foreground leading-tight mt-0.5">
-                <span className="font-medium text-foreground">{user?.position ?? "Diretor Financeiro"}</span>
-                <span className="mx-1.5 text-border">·</span>
-                {user?.department ?? "Departamento Financeiro"}
-                <span className="mx-1.5 text-border">·</span>
-                Universidade Privada De Angola
-              </p>
-            </div>
-          </div>
-
-          {/* Right: date/time + ano letivo + presença */}
-          <div className="flex items-center gap-2 shrink-0 flex-wrap">
+        <div className="flex items-start justify-between gap-4 flex-wrap">
+          {/* Left: date/time pill, then greeting */}
+          <div className="min-w-0 space-y-2">
             <div className="inline-flex items-stretch rounded-md border border-border bg-card overflow-hidden text-[11px] uppercase tracking-wider font-medium shadow-sm">
               <span className="flex items-center gap-1.5 px-2.5 py-1 text-foreground capitalize">
                 <CalendarDays className="w-3.5 h-3.5 text-muted-foreground" />{todayLabel}
@@ -101,17 +81,46 @@ export default function FinancasInicio() {
                 <Clock className="w-3.5 h-3.5" />{liveTime}
               </span>
             </div>
-            <span className="inline-flex items-center gap-1.5 rounded-md border border-primary/20 bg-primary/10 px-2.5 py-1 text-[11px] uppercase tracking-wider font-semibold text-primary">
+            <div className="flex items-center gap-3">
+              <div className="w-11 h-11 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-base shrink-0">
+                {(user?.name ?? "DF").split(" ").map(n => n[0]).slice(0, 2).join("")}
+              </div>
+              <div className="min-w-0">
+                <h1 className="text-lg font-bold text-foreground leading-tight">
+                  Bom dia, {user?.name?.split(" ").pop()} 👋
+                </h1>
+                <p className="text-xs text-muted-foreground leading-tight mt-0.5">
+                  <span className="font-medium text-foreground">{user?.position ?? "Diretor Financeiro"}</span>
+                  <span className="mx-1.5 text-border">·</span>
+                  {user?.department ?? "Departamento Financeiro"}
+                  <span className="mx-1.5 text-border">·</span>
+                  Universidade Privada De Angola
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Right: ano letivo pill + minha presença small box */}
+          <div className="flex flex-col items-end gap-2 shrink-0">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-[11px] uppercase tracking-wider font-semibold text-primary">
               <GraduationCap className="w-3.5 h-3.5" />
-              {ANO_LETIVO}
+              Ano Letivo <span className="font-bold tabular-nums">{ANO_LETIVO}</span>
             </span>
-            <span className="inline-flex items-center gap-1.5 rounded-md border border-accent/20 bg-accent/10 px-2.5 py-1 text-[11px] uppercase tracking-wider font-semibold text-accent">
-              <UserCheck className="w-3.5 h-3.5" />
-              Presença <span className="font-bold tabular-nums">{presencaPct}</span>
-            </span>
+            <div className="rounded-md border border-border bg-card px-3 py-2 flex items-center gap-2 shadow-sm">
+              <div className="w-7 h-7 rounded-md bg-accent/10 flex items-center justify-center shrink-0">
+                <UserCheck className="w-3.5 h-3.5 text-accent" />
+              </div>
+              <div className="leading-tight">
+                <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
+                  Minha Presença
+                </p>
+                <p className="text-sm font-bold text-accent tabular-nums">{presencaPct}</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
+
 
 
 
