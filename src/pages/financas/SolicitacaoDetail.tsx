@@ -51,8 +51,8 @@ export default function FinancasSolicitacaoDetail() {
   const st = finStatusMeta[selected.status];
   const tm = finTypeMeta[selected.type];
   const isRecebida = selected.direction === "recebida";
-  const counterpart = isRecebida ? selected.requester : (selected.destinatario ?? "—");
-  const counterpartRole = isRecebida ? selected.requesterRole : "Destinatário";
+  const counterpart = selected.requester;
+  const counterpartRole = selected.requesterRole;
 
   const dSub = new Date(selected.date);
   const fmt = (d: Date) => d.toLocaleDateString("pt-PT", { day: "2-digit", month: "2-digit", year: "numeric" });
@@ -415,7 +415,7 @@ export default function FinancasSolicitacaoDetail() {
           <aside className="p-5 space-y-5 bg-muted/15">
             <div>
               <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold mb-2">
-                {isRecebida ? "Requerente" : "Destinatário"}
+                Requerente
               </p>
               <div className="flex items-start gap-3">
                 <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 font-semibold text-xs ring-1 ring-primary/15">

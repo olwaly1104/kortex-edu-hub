@@ -30,7 +30,7 @@ type EstadoFilter = "todos" | "pendentes" | "atrasadas" | "em_execucao" | "execu
 export default function FinancasSolicitacoes() {
   const { toast } = useToast();
   const navigate = useNavigate();
-  const [tab, setTab] = useState<"todos" | "recebidas" | "enviadas">("todos");
+  const [tab, setTab] = useState<"recebidas" | "enviadas">("recebidas");
   const [estado, setEstado] = useState<EstadoFilter>("todos");
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState<FinType | "todos">("todos");
@@ -41,9 +41,7 @@ export default function FinancasSolicitacoes() {
   const [newDesc, setNewDesc] = useState("");
   const [newDest, setNewDest] = useState("");
 
-  const directionFiltered = tab === "todos"
-    ? finSolicitacoes
-    : finSolicitacoes.filter(s => s.direction === (tab === "recebidas" ? "recebida" : "enviada"));
+  const directionFiltered = finSolicitacoes.filter(s => s.direction === (tab === "recebidas" ? "recebida" : "enviada"));
 
   const counts = useMemo(() => ({
     todos: directionFiltered.length,
@@ -192,9 +190,8 @@ export default function FinancasSolicitacoes() {
           {/* Direção segmented */}
           <div className="flex bg-muted/60 rounded-lg p-0.5">
             {([
-              { key: "todos"     as const, label: "Todos",     icon: CheckSquare, count: finSolicitacoes.length },
-              { key: "recebidas" as const, label: "Recebidas", icon: Inbox,       count: finSolicitacoes.filter(s => s.direction === "recebida").length },
-              { key: "enviadas"  as const, label: "Enviadas",  icon: Send,        count: finSolicitacoes.filter(s => s.direction === "enviada").length },
+              { key: "recebidas" as const, label: "Recebidas", icon: Inbox, count: finSolicitacoes.filter(s => s.direction === "recebida").length },
+              { key: "enviadas"  as const, label: "Enviadas",  icon: Send,  count: finSolicitacoes.filter(s => s.direction === "enviada").length },
             ]).map(t => (
               <button key={t.key}
                 onClick={() => { setTab(t.key); setEstado("todos"); }}
@@ -281,7 +278,7 @@ export default function FinancasSolicitacoes() {
           <div>Referência</div>
           <div>Assunto</div>
           <div>Categoria</div>
-          <div>{tab === "enviadas" ? "Destinatário" : "Requerente"}</div>
+          <div>Requerente</div>
           <div>Submetido</div>
           <div>Estado</div>
           <div></div>
@@ -300,7 +297,7 @@ export default function FinancasSolicitacoes() {
             {filtered.map(s => {
               const tm = finTypeMeta[s.type];
               const st = finStatusMeta[s.status];
-              const counterpart = s.direction === "recebida" ? s.requester : (s.destinatario ?? "—");
+              const counterpart = s.requester;
               return (
                 <button
                   key={s.id}
@@ -325,7 +322,7 @@ export default function FinancasSolicitacoes() {
                     </div>
                     <div className="min-w-0">
                       <p className="text-[12px] font-medium text-foreground truncate">{counterpart}</p>
-                      {s.direction === "recebida" && s.requesterRole && (
+                      {s.requesterRole && (
                         <p className="text-[10px] text-muted-foreground truncate mt-0.5">{s.requesterRole}</p>
                       )}
                     </div>
