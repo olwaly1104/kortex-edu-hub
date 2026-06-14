@@ -7,6 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import { Card } from "@/components/ui/card";
 import { formatCurrency, orcamentos } from "@/data/financeModuleData";
 import { cn } from "@/lib/utils";
+import { FinHeader } from "./_FinHeader";
 
 const statusConfig: Record<string, { label: string; className: string; dot: string }> = {
   activo: { label: "Activo", className: "bg-accent/10 text-accent border-accent/20", dot: "bg-accent" },
@@ -87,16 +88,14 @@ export default function Orcamentos() {
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
-      {/* Header */}
-      <div className="flex items-center justify-between gap-3 flex-wrap">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground tracking-tight flex items-center gap-2">
-            <Wallet className="w-6 h-6 text-primary" /> Orçamentos
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">Acompanhamento de orçamentos por departamento.</p>
-        </div>
-        <Button size="sm" className="gap-1.5 h-9"><Plus className="w-4 h-4" /> Novo Orçamento</Button>
-      </div>
+      <FinHeader
+        title="Orçamentos"
+        subtitle="Acompanhamento de orçamentos por departamento."
+        icon={<Wallet className="w-5 h-5 text-primary" />}
+        right={
+          <Button size="sm" className="gap-1.5 h-9"><Plus className="w-4 h-4" /> Novo Orçamento</Button>
+        }
+      />
 
       {/* Ano Letivo banner */}
       <div className="flex items-center justify-between gap-3 rounded-lg border border-border/70 bg-muted/30 px-4 py-2.5">

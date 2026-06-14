@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { formatCurrency, despesas } from "@/data/financeModuleData";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { FinHeader } from "./_FinHeader";
 
 type SortField = "amount";
 type SortDir = "asc" | "desc";
@@ -62,10 +63,14 @@ export default function Despesas() {
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-foreground flex items-center gap-2"><TrendingDown className="w-6 h-6 text-primary" /> Despesas</h1>
-        <Button size="sm" onClick={() => setSheetOpen(true)} className="gap-1.5"><Plus className="w-4 h-4" /> Nova Despesa</Button>
-      </div>
+      <FinHeader
+        title="Despesas"
+        subtitle="Aprovação e acompanhamento de despesas institucionais."
+        icon={<TrendingDown className="w-5 h-5 text-primary" />}
+        right={
+          <Button size="sm" onClick={() => setSheetOpen(true)} className="gap-1.5"><Plus className="w-4 h-4" /> Nova Despesa</Button>
+        }
+      />
 
       {/* KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
