@@ -114,10 +114,10 @@ export default function FinancasSolicitacaoDetail() {
       // mid-step: execução in progress
       if (!isExecutada) {
         steps.push({
-          label: "Em execução",
+          label: "Solicitação executada",
           actor: "Direcção Financeira",
-          previsao: `Conclusão prevista · ${fmt(execEndForecast)}`,
-          tone: "scheduled",
+          previsao: `Previsão · ${fmt(execEndForecast)}`,
+          tone: "pending",
         });
       }
       if (isExecutada) {
