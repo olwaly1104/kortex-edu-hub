@@ -52,8 +52,15 @@ export default function FinancasSolicitacoes() {
     fornecedor:  { destinatario: "Conselho de Gestão",  responsavel: "Conselho de Gestão · Órgão Colegial",          description: "Aprovação de pagamento a fornecedores externos.",     needsValor: true },
     antecipacao: { destinatario: "Magnífico Reitor",    responsavel: "Prof. Dr. António Mendes · Reitor",            description: "Adiantamento de verba para missão ou despesa futura.", needsValor: true },
     verba:       { destinatario: "Conselho de Gestão",  responsavel: "Conselho de Gestão · Órgão Colegial",          description: "Solicitação de verba extraordinária não orçamentada.", needsValor: true },
-    outro:       { destinatario: "Secretaria Geral",    responsavel: "Sec. Geral · Apoio Institucional",             description: "Outras solicitações financeiras institucionais.",     needsValor: false },
+    ferias:      { destinatario: "Recursos Humanos",    responsavel: "Sra. Isabel Tavares · Direcção de RH",         description: "Marcação ou alteração de período de férias.",          needsValor: false },
+    licenca:     { destinatario: "Recursos Humanos",    responsavel: "Sra. Isabel Tavares · Direcção de RH",         description: "Licença médica, parental ou justificação de ausência.", needsValor: false },
+    declaracao:  { destinatario: "Secretaria Geral",    responsavel: "Sec. Geral · Apoio Institucional",             description: "Emissão de declarações, certidões ou comprovativos.",  needsValor: false },
+    material:    { destinatario: "Logística & Compras", responsavel: "Sr. Paulo Neves · Logística",                  description: "Requisição de material de escritório ou equipamento.", needsValor: true },
+    formacao:    { destinatario: "Recursos Humanos",    responsavel: "Sra. Isabel Tavares · Direcção de RH",         description: "Pedido de inscrição em formações ou conferências.",    needsValor: true },
+    ti:          { destinatario: "Departamento TI",     responsavel: "Eng. Rui Cabral · Direcção de TI",             description: "Acessos, equipamentos ou suporte informático.",        needsValor: false },
+    outro:       { destinatario: "Secretaria Geral",    responsavel: "Sec. Geral · Apoio Institucional",             description: "Outras solicitações institucionais não classificadas.", needsValor: false },
   };
+
 
   const previewRef = useMemo(() => {
     const n = 412 + finSolicitacoes.filter(s => s.direction === "enviada").length + 1;
