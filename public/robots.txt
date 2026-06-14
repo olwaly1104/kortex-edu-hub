@@ -1,14 +1,17 @@
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
-
 User-agent: *
-Allow: /
+Allow: /$
+Allow: /site
+Allow: /candidatar
+Disallow: /student/
+Disallow: /professor/
+Disallow: /coordenador/
+Disallow: /decano/
+Disallow: /reitor/
+Disallow: /financas/
+Disallow: /academica2/
+Disallow: /gap/
+Disallow: /secretaria/
+Disallow: /inscricoes/
+Disallow: /admin/
+
+Sitemap: https://upra-kortex-teste.lovable.app/sitemap.xml
