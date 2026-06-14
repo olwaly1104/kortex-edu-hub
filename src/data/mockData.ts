@@ -9,6 +9,8 @@ export interface User {
   course?: string;
   year?: number;
   presence?: string;
+  position?: string;
+  department?: string;
 }
 
 export interface Discipline {
