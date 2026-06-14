@@ -16,9 +16,12 @@ import {
 } from "@/components/ui/dialog";
 import {
   Megaphone, Search, Plus, CheckCircle2, Calendar as CalendarIcon,
-  User as UserIcon, Building2, Sparkles, Trash2, GraduationCap, Inbox, UserCircle2,
+  User as UserIcon, Building2, Trash2, GraduationCap, CalendarDays,
+  Clock, ArrowRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useEffect } from "react";
+
 
 type AnnType = "urgente" | "evento" | "academico" | "geral";
 
