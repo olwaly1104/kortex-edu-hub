@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import {
   ArrowLeft, Clock, FileText, MessageSquare, Mail, Phone, Check, X, Hourglass, Send,
   Eye, Download, Users, Share2, Paperclip, FileImage, FileSpreadsheet, CheckCircle2, XCircle,
-  ChevronLeft, ChevronRight, Lock, Pencil,
+  ChevronLeft, ChevronRight, Lock, Pencil, Plus,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Textarea } from "@/components/ui/textarea";
@@ -542,245 +542,125 @@ export default function FinancasSolicitacaoDetail() {
                 <DialogDescription className="sr-only">{pm.desc}</DialogDescription>
               </div>
 
-              {/* Stepper */}
+              {/* Estado transition banner */}
               {(() => {
-                const steps = [
-                  { label: "Parecer", icon: MessageSquare },
-                  { label: "Anexos", icon: Paperclip },
-                  { label: "Revisão", icon: CheckCircle2 },
-                ] as const;
+                const fromMeta = finStatusMeta[selected.status];
+                const toMeta = finStatusMeta[pendingAction!];
                 return (
                   <div className="px-5 py-3 border-b border-border bg-muted/15">
-                    <ol className="flex items-center gap-1.5">
-                      {steps.map((s, i) => {
-                        const isCurrent = i === actionStep;
-                        const isDone = i < maxStep || (i === maxStep && i < actionStep);
-                        const isReachable = i <= maxStep;
-                        const Ic = isDone && !isCurrent ? Check : s.icon;
-                        return (
-                          <li key={s.label} className="flex items-center gap-1.5 flex-1">
-                            <button
-                              type="button"
-                              onClick={() => goToStep(i as 0 | 1 | 2)}
-                              disabled={!isReachable}
-                              className={cn(
-                                "flex items-center gap-1.5 px-2 py-1 rounded-md transition-colors flex-1 min-w-0",
-                                isCurrent && "bg-background border border-border shadow-sm",
-                                !isCurrent && isReachable && "hover:bg-background/60 cursor-pointer",
-                                !isReachable && "opacity-50 cursor-not-allowed",
-                              )}
-                            >
-                              <span className={cn(
-                                "w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0",
-                                isCurrent ? cn(pm.iconBg) : isDone ? "bg-emerald-500 text-white" : "bg-muted text-muted-foreground border border-border",
-                              )}>
-                                {isDone && !isCurrent ? <Check className="w-3 h-3" /> : (i + 1)}
-                              </span>
-                              <span className={cn(
-                                "text-[11px] font-semibold truncate",
-                                isCurrent ? "text-foreground" : "text-muted-foreground",
-                              )}>{s.label}</span>
-                            </button>
-                            {i < steps.length - 1 && <ChevronRight className="w-3 h-3 text-muted-foreground/40 shrink-0" />}
-                          </li>
-                        );
-                      })}
-                    </ol>
+                    <p className="text-[10px] uppercase tracking-[0.1em] font-semibold text-muted-foreground mb-1.5">
+                      Transição de estado
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className={cn("text-[10.5px] font-semibold px-2 py-0.5 uppercase tracking-wider gap-1", fromMeta.cls)}>
+                        <span className={cn("w-1.5 h-1.5 rounded-full", fromMeta.dot)} />
+                        {fromMeta.label}
+                      </Badge>
+                      <ChevronRight className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                      <Badge variant="outline" className={cn("text-[10.5px] font-semibold px-2 py-0.5 uppercase tracking-wider gap-1", toMeta.cls)}>
+                        <span className={cn("w-1.5 h-1.5 rounded-full", toMeta.dot)} />
+                        {toMeta.label}
+                      </Badge>
+                    </div>
+                    <p className="text-[11.5px] text-foreground/75 leading-relaxed mt-2">
+                      Está a declarar que esta solicitação passa para <span className="font-semibold text-foreground">{toMeta.label}</span>. A acção será registada no histórico.
+                    </p>
                   </div>
                 );
               })()}
 
-              {/* Body — step content */}
-              <div className="px-5 py-4 min-h-[260px]">
-                {/* Locked banner when viewing a past step */}
-                {actionStep < maxStep && (
-                  <div className="mb-3 flex items-center gap-2 px-2.5 py-1.5 rounded-md border border-amber-200 bg-amber-50/60 text-[11px] text-amber-800">
-                    <Lock className="w-3 h-3 shrink-0" />
-                    <span>Etapa anterior — apenas visualização. Volte à etapa actual para editar.</span>
+              {/* Body — Parecer + Anexos */}
+              <div className="px-5 py-4 space-y-4">
+                {/* Parecer / Notas */}
+                <section className="space-y-1.5">
+                  <div className="flex items-baseline justify-between">
+                    <Label htmlFor="action-notes" className="text-[11px] uppercase tracking-[0.08em] font-semibold text-foreground">
+                      Parecer / Notas
+                    </Label>
+                    <span className="text-[10px] text-muted-foreground">Obrigatório</span>
                   </div>
-                )}
+                  <Textarea
+                    id="action-notes"
+                    value={actionNotes}
+                    onChange={(e) => setActionNotes(e.target.value)}
+                    placeholder={pm.notesPlaceholder}
+                    rows={4}
+                    className="resize-none text-sm leading-relaxed"
+                  />
+                </section>
 
-                {/* Step 0 — Parecer */}
-                {actionStep === 0 && (
-                  <section className="space-y-2">
-                    <div className="flex items-baseline justify-between">
-                      <Label htmlFor="action-notes" className="text-[11px] uppercase tracking-[0.08em] font-semibold text-foreground">
-                        {pm.notesLabel}
-                      </Label>
-                      <span className="text-[10px] text-muted-foreground">Obrigatório</span>
-                    </div>
-                    <p className="text-[11.5px] text-muted-foreground leading-relaxed">
-                      Deixe o seu parecer. Será registado no histórico da solicitação.
-                    </p>
-                    {actionStep < maxStep ? (
-                      <div className="rounded-md border border-border bg-muted/20 p-3 text-sm text-foreground/85 leading-relaxed whitespace-pre-wrap min-h-[96px]">
-                        {actionNotes || <span className="text-muted-foreground italic">Sem parecer.</span>}
-                      </div>
-                    ) : (
-                      <Textarea
-                        id="action-notes"
-                        value={actionNotes}
-                        onChange={(e) => setActionNotes(e.target.value)}
-                        placeholder={pm.notesPlaceholder}
-                        rows={5}
-                        className="resize-none text-sm leading-relaxed"
-                      />
-                    )}
-                  </section>
-                )}
+                {/* Anexos */}
+                <section className="space-y-1.5">
+                  <div className="flex items-baseline justify-between">
+                    <Label className="text-[11px] uppercase tracking-[0.08em] font-semibold text-foreground">
+                      Anexos e evidências
+                    </Label>
+                    <span className="text-[10px] text-muted-foreground">
+                      {actionFiles.length > 0 ? `${actionFiles.length} ${actionFiles.length === 1 ? "ficheiro" : "ficheiros"}` : "Opcional"}
+                    </span>
+                  </div>
 
-                {/* Step 1 — Anexos */}
-                {actionStep === 1 && (
-                  <section className="space-y-1.5">
-                    <div className="flex items-baseline justify-between">
-                      <Label className="text-[11px] uppercase tracking-[0.08em] font-semibold text-foreground">
-                        Anexos e evidências
-                      </Label>
-                      <span className="text-[10px] text-muted-foreground">
-                        {actionFiles.length > 0 ? `${actionFiles.length} ${actionFiles.length === 1 ? "ficheiro" : "ficheiros"}` : "Opcional"}
-                      </span>
-                    </div>
-                    <p className="text-[11.5px] text-muted-foreground leading-relaxed">
-                      Anexe documentos de suporte para registo da decisão.
-                    </p>
+                  <label className="group flex items-center gap-2.5 rounded-md border border-dashed border-border bg-muted/10 hover:border-primary/40 hover:bg-primary/[0.03] transition-colors cursor-pointer px-3 py-2">
+                    <span className="w-5 h-5 rounded-full border border-border bg-background flex items-center justify-center group-hover:border-primary/50 group-hover:text-primary transition-colors shrink-0">
+                      <Plus className="w-3 h-3 text-muted-foreground group-hover:text-primary transition-colors" />
+                    </span>
+                    <span className="text-[12px] text-foreground/80 flex-1 truncate">
+                      Carregar anexo <span className="text-muted-foreground">(PDF, DOCX, XLSX, PNG, JPG)</span>
+                    </span>
+                    <input
+                      type="file"
+                      multiple
+                      className="hidden"
+                      onChange={(e) => setActionFiles(prev => [...prev, ...Array.from(e.target.files ?? [])])}
+                    />
+                  </label>
 
-                    {actionStep >= maxStep && (
-                      <label className="group flex items-center gap-2.5 rounded-md border border-dashed border-border bg-muted/10 hover:border-primary/40 hover:bg-primary/[0.03] transition-colors cursor-pointer px-3 py-2 mt-1">
-                        <Paperclip className="w-3.5 h-3.5 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
-                        <span className="text-[12px] text-foreground/80 flex-1 truncate">
-                          Carregar ficheiros <span className="text-muted-foreground">(PDF, DOCX, XLSX, PNG, JPG)</span>
-                        </span>
-                        <span className="text-[10.5px] font-medium text-primary shrink-0">Procurar</span>
-                        <input
-                          type="file"
-                          multiple
-                          className="hidden"
-                          onChange={(e) => setActionFiles(prev => [...prev, ...Array.from(e.target.files ?? [])])}
-                        />
-                      </label>
-                    )}
-
-                    {actionFiles.length > 0 ? (
-                      <ul className="space-y-1 pt-1">
-                        {actionFiles.map((f, i) => {
-                          const ext = f.name.split(".").pop()?.toUpperCase() ?? "FILE";
-                          const isImg = /^(PNG|JPG|JPEG|WEBP|GIF)$/.test(ext);
-                          const isSheet = /^(XLS|XLSX|CSV)$/.test(ext);
-                          const Ic = isImg ? FileImage : isSheet ? FileSpreadsheet : FileText;
-                          const cls = isImg ? "text-violet-600"
-                            : isSheet ? "text-emerald-600"
-                            : "text-red-600";
-                          const locked = actionStep < maxStep;
-                          return (
-                            <li key={i} className="flex items-center gap-2 pl-2 pr-1.5 py-1.5 rounded-md border border-border bg-background hover:bg-muted/20 transition-colors">
-                              <Ic className={cn("w-3.5 h-3.5 shrink-0", cls)} />
-                              <span className="text-[12px] font-medium text-foreground truncate flex-1 leading-tight">{f.name}</span>
-                              <span className="text-[10px] text-muted-foreground tabular-nums shrink-0">
-                                {f.size < 1024 * 1024 ? `${(f.size / 1024).toFixed(0)} KB` : `${(f.size / 1024 / 1024).toFixed(1)} MB`}
-                              </span>
-                              {!locked && (
-                                <button
-                                  type="button"
-                                  onClick={() => setActionFiles(prev => prev.filter((_, idx) => idx !== i))}
-                                  className="w-5 h-5 rounded inline-flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors shrink-0"
-                                  title="Remover"
-                                >
-                                  <X className="w-3 h-3" />
-                                </button>
-                              )}
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    ) : actionStep < maxStep ? (
-                      <p className="text-[11.5px] text-muted-foreground italic pt-2">Sem anexos.</p>
-                    ) : null}
-                  </section>
-                )}
-
-                {/* Step 2 — Revisão */}
-                {actionStep === 2 && (
-                  <section className="space-y-3">
-                    <div>
-                      <Label className="text-[11px] uppercase tracking-[0.08em] font-semibold text-foreground">Revisão final</Label>
-                      <p className="text-[11.5px] text-muted-foreground leading-relaxed mt-1">
-                        Confirme as informações antes de submeter. Esta acção é registada no histórico.
-                      </p>
-                    </div>
-
-                    <div className="rounded-md border border-border bg-muted/15 divide-y divide-border">
-                      <div className="px-3 py-2.5">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">{pm.notesLabel}</span>
-                          <button type="button" onClick={() => goToStep(0)} className="inline-flex items-center gap-1 text-[10px] font-medium text-primary hover:underline">
-                            <Pencil className="w-2.5 h-2.5" /> Editar
-                          </button>
-                        </div>
-                        <p className="text-[12.5px] text-foreground/90 leading-relaxed whitespace-pre-wrap">
-                          {actionNotes || <span className="text-muted-foreground italic">Sem parecer.</span>}
-                        </p>
-                      </div>
-                      <div className="px-3 py-2.5">
-                        <div className="flex items-center justify-between mb-1.5">
-                          <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">
-                            Anexos {actionFiles.length > 0 && `(${actionFiles.length})`}
-                          </span>
-                          <button type="button" onClick={() => goToStep(1)} className="inline-flex items-center gap-1 text-[10px] font-medium text-primary hover:underline">
-                            <Pencil className="w-2.5 h-2.5" /> Editar
-                          </button>
-                        </div>
-                        {actionFiles.length === 0 ? (
-                          <p className="text-[12px] text-muted-foreground italic">Sem anexos.</p>
-                        ) : (
-                          <ul className="space-y-1">
-                            {actionFiles.map((f, i) => (
-                              <li key={i} className="flex items-center gap-1.5 text-[11.5px] text-foreground/80">
-                                <FileText className="w-3 h-3 text-muted-foreground shrink-0" />
-                                <span className="truncate">{f.name}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        )}
-                      </div>
-                    </div>
-                  </section>
-                )}
+                  {actionFiles.length > 0 && (
+                    <ul className="space-y-1 pt-0.5">
+                      {actionFiles.map((f, i) => {
+                        const ext = f.name.split(".").pop()?.toUpperCase() ?? "FILE";
+                        const isImg = /^(PNG|JPG|JPEG|WEBP|GIF)$/.test(ext);
+                        const isSheet = /^(XLS|XLSX|CSV)$/.test(ext);
+                        const Ic = isImg ? FileImage : isSheet ? FileSpreadsheet : FileText;
+                        const cls = isImg ? "text-violet-600"
+                          : isSheet ? "text-emerald-600"
+                          : "text-red-600";
+                        return (
+                          <li key={i} className="flex items-center gap-2 pl-2 pr-1.5 py-1.5 rounded-md border border-border bg-background hover:bg-muted/20 transition-colors">
+                            <Ic className={cn("w-3.5 h-3.5 shrink-0", cls)} />
+                            <span className="text-[12px] font-medium text-foreground truncate flex-1 leading-tight">{f.name}</span>
+                            <span className="text-[10px] text-muted-foreground tabular-nums shrink-0">
+                              {f.size < 1024 * 1024 ? `${(f.size / 1024).toFixed(0)} KB` : `${(f.size / 1024 / 1024).toFixed(1)} MB`}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => setActionFiles(prev => prev.filter((_, idx) => idx !== i))}
+                              className="w-5 h-5 rounded inline-flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors shrink-0"
+                              title="Remover"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  )}
+                </section>
               </div>
 
               {/* Footer */}
-              <DialogFooter className="px-5 py-3 border-t border-border bg-muted/20 flex-row sm:justify-between gap-2 sm:gap-2">
-                <div className="flex items-center gap-2">
-                  <DialogClose asChild>
-                    <Button variant="ghost" size="sm" className="h-8 text-[12px] text-muted-foreground">Cancelar</Button>
-                  </DialogClose>
-                  {actionStep > 0 && (
-                    <Button variant="outline" size="sm" className="h-8 text-[12px] gap-1" onClick={() => setActionStep((actionStep - 1) as 0 | 1 | 2)}>
-                      <ChevronLeft className="w-3.5 h-3.5" /> Voltar
-                    </Button>
-                  )}
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-[10.5px] text-muted-foreground tabular-nums">Etapa {actionStep + 1} de 3</span>
-                  {actionStep < 2 ? (
-                    <Button
-                      size="sm"
-                      className="h-8 text-[12px] gap-1"
-                      onClick={advance}
-                      disabled={actionStep === 0 && !actionNotes.trim()}
-                    >
-                      Próximo <ChevronRight className="w-3.5 h-3.5" />
-                    </Button>
-                  ) : (
-                    <Button
-                      size="sm"
-                      className={cn("h-8 text-[12px] gap-1.5", pm.tone)}
-                      onClick={confirmAction}
-                      disabled={!actionNotes.trim()}
-                    >
-                      <pm.icon className="w-3.5 h-3.5" /> {pm.cta}
-                    </Button>
-                  )}
-                </div>
+              <DialogFooter className="px-5 py-3 border-t border-border bg-muted/20 gap-2 sm:gap-2">
+                <DialogClose asChild>
+                  <Button variant="outline" size="sm" className="h-8 text-[12px]">Cancelar</Button>
+                </DialogClose>
+                <Button
+                  size="sm"
+                  className={cn("h-8 text-[12px] gap-1.5", pm.tone)}
+                  onClick={confirmAction}
+                  disabled={!actionNotes.trim()}
+                >
+                  <pm.icon className="w-3.5 h-3.5" /> {pm.cta}
+                </Button>
               </DialogFooter>
             </>
           )}
