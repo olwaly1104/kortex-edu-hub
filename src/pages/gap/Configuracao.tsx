@@ -327,7 +327,44 @@ export default function GapConfiguracao() {
   const [newPergLabel, setNewPergLabel] = useState("");
   const [newPergTipo, setNewPergTipo] = useState<CdPergunta["tipo"]>("texto");
   const [newPergObrig, setNewPergObrig] = useState(true);
-
+  const CD_COLORS = [
+    "bg-blue-50 text-blue-700 border-blue-200",
+    "bg-green-50 text-green-700 border-green-200",
+    "bg-amber-50 text-amber-700 border-amber-200",
+    "bg-red-50 text-red-700 border-red-200",
+    "bg-violet-50 text-violet-700 border-violet-200",
+    "bg-slate-50 text-slate-700 border-slate-200",
+  ];
+  const addCdEstado = () => {
+    const v = newCdEstadoLabel.trim(); if (!v) return;
+    const key = v.toLowerCase().replace(/\s+/g, "_");
+    if (cdEstados.some(e => e.key === key)) { toast({ title: "Estado já existe", variant: "destructive" }); return; }
+    setCdEstados(s => [...s, { key, label: v, color: CD_COLORS[s.length % CD_COLORS.length] }]);
+    setNewCdEstadoLabel(""); setCdEstadoOpen(false);
+  };
+  const removeCdEstado = (key: string) => setCdEstados(s => s.filter(e => e.key !== key));
+  const addCdEtapa = () => {
+    const v = newCdEtapaLabel.trim(); if (!v) return;
+    const key = v.toLowerCase().replace(/\s+/g, "_");
+    setCdEtapas(es => [...es, { key, label: v, diasAposSubmissao: newCdEtapaDias, obrigatoria: false, estadosPossiveis: [] }]);
+    setNewCdEtapaLabel(""); setNewCdEtapaDias(7);
+  };
+  const removeCdEtapa = (key: string) => setCdEtapas(es => es.filter(e => e.key !== key));
+  const toggleEtapaObrig = (key: string) => setCdEtapas(es => es.map(e => e.key === key ? { ...e, obrigatoria: !e.obrigatoria } : e));
+  const addCdSessao = () => {
+    if (!newCdSessData || !newCdSessLocal.trim()) { toast({ title: "Preencha data e local", variant: "destructive" }); return; }
+    setCdSessoes(s => [...s, { key: `s-${Date.now()}`, etapa: newCdSessEtapa, data: newCdSessData, hora: newCdSessHora, local: newCdSessLocal.trim(), capacidade: newCdSessCap }]);
+    setNewCdSessData(""); setNewCdSessLocal(""); setNewCdSessCap(60);
+  };
+  const removeCdSessao = (key: string) => setCdSessoes(s => s.filter(x => x.key !== key));
+  const addPergunta = (stepKey: string) => {
+    const v = newPergLabel.trim(); if (!v || newPergStep !== stepKey) return;
+    const key = `${v.toLowerCase().replace(/\s+/g, "_")}_${Date.now()}`;
+    setCdFormSteps(steps => steps.map(s => s.key === stepKey ? { ...s, perguntas: [...s.perguntas, { key, label: v, tipo: newPergTipo, obrigatoria: newPergObrig }] } : s));
+    setNewPergLabel(""); setNewPergTipo("texto"); setNewPergObrig(true);
+  };
+  const removePergunta = (stepKey: string, pKey: string) =>
+    setCdFormSteps(steps => steps.map(s => s.key === stepKey ? { ...s, perguntas: s.perguntas.filter(p => p.key !== pKey) } : s));
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
@@ -337,14 +374,15 @@ export default function GapConfiguracao() {
           <Settings2 className="w-6 h-6 text-primary" /> Configuração
         </h1>
         <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
-          Configure tudo o que diz respeito a Solicitações e Agendamentos do GAP.
+          Configure Solicitações, Agendamentos e o processo de Candidaturas do GAP.
         </p>
       </div>
 
       <Tabs defaultValue="solicitacoes" className="space-y-6">
-        <TabsList className="grid grid-cols-2 w-full max-w-md">
+        <TabsList className="grid grid-cols-3 w-full max-w-2xl">
           <TabsTrigger value="solicitacoes" className="gap-1.5"><FileText className="w-3.5 h-3.5" /> Solicitações</TabsTrigger>
           <TabsTrigger value="agendamentos" className="gap-1.5"><CalendarClock className="w-3.5 h-3.5" /> Agendamentos</TabsTrigger>
+          <TabsTrigger value="candidaturas" className="gap-1.5"><GraduationCap className="w-3.5 h-3.5" /> Candidaturas</TabsTrigger>
         </TabsList>
 
         <TabsContent value="solicitacoes" className="space-y-6 mt-0">
@@ -766,6 +804,278 @@ export default function GapConfiguracao() {
         </TabsContent>
 
         {/* ============ CANDIDATURAS ============ */}
+        <TabsContent value="candidaturas" className="space-y-6 mt-0">
+
+          {/* Parâmetros gerais */}
+          <Card className="p-5">
+            <div className="flex items-center gap-2 mb-4">
+              <Settings2 className="w-4 h-4 text-muted-foreground" />
+              <h2 className="text-sm font-semibold text-foreground">Parâmetros gerais</h2>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Nota mínima de acesso</label>
+                <Input type="number" min={0} max={20} value={cdNotaMinima}
+                  onChange={e => setCdNotaMinima(Number(e.target.value) || 0)} />
+                <p className="text-[10px] text-muted-foreground mt-1">Valor sobre 20 no exame de acesso</p>
+              </div>
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Taxa de candidatura (Kz)</label>
+                <Input type="number" min={0} value={cdTaxa}
+                  onChange={e => setCdTaxa(Number(e.target.value) || 0)} />
+                <p className="text-[10px] text-muted-foreground mt-1">Paga no momento da submissão</p>
+              </div>
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Opções de curso (máx.)</label>
+                <Input type="number" min={1} max={5} value={cdMaxOpcoes}
+                  onChange={e => setCdMaxOpcoes(Number(e.target.value) || 1)} />
+                <p className="text-[10px] text-muted-foreground mt-1">Nº de cursos que pode escolher</p>
+              </div>
+            </div>
+          </Card>
+
+          {/* Estados */}
+          <Card className="p-5">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 text-muted-foreground" />
+                <h2 className="text-sm font-semibold text-foreground">Estados</h2>
+                <span className="text-[11px] text-muted-foreground tabular-nums">· {cdEstados.length}</span>
+              </div>
+              <Dialog open={cdEstadoOpen} onOpenChange={setCdEstadoOpen}>
+                <DialogTrigger asChild>
+                  <Button size="sm" variant="outline" className="gap-1.5 h-8 text-xs">
+                    <Plus className="w-3.5 h-3.5" /> Novo estado
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-md">
+                  <DialogHeader><DialogTitle>Novo estado</DialogTitle></DialogHeader>
+                  <div className="space-y-3 py-2">
+                    <div>
+                      <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Designação</label>
+                      <Input value={newCdEstadoLabel} onChange={e => setNewCdEstadoLabel(e.target.value)} placeholder="Ex: Em análise" />
+                    </div>
+                  </div>
+                  <DialogFooter className="gap-2 sm:gap-2">
+                    <DialogClose asChild><Button variant="outline">Cancelar</Button></DialogClose>
+                    <Button onClick={addCdEstado} disabled={!newCdEstadoLabel.trim()}>Adicionar</Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {cdEstados.map(e => (
+                <div key={e.key} className={cn("inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs", e.color)}>
+                  <span className="font-medium">{e.label}</span>
+                  <button onClick={() => removeCdEstado(e.key)} className="opacity-60 hover:opacity-100" aria-label={`Remover ${e.label}`}>
+                    <Trash2 className="w-3 h-3" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          {/* Etapas do processo */}
+          <Card className="p-5">
+            <div className="flex items-center justify-between mb-4 gap-3 flex-wrap">
+              <div className="flex items-center gap-2">
+                <FileCheck2 className="w-4 h-4 text-muted-foreground" />
+                <h2 className="text-sm font-semibold text-foreground">Etapas do processo</h2>
+                <span className="text-[11px] text-muted-foreground tabular-nums">· {cdEtapas.length}</span>
+              </div>
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <Input value={newCdEtapaLabel} onChange={e => setNewCdEtapaLabel(e.target.value)}
+                  onKeyDown={e => { if (e.key === "Enter") addCdEtapa(); }}
+                  placeholder="Nova etapa" className="h-8 w-44 text-xs" />
+                <Input type="number" min={0} value={newCdEtapaDias}
+                  onChange={e => setNewCdEtapaDias(Number(e.target.value) || 0)}
+                  placeholder="dias" className="h-8 w-20 text-xs" />
+                <Button size="sm" variant="outline" className="h-8 text-xs gap-1.5" onClick={addCdEtapa} disabled={!newCdEtapaLabel.trim()}>
+                  <Plus className="w-3.5 h-3.5" /> Adicionar
+                </Button>
+              </div>
+            </div>
+            <div className="overflow-x-auto rounded-lg border border-border">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="text-[10px] uppercase tracking-wider text-muted-foreground border-b border-border bg-muted/30">
+                    <th className="text-left font-semibold px-4 py-2">Etapa</th>
+                    <th className="text-center font-semibold px-3 py-2">Dias após submissão</th>
+                    <th className="text-center font-semibold px-3 py-2">Obrigatória</th>
+                    <th className="text-left font-semibold px-3 py-2">Estados possíveis</th>
+                    <th className="w-12"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {cdEtapas.map(et => (
+                    <tr key={et.key} className="border-b border-border/50 last:border-0">
+                      <td className="px-4 py-2.5 text-sm font-medium text-foreground">{et.label}</td>
+                      <td className="px-3 py-2.5 text-center text-xs tabular-nums">+{et.diasAposSubmissao}d</td>
+                      <td className="px-3 py-2.5 text-center">
+                        <button onClick={() => toggleEtapaObrig(et.key)}
+                          className={cn("inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium",
+                            et.obrigatoria ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-muted text-muted-foreground border-border")}>
+                          {et.obrigatoria ? "Sim" : "Opcional"}
+                        </button>
+                      </td>
+                      <td className="px-3 py-2.5">
+                        <div className="flex flex-wrap gap-1">
+                          {et.estadosPossiveis.length === 0
+                            ? <span className="text-[10px] text-muted-foreground italic">—</span>
+                            : et.estadosPossiveis.map(es => {
+                                const meta = cdEstados.find(x => x.key === es);
+                                return <span key={es} className={cn("inline-flex rounded-full border px-1.5 py-0.5 text-[10px] font-medium", meta?.color || "bg-muted text-muted-foreground border-border")}>{meta?.label || es}</span>;
+                              })}
+                        </div>
+                      </td>
+                      <td className="px-2 py-2.5 text-right">
+                        <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => removeCdEtapa(et.key)} title="Remover">
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+
+          {/* Sessões de exames e cursos preparatórios */}
+          <Card className="p-5">
+            <div className="flex items-center justify-between mb-4 gap-3 flex-wrap">
+              <div className="flex items-center gap-2">
+                <CalendarClock className="w-4 h-4 text-muted-foreground" />
+                <h2 className="text-sm font-semibold text-foreground">Sessões agendadas</h2>
+                <span className="text-[11px] text-muted-foreground tabular-nums">· {cdSessoes.length}</span>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-6 gap-2 mb-3">
+              <Select value={newCdSessEtapa} onValueChange={setNewCdSessEtapa}>
+                <SelectTrigger className="h-8 text-xs sm:col-span-2"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {cdEtapas.filter(e => e.key !== "submissao").map(e => <SelectItem key={e.key} value={e.label}>{e.label}</SelectItem>)}
+                </SelectContent>
+              </Select>
+              <Input type="date" value={newCdSessData} onChange={e => setNewCdSessData(e.target.value)} className="h-8 text-xs" />
+              <Input type="time" value={newCdSessHora} onChange={e => setNewCdSessHora(e.target.value)} className="h-8 text-xs" />
+              <Input value={newCdSessLocal} onChange={e => setNewCdSessLocal(e.target.value)} placeholder="Local" className="h-8 text-xs" />
+              <div className="flex gap-1.5">
+                <Input type="number" min={1} value={newCdSessCap} onChange={e => setNewCdSessCap(Number(e.target.value) || 1)} placeholder="Cap." className="h-8 text-xs w-20" />
+                <Button size="sm" variant="outline" className="h-8 text-xs gap-1.5 flex-1" onClick={addCdSessao}>
+                  <Plus className="w-3.5 h-3.5" /> Add
+                </Button>
+              </div>
+            </div>
+            <div className="overflow-x-auto rounded-lg border border-border">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="text-[10px] uppercase tracking-wider text-muted-foreground border-b border-border bg-muted/30">
+                    <th className="text-left font-semibold px-4 py-2">Etapa</th>
+                    <th className="text-left font-semibold px-3 py-2">Data</th>
+                    <th className="text-left font-semibold px-3 py-2">Hora</th>
+                    <th className="text-left font-semibold px-3 py-2">Local</th>
+                    <th className="text-center font-semibold px-3 py-2">Capacidade</th>
+                    <th className="w-12"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {cdSessoes.map(s => (
+                    <tr key={s.key} className="border-b border-border/50 last:border-0">
+                      <td className="px-4 py-2.5 text-sm font-medium text-foreground">{s.etapa}</td>
+                      <td className="px-3 py-2.5 text-xs tabular-nums">{s.data}</td>
+                      <td className="px-3 py-2.5 text-xs tabular-nums">{s.hora}</td>
+                      <td className="px-3 py-2.5 text-xs text-muted-foreground">{s.local}</td>
+                      <td className="px-3 py-2.5 text-center text-xs tabular-nums">{s.capacidade}</td>
+                      <td className="px-2 py-2.5 text-right">
+                        <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => removeCdSessao(s.key)} title="Remover">
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+
+          {/* Formulário de candidatura */}
+          <Card className="p-5">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <FileText className="w-4 h-4 text-muted-foreground" />
+                <h2 className="text-sm font-semibold text-foreground">Formulário de candidatura</h2>
+                <span className="text-[11px] text-muted-foreground tabular-nums">· {cdFormSteps.length} passos</span>
+              </div>
+            </div>
+            <div className="space-y-2">
+              {cdFormSteps.map(step => {
+                const open = expandedStep === step.key;
+                return (
+                  <div key={step.key} className="rounded-lg border border-border overflow-hidden">
+                    <button onClick={() => setExpandedStep(open ? null : step.key)}
+                      className="w-full flex items-center justify-between px-4 py-3 hover:bg-muted/30 transition text-left">
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-foreground">{step.titulo}</p>
+                        <p className="text-[11px] text-muted-foreground mt-0.5">{step.subtitulo}</p>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span className="text-[10px] text-muted-foreground tabular-nums">{step.perguntas.length} campos</span>
+                        <span className={cn("text-xs transition-transform", open && "rotate-90")}>›</span>
+                      </div>
+                    </button>
+                    {open && (
+                      <div className="border-t border-border bg-muted/10 px-4 py-3 space-y-2">
+                        {step.perguntas.map(p => (
+                          <div key={p.key} className="flex items-center justify-between gap-2 rounded-md border border-border bg-card px-3 py-1.5">
+                            <div className="flex items-center gap-2 min-w-0">
+                              <span className="text-sm text-foreground truncate">{p.label}</span>
+                              <Badge variant="outline" className="text-[10px] font-normal">{p.tipo}</Badge>
+                              {p.obrigatoria && <Badge className="text-[10px] bg-red-50 text-red-700 border-red-200 border" variant="outline">obrigatória</Badge>}
+                            </div>
+                            <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => removePergunta(step.key, p.key)} title="Remover">
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </Button>
+                          </div>
+                        ))}
+                        <div className="flex flex-wrap items-center gap-1.5 pt-2 border-t border-border">
+                          <Input value={newPergStep === step.key ? newPergLabel : ""}
+                            onChange={e => { setNewPergStep(step.key); setNewPergLabel(e.target.value); }}
+                            placeholder="Nova pergunta" className="h-8 text-xs flex-1 min-w-[160px]" />
+                          <Select value={newPergStep === step.key ? newPergTipo : "texto"}
+                            onValueChange={(v: CdPergunta["tipo"]) => { setNewPergStep(step.key); setNewPergTipo(v); }}>
+                            <SelectTrigger className="h-8 text-xs w-28"><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="texto">Texto</SelectItem>
+                              <SelectItem value="numero">Número</SelectItem>
+                              <SelectItem value="data">Data</SelectItem>
+                              <SelectItem value="selecao">Seleção</SelectItem>
+                              <SelectItem value="ficheiro">Ficheiro</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <label className="inline-flex items-center gap-1 text-[11px] text-muted-foreground">
+                            <input type="checkbox" checked={newPergStep === step.key ? newPergObrig : true}
+                              onChange={e => { setNewPergStep(step.key); setNewPergObrig(e.target.checked); }} />
+                            Obrigatória
+                          </label>
+                          <Button size="sm" variant="outline" className="h-8 text-xs gap-1.5" onClick={() => addPergunta(step.key)}
+                            disabled={!(newPergStep === step.key && newPergLabel.trim())}>
+                            <Plus className="w-3.5 h-3.5" /> Adicionar
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </Card>
+
+          <p className="text-[11px] text-muted-foreground">
+            Total de candidaturas registadas no sistema: <span className="font-semibold text-foreground tabular-nums">{allCandidaturas.length}</span>
+          </p>
+        </TabsContent>
+
+
 
       </Tabs>
 
