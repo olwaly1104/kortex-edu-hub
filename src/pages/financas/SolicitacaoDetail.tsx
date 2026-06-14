@@ -505,81 +505,131 @@ export default function FinancasSolicitacaoDetail() {
       </Card>
       {/* Action confirmation dialog */}
       <Dialog open={!!pendingAction} onOpenChange={(o) => !o && setPendingAction(null)}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-lg p-0 gap-0 overflow-hidden">
           {pm && (
             <>
-              <DialogHeader>
-                <div className="flex items-center gap-2.5">
-                  <div className={cn("w-9 h-9 rounded-lg flex items-center justify-center shrink-0",
-                    pendingAction === "em_execucao" && "bg-emerald-50 text-emerald-600",
-                    pendingAction === "rejeitado" && "bg-red-50 text-red-600",
-                    pendingAction === "executada" && "bg-blue-50 text-blue-600",
-                  )}>
+              {/* Header */}
+              <div className="px-6 pt-5 pb-4 border-b border-border">
+                <div className="flex items-start gap-3">
+                  <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center shrink-0", pm.iconBg)}>
                     <pm.icon className="w-5 h-5" />
                   </div>
-                  <div className="min-w-0">
-                    <DialogTitle className="text-base">{pm.title}</DialogTitle>
-                    <DialogDescription className="text-[12px] mt-0.5">{tm.label} · {selected.title}</DialogDescription>
+                  <div className="min-w-0 flex-1">
+                    <DialogTitle className="text-base leading-tight">{pm.title}</DialogTitle>
+                    <DialogDescription className="text-[12px] mt-1 leading-relaxed">
+                      {pm.desc}
+                    </DialogDescription>
+                  </div>
+                  <div className="shrink-0 inline-flex items-center px-2 py-0.5 rounded-md border border-border bg-muted/40 text-[10px] font-mono font-semibold text-foreground">
+                    {selected.ref}
                   </div>
                 </div>
-              </DialogHeader>
+              </div>
 
-              <div className="space-y-4 pt-1">
-                <p className="text-[12px] text-muted-foreground leading-relaxed">{pm.desc}</p>
+              {/* Context strip */}
+              <div className="px-6 py-3 border-b border-border bg-muted/15 flex items-center gap-4 text-[11px]">
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <tm.icon className={cn("w-3.5 h-3.5 shrink-0", pm.accent)} />
+                  <span className="font-semibold text-foreground">{tm.label}</span>
+                </div>
+                <span className="w-px h-3.5 bg-border" />
+                <span className="text-muted-foreground truncate flex-1">{selected.title}</span>
+                <span className="text-muted-foreground tabular-nums shrink-0">{fmt(dSub)}</span>
+              </div>
 
-                <div className="space-y-1.5">
-                  <Label htmlFor="action-notes" className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground">
-                    {pm.notesLabel}
-                  </Label>
+              {/* Body sections */}
+              <div className="px-6 py-5 space-y-5">
+                {/* Section: Notes */}
+                <section className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="action-notes" className="text-[11px] uppercase tracking-[0.08em] font-semibold text-foreground">
+                      {pm.notesLabel}
+                    </Label>
+                    <span className="text-[10px] text-muted-foreground">Obrigatório</span>
+                  </div>
                   <Textarea
                     id="action-notes"
                     value={actionNotes}
                     onChange={(e) => setActionNotes(e.target.value)}
                     placeholder={pm.notesPlaceholder}
                     rows={4}
-                    className="resize-none text-sm"
+                    className="resize-none text-sm leading-relaxed"
                   />
-                </div>
+                </section>
 
-                <div className="space-y-1.5">
-                  <Label className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground">
-                    Evidências e anexos
-                  </Label>
-                  <label className="flex items-center gap-2 px-3 py-2.5 rounded-md border border-dashed border-border bg-muted/20 hover:bg-muted/40 cursor-pointer transition-colors">
-                    <Paperclip className="w-4 h-4 text-muted-foreground shrink-0" />
-                    <span className="text-[12px] text-muted-foreground flex-1">
-                      Anexar comprovativo, fatura ou documento de suporte
+                {/* Section: Evidence upload */}
+                <section className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-[11px] uppercase tracking-[0.08em] font-semibold text-foreground">
+                      Anexos e evidências
+                    </Label>
+                    <span className="text-[10px] text-muted-foreground">
+                      {actionFiles.length > 0 ? `${actionFiles.length} ${actionFiles.length === 1 ? "ficheiro" : "ficheiros"}` : "Opcional"}
                     </span>
-                    <span className="text-[11px] font-semibold text-primary">Carregar</span>
+                  </div>
+
+                  <label className="group relative block rounded-lg border-2 border-dashed border-border bg-muted/10 hover:border-primary/40 hover:bg-primary/[0.03] transition-colors cursor-pointer">
+                    <div className="flex flex-col items-center justify-center px-4 py-6 text-center">
+                      <div className="w-9 h-9 rounded-full bg-background border border-border flex items-center justify-center mb-2 group-hover:border-primary/40 transition-colors">
+                        <Paperclip className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                      </div>
+                      <p className="text-[13px] font-semibold text-foreground">
+                        Carregue anexos ou evidências para registo
+                      </p>
+                      <p className="text-[11px] text-muted-foreground mt-0.5">
+                        Arraste ficheiros ou <span className="text-primary font-medium">procure no dispositivo</span>
+                      </p>
+                      <p className="text-[10px] text-muted-foreground/70 mt-2">
+                        PDF, DOCX, XLSX, PNG, JPG · até 10 MB cada
+                      </p>
+                    </div>
                     <input
                       type="file"
                       multiple
-                      className="hidden"
+                      className="absolute inset-0 opacity-0 cursor-pointer"
                       onChange={(e) => setActionFiles(prev => [...prev, ...Array.from(e.target.files ?? [])])}
                     />
                   </label>
+
                   {actionFiles.length > 0 && (
-                    <div className="space-y-1 pt-1">
-                      {actionFiles.map((f, i) => (
-                        <div key={i} className="flex items-center gap-2 px-2.5 py-1.5 rounded-md border border-border bg-background">
-                          <FileText className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-                          <span className="text-[12px] text-foreground flex-1 truncate">{f.name}</span>
-                          <span className="text-[10px] text-muted-foreground tabular-nums">{(f.size / 1024).toFixed(0)} KB</span>
-                          <button
-                            type="button"
-                            onClick={() => setActionFiles(prev => prev.filter((_, idx) => idx !== i))}
-                            className="text-muted-foreground hover:text-destructive transition-colors"
-                          >
-                            <X className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
+                    <ul className="space-y-1.5 pt-1">
+                      {actionFiles.map((f, i) => {
+                        const ext = f.name.split(".").pop()?.toUpperCase() ?? "FILE";
+                        const isImg = /^(PNG|JPG|JPEG|WEBP|GIF)$/.test(ext);
+                        const isSheet = /^(XLS|XLSX|CSV)$/.test(ext);
+                        const Ic = isImg ? FileImage : isSheet ? FileSpreadsheet : FileText;
+                        const cls = isImg ? "bg-violet-50 text-violet-600 border-violet-100"
+                          : isSheet ? "bg-emerald-50 text-emerald-600 border-emerald-100"
+                          : "bg-red-50 text-red-600 border-red-100";
+                        return (
+                          <li key={i} className="flex items-center gap-3 pl-2 pr-2.5 py-2 rounded-md border border-border bg-background hover:bg-muted/20 transition-colors">
+                            <div className={cn("w-8 h-8 rounded-md border flex items-center justify-center shrink-0", cls)}>
+                              <Ic className="w-4 h-4" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-[12px] font-semibold text-foreground truncate leading-tight">{f.name}</p>
+                              <p className="text-[10px] text-muted-foreground mt-0.5 tabular-nums">
+                                {ext} · {f.size < 1024 * 1024 ? `${(f.size / 1024).toFixed(0)} KB` : `${(f.size / 1024 / 1024).toFixed(1)} MB`}
+                              </p>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => setActionFiles(prev => prev.filter((_, idx) => idx !== i))}
+                              className="w-6 h-6 rounded inline-flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors shrink-0"
+                              title="Remover"
+                            >
+                              <X className="w-3.5 h-3.5" />
+                            </button>
+                          </li>
+                        );
+                      })}
+                    </ul>
                   )}
-                </div>
+                </section>
               </div>
 
-              <DialogFooter className="gap-2 sm:gap-2">
+              {/* Footer */}
+              <DialogFooter className="px-6 py-3.5 border-t border-border bg-muted/20 gap-2 sm:gap-2">
                 <DialogClose asChild>
                   <Button variant="outline" size="sm" className="h-9">Cancelar</Button>
                 </DialogClose>
@@ -596,6 +646,7 @@ export default function FinancasSolicitacaoDetail() {
           )}
         </DialogContent>
       </Dialog>
+
     </div>
   );
 }
