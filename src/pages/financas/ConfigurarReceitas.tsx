@@ -997,7 +997,6 @@ export default function ConfigurarReceitas() {
                     {MULTA_SUBTYPES.map(sub => {
                       const SubIcon = sub.icon;
                       const subItems = items.filter(r => r.tipo === sub.key);
-                      const subSum = subItems.reduce((s, r) => s + r.valor, 0);
                       const active = multaSubtype === sub.key;
                       return (
                         <button key={sub.key} type="button" onClick={() => setMultaSubtype(sub.key)}
@@ -1008,19 +1007,15 @@ export default function ConfigurarReceitas() {
                               : "border-border bg-card hover:border-foreground/20 hover:shadow-sm"
                           )}>
                           <span className={cn("absolute left-0 top-0 bottom-0 w-1", sub.bar, active ? "opacity-100" : "opacity-40")} />
-                          <div className="flex items-start gap-3 pl-1.5">
+                          <div className="flex items-center gap-3 pl-1.5">
                             <div className={cn("w-9 h-9 rounded-lg flex items-center justify-center shrink-0", sub.iconBg)}>
                               <SubIcon className={cn("w-4.5 h-4.5", sub.iconColor)} />
                             </div>
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2">
-                                <span className={cn("text-sm font-semibold", active ? sub.iconColor : "text-foreground")}>{sub.label}</span>
-                                <span className={cn("inline-flex items-center justify-center min-w-[20px] h-[18px] px-1.5 rounded-full text-[10px] font-semibold tabular-nums", sub.chip)}>
-                                  {subItems.length}
-                                </span>
-                              </div>
-                              <p className="text-[11px] text-muted-foreground mt-0.5">Total bruto</p>
-                              <p className="text-sm font-semibold tabular-nums text-foreground mt-0.5">{formatCurrency(subSum)}</p>
+                            <div className="flex-1 min-w-0 flex items-center gap-2">
+                              <span className={cn("text-sm font-semibold", active ? sub.iconColor : "text-foreground")}>{sub.label}</span>
+                              <span className={cn("inline-flex items-center justify-center min-w-[20px] h-[18px] px-1.5 rounded-full text-[10px] font-semibold tabular-nums", sub.chip)}>
+                                {subItems.length}
+                              </span>
                             </div>
                           </div>
                         </button>
