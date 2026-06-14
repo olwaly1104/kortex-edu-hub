@@ -186,12 +186,13 @@ export default function FinancasSolicitacoes() {
             </span>
             <div>
               <h1 className="text-xl font-bold text-foreground flex items-center gap-2 leading-tight">
-                <CheckSquare className="w-5 h-5 text-primary" /> Solicitações Financeiras
+                <CheckSquare className="w-5 h-5 text-primary" /> Minhas Solicitações
               </h1>
               <p className="text-sm text-muted-foreground mt-0.5">
-                Caixa de entrada de pedidos financeiros — analisar e acompanhar.
+                Pedidos institucionais — financeiros, pessoais e administrativos.
               </p>
             </div>
+
           </div>
           <div className="flex flex-col items-end gap-2 shrink-0">
             <div className="inline-flex items-stretch rounded-md border border-border bg-card overflow-hidden text-[11px] uppercase tracking-wider font-medium shadow-sm">
