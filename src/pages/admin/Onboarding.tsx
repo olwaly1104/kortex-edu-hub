@@ -441,20 +441,18 @@ function SummaryRow({ label, value }: { label: string; value: string }) {
 }
 
 function RepeatableSection<T extends { id: string }>({
-  title, subtitle, items, onAdd, onRemove, renderRow, disabledAdd, emptyHint,
+  title, subtitle, items, onAdd, onRemove, onUpdate, renderRow, disabledAdd, emptyHint,
 }: {
   title: string;
   subtitle?: string;
   items: T[];
   onAdd: () => void;
   onRemove: (id: string) => void;
+  onUpdate: (next: T) => void;
   renderRow: (item: T, update: (next: T) => void) => React.ReactNode;
   disabledAdd?: boolean;
   emptyHint?: string;
 }) {
-  // local update routes back through parent by replacing item
-  // we rely on parent passing the updated list via onAdd/renderRow callbacks
-  // For inline updates, we use a wrapper:
   return (
     <div>
       <div className="flex items-end justify-between mb-3">
@@ -473,7 +471,12 @@ function RepeatableSection<T extends { id: string }>({
       ) : (
         <div className="space-y-2">
           {items.map((item) => (
-            <RepeatableRow key={item.id} item={item} onRemove={() => onRemove(item.id)} renderRow={renderRow} />
+            <div key={item.id} className="flex items-start gap-2 rounded-lg border border-border bg-card px-3 py-2">
+              <div className="flex-1 min-w-0">{renderRow(item, onUpdate)}</div>
+              <Button type="button" variant="ghost" size="icon" onClick={() => onRemove(item.id)} className="text-muted-foreground hover:text-destructive">
+                <Trash2 className="w-4 h-4" />
+              </Button>
+            </div>
           ))}
         </div>
       )}
@@ -481,33 +484,3 @@ function RepeatableSection<T extends { id: string }>({
   );
 }
 
-function RepeatableRow<T extends { id: string }>({ item, onRemove, renderRow }: { item: T; onRemove: () => void; renderRow: (item: T, update: (next: T) => void) => React.ReactNode }) {
-  // Local controlled wrapper: update propagates via a custom event upward
-  // Since renderRow receives `update`, we must keep state aligned with parent
-  // Simpler: the parent owns state; we forward update through a callback via DOM events.
-  // To keep it straightforward, renderRow receives `update` that we re-emit using a custom mutation:
-  const update = (next: T) => {
-    const evt = new CustomEvent("repeatable-update", { detail: next, bubbles: true });
-    rowRef.current?.dispatchEvent(evt);
-  };
-  const rowRef = useRowRef<T>(item);
-  return (
-    <div ref={rowRef.ref} className="flex items-start gap-2 rounded-lg border border-border bg-card px-3 py-2">
-      <div className="flex-1 min-w-0">{renderRow(item, update)}</div>
-      <Button type="button" variant="ghost" size="icon" onClick={onRemove} className="text-muted-foreground hover:text-destructive">
-        <Trash2 className="w-4 h-4" />
-      </Button>
-    </div>
-  );
-}
-
-// Tiny hook that bridges the inline update event back to parent setter via a closure callback registered on the DOM element.
-function useRowRef<T extends { id: string }>(item: T) {
-  // We attach a listener that finds the parent setter through a global registry keyed by item.id is overkill.
-  // Cleaner: dispatch a custom event that bubbles, and the section listens. But sections don't listen here.
-  // To avoid that complexity, replace this whole approach with React: pass an "update" prop down.
-  // (Kept as no-op ref because RepeatableSection is refactored below if needed.)
-  const ref = { current: null as HTMLDivElement | null };
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  return { ref: (el: HTMLDivElement | null) => { ref.current = el; } } as unknown as { ref: React.RefCallback<HTMLDivElement> };
-}
