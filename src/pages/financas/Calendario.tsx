@@ -318,6 +318,12 @@ export default function FinancasCalendario() {
           </div>
         )}
       </div>
+
+      {/* ── Grid ─────────────────────────────── */}
+      <div className="flex gap-6">
+        <div className="flex-1 min-w-0">
+          {view === "week" ? (
+            <Card className="overflow-hidden">
               <div className="grid grid-cols-7 border-b bg-muted/10">
                 {weekDays.map(d => {
                   const dD = parseISO(d);
