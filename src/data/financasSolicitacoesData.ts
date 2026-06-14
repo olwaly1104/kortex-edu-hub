@@ -1,13 +1,18 @@
 import {
   Receipt, TrendingUp, FileText, Wallet, Coins, Sparkles,
-  Clock, CheckCircle2, XCircle, AlertTriangle, BadgeCheck, type LucideIcon,
+  Clock, CheckCircle2, XCircle, AlertTriangle, BadgeCheck,
+  Plane, HeartPulse, Package, GraduationCap, Stamp, Laptop,
+  type LucideIcon,
 } from "lucide-react";
 
 export type FinDirection = "recebida" | "enviada";
 export type FinStatus = "pendente" | "atrasado" | "em_execucao" | "executada" | "rejeitado";
 export type FinType =
   | "reembolso" | "orcamento" | "fornecedor"
-  | "antecipacao" | "verba" | "outro";
+  | "antecipacao" | "verba"
+  | "ferias" | "licenca" | "declaracao" | "material" | "formacao" | "ti"
+  | "outro";
+
 
 export interface FinHistorico {
   data: string;
