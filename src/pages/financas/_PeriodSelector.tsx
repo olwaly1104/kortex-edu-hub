@@ -33,29 +33,31 @@ export function PeriodSelector({ periodo, setPeriodo, value, setValue }: Props) 
   };
 
   return (
-    <div className="space-y-2">
-      <div className="inline-flex items-center gap-0.5 rounded-lg border border-border bg-muted/30 p-0.5">
-        {(["mes", "semestre", "ano"] as Periodo[]).map(p => (
-          <Button
-            key={p}
-            size="sm"
-            variant={periodo === p ? "default" : "ghost"}
-            onClick={() => handlePeriodo(p)}
-            className="text-xs h-7 px-3"
-          >
-            {p === "mes" ? "Mês" : p === "semestre" ? "Semestre" : "Ano"}
-          </Button>
-        ))}
+    <div className="flex items-end justify-between gap-4 flex-wrap">
+      {/* Left: label + result */}
+      <div>
+        <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">
+          {label}
+        </p>
+        <p className="text-lg font-bold text-foreground leading-tight capitalize">
+          {value}{suffix}
+        </p>
       </div>
 
-      <div className="flex items-end justify-between gap-3 flex-wrap">
-        <div>
-          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">
-            {label}
-          </p>
-          <p className="text-lg font-bold text-foreground leading-tight capitalize">
-            {value}{suffix}
-          </p>
+      {/* Right: toggle above select */}
+      <div className="flex flex-col items-end gap-2">
+        <div className="inline-flex items-center gap-0.5 rounded-lg border border-border bg-muted/30 p-0.5">
+          {(["mes", "semestre", "ano"] as Periodo[]).map(p => (
+            <Button
+              key={p}
+              size="sm"
+              variant={periodo === p ? "default" : "ghost"}
+              onClick={() => handlePeriodo(p)}
+              className="text-xs h-7 px-3"
+            >
+              {p === "mes" ? "Mês" : p === "semestre" ? "Semestre" : "Ano"}
+            </Button>
+          ))}
         </div>
         <Select value={value} onValueChange={setValue}>
           <SelectTrigger className="w-[200px] h-9 text-sm">
