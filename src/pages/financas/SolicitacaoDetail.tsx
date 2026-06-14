@@ -154,6 +154,24 @@ export default function FinancasSolicitacaoDetail() {
             </div>
           </div>
         )}
+        {/* Execution bar — after approval */}
+        {isRecebida && selected.status === "em_execucao" && (
+          <div className="px-6 pt-3">
+            <div className="flex items-center justify-between rounded-lg border border-blue-200 bg-blue-50/40 px-4 py-2.5">
+              <div className="flex items-center gap-2.5">
+                <Hourglass className="w-4 h-4 shrink-0 text-blue-600" />
+                <span className="text-sm font-semibold text-foreground">Em execução</span>
+                <span className="text-[11px] text-muted-foreground">Aguarda confirmação de execução</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button size="sm" className="h-7 text-[11px] gap-1.5 bg-blue-600 hover:bg-blue-700 text-white transition-colors" onClick={() => handleAction("executada")}>
+                  <Check className="w-3.5 h-3.5" /> Confirmar execução
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
 
         {/* Title block */}
         <div className="px-6 pt-4 pb-4">
