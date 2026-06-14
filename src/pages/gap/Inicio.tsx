@@ -66,21 +66,15 @@ export default function GapInicio() {
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       {/* Welcome */}
-      <div className="rounded-xl border border-border bg-gradient-to-r from-primary/5 to-transparent p-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">
-              Bom dia, {user?.name?.split(" ").pop()} 👋
-            </h1>
-            <p className="text-muted-foreground mt-1 text-sm">
-              GAP — Gabinete de Apoio Psicopedagógico
-            </p>
-          </div>
-          <Link to="/gap" className="text-sm text-primary hover:underline flex items-center gap-1">
+      <FinHeader
+        title={`Bom dia, ${user?.name?.split(" ").pop() ?? ""} 👋`}
+        subtitle="GAP — Gabinete de Apoio Psicopedagógico"
+        right={
+          <Link to="/gap/dashboard" className="text-sm text-primary hover:underline flex items-center gap-1">
             Ver Dashboard <ChevronRight className="w-4 h-4" />
           </Link>
-        </div>
-      </div>
+        }
+      />
 
       {/* KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
