@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import {
   ArrowLeft, Clock, FileText, MessageSquare, Mail, Phone, Check, X, Hourglass, Send,
   Eye, Download, Users, Share2, Paperclip, FileImage, FileSpreadsheet, CheckCircle2, XCircle,
-  ChevronLeft, ChevronRight, Lock, Pencil,
+  ChevronLeft, ChevronRight, Lock, Pencil, Plus,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Textarea } from "@/components/ui/textarea";
