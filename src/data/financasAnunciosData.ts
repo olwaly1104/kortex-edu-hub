@@ -12,6 +12,7 @@ export interface FinAnn {
   department: string;
   cta?: "inscrever" | null;
   ctaDeadline?: string;
+  ctaDeadlineTime?: string;
   ctaLink?: string;
   isMine?: boolean;
 }
