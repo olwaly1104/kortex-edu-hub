@@ -323,14 +323,6 @@ export default function GapConfiguracao() {
             Configure Solicitações, Agendamentos e o processo de Candidaturas do GAP.
           </p>
         </div>
-        <Button
-          size="sm"
-          variant={isEditing ? "default" : "outline"}
-          onClick={() => setIsEditing(v => !v)}
-          className="gap-1.5"
-        >
-          {isEditing ? <><Unlock className="w-4 h-4" /> Bloquear edição</> : <><Pencil className="w-4 h-4" /> Editar geral</>}
-        </Button>
       </div>
 
       <Tabs defaultValue="solicitacoes" className="space-y-6">
