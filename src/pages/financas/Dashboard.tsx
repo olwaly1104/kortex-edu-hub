@@ -103,16 +103,11 @@ export default function FinancasDashboard() {
         subtitle="Visão geral das receitas, despesas e transações institucionais."
       />
 
-      {/* Mês de referência — menu + result above KPIs */}
-      <div className="flex items-center justify-between gap-3 flex-wrap rounded-xl border border-border bg-card px-4 py-3">
-        <div className="flex items-center gap-3 min-w-0">
-          <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-            <CalendarIcon className="w-4 h-4 text-primary" />
-          </div>
-          <div className="min-w-0">
-            <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Mês de referência</p>
-            <p className="text-base font-bold text-foreground leading-tight capitalize">{selectedMonthLabel}</p>
-          </div>
+      {/* Mês de referência — plain text above KPIs */}
+      <div className="flex items-end justify-between gap-3 flex-wrap">
+        <div>
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Mes</p>
+          <p className="text-lg font-bold text-foreground leading-tight capitalize">{selectedMonthLabel} 2025</p>
         </div>
         <Select value={selectedMonth} onValueChange={setSelectedMonth}>
           <SelectTrigger className="w-[180px] h-9 text-sm">
