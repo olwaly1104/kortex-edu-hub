@@ -1280,22 +1280,23 @@ export default function ConfigurarReceitas() {
 
           {/* 2. Estados */}
           <Card className="p-5">
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-4 gap-3 flex-wrap">
               <div className="flex items-center gap-2">
                 <CircleDot className="w-4 h-4 text-muted-foreground" />
                 <h2 className="text-sm font-semibold text-foreground">Estados</h2>
                 <span className="text-[11px] text-muted-foreground tabular-nums">· {estados.length}</span>
                 <span className="text-xs text-muted-foreground hidden md:inline">— Ciclo de vida das despesas</span>
               </div>
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1.5 flex-wrap">
                 <Input value={newEstado} onChange={e => setNewEstado(e.target.value)}
                   onKeyDown={e => { if (e.key === "Enter") addEstado(); }}
                   placeholder="Novo estado" className="h-8 w-48 text-xs" />
-                <Button size="sm" variant="outline" className="h-8 text-xs gap-1.5" onClick={addEstado}>
+                <Button size="sm" variant="outline" className="h-8 text-xs gap-1.5" onClick={addEstado} disabled={!newEstado.trim()}>
                   <Plus className="w-3.5 h-3.5" /> Adicionar
                 </Button>
               </div>
             </div>
+
             {estados.length === 0 ? (
               <p className="text-xs text-muted-foreground italic">Crie estados (ex.: Activo, Em revisão, Suspensa).</p>
             ) : (
