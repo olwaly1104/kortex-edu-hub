@@ -12,6 +12,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { gapTickets, gapAtendimentos, gapKpis, ticketCategoriaConfig } from "@/data/gapData";
 import { solicitacoes, estadoSolicitacaoConfig, destinoConfig, tipoConfig, categoriaConfig as solCategoriaConfig, type Categoria } from "@/data/gapData";
+import { FinHeader } from "@/pages/financas/_FinHeader";
 
 const estadoDot: Record<string, string> = {
   recebida: "bg-amber-500",
