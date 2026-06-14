@@ -169,30 +169,25 @@ export default function FinancasAnuncioDetail() {
             </div>
 
             {ann.cta === "inscrever" && (
-              <div className="rounded-lg border border-primary/25 bg-primary/[0.04] p-4">
-                <div className="flex items-center justify-between gap-4 flex-wrap">
-                  <div className="space-y-0.5">
-                    <p className="text-[10px] uppercase tracking-wider font-semibold text-primary">Inscrições abertas</p>
-                    <p className="text-sm font-bold text-foreground">{ann.title}</p>
-                    <p className="text-[12px] text-muted-foreground">Confirme a sua participação</p>
-
-                    {ann.ctaDeadline && (
-                      <p className="text-[12px] text-muted-foreground flex items-center gap-1.5">
-                        <Clock className="w-3 h-3" />
-                        Data limite: <span className="font-semibold text-foreground tabular-nums">{ann.ctaDeadline}{ann.ctaDeadlineTime ? ` - ${ann.ctaDeadlineTime}` : ""}</span>
-                      </p>
-                    )}
-                  </div>
-                  {subscribed ? (
-                    <Badge variant="outline" className="text-[11px] gap-1 bg-emerald-50 text-emerald-700 border-emerald-200 h-9 px-3">
-                      <CheckCircle2 className="w-3.5 h-3.5" /> Inscrito
-                    </Badge>
-                  ) : (
-                    <Button size="sm" className="h-9 gap-1.5" onClick={() => setSubscribed(true)}>
-                      <CheckCircle2 className="w-4 h-4" /> Inscrever-me
-                    </Button>
+              <div className="rounded-lg border border-primary/25 bg-primary/[0.04] px-3.5 py-2.5 flex items-center justify-between gap-3 flex-wrap">
+                <div className="min-w-0 flex items-center gap-3 flex-wrap">
+                  <p className="text-[13px] font-semibold text-foreground truncate">{ann.title}</p>
+                  {ann.ctaDeadline && (
+                    <span className="inline-flex items-center gap-1 text-[11.5px] text-muted-foreground">
+                      <Clock className="w-3 h-3" />
+                      Data limite:&nbsp;<span className="font-semibold text-foreground tabular-nums">{ann.ctaDeadline}{ann.ctaDeadlineTime ? ` · ${ann.ctaDeadlineTime}` : ""}</span>
+                    </span>
                   )}
                 </div>
+                {subscribed ? (
+                  <Badge variant="outline" className="text-[11px] gap-1 bg-emerald-50 text-emerald-700 border-emerald-200 h-8 px-2.5">
+                    <CheckCircle2 className="w-3.5 h-3.5" /> Inscrito
+                  </Badge>
+                ) : (
+                  <Button size="sm" className="h-8 gap-1.5" onClick={() => setSubscribed(true)}>
+                    <CheckCircle2 className="w-3.5 h-3.5" /> Inscrever-me
+                  </Button>
+                )}
               </div>
             )}
 
