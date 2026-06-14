@@ -294,7 +294,7 @@ export default function FinancasAnuncios() {
                   <div className="border-t border-border/60 mb-3" />
 
                   {/* body */}
-                  <Link to={`/financas/anuncios/${a.id}`} className="block group/title">
+                  <Link to={`/financas/anuncios/${a.id}`} onClick={() => markRead(a.id)} className="block group/title">
                     <h3 className="text-[15px] font-semibold text-foreground leading-snug mb-1 group-hover/title:text-primary transition-colors">
                       {a.title}
                     </h3>
