@@ -147,6 +147,30 @@ function fmtShort(s: string) {
   return d.toLocaleDateString("pt-PT", { day: "2-digit", month: "short", year: "numeric" });
 }
 
+/* mock current time for entry state computation on TODAY */
+const NOW_MIN = 10 * 60 + 45;
+type EvState = "agendado" | "decorrer" | "concluido";
+const EV_STATE_META: Record<EvState, { label: string; cls: string }> = {
+  agendado:  { label: "Agendado",   cls: "bg-blue-50 text-blue-700 border-blue-200" },
+  decorrer:  { label: "A decorrer", cls: "bg-amber-50 text-amber-700 border-amber-200" },
+  concluido: { label: "Concluído",  cls: "bg-slate-100 text-slate-600 border-slate-200" },
+};
+function eventState(ev: AgendaEvent): EvState {
+  const end = ev.endDate ?? ev.date;
+  if (ev.date > TODAY) return "agendado";
+  if (end < TODAY) return "concluido";
+  // overlaps today
+  if (ev.date < TODAY || end > TODAY) return "decorrer";
+  // single-day today
+  if (!ev.startTime) return "decorrer";
+  const [sh, sm] = ev.startTime.split(":").map(Number);
+  const [eh, em] = (ev.endTime ?? ev.startTime).split(":").map(Number);
+  const start = sh * 60 + sm, finish = eh * 60 + em;
+  if (NOW_MIN < start) return "agendado";
+  if (NOW_MIN > finish) return "concluido";
+  return "decorrer";
+}
+
 /* ─────────────────────────────────────────────────── */
 export default function FinancasCalendario() {
   const [view, setView] = useState<"week" | "month">("week");
