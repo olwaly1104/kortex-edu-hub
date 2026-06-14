@@ -247,57 +247,77 @@ export default function FinancasCalendario() {
             <div className="flex items-center gap-3 text-[11px] uppercase tracking-wider text-muted-foreground font-medium mb-2 flex-wrap">
               <span className="flex items-center gap-1.5"><CalendarDays className="w-3.5 h-3.5" />{fmtLong(TODAY)}</span>
               <span className="h-3 w-px bg-border" />
+              <span className="flex items-center gap-1.5 font-mono tabular-nums text-primary"><Clock className="w-3.5 h-3.5" />{liveTime}</span>
+              <span className="h-3 w-px bg-border" />
               <span className="flex items-center gap-1.5"><GraduationCap className="w-3.5 h-3.5" />Ano Letivo {ANO_LETIVO}</span>
             </div>
             <h1 className="text-2xl font-bold text-foreground">Calendário</h1>
-            <p className="text-sm text-muted-foreground mt-1">Agenda institucional do Departamento Financeiro</p>
           </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <div className="flex items-center bg-muted/60 rounded-lg p-0.5">
-              <button onClick={() => navigateBy(-1)} className="p-1.5 rounded-md hover:bg-card transition-colors">
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-              <span className="px-3 text-xs font-medium text-foreground min-w-[150px] text-center">
-                {view === "week" ? weekLabel : monthLabel}
-              </span>
-              <button onClick={() => navigateBy(1)} className="p-1.5 rounded-md hover:bg-card transition-colors">
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
-            <div className="flex bg-muted/60 rounded-lg p-0.5">
-              {(["week", "month"] as const).map(v => (
-                <button key={v} onClick={() => setView(v)}
-                  className={cn("px-3 py-1.5 rounded-md text-xs font-medium transition-colors",
-                    view === v ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground")}>
-                  {v === "week" ? "Semana" : "Mês"}
-                </button>
-              ))}
-            </div>
-          </div>
+          <Button size="sm" className="h-9 gap-1.5 text-xs"
+            onClick={() => { setForm(f => ({ ...f, date: selectedDate })); setOpenCreate(true); }}>
+            <Plus className="w-4 h-4" /> Adicionar à Agenda
+          </Button>
         </div>
       </div>
 
-      {/* ── Period title + Adicionar ─────────────── */}
-      <div className="flex items-end justify-between gap-3 flex-wrap">
-        <div>
-          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">
-            {view === "week" ? "Semana" : "Mês"}
-          </p>
-          <h2 className="text-lg font-bold text-foreground capitalize leading-tight mt-0.5">
-            {view === "week" ? weekLabel : monthLabel}
-          </h2>
+      {/* ── Period title + view toggle + nav ─────────────── */}
+      <div className="flex items-center justify-between gap-3 flex-wrap rounded-lg border border-border bg-card px-4 py-3">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="flex bg-muted/60 rounded-lg p-0.5">
+            {(["week", "month"] as const).map(v => (
+              <button key={v} onClick={() => setView(v)}
+                className={cn("px-3 py-1.5 rounded-md text-xs font-semibold transition-colors",
+                  view === v ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground")}>
+                {v === "week" ? "Semana" : "Mês"}
+              </button>
+            ))}
+          </div>
+          <div className="h-5 w-px bg-border" />
+          <div className="min-w-0">
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium leading-none">
+              {view === "week" ? "Semana" : "Mês"}
+            </p>
+            <h2 className="text-base font-bold text-foreground capitalize leading-tight mt-1 truncate">
+              {view === "week" ? weekLabel : monthLabel}
+            </h2>
+          </div>
         </div>
-        <Button size="sm" className="h-9 gap-1.5 text-xs"
-          onClick={() => { setForm(f => ({ ...f, date: selectedDate })); setOpenCreate(true); }}>
-          <Plus className="w-4 h-4" /> Adicionar à Agenda
-        </Button>
-      </div>
 
-      {/* ── Grid ─────────────────────────────── */}
-      <div className="flex gap-6">
-        <div className="flex-1 min-w-0">
-          {view === "week" ? (
-            <Card className="overflow-hidden">
+        {view === "week" ? (
+          <div className="flex items-center bg-muted/60 rounded-lg p-0.5">
+            <button onClick={() => navigateBy(-1)} className="p-1.5 rounded-md hover:bg-card transition-colors" aria-label="Semana anterior">
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <span className="px-3 text-xs font-medium text-foreground min-w-[150px] text-center">{weekLabel}</span>
+            <button onClick={() => navigateBy(1)} className="p-1.5 rounded-md hover:bg-card transition-colors" aria-label="Próxima semana">
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        ) : (
+          <div className="flex items-center gap-2">
+            <Select value={String(cursorD.getMonth())} onValueChange={(v) => {
+              const d = parseISO(cursor); d.setMonth(parseInt(v, 10)); setCursor(toISO(d));
+            }}>
+              <SelectTrigger className="h-9 w-[140px] text-xs"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {MONTH_NAMES.map((mn, i) => (
+                  <SelectItem key={mn} value={String(i)} className="text-xs">{mn}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={String(cursorD.getFullYear())} onValueChange={(v) => {
+              const d = parseISO(cursor); d.setFullYear(parseInt(v, 10)); setCursor(toISO(d));
+            }}>
+              <SelectTrigger className="h-9 w-[90px] text-xs"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {[2023, 2024, 2025, 2026].map(y => (
+                  <SelectItem key={y} value={String(y)} className="text-xs">{y}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+      </div>
               <div className="grid grid-cols-7 border-b bg-muted/10">
                 {weekDays.map(d => {
                   const dD = parseISO(d);
