@@ -337,7 +337,7 @@ export default function FinancasSolicitacaoDetail() {
                 <FactItem label="Submetido" value={fmt(dSub)} />
                 <FactItem label="Hora" value={fmtT(dSub)} />
                 <FactItem label="Categoria" value={tm.label} />
-                <FactItem label="Prazo" value={selected.dueDate ? fmt(new Date(selected.dueDate)) : "—"} />
+                <FactItem label="Estado" value={st.label} />
               </div>
             </section>
 
