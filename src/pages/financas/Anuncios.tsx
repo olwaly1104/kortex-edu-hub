@@ -16,9 +16,12 @@ import {
 } from "@/components/ui/dialog";
 import {
   Megaphone, Search, Plus, CheckCircle2, Calendar as CalendarIcon,
-  User as UserIcon, Building2, Sparkles, Trash2, GraduationCap, Inbox, UserCircle2,
+  User as UserIcon, Building2, Trash2, GraduationCap, CalendarDays,
+  Clock, ArrowRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useEffect } from "react";
+
 
 type AnnType = "urgente" | "evento" | "academico" | "geral";
 
@@ -112,147 +115,148 @@ export default function FinancasAnuncios() {
     { key: "meus", label: "Os meus", count: meusCount },
   ];
 
+  const [now, setNow] = useState<Date>(new Date());
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(id);
+  }, []);
+  const liveTime = `${String(now.getHours()).padStart(2, "0")}h:${String(now.getMinutes()).padStart(2, "0")}min:${String(now.getSeconds()).padStart(2, "0")}s`;
   const todayLabel = new Date().toLocaleDateString("pt-PT", {
     weekday: "long", day: "2-digit", month: "long", year: "numeric",
   });
-  const anoLetivo = "2024 / 2025";
-
-  const stats = [
-    { label: "Novos hoje", value: todayCount, icon: Sparkles, tone: "text-amber-600 bg-amber-50 border-amber-100" },
-    { label: "Departamento Financeiro", value: deptCount, icon: Building2, tone: "text-primary bg-primary/5 border-primary/10" },
-    { label: "Meus anúncios", value: meusCount, icon: UserCircle2, tone: "text-violet-600 bg-violet-50 border-violet-100" },
-    { label: "Total", value: items.length, icon: Inbox, tone: "text-slate-600 bg-slate-50 border-slate-100" },
-  ];
+  const ANO_LETIVO = "2024 / 2025";
 
   return (
     <div className="p-6 lg:p-8 animate-fade-in space-y-6">
-      {/* ── Header ──────────────────────────────── */}
-      <div className="rounded-xl border border-border bg-gradient-to-r from-primary/5 to-transparent p-6">
-        <div className="flex items-start justify-between gap-4 flex-wrap mb-5">
-          <div className="min-w-0">
-            <div className="flex items-center gap-2 text-[11px] uppercase tracking-wider text-muted-foreground font-medium mb-2">
-              <span className="flex items-center gap-1 capitalize">
-                <CalendarIcon className="w-3.5 h-3.5" />
-                {todayLabel}
+      {/* ── Header (matches Início / Calendário) ── */}
+      <div className="rounded-xl border border-border bg-gradient-to-r from-primary/5 to-transparent px-5 py-4">
+        <div className="flex items-start justify-between gap-4 flex-wrap">
+          <div className="min-w-0 space-y-2.5">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-[11px] uppercase tracking-wider font-semibold text-primary">
+              <GraduationCap className="w-3.5 h-3.5" />
+              Ano Letivo <span className="font-bold tabular-nums">{ANO_LETIVO}</span>
+            </span>
+            <div>
+              <h1 className="text-xl font-bold text-foreground flex items-center gap-2 leading-tight">
+                <Megaphone className="w-5 h-5 text-primary" /> Anúncios
+              </h1>
+              <p className="text-sm text-muted-foreground mt-0.5">
+                Comunicações institucionais e do Departamento Financeiro.
+              </p>
+            </div>
+          </div>
+          <div className="flex flex-col items-end gap-2 shrink-0">
+            <div className="inline-flex items-stretch rounded-md border border-border bg-card overflow-hidden text-[11px] uppercase tracking-wider font-medium shadow-sm">
+              <span className="flex items-center gap-1.5 px-2.5 py-1 text-foreground capitalize">
+                <CalendarDays className="w-3.5 h-3.5 text-muted-foreground" />{todayLabel}
               </span>
-              <span className="text-border">•</span>
-              <span className="flex items-center gap-1">
-                <GraduationCap className="w-3.5 h-3.5" />
-                Ano Letivo {anoLetivo}
+              <span className="w-px bg-border" />
+              <span className="flex items-center gap-1.5 px-2.5 py-1 font-mono tabular-nums text-primary bg-muted/30">
+                <Clock className="w-3.5 h-3.5" />{liveTime}
               </span>
             </div>
-            <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-              <Megaphone className="w-6 h-6 text-primary" /> Anúncios
-            </h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              Comunicações institucionais e do Departamento Financeiro.
-            </p>
+            <Dialog open={openCreate} onOpenChange={setOpenCreate}>
+              <DialogTrigger asChild>
+                <Button size="sm" className="h-9 gap-1.5 text-xs shadow-md hover:shadow-lg transition-shadow">
+                  <Plus className="w-4 h-4" /> Criar Anúncio
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-lg">
+                <DialogHeader><DialogTitle>Novo anúncio</DialogTitle></DialogHeader>
+                <div className="space-y-3">
+                  <div>
+                    <Label className="text-xs">Título</Label>
+                    <Input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} placeholder="Título do anúncio" />
+                  </div>
+                  <div>
+                    <Label className="text-xs">Conteúdo</Label>
+                    <Textarea rows={4} value={form.content} onChange={e => setForm({ ...form, content: e.target.value })} placeholder="Detalhes do anúncio…" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <Label className="text-xs">Categoria</Label>
+                      <Select value={form.type} onValueChange={(v: AnnType) => setForm({ ...form, type: v })}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="geral">Geral</SelectItem>
+                          <SelectItem value="urgente">Urgente</SelectItem>
+                          <SelectItem value="evento">Evento</SelectItem>
+                          <SelectItem value="academico">Académico</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label className="text-xs">Destinatários</Label>
+                      <Select value={form.department} onValueChange={v => setForm({ ...form, department: v })}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Departamento Financeiro">Departamento Financeiro</SelectItem>
+                          <SelectItem value="Toda a Instituição">Toda a Instituição</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  <label className="flex items-start gap-2 rounded-lg border border-dashed border-border bg-muted/30 p-3 cursor-pointer">
+                    <Checkbox checked={hasCta} onCheckedChange={v => setHasCta(!!v)} className="mt-0.5" />
+                    <div>
+                      <p className="text-xs font-medium text-foreground">Incluir botão de inscrição</p>
+                      <p className="text-[11px] text-muted-foreground">Permite aos destinatários inscreverem-se diretamente neste anúncio.</p>
+                    </div>
+                  </label>
+                </div>
+                <DialogFooter>
+                  <Button variant="ghost" onClick={() => setOpenCreate(false)}>Cancelar</Button>
+                  <Button onClick={handleCreate}>Publicar anúncio</Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </div>
-          <Dialog open={openCreate} onOpenChange={setOpenCreate}>
-            <DialogTrigger asChild>
-              <Button size="sm" className="h-9 gap-1.5 text-xs">
-                <Plus className="w-4 h-4" /> Criar Anúncio
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-lg">
-              <DialogHeader><DialogTitle>Novo anúncio</DialogTitle></DialogHeader>
-              <div className="space-y-3">
-                <div>
-                  <Label className="text-xs">Título</Label>
-                  <Input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} placeholder="Título do anúncio" />
-                </div>
-                <div>
-                  <Label className="text-xs">Conteúdo</Label>
-                  <Textarea rows={4} value={form.content} onChange={e => setForm({ ...form, content: e.target.value })} placeholder="Detalhes do anúncio…" />
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <Label className="text-xs">Categoria</Label>
-                    <Select value={form.type} onValueChange={(v: AnnType) => setForm({ ...form, type: v })}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="geral">Geral</SelectItem>
-                        <SelectItem value="urgente">Urgente</SelectItem>
-                        <SelectItem value="evento">Evento</SelectItem>
-                        <SelectItem value="academico">Académico</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label className="text-xs">Destinatários</Label>
-                    <Select value={form.department} onValueChange={v => setForm({ ...form, department: v })}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Departamento Financeiro">Departamento Financeiro</SelectItem>
-                        <SelectItem value="Toda a Instituição">Toda a Instituição</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <label className="flex items-start gap-2 rounded-lg border border-dashed border-border bg-muted/30 p-3 cursor-pointer">
-                  <Checkbox checked={hasCta} onCheckedChange={v => setHasCta(!!v)} className="mt-0.5" />
-                  <div>
-                    <p className="text-xs font-medium text-foreground">Incluir botão de inscrição</p>
-                    <p className="text-[11px] text-muted-foreground">Permite aos destinatários inscreverem-se diretamente neste anúncio.</p>
-                  </div>
-                </label>
-              </div>
-              <DialogFooter>
-                <Button variant="ghost" onClick={() => setOpenCreate(false)}>Cancelar</Button>
-                <Button onClick={handleCreate}>Publicar anúncio</Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        </div>
-
-
-
-
-        {/* Search */}
-        <div className="relative mb-3">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder="Pesquisar anúncios por título ou conteúdo…"
-            className="pl-10 h-11 text-sm bg-card border-border"
-          />
-        </div>
-
-        {/* Scope tabs + Category filter */}
-        <div className="flex flex-col lg:flex-row lg:items-center gap-3">
-          <div className="flex bg-muted/60 rounded-lg p-0.5 self-start overflow-x-auto">
-            {scopeTabs.map(t => (
-              <button key={t.key} onClick={() => setScope(t.key)}
-                className={cn("flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors whitespace-nowrap",
-                  scope === t.key ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground")}>
-                {t.label}
-                <span className={cn("text-[10px] px-1.5 rounded-full",
-                  scope === t.key ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground")}>
-                  {t.count}
-                </span>
-              </button>
-            ))}
-          </div>
-          <div className="flex-1" />
-          <Select value={typeFilter} onValueChange={(v: AnnType | "todos") => setTypeFilter(v)}>
-            <SelectTrigger className="w-[180px] h-9 text-xs bg-card">
-              <SelectValue placeholder="Categoria" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="todos">Todas as categorias</SelectItem>
-              <SelectItem value="urgente">Urgente</SelectItem>
-              <SelectItem value="evento">Evento</SelectItem>
-              <SelectItem value="academico">Académico</SelectItem>
-              <SelectItem value="geral">Geral</SelectItem>
-            </SelectContent>
-          </Select>
         </div>
       </div>
 
+      {/* ── Controls ─────────────────────────────── */}
+      <Card className="p-3 flex flex-col lg:flex-row lg:items-center gap-3">
+        <div className="relative flex-1 min-w-[220px]">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Pesquisar anúncios…"
+            className="pl-9 h-9 text-sm border-border"
+          />
+        </div>
+        <div className="flex bg-muted/60 rounded-lg p-0.5 overflow-x-auto">
+          {scopeTabs.map(t => (
+            <button key={t.key} onClick={() => setScope(t.key)}
+              className={cn("flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors whitespace-nowrap",
+                scope === t.key ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground")}>
+              {t.label}
+              <span className={cn("text-[10px] px-1.5 rounded-full tabular-nums",
+                scope === t.key ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground")}>
+                {t.count}
+              </span>
+            </button>
+          ))}
+        </div>
+        <Select value={typeFilter} onValueChange={(v: AnnType | "todos") => setTypeFilter(v)}>
+          <SelectTrigger className="w-[170px] h-9 text-xs">
+            <SelectValue placeholder="Categoria" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="todos">Todas as categorias</SelectItem>
+            <SelectItem value="urgente">Urgente</SelectItem>
+            <SelectItem value="evento">Evento</SelectItem>
+            <SelectItem value="academico">Académico</SelectItem>
+            <SelectItem value="geral">Geral</SelectItem>
+          </SelectContent>
+        </Select>
+      </Card>
+
+
+
 
       {/* ── Feed ────────────────────────────────── */}
-      <div className="space-y-3">
+      <div className="space-y-2.5">
         {filtered.length === 0 ? (
           <Card className="p-10 text-center">
             <Megaphone className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" />
@@ -261,53 +265,67 @@ export default function FinancasAnuncios() {
         ) : filtered.map(a => {
           const m = TYPE_META[a.type];
           const isSub = subscribed.has(a.id);
+          const initials = (a.author || a.department).split(" ").slice(0, 2).map(w => w[0]).join("").toUpperCase();
           return (
-            <Card key={a.id} className="overflow-hidden hover:shadow-md transition-shadow">
+            <Card key={a.id} className="group overflow-hidden hover:shadow-md hover:border-primary/20 transition-all">
               <div className="flex">
                 <div className={cn("w-1 shrink-0", m.dot)} />
-                <div className="flex-1 p-5">
-                  <div className="flex items-start justify-between gap-3 mb-2">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <Badge variant="outline" className={cn("text-[10px] font-medium", m.chip)}>{m.label}</Badge>
-                      <Badge variant="outline" className="text-[10px] bg-muted/40 gap-1">
+                <div className="flex-1 p-4">
+                  {/* meta row */}
+                  <div className="flex items-center justify-between gap-3 mb-2">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <Badge variant="outline" className={cn("text-[10px] font-semibold gap-1 px-1.5", m.chip)}>
+                        <span className={cn("w-1.5 h-1.5 rounded-full", m.dot)} />
+                        {m.label}
+                      </Badge>
+                      <Badge variant="outline" className="text-[10px] bg-muted/40 gap-1 px-1.5 font-normal">
                         <Building2 className="w-2.5 h-2.5" />{a.department}
                       </Badge>
-                      {a.isMine && <Badge variant="outline" className="text-[10px] bg-primary/10 text-primary border-primary/20">Criado por mim</Badge>}
+                      {a.isMine && (
+                        <Badge variant="outline" className="text-[10px] bg-primary/10 text-primary border-primary/20 px-1.5">
+                          Criado por mim
+                        </Badge>
+                      )}
                     </div>
-                    <div className="flex items-center gap-1 text-[11px] text-muted-foreground shrink-0">
+                    <div className="flex items-center gap-1 text-[11px] text-muted-foreground shrink-0 tabular-nums">
                       <CalendarIcon className="w-3 h-3" />{a.date}
                     </div>
                   </div>
-                  <h3 className="text-base font-semibold text-foreground mb-1.5 leading-tight">{a.title}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{a.content}</p>
-                  <div className="flex items-center justify-between gap-3 mt-3 pt-3 border-t border-border">
-                    {a.author && a.author !== a.department ? (
-                      <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-                        <UserIcon className="w-3 h-3" />
-                        <span className="font-medium text-foreground">{a.author}</span>
+
+                  {/* body */}
+                  <h3 className="text-[15px] font-semibold text-foreground leading-snug mb-1">{a.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">{a.content}</p>
+
+                  {/* footer */}
+                  <div className="flex items-center justify-between gap-3 mt-3 pt-2.5 border-t border-border/60">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className="w-6 h-6 rounded-full bg-primary/10 text-primary text-[10px] font-semibold flex items-center justify-center shrink-0">
+                        {initials || <UserIcon className="w-3 h-3" />}
                       </div>
-                    ) : <div />}
-                    <div className="flex items-center gap-2">
-                      <Button variant="outline" size="sm" className="h-7 text-[11px] gap-1">
-                        Ver detalhes
-                      </Button>
+                      <span className="text-[11px] text-muted-foreground truncate">
+                        Por <span className="font-medium text-foreground">{a.author || a.department}</span>
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
                       {a.cta === "inscrever" && (
                         isSub ? (
-                          <Badge className="text-[10px] gap-1 bg-emerald-100 text-emerald-700 border-emerald-200 border">
+                          <Badge variant="outline" className="text-[10px] gap-1 bg-emerald-50 text-emerald-700 border-emerald-200 h-7 px-2">
                             <CheckCircle2 className="w-3 h-3" /> Inscrito
                           </Badge>
-
                         ) : (
-                          <Button size="sm" className="h-7 text-[11px] gap-1" onClick={() => setSubscribed(s => new Set(s).add(a.id))}>
+                          <Button size="sm" className="h-7 text-[11px] gap-1 px-2.5" onClick={() => setSubscribed(s => new Set(s).add(a.id))}>
                             <CheckCircle2 className="w-3 h-3" /> Inscrever
                           </Button>
                         )
                       )}
                       {a.isMine && (
-                        <Button variant="ghost" size="sm" className="h-7 text-[11px] gap-1 text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => handleDelete(a.id)}>
-                          <Trash2 className="w-3 h-3" /> Apagar
+                        <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => handleDelete(a.id)}>
+                          <Trash2 className="w-3.5 h-3.5" />
                         </Button>
                       )}
+                      <Button variant="ghost" size="sm" className="h-7 text-[11px] gap-1 px-2 text-primary hover:text-primary hover:bg-primary/5">
+                        Ver detalhes <ArrowRight className="w-3 h-3 transition-transform group-hover:translate-x-0.5" />
+                      </Button>
                     </div>
                   </div>
                 </div>
@@ -319,3 +337,4 @@ export default function FinancasAnuncios() {
     </div>
   );
 }
+
