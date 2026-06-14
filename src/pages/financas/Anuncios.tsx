@@ -269,7 +269,7 @@ export default function FinancasAnuncios() {
             <AnnouncementCard key={a.id} id={a.id} unread={unread} onSeen={markRead}>
               <Card className={cn(
                 "group overflow-hidden hover:shadow-md transition-all",
-                unread ? "border-primary/40 bg-primary/[0.025] shadow-sm" : "hover:border-primary/30"
+                unread ? "border-primary/40 bg-primary/[0.025] shadow-sm" : "opacity-80 hover:opacity-100 hover:border-primary/30"
               )}>
 
               <div className="flex">
