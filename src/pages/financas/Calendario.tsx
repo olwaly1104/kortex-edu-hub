@@ -224,16 +224,36 @@ export default function FinancasCalendario() {
       <div className="rounded-xl border border-border bg-gradient-to-r from-primary/5 to-transparent p-6">
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div className="min-w-0">
-            <div className="flex items-center gap-2 text-[11px] uppercase tracking-wider text-muted-foreground font-medium mb-2">
-              <GraduationCap className="w-3.5 h-3.5" />Ano Letivo {ANO_LETIVO}
+            <div className="flex items-center gap-3 text-[11px] uppercase tracking-wider text-muted-foreground font-medium mb-2 flex-wrap">
+              <span className="flex items-center gap-1.5"><CalendarDays className="w-3.5 h-3.5" />{fmtLong(TODAY)}</span>
+              <span className="h-3 w-px bg-border" />
+              <span className="flex items-center gap-1.5"><GraduationCap className="w-3.5 h-3.5" />Ano Letivo {ANO_LETIVO}</span>
             </div>
             <h1 className="text-2xl font-bold text-foreground">Calendário</h1>
             <p className="text-sm text-muted-foreground mt-1">Agenda institucional do Departamento Financeiro</p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <Button variant="outline" size="sm" className="h-9 gap-1.5 text-xs" onClick={() => { setCursor(TODAY); setSelectedDate(TODAY); }}>
-              Hoje
-            </Button>
+            <div className="flex items-center bg-muted/60 rounded-lg p-0.5">
+              <button onClick={() => navigateBy(-1)} className="p-1.5 rounded-md hover:bg-card transition-colors">
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <span className="px-3 text-xs font-medium text-foreground min-w-[150px] text-center">
+                {view === "week" ? weekLabel : monthLabel}
+              </span>
+              <button onClick={() => navigateBy(1)} className="p-1.5 rounded-md hover:bg-card transition-colors">
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="flex bg-muted/60 rounded-lg p-0.5">
+              {(["week", "month"] as const).map(v => (
+                <button key={v} onClick={() => setView(v)}
+                  className={cn("px-3 py-1.5 rounded-md text-xs font-medium transition-colors",
+                    view === v ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground")}>
+                  {v === "week" ? "Semana" : "Mês"}
+                </button>
+              ))}
+            </div>
+          </div>
             <div className="flex items-center bg-muted/60 rounded-lg p-0.5">
               <button onClick={() => navigateBy(-1)} className="p-1.5 rounded-md hover:bg-card transition-colors">
                 <ChevronLeft className="w-4 h-4" />
