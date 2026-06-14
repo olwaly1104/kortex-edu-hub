@@ -1184,3 +1184,85 @@ function ModalityBanner({ modality, location, link }: { modality?: "presencial" 
     </div>
   );
 }
+
+/* ── All Requests dialog ── */
+function AllRequestsDialog({ open, onClose, requests, onAccept, onDecline, onDetail, onParticipants }: {
+  open: boolean;
+  onClose: () => void;
+  requests: MeetingRequest[];
+  onAccept: (id: string) => void;
+  onDecline: (id: string) => void;
+  onDetail: (r: MeetingRequest) => void;
+  onParticipants: (r: MeetingRequest) => void;
+}) {
+  const [filter, setFilter] = useState<"all" | MeetingRequest["status"]>("all");
+  const sorted = [...requests].sort((a, b) => b.requestedAt.localeCompare(a.requestedAt));
+  const filtered = filter === "all" ? sorted : sorted.filter(r => r.status === filter);
+
+  const counts = {
+    all: requests.length,
+    pending: requests.filter(r => r.status === "pending").length,
+    accepted: requests.filter(r => r.status === "accepted").length,
+    declined: requests.filter(r => r.status === "declined").length,
+  };
+
+  const tabs: { v: "all" | MeetingRequest["status"]; label: string; count: number }[] = [
+    { v: "all", label: "Todos", count: counts.all },
+    { v: "pending", label: "Pendentes", count: counts.pending },
+    { v: "accepted", label: "Aceites", count: counts.accepted },
+    { v: "declined", label: "Recusados", count: counts.declined },
+  ];
+
+  return (
+    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="sm:max-w-4xl p-0 gap-0 overflow-hidden">
+        <div className="px-6 py-4 border-b bg-muted/10">
+          <DialogHeader className="space-y-1">
+            <DialogTitle className="text-lg font-bold flex items-center gap-2">
+              <Bell className="w-4 h-4 text-primary" />
+              Pedidos de Reunião
+            </DialogTitle>
+            <DialogDescription className="text-xs">
+              Histórico completo de pedidos — pendentes, aceites e recusados.
+            </DialogDescription>
+          </DialogHeader>
+        </div>
+
+        <div className="px-6 pt-4 pb-2 flex items-center gap-1.5 flex-wrap border-b">
+          {tabs.map(t => (
+            <button key={t.v} onClick={() => setFilter(t.v)}
+              className={cn("inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-colors border",
+                filter === t.v ? "bg-primary text-primary-foreground border-primary" : "bg-card text-foreground border-border hover:bg-muted/40")}>
+              {t.label}
+              <span className={cn("text-[10px] px-1.5 py-0.5 rounded-full font-bold",
+                filter === t.v ? "bg-primary-foreground/20 text-primary-foreground" : "bg-muted text-muted-foreground")}>
+                {t.count}
+              </span>
+            </button>
+          ))}
+        </div>
+
+        <div className="px-6 py-5 max-h-[60vh] overflow-y-auto">
+          {filtered.length === 0 ? (
+            <div className="text-center py-10">
+              <Bell className="w-8 h-8 text-muted-foreground/40 mx-auto mb-2" />
+              <p className="text-sm text-muted-foreground">Sem pedidos para mostrar.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+              {filtered.map(r => (
+                <RequestCard key={r.id} r={r}
+                  readOnly={r.status !== "pending"}
+                  onAccept={() => onAccept(r.id)}
+                  onDecline={() => onDecline(r.id)}
+                  onDetail={() => onDetail(r)}
+                  onParticipants={() => onParticipants(r)} />
+              ))}
+            </div>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
