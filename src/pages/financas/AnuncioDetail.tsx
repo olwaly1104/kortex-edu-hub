@@ -64,12 +64,18 @@ export default function FinancasAnuncioDetail() {
 
       {/* Main document card */}
       <div className="rounded-lg border border-border bg-card overflow-hidden">
-        {/* Header strip */}
-        <div className="px-7 pt-5 pb-4 border-b border-border">
-          <div className="flex items-center justify-end gap-4">
+        {/* Header: title + document pill */}
+        <div className="px-6 pt-5 pb-5 border-b border-border">
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0 flex-1">
+              <Badge variant="outline" className={cn("text-[10px] font-semibold gap-1 px-2 py-0.5 uppercase tracking-wider mb-2", m.chip)}>
+                <span className={cn("w-1.5 h-1.5 rounded-full", m.dot)} />
+                {m.label}
+              </Badge>
+              <h1 className="text-[24px] font-bold text-foreground leading-tight tracking-tight">{ann.title}</h1>
+            </div>
 
-
-            {/* Right: Document pill (matches GAP) */}
+            {/* Document pill (GAP-style) */}
             <div className="inline-flex items-center gap-2 pl-1.5 pr-1 py-1 rounded-md border border-border bg-background shadow-sm shrink-0">
               <div className="w-6 h-6 rounded bg-red-50 border border-red-200 flex items-center justify-center shrink-0">
                 <FileText className="w-3 h-3 text-red-600" />
@@ -135,120 +141,110 @@ export default function FinancasAnuncioDetail() {
           </div>
         </div>
 
-        {/* 2-col body */}
-        <div className="grid md:grid-cols-[260px_1fr] divide-x divide-border">
-          {/* LEFT — meta */}
-          <aside className="p-5 space-y-5 bg-muted/15">
-            <MetaRow
-              icon={<UserIcon className="w-3 h-3" />}
-              label="Publicado por"
+        {/* Meta strip */}
+        <div className="px-6 py-3 border-b border-border bg-muted/20 grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-3">
+          <MetaCell
+            icon={<UserIcon className="w-3 h-3" />}
+            label="Publicado por"
+            value={
+              <span className="inline-flex items-center gap-1.5">
+                <span className="w-5 h-5 rounded-full bg-primary/10 text-primary text-[9px] font-bold flex items-center justify-center ring-1 ring-primary/15">
+                  {initials}
+                </span>
+                <span className="truncate">{ann.author}</span>
+              </span>
+            }
+          />
+          <MetaCell
+            icon={<Building2 className="w-3 h-3" />}
+            label="Departamento"
+            value={
+              <Link
+                to={`/financas/anuncios?dep=${encodeURIComponent(ann.department)}`}
+                className="hover:text-primary hover:underline underline-offset-2 truncate"
+              >
+                {ann.department}
+              </Link>
+            }
+          />
+          <MetaCell
+            icon={<CalendarIcon className="w-3 h-3" />}
+            label="Publicação"
+            value={<span className="tabular-nums">{ann.date}</span>}
+          />
+          {ann.ctaDeadline ? (
+            <MetaCell
+              icon={<Clock className="w-3 h-3" />}
+              label="Data limite"
               value={
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-full bg-primary/10 text-primary text-[10px] font-bold flex items-center justify-center ring-1 ring-primary/15">
-                    {initials}
-                  </div>
-                  <span className="text-[12px] font-semibold text-foreground truncate">{ann.author}</span>
-                </div>
+                <span className="tabular-nums font-semibold">
+                  {ann.ctaDeadline}{ann.ctaDeadlineTime ? ` · ${ann.ctaDeadlineTime}` : ""}
+                </span>
               }
             />
-            <MetaRow
-              icon={<Building2 className="w-3 h-3" />}
-              label="Departamento"
-              value={
-                <Link
-                  to={`/financas/anuncios?dep=${encodeURIComponent(ann.department)}`}
-                  className="text-[12px] font-medium text-foreground hover:text-primary hover:underline underline-offset-2"
-                >
-                  {ann.department}
-                </Link>
-              }
-            />
-            <MetaRow
-              icon={<CalendarIcon className="w-3 h-3" />}
-              label="Data de publicação"
-              value={<span className="text-[12px] font-medium text-foreground tabular-nums">{ann.date}</span>}
-            />
-            {ann.ctaDeadline && (
-              <MetaRow
-                icon={<Clock className="w-3 h-3" />}
-                label="Data limite"
-                value={
-                  <span className="text-[12px] font-semibold text-foreground tabular-nums">
-                    {ann.ctaDeadline}{ann.ctaDeadlineTime ? ` - ${ann.ctaDeadlineTime}` : ""}
-                  </span>
-                }
-              />
-            )}
-            <MetaRow
+          ) : (
+            <MetaCell
               icon={<Tag className="w-3 h-3" />}
               label="Referência"
               value={
                 <button
                   type="button"
                   onClick={() => { navigator.clipboard?.writeText(ann.id); toast({ title: "ID copiado", description: ann.id }); }}
-                  className="text-[11px] font-mono font-semibold text-foreground hover:text-primary tabular-nums"
+                  className="font-mono tabular-nums hover:text-primary"
                 >
                   {ann.id.toUpperCase()}
                 </button>
               }
             />
-
-          </aside>
-
-          {/* RIGHT — title + body */}
-          <div className="p-7">
-            <Badge variant="outline" className={cn("text-[10px] font-semibold gap-1 px-2 py-0.5 uppercase tracking-wider mb-3", m.chip)}>
-              <span className={cn("w-1.5 h-1.5 rounded-full", m.dot)} />
-              {m.label}
-            </Badge>
-
-            <h1 className="text-[26px] font-bold text-foreground leading-tight tracking-tight">{ann.title}</h1>
-            <div className="h-px bg-border my-5" />
-            <article className="max-w-none">
-              <p className="text-[15px] leading-7 text-foreground whitespace-pre-line">{ann.content}</p>
-            </article>
-
-            {ann.cta === "inscrever" && (
-              <div className="mt-7 rounded-lg border border-primary/25 bg-primary/[0.04] p-5">
-                <div className="flex items-start justify-between gap-4 flex-wrap">
-                  <div className="space-y-1">
-                    <p className="text-[11px] uppercase tracking-wider font-semibold text-primary">Inscrições abertas</p>
-                    <p className="text-sm font-semibold text-foreground">Confirme a sua participação</p>
-                    {ann.ctaDeadline && (
-                      <p className="text-[12px] text-muted-foreground flex items-center gap-1.5 mt-1">
-                        <Clock className="w-3 h-3" />
-                        Data limite: <span className="font-semibold text-foreground tabular-nums">{ann.ctaDeadline}{ann.ctaDeadlineTime ? ` - ${ann.ctaDeadlineTime}` : ""}</span>
-                      </p>
-                    )}
-                  </div>
-                  {subscribed ? (
-                    <Badge variant="outline" className="text-[11px] gap-1 bg-emerald-50 text-emerald-700 border-emerald-200 h-9 px-3">
-                      <CheckCircle2 className="w-3.5 h-3.5" /> Inscrito
-                    </Badge>
-                  ) : (
-                    <Button size="sm" className="h-9 gap-1.5" onClick={() => setSubscribed(true)}>
-                      <CheckCircle2 className="w-4 h-4" /> Inscrever-me
-                    </Button>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
+          )}
         </div>
 
+        {/* Body */}
+        <div className="px-6 py-6">
+          <article className="max-w-3xl">
+            <p className="text-[15px] leading-7 text-foreground whitespace-pre-line">{ann.content}</p>
+          </article>
+
+          {ann.cta === "inscrever" && (
+            <div className="mt-6 max-w-3xl rounded-lg border border-primary/25 bg-primary/[0.04] p-4">
+              <div className="flex items-center justify-between gap-4 flex-wrap">
+                <div className="space-y-0.5">
+                  <p className="text-[10px] uppercase tracking-wider font-semibold text-primary">Inscrições abertas</p>
+                  <p className="text-sm font-semibold text-foreground">Confirme a sua participação</p>
+                  {ann.ctaDeadline && (
+                    <p className="text-[12px] text-muted-foreground flex items-center gap-1.5">
+                      <Clock className="w-3 h-3" />
+                      Data limite: <span className="font-semibold text-foreground tabular-nums">{ann.ctaDeadline}{ann.ctaDeadlineTime ? ` - ${ann.ctaDeadlineTime}` : ""}</span>
+                    </p>
+                  )}
+                </div>
+                {subscribed ? (
+                  <Badge variant="outline" className="text-[11px] gap-1 bg-emerald-50 text-emerald-700 border-emerald-200 h-9 px-3">
+                    <CheckCircle2 className="w-3.5 h-3.5" /> Inscrito
+                  </Badge>
+                ) : (
+                  <Button size="sm" className="h-9 gap-1.5" onClick={() => setSubscribed(true)}>
+                    <CheckCircle2 className="w-4 h-4" /> Inscrever-me
+                  </Button>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
+
 
   );
 }
 
-function MetaRow({ icon, label, value }: { icon: React.ReactNode; label: string; value: React.ReactNode }) {
+function MetaCell({ icon, label, value }: { icon: React.ReactNode; label: string; value: React.ReactNode }) {
   return (
     <div className="min-w-0">
-      <p className="text-[9.5px] uppercase tracking-[0.14em] font-semibold text-muted-foreground/80 flex items-center gap-1 mb-1.5">
+      <p className="text-[9.5px] uppercase tracking-[0.14em] font-semibold text-muted-foreground/80 flex items-center gap-1 mb-1">
         {icon}{label}
       </p>
-      <div className="min-w-0">{value}</div>
+      <div className="text-[12px] font-medium text-foreground min-w-0 truncate">{value}</div>
     </div>
   );
 }
