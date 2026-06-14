@@ -828,23 +828,10 @@ export default function FinancasSolicitacaoDetail() {
                     );
                   })()}
 
-                  <DialogFooter className="px-5 py-2.5 border-t border-border bg-muted/20 gap-2 sm:gap-2 sm:justify-between">
+                  <DialogFooter className="px-5 py-2.5 border-t border-border bg-muted/20 gap-2 sm:gap-2">
                     <Button variant="ghost" size="sm" className="h-7 text-[12px] gap-1" onClick={() => setActionStep(0)}>
                       <ChevronLeft className="w-3.5 h-3.5" /> Voltar
                     </Button>
-                    <div className="flex items-center gap-2">
-                      <DialogClose asChild>
-                        <Button variant="outline" size="sm" className="h-7 text-[12px]">Cancelar</Button>
-                      </DialogClose>
-                      <Button
-                        size="sm"
-                        className={cn("h-7 text-[12px] gap-1.5", pm.tone)}
-                        onClick={confirmAction}
-                        disabled={!declarationChecked}
-                      >
-                        <pm.icon className="w-3.5 h-3.5" /> Confirmar
-                      </Button>
-                    </div>
                   </DialogFooter>
                 </>
               )}
