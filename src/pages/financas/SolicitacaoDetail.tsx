@@ -781,6 +781,7 @@ export default function FinancasSolicitacaoDetail() {
                           </div>
                         </div>
                       </div>
+                      </>
                     );
                   })()}
 
