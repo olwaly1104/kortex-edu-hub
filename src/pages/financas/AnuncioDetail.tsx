@@ -160,14 +160,23 @@ export default function FinancasAnuncioDetail() {
 
         <div className="grid md:grid-cols-[1fr_280px] divide-x divide-border">
           {/* LEFT — descrição body */}
-          <div className="p-6 min-w-0">
-            <h2 className="text-[11px] uppercase tracking-[0.16em] font-semibold text-muted-foreground mb-3">Conteúdo</h2>
-            <article className="max-w-none">
-              <p className="text-[14.5px] leading-7 text-foreground whitespace-pre-line">{ann.content}</p>
-            </article>
+          <div className="p-6 min-w-0 space-y-6">
+            {/* Lead / pull-quote */}
+            <div className="border-l-[3px] border-primary/60 pl-3.5 py-1">
+              <p className="text-[13px] leading-6 italic text-muted-foreground">
+                {(ann.content.split(/(?<=[.!?])\s/)[0] || ann.content).slice(0, 180)}
+              </p>
+            </div>
+
+            <div>
+              <h2 className="text-[11px] uppercase tracking-[0.16em] font-semibold text-muted-foreground mb-3">Conteúdo</h2>
+              <article className="max-w-none">
+                <p className="text-[14.5px] leading-7 text-foreground whitespace-pre-line">{ann.content}</p>
+              </article>
+            </div>
 
             {ann.cta === "inscrever" && (
-              <div className="mt-6 rounded-lg border border-primary/25 bg-primary/[0.04] p-4">
+              <div className="rounded-lg border border-primary/25 bg-primary/[0.04] p-4">
                 <div className="flex items-center justify-between gap-4 flex-wrap">
                   <div className="space-y-0.5">
                     <p className="text-[10px] uppercase tracking-wider font-semibold text-primary">Inscrições abertas</p>
@@ -191,56 +200,192 @@ export default function FinancasAnuncioDetail() {
                 </div>
               </div>
             )}
+
+            {/* Documentos anexos */}
+            <div>
+              <h2 className="text-[11px] uppercase tracking-[0.16em] font-semibold text-muted-foreground mb-2 flex items-center gap-1.5">
+                <Paperclip className="w-3 h-3" /> Documentos anexos
+              </h2>
+              <div className="rounded-md border border-border divide-y divide-border overflow-hidden">
+                {[
+                  { name: `Anuncio-${ann.id.toUpperCase()}.pdf`, size: "184 KB" },
+                  ...(ann.cta === "inscrever" ? [{ name: "Programa-detalhado.pdf", size: "312 KB" }] : []),
+                ].map((f, i) => (
+                  <div key={i} className="flex items-center gap-3 px-3 py-2.5 bg-background hover:bg-muted/40 transition-colors">
+                    <div className="w-7 h-7 rounded bg-red-50 border border-red-200 flex items-center justify-center shrink-0">
+                      <FileText className="w-3.5 h-3.5 text-red-600" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[12.5px] font-semibold text-foreground truncate">{f.name}</p>
+                      <p className="text-[10.5px] text-muted-foreground tabular-nums">PDF · {f.size}</p>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 px-2 text-[11px] gap-1"
+                      onClick={() => toast({ title: "Download iniciado", description: f.name })}
+                    >
+                      <Download className="w-3 h-3" /> Baixar
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Partilhado com inline */}
+            <Dialog>
+              <div className="flex items-center justify-between gap-3 pt-1">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="flex -space-x-1.5">
+                    {sharedWith.slice(0, 4).map((p, i) => {
+                      const ini = p.name.split(" ").slice(0, 2).map(n => n[0]).join("").toUpperCase();
+                      return (
+                        <div key={i} className="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[10px] font-semibold ring-2 ring-card">
+                          {ini}
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <p className="text-[12px] text-muted-foreground">
+                    <span className="font-semibold text-foreground">{sharedWith.length} pessoas</span> com acesso
+                  </p>
+                </div>
+                <DialogTrigger asChild>
+                  <Button variant="ghost" size="sm" className="h-7 px-2 text-[11px] gap-1">
+                    <Users className="w-3 h-3" /> Ver todos
+                  </Button>
+                </DialogTrigger>
+              </div>
+              <DialogContent className="max-w-md">
+                <DialogHeader>
+                  <DialogTitle className="text-base flex items-center gap-2">
+                    <Share2 className="w-4 h-4 text-primary" /> Partilhado com {sharedWith.length} pessoas
+                  </DialogTitle>
+                  <DialogDescription className="text-[12px]">
+                    Pessoas com acesso ao documento <span className="font-medium text-foreground">Anuncio-{ann.id.toUpperCase()}</span>.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-2 mt-2">
+                  {sharedWith.map((p, i) => {
+                    const ini = p.name.split(" ").slice(0, 2).map(n => n[0]).join("").toUpperCase();
+                    return (
+                      <div key={i} className="flex items-center gap-3 px-3 py-2.5 rounded-md border border-border bg-muted/20">
+                        <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[11px] font-semibold ring-1 ring-primary/15 shrink-0">
+                          {ini}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-[13px] font-semibold text-foreground leading-tight truncate">{p.name}</p>
+                          <p className="text-[11px] text-muted-foreground mt-0.5">{p.role}</p>
+                        </div>
+                        <Badge variant="outline" className="text-[10px] font-medium px-2 py-0.5 shrink-0">{p.access}</Badge>
+                      </div>
+                    );
+                  })}
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
 
           {/* RIGHT — Dados */}
-          <aside className="p-5 bg-muted/15 space-y-4">
-            <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground font-semibold">Dados</p>
-
-
-
-              <MetaCell
-                icon={<CalendarIcon className="w-3 h-3" />}
-                label="Data de publicação"
-                value={<span className="tabular-nums">{ann.date}</span>}
-              />
-              <MetaCell
-                icon={<UserIcon className="w-3 h-3" />}
-                label="Publicado por"
-                value={<span className="truncate">{ann.author}</span>}
-              />
-              <MetaCell
-                icon={<Building2 className="w-3 h-3" />}
-                label="Departamento"
-                value={
-                  <Link
-                    to={`/financas/anuncios?dep=${encodeURIComponent(ann.department)}`}
-                    className="hover:text-primary hover:underline underline-offset-2 truncate"
-                  >
-                    {ann.department}
-                  </Link>
-                }
-              />
-              <MetaCell
-                icon={<Tag className="w-3 h-3" />}
-                label="Categoria"
-                value={m.label}
-              />
-              {ann.ctaDeadline && (
+          <aside className="p-5 bg-muted/15">
+            <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground font-semibold mb-3">Dados</p>
+            <div className="divide-y divide-border/60">
+              <div className="pb-3">
                 <MetaCell
-                  icon={<Clock className="w-3 h-3" />}
-                  label="Data limite"
+                  icon={<CalendarIcon className="w-3 h-3" />}
+                  label="Data de publicação"
+                  value={<span className="tabular-nums">{ann.date}</span>}
+                />
+              </div>
+              <div className="py-3">
+                <MetaCell
+                  icon={<UserIcon className="w-3 h-3" />}
+                  label="Publicado por"
+                  value={<span className="truncate">{ann.author}</span>}
+                />
+              </div>
+              <div className="py-3">
+                <MetaCell
+                  icon={<Building2 className="w-3 h-3" />}
+                  label="Departamento"
                   value={
-                    <span className="tabular-nums font-semibold">
-                      {ann.ctaDeadline}{ann.ctaDeadlineTime ? ` · ${ann.ctaDeadlineTime}` : ""}
+                    <Link
+                      to={`/financas/anuncios?dep=${encodeURIComponent(ann.department)}`}
+                      className="hover:text-primary hover:underline underline-offset-2 truncate"
+                    >
+                      {ann.department}
+                    </Link>
+                  }
+                />
+              </div>
+              <div className="py-3">
+                <MetaCell
+                  icon={<Tag className="w-3 h-3" />}
+                  label="Categoria"
+                  value={m.label}
+                />
+              </div>
+              <div className="py-3">
+                <MetaCell
+                  icon={<Circle className="w-3 h-3" />}
+                  label="Estado"
+                  value={
+                    <span className="inline-flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                      Publicado
                     </span>
                   }
                 />
+              </div>
+              {ann.ctaDeadline && (
+                <div className="pt-3">
+                  <MetaCell
+                    icon={<Clock className="w-3 h-3" />}
+                    label="Data limite"
+                    value={
+                      <span className="tabular-nums font-semibold">
+                        {ann.ctaDeadline}{ann.ctaDeadlineTime ? ` · ${ann.ctaDeadlineTime}` : ""}
+                      </span>
+                    }
+                  />
+                </div>
               )}
+            </div>
           </aside>
 
         </div>
       </div>
+
+      {/* Related */}
+      {related.length > 0 && (
+        <section className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h2 className="text-[13px] font-semibold text-foreground">Mais do mesmo departamento</h2>
+            <Link to={`/financas/anuncios?dep=${encodeURIComponent(ann.department)}`} className="text-[11.5px] text-primary hover:underline font-medium">
+              Ver todos
+            </Link>
+          </div>
+          <div className="grid sm:grid-cols-2 gap-3">
+            {related.map(r => {
+              const rm = TYPE_META[r.type];
+              return (
+                <Link
+                  key={r.id}
+                  to={`/financas/anuncios/${r.id}`}
+                  className="rounded-lg border border-border bg-card p-3.5 hover:border-primary/40 hover:shadow-sm transition-all space-y-2"
+                >
+                  <Badge variant="outline" className="text-[9.5px] font-semibold px-1.5 py-0 gap-1 uppercase tracking-wider">
+                    <span className={cn("w-1 h-1 rounded-full", rm.dot)} />
+                    {rm.label}
+                  </Badge>
+                  <p className="text-[13px] font-semibold text-foreground leading-snug line-clamp-2">{r.title}</p>
+                  <p className="text-[11px] text-muted-foreground tabular-nums">{r.date}</p>
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+      )}
     </div>
 
 
