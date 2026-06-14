@@ -358,7 +358,6 @@ export default function FinancasCalendario() {
             </div>
           </div>
 
-          {/* Result label above calendar */}
           {(() => {
             const periodEntriesCount = (view === "week"
               ? weekDays.flatMap(d => eventsOnDate(d))
@@ -367,127 +366,133 @@ export default function FinancasCalendario() {
                   return dd.getMonth() === cursorD.getMonth() && dd.getFullYear() === cursorD.getFullYear();
                 })
             ).length;
-            return (
-              <div className="px-1">
-                <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-0.5">
-                  {view === "week" ? "Semana" : "Mês"}
-                </p>
-                <div className="flex items-end justify-between gap-3">
-                  <h3 className="text-lg font-bold text-foreground capitalize">
-                    {view === "week" ? weekLabel : `${MONTH_NAMES[cursorD.getMonth()]} ${cursorD.getFullYear()}`}
-                  </h3>
-                  <Badge variant="outline" className="h-7 px-2.5 gap-1.5 text-xs font-semibold shrink-0">
-                    <CalendarRange className="w-3.5 h-3.5 text-muted-foreground" />
-                    {periodEntriesCount} {periodEntriesCount === 1 ? "entrada" : "entradas"}
-                  </Badge>
+            const periodLabel = view === "week" ? weekLabel : `${MONTH_NAMES[cursorD.getMonth()]} ${cursorD.getFullYear()}`;
+
+            const PeriodHeader = (
+              <div className="px-4 py-3 border-b bg-muted/10 flex items-end justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-0.5">
+                    {view === "week" ? "Semana" : "Mês"}
+                  </p>
+                  <h3 className="text-base font-bold text-foreground capitalize leading-tight truncate">{periodLabel}</h3>
                 </div>
+                <Badge variant="outline" className="h-7 px-2.5 gap-1.5 text-xs font-semibold shrink-0">
+                  <CalendarRange className="w-3.5 h-3.5 text-muted-foreground" />
+                  {periodEntriesCount} {periodEntriesCount === 1 ? "entrada" : "entradas"}
+                </Badge>
               </div>
             );
-          })()}
 
-          {view === "week" ? (
-            <div className="space-y-3">
+            if (view === "week") {
+              return (
+                <div className="space-y-3">
+                  <Card className="overflow-hidden">
+                    {PeriodHeader}
+                    <div className="grid grid-cols-7 bg-muted/5">
+                      {weekDays.map(d => {
+                        const dD = parseISO(d);
+                        const isToday = d === TODAY;
+                        const isSel = d === selectedDate;
+                        const count = eventsOnDate(d).length;
+                        return (
+                          <button key={d} onClick={() => setSelectedDate(d)}
+                            className={cn("relative py-2.5 text-center border-l first:border-l-0 transition-colors",
+                              isSel ? "bg-primary/10" : "hover:bg-primary/5")}>
+                            <p className="text-[9px] uppercase tracking-wider text-muted-foreground font-medium">
+                              {DAYS_SHORT[(dD.getDay() + 6) % 7]}
+                            </p>
+                            <p className={cn("text-sm font-bold mt-0.5 w-7 h-7 mx-auto flex items-center justify-center rounded-full transition-colors",
+                              isToday ? "bg-primary text-primary-foreground" :
+                              isSel ? "ring-2 ring-primary text-foreground" : "text-foreground"
+                            )}>{dD.getDate()}</p>
+                            {count > 0 && (
+                              <div className="flex items-center justify-center gap-0.5 mt-1 h-1">
+                                {Array.from({ length: Math.min(count, 4) }).map((_, i) => (
+                                  <span key={i} className="w-1 h-1 rounded-full bg-primary/60" />
+                                ))}
+                              </div>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </Card>
+
+                  <Card className="overflow-hidden">
+                    <div className="px-4 py-2.5 border-b bg-muted/5 flex items-center justify-between">
+                      <div>
+                        <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Agenda do dia</p>
+                        <h3 className="text-sm font-bold text-foreground capitalize">{fmtLong(selectedDate)}</h3>
+                      </div>
+                      <Badge variant="outline" className="text-[10px]">
+                        {selectedEvents.length} entrada{selectedEvents.length !== 1 ? "s" : ""}
+                      </Badge>
+                    </div>
+
+                    {selectedEvents.length === 0 ? (
+                      <div className="p-8 text-center">
+                        <CalendarDays className="w-7 h-7 text-muted-foreground/40 mx-auto mb-2" />
+                        <p className="text-xs text-muted-foreground">Sem eventos neste dia</p>
+                        <Button size="sm" variant="outline" className="mt-3 gap-1.5 text-xs"
+                          onClick={() => { setForm(f => ({ ...f, date: selectedDate })); setOpenCreate(true); }}>
+                          <Plus className="w-3.5 h-3.5" /> Adicionar
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="divide-y divide-border max-h-[480px] overflow-y-auto">
+                        {selectedEvents.map(ev => (
+                          <EventRow key={ev.id} ev={ev} onOpen={() => setDetailEvent(ev)} onParticipants={() => openParticipants(ev.title, ev.participants, ev.id)} />
+                        ))}
+                      </div>
+                    )}
+                  </Card>
+                </div>
+              );
+            }
+
+            return (
               <Card className="overflow-hidden">
-                <div className="grid grid-cols-7 bg-muted/10">
-                  {weekDays.map(d => {
-                    const dD = parseISO(d);
-                    const isToday = d === TODAY;
-                    const isSel = d === selectedDate;
-                    const count = eventsOnDate(d).length;
+                {PeriodHeader}
+                <div className="grid grid-cols-7 border-b">
+                  {DAYS_SHORT.map(d => (
+                    <div key={d} className="py-2.5 text-center text-[10px] font-medium text-muted-foreground uppercase tracking-widest bg-muted/20 border-l first:border-l-0">{d}</div>
+                  ))}
+                </div>
+                <div className="grid grid-cols-7">
+                  {Array.from({ length: monthStartOffset }).map((_, i) => (
+                    <div key={`e${i}`} className="min-h-[100px] border-t border-l first:border-l-0 bg-muted/5" />
+                  ))}
+                  {Array.from({ length: daysInMonth }, (_, i) => i + 1).map(day => {
+                    const dateStr = toISO(new Date(cursorD.getFullYear(), cursorD.getMonth(), day));
+                    const dayEvents = eventsOnDate(dateStr);
+                    const isToday = dateStr === TODAY;
+                    const isSel = dateStr === selectedDate;
                     return (
-                      <button key={d} onClick={() => setSelectedDate(d)}
-                        className={cn("relative py-2.5 text-center border-l first:border-l-0 transition-colors",
-                          isSel ? "bg-primary/10" : "hover:bg-primary/5")}>
-                        <p className="text-[9px] uppercase tracking-wider text-muted-foreground font-medium">
-                          {DAYS_SHORT[(dD.getDay() + 6) % 7]}
-                        </p>
-                        <p className={cn("text-sm font-bold mt-0.5 w-7 h-7 mx-auto flex items-center justify-center rounded-full transition-colors",
-                          isToday ? "bg-primary text-primary-foreground" :
-                          isSel ? "ring-2 ring-primary text-foreground" : "text-foreground"
-                        )}>{dD.getDate()}</p>
-                        {count > 0 && (
-                          <div className="flex items-center justify-center gap-0.5 mt-1 h-1">
-                            {Array.from({ length: Math.min(count, 4) }).map((_, i) => (
-                              <span key={i} className="w-1 h-1 rounded-full bg-primary/60" />
-                            ))}
-                          </div>
-                        )}
-                      </button>
+                      <div key={day} onClick={() => setSelectedDate(dateStr)}
+                        className={cn("min-h-[100px] border-t border-l p-1.5 cursor-pointer transition-colors",
+                          isSel ? "bg-primary/10" : "hover:bg-primary/5"
+                        )}>
+                        <p className={cn("text-xs font-medium mb-1 w-6 h-6 flex items-center justify-center rounded-full",
+                          isToday ? "bg-primary text-primary-foreground" : "text-foreground")}>{day}</p>
+                        <div className="space-y-0.5">
+                          {dayEvents.slice(0, 3).map(ev => {
+                            const m = TYPE_META[ev.type];
+                            return (
+                              <div key={ev.id} onClick={(e) => { e.stopPropagation(); setDetailEvent(ev); }}
+                                className={cn("text-[9px] px-1.5 py-0.5 rounded truncate border font-medium cursor-pointer", m.soft, m.text)}>
+                                {ev.title}
+                              </div>
+                            );
+                          })}
+                          {dayEvents.length > 3 && <p className="text-[9px] text-muted-foreground pl-1">+{dayEvents.length - 3}</p>}
+                        </div>
+                      </div>
                     );
                   })}
                 </div>
               </Card>
-
-              <Card className="overflow-hidden">
-                <div className="px-4 py-2.5 border-b bg-muted/5 flex items-center justify-between">
-                  <div>
-                    <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Agenda do dia</p>
-                    <h3 className="text-sm font-bold text-foreground capitalize">{fmtLong(selectedDate)}</h3>
-                  </div>
-                  <Badge variant="outline" className="text-[10px]">
-                    {selectedEvents.length} entrada{selectedEvents.length !== 1 ? "s" : ""}
-                  </Badge>
-                </div>
-
-                {selectedEvents.length === 0 ? (
-                  <div className="p-8 text-center">
-                    <CalendarDays className="w-7 h-7 text-muted-foreground/40 mx-auto mb-2" />
-                    <p className="text-xs text-muted-foreground">Sem eventos neste dia</p>
-                    <Button size="sm" variant="outline" className="mt-3 gap-1.5 text-xs"
-                      onClick={() => { setForm(f => ({ ...f, date: selectedDate })); setOpenCreate(true); }}>
-                      <Plus className="w-3.5 h-3.5" /> Adicionar
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="divide-y divide-border max-h-[480px] overflow-y-auto">
-                    {selectedEvents.map(ev => (
-                      <EventRow key={ev.id} ev={ev} onOpen={() => setDetailEvent(ev)} onParticipants={() => openParticipants(ev.title, ev.participants, ev.id)} />
-                    ))}
-                  </div>
-                )}
-              </Card>
-            </div>
-          ) : (
-            <Card className="overflow-hidden">
-              <div className="grid grid-cols-7 border-b">
-                {DAYS_SHORT.map(d => (
-                  <div key={d} className="py-2.5 text-center text-[10px] font-medium text-muted-foreground uppercase tracking-widest bg-muted/20 border-l first:border-l-0">{d}</div>
-                ))}
-              </div>
-              <div className="grid grid-cols-7">
-                {Array.from({ length: monthStartOffset }).map((_, i) => (
-                  <div key={`e${i}`} className="min-h-[100px] border-t border-l first:border-l-0 bg-muted/5" />
-                ))}
-                {Array.from({ length: daysInMonth }, (_, i) => i + 1).map(day => {
-                  const dateStr = toISO(new Date(cursorD.getFullYear(), cursorD.getMonth(), day));
-                  const dayEvents = eventsOnDate(dateStr);
-                  const isToday = dateStr === TODAY;
-                  const isSel = dateStr === selectedDate;
-                  return (
-                    <div key={day} onClick={() => setSelectedDate(dateStr)}
-                      className={cn("min-h-[100px] border-t border-l p-1.5 cursor-pointer transition-colors",
-                        isSel ? "bg-primary/10" : "hover:bg-primary/5"
-                      )}>
-                      <p className={cn("text-xs font-medium mb-1 w-6 h-6 flex items-center justify-center rounded-full",
-                        isToday ? "bg-primary text-primary-foreground" : "text-foreground")}>{day}</p>
-                      <div className="space-y-0.5">
-                        {dayEvents.slice(0, 3).map(ev => {
-                          const m = TYPE_META[ev.type];
-                          return (
-                            <div key={ev.id} onClick={(e) => { e.stopPropagation(); setDetailEvent(ev); }}
-                              className={cn("text-[9px] px-1.5 py-0.5 rounded truncate border font-medium cursor-pointer", m.soft, m.text)}>
-                              {ev.title}
-                            </div>
-                          );
-                        })}
-                        {dayEvents.length > 3 && <p className="text-[9px] text-muted-foreground pl-1">+{dayEvents.length - 3}</p>}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </Card>
-          )}
+            );
+          })()}
         </div>
 
         {/* ── Side panel ─────────────────────── */}
