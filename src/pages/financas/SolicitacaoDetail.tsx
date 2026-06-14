@@ -32,6 +32,8 @@ export default function FinancasSolicitacaoDetail() {
   const [actionFiles, setActionFiles] = useState<File[]>([]);
   const [actionStep, setActionStep] = useState<0 | 1 | 2>(0);
   const [maxStep, setMaxStep] = useState<0 | 1 | 2>(0);
+  const [declarationChecked, setDeclarationChecked] = useState(false);
+
 
 
 
