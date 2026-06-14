@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  CheckSquare, Clock, CheckCircle2, Search, X, Inbox, Send,
+  Clock, CheckCircle2, Search, X, Inbox, Send,
   Plus, GraduationCap, CalendarDays, Calendar, ArrowUpRight,
   AlertTriangle, BadgeCheck, ChevronLeft, ChevronRight,
   Paperclip, FileText, Trash2, ArrowRight, Check,
@@ -189,7 +189,7 @@ export default function FinancasSolicitacoes() {
             </span>
             <div>
               <h1 className="text-xl font-bold text-foreground flex items-center gap-2 leading-tight">
-                <CheckSquare className="w-5 h-5 text-primary" /> Minhas Solicitações
+                Minhas Solicitações
               </h1>
               <p className="text-sm text-muted-foreground mt-0.5">
                 Pedidos institucionais — financeiros, pessoais e administrativos.

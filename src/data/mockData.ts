@@ -199,7 +199,7 @@ export const currentDecano: User = {
 
 export const currentReitor: User = {
   id: "7",
-  name: "Prof. Dr. António Bernardo",
+  name: "Dr. José Manuel",
   email: "reitor@upra.kor",
   role: "reitor",
 };
