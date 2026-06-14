@@ -685,6 +685,42 @@ export default function FinancasSolicitacaoDetail() {
                           </p>
                         </div>
 
+                        <div className="space-y-3 rounded-md border border-border bg-muted/10 px-3 py-2.5">
+                          <div>
+                            <p className="text-[10px] uppercase tracking-[0.1em] font-semibold text-muted-foreground mb-1">Parecer / Notas</p>
+                            <p className="text-[12px] text-foreground/90 leading-snug whitespace-pre-wrap break-words">
+                              {actionNotes.trim() || <span className="italic text-muted-foreground">Sem parecer.</span>}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-[10px] uppercase tracking-[0.1em] font-semibold text-muted-foreground mb-1.5">
+                              Anexos {actionFiles.length > 0 && <span className="text-muted-foreground/80">({actionFiles.length})</span>}
+                            </p>
+                            {actionFiles.length === 0 ? (
+                              <p className="text-[12px] italic text-muted-foreground">Sem anexos.</p>
+                            ) : (
+                              <ul className="space-y-1">
+                                {actionFiles.map((f, i) => {
+                                  const ext = f.name.split(".").pop()?.toLowerCase() ?? "";
+                                  const isImg = ["png","jpg","jpeg","gif","webp","svg"].includes(ext);
+                                  const isSheet = ["xls","xlsx","csv"].includes(ext);
+                                  const Ic = isImg ? FileImage : isSheet ? FileSpreadsheet : FileText;
+                                  const cls = isImg ? "text-violet-600" : isSheet ? "text-emerald-600" : "text-red-600";
+                                  return (
+                                    <li key={i} className="flex items-center gap-2 px-2 py-1 rounded-md border border-border bg-background">
+                                      <Ic className={cn("w-3.5 h-3.5 shrink-0", cls)} />
+                                      <span className="text-[12px] font-medium text-foreground truncate flex-1 leading-tight">{f.name}</span>
+                                      <span className="text-[10px] text-muted-foreground tabular-nums shrink-0">
+                                        {f.size < 1024 * 1024 ? `${(f.size / 1024).toFixed(0)} KB` : `${(f.size / 1024 / 1024).toFixed(1)} MB`}
+                                      </span>
+                                    </li>
+                                  );
+                                })}
+                              </ul>
+                            )}
+                          </div>
+                        </div>
+
                         <div className="flex items-start gap-2 rounded-md border border-border bg-muted/10 px-3 py-2.5">
                           <Checkbox
                             id="declaration"
