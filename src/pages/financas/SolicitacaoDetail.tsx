@@ -226,35 +226,33 @@ export default function FinancasSolicitacaoDetail() {
           </div>
         </div>
 
-        {/* Aprovar / Rejeitar */}
-        {isRecebida && selected.status === "pendente" && (
-          <div className="px-6 pb-5 pt-0">
-            <div className="rounded-lg border border-border bg-background p-3 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center shrink-0">
-                  <Hourglass className="w-3.5 h-3.5 text-amber-600" />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-foreground">Aguarda decisão</p>
-                  <p className="text-[11px] text-muted-foreground mt-0.5">Aprovar ou rejeitar esta solicitação</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <Button variant="outline" className="h-9 px-4 text-xs gap-1.5 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-300 transition-colors" onClick={() => handleAction("rejeitado")}>
-                  <XCircle className="w-4 h-4" /> Rejeitar
-                </Button>
-                <Button className="h-9 px-4 text-xs gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white transition-colors" onClick={() => handleAction("aprovado")}>
-                  <CheckCircle2 className="w-4 h-4" /> Aprovar
-                </Button>
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* 2-column body */}
         <div className="grid md:grid-cols-[280px_1fr] divide-x divide-border border-t border-border">
           {/* LEFT */}
           <aside className="p-5 space-y-5 bg-muted/15">
+            {/* Aprovar / Rejeitar */}
+            {isRecebida && selected.status === "pendente" && (
+              <div className="rounded-lg border border-border bg-background p-3 space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center shrink-0">
+                    <Hourglass className="w-3.5 h-3.5 text-amber-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-foreground">Aguarda decisão</p>
+                    <p className="text-[11px] text-muted-foreground mt-0.5">Aprovar ou rejeitar esta solicitação</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button variant="outline" className="h-9 flex-1 text-xs gap-1.5 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-300 transition-colors" onClick={() => handleAction("rejeitado")}>
+                    <XCircle className="w-4 h-4" /> Rejeitar
+                  </Button>
+                  <Button className="h-9 flex-1 text-xs gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white transition-colors" onClick={() => handleAction("aprovado")}>
+                    <CheckCircle2 className="w-4 h-4" /> Aprovar
+                  </Button>
+                </div>
+              </div>
+            )}
+
             <div>
               <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold mb-2">
                 {isRecebida ? "Requerente" : "Destinatário"}
@@ -273,20 +271,6 @@ export default function FinancasSolicitacaoDetail() {
                 <Button variant="outline" size="sm" className="h-7 px-1 text-[11px] gap-1"><Mail className="w-3 h-3" /> Email</Button>
                 <Button variant="outline" size="sm" className="h-7 px-1 text-[11px] gap-1"><Phone className="w-3 h-3" /> Ligar</Button>
               </div>
-              {(selected.requesterMatricula || isRecebida) && (
-                <div className="mt-3 pt-3 border-t border-border space-y-1.5">
-                  {selected.requesterMatricula && (
-                    <div className="flex items-baseline justify-between gap-2">
-                      <span className="text-[10px] uppercase tracking-wider text-muted-foreground">ID</span>
-                      <span className="text-[11px] font-medium text-foreground font-mono tabular-nums">{selected.requesterMatricula}</span>
-                    </div>
-                  )}
-                  <div className="flex items-baseline justify-between gap-2">
-                    <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Direcção</span>
-                    <span className="text-[11px] font-medium text-foreground text-right truncate max-w-[150px]">{isRecebida ? "Direcção Financeira" : counterpart}</span>
-                  </div>
-                </div>
-              )}
             </div>
 
             <div className="pt-4 border-t border-border">
@@ -328,7 +312,7 @@ export default function FinancasSolicitacaoDetail() {
                 <FactItem label="Submetido" value={fmt(dSub)} />
                 <FactItem label="Hora" value={fmtT(dSub)} />
                 <FactItem label="Categoria" value={tm.label} />
-                <FactItem label="Prazo" value={selected.dueDate ? fmt(new Date(selected.dueDate)) : "—"} />
+                <FactItem label="Estado" value={st.label} />
               </div>
             </section>
 
