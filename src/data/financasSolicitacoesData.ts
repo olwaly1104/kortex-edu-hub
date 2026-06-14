@@ -93,7 +93,7 @@ export const finSolicitacoes: FinSolicitacao[] = [
     date: "2025-03-28", status: "rejeitado",
     historico: [
       { data: "2025-03-28 08:30", actor: "Eng. João Martins", accao: "Solicitação submetida" },
-      { data: "2025-03-29 16:00", actor: "Direcção Financeira", accao: "Solicitação rejeitada", nota: "Já existe antecipação concedida no trimestre corrente." },
+      { data: "2025-03-29 16:00", actor: "Direcção Financeira", accao: "Solicitação rejeitada", nota: "Já existe antecipação concedida no trimestre corrente.", anexos: [{ nome: "Parecer-RH.pdf", tamanho: "48 KB", tipo: "pdf" }] },
     ],
   },
   {
