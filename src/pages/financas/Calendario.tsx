@@ -774,10 +774,10 @@ export default function FinancasCalendario() {
 }
 
 /* ── Request card ── */
-const REQ_STATUS_META: Record<MeetingRequest["status"], { label: string; cls: string; bar: string }> = {
-  pending:  { label: "Pendente",  cls: "bg-amber-50 text-amber-700 border-amber-200",     bar: "bg-amber-500" },
-  accepted: { label: "Aceite",    cls: "bg-emerald-50 text-emerald-700 border-emerald-200", bar: "bg-emerald-500" },
-  declined: { label: "Recusado",  cls: "bg-rose-50 text-rose-700 border-rose-200",        bar: "bg-rose-500" },
+const REQ_STATUS_META: Record<MeetingRequest["status"], { label: string; cls: string; dot: string; bar: string }> = {
+  pending:  { label: "Pendente",  cls: "bg-amber-50 text-amber-700 border-amber-200",       dot: "bg-amber-500",   bar: "bg-amber-500" },
+  accepted: { label: "Aceite",    cls: "bg-emerald-50 text-emerald-700 border-emerald-200", dot: "bg-emerald-500", bar: "bg-emerald-500" },
+  declined: { label: "Recusado",  cls: "bg-rose-50 text-rose-700 border-rose-200",          dot: "bg-rose-500",    bar: "bg-rose-500" },
 };
 
 function RequestCard({ r, onAccept, onDecline, onDetail, onParticipants, readOnly = false }: {
