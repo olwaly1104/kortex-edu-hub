@@ -119,7 +119,7 @@ const tipoChip: Record<TipoReceita, string> = {
   "Propina mensal": "bg-blue-50 text-blue-700 border-blue-200",
   "Matrícula": "bg-indigo-50 text-indigo-700 border-indigo-200",
   "Emolumento": "bg-emerald-50 text-emerald-700 border-emerald-200",
-  "Taxa": "bg-amber-50 text-amber-700 border-amber-200",
+  
   "Serviço Académico": "bg-violet-50 text-violet-700 border-violet-200",
   "Candidatura": "bg-pink-50 text-pink-700 border-pink-200",
   "Multa": "bg-red-50 text-red-700 border-red-200",
