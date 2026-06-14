@@ -9,6 +9,7 @@ import { Progress } from "@/components/ui/progress";
 import { formatCurrency, salarios, payrollBudget } from "@/data/financeModuleData";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { FinHeader } from "./_FinHeader";
 
 type SortField = "grossSalary" | "netSalary" | "deductions";
 type SortDir = "asc" | "desc";
