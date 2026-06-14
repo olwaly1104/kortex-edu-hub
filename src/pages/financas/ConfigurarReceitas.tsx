@@ -1243,7 +1243,6 @@ export default function ConfigurarReceitas() {
                   <th className="text-left font-semibold px-2 py-2">Colaborador</th>
                   <th className="text-left font-semibold px-2 py-2">Posição</th>
                   <th className="text-left font-semibold px-2 py-2">Contrato</th>
-                  <th className="text-left font-semibold px-2 py-2">Entrada</th>
                   <th className="text-left font-semibold px-2 py-2">Departamento</th>
                   <th className="text-right font-semibold px-2 py-2">Salário Bruto</th>
                   <th className="text-right font-semibold px-2 py-2">Salário Líquido</th>
