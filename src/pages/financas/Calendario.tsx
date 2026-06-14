@@ -150,6 +150,12 @@ function fmtShort(s: string) {
 /* ─────────────────────────────────────────────────── */
 export default function FinancasCalendario() {
   const [view, setView] = useState<"week" | "month">("week");
+  const [now, setNow] = useState<Date>(new Date());
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(id);
+  }, []);
+  const liveTime = `${String(now.getHours()).padStart(2, "0")}h:${String(now.getMinutes()).padStart(2, "0")}min:${String(now.getSeconds()).padStart(2, "0")}s`;
   const [cursor, setCursor] = useState<string>(TODAY);
   const [selectedDate, setSelectedDate] = useState<string>(TODAY);
   const [openCreate, setOpenCreate] = useState(false);
