@@ -68,13 +68,22 @@ const seedPropina = (f: string) =>
   f.includes("Medicina") ? 65000 : f.includes("Arquitectura") ? 52000 : f.includes("Direito") ? 48000 : f.includes("Economia") ? 45000 : 38000;
 
 const initialReceitas = (): ReceitaRow[] => {
-  const perCurso: ReceitaRow[] = ALL_COURSES.map(c => ({
-    id: `prop-${c.id}`,
-    nome: `Propina mensal — ${c.name}`,
-    tipo: "Propina mensal",
-    escopo: c.id,
-    valor: seedPropina(c.facultyName),
-  }));
+  const perCurso: ReceitaRow[] = ALL_COURSES.map(c => {
+    const base = seedPropina(c.facultyName);
+    const plans: PropinaPlan[] = [
+      { months: 10, valor: base },
+      { months: 11, valor: Math.round(base * 0.92) },
+      { months: 12, valor: Math.round(base * 0.85) },
+    ];
+    return {
+      id: `prop-${c.id}`,
+      nome: `Propina mensal — ${c.name}`,
+      tipo: "Propina mensal" as const,
+      escopo: c.id,
+      valor: plans[0].valor,
+      plans,
+    };
+  });
   const matriculas: ReceitaRow[] = reitorFaculties.map(f => ({
     id: `matr-${f.id}`,
     nome: `Matrícula — ${f.name}`,
@@ -93,6 +102,8 @@ const initialReceitas = (): ReceitaRow[] => {
     { id: "tax-2", nome: "Taxa de Emissão de 2ª Via de Cartão", tipo: "Emolumento", escopo: "geral", valor: 2000 },
     { id: "can-1", nome: "Candidatura — Licenciatura", tipo: "Candidatura", escopo: "geral", valor: 15000 },
     { id: "can-2", nome: "Candidatura — Mestrado", tipo: "Candidatura", escopo: "geral", valor: 20000 },
+    { id: "can-3", nome: "Exame de Acesso", tipo: "Candidatura", escopo: "geral", valor: 25000 },
+    { id: "can-4", nome: "Curso Preparatório", tipo: "Candidatura", escopo: "geral", valor: 85000 },
     // Multas Estudantes
     { id: "mes-1", nome: "Atraso de propina (por mês)", tipo: "Multa Estudante", escopo: "geral", valor: 5000 },
     { id: "mes-2", nome: "Falta a exame sem justificação", tipo: "Multa Estudante", escopo: "geral", valor: 7500 },
