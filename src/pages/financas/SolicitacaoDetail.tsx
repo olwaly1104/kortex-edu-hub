@@ -107,7 +107,18 @@ export default function FinancasSolicitacaoDetail() {
   const openAction = (action: "em_execucao" | "rejeitado" | "executada") => {
     setActionNotes("");
     setActionFiles([]);
+    setActionStep(0);
+    setMaxStep(0);
     setPendingAction(action);
+  };
+
+  const goToStep = (s: 0 | 1 | 2) => {
+    if (s <= maxStep) setActionStep(s);
+  };
+  const advance = () => {
+    const next = Math.min(2, actionStep + 1) as 0 | 1 | 2;
+    setActionStep(next);
+    if (next > maxStep) setMaxStep(next);
   };
 
   const confirmAction = () => {
