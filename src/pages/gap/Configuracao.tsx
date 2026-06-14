@@ -323,7 +323,7 @@ export default function GapConfiguracao() {
         </div>
       </div>
 
-      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="space-y-6">
+      <Tabs defaultValue="solicitacoes" className="space-y-6">
         <TabsList className="grid grid-cols-3 w-full max-w-2xl">
           <TabsTrigger value="solicitacoes" className="gap-1.5"><FileText className="w-3.5 h-3.5" /> Solicitações</TabsTrigger>
           <TabsTrigger value="agendamentos" className="gap-1.5"><CalendarClock className="w-3.5 h-3.5" /> Agendamentos</TabsTrigger>
@@ -331,7 +331,6 @@ export default function GapConfiguracao() {
         </TabsList>
 
         <TabsContent value="solicitacoes" className="space-y-6 mt-0">
-          <div className="flex justify-end"><EditToggle tab="sol" /></div>
           {/* Estados */}
           <Card className="p-5">
             <div className="flex items-center justify-between mb-4">
@@ -340,7 +339,7 @@ export default function GapConfiguracao() {
                 <h2 className="text-sm font-semibold text-foreground">Estados</h2>
                 <span className="text-[11px] text-muted-foreground tabular-nums">· {estados.length}</span>
               </div>
-              {isEditing && (
+              {isCardEditing("sol-estados") && (
                 <Dialog open={estadoOpen} onOpenChange={setEstadoOpen}>
                   <DialogTrigger asChild>
                     <Button size="sm" variant="outline" className="gap-1.5 h-8 text-xs">
@@ -367,8 +366,8 @@ export default function GapConfiguracao() {
               {estados.map(e => (
                 <div key={e.key} className={cn("inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs", e.color)}>
                   <span className="font-medium">{e.label}</span>
-                  <EditIcon onClick={() => setEditEstado(e)} label={`Editar ${e.label}`} />
-                  <RemoveIcon onClick={() => removeEstado(e.key)} label={`Remover ${e.label}`} />
+                  <EditIcon onClick={() => setEditEstado(e)} label={`Editar ${e.label}`} editing={isCardEditing("sol-estados")} />
+                  <RemoveIcon onClick={() => removeEstado(e.key)} label={`Remover ${e.label}`} editing={isCardEditing("sol-estados")} />
                 </div>
               ))}
             </div>
@@ -382,7 +381,7 @@ export default function GapConfiguracao() {
                 <h2 className="text-sm font-semibold text-foreground">Categorias</h2>
                 <span className="text-[11px] text-muted-foreground tabular-nums">· {categorias.length}</span>
               </div>
-              {isEditing && (
+              {isCardEditing("sol-categorias") && (
                 <Dialog open={catOpen} onOpenChange={setCatOpen}>
                   <DialogTrigger asChild>
                     <Button size="sm" variant="outline" className="gap-1.5 h-8 text-xs">
@@ -412,8 +411,8 @@ export default function GapConfiguracao() {
                   <div key={c.key} className={cn("inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs", c.color)}>
                     <span className="font-medium">{c.label}</span>
                     <span className="opacity-60 tabular-nums">· {count} motivos</span>
-                    <EditIcon onClick={() => setEditCategoria(c)} label={`Editar ${c.label}`} />
-                    <RemoveIcon onClick={() => removeCategoria(c.key)} label={`Remover ${c.label}`} />
+                    <EditIcon onClick={() => setEditCategoria(c)} label={`Editar ${c.label}`} editing={isCardEditing("sol-categorias")} />
+                    <RemoveIcon onClick={() => removeCategoria(c.key)} label={`Remover ${c.label}`} editing={isCardEditing("sol-categorias")} />
                   </div>
                 );
               })}
@@ -428,7 +427,7 @@ export default function GapConfiguracao() {
                 <h2 className="text-sm font-semibold text-foreground">Motivos</h2>
                 <span className="text-[11px] text-muted-foreground tabular-nums">· {motivos.length}</span>
               </div>
-              {isEditing && (
+              {isCardEditing("sol-motivos") && (
                 <Dialog open={motivoOpen} onOpenChange={setMotivoOpen}>
                   <DialogTrigger asChild>
                     <Button size="sm" variant="outline" className="gap-1.5 h-8 text-xs">
@@ -512,7 +511,7 @@ export default function GapConfiguracao() {
                     <th className="text-center p-3 font-medium text-muted-foreground text-xs whitespace-nowrap">Aceitar</th>
                     <th className="text-center p-3 font-medium text-muted-foreground text-xs whitespace-nowrap">Concluir</th>
                     <th className="text-left p-3 font-medium text-muted-foreground text-xs whitespace-nowrap">Multa</th>
-                    {isEditing && <th className="w-20" />}
+                    {isCardEditing("sol-motivos") && <th className="w-20" />}
                   </tr>
                 </thead>
                 <tbody>
@@ -537,7 +536,7 @@ export default function GapConfiguracao() {
                             return mu ? <span className="text-foreground">{mu.diasAposPrazo}d</span> : <span className="text-muted-foreground">—</span>;
                           })()}
                         </td>
-                        {isEditing && (
+                        {isCardEditing("sol-motivos") && (
                           <td className="p-3 text-right">
                             <div className="inline-flex items-center gap-2">
                               <button onClick={() => setEditMotivo(m)} className="text-muted-foreground hover:text-foreground" aria-label={`Editar ${m.label}`}>
@@ -560,7 +559,6 @@ export default function GapConfiguracao() {
 
         {/* ============ AGENDAMENTOS ============ */}
         <TabsContent value="agendamentos" className="space-y-6 mt-0">
-          <div className="flex justify-end"><EditToggle tab="ag" /></div>
           {/* Parâmetros gerais — só início e fim */}
           <Card className="p-5">
             <div className="flex items-center gap-2 mb-4">
@@ -570,11 +568,11 @@ export default function GapConfiguracao() {
             <div className="grid grid-cols-2 gap-4 max-w-md">
               <div>
                 <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Início atendimento</label>
-                <Input type="time" value={agHoraInicio} disabled={!isEditing} onChange={e => setAgHoraInicio(e.target.value)} />
+                <Input type="time" value={agHoraInicio} disabled={!isCardEditing("ag-params")} onChange={e => setAgHoraInicio(e.target.value)} />
               </div>
               <div>
                 <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Fim atendimento</label>
-                <Input type="time" value={agHoraFim} disabled={!isEditing} onChange={e => setAgHoraFim(e.target.value)} />
+                <Input type="time" value={agHoraFim} disabled={!isCardEditing("ag-params")} onChange={e => setAgHoraFim(e.target.value)} />
               </div>
             </div>
           </Card>
@@ -587,7 +585,7 @@ export default function GapConfiguracao() {
                 <h2 className="text-sm font-semibold text-foreground">Categorias de atendimento</h2>
                 <span className="text-[11px] text-muted-foreground tabular-nums">· {agCategorias.length}</span>
               </div>
-              {isEditing && (
+              {isCardEditing("ag-categorias") && (
                 <Dialog open={agCatOpen} onOpenChange={setAgCatOpen}>
                   <DialogTrigger asChild>
                     <Button size="sm" variant="outline" className="gap-1.5 h-8 text-xs"><Plus className="w-3.5 h-3.5" /> Adicionar</Button>
@@ -618,7 +616,7 @@ export default function GapConfiguracao() {
               {agCategorias.map(c => (
                 <div key={c.key} className={cn("inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs", c.color)}>
                   <span className="font-medium">{c.label}</span>
-                  <RemoveIcon onClick={() => setAgCategorias(prev => prev.filter(x => x.key !== c.key))} label={`Remover ${c.label}`} />
+                  <RemoveIcon onClick={() => setAgCategorias(prev => prev.filter(x => x.key !== c.key))} label={`Remover ${c.label}`} editing={isCardEditing("ag-categorias")} />
                 </div>
               ))}
             </div>
@@ -632,7 +630,7 @@ export default function GapConfiguracao() {
                 <h2 className="text-sm font-semibold text-foreground">Motivos de agendamento</h2>
                 <span className="text-[11px] text-muted-foreground tabular-nums">· {agMotivos.length}</span>
               </div>
-              {isEditing && (
+              {isCardEditing("ag-motivos") && (
                 <Dialog open={agMotOpen} onOpenChange={setAgMotOpen}>
                   <DialogTrigger asChild>
                     <Button size="sm" variant="outline" className="gap-1.5 h-8 text-xs"><Plus className="w-3.5 h-3.5" /> Adicionar</Button>
@@ -685,7 +683,7 @@ export default function GapConfiguracao() {
                     <th className="text-left p-3 font-medium text-muted-foreground text-xs">Categoria</th>
                     <th className="text-left p-3 font-medium text-muted-foreground text-xs">Responsável</th>
                     <th className="text-center p-3 font-medium text-muted-foreground text-xs">Duração</th>
-                    {isEditing && <th className="w-12" />}
+                    {isCardEditing("ag-motivos") && <th className="w-12" />}
                   </tr>
                 </thead>
                 <tbody>
@@ -699,7 +697,7 @@ export default function GapConfiguracao() {
                         </td>
                         <td className="p-3 text-xs text-foreground whitespace-nowrap">{m.responsavel}</td>
                         <td className="p-3 text-center text-xs tabular-nums text-blue-700">{m.duracao} min</td>
-                        {isEditing && (
+                        {isCardEditing("ag-motivos") && (
                           <td className="p-3 text-right">
                             <button onClick={() => setAgMotivos(prev => prev.filter(x => x.key !== m.key))} className="text-muted-foreground hover:text-destructive">
                               <Trash2 className="w-3.5 h-3.5" />
@@ -722,7 +720,7 @@ export default function GapConfiguracao() {
                 <h2 className="text-sm font-semibold text-foreground">Salas / Gabinetes</h2>
                 <span className="text-[11px] text-muted-foreground tabular-nums">· {agSalas.length}</span>
               </div>
-              {isEditing && (
+              {isCardEditing("ag-salas") && (
                 <Dialog open={agSalaOpen} onOpenChange={setAgSalaOpen}>
                   <DialogTrigger asChild>
                     <Button size="sm" variant="outline" className="gap-1.5 h-8 text-xs"><Plus className="w-3.5 h-3.5" /> Adicionar</Button>
@@ -758,8 +756,8 @@ export default function GapConfiguracao() {
                   <MapPin className="w-3 h-3 text-muted-foreground" />
                   <span className="font-medium text-foreground">{s.label}</span>
                   <span className="text-muted-foreground tabular-nums">· {s.lotacao} lug.</span>
-                  <EditIcon onClick={() => setEditAgSala(s)} label={`Editar ${s.label}`} />
-                  <RemoveIcon onClick={() => setAgSalas(prev => prev.filter(x => x.key !== s.key))} label={`Remover ${s.label}`} />
+                  <EditIcon onClick={() => setEditAgSala(s)} label={`Editar ${s.label}`} editing={isCardEditing("ag-salas")} />
+                  <RemoveIcon onClick={() => setAgSalas(prev => prev.filter(x => x.key !== s.key))} label={`Remover ${s.label}`} editing={isCardEditing("ag-salas")} />
                 </div>
               ))}
             </div>
@@ -768,7 +766,6 @@ export default function GapConfiguracao() {
 
         {/* ============ CANDIDATURAS ============ */}
         <TabsContent value="candidaturas" className="space-y-6 mt-0">
-          <div className="flex justify-end"><EditToggle tab="cd" /></div>
           {/* Parâmetros gerais — período de candidaturas */}
           <Card className="p-5">
             <div className="flex items-center gap-2 mb-4">
@@ -778,12 +775,12 @@ export default function GapConfiguracao() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-2xl">
               <div>
                 <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Início das candidaturas</label>
-                <Input type="date" value={cdPeriodoInicio} disabled={!isEditing} onChange={e => setCdPeriodoInicio(e.target.value)} />
+                <Input type="date" value={cdPeriodoInicio} disabled={!isCardEditing("cd-params")} onChange={e => setCdPeriodoInicio(e.target.value)} />
                 <p className="text-[10px] text-muted-foreground mt-1">Data a partir da qual abre a submissão</p>
               </div>
               <div>
                 <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Fim das candidaturas</label>
-                <Input type="date" value={cdPeriodoFim} disabled={!isEditing} onChange={e => setCdPeriodoFim(e.target.value)} />
+                <Input type="date" value={cdPeriodoFim} disabled={!isCardEditing("cd-params")} onChange={e => setCdPeriodoFim(e.target.value)} />
                 <p className="text-[10px] text-muted-foreground mt-1">Data limite para submissão</p>
               </div>
             </div>
@@ -798,7 +795,7 @@ export default function GapConfiguracao() {
                 <h2 className="text-sm font-semibold text-foreground">Estados</h2>
                 <span className="text-[11px] text-muted-foreground tabular-nums">· {cdEstados.length}</span>
               </div>
-              {isEditing && (
+              {isCardEditing("cd-estados") && (
                 <Dialog open={cdEstadoOpen} onOpenChange={setCdEstadoOpen}>
                   <DialogTrigger asChild>
                     <Button size="sm" variant="outline" className="gap-1.5 h-8 text-xs"><Plus className="w-3.5 h-3.5" /> Adicionar</Button>
@@ -823,7 +820,7 @@ export default function GapConfiguracao() {
               {cdEstados.map(e => (
                 <div key={e.key} className={cn("inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs", e.color)}>
                   <span className="font-medium">{e.label}</span>
-                  <RemoveIcon onClick={() => removeCdEstado(e.key)} label={`Remover ${e.label}`} />
+                  <RemoveIcon onClick={() => removeCdEstado(e.key)} label={`Remover ${e.label}`} editing={isCardEditing("cd-estados")} />
                 </div>
               ))}
             </div>
@@ -837,7 +834,7 @@ export default function GapConfiguracao() {
                 <h2 className="text-sm font-semibold text-foreground">Etapas do processo</h2>
                 <span className="text-[11px] text-muted-foreground tabular-nums">· {cdEtapas.length}</span>
               </div>
-              {isEditing && (
+              {isCardEditing("cd-etapas") && (
                 <Dialog open={cdEtapaOpen} onOpenChange={setCdEtapaOpen}>
                   <DialogTrigger asChild>
                     <Button size="sm" variant="outline" className="gap-1.5 h-8 text-xs"><Plus className="w-3.5 h-3.5" /> Adicionar</Button>
@@ -865,7 +862,7 @@ export default function GapConfiguracao() {
                     <th className="text-left font-semibold px-4 py-2">Etapa</th>
                     <th className="text-center font-semibold px-3 py-2">Obrigatória</th>
                     <th className="text-left font-semibold px-3 py-2">Estados possíveis</th>
-                    {isEditing && <th className="w-12"></th>}
+                    {isCardEditing("cd-etapas") && <th className="w-12"></th>}
                   </tr>
                 </thead>
                 <tbody>
@@ -874,11 +871,11 @@ export default function GapConfiguracao() {
                       <td className="px-4 py-2.5 text-sm font-medium text-foreground">{et.label}</td>
                       <td className="px-3 py-2.5 text-center">
                         <button
-                          disabled={!isEditing}
+                          disabled={!isCardEditing("cd-etapas")}
                           onClick={() => toggleEtapaObrig(et.key)}
                           className={cn("inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium",
                             et.obrigatoria ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-muted text-muted-foreground border-border",
-                            !isEditing && "cursor-default")}>
+                            !isCardEditing("cd-etapas") && "cursor-default")}>
                           {et.obrigatoria ? "Sim" : "Opcional"}
                         </button>
                       </td>
@@ -892,7 +889,7 @@ export default function GapConfiguracao() {
                               })}
                         </div>
                       </td>
-                      {isEditing && (
+                      {isCardEditing("cd-etapas") && (
                         <td className="px-2 py-2.5 text-right">
                           <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => removeCdEtapa(et.key)} title="Remover">
                             <Trash2 className="w-3.5 h-3.5" />
@@ -914,7 +911,7 @@ export default function GapConfiguracao() {
                 <h2 className="text-sm font-semibold text-foreground">Sessões agendadas</h2>
                 <span className="text-[11px] text-muted-foreground tabular-nums">· {cdSessoes.length}</span>
               </div>
-              {isEditing && (
+              {isCardEditing("cd-sessoes") && (
                 <Dialog open={cdSessOpen} onOpenChange={setCdSessOpen}>
                   <DialogTrigger asChild>
                     <Button size="sm" variant="outline" className="gap-1.5 h-8 text-xs"><Plus className="w-3.5 h-3.5" /> Adicionar</Button>
@@ -965,7 +962,7 @@ export default function GapConfiguracao() {
                     <th className="text-left font-semibold px-3 py-2">Hora</th>
                     <th className="text-left font-semibold px-3 py-2">Local</th>
                     <th className="text-center font-semibold px-3 py-2">Capacidade</th>
-                    {isEditing && <th className="w-12"></th>}
+                    {isCardEditing("cd-sessoes") && <th className="w-12"></th>}
                   </tr>
                 </thead>
                 <tbody>
@@ -976,7 +973,7 @@ export default function GapConfiguracao() {
                       <td className="px-3 py-2.5 text-xs tabular-nums">{s.hora}</td>
                       <td className="px-3 py-2.5 text-xs text-muted-foreground">{s.local}</td>
                       <td className="px-3 py-2.5 text-center text-xs tabular-nums">{s.capacidade}</td>
-                      {isEditing && (
+                      {isCardEditing("cd-sessoes") && (
                         <td className="px-2 py-2.5 text-right">
                           <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => removeCdSessao(s.key)} title="Remover">
                             <Trash2 className="w-3.5 h-3.5" />
