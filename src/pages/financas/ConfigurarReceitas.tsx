@@ -712,39 +712,29 @@ export default function ConfigurarReceitas() {
                             </div>
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                               {plans.map(p => {
-                                const editingInline = inlineEditPlan?.rowId === r.id && inlineEditPlan?.months === p.months;
+                                const liq = liquidoOf(p.valor, p.imposto);
                                 return (
-                                  <div key={p.months}
-                                    className="rounded-md border border-border bg-card px-3 py-2 flex items-center justify-between gap-2 hover:border-primary/40 transition">
-                                    <div className="min-w-0">
-                                      <p className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">Prazo</p>
-                                      <p className="text-xs font-semibold text-foreground">{p.months} meses</p>
+                                  <button key={p.months} type="button"
+                                    onClick={() => setPlanEdit({ rowId: r.id, months: p.months, valor: String(p.valor), imposto: String(((p.imposto ?? DEFAULT_IMPOSTO) * 100).toFixed(1)) })}
+                                    className="rounded-md border border-border bg-card px-3 py-2 hover:border-primary/40 hover:bg-muted/30 transition text-left group/plan">
+                                    <div className="flex items-center justify-between gap-2">
+                                      <div className="min-w-0">
+                                        <p className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">{p.months} meses</p>
+                                        <p className="text-sm font-semibold text-foreground tabular-nums">{formatCurrency(p.valor)}</p>
+                                        <p className="text-[10px] text-muted-foreground tabular-nums">Líquido {formatCurrency(liq)}</p>
+                                      </div>
+                                      {plans.length > 1 && (
+                                        <span
+                                          role="button"
+                                          tabIndex={0}
+                                          className="inline-flex items-center justify-center h-6 w-6 rounded-md text-destructive opacity-0 group-hover/plan:opacity-100 hover:bg-destructive/10 transition cursor-pointer"
+                                          onClick={(e) => { e.stopPropagation(); removePlanFromRow(r.id, p.months); }}
+                                          title="Remover prazo">
+                                          <Trash2 className="w-3 h-3" />
+                                        </span>
+                                      )}
                                     </div>
-                                    {editingInline ? (
-                                      <div className="flex items-center gap-1">
-                                        <Input type="number" autoFocus value={inlineEditPlan!.valor}
-                                          onChange={e => setInlineEditPlan({ ...inlineEditPlan!, valor: e.target.value })}
-                                          onKeyDown={e => { if (e.key === "Enter") commitInlinePlan(); if (e.key === "Escape") setInlineEditPlan(null); }}
-                                          className="h-7 w-24 text-xs text-right tabular-nums" />
-                                        <Button size="sm" className="h-7 px-2 text-[11px]" onClick={commitInlinePlan}>OK</Button>
-                                      </div>
-                                    ) : (
-                                      <div className="flex items-center gap-0.5">
-                                        <button
-                                          onClick={() => setInlineEditPlan({ rowId: r.id, months: p.months, valor: String(p.valor) })}
-                                          className="text-sm font-semibold text-foreground tabular-nums whitespace-nowrap px-2 py-1 rounded hover:bg-muted transition"
-                                          title="Clique para editar valor mensal">
-                                          {formatCurrency(p.valor)}
-                                        </button>
-                                        {plans.length > 1 && (
-                                          <Button variant="ghost" size="icon" className="h-6 w-6 rounded-md text-destructive opacity-50 hover:opacity-100"
-                                            onClick={() => removePlanFromRow(r.id, p.months)} title="Remover prazo">
-                                            <Trash2 className="w-3 h-3" />
-                                          </Button>
-                                        )}
-                                      </div>
-                                    )}
-                                  </div>
+                                  </button>
                                 );
                               })}
                             </div>
