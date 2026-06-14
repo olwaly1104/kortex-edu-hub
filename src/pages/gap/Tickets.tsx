@@ -20,6 +20,7 @@ import {
   estadoSolicitacaoConfig, destinoConfig,
   tipoConfig, categoriaConfig,
 } from "@/data/gapData";
+import { FinHeader } from "@/pages/financas/_FinHeader";
 
 const MESES = [
   "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
