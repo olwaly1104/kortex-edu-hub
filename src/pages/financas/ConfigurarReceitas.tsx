@@ -1243,7 +1243,6 @@ export default function ConfigurarReceitas() {
                   <th className="text-left font-semibold px-2 py-2">Colaborador</th>
                   <th className="text-left font-semibold px-2 py-2">Posição</th>
                   <th className="text-left font-semibold px-2 py-2">Contrato</th>
-                  <th className="text-left font-semibold px-2 py-2">Entrada</th>
                   <th className="text-left font-semibold px-2 py-2">Departamento</th>
                   <th className="text-right font-semibold px-2 py-2">Salário Bruto</th>
                   <th className="text-right font-semibold px-2 py-2">Salário Líquido</th>
@@ -1256,11 +1255,6 @@ export default function ConfigurarReceitas() {
                   if (!cfg) return null;
                   const net = computeNet(cfg);
                   const contractLabel = s.contractType === "efectivo" ? "Permanente" : "Prestador";
-                  // Deterministic entry date from employeeId hash
-                  const hash = s.employeeId.split("").reduce((a, c) => a + c.charCodeAt(0), 0);
-                  const entryYear = 2015 + (hash % 10);
-                  const entryMonth = (hash % 12) + 1;
-                  const entryLabel = `${String(entryMonth).padStart(2, "0")}/${entryYear}`;
                   return (
                     <tr key={s.id} className="border-b border-border/50 hover:bg-muted/40 group">
                       <td className="px-2 py-2.5">
@@ -1280,11 +1274,6 @@ export default function ConfigurarReceitas() {
                           "inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] font-medium",
                           s.contractType === "efectivo" ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-amber-50 text-amber-700 border-amber-200"
                         )}>{contractLabel}</span>
-                      </td>
-                      <td className="px-2 py-2.5">
-                        <span className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[10px] font-medium text-slate-700 tabular-nums">
-                          {entryLabel}
-                        </span>
                       </td>
                       <td className="px-2 py-2.5">
                         <p className="text-xs text-foreground truncate">{s.department}</p>
