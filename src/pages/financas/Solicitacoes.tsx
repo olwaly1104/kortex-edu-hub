@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  CheckSquare, Clock, CheckCircle2, Search, X, Inbox, Send,
+  Clock, CheckCircle2, Search, X, Inbox, Send,
   Plus, GraduationCap, CalendarDays, Calendar, ArrowUpRight,
   AlertTriangle, BadgeCheck, ChevronLeft, ChevronRight,
   Paperclip, FileText, Trash2, ArrowRight, Check,
