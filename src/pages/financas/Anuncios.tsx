@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card } from "@/components/ui/card";
@@ -21,6 +21,8 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { FIN_ANUNCIOS, TYPE_META, type AnnType, type FinAnn } from "@/data/financasAnunciosData";
+import { useFinAnunciosUnread } from "@/hooks/useFinAnunciosUnread";
+
 
 const TODAY_LABEL = "14/02/2024";
 
@@ -43,6 +45,8 @@ export default function FinancasAnuncios() {
   const [search, setSearch] = useState("");
   const [openCreate, setOpenCreate] = useState(false);
   const [subscribed, setSubscribed] = useState<Set<string>>(new Set());
+  const { isRead, markRead } = useFinAnunciosUnread();
+
 
   const [form, setForm] = useState<Omit<FinAnn, "id" | "author" | "isMine" | "date">>({
     title: "", content: "", type: "geral",
@@ -260,8 +264,14 @@ export default function FinancasAnuncios() {
           const m = TYPE_META[a.type];
           const isSub = subscribed.has(a.id);
           const initials = (a.author || a.department).split(" ").slice(0, 2).map(w => w[0]).join("").toUpperCase();
+          const unread = !a.isMine && !isRead(a.id);
           return (
-            <Card key={a.id} className="group overflow-hidden hover:shadow-md hover:border-primary/30 transition-all">
+            <AnnouncementCard key={a.id} id={a.id} unread={unread} onSeen={markRead}>
+              <Card className={cn(
+                "group overflow-hidden hover:shadow-md transition-all",
+                unread ? "border-primary/40 bg-primary/[0.025] shadow-sm" : "hover:border-primary/30"
+              )}>
+
               <div className="flex">
                 <div className={cn("w-1 shrink-0", m.dot)} />
                 <div className="flex-1 p-4">
@@ -284,7 +294,7 @@ export default function FinancasAnuncios() {
                   <div className="border-t border-border/60 mb-3" />
 
                   {/* body */}
-                  <Link to={`/financas/anuncios/${a.id}`} className="block group/title">
+                  <Link to={`/financas/anuncios/${a.id}`} onClick={() => markRead(a.id)} className="block group/title">
                     <h3 className="text-[15px] font-semibold text-foreground leading-snug mb-1 group-hover/title:text-primary transition-colors">
                       {a.title}
                     </h3>
@@ -349,7 +359,7 @@ export default function FinancasAnuncios() {
                         </Button>
                       )}
                       <Button asChild size="sm" variant="outline" className="h-7 text-[11px] gap-1.5 px-2.5 border-primary/30 text-primary hover:bg-primary hover:text-primary-foreground">
-                        <Link to={`/financas/anuncios/${a.id}`}>
+                        <Link to={`/financas/anuncios/${a.id}`} onClick={() => markRead(a.id)}>
                           Ver detalhes <ArrowRight className="w-3 h-3 transition-transform group-hover:translate-x-0.5" />
                         </Link>
                       </Button>
@@ -358,12 +368,52 @@ export default function FinancasAnuncios() {
 
                 </div>
               </div>
-            </Card>
+              </Card>
+            </AnnouncementCard>
           );
         })}
       </div>
     </div>
   );
 }
+
+function AnnouncementCard({
+  id, unread, onSeen, children,
+}: { id: string; unread: boolean; onSeen: (id: string) => void; children: React.ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!unread || !ref.current) return;
+    const el = ref.current;
+    let timer: number | undefined;
+    const obs = new IntersectionObserver(entries => {
+      for (const e of entries) {
+        if (e.isIntersecting && e.intersectionRatio >= 0.6) {
+          timer = window.setTimeout(() => onSeen(id), 700);
+        } else if (timer) {
+          window.clearTimeout(timer);
+          timer = undefined;
+        }
+      }
+    }, { threshold: [0, 0.6, 1] });
+    obs.observe(el);
+    return () => {
+      obs.disconnect();
+      if (timer) window.clearTimeout(timer);
+    };
+  }, [id, unread, onSeen]);
+
+  return (
+    <div ref={ref} className="relative">
+      {unread && (
+        <span
+          aria-label="Não lido"
+          className="absolute -left-1.5 top-5 w-2.5 h-2.5 rounded-full bg-destructive ring-4 ring-destructive/15 z-10"
+        />
+      )}
+      {children}
+    </div>
+  );
+}
+
 
 

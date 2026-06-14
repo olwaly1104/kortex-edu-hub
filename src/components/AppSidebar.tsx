@@ -10,6 +10,8 @@ import {
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import logoUpra from "@/assets/logo-upra.asset.json";
+import { useFinAnunciosUnread } from "@/hooks/useFinAnunciosUnread";
+
 
 interface NavItem { label: string; icon: React.ElementType; path: string; badge?: number; }
 interface NavSection { title: string; items: NavItem[]; }
@@ -164,7 +166,7 @@ const financasSections: NavSection[] = [
   { title: "Geral", items: [
     { label: "Início", icon: LayoutDashboard, path: "/financas" },
     { label: "Calendário", icon: Calendar, path: "/financas/calendario" },
-    { label: "Anúncios", icon: Megaphone, path: "/financas/anuncios", badge: 4 },
+    { label: "Anúncios", icon: Megaphone, path: "/financas/anuncios" },
     { label: "Solicitações", icon: CheckSquare, path: "/financas/solicitacoes" },
   ]},
   { title: "Finanças", items: [
@@ -271,11 +273,21 @@ export default function AppSidebar() {
   const { user, logout } = useAuth();
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
+  const { unreadCount: finAnunciosUnread } = useFinAnunciosUnread();
 
   if (!user) return null;
 
-  const sections = roleSectionsMap[user.role] || studentSections;
+  const baseSections = roleSectionsMap[user.role] || studentSections;
+  const sections = user.role === "financas"
+    ? baseSections.map(sec => ({
+        ...sec,
+        items: sec.items.map(it =>
+          it.path === "/financas/anuncios" ? { ...it, badge: finAnunciosUnread } : it
+        ),
+      }))
+    : baseSections;
   const roleLabel = roleLabelMap[user.role] || "Utilizador";
+
 
   return (
     <aside className={cn("h-screen bg-sidebar text-sidebar-foreground flex flex-col transition-all duration-300 sticky top-0 shrink-0", collapsed ? "w-[68px]" : "w-[260px]")}>
@@ -315,10 +327,12 @@ export default function AppSidebar() {
                     <item.icon className="w-[18px] h-[18px] shrink-0" />
                     {!collapsed && <span className="truncate flex-1">{item.label}</span>}
                     {item.badge && item.badge > 0 && (
-                      <span className={cn("shrink-0 min-w-[18px] h-[18px] flex items-center justify-center rounded-full text-[10px] font-bold bg-destructive text-destructive-foreground", collapsed && "absolute -top-1 -right-1 min-w-[16px] h-[16px] text-[9px]")}>
-                        {item.badge}
+                      <span className={cn("relative shrink-0 min-w-[18px] h-[18px] flex items-center justify-center rounded-full text-[10px] font-bold bg-destructive text-destructive-foreground ring-2 ring-destructive/30", collapsed && "absolute -top-1 -right-1 min-w-[16px] h-[16px] text-[9px]")}>
+                        <span className="absolute inset-0 rounded-full bg-destructive/60 animate-ping" />
+                        <span className="relative">{item.badge}</span>
                       </span>
                     )}
+
                   </NavLink>
                 );
               })}
