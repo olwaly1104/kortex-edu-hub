@@ -237,11 +237,24 @@ export default function FinancasCalendario() {
                 </button>
               ))}
             </div>
-            <Button size="sm" className="h-9 gap-1.5 text-xs" onClick={() => { setForm(f => ({ ...f, date: selectedDate })); setOpenCreate(true); }}>
-              <Plus className="w-4 h-4" /> Adicionar à Agenda
-            </Button>
           </div>
         </div>
+      </div>
+
+      {/* ── Period title + Adicionar ─────────────── */}
+      <div className="flex items-end justify-between gap-3 flex-wrap">
+        <div>
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">
+            {view === "week" ? "Semana Atual" : "Mês Atual"}
+          </p>
+          <h2 className="text-lg font-bold text-foreground capitalize leading-tight mt-0.5">
+            {view === "week" ? weekLabel : monthLabel}
+          </h2>
+        </div>
+        <Button size="sm" className="h-9 gap-1.5 text-xs"
+          onClick={() => { setForm(f => ({ ...f, date: selectedDate })); setOpenCreate(true); }}>
+          <Plus className="w-4 h-4" /> Adicionar à Agenda
+        </Button>
       </div>
 
       {/* ── Grid ─────────────────────────────── */}
@@ -371,42 +384,37 @@ export default function FinancasCalendario() {
                   </Button>
                 </div>
               ) : (
-                <div className="p-3 space-y-2 max-h-[540px] overflow-y-auto">
+                <div className="p-3 space-y-2.5 max-h-[560px] overflow-y-auto">
                   {selectedEvents.map(ev => {
                     const m = TYPE_META[ev.type];
                     const Icon = m.icon;
                     const hasTime = !!ev.startTime;
                     return (
                       <button key={ev.id} onClick={() => setDetailEvent(ev)}
-                        className="w-full text-left rounded-lg border bg-card hover:border-foreground/20 hover:shadow-sm transition-all overflow-hidden group">
-                        <div className="flex items-stretch">
-                          <div className={cn("w-1 shrink-0", m.bar)} />
-                          <div className="flex-1 min-w-0 p-2.5">
-                            <div className="flex items-start justify-between gap-2 mb-1.5">
-                              <div className="flex items-center gap-1.5 min-w-0">
-                                <div className={cn("w-5 h-5 rounded-md flex items-center justify-center shrink-0", m.soft)}>
-                                  <Icon className={cn("w-3 h-3", m.text)} />
-                                </div>
-                                <span className={cn("text-[10px] font-semibold uppercase tracking-wide", m.text)}>{m.label}</span>
-                              </div>
-                              {ev.obligatory && (
-                                <Badge variant="outline" className="text-[9px] h-4 px-1 bg-red-50 text-red-700 border-red-200">Obrig.</Badge>
-                              )}
+                        className="w-full text-left rounded-lg border bg-card hover:border-foreground/30 hover:shadow-sm transition-all overflow-hidden group">
+                        <div className={cn("h-1 w-full", m.bar)} />
+                        <div className="p-3 space-y-2">
+                          <div className="flex items-center justify-between gap-2">
+                            <div className={cn("inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md", m.soft)}>
+                              <Icon className={cn("w-3 h-3", m.text)} />
+                              <span className={cn("text-[10px] font-semibold uppercase tracking-wide", m.text)}>{m.label}</span>
                             </div>
-                            <p className="text-xs font-semibold text-foreground leading-snug line-clamp-2">{ev.title}</p>
-                            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2 text-[10px] text-muted-foreground">
-                              {hasTime && (
-                                <span className="flex items-center gap-1 font-medium text-foreground/80">
-                                  <Clock className="w-3 h-3" />{ev.startTime}–{ev.endTime}
-                                </span>
-                              )}
-                              {ev.location && (
-                                <span className="flex items-center gap-1 truncate"><MapPin className="w-3 h-3" />{ev.location}</span>
-                              )}
-                              {ev.participants && ev.participants.length > 0 && (
-                                <span className="flex items-center gap-1"><Users className="w-3 h-3" />{ev.participants.length}</span>
-                              )}
+                            {ev.obligatory && (
+                              <Badge variant="outline" className="text-[9px] h-4 px-1 bg-red-50 text-red-700 border-red-200">Obrig.</Badge>
+                            )}
+                          </div>
+                          <p className="text-sm font-semibold text-foreground leading-snug line-clamp-2">{ev.title}</p>
+                          <div className="pt-2 border-t border-border/60 space-y-1 text-[11px] text-muted-foreground">
+                            <div className="flex items-center gap-1.5 font-medium text-foreground/80">
+                              <Clock className="w-3 h-3" />
+                              {hasTime ? `${ev.startTime} – ${ev.endTime}` : "Dia todo"}
                             </div>
+                            {ev.location && (
+                              <div className="flex items-center gap-1.5 truncate"><MapPin className="w-3 h-3 shrink-0" />{ev.location}</div>
+                            )}
+                            {ev.participants && ev.participants.length > 0 && (
+                              <div className="flex items-center gap-1.5"><Users className="w-3 h-3" />{ev.participants.length} participante{ev.participants.length !== 1 ? "s" : ""}</div>
+                            )}
                           </div>
                         </div>
                       </button>
