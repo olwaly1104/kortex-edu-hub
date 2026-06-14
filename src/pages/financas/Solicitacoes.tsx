@@ -181,11 +181,11 @@ export default function FinancasSolicitacoes() {
             <p className="text-[11px] text-muted-foreground mt-0.5">Ano lectivo {ANO_LETIVO}</p>
           </div>
 
-          {/* Direção tabs */}
+          {/* Direção segmented */}
           <div className="flex bg-muted/60 rounded-lg p-0.5">
             {([
-              { key: "recebidas" as const, label: "Recebidas", icon: Inbox },
-              { key: "enviadas"  as const, label: "Enviadas",  icon: Send },
+              { key: "recebidas" as const, label: "Recebidas", icon: Inbox, count: finSolicitacoes.filter(s => s.direction === "recebida").length },
+              { key: "enviadas"  as const, label: "Enviadas",  icon: Send,  count: finSolicitacoes.filter(s => s.direction === "enviada").length },
             ]).map(t => (
               <button key={t.key}
                 onClick={() => { setTab(t.key); setEstado("todos"); }}
@@ -194,29 +194,35 @@ export default function FinancasSolicitacoes() {
                   tab === t.key ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
                 )}>
                 <t.icon className="w-3.5 h-3.5" />{t.label}
+                <span className={cn(
+                  "tabular-nums text-[10px] font-bold px-1.5 rounded-full ml-0.5",
+                  tab === t.key ? "bg-primary/10 text-primary" : "bg-muted-foreground/15 text-muted-foreground"
+                )}>{t.count}</span>
               </button>
             ))}
           </div>
         </div>
 
-        {/* Search + Categoria */}
-        <div className="px-5 py-3 border-b border-border bg-muted/15 flex items-center gap-2 flex-wrap">
-          <div className="relative flex-1 min-w-[220px]">
+        {/* Toolbar: search + filters */}
+        <div className="px-5 py-3 border-b border-border bg-muted/20 flex items-center gap-2 flex-wrap">
+          <div className="relative flex-1 min-w-[240px]">
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
             <Input
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Procurar por título, referência ou requerente…"
-              className="pl-8 h-8 text-xs bg-background"
+              className="pl-8 pr-8 h-9 text-xs bg-background border-border"
             />
             {search && (
-              <button type="button" onClick={() => setSearch("")} className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+              <button type="button" onClick={() => setSearch("")} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
                 <X className="w-3.5 h-3.5" />
               </button>
             )}
           </div>
           <Select value={typeFilter} onValueChange={(v: FinType | "todos") => setTypeFilter(v)}>
-            <SelectTrigger className="w-[180px] h-8 text-xs bg-background"><SelectValue placeholder="Categoria" /></SelectTrigger>
+            <SelectTrigger className="w-[190px] h-9 text-xs bg-background border-border">
+              <SelectValue placeholder="Categoria" />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="todos">Todas as categorias</SelectItem>
               {(Object.keys(finTypeMeta) as FinType[]).map(k => (
@@ -224,32 +230,31 @@ export default function FinancasSolicitacoes() {
               ))}
             </SelectContent>
           </Select>
-        </div>
-
-        {/* Filter chips */}
-        <div className="px-5 py-2 border-b border-border bg-muted/10 flex items-center gap-1.5 flex-wrap">
-          {tabs.map(t => {
-            const active = estado === t.key;
-            return (
-              <button
-                key={t.key}
-                type="button"
-                onClick={() => setEstado(t.key)}
-                className={cn(
-                  "inline-flex items-center gap-1.5 h-7 px-2.5 rounded-full border text-[11px] font-medium transition-colors",
-                  active
-                    ? "bg-primary text-primary-foreground border-primary shadow-sm"
-                    : "bg-background text-muted-foreground border-border hover:bg-muted/60 hover:text-foreground"
-                )}
-              >
-                <span>{t.label}</span>
-                <span className={cn(
-                  "tabular-nums text-[10px] font-bold px-1.5 rounded-full",
-                  active ? "bg-primary-foreground/20 text-primary-foreground" : "bg-muted text-foreground/70"
-                )}>{t.count}</span>
-              </button>
-            );
-          })}
+          <Select value={estado} onValueChange={(v: EstadoFilter) => setEstado(v)}>
+            <SelectTrigger className="w-[180px] h-9 text-xs bg-background border-border">
+              <SelectValue placeholder="Estado" />
+            </SelectTrigger>
+            <SelectContent>
+              {tabs.map(t => (
+                <SelectItem key={t.key} value={t.key}>
+                  <span className="flex items-center gap-2">
+                    {t.key === "todos" ? "Todos os estados" : t.label}
+                    <span className="tabular-nums text-[10px] font-semibold text-muted-foreground">({t.count})</span>
+                  </span>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {(search || typeFilter !== "todos" || estado !== "todos") && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => { setSearch(""); setTypeFilter("todos"); setEstado("todos"); }}
+              className="h-9 text-xs text-muted-foreground hover:text-foreground gap-1"
+            >
+              <X className="w-3.5 h-3.5" /> Limpar
+            </Button>
+          )}
         </div>
 
         {/* Table-style header */}
