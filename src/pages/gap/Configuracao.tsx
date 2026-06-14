@@ -342,9 +342,10 @@ export default function GapConfiguracao() {
       </div>
 
       <Tabs defaultValue="solicitacoes" className="space-y-6">
-        <TabsList className="grid grid-cols-2 w-full max-w-md">
+        <TabsList className="grid grid-cols-3 w-full max-w-2xl">
           <TabsTrigger value="solicitacoes" className="gap-1.5"><FileText className="w-3.5 h-3.5" /> Solicitações</TabsTrigger>
           <TabsTrigger value="agendamentos" className="gap-1.5"><CalendarClock className="w-3.5 h-3.5" /> Agendamentos</TabsTrigger>
+          <TabsTrigger value="candidaturas" className="gap-1.5"><GraduationCap className="w-3.5 h-3.5" /> Candidaturas</TabsTrigger>
         </TabsList>
 
         <TabsContent value="solicitacoes" className="space-y-6 mt-0">
