@@ -1,6 +1,6 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { announcements as baseAnnouncements } from "@/data/mockData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -20,51 +20,23 @@ import {
   Clock, ArrowRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useEffect } from "react";
-
-
-type AnnType = "urgente" | "evento" | "academico" | "geral";
-
-interface FinAnn {
-  id: string;
-  title: string;
-  content: string;
-  type: AnnType;
-  date: string;          // dd/mm/yyyy
-  author: string;
-  department: string;    // e.g. "Departamento Financeiro" | "Direcção Académica"
-  cta?: "inscrever" | null;
-  ctaLink?: string;
-  isMine?: boolean;
-}
+import { FIN_ANUNCIOS, TYPE_META, type AnnType, type FinAnn } from "@/data/financasAnunciosData";
 
 const TODAY_LABEL = "14/02/2024";
 
-const TYPE_META: Record<AnnType, { label: string; chip: string; dot: string }> = {
-  urgente:   { label: "Urgente",   chip: "bg-red-50 text-red-700 border-red-200",         dot: "bg-red-500" },
-  evento:    { label: "Evento",    chip: "bg-violet-50 text-violet-700 border-violet-200", dot: "bg-violet-500" },
-  academico: { label: "Académico", chip: "bg-blue-50 text-blue-700 border-blue-200",       dot: "bg-blue-500" },
-  geral:     { label: "Geral",     chip: "bg-slate-50 text-slate-700 border-slate-200",    dot: "bg-slate-400" },
-};
-
-/* Seed with shared + finance-specific anúncios */
-const SEED: FinAnn[] = [
-  ...baseAnnouncements.map((a, i) => ({
-    ...a,
-    department: i % 2 === 0 ? "Direcção Académica" : "Reitoria",
-    cta: i === 2 ? ("inscrever" as const) : null,
-  })),
-  { id: "f1", title: "Formação: Novas regras IVA 2024", content: "Sessão de formação obrigatória sobre as alterações fiscais em vigor. Aberta a inscrições para toda a equipa do Departamento Financeiro.", type: "evento", date: "14/02/2024", author: "Dr. Manuel Sousa", department: "Departamento Financeiro", cta: "inscrever" },
-  { id: "f2", title: "Fecho contabilístico de Janeiro concluído", content: "O processo de encerramento contabilístico de Janeiro foi finalizado. Relatórios disponíveis no EduDrive Financeiro.", type: "geral", date: "14/02/2024", author: "Departamento Financeiro", department: "Departamento Financeiro" },
-  { id: "f3", title: "Reunião extraordinária — Orçamento 2025", content: "Convocados todos os responsáveis para reunião extraordinária dia 20/02 às 10h00.", type: "urgente", date: "14/02/2024", author: "Reitoria", department: "Reitoria" },
-  { id: "f4", title: "Workshop: Gestão de Tesouraria", content: "Workshop facultativo para a equipa financeira. Inscrições até 22/02.", type: "evento", date: "13/02/2024", author: "Departamento Financeiro", department: "Departamento Financeiro", cta: "inscrever" },
-];
+/* parse "dd/mm/yyyy" → nice "14 Fev 2024" */
+const MONTHS_PT_SHORT = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
+function prettyDate(dmy: string) {
+  const [d, m, y] = dmy.split("/").map(Number);
+  if (!d || !m || !y) return dmy;
+  return `${String(d).padStart(2,"0")} ${MONTHS_PT_SHORT[m-1]} ${y}`;
+}
 
 type Scope = "todos" | "departamento" | "meus";
 
 export default function FinancasAnuncios() {
   const { user } = useAuth();
-  const [items, setItems] = useState<FinAnn[]>(SEED);
+  const [items, setItems] = useState<FinAnn[]>(FIN_ANUNCIOS);
   const [scope, setScope] = useState<Scope>("todos");
   const [typeFilter, setTypeFilter] = useState<AnnType | "todos">("todos");
   const [search, setSearch] = useState("");
@@ -76,6 +48,7 @@ export default function FinancasAnuncios() {
     department: "Departamento Financeiro", cta: null,
   });
   const [hasCta, setHasCta] = useState(false);
+
 
   const handleCreate = () => {
     if (!form.title.trim() || !form.content.trim()) return;
