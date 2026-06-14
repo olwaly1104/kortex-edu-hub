@@ -92,7 +92,7 @@ const initialReceitas = (): ReceitaRow[] => {
   const matriculas: ReceitaRow[] = reitorFaculties.map(f => ({
     id: `matr-${f.id}`,
     nome: `Matrícula — ${f.name}`,
-    tipo: "Matrícula",
+    tipo: "Emolumento",
     escopo: "geral",
     valor: f.name.includes("Medicina") ? 35000 : (f.name.includes("Arquitectura") || f.name.includes("Direito")) ? 30000 : 25000,
   }));
@@ -139,7 +139,7 @@ const RECEITA_SECTIONS: SectionDef[] = [
     tipos: ["Propina mensal"], defaultTipo: "Propina mensal",
     icon: GraduationCap, accent: "text-blue-700", chip: "bg-blue-50 border-blue-200 text-blue-700" },
   { key: "emolumentos", title: "Emolumentos", description: "Matrícula, documentos e certificados oficiais.",
-    tipos: ["Emolumento", "Matrícula"], defaultTipo: "Emolumento",
+    tipos: ["Emolumento"], defaultTipo: "Emolumento",
     icon: FileText, accent: "text-emerald-700", chip: "bg-emerald-50 border-emerald-200 text-emerald-700" },
   { key: "servicos", title: "Serviços Académicos", description: "Pedidos académicos pontuais.",
     tipos: ["Serviço Académico"], defaultTipo: "Serviço Académico",
@@ -757,12 +757,12 @@ export default function ConfigurarReceitas() {
         </div>
       </div>
 
-      {/* Mode toggle */}
-      <div className="grid grid-cols-3 gap-2">
+      {/* Mode toggle — compact pill */}
+      <div className="inline-flex items-center gap-0.5 rounded-lg border border-border bg-muted/40 p-0.5 w-fit">
         {([
-          { key: "receitas" as const, label: "Receitas", sub: "Propinas, emolumentos, multas",   icon: TrendingUp,   accent: "text-emerald-700", bg: "bg-emerald-50", border: "border-emerald-200" },
-          { key: "despesas" as const, label: "Despesas", sub: "Rubricas e categorias customizadas", icon: TrendingDown, accent: "text-red-700",     bg: "bg-red-50",     border: "border-red-200" },
-          { key: "salarios" as const, label: "Salários", sub: "Folha salarial de colaboradores", icon: Banknote,     accent: "text-blue-700",    bg: "bg-blue-50",    border: "border-blue-200" },
+          { key: "receitas" as const, label: "Receitas", icon: TrendingUp,   accent: "text-emerald-700" },
+          { key: "despesas" as const, label: "Despesas", icon: TrendingDown, accent: "text-red-700" },
+          { key: "salarios" as const, label: "Salários", icon: Banknote,     accent: "text-blue-700" },
         ]).map(m => {
           const Icon = m.icon;
           const active = mode === m.key;
@@ -771,19 +771,14 @@ export default function ConfigurarReceitas() {
               key={m.key}
               onClick={() => setMode(m.key)}
               className={cn(
-                "flex items-center gap-3 p-3 rounded-lg border transition-all text-left",
+                "inline-flex items-center gap-1.5 h-8 px-3 rounded-md text-xs font-medium transition",
                 active
-                  ? `${m.bg} ${m.border} ring-2 ring-offset-1 ring-primary/20 shadow-sm`
-                  : "border-border bg-card hover:border-primary/40"
+                  ? cn("bg-background shadow-sm", m.accent)
+                  : "text-muted-foreground hover:text-foreground"
               )}
             >
-              <div className={cn("w-10 h-10 rounded-md flex items-center justify-center", m.bg, m.accent)}>
-                <Icon className="w-5 h-5" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className={cn("text-sm font-semibold", active ? m.accent : "text-foreground")}>{m.label}</p>
-                <p className="text-[11px] text-muted-foreground truncate">{m.sub}</p>
-              </div>
+              <Icon className="w-3.5 h-3.5" />
+              {m.label}
             </button>
           );
         })}
@@ -1816,15 +1811,9 @@ export default function ConfigurarReceitas() {
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2">
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <label className="text-xs font-medium text-muted-foreground">Nome completo</label>
-                <Input value={newSalaryForm.name} onChange={e => setNewSalaryForm({ ...newSalaryForm, name: e.target.value })} placeholder="Ex.: João Silva" />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-xs font-medium text-muted-foreground">Nº de colaborador</label>
-                <Input value={newSalaryForm.employeeId} onChange={e => setNewSalaryForm({ ...newSalaryForm, employeeId: e.target.value })} placeholder="auto se vazio" />
-              </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground">Nome completo</label>
+              <Input value={newSalaryForm.name} onChange={e => setNewSalaryForm({ ...newSalaryForm, name: e.target.value })} placeholder="Ex.: João Silva" />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
