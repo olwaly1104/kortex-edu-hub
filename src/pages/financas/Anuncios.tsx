@@ -256,7 +256,7 @@ export default function FinancasAnuncios() {
 
 
       {/* ── Feed ────────────────────────────────── */}
-      <div className="space-y-3">
+      <div className="space-y-2.5">
         {filtered.length === 0 ? (
           <Card className="p-10 text-center">
             <Megaphone className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" />
@@ -265,53 +265,67 @@ export default function FinancasAnuncios() {
         ) : filtered.map(a => {
           const m = TYPE_META[a.type];
           const isSub = subscribed.has(a.id);
+          const initials = (a.author || a.department).split(" ").slice(0, 2).map(w => w[0]).join("").toUpperCase();
           return (
-            <Card key={a.id} className="overflow-hidden hover:shadow-md transition-shadow">
+            <Card key={a.id} className="group overflow-hidden hover:shadow-md hover:border-primary/20 transition-all">
               <div className="flex">
                 <div className={cn("w-1 shrink-0", m.dot)} />
-                <div className="flex-1 p-5">
-                  <div className="flex items-start justify-between gap-3 mb-2">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <Badge variant="outline" className={cn("text-[10px] font-medium", m.chip)}>{m.label}</Badge>
-                      <Badge variant="outline" className="text-[10px] bg-muted/40 gap-1">
+                <div className="flex-1 p-4">
+                  {/* meta row */}
+                  <div className="flex items-center justify-between gap-3 mb-2">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <Badge variant="outline" className={cn("text-[10px] font-semibold gap-1 px-1.5", m.chip)}>
+                        <span className={cn("w-1.5 h-1.5 rounded-full", m.dot)} />
+                        {m.label}
+                      </Badge>
+                      <Badge variant="outline" className="text-[10px] bg-muted/40 gap-1 px-1.5 font-normal">
                         <Building2 className="w-2.5 h-2.5" />{a.department}
                       </Badge>
-                      {a.isMine && <Badge variant="outline" className="text-[10px] bg-primary/10 text-primary border-primary/20">Criado por mim</Badge>}
+                      {a.isMine && (
+                        <Badge variant="outline" className="text-[10px] bg-primary/10 text-primary border-primary/20 px-1.5">
+                          Criado por mim
+                        </Badge>
+                      )}
                     </div>
-                    <div className="flex items-center gap-1 text-[11px] text-muted-foreground shrink-0">
+                    <div className="flex items-center gap-1 text-[11px] text-muted-foreground shrink-0 tabular-nums">
                       <CalendarIcon className="w-3 h-3" />{a.date}
                     </div>
                   </div>
-                  <h3 className="text-base font-semibold text-foreground mb-1.5 leading-tight">{a.title}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{a.content}</p>
-                  <div className="flex items-center justify-between gap-3 mt-3 pt-3 border-t border-border">
-                    {a.author && a.author !== a.department ? (
-                      <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-                        <UserIcon className="w-3 h-3" />
-                        <span className="font-medium text-foreground">{a.author}</span>
+
+                  {/* body */}
+                  <h3 className="text-[15px] font-semibold text-foreground leading-snug mb-1">{a.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">{a.content}</p>
+
+                  {/* footer */}
+                  <div className="flex items-center justify-between gap-3 mt-3 pt-2.5 border-t border-border/60">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className="w-6 h-6 rounded-full bg-primary/10 text-primary text-[10px] font-semibold flex items-center justify-center shrink-0">
+                        {initials || <UserIcon className="w-3 h-3" />}
                       </div>
-                    ) : <div />}
-                    <div className="flex items-center gap-2">
-                      <Button variant="outline" size="sm" className="h-7 text-[11px] gap-1">
-                        Ver detalhes
-                      </Button>
+                      <span className="text-[11px] text-muted-foreground truncate">
+                        Por <span className="font-medium text-foreground">{a.author || a.department}</span>
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
                       {a.cta === "inscrever" && (
                         isSub ? (
-                          <Badge className="text-[10px] gap-1 bg-emerald-100 text-emerald-700 border-emerald-200 border">
+                          <Badge variant="outline" className="text-[10px] gap-1 bg-emerald-50 text-emerald-700 border-emerald-200 h-7 px-2">
                             <CheckCircle2 className="w-3 h-3" /> Inscrito
                           </Badge>
-
                         ) : (
-                          <Button size="sm" className="h-7 text-[11px] gap-1" onClick={() => setSubscribed(s => new Set(s).add(a.id))}>
+                          <Button size="sm" className="h-7 text-[11px] gap-1 px-2.5" onClick={() => setSubscribed(s => new Set(s).add(a.id))}>
                             <CheckCircle2 className="w-3 h-3" /> Inscrever
                           </Button>
                         )
                       )}
                       {a.isMine && (
-                        <Button variant="ghost" size="sm" className="h-7 text-[11px] gap-1 text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => handleDelete(a.id)}>
-                          <Trash2 className="w-3 h-3" /> Apagar
+                        <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => handleDelete(a.id)}>
+                          <Trash2 className="w-3.5 h-3.5" />
                         </Button>
                       )}
+                      <Button variant="ghost" size="sm" className="h-7 text-[11px] gap-1 px-2 text-primary hover:text-primary hover:bg-primary/5">
+                        Ver detalhes <ArrowRight className="w-3 h-3 transition-transform group-hover:translate-x-0.5" />
+                      </Button>
                     </div>
                   </div>
                 </div>
@@ -323,3 +337,4 @@ export default function FinancasAnuncios() {
     </div>
   );
 }
+
