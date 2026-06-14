@@ -210,7 +210,7 @@ function AppRoutes() {
 
   return (
     <Routes>
-      <Route path="/" element={<Navigate to={homeRedirect} replace />} />
+      <Route path="/" element={<Website />} />
       <Route element={<RoleGuardedLayout homeRedirect={homeRedirect} />}>
         {/* Student */}
         <Route path="/student" element={<StudentDashboard />} />
