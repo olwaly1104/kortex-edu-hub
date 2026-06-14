@@ -821,37 +821,58 @@ export default function ConfigurarReceitas() {
                     )}
                   </div>
 
-                  {!selected ? (
-                    <div className="grid sm:grid-cols-2 gap-2">
-                      {facultyStats.map(f => (
-                        <button key={f.id} onClick={() => setSelectedFaculty(f.id)}
-                          className="flex items-center gap-3 p-3 rounded-lg border border-border hover:border-primary/40 hover:bg-muted/40 transition text-left group">
-                          <div className="w-9 h-9 rounded-md bg-blue-50 text-blue-700 flex items-center justify-center flex-shrink-0">
-                            <Building2 className="w-4 h-4" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-foreground truncate">{f.name}</p>
-                            <p className="text-[11px] text-muted-foreground">{f.courseCount} cursos · {formatCurrency(f.min)} – {formatCurrency(f.max)}</p>
-                          </div>
-                          <div className="text-right">
-                            <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Média</p>
-                            <p className="text-sm font-semibold text-foreground tabular-nums">{formatCurrency(f.avg)}</p>
-                          </div>
-                          <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition" />
-                        </button>
-                      ))}
-                    </div>
-                  ) : (
+                  {(() => {
+                    const FAC_PALETTE = [
+                      { border: "border-blue-200/70",    gradient: "from-blue-50 via-blue-50/40",       iconBg: "bg-blue-600",    iconLight: "bg-blue-50 text-blue-700",       label: "text-blue-700",    ring: "hover:border-blue-300" },
+                      { border: "border-emerald-200/70", gradient: "from-emerald-50 via-emerald-50/40", iconBg: "bg-emerald-600", iconLight: "bg-emerald-50 text-emerald-700", label: "text-emerald-700", ring: "hover:border-emerald-300" },
+                      { border: "border-amber-200/70",   gradient: "from-amber-50 via-amber-50/40",     iconBg: "bg-amber-600",   iconLight: "bg-amber-50 text-amber-700",     label: "text-amber-700",   ring: "hover:border-amber-300" },
+                      { border: "border-violet-200/70",  gradient: "from-violet-50 via-violet-50/40",   iconBg: "bg-violet-600",  iconLight: "bg-violet-50 text-violet-700",   label: "text-violet-700",  ring: "hover:border-violet-300" },
+                      { border: "border-rose-200/70",    gradient: "from-rose-50 via-rose-50/40",       iconBg: "bg-rose-600",    iconLight: "bg-rose-50 text-rose-700",       label: "text-rose-700",    ring: "hover:border-rose-300" },
+                      { border: "border-cyan-200/70",    gradient: "from-cyan-50 via-cyan-50/40",       iconBg: "bg-cyan-600",    iconLight: "bg-cyan-50 text-cyan-700",       label: "text-cyan-700",    ring: "hover:border-cyan-300" },
+                      { border: "border-indigo-200/70",  gradient: "from-indigo-50 via-indigo-50/40",   iconBg: "bg-indigo-600",  iconLight: "bg-indigo-50 text-indigo-700",   label: "text-indigo-700",  ring: "hover:border-indigo-300" },
+                      { border: "border-teal-200/70",    gradient: "from-teal-50 via-teal-50/40",       iconBg: "bg-teal-600",    iconLight: "bg-teal-50 text-teal-700",       label: "text-teal-700",    ring: "hover:border-teal-300" },
+                    ];
+                    const facColor = (id: string) => FAC_PALETTE[reitorFaculties.findIndex(f => f.id === id) % FAC_PALETTE.length] ?? FAC_PALETTE[0];
+
+                    if (!selected) {
+                      return (
+                        <div className="grid sm:grid-cols-2 gap-2">
+                          {facultyStats.map(f => {
+                            const fc = facColor(f.id);
+                            return (
+                              <button key={f.id} onClick={() => setSelectedFaculty(f.id)}
+                                className={cn("flex items-center gap-3 p-3 rounded-lg border border-border bg-card transition text-left group", fc.ring)}>
+                                <div className={cn("w-9 h-9 rounded-md flex items-center justify-center flex-shrink-0", fc.iconLight)}>
+                                  <Building2 className="w-4 h-4" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-sm font-medium text-foreground truncate">{f.name}</p>
+                                  <p className="text-[11px] text-muted-foreground">{f.courseCount} cursos · {formatCurrency(f.min)} – {formatCurrency(f.max)}</p>
+                                </div>
+                                <div className="text-right">
+                                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Média</p>
+                                  <p className="text-sm font-semibold text-foreground tabular-nums">{formatCurrency(f.avg)}</p>
+                                </div>
+                                <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition" />
+                              </button>
+                            );
+                          })}
+                        </div>
+                      );
+                    }
+
+                    const fc = facColor(selected.id);
+                    return (
                     <div className="space-y-4">
                       {/* Faculty header with toggle to switch faculties */}
-                      <div className="rounded-xl border border-blue-200/70 bg-gradient-to-br from-blue-50 via-blue-50/40 to-transparent p-4">
+                      <div className={cn("rounded-xl border bg-gradient-to-br to-transparent p-4", fc.border, fc.gradient)}>
                         <div className="flex items-start justify-between gap-4 flex-wrap">
                           <div className="flex items-center gap-3 min-w-0">
-                            <div className="w-11 h-11 rounded-lg bg-blue-600 text-white flex items-center justify-center shadow-sm flex-shrink-0">
+                            <div className={cn("w-11 h-11 rounded-lg text-white flex items-center justify-center shadow-sm flex-shrink-0", fc.iconBg)}>
                               <Building2 className="w-5 h-5" />
                             </div>
                             <div className="min-w-0">
-                              <p className="text-[10px] uppercase tracking-wider text-blue-700 font-bold">Faculdade · Propinas</p>
+                              <p className={cn("text-[10px] uppercase tracking-wider font-bold", fc.label)}>Faculdade · Propinas</p>
                               <p className="text-base font-bold text-foreground truncate">{selected.name}</p>
                               <p className="text-[11px] text-muted-foreground tabular-nums">
                                 {selected.courses.length} cursos ·{" "}
@@ -869,9 +890,17 @@ export default function ConfigurarReceitas() {
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
-                                {reitorFaculties.map(f => (
-                                  <SelectItem key={f.id} value={f.id} className="text-xs">{f.name}</SelectItem>
-                                ))}
+                                {reitorFaculties.map(f => {
+                                  const ic = facColor(f.id);
+                                  return (
+                                    <SelectItem key={f.id} value={f.id} className="text-xs">
+                                      <span className="inline-flex items-center gap-2">
+                                        <span className={cn("w-2 h-2 rounded-full", ic.iconBg)} />
+                                        {f.name}
+                                      </span>
+                                    </SelectItem>
+                                  );
+                                })}
                               </SelectContent>
                             </Select>
                           </div>
