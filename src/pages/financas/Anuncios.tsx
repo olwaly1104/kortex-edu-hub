@@ -205,20 +205,8 @@ export default function FinancasAnuncios() {
           </Dialog>
         </div>
 
-        {/* Square stat tiles */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
-          {stats.map(s => (
-            <div key={s.label} className={cn("rounded-xl border bg-card p-3 flex items-center gap-3", s.tone.split(" ").filter(c => c.startsWith("border")).join(" "))}>
-              <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center shrink-0", s.tone)}>
-                <s.icon className="w-4.5 h-4.5" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-xl font-bold text-foreground leading-none">{s.value}</p>
-                <p className="text-[11px] text-muted-foreground mt-1 truncate">{s.label}</p>
-              </div>
-            </div>
-          ))}
-        </div>
+
+
 
         {/* Search */}
         <div className="relative mb-3">
