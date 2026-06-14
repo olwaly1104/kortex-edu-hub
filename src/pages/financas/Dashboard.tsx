@@ -36,6 +36,14 @@ const PIE_COLORS = ["hsl(var(--primary))", "hsl(210, 70%, 55%)", "hsl(25, 90%, 5
 const catData = Array.from(catMap.entries()).sort((a, b) => b[1] - a[1]).map(([name, value], i) => ({ name, value, color: PIE_COLORS[i % PIE_COLORS.length] }));
 const despesaAprovadas = catData.reduce((s, c) => s + c.value, 0);
 
+/* receitas por categoria */
+const recMap = new Map<string, number>();
+receitas.forEach(r => recMap.set(r.category, (recMap.get(r.category) || 0) + r.amount));
+const REC_COLORS = ["hsl(var(--accent))", "hsl(150, 60%, 40%)", "hsl(200, 70%, 50%)", "hsl(45, 85%, 50%)", "hsl(280, 50%, 55%)", "hsl(var(--muted-foreground))"];
+const recCatData = Array.from(recMap.entries()).sort((a, b) => b[1] - a[1]).map(([name, value], i) => ({ name, value, color: REC_COLORS[i % REC_COLORS.length] }));
+const receitaTotal = recCatData.reduce((s, c) => s + c.value, 0);
+const receitaEsperadaMes = receitas.reduce((s, r) => s + r.amount, 0);
+
 /* all transactions merged */
 const allTx = [
   ...receitas.map(r => ({ id: r.id, desc: r.description, date: r.date, amount: r.amount, type: "receita" as const, category: r.category, status: r.status, entity: r.payer || "—" })),
