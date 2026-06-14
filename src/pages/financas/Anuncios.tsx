@@ -359,7 +359,7 @@ export default function FinancasAnuncios() {
                         </Button>
                       )}
                       <Button asChild size="sm" variant="outline" className="h-7 text-[11px] gap-1.5 px-2.5 border-primary/30 text-primary hover:bg-primary hover:text-primary-foreground">
-                        <Link to={`/financas/anuncios/${a.id}`}>
+                        <Link to={`/financas/anuncios/${a.id}`} onClick={() => markRead(a.id)}>
                           Ver detalhes <ArrowRight className="w-3 h-3 transition-transform group-hover:translate-x-0.5" />
                         </Link>
                       </Button>
