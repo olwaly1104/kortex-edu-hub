@@ -22,10 +22,6 @@ export default function FinancasAnuncioDetail() {
 
   const ann = useMemo(() => FIN_ANUNCIOS.find(a => a.id === id), [id]);
 
-  const related = useMemo(
-    () => ann ? FIN_ANUNCIOS.filter(a => a.id !== ann.id && a.department === ann.department).slice(0, 4) : [],
-    [ann]
-  );
 
   if (!ann) {
     return (
