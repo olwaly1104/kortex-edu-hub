@@ -161,13 +161,6 @@ export default function FinancasAnuncioDetail() {
         <div className="grid md:grid-cols-[1fr_280px] divide-x divide-border">
           {/* LEFT — descrição body */}
           <div className="p-6 min-w-0 space-y-6">
-            {/* Lead / pull-quote */}
-            <div className="border-l-[3px] border-primary/60 pl-3.5 py-1">
-              <p className="text-[13px] leading-6 italic text-muted-foreground">
-                {(ann.content.split(/(?<=[.!?])\s/)[0] || ann.content).slice(0, 180)}
-              </p>
-            </div>
-
             <div>
               <h2 className="text-[11px] uppercase tracking-[0.16em] font-semibold text-muted-foreground mb-3">Conteúdo</h2>
               <article className="max-w-none">
@@ -201,89 +194,49 @@ export default function FinancasAnuncioDetail() {
               </div>
             )}
 
-            {/* Documentos anexos */}
-            <div>
-              <h2 className="text-[11px] uppercase tracking-[0.16em] font-semibold text-muted-foreground mb-2 flex items-center gap-1.5">
-                <Paperclip className="w-3 h-3" /> Documentos anexos
-              </h2>
-              <div className="rounded-md border border-border divide-y divide-border overflow-hidden">
-                {[
-                  { name: `Anuncio-${ann.id.toUpperCase()}.pdf`, size: "184 KB" },
-                  ...(ann.cta === "inscrever" ? [{ name: "Programa-detalhado.pdf", size: "312 KB" }] : []),
-                ].map((f, i) => (
-                  <div key={i} className="flex items-center gap-3 px-3 py-2.5 bg-background hover:bg-muted/40 transition-colors">
-                    <div className="w-7 h-7 rounded bg-red-50 border border-red-200 flex items-center justify-center shrink-0">
-                      <FileText className="w-3.5 h-3.5 text-red-600" />
+            {/* Anexos */}
+            {(() => {
+              const attachments = ann.type === "suspensao"
+                ? []
+                : ann.cta === "inscrever"
+                  ? [{ name: "Programa-detalhado.pdf", size: "312 KB" }]
+                  : [];
+              return (
+                <div>
+                  <h2 className="text-[11px] uppercase tracking-[0.16em] font-semibold text-muted-foreground mb-2 flex items-center gap-1.5">
+                    <Paperclip className="w-3 h-3" /> Anexos
+                    <span className="text-muted-foreground/70 normal-case tracking-normal font-medium">({attachments.length})</span>
+                  </h2>
+                  {attachments.length === 0 ? (
+                    <div className="rounded-md border border-dashed border-border px-3 py-4 text-center text-[12px] text-muted-foreground">
+                      Sem anexos
                     </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-[12.5px] font-semibold text-foreground truncate">{f.name}</p>
-                      <p className="text-[10.5px] text-muted-foreground tabular-nums">PDF · {f.size}</p>
+                  ) : (
+                    <div className="rounded-md border border-border divide-y divide-border overflow-hidden">
+                      {attachments.map((f, i) => (
+                        <div key={i} className="flex items-center gap-3 px-3 py-2.5 bg-background hover:bg-muted/40 transition-colors">
+                          <div className="w-7 h-7 rounded bg-red-50 border border-red-200 flex items-center justify-center shrink-0">
+                            <FileText className="w-3.5 h-3.5 text-red-600" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-[12.5px] font-semibold text-foreground truncate">{f.name}</p>
+                            <p className="text-[10.5px] text-muted-foreground tabular-nums">PDF · {f.size}</p>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 px-2 text-[11px] gap-1"
+                            onClick={() => toast({ title: "Download iniciado", description: f.name })}
+                          >
+                            <Download className="w-3 h-3" /> Baixar
+                          </Button>
+                        </div>
+                      ))}
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-7 px-2 text-[11px] gap-1"
-                      onClick={() => toast({ title: "Download iniciado", description: f.name })}
-                    >
-                      <Download className="w-3 h-3" /> Baixar
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Partilhado com inline */}
-            <Dialog>
-              <div className="flex items-center justify-between gap-3 pt-1">
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="flex -space-x-1.5">
-                    {sharedWith.slice(0, 4).map((p, i) => {
-                      const ini = p.name.split(" ").slice(0, 2).map(n => n[0]).join("").toUpperCase();
-                      return (
-                        <div key={i} className="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[10px] font-semibold ring-2 ring-card">
-                          {ini}
-                        </div>
-                      );
-                    })}
-                  </div>
-                  <p className="text-[12px] text-muted-foreground">
-                    <span className="font-semibold text-foreground">{sharedWith.length} pessoas</span> com acesso
-                  </p>
+                  )}
                 </div>
-                <DialogTrigger asChild>
-                  <Button variant="ghost" size="sm" className="h-7 px-2 text-[11px] gap-1">
-                    <Users className="w-3 h-3" /> Ver todos
-                  </Button>
-                </DialogTrigger>
-              </div>
-              <DialogContent className="max-w-md">
-                <DialogHeader>
-                  <DialogTitle className="text-base flex items-center gap-2">
-                    <Share2 className="w-4 h-4 text-primary" /> Partilhado com {sharedWith.length} pessoas
-                  </DialogTitle>
-                  <DialogDescription className="text-[12px]">
-                    Pessoas com acesso ao documento <span className="font-medium text-foreground">Anuncio-{ann.id.toUpperCase()}</span>.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-2 mt-2">
-                  {sharedWith.map((p, i) => {
-                    const ini = p.name.split(" ").slice(0, 2).map(n => n[0]).join("").toUpperCase();
-                    return (
-                      <div key={i} className="flex items-center gap-3 px-3 py-2.5 rounded-md border border-border bg-muted/20">
-                        <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[11px] font-semibold ring-1 ring-primary/15 shrink-0">
-                          {ini}
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="text-[13px] font-semibold text-foreground leading-tight truncate">{p.name}</p>
-                          <p className="text-[11px] text-muted-foreground mt-0.5">{p.role}</p>
-                        </div>
-                        <Badge variant="outline" className="text-[10px] font-medium px-2 py-0.5 shrink-0">{p.access}</Badge>
-                      </div>
-                    );
-                  })}
-                </div>
-              </DialogContent>
-            </Dialog>
+              );
+            })()}
           </div>
 
           {/* RIGHT — Dados */}
