@@ -285,24 +285,24 @@ export default function FinancasAnuncios() {
 
                   {/* compact CTA */}
                   {a.cta === "inscrever" && (
-                    <div className="mt-3 flex items-center gap-2.5 flex-wrap">
+                    <div className="mt-3 inline-flex items-stretch rounded-md border border-border bg-card overflow-hidden shadow-sm">
                       {isSub ? (
-                        <span className="inline-flex items-center gap-1.5 rounded-md bg-emerald-600 text-white px-3 py-1.5 text-xs font-semibold shadow-sm">
+                        <span className="inline-flex items-center gap-1.5 bg-emerald-600 text-white px-3 py-1.5 text-xs font-semibold">
                           <CheckCircle2 className="w-3.5 h-3.5" />
                           Inscrito
                         </span>
                       ) : (
                         <button
                           onClick={() => setSubscribed(s => new Set(s).add(a.id))}
-                          className="inline-flex items-center gap-1.5 rounded-md bg-primary text-primary-foreground px-3.5 py-1.5 text-xs font-semibold shadow-sm hover:bg-primary/90 transition-colors"
+                          className="inline-flex items-center gap-1.5 bg-primary text-primary-foreground px-3.5 py-1.5 text-xs font-semibold hover:bg-primary/90 transition-colors"
                         >
                           <CheckCircle2 className="w-3.5 h-3.5" />
                           Inscrever-me
                         </button>
                       )}
                       {a.ctaDeadline && (
-                        <span className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground">
-                          <span className="uppercase tracking-wide font-medium text-foreground/70">Data limite:</span>
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] bg-muted/40">
+                          <span className="uppercase tracking-wide font-medium text-muted-foreground">Data limite:</span>
                           <span className="font-semibold text-foreground tabular-nums">{a.ctaDeadline}</span>
                         </span>
                       )}
