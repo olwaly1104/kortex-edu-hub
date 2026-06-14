@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Search, Users, AlertTriangle, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { gapEstudantesSeguimento, gapTickets, gapAtendimentos } from "@/data/gapData";
+import { FinHeader } from "@/pages/financas/_FinHeader";
 
 export default function GapEstudantes() {
   const navigate = useNavigate();
@@ -36,14 +37,11 @@ export default function GapEstudantes() {
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       {/* Header */}
-      <div className="flex items-end justify-between gap-4 flex-wrap">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground tracking-tight">Discentes</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Discentes acompanhados pelo GAP — solicitações e agendamentos.
-          </p>
-        </div>
-      </div>
+      <FinHeader
+        title="Discentes"
+        subtitle="Discentes acompanhados pelo GAP — solicitações e agendamentos."
+        icon={<Users className="w-6 h-6 text-primary" />}
+      />
 
       {/* KPIs — only 2 */}
       <div className="grid grid-cols-2 lg:grid-cols-2 gap-3 max-w-xl">

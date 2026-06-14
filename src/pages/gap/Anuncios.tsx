@@ -14,6 +14,7 @@ import {
   CalendarDays, Tag, Search, Wallet,
 } from "lucide-react";
 import { toast } from "sonner";
+import { FinHeader } from "@/pages/financas/_FinHeader";
 
 const typeConfig: Record<string, { icon: typeof AlertTriangle; label: string; className: string }> = {
   urgente: { icon: AlertTriangle, label: "Urgente", className: "bg-destructive/10 text-destructive border-destructive/20" },
@@ -115,24 +116,16 @@ export default function GapAnuncios() {
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
-              <Megaphone className="w-5 h-5 text-primary" />
-            </div>
-            Quadro de Comunicações
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1 ml-[46px]">
-            Acompanhe avisos institucionais e publique comunicados do GAP
-          </p>
-        </div>
-        {activeTab === "meus" && (
-          <Button onClick={() => setShowCreate(true)} className="gap-2 shadow-sm">
+      <FinHeader
+        title="Quadro de Comunicações"
+        subtitle="Acompanhe avisos institucionais e publique comunicados do GAP"
+        icon={<Megaphone className="w-6 h-6 text-primary" />}
+        right={activeTab === "meus" ? (
+          <Button onClick={() => setShowCreate(true)} size="sm" className="gap-2 shadow-sm">
             <Plus className="w-4 h-4" /> Novo Anúncio
           </Button>
-        )}
-      </div>
+        ) : undefined}
+      />
 
       {/* Tabs */}
       <div className="flex gap-1 border-b border-border">

@@ -374,7 +374,7 @@ function AppRoutes() {
         <Route path="/gap/candidaturas" element={<GapCandidaturas />} />
         <Route path="/gap/candidaturas/:id" element={<GapCandidaturaDetail />} />
         <Route path="/gap/configuracao" element={<GapConfiguracao />} />
-        <Route path="/gap/calendario" element={<StudentCalendar />} />
+        <Route path="/gap/calendario" element={<FinancasCalendario />} />
         <Route path="/gap/anuncios" element={<GapAnuncios />} />
         <Route path="/gap/chat" element={<StudentChat />} />
         <Route path="/gap/email" element={<StudentEmail />} />
