@@ -10,6 +10,8 @@ import {
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import logoUpra from "@/assets/logo-upra.asset.json";
+import { useFinAnunciosUnread } from "@/hooks/useFinAnunciosUnread";
+
 
 interface NavItem { label: string; icon: React.ElementType; path: string; badge?: number; }
 interface NavSection { title: string; items: NavItem[]; }
