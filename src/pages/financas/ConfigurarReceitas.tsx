@@ -1314,31 +1314,108 @@ export default function ConfigurarReceitas() {
                 <span className="text-[11px] text-muted-foreground tabular-nums">· {estados.length}</span>
                 <span className="text-xs text-muted-foreground hidden md:inline">— Ciclo de vida das despesas</span>
               </div>
-              <div className="flex items-center gap-1.5 flex-wrap">
-                <Input value={newEstado} onChange={e => setNewEstado(e.target.value)}
-                  onKeyDown={e => { if (e.key === "Enter") addEstado(); }}
-                  placeholder="Novo estado" className="h-8 w-48 text-xs" />
-                <Button size="sm" variant="outline" className="h-8 text-xs gap-1.5" onClick={addEstado} disabled={!newEstado.trim()}>
-                  <Plus className="w-3.5 h-3.5" /> Adicionar
-                </Button>
-              </div>
+              <Dialog open={estadoDialogOpen} onOpenChange={setEstadoDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button size="sm" variant="outline" className="h-8 text-xs gap-1.5">
+                    <Plus className="w-3.5 h-3.5" /> Novo estado
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-md">
+                  <DialogHeader><DialogTitle>Novo estado</DialogTitle></DialogHeader>
+                  <div className="space-y-4 py-2">
+                    <div>
+                      <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Designação</label>
+                      <Input value={newEstadoLabel} onChange={e => setNewEstadoLabel(e.target.value)}
+                        placeholder="Ex.: Em revisão" className="text-sm" />
+                    </div>
+                    <div>
+                      <label className="text-xs font-medium text-muted-foreground mb-2 block">Cor</label>
+                      <div className="flex flex-wrap gap-2">
+                        {CAT_PALETTE.map(p => (
+                          <button key={p.cls} type="button"
+                            onClick={() => setNewEstadoColor(p.cls)}
+                            className={cn("h-8 w-8 rounded-full border-2 flex items-center justify-center transition",
+                              newEstadoColor === p.cls ? "border-foreground" : "border-transparent hover:border-muted-foreground/40")}
+                            title={p.name}>
+                            <span className={cn("h-5 w-5 rounded-full", p.dot)} />
+                          </button>
+                        ))}
+                      </div>
+                      <div className="mt-3">
+                        <span className={cn("inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs", newEstadoColor)}>
+                          <span className="font-medium">{newEstadoLabel.trim() || "Pré-visualização"}</span>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <DialogFooter className="gap-2 sm:gap-2">
+                    <DialogClose asChild><Button variant="outline">Cancelar</Button></DialogClose>
+                    <Button onClick={addEstado} disabled={!newEstadoLabel.trim()}>Adicionar</Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </div>
-
             {estados.length === 0 ? (
               <p className="text-xs text-muted-foreground italic">Crie estados (ex.: Activo, Em revisão, Suspensa).</p>
             ) : (
               <div className="flex flex-wrap gap-2">
-                {estados.map(e => (
-                  <div key={e} className={cn("inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs", chipFor(e))}>
-                    <span className="font-medium">{e}</span>
-                    <button onClick={() => removeEstado(e)} className="opacity-60 hover:opacity-100" title="Remover">
-                      <Trash2 className="w-3 h-3" />
-                    </button>
-                  </div>
-                ))}
+                {estados.map(e => {
+                  const count = despesas.filter(d => d.estado === e.label).length;
+                  return (
+                    <div key={e.id} className={cn("inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs", e.color)}>
+                      <span className="font-medium">{e.label}</span>
+                      <span className="opacity-60 tabular-nums">· {count}</span>
+                      <button onClick={() => setEditingEstado({ ...e })} className="opacity-60 hover:opacity-100" title="Editar">
+                        <Pencil className="w-3 h-3" />
+                      </button>
+                      <button onClick={() => removeEstado(e)} className="opacity-60 hover:opacity-100" title="Remover">
+                        <Trash2 className="w-3 h-3" />
+                      </button>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </Card>
+
+          {/* Edit estado dialog */}
+          <Dialog open={!!editingEstado} onOpenChange={(o) => !o && setEditingEstado(null)}>
+            <DialogContent className="max-w-md">
+              <DialogHeader><DialogTitle>Editar estado</DialogTitle></DialogHeader>
+              {editingEstado && (
+                <div className="space-y-4 py-2">
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Designação</label>
+                    <Input value={editingEstado.label}
+                      onChange={e => setEditingEstado({ ...editingEstado, label: e.target.value })} />
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-2 block">Cor</label>
+                    <div className="flex flex-wrap gap-2">
+                      {CAT_PALETTE.map(p => (
+                        <button key={p.cls} type="button"
+                          onClick={() => setEditingEstado({ ...editingEstado, color: p.cls })}
+                          className={cn("h-8 w-8 rounded-full border-2 flex items-center justify-center transition",
+                            editingEstado.color === p.cls ? "border-foreground" : "border-transparent hover:border-muted-foreground/40")}
+                          title={p.name}>
+                          <span className={cn("h-5 w-5 rounded-full", p.dot)} />
+                        </button>
+                      ))}
+                    </div>
+                    <div className="mt-3">
+                      <span className={cn("inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs", editingEstado.color)}>
+                        <span className="font-medium">{editingEstado.label.trim() || "Pré-visualização"}</span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+              <DialogFooter className="gap-2 sm:gap-2">
+                <Button variant="outline" onClick={() => setEditingEstado(null)}>Cancelar</Button>
+                <Button onClick={saveEditEstado} disabled={!editingEstado?.label.trim()}>Guardar</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
 
           {/* 3. Responsáveis */}
           <Card className="p-5">
