@@ -297,6 +297,19 @@ export default function ConfigurarReceitas() {
   const [newCategoria, setNewCategoria] = useState("");
   const [newEstado, setNewEstado] = useState("");
 
+  // Responsáveis
+  const [responsaveis, setResponsaveis] = useState<ResponsavelItem[]>(INITIAL_RESPONSAVEIS);
+  const [newRespNome, setNewRespNome] = useState("");
+  const [newRespCargo, setNewRespCargo] = useState("");
+
+  // Destinatário por categoria
+  const [destinatariosMap, setDestinatariosMap] = useState<DestinatarioMap[]>([]);
+
+  // Regras de aprovação por faixa de valor
+  const [approvalRules, setApprovalRules] = useState<ApprovalRule[]>([]);
+  const [ruleForm, setRuleForm] = useState<{ id?: string; min: string; max: string; responsavelId: string }>({ min: "", max: "", responsavelId: "" });
+  const [openRuleDialog, setOpenRuleDialog] = useState(false);
+
   /* ── SALÁRIOS ── */
   const [salaries, setSalaries] = useState<Salary[]>(initialSalarios);
   const [salaryConfigs, setSalaryConfigs] = useState<Record<string, SalaryConfig>>(() => {
