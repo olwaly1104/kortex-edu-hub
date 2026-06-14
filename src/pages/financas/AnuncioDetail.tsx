@@ -64,175 +64,184 @@ export default function FinancasAnuncioDetail() {
 
       {/* Main document card */}
       <div className="rounded-lg border border-border bg-card overflow-hidden">
-        {/* Header: title + document pill */}
-        <div className="px-6 pt-5 pb-5 border-b border-border">
-          <div className="flex items-start justify-between gap-4">
-            <div className="min-w-0 flex-1">
-              <Badge variant="outline" className={cn("text-[10px] font-semibold gap-1 px-2 py-0.5 uppercase tracking-wider mb-2", m.chip)}>
-                <span className={cn("w-1.5 h-1.5 rounded-full", m.dot)} />
-                {m.label}
-              </Badge>
-              <h1 className="text-[24px] font-bold text-foreground leading-tight tracking-tight">{ann.title}</h1>
+        <div className="grid md:grid-cols-[1fr_280px] divide-x divide-border">
+          {/* LEFT — title + descrição body */}
+          <div className="p-6 min-w-0">
+            <h1 className="text-[24px] font-bold text-foreground leading-tight tracking-tight">{ann.title}</h1>
+
+            <div className="mt-6">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="h-px flex-1 bg-border" />
+                <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground font-semibold">Descrição</p>
+                <span className="h-px flex-1 bg-border" />
+              </div>
+              <article className="max-w-none">
+                <p className="text-[14.5px] leading-7 text-foreground whitespace-pre-line">{ann.content}</p>
+              </article>
             </div>
 
-            {/* Document pill (GAP-style) */}
-            <div className="inline-flex items-center gap-2 pl-1.5 pr-1 py-1 rounded-md border border-border bg-background shadow-sm shrink-0">
-              <div className="w-6 h-6 rounded bg-red-50 border border-red-200 flex items-center justify-center shrink-0">
-                <FileText className="w-3 h-3 text-red-600" />
-              </div>
-              <div className="flex flex-col min-w-0 leading-tight">
-                <span className="text-[11px] font-semibold text-foreground tabular-nums">Anuncio-{ann.id.toUpperCase()}</span>
-                <span className="text-[9px] tracking-[0.02em] text-muted-foreground font-medium">Gerado automaticamente</span>
-              </div>
-              <span className="self-stretch w-px bg-border mx-0.5" />
-
-              <Dialog>
-                <DialogTrigger asChild>
-                  <button type="button" className="inline-flex items-center gap-1 px-1 h-5 rounded text-[10px] text-primary hover:bg-muted font-medium transition-colors" title="Partilhas">
-                    <Users className="w-3 h-3" /> {sharedWith.length}
-                  </button>
-                </DialogTrigger>
-                <DialogContent className="max-w-md">
-                  <DialogHeader>
-                    <DialogTitle className="text-base flex items-center gap-2">
-                      <Share2 className="w-4 h-4 text-primary" /> Partilhado com {sharedWith.length} pessoas
-                    </DialogTitle>
-                    <DialogDescription className="text-[12px]">
-                      Pessoas com acesso ao documento <span className="font-medium text-foreground">Anuncio-{ann.id.toUpperCase()}</span>.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="space-y-2 mt-2">
-                    {sharedWith.map((p, i) => {
-                      const ini = p.name.split(" ").slice(0, 2).map(n => n[0]).join("").toUpperCase();
-                      return (
-                        <div key={i} className="flex items-center gap-3 px-3 py-2.5 rounded-md border border-border bg-muted/20">
-                          <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[11px] font-semibold ring-1 ring-primary/15 shrink-0">
-                            {ini}
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <p className="text-[13px] font-semibold text-foreground leading-tight truncate">{p.name}</p>
-                            <p className="text-[11px] text-muted-foreground mt-0.5">{p.role}</p>
-                          </div>
-                          <Badge variant="outline" className="text-[10px] font-medium px-2 py-0.5 shrink-0">{p.access}</Badge>
-                        </div>
-                      );
-                    })}
+            {ann.cta === "inscrever" && (
+              <div className="mt-6 rounded-lg border border-primary/25 bg-primary/[0.04] p-4">
+                <div className="flex items-center justify-between gap-4 flex-wrap">
+                  <div className="space-y-0.5">
+                    <p className="text-[10px] uppercase tracking-wider font-semibold text-primary">Inscrições abertas</p>
+                    <p className="text-sm font-semibold text-foreground">Confirme a sua participação</p>
+                    {ann.ctaDeadline && (
+                      <p className="text-[12px] text-muted-foreground flex items-center gap-1.5">
+                        <Clock className="w-3 h-3" />
+                        Data limite: <span className="font-semibold text-foreground tabular-nums">{ann.ctaDeadline}{ann.ctaDeadlineTime ? ` - ${ann.ctaDeadlineTime}` : ""}</span>
+                      </p>
+                    )}
                   </div>
-                </DialogContent>
-              </Dialog>
-
-              <button
-                type="button"
-                onClick={() => toast({ title: "Pré-visualização", description: `Anuncio-${ann.id.toUpperCase()}` })}
-                className="w-5 h-5 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-                title="Ver documento"
-              >
-                <Eye className="w-3 h-3" />
-              </button>
-              <button
-                type="button"
-                onClick={() => toast({ title: "Documento exportado", description: `Anuncio-${ann.id.toUpperCase()}.pdf` })}
-                className="w-5 h-5 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-                title="Exportar"
-              >
-                <Download className="w-3 h-3" />
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Meta strip */}
-        <div className="px-6 py-3 border-b border-border bg-muted/20 grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-3">
-          <MetaCell
-            icon={<UserIcon className="w-3 h-3" />}
-            label="Publicado por"
-            value={
-              <span className="inline-flex items-center gap-1.5">
-                <span className="w-5 h-5 rounded-full bg-primary/10 text-primary text-[9px] font-bold flex items-center justify-center ring-1 ring-primary/15">
-                  {initials}
-                </span>
-                <span className="truncate">{ann.author}</span>
-              </span>
-            }
-          />
-          <MetaCell
-            icon={<Building2 className="w-3 h-3" />}
-            label="Departamento"
-            value={
-              <Link
-                to={`/financas/anuncios?dep=${encodeURIComponent(ann.department)}`}
-                className="hover:text-primary hover:underline underline-offset-2 truncate"
-              >
-                {ann.department}
-              </Link>
-            }
-          />
-          <MetaCell
-            icon={<CalendarIcon className="w-3 h-3" />}
-            label="Publicação"
-            value={<span className="tabular-nums">{ann.date}</span>}
-          />
-          {ann.ctaDeadline ? (
-            <MetaCell
-              icon={<Clock className="w-3 h-3" />}
-              label="Data limite"
-              value={
-                <span className="tabular-nums font-semibold">
-                  {ann.ctaDeadline}{ann.ctaDeadlineTime ? ` · ${ann.ctaDeadlineTime}` : ""}
-                </span>
-              }
-            />
-          ) : (
-            <MetaCell
-              icon={<Tag className="w-3 h-3" />}
-              label="Referência"
-              value={
-                <button
-                  type="button"
-                  onClick={() => { navigator.clipboard?.writeText(ann.id); toast({ title: "ID copiado", description: ann.id }); }}
-                  className="font-mono tabular-nums hover:text-primary"
-                >
-                  {ann.id.toUpperCase()}
-                </button>
-              }
-            />
-          )}
-        </div>
-
-        {/* Body */}
-        <div className="px-6 py-6">
-          <article className="max-w-3xl">
-            <p className="text-[15px] leading-7 text-foreground whitespace-pre-line">{ann.content}</p>
-          </article>
-
-          {ann.cta === "inscrever" && (
-            <div className="mt-6 max-w-3xl rounded-lg border border-primary/25 bg-primary/[0.04] p-4">
-              <div className="flex items-center justify-between gap-4 flex-wrap">
-                <div className="space-y-0.5">
-                  <p className="text-[10px] uppercase tracking-wider font-semibold text-primary">Inscrições abertas</p>
-                  <p className="text-sm font-semibold text-foreground">Confirme a sua participação</p>
-                  {ann.ctaDeadline && (
-                    <p className="text-[12px] text-muted-foreground flex items-center gap-1.5">
-                      <Clock className="w-3 h-3" />
-                      Data limite: <span className="font-semibold text-foreground tabular-nums">{ann.ctaDeadline}{ann.ctaDeadlineTime ? ` - ${ann.ctaDeadlineTime}` : ""}</span>
-                    </p>
+                  {subscribed ? (
+                    <Badge variant="outline" className="text-[11px] gap-1 bg-emerald-50 text-emerald-700 border-emerald-200 h-9 px-3">
+                      <CheckCircle2 className="w-3.5 h-3.5" /> Inscrito
+                    </Badge>
+                  ) : (
+                    <Button size="sm" className="h-9 gap-1.5" onClick={() => setSubscribed(true)}>
+                      <CheckCircle2 className="w-4 h-4" /> Inscrever-me
+                    </Button>
                   )}
                 </div>
-                {subscribed ? (
-                  <Badge variant="outline" className="text-[11px] gap-1 bg-emerald-50 text-emerald-700 border-emerald-200 h-9 px-3">
-                    <CheckCircle2 className="w-3.5 h-3.5" /> Inscrito
-                  </Badge>
-                ) : (
-                  <Button size="sm" className="h-9 gap-1.5" onClick={() => setSubscribed(true)}>
-                    <CheckCircle2 className="w-4 h-4" /> Inscrever-me
-                  </Button>
-                )}
+              </div>
+            )}
+          </div>
+
+          {/* RIGHT — ID + Documento pill + Dados */}
+          <aside className="p-5 bg-muted/15 space-y-5">
+            {/* ID + Document pill stacked */}
+            <div className="flex flex-col items-end gap-1.5">
+              <button
+                type="button"
+                onClick={() => { navigator.clipboard?.writeText(ann.id); toast({ title: "ID copiado", description: ann.id }); }}
+                className="inline-flex items-center px-2 py-0.5 rounded-md border border-border bg-background hover:bg-muted text-[11px] font-mono font-semibold text-foreground transition-colors"
+              >
+                {ann.id.toUpperCase()}
+              </button>
+              <div className="inline-flex items-center gap-2 pl-1.5 pr-1 py-1 rounded-md border border-border bg-background shadow-sm">
+                <div className="w-6 h-6 rounded bg-red-50 border border-red-200 flex items-center justify-center shrink-0">
+                  <FileText className="w-3 h-3 text-red-600" />
+                </div>
+                <div className="flex flex-col min-w-0 leading-tight">
+                  <span className="text-[11px] font-semibold text-foreground tabular-nums">Anuncio-{ann.id.toUpperCase()}</span>
+                  <span className="text-[9px] tracking-[0.02em] text-muted-foreground font-medium">Gerado automaticamente</span>
+                </div>
+                <span className="self-stretch w-px bg-border mx-0.5" />
+
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <button type="button" className="inline-flex items-center gap-1 px-1 h-5 rounded text-[10px] text-primary hover:bg-muted font-medium transition-colors" title="Partilhas">
+                      <Users className="w-3 h-3" /> {sharedWith.length}
+                    </button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-md">
+                    <DialogHeader>
+                      <DialogTitle className="text-base flex items-center gap-2">
+                        <Share2 className="w-4 h-4 text-primary" /> Partilhado com {sharedWith.length} pessoas
+                      </DialogTitle>
+                      <DialogDescription className="text-[12px]">
+                        Pessoas com acesso ao documento <span className="font-medium text-foreground">Anuncio-{ann.id.toUpperCase()}</span>.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-2 mt-2">
+                      {sharedWith.map((p, i) => {
+                        const ini = p.name.split(" ").slice(0, 2).map(n => n[0]).join("").toUpperCase();
+                        return (
+                          <div key={i} className="flex items-center gap-3 px-3 py-2.5 rounded-md border border-border bg-muted/20">
+                            <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[11px] font-semibold ring-1 ring-primary/15 shrink-0">
+                              {ini}
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-[13px] font-semibold text-foreground leading-tight truncate">{p.name}</p>
+                              <p className="text-[11px] text-muted-foreground mt-0.5">{p.role}</p>
+                            </div>
+                            <Badge variant="outline" className="text-[10px] font-medium px-2 py-0.5 shrink-0">{p.access}</Badge>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </DialogContent>
+                </Dialog>
+
+                <button
+                  type="button"
+                  onClick={() => toast({ title: "Pré-visualização", description: `Anuncio-${ann.id.toUpperCase()}` })}
+                  className="w-5 h-5 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                  title="Ver documento"
+                >
+                  <Eye className="w-3 h-3" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => toast({ title: "Documento exportado", description: `Anuncio-${ann.id.toUpperCase()}.pdf` })}
+                  className="w-5 h-5 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                  title="Exportar"
+                >
+                  <Download className="w-3 h-3" />
+                </button>
               </div>
             </div>
-          )}
+
+            {/* Dados */}
+            <div className="pt-4 border-t border-border space-y-4">
+              <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground font-semibold">Dados</p>
+
+              <MetaCell
+                icon={<UserIcon className="w-3 h-3" />}
+                label="Publicado por"
+                value={
+                  <span className="inline-flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-full bg-primary/10 text-primary text-[10px] font-bold flex items-center justify-center ring-1 ring-primary/15">
+                      {initials}
+                    </span>
+                    <span className="truncate">{ann.author}</span>
+                  </span>
+                }
+              />
+              <MetaCell
+                icon={<Building2 className="w-3 h-3" />}
+                label="Departamento"
+                value={
+                  <Link
+                    to={`/financas/anuncios?dep=${encodeURIComponent(ann.department)}`}
+                    className="hover:text-primary hover:underline underline-offset-2 truncate"
+                  >
+                    {ann.department}
+                  </Link>
+                }
+              />
+              <MetaCell
+                icon={<CalendarIcon className="w-3 h-3" />}
+                label="Data de publicação"
+                value={<span className="tabular-nums">{ann.date}</span>}
+              />
+              <MetaCell
+                icon={<Tag className="w-3 h-3" />}
+                label="Categoria"
+                value={
+                  <span className="inline-flex items-center gap-1.5">
+                    <span className={cn("w-1.5 h-1.5 rounded-full", m.dot)} />
+                    {m.label}
+                  </span>
+                }
+              />
+              {ann.ctaDeadline && (
+                <MetaCell
+                  icon={<Clock className="w-3 h-3" />}
+                  label="Data limite"
+                  value={
+                    <span className="tabular-nums font-semibold">
+                      {ann.ctaDeadline}{ann.ctaDeadlineTime ? ` · ${ann.ctaDeadlineTime}` : ""}
+                    </span>
+                  }
+                />
+              )}
+            </div>
+          </aside>
         </div>
       </div>
     </div>
+
 
 
   );
