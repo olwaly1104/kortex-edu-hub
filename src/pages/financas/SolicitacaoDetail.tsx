@@ -57,9 +57,9 @@ export default function FinancasSolicitacaoDetail() {
   if (selected.status === "rejeitado") {
     const rej = selected.historico.slice().reverse().find(h => h.accao.toLowerCase().includes("rejeit"));
     steps.push({ label: "Solicitação rejeitada", data: rej?.data, actor: rej?.actor ?? "Direcção Financeira", nota: rej?.nota, tone: "rejected" });
-  } else if (selected.status === "aprovado" || selected.status === "executada") {
+  } else if (selected.status === "em_execucao" || selected.status === "executada") {
     const ap = selected.historico.slice().reverse().find(h => h.accao.toLowerCase().includes("aprov"));
-    steps.push({ label: "Solicitação aprovada", data: ap?.data, actor: ap?.actor ?? "Direcção Financeira", nota: ap?.nota, tone: "accepted" });
+    steps.push({ label: "Em execução", data: ap?.data, actor: ap?.actor ?? "Direcção Financeira", nota: ap?.nota, tone: "accepted" });
     if (selected.status === "executada") {
       const ex = selected.historico.slice().reverse().find(h => h.accao.toLowerCase().includes("execut"));
       steps.push({ label: "Solicitação executada", data: ex?.data, actor: ex?.actor ?? "Direcção Financeira", nota: ex?.nota, tone: "executed" });
@@ -90,10 +90,10 @@ export default function FinancasSolicitacaoDetail() {
     pending:   "bg-background border-2 border-dashed border-border text-muted-foreground",
   };
 
-  const handleAction = (action: "aprovado" | "rejeitado") => {
+  const handleAction = (action: "em_execucao" | "rejeitado") => {
     toast({
-      title: action === "aprovado" ? "Solicitação aprovada" : "Solicitação rejeitada",
-      description: `O pedido ${selected.ref} foi ${action === "aprovado" ? "aprovado" : "rejeitado"}.`,
+      title: action === "em_execucao" ? "Solicitação em execução" : "Solicitação rejeitada",
+      description: `O pedido ${selected.ref} foi ${action === "em_execucao" ? "colocado em execução" : "rejeitado"}.`,
     });
   };
 
@@ -135,7 +135,7 @@ export default function FinancasSolicitacaoDetail() {
                 <Button variant="outline" size="sm" className="h-7 text-[11px] gap-1.5 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-300 transition-colors" onClick={() => handleAction("rejeitado")}>
                   <XCircle className="w-3.5 h-3.5" /> Rejeitar
                 </Button>
-                <Button size="sm" className="h-7 text-[11px] gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white transition-colors" onClick={() => handleAction("aprovado")}>
+                <Button size="sm" className="h-7 text-[11px] gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white transition-colors" onClick={() => handleAction("em_execucao")}>
                   <CheckCircle2 className="w-3.5 h-3.5" /> Aprovar
                 </Button>
               </div>

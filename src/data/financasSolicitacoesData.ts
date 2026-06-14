@@ -4,7 +4,7 @@ import {
 } from "lucide-react";
 
 export type FinDirection = "recebida" | "enviada";
-export type FinStatus = "pendente" | "atrasado" | "aprovado" | "executada" | "rejeitado";
+export type FinStatus = "pendente" | "atrasado" | "em_execucao" | "executada" | "rejeitado";
 export type FinType =
   | "reembolso" | "orcamento" | "fornecedor"
   | "antecipacao" | "verba" | "outro";
@@ -77,7 +77,7 @@ export const finSolicitacoes: FinSolicitacao[] = [
     title: "Pagamento Fornecedor — Reagentes Químicos",
     description: "Liquidação da factura FT-2025/0412 ao fornecedor LabSupplies Angola, vencida a 30/04.",
     requester: "Coord. Fac. Ciências", requesterRole: "Coordenador", requesterMatricula: "COR-0021",
-    date: "2025-04-02", status: "aprovado",
+    date: "2025-04-02", status: "em_execucao",
     anexos: [{ nome: "Factura-LabSupplies.pdf", tamanho: "156 KB", tipo: "pdf" }],
     historico: [
       { data: "2025-04-02 10:00", actor: "Coord. Fac. Ciências", accao: "Solicitação submetida" },
@@ -186,7 +186,7 @@ export const finTypeMeta: Record<FinType, { label: string; icon: LucideIcon; cls
 export const finStatusMeta: Record<FinStatus, { label: string; cls: string; dot: string; icon: LucideIcon }> = {
   pendente:  { label: "Pendente",  cls: "bg-amber-50 text-amber-700 border-amber-200",       dot: "bg-amber-500",   icon: Clock },
   atrasado:  { label: "Em atraso", cls: "bg-orange-50 text-orange-700 border-orange-200",    dot: "bg-orange-500",  icon: AlertTriangle },
-  aprovado:  { label: "Aprovada",  cls: "bg-emerald-50 text-emerald-700 border-emerald-200", dot: "bg-emerald-500", icon: CheckCircle2 },
+  em_execucao: { label: "Em execução", cls: "bg-emerald-50 text-emerald-700 border-emerald-200", dot: "bg-emerald-500", icon: CheckCircle2 },
   executada: { label: "Executada", cls: "bg-teal-50 text-teal-700 border-teal-200",          dot: "bg-teal-500",    icon: BadgeCheck },
   rejeitado: { label: "Rejeitada", cls: "bg-red-50 text-red-600 border-red-200",             dot: "bg-red-500",     icon: XCircle },
 };
