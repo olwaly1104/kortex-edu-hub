@@ -58,7 +58,24 @@ interface MeetingRequest {
   participants?: string[];
   agenda?: string[];
   status: "pending" | "accepted" | "declined";
+  requestedAt: string;
 }
+
+type ParticipantStatus = "accepted" | "declined" | "pending";
+function participantStatus(name: string, seed: string): ParticipantStatus {
+  let h = 0;
+  const s = name + "|" + seed;
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+  const m = Math.abs(h) % 10;
+  if (m < 6) return "accepted";
+  if (m < 8) return "declined";
+  return "pending";
+}
+const STATUS_META: Record<ParticipantStatus, { label: string; cls: string; dot: string }> = {
+  accepted: { label: "Confirmado", cls: "bg-emerald-50 text-emerald-700 border-emerald-200", dot: "bg-emerald-500" },
+  declined: { label: "Recusou",    cls: "bg-rose-50 text-rose-700 border-rose-200",          dot: "bg-rose-500" },
+  pending:  { label: "Pendente",   cls: "bg-amber-50 text-amber-700 border-amber-200",       dot: "bg-amber-500" },
+};
 
 const TYPE_META: Record<EventType, { label: string; text: string; soft: string; bar: string; icon: typeof Palmtree }> = {
   ferias:  { label: "Férias",   text: "text-emerald-700", soft: "bg-emerald-50 border-emerald-200", bar: "bg-emerald-500", icon: Palmtree },
@@ -90,11 +107,11 @@ const PRESET_EVENTS: AgendaEvent[] = [
 ];
 
 const INITIAL_REQUESTS: MeetingRequest[] = [
-  { id: "r1", title: "Revisão de Orçamento — Curso de Arquitectura", date: "2024-02-15", startTime: "14:00", endTime: "15:00", location: "Sala 204", organizer: "Coordenação ARQ", description: "Análise de despesas extra-orçamentais do semestre.", participants: ["Coordenador ARQ","Diretor Financeiro","Ana Lopes — Orçamento"], agenda: ["Despesas extra-orçamentais","Projeções Q2","Pedidos pendentes"], status: "pending" },
-  { id: "r2", title: "Reunião de planeamento — GAP", date: "2024-02-19", startTime: "11:00", endTime: "12:00", location: "Sala GAP", organizer: "Gestão Académica de Pessoal", participants: ["Coord. GAP","Diretor Financeiro"], status: "pending" },
-  { id: "r3", title: "Auditoria de processos", date: "2024-02-21", startTime: "09:30", endTime: "11:00", location: "Reitoria", organizer: "Pedro Silva", description: "Revisão dos processos contabilísticos do trimestre.", participants: ["Pedro Silva — Auditoria Interna","Diretor Financeiro","Maria Tavares — Contabilidade"], status: "pending" },
-  { id: "r4", title: "Pagamentos a fornecedores", date: "2024-02-22", startTime: "15:00", endTime: "16:00", location: "Sala Tesouraria", organizer: "João Mendes", participants: ["João Mendes — Tesouraria","Diretor Financeiro"], status: "pending" },
-  { id: "r5", title: "Folha salarial — fecho mês", date: "2024-02-26", startTime: "10:00", endTime: "11:00", location: "Sala 102", organizer: "Carla Neto", participants: ["Carla Neto — Folha Salarial","Diretor Financeiro"], status: "pending" },
+  { id: "r1", title: "Revisão de Orçamento — Curso de Arquitectura", date: "2024-02-15", startTime: "14:00", endTime: "15:00", location: "Sala 204", organizer: "Coordenação ARQ", description: "Análise de despesas extra-orçamentais do semestre.", participants: ["Coordenador ARQ","Diretor Financeiro","Ana Lopes — Orçamento"], agenda: ["Despesas extra-orçamentais","Projeções Q2","Pedidos pendentes"], status: "pending", requestedAt: "2024-02-09" },
+  { id: "r2", title: "Reunião de planeamento — GAP", date: "2024-02-19", startTime: "11:00", endTime: "12:00", location: "Sala GAP", organizer: "Gestão Académica de Pessoal", participants: ["Coord. GAP","Diretor Financeiro"], status: "pending", requestedAt: "2024-02-12" },
+  { id: "r3", title: "Auditoria de processos", date: "2024-02-21", startTime: "09:30", endTime: "11:00", location: "Reitoria", organizer: "Pedro Silva", description: "Revisão dos processos contabilísticos do trimestre.", participants: ["Pedro Silva — Auditoria Interna","Diretor Financeiro","Maria Tavares — Contabilidade"], status: "pending", requestedAt: "2024-02-13" },
+  { id: "r4", title: "Pagamentos a fornecedores", date: "2024-02-22", startTime: "15:00", endTime: "16:00", location: "Sala Tesouraria", organizer: "João Mendes", participants: ["João Mendes — Tesouraria","Diretor Financeiro"], status: "pending", requestedAt: "2024-02-14" },
+  { id: "r5", title: "Folha salarial — fecho mês", date: "2024-02-26", startTime: "10:00", endTime: "11:00", location: "Sala 102", organizer: "Carla Neto", participants: ["Carla Neto — Folha Salarial","Diretor Financeiro"], status: "pending", requestedAt: "2024-02-14" },
 ];
 
 /* ── helpers ───────────────────────────────────────── */
@@ -131,6 +148,11 @@ export default function FinancasCalendario() {
   const [requests, setRequests] = useState<MeetingRequest[]>(INITIAL_REQUESTS);
   const [detailEvent, setDetailEvent] = useState<AgendaEvent | null>(null);
   const [detailRequest, setDetailRequest] = useState<MeetingRequest | null>(null);
+  const [participantsView, setParticipantsView] = useState<{ title: string; participants: string[]; seed: string } | null>(null);
+  const openParticipants = (title: string, participants: string[] | undefined, seed: string) => {
+    if (!participants || participants.length === 0) return;
+    setParticipantsView({ title, participants, seed });
+  };
 
   const allEvents = useMemo(() => {
     const accepted: AgendaEvent[] = requests
@@ -207,16 +229,15 @@ export default function FinancasCalendario() {
       <div className="rounded-xl border border-border bg-gradient-to-r from-primary/5 to-transparent p-6">
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div className="min-w-0">
-            <div className="flex items-center gap-2 text-[11px] uppercase tracking-wider text-muted-foreground font-medium mb-2">
-              <GraduationCap className="w-3.5 h-3.5" />Ano Letivo {ANO_LETIVO}
+            <div className="flex items-center gap-3 text-[11px] uppercase tracking-wider text-muted-foreground font-medium mb-2 flex-wrap">
+              <span className="flex items-center gap-1.5"><CalendarDays className="w-3.5 h-3.5" />{fmtLong(TODAY)}</span>
+              <span className="h-3 w-px bg-border" />
+              <span className="flex items-center gap-1.5"><GraduationCap className="w-3.5 h-3.5" />Ano Letivo {ANO_LETIVO}</span>
             </div>
             <h1 className="text-2xl font-bold text-foreground">Calendário</h1>
             <p className="text-sm text-muted-foreground mt-1">Agenda institucional do Departamento Financeiro</p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <Button variant="outline" size="sm" className="h-9 gap-1.5 text-xs" onClick={() => { setCursor(TODAY); setSelectedDate(TODAY); }}>
-              Hoje
-            </Button>
             <div className="flex items-center bg-muted/60 rounded-lg p-0.5">
               <button onClick={() => navigateBy(-1)} className="p-1.5 rounded-md hover:bg-card transition-colors">
                 <ChevronLeft className="w-4 h-4" />
@@ -245,7 +266,7 @@ export default function FinancasCalendario() {
       <div className="flex items-end justify-between gap-3 flex-wrap">
         <div>
           <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">
-            {view === "week" ? "Semana Atual" : "Mês Atual"}
+            {view === "week" ? "Semana" : "Mês"}
           </p>
           <h2 className="text-lg font-bold text-foreground capitalize leading-tight mt-0.5">
             {view === "week" ? weekLabel : monthLabel}
@@ -313,7 +334,7 @@ export default function FinancasCalendario() {
               ) : (
                 <div className="divide-y divide-border max-h-[480px] overflow-y-auto">
                   {selectedEvents.map(ev => (
-                    <EventRow key={ev.id} ev={ev} onOpen={() => setDetailEvent(ev)} />
+                    <EventRow key={ev.id} ev={ev} onOpen={() => setDetailEvent(ev)} onParticipants={() => openParticipants(ev.title, ev.participants, ev.id)} />
                   ))}
                 </div>
               )}
@@ -413,7 +434,11 @@ export default function FinancasCalendario() {
                               <div className="flex items-center gap-1.5 truncate"><MapPin className="w-3 h-3 shrink-0" />{ev.location}</div>
                             )}
                             {ev.participants && ev.participants.length > 0 && (
-                              <div className="flex items-center gap-1.5"><Users className="w-3 h-3" />{ev.participants.length} participante{ev.participants.length !== 1 ? "s" : ""}</div>
+                              <span role="button" tabIndex={0}
+                                onClick={(e) => { e.stopPropagation(); openParticipants(ev.title, ev.participants, ev.id); }}
+                                className="inline-flex items-center gap-1.5 hover:text-foreground underline-offset-2 hover:underline cursor-pointer">
+                                <Users className="w-3 h-3" />{ev.participants.length} participante{ev.participants.length !== 1 ? "s" : ""}
+                              </span>
                             )}
                           </div>
                         </div>
@@ -443,7 +468,8 @@ export default function FinancasCalendario() {
                 <div className="p-2 space-y-2 overflow-y-auto" style={{ maxHeight: 3 * 176 }}>
                   {pendingRequests.map(r => (
                     <RequestCard key={r.id} r={r} onAccept={() => respondRequest(r.id, "accepted")}
-                      onDecline={() => respondRequest(r.id, "declined")} onDetail={() => setDetailRequest(r)} />
+                      onDecline={() => respondRequest(r.id, "declined")} onDetail={() => setDetailRequest(r)}
+                      onParticipants={() => openParticipants(r.title, r.participants, r.id)} />
                   ))}
                 </div>
               )}
@@ -468,7 +494,8 @@ export default function FinancasCalendario() {
               {pendingRequests.map(r => (
                 <div key={r.id} className="w-[280px] shrink-0">
                   <RequestCard r={r} onAccept={() => respondRequest(r.id, "accepted")}
-                    onDecline={() => respondRequest(r.id, "declined")} onDetail={() => setDetailRequest(r)} />
+                    onDecline={() => respondRequest(r.id, "declined")} onDetail={() => setDetailRequest(r)}
+                    onParticipants={() => openParticipants(r.title, r.participants, r.id)} />
                 </div>
               ))}
             </div>
@@ -605,17 +632,25 @@ export default function FinancasCalendario() {
       <EventDetailDialog event={detailEvent} onClose={() => setDetailEvent(null)} onDelete={handleDelete} />
 
       {/* ── Request detail ── */}
-      <RequestDetailDialog request={detailRequest} onClose={() => setDetailRequest(null)} onRespond={respondRequest} />
+      <RequestDetailDialog request={detailRequest} onClose={() => setDetailRequest(null)} onRespond={respondRequest}
+        onParticipants={(r) => openParticipants(r.title, r.participants, r.id)} />
+
+      {/* ── Participants viewer ── */}
+      <ParticipantsDialog data={participantsView} onClose={() => setParticipantsView(null)} />
     </div>
   );
 }
 
-/* ── Event row in agenda ── */
-function RequestCard({ r, onAccept, onDecline, onDetail }: {
-  r: MeetingRequest; onAccept: () => void; onDecline: () => void; onDetail: () => void;
+/* ── Request card ── */
+function RequestCard({ r, onAccept, onDecline, onDetail, onParticipants }: {
+  r: MeetingRequest; onAccept: () => void; onDecline: () => void; onDetail: () => void; onParticipants: () => void;
 }) {
   return (
     <div className="rounded-lg border bg-card hover:border-foreground/20 transition-colors overflow-hidden h-full flex flex-col">
+      <div className="px-2.5 pt-2 pb-1 border-b bg-muted/20 flex items-center justify-between gap-2">
+        <span className="text-[9px] uppercase tracking-wider text-muted-foreground font-medium">Pedido em</span>
+        <span className="text-[10px] font-semibold text-foreground">{fmtShort(r.requestedAt)}</span>
+      </div>
       <div className="p-2.5 space-y-2 flex-1">
         <div>
           <p className="text-xs font-semibold text-foreground leading-tight line-clamp-2">{r.title}</p>
@@ -624,10 +659,13 @@ function RequestCard({ r, onAccept, onDecline, onDetail }: {
           </p>
         </div>
         <div className="space-y-0.5 text-[10px] text-muted-foreground">
-          <div className="flex items-center gap-1"><CalendarDays className="w-3 h-3" />{r.date} · {r.startTime}–{r.endTime}</div>
+          <div className="flex items-center gap-1"><CalendarDays className="w-3 h-3" />{fmtShort(r.date)} · {r.startTime}–{r.endTime}</div>
           <div className="flex items-center gap-1 truncate"><MapPin className="w-3 h-3" />{r.location}</div>
-          {r.participants && (
-            <div className="flex items-center gap-1"><Users className="w-3 h-3" />{r.participants.length} participante{r.participants.length !== 1 ? "s" : ""}</div>
+          {r.participants && r.participants.length > 0 && (
+            <button type="button" onClick={onParticipants}
+              className="flex items-center gap-1 hover:text-foreground hover:underline underline-offset-2">
+              <Users className="w-3 h-3" />{r.participants.length} participante{r.participants.length !== 1 ? "s" : ""}
+            </button>
           )}
         </div>
         <div className="flex items-center gap-1.5 pt-1">
@@ -647,12 +685,13 @@ function RequestCard({ r, onAccept, onDecline, onDetail }: {
   );
 }
 
-function EventRow({ ev, onOpen, compact = false }: { ev: AgendaEvent; onOpen: () => void; compact?: boolean }) {
+function EventRow({ ev, onOpen, compact = false, onParticipants }: { ev: AgendaEvent; onOpen: () => void; compact?: boolean; onParticipants?: () => void }) {
   const m = TYPE_META[ev.type];
   const Icon = m.icon;
   const hasTime = !!ev.startTime;
   return (
-    <button onClick={onOpen} className={cn("w-full text-left flex items-center hover:bg-muted/30 transition-colors group",
+    <div onClick={onOpen} role="button" tabIndex={0}
+      className={cn("w-full text-left flex items-center hover:bg-muted/30 transition-colors group cursor-pointer",
       compact ? "gap-2.5 px-3 py-2.5" : "gap-4 px-4 py-3")}>
       <div className={cn("text-center shrink-0", compact ? "w-10" : "w-14")}>
         {hasTime ? (
@@ -673,7 +712,10 @@ function EventRow({ ev, onOpen, compact = false }: { ev: AgendaEvent; onOpen: ()
         <div className={cn("flex items-center mt-0.5 text-[10px] text-muted-foreground", compact ? "gap-2" : "gap-3 mt-1 text-[11px]")}>
           {ev.location && <span className="flex items-center gap-1 truncate"><MapPin className="w-3 h-3" />{ev.location}</span>}
           {ev.participants && ev.participants.length > 0 && (
-            <span className="flex items-center gap-1"><Users className="w-3 h-3" />{ev.participants.length}{!compact && ` participante${ev.participants.length !== 1 ? "s" : ""}`}</span>
+            <button type="button" onClick={(e) => { e.stopPropagation(); onParticipants?.(); }}
+              className="flex items-center gap-1 hover:text-foreground hover:underline underline-offset-2">
+              <Users className="w-3 h-3" />{ev.participants.length}{!compact && ` participante${ev.participants.length !== 1 ? "s" : ""}`}
+            </button>
           )}
         </div>
       </div>
@@ -683,7 +725,7 @@ function EventRow({ ev, onOpen, compact = false }: { ev: AgendaEvent; onOpen: ()
       {ev.obligatory && !compact && (
         <Badge variant="outline" className="text-[9px] bg-red-50 text-red-700 border-red-200 shrink-0">Obrigatório</Badge>
       )}
-    </button>
+    </div>
   );
 }
 
@@ -748,14 +790,20 @@ function EventDetailDialog({ event, onClose, onDelete }: { event: AgendaEvent | 
                     <Users className="w-3 h-3" /> Participantes ({event.participants.length})
                   </p>
                   <div className="rounded-lg border divide-y">
-                    {event.participants.map(p => (
-                      <div key={p} className="flex items-center gap-2 px-3 py-2 text-xs text-foreground">
-                        <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-[10px] font-semibold">
-                          {p.split(" ").map(s => s[0]).slice(0, 2).join("")}
+                    {event.participants.map(p => {
+                      const st = STATUS_META[participantStatus(p, event.id)];
+                      return (
+                        <div key={p} className="flex items-center gap-2 px-3 py-2 text-xs text-foreground">
+                          <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-[10px] font-semibold">
+                            {p.split(" ").map(s => s[0]).slice(0, 2).join("")}
+                          </div>
+                          <span className="flex-1 truncate">{p}</span>
+                          <Badge variant="outline" className={cn("text-[9px] gap-1", st.cls)}>
+                            <span className={cn("w-1.5 h-1.5 rounded-full", st.dot)} />{st.label}
+                          </Badge>
                         </div>
-                        {p}
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -832,9 +880,10 @@ function InfoTile({ icon: I, label, children }: { icon: typeof Clock; label: str
 }
 
 /* ── Request detail dialog ── */
-function RequestDetailDialog({ request, onClose, onRespond }: {
+function RequestDetailDialog({ request, onClose, onRespond, onParticipants }: {
   request: MeetingRequest | null; onClose: () => void;
   onRespond: (id: string, s: "accepted" | "declined") => void;
+  onParticipants: (r: MeetingRequest) => void;
 }) {
   if (!request) return null;
   return (
@@ -857,6 +906,8 @@ function RequestDetailDialog({ request, onClose, onRespond }: {
 
         <div className="px-6 py-5 space-y-5 max-h-[60vh] overflow-y-auto">
           <div className="grid grid-cols-2 gap-3">
+            <InfoTile icon={CalendarDays} label="Data do Pedido">{fmtShort(request.requestedAt)}</InfoTile>
+            <InfoTile icon={CalendarRange} label="Data da Reunião">{fmtShort(request.date)}</InfoTile>
             <InfoTile icon={Clock} label="Horário">{request.startTime} – {request.endTime}</InfoTile>
             <InfoTile icon={MapPin} label="Local">{request.location}</InfoTile>
             <InfoTile icon={Briefcase} label="Organizador">{request.organizer}</InfoTile>
@@ -867,18 +918,29 @@ function RequestDetailDialog({ request, onClose, onRespond }: {
 
           {request.participants && request.participants.length > 0 && (
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-2 flex items-center gap-1.5">
-                <Users className="w-3 h-3" /> Convidados
-              </p>
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium flex items-center gap-1.5">
+                  <Users className="w-3 h-3" /> Convidados
+                </p>
+                <Button size="sm" variant="ghost" className="h-6 text-[10px] gap-1" onClick={() => onParticipants(request)}>
+                  <Eye className="w-3 h-3" /> Ver todos
+                </Button>
+              </div>
               <div className="rounded-lg border divide-y">
-                {request.participants.map(p => (
-                  <div key={p} className="flex items-center gap-2 px-3 py-2 text-xs text-foreground">
-                    <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-[10px] font-semibold">
-                      {p.split(" ").map(s => s[0]).slice(0, 2).join("")}
+                {request.participants.map(p => {
+                  const st = STATUS_META[participantStatus(p, request.id)];
+                  return (
+                    <div key={p} className="flex items-center gap-2 px-3 py-2 text-xs text-foreground">
+                      <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-[10px] font-semibold">
+                        {p.split(" ").map(s => s[0]).slice(0, 2).join("")}
+                      </div>
+                      <span className="flex-1 truncate">{p}</span>
+                      <Badge variant="outline" className={cn("text-[9px] gap-1", st.cls)}>
+                        <span className={cn("w-1.5 h-1.5 rounded-full", st.dot)} />{st.label}
+                      </Badge>
                     </div>
-                    {p}
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           )}
@@ -916,6 +978,62 @@ function RequestDetailDialog({ request, onClose, onRespond }: {
             onClick={() => onRespond(request.id, "accepted")}>
             <Check className="w-4 h-4" /> Aceitar
           </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+/* ── Participants dialog (clickable list with status) ── */
+function ParticipantsDialog({ data, onClose }: {
+  data: { title: string; participants: string[]; seed: string } | null;
+  onClose: () => void;
+}) {
+  if (!data) return null;
+  const counts = data.participants.reduce(
+    (acc, p) => { const s = participantStatus(p, data.seed); acc[s]++; return acc; },
+    { accepted: 0, declined: 0, pending: 0 } as Record<ParticipantStatus, number>
+  );
+  return (
+    <Dialog open={!!data} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="sm:max-w-lg p-0 gap-0 overflow-hidden">
+        <div className="px-6 py-4 border-b bg-muted/20">
+          <DialogHeader className="space-y-1">
+            <Badge variant="outline" className="text-[10px] w-fit border-0 bg-card text-muted-foreground">Participantes</Badge>
+            <DialogTitle className="text-base font-bold leading-tight">{data.title}</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-wrap items-center gap-1.5 mt-2">
+            <Badge variant="outline" className={cn("text-[10px] gap-1", STATUS_META.accepted.cls)}>
+              <span className={cn("w-1.5 h-1.5 rounded-full", STATUS_META.accepted.dot)} />{counts.accepted} Confirmados
+            </Badge>
+            <Badge variant="outline" className={cn("text-[10px] gap-1", STATUS_META.declined.cls)}>
+              <span className={cn("w-1.5 h-1.5 rounded-full", STATUS_META.declined.dot)} />{counts.declined} Recusaram
+            </Badge>
+            <Badge variant="outline" className={cn("text-[10px] gap-1", STATUS_META.pending.cls)}>
+              <span className={cn("w-1.5 h-1.5 rounded-full", STATUS_META.pending.dot)} />{counts.pending} Pendentes
+            </Badge>
+          </div>
+        </div>
+        <div className="px-6 py-4 max-h-[60vh] overflow-y-auto">
+          <div className="rounded-lg border divide-y">
+            {data.participants.map(p => {
+              const st = STATUS_META[participantStatus(p, data.seed)];
+              return (
+                <div key={p} className="flex items-center gap-2.5 px-3 py-2.5 text-xs text-foreground">
+                  <div className="w-7 h-7 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-[10px] font-semibold shrink-0">
+                    {p.split(" ").map(s => s[0]).slice(0, 2).join("")}
+                  </div>
+                  <span className="flex-1 truncate text-foreground">{p}</span>
+                  <Badge variant="outline" className={cn("text-[10px] gap-1", st.cls)}>
+                    <span className={cn("w-1.5 h-1.5 rounded-full", st.dot)} />{st.label}
+                  </Badge>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+        <DialogFooter className="px-6 py-3 border-t bg-muted/20">
+          <Button variant="ghost" size="sm" onClick={onClose}>Fechar</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
