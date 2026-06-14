@@ -12,10 +12,19 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 const MIN_PASSWORD_LENGTH = 6;
 
+const STORAGE_KEY = "upra.demo.session";
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  // Session is held in memory only. Role is never persisted to localStorage
-  // so it cannot be tampered with via DevTools.
-  const [user, setUser] = useState<User | null>(null);
+  // Session persists in sessionStorage so reloads/deep-links don't kick the user
+  // back to the login page. Cleared on tab close or explicit logout.
+  const [user, setUser] = useState<User | null>(() => {
+    try {
+      const raw = sessionStorage.getItem(STORAGE_KEY);
+      return raw ? (JSON.parse(raw) as User) : null;
+    } catch {
+      return null;
+    }
+  });
 
   const login = useCallback((email: string, password: string) => {
     if (!email || !password) {
@@ -37,13 +46,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       inscricoes: currentInscricoes,
       academica2: currentAcademica2,
     };
-    setUser({ ...mockUsers[role], email });
+    const next = { ...mockUsers[role], email };
+    setUser(next);
+    try { sessionStorage.setItem(STORAGE_KEY, JSON.stringify(next)); } catch { /* ignore */ }
     return { ok: true };
   }, []);
 
   const logout = useCallback(() => {
     setUser(null);
+    try { sessionStorage.removeItem(STORAGE_KEY); } catch { /* ignore */ }
   }, []);
+
 
   return (
     <AuthContext.Provider value={{ user, isAuthenticated: !!user, login, logout }}>
