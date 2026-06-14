@@ -248,58 +248,6 @@ export default function FinancasAnuncioDetail() {
 
 
 
-            {/* Anexos */}
-            {(() => {
-              const attachments = ann.cta === "inscrever"
-                ? [{ name: "Programa-detalhado.pdf", size: "312 KB" }]
-                : [];
-              return (
-                <div>
-                  <h2 className="text-[11px] uppercase tracking-[0.16em] font-semibold text-muted-foreground mb-2 flex items-center gap-1.5">
-                    <Paperclip className="w-3 h-3" /> Anexos
-                    <span className="text-muted-foreground/70 normal-case tracking-normal font-medium">({attachments.length})</span>
-                  </h2>
-                  {attachments.length === 0 ? (
-                    <div className="rounded-md border border-dashed border-border px-3 py-4 text-center text-[12px] text-muted-foreground">
-                      Sem anexos
-                    </div>
-                  ) : (
-                    <div className="rounded-md border border-border divide-y divide-border overflow-hidden">
-                      {attachments.map((f, i) => (
-                        <div key={i} className="flex items-center gap-3 px-3 py-2.5 bg-background hover:bg-muted/40 transition-colors">
-                          <div className="w-7 h-7 rounded bg-red-50 border border-red-200 flex items-center justify-center shrink-0">
-                            <FileText className="w-3.5 h-3.5 text-red-600" />
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <p className="text-[12.5px] font-semibold text-foreground truncate">{f.name}</p>
-                            <p className="text-[10.5px] text-muted-foreground tabular-nums">PDF · {f.size}</p>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-7 px-2 text-[11px] gap-1"
-                              onClick={() => toast({ title: "Pré-visualização", description: f.name })}
-                            >
-                              <Eye className="w-3 h-3" /> Ver
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-7 px-2 text-[11px] gap-1"
-                              onClick={() => toast({ title: "Download iniciado", description: f.name })}
-                            >
-                              <Download className="w-3 h-3" /> Descarregar
-                            </Button>
-                          </div>
-
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              );
-            })()}
           </div>
 
           {/* RIGHT — Dados */}
