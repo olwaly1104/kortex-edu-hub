@@ -19,6 +19,16 @@ const typeStyles: Record<string, { bg: string; label: string }> = {
   geral: { bg: "bg-muted text-foreground", label: "Geral" },
 };
 
+const CATEGORY_META: Record<string, { label: string; cls: string }> = {
+  aula:     { label: "Aula",     cls: "bg-blue-50 text-blue-700 border-blue-200" },
+  teste:    { label: "Teste",    cls: "bg-amber-50 text-amber-700 border-amber-200" },
+  entrega:  { label: "Entrega",  cls: "bg-violet-50 text-violet-700 border-violet-200" },
+  exame:    { label: "Exame",    cls: "bg-red-50 text-red-700 border-red-200" },
+  pessoal:  { label: "Pessoal",  cls: "bg-slate-50 text-slate-700 border-slate-200" },
+  reuniao:  { label: "Reunião",  cls: "bg-emerald-50 text-emerald-700 border-emerald-200" },
+};
+
+
 export default function FinancasInicio() {
   const { user } = useAuth();
 
