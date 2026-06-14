@@ -514,7 +514,32 @@ export default function FinancasSolicitacaoDetail() {
                             s.aside.includes("atraso") ? "text-red-600 font-semibold not-italic" : "text-muted-foreground/90"
                           )}>{s.aside}</p>
                         )}
-                        {s.nota && <p className="mt-2 text-xs text-foreground/75 leading-relaxed pl-3 border-l-2 border-border">{s.nota}</p>}
+                        {s.nota && (
+                          <div className="mt-2 pl-3 border-l-2 border-border">
+                            <p className="text-[10px] uppercase tracking-[0.08em] text-muted-foreground font-semibold mb-0.5">Parecer / Notas</p>
+                            <p className="text-xs text-foreground/80 leading-relaxed whitespace-pre-wrap">{s.nota}</p>
+                          </div>
+                        )}
+                        {s.anexos && s.anexos.length > 0 && (
+                          <div className="mt-2 pl-3 border-l-2 border-border">
+                            <p className="text-[10px] uppercase tracking-[0.08em] text-muted-foreground font-semibold mb-1">
+                              Anexos <span className="normal-case tracking-normal tabular-nums">({s.anexos.length})</span>
+                            </p>
+                            <ul className="space-y-1">
+                              {s.anexos.map((a, ai) => {
+                                const Ic = a.tipo === "image" ? FileImage : a.tipo === "sheet" ? FileSpreadsheet : FileText;
+                                const cls = a.tipo === "image" ? "text-violet-600" : a.tipo === "sheet" ? "text-emerald-600" : "text-red-600";
+                                return (
+                                  <li key={ai} className="flex items-center gap-2 px-2 py-1 rounded-md border border-border bg-background hover:bg-muted/20 transition-colors">
+                                    <Ic className={cn("w-3.5 h-3.5 shrink-0", cls)} />
+                                    <span className="text-[12px] font-medium text-foreground truncate flex-1 leading-tight">{a.nome}</span>
+                                    <span className="text-[10px] text-muted-foreground tabular-nums shrink-0">{a.tamanho}</span>
+                                  </li>
+                                );
+                              })}
+                            </ul>
+                          </div>
+                        )}
                       </div>
                     </li>
                   );
