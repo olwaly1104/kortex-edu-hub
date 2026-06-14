@@ -29,6 +29,10 @@ export default function FinancasSolicitacaoDetail() {
   const [pendingAction, setPendingAction] = useState<null | "em_execucao" | "executada" | "rejeitado">(null);
   const [actionNotes, setActionNotes] = useState("");
   const [actionFiles, setActionFiles] = useState<File[]>([]);
+  const [actionStep, setActionStep] = useState<0 | 1 | 2>(0);
+  const [maxStep, setMaxStep] = useState<0 | 1 | 2>(0);
+
+
 
   if (!baseSelected) {
     return (
