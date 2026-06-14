@@ -817,9 +817,12 @@ function EventDetailDialog({ event, onClose, onDelete }: { event: AgendaEvent | 
           {/* Category-specific blocks */}
           {event.type === "reuniao" && (
             <>
+              {event.modality && (
+                <ModalityBanner modality={event.modality} location={event.location} link={event.meetingLink} />
+              )}
               <div className="grid grid-cols-2 gap-3">
                 {event.location && (
-                  <InfoTile icon={MapPin} label="Local">{event.location}</InfoTile>
+                  <InfoTile icon={event.modality === "virtual" ? Video : MapPin} label={event.modality === "virtual" ? "Plataforma" : "Local"}>{event.location}</InfoTile>
                 )}
                 {event.organizer && (
                   <InfoTile icon={UserCircle2} label="Organizador">{event.organizer}</InfoTile>
