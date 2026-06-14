@@ -268,17 +268,10 @@ export default function FinancasCalendario() {
         </div>
       </div>
 
-      {/* ── Period bar: toggle + entries (top), nav title (bottom) ─────────────── */}
-      {(() => {
-        const periodEntries = (view === "week"
-          ? weekDays.flatMap(d => eventsOnDate(d))
-          : allEvents.filter(e => {
-              const dd = parseISO(e.date);
-              return dd.getMonth() === cursorD.getMonth() && dd.getFullYear() === cursorD.getFullYear();
-            })
-        );
-        const totalEntries = periodEntries.length;
-        return (
+      {/* ── Grid ─────────────────────────────── */}
+      <div className="flex gap-6">
+        <div className="flex-1 min-w-0 space-y-3">
+          {/* ── Period bar: toggle + nav ─────────────── */}
           <div className="rounded-lg border border-border bg-card px-4 py-2.5 flex items-center justify-between gap-3 flex-wrap">
             {/* left: view toggle */}
             <div className="flex bg-muted/60 rounded-lg p-0.5 shrink-0">
@@ -338,14 +331,8 @@ export default function FinancasCalendario() {
                 <ChevronRight className="w-4 h-4" />
               </button>
             </div>
-
           </div>
-        );
-      })()}
 
-      {/* ── Grid ─────────────────────────────── */}
-      <div className="flex gap-6">
-        <div className="flex-1 min-w-0 space-y-3">
           {/* Result label above calendar */}
           {(() => {
             const periodEntriesCount = (view === "week"
