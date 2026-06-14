@@ -729,33 +729,38 @@ export default function FinancasCalendario() {
 }
 
 /* ── Request card ── */
-function RequestCard({ r, onAccept, onDecline, onDetail, onParticipants }: {
-  r: MeetingRequest; onAccept: () => void; onDecline: () => void; onDetail: () => void; onParticipants: () => void;
+const REQ_STATUS_META: Record<MeetingRequest["status"], { label: string; cls: string; bar: string }> = {
+  pending:  { label: "Pendente",  cls: "bg-amber-50 text-amber-700 border-amber-200",     bar: "bg-amber-500" },
+  accepted: { label: "Aceite",    cls: "bg-emerald-50 text-emerald-700 border-emerald-200", bar: "bg-emerald-500" },
+  declined: { label: "Recusado",  cls: "bg-rose-50 text-rose-700 border-rose-200",        bar: "bg-rose-500" },
+};
+
+function RequestCard({ r, onAccept, onDecline, onDetail, onParticipants, readOnly = false }: {
+  r: MeetingRequest; onAccept: () => void; onDecline: () => void; onDetail: () => void; onParticipants: () => void; readOnly?: boolean;
 }) {
+  const st = REQ_STATUS_META[r.status];
   return (
     <div className="rounded-lg border bg-card hover:border-foreground/20 transition-colors overflow-hidden h-full flex flex-col">
-      <div className="px-2.5 pt-2 pb-1 border-b bg-muted/20 flex items-center justify-between gap-2">
-        <span className="text-[9px] uppercase tracking-wider text-muted-foreground font-medium">Data do Pedido</span>
-        <span className="text-[10px] font-semibold text-foreground">{fmtShort(r.requestedAt)}</span>
-      </div>
-      <div className="p-2.5 space-y-2 flex-1">
+      <div className={cn("h-1 w-full shrink-0", st.bar)} />
+      <div className="p-3 space-y-2.5 flex-1">
+        <div className="flex items-center justify-between gap-1.5">
+          <Badge variant="outline" className={cn("text-[9px] h-4 px-1.5 font-semibold", st.cls)}>{st.label}</Badge>
+          <Badge variant="outline" className={cn("text-[9px] h-4 px-1 gap-0.5", MODALITY_META[r.modality].cls)}>
+            {(() => { const I = MODALITY_META[r.modality].icon; return <I className="w-2.5 h-2.5" />; })()}
+            {MODALITY_META[r.modality].label}
+          </Badge>
+        </div>
         <div>
-          <div className="flex items-start justify-between gap-1.5">
-            <p className="text-xs font-semibold text-foreground leading-tight line-clamp-2 flex-1">{r.title}</p>
-            <Badge variant="outline" className={cn("text-[9px] h-4 px-1 gap-0.5 shrink-0", MODALITY_META[r.modality].cls)}>
-              {(() => { const I = MODALITY_META[r.modality].icon; return <I className="w-2.5 h-2.5" />; })()}
-              {MODALITY_META[r.modality].label}
-            </Badge>
-          </div>
-          <p className="text-[10px] text-muted-foreground mt-0.5 flex items-center gap-1">
-            <UserCircle2 className="w-3 h-3" />{r.organizer}
+          <p className="text-xs font-semibold text-foreground leading-tight line-clamp-2">{r.title}</p>
+          <p className="text-[10px] text-muted-foreground mt-1 flex items-center gap-1 truncate">
+            <UserCircle2 className="w-3 h-3 shrink-0" />{r.organizer}
           </p>
         </div>
-        <div className="space-y-0.5 text-[10px] text-muted-foreground">
-          <div className="flex items-center gap-1"><CalendarDays className="w-3 h-3" />{fmtShort(r.date)} · {r.startTime}–{r.endTime}</div>
+        <div className="space-y-1 text-[10px] text-muted-foreground border-t border-border/60 pt-2">
+          <div className="flex items-center gap-1"><CalendarDays className="w-3 h-3 shrink-0" />{fmtShort(r.date)} · {r.startTime}–{r.endTime}</div>
           <div className="flex items-center gap-1 truncate">
-            {r.modality === "virtual" ? <Video className="w-3 h-3" /> : <MapPin className="w-3 h-3" />}
-            {r.location}
+            {r.modality === "virtual" ? <Video className="w-3 h-3 shrink-0" /> : <MapPin className="w-3 h-3 shrink-0" />}
+            <span className="truncate">{r.location}</span>
           </div>
           {r.participants && r.participants.length > 0 && (
             <button type="button" onClick={onParticipants}
@@ -764,14 +769,16 @@ function RequestCard({ r, onAccept, onDecline, onDetail, onParticipants }: {
             </button>
           )}
         </div>
-        <div className="flex items-center gap-1.5 pt-1">
-          <Button size="sm" className="h-7 flex-1 text-[10px] gap-1 bg-emerald-600 hover:bg-emerald-700" onClick={onAccept}>
-            <Check className="w-3 h-3" /> Aceitar
-          </Button>
-          <Button size="sm" variant="outline" className="h-7 flex-1 text-[10px] gap-1 border-red-200 text-red-700 hover:bg-red-50" onClick={onDecline}>
-            <X className="w-3 h-3" /> Recusar
-          </Button>
-        </div>
+        {!readOnly && r.status === "pending" && (
+          <div className="flex items-center gap-1.5 pt-1">
+            <Button size="sm" className="h-7 flex-1 text-[10px] gap-1 bg-emerald-600 hover:bg-emerald-700" onClick={onAccept}>
+              <Check className="w-3 h-3" /> Aceitar
+            </Button>
+            <Button size="sm" variant="outline" className="h-7 flex-1 text-[10px] gap-1 border-red-200 text-red-700 hover:bg-red-50" onClick={onDecline}>
+              <X className="w-3 h-3" /> Recusar
+            </Button>
+          </div>
+        )}
       </div>
       <button onClick={onDetail}
         className="w-full h-8 text-[10px] font-medium text-foreground/80 hover:text-foreground border-t bg-muted/20 hover:bg-muted/40 transition-colors flex items-center justify-center gap-1.5">
