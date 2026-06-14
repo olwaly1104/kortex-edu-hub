@@ -733,6 +733,19 @@ export default function FinancasSolicitacaoDetail() {
                     const fromMeta = finStatusMeta[selected.status];
                     const toMeta = finStatusMeta[pendingAction!];
                     return (
+                      <>
+                        <div className="px-5 pt-3 pb-2 border-b border-border bg-muted/10 flex items-center gap-4">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">Data</span>
+                            <span className="text-[12px] font-semibold text-foreground tabular-nums">{fmt(dSub)}</span>
+                          </div>
+                          <span className="w-px h-3 bg-border" />
+                          <div className="flex items-center gap-1.5 min-w-0">
+                            <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground shrink-0">Requerente</span>
+                            <span className="text-[12px] font-semibold text-foreground truncate">{selected.requester}</span>
+                            <span className="text-[10px] text-muted-foreground truncate">{counterpartRole}</span>
+                          </div>
+                        </div>
                       <div className="px-5 py-4 space-y-4">
                         <div>
                           <p className="text-[10px] uppercase tracking-[0.1em] font-semibold text-muted-foreground mb-2">
