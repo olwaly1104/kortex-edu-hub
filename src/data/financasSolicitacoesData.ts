@@ -1,10 +1,10 @@
 import {
   Receipt, TrendingUp, FileText, Wallet, Coins, Sparkles,
-  Clock, CheckCircle2, XCircle, type LucideIcon,
+  Clock, CheckCircle2, XCircle, AlertTriangle, BadgeCheck, type LucideIcon,
 } from "lucide-react";
 
 export type FinDirection = "recebida" | "enviada";
-export type FinStatus = "pendente" | "aprovado" | "rejeitado";
+export type FinStatus = "pendente" | "atrasado" | "aprovado" | "executada" | "rejeitado";
 export type FinType =
   | "reembolso" | "orcamento" | "fornecedor"
   | "antecipacao" | "verba" | "outro";
