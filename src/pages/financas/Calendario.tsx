@@ -865,6 +865,9 @@ function EventRow({ ev, onOpen, compact = false, onParticipants }: { ev: AgendaE
           )}
         </div>
       </div>
+      {!compact && (() => { const s = EV_STATE_META[eventState(ev)]; return (
+        <Badge variant="outline" className={cn("text-[10px] shrink-0", s.cls)}>{s.label}</Badge>
+      ); })()}
       {!compact && (
         <Badge variant="outline" className={cn("text-[10px] shrink-0 border-0", m.soft, m.text)}>{m.label}</Badge>
       )}
