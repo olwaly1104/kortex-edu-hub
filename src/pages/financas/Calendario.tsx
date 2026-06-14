@@ -150,10 +150,10 @@ function fmtShort(s: string) {
 /* mock current time for entry state computation on TODAY */
 const NOW_MIN = 10 * 60 + 45;
 type EvState = "agendado" | "decorrer" | "concluido";
-const EV_STATE_META: Record<EvState, { label: string; cls: string }> = {
-  agendado:  { label: "Agendado",   cls: "bg-blue-50 text-blue-700 border-blue-200" },
-  decorrer:  { label: "A decorrer", cls: "bg-amber-50 text-amber-700 border-amber-200" },
-  concluido: { label: "Concluído",  cls: "bg-slate-100 text-slate-600 border-slate-200" },
+const EV_STATE_META: Record<EvState, { label: string; cls: string; dot: string }> = {
+  agendado:  { label: "Agendado",   cls: "bg-blue-50 text-blue-700 border-blue-200",     dot: "bg-blue-500" },
+  decorrer:  { label: "A decorrer", cls: "bg-amber-50 text-amber-700 border-amber-200",  dot: "bg-amber-500" },
+  concluido: { label: "Concluído",  cls: "bg-slate-100 text-slate-600 border-slate-200", dot: "bg-slate-400" },
 };
 function eventState(ev: AgendaEvent): EvState {
   const end = ev.endDate ?? ev.date;
@@ -372,7 +372,7 @@ export default function FinancasCalendario() {
                 <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-0.5">
                   {view === "week" ? "Semana" : "Mês"}
                 </p>
-                <div className="rounded-lg border border-border bg-card px-4 py-2 flex items-end justify-between gap-3">
+                <div className="flex items-end justify-between gap-3">
                   <h3 className="text-lg font-bold text-foreground capitalize">
                     {view === "week" ? weekLabel : `${MONTH_NAMES[cursorD.getMonth()]} ${cursorD.getFullYear()}`}
                   </h3>
@@ -526,7 +526,10 @@ export default function FinancasCalendario() {
                             </div>
                             <div className="flex items-center gap-1">
                               {(() => { const s = EV_STATE_META[eventState(ev)]; return (
-                                <Badge variant="outline" className={cn("text-[9px] h-4 px-1.5", s.cls)}>{s.label}</Badge>
+                                <Badge variant="outline" className={cn("h-5 px-1.5 gap-1 text-[10px] font-medium", s.cls)}>
+                                  <span className={cn("w-1.5 h-1.5 rounded-full", s.dot)} />
+                                  {s.label}
+                                </Badge>
                               ); })()}
                               {ev.obligatory && (
                                 <Badge variant="outline" className="text-[9px] h-4 px-1 bg-red-50 text-red-700 border-red-200">Obrig.</Badge>
@@ -871,7 +874,10 @@ function EventRow({ ev, onOpen, compact = false, onParticipants }: { ev: AgendaE
         </div>
       </div>
       {!compact && (() => { const s = EV_STATE_META[eventState(ev)]; return (
-        <Badge variant="outline" className={cn("text-[10px] shrink-0", s.cls)}>{s.label}</Badge>
+        <Badge variant="outline" className={cn("h-5 px-1.5 gap-1 text-[10px] font-medium shrink-0", s.cls)}>
+          <span className={cn("w-1.5 h-1.5 rounded-full", s.dot)} />
+          {s.label}
+        </Badge>
       ); })()}
       {!compact && (
         <Badge variant="outline" className={cn("text-[10px] shrink-0 border-0", m.soft, m.text)}>{m.label}</Badge>
