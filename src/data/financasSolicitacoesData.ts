@@ -118,6 +118,7 @@ export const finSolicitacoes: FinSolicitacao[] = [
     historico: [
       { data: "2025-03-22 09:00", actor: "Secretaria Geral", accao: "Solicitação submetida" },
       { data: "2025-03-23 11:30", actor: "Direcção Financeira", accao: "Solicitação aprovada" },
+      { data: "2025-03-24 10:15", actor: "Direcção Financeira", accao: "Solicitação executada", nota: "Pagamento processado por transferência bancária." },
     ],
   },
   {
@@ -129,6 +130,7 @@ export const finSolicitacoes: FinSolicitacao[] = [
     historico: [
       { data: "2025-03-18 17:00", actor: "Dr. Carlos Bento", accao: "Solicitação submetida" },
       { data: "2025-03-19 10:00", actor: "Direcção Financeira", accao: "Solicitação aprovada" },
+      { data: "2025-03-20 09:30", actor: "Direcção Financeira", accao: "Solicitação executada", nota: "Reembolso liquidado." },
     ],
   },
   {
@@ -156,6 +158,7 @@ export const finSolicitacoes: FinSolicitacao[] = [
     historico: [
       { data: "2025-03-26 09:00", actor: "Direcção Financeira", accao: "Solicitação submetida" },
       { data: "2025-03-28 15:00", actor: "Magnífico Reitor", accao: "Solicitação aprovada" },
+      { data: "2025-03-30 11:00", actor: "Direcção Financeira", accao: "Solicitação executada", nota: "Contrato KPMG formalizado." },
     ],
   },
   {
