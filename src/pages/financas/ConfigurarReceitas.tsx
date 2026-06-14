@@ -193,6 +193,7 @@ interface ResponsavelItem { id: string; nome: string; cargo: string; }
 interface DestinatarioMap { categoria: string; destinatario: string; }
 interface ApprovalRule { id: string; min: number; max: number; responsavelId: string; }
 interface CategoriaItem { id: string; label: string; color: string; }
+interface EstadoItem { id: string; label: string; color: string; }
 
 const CAT_PALETTE: { name: string; cls: string; dot: string }[] = [
   { name: "Azul",     cls: "bg-blue-50 text-blue-700 border-blue-200",         dot: "bg-blue-500" },
