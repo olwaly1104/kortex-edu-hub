@@ -546,12 +546,26 @@ export default function FinancasSolicitacaoDetail() {
                 <DialogDescription className="sr-only">{pm.desc}</DialogDescription>
               </div>
 
+              {/* Data + Requerente */}
+              <div className="px-5 pt-3 pb-2 border-b border-border bg-muted/10 flex items-center gap-4">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">Data</span>
+                  <span className="text-[12px] font-semibold text-foreground tabular-nums">{fmt(dSub)}</span>
+                </div>
+                <span className="w-px h-3 bg-border" />
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground shrink-0">Requerente</span>
+                  <span className="text-[12px] font-semibold text-foreground truncate">{selected.requester}</span>
+                  <span className="text-[10px] text-muted-foreground truncate">{counterpartRole}</span>
+                </div>
+              </div>
+
               {/* Estado transition banner */}
               {(() => {
                 const fromMeta = finStatusMeta[selected.status];
                 const toMeta = finStatusMeta[pendingAction!];
                 return (
-                  <div className="px-5 py-3 border-b border-border bg-muted/15">
+                  <div className="px-5 py-2.5 border-b border-border bg-muted/15">
                     <p className="text-[10px] uppercase tracking-[0.1em] font-semibold text-muted-foreground mb-1.5">
                       Transição de estado
                     </p>
@@ -566,27 +580,15 @@ export default function FinancasSolicitacaoDetail() {
                         {toMeta.label}
                       </Badge>
                     </div>
-                    <p className="text-[11.5px] text-foreground/75 leading-relaxed mt-2">
-                      Registo histórico. Requerente e responsáveis serão notificados.
+                    <p className="text-[11px] text-foreground/70 leading-snug mt-1.5">
+                      Ação será registada. Requerente e responsáveis serão notificados.
                     </p>
                   </div>
                 );
               })()}
 
               {/* Body */}
-              <div className="px-5 py-4 space-y-4">
-                {/* Data + Requerente */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="rounded-md border border-border bg-muted/10 px-3 py-2">
-                    <p className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground mb-0.5">Data</p>
-                    <p className="text-[13px] font-semibold text-foreground">{fmt(dSub)}</p>
-                  </div>
-                  <div className="rounded-md border border-border bg-muted/10 px-3 py-2">
-                    <p className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground mb-0.5">Requerente</p>
-                    <p className="text-[13px] font-semibold text-foreground truncate">{selected.requester}</p>
-                    <p className="text-[10px] text-muted-foreground truncate">{counterpartRole}</p>
-                  </div>
-                </div>
+              <div className="px-5 py-3 space-y-3">
 
                 {/* Parecer / Notas */}
                 <section className="space-y-1.5">
