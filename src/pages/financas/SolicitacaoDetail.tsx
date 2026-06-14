@@ -25,6 +25,9 @@ export default function FinancasSolicitacaoDetail() {
   const { toast } = useToast();
   const baseSelected = finSolicitacoes.find(s => s.id === id);
   const [statusOverride, setStatusOverride] = useState<null | "em_execucao" | "executada" | "rejeitado">(null);
+  const [pendingAction, setPendingAction] = useState<null | "em_execucao" | "executada" | "rejeitado">(null);
+  const [actionNotes, setActionNotes] = useState("");
+  const [actionFiles, setActionFiles] = useState<File[]>([]);
 
   if (!baseSelected) {
     return (
