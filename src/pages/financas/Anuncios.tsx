@@ -285,34 +285,26 @@ export default function FinancasAnuncios() {
 
                   {/* compact CTA */}
                   {a.cta === "inscrever" && (
-                    <div className="mt-3">
+                    <div className="mt-3 flex items-center gap-2.5 flex-wrap">
                       {isSub ? (
-                        <div className="inline-flex items-stretch rounded-md overflow-hidden border border-emerald-200 bg-emerald-50">
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-semibold text-emerald-700">
-                            <CheckCircle2 className="w-3.5 h-3.5" />
-                            Inscrito
-                          </span>
-                          {a.ctaDeadline && (
-                            <span className="inline-flex items-center px-2.5 py-1.5 text-[10.5px] font-medium text-emerald-700/80 bg-emerald-100/60 border-l border-emerald-200 tabular-nums">
-                              {a.ctaDeadline}
-                            </span>
-                          )}
-                        </div>
+                        <span className="inline-flex items-center gap-1.5 rounded-md bg-emerald-600 text-white px-3 py-1.5 text-xs font-semibold shadow-sm">
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                          Inscrito
+                        </span>
                       ) : (
                         <button
                           onClick={() => setSubscribed(s => new Set(s).add(a.id))}
-                          className="group inline-flex items-stretch rounded-md overflow-hidden bg-primary text-primary-foreground shadow-sm hover:shadow transition-all"
+                          className="inline-flex items-center gap-1.5 rounded-md bg-primary text-primary-foreground px-3.5 py-1.5 text-xs font-semibold shadow-sm hover:bg-primary/90 transition-colors"
                         >
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-semibold group-hover:bg-primary/90 transition-colors">
-                            <CheckCircle2 className="w-3.5 h-3.5" />
-                            Inscrever-me
-                          </span>
-                          {a.ctaDeadline && (
-                            <span className="inline-flex items-center px-2.5 py-1.5 text-[10.5px] font-medium bg-primary-foreground/15 border-l border-primary-foreground/20 tabular-nums">
-                              {a.ctaDeadline}
-                            </span>
-                          )}
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                          Inscrever-me
                         </button>
+                      )}
+                      {a.ctaDeadline && (
+                        <span className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                          <span className="uppercase tracking-wide font-medium text-foreground/70">Data limite:</span>
+                          <span className="font-semibold text-foreground tabular-nums">{a.ctaDeadline}</span>
+                        </span>
                       )}
                     </div>
                   )}
