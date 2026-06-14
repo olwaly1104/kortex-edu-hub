@@ -70,15 +70,15 @@ export default function FinancasSolicitacoes() {
 
   const openWizard = () => {
     setNewType(null); setNewTitle(""); setNewDesc(""); setNewValor("");
-    setNewPrazo(""); setNewFiles([]); setWizStep(1);
+    setNewPrazoDe(undefined); setNewPrazoAte(undefined); setNewFiles([]); setWizStep(1);
     setShowNewDialog(true);
   };
 
-  const fmtPrazo = (iso: string) => {
-    if (!iso) return "—";
-    const d = new Date(iso);
+  const fmtPrazo = (d?: Date) => {
+    if (!d) return "—";
     return d.toLocaleDateString("pt-PT", { day: "2-digit", month: "long", year: "numeric" });
   };
+  const fmtPrazoShort = (d?: Date) => d ? d.toLocaleDateString("pt-PT", { day: "2-digit", month: "short", year: "numeric" }) : "Escolher";
   const fmtKz = (v: string) => {
     const n = Number(v.replace(/[^\d]/g, ""));
     if (!n) return "—";
