@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,7 @@ import {
   Settings2, Plus, Pencil, Trash2, ArrowLeft, ChevronRight, Search,
   GraduationCap, BookOpen, FileText, ClipboardCheck, AlertTriangle, Building2,
   Users, Banknote, TrendingDown, TrendingUp, Tag, CircleDot, X,
+  CalendarDays, Clock,
 } from "lucide-react";
 import { formatCurrency, salarios as initialSalarios, type Salary } from "@/data/financeModuleData";
 import { reitorFaculties } from "@/data/institutionData";
