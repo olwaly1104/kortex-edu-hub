@@ -37,6 +37,10 @@ export default function Despesas() {
   const [sortField, setSortField] = useState<SortField | null>(null);
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [periodo, setPeriodo] = useState<Periodo>("mes");
+  const [periodoValue, setPeriodoValue] = useState<string>(periodoDefaultValue("mes"));
+  const mult = PERIODO_MULT[periodo];
+
 
   const isSortActive = sortField !== null;
   const isStatusActive = filterStatus !== "todos";
