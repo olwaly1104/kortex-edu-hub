@@ -505,48 +505,40 @@ export default function FinancasSolicitacaoDetail() {
       </Card>
       {/* Action confirmation dialog */}
       <Dialog open={!!pendingAction} onOpenChange={(o) => !o && setPendingAction(null)}>
-        <DialogContent className="max-w-lg p-0 gap-0 overflow-hidden">
+        <DialogContent className="max-w-[520px] p-0 gap-0 overflow-hidden">
           {pm && (
             <>
-              {/* Header */}
-              <div className="px-6 pt-5 pb-4 border-b border-border">
-                <div className="flex items-start gap-3">
-                  <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center shrink-0", pm.iconBg)}>
-                    <pm.icon className="w-5 h-5" />
+              {/* Header — clean single-row */}
+              <div className="px-5 pt-4 pb-3.5 border-b border-border">
+                <div className="flex items-center gap-3">
+                  <div className={cn("w-9 h-9 rounded-lg flex items-center justify-center shrink-0", pm.iconBg)}>
+                    <pm.icon className="w-[18px] h-[18px]" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <DialogTitle className="text-base leading-tight">{pm.title}</DialogTitle>
-                    <DialogDescription className="text-[12px] mt-1 leading-relaxed">
-                      {pm.desc}
-                    </DialogDescription>
-                  </div>
-                  <div className="shrink-0 inline-flex items-center px-2 py-0.5 rounded-md border border-border bg-muted/40 text-[10px] font-mono font-semibold text-foreground">
-                    {selected.ref}
+                    <DialogTitle className="text-[15px] leading-tight font-semibold">{pm.title}</DialogTitle>
+                    <p className="text-[11.5px] text-muted-foreground mt-0.5 truncate">
+                      <span className="font-mono font-semibold text-foreground/80">{selected.ref}</span>
+                      <span className="mx-1.5 text-muted-foreground/40">·</span>
+                      <span className="truncate">{selected.title}</span>
+                    </p>
                   </div>
                 </div>
+                <DialogDescription className="sr-only">{pm.desc}</DialogDescription>
               </div>
 
-              {/* Context strip */}
-              <div className="px-6 py-3 border-b border-border bg-muted/15 flex items-center gap-4 text-[11px]">
-                <div className="flex items-center gap-1.5 min-w-0">
-                  <tm.icon className={cn("w-3.5 h-3.5 shrink-0", pm.accent)} />
-                  <span className="font-semibold text-foreground">{tm.label}</span>
-                </div>
-                <span className="w-px h-3.5 bg-border" />
-                <span className="text-muted-foreground truncate flex-1">{selected.title}</span>
-                <span className="text-muted-foreground tabular-nums shrink-0">{fmt(dSub)}</span>
-              </div>
-
-              {/* Body sections */}
-              <div className="px-6 py-5 space-y-5">
-                {/* Section: Notes */}
+              {/* Body */}
+              <div className="px-5 py-4 space-y-4">
+                {/* Parecer */}
                 <section className="space-y-2">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-baseline justify-between">
                     <Label htmlFor="action-notes" className="text-[11px] uppercase tracking-[0.08em] font-semibold text-foreground">
                       {pm.notesLabel}
                     </Label>
                     <span className="text-[10px] text-muted-foreground">Obrigatório</span>
                   </div>
+                  <p className="text-[11.5px] text-muted-foreground leading-relaxed">
+                    Deixe o seu parecer. Será registado no histórico da solicitação.
+                  </p>
                   <Textarea
                     id="action-notes"
                     value={actionNotes}
@@ -557,9 +549,9 @@ export default function FinancasSolicitacaoDetail() {
                   />
                 </section>
 
-                {/* Section: Evidence upload */}
-                <section className="space-y-2">
-                  <div className="flex items-center justify-between">
+                {/* Anexos — compact */}
+                <section className="space-y-1.5">
+                  <div className="flex items-baseline justify-between">
                     <Label className="text-[11px] uppercase tracking-[0.08em] font-semibold text-foreground">
                       Anexos e evidências
                     </Label>
@@ -568,57 +560,44 @@ export default function FinancasSolicitacaoDetail() {
                     </span>
                   </div>
 
-                  <label className="group relative block rounded-lg border-2 border-dashed border-border bg-muted/10 hover:border-primary/40 hover:bg-primary/[0.03] transition-colors cursor-pointer">
-                    <div className="flex flex-col items-center justify-center px-4 py-6 text-center">
-                      <div className="w-9 h-9 rounded-full bg-background border border-border flex items-center justify-center mb-2 group-hover:border-primary/40 transition-colors">
-                        <Paperclip className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
-                      </div>
-                      <p className="text-[13px] font-semibold text-foreground">
-                        Carregue anexos ou evidências para registo
-                      </p>
-                      <p className="text-[11px] text-muted-foreground mt-0.5">
-                        Arraste ficheiros ou <span className="text-primary font-medium">procure no dispositivo</span>
-                      </p>
-                      <p className="text-[10px] text-muted-foreground/70 mt-2">
-                        PDF, DOCX, XLSX, PNG, JPG · até 10 MB cada
-                      </p>
-                    </div>
+                  <label className="group flex items-center gap-2.5 rounded-md border border-dashed border-border bg-muted/10 hover:border-primary/40 hover:bg-primary/[0.03] transition-colors cursor-pointer px-3 py-2">
+                    <Paperclip className="w-3.5 h-3.5 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
+                    <span className="text-[12px] text-foreground/80 flex-1 truncate">
+                      Anexe documentos de suporte <span className="text-muted-foreground">(PDF, DOCX, XLSX, PNG, JPG)</span>
+                    </span>
+                    <span className="text-[10.5px] font-medium text-primary shrink-0">Procurar</span>
                     <input
                       type="file"
                       multiple
-                      className="absolute inset-0 opacity-0 cursor-pointer"
+                      className="hidden"
                       onChange={(e) => setActionFiles(prev => [...prev, ...Array.from(e.target.files ?? [])])}
                     />
                   </label>
 
                   {actionFiles.length > 0 && (
-                    <ul className="space-y-1.5 pt-1">
+                    <ul className="space-y-1 pt-0.5">
                       {actionFiles.map((f, i) => {
                         const ext = f.name.split(".").pop()?.toUpperCase() ?? "FILE";
                         const isImg = /^(PNG|JPG|JPEG|WEBP|GIF)$/.test(ext);
                         const isSheet = /^(XLS|XLSX|CSV)$/.test(ext);
                         const Ic = isImg ? FileImage : isSheet ? FileSpreadsheet : FileText;
-                        const cls = isImg ? "bg-violet-50 text-violet-600 border-violet-100"
-                          : isSheet ? "bg-emerald-50 text-emerald-600 border-emerald-100"
-                          : "bg-red-50 text-red-600 border-red-100";
+                        const cls = isImg ? "text-violet-600"
+                          : isSheet ? "text-emerald-600"
+                          : "text-red-600";
                         return (
-                          <li key={i} className="flex items-center gap-3 pl-2 pr-2.5 py-2 rounded-md border border-border bg-background hover:bg-muted/20 transition-colors">
-                            <div className={cn("w-8 h-8 rounded-md border flex items-center justify-center shrink-0", cls)}>
-                              <Ic className="w-4 h-4" />
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              <p className="text-[12px] font-semibold text-foreground truncate leading-tight">{f.name}</p>
-                              <p className="text-[10px] text-muted-foreground mt-0.5 tabular-nums">
-                                {ext} · {f.size < 1024 * 1024 ? `${(f.size / 1024).toFixed(0)} KB` : `${(f.size / 1024 / 1024).toFixed(1)} MB`}
-                              </p>
-                            </div>
+                          <li key={i} className="flex items-center gap-2 pl-2 pr-1.5 py-1.5 rounded-md border border-border bg-background hover:bg-muted/20 transition-colors">
+                            <Ic className={cn("w-3.5 h-3.5 shrink-0", cls)} />
+                            <span className="text-[12px] font-medium text-foreground truncate flex-1 leading-tight">{f.name}</span>
+                            <span className="text-[10px] text-muted-foreground tabular-nums shrink-0">
+                              {f.size < 1024 * 1024 ? `${(f.size / 1024).toFixed(0)} KB` : `${(f.size / 1024 / 1024).toFixed(1)} MB`}
+                            </span>
                             <button
                               type="button"
                               onClick={() => setActionFiles(prev => prev.filter((_, idx) => idx !== i))}
-                              className="w-6 h-6 rounded inline-flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors shrink-0"
+                              className="w-5 h-5 rounded inline-flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors shrink-0"
                               title="Remover"
                             >
-                              <X className="w-3.5 h-3.5" />
+                              <X className="w-3 h-3" />
                             </button>
                           </li>
                         );
@@ -629,17 +608,17 @@ export default function FinancasSolicitacaoDetail() {
               </div>
 
               {/* Footer */}
-              <DialogFooter className="px-6 py-3.5 border-t border-border bg-muted/20 gap-2 sm:gap-2">
+              <DialogFooter className="px-5 py-3 border-t border-border bg-muted/20 gap-2 sm:gap-2">
                 <DialogClose asChild>
-                  <Button variant="outline" size="sm" className="h-9">Cancelar</Button>
+                  <Button variant="outline" size="sm" className="h-8 text-[12px]">Cancelar</Button>
                 </DialogClose>
                 <Button
                   size="sm"
-                  className={cn("h-9 gap-1.5", pm.tone)}
+                  className={cn("h-8 text-[12px] gap-1.5", pm.tone)}
                   onClick={confirmAction}
                   disabled={!actionNotes.trim()}
                 >
-                  <pm.icon className="w-4 h-4" /> {pm.cta}
+                  <pm.icon className="w-3.5 h-3.5" /> {pm.cta}
                 </Button>
               </DialogFooter>
             </>
