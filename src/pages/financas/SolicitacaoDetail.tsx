@@ -125,30 +125,36 @@ export default function FinancasSolicitacaoDetail() {
     setActionFiles([]);
   };
 
-  const actionMeta: Record<"em_execucao" | "rejeitado" | "executada", { title: string; desc: string; cta: string; tone: string; icon: typeof Check; notesLabel: string; notesPlaceholder: string }> = {
+  const actionMeta: Record<"em_execucao" | "rejeitado" | "executada", { title: string; desc: string; cta: string; tone: string; accent: string; iconBg: string; icon: typeof Check; notesLabel: string; notesPlaceholder: string }> = {
     em_execucao: {
       title: "Aprovar solicitação",
-      desc: `Registe o parecer da aprovação do pedido ${selected.ref}. As notas e anexos ficam no histórico.`,
+      desc: "Carregue anexos ou evidências para registo da aprovação.",
       cta: "Aprovar",
       tone: "bg-emerald-600 hover:bg-emerald-700 text-white",
+      accent: "text-emerald-600",
+      iconBg: "bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100",
       icon: CheckCircle2,
       notesLabel: "Parecer / Justificação",
       notesPlaceholder: "Ex: Pedido validado conforme orçamento de Maio. Em conformidade com a política financeira.",
     },
     rejeitado: {
       title: "Rejeitar solicitação",
-      desc: `Indique o motivo da rejeição do pedido ${selected.ref}. As notas ficam no histórico do requerente.`,
+      desc: "Carregue anexos ou evidências para registo da rejeição.",
       cta: "Rejeitar",
       tone: "bg-red-600 hover:bg-red-700 text-white",
+      accent: "text-red-600",
+      iconBg: "bg-red-50 text-red-600 ring-1 ring-red-100",
       icon: XCircle,
       notesLabel: "Motivo da rejeição",
       notesPlaceholder: "Ex: Documentação incompleta. Falta fatura original e comprovativo bancário.",
     },
     executada: {
       title: "Confirmar execução",
-      desc: `Confirme a execução do pedido ${selected.ref} e anexe o comprovativo (transferência, recibo, fatura).`,
+      desc: "Carregue anexos ou evidências para registo da execução.",
       cta: "Confirmar execução",
       tone: "bg-blue-600 hover:bg-blue-700 text-white",
+      accent: "text-blue-600",
+      iconBg: "bg-blue-50 text-blue-600 ring-1 ring-blue-100",
       icon: Check,
       notesLabel: "Notas da execução",
       notesPlaceholder: "Ex: Reembolso transferido para IBAN do requerente em 14/06/2026. Ref. transação TRX-44821.",
