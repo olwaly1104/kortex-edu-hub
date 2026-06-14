@@ -193,10 +193,10 @@ export default function FinancasSolicitacaoDetail() {
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" className="h-7 text-[11px] gap-1.5 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-300 transition-colors" onClick={() => handleAction("rejeitado")}>
+                <Button variant="outline" size="sm" className="h-7 text-[11px] gap-1.5 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-300 transition-colors" onClick={() => openAction("rejeitado")}>
                   <XCircle className="w-3.5 h-3.5" /> Rejeitar
                 </Button>
-                <Button size="sm" className="h-7 text-[11px] gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white transition-colors" onClick={() => handleAction("em_execucao")}>
+                <Button size="sm" className="h-7 text-[11px] gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white transition-colors" onClick={() => openAction("em_execucao")}>
                   <CheckCircle2 className="w-3.5 h-3.5" /> Aprovar
                 </Button>
               </div>
@@ -213,7 +213,7 @@ export default function FinancasSolicitacaoDetail() {
                 <span className="text-[11px] text-muted-foreground">Aguarda confirmação de execução</span>
               </div>
               <div className="flex items-center gap-2">
-                <Button size="sm" className="h-7 text-[11px] gap-1.5 bg-blue-600 hover:bg-blue-700 text-white transition-colors" onClick={() => handleAction("executada")}>
+                <Button size="sm" className="h-7 text-[11px] gap-1.5 bg-blue-600 hover:bg-blue-700 text-white transition-colors" onClick={() => openAction("executada")}>
                   <Check className="w-3.5 h-3.5" /> Confirmar execução
                 </Button>
               </div>
