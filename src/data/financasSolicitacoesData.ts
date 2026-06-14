@@ -138,7 +138,7 @@ export const finSolicitacoes: FinSolicitacao[] = [
     id: "fs8", ref: "REQ-2025-0405", direction: "enviada", type: "orcamento",
     title: "Pedido de Aprovação — Orçamento Q2",
     description: "Submissão do orçamento consolidado do 2º trimestre ao Magnífico Reitor para aprovação.",
-    requester: "Direcção Financeira", destinatario: "Magnífico Reitor",
+    requester: "Dr. Manuel Sousa", requesterRole: "Direcção Financeira", destinatario: "Magnífico Reitor",
     responsavel: "Prof. Dr. António Mendes · Reitor",
     date: "2026-06-01", dueDate: "2026-06-25", status: "pendente",
     anexos: [
@@ -153,7 +153,7 @@ export const finSolicitacoes: FinSolicitacao[] = [
     id: "fs9", ref: "REQ-2025-0386", direction: "enviada", type: "outro",
     title: "Auditoria Externa — Aprovação KPMG",
     description: "Pedido de contratação da firma KPMG para auditoria anual de contas.",
-    requester: "Direcção Financeira", destinatario: "Magnífico Reitor",
+    requester: "Dr. Manuel Sousa", requesterRole: "Direcção Financeira", destinatario: "Magnífico Reitor",
     responsavel: "Prof. Dr. António Mendes · Reitor",
     date: "2025-03-26", status: "executada",
     historico: [
@@ -166,7 +166,7 @@ export const finSolicitacoes: FinSolicitacao[] = [
     id: "fs10", ref: "REQ-2025-0378", direction: "enviada", type: "verba",
     title: "Reforço de Tesouraria — Bolsas de Mérito",
     description: "Solicitação de transferência adicional para o fundo de bolsas de mérito do 2º semestre.",
-    requester: "Direcção Financeira", destinatario: "Conselho de Gestão",
+    requester: "Dr. Manuel Sousa", requesterRole: "Direcção Financeira", destinatario: "Conselho de Gestão",
     responsavel: "Conselho de Gestão · Órgão Colegial",
     date: "2025-03-20", dueDate: "2025-04-12", status: "atrasado",
     historico: [
