@@ -368,19 +368,19 @@ export default function FinancasCalendario() {
                 })
             ).length;
             return (
-              <div className="px-1 flex items-end justify-between gap-3">
-                <div>
-                  <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-0.5">
-                    {view === "week" ? "Semana" : "Mês"}
-                  </p>
+              <div className="px-1">
+                <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-0.5">
+                  {view === "week" ? "Semana" : "Mês"}
+                </p>
+                <div className="rounded-lg border border-border bg-card px-4 py-2 flex items-end justify-between gap-3">
                   <h3 className="text-lg font-bold text-foreground capitalize">
                     {view === "week" ? weekLabel : `${MONTH_NAMES[cursorD.getMonth()]} ${cursorD.getFullYear()}`}
                   </h3>
+                  <Badge variant="outline" className="h-7 px-2.5 gap-1.5 text-xs font-semibold shrink-0">
+                    <CalendarRange className="w-3.5 h-3.5 text-muted-foreground" />
+                    {periodEntriesCount} {periodEntriesCount === 1 ? "entrada" : "entradas"}
+                  </Badge>
                 </div>
-                <Badge variant="outline" className="h-7 px-2.5 gap-1.5 text-xs font-semibold shrink-0">
-                  <CalendarRange className="w-3.5 h-3.5 text-muted-foreground" />
-                  {periodEntriesCount} {periodEntriesCount === 1 ? "entrada" : "entradas"}
-                </Badge>
               </div>
             );
           })()}
@@ -561,7 +561,7 @@ export default function FinancasCalendario() {
             <Card className="overflow-hidden sticky top-6">
               <div className="px-3.5 py-2.5 border-b bg-muted/10 flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2 min-w-0">
-                  <Bell className="w-4 h-4 text-muted-foreground shrink-0" />
+<Bell className="w-4 h-4 text-blue-500 shrink-0" />
                   <p className="text-sm font-semibold text-foreground truncate">Pedidos de Reunião</p>
                   {pendingRequests.length > 0 && (
                     <Badge variant="outline" className="text-[10px] h-5">{pendingRequests.length}</Badge>
@@ -596,7 +596,7 @@ export default function FinancasCalendario() {
         <Card className="overflow-hidden">
           <div className="px-4 py-2.5 border-b bg-muted/10 flex items-center justify-between gap-2">
             <div className="flex items-center gap-2 min-w-0">
-              <Bell className="w-4 h-4 text-muted-foreground shrink-0" />
+              <Bell className="w-4 h-4 text-blue-500 shrink-0" />
               <p className="text-sm font-semibold text-foreground truncate">Pedidos de Reunião</p>
               <Badge variant="outline" className="text-[10px] h-5">{pendingRequests.length}</Badge>
             </div>
