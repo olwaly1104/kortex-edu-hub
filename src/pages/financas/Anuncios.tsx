@@ -368,12 +368,52 @@ export default function FinancasAnuncios() {
 
                 </div>
               </div>
-            </Card>
+              </Card>
+            </AnnouncementCard>
           );
         })}
       </div>
     </div>
   );
 }
+
+function AnnouncementCard({
+  id, unread, onSeen, children,
+}: { id: string; unread: boolean; onSeen: (id: string) => void; children: React.ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!unread || !ref.current) return;
+    const el = ref.current;
+    let timer: number | undefined;
+    const obs = new IntersectionObserver(entries => {
+      for (const e of entries) {
+        if (e.isIntersecting && e.intersectionRatio >= 0.6) {
+          timer = window.setTimeout(() => onSeen(id), 700);
+        } else if (timer) {
+          window.clearTimeout(timer);
+          timer = undefined;
+        }
+      }
+    }, { threshold: [0, 0.6, 1] });
+    obs.observe(el);
+    return () => {
+      obs.disconnect();
+      if (timer) window.clearTimeout(timer);
+    };
+  }, [id, unread, onSeen]);
+
+  return (
+    <div ref={ref} className="relative">
+      {unread && (
+        <span
+          aria-label="Não lido"
+          className="absolute -left-1.5 top-5 w-2.5 h-2.5 rounded-full bg-destructive ring-4 ring-destructive/15 z-10"
+        />
+      )}
+      {children}
+    </div>
+  );
+}
+
 
 
