@@ -10,13 +10,12 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { Settings2, Plus, Layers, AlertCircle, FileText, Trash2, Pencil, AlertTriangle, CalendarClock, GraduationCap, MapPin, Clock, FileCheck2, Wallet, Users } from "lucide-react";
+import { Settings2, Plus, Layers, AlertCircle, FileText, Trash2, Pencil, CalendarClock, GraduationCap, MapPin, Clock, FileCheck2, Lock, Unlock } from "lucide-react";
 import {
   tipoConfig as initialTipoConfig,
   categoriaConfig as initialCategoriaConfig,
   estadoSolicitacaoConfig as initialEstadoConfig,
   destinoConfig,
-  type Categoria,
 } from "@/data/gapData";
 import { candidaturas as allCandidaturas } from "@/data/admissoesData";
 import { cn } from "@/lib/utils";
@@ -34,8 +33,6 @@ const INITIAL_MULTAS: MultaItem[] = [
   { key: "incumprimento_sla", label: "Incumprimento de SLA de solicitação", diasAposPrazo: 5, valor: 5000, descricao: "Aplicada 5 dias após o prazo de tratamento da solicitação." },
   { key: "uso_indevido", label: "Uso indevido de recursos institucionais", diasAposPrazo: 5, valor: 8000, descricao: "Aplicada 5 dias após o prazo de regularização do uso de recursos." },
 ];
-
-
 
 const STAFF_OPTIONS = [
   "Dra. Helena Cabral · GAP",
@@ -64,17 +61,19 @@ const defaultResponsavelByDestino = (destino: string) => {
 export default function GapConfiguracao() {
   const { toast } = useToast();
 
+  // Global edit lock
+  const [isEditing, setIsEditing] = useState(false);
+
   const [estados, setEstados] = useState<EstadoItem[]>(
     Object.entries(initialEstadoConfig).map(([key, v]) => ({ key, label: v.label, color: v.color }))
   );
   const [categorias, setCategorias] = useState<CategoriaItem[]>(
     Object.entries(initialCategoriaConfig).map(([key, v]) => ({ key, label: v.label, color: v.color }))
   );
-  const [multas, setMultas] = useState<MultaItem[]>(INITIAL_MULTAS);
+  const [multas] = useState<MultaItem[]>(INITIAL_MULTAS);
   const [motivos, setMotivos] = useState<MotivoItem[]>(
     Object.entries(initialTipoConfig).map(([key, v]) => {
       const slaConcl = v.slaDias;
-      // Mock: atribuir multa por defeito (5 dias) apenas se conclusão < 5d
       const multaDefault = slaConcl < 5
         ? (v.categoria === "Académico" ? "atraso_relatorio"
           : v.categoria === "Tecnológico" ? "incumprimento_sla"
@@ -95,13 +94,9 @@ export default function GapConfiguracao() {
   const [estadoOpen, setEstadoOpen] = useState(false);
   const [catOpen, setCatOpen] = useState(false);
   const [motivoOpen, setMotivoOpen] = useState(false);
-  const [multaOpen, setMultaOpen] = useState(false);
 
-  // New estado form
   const [newEstadoLabel, setNewEstadoLabel] = useState("");
-  // New categoria form
   const [newCatLabel, setNewCatLabel] = useState("");
-  // New motivo form
   const [newMotLabel, setNewMotLabel] = useState("");
   const [newMotCat, setNewMotCat] = useState<string>("");
   const [newMotDest, setNewMotDest] = useState<string>("CTI");
@@ -109,10 +104,6 @@ export default function GapConfiguracao() {
   const [newMotSlaConcl, setNewMotSlaConcl] = useState<number>(5);
   const [newMotResp, setNewMotResp] = useState<string>(STAFF_OPTIONS[0]);
   const [newMotMulta, setNewMotMulta] = useState<string>("__none__");
-  // New multa form
-  const [newMultaLabel, setNewMultaLabel] = useState("");
-  const [newMultaDias, setNewMultaDias] = useState<number>(3);
-  const [newMultaDesc, setNewMultaDesc] = useState("");
 
   const slugify = (s: string) =>
     s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
@@ -121,43 +112,32 @@ export default function GapConfiguracao() {
   const handleAddEstado = () => {
     if (!newEstadoLabel.trim()) return;
     const key = slugify(newEstadoLabel);
-    setEstados(prev => [...prev, {
-      key, label: newEstadoLabel.trim(),
-      color: "bg-slate-100 text-slate-700 border-slate-200",
-    }]);
-    setNewEstadoLabel("");
-    setEstadoOpen(false);
-    toast({ title: "Estado criado", description: `“${newEstadoLabel}” foi adicionado.` });
+    setEstados(prev => [...prev, { key, label: newEstadoLabel.trim(), color: "bg-slate-100 text-slate-700 border-slate-200" }]);
+    setNewEstadoLabel(""); setEstadoOpen(false);
+    toast({ title: "Estado criado" });
   };
 
   const handleAddCategoria = () => {
     if (!newCatLabel.trim()) return;
     const key = slugify(newCatLabel);
-    setCategorias(prev => [...prev, {
-      key, label: newCatLabel.trim(),
-      color: "bg-slate-50 text-slate-700 border-slate-200",
-    }]);
-    setNewCatLabel("");
-    setCatOpen(false);
-    toast({ title: "Categoria criada", description: `“${newCatLabel}” foi adicionada.` });
+    setCategorias(prev => [...prev, { key, label: newCatLabel.trim(), color: "bg-slate-50 text-slate-700 border-slate-200" }]);
+    setNewCatLabel(""); setCatOpen(false);
+    toast({ title: "Categoria criada" });
   };
 
   const handleAddMotivo = () => {
     if (!newMotLabel.trim() || !newMotCat) return;
     const key = slugify(newMotLabel);
     setMotivos(prev => [...prev, {
-      key, label: newMotLabel.trim(),
-      categoria: newMotCat, destino: newMotDest,
-      responsavel: newMotResp,
-      slaAceitacao: newMotSlaAceit, slaConclusao: newMotSlaConcl,
+      key, label: newMotLabel.trim(), categoria: newMotCat, destino: newMotDest,
+      responsavel: newMotResp, slaAceitacao: newMotSlaAceit, slaConclusao: newMotSlaConcl,
       multa: newMotMulta === "__none__" ? "" : newMotMulta,
     }]);
     setNewMotLabel(""); setNewMotCat(""); setNewMotDest("CTI");
     setNewMotSlaAceit(2); setNewMotSlaConcl(5);
-    setNewMotResp(STAFF_OPTIONS[0]);
-    setNewMotMulta("__none__");
+    setNewMotResp(STAFF_OPTIONS[0]); setNewMotMulta("__none__");
     setMotivoOpen(false);
-    toast({ title: "Motivo criado", description: `“${newMotLabel}” foi adicionado.` });
+    toast({ title: "Motivo criado" });
   };
 
   const removeEstado = (key: string) => setEstados(prev => prev.filter(e => e.key !== key));
@@ -168,41 +148,28 @@ export default function GapConfiguracao() {
   const [editEstado, setEditEstado] = useState<EstadoItem | null>(null);
   const [editCategoria, setEditCategoria] = useState<CategoriaItem | null>(null);
   const [editMotivo, setEditMotivo] = useState<MotivoItem | null>(null);
-  const [editMulta, setEditMulta] = useState<MultaItem | null>(null);
 
   const saveEditEstado = () => {
     if (!editEstado || !editEstado.label.trim()) return;
     setEstados(prev => prev.map(e => e.key === editEstado.key ? editEstado : e));
-    toast({ title: "Estado atualizado" });
-    setEditEstado(null);
+    toast({ title: "Estado atualizado" }); setEditEstado(null);
   };
   const saveEditCategoria = () => {
     if (!editCategoria || !editCategoria.label.trim()) return;
     setCategorias(prev => prev.map(c => c.key === editCategoria.key ? editCategoria : c));
-    toast({ title: "Categoria atualizada" });
-    setEditCategoria(null);
+    toast({ title: "Categoria atualizada" }); setEditCategoria(null);
   };
   const saveEditMotivo = () => {
     if (!editMotivo || !editMotivo.label.trim()) return;
     setMotivos(prev => prev.map(m => m.key === editMotivo.key ? editMotivo : m));
-    toast({ title: "Motivo atualizado" });
-    setEditMotivo(null);
+    toast({ title: "Motivo atualizado" }); setEditMotivo(null);
   };
-  const saveEditMulta = () => {
-    if (!editMulta || !editMulta.label.trim()) return;
-    setMultas(prev => prev.map(m => m.key === editMulta.key ? editMulta : m));
-    toast({ title: "Multa atualizada" });
-    setEditMulta(null);
-  };
-
-  const formatKz = (n: number) =>
-    new Intl.NumberFormat("pt-AO", { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(n) + " Kz";
 
   const formatMultaDias = (d: number) => `${d}d após prazo`;
 
   // ===== AGENDAMENTOS =====
   type AgCategoria = { key: string; label: string; color: string };
-  type AgMotivo = { key: string; label: string; categoria: string; duracao: number };
+  type AgMotivo = { key: string; label: string; categoria: string; responsavel: string; duracao: number };
   type AgSala = { key: string; label: string; lotacao: number };
 
   const [agCategorias, setAgCategorias] = useState<AgCategoria[]>([
@@ -215,40 +182,39 @@ export default function GapConfiguracao() {
     { key: "documentacao", label: "Documentação", color: "bg-slate-100 text-slate-700 border-slate-200" },
   ]);
   const [agMotivos, setAgMotivos] = useState<AgMotivo[]>([
-    { key: "acomp_psico", label: "Acompanhamento psicológico", categoria: "Psicológico", duracao: 50 },
-    { key: "metodos_estudo", label: "Orientação académica — métodos de estudo", categoria: "Académico", duracao: 40 },
-    { key: "vocacional", label: "Orientação vocacional", categoria: "Carreira / Vocacional", duracao: 60 },
-    { key: "estagio", label: "Acompanhamento de estágio", categoria: "Carreira / Vocacional", duracao: 30 },
-    { key: "mediacao", label: "Mediação de conflito", categoria: "Social", duracao: 60 },
+    { key: "acomp_psico", label: "Acompanhamento psicológico", categoria: "Psicológico", responsavel: "Dra. Helena Cabral · GAP", duracao: 50 },
+    { key: "metodos_estudo", label: "Orientação académica — métodos de estudo", categoria: "Académico", responsavel: "Dr. João Tavares · GAP", duracao: 40 },
+    { key: "vocacional", label: "Orientação vocacional", categoria: "Carreira / Vocacional", responsavel: "Dra. Helena Cabral · GAP", duracao: 60 },
+    { key: "estagio", label: "Acompanhamento de estágio", categoria: "Carreira / Vocacional", responsavel: "Dr. João Tavares · GAP", duracao: 30 },
+    { key: "mediacao", label: "Mediação de conflito", categoria: "Social", responsavel: "Dra. Helena Cabral · GAP", duracao: 60 },
   ]);
   const [agSalas, setAgSalas] = useState<AgSala[]>([
     { key: "gap1", label: "Gab. GAP 1", lotacao: 4 },
     { key: "gap2", label: "Gab. GAP 2", lotacao: 4 },
     { key: "gap3", label: "Sala de Reuniões GAP", lotacao: 8 },
   ]);
-  const [agModalidades, setAgModalidades] = useState<{ key: string; label: string }[]>([
-    { key: "presencial", label: "Presencial" },
-    { key: "online", label: "Online" },
-  ]);
-  const [agDuracaoPadrao, setAgDuracaoPadrao] = useState(45);
-  const [agAntecedenciaMin, setAgAntecedenciaMin] = useState(24);
   const [agHoraInicio, setAgHoraInicio] = useState("08:00");
   const [agHoraFim, setAgHoraFim] = useState("17:00");
+
+  // Ag dialogs
+  const [agCatOpen, setAgCatOpen] = useState(false);
+  const [agMotOpen, setAgMotOpen] = useState(false);
+  const [agSalaOpen, setAgSalaOpen] = useState(false);
 
   const [newAgCat, setNewAgCat] = useState("");
   const [newAgMotLabel, setNewAgMotLabel] = useState("");
   const [newAgMotCat, setNewAgMotCat] = useState("");
+  const [newAgMotResp, setNewAgMotResp] = useState(STAFF_OPTIONS[0]);
   const [newAgMotDur, setNewAgMotDur] = useState(45);
   const [newAgSalaLabel, setNewAgSalaLabel] = useState("");
   const [newAgSalaLot, setNewAgSalaLot] = useState(4);
-  const [newAgModLabel, setNewAgModLabel] = useState("");
+
+  const [editAgSala, setEditAgSala] = useState<AgSala | null>(null);
 
   // ===== CANDIDATURAS =====
   type CdEstado = { key: string; label: string; color: string };
-  type CdEtapa = { key: string; label: string; diasAposSubmissao: number; obrigatoria: boolean; estadosPossiveis: string[] };
+  type CdEtapa = { key: string; label: string; obrigatoria: boolean; estadosPossiveis: string[] };
   type CdSessao = { key: string; etapa: string; data: string; hora: string; local: string; capacidade: number };
-  type CdPergunta = { key: string; label: string; tipo: "texto" | "numero" | "data" | "selecao" | "ficheiro"; obrigatoria: boolean };
-  type CdFormStep = { key: string; titulo: string; subtitulo: string; perguntas: CdPergunta[] };
 
   const [cdEstados, setCdEstados] = useState<CdEstado[]>([
     { key: "completo", label: "Completo", color: "bg-green-50 text-green-700 border-green-200" },
@@ -259,10 +225,10 @@ export default function GapConfiguracao() {
     { key: "reprovado", label: "Reprovado", color: "bg-red-50 text-red-700 border-red-200" },
   ]);
   const [cdEtapas, setCdEtapas] = useState<CdEtapa[]>([
-    { key: "submissao", label: "Submissão da candidatura", diasAposSubmissao: 0, obrigatoria: true, estadosPossiveis: ["completo"] },
-    { key: "entrevista", label: "Entrevista", diasAposSubmissao: 12, obrigatoria: true, estadosPossiveis: ["agendado", "completo", "remarcado", "falta"] },
-    { key: "curso_preparatorio", label: "Curso Preparatório", diasAposSubmissao: 35, obrigatoria: false, estadosPossiveis: ["agendado", "completo", "remarcado"] },
-    { key: "exame", label: "Exame de Acesso", diasAposSubmissao: 60, obrigatoria: true, estadosPossiveis: ["agendado", "aprovado", "reprovado", "remarcado"] },
+    { key: "submissao", label: "Submissão da candidatura", obrigatoria: true, estadosPossiveis: ["completo"] },
+    { key: "entrevista", label: "Entrevista", obrigatoria: true, estadosPossiveis: ["agendado", "completo", "remarcado", "falta"] },
+    { key: "curso_preparatorio", label: "Curso Preparatório", obrigatoria: false, estadosPossiveis: ["agendado", "completo", "remarcado"] },
+    { key: "exame", label: "Exame de Acesso", obrigatoria: true, estadosPossiveis: ["agendado", "aprovado", "reprovado", "remarcado"] },
   ]);
   const [cdSessoes, setCdSessoes] = useState<CdSessao[]>([
     { key: "cp_s1", etapa: "Curso Preparatório", data: "2026-07-18", hora: "09:00", local: "Anfiteatro A — Campus UPRA", capacidade: 80 },
@@ -274,59 +240,18 @@ export default function GapConfiguracao() {
   const [cdTaxa, setCdTaxa] = useState(15000);
   const [cdMaxOpcoes, setCdMaxOpcoes] = useState(3);
 
-  const [cdFormSteps, setCdFormSteps] = useState<CdFormStep[]>([
-    { key: "dados_pessoais", titulo: "Dados Pessoais", subtitulo: "Identificação do candidato", perguntas: [
-      { key: "nome_completo", label: "Nome completo", tipo: "texto", obrigatoria: true },
-      { key: "data_nasc", label: "Data de nascimento", tipo: "data", obrigatoria: true },
-      { key: "bi", label: "Bilhete de Identidade", tipo: "texto", obrigatoria: true },
-      { key: "genero", label: "Género", tipo: "selecao", obrigatoria: true },
-      { key: "naturalidade", label: "Naturalidade", tipo: "texto", obrigatoria: true },
-    ]},
-    { key: "morada_contactos", titulo: "Morada & Contactos", subtitulo: "Contactos e residência", perguntas: [
-      { key: "telefone", label: "Telefone", tipo: "texto", obrigatoria: true },
-      { key: "email", label: "Email", tipo: "texto", obrigatoria: true },
-      { key: "morada", label: "Morada de residência", tipo: "texto", obrigatoria: true },
-      { key: "provincia", label: "Província", tipo: "selecao", obrigatoria: true },
-    ]},
-    { key: "formacao", titulo: "Formação", subtitulo: "Histórico do ensino secundário", perguntas: [
-      { key: "escola", label: "Escola de origem", tipo: "texto", obrigatoria: true },
-      { key: "ano_conclusao", label: "Ano de conclusão", tipo: "numero", obrigatoria: true },
-      { key: "media_final", label: "Média final", tipo: "numero", obrigatoria: true },
-      { key: "cert_medio", label: "Certificado do Ensino Médio", tipo: "ficheiro", obrigatoria: true },
-      { key: "decl_notas", label: "Declaração de Notas", tipo: "ficheiro", obrigatoria: true },
-    ]},
-    { key: "curso", titulo: "Curso", subtitulo: "Faculdades e cursos por ordem de escolha", perguntas: [
-      { key: "opcao1", label: "1ª opção de curso", tipo: "selecao", obrigatoria: true },
-      { key: "opcao2", label: "2ª opção de curso", tipo: "selecao", obrigatoria: false },
-      { key: "opcao3", label: "3ª opção de curso", tipo: "selecao", obrigatoria: false },
-    ]},
-    { key: "entrevista", titulo: "Entrevista", subtitulo: "Marcação da data de entrevista", perguntas: [
-      { key: "disponibilidade", label: "Disponibilidade horária", tipo: "selecao", obrigatoria: true },
-      { key: "observacoes", label: "Observações", tipo: "texto", obrigatoria: false },
-    ]},
-    { key: "curso_prep", titulo: "Curso Preparatório", subtitulo: "Opcional — escolha da sessão", perguntas: [
-      { key: "inscricao", label: "Pretende inscrever-se?", tipo: "selecao", obrigatoria: true },
-      { key: "sessao", label: "Sessão preferida", tipo: "selecao", obrigatoria: false },
-    ]},
-    { key: "revisao", titulo: "Revisão", subtitulo: "Confirmação final da candidatura", perguntas: [
-      { key: "confirma", label: "Confirmo que os dados estão corretos", tipo: "selecao", obrigatoria: true },
-    ]},
-  ]);
-
   const [cdEstadoOpen, setCdEstadoOpen] = useState(false);
+  const [cdEtapaOpen, setCdEtapaOpen] = useState(false);
+  const [cdSessOpen, setCdSessOpen] = useState(false);
+
   const [newCdEstadoLabel, setNewCdEstadoLabel] = useState("");
   const [newCdEtapaLabel, setNewCdEtapaLabel] = useState("");
-  const [newCdEtapaDias, setNewCdEtapaDias] = useState(7);
   const [newCdSessEtapa, setNewCdSessEtapa] = useState("Curso Preparatório");
   const [newCdSessData, setNewCdSessData] = useState("");
   const [newCdSessHora, setNewCdSessHora] = useState("09:00");
   const [newCdSessLocal, setNewCdSessLocal] = useState("");
   const [newCdSessCap, setNewCdSessCap] = useState(60);
-  const [expandedStep, setExpandedStep] = useState<string | null>("dados_pessoais");
-  const [newPergStep, setNewPergStep] = useState<string>("");
-  const [newPergLabel, setNewPergLabel] = useState("");
-  const [newPergTipo, setNewPergTipo] = useState<CdPergunta["tipo"]>("texto");
-  const [newPergObrig, setNewPergObrig] = useState(true);
+
   const CD_COLORS = [
     "bg-blue-50 text-blue-700 border-blue-200",
     "bg-green-50 text-green-700 border-green-200",
@@ -346,36 +271,52 @@ export default function GapConfiguracao() {
   const addCdEtapa = () => {
     const v = newCdEtapaLabel.trim(); if (!v) return;
     const key = v.toLowerCase().replace(/\s+/g, "_");
-    setCdEtapas(es => [...es, { key, label: v, diasAposSubmissao: newCdEtapaDias, obrigatoria: false, estadosPossiveis: [] }]);
-    setNewCdEtapaLabel(""); setNewCdEtapaDias(7);
+    setCdEtapas(es => [...es, { key, label: v, obrigatoria: false, estadosPossiveis: [] }]);
+    setNewCdEtapaLabel(""); setCdEtapaOpen(false);
   };
   const removeCdEtapa = (key: string) => setCdEtapas(es => es.filter(e => e.key !== key));
   const toggleEtapaObrig = (key: string) => setCdEtapas(es => es.map(e => e.key === key ? { ...e, obrigatoria: !e.obrigatoria } : e));
   const addCdSessao = () => {
     if (!newCdSessData || !newCdSessLocal.trim()) { toast({ title: "Preencha data e local", variant: "destructive" }); return; }
     setCdSessoes(s => [...s, { key: `s-${Date.now()}`, etapa: newCdSessEtapa, data: newCdSessData, hora: newCdSessHora, local: newCdSessLocal.trim(), capacidade: newCdSessCap }]);
-    setNewCdSessData(""); setNewCdSessLocal(""); setNewCdSessCap(60);
+    setNewCdSessData(""); setNewCdSessLocal(""); setNewCdSessCap(60); setCdSessOpen(false);
   };
   const removeCdSessao = (key: string) => setCdSessoes(s => s.filter(x => x.key !== key));
-  const addPergunta = (stepKey: string) => {
-    const v = newPergLabel.trim(); if (!v || newPergStep !== stepKey) return;
-    const key = `${v.toLowerCase().replace(/\s+/g, "_")}_${Date.now()}`;
-    setCdFormSteps(steps => steps.map(s => s.key === stepKey ? { ...s, perguntas: [...s.perguntas, { key, label: v, tipo: newPergTipo, obrigatoria: newPergObrig }] } : s));
-    setNewPergLabel(""); setNewPergTipo("texto"); setNewPergObrig(true);
-  };
-  const removePergunta = (stepKey: string, pKey: string) =>
-    setCdFormSteps(steps => steps.map(s => s.key === stepKey ? { ...s, perguntas: s.perguntas.filter(p => p.key !== pKey) } : s));
+
+  // helper components
+  const EditIcon = ({ onClick, label }: { onClick: () => void; label: string }) =>
+    isEditing ? (
+      <button onClick={onClick} className="opacity-60 hover:opacity-100" aria-label={label}>
+        <Pencil className="w-3 h-3" />
+      </button>
+    ) : null;
+  const RemoveIcon = ({ onClick, label, size = "sm" }: { onClick: () => void; label: string; size?: "sm" | "md" }) =>
+    isEditing ? (
+      <button onClick={onClick} className="opacity-60 hover:opacity-100 hover:text-destructive" aria-label={label}>
+        <Trash2 className={size === "sm" ? "w-3 h-3" : "w-3.5 h-3.5"} />
+      </button>
+    ) : null;
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-foreground tracking-tight flex items-center gap-2">
-          <Settings2 className="w-6 h-6 text-primary" /> Configuração
-        </h1>
-        <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
-          Configure Solicitações, Agendamentos e o processo de Candidaturas do GAP.
-        </p>
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground tracking-tight flex items-center gap-2">
+            <Settings2 className="w-6 h-6 text-primary" /> Configuração
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
+            Configure Solicitações, Agendamentos e o processo de Candidaturas do GAP.
+          </p>
+        </div>
+        <Button
+          size="sm"
+          variant={isEditing ? "default" : "outline"}
+          onClick={() => setIsEditing(v => !v)}
+          className="gap-1.5"
+        >
+          {isEditing ? <><Unlock className="w-4 h-4" /> Bloquear edição</> : <><Pencil className="w-4 h-4" /> Editar geral</>}
+        </Button>
       </div>
 
       <Tabs defaultValue="solicitacoes" className="space-y-6">
@@ -386,269 +327,248 @@ export default function GapConfiguracao() {
         </TabsList>
 
         <TabsContent value="solicitacoes" className="space-y-6 mt-0">
-
-      <Card className="p-5">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 text-muted-foreground" />
-            <h2 className="text-sm font-semibold text-foreground">Estados</h2>
-            <span className="text-[11px] text-muted-foreground tabular-nums">· {estados.length}</span>
-          </div>
-          <Dialog open={estadoOpen} onOpenChange={setEstadoOpen}>
-            <DialogTrigger asChild>
-              <Button size="sm" variant="outline" className="gap-1.5 h-8 text-xs">
-                <Plus className="w-3.5 h-3.5" /> Novo estado
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-md">
-              <DialogHeader><DialogTitle>Novo estado</DialogTitle></DialogHeader>
-              <div className="space-y-3 py-2">
-                <div>
-                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Designação</label>
-                  <Input value={newEstadoLabel} onChange={e => setNewEstadoLabel(e.target.value)} placeholder="Ex: Em revisão" />
-                </div>
+          {/* Estados */}
+          <Card className="p-5">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 text-muted-foreground" />
+                <h2 className="text-sm font-semibold text-foreground">Estados</h2>
+                <span className="text-[11px] text-muted-foreground tabular-nums">· {estados.length}</span>
               </div>
-              <DialogFooter className="gap-2 sm:gap-2">
-                <DialogClose asChild><Button variant="outline">Cancelar</Button></DialogClose>
-                <Button onClick={handleAddEstado} disabled={!newEstadoLabel.trim()}>Adicionar</Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {estados.map(e => (
-            <div key={e.key} className={cn("inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs", e.color)}>
-              <span className="font-medium">{e.label}</span>
-              <button onClick={() => setEditEstado(e)} className="opacity-60 hover:opacity-100" aria-label={`Editar ${e.label}`}>
-                <Pencil className="w-3 h-3" />
-              </button>
-              <button onClick={() => removeEstado(e.key)} className="opacity-60 hover:opacity-100" aria-label={`Remover ${e.label}`}>
-                <Trash2 className="w-3 h-3" />
-              </button>
-            </div>
-          ))}
-        </div>
-      </Card>
-
-      {/* Categorias */}
-      <Card className="p-5">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <Layers className="w-4 h-4 text-muted-foreground" />
-            <h2 className="text-sm font-semibold text-foreground">Categorias</h2>
-            <span className="text-[11px] text-muted-foreground tabular-nums">· {categorias.length}</span>
-          </div>
-          <Dialog open={catOpen} onOpenChange={setCatOpen}>
-            <DialogTrigger asChild>
-              <Button size="sm" variant="outline" className="gap-1.5 h-8 text-xs">
-                <Plus className="w-3.5 h-3.5" /> Nova categoria
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-md">
-              <DialogHeader><DialogTitle>Nova categoria</DialogTitle></DialogHeader>
-              <div className="space-y-3 py-2">
-                <div>
-                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Designação</label>
-                  <Input value={newCatLabel} onChange={e => setNewCatLabel(e.target.value)} placeholder="Ex: Social" />
-                </div>
-              </div>
-              <DialogFooter className="gap-2 sm:gap-2">
-                <DialogClose asChild><Button variant="outline">Cancelar</Button></DialogClose>
-                <Button onClick={handleAddCategoria} disabled={!newCatLabel.trim()}>Adicionar</Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {categorias.map(c => {
-            const count = motivos.filter(m => m.categoria === c.label).length;
-            return (
-              <div key={c.key} className={cn("inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs", c.color)}>
-                <span className="font-medium">{c.label}</span>
-                <span className="opacity-60 tabular-nums">· {count} motivos</span>
-                <button onClick={() => setEditCategoria(c)} className="opacity-60 hover:opacity-100" aria-label={`Editar ${c.label}`}>
-                  <Pencil className="w-3 h-3" />
-                </button>
-                <button onClick={() => removeCategoria(c.key)} className="opacity-60 hover:opacity-100" aria-label={`Remover ${c.label}`}>
-                  <Trash2 className="w-3 h-3" />
-                </button>
-              </div>
-            );
-          })}
-        </div>
-      </Card>
-
-      {/* Motivos */}
-      <Card className="p-5">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <FileText className="w-4 h-4 text-muted-foreground" />
-            <h2 className="text-sm font-semibold text-foreground">Motivos</h2>
-            <span className="text-[11px] text-muted-foreground tabular-nums">· {motivos.length}</span>
-          </div>
-          <Dialog open={motivoOpen} onOpenChange={setMotivoOpen}>
-            <DialogTrigger asChild>
-              <Button size="sm" variant="outline" className="gap-1.5 h-8 text-xs">
-                <Plus className="w-3.5 h-3.5" /> Novo motivo
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-lg">
-              <DialogHeader><DialogTitle>Novo motivo</DialogTitle></DialogHeader>
-              <div className="space-y-3 py-2">
-                <div>
-                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Designação</label>
-                  <Input value={newMotLabel} onChange={e => setNewMotLabel(e.target.value)} placeholder="Ex: Pedido de declaração" />
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Categoria</label>
-                    <Select value={newMotCat} onValueChange={setNewMotCat}>
-                      <SelectTrigger><SelectValue placeholder="Selecionar..." /></SelectTrigger>
-                      <SelectContent>
-                        {categorias.map(c => <SelectItem key={c.key} value={c.label}>{c.label}</SelectItem>)}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Destino</label>
-                    <Select value={newMotDest} onValueChange={setNewMotDest}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        {Object.entries(destinoConfig).map(([k, v]) => <SelectItem key={k} value={k}>{v.label}</SelectItem>)}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Limite p/ aceitar (dias)</label>
-                    <Input type="number" min={1} value={newMotSlaAceit} onChange={e => setNewMotSlaAceit(Number(e.target.value) || 1)} />
-                    <p className="text-[10px] text-muted-foreground mt-1">Pendente → Em Execução</p>
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Limite p/ concluir (dias)</label>
-                    <Input type="number" min={1} value={newMotSlaConcl} onChange={e => setNewMotSlaConcl(Number(e.target.value) || 1)} />
-                    <p className="text-[10px] text-muted-foreground mt-1">Em Execução → Concluída</p>
-                  </div>
-                </div>
-                <div>
-                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Multa associada</label>
-                  <Select value={newMotMulta} onValueChange={setNewMotMulta}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="__none__">Sem multa</SelectItem>
-                      {multas.map(mu => {
-                        const invalid = mu.diasAposPrazo <= newMotSlaConcl;
-                        return (
-                          <SelectItem key={mu.key} value={mu.key} disabled={invalid}>
-                            {mu.label} · {formatMultaDias(mu.diasAposPrazo)}{invalid ? " (≤ conclusão)" : ""}
-                          </SelectItem>
-                        );
-                      })}
-                    </SelectContent>
-                  </Select>
-                  <p className="text-[10px] text-muted-foreground mt-1">Aplicada se o limite de conclusão for excedido</p>
-                </div>
-                <div>
-                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Responsável</label>
-                  <Select value={newMotResp} onValueChange={setNewMotResp}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      {STAFF_OPTIONS.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              <DialogFooter className="gap-2 sm:gap-2">
-                <DialogClose asChild><Button variant="outline">Cancelar</Button></DialogClose>
-                <Button onClick={handleAddMotivo} disabled={!newMotLabel.trim() || !newMotCat}>Adicionar</Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        </div>
-        <div className="overflow-x-auto rounded-lg border border-border">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b bg-muted/30">
-                <th className="text-left p-3 font-medium text-muted-foreground text-xs">Motivo</th>
-                <th className="text-left p-3 font-medium text-muted-foreground text-xs">Categoria</th>
-                <th className="text-left p-3 font-medium text-muted-foreground text-xs">Destino</th>
-                <th className="text-left p-3 font-medium text-muted-foreground text-xs">Responsável</th>
-                <th className="text-center p-3 font-medium text-muted-foreground text-xs whitespace-nowrap">Aceitar</th>
-                <th className="text-center p-3 font-medium text-muted-foreground text-xs whitespace-nowrap">Concluir</th>
-                <th className="text-left p-3 font-medium text-muted-foreground text-xs whitespace-nowrap">Multa</th>
-                <th className="w-20" />
-              </tr>
-            </thead>
-            <tbody>
-              {motivos.map(m => {
-                const catCfg = categorias.find(c => c.label === m.categoria);
-                const destCfg = destinoConfig[m.destino as keyof typeof destinoConfig];
-                return (
-                  <tr key={m.key} className="border-b last:border-0 hover:bg-muted/20">
-                    <td className="p-3 text-xs font-medium text-foreground">{m.label}</td>
-                    <td className="p-3">
-                      {catCfg ? (
-                        <Badge variant="outline" className={cn("text-[10px]", catCfg.color)}>{catCfg.label}</Badge>
-                      ) : <span className="text-xs text-muted-foreground">{m.categoria}</span>}
-                    </td>
-                    <td className="p-3">
-                      {destCfg ? (
-                        <Badge variant="outline" className={cn("text-[10px]", destCfg.color)}>{destCfg.label}</Badge>
-                      ) : <span className="text-xs text-muted-foreground">{m.destino}</span>}
-                    </td>
-                    <td className="p-3 text-xs text-foreground whitespace-nowrap">{m.responsavel}</td>
-                    <td className="p-3 text-center text-xs tabular-nums text-amber-700">{m.slaAceitacao}d</td>
-                    <td className="p-3 text-center text-xs tabular-nums text-blue-700">{m.slaConclusao}d</td>
-                    <td className="p-3 text-xs whitespace-nowrap tabular-nums">
-                      {(() => {
-                        const mu = multas.find(x => x.key === m.multa);
-                        return mu ? <span className="text-foreground">{mu.diasAposPrazo}d</span> : <span className="text-muted-foreground">—</span>;
-                      })()}
-                    </td>
-                    <td className="p-3 text-right">
-                      <div className="inline-flex items-center gap-2">
-                        <button onClick={() => setEditMotivo(m)} className="text-muted-foreground hover:text-foreground" aria-label={`Editar ${m.label}`}>
-                          <Pencil className="w-3.5 h-3.5" />
-                        </button>
-                        <button onClick={() => removeMotivo(m.key)} className="text-muted-foreground hover:text-destructive" aria-label={`Remover ${m.label}`}>
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
+              {isEditing && (
+                <Dialog open={estadoOpen} onOpenChange={setEstadoOpen}>
+                  <DialogTrigger asChild>
+                    <Button size="sm" variant="outline" className="gap-1.5 h-8 text-xs">
+                      <Plus className="w-3.5 h-3.5" /> Adicionar
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-md">
+                    <DialogHeader><DialogTitle>Novo estado</DialogTitle></DialogHeader>
+                    <div className="space-y-3 py-2">
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Designação</label>
+                        <Input value={newEstadoLabel} onChange={e => setNewEstadoLabel(e.target.value)} placeholder="Ex: Em revisão" />
                       </div>
-                    </td>
-                  </tr>
+                    </div>
+                    <DialogFooter className="gap-2 sm:gap-2">
+                      <DialogClose asChild><Button variant="outline">Cancelar</Button></DialogClose>
+                      <Button onClick={handleAddEstado} disabled={!newEstadoLabel.trim()}>Adicionar</Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              )}
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {estados.map(e => (
+                <div key={e.key} className={cn("inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs", e.color)}>
+                  <span className="font-medium">{e.label}</span>
+                  <EditIcon onClick={() => setEditEstado(e)} label={`Editar ${e.label}`} />
+                  <RemoveIcon onClick={() => removeEstado(e.key)} label={`Remover ${e.label}`} />
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          {/* Categorias */}
+          <Card className="p-5">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Layers className="w-4 h-4 text-muted-foreground" />
+                <h2 className="text-sm font-semibold text-foreground">Categorias</h2>
+                <span className="text-[11px] text-muted-foreground tabular-nums">· {categorias.length}</span>
+              </div>
+              {isEditing && (
+                <Dialog open={catOpen} onOpenChange={setCatOpen}>
+                  <DialogTrigger asChild>
+                    <Button size="sm" variant="outline" className="gap-1.5 h-8 text-xs">
+                      <Plus className="w-3.5 h-3.5" /> Adicionar
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-md">
+                    <DialogHeader><DialogTitle>Nova categoria</DialogTitle></DialogHeader>
+                    <div className="space-y-3 py-2">
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Designação</label>
+                        <Input value={newCatLabel} onChange={e => setNewCatLabel(e.target.value)} placeholder="Ex: Social" />
+                      </div>
+                    </div>
+                    <DialogFooter className="gap-2 sm:gap-2">
+                      <DialogClose asChild><Button variant="outline">Cancelar</Button></DialogClose>
+                      <Button onClick={handleAddCategoria} disabled={!newCatLabel.trim()}>Adicionar</Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              )}
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {categorias.map(c => {
+                const count = motivos.filter(m => m.categoria === c.label).length;
+                return (
+                  <div key={c.key} className={cn("inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs", c.color)}>
+                    <span className="font-medium">{c.label}</span>
+                    <span className="opacity-60 tabular-nums">· {count} motivos</span>
+                    <EditIcon onClick={() => setEditCategoria(c)} label={`Editar ${c.label}`} />
+                    <RemoveIcon onClick={() => removeCategoria(c.key)} label={`Remover ${c.label}`} />
+                  </div>
                 );
               })}
-            </tbody>
-          </table>
-        </div>
-      </Card>
+            </div>
+          </Card>
+
+          {/* Motivos */}
+          <Card className="p-5">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <FileText className="w-4 h-4 text-muted-foreground" />
+                <h2 className="text-sm font-semibold text-foreground">Motivos</h2>
+                <span className="text-[11px] text-muted-foreground tabular-nums">· {motivos.length}</span>
+              </div>
+              {isEditing && (
+                <Dialog open={motivoOpen} onOpenChange={setMotivoOpen}>
+                  <DialogTrigger asChild>
+                    <Button size="sm" variant="outline" className="gap-1.5 h-8 text-xs">
+                      <Plus className="w-3.5 h-3.5" /> Adicionar
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-lg">
+                    <DialogHeader><DialogTitle>Novo motivo</DialogTitle></DialogHeader>
+                    <div className="space-y-3 py-2">
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Designação</label>
+                        <Input value={newMotLabel} onChange={e => setNewMotLabel(e.target.value)} placeholder="Ex: Pedido de declaração" />
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Categoria</label>
+                          <Select value={newMotCat} onValueChange={setNewMotCat}>
+                            <SelectTrigger><SelectValue placeholder="Selecionar..." /></SelectTrigger>
+                            <SelectContent>{categorias.map(c => <SelectItem key={c.key} value={c.label}>{c.label}</SelectItem>)}</SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Destino</label>
+                          <Select value={newMotDest} onValueChange={setNewMotDest}>
+                            <SelectTrigger><SelectValue /></SelectTrigger>
+                            <SelectContent>{Object.entries(destinoConfig).map(([k, v]) => <SelectItem key={k} value={k}>{v.label}</SelectItem>)}</SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Limite p/ aceitar (dias)</label>
+                          <Input type="number" min={1} value={newMotSlaAceit} onChange={e => setNewMotSlaAceit(Number(e.target.value) || 1)} />
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Limite p/ concluir (dias)</label>
+                          <Input type="number" min={1} value={newMotSlaConcl} onChange={e => setNewMotSlaConcl(Number(e.target.value) || 1)} />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Multa associada</label>
+                        <Select value={newMotMulta} onValueChange={setNewMotMulta}>
+                          <SelectTrigger><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="__none__">Sem multa</SelectItem>
+                            {multas.map(mu => {
+                              const invalid = mu.diasAposPrazo <= newMotSlaConcl;
+                              return (
+                                <SelectItem key={mu.key} value={mu.key} disabled={invalid}>
+                                  {mu.label} · {formatMultaDias(mu.diasAposPrazo)}{invalid ? " (≤ conclusão)" : ""}
+                                </SelectItem>
+                              );
+                            })}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Responsável</label>
+                        <Select value={newMotResp} onValueChange={setNewMotResp}>
+                          <SelectTrigger><SelectValue /></SelectTrigger>
+                          <SelectContent>{STAFF_OPTIONS.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <DialogFooter className="gap-2 sm:gap-2">
+                      <DialogClose asChild><Button variant="outline">Cancelar</Button></DialogClose>
+                      <Button onClick={handleAddMotivo} disabled={!newMotLabel.trim() || !newMotCat}>Adicionar</Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              )}
+            </div>
+            <div className="overflow-x-auto rounded-lg border border-border">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b bg-muted/30">
+                    <th className="text-left p-3 font-medium text-muted-foreground text-xs">Motivo</th>
+                    <th className="text-left p-3 font-medium text-muted-foreground text-xs">Categoria</th>
+                    <th className="text-left p-3 font-medium text-muted-foreground text-xs">Destino</th>
+                    <th className="text-left p-3 font-medium text-muted-foreground text-xs">Responsável</th>
+                    <th className="text-center p-3 font-medium text-muted-foreground text-xs whitespace-nowrap">Aceitar</th>
+                    <th className="text-center p-3 font-medium text-muted-foreground text-xs whitespace-nowrap">Concluir</th>
+                    <th className="text-left p-3 font-medium text-muted-foreground text-xs whitespace-nowrap">Multa</th>
+                    {isEditing && <th className="w-20" />}
+                  </tr>
+                </thead>
+                <tbody>
+                  {motivos.map(m => {
+                    const catCfg = categorias.find(c => c.label === m.categoria);
+                    const destCfg = destinoConfig[m.destino as keyof typeof destinoConfig];
+                    return (
+                      <tr key={m.key} className="border-b last:border-0 hover:bg-muted/20">
+                        <td className="p-3 text-xs font-medium text-foreground">{m.label}</td>
+                        <td className="p-3">
+                          {catCfg ? <Badge variant="outline" className={cn("text-[10px]", catCfg.color)}>{catCfg.label}</Badge> : <span className="text-xs text-muted-foreground">{m.categoria}</span>}
+                        </td>
+                        <td className="p-3">
+                          {destCfg ? <Badge variant="outline" className={cn("text-[10px]", destCfg.color)}>{destCfg.label}</Badge> : <span className="text-xs text-muted-foreground">{m.destino}</span>}
+                        </td>
+                        <td className="p-3 text-xs text-foreground whitespace-nowrap">{m.responsavel}</td>
+                        <td className="p-3 text-center text-xs tabular-nums text-amber-700">{m.slaAceitacao}d</td>
+                        <td className="p-3 text-center text-xs tabular-nums text-blue-700">{m.slaConclusao}d</td>
+                        <td className="p-3 text-xs whitespace-nowrap tabular-nums">
+                          {(() => {
+                            const mu = multas.find(x => x.key === m.multa);
+                            return mu ? <span className="text-foreground">{mu.diasAposPrazo}d</span> : <span className="text-muted-foreground">—</span>;
+                          })()}
+                        </td>
+                        {isEditing && (
+                          <td className="p-3 text-right">
+                            <div className="inline-flex items-center gap-2">
+                              <button onClick={() => setEditMotivo(m)} className="text-muted-foreground hover:text-foreground" aria-label={`Editar ${m.label}`}>
+                                <Pencil className="w-3.5 h-3.5" />
+                              </button>
+                              <button onClick={() => removeMotivo(m.key)} className="text-muted-foreground hover:text-destructive" aria-label={`Remover ${m.label}`}>
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </td>
+                        )}
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </Card>
         </TabsContent>
 
         {/* ============ AGENDAMENTOS ============ */}
         <TabsContent value="agendamentos" className="space-y-6 mt-0">
-          {/* Parâmetros gerais */}
+          {/* Parâmetros gerais — só início e fim */}
           <Card className="p-5">
             <div className="flex items-center gap-2 mb-4">
               <Clock className="w-4 h-4 text-muted-foreground" />
               <h2 className="text-sm font-semibold text-foreground">Parâmetros de agendamento</h2>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div>
-                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Duração padrão (min)</label>
-                <Input type="number" min={10} step={5} value={agDuracaoPadrao} onChange={e => setAgDuracaoPadrao(Number(e.target.value) || 30)} />
-              </div>
-              <div>
-                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Antecedência mín. (horas)</label>
-                <Input type="number" min={0} value={agAntecedenciaMin} onChange={e => setAgAntecedenciaMin(Number(e.target.value) || 0)} />
-              </div>
+            <div className="grid grid-cols-2 gap-4 max-w-md">
               <div>
                 <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Início atendimento</label>
-                <Input type="time" value={agHoraInicio} onChange={e => setAgHoraInicio(e.target.value)} />
+                <Input type="time" value={agHoraInicio} disabled={!isEditing} onChange={e => setAgHoraInicio(e.target.value)} />
               </div>
               <div>
                 <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Fim atendimento</label>
-                <Input type="time" value={agHoraFim} onChange={e => setAgHoraFim(e.target.value)} />
+                <Input type="time" value={agHoraFim} disabled={!isEditing} onChange={e => setAgHoraFim(e.target.value)} />
               </div>
             </div>
           </Card>
@@ -661,24 +581,38 @@ export default function GapConfiguracao() {
                 <h2 className="text-sm font-semibold text-foreground">Categorias de atendimento</h2>
                 <span className="text-[11px] text-muted-foreground tabular-nums">· {agCategorias.length}</span>
               </div>
-              <div className="flex items-center gap-2">
-                <Input value={newAgCat} onChange={e => setNewAgCat(e.target.value)} placeholder="Nova categoria" className="h-8 w-48 text-xs" />
-                <Button size="sm" variant="outline" className="h-8 text-xs gap-1.5" onClick={() => {
-                  if (!newAgCat.trim()) return;
-                  const key = slugify(newAgCat);
-                  setAgCategorias(prev => [...prev, { key, label: newAgCat.trim(), color: "bg-slate-100 text-slate-700 border-slate-200" }]);
-                  setNewAgCat("");
-                  toast({ title: "Categoria adicionada" });
-                }}><Plus className="w-3.5 h-3.5" /> Adicionar</Button>
-              </div>
+              {isEditing && (
+                <Dialog open={agCatOpen} onOpenChange={setAgCatOpen}>
+                  <DialogTrigger asChild>
+                    <Button size="sm" variant="outline" className="gap-1.5 h-8 text-xs"><Plus className="w-3.5 h-3.5" /> Adicionar</Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-md">
+                    <DialogHeader><DialogTitle>Nova categoria de atendimento</DialogTitle></DialogHeader>
+                    <div className="space-y-3 py-2">
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Designação</label>
+                        <Input value={newAgCat} onChange={e => setNewAgCat(e.target.value)} placeholder="Ex: Social" />
+                      </div>
+                    </div>
+                    <DialogFooter className="gap-2 sm:gap-2">
+                      <DialogClose asChild><Button variant="outline">Cancelar</Button></DialogClose>
+                      <Button onClick={() => {
+                        if (!newAgCat.trim()) return;
+                        const key = slugify(newAgCat);
+                        setAgCategorias(prev => [...prev, { key, label: newAgCat.trim(), color: "bg-slate-100 text-slate-700 border-slate-200" }]);
+                        setNewAgCat(""); setAgCatOpen(false);
+                        toast({ title: "Categoria adicionada" });
+                      }} disabled={!newAgCat.trim()}>Adicionar</Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              )}
             </div>
             <div className="flex flex-wrap gap-2">
               {agCategorias.map(c => (
                 <div key={c.key} className={cn("inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs", c.color)}>
                   <span className="font-medium">{c.label}</span>
-                  <button onClick={() => setAgCategorias(prev => prev.filter(x => x.key !== c.key))} className="opacity-60 hover:opacity-100">
-                    <Trash2 className="w-3 h-3" />
-                  </button>
+                  <RemoveIcon onClick={() => setAgCategorias(prev => prev.filter(x => x.key !== c.key))} label={`Remover ${c.label}`} />
                 </div>
               ))}
             </div>
@@ -692,20 +626,50 @@ export default function GapConfiguracao() {
                 <h2 className="text-sm font-semibold text-foreground">Motivos de agendamento</h2>
                 <span className="text-[11px] text-muted-foreground tabular-nums">· {agMotivos.length}</span>
               </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-[1fr_220px_120px_auto] gap-2 mb-3">
-              <Input value={newAgMotLabel} onChange={e => setNewAgMotLabel(e.target.value)} placeholder="Designação do motivo" className="h-9 text-xs" />
-              <Select value={newAgMotCat} onValueChange={setNewAgMotCat}>
-                <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Categoria" /></SelectTrigger>
-                <SelectContent>{agCategorias.map(c => <SelectItem key={c.key} value={c.label}>{c.label}</SelectItem>)}</SelectContent>
-              </Select>
-              <Input type="number" min={10} step={5} value={newAgMotDur} onChange={e => setNewAgMotDur(Number(e.target.value) || 30)} placeholder="Duração" className="h-9 text-xs" />
-              <Button size="sm" variant="outline" className="h-9 text-xs gap-1.5" onClick={() => {
-                if (!newAgMotLabel.trim() || !newAgMotCat) return;
-                setAgMotivos(prev => [...prev, { key: slugify(newAgMotLabel), label: newAgMotLabel.trim(), categoria: newAgMotCat, duracao: newAgMotDur }]);
-                setNewAgMotLabel(""); setNewAgMotCat(""); setNewAgMotDur(45);
-                toast({ title: "Motivo adicionado" });
-              }}><Plus className="w-3.5 h-3.5" /> Adicionar</Button>
+              {isEditing && (
+                <Dialog open={agMotOpen} onOpenChange={setAgMotOpen}>
+                  <DialogTrigger asChild>
+                    <Button size="sm" variant="outline" className="gap-1.5 h-8 text-xs"><Plus className="w-3.5 h-3.5" /> Adicionar</Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-lg">
+                    <DialogHeader><DialogTitle>Novo motivo de agendamento</DialogTitle></DialogHeader>
+                    <div className="space-y-3 py-2">
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Designação</label>
+                        <Input value={newAgMotLabel} onChange={e => setNewAgMotLabel(e.target.value)} placeholder="Ex: Orientação vocacional" />
+                      </div>
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Categoria</label>
+                        <Select value={newAgMotCat} onValueChange={setNewAgMotCat}>
+                          <SelectTrigger><SelectValue placeholder="Selecionar..." /></SelectTrigger>
+                          <SelectContent>{agCategorias.map(c => <SelectItem key={c.key} value={c.label}>{c.label}</SelectItem>)}</SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Responsável</label>
+                        <Select value={newAgMotResp} onValueChange={setNewAgMotResp}>
+                          <SelectTrigger><SelectValue /></SelectTrigger>
+                          <SelectContent>{STAFF_OPTIONS.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Duração (min)</label>
+                        <Input type="number" min={10} step={5} value={newAgMotDur} onChange={e => setNewAgMotDur(Number(e.target.value) || 30)} />
+                      </div>
+                    </div>
+                    <DialogFooter className="gap-2 sm:gap-2">
+                      <DialogClose asChild><Button variant="outline">Cancelar</Button></DialogClose>
+                      <Button onClick={() => {
+                        if (!newAgMotLabel.trim() || !newAgMotCat) return;
+                        setAgMotivos(prev => [...prev, { key: slugify(newAgMotLabel), label: newAgMotLabel.trim(), categoria: newAgMotCat, responsavel: newAgMotResp, duracao: newAgMotDur }]);
+                        setNewAgMotLabel(""); setNewAgMotCat(""); setNewAgMotResp(STAFF_OPTIONS[0]); setNewAgMotDur(45);
+                        setAgMotOpen(false);
+                        toast({ title: "Motivo adicionado" });
+                      }} disabled={!newAgMotLabel.trim() || !newAgMotCat}>Adicionar</Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              )}
             </div>
             <div className="overflow-x-auto rounded-lg border border-border">
               <table className="w-full text-sm">
@@ -713,8 +677,9 @@ export default function GapConfiguracao() {
                   <tr className="border-b bg-muted/30">
                     <th className="text-left p-3 font-medium text-muted-foreground text-xs">Motivo</th>
                     <th className="text-left p-3 font-medium text-muted-foreground text-xs">Categoria</th>
+                    <th className="text-left p-3 font-medium text-muted-foreground text-xs">Responsável</th>
                     <th className="text-center p-3 font-medium text-muted-foreground text-xs">Duração</th>
-                    <th className="w-12" />
+                    {isEditing && <th className="w-12" />}
                   </tr>
                 </thead>
                 <tbody>
@@ -726,12 +691,15 @@ export default function GapConfiguracao() {
                         <td className="p-3">
                           {catCfg ? <Badge variant="outline" className={cn("text-[10px]", catCfg.color)}>{catCfg.label}</Badge> : <span className="text-xs text-muted-foreground">{m.categoria}</span>}
                         </td>
+                        <td className="p-3 text-xs text-foreground whitespace-nowrap">{m.responsavel}</td>
                         <td className="p-3 text-center text-xs tabular-nums text-blue-700">{m.duracao} min</td>
-                        <td className="p-3 text-right">
-                          <button onClick={() => setAgMotivos(prev => prev.filter(x => x.key !== m.key))} className="text-muted-foreground hover:text-destructive">
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        </td>
+                        {isEditing && (
+                          <td className="p-3 text-right">
+                            <button onClick={() => setAgMotivos(prev => prev.filter(x => x.key !== m.key))} className="text-muted-foreground hover:text-destructive">
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </td>
+                        )}
                       </tr>
                     );
                   })}
@@ -748,16 +716,35 @@ export default function GapConfiguracao() {
                 <h2 className="text-sm font-semibold text-foreground">Salas / Gabinetes</h2>
                 <span className="text-[11px] text-muted-foreground tabular-nums">· {agSalas.length}</span>
               </div>
-              <div className="flex items-center gap-2">
-                <Input value={newAgSalaLabel} onChange={e => setNewAgSalaLabel(e.target.value)} placeholder="Nome da sala" className="h-8 w-44 text-xs" />
-                <Input type="number" min={1} value={newAgSalaLot} onChange={e => setNewAgSalaLot(Number(e.target.value) || 1)} placeholder="Lotação" className="h-8 w-24 text-xs" />
-                <Button size="sm" variant="outline" className="h-8 text-xs gap-1.5" onClick={() => {
-                  if (!newAgSalaLabel.trim()) return;
-                  setAgSalas(prev => [...prev, { key: slugify(newAgSalaLabel), label: newAgSalaLabel.trim(), lotacao: newAgSalaLot }]);
-                  setNewAgSalaLabel(""); setNewAgSalaLot(4);
-                  toast({ title: "Sala adicionada" });
-                }}><Plus className="w-3.5 h-3.5" /> Adicionar</Button>
-              </div>
+              {isEditing && (
+                <Dialog open={agSalaOpen} onOpenChange={setAgSalaOpen}>
+                  <DialogTrigger asChild>
+                    <Button size="sm" variant="outline" className="gap-1.5 h-8 text-xs"><Plus className="w-3.5 h-3.5" /> Adicionar</Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-md">
+                    <DialogHeader><DialogTitle>Nova sala / gabinete</DialogTitle></DialogHeader>
+                    <div className="space-y-3 py-2">
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Nome da sala</label>
+                        <Input value={newAgSalaLabel} onChange={e => setNewAgSalaLabel(e.target.value)} placeholder="Ex: Gab. GAP 4" />
+                      </div>
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Lotação</label>
+                        <Input type="number" min={1} value={newAgSalaLot} onChange={e => setNewAgSalaLot(Number(e.target.value) || 1)} />
+                      </div>
+                    </div>
+                    <DialogFooter className="gap-2 sm:gap-2">
+                      <DialogClose asChild><Button variant="outline">Cancelar</Button></DialogClose>
+                      <Button onClick={() => {
+                        if (!newAgSalaLabel.trim()) return;
+                        setAgSalas(prev => [...prev, { key: slugify(newAgSalaLabel), label: newAgSalaLabel.trim(), lotacao: newAgSalaLot }]);
+                        setNewAgSalaLabel(""); setNewAgSalaLot(4); setAgSalaOpen(false);
+                        toast({ title: "Sala adicionada" });
+                      }} disabled={!newAgSalaLabel.trim()}>Adicionar</Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              )}
             </div>
             <div className="flex flex-wrap gap-2">
               {agSalas.map(s => (
@@ -765,38 +752,8 @@ export default function GapConfiguracao() {
                   <MapPin className="w-3 h-3 text-muted-foreground" />
                   <span className="font-medium text-foreground">{s.label}</span>
                   <span className="text-muted-foreground tabular-nums">· {s.lotacao} lug.</span>
-                  <button onClick={() => setAgSalas(prev => prev.filter(x => x.key !== s.key))} className="opacity-60 hover:opacity-100">
-                    <Trash2 className="w-3 h-3" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          </Card>
-
-          {/* Modalidades */}
-          <Card className="p-5">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 text-muted-foreground" />
-                <h2 className="text-sm font-semibold text-foreground">Modalidades</h2>
-                <span className="text-[11px] text-muted-foreground tabular-nums">· {agModalidades.length}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Input value={newAgModLabel} onChange={e => setNewAgModLabel(e.target.value)} placeholder="Nova modalidade" className="h-8 w-44 text-xs" />
-                <Button size="sm" variant="outline" className="h-8 text-xs gap-1.5" onClick={() => {
-                  if (!newAgModLabel.trim()) return;
-                  setAgModalidades(prev => [...prev, { key: slugify(newAgModLabel), label: newAgModLabel.trim() }]);
-                  setNewAgModLabel("");
-                }}><Plus className="w-3.5 h-3.5" /> Adicionar</Button>
-              </div>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {agModalidades.map(m => (
-                <div key={m.key} className="inline-flex items-center gap-2 rounded-full border border-border bg-muted/30 px-3 py-1 text-xs">
-                  <span className="font-medium text-foreground">{m.label}</span>
-                  <button onClick={() => setAgModalidades(prev => prev.filter(x => x.key !== m.key))} className="opacity-60 hover:opacity-100">
-                    <Trash2 className="w-3 h-3" />
-                  </button>
+                  <EditIcon onClick={() => setEditAgSala(s)} label={`Editar ${s.label}`} />
+                  <RemoveIcon onClick={() => setAgSalas(prev => prev.filter(x => x.key !== s.key))} label={`Remover ${s.label}`} />
                 </div>
               ))}
             </div>
@@ -805,7 +762,6 @@ export default function GapConfiguracao() {
 
         {/* ============ CANDIDATURAS ============ */}
         <TabsContent value="candidaturas" className="space-y-6 mt-0">
-
           {/* Parâmetros gerais */}
           <Card className="p-5">
             <div className="flex items-center gap-2 mb-4">
@@ -815,20 +771,17 @@ export default function GapConfiguracao() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
                 <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Nota mínima de acesso</label>
-                <Input type="number" min={0} max={20} value={cdNotaMinima}
-                  onChange={e => setCdNotaMinima(Number(e.target.value) || 0)} />
+                <Input type="number" min={0} max={20} value={cdNotaMinima} disabled={!isEditing} onChange={e => setCdNotaMinima(Number(e.target.value) || 0)} />
                 <p className="text-[10px] text-muted-foreground mt-1">Valor sobre 20 no exame de acesso</p>
               </div>
               <div>
                 <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Taxa de candidatura (Kz)</label>
-                <Input type="number" min={0} value={cdTaxa}
-                  onChange={e => setCdTaxa(Number(e.target.value) || 0)} />
+                <Input type="number" min={0} value={cdTaxa} disabled={!isEditing} onChange={e => setCdTaxa(Number(e.target.value) || 0)} />
                 <p className="text-[10px] text-muted-foreground mt-1">Paga no momento da submissão</p>
               </div>
               <div>
                 <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Opções de curso (máx.)</label>
-                <Input type="number" min={1} max={5} value={cdMaxOpcoes}
-                  onChange={e => setCdMaxOpcoes(Number(e.target.value) || 1)} />
+                <Input type="number" min={1} max={5} value={cdMaxOpcoes} disabled={!isEditing} onChange={e => setCdMaxOpcoes(Number(e.target.value) || 1)} />
                 <p className="text-[10px] text-muted-foreground mt-1">Nº de cursos que pode escolher</p>
               </div>
             </div>
@@ -842,34 +795,32 @@ export default function GapConfiguracao() {
                 <h2 className="text-sm font-semibold text-foreground">Estados</h2>
                 <span className="text-[11px] text-muted-foreground tabular-nums">· {cdEstados.length}</span>
               </div>
-              <Dialog open={cdEstadoOpen} onOpenChange={setCdEstadoOpen}>
-                <DialogTrigger asChild>
-                  <Button size="sm" variant="outline" className="gap-1.5 h-8 text-xs">
-                    <Plus className="w-3.5 h-3.5" /> Novo estado
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-md">
-                  <DialogHeader><DialogTitle>Novo estado</DialogTitle></DialogHeader>
-                  <div className="space-y-3 py-2">
-                    <div>
-                      <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Designação</label>
-                      <Input value={newCdEstadoLabel} onChange={e => setNewCdEstadoLabel(e.target.value)} placeholder="Ex: Em análise" />
+              {isEditing && (
+                <Dialog open={cdEstadoOpen} onOpenChange={setCdEstadoOpen}>
+                  <DialogTrigger asChild>
+                    <Button size="sm" variant="outline" className="gap-1.5 h-8 text-xs"><Plus className="w-3.5 h-3.5" /> Adicionar</Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-md">
+                    <DialogHeader><DialogTitle>Novo estado</DialogTitle></DialogHeader>
+                    <div className="space-y-3 py-2">
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Designação</label>
+                        <Input value={newCdEstadoLabel} onChange={e => setNewCdEstadoLabel(e.target.value)} placeholder="Ex: Em análise" />
+                      </div>
                     </div>
-                  </div>
-                  <DialogFooter className="gap-2 sm:gap-2">
-                    <DialogClose asChild><Button variant="outline">Cancelar</Button></DialogClose>
-                    <Button onClick={addCdEstado} disabled={!newCdEstadoLabel.trim()}>Adicionar</Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
+                    <DialogFooter className="gap-2 sm:gap-2">
+                      <DialogClose asChild><Button variant="outline">Cancelar</Button></DialogClose>
+                      <Button onClick={addCdEstado} disabled={!newCdEstadoLabel.trim()}>Adicionar</Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              )}
             </div>
             <div className="flex flex-wrap gap-2">
               {cdEstados.map(e => (
                 <div key={e.key} className={cn("inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs", e.color)}>
                   <span className="font-medium">{e.label}</span>
-                  <button onClick={() => removeCdEstado(e.key)} className="opacity-60 hover:opacity-100" aria-label={`Remover ${e.label}`}>
-                    <Trash2 className="w-3 h-3" />
-                  </button>
+                  <RemoveIcon onClick={() => removeCdEstado(e.key)} label={`Remover ${e.label}`} />
                 </div>
               ))}
             </div>
@@ -877,44 +828,54 @@ export default function GapConfiguracao() {
 
           {/* Etapas do processo */}
           <Card className="p-5">
-            <div className="flex items-center justify-between mb-4 gap-3 flex-wrap">
+            <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <FileCheck2 className="w-4 h-4 text-muted-foreground" />
                 <h2 className="text-sm font-semibold text-foreground">Etapas do processo</h2>
                 <span className="text-[11px] text-muted-foreground tabular-nums">· {cdEtapas.length}</span>
               </div>
-              <div className="flex items-center gap-1.5 flex-wrap">
-                <Input value={newCdEtapaLabel} onChange={e => setNewCdEtapaLabel(e.target.value)}
-                  onKeyDown={e => { if (e.key === "Enter") addCdEtapa(); }}
-                  placeholder="Nova etapa" className="h-8 w-44 text-xs" />
-                <Input type="number" min={0} value={newCdEtapaDias}
-                  onChange={e => setNewCdEtapaDias(Number(e.target.value) || 0)}
-                  placeholder="dias" className="h-8 w-20 text-xs" />
-                <Button size="sm" variant="outline" className="h-8 text-xs gap-1.5" onClick={addCdEtapa} disabled={!newCdEtapaLabel.trim()}>
-                  <Plus className="w-3.5 h-3.5" /> Adicionar
-                </Button>
-              </div>
+              {isEditing && (
+                <Dialog open={cdEtapaOpen} onOpenChange={setCdEtapaOpen}>
+                  <DialogTrigger asChild>
+                    <Button size="sm" variant="outline" className="gap-1.5 h-8 text-xs"><Plus className="w-3.5 h-3.5" /> Adicionar</Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-md">
+                    <DialogHeader><DialogTitle>Nova etapa</DialogTitle></DialogHeader>
+                    <div className="space-y-3 py-2">
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Designação</label>
+                        <Input value={newCdEtapaLabel} onChange={e => setNewCdEtapaLabel(e.target.value)} placeholder="Ex: Entrevista técnica" />
+                      </div>
+                    </div>
+                    <DialogFooter className="gap-2 sm:gap-2">
+                      <DialogClose asChild><Button variant="outline">Cancelar</Button></DialogClose>
+                      <Button onClick={addCdEtapa} disabled={!newCdEtapaLabel.trim()}>Adicionar</Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              )}
             </div>
             <div className="overflow-x-auto rounded-lg border border-border">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="text-[10px] uppercase tracking-wider text-muted-foreground border-b border-border bg-muted/30">
                     <th className="text-left font-semibold px-4 py-2">Etapa</th>
-                    <th className="text-center font-semibold px-3 py-2">Dias após submissão</th>
                     <th className="text-center font-semibold px-3 py-2">Obrigatória</th>
                     <th className="text-left font-semibold px-3 py-2">Estados possíveis</th>
-                    <th className="w-12"></th>
+                    {isEditing && <th className="w-12"></th>}
                   </tr>
                 </thead>
                 <tbody>
                   {cdEtapas.map(et => (
                     <tr key={et.key} className="border-b border-border/50 last:border-0">
                       <td className="px-4 py-2.5 text-sm font-medium text-foreground">{et.label}</td>
-                      <td className="px-3 py-2.5 text-center text-xs tabular-nums">+{et.diasAposSubmissao}d</td>
                       <td className="px-3 py-2.5 text-center">
-                        <button onClick={() => toggleEtapaObrig(et.key)}
+                        <button
+                          disabled={!isEditing}
+                          onClick={() => toggleEtapaObrig(et.key)}
                           className={cn("inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium",
-                            et.obrigatoria ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-muted text-muted-foreground border-border")}>
+                            et.obrigatoria ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-muted text-muted-foreground border-border",
+                            !isEditing && "cursor-default")}>
                           {et.obrigatoria ? "Sim" : "Opcional"}
                         </button>
                       </td>
@@ -928,11 +889,13 @@ export default function GapConfiguracao() {
                               })}
                         </div>
                       </td>
-                      <td className="px-2 py-2.5 text-right">
-                        <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => removeCdEtapa(et.key)} title="Remover">
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </Button>
-                      </td>
+                      {isEditing && (
+                        <td className="px-2 py-2.5 text-right">
+                          <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => removeCdEtapa(et.key)} title="Remover">
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </Button>
+                        </td>
+                      )}
                     </tr>
                   ))}
                 </tbody>
@@ -940,31 +903,55 @@ export default function GapConfiguracao() {
             </div>
           </Card>
 
-          {/* Sessões de exames e cursos preparatórios */}
+          {/* Sessões */}
           <Card className="p-5">
-            <div className="flex items-center justify-between mb-4 gap-3 flex-wrap">
+            <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <CalendarClock className="w-4 h-4 text-muted-foreground" />
                 <h2 className="text-sm font-semibold text-foreground">Sessões agendadas</h2>
                 <span className="text-[11px] text-muted-foreground tabular-nums">· {cdSessoes.length}</span>
               </div>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-6 gap-2 mb-3">
-              <Select value={newCdSessEtapa} onValueChange={setNewCdSessEtapa}>
-                <SelectTrigger className="h-8 text-xs sm:col-span-2"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {cdEtapas.filter(e => e.key !== "submissao").map(e => <SelectItem key={e.key} value={e.label}>{e.label}</SelectItem>)}
-                </SelectContent>
-              </Select>
-              <Input type="date" value={newCdSessData} onChange={e => setNewCdSessData(e.target.value)} className="h-8 text-xs" />
-              <Input type="time" value={newCdSessHora} onChange={e => setNewCdSessHora(e.target.value)} className="h-8 text-xs" />
-              <Input value={newCdSessLocal} onChange={e => setNewCdSessLocal(e.target.value)} placeholder="Local" className="h-8 text-xs" />
-              <div className="flex gap-1.5">
-                <Input type="number" min={1} value={newCdSessCap} onChange={e => setNewCdSessCap(Number(e.target.value) || 1)} placeholder="Cap." className="h-8 text-xs w-20" />
-                <Button size="sm" variant="outline" className="h-8 text-xs gap-1.5 flex-1" onClick={addCdSessao}>
-                  <Plus className="w-3.5 h-3.5" /> Add
-                </Button>
-              </div>
+              {isEditing && (
+                <Dialog open={cdSessOpen} onOpenChange={setCdSessOpen}>
+                  <DialogTrigger asChild>
+                    <Button size="sm" variant="outline" className="gap-1.5 h-8 text-xs"><Plus className="w-3.5 h-3.5" /> Adicionar</Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-md">
+                    <DialogHeader><DialogTitle>Nova sessão</DialogTitle></DialogHeader>
+                    <div className="space-y-3 py-2">
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Etapa</label>
+                        <Select value={newCdSessEtapa} onValueChange={setNewCdSessEtapa}>
+                          <SelectTrigger><SelectValue /></SelectTrigger>
+                          <SelectContent>{cdEtapas.filter(e => e.key !== "submissao").map(e => <SelectItem key={e.key} value={e.label}>{e.label}</SelectItem>)}</SelectContent>
+                        </Select>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Data</label>
+                          <Input type="date" value={newCdSessData} onChange={e => setNewCdSessData(e.target.value)} />
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Hora</label>
+                          <Input type="time" value={newCdSessHora} onChange={e => setNewCdSessHora(e.target.value)} />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Local</label>
+                        <Input value={newCdSessLocal} onChange={e => setNewCdSessLocal(e.target.value)} placeholder="Ex: Anfiteatro A" />
+                      </div>
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Capacidade</label>
+                        <Input type="number" min={1} value={newCdSessCap} onChange={e => setNewCdSessCap(Number(e.target.value) || 1)} />
+                      </div>
+                    </div>
+                    <DialogFooter className="gap-2 sm:gap-2">
+                      <DialogClose asChild><Button variant="outline">Cancelar</Button></DialogClose>
+                      <Button onClick={addCdSessao} disabled={!newCdSessData || !newCdSessLocal.trim()}>Adicionar</Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              )}
             </div>
             <div className="overflow-x-auto rounded-lg border border-border">
               <table className="w-full text-sm">
@@ -975,7 +962,7 @@ export default function GapConfiguracao() {
                     <th className="text-left font-semibold px-3 py-2">Hora</th>
                     <th className="text-left font-semibold px-3 py-2">Local</th>
                     <th className="text-center font-semibold px-3 py-2">Capacidade</th>
-                    <th className="w-12"></th>
+                    {isEditing && <th className="w-12"></th>}
                   </tr>
                 </thead>
                 <tbody>
@@ -986,11 +973,13 @@ export default function GapConfiguracao() {
                       <td className="px-3 py-2.5 text-xs tabular-nums">{s.hora}</td>
                       <td className="px-3 py-2.5 text-xs text-muted-foreground">{s.local}</td>
                       <td className="px-3 py-2.5 text-center text-xs tabular-nums">{s.capacidade}</td>
-                      <td className="px-2 py-2.5 text-right">
-                        <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => removeCdSessao(s.key)} title="Remover">
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </Button>
-                      </td>
+                      {isEditing && (
+                        <td className="px-2 py-2.5 text-right">
+                          <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => removeCdSessao(s.key)} title="Remover">
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </Button>
+                        </td>
+                      )}
                     </tr>
                   ))}
                 </tbody>
@@ -998,88 +987,13 @@ export default function GapConfiguracao() {
             </div>
           </Card>
 
-          {/* Formulário de candidatura */}
-          <Card className="p-5">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <FileText className="w-4 h-4 text-muted-foreground" />
-                <h2 className="text-sm font-semibold text-foreground">Formulário de candidatura</h2>
-                <span className="text-[11px] text-muted-foreground tabular-nums">· {cdFormSteps.length} passos</span>
-              </div>
-            </div>
-            <div className="space-y-2">
-              {cdFormSteps.map(step => {
-                const open = expandedStep === step.key;
-                return (
-                  <div key={step.key} className="rounded-lg border border-border overflow-hidden">
-                    <button onClick={() => setExpandedStep(open ? null : step.key)}
-                      className="w-full flex items-center justify-between px-4 py-3 hover:bg-muted/30 transition text-left">
-                      <div className="min-w-0">
-                        <p className="text-sm font-semibold text-foreground">{step.titulo}</p>
-                        <p className="text-[11px] text-muted-foreground mt-0.5">{step.subtitulo}</p>
-                      </div>
-                      <div className="flex items-center gap-2 shrink-0">
-                        <span className="text-[10px] text-muted-foreground tabular-nums">{step.perguntas.length} campos</span>
-                        <span className={cn("text-xs transition-transform", open && "rotate-90")}>›</span>
-                      </div>
-                    </button>
-                    {open && (
-                      <div className="border-t border-border bg-muted/10 px-4 py-3 space-y-2">
-                        {step.perguntas.map(p => (
-                          <div key={p.key} className="flex items-center justify-between gap-2 rounded-md border border-border bg-card px-3 py-1.5">
-                            <div className="flex items-center gap-2 min-w-0">
-                              <span className="text-sm text-foreground truncate">{p.label}</span>
-                              <Badge variant="outline" className="text-[10px] font-normal">{p.tipo}</Badge>
-                              {p.obrigatoria && <Badge className="text-[10px] bg-red-50 text-red-700 border-red-200 border" variant="outline">obrigatória</Badge>}
-                            </div>
-                            <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => removePergunta(step.key, p.key)} title="Remover">
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </Button>
-                          </div>
-                        ))}
-                        <div className="flex flex-wrap items-center gap-1.5 pt-2 border-t border-border">
-                          <Input value={newPergStep === step.key ? newPergLabel : ""}
-                            onChange={e => { setNewPergStep(step.key); setNewPergLabel(e.target.value); }}
-                            placeholder="Nova pergunta" className="h-8 text-xs flex-1 min-w-[160px]" />
-                          <Select value={newPergStep === step.key ? newPergTipo : "texto"}
-                            onValueChange={(v: CdPergunta["tipo"]) => { setNewPergStep(step.key); setNewPergTipo(v); }}>
-                            <SelectTrigger className="h-8 text-xs w-28"><SelectValue /></SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="texto">Texto</SelectItem>
-                              <SelectItem value="numero">Número</SelectItem>
-                              <SelectItem value="data">Data</SelectItem>
-                              <SelectItem value="selecao">Seleção</SelectItem>
-                              <SelectItem value="ficheiro">Ficheiro</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <label className="inline-flex items-center gap-1 text-[11px] text-muted-foreground">
-                            <input type="checkbox" checked={newPergStep === step.key ? newPergObrig : true}
-                              onChange={e => { setNewPergStep(step.key); setNewPergObrig(e.target.checked); }} />
-                            Obrigatória
-                          </label>
-                          <Button size="sm" variant="outline" className="h-8 text-xs gap-1.5" onClick={() => addPergunta(step.key)}
-                            disabled={!(newPergStep === step.key && newPergLabel.trim())}>
-                            <Plus className="w-3.5 h-3.5" /> Adicionar
-                          </Button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </Card>
-
           <p className="text-[11px] text-muted-foreground">
             Total de candidaturas registadas no sistema: <span className="font-semibold text-foreground tabular-nums">{allCandidaturas.length}</span>
           </p>
         </TabsContent>
-
-
-
       </Tabs>
 
-
+      {/* Edit Estado Dialog */}
       <Dialog open={!!editEstado} onOpenChange={(o) => !o && setEditEstado(null)}>
         <DialogContent className="max-w-md">
           <DialogHeader><DialogTitle>Editar estado</DialogTitle></DialogHeader>
@@ -1117,6 +1031,33 @@ export default function GapConfiguracao() {
         </DialogContent>
       </Dialog>
 
+      {/* Edit Sala Dialog */}
+      <Dialog open={!!editAgSala} onOpenChange={(o) => !o && setEditAgSala(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader><DialogTitle>Editar sala</DialogTitle></DialogHeader>
+          {editAgSala && (
+            <div className="space-y-3 py-2">
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Nome da sala</label>
+                <Input value={editAgSala.label} onChange={e => setEditAgSala({ ...editAgSala, label: e.target.value })} />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Lotação</label>
+                <Input type="number" min={1} value={editAgSala.lotacao} onChange={e => setEditAgSala({ ...editAgSala, lotacao: Number(e.target.value) || 1 })} />
+              </div>
+            </div>
+          )}
+          <DialogFooter className="gap-2 sm:gap-2">
+            <Button variant="outline" onClick={() => setEditAgSala(null)}>Cancelar</Button>
+            <Button onClick={() => {
+              if (!editAgSala || !editAgSala.label.trim()) return;
+              setAgSalas(prev => prev.map(s => s.key === editAgSala.key ? editAgSala : s));
+              toast({ title: "Sala atualizada" }); setEditAgSala(null);
+            }} disabled={!editAgSala?.label.trim()}>Guardar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Edit Motivo Dialog */}
       <Dialog open={!!editMotivo} onOpenChange={(o) => !o && setEditMotivo(null)}>
         <DialogContent className="max-w-lg">
@@ -1132,18 +1073,14 @@ export default function GapConfiguracao() {
                   <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Categoria</label>
                   <Select value={editMotivo.categoria} onValueChange={(v) => setEditMotivo({ ...editMotivo, categoria: v })}>
                     <SelectTrigger><SelectValue placeholder="Selecionar..." /></SelectTrigger>
-                    <SelectContent>
-                      {categorias.map(c => <SelectItem key={c.key} value={c.label}>{c.label}</SelectItem>)}
-                    </SelectContent>
+                    <SelectContent>{categorias.map(c => <SelectItem key={c.key} value={c.label}>{c.label}</SelectItem>)}</SelectContent>
                   </Select>
                 </div>
                 <div>
                   <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Destino</label>
                   <Select value={editMotivo.destino} onValueChange={(v) => setEditMotivo({ ...editMotivo, destino: v })}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      {Object.entries(destinoConfig).map(([k, v]) => <SelectItem key={k} value={k}>{v.label}</SelectItem>)}
-                    </SelectContent>
+                    <SelectContent>{Object.entries(destinoConfig).map(([k, v]) => <SelectItem key={k} value={k}>{v.label}</SelectItem>)}</SelectContent>
                   </Select>
                 </div>
               </div>
@@ -1151,12 +1088,10 @@ export default function GapConfiguracao() {
                 <div>
                   <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Limite p/ aceitar (dias)</label>
                   <Input type="number" min={1} value={editMotivo.slaAceitacao} onChange={e => setEditMotivo({ ...editMotivo, slaAceitacao: Number(e.target.value) || 1 })} />
-                  <p className="text-[10px] text-muted-foreground mt-1">Pendente → Em Execução</p>
                 </div>
                 <div>
                   <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Limite p/ concluir (dias)</label>
                   <Input type="number" min={1} value={editMotivo.slaConclusao} onChange={e => setEditMotivo({ ...editMotivo, slaConclusao: Number(e.target.value) || 1 })} />
-                  <p className="text-[10px] text-muted-foreground mt-1">Em Execução → Concluída</p>
                 </div>
               </div>
               <div>
@@ -1187,7 +1122,6 @@ export default function GapConfiguracao() {
                     })}
                   </SelectContent>
                 </Select>
-                <p className="text-[10px] text-muted-foreground mt-1">Aplicada se o limite de conclusão for excedido</p>
               </div>
             </div>
           )}
