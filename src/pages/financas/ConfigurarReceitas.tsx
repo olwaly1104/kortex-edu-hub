@@ -282,7 +282,7 @@ export default function ConfigurarReceitas() {
 
   /* ── DESPESAS ── */
   const [despesas, setDespesas] = useState<DespesaRow[]>([]);
-  const [categorias, setCategorias] = useState<string[]>([]);
+  const [categorias, setCategorias] = useState<CategoriaItem[]>(INITIAL_CATEGORIAS);
   const [estados, setEstados] = useState<string[]>(["Pendente", "Aprovada", "Executada", "Rejeitada"]);
   const [despesaCatFilter, setDespesaCatFilter] = useState<string>("todos");
   const [despesaEstadoFilter, setDespesaEstadoFilter] = useState<string>("todos");
@@ -294,7 +294,13 @@ export default function ConfigurarReceitas() {
     id: "", nome: "", categoria: "", estado: "", departamento: "Geral", periodicidade: "mensal", valorEstimado: 0,
   });
   const [confirmDelDespesa, setConfirmDelDespesa] = useState<DespesaRow | null>(null);
-  const [newCategoria, setNewCategoria] = useState("");
+
+  // Categoria add / edit dialogs
+  const [catDialogOpen, setCatDialogOpen] = useState(false);
+  const [newCatLabel, setNewCatLabel] = useState("");
+  const [newCatColor, setNewCatColor] = useState<string>(CAT_PALETTE[0].cls);
+  const [editingCategoria, setEditingCategoria] = useState<CategoriaItem | null>(null);
+
   const [newEstado, setNewEstado] = useState("");
 
   // Responsáveis
