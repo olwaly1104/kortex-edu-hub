@@ -12,6 +12,7 @@ import {
   solicitacoesPorDestino, destinoConfig, estadoSolicitacaoConfig,
   ticketCategoriaConfig, tipoConfig, categoriaConfig,
 } from "@/data/gapData";
+import { FinHeader } from "@/pages/financas/_FinHeader";
 
 const TODAY_STR = "2025-12-16";
 
