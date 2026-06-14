@@ -417,6 +417,7 @@ function AppRoutes() {
       </Route>
       <Route path="/site" element={<Website />} />
       <Route path="/candidatar" element={<Candidatar />} />
+      <Route path="/login" element={<Navigate to={homeRedirect} replace />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
