@@ -58,7 +58,24 @@ interface MeetingRequest {
   participants?: string[];
   agenda?: string[];
   status: "pending" | "accepted" | "declined";
+  requestedAt: string;
 }
+
+type ParticipantStatus = "accepted" | "declined" | "pending";
+function participantStatus(name: string, seed: string): ParticipantStatus {
+  let h = 0;
+  const s = name + "|" + seed;
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+  const m = Math.abs(h) % 10;
+  if (m < 6) return "accepted";
+  if (m < 8) return "declined";
+  return "pending";
+}
+const STATUS_META: Record<ParticipantStatus, { label: string; cls: string; dot: string }> = {
+  accepted: { label: "Confirmado", cls: "bg-emerald-50 text-emerald-700 border-emerald-200", dot: "bg-emerald-500" },
+  declined: { label: "Recusou",    cls: "bg-rose-50 text-rose-700 border-rose-200",          dot: "bg-rose-500" },
+  pending:  { label: "Pendente",   cls: "bg-amber-50 text-amber-700 border-amber-200",       dot: "bg-amber-500" },
+};
 
 const TYPE_META: Record<EventType, { label: string; text: string; soft: string; bar: string; icon: typeof Palmtree }> = {
   ferias:  { label: "Férias",   text: "text-emerald-700", soft: "bg-emerald-50 border-emerald-200", bar: "bg-emerald-500", icon: Palmtree },
