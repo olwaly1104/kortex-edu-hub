@@ -579,6 +579,14 @@ export default function FinancasSolicitacaoDetail() {
                                     <Ic className={cn("w-3.5 h-3.5 shrink-0", cls)} />
                                     <span className="text-[12px] font-medium text-foreground truncate flex-1 leading-tight">{a.nome}</span>
                                     <span className="text-[10px] text-muted-foreground tabular-nums shrink-0">{a.tamanho}</span>
+                                    <div className="flex items-center gap-0.5 shrink-0">
+                                      <button type="button" onClick={() => toast({ title: "A abrir anexo", description: a.nome })} className="w-6 h-6 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors" title="Ver">
+                                        <Eye className="w-3 h-3" />
+                                      </button>
+                                      <button type="button" onClick={() => toast({ title: "Anexo descarregado", description: a.nome })} className="w-6 h-6 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors" title="Descarregar">
+                                        <Download className="w-3 h-3" />
+                                      </button>
+                                    </div>
                                   </li>
                                 );
                               })}
