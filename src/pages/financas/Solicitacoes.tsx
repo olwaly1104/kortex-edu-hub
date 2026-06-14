@@ -8,7 +8,8 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   CheckSquare, Clock, CheckCircle2, Search, X, Inbox, Send,
   Plus, GraduationCap, CalendarDays, Calendar, ArrowUpRight,
-  AlertTriangle, BadgeCheck,
+  AlertTriangle, BadgeCheck, ChevronLeft, ChevronRight,
+  Paperclip, FileText, Trash2, ArrowRight, Check,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -36,10 +37,50 @@ export default function FinancasSolicitacoes() {
   const [typeFilter, setTypeFilter] = useState<FinType | "todos">("todos");
 
   const [showNewDialog, setShowNewDialog] = useState(false);
-  const [newType, setNewType] = useState<FinType>("orcamento");
+  const [wizStep, setWizStep] = useState<1 | 2 | 3>(1);
+  const [newType, setNewType] = useState<FinType | null>(null);
   const [newTitle, setNewTitle] = useState("");
   const [newDesc, setNewDesc] = useState("");
-  const [newDest, setNewDest] = useState("");
+  const [newValor, setNewValor] = useState("");
+  const [newPrazo, setNewPrazo] = useState("");
+  const [newFiles, setNewFiles] = useState<{ name: string; size: string }[]>([]);
+
+  // Auto-routing by category
+  const ROUTING: Record<FinType, { destinatario: string; responsavel: string; description: string; needsValor: boolean }> = {
+    reembolso:   { destinatario: "Direcção Académica",  responsavel: "Dra. Helena Costa · Direcção Académica",      description: "Reembolso de despesas profissionais já incorridas.",  needsValor: true },
+    orcamento:   { destinatario: "Magnífico Reitor",    responsavel: "Prof. Dr. António Mendes · Reitor",            description: "Pedido de reforço ou ajuste ao orçamento aprovado.",  needsValor: true },
+    fornecedor:  { destinatario: "Conselho de Gestão",  responsavel: "Conselho de Gestão · Órgão Colegial",          description: "Aprovação de pagamento a fornecedores externos.",     needsValor: true },
+    antecipacao: { destinatario: "Magnífico Reitor",    responsavel: "Prof. Dr. António Mendes · Reitor",            description: "Adiantamento de verba para missão ou despesa futura.", needsValor: true },
+    verba:       { destinatario: "Conselho de Gestão",  responsavel: "Conselho de Gestão · Órgão Colegial",          description: "Solicitação de verba extraordinária não orçamentada.", needsValor: true },
+    outro:       { destinatario: "Secretaria Geral",    responsavel: "Sec. Geral · Apoio Institucional",             description: "Outras solicitações financeiras institucionais.",     needsValor: false },
+  };
+
+  const previewRef = useMemo(() => {
+    const n = 412 + finSolicitacoes.filter(s => s.direction === "enviada").length + 1;
+    return `REQ-2025-${String(n).padStart(4, "0")}`;
+  }, [showNewDialog]);
+
+  const openWizard = () => {
+    setNewType(null); setNewTitle(""); setNewDesc(""); setNewValor("");
+    setNewPrazo(""); setNewFiles([]); setWizStep(1);
+    setShowNewDialog(true);
+  };
+
+  const fmtPrazo = (iso: string) => {
+    if (!iso) return "—";
+    const d = new Date(iso);
+    return d.toLocaleDateString("pt-PT", { day: "2-digit", month: "long", year: "numeric" });
+  };
+  const fmtKz = (v: string) => {
+    const n = Number(v.replace(/[^\d]/g, ""));
+    if (!n) return "—";
+    return new Intl.NumberFormat("pt-AO").format(n) + " Kz";
+  };
+  const addFiles = (list: FileList | null) => {
+    if (!list) return;
+    const arr = Array.from(list).map(f => ({ name: f.name, size: `${(f.size / 1024).toFixed(0)} KB` }));
+    setNewFiles(prev => [...prev, ...arr]);
+  };
 
   const directionFiltered = finSolicitacoes.filter(s => s.direction === (tab === "recebidas" ? "recebida" : "enviada"));
 
