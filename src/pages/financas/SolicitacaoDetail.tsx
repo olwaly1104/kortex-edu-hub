@@ -754,13 +754,20 @@ export default function FinancasSolicitacaoDetail() {
                           </p>
                         </div>
 
-                        <div className="space-y-3 rounded-md border border-border bg-muted/10 px-3 py-2.5">
+                        <div className="space-y-3 rounded-lg border border-border bg-background/60 px-3.5 py-3">
                           <div>
-                            <p className="text-[10px] uppercase tracking-[0.1em] font-semibold text-muted-foreground mb-1">Parecer / Notas</p>
-                            <p className="text-[12px] text-foreground/90 leading-snug whitespace-pre-wrap break-words">
-                              {actionNotes.trim() || <span className="italic text-muted-foreground">Sem parecer.</span>}
-                            </p>
+                            <p className="text-[10px] uppercase tracking-[0.1em] font-semibold text-muted-foreground mb-1.5">Parecer / Notas</p>
+                            {actionNotes.trim() ? (
+                              <div className="rounded-md border border-border/60 bg-muted/30 px-3 py-2">
+                                <p className="text-[12.5px] text-foreground/90 leading-relaxed whitespace-pre-wrap break-words">
+                                  {actionNotes}
+                                </p>
+                              </div>
+                            ) : (
+                              <p className="text-[12px] italic text-muted-foreground">Sem parecer.</p>
+                            )}
                           </div>
+
                           <div>
                             <p className="text-[10px] uppercase tracking-[0.1em] font-semibold text-muted-foreground mb-1.5">
                               Anexos {actionFiles.length > 0 && <span className="text-muted-foreground/80">({actionFiles.length})</span>}
@@ -768,7 +775,7 @@ export default function FinancasSolicitacaoDetail() {
                             {actionFiles.length === 0 ? (
                               <p className="text-[12px] italic text-muted-foreground">Sem anexos.</p>
                             ) : (
-                              <ul className="space-y-1">
+                              <ul className="space-y-1.5">
                                 {actionFiles.map((f, i) => {
                                   const ext = f.name.split(".").pop()?.toLowerCase() ?? "";
                                   const isImg = ["png","jpg","jpeg","gif","webp","svg"].includes(ext);
@@ -776,9 +783,9 @@ export default function FinancasSolicitacaoDetail() {
                                   const Ic = isImg ? FileImage : isSheet ? FileSpreadsheet : FileText;
                                   const cls = isImg ? "text-violet-600" : isSheet ? "text-emerald-600" : "text-red-600";
                                   return (
-                                    <li key={i} className="flex items-center gap-2 px-2 py-1 rounded-md border border-border bg-background">
-                                      <Ic className={cn("w-3.5 h-3.5 shrink-0", cls)} />
-                                      <span className="text-[12px] font-medium text-foreground truncate flex-1 leading-tight">{f.name}</span>
+                                    <li key={i} className="flex items-center gap-2.5 px-2.5 py-1.5 rounded-md border border-border bg-background">
+                                      <Ic className={cn("w-4 h-4 shrink-0", cls)} />
+                                      <span className="text-[12.5px] font-medium text-foreground truncate flex-1 leading-tight">{f.name}</span>
                                       <span className="text-[10px] text-muted-foreground tabular-nums shrink-0">
                                         {f.size < 1024 * 1024 ? `${(f.size / 1024).toFixed(0)} KB` : `${(f.size / 1024 / 1024).toFixed(1)} MB`}
                                       </span>
@@ -790,16 +797,32 @@ export default function FinancasSolicitacaoDetail() {
                           </div>
                         </div>
 
-                        <div className="flex items-start gap-2 rounded-md border border-border bg-muted/10 px-3 py-2.5">
-                          <Checkbox
-                            id="declaration"
-                            checked={declarationChecked}
-                            onCheckedChange={(c) => setDeclarationChecked(c === true)}
-                            className="mt-0.5 shrink-0"
-                          />
-                          <Label htmlFor="declaration" className="text-[12px] text-foreground/80 leading-snug cursor-pointer font-normal">
-                            Eu declaro que esta solicitação está em <span className="font-semibold text-foreground">{toMeta.label.toLowerCase()}</span>.
-                          </Label>
+                        <div className="rounded-lg border border-border bg-muted/20 px-3.5 py-3 space-y-3">
+                          <div className="flex items-start gap-3">
+                            <Checkbox
+                              id="declaration"
+                              checked={declarationChecked}
+                              onCheckedChange={(c) => setDeclarationChecked(c === true)}
+                              className="mt-0.5 shrink-0"
+                            />
+                            <Label htmlFor="declaration" className="text-[12.5px] text-foreground/90 leading-relaxed cursor-pointer font-normal block">
+                              Eu declaro que esta solicitação está em <span className="font-semibold text-foreground">{toMeta.label.toLowerCase()}</span>.
+                            </Label>
+                          </div>
+
+                          <div className="flex items-center justify-end gap-2">
+                            <DialogClose asChild>
+                              <Button variant="outline" size="sm" className="h-7 text-[12px]">Cancelar</Button>
+                            </DialogClose>
+                            <Button
+                              size="sm"
+                              className={cn("h-7 text-[12px] gap-1.5", pm.tone)}
+                              onClick={confirmAction}
+                              disabled={!declarationChecked}
+                            >
+                              <pm.icon className="w-3.5 h-3.5" /> Confirmar
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     );
