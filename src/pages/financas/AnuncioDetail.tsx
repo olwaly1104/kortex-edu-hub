@@ -299,7 +299,7 @@ export default function FinancasAnuncioDetail() {
       {related.length > 0 && (
         <section className="space-y-3">
           <div className="flex items-center justify-between">
-            <h2 className="text-[13px] font-semibold text-foreground">Mais do mesmo departamento</h2>
+            <h2 className="text-[13px] font-semibold text-foreground">Anúncios do {ann.department}</h2>
             <Link to={`/financas/anuncios?dep=${encodeURIComponent(ann.department)}`} className="text-[11.5px] text-primary hover:underline font-medium">
               Ver todos
             </Link>
