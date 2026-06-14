@@ -249,7 +249,7 @@ export default function FinancasSolicitacaoDetail() {
             <div className={cn("flex items-center justify-between rounded-lg border px-4 py-2.5", selected.status === "atrasado" ? "border-orange-200 bg-orange-50/40" : "border-border bg-background")}>
               <div className="flex items-center gap-2.5">
                 <Hourglass className={cn("w-4 h-4 shrink-0", selected.status === "atrasado" ? "text-orange-600" : "text-amber-600")} />
-                <span className="text-sm font-semibold text-foreground">{selected.status === "atrasado" ? "Decisão em atraso" : "Aguarda decisão"}</span>
+                <span className="text-sm font-semibold text-foreground">{selected.status === "atrasado" ? "Decisão em atraso" : "Aguardando decisão"}</span>
                 <span className="text-[11px] text-muted-foreground tabular-nums">
                   {selected.dueDate ? (() => {
                     const base = new Date(selected.dueDate);
