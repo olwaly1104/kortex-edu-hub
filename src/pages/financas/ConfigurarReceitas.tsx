@@ -22,13 +22,12 @@ type TipoReceita =
   | "Propina mensal"
   | "Matrícula"
   | "Emolumento"
-  | "Taxa"
   | "Serviço Académico"
   | "Candidatura"
   | "Multa";
 
 const TIPOS: TipoReceita[] = [
-  "Propina mensal", "Matrícula", "Emolumento", "Taxa", "Serviço Académico", "Candidatura", "Multa",
+  "Propina mensal", "Matrícula", "Emolumento", "Serviço Académico", "Candidatura", "Multa",
 ];
 
 interface ReceitaRow {
