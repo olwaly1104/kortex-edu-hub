@@ -291,36 +291,6 @@ export default function FinancasAnuncioDetail() {
         </div>
       </div>
 
-      {/* Related */}
-      {related.length > 0 && (
-        <section className="space-y-3">
-          <div className="flex items-center justify-between">
-            <h2 className="text-[13px] font-semibold text-foreground">Anúncios do {ann.department}</h2>
-            <Link to={`/financas/anuncios?dep=${encodeURIComponent(ann.department)}`} className="text-[11.5px] text-primary hover:underline font-medium">
-              Ver todos
-            </Link>
-          </div>
-          <div className="grid sm:grid-cols-2 gap-3">
-            {related.map(r => {
-              const rm = TYPE_META[r.type];
-              return (
-                <Link
-                  key={r.id}
-                  to={`/financas/anuncios/${r.id}`}
-                  className="rounded-lg border border-border bg-card p-3.5 hover:border-primary/40 hover:shadow-sm transition-all space-y-2"
-                >
-                  <Badge variant="outline" className="text-[9.5px] font-semibold px-1.5 py-0 gap-1 uppercase tracking-wider">
-                    <span className={cn("w-1 h-1 rounded-full", rm.dot)} />
-                    {rm.label}
-                  </Badge>
-                  <p className="text-[13px] font-semibold text-foreground leading-snug line-clamp-2">{r.title}</p>
-                  <p className="text-[11px] text-muted-foreground tabular-nums">{r.date}</p>
-                </Link>
-              );
-            })}
-          </div>
-        </section>
-      )}
     </div>
 
 
