@@ -29,7 +29,7 @@ type EstadoFilter = "todos" | "pendentes" | "aprovadas" | "rejeitadas";
 export default function FinancasSolicitacoes() {
   const { toast } = useToast();
   const navigate = useNavigate();
-  const [tab, setTab] = useState<"recebidas" | "enviadas">("recebidas");
+  const [tab, setTab] = useState<"todos" | "recebidas" | "enviadas">("todos");
   const [estado, setEstado] = useState<EstadoFilter>("todos");
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState<FinType | "todos">("todos");
@@ -40,9 +40,9 @@ export default function FinancasSolicitacoes() {
   const [newDesc, setNewDesc] = useState("");
   const [newDest, setNewDest] = useState("");
 
-  const directionFiltered = finSolicitacoes.filter(
-    s => s.direction === (tab === "recebidas" ? "recebida" : "enviada")
-  );
+  const directionFiltered = tab === "todos"
+    ? finSolicitacoes
+    : finSolicitacoes.filter(s => s.direction === (tab === "recebidas" ? "recebida" : "enviada"));
 
   const counts = useMemo(() => ({
     todos: directionFiltered.length,
