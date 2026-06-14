@@ -283,37 +283,23 @@ export default function FinancasAnuncios() {
                     </p>
                   </Link>
 
-                  {/* inline CTA — refined */}
+                  {/* compact CTA */}
                   {a.cta === "inscrever" && (
-                    <div className={cn(
-                      "mt-3 flex items-center gap-3 rounded-lg px-3 py-2.5 border transition-colors",
-                      isSub
-                        ? "bg-emerald-50/60 border-emerald-200"
-                        : "bg-gradient-to-r from-primary/[0.07] to-primary/[0.02] border-primary/20"
-                    )}>
-                      <div className={cn(
-                        "w-8 h-8 rounded-md flex items-center justify-center shrink-0",
-                        isSub ? "bg-emerald-100 text-emerald-700" : "bg-primary/10 text-primary"
-                      )}>
-                        <CheckCircle2 className="w-4 h-4" />
-                      </div>
-                      <div className="flex-1 min-w-0 leading-tight">
-                        <p className="text-[12px] font-semibold text-foreground">
-                          {isSub ? "Inscrição confirmada" : "Inscrições abertas"}
-                        </p>
-                        <p className="text-[10.5px] text-muted-foreground">
-                          {isSub ? "Receberá novidades por e-mail." : "Confirme a sua participação neste anúncio."}
-                        </p>
-                      </div>
+                    <div className="mt-3 flex items-center justify-between gap-3">
                       {isSub ? (
-                        <Badge variant="outline" className="text-[10px] gap-1 bg-white text-emerald-700 border-emerald-200 h-7 px-2.5 shrink-0">
+                        <Badge variant="outline" className="text-[10px] gap-1 bg-emerald-50 text-emerald-700 border-emerald-200 h-6 px-2">
                           <CheckCircle2 className="w-3 h-3" /> Inscrito
                         </Badge>
                       ) : (
-                        <Button size="sm" className="h-7 text-[11px] gap-1.5 px-3 shrink-0 shadow-sm"
-                          onClick={() => setSubscribed(s => new Set(s).add(a.id))}>
-                          Inscrever-me
-                        </Button>
+                        <>
+                          <span className="text-[11px] text-muted-foreground">
+                            Inscrições até <span className="font-medium text-foreground tabular-nums">{a.ctaDeadline ?? "—"}</span>
+                          </span>
+                          <Button size="sm" className="h-7 text-[11px] gap-1.5 px-3 shadow-sm"
+                            onClick={() => setSubscribed(s => new Set(s).add(a.id))}>
+                            <CheckCircle2 className="w-3.5 h-3.5" /> Inscrever-me
+                          </Button>
+                        </>
                       )}
                     </div>
                   )}

@@ -11,6 +11,7 @@ export interface FinAnn {
   author: string;
   department: string;
   cta?: "inscrever" | null;
+  ctaDeadline?: string;
   ctaLink?: string;
   isMine?: boolean;
 }
@@ -27,9 +28,10 @@ export const FIN_ANUNCIOS: FinAnn[] = [
     ...a,
     department: i % 2 === 0 ? "Direcção Académica" : "Reitoria",
     cta: i === 2 ? ("inscrever" as const) : null,
+    ctaDeadline: i === 2 ? "20/02/2024" : undefined,
   })),
-  { id: "f1", title: "Formação: Novas regras IVA 2024", content: "Sessão de formação obrigatória sobre as alterações fiscais em vigor. Aberta a inscrições para toda a equipa do Departamento Financeiro. A formação aborda os novos limiares de isenção, alterações no regime de IVA de caixa, e procedimentos atualizados de declaração trimestral. Inclui sessão prática com exemplos reais do nosso histórico.", type: "evento", date: "14/02/2024", author: "Dr. Manuel Sousa", department: "Departamento Financeiro", cta: "inscrever" },
+  { id: "f1", title: "Formação: Novas regras IVA 2024", content: "Sessão de formação obrigatória sobre as alterações fiscais em vigor. Aberta a inscrições para toda a equipa do Departamento Financeiro. A formação aborda os novos limiares de isenção, alterações no regime de IVA de caixa, e procedimentos atualizados de declaração trimestral. Inclui sessão prática com exemplos reais do nosso histórico.", type: "evento", date: "14/02/2024", author: "Dr. Manuel Sousa", department: "Departamento Financeiro", cta: "inscrever", ctaDeadline: "18/02/2024" },
   { id: "f2", title: "Fecho contabilístico de Janeiro concluído", content: "O processo de encerramento contabilístico de Janeiro foi finalizado com sucesso. Todos os relatórios mensais — balancete, demonstração de resultados, e mapa de tesouraria — estão disponíveis no EduDrive Financeiro na pasta correspondente. Quaisquer ajustes ou correções devem ser comunicados até dia 20/02.", type: "geral", date: "14/02/2024", author: "Departamento Financeiro", department: "Departamento Financeiro" },
   { id: "f3", title: "Reunião extraordinária — Orçamento 2025", content: "Convocados todos os responsáveis para reunião extraordinária dia 20/02 às 10h00 na Sala do Conselho. Agenda: revisão das propostas departamentais, ajustes ao plano de investimento, e aprovação preliminar do orçamento para o exercício de 2025. Presença obrigatória.", type: "urgente", date: "14/02/2024", author: "Reitoria", department: "Reitoria" },
-  { id: "f4", title: "Workshop: Gestão de Tesouraria", content: "Workshop facultativo para a equipa financeira sobre boas práticas de gestão de tesouraria e otimização de fluxos de caixa. Inscrições abertas até 22/02. Limite de 15 participantes por sessão.", type: "evento", date: "13/02/2024", author: "Departamento Financeiro", department: "Departamento Financeiro", cta: "inscrever" },
+  { id: "f4", title: "Workshop: Gestão de Tesouraria", content: "Workshop facultativo para a equipa financeira sobre boas práticas de gestão de tesouraria e otimização de fluxos de caixa. Inscrições abertas até 22/02. Limite de 15 participantes por sessão.", type: "evento", date: "13/02/2024", author: "Departamento Financeiro", department: "Departamento Financeiro", cta: "inscrever", ctaDeadline: "22/02/2024" },
 ];
