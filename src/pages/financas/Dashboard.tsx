@@ -18,6 +18,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { FinHeader } from "./_FinHeader";
+import { PeriodSelector, PERIODO_MULT, type Periodo, periodoDefaultValue } from "./_PeriodSelector";
 
 /* ── month mapping ───────────────────────────────── */
 const MONTH_FULL: Record<string, string> = {
