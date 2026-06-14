@@ -481,11 +481,11 @@ export default function FinancasSolicitacaoDetail() {
               </div>
             </section>
 
-            {/* Histórico */}
+            {/* Cronologia */}
             <section>
               <div className="flex items-center gap-2 mb-3">
                 <Clock className="w-3.5 h-3.5 text-muted-foreground" />
-                <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Histórico</h3>
+                <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Cronologia</h3>
               </div>
               <ol className="space-y-0">
                 {steps.map((s, i) => {
