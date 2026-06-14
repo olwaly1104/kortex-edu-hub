@@ -8,7 +8,9 @@ import {
   ChevronRight, Clock, CheckCircle, Play,
   Calendar as CalendarIcon, Megaphone, MapPin,
   GraduationCap, CalendarDays, Search, UserCheck,
+  Building2, School,
 } from "lucide-react";
+
 import { Link } from "react-router-dom";
 
 const typeStyles: Record<string, { bg: string; label: string }> = {
