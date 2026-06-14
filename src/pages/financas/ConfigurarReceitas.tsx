@@ -362,7 +362,15 @@ export default function ConfigurarReceitas() {
             ) : (
               <div className="divide-y divide-border">
                 {items.map(r => (
-                  <div key={r.id} className="flex items-center gap-3 py-2.5 group">
+                  <div
+                    key={r.id}
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => openEdit(section, r)}
+                    onKeyDown={(e) => { if (e.key === "Enter") openEdit(section, r); }}
+                    className="flex items-center gap-3 py-2.5 px-2 -mx-2 rounded-md cursor-pointer hover:bg-muted/50 transition group"
+                    title="Clique para editar"
+                  >
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-foreground truncate">{r.nome}</p>
                       <div className="flex items-center gap-1.5 mt-0.5">
@@ -375,12 +383,23 @@ export default function ConfigurarReceitas() {
                     <span className="text-sm font-semibold text-foreground tabular-nums whitespace-nowrap">
                       {formatCurrency(r.valor)}
                     </span>
-                    <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md" onClick={() => openEdit(section, r)}>
+                    <div className="flex items-center gap-0.5">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 rounded-md"
+                        onClick={(e) => { e.stopPropagation(); openEdit(section, r); }}
+                        title="Editar"
+                      >
                         <Pencil className="w-3.5 h-3.5" />
                       </Button>
-                      <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md text-destructive hover:text-destructive"
-                        onClick={() => setConfirmDel(r)}>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 rounded-md text-destructive hover:text-destructive opacity-60 hover:opacity-100"
+                        onClick={(e) => { e.stopPropagation(); setConfirmDel(r); }}
+                        title="Remover"
+                      >
                         <Trash2 className="w-3.5 h-3.5" />
                       </Button>
                     </div>
