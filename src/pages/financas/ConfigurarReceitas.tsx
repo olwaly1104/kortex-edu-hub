@@ -994,155 +994,337 @@ export default function ConfigurarReceitas() {
 
       {/* ════════════════ DESPESAS ════════════════ */}
       {mode === "despesas" && (
-        <Card className="p-5">
-          <div className="flex items-center justify-between mb-4 gap-3 flex-wrap">
-            <div className="flex items-center gap-2 min-w-0">
-              <TrendingDown className="w-4 h-4 text-red-700" />
-              <h2 className="text-sm font-semibold text-foreground">Despesas</h2>
-              <span className="text-[11px] text-muted-foreground tabular-nums">· {filteredDespesas.length} de {despesas.length}</span>
-              {despesas.length > 0 && (
-                <span className="text-xs text-muted-foreground hidden md:inline">
-                  — Total filtrado: <span className="font-semibold text-foreground tabular-nums">{formatCurrency(filteredDespesas.reduce((s, d) => s + d.valorEstimado, 0))}</span>
-                </span>
-              )}
-            </div>
-            <Button size="sm" className="gap-1.5 h-8 text-xs" onClick={openNewDespesa}>
-              <Plus className="w-3.5 h-3.5" /> Nova despesa
-            </Button>
-          </div>
-
-          {/* Configurador de categorias e estados */}
-          <div className="grid sm:grid-cols-2 gap-3 mb-4">
-            {/* Categorias */}
-            <div className="rounded-lg border border-border p-3 bg-muted/20">
-              <div className="flex items-center justify-between mb-2">
-                <p className="text-[11px] font-semibold text-foreground flex items-center gap-1.5">
-                  <Tag className="w-3.5 h-3.5 text-muted-foreground" /> Categorias
-                </p>
-                <span className="text-[10px] text-muted-foreground tabular-nums">{categorias.length}</span>
+        <div className="space-y-4">
+          {/* 1. Categorias */}
+          <Card className="p-5">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Tag className="w-4 h-4 text-muted-foreground" />
+                <h2 className="text-sm font-semibold text-foreground">Categorias</h2>
+                <span className="text-[11px] text-muted-foreground tabular-nums">· {categorias.length}</span>
+                <span className="text-xs text-muted-foreground hidden md:inline">— Classificação principal das despesas</span>
               </div>
-              <div className="flex flex-wrap gap-1.5 mb-2 min-h-[28px]">
-                {categorias.length === 0 ? (
-                  <span className="text-[11px] text-muted-foreground italic">Crie categorias para classificar as despesas.</span>
-                ) : categorias.map(c => (
-                  <span key={c} className={cn("inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-medium", chipFor(c))}>
-                    {c}
-                    <button onClick={() => removeCategoria(c)} className="hover:bg-black/10 rounded-full" title="Remover categoria">
-                      <X className="w-3 h-3" />
-                    </button>
-                  </span>
-                ))}
-              </div>
-              <div className="flex gap-1.5">
+              <div className="flex items-center gap-1.5">
                 <Input value={newCategoria} onChange={e => setNewCategoria(e.target.value)}
                   onKeyDown={e => { if (e.key === "Enter") addCategoria(); }}
-                  placeholder="Nova categoria" className="h-7 text-xs" />
-                <Button size="sm" variant="outline" className="h-7 px-2 gap-1 text-[11px]" onClick={addCategoria}>
-                  <Plus className="w-3 h-3" /> Add
+                  placeholder="Nova categoria" className="h-8 w-48 text-xs" />
+                <Button size="sm" variant="outline" className="h-8 text-xs gap-1.5" onClick={addCategoria}>
+                  <Plus className="w-3.5 h-3.5" /> Adicionar
                 </Button>
               </div>
             </div>
+            {categorias.length === 0 ? (
+              <p className="text-xs text-muted-foreground italic">Crie categorias para classificar as despesas.</p>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                {categorias.map(c => {
+                  const count = despesas.filter(d => d.categoria === c).length;
+                  return (
+                    <div key={c} className={cn("inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs", chipFor(c))}>
+                      <span className="font-medium">{c}</span>
+                      <span className="opacity-60 tabular-nums">· {count}</span>
+                      <button onClick={() => removeCategoria(c)} className="opacity-60 hover:opacity-100" title="Remover">
+                        <Trash2 className="w-3 h-3" />
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </Card>
 
-            {/* Estados */}
-            <div className="rounded-lg border border-border p-3 bg-muted/20">
-              <div className="flex items-center justify-between mb-2">
-                <p className="text-[11px] font-semibold text-foreground flex items-center gap-1.5">
-                  <CircleDot className="w-3.5 h-3.5 text-muted-foreground" /> Estados
-                </p>
-                <span className="text-[10px] text-muted-foreground tabular-nums">{estados.length}</span>
+          {/* 2. Estados */}
+          <Card className="p-5">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <CircleDot className="w-4 h-4 text-muted-foreground" />
+                <h2 className="text-sm font-semibold text-foreground">Estados</h2>
+                <span className="text-[11px] text-muted-foreground tabular-nums">· {estados.length}</span>
+                <span className="text-xs text-muted-foreground hidden md:inline">— Ciclo de vida das despesas</span>
               </div>
-              <div className="flex flex-wrap gap-1.5 mb-2 min-h-[28px]">
-                {estados.length === 0 ? (
-                  <span className="text-[11px] text-muted-foreground italic">Crie estados (ex.: Activo, Suspensa).</span>
-                ) : estados.map(e => (
-                  <span key={e} className={cn("inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-medium", chipFor(e))}>
-                    {e}
-                    <button onClick={() => removeEstado(e)} className="hover:bg-black/10 rounded-full" title="Remover estado">
-                      <X className="w-3 h-3" />
-                    </button>
-                  </span>
-                ))}
-              </div>
-              <div className="flex gap-1.5">
+              <div className="flex items-center gap-1.5">
                 <Input value={newEstado} onChange={e => setNewEstado(e.target.value)}
                   onKeyDown={e => { if (e.key === "Enter") addEstado(); }}
-                  placeholder="Novo estado" className="h-7 text-xs" />
-                <Button size="sm" variant="outline" className="h-7 px-2 gap-1 text-[11px]" onClick={addEstado}>
-                  <Plus className="w-3 h-3" /> Add
+                  placeholder="Novo estado" className="h-8 w-48 text-xs" />
+                <Button size="sm" variant="outline" className="h-8 text-xs gap-1.5" onClick={addEstado}>
+                  <Plus className="w-3.5 h-3.5" /> Adicionar
                 </Button>
               </div>
             </div>
-          </div>
-
-          {/* Filtros */}
-          <div className="flex items-center gap-2 mb-3 flex-wrap">
-            <div className="relative">
-              <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
-              <Input value={despesaSearch} onChange={e => setDespesaSearch(e.target.value)}
-                placeholder="Procurar..." className="h-8 text-xs pl-8 w-[200px]" />
-            </div>
-            <Select value={despesaCatFilter} onValueChange={setDespesaCatFilter}>
-              <SelectTrigger className="h-8 w-[180px] text-xs"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="todos">Todas as categorias</SelectItem>
-                {categorias.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-              </SelectContent>
-            </Select>
-            <Select value={despesaEstadoFilter} onValueChange={setDespesaEstadoFilter}>
-              <SelectTrigger className="h-8 w-[160px] text-xs"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="todos">Todos os estados</SelectItem>
-                {estados.map(e => <SelectItem key={e} value={e}>{e}</SelectItem>)}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {despesas.length === 0 ? (
-            <div className="text-center py-10">
-              <p className="text-sm text-muted-foreground">Sem despesas configuradas.</p>
-              <p className="text-[11px] text-muted-foreground mt-1">Comece por criar categorias e estados, depois adicione despesas.</p>
-            </div>
-          ) : filteredDespesas.length === 0 ? (
-            <p className="text-center text-xs text-muted-foreground py-8">Nenhuma despesa corresponde aos filtros.</p>
-          ) : (
-            <div className="divide-y divide-border">
-              {filteredDespesas.map(d => (
-                <div key={d.id} role="button" tabIndex={0}
-                  onClick={() => openEditDespesa(d)}
-                  onKeyDown={(e) => { if (e.key === "Enter") openEditDespesa(d); }}
-                  className="flex items-center gap-3 py-2.5 px-2 -mx-2 rounded-md cursor-pointer hover:bg-muted/50 transition group"
-                  title="Clique para editar">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-foreground truncate">{d.nome}</p>
-                    <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
-                      <span className={cn("inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] font-medium", chipFor(d.categoria))}>
-                        {d.categoria}
-                      </span>
-                      <span className={cn("inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] font-medium", chipFor(d.estado))}>
-                        {d.estado}
-                      </span>
-                      <span className={cn("inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] font-medium capitalize", periodCls[d.periodicidade])}>
-                        {d.periodicidade}
-                      </span>
-                      <span className="text-[11px] text-muted-foreground truncate">{d.departamento}</span>
-                    </div>
+            {estados.length === 0 ? (
+              <p className="text-xs text-muted-foreground italic">Crie estados (ex.: Activo, Em revisão, Suspensa).</p>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                {estados.map(e => (
+                  <div key={e} className={cn("inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs", chipFor(e))}>
+                    <span className="font-medium">{e}</span>
+                    <button onClick={() => removeEstado(e)} className="opacity-60 hover:opacity-100" title="Remover">
+                      <Trash2 className="w-3 h-3" />
+                    </button>
                   </div>
-                  <span className="text-sm font-semibold text-foreground tabular-nums whitespace-nowrap">{formatCurrency(d.valorEstimado)}</span>
-                  <div className="flex items-center gap-0.5">
-                    <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md" onClick={(e) => { e.stopPropagation(); openEditDespesa(d); }} title="Editar">
-                      <Pencil className="w-3.5 h-3.5" />
-                    </Button>
-                    <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md text-destructive hover:text-destructive opacity-60 hover:opacity-100"
-                      onClick={(e) => { e.stopPropagation(); setConfirmDelDespesa(d); }} title="Remover">
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </Button>
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
+            )}
+          </Card>
+
+          {/* 3. Responsáveis */}
+          <Card className="p-5">
+            <div className="flex items-center justify-between mb-4 gap-3 flex-wrap">
+              <div className="flex items-center gap-2">
+                <Users className="w-4 h-4 text-muted-foreground" />
+                <h2 className="text-sm font-semibold text-foreground">Responsáveis</h2>
+                <span className="text-[11px] text-muted-foreground tabular-nums">· {responsaveis.length}</span>
+                <span className="text-xs text-muted-foreground hidden md:inline">— Pessoas que podem aprovar despesas</span>
+              </div>
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <Input value={newRespNome} onChange={e => setNewRespNome(e.target.value)}
+                  placeholder="Nome" className="h-8 w-44 text-xs" />
+                <Input value={newRespCargo} onChange={e => setNewRespCargo(e.target.value)}
+                  onKeyDown={e => { if (e.key === "Enter") addResponsavel(); }}
+                  placeholder="Cargo" className="h-8 w-44 text-xs" />
+                <Button size="sm" variant="outline" className="h-8 text-xs gap-1.5" onClick={addResponsavel}>
+                  <Plus className="w-3.5 h-3.5" /> Adicionar
+                </Button>
+              </div>
             </div>
-          )}
-        </Card>
+            {responsaveis.length === 0 ? (
+              <p className="text-xs text-muted-foreground italic">Adicione responsáveis para configurar regras de aprovação.</p>
+            ) : (
+              <div className="overflow-x-auto rounded-lg border border-border">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b bg-muted/30">
+                      <th className="text-left p-3 font-medium text-muted-foreground text-xs">Nome</th>
+                      <th className="text-left p-3 font-medium text-muted-foreground text-xs">Cargo</th>
+                      <th className="text-center p-3 font-medium text-muted-foreground text-xs">Regras associadas</th>
+                      <th className="w-12"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {responsaveis.map(r => {
+                      const rulesCount = approvalRules.filter(x => x.responsavelId === r.id).length;
+                      return (
+                        <tr key={r.id} className="border-b last:border-0 hover:bg-muted/20">
+                          <td className="p-3 text-xs font-medium text-foreground">{r.nome}</td>
+                          <td className="p-3 text-xs text-muted-foreground">{r.cargo}</td>
+                          <td className="p-3 text-center text-xs tabular-nums text-foreground">{rulesCount}</td>
+                          <td className="p-3 text-right">
+                            <button onClick={() => removeResponsavel(r.id)} className="text-muted-foreground hover:text-destructive" title="Remover">
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </Card>
+
+          {/* 4. Destinatários por categoria */}
+          <Card className="p-5">
+            <div className="flex items-center gap-2 mb-4">
+              <Building2 className="w-4 h-4 text-muted-foreground" />
+              <h2 className="text-sm font-semibold text-foreground">Destinatários por Categoria</h2>
+              <span className="text-xs text-muted-foreground hidden md:inline">— Departamento que recebe cada pedido de despesa</span>
+            </div>
+            {categorias.length === 0 ? (
+              <p className="text-xs text-muted-foreground italic">Crie categorias primeiro para mapear destinatários.</p>
+            ) : (
+              <div className="overflow-x-auto rounded-lg border border-border">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b bg-muted/30">
+                      <th className="text-left p-3 font-medium text-muted-foreground text-xs">Categoria</th>
+                      <th className="text-left p-3 font-medium text-muted-foreground text-xs">Destinatário</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {categorias.map(c => (
+                      <tr key={c} className="border-b last:border-0 hover:bg-muted/20">
+                        <td className="p-3">
+                          <span className={cn("inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-medium", chipFor(c))}>{c}</span>
+                        </td>
+                        <td className="p-3">
+                          <Select value={getDestinatarioFor(c) || "__none__"} onValueChange={v => setDestinatarioFor(c, v === "__none__" ? "" : v)}>
+                            <SelectTrigger className="h-8 w-[260px] text-xs"><SelectValue placeholder="Sem destinatário" /></SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="__none__">— Sem destinatário —</SelectItem>
+                              {DEPARTAMENTOS.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}
+                            </SelectContent>
+                          </Select>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </Card>
+
+          {/* 5. Regras de Aprovação */}
+          <Card className="p-5">
+            <div className="flex items-center justify-between mb-4 gap-3 flex-wrap">
+              <div className="flex items-center gap-2">
+                <ClipboardCheck className="w-4 h-4 text-muted-foreground" />
+                <h2 className="text-sm font-semibold text-foreground">Regras de Aprovação</h2>
+                <span className="text-[11px] text-muted-foreground tabular-nums">· {approvalRules.length}</span>
+                <span className="text-xs text-muted-foreground hidden md:inline">— De X Kz a Y Kz → Responsável</span>
+              </div>
+              <Button size="sm" variant="outline" className="h-8 text-xs gap-1.5" onClick={openNewRule}>
+                <Plus className="w-3.5 h-3.5" /> Nova regra
+              </Button>
+            </div>
+            {approvalRules.length === 0 ? (
+              <p className="text-xs text-muted-foreground italic">Defina faixas de valor para encaminhar automaticamente as despesas para o responsável certo.</p>
+            ) : (
+              <div className="overflow-x-auto rounded-lg border border-border">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b bg-muted/30">
+                      <th className="text-left p-3 font-medium text-muted-foreground text-xs">De</th>
+                      <th className="text-left p-3 font-medium text-muted-foreground text-xs">Até</th>
+                      <th className="text-left p-3 font-medium text-muted-foreground text-xs">Responsável</th>
+                      <th className="w-24"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {approvalRules.map(r => {
+                      const resp = responsaveis.find(x => x.id === r.responsavelId);
+                      return (
+                        <tr key={r.id} className="border-b last:border-0 hover:bg-muted/20">
+                          <td className="p-3 text-xs tabular-nums text-foreground">{formatCurrency(r.min)}</td>
+                          <td className="p-3 text-xs tabular-nums text-foreground">{formatCurrency(r.max)}</td>
+                          <td className="p-3 text-xs text-foreground">
+                            {resp ? <><span className="font-medium">{resp.nome}</span> <span className="text-muted-foreground">· {resp.cargo}</span></> : <span className="text-muted-foreground italic">—</span>}
+                          </td>
+                          <td className="p-3 text-right">
+                            <div className="inline-flex items-center gap-2">
+                              <button onClick={() => openEditRule(r)} className="text-muted-foreground hover:text-foreground" title="Editar">
+                                <Pencil className="w-3.5 h-3.5" />
+                              </button>
+                              <button onClick={() => removeRule(r.id)} className="text-muted-foreground hover:text-destructive" title="Remover">
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </Card>
+
+          {/* 6. Despesas (lista) */}
+          <Card className="p-5">
+            <div className="flex items-center justify-between mb-4 gap-3 flex-wrap">
+              <div className="flex items-center gap-2 min-w-0">
+                <TrendingDown className="w-4 h-4 text-red-700" />
+                <h2 className="text-sm font-semibold text-foreground">Despesas</h2>
+                <span className="text-[11px] text-muted-foreground tabular-nums">· {filteredDespesas.length} de {despesas.length}</span>
+                {despesas.length > 0 && (
+                  <span className="text-xs text-muted-foreground hidden md:inline">
+                    — Total filtrado: <span className="font-semibold text-foreground tabular-nums">{formatCurrency(filteredDespesas.reduce((s, d) => s + d.valorEstimado, 0))}</span>
+                  </span>
+                )}
+              </div>
+              <Button size="sm" className="gap-1.5 h-8 text-xs" onClick={openNewDespesa}>
+                <Plus className="w-3.5 h-3.5" /> Nova despesa
+              </Button>
+            </div>
+
+            <div className="flex items-center gap-2 mb-3 flex-wrap">
+              <div className="relative">
+                <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                <Input value={despesaSearch} onChange={e => setDespesaSearch(e.target.value)}
+                  placeholder="Procurar..." className="h-8 text-xs pl-8 w-[200px]" />
+              </div>
+              <Select value={despesaCatFilter} onValueChange={setDespesaCatFilter}>
+                <SelectTrigger className="h-8 w-[180px] text-xs"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Todas as categorias</SelectItem>
+                  {categorias.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                </SelectContent>
+              </Select>
+              <Select value={despesaEstadoFilter} onValueChange={setDespesaEstadoFilter}>
+                <SelectTrigger className="h-8 w-[160px] text-xs"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Todos os estados</SelectItem>
+                  {estados.map(e => <SelectItem key={e} value={e}>{e}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {despesas.length === 0 ? (
+              <div className="text-center py-10">
+                <p className="text-sm text-muted-foreground">Sem despesas configuradas.</p>
+                <p className="text-[11px] text-muted-foreground mt-1">Comece por criar categorias e estados, depois adicione despesas.</p>
+              </div>
+            ) : filteredDespesas.length === 0 ? (
+              <p className="text-center text-xs text-muted-foreground py-8">Nenhuma despesa corresponde aos filtros.</p>
+            ) : (
+              <div className="overflow-x-auto rounded-lg border border-border">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b bg-muted/30">
+                      <th className="text-left p-3 font-medium text-muted-foreground text-xs">Despesa</th>
+                      <th className="text-left p-3 font-medium text-muted-foreground text-xs">Categoria</th>
+                      <th className="text-left p-3 font-medium text-muted-foreground text-xs">Estado</th>
+                      <th className="text-left p-3 font-medium text-muted-foreground text-xs">Destinatário</th>
+                      <th className="text-left p-3 font-medium text-muted-foreground text-xs">Responsável</th>
+                      <th className="text-right p-3 font-medium text-muted-foreground text-xs">Valor</th>
+                      <th className="w-20"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredDespesas.map(d => {
+                      const dest = getDestinatarioFor(d.categoria);
+                      const resp = responsavelForValue(d.valorEstimado);
+                      return (
+                        <tr key={d.id} role="button" tabIndex={0}
+                          onClick={() => openEditDespesa(d)}
+                          className="border-b last:border-0 hover:bg-muted/30 cursor-pointer group">
+                          <td className="p-3">
+                            <p className="text-xs font-medium text-foreground">{d.nome}</p>
+                            <span className={cn("inline-flex items-center rounded-full border px-1.5 py-0.5 text-[9px] font-medium capitalize mt-0.5", periodCls[d.periodicidade])}>{d.periodicidade}</span>
+                          </td>
+                          <td className="p-3">
+                            <span className={cn("inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium", chipFor(d.categoria))}>{d.categoria}</span>
+                          </td>
+                          <td className="p-3">
+                            <span className={cn("inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium", chipFor(d.estado))}>{d.estado}</span>
+                          </td>
+                          <td className="p-3 text-xs text-foreground">{dest || <span className="text-muted-foreground italic">—</span>}</td>
+                          <td className="p-3 text-xs">
+                            {resp ? <span className="text-foreground">{resp.nome}</span> : <span className="text-muted-foreground italic">—</span>}
+                          </td>
+                          <td className="p-3 text-right text-sm font-semibold tabular-nums text-foreground whitespace-nowrap">{formatCurrency(d.valorEstimado)}</td>
+                          <td className="p-3 text-right">
+                            <div className="inline-flex items-center gap-0.5 opacity-60 group-hover:opacity-100 transition">
+                              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={(e) => { e.stopPropagation(); openEditDespesa(d); }} title="Editar">
+                                <Pencil className="w-3.5 h-3.5" />
+                              </Button>
+                              <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive"
+                                onClick={(e) => { e.stopPropagation(); setConfirmDelDespesa(d); }} title="Remover">
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </Button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </Card>
+        </div>
       )}
+
+
 
       {/* ════════════════ SALÁRIOS ════════════════ */}
       {mode === "salarios" && (
