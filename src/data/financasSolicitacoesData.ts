@@ -1,10 +1,10 @@
 import {
   Receipt, TrendingUp, FileText, Wallet, Coins, Sparkles,
-  Clock, CheckCircle2, XCircle, type LucideIcon,
+  Clock, CheckCircle2, XCircle, AlertTriangle, BadgeCheck, type LucideIcon,
 } from "lucide-react";
 
 export type FinDirection = "recebida" | "enviada";
-export type FinStatus = "pendente" | "aprovado" | "rejeitado";
+export type FinStatus = "pendente" | "atrasado" | "aprovado" | "executada" | "rejeitado";
 export type FinType =
   | "reembolso" | "orcamento" | "fornecedor"
   | "antecipacao" | "verba" | "outro";
@@ -47,7 +47,7 @@ export const finSolicitacoes: FinSolicitacao[] = [
     title: "Reembolso — Conferência Internacional Lisboa",
     description: "Reembolso de viagem, alojamento e inscrição da conferência IEEE 2025 realizada entre 12 e 16 de Março em Lisboa. Inclui bilhetes de avião, três noites de hotel e taxa de inscrição.",
     requester: "Prof. António Silva", requesterRole: "Docente — Fac. Engenharia", requesterMatricula: "DOC-1042",
-    date: "2025-04-08", dueDate: "2025-04-18", status: "pendente",
+    date: "2026-06-08", dueDate: "2026-06-22", status: "pendente",
     anexos: [
       { nome: "Fatura-hotel-Lisboa.pdf", tamanho: "184 KB", tipo: "pdf" },
       { nome: "Bilhete-aviao.pdf", tamanho: "92 KB", tipo: "pdf" },
@@ -63,7 +63,7 @@ export const finSolicitacoes: FinSolicitacao[] = [
     title: "Reforço Orçamental — Laboratório de Redes",
     description: "Solicitação de reforço orçamental para aquisição de switches geridos Cisco e equipamento de teste de rede destinado ao laboratório de redes do 3.º ano.",
     requester: "Decano Fac. Engenharia", requesterRole: "Decano", requesterMatricula: "DEC-0007",
-    date: "2025-04-05", dueDate: "2025-04-15", status: "pendente",
+    date: "2025-04-05", dueDate: "2025-04-15", status: "atrasado",
     anexos: [
       { nome: "Proforma-fornecedor.pdf", tamanho: "212 KB", tipo: "pdf" },
       { nome: "Justificacao-tecnica.docx", tamanho: "48 KB", tipo: "doc" },
@@ -100,7 +100,7 @@ export const finSolicitacoes: FinSolicitacao[] = [
     title: "Verba Extra — Evento de Boas-Vindas",
     description: "Apoio financeiro à organização do evento de recepção dos novos estudantes do ano lectivo 2025/26.",
     requester: "Assoc. Estudantes", requesterRole: "AEUPRA", requesterMatricula: "AEU-0001",
-    date: "2025-03-25", dueDate: "2025-04-20", status: "pendente",
+    date: "2025-03-25", dueDate: "2025-04-20", status: "atrasado",
     anexos: [
       { nome: "Plano-evento.pdf", tamanho: "320 KB", tipo: "pdf" },
       { nome: "Orcamento-detalhado.xlsx", tamanho: "44 KB", tipo: "sheet" },
@@ -114,10 +114,11 @@ export const finSolicitacoes: FinSolicitacao[] = [
     title: "Pagamento Fornecedor — Material Gráfico",
     description: "Pagamento da factura FT-2025/0388 à gráfica institucional pelos materiais do evento de Março.",
     requester: "Secretaria Geral", requesterRole: "Sec. Académica", requesterMatricula: "SEC-0011",
-    date: "2025-03-22", status: "aprovado",
+    date: "2025-03-22", status: "executada",
     historico: [
       { data: "2025-03-22 09:00", actor: "Secretaria Geral", accao: "Solicitação submetida" },
       { data: "2025-03-23 11:30", actor: "Direcção Financeira", accao: "Solicitação aprovada" },
+      { data: "2025-03-24 10:15", actor: "Direcção Financeira", accao: "Solicitação executada", nota: "Pagamento processado por transferência bancária." },
     ],
   },
   {
@@ -125,10 +126,11 @@ export const finSolicitacoes: FinSolicitacao[] = [
     title: "Reembolso — Deslocação Inspecção",
     description: "Reembolso de combustível e portagens das visitas aos campi externos.",
     requester: "Dr. Carlos Bento", requesterRole: "Inspector Académico", requesterMatricula: "INS-0003",
-    date: "2025-03-18", status: "aprovado",
+    date: "2025-03-18", status: "executada",
     historico: [
       { data: "2025-03-18 17:00", actor: "Dr. Carlos Bento", accao: "Solicitação submetida" },
       { data: "2025-03-19 10:00", actor: "Direcção Financeira", accao: "Solicitação aprovada" },
+      { data: "2025-03-20 09:30", actor: "Direcção Financeira", accao: "Solicitação executada", nota: "Reembolso liquidado." },
     ],
   },
   {
@@ -137,7 +139,7 @@ export const finSolicitacoes: FinSolicitacao[] = [
     description: "Submissão do orçamento consolidado do 2º trimestre ao Magnífico Reitor para aprovação.",
     requester: "Direcção Financeira", destinatario: "Magnífico Reitor",
     responsavel: "Prof. Dr. António Mendes · Reitor",
-    date: "2025-04-01", dueDate: "2025-04-20", status: "pendente",
+    date: "2026-06-01", dueDate: "2026-06-25", status: "pendente",
     anexos: [
       { nome: "Orcamento-Q2-2025.pdf", tamanho: "612 KB", tipo: "pdf" },
       { nome: "Mapa-execucao-Q1.xlsx", tamanho: "88 KB", tipo: "sheet" },
@@ -152,10 +154,11 @@ export const finSolicitacoes: FinSolicitacao[] = [
     description: "Pedido de contratação da firma KPMG para auditoria anual de contas.",
     requester: "Direcção Financeira", destinatario: "Magnífico Reitor",
     responsavel: "Prof. Dr. António Mendes · Reitor",
-    date: "2025-03-26", status: "aprovado",
+    date: "2025-03-26", status: "executada",
     historico: [
       { data: "2025-03-26 09:00", actor: "Direcção Financeira", accao: "Solicitação submetida" },
       { data: "2025-03-28 15:00", actor: "Magnífico Reitor", accao: "Solicitação aprovada" },
+      { data: "2025-03-30 11:00", actor: "Direcção Financeira", accao: "Solicitação executada", nota: "Contrato KPMG formalizado." },
     ],
   },
   {
@@ -164,7 +167,7 @@ export const finSolicitacoes: FinSolicitacao[] = [
     description: "Solicitação de transferência adicional para o fundo de bolsas de mérito do 2º semestre.",
     requester: "Direcção Financeira", destinatario: "Conselho de Gestão",
     responsavel: "Conselho de Gestão · Órgão Colegial",
-    date: "2025-03-20", dueDate: "2025-04-12", status: "pendente",
+    date: "2025-03-20", dueDate: "2025-04-12", status: "atrasado",
     historico: [
       { data: "2025-03-20 12:00", actor: "Direcção Financeira", accao: "Solicitação submetida" },
     ],
@@ -182,7 +185,9 @@ export const finTypeMeta: Record<FinType, { label: string; icon: LucideIcon; cls
 
 export const finStatusMeta: Record<FinStatus, { label: string; cls: string; dot: string; icon: LucideIcon }> = {
   pendente:  { label: "Pendente",  cls: "bg-amber-50 text-amber-700 border-amber-200",       dot: "bg-amber-500",   icon: Clock },
+  atrasado:  { label: "Em atraso", cls: "bg-orange-50 text-orange-700 border-orange-200",    dot: "bg-orange-500",  icon: AlertTriangle },
   aprovado:  { label: "Aprovada",  cls: "bg-emerald-50 text-emerald-700 border-emerald-200", dot: "bg-emerald-500", icon: CheckCircle2 },
+  executada: { label: "Executada", cls: "bg-teal-50 text-teal-700 border-teal-200",          dot: "bg-teal-500",    icon: BadgeCheck },
   rejeitado: { label: "Rejeitada", cls: "bg-red-50 text-red-600 border-red-200",             dot: "bg-red-500",     icon: XCircle },
 };
 

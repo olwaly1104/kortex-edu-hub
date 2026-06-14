@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   CheckSquare, Clock, CheckCircle2, Search, X, Inbox, Send,
   Plus, GraduationCap, CalendarDays, Calendar, ArrowUpRight,
+  AlertTriangle, BadgeCheck,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -24,7 +25,7 @@ import {
   type FinType, type FinStatus,
 } from "@/data/financasSolicitacoesData";
 
-type EstadoFilter = "todos" | "pendentes" | "aprovadas" | "rejeitadas";
+type EstadoFilter = "todos" | "pendentes" | "atrasadas" | "aprovadas" | "executadas" | "rejeitadas";
 
 export default function FinancasSolicitacoes() {
   const { toast } = useToast();
@@ -47,7 +48,9 @@ export default function FinancasSolicitacoes() {
   const counts = useMemo(() => ({
     todos: directionFiltered.length,
     pendentes: directionFiltered.filter(s => s.status === "pendente").length,
+    atrasadas: directionFiltered.filter(s => s.status === "atrasado").length,
     aprovadas: directionFiltered.filter(s => s.status === "aprovado").length,
+    executadas: directionFiltered.filter(s => s.status === "executada").length,
     rejeitadas: directionFiltered.filter(s => s.status === "rejeitado").length,
   }), [directionFiltered]);
 
@@ -55,7 +58,9 @@ export default function FinancasSolicitacoes() {
     return directionFiltered
       .filter(s => {
         if (estado === "pendentes"  && s.status !== "pendente")  return false;
+        if (estado === "atrasadas"  && s.status !== "atrasado")  return false;
         if (estado === "aprovadas"  && s.status !== "aprovado")  return false;
+        if (estado === "executadas" && s.status !== "executada") return false;
         if (estado === "rejeitadas" && s.status !== "rejeitado") return false;
         if (typeFilter !== "todos" && s.type !== typeFilter) return false;
         if (search) {
@@ -77,7 +82,9 @@ export default function FinancasSolicitacoes() {
   const tabs: { key: EstadoFilter; label: string; count: number }[] = [
     { key: "todos",      label: "Todas",      count: counts.todos },
     { key: "pendentes",  label: "Pendentes",  count: counts.pendentes },
+    { key: "atrasadas",  label: "Em atraso",  count: counts.atrasadas },
     { key: "aprovadas",  label: "Aprovadas",  count: counts.aprovadas },
+    { key: "executadas", label: "Executadas", count: counts.executadas },
     { key: "rejeitadas", label: "Rejeitadas", count: counts.rejeitadas },
   ];
 
@@ -99,12 +106,14 @@ export default function FinancasSolicitacoes() {
   };
 
   const StatCell = ({ icon: Icon, label, value, tone }:{
-    icon: LucideIcon; label: string; value: number; tone: "primary" | "amber" | "emerald" | "red";
+    icon: LucideIcon; label: string; value: number; tone: "primary" | "amber" | "orange" | "emerald" | "teal" | "red";
   }) => {
     const toneCls: Record<typeof tone, string> = {
       primary: "text-primary bg-primary/10",
       amber:   "text-amber-600 bg-amber-50",
+      orange:  "text-orange-600 bg-orange-50",
       emerald: "text-emerald-600 bg-emerald-50",
+      teal:    "text-teal-600 bg-teal-50",
       red:     "text-red-600 bg-red-50",
     };
     return (
@@ -158,11 +167,13 @@ export default function FinancasSolicitacoes() {
 
       {/* ── Hero stat strip ── */}
       <Card className="overflow-hidden p-0 gap-0 border-border">
-        <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-border bg-gradient-to-r from-primary/[0.04] via-transparent to-transparent">
-          <StatCell icon={Inbox}        label="Total"      value={counts.todos}      tone="primary" />
-          <StatCell icon={Clock}        label="Pendentes"  value={counts.pendentes}  tone="amber" />
-          <StatCell icon={CheckCircle2} label="Aprovadas"  value={counts.aprovadas}  tone="emerald" />
-          <StatCell icon={X}            label="Rejeitadas" value={counts.rejeitadas} tone="red" />
+        <div className="grid grid-cols-3 sm:grid-cols-6 divide-x divide-border bg-gradient-to-r from-primary/[0.04] via-transparent to-transparent">
+          <StatCell icon={Inbox}          label="Total"      value={counts.todos}      tone="primary" />
+          <StatCell icon={Clock}          label="Pendentes"  value={counts.pendentes}  tone="amber" />
+          <StatCell icon={AlertTriangle}  label="Em atraso"  value={counts.atrasadas}  tone="orange" />
+          <StatCell icon={CheckCircle2}   label="Aprovadas"  value={counts.aprovadas}  tone="emerald" />
+          <StatCell icon={BadgeCheck}     label="Executadas" value={counts.executadas} tone="teal" />
+          <StatCell icon={X}              label="Rejeitadas" value={counts.rejeitadas} tone="red" />
         </div>
       </Card>
 

@@ -57,20 +57,25 @@ export default function FinancasSolicitacaoDetail() {
   if (selected.status === "rejeitado") {
     const rej = selected.historico.slice().reverse().find(h => h.accao.toLowerCase().includes("rejeit"));
     steps.push({ label: "Solicitação rejeitada", data: rej?.data, actor: rej?.actor ?? "Direcção Financeira", nota: rej?.nota, tone: "rejected" });
-  } else if (selected.status === "aprovado") {
+  } else if (selected.status === "aprovado" || selected.status === "executada") {
     const ap = selected.historico.slice().reverse().find(h => h.accao.toLowerCase().includes("aprov"));
     steps.push({ label: "Solicitação aprovada", data: ap?.data, actor: ap?.actor ?? "Direcção Financeira", nota: ap?.nota, tone: "accepted" });
+    if (selected.status === "executada") {
+      const ex = selected.historico.slice().reverse().find(h => h.accao.toLowerCase().includes("execut"));
+      steps.push({ label: "Solicitação executada", data: ex?.data, actor: ex?.actor ?? "Direcção Financeira", nota: ex?.nota, tone: "executed" });
+    }
   } else if (selected.dueDate) {
     const base = new Date(selected.dueDate);
     const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
     const diff = Math.ceil((base.getTime() - hoje.getTime()) / 86400000);
-    const aside = diff < 0
+    const overdue = diff < 0;
+    const aside = overdue
       ? `${Math.abs(diff)} ${Math.abs(diff) === 1 ? "dia" : "dias"} em atraso`
       : diff === 0 ? "Prazo termina hoje" : `Faltam ${diff} ${diff === 1 ? "dia" : "dias"}`;
     steps.push({
       label: `Aguarda decisão · prevista ${fmt(base)}`,
       actor: isRecebida ? "Direcção Financeira" : counterpart,
-      aside, tone: "scheduled",
+      aside, tone: overdue ? "rejected" : "scheduled",
     });
   } else {
     steps.push({ label: "Aguarda decisão", actor: isRecebida ? "Direcção Financeira" : counterpart, tone: "scheduled" });
@@ -109,12 +114,12 @@ export default function FinancasSolicitacaoDetail() {
         </div>
 
         {/* Decision bar */}
-        {isRecebida && selected.status === "pendente" && (
+        {isRecebida && (selected.status === "pendente" || selected.status === "atrasado") && (
           <div className="px-6 pt-3">
-            <div className="flex items-center justify-between rounded-lg border border-border bg-background px-4 py-2.5">
+            <div className={cn("flex items-center justify-between rounded-lg border px-4 py-2.5", selected.status === "atrasado" ? "border-orange-200 bg-orange-50/40" : "border-border bg-background")}>
               <div className="flex items-center gap-2.5">
-                <Hourglass className="w-4 h-4 text-amber-600 shrink-0" />
-                <span className="text-sm font-semibold text-foreground">Aguarda decisão</span>
+                <Hourglass className={cn("w-4 h-4 shrink-0", selected.status === "atrasado" ? "text-orange-600" : "text-amber-600")} />
+                <span className="text-sm font-semibold text-foreground">{selected.status === "atrasado" ? "Decisão em atraso" : "Aguarda decisão"}</span>
                 <span className="text-[11px] text-muted-foreground tabular-nums">
                   {selected.dueDate ? (() => {
                     const base = new Date(selected.dueDate);
@@ -313,7 +318,7 @@ export default function FinancasSolicitacaoDetail() {
             <section>
               <div className="flex items-center gap-2 mb-3">
                 <FileText className="w-3.5 h-3.5 text-muted-foreground" />
-                <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Detalhes do Pedido</h3>
+                <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Detalhes da Solicitação</h3>
               </div>
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-5 gap-y-4">
                 <FactItem label="Submetido" value={fmt(dSub)} />
@@ -328,7 +333,7 @@ export default function FinancasSolicitacaoDetail() {
             <section>
               <div className="flex items-center gap-2 mb-3">
                 <FileText className="w-3.5 h-3.5 text-muted-foreground" />
-                <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Descrição do Pedido</h3>
+                <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Descrição da Solicitação</h3>
               </div>
               <div className="rounded-lg border border-border bg-background overflow-hidden divide-y divide-border">
                 <div className="px-4 py-3">
