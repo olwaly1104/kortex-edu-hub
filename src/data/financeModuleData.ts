@@ -98,6 +98,13 @@ function generateReceitas(): Transaction[] {
     { id: `r${id++}`, date: "2025-04-01", description: "Emolumentos de Inscrição", category: "Emolumentos", amount: 18000, type: "receita", status: "pendente", source: "Emolumentos", payer: "Carlos Ferreira", studentId: "EST-1003", course: "Direito" },
     { id: `r${id++}`, date: "2025-03-28", description: "Taxa de Certificado", category: "Emolumentos", amount: 8000, type: "receita", status: "pago", source: "Emolumentos", payer: "Ana Lopes", studentId: "EST-1004", course: "Medicina" },
     { id: `r${id++}`, date: "2025-03-25", description: "Propina Mensal", category: "Propinas", amount: 52000, type: "receita", status: "em_atraso", source: "Propinas", payer: "Diogo Nascimento", studentId: "EST-1009", course: "Eng. Informática" },
+    { id: `r${id++}`, date: "2025-04-08", description: "Aluguer Auditório — Evento Externo", category: "Serviços", amount: 450000, type: "receita", status: "pago", source: "Serviços", payer: "Empresa XYZ Lda.", studentId: "N/A", course: "—" },
+    { id: `r${id++}`, date: "2025-04-06", description: "Cursos de Formação Contínua", category: "Serviços", amount: 320000, type: "receita", status: "pago", source: "Serviços", payer: "Formandos Q1", studentId: "N/A", course: "—" },
+    { id: `r${id++}`, date: "2025-04-02", description: "Consultoria Engenharia — Projecto Público", category: "Serviços", amount: 1200000, type: "receita", status: "pendente", source: "Serviços", payer: "Ministério das Obras", studentId: "N/A", course: "—" },
+    { id: `r${id++}`, date: "2025-04-01", description: "Laboratórios — Análises Externas", category: "Serviços", amount: 180000, type: "receita", status: "pago", source: "Serviços", payer: "Clínica Saúde+", studentId: "N/A", course: "—" },
+    { id: `r${id++}`, date: "2025-03-30", description: "Multa — Atraso Entrega Documentos", category: "Multas", amount: 25000, type: "receita", status: "pago", source: "Multas", payer: "Estudante Atrasado", studentId: "EST-1050", course: "Direito" },
+    { id: `r${id++}`, date: "2025-03-27", description: "Multa — Biblioteca — Atraso Devolução", category: "Multas", amount: 5000, type: "receita", status: "pago", source: "Multas", payer: "Pedro Baptista", studentId: "EST-1005", course: "Eng. Informática" },
+    { id: `r${id++}`, date: "2025-03-22", description: "Multa — Quebra Material Didáctico", category: "Multas", amount: 15000, type: "receita", status: "pendente", source: "Multas", payer: "Tiago Pereira", studentId: "EST-1015", course: "Medicina" },
   );
   return items;
 }

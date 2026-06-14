@@ -132,11 +132,10 @@ export default function FinancasDashboard() {
       </div>
 
       {/* ── KPIs ── */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <KPICard label="Receita Esperada" value={formatCurrency(receitaEsperadaMes)} subtitle="Este Mês" icon={Receipt} accent />
         <KPICard label="Receitas do Mês" value={formatCurrency(cur.receitas)} change={receitaVar} icon={TrendingUp} positive />
         <KPICard label="Despesas do Mês" value={formatCurrency(cur.despesas)} change={despesaVar} icon={TrendingDown} positive={false} />
-        <KPICard label="Saldo Líquido" value={formatCurrency(saldo)} change={saldoChange} icon={Wallet} positive={saldo > 0} accent />
         <KPICard label="Salários a Processar" value={formatCurrency(totalBruto)} subtitle={`${salariosPagos} pagos · ${salariosPendentes} pendentes`} icon={CreditCard} />
       </div>
 
