@@ -242,6 +242,13 @@ export const currentAcademica2: User = {
   role: "academica2",
 };
 
+export const currentAdmin: User = {
+  id: "12",
+  name: "Administrador da Instituição",
+  email: "admin@upra.kor",
+  role: "admin",
+};
+
 // Disciplines
 export const disciplines: Discipline[] = [
   {
