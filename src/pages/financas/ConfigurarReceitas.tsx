@@ -1038,18 +1038,25 @@ export default function ConfigurarReceitas() {
                 {salaryList.map(s => {
                   const cfg = salaryConfigs[s.id];
                   if (!cfg) return null;
-                  const deductions = Math.round(cfg.baseSalary * cfg.deductionRate);
-                  const multasTotal = cfg.multas.reduce((sum, m) => sum + m.valor, 0);
-                  const net = cfg.baseSalary - deductions - multasTotal;
+                  const net = computeNet(cfg);
+                  const contractLabel = s.contractType === "efectivo" ? "Permanente" : "Prestador";
                   return (
-                    <tr key={s.id} className="border-b border-border/50 hover:bg-muted/40 cursor-pointer group"
-                      onClick={() => openEditSalary(s)}>
+                    <tr key={s.id} className="border-b border-border/50 hover:bg-muted/40 group">
                       <td className="px-2 py-2.5">
-                        <p className="text-sm font-medium text-foreground truncate">{s.name}</p>
-                        <p className="text-[10px] text-muted-foreground font-mono">{s.employeeId}</p>
+                        <button
+                          type="button"
+                          onClick={() => navigate(`/financas/pessoal/financas?id=${s.id}`)}
+                          className="text-left">
+                          <p className="text-sm font-medium text-foreground truncate hover:text-primary hover:underline underline-offset-2">{s.name}</p>
+                          <p className="text-[10px] text-muted-foreground font-mono">{s.employeeId}</p>
+                        </button>
                       </td>
                       <td className="px-2 py-2.5">
                         <p className="text-xs text-foreground truncate">{s.role}</p>
+                        <span className={cn(
+                          "inline-flex items-center rounded-full border px-1.5 py-0.5 text-[9px] font-medium mt-0.5",
+                          s.contractType === "efectivo" ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-amber-50 text-amber-700 border-amber-200"
+                        )}>{contractLabel}</span>
                       </td>
                       <td className="px-2 py-2.5">
                         <p className="text-xs text-foreground truncate">{s.department}</p>
