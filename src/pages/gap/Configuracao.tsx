@@ -296,14 +296,14 @@ export default function GapConfiguracao() {
   const removeCdSessao = (key: string) => setCdSessoes(s => s.filter(x => x.key !== key));
 
   // helper components
-  const EditIcon = ({ onClick, label }: { onClick: () => void; label: string }) =>
-    isEditing ? (
+  const EditIcon = ({ onClick, label, editing }: { onClick: () => void; label: string; editing: boolean }) =>
+    editing ? (
       <button onClick={onClick} className="opacity-60 hover:opacity-100" aria-label={label}>
         <Pencil className="w-3 h-3" />
       </button>
     ) : null;
-  const RemoveIcon = ({ onClick, label, size = "sm" }: { onClick: () => void; label: string; size?: "sm" | "md" }) =>
-    isEditing ? (
+  const RemoveIcon = ({ onClick, label, editing, size = "sm" }: { onClick: () => void; label: string; editing: boolean; size?: "sm" | "md" }) =>
+    editing ? (
       <button onClick={onClick} className="opacity-60 hover:opacity-100 hover:text-destructive" aria-label={label}>
         <Trash2 className={size === "sm" ? "w-3 h-3" : "w-3.5 h-3.5"} />
       </button>
