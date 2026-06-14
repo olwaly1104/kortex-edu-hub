@@ -32,11 +32,12 @@ export default function Receitas() {
   const [filterCategory, setFilterCategory] = useState("todos");
   const [sortField, setSortField] = useState<SortField | null>(null);
   const [sortDir, setSortDir] = useState<SortDir>("desc");
-  const [periodo, setPeriodo] = useState("mes");
+  const [periodo, setPeriodo] = useState<Periodo>("mes");
+  const [periodoValue, setPeriodoValue] = useState<string>(periodoDefaultValue("mes"));
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editValue, setEditValue] = useState<string>("");
 
-  const mult = periodo === "ano" ? 12 : periodo === "semestre" ? 6 : 1;
+  const mult = PERIODO_MULT[periodo];
 
   const isSortActive = sortField !== null;
   const isStatusActive = filterStatus !== "todos";
