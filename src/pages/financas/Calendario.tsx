@@ -911,6 +911,16 @@ function EventDetailDialog({ event, onClose, onDelete }: { event: AgendaEvent | 
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2 flex-wrap mb-1">
                 <Badge variant="outline" className={cn("text-[10px] border-0 bg-card", m.text)}>{m.label}</Badge>
+                {event.modality && (() => {
+                  const mm = MODALITY_META[event.modality];
+                  const I = mm.icon;
+                  return (
+                    <Badge variant="outline" className={cn("text-[10px] gap-1 h-5 px-1.5", mm.cls)}>
+                      <I className="w-3 h-3" />
+                      {mm.label}
+                    </Badge>
+                  );
+                })()}
                 {event.obligatory && (
                   <Badge variant="outline" className="text-[10px] bg-red-50 text-red-700 border-red-200">Obrigatório</Badge>
                 )}

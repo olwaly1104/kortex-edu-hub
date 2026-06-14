@@ -166,12 +166,17 @@ export default function FinancasAnuncioDetail() {
         <div className="grid md:grid-cols-[1fr_280px] divide-x divide-border">
           {/* LEFT — descrição body */}
           <div className="p-6 min-w-0 space-y-6">
-            <div>
-              <h2 className="text-[11px] uppercase tracking-[0.16em] font-semibold text-muted-foreground mb-3">Conteúdo</h2>
-              <article className="max-w-none">
-                <p className="text-[14.5px] leading-7 text-foreground whitespace-pre-line">{ann.content}</p>
-              </article>
-            </div>
+            <section>
+              <div className="flex items-center gap-2 mb-3">
+                <FileText className="w-3.5 h-3.5 text-muted-foreground" />
+                <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Conteúdo</h3>
+              </div>
+              <div className="rounded-lg border border-border bg-background overflow-hidden">
+                <div className="px-4 py-3">
+                  <p className="text-[13.5px] text-foreground/90 leading-[1.65] whitespace-pre-line">{ann.content}</p>
+                </div>
+              </div>
+            </section>
 
             {ann.cta === "inscrever" && (
               <div className="rounded-lg border border-primary/25 bg-primary/[0.04] px-4 py-3">
