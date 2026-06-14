@@ -618,7 +618,7 @@ export default function FinancasSolicitacoes() {
                       <ReviewCell label="Requerente" value="Dr. Manuel Sousa" sub="Direcção Financeira" />
                       <ReviewCell label="Destinatário" value={ROUTING[newType].destinatario} sub="Atribuição automática" />
                       <ReviewCell label="Submetido" value={new Date().toLocaleDateString("pt-PT", { day: "2-digit", month: "long", year: "numeric" })} />
-                      <ReviewCell label="Prazo" value={fmtPrazo(newPrazo)} />
+                      <ReviewCell label="Prazo" value={newPrazoDe || newPrazoAte ? `${fmtPrazo(newPrazoDe)} → ${fmtPrazo(newPrazoAte)}` : "—"} />
                       {ROUTING[newType].needsValor && <ReviewCell label="Valor" value={fmtKz(newValor)} mono />}
                       <ReviewCell label="Anexos" value={`${newFiles.length} ficheiro${newFiles.length === 1 ? "" : "s"}`} />
                     </div>
