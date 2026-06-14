@@ -60,6 +60,15 @@ export default function FinancasAnuncioDetail() {
 
       {/* Main document card */}
       <div className="rounded-lg border border-border bg-card overflow-hidden">
+        {/* Standard bar */}
+        <div className="flex items-center gap-2 px-6 py-3 border-b border-border bg-muted/20 text-[10px] uppercase tracking-[0.12em] font-semibold">
+          <span className="text-primary">Ano Letivo 2024/2025</span>
+          <span className="text-muted-foreground/40">·</span>
+          <Link to="/financas/anuncios" className="text-muted-foreground hover:text-foreground transition-colors">Anúncios</Link>
+          <span className="text-muted-foreground/40">·</span>
+          <span className="font-mono text-foreground normal-case tracking-normal">{ann.id.toUpperCase()}</span>
+        </div>
+
         {/* Header: title + ID/Document pill */}
         <div className="px-6 pt-5 pb-5 border-b border-border">
           <div className="flex items-start justify-between gap-4">
@@ -76,10 +85,6 @@ export default function FinancasAnuncioDetail() {
                   <Building2 className="w-3 h-3" />
                   {ann.department}
                 </Link>
-                <span className="inline-flex items-center gap-1.5 text-[10.5px] font-semibold px-2 py-0.5 rounded-md border border-border bg-background uppercase tracking-wider text-foreground">
-                  <CalendarIcon className="w-3 h-3" />
-                  <span className="tabular-nums normal-case">{new Date(ann.date).toLocaleDateString("pt-PT", { day: "2-digit", month: "short", year: "numeric" })}</span>
-                </span>
               </div>
               <h1 className="text-[24px] font-bold text-foreground leading-tight tracking-tight">{ann.title}</h1>
             </div>
