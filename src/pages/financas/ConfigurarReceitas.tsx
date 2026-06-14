@@ -1276,11 +1276,6 @@ export default function ConfigurarReceitas() {
                         )}>{contractLabel}</span>
                       </td>
                       <td className="px-2 py-2.5">
-                        <span className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[10px] font-medium text-slate-700 tabular-nums">
-                          {entryLabel}
-                        </span>
-                      </td>
-                      <td className="px-2 py-2.5">
                         <p className="text-xs text-foreground truncate">{s.department}</p>
                       </td>
                       <td className="px-2 py-2.5 text-right text-sm tabular-nums text-foreground">{formatCurrency(cfg.baseSalary)}</td>
