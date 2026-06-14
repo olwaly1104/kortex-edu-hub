@@ -150,10 +150,10 @@ function fmtShort(s: string) {
 /* mock current time for entry state computation on TODAY */
 const NOW_MIN = 10 * 60 + 45;
 type EvState = "agendado" | "decorrer" | "concluido";
-const EV_STATE_META: Record<EvState, { label: string; cls: string }> = {
-  agendado:  { label: "Agendado",   cls: "bg-blue-50 text-blue-700 border-blue-200" },
-  decorrer:  { label: "A decorrer", cls: "bg-amber-50 text-amber-700 border-amber-200" },
-  concluido: { label: "Concluído",  cls: "bg-slate-100 text-slate-600 border-slate-200" },
+const EV_STATE_META: Record<EvState, { label: string; cls: string; dot: string }> = {
+  agendado:  { label: "Agendado",   cls: "bg-blue-50 text-blue-700 border-blue-200",     dot: "bg-blue-500" },
+  decorrer:  { label: "A decorrer", cls: "bg-amber-50 text-amber-700 border-amber-200",  dot: "bg-amber-500" },
+  concluido: { label: "Concluído",  cls: "bg-slate-100 text-slate-600 border-slate-200", dot: "bg-slate-400" },
 };
 function eventState(ev: AgendaEvent): EvState {
   const end = ev.endDate ?? ev.date;
