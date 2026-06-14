@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import {
   Megaphone, Search, Plus, CheckCircle2, Calendar as CalendarIcon,
-  User as UserIcon, Building2, Filter, Sparkles, Trash2,
+  User as UserIcon, Building2, Sparkles, Trash2, GraduationCap, Inbox, UserCircle2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
