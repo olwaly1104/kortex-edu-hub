@@ -565,13 +565,16 @@ export default function FinancasCalendario() {
       {/* ── Horizontal Pedidos (Mês only) ── */}
       {view === "month" && pendingRequests.length > 0 && (
         <Card className="overflow-hidden">
-          <div className="px-4 py-2.5 border-b bg-muted/10 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Bell className="w-4 h-4 text-muted-foreground" />
-              <p className="text-sm font-semibold text-foreground">Pedidos de Reunião</p>
+          <div className="px-4 py-2.5 border-b bg-muted/10 flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 min-w-0">
+              <Bell className="w-4 h-4 text-muted-foreground shrink-0" />
+              <p className="text-sm font-semibold text-foreground truncate">Pedidos de Reunião</p>
               <Badge variant="outline" className="text-[10px] h-5">{pendingRequests.length}</Badge>
             </div>
-            <p className="text-[10px] text-muted-foreground hidden sm:block">Desliza horizontalmente para ver mais</p>
+            <button onClick={() => setShowAllRequests(true)}
+              className="text-[11px] font-semibold text-primary hover:underline shrink-0">
+              Ver todos
+            </button>
           </div>
           <div className="overflow-x-auto">
             <div className="flex gap-3 p-3" style={{ width: "max-content" }}>
