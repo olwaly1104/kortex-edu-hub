@@ -244,30 +244,40 @@ export default function FinancasAnuncios() {
               <div className="flex">
                 <div className={cn("w-1 shrink-0", m.dot)} />
                 <div className="flex-1 p-4">
-                  {/* meta row: category + department + mine + date */}
-                  <div className="flex items-center justify-between gap-3 mb-3">
-                    <div className="flex items-center gap-1.5 flex-wrap">
-                      <Badge variant="outline" className={cn("text-[10px] font-semibold gap-1 px-1.5", m.chip)}>
-                        <span className={cn("w-1.5 h-1.5 rounded-full", m.dot)} />
-                        {m.label}
+                  {/* top meta: sender + date */}
+                  <div className="flex items-center justify-between gap-3 mb-2">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className="w-7 h-7 rounded-full bg-primary/10 text-primary text-[11px] font-bold flex items-center justify-center shrink-0">
+                        {initials || <UserIcon className="w-3.5 h-3.5" />}
+                      </div>
+                      <span className="text-xs font-semibold text-foreground truncate">
+                        {a.author || a.department}
+                      </span>
+                    </div>
+                    <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground shrink-0 tabular-nums">
+                      <CalendarDays className="w-3.5 h-3.5" />{prettyDate(a.date)}
+                    </span>
+                  </div>
+
+                  {/* category + department row */}
+                  <div className="flex items-center gap-1.5 flex-wrap mb-3">
+                    <Badge variant="outline" className={cn("text-[10px] font-semibold gap-1 px-1.5", m.chip)}>
+                      <span className={cn("w-1.5 h-1.5 rounded-full", m.dot)} />
+                      {m.label}
+                    </Badge>
+                    <button
+                      type="button"
+                      onClick={() => setScope("todos")}
+                      title={`Ver anúncios de ${a.department}`}
+                      className="inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded-md border border-border bg-muted/40 hover:bg-primary/5 hover:border-primary/30 hover:text-primary transition-colors text-foreground/80"
+                    >
+                      <Building2 className="w-2.5 h-2.5" />{a.department}
+                    </button>
+                    {a.isMine && (
+                      <Badge variant="outline" className="text-[10px] bg-primary/10 text-primary border-primary/20 px-1.5">
+                        Criado por mim
                       </Badge>
-                      <button
-                        type="button"
-                        onClick={() => setScope("todos")}
-                        title={`Ver anúncios de ${a.department}`}
-                        className="inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded-md border border-border bg-muted/40 hover:bg-primary/5 hover:border-primary/30 hover:text-primary transition-colors text-foreground/80"
-                      >
-                        <Building2 className="w-2.5 h-2.5" />{a.department}
-                      </button>
-                      {a.isMine && (
-                        <Badge variant="outline" className="text-[10px] bg-primary/10 text-primary border-primary/20 px-1.5">
-                          Criado por mim
-                        </Badge>
-                      )}
-                    </div>
-                    <div className="inline-flex items-center gap-1.5 text-[10.5px] font-medium text-foreground/80 shrink-0 px-2 py-0.5 rounded-md border border-border bg-muted/30 tabular-nums">
-                      <CalendarDays className="w-3 h-3 text-muted-foreground" />{prettyDate(a.date)}
-                    </div>
+                    )}
                   </div>
 
                   {/* divider between meta and body */}
