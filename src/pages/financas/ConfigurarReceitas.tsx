@@ -670,10 +670,13 @@ export default function ConfigurarReceitas() {
                       ))}
                     </div>
                   ) : (
-                    <div className="divide-y divide-border">
-                      <div className="pb-3 mb-1">
-                        <p className="text-xs text-muted-foreground">Faculdade</p>
-                        <p className="text-sm font-semibold text-foreground">{selected.name}</p>
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2 pb-2 border-b border-border">
+                        <Building2 className="w-4 h-4 text-blue-700" />
+                        <div className="min-w-0">
+                          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Faculdade</p>
+                          <p className="text-sm font-semibold text-foreground">{selected.name}</p>
+                        </div>
                       </div>
                       {selected.courses.map(c => {
                         const r = receitas.find(x => x.tipo === "Propina mensal" && x.escopo === c.id);
@@ -682,7 +685,8 @@ export default function ConfigurarReceitas() {
                         const existingMonths = new Set(plans.map(p => p.months));
                         const availableToAdd = [10, 11, 12].filter(m => !existingMonths.has(m));
                         return (
-                          <div key={c.id} className="py-3 group">
+                          <div key={c.id} className="rounded-lg border border-border bg-card p-3 hover:border-primary/30 transition group">
+
                             <div className="flex items-center justify-between gap-3 mb-2">
                               <div className="min-w-0">
                                 <p className="text-sm font-medium text-foreground truncate">{c.name}</p>
