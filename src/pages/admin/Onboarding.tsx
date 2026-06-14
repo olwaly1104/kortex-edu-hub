@@ -252,6 +252,7 @@ export default function AdminOnboarding() {
                     set("faculdades", state.faculdades.filter((f) => f.id !== id));
                     set("cursos", state.cursos.filter((c) => c.faculdadeId !== id));
                   }}
+                  onUpdate={(next) => set("faculdades", state.faculdades.map((f) => f.id === next.id ? next : f))}
                   renderRow={(f, update) => (
                     <Input value={f.nome} onChange={(e) => update({ ...f, nome: e.target.value })} placeholder="Nome da faculdade" />
                   )}
@@ -262,6 +263,7 @@ export default function AdminOnboarding() {
                   items={state.cursos}
                   onAdd={() => set("cursos", [...state.cursos, { id: uid(), nome: "", faculdadeId: state.faculdades[0]?.id || "" }])}
                   onRemove={(id) => set("cursos", state.cursos.filter((c) => c.id !== id))}
+                  onUpdate={(next) => set("cursos", state.cursos.map((c) => c.id === next.id ? next : c))}
                   disabledAdd={state.faculdades.length === 0}
                   emptyHint={state.faculdades.length === 0 ? "Adicione uma faculdade primeiro" : undefined}
                   renderRow={(c, update) => (
@@ -296,6 +298,7 @@ export default function AdminOnboarding() {
                   items={state.calendario.etapas}
                   onAdd={() => setCal({ etapas: [...state.calendario.etapas, { id: uid(), nome: "" }] })}
                   onRemove={(id) => setCal({ etapas: state.calendario.etapas.filter((x) => x.id !== id) })}
+                  onUpdate={(next) => setCal({ etapas: state.calendario.etapas.map((x) => x.id === next.id ? next : x) })}
                   renderRow={(et, update) => <Input value={et.nome} onChange={(e) => update({ ...et, nome: e.target.value })} placeholder="Nome da etapa" />}
                 />
                 <RepeatableSection
@@ -303,6 +306,7 @@ export default function AdminOnboarding() {
                   items={state.calendario.ferias}
                   onAdd={() => setCal({ ferias: [...state.calendario.ferias, { id: uid(), nome: "", inicio: "", fim: "" }] })}
                   onRemove={(id) => setCal({ ferias: state.calendario.ferias.filter((x) => x.id !== id) })}
+                  onUpdate={(next) => setCal({ ferias: state.calendario.ferias.map((x) => x.id === next.id ? next : x) })}
                   renderRow={(p, update) => (
                     <div className="grid md:grid-cols-3 gap-2 w-full">
                       <Input value={p.nome} onChange={(e) => update({ ...p, nome: e.target.value })} placeholder="Nome" />
@@ -324,6 +328,7 @@ export default function AdminOnboarding() {
                     set("edificios", state.edificios.filter((e) => e.id !== id));
                     set("salas", state.salas.filter((s) => s.edificioId !== id));
                   }}
+                  onUpdate={(next) => set("edificios", state.edificios.map((e) => e.id === next.id ? next : e))}
                   renderRow={(b, update) => <Input value={b.nome} onChange={(e) => update({ ...b, nome: e.target.value })} placeholder="Nome do edifício" />}
                 />
                 <RepeatableSection
@@ -333,6 +338,7 @@ export default function AdminOnboarding() {
                   emptyHint={state.edificios.length === 0 ? "Adicione um edifício primeiro" : undefined}
                   onAdd={() => set("salas", [...state.salas, { id: uid(), edificioId: state.edificios[0]?.id || "", nome: "", capacidade: "" }])}
                   onRemove={(id) => set("salas", state.salas.filter((s) => s.id !== id))}
+                  onUpdate={(next) => set("salas", state.salas.map((s) => s.id === next.id ? next : s))}
                   renderRow={(s, update) => (
                     <div className="grid md:grid-cols-3 gap-2 w-full">
                       <Select value={s.edificioId} onValueChange={(v) => update({ ...s, edificioId: v })}>
@@ -354,6 +360,7 @@ export default function AdminOnboarding() {
                   items={state.docentes}
                   onAdd={() => set("docentes", [...state.docentes, { id: uid(), nome: "", email: "", contrato: "", telefone: "" }])}
                   onRemove={(id) => set("docentes", state.docentes.filter((d) => d.id !== id))}
+                  onUpdate={(next) => set("docentes", state.docentes.map((d) => d.id === next.id ? next : d))}
                   renderRow={(d, update) => (
                     <div className="grid md:grid-cols-4 gap-2 w-full">
                       <Input value={d.nome} onChange={(e) => update({ ...d, nome: e.target.value })} placeholder="Nome" />
@@ -368,6 +375,7 @@ export default function AdminOnboarding() {
                   items={state.staff}
                   onAdd={() => set("staff", [...state.staff, { id: uid(), nome: "", posicao: "", contrato: "", email: "", telefone: "" }])}
                   onRemove={(id) => set("staff", state.staff.filter((s) => s.id !== id))}
+                  onUpdate={(next) => set("staff", state.staff.map((s) => s.id === next.id ? next : s))}
                   renderRow={(s, update) => (
                     <div className="grid md:grid-cols-5 gap-2 w-full">
                       <Input value={s.nome} onChange={(e) => update({ ...s, nome: e.target.value })} placeholder="Nome" />
