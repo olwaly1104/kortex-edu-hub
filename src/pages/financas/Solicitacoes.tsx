@@ -42,7 +42,8 @@ export default function FinancasSolicitacoes() {
   const [newTitle, setNewTitle] = useState("");
   const [newDesc, setNewDesc] = useState("");
   const [newValor, setNewValor] = useState("");
-  const [newPrazo, setNewPrazo] = useState("");
+  const [newPrazoDe, setNewPrazoDe] = useState<Date | undefined>(undefined);
+  const [newPrazoAte, setNewPrazoAte] = useState<Date | undefined>(undefined);
   const [newFiles, setNewFiles] = useState<{ name: string; size: string }[]>([]);
 
   // Auto-routing by category
