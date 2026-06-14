@@ -11,6 +11,7 @@ export interface FinAnn {
   author: string;
   department: string;
   cta?: "inscrever" | null;
+  ctaDeadline?: string;
   ctaLink?: string;
   isMine?: boolean;
 }
