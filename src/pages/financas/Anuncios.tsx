@@ -293,12 +293,12 @@ export default function FinancasAnuncios() {
                   <h3 className="text-base font-semibold text-foreground mb-1.5 leading-tight">{a.title}</h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">{a.content}</p>
                   <div className="flex items-center justify-between gap-3 mt-3 pt-3 border-t border-border">
-                    <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-                      <UserIcon className="w-3 h-3" />
-                      <span className="font-medium text-foreground">
-                        {a.author === a.department ? "—" : a.author}
-                      </span>
-                    </div>
+                    {a.author && a.author !== a.department ? (
+                      <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                        <UserIcon className="w-3 h-3" />
+                        <span className="font-medium text-foreground">{a.author}</span>
+                      </div>
+                    ) : <div />}
                     <div className="flex items-center gap-2">
                       {a.cta === "inscrever" && (
                         isSub ? (
