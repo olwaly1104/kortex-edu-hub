@@ -537,7 +537,32 @@ export default function FinancasSolicitacoes() {
                   )}
                   <div className={cn("space-y-1.5", !ROUTING[newType].needsValor && "col-span-2")}>
                     <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Prazo pretendido</label>
-                    <Input type="date" value={newPrazo} onChange={e => setNewPrazo(e.target.value)} className="h-9 text-[13px]" />
+                    <div className="grid grid-cols-2 gap-2">
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button variant="outline" className={cn("h-9 text-[12px] justify-start gap-1.5 font-normal", !newPrazoDe && "text-muted-foreground")}>
+                            <Calendar className="w-3.5 h-3.5" />
+                            <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">De</span>
+                            {fmtPrazoShort(newPrazoDe)}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <CalendarPicker mode="single" selected={newPrazoDe} onSelect={setNewPrazoDe} initialFocus className="p-3 pointer-events-auto" />
+                        </PopoverContent>
+                      </Popover>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button variant="outline" className={cn("h-9 text-[12px] justify-start gap-1.5 font-normal", !newPrazoAte && "text-muted-foreground")}>
+                            <Calendar className="w-3.5 h-3.5" />
+                            <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">Até</span>
+                            {fmtPrazoShort(newPrazoAte)}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <CalendarPicker mode="single" selected={newPrazoAte} onSelect={setNewPrazoAte} disabled={(d) => newPrazoDe ? d < newPrazoDe : false} initialFocus className="p-3 pointer-events-auto" />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
                   </div>
                 </div>
 
