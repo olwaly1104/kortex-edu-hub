@@ -327,10 +327,12 @@ export default function AppSidebar() {
                     <item.icon className="w-[18px] h-[18px] shrink-0" />
                     {!collapsed && <span className="truncate flex-1">{item.label}</span>}
                     {item.badge && item.badge > 0 && (
-                      <span className={cn("shrink-0 min-w-[18px] h-[18px] flex items-center justify-center rounded-full text-[10px] font-bold bg-destructive text-destructive-foreground", collapsed && "absolute -top-1 -right-1 min-w-[16px] h-[16px] text-[9px]")}>
-                        {item.badge}
+                      <span className={cn("relative shrink-0 min-w-[18px] h-[18px] flex items-center justify-center rounded-full text-[10px] font-bold bg-destructive text-destructive-foreground ring-2 ring-destructive/30", collapsed && "absolute -top-1 -right-1 min-w-[16px] h-[16px] text-[9px]")}>
+                        <span className="absolute inset-0 rounded-full bg-destructive/60 animate-ping" />
+                        <span className="relative">{item.badge}</span>
                       </span>
                     )}
+
                   </NavLink>
                 );
               })}
