@@ -238,13 +238,13 @@ export default function FinancasAnuncioDetail() {
   );
 }
 
-function MetaRow({ icon, label, value }: { icon: React.ReactNode; label: string; value: React.ReactNode }) {
+function MetaCell({ icon, label, value }: { icon: React.ReactNode; label: string; value: React.ReactNode }) {
   return (
     <div className="min-w-0">
-      <p className="text-[9.5px] uppercase tracking-[0.14em] font-semibold text-muted-foreground/80 flex items-center gap-1 mb-1.5">
+      <p className="text-[9.5px] uppercase tracking-[0.14em] font-semibold text-muted-foreground/80 flex items-center gap-1 mb-1">
         {icon}{label}
       </p>
-      <div className="min-w-0">{value}</div>
+      <div className="text-[12px] font-medium text-foreground min-w-0 truncate">{value}</div>
     </div>
   );
 }
