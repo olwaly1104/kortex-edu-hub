@@ -205,7 +205,7 @@ function RoleGuardedLayout({ homeRedirect }: { homeRedirect: string }) {
 
 function AppRoutes() {
   const { isAuthenticated, user } = useAuth();
-  if (!isAuthenticated) return <Routes><Route path="/site" element={<Website />} /><Route path="/candidatar" element={<Candidatar />} /><Route path="*" element={<Login />} /></Routes>;
+  if (!isAuthenticated) return <Routes><Route path="/" element={<Website />} /><Route path="/site" element={<Website />} /><Route path="/candidatar" element={<Candidatar />} /><Route path="*" element={<Login />} /></Routes>;
   const homeRedirect = homeRedirectMap[user?.role || "student"] || "/student";
 
   return (
