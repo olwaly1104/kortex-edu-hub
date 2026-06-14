@@ -132,7 +132,8 @@ export default function FinancasDashboard() {
       </div>
 
       {/* ── KPIs ── */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+        <KPICard label="Receita Esperada" value={formatCurrency(receitaEsperadaMes)} subtitle="Este Mês" icon={Receipt} accent />
         <KPICard label="Receitas do Mês" value={formatCurrency(cur.receitas)} change={receitaVar} icon={TrendingUp} positive />
         <KPICard label="Despesas do Mês" value={formatCurrency(cur.despesas)} change={despesaVar} icon={TrendingDown} positive={false} />
         <KPICard label="Saldo Líquido" value={formatCurrency(saldo)} change={saldoChange} icon={Wallet} positive={saldo > 0} accent />
@@ -191,15 +192,6 @@ export default function FinancasDashboard() {
 
           {/* Divider */}
           <div className="my-4 border-t border-border" />
-
-          {/* Receita Esperada */}
-          <div className="flex items-center justify-between mb-3 px-1">
-            <div>
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Receita Esperada Este Mês</p>
-              <p className="text-sm font-bold text-foreground mt-0.5">{formatCurrency(receitaEsperadaMes)}</p>
-            </div>
-            <Badge className="bg-accent/15 text-accent border-accent/30 text-[10px]">Previsto</Badge>
-          </div>
 
           <h3 className="text-sm font-semibold text-foreground mb-3">Receitas por Categoria</h3>
           <div className="flex items-center gap-4">
