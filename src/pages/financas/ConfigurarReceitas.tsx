@@ -216,14 +216,17 @@ const chipFor = (s: string) => {
 interface SalaryMulta { id: string; nome: string; valor: number; }
 interface SalaryConfig {
   baseSalary: number;
-  deductionRate: number;
+  irtRate: number;
+  ssRate: number;
   multas: SalaryMulta[];
 }
-const seedSalaryConfig = (s: Salary): SalaryConfig => ({
-  baseSalary: s.grossSalary,
-  deductionRate: s.deductions / s.grossSalary,
-  multas: [],
-});
+const seedSalaryConfig = (s: Salary): SalaryConfig => {
+  // Decompose existing deductions into IRT + SS aproximação (default 8% + 3%)
+  const total = s.deductions / s.grossSalary;
+  const ssRate = Math.min(0.03, total);
+  const irtRate = Math.max(0, total - ssRate);
+  return { baseSalary: s.grossSalary, irtRate, ssRate, multas: [] };
+};
 
 /* ════════════════════════════════════════════════════════════════════════
    MAIN COMPONENT
