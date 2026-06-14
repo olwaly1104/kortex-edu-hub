@@ -10,7 +10,7 @@ import {
 import {
   ArrowLeft, Calendar as CalendarIcon, Building2, User as UserIcon,
   CheckCircle2, Megaphone, ChevronRight, Clock, FileText, Tag,
-  Users, Share2, Eye, Download, Paperclip,
+  Users, Share2, Eye, Download, Paperclip, FileImage, FileSpreadsheet,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
