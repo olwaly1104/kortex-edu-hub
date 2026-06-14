@@ -471,7 +471,7 @@ export default function FinancasCalendario() {
                   <h3 className="text-sm font-bold text-foreground capitalize leading-tight mt-0.5 truncate">{fmtLong(selectedDate)}</h3>
                 </div>
                 <Badge variant="outline" className="text-[10px] shrink-0 ml-2">
-                  {selectedEvents.length} evento{selectedEvents.length !== 1 ? "s" : ""}
+                  {selectedEvents.length} entrada{selectedEvents.length !== 1 ? "s" : ""}
                 </Badge>
               </div>
               {selectedEvents.length === 0 ? (
