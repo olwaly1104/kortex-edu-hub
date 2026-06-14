@@ -182,7 +182,9 @@ export const finTypeMeta: Record<FinType, { label: string; icon: LucideIcon; cls
 
 export const finStatusMeta: Record<FinStatus, { label: string; cls: string; dot: string; icon: LucideIcon }> = {
   pendente:  { label: "Pendente",  cls: "bg-amber-50 text-amber-700 border-amber-200",       dot: "bg-amber-500",   icon: Clock },
+  atrasado:  { label: "Em atraso", cls: "bg-orange-50 text-orange-700 border-orange-200",    dot: "bg-orange-500",  icon: AlertTriangle },
   aprovado:  { label: "Aprovada",  cls: "bg-emerald-50 text-emerald-700 border-emerald-200", dot: "bg-emerald-500", icon: CheckCircle2 },
+  executada: { label: "Executada", cls: "bg-teal-50 text-teal-700 border-teal-200",          dot: "bg-teal-500",    icon: BadgeCheck },
   rejeitado: { label: "Rejeitada", cls: "bg-red-50 text-red-600 border-red-200",             dot: "bg-red-500",     icon: XCircle },
 };
 
