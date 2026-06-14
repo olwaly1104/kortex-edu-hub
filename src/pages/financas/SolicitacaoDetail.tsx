@@ -9,8 +9,10 @@ import {
   Eye, Download, Users, Share2, Paperclip, FileImage, FileSpreadsheet, CheckCircle2, XCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import {
-  Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger,
+  Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose,
 } from "@/components/ui/dialog";
 import {
   finSolicitacoes, finStatusMeta, finTypeMeta,
@@ -23,6 +25,9 @@ export default function FinancasSolicitacaoDetail() {
   const { toast } = useToast();
   const baseSelected = finSolicitacoes.find(s => s.id === id);
   const [statusOverride, setStatusOverride] = useState<null | "em_execucao" | "executada" | "rejeitado">(null);
+  const [pendingAction, setPendingAction] = useState<null | "em_execucao" | "executada" | "rejeitado">(null);
+  const [actionNotes, setActionNotes] = useState("");
+  const [actionFiles, setActionFiles] = useState<File[]>([]);
 
   if (!baseSelected) {
     return (
@@ -94,7 +99,15 @@ export default function FinancasSolicitacaoDetail() {
     pending:   "bg-background border-2 border-dashed border-border text-muted-foreground",
   };
 
-  const handleAction = (action: "em_execucao" | "rejeitado" | "executada") => {
+  const openAction = (action: "em_execucao" | "rejeitado" | "executada") => {
+    setActionNotes("");
+    setActionFiles([]);
+    setPendingAction(action);
+  };
+
+  const confirmAction = () => {
+    if (!pendingAction) return;
+    const action = pendingAction;
     setStatusOverride(action);
     const titles: Record<typeof action, string> = {
       em_execucao: "Solicitação aprovada",
@@ -107,7 +120,43 @@ export default function FinancasSolicitacaoDetail() {
       executada: `O pedido ${selected.ref} foi marcado como executado.`,
     };
     toast({ title: titles[action], description: descs[action] });
+    setPendingAction(null);
+    setActionNotes("");
+    setActionFiles([]);
   };
+
+  const actionMeta: Record<"em_execucao" | "rejeitado" | "executada", { title: string; desc: string; cta: string; tone: string; icon: typeof Check; notesLabel: string; notesPlaceholder: string }> = {
+    em_execucao: {
+      title: "Aprovar solicitação",
+      desc: `Registe o parecer da aprovação do pedido ${selected.ref}. As notas e anexos ficam no histórico.`,
+      cta: "Aprovar",
+      tone: "bg-emerald-600 hover:bg-emerald-700 text-white",
+      icon: CheckCircle2,
+      notesLabel: "Parecer / Justificação",
+      notesPlaceholder: "Ex: Pedido validado conforme orçamento de Maio. Em conformidade com a política financeira.",
+    },
+    rejeitado: {
+      title: "Rejeitar solicitação",
+      desc: `Indique o motivo da rejeição do pedido ${selected.ref}. As notas ficam no histórico do requerente.`,
+      cta: "Rejeitar",
+      tone: "bg-red-600 hover:bg-red-700 text-white",
+      icon: XCircle,
+      notesLabel: "Motivo da rejeição",
+      notesPlaceholder: "Ex: Documentação incompleta. Falta fatura original e comprovativo bancário.",
+    },
+    executada: {
+      title: "Confirmar execução",
+      desc: `Confirme a execução do pedido ${selected.ref} e anexe o comprovativo (transferência, recibo, fatura).`,
+      cta: "Confirmar execução",
+      tone: "bg-blue-600 hover:bg-blue-700 text-white",
+      icon: Check,
+      notesLabel: "Notas da execução",
+      notesPlaceholder: "Ex: Reembolso transferido para IBAN do requerente em 14/06/2026. Ref. transação TRX-44821.",
+    },
+  };
+
+  const pm = pendingAction ? actionMeta[pendingAction] : null;
+
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
@@ -144,10 +193,10 @@ export default function FinancasSolicitacaoDetail() {
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" className="h-7 text-[11px] gap-1.5 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-300 transition-colors" onClick={() => handleAction("rejeitado")}>
+                <Button variant="outline" size="sm" className="h-7 text-[11px] gap-1.5 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-300 transition-colors" onClick={() => openAction("rejeitado")}>
                   <XCircle className="w-3.5 h-3.5" /> Rejeitar
                 </Button>
-                <Button size="sm" className="h-7 text-[11px] gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white transition-colors" onClick={() => handleAction("em_execucao")}>
+                <Button size="sm" className="h-7 text-[11px] gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white transition-colors" onClick={() => openAction("em_execucao")}>
                   <CheckCircle2 className="w-3.5 h-3.5" /> Aprovar
                 </Button>
               </div>
@@ -164,7 +213,7 @@ export default function FinancasSolicitacaoDetail() {
                 <span className="text-[11px] text-muted-foreground">Aguarda confirmação de execução</span>
               </div>
               <div className="flex items-center gap-2">
-                <Button size="sm" className="h-7 text-[11px] gap-1.5 bg-blue-600 hover:bg-blue-700 text-white transition-colors" onClick={() => handleAction("executada")}>
+                <Button size="sm" className="h-7 text-[11px] gap-1.5 bg-blue-600 hover:bg-blue-700 text-white transition-colors" onClick={() => openAction("executada")}>
                   <Check className="w-3.5 h-3.5" /> Confirmar execução
                 </Button>
               </div>
@@ -448,6 +497,99 @@ export default function FinancasSolicitacaoDetail() {
           </main>
         </div>
       </Card>
+      {/* Action confirmation dialog */}
+      <Dialog open={!!pendingAction} onOpenChange={(o) => !o && setPendingAction(null)}>
+        <DialogContent className="max-w-md">
+          {pm && (
+            <>
+              <DialogHeader>
+                <div className="flex items-center gap-2.5">
+                  <div className={cn("w-9 h-9 rounded-lg flex items-center justify-center shrink-0",
+                    pendingAction === "em_execucao" && "bg-emerald-50 text-emerald-600",
+                    pendingAction === "rejeitado" && "bg-red-50 text-red-600",
+                    pendingAction === "executada" && "bg-blue-50 text-blue-600",
+                  )}>
+                    <pm.icon className="w-5 h-5" />
+                  </div>
+                  <div className="min-w-0">
+                    <DialogTitle className="text-base">{pm.title}</DialogTitle>
+                    <DialogDescription className="text-[12px] mt-0.5">{tm.label} · {selected.title}</DialogDescription>
+                  </div>
+                </div>
+              </DialogHeader>
+
+              <div className="space-y-4 pt-1">
+                <p className="text-[12px] text-muted-foreground leading-relaxed">{pm.desc}</p>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="action-notes" className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground">
+                    {pm.notesLabel}
+                  </Label>
+                  <Textarea
+                    id="action-notes"
+                    value={actionNotes}
+                    onChange={(e) => setActionNotes(e.target.value)}
+                    placeholder={pm.notesPlaceholder}
+                    rows={4}
+                    className="resize-none text-sm"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground">
+                    Evidências e anexos
+                  </Label>
+                  <label className="flex items-center gap-2 px-3 py-2.5 rounded-md border border-dashed border-border bg-muted/20 hover:bg-muted/40 cursor-pointer transition-colors">
+                    <Paperclip className="w-4 h-4 text-muted-foreground shrink-0" />
+                    <span className="text-[12px] text-muted-foreground flex-1">
+                      Anexar comprovativo, fatura ou documento de suporte
+                    </span>
+                    <span className="text-[11px] font-semibold text-primary">Carregar</span>
+                    <input
+                      type="file"
+                      multiple
+                      className="hidden"
+                      onChange={(e) => setActionFiles(prev => [...prev, ...Array.from(e.target.files ?? [])])}
+                    />
+                  </label>
+                  {actionFiles.length > 0 && (
+                    <div className="space-y-1 pt-1">
+                      {actionFiles.map((f, i) => (
+                        <div key={i} className="flex items-center gap-2 px-2.5 py-1.5 rounded-md border border-border bg-background">
+                          <FileText className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                          <span className="text-[12px] text-foreground flex-1 truncate">{f.name}</span>
+                          <span className="text-[10px] text-muted-foreground tabular-nums">{(f.size / 1024).toFixed(0)} KB</span>
+                          <button
+                            type="button"
+                            onClick={() => setActionFiles(prev => prev.filter((_, idx) => idx !== i))}
+                            className="text-muted-foreground hover:text-destructive transition-colors"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <DialogFooter className="gap-2 sm:gap-2">
+                <DialogClose asChild>
+                  <Button variant="outline" size="sm" className="h-9">Cancelar</Button>
+                </DialogClose>
+                <Button
+                  size="sm"
+                  className={cn("h-9 gap-1.5", pm.tone)}
+                  onClick={confirmAction}
+                  disabled={!actionNotes.trim()}
+                >
+                  <pm.icon className="w-4 h-4" /> {pm.cta}
+                </Button>
+              </DialogFooter>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
