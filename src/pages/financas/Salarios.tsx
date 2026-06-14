@@ -29,8 +29,7 @@ const contractColors: Record<string, string> = {
 };
 const contractLabels: Record<string, string> = { efectivo: "Efectivo", contratado: "Contratado", colaborador: "Colaborador" };
 
-const periodoMultiplier: Record<Periodo, number> = { mensal: 1, semestral: 6, anual: 12 };
-const periodoLabels: Record<Periodo, string> = { mensal: "Mensal", semestral: "Semestral", anual: "Anual" };
+// Period multipliers/labels come from shared PeriodSelector
 
 export default function Salarios() {
   const { toast } = useToast();
