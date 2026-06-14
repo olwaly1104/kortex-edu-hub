@@ -295,7 +295,9 @@ export default function FinancasAnuncios() {
                   <div className="flex items-center justify-between gap-3 mt-3 pt-3 border-t border-border">
                     <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
                       <UserIcon className="w-3 h-3" />
-                      <span className="font-medium text-foreground">{a.author}</span>
+                      <span className="font-medium text-foreground">
+                        {a.author === a.department ? "—" : a.author}
+                      </span>
                     </div>
                     <div className="flex items-center gap-2">
                       {a.cta === "inscrever" && (
