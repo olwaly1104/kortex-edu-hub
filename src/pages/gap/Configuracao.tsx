@@ -61,18 +61,14 @@ const defaultResponsavelByDestino = (destino: string) => {
 export default function GapConfiguracao() {
   const { toast } = useToast();
 
-  // Per-tab edit lock
-  const [editingTab, setEditingTab] = useState<{ sol: boolean; ag: boolean; cd: boolean }>({ sol: false, ag: false, cd: false });
-  const [activeTab, setActiveTab] = useState<"solicitacoes" | "agendamentos" | "candidaturas">("solicitacoes");
-  const isEditing =
-    (activeTab === "solicitacoes" && editingTab.sol) ||
-    (activeTab === "agendamentos" && editingTab.ag) ||
-    (activeTab === "candidaturas" && editingTab.cd);
-  const toggleEdit = (tab: "sol" | "ag" | "cd") => setEditingTab(prev => ({ ...prev, [tab]: !prev[tab] }));
-  const EditToggle = ({ tab }: { tab: "sol" | "ag" | "cd" }) => {
-    const on = editingTab[tab];
+  // Per-card edit lock
+  const [cardEdit, setCardEdit] = useState<Record<string, boolean>>({});
+  const isCardEditing = (id: string) => !!cardEdit[id];
+  const toggleCardEdit = (id: string) => setCardEdit(prev => ({ ...prev, [id]: !prev[id] }));
+  const CardEditToggle = ({ id }: { id: string }) => {
+    const on = !!cardEdit[id];
     return (
-      <Button size="sm" variant={on ? "default" : "outline"} onClick={() => toggleEdit(tab)} className="gap-1.5 h-8 text-xs">
+      <Button size="sm" variant={on ? "default" : "outline"} onClick={() => toggleCardEdit(id)} className="gap-1.5 h-8 text-xs">
         {on ? <><Unlock className="w-3.5 h-3.5" /> Bloquear</> : <><Pencil className="w-3.5 h-3.5" /> Editar</>}
       </Button>
     );
