@@ -481,7 +481,7 @@ export default function ConfigurarReceitas() {
     setEditingDespesa(null);
     setDespesaForm({
       id: "", nome: "",
-      categoria: categorias[0],
+      categoria: categorias[0].label,
       estado: estados[0] ?? "",
       departamento: "Geral", periodicidade: "mensal", valorEstimado: 0,
     });
