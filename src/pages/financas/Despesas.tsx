@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { formatCurrency, despesas } from "@/data/financeModuleData";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { FinHeader } from "./_FinHeader";
 
 type SortField = "amount";
 type SortDir = "asc" | "desc";
