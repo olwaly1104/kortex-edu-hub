@@ -319,28 +319,18 @@ export default function FinancasAnuncios() {
                     </div>
                   )}
 
-                  {/* footer: author only + ver detalhes */}
-                  <div className="flex items-center justify-between gap-3 mt-3 pt-2.5 border-t border-border/60">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <div className="w-6 h-6 rounded-full bg-primary/10 text-primary text-[10px] font-semibold flex items-center justify-center shrink-0">
-                        {initials || <UserIcon className="w-3 h-3" />}
-                      </div>
-                      <span className="text-[11px] font-medium text-foreground truncate">
-                        {a.author || a.department}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-1.5 shrink-0">
-                      {a.isMine && (
-                        <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => handleDelete(a.id)}>
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </Button>
-                      )}
-                      <Button asChild size="sm" variant="outline" className="h-7 text-[11px] gap-1.5 px-2.5 border-primary/30 text-primary hover:bg-primary hover:text-primary-foreground">
-                        <Link to={`/financas/anuncios/${a.id}`}>
-                          Ver detalhes <ArrowRight className="w-3 h-3 transition-transform group-hover:translate-x-0.5" />
-                        </Link>
+                  {/* footer: actions only */}
+                  <div className="flex items-center justify-end gap-1.5 mt-3 pt-2.5 border-t border-border/60">
+                    {a.isMine && (
+                      <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => handleDelete(a.id)}>
+                        <Trash2 className="w-3.5 h-3.5" />
                       </Button>
-                    </div>
+                    )}
+                    <Button asChild size="sm" variant="outline" className="h-7 text-[11px] gap-1.5 px-2.5 border-primary/30 text-primary hover:bg-primary hover:text-primary-foreground">
+                      <Link to={`/financas/anuncios/${a.id}`}>
+                        Ver detalhes <ArrowRight className="w-3 h-3 transition-transform group-hover:translate-x-0.5" />
+                      </Link>
+                    </Button>
                   </div>
 
                 </div>
