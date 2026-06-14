@@ -240,6 +240,17 @@ export default function ConfigurarReceitas() {
 
   const [mode, setMode] = useState<Mode>("receitas");
 
+  /* ── Header live clock ── */
+  const [now, setNow] = useState<Date>(new Date());
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(id);
+  }, []);
+  const liveTime = `${String(now.getHours()).padStart(2, "0")}h:${String(now.getMinutes()).padStart(2, "0")}min:${String(now.getSeconds()).padStart(2, "0")}s`;
+  const todayLabel = new Date().toLocaleDateString("pt-PT", { weekday: "long", day: "2-digit", month: "long", year: "numeric" });
+  const ANO_LETIVO = "2024 / 2025";
+
+
   /* ── RECEITAS ── */
   const [receitas, setReceitas] = useState<ReceitaRow[]>(initialReceitas);
   const [receitaFilter, setReceitaFilter] = useState<string>("todos");
