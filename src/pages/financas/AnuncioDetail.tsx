@@ -186,9 +186,6 @@ export default function FinancasAnuncioDetail() {
             <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground font-semibold">Dados</p>
 
 
-            {/* Dados */}
-            <div className="pt-4 border-t border-border space-y-4">
-              <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground font-semibold">Dados</p>
 
               <MetaCell
                 icon={<UserIcon className="w-3 h-3" />}
