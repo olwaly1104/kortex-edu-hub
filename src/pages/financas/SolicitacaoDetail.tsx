@@ -547,8 +547,9 @@ export default function FinancasSolicitacaoDetail() {
                       </div>
                       <div className={cn("flex-1 min-w-0", !isLast && "pb-5")}>
                         <div className="flex items-baseline justify-between gap-2 flex-wrap">
-                          <p className="text-sm font-medium text-foreground">{s.label}</p>
+                          <p className={cn("text-sm font-medium", s.tone === "pending" ? "text-muted-foreground" : "text-foreground")}>{s.label}</p>
                           {s.data && <span className="text-[10px] text-muted-foreground tabular-nums whitespace-nowrap">{s.data}</span>}
+                          {!s.data && s.previsao && <span className="text-[10px] text-amber-700 bg-amber-50 border border-amber-200 rounded px-1.5 py-0.5 tabular-nums whitespace-nowrap font-medium">{s.previsao}</span>}
                         </div>
                         {s.actor && <p className="text-[11px] text-muted-foreground mt-0.5">{s.actor}</p>}
                         {s.aside && (
