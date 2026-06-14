@@ -199,14 +199,7 @@ export default function FinancasAnuncioDetail() {
               <MetaCell
                 icon={<UserIcon className="w-3 h-3" />}
                 label="Publicado por"
-                value={
-                  <span className="inline-flex items-center gap-2">
-                    <span className="w-6 h-6 rounded-full bg-primary/10 text-primary text-[10px] font-bold flex items-center justify-center ring-1 ring-primary/15">
-                      {initials}
-                    </span>
-                    <span className="truncate">{ann.author}</span>
-                  </span>
-                }
+                value={<span className="truncate">{ann.author}</span>}
               />
               <MetaCell
                 icon={<Building2 className="w-3 h-3" />}
