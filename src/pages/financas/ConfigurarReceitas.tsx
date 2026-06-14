@@ -16,8 +16,9 @@ import {
   Settings2, Plus, Pencil, Trash2, ArrowLeft, ChevronRight, Search,
   GraduationCap, BookOpen, FileText, ClipboardCheck, AlertTriangle, Building2,
   Users, Banknote, TrendingDown, TrendingUp, Tag, CircleDot, X,
-  CalendarDays, Clock,
+  CalendarDays, Clock, Briefcase, UserCog,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { formatCurrency, salarios as initialSalarios, type Salary } from "@/data/financeModuleData";
 import { reitorFaculties } from "@/data/institutionData";
 import { useToast } from "@/hooks/use-toast";
