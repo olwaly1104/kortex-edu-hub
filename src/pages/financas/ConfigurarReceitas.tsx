@@ -39,12 +39,19 @@ const TIPOS_RECEITA: TipoReceita[] = [
   "Multa Estudante", "Multa Administrativo", "Multa Docente",
 ];
 
+interface PropinaPlan {
+  months: number;
+  valor: number;
+}
+
 interface ReceitaRow {
   id: string;
   nome: string;
   tipo: TipoReceita;
   escopo: string; // "geral" or course id
   valor: number;
+  /** Only for "Propina mensal" — payment plans (e.g. 10x52k or 11x60k). When present, `valor` mirrors plans[0].valor. */
+  plans?: PropinaPlan[];
 }
 
 const ALL_COURSES = reitorFaculties.flatMap(f =>
