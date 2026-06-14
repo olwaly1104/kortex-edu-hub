@@ -283,19 +283,6 @@ export default function FinancasAnuncioDetail() {
                   value={m.label}
                 />
               </div>
-              {ann.ctaDeadline && (
-                <div className="pt-3">
-                  <MetaCell
-                    icon={<Clock className="w-3 h-3" />}
-                    label="Data limite"
-                    value={
-                      <span className="tabular-nums font-semibold">
-                        {ann.ctaDeadline}{ann.ctaDeadlineTime ? ` · ${ann.ctaDeadlineTime}` : ""}
-                      </span>
-                    }
-                  />
-                </div>
-              )}
             </div>
           </aside>
 
