@@ -13,6 +13,7 @@ import { formatCurrency, despesas } from "@/data/financeModuleData";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { FinHeader } from "./_FinHeader";
+import { PeriodSelector, PERIODO_MULT, type Periodo, periodoDefaultValue } from "./_PeriodSelector";
 
 type SortField = "amount";
 type SortDir = "asc" | "desc";
@@ -36,6 +37,10 @@ export default function Despesas() {
   const [sortField, setSortField] = useState<SortField | null>(null);
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [periodo, setPeriodo] = useState<Periodo>("mes");
+  const [periodoValue, setPeriodoValue] = useState<string>(periodoDefaultValue("mes"));
+  const mult = PERIODO_MULT[periodo];
+
 
   const isSortActive = sortField !== null;
   const isStatusActive = filterStatus !== "todos";
@@ -72,13 +77,16 @@ export default function Despesas() {
         }
       />
 
+      {/* Período toggle + result + selector */}
+      <PeriodSelector periodo={periodo} setPeriodo={setPeriodo} value={periodoValue} setValue={setPeriodoValue} />
+
       {/* KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: "Despesas Total do Mês", value: formatCurrency(totalMes), icon: TrendingDown, color: "text-foreground" },
-          { label: "Aprovadas", value: formatCurrency(aprovadas), icon: Wallet, color: "text-accent" },
-          { label: "Pendentes", value: formatCurrency(pendentes), icon: Clock, color: "text-amber-600" },
-          { label: "Rejeitadas", value: formatCurrency(rejeitadas), icon: Ban, color: "text-destructive" },
+          { label: periodo === "mes" ? "Despesas Total do Mês" : periodo === "semestre" ? "Despesas Total do Semestre" : "Despesas Total do Ano", value: formatCurrency(totalMes * mult), icon: TrendingDown, color: "text-foreground" },
+          { label: "Aprovadas", value: formatCurrency(aprovadas * mult), icon: Wallet, color: "text-accent" },
+          { label: "Pendentes", value: formatCurrency(pendentes * mult), icon: Clock, color: "text-amber-600" },
+          { label: "Rejeitadas", value: formatCurrency(rejeitadas * mult), icon: Ban, color: "text-destructive" },
         ].map(kpi => (
           <Card key={kpi.label} className="p-4">
             <div className="flex items-center gap-2 mb-3">
@@ -89,6 +97,7 @@ export default function Despesas() {
           </Card>
         ))}
       </div>
+
 
       {/* Controls */}
       <div className="rounded-xl border border-border bg-card p-4 space-y-3">

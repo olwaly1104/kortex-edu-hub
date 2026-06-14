@@ -10,10 +10,10 @@ import { formatCurrency, salarios, payrollBudget } from "@/data/financeModuleDat
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { FinHeader } from "./_FinHeader";
+import { PeriodSelector, PERIODO_MULT, type Periodo, periodoDefaultValue } from "./_PeriodSelector";
 
 type SortField = "grossSalary" | "netSalary" | "deductions";
 type SortDir = "asc" | "desc";
-type Periodo = "mensal" | "semestral" | "anual";
 
 const statusColors: Record<string, string> = {
   pago: "bg-accent/15 text-accent border-accent/30",
@@ -29,8 +29,7 @@ const contractColors: Record<string, string> = {
 };
 const contractLabels: Record<string, string> = { efectivo: "Efectivo", contratado: "Contratado", colaborador: "Colaborador" };
 
-const periodoMultiplier: Record<Periodo, number> = { mensal: 1, semestral: 6, anual: 12 };
-const periodoLabels: Record<Periodo, string> = { mensal: "Mensal", semestral: "Semestral", anual: "Anual" };
+// Period multipliers/labels come from shared PeriodSelector
 
 export default function Salarios() {
   const { toast } = useToast();
@@ -39,9 +38,10 @@ export default function Salarios() {
   const [filterContract, setFilterContract] = useState("todos");
   const [sortField, setSortField] = useState<SortField | null>(null);
   const [sortDir, setSortDir] = useState<SortDir>("desc");
-  const [periodo, setPeriodo] = useState<Periodo>("mensal");
+  const [periodo, setPeriodo] = useState<Periodo>("mes");
+  const [periodoValue, setPeriodoValue] = useState<string>(periodoDefaultValue("mes"));
 
-  const mult = periodoMultiplier[periodo];
+  const mult = PERIODO_MULT[periodo];
 
   const isStatusActive = filterStatus !== "todos";
   const isContractActive = filterContract !== "todos";
@@ -77,18 +77,15 @@ export default function Salarios() {
         subtitle="Processamento salarial, descontos e contratos."
         icon={<CreditCard className="w-5 h-5 text-primary" />}
         right={
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1 rounded-lg border border-border bg-muted/30 p-0.5">
-              {(["mensal", "semestral", "anual"] as Periodo[]).map(p => (
-                <Button key={p} size="sm" variant={periodo === p ? "default" : "ghost"} onClick={() => setPeriodo(p)} className="text-xs h-8 px-3">{periodoLabels[p]}</Button>
-              ))}
-            </div>
-            <Button variant="outline" size="sm" className="gap-1.5" onClick={() => toast({ title: "Relatório exportado" })}>
-              <Download className="w-4 h-4" /> Exportar
-            </Button>
-          </div>
+          <Button variant="outline" size="sm" className="gap-1.5" onClick={() => toast({ title: "Relatório exportado" })}>
+            <Download className="w-4 h-4" /> Exportar
+          </Button>
         }
       />
+
+      {/* Período toggle + result + selector */}
+      <PeriodSelector periodo={periodo} setPeriodo={setPeriodo} value={periodoValue} setValue={setPeriodoValue} />
+
 
       {/* KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">

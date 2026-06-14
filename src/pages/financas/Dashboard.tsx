@@ -18,6 +18,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { FinHeader } from "./_FinHeader";
+import { PeriodSelector, PERIODO_MULT, type Periodo, periodoDefaultValue } from "./_PeriodSelector";
 
 /* ── month mapping ───────────────────────────────── */
 const MONTH_FULL: Record<string, string> = {
@@ -71,7 +72,12 @@ export default function FinancasDashboard() {
   const [txSearch, setTxSearch] = useState("");
   const [txCategory, setTxCategory] = useState("todos");
   const [txType, setTxType] = useState("todos");
-  const [selectedMonth, setSelectedMonth] = useState<string>(monthlyData[monthlyData.length - 1].month);
+  const [periodo, setPeriodo] = useState<Periodo>("mes");
+  const [periodoValue, setPeriodoValue] = useState<string>(periodoDefaultValue("mes"));
+  const mult = PERIODO_MULT[periodo];
+  // Map full month name back to short for monthlyData lookup
+  const MONTH_SHORT: Record<string, string> = Object.fromEntries(Object.entries(MONTH_FULL).map(([k, v]) => [v, k]));
+  const selectedMonth = periodo === "mes" ? (MONTH_SHORT[periodoValue] ?? monthlyData[monthlyData.length - 1].month) : monthlyData[monthlyData.length - 1].month;
 
   const monthIdx = monthlyData.findIndex(m => m.month === selectedMonth);
   const cur = monthlyData[monthIdx] ?? monthlyData[monthlyData.length - 1];
@@ -103,32 +109,18 @@ export default function FinancasDashboard() {
         subtitle="Visão geral das receitas, despesas e transações institucionais."
       />
 
-      {/* Mês de referência — plain text above KPIs */}
-      <div className="flex items-end justify-between gap-3 flex-wrap">
-        <div>
-          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Mes</p>
-          <p className="text-lg font-bold text-foreground leading-tight capitalize">{selectedMonthLabel} 2025</p>
-        </div>
-        <Select value={selectedMonth} onValueChange={setSelectedMonth}>
-          <SelectTrigger className="w-[180px] h-9 text-sm">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {monthlyData.map(m => (
-              <SelectItem key={m.month} value={m.month}>{MONTH_FULL[m.month] ?? m.month}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      {/* Período toggle + result + selector */}
+      <PeriodSelector periodo={periodo} setPeriodo={setPeriodo} value={periodoValue} setValue={setPeriodoValue} />
 
       {/* ── KPIs ── */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
-        <KPICard label="Receita Esperada" value={formatCurrency(receitaEsperadaMes)} subtitle="Este Mês" icon={Receipt} accent />
-        <KPICard label="Receitas do Mês" value={formatCurrency(cur.receitas)} change={receitaVar} icon={TrendingUp} positive />
-        <KPICard label="Despesa Orçamentada" value={formatCurrency(despesaOrcamentadaMes)} subtitle="Este Mês" icon={FileText} accent />
-        <KPICard label="Despesas do Mês" value={formatCurrency(cur.despesas)} change={despesaVar} icon={TrendingDown} positive={false} />
-        <KPICard label="Salários a Processar" value={formatCurrency(totalBruto)} subtitle={`${salariosPagos} pagos · ${salariosPendentes} pendentes`} icon={CreditCard} />
+        <KPICard label="Receita Esperada" value={formatCurrency(receitaEsperadaMes * mult)} subtitle={periodo === "mes" ? "Este Mês" : periodo === "semestre" ? "Este Semestre" : "Este Ano"} icon={Receipt} accent />
+        <KPICard label={periodo === "mes" ? "Receitas do Mês" : periodo === "semestre" ? "Receitas do Semestre" : "Receitas do Ano"} value={formatCurrency(cur.receitas * mult)} change={receitaVar} icon={TrendingUp} positive />
+        <KPICard label="Despesa Orçamentada" value={formatCurrency(despesaOrcamentadaMes * mult)} subtitle={periodo === "mes" ? "Este Mês" : periodo === "semestre" ? "Este Semestre" : "Este Ano"} icon={FileText} accent />
+        <KPICard label={periodo === "mes" ? "Despesas do Mês" : periodo === "semestre" ? "Despesas do Semestre" : "Despesas do Ano"} value={formatCurrency(cur.despesas * mult)} change={despesaVar} icon={TrendingDown} positive={false} />
+        <KPICard label="Salários a Processar" value={formatCurrency(totalBruto * mult)} subtitle={`${salariosPagos} pagos · ${salariosPendentes} pendentes`} icon={CreditCard} />
       </div>
+
 
       {/* ── Charts row ── */}
       <div className="grid lg:grid-cols-5 gap-4">

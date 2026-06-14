@@ -8,6 +8,7 @@ import { Card } from "@/components/ui/card";
 import { formatCurrency, orcamentos } from "@/data/financeModuleData";
 import { cn } from "@/lib/utils";
 import { FinHeader } from "./_FinHeader";
+import { PeriodSelector, type Periodo, periodoDefaultValue } from "./_PeriodSelector";
 
 const statusConfig: Record<string, { label: string; className: string; dot: string }> = {
   activo: { label: "Activo", className: "bg-accent/10 text-accent border-accent/20", dot: "bg-accent" },
@@ -29,6 +30,8 @@ const usageBar = (pct: number) => {
 export default function Orcamentos() {
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("todos");
+  const [periodo, setPeriodo] = useState<Periodo>("ano");
+  const [periodoValue, setPeriodoValue] = useState<string>(periodoDefaultValue("ano"));
 
   const filtered = useMemo(() => {
     return orcamentos
@@ -97,14 +100,10 @@ export default function Orcamentos() {
         }
       />
 
-      {/* Ano Letivo banner */}
-      <div className="flex items-center justify-between gap-3 rounded-lg border border-border/70 bg-muted/30 px-4 py-2.5">
-        <div className="flex items-center gap-2">
-          <span className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground font-semibold">Ano Letivo</span>
-          <span className="text-sm font-semibold text-foreground tabular-nums">{orcamentos[0]?.period ?? "2025"}</span>
-        </div>
-        <p className="text-[11px] text-muted-foreground">Todos os dados abaixo referem-se a este ano letivo</p>
-      </div>
+      {/* Período toggle + result + selector */}
+      <PeriodSelector periodo={periodo} setPeriodo={setPeriodo} value={periodoValue} setValue={setPeriodoValue} />
+
+
 
       {/* Orçamento — anchor card */}
       <Card className="overflow-hidden p-0">
