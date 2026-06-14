@@ -185,6 +185,29 @@ interface DespesaRow {
 interface ResponsavelItem { id: string; nome: string; cargo: string; }
 interface DestinatarioMap { categoria: string; destinatario: string; }
 interface ApprovalRule { id: string; min: number; max: number; responsavelId: string; }
+interface CategoriaItem { id: string; label: string; color: string; }
+
+const CAT_PALETTE: { name: string; cls: string; dot: string }[] = [
+  { name: "Azul",     cls: "bg-blue-50 text-blue-700 border-blue-200",         dot: "bg-blue-500" },
+  { name: "Verde",    cls: "bg-emerald-50 text-emerald-700 border-emerald-200", dot: "bg-emerald-500" },
+  { name: "Violeta",  cls: "bg-violet-50 text-violet-700 border-violet-200",   dot: "bg-violet-500" },
+  { name: "Âmbar",    cls: "bg-amber-50 text-amber-700 border-amber-200",      dot: "bg-amber-500" },
+  { name: "Rosa",     cls: "bg-pink-50 text-pink-700 border-pink-200",         dot: "bg-pink-500" },
+  { name: "Turquesa", cls: "bg-teal-50 text-teal-700 border-teal-200",         dot: "bg-teal-500" },
+  { name: "Índigo",   cls: "bg-indigo-50 text-indigo-700 border-indigo-200",   dot: "bg-indigo-500" },
+  { name: "Laranja",  cls: "bg-orange-50 text-orange-700 border-orange-200",   dot: "bg-orange-500" },
+  { name: "Vermelho", cls: "bg-red-50 text-red-700 border-red-200",            dot: "bg-red-500" },
+  { name: "Cinzento", cls: "bg-slate-50 text-slate-700 border-slate-200",      dot: "bg-slate-500" },
+];
+
+const INITIAL_CATEGORIAS: CategoriaItem[] = [
+  { id: "cat-sal",  label: "Salários",                color: CAT_PALETTE[0].cls },
+  { id: "cat-aca",  label: "Académico",               color: CAT_PALETTE[1].cls },
+  { id: "cat-man",  label: "Manutenção & Logística",  color: CAT_PALETTE[7].cls },
+  { id: "cat-eve",  label: "Eventos",                 color: CAT_PALETTE[2].cls },
+  { id: "cat-ser",  label: "Serviços",                color: CAT_PALETTE[6].cls },
+  { id: "cat-bol",  label: "Bolsas & Apoios",         color: CAT_PALETTE[4].cls },
+];
 
 const DEPARTAMENTOS = [
   "Geral", "Reitoria", "Administração", "Docentes", "TI", "Serviços Gerais",
