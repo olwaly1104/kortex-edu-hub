@@ -92,7 +92,7 @@ export default function FinancasSolicitacaoDetail() {
     steps.push({ label: "Solicitação rejeitada", data: rej?.data, actor: rej?.actor ?? decisionActor, nota: rej?.nota, anexos: rej?.anexos, tone: "rejected" });
   } else if (isExecucao) {
     const ap = selected.historico.slice().reverse().find(h => h.accao.toLowerCase().includes("aprov"));
-    steps.push({ label: "Solicitação aprovada", data: ap?.data, actor: ap?.actor ?? decisionActor, nota: ap?.nota, anexos: ap?.anexos, tone: "accepted" });
+    steps.push({ label: "Solicitação em Execução", data: ap?.data, actor: ap?.actor ?? decisionActor, nota: ap?.nota, anexos: ap?.anexos, tone: "accepted" });
   } else {
     const diff = Math.ceil((decisionForecast.getTime() - hoje.getTime()) / 86400000);
     const overdue = diff < 0;
