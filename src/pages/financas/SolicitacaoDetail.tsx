@@ -4,6 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   ArrowLeft, Clock, FileText, MessageSquare, Mail, Phone, Check, X, Hourglass, Send,
   Eye, Download, Users, Share2, Paperclip, FileImage, FileSpreadsheet, CheckCircle2, XCircle,
@@ -31,6 +32,8 @@ export default function FinancasSolicitacaoDetail() {
   const [actionFiles, setActionFiles] = useState<File[]>([]);
   const [actionStep, setActionStep] = useState<0 | 1 | 2>(0);
   const [maxStep, setMaxStep] = useState<0 | 1 | 2>(0);
+  const [declarationChecked, setDeclarationChecked] = useState(false);
+
 
 
 
@@ -109,6 +112,7 @@ export default function FinancasSolicitacaoDetail() {
     setActionFiles([]);
     setActionStep(0);
     setMaxStep(0);
+    setDeclarationChecked(false);
     setPendingAction(action);
   };
 
@@ -521,67 +525,73 @@ export default function FinancasSolicitacaoDetail() {
       </Card>
       {/* Action confirmation dialog */}
       <Dialog open={!!pendingAction} onOpenChange={(o) => !o && setPendingAction(null)}>
-        <DialogContent className="max-w-[460px] p-0 gap-0 overflow-hidden">
+        <DialogContent className="max-w-[520px] p-0 gap-0 overflow-hidden">
           {pm && (
             <>
               {/* Header */}
-              <div className="px-5 pt-4 pb-3 border-b border-border flex items-start justify-between gap-3">
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <div className={cn("w-8 h-8 rounded-md flex items-center justify-center shrink-0", pm.iconBg)}>
-                    <pm.icon className="w-4 h-4" />
+              <div className="px-5 pt-4 pb-3 border-b border-border">
+                <div className="flex items-center gap-3">
+                  <div className={cn("w-9 h-9 rounded-lg flex items-center justify-center shrink-0", pm.iconBg)}>
+                    <pm.icon className="w-[18px] h-[18px]" />
                   </div>
-                  <div className="min-w-0">
-                    <DialogTitle className="text-sm font-semibold leading-tight">{pm.title}</DialogTitle>
-                    <p className="text-[11px] text-muted-foreground truncate">{selected.title}</p>
+                  <div className="min-w-0 flex-1">
+                    <DialogTitle className="text-[15px] leading-tight font-semibold">Transição de Estado</DialogTitle>
+                    <p className="text-[11.5px] text-muted-foreground mt-0.5 truncate">
+                      <span className="font-mono font-semibold text-foreground/80">{selected.ref}</span>
+                      <span className="mx-1.5 text-muted-foreground/40">·</span>
+                      <span className="truncate">{selected.title}</span>
+                    </p>
                   </div>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => { navigator.clipboard?.writeText(selected.ref); toast({ title: "Referência copiada", description: selected.ref }); }}
-                  className="shrink-0 inline-flex items-center px-1.5 py-0.5 rounded border border-border bg-background hover:bg-muted text-[10px] font-mono font-semibold text-foreground transition-colors"
-                >
-                  {selected.ref}
-                </button>
                 <DialogDescription className="sr-only">{pm.desc}</DialogDescription>
               </div>
 
-              {/* Estado + Declaration */}
+              {/* Estado transition banner */}
               {(() => {
                 const fromMeta = finStatusMeta[selected.status];
                 const toMeta = finStatusMeta[pendingAction!];
                 return (
-                  <div className="px-5 py-3 border-b border-border bg-muted/15 space-y-2">
-                    <div className="flex items-center gap-1.5">
-                      <Badge variant="outline" className={cn("text-[10px] font-semibold px-1.5 py-0.5 uppercase tracking-wider gap-1", fromMeta.cls)}>
+                  <div className="px-5 py-3 border-b border-border bg-muted/15">
+                    <p className="text-[10px] uppercase tracking-[0.1em] font-semibold text-muted-foreground mb-1.5">
+                      Transição de estado
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className={cn("text-[10.5px] font-semibold px-2 py-0.5 uppercase tracking-wider gap-1", fromMeta.cls)}>
                         <span className={cn("w-1.5 h-1.5 rounded-full", fromMeta.dot)} />
                         {fromMeta.label}
                       </Badge>
-                      <ChevronRight className="w-3 h-3 text-muted-foreground shrink-0" />
-                      <Badge variant="outline" className={cn("text-[10px] font-semibold px-1.5 py-0.5 uppercase tracking-wider gap-1", toMeta.cls)}>
+                      <ChevronRight className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                      <Badge variant="outline" className={cn("text-[10.5px] font-semibold px-2 py-0.5 uppercase tracking-wider gap-1", toMeta.cls)}>
                         <span className={cn("w-1.5 h-1.5 rounded-full", toMeta.dot)} />
                         {toMeta.label}
                       </Badge>
                     </div>
-                    <p className="text-[11px] text-foreground/80 leading-snug">
-                      Eu declaro que esta solicitação está em transição para <span className="font-semibold text-foreground">{toMeta.label}</span>. Registo histórico. Requerente notificado.
+                    <p className="text-[11.5px] text-foreground/75 leading-relaxed mt-2">
+                      Registo histórico. Requerente e responsáveis serão notificados.
                     </p>
                   </div>
                 );
               })()}
 
-              {/* Metadata row */}
-              <div className="px-5 py-2 border-b border-border flex items-center gap-3 text-[11px]">
-                <span className="text-muted-foreground">{fmt(dSub)}</span>
-                <span className="w-1 h-1 rounded-full bg-border" />
-                <span className="text-foreground truncate">{selected.requester}</span>
-                <span className="text-muted-foreground truncate">· {counterpartRole}</span>
-              </div>
+              {/* Body */}
+              <div className="px-5 py-4 space-y-4">
+                {/* Data + Requerente */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="rounded-md border border-border bg-muted/10 px-3 py-2">
+                    <p className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground mb-0.5">Data</p>
+                    <p className="text-[13px] font-semibold text-foreground">{fmt(dSub)}</p>
+                  </div>
+                  <div className="rounded-md border border-border bg-muted/10 px-3 py-2">
+                    <p className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground mb-0.5">Requerente</p>
+                    <p className="text-[13px] font-semibold text-foreground truncate">{selected.requester}</p>
+                    <p className="text-[10px] text-muted-foreground truncate">{counterpartRole}</p>
+                  </div>
+                </div>
 
-              {/* Body — Parecer + Anexos */}
-              <div className="px-5 py-3 space-y-3">
-                <section className="space-y-1">
+                {/* Parecer / Notas */}
+                <section className="space-y-1.5">
                   <div className="flex items-baseline justify-between">
-                    <Label htmlFor="action-notes" className="text-[11px] font-semibold text-foreground">
+                    <Label htmlFor="action-notes" className="text-[11px] uppercase tracking-[0.08em] font-semibold text-foreground">
                       Parecer / Notas
                     </Label>
                     <span className="text-[10px] text-muted-foreground">Obrigatório</span>
@@ -591,22 +601,27 @@ export default function FinancasSolicitacaoDetail() {
                     value={actionNotes}
                     onChange={(e) => setActionNotes(e.target.value)}
                     placeholder={pm.notesPlaceholder}
-                    rows={3}
+                    rows={4}
                     className="resize-none text-sm leading-relaxed"
                   />
                 </section>
 
-                <section className="space-y-1">
+                {/* Anexos */}
+                <section className="space-y-1.5">
                   <div className="flex items-baseline justify-between">
-                    <Label className="text-[11px] font-semibold text-foreground">Anexos</Label>
+                    <Label className="text-[11px] uppercase tracking-[0.08em] font-semibold text-foreground">
+                      Anexos e evidências
+                    </Label>
                     <span className="text-[10px] text-muted-foreground">
-                      {actionFiles.length > 0 ? `${actionFiles.length}` : "Opcional"}
+                      {actionFiles.length > 0 ? `${actionFiles.length} ${actionFiles.length === 1 ? "ficheiro" : "ficheiros"}` : "Opcional"}
                     </span>
                   </div>
 
-                  <label className="group flex items-center gap-2 rounded-md border border-dashed border-border bg-muted/10 hover:border-primary/40 hover:bg-primary/[0.03] transition-colors cursor-pointer px-3 py-1.5">
-                    <Plus className="w-3.5 h-3.5 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
-                    <span className="text-[11px] text-foreground/70 flex-1 truncate">
+                  <label className="group flex items-center gap-2.5 rounded-md border border-dashed border-border bg-muted/10 hover:border-primary/40 hover:bg-primary/[0.03] transition-colors cursor-pointer px-3 py-2">
+                    <span className="w-5 h-5 rounded-full border border-border bg-background flex items-center justify-center group-hover:border-primary/50 group-hover:text-primary transition-colors shrink-0">
+                      <Plus className="w-3 h-3 text-muted-foreground group-hover:text-primary transition-colors" />
+                    </span>
+                    <span className="text-[12px] text-foreground/80 flex-1 truncate">
                       Carregar anexo <span className="text-muted-foreground">(PDF, DOCX, XLSX, PNG, JPG)</span>
                     </span>
                     <input
@@ -618,7 +633,7 @@ export default function FinancasSolicitacaoDetail() {
                   </label>
 
                   {actionFiles.length > 0 && (
-                    <ul className="space-y-1">
+                    <ul className="space-y-1 pt-0.5">
                       {actionFiles.map((f, i) => {
                         const ext = f.name.split(".").pop()?.toUpperCase() ?? "FILE";
                         const isImg = /^(PNG|JPG|JPEG|WEBP|GIF)$/.test(ext);
@@ -628,16 +643,16 @@ export default function FinancasSolicitacaoDetail() {
                           : isSheet ? "text-emerald-600"
                           : "text-red-600";
                         return (
-                          <li key={i} className="flex items-center gap-2 px-2 py-1 rounded-md border border-border bg-background hover:bg-muted/20 transition-colors">
+                          <li key={i} className="flex items-center gap-2 pl-2 pr-1.5 py-1.5 rounded-md border border-border bg-background hover:bg-muted/20 transition-colors">
                             <Ic className={cn("w-3.5 h-3.5 shrink-0", cls)} />
-                            <span className="text-[11px] font-medium text-foreground truncate flex-1">{f.name}</span>
+                            <span className="text-[12px] font-medium text-foreground truncate flex-1 leading-tight">{f.name}</span>
                             <span className="text-[10px] text-muted-foreground tabular-nums shrink-0">
                               {f.size < 1024 * 1024 ? `${(f.size / 1024).toFixed(0)} KB` : `${(f.size / 1024 / 1024).toFixed(1)} MB`}
                             </span>
                             <button
                               type="button"
                               onClick={() => setActionFiles(prev => prev.filter((_, idx) => idx !== i))}
-                              className="w-4 h-4 rounded inline-flex items-center justify-center text-muted-foreground hover:text-destructive transition-colors shrink-0"
+                              className="w-5 h-5 rounded inline-flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors shrink-0"
                               title="Remover"
                             >
                               <X className="w-3 h-3" />
@@ -648,26 +663,45 @@ export default function FinancasSolicitacaoDetail() {
                     </ul>
                   )}
                 </section>
+
+                {/* Declaração */}
+                {(() => {
+                  const toMeta = finStatusMeta[pendingAction!];
+                  return (
+                    <div className="flex items-start gap-2.5 rounded-md border border-border bg-muted/10 px-3 py-2.5">
+                      <Checkbox
+                        id="declaration"
+                        checked={declarationChecked}
+                        onCheckedChange={(c) => setDeclarationChecked(c === true)}
+                        className="mt-0.5 shrink-0"
+                      />
+                      <Label htmlFor="declaration" className="text-[12px] text-foreground/80 leading-snug cursor-pointer font-normal">
+                        Eu declaro que esta solicitação está em <span className="font-semibold text-foreground">{toMeta.label.toLowerCase()}</span>.
+                      </Label>
+                    </div>
+                  );
+                })()}
               </div>
 
               {/* Footer */}
-              <DialogFooter className="px-5 py-2.5 border-t border-border bg-muted/20 gap-2 sm:gap-2">
+              <DialogFooter className="px-5 py-3 border-t border-border bg-muted/20 gap-2 sm:gap-2">
                 <DialogClose asChild>
-                  <Button variant="outline" size="sm" className="h-7 text-[11px]">Cancelar</Button>
+                  <Button variant="outline" size="sm" className="h-8 text-[12px]">Cancelar</Button>
                 </DialogClose>
                 <Button
                   size="sm"
-                  className={cn("h-7 text-[11px] gap-1", pm.tone)}
+                  className={cn("h-8 text-[12px] gap-1.5", pm.tone)}
                   onClick={confirmAction}
-                  disabled={!actionNotes.trim()}
+                  disabled={!actionNotes.trim() || !declarationChecked}
                 >
-                  <pm.icon className="w-3 h-3" /> {pm.cta}
+                  <pm.icon className="w-3.5 h-3.5" /> {pm.cta}
                 </Button>
               </DialogFooter>
             </>
           )}
         </DialogContent>
       </Dialog>
+
 
     </div>
   );
