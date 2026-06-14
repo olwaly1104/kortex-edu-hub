@@ -268,17 +268,10 @@ export default function FinancasCalendario() {
         </div>
       </div>
 
-      {/* ── Period bar: toggle + entries (top), nav title (bottom) ─────────────── */}
-      {(() => {
-        const periodEntries = (view === "week"
-          ? weekDays.flatMap(d => eventsOnDate(d))
-          : allEvents.filter(e => {
-              const dd = parseISO(e.date);
-              return dd.getMonth() === cursorD.getMonth() && dd.getFullYear() === cursorD.getFullYear();
-            })
-        );
-        const totalEntries = periodEntries.length;
-        return (
+      {/* ── Grid ─────────────────────────────── */}
+      <div className="flex gap-6">
+        <div className="flex-1 min-w-0 space-y-3">
+          {/* ── Period bar: toggle + nav ─────────────── */}
           <div className="rounded-lg border border-border bg-card px-4 py-2.5 flex items-center justify-between gap-3 flex-wrap">
             {/* left: view toggle */}
             <div className="flex bg-muted/60 rounded-lg p-0.5 shrink-0">
@@ -338,28 +331,34 @@ export default function FinancasCalendario() {
                 <ChevronRight className="w-4 h-4" />
               </button>
             </div>
-
-            {/* right: entries count */}
-            <Badge variant="outline" className="h-7 px-2.5 gap-1.5 text-xs font-semibold shrink-0">
-              <CalendarRange className="w-3.5 h-3.5 text-muted-foreground" />
-              {totalEntries} {totalEntries === 1 ? "entrada" : "entradas"}
-            </Badge>
           </div>
-        );
-      })()}
 
-      {/* ── Grid ─────────────────────────────── */}
-      <div className="flex gap-6">
-        <div className="flex-1 min-w-0 space-y-3">
           {/* Result label above calendar */}
-          <div className="px-1">
-            <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-0.5">
-              {view === "week" ? "Semana" : "Mês"}
-            </p>
-            <h3 className="text-lg font-bold text-foreground capitalize">
-              {view === "week" ? weekLabel : `${MONTH_NAMES[cursorD.getMonth()]} ${cursorD.getFullYear()}`}
-            </h3>
-          </div>
+          {(() => {
+            const periodEntriesCount = (view === "week"
+              ? weekDays.flatMap(d => eventsOnDate(d))
+              : allEvents.filter(e => {
+                  const dd = parseISO(e.date);
+                  return dd.getMonth() === cursorD.getMonth() && dd.getFullYear() === cursorD.getFullYear();
+                })
+            ).length;
+            return (
+              <div className="px-1 flex items-end justify-between gap-3">
+                <div>
+                  <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-0.5">
+                    {view === "week" ? "Semana" : "Mês"}
+                  </p>
+                  <h3 className="text-lg font-bold text-foreground capitalize">
+                    {view === "week" ? weekLabel : `${MONTH_NAMES[cursorD.getMonth()]} ${cursorD.getFullYear()}`}
+                  </h3>
+                </div>
+                <Badge variant="outline" className="h-7 px-2.5 gap-1.5 text-xs font-semibold shrink-0">
+                  <CalendarRange className="w-3.5 h-3.5 text-muted-foreground" />
+                  {periodEntriesCount} {periodEntriesCount === 1 ? "entrada" : "entradas"}
+                </Badge>
+              </div>
+            );
+          })()}
 
           {view === "week" ? (
             <Card className="overflow-hidden">
