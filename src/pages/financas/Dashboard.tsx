@@ -1,8 +1,7 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import {
   Wallet, TrendingUp, TrendingDown, CreditCard,
-  ArrowUpRight, ArrowDownRight, FileText, ChevronRight, Receipt, Search, X, GraduationCap, Calendar as CalendarIcon,
-  Clock, CalendarDays,
+  ArrowUpRight, ArrowDownRight, FileText, ChevronRight, Receipt, Search, X, Calendar as CalendarIcon,
 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
@@ -18,6 +17,7 @@ import {
 } from "@/data/financeModuleData";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { FinHeader } from "./_FinHeader";
 
 /* ── month mapping ───────────────────────────────── */
 const MONTH_FULL: Record<string, string> = {
