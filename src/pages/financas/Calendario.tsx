@@ -774,10 +774,10 @@ export default function FinancasCalendario() {
 }
 
 /* ── Request card ── */
-const REQ_STATUS_META: Record<MeetingRequest["status"], { label: string; cls: string; bar: string }> = {
-  pending:  { label: "Pendente",  cls: "bg-amber-50 text-amber-700 border-amber-200",     bar: "bg-amber-500" },
-  accepted: { label: "Aceite",    cls: "bg-emerald-50 text-emerald-700 border-emerald-200", bar: "bg-emerald-500" },
-  declined: { label: "Recusado",  cls: "bg-rose-50 text-rose-700 border-rose-200",        bar: "bg-rose-500" },
+const REQ_STATUS_META: Record<MeetingRequest["status"], { label: string; cls: string; dot: string; bar: string }> = {
+  pending:  { label: "Pendente",  cls: "bg-amber-50 text-amber-700 border-amber-200",       dot: "bg-amber-500",   bar: "bg-amber-500" },
+  accepted: { label: "Aceite",    cls: "bg-emerald-50 text-emerald-700 border-emerald-200", dot: "bg-emerald-500", bar: "bg-emerald-500" },
+  declined: { label: "Recusado",  cls: "bg-rose-50 text-rose-700 border-rose-200",          dot: "bg-rose-500",    bar: "bg-rose-500" },
 };
 
 function RequestCard({ r, onAccept, onDecline, onDetail, onParticipants, readOnly = false }: {
@@ -796,7 +796,10 @@ function RequestCard({ r, onAccept, onDecline, onDetail, onParticipants, readOnl
             {(() => { const I = MODALITY_META[r.modality].icon; return <I className="w-2.5 h-2.5" />; })()}
             {MODALITY_META[r.modality].label}
           </Badge>
-          <Badge variant="outline" className={cn("text-[9px] h-4 px-1.5 font-semibold", st.cls)}>{st.label}</Badge>
+          <Badge variant="outline" className={cn("text-[9px] h-4 px-1.5 gap-1 font-semibold", st.cls)}>
+            <span className={cn("w-1.5 h-1.5 rounded-full", st.dot)} />
+            {st.label}
+          </Badge>
         </div>
         <div>
           <p className="text-xs font-semibold text-foreground leading-tight line-clamp-2">{r.title}</p>
