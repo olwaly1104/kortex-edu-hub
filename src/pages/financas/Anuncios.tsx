@@ -275,7 +275,7 @@ export default function FinancasAnuncios() {
                   {/* compact CTA */}
                   {a.cta === "inscrever" && (
                     <div className="mt-2 rounded-lg border border-primary/25 bg-primary/[0.04] px-3 py-2">
-                      <div className="flex items-center justify-between gap-3 flex-wrap">
+                      <div className="flex items-center gap-3 flex-wrap">
                         <div className="min-w-0">
                           <p className="text-[10px] uppercase tracking-[0.14em] font-semibold text-primary">Inscrições abertas</p>
                           <p className="text-[13px] font-bold text-foreground leading-tight truncate">{a.title}</p>
