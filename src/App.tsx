@@ -136,6 +136,8 @@ import FinancasSalarios from "./pages/financas/Salarios";
 import FinancasOrcamentos from "./pages/financas/Orcamentos";
 import FinancasSolicitacoes from "./pages/financas/Solicitacoes";
 import FinancasPessoalFinancas from "./pages/financas/PessoalFinancas";
+import FinancasCalendario from "./pages/financas/Calendario";
+import FinancasAnuncios from "./pages/financas/Anuncios";
 import InscricoesLayout from "./layouts/InscricoesLayout";
 import InscricoesRegistar from "./pages/inscricoes/Registar";
 import InscricoesCandidatoDetail from "./pages/inscricoes/CandidatoDetail";
@@ -338,8 +340,8 @@ function AppRoutes() {
         <Route path="/secretaria/perfil" element={<StudentProfile />} />
         {/* Finanças */}
         <Route path="/financas" element={<FinancasInicio />} />
-        <Route path="/financas/calendario" element={<StudentCalendar />} />
-        <Route path="/financas/anuncios" element={<StudentAnnouncements />} />
+        <Route path="/financas/calendario" element={<FinancasCalendario />} />
+        <Route path="/financas/anuncios" element={<FinancasAnuncios />} />
         <Route path="/financas/solicitacoes" element={<FinancasSolicitacoes />} />
         <Route path="/financas/dashboard" element={<FinancasDashboard />} />
         <Route path="/financas/receitas" element={<FinancasReceitas />} />
