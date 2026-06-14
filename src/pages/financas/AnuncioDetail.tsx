@@ -152,16 +152,10 @@ export default function FinancasAnuncioDetail() {
         <div className="grid md:grid-cols-[1fr_280px] divide-x divide-border">
           {/* LEFT — descrição body */}
           <div className="p-6 min-w-0">
+            <h2 className="text-[11px] uppercase tracking-[0.16em] font-semibold text-muted-foreground mb-3">Conteúdo</h2>
             <article className="max-w-none">
               <p className="text-[14.5px] leading-7 text-foreground whitespace-pre-line">{ann.content}</p>
             </article>
-
-            <div className="mt-8 pt-4 border-t border-border flex items-center justify-between gap-3 text-[12px] text-muted-foreground">
-              <span>
-                Publicado por <span className="font-semibold text-foreground">{ann.author}</span>
-              </span>
-              <span className="tabular-nums">{ann.date}</span>
-            </div>
 
             {ann.cta === "inscrever" && (
               <div className="mt-6 rounded-lg border border-primary/25 bg-primary/[0.04] p-4">
@@ -197,6 +191,11 @@ export default function FinancasAnuncioDetail() {
 
 
               <MetaCell
+                icon={<CalendarIcon className="w-3 h-3" />}
+                label="Data de publicação"
+                value={<span className="tabular-nums">{ann.date}</span>}
+              />
+              <MetaCell
                 icon={<UserIcon className="w-3 h-3" />}
                 label="Publicado por"
                 value={<span className="truncate">{ann.author}</span>}
@@ -212,11 +211,6 @@ export default function FinancasAnuncioDetail() {
                     {ann.department}
                   </Link>
                 }
-              />
-              <MetaCell
-                icon={<CalendarIcon className="w-3 h-3" />}
-                label="Data de publicação"
-                value={<span className="tabular-nums">{ann.date}</span>}
               />
               <MetaCell
                 icon={<Tag className="w-3 h-3" />}
