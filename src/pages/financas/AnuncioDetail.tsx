@@ -65,22 +65,9 @@ export default function FinancasAnuncioDetail() {
       {/* Main document card */}
       <div className="rounded-lg border border-border bg-card overflow-hidden">
         {/* Header strip */}
-        <div className="px-7 pt-6 pb-5 border-b border-border">
-          <div className="flex items-start justify-between gap-4">
-            {/* Left: category + id */}
-            <div className="min-w-0 flex items-center gap-1.5 flex-wrap">
-              <Badge variant="outline" className={cn("text-[10px] font-semibold gap-1 px-1.5 uppercase tracking-wider", m.chip)}>
-                <span className={cn("w-1.5 h-1.5 rounded-full", m.dot)} />
-                {m.label}
-              </Badge>
-              <button
-                type="button"
-                onClick={() => { navigator.clipboard?.writeText(ann.id); toast({ title: "ID copiado", description: ann.id }); }}
-                className="inline-flex items-center px-2 py-0.5 rounded-md border border-border bg-background hover:bg-muted text-[11px] font-mono font-semibold text-foreground transition-colors"
-              >
-                {ann.id.toUpperCase()}
-              </button>
-            </div>
+        <div className="px-7 pt-5 pb-4 border-b border-border">
+          <div className="flex items-center justify-end gap-4">
+
 
             {/* Right: Document pill (matches GAP) */}
             <div className="inline-flex items-center gap-2 pl-1.5 pr-1 py-1 rounded-md border border-border bg-background shadow-sm shrink-0">
