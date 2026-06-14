@@ -92,7 +92,7 @@ const initialReceitas = (): ReceitaRow[] => {
   const matriculas: ReceitaRow[] = reitorFaculties.map(f => ({
     id: `matr-${f.id}`,
     nome: `Matrícula — ${f.name}`,
-    tipo: "Matrícula",
+    tipo: "Emolumento",
     escopo: "geral",
     valor: f.name.includes("Medicina") ? 35000 : (f.name.includes("Arquitectura") || f.name.includes("Direito")) ? 30000 : 25000,
   }));
@@ -139,7 +139,7 @@ const RECEITA_SECTIONS: SectionDef[] = [
     tipos: ["Propina mensal"], defaultTipo: "Propina mensal",
     icon: GraduationCap, accent: "text-blue-700", chip: "bg-blue-50 border-blue-200 text-blue-700" },
   { key: "emolumentos", title: "Emolumentos", description: "Matrícula, documentos e certificados oficiais.",
-    tipos: ["Emolumento", "Matrícula"], defaultTipo: "Emolumento",
+    tipos: ["Emolumento"], defaultTipo: "Emolumento",
     icon: FileText, accent: "text-emerald-700", chip: "bg-emerald-50 border-emerald-200 text-emerald-700" },
   { key: "servicos", title: "Serviços Académicos", description: "Pedidos académicos pontuais.",
     tipos: ["Serviço Académico"], defaultTipo: "Serviço Académico",
@@ -757,12 +757,12 @@ export default function ConfigurarReceitas() {
         </div>
       </div>
 
-      {/* Mode toggle */}
-      <div className="grid grid-cols-3 gap-2">
+      {/* Mode toggle — compact pill */}
+      <div className="inline-flex items-center gap-0.5 rounded-lg border border-border bg-muted/40 p-0.5 w-fit">
         {([
-          { key: "receitas" as const, label: "Receitas", sub: "Propinas, emolumentos, multas",   icon: TrendingUp,   accent: "text-emerald-700", bg: "bg-emerald-50", border: "border-emerald-200" },
-          { key: "despesas" as const, label: "Despesas", sub: "Rubricas e categorias customizadas", icon: TrendingDown, accent: "text-red-700",     bg: "bg-red-50",     border: "border-red-200" },
-          { key: "salarios" as const, label: "Salários", sub: "Folha salarial de colaboradores", icon: Banknote,     accent: "text-blue-700",    bg: "bg-blue-50",    border: "border-blue-200" },
+          { key: "receitas" as const, label: "Receitas", icon: TrendingUp,   accent: "text-emerald-700" },
+          { key: "despesas" as const, label: "Despesas", icon: TrendingDown, accent: "text-red-700" },
+          { key: "salarios" as const, label: "Salários", icon: Banknote,     accent: "text-blue-700" },
         ]).map(m => {
           const Icon = m.icon;
           const active = mode === m.key;
@@ -771,19 +771,14 @@ export default function ConfigurarReceitas() {
               key={m.key}
               onClick={() => setMode(m.key)}
               className={cn(
-                "flex items-center gap-3 p-3 rounded-lg border transition-all text-left",
+                "inline-flex items-center gap-1.5 h-8 px-3 rounded-md text-xs font-medium transition",
                 active
-                  ? `${m.bg} ${m.border} ring-2 ring-offset-1 ring-primary/20 shadow-sm`
-                  : "border-border bg-card hover:border-primary/40"
+                  ? cn("bg-background shadow-sm", m.accent)
+                  : "text-muted-foreground hover:text-foreground"
               )}
             >
-              <div className={cn("w-10 h-10 rounded-md flex items-center justify-center", m.bg, m.accent)}>
-                <Icon className="w-5 h-5" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className={cn("text-sm font-semibold", active ? m.accent : "text-foreground")}>{m.label}</p>
-                <p className="text-[11px] text-muted-foreground truncate">{m.sub}</p>
-              </div>
+              <Icon className="w-3.5 h-3.5" />
+              {m.label}
             </button>
           );
         })}
@@ -986,8 +981,6 @@ export default function ConfigurarReceitas() {
               const activeSub = MULTA_SUBTYPES.find(s => s.key === multaSubtype)!;
               const ActiveIcon = activeSub.icon;
               const filtered = items.filter(r => r.tipo === multaSubtype);
-              const totalBruto = filtered.reduce((sum, r) => sum + r.valor, 0);
-              const totalLiquido = filtered.reduce((sum, r) => sum + liquidoOf(r.valor, r.imposto), 0);
               return (
                 <Card key={section.key} className="p-5">
                   <div className="flex items-center justify-between mb-4 gap-4 flex-wrap">
@@ -1004,7 +997,6 @@ export default function ConfigurarReceitas() {
                     {MULTA_SUBTYPES.map(sub => {
                       const SubIcon = sub.icon;
                       const subItems = items.filter(r => r.tipo === sub.key);
-                      const subSum = subItems.reduce((s, r) => s + r.valor, 0);
                       const active = multaSubtype === sub.key;
                       return (
                         <button key={sub.key} type="button" onClick={() => setMultaSubtype(sub.key)}
@@ -1015,19 +1007,15 @@ export default function ConfigurarReceitas() {
                               : "border-border bg-card hover:border-foreground/20 hover:shadow-sm"
                           )}>
                           <span className={cn("absolute left-0 top-0 bottom-0 w-1", sub.bar, active ? "opacity-100" : "opacity-40")} />
-                          <div className="flex items-start gap-3 pl-1.5">
+                          <div className="flex items-center gap-3 pl-1.5">
                             <div className={cn("w-9 h-9 rounded-lg flex items-center justify-center shrink-0", sub.iconBg)}>
                               <SubIcon className={cn("w-4.5 h-4.5", sub.iconColor)} />
                             </div>
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2">
-                                <span className={cn("text-sm font-semibold", active ? sub.iconColor : "text-foreground")}>{sub.label}</span>
-                                <span className={cn("inline-flex items-center justify-center min-w-[20px] h-[18px] px-1.5 rounded-full text-[10px] font-semibold tabular-nums", sub.chip)}>
-                                  {subItems.length}
-                                </span>
-                              </div>
-                              <p className="text-[11px] text-muted-foreground mt-0.5">Total bruto</p>
-                              <p className="text-sm font-semibold tabular-nums text-foreground mt-0.5">{formatCurrency(subSum)}</p>
+                            <div className="flex-1 min-w-0 flex items-center gap-2">
+                              <span className={cn("text-sm font-semibold", active ? sub.iconColor : "text-foreground")}>{sub.label}</span>
+                              <span className={cn("inline-flex items-center justify-center min-w-[20px] h-[18px] px-1.5 rounded-full text-[10px] font-semibold tabular-nums", sub.chip)}>
+                                {subItems.length}
+                              </span>
                             </div>
                           </div>
                         </button>
@@ -1042,15 +1030,9 @@ export default function ConfigurarReceitas() {
                       <span className={cn("text-sm font-semibold", activeSub.iconColor)}>Multas · {activeSub.label}</span>
                       <span className="text-[11px] text-muted-foreground tabular-nums">· {filtered.length} {filtered.length === 1 ? "item" : "itens"}</span>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <div className="hidden sm:flex items-center gap-3 text-[11px] text-muted-foreground">
-                        <span>Bruto <span className="font-semibold text-foreground tabular-nums ml-0.5">{formatCurrency(totalBruto)}</span></span>
-                        <span>Líquido <span className="font-semibold text-emerald-700 tabular-nums ml-0.5">{formatCurrency(totalLiquido)}</span></span>
-                      </div>
-                      <Button size="sm" variant="outline" className="gap-1.5 h-8 text-xs" onClick={() => openNewReceita(section)}>
-                        <Plus className="w-3.5 h-3.5" /> Nova multa
-                      </Button>
-                    </div>
+                    <Button size="sm" variant="outline" className="gap-1.5 h-8 text-xs" onClick={() => openNewReceita(section)}>
+                      <Plus className="w-3.5 h-3.5" /> Nova multa
+                    </Button>
                   </div>
 
                   {filtered.length === 0 ? (
@@ -1062,60 +1044,27 @@ export default function ConfigurarReceitas() {
                       </Button>
                     </div>
                   ) : (
-                    <div className="overflow-x-auto rounded-lg border border-border">
-                      <table className="w-full text-sm">
-                        <thead>
-                          <tr className="text-[10px] uppercase tracking-wider text-muted-foreground border-b border-border bg-muted/30">
-                            <th className="text-left font-semibold px-4 py-2">Multa</th>
-                            <th className="text-right font-semibold px-3 py-2">Bruto</th>
-                            <th className="text-right font-semibold px-3 py-2">Líquido</th>
-                            <th className="text-right font-semibold px-3 py-2 hidden sm:table-cell">Imposto</th>
-                            <th className="w-20"></th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {filtered.map(r => {
-                            const impPct = ((r.imposto ?? DEFAULT_IMPOSTO) * 100);
-                            return (
-                              <tr key={r.id} role="button" tabIndex={0}
-                                onClick={() => openEditReceita(section, r)}
-                                onKeyDown={(e) => { if (e.key === "Enter") openEditReceita(section, r); }}
-                                className="border-b border-border/50 last:border-0 cursor-pointer hover:bg-muted/30 transition group">
-                                <td className="px-4 py-2.5">
-                                  <div className="flex items-center gap-2.5">
-                                    <span className={cn("w-1 h-6 rounded-full shrink-0", activeSub.bar)} />
-                                    <span className="text-sm font-medium text-foreground">{r.nome}</span>
-                                  </div>
-                                </td>
-                                <td className="px-3 py-2.5 text-right text-sm font-semibold tabular-nums text-foreground">{formatCurrency(r.valor)}</td>
-                                <td className="px-3 py-2.5 text-right text-sm font-semibold tabular-nums text-emerald-700">{formatCurrency(liquidoOf(r.valor, r.imposto))}</td>
-                                <td className="px-3 py-2.5 text-right text-xs tabular-nums text-muted-foreground hidden sm:table-cell">{impPct.toFixed(1)}%</td>
-                                <td className="px-2 py-2.5 text-right">
-                                  <div className="inline-flex items-center gap-0.5 opacity-60 group-hover:opacity-100 transition">
-                                    <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md" onClick={(e) => { e.stopPropagation(); openEditReceita(section, r); }} title="Editar">
-                                      <Pencil className="w-3.5 h-3.5" />
-                                    </Button>
-                                    <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md text-destructive hover:text-destructive"
-                                      onClick={(e) => { e.stopPropagation(); setConfirmDelReceita(r); }} title="Remover">
-                                      <Trash2 className="w-3.5 h-3.5" />
-                                    </Button>
-                                  </div>
-                                </td>
-                              </tr>
-                            );
-                          })}
-                        </tbody>
-                        <tfoot>
-                          <tr className="border-t-2 border-border bg-muted/20">
-                            <td className="px-4 py-2 text-[11px] uppercase tracking-wider font-semibold text-muted-foreground">Total</td>
-                            <td className="px-3 py-2 text-right text-sm font-bold tabular-nums text-foreground">{formatCurrency(totalBruto)}</td>
-                            <td className="px-3 py-2 text-right text-sm font-bold tabular-nums text-emerald-700">{formatCurrency(totalLiquido)}</td>
-                            <td className="hidden sm:table-cell" />
-                            <td />
-                          </tr>
-                        </tfoot>
-                      </table>
-                    </div>
+                    <ul className="rounded-lg border border-border divide-y divide-border/60 overflow-hidden">
+                      {filtered.map(r => (
+                        <li key={r.id}
+                          role="button" tabIndex={0}
+                          onClick={() => openEditReceita(section, r)}
+                          onKeyDown={(e) => { if (e.key === "Enter") openEditReceita(section, r); }}
+                          className="flex items-center gap-3 px-3 py-2.5 cursor-pointer hover:bg-muted/30 transition group">
+                          <span className={cn("w-1 h-6 rounded-full shrink-0", activeSub.bar)} />
+                          <span className="flex-1 text-sm font-medium text-foreground truncate">{r.nome}</span>
+                          <div className="inline-flex items-center gap-0.5 opacity-60 group-hover:opacity-100 transition">
+                            <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md" onClick={(e) => { e.stopPropagation(); openEditReceita(section, r); }} title="Editar">
+                              <Pencil className="w-3.5 h-3.5" />
+                            </Button>
+                            <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md text-destructive hover:text-destructive"
+                              onClick={(e) => { e.stopPropagation(); setConfirmDelReceita(r); }} title="Remover">
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </Button>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
                   )}
                 </Card>
               );
@@ -1527,6 +1476,7 @@ export default function ConfigurarReceitas() {
                   <th className="text-left font-semibold px-2 py-2">Contrato</th>
                   <th className="text-left font-semibold px-2 py-2">Departamento</th>
                   <th className="text-right font-semibold px-2 py-2">Salário Bruto</th>
+                  <th className="text-right font-semibold px-2 py-2">Impostos</th>
                   <th className="text-right font-semibold px-2 py-2">Salário Líquido</th>
                   <th className="w-16"></th>
                 </tr>
@@ -1535,6 +1485,10 @@ export default function ConfigurarReceitas() {
                 {salaryList.map(s => {
                   const cfg = salaryConfigs[s.id];
                   if (!cfg) return null;
+                  const irt = Math.round(cfg.baseSalary * cfg.irtRate);
+                  const ss = Math.round(cfg.baseSalary * cfg.ssRate);
+                  const impostos = irt + ss;
+                  const impostoPct = ((cfg.irtRate + cfg.ssRate) * 100);
                   const net = computeNet(cfg);
                   const contractLabel = s.contractType === "efectivo" ? "Permanente" : "Prestador";
                   return (
@@ -1561,6 +1515,10 @@ export default function ConfigurarReceitas() {
                         <p className="text-xs text-foreground truncate">{s.department}</p>
                       </td>
                       <td className="px-2 py-2.5 text-right text-sm tabular-nums text-foreground">{formatCurrency(cfg.baseSalary)}</td>
+                      <td className="px-2 py-2.5 text-right text-sm tabular-nums text-red-600">
+                        −{formatCurrency(impostos)}
+                        <span className="block text-[10px] text-muted-foreground font-normal">IRT+SS {impostoPct.toFixed(1)}%</span>
+                      </td>
                       <td className="px-2 py-2.5 text-right text-sm font-semibold tabular-nums text-blue-700">{formatCurrency(net)}</td>
                       <td className="px-2 py-2.5">
                         <div className="flex items-center gap-0.5 justify-end opacity-60 group-hover:opacity-100 transition">
@@ -1816,15 +1774,9 @@ export default function ConfigurarReceitas() {
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2">
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <label className="text-xs font-medium text-muted-foreground">Nome completo</label>
-                <Input value={newSalaryForm.name} onChange={e => setNewSalaryForm({ ...newSalaryForm, name: e.target.value })} placeholder="Ex.: João Silva" />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-xs font-medium text-muted-foreground">Nº de colaborador</label>
-                <Input value={newSalaryForm.employeeId} onChange={e => setNewSalaryForm({ ...newSalaryForm, employeeId: e.target.value })} placeholder="auto se vazio" />
-              </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground">Nome completo</label>
+              <Input value={newSalaryForm.name} onChange={e => setNewSalaryForm({ ...newSalaryForm, name: e.target.value })} placeholder="Ex.: João Silva" />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
