@@ -156,14 +156,11 @@ export default function GapTickets() {
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       {/* Header */}
-      <div className="flex items-end justify-between gap-4 flex-wrap">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground tracking-tight">Solicitações</h1>
-          <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
-            Pedidos submetidos pelos discentes no Portal e encaminhados automaticamente ao departamento responsável. O GAP acompanha a execução.
-          </p>
-        </div>
-      </div>
+      <FinHeader
+        title="Solicitações"
+        subtitle="Pedidos submetidos pelos discentes no Portal e encaminhados automaticamente ao departamento responsável. O GAP acompanha a execução."
+        icon={<Inbox className="w-6 h-6 text-primary" />}
+      />
 
       {/* KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
