@@ -621,7 +621,7 @@ export default function FinancasSolicitacaoDetail() {
 
                   <label className="group flex items-center gap-2 rounded-md border border-dashed border-border bg-muted/10 hover:border-primary/40 hover:bg-primary/[0.03] transition-colors cursor-pointer px-3 py-1.5">
                     <span className="w-5 h-5 rounded-full border border-border bg-background flex items-center justify-center group-hover:border-primary/50 group-hover:text-primary transition-colors shrink-0">
-                      <Plus className="w-3 h-3 text-muted-foreground group-hover:text-primary transition-colors $" />
+                      <Plus className="w-3 h-3 text-muted-foreground group-hover:text-primary transition-colors" />
                     </span>
                     <span className="text-[12px] text-foreground/80 flex-1 truncate">
                       Carregar anexo <span className="text-muted-foreground">(PDF, DOCX, XLSX, PNG, JPG)</span>
