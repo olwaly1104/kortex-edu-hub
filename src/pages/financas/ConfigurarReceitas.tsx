@@ -10,10 +10,12 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import {
+  Popover, PopoverContent, PopoverTrigger,
+} from "@/components/ui/popover";
+import {
   Settings2, Plus, Pencil, Trash2, ArrowLeft, ChevronRight, Search,
-  GraduationCap, BookOpen, FileText, Receipt, ClipboardCheck, AlertTriangle, Building2,
-  Wrench, Zap, Package, HandCoins, FlaskConical, Coins, Users, Banknote,
-  TrendingDown, TrendingUp,
+  GraduationCap, BookOpen, FileText, ClipboardCheck, AlertTriangle, Building2,
+  Users, Banknote, TrendingDown, TrendingUp, Tag, CircleDot, X,
 } from "lucide-react";
 import { formatCurrency, salarios as initialSalarios, type Salary } from "@/data/financeModuleData";
 import { reitorFaculties } from "@/data/institutionData";
@@ -39,18 +41,14 @@ const TIPOS_RECEITA: TipoReceita[] = [
   "Multa Estudante", "Multa Administrativo", "Multa Docente",
 ];
 
-interface PropinaPlan {
-  months: number;
-  valor: number;
-}
+interface PropinaPlan { months: number; valor: number; }
 
 interface ReceitaRow {
   id: string;
   nome: string;
   tipo: TipoReceita;
-  escopo: string; // "geral" or course id
+  escopo: string;
   valor: number;
-  /** Only for "Propina mensal" — payment plans (e.g. 10x52k or 11x60k). When present, `valor` mirrors plans[0].valor. */
   plans?: PropinaPlan[];
 }
 
@@ -104,16 +102,13 @@ const initialReceitas = (): ReceitaRow[] => {
     { id: "can-2", nome: "Candidatura — Mestrado", tipo: "Candidatura", escopo: "geral", valor: 20000 },
     { id: "can-3", nome: "Exame de Acesso", tipo: "Candidatura", escopo: "geral", valor: 25000 },
     { id: "can-4", nome: "Curso Preparatório", tipo: "Candidatura", escopo: "geral", valor: 85000 },
-    // Multas Estudantes
     { id: "mes-1", nome: "Atraso de propina (por mês)", tipo: "Multa Estudante", escopo: "geral", valor: 5000 },
     { id: "mes-2", nome: "Falta a exame sem justificação", tipo: "Multa Estudante", escopo: "geral", valor: 7500 },
     { id: "mes-3", nome: "Extravio de cartão de estudante", tipo: "Multa Estudante", escopo: "geral", valor: 4000 },
     { id: "mes-4", nome: "Danos em equipamento académico", tipo: "Multa Estudante", escopo: "geral", valor: 15000 },
-    // Multas Administrativos
     { id: "mad-1", nome: "Atraso injustificado (por dia)", tipo: "Multa Administrativo", escopo: "geral", valor: 3500 },
     { id: "mad-2", nome: "Falta não justificada", tipo: "Multa Administrativo", escopo: "geral", valor: 12000 },
     { id: "mad-3", nome: "Quebra de protocolo institucional", tipo: "Multa Administrativo", escopo: "geral", valor: 20000 },
-    // Multas Docentes
     { id: "mdo-1", nome: "Atraso na entrega de notas", tipo: "Multa Docente", escopo: "geral", valor: 10000 },
     { id: "mdo-2", nome: "Falta a aula sem justificação", tipo: "Multa Docente", escopo: "geral", valor: 15000 },
     { id: "mdo-3", nome: "Atraso na entrega de pauta final", tipo: "Multa Docente", escopo: "geral", valor: 18000 },
@@ -145,15 +140,15 @@ const RECEITA_SECTIONS: SectionDef[] = [
   { key: "candidatura", title: "Candidaturas", description: "Taxas de candidatura para processos de admissão.",
     tipos: ["Candidatura"], defaultTipo: "Candidatura",
     icon: ClipboardCheck, accent: "text-pink-700", chip: "bg-pink-50 border-pink-200 text-pink-700" },
-  { key: "multas_est", title: "Multas — Estudantes", description: "Penalizações aplicáveis a estudantes.",
-    tipos: ["Multa Estudante"], defaultTipo: "Multa Estudante",
+  { key: "multas", title: "Multas", description: "Penalizações aplicáveis a estudantes, administrativos e docentes.",
+    tipos: ["Multa Estudante", "Multa Administrativo", "Multa Docente"], defaultTipo: "Multa Estudante",
     icon: AlertTriangle, accent: "text-red-700", chip: "bg-red-50 border-red-200 text-red-700" },
-  { key: "multas_adm", title: "Multas — Administrativos", description: "Penalizações aplicáveis ao pessoal administrativo.",
-    tipos: ["Multa Administrativo"], defaultTipo: "Multa Administrativo",
-    icon: AlertTriangle, accent: "text-orange-700", chip: "bg-orange-50 border-orange-200 text-orange-700" },
-  { key: "multas_doc", title: "Multas — Docentes", description: "Penalizações aplicáveis ao corpo docente.",
-    tipos: ["Multa Docente"], defaultTipo: "Multa Docente",
-    icon: AlertTriangle, accent: "text-amber-700", chip: "bg-amber-50 border-amber-200 text-amber-700" },
+];
+
+const MULTA_SUBTYPES: { key: TipoReceita; label: string; accent: string }[] = [
+  { key: "Multa Estudante", label: "Estudantes", accent: "text-red-700" },
+  { key: "Multa Administrativo", label: "Administrativos", accent: "text-orange-700" },
+  { key: "Multa Docente", label: "Docentes", accent: "text-amber-700" },
 ];
 
 const tipoChipReceita: Record<TipoReceita, string> = {
@@ -168,86 +163,24 @@ const tipoChipReceita: Record<TipoReceita, string> = {
 };
 
 /* ════════════════════════════════════════════════════════════════════════
-   DESPESAS
+   DESPESAS — categorias e estados definidos pelo utilizador
    ════════════════════════════════════════════════════════════════════════ */
-
-type TipoDespesa =
-  | "Salários"
-  | "Infraestrutura"
-  | "Material Didáctico"
-  | "Serviços e Utilities"
-  | "Operacional"
-  | "Bolsas e Apoios"
-  | "Investigação"
-  | "Tecnologia";
 
 interface DespesaRow {
   id: string;
   nome: string;
-  tipo: TipoDespesa;
+  categoria: string;
+  estado: string;
   departamento: string;
   periodicidade: "mensal" | "trimestral" | "anual" | "pontual";
   valorEstimado: number;
 }
-
-const TIPOS_DESPESA: TipoDespesa[] = [
-  "Salários", "Infraestrutura", "Material Didáctico", "Serviços e Utilities",
-  "Operacional", "Bolsas e Apoios", "Investigação", "Tecnologia",
-];
 
 const DEPARTAMENTOS = [
   "Geral", "Reitoria", "Administração", "TI", "Serviços Gerais",
   "Fac. Engenharia", "Fac. Medicina", "Fac. Direito", "Fac. Arquitectura",
   "Fac. Ciências", "Fac. Letras", "Fac. Economia",
 ];
-
-const initialDespesas = (): DespesaRow[] => [
-  { id: "dx-1", nome: "Folha Salarial — Docentes", tipo: "Salários", departamento: "Geral", periodicidade: "mensal", valorEstimado: 42000000 },
-  { id: "dx-2", nome: "Folha Salarial — Administrativos", tipo: "Salários", departamento: "Administração", periodicidade: "mensal", valorEstimado: 18000000 },
-  { id: "dx-3", nome: "Manutenção de Edifícios", tipo: "Infraestrutura", departamento: "Administração", periodicidade: "trimestral", valorEstimado: 4500000 },
-  { id: "dx-4", nome: "Mobiliário e Equipamento de Sala", tipo: "Infraestrutura", departamento: "Geral", periodicidade: "anual", valorEstimado: 8000000 },
-  { id: "dx-5", nome: "Material Didáctico — Laboratórios", tipo: "Material Didáctico", departamento: "Fac. Ciências", periodicidade: "trimestral", valorEstimado: 2300000 },
-  { id: "dx-6", nome: "Resmas, Toners e Consumíveis", tipo: "Material Didáctico", departamento: "Geral", periodicidade: "trimestral", valorEstimado: 350000 },
-  { id: "dx-7", nome: "Energia Eléctrica", tipo: "Serviços e Utilities", departamento: "Administração", periodicidade: "mensal", valorEstimado: 4100000 },
-  { id: "dx-8", nome: "Água e Saneamento", tipo: "Serviços e Utilities", departamento: "Administração", periodicidade: "mensal", valorEstimado: 1800000 },
-  { id: "dx-9", nome: "Internet e Telecomunicações", tipo: "Serviços e Utilities", departamento: "TI", periodicidade: "mensal", valorEstimado: 1200000 },
-  { id: "dx-10", nome: "Seguro Institucional", tipo: "Operacional", departamento: "Administração", periodicidade: "mensal", valorEstimado: 2100000 },
-  { id: "dx-11", nome: "Limpeza e Higiene", tipo: "Operacional", departamento: "Serviços Gerais", periodicidade: "mensal", valorEstimado: 900000 },
-  { id: "dx-12", nome: "Combustível — Frota", tipo: "Operacional", departamento: "Serviços Gerais", periodicidade: "mensal", valorEstimado: 750000 },
-  { id: "dx-13", nome: "Bolsas de Mérito", tipo: "Bolsas e Apoios", departamento: "Reitoria", periodicidade: "mensal", valorEstimado: 3500000 },
-  { id: "dx-14", nome: "Bolsas Sociais", tipo: "Bolsas e Apoios", departamento: "Reitoria", periodicidade: "mensal", valorEstimado: 2200000 },
-  { id: "dx-15", nome: "Apoio a Projectos de Investigação", tipo: "Investigação", departamento: "Reitoria", periodicidade: "trimestral", valorEstimado: 1100000 },
-  { id: "dx-16", nome: "Licenças de Software", tipo: "Tecnologia", departamento: "TI", periodicidade: "anual", valorEstimado: 6800000 },
-  { id: "dx-17", nome: "Renovação de Hardware", tipo: "Tecnologia", departamento: "TI", periodicidade: "anual", valorEstimado: 4500000 },
-];
-
-interface DespesaSectionDef {
-  key: TipoDespesa;
-  icon: typeof Wrench;
-  accent: string;
-}
-
-const DESPESA_SECTIONS: DespesaSectionDef[] = [
-  { key: "Salários", icon: Users, accent: "text-blue-700" },
-  { key: "Infraestrutura", icon: Wrench, accent: "text-amber-700" },
-  { key: "Material Didáctico", icon: Package, accent: "text-violet-700" },
-  { key: "Serviços e Utilities", icon: Zap, accent: "text-emerald-700" },
-  { key: "Operacional", icon: Building2, accent: "text-slate-700" },
-  { key: "Bolsas e Apoios", icon: HandCoins, accent: "text-pink-700" },
-  { key: "Investigação", icon: FlaskConical, accent: "text-teal-700" },
-  { key: "Tecnologia", icon: Coins, accent: "text-indigo-700" },
-];
-
-const tipoChipDespesa: Record<TipoDespesa, string> = {
-  "Salários": "bg-blue-50 text-blue-700 border-blue-200",
-  "Infraestrutura": "bg-amber-50 text-amber-700 border-amber-200",
-  "Material Didáctico": "bg-violet-50 text-violet-700 border-violet-200",
-  "Serviços e Utilities": "bg-emerald-50 text-emerald-700 border-emerald-200",
-  "Operacional": "bg-slate-50 text-slate-700 border-slate-200",
-  "Bolsas e Apoios": "bg-pink-50 text-pink-700 border-pink-200",
-  "Investigação": "bg-teal-50 text-teal-700 border-teal-200",
-  "Tecnologia": "bg-indigo-50 text-indigo-700 border-indigo-200",
-};
 
 const periodCls: Record<DespesaRow["periodicidade"], string> = {
   mensal: "bg-blue-50 text-blue-700 border-blue-200",
@@ -256,22 +189,35 @@ const periodCls: Record<DespesaRow["periodicidade"], string> = {
   pontual: "bg-slate-50 text-slate-700 border-slate-200",
 };
 
+// Deterministic colour palette indexed by string hash
+const PALETTE = [
+  "bg-blue-50 text-blue-700 border-blue-200",
+  "bg-emerald-50 text-emerald-700 border-emerald-200",
+  "bg-violet-50 text-violet-700 border-violet-200",
+  "bg-amber-50 text-amber-700 border-amber-200",
+  "bg-pink-50 text-pink-700 border-pink-200",
+  "bg-teal-50 text-teal-700 border-teal-200",
+  "bg-indigo-50 text-indigo-700 border-indigo-200",
+  "bg-orange-50 text-orange-700 border-orange-200",
+  "bg-red-50 text-red-700 border-red-200",
+  "bg-slate-50 text-slate-700 border-slate-200",
+];
+const chipFor = (s: string) => {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+  return PALETTE[h % PALETTE.length];
+};
+
 /* ════════════════════════════════════════════════════════════════════════
-   SALÁRIOS — multas (descontos) e configuração
+   SALÁRIOS
    ════════════════════════════════════════════════════════════════════════ */
 
-interface SalaryMulta {
-  id: string;
-  nome: string;
-  valor: number;
-}
-
+interface SalaryMulta { id: string; nome: string; valor: number; }
 interface SalaryConfig {
   baseSalary: number;
-  deductionRate: number; // 0-1 (IRT/SS)
+  deductionRate: number;
   multas: SalaryMulta[];
 }
-
 const seedSalaryConfig = (s: Salary): SalaryConfig => ({
   baseSalary: s.grossSalary,
   deductionRate: s.deductions / s.grossSalary,
@@ -294,6 +240,7 @@ export default function ConfigurarReceitas() {
   const [receitas, setReceitas] = useState<ReceitaRow[]>(initialReceitas);
   const [receitaFilter, setReceitaFilter] = useState<string>("todos");
   const [selectedFaculty, setSelectedFaculty] = useState<string | null>(null);
+  const [multaSubtype, setMultaSubtype] = useState<TipoReceita>("Multa Estudante");
 
   const [openReceitaSection, setOpenReceitaSection] = useState<SectionDef | null>(null);
   const [editingReceita, setEditingReceita] = useState<ReceitaRow | null>(null);
@@ -302,16 +249,24 @@ export default function ConfigurarReceitas() {
   const [inlineEditPlan, setInlineEditPlan] = useState<{ rowId: string; months: number; valor: string } | null>(null);
 
   /* ── DESPESAS ── */
-  const [despesas, setDespesas] = useState<DespesaRow[]>(initialDespesas);
-  const [despesaFilter, setDespesaFilter] = useState<"todos" | TipoDespesa>("todos");
-  const [openDespesaSection, setOpenDespesaSection] = useState<TipoDespesa | null>(null);
+  const [despesas, setDespesas] = useState<DespesaRow[]>([]);
+  const [categorias, setCategorias] = useState<string[]>([]);
+  const [estados, setEstados] = useState<string[]>(["Activo", "Em revisão", "Suspensa"]);
+  const [despesaCatFilter, setDespesaCatFilter] = useState<string>("todos");
+  const [despesaEstadoFilter, setDespesaEstadoFilter] = useState<string>("todos");
+  const [despesaSearch, setDespesaSearch] = useState("");
+
   const [editingDespesa, setEditingDespesa] = useState<DespesaRow | null>(null);
+  const [openDespesaDialog, setOpenDespesaDialog] = useState(false);
   const [despesaForm, setDespesaForm] = useState<DespesaRow>({
-    id: "", nome: "", tipo: "Operacional", departamento: "Geral", periodicidade: "mensal", valorEstimado: 0,
+    id: "", nome: "", categoria: "", estado: "", departamento: "Geral", periodicidade: "mensal", valorEstimado: 0,
   });
   const [confirmDelDespesa, setConfirmDelDespesa] = useState<DespesaRow | null>(null);
+  const [newCategoria, setNewCategoria] = useState("");
+  const [newEstado, setNewEstado] = useState("");
 
   /* ── SALÁRIOS ── */
+  const [salaries, setSalaries] = useState<Salary[]>(initialSalarios);
   const [salaryConfigs, setSalaryConfigs] = useState<Record<string, SalaryConfig>>(() => {
     const map: Record<string, SalaryConfig> = {};
     for (const s of initialSalarios) map[s.id] = seedSalaryConfig(s);
@@ -322,6 +277,11 @@ export default function ConfigurarReceitas() {
   const [editingSalary, setEditingSalary] = useState<Salary | null>(null);
   const [salaryForm, setSalaryForm] = useState<SalaryConfig>({ baseSalary: 0, deductionRate: 0.14, multas: [] });
   const [newMulta, setNewMulta] = useState<{ nome: string; valor: string }>({ nome: "", valor: "" });
+  const [confirmDelSalary, setConfirmDelSalary] = useState<Salary | null>(null);
+  const [openNewSalary, setOpenNewSalary] = useState(false);
+  const [newSalaryForm, setNewSalaryForm] = useState({
+    name: "", employeeId: "", role: "", department: "Administração", grossSalary: 0,
+  });
 
   /* ── derived ── */
   const receitasBySection = useMemo(() => {
@@ -341,14 +301,20 @@ export default function ConfigurarReceitas() {
     });
   }, [receitas]);
 
-  const despesasByTipo = useMemo(() => {
-    const map: Record<TipoDespesa, DespesaRow[]> = {} as Record<TipoDespesa, DespesaRow[]>;
-    for (const t of TIPOS_DESPESA) map[t] = despesas.filter(d => d.tipo === t);
-    return map;
-  }, [despesas]);
+  const filteredDespesas = useMemo(() => {
+    return despesas.filter(d => {
+      if (despesaCatFilter !== "todos" && d.categoria !== despesaCatFilter) return false;
+      if (despesaEstadoFilter !== "todos" && d.estado !== despesaEstadoFilter) return false;
+      if (despesaSearch) {
+        const q = despesaSearch.toLowerCase();
+        if (!d.nome.toLowerCase().includes(q) && !d.departamento.toLowerCase().includes(q)) return false;
+      }
+      return true;
+    });
+  }, [despesas, despesaCatFilter, despesaEstadoFilter, despesaSearch]);
 
   const salaryList = useMemo(() => {
-    return initialSalarios.filter(s => {
+    return salaries.filter(s => {
       if (salaryDeptFilter !== "todos" && s.department !== salaryDeptFilter) return false;
       if (salarySearch) {
         const q = salarySearch.toLowerCase();
@@ -356,13 +322,14 @@ export default function ConfigurarReceitas() {
       }
       return true;
     });
-  }, [salaryDeptFilter, salarySearch]);
+  }, [salaries, salaryDeptFilter, salarySearch]);
 
   /* ── RECEITAS ops ── */
   const openNewReceita = (s: SectionDef) => {
     setOpenReceitaSection(s);
     setEditingReceita(null);
-    setReceitaForm({ id: "", nome: "", tipo: s.defaultTipo, escopo: "geral", valor: 0 });
+    const defaultTipo = s.key === "multas" ? multaSubtype : s.defaultTipo;
+    setReceitaForm({ id: "", nome: "", tipo: defaultTipo, escopo: "geral", valor: 0 });
   };
   const openEditReceita = (s: SectionDef, r: ReceitaRow) => {
     setOpenReceitaSection(s);
@@ -419,20 +386,29 @@ export default function ConfigurarReceitas() {
   };
 
   /* ── DESPESAS ops ── */
-  const openNewDespesa = (tipo: TipoDespesa) => {
-    setOpenDespesaSection(tipo);
+  const openNewDespesa = () => {
+    if (categorias.length === 0) {
+      toast({ title: "Crie primeiro uma categoria", description: "Defina pelo menos uma categoria antes de adicionar uma despesa.", variant: "destructive" });
+      return;
+    }
     setEditingDespesa(null);
-    setDespesaForm({ id: "", nome: "", tipo, departamento: "Geral", periodicidade: "mensal", valorEstimado: 0 });
+    setDespesaForm({
+      id: "", nome: "",
+      categoria: categorias[0],
+      estado: estados[0] ?? "",
+      departamento: "Geral", periodicidade: "mensal", valorEstimado: 0,
+    });
+    setOpenDespesaDialog(true);
   };
   const openEditDespesa = (d: DespesaRow) => {
-    setOpenDespesaSection(d.tipo);
     setEditingDespesa(d);
     setDespesaForm({ ...d });
+    setOpenDespesaDialog(true);
   };
-  const closeDespesa = () => { setOpenDespesaSection(null); setEditingDespesa(null); };
+  const closeDespesa = () => { setOpenDespesaDialog(false); setEditingDespesa(null); };
   const saveDespesa = () => {
-    if (!despesaForm.nome.trim() || despesaForm.valorEstimado < 0) {
-      toast({ title: "Dados incompletos", variant: "destructive" });
+    if (!despesaForm.nome.trim() || !despesaForm.categoria || !despesaForm.estado || despesaForm.valorEstimado < 0) {
+      toast({ title: "Dados incompletos", description: "Preencha designação, categoria e estado.", variant: "destructive" });
       return;
     }
     if (editingDespesa) {
@@ -449,6 +425,36 @@ export default function ConfigurarReceitas() {
     setDespesas(ds => ds.filter(d => d.id !== confirmDelDespesa.id));
     toast({ title: "Despesa removida", description: confirmDelDespesa.nome });
     setConfirmDelDespesa(null);
+  };
+  const addCategoria = () => {
+    const v = newCategoria.trim();
+    if (!v) return;
+    if (categorias.includes(v)) { toast({ title: "Categoria já existe", variant: "destructive" }); return; }
+    setCategorias(cs => [...cs, v]);
+    setNewCategoria("");
+  };
+  const removeCategoria = (c: string) => {
+    if (despesas.some(d => d.categoria === c)) {
+      toast({ title: "Categoria em uso", description: "Remova primeiro as despesas que a usam.", variant: "destructive" });
+      return;
+    }
+    setCategorias(cs => cs.filter(x => x !== c));
+    if (despesaCatFilter === c) setDespesaCatFilter("todos");
+  };
+  const addEstado = () => {
+    const v = newEstado.trim();
+    if (!v) return;
+    if (estados.includes(v)) { toast({ title: "Estado já existe", variant: "destructive" }); return; }
+    setEstados(es => [...es, v]);
+    setNewEstado("");
+  };
+  const removeEstado = (e: string) => {
+    if (despesas.some(d => d.estado === e)) {
+      toast({ title: "Estado em uso", description: "Remova primeiro as despesas que o usam.", variant: "destructive" });
+      return;
+    }
+    setEstados(es => es.filter(x => x !== e));
+    if (despesaEstadoFilter === e) setDespesaEstadoFilter("todos");
   };
 
   /* ── SALÁRIOS ops ── */
@@ -478,10 +484,43 @@ export default function ConfigurarReceitas() {
     return c.baseSalary - deductions - multasTotal;
   };
 
-  // (toggle cards intentionally show no values — they are just mode switches)
+  const saveNewSalary = () => {
+    if (!newSalaryForm.name.trim() || !newSalaryForm.role.trim() || newSalaryForm.grossSalary <= 0) {
+      toast({ title: "Dados incompletos", description: "Preencha nome, posição e salário bruto.", variant: "destructive" });
+      return;
+    }
+    const id = `sal-${Date.now()}`;
+    const empId = newSalaryForm.employeeId.trim() || `EMP-${Math.floor(Math.random() * 9000 + 1000)}`;
+    const deductionRate = 0.14;
+    const deductions = Math.round(newSalaryForm.grossSalary * deductionRate);
+    const newSal: Salary = {
+      id,
+      employeeId: empId,
+      name: newSalaryForm.name.trim(),
+      role: newSalaryForm.role.trim(),
+      department: newSalaryForm.department,
+      contractType: "efectivo",
+      grossSalary: newSalaryForm.grossSalary,
+      netSalary: newSalaryForm.grossSalary - deductions,
+      deductions,
+      status: "pendente",
+      payDate: new Date().toISOString().slice(0, 10),
+    };
+    setSalaries(ss => [newSal, ...ss]);
+    setSalaryConfigs(c => ({ ...c, [id]: { baseSalary: newSalaryForm.grossSalary, deductionRate, multas: [] } }));
+    toast({ title: "Colaborador adicionado", description: newSal.name });
+    setOpenNewSalary(false);
+    setNewSalaryForm({ name: "", employeeId: "", role: "", department: "Administração", grossSalary: 0 });
+  };
+  const confirmRemoveSalary = () => {
+    if (!confirmDelSalary) return;
+    setSalaries(ss => ss.filter(s => s.id !== confirmDelSalary.id));
+    setSalaryConfigs(c => { const n = { ...c }; delete n[confirmDelSalary.id]; return n; });
+    toast({ title: "Colaborador removido", description: confirmDelSalary.name });
+    setConfirmDelSalary(null);
+  };
 
   const visibleReceitaSections = receitaFilter === "todos" ? RECEITA_SECTIONS : RECEITA_SECTIONS.filter(s => s.key === receitaFilter);
-  const visibleDespesaSections = despesaFilter === "todos" ? DESPESA_SECTIONS : DESPESA_SECTIONS.filter(s => s.key === despesaFilter);
 
   return (
     <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6 animate-fade-in">
@@ -504,7 +543,7 @@ export default function ConfigurarReceitas() {
       <div className="grid grid-cols-3 gap-2">
         {([
           { key: "receitas" as const, label: "Receitas", sub: "Propinas, emolumentos, multas",   icon: TrendingUp,   accent: "text-emerald-700", bg: "bg-emerald-50", border: "border-emerald-200" },
-          { key: "despesas" as const, label: "Despesas", sub: "Rubricas orçamentais",            icon: TrendingDown, accent: "text-red-700",     bg: "bg-red-50",     border: "border-red-200" },
+          { key: "despesas" as const, label: "Despesas", sub: "Rubricas e categorias customizadas", icon: TrendingDown, accent: "text-red-700",     bg: "bg-red-50",     border: "border-red-200" },
           { key: "salarios" as const, label: "Salários", sub: "Folha salarial de colaboradores", icon: Banknote,     accent: "text-blue-700",    bg: "bg-blue-50",    border: "border-blue-200" },
         ]).map(m => {
           const Icon = m.icon;
@@ -668,6 +707,77 @@ export default function ConfigurarReceitas() {
               );
             }
 
+            // Multas section — single card with internal subtype toggle
+            if (section.key === "multas") {
+              const filtered = items.filter(r => r.tipo === multaSubtype);
+              return (
+                <Card key={section.key} className="p-5">
+                  <div className="flex items-center justify-between mb-3 gap-4 flex-wrap">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <Icon className={cn("w-4 h-4", section.accent)} />
+                      <h2 className="text-sm font-semibold text-foreground">{section.title}</h2>
+                      <span className="text-[11px] text-muted-foreground tabular-nums">· {items.length} no total</span>
+                      <span className="text-xs text-muted-foreground truncate hidden md:inline">— {section.description}</span>
+                    </div>
+                    <Button size="sm" variant="outline" className="gap-1.5 h-8 text-xs" onClick={() => openNewReceita(section)}>
+                      <Plus className="w-3.5 h-3.5" /> Nova multa
+                    </Button>
+                  </div>
+
+                  <div className="flex items-center gap-1 bg-muted/50 rounded-lg p-1 w-fit mb-4">
+                    {MULTA_SUBTYPES.map(sub => {
+                      const count = items.filter(r => r.tipo === sub.key).length;
+                      const active = multaSubtype === sub.key;
+                      return (
+                        <Button key={sub.key} variant="ghost" size="sm"
+                          onClick={() => setMultaSubtype(sub.key)}
+                          className={cn("text-xs h-7 px-3 rounded-md gap-1.5",
+                            active ? "bg-background shadow-sm text-foreground font-medium" : "text-muted-foreground hover:text-foreground"
+                          )}>
+                          {sub.label}
+                          <span className={cn("inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full text-[10px] tabular-nums",
+                            active ? "bg-muted text-foreground" : "bg-background text-muted-foreground")}>{count}</span>
+                        </Button>
+                      );
+                    })}
+                  </div>
+
+                  {filtered.length === 0 ? (
+                    <p className="text-xs text-muted-foreground italic py-3">Sem multas configuradas para esta categoria.</p>
+                  ) : (
+                    <div className="divide-y divide-border">
+                      {filtered.map(r => (
+                        <div key={r.id} role="button" tabIndex={0}
+                          onClick={() => openEditReceita(section, r)}
+                          onKeyDown={(e) => { if (e.key === "Enter") openEditReceita(section, r); }}
+                          className="flex items-center gap-3 py-2.5 px-2 -mx-2 rounded-md cursor-pointer hover:bg-muted/50 transition group"
+                          title="Clique para editar">
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-foreground truncate">{r.nome}</p>
+                            <div className="flex items-center gap-1.5 mt-0.5">
+                              <span className={cn("inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] font-medium", tipoChipReceita[r.tipo])}>
+                                {r.tipo}
+                              </span>
+                            </div>
+                          </div>
+                          <span className="text-sm font-semibold text-foreground tabular-nums whitespace-nowrap">{formatCurrency(r.valor)}</span>
+                          <div className="flex items-center gap-0.5">
+                            <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md" onClick={(e) => { e.stopPropagation(); openEditReceita(section, r); }} title="Editar">
+                              <Pencil className="w-3.5 h-3.5" />
+                            </Button>
+                            <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md text-destructive hover:text-destructive opacity-60 hover:opacity-100"
+                              onClick={(e) => { e.stopPropagation(); setConfirmDelReceita(r); }} title="Remover">
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </Card>
+              );
+            }
+
             return (
               <Card key={section.key} className="p-5">
                 <div className="flex items-center justify-between mb-4 gap-4 flex-wrap">
@@ -723,80 +833,154 @@ export default function ConfigurarReceitas() {
 
       {/* ════════════════ DESPESAS ════════════════ */}
       {mode === "despesas" && (
-        <>
-          <div className="flex items-center gap-1 bg-muted/50 rounded-lg p-1 w-fit flex-wrap">
-            <Button variant="ghost" size="sm" onClick={() => setDespesaFilter("todos")}
-              className={cn("text-xs h-7 px-3 rounded-md",
-                despesaFilter === "todos" ? "bg-background shadow-sm text-foreground font-medium" : "text-muted-foreground hover:text-foreground")}>
-              Todos
+        <Card className="p-5">
+          <div className="flex items-center justify-between mb-4 gap-3 flex-wrap">
+            <div className="flex items-center gap-2 min-w-0">
+              <TrendingDown className="w-4 h-4 text-red-700" />
+              <h2 className="text-sm font-semibold text-foreground">Despesas</h2>
+              <span className="text-[11px] text-muted-foreground tabular-nums">· {filteredDespesas.length} de {despesas.length}</span>
+              {despesas.length > 0 && (
+                <span className="text-xs text-muted-foreground hidden md:inline">
+                  — Total filtrado: <span className="font-semibold text-foreground tabular-nums">{formatCurrency(filteredDespesas.reduce((s, d) => s + d.valorEstimado, 0))}</span>
+                </span>
+              )}
+            </div>
+            <Button size="sm" className="gap-1.5 h-8 text-xs" onClick={openNewDespesa}>
+              <Plus className="w-3.5 h-3.5" /> Nova despesa
             </Button>
-            {DESPESA_SECTIONS.map(s => (
-              <Button key={s.key} variant="ghost" size="sm" onClick={() => setDespesaFilter(s.key)}
-                className={cn("text-xs h-7 px-3 rounded-md",
-                  despesaFilter === s.key ? "bg-background shadow-sm text-foreground font-medium" : "text-muted-foreground hover:text-foreground")}>
-                {s.key}
-              </Button>
-            ))}
           </div>
 
-          {visibleDespesaSections.map(section => {
-            const items = despesasByTipo[section.key];
-            const Icon = section.icon;
-            const sectionTotal = items.reduce((s, d) => s + d.valorEstimado, 0);
-            return (
-              <Card key={section.key} className="p-5">
-                <div className="flex items-center justify-between mb-4 gap-4 flex-wrap">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <Icon className={cn("w-4 h-4", section.accent)} />
-                    <h2 className="text-sm font-semibold text-foreground">{section.key}</h2>
-                    <span className="text-[11px] text-muted-foreground tabular-nums">· {items.length}</span>
-                    <span className="text-xs text-muted-foreground hidden md:inline">— Total: <span className="font-semibold text-foreground tabular-nums">{formatCurrency(sectionTotal)}</span></span>
-                  </div>
-                  <Button size="sm" variant="outline" className="gap-1.5 h-8 text-xs" onClick={() => openNewDespesa(section.key)}>
-                    <Plus className="w-3.5 h-3.5" /> Nova
-                  </Button>
-                </div>
+          {/* Configurador de categorias e estados */}
+          <div className="grid sm:grid-cols-2 gap-3 mb-4">
+            {/* Categorias */}
+            <div className="rounded-lg border border-border p-3 bg-muted/20">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-[11px] font-semibold text-foreground flex items-center gap-1.5">
+                  <Tag className="w-3.5 h-3.5 text-muted-foreground" /> Categorias
+                </p>
+                <span className="text-[10px] text-muted-foreground tabular-nums">{categorias.length}</span>
+              </div>
+              <div className="flex flex-wrap gap-1.5 mb-2 min-h-[28px]">
+                {categorias.length === 0 ? (
+                  <span className="text-[11px] text-muted-foreground italic">Crie categorias para classificar as despesas.</span>
+                ) : categorias.map(c => (
+                  <span key={c} className={cn("inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-medium", chipFor(c))}>
+                    {c}
+                    <button onClick={() => removeCategoria(c)} className="hover:bg-black/10 rounded-full" title="Remover categoria">
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                ))}
+              </div>
+              <div className="flex gap-1.5">
+                <Input value={newCategoria} onChange={e => setNewCategoria(e.target.value)}
+                  onKeyDown={e => { if (e.key === "Enter") addCategoria(); }}
+                  placeholder="Nova categoria" className="h-7 text-xs" />
+                <Button size="sm" variant="outline" className="h-7 px-2 gap-1 text-[11px]" onClick={addCategoria}>
+                  <Plus className="w-3 h-3" /> Add
+                </Button>
+              </div>
+            </div>
 
-                {items.length === 0 ? (
-                  <p className="text-xs text-muted-foreground italic py-3">Sem itens configurados.</p>
-                ) : (
-                  <div className="divide-y divide-border">
-                    {items.map(d => (
-                      <div key={d.id} role="button" tabIndex={0}
-                        onClick={() => openEditDespesa(d)}
-                        onKeyDown={(e) => { if (e.key === "Enter") openEditDespesa(d); }}
-                        className="flex items-center gap-3 py-2.5 px-2 -mx-2 rounded-md cursor-pointer hover:bg-muted/50 transition group"
-                        title="Clique para editar">
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-foreground truncate">{d.nome}</p>
-                          <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
-                            <span className={cn("inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] font-medium", tipoChipDespesa[d.tipo])}>
-                              {d.tipo}
-                            </span>
-                            <span className={cn("inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] font-medium capitalize", periodCls[d.periodicidade])}>
-                              {d.periodicidade}
-                            </span>
-                            <span className="text-[11px] text-muted-foreground truncate">{d.departamento}</span>
-                          </div>
-                        </div>
-                        <span className="text-sm font-semibold text-foreground tabular-nums whitespace-nowrap">{formatCurrency(d.valorEstimado)}</span>
-                        <div className="flex items-center gap-0.5">
-                          <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md" onClick={(e) => { e.stopPropagation(); openEditDespesa(d); }} title="Editar">
-                            <Pencil className="w-3.5 h-3.5" />
-                          </Button>
-                          <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md text-destructive hover:text-destructive opacity-60 hover:opacity-100"
-                            onClick={(e) => { e.stopPropagation(); setConfirmDelDespesa(d); }} title="Remover">
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
+            {/* Estados */}
+            <div className="rounded-lg border border-border p-3 bg-muted/20">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-[11px] font-semibold text-foreground flex items-center gap-1.5">
+                  <CircleDot className="w-3.5 h-3.5 text-muted-foreground" /> Estados
+                </p>
+                <span className="text-[10px] text-muted-foreground tabular-nums">{estados.length}</span>
+              </div>
+              <div className="flex flex-wrap gap-1.5 mb-2 min-h-[28px]">
+                {estados.length === 0 ? (
+                  <span className="text-[11px] text-muted-foreground italic">Crie estados (ex.: Activo, Suspensa).</span>
+                ) : estados.map(e => (
+                  <span key={e} className={cn("inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-medium", chipFor(e))}>
+                    {e}
+                    <button onClick={() => removeEstado(e)} className="hover:bg-black/10 rounded-full" title="Remover estado">
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                ))}
+              </div>
+              <div className="flex gap-1.5">
+                <Input value={newEstado} onChange={e => setNewEstado(e.target.value)}
+                  onKeyDown={e => { if (e.key === "Enter") addEstado(); }}
+                  placeholder="Novo estado" className="h-7 text-xs" />
+                <Button size="sm" variant="outline" className="h-7 px-2 gap-1 text-[11px]" onClick={addEstado}>
+                  <Plus className="w-3 h-3" /> Add
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          {/* Filtros */}
+          <div className="flex items-center gap-2 mb-3 flex-wrap">
+            <div className="relative">
+              <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <Input value={despesaSearch} onChange={e => setDespesaSearch(e.target.value)}
+                placeholder="Procurar..." className="h-8 text-xs pl-8 w-[200px]" />
+            </div>
+            <Select value={despesaCatFilter} onValueChange={setDespesaCatFilter}>
+              <SelectTrigger className="h-8 w-[180px] text-xs"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Todas as categorias</SelectItem>
+                {categorias.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+              </SelectContent>
+            </Select>
+            <Select value={despesaEstadoFilter} onValueChange={setDespesaEstadoFilter}>
+              <SelectTrigger className="h-8 w-[160px] text-xs"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Todos os estados</SelectItem>
+                {estados.map(e => <SelectItem key={e} value={e}>{e}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {despesas.length === 0 ? (
+            <div className="text-center py-10">
+              <p className="text-sm text-muted-foreground">Sem despesas configuradas.</p>
+              <p className="text-[11px] text-muted-foreground mt-1">Comece por criar categorias e estados, depois adicione despesas.</p>
+            </div>
+          ) : filteredDespesas.length === 0 ? (
+            <p className="text-center text-xs text-muted-foreground py-8">Nenhuma despesa corresponde aos filtros.</p>
+          ) : (
+            <div className="divide-y divide-border">
+              {filteredDespesas.map(d => (
+                <div key={d.id} role="button" tabIndex={0}
+                  onClick={() => openEditDespesa(d)}
+                  onKeyDown={(e) => { if (e.key === "Enter") openEditDespesa(d); }}
+                  className="flex items-center gap-3 py-2.5 px-2 -mx-2 rounded-md cursor-pointer hover:bg-muted/50 transition group"
+                  title="Clique para editar">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-foreground truncate">{d.nome}</p>
+                    <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                      <span className={cn("inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] font-medium", chipFor(d.categoria))}>
+                        {d.categoria}
+                      </span>
+                      <span className={cn("inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] font-medium", chipFor(d.estado))}>
+                        {d.estado}
+                      </span>
+                      <span className={cn("inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] font-medium capitalize", periodCls[d.periodicidade])}>
+                        {d.periodicidade}
+                      </span>
+                      <span className="text-[11px] text-muted-foreground truncate">{d.departamento}</span>
+                    </div>
                   </div>
-                )}
-              </Card>
-            );
-          })}
-        </>
+                  <span className="text-sm font-semibold text-foreground tabular-nums whitespace-nowrap">{formatCurrency(d.valorEstimado)}</span>
+                  <div className="flex items-center gap-0.5">
+                    <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md" onClick={(e) => { e.stopPropagation(); openEditDespesa(d); }} title="Editar">
+                      <Pencil className="w-3.5 h-3.5" />
+                    </Button>
+                    <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md text-destructive hover:text-destructive opacity-60 hover:opacity-100"
+                      onClick={(e) => { e.stopPropagation(); setConfirmDelDespesa(d); }} title="Remover">
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </Card>
       )}
 
       {/* ════════════════ SALÁRIOS ════════════════ */}
@@ -806,23 +990,26 @@ export default function ConfigurarReceitas() {
             <div className="flex items-center gap-2 min-w-0">
               <Banknote className="w-4 h-4 text-blue-700" />
               <h2 className="text-sm font-semibold text-foreground">Folha Salarial</h2>
-              <span className="text-[11px] text-muted-foreground tabular-nums">· {salaryList.length} colaboradores</span>
+              <span className="text-[11px] text-muted-foreground tabular-nums">· {salaryList.length} de {salaries.length}</span>
             </div>
             <div className="flex items-center gap-2 flex-wrap">
               <div className="relative">
                 <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
                 <Input value={salarySearch} onChange={e => setSalarySearch(e.target.value)}
-                  placeholder="Procurar..." className="h-8 text-xs pl-8 w-[220px]" />
+                  placeholder="Procurar..." className="h-8 text-xs pl-8 w-[200px]" />
               </div>
               <Select value={salaryDeptFilter} onValueChange={setSalaryDeptFilter}>
-                <SelectTrigger className="h-8 w-[200px] text-xs"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="h-8 w-[180px] text-xs"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="todos">Todos os departamentos</SelectItem>
-                  {Array.from(new Set(initialSalarios.map(s => s.department))).map(d => (
+                  {Array.from(new Set(salaries.map(s => s.department))).map(d => (
                     <SelectItem key={d} value={d}>{d}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
+              <Button size="sm" className="h-8 gap-1.5 text-xs" onClick={() => setOpenNewSalary(true)}>
+                <Plus className="w-3.5 h-3.5" /> Novo colaborador
+              </Button>
             </div>
           </div>
 
@@ -835,12 +1022,13 @@ export default function ConfigurarReceitas() {
                   <th className="text-left font-semibold px-2 py-2">Departamento</th>
                   <th className="text-right font-semibold px-2 py-2">Salário Bruto</th>
                   <th className="text-right font-semibold px-2 py-2">Salário Líquido</th>
-                  <th className="w-8"></th>
+                  <th className="w-16"></th>
                 </tr>
               </thead>
               <tbody>
                 {salaryList.map(s => {
                   const cfg = salaryConfigs[s.id];
+                  if (!cfg) return null;
                   const deductions = Math.round(cfg.baseSalary * cfg.deductionRate);
                   const multasTotal = cfg.multas.reduce((sum, m) => sum + m.valor, 0);
                   const net = cfg.baseSalary - deductions - multasTotal;
@@ -859,8 +1047,16 @@ export default function ConfigurarReceitas() {
                       </td>
                       <td className="px-2 py-2.5 text-right text-sm tabular-nums text-foreground">{formatCurrency(cfg.baseSalary)}</td>
                       <td className="px-2 py-2.5 text-right text-sm font-semibold tabular-nums text-blue-700">{formatCurrency(net)}</td>
-                      <td className="px-2">
-                        <Pencil className="w-3.5 h-3.5 text-muted-foreground group-hover:text-foreground" />
+                      <td className="px-2 py-2.5">
+                        <div className="flex items-center gap-0.5 justify-end opacity-60 group-hover:opacity-100 transition">
+                          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={(e) => { e.stopPropagation(); openEditSalary(s); }} title="Editar">
+                            <Pencil className="w-3.5 h-3.5" />
+                          </Button>
+                          <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive"
+                            onClick={(e) => { e.stopPropagation(); setConfirmDelSalary(s); }} title="Remover">
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </Button>
+                        </div>
                       </td>
                     </tr>
                   );
@@ -938,10 +1134,10 @@ export default function ConfigurarReceitas() {
       </Dialog>
 
       {/* ═══════ Despesa dialog ═══════ */}
-      <Dialog open={!!openDespesaSection} onOpenChange={(o) => !o && closeDespesa()}>
+      <Dialog open={openDespesaDialog} onOpenChange={(o) => !o && closeDespesa()}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>{editingDespesa ? "Editar despesa" : `Nova despesa — ${openDespesaSection ?? ""}`}</DialogTitle>
+            <DialogTitle>{editingDespesa ? "Editar despesa" : "Nova despesa"}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div className="space-y-1.5">
@@ -951,13 +1147,24 @@ export default function ConfigurarReceitas() {
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <label className="text-xs font-medium text-muted-foreground">Categoria</label>
-                <Select value={despesaForm.tipo} onValueChange={(v: TipoDespesa) => setDespesaForm({ ...despesaForm, tipo: v })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                <Select value={despesaForm.categoria} onValueChange={v => setDespesaForm({ ...despesaForm, categoria: v })}>
+                  <SelectTrigger><SelectValue placeholder="Seleccionar..." /></SelectTrigger>
                   <SelectContent>
-                    {TIPOS_DESPESA.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                    {categorias.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-muted-foreground">Estado</label>
+                <Select value={despesaForm.estado} onValueChange={v => setDespesaForm({ ...despesaForm, estado: v })}>
+                  <SelectTrigger><SelectValue placeholder="Seleccionar..." /></SelectTrigger>
+                  <SelectContent>
+                    {estados.map(e => <SelectItem key={e} value={e}>{e}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <label className="text-xs font-medium text-muted-foreground">Periodicidade</label>
                 <Select value={despesaForm.periodicidade} onValueChange={(v: DespesaRow["periodicidade"]) => setDespesaForm({ ...despesaForm, periodicidade: v })}>
@@ -970,22 +1177,20 @@ export default function ConfigurarReceitas() {
                   </SelectContent>
                 </Select>
               </div>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <label className="text-xs font-medium text-muted-foreground">Departamento</label>
-                <Select value={despesaForm.departamento} onValueChange={v => setDespesaForm({ ...despesaForm, departamento: v })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent className="max-h-[300px]">
-                    {DEPARTAMENTOS.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-              </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-medium text-muted-foreground">Valor estimado (Kz)</label>
                 <Input type="number" min={0} value={despesaForm.valorEstimado}
                   onChange={e => setDespesaForm({ ...despesaForm, valorEstimado: Number(e.target.value) || 0 })} />
               </div>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground">Departamento</label>
+              <Select value={despesaForm.departamento} onValueChange={v => setDespesaForm({ ...despesaForm, departamento: v })}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent className="max-h-[300px]">
+                  {DEPARTAMENTOS.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}
+                </SelectContent>
+              </Select>
             </div>
           </div>
           <DialogFooter className="gap-2 sm:gap-2">
@@ -1006,7 +1211,7 @@ export default function ConfigurarReceitas() {
         </DialogContent>
       </Dialog>
 
-      {/* ═══════ Salary dialog ═══════ */}
+      {/* ═══════ Salary edit dialog ═══════ */}
       <Dialog open={!!editingSalary} onOpenChange={(o) => !o && closeSalary()}>
         <DialogContent className="max-w-xl">
           <DialogHeader>
@@ -1095,7 +1300,68 @@ export default function ConfigurarReceitas() {
         </DialogContent>
       </Dialog>
 
-      <span className="hidden"><Receipt /></span>
+      {/* ═══════ Novo colaborador dialog ═══════ */}
+      <Dialog open={openNewSalary} onOpenChange={setOpenNewSalary}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Plus className="w-4 h-4 text-blue-700" /> Novo colaborador
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-muted-foreground">Nome completo</label>
+                <Input value={newSalaryForm.name} onChange={e => setNewSalaryForm({ ...newSalaryForm, name: e.target.value })} placeholder="Ex.: João Silva" />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-muted-foreground">Nº de colaborador</label>
+                <Input value={newSalaryForm.employeeId} onChange={e => setNewSalaryForm({ ...newSalaryForm, employeeId: e.target.value })} placeholder="auto se vazio" />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-muted-foreground">Posição</label>
+                <Input value={newSalaryForm.role} onChange={e => setNewSalaryForm({ ...newSalaryForm, role: e.target.value })} placeholder="Ex.: Professor Auxiliar" />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-muted-foreground">Departamento</label>
+                <Select value={newSalaryForm.department} onValueChange={v => setNewSalaryForm({ ...newSalaryForm, department: v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent className="max-h-[260px]">
+                    {Array.from(new Set([...DEPARTAMENTOS, ...salaries.map(s => s.department)])).map(d => (
+                      <SelectItem key={d} value={d}>{d}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground">Salário Bruto (Kz)</label>
+              <Input type="number" min={0} value={newSalaryForm.grossSalary}
+                onChange={e => setNewSalaryForm({ ...newSalaryForm, grossSalary: Number(e.target.value) || 0 })} />
+            </div>
+          </div>
+          <DialogFooter className="gap-2 sm:gap-2">
+            <DialogClose asChild><Button variant="outline">Cancelar</Button></DialogClose>
+            <Button onClick={saveNewSalary}>Adicionar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!confirmDelSalary} onOpenChange={(o) => !o && setConfirmDelSalary(null)}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader><DialogTitle>Remover colaborador?</DialogTitle></DialogHeader>
+          <p className="text-sm text-muted-foreground">{confirmDelSalary?.name} ({confirmDelSalary?.role}). Esta acção não pode ser desfeita.</p>
+          <DialogFooter className="gap-2 sm:gap-2">
+            <DialogClose asChild><Button variant="outline">Cancelar</Button></DialogClose>
+            <Button variant="destructive" onClick={confirmRemoveSalary}>Remover</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* unused-import guard */}
+      <span className="hidden"><Popover><PopoverTrigger /><PopoverContent /></Popover><Users /></span>
     </div>
   );
 }
