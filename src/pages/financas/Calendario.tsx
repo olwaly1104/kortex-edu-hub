@@ -565,37 +565,40 @@ export default function FinancasCalendario() {
 }
 
 /* ── Event row in agenda ── */
-function EventRow({ ev, onOpen }: { ev: AgendaEvent; onOpen: () => void }) {
+function EventRow({ ev, onOpen, compact = false }: { ev: AgendaEvent; onOpen: () => void; compact?: boolean }) {
   const m = TYPE_META[ev.type];
   const Icon = m.icon;
   const hasTime = !!ev.startTime;
   return (
-    <button onClick={onOpen} className="w-full text-left flex items-center gap-4 px-4 py-3 hover:bg-muted/30 transition-colors group">
-      <div className="text-center shrink-0 w-14">
+    <button onClick={onOpen} className={cn("w-full text-left flex items-center hover:bg-muted/30 transition-colors group",
+      compact ? "gap-2.5 px-3 py-2.5" : "gap-4 px-4 py-3")}>
+      <div className={cn("text-center shrink-0", compact ? "w-10" : "w-14")}>
         {hasTime ? (
           <>
-            <p className="text-sm font-bold text-foreground">{ev.startTime}</p>
+            <p className={cn("font-bold text-foreground", compact ? "text-xs" : "text-sm")}>{ev.startTime}</p>
             <p className="text-[10px] text-muted-foreground">{ev.endTime}</p>
           </>
         ) : (
           <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Dia<br/>todo</p>
         )}
       </div>
-      <div className={cn("w-0.5 h-10 rounded-full shrink-0", m.bar)} />
-      <div className={cn("w-7 h-7 rounded-lg flex items-center justify-center shrink-0", m.soft)}>
-        <Icon className={cn("w-3.5 h-3.5", m.text)} />
+      <div className={cn("w-0.5 rounded-full shrink-0", m.bar, compact ? "h-8" : "h-10")} />
+      <div className={cn("rounded-lg flex items-center justify-center shrink-0", m.soft, compact ? "w-6 h-6" : "w-7 h-7")}>
+        <Icon className={cn(m.text, compact ? "w-3 h-3" : "w-3.5 h-3.5")} />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="font-medium text-sm leading-tight text-foreground line-clamp-1">{ev.title}</p>
-        <div className="flex items-center gap-3 mt-1 text-[11px] text-muted-foreground">
+        <p className={cn("font-medium leading-tight text-foreground line-clamp-1", compact ? "text-xs" : "text-sm")}>{ev.title}</p>
+        <div className={cn("flex items-center mt-0.5 text-[10px] text-muted-foreground", compact ? "gap-2" : "gap-3 mt-1 text-[11px]")}>
           {ev.location && <span className="flex items-center gap-1 truncate"><MapPin className="w-3 h-3" />{ev.location}</span>}
           {ev.participants && ev.participants.length > 0 && (
-            <span className="flex items-center gap-1"><Users className="w-3 h-3" />{ev.participants.length} participante{ev.participants.length !== 1 ? "s" : ""}</span>
+            <span className="flex items-center gap-1"><Users className="w-3 h-3" />{ev.participants.length}{!compact && ` participante${ev.participants.length !== 1 ? "s" : ""}`}</span>
           )}
         </div>
       </div>
-      <Badge variant="outline" className={cn("text-[10px] shrink-0 border-0", m.soft, m.text)}>{m.label}</Badge>
-      {ev.obligatory && (
+      {!compact && (
+        <Badge variant="outline" className={cn("text-[10px] shrink-0 border-0", m.soft, m.text)}>{m.label}</Badge>
+      )}
+      {ev.obligatory && !compact && (
         <Badge variant="outline" className="text-[9px] bg-red-50 text-red-700 border-red-200 shrink-0">Obrigatório</Badge>
       )}
     </button>
