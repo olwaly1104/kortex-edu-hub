@@ -253,6 +253,8 @@ export default function GapConfiguracao() {
   const [cdNotaMinima, setCdNotaMinima] = useState(10);
   const [cdTaxa, setCdTaxa] = useState(15000);
   const [cdMaxOpcoes, setCdMaxOpcoes] = useState(3);
+  const [cdPeriodoInicio, setCdPeriodoInicio] = useState("2026-06-01");
+  const [cdPeriodoFim, setCdPeriodoFim] = useState("2026-08-31");
 
   const [cdEstadoOpen, setCdEstadoOpen] = useState(false);
   const [cdEtapaOpen, setCdEtapaOpen] = useState(false);
