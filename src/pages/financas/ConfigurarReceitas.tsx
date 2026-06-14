@@ -515,6 +515,63 @@ export default function ConfigurarReceitas() {
     if (despesaEstadoFilter === e) setDespesaEstadoFilter("todos");
   };
 
+  /* ── Responsáveis / Destinatários / Regras de aprovação ops ── */
+  const addResponsavel = () => {
+    if (!newRespNome.trim() || !newRespCargo.trim()) return;
+    setResponsaveis(rs => [...rs, { id: `resp-${Date.now()}`, nome: newRespNome.trim(), cargo: newRespCargo.trim() }]);
+    setNewRespNome(""); setNewRespCargo("");
+  };
+  const removeResponsavel = (id: string) => {
+    if (approvalRules.some(r => r.responsavelId === id)) {
+      toast({ title: "Responsável em uso", description: "Remova primeiro as regras associadas.", variant: "destructive" });
+      return;
+    }
+    setResponsaveis(rs => rs.filter(r => r.id !== id));
+  };
+  const setDestinatarioFor = (categoria: string, destinatario: string) => {
+    setDestinatariosMap(prev => {
+      const filtered = prev.filter(d => d.categoria !== categoria);
+      return destinatario ? [...filtered, { categoria, destinatario }] : filtered;
+    });
+  };
+  const getDestinatarioFor = (categoria: string) =>
+    destinatariosMap.find(d => d.categoria === categoria)?.destinatario ?? "";
+
+  const openNewRule = () => {
+    if (responsaveis.length === 0) {
+      toast({ title: "Crie primeiro um responsável", variant: "destructive" });
+      return;
+    }
+    setRuleForm({ min: "0", max: "", responsavelId: responsaveis[0].id });
+    setOpenRuleDialog(true);
+  };
+  const openEditRule = (r: ApprovalRule) => {
+    setRuleForm({ id: r.id, min: String(r.min), max: String(r.max), responsavelId: r.responsavelId });
+    setOpenRuleDialog(true);
+  };
+  const saveRule = () => {
+    const min = Number(ruleForm.min) || 0;
+    const max = Number(ruleForm.max) || 0;
+    if (max < min || !ruleForm.responsavelId) {
+      toast({ title: "Dados inválidos", description: "Verifique a faixa de valores e o responsável.", variant: "destructive" });
+      return;
+    }
+    if (ruleForm.id) {
+      setApprovalRules(rs => rs.map(r => r.id === ruleForm.id ? { ...r, min, max, responsavelId: ruleForm.responsavelId } : r));
+    } else {
+      setApprovalRules(rs => [...rs, { id: `rule-${Date.now()}`, min, max, responsavelId: ruleForm.responsavelId }].sort((a, b) => a.min - b.min));
+    }
+    setOpenRuleDialog(false);
+  };
+  const removeRule = (id: string) => setApprovalRules(rs => rs.filter(r => r.id !== id));
+  const responsavelForValue = (v: number) => {
+    const rule = approvalRules.find(r => v >= r.min && v <= r.max);
+    if (!rule) return null;
+    return responsaveis.find(r => r.id === rule.responsavelId) ?? null;
+  };
+
+
+
   /* ── SALÁRIOS ops ── */
   const openEditSalary = (s: Salary) => {
     setEditingSalary(s);
