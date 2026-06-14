@@ -39,6 +39,7 @@ export default function FinancasAnuncios() {
   const [items, setItems] = useState<FinAnn[]>(FIN_ANUNCIOS);
   const [scope, setScope] = useState<Scope>("todos");
   const [typeFilter, setTypeFilter] = useState<AnnType | "todos">("todos");
+  const [deptFilter, setDeptFilter] = useState<string>("todos");
   const [search, setSearch] = useState("");
   const [openCreate, setOpenCreate] = useState(false);
   const [subscribed, setSubscribed] = useState<Set<string>>(new Set());
