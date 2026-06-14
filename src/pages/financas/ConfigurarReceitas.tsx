@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose,
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose, DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
@@ -193,6 +193,7 @@ interface ResponsavelItem { id: string; nome: string; cargo: string; }
 interface DestinatarioMap { categoria: string; destinatario: string; }
 interface ApprovalRule { id: string; min: number; max: number; responsavelId: string; }
 interface CategoriaItem { id: string; label: string; color: string; }
+interface EstadoItem { id: string; label: string; color: string; }
 
 const CAT_PALETTE: { name: string; cls: string; dot: string }[] = [
   { name: "Azul",     cls: "bg-blue-50 text-blue-700 border-blue-200",         dot: "bg-blue-500" },
@@ -313,7 +314,12 @@ export default function ConfigurarReceitas() {
   /* ── DESPESAS ── */
   const [despesas, setDespesas] = useState<DespesaRow[]>([]);
   const [categorias, setCategorias] = useState<CategoriaItem[]>(INITIAL_CATEGORIAS);
-  const [estados, setEstados] = useState<string[]>(["Pendente", "Aprovada", "Executada", "Rejeitada"]);
+  const [estados, setEstados] = useState<EstadoItem[]>([
+    { id: "est-1", label: "Pendente",  color: "bg-amber-50 text-amber-700 border-amber-200" },
+    { id: "est-2", label: "Aprovada",  color: "bg-emerald-50 text-emerald-700 border-emerald-200" },
+    { id: "est-3", label: "Executada", color: "bg-blue-50 text-blue-700 border-blue-200" },
+    { id: "est-4", label: "Rejeitada", color: "bg-red-50 text-red-700 border-red-200" },
+  ]);
   const [despesaCatFilter, setDespesaCatFilter] = useState<string>("todos");
   const [despesaEstadoFilter, setDespesaEstadoFilter] = useState<string>("todos");
   const [despesaSearch, setDespesaSearch] = useState("");
@@ -331,7 +337,11 @@ export default function ConfigurarReceitas() {
   const [newCatColor, setNewCatColor] = useState<string>(CAT_PALETTE[0].cls);
   const [editingCategoria, setEditingCategoria] = useState<CategoriaItem | null>(null);
 
-  const [newEstado, setNewEstado] = useState("");
+  // Estado add / edit dialogs
+  const [estadoDialogOpen, setEstadoDialogOpen] = useState(false);
+  const [newEstadoLabel, setNewEstadoLabel] = useState("");
+  const [newEstadoColor, setNewEstadoColor] = useState<string>(CAT_PALETTE[0].cls);
+  const [editingEstado, setEditingEstado] = useState<EstadoItem | null>(null);
 
   // Responsáveis
   const [responsaveis, setResponsaveis] = useState<ResponsavelItem[]>(INITIAL_RESPONSAVEIS);
@@ -489,7 +499,7 @@ export default function ConfigurarReceitas() {
     setDespesaForm({
       id: "", nome: "",
       categoria: categorias[0].label,
-      estado: estados[0] ?? "",
+      estado: estados[0]?.label ?? "",
       departamento: "Geral", periodicidade: "mensal", valorEstimado: 0,
     });
     setOpenDespesaDialog(true);
@@ -551,19 +561,36 @@ export default function ConfigurarReceitas() {
     if (despesaCatFilter === cat.label) setDespesaCatFilter("todos");
   };
   const addEstado = () => {
-    const v = newEstado.trim();
+    const v = newEstadoLabel.trim();
     if (!v) return;
-    if (estados.includes(v)) { toast({ title: "Estado já existe", variant: "destructive" }); return; }
-    setEstados(es => [...es, v]);
-    setNewEstado("");
+    if (estados.some(e => e.label.toLowerCase() === v.toLowerCase())) {
+      toast({ title: "Estado já existe", variant: "destructive" });
+      return;
+    }
+    setEstados(es => [...es, { id: `est-${Date.now()}`, label: v, color: newEstadoColor }]);
+    setNewEstadoLabel("");
+    setNewEstadoColor(CAT_PALETTE[0].cls);
+    setEstadoDialogOpen(false);
+    toast({ title: "Estado criado", description: v });
   };
-  const removeEstado = (e: string) => {
-    if (despesas.some(d => d.estado === e)) {
+  const saveEditEstado = () => {
+    if (!editingEstado || !editingEstado.label.trim()) return;
+    const v = editingEstado.label.trim();
+    if (estados.some(e => e.id !== editingEstado.id && e.label.toLowerCase() === v.toLowerCase())) {
+      toast({ title: "Estado já existe", variant: "destructive" });
+      return;
+    }
+    setEstados(es => es.map(e => e.id === editingEstado.id ? { ...editingEstado, label: v } : e));
+    setEditingEstado(null);
+    toast({ title: "Estado actualizado" });
+  };
+  const removeEstado = (e: EstadoItem) => {
+    if (despesas.some(d => d.estado === e.label)) {
       toast({ title: "Estado em uso", description: "Remova primeiro as despesas que o usam.", variant: "destructive" });
       return;
     }
-    setEstados(es => es.filter(x => x !== e));
-    if (despesaEstadoFilter === e) setDespesaEstadoFilter("todos");
+    setEstados(es => es.filter(x => x.id !== e.id));
+    if (despesaEstadoFilter === e.label) setDespesaEstadoFilter("todos");
   };
 
   /* ── Responsáveis / Destinatários / Regras de aprovação ops ── */
@@ -1287,31 +1314,108 @@ export default function ConfigurarReceitas() {
                 <span className="text-[11px] text-muted-foreground tabular-nums">· {estados.length}</span>
                 <span className="text-xs text-muted-foreground hidden md:inline">— Ciclo de vida das despesas</span>
               </div>
-              <div className="flex items-center gap-1.5 flex-wrap">
-                <Input value={newEstado} onChange={e => setNewEstado(e.target.value)}
-                  onKeyDown={e => { if (e.key === "Enter") addEstado(); }}
-                  placeholder="Novo estado" className="h-8 w-48 text-xs" />
-                <Button size="sm" variant="outline" className="h-8 text-xs gap-1.5" onClick={addEstado} disabled={!newEstado.trim()}>
-                  <Plus className="w-3.5 h-3.5" /> Adicionar
-                </Button>
-              </div>
+              <Dialog open={estadoDialogOpen} onOpenChange={setEstadoDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button size="sm" variant="outline" className="h-8 text-xs gap-1.5">
+                    <Plus className="w-3.5 h-3.5" /> Novo estado
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-md">
+                  <DialogHeader><DialogTitle>Novo estado</DialogTitle></DialogHeader>
+                  <div className="space-y-4 py-2">
+                    <div>
+                      <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Designação</label>
+                      <Input value={newEstadoLabel} onChange={e => setNewEstadoLabel(e.target.value)}
+                        placeholder="Ex.: Em revisão" className="text-sm" />
+                    </div>
+                    <div>
+                      <label className="text-xs font-medium text-muted-foreground mb-2 block">Cor</label>
+                      <div className="flex flex-wrap gap-2">
+                        {CAT_PALETTE.map(p => (
+                          <button key={p.cls} type="button"
+                            onClick={() => setNewEstadoColor(p.cls)}
+                            className={cn("h-8 w-8 rounded-full border-2 flex items-center justify-center transition",
+                              newEstadoColor === p.cls ? "border-foreground" : "border-transparent hover:border-muted-foreground/40")}
+                            title={p.name}>
+                            <span className={cn("h-5 w-5 rounded-full", p.dot)} />
+                          </button>
+                        ))}
+                      </div>
+                      <div className="mt-3">
+                        <span className={cn("inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs", newEstadoColor)}>
+                          <span className="font-medium">{newEstadoLabel.trim() || "Pré-visualização"}</span>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <DialogFooter className="gap-2 sm:gap-2">
+                    <DialogClose asChild><Button variant="outline">Cancelar</Button></DialogClose>
+                    <Button onClick={addEstado} disabled={!newEstadoLabel.trim()}>Adicionar</Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </div>
-
             {estados.length === 0 ? (
               <p className="text-xs text-muted-foreground italic">Crie estados (ex.: Activo, Em revisão, Suspensa).</p>
             ) : (
               <div className="flex flex-wrap gap-2">
-                {estados.map(e => (
-                  <div key={e} className={cn("inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs", chipFor(e))}>
-                    <span className="font-medium">{e}</span>
-                    <button onClick={() => removeEstado(e)} className="opacity-60 hover:opacity-100" title="Remover">
-                      <Trash2 className="w-3 h-3" />
-                    </button>
-                  </div>
-                ))}
+                {estados.map(e => {
+                  const count = despesas.filter(d => d.estado === e.label).length;
+                  return (
+                    <div key={e.id} className={cn("inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs", e.color)}>
+                      <span className="font-medium">{e.label}</span>
+                      <span className="opacity-60 tabular-nums">· {count}</span>
+                      <button onClick={() => setEditingEstado({ ...e })} className="opacity-60 hover:opacity-100" title="Editar">
+                        <Pencil className="w-3 h-3" />
+                      </button>
+                      <button onClick={() => removeEstado(e)} className="opacity-60 hover:opacity-100" title="Remover">
+                        <Trash2 className="w-3 h-3" />
+                      </button>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </Card>
+
+          {/* Edit estado dialog */}
+          <Dialog open={!!editingEstado} onOpenChange={(o) => !o && setEditingEstado(null)}>
+            <DialogContent className="max-w-md">
+              <DialogHeader><DialogTitle>Editar estado</DialogTitle></DialogHeader>
+              {editingEstado && (
+                <div className="space-y-4 py-2">
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Designação</label>
+                    <Input value={editingEstado.label}
+                      onChange={e => setEditingEstado({ ...editingEstado, label: e.target.value })} />
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-2 block">Cor</label>
+                    <div className="flex flex-wrap gap-2">
+                      {CAT_PALETTE.map(p => (
+                        <button key={p.cls} type="button"
+                          onClick={() => setEditingEstado({ ...editingEstado, color: p.cls })}
+                          className={cn("h-8 w-8 rounded-full border-2 flex items-center justify-center transition",
+                            editingEstado.color === p.cls ? "border-foreground" : "border-transparent hover:border-muted-foreground/40")}
+                          title={p.name}>
+                          <span className={cn("h-5 w-5 rounded-full", p.dot)} />
+                        </button>
+                      ))}
+                    </div>
+                    <div className="mt-3">
+                      <span className={cn("inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs", editingEstado.color)}>
+                        <span className="font-medium">{editingEstado.label.trim() || "Pré-visualização"}</span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+              <DialogFooter className="gap-2 sm:gap-2">
+                <Button variant="outline" onClick={() => setEditingEstado(null)}>Cancelar</Button>
+                <Button onClick={saveEditEstado} disabled={!editingEstado?.label.trim()}>Guardar</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
 
           {/* 3. Responsáveis */}
           <Card className="p-5">
@@ -1592,7 +1696,7 @@ export default function ConfigurarReceitas() {
                 <Select value={despesaForm.estado} onValueChange={v => setDespesaForm({ ...despesaForm, estado: v })}>
                   <SelectTrigger><SelectValue placeholder="Seleccionar..." /></SelectTrigger>
                   <SelectContent>
-                    {estados.map(e => <SelectItem key={e} value={e}>{e}</SelectItem>)}
+                    {estados.map(e => <SelectItem key={e.id} value={e.label}>{e.label}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
