@@ -1053,6 +1053,7 @@ export default function ConfigurarReceitas() {
                           <tr className="text-[10px] uppercase tracking-wider text-muted-foreground border-b border-border bg-muted/30">
                             <th className="text-left font-semibold px-4 py-2">Multa</th>
                             <th className="text-left font-semibold px-3 py-2 hidden sm:table-cell">Categoria</th>
+                            <th className="text-right font-semibold px-3 py-2">Valor</th>
                             <th className="w-20"></th>
                           </tr>
                         </thead>
