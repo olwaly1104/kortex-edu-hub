@@ -749,11 +749,6 @@ export default function FinancasCalendario() {
               </div>
             )}
 
-            <div className="space-y-1.5">
-              <Label className="text-xs flex items-center gap-1.5 text-foreground"><AlignLeft className="w-3 h-3" /> Descrição <span className="text-muted-foreground font-normal">(opcional)</span></Label>
-              <Textarea rows={3} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })}
-                placeholder="Notas, contexto ou agenda da reunião…" />
-            </div>
           </div>
 
           <DialogFooter className="px-6 py-4 border-t bg-muted/20">
