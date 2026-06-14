@@ -1354,11 +1354,27 @@ export default function ConfigurarReceitas() {
                 </Select>
               </div>
             </div>
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">Salário Bruto (Kz)</label>
-              <Input type="number" min={0} value={newSalaryForm.grossSalary}
-                onChange={e => setNewSalaryForm({ ...newSalaryForm, grossSalary: Number(e.target.value) || 0 })} />
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-muted-foreground">Salário Bruto (Kz)</label>
+                <Input type="number" min={0} value={newSalaryForm.grossSalary}
+                  onChange={e => setNewSalaryForm({ ...newSalaryForm, grossSalary: Number(e.target.value) || 0 })} />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-muted-foreground">Tipo de Contrato</label>
+                <Select value={newSalaryForm.contractType}
+                  onValueChange={(v: "permanente" | "prestador") => setNewSalaryForm({ ...newSalaryForm, contractType: v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="permanente">Permanente</SelectItem>
+                    <SelectItem value="prestador">Prestador de Serviços</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
+            <p className="text-[11px] text-muted-foreground -mt-2">
+              Posições de docência são automaticamente atribuídas ao departamento <strong>Docentes</strong>.
+            </p>
           </div>
           <DialogFooter className="gap-2 sm:gap-2">
             <DialogClose asChild><Button variant="outline">Cancelar</Button></DialogClose>
