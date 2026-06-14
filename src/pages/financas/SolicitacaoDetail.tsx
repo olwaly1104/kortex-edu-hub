@@ -61,25 +61,26 @@ export default function FinancasSolicitacaoDetail() {
 
   const anexos = selected.anexos ?? [];
 
-  type Step = { label: string; data?: string; actor?: string; nota?: string; aside?: string; tone: "submitted" | "accepted" | "rejected" | "executed" | "pending" | "scheduled" };
+  type Step = { label: string; data?: string; actor?: string; nota?: string; aside?: string; anexos?: typeof anexos; tone: "submitted" | "accepted" | "rejected" | "executed" | "pending" | "scheduled" };
   const steps: Step[] = [];
 
   const submetida = selected.historico.find(h => h.accao.toLowerCase().includes("submetida"));
   steps.push({
     label: "Solicitação submetida",
     data: submetida?.data, actor: submetida?.actor ?? selected.requester,
+    nota: submetida?.nota, anexos: submetida?.anexos,
     tone: "submitted",
   });
 
   if (selected.status === "rejeitado") {
     const rej = selected.historico.slice().reverse().find(h => h.accao.toLowerCase().includes("rejeit"));
-    steps.push({ label: "Solicitação rejeitada", data: rej?.data, actor: rej?.actor ?? "Direcção Financeira", nota: rej?.nota, tone: "rejected" });
+    steps.push({ label: "Solicitação rejeitada", data: rej?.data, actor: rej?.actor ?? "Direcção Financeira", nota: rej?.nota, anexos: rej?.anexos, tone: "rejected" });
   } else if (selected.status === "em_execucao" || selected.status === "executada") {
     const ap = selected.historico.slice().reverse().find(h => h.accao.toLowerCase().includes("aprov"));
-    steps.push({ label: "Em execução", data: ap?.data, actor: ap?.actor ?? "Direcção Financeira", nota: ap?.nota, tone: "accepted" });
+    steps.push({ label: "Em execução", data: ap?.data, actor: ap?.actor ?? "Direcção Financeira", nota: ap?.nota, anexos: ap?.anexos, tone: "accepted" });
     if (selected.status === "executada") {
       const ex = selected.historico.slice().reverse().find(h => h.accao.toLowerCase().includes("execut"));
-      steps.push({ label: "Solicitação executada", data: ex?.data, actor: ex?.actor ?? "Direcção Financeira", nota: ex?.nota, tone: "executed" });
+      steps.push({ label: "Solicitação executada", data: ex?.data, actor: ex?.actor ?? "Direcção Financeira", nota: ex?.nota, anexos: ex?.anexos, tone: "executed" });
     }
   } else if (selected.dueDate) {
     const base = new Date(selected.dueDate);
@@ -480,11 +481,11 @@ export default function FinancasSolicitacaoDetail() {
               </div>
             </section>
 
-            {/* Histórico */}
+            {/* Cronologia */}
             <section>
               <div className="flex items-center gap-2 mb-3">
                 <Clock className="w-3.5 h-3.5 text-muted-foreground" />
-                <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Histórico</h3>
+                <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Cronologia</h3>
               </div>
               <ol className="space-y-0">
                 {steps.map((s, i) => {
@@ -513,7 +514,32 @@ export default function FinancasSolicitacaoDetail() {
                             s.aside.includes("atraso") ? "text-red-600 font-semibold not-italic" : "text-muted-foreground/90"
                           )}>{s.aside}</p>
                         )}
-                        {s.nota && <p className="mt-2 text-xs text-foreground/75 leading-relaxed pl-3 border-l-2 border-border">{s.nota}</p>}
+                        {s.nota && (
+                          <div className="mt-2 pl-3 border-l-2 border-border">
+                            <p className="text-[10px] uppercase tracking-[0.08em] text-muted-foreground font-semibold mb-0.5">Parecer / Notas</p>
+                            <p className="text-xs text-foreground/80 leading-relaxed whitespace-pre-wrap">{s.nota}</p>
+                          </div>
+                        )}
+                        {s.anexos && s.anexos.length > 0 && (
+                          <div className="mt-2 pl-3 border-l-2 border-border">
+                            <p className="text-[10px] uppercase tracking-[0.08em] text-muted-foreground font-semibold mb-1">
+                              Anexos <span className="normal-case tracking-normal tabular-nums">({s.anexos.length})</span>
+                            </p>
+                            <ul className="space-y-1">
+                              {s.anexos.map((a, ai) => {
+                                const Ic = a.tipo === "image" ? FileImage : a.tipo === "sheet" ? FileSpreadsheet : FileText;
+                                const cls = a.tipo === "image" ? "text-violet-600" : a.tipo === "sheet" ? "text-emerald-600" : "text-red-600";
+                                return (
+                                  <li key={ai} className="flex items-center gap-2 px-2 py-1 rounded-md border border-border bg-background hover:bg-muted/20 transition-colors">
+                                    <Ic className={cn("w-3.5 h-3.5 shrink-0", cls)} />
+                                    <span className="text-[12px] font-medium text-foreground truncate flex-1 leading-tight">{a.nome}</span>
+                                    <span className="text-[10px] text-muted-foreground tabular-nums shrink-0">{a.tamanho}</span>
+                                  </li>
+                                );
+                              })}
+                            </ul>
+                          </div>
+                        )}
                       </div>
                     </li>
                   );

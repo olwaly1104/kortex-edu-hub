@@ -14,6 +14,7 @@ export interface FinHistorico {
   actor: string;
   accao: string;
   nota?: string;
+  anexos?: FinAnexo[];
 }
 
 export interface FinAnexo {
@@ -81,7 +82,7 @@ export const finSolicitacoes: FinSolicitacao[] = [
     anexos: [{ nome: "Factura-LabSupplies.pdf", tamanho: "156 KB", tipo: "pdf" }],
     historico: [
       { data: "2025-04-02 10:00", actor: "Coord. Fac. Ciências", accao: "Solicitação submetida" },
-      { data: "2025-04-03 14:20", actor: "Direcção Financeira", accao: "Solicitação aprovada", nota: "Pagamento agendado para o dia seguinte." },
+      { data: "2025-04-03 14:20", actor: "Direcção Financeira", accao: "Solicitação aprovada", nota: "Pagamento agendado para o dia seguinte.", anexos: [{ nome: "Despacho-aprovacao.pdf", tamanho: "62 KB", tipo: "pdf" }] },
     ],
   },
   {
@@ -92,7 +93,7 @@ export const finSolicitacoes: FinSolicitacao[] = [
     date: "2025-03-28", status: "rejeitado",
     historico: [
       { data: "2025-03-28 08:30", actor: "Eng. João Martins", accao: "Solicitação submetida" },
-      { data: "2025-03-29 16:00", actor: "Direcção Financeira", accao: "Solicitação rejeitada", nota: "Já existe antecipação concedida no trimestre corrente." },
+      { data: "2025-03-29 16:00", actor: "Direcção Financeira", accao: "Solicitação rejeitada", nota: "Já existe antecipação concedida no trimestre corrente.", anexos: [{ nome: "Parecer-RH.pdf", tamanho: "48 KB", tipo: "pdf" }] },
     ],
   },
   {
@@ -117,8 +118,8 @@ export const finSolicitacoes: FinSolicitacao[] = [
     date: "2025-03-22", status: "executada",
     historico: [
       { data: "2025-03-22 09:00", actor: "Secretaria Geral", accao: "Solicitação submetida" },
-      { data: "2025-03-23 11:30", actor: "Direcção Financeira", accao: "Solicitação aprovada" },
-      { data: "2025-03-24 10:15", actor: "Direcção Financeira", accao: "Solicitação executada", nota: "Pagamento processado por transferência bancária." },
+      { data: "2025-03-23 11:30", actor: "Direcção Financeira", accao: "Solicitação aprovada", anexos: [{ nome: "Autorizacao-pagamento.pdf", tamanho: "54 KB", tipo: "pdf" }] },
+      { data: "2025-03-24 10:15", actor: "Direcção Financeira", accao: "Solicitação executada", nota: "Pagamento processado por transferência bancária.", anexos: [{ nome: "Comprovativo-TRF-BAI.pdf", tamanho: "112 KB", tipo: "pdf" }] },
     ],
   },
   {
@@ -130,7 +131,7 @@ export const finSolicitacoes: FinSolicitacao[] = [
     historico: [
       { data: "2025-03-18 17:00", actor: "Dr. Carlos Bento", accao: "Solicitação submetida" },
       { data: "2025-03-19 10:00", actor: "Direcção Financeira", accao: "Solicitação aprovada" },
-      { data: "2025-03-20 09:30", actor: "Direcção Financeira", accao: "Solicitação executada", nota: "Reembolso liquidado." },
+      { data: "2025-03-20 09:30", actor: "Direcção Financeira", accao: "Solicitação executada", nota: "Reembolso liquidado.", anexos: [{ nome: "Recibo-reembolso.pdf", tamanho: "74 KB", tipo: "pdf" }] },
     ],
   },
   {
