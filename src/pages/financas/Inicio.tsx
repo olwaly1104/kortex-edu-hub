@@ -71,7 +71,7 @@ export default function FinancasInicio() {
       <div className="rounded-xl border border-border bg-gradient-to-r from-primary/5 to-transparent px-5 py-4">
         <div className="flex items-start justify-between gap-4 flex-wrap">
           {/* Left: date/time pill, then greeting */}
-          <div className="min-w-0 space-y-2">
+          <div className="min-w-0 space-y-2.5">
             <div className="inline-flex items-stretch rounded-md border border-border bg-card overflow-hidden text-[11px] uppercase tracking-wider font-medium shadow-sm">
               <span className="flex items-center gap-1.5 px-2.5 py-1 text-foreground capitalize">
                 <CalendarDays className="w-3.5 h-3.5 text-muted-foreground" />{todayLabel}
@@ -81,24 +81,29 @@ export default function FinancasInicio() {
                 <Clock className="w-3.5 h-3.5" />{liveTime}
               </span>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-base shrink-0">
-                {(user?.name ?? "DF").split(" ").map(n => n[0]).slice(0, 2).join("")}
-              </div>
-              <div className="min-w-0">
-                <h1 className="text-lg font-bold text-foreground leading-tight">
-                  Bom dia, {user?.name?.split(" ").pop()} 👋
-                </h1>
-                <p className="text-xs text-muted-foreground leading-tight mt-0.5">
-                  <span className="font-medium text-foreground">{user?.position ?? "Diretor Financeiro"}</span>
-                  <span className="mx-1.5 text-border">·</span>
+            <div className="min-w-0">
+              <h1 className="text-xl font-bold text-foreground leading-tight">
+                Bom dia, {(() => {
+                  const parts = (user?.name ?? "Manuel Sousa").trim().split(/\s+/);
+                  return parts.length > 1 ? `${parts[0]} ${parts[parts.length - 1]}` : parts[0];
+                })()} 👋
+              </h1>
+              <p className="text-sm font-medium text-foreground/80 mt-0.5">
+                {user?.position ?? "Diretor Financeiro"}
+              </p>
+              <div className="flex items-center gap-1.5 flex-wrap mt-2">
+                <span className="inline-flex items-center gap-1 rounded-md border border-border bg-muted/40 px-2 py-0.5 text-[11px] font-medium text-foreground">
+                  <Building2 className="w-3 h-3 text-muted-foreground" />
                   {user?.department ?? "Departamento Financeiro"}
-                  <span className="mx-1.5 text-border">·</span>
+                </span>
+                <span className="inline-flex items-center gap-1 rounded-md border border-border bg-muted/40 px-2 py-0.5 text-[11px] font-medium text-foreground">
+                  <School className="w-3 h-3 text-muted-foreground" />
                   Universidade Privada De Angola
-                </p>
+                </span>
               </div>
             </div>
           </div>
+
 
           {/* Right: ano letivo pill + minha presença small box */}
           <div className="flex flex-col items-end gap-2 shrink-0">
