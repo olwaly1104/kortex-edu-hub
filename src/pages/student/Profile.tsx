@@ -1,7 +1,7 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { User, Mail, BookOpen, Calendar, Camera, Bell, Moon, Globe, Lock, Shield, Eye } from "lucide-react";
+import { User, Mail, BookOpen, Calendar, Camera, Bell, Moon, Globe, Lock, Shield, Eye, CheckCircle } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { useState } from "react";
 import placeholderStudent from "@/assets/placeholder-student.jpg";
