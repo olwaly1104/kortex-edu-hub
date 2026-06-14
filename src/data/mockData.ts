@@ -519,6 +519,7 @@ export const emailMessages: EmailMessage[] = [
 
 // Helper function
 export function detectRole(email: string): UserRole {
+  if (email.startsWith("admin")) return "admin";
   if (email.startsWith("inscricoes")) return "inscricoes";
   if (email.startsWith("gap")) return "gap";
   if (email.startsWith("financas")) return "financas";
