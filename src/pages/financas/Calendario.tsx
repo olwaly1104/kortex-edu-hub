@@ -107,11 +107,11 @@ const PRESET_EVENTS: AgendaEvent[] = [
 ];
 
 const INITIAL_REQUESTS: MeetingRequest[] = [
-  { id: "r1", title: "Revisão de Orçamento — Curso de Arquitectura", date: "2024-02-15", startTime: "14:00", endTime: "15:00", location: "Sala 204", organizer: "Coordenação ARQ", description: "Análise de despesas extra-orçamentais do semestre.", participants: ["Coordenador ARQ","Diretor Financeiro","Ana Lopes — Orçamento"], agenda: ["Despesas extra-orçamentais","Projeções Q2","Pedidos pendentes"], status: "pending" },
-  { id: "r2", title: "Reunião de planeamento — GAP", date: "2024-02-19", startTime: "11:00", endTime: "12:00", location: "Sala GAP", organizer: "Gestão Académica de Pessoal", participants: ["Coord. GAP","Diretor Financeiro"], status: "pending" },
-  { id: "r3", title: "Auditoria de processos", date: "2024-02-21", startTime: "09:30", endTime: "11:00", location: "Reitoria", organizer: "Pedro Silva", description: "Revisão dos processos contabilísticos do trimestre.", participants: ["Pedro Silva — Auditoria Interna","Diretor Financeiro","Maria Tavares — Contabilidade"], status: "pending" },
-  { id: "r4", title: "Pagamentos a fornecedores", date: "2024-02-22", startTime: "15:00", endTime: "16:00", location: "Sala Tesouraria", organizer: "João Mendes", participants: ["João Mendes — Tesouraria","Diretor Financeiro"], status: "pending" },
-  { id: "r5", title: "Folha salarial — fecho mês", date: "2024-02-26", startTime: "10:00", endTime: "11:00", location: "Sala 102", organizer: "Carla Neto", participants: ["Carla Neto — Folha Salarial","Diretor Financeiro"], status: "pending" },
+  { id: "r1", title: "Revisão de Orçamento — Curso de Arquitectura", date: "2024-02-15", startTime: "14:00", endTime: "15:00", location: "Sala 204", organizer: "Coordenação ARQ", description: "Análise de despesas extra-orçamentais do semestre.", participants: ["Coordenador ARQ","Diretor Financeiro","Ana Lopes — Orçamento"], agenda: ["Despesas extra-orçamentais","Projeções Q2","Pedidos pendentes"], status: "pending", requestedAt: "2024-02-09" },
+  { id: "r2", title: "Reunião de planeamento — GAP", date: "2024-02-19", startTime: "11:00", endTime: "12:00", location: "Sala GAP", organizer: "Gestão Académica de Pessoal", participants: ["Coord. GAP","Diretor Financeiro"], status: "pending", requestedAt: "2024-02-12" },
+  { id: "r3", title: "Auditoria de processos", date: "2024-02-21", startTime: "09:30", endTime: "11:00", location: "Reitoria", organizer: "Pedro Silva", description: "Revisão dos processos contabilísticos do trimestre.", participants: ["Pedro Silva — Auditoria Interna","Diretor Financeiro","Maria Tavares — Contabilidade"], status: "pending", requestedAt: "2024-02-13" },
+  { id: "r4", title: "Pagamentos a fornecedores", date: "2024-02-22", startTime: "15:00", endTime: "16:00", location: "Sala Tesouraria", organizer: "João Mendes", participants: ["João Mendes — Tesouraria","Diretor Financeiro"], status: "pending", requestedAt: "2024-02-14" },
+  { id: "r5", title: "Folha salarial — fecho mês", date: "2024-02-26", startTime: "10:00", endTime: "11:00", location: "Sala 102", organizer: "Carla Neto", participants: ["Carla Neto — Folha Salarial","Diretor Financeiro"], status: "pending", requestedAt: "2024-02-14" },
 ];
 
 /* ── helpers ───────────────────────────────────────── */
