@@ -261,7 +261,7 @@ export default function FinancasCalendario() {
       <div className="flex items-end justify-between gap-3 flex-wrap">
         <div>
           <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">
-            {view === "week" ? "Semana Atual" : "Mês Atual"}
+            {view === "week" ? "Semana" : "Mês"}
           </p>
           <h2 className="text-lg font-bold text-foreground capitalize leading-tight mt-0.5">
             {view === "week" ? weekLabel : monthLabel}
