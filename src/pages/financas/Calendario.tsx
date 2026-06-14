@@ -983,3 +983,59 @@ function RequestDetailDialog({ request, onClose, onRespond, onParticipants }: {
     </Dialog>
   );
 }
+
+/* ── Participants dialog (clickable list with status) ── */
+function ParticipantsDialog({ data, onClose }: {
+  data: { title: string; participants: string[]; seed: string } | null;
+  onClose: () => void;
+}) {
+  if (!data) return null;
+  const counts = data.participants.reduce(
+    (acc, p) => { const s = participantStatus(p, data.seed); acc[s]++; return acc; },
+    { accepted: 0, declined: 0, pending: 0 } as Record<ParticipantStatus, number>
+  );
+  return (
+    <Dialog open={!!data} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="sm:max-w-lg p-0 gap-0 overflow-hidden">
+        <div className="px-6 py-4 border-b bg-muted/20">
+          <DialogHeader className="space-y-1">
+            <Badge variant="outline" className="text-[10px] w-fit border-0 bg-card text-muted-foreground">Participantes</Badge>
+            <DialogTitle className="text-base font-bold leading-tight">{data.title}</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-wrap items-center gap-1.5 mt-2">
+            <Badge variant="outline" className={cn("text-[10px] gap-1", STATUS_META.accepted.cls)}>
+              <span className={cn("w-1.5 h-1.5 rounded-full", STATUS_META.accepted.dot)} />{counts.accepted} Confirmados
+            </Badge>
+            <Badge variant="outline" className={cn("text-[10px] gap-1", STATUS_META.declined.cls)}>
+              <span className={cn("w-1.5 h-1.5 rounded-full", STATUS_META.declined.dot)} />{counts.declined} Recusaram
+            </Badge>
+            <Badge variant="outline" className={cn("text-[10px] gap-1", STATUS_META.pending.cls)}>
+              <span className={cn("w-1.5 h-1.5 rounded-full", STATUS_META.pending.dot)} />{counts.pending} Pendentes
+            </Badge>
+          </div>
+        </div>
+        <div className="px-6 py-4 max-h-[60vh] overflow-y-auto">
+          <div className="rounded-lg border divide-y">
+            {data.participants.map(p => {
+              const st = STATUS_META[participantStatus(p, data.seed)];
+              return (
+                <div key={p} className="flex items-center gap-2.5 px-3 py-2.5 text-xs text-foreground">
+                  <div className="w-7 h-7 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-[10px] font-semibold shrink-0">
+                    {p.split(" ").map(s => s[0]).slice(0, 2).join("")}
+                  </div>
+                  <span className="flex-1 truncate text-foreground">{p}</span>
+                  <Badge variant="outline" className={cn("text-[10px] gap-1", st.cls)}>
+                    <span className={cn("w-1.5 h-1.5 rounded-full", st.dot)} />{st.label}
+                  </Badge>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+        <DialogFooter className="px-6 py-3 border-t bg-muted/20">
+          <Button variant="ghost" size="sm" onClick={onClose}>Fechar</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
