@@ -115,14 +115,11 @@ export default function GapCandidaturas() {
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       {/* Header */}
-      <div className="flex items-end justify-between gap-4 flex-wrap">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground tracking-tight">Candidaturas</h1>
-          <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
-            Candidaturas submetidas ao processo de admissão. O GAP acompanha entrevista, curso preparatório e exame até à decisão final.
-          </p>
-        </div>
-      </div>
+      <FinHeader
+        title="Candidaturas"
+        subtitle="Candidaturas submetidas ao processo de admissão. O GAP acompanha entrevista, curso preparatório e exame até à decisão final."
+        icon={<GraduationCap className="w-6 h-6 text-primary" />}
+      />
 
       {/* KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
