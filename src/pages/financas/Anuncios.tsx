@@ -288,11 +288,15 @@ export default function FinancasAnuncios() {
                       </div>
                     ) : <div />}
                     <div className="flex items-center gap-2">
+                      <Button variant="outline" size="sm" className="h-7 text-[11px] gap-1">
+                        Ver detalhes
+                      </Button>
                       {a.cta === "inscrever" && (
                         isSub ? (
                           <Badge className="text-[10px] gap-1 bg-emerald-100 text-emerald-700 border-emerald-200 border">
                             <CheckCircle2 className="w-3 h-3" /> Inscrito
                           </Badge>
+
                         ) : (
                           <Button size="sm" className="h-7 text-[11px] gap-1" onClick={() => setSubscribed(s => new Set(s).add(a.id))}>
                             <CheckCircle2 className="w-3 h-3" /> Inscrever
