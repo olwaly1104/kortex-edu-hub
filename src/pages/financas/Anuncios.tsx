@@ -303,7 +303,7 @@ export default function FinancasAnuncios() {
                       {a.ctaDeadline && (
                         <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] bg-muted/40">
                           <span className="uppercase tracking-wide font-medium text-muted-foreground">Data limite:</span>
-                          <span className="font-semibold text-foreground tabular-nums">{a.ctaDeadline}</span>
+                          <span className="font-semibold text-foreground tabular-nums">{a.ctaDeadline}{a.ctaDeadlineTime ? ` às ${a.ctaDeadlineTime}` : ""}</span>
                         </span>
                       )}
                     </div>
