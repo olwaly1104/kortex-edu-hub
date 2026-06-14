@@ -156,6 +156,13 @@ export default function FinancasAnuncioDetail() {
               <p className="text-[14.5px] leading-7 text-foreground whitespace-pre-line">{ann.content}</p>
             </article>
 
+            <div className="mt-8 pt-4 border-t border-border flex items-center justify-between gap-3 text-[12px] text-muted-foreground">
+              <span>
+                Publicado por <span className="font-semibold text-foreground">{ann.author}</span>
+              </span>
+              <span className="tabular-nums">{ann.date}</span>
+            </div>
+
             {ann.cta === "inscrever" && (
               <div className="mt-6 rounded-lg border border-primary/25 bg-primary/[0.04] p-4">
                 <div className="flex items-center justify-between gap-4 flex-wrap">
@@ -192,14 +199,7 @@ export default function FinancasAnuncioDetail() {
               <MetaCell
                 icon={<UserIcon className="w-3 h-3" />}
                 label="Publicado por"
-                value={
-                  <span className="inline-flex items-center gap-2">
-                    <span className="w-6 h-6 rounded-full bg-primary/10 text-primary text-[10px] font-bold flex items-center justify-center ring-1 ring-primary/15">
-                      {initials}
-                    </span>
-                    <span className="truncate">{ann.author}</span>
-                  </span>
-                }
+                value={<span className="truncate">{ann.author}</span>}
               />
               <MetaCell
                 icon={<Building2 className="w-3 h-3" />}
@@ -221,12 +221,7 @@ export default function FinancasAnuncioDetail() {
               <MetaCell
                 icon={<Tag className="w-3 h-3" />}
                 label="Categoria"
-                value={
-                  <span className="inline-flex items-center gap-1.5">
-                    <span className={cn("w-1.5 h-1.5 rounded-full", m.dot)} />
-                    {m.label}
-                  </span>
-                }
+                value={m.label}
               />
               {ann.ctaDeadline && (
                 <MetaCell
