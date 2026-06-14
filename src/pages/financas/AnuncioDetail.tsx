@@ -152,10 +152,6 @@ export default function FinancasAnuncioDetail() {
         <div className="grid md:grid-cols-[1fr_280px] divide-x divide-border">
           {/* LEFT — descrição body */}
           <div className="p-6 min-w-0">
-            <div className="flex items-center gap-2 mb-3">
-              <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground font-semibold">Descrição</p>
-              <span className="h-px flex-1 bg-border" />
-            </div>
             <article className="max-w-none">
               <p className="text-[14.5px] leading-7 text-foreground whitespace-pre-line">{ann.content}</p>
             </article>
