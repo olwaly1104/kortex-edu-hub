@@ -339,11 +339,6 @@ export default function FinancasCalendario() {
               </button>
             </div>
 
-            {/* right: entries count */}
-            <Badge variant="outline" className="h-7 px-2.5 gap-1.5 text-xs font-semibold shrink-0">
-              <CalendarRange className="w-3.5 h-3.5 text-muted-foreground" />
-              {totalEntries} {totalEntries === 1 ? "entrada" : "entradas"}
-            </Badge>
           </div>
         );
       })()}
