@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card } from "@/components/ui/card";
@@ -21,6 +21,8 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { FIN_ANUNCIOS, TYPE_META, type AnnType, type FinAnn } from "@/data/financasAnunciosData";
+import { useFinAnunciosUnread } from "@/hooks/useFinAnunciosUnread";
+
 
 const TODAY_LABEL = "14/02/2024";
 
