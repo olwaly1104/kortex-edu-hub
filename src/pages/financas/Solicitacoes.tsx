@@ -138,10 +138,9 @@ export default function FinancasSolicitacoes() {
   const ANO_LETIVO = "2024 / 2025";
 
   const handleNewSubmit = () => {
-    if (!newTitle.trim()) return;
-    toast({ title: "Solicitação submetida", description: "O pedido foi enviado para aprovação." });
+    if (!newType || !newTitle.trim() || !newDesc.trim()) return;
+    toast({ title: "Solicitação submetida", description: `${previewRef} · enviada para ${ROUTING[newType].destinatario}.` });
     setShowNewDialog(false);
-    setNewTitle(""); setNewDesc(""); setNewDest(""); setNewType("orcamento");
   };
 
   const StatCell = ({ icon: Icon, label, value, tone }:{
