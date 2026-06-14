@@ -8,6 +8,7 @@ export interface User {
   avatar?: string;
   course?: string;
   year?: number;
+  presence?: string;
 }
 
 export interface Discipline {
