@@ -482,9 +482,9 @@ export default function ConfigurarReceitas() {
       {/* Mode toggle */}
       <div className="grid grid-cols-3 gap-2">
         {([
-          { key: "receitas" as const, label: "Receitas", icon: TrendingUp, total: totalReceitas, accent: "text-emerald-600", bg: "bg-emerald-50", border: "border-emerald-200" },
-          { key: "despesas" as const, label: "Despesas", icon: TrendingDown, total: totalDespesas, accent: "text-red-600", bg: "bg-red-50", border: "border-red-200" },
-          { key: "salarios" as const, label: "Salários", icon: Banknote, total: totalSalarios, accent: "text-blue-600", bg: "bg-blue-50", border: "border-blue-200" },
+          { key: "receitas" as const, label: "Receitas", sub: "Propinas, emolumentos, multas",   icon: TrendingUp,   accent: "text-emerald-700", bg: "bg-emerald-50", border: "border-emerald-200" },
+          { key: "despesas" as const, label: "Despesas", sub: "Rubricas orçamentais",            icon: TrendingDown, accent: "text-red-700",     bg: "bg-red-50",     border: "border-red-200" },
+          { key: "salarios" as const, label: "Salários", sub: "Folha salarial de colaboradores", icon: Banknote,     accent: "text-blue-700",    bg: "bg-blue-50",    border: "border-blue-200" },
         ]).map(m => {
           const Icon = m.icon;
           const active = mode === m.key;
@@ -504,7 +504,7 @@ export default function ConfigurarReceitas() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className={cn("text-sm font-semibold", active ? m.accent : "text-foreground")}>{m.label}</p>
-                <p className="text-[11px] text-muted-foreground tabular-nums truncate">{formatCurrency(m.total)}</p>
+                <p className="text-[11px] text-muted-foreground truncate">{m.sub}</p>
               </div>
             </button>
           );
