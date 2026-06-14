@@ -45,6 +45,8 @@ export default function FinancasAnuncios() {
   const [search, setSearch] = useState("");
   const [openCreate, setOpenCreate] = useState(false);
   const [subscribed, setSubscribed] = useState<Set<string>>(new Set());
+  const { isRead, markRead } = useFinAnunciosUnread();
+
 
   const [form, setForm] = useState<Omit<FinAnn, "id" | "author" | "isMine" | "date">>({
     title: "", content: "", type: "geral",
