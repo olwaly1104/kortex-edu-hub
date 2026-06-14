@@ -236,60 +236,9 @@ export default function FinancasAnuncioDetail() {
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="px-7 py-3 border-t border-border bg-muted/20 flex items-center justify-end">
-          <Button variant="ghost" size="sm" onClick={() => navigate("/financas/anuncios")} className="gap-1.5 text-[11px] h-8">
-            <ArrowLeft className="w-3.5 h-3.5" /> Voltar à lista
-          </Button>
-        </div>
       </div>
-
-      {/* Related */}
-      {related.length > 0 && (
-        <div className="space-y-3 pt-2">
-          <div className="flex items-baseline justify-between gap-3">
-            <h2 className="text-sm font-semibold text-foreground flex items-center gap-2">
-              <Megaphone className="w-4 h-4 text-primary" />
-              Outros anúncios de <span className="text-primary">{ann.department}</span>
-            </h2>
-            <Link
-              to={`/financas/anuncios?dep=${encodeURIComponent(ann.department)}`}
-              className="text-[11px] text-muted-foreground hover:text-primary flex items-center gap-1"
-            >
-              Ver todos <ChevronRight className="w-3 h-3" />
-            </Link>
-          </div>
-          <div className="grid sm:grid-cols-2 gap-3">
-            {related.map(r => {
-              const rm = TYPE_META[r.type];
-              const rInitials = (r.author || r.department).split(" ").slice(0, 2).map(w => w[0]).join("").toUpperCase();
-              return (
-                <Link
-                  key={r.id}
-                  to={`/financas/anuncios/${r.id}`}
-                  className="group block rounded-lg border border-border bg-card hover:border-primary/40 hover:shadow-md transition-all p-4"
-                >
-                  <div className="flex items-center gap-1.5 mb-2">
-                    <Badge variant="outline" className={cn("text-[9px] font-semibold px-1.5", rm.chip)}>{rm.label}</Badge>
-                    <span className="text-[10px] text-muted-foreground tabular-nums ml-auto flex items-center gap-1">
-                      <CalendarIcon className="w-2.5 h-2.5" />{r.date}
-                    </span>
-                  </div>
-                  <p className="text-sm font-semibold text-foreground line-clamp-1 group-hover:text-primary transition-colors">{r.title}</p>
-                  <p className="text-[11px] text-muted-foreground line-clamp-2 mt-1 leading-relaxed">{r.content}</p>
-                  <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-border/60">
-                    <span className="w-4 h-4 rounded-full bg-primary/10 text-primary text-[8px] font-bold flex items-center justify-center">
-                      {rInitials}
-                    </span>
-                    <span className="text-[10px] text-muted-foreground truncate">{r.author}</span>
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-      )}
     </div>
+
   );
 }
 
