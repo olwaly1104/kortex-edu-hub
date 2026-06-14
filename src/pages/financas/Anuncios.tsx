@@ -1,6 +1,6 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { announcements as baseAnnouncements } from "@/data/mockData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -20,51 +20,23 @@ import {
   Clock, ArrowRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useEffect } from "react";
-
-
-type AnnType = "urgente" | "evento" | "academico" | "geral";
-
-interface FinAnn {
-  id: string;
-  title: string;
-  content: string;
-  type: AnnType;
-  date: string;          // dd/mm/yyyy
-  author: string;
-  department: string;    // e.g. "Departamento Financeiro" | "Direcção Académica"
-  cta?: "inscrever" | null;
-  ctaLink?: string;
-  isMine?: boolean;
-}
+import { FIN_ANUNCIOS, TYPE_META, type AnnType, type FinAnn } from "@/data/financasAnunciosData";
 
 const TODAY_LABEL = "14/02/2024";
 
-const TYPE_META: Record<AnnType, { label: string; chip: string; dot: string }> = {
-  urgente:   { label: "Urgente",   chip: "bg-red-50 text-red-700 border-red-200",         dot: "bg-red-500" },
-  evento:    { label: "Evento",    chip: "bg-violet-50 text-violet-700 border-violet-200", dot: "bg-violet-500" },
-  academico: { label: "Académico", chip: "bg-blue-50 text-blue-700 border-blue-200",       dot: "bg-blue-500" },
-  geral:     { label: "Geral",     chip: "bg-slate-50 text-slate-700 border-slate-200",    dot: "bg-slate-400" },
-};
-
-/* Seed with shared + finance-specific anúncios */
-const SEED: FinAnn[] = [
-  ...baseAnnouncements.map((a, i) => ({
-    ...a,
-    department: i % 2 === 0 ? "Direcção Académica" : "Reitoria",
-    cta: i === 2 ? ("inscrever" as const) : null,
-  })),
-  { id: "f1", title: "Formação: Novas regras IVA 2024", content: "Sessão de formação obrigatória sobre as alterações fiscais em vigor. Aberta a inscrições para toda a equipa do Departamento Financeiro.", type: "evento", date: "14/02/2024", author: "Dr. Manuel Sousa", department: "Departamento Financeiro", cta: "inscrever" },
-  { id: "f2", title: "Fecho contabilístico de Janeiro concluído", content: "O processo de encerramento contabilístico de Janeiro foi finalizado. Relatórios disponíveis no EduDrive Financeiro.", type: "geral", date: "14/02/2024", author: "Departamento Financeiro", department: "Departamento Financeiro" },
-  { id: "f3", title: "Reunião extraordinária — Orçamento 2025", content: "Convocados todos os responsáveis para reunião extraordinária dia 20/02 às 10h00.", type: "urgente", date: "14/02/2024", author: "Reitoria", department: "Reitoria" },
-  { id: "f4", title: "Workshop: Gestão de Tesouraria", content: "Workshop facultativo para a equipa financeira. Inscrições até 22/02.", type: "evento", date: "13/02/2024", author: "Departamento Financeiro", department: "Departamento Financeiro", cta: "inscrever" },
-];
+/* parse "dd/mm/yyyy" → nice "14 Fev 2024" */
+const MONTHS_PT_SHORT = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
+function prettyDate(dmy: string) {
+  const [d, m, y] = dmy.split("/").map(Number);
+  if (!d || !m || !y) return dmy;
+  return `${String(d).padStart(2,"0")} ${MONTHS_PT_SHORT[m-1]} ${y}`;
+}
 
 type Scope = "todos" | "departamento" | "meus";
 
 export default function FinancasAnuncios() {
   const { user } = useAuth();
-  const [items, setItems] = useState<FinAnn[]>(SEED);
+  const [items, setItems] = useState<FinAnn[]>(FIN_ANUNCIOS);
   const [scope, setScope] = useState<Scope>("todos");
   const [typeFilter, setTypeFilter] = useState<AnnType | "todos">("todos");
   const [search, setSearch] = useState("");
@@ -76,6 +48,7 @@ export default function FinancasAnuncios() {
     department: "Departamento Financeiro", cta: null,
   });
   const [hasCta, setHasCta] = useState(false);
+
 
   const handleCreate = () => {
     if (!form.title.trim() || !form.content.trim()) return;
@@ -267,19 +240,16 @@ export default function FinancasAnuncios() {
           const isSub = subscribed.has(a.id);
           const initials = (a.author || a.department).split(" ").slice(0, 2).map(w => w[0]).join("").toUpperCase();
           return (
-            <Card key={a.id} className="group overflow-hidden hover:shadow-md hover:border-primary/20 transition-all">
+            <Card key={a.id} className="group overflow-hidden hover:shadow-md hover:border-primary/30 transition-all">
               <div className="flex">
                 <div className={cn("w-1 shrink-0", m.dot)} />
                 <div className="flex-1 p-4">
-                  {/* meta row */}
+                  {/* meta row: category + date + mine */}
                   <div className="flex items-center justify-between gap-3 mb-2">
                     <div className="flex items-center gap-1.5 flex-wrap">
                       <Badge variant="outline" className={cn("text-[10px] font-semibold gap-1 px-1.5", m.chip)}>
                         <span className={cn("w-1.5 h-1.5 rounded-full", m.dot)} />
                         {m.label}
-                      </Badge>
-                      <Badge variant="outline" className="text-[10px] bg-muted/40 gap-1 px-1.5 font-normal">
-                        <Building2 className="w-2.5 h-2.5" />{a.department}
                       </Badge>
                       {a.isMine && (
                         <Badge variant="outline" className="text-[10px] bg-primary/10 text-primary border-primary/20 px-1.5">
@@ -287,44 +257,70 @@ export default function FinancasAnuncios() {
                         </Badge>
                       )}
                     </div>
-                    <div className="flex items-center gap-1 text-[11px] text-muted-foreground shrink-0 tabular-nums">
-                      <CalendarIcon className="w-3 h-3" />{a.date}
+                    <div className="inline-flex items-center gap-1.5 text-[10.5px] font-medium text-foreground/80 shrink-0 px-2 py-0.5 rounded-md border border-border bg-muted/30 tabular-nums">
+                      <CalendarDays className="w-3 h-3 text-muted-foreground" />{prettyDate(a.date)}
                     </div>
                   </div>
 
                   {/* body */}
-                  <h3 className="text-[15px] font-semibold text-foreground leading-snug mb-1">{a.title}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">{a.content}</p>
+                  <Link to={`/financas/anuncios/${a.id}`} className="block group/title">
+                    <h3 className="text-[15px] font-semibold text-foreground leading-snug mb-1 group-hover/title:text-primary transition-colors">
+                      {a.title}
+                    </h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">
+                      {a.content.length > 200 ? a.content.slice(0, 200).trimEnd() + "…" : a.content}
+                    </p>
+                  </Link>
 
-                  {/* footer */}
-                  <div className="flex items-center justify-between gap-3 mt-3 pt-2.5 border-t border-border/60">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <div className="w-6 h-6 rounded-full bg-primary/10 text-primary text-[10px] font-semibold flex items-center justify-center shrink-0">
-                        {initials || <UserIcon className="w-3 h-3" />}
-                      </div>
-                      <span className="text-[11px] text-muted-foreground truncate">
-                        Por <span className="font-medium text-foreground">{a.author || a.department}</span>
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      {a.cta === "inscrever" && (
-                        isSub ? (
-                          <Badge variant="outline" className="text-[10px] gap-1 bg-emerald-50 text-emerald-700 border-emerald-200 h-7 px-2">
-                            <CheckCircle2 className="w-3 h-3" /> Inscrito
-                          </Badge>
-                        ) : (
-                          <Button size="sm" className="h-7 text-[11px] gap-1 px-2.5" onClick={() => setSubscribed(s => new Set(s).add(a.id))}>
-                            <CheckCircle2 className="w-3 h-3" /> Inscrever
-                          </Button>
-                        )
+                  {/* inline CTA in body (above footer) */}
+                  {a.cta === "inscrever" && (
+                    <div className="mt-3 flex items-center justify-between gap-3 rounded-md border border-dashed border-primary/30 bg-primary/5 px-3 py-2">
+                      <p className="text-[11px] text-foreground">
+                        <span className="font-semibold">Inscrições abertas</span> — confirme a sua participação.
+                      </p>
+                      {isSub ? (
+                        <Badge variant="outline" className="text-[10px] gap-1 bg-emerald-50 text-emerald-700 border-emerald-200 h-6 px-2">
+                          <CheckCircle2 className="w-3 h-3" /> Inscrito
+                        </Badge>
+                      ) : (
+                        <Button size="sm" className="h-7 text-[11px] gap-1 px-2.5" onClick={() => setSubscribed(s => new Set(s).add(a.id))}>
+                          <CheckCircle2 className="w-3 h-3" /> Inscrever
+                        </Button>
                       )}
+                    </div>
+                  )}
+
+                  {/* footer: author + clickable department + ver detalhes */}
+                  <div className="flex items-center justify-between gap-3 mt-3 pt-2.5 border-t border-border/60">
+                    <div className="flex items-center gap-2 min-w-0 flex-wrap">
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <div className="w-6 h-6 rounded-full bg-primary/10 text-primary text-[10px] font-semibold flex items-center justify-center shrink-0">
+                          {initials || <UserIcon className="w-3 h-3" />}
+                        </div>
+                        <span className="text-[11px] text-muted-foreground truncate">
+                          Por <span className="font-medium text-foreground">{a.author || a.department}</span>
+                        </span>
+                      </div>
+                      <span className="text-border">•</span>
+                      <button
+                        type="button"
+                        onClick={() => setScope("todos")}
+                        title={`Ver anúncios de ${a.department}`}
+                        className="inline-flex items-center gap-1 text-[10.5px] font-medium px-1.5 py-0.5 rounded-md border border-border bg-card hover:bg-primary/5 hover:border-primary/30 hover:text-primary transition-colors text-foreground/80"
+                      >
+                        <Building2 className="w-3 h-3" />{a.department}
+                      </button>
+                    </div>
+                    <div className="flex items-center gap-1.5 shrink-0">
                       {a.isMine && (
                         <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => handleDelete(a.id)}>
                           <Trash2 className="w-3.5 h-3.5" />
                         </Button>
                       )}
-                      <Button variant="ghost" size="sm" className="h-7 text-[11px] gap-1 px-2 text-primary hover:text-primary hover:bg-primary/5">
-                        Ver detalhes <ArrowRight className="w-3 h-3 transition-transform group-hover:translate-x-0.5" />
+                      <Button asChild size="sm" variant="outline" className="h-7 text-[11px] gap-1.5 px-2.5 border-primary/30 text-primary hover:bg-primary hover:text-primary-foreground">
+                        <Link to={`/financas/anuncios/${a.id}`}>
+                          Ver detalhes <ArrowRight className="w-3 h-3 transition-transform group-hover:translate-x-0.5" />
+                        </Link>
                       </Button>
                     </div>
                   </div>
@@ -337,4 +333,5 @@ export default function FinancasAnuncios() {
     </div>
   );
 }
+
 

@@ -19,6 +19,16 @@ const typeStyles: Record<string, { bg: string; label: string }> = {
   geral: { bg: "bg-muted text-foreground", label: "Geral" },
 };
 
+const CATEGORY_META: Record<string, { label: string; cls: string }> = {
+  aula:     { label: "Aula",     cls: "bg-blue-50 text-blue-700 border-blue-200" },
+  teste:    { label: "Teste",    cls: "bg-amber-50 text-amber-700 border-amber-200" },
+  entrega:  { label: "Entrega",  cls: "bg-violet-50 text-violet-700 border-violet-200" },
+  exame:    { label: "Exame",    cls: "bg-red-50 text-red-700 border-red-200" },
+  pessoal:  { label: "Pessoal",  cls: "bg-slate-50 text-slate-700 border-slate-200" },
+  reuniao:  { label: "Reunião",  cls: "bg-emerald-50 text-emerald-700 border-emerald-200" },
+};
+
+
 export default function FinancasInicio() {
   const { user } = useAuth();
 
@@ -166,9 +176,18 @@ export default function FinancasInicio() {
                         </p>
                       )}
                     </div>
-                    <Badge variant={isActive ? "default" : "outline"} className="text-[10px] gap-1 shrink-0">
-                      <StatusIcon className="w-3 h-3" /> {cfg.label}
-                    </Badge>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      {(() => {
+                        const cat = CATEGORY_META[evento.type] ?? { label: evento.type, cls: "bg-slate-50 text-slate-700 border-slate-200" };
+                        return (
+                          <Badge variant="outline" className={`text-[10px] ${cat.cls}`}>{cat.label}</Badge>
+                        );
+                      })()}
+                      <Badge variant={isActive ? "default" : "outline"} className="text-[10px] gap-1">
+                        <StatusIcon className="w-3 h-3" /> {cfg.label}
+                      </Badge>
+                    </div>
+
                   </div>
                 );
               })}
