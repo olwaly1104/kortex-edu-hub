@@ -949,11 +949,12 @@ function RequestDetailDialog({ request, onClose, onRespond, onParticipants }: {
         </div>
 
         <div className="px-6 py-5 space-y-5 max-h-[60vh] overflow-y-auto">
+          <ModalityBanner modality={request.modality} location={request.location} link={request.meetingLink} />
           <div className="grid grid-cols-2 gap-3">
             <InfoTile icon={CalendarDays} label="Data do Pedido">{fmtShort(request.requestedAt)}</InfoTile>
             <InfoTile icon={CalendarRange} label="Data da Reunião">{fmtShort(request.date)}</InfoTile>
             <InfoTile icon={Clock} label="Horário">{request.startTime} – {request.endTime}</InfoTile>
-            <InfoTile icon={MapPin} label="Local">{request.location}</InfoTile>
+            <InfoTile icon={request.modality === "virtual" ? Video : MapPin} label={request.modality === "virtual" ? "Plataforma" : "Local"}>{request.location}</InfoTile>
             <InfoTile icon={Briefcase} label="Organizador">{request.organizer}</InfoTile>
             {request.participants && (
               <InfoTile icon={Users} label="Participantes">{request.participants.length}</InfoTile>
