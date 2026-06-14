@@ -484,9 +484,9 @@ export default function ConfigurarReceitas() {
   const removeMulta = (id: string) => setSalaryForm(f => ({ ...f, multas: f.multas.filter(m => m.id !== id) }));
 
   const computeNet = (c: SalaryConfig) => {
-    const deductions = Math.round(c.baseSalary * c.deductionRate);
-    const multasTotal = c.multas.reduce((s, m) => s + m.valor, 0);
-    return c.baseSalary - deductions - multasTotal;
+    const irt = Math.round(c.baseSalary * c.irtRate);
+    const ss = Math.round(c.baseSalary * c.ssRate);
+    return c.baseSalary - irt - ss;
   };
 
   const saveNewSalary = () => {
@@ -496,15 +496,19 @@ export default function ConfigurarReceitas() {
     }
     const id = `sal-${Date.now()}`;
     const empId = newSalaryForm.employeeId.trim() || `EMP-${Math.floor(Math.random() * 9000 + 1000)}`;
-    const deductionRate = 0.14;
-    const deductions = Math.round(newSalaryForm.grossSalary * deductionRate);
+    const irtRate = 0.08, ssRate = 0.03;
+    const deductions = Math.round(newSalaryForm.grossSalary * (irtRate + ssRate));
+    // Teachers always belong to "Docentes" department
+    const role = newSalaryForm.role.trim();
+    const isTeacher = /professor|docente|leitor|assistente|catedrático/i.test(role);
+    const dept = isTeacher ? "Docentes" : newSalaryForm.department;
     const newSal: Salary = {
       id,
       employeeId: empId,
       name: newSalaryForm.name.trim(),
-      role: newSalaryForm.role.trim(),
-      department: newSalaryForm.department,
-      contractType: "efectivo",
+      role,
+      department: dept,
+      contractType: newSalaryForm.contractType === "permanente" ? "efectivo" : "contratado",
       grossSalary: newSalaryForm.grossSalary,
       netSalary: newSalaryForm.grossSalary - deductions,
       deductions,
@@ -512,10 +516,10 @@ export default function ConfigurarReceitas() {
       payDate: new Date().toISOString().slice(0, 10),
     };
     setSalaries(ss => [newSal, ...ss]);
-    setSalaryConfigs(c => ({ ...c, [id]: { baseSalary: newSalaryForm.grossSalary, deductionRate, multas: [] } }));
+    setSalaryConfigs(c => ({ ...c, [id]: { baseSalary: newSalaryForm.grossSalary, irtRate, ssRate, multas: [] } }));
     toast({ title: "Colaborador adicionado", description: newSal.name });
     setOpenNewSalary(false);
-    setNewSalaryForm({ name: "", employeeId: "", role: "", department: "Administração", grossSalary: 0 });
+    setNewSalaryForm({ name: "", employeeId: "", role: "", department: "Docentes", grossSalary: 0, contractType: "permanente" });
   };
   const confirmRemoveSalary = () => {
     if (!confirmDelSalary) return;
