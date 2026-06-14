@@ -237,8 +237,8 @@ export default function FinancasAnuncioDetail() {
                   }
                 />
               )}
-            </div>
           </aside>
+
         </div>
       </div>
     </div>
