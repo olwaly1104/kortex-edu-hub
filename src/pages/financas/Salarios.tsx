@@ -10,10 +10,10 @@ import { formatCurrency, salarios, payrollBudget } from "@/data/financeModuleDat
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { FinHeader } from "./_FinHeader";
+import { PeriodSelector, PERIODO_MULT, type Periodo, periodoDefaultValue } from "./_PeriodSelector";
 
 type SortField = "grossSalary" | "netSalary" | "deductions";
 type SortDir = "asc" | "desc";
-type Periodo = "mensal" | "semestral" | "anual";
 
 const statusColors: Record<string, string> = {
   pago: "bg-accent/15 text-accent border-accent/30",
