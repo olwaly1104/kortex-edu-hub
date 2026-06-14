@@ -85,8 +85,14 @@ export default function FinancasInicio() {
               <h1 className="text-2xl font-bold text-foreground">
                 Bom dia, {user?.name?.split(" ").pop()} 👋
               </h1>
-              <p className="text-muted-foreground mt-1 text-sm">
-                {user?.position ?? "Diretor Financeiro"} — {user?.department ?? "Departamento Financeiro"}
+              <p className="text-sm font-medium text-foreground mt-1">
+                {user?.position ?? "Diretor Financeiro"}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {user?.department ?? "Departamento Financeiro"}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Universidade Privada De Angola
               </p>
             </div>
           </div>
@@ -95,11 +101,19 @@ export default function FinancasInicio() {
               <GraduationCap className="w-3.5 h-3.5" />
               Ano Letivo <span className="font-bold tabular-nums">{ANO_LETIVO}</span>
             </span>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-accent/20 bg-accent/10 px-3 py-1 text-[11px] uppercase tracking-wider font-semibold text-accent">
-              <UserCheck className="w-3.5 h-3.5" />
-              Minha Presença <span className="font-bold tabular-nums">{presencaPct}</span>
-            </span>
+            <div className="rounded-md border border-border bg-card px-3 py-2 flex items-center gap-2 shadow-sm">
+              <div className="w-7 h-7 rounded-md bg-accent/10 flex items-center justify-center shrink-0">
+                <UserCheck className="w-3.5 h-3.5 text-accent" />
+              </div>
+              <div className="leading-tight">
+                <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
+                  Minha Presença
+                </p>
+                <p className="text-sm font-bold text-accent tabular-nums">{presencaPct}</p>
+              </div>
+            </div>
           </div>
+
         </div>
       </div>
 
