@@ -95,23 +95,19 @@ export default function FinancasInicio() {
               <GraduationCap className="w-3.5 h-3.5" />
               Ano Letivo <span className="font-bold tabular-nums">{ANO_LETIVO}</span>
             </span>
+            <Card className="p-3 w-44">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <UserCheck className="w-3.5 h-3.5 text-primary" />
+                </div>
+                <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
+                  Minha Presença
+                </span>
+              </div>
+              <p className="text-xl font-bold text-accent">{presencaPct}</p>
+            </Card>
           </div>
         </div>
-      </div>
-
-      {/* KPI: Minha Presença (same style as Despesas/Receitas) */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-              <UserCheck className="w-4 h-4 text-primary" />
-            </div>
-            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-              Minha Presença
-            </span>
-          </div>
-          <p className="text-2xl font-bold text-accent">{presencaPct}</p>
-        </Card>
       </div>
 
       {/* Search */}
