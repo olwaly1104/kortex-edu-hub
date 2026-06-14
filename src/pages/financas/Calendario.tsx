@@ -342,7 +342,17 @@ export default function FinancasCalendario() {
 
       {/* ── Grid ─────────────────────────────── */}
       <div className="flex gap-6">
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 space-y-3">
+          {/* Result label above calendar */}
+          <div className="px-1">
+            <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-0.5">
+              {view === "week" ? "Semana" : "Mês"}
+            </p>
+            <h3 className="text-lg font-bold text-foreground capitalize">
+              {view === "week" ? weekLabel : `${MONTH_NAMES[cursorD.getMonth()]} ${cursorD.getFullYear()}`}
+            </h3>
+          </div>
+
           {view === "week" ? (
             <Card className="overflow-hidden">
               <div className="grid grid-cols-7 border-b bg-muted/10">
