@@ -264,8 +264,14 @@ export default function FinancasAnuncios() {
           const m = TYPE_META[a.type];
           const isSub = subscribed.has(a.id);
           const initials = (a.author || a.department).split(" ").slice(0, 2).map(w => w[0]).join("").toUpperCase();
+          const unread = !a.isMine && !isRead(a.id);
           return (
-            <Card key={a.id} className="group overflow-hidden hover:shadow-md hover:border-primary/30 transition-all">
+            <AnnouncementCard key={a.id} id={a.id} unread={unread} onSeen={markRead}>
+              <Card className={cn(
+                "group overflow-hidden hover:shadow-md transition-all",
+                unread ? "border-primary/40 bg-primary/[0.025] shadow-sm" : "hover:border-primary/30"
+              )}>
+
               <div className="flex">
                 <div className={cn("w-1 shrink-0", m.dot)} />
                 <div className="flex-1 p-4">
