@@ -135,6 +135,7 @@ import FinancasConfigurarReceitas from "./pages/financas/ConfigurarReceitas";
 import FinancasSalarios from "./pages/financas/Salarios";
 import FinancasOrcamentos from "./pages/financas/Orcamentos";
 import FinancasSolicitacoes from "./pages/financas/Solicitacoes";
+import FinancasSolicitacaoDetail from "./pages/financas/SolicitacaoDetail";
 import FinancasPessoalFinancas from "./pages/financas/PessoalFinancas";
 import FinancasCalendario from "./pages/financas/Calendario";
 import FinancasAnuncios from "./pages/financas/Anuncios";
@@ -347,6 +348,7 @@ function AppRoutes() {
         <Route path="/financas/anuncios/:id" element={<FinancasAnuncioDetail />} />
 
         <Route path="/financas/solicitacoes" element={<FinancasSolicitacoes />} />
+        <Route path="/financas/solicitacoes/:id" element={<FinancasSolicitacaoDetail />} />
         <Route path="/financas/dashboard" element={<FinancasDashboard />} />
         <Route path="/financas/receitas" element={<FinancasReceitas />} />
         <Route path="/financas/despesas" element={<FinancasDespesas />} />
