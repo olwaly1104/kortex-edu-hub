@@ -68,10 +68,19 @@ export default function FinancasAnuncioDetail() {
         <div className="px-6 pt-5 pb-5 border-b border-border">
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0 flex-1 space-y-2">
-              <Badge variant="outline" className="text-[10.5px] font-semibold px-2 py-0.5 gap-1.5 uppercase tracking-wider">
-                <span className={cn("w-1.5 h-1.5 rounded-full", m.dot)} />
-                {m.label}
-              </Badge>
+              <div className="flex flex-wrap items-center gap-1.5">
+                <Badge variant="outline" className="text-[10.5px] font-semibold px-2 py-0.5 gap-1.5 uppercase tracking-wider">
+                  <span className={cn("w-1.5 h-1.5 rounded-full", m.dot)} />
+                  {m.label}
+                </Badge>
+                <Link
+                  to={`/financas/anuncios?dep=${encodeURIComponent(ann.department)}`}
+                  className="inline-flex items-center gap-1.5 text-[10.5px] font-semibold px-2 py-0.5 rounded-md border border-border bg-background hover:bg-muted hover:text-primary uppercase tracking-wider text-foreground transition-colors"
+                >
+                  <Building2 className="w-3 h-3" />
+                  {ann.department}
+                </Link>
+              </div>
               <h1 className="text-[24px] font-bold text-foreground leading-tight tracking-tight">{ann.title}</h1>
             </div>
 
