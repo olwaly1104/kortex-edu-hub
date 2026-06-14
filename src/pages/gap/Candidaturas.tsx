@@ -143,19 +143,15 @@ export default function GapCandidaturas() {
           </Card>
         ))}
 
-        {/* Histórico de Admissões */}
+        {/* Período de candidaturas */}
         <Card className="p-4 hover:shadow-sm transition-shadow border-primary/30 bg-gradient-to-br from-primary/5 to-transparent flex items-center justify-between">
           <div className="min-w-0">
-            <p className="text-[11px] font-medium text-primary uppercase tracking-wider">Histórico de Admissões</p>
-            <p className="text-[11px] text-muted-foreground mt-1 leading-snug">
-              Relatórios mensais do funil de candidaturas e taxa de aprovação.
-            </p>
-            <div className="mt-2">
-              <ReportsMenuButton categories={candidaturaReportCategories} data={candidaturaReportData} />
-            </div>
+            <p className="text-[11px] font-medium text-primary uppercase tracking-wider">Período</p>
+            <p className="text-sm font-semibold text-foreground mt-1 tabular-nums">01 Jun → 31 Ago 2026</p>
+            <p className="text-[11px] text-muted-foreground mt-0.5">Janela aberta para submissão de candidaturas.</p>
           </div>
           <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-primary/10 text-primary shrink-0">
-            <FileBarChart2 className="w-4 h-4" />
+            <CalendarClock className="w-4 h-4" />
           </div>
         </Card>
       </div>
