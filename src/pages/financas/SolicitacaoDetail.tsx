@@ -266,7 +266,7 @@ export default function FinancasSolicitacaoDetail() {
                   <XCircle className="w-3.5 h-3.5" /> Rejeitar
                 </Button>
                 <Button size="sm" className="h-7 text-[11px] gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white transition-colors" onClick={() => openAction("em_execucao")}>
-                  <CheckCircle2 className="w-3.5 h-3.5" /> Aprovar
+                  <CheckCircle2 className="w-3.5 h-3.5" /> Confirmar
                 </Button>
               </div>
             </div>
