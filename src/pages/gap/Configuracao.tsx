@@ -313,16 +313,11 @@ export default function GapConfiguracao() {
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       {/* Header */}
-      <div className="flex items-start justify-between gap-4 flex-wrap">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground tracking-tight flex items-center gap-2">
-            <Settings2 className="w-6 h-6 text-primary" /> Configuração
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
-            Configure Solicitações, Agendamentos e o processo de Candidaturas do GAP.
-          </p>
-        </div>
-      </div>
+      <FinHeader
+        title="Configuração"
+        subtitle="Configure Solicitações, Agendamentos e o processo de Candidaturas do GAP."
+        icon={<Settings2 className="w-6 h-6 text-primary" />}
+      />
 
       <Tabs defaultValue="solicitacoes" className="space-y-6">
         <TabsList className="grid grid-cols-3 w-full max-w-2xl">
