@@ -185,6 +185,29 @@ interface DespesaRow {
 interface ResponsavelItem { id: string; nome: string; cargo: string; }
 interface DestinatarioMap { categoria: string; destinatario: string; }
 interface ApprovalRule { id: string; min: number; max: number; responsavelId: string; }
+interface CategoriaItem { id: string; label: string; color: string; }
+
+const CAT_PALETTE: { name: string; cls: string; dot: string }[] = [
+  { name: "Azul",     cls: "bg-blue-50 text-blue-700 border-blue-200",         dot: "bg-blue-500" },
+  { name: "Verde",    cls: "bg-emerald-50 text-emerald-700 border-emerald-200", dot: "bg-emerald-500" },
+  { name: "Violeta",  cls: "bg-violet-50 text-violet-700 border-violet-200",   dot: "bg-violet-500" },
+  { name: "Âmbar",    cls: "bg-amber-50 text-amber-700 border-amber-200",      dot: "bg-amber-500" },
+  { name: "Rosa",     cls: "bg-pink-50 text-pink-700 border-pink-200",         dot: "bg-pink-500" },
+  { name: "Turquesa", cls: "bg-teal-50 text-teal-700 border-teal-200",         dot: "bg-teal-500" },
+  { name: "Índigo",   cls: "bg-indigo-50 text-indigo-700 border-indigo-200",   dot: "bg-indigo-500" },
+  { name: "Laranja",  cls: "bg-orange-50 text-orange-700 border-orange-200",   dot: "bg-orange-500" },
+  { name: "Vermelho", cls: "bg-red-50 text-red-700 border-red-200",            dot: "bg-red-500" },
+  { name: "Cinzento", cls: "bg-slate-50 text-slate-700 border-slate-200",      dot: "bg-slate-500" },
+];
+
+const INITIAL_CATEGORIAS: CategoriaItem[] = [
+  { id: "cat-sal",  label: "Salários",                color: CAT_PALETTE[0].cls },
+  { id: "cat-aca",  label: "Académico",               color: CAT_PALETTE[1].cls },
+  { id: "cat-man",  label: "Manutenção & Logística",  color: CAT_PALETTE[7].cls },
+  { id: "cat-eve",  label: "Eventos",                 color: CAT_PALETTE[2].cls },
+  { id: "cat-ser",  label: "Serviços",                color: CAT_PALETTE[6].cls },
+  { id: "cat-bol",  label: "Bolsas & Apoios",         color: CAT_PALETTE[4].cls },
+];
 
 const DEPARTAMENTOS = [
   "Geral", "Reitoria", "Administração", "Docentes", "TI", "Serviços Gerais",
@@ -282,7 +305,7 @@ export default function ConfigurarReceitas() {
 
   /* ── DESPESAS ── */
   const [despesas, setDespesas] = useState<DespesaRow[]>([]);
-  const [categorias, setCategorias] = useState<string[]>([]);
+  const [categorias, setCategorias] = useState<CategoriaItem[]>(INITIAL_CATEGORIAS);
   const [estados, setEstados] = useState<string[]>(["Pendente", "Aprovada", "Executada", "Rejeitada"]);
   const [despesaCatFilter, setDespesaCatFilter] = useState<string>("todos");
   const [despesaEstadoFilter, setDespesaEstadoFilter] = useState<string>("todos");
@@ -294,7 +317,13 @@ export default function ConfigurarReceitas() {
     id: "", nome: "", categoria: "", estado: "", departamento: "Geral", periodicidade: "mensal", valorEstimado: 0,
   });
   const [confirmDelDespesa, setConfirmDelDespesa] = useState<DespesaRow | null>(null);
-  const [newCategoria, setNewCategoria] = useState("");
+
+  // Categoria add / edit dialogs
+  const [catDialogOpen, setCatDialogOpen] = useState(false);
+  const [newCatLabel, setNewCatLabel] = useState("");
+  const [newCatColor, setNewCatColor] = useState<string>(CAT_PALETTE[0].cls);
+  const [editingCategoria, setEditingCategoria] = useState<CategoriaItem | null>(null);
+
   const [newEstado, setNewEstado] = useState("");
 
   // Responsáveis
@@ -452,7 +481,7 @@ export default function ConfigurarReceitas() {
     setEditingDespesa(null);
     setDespesaForm({
       id: "", nome: "",
-      categoria: categorias[0],
+      categoria: categorias[0].label,
       estado: estados[0] ?? "",
       departamento: "Geral", periodicidade: "mensal", valorEstimado: 0,
     });
@@ -485,19 +514,34 @@ export default function ConfigurarReceitas() {
     setConfirmDelDespesa(null);
   };
   const addCategoria = () => {
-    const v = newCategoria.trim();
+    const v = newCatLabel.trim();
     if (!v) return;
-    if (categorias.includes(v)) { toast({ title: "Categoria já existe", variant: "destructive" }); return; }
-    setCategorias(cs => [...cs, v]);
-    setNewCategoria("");
+    if (categorias.some(c => c.label.toLowerCase() === v.toLowerCase())) {
+      toast({ title: "Categoria já existe", variant: "destructive" }); return;
+    }
+    setCategorias(cs => [...cs, { id: `cat-${Date.now()}`, label: v, color: newCatColor }]);
+    setNewCatLabel("");
+    setNewCatColor(CAT_PALETTE[0].cls);
+    setCatDialogOpen(false);
+    toast({ title: "Categoria criada", description: v });
   };
-  const removeCategoria = (c: string) => {
-    if (despesas.some(d => d.categoria === c)) {
+  const saveEditCategoria = () => {
+    if (!editingCategoria || !editingCategoria.label.trim()) return;
+    const v = editingCategoria.label.trim();
+    if (categorias.some(c => c.id !== editingCategoria.id && c.label.toLowerCase() === v.toLowerCase())) {
+      toast({ title: "Categoria já existe", variant: "destructive" }); return;
+    }
+    setCategorias(cs => cs.map(c => c.id === editingCategoria.id ? { ...editingCategoria, label: v } : c));
+    setEditingCategoria(null);
+    toast({ title: "Categoria actualizada" });
+  };
+  const removeCategoria = (cat: CategoriaItem) => {
+    if (despesas.some(d => d.categoria === cat.label)) {
       toast({ title: "Categoria em uso", description: "Remova primeiro as despesas que a usam.", variant: "destructive" });
       return;
     }
-    setCategorias(cs => cs.filter(x => x !== c));
-    if (despesaCatFilter === c) setDespesaCatFilter("todos");
+    setCategorias(cs => cs.filter(x => x.id !== cat.id));
+    if (despesaCatFilter === cat.label) setDespesaCatFilter("todos");
   };
   const addEstado = () => {
     const v = newEstado.trim();
@@ -1063,7 +1107,6 @@ export default function ConfigurarReceitas() {
       {/* ════════════════ DESPESAS ════════════════ */}
       {mode === "despesas" && (
         <div className="space-y-4">
-          {/* 1. Categorias */}
           <Card className="p-5">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
@@ -1072,25 +1115,58 @@ export default function ConfigurarReceitas() {
                 <span className="text-[11px] text-muted-foreground tabular-nums">· {categorias.length}</span>
                 <span className="text-xs text-muted-foreground hidden md:inline">— Classificação principal das despesas</span>
               </div>
-              <div className="flex items-center gap-1.5">
-                <Input value={newCategoria} onChange={e => setNewCategoria(e.target.value)}
-                  onKeyDown={e => { if (e.key === "Enter") addCategoria(); }}
-                  placeholder="Nova categoria" className="h-8 w-48 text-xs" />
-                <Button size="sm" variant="outline" className="h-8 text-xs gap-1.5" onClick={addCategoria}>
-                  <Plus className="w-3.5 h-3.5" /> Adicionar
+              <Dialog open={catDialogOpen} onOpenChange={(o) => { setCatDialogOpen(o); if (!o) { setNewCatLabel(""); setNewCatColor(CAT_PALETTE[0].cls); } }}>
+                <Button size="sm" variant="outline" className="h-8 text-xs gap-1.5" onClick={() => setCatDialogOpen(true)}>
+                  <Plus className="w-3.5 h-3.5" /> Nova categoria
                 </Button>
-              </div>
+                <DialogContent className="max-w-md">
+                  <DialogHeader><DialogTitle>Nova categoria</DialogTitle></DialogHeader>
+                  <div className="space-y-4 py-2">
+                    <div>
+                      <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Designação</label>
+                      <Input value={newCatLabel} onChange={e => setNewCatLabel(e.target.value)}
+                        onKeyDown={e => { if (e.key === "Enter") addCategoria(); }}
+                        placeholder="Ex: Eventos" />
+                    </div>
+                    <div>
+                      <label className="text-xs font-medium text-muted-foreground mb-2 block">Cor</label>
+                      <div className="flex flex-wrap gap-2">
+                        {CAT_PALETTE.map(p => (
+                          <button key={p.cls} type="button" onClick={() => setNewCatColor(p.cls)}
+                            className={cn("h-8 w-8 rounded-full border-2 flex items-center justify-center transition",
+                              newCatColor === p.cls ? "border-foreground" : "border-transparent hover:border-muted-foreground/40")}
+                            title={p.name}>
+                            <span className={cn("h-5 w-5 rounded-full", p.dot)} />
+                          </button>
+                        ))}
+                      </div>
+                      <div className="mt-3">
+                        <span className={cn("inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs", newCatColor)}>
+                          <span className="font-medium">{newCatLabel.trim() || "Pré-visualização"}</span>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <DialogFooter className="gap-2 sm:gap-2">
+                    <DialogClose asChild><Button variant="outline">Cancelar</Button></DialogClose>
+                    <Button onClick={addCategoria} disabled={!newCatLabel.trim()}>Adicionar</Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </div>
             {categorias.length === 0 ? (
               <p className="text-xs text-muted-foreground italic">Crie categorias para classificar as despesas.</p>
             ) : (
               <div className="flex flex-wrap gap-2">
                 {categorias.map(c => {
-                  const count = despesas.filter(d => d.categoria === c).length;
+                  const count = despesas.filter(d => d.categoria === c.label).length;
                   return (
-                    <div key={c} className={cn("inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs", chipFor(c))}>
-                      <span className="font-medium">{c}</span>
+                    <div key={c.id} className={cn("inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs", c.color)}>
+                      <span className="font-medium">{c.label}</span>
                       <span className="opacity-60 tabular-nums">· {count}</span>
+                      <button onClick={() => setEditingCategoria({ ...c })} className="opacity-60 hover:opacity-100" title="Editar">
+                        <Pencil className="w-3 h-3" />
+                      </button>
                       <button onClick={() => removeCategoria(c)} className="opacity-60 hover:opacity-100" title="Remover">
                         <Trash2 className="w-3 h-3" />
                       </button>
@@ -1100,6 +1176,46 @@ export default function ConfigurarReceitas() {
               </div>
             )}
           </Card>
+
+          {/* Edit categoria dialog */}
+          <Dialog open={!!editingCategoria} onOpenChange={(o) => !o && setEditingCategoria(null)}>
+            <DialogContent className="max-w-md">
+              <DialogHeader><DialogTitle>Editar categoria</DialogTitle></DialogHeader>
+              {editingCategoria && (
+                <div className="space-y-4 py-2">
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Designação</label>
+                    <Input value={editingCategoria.label}
+                      onChange={e => setEditingCategoria({ ...editingCategoria, label: e.target.value })} />
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-2 block">Cor</label>
+                    <div className="flex flex-wrap gap-2">
+                      {CAT_PALETTE.map(p => (
+                        <button key={p.cls} type="button"
+                          onClick={() => setEditingCategoria({ ...editingCategoria, color: p.cls })}
+                          className={cn("h-8 w-8 rounded-full border-2 flex items-center justify-center transition",
+                            editingCategoria.color === p.cls ? "border-foreground" : "border-transparent hover:border-muted-foreground/40")}
+                          title={p.name}>
+                          <span className={cn("h-5 w-5 rounded-full", p.dot)} />
+                        </button>
+                      ))}
+                    </div>
+                    <div className="mt-3">
+                      <span className={cn("inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs", editingCategoria.color)}>
+                        <span className="font-medium">{editingCategoria.label.trim() || "Pré-visualização"}</span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+              <DialogFooter className="gap-2 sm:gap-2">
+                <Button variant="outline" onClick={() => setEditingCategoria(null)}>Cancelar</Button>
+                <Button onClick={saveEditCategoria} disabled={!editingCategoria?.label.trim()}>Guardar</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+
 
           {/* 2. Estados */}
           <Card className="p-5">
@@ -1405,7 +1521,7 @@ export default function ConfigurarReceitas() {
                 <Select value={despesaForm.categoria} onValueChange={v => setDespesaForm({ ...despesaForm, categoria: v })}>
                   <SelectTrigger><SelectValue placeholder="Seleccionar..." /></SelectTrigger>
                   <SelectContent>
-                    {categorias.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                    {categorias.map(c => <SelectItem key={c.id} value={c.label}>{c.label}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
