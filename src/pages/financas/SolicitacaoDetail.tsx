@@ -524,181 +524,202 @@ export default function FinancasSolicitacaoDetail() {
         </div>
       </Card>
       {/* Action confirmation dialog */}
-      <Dialog open={!!pendingAction} onOpenChange={(o) => !o && setPendingAction(null)}>
+      <Dialog open={!!pendingAction} onOpenChange={(o) => { if (!o) { setPendingAction(null); setActionStep(0); } }}>
         <DialogContent className="max-w-[520px] p-0 gap-0 overflow-hidden">
           {pm && (
             <>
               {/* Header */}
               <div className="px-5 pt-4 pb-3 border-b border-border">
-                <div className="flex items-center gap-3">
+                <div className="flex items-start gap-3">
                   <div className={cn("w-9 h-9 rounded-lg flex items-center justify-center shrink-0", pm.iconBg)}>
                     <pm.icon className="w-[18px] h-[18px]" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <DialogTitle className="text-[15px] leading-tight font-semibold">Transição de Estado</DialogTitle>
-                    <p className="text-[11.5px] text-muted-foreground mt-0.5 truncate">
-                      <span className="font-mono font-semibold text-foreground/80">{selected.ref}</span>
-                      <span className="mx-1.5 text-muted-foreground/40">·</span>
-                      <span className="truncate">{selected.title}</span>
-                    </p>
+                    <DialogTitle className="text-[15px] leading-tight font-semibold">
+                      {actionStep === 0 ? pm.title : "Confirmar transição de estado"}
+                    </DialogTitle>
+                    <p className="text-[11.5px] text-muted-foreground mt-0.5 truncate">{selected.title}</p>
                   </div>
+                  <button
+                    type="button"
+                    onClick={() => { navigator.clipboard?.writeText(selected.ref); toast({ title: "Referência copiada", description: selected.ref }); }}
+                    className="shrink-0 inline-flex items-center px-2 py-0.5 rounded-md border border-border bg-background hover:bg-muted text-[11px] font-mono font-semibold text-foreground transition-colors"
+                  >
+                    {selected.ref}
+                  </button>
                 </div>
                 <DialogDescription className="sr-only">{pm.desc}</DialogDescription>
               </div>
 
-              {/* Data + Requerente */}
-              <div className="px-5 pt-3 pb-2 border-b border-border bg-muted/10 flex items-center gap-4">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">Data</span>
-                  <span className="text-[12px] font-semibold text-foreground tabular-nums">{fmt(dSub)}</span>
-                </div>
-                <span className="w-px h-3 bg-border" />
-                <div className="flex items-center gap-1.5 min-w-0">
-                  <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground shrink-0">Requerente</span>
-                  <span className="text-[12px] font-semibold text-foreground truncate">{selected.requester}</span>
-                  <span className="text-[10px] text-muted-foreground truncate">{counterpartRole}</span>
-                </div>
-              </div>
-
-              {/* Estado transition banner */}
-              {(() => {
-                const fromMeta = finStatusMeta[selected.status];
-                const toMeta = finStatusMeta[pendingAction!];
-                return (
-                  <div className="px-5 py-2.5 border-b border-border bg-muted/15">
-                    <p className="text-[10px] uppercase tracking-[0.1em] font-semibold text-muted-foreground mb-1.5">
-                      Transição de estado
-                    </p>
-                    <div className="flex items-center gap-2">
-                      <Badge variant="outline" className={cn("text-[10.5px] font-semibold px-2 py-0.5 uppercase tracking-wider gap-1", fromMeta.cls)}>
-                        <span className={cn("w-1.5 h-1.5 rounded-full", fromMeta.dot)} />
-                        {fromMeta.label}
-                      </Badge>
-                      <ChevronRight className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-                      <Badge variant="outline" className={cn("text-[10.5px] font-semibold px-2 py-0.5 uppercase tracking-wider gap-1", toMeta.cls)}>
-                        <span className={cn("w-1.5 h-1.5 rounded-full", toMeta.dot)} />
-                        {toMeta.label}
-                      </Badge>
+              {actionStep === 0 ? (
+                <>
+                  {/* Data + Requerente */}
+                  <div className="px-5 pt-3 pb-2 border-b border-border bg-muted/10 flex items-center gap-4">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">Data</span>
+                      <span className="text-[12px] font-semibold text-foreground tabular-nums">{fmt(dSub)}</span>
                     </div>
-                    <p className="text-[11px] text-foreground/70 leading-snug mt-1.5">
-                      Ação será registada. Requerente e responsáveis serão notificados.
-                    </p>
-                  </div>
-                );
-              })()}
-
-              {/* Body */}
-              <div className="px-5 py-3 space-y-3">
-
-                {/* Parecer / Notas */}
-                <section className="space-y-1">
-                  <div className="flex items-baseline justify-between">
-                    <Label htmlFor="action-notes" className="text-[11px] uppercase tracking-[0.08em] font-semibold text-foreground">
-                      Parecer / Notas
-                    </Label>
-                    <span className="text-[10px] text-muted-foreground">Obrigatório</span>
-                  </div>
-                  <Textarea
-                    id="action-notes"
-                    value={actionNotes}
-                    onChange={(e) => setActionNotes(e.target.value)}
-                    placeholder={pm.notesPlaceholder}
-                    rows={3}
-                    className="resize-none text-sm leading-relaxed"
-                  />
-                </section>
-
-                {/* Anexos */}
-                <section className="space-y-1">
-                  <div className="flex items-baseline justify-between">
-                    <Label className="text-[11px] uppercase tracking-[0.08em] font-semibold text-foreground">
-                      Anexos e evidências
-                    </Label>
-                    <span className="text-[10px] text-muted-foreground">
-                      {actionFiles.length > 0 ? `${actionFiles.length} ${actionFiles.length === 1 ? "ficheiro" : "ficheiros"}` : "Opcional"}
-                    </span>
+                    <span className="w-px h-3 bg-border" />
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground shrink-0">Requerente</span>
+                      <span className="text-[12px] font-semibold text-foreground truncate">{selected.requester}</span>
+                      <span className="text-[10px] text-muted-foreground truncate">{counterpartRole}</span>
+                    </div>
                   </div>
 
-                  <label className="group flex items-center gap-2 rounded-md border border-dashed border-border bg-muted/10 hover:border-primary/40 hover:bg-primary/[0.03] transition-colors cursor-pointer px-3 py-1.5">
-                    <span className="w-5 h-5 rounded-full border border-border bg-background flex items-center justify-center group-hover:border-primary/50 group-hover:text-primary transition-colors shrink-0">
-                      <Plus className="w-3 h-3 text-muted-foreground group-hover:text-primary transition-colors" />
-                    </span>
-                    <span className="text-[12px] text-foreground/80 flex-1 truncate">
-                      Carregar anexo <span className="text-muted-foreground">(PDF, DOCX, XLSX, PNG, JPG)</span>
-                    </span>
-                    <input
-                      type="file"
-                      multiple
-                      className="hidden"
-                      onChange={(e) => setActionFiles(prev => [...prev, ...Array.from(e.target.files ?? [])])}
-                    />
-                  </label>
-
-                  {actionFiles.length > 0 && (
-                    <ul className="space-y-1 pt-0.5">
-                      {actionFiles.map((f, i) => {
-                        const ext = f.name.split(".").pop()?.toUpperCase() ?? "FILE";
-                        const isImg = /^(PNG|JPG|JPEG|WEBP|GIF)$/.test(ext);
-                        const isSheet = /^(XLS|XLSX|CSV)$/.test(ext);
-                        const Ic = isImg ? FileImage : isSheet ? FileSpreadsheet : FileText;
-                        const cls = isImg ? "text-violet-600"
-                          : isSheet ? "text-emerald-600"
-                          : "text-red-600";
-                        return (
-                          <li key={i} className="flex items-center gap-2 pl-2 pr-1.5 py-1 rounded-md border border-border bg-background hover:bg-muted/20 transition-colors">
-                            <Ic className={cn("w-3.5 h-3.5 shrink-0", cls)} />
-                            <span className="text-[12px] font-medium text-foreground truncate flex-1 leading-tight">{f.name}</span>
-                            <span className="text-[10px] text-muted-foreground tabular-nums shrink-0">
-                              {f.size < 1024 * 1024 ? `${(f.size / 1024).toFixed(0)} KB` : `${(f.size / 1024 / 1024).toFixed(1)} MB`}
-                            </span>
-                            <button
-                              type="button"
-                              onClick={() => setActionFiles(prev => prev.filter((_, idx) => idx !== i))}
-                              className="w-5 h-5 rounded inline-flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors shrink-0"
-                              title="Remover"
-                            >
-                              <X className="w-3 h-3" />
-                            </button>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  )}
-                </section>
-
-                {/* Declaração */}
-                {(() => {
-                  const toMeta = finStatusMeta[pendingAction!];
-                  return (
-                    <div className="flex items-start gap-2 rounded-md border border-border bg-muted/10 px-3 py-2">
-                      <Checkbox
-                        id="declaration"
-                        checked={declarationChecked}
-                        onCheckedChange={(c) => setDeclarationChecked(c === true)}
-                        className="mt-0.5 shrink-0"
+                  {/* Body */}
+                  <div className="px-5 py-3 space-y-3">
+                    <section className="space-y-1">
+                      <div className="flex items-baseline justify-between">
+                        <Label htmlFor="action-notes" className="text-[11px] uppercase tracking-[0.08em] font-semibold text-foreground">
+                          Parecer / Notas
+                        </Label>
+                        <span className="text-[10px] text-muted-foreground">Obrigatório</span>
+                      </div>
+                      <Textarea
+                        id="action-notes"
+                        value={actionNotes}
+                        onChange={(e) => setActionNotes(e.target.value)}
+                        placeholder={pm.notesPlaceholder}
+                        rows={3}
+                        className="resize-none text-sm leading-relaxed"
                       />
-                      <Label htmlFor="declaration" className="text-[12px] text-foreground/80 leading-snug cursor-pointer font-normal">
-                        Eu declaro que esta solicitação está em <span className="font-semibold text-foreground">{toMeta.label.toLowerCase()}</span>.
-                      </Label>
-                    </div>
-                  );
-                })()}
-              </div>
+                    </section>
 
-              {/* Footer */}
-              <DialogFooter className="px-5 py-2.5 border-t border-border bg-muted/20 gap-2 sm:gap-2">
-                <DialogClose asChild>
-                  <Button variant="outline" size="sm" className="h-7 text-[12px]">Cancelar</Button>
-                </DialogClose>
-                <Button
-                  size="sm"
-                  className={cn("h-7 text-[12px] gap-1.5", pm.tone)}
-                  onClick={confirmAction}
-                  disabled={!actionNotes.trim() || !declarationChecked}
-                >
-                  <pm.icon className="w-3.5 h-3.5" /> {pm.cta}
-                </Button>
-              </DialogFooter>
+                    <section className="space-y-1">
+                      <div className="flex items-baseline justify-between">
+                        <Label className="text-[11px] uppercase tracking-[0.08em] font-semibold text-foreground">
+                          Anexos e evidências
+                        </Label>
+                        <span className="text-[10px] text-muted-foreground">
+                          {actionFiles.length > 0 ? `${actionFiles.length} ${actionFiles.length === 1 ? "ficheiro" : "ficheiros"}` : "Opcional"}
+                        </span>
+                      </div>
+
+                      <label className="group flex items-center gap-2 rounded-md border border-dashed border-border bg-muted/10 hover:border-primary/40 hover:bg-primary/[0.03] transition-colors cursor-pointer px-3 py-1.5">
+                        <span className="w-5 h-5 rounded-full border border-border bg-background flex items-center justify-center group-hover:border-primary/50 group-hover:text-primary transition-colors shrink-0">
+                          <Plus className="w-3 h-3 text-muted-foreground group-hover:text-primary transition-colors" />
+                        </span>
+                        <span className="text-[12px] text-foreground/80 flex-1 truncate">
+                          Carregar anexo <span className="text-muted-foreground">(PDF, DOCX, XLSX, PNG, JPG)</span>
+                        </span>
+                        <input
+                          type="file"
+                          multiple
+                          className="hidden"
+                          onChange={(e) => setActionFiles(prev => [...prev, ...Array.from(e.target.files ?? [])])}
+                        />
+                      </label>
+
+                      {actionFiles.length > 0 && (
+                        <ul className="space-y-1 pt-0.5">
+                          {actionFiles.map((f, i) => {
+                            const ext = f.name.split(".").pop()?.toUpperCase() ?? "FILE";
+                            const isImg = /^(PNG|JPG|JPEG|WEBP|GIF)$/.test(ext);
+                            const isSheet = /^(XLS|XLSX|CSV)$/.test(ext);
+                            const Ic = isImg ? FileImage : isSheet ? FileSpreadsheet : FileText;
+                            const cls = isImg ? "text-violet-600"
+                              : isSheet ? "text-emerald-600"
+                              : "text-red-600";
+                            return (
+                              <li key={i} className="flex items-center gap-2 pl-2 pr-1.5 py-1 rounded-md border border-border bg-background hover:bg-muted/20 transition-colors">
+                                <Ic className={cn("w-3.5 h-3.5 shrink-0", cls)} />
+                                <span className="text-[12px] font-medium text-foreground truncate flex-1 leading-tight">{f.name}</span>
+                                <span className="text-[10px] text-muted-foreground tabular-nums shrink-0">
+                                  {f.size < 1024 * 1024 ? `${(f.size / 1024).toFixed(0)} KB` : `${(f.size / 1024 / 1024).toFixed(1)} MB`}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => setActionFiles(prev => prev.filter((_, idx) => idx !== i))}
+                                  className="w-5 h-5 rounded inline-flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors shrink-0"
+                                  title="Remover"
+                                >
+                                  <X className="w-3 h-3" />
+                                </button>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      )}
+                    </section>
+                  </div>
+
+                  <DialogFooter className="px-5 py-2.5 border-t border-border bg-muted/20 gap-2 sm:gap-2">
+                    <DialogClose asChild>
+                      <Button variant="outline" size="sm" className="h-7 text-[12px]">Cancelar</Button>
+                    </DialogClose>
+                    <Button
+                      size="sm"
+                      className={cn("h-7 text-[12px] gap-1.5", pm.tone)}
+                      onClick={() => setActionStep(1)}
+                      disabled={!actionNotes.trim()}
+                    >
+                      <pm.icon className="w-3.5 h-3.5" /> {pm.cta}
+                    </Button>
+                  </DialogFooter>
+                </>
+              ) : (
+                <>
+                  {(() => {
+                    const fromMeta = finStatusMeta[selected.status];
+                    const toMeta = finStatusMeta[pendingAction!];
+                    return (
+                      <div className="px-5 py-4 space-y-4">
+                        <div>
+                          <p className="text-[10px] uppercase tracking-[0.1em] font-semibold text-muted-foreground mb-2">
+                            Transição de estado
+                          </p>
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline" className={cn("text-[10.5px] font-semibold px-2 py-0.5 uppercase tracking-wider gap-1", fromMeta.cls)}>
+                              <span className={cn("w-1.5 h-1.5 rounded-full", fromMeta.dot)} />
+                              {fromMeta.label}
+                            </Badge>
+                            <ChevronRight className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                            <Badge variant="outline" className={cn("text-[10.5px] font-semibold px-2 py-0.5 uppercase tracking-wider gap-1", toMeta.cls)}>
+                              <span className={cn("w-1.5 h-1.5 rounded-full", toMeta.dot)} />
+                              {toMeta.label}
+                            </Badge>
+                          </div>
+                          <p className="text-[11px] text-muted-foreground leading-snug mt-2">
+                            Ação será registada. Requerente e responsáveis serão notificados.
+                          </p>
+                        </div>
+
+                        <div className="flex items-start gap-2 rounded-md border border-border bg-muted/10 px-3 py-2.5">
+                          <Checkbox
+                            id="declaration"
+                            checked={declarationChecked}
+                            onCheckedChange={(c) => setDeclarationChecked(c === true)}
+                            className="mt-0.5 shrink-0"
+                          />
+                          <Label htmlFor="declaration" className="text-[12px] text-foreground/80 leading-snug cursor-pointer font-normal">
+                            Eu declaro que esta solicitação está em <span className="font-semibold text-foreground">{toMeta.label.toLowerCase()}</span>.
+                          </Label>
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  <DialogFooter className="px-5 py-2.5 border-t border-border bg-muted/20 gap-2 sm:gap-2 sm:justify-between">
+                    <Button variant="ghost" size="sm" className="h-7 text-[12px] gap-1" onClick={() => setActionStep(0)}>
+                      <ChevronLeft className="w-3.5 h-3.5" /> Voltar
+                    </Button>
+                    <div className="flex items-center gap-2">
+                      <DialogClose asChild>
+                        <Button variant="outline" size="sm" className="h-7 text-[12px]">Cancelar</Button>
+                      </DialogClose>
+                      <Button
+                        size="sm"
+                        className={cn("h-7 text-[12px] gap-1.5", pm.tone)}
+                        onClick={confirmAction}
+                        disabled={!declarationChecked}
+                      >
+                        <pm.icon className="w-3.5 h-3.5" /> Confirmar
+                      </Button>
+                    </div>
+                  </DialogFooter>
+                </>
+              )}
             </>
           )}
         </DialogContent>
