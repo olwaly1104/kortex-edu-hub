@@ -285,20 +285,20 @@ export default function FinancasAnuncios() {
 
                   {/* compact CTA */}
                   {a.cta === "inscrever" && (
-                    <div className="mt-3 flex items-center justify-between gap-3">
+                    <div className="mt-3 flex items-center gap-3">
                       {isSub ? (
                         <Badge variant="outline" className="text-[10px] gap-1 bg-emerald-50 text-emerald-700 border-emerald-200 h-6 px-2">
                           <CheckCircle2 className="w-3 h-3" /> Inscrito
                         </Badge>
                       ) : (
                         <>
-                          <span className="text-[11px] text-muted-foreground">
-                            Inscrições até <span className="font-medium text-foreground tabular-nums">{a.ctaDeadline ?? "—"}</span>
-                          </span>
                           <Button size="sm" className="h-7 text-[11px] gap-1.5 px-3 shadow-sm"
                             onClick={() => setSubscribed(s => new Set(s).add(a.id))}>
                             <CheckCircle2 className="w-3.5 h-3.5" /> Inscrever-me
                           </Button>
+                          <span className="text-[11px] text-muted-foreground">
+                            até <span className="font-medium text-foreground tabular-nums">{a.ctaDeadline ?? "—"}</span>
+                          </span>
                         </>
                       )}
                     </div>
