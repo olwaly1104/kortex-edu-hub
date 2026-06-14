@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,7 @@ import {
   Settings2, Plus, Pencil, Trash2, ArrowLeft, ChevronRight, Search,
   GraduationCap, BookOpen, FileText, ClipboardCheck, AlertTriangle, Building2,
   Users, Banknote, TrendingDown, TrendingUp, Tag, CircleDot, X,
+  CalendarDays, Clock,
 } from "lucide-react";
 import { formatCurrency, salarios as initialSalarios, type Salary } from "@/data/financeModuleData";
 import { reitorFaculties } from "@/data/institutionData";
@@ -177,7 +178,7 @@ interface DespesaRow {
 }
 
 const DEPARTAMENTOS = [
-  "Geral", "Reitoria", "Administração", "TI", "Serviços Gerais",
+  "Geral", "Reitoria", "Administração", "Docentes", "TI", "Serviços Gerais",
   "Fac. Engenharia", "Fac. Medicina", "Fac. Direito", "Fac. Arquitectura",
   "Fac. Ciências", "Fac. Letras", "Fac. Economia",
 ];
@@ -215,14 +216,17 @@ const chipFor = (s: string) => {
 interface SalaryMulta { id: string; nome: string; valor: number; }
 interface SalaryConfig {
   baseSalary: number;
-  deductionRate: number;
+  irtRate: number;
+  ssRate: number;
   multas: SalaryMulta[];
 }
-const seedSalaryConfig = (s: Salary): SalaryConfig => ({
-  baseSalary: s.grossSalary,
-  deductionRate: s.deductions / s.grossSalary,
-  multas: [],
-});
+const seedSalaryConfig = (s: Salary): SalaryConfig => {
+  // Decompose existing deductions into IRT + SS aproximação (default 8% + 3%)
+  const total = s.deductions / s.grossSalary;
+  const ssRate = Math.min(0.03, total);
+  const irtRate = Math.max(0, total - ssRate);
+  return { baseSalary: s.grossSalary, irtRate, ssRate, multas: [] };
+};
 
 /* ════════════════════════════════════════════════════════════════════════
    MAIN COMPONENT
@@ -235,6 +239,17 @@ export default function ConfigurarReceitas() {
   const { toast } = useToast();
 
   const [mode, setMode] = useState<Mode>("receitas");
+
+  /* ── Header live clock ── */
+  const [now, setNow] = useState<Date>(new Date());
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(id);
+  }, []);
+  const liveTime = `${String(now.getHours()).padStart(2, "0")}h:${String(now.getMinutes()).padStart(2, "0")}min:${String(now.getSeconds()).padStart(2, "0")}s`;
+  const todayLabel = new Date().toLocaleDateString("pt-PT", { weekday: "long", day: "2-digit", month: "long", year: "numeric" });
+  const ANO_LETIVO = "2024 / 2025";
+
 
   /* ── RECEITAS ── */
   const [receitas, setReceitas] = useState<ReceitaRow[]>(initialReceitas);
@@ -275,12 +290,13 @@ export default function ConfigurarReceitas() {
   const [salaryDeptFilter, setSalaryDeptFilter] = useState<string>("todos");
   const [salarySearch, setSalarySearch] = useState("");
   const [editingSalary, setEditingSalary] = useState<Salary | null>(null);
-  const [salaryForm, setSalaryForm] = useState<SalaryConfig>({ baseSalary: 0, deductionRate: 0.14, multas: [] });
+  const [salaryForm, setSalaryForm] = useState<SalaryConfig>({ baseSalary: 0, irtRate: 0.08, ssRate: 0.03, multas: [] });
   const [newMulta, setNewMulta] = useState<{ nome: string; valor: string }>({ nome: "", valor: "" });
   const [confirmDelSalary, setConfirmDelSalary] = useState<Salary | null>(null);
   const [openNewSalary, setOpenNewSalary] = useState(false);
   const [newSalaryForm, setNewSalaryForm] = useState({
-    name: "", employeeId: "", role: "", department: "Administração", grossSalary: 0,
+    name: "", employeeId: "", role: "", department: "Docentes", grossSalary: 0,
+    contractType: "permanente" as "permanente" | "prestador",
   });
 
   /* ── derived ── */
@@ -479,9 +495,9 @@ export default function ConfigurarReceitas() {
   const removeMulta = (id: string) => setSalaryForm(f => ({ ...f, multas: f.multas.filter(m => m.id !== id) }));
 
   const computeNet = (c: SalaryConfig) => {
-    const deductions = Math.round(c.baseSalary * c.deductionRate);
-    const multasTotal = c.multas.reduce((s, m) => s + m.valor, 0);
-    return c.baseSalary - deductions - multasTotal;
+    const irt = Math.round(c.baseSalary * c.irtRate);
+    const ss = Math.round(c.baseSalary * c.ssRate);
+    return c.baseSalary - irt - ss;
   };
 
   const saveNewSalary = () => {
@@ -491,15 +507,19 @@ export default function ConfigurarReceitas() {
     }
     const id = `sal-${Date.now()}`;
     const empId = newSalaryForm.employeeId.trim() || `EMP-${Math.floor(Math.random() * 9000 + 1000)}`;
-    const deductionRate = 0.14;
-    const deductions = Math.round(newSalaryForm.grossSalary * deductionRate);
+    const irtRate = 0.08, ssRate = 0.03;
+    const deductions = Math.round(newSalaryForm.grossSalary * (irtRate + ssRate));
+    // Teachers always belong to "Docentes" department
+    const role = newSalaryForm.role.trim();
+    const isTeacher = /professor|docente|leitor|assistente|catedrático/i.test(role);
+    const dept = isTeacher ? "Docentes" : newSalaryForm.department;
     const newSal: Salary = {
       id,
       employeeId: empId,
       name: newSalaryForm.name.trim(),
-      role: newSalaryForm.role.trim(),
-      department: newSalaryForm.department,
-      contractType: "efectivo",
+      role,
+      department: dept,
+      contractType: newSalaryForm.contractType === "permanente" ? "efectivo" : "contratado",
       grossSalary: newSalaryForm.grossSalary,
       netSalary: newSalaryForm.grossSalary - deductions,
       deductions,
@@ -507,10 +527,10 @@ export default function ConfigurarReceitas() {
       payDate: new Date().toISOString().slice(0, 10),
     };
     setSalaries(ss => [newSal, ...ss]);
-    setSalaryConfigs(c => ({ ...c, [id]: { baseSalary: newSalaryForm.grossSalary, deductionRate, multas: [] } }));
+    setSalaryConfigs(c => ({ ...c, [id]: { baseSalary: newSalaryForm.grossSalary, irtRate, ssRate, multas: [] } }));
     toast({ title: "Colaborador adicionado", description: newSal.name });
     setOpenNewSalary(false);
-    setNewSalaryForm({ name: "", employeeId: "", role: "", department: "Administração", grossSalary: 0 });
+    setNewSalaryForm({ name: "", employeeId: "", role: "", department: "Docentes", grossSalary: 0, contractType: "permanente" });
   };
   const confirmRemoveSalary = () => {
     if (!confirmDelSalary) return;
@@ -524,18 +544,39 @@ export default function ConfigurarReceitas() {
 
   return (
     <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6 animate-fade-in">
-      {/* Header */}
-      <div className="flex items-start gap-3">
-        <Button variant="ghost" size="icon" className="rounded-lg" onClick={() => navigate("/financas/dashboard")}>
-          <ArrowLeft className="w-4 h-4" />
-        </Button>
-        <div className="flex-1">
-          <h1 className="text-2xl font-bold text-foreground tracking-tight flex items-center gap-2">
-            <Settings2 className="w-6 h-6 text-primary" /> Configurador Financeiro
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
-            Gere receitas, despesas e salários da instituição num único painel.
-          </p>
+      {/* Header — institucional (Ano Letivo + Dia de Hoje) */}
+      <div className="rounded-xl border border-border bg-gradient-to-r from-primary/5 to-transparent px-5 py-4">
+        <div className="flex items-start justify-between gap-4 flex-wrap">
+          <div className="flex items-start gap-2 min-w-0">
+            <Button variant="ghost" size="icon" className="rounded-lg -ml-2 mt-0.5" onClick={() => navigate("/financas/dashboard")}>
+              <ArrowLeft className="w-4 h-4" />
+            </Button>
+            <div className="min-w-0 space-y-2.5">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-[11px] uppercase tracking-wider font-semibold text-primary">
+                <GraduationCap className="w-3.5 h-3.5" />
+                Ano Letivo <span className="font-bold tabular-nums">{ANO_LETIVO}</span>
+              </span>
+              <div>
+                <h1 className="text-xl font-bold text-foreground flex items-center gap-2 leading-tight">
+                  <Settings2 className="w-5 h-5 text-primary" /> Configurador Financeiro
+                </h1>
+                <p className="text-sm text-muted-foreground mt-0.5">
+                  Gere receitas, despesas e salários da instituição num único painel.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-col items-end gap-2 shrink-0">
+            <div className="inline-flex items-stretch rounded-md border border-border bg-card overflow-hidden text-[11px] uppercase tracking-wider font-medium shadow-sm">
+              <span className="flex items-center gap-1.5 px-2.5 py-1 text-foreground capitalize">
+                <CalendarDays className="w-3.5 h-3.5 text-muted-foreground" />{todayLabel}
+              </span>
+              <span className="w-px bg-border" />
+              <span className="flex items-center gap-1.5 px-2.5 py-1 font-mono tabular-nums text-primary bg-muted/30">
+                <Clock className="w-3.5 h-3.5" />{liveTime}
+              </span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -629,10 +670,13 @@ export default function ConfigurarReceitas() {
                       ))}
                     </div>
                   ) : (
-                    <div className="divide-y divide-border">
-                      <div className="pb-3 mb-1">
-                        <p className="text-xs text-muted-foreground">Faculdade</p>
-                        <p className="text-sm font-semibold text-foreground">{selected.name}</p>
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2 pb-2 border-b border-border">
+                        <Building2 className="w-4 h-4 text-blue-700" />
+                        <div className="min-w-0">
+                          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Faculdade</p>
+                          <p className="text-sm font-semibold text-foreground">{selected.name}</p>
+                        </div>
                       </div>
                       {selected.courses.map(c => {
                         const r = receitas.find(x => x.tipo === "Propina mensal" && x.escopo === c.id);
@@ -641,7 +685,8 @@ export default function ConfigurarReceitas() {
                         const existingMonths = new Set(plans.map(p => p.months));
                         const availableToAdd = [10, 11, 12].filter(m => !existingMonths.has(m));
                         return (
-                          <div key={c.id} className="py-3 group">
+                          <div key={c.id} className="rounded-lg border border-border bg-card p-3 hover:border-primary/30 transition group">
+
                             <div className="flex items-center justify-between gap-3 mb-2">
                               <div className="min-w-0">
                                 <p className="text-sm font-medium text-foreground truncate">{c.name}</p>
@@ -1029,18 +1074,25 @@ export default function ConfigurarReceitas() {
                 {salaryList.map(s => {
                   const cfg = salaryConfigs[s.id];
                   if (!cfg) return null;
-                  const deductions = Math.round(cfg.baseSalary * cfg.deductionRate);
-                  const multasTotal = cfg.multas.reduce((sum, m) => sum + m.valor, 0);
-                  const net = cfg.baseSalary - deductions - multasTotal;
+                  const net = computeNet(cfg);
+                  const contractLabel = s.contractType === "efectivo" ? "Permanente" : "Prestador";
                   return (
-                    <tr key={s.id} className="border-b border-border/50 hover:bg-muted/40 cursor-pointer group"
-                      onClick={() => openEditSalary(s)}>
+                    <tr key={s.id} className="border-b border-border/50 hover:bg-muted/40 group">
                       <td className="px-2 py-2.5">
-                        <p className="text-sm font-medium text-foreground truncate">{s.name}</p>
-                        <p className="text-[10px] text-muted-foreground font-mono">{s.employeeId}</p>
+                        <button
+                          type="button"
+                          onClick={() => navigate(`/financas/pessoal/financas?id=${s.id}`)}
+                          className="text-left">
+                          <p className="text-sm font-medium text-foreground truncate hover:text-primary hover:underline underline-offset-2">{s.name}</p>
+                          <p className="text-[10px] text-muted-foreground font-mono">{s.employeeId}</p>
+                        </button>
                       </td>
                       <td className="px-2 py-2.5">
                         <p className="text-xs text-foreground truncate">{s.role}</p>
+                        <span className={cn(
+                          "inline-flex items-center rounded-full border px-1.5 py-0.5 text-[9px] font-medium mt-0.5",
+                          s.contractType === "efectivo" ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-amber-50 text-amber-700 border-amber-200"
+                        )}>{contractLabel}</span>
                       </td>
                       <td className="px-2 py-2.5">
                         <p className="text-xs text-foreground truncate">{s.department}</p>
@@ -1223,71 +1275,41 @@ export default function ConfigurarReceitas() {
           </DialogHeader>
           {editingSalary && (
             <div className="space-y-4 py-2">
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-3 gap-3">
                 <div className="space-y-1.5">
                   <label className="text-xs font-medium text-muted-foreground">Salário Bruto (Kz)</label>
                   <Input type="number" min={0} value={salaryForm.baseSalary}
                     onChange={e => setSalaryForm({ ...salaryForm, baseSalary: Number(e.target.value) || 0 })} />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-muted-foreground">Desconto IRT/SS (%)</label>
+                  <label className="text-xs font-medium text-muted-foreground">Desconto IRT (%)</label>
                   <Input type="number" min={0} max={100} step={0.5}
-                    value={(salaryForm.deductionRate * 100).toFixed(1)}
-                    onChange={e => setSalaryForm({ ...salaryForm, deductionRate: (Number(e.target.value) || 0) / 100 })} />
+                    value={(salaryForm.irtRate * 100).toFixed(1)}
+                    onChange={e => setSalaryForm({ ...salaryForm, irtRate: (Number(e.target.value) || 0) / 100 })} />
                 </div>
-              </div>
-
-              <div className="rounded-lg border border-border p-3 space-y-2">
-                <div className="flex items-center justify-between">
-                  <p className="text-xs font-semibold text-foreground flex items-center gap-1.5">
-                    <AlertTriangle className="w-3.5 h-3.5 text-orange-600" />
-                    Multas / Descontos adicionais
-                  </p>
-                  <span className="text-[10px] text-muted-foreground tabular-nums">{salaryForm.multas.length} item(s)</span>
-                </div>
-
-                {salaryForm.multas.length > 0 && (
-                  <div className="divide-y divide-border">
-                    {salaryForm.multas.map(m => (
-                      <div key={m.id} className="flex items-center gap-2 py-1.5">
-                        <p className="text-xs text-foreground flex-1 truncate">{m.nome}</p>
-                        <span className="text-xs font-semibold tabular-nums text-orange-600">−{formatCurrency(m.valor)}</span>
-                        <Button variant="ghost" size="icon" className="h-6 w-6 text-destructive" onClick={() => removeMulta(m.id)}>
-                          <Trash2 className="w-3 h-3" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                <div className="flex items-center gap-2 pt-2 border-t border-border">
-                  <Input placeholder="Designação da multa" value={newMulta.nome}
-                    onChange={e => setNewMulta({ ...newMulta, nome: e.target.value })}
-                    className="h-8 text-xs flex-1" />
-                  <Input type="number" placeholder="Kz" value={newMulta.valor}
-                    onChange={e => setNewMulta({ ...newMulta, valor: e.target.value })}
-                    className="h-8 text-xs w-28 text-right tabular-nums" />
-                  <Button size="sm" className="h-8 gap-1" onClick={addMulta}>
-                    <Plus className="w-3 h-3" /> Add
-                  </Button>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-muted-foreground">Segurança Social (%)</label>
+                  <Input type="number" min={0} max={100} step={0.5}
+                    value={(salaryForm.ssRate * 100).toFixed(1)}
+                    onChange={e => setSalaryForm({ ...salaryForm, ssRate: (Number(e.target.value) || 0) / 100 })} />
                 </div>
               </div>
 
               <div className="rounded-lg bg-muted/30 p-3 space-y-1.5">
                 <div className="flex justify-between text-xs">
-                  <span className="text-muted-foreground">Bruto</span>
+                  <span className="text-muted-foreground">Salário Bruto</span>
                   <span className="font-medium tabular-nums">{formatCurrency(salaryForm.baseSalary)}</span>
                 </div>
                 <div className="flex justify-between text-xs">
-                  <span className="text-muted-foreground">Descontos ({(salaryForm.deductionRate * 100).toFixed(1)}%)</span>
-                  <span className="font-medium tabular-nums text-red-600">−{formatCurrency(Math.round(salaryForm.baseSalary * salaryForm.deductionRate))}</span>
+                  <span className="text-muted-foreground">Desconto IRT ({(salaryForm.irtRate * 100).toFixed(1)}%)</span>
+                  <span className="font-medium tabular-nums text-red-600">−{formatCurrency(Math.round(salaryForm.baseSalary * salaryForm.irtRate))}</span>
                 </div>
                 <div className="flex justify-between text-xs">
-                  <span className="text-muted-foreground">Multas</span>
-                  <span className="font-medium tabular-nums text-orange-600">−{formatCurrency(salaryForm.multas.reduce((s, m) => s + m.valor, 0))}</span>
+                  <span className="text-muted-foreground">Segurança Social ({(salaryForm.ssRate * 100).toFixed(1)}%)</span>
+                  <span className="font-medium tabular-nums text-red-600">−{formatCurrency(Math.round(salaryForm.baseSalary * salaryForm.ssRate))}</span>
                 </div>
                 <div className="flex justify-between pt-2 border-t border-border">
-                  <span className="text-sm font-semibold">Líquido a receber</span>
+                  <span className="text-sm font-semibold">Salário Líquido</span>
                   <span className="text-sm font-bold tabular-nums text-blue-700">{formatCurrency(computeNet(salaryForm))}</span>
                 </div>
               </div>
@@ -1336,11 +1358,27 @@ export default function ConfigurarReceitas() {
                 </Select>
               </div>
             </div>
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">Salário Bruto (Kz)</label>
-              <Input type="number" min={0} value={newSalaryForm.grossSalary}
-                onChange={e => setNewSalaryForm({ ...newSalaryForm, grossSalary: Number(e.target.value) || 0 })} />
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-muted-foreground">Salário Bruto (Kz)</label>
+                <Input type="number" min={0} value={newSalaryForm.grossSalary}
+                  onChange={e => setNewSalaryForm({ ...newSalaryForm, grossSalary: Number(e.target.value) || 0 })} />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-muted-foreground">Tipo de Contrato</label>
+                <Select value={newSalaryForm.contractType}
+                  onValueChange={(v: "permanente" | "prestador") => setNewSalaryForm({ ...newSalaryForm, contractType: v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="permanente">Permanente</SelectItem>
+                    <SelectItem value="prestador">Prestador de Serviços</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
+            <p className="text-[11px] text-muted-foreground -mt-2">
+              Posições de docência são automaticamente atribuídas ao departamento <strong>Docentes</strong>.
+            </p>
           </div>
           <DialogFooter className="gap-2 sm:gap-2">
             <DialogClose asChild><Button variant="outline">Cancelar</Button></DialogClose>
