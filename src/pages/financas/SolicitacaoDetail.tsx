@@ -525,21 +525,37 @@ export default function FinancasSolicitacaoDetail() {
           {pm && (
             <>
               {/* Header — clean single-row */}
-              <div className="px-5 pt-4 pb-3.5 border-b border-border">
-                <div className="flex items-center gap-3">
+              <div className="px-5 pt-4 pb-3.5 border-b border-border flex items-start justify-between gap-4">
+                <div className="flex items-center gap-3 min-w-0">
                   <div className={cn("w-9 h-9 rounded-lg flex items-center justify-center shrink-0", pm.iconBg)}>
                     <pm.icon className="w-[18px] h-[18px]" />
                   </div>
                   <div className="min-w-0 flex-1">
                     <DialogTitle className="text-[15px] leading-tight font-semibold">{pm.title}</DialogTitle>
-                    <p className="text-[11.5px] text-muted-foreground mt-0.5 truncate">
-                      <span className="font-mono font-semibold text-foreground/80">{selected.ref}</span>
-                      <span className="mx-1.5 text-muted-foreground/40">·</span>
-                      <span className="truncate">{selected.title}</span>
-                    </p>
+                    <p className="text-[11.5px] text-muted-foreground mt-0.5 truncate">{selected.title}</p>
                   </div>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => { navigator.clipboard?.writeText(selected.ref); toast({ title: "Referência copiada", description: selected.ref }); }}
+                  className="shrink-0 inline-flex items-center px-2 py-0.5 rounded-md border border-border bg-background hover:bg-muted text-[11px] font-mono font-semibold text-foreground transition-colors"
+                >
+                  {selected.ref}
+                </button>
                 <DialogDescription className="sr-only">{pm.desc}</DialogDescription>
+              </div>
+
+              {/* Metadata — data + requerente */}
+              <div className="px-5 py-2.5 border-b border-border bg-muted/15 flex items-center gap-4">
+                <div>
+                  <p className="text-[10px] uppercase tracking-[0.1em] font-semibold text-muted-foreground">Data</p>
+                  <p className="text-[12px] font-medium text-foreground">{fmt(dSub)}</p>
+                </div>
+                <div className="w-px h-6 bg-border" />
+                <div className="min-w-0 flex-1">
+                  <p className="text-[10px] uppercase tracking-[0.1em] font-semibold text-muted-foreground">Requerente</p>
+                  <p className="text-[12px] font-medium text-foreground truncate">{selected.requester} <span className="text-muted-foreground font-normal">· {counterpartRole}</span></p>
+                </div>
               </div>
 
               {/* Estado transition banner */}
