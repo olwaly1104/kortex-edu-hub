@@ -1009,7 +1009,6 @@ export default function ConfigurarReceitas() {
             // Multas section — premium category cards + themed table
             if (section.key === "multas") {
               const activeSub = MULTA_SUBTYPES.find(s => s.key === multaSubtype)!;
-              const ActiveIcon = activeSub.icon;
               const filtered = items.filter(r => r.tipo === multaSubtype);
               return (
                 <Card key={section.key} className="p-5">
