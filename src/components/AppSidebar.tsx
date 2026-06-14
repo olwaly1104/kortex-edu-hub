@@ -164,7 +164,7 @@ const financasSections: NavSection[] = [
   { title: "Geral", items: [
     { label: "Início", icon: LayoutDashboard, path: "/financas" },
     { label: "Calendário", icon: Calendar, path: "/financas/calendario" },
-    { label: "Anúncios", icon: Megaphone, path: "/financas/anuncios", badge: 4 },
+    { label: "Anúncios", icon: Megaphone, path: "/financas/anuncios" },
     { label: "Solicitações", icon: CheckSquare, path: "/financas/solicitacoes" },
   ]},
   { title: "Finanças", items: [
