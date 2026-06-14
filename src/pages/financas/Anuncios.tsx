@@ -69,15 +69,21 @@ export default function FinancasAnuncios() {
 
   const handleDelete = (id: string) => setItems(prev => prev.filter(a => a.id !== id));
 
+  const departments = useMemo(
+    () => Array.from(new Set(items.map(i => i.department).filter(Boolean))) as string[],
+    [items]
+  );
+
   const filtered = useMemo(() => {
     return items.filter(a => {
       if (scope === "departamento" && a.department !== "Departamento Financeiro") return false;
       if (scope === "meus" && !a.isMine) return false;
       if (typeFilter !== "todos" && a.type !== typeFilter) return false;
+      if (deptFilter !== "todos" && a.department !== deptFilter) return false;
       if (search && !(a.title.toLowerCase().includes(search.toLowerCase()) || a.content.toLowerCase().includes(search.toLowerCase()))) return false;
       return true;
     });
-  }, [items, scope, typeFilter, search]);
+  }, [items, scope, typeFilter, deptFilter, search]);
 
   const todayCount = items.filter(a => a.date === TODAY_LABEL).length;
   const meusCount = items.filter(a => a.isMine).length;
