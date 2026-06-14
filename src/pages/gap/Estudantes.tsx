@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Search, Users, AlertTriangle, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { gapEstudantesSeguimento, gapTickets, gapAtendimentos } from "@/data/gapData";
+import { FinHeader } from "@/pages/financas/_FinHeader";
 
 export default function GapEstudantes() {
   const navigate = useNavigate();
