@@ -603,6 +603,42 @@ export default function FinancasCalendario() {
 }
 
 /* ── Event row in agenda ── */
+function RequestCard({ r, onAccept, onDecline, onDetail }: {
+  r: MeetingRequest; onAccept: () => void; onDecline: () => void; onDetail: () => void;
+}) {
+  return (
+    <div className="rounded-lg border bg-card hover:border-foreground/20 transition-colors overflow-hidden h-full flex flex-col">
+      <div className="p-2.5 space-y-2 flex-1">
+        <div>
+          <p className="text-xs font-semibold text-foreground leading-tight line-clamp-2">{r.title}</p>
+          <p className="text-[10px] text-muted-foreground mt-0.5 flex items-center gap-1">
+            <UserCircle2 className="w-3 h-3" />{r.organizer}
+          </p>
+        </div>
+        <div className="space-y-0.5 text-[10px] text-muted-foreground">
+          <div className="flex items-center gap-1"><CalendarDays className="w-3 h-3" />{r.date} · {r.startTime}–{r.endTime}</div>
+          <div className="flex items-center gap-1 truncate"><MapPin className="w-3 h-3" />{r.location}</div>
+          {r.participants && (
+            <div className="flex items-center gap-1"><Users className="w-3 h-3" />{r.participants.length} participante{r.participants.length !== 1 ? "s" : ""}</div>
+          )}
+        </div>
+        <div className="flex items-center gap-1.5 pt-1">
+          <Button size="sm" className="h-7 flex-1 text-[10px] gap-1 bg-emerald-600 hover:bg-emerald-700" onClick={onAccept}>
+            <Check className="w-3 h-3" /> Aceitar
+          </Button>
+          <Button size="sm" variant="outline" className="h-7 flex-1 text-[10px] gap-1 border-red-200 text-red-700 hover:bg-red-50" onClick={onDecline}>
+            <X className="w-3 h-3" /> Recusar
+          </Button>
+        </div>
+      </div>
+      <button onClick={onDetail}
+        className="w-full h-8 text-[10px] font-medium text-foreground/80 hover:text-foreground border-t bg-muted/20 hover:bg-muted/40 transition-colors flex items-center justify-center gap-1.5">
+        <Eye className="w-3 h-3" /> Ver detalhes
+      </button>
+    </div>
+  );
+}
+
 function EventRow({ ev, onOpen, compact = false }: { ev: AgendaEvent; onOpen: () => void; compact?: boolean }) {
   const m = TYPE_META[ev.type];
   const Icon = m.icon;
