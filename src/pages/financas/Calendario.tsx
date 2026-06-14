@@ -880,9 +880,10 @@ function InfoTile({ icon: I, label, children }: { icon: typeof Clock; label: str
 }
 
 /* ── Request detail dialog ── */
-function RequestDetailDialog({ request, onClose, onRespond }: {
+function RequestDetailDialog({ request, onClose, onRespond, onParticipants }: {
   request: MeetingRequest | null; onClose: () => void;
   onRespond: (id: string, s: "accepted" | "declined") => void;
+  onParticipants: (r: MeetingRequest) => void;
 }) {
   if (!request) return null;
   return (
@@ -905,6 +906,8 @@ function RequestDetailDialog({ request, onClose, onRespond }: {
 
         <div className="px-6 py-5 space-y-5 max-h-[60vh] overflow-y-auto">
           <div className="grid grid-cols-2 gap-3">
+            <InfoTile icon={CalendarDays} label="Data do Pedido">{fmtShort(request.requestedAt)}</InfoTile>
+            <InfoTile icon={CalendarRange} label="Data da Reunião">{fmtShort(request.date)}</InfoTile>
             <InfoTile icon={Clock} label="Horário">{request.startTime} – {request.endTime}</InfoTile>
             <InfoTile icon={MapPin} label="Local">{request.location}</InfoTile>
             <InfoTile icon={Briefcase} label="Organizador">{request.organizer}</InfoTile>
@@ -915,18 +918,29 @@ function RequestDetailDialog({ request, onClose, onRespond }: {
 
           {request.participants && request.participants.length > 0 && (
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium mb-2 flex items-center gap-1.5">
-                <Users className="w-3 h-3" /> Convidados
-              </p>
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium flex items-center gap-1.5">
+                  <Users className="w-3 h-3" /> Convidados
+                </p>
+                <Button size="sm" variant="ghost" className="h-6 text-[10px] gap-1" onClick={() => onParticipants(request)}>
+                  <Eye className="w-3 h-3" /> Ver todos
+                </Button>
+              </div>
               <div className="rounded-lg border divide-y">
-                {request.participants.map(p => (
-                  <div key={p} className="flex items-center gap-2 px-3 py-2 text-xs text-foreground">
-                    <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-[10px] font-semibold">
-                      {p.split(" ").map(s => s[0]).slice(0, 2).join("")}
+                {request.participants.map(p => {
+                  const st = STATUS_META[participantStatus(p, request.id)];
+                  return (
+                    <div key={p} className="flex items-center gap-2 px-3 py-2 text-xs text-foreground">
+                      <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-[10px] font-semibold">
+                        {p.split(" ").map(s => s[0]).slice(0, 2).join("")}
+                      </div>
+                      <span className="flex-1 truncate">{p}</span>
+                      <Badge variant="outline" className={cn("text-[9px] gap-1", st.cls)}>
+                        <span className={cn("w-1.5 h-1.5 rounded-full", st.dot)} />{st.label}
+                      </Badge>
                     </div>
-                    {p}
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           )}
