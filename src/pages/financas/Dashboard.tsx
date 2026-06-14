@@ -72,7 +72,12 @@ export default function FinancasDashboard() {
   const [txSearch, setTxSearch] = useState("");
   const [txCategory, setTxCategory] = useState("todos");
   const [txType, setTxType] = useState("todos");
-  const [selectedMonth, setSelectedMonth] = useState<string>(monthlyData[monthlyData.length - 1].month);
+  const [periodo, setPeriodo] = useState<Periodo>("mes");
+  const [periodoValue, setPeriodoValue] = useState<string>(periodoDefaultValue("mes"));
+  const mult = PERIODO_MULT[periodo];
+  // Map full month name back to short for monthlyData lookup
+  const MONTH_SHORT: Record<string, string> = Object.fromEntries(Object.entries(MONTH_FULL).map(([k, v]) => [v, k]));
+  const selectedMonth = periodo === "mes" ? (MONTH_SHORT[periodoValue] ?? monthlyData[monthlyData.length - 1].month) : monthlyData[monthlyData.length - 1].month;
 
   const monthIdx = monthlyData.findIndex(m => m.month === selectedMonth);
   const cur = monthlyData[monthIdx] ?? monthlyData[monthlyData.length - 1];
