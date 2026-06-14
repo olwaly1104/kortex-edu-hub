@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -16,7 +16,7 @@ import {
 import {
   ChevronLeft, ChevronRight, Plus, CalendarDays, Clock, MapPin,
   GraduationCap, Palmtree, Users, FileText, Trash2, Check, X, Bell, UserCircle2,
-  Eye, AlignLeft, Tag, CalendarRange, Info, Briefcase, Sparkles,
+  Eye, AlignLeft, Tag, CalendarRange, Info, Briefcase, Sparkles, Video, Building2, Link2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -44,6 +44,8 @@ interface AgendaEvent {
   obligatory?: boolean;
   participants?: string[];
   organizer?: string;
+  modality?: "presencial" | "virtual";
+  meetingLink?: string;
 }
 
 interface MeetingRequest {
@@ -59,7 +61,14 @@ interface MeetingRequest {
   agenda?: string[];
   status: "pending" | "accepted" | "declined";
   requestedAt: string;
+  modality: "presencial" | "virtual";
+  meetingLink?: string;
 }
+
+const MODALITY_META: Record<"presencial" | "virtual", { label: string; cls: string; icon: typeof Video }> = {
+  presencial: { label: "Presencial", cls: "bg-slate-50 text-slate-700 border-slate-200", icon: Building2 },
+  virtual:    { label: "Virtual",    cls: "bg-indigo-50 text-indigo-700 border-indigo-200", icon: Video },
+};
 
 type ParticipantStatus = "accepted" | "declined" | "pending";
 function participantStatus(name: string, seed: string): ParticipantStatus {
@@ -96,22 +105,22 @@ const DEPT_PEOPLE = [
 ];
 
 const PRESET_EVENTS: AgendaEvent[] = [
-  { id: "p1", title: "Reunião do Departamento Financeiro", type: "reuniao", date: "2024-02-14", startTime: "15:00", endTime: "16:30", location: "Sala de Reuniões — Reitoria", obligatory: true, description: "Revisão do fecho mensal e ponto de situação dos orçamentos.", organizer: "Diretor Financeiro", participants: ["Maria Tavares — Contabilidade","João Mendes — Tesouraria","Ana Lopes — Orçamento","Carla Neto — Folha Salarial"] },
-  { id: "p2", title: "Reunião com Reitoria — Orçamento", type: "reuniao", date: "2024-02-15", startTime: "10:00", endTime: "11:30", location: "Gabinete do Reitor", obligatory: true, organizer: "Reitor — Prof. Manuel Costa", participants: ["Diretor Financeiro","Ana Lopes — Orçamento"] },
+  { id: "p1", title: "Reunião do Departamento Financeiro", type: "reuniao", date: "2024-02-14", startTime: "15:00", endTime: "16:30", location: "Sala de Reuniões — Reitoria", obligatory: true, description: "Revisão do fecho mensal e ponto de situação dos orçamentos.", organizer: "Diretor Financeiro", modality: "presencial", participants: ["Maria Tavares — Contabilidade","João Mendes — Tesouraria","Ana Lopes — Orçamento","Carla Neto — Folha Salarial"] },
+  { id: "p2", title: "Reunião com Reitoria — Orçamento", type: "reuniao", date: "2024-02-15", startTime: "10:00", endTime: "11:30", location: "Gabinete do Reitor", obligatory: true, organizer: "Reitor — Prof. Manuel Costa", modality: "presencial", participants: ["Diretor Financeiro","Ana Lopes — Orçamento"] },
   { id: "p3", title: "Encerramento Mensal — Janeiro", type: "prazo", date: "2024-02-13", startTime: "17:00", endTime: "18:00", description: "Prazo para encerramento contabilístico." },
   { id: "p4", title: "Pagamento de Salários", type: "prazo", date: "2024-02-28", obligatory: true, description: "Processamento e transferência de salários do mês." },
   { id: "p5", title: "Feriado Nacional", type: "feriado", date: "2024-02-04", description: "Dia do Início da Luta Armada." },
   { id: "p6", title: "Férias Académicas de Inverno", type: "ferias", date: "2024-02-26", endDate: "2024-03-01", description: "Pausa académica entre semestres." },
-  { id: "p7", title: "Conselho Administrativo", type: "reuniao", date: "2024-02-16", startTime: "09:00", endTime: "12:00", location: "Auditório Principal", obligatory: true, organizer: "Reitoria", participants: ["Reitor — Prof. Manuel Costa","Decano FCE","Diretor Financeiro"] },
+  { id: "p7", title: "Conselho Administrativo", type: "reuniao", date: "2024-02-16", startTime: "09:00", endTime: "12:00", location: "Microsoft Teams", obligatory: true, organizer: "Reitoria", modality: "virtual", meetingLink: "https://teams.microsoft.com/l/meetup-join/abc", participants: ["Reitor — Prof. Manuel Costa","Decano FCE","Diretor Financeiro"] },
   { id: "p8", title: "Almoço com equipa", type: "pessoal", date: "2024-02-14", startTime: "12:30", endTime: "13:30", location: "Cantina" },
 ];
 
 const INITIAL_REQUESTS: MeetingRequest[] = [
-  { id: "r1", title: "Revisão de Orçamento — Curso de Arquitectura", date: "2024-02-15", startTime: "14:00", endTime: "15:00", location: "Sala 204", organizer: "Coordenação ARQ", description: "Análise de despesas extra-orçamentais do semestre.", participants: ["Coordenador ARQ","Diretor Financeiro","Ana Lopes — Orçamento"], agenda: ["Despesas extra-orçamentais","Projeções Q2","Pedidos pendentes"], status: "pending", requestedAt: "2024-02-09" },
-  { id: "r2", title: "Reunião de planeamento — GAP", date: "2024-02-19", startTime: "11:00", endTime: "12:00", location: "Sala GAP", organizer: "Gestão Académica de Pessoal", participants: ["Coord. GAP","Diretor Financeiro"], status: "pending", requestedAt: "2024-02-12" },
-  { id: "r3", title: "Auditoria de processos", date: "2024-02-21", startTime: "09:30", endTime: "11:00", location: "Reitoria", organizer: "Pedro Silva", description: "Revisão dos processos contabilísticos do trimestre.", participants: ["Pedro Silva — Auditoria Interna","Diretor Financeiro","Maria Tavares — Contabilidade"], status: "pending", requestedAt: "2024-02-13" },
-  { id: "r4", title: "Pagamentos a fornecedores", date: "2024-02-22", startTime: "15:00", endTime: "16:00", location: "Sala Tesouraria", organizer: "João Mendes", participants: ["João Mendes — Tesouraria","Diretor Financeiro"], status: "pending", requestedAt: "2024-02-14" },
-  { id: "r5", title: "Folha salarial — fecho mês", date: "2024-02-26", startTime: "10:00", endTime: "11:00", location: "Sala 102", organizer: "Carla Neto", participants: ["Carla Neto — Folha Salarial","Diretor Financeiro"], status: "pending", requestedAt: "2024-02-14" },
+  { id: "r1", title: "Revisão de Orçamento — Curso de Arquitectura", date: "2024-02-15", startTime: "14:00", endTime: "15:00", location: "Sala 204", organizer: "Coordenação ARQ", description: "Análise de despesas extra-orçamentais do semestre.", participants: ["Coordenador ARQ","Diretor Financeiro","Ana Lopes — Orçamento"], agenda: ["Despesas extra-orçamentais","Projeções Q2","Pedidos pendentes"], status: "pending", requestedAt: "2024-02-09", modality: "presencial" },
+  { id: "r2", title: "Reunião de planeamento — GAP", date: "2024-02-19", startTime: "11:00", endTime: "12:00", location: "Google Meet", organizer: "Gestão Académica de Pessoal", participants: ["Coord. GAP","Diretor Financeiro"], status: "pending", requestedAt: "2024-02-12", modality: "virtual", meetingLink: "https://meet.google.com/abc-defg-hij" },
+  { id: "r3", title: "Auditoria de processos", date: "2024-02-21", startTime: "09:30", endTime: "11:00", location: "Reitoria", organizer: "Pedro Silva", description: "Revisão dos processos contabilísticos do trimestre.", participants: ["Pedro Silva — Auditoria Interna","Diretor Financeiro","Maria Tavares — Contabilidade"], status: "pending", requestedAt: "2024-02-13", modality: "presencial" },
+  { id: "r4", title: "Pagamentos a fornecedores", date: "2024-02-22", startTime: "15:00", endTime: "16:00", location: "Microsoft Teams", organizer: "João Mendes", participants: ["João Mendes — Tesouraria","Diretor Financeiro"], status: "pending", requestedAt: "2024-02-14", modality: "virtual", meetingLink: "https://teams.microsoft.com/l/meetup-join/xyz" },
+  { id: "r5", title: "Folha salarial — fecho mês", date: "2024-02-26", startTime: "10:00", endTime: "11:00", location: "Sala 102", organizer: "Carla Neto", participants: ["Carla Neto — Folha Salarial","Diretor Financeiro"], status: "pending", requestedAt: "2024-02-14", modality: "presencial" },
 ];
 
 /* ── helpers ───────────────────────────────────────── */
@@ -141,6 +150,12 @@ function fmtShort(s: string) {
 /* ─────────────────────────────────────────────────── */
 export default function FinancasCalendario() {
   const [view, setView] = useState<"week" | "month">("week");
+  const [now, setNow] = useState<Date>(new Date());
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(id);
+  }, []);
+  const liveTime = `${String(now.getHours()).padStart(2, "0")}h:${String(now.getMinutes()).padStart(2, "0")}min:${String(now.getSeconds()).padStart(2, "0")}s`;
   const [cursor, setCursor] = useState<string>(TODAY);
   const [selectedDate, setSelectedDate] = useState<string>(TODAY);
   const [openCreate, setOpenCreate] = useState(false);
@@ -232,50 +247,76 @@ export default function FinancasCalendario() {
             <div className="flex items-center gap-3 text-[11px] uppercase tracking-wider text-muted-foreground font-medium mb-2 flex-wrap">
               <span className="flex items-center gap-1.5"><CalendarDays className="w-3.5 h-3.5" />{fmtLong(TODAY)}</span>
               <span className="h-3 w-px bg-border" />
+              <span className="flex items-center gap-1.5 font-mono tabular-nums text-primary"><Clock className="w-3.5 h-3.5" />{liveTime}</span>
+              <span className="h-3 w-px bg-border" />
               <span className="flex items-center gap-1.5"><GraduationCap className="w-3.5 h-3.5" />Ano Letivo {ANO_LETIVO}</span>
             </div>
             <h1 className="text-2xl font-bold text-foreground">Calendário</h1>
-            <p className="text-sm text-muted-foreground mt-1">Agenda institucional do Departamento Financeiro</p>
           </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <div className="flex items-center bg-muted/60 rounded-lg p-0.5">
-              <button onClick={() => navigateBy(-1)} className="p-1.5 rounded-md hover:bg-card transition-colors">
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-              <span className="px-3 text-xs font-medium text-foreground min-w-[150px] text-center">
-                {view === "week" ? weekLabel : monthLabel}
-              </span>
-              <button onClick={() => navigateBy(1)} className="p-1.5 rounded-md hover:bg-card transition-colors">
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
-            <div className="flex bg-muted/60 rounded-lg p-0.5">
-              {(["week", "month"] as const).map(v => (
-                <button key={v} onClick={() => setView(v)}
-                  className={cn("px-3 py-1.5 rounded-md text-xs font-medium transition-colors",
-                    view === v ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground")}>
-                  {v === "week" ? "Semana" : "Mês"}
-                </button>
-              ))}
-            </div>
-          </div>
+          <Button size="sm" className="h-9 gap-1.5 text-xs"
+            onClick={() => { setForm(f => ({ ...f, date: selectedDate })); setOpenCreate(true); }}>
+            <Plus className="w-4 h-4" /> Adicionar à Agenda
+          </Button>
         </div>
       </div>
 
-      {/* ── Period title + Adicionar ─────────────── */}
-      <div className="flex items-end justify-between gap-3 flex-wrap">
-        <div>
-          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">
-            {view === "week" ? "Semana" : "Mês"}
-          </p>
-          <h2 className="text-lg font-bold text-foreground capitalize leading-tight mt-0.5">
-            {view === "week" ? weekLabel : monthLabel}
-          </h2>
+      {/* ── Period title + view toggle + nav ─────────────── */}
+      <div className="flex items-center justify-between gap-3 flex-wrap rounded-lg border border-border bg-card px-4 py-3">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="flex bg-muted/60 rounded-lg p-0.5">
+            {(["week", "month"] as const).map(v => (
+              <button key={v} onClick={() => setView(v)}
+                className={cn("px-3 py-1.5 rounded-md text-xs font-semibold transition-colors",
+                  view === v ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground")}>
+                {v === "week" ? "Semana" : "Mês"}
+              </button>
+            ))}
+          </div>
+          <div className="h-5 w-px bg-border" />
+          <div className="min-w-0">
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium leading-none">
+              {view === "week" ? "Semana" : "Mês"}
+            </p>
+            <h2 className="text-base font-bold text-foreground capitalize leading-tight mt-1 truncate">
+              {view === "week" ? weekLabel : monthLabel}
+            </h2>
+          </div>
         </div>
-        <Button size="sm" className="h-9 gap-1.5 text-xs"
-          onClick={() => { setForm(f => ({ ...f, date: selectedDate })); setOpenCreate(true); }}>
-          <Plus className="w-4 h-4" /> Adicionar à Agenda
-        </Button>
+
+        {view === "week" ? (
+          <div className="flex items-center bg-muted/60 rounded-lg p-0.5">
+            <button onClick={() => navigateBy(-1)} className="p-1.5 rounded-md hover:bg-card transition-colors" aria-label="Semana anterior">
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <span className="px-3 text-xs font-medium text-foreground min-w-[150px] text-center">{weekLabel}</span>
+            <button onClick={() => navigateBy(1)} className="p-1.5 rounded-md hover:bg-card transition-colors" aria-label="Próxima semana">
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        ) : (
+          <div className="flex items-center gap-2">
+            <Select value={String(cursorD.getMonth())} onValueChange={(v) => {
+              const d = parseISO(cursor); d.setMonth(parseInt(v, 10)); setCursor(toISO(d));
+            }}>
+              <SelectTrigger className="h-9 w-[140px] text-xs"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {MONTH_NAMES.map((mn, i) => (
+                  <SelectItem key={mn} value={String(i)} className="text-xs">{mn}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={String(cursorD.getFullYear())} onValueChange={(v) => {
+              const d = parseISO(cursor); d.setFullYear(parseInt(v, 10)); setCursor(toISO(d));
+            }}>
+              <SelectTrigger className="h-9 w-[90px] text-xs"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {[2023, 2024, 2025, 2026].map(y => (
+                  <SelectItem key={y} value={String(y)} className="text-xs">{y}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
       </div>
 
       {/* ── Grid ─────────────────────────────── */}
@@ -648,19 +689,28 @@ function RequestCard({ r, onAccept, onDecline, onDetail, onParticipants }: {
   return (
     <div className="rounded-lg border bg-card hover:border-foreground/20 transition-colors overflow-hidden h-full flex flex-col">
       <div className="px-2.5 pt-2 pb-1 border-b bg-muted/20 flex items-center justify-between gap-2">
-        <span className="text-[9px] uppercase tracking-wider text-muted-foreground font-medium">Pedido em</span>
+        <span className="text-[9px] uppercase tracking-wider text-muted-foreground font-medium">Data do Pedido</span>
         <span className="text-[10px] font-semibold text-foreground">{fmtShort(r.requestedAt)}</span>
       </div>
       <div className="p-2.5 space-y-2 flex-1">
         <div>
-          <p className="text-xs font-semibold text-foreground leading-tight line-clamp-2">{r.title}</p>
+          <div className="flex items-start justify-between gap-1.5">
+            <p className="text-xs font-semibold text-foreground leading-tight line-clamp-2 flex-1">{r.title}</p>
+            <Badge variant="outline" className={cn("text-[9px] h-4 px-1 gap-0.5 shrink-0", MODALITY_META[r.modality].cls)}>
+              {(() => { const I = MODALITY_META[r.modality].icon; return <I className="w-2.5 h-2.5" />; })()}
+              {MODALITY_META[r.modality].label}
+            </Badge>
+          </div>
           <p className="text-[10px] text-muted-foreground mt-0.5 flex items-center gap-1">
             <UserCircle2 className="w-3 h-3" />{r.organizer}
           </p>
         </div>
         <div className="space-y-0.5 text-[10px] text-muted-foreground">
           <div className="flex items-center gap-1"><CalendarDays className="w-3 h-3" />{fmtShort(r.date)} · {r.startTime}–{r.endTime}</div>
-          <div className="flex items-center gap-1 truncate"><MapPin className="w-3 h-3" />{r.location}</div>
+          <div className="flex items-center gap-1 truncate">
+            {r.modality === "virtual" ? <Video className="w-3 h-3" /> : <MapPin className="w-3 h-3" />}
+            {r.location}
+          </div>
           {r.participants && r.participants.length > 0 && (
             <button type="button" onClick={onParticipants}
               className="flex items-center gap-1 hover:text-foreground hover:underline underline-offset-2">
@@ -776,9 +826,12 @@ function EventDetailDialog({ event, onClose, onDelete }: { event: AgendaEvent | 
           {/* Category-specific blocks */}
           {event.type === "reuniao" && (
             <>
+              {event.modality && (
+                <ModalityBanner modality={event.modality} location={event.location} link={event.meetingLink} />
+              )}
               <div className="grid grid-cols-2 gap-3">
                 {event.location && (
-                  <InfoTile icon={MapPin} label="Local">{event.location}</InfoTile>
+                  <InfoTile icon={event.modality === "virtual" ? Video : MapPin} label={event.modality === "virtual" ? "Plataforma" : "Local"}>{event.location}</InfoTile>
                 )}
                 {event.organizer && (
                   <InfoTile icon={UserCircle2} label="Organizador">{event.organizer}</InfoTile>
@@ -905,11 +958,12 @@ function RequestDetailDialog({ request, onClose, onRespond, onParticipants }: {
         </div>
 
         <div className="px-6 py-5 space-y-5 max-h-[60vh] overflow-y-auto">
+          <ModalityBanner modality={request.modality} location={request.location} link={request.meetingLink} />
           <div className="grid grid-cols-2 gap-3">
             <InfoTile icon={CalendarDays} label="Data do Pedido">{fmtShort(request.requestedAt)}</InfoTile>
             <InfoTile icon={CalendarRange} label="Data da Reunião">{fmtShort(request.date)}</InfoTile>
             <InfoTile icon={Clock} label="Horário">{request.startTime} – {request.endTime}</InfoTile>
-            <InfoTile icon={MapPin} label="Local">{request.location}</InfoTile>
+            <InfoTile icon={request.modality === "virtual" ? Video : MapPin} label={request.modality === "virtual" ? "Plataforma" : "Local"}>{request.location}</InfoTile>
             <InfoTile icon={Briefcase} label="Organizador">{request.organizer}</InfoTile>
             {request.participants && (
               <InfoTile icon={Users} label="Participantes">{request.participants.length}</InfoTile>
@@ -1037,5 +1091,30 @@ function ParticipantsDialog({ data, onClose }: {
         </DialogFooter>
       </DialogContent>
     </Dialog>
+  );
+}
+
+/* ── Modality banner (virtual/presencial) ── */
+function ModalityBanner({ modality, location, link }: { modality?: "presencial" | "virtual"; location?: string; link?: string }) {
+  if (!modality) return null;
+  const m = MODALITY_META[modality];
+  const Icon = m.icon;
+  return (
+    <div className={cn("rounded-lg border p-3 flex items-center gap-3", m.cls)}>
+      <div className="w-9 h-9 rounded-lg bg-card flex items-center justify-center shrink-0">
+        <Icon className="w-4 h-4" />
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="text-[10px] uppercase tracking-wider font-semibold opacity-80">Modalidade</p>
+        <p className="text-sm font-bold leading-tight">{m.label}</p>
+        {location && <p className="text-[11px] opacity-80 truncate mt-0.5">{location}</p>}
+      </div>
+      {modality === "virtual" && link && (
+        <a href={link} target="_blank" rel="noreferrer"
+          className="inline-flex items-center gap-1.5 text-[11px] font-semibold px-3 py-1.5 rounded-md bg-card hover:bg-card/80 transition-colors shrink-0">
+          <Link2 className="w-3 h-3" /> Entrar
+        </a>
+      )}
+    </div>
   );
 }
