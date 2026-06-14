@@ -90,36 +90,19 @@ export default function FinancasInicio() {
               </p>
             </div>
           </div>
-          <div className="flex flex-col items-end gap-3 shrink-0">
+          <div className="flex flex-col items-end gap-2 shrink-0">
             <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-[11px] uppercase tracking-wider font-semibold text-primary">
               <GraduationCap className="w-3.5 h-3.5" />
               Ano Letivo <span className="font-bold tabular-nums">{ANO_LETIVO}</span>
             </span>
-            <Card className="p-3 w-44">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <UserCheck className="w-3.5 h-3.5 text-primary" />
-                </div>
-                <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
-                  Minha Presença
-                </span>
-              </div>
-              <p className="text-xl font-bold text-accent">{presencaPct}</p>
-            </Card>
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-accent/20 bg-accent/10 px-3 py-1 text-[11px] uppercase tracking-wider font-semibold text-accent">
+              <UserCheck className="w-3.5 h-3.5" />
+              Minha Presença <span className="font-bold tabular-nums">{presencaPct}</span>
+            </span>
           </div>
         </div>
       </div>
 
-      {/* Search */}
-      <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
-        <Input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Pesquisar em agenda e anúncios…"
-          className="pl-9 h-9 text-sm"
-        />
-      </div>
 
       {/* Agenda + Anúncios */}
       <div className="grid lg:grid-cols-3 gap-6">
