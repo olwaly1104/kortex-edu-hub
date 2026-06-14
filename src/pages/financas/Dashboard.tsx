@@ -1,8 +1,9 @@
 import { useState, useMemo } from "react";
 import {
   Wallet, TrendingUp, TrendingDown, CreditCard,
-  ArrowUpRight, ArrowDownRight, Clock, AlertTriangle, FileText, ChevronRight, Receipt, Search, X,
+  ArrowUpRight, ArrowDownRight, FileText, ChevronRight, Receipt, Search, X, GraduationCap, Calendar as CalendarIcon,
 } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -17,14 +18,12 @@ import {
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
-/* ── derived data ────────────────────────────────── */
-const cur = monthlyData[monthlyData.length - 1];
-const prev = monthlyData[monthlyData.length - 2];
-const receitaVar = Math.round(((cur.receitas - prev.receitas) / prev.receitas) * 100);
-const despesaVar = Math.round(((cur.despesas - prev.despesas) / prev.despesas) * 100);
-const saldo = cur.receitas - cur.despesas;
-const saldoVar = prev.receitas - prev.despesas;
-const saldoChange = saldoVar !== 0 ? Math.round(((saldo - saldoVar) / Math.abs(saldoVar)) * 100) : 0;
+/* ── month mapping ───────────────────────────────── */
+const MONTH_FULL: Record<string, string> = {
+  Jan: "Janeiro", Fev: "Fevereiro", Mar: "Março", Abr: "Abril",
+  Mai: "Maio", Jun: "Junho", Jul: "Julho", Ago: "Agosto",
+  Set: "Setembro", Out: "Outubro", Nov: "Novembro", Dez: "Dezembro",
+};
 
 const totalBruto = salarios.reduce((s, v) => s + v.grossSalary, 0);
 const salariosPagos = salarios.filter(s => s.status === "pago").length;
@@ -62,6 +61,16 @@ export default function FinancasDashboard() {
   const [txSearch, setTxSearch] = useState("");
   const [txCategory, setTxCategory] = useState("todos");
   const [txType, setTxType] = useState("todos");
+  const [selectedMonth, setSelectedMonth] = useState<string>(monthlyData[monthlyData.length - 1].month);
+
+  const monthIdx = monthlyData.findIndex(m => m.month === selectedMonth);
+  const cur = monthlyData[monthIdx] ?? monthlyData[monthlyData.length - 1];
+  const prev = monthlyData[Math.max(0, monthIdx - 1)] ?? cur;
+  const receitaVar = prev.receitas ? Math.round(((cur.receitas - prev.receitas) / prev.receitas) * 100) : 0;
+  const despesaVar = prev.despesas ? Math.round(((cur.despesas - prev.despesas) / prev.despesas) * 100) : 0;
+  const saldo = cur.receitas - cur.despesas;
+  const saldoVar = prev.receitas - prev.despesas;
+  const saldoChange = saldoVar !== 0 ? Math.round(((saldo - saldoVar) / Math.abs(saldoVar)) * 100) : 0;
 
   const filteredTx = useMemo(() => {
     return allTx
@@ -74,12 +83,47 @@ export default function FinancasDashboard() {
   const hasFilters = txSearch !== "" || txCategory !== "todos" || txType !== "todos";
   const navigate = useNavigate();
 
+  const todayLabel = new Date().toLocaleDateString("pt-PT", {
+    weekday: "long", day: "2-digit", month: "long", year: "numeric",
+  });
+  const anoLetivo = "2024 / 2025";
+
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">Dashboard Financeiro</h1>
-        <p className="text-sm text-muted-foreground">Abril 2025 — Visão geral das finanças institucionais</p>
+      <div className="rounded-xl border border-border bg-gradient-to-r from-primary/5 to-transparent p-6">
+        <div className="flex items-start justify-between gap-4 flex-wrap">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 text-[11px] uppercase tracking-wider text-muted-foreground font-medium mb-2">
+              <span className="flex items-center gap-1 capitalize">
+                <CalendarIcon className="w-3.5 h-3.5" />
+                {todayLabel}
+              </span>
+              <span className="text-border">•</span>
+              <span className="flex items-center gap-1">
+                <GraduationCap className="w-3.5 h-3.5" />
+                Ano Letivo {anoLetivo}
+              </span>
+            </div>
+            <h1 className="text-2xl font-bold text-foreground">Dashboard Financeiro</h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              {MONTH_FULL[cur.month] ?? cur.month} — Visão geral das finanças institucionais
+            </p>
+          </div>
+          <div className="flex flex-col items-end gap-1">
+            <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Mês de referência</span>
+            <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+              <SelectTrigger className="w-[180px] h-9 text-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {monthlyData.map(m => (
+                  <SelectItem key={m.month} value={m.month}>{MONTH_FULL[m.month] ?? m.month}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
       </div>
 
       {/* ── KPIs ── */}
@@ -225,23 +269,6 @@ export default function FinancasDashboard() {
         {filteredTx.length === 0 && <p className="text-center text-muted-foreground py-8">Nenhuma transação encontrada.</p>}
         <div className="border-t bg-muted/20 px-3 py-2 text-xs text-muted-foreground">{filteredTx.length} transações</div>
       </Card>
-
-      {/* ── Alerts ── */}
-      <div className="flex flex-wrap gap-2">
-        {[
-          { type: "error", msg: "Orçamento de Infraestrutura atingiu 92% do limite", icon: AlertTriangle },
-          { type: "warning", msg: `${receitas.filter(r => r.status === "em_atraso").length} pagamentos de propinas em atraso`, icon: Clock },
-          { type: "warning", msg: `${despesas.filter(d => d.status === "pendente").length} despesas pendentes de aprovação`, icon: FileText },
-        ].map((a, i) => (
-          <div key={i} className={cn(
-            "flex items-center gap-2 px-3 py-2 rounded-lg border text-xs",
-            a.type === "error" ? "text-destructive bg-destructive/5 border-destructive/20" : "text-amber-700 bg-amber-50 border-amber-200"
-          )}>
-            <a.icon className="w-3.5 h-3.5 shrink-0" />
-            <span>{a.msg}</span>
-          </div>
-        ))}
-      </div>
     </div>
   );
 }

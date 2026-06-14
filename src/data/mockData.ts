@@ -9,6 +9,8 @@ export interface User {
   course?: string;
   year?: number;
   presence?: string;
+  position?: string;
+  department?: string;
 }
 
 export interface Discipline {
@@ -215,6 +217,8 @@ export const currentFinancas: User = {
   email: "financas@upra.kor",
   role: "financas",
   presence: "96%",
+  position: "Diretor Financeiro",
+  department: "Departamento Financeiro",
 };
 
 export const currentGap: User = {
