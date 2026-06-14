@@ -190,14 +190,25 @@ export default function FinancasAnuncioDetail() {
                             <p className="text-[12.5px] font-semibold text-foreground truncate">{f.name}</p>
                             <p className="text-[10.5px] text-muted-foreground tabular-nums">PDF · {f.size}</p>
                           </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-7 px-2 text-[11px] gap-1"
-                            onClick={() => toast({ title: "Download iniciado", description: f.name })}
-                          >
-                            <Download className="w-3 h-3" /> Baixar
-                          </Button>
+                          <div className="flex items-center gap-1">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-7 px-2 text-[11px] gap-1"
+                              onClick={() => toast({ title: "Pré-visualização", description: f.name })}
+                            >
+                              <Eye className="w-3 h-3" /> Ver
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-7 px-2 text-[11px] gap-1"
+                              onClick={() => toast({ title: "Download iniciado", description: f.name })}
+                            >
+                              <Download className="w-3 h-3" /> Descarregar
+                            </Button>
+                          </div>
+
                         </div>
                       ))}
                     </div>
