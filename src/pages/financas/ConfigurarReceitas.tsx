@@ -769,26 +769,65 @@ export default function ConfigurarReceitas() {
                       ))}
                     </div>
                   ) : (
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2 pb-2 border-b border-border">
-                        <Building2 className="w-4 h-4 text-blue-700" />
-                        <div className="min-w-0">
-                          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Faculdade</p>
-                          <p className="text-sm font-semibold text-foreground">{selected.name}</p>
+                    <div className="space-y-4">
+                      {/* Faculty header with toggle to switch faculties */}
+                      <div className="rounded-xl border border-blue-200/70 bg-gradient-to-br from-blue-50 via-blue-50/40 to-transparent p-4">
+                        <div className="flex items-start justify-between gap-4 flex-wrap">
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div className="w-11 h-11 rounded-lg bg-blue-600 text-white flex items-center justify-center shadow-sm flex-shrink-0">
+                              <Building2 className="w-5 h-5" />
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-[10px] uppercase tracking-wider text-blue-700 font-bold">Faculdade · Propinas</p>
+                              <p className="text-base font-bold text-foreground truncate">{selected.name}</p>
+                              <p className="text-[11px] text-muted-foreground tabular-nums">
+                                {selected.courses.length} cursos ·{" "}
+                                {(() => {
+                                  const stat = facultyStats.find(f => f.id === selected.id);
+                                  return stat ? `${formatCurrency(stat.min)} – ${formatCurrency(stat.max)} · média ${formatCurrency(stat.avg)}` : "";
+                                })()}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Trocar</span>
+                            <Select value={selected.id} onValueChange={v => setSelectedFaculty(v)}>
+                              <SelectTrigger className="h-8 w-[200px] text-xs bg-background">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {reitorFaculties.map(f => (
+                                  <SelectItem key={f.id} value={f.id} className="text-xs">{f.name}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
                         </div>
                       </div>
+
                       <div className="grid gap-3">
-                      {selected.courses.map(c => {
+                      {selected.courses.map((c, idx) => {
                         const r = receitas.find(x => x.tipo === "Propina mensal" && x.escopo === c.id);
                         if (!r) return null;
                         const plans = r.plans ?? [{ months: 10, valor: r.valor }];
                         const existingMonths = new Set(plans.map(p => p.months));
                         const availableToAdd = [10, 11, 12].filter(m => !existingMonths.has(m));
+                        const palette = [
+                          { badge: "bg-blue-100 text-blue-700", header: "from-blue-50/70", border: "hover:border-blue-300", row: "hover:bg-blue-50/40" },
+                          { badge: "bg-emerald-100 text-emerald-700", header: "from-emerald-50/70", border: "hover:border-emerald-300", row: "hover:bg-emerald-50/40" },
+                          { badge: "bg-amber-100 text-amber-700", header: "from-amber-50/70", border: "hover:border-amber-300", row: "hover:bg-amber-50/40" },
+                          { badge: "bg-violet-100 text-violet-700", header: "from-violet-50/70", border: "hover:border-violet-300", row: "hover:bg-violet-50/40" },
+                          { badge: "bg-rose-100 text-rose-700", header: "from-rose-50/70", border: "hover:border-rose-300", row: "hover:bg-rose-50/40" },
+                          { badge: "bg-cyan-100 text-cyan-700", header: "from-cyan-50/70", border: "hover:border-cyan-300", row: "hover:bg-cyan-50/40" },
+                          { badge: "bg-indigo-100 text-indigo-700", header: "from-indigo-50/70", border: "hover:border-indigo-300", row: "hover:bg-indigo-50/40" },
+                          { badge: "bg-teal-100 text-teal-700", header: "from-teal-50/70", border: "hover:border-teal-300", row: "hover:bg-teal-50/40" },
+                        ];
+                        const col = palette[idx % palette.length];
                         return (
-                          <div key={c.id} className="rounded-xl border border-border bg-card overflow-hidden shadow-sm hover:shadow-md hover:border-blue-200 transition">
-                            <div className="flex items-center justify-between gap-3 px-4 py-3 bg-gradient-to-r from-blue-50/60 to-transparent border-b border-border">
+                          <div key={c.id} className={cn("rounded-xl border border-border bg-card overflow-hidden shadow-sm hover:shadow-md transition", col.border)}>
+                            <div className={cn("flex items-center justify-between gap-3 px-4 py-3 bg-gradient-to-r to-transparent border-b border-border", col.header)}>
                               <div className="flex items-center gap-2.5 min-w-0">
-                                <span className="inline-flex items-center justify-center w-8 h-8 rounded-md bg-blue-100 text-blue-700 text-[11px] font-bold tracking-wide flex-shrink-0">
+                                <span className={cn("inline-flex items-center justify-center w-8 h-8 rounded-md text-[11px] font-bold tracking-wide flex-shrink-0", col.badge)}>
                                   {c.code}
                                 </span>
                                 <div className="min-w-0">
@@ -816,7 +855,8 @@ export default function ConfigurarReceitas() {
                                   <th className="text-right font-semibold px-3 py-2">Bruto / mês</th>
                                   <th className="text-right font-semibold px-3 py-2">Líquido / mês</th>
                                   <th className="text-right font-semibold px-3 py-2 hidden sm:table-cell">Imposto</th>
-                                  <th className="text-right font-semibold px-3 py-2 hidden md:table-cell">Total anual (bruto)</th>
+                                  <th className="text-right font-semibold px-3 py-2 hidden md:table-cell">Total anual bruto</th>
+                                  <th className="text-right font-semibold px-3 py-2 hidden md:table-cell">Total anual líquido</th>
                                   <th className="w-10"></th>
                                 </tr>
                               </thead>
@@ -828,14 +868,15 @@ export default function ConfigurarReceitas() {
                                     <tr key={p.months}
                                       role="button" tabIndex={0}
                                       onClick={() => setPlanEdit({ rowId: r.id, months: p.months, valor: String(p.valor), imposto: String(impPct.toFixed(1)) })}
-                                      className="border-b border-border/50 last:border-0 hover:bg-blue-50/40 cursor-pointer group/row">
+                                      className={cn("border-b border-border/50 last:border-0 cursor-pointer group/row", col.row)}>
                                       <td className="px-4 py-2.5">
-                                        <span className="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-2 py-0.5 text-[11px] font-semibold text-blue-700 tabular-nums">{p.months} meses</span>
+                                        <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold tabular-nums", col.badge)}>{p.months} meses</span>
                                       </td>
                                       <td className="px-3 py-2.5 text-right text-sm font-semibold tabular-nums text-foreground">{formatCurrency(p.valor)}</td>
                                       <td className="px-3 py-2.5 text-right text-sm font-semibold tabular-nums text-emerald-700">{formatCurrency(liq)}</td>
                                       <td className="px-3 py-2.5 text-right text-xs tabular-nums text-muted-foreground hidden sm:table-cell">{impPct.toFixed(1)}%</td>
                                       <td className="px-3 py-2.5 text-right text-xs tabular-nums text-muted-foreground hidden md:table-cell">{formatCurrency(p.valor * p.months)}</td>
+                                      <td className="px-3 py-2.5 text-right text-xs tabular-nums font-semibold text-emerald-700 hidden md:table-cell">{formatCurrency(liq * p.months)}</td>
                                       <td className="px-2 py-2.5 text-right">
                                         {plans.length > 1 && (
                                           <button
