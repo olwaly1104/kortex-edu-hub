@@ -1434,6 +1434,57 @@ export default function ConfigurarReceitas() {
         </DialogContent>
       </Dialog>
 
+      {/* ═══════ Plano (propina) edit dialog ═══════ */}
+      <Dialog open={!!planEdit} onOpenChange={(o) => !o && setPlanEdit(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <GraduationCap className="w-4 h-4 text-blue-700" /> Plano de Propina — {planEdit?.months} meses
+            </DialogTitle>
+          </DialogHeader>
+          {planEdit && (() => {
+            const v = Number(planEdit.valor) || 0;
+            const imp = (Number(planEdit.imposto) || 0) / 100;
+            const liq = Math.round(v * (1 - imp));
+            return (
+              <div className="space-y-4 py-2">
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-medium text-muted-foreground">Valor Bruto (Kz / mês)</label>
+                    <Input type="number" min={0} autoFocus value={planEdit.valor}
+                      onChange={e => setPlanEdit({ ...planEdit, valor: e.target.value })} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-medium text-muted-foreground">Imposto (%)</label>
+                    <Input type="number" min={0} max={100} step={0.5} value={planEdit.imposto}
+                      onChange={e => setPlanEdit({ ...planEdit, imposto: e.target.value })} />
+                  </div>
+                </div>
+                <div className="rounded-lg bg-muted/30 p-3 space-y-1">
+                  <div className="flex justify-between text-xs">
+                    <span className="text-muted-foreground">Valor Bruto</span>
+                    <span className="font-medium tabular-nums">{formatCurrency(v)}</span>
+                  </div>
+                  <div className="flex justify-between text-xs">
+                    <span className="text-muted-foreground">Imposto ({imp ? (imp * 100).toFixed(1) : "0.0"}%)</span>
+                    <span className="font-medium tabular-nums text-red-600">−{formatCurrency(v - liq)}</span>
+                  </div>
+                  <div className="flex justify-between pt-1.5 border-t border-border">
+                    <span className="text-sm font-semibold">Valor Líquido</span>
+                    <span className="text-sm font-bold tabular-nums text-emerald-700">{formatCurrency(liq)}</span>
+                  </div>
+                  <p className="text-[10px] text-muted-foreground pt-1">Total anual ({planEdit.months} meses): <span className="font-semibold text-foreground tabular-nums">{formatCurrency(v * planEdit.months)}</span> bruto · <span className="font-semibold text-foreground tabular-nums">{formatCurrency(liq * planEdit.months)}</span> líquido</p>
+                </div>
+              </div>
+            );
+          })()}
+          <DialogFooter className="gap-2 sm:gap-2">
+            <DialogClose asChild><Button variant="outline">Cancelar</Button></DialogClose>
+            <Button onClick={commitPlanEdit}>Guardar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* unused-import guard */}
       <span className="hidden"><Popover><PopoverTrigger /><PopoverContent /></Popover><Users /></span>
     </div>
