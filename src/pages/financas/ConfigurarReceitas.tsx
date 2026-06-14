@@ -544,18 +544,39 @@ export default function ConfigurarReceitas() {
 
   return (
     <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6 animate-fade-in">
-      {/* Header */}
-      <div className="flex items-start gap-3">
-        <Button variant="ghost" size="icon" className="rounded-lg" onClick={() => navigate("/financas/dashboard")}>
-          <ArrowLeft className="w-4 h-4" />
-        </Button>
-        <div className="flex-1">
-          <h1 className="text-2xl font-bold text-foreground tracking-tight flex items-center gap-2">
-            <Settings2 className="w-6 h-6 text-primary" /> Configurador Financeiro
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
-            Gere receitas, despesas e salários da instituição num único painel.
-          </p>
+      {/* Header — institucional (Ano Letivo + Dia de Hoje) */}
+      <div className="rounded-xl border border-border bg-gradient-to-r from-primary/5 to-transparent px-5 py-4">
+        <div className="flex items-start justify-between gap-4 flex-wrap">
+          <div className="flex items-start gap-2 min-w-0">
+            <Button variant="ghost" size="icon" className="rounded-lg -ml-2 mt-0.5" onClick={() => navigate("/financas/dashboard")}>
+              <ArrowLeft className="w-4 h-4" />
+            </Button>
+            <div className="min-w-0 space-y-2.5">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-[11px] uppercase tracking-wider font-semibold text-primary">
+                <GraduationCap className="w-3.5 h-3.5" />
+                Ano Letivo <span className="font-bold tabular-nums">{ANO_LETIVO}</span>
+              </span>
+              <div>
+                <h1 className="text-xl font-bold text-foreground flex items-center gap-2 leading-tight">
+                  <Settings2 className="w-5 h-5 text-primary" /> Configurador Financeiro
+                </h1>
+                <p className="text-sm text-muted-foreground mt-0.5">
+                  Gere receitas, despesas e salários da instituição num único painel.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-col items-end gap-2 shrink-0">
+            <div className="inline-flex items-stretch rounded-md border border-border bg-card overflow-hidden text-[11px] uppercase tracking-wider font-medium shadow-sm">
+              <span className="flex items-center gap-1.5 px-2.5 py-1 text-foreground capitalize">
+                <CalendarDays className="w-3.5 h-3.5 text-muted-foreground" />{todayLabel}
+              </span>
+              <span className="w-px bg-border" />
+              <span className="flex items-center gap-1.5 px-2.5 py-1 font-mono tabular-nums text-primary bg-muted/30">
+                <Clock className="w-3.5 h-3.5" />{liveTime}
+              </span>
+            </div>
+          </div>
         </div>
       </div>
 
