@@ -99,7 +99,15 @@ export default function FinancasSolicitacaoDetail() {
     pending:   "bg-background border-2 border-dashed border-border text-muted-foreground",
   };
 
-  const handleAction = (action: "em_execucao" | "rejeitado" | "executada") => {
+  const openAction = (action: "em_execucao" | "rejeitado" | "executada") => {
+    setActionNotes("");
+    setActionFiles([]);
+    setPendingAction(action);
+  };
+
+  const confirmAction = () => {
+    if (!pendingAction) return;
+    const action = pendingAction;
     setStatusOverride(action);
     const titles: Record<typeof action, string> = {
       em_execucao: "Solicitação aprovada",
@@ -112,7 +120,43 @@ export default function FinancasSolicitacaoDetail() {
       executada: `O pedido ${selected.ref} foi marcado como executado.`,
     };
     toast({ title: titles[action], description: descs[action] });
+    setPendingAction(null);
+    setActionNotes("");
+    setActionFiles([]);
   };
+
+  const actionMeta: Record<"em_execucao" | "rejeitado" | "executada", { title: string; desc: string; cta: string; tone: string; icon: typeof Check; notesLabel: string; notesPlaceholder: string }> = {
+    em_execucao: {
+      title: "Aprovar solicitação",
+      desc: `Registe o parecer da aprovação do pedido ${selected.ref}. As notas e anexos ficam no histórico.`,
+      cta: "Aprovar",
+      tone: "bg-emerald-600 hover:bg-emerald-700 text-white",
+      icon: CheckCircle2,
+      notesLabel: "Parecer / Justificação",
+      notesPlaceholder: "Ex: Pedido validado conforme orçamento de Maio. Em conformidade com a política financeira.",
+    },
+    rejeitado: {
+      title: "Rejeitar solicitação",
+      desc: `Indique o motivo da rejeição do pedido ${selected.ref}. As notas ficam no histórico do requerente.`,
+      cta: "Rejeitar",
+      tone: "bg-red-600 hover:bg-red-700 text-white",
+      icon: XCircle,
+      notesLabel: "Motivo da rejeição",
+      notesPlaceholder: "Ex: Documentação incompleta. Falta fatura original e comprovativo bancário.",
+    },
+    executada: {
+      title: "Confirmar execução",
+      desc: `Confirme a execução do pedido ${selected.ref} e anexe o comprovativo (transferência, recibo, fatura).`,
+      cta: "Confirmar execução",
+      tone: "bg-blue-600 hover:bg-blue-700 text-white",
+      icon: Check,
+      notesLabel: "Notas da execução",
+      notesPlaceholder: "Ex: Reembolso transferido para IBAN do requerente em 14/06/2026. Ref. transação TRX-44821.",
+    },
+  };
+
+  const pm = pendingAction ? actionMeta[pendingAction] : null;
+
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
