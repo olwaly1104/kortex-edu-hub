@@ -590,6 +590,19 @@ export default function FinancasCalendario() {
         </Card>
       )}
 
+      {/* ── Ver todos os Pedidos de Reunião ── */}
+      <AllRequestsDialog
+        open={showAllRequests}
+        onClose={() => setShowAllRequests(false)}
+        requests={requests}
+        onAccept={(id) => respondRequest(id, "accepted")}
+        onDecline={(id) => respondRequest(id, "declined")}
+        onDetail={(r) => { setDetailRequest(r); setShowAllRequests(false); }}
+        onParticipants={(r) => openParticipants(r.title, r.participants, r.id)}
+      />
+
+
+
       {/* ── Adicionar à Agenda (modern full-page modal) ── */}
       <Dialog open={openCreate} onOpenChange={setOpenCreate}>
         <DialogContent className="sm:max-w-2xl p-0 gap-0 overflow-hidden">
