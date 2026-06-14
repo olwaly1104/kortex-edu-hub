@@ -28,6 +28,7 @@ export const FIN_ANUNCIOS: FinAnn[] = [
     ...a,
     department: i % 2 === 0 ? "Direcção Académica" : "Reitoria",
     cta: i === 2 ? ("inscrever" as const) : null,
+    ctaDeadline: i === 2 ? "20/02/2024" : undefined,
   })),
   { id: "f1", title: "Formação: Novas regras IVA 2024", content: "Sessão de formação obrigatória sobre as alterações fiscais em vigor. Aberta a inscrições para toda a equipa do Departamento Financeiro. A formação aborda os novos limiares de isenção, alterações no regime de IVA de caixa, e procedimentos atualizados de declaração trimestral. Inclui sessão prática com exemplos reais do nosso histórico.", type: "evento", date: "14/02/2024", author: "Dr. Manuel Sousa", department: "Departamento Financeiro", cta: "inscrever" },
   { id: "f2", title: "Fecho contabilístico de Janeiro concluído", content: "O processo de encerramento contabilístico de Janeiro foi finalizado com sucesso. Todos os relatórios mensais — balancete, demonstração de resultados, e mapa de tesouraria — estão disponíveis no EduDrive Financeiro na pasta correspondente. Quaisquer ajustes ou correções devem ser comunicados até dia 20/02.", type: "geral", date: "14/02/2024", author: "Departamento Financeiro", department: "Departamento Financeiro" },
