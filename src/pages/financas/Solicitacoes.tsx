@@ -630,3 +630,13 @@ export default function FinancasSolicitacoes() {
     </div>
   );
 }
+
+function ReviewCell({ label, value, sub, mono }: { label: string; value: string; sub?: string; mono?: boolean }) {
+  return (
+    <div className="min-w-0">
+      <p className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground mb-1">{label}</p>
+      <p className={"text-[12.5px] font-semibold text-foreground leading-tight truncate " + (mono ? "font-mono tabular-nums" : "")}>{value}</p>
+      {sub && <p className="text-[10px] text-muted-foreground mt-0.5 truncate">{sub}</p>}
+    </div>
+  );
+}
