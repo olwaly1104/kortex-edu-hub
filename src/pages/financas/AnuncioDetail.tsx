@@ -64,53 +64,12 @@ export default function FinancasAnuncioDetail() {
 
       {/* Main document card */}
       <div className="rounded-lg border border-border bg-card overflow-hidden">
-        <div className="grid md:grid-cols-[1fr_280px] divide-x divide-border">
-          {/* LEFT — title + descrição body */}
-          <div className="p-6 min-w-0">
-            <h1 className="text-[24px] font-bold text-foreground leading-tight tracking-tight">{ann.title}</h1>
+        {/* Header: title + ID/Document pill */}
+        <div className="px-6 pt-5 pb-5 border-b border-border">
+          <div className="flex items-start justify-between gap-4">
+            <h1 className="text-[24px] font-bold text-foreground leading-tight tracking-tight min-w-0 flex-1">{ann.title}</h1>
 
-            <div className="mt-6">
-              <div className="flex items-center gap-2 mb-3">
-                <span className="h-px flex-1 bg-border" />
-                <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground font-semibold">Descrição</p>
-                <span className="h-px flex-1 bg-border" />
-              </div>
-              <article className="max-w-none">
-                <p className="text-[14.5px] leading-7 text-foreground whitespace-pre-line">{ann.content}</p>
-              </article>
-            </div>
-
-            {ann.cta === "inscrever" && (
-              <div className="mt-6 rounded-lg border border-primary/25 bg-primary/[0.04] p-4">
-                <div className="flex items-center justify-between gap-4 flex-wrap">
-                  <div className="space-y-0.5">
-                    <p className="text-[10px] uppercase tracking-wider font-semibold text-primary">Inscrições abertas</p>
-                    <p className="text-sm font-semibold text-foreground">Confirme a sua participação</p>
-                    {ann.ctaDeadline && (
-                      <p className="text-[12px] text-muted-foreground flex items-center gap-1.5">
-                        <Clock className="w-3 h-3" />
-                        Data limite: <span className="font-semibold text-foreground tabular-nums">{ann.ctaDeadline}{ann.ctaDeadlineTime ? ` - ${ann.ctaDeadlineTime}` : ""}</span>
-                      </p>
-                    )}
-                  </div>
-                  {subscribed ? (
-                    <Badge variant="outline" className="text-[11px] gap-1 bg-emerald-50 text-emerald-700 border-emerald-200 h-9 px-3">
-                      <CheckCircle2 className="w-3.5 h-3.5" /> Inscrito
-                    </Badge>
-                  ) : (
-                    <Button size="sm" className="h-9 gap-1.5" onClick={() => setSubscribed(true)}>
-                      <CheckCircle2 className="w-4 h-4" /> Inscrever-me
-                    </Button>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* RIGHT — ID + Documento pill + Dados */}
-          <aside className="p-5 bg-muted/15 space-y-5">
-            {/* ID + Document pill stacked */}
-            <div className="flex flex-col items-end gap-1.5">
+            <div className="flex flex-col items-end gap-1.5 shrink-0">
               <button
                 type="button"
                 onClick={() => { navigator.clipboard?.writeText(ann.id); toast({ title: "ID copiado", description: ann.id }); }}
@@ -181,10 +140,52 @@ export default function FinancasAnuncioDetail() {
                 </button>
               </div>
             </div>
+          </div>
+        </div>
 
-            {/* Dados */}
-            <div className="pt-4 border-t border-border space-y-4">
-              <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground font-semibold">Dados</p>
+        <div className="grid md:grid-cols-[1fr_280px] divide-x divide-border">
+          {/* LEFT — descrição body */}
+          <div className="p-6 min-w-0">
+            <div className="flex items-center gap-2 mb-3">
+              <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground font-semibold">Descrição</p>
+              <span className="h-px flex-1 bg-border" />
+            </div>
+            <article className="max-w-none">
+              <p className="text-[14.5px] leading-7 text-foreground whitespace-pre-line">{ann.content}</p>
+            </article>
+
+            {ann.cta === "inscrever" && (
+              <div className="mt-6 rounded-lg border border-primary/25 bg-primary/[0.04] p-4">
+                <div className="flex items-center justify-between gap-4 flex-wrap">
+                  <div className="space-y-0.5">
+                    <p className="text-[10px] uppercase tracking-wider font-semibold text-primary">Inscrições abertas</p>
+                    <p className="text-sm font-semibold text-foreground">Confirme a sua participação</p>
+                    {ann.ctaDeadline && (
+                      <p className="text-[12px] text-muted-foreground flex items-center gap-1.5">
+                        <Clock className="w-3 h-3" />
+                        Data limite: <span className="font-semibold text-foreground tabular-nums">{ann.ctaDeadline}{ann.ctaDeadlineTime ? ` - ${ann.ctaDeadlineTime}` : ""}</span>
+                      </p>
+                    )}
+                  </div>
+                  {subscribed ? (
+                    <Badge variant="outline" className="text-[11px] gap-1 bg-emerald-50 text-emerald-700 border-emerald-200 h-9 px-3">
+                      <CheckCircle2 className="w-3.5 h-3.5" /> Inscrito
+                    </Badge>
+                  ) : (
+                    <Button size="sm" className="h-9 gap-1.5" onClick={() => setSubscribed(true)}>
+                      <CheckCircle2 className="w-4 h-4" /> Inscrever-me
+                    </Button>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* RIGHT — Dados */}
+          <aside className="p-5 bg-muted/15 space-y-4">
+            <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground font-semibold">Dados</p>
+
+
 
               <MetaCell
                 icon={<UserIcon className="w-3 h-3" />}
@@ -236,8 +237,8 @@ export default function FinancasAnuncioDetail() {
                   }
                 />
               )}
-            </div>
           </aside>
+
         </div>
       </div>
     </div>
