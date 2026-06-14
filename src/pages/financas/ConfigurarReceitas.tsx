@@ -1155,27 +1155,49 @@ export default function ConfigurarReceitas() {
                 </Select>
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-muted-foreground">Valor (Kz)</label>
+                <label className="text-xs font-medium text-muted-foreground">Aplica-se a</label>
+                <Select value={receitaForm.escopo} onValueChange={v => setReceitaForm({ ...receitaForm, escopo: v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent className="max-h-[300px]">
+                    <SelectItem value="geral">Geral — todos os cursos</SelectItem>
+                    {reitorFaculties.map(f => (
+                      <div key={f.id}>
+                        <div className="px-2 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{f.name}</div>
+                        {f.courses.map(c => (
+                          <SelectItem key={c.id} value={c.id}>{c.code} — {c.name}</SelectItem>
+                        ))}
+                      </div>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-muted-foreground">Valor Bruto (Kz)</label>
                 <Input type="number" min={0} value={receitaForm.valor}
                   onChange={e => setReceitaForm({ ...receitaForm, valor: Number(e.target.value) || 0 })} />
               </div>
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-muted-foreground">Imposto (%)</label>
+                <Input type="number" min={0} max={100} step={0.5}
+                  value={((receitaForm.imposto ?? DEFAULT_IMPOSTO) * 100).toFixed(1)}
+                  onChange={e => setReceitaForm({ ...receitaForm, imposto: (Number(e.target.value) || 0) / 100 })} />
+              </div>
             </div>
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">Aplica-se a</label>
-              <Select value={receitaForm.escopo} onValueChange={v => setReceitaForm({ ...receitaForm, escopo: v })}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent className="max-h-[300px]">
-                  <SelectItem value="geral">Geral — todos os cursos</SelectItem>
-                  {reitorFaculties.map(f => (
-                    <div key={f.id}>
-                      <div className="px-2 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{f.name}</div>
-                      {f.courses.map(c => (
-                        <SelectItem key={c.id} value={c.id}>{c.code} — {c.name}</SelectItem>
-                      ))}
-                    </div>
-                  ))}
-                </SelectContent>
-              </Select>
+            <div className="rounded-lg bg-muted/30 p-3 space-y-1">
+              <div className="flex justify-between text-xs">
+                <span className="text-muted-foreground">Valor Bruto</span>
+                <span className="font-medium tabular-nums">{formatCurrency(receitaForm.valor)}</span>
+              </div>
+              <div className="flex justify-between text-xs">
+                <span className="text-muted-foreground">Imposto ({((receitaForm.imposto ?? DEFAULT_IMPOSTO) * 100).toFixed(1)}%)</span>
+                <span className="font-medium tabular-nums text-red-600">−{formatCurrency(receitaForm.valor - liquidoOf(receitaForm.valor, receitaForm.imposto))}</span>
+              </div>
+              <div className="flex justify-between pt-1.5 border-t border-border">
+                <span className="text-sm font-semibold">Valor Líquido</span>
+                <span className="text-sm font-bold tabular-nums text-emerald-700">{formatCurrency(liquidoOf(receitaForm.valor, receitaForm.imposto))}</span>
+              </div>
             </div>
           </div>
           <DialogFooter className="gap-2 sm:gap-2">
