@@ -197,7 +197,11 @@ export default function FinancasAnuncioDetail() {
 
           {/* RIGHT — title + body */}
           <div className="p-7">
-            <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground font-semibold mb-2">Comunicado</p>
+            <Badge variant="outline" className={cn("text-[10px] font-semibold gap-1 px-2 py-0.5 uppercase tracking-wider mb-3", m.chip)}>
+              <span className={cn("w-1.5 h-1.5 rounded-full", m.dot)} />
+              {m.label}
+            </Badge>
+
             <h1 className="text-[26px] font-bold text-foreground leading-tight tracking-tight">{ann.title}</h1>
             <div className="h-px bg-border my-5" />
             <article className="max-w-none">
