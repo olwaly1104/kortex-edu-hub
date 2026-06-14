@@ -76,6 +76,10 @@ export default function FinancasAnuncioDetail() {
                   <Building2 className="w-3 h-3" />
                   {ann.department}
                 </Link>
+                <span className="inline-flex items-center gap-1.5 text-[10.5px] font-semibold px-2 py-0.5 rounded-md border border-border bg-background uppercase tracking-wider text-foreground">
+                  <CalendarIcon className="w-3 h-3" />
+                  <span className="tabular-nums normal-case">{new Date(ann.date).toLocaleDateString("pt-PT", { day: "2-digit", month: "short", year: "numeric" })}</span>
+                </span>
               </div>
               <h1 className="text-[24px] font-bold text-foreground leading-tight tracking-tight">{ann.title}</h1>
             </div>
