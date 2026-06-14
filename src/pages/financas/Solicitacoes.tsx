@@ -189,7 +189,7 @@ export default function FinancasSolicitacoes() {
             </span>
             <div>
               <h1 className="text-xl font-bold text-foreground flex items-center gap-2 leading-tight">
-                <CheckSquare className="w-5 h-5 text-primary" /> Minhas Solicitações
+                Minhas Solicitações
               </h1>
               <p className="text-sm text-muted-foreground mt-0.5">
                 Pedidos institucionais — financeiros, pessoais e administrativos.
