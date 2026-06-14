@@ -796,7 +796,10 @@ function RequestCard({ r, onAccept, onDecline, onDetail, onParticipants, readOnl
             {(() => { const I = MODALITY_META[r.modality].icon; return <I className="w-2.5 h-2.5" />; })()}
             {MODALITY_META[r.modality].label}
           </Badge>
-          <Badge variant="outline" className={cn("text-[9px] h-4 px-1.5 font-semibold", st.cls)}>{st.label}</Badge>
+          <Badge variant="outline" className={cn("text-[9px] h-4 px-1.5 gap-1 font-semibold", st.cls)}>
+            <span className={cn("w-1.5 h-1.5 rounded-full", st.dot)} />
+            {st.label}
+          </Badge>
         </div>
         <div>
           <p className="text-xs font-semibold text-foreground leading-tight line-clamp-2">{r.title}</p>
