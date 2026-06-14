@@ -334,7 +334,7 @@ export default function FinancasCalendario() {
               ) : (
                 <div className="divide-y divide-border max-h-[480px] overflow-y-auto">
                   {selectedEvents.map(ev => (
-                    <EventRow key={ev.id} ev={ev} onOpen={() => setDetailEvent(ev)} />
+                    <EventRow key={ev.id} ev={ev} onOpen={() => setDetailEvent(ev)} onParticipants={() => openParticipants(ev.title, ev.participants, ev.id)} />
                   ))}
                 </div>
               )}
