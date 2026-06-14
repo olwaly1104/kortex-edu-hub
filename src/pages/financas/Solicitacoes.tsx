@@ -196,7 +196,7 @@ export default function FinancasSolicitacoes() {
                 <Clock className="w-3.5 h-3.5" />{liveTime}
               </span>
             </div>
-            <Button size="sm" onClick={() => setShowNewDialog(true)} className="h-9 gap-1.5 text-xs shadow-md hover:shadow-lg transition-shadow">
+            <Button size="sm" onClick={openWizard} className="h-9 gap-1.5 text-xs shadow-md hover:shadow-lg transition-shadow">
               <Plus className="w-4 h-4" /> Nova Solicitação
             </Button>
           </div>
