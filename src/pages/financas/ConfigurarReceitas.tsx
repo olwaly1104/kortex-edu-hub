@@ -864,7 +864,10 @@ export default function ConfigurarReceitas() {
                             <span className="text-[11px] text-muted-foreground truncate">{courseLabel(r.escopo)}</span>
                           </div>
                         </div>
-                        <span className="text-sm font-semibold text-foreground tabular-nums whitespace-nowrap">{formatCurrency(r.valor)}</span>
+                        <div className="text-right whitespace-nowrap">
+                          <p className="text-sm font-semibold text-foreground tabular-nums">{formatCurrency(r.valor)}</p>
+                          <p className="text-[10px] text-muted-foreground tabular-nums">Líquido {formatCurrency(liquidoOf(r.valor, r.imposto))}</p>
+                        </div>
                         <div className="flex items-center gap-0.5">
                           <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md" onClick={(e) => { e.stopPropagation(); openEditReceita(section, r); }} title="Editar">
                             <Pencil className="w-3.5 h-3.5" />
