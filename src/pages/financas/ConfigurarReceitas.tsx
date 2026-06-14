@@ -1013,88 +1013,76 @@ export default function ConfigurarReceitas() {
               const filtered = items.filter(r => r.tipo === multaSubtype);
               return (
                 <Card key={section.key} className="p-5">
-                  <div className="flex items-center justify-between mb-4 gap-4 flex-wrap">
+                  <div className="flex items-center justify-between mb-4 gap-3 flex-wrap">
                     <div className="flex items-center gap-2 min-w-0">
                       <Icon className={cn("w-4 h-4", section.accent)} />
                       <h2 className="text-sm font-semibold text-foreground">{section.title}</h2>
-                      <span className="text-[11px] text-muted-foreground tabular-nums">· {items.length} no total</span>
+                      <span className="text-[11px] text-muted-foreground tabular-nums">· {filtered.length} de {items.length}</span>
                       <span className="text-xs text-muted-foreground truncate hidden md:inline">— {section.description}</span>
                     </div>
-                  </div>
-
-                  {/* Category selector cards */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
-                    {MULTA_SUBTYPES.map(sub => {
-                      const SubIcon = sub.icon;
-                      const subItems = items.filter(r => r.tipo === sub.key);
-                      const active = multaSubtype === sub.key;
-                      return (
-                        <button key={sub.key} type="button" onClick={() => setMultaSubtype(sub.key)}
-                          className={cn(
-                            "relative text-left rounded-xl border p-3.5 transition-all overflow-hidden",
-                            active
-                              ? cn("ring-2 ring-offset-1 shadow-sm", sub.ring)
-                              : "border-border bg-card hover:border-foreground/20 hover:shadow-sm"
-                          )}>
-                          <span className={cn("absolute left-0 top-0 bottom-0 w-1", sub.bar, active ? "opacity-100" : "opacity-40")} />
-                          <div className="flex items-center gap-3 pl-1.5">
-                            <div className={cn("w-9 h-9 rounded-lg flex items-center justify-center shrink-0", sub.iconBg)}>
-                              <SubIcon className={cn("w-4.5 h-4.5", sub.iconColor)} />
-                            </div>
-                            <div className="flex-1 min-w-0 flex items-center gap-2">
-                              <span className={cn("text-sm font-semibold", active ? sub.iconColor : "text-foreground")}>{sub.label}</span>
-                              <span className={cn("inline-flex items-center justify-center min-w-[20px] h-[18px] px-1.5 rounded-full text-[10px] font-semibold tabular-nums", sub.chip)}>
-                                {subItems.length}
-                              </span>
-                            </div>
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-
-                  {/* Active category header bar */}
-                  <div className={cn("flex items-center justify-between gap-3 rounded-lg border px-3 py-2 mb-3", activeSub.ring)}>
-                    <div className="flex items-center gap-2 min-w-0">
-                      <ActiveIcon className={cn("w-4 h-4", activeSub.iconColor)} />
-                      <span className={cn("text-sm font-semibold", activeSub.iconColor)}>Multas · {activeSub.label}</span>
-                      <span className="text-[11px] text-muted-foreground tabular-nums">· {filtered.length} {filtered.length === 1 ? "item" : "itens"}</span>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <div className="inline-flex items-center gap-0.5 rounded-lg border border-border bg-muted/40 p-0.5">
+                        {MULTA_SUBTYPES.map(sub => {
+                          const SubIcon = sub.icon;
+                          const subItems = items.filter(r => r.tipo === sub.key);
+                          const active = multaSubtype === sub.key;
+                          return (
+                            <button key={sub.key} type="button" onClick={() => setMultaSubtype(sub.key)}
+                              className={cn(
+                                "inline-flex items-center gap-1.5 h-7 px-2.5 rounded-md text-xs font-medium transition",
+                                active ? cn("bg-background shadow-sm", sub.iconColor) : "text-muted-foreground hover:text-foreground"
+                              )}>
+                              <SubIcon className="w-3.5 h-3.5" />
+                              {sub.label}
+                              <span className="text-[10px] tabular-nums opacity-70">{subItems.length}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                      <Button size="sm" variant="outline" className="gap-1.5 h-8 text-xs" onClick={() => openNewReceita(section)}>
+                        <Plus className="w-3.5 h-3.5" /> Nova multa
+                      </Button>
                     </div>
-                    <Button size="sm" variant="outline" className="gap-1.5 h-8 text-xs" onClick={() => openNewReceita(section)}>
-                      <Plus className="w-3.5 h-3.5" /> Nova multa
-                    </Button>
                   </div>
 
                   {filtered.length === 0 ? (
-                    <div className="text-center py-8 rounded-lg border border-dashed border-border bg-muted/20">
-                      <ActiveIcon className={cn("w-6 h-6 mx-auto mb-2 opacity-60", activeSub.iconColor)} />
-                      <p className="text-xs text-muted-foreground">Sem multas configuradas para {activeSub.label.toLowerCase()}.</p>
-                      <Button size="sm" variant="outline" className="gap-1.5 h-8 text-xs mt-3" onClick={() => openNewReceita(section)}>
-                        <Plus className="w-3.5 h-3.5" /> Adicionar primeira multa
-                      </Button>
-                    </div>
+                    <p className="text-xs text-muted-foreground italic py-3">Sem multas configuradas para {activeSub.label.toLowerCase()}.</p>
                   ) : (
-                    <ul className="rounded-lg border border-border divide-y divide-border/60 overflow-hidden">
-                      {filtered.map(r => (
-                        <li key={r.id}
-                          role="button" tabIndex={0}
-                          onClick={() => openEditReceita(section, r)}
-                          onKeyDown={(e) => { if (e.key === "Enter") openEditReceita(section, r); }}
-                          className="flex items-center gap-3 px-3 py-2.5 cursor-pointer hover:bg-muted/30 transition group">
-                          <span className={cn("w-1 h-6 rounded-full shrink-0", activeSub.bar)} />
-                          <span className="flex-1 text-sm font-medium text-foreground truncate">{r.nome}</span>
-                          <div className="inline-flex items-center gap-0.5 opacity-60 group-hover:opacity-100 transition">
-                            <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md" onClick={(e) => { e.stopPropagation(); openEditReceita(section, r); }} title="Editar">
-                              <Pencil className="w-3.5 h-3.5" />
-                            </Button>
-                            <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md text-destructive hover:text-destructive"
-                              onClick={(e) => { e.stopPropagation(); setConfirmDelReceita(r); }} title="Remover">
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </Button>
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
+                    <div className="overflow-x-auto rounded-lg border border-border">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="text-[10px] uppercase tracking-wider text-muted-foreground border-b border-border bg-muted/30">
+                            <th className="text-left font-semibold px-4 py-2">Multa</th>
+                            <th className="text-left font-semibold px-3 py-2 hidden sm:table-cell">Categoria</th>
+                            <th className="w-20"></th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {filtered.map(r => (
+                            <tr key={r.id} role="button" tabIndex={0}
+                              onClick={() => openEditReceita(section, r)}
+                              onKeyDown={(e) => { if (e.key === "Enter") openEditReceita(section, r); }}
+                              className="border-b border-border/50 last:border-0 cursor-pointer hover:bg-muted/30 transition group">
+                              <td className="px-4 py-2.5 text-sm font-medium text-foreground">{r.nome}</td>
+                              <td className="px-3 py-2.5 hidden sm:table-cell">
+                                <span className={cn("inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-medium", activeSub.chip)}>{activeSub.label}</span>
+                              </td>
+                              <td className="px-2 py-2.5 text-right">
+                                <div className="inline-flex items-center gap-0.5 opacity-60 group-hover:opacity-100 transition">
+                                  <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md" onClick={(e) => { e.stopPropagation(); openEditReceita(section, r); }} title="Editar">
+                                    <Pencil className="w-3.5 h-3.5" />
+                                  </Button>
+                                  <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md text-destructive hover:text-destructive"
+                                    onClick={(e) => { e.stopPropagation(); setConfirmDelReceita(r); }} title="Remover">
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </Button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
                   )}
                 </Card>
               );
