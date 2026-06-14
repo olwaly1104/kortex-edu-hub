@@ -499,7 +499,7 @@ export default function ConfigurarReceitas() {
     setDespesaForm({
       id: "", nome: "",
       categoria: categorias[0].label,
-      estado: estados[0] ?? "",
+      estado: estados[0]?.label ?? "",
       departamento: "Geral", periodicidade: "mensal", valorEstimado: 0,
     });
     setOpenDespesaDialog(true);
