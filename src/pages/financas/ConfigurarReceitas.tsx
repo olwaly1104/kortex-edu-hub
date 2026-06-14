@@ -1516,8 +1516,7 @@ export default function ConfigurarReceitas() {
                       </td>
                       <td className="px-2 py-2.5 text-right text-sm tabular-nums text-foreground">{formatCurrency(cfg.baseSalary)}</td>
                       <td className="px-2 py-2.5 text-right text-sm tabular-nums text-red-600">
-                        −{formatCurrency(impostos)}
-                        <span className="block text-[10px] text-muted-foreground font-normal">IRT+SS {impostoPct.toFixed(1)}%</span>
+                        {impostoPct.toFixed(1)}%
                       </td>
                       <td className="px-2 py-2.5 text-right text-sm font-semibold tabular-nums text-blue-700">{formatCurrency(net)}</td>
                       <td className="px-2 py-2.5">
