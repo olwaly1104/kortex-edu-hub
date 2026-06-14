@@ -389,6 +389,17 @@ export default function ConfigurarReceitas() {
     }));
     setInlineEditPlan(null);
   };
+  const commitPlanEdit = () => {
+    if (!planEdit) return;
+    const v = Number(planEdit.valor) || 0;
+    const imp = Math.max(0, Math.min(100, Number(planEdit.imposto) || 0)) / 100;
+    setReceitas(rs => rs.map(r => {
+      if (r.id !== planEdit.rowId || !r.plans) return r;
+      const plans = r.plans.map(p => p.months === planEdit.months ? { ...p, valor: v, imposto: imp } : p);
+      return { ...r, plans, valor: plans[0].valor };
+    }));
+    setPlanEdit(null);
+    toast({ title: "Plano actualizado", description: `${planEdit.months} meses · ${formatCurrency(v)}` });
   const addPlanToRow = (rowId: string, months: number) => {
     setReceitas(rs => rs.map(r => {
       if (r.id !== rowId) return r;
