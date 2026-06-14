@@ -30,6 +30,8 @@ const usageBar = (pct: number) => {
 export default function Orcamentos() {
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("todos");
+  const [periodo, setPeriodo] = useState<Periodo>("ano");
+  const [periodoValue, setPeriodoValue] = useState<string>(periodoDefaultValue("ano"));
 
   const filtered = useMemo(() => {
     return orcamentos
