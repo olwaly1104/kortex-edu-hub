@@ -73,20 +73,22 @@ export default function Receitas() {
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
-      <div className="flex items-center justify-between gap-3 flex-wrap">
-        <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-          <TrendingUp className="w-6 h-6 text-primary" /> Receitas
-        </h1>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => navigate("/financas/configurar-receitas")}
-          className="h-9 gap-2 border-border/70 text-foreground hover:bg-muted/60 hover:text-foreground"
-        >
-          <Settings2 className="w-4 h-4 text-muted-foreground" />
-          Configurar Receitas
-        </Button>
-      </div>
+      <FinHeader
+        title="Receitas"
+        subtitle="Gestão de propinas, emolumentos e outras receitas institucionais."
+        icon={<TrendingUp className="w-5 h-5 text-primary" />}
+        right={
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => navigate("/financas/configurar-receitas")}
+            className="h-9 gap-2 border-border/70 text-foreground hover:bg-muted/60 hover:text-foreground"
+          >
+            <Settings2 className="w-4 h-4 text-muted-foreground" />
+            Configurar Receitas
+          </Button>
+        }
+      />
 
 
       {/* KPIs */}
