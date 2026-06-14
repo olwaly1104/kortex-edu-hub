@@ -524,9 +524,14 @@ export default function FinancasCalendario() {
                               <Icon className={cn("w-3 h-3", m.text)} />
                               <span className={cn("text-[10px] font-semibold uppercase tracking-wide", m.text)}>{m.label}</span>
                             </div>
-                            {ev.obligatory && (
-                              <Badge variant="outline" className="text-[9px] h-4 px-1 bg-red-50 text-red-700 border-red-200">Obrig.</Badge>
-                            )}
+                            <div className="flex items-center gap-1">
+                              {(() => { const s = EV_STATE_META[eventState(ev)]; return (
+                                <Badge variant="outline" className={cn("text-[9px] h-4 px-1.5", s.cls)}>{s.label}</Badge>
+                              ); })()}
+                              {ev.obligatory && (
+                                <Badge variant="outline" className="text-[9px] h-4 px-1 bg-red-50 text-red-700 border-red-200">Obrig.</Badge>
+                              )}
+                            </div>
                           </div>
                           <p className="text-sm font-semibold text-foreground leading-snug line-clamp-2">{ev.title}</p>
                           <div className="pt-2 border-t border-border/60 space-y-1 text-[11px] text-muted-foreground">
