@@ -182,10 +182,21 @@ interface DespesaRow {
   valorEstimado: number;
 }
 
+interface ResponsavelItem { id: string; nome: string; cargo: string; }
+interface DestinatarioMap { categoria: string; destinatario: string; }
+interface ApprovalRule { id: string; min: number; max: number; responsavelId: string; }
+
 const DEPARTAMENTOS = [
   "Geral", "Reitoria", "Administração", "Docentes", "TI", "Serviços Gerais",
   "Fac. Engenharia", "Fac. Medicina", "Fac. Direito", "Fac. Arquitectura",
   "Fac. Ciências", "Fac. Letras", "Fac. Economia",
+];
+
+const INITIAL_RESPONSAVEIS: ResponsavelItem[] = [
+  { id: "resp-1", nome: "Dra. Catarina Lopes", cargo: "Diretora Financeira" },
+  { id: "resp-2", nome: "Dra. Lúcia Mateus", cargo: "Tesoureira" },
+  { id: "resp-3", nome: "Sr. Adriano Paka", cargo: "Cobranças" },
+  { id: "resp-4", nome: "Reitor — Pe. José Manuel", cargo: "Aprovação Institucional" },
 ];
 
 const periodCls: Record<DespesaRow["periodicidade"], string> = {
