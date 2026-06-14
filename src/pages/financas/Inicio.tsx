@@ -69,27 +69,13 @@ export default function FinancasInicio() {
               Departamento Financeiro — UPRA
             </p>
           </div>
-          <Link to="/financas/dashboard" className="text-sm text-primary hover:underline flex items-center gap-1">
-            Ver Dashboard <ChevronRight className="w-4 h-4" />
-          </Link>
+          <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-700 text-xs font-medium">
+            <CheckCircle className="w-4 h-4 shrink-0" />
+            <span>Minha Presença: 96%</span>
+          </div>
         </div>
       </div>
 
-      {/* Alerts */}
-      {alerts.length > 0 && (
-        <div className="flex flex-wrap gap-2">
-          {alerts.map((a) => {
-            const Icon = alertIcons[a.type];
-            const color = a.type === "error" ? "text-destructive bg-destructive/10 border-destructive/20" : a.type === "warning" ? "text-amber-600 bg-amber-50 border-amber-200" : "text-blue-600 bg-blue-50 border-blue-200";
-            return (
-              <div key={a.id} className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-xs ${color}`}>
-                <Icon className="w-3.5 h-3.5 shrink-0" />
-                <span>{a.message}</span>
-              </div>
-            );
-          })}
-        </div>
-      )}
 
       {/* Row 1: Agenda + Anúncios */}
       <div className="grid lg:grid-cols-3 gap-6">
