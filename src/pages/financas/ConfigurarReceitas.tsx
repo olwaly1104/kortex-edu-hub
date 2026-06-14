@@ -981,8 +981,6 @@ export default function ConfigurarReceitas() {
               const activeSub = MULTA_SUBTYPES.find(s => s.key === multaSubtype)!;
               const ActiveIcon = activeSub.icon;
               const filtered = items.filter(r => r.tipo === multaSubtype);
-              const totalBruto = filtered.reduce((sum, r) => sum + r.valor, 0);
-              const totalLiquido = filtered.reduce((sum, r) => sum + liquidoOf(r.valor, r.imposto), 0);
               return (
                 <Card key={section.key} className="p-5">
                   <div className="flex items-center justify-between mb-4 gap-4 flex-wrap">
