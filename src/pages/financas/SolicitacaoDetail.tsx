@@ -94,11 +94,19 @@ export default function FinancasSolicitacaoDetail() {
     pending:   "bg-background border-2 border-dashed border-border text-muted-foreground",
   };
 
-  const handleAction = (action: "em_execucao" | "rejeitado") => {
-    toast({
-      title: action === "em_execucao" ? "Solicitação em execução" : "Solicitação rejeitada",
-      description: `O pedido ${selected.ref} foi ${action === "em_execucao" ? "colocado em execução" : "rejeitado"}.`,
-    });
+  const handleAction = (action: "em_execucao" | "rejeitado" | "executada") => {
+    setStatusOverride(action);
+    const titles: Record<typeof action, string> = {
+      em_execucao: "Solicitação aprovada",
+      rejeitado: "Solicitação rejeitada",
+      executada: "Solicitação executada",
+    };
+    const descs: Record<typeof action, string> = {
+      em_execucao: `O pedido ${selected.ref} foi aprovado e está em execução.`,
+      rejeitado: `O pedido ${selected.ref} foi rejeitado.`,
+      executada: `O pedido ${selected.ref} foi marcado como executado.`,
+    };
+    toast({ title: titles[action], description: descs[action] });
   };
 
   return (
