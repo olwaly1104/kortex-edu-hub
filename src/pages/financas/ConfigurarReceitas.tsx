@@ -514,19 +514,34 @@ export default function ConfigurarReceitas() {
     setConfirmDelDespesa(null);
   };
   const addCategoria = () => {
-    const v = newCategoria.trim();
+    const v = newCatLabel.trim();
     if (!v) return;
-    if (categorias.includes(v)) { toast({ title: "Categoria já existe", variant: "destructive" }); return; }
-    setCategorias(cs => [...cs, v]);
-    setNewCategoria("");
+    if (categorias.some(c => c.label.toLowerCase() === v.toLowerCase())) {
+      toast({ title: "Categoria já existe", variant: "destructive" }); return;
+    }
+    setCategorias(cs => [...cs, { id: `cat-${Date.now()}`, label: v, color: newCatColor }]);
+    setNewCatLabel("");
+    setNewCatColor(CAT_PALETTE[0].cls);
+    setCatDialogOpen(false);
+    toast({ title: "Categoria criada", description: v });
   };
-  const removeCategoria = (c: string) => {
-    if (despesas.some(d => d.categoria === c)) {
+  const saveEditCategoria = () => {
+    if (!editingCategoria || !editingCategoria.label.trim()) return;
+    const v = editingCategoria.label.trim();
+    if (categorias.some(c => c.id !== editingCategoria.id && c.label.toLowerCase() === v.toLowerCase())) {
+      toast({ title: "Categoria já existe", variant: "destructive" }); return;
+    }
+    setCategorias(cs => cs.map(c => c.id === editingCategoria.id ? { ...editingCategoria, label: v } : c));
+    setEditingCategoria(null);
+    toast({ title: "Categoria actualizada" });
+  };
+  const removeCategoria = (cat: CategoriaItem) => {
+    if (despesas.some(d => d.categoria === cat.label)) {
       toast({ title: "Categoria em uso", description: "Remova primeiro as despesas que a usam.", variant: "destructive" });
       return;
     }
-    setCategorias(cs => cs.filter(x => x !== c));
-    if (despesaCatFilter === c) setDespesaCatFilter("todos");
+    setCategorias(cs => cs.filter(x => x.id !== cat.id));
+    if (despesaCatFilter === cat.label) setDespesaCatFilter("todos");
   };
   const addEstado = () => {
     const v = newEstado.trim();
