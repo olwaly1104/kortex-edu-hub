@@ -314,7 +314,12 @@ export default function ConfigurarReceitas() {
   /* ── DESPESAS ── */
   const [despesas, setDespesas] = useState<DespesaRow[]>([]);
   const [categorias, setCategorias] = useState<CategoriaItem[]>(INITIAL_CATEGORIAS);
-  const [estados, setEstados] = useState<string[]>(["Pendente", "Aprovada", "Executada", "Rejeitada"]);
+  const [estados, setEstados] = useState<EstadoItem[]>([
+    { id: "est-1", label: "Pendente",  color: "bg-amber-50 text-amber-700 border-amber-200" },
+    { id: "est-2", label: "Aprovada",  color: "bg-emerald-50 text-emerald-700 border-emerald-200" },
+    { id: "est-3", label: "Executada", color: "bg-blue-50 text-blue-700 border-blue-200" },
+    { id: "est-4", label: "Rejeitada", color: "bg-red-50 text-red-700 border-red-200" },
+  ]);
   const [despesaCatFilter, setDespesaCatFilter] = useState<string>("todos");
   const [despesaEstadoFilter, setDespesaEstadoFilter] = useState<string>("todos");
   const [despesaSearch, setDespesaSearch] = useState("");
@@ -332,7 +337,11 @@ export default function ConfigurarReceitas() {
   const [newCatColor, setNewCatColor] = useState<string>(CAT_PALETTE[0].cls);
   const [editingCategoria, setEditingCategoria] = useState<CategoriaItem | null>(null);
 
-  const [newEstado, setNewEstado] = useState("");
+  // Estado add / edit dialogs
+  const [estadoDialogOpen, setEstadoDialogOpen] = useState(false);
+  const [newEstadoLabel, setNewEstadoLabel] = useState("");
+  const [newEstadoColor, setNewEstadoColor] = useState<string>(CAT_PALETTE[0].cls);
+  const [editingEstado, setEditingEstado] = useState<EstadoItem | null>(null);
 
   // Responsáveis
   const [responsaveis, setResponsaveis] = useState<ResponsavelItem[]>(INITIAL_RESPONSAVEIS);
