@@ -1522,6 +1522,7 @@ export default function ConfigurarReceitas() {
                   <th className="text-left font-semibold px-2 py-2">Contrato</th>
                   <th className="text-left font-semibold px-2 py-2">Departamento</th>
                   <th className="text-right font-semibold px-2 py-2">Salário Bruto</th>
+                  <th className="text-right font-semibold px-2 py-2">Impostos</th>
                   <th className="text-right font-semibold px-2 py-2">Salário Líquido</th>
                   <th className="w-16"></th>
                 </tr>
@@ -1530,6 +1531,10 @@ export default function ConfigurarReceitas() {
                 {salaryList.map(s => {
                   const cfg = salaryConfigs[s.id];
                   if (!cfg) return null;
+                  const irt = Math.round(cfg.baseSalary * cfg.irtRate);
+                  const ss = Math.round(cfg.baseSalary * cfg.ssRate);
+                  const impostos = irt + ss;
+                  const impostoPct = ((cfg.irtRate + cfg.ssRate) * 100);
                   const net = computeNet(cfg);
                   const contractLabel = s.contractType === "efectivo" ? "Permanente" : "Prestador";
                   return (
@@ -1556,6 +1561,10 @@ export default function ConfigurarReceitas() {
                         <p className="text-xs text-foreground truncate">{s.department}</p>
                       </td>
                       <td className="px-2 py-2.5 text-right text-sm tabular-nums text-foreground">{formatCurrency(cfg.baseSalary)}</td>
+                      <td className="px-2 py-2.5 text-right text-sm tabular-nums text-red-600">
+                        −{formatCurrency(impostos)}
+                        <span className="block text-[10px] text-muted-foreground font-normal">IRT+SS {impostoPct.toFixed(1)}%</span>
+                      </td>
                       <td className="px-2 py-2.5 text-right text-sm font-semibold tabular-nums text-blue-700">{formatCurrency(net)}</td>
                       <td className="px-2 py-2.5">
                         <div className="flex items-center gap-0.5 justify-end opacity-60 group-hover:opacity-100 transition">
