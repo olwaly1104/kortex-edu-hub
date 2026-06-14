@@ -274,27 +274,32 @@ export default function FinancasAnuncios() {
 
                   {/* compact CTA */}
                   {a.cta === "inscrever" && (
-                    <div className="mt-3 inline-flex items-stretch rounded-md border border-border bg-card overflow-hidden shadow-sm">
-                      {isSub ? (
-                        <span className="inline-flex items-center gap-1.5 bg-emerald-600 text-white px-3 py-1.5 text-xs font-semibold">
-                          <CheckCircle2 className="w-3.5 h-3.5" />
-                          Inscrito
-                        </span>
-                      ) : (
-                        <button
-                          onClick={() => setSubscribed(s => new Set(s).add(a.id))}
-                          className="inline-flex items-center gap-1.5 bg-primary text-primary-foreground px-3.5 py-1.5 text-xs font-semibold hover:bg-primary/90 transition-colors"
-                        >
-                          <CheckCircle2 className="w-3.5 h-3.5" />
-                          Inscrever-me
-                        </button>
-                      )}
-                      {a.ctaDeadline && (
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] bg-muted/40">
-                          <span className="uppercase tracking-wide font-medium text-muted-foreground">Data limite:</span>
-                          <span className="font-semibold text-foreground tabular-nums">{a.ctaDeadline}{a.ctaDeadlineTime ? ` - ${a.ctaDeadlineTime}` : ""}</span>
-                        </span>
-                      )}
+                    <div className="mt-3 rounded-md border border-border bg-card overflow-hidden shadow-sm">
+                      <div className="px-3 pt-2.5 pb-1.5 border-b border-border/60 bg-muted/20">
+                        <p className="text-[12px] font-semibold text-foreground truncate">{a.title}</p>
+                      </div>
+                      <div className="inline-flex items-stretch">
+                        {isSub ? (
+                          <span className="inline-flex items-center gap-1.5 bg-emerald-600 text-white px-3 py-1.5 text-xs font-semibold">
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            Inscrito
+                          </span>
+                        ) : (
+                          <button
+                            onClick={() => setSubscribed(s => new Set(s).add(a.id))}
+                            className="inline-flex items-center gap-1.5 bg-primary text-primary-foreground px-3.5 py-1.5 text-xs font-semibold hover:bg-primary/90 transition-colors"
+                          >
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            Inscrever-me
+                          </button>
+                        )}
+                        {a.ctaDeadline && (
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] bg-muted/40">
+                            <span className="uppercase tracking-wide font-medium text-muted-foreground">Data limite:</span>
+                            <span className="font-semibold text-foreground tabular-nums">{a.ctaDeadline}{a.ctaDeadlineTime ? ` - ${a.ctaDeadlineTime}` : ""}</span>
+                          </span>
+                        )}
+                      </div>
                     </div>
                   )}
 
