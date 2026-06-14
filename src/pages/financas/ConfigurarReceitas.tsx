@@ -267,6 +267,7 @@ export default function ConfigurarReceitas() {
   const [receitaForm, setReceitaForm] = useState<ReceitaRow>({ id: "", nome: "", tipo: "Emolumento", escopo: "geral", valor: 0 });
   const [confirmDelReceita, setConfirmDelReceita] = useState<ReceitaRow | null>(null);
   const [inlineEditPlan, setInlineEditPlan] = useState<{ rowId: string; months: number; valor: string } | null>(null);
+  const [planEdit, setPlanEdit] = useState<{ rowId: string; months: number; valor: string; imposto: string } | null>(null);
 
   /* ── DESPESAS ── */
   const [despesas, setDespesas] = useState<DespesaRow[]>([]);
