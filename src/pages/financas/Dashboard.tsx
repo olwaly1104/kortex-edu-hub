@@ -1,8 +1,9 @@
 import { useState, useMemo } from "react";
 import {
   Wallet, TrendingUp, TrendingDown, CreditCard,
-  ArrowUpRight, ArrowDownRight, Clock, AlertTriangle, FileText, ChevronRight, Receipt, Search, X,
+  ArrowUpRight, ArrowDownRight, FileText, ChevronRight, Receipt, Search, X, GraduationCap, Calendar as CalendarIcon,
 } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
