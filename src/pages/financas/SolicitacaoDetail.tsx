@@ -92,7 +92,7 @@ export default function FinancasSolicitacaoDetail() {
     steps.push({ label: "Solicitação rejeitada", data: rej?.data, actor: rej?.actor ?? decisionActor, nota: rej?.nota, anexos: rej?.anexos, tone: "rejected" });
   } else if (isExecucao) {
     const ap = selected.historico.slice().reverse().find(h => h.accao.toLowerCase().includes("aprov"));
-    steps.push({ label: "Solicitação aprovada", data: ap?.data, actor: ap?.actor ?? decisionActor, nota: ap?.nota, anexos: ap?.anexos, tone: "accepted" });
+    steps.push({ label: "Solicitação em Execução", data: ap?.data, actor: ap?.actor ?? decisionActor, nota: ap?.nota, anexos: ap?.anexos, tone: "accepted" });
   } else {
     const diff = Math.ceil((decisionForecast.getTime() - hoje.getTime()) / 86400000);
     const overdue = diff < 0;
@@ -489,11 +489,13 @@ export default function FinancasSolicitacaoDetail() {
                   <p className="text-[13.5px] text-foreground/90 leading-[1.65] whitespace-pre-line">{selected.description}</p>
                 </div>
 
-                {anexos.length > 0 && (
-                  <div className="px-4 py-3">
-                    <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold mb-2">
-                      Anexos <span className="text-muted-foreground/70 normal-case tracking-normal tabular-nums">({anexos.length})</span>
-                    </p>
+                <div className="px-4 py-3">
+                  <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold mb-2">
+                    Anexos <span className="text-muted-foreground/70 normal-case tracking-normal tabular-nums">({anexos.length})</span>
+                  </p>
+                  {anexos.length === 0 ? (
+                    <p className="text-[12px] text-muted-foreground">Anexo 0</p>
+                  ) : (
                     <ul className="divide-y divide-border/70">
                       {anexos.map((a, i) => {
                         const { Icon, cls } = anexoIcon(a.tipo);
@@ -518,8 +520,8 @@ export default function FinancasSolicitacaoDetail() {
                         );
                       })}
                     </ul>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             </section>
 
