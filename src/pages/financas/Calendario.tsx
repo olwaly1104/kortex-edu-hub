@@ -637,12 +637,16 @@ export default function FinancasCalendario() {
   );
 }
 
-/* ── Event row in agenda ── */
-function RequestCard({ r, onAccept, onDecline, onDetail }: {
-  r: MeetingRequest; onAccept: () => void; onDecline: () => void; onDetail: () => void;
+/* ── Request card ── */
+function RequestCard({ r, onAccept, onDecline, onDetail, onParticipants }: {
+  r: MeetingRequest; onAccept: () => void; onDecline: () => void; onDetail: () => void; onParticipants: () => void;
 }) {
   return (
     <div className="rounded-lg border bg-card hover:border-foreground/20 transition-colors overflow-hidden h-full flex flex-col">
+      <div className="px-2.5 pt-2 pb-1 border-b bg-muted/20 flex items-center justify-between gap-2">
+        <span className="text-[9px] uppercase tracking-wider text-muted-foreground font-medium">Pedido em</span>
+        <span className="text-[10px] font-semibold text-foreground">{fmtShort(r.requestedAt)}</span>
+      </div>
       <div className="p-2.5 space-y-2 flex-1">
         <div>
           <p className="text-xs font-semibold text-foreground leading-tight line-clamp-2">{r.title}</p>
@@ -651,10 +655,13 @@ function RequestCard({ r, onAccept, onDecline, onDetail }: {
           </p>
         </div>
         <div className="space-y-0.5 text-[10px] text-muted-foreground">
-          <div className="flex items-center gap-1"><CalendarDays className="w-3 h-3" />{r.date} · {r.startTime}–{r.endTime}</div>
+          <div className="flex items-center gap-1"><CalendarDays className="w-3 h-3" />{fmtShort(r.date)} · {r.startTime}–{r.endTime}</div>
           <div className="flex items-center gap-1 truncate"><MapPin className="w-3 h-3" />{r.location}</div>
-          {r.participants && (
-            <div className="flex items-center gap-1"><Users className="w-3 h-3" />{r.participants.length} participante{r.participants.length !== 1 ? "s" : ""}</div>
+          {r.participants && r.participants.length > 0 && (
+            <button type="button" onClick={onParticipants}
+              className="flex items-center gap-1 hover:text-foreground hover:underline underline-offset-2">
+              <Users className="w-3 h-3" />{r.participants.length} participante{r.participants.length !== 1 ? "s" : ""}
+            </button>
           )}
         </div>
         <div className="flex items-center gap-1.5 pt-1">
