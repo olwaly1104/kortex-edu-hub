@@ -25,7 +25,7 @@ import {
   type FinType, type FinStatus,
 } from "@/data/financasSolicitacoesData";
 
-type EstadoFilter = "todos" | "pendentes" | "atrasadas" | "aprovadas" | "executadas" | "rejeitadas";
+type EstadoFilter = "todos" | "pendentes" | "atrasadas" | "em_execucao" | "executadas" | "rejeitadas";
 
 export default function FinancasSolicitacoes() {
   const { toast } = useToast();
@@ -49,7 +49,7 @@ export default function FinancasSolicitacoes() {
     todos: directionFiltered.length,
     pendentes: directionFiltered.filter(s => s.status === "pendente").length,
     atrasadas: directionFiltered.filter(s => s.status === "atrasado").length,
-    aprovadas: directionFiltered.filter(s => s.status === "aprovado").length,
+    em_execucao: directionFiltered.filter(s => s.status === "em_execucao").length,
     executadas: directionFiltered.filter(s => s.status === "executada").length,
     rejeitadas: directionFiltered.filter(s => s.status === "rejeitado").length,
   }), [directionFiltered]);
@@ -59,7 +59,7 @@ export default function FinancasSolicitacoes() {
       .filter(s => {
         if (estado === "pendentes"  && s.status !== "pendente")  return false;
         if (estado === "atrasadas"  && s.status !== "atrasado")  return false;
-        if (estado === "aprovadas"  && s.status !== "aprovado")  return false;
+        if (estado === "em_execucao" && s.status !== "em_execucao") return false;
         if (estado === "executadas" && s.status !== "executada") return false;
         if (estado === "rejeitadas" && s.status !== "rejeitado") return false;
         if (typeFilter !== "todos" && s.type !== typeFilter) return false;
@@ -83,7 +83,7 @@ export default function FinancasSolicitacoes() {
     { key: "todos",      label: "Todas",      count: counts.todos },
     { key: "pendentes",  label: "Pendentes",  count: counts.pendentes },
     { key: "atrasadas",  label: "Em atraso",  count: counts.atrasadas },
-    { key: "aprovadas",  label: "Aprovadas",  count: counts.aprovadas },
+    { key: "em_execucao", label: "Em execução", count: counts.em_execucao },
     { key: "executadas", label: "Executadas", count: counts.executadas },
     { key: "rejeitadas", label: "Rejeitadas", count: counts.rejeitadas },
   ];
@@ -171,7 +171,7 @@ export default function FinancasSolicitacoes() {
           <StatCell icon={Inbox}          label="Total"      value={counts.todos}      tone="primary" />
           <StatCell icon={Clock}          label="Pendentes"  value={counts.pendentes}  tone="amber" />
           <StatCell icon={AlertTriangle}  label="Em atraso"  value={counts.atrasadas}  tone="orange" />
-          <StatCell icon={CheckCircle2}   label="Aprovadas"  value={counts.aprovadas}  tone="emerald" />
+          <StatCell icon={CheckCircle2}   label="Em execução" value={counts.em_execucao} tone="emerald" />
           <StatCell icon={BadgeCheck}     label="Executadas" value={counts.executadas} tone="teal" />
           <StatCell icon={X}              label="Rejeitadas" value={counts.rejeitadas} tone="red" />
         </div>
