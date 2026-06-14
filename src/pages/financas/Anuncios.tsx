@@ -195,17 +195,8 @@ export default function FinancasAnuncios() {
       </div>
 
       {/* ── Controls ─────────────────────────────── */}
-      <Card className="p-3 flex flex-col lg:flex-row lg:items-center gap-3">
-        <div className="relative flex-1 min-w-[220px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder="Pesquisar anúncios…"
-            className="pl-9 h-9 text-sm border-border"
-          />
-        </div>
-        <div className="flex bg-muted/60 rounded-lg p-0.5 overflow-x-auto">
+      <Card className="p-3 space-y-3">
+        <div className="flex bg-muted/60 rounded-lg p-0.5 overflow-x-auto w-fit">
           {scopeTabs.map(t => (
             <button key={t.key} onClick={() => setScope(t.key)}
               className={cn("flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors whitespace-nowrap",
@@ -218,19 +209,42 @@ export default function FinancasAnuncios() {
             </button>
           ))}
         </div>
-        <Select value={typeFilter} onValueChange={(v: AnnType | "todos") => setTypeFilter(v)}>
-          <SelectTrigger className="w-[170px] h-9 text-xs">
-            <SelectValue placeholder="Categoria" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="todos">Todas as categorias</SelectItem>
-            <SelectItem value="urgente">Urgente</SelectItem>
-            <SelectItem value="evento">Evento</SelectItem>
-            <SelectItem value="academico">Académico</SelectItem>
-            <SelectItem value="geral">Geral</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="flex flex-col lg:flex-row lg:items-center gap-3">
+          <div className="relative flex-1 min-w-[220px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Pesquisar anúncios…"
+              className="pl-9 h-9 text-sm border-border"
+            />
+          </div>
+          <Select value={typeFilter} onValueChange={(v: AnnType | "todos") => setTypeFilter(v)}>
+            <SelectTrigger className="w-[170px] h-9 text-xs">
+              <SelectValue placeholder="Categoria" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todos">Todas as categorias</SelectItem>
+              <SelectItem value="urgente">Urgente</SelectItem>
+              <SelectItem value="evento">Evento</SelectItem>
+              <SelectItem value="academico">Académico</SelectItem>
+              <SelectItem value="geral">Geral</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={deptFilter} onValueChange={setDeptFilter}>
+            <SelectTrigger className="w-[210px] h-9 text-xs">
+              <SelectValue placeholder="Departamento" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todos">Todos os departamentos</SelectItem>
+              {departments.map(d => (
+                <SelectItem key={d} value={d}>{d}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </Card>
+
 
 
 
