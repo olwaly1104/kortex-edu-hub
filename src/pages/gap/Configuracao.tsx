@@ -337,7 +337,7 @@ export default function GapConfiguracao() {
           <Settings2 className="w-6 h-6 text-primary" /> Configuração
         </h1>
         <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
-          Configure tudo o que diz respeito a Solicitações e Agendamentos do GAP.
+          Configure Solicitações, Agendamentos e o processo de Candidaturas do GAP.
         </p>
       </div>
 
