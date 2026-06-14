@@ -784,17 +784,20 @@ function RequestCard({ r, onAccept, onDecline, onDetail, onParticipants, readOnl
       </div>
       <div className="p-3 space-y-2.5 flex-1">
         <div className="flex items-center justify-between gap-1.5">
-          <Badge variant="outline" className={cn("text-[9px] h-4 px-1.5 font-semibold", st.cls)}>{st.label}</Badge>
           <Badge variant="outline" className={cn("text-[9px] h-4 px-1 gap-0.5", MODALITY_META[r.modality].cls)}>
             {(() => { const I = MODALITY_META[r.modality].icon; return <I className="w-2.5 h-2.5" />; })()}
             {MODALITY_META[r.modality].label}
           </Badge>
+          <Badge variant="outline" className={cn("text-[9px] h-4 px-1.5 font-semibold", st.cls)}>{st.label}</Badge>
         </div>
         <div>
           <p className="text-xs font-semibold text-foreground leading-tight line-clamp-2">{r.title}</p>
-          <p className="text-[10px] text-muted-foreground mt-1 flex items-center gap-1 truncate">
-            <UserCircle2 className="w-3 h-3 shrink-0" />{r.organizer}
-          </p>
+          <div className="mt-1.5">
+            <Badge variant="outline" className="text-[9px] h-4 px-1.5 gap-1 bg-primary/5 text-primary border-primary/20 font-medium max-w-full">
+              <UserCircle2 className="w-2.5 h-2.5 shrink-0" />
+              <span className="truncate">{r.organizer}</span>
+            </Badge>
+          </div>
         </div>
         <div className="space-y-1 text-[10px] text-muted-foreground border-t border-border/60 pt-2">
           <div className="flex items-center gap-1"><CalendarDays className="w-3 h-3 shrink-0" />{fmtShort(r.date)} · {r.startTime}–{r.endTime}</div>
