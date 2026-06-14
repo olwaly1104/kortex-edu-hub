@@ -22,7 +22,7 @@ export default function FinancasSolicitacaoDetail() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const baseSelected = finSolicitacoes.find(s => s.id === id);
-  const [statusOverride, setStatusOverride] = useState<typeof baseSelected extends undefined ? never : null | "em_execucao" | "executada" | "rejeitado">(null);
+  const [statusOverride, setStatusOverride] = useState<null | "em_execucao" | "executada" | "rejeitado">(null);
 
   if (!baseSelected) {
     return (
