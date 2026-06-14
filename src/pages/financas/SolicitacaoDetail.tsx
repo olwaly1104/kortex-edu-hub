@@ -579,7 +579,7 @@ export default function FinancasSolicitacaoDetail() {
                       </Badge>
                     </div>
                     <p className="text-[11.5px] text-foreground/75 leading-relaxed mt-2">
-                      Está a declarar que esta solicitação passa para <span className="font-semibold text-foreground">{toMeta.label}</span>. A acção será registada no histórico.
+                      Eu declaro que esta solicitação está em transição para <span className="font-semibold text-foreground">{toMeta.label}</span>. Esta alteração de estado será registada no histórico e vinculada ao parecer e documentos anexos fornecidos. O requerente será notificado da decisão.
                     </p>
                   </div>
                 );
