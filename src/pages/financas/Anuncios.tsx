@@ -274,8 +274,8 @@ export default function FinancasAnuncios() {
 
                   {/* compact CTA */}
                   {a.cta === "inscrever" && (
-                    <div className="mt-2 rounded-lg border border-primary/25 bg-primary/[0.04] px-3 py-2">
-                      <div className="flex items-center gap-3 flex-wrap">
+                    <div className="mt-2 rounded-md border border-primary/20 bg-primary/[0.04] px-2.5 py-1.5">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <div className="min-w-0">
                           <p className="text-[10px] uppercase tracking-[0.14em] font-semibold text-primary">Inscrições abertas</p>
                           <p className="text-[13px] font-bold text-foreground leading-tight truncate">{a.title}</p>
@@ -287,13 +287,13 @@ export default function FinancasAnuncios() {
                           )}
                         </div>
                         {isSub ? (
-                          <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-md h-7 px-2.5 text-[11px] font-semibold shrink-0">
+                          <span className="ml-auto inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-md h-7 px-2.5 text-[11px] font-semibold shrink-0">
                             <CheckCircle2 className="w-3.5 h-3.5" /> Inscrito
                           </span>
                         ) : (
                           <button
                             onClick={() => setSubscribed(s => new Set(s).add(a.id))}
-                            className="inline-flex items-center gap-1.5 bg-primary text-primary-foreground rounded-md h-7 px-3 text-[11.5px] font-semibold hover:bg-primary/90 transition-colors shrink-0"
+                            className="ml-auto inline-flex items-center gap-1.5 bg-primary text-primary-foreground rounded-md h-7 px-3 text-[11.5px] font-semibold hover:bg-primary/90 transition-colors shrink-0"
                           >
                             <CheckCircle2 className="w-3.5 h-3.5" /> Inscrever-me
                           </button>
