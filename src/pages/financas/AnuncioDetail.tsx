@@ -10,7 +10,7 @@ import {
 import {
   ArrowLeft, Calendar as CalendarIcon, Building2, User as UserIcon,
   CheckCircle2, Megaphone, ChevronRight, Clock, FileText, Tag,
-  Users, Share2, Eye, Download, Paperclip,
+  Users, Share2, Eye, Download, Paperclip, FileImage, FileSpreadsheet,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -171,11 +171,52 @@ export default function FinancasAnuncioDetail() {
                 <FileText className="w-3.5 h-3.5 text-muted-foreground" />
                 <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Conteúdo</h3>
               </div>
-              <div className="rounded-lg border border-border bg-background overflow-hidden">
+              <div className="rounded-lg border border-border bg-background overflow-hidden divide-y divide-border">
                 <div className="px-4 pt-3 pb-3">
                   <p className="text-[10px] uppercase tracking-[0.14em] font-semibold text-muted-foreground/80 mb-2">Descrição</p>
                   <p className="text-[13.5px] text-foreground/90 leading-[1.65] whitespace-pre-line">{ann.content}</p>
                 </div>
+
+                {(() => {
+                  const attachments = ann.cta === "inscrever"
+                    ? [{ name: "Programa-detalhado.pdf", size: "312 KB", tipo: "pdf" as const }]
+                    : [];
+                  return (
+                    <div className="px-4 py-3">
+                      <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold mb-2">
+                        Anexos <span className="text-muted-foreground/70 normal-case tracking-normal tabular-nums">({attachments.length})</span>
+                      </p>
+                      {attachments.length === 0 ? (
+                        <p className="text-[12px] text-muted-foreground">Sem anexos</p>
+                      ) : (
+                        <ul className="divide-y divide-border/70">
+                          {attachments.map((a, i) => {
+                            const { Icon, cls } = anexoIcon(a.tipo);
+                            return (
+                              <li key={i} className="flex items-center gap-3 py-2 first:pt-0 last:pb-0">
+                                <div className={cn("w-8 h-8 rounded-md border flex items-center justify-center shrink-0", cls)}>
+                                  <Icon className="w-4 h-4" />
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                  <p className="text-[13px] font-medium text-foreground leading-tight truncate">{a.name}</p>
+                                  <p className="text-[11px] text-muted-foreground mt-0.5 truncate">{a.size}</p>
+                                </div>
+                                <div className="flex items-center gap-0.5 shrink-0">
+                                  <button type="button" onClick={() => toast({ title: "A abrir anexo", description: a.name })} className="w-7 h-7 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors" title="Ver">
+                                    <Eye className="w-3.5 h-3.5" />
+                                  </button>
+                                  <button type="button" onClick={() => toast({ title: "Anexo descarregado", description: a.name })} className="w-7 h-7 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors" title="Descarregar">
+                                    <Download className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      )}
+                    </div>
+                  );
+                })()}
               </div>
             </section>
 
@@ -207,58 +248,6 @@ export default function FinancasAnuncioDetail() {
 
 
 
-            {/* Anexos */}
-            {(() => {
-              const attachments = ann.cta === "inscrever"
-                ? [{ name: "Programa-detalhado.pdf", size: "312 KB" }]
-                : [];
-              return (
-                <div>
-                  <h2 className="text-[11px] uppercase tracking-[0.16em] font-semibold text-muted-foreground mb-2 flex items-center gap-1.5">
-                    <Paperclip className="w-3 h-3" /> Anexos
-                    <span className="text-muted-foreground/70 normal-case tracking-normal font-medium">({attachments.length})</span>
-                  </h2>
-                  {attachments.length === 0 ? (
-                    <div className="rounded-md border border-dashed border-border px-3 py-4 text-center text-[12px] text-muted-foreground">
-                      Sem anexos
-                    </div>
-                  ) : (
-                    <div className="rounded-md border border-border divide-y divide-border overflow-hidden">
-                      {attachments.map((f, i) => (
-                        <div key={i} className="flex items-center gap-3 px-3 py-2.5 bg-background hover:bg-muted/40 transition-colors">
-                          <div className="w-7 h-7 rounded bg-red-50 border border-red-200 flex items-center justify-center shrink-0">
-                            <FileText className="w-3.5 h-3.5 text-red-600" />
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <p className="text-[12.5px] font-semibold text-foreground truncate">{f.name}</p>
-                            <p className="text-[10.5px] text-muted-foreground tabular-nums">PDF · {f.size}</p>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-7 px-2 text-[11px] gap-1"
-                              onClick={() => toast({ title: "Pré-visualização", description: f.name })}
-                            >
-                              <Eye className="w-3 h-3" /> Ver
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-7 px-2 text-[11px] gap-1"
-                              onClick={() => toast({ title: "Download iniciado", description: f.name })}
-                            >
-                              <Download className="w-3 h-3" /> Descarregar
-                            </Button>
-                          </div>
-
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              );
-            })()}
           </div>
 
           {/* RIGHT — Dados */}
@@ -320,6 +309,13 @@ export default function FinancasAnuncioDetail() {
 
 
   );
+}
+
+function anexoIcon(t: "pdf" | "doc" | "image" | "sheet") {
+  if (t === "image") return { Icon: FileImage, cls: "bg-violet-50 border-violet-200 text-violet-600" };
+  if (t === "sheet") return { Icon: FileSpreadsheet, cls: "bg-emerald-50 border-emerald-200 text-emerald-600" };
+  if (t === "doc")   return { Icon: FileText, cls: "bg-sky-50 border-sky-200 text-sky-600" };
+  return { Icon: FileText, cls: "bg-red-50 border-red-200 text-red-600" };
 }
 
 function MetaCell({ icon, label, value }: { icon: React.ReactNode; label: string; value: React.ReactNode }) {
