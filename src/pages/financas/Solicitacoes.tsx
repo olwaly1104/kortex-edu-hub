@@ -404,41 +404,227 @@ export default function FinancasSolicitacoes() {
         )}
       </Card>
 
-      {/* New Request Dialog */}
+      {/* ─── Nova Solicitação — Wizard ─── */}
       <Dialog open={showNewDialog} onOpenChange={setShowNewDialog}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2"><Send className="w-5 h-5 text-primary" /> Nova Solicitação</DialogTitle>
-          </DialogHeader>
-          <Separator />
-          <div className="space-y-4 py-2">
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Categoria</label>
-              <Select value={newType} onValueChange={v => setNewType(v as FinType)}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {(Object.keys(finTypeMeta) as FinType[]).map(k => <SelectItem key={k} value={k}>{finTypeMeta[k].label}</SelectItem>)}
-                </SelectContent>
-              </Select>
+        <DialogContent className="max-w-[640px] p-0 gap-0 overflow-hidden">
+          {/* Header */}
+          <div className="px-6 pt-5 pb-4 border-b border-border bg-gradient-to-br from-primary/[0.06] via-background to-background">
+            <div className="flex items-start justify-between gap-4">
+              <div className="min-w-0">
+                <DialogTitle className="text-[15px] font-semibold flex items-center gap-2 leading-tight">
+                  <Send className="w-4 h-4 text-primary" /> Nova Solicitação Financeira
+                </DialogTitle>
+                <p className="text-[11.5px] text-muted-foreground mt-1">
+                  {wizStep === 1 && "Escolha a categoria — o destinatário é atribuído automaticamente."}
+                  {wizStep === 2 && "Descreva o pedido com clareza e anexe documentos comprovativos."}
+                  {wizStep === 3 && "Reveja os detalhes antes de submeter o pedido."}
+                </p>
+              </div>
+              <span className="font-mono text-[10.5px] tabular-nums font-semibold text-foreground bg-background border border-border px-2 py-0.5 rounded-md shrink-0">
+                {previewRef}
+              </span>
             </div>
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Assunto</label>
-              <Input placeholder="Ex: Reforço orçamental Q2" value={newTitle} onChange={e => setNewTitle(e.target.value)} />
-            </div>
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Destinatário</label>
-              <Input placeholder="Ex: Magnífico Reitor" value={newDest} onChange={e => setNewDest(e.target.value)} />
-            </div>
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Justificação</label>
-              <Textarea rows={3} placeholder="Descreva o motivo do pedido..." value={newDesc} onChange={e => setNewDesc(e.target.value)} />
-            </div>
+
+            {/* Stepper */}
+            <ol className="mt-4 flex items-center gap-2">
+              {([
+                { n: 1 as const, label: "Categoria" },
+                { n: 2 as const, label: "Detalhes" },
+                { n: 3 as const, label: "Revisão" },
+              ]).map((s, i, arr) => {
+                const done = wizStep > s.n;
+                const active = wizStep === s.n;
+                return (
+                  <li key={s.n} className="flex items-center gap-2 flex-1">
+                    <button
+                      type="button"
+                      disabled={s.n > wizStep}
+                      onClick={() => setWizStep(s.n)}
+                      className={cn(
+                        "flex items-center gap-1.5 text-[11px] font-semibold transition-colors",
+                        active ? "text-primary" : done ? "text-foreground" : "text-muted-foreground/60",
+                        s.n <= wizStep ? "cursor-pointer" : "cursor-not-allowed"
+                      )}
+                    >
+                      <span className={cn(
+                        "w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold tabular-nums shrink-0",
+                        active ? "bg-primary text-primary-foreground ring-4 ring-primary/15" :
+                        done   ? "bg-emerald-500 text-white" :
+                                 "bg-muted text-muted-foreground"
+                      )}>
+                        {done ? <Check className="w-3 h-3" strokeWidth={3} /> : s.n}
+                      </span>
+                      {s.label}
+                    </button>
+                    {i < arr.length - 1 && <span className={cn("h-px flex-1", done ? "bg-emerald-500/50" : "bg-border")} />}
+                  </li>
+                );
+              })}
+            </ol>
           </div>
-          <Separator />
-          <DialogFooter className="gap-2 sm:gap-2">
-            <DialogClose asChild><Button variant="outline">Cancelar</Button></DialogClose>
-            <Button onClick={handleNewSubmit} disabled={!newTitle.trim()} className="gap-1.5"><Send className="w-4 h-4" /> Submeter</Button>
-          </DialogFooter>
+
+          {/* Body */}
+          <div className="px-6 py-5 max-h-[55vh] overflow-y-auto">
+            {/* STEP 1 — Categoria */}
+            {wizStep === 1 && (
+              <div className="grid grid-cols-2 gap-2.5">
+                {(Object.keys(finTypeMeta) as FinType[]).map(k => {
+                  const m = finTypeMeta[k];
+                  const r = ROUTING[k];
+                  const selected = newType === k;
+                  return (
+                    <button
+                      key={k}
+                      type="button"
+                      onClick={() => { setNewType(k); }}
+                      className={cn(
+                        "text-left rounded-lg border p-3 transition-all hover:shadow-sm",
+                        selected ? "border-primary bg-primary/[0.04] ring-2 ring-primary/15" : "border-border bg-background hover:border-primary/40"
+                      )}
+                    >
+                      <div className="flex items-start gap-2.5">
+                        <div className={cn("w-8 h-8 rounded-md border flex items-center justify-center shrink-0", m.cls)}>
+                          <m.icon className="w-4 h-4" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center justify-between gap-1">
+                            <p className="text-[13px] font-semibold text-foreground leading-tight">{m.label}</p>
+                            {selected && <Check className="w-3.5 h-3.5 text-primary shrink-0" strokeWidth={3} />}
+                          </div>
+                          <p className="text-[10.5px] text-muted-foreground mt-1 leading-snug line-clamp-2">{r.description}</p>
+                          <p className="text-[10px] text-muted-foreground/80 mt-1.5 flex items-center gap-1">
+                            <ArrowRight className="w-2.5 h-2.5" />
+                            <span className="font-medium text-foreground/80 truncate">{r.destinatario}</span>
+                          </p>
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* STEP 2 — Detalhes */}
+            {wizStep === 2 && newType && (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2.5 px-3 py-2 rounded-md border border-border bg-muted/30">
+                  <div className={cn("w-7 h-7 rounded-md border flex items-center justify-center shrink-0", finTypeMeta[newType].cls)}>
+                    {(() => { const I = finTypeMeta[newType].icon; return <I className="w-3.5 h-3.5" />; })()}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[12px] font-semibold text-foreground leading-tight">{finTypeMeta[newType].label}</p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">Destinatário: <span className="font-medium text-foreground/80">{ROUTING[newType].destinatario}</span></p>
+                  </div>
+                  <button type="button" onClick={() => setWizStep(1)} className="text-[10.5px] text-primary hover:underline font-medium shrink-0">Alterar</button>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Assunto <span className="text-destructive">*</span></label>
+                  <Input placeholder="Ex: Reforço orçamental Q2 — Departamento Financeiro" value={newTitle} onChange={e => setNewTitle(e.target.value)} className="h-9 text-[13px]" />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  {ROUTING[newType].needsValor && (
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Valor (Kz)</label>
+                      <Input placeholder="0" value={newValor} onChange={e => setNewValor(e.target.value.replace(/[^\d]/g, ""))} className="h-9 text-[13px] tabular-nums font-mono" />
+                    </div>
+                  )}
+                  <div className={cn("space-y-1.5", !ROUTING[newType].needsValor && "col-span-2")}>
+                    <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Prazo pretendido</label>
+                    <Input type="date" value={newPrazo} onChange={e => setNewPrazo(e.target.value)} className="h-9 text-[13px]" />
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Justificação <span className="text-destructive">*</span></label>
+                  <Textarea rows={4} placeholder="Descreva o motivo do pedido, contexto e impacto esperado…" value={newDesc} onChange={e => setNewDesc(e.target.value)} className="text-[13px] resize-none" />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Anexos</label>
+                  <label className="flex flex-col items-center justify-center gap-1.5 rounded-lg border-2 border-dashed border-border hover:border-primary/50 hover:bg-primary/[0.02] transition-colors cursor-pointer py-5 px-4">
+                    <Paperclip className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-[11.5px] text-muted-foreground"><span className="text-primary font-semibold">Carregar ficheiros</span> · PDF, imagens ou folhas (máx 10MB)</span>
+                    <input type="file" multiple className="sr-only" onChange={e => addFiles(e.target.files)} />
+                  </label>
+                  {newFiles.length > 0 && (
+                    <ul className="mt-2 space-y-1">
+                      {newFiles.map((f, i) => (
+                        <li key={i} className="flex items-center gap-2 px-2.5 py-1.5 rounded-md border border-border bg-background">
+                          <FileText className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                          <span className="text-[12px] font-medium text-foreground truncate flex-1">{f.name}</span>
+                          <span className="text-[10px] text-muted-foreground tabular-nums">{f.size}</span>
+                          <button type="button" onClick={() => setNewFiles(p => p.filter((_, j) => j !== i))} className="w-5 h-5 rounded inline-flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors">
+                            <Trash2 className="w-3 h-3" />
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* STEP 3 — Revisão */}
+            {wizStep === 3 && newType && (
+              <div className="space-y-3">
+                <div className="rounded-lg border border-border bg-background overflow-hidden">
+                  <div className="px-4 py-3 border-b border-border bg-muted/20 flex items-center gap-2">
+                    <Badge variant="outline" className={cn("text-[10px] gap-1 px-2 py-0.5", finTypeMeta[newType].cls)}>
+                      {(() => { const I = finTypeMeta[newType].icon; return <I className="w-2.5 h-2.5" />; })()}
+                      {finTypeMeta[newType].label}
+                    </Badge>
+                    <span className="text-[10.5px] text-muted-foreground font-mono ml-auto">{previewRef}</span>
+                  </div>
+                  <div className="p-4 space-y-3">
+                    <div>
+                      <p className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground mb-1">Assunto</p>
+                      <p className="text-[14px] font-semibold text-foreground leading-tight">{newTitle || "—"}</p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3 pt-2 border-t border-border">
+                      <ReviewCell label="Requerente" value="Dr. Manuel Sousa" sub="Direcção Financeira" />
+                      <ReviewCell label="Destinatário" value={ROUTING[newType].destinatario} sub="Atribuição automática" />
+                      <ReviewCell label="Submetido" value={new Date().toLocaleDateString("pt-PT", { day: "2-digit", month: "long", year: "numeric" })} />
+                      <ReviewCell label="Prazo" value={fmtPrazo(newPrazo)} />
+                      {ROUTING[newType].needsValor && <ReviewCell label="Valor" value={fmtKz(newValor)} mono />}
+                      <ReviewCell label="Anexos" value={`${newFiles.length} ficheiro${newFiles.length === 1 ? "" : "s"}`} />
+                    </div>
+                    <div className="pt-2 border-t border-border">
+                      <p className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground mb-1">Justificação</p>
+                      <p className="text-[12.5px] text-foreground/85 leading-relaxed whitespace-pre-line">{newDesc || "—"}</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2 px-3 py-2 rounded-md border border-amber-200 bg-amber-50/50 text-[11px] text-amber-900">
+                  <AlertTriangle className="w-3.5 h-3.5 mt-0.5 shrink-0" />
+                  <span>Ao submeter, o pedido será enviado para <span className="font-semibold">{ROUTING[newType].destinatario}</span> e ficará pendente de aprovação.</span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Footer */}
+          <div className="px-6 py-3 border-t border-border bg-muted/15 flex items-center justify-between gap-2">
+            <Button variant="ghost" size="sm" onClick={() => wizStep === 1 ? setShowNewDialog(false) : setWizStep((wizStep - 1) as 1 | 2 | 3)} className="h-8 text-[12px] gap-1">
+              {wizStep === 1 ? <X className="w-3.5 h-3.5" /> : <ChevronLeft className="w-3.5 h-3.5" />}
+              {wizStep === 1 ? "Cancelar" : "Voltar"}
+            </Button>
+            {wizStep < 3 ? (
+              <Button
+                size="sm"
+                onClick={() => setWizStep((wizStep + 1) as 1 | 2 | 3)}
+                disabled={wizStep === 1 ? !newType : (!newTitle.trim() || !newDesc.trim())}
+                className="h-8 text-[12px] gap-1"
+              >
+                Continuar <ChevronRight className="w-3.5 h-3.5" />
+              </Button>
+            ) : (
+              <Button size="sm" onClick={handleNewSubmit} className="h-8 text-[12px] gap-1 bg-primary hover:bg-primary/90">
+                <Send className="w-3.5 h-3.5" /> Submeter solicitação
+              </Button>
+            )}
+          </div>
         </DialogContent>
       </Dialog>
     </div>
