@@ -49,14 +49,9 @@ export default function FinancasAnuncioDetail() {
 
   return (
     <div className="p-6 lg:p-8 space-y-5 animate-fade-in max-w-5xl">
-      {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-[12px] text-muted-foreground min-w-0">
-        <Link to="/financas/anuncios" className="hover:text-foreground flex items-center gap-1 shrink-0">
-          <ArrowLeft className="w-3.5 h-3.5" /> Anúncios
-        </Link>
-        <ChevronRight className="w-3 h-3 shrink-0" />
-        <span className="text-foreground font-medium truncate">{ann.title}</span>
-      </div>
+      <Link to="/financas/anuncios" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
+        <ArrowLeft className="w-4 h-4" /> Voltar a Anúncios
+      </Link>
 
       {/* Main document card */}
       <div className="rounded-lg border border-border bg-card overflow-hidden">
