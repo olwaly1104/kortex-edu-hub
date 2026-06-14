@@ -61,9 +61,23 @@ export default function FinancasSolicitacaoDetail() {
 
   const anexos = selected.anexos ?? [];
 
-  type Step = { label: string; data?: string; actor?: string; nota?: string; aside?: string; anexos?: typeof anexos; tone: "submitted" | "accepted" | "rejected" | "executed" | "pending" | "scheduled" };
+  type Step = { label: string; data?: string; actor?: string; nota?: string; aside?: string; previsao?: string; anexos?: typeof anexos; tone: "submitted" | "accepted" | "rejected" | "executed" | "pending" | "scheduled" };
   const steps: Step[] = [];
 
+  const decisionActor = isRecebida ? "Direcção Financeira" : counterpart;
+  const isRejected = selected.status === "rejeitado";
+  const isExecucao = selected.status === "em_execucao" || selected.status === "executada";
+  const isExecutada = selected.status === "executada";
+
+  // Forecast helpers
+  const baseDue = selected.dueDate ? new Date(selected.dueDate) : null;
+  const addDays = (d: Date, n: number) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
+  const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
+  const decisionForecast = baseDue ?? addDays(hoje, 5);
+  const execStartForecast = addDays(decisionForecast, 1);
+  const execEndForecast = addDays(decisionForecast, 5);
+
+  // 1. Submetida
   const submetida = selected.historico.find(h => h.accao.toLowerCase().includes("submetida"));
   steps.push({
     label: "Solicitação submetida",
@@ -72,32 +86,60 @@ export default function FinancasSolicitacaoDetail() {
     tone: "submitted",
   });
 
-  if (selected.status === "rejeitado") {
+  // 2. Decisão (aprovada / rejeitada)
+  if (isRejected) {
     const rej = selected.historico.slice().reverse().find(h => h.accao.toLowerCase().includes("rejeit"));
-    steps.push({ label: "Solicitação rejeitada", data: rej?.data, actor: rej?.actor ?? "Direcção Financeira", nota: rej?.nota, anexos: rej?.anexos, tone: "rejected" });
-  } else if (selected.status === "em_execucao" || selected.status === "executada") {
+    steps.push({ label: "Solicitação rejeitada", data: rej?.data, actor: rej?.actor ?? decisionActor, nota: rej?.nota, anexos: rej?.anexos, tone: "rejected" });
+  } else if (isExecucao) {
     const ap = selected.historico.slice().reverse().find(h => h.accao.toLowerCase().includes("aprov"));
-    steps.push({ label: "Em execução", data: ap?.data, actor: ap?.actor ?? "Direcção Financeira", nota: ap?.nota, anexos: ap?.anexos, tone: "accepted" });
-    if (selected.status === "executada") {
-      const ex = selected.historico.slice().reverse().find(h => h.accao.toLowerCase().includes("execut"));
-      steps.push({ label: "Solicitação executada", data: ex?.data, actor: ex?.actor ?? "Direcção Financeira", nota: ex?.nota, anexos: ex?.anexos, tone: "executed" });
-    }
-  } else if (selected.dueDate) {
-    const base = new Date(selected.dueDate);
-    const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
-    const diff = Math.ceil((base.getTime() - hoje.getTime()) / 86400000);
+    steps.push({ label: "Solicitação aprovada", data: ap?.data, actor: ap?.actor ?? decisionActor, nota: ap?.nota, anexos: ap?.anexos, tone: "accepted" });
+  } else {
+    const diff = Math.ceil((decisionForecast.getTime() - hoje.getTime()) / 86400000);
     const overdue = diff < 0;
     const aside = overdue
       ? `${Math.abs(diff)} ${Math.abs(diff) === 1 ? "dia" : "dias"} em atraso`
       : diff === 0 ? "Prazo termina hoje" : `Faltam ${diff} ${diff === 1 ? "dia" : "dias"}`;
     steps.push({
-      label: `Aguarda decisão · prevista ${fmt(base)}`,
-      actor: isRecebida ? "Direcção Financeira" : counterpart,
-      aside, tone: overdue ? "rejected" : "scheduled",
+      label: "Aguarda decisão",
+      actor: decisionActor,
+      previsao: `Previsão · ${fmt(decisionForecast)}`,
+      aside,
+      tone: overdue ? "rejected" : "scheduled",
     });
-  } else {
-    steps.push({ label: "Aguarda decisão", actor: isRecebida ? "Direcção Financeira" : counterpart, tone: "scheduled" });
   }
+
+  // 3 & 4. Execução / Concluída — skip if rejected
+  if (!isRejected) {
+    if (isExecucao) {
+      // mid-step: execução in progress
+      if (!isExecutada) {
+        steps.push({
+          label: "Em execução",
+          actor: "Direcção Financeira",
+          previsao: `Conclusão prevista · ${fmt(execEndForecast)}`,
+          tone: "scheduled",
+        });
+      }
+      if (isExecutada) {
+        const ex = selected.historico.slice().reverse().find(h => h.accao.toLowerCase().includes("execut"));
+        steps.push({ label: "Solicitação executada", data: ex?.data, actor: ex?.actor ?? "Direcção Financeira", nota: ex?.nota, anexos: ex?.anexos, tone: "executed" });
+      }
+    } else {
+      steps.push({
+        label: "Em execução",
+        actor: "Direcção Financeira",
+        previsao: `Previsão · ${fmt(execStartForecast)}`,
+        tone: "pending",
+      });
+      steps.push({
+        label: "Solicitação executada",
+        actor: "Direcção Financeira",
+        previsao: `Previsão · ${fmt(execEndForecast)}`,
+        tone: "pending",
+      });
+    }
+  }
+
 
   const nodeCls: Record<Step["tone"], string> = {
     submitted: "bg-emerald-500 text-white ring-4 ring-emerald-500/15",
