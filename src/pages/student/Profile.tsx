@@ -1,7 +1,7 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { User, Mail, BookOpen, Calendar, Camera, Bell, Moon, Globe, Lock, Shield, Eye } from "lucide-react";
+import { User, Mail, BookOpen, Calendar, Camera, Bell, Moon, Globe, Lock, Shield, Eye, CheckCircle } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { useState } from "react";
 import placeholderStudent from "@/assets/placeholder-student.jpg";
@@ -40,11 +40,12 @@ export default function StudentProfile() {
             {[
               { icon: Mail, label: "Email", value: user?.email },
               { icon: User, label: "Nome Completo", value: user?.name },
-              { icon: BookOpen, label: "Curso", value: user?.course },
-              { icon: Calendar, label: "Ano", value: `${user?.year}º Ano` },
+              ...(user?.course ? [{ icon: BookOpen, label: "Curso", value: user.course }] : []),
+              ...(user?.year ? [{ icon: Calendar, label: "Ano", value: `${user.year}º Ano` }] : []),
+              ...(user?.presence ? [{ icon: CheckCircle, label: "Presença", value: user.presence, color: "text-emerald-600" }] : []),
             ].map(item => (
               <div key={item.label} className="flex items-center gap-3 py-3 border-b last:border-0">
-                <item.icon className="w-4 h-4 text-muted-foreground" />
+                <item.icon className={`w-4 h-4 ${"color" in item && item.color ? item.color : "text-muted-foreground"}`} />
                 <span className="text-sm text-muted-foreground w-32">{item.label}</span>
                 <span className="text-sm font-medium text-foreground">{item.value}</span>
               </div>

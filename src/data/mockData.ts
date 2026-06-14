@@ -8,6 +8,7 @@ export interface User {
   avatar?: string;
   course?: string;
   year?: number;
+  presence?: string;
 }
 
 export interface Discipline {
@@ -213,6 +214,7 @@ export const currentFinancas: User = {
   name: "Dr. Manuel Sousa",
   email: "financas@upra.kor",
   role: "financas",
+  presence: "96%",
 };
 
 export const currentGap: User = {
