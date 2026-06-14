@@ -21,9 +21,10 @@ export default function FinancasSolicitacaoDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const selected = finSolicitacoes.find(s => s.id === id);
+  const baseSelected = finSolicitacoes.find(s => s.id === id);
+  const [statusOverride, setStatusOverride] = useState<typeof baseSelected extends undefined ? never : null | "em_execucao" | "executada" | "rejeitado">(null);
 
-  if (!selected) {
+  if (!baseSelected) {
     return (
       <div className="p-8 text-center">
         <p className="text-sm text-muted-foreground">Solicitação não encontrada.</p>
@@ -31,6 +32,8 @@ export default function FinancasSolicitacaoDetail() {
       </div>
     );
   }
+
+  const selected = { ...baseSelected, status: (statusOverride ?? baseSelected.status) as typeof baseSelected.status };
 
   const st = finStatusMeta[selected.status];
   const tm = finTypeMeta[selected.type];
