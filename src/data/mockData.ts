@@ -1,4 +1,4 @@
-export type UserRole = "professor" | "student" | "coordenador_curso" | "decano" | "reitor" | "secretaria" | "financas" | "gap" | "inscricoes" | "academica2";
+export type UserRole = "professor" | "student" | "coordenador_curso" | "decano" | "reitor" | "secretaria" | "financas" | "gap" | "inscricoes" | "academica2" | "admin";
 
 export interface User {
   id: string;
