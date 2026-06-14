@@ -390,11 +390,32 @@ export default function ConfigurarReceitas() {
     toast({ title: "Receita removida", description: confirmDelReceita.nome });
     setConfirmDelReceita(null);
   };
-  const commitInlineReceita = () => {
-    if (!inlineEditReceita) return;
-    const v = Number(inlineEditReceita.valor) || 0;
-    setReceitas(rs => rs.map(r => r.id === inlineEditReceita.id ? { ...r, valor: v } : r));
-    setInlineEditReceita(null);
+  const commitInlinePlan = () => {
+    if (!inlineEditPlan) return;
+    const v = Number(inlineEditPlan.valor) || 0;
+    setReceitas(rs => rs.map(r => {
+      if (r.id !== inlineEditPlan.rowId || !r.plans) return r;
+      const plans = r.plans.map(p => p.months === inlineEditPlan.months ? { ...p, valor: v } : p);
+      return { ...r, plans, valor: plans[0].valor };
+    }));
+    setInlineEditPlan(null);
+  };
+  const addPlanToRow = (rowId: string, months: number) => {
+    setReceitas(rs => rs.map(r => {
+      if (r.id !== rowId) return r;
+      const plans = r.plans ? [...r.plans] : [];
+      if (plans.some(p => p.months === months)) return r;
+      plans.push({ months, valor: 0 });
+      plans.sort((a, b) => a.months - b.months);
+      return { ...r, plans, valor: plans[0].valor };
+    }));
+  };
+  const removePlanFromRow = (rowId: string, months: number) => {
+    setReceitas(rs => rs.map(r => {
+      if (r.id !== rowId || !r.plans || r.plans.length <= 1) return r;
+      const plans = r.plans.filter(p => p.months !== months);
+      return { ...r, plans, valor: plans[0].valor };
+    }));
   };
 
   /* ── DESPESAS ops ── */
