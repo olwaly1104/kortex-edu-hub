@@ -95,19 +95,11 @@ export default function GapDashboard() {
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       {/* Header */}
-      <div className="flex items-end justify-between gap-4 flex-wrap">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground tracking-tight flex items-center gap-2">
-            <BarChart3 className="w-6 h-6 text-primary" /> Dashboard GAP
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1 max-w-2xl">
-            Gabinete de Apoio ao Discente — monitorização do pipeline de solicitações encaminhadas e acompanhamento individual.
-          </p>
-        </div>
-        <Badge variant="outline" className="text-[11px] font-semibold bg-primary/5 text-primary border-primary/20 px-3 py-1.5">
-          Ano Letivo 2024/2025
-        </Badge>
-      </div>
+      <FinHeader
+        title="Dashboard GAP"
+        subtitle="Gabinete de Apoio ao Discente — monitorização do pipeline de solicitações encaminhadas e acompanhamento individual."
+        icon={<BarChart3 className="w-6 h-6 text-primary" />}
+      />
 
       {/* Single consolidated KPI row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
