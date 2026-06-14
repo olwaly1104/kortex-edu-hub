@@ -546,12 +546,26 @@ export default function FinancasSolicitacaoDetail() {
                 <DialogDescription className="sr-only">{pm.desc}</DialogDescription>
               </div>
 
+              {/* Data + Requerente */}
+              <div className="px-5 pt-3 pb-2 border-b border-border bg-muted/10 flex items-center gap-4">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">Data</span>
+                  <span className="text-[12px] font-semibold text-foreground tabular-nums">{fmt(dSub)}</span>
+                </div>
+                <span className="w-px h-3 bg-border" />
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground shrink-0">Requerente</span>
+                  <span className="text-[12px] font-semibold text-foreground truncate">{selected.requester}</span>
+                  <span className="text-[10px] text-muted-foreground truncate">{counterpartRole}</span>
+                </div>
+              </div>
+
               {/* Estado transition banner */}
               {(() => {
                 const fromMeta = finStatusMeta[selected.status];
                 const toMeta = finStatusMeta[pendingAction!];
                 return (
-                  <div className="px-5 py-3 border-b border-border bg-muted/15">
+                  <div className="px-5 py-2.5 border-b border-border bg-muted/15">
                     <p className="text-[10px] uppercase tracking-[0.1em] font-semibold text-muted-foreground mb-1.5">
                       Transição de estado
                     </p>
@@ -566,30 +580,18 @@ export default function FinancasSolicitacaoDetail() {
                         {toMeta.label}
                       </Badge>
                     </div>
-                    <p className="text-[11.5px] text-foreground/75 leading-relaxed mt-2">
-                      Registo histórico. Requerente e responsáveis serão notificados.
+                    <p className="text-[11px] text-foreground/70 leading-snug mt-1.5">
+                      Ação será registada. Requerente e responsáveis serão notificados.
                     </p>
                   </div>
                 );
               })()}
 
               {/* Body */}
-              <div className="px-5 py-4 space-y-4">
-                {/* Data + Requerente */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="rounded-md border border-border bg-muted/10 px-3 py-2">
-                    <p className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground mb-0.5">Data</p>
-                    <p className="text-[13px] font-semibold text-foreground">{fmt(dSub)}</p>
-                  </div>
-                  <div className="rounded-md border border-border bg-muted/10 px-3 py-2">
-                    <p className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground mb-0.5">Requerente</p>
-                    <p className="text-[13px] font-semibold text-foreground truncate">{selected.requester}</p>
-                    <p className="text-[10px] text-muted-foreground truncate">{counterpartRole}</p>
-                  </div>
-                </div>
+              <div className="px-5 py-3 space-y-3">
 
                 {/* Parecer / Notas */}
-                <section className="space-y-1.5">
+                <section className="space-y-1">
                   <div className="flex items-baseline justify-between">
                     <Label htmlFor="action-notes" className="text-[11px] uppercase tracking-[0.08em] font-semibold text-foreground">
                       Parecer / Notas
@@ -601,13 +603,13 @@ export default function FinancasSolicitacaoDetail() {
                     value={actionNotes}
                     onChange={(e) => setActionNotes(e.target.value)}
                     placeholder={pm.notesPlaceholder}
-                    rows={4}
+                    rows={3}
                     className="resize-none text-sm leading-relaxed"
                   />
                 </section>
 
                 {/* Anexos */}
-                <section className="space-y-1.5">
+                <section className="space-y-1">
                   <div className="flex items-baseline justify-between">
                     <Label className="text-[11px] uppercase tracking-[0.08em] font-semibold text-foreground">
                       Anexos e evidências
@@ -617,7 +619,7 @@ export default function FinancasSolicitacaoDetail() {
                     </span>
                   </div>
 
-                  <label className="group flex items-center gap-2.5 rounded-md border border-dashed border-border bg-muted/10 hover:border-primary/40 hover:bg-primary/[0.03] transition-colors cursor-pointer px-3 py-2">
+                  <label className="group flex items-center gap-2 rounded-md border border-dashed border-border bg-muted/10 hover:border-primary/40 hover:bg-primary/[0.03] transition-colors cursor-pointer px-3 py-1.5">
                     <span className="w-5 h-5 rounded-full border border-border bg-background flex items-center justify-center group-hover:border-primary/50 group-hover:text-primary transition-colors shrink-0">
                       <Plus className="w-3 h-3 text-muted-foreground group-hover:text-primary transition-colors" />
                     </span>
@@ -643,7 +645,7 @@ export default function FinancasSolicitacaoDetail() {
                           : isSheet ? "text-emerald-600"
                           : "text-red-600";
                         return (
-                          <li key={i} className="flex items-center gap-2 pl-2 pr-1.5 py-1.5 rounded-md border border-border bg-background hover:bg-muted/20 transition-colors">
+                          <li key={i} className="flex items-center gap-2 pl-2 pr-1.5 py-1 rounded-md border border-border bg-background hover:bg-muted/20 transition-colors">
                             <Ic className={cn("w-3.5 h-3.5 shrink-0", cls)} />
                             <span className="text-[12px] font-medium text-foreground truncate flex-1 leading-tight">{f.name}</span>
                             <span className="text-[10px] text-muted-foreground tabular-nums shrink-0">
@@ -668,7 +670,7 @@ export default function FinancasSolicitacaoDetail() {
                 {(() => {
                   const toMeta = finStatusMeta[pendingAction!];
                   return (
-                    <div className="flex items-start gap-2.5 rounded-md border border-border bg-muted/10 px-3 py-2.5">
+                    <div className="flex items-start gap-2 rounded-md border border-border bg-muted/10 px-3 py-2">
                       <Checkbox
                         id="declaration"
                         checked={declarationChecked}
@@ -684,13 +686,13 @@ export default function FinancasSolicitacaoDetail() {
               </div>
 
               {/* Footer */}
-              <DialogFooter className="px-5 py-3 border-t border-border bg-muted/20 gap-2 sm:gap-2">
+              <DialogFooter className="px-5 py-2.5 border-t border-border bg-muted/20 gap-2 sm:gap-2">
                 <DialogClose asChild>
-                  <Button variant="outline" size="sm" className="h-8 text-[12px]">Cancelar</Button>
+                  <Button variant="outline" size="sm" className="h-7 text-[12px]">Cancelar</Button>
                 </DialogClose>
                 <Button
                   size="sm"
-                  className={cn("h-8 text-[12px] gap-1.5", pm.tone)}
+                  className={cn("h-7 text-[12px] gap-1.5", pm.tone)}
                   onClick={confirmAction}
                   disabled={!actionNotes.trim() || !declarationChecked}
                 >
