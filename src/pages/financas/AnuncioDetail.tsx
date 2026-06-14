@@ -196,11 +196,9 @@ export default function FinancasAnuncioDetail() {
 
             {/* Anexos */}
             {(() => {
-              const attachments = ann.type === "suspensao"
-                ? []
-                : ann.cta === "inscrever"
-                  ? [{ name: "Programa-detalhado.pdf", size: "312 KB" }]
-                  : [];
+              const attachments = ann.cta === "inscrever"
+                ? [{ name: "Programa-detalhado.pdf", size: "312 KB" }]
+                : [];
               return (
                 <div>
                   <h2 className="text-[11px] uppercase tracking-[0.16em] font-semibold text-muted-foreground mb-2 flex items-center gap-1.5">
