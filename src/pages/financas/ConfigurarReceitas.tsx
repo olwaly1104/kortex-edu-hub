@@ -561,19 +561,36 @@ export default function ConfigurarReceitas() {
     if (despesaCatFilter === cat.label) setDespesaCatFilter("todos");
   };
   const addEstado = () => {
-    const v = newEstado.trim();
+    const v = newEstadoLabel.trim();
     if (!v) return;
-    if (estados.includes(v)) { toast({ title: "Estado já existe", variant: "destructive" }); return; }
-    setEstados(es => [...es, v]);
-    setNewEstado("");
+    if (estados.some(e => e.label.toLowerCase() === v.toLowerCase())) {
+      toast({ title: "Estado já existe", variant: "destructive" });
+      return;
+    }
+    setEstados(es => [...es, { id: `est-${Date.now()}`, label: v, color: newEstadoColor }]);
+    setNewEstadoLabel("");
+    setNewEstadoColor(CAT_PALETTE[0].cls);
+    setEstadoDialogOpen(false);
+    toast({ title: "Estado criado", description: v });
   };
-  const removeEstado = (e: string) => {
-    if (despesas.some(d => d.estado === e)) {
+  const saveEditEstado = () => {
+    if (!editingEstado || !editingEstado.label.trim()) return;
+    const v = editingEstado.label.trim();
+    if (estados.some(e => e.id !== editingEstado.id && e.label.toLowerCase() === v.toLowerCase())) {
+      toast({ title: "Estado já existe", variant: "destructive" });
+      return;
+    }
+    setEstados(es => es.map(e => e.id === editingEstado.id ? { ...editingEstado, label: v } : e));
+    setEditingEstado(null);
+    toast({ title: "Estado actualizado" });
+  };
+  const removeEstado = (e: EstadoItem) => {
+    if (despesas.some(d => d.estado === e.label)) {
       toast({ title: "Estado em uso", description: "Remova primeiro as despesas que o usam.", variant: "destructive" });
       return;
     }
-    setEstados(es => es.filter(x => x !== e));
-    if (despesaEstadoFilter === e) setDespesaEstadoFilter("todos");
+    setEstados(es => es.filter(x => x.id !== e.id));
+    if (despesaEstadoFilter === e.label) setDespesaEstadoFilter("todos");
   };
 
   /* ── Responsáveis / Destinatários / Regras de aprovação ops ── */
