@@ -52,8 +52,15 @@ export default function FinancasSolicitacoes() {
     fornecedor:  { destinatario: "Conselho de Gestão",  responsavel: "Conselho de Gestão · Órgão Colegial",          description: "Aprovação de pagamento a fornecedores externos.",     needsValor: true },
     antecipacao: { destinatario: "Magnífico Reitor",    responsavel: "Prof. Dr. António Mendes · Reitor",            description: "Adiantamento de verba para missão ou despesa futura.", needsValor: true },
     verba:       { destinatario: "Conselho de Gestão",  responsavel: "Conselho de Gestão · Órgão Colegial",          description: "Solicitação de verba extraordinária não orçamentada.", needsValor: true },
-    outro:       { destinatario: "Secretaria Geral",    responsavel: "Sec. Geral · Apoio Institucional",             description: "Outras solicitações financeiras institucionais.",     needsValor: false },
+    ferias:      { destinatario: "Recursos Humanos",    responsavel: "Sra. Isabel Tavares · Direcção de RH",         description: "Marcação ou alteração de período de férias.",          needsValor: false },
+    licenca:     { destinatario: "Recursos Humanos",    responsavel: "Sra. Isabel Tavares · Direcção de RH",         description: "Licença médica, parental ou justificação de ausência.", needsValor: false },
+    declaracao:  { destinatario: "Secretaria Geral",    responsavel: "Sec. Geral · Apoio Institucional",             description: "Emissão de declarações, certidões ou comprovativos.",  needsValor: false },
+    material:    { destinatario: "Logística & Compras", responsavel: "Sr. Paulo Neves · Logística",                  description: "Requisição de material de escritório ou equipamento.", needsValor: true },
+    formacao:    { destinatario: "Recursos Humanos",    responsavel: "Sra. Isabel Tavares · Direcção de RH",         description: "Pedido de inscrição em formações ou conferências.",    needsValor: true },
+    ti:          { destinatario: "Departamento TI",     responsavel: "Eng. Rui Cabral · Direcção de TI",             description: "Acessos, equipamentos ou suporte informático.",        needsValor: false },
+    outro:       { destinatario: "Secretaria Geral",    responsavel: "Sec. Geral · Apoio Institucional",             description: "Outras solicitações institucionais não classificadas.", needsValor: false },
   };
+
 
   const previewRef = useMemo(() => {
     const n = 412 + finSolicitacoes.filter(s => s.direction === "enviada").length + 1;
@@ -179,12 +186,13 @@ export default function FinancasSolicitacoes() {
             </span>
             <div>
               <h1 className="text-xl font-bold text-foreground flex items-center gap-2 leading-tight">
-                <CheckSquare className="w-5 h-5 text-primary" /> Solicitações Financeiras
+                <CheckSquare className="w-5 h-5 text-primary" /> Minhas Solicitações
               </h1>
               <p className="text-sm text-muted-foreground mt-0.5">
-                Caixa de entrada de pedidos financeiros — analisar e acompanhar.
+                Pedidos institucionais — financeiros, pessoais e administrativos.
               </p>
             </div>
+
           </div>
           <div className="flex flex-col items-end gap-2 shrink-0">
             <div className="inline-flex items-stretch rounded-md border border-border bg-card overflow-hidden text-[11px] uppercase tracking-wider font-medium shadow-sm">
@@ -409,21 +417,17 @@ export default function FinancasSolicitacoes() {
         <DialogContent className="max-w-[640px] p-0 gap-0 overflow-hidden">
           {/* Header */}
           <div className="px-6 pt-5 pb-4 border-b border-border bg-gradient-to-br from-primary/[0.06] via-background to-background">
-            <div className="flex items-start justify-between gap-4">
-              <div className="min-w-0">
-                <DialogTitle className="text-[15px] font-semibold flex items-center gap-2 leading-tight">
-                  <Send className="w-4 h-4 text-primary" /> Nova Solicitação Financeira
-                </DialogTitle>
-                <p className="text-[11.5px] text-muted-foreground mt-1">
-                  {wizStep === 1 && "Escolha a categoria — o destinatário é atribuído automaticamente."}
-                  {wizStep === 2 && "Descreva o pedido com clareza e anexe documentos comprovativos."}
-                  {wizStep === 3 && "Reveja os detalhes antes de submeter o pedido."}
-                </p>
-              </div>
-              <span className="font-mono text-[10.5px] tabular-nums font-semibold text-foreground bg-background border border-border px-2 py-0.5 rounded-md shrink-0">
-                {previewRef}
-              </span>
+            <div className="min-w-0">
+              <DialogTitle className="text-[15px] font-semibold flex items-center gap-2 leading-tight">
+                <Send className="w-4 h-4 text-primary" /> Nova Solicitação
+              </DialogTitle>
+              <p className="text-[11.5px] text-muted-foreground mt-1">
+                {wizStep === 1 && "Escolha a categoria — o destinatário é atribuído automaticamente."}
+                {wizStep === 2 && "Descreva o pedido com clareza e anexe documentos comprovativos."}
+                {wizStep === 3 && "Reveja os detalhes antes de submeter o pedido."}
+              </p>
             </div>
+
 
             {/* Stepper */}
             <ol className="mt-4 flex items-center gap-2">

@@ -1,13 +1,18 @@
 import {
   Receipt, TrendingUp, FileText, Wallet, Coins, Sparkles,
-  Clock, CheckCircle2, XCircle, AlertTriangle, BadgeCheck, type LucideIcon,
+  Clock, CheckCircle2, XCircle, AlertTriangle, BadgeCheck,
+  Plane, HeartPulse, Package, GraduationCap, Stamp, Laptop,
+  type LucideIcon,
 } from "lucide-react";
 
 export type FinDirection = "recebida" | "enviada";
 export type FinStatus = "pendente" | "atrasado" | "em_execucao" | "executada" | "rejeitado";
 export type FinType =
   | "reembolso" | "orcamento" | "fornecedor"
-  | "antecipacao" | "verba" | "outro";
+  | "antecipacao" | "verba"
+  | "ferias" | "licenca" | "declaracao" | "material" | "formacao" | "ti"
+  | "outro";
+
 
 export interface FinHistorico {
   data: string;
@@ -181,8 +186,15 @@ export const finTypeMeta: Record<FinType, { label: string; icon: LucideIcon; cls
   fornecedor:  { label: "Fornecedor",  icon: FileText,   cls: "bg-amber-50 text-amber-700 border-amber-200",    dot: "bg-amber-500" },
   antecipacao: { label: "Antecipação", icon: Wallet,     cls: "bg-rose-50 text-rose-700 border-rose-200",       dot: "bg-rose-500" },
   verba:       { label: "Verba",       icon: Coins,      cls: "bg-emerald-50 text-emerald-700 border-emerald-200", dot: "bg-emerald-500" },
+  ferias:      { label: "Férias",      icon: Plane,      cls: "bg-sky-50 text-sky-700 border-sky-200",          dot: "bg-sky-500" },
+  licenca:     { label: "Licença",     icon: HeartPulse, cls: "bg-pink-50 text-pink-700 border-pink-200",       dot: "bg-pink-500" },
+  declaracao:  { label: "Declaração",  icon: Stamp,      cls: "bg-indigo-50 text-indigo-700 border-indigo-200", dot: "bg-indigo-500" },
+  material:    { label: "Material",    icon: Package,    cls: "bg-orange-50 text-orange-700 border-orange-200", dot: "bg-orange-500" },
+  formacao:    { label: "Formação",    icon: GraduationCap, cls: "bg-teal-50 text-teal-700 border-teal-200",    dot: "bg-teal-500" },
+  ti:          { label: "Acesso / TI", icon: Laptop,     cls: "bg-cyan-50 text-cyan-700 border-cyan-200",       dot: "bg-cyan-500" },
   outro:       { label: "Outro",       icon: Sparkles,   cls: "bg-slate-50 text-slate-700 border-slate-200",    dot: "bg-slate-500" },
 };
+
 
 export const finStatusMeta: Record<FinStatus, { label: string; cls: string; dot: string; icon: LucideIcon }> = {
   pendente:  { label: "Pendente",  cls: "bg-amber-50 text-amber-700 border-amber-200",       dot: "bg-amber-500",   icon: Clock },
