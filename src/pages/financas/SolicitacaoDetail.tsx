@@ -230,6 +230,20 @@ export default function FinancasSolicitacaoDetail() {
         <div className="grid md:grid-cols-[280px_1fr] divide-x divide-border border-t border-border">
           {/* LEFT */}
           <aside className="p-5 space-y-5 bg-muted/15">
+            {/* ID + Direção */}
+            <div className="rounded-lg border border-border bg-background p-3 space-y-2">
+              {selected.requesterMatricula && (
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] text-muted-foreground">ID</span>
+                  <span className="text-xs font-mono font-semibold text-foreground">{selected.requesterMatricula}</span>
+                </div>
+              )}
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] text-muted-foreground">Direcção</span>
+                <span className="text-xs font-semibold text-foreground">{isRecebida ? "Direcção Financeira" : "—"}</span>
+              </div>
+            </div>
+
             {/* Aprovar / Rejeitar */}
             {isRecebida && selected.status === "pendente" && (
               <div className="rounded-lg border border-border bg-background p-3 space-y-3">
