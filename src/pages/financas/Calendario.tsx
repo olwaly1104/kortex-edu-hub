@@ -526,7 +526,10 @@ export default function FinancasCalendario() {
                             </div>
                             <div className="flex items-center gap-1">
                               {(() => { const s = EV_STATE_META[eventState(ev)]; return (
-                                <Badge variant="outline" className={cn("text-[9px] h-4 px-1.5", s.cls)}>{s.label}</Badge>
+                                <Badge variant="outline" className={cn("h-5 px-1.5 gap-1 text-[10px] font-medium", s.cls)}>
+                                  <span className={cn("w-1.5 h-1.5 rounded-full", s.dot)} />
+                                  {s.label}
+                                </Badge>
                               ); })()}
                               {ev.obligatory && (
                                 <Badge variant="outline" className="text-[9px] h-4 px-1 bg-red-50 text-red-700 border-red-200">Obrig.</Badge>
