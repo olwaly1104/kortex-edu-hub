@@ -169,15 +169,12 @@ export default function GapAtendimentos() {
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       {/* Header */}
-      <div className="flex items-end justify-between gap-4 flex-wrap">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground tracking-tight">Agendamentos</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Sessões de apoio individual marcadas pelo GAP — psicológico, académico, vocacional e social.
-          </p>
-        </div>
-        <NovoAgendamentoDialog />
-      </div>
+      <FinHeader
+        title="Agendamentos"
+        subtitle="Sessões de apoio individual marcadas pelo GAP — psicológico, académico, vocacional e social."
+        icon={<CalendarIcon className="w-6 h-6 text-primary" />}
+        right={<NovoAgendamentoDialog />}
+      />
 
       {/* KPIs */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
