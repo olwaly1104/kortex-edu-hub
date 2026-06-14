@@ -681,12 +681,13 @@ function RequestCard({ r, onAccept, onDecline, onDetail, onParticipants }: {
   );
 }
 
-function EventRow({ ev, onOpen, compact = false }: { ev: AgendaEvent; onOpen: () => void; compact?: boolean }) {
+function EventRow({ ev, onOpen, compact = false, onParticipants }: { ev: AgendaEvent; onOpen: () => void; compact?: boolean; onParticipants?: () => void }) {
   const m = TYPE_META[ev.type];
   const Icon = m.icon;
   const hasTime = !!ev.startTime;
   return (
-    <button onClick={onOpen} className={cn("w-full text-left flex items-center hover:bg-muted/30 transition-colors group",
+    <div onClick={onOpen} role="button" tabIndex={0}
+      className={cn("w-full text-left flex items-center hover:bg-muted/30 transition-colors group cursor-pointer",
       compact ? "gap-2.5 px-3 py-2.5" : "gap-4 px-4 py-3")}>
       <div className={cn("text-center shrink-0", compact ? "w-10" : "w-14")}>
         {hasTime ? (
@@ -707,7 +708,10 @@ function EventRow({ ev, onOpen, compact = false }: { ev: AgendaEvent; onOpen: ()
         <div className={cn("flex items-center mt-0.5 text-[10px] text-muted-foreground", compact ? "gap-2" : "gap-3 mt-1 text-[11px]")}>
           {ev.location && <span className="flex items-center gap-1 truncate"><MapPin className="w-3 h-3" />{ev.location}</span>}
           {ev.participants && ev.participants.length > 0 && (
-            <span className="flex items-center gap-1"><Users className="w-3 h-3" />{ev.participants.length}{!compact && ` participante${ev.participants.length !== 1 ? "s" : ""}`}</span>
+            <button type="button" onClick={(e) => { e.stopPropagation(); onParticipants?.(); }}
+              className="flex items-center gap-1 hover:text-foreground hover:underline underline-offset-2">
+              <Users className="w-3 h-3" />{ev.participants.length}{!compact && ` participante${ev.participants.length !== 1 ? "s" : ""}`}
+            </button>
           )}
         </div>
       </div>
@@ -717,7 +721,7 @@ function EventRow({ ev, onOpen, compact = false }: { ev: AgendaEvent; onOpen: ()
       {ev.obligatory && !compact && (
         <Badge variant="outline" className="text-[9px] bg-red-50 text-red-700 border-red-200 shrink-0">Obrigatório</Badge>
       )}
-    </button>
+    </div>
   );
 }
 
