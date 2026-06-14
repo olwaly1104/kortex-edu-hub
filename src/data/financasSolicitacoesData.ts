@@ -14,6 +14,7 @@ export interface FinHistorico {
   actor: string;
   accao: string;
   nota?: string;
+  anexos?: FinAnexo[];
 }
 
 export interface FinAnexo {
