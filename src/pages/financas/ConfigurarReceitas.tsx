@@ -279,12 +279,13 @@ export default function ConfigurarReceitas() {
   const [salaryDeptFilter, setSalaryDeptFilter] = useState<string>("todos");
   const [salarySearch, setSalarySearch] = useState("");
   const [editingSalary, setEditingSalary] = useState<Salary | null>(null);
-  const [salaryForm, setSalaryForm] = useState<SalaryConfig>({ baseSalary: 0, deductionRate: 0.14, multas: [] });
+  const [salaryForm, setSalaryForm] = useState<SalaryConfig>({ baseSalary: 0, irtRate: 0.08, ssRate: 0.03, multas: [] });
   const [newMulta, setNewMulta] = useState<{ nome: string; valor: string }>({ nome: "", valor: "" });
   const [confirmDelSalary, setConfirmDelSalary] = useState<Salary | null>(null);
   const [openNewSalary, setOpenNewSalary] = useState(false);
   const [newSalaryForm, setNewSalaryForm] = useState({
-    name: "", employeeId: "", role: "", department: "Administração", grossSalary: 0,
+    name: "", employeeId: "", role: "", department: "Docentes", grossSalary: 0,
+    contractType: "permanente" as "permanente" | "prestador",
   });
 
   /* ── derived ── */
