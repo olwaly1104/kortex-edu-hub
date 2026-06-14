@@ -42,16 +42,21 @@ const TIPOS_RECEITA: TipoReceita[] = [
   "Multa Estudante", "Multa Administrativo", "Multa Docente",
 ];
 
-interface PropinaPlan { months: number; valor: number; }
+interface PropinaPlan { months: number; valor: number; imposto?: number; }
 
 interface ReceitaRow {
   id: string;
   nome: string;
   tipo: TipoReceita;
   escopo: string;
-  valor: number;
+  valor: number;          // valor bruto
+  imposto?: number;       // taxa de imposto (0-1), default 0.14
   plans?: PropinaPlan[];
 }
+
+const DEFAULT_IMPOSTO = 0.14;
+const liquidoOf = (bruto: number, imposto?: number) =>
+  Math.round(bruto * (1 - (imposto ?? DEFAULT_IMPOSTO)));
 
 const ALL_COURSES = reitorFaculties.flatMap(f =>
   f.courses.map(c => ({ id: c.id, code: c.code, name: c.name, facultyId: f.id, facultyName: f.name }))
@@ -262,6 +267,7 @@ export default function ConfigurarReceitas() {
   const [receitaForm, setReceitaForm] = useState<ReceitaRow>({ id: "", nome: "", tipo: "Emolumento", escopo: "geral", valor: 0 });
   const [confirmDelReceita, setConfirmDelReceita] = useState<ReceitaRow | null>(null);
   const [inlineEditPlan, setInlineEditPlan] = useState<{ rowId: string; months: number; valor: string } | null>(null);
+  const [planEdit, setPlanEdit] = useState<{ rowId: string; months: number; valor: string; imposto: string } | null>(null);
 
   /* ── DESPESAS ── */
   const [despesas, setDespesas] = useState<DespesaRow[]>([]);
@@ -382,6 +388,18 @@ export default function ConfigurarReceitas() {
       return { ...r, plans, valor: plans[0].valor };
     }));
     setInlineEditPlan(null);
+  };
+  const commitPlanEdit = () => {
+    if (!planEdit) return;
+    const v = Number(planEdit.valor) || 0;
+    const imp = Math.max(0, Math.min(100, Number(planEdit.imposto) || 0)) / 100;
+    setReceitas(rs => rs.map(r => {
+      if (r.id !== planEdit.rowId || !r.plans) return r;
+      const plans = r.plans.map(p => p.months === planEdit.months ? { ...p, valor: v, imposto: imp } : p);
+      return { ...r, plans, valor: plans[0].valor };
+    }));
+    setPlanEdit(null);
+    toast({ title: "Plano actualizado", description: `${planEdit.months} meses · ${formatCurrency(v)}` });
   };
   const addPlanToRow = (rowId: string, months: number) => {
     setReceitas(rs => rs.map(r => {
@@ -707,39 +725,29 @@ export default function ConfigurarReceitas() {
                             </div>
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                               {plans.map(p => {
-                                const editingInline = inlineEditPlan?.rowId === r.id && inlineEditPlan?.months === p.months;
+                                const liq = liquidoOf(p.valor, p.imposto);
                                 return (
-                                  <div key={p.months}
-                                    className="rounded-md border border-border bg-card px-3 py-2 flex items-center justify-between gap-2 hover:border-primary/40 transition">
-                                    <div className="min-w-0">
-                                      <p className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">Prazo</p>
-                                      <p className="text-xs font-semibold text-foreground">{p.months} meses</p>
+                                  <button key={p.months} type="button"
+                                    onClick={() => setPlanEdit({ rowId: r.id, months: p.months, valor: String(p.valor), imposto: String(((p.imposto ?? DEFAULT_IMPOSTO) * 100).toFixed(1)) })}
+                                    className="rounded-md border border-border bg-card px-3 py-2 hover:border-primary/40 hover:bg-muted/30 transition text-left group/plan">
+                                    <div className="flex items-center justify-between gap-2">
+                                      <div className="min-w-0">
+                                        <p className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">{p.months} meses</p>
+                                        <p className="text-sm font-semibold text-foreground tabular-nums">{formatCurrency(p.valor)}</p>
+                                        <p className="text-[10px] text-muted-foreground tabular-nums">Líquido {formatCurrency(liq)}</p>
+                                      </div>
+                                      {plans.length > 1 && (
+                                        <span
+                                          role="button"
+                                          tabIndex={0}
+                                          className="inline-flex items-center justify-center h-6 w-6 rounded-md text-destructive opacity-0 group-hover/plan:opacity-100 hover:bg-destructive/10 transition cursor-pointer"
+                                          onClick={(e) => { e.stopPropagation(); removePlanFromRow(r.id, p.months); }}
+                                          title="Remover prazo">
+                                          <Trash2 className="w-3 h-3" />
+                                        </span>
+                                      )}
                                     </div>
-                                    {editingInline ? (
-                                      <div className="flex items-center gap-1">
-                                        <Input type="number" autoFocus value={inlineEditPlan!.valor}
-                                          onChange={e => setInlineEditPlan({ ...inlineEditPlan!, valor: e.target.value })}
-                                          onKeyDown={e => { if (e.key === "Enter") commitInlinePlan(); if (e.key === "Escape") setInlineEditPlan(null); }}
-                                          className="h-7 w-24 text-xs text-right tabular-nums" />
-                                        <Button size="sm" className="h-7 px-2 text-[11px]" onClick={commitInlinePlan}>OK</Button>
-                                      </div>
-                                    ) : (
-                                      <div className="flex items-center gap-0.5">
-                                        <button
-                                          onClick={() => setInlineEditPlan({ rowId: r.id, months: p.months, valor: String(p.valor) })}
-                                          className="text-sm font-semibold text-foreground tabular-nums whitespace-nowrap px-2 py-1 rounded hover:bg-muted transition"
-                                          title="Clique para editar valor mensal">
-                                          {formatCurrency(p.valor)}
-                                        </button>
-                                        {plans.length > 1 && (
-                                          <Button variant="ghost" size="icon" className="h-6 w-6 rounded-md text-destructive opacity-50 hover:opacity-100"
-                                            onClick={() => removePlanFromRow(r.id, p.months)} title="Remover prazo">
-                                            <Trash2 className="w-3 h-3" />
-                                          </Button>
-                                        )}
-                                      </div>
-                                    )}
-                                  </div>
+                                  </button>
                                 );
                               })}
                             </div>
@@ -805,7 +813,10 @@ export default function ConfigurarReceitas() {
                               </span>
                             </div>
                           </div>
-                          <span className="text-sm font-semibold text-foreground tabular-nums whitespace-nowrap">{formatCurrency(r.valor)}</span>
+                          <div className="text-right whitespace-nowrap">
+                            <p className="text-sm font-semibold text-foreground tabular-nums">{formatCurrency(r.valor)}</p>
+                            <p className="text-[10px] text-muted-foreground tabular-nums">Líquido {formatCurrency(liquidoOf(r.valor, r.imposto))}</p>
+                          </div>
                           <div className="flex items-center gap-0.5">
                             <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md" onClick={(e) => { e.stopPropagation(); openEditReceita(section, r); }} title="Editar">
                               <Pencil className="w-3.5 h-3.5" />
@@ -856,7 +867,10 @@ export default function ConfigurarReceitas() {
                             <span className="text-[11px] text-muted-foreground truncate">{courseLabel(r.escopo)}</span>
                           </div>
                         </div>
-                        <span className="text-sm font-semibold text-foreground tabular-nums whitespace-nowrap">{formatCurrency(r.valor)}</span>
+                        <div className="text-right whitespace-nowrap">
+                          <p className="text-sm font-semibold text-foreground tabular-nums">{formatCurrency(r.valor)}</p>
+                          <p className="text-[10px] text-muted-foreground tabular-nums">Líquido {formatCurrency(liquidoOf(r.valor, r.imposto))}</p>
+                        </div>
                         <div className="flex items-center gap-0.5">
                           <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md" onClick={(e) => { e.stopPropagation(); openEditReceita(section, r); }} title="Editar">
                             <Pencil className="w-3.5 h-3.5" />
@@ -1144,27 +1158,49 @@ export default function ConfigurarReceitas() {
                 </Select>
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-muted-foreground">Valor (Kz)</label>
+                <label className="text-xs font-medium text-muted-foreground">Aplica-se a</label>
+                <Select value={receitaForm.escopo} onValueChange={v => setReceitaForm({ ...receitaForm, escopo: v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent className="max-h-[300px]">
+                    <SelectItem value="geral">Geral — todos os cursos</SelectItem>
+                    {reitorFaculties.map(f => (
+                      <div key={f.id}>
+                        <div className="px-2 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{f.name}</div>
+                        {f.courses.map(c => (
+                          <SelectItem key={c.id} value={c.id}>{c.code} — {c.name}</SelectItem>
+                        ))}
+                      </div>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-muted-foreground">Valor Bruto (Kz)</label>
                 <Input type="number" min={0} value={receitaForm.valor}
                   onChange={e => setReceitaForm({ ...receitaForm, valor: Number(e.target.value) || 0 })} />
               </div>
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-muted-foreground">Imposto (%)</label>
+                <Input type="number" min={0} max={100} step={0.5}
+                  value={((receitaForm.imposto ?? DEFAULT_IMPOSTO) * 100).toFixed(1)}
+                  onChange={e => setReceitaForm({ ...receitaForm, imposto: (Number(e.target.value) || 0) / 100 })} />
+              </div>
             </div>
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">Aplica-se a</label>
-              <Select value={receitaForm.escopo} onValueChange={v => setReceitaForm({ ...receitaForm, escopo: v })}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent className="max-h-[300px]">
-                  <SelectItem value="geral">Geral — todos os cursos</SelectItem>
-                  {reitorFaculties.map(f => (
-                    <div key={f.id}>
-                      <div className="px-2 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{f.name}</div>
-                      {f.courses.map(c => (
-                        <SelectItem key={c.id} value={c.id}>{c.code} — {c.name}</SelectItem>
-                      ))}
-                    </div>
-                  ))}
-                </SelectContent>
-              </Select>
+            <div className="rounded-lg bg-muted/30 p-3 space-y-1">
+              <div className="flex justify-between text-xs">
+                <span className="text-muted-foreground">Valor Bruto</span>
+                <span className="font-medium tabular-nums">{formatCurrency(receitaForm.valor)}</span>
+              </div>
+              <div className="flex justify-between text-xs">
+                <span className="text-muted-foreground">Imposto ({((receitaForm.imposto ?? DEFAULT_IMPOSTO) * 100).toFixed(1)}%)</span>
+                <span className="font-medium tabular-nums text-red-600">−{formatCurrency(receitaForm.valor - liquidoOf(receitaForm.valor, receitaForm.imposto))}</span>
+              </div>
+              <div className="flex justify-between pt-1.5 border-t border-border">
+                <span className="text-sm font-semibold">Valor Líquido</span>
+                <span className="text-sm font-bold tabular-nums text-emerald-700">{formatCurrency(liquidoOf(receitaForm.valor, receitaForm.imposto))}</span>
+              </div>
             </div>
           </div>
           <DialogFooter className="gap-2 sm:gap-2">
@@ -1394,6 +1430,57 @@ export default function ConfigurarReceitas() {
           <DialogFooter className="gap-2 sm:gap-2">
             <DialogClose asChild><Button variant="outline">Cancelar</Button></DialogClose>
             <Button variant="destructive" onClick={confirmRemoveSalary}>Remover</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ═══════ Plano (propina) edit dialog ═══════ */}
+      <Dialog open={!!planEdit} onOpenChange={(o) => !o && setPlanEdit(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <GraduationCap className="w-4 h-4 text-blue-700" /> Plano de Propina — {planEdit?.months} meses
+            </DialogTitle>
+          </DialogHeader>
+          {planEdit && (() => {
+            const v = Number(planEdit.valor) || 0;
+            const imp = (Number(planEdit.imposto) || 0) / 100;
+            const liq = Math.round(v * (1 - imp));
+            return (
+              <div className="space-y-4 py-2">
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-medium text-muted-foreground">Valor Bruto (Kz / mês)</label>
+                    <Input type="number" min={0} autoFocus value={planEdit.valor}
+                      onChange={e => setPlanEdit({ ...planEdit, valor: e.target.value })} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-medium text-muted-foreground">Imposto (%)</label>
+                    <Input type="number" min={0} max={100} step={0.5} value={planEdit.imposto}
+                      onChange={e => setPlanEdit({ ...planEdit, imposto: e.target.value })} />
+                  </div>
+                </div>
+                <div className="rounded-lg bg-muted/30 p-3 space-y-1">
+                  <div className="flex justify-between text-xs">
+                    <span className="text-muted-foreground">Valor Bruto</span>
+                    <span className="font-medium tabular-nums">{formatCurrency(v)}</span>
+                  </div>
+                  <div className="flex justify-between text-xs">
+                    <span className="text-muted-foreground">Imposto ({imp ? (imp * 100).toFixed(1) : "0.0"}%)</span>
+                    <span className="font-medium tabular-nums text-red-600">−{formatCurrency(v - liq)}</span>
+                  </div>
+                  <div className="flex justify-between pt-1.5 border-t border-border">
+                    <span className="text-sm font-semibold">Valor Líquido</span>
+                    <span className="text-sm font-bold tabular-nums text-emerald-700">{formatCurrency(liq)}</span>
+                  </div>
+                  <p className="text-[10px] text-muted-foreground pt-1">Total anual ({planEdit.months} meses): <span className="font-semibold text-foreground tabular-nums">{formatCurrency(v * planEdit.months)}</span> bruto · <span className="font-semibold text-foreground tabular-nums">{formatCurrency(liq * planEdit.months)}</span> líquido</p>
+                </div>
+              </div>
+            );
+          })()}
+          <DialogFooter className="gap-2 sm:gap-2">
+            <DialogClose asChild><Button variant="outline">Cancelar</Button></DialogClose>
+            <Button onClick={commitPlanEdit}>Guardar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
