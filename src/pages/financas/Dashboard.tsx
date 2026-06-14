@@ -108,34 +108,42 @@ export default function FinancasDashboard() {
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       {/* Header */}
-      <div className="flex items-start justify-between gap-4 flex-wrap">
-        <div className="min-w-0 space-y-1">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-[11px] uppercase tracking-wider font-semibold text-primary">
-              <CalendarIcon className="w-3.5 h-3.5" />
-              {todayLabel}
-            </span>
+      <div className="rounded-xl border border-border bg-gradient-to-r from-primary/5 to-transparent px-5 py-4">
+        <div className="flex items-start justify-between gap-4 flex-wrap">
+          <div className="min-w-0 space-y-2.5">
             <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-[11px] uppercase tracking-wider font-semibold text-primary">
               <GraduationCap className="w-3.5 h-3.5" />
               Ano Letivo <span className="font-bold tabular-nums">{anoLetivo}</span>
             </span>
+            <div>
+              <h1 className="text-xl font-bold text-foreground leading-tight">Dashboard Financeiro</h1>
+              <p className="text-sm text-muted-foreground mt-0.5">Visão geral das receitas, despesas e transações institucionais.</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">Dashboard Financeiro</h1>
+          <div className="flex flex-col items-end gap-2 shrink-0">
+            <div className="inline-flex items-stretch rounded-md border border-border bg-card overflow-hidden text-[11px] uppercase tracking-wider font-medium shadow-sm">
+              <span className="flex items-center gap-1.5 px-2.5 py-1 text-foreground capitalize">
+                <CalendarDays className="w-3.5 h-3.5 text-muted-foreground" />{todayLabel}
+              </span>
+              <span className="w-px bg-border" />
+              <span className="flex items-center gap-1.5 px-2.5 py-1 font-mono tabular-nums text-primary bg-muted/30">
+                <Clock className="w-3.5 h-3.5" />{liveTime}
+              </span>
+            </div>
+            <div className="flex flex-col items-end gap-1">
+              <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Mês de referência</span>
+              <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+                <SelectTrigger className="w-[180px] h-9 text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {monthlyData.map(m => (
+                    <SelectItem key={m.month} value={m.month}>{MONTH_FULL[m.month] ?? m.month}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
-        </div>
-        <div className="flex flex-col items-end gap-1">
-          <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Mês de referência</span>
-          <Select value={selectedMonth} onValueChange={setSelectedMonth}>
-            <SelectTrigger className="w-[180px] h-9 text-sm">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {monthlyData.map(m => (
-                <SelectItem key={m.month} value={m.month}>{MONTH_FULL[m.month] ?? m.month}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
         </div>
       </div>
 
