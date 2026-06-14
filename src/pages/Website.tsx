@@ -119,7 +119,7 @@ export default function Website() {
 
           {/* Right action: Portal UPRA only */}
           <div className="ml-auto shrink-0">
-            <Link to="/">
+            <Link to="/login">
               <Button
                 size="sm"
                 variant="ghost"
