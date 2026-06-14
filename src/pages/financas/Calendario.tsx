@@ -164,6 +164,7 @@ export default function FinancasCalendario() {
   const [detailEvent, setDetailEvent] = useState<AgendaEvent | null>(null);
   const [detailRequest, setDetailRequest] = useState<MeetingRequest | null>(null);
   const [participantsView, setParticipantsView] = useState<{ title: string; participants: string[]; seed: string } | null>(null);
+  const [showAllRequests, setShowAllRequests] = useState(false);
   const openParticipants = (title: string, participants: string[] | undefined, seed: string) => {
     if (!participants || participants.length === 0) return;
     setParticipantsView({ title, participants, seed });
