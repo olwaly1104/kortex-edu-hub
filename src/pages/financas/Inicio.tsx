@@ -176,9 +176,18 @@ export default function FinancasInicio() {
                         </p>
                       )}
                     </div>
-                    <Badge variant={isActive ? "default" : "outline"} className="text-[10px] gap-1 shrink-0">
-                      <StatusIcon className="w-3 h-3" /> {cfg.label}
-                    </Badge>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      {(() => {
+                        const cat = CATEGORY_META[evento.type] ?? { label: evento.type, cls: "bg-slate-50 text-slate-700 border-slate-200" };
+                        return (
+                          <Badge variant="outline" className={`text-[10px] ${cat.cls}`}>{cat.label}</Badge>
+                        );
+                      })()}
+                      <Badge variant={isActive ? "default" : "outline"} className="text-[10px] gap-1">
+                        <StatusIcon className="w-3 h-3" /> {cfg.label}
+                      </Badge>
+                    </div>
+
                   </div>
                 );
               })}
