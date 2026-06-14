@@ -61,8 +61,22 @@ const defaultResponsavelByDestino = (destino: string) => {
 export default function GapConfiguracao() {
   const { toast } = useToast();
 
-  // Global edit lock
-  const [isEditing, setIsEditing] = useState(false);
+  // Per-tab edit lock
+  const [editingTab, setEditingTab] = useState<{ sol: boolean; ag: boolean; cd: boolean }>({ sol: false, ag: false, cd: false });
+  const [activeTab, setActiveTab] = useState<"solicitacoes" | "agendamentos" | "candidaturas">("solicitacoes");
+  const isEditing =
+    (activeTab === "solicitacoes" && editingTab.sol) ||
+    (activeTab === "agendamentos" && editingTab.ag) ||
+    (activeTab === "candidaturas" && editingTab.cd);
+  const toggleEdit = (tab: "sol" | "ag" | "cd") => setEditingTab(prev => ({ ...prev, [tab]: !prev[tab] }));
+  const EditToggle = ({ tab }: { tab: "sol" | "ag" | "cd" }) => {
+    const on = editingTab[tab];
+    return (
+      <Button size="sm" variant={on ? "default" : "outline"} onClick={() => toggleEdit(tab)} className="gap-1.5 h-8 text-xs">
+        {on ? <><Unlock className="w-3.5 h-3.5" /> Bloquear</> : <><Pencil className="w-3.5 h-3.5" /> Editar</>}
+      </Button>
+    );
+  };
 
   const [estados, setEstados] = useState<EstadoItem[]>(
     Object.entries(initialEstadoConfig).map(([key, v]) => ({ key, label: v.label, color: v.color }))
@@ -239,6 +253,8 @@ export default function GapConfiguracao() {
   const [cdNotaMinima, setCdNotaMinima] = useState(10);
   const [cdTaxa, setCdTaxa] = useState(15000);
   const [cdMaxOpcoes, setCdMaxOpcoes] = useState(3);
+  const [cdPeriodoInicio, setCdPeriodoInicio] = useState("2026-06-01");
+  const [cdPeriodoFim, setCdPeriodoFim] = useState("2026-08-31");
 
   const [cdEstadoOpen, setCdEstadoOpen] = useState(false);
   const [cdEtapaOpen, setCdEtapaOpen] = useState(false);
@@ -309,17 +325,9 @@ export default function GapConfiguracao() {
             Configure Solicitações, Agendamentos e o processo de Candidaturas do GAP.
           </p>
         </div>
-        <Button
-          size="sm"
-          variant={isEditing ? "default" : "outline"}
-          onClick={() => setIsEditing(v => !v)}
-          className="gap-1.5"
-        >
-          {isEditing ? <><Unlock className="w-4 h-4" /> Bloquear edição</> : <><Pencil className="w-4 h-4" /> Editar geral</>}
-        </Button>
       </div>
 
-      <Tabs defaultValue="solicitacoes" className="space-y-6">
+      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="space-y-6">
         <TabsList className="grid grid-cols-3 w-full max-w-2xl">
           <TabsTrigger value="solicitacoes" className="gap-1.5"><FileText className="w-3.5 h-3.5" /> Solicitações</TabsTrigger>
           <TabsTrigger value="agendamentos" className="gap-1.5"><CalendarClock className="w-3.5 h-3.5" /> Agendamentos</TabsTrigger>
@@ -327,6 +335,7 @@ export default function GapConfiguracao() {
         </TabsList>
 
         <TabsContent value="solicitacoes" className="space-y-6 mt-0">
+          <div className="flex justify-end"><EditToggle tab="sol" /></div>
           {/* Estados */}
           <Card className="p-5">
             <div className="flex items-center justify-between mb-4">
@@ -555,6 +564,7 @@ export default function GapConfiguracao() {
 
         {/* ============ AGENDAMENTOS ============ */}
         <TabsContent value="agendamentos" className="space-y-6 mt-0">
+          <div className="flex justify-end"><EditToggle tab="ag" /></div>
           {/* Parâmetros gerais — só início e fim */}
           <Card className="p-5">
             <div className="flex items-center gap-2 mb-4">
@@ -762,30 +772,27 @@ export default function GapConfiguracao() {
 
         {/* ============ CANDIDATURAS ============ */}
         <TabsContent value="candidaturas" className="space-y-6 mt-0">
-          {/* Parâmetros gerais */}
+          <div className="flex justify-end"><EditToggle tab="cd" /></div>
+          {/* Parâmetros gerais — período de candidaturas */}
           <Card className="p-5">
             <div className="flex items-center gap-2 mb-4">
               <Settings2 className="w-4 h-4 text-muted-foreground" />
               <h2 className="text-sm font-semibold text-foreground">Parâmetros gerais</h2>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-2xl">
               <div>
-                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Nota mínima de acesso</label>
-                <Input type="number" min={0} max={20} value={cdNotaMinima} disabled={!isEditing} onChange={e => setCdNotaMinima(Number(e.target.value) || 0)} />
-                <p className="text-[10px] text-muted-foreground mt-1">Valor sobre 20 no exame de acesso</p>
+                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Início das candidaturas</label>
+                <Input type="date" value={cdPeriodoInicio} disabled={!isEditing} onChange={e => setCdPeriodoInicio(e.target.value)} />
+                <p className="text-[10px] text-muted-foreground mt-1">Data a partir da qual abre a submissão</p>
               </div>
               <div>
-                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Taxa de candidatura (Kz)</label>
-                <Input type="number" min={0} value={cdTaxa} disabled={!isEditing} onChange={e => setCdTaxa(Number(e.target.value) || 0)} />
-                <p className="text-[10px] text-muted-foreground mt-1">Paga no momento da submissão</p>
-              </div>
-              <div>
-                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Opções de curso (máx.)</label>
-                <Input type="number" min={1} max={5} value={cdMaxOpcoes} disabled={!isEditing} onChange={e => setCdMaxOpcoes(Number(e.target.value) || 1)} />
-                <p className="text-[10px] text-muted-foreground mt-1">Nº de cursos que pode escolher</p>
+                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Fim das candidaturas</label>
+                <Input type="date" value={cdPeriodoFim} disabled={!isEditing} onChange={e => setCdPeriodoFim(e.target.value)} />
+                <p className="text-[10px] text-muted-foreground mt-1">Data limite para submissão</p>
               </div>
             </div>
           </Card>
+
 
           {/* Estados */}
           <Card className="p-5">
