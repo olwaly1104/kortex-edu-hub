@@ -327,9 +327,46 @@ export default function GapConfiguracao() {
   const [newPergLabel, setNewPergLabel] = useState("");
   const [newPergTipo, setNewPergTipo] = useState<CdPergunta["tipo"]>("texto");
   const [newPergObrig, setNewPergObrig] = useState(true);
+  const CD_COLORS = [
+    "bg-blue-50 text-blue-700 border-blue-200",
+    "bg-green-50 text-green-700 border-green-200",
+    "bg-amber-50 text-amber-700 border-amber-200",
+    "bg-red-50 text-red-700 border-red-200",
+    "bg-violet-50 text-violet-700 border-violet-200",
+    "bg-slate-50 text-slate-700 border-slate-200",
+  ];
+  const addCdEstado = () => {
+    const v = newCdEstadoLabel.trim(); if (!v) return;
+    const key = v.toLowerCase().replace(/\s+/g, "_");
+    if (cdEstados.some(e => e.key === key)) { toast({ title: "Estado já existe", variant: "destructive" }); return; }
+    setCdEstados(s => [...s, { key, label: v, color: CD_COLORS[s.length % CD_COLORS.length] }]);
+    setNewCdEstadoLabel(""); setCdEstadoOpen(false);
+  };
+  const removeCdEstado = (key: string) => setCdEstados(s => s.filter(e => e.key !== key));
+  const addCdEtapa = () => {
+    const v = newCdEtapaLabel.trim(); if (!v) return;
+    const key = v.toLowerCase().replace(/\s+/g, "_");
+    setCdEtapas(es => [...es, { key, label: v, diasAposSubmissao: newCdEtapaDias, obrigatoria: false, estadosPossiveis: [] }]);
+    setNewCdEtapaLabel(""); setNewCdEtapaDias(7);
+  };
+  const removeCdEtapa = (key: string) => setCdEtapas(es => es.filter(e => e.key !== key));
+  const toggleEtapaObrig = (key: string) => setCdEtapas(es => es.map(e => e.key === key ? { ...e, obrigatoria: !e.obrigatoria } : e));
+  const addCdSessao = () => {
+    if (!newCdSessData || !newCdSessLocal.trim()) { toast({ title: "Preencha data e local", variant: "destructive" }); return; }
+    setCdSessoes(s => [...s, { key: `s-${Date.now()}`, etapa: newCdSessEtapa, data: newCdSessData, hora: newCdSessHora, local: newCdSessLocal.trim(), capacidade: newCdSessCap }]);
+    setNewCdSessData(""); setNewCdSessLocal(""); setNewCdSessCap(60);
+  };
+  const removeCdSessao = (key: string) => setCdSessoes(s => s.filter(x => x.key !== key));
+  const addPergunta = (stepKey: string) => {
+    const v = newPergLabel.trim(); if (!v || newPergStep !== stepKey) return;
+    const key = `${v.toLowerCase().replace(/\s+/g, "_")}_${Date.now()}`;
+    setCdFormSteps(steps => steps.map(s => s.key === stepKey ? { ...s, perguntas: [...s.perguntas, { key, label: v, tipo: newPergTipo, obrigatoria: newPergObrig }] } : s));
+    setNewPergLabel(""); setNewPergTipo("texto"); setNewPergObrig(true);
+  };
+  const removePergunta = (stepKey: string, pKey: string) =>
+    setCdFormSteps(steps => steps.map(s => s.key === stepKey ? { ...s, perguntas: s.perguntas.filter(p => p.key !== pKey) } : s));
 
 
-  return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       {/* Header */}
       <div>
