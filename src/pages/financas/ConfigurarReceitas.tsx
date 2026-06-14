@@ -831,11 +831,10 @@ export default function ConfigurarReceitas() {
               <thead>
                 <tr className="text-[10px] uppercase tracking-wider text-muted-foreground border-b border-border">
                   <th className="text-left font-semibold px-2 py-2">Colaborador</th>
-                  <th className="text-left font-semibold px-2 py-2">Função / Dept.</th>
-                  <th className="text-right font-semibold px-2 py-2">Bruto</th>
-                  <th className="text-right font-semibold px-2 py-2">Descontos</th>
-                  <th className="text-right font-semibold px-2 py-2">Multas</th>
-                  <th className="text-right font-semibold px-2 py-2">Líquido</th>
+                  <th className="text-left font-semibold px-2 py-2">Posição</th>
+                  <th className="text-left font-semibold px-2 py-2">Departamento</th>
+                  <th className="text-right font-semibold px-2 py-2">Salário Bruto</th>
+                  <th className="text-right font-semibold px-2 py-2">Salário Líquido</th>
                   <th className="w-8"></th>
                 </tr>
               </thead>
@@ -854,15 +853,12 @@ export default function ConfigurarReceitas() {
                       </td>
                       <td className="px-2 py-2.5">
                         <p className="text-xs text-foreground truncate">{s.role}</p>
-                        <p className="text-[10px] text-muted-foreground truncate">{s.department}</p>
+                      </td>
+                      <td className="px-2 py-2.5">
+                        <p className="text-xs text-foreground truncate">{s.department}</p>
                       </td>
                       <td className="px-2 py-2.5 text-right text-sm tabular-nums text-foreground">{formatCurrency(cfg.baseSalary)}</td>
-                      <td className="px-2 py-2.5 text-right text-sm tabular-nums text-red-600">−{formatCurrency(deductions)}</td>
-                      <td className="px-2 py-2.5 text-right text-sm tabular-nums">
-                        {multasTotal > 0 ? <span className="text-orange-600">−{formatCurrency(multasTotal)}</span> : <span className="text-muted-foreground">—</span>}
-                        {cfg.multas.length > 0 && <span className="text-[10px] text-muted-foreground ml-1">({cfg.multas.length})</span>}
-                      </td>
-                      <td className="px-2 py-2.5 text-right text-sm font-semibold tabular-nums text-foreground">{formatCurrency(net)}</td>
+                      <td className="px-2 py-2.5 text-right text-sm font-semibold tabular-nums text-blue-700">{formatCurrency(net)}</td>
                       <td className="px-2">
                         <Pencil className="w-3.5 h-3.5 text-muted-foreground group-hover:text-foreground" />
                       </td>
