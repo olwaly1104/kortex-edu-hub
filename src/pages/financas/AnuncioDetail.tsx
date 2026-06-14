@@ -172,7 +172,8 @@ export default function FinancasAnuncioDetail() {
                 <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Conteúdo</h3>
               </div>
               <div className="rounded-lg border border-border bg-background overflow-hidden">
-                <div className="px-4 py-3">
+                <div className="px-4 pt-3 pb-3">
+                  <p className="text-[10px] uppercase tracking-[0.14em] font-semibold text-muted-foreground/80 mb-2">Descrição</p>
                   <p className="text-[13.5px] text-foreground/90 leading-[1.65] whitespace-pre-line">{ann.content}</p>
                 </div>
               </div>
