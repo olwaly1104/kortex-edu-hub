@@ -8,6 +8,7 @@ import { Card } from "@/components/ui/card";
 import { formatCurrency, orcamentos } from "@/data/financeModuleData";
 import { cn } from "@/lib/utils";
 import { FinHeader } from "./_FinHeader";
+import { PeriodSelector, type Periodo, periodoDefaultValue } from "./_PeriodSelector";
 
 const statusConfig: Record<string, { label: string; className: string; dot: string }> = {
   activo: { label: "Activo", className: "bg-accent/10 text-accent border-accent/20", dot: "bg-accent" },
