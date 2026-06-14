@@ -46,12 +46,13 @@ export default function FinancasInicio() {
       <div className="rounded-xl border border-border bg-gradient-to-r from-primary/5 to-transparent p-6">
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div className="min-w-0">
-            <div className="flex items-center gap-2 text-[11px] uppercase tracking-wider text-muted-foreground font-medium mb-2">
-              <span className="capitalize">{todayLabel}</span>
-              <span className="text-border">•</span>
-              <span className="flex items-center gap-1">
+            <div className="flex flex-col items-start gap-2 mb-2">
+              <span className="flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-muted-foreground font-medium">
                 <GraduationCap className="w-3.5 h-3.5" />
                 Ano Letivo {anoLetivo}
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-md border border-border bg-card px-2.5 py-1 text-[11px] uppercase tracking-wider font-medium text-foreground capitalize">
+                {todayLabel}
               </span>
             </div>
             <h1 className="text-2xl font-bold text-foreground">

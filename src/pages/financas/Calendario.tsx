@@ -244,12 +244,19 @@ export default function FinancasCalendario() {
       <div className="rounded-xl border border-border bg-gradient-to-r from-primary/5 to-transparent p-6">
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div className="min-w-0">
-            <div className="flex items-center gap-3 text-[11px] uppercase tracking-wider text-muted-foreground font-medium mb-2 flex-wrap">
-              <span className="flex items-center gap-1.5"><CalendarDays className="w-3.5 h-3.5" />{fmtLong(TODAY)}</span>
-              <span className="h-3 w-px bg-border" />
-              <span className="flex items-center gap-1.5 font-mono tabular-nums text-primary"><Clock className="w-3.5 h-3.5" />{liveTime}</span>
-              <span className="h-3 w-px bg-border" />
-              <span className="flex items-center gap-1.5"><GraduationCap className="w-3.5 h-3.5" />Ano Letivo {ANO_LETIVO}</span>
+            <div className="flex flex-col items-start gap-2 mb-2">
+              <span className="flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-muted-foreground font-medium">
+                <GraduationCap className="w-3.5 h-3.5" />Ano Letivo {ANO_LETIVO}
+              </span>
+              <div className="inline-flex items-stretch rounded-md border border-border bg-card overflow-hidden text-[11px] uppercase tracking-wider font-medium">
+                <span className="flex items-center gap-1.5 px-2.5 py-1 text-foreground">
+                  <CalendarDays className="w-3.5 h-3.5 text-muted-foreground" />{fmtLong(TODAY)}
+                </span>
+                <span className="w-px bg-border" />
+                <span className="flex items-center gap-1.5 px-2.5 py-1 font-mono tabular-nums text-primary bg-muted/30">
+                  <Clock className="w-3.5 h-3.5" />{liveTime}
+                </span>
+              </div>
             </div>
             <h1 className="text-2xl font-bold text-foreground">Calendário</h1>
           </div>
