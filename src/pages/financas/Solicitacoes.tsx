@@ -166,26 +166,24 @@ export default function FinancasSolicitacoes() {
         </div>
       </Card>
 
-      {/* ── Minhas Solicitações ── */}
+      {/* ── Filtros / Toolbar ── */}
       <Card className="overflow-hidden border-border p-0 gap-0">
         {/* Section header */}
         <div className="px-5 py-3.5 border-b border-border bg-card flex items-center justify-between gap-4 flex-wrap">
-          <div className="min-w-0">
-            <h2 className="text-[14px] font-semibold text-foreground flex items-center gap-2">
-              <Inbox className="w-4 h-4 text-primary" />
-              Minhas Solicitações
-              <span className="text-[10px] font-medium text-muted-foreground tabular-nums px-1.5 py-0.5 rounded-md bg-muted ml-1">
-                {filtered.length}
-              </span>
-            </h2>
-            <p className="text-[11px] text-muted-foreground mt-0.5">Ano lectivo {ANO_LETIVO}</p>
-          </div>
+          <h2 className="text-[14px] font-semibold text-foreground flex items-center gap-2">
+            <Inbox className="w-4 h-4 text-primary" />
+            Minhas Solicitações
+            <span className="text-[10px] font-medium text-muted-foreground tabular-nums px-1.5 py-0.5 rounded-md bg-muted ml-1">
+              {filtered.length}
+            </span>
+          </h2>
 
           {/* Direção segmented */}
           <div className="flex bg-muted/60 rounded-lg p-0.5">
             {([
-              { key: "recebidas" as const, label: "Recebidas", icon: Inbox, count: finSolicitacoes.filter(s => s.direction === "recebida").length },
-              { key: "enviadas"  as const, label: "Enviadas",  icon: Send,  count: finSolicitacoes.filter(s => s.direction === "enviada").length },
+              { key: "todos"     as const, label: "Todos",     icon: CheckSquare, count: finSolicitacoes.length },
+              { key: "recebidas" as const, label: "Recebidas", icon: Inbox,       count: finSolicitacoes.filter(s => s.direction === "recebida").length },
+              { key: "enviadas"  as const, label: "Enviadas",  icon: Send,        count: finSolicitacoes.filter(s => s.direction === "enviada").length },
             ]).map(t => (
               <button key={t.key}
                 onClick={() => { setTab(t.key); setEstado("todos"); }}
@@ -204,7 +202,7 @@ export default function FinancasSolicitacoes() {
         </div>
 
         {/* Toolbar: search + filters */}
-        <div className="px-5 py-3 border-b border-border bg-muted/20 flex items-center gap-2 flex-wrap">
+        <div className="px-5 py-3 bg-muted/20 flex items-center gap-2 flex-wrap">
           <div className="relative flex-1 min-w-[240px]">
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
             <Input
@@ -256,17 +254,29 @@ export default function FinancasSolicitacoes() {
             </Button>
           )}
         </div>
+      </Card>
+
+      {/* ── Resultados ── */}
+      <Card className="overflow-hidden border-border p-0 gap-0">
+        {/* Results header */}
+        <div className="px-5 py-2.5 bg-card border-b border-border flex items-center justify-between gap-3">
+          <p className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground">
+            Resultados <span className="text-foreground tabular-nums ml-1">({filtered.length})</span>
+          </p>
+        </div>
 
         {/* Table-style header */}
         <div className="hidden md:grid grid-cols-[120px_1fr_130px_140px_120px_110px_28px] gap-3 px-5 py-2 bg-muted/10 border-b border-border text-[10px] uppercase tracking-[0.08em] font-semibold text-muted-foreground">
           <div>Referência</div>
           <div>Assunto</div>
           <div>Categoria</div>
-          <div>{tab === "recebidas" ? "Requerente" : "Destinatário"}</div>
+          <div>{tab === "enviadas" ? "Destinatário" : "Requerente"}</div>
           <div>Submetido</div>
           <div>Estado</div>
           <div></div>
         </div>
+
+
 
         {/* Lista */}
         {filtered.length === 0 ? (
