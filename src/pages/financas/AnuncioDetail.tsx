@@ -169,30 +169,28 @@ export default function FinancasAnuncioDetail() {
             </div>
 
             {ann.cta === "inscrever" && (
-              <div className="rounded-lg border border-primary/25 bg-primary/[0.04] px-4 py-3 space-y-2">
-                <div className="flex items-center justify-between gap-3 flex-wrap">
-                  <div>
-                    <p className="text-[10.5px] uppercase tracking-[0.14em] font-semibold text-primary mb-0.5">Inscrições abertas</p>
-                    <h3 className="text-[15px] font-bold text-foreground leading-tight">{ann.title}</h3>
-                  </div>
-                  {subscribed ? (
-                    <Badge variant="outline" className="text-[11px] gap-1 bg-emerald-50 text-emerald-700 border-emerald-200 h-9 px-3">
-                      <CheckCircle2 className="w-4 h-4" /> Inscrito
-                    </Badge>
-                  ) : (
-                    <Button size="sm" className="h-9 gap-1.5" onClick={() => setSubscribed(true)}>
-                      <CheckCircle2 className="w-4 h-4" /> Inscrever-me
-                    </Button>
+              <div className="rounded-lg border border-primary/25 bg-primary/[0.04] px-3 py-2 flex items-center justify-between gap-3 flex-wrap">
+                <div className="min-w-0">
+                  <p className="text-[10px] uppercase tracking-[0.14em] font-semibold text-primary leading-none mb-1">Inscrições abertas</p>
+                  {ann.ctaDeadline && (
+                    <p className="text-[11.5px] text-muted-foreground flex items-center gap-1 leading-none">
+                      <Clock className="w-3 h-3" />
+                      Até <span className="font-semibold text-foreground tabular-nums">{ann.ctaDeadline}{ann.ctaDeadlineTime ? ` · ${ann.ctaDeadlineTime}` : ""}</span>
+                    </p>
                   )}
                 </div>
-                {ann.ctaDeadline && (
-                  <p className="text-[12px] text-muted-foreground flex items-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5" />
-                    Data limite:&nbsp;<span className="font-semibold text-foreground tabular-nums">{ann.ctaDeadline}{ann.ctaDeadlineTime ? ` · ${ann.ctaDeadlineTime}` : ""}</span>
-                  </p>
+                {subscribed ? (
+                  <Badge variant="outline" className="text-[11px] gap-1 bg-emerald-50 text-emerald-700 border-emerald-200 h-7 px-2">
+                    <CheckCircle2 className="w-3.5 h-3.5" /> Inscrito
+                  </Badge>
+                ) : (
+                  <Button size="sm" className="h-7 px-3 gap-1 text-[12px]" onClick={() => setSubscribed(true)}>
+                    <CheckCircle2 className="w-3.5 h-3.5" /> Inscrever-me
+                  </Button>
                 )}
               </div>
             )}
+
 
             {/* Anexos */}
             {(() => {
