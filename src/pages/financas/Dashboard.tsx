@@ -188,6 +188,41 @@ export default function FinancasDashboard() {
               })}
             </div>
           </div>
+
+          {/* Divider */}
+          <div className="my-4 border-t border-border" />
+
+          {/* Receita Esperada */}
+          <div className="flex items-center justify-between mb-3 px-1">
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Receita Esperada Este Mês</p>
+              <p className="text-sm font-bold text-foreground mt-0.5">{formatCurrency(receitaEsperadaMes)}</p>
+            </div>
+            <Badge className="bg-accent/15 text-accent border-accent/30 text-[10px]">Previsto</Badge>
+          </div>
+
+          <h3 className="text-sm font-semibold text-foreground mb-3">Receitas por Categoria</h3>
+          <div className="flex items-center gap-4">
+            <ResponsiveContainer width={100} height={100}>
+              <PieChart>
+                <Pie data={recCatData} dataKey="value" cx="50%" cy="50%" outerRadius={45} innerRadius={28} paddingAngle={2} strokeWidth={0}>
+                  {recCatData.map((c, i) => <Cell key={i} fill={c.color} />)}
+                </Pie>
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="flex-1 space-y-1.5">
+              {recCatData.slice(0, 5).map(c => {
+                const pct = receitaTotal > 0 ? Math.round((c.value / receitaTotal) * 100) : 0;
+                return (
+                  <div key={c.name} className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full shrink-0" style={{ background: c.color }} />
+                    <span className="text-[11px] text-muted-foreground flex-1 truncate">{c.name}</span>
+                    <span className="text-[11px] font-medium text-foreground">{pct}%</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </Card>
       </div>
 
