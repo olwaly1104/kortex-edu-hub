@@ -44,6 +44,8 @@ interface AgendaEvent {
   obligatory?: boolean;
   participants?: string[];
   organizer?: string;
+  modality?: "presencial" | "virtual";
+  meetingLink?: string;
 }
 
 interface MeetingRequest {
@@ -59,7 +61,14 @@ interface MeetingRequest {
   agenda?: string[];
   status: "pending" | "accepted" | "declined";
   requestedAt: string;
+  modality: "presencial" | "virtual";
+  meetingLink?: string;
 }
+
+const MODALITY_META: Record<"presencial" | "virtual", { label: string; cls: string; icon: typeof Video }> = {
+  presencial: { label: "Presencial", cls: "bg-slate-50 text-slate-700 border-slate-200", icon: Building2 },
+  virtual:    { label: "Virtual",    cls: "bg-indigo-50 text-indigo-700 border-indigo-200", icon: Video },
+};
 
 type ParticipantStatus = "accepted" | "declined" | "pending";
 function participantStatus(name: string, seed: string): ParticipantStatus {
