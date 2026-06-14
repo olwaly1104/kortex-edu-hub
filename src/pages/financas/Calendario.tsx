@@ -164,6 +164,7 @@ export default function FinancasCalendario() {
   const [detailEvent, setDetailEvent] = useState<AgendaEvent | null>(null);
   const [detailRequest, setDetailRequest] = useState<MeetingRequest | null>(null);
   const [participantsView, setParticipantsView] = useState<{ title: string; participants: string[]; seed: string } | null>(null);
+  const [showAllRequests, setShowAllRequests] = useState(false);
   const openParticipants = (title: string, participants: string[] | undefined, seed: string) => {
     if (!participants || participants.length === 0) return;
     setParticipantsView({ title, participants, seed });
@@ -397,7 +398,7 @@ export default function FinancasCalendario() {
                   <h3 className="text-sm font-bold text-foreground capitalize">{fmtLong(selectedDate)}</h3>
                 </div>
                 <Badge variant="outline" className="text-[10px]">
-                  {selectedEvents.length} evento{selectedEvents.length !== 1 ? "s" : ""}
+                  {selectedEvents.length} entrada{selectedEvents.length !== 1 ? "s" : ""}
                 </Badge>
               </div>
 
@@ -471,7 +472,7 @@ export default function FinancasCalendario() {
                   <h3 className="text-sm font-bold text-foreground capitalize leading-tight mt-0.5 truncate">{fmtLong(selectedDate)}</h3>
                 </div>
                 <Badge variant="outline" className="text-[10px] shrink-0 ml-2">
-                  {selectedEvents.length} evento{selectedEvents.length !== 1 ? "s" : ""}
+                  {selectedEvents.length} entrada{selectedEvents.length !== 1 ? "s" : ""}
                 </Badge>
               </div>
               {selectedEvents.length === 0 ? (
@@ -529,14 +530,18 @@ export default function FinancasCalendario() {
             </Card>
           ) : (
             <Card className="overflow-hidden sticky top-6">
-              <div className="px-3.5 py-2.5 border-b bg-muted/10 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Bell className="w-4 h-4 text-muted-foreground" />
-                  <p className="text-sm font-semibold text-foreground">Pedidos de Reunião</p>
+              <div className="px-3.5 py-2.5 border-b bg-muted/10 flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2 min-w-0">
+                  <Bell className="w-4 h-4 text-muted-foreground shrink-0" />
+                  <p className="text-sm font-semibold text-foreground truncate">Pedidos de Reunião</p>
+                  {pendingRequests.length > 0 && (
+                    <Badge variant="outline" className="text-[10px] h-5">{pendingRequests.length}</Badge>
+                  )}
                 </div>
-                {pendingRequests.length > 0 && (
-                  <Badge variant="outline" className="text-[10px] h-5">{pendingRequests.length}</Badge>
-                )}
+                <button onClick={() => setShowAllRequests(true)}
+                  className="text-[11px] font-semibold text-primary hover:underline shrink-0">
+                  Ver todos
+                </button>
               </div>
               {pendingRequests.length === 0 ? (
                 <div className="text-center py-8">
@@ -560,13 +565,16 @@ export default function FinancasCalendario() {
       {/* ── Horizontal Pedidos (Mês only) ── */}
       {view === "month" && pendingRequests.length > 0 && (
         <Card className="overflow-hidden">
-          <div className="px-4 py-2.5 border-b bg-muted/10 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Bell className="w-4 h-4 text-muted-foreground" />
-              <p className="text-sm font-semibold text-foreground">Pedidos de Reunião</p>
+          <div className="px-4 py-2.5 border-b bg-muted/10 flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 min-w-0">
+              <Bell className="w-4 h-4 text-muted-foreground shrink-0" />
+              <p className="text-sm font-semibold text-foreground truncate">Pedidos de Reunião</p>
               <Badge variant="outline" className="text-[10px] h-5">{pendingRequests.length}</Badge>
             </div>
-            <p className="text-[10px] text-muted-foreground hidden sm:block">Desliza horizontalmente para ver mais</p>
+            <button onClick={() => setShowAllRequests(true)}
+              className="text-[11px] font-semibold text-primary hover:underline shrink-0">
+              Ver todos
+            </button>
           </div>
           <div className="overflow-x-auto">
             <div className="flex gap-3 p-3" style={{ width: "max-content" }}>
@@ -581,6 +589,19 @@ export default function FinancasCalendario() {
           </div>
         </Card>
       )}
+
+      {/* ── Ver todos os Pedidos de Reunião ── */}
+      <AllRequestsDialog
+        open={showAllRequests}
+        onClose={() => setShowAllRequests(false)}
+        requests={requests}
+        onAccept={(id) => respondRequest(id, "accepted")}
+        onDecline={(id) => respondRequest(id, "declined")}
+        onDetail={(r) => { setDetailRequest(r); setShowAllRequests(false); }}
+        onParticipants={(r) => openParticipants(r.title, r.participants, r.id)}
+      />
+
+
 
       {/* ── Adicionar à Agenda (modern full-page modal) ── */}
       <Dialog open={openCreate} onOpenChange={setOpenCreate}>
@@ -721,33 +742,38 @@ export default function FinancasCalendario() {
 }
 
 /* ── Request card ── */
-function RequestCard({ r, onAccept, onDecline, onDetail, onParticipants }: {
-  r: MeetingRequest; onAccept: () => void; onDecline: () => void; onDetail: () => void; onParticipants: () => void;
+const REQ_STATUS_META: Record<MeetingRequest["status"], { label: string; cls: string; bar: string }> = {
+  pending:  { label: "Pendente",  cls: "bg-amber-50 text-amber-700 border-amber-200",     bar: "bg-amber-500" },
+  accepted: { label: "Aceite",    cls: "bg-emerald-50 text-emerald-700 border-emerald-200", bar: "bg-emerald-500" },
+  declined: { label: "Recusado",  cls: "bg-rose-50 text-rose-700 border-rose-200",        bar: "bg-rose-500" },
+};
+
+function RequestCard({ r, onAccept, onDecline, onDetail, onParticipants, readOnly = false }: {
+  r: MeetingRequest; onAccept: () => void; onDecline: () => void; onDetail: () => void; onParticipants: () => void; readOnly?: boolean;
 }) {
+  const st = REQ_STATUS_META[r.status];
   return (
     <div className="rounded-lg border bg-card hover:border-foreground/20 transition-colors overflow-hidden h-full flex flex-col">
-      <div className="px-2.5 pt-2 pb-1 border-b bg-muted/20 flex items-center justify-between gap-2">
-        <span className="text-[9px] uppercase tracking-wider text-muted-foreground font-medium">Data do Pedido</span>
-        <span className="text-[10px] font-semibold text-foreground">{fmtShort(r.requestedAt)}</span>
-      </div>
-      <div className="p-2.5 space-y-2 flex-1">
+      <div className={cn("h-1 w-full shrink-0", st.bar)} />
+      <div className="p-3 space-y-2.5 flex-1">
+        <div className="flex items-center justify-between gap-1.5">
+          <Badge variant="outline" className={cn("text-[9px] h-4 px-1.5 font-semibold", st.cls)}>{st.label}</Badge>
+          <Badge variant="outline" className={cn("text-[9px] h-4 px-1 gap-0.5", MODALITY_META[r.modality].cls)}>
+            {(() => { const I = MODALITY_META[r.modality].icon; return <I className="w-2.5 h-2.5" />; })()}
+            {MODALITY_META[r.modality].label}
+          </Badge>
+        </div>
         <div>
-          <div className="flex items-start justify-between gap-1.5">
-            <p className="text-xs font-semibold text-foreground leading-tight line-clamp-2 flex-1">{r.title}</p>
-            <Badge variant="outline" className={cn("text-[9px] h-4 px-1 gap-0.5 shrink-0", MODALITY_META[r.modality].cls)}>
-              {(() => { const I = MODALITY_META[r.modality].icon; return <I className="w-2.5 h-2.5" />; })()}
-              {MODALITY_META[r.modality].label}
-            </Badge>
-          </div>
-          <p className="text-[10px] text-muted-foreground mt-0.5 flex items-center gap-1">
-            <UserCircle2 className="w-3 h-3" />{r.organizer}
+          <p className="text-xs font-semibold text-foreground leading-tight line-clamp-2">{r.title}</p>
+          <p className="text-[10px] text-muted-foreground mt-1 flex items-center gap-1 truncate">
+            <UserCircle2 className="w-3 h-3 shrink-0" />{r.organizer}
           </p>
         </div>
-        <div className="space-y-0.5 text-[10px] text-muted-foreground">
-          <div className="flex items-center gap-1"><CalendarDays className="w-3 h-3" />{fmtShort(r.date)} · {r.startTime}–{r.endTime}</div>
+        <div className="space-y-1 text-[10px] text-muted-foreground border-t border-border/60 pt-2">
+          <div className="flex items-center gap-1"><CalendarDays className="w-3 h-3 shrink-0" />{fmtShort(r.date)} · {r.startTime}–{r.endTime}</div>
           <div className="flex items-center gap-1 truncate">
-            {r.modality === "virtual" ? <Video className="w-3 h-3" /> : <MapPin className="w-3 h-3" />}
-            {r.location}
+            {r.modality === "virtual" ? <Video className="w-3 h-3 shrink-0" /> : <MapPin className="w-3 h-3 shrink-0" />}
+            <span className="truncate">{r.location}</span>
           </div>
           {r.participants && r.participants.length > 0 && (
             <button type="button" onClick={onParticipants}
@@ -756,14 +782,16 @@ function RequestCard({ r, onAccept, onDecline, onDetail, onParticipants }: {
             </button>
           )}
         </div>
-        <div className="flex items-center gap-1.5 pt-1">
-          <Button size="sm" className="h-7 flex-1 text-[10px] gap-1 bg-emerald-600 hover:bg-emerald-700" onClick={onAccept}>
-            <Check className="w-3 h-3" /> Aceitar
-          </Button>
-          <Button size="sm" variant="outline" className="h-7 flex-1 text-[10px] gap-1 border-red-200 text-red-700 hover:bg-red-50" onClick={onDecline}>
-            <X className="w-3 h-3" /> Recusar
-          </Button>
-        </div>
+        {!readOnly && r.status === "pending" && (
+          <div className="flex items-center gap-1.5 pt-1">
+            <Button size="sm" className="h-7 flex-1 text-[10px] gap-1 bg-emerald-600 hover:bg-emerald-700" onClick={onAccept}>
+              <Check className="w-3 h-3" /> Aceitar
+            </Button>
+            <Button size="sm" variant="outline" className="h-7 flex-1 text-[10px] gap-1 border-red-200 text-red-700 hover:bg-red-50" onClick={onDecline}>
+              <X className="w-3 h-3" /> Recusar
+            </Button>
+          </div>
+        )}
       </div>
       <button onClick={onDetail}
         className="w-full h-8 text-[10px] font-medium text-foreground/80 hover:text-foreground border-t bg-muted/20 hover:bg-muted/40 transition-colors flex items-center justify-center gap-1.5">
@@ -1156,3 +1184,85 @@ function ModalityBanner({ modality, location, link }: { modality?: "presencial" 
     </div>
   );
 }
+
+/* ── All Requests dialog ── */
+function AllRequestsDialog({ open, onClose, requests, onAccept, onDecline, onDetail, onParticipants }: {
+  open: boolean;
+  onClose: () => void;
+  requests: MeetingRequest[];
+  onAccept: (id: string) => void;
+  onDecline: (id: string) => void;
+  onDetail: (r: MeetingRequest) => void;
+  onParticipants: (r: MeetingRequest) => void;
+}) {
+  const [filter, setFilter] = useState<"all" | MeetingRequest["status"]>("all");
+  const sorted = [...requests].sort((a, b) => b.requestedAt.localeCompare(a.requestedAt));
+  const filtered = filter === "all" ? sorted : sorted.filter(r => r.status === filter);
+
+  const counts = {
+    all: requests.length,
+    pending: requests.filter(r => r.status === "pending").length,
+    accepted: requests.filter(r => r.status === "accepted").length,
+    declined: requests.filter(r => r.status === "declined").length,
+  };
+
+  const tabs: { v: "all" | MeetingRequest["status"]; label: string; count: number }[] = [
+    { v: "all", label: "Todos", count: counts.all },
+    { v: "pending", label: "Pendentes", count: counts.pending },
+    { v: "accepted", label: "Aceites", count: counts.accepted },
+    { v: "declined", label: "Recusados", count: counts.declined },
+  ];
+
+  return (
+    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="sm:max-w-4xl p-0 gap-0 overflow-hidden">
+        <div className="px-6 py-4 border-b bg-muted/10">
+          <DialogHeader className="space-y-1">
+            <DialogTitle className="text-lg font-bold flex items-center gap-2">
+              <Bell className="w-4 h-4 text-primary" />
+              Pedidos de Reunião
+            </DialogTitle>
+            <DialogDescription className="text-xs">
+              Histórico completo de pedidos — pendentes, aceites e recusados.
+            </DialogDescription>
+          </DialogHeader>
+        </div>
+
+        <div className="px-6 pt-4 pb-2 flex items-center gap-1.5 flex-wrap border-b">
+          {tabs.map(t => (
+            <button key={t.v} onClick={() => setFilter(t.v)}
+              className={cn("inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-colors border",
+                filter === t.v ? "bg-primary text-primary-foreground border-primary" : "bg-card text-foreground border-border hover:bg-muted/40")}>
+              {t.label}
+              <span className={cn("text-[10px] px-1.5 py-0.5 rounded-full font-bold",
+                filter === t.v ? "bg-primary-foreground/20 text-primary-foreground" : "bg-muted text-muted-foreground")}>
+                {t.count}
+              </span>
+            </button>
+          ))}
+        </div>
+
+        <div className="px-6 py-5 max-h-[60vh] overflow-y-auto">
+          {filtered.length === 0 ? (
+            <div className="text-center py-10">
+              <Bell className="w-8 h-8 text-muted-foreground/40 mx-auto mb-2" />
+              <p className="text-sm text-muted-foreground">Sem pedidos para mostrar.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+              {filtered.map(r => (
+                <RequestCard key={r.id} r={r}
+                  readOnly={r.status !== "pending"}
+                  onAccept={() => onAccept(r.id)}
+                  onDecline={() => onDecline(r.id)}
+                  onDetail={() => onDetail(r)}
+                  onParticipants={() => onParticipants(r)} />
+              ))}
+            </div>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
