@@ -106,9 +106,6 @@ export default function FinancasDashboard() {
               </span>
             </div>
             <h1 className="text-2xl font-bold text-foreground">Dashboard Financeiro</h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              {MONTH_FULL[cur.month] ?? cur.month} — Visão geral das finanças institucionais
-            </p>
           </div>
           <div className="flex flex-col items-end gap-1">
             <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Mês de referência</span>

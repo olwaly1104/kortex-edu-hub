@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import {
   Megaphone, Search, Plus, CheckCircle2, Calendar as CalendarIcon,
-  User as UserIcon, Building2, Filter, Sparkles, Trash2,
+  User as UserIcon, Building2, Sparkles, Trash2, GraduationCap, Inbox, UserCircle2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -112,26 +112,41 @@ export default function FinancasAnuncios() {
     { key: "meus", label: "Os meus", count: meusCount },
   ];
 
+  const todayLabel = new Date().toLocaleDateString("pt-PT", {
+    weekday: "long", day: "2-digit", month: "long", year: "numeric",
+  });
+  const anoLetivo = "2024 / 2025";
+
+  const stats = [
+    { label: "Novos hoje", value: todayCount, icon: Sparkles, tone: "text-amber-600 bg-amber-50 border-amber-100" },
+    { label: "Departamento Financeiro", value: deptCount, icon: Building2, tone: "text-primary bg-primary/5 border-primary/10" },
+    { label: "Meus anúncios", value: meusCount, icon: UserCircle2, tone: "text-violet-600 bg-violet-50 border-violet-100" },
+    { label: "Total", value: items.length, icon: Inbox, tone: "text-slate-600 bg-slate-50 border-slate-100" },
+  ];
+
   return (
     <div className="p-6 lg:p-8 animate-fade-in space-y-6">
       {/* ── Header ──────────────────────────────── */}
       <div className="rounded-xl border border-border bg-gradient-to-r from-primary/5 to-transparent p-6">
-        <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div className="flex items-start justify-between gap-4 flex-wrap mb-5">
           <div className="min-w-0">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Megaphone className="w-4 h-4 text-primary" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-foreground">Anúncios</h1>
-                <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1.5">
-                  <Sparkles className="w-3 h-3 text-amber-500" />
-                  <span className="font-medium text-foreground">{todayCount}</span> {todayCount === 1 ? "novo hoje" : "novos hoje"}
-                  <span className="text-border">•</span>
-                  <span>{items.length} no total</span>
-                </p>
-              </div>
+            <div className="flex items-center gap-2 text-[11px] uppercase tracking-wider text-muted-foreground font-medium mb-2">
+              <span className="flex items-center gap-1 capitalize">
+                <CalendarIcon className="w-3.5 h-3.5" />
+                {todayLabel}
+              </span>
+              <span className="text-border">•</span>
+              <span className="flex items-center gap-1">
+                <GraduationCap className="w-3.5 h-3.5" />
+                Ano Letivo {anoLetivo}
+              </span>
             </div>
+            <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+              <Megaphone className="w-6 h-6 text-primary" /> Anúncios
+            </h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              Comunicações institucionais e do Departamento Financeiro.
+            </p>
           </div>
           <Dialog open={openCreate} onOpenChange={setOpenCreate}>
             <DialogTrigger asChild>
@@ -152,7 +167,7 @@ export default function FinancasAnuncios() {
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <Label className="text-xs">Tipo</Label>
+                    <Label className="text-xs">Categoria</Label>
                     <Select value={form.type} onValueChange={(v: AnnType) => setForm({ ...form, type: v })}>
                       <SelectTrigger><SelectValue /></SelectTrigger>
                       <SelectContent>
@@ -190,12 +205,38 @@ export default function FinancasAnuncios() {
           </Dialog>
         </div>
 
-        {/* Toolbar: scope tabs + search + type filter */}
-        <div className="mt-5 flex flex-col lg:flex-row lg:items-center gap-3">
-          <div className="flex bg-muted/60 rounded-lg p-0.5 self-start">
+        {/* Square stat tiles */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+          {stats.map(s => (
+            <div key={s.label} className={cn("rounded-xl border bg-card p-3 flex items-center gap-3", s.tone.split(" ").filter(c => c.startsWith("border")).join(" "))}>
+              <div className={cn("w-10 h-10 rounded-lg flex items-center justify-center shrink-0", s.tone)}>
+                <s.icon className="w-4.5 h-4.5" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-xl font-bold text-foreground leading-none">{s.value}</p>
+                <p className="text-[11px] text-muted-foreground mt-1 truncate">{s.label}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Search */}
+        <div className="relative mb-3">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Pesquisar anúncios por título ou conteúdo…"
+            className="pl-10 h-11 text-sm bg-card border-border"
+          />
+        </div>
+
+        {/* Scope tabs + Category filter */}
+        <div className="flex flex-col lg:flex-row lg:items-center gap-3">
+          <div className="flex bg-muted/60 rounded-lg p-0.5 self-start overflow-x-auto">
             {scopeTabs.map(t => (
               <button key={t.key} onClick={() => setScope(t.key)}
-                className={cn("flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors",
+                className={cn("flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors whitespace-nowrap",
                   scope === t.key ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground")}>
                 {t.label}
                 <span className={cn("text-[10px] px-1.5 rounded-full",
@@ -206,25 +247,21 @@ export default function FinancasAnuncios() {
             ))}
           </div>
           <div className="flex-1" />
-          <div className="relative flex-1 max-w-sm">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input value={search} onChange={e => setSearch(e.target.value)} placeholder="Pesquisar anúncios…" className="pl-9 h-9 text-xs" />
-          </div>
-          <div className="flex items-center gap-1.5">
-            <Filter className="w-3.5 h-3.5 text-muted-foreground" />
-            <Select value={typeFilter} onValueChange={(v: AnnType | "todos") => setTypeFilter(v)}>
-              <SelectTrigger className="w-[140px] h-9 text-xs"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="todos">Todos os tipos</SelectItem>
-                <SelectItem value="urgente">Urgente</SelectItem>
-                <SelectItem value="evento">Evento</SelectItem>
-                <SelectItem value="academico">Académico</SelectItem>
-                <SelectItem value="geral">Geral</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          <Select value={typeFilter} onValueChange={(v: AnnType | "todos") => setTypeFilter(v)}>
+            <SelectTrigger className="w-[180px] h-9 text-xs bg-card">
+              <SelectValue placeholder="Categoria" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todos">Todas as categorias</SelectItem>
+              <SelectItem value="urgente">Urgente</SelectItem>
+              <SelectItem value="evento">Evento</SelectItem>
+              <SelectItem value="academico">Académico</SelectItem>
+              <SelectItem value="geral">Geral</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
+
 
       {/* ── Feed ────────────────────────────────── */}
       <div className="space-y-3">
@@ -256,10 +293,12 @@ export default function FinancasAnuncios() {
                   <h3 className="text-base font-semibold text-foreground mb-1.5 leading-tight">{a.title}</h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">{a.content}</p>
                   <div className="flex items-center justify-between gap-3 mt-3 pt-3 border-t border-border">
-                    <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-                      <UserIcon className="w-3 h-3" />
-                      <span className="font-medium text-foreground">{a.author}</span>
-                    </div>
+                    {a.author && a.author !== a.department ? (
+                      <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                        <UserIcon className="w-3 h-3" />
+                        <span className="font-medium text-foreground">{a.author}</span>
+                      </div>
+                    ) : <div />}
                     <div className="flex items-center gap-2">
                       {a.cta === "inscrever" && (
                         isSub ? (
