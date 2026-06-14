@@ -109,23 +109,19 @@ export default function FinancasDashboard() {
         subtitle="Visão geral das receitas, despesas e transações institucionais."
       />
 
-      {/* Mês de referência — plain text above KPIs */}
-      <div className="flex items-end justify-between gap-3 flex-wrap">
-        <div>
-          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Mes</p>
-          <p className="text-lg font-bold text-foreground leading-tight capitalize">{selectedMonthLabel} 2025</p>
-        </div>
-        <Select value={selectedMonth} onValueChange={setSelectedMonth}>
-          <SelectTrigger className="w-[180px] h-9 text-sm">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {monthlyData.map(m => (
-              <SelectItem key={m.month} value={m.month}>{MONTH_FULL[m.month] ?? m.month}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+      {/* Período toggle + result + selector */}
+      <PeriodSelector periodo={periodo} setPeriodo={setPeriodo} value={periodoValue} setValue={setPeriodoValue} />
+
+      {/* ── KPIs ── */}
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+        <KPICard label="Receita Esperada" value={formatCurrency(receitaEsperadaMes * mult)} subtitle={periodo === "mes" ? "Este Mês" : periodo === "semestre" ? "Este Semestre" : "Este Ano"} icon={Receipt} accent />
+        <KPICard label={periodo === "mes" ? "Receitas do Mês" : periodo === "semestre" ? "Receitas do Semestre" : "Receitas do Ano"} value={formatCurrency(cur.receitas * mult)} change={receitaVar} icon={TrendingUp} positive />
+        <KPICard label="Despesa Orçamentada" value={formatCurrency(despesaOrcamentadaMes * mult)} subtitle={periodo === "mes" ? "Este Mês" : periodo === "semestre" ? "Este Semestre" : "Este Ano"} icon={FileText} accent />
+        <KPICard label={periodo === "mes" ? "Despesas do Mês" : periodo === "semestre" ? "Despesas do Semestre" : "Despesas do Ano"} value={formatCurrency(cur.despesas * mult)} change={despesaVar} icon={TrendingDown} positive={false} />
       </div>
+{/* placeholder removed */}
+      <div className="hidden">
+
 
       {/* ── KPIs ── */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
