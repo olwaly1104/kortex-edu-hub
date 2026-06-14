@@ -237,9 +237,6 @@ export default function FinancasCalendario() {
                 </button>
               ))}
             </div>
-            <Button size="sm" className="h-9 gap-1.5 text-xs" onClick={() => { setForm(f => ({ ...f, date: selectedDate })); setOpenCreate(true); }}>
-              <Plus className="w-4 h-4" /> Adicionar à Agenda
-            </Button>
           </div>
         </div>
       </div>
