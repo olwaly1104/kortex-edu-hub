@@ -689,7 +689,7 @@ function RequestCard({ r, onAccept, onDecline, onDetail, onParticipants }: {
   return (
     <div className="rounded-lg border bg-card hover:border-foreground/20 transition-colors overflow-hidden h-full flex flex-col">
       <div className="px-2.5 pt-2 pb-1 border-b bg-muted/20 flex items-center justify-between gap-2">
-        <span className="text-[9px] uppercase tracking-wider text-muted-foreground font-medium">Pedido em</span>
+        <span className="text-[9px] uppercase tracking-wider text-muted-foreground font-medium">Data do Pedido</span>
         <span className="text-[10px] font-semibold text-foreground">{fmtShort(r.requestedAt)}</span>
       </div>
       <div className="p-2.5 space-y-2 flex-1">
