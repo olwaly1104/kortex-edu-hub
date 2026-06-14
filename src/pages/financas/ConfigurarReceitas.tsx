@@ -325,13 +325,24 @@ export default function ConfigurarReceitas() {
                             <Button size="sm" className="h-8" onClick={commitInline}>OK</Button>
                           </div>
                         ) : (
-                          <button
-                            onClick={() => setInlineEdit({ id: r.id, valor: String(r.valor) })}
-                            className="text-sm font-semibold text-foreground tabular-nums whitespace-nowrap px-2 py-1 rounded hover:bg-muted transition"
-                            title="Clique para editar"
-                          >
-                            {formatCurrency(r.valor)}
-                          </button>
+                          <>
+                            <button
+                              onClick={() => setInlineEdit({ id: r.id, valor: String(r.valor) })}
+                              className="text-sm font-semibold text-foreground tabular-nums whitespace-nowrap px-2 py-1 rounded hover:bg-muted transition"
+                              title="Clique para editar valor"
+                            >
+                              {formatCurrency(r.valor)}
+                            </button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7 rounded-md"
+                              onClick={() => openEdit(section, r)}
+                              title="Editar detalhes"
+                            >
+                              <Pencil className="w-3.5 h-3.5" />
+                            </Button>
+                          </>
                         )}
                       </div>
                     );
