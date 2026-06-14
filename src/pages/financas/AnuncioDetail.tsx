@@ -276,18 +276,6 @@ export default function FinancasAnuncioDetail() {
                   value={m.label}
                 />
               </div>
-              <div className="py-3">
-                <MetaCell
-                  icon={<Circle className="w-3 h-3" />}
-                  label="Estado"
-                  value={
-                    <span className="inline-flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                      Publicado
-                    </span>
-                  }
-                />
-              </div>
               {ann.ctaDeadline && (
                 <div className="pt-3">
                   <MetaCell
