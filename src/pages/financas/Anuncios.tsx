@@ -285,21 +285,26 @@ export default function FinancasAnuncios() {
 
                   {/* compact CTA */}
                   {a.cta === "inscrever" && (
-                    <div className="mt-3 flex items-center gap-3">
+                    <div className="mt-3">
                       {isSub ? (
-                        <Badge variant="outline" className="text-[10px] gap-1 bg-emerald-50 text-emerald-700 border-emerald-200 h-6 px-2">
-                          <CheckCircle2 className="w-3 h-3" /> Inscrito
-                        </Badge>
+                        <div className="inline-flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                          <span className="text-[11px] font-medium text-emerald-700">Inscrito</span>
+                        </div>
                       ) : (
-                        <>
-                          <Button size="sm" className="h-7 text-[11px] gap-1.5 px-3 shadow-sm"
-                            onClick={() => setSubscribed(s => new Set(s).add(a.id))}>
-                            <CheckCircle2 className="w-3.5 h-3.5" /> Inscrever-me
-                          </Button>
+                        <div className="inline-flex items-center gap-3 rounded-lg border border-border/80 bg-muted/30 px-3 py-2">
+                          <button
+                            className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-primary hover:text-primary/80 transition-colors"
+                            onClick={() => setSubscribed(s => new Set(s).add(a.id))}
+                          >
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            Inscrever-me
+                          </button>
+                          <span className="h-3 w-px bg-border" />
                           <span className="text-[11px] text-muted-foreground">
                             até <span className="font-medium text-foreground tabular-nums">{a.ctaDeadline ?? "—"}</span>
                           </span>
-                        </>
+                        </div>
                       )}
                     </div>
                   )}
