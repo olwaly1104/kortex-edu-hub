@@ -214,6 +214,7 @@ export const currentFinancas: User = {
   name: "Dr. Manuel Sousa",
   email: "financas@upra.kor",
   role: "financas",
+  presence: "96%",
 };
 
 export const currentGap: User = {
