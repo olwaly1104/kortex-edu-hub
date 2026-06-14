@@ -82,7 +82,7 @@ export const finSolicitacoes: FinSolicitacao[] = [
     anexos: [{ nome: "Factura-LabSupplies.pdf", tamanho: "156 KB", tipo: "pdf" }],
     historico: [
       { data: "2025-04-02 10:00", actor: "Coord. Fac. Ciências", accao: "Solicitação submetida" },
-      { data: "2025-04-03 14:20", actor: "Direcção Financeira", accao: "Solicitação aprovada", nota: "Pagamento agendado para o dia seguinte." },
+      { data: "2025-04-03 14:20", actor: "Direcção Financeira", accao: "Solicitação aprovada", nota: "Pagamento agendado para o dia seguinte.", anexos: [{ nome: "Despacho-aprovacao.pdf", tamanho: "62 KB", tipo: "pdf" }] },
     ],
   },
   {
