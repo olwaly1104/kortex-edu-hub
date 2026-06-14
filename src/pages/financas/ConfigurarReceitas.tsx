@@ -42,16 +42,21 @@ const TIPOS_RECEITA: TipoReceita[] = [
   "Multa Estudante", "Multa Administrativo", "Multa Docente",
 ];
 
-interface PropinaPlan { months: number; valor: number; }
+interface PropinaPlan { months: number; valor: number; imposto?: number; }
 
 interface ReceitaRow {
   id: string;
   nome: string;
   tipo: TipoReceita;
   escopo: string;
-  valor: number;
+  valor: number;          // valor bruto
+  imposto?: number;       // taxa de imposto (0-1), default 0.14
   plans?: PropinaPlan[];
 }
+
+const DEFAULT_IMPOSTO = 0.14;
+const liquidoOf = (bruto: number, imposto?: number) =>
+  Math.round(bruto * (1 - (imposto ?? DEFAULT_IMPOSTO)));
 
 const ALL_COURSES = reitorFaculties.flatMap(f =>
   f.courses.map(c => ({ id: c.id, code: c.code, name: c.name, facultyId: f.id, facultyName: f.name }))
