@@ -187,7 +187,7 @@ export const finTypeMeta: Record<FinType, { label: string; icon: LucideIcon; cls
   antecipacao: { label: "Antecipação", icon: Wallet,     cls: "bg-rose-50 text-rose-700 border-rose-200",       dot: "bg-rose-500" },
   verba:       { label: "Verba",       icon: Coins,      cls: "bg-emerald-50 text-emerald-700 border-emerald-200", dot: "bg-emerald-500" },
   ferias:      { label: "Férias",      icon: Plane,      cls: "bg-sky-50 text-sky-700 border-sky-200",          dot: "bg-sky-500" },
-  licenca:     { label: "Licença",     icon: HeartPulse, cls: "bg-pink-50 text-pink-700 border-pink-200",       dot: "bg-pink-500" },
+  licenca:     { label: "Pessoal",     icon: HeartPulse, cls: "bg-pink-50 text-pink-700 border-pink-200",       dot: "bg-pink-500" },
   declaracao:  { label: "Declaração",  icon: Stamp,      cls: "bg-indigo-50 text-indigo-700 border-indigo-200", dot: "bg-indigo-500" },
   material:    { label: "Material",    icon: Package,    cls: "bg-orange-50 text-orange-700 border-orange-200", dot: "bg-orange-500" },
   formacao:    { label: "Formação",    icon: GraduationCap, cls: "bg-teal-50 text-teal-700 border-teal-200",    dot: "bg-teal-500" },

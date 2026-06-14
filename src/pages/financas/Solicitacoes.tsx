@@ -20,6 +20,8 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar as CalendarPicker } from "@/components/ui/calendar";
 import { useToast } from "@/hooks/use-toast";
 import {
   finSolicitacoes, finTypeMeta, finStatusMeta,
@@ -42,7 +44,8 @@ export default function FinancasSolicitacoes() {
   const [newTitle, setNewTitle] = useState("");
   const [newDesc, setNewDesc] = useState("");
   const [newValor, setNewValor] = useState("");
-  const [newPrazo, setNewPrazo] = useState("");
+  const [newPrazoDe, setNewPrazoDe] = useState<Date | undefined>(undefined);
+  const [newPrazoAte, setNewPrazoAte] = useState<Date | undefined>(undefined);
   const [newFiles, setNewFiles] = useState<{ name: string; size: string }[]>([]);
 
   // Auto-routing by category
@@ -53,7 +56,7 @@ export default function FinancasSolicitacoes() {
     antecipacao: { destinatario: "Magnífico Reitor",    responsavel: "Prof. Dr. António Mendes · Reitor",            description: "Adiantamento de verba para missão ou despesa futura.", needsValor: true },
     verba:       { destinatario: "Conselho de Gestão",  responsavel: "Conselho de Gestão · Órgão Colegial",          description: "Solicitação de verba extraordinária não orçamentada.", needsValor: true },
     ferias:      { destinatario: "Recursos Humanos",    responsavel: "Sra. Isabel Tavares · Direcção de RH",         description: "Marcação ou alteração de período de férias.",          needsValor: false },
-    licenca:     { destinatario: "Recursos Humanos",    responsavel: "Sra. Isabel Tavares · Direcção de RH",         description: "Licença médica, parental ou justificação de ausência.", needsValor: false },
+    licenca:     { destinatario: "Recursos Humanos",    responsavel: "Sra. Isabel Tavares · Direcção de RH",         description: "Assuntos pessoais — licenças, ausências e justificações.", needsValor: false },
     declaracao:  { destinatario: "Secretaria Geral",    responsavel: "Sec. Geral · Apoio Institucional",             description: "Emissão de declarações, certidões ou comprovativos.",  needsValor: false },
     material:    { destinatario: "Logística & Compras", responsavel: "Sr. Paulo Neves · Logística",                  description: "Requisição de material de escritório ou equipamento.", needsValor: true },
     formacao:    { destinatario: "Recursos Humanos",    responsavel: "Sra. Isabel Tavares · Direcção de RH",         description: "Pedido de inscrição em formações ou conferências.",    needsValor: true },
@@ -69,15 +72,15 @@ export default function FinancasSolicitacoes() {
 
   const openWizard = () => {
     setNewType(null); setNewTitle(""); setNewDesc(""); setNewValor("");
-    setNewPrazo(""); setNewFiles([]); setWizStep(1);
+    setNewPrazoDe(undefined); setNewPrazoAte(undefined); setNewFiles([]); setWizStep(1);
     setShowNewDialog(true);
   };
 
-  const fmtPrazo = (iso: string) => {
-    if (!iso) return "—";
-    const d = new Date(iso);
+  const fmtPrazo = (d?: Date) => {
+    if (!d) return "—";
     return d.toLocaleDateString("pt-PT", { day: "2-digit", month: "long", year: "numeric" });
   };
+  const fmtPrazoShort = (d?: Date) => d ? d.toLocaleDateString("pt-PT", { day: "2-digit", month: "short", year: "numeric" }) : "Escolher";
   const fmtKz = (v: string) => {
     const n = Number(v.replace(/[^\d]/g, ""));
     if (!n) return "—";
@@ -536,7 +539,32 @@ export default function FinancasSolicitacoes() {
                   )}
                   <div className={cn("space-y-1.5", !ROUTING[newType].needsValor && "col-span-2")}>
                     <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Prazo pretendido</label>
-                    <Input type="date" value={newPrazo} onChange={e => setNewPrazo(e.target.value)} className="h-9 text-[13px]" />
+                    <div className="grid grid-cols-2 gap-2">
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button variant="outline" className={cn("h-9 text-[12px] justify-start gap-1.5 font-normal", !newPrazoDe && "text-muted-foreground")}>
+                            <Calendar className="w-3.5 h-3.5" />
+                            <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">De</span>
+                            {fmtPrazoShort(newPrazoDe)}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <CalendarPicker mode="single" selected={newPrazoDe} onSelect={setNewPrazoDe} initialFocus className="p-3 pointer-events-auto" />
+                        </PopoverContent>
+                      </Popover>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button variant="outline" className={cn("h-9 text-[12px] justify-start gap-1.5 font-normal", !newPrazoAte && "text-muted-foreground")}>
+                            <Calendar className="w-3.5 h-3.5" />
+                            <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">Até</span>
+                            {fmtPrazoShort(newPrazoAte)}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <CalendarPicker mode="single" selected={newPrazoAte} onSelect={setNewPrazoAte} disabled={(d) => newPrazoDe ? d < newPrazoDe : false} initialFocus className="p-3 pointer-events-auto" />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
                   </div>
                 </div>
 
@@ -590,7 +618,7 @@ export default function FinancasSolicitacoes() {
                       <ReviewCell label="Requerente" value="Dr. Manuel Sousa" sub="Direcção Financeira" />
                       <ReviewCell label="Destinatário" value={ROUTING[newType].destinatario} sub="Atribuição automática" />
                       <ReviewCell label="Submetido" value={new Date().toLocaleDateString("pt-PT", { day: "2-digit", month: "long", year: "numeric" })} />
-                      <ReviewCell label="Prazo" value={fmtPrazo(newPrazo)} />
+                      <ReviewCell label="Prazo" value={newPrazoDe || newPrazoAte ? `${fmtPrazo(newPrazoDe)} → ${fmtPrazo(newPrazoAte)}` : "—"} />
                       {ROUTING[newType].needsValor && <ReviewCell label="Valor" value={fmtKz(newValor)} mono />}
                       <ReviewCell label="Anexos" value={`${newFiles.length} ficheiro${newFiles.length === 1 ? "" : "s"}`} />
                     </div>
