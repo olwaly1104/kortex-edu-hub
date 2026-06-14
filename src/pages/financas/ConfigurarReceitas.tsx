@@ -178,7 +178,7 @@ interface DespesaRow {
 }
 
 const DEPARTAMENTOS = [
-  "Geral", "Reitoria", "Administração", "TI", "Serviços Gerais",
+  "Geral", "Reitoria", "Administração", "Docentes", "TI", "Serviços Gerais",
   "Fac. Engenharia", "Fac. Medicina", "Fac. Direito", "Fac. Arquitectura",
   "Fac. Ciências", "Fac. Letras", "Fac. Economia",
 ];
