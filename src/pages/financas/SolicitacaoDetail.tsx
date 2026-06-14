@@ -192,7 +192,7 @@ export default function FinancasSolicitacaoDetail() {
     em_execucao: {
       title: "Aprovar solicitação",
       desc: "Carregue anexos ou evidências para registo da aprovação.",
-      cta: "Aprovar",
+      cta: "Confirmar",
       tone: "bg-emerald-600 hover:bg-emerald-700 text-white",
       accent: "text-emerald-600",
       iconBg: "bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100",
