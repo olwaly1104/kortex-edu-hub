@@ -954,50 +954,92 @@ export default function ConfigurarReceitas() {
               );
             }
 
-            // Multas section — single card with internal subtype toggle
+            // Multas section — premium category cards + themed table
             if (section.key === "multas") {
+              const activeSub = MULTA_SUBTYPES.find(s => s.key === multaSubtype)!;
+              const ActiveIcon = activeSub.icon;
               const filtered = items.filter(r => r.tipo === multaSubtype);
+              const totalBruto = filtered.reduce((sum, r) => sum + r.valor, 0);
+              const totalLiquido = filtered.reduce((sum, r) => sum + liquidoOf(r.valor, r.imposto), 0);
               return (
                 <Card key={section.key} className="p-5">
-                  <div className="flex items-center justify-between mb-3 gap-4 flex-wrap">
+                  <div className="flex items-center justify-between mb-4 gap-4 flex-wrap">
                     <div className="flex items-center gap-2 min-w-0">
                       <Icon className={cn("w-4 h-4", section.accent)} />
                       <h2 className="text-sm font-semibold text-foreground">{section.title}</h2>
                       <span className="text-[11px] text-muted-foreground tabular-nums">· {items.length} no total</span>
                       <span className="text-xs text-muted-foreground truncate hidden md:inline">— {section.description}</span>
                     </div>
-                    <Button size="sm" variant="outline" className="gap-1.5 h-8 text-xs" onClick={() => openNewReceita(section)}>
-                      <Plus className="w-3.5 h-3.5" /> Nova multa
-                    </Button>
                   </div>
 
-                  <div className="flex items-center gap-1 bg-muted/50 rounded-lg p-1 w-fit mb-4">
+                  {/* Category selector cards */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
                     {MULTA_SUBTYPES.map(sub => {
-                      const count = items.filter(r => r.tipo === sub.key).length;
+                      const SubIcon = sub.icon;
+                      const subItems = items.filter(r => r.tipo === sub.key);
+                      const subSum = subItems.reduce((s, r) => s + r.valor, 0);
                       const active = multaSubtype === sub.key;
                       return (
-                        <Button key={sub.key} variant="ghost" size="sm"
-                          onClick={() => setMultaSubtype(sub.key)}
-                          className={cn("text-xs h-7 px-3 rounded-md gap-1.5",
-                            active ? "bg-background shadow-sm text-foreground font-medium" : "text-muted-foreground hover:text-foreground"
+                        <button key={sub.key} type="button" onClick={() => setMultaSubtype(sub.key)}
+                          className={cn(
+                            "relative text-left rounded-xl border p-3.5 transition-all overflow-hidden",
+                            active
+                              ? cn("ring-2 ring-offset-1 shadow-sm", sub.ring)
+                              : "border-border bg-card hover:border-foreground/20 hover:shadow-sm"
                           )}>
-                          {sub.label}
-                          <span className={cn("inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full text-[10px] tabular-nums",
-                            active ? "bg-muted text-foreground" : "bg-background text-muted-foreground")}>{count}</span>
-                        </Button>
+                          <span className={cn("absolute left-0 top-0 bottom-0 w-1", sub.bar, active ? "opacity-100" : "opacity-40")} />
+                          <div className="flex items-start gap-3 pl-1.5">
+                            <div className={cn("w-9 h-9 rounded-lg flex items-center justify-center shrink-0", sub.iconBg)}>
+                              <SubIcon className={cn("w-4.5 h-4.5", sub.iconColor)} />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2">
+                                <span className={cn("text-sm font-semibold", active ? sub.iconColor : "text-foreground")}>{sub.label}</span>
+                                <span className={cn("inline-flex items-center justify-center min-w-[20px] h-[18px] px-1.5 rounded-full text-[10px] font-semibold tabular-nums", sub.chip)}>
+                                  {subItems.length}
+                                </span>
+                              </div>
+                              <p className="text-[11px] text-muted-foreground mt-0.5">Total bruto</p>
+                              <p className="text-sm font-semibold tabular-nums text-foreground mt-0.5">{formatCurrency(subSum)}</p>
+                            </div>
+                          </div>
+                        </button>
                       );
                     })}
                   </div>
 
+                  {/* Active category header bar */}
+                  <div className={cn("flex items-center justify-between gap-3 rounded-lg border px-3 py-2 mb-3", activeSub.ring)}>
+                    <div className="flex items-center gap-2 min-w-0">
+                      <ActiveIcon className={cn("w-4 h-4", activeSub.iconColor)} />
+                      <span className={cn("text-sm font-semibold", activeSub.iconColor)}>Multas · {activeSub.label}</span>
+                      <span className="text-[11px] text-muted-foreground tabular-nums">· {filtered.length} {filtered.length === 1 ? "item" : "itens"}</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="hidden sm:flex items-center gap-3 text-[11px] text-muted-foreground">
+                        <span>Bruto <span className="font-semibold text-foreground tabular-nums ml-0.5">{formatCurrency(totalBruto)}</span></span>
+                        <span>Líquido <span className="font-semibold text-emerald-700 tabular-nums ml-0.5">{formatCurrency(totalLiquido)}</span></span>
+                      </div>
+                      <Button size="sm" variant="outline" className="gap-1.5 h-8 text-xs" onClick={() => openNewReceita(section)}>
+                        <Plus className="w-3.5 h-3.5" /> Nova multa
+                      </Button>
+                    </div>
+                  </div>
+
                   {filtered.length === 0 ? (
-                    <p className="text-xs text-muted-foreground italic py-3">Sem multas configuradas para esta categoria.</p>
+                    <div className="text-center py-8 rounded-lg border border-dashed border-border bg-muted/20">
+                      <ActiveIcon className={cn("w-6 h-6 mx-auto mb-2 opacity-60", activeSub.iconColor)} />
+                      <p className="text-xs text-muted-foreground">Sem multas configuradas para {activeSub.label.toLowerCase()}.</p>
+                      <Button size="sm" variant="outline" className="gap-1.5 h-8 text-xs mt-3" onClick={() => openNewReceita(section)}>
+                        <Plus className="w-3.5 h-3.5" /> Adicionar primeira multa
+                      </Button>
+                    </div>
                   ) : (
                     <div className="overflow-x-auto rounded-lg border border-border">
                       <table className="w-full text-sm">
                         <thead>
                           <tr className="text-[10px] uppercase tracking-wider text-muted-foreground border-b border-border bg-muted/30">
                             <th className="text-left font-semibold px-4 py-2">Multa</th>
-                            <th className="text-left font-semibold px-3 py-2 hidden sm:table-cell">Tipo</th>
                             <th className="text-right font-semibold px-3 py-2">Bruto</th>
                             <th className="text-right font-semibold px-3 py-2">Líquido</th>
                             <th className="text-right font-semibold px-3 py-2 hidden sm:table-cell">Imposto</th>
@@ -1012,9 +1054,11 @@ export default function ConfigurarReceitas() {
                                 onClick={() => openEditReceita(section, r)}
                                 onKeyDown={(e) => { if (e.key === "Enter") openEditReceita(section, r); }}
                                 className="border-b border-border/50 last:border-0 cursor-pointer hover:bg-muted/30 transition group">
-                                <td className="px-4 py-2.5 text-sm font-medium text-foreground">{r.nome}</td>
-                                <td className="px-3 py-2.5 hidden sm:table-cell">
-                                  <span className={cn("inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] font-medium", tipoChipReceita[r.tipo])}>{r.tipo}</span>
+                                <td className="px-4 py-2.5">
+                                  <div className="flex items-center gap-2.5">
+                                    <span className={cn("w-1 h-6 rounded-full shrink-0", activeSub.bar)} />
+                                    <span className="text-sm font-medium text-foreground">{r.nome}</span>
+                                  </div>
                                 </td>
                                 <td className="px-3 py-2.5 text-right text-sm font-semibold tabular-nums text-foreground">{formatCurrency(r.valor)}</td>
                                 <td className="px-3 py-2.5 text-right text-sm font-semibold tabular-nums text-emerald-700">{formatCurrency(liquidoOf(r.valor, r.imposto))}</td>
@@ -1034,12 +1078,22 @@ export default function ConfigurarReceitas() {
                             );
                           })}
                         </tbody>
+                        <tfoot>
+                          <tr className="border-t-2 border-border bg-muted/20">
+                            <td className="px-4 py-2 text-[11px] uppercase tracking-wider font-semibold text-muted-foreground">Total</td>
+                            <td className="px-3 py-2 text-right text-sm font-bold tabular-nums text-foreground">{formatCurrency(totalBruto)}</td>
+                            <td className="px-3 py-2 text-right text-sm font-bold tabular-nums text-emerald-700">{formatCurrency(totalLiquido)}</td>
+                            <td className="hidden sm:table-cell" />
+                            <td />
+                          </tr>
+                        </tfoot>
                       </table>
                     </div>
                   )}
                 </Card>
               );
             }
+
 
             return (
               <Card key={section.key} className="p-5">
