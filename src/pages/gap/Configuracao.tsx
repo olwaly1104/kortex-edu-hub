@@ -366,7 +366,7 @@ export default function GapConfiguracao() {
   const removePergunta = (stepKey: string, pKey: string) =>
     setCdFormSteps(steps => steps.map(s => s.key === stepKey ? { ...s, perguntas: s.perguntas.filter(p => p.key !== pKey) } : s));
 
-
+  return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       {/* Header */}
       <div>
