@@ -335,124 +335,141 @@ export default function FinancasCalendario() {
         </div>
       </div>
 
+      {/* ── Pedidos de Reunião (banner) ───────────── */}
+      {pendingRequests.length > 0 && (
+        <Card className="overflow-hidden border-blue-200">
+          <div className="px-4 py-2.5 border-b bg-blue-50/60 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Bell className="w-4 h-4 text-blue-600" />
+              <p className="text-sm font-semibold text-foreground">Pedidos de Reunião</p>
+              <Badge className="bg-blue-600 hover:bg-blue-600 text-white text-[10px] h-5">{pendingRequests.length}</Badge>
+            </div>
+            <p className="text-[11px] text-muted-foreground">Aceite para adicionar ao seu calendário</p>
+          </div>
+          <div className="flex gap-3 p-3 overflow-x-auto">
+            {pendingRequests.map(r => (
+              <div key={r.id} className="shrink-0 w-[320px] rounded-lg border p-3 space-y-2 bg-card hover:border-blue-300 transition-colors">
+                <div>
+                  <p className="text-xs font-semibold text-foreground leading-tight line-clamp-1">{r.title}</p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5 flex items-center gap-1">
+                    <UserCircle2 className="w-3 h-3" />{r.organizer}
+                  </p>
+                </div>
+                <div className="flex items-center gap-3 text-[10px] text-muted-foreground flex-wrap">
+                  <span className="flex items-center gap-1"><CalendarDays className="w-3 h-3" />{r.date}</span>
+                  <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{r.startTime}–{r.endTime}</span>
+                  <span className="flex items-center gap-1 truncate"><MapPin className="w-3 h-3" />{r.location}</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Button size="sm" className="h-7 flex-1 text-[10px] gap-1 bg-emerald-600 hover:bg-emerald-700"
+                    onClick={() => respondRequest(r.id, "accepted")}>
+                    <Check className="w-3 h-3" /> Aceitar
+                  </Button>
+                  <Button size="sm" variant="outline" className="h-7 flex-1 text-[10px] gap-1 border-red-200 text-red-700 hover:bg-red-50"
+                    onClick={() => respondRequest(r.id, "declined")}>
+                    <X className="w-3 h-3" /> Recusar
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
+
       {/* ── Grid ─────────────────────────────────── */}
       <div className="flex gap-6">
         <div className="flex-1 min-w-0">
           {view === "week" ? (
-            <Card className="overflow-hidden">
-              {/* Day headers */}
-              <div className="grid grid-cols-[60px_repeat(7,1fr)] border-b bg-muted/10">
-                <div />
-                {weekDays.map(d => {
-                  const dD = parseISO(d);
-                  const isToday = d === TODAY;
-                  const isSel = d === selectedDate;
-                  return (
+            <div className="space-y-3">
+              {weekDays.map(d => {
+                const dD = parseISO(d);
+                const isToday = d === TODAY;
+                const isSel = d === selectedDate;
+                const dayEvents = eventsOnDate(d).sort((a, b) =>
+                  (a.startTime ?? "00:00").localeCompare(b.startTime ?? "00:00")
+                );
+                return (
+                  <Card key={d} className={cn("overflow-hidden transition-colors",
+                    isSel && "ring-2 ring-primary/40",
+                    isToday && "border-primary/40"
+                  )}>
                     <button
-                      key={d}
                       onClick={() => setSelectedDate(d)}
                       className={cn(
-                        "py-3 text-center border-l transition-colors",
-                        isSel ? "bg-primary/10" : "hover:bg-primary/5",
+                        "w-full flex items-center gap-4 px-4 py-2.5 border-b text-left",
+                        isToday ? "bg-primary/5" : "bg-muted/20 hover:bg-muted/40"
                       )}
                     >
-                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">
-                        {DAYS_SHORT[(dD.getDay() + 6) % 7]}
-                      </p>
-                      <p className={cn(
-                        "text-base font-bold mt-0.5 w-8 h-8 mx-auto flex items-center justify-center rounded-full transition-colors",
-                        isToday ? "bg-primary text-primary-foreground" :
-                        isSel ? "ring-2 ring-primary text-foreground" : "text-foreground"
-                      )}>{dD.getDate()}</p>
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* All-day row */}
-              <div className="grid grid-cols-[60px_repeat(7,1fr)] border-b bg-muted/5">
-                <div className="text-[9px] uppercase tracking-wider text-muted-foreground font-medium px-2 py-2 text-right">Dia todo</div>
-                {weekDays.map(d => {
-                  const allDay = eventsOnDate(d).filter(e => !e.startTime || e.startTime === "23:59" || e.type === "feriado" || e.type === "ferias");
-                  return (
-                    <div key={d} className="border-l p-1 space-y-1 min-h-[32px]">
-                      {allDay.map(ev => {
-                        const m = TYPE_META[ev.type];
-                        return (
-                          <div key={ev.id} className={cn("text-[10px] rounded px-1.5 py-0.5 border truncate font-medium", m.soft, m.text)}>
-                            {ev.title}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* Time grid */}
-              <ScrollArea className="h-[520px]">
-                <div className="grid grid-cols-[60px_repeat(7,1fr)] relative" style={{ height: HOURS.length * HOUR_HEIGHT }}>
-                  {/* hour labels */}
-                  <div className="relative">
-                    {HOURS.map((h, i) => (
-                      <div key={h} className="absolute right-2 text-[10px] text-muted-foreground font-medium" style={{ top: i * HOUR_HEIGHT - 6 }}>
-                        {String(h).padStart(2, "0")}:00
+                      <div className={cn(
+                        "w-10 h-10 rounded-lg flex flex-col items-center justify-center shrink-0",
+                        isToday ? "bg-primary text-primary-foreground" : "bg-card border"
+                      )}>
+                        <span className="text-[9px] uppercase tracking-wider font-medium leading-none">
+                          {DAYS_SHORT[(dD.getDay() + 6) % 7]}
+                        </span>
+                        <span className="text-sm font-bold leading-none mt-0.5">{dD.getDate()}</span>
                       </div>
-                    ))}
-                  </div>
-                  {/* day columns */}
-                  {weekDays.map(d => {
-                    const isToday = d === TODAY;
-                    const isSel = d === selectedDate;
-                    const timed = eventsOnDate(d).filter(e => e.startTime && e.startTime !== "23:59" && e.type !== "feriado" && e.type !== "ferias");
-                    return (
-                      <div key={d}
-                        onClick={() => setSelectedDate(d)}
-                        className={cn("relative border-l cursor-pointer",
-                          isToday && "bg-primary/[0.03]",
-                          isSel && !isToday && "bg-primary/[0.05]"
-                        )}>
-                        {HOURS.map((_, i) => (
-                          <div key={i} className="absolute w-full border-t border-border/40" style={{ top: i * HOUR_HEIGHT }} />
-                        ))}
-                        {/* now indicator */}
-                        {isToday && (() => {
-                          const top = ((14 * 60 + 30) - 8 * 60) / 60 * HOUR_HEIGHT; // 14:30 mock current time
-                          return (
-                            <div className="absolute left-0 right-0 z-20 pointer-events-none" style={{ top }}>
-                              <div className="h-px bg-red-500" />
-                              <div className="w-2 h-2 rounded-full bg-red-500 -mt-1" />
-                            </div>
-                          );
-                        })()}
-                        {timed.map(ev => {
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-foreground capitalize">
+                          {DAYS_FULL[(dD.getDay() + 6) % 7]}
+                          {isToday && <span className="ml-2 text-[10px] font-medium text-primary uppercase tracking-wider">Hoje</span>}
+                        </p>
+                        <p className="text-[11px] text-muted-foreground">
+                          {dayEvents.length === 0 ? "Sem eventos" : `${dayEvents.length} evento${dayEvents.length > 1 ? "s" : ""}`}
+                        </p>
+                      </div>
+                    </button>
+
+                    {dayEvents.length === 0 ? (
+                      <p className="text-xs text-muted-foreground text-center py-4">Sem eventos agendados</p>
+                    ) : (
+                      <div className="divide-y divide-border">
+                        {dayEvents.map(ev => {
                           const m = TYPE_META[ev.type];
-                          const start = (timeToMin(ev.startTime!) - 8 * 60) / 60 * HOUR_HEIGHT;
-                          const end = (timeToMin(ev.endTime ?? ev.startTime!) - 8 * 60) / 60 * HOUR_HEIGHT;
-                          const height = Math.max(end - start, 22);
+                          const Icon = m.icon;
+                          const hasTime = ev.startTime && ev.startTime !== "23:59";
                           return (
-                            <div key={ev.id}
-                              onClick={(e) => { e.stopPropagation(); setSelectedDate(d); }}
-                              className={cn("absolute left-1 right-1 rounded-md border-l-4 px-1.5 py-1 z-10 overflow-hidden cursor-pointer hover:shadow-md transition-shadow",
-                                m.soft)}
-                              style={{ top: start + 1, height: height - 2, borderLeftColor: undefined }}
-                            >
-                              <div className={cn("absolute left-0 top-0 bottom-0 w-1", m.bar)} />
-                              <p className={cn("text-[10px] font-semibold leading-tight truncate pl-1", m.text)}>
-                                {ev.title}
-                              </p>
-                              {height > 32 && (
-                                <p className="text-[9px] text-muted-foreground pl-1 truncate">{ev.startTime}–{ev.endTime}</p>
+                            <div key={ev.id} className="flex items-center gap-4 px-4 py-3 hover:bg-muted/30 transition-colors">
+                              <div className="text-center shrink-0 w-14">
+                                {hasTime ? (
+                                  <>
+                                    <p className="text-sm font-bold text-foreground">{ev.startTime}</p>
+                                    <p className="text-[10px] text-muted-foreground">{ev.endTime}</p>
+                                  </>
+                                ) : (
+                                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Dia<br/>todo</p>
+                                )}
+                              </div>
+                              <div className={cn("w-0.5 h-10 rounded-full shrink-0", m.bar)} />
+                              <div className={cn("w-7 h-7 rounded-lg flex items-center justify-center shrink-0", m.soft)}>
+                                <Icon className={cn("w-3.5 h-3.5", m.text)} />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="font-medium text-sm leading-tight text-foreground line-clamp-1">{ev.title}</p>
+                                <div className="flex items-center gap-3 mt-1 text-[11px] text-muted-foreground">
+                                  {ev.location && (
+                                    <span className="flex items-center gap-1 truncate"><MapPin className="w-3 h-3" />{ev.location}</span>
+                                  )}
+                                  {ev.organizer && (
+                                    <span className="flex items-center gap-1 truncate"><UserCircle2 className="w-3 h-3" />{ev.organizer}</span>
+                                  )}
+                                </div>
+                              </div>
+                              <Badge variant="outline" className={cn("text-[10px] shrink-0", m.soft, m.text, "border-0")}>
+                                {m.label}
+                              </Badge>
+                              {ev.obligatory && (
+                                <Badge variant="outline" className="text-[9px] bg-red-50 text-red-700 border-red-200 shrink-0">Obrigatório</Badge>
                               )}
                             </div>
                           );
                         })}
                       </div>
-                    );
-                  })}
-                </div>
-              </ScrollArea>
-            </Card>
+                    )}
+                  </Card>
+                );
+              })}
+            </div>
           ) : (
             <Card className="overflow-hidden">
               <div className="grid grid-cols-7 border-b">
@@ -495,53 +512,11 @@ export default function FinancasCalendario() {
           )}
         </div>
 
-        {/* ── Side panel ───────────────────────────── */}
+        {/* ── Side panel: selected day detail ────── */}
         <div className="w-[320px] shrink-0 hidden lg:block space-y-4">
-          {/* Meeting requests */}
-          <Card className="overflow-hidden">
-            <div className="px-3.5 py-2.5 border-b bg-blue-50/50 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Bell className="w-3.5 h-3.5 text-blue-600" />
-                <p className="text-xs font-semibold text-foreground">Pedidos de Reunião</p>
-              </div>
-              {pendingRequests.length > 0 && (
-                <Badge className="bg-blue-600 hover:bg-blue-600 text-white text-[10px] h-5">{pendingRequests.length}</Badge>
-              )}
-            </div>
-            <div className="p-2 space-y-2 max-h-[260px] overflow-y-auto">
-              {pendingRequests.length === 0 ? (
-                <p className="text-[11px] text-muted-foreground text-center py-4">Sem pedidos pendentes</p>
-              ) : pendingRequests.map(r => (
-                <div key={r.id} className="rounded-md border p-2.5 space-y-2 bg-card hover:border-blue-300 transition-colors">
-                  <div>
-                    <p className="text-xs font-semibold text-foreground leading-tight">{r.title}</p>
-                    <p className="text-[10px] text-muted-foreground mt-0.5 flex items-center gap-1">
-                      <UserCircle2 className="w-3 h-3" />{r.organizer}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
-                    <span className="flex items-center gap-1"><CalendarDays className="w-3 h-3" />{r.date}</span>
-                    <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{r.startTime}–{r.endTime}</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <Button size="sm" className="h-7 flex-1 text-[10px] gap-1 bg-emerald-600 hover:bg-emerald-700"
-                      onClick={() => respondRequest(r.id, "accepted")}>
-                      <Check className="w-3 h-3" /> Aceitar
-                    </Button>
-                    <Button size="sm" variant="outline" className="h-7 flex-1 text-[10px] gap-1 border-red-200 text-red-700 hover:bg-red-50"
-                      onClick={() => respondRequest(r.id, "declined")}>
-                      <X className="w-3 h-3" /> Recusar
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </Card>
-
-          {/* Selected day events */}
           <div>
             <div className="px-1 mb-2">
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Eventos do dia</p>
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Detalhe do dia</p>
               <h3 className="text-sm font-bold text-foreground capitalize">{fmtLong(selectedDate)}</h3>
             </div>
             <div className="space-y-2">
