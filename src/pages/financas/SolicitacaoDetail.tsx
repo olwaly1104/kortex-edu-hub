@@ -226,46 +226,30 @@ export default function FinancasSolicitacaoDetail() {
           </div>
         </div>
 
-        {/* Histórico */}
-        <div className="px-6 py-4 border-t border-border bg-muted/10">
-          <div className="flex items-center gap-2 mb-3">
-            <Clock className="w-3.5 h-3.5 text-muted-foreground" />
-            <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Histórico</h3>
+        {/* Aprovar / Rejeitar */}
+        {isRecebida && selected.status === "pendente" && (
+          <div className="px-6 pb-5 pt-0">
+            <div className="rounded-lg border border-border bg-background p-3 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center shrink-0">
+                  <Hourglass className="w-3.5 h-3.5 text-amber-600" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-foreground">Aguarda decisão</p>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">Aprovar ou rejeitar esta solicitação</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button variant="outline" className="h-9 px-4 text-xs gap-1.5 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-300 transition-colors" onClick={() => handleAction("rejeitado")}>
+                  <XCircle className="w-4 h-4" /> Rejeitar
+                </Button>
+                <Button className="h-9 px-4 text-xs gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white transition-colors" onClick={() => handleAction("aprovado")}>
+                  <CheckCircle2 className="w-4 h-4" /> Aprovar
+                </Button>
+              </div>
+            </div>
           </div>
-          <ol className="space-y-0">
-            {steps.map((s, i) => {
-              const isLast = i === steps.length - 1;
-              const Icon =
-                s.tone === "rejected" ? X :
-                s.tone === "scheduled" ? Hourglass :
-                s.tone === "pending" ? null :
-                Check;
-              return (
-                <li key={i} className="flex gap-3 relative">
-                  <div className="flex flex-col items-center shrink-0 w-5">
-                    <div className={cn("w-5 h-5 rounded-full flex items-center justify-center mt-0.5 z-10", nodeCls[s.tone])}>
-                      {Icon && <Icon className="w-3 h-3" strokeWidth={3} />}
-                    </div>
-                    {!isLast && <div className="w-px flex-1 bg-border mt-1" />}
-                  </div>
-                  <div className={cn("flex-1 min-w-0", !isLast && "pb-5")}>
-                    <div className="flex items-baseline justify-between gap-2 flex-wrap">
-                      <p className="text-sm font-medium text-foreground">{s.label}</p>
-                      {s.data && <span className="text-[10px] text-muted-foreground tabular-nums whitespace-nowrap">{s.data}</span>}
-                    </div>
-                    {s.actor && <p className="text-[11px] text-muted-foreground mt-0.5">{s.actor}</p>}
-                    {s.aside && (
-                      <p className={cn("mt-1.5 text-[11px] italic",
-                        s.aside.includes("atraso") ? "text-red-600 font-semibold not-italic" : "text-muted-foreground/90"
-                      )}>{s.aside}</p>
-                    )}
-                    {s.nota && <p className="mt-2 text-xs text-foreground/75 leading-relaxed pl-3 border-l-2 border-border">{s.nota}</p>}
-                  </div>
-                </li>
-              );
-            })}
-          </ol>
-        </div>
+        )}
 
         {/* 2-column body */}
         <div className="grid md:grid-cols-[280px_1fr] divide-x divide-border border-t border-border">
