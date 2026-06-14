@@ -290,16 +290,6 @@ export default function FinancasSolicitacaoDetail() {
               })()}
             </div>
 
-            {isRecebida && selected.status === "pendente" && (
-              <div className="pt-4 border-t border-border space-y-2">
-                <Button className="w-full gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => handleAction("aprovado")}>
-                  <CheckCircle2 className="w-4 h-4" /> Aprovar
-                </Button>
-                <Button variant="outline" className="w-full gap-1.5 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700" onClick={() => handleAction("rejeitado")}>
-                  <XCircle className="w-4 h-4" /> Rejeitar
-                </Button>
-              </div>
-            )}
           </aside>
 
           {/* RIGHT */}
