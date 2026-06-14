@@ -112,6 +112,7 @@ export default function FinancasSolicitacaoDetail() {
     setActionFiles([]);
     setActionStep(0);
     setMaxStep(0);
+    setDeclarationChecked(false);
     setPendingAction(action);
   };
 
