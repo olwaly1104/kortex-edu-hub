@@ -349,29 +349,53 @@ export default function FinancasCalendario() {
         </div>
 
         {/* ── Side panel ─────────────────────── */}
-        <div className="w-[300px] shrink-0 hidden lg:block">
-          {view === "week" ? (
-            <Card className="overflow-hidden sticky top-6">
-              <div className="px-3.5 py-2.5 border-b bg-blue-50/60 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Bell className="w-4 h-4 text-blue-600" />
-                  <p className="text-sm font-semibold text-foreground">Pedidos de Reunião</p>
+        <div className="w-[320px] shrink-0 hidden lg:block space-y-4">
+          {view === "month" && (
+            <Card className="overflow-hidden">
+              <div className="px-3.5 py-2.5 border-b bg-muted/10 flex items-center justify-between">
+                <div className="min-w-0">
+                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Agenda do dia</p>
+                  <h3 className="text-sm font-bold text-foreground capitalize leading-tight mt-0.5 truncate">{fmtLong(selectedDate)}</h3>
                 </div>
-                {pendingRequests.length > 0 && (
-                  <Badge className="bg-blue-600 hover:bg-blue-600 text-white text-[10px] h-5">{pendingRequests.length}</Badge>
-                )}
+                <Badge variant="outline" className="text-[10px] shrink-0 ml-2">{selectedEvents.length}</Badge>
               </div>
-              {pendingRequests.length === 0 ? (
+              {selectedEvents.length === 0 ? (
                 <div className="text-center py-8">
-                  <Bell className="w-6 h-6 text-muted-foreground/40 mx-auto mb-2" />
-                  <p className="text-[11px] text-muted-foreground">Sem pedidos pendentes</p>
+                  <CalendarDays className="w-6 h-6 text-muted-foreground/40 mx-auto mb-2" />
+                  <p className="text-[11px] text-muted-foreground">Sem eventos</p>
                 </div>
               ) : (
-                <div className="p-2 space-y-2 overflow-y-auto" style={{ maxHeight: 3 * 168 }}>
-                  {pendingRequests.map(r => (
-                    <div key={r.id} className="rounded-md border p-2.5 space-y-2 bg-card hover:border-blue-300 transition-colors">
+                <div className="divide-y divide-border max-h-[380px] overflow-y-auto">
+                  {selectedEvents.map(ev => (
+                    <EventRow key={ev.id} ev={ev} onOpen={() => setDetailEvent(ev)} compact />
+                  ))}
+                </div>
+              )}
+            </Card>
+          )}
+
+          <Card className={cn("overflow-hidden", view === "week" && "sticky top-6")}>
+            <div className="px-3.5 py-2.5 border-b bg-muted/10 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Bell className="w-4 h-4 text-muted-foreground" />
+                <p className="text-sm font-semibold text-foreground">Pedidos de Reunião</p>
+              </div>
+              {pendingRequests.length > 0 && (
+                <Badge variant="outline" className="text-[10px] h-5">{pendingRequests.length}</Badge>
+              )}
+            </div>
+            {pendingRequests.length === 0 ? (
+              <div className="text-center py-8">
+                <Bell className="w-6 h-6 text-muted-foreground/40 mx-auto mb-2" />
+                <p className="text-[11px] text-muted-foreground">Sem pedidos pendentes</p>
+              </div>
+            ) : (
+              <div className="p-2 space-y-2 overflow-y-auto" style={{ maxHeight: 3 * 176 }}>
+                {pendingRequests.map(r => (
+                  <div key={r.id} className="rounded-lg border bg-card hover:border-foreground/20 transition-colors overflow-hidden">
+                    <div className="p-2.5 space-y-2">
                       <div>
-                        <p className="text-xs font-semibold text-foreground leading-tight">{r.title}</p>
+                        <p className="text-xs font-semibold text-foreground leading-tight line-clamp-2">{r.title}</p>
                         <p className="text-[10px] text-muted-foreground mt-0.5 flex items-center gap-1">
                           <UserCircle2 className="w-3 h-3" />{r.organizer}
                         </p>
@@ -383,7 +407,7 @@ export default function FinancasCalendario() {
                           <div className="flex items-center gap-1"><Users className="w-3 h-3" />{r.participants.length} participante{r.participants.length !== 1 ? "s" : ""}</div>
                         )}
                       </div>
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex items-center gap-1.5 pt-1">
                         <Button size="sm" className="h-7 flex-1 text-[10px] gap-1 bg-emerald-600 hover:bg-emerald-700"
                           onClick={() => respondRequest(r.id, "accepted")}>
                           <Check className="w-3 h-3" /> Aceitar
@@ -393,51 +417,16 @@ export default function FinancasCalendario() {
                           <X className="w-3 h-3" /> Recusar
                         </Button>
                       </div>
-                      <Button size="sm" variant="ghost" className="h-7 w-full text-[10px] gap-1 text-blue-700 hover:bg-blue-50"
-                        onClick={() => setDetailRequest(r)}>
-                        <Eye className="w-3 h-3" /> Ver detalhes
-                      </Button>
                     </div>
-                  ))}
-                </div>
-              )}
-            </Card>
-          ) : (
-            <Card className="overflow-hidden sticky top-6">
-              <div className="px-3.5 py-2.5 border-b bg-muted/10">
-                <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Agenda do dia</p>
-                <h3 className="text-sm font-bold text-foreground capitalize leading-tight mt-0.5">{fmtLong(selectedDate)}</h3>
+                    <button onClick={() => setDetailRequest(r)}
+                      className="w-full h-8 text-[10px] font-medium text-foreground/80 hover:text-foreground border-t bg-muted/20 hover:bg-muted/40 transition-colors flex items-center justify-center gap-1.5">
+                      <Eye className="w-3 h-3" /> Ver detalhes
+                    </button>
+                  </div>
+                ))}
               </div>
-              {selectedEvents.length === 0 ? (
-                <div className="text-center py-8">
-                  <CalendarDays className="w-6 h-6 text-muted-foreground/40 mx-auto mb-2" />
-                  <p className="text-[11px] text-muted-foreground">Sem eventos</p>
-                </div>
-              ) : (
-                <div className="divide-y divide-border max-h-[520px] overflow-y-auto">
-                  {selectedEvents.map(ev => {
-                    const m = TYPE_META[ev.type];
-                    const Icon = m.icon;
-                    return (
-                      <button key={ev.id} onClick={() => setDetailEvent(ev)}
-                        className="w-full text-left p-3 flex items-start gap-2.5 hover:bg-muted/30 transition-colors">
-                        <div className={cn("w-7 h-7 rounded-lg flex items-center justify-center shrink-0", m.soft)}>
-                          <Icon className={cn("w-3.5 h-3.5", m.text)} />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="text-xs font-semibold text-foreground leading-tight line-clamp-2">{ev.title}</p>
-                          <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1 text-[10px] text-muted-foreground">
-                            {ev.startTime && <span>{ev.startTime}–{ev.endTime}</span>}
-                            {ev.participants && <span className="flex items-center gap-0.5"><Users className="w-2.5 h-2.5" />{ev.participants.length}</span>}
-                          </div>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-            </Card>
-          )}
+            )}
+          </Card>
         </div>
       </div>
 
@@ -576,37 +565,40 @@ export default function FinancasCalendario() {
 }
 
 /* ── Event row in agenda ── */
-function EventRow({ ev, onOpen }: { ev: AgendaEvent; onOpen: () => void }) {
+function EventRow({ ev, onOpen, compact = false }: { ev: AgendaEvent; onOpen: () => void; compact?: boolean }) {
   const m = TYPE_META[ev.type];
   const Icon = m.icon;
   const hasTime = !!ev.startTime;
   return (
-    <button onClick={onOpen} className="w-full text-left flex items-center gap-4 px-4 py-3 hover:bg-muted/30 transition-colors group">
-      <div className="text-center shrink-0 w-14">
+    <button onClick={onOpen} className={cn("w-full text-left flex items-center hover:bg-muted/30 transition-colors group",
+      compact ? "gap-2.5 px-3 py-2.5" : "gap-4 px-4 py-3")}>
+      <div className={cn("text-center shrink-0", compact ? "w-10" : "w-14")}>
         {hasTime ? (
           <>
-            <p className="text-sm font-bold text-foreground">{ev.startTime}</p>
+            <p className={cn("font-bold text-foreground", compact ? "text-xs" : "text-sm")}>{ev.startTime}</p>
             <p className="text-[10px] text-muted-foreground">{ev.endTime}</p>
           </>
         ) : (
           <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Dia<br/>todo</p>
         )}
       </div>
-      <div className={cn("w-0.5 h-10 rounded-full shrink-0", m.bar)} />
-      <div className={cn("w-7 h-7 rounded-lg flex items-center justify-center shrink-0", m.soft)}>
-        <Icon className={cn("w-3.5 h-3.5", m.text)} />
+      <div className={cn("w-0.5 rounded-full shrink-0", m.bar, compact ? "h-8" : "h-10")} />
+      <div className={cn("rounded-lg flex items-center justify-center shrink-0", m.soft, compact ? "w-6 h-6" : "w-7 h-7")}>
+        <Icon className={cn(m.text, compact ? "w-3 h-3" : "w-3.5 h-3.5")} />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="font-medium text-sm leading-tight text-foreground line-clamp-1">{ev.title}</p>
-        <div className="flex items-center gap-3 mt-1 text-[11px] text-muted-foreground">
+        <p className={cn("font-medium leading-tight text-foreground line-clamp-1", compact ? "text-xs" : "text-sm")}>{ev.title}</p>
+        <div className={cn("flex items-center mt-0.5 text-[10px] text-muted-foreground", compact ? "gap-2" : "gap-3 mt-1 text-[11px]")}>
           {ev.location && <span className="flex items-center gap-1 truncate"><MapPin className="w-3 h-3" />{ev.location}</span>}
           {ev.participants && ev.participants.length > 0 && (
-            <span className="flex items-center gap-1"><Users className="w-3 h-3" />{ev.participants.length} participante{ev.participants.length !== 1 ? "s" : ""}</span>
+            <span className="flex items-center gap-1"><Users className="w-3 h-3" />{ev.participants.length}{!compact && ` participante${ev.participants.length !== 1 ? "s" : ""}`}</span>
           )}
         </div>
       </div>
-      <Badge variant="outline" className={cn("text-[10px] shrink-0 border-0", m.soft, m.text)}>{m.label}</Badge>
-      {ev.obligatory && (
+      {!compact && (
+        <Badge variant="outline" className={cn("text-[10px] shrink-0 border-0", m.soft, m.text)}>{m.label}</Badge>
+      )}
+      {ev.obligatory && !compact && (
         <Badge variant="outline" className="text-[9px] bg-red-50 text-red-700 border-red-200 shrink-0">Obrigatório</Badge>
       )}
     </button>
