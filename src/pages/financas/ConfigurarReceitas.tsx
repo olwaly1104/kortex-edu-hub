@@ -39,12 +39,19 @@ const TIPOS_RECEITA: TipoReceita[] = [
   "Multa Estudante", "Multa Administrativo", "Multa Docente",
 ];
 
+interface PropinaPlan {
+  months: number;
+  valor: number;
+}
+
 interface ReceitaRow {
   id: string;
   nome: string;
   tipo: TipoReceita;
   escopo: string; // "geral" or course id
   valor: number;
+  /** Only for "Propina mensal" — payment plans (e.g. 10x52k or 11x60k). When present, `valor` mirrors plans[0].valor. */
+  plans?: PropinaPlan[];
 }
 
 const ALL_COURSES = reitorFaculties.flatMap(f =>
@@ -61,13 +68,22 @@ const seedPropina = (f: string) =>
   f.includes("Medicina") ? 65000 : f.includes("Arquitectura") ? 52000 : f.includes("Direito") ? 48000 : f.includes("Economia") ? 45000 : 38000;
 
 const initialReceitas = (): ReceitaRow[] => {
-  const perCurso: ReceitaRow[] = ALL_COURSES.map(c => ({
-    id: `prop-${c.id}`,
-    nome: `Propina mensal — ${c.name}`,
-    tipo: "Propina mensal",
-    escopo: c.id,
-    valor: seedPropina(c.facultyName),
-  }));
+  const perCurso: ReceitaRow[] = ALL_COURSES.map(c => {
+    const base = seedPropina(c.facultyName);
+    const plans: PropinaPlan[] = [
+      { months: 10, valor: base },
+      { months: 11, valor: Math.round(base * 0.92) },
+      { months: 12, valor: Math.round(base * 0.85) },
+    ];
+    return {
+      id: `prop-${c.id}`,
+      nome: `Propina mensal — ${c.name}`,
+      tipo: "Propina mensal" as const,
+      escopo: c.id,
+      valor: plans[0].valor,
+      plans,
+    };
+  });
   const matriculas: ReceitaRow[] = reitorFaculties.map(f => ({
     id: `matr-${f.id}`,
     nome: `Matrícula — ${f.name}`,
@@ -86,6 +102,8 @@ const initialReceitas = (): ReceitaRow[] => {
     { id: "tax-2", nome: "Taxa de Emissão de 2ª Via de Cartão", tipo: "Emolumento", escopo: "geral", valor: 2000 },
     { id: "can-1", nome: "Candidatura — Licenciatura", tipo: "Candidatura", escopo: "geral", valor: 15000 },
     { id: "can-2", nome: "Candidatura — Mestrado", tipo: "Candidatura", escopo: "geral", valor: 20000 },
+    { id: "can-3", nome: "Exame de Acesso", tipo: "Candidatura", escopo: "geral", valor: 25000 },
+    { id: "can-4", nome: "Curso Preparatório", tipo: "Candidatura", escopo: "geral", valor: 85000 },
     // Multas Estudantes
     { id: "mes-1", nome: "Atraso de propina (por mês)", tipo: "Multa Estudante", escopo: "geral", valor: 5000 },
     { id: "mes-2", nome: "Falta a exame sem justificação", tipo: "Multa Estudante", escopo: "geral", valor: 7500 },
@@ -281,7 +299,7 @@ export default function ConfigurarReceitas() {
   const [editingReceita, setEditingReceita] = useState<ReceitaRow | null>(null);
   const [receitaForm, setReceitaForm] = useState<ReceitaRow>({ id: "", nome: "", tipo: "Emolumento", escopo: "geral", valor: 0 });
   const [confirmDelReceita, setConfirmDelReceita] = useState<ReceitaRow | null>(null);
-  const [inlineEditReceita, setInlineEditReceita] = useState<{ id: string; valor: string } | null>(null);
+  const [inlineEditPlan, setInlineEditPlan] = useState<{ rowId: string; months: number; valor: string } | null>(null);
 
   /* ── DESPESAS ── */
   const [despesas, setDespesas] = useState<DespesaRow[]>(initialDespesas);
@@ -372,11 +390,32 @@ export default function ConfigurarReceitas() {
     toast({ title: "Receita removida", description: confirmDelReceita.nome });
     setConfirmDelReceita(null);
   };
-  const commitInlineReceita = () => {
-    if (!inlineEditReceita) return;
-    const v = Number(inlineEditReceita.valor) || 0;
-    setReceitas(rs => rs.map(r => r.id === inlineEditReceita.id ? { ...r, valor: v } : r));
-    setInlineEditReceita(null);
+  const commitInlinePlan = () => {
+    if (!inlineEditPlan) return;
+    const v = Number(inlineEditPlan.valor) || 0;
+    setReceitas(rs => rs.map(r => {
+      if (r.id !== inlineEditPlan.rowId || !r.plans) return r;
+      const plans = r.plans.map(p => p.months === inlineEditPlan.months ? { ...p, valor: v } : p);
+      return { ...r, plans, valor: plans[0].valor };
+    }));
+    setInlineEditPlan(null);
+  };
+  const addPlanToRow = (rowId: string, months: number) => {
+    setReceitas(rs => rs.map(r => {
+      if (r.id !== rowId) return r;
+      const plans = r.plans ? [...r.plans] : [];
+      if (plans.some(p => p.months === months)) return r;
+      plans.push({ months, valor: 0 });
+      plans.sort((a, b) => a.months - b.months);
+      return { ...r, plans, valor: plans[0].valor };
+    }));
+  };
+  const removePlanFromRow = (rowId: string, months: number) => {
+    setReceitas(rs => rs.map(r => {
+      if (r.id !== rowId || !r.plans || r.plans.length <= 1) return r;
+      const plans = r.plans.filter(p => p.months !== months);
+      return { ...r, plans, valor: plans[0].valor };
+    }));
   };
 
   /* ── DESPESAS ops ── */
@@ -439,9 +478,7 @@ export default function ConfigurarReceitas() {
     return c.baseSalary - deductions - multasTotal;
   };
 
-  const totalReceitas = receitas.reduce((s, r) => s + r.valor, 0);
-  const totalDespesas = despesas.reduce((s, d) => s + d.valorEstimado, 0);
-  const totalSalarios = Object.values(salaryConfigs).reduce((s, c) => s + c.baseSalary, 0);
+  // (toggle cards intentionally show no values — they are just mode switches)
 
   const visibleReceitaSections = receitaFilter === "todos" ? RECEITA_SECTIONS : RECEITA_SECTIONS.filter(s => s.key === receitaFilter);
   const visibleDespesaSections = despesaFilter === "todos" ? DESPESA_SECTIONS : DESPESA_SECTIONS.filter(s => s.key === despesaFilter);
@@ -466,9 +503,9 @@ export default function ConfigurarReceitas() {
       {/* Mode toggle */}
       <div className="grid grid-cols-3 gap-2">
         {([
-          { key: "receitas" as const, label: "Receitas", icon: TrendingUp, total: totalReceitas, accent: "text-emerald-600", bg: "bg-emerald-50", border: "border-emerald-200" },
-          { key: "despesas" as const, label: "Despesas", icon: TrendingDown, total: totalDespesas, accent: "text-red-600", bg: "bg-red-50", border: "border-red-200" },
-          { key: "salarios" as const, label: "Salários", icon: Banknote, total: totalSalarios, accent: "text-blue-600", bg: "bg-blue-50", border: "border-blue-200" },
+          { key: "receitas" as const, label: "Receitas", sub: "Propinas, emolumentos, multas",   icon: TrendingUp,   accent: "text-emerald-700", bg: "bg-emerald-50", border: "border-emerald-200" },
+          { key: "despesas" as const, label: "Despesas", sub: "Rubricas orçamentais",            icon: TrendingDown, accent: "text-red-700",     bg: "bg-red-50",     border: "border-red-200" },
+          { key: "salarios" as const, label: "Salários", sub: "Folha salarial de colaboradores", icon: Banknote,     accent: "text-blue-700",    bg: "bg-blue-50",    border: "border-blue-200" },
         ]).map(m => {
           const Icon = m.icon;
           const active = mode === m.key;
@@ -488,7 +525,7 @@ export default function ConfigurarReceitas() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className={cn("text-sm font-semibold", active ? m.accent : "text-foreground")}>{m.label}</p>
-                <p className="text-[11px] text-muted-foreground tabular-nums truncate">{formatCurrency(m.total)}</p>
+                <p className="text-[11px] text-muted-foreground truncate">{m.sub}</p>
               </div>
             </button>
           );
@@ -561,32 +598,67 @@ export default function ConfigurarReceitas() {
                       {selected.courses.map(c => {
                         const r = receitas.find(x => x.tipo === "Propina mensal" && x.escopo === c.id);
                         if (!r) return null;
-                        const editingInline = inlineEditReceita?.id === r.id;
+                        const plans = r.plans ?? [{ months: 10, valor: r.valor }];
+                        const existingMonths = new Set(plans.map(p => p.months));
+                        const availableToAdd = [10, 11, 12].filter(m => !existingMonths.has(m));
                         return (
-                          <div key={c.id} className="flex items-center gap-3 py-2.5 group">
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium text-foreground truncate">{c.name}</p>
-                              <p className="text-[11px] text-muted-foreground">{c.code} · Propina mensal</p>
-                            </div>
-                            {editingInline ? (
-                              <div className="flex items-center gap-1.5">
-                                <Input type="number" autoFocus value={inlineEditReceita!.valor}
-                                  onChange={e => setInlineEditReceita({ ...inlineEditReceita!, valor: e.target.value })}
-                                  onKeyDown={e => { if (e.key === "Enter") commitInlineReceita(); if (e.key === "Escape") setInlineEditReceita(null); }}
-                                  className="h-8 w-28 text-sm text-right tabular-nums" />
-                                <Button size="sm" className="h-8" onClick={commitInlineReceita}>OK</Button>
+                          <div key={c.id} className="py-3 group">
+                            <div className="flex items-center justify-between gap-3 mb-2">
+                              <div className="min-w-0">
+                                <p className="text-sm font-medium text-foreground truncate">{c.name}</p>
+                                <p className="text-[11px] text-muted-foreground">{c.code} · Planos de pagamento da propina mensal</p>
                               </div>
-                            ) : (
-                              <>
-                                <button onClick={() => setInlineEditReceita({ id: r.id, valor: String(r.valor) })}
-                                  className="text-sm font-semibold text-foreground tabular-nums whitespace-nowrap px-2 py-1 rounded hover:bg-muted transition" title="Clique para editar valor">
-                                  {formatCurrency(r.valor)}
-                                </button>
-                                <Button variant="ghost" size="icon" className="h-7 w-7 rounded-md" onClick={() => openEditReceita(section, r)} title="Editar detalhes">
-                                  <Pencil className="w-3.5 h-3.5" />
-                                </Button>
-                              </>
-                            )}
+                              {availableToAdd.length > 0 && (
+                                <Select onValueChange={(v) => addPlanToRow(r.id, Number(v))}>
+                                  <SelectTrigger className="h-7 w-[130px] text-[11px]">
+                                    <Plus className="w-3 h-3 mr-1" /> <SelectValue placeholder="Add prazo" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {availableToAdd.map(m => (
+                                      <SelectItem key={m} value={String(m)}>{m} meses</SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              )}
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                              {plans.map(p => {
+                                const editingInline = inlineEditPlan?.rowId === r.id && inlineEditPlan?.months === p.months;
+                                return (
+                                  <div key={p.months}
+                                    className="rounded-md border border-border bg-card px-3 py-2 flex items-center justify-between gap-2 hover:border-primary/40 transition">
+                                    <div className="min-w-0">
+                                      <p className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">Prazo</p>
+                                      <p className="text-xs font-semibold text-foreground">{p.months} meses</p>
+                                    </div>
+                                    {editingInline ? (
+                                      <div className="flex items-center gap-1">
+                                        <Input type="number" autoFocus value={inlineEditPlan!.valor}
+                                          onChange={e => setInlineEditPlan({ ...inlineEditPlan!, valor: e.target.value })}
+                                          onKeyDown={e => { if (e.key === "Enter") commitInlinePlan(); if (e.key === "Escape") setInlineEditPlan(null); }}
+                                          className="h-7 w-24 text-xs text-right tabular-nums" />
+                                        <Button size="sm" className="h-7 px-2 text-[11px]" onClick={commitInlinePlan}>OK</Button>
+                                      </div>
+                                    ) : (
+                                      <div className="flex items-center gap-0.5">
+                                        <button
+                                          onClick={() => setInlineEditPlan({ rowId: r.id, months: p.months, valor: String(p.valor) })}
+                                          className="text-sm font-semibold text-foreground tabular-nums whitespace-nowrap px-2 py-1 rounded hover:bg-muted transition"
+                                          title="Clique para editar valor mensal">
+                                          {formatCurrency(p.valor)}
+                                        </button>
+                                        {plans.length > 1 && (
+                                          <Button variant="ghost" size="icon" className="h-6 w-6 rounded-md text-destructive opacity-50 hover:opacity-100"
+                                            onClick={() => removePlanFromRow(r.id, p.months)} title="Remover prazo">
+                                            <Trash2 className="w-3 h-3" />
+                                          </Button>
+                                        )}
+                                      </div>
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
                           </div>
                         );
                       })}
@@ -759,11 +831,10 @@ export default function ConfigurarReceitas() {
               <thead>
                 <tr className="text-[10px] uppercase tracking-wider text-muted-foreground border-b border-border">
                   <th className="text-left font-semibold px-2 py-2">Colaborador</th>
-                  <th className="text-left font-semibold px-2 py-2">Função / Dept.</th>
-                  <th className="text-right font-semibold px-2 py-2">Bruto</th>
-                  <th className="text-right font-semibold px-2 py-2">Descontos</th>
-                  <th className="text-right font-semibold px-2 py-2">Multas</th>
-                  <th className="text-right font-semibold px-2 py-2">Líquido</th>
+                  <th className="text-left font-semibold px-2 py-2">Posição</th>
+                  <th className="text-left font-semibold px-2 py-2">Departamento</th>
+                  <th className="text-right font-semibold px-2 py-2">Salário Bruto</th>
+                  <th className="text-right font-semibold px-2 py-2">Salário Líquido</th>
                   <th className="w-8"></th>
                 </tr>
               </thead>
@@ -782,15 +853,12 @@ export default function ConfigurarReceitas() {
                       </td>
                       <td className="px-2 py-2.5">
                         <p className="text-xs text-foreground truncate">{s.role}</p>
-                        <p className="text-[10px] text-muted-foreground truncate">{s.department}</p>
+                      </td>
+                      <td className="px-2 py-2.5">
+                        <p className="text-xs text-foreground truncate">{s.department}</p>
                       </td>
                       <td className="px-2 py-2.5 text-right text-sm tabular-nums text-foreground">{formatCurrency(cfg.baseSalary)}</td>
-                      <td className="px-2 py-2.5 text-right text-sm tabular-nums text-red-600">−{formatCurrency(deductions)}</td>
-                      <td className="px-2 py-2.5 text-right text-sm tabular-nums">
-                        {multasTotal > 0 ? <span className="text-orange-600">−{formatCurrency(multasTotal)}</span> : <span className="text-muted-foreground">—</span>}
-                        {cfg.multas.length > 0 && <span className="text-[10px] text-muted-foreground ml-1">({cfg.multas.length})</span>}
-                      </td>
-                      <td className="px-2 py-2.5 text-right text-sm font-semibold tabular-nums text-foreground">{formatCurrency(net)}</td>
+                      <td className="px-2 py-2.5 text-right text-sm font-semibold tabular-nums text-blue-700">{formatCurrency(net)}</td>
                       <td className="px-2">
                         <Pencil className="w-3.5 h-3.5 text-muted-foreground group-hover:text-foreground" />
                       </td>
