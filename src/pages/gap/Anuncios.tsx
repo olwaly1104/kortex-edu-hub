@@ -14,6 +14,7 @@ import {
   CalendarDays, Tag, Search, Wallet,
 } from "lucide-react";
 import { toast } from "sonner";
+import { FinHeader } from "@/pages/financas/_FinHeader";
 
 const typeConfig: Record<string, { icon: typeof AlertTriangle; label: string; className: string }> = {
   urgente: { icon: AlertTriangle, label: "Urgente", className: "bg-destructive/10 text-destructive border-destructive/20" },
