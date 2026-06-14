@@ -400,6 +400,7 @@ export default function ConfigurarReceitas() {
     }));
     setPlanEdit(null);
     toast({ title: "Plano actualizado", description: `${planEdit.months} meses · ${formatCurrency(v)}` });
+  };
   const addPlanToRow = (rowId: string, months: number) => {
     setReceitas(rs => rs.map(r => {
       if (r.id !== rowId) return r;
