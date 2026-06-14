@@ -790,14 +790,20 @@ function EventDetailDialog({ event, onClose, onDelete }: { event: AgendaEvent | 
                     <Users className="w-3 h-3" /> Participantes ({event.participants.length})
                   </p>
                   <div className="rounded-lg border divide-y">
-                    {event.participants.map(p => (
-                      <div key={p} className="flex items-center gap-2 px-3 py-2 text-xs text-foreground">
-                        <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-[10px] font-semibold">
-                          {p.split(" ").map(s => s[0]).slice(0, 2).join("")}
+                    {event.participants.map(p => {
+                      const st = STATUS_META[participantStatus(p, event.id)];
+                      return (
+                        <div key={p} className="flex items-center gap-2 px-3 py-2 text-xs text-foreground">
+                          <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-[10px] font-semibold">
+                            {p.split(" ").map(s => s[0]).slice(0, 2).join("")}
+                          </div>
+                          <span className="flex-1 truncate">{p}</span>
+                          <Badge variant="outline" className={cn("text-[9px] gap-1", st.cls)}>
+                            <span className={cn("w-1.5 h-1.5 rounded-full", st.dot)} />{st.label}
+                          </Badge>
                         </div>
-                        {p}
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               )}
