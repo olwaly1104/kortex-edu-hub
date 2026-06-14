@@ -1137,18 +1137,28 @@ export default function ConfigurarReceitas() {
                     <tr className="border-b bg-muted/30">
                       <th className="text-left p-3 font-medium text-muted-foreground text-xs">Nome</th>
                       <th className="text-left p-3 font-medium text-muted-foreground text-xs">Cargo</th>
-                      <th className="text-center p-3 font-medium text-muted-foreground text-xs">Regras associadas</th>
+                      <th className="text-left p-3 font-medium text-muted-foreground text-xs">Aprova até</th>
                       <th className="w-12"></th>
                     </tr>
                   </thead>
                   <tbody>
                     {responsaveis.map(r => {
-                      const rulesCount = approvalRules.filter(x => x.responsavelId === r.id).length;
+                      const isReitor = /reitor/i.test(r.nome) || /reitor/i.test(r.cargo);
+                      const respRules = approvalRules.filter(x => x.responsavelId === r.id);
+                      const maxLimit = respRules.length ? Math.max(...respRules.map(x => x.max)) : null;
                       return (
                         <tr key={r.id} className="border-b last:border-0 hover:bg-muted/20">
                           <td className="p-3 text-xs font-medium text-foreground">{r.nome}</td>
                           <td className="p-3 text-xs text-muted-foreground">{r.cargo}</td>
-                          <td className="p-3 text-center text-xs tabular-nums text-foreground">{rulesCount}</td>
+                          <td className="p-3 text-xs">
+                            {isReitor ? (
+                              <span className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 text-emerald-700 px-2 py-0.5 text-[10px] font-medium">Sem limite</span>
+                            ) : maxLimit !== null ? (
+                              <span className="tabular-nums text-foreground font-medium">{formatCurrency(maxLimit)}</span>
+                            ) : (
+                              <span className="text-muted-foreground italic">— sem limite definido</span>
+                            )}
+                          </td>
                           <td className="p-3 text-right">
                             <button onClick={() => removeResponsavel(r.id)} className="text-muted-foreground hover:text-destructive" title="Remover">
                               <Trash2 className="w-3.5 h-3.5" />
