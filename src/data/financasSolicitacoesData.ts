@@ -131,7 +131,7 @@ export const finSolicitacoes: FinSolicitacao[] = [
     historico: [
       { data: "2025-03-18 17:00", actor: "Dr. Carlos Bento", accao: "Solicitação submetida" },
       { data: "2025-03-19 10:00", actor: "Direcção Financeira", accao: "Solicitação aprovada" },
-      { data: "2025-03-20 09:30", actor: "Direcção Financeira", accao: "Solicitação executada", nota: "Reembolso liquidado." },
+      { data: "2025-03-20 09:30", actor: "Direcção Financeira", accao: "Solicitação executada", nota: "Reembolso liquidado.", anexos: [{ nome: "Recibo-reembolso.pdf", tamanho: "74 KB", tipo: "pdf" }] },
     ],
   },
   {
