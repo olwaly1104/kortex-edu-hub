@@ -164,11 +164,6 @@ export default function FinancasAnuncioDetail() {
               }
             />
             <MetaRow
-              icon={<Tag className="w-3 h-3" />}
-              label="Categoria"
-              value={<span className="text-[12px] font-medium text-foreground">{m.label}</span>}
-            />
-            <MetaRow
               icon={<CalendarIcon className="w-3 h-3" />}
               label="Data de publicação"
               value={<span className="text-[12px] font-medium text-foreground tabular-nums">{ann.date}</span>}
@@ -184,6 +179,20 @@ export default function FinancasAnuncioDetail() {
                 }
               />
             )}
+            <MetaRow
+              icon={<Tag className="w-3 h-3" />}
+              label="Referência"
+              value={
+                <button
+                  type="button"
+                  onClick={() => { navigator.clipboard?.writeText(ann.id); toast({ title: "ID copiado", description: ann.id }); }}
+                  className="text-[11px] font-mono font-semibold text-foreground hover:text-primary tabular-nums"
+                >
+                  {ann.id.toUpperCase()}
+                </button>
+              }
+            />
+
           </aside>
 
           {/* RIGHT — title + body */}
