@@ -61,25 +61,26 @@ export default function FinancasSolicitacaoDetail() {
 
   const anexos = selected.anexos ?? [];
 
-  type Step = { label: string; data?: string; actor?: string; nota?: string; aside?: string; tone: "submitted" | "accepted" | "rejected" | "executed" | "pending" | "scheduled" };
+  type Step = { label: string; data?: string; actor?: string; nota?: string; aside?: string; anexos?: typeof anexos; tone: "submitted" | "accepted" | "rejected" | "executed" | "pending" | "scheduled" };
   const steps: Step[] = [];
 
   const submetida = selected.historico.find(h => h.accao.toLowerCase().includes("submetida"));
   steps.push({
     label: "Solicitação submetida",
     data: submetida?.data, actor: submetida?.actor ?? selected.requester,
+    nota: submetida?.nota, anexos: submetida?.anexos,
     tone: "submitted",
   });
 
   if (selected.status === "rejeitado") {
     const rej = selected.historico.slice().reverse().find(h => h.accao.toLowerCase().includes("rejeit"));
-    steps.push({ label: "Solicitação rejeitada", data: rej?.data, actor: rej?.actor ?? "Direcção Financeira", nota: rej?.nota, tone: "rejected" });
+    steps.push({ label: "Solicitação rejeitada", data: rej?.data, actor: rej?.actor ?? "Direcção Financeira", nota: rej?.nota, anexos: rej?.anexos, tone: "rejected" });
   } else if (selected.status === "em_execucao" || selected.status === "executada") {
     const ap = selected.historico.slice().reverse().find(h => h.accao.toLowerCase().includes("aprov"));
-    steps.push({ label: "Em execução", data: ap?.data, actor: ap?.actor ?? "Direcção Financeira", nota: ap?.nota, tone: "accepted" });
+    steps.push({ label: "Em execução", data: ap?.data, actor: ap?.actor ?? "Direcção Financeira", nota: ap?.nota, anexos: ap?.anexos, tone: "accepted" });
     if (selected.status === "executada") {
       const ex = selected.historico.slice().reverse().find(h => h.accao.toLowerCase().includes("execut"));
-      steps.push({ label: "Solicitação executada", data: ex?.data, actor: ex?.actor ?? "Direcção Financeira", nota: ex?.nota, tone: "executed" });
+      steps.push({ label: "Solicitação executada", data: ex?.data, actor: ex?.actor ?? "Direcção Financeira", nota: ex?.nota, anexos: ex?.anexos, tone: "executed" });
     }
   } else if (selected.dueDate) {
     const base = new Date(selected.dueDate);
