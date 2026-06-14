@@ -296,68 +296,6 @@ export default function FinancasCalendario() {
       {/* ── Grid ─────────────────────────────── */}
       <div className="flex gap-6">
         <div className="flex-1 min-w-0 space-y-3">
-          {/* ── Period bar: toggle + nav ─────────────── */}
-          <div className="rounded-lg border border-border bg-card px-4 py-2.5 flex items-center justify-between gap-3 flex-wrap">
-            {/* left: view toggle */}
-            <div className="flex bg-muted/60 rounded-lg p-0.5 shrink-0">
-              {(["week", "month"] as const).map(v => (
-                <button key={v} onClick={() => setView(v)}
-                  className={cn("px-3 py-1.5 rounded-md text-xs font-semibold transition-colors",
-                    view === v ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground")}>
-                  {v === "week" ? "Semana" : "Mês"}
-                </button>
-              ))}
-            </div>
-
-            {/* center: arrows + result title */}
-            <div className="flex items-center gap-1.5 min-w-0">
-              <button onClick={() => navigateBy(-1)}
-                className="h-8 w-8 rounded-md border border-border hover:bg-muted/60 flex items-center justify-center transition-colors shrink-0"
-                aria-label={view === "week" ? "Semana anterior" : "Mês anterior"}>
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-
-              {view === "week" ? (
-                <h2 className="px-2 text-sm font-bold text-foreground capitalize truncate">
-                  {weekLabel}
-                </h2>
-              ) : (
-                <div className="flex items-center gap-1">
-                  <Select value={String(cursorD.getMonth())} onValueChange={(v) => {
-                    const d = parseISO(cursor); d.setMonth(parseInt(v, 10)); setCursor(toISO(d));
-                  }}>
-                    <SelectTrigger className="h-8 w-auto gap-1.5 text-sm font-bold capitalize border-0 shadow-none hover:bg-muted/60 focus:ring-0 px-2">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {MONTH_NAMES.map((mn, i) => (
-                        <SelectItem key={mn} value={String(i)} className="text-sm">{mn}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Select value={String(cursorD.getFullYear())} onValueChange={(v) => {
-                    const d = parseISO(cursor); d.setFullYear(parseInt(v, 10)); setCursor(toISO(d));
-                  }}>
-                    <SelectTrigger className="h-8 w-auto gap-1.5 text-sm font-bold border-0 shadow-none hover:bg-muted/60 focus:ring-0 px-2">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {[2023, 2024, 2025, 2026].map(y => (
-                        <SelectItem key={y} value={String(y)} className="text-sm">{y}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
-
-              <button onClick={() => navigateBy(1)}
-                className="h-8 w-8 rounded-md border border-border hover:bg-muted/60 flex items-center justify-center transition-colors shrink-0"
-                aria-label={view === "week" ? "Próxima semana" : "Próximo mês"}>
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-
           {(() => {
             const periodEntriesCount = (view === "week"
               ? weekDays.flatMap(d => eventsOnDate(d))
@@ -366,16 +304,69 @@ export default function FinancasCalendario() {
                   return dd.getMonth() === cursorD.getMonth() && dd.getFullYear() === cursorD.getFullYear();
                 })
             ).length;
-            const periodLabel = view === "week" ? weekLabel : `${MONTH_NAMES[cursorD.getMonth()]} ${cursorD.getFullYear()}`;
 
             const PeriodHeader = (
-              <div className="px-4 py-3 border-b bg-muted/10 flex items-end justify-between gap-3">
-                <div className="min-w-0">
-                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-0.5">
-                    {view === "week" ? "Semana" : "Mês"}
-                  </p>
-                  <h3 className="text-base font-bold text-foreground capitalize leading-tight truncate">{periodLabel}</h3>
+              <div className="px-3 py-2.5 border-b bg-muted/10 flex items-center justify-between gap-3 flex-wrap">
+                {/* view toggle */}
+                <div className="flex bg-muted/60 rounded-lg p-0.5 shrink-0">
+                  {(["week", "month"] as const).map(v => (
+                    <button key={v} onClick={() => setView(v)}
+                      className={cn("px-3 py-1.5 rounded-md text-xs font-semibold transition-colors",
+                        view === v ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground")}>
+                      {v === "week" ? "Semana" : "Mês"}
+                    </button>
+                  ))}
                 </div>
+
+                {/* arrows + date selector */}
+                <div className="flex items-center gap-1.5 min-w-0 flex-1 justify-center">
+                  <button onClick={() => navigateBy(-1)}
+                    className="h-8 w-8 rounded-md border border-border hover:bg-muted/60 flex items-center justify-center transition-colors shrink-0"
+                    aria-label={view === "week" ? "Semana anterior" : "Mês anterior"}>
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+
+                  {view === "week" ? (
+                    <h2 className="px-2 text-sm font-bold text-foreground capitalize truncate">
+                      {weekLabel}
+                    </h2>
+                  ) : (
+                    <div className="flex items-center gap-1">
+                      <Select value={String(cursorD.getMonth())} onValueChange={(v) => {
+                        const d = parseISO(cursor); d.setMonth(parseInt(v, 10)); setCursor(toISO(d));
+                      }}>
+                        <SelectTrigger className="h-8 w-auto gap-1.5 text-sm font-bold capitalize border-0 shadow-none hover:bg-muted/60 focus:ring-0 px-2">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {MONTH_NAMES.map((mn, i) => (
+                            <SelectItem key={mn} value={String(i)} className="text-sm">{mn}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Select value={String(cursorD.getFullYear())} onValueChange={(v) => {
+                        const d = parseISO(cursor); d.setFullYear(parseInt(v, 10)); setCursor(toISO(d));
+                      }}>
+                        <SelectTrigger className="h-8 w-auto gap-1.5 text-sm font-bold border-0 shadow-none hover:bg-muted/60 focus:ring-0 px-2">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {[2023, 2024, 2025, 2026].map(y => (
+                            <SelectItem key={y} value={String(y)} className="text-sm">{y}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+
+                  <button onClick={() => navigateBy(1)}
+                    className="h-8 w-8 rounded-md border border-border hover:bg-muted/60 flex items-center justify-center transition-colors shrink-0"
+                    aria-label={view === "week" ? "Próxima semana" : "Próximo mês"}>
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+
+                {/* entradas badge */}
                 <Badge variant="outline" className="h-7 px-2.5 gap-1.5 text-xs font-semibold shrink-0">
                   <CalendarRange className="w-3.5 h-3.5 text-muted-foreground" />
                   {periodEntriesCount} {periodEntriesCount === 1 ? "entrada" : "entradas"}
