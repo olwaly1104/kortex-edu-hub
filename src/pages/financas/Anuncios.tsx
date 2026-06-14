@@ -115,143 +115,144 @@ export default function FinancasAnuncios() {
     { key: "meus", label: "Os meus", count: meusCount },
   ];
 
+  const [now, setNow] = useState<Date>(new Date());
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(id);
+  }, []);
+  const liveTime = `${String(now.getHours()).padStart(2, "0")}h:${String(now.getMinutes()).padStart(2, "0")}min:${String(now.getSeconds()).padStart(2, "0")}s`;
   const todayLabel = new Date().toLocaleDateString("pt-PT", {
     weekday: "long", day: "2-digit", month: "long", year: "numeric",
   });
-  const anoLetivo = "2024 / 2025";
-
-  const stats = [
-    { label: "Novos hoje", value: todayCount, icon: Sparkles, tone: "text-amber-600 bg-amber-50 border-amber-100" },
-    { label: "Departamento Financeiro", value: deptCount, icon: Building2, tone: "text-primary bg-primary/5 border-primary/10" },
-    { label: "Meus anúncios", value: meusCount, icon: UserCircle2, tone: "text-violet-600 bg-violet-50 border-violet-100" },
-    { label: "Total", value: items.length, icon: Inbox, tone: "text-slate-600 bg-slate-50 border-slate-100" },
-  ];
+  const ANO_LETIVO = "2024 / 2025";
 
   return (
     <div className="p-6 lg:p-8 animate-fade-in space-y-6">
-      {/* ── Header ──────────────────────────────── */}
-      <div className="rounded-xl border border-border bg-gradient-to-r from-primary/5 to-transparent p-6">
-        <div className="flex items-start justify-between gap-4 flex-wrap mb-5">
-          <div className="min-w-0">
-            <div className="flex items-center gap-2 text-[11px] uppercase tracking-wider text-muted-foreground font-medium mb-2">
-              <span className="flex items-center gap-1 capitalize">
-                <CalendarIcon className="w-3.5 h-3.5" />
-                {todayLabel}
+      {/* ── Header (matches Início / Calendário) ── */}
+      <div className="rounded-xl border border-border bg-gradient-to-r from-primary/5 to-transparent px-5 py-4">
+        <div className="flex items-start justify-between gap-4 flex-wrap">
+          <div className="min-w-0 space-y-2.5">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-[11px] uppercase tracking-wider font-semibold text-primary">
+              <GraduationCap className="w-3.5 h-3.5" />
+              Ano Letivo <span className="font-bold tabular-nums">{ANO_LETIVO}</span>
+            </span>
+            <div>
+              <h1 className="text-xl font-bold text-foreground flex items-center gap-2 leading-tight">
+                <Megaphone className="w-5 h-5 text-primary" /> Anúncios
+              </h1>
+              <p className="text-sm text-muted-foreground mt-0.5">
+                Comunicações institucionais e do Departamento Financeiro.
+              </p>
+            </div>
+          </div>
+          <div className="flex flex-col items-end gap-2 shrink-0">
+            <div className="inline-flex items-stretch rounded-md border border-border bg-card overflow-hidden text-[11px] uppercase tracking-wider font-medium shadow-sm">
+              <span className="flex items-center gap-1.5 px-2.5 py-1 text-foreground capitalize">
+                <CalendarDays className="w-3.5 h-3.5 text-muted-foreground" />{todayLabel}
               </span>
-              <span className="text-border">•</span>
-              <span className="flex items-center gap-1">
-                <GraduationCap className="w-3.5 h-3.5" />
-                Ano Letivo {anoLetivo}
+              <span className="w-px bg-border" />
+              <span className="flex items-center gap-1.5 px-2.5 py-1 font-mono tabular-nums text-primary bg-muted/30">
+                <Clock className="w-3.5 h-3.5" />{liveTime}
               </span>
             </div>
-            <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-              <Megaphone className="w-6 h-6 text-primary" /> Anúncios
-            </h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              Comunicações institucionais e do Departamento Financeiro.
-            </p>
+            <Dialog open={openCreate} onOpenChange={setOpenCreate}>
+              <DialogTrigger asChild>
+                <Button size="sm" className="h-9 gap-1.5 text-xs shadow-md hover:shadow-lg transition-shadow">
+                  <Plus className="w-4 h-4" /> Criar Anúncio
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-lg">
+                <DialogHeader><DialogTitle>Novo anúncio</DialogTitle></DialogHeader>
+                <div className="space-y-3">
+                  <div>
+                    <Label className="text-xs">Título</Label>
+                    <Input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} placeholder="Título do anúncio" />
+                  </div>
+                  <div>
+                    <Label className="text-xs">Conteúdo</Label>
+                    <Textarea rows={4} value={form.content} onChange={e => setForm({ ...form, content: e.target.value })} placeholder="Detalhes do anúncio…" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <Label className="text-xs">Categoria</Label>
+                      <Select value={form.type} onValueChange={(v: AnnType) => setForm({ ...form, type: v })}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="geral">Geral</SelectItem>
+                          <SelectItem value="urgente">Urgente</SelectItem>
+                          <SelectItem value="evento">Evento</SelectItem>
+                          <SelectItem value="academico">Académico</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label className="text-xs">Destinatários</Label>
+                      <Select value={form.department} onValueChange={v => setForm({ ...form, department: v })}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Departamento Financeiro">Departamento Financeiro</SelectItem>
+                          <SelectItem value="Toda a Instituição">Toda a Instituição</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  <label className="flex items-start gap-2 rounded-lg border border-dashed border-border bg-muted/30 p-3 cursor-pointer">
+                    <Checkbox checked={hasCta} onCheckedChange={v => setHasCta(!!v)} className="mt-0.5" />
+                    <div>
+                      <p className="text-xs font-medium text-foreground">Incluir botão de inscrição</p>
+                      <p className="text-[11px] text-muted-foreground">Permite aos destinatários inscreverem-se diretamente neste anúncio.</p>
+                    </div>
+                  </label>
+                </div>
+                <DialogFooter>
+                  <Button variant="ghost" onClick={() => setOpenCreate(false)}>Cancelar</Button>
+                  <Button onClick={handleCreate}>Publicar anúncio</Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </div>
-          <Dialog open={openCreate} onOpenChange={setOpenCreate}>
-            <DialogTrigger asChild>
-              <Button size="sm" className="h-9 gap-1.5 text-xs">
-                <Plus className="w-4 h-4" /> Criar Anúncio
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-lg">
-              <DialogHeader><DialogTitle>Novo anúncio</DialogTitle></DialogHeader>
-              <div className="space-y-3">
-                <div>
-                  <Label className="text-xs">Título</Label>
-                  <Input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} placeholder="Título do anúncio" />
-                </div>
-                <div>
-                  <Label className="text-xs">Conteúdo</Label>
-                  <Textarea rows={4} value={form.content} onChange={e => setForm({ ...form, content: e.target.value })} placeholder="Detalhes do anúncio…" />
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <Label className="text-xs">Categoria</Label>
-                    <Select value={form.type} onValueChange={(v: AnnType) => setForm({ ...form, type: v })}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="geral">Geral</SelectItem>
-                        <SelectItem value="urgente">Urgente</SelectItem>
-                        <SelectItem value="evento">Evento</SelectItem>
-                        <SelectItem value="academico">Académico</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label className="text-xs">Destinatários</Label>
-                    <Select value={form.department} onValueChange={v => setForm({ ...form, department: v })}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Departamento Financeiro">Departamento Financeiro</SelectItem>
-                        <SelectItem value="Toda a Instituição">Toda a Instituição</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <label className="flex items-start gap-2 rounded-lg border border-dashed border-border bg-muted/30 p-3 cursor-pointer">
-                  <Checkbox checked={hasCta} onCheckedChange={v => setHasCta(!!v)} className="mt-0.5" />
-                  <div>
-                    <p className="text-xs font-medium text-foreground">Incluir botão de inscrição</p>
-                    <p className="text-[11px] text-muted-foreground">Permite aos destinatários inscreverem-se diretamente neste anúncio.</p>
-                  </div>
-                </label>
-              </div>
-              <DialogFooter>
-                <Button variant="ghost" onClick={() => setOpenCreate(false)}>Cancelar</Button>
-                <Button onClick={handleCreate}>Publicar anúncio</Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
         </div>
+      </div>
 
-
-
-
-        {/* Search */}
-        <div className="relative mb-3">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+      {/* ── Controls ─────────────────────────────── */}
+      <Card className="p-3 flex flex-col lg:flex-row lg:items-center gap-3">
+        <div className="relative flex-1 min-w-[220px]">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             value={search}
             onChange={e => setSearch(e.target.value)}
-            placeholder="Pesquisar anúncios por título ou conteúdo…"
-            className="pl-10 h-11 text-sm bg-card border-border"
+            placeholder="Pesquisar anúncios…"
+            className="pl-9 h-9 text-sm border-border"
           />
         </div>
-
-        {/* Scope tabs + Category filter */}
-        <div className="flex flex-col lg:flex-row lg:items-center gap-3">
-          <div className="flex bg-muted/60 rounded-lg p-0.5 self-start overflow-x-auto">
-            {scopeTabs.map(t => (
-              <button key={t.key} onClick={() => setScope(t.key)}
-                className={cn("flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors whitespace-nowrap",
-                  scope === t.key ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground")}>
-                {t.label}
-                <span className={cn("text-[10px] px-1.5 rounded-full",
-                  scope === t.key ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground")}>
-                  {t.count}
-                </span>
-              </button>
-            ))}
-          </div>
-          <div className="flex-1" />
-          <Select value={typeFilter} onValueChange={(v: AnnType | "todos") => setTypeFilter(v)}>
-            <SelectTrigger className="w-[180px] h-9 text-xs bg-card">
-              <SelectValue placeholder="Categoria" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="todos">Todas as categorias</SelectItem>
-              <SelectItem value="urgente">Urgente</SelectItem>
-              <SelectItem value="evento">Evento</SelectItem>
-              <SelectItem value="academico">Académico</SelectItem>
-              <SelectItem value="geral">Geral</SelectItem>
-            </SelectContent>
-          </Select>
+        <div className="flex bg-muted/60 rounded-lg p-0.5 overflow-x-auto">
+          {scopeTabs.map(t => (
+            <button key={t.key} onClick={() => setScope(t.key)}
+              className={cn("flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors whitespace-nowrap",
+                scope === t.key ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground")}>
+              {t.label}
+              <span className={cn("text-[10px] px-1.5 rounded-full tabular-nums",
+                scope === t.key ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground")}>
+                {t.count}
+              </span>
+            </button>
+          ))}
         </div>
-      </div>
+        <Select value={typeFilter} onValueChange={(v: AnnType | "todos") => setTypeFilter(v)}>
+          <SelectTrigger className="w-[170px] h-9 text-xs">
+            <SelectValue placeholder="Categoria" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="todos">Todas as categorias</SelectItem>
+            <SelectItem value="urgente">Urgente</SelectItem>
+            <SelectItem value="evento">Evento</SelectItem>
+            <SelectItem value="academico">Académico</SelectItem>
+            <SelectItem value="geral">Geral</SelectItem>
+          </SelectContent>
+        </Select>
+      </Card>
+
+
 
 
       {/* ── Feed ────────────────────────────────── */}
