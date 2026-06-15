@@ -64,14 +64,37 @@ export default function Login() {
         return;
       }
       // Cloud accounts: try Supabase
-      const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({ email, password });
       if (signInError) {
         setError(signInError.message || "Credenciais inválidas.");
         return;
       }
-      // Open a local Estudante session so the app shell loads, then jump to chat
-      login("2934@upra.kor", "olwaly");
-      navigate("/student/chat");
+      // Look up role from user_roles, then open the matching demo shell
+      const userId = signInData.user?.id;
+      let modulo: string = (signInData.user?.user_metadata as any)?.modulo || "estudante";
+      if (userId) {
+        const { data: roleRow } = await supabase
+          .from("user_roles" as any)
+          .select("role")
+          .eq("user_id", userId)
+          .maybeSingle();
+        if (roleRow && (roleRow as any).role) modulo = (roleRow as any).role;
+      }
+      const MODULE_TO_DEMO: Record<string, { email: string; path: string }> = {
+        admin:        { email: "admin@upra.kor",          path: "/admin" },
+        estudante:    { email: "2934@upra.kor",           path: "/student" },
+        professor:    { email: "prof.silva@upra.kor",     path: "/professor" },
+        coordenador:  { email: "coordcurso@upra.kor",     path: "/coordenador" },
+        decano:       { email: "decano@upra.kor",         path: "/decano" },
+        reitor:       { email: "reitor@upra.kor",         path: "/reitor" },
+        financas:     { email: "financas@upra.kor",       path: "/financas" },
+        academica:    { email: "academica@upra.kor",      path: "/secretaria" },
+        gap:          { email: "gap@upra.kor",            path: "/gap" },
+        inscricoes:   { email: "inscricoes@upra.kor",     path: "/inscricoes" },
+      };
+      const target = MODULE_TO_DEMO[modulo] ?? MODULE_TO_DEMO.estudante;
+      login(target.email, "olwaly");
+      navigate(target.path);
     } finally {
       setSubmitting(false);
     }
