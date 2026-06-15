@@ -1,3 +1,4 @@
+import { OnboardingStepBanner } from "@/components/admin/OnboardingStepBanner";
 import { useState, useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
