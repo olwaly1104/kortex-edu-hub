@@ -25,10 +25,20 @@ export function progressKey(email?: string | null) {
 
 export function isOnboardingCompleteFor(email?: string | null): boolean {
   try {
-    const raw = localStorage.getItem(onboardingKey(email));
+    const raw = localStorage.getItem(onboardingKey(email)) || localStorage.getItem(ONBOARDING_BASE);
     if (!raw) return false;
     return !!JSON.parse(raw)?.completed;
   } catch {
     return false;
   }
+}
+
+export function readOnboardingStateFor<T>(email?: string | null, fallback: T): T {
+  try {
+    const accountRaw = localStorage.getItem(onboardingKey(email));
+    if (accountRaw) return { ...fallback, ...JSON.parse(accountRaw) };
+    const legacyRaw = localStorage.getItem(ONBOARDING_BASE);
+    if (legacyRaw) return { ...fallback, ...JSON.parse(legacyRaw) };
+  } catch { /* ignore */ }
+  return fallback;
 }
