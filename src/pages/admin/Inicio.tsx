@@ -47,12 +47,12 @@ const GROUPS: Group[] = [
   {
     id: "inf",
     area: "Infraestrutura",
-    title: "Adicionar Edifícios e Salas",
-    subtitle: "Salas de aula, gabinetes, laboratórios e geopontos do campus",
+    title: "Registar Salas, Edifícios e Geopontos do Campus",
+    subtitle: "Espaços físicos e pontos GPS de presença",
     icon: Building2,
     steps: [
-      { key: "inf.esp", title: "Edifícios e salas", desc: "Registar todos os espaços físicos da instituição.", icon: Building2, path: "/admin/onboarding/espacos?step=inf.esp" },
-      { key: "inf.geo", title: "Registar geopontos do campus", desc: "Definir pontos GPS de entradas, edifícios e zonas de presença.", icon: MapPin, path: "/admin/onboarding/espacos?tab=geopontos&step=inf.geo" },
+      { key: "inf.esp", title: "Salas e edifícios", desc: "Registar todos os espaços físicos da instituição.", icon: Building2, path: "/admin/onboarding/espacos?step=inf.esp" },
+      { key: "inf.geo", title: "Geopontos do campus", desc: "Definir pontos GPS de entradas, edifícios e zonas de presença.", icon: MapPin, path: "/admin/onboarding/espacos?tab=geopontos&step=inf.geo" },
     ],
   },
   {
