@@ -13,6 +13,7 @@ type Mode = "docentes" | "staff";
 
 type Person = {
   id: string;
+  prefixo?: string;
   nome: string;
   email: string;
   contacto?: string;
@@ -20,6 +21,8 @@ type Person = {
   departamento?: string;
   funcao?: string;
 };
+
+const prefixosPool = ["Sr.", "Sra.", "Dr.", "Dra.", "Prof.", "Eng.", "Me."];
 
 const grausPool      = ["Licenciado", "Mestre", "Doutor", "Pós-doc"];
 
