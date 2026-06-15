@@ -243,6 +243,14 @@ const academica2Sections: NavSection[] = [
   ]},
 ];
 
+const adminSections: NavSection[] = [
+  { title: "Geral", items: [
+    { label: "Início", icon: LayoutDashboard, path: "/admin" },
+    { label: "Calendário", icon: Calendar, path: "/admin/calendario" },
+    { label: "Anúncios", icon: Megaphone, path: "/admin/anuncios" },
+  ]},
+];
+
 const roleSectionsMap: Record<string, NavSection[]> = {
   student: studentSections,
   professor: professorSections,
@@ -253,6 +261,7 @@ const roleSectionsMap: Record<string, NavSection[]> = {
   financas: financasSections,
   gap: gapSections,
   academica2: academica2Sections,
+  admin: adminSections,
 };
 
 const roleLabelMap: Record<string, string> = {
@@ -265,9 +274,10 @@ const roleLabelMap: Record<string, string> = {
   financas: "Finanças",
   gap: "GAP — Apoio ao Estudante",
   academica2: "Área Académica II",
+  admin: "Administrador",
 };
 
-const roleBasePaths = ["/student", "/professor", "/coordenador", "/decano", "/reitor", "/secretaria", "/financas", "/gap", "/areaacademica"];
+const roleBasePaths = ["/student", "/professor", "/coordenador", "/decano", "/reitor", "/secretaria", "/financas", "/gap", "/areaacademica", "/admin"];
 
 export default function AppSidebar() {
   const { user, logout } = useAuth();
