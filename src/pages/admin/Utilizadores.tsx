@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Users, Plus, Search, Trash2, ShieldCheck, Loader2, User } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { isPreviewHost } from "@/lib/runtimeEnv";
 
 type StoredUser = {
   id: string;
@@ -83,21 +84,28 @@ export default function AdminUtilizadores() {
     }
     setSubmitting(true);
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email: form.email.trim(),
-        password: form.password,
-        options: {
-          data: { display_name: form.name.trim(), modulo: form.modulo },
-          emailRedirectTo: `${window.location.origin}/`,
-        },
-      });
-      if (error) { setErr(error.message); setSubmitting(false); return; }
-      const userId = data.user?.id;
-      if (userId) {
-        const { error: roleErr } = await supabase.from("user_roles" as any).insert({
-          user_id: userId, role: form.modulo,
-        } as any);
-        if (roleErr) console.warn("user_roles insert failed:", roleErr.message);
+      let userId: string | undefined;
+      if (isPreviewHost()) {
+        // Preview (Lovable editor) → não cria conta real no backend.
+        console.info("[utilizadores] preview host: skipping backend signUp");
+        userId = `local-${Date.now()}`;
+      } else {
+        const { data, error } = await supabase.auth.signUp({
+          email: form.email.trim(),
+          password: form.password,
+          options: {
+            data: { display_name: form.name.trim(), modulo: form.modulo },
+            emailRedirectTo: `${window.location.origin}/`,
+          },
+        });
+        if (error) { setErr(error.message); setSubmitting(false); return; }
+        userId = data.user?.id;
+        if (userId) {
+          const { error: roleErr } = await supabase.from("user_roles" as any).insert({
+            user_id: userId, role: form.modulo,
+          } as any);
+          if (roleErr) console.warn("user_roles insert failed:", roleErr.message);
+        }
       }
       const newRow: StoredUser = {
         id: userId || `${Date.now()}`,

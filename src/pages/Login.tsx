@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import logoUpra from "@/assets/logo-upra.asset.json";
 import { supabase } from "@/integrations/supabase/client";
 import { onboardingKey, isOnboardingCompleteFor } from "@/lib/onboardingStorage";
+import { isPreviewHost } from "@/lib/runtimeEnv";
 
 const DEMO_PASSWORD = "olwaly";
 const DEMO_ACCOUNTS: { role: string; email: string }[] = [
@@ -144,27 +145,33 @@ export default function Login() {
       return;
     }
     setSuLoading(true);
-    const { data: suData, error: signUpError } = await supabase.auth.signUp({
-      email: suEmail.trim(),
-      password: suPassword,
-      options: {
-        data: { display_name: suName.trim(), modulo: suModulo },
-        emailRedirectTo: `${window.location.origin}/`,
-      },
-    });
-    if (signUpError) {
-      setSuLoading(false);
-      setSuError(signUpError.message || "Não foi possível criar conta.");
-      return;
-    }
-    // Assign role
-    const userId = suData.user?.id;
-    if (userId) {
-      const { error: roleErr } = await supabase.from("user_roles" as any).insert({
-        user_id: userId,
-        role: suModulo,
-      } as any);
-      if (roleErr) console.warn("user_roles insert failed:", roleErr.message);
+    // Preview (Lovable editor) → não escreve no backend; só simula localmente.
+    // Published site / custom domain → cria conta real no Lovable Cloud.
+    if (isPreviewHost()) {
+      // No-op no backend. A conta fica apenas como demo local.
+      console.info("[signup] preview host: skipping backend signUp");
+    } else {
+      const { data: suData, error: signUpError } = await supabase.auth.signUp({
+        email: suEmail.trim(),
+        password: suPassword,
+        options: {
+          data: { display_name: suName.trim(), modulo: suModulo },
+          emailRedirectTo: `${window.location.origin}/`,
+        },
+      });
+      if (signUpError) {
+        setSuLoading(false);
+        setSuError(signUpError.message || "Não foi possível criar conta.");
+        return;
+      }
+      const userId = suData.user?.id;
+      if (userId) {
+        const { error: roleErr } = await supabase.from("user_roles" as any).insert({
+          user_id: userId,
+          role: suModulo,
+        } as any);
+        if (roleErr) console.warn("user_roles insert failed:", roleErr.message);
+      }
     }
     // For admin: pre-complete institutional onboarding using the name supplied at signup,
     // so the user is never asked to register again on the next sign-in.
