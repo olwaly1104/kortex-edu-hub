@@ -24,6 +24,7 @@ import { formatCurrency, salarios as initialSalarios, type Salary } from "@/data
 import { reitorFaculties } from "@/data/institutionData";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import { useFaculdades, useCursos, usePropinas, useUpdatePropina } from "@/lib/useInstitution";
 import { cn } from "@/lib/utils";
 
 
@@ -305,12 +306,68 @@ export default function ConfigurarReceitas() {
   const ANO_LETIVO = "2024 / 2025";
 
 
+  /* ── Backend institution data (admin only) ── */
+  const facsQ = useFaculdades();
+  const cursosQ = useCursos();
+  const propinasQ = usePropinas();
+  const updatePropina = useUpdatePropina();
+
+  const backendFaculties = useMemo(() => {
+    if (!isAdmin) return [] as any[];
+    const facs = facsQ.data ?? [];
+    const cursos = cursosQ.data ?? [];
+    return facs.map((f) => ({
+      id: f.id,
+      name: f.name,
+      courses: cursos
+        .filter((c) => c.faculdade_id === f.id)
+        .map((c) => ({ id: c.id, code: c.code, name: c.name, facultyName: f.name })),
+    }));
+  }, [isAdmin, facsQ.data, cursosQ.data]);
+
   /* ── RECEITAS ── */
   const [receitas, setReceitas] = useState<ReceitaRow[]>(() => (isAdmin ? [] : initialReceitas()));
-  const accountFaculties = isAdmin ? [] : reitorFaculties;
+  const accountFaculties: any[] = isAdmin ? backendFaculties : (reitorFaculties as any[]);
   const [receitaFilter, setReceitaFilter] = useState<string>("todos");
   const [selectedFaculty, setSelectedFaculty] = useState<string | null>(null);
   const [multaSubtype, setMultaSubtype] = useState<TipoReceita>("Multa Estudante");
+
+  // Seed admin propina receitas from backend whenever cursos / propinas change.
+  useEffect(() => {
+    if (!isAdmin) return;
+    const cursos = cursosQ.data ?? [];
+    const propinas = propinasQ.data ?? [];
+    const propinaByCurso = new Map(propinas.map((p) => [p.curso_id, p]));
+    const next: ReceitaRow[] = cursos.map((c) => {
+      const p = propinaByCurso.get(c.id);
+      const valor = Number(p?.valor_mensal ?? 0);
+      return {
+        id: `propina-${c.id}`,
+        nome: `Propina mensal — ${c.name}`,
+        tipo: "Propina mensal" as const,
+        escopo: c.id,
+        valor,
+        plans: [{ months: 10, valor }],
+      };
+    });
+    setReceitas((prev) => {
+      // Preserve non-propina rows (matrículas, taxas, etc.) the admin may have added.
+      const others = prev.filter((r) => r.tipo !== "Propina mensal");
+      return [...next, ...others];
+    });
+  }, [isAdmin, cursosQ.data, propinasQ.data]);
+
+  // Persist propina value changes back to the backend.
+  const persistPropinaIfBackend = (rowId: string, valor: number) => {
+    if (!isAdmin) return;
+    const r = receitas.find((x) => x.id === rowId);
+    if (!r || r.tipo !== "Propina mensal") return;
+    const cursoId = r.escopo;
+    const isBackend = (cursosQ.data ?? []).some((c) => c.id === cursoId);
+    if (!isBackend) return;
+    updatePropina.mutate({ curso_id: cursoId, valor_mensal: valor });
+  };
+
 
   const [openReceitaSection, setOpenReceitaSection] = useState<SectionDef | null>(null);
   const [editingReceita, setEditingReceita] = useState<ReceitaRow | null>(null);
@@ -461,22 +518,26 @@ export default function ConfigurarReceitas() {
   const commitInlinePlan = () => {
     if (!inlineEditPlan) return;
     const v = Number(inlineEditPlan.valor) || 0;
+    const rowId = inlineEditPlan.rowId;
     setReceitas(rs => rs.map(r => {
-      if (r.id !== inlineEditPlan.rowId || !r.plans) return r;
+      if (r.id !== rowId || !r.plans) return r;
       const plans = r.plans.map(p => p.months === inlineEditPlan.months ? { ...p, valor: v } : p);
       return { ...r, plans, valor: plans[0].valor };
     }));
+    persistPropinaIfBackend(rowId, v);
     setInlineEditPlan(null);
   };
   const commitPlanEdit = () => {
     if (!planEdit) return;
     const v = Number(planEdit.valor) || 0;
     const imp = Math.max(0, Math.min(100, Number(planEdit.imposto) || 0)) / 100;
+    const rowId = planEdit.rowId;
     setReceitas(rs => rs.map(r => {
-      if (r.id !== planEdit.rowId || !r.plans) return r;
+      if (r.id !== rowId || !r.plans) return r;
       const plans = r.plans.map(p => p.months === planEdit.months ? { ...p, valor: v, imposto: imp } : p);
       return { ...r, plans, valor: plans[0].valor };
     }));
+    persistPropinaIfBackend(rowId, v);
     setPlanEdit(null);
     toast({ title: "Plano actualizado", description: `${planEdit.months} meses · ${formatCurrency(v)}` });
   };

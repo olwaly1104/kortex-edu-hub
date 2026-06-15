@@ -1,6 +1,6 @@
 import { FinHeader } from "@/pages/financas/_FinHeader";
 import { OnboardingStepBanner } from "@/components/admin/OnboardingStepBanner";
-import { Building2, Lock, Pencil, Check, GraduationCap, Users, UserCog, Plus, X } from "lucide-react";
+import { Building2, Lock, Pencil, Check, GraduationCap, Users, UserCog, Plus, X, Loader2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -8,18 +8,36 @@ import {
 } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import type { CursoTemplate } from "@/data/academica2Data";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { loadDocentes, fullName, type DocenteRow } from "@/lib/peopleStorage";
-
-type FacState = { id: string; name: string; decano: string; editing: boolean; cursos: CursoTemplate[] };
+import {
+  useFaculdades, useCursos,
+  useCreateFaculdade, useUpdateFaculdade, useDeleteFaculdade,
+  useCreateCurso, useUpdateCurso, useDeleteCurso,
+  type FaculdadeRow, type CursoRow,
+} from "@/lib/useInstitution";
+import { toast } from "sonner";
 
 export default function AdminFaculdadesCursos() {
-  const [faculdades, setFaculdades] = useState<FacState[]>([]);
-  const [docentes, setDocentes] = useState<DocenteRow[]>(() => loadDocentes());
+  const facsQ = useFaculdades();
+  const cursosQ = useCursos();
+  const createFac = useCreateFaculdade();
+  const updateFac = useUpdateFaculdade();
+  const deleteFac = useDeleteFaculdade();
+  const createCurso = useCreateCurso();
+  const updateCurso = useUpdateCurso();
+  const deleteCurso = useDeleteCurso();
 
-  // Refresh docentes list when the page regains focus, so newly added teachers appear in dropdowns.
+  const faculdades = facsQ.data ?? [];
+  const cursos = cursosQ.data ?? [];
+  const cursosByFac = useMemo(() => {
+    const m = new Map<string, CursoRow[]>();
+    cursos.forEach((c) => { const arr = m.get(c.faculdade_id) || []; arr.push(c); m.set(c.faculdade_id, arr); });
+    return m;
+  }, [cursos]);
+
+  const [docentes, setDocentes] = useState<DocenteRow[]>(() => loadDocentes());
   useEffect(() => {
     const refresh = () => setDocentes(loadDocentes());
     window.addEventListener("focus", refresh);
@@ -29,70 +47,100 @@ export default function AdminFaculdadesCursos() {
       window.removeEventListener("storage", refresh);
     };
   }, []);
-
   const decanoOptions = useMemo(() => docentes.map((d) => fullName(d)).filter(Boolean), [docentes]);
-  const coordOptions = useMemo(() => docentes.map((d) => fullName(d)).filter(Boolean), [docentes]);
+  const coordOptions = decanoOptions;
+
+  // Local UI-only state: which faculdade rows are in edit mode
+  const [editingFacIds, setEditingFacIds] = useState<Record<string, boolean>>({});
+  // Local buffer for edits in progress (so inputs feel snappy)
+  const [edits, setEdits] = useState<Record<string, Partial<FaculdadeRow>>>({});
+  const [cursoEdits, setCursoEdits] = useState<Record<string, Partial<CursoRow>>>({});
 
   // Add Faculdade dialog
   const [openAddFac, setOpenAddFac] = useState(false);
   const [newFac, setNewFac] = useState({ name: "", decano: "" });
 
-  const submitNewFac = () => {
+  const submitNewFac = async () => {
     if (!newFac.name.trim()) return;
-    setFaculdades((prev) => [
-      ...prev,
-      { id: `fac-${Date.now()}`, name: newFac.name.trim(), decano: newFac.decano.trim(), editing: false, cursos: [] },
-    ]);
-    setNewFac({ name: "", decano: "" });
-    setOpenAddFac(false);
+    try {
+      await createFac.mutateAsync({ name: newFac.name, decano: newFac.decano });
+      setNewFac({ name: "", decano: "" });
+      setOpenAddFac(false);
+      toast.success("Faculdade criada");
+    } catch (e: any) {
+      toast.error(e?.message ?? "Falha ao criar faculdade");
+    }
   };
 
   // Add Curso dialog
   const [openAddCurso, setOpenAddCurso] = useState<string | null>(null);
-  const [newCurso, setNewCurso] = useState({ name: "", code: "", years: 4, estudantesEsperados: 0, coordenador: "" });
+  const [newCurso, setNewCurso] = useState({ name: "", code: "", years: 4, estudantes_esperados: 0, coordenador: "" });
 
-  const submitNewCurso = () => {
+  const submitNewCurso = async () => {
     if (!openAddCurso || !newCurso.name.trim() || !newCurso.code.trim()) return;
-    const facId = openAddCurso;
-    const fac = faculdades.find((f) => f.id === facId);
-    if (!fac) return;
-    update(facId, {
-      cursos: [
-        ...fac.cursos,
-        {
-          id: `${facId}-${Date.now()}`,
-          name: newCurso.name.trim(),
-          code: newCurso.code.trim().toUpperCase(),
-          faculty: fac.name,
-          years: newCurso.years || 4,
-          cadeirasPorAno: 6,
-          estudantesEsperados: newCurso.estudantesEsperados || 0,
-          coordenador: newCurso.coordenador.trim(),
-        },
-      ],
-    });
-    setNewCurso({ name: "", code: "", years: 4, estudantesEsperados: 0, coordenador: "" });
-    setOpenAddCurso(null);
+    try {
+      await createCurso.mutateAsync({
+        faculdade_id: openAddCurso,
+        name: newCurso.name,
+        code: newCurso.code,
+        years: newCurso.years || 4,
+        estudantes_esperados: newCurso.estudantes_esperados || 0,
+        coordenador: newCurso.coordenador,
+      });
+      setNewCurso({ name: "", code: "", years: 4, estudantes_esperados: 0, coordenador: "" });
+      setOpenAddCurso(null);
+      toast.success("Curso criado (propina iniciada em 0 Kz)");
+    } catch (e: any) {
+      toast.error(e?.message ?? "Falha ao criar curso");
+    }
   };
 
-  const update = (id: string, patch: Partial<FacState>) =>
-    setFaculdades((prev) => prev.map((f) => (f.id === id ? { ...f, ...patch } : f)));
-
-  const updateCurso = (facId: string, cursoId: string, patch: Partial<CursoTemplate>) => {
-    const fac = faculdades.find((f) => f.id === facId);
-    if (!fac) return;
-    update(facId, { cursos: fac.cursos.map((c) => (c.id === cursoId ? { ...c, ...patch } : c)) });
+  const toggleEdit = async (f: FaculdadeRow) => {
+    const isEditing = !!editingFacIds[f.id];
+    if (isEditing) {
+      // Save buffered changes
+      const facPatch = edits[f.id];
+      if (facPatch && (facPatch.name !== undefined || facPatch.decano !== undefined)) {
+        await updateFac.mutateAsync({
+          id: f.id,
+          patch: {
+            ...(facPatch.name !== undefined ? { name: facPatch.name } : {}),
+            ...(facPatch.decano !== undefined ? { decano: facPatch.decano } : {}),
+          },
+        });
+      }
+      const cursoIds = (cursosByFac.get(f.id) ?? []).map((c) => c.id);
+      for (const cid of cursoIds) {
+        const patch = cursoEdits[cid];
+        if (!patch) continue;
+        await updateCurso.mutateAsync({
+          id: cid,
+          patch: {
+            ...(patch.name !== undefined ? { name: patch.name } : {}),
+            ...(patch.code !== undefined ? { code: patch.code } : {}),
+            ...(patch.coordenador !== undefined ? { coordenador: patch.coordenador } : {}),
+          },
+        });
+      }
+      setEdits((e) => { const n = { ...e }; delete n[f.id]; return n; });
+      setCursoEdits((e) => { const n = { ...e }; cursoIds.forEach((id) => delete n[id]); return n; });
+    }
+    setEditingFacIds((m) => ({ ...m, [f.id]: !isEditing }));
   };
 
-  const removeCurso = (facId: string, cursoId: string) => {
-    const fac = faculdades.find((f) => f.id === facId);
-    if (!fac) return;
-    update(facId, { cursos: fac.cursos.filter((c) => c.id !== cursoId) });
-  };
+  const facValue = (f: FaculdadeRow, key: keyof FaculdadeRow) =>
+    (edits[f.id]?.[key] ?? f[key]) as any;
+  const cursoValue = (c: CursoRow, key: keyof CursoRow) =>
+    (cursoEdits[c.id]?.[key] ?? c[key]) as any;
 
-  const totalCursos = useMemo(() => faculdades.reduce((s, f) => s + f.cursos.length, 0), [faculdades]);
-  const totalEstud = useMemo(() => faculdades.reduce((s, f) => s + f.cursos.reduce((a, c) => a + c.estudantesEsperados, 0), 0), [faculdades]);
-  const decanosCount = useMemo(() => faculdades.filter((f) => f.decano.trim()).length, [faculdades]);
+  const setFacField = (id: string, patch: Partial<FaculdadeRow>) =>
+    setEdits((e) => ({ ...e, [id]: { ...e[id], ...patch } }));
+  const setCursoField = (id: string, patch: Partial<CursoRow>) =>
+    setCursoEdits((e) => ({ ...e, [id]: { ...e[id], ...patch } }));
+
+  const totalCursos = cursos.length;
+  const totalEstud = cursos.reduce((s, c) => s + (c.estudantes_esperados || 0), 0);
+  const decanosCount = faculdades.filter((f) => (f.decano || "").trim()).length;
 
   return (
     <div className="p-6 space-y-6 max-w-6xl mx-auto">
@@ -111,15 +159,22 @@ export default function AdminFaculdadesCursos() {
         <div className="rounded-lg border border-border bg-card p-4"><p className="text-xs text-muted-foreground">Decanos</p><p className="text-2xl font-bold tabular-nums">{decanosCount}</p></div>
       </div>
 
+      {facsQ.isLoading && (
+        <div className="flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="w-4 h-4 animate-spin" /> A carregar…</div>
+      )}
+
       <div className="space-y-4">
-        {faculdades.length === 0 && (
+        {!facsQ.isLoading && faculdades.length === 0 && (
           <div className="rounded-xl border border-dashed border-border bg-card p-8 text-center">
             <Building2 className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
             <p className="text-sm font-semibold text-foreground">Nenhuma faculdade registada</p>
             <p className="text-xs text-muted-foreground mt-1">Adicione a primeira faculdade para começar a estrutura académica.</p>
           </div>
         )}
-        {faculdades.map((f) => (
+        {faculdades.map((f) => {
+          const facCursos = cursosByFac.get(f.id) ?? [];
+          const isEditing = !!editingFacIds[f.id];
+          return (
           <div key={f.id} className="rounded-xl border border-border bg-card overflow-hidden">
             <div className="px-5 py-4 border-b border-border bg-muted/20 flex items-center justify-between flex-wrap gap-3">
               <div className="flex items-center gap-3 min-w-0">
@@ -127,14 +182,14 @@ export default function AdminFaculdadesCursos() {
                   <Building2 className="w-5 h-5" />
                 </div>
                 <div className="min-w-0">
-                  {f.editing ? (
-                    <Input value={f.name} onChange={(e) => update(f.id, { name: e.target.value })} className="h-8 text-sm font-semibold mb-1" />
+                  {isEditing ? (
+                    <Input value={facValue(f, "name")} onChange={(e) => setFacField(f.id, { name: e.target.value })} className="h-8 text-sm font-semibold mb-1" />
                   ) : (
                     <p className="text-base font-semibold truncate">{f.name}</p>
                   )}
                   <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
-                    <span className="flex items-center gap-1"><GraduationCap className="w-3 h-3" /> {f.cursos.length} cursos</span>
-                    <span className="flex items-center gap-1"><Users className="w-3 h-3" /> {f.cursos.reduce((a, c) => a + c.estudantesEsperados, 0)} estudantes</span>
+                    <span className="flex items-center gap-1"><GraduationCap className="w-3 h-3" /> {facCursos.length} cursos</span>
+                    <span className="flex items-center gap-1"><Users className="w-3 h-3" /> {facCursos.reduce((a, c) => a + (c.estudantes_esperados || 0), 0)} estudantes</span>
                   </div>
                 </div>
               </div>
@@ -143,8 +198,8 @@ export default function AdminFaculdadesCursos() {
                   <UserCog className="w-3.5 h-3.5 text-muted-foreground" />
                   <div className="min-w-0">
                     <p className="text-[10px] uppercase tracking-wide text-muted-foreground leading-tight">Decano</p>
-                    {f.editing ? (
-                      <Select value={f.decano || undefined} onValueChange={(v) => update(f.id, { decano: v })}>
+                    {isEditing ? (
+                      <Select value={facValue(f, "decano") || undefined} onValueChange={(v) => setFacField(f.id, { decano: v })}>
                         <SelectTrigger className="h-6 text-xs border-0 px-0 shadow-none focus:ring-0"><SelectValue placeholder={decanoOptions.length ? "Escolher" : "Sem docentes"} /></SelectTrigger>
                         <SelectContent>
                           {decanoOptions.length === 0 ? (
@@ -157,10 +212,19 @@ export default function AdminFaculdadesCursos() {
                     )}
                   </div>
                 </div>
-                {!f.editing && <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-muted text-muted-foreground text-[11px] font-semibold"><Lock className="w-3 h-3" /> Bloqueado</span>}
-                <Button size="sm" variant={f.editing ? "default" : "outline"} className="gap-1 h-8" onClick={() => update(f.id, { editing: !f.editing })}>
-                  {f.editing ? <><Check className="w-3.5 h-3.5" /> Concluir</> : <><Pencil className="w-3.5 h-3.5" /> Editar</>}
+                {!isEditing && <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-muted text-muted-foreground text-[11px] font-semibold"><Lock className="w-3 h-3" /> Bloqueado</span>}
+                <Button size="sm" variant={isEditing ? "default" : "outline"} className="gap-1 h-8" onClick={() => toggleEdit(f)}>
+                  {isEditing ? <><Check className="w-3.5 h-3.5" /> Concluir</> : <><Pencil className="w-3.5 h-3.5" /> Editar</>}
                 </Button>
+                {isEditing && (
+                  <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive hover:text-destructive" onClick={async () => {
+                    if (!confirm(`Eliminar a faculdade "${f.name}" e todos os seus cursos?`)) return;
+                    await deleteFac.mutateAsync(f.id);
+                    toast.success("Faculdade eliminada");
+                  }}>
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </Button>
+                )}
               </div>
             </div>
 
@@ -171,29 +235,29 @@ export default function AdminFaculdadesCursos() {
                   <Plus className="w-3 h-3" /> Adicionar Curso
                 </Button>
               </div>
-              {f.cursos.length === 0 ? (
+              {facCursos.length === 0 ? (
                 <div className="rounded-md border border-dashed border-border p-4 text-center text-xs text-muted-foreground">
                   Nenhum curso registado nesta faculdade.
                 </div>
               ) : (
                 <div className="grid sm:grid-cols-2 gap-2">
-                  {f.cursos.map((c) => (
+                  {facCursos.map((c) => (
                     <div key={c.id} className="flex items-center gap-2 px-3 py-2 rounded-md border border-border bg-card">
                       <span className="inline-flex items-center justify-center h-5 min-w-[34px] px-1 rounded bg-primary text-primary-foreground text-[10px] font-bold">{c.code}</span>
                       <div className="min-w-0 flex-1">
-                        {f.editing ? (
-                          <Input value={c.name} onChange={(e) => updateCurso(f.id, c.id, { name: e.target.value })} className="h-6 text-xs mb-0.5" />
+                        {isEditing ? (
+                          <Input value={cursoValue(c, "name")} onChange={(e) => setCursoField(c.id, { name: e.target.value })} className="h-6 text-xs mb-0.5" />
                         ) : (
                           <p className="text-xs font-medium truncate">{c.name}</p>
                         )}
-                        <p className="text-[10px] text-muted-foreground truncate">{c.years} anos · ~{c.estudantesEsperados} est.</p>
+                        <p className="text-[10px] text-muted-foreground truncate">{c.years} anos · ~{c.estudantes_esperados} est.</p>
                       </div>
                       <div className="flex items-center gap-1.5 px-2 py-1 rounded border border-border bg-muted/30 shrink-0">
                         <UserCog className="w-3 h-3 text-muted-foreground" />
                         <div className="min-w-0">
                           <p className="text-[9px] uppercase tracking-wide text-muted-foreground leading-tight">Coord.</p>
-                          {f.editing ? (
-                            <Select value={c.coordenador || undefined} onValueChange={(v) => updateCurso(f.id, c.id, { coordenador: v })}>
+                          {isEditing ? (
+                            <Select value={cursoValue(c, "coordenador") || undefined} onValueChange={(v) => setCursoField(c.id, { coordenador: v })}>
                               <SelectTrigger className="h-5 text-[11px] border-0 px-0 shadow-none focus:ring-0 gap-1 max-w-[140px]"><SelectValue placeholder={coordOptions.length ? "Escolher" : "Sem docentes"} /></SelectTrigger>
                               <SelectContent>
                                 {coordOptions.length === 0 ? (
@@ -206,8 +270,12 @@ export default function AdminFaculdadesCursos() {
                           )}
                         </div>
                       </div>
-                      {f.editing && (
-                        <Button size="icon" variant="ghost" className="h-6 w-6 text-destructive hover:text-destructive" onClick={() => removeCurso(f.id, c.id)}>
+                      {isEditing && (
+                        <Button size="icon" variant="ghost" className="h-6 w-6 text-destructive hover:text-destructive" onClick={async () => {
+                          if (!confirm(`Eliminar o curso "${c.name}"?`)) return;
+                          await deleteCurso.mutateAsync(c.id);
+                          toast.success("Curso eliminado");
+                        }}>
                           <X className="w-3.5 h-3.5" />
                         </Button>
                       )}
@@ -217,7 +285,8 @@ export default function AdminFaculdadesCursos() {
               )}
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Add Faculdade dialog */}
@@ -249,7 +318,9 @@ export default function AdminFaculdadesCursos() {
           </div>
           <DialogFooter>
             <DialogClose asChild><Button variant="outline" size="sm">Cancelar</Button></DialogClose>
-            <Button size="sm" onClick={submitNewFac} disabled={!newFac.name.trim()}>Criar Faculdade</Button>
+            <Button size="sm" onClick={submitNewFac} disabled={!newFac.name.trim() || createFac.isPending}>
+              {createFac.isPending ? <><Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" /> A criar…</> : "Criar Faculdade"}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -278,7 +349,7 @@ export default function AdminFaculdadesCursos() {
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="cur-est" className="text-xs">Estudantes esperados</Label>
-                <Input id="cur-est" type="number" min={0} value={newCurso.estudantesEsperados} onChange={(e) => setNewCurso({ ...newCurso, estudantesEsperados: Number(e.target.value) })} />
+                <Input id="cur-est" type="number" min={0} value={newCurso.estudantes_esperados} onChange={(e) => setNewCurso({ ...newCurso, estudantes_esperados: Number(e.target.value) })} />
               </div>
             </div>
             <div className="space-y-1.5">
@@ -296,10 +367,15 @@ export default function AdminFaculdadesCursos() {
                 </Select>
               )}
             </div>
+            <p className="text-[11px] text-muted-foreground bg-muted/40 rounded-md px-3 py-2 border border-border">
+              A propina mensal deste curso é criada automaticamente em <strong>0&nbsp;Kz</strong>. Define o valor em <Link to="/financas/configurar/receitas" className="text-primary underline">Finanças → Configurar Receitas → Propinas por Curso</Link>.
+            </p>
           </div>
           <DialogFooter>
             <DialogClose asChild><Button variant="outline" size="sm">Cancelar</Button></DialogClose>
-            <Button size="sm" onClick={submitNewCurso} disabled={!newCurso.name.trim() || !newCurso.code.trim()}>Criar Curso</Button>
+            <Button size="sm" onClick={submitNewCurso} disabled={!newCurso.name.trim() || !newCurso.code.trim() || createCurso.isPending}>
+              {createCurso.isPending ? <><Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" /> A criar…</> : "Criar Curso"}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
