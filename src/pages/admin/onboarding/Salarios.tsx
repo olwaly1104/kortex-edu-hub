@@ -21,14 +21,9 @@ type Row = {
   confirmado: boolean;
 };
 
-const seedDocentes: Row[] = [
-  { id: "d1", nome: "Prof. Sofia Martins", email: "sofia.martins@upra.kor", categoria: "docente", cargo: "Doutor · Matemática I", bruto: 850000, imposto: 17, confirmado: false },
-  { id: "d2", nome: "Prof. Carlos Mendes", email: "carlos.mendes@upra.kor", categoria: "docente", cargo: "Mestre · Anatomia",      bruto: 720000, imposto: 17, confirmado: false },
-];
-const seedStaff: Row[] = [
-  { id: "s1", nome: "Joana Pinto", email: "joana.pinto@upra.kor", categoria: "staff", cargo: "Académica · Coordenador", bruto: 650000, imposto: 17, confirmado: false },
-  { id: "s2", nome: "Rui Tavares", email: "rui.tavares@upra.kor", categoria: "staff", cargo: "TI · Técnico",            bruto: 480000, imposto: 13, confirmado: false },
-];
+const seedDocentes: Row[] = [];
+const seedStaff: Row[] = [];
+
 
 const fmt = (v: number) => v.toLocaleString("pt-AO", { maximumFractionDigits: 0 });
 const liquido = (r: Row) => Math.round(r.bruto * (1 - r.imposto / 100));

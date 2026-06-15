@@ -18,18 +18,10 @@ const cursosPool = ["ARQ", "ENG", "MED", "DIR", "ECO"];
 const turmasPool = ["A", "B", "C", "D", "E"];
 const provincias = ["Luanda", "Benguela", "Huíla", "Huambo", "Cabinda", "Namibe", "Uíge", "Bié"];
 
-const seedRows: Row[] = [
-  { id: "1", nome: "Ana Silva",    email: "ana.silva@upra.kor",   curso: "ARQ", ano: "1", turma: "A", origem: "importado" },
-  { id: "2", nome: "Bruno Costa",  email: "bruno.costa@upra.kor", curso: "ENG", ano: "1", turma: "B", origem: "importado" },
-  { id: "3", nome: "Carla Mendes", email: "carla.mendes@upra.kor",curso: "MED", ano: "2", turma: "A", origem: "importado" },
-];
+const seedRows: Row[] = [];
 
-const existentesPool = [
-  { id: "ex-1", nome: "Diogo Pereira",  email: "diogo.pereira@upra.kor",  cursoAtual: "DIR", ano: "2" },
-  { id: "ex-2", nome: "Eunice Lopes",   email: "eunice.lopes@upra.kor",   cursoAtual: "ECO", ano: "3" },
-  { id: "ex-3", nome: "Fábio Antunes",  email: "fabio.antunes@upra.kor",  cursoAtual: "ENG", ano: "1" },
-  { id: "ex-4", nome: "Gisela Tavares", email: "gisela.tavares@upra.kor", cursoAtual: "ARQ", ano: "2" },
-];
+const existentesPool: Array<{ id: string; nome: string; email: string; cursoAtual: string; ano: string }> = [];
+
 
 const emptyNovo = {
   primeiroNome: "", ultimoNome: "", nascimento: "", genero: "", nacionalidade: "Angolana",

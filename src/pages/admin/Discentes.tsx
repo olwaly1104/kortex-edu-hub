@@ -11,16 +11,8 @@ const cursosPool = ["ARQ", "EC", "EI", "MED", "DIR", "ECN", "LET", "HIST", "AGR"
 const anosPool = ["1", "2", "3", "4", "5", "6"];
 const turmasPool = ["A", "B", "C", "D", "E"];
 
-const initialSeed: Discente[] = [
-  { id: "1", primeiroNome: "Ana",    ultimoNome: "Silva",    email: "ana.silva@upra.kor",      curso: "ARQ", ano: "1", turma: "A", estado: "Ativo" },
-  { id: "2", primeiroNome: "Bruno",  ultimoNome: "Costa",    email: "bruno.costa@upra.kor",    curso: "EC",  ano: "1", turma: "B", estado: "Ativo" },
-  { id: "3", primeiroNome: "Carla",  ultimoNome: "Mendes",   email: "carla.mendes@upra.kor",   curso: "MED", ano: "2", turma: "A", estado: "Ativo" },
-  { id: "4", primeiroNome: "Diogo",  ultimoNome: "Pereira",  email: "diogo.pereira@upra.kor",  curso: "DIR", ano: "2", turma: "C", estado: "Ativo" },
-  { id: "5", primeiroNome: "Eunice", ultimoNome: "Lopes",    email: "eunice.lopes@upra.kor",   curso: "ECN", ano: "3", turma: "A", estado: "Ativo" },
-  { id: "6", primeiroNome: "Fábio",  ultimoNome: "Antunes",  email: "fabio.antunes@upra.kor",  curso: "EI",  ano: "1", turma: "B", estado: "Ativo" },
-  { id: "7", primeiroNome: "Gisela", ultimoNome: "Tavares",  email: "gisela.tavares@upra.kor", curso: "ARQ", ano: "2", turma: "A", estado: "Ativo" },
-  { id: "8", primeiroNome: "Hugo",   ultimoNome: "Faria",    email: "hugo.faria@upra.kor",     curso: "EC",  ano: "3", turma: "B", estado: "Inativo" },
-];
+const initialSeed: Discente[] = [];
+
 
 export default function AdminDiscentes() {
   const [rows, setRows] = useState<Discente[]>(initialSeed);

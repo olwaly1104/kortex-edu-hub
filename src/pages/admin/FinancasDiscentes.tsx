@@ -16,16 +16,8 @@ type Row = {
   saldo: number;
 };
 
-const SEED: Row[] = [
-  { id: "1", matricula: "2934", nome: "Ana Silva",     curso: "ARQ",  ano: "1", turma: "A", estado: "Em dia", saldo: 0 },
-  { id: "2", matricula: "2935", nome: "Bruno Costa",   curso: "EC",   ano: "1", turma: "B", estado: "Por regularizar", saldo: 45000 },
-  { id: "3", matricula: "2936", nome: "Carla Mendes",  curso: "MED",  ano: "2", turma: "A", estado: "Em dia", saldo: 0 },
-  { id: "4", matricula: "2937", nome: "Diogo Pereira", curso: "DIR",  ano: "2", turma: "C", estado: "Por regularizar", saldo: 30000 },
-  { id: "5", matricula: "2938", nome: "Eunice Lopes",  curso: "ECN",  ano: "3", turma: "A", estado: "Em dia", saldo: 0 },
-  { id: "6", matricula: "2939", nome: "Fábio Antunes", curso: "EI",   ano: "1", turma: "B", estado: "Em dia", saldo: 0 },
-  { id: "7", matricula: "2940", nome: "Gisela Tavares",curso: "ARQ",  ano: "2", turma: "A", estado: "Em dia", saldo: 0 },
-  { id: "8", matricula: "2941", nome: "Hugo Faria",    curso: "EC",   ano: "3", turma: "B", estado: "Por regularizar", saldo: 60000 },
-];
+const SEED: Row[] = [];
+
 
 export default function AdminFinancasDiscentes() {
   const navigate = useNavigate();

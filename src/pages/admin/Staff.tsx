@@ -15,14 +15,8 @@ const departamentosPool = ["Académica", "Finanças", "GAP", "TI", "Recursos Hum
 const funcoesPool = ["Assistente", "Coordenador", "Técnico", "Auxiliar", "Diretor"];
 const modulosKortexPool = ["Não", "Estudante", "Professor", "Coordenador", "Decano", "Reitor", "Finanças", "Académica", "GAP", "Inscrições", "Administrador"];
 
-const initialSeed: StaffRow[] = [
-  { id: "s1", prefixo: "Sra.", primeiroNome: "Joana",   ultimoNome: "Pinto",   email: "joana.pinto@upra.kor",   contacto: "+244 923 100 001", departamento: "Académica",        funcao: "Coordenador", moduloKortex: "Académica" },
-  { id: "s2", prefixo: "Sr.",  primeiroNome: "Rui",     ultimoNome: "Tavares", email: "rui.tavares@upra.kor",   contacto: "+244 923 100 002", departamento: "TI",               funcao: "Técnico",     moduloKortex: "Administrador" },
-  { id: "s3", prefixo: "Dra.", primeiroNome: "Mariana", ultimoNome: "Sousa",   email: "mariana.sousa@upra.kor", contacto: "+244 923 100 003", departamento: "Finanças",         funcao: "Diretor",     moduloKortex: "Finanças" },
-  { id: "s4", prefixo: "Sr.",  primeiroNome: "Paulo",   ultimoNome: "Neto",    email: "paulo.neto@upra.kor",    contacto: "+244 923 100 004", departamento: "GAP",              funcao: "Assistente",  moduloKortex: "GAP" },
-  { id: "s5", prefixo: "Sra.", primeiroNome: "Helena",  ultimoNome: "Vaz",     email: "helena.vaz@upra.kor",    contacto: "+244 923 100 005", departamento: "Recursos Humanos", funcao: "Coordenador", moduloKortex: "Não" },
-  { id: "s6", prefixo: "Sr.",  primeiroNome: "Tiago",   ultimoNome: "Lopes",   email: "tiago.lopes@upra.kor",   contacto: "+244 923 100 006", departamento: "Manutenção",       funcao: "Auxiliar",    moduloKortex: "Não" },
-];
+const initialSeed: StaffRow[] = [];
+
 
 export default function AdminStaff() {
   const [rows, setRows] = useState<StaffRow[]>(initialSeed);

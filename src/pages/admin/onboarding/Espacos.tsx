@@ -36,19 +36,10 @@ const tiposSala = [
   { value: "Espaço Comum", icon: Coffee },
 ];
 
-const seedEdificios: Edificio[] = [
-  { id: "e1", nome: "Edifício Central", codigo: "EC", pisos: 4, endereco: "Campus Principal" },
-  { id: "e2", nome: "Edifício de Ciências", codigo: "ECI", pisos: 3, endereco: "Campus Principal" },
-];
+const seedEdificios: Edificio[] = [];
 
-const seedSalas: Sala[] = [
-  { id: "s1", edificioId: "e1", nome: "A.101", tipo: "Sala de Aula", piso: "1", capacidade: 40 },
-  { id: "s2", edificioId: "e1", nome: "A.102", tipo: "Sala de Aula", piso: "1", capacidade: 35 },
-  { id: "s3", edificioId: "e1", nome: "G.201", tipo: "Gabinete", piso: "2", capacidade: 2, ocupante: "Dr. Manuel Rebelo" },
-  { id: "s4", edificioId: "e1", nome: "G.202", tipo: "Gabinete", piso: "2", capacidade: 2, ocupante: "Dra. Helena Vaz" },
-  { id: "s5", edificioId: "e2", nome: "L.001", tipo: "Laboratório", piso: "0", capacidade: 24 },
-  { id: "s6", edificioId: "e2", nome: "BIB", tipo: "Biblioteca", piso: "0", capacidade: 80 },
-];
+const seedSalas: Sala[] = [];
+
 
 export default function OnboardingEspacos() {
   const [edificios, setEdificios] = useState<Edificio[]>(seedEdificios);
