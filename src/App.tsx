@@ -227,8 +227,33 @@ function RoleGuardedLayout({ homeRedirect }: { homeRedirect: string }) {
 
 function AppRoutes() {
   const { isAuthenticated, user } = useAuth();
+  const [hydrated, setHydrated] = useState(false);
+  const [hydratingFor, setHydratingFor] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!isAuthenticated || user?.role !== "admin") {
+      setHydrated(true);
+      setHydratingFor(null);
+      return;
+    }
+    if (hydratingFor === user.email) return;
+    setHydratingFor(user.email || null);
+    setHydrated(false);
+    hydrateAdminStateFromBackend(user.email).finally(() => setHydrated(true));
+  }, [isAuthenticated, user?.role, user?.email, hydratingFor]);
+
   if (!isAuthenticated) return <Routes><Route path="/" element={<Website />} /><Route path="/site" element={<Website />} /><Route path="/candidatar" element={<Candidatar />} /><Route path="*" element={<Login />} /></Routes>;
   const homeRedirect = homeRedirectMap[user?.role || "student"] || "/student";
+
+  if (user?.role === "admin" && !hydrated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="flex items-center gap-2 text-muted-foreground text-sm">
+          <Loader2 className="w-4 h-4 animate-spin" /> A carregar os dados da instituição…
+        </div>
+      </div>
+    );
+  }
 
   // Admin gate: before onboarding completion, force onboarding route (no app layout)
   if (user?.role === "admin" && !isOnboardingCompleteFor(user?.email)) {
