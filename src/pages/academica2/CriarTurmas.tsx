@@ -1,4 +1,4 @@
-import { OnboardingStepBanner } from "@/components/admin/OnboardingStepBanner";
+import { OnboardingStepBanner, useIsOnboardingStep } from "@/components/admin/OnboardingStepBanner";
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
@@ -87,25 +87,33 @@ export default function CriarTurmas() {
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
-      <OnboardingStepBanner />
-      <div>
-        <Link to="/areaacademica/criador" className="text-xs text-muted-foreground hover:text-primary inline-flex items-center gap-1 mb-2">
-          <ArrowLeft className="w-3 h-3" /> Voltar ao Criador
-        </Link>
-        <div className="rounded-xl border border-primary/30 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-6 flex items-center justify-between flex-wrap gap-3">
-          <div>
-            <Badge className="mb-2 gap-1"><ClipboardList className="w-3 h-3" /> Passo 4 de 6</Badge>
-            <h1 className="text-2xl font-bold flex items-center gap-2">
-              <Users className="w-6 h-6 text-primary" /> Criar Turmas
-            </h1>
-            <p className="text-muted-foreground mt-1 text-sm">Geração automática de turmas (A–E) por curso e ano. Configure capacidade, sala e turno.</p>
-          </div>
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={regenerate} className="gap-2"><Wand2 className="w-4 h-4" /> Regenerar Automático</Button>
-            <Button onClick={() => toast.success("Turmas confirmadas para todos os cursos")} className="gap-2"><Check className="w-4 h-4" /> Confirmar Turmas</Button>
+      {(() => null)()}
+      <OnboardingStepBanner actions={
+        <>
+          <Button onClick={regenerate} size="sm" variant="outline" className="gap-1 h-8"><Wand2 className="w-3.5 h-3.5" /> Regenerar</Button>
+          <Button onClick={() => toast.success("Turmas confirmadas para todos os cursos")} size="sm" variant="outline" className="gap-1 h-8"><Check className="w-3.5 h-3.5" /> Confirmar</Button>
+        </>
+      } />
+      {!useIsOnboardingStep() && (
+        <div>
+          <Link to="/areaacademica/criador" className="text-xs text-muted-foreground hover:text-primary inline-flex items-center gap-1 mb-2">
+            <ArrowLeft className="w-3 h-3" /> Voltar ao Criador
+          </Link>
+          <div className="rounded-xl border border-primary/30 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-6 flex items-center justify-between flex-wrap gap-3">
+            <div>
+              <Badge className="mb-2 gap-1"><ClipboardList className="w-3 h-3" /> Passo 4 de 6</Badge>
+              <h1 className="text-2xl font-bold flex items-center gap-2">
+                <Users className="w-6 h-6 text-primary" /> Criar Turmas
+              </h1>
+              <p className="text-muted-foreground mt-1 text-sm">Geração automática de turmas (A–E) por curso e ano. Configure capacidade, sala e turno.</p>
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={regenerate} className="gap-2"><Wand2 className="w-4 h-4" /> Regenerar Automático</Button>
+              <Button onClick={() => toast.success("Turmas confirmadas para todos os cursos")} className="gap-2"><Check className="w-4 h-4" /> Confirmar Turmas</Button>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
         <Card className="p-4"><div className="flex items-center gap-1.5 text-muted-foreground mb-1"><Building2 className="w-3.5 h-3.5" /><p className="text-xs">Faculdades</p></div><p className="text-2xl font-bold">{faculdades.length}</p></Card>
