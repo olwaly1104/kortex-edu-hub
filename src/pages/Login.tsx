@@ -9,6 +9,7 @@ import { Eye, EyeOff, Globe, KeyRound, UserPlus, Loader2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
 import logoUpra from "@/assets/logo-upra.asset.json";
 import { supabase } from "@/integrations/supabase/client";
+import { onboardingKey } from "@/lib/onboardingStorage";
 
 const DEMO_PASSWORD = "olwaly";
 const DEMO_ACCOUNTS: { role: string; email: string }[] = [
@@ -62,7 +63,7 @@ export default function Login() {
 
   const isOnboardingDone = (forEmail: string) => {
     try {
-      const raw = localStorage.getItem(`upra.admin.onboarding:${forEmail.trim().toLowerCase()}`);
+      const raw = localStorage.getItem(onboardingKey(forEmail));
       if (!raw) return false;
       const parsed = JSON.parse(raw);
       return !!parsed?.completed;
@@ -79,22 +80,21 @@ export default function Login() {
     }
     setSubmitting(true);
     try {
-      // Demo accounts: .kor emails go through the local mock auth
-      if (email.endsWith(".kor")) {
-        const result = login(email, password);
-        if (!result.ok) {
-          setError(result.error || "Não foi possível iniciar sessão.");
+      const normalizedEmail = email.trim().toLowerCase();
+      // Try real account first; if a .kor demo email is not registered, fall back to local demo auth.
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({ email: normalizedEmail, password });
+      if (signInError) {
+        if (normalizedEmail.endsWith(".kor")) {
+          const result = login(normalizedEmail, password);
+          if (!result.ok) {
+            setError(result.error || "Não foi possível iniciar sessão.");
+            return;
+          }
+          if (normalizedEmail.startsWith("admin") && !isOnboardingDone(normalizedEmail)) {
+            navigate("/admin/onboarding");
+          }
           return;
         }
-        // Admin demo: send to institutional onboarding (ficha de inscrição) first if not completed
-        if (email === "admin@upra.kor" && !isOnboardingDone(email)) {
-          navigate("/admin/onboarding");
-        }
-        return;
-      }
-      // Cloud accounts: try Supabase
-      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({ email, password });
-      if (signInError) {
         setError(signInError.message || "Credenciais inválidas.");
         return;
       }
@@ -122,10 +122,12 @@ export default function Login() {
         inscricoes:   { email: "inscricoes@upra.kor",     path: "/inscricoes" },
       };
       const target = MODULE_TO_DEMO[modulo] ?? MODULE_TO_DEMO.estudante;
-      login(target.email, "olwaly");
+      const accountEmail = signInData.user?.email || email;
+      const displayName = (signInData.user?.user_metadata as any)?.display_name;
+      login(target.email, "olwaly", { sourceEmail: accountEmail, displayName });
       // Admin (real cloud account): always run institutional onboarding (ficha de inscrição)
       // before the inicio, until it's marked completed.
-      if (modulo === "admin" && !isOnboardingDone(target.email)) {
+      if (modulo === "admin" && !isOnboardingDone(accountEmail)) {
         navigate("/admin/onboarding");
         return;
       }
