@@ -92,7 +92,7 @@ const initialReceitas = (): ReceitaRow[] => {
       plans,
     };
   });
-  const matriculas: ReceitaRow[] = reitorFaculties.map(f => ({
+  const matriculas: ReceitaRow[] = accountFaculties.map(f => ({
     id: `matr-${f.id}`,
     nome: `Matrícula — ${f.name}`,
     tipo: "Emolumento",
@@ -307,6 +307,7 @@ export default function ConfigurarReceitas() {
 
   /* ── RECEITAS ── */
   const [receitas, setReceitas] = useState<ReceitaRow[]>(() => (isAdmin ? [] : initialReceitas()));
+  const accountFaculties = isAdmin ? [] : reitorFaculties;
   const [receitaFilter, setReceitaFilter] = useState<string>("todos");
   const [selectedFaculty, setSelectedFaculty] = useState<string | null>(null);
   const [multaSubtype, setMultaSubtype] = useState<TipoReceita>("Multa Estudante");
@@ -391,7 +392,7 @@ export default function ConfigurarReceitas() {
   }, [receitas]);
 
   const facultyStats = useMemo(() => {
-    return reitorFaculties.map(f => {
+    return accountFaculties.map(f => {
       const courseIds = new Set(f.courses.map(c => c.id));
       const propinas = receitas.filter(r => r.tipo === "Propina mensal" && courseIds.has(r.escopo));
       const avg = propinas.length ? Math.round(propinas.reduce((s, r) => s + r.valor, 0) / propinas.length) : 0;
@@ -815,7 +816,7 @@ export default function ConfigurarReceitas() {
             const Icon = section.icon;
 
             if (section.key === "propinas") {
-              const selected = selectedFaculty ? reitorFaculties.find(f => f.id === selectedFaculty) : null;
+              const selected = selectedFaculty ? accountFaculties.find(f => f.id === selectedFaculty) : null;
               return (
                 <Card key={section.key} className="p-5">
                   <div className="flex items-center justify-between mb-4 gap-4 flex-wrap">
@@ -843,7 +844,7 @@ export default function ConfigurarReceitas() {
                       { border: "border-indigo-200/70",  gradient: "from-indigo-50 via-indigo-50/40",   iconBg: "bg-indigo-600",  iconLight: "bg-indigo-50 text-indigo-700",   label: "text-indigo-700",  ring: "hover:border-indigo-300" },
                       { border: "border-teal-200/70",    gradient: "from-teal-50 via-teal-50/40",       iconBg: "bg-teal-600",    iconLight: "bg-teal-50 text-teal-700",       label: "text-teal-700",    ring: "hover:border-teal-300" },
                     ];
-                    const facColor = (id: string) => FAC_PALETTE[reitorFaculties.findIndex(f => f.id === id) % FAC_PALETTE.length] ?? FAC_PALETTE[0];
+                    const facColor = (id: string) => FAC_PALETTE[accountFaculties.findIndex(f => f.id === id) % FAC_PALETTE.length] ?? FAC_PALETTE[0];
 
                     if (!selected) {
                       return (
@@ -901,7 +902,7 @@ export default function ConfigurarReceitas() {
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
-                                {reitorFaculties.map(f => {
+                                {accountFaculties.map(f => {
                                   const ic = facColor(f.id);
                                   return (
                                     <SelectItem key={f.id} value={f.id} className="text-xs">
@@ -1599,7 +1600,7 @@ export default function ConfigurarReceitas() {
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent className="max-h-[300px]">
                     <SelectItem value="geral">Geral — todos os cursos</SelectItem>
-                    {reitorFaculties.map(f => (
+                    {accountFaculties.map(f => (
                       <div key={f.id}>
                         <div className="px-2 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{f.name}</div>
                         {f.courses.map(c => (
