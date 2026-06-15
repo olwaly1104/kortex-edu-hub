@@ -44,9 +44,9 @@ const TAB_DEFS: { id: Tab; label: string; icon: React.ComponentType<{ className?
 // Map onboarding step keys → tab IDs so banner ↔ page stay in sync
 const STEP_TO_TAB: Record<string, Tab> = {
   "fin.pro": "receitas",
-  "fin.emo": "receitas",
-  "fin.mul": "multas",
+  "fin.des": "despesas",
   "fin.sal": "salarios",
+  "fin.mul": "multas",
 };
 
 export default function ConfigurarReceitas() {
