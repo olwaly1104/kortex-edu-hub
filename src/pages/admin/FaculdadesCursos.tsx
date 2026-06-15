@@ -6,14 +6,32 @@ import { Input } from "@/components/ui/input";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose,
 } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import type { CursoTemplate } from "@/data/academica2Data";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
+import { loadDocentes, fullName, type DocenteRow } from "@/lib/peopleStorage";
 
 type FacState = { id: string; name: string; decano: string; editing: boolean; cursos: CursoTemplate[] };
 
 export default function AdminFaculdadesCursos() {
   const [faculdades, setFaculdades] = useState<FacState[]>([]);
+  const [docentes, setDocentes] = useState<DocenteRow[]>(() => loadDocentes());
+
+  // Refresh docentes list when the page regains focus, so newly added teachers appear in dropdowns.
+  useEffect(() => {
+    const refresh = () => setDocentes(loadDocentes());
+    window.addEventListener("focus", refresh);
+    window.addEventListener("storage", refresh);
+    return () => {
+      window.removeEventListener("focus", refresh);
+      window.removeEventListener("storage", refresh);
+    };
+  }, []);
+
+  const decanoOptions = useMemo(() => docentes.map((d) => fullName(d)).filter(Boolean), [docentes]);
+  const coordOptions = useMemo(() => docentes.map((d) => fullName(d)).filter(Boolean), [docentes]);
 
   // Add Faculdade dialog
   const [openAddFac, setOpenAddFac] = useState(false);
