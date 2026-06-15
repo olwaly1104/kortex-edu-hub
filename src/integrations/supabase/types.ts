@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_state: {
+        Row: {
+          created_at: string
+          onboarding: Json | null
+          profile: Json | null
+          progress: Json | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          onboarding?: Json | null
+          profile?: Json | null
+          progress?: Json | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          onboarding?: Json | null
+          profile?: Json | null
+          progress?: Json | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       candidaturas: {
         Row: {
           created_at: string
