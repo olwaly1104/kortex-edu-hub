@@ -1,5 +1,13 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { isOnboardingCompleteFor } from "@/lib/onboardingStorage";
+
+const HOME_REDIRECT_MAP: Record<string, string> = {
+  professor: "/professor", student: "/student", coordenador_curso: "/coordenador",
+  decano: "/decano", reitor: "/reitor", secretaria: "/secretaria", financas: "/financas",
+  gap: "/gap", inscricoes: "/inscricoes", academica2: "/areaacademica", admin: "/admin",
+};
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -118,17 +126,8 @@ export default function Website() {
           </nav>
 
           {/* Right action: Portal UPRA only */}
-          <div className="ml-auto shrink-0">
-            <Link to="/login">
-              <Button
-                size="sm"
-                variant="ghost"
-                className="h-10 gap-2 rounded-full px-4 text-sm font-semibold bg-primary/8 text-primary hover:bg-primary/12 hover:text-primary border border-primary/15"
-              >
-                <LogIn className="w-4 h-4" /> Portal UPRA
-              </Button>
-            </Link>
-          </div>
+          <PortalCta />
+
         </div>
 
         {/* Sub-bar: refined announcement strip + Candidatar-me CTA */}
@@ -515,3 +514,29 @@ export default function Website() {
     </div>
   );
 }
+
+function PortalCta() {
+  const { user, isAuthenticated } = useAuth();
+  let to = "/login";
+  if (isAuthenticated && user) {
+    if (user.role === "admin" && !isOnboardingCompleteFor(user.email)) {
+      to = "/admin/onboarding";
+    } else {
+      to = HOME_REDIRECT_MAP[user.role] || "/login";
+    }
+  }
+  return (
+    <div className="ml-auto shrink-0">
+      <Link to={to}>
+        <Button
+          size="sm"
+          variant="ghost"
+          className="h-10 gap-2 rounded-full px-4 text-sm font-semibold bg-primary/8 text-primary hover:bg-primary/12 hover:text-primary border border-primary/15"
+        >
+          <LogIn className="w-4 h-4" /> Portal UPRA
+        </Button>
+      </Link>
+    </div>
+  );
+}
+

@@ -171,6 +171,17 @@ export default function Login() {
       } as any);
       if (roleErr) console.warn("user_roles insert failed:", roleErr.message);
     }
+    // For admin: pre-complete institutional onboarding using the name supplied at signup,
+    // so the user is never asked to register again on the next sign-in.
+    if (suModulo === "admin") {
+      try {
+        const onboardingState = {
+          dados: { nome: suName.trim(), tipo: "", sigla: "", provincia: "", municipio: "", endereco: "", telefone: "", email: suEmail.trim(), nif: "", logoDataUrl: "" },
+          completed: true,
+        };
+        localStorage.setItem(onboardingKey(suEmail.trim()), JSON.stringify(onboardingState));
+      } catch { /* ignore */ }
+    }
     setSuLoading(false);
     setSignupOpen(false);
     setEmail(suEmail.trim());
