@@ -17,7 +17,7 @@ import {
   Settings2, Plus, Pencil, Trash2, ArrowLeft, ChevronRight, Search,
   GraduationCap, BookOpen, FileText, ClipboardCheck, AlertTriangle, Building2,
   Users, Banknote, TrendingDown, TrendingUp, Tag, CircleDot, X,
-  CalendarDays, Clock, Briefcase, UserCog,
+  CalendarDays, Clock, Briefcase, UserCog, LayoutDashboard, Eye,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { formatCurrency, salarios as initialSalarios, type Salary } from "@/data/financeModuleData";
@@ -1572,6 +1572,25 @@ export default function ConfigurarReceitas() {
           </div>
         </Card>
       )}
+
+      {/* ═══════ Pré-visualização do Dashboard ═══════ */}
+      <div className="mt-8 pt-6 border-t border-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div className="space-y-0.5">
+          <p className="text-sm font-semibold text-foreground flex items-center gap-2">
+            <LayoutDashboard className="w-4 h-4 text-primary" /> Pré-visualização do Dashboard
+          </p>
+          <p className="text-xs text-muted-foreground">
+            Veja como ficará o painel financeiro com a configuração actual.
+          </p>
+        </div>
+        <Button
+          onClick={() => navigate("/financas/dashboard")}
+          className="gap-2 shadow-sm"
+          size="lg"
+        >
+          <Eye className="w-4 h-4" /> Pré-visualizar Dashboard
+        </Button>
+      </div>
 
       {/* ═══════ Receita dialog ═══════ */}
       <Dialog open={!!openReceitaSection} onOpenChange={(o) => !o && closeReceita()}>
