@@ -165,11 +165,13 @@ import Academica2Notas from "./pages/academica2/Notas";
 import Academica2Relatorios from "./pages/academica2/Relatorios";
 import AdminOnboarding from "./pages/admin/Onboarding";
 import AdminInicio from "./pages/admin/Inicio";
+import AdminPerfil from "./pages/admin/Perfil";
 import AdminAnuncios from "./pages/admin/Anuncios";
 import AdminOnboardingEstudantes from "./pages/admin/onboarding/Estudantes";
 import AdminOnboardingPessoas from "./pages/admin/onboarding/Pessoas";
 import AdminOnboardingRegrasPresenca from "./pages/admin/onboarding/RegrasPresenca";
 import AdminOnboardingSalarios from "./pages/admin/onboarding/Salarios";
+import AdminOnboardingEspacos from "./pages/admin/onboarding/Espacos";
 
 const queryClient = new QueryClient();
 
