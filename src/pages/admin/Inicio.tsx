@@ -5,7 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import {
   Building2, Wallet, LifeBuoy, BookOpen, ArrowRight, CheckCircle2, Circle,
   RotateCcw, ShieldCheck, GraduationCap, Users, CalendarDays, Receipt,
-  Banknote, FileText, Layers, School, ChevronDown,
+  Banknote, FileText, Layers, School, ChevronDown, UserCog, Clock, Briefcase,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
