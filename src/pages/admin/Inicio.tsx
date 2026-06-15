@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { FinHeader } from "@/pages/financas/_FinHeader";
 import { useAuth } from "@/contexts/AuthContext";
-import { onboardingKey } from "@/lib/onboardingStorage";
+import { onboardingKey, progressKey } from "@/lib/onboardingStorage";
 import {
   Building2, LifeBuoy, BookOpen, ArrowRight, CheckCircle2,
   RotateCcw, ShieldCheck, GraduationCap, CalendarDays,
@@ -11,10 +11,8 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-const ADMIN_PROGRESS_KEY = "upra.admin.config.progress";
-
-function readProgress(): Record<string, boolean> {
-  try { return JSON.parse(localStorage.getItem(ADMIN_PROGRESS_KEY) || "{}"); } catch { return {}; }
+function readProgress(email?: string | null): Record<string, boolean> {
+  try { return JSON.parse(localStorage.getItem(progressKey(email)) || "{}"); } catch { return {}; }
 }
 
 type Step = {
@@ -114,7 +112,7 @@ const ALL_STEPS = GROUPS.flatMap((g) => g.steps);
 export default function AdminInicio() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const progress = readProgress();
+  const progress = readProgress(user?.email);
   const doneCount = ALL_STEPS.filter((t) => progress[t.key]).length;
   const pct = Math.round((doneCount / ALL_STEPS.length) * 100);
   const [open, setOpen] = useState<string | null>(null);
@@ -122,7 +120,7 @@ export default function AdminInicio() {
   const reset = () => {
     if (!confirm("Repor onboarding? Todos os dados introduzidos serão perdidos.")) return;
     localStorage.removeItem(onboardingKey(user?.email));
-    localStorage.removeItem(ADMIN_PROGRESS_KEY);
+    localStorage.removeItem(progressKey(user?.email));
     navigate("/admin/onboarding");
   };
 
