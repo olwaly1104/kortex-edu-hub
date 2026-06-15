@@ -80,22 +80,21 @@ export default function Login() {
     }
     setSubmitting(true);
     try {
-      // Demo accounts: .kor emails go through the local mock auth
-      if (email.endsWith(".kor")) {
-        const result = login(email, password);
-        if (!result.ok) {
-          setError(result.error || "Não foi possível iniciar sessão.");
+      const normalizedEmail = email.trim().toLowerCase();
+      // Try real account first; if a .kor demo email is not registered, fall back to local demo auth.
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({ email: normalizedEmail, password });
+      if (signInError) {
+        if (normalizedEmail.endsWith(".kor")) {
+          const result = login(normalizedEmail, password);
+          if (!result.ok) {
+            setError(result.error || "Não foi possível iniciar sessão.");
+            return;
+          }
+          if (normalizedEmail.startsWith("admin") && !isOnboardingDone(normalizedEmail)) {
+            navigate("/admin/onboarding");
+          }
           return;
         }
-        // Admin demo: send to institutional onboarding (ficha de inscrição) first if not completed
-        if (email === "admin@upra.kor" && !isOnboardingDone(email)) {
-          navigate("/admin/onboarding");
-        }
-        return;
-      }
-      // Cloud accounts: try Supabase
-      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({ email, password });
-      if (signInError) {
         setError(signInError.message || "Credenciais inválidas.");
         return;
       }
