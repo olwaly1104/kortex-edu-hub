@@ -166,6 +166,9 @@ import Academica2Relatorios from "./pages/academica2/Relatorios";
 import AdminOnboarding from "./pages/admin/Onboarding";
 import AdminInicio from "./pages/admin/Inicio";
 import AdminAnuncios from "./pages/admin/Anuncios";
+import AdminOnboardingEstudantes from "./pages/admin/onboarding/Estudantes";
+import AdminOnboardingPessoas from "./pages/admin/onboarding/Pessoas";
+import AdminOnboardingRegrasPresenca from "./pages/admin/onboarding/RegrasPresenca";
 
 const queryClient = new QueryClient();
 
@@ -241,6 +244,10 @@ function AppRoutes() {
         <Route path="/admin" element={<AdminInicio />} />
         <Route path="/admin/calendario" element={<FinancasCalendario />} />
         <Route path="/admin/anuncios" element={<AdminAnuncios />} />
+        <Route path="/admin/onboarding/estudantes" element={<AdminOnboardingEstudantes />} />
+        <Route path="/admin/onboarding/docentes" element={<AdminOnboardingPessoas mode="docentes" />} />
+        <Route path="/admin/onboarding/staff" element={<AdminOnboardingPessoas mode="staff" />} />
+        <Route path="/admin/onboarding/regras-presenca" element={<AdminOnboardingRegrasPresenca />} />
         {/* Student */}
         <Route path="/student" element={<StudentDashboard />} />
         <Route path="/student/disciplines" element={<StudentDisciplines />} />
