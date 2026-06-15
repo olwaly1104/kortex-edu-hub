@@ -61,6 +61,9 @@ const docentesPool = [
 ];
 
 export default function CourseCreator() {
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
+  const steps = isAdmin ? stepsAdmin : stepsAcademica;
   const [anoLabel, setAnoLabel] = useState("2025/2026");
   const [startDate, setStartDate] = useState("01/09/2025");
   const [endDate, setEndDate] = useState("31/07/2026");
