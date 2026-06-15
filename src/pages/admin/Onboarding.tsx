@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAuth } from "@/contexts/AuthContext";
-import { onboardingKey } from "@/lib/onboardingStorage";
+import { onboardingKey, readOnboardingStateFor } from "@/lib/onboardingStorage";
 import { Building2, Loader2, Upload, CheckCircle2 } from "lucide-react";
 
 interface OnboardingState {
@@ -52,11 +52,7 @@ export default function AdminOnboarding() {
   const navigate = useNavigate();
   const STORAGE = onboardingKey(user?.email);
   const [state, setState] = useState<OnboardingState>(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE);
-      if (raw) return { ...initial, ...JSON.parse(raw) };
-    } catch { /* ignore */ }
-    return initial;
+    return readOnboardingStateFor(initial, user?.email);
   });
   const [success, setSuccess] = useState(false);
   const [activating, setActivating] = useState(false);
