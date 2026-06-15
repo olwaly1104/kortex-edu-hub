@@ -20,6 +20,7 @@ type Person = {
   grau?: string;
   departamento?: string;
   funcao?: string;
+  moduloKortex?: string;
 };
 
 const prefixosPool = ["Sr.", "Sra.", "Dr.", "Dra.", "Prof.", "Eng.", "Me."];
