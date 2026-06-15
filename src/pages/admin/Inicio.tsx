@@ -40,10 +40,10 @@ const GROUPS: Group[] = [
     subtitle: "Estrutura curricular, turmas e calendário",
     icon: GraduationCap,
     steps: [
-      { key: "aca.fac", title: "Faculdades e cursos", desc: "Confirmar faculdades e cursos da instituição.", icon: School, path: "/areaacademica/criador/faculdades" },
-      { key: "aca.cad", title: "Cadeiras", desc: "Gerar cadeiras por curso, ano e semestre.", icon: BookOpen, path: "/areaacademica/criador/cadeiras" },
-      { key: "aca.tur", title: "Turmas", desc: "Criar turmas e definir capacidade.", icon: Layers, path: "/areaacademica/criador/turmas" },
-      { key: "aca.cal", title: "Calendário académico", desc: "Definir ano letivo, semestres e feriados.", icon: CalendarDays, path: "/areaacademica/criador/calendario" },
+      { key: "aca.fac", title: "Faculdades e cursos", desc: "Confirmar faculdades e cursos da instituição.", icon: School, path: "/areaacademica/criador/faculdades?step=aca.fac" },
+      { key: "aca.cad", title: "Cadeiras", desc: "Gerar cadeiras por curso, ano e semestre.", icon: BookOpen, path: "/areaacademica/criador/cadeiras?step=aca.cad" },
+      { key: "aca.tur", title: "Turmas", desc: "Criar turmas e definir capacidade.", icon: Layers, path: "/areaacademica/criador/turmas?step=aca.tur" },
+      { key: "aca.cal", title: "Calendário académico", desc: "Definir ano letivo, semestres e feriados.", icon: CalendarDays, path: "/areaacademica/criador/calendario?step=aca.cal" },
     ],
   },
   {
@@ -53,9 +53,9 @@ const GROUPS: Group[] = [
     subtitle: "Docentes, staff e regras de presença",
     icon: UserCog,
     steps: [
-      { key: "rh.doc", title: "Registar docentes", desc: "Registar todos os docentes e atribuir cadeiras.", icon: GraduationCap, path: "/areaacademica/docentes" },
-      { key: "rh.staff", title: "Registar staff", desc: "Registar funcionários administrativos e técnicos.", icon: Briefcase, path: "/areaacademica/docentes" },
-      { key: "rh.pres", title: "Regras de presença", desc: "Definir limites de presença, tolerâncias e faltas justificadas.", icon: Clock, path: "/areaacademica/docentes" },
+      { key: "rh.doc", title: "Registar docentes", desc: "Registar todos os docentes e atribuir cadeiras.", icon: GraduationCap, path: "/areaacademica/docentes?step=rh.doc" },
+      { key: "rh.staff", title: "Registar staff", desc: "Registar funcionários administrativos e técnicos.", icon: Briefcase, path: "/areaacademica/docentes?step=rh.staff" },
+      { key: "rh.pres", title: "Regras de presença", desc: "Definir limites de presença, tolerâncias e faltas justificadas.", icon: Clock, path: "/areaacademica/docentes?step=rh.pres" },
     ],
   },
   {
@@ -65,9 +65,9 @@ const GROUPS: Group[] = [
     subtitle: "Receitas, propinas e tabelas financeiras",
     icon: Wallet,
     steps: [
-      { key: "fin.prop", title: "Propinas por curso", desc: "Definir valores de propinas por curso e ano.", icon: Banknote, path: "/financas/configurar-receitas" },
-      { key: "fin.taxas", title: "Emolumentos e serviços", desc: "Configurar emolumentos administrativos e serviços académicos.", icon: Receipt, path: "/financas/configurar-receitas" },
-      { key: "fin.multas", title: "Multas", desc: "Definir tabela de multas e penalidades aplicáveis.", icon: Receipt, path: "/financas/configurar-receitas" },
+      { key: "fin.prop", title: "Propinas por curso", desc: "Definir valores de propinas por curso e ano.", icon: Banknote, path: "/financas/configurar-receitas?step=fin.prop" },
+      { key: "fin.taxas", title: "Emolumentos e serviços", desc: "Configurar emolumentos administrativos e serviços académicos.", icon: Receipt, path: "/financas/configurar-receitas?step=fin.taxas" },
+      { key: "fin.multas", title: "Multas", desc: "Definir tabela de multas e penalidades aplicáveis.", icon: Receipt, path: "/financas/configurar-receitas?step=fin.multas" },
     ],
   },
   {
@@ -77,9 +77,9 @@ const GROUPS: Group[] = [
     subtitle: "Gabinete de apoio: solicitações, agendamentos e candidaturas",
     icon: LifeBuoy,
     steps: [
-      { key: "gap.sol", title: "Solicitações", desc: "Categorias, motivos e estados das solicitações.", icon: FileText, path: "/gap/configuracao?tab=solicitacoes" },
-      { key: "gap.age", title: "Agendamentos", desc: "Tipos de atendimento, salas e horários disponíveis.", icon: CalendarDays, path: "/gap/configuracao?tab=agendamentos" },
-      { key: "gap.cand", title: "Candidaturas", desc: "Processo de candidaturas, etapas e documentos.", icon: GraduationCap, path: "/gap/configuracao?tab=candidaturas" },
+      { key: "gap.sol", title: "Solicitações", desc: "Categorias, motivos e estados das solicitações.", icon: FileText, path: "/gap/configuracao?tab=solicitacoes&step=gap.sol" },
+      { key: "gap.age", title: "Agendamentos", desc: "Tipos de atendimento, salas e horários disponíveis.", icon: CalendarDays, path: "/gap/configuracao?tab=agendamentos&step=gap.age" },
+      { key: "gap.cand", title: "Candidaturas", desc: "Processo de candidaturas, etapas e documentos.", icon: GraduationCap, path: "/gap/configuracao?tab=candidaturas&step=gap.cand" },
     ],
   },
 ];
