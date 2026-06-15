@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Upload, FileSpreadsheet, UserPlus, Trash2, Users, GraduationCap, Briefcase, CheckCircle2, Mail } from "lucide-react";
+import { Upload, FileSpreadsheet, UserPlus, Trash2, Pencil, Users, GraduationCap, Briefcase, CheckCircle2, Mail } from "lucide-react";
 import { toast } from "sonner";
 
 type Mode = "docentes" | "staff";
@@ -14,7 +14,8 @@ type Mode = "docentes" | "staff";
 type Person = {
   id: string;
   prefixo?: string;
-  nome: string;
+  primeiroNome: string;
+  ultimoNome: string;
   email: string;
   contacto?: string;
   grau?: string;
@@ -34,21 +35,22 @@ export default function OnboardingPessoas({ mode }: { mode: Mode }) {
 
   const seed: Person[] = isDoc
     ? [
-        { id: "d1", prefixo: "Prof.", nome: "Sofia Martins", email: "sofia.martins@upra.kor", contacto: "+244 923 000 001", grau: "Doutor" },
-        { id: "d2", prefixo: "Prof.", nome: "Carlos Mendes", email: "carlos.mendes@upra.kor", contacto: "+244 923 000 002", grau: "Mestre" },
+        { id: "d1", prefixo: "Prof.", primeiroNome: "Sofia", ultimoNome: "Martins", email: "sofia.martins@upra.kor", contacto: "+244 923 000 001", grau: "Doutor" },
+        { id: "d2", prefixo: "Prof.", primeiroNome: "Carlos", ultimoNome: "Mendes", email: "carlos.mendes@upra.kor", contacto: "+244 923 000 002", grau: "Mestre" },
       ]
     : [
-        { id: "s1", prefixo: "Sra.", nome: "Joana Pinto", email: "joana.pinto@upra.kor", contacto: "+244 923 100 001", departamento: "Académica", funcao: "Coordenador" },
-        { id: "s2", prefixo: "Sr.", nome: "Rui Tavares", email: "rui.tavares@upra.kor", contacto: "+244 923 100 002", departamento: "TI", funcao: "Técnico" },
+        { id: "s1", prefixo: "Sra.", primeiroNome: "Joana", ultimoNome: "Pinto", email: "joana.pinto@upra.kor", contacto: "+244 923 100 001", departamento: "Académica", funcao: "Coordenador" },
+        { id: "s2", prefixo: "Sr.", primeiroNome: "Rui", ultimoNome: "Tavares", email: "rui.tavares@upra.kor", contacto: "+244 923 100 002", departamento: "TI", funcao: "Técnico" },
       ];
 
   const [rows, setRows] = useState<Person[]>(seed);
   const emptyDraft: Person = isDoc
-    ? { id: "", prefixo: "", nome: "", email: "", contacto: "", grau: grausPool[2] }
-    : { id: "", prefixo: "", nome: "", email: "", contacto: "", departamento: departamentosPool[0], funcao: funcoesPool[0] };
+    ? { id: "", prefixo: "", primeiroNome: "", ultimoNome: "", email: "", contacto: "", grau: grausPool[2] }
+    : { id: "", prefixo: "", primeiroNome: "", ultimoNome: "", email: "", contacto: "", departamento: departamentosPool[0], funcao: funcoesPool[0] };
   const [draft, setDraft] = useState<Person>(emptyDraft);
   const [primeiroNome, setPrimeiroNome] = useState("");
   const [ultimoNome, setUltimoNome] = useState("");
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const totals = useMemo(() => ({
     total: rows.length,
@@ -57,10 +59,9 @@ export default function OnboardingPessoas({ mode }: { mode: Mode }) {
 
   const add = () => {
     if (!primeiroNome.trim() || !ultimoNome.trim()) { toast.error("Primeiro e último nome são obrigatórios"); return; }
-    const nome = `${primeiroNome.trim()} ${ultimoNome.trim()}`;
     const emailBase = `${primeiroNome.trim().toLowerCase()}.${ultimoNome.trim().toLowerCase()}`.normalize("NFD").replace(/[^a-z.]/g, "");
     const email = `${emailBase}@upra.kor`;
-    setRows(prev => [...prev, { ...draft, nome, email, id: String(Date.now()) }]);
+    setRows(prev => [...prev, { ...draft, primeiroNome: primeiroNome.trim(), ultimoNome: ultimoNome.trim(), email, id: String(Date.now()) }]);
     setDraft(emptyDraft);
     setPrimeiroNome("");
     setUltimoNome("");
@@ -70,18 +71,40 @@ export default function OnboardingPessoas({ mode }: { mode: Mode }) {
   const update = (id: string, patch: Partial<Person>) => setRows(prev => prev.map(r => r.id === id ? { ...r, ...patch } : r));
 
   const simulateImport = () => {
-    const generated: Person[] = Array.from({ length: 8 }).map((_, i) => isDoc
-      ? { id: `id-${Date.now()}-${i}`, prefixo: "Prof.", nome: `Importado ${i + 1}`, email: `docente${i + 1}@upra.kor`, contacto: `+244 923 200 00${i}`, grau: grausPool[i % grausPool.length] }
-      : { id: `is-${Date.now()}-${i}`, prefixo: "Sr.", nome: `Staff Importado ${i + 1}`, email: `staff${i + 1}@upra.kor`, contacto: `+244 923 300 00${i}`, departamento: departamentosPool[i % departamentosPool.length], funcao: funcoesPool[i % funcoesPool.length] }
-    );
+    const generated: Person[] = Array.from({ length: 8 }).map((_, i) => {
+      const n = i + 1;
+      if (isDoc) {
+        const pn = "Importado";
+        const un = `${n}`;
+        return {
+          id: `id-${Date.now()}-${i}`,
+          prefixo: "Prof.",
+          primeiroNome: pn,
+          ultimoNome: un,
+          email: `docente${n}@upra.kor`,
+          contacto: `+244 923 200 00${i}`,
+          grau: grausPool[i % grausPool.length],
+        };
+      }
+      return {
+        id: `is-${Date.now()}-${i}`,
+        prefixo: "Sr.",
+        primeiroNome: "Staff",
+        ultimoNome: `Importado ${n}`,
+        email: `staff${n}@upra.kor`,
+        contacto: `+244 923 300 00${i}`,
+        departamento: departamentosPool[i % departamentosPool.length],
+        funcao: funcoesPool[i % funcoesPool.length],
+      };
+    });
     setRows(prev => [...prev, ...generated]);
     toast.success(`${generated.length} ${isDoc ? "docentes" : "funcionários"} importados`);
   };
 
   const HeaderIcon = isDoc ? GraduationCap : Briefcase;
   const grid = isDoc
-    ? "grid-cols-[90px_1.2fr_1.4fr_1fr_1fr_40px]"
-    : "grid-cols-[90px_1fr_1.4fr_1fr_1fr_1fr_40px]";
+    ? "grid-cols-[90px_1fr_1fr_1.4fr_1fr_1fr_80px]"
+    : "grid-cols-[90px_1fr_1fr_1.4fr_1fr_1fr_1fr_80px]";
 
   return (
     <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6 animate-fade-in">
@@ -185,18 +208,19 @@ export default function OnboardingPessoas({ mode }: { mode: Mode }) {
           <span className="text-xs text-muted-foreground">{rows.length} {rows.length === 1 ? "registo" : "registos"}</span>
         </div>
         <div className={`grid ${grid} gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b`}>
-          <span>Prefixo</span><span>Nome</span><span>Email</span>
+          <span>Prefixo</span><span>Primeiro nome</span><span>Último nome</span><span>Email</span>
           {isDoc ? (<><span>Contacto</span><span>Grau</span></>) : (<><span>Contacto</span><span>Departamento</span><span>Função</span></>)}
           <span></span>
         </div>
         <div className="divide-y">
           {rows.map(r => (
-            <div key={r.id} className={`grid ${grid} gap-2 px-4 py-2 items-center`}>
+            <div key={r.id} className={`grid ${grid} gap-2 px-4 py-2 items-center ${editingId === r.id ? "bg-primary/5 ring-1 ring-primary/20" : ""}`}>
               <Select value={r.prefixo || ""} onValueChange={v => update(r.id, { prefixo: v })}>
                 <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="—" /></SelectTrigger>
                 <SelectContent>{prefixosPool.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
               </Select>
-              <Input value={r.nome} onChange={e => update(r.id, { nome: e.target.value })} className="h-8 text-xs" />
+              <Input value={r.primeiroNome} onChange={e => update(r.id, { primeiroNome: e.target.value })} className="h-8 text-xs" placeholder="Primeiro" />
+              <Input value={r.ultimoNome} onChange={e => update(r.id, { ultimoNome: e.target.value })} className="h-8 text-xs" placeholder="Último" />
               <Input value={r.email} readOnly disabled className="h-8 text-xs bg-muted/40 cursor-not-allowed" />
               <Input value={r.contacto || ""} onChange={e => update(r.id, { contacto: e.target.value })} className="h-8 text-xs" placeholder="+244 ..." />
               {isDoc ? (
@@ -216,9 +240,14 @@ export default function OnboardingPessoas({ mode }: { mode: Mode }) {
                   </Select>
                 </>
               )}
-              <Button size="icon" variant="ghost" onClick={() => remove(r.id)} className="h-8 w-8 text-muted-foreground hover:text-destructive">
-                <Trash2 className="w-3.5 h-3.5" />
-              </Button>
+              <div className="flex items-center gap-1">
+                <Button size="icon" variant="ghost" onClick={() => setEditingId(editingId === r.id ? null : r.id)} className="h-8 w-8 text-muted-foreground hover:text-primary">
+                  <Pencil className="w-3.5 h-3.5" />
+                </Button>
+                <Button size="icon" variant="ghost" onClick={() => remove(r.id)} className="h-8 w-8 text-muted-foreground hover:text-destructive">
+                  <Trash2 className="w-3.5 h-3.5" />
+                </Button>
+              </div>
             </div>
           ))}
           {rows.length === 0 && (
