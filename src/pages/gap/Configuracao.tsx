@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -60,6 +61,9 @@ const defaultResponsavelByDestino = (destino: string) => {
 };
 
 export default function GapConfiguracao() {
+  const [searchParams] = useSearchParams();
+  const tabParam = searchParams.get("tab");
+  const initialTab = tabParam === "agendamentos" || tabParam === "candidaturas" ? tabParam : "solicitacoes";
   const { toast } = useToast();
 
   // Per-card edit lock
@@ -319,7 +323,7 @@ export default function GapConfiguracao() {
         icon={<Settings2 className="w-6 h-6 text-primary" />}
       />
 
-      <Tabs defaultValue="solicitacoes" className="space-y-6">
+      <Tabs defaultValue={initialTab} className="space-y-6">
         <TabsList className="grid grid-cols-3 w-full max-w-2xl">
           <TabsTrigger value="solicitacoes" className="gap-1.5"><FileText className="w-3.5 h-3.5" /> Solicitações</TabsTrigger>
           <TabsTrigger value="agendamentos" className="gap-1.5"><CalendarClock className="w-3.5 h-3.5" /> Agendamentos</TabsTrigger>

@@ -55,19 +55,23 @@ const GROUPS: Group[] = [
     icon: Wallet,
     steps: [
       { key: "fin.prop", title: "Propinas por curso", desc: "Definir valores de propinas por curso e ano.", icon: Banknote, path: "/financas/configurar-receitas" },
-      { key: "fin.taxas", title: "Taxas e serviços", desc: "Configurar taxas administrativas e serviços académicos.", icon: Receipt, path: "/financas/configurar-receitas" },
+      { key: "fin.taxas", title: "Emolumentos e serviços", desc: "Configurar emolumentos administrativos e serviços académicos.", icon: Receipt, path: "/financas/configurar-receitas" },
+      { key: "fin.multas", title: "Multas", desc: "Definir tabela de multas e penalidades aplicáveis.", icon: Receipt, path: "/financas/configurar-receitas" },
     ],
   },
   {
     id: "gap",
     area: "GAP",
     title: "Configurar GAP",
-    subtitle: "Gabinete de apoio: motivos, categorias e canais",
+    subtitle: "Gabinete de apoio: solicitações, agendamentos e candidaturas",
     icon: LifeBuoy,
     steps: [
-      { key: "gap.cfg", title: "Configuração do gabinete", desc: "Categorias de solicitações, motivos e canais.", icon: FileText, path: "/gap/configuracao" },
+      { key: "gap.sol", title: "Solicitações", desc: "Categorias, motivos e estados das solicitações.", icon: FileText, path: "/gap/configuracao?tab=solicitacoes" },
+      { key: "gap.age", title: "Agendamentos", desc: "Tipos de atendimento, salas e horários disponíveis.", icon: CalendarDays, path: "/gap/configuracao?tab=agendamentos" },
+      { key: "gap.cand", title: "Candidaturas", desc: "Processo de candidaturas, etapas e documentos.", icon: GraduationCap, path: "/gap/configuracao?tab=candidaturas" },
     ],
   },
+
 ];
 
 const ALL_STEPS = GROUPS.flatMap((g) => g.steps);
