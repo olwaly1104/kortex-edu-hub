@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 const DEMO_PASSWORD = "olwaly";
 const DEMO_ACCOUNTS: { role: string; email: string }[] = [
+  { role: "Admin — Onboarding institucional", email: "admin@upra.kor" },
   { role: "Estudante", email: "2934@upra.kor" },
   { role: "Professor", email: "prof.silva@upra.kor" },
   { role: "Coordenador de Curso", email: "coordcurso@upra.kor" },
