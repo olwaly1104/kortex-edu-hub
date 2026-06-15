@@ -46,6 +46,20 @@ export default function Login() {
   const [suError, setSuError] = useState("");
   const [suLoading, setSuLoading] = useState(false);
 
+  // Auto-fill email as modulo@nome-a-apresentar.kor
+  useEffect(() => {
+    if (!suName.trim() || suEmailManuallyEdited) return;
+    const normalized = suName
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/[^a-z0-9-]/g, "");
+    if (normalized) {
+      setSuEmail(`${suModulo}@${normalized}.kor`);
+    }
+  }, [suModulo, suName, suEmailManuallyEdited]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
