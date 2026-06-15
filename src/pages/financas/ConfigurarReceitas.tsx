@@ -92,7 +92,7 @@ const initialReceitas = (): ReceitaRow[] => {
       plans,
     };
   });
-  const matriculas: ReceitaRow[] = accountFaculties.map(f => ({
+  const matriculas: ReceitaRow[] = reitorFaculties.map(f => ({
     id: `matr-${f.id}`,
     nome: `Matrícula — ${f.name}`,
     tipo: "Emolumento",
