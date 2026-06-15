@@ -176,6 +176,7 @@ import AdminFaculdadesCursos from "./pages/admin/FaculdadesCursos";
 import AdminDiscentes from "./pages/admin/Discentes";
 import AdminSalas from "./pages/admin/Salas";
 import AdminStaff from "./pages/admin/Staff";
+import AdminFinancasDiscentes from "./pages/admin/FinancasDiscentes";
 
 const queryClient = new QueryClient();
 
