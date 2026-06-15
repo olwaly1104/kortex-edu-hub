@@ -32,8 +32,10 @@ function isDone(key: string): boolean {
   try { return !!JSON.parse(localStorage.getItem(PROGRESS_KEY) || "{}")[key]; } catch { return false; }
 }
 
-export function OnboardingStepBanner({ stepKey }: { stepKey: string }) {
+export function OnboardingStepBanner({ stepKey: stepKeyProp }: { stepKey?: string }) {
   const { user } = useAuth();
+  const [params] = useSearchParams();
+  const stepKey = stepKeyProp || params.get("step") || "";
   if (user?.role !== "admin") return null;
   const meta = STEPS_BY_KEY[stepKey];
   if (!meta) return null;
