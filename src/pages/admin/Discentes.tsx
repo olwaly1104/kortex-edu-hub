@@ -1,27 +1,35 @@
 import { FinHeader } from "@/pages/financas/_FinHeader";
-import { Users, Lock, Pencil, Check, Plus, Search, Trash2, GraduationCap } from "lucide-react";
+import { Users, Plus, Search, Trash2, GraduationCap, User, Mail, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { useMemo, useState } from "react";
+import { FormSection, EmptyState } from "./Staff";
 
-type Discente = { id: string; primeiroNome: string; ultimoNome: string; email: string; curso: string; ano: string; turma: string; estado: "Ativo" | "Inativo"; editing?: boolean };
+type Discente = { id: string; primeiroNome: string; ultimoNome: string; email: string; curso: string; ano: string; turma: string; estado: "Ativo" | "Inativo" };
 
 const cursosPool = ["ARQ", "EC", "EI", "MED", "DIR", "ECN", "LET", "HIST", "AGR", "VET"];
 const anosPool = ["1", "2", "3", "4", "5", "6"];
 const turmasPool = ["A", "B", "C", "D", "E"];
 
-const initialSeed: Discente[] = [];
-
+const empty = (): Discente => ({ id: "", primeiroNome: "", ultimoNome: "", email: "", curso: "ARQ", ano: "1", turma: "A", estado: "Ativo" });
 
 export default function AdminDiscentes() {
-  const [rows, setRows] = useState<Discente[]>(initialSeed);
+  const [rows, setRows] = useState<Discente[]>([]);
   const [q, setQ] = useState("");
+  const [open, setOpen] = useState(false);
+  const [draft, setDraft] = useState<Discente>(empty());
 
-  const update = (id: string, patch: Partial<Discente>) =>
-    setRows((prev) => prev.map((r) => (r.id === id ? { ...r, ...patch } : r)));
-  const remove = (id: string) => setRows((prev) => prev.filter((r) => r.id !== id));
-  const add = () => setRows((prev) => [...prev, { id: `${Date.now()}`, primeiroNome: "", ultimoNome: "", email: "", curso: "ARQ", ano: "1", turma: "A", estado: "Ativo", editing: true }]);
+  const setF = <K extends keyof Discente>(k: K, v: Discente[K]) => setDraft((d) => ({ ...d, [k]: v }));
+  const openNew = () => { setDraft(empty()); setOpen(true); };
+  const save = () => {
+    if (!draft.primeiroNome.trim() || !draft.email.trim()) return;
+    setRows((p) => [...p, { ...draft, id: `${Date.now()}` }]);
+    setOpen(false);
+  };
+  const remove = (id: string) => setRows((p) => p.filter((r) => r.id !== id));
 
   const filtered = useMemo(() => rows.filter((r) => [r.primeiroNome, r.ultimoNome, r.email, r.curso].some((v) => v.toLowerCase().includes(q.toLowerCase()))), [rows, q]);
 
@@ -30,10 +38,10 @@ export default function AdminDiscentes() {
       <FinHeader title="Discentes" subtitle="Todos os estudantes registados na instituição" icon={<Users className="w-5 h-5 text-primary" />} />
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="rounded-lg border border-border bg-card p-4"><p className="text-xs text-muted-foreground">Total</p><p className="text-2xl font-bold tabular-nums">{rows.length}</p></div>
-        <div className="rounded-lg border border-border bg-card p-4"><p className="text-xs text-muted-foreground">Ativos</p><p className="text-2xl font-bold tabular-nums text-emerald-600">{rows.filter((r) => r.estado === "Ativo").length}</p></div>
-        <div className="rounded-lg border border-border bg-card p-4"><p className="text-xs text-muted-foreground">Cursos</p><p className="text-2xl font-bold tabular-nums">{new Set(rows.map((r) => r.curso)).size}</p></div>
-        <div className="rounded-lg border border-border bg-card p-4"><p className="text-xs text-muted-foreground">Turmas</p><p className="text-2xl font-bold tabular-nums">{new Set(rows.map((r) => `${r.curso}-${r.ano}${r.turma}`)).size}</p></div>
+        <Stat label="Total" value={rows.length} />
+        <Stat label="Ativos" value={rows.filter((r) => r.estado === "Ativo").length} accent />
+        <Stat label="Cursos" value={new Set(rows.map((r) => r.curso)).size} />
+        <Stat label="Turmas" value={new Set(rows.map((r) => `${r.curso}-${r.ano}${r.turma}`)).size} />
       </div>
 
       <div className="flex items-center gap-3">
@@ -42,58 +50,113 @@ export default function AdminDiscentes() {
           <Input placeholder="Procurar discente..." value={q} onChange={(e) => setQ(e.target.value)} className="pl-8 h-9" />
         </div>
         <div className="text-xs text-muted-foreground tabular-nums">{filtered.length} de {rows.length}</div>
-        <Button size="sm" onClick={add} className="ml-auto gap-1"><Plus className="w-3.5 h-3.5" /> Adicionar</Button>
+        <Button size="sm" onClick={openNew} className="ml-auto gap-1"><Plus className="w-3.5 h-3.5" /> Adicionar Discente</Button>
       </div>
 
-      <div className="space-y-2">
-        {filtered.map((r) => (
-          <div key={r.id} className="rounded-lg border border-border bg-card p-3 flex items-center gap-3 flex-wrap">
-            <div className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0">
-              <GraduationCap className="w-4 h-4" />
-            </div>
-            <div className="flex-1 min-w-[240px] grid grid-cols-2 md:grid-cols-6 gap-2 items-center">
-              {r.editing ? (
-                <>
-                  <Input value={r.primeiroNome} onChange={(e) => update(r.id, { primeiroNome: e.target.value })} placeholder="Primeiro nome" className="h-8 text-xs" />
-                  <Input value={r.ultimoNome} onChange={(e) => update(r.id, { ultimoNome: e.target.value })} placeholder="Último nome" className="h-8 text-xs" />
-                  <Input value={r.email} onChange={(e) => update(r.id, { email: e.target.value })} placeholder="email@upra.kor" className="h-8 text-xs md:col-span-2" />
-                  <Select value={r.curso} onValueChange={(v) => update(r.id, { curso: v })}>
-                    <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+      {rows.length === 0 ? (
+        <EmptyState onAdd={openNew} icon={<GraduationCap className="w-7 h-7" />} title="Nenhum discente registado" hint="Comece por adicionar estudantes manualmente ou via inscrições." cta="Adicionar Discente" />
+      ) : (
+        <div className="overflow-hidden rounded-xl border border-border bg-card">
+          <table className="w-full text-sm">
+            <thead className="bg-muted/40 text-xs uppercase tracking-wider text-muted-foreground">
+              <tr>
+                <th className="text-left font-semibold py-2.5 px-4">Estudante</th>
+                <th className="text-left font-semibold py-2.5 px-4">Email</th>
+                <th className="text-left font-semibold py-2.5 px-4">Curso</th>
+                <th className="text-left font-semibold py-2.5 px-4">Ano · Turma</th>
+                <th className="text-left font-semibold py-2.5 px-4">Estado</th>
+                <th className="w-10"></th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {filtered.map((r) => (
+                <tr key={r.id} className="hover:bg-muted/30">
+                  <td className="py-3 px-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center"><GraduationCap className="w-4 h-4" /></div>
+                      <span className="font-semibold">{r.primeiroNome} {r.ultimoNome}</span>
+                    </div>
+                  </td>
+                  <td className="py-3 px-4 text-xs text-muted-foreground">{r.email}</td>
+                  <td className="py-3 px-4 text-xs font-mono">{r.curso}</td>
+                  <td className="py-3 px-4 text-xs tabular-nums">{r.ano}º · {r.turma}</td>
+                  <td className="py-3 px-4">
+                    <span className={`px-2 py-0.5 rounded-full text-[11px] font-semibold ${r.estado === "Ativo" ? "bg-emerald-50 text-emerald-700" : "bg-muted text-muted-foreground"}`}>{r.estado}</span>
+                  </td>
+                  <td className="py-3 px-2">
+                    <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive" onClick={() => remove(r.id)}><Trash2 className="w-3.5 h-3.5" /></Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2"><GraduationCap className="w-5 h-5 text-primary" /> Adicionar Discente</DialogTitle>
+            <DialogDescription>O estudante poderá completar os seus restantes dados pessoais ao primeiro acesso.</DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-5 py-2">
+            <FormSection icon={<User className="w-3.5 h-3.5" />} title="Identificação">
+              <div className="grid grid-cols-2 gap-3">
+                <div><Label className="text-xs">Primeiro nome</Label>
+                  <Input className="h-9 mt-1" value={draft.primeiroNome} onChange={(e) => setF("primeiroNome", e.target.value)} />
+                </div>
+                <div><Label className="text-xs">Último nome</Label>
+                  <Input className="h-9 mt-1" value={draft.ultimoNome} onChange={(e) => setF("ultimoNome", e.target.value)} />
+                </div>
+              </div>
+            </FormSection>
+
+            <FormSection icon={<Mail className="w-3.5 h-3.5" />} title="Acesso">
+              <Label className="text-xs">Email institucional</Label>
+              <Input className="h-9 mt-1" type="email" value={draft.email} onChange={(e) => setF("email", e.target.value)} placeholder="estudante@upra.kor" />
+            </FormSection>
+
+            <FormSection icon={<BookOpen className="w-3.5 h-3.5" />} title="Matrícula">
+              <div className="grid grid-cols-3 gap-3">
+                <div><Label className="text-xs">Curso</Label>
+                  <Select value={draft.curso} onValueChange={(v) => setF("curso", v)}>
+                    <SelectTrigger className="h-9 mt-1"><SelectValue /></SelectTrigger>
                     <SelectContent>{cursosPool.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
                   </Select>
-                  <div className="flex gap-1">
-                    <Select value={r.ano} onValueChange={(v) => update(r.id, { ano: v })}>
-                      <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                      <SelectContent>{anosPool.map((a) => <SelectItem key={a} value={a}>{a}º</SelectItem>)}</SelectContent>
-                    </Select>
-                    <Select value={r.turma} onValueChange={(v) => update(r.id, { turma: v })}>
-                      <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                      <SelectContent>{turmasPool.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
-                    </Select>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <p className="text-sm font-semibold md:col-span-2 truncate">{r.primeiroNome} {r.ultimoNome}</p>
-                  <p className="text-xs text-muted-foreground truncate md:col-span-2">{r.email}</p>
-                  <p className="text-xs font-mono">{r.curso}</p>
-                  <p className="text-xs tabular-nums">{r.ano}º · {r.turma}</p>
-                </>
-              )}
-            </div>
-            <span className={`px-2 py-0.5 rounded-full text-[11px] font-semibold ${r.estado === "Ativo" ? "bg-emerald-50 text-emerald-700" : "bg-muted text-muted-foreground"}`}>{r.estado}</span>
-            {!r.editing && <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-muted text-muted-foreground text-[11px] font-semibold"><Lock className="w-3 h-3" /> Bloqueado</span>}
-            <Button size="sm" variant={r.editing ? "default" : "outline"} className="h-8 gap-1" onClick={() => update(r.id, { editing: !r.editing })}>
-              {r.editing ? <><Check className="w-3.5 h-3.5" /> Concluir</> : <><Pencil className="w-3.5 h-3.5" /> Editar</>}
-            </Button>
-            {r.editing && (
-              <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive" onClick={() => remove(r.id)}>
-                <Trash2 className="w-3.5 h-3.5" />
-              </Button>
-            )}
+                </div>
+                <div><Label className="text-xs">Ano</Label>
+                  <Select value={draft.ano} onValueChange={(v) => setF("ano", v)}>
+                    <SelectTrigger className="h-9 mt-1"><SelectValue /></SelectTrigger>
+                    <SelectContent>{anosPool.map((a) => <SelectItem key={a} value={a}>{a}º</SelectItem>)}</SelectContent>
+                  </Select>
+                </div>
+                <div><Label className="text-xs">Turma</Label>
+                  <Select value={draft.turma} onValueChange={(v) => setF("turma", v)}>
+                    <SelectTrigger className="h-9 mt-1"><SelectValue /></SelectTrigger>
+                    <SelectContent>{turmasPool.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <p className="text-[11px] text-muted-foreground mt-1.5">O bilhete de identidade e restantes dados pessoais serão preenchidos pelo próprio estudante.</p>
+            </FormSection>
           </div>
-        ))}
-      </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
+            <Button onClick={save} disabled={!draft.primeiroNome.trim() || !draft.email.trim()}>Adicionar Discente</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
+
+function Stat({ label, value, accent }: { label: string; value: number; accent?: boolean }) {
+  return (
+    <div className="rounded-lg border border-border bg-card p-4">
+      <p className="text-xs text-muted-foreground">{label}</p>
+      <p className={`text-2xl font-bold tabular-nums ${accent ? "text-emerald-600" : ""}`}>{value}</p>
     </div>
   );
 }
