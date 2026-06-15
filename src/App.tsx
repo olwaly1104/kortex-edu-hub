@@ -165,11 +165,13 @@ import Academica2Notas from "./pages/academica2/Notas";
 import Academica2Relatorios from "./pages/academica2/Relatorios";
 import AdminOnboarding from "./pages/admin/Onboarding";
 import AdminInicio from "./pages/admin/Inicio";
+import AdminPerfil from "./pages/admin/Perfil";
 import AdminAnuncios from "./pages/admin/Anuncios";
 import AdminOnboardingEstudantes from "./pages/admin/onboarding/Estudantes";
 import AdminOnboardingPessoas from "./pages/admin/onboarding/Pessoas";
 import AdminOnboardingRegrasPresenca from "./pages/admin/onboarding/RegrasPresenca";
 import AdminOnboardingSalarios from "./pages/admin/onboarding/Salarios";
+import AdminOnboardingEspacos from "./pages/admin/onboarding/Espacos";
 
 const queryClient = new QueryClient();
 
@@ -243,10 +245,11 @@ function AppRoutes() {
       <Route element={<RoleGuardedLayout homeRedirect={homeRedirect} />}>
         {/* Admin */}
         <Route path="/admin" element={<AdminInicio />} />
-        <Route path="/admin/perfil" element={<StudentProfile />} />
+        <Route path="/admin/perfil" element={<AdminPerfil />} />
         <Route path="/admin/onboarding/estudantes" element={<AdminOnboardingEstudantes />} />
         <Route path="/admin/onboarding/docentes" element={<AdminOnboardingPessoas mode="docentes" />} />
         <Route path="/admin/onboarding/staff" element={<AdminOnboardingPessoas mode="staff" />} />
+        <Route path="/admin/onboarding/espacos" element={<AdminOnboardingEspacos />} />
         <Route path="/admin/onboarding/regras-presenca" element={<AdminOnboardingRegrasPresenca />} />
         <Route path="/admin/onboarding/salarios" element={<AdminOnboardingSalarios />} />
         {/* Student */}

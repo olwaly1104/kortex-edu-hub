@@ -1,0 +1,169 @@
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { useAuth } from "@/contexts/AuthContext";
+import {
+  ShieldCheck, Building2, Mail, Phone, Globe, MapPin, Calendar, GraduationCap,
+  Users, Briefcase, Settings2, Save, IdCard, Hash,
+} from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
+
+export default function AdminPerfil() {
+  const { user } = useAuth();
+
+  const [instituicao, setInstituicao] = useState({
+    nomeOficial: "Universidade Privada de Arquitectura — UPRA",
+    sigla: "UPRA",
+    nif: "5417123456",
+    fundacao: "2008",
+    natureza: "Privada",
+    reitor: "Prof. Dr. António Almeida",
+    presidenteCA: "Dra. Maria Joaquina Pires",
+    email: "geral@upra.kor",
+    telefone: "+244 222 000 000",
+    website: "www.upra.ao",
+    morada: "Av. Comandante Valódia, Luanda — Angola",
+  });
+
+  const handleSave = () => toast.success("Dados da instituição atualizados");
+
+  const stats = [
+    { label: "Faculdades", value: 5, icon: Building2 },
+    { label: "Cursos", value: 13, icon: GraduationCap },
+    { label: "Docentes", value: 108, icon: Users },
+    { label: "Staff", value: 42, icon: Briefcase },
+  ];
+
+  return (
+    <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6 animate-fade-in">
+      {/* Header institucional */}
+      <Card className="overflow-hidden">
+        <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-6 border-b">
+          <div className="flex items-start gap-5 flex-wrap">
+            <div className="w-20 h-20 rounded-xl bg-primary text-primary-foreground flex items-center justify-center shrink-0 shadow-sm">
+              <ShieldCheck className="w-10 h-10" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <Badge variant="outline" className="mb-2 gap-1 text-[10px]"><Settings2 className="w-3 h-3" /> Administração da plataforma</Badge>
+              <h1 className="text-2xl font-bold leading-tight">{instituicao.nomeOficial}</h1>
+              <p className="text-sm text-muted-foreground mt-1">
+                Perfil institucional · Conta de {user?.name || "Administrador"} — controla toda a configuração da app Kortex.
+              </p>
+              <div className="flex flex-wrap items-center gap-3 mt-3 text-xs text-muted-foreground">
+                <span className="inline-flex items-center gap-1.5"><Hash className="w-3.5 h-3.5" /> {instituicao.sigla}</span>
+                <span className="inline-flex items-center gap-1.5"><IdCard className="w-3.5 h-3.5" /> NIF {instituicao.nif}</span>
+                <span className="inline-flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /> Desde {instituicao.fundacao}</span>
+                <span className="inline-flex items-center gap-1.5"><Building2 className="w-3.5 h-3.5" /> {instituicao.natureza}</span>
+              </div>
+            </div>
+            <Button onClick={handleSave} size="sm" className="gap-1.5"><Save className="w-3.5 h-3.5" /> Guardar alterações</Button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-y md:divide-y-0">
+          {stats.map(s => {
+            const I = s.icon;
+            return (
+              <div key={s.label} className="p-4 flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg bg-muted text-foreground flex items-center justify-center">
+                  <I className="w-4 h-4" />
+                </div>
+                <div>
+                  <p className="text-[10px] uppercase tracking-wide text-muted-foreground">{s.label}</p>
+                  <p className="text-xl font-bold leading-none mt-0.5">{s.value}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </Card>
+
+      {/* Identificação institucional */}
+      <Card className="p-6 space-y-4">
+        <div className="flex items-center gap-2">
+          <Building2 className="w-4 h-4 text-primary" />
+          <h2 className="text-sm font-semibold">Identificação Institucional</h2>
+        </div>
+        <Separator />
+        <div className="grid md:grid-cols-2 gap-4">
+          <div className="space-y-1.5">
+            <Label className="text-xs">Nome oficial</Label>
+            <Input value={instituicao.nomeOficial} onChange={e => setInstituicao({ ...instituicao, nomeOficial: e.target.value })} className="h-9" />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label className="text-xs">Sigla</Label>
+              <Input value={instituicao.sigla} onChange={e => setInstituicao({ ...instituicao, sigla: e.target.value })} className="h-9" />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs">NIF</Label>
+              <Input value={instituicao.nif} onChange={e => setInstituicao({ ...instituicao, nif: e.target.value })} className="h-9" />
+            </div>
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs">Ano de fundação</Label>
+            <Input value={instituicao.fundacao} onChange={e => setInstituicao({ ...instituicao, fundacao: e.target.value })} className="h-9" />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs">Natureza</Label>
+            <Input value={instituicao.natureza} onChange={e => setInstituicao({ ...instituicao, natureza: e.target.value })} className="h-9" />
+          </div>
+        </div>
+      </Card>
+
+      {/* Liderança */}
+      <Card className="p-6 space-y-4">
+        <div className="flex items-center gap-2">
+          <Users className="w-4 h-4 text-primary" />
+          <h2 className="text-sm font-semibold">Liderança</h2>
+        </div>
+        <Separator />
+        <div className="grid md:grid-cols-2 gap-4">
+          <div className="space-y-1.5">
+            <Label className="text-xs">Reitor</Label>
+            <Input value={instituicao.reitor} onChange={e => setInstituicao({ ...instituicao, reitor: e.target.value })} className="h-9" />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs">Presidente do Conselho de Administração</Label>
+            <Input value={instituicao.presidenteCA} onChange={e => setInstituicao({ ...instituicao, presidenteCA: e.target.value })} className="h-9" />
+          </div>
+        </div>
+      </Card>
+
+      {/* Contactos */}
+      <Card className="p-6 space-y-4">
+        <div className="flex items-center gap-2">
+          <Mail className="w-4 h-4 text-primary" />
+          <h2 className="text-sm font-semibold">Contactos</h2>
+        </div>
+        <Separator />
+        <div className="grid md:grid-cols-2 gap-4">
+          <div className="space-y-1.5">
+            <Label className="text-xs flex items-center gap-1.5"><Mail className="w-3 h-3" /> Email geral</Label>
+            <Input value={instituicao.email} onChange={e => setInstituicao({ ...instituicao, email: e.target.value })} className="h-9" />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs flex items-center gap-1.5"><Phone className="w-3 h-3" /> Telefone</Label>
+            <Input value={instituicao.telefone} onChange={e => setInstituicao({ ...instituicao, telefone: e.target.value })} className="h-9" />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs flex items-center gap-1.5"><Globe className="w-3 h-3" /> Website</Label>
+            <Input value={instituicao.website} onChange={e => setInstituicao({ ...instituicao, website: e.target.value })} className="h-9" />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs flex items-center gap-1.5"><MapPin className="w-3 h-3" /> Morada</Label>
+            <Input value={instituicao.morada} onChange={e => setInstituicao({ ...instituicao, morada: e.target.value })} className="h-9" />
+          </div>
+        </div>
+      </Card>
+
+      <div className="flex justify-end">
+        <Button onClick={handleSave} className="gap-1.5"><Save className="w-4 h-4" /> Guardar alterações</Button>
+      </div>
+    </div>
+  );
+}

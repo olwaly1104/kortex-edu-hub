@@ -35,6 +35,16 @@ type Group = {
 
 const GROUPS: Group[] = [
   {
+    id: "inf",
+    area: "Infraestrutura",
+    title: "Adicionar Edifícios e Salas",
+    subtitle: "Salas de aula, gabinetes, laboratórios, bibliotecas",
+    icon: Building2,
+    steps: [
+      { key: "inf.esp", title: "Edifícios e salas", desc: "Registar todos os espaços físicos da instituição.", icon: Building2, path: "/admin/onboarding/espacos?step=inf.esp" },
+    ],
+  },
+  {
     id: "est",
     area: "Estudantes",
     title: "Adicionar Estudantes",
