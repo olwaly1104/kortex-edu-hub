@@ -59,7 +59,8 @@ export default function AdminOnboarding() {
 
   useEffect(() => {
     try { localStorage.setItem(STORAGE, JSON.stringify(state)); } catch { /* ignore */ }
-  }, [state, STORAGE]);
+    pushOnboarding(user?.email, state);
+  }, [state, STORAGE, user?.email]);
 
   const setDados = (patch: Partial<OnboardingState["dados"]>) =>
     setState((s) => ({ ...s, dados: { ...s.dados, ...patch } }));
