@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import { isOnboardingCompleteFor } from "@/lib/onboardingStorage";
 import Login from "./pages/Login";
 import Website from "./pages/Website";
 import Candidatar from "./pages/Candidatar";
