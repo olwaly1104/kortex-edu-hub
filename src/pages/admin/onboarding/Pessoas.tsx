@@ -60,7 +60,6 @@ export default function OnboardingPessoas({ mode }: { mode: Mode }) {
     setRows(prev => [...prev, novo]);
   };
 
-  const remove = (id: string) => setRows(prev => prev.filter(r => r.id !== id));
   const update = (id: string, patch: Partial<Person>) => setRows(prev => prev.map(r => {
     if (r.id !== id) return r;
     const next = { ...r, ...patch };
