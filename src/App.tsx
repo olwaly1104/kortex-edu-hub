@@ -163,6 +163,9 @@ import Academica2Exames from "./pages/academica2/Exames";
 import Academica2Quizzes from "./pages/academica2/Quizzes";
 import Academica2Notas from "./pages/academica2/Notas";
 import Academica2Relatorios from "./pages/academica2/Relatorios";
+import AdminOnboarding from "./pages/admin/Onboarding";
+import AdminInicio from "./pages/admin/Inicio";
+import AdminAnuncios from "./pages/admin/Anuncios";
 
 const queryClient = new QueryClient();
 
@@ -177,6 +180,7 @@ const homeRedirectMap: Record<string, string> = {
   gap: "/gap",
   inscricoes: "/inscricoes",
   academica2: "/areaacademica",
+  admin: "/admin",
 };
 
 // Maps a URL prefix to the role(s) allowed to access it.
@@ -191,6 +195,7 @@ const pathRoleMap: Array<{ prefix: string; roles: string[] }> = [
   { prefix: "/gap", roles: ["gap"] },
   { prefix: "/inscricoes", roles: ["inscricoes"] },
   { prefix: "/areaacademica", roles: ["academica2"] },
+  { prefix: "/admin", roles: ["admin"] },
 ];
 
 function RoleGuardedLayout({ homeRedirect }: { homeRedirect: string }) {
