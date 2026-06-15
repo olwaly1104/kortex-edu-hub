@@ -35,16 +35,6 @@ type Group = {
 
 const GROUPS: Group[] = [
   {
-    id: "doc",
-    area: "Docentes",
-    title: "Registar Docentes",
-    subtitle: "Adicionar corpo docente da instituição",
-    icon: GraduationCap,
-    steps: [
-      { key: "rh.doc", title: "Registar docentes", desc: "Adicionar todos os docentes da instituição em lote.", icon: GraduationCap, path: "/admin/onboarding/docentes?step=rh.doc" },
-    ],
-  },
-  {
     id: "inf",
     area: "Infraestrutura",
     title: "Registar Salas, Edifícios e Geopontos do Campus",
@@ -79,16 +69,6 @@ const GROUPS: Group[] = [
     ],
   },
   {
-    id: "staff",
-    area: "Staff",
-    title: "Registar Staff",
-    subtitle: "Funcionários administrativos e técnicos",
-    icon: Briefcase,
-    steps: [
-      { key: "rh.staff", title: "Registar staff", desc: "Adicionar funcionários administrativos e técnicos.", icon: Briefcase, path: "/admin/onboarding/staff?step=rh.staff" },
-    ],
-  },
-  {
     id: "fin",
     area: "Finanças",
     title: "Configurar Finanças",
@@ -105,9 +85,11 @@ const GROUPS: Group[] = [
     id: "rh",
     area: "Recursos Humanos",
     title: "Configurar RH",
-    subtitle: "Regras de presença e políticas internas",
+    subtitle: "Docentes, staff e políticas internas",
     icon: UserCog,
     steps: [
+      { key: "rh.doc", title: "Registar docentes", desc: "Adicionar todos os docentes da instituição em lote.", icon: GraduationCap, path: "/admin/onboarding/docentes?step=rh.doc" },
+      { key: "rh.staff", title: "Registar staff", desc: "Adicionar funcionários administrativos e técnicos.", icon: Briefcase, path: "/admin/onboarding/staff?step=rh.staff" },
       { key: "rh.pres", title: "Regras de presença", desc: "Definir limites de presença, tolerâncias e faltas justificadas.", icon: Clock, path: "/admin/onboarding/regras-presenca?step=rh.pres" },
     ],
   },
