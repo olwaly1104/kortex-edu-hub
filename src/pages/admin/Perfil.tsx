@@ -26,12 +26,21 @@ const EMPTY: Instituicao = {
   email: "", telefone: "", website: "", morada: "", logoDataUrl: "",
 };
 
+function currentSiteUrl(): string {
+  try { return window.location.origin; } catch { return ""; }
+}
+
 function loadInitial(email?: string | null): Instituicao {
   const PROFILE_KEY = profileKey(email);
   const STORAGE = onboardingKey(email);
+  const defaultWebsite = currentSiteUrl();
   try {
     const saved = localStorage.getItem(PROFILE_KEY);
-    if (saved) return { ...EMPTY, ...JSON.parse(saved) };
+    if (saved) {
+      const parsed = { ...EMPTY, ...JSON.parse(saved) };
+      if (!parsed.website) parsed.website = defaultWebsite;
+      return parsed;
+    }
   } catch { /* ignore */ }
   try {
     const raw = localStorage.getItem(STORAGE);
@@ -46,12 +55,13 @@ function loadInitial(email?: string | null): Instituicao {
         natureza: d.tipo || "",
         email: d.email || "",
         telefone: d.telefone || "",
+        website: defaultWebsite,
         morada: [d.endereco, d.municipio, d.provincia].filter(Boolean).join(", "),
         logoDataUrl: d.logoDataUrl || "",
       };
     }
   } catch { /* ignore */ }
-  return EMPTY;
+  return { ...EMPTY, website: defaultWebsite };
 }
 
 export default function AdminPerfil() {
