@@ -1,4 +1,4 @@
-import { OnboardingStepBanner } from "@/components/admin/OnboardingStepBanner";
+import { OnboardingStepBanner, useIsOnboardingStep } from "@/components/admin/OnboardingStepBanner";
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
@@ -27,9 +27,10 @@ const docentesPool = [
   "Prof. Margarida Sá", "Prof. Bruno Tavares", "Prof. Cláudia Nunes",
 ];
 
-type CadeiraAlloc = { name: string; docente: string; ects: number; semestre: 1 | 2 };
+type CadeiraAlloc = { name: string; docente: string; ects: number; semestre: 1 | 2 | "anual" };
 
 export default function GerarCadeiras() {
+  const isOnboarding = useIsOnboardingStep();
   const cursosWithCadeiras = Object.keys(cadeirasTemplate);
   const [cadeiraCurso, setCadeiraCurso] = useState<string>(cursosWithCadeiras[0]);
 
@@ -40,7 +41,7 @@ export default function GerarCadeiras() {
         name: n,
         docente: docentesPool[(i + cid.length) % docentesPool.length],
         ects: 6,
-        semestre: (i % 2 === 0 ? 1 : 2) as 1 | 2,
+        semestre: (i % 2 === 0 ? 1 : 2) as 1 | 2 | "anual",
       })));
     });
     return out;
@@ -105,22 +106,26 @@ export default function GerarCadeiras() {
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
-      <OnboardingStepBanner />
-      <div>
-        <Link to="/areaacademica/criador" className="text-xs text-muted-foreground hover:text-primary inline-flex items-center gap-1 mb-2">
-          <ArrowLeft className="w-3 h-3" /> Voltar ao Criador
-        </Link>
-        <div className="rounded-xl border border-primary/30 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-6 flex items-center justify-between flex-wrap gap-3">
-          <div>
-            <Badge className="mb-2 gap-1"><BookOpen className="w-3 h-3" /> Passo 3 de 6</Badge>
-            <h1 className="text-2xl font-bold flex items-center gap-2">
-              <BookOpen className="w-6 h-6 text-primary" /> Confirmar Cadeiras
-            </h1>
-            <p className="text-muted-foreground mt-1 text-sm">Alocar cadeiras, docente, ECTS, semestre e banco de quizzes por curso e por ano.</p>
+      <OnboardingStepBanner actions={
+        <Button onClick={confirmAll} size="sm" variant="outline" className="gap-1 h-8"><Check className="w-3.5 h-3.5" /> Confirmar Alocação</Button>
+      } />
+      {!isOnboarding && (
+        <div>
+          <Link to="/areaacademica/criador" className="text-xs text-muted-foreground hover:text-primary inline-flex items-center gap-1 mb-2">
+            <ArrowLeft className="w-3 h-3" /> Voltar ao Criador
+          </Link>
+          <div className="rounded-xl border border-primary/30 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-6 flex items-center justify-between flex-wrap gap-3">
+            <div>
+              <Badge className="mb-2 gap-1"><BookOpen className="w-3 h-3" /> Passo 3 de 6</Badge>
+              <h1 className="text-2xl font-bold flex items-center gap-2">
+                <BookOpen className="w-6 h-6 text-primary" /> Confirmar Cadeiras
+              </h1>
+              <p className="text-muted-foreground mt-1 text-sm">Alocar cadeiras, docente, ECTS, semestre e banco de quizzes por curso e por ano.</p>
+            </div>
+            <Button onClick={confirmAll} className="gap-2"><Check className="w-4 h-4" /> Confirmar Alocação</Button>
           </div>
-          <Button onClick={confirmAll} className="gap-2"><Check className="w-4 h-4" /> Confirmar Alocação</Button>
         </div>
-      </div>
+      )}
 
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
         <Card className="p-4">
@@ -219,11 +224,12 @@ export default function GerarCadeiras() {
                       <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
                       <SelectContent>{docentesPool.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent>
                     </Select>
-                    <Select value={String(c.semestre)} onValueChange={v => update(cadeiraCurso, ano, idx, { semestre: +v as 1 | 2 })}>
+                    <Select value={String(c.semestre)} onValueChange={v => update(cadeiraCurso, ano, idx, { semestre: (v === "anual" ? "anual" : (+v as 1 | 2)) })}>
                       <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="1">1º Sem</SelectItem>
                         <SelectItem value="2">2º Sem</SelectItem>
+                        <SelectItem value="anual">Anual</SelectItem>
                       </SelectContent>
                     </Select>
                     <Select value={String(c.ects)} onValueChange={v => update(cadeiraCurso, ano, idx, { ects: +v })}>
