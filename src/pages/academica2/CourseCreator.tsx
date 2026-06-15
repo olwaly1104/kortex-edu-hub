@@ -215,8 +215,9 @@ export default function CourseCreator() {
         </div>
       </Card>
 
-      <div className="grid lg:grid-cols-[320px_1fr] gap-6">
-        {/* LEFT: Parameters */}
+      <div className={isAdmin ? "" : "grid lg:grid-cols-[320px_1fr] gap-6"}>
+        {/* LEFT: Parameters — academica only */}
+        {!isAdmin && (
         <Card className="p-5 space-y-4 h-fit">
           <h2 className="text-base font-semibold flex items-center gap-2"><Calendar className="w-4 h-4 text-primary" /> Parâmetros do Ano</h2>
 
@@ -246,6 +247,7 @@ export default function CourseCreator() {
             </div>
           </div>
         </Card>
+        )}
 
 
         {/* RIGHT: Steps + Detail */}
