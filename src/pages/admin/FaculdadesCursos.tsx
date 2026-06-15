@@ -3,27 +3,59 @@ import { OnboardingStepBanner } from "@/components/admin/OnboardingStepBanner";
 import { Building2, Lock, Pencil, Check, GraduationCap, Users, UserCog, Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { cursoTemplates, type CursoTemplate } from "@/data/academica2Data";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import type { CursoTemplate } from "@/data/academica2Data";
 import { useMemo, useState } from "react";
 
-const decanosPool = ["Dr. Manuel Rebelo", "Dra. Helena Vaz", "Dr. Eduardo Pinto", "Dra. Cristina Marques", "Dr. Joaquim Sousa"];
-const coordenadoresPool = ["Dr. Fábio Costa", "Dra. Marta Lopes", "Dr. Hugo Faria", "Dra. Sílvia Antunes", "Dr. Tomás Henriques", "Dra. Sara Quintas", "Dr. Rui Pinto", "Dra. Helena Vaz", "Dr. Manuel Pires", "Dr. Vasco Lima", "Dra. Clara Pinto"];
-
 type FacState = { id: string; name: string; decano: string; editing: boolean; cursos: CursoTemplate[] };
-
-const facDecanoMap: Record<string, string> = {
-  "Faculdade de Ciências Exatas": "Dr. Manuel Rebelo",
-  "Faculdade de Ciências da Saúde": "Dra. Helena Vaz",
-  "Faculdade de Ciências Sociais": "Dr. Eduardo Pinto",
-  "Faculdade de Letras": "Dra. Helena Vaz",
-  "Faculdade de Ciências Agrárias": "Dr. Vasco Lima",
-};
 
 export default function AdminFaculdadesCursos() {
   const [faculdades, setFaculdades] = useState<FacState[]>([]);
 
-  const addFaculdade = () => setFaculdades((prev) => [...prev, { id: `fac-${Date.now()}`, name: "Nova Faculdade", decano: decanosPool[0], editing: true, cursos: [] }]);
+  // Add Faculdade dialog
+  const [openAddFac, setOpenAddFac] = useState(false);
+  const [newFac, setNewFac] = useState({ name: "", decano: "" });
+
+  const submitNewFac = () => {
+    if (!newFac.name.trim()) return;
+    setFaculdades((prev) => [
+      ...prev,
+      { id: `fac-${Date.now()}`, name: newFac.name.trim(), decano: newFac.decano.trim(), editing: false, cursos: [] },
+    ]);
+    setNewFac({ name: "", decano: "" });
+    setOpenAddFac(false);
+  };
+
+  // Add Curso dialog
+  const [openAddCurso, setOpenAddCurso] = useState<string | null>(null);
+  const [newCurso, setNewCurso] = useState({ name: "", code: "", years: 4, estudantesEsperados: 0, coordenador: "" });
+
+  const submitNewCurso = () => {
+    if (!openAddCurso || !newCurso.name.trim() || !newCurso.code.trim()) return;
+    const facId = openAddCurso;
+    const fac = faculdades.find((f) => f.id === facId);
+    if (!fac) return;
+    update(facId, {
+      cursos: [
+        ...fac.cursos,
+        {
+          id: `${facId}-${Date.now()}`,
+          name: newCurso.name.trim(),
+          code: newCurso.code.trim().toUpperCase(),
+          faculty: fac.name,
+          years: newCurso.years || 4,
+          cadeirasPorAno: 6,
+          estudantesEsperados: newCurso.estudantesEsperados || 0,
+          coordenador: newCurso.coordenador.trim(),
+        },
+      ],
+    });
+    setNewCurso({ name: "", code: "", years: 4, estudantesEsperados: 0, coordenador: "" });
+    setOpenAddCurso(null);
+  };
 
   const update = (id: string, patch: Partial<FacState>) =>
     setFaculdades((prev) => prev.map((f) => (f.id === id ? { ...f, ...patch } : f)));
@@ -40,14 +72,9 @@ export default function AdminFaculdadesCursos() {
     update(facId, { cursos: fac.cursos.filter((c) => c.id !== cursoId) });
   };
 
-  const addCurso = (facId: string) => {
-    const fac = faculdades.find((f) => f.id === facId);
-    if (!fac) return;
-    update(facId, { cursos: [...fac.cursos, { id: `${facId}-${Date.now()}`, name: "Novo Curso", code: "NEW", faculty: fac.name, years: 4, cadeirasPorAno: 6, estudantesEsperados: 100, coordenador: coordenadoresPool[0] }] });
-  };
-
   const totalCursos = useMemo(() => faculdades.reduce((s, f) => s + f.cursos.length, 0), [faculdades]);
   const totalEstud = useMemo(() => faculdades.reduce((s, f) => s + f.cursos.reduce((a, c) => a + c.estudantesEsperados, 0), 0), [faculdades]);
+  const decanosCount = useMemo(() => faculdades.filter((f) => f.decano.trim()).length, [faculdades]);
 
   return (
     <div className="p-6 space-y-6 max-w-6xl mx-auto">
@@ -56,14 +83,14 @@ export default function AdminFaculdadesCursos() {
         title="Faculdades & Cursos"
         subtitle="Estrutura académica da instituição"
         icon={<Building2 className="w-5 h-5 text-primary" />}
-        right={<Button size="sm" onClick={addFaculdade} className="gap-1"><Plus className="w-3.5 h-3.5" /> Adicionar Faculdade</Button>}
+        right={<Button size="sm" onClick={() => setOpenAddFac(true)} className="gap-1"><Plus className="w-3.5 h-3.5" /> Adicionar Faculdade</Button>}
       />
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div className="rounded-lg border border-border bg-card p-4"><p className="text-xs text-muted-foreground">Faculdades</p><p className="text-2xl font-bold tabular-nums">{faculdades.length}</p></div>
         <div className="rounded-lg border border-border bg-card p-4"><p className="text-xs text-muted-foreground">Cursos</p><p className="text-2xl font-bold tabular-nums">{totalCursos}</p></div>
         <div className="rounded-lg border border-border bg-card p-4"><p className="text-xs text-muted-foreground">Estudantes est.</p><p className="text-2xl font-bold tabular-nums">{totalEstud}</p></div>
-        <div className="rounded-lg border border-border bg-card p-4"><p className="text-xs text-muted-foreground">Decanos</p><p className="text-2xl font-bold tabular-nums">{faculdades.length}</p></div>
+        <div className="rounded-lg border border-border bg-card p-4"><p className="text-xs text-muted-foreground">Decanos</p><p className="text-2xl font-bold tabular-nums">{decanosCount}</p></div>
       </div>
 
       <div className="space-y-4">
@@ -99,12 +126,9 @@ export default function AdminFaculdadesCursos() {
                   <div className="min-w-0">
                     <p className="text-[10px] uppercase tracking-wide text-muted-foreground leading-tight">Decano</p>
                     {f.editing ? (
-                      <Select value={f.decano} onValueChange={(v) => update(f.id, { decano: v })}>
-                        <SelectTrigger className="h-6 text-xs border-0 px-0 shadow-none focus:ring-0"><SelectValue /></SelectTrigger>
-                        <SelectContent>{decanosPool.map((d) => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent>
-                      </Select>
+                      <Input value={f.decano} onChange={(e) => update(f.id, { decano: e.target.value })} placeholder="Nome do decano" className="h-6 text-xs border-0 px-0 shadow-none focus-visible:ring-0" />
                     ) : (
-                      <p className="text-xs font-semibold leading-tight">{f.decano}</p>
+                      <p className="text-xs font-semibold leading-tight">{f.decano || <span className="text-muted-foreground italic font-normal">Por atribuir</span>}</p>
                     )}
                   </div>
                 </div>
@@ -118,50 +142,113 @@ export default function AdminFaculdadesCursos() {
             <div className="p-4">
               <div className="flex items-center justify-between mb-2">
                 <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Cursos da Faculdade</p>
-                {f.editing && (
-                  <Button size="sm" variant="outline" className="h-7 gap-1 text-xs" onClick={() => addCurso(f.id)}>
-                    <Plus className="w-3 h-3" /> Adicionar Curso
-                  </Button>
-                )}
+                <Button size="sm" variant="outline" className="h-7 gap-1 text-xs" onClick={() => setOpenAddCurso(f.id)}>
+                  <Plus className="w-3 h-3" /> Adicionar Curso
+                </Button>
               </div>
-              <div className="grid sm:grid-cols-2 gap-2">
-                {f.cursos.map((c) => (
-                  <div key={c.id} className="flex items-center gap-2 px-3 py-2 rounded-md border border-border bg-card">
-                    <span className="inline-flex items-center justify-center h-5 min-w-[34px] px-1 rounded bg-primary text-primary-foreground text-[10px] font-bold">{c.code}</span>
-                    <div className="min-w-0 flex-1">
-                      {f.editing ? (
-                        <Input value={c.name} onChange={(e) => updateCurso(f.id, c.id, { name: e.target.value })} className="h-6 text-xs mb-0.5" />
-                      ) : (
-                        <p className="text-xs font-medium truncate">{c.name}</p>
-                      )}
-                      <p className="text-[10px] text-muted-foreground truncate">{c.years} anos · ~{c.estudantesEsperados} est.</p>
-                    </div>
-                    <div className="flex items-center gap-1.5 px-2 py-1 rounded border border-border bg-muted/30 shrink-0">
-                      <UserCog className="w-3 h-3 text-muted-foreground" />
-                      <div className="min-w-0">
-                        <p className="text-[9px] uppercase tracking-wide text-muted-foreground leading-tight">Coord.</p>
+              {f.cursos.length === 0 ? (
+                <div className="rounded-md border border-dashed border-border p-4 text-center text-xs text-muted-foreground">
+                  Nenhum curso registado nesta faculdade.
+                </div>
+              ) : (
+                <div className="grid sm:grid-cols-2 gap-2">
+                  {f.cursos.map((c) => (
+                    <div key={c.id} className="flex items-center gap-2 px-3 py-2 rounded-md border border-border bg-card">
+                      <span className="inline-flex items-center justify-center h-5 min-w-[34px] px-1 rounded bg-primary text-primary-foreground text-[10px] font-bold">{c.code}</span>
+                      <div className="min-w-0 flex-1">
                         {f.editing ? (
-                          <Select value={c.coordenador} onValueChange={(v) => updateCurso(f.id, c.id, { coordenador: v })}>
-                            <SelectTrigger className="h-5 text-[11px] border-0 px-0 shadow-none focus:ring-0 gap-1"><SelectValue /></SelectTrigger>
-                            <SelectContent>{coordenadoresPool.map((co) => <SelectItem key={co} value={co}>{co}</SelectItem>)}</SelectContent>
-                          </Select>
+                          <Input value={c.name} onChange={(e) => updateCurso(f.id, c.id, { name: e.target.value })} className="h-6 text-xs mb-0.5" />
                         ) : (
-                          <p className="text-[11px] font-semibold leading-tight truncate max-w-[140px]">{c.coordenador}</p>
+                          <p className="text-xs font-medium truncate">{c.name}</p>
                         )}
+                        <p className="text-[10px] text-muted-foreground truncate">{c.years} anos · ~{c.estudantesEsperados} est.</p>
                       </div>
+                      <div className="flex items-center gap-1.5 px-2 py-1 rounded border border-border bg-muted/30 shrink-0">
+                        <UserCog className="w-3 h-3 text-muted-foreground" />
+                        <div className="min-w-0">
+                          <p className="text-[9px] uppercase tracking-wide text-muted-foreground leading-tight">Coord.</p>
+                          {f.editing ? (
+                            <Input value={c.coordenador} onChange={(e) => updateCurso(f.id, c.id, { coordenador: e.target.value })} placeholder="Nome" className="h-5 text-[11px] border-0 px-0 shadow-none focus-visible:ring-0 max-w-[140px]" />
+                          ) : (
+                            <p className="text-[11px] font-semibold leading-tight truncate max-w-[140px]">{c.coordenador || <span className="text-muted-foreground italic font-normal">Por atribuir</span>}</p>
+                          )}
+                        </div>
+                      </div>
+                      {f.editing && (
+                        <Button size="icon" variant="ghost" className="h-6 w-6 text-destructive hover:text-destructive" onClick={() => removeCurso(f.id, c.id)}>
+                          <X className="w-3.5 h-3.5" />
+                        </Button>
+                      )}
                     </div>
-                    {f.editing && (
-                      <Button size="icon" variant="ghost" className="h-6 w-6 text-destructive hover:text-destructive" onClick={() => removeCurso(f.id, c.id)}>
-                        <X className="w-3.5 h-3.5" />
-                      </Button>
-                    )}
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         ))}
       </div>
+
+      {/* Add Faculdade dialog */}
+      <Dialog open={openAddFac} onOpenChange={setOpenAddFac}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Nova Faculdade</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 py-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="fac-name" className="text-xs">Nome da Faculdade</Label>
+              <Input id="fac-name" value={newFac.name} onChange={(e) => setNewFac({ ...newFac, name: e.target.value })} placeholder="Ex: Faculdade de Ciências Exatas" />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="fac-decano" className="text-xs">Decano <span className="text-muted-foreground font-normal">(opcional)</span></Label>
+              <Input id="fac-decano" value={newFac.decano} onChange={(e) => setNewFac({ ...newFac, decano: e.target.value })} placeholder="Nome do decano" />
+            </div>
+          </div>
+          <DialogFooter>
+            <DialogClose asChild><Button variant="outline" size="sm">Cancelar</Button></DialogClose>
+            <Button size="sm" onClick={submitNewFac} disabled={!newFac.name.trim()}>Criar Faculdade</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Curso dialog */}
+      <Dialog open={!!openAddCurso} onOpenChange={(o) => !o && setOpenAddCurso(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Novo Curso</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 py-2">
+            <div className="grid grid-cols-3 gap-2">
+              <div className="col-span-2 space-y-1.5">
+                <Label htmlFor="cur-name" className="text-xs">Nome do Curso</Label>
+                <Input id="cur-name" value={newCurso.name} onChange={(e) => setNewCurso({ ...newCurso, name: e.target.value })} placeholder="Ex: Arquitectura" />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="cur-code" className="text-xs">Código</Label>
+                <Input id="cur-code" value={newCurso.code} onChange={(e) => setNewCurso({ ...newCurso, code: e.target.value })} placeholder="ARQ" />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <div className="space-y-1.5">
+                <Label htmlFor="cur-years" className="text-xs">Duração (anos)</Label>
+                <Input id="cur-years" type="number" min={1} max={8} value={newCurso.years} onChange={(e) => setNewCurso({ ...newCurso, years: Number(e.target.value) })} />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="cur-est" className="text-xs">Estudantes esperados</Label>
+                <Input id="cur-est" type="number" min={0} value={newCurso.estudantesEsperados} onChange={(e) => setNewCurso({ ...newCurso, estudantesEsperados: Number(e.target.value) })} />
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="cur-coord" className="text-xs">Coordenador <span className="text-muted-foreground font-normal">(opcional)</span></Label>
+              <Input id="cur-coord" value={newCurso.coordenador} onChange={(e) => setNewCurso({ ...newCurso, coordenador: e.target.value })} placeholder="Nome do coordenador" />
+            </div>
+          </div>
+          <DialogFooter>
+            <DialogClose asChild><Button variant="outline" size="sm">Cancelar</Button></DialogClose>
+            <Button size="sm" onClick={submitNewCurso} disabled={!newCurso.name.trim() || !newCurso.code.trim()}>Criar Curso</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
