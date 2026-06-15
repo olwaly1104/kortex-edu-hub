@@ -2,7 +2,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { ArrowLeft, ChevronRight, ShieldCheck, CheckCircle2, Circle } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { ReactNode, useState } from "react";
-import { progressKey } from "@/lib/onboardingStorage";
+import { progressKey, pushProgress } from "@/lib/onboardingStorage";
 
 type StepMeta = { key: string; title: string; desc: string; path: string };
 type GroupMeta = { id: string; title: string; steps: StepMeta[] };
