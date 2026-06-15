@@ -33,7 +33,7 @@ export function isOnboardingCompleteFor(email?: string | null): boolean {
   }
 }
 
-export function readOnboardingStateFor<T>(fallback: T, email?: string | null): T {
+export function readOnboardingStateFor<T extends object>(fallback: T, email?: string | null): T {
   try {
     const accountRaw = localStorage.getItem(onboardingKey(email));
     if (accountRaw) return { ...fallback, ...JSON.parse(accountRaw) };
