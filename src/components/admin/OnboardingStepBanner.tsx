@@ -39,6 +39,7 @@ export const ONBOARDING_GROUPS: GroupMeta[] = [
       { key: "fin.prop",   title: "Propinas por curso",     desc: "Valores de propinas por curso e ano.",                       path: "/financas/configurar-receitas?step=fin.prop" },
       { key: "fin.taxas",  title: "Emolumentos e serviços", desc: "Emolumentos administrativos e serviços académicos.",         path: "/financas/configurar-receitas?step=fin.taxas" },
       { key: "fin.multas", title: "Multas",                 desc: "Tabela de multas e penalidades aplicáveis.",                 path: "/financas/configurar-receitas?step=fin.multas" },
+      { key: "fin.sal",    title: "Confirmar salários",     desc: "Bruto, imposto e líquido dos docentes e staff registados.",  path: "/admin/onboarding/salarios?step=fin.sal" },
     ],
   },
   {
