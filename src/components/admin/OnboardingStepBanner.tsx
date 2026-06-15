@@ -43,10 +43,10 @@ export const ONBOARDING_GROUPS: GroupMeta[] = [
   {
     id: "fin", title: "Configurar Finanças",
     steps: [
-      { key: "fin.pro", title: "Propinas", desc: "Definir valores de propinas por curso e ano.", path: "/financas/configurador?tab=propinas&step=fin.pro" },
-      { key: "fin.emo", title: "Emolumentos e taxas", desc: "Configurar taxas e serviços académicos.", path: "/financas/configurador?tab=taxas&step=fin.emo" },
-      { key: "fin.mul", title: "Multas", desc: "Definir regras e valores de multas.", path: "/financas/configurador?tab=multas&step=fin.mul" },
-      { key: "fin.sal", title: "Salários", desc: "Configurar escalões e tabela salarial.", path: "/admin/onboarding/salarios?step=fin.sal" },
+      { key: "fin.pro", title: "Receitas — Propinas & emolumentos", desc: "Propinas por curso, emolumentos e taxas académicas.", path: "/financas/configurador?tab=receitas&step=fin.pro" },
+      { key: "fin.des", title: "Despesas", desc: "Rubricas e categorias de despesa institucional.", path: "/financas/configurador?tab=despesas&step=fin.des" },
+      { key: "fin.sal", title: "Salários", desc: "Escalões salariais de docentes e staff.", path: "/financas/configurador?tab=salarios&step=fin.sal" },
+      { key: "fin.mul", title: "Multas", desc: "Multas aplicadas a estudantes, docentes e staff.", path: "/financas/configurador?tab=multas&step=fin.mul" },
     ],
   },
   {

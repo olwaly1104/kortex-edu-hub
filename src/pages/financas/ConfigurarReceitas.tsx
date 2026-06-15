@@ -7,42 +7,62 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FinHeader } from "@/pages/financas/_FinHeader";
 import { OnboardingStepBanner } from "@/components/admin/OnboardingStepBanner";
 import {
-  ArrowLeft, Banknote, Building2, GraduationCap, Loader2, Save,
-  AlertCircle, Receipt, Wallet, Plus, Trash2,
+  ArrowLeft, Banknote, Building2, GraduationCap, Loader2, Save, AlertCircle,
+  Receipt, Wallet, Plus, Trash2, TrendingUp, TrendingDown, CreditCard,
+  Users, Briefcase, BookOpenCheck, Settings2,
 } from "lucide-react";
 import { useFaculdades, useCursos, usePropinas, useUpdatePropina } from "@/lib/useInstitution";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 
 /**
- * Configurar Receitas — espelha o passo "Configurar Finanças" do onboarding.
- * Tabs: Propinas (DB), Emolumentos & Taxas (local), Multas (local).
+ * Configurar Finanças — página única ligada ao onboarding.
+ *
+ * Estrutura espelha o módulo Finanças real (Receitas, Despesas, Salários,
+ * Multas) para que a configuração corresponda exatamente ao que é depois
+ * apresentado nas tabelas operacionais. Tudo aqui alimenta o backend ou o
+ * estado local da instituição — nenhum dado de demonstração.
  */
 
-type Tab = "propinas" | "taxas" | "multas";
+type Tab = "receitas" | "despesas" | "salarios" | "multas";
 
-type TaxaRow = { id: string; nome: string; valor: number };
-type MultaRow = { id: string; nome: string; valor: number; unidade: string };
+type LineItem = { id: string; nome: string; valor: number; unidade?: string; aplicaA?: "estudante" | "docente" | "staff" | "todos" };
 
-const taxasKey = (email?: string | null) => `upra.admin.fin.taxas::${email || "anon"}`;
-const multasKey = (email?: string | null) => `upra.admin.fin.multas::${email || "anon"}`;
-
-const readJSON = <T,>(key: string, fallback: T): T => {
-  try { const r = localStorage.getItem(key); return r ? (JSON.parse(r) as T) : fallback; } catch { return fallback; }
-};
-const writeJSON = (key: string, value: unknown) => { try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* ignore */ } };
-
+const KEY = (kind: string, email?: string | null) => `upra.fin.cfg.${kind}::${email || "anon"}`;
 const newId = () => Math.random().toString(36).slice(2, 10);
 const fmt = (v: number) => v.toLocaleString("pt-AO", { maximumFractionDigits: 0 });
+const readJSON = <T,>(k: string, fb: T): T => { try { const r = localStorage.getItem(k); return r ? (JSON.parse(r) as T) : fb; } catch { return fb; } };
+const writeJSON = (k: string, v: unknown) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* */ } };
+
+const TAB_DEFS: { id: Tab; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
+  { id: "receitas", label: "Receitas", icon: TrendingUp },
+  { id: "despesas", label: "Despesas", icon: TrendingDown },
+  { id: "salarios", label: "Salários", icon: CreditCard },
+  { id: "multas", label: "Multas", icon: Banknote },
+];
+
+// Map onboarding step keys → tab IDs so banner ↔ page stay in sync
+const STEP_TO_TAB: Record<string, Tab> = {
+  "fin.pro": "receitas",
+  "fin.des": "despesas",
+  "fin.sal": "salarios",
+  "fin.mul": "multas",
+};
 
 export default function ConfigurarReceitas() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [params, setParams] = useSearchParams();
-  const tabParam = (params.get("tab") as Tab) || "propinas";
-  const [tab, setTab] = useState<Tab>(tabParam);
 
-  useEffect(() => { if (tabParam !== tab) setTab(tabParam); }, [tabParam]); // eslint-disable-line
+  const stepKey = params.get("step") || "";
+  const initialTab = (params.get("tab") as Tab) || STEP_TO_TAB[stepKey] || "receitas";
+  const [tab, setTab] = useState<Tab>(initialTab);
+
+  useEffect(() => {
+    const next = (params.get("tab") as Tab) || STEP_TO_TAB[params.get("step") || ""] || "receitas";
+    if (next !== tab) setTab(next);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params]);
 
   const changeTab = (next: Tab) => {
     setTab(next);
@@ -52,13 +72,13 @@ export default function ConfigurarReceitas() {
   };
 
   return (
-    <div className="p-6 space-y-6 max-w-6xl mx-auto">
+    <div className="p-6 lg:p-8 space-y-6 animate-fade-in max-w-6xl mx-auto">
       <OnboardingStepBanner />
 
       <FinHeader
-        title="Configurar Receitas"
-        subtitle="Propinas, emolumentos e multas — base que alimenta todos os módulos financeiros"
-        icon={<Banknote className="w-5 h-5 text-primary" />}
+        title="Configurar Finanças"
+        subtitle="Receitas, despesas, salários e multas — base que alimenta todo o módulo financeiro."
+        icon={<Settings2 className="w-5 h-5 text-primary" />}
         right={
           <Button size="sm" variant="outline" className="gap-1.5" onClick={() => navigate(-1)}>
             <ArrowLeft className="w-3.5 h-3.5" /> Voltar
@@ -67,23 +87,47 @@ export default function ConfigurarReceitas() {
       />
 
       <Tabs value={tab} onValueChange={(v) => changeTab(v as Tab)}>
-        <TabsList>
-          <TabsTrigger value="propinas" className="gap-1.5"><Wallet className="w-3.5 h-3.5" /> Propinas</TabsTrigger>
-          <TabsTrigger value="taxas" className="gap-1.5"><Receipt className="w-3.5 h-3.5" /> Emolumentos & Taxas</TabsTrigger>
-          <TabsTrigger value="multas" className="gap-1.5"><Banknote className="w-3.5 h-3.5" /> Multas</TabsTrigger>
+        <TabsList className="grid grid-cols-4 w-full max-w-2xl">
+          {TAB_DEFS.map((t) => {
+            const Icon = t.icon;
+            return (
+              <TabsTrigger key={t.id} value={t.id} className="gap-1.5">
+                <Icon className="w-3.5 h-3.5" /> {t.label}
+              </TabsTrigger>
+            );
+          })}
         </TabsList>
       </Tabs>
 
-      {tab === "propinas" && <PropinasTab onAddCursos={() => navigate("/admin/faculdades-cursos")} />}
-      {tab === "taxas" && <TaxasTab storageKey={taxasKey(user?.email)} />}
-      {tab === "multas" && <MultasTab storageKey={multasKey(user?.email)} />}
+      {tab === "receitas" && <ReceitasSection email={user?.email} onAddCursos={() => navigate("/admin/faculdades-cursos")} />}
+      {tab === "despesas" && <DespesasSection email={user?.email} />}
+      {tab === "salarios" && <SalariosSection email={user?.email} />}
+      {tab === "multas" && <MultasSection email={user?.email} />}
     </div>
   );
 }
 
-/* ───────────────────────────── Propinas (backend) ─────────────────────────── */
+/* ═══════════════════════════════ RECEITAS ═════════════════════════════════ */
 
-function PropinasTab({ onAddCursos }: { onAddCursos: () => void }) {
+function ReceitasSection({ email, onAddCursos }: { email?: string | null; onAddCursos: () => void }) {
+  return (
+    <div className="space-y-6">
+      <PropinasBlock onAddCursos={onAddCursos} />
+      <LineItemsBlock
+        title="Emolumentos & Taxas académicas"
+        subtitle="Inscrições, matrículas, declarações, certificados, 2ª via de cartão, etc."
+        icon={Receipt}
+        storageKey={KEY("taxas", email)}
+        withTarget
+        addLabel="Adicionar taxa"
+        placeholder="Ex: Certidão de matrícula"
+        valueLabel="Valor (Kz)"
+      />
+    </div>
+  );
+}
+
+function PropinasBlock({ onAddCursos }: { onAddCursos: () => void }) {
   const { data: faculdades = [], isLoading: lF } = useFaculdades();
   const { data: cursos = [], isLoading: lC } = useCursos();
   const { data: propinas = [], isLoading: lP } = usePropinas();
@@ -115,199 +159,255 @@ function PropinasTab({ onAddCursos }: { onAddCursos: () => void }) {
     toast.success("Propina atualizada");
   };
 
-  if (loading) {
-    return <div className="flex items-center justify-center py-20 text-muted-foreground gap-2 text-sm"><Loader2 className="w-4 h-4 animate-spin" /> A carregar dados institucionais…</div>;
-  }
-
-  if (facWithCursos.length === 0) {
-    return (
-      <Card className="p-10 text-center">
-        <Building2 className="w-10 h-10 mx-auto text-muted-foreground/40 mb-3" />
-        <h3 className="font-semibold text-foreground">Sem faculdades nem cursos</h3>
-        <p className="text-sm text-muted-foreground mt-1 max-w-md mx-auto">
-          Comece por adicionar faculdades e cursos em <span className="font-medium text-foreground">Admin → Faculdades & Cursos</span>.
-          Cada curso novo aparece aqui com propina a 0 Kz.
-        </p>
-        <Button className="mt-5" onClick={onAddCursos}>Ir para Faculdades & Cursos</Button>
-      </Card>
-    );
-  }
-
-  return (
-    <div className="space-y-5">
-      {facWithCursos.map((f) => (
-        <Card key={f.id} className="overflow-hidden">
-          <div className="px-5 py-3 border-b bg-muted/30 flex items-center gap-2">
-            <Building2 className="w-4 h-4 text-primary" />
-            <h2 className="text-sm font-bold text-foreground">{f.name}</h2>
-            <span className="text-[11px] text-muted-foreground ml-auto">
-              {f.cursos.length} curso{f.cursos.length === 1 ? "" : "s"}
-            </span>
-          </div>
-          {f.cursos.length === 0 ? (
-            <div className="px-5 py-6 text-xs text-muted-foreground flex items-center gap-2">
-              <AlertCircle className="w-3.5 h-3.5" /> Sem cursos nesta faculdade.
-            </div>
-          ) : (
-            <div className="divide-y">
-              <div className="grid grid-cols-12 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
-                <div className="col-span-5">Curso</div>
-                <div className="col-span-3">Propina mensal (Kz)</div>
-                <div className="col-span-2">Imposto (0–1)</div>
-                <div className="col-span-2 text-right">Ação</div>
-              </div>
-              {f.cursos.map((c) => {
-                const p = propinaByCurso.get(c.id) ?? { valor_mensal: 0, imposto: 0 };
-                const d = draft[c.id];
-                const valorVal = d?.valor ?? String(p.valor_mensal);
-                const impVal = d?.imposto ?? String(p.imposto);
-                const dirty = d !== undefined;
-                return (
-                  <div key={c.id} className="grid grid-cols-12 px-5 py-3 items-center text-sm">
-                    <div className="col-span-5 flex items-center gap-2 min-w-0">
-                      <GraduationCap className="w-4 h-4 text-muted-foreground shrink-0" />
-                      <div className="min-w-0">
-                        <p className="font-medium truncate">{c.name}</p>
-                        <p className="text-[11px] text-muted-foreground font-mono">{c.code} · {c.years} anos</p>
-                      </div>
-                    </div>
-                    <div className="col-span-3">
-                      <Input type="number" min={0} className="h-9 tabular-nums"
-                        value={valorVal}
-                        onChange={(e) => setDraft((s) => ({ ...s, [c.id]: { valor: e.target.value, imposto: impVal } }))} />
-                    </div>
-                    <div className="col-span-2">
-                      <Input type="number" step="0.01" min={0} max={1} className="h-9 tabular-nums"
-                        value={impVal}
-                        onChange={(e) => setDraft((s) => ({ ...s, [c.id]: { valor: valorVal, imposto: e.target.value } }))} />
-                    </div>
-                    <div className="col-span-2 flex justify-end">
-                      <Button size="sm" variant={dirty ? "default" : "outline"}
-                        disabled={!dirty || updatePropina.isPending}
-                        onClick={() => save(c.id)} className="gap-1.5">
-                        <Save className="w-3.5 h-3.5" /> Guardar
-                      </Button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </Card>
-      ))}
-    </div>
-  );
-}
-
-/* ───────────────────────────── Emolumentos & Taxas ────────────────────────── */
-
-const DEFAULT_TAXAS: TaxaRow[] = [];
-
-function TaxasTab({ storageKey }: { storageKey: string }) {
-  const [rows, setRows] = useState<TaxaRow[]>(() => readJSON<TaxaRow[]>(storageKey, DEFAULT_TAXAS));
-  useEffect(() => writeJSON(storageKey, rows), [rows, storageKey]);
-
-  const add = () => setRows((r) => [...r, { id: newId(), nome: "", valor: 0 }]);
-  const update = (id: string, patch: Partial<TaxaRow>) => setRows((r) => r.map((x) => x.id === id ? { ...x, ...patch } : x));
-  const remove = (id: string) => setRows((r) => r.filter((x) => x.id !== id));
-
-  const total = rows.reduce((s, r) => s + (r.valor || 0), 0);
-
   return (
     <Card className="overflow-hidden">
       <div className="px-5 py-3 border-b bg-muted/30 flex items-center gap-2">
-        <Receipt className="w-4 h-4 text-primary" />
-        <h2 className="text-sm font-bold text-foreground">Emolumentos & Taxas académicas</h2>
+        <Wallet className="w-4 h-4 text-primary" />
+        <h2 className="text-sm font-bold text-foreground">Propinas por curso</h2>
         <span className="text-[11px] text-muted-foreground ml-auto">
-          {rows.length} item{rows.length === 1 ? "" : "s"} · soma {fmt(total)} Kz
+          Valor mensal pago pelo estudante · alimenta Finanças → Receitas
         </span>
       </div>
-      <div className="divide-y">
-        <div className="grid grid-cols-12 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
-          <div className="col-span-8">Designação</div>
-          <div className="col-span-3">Valor (Kz)</div>
-          <div className="col-span-1 text-right">Ação</div>
+
+      {loading ? (
+        <div className="flex items-center justify-center py-12 text-muted-foreground gap-2 text-sm">
+          <Loader2 className="w-4 h-4 animate-spin" /> A carregar…
         </div>
-        {rows.length === 0 ? (
-          <div className="px-5 py-10 text-center text-xs text-muted-foreground">Sem taxas configuradas.</div>
-        ) : rows.map((r) => (
-          <div key={r.id} className="grid grid-cols-12 px-5 py-2.5 items-center text-sm">
-            <div className="col-span-8 pr-3">
-              <Input className="h-9" placeholder="Ex: Certidão de matrícula" value={r.nome}
-                onChange={(e) => update(r.id, { nome: e.target.value })} />
-            </div>
-            <div className="col-span-3 pr-3">
-              <Input type="number" min={0} className="h-9 tabular-nums" value={r.valor}
-                onChange={(e) => update(r.id, { valor: Number(e.target.value) || 0 })} />
-            </div>
-            <div className="col-span-1 flex justify-end">
-              <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                onClick={() => remove(r.id)}><Trash2 className="w-3.5 h-3.5" /></Button>
-            </div>
+      ) : facWithCursos.length === 0 ? (
+        <div className="px-5 py-10 text-center">
+          <Building2 className="w-10 h-10 mx-auto text-muted-foreground/40 mb-3" />
+          <h3 className="font-semibold text-foreground text-sm">Sem faculdades nem cursos</h3>
+          <p className="text-xs text-muted-foreground mt-1 max-w-md mx-auto">
+            Comece por adicionar faculdades e cursos. Cada curso novo aparece aqui com propina a 0 Kz.
+          </p>
+          <Button className="mt-4" size="sm" onClick={onAddCursos}>Ir para Faculdades & Cursos</Button>
+        </div>
+      ) : (
+        <div className="divide-y">
+          <div className="grid grid-cols-12 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
+            <div className="col-span-5">Faculdade · Curso</div>
+            <div className="col-span-3">Propina mensal (Kz)</div>
+            <div className="col-span-2">Imposto (0–1)</div>
+            <div className="col-span-2 text-right">Ação</div>
           </div>
-        ))}
-      </div>
-      <div className="px-5 py-3 border-t bg-muted/10">
-        <Button size="sm" variant="outline" className="gap-1.5" onClick={add}>
-          <Plus className="w-3.5 h-3.5" /> Adicionar taxa
-        </Button>
-      </div>
+          {facWithCursos.flatMap((f) =>
+            f.cursos.length === 0
+              ? [(
+                  <div key={`empty-${f.id}`} className="grid grid-cols-12 px-5 py-2.5 items-center text-xs text-muted-foreground">
+                    <div className="col-span-12 flex items-center gap-2">
+                      <AlertCircle className="w-3.5 h-3.5" />
+                      <span className="font-medium text-foreground">{f.name}</span> · sem cursos
+                    </div>
+                  </div>
+                )]
+              : f.cursos.map((c) => {
+                  const p = propinaByCurso.get(c.id) ?? { valor_mensal: 0, imposto: 0 };
+                  const d = draft[c.id];
+                  const valorVal = d?.valor ?? String(p.valor_mensal);
+                  const impVal = d?.imposto ?? String(p.imposto);
+                  const dirty = d !== undefined;
+                  return (
+                    <div key={c.id} className="grid grid-cols-12 px-5 py-3 items-center text-sm">
+                      <div className="col-span-5 flex items-center gap-2 min-w-0">
+                        <GraduationCap className="w-4 h-4 text-muted-foreground shrink-0" />
+                        <div className="min-w-0">
+                          <p className="font-medium truncate">{c.name}</p>
+                          <p className="text-[11px] text-muted-foreground font-mono">
+                            {f.name} · {c.code} · {c.years} anos
+                          </p>
+                        </div>
+                      </div>
+                      <div className="col-span-3">
+                        <Input type="number" min={0} className="h-9 tabular-nums"
+                          value={valorVal}
+                          onChange={(e) => setDraft((s) => ({ ...s, [c.id]: { valor: e.target.value, imposto: impVal } }))} />
+                      </div>
+                      <div className="col-span-2">
+                        <Input type="number" step="0.01" min={0} max={1} className="h-9 tabular-nums"
+                          value={impVal}
+                          onChange={(e) => setDraft((s) => ({ ...s, [c.id]: { valor: valorVal, imposto: e.target.value } }))} />
+                      </div>
+                      <div className="col-span-2 flex justify-end">
+                        <Button size="sm" variant={dirty ? "default" : "outline"}
+                          disabled={!dirty || updatePropina.isPending}
+                          onClick={() => save(c.id)} className="gap-1.5">
+                          <Save className="w-3.5 h-3.5" /> Guardar
+                        </Button>
+                      </div>
+                    </div>
+                  );
+                }),
+          )}
+        </div>
+      )}
     </Card>
   );
 }
 
-/* ───────────────────────────── Multas ─────────────────────────────────────── */
+/* ═══════════════════════════════ DESPESAS ═════════════════════════════════ */
 
-const DEFAULT_MULTAS: MultaRow[] = [];
+function DespesasSection({ email }: { email?: string | null }) {
+  return (
+    <div className="space-y-6">
+      <LineItemsBlock
+        title="Categorias de despesa"
+        subtitle="Rubricas usadas para classificar todas as despesas registadas em Finanças → Despesas."
+        icon={TrendingDown}
+        storageKey={KEY("despesas", email)}
+        addLabel="Adicionar categoria"
+        placeholder="Ex: Infraestrutura, Material didáctico, Serviços e utilities…"
+        valueLabel="Orçamento mensal (Kz)"
+      />
+    </div>
+  );
+}
 
-function MultasTab({ storageKey }: { storageKey: string }) {
-  const [rows, setRows] = useState<MultaRow[]>(() => readJSON<MultaRow[]>(storageKey, DEFAULT_MULTAS));
+/* ═══════════════════════════════ SALÁRIOS ═════════════════════════════════ */
+
+function SalariosSection({ email }: { email?: string | null }) {
+  return (
+    <div className="space-y-6">
+      <LineItemsBlock
+        title="Escalões salariais — Docentes"
+        subtitle="Categorias e valores base aplicados aos docentes."
+        icon={GraduationCap}
+        storageKey={KEY("sal.docentes", email)}
+        addLabel="Adicionar escalão de docente"
+        placeholder="Ex: Assistente, Professor Auxiliar, Professor Catedrático…"
+        valueLabel="Salário base (Kz)"
+      />
+      <LineItemsBlock
+        title="Escalões salariais — Staff"
+        subtitle="Categorias administrativas e técnicas."
+        icon={Briefcase}
+        storageKey={KEY("sal.staff", email)}
+        addLabel="Adicionar escalão de staff"
+        placeholder="Ex: Técnico, Coordenador, Diretor de serviços…"
+        valueLabel="Salário base (Kz)"
+      />
+    </div>
+  );
+}
+
+/* ═══════════════════════════════ MULTAS ═══════════════════════════════════ */
+
+function MultasSection({ email }: { email?: string | null }) {
+  return (
+    <div className="space-y-6">
+      <LineItemsBlock
+        title="Multas a estudantes"
+        subtitle="Atrasos de pagamento, faltas a exames, devoluções tardias na biblioteca, etc."
+        icon={Users}
+        storageKey={KEY("mul.estudante", email)}
+        withUnit
+        addLabel="Adicionar multa de estudante"
+        placeholder="Ex: Atraso no pagamento de propina"
+        valueLabel="Valor"
+      />
+      <LineItemsBlock
+        title="Multas a docentes & staff"
+        subtitle="Atrasos no lançamento de notas, faltas não justificadas, etc."
+        icon={BookOpenCheck}
+        storageKey={KEY("mul.docente", email)}
+        withUnit
+        addLabel="Adicionar multa de docente/staff"
+        placeholder="Ex: Atraso no lançamento de notas"
+        valueLabel="Valor"
+      />
+    </div>
+  );
+}
+
+/* ═══════════════════════════════ Generic block ════════════════════════════ */
+
+function LineItemsBlock({
+  title, subtitle, icon: Icon, storageKey, addLabel, placeholder, valueLabel,
+  withUnit = false, withTarget = false,
+}: {
+  title: string;
+  subtitle: string;
+  icon: React.ComponentType<{ className?: string }>;
+  storageKey: string;
+  addLabel: string;
+  placeholder: string;
+  valueLabel: string;
+  withUnit?: boolean;
+  withTarget?: boolean;
+}) {
+  const [rows, setRows] = useState<LineItem[]>(() => readJSON<LineItem[]>(storageKey, []));
   useEffect(() => writeJSON(storageKey, rows), [rows, storageKey]);
 
-  const add = () => setRows((r) => [...r, { id: newId(), nome: "", valor: 0, unidade: "Kz" }]);
-  const update = (id: string, patch: Partial<MultaRow>) => setRows((r) => r.map((x) => x.id === id ? { ...x, ...patch } : x));
+  const add = () => setRows((r) => [...r, { id: newId(), nome: "", valor: 0, ...(withUnit ? { unidade: "Kz" } : {}), ...(withTarget ? { aplicaA: "estudante" } : {}) }]);
+  const update = (id: string, patch: Partial<LineItem>) => setRows((r) => r.map((x) => x.id === id ? { ...x, ...patch } : x));
   const remove = (id: string) => setRows((r) => r.filter((x) => x.id !== id));
+
+  const total = rows.reduce((s, r) => s + (r.valor || 0), 0);
+
+  const cols = (() => {
+    if (withUnit) return "grid-cols-[1fr_140px_120px_40px]";
+    if (withTarget) return "grid-cols-[1fr_140px_150px_40px]";
+    return "grid-cols-[1fr_180px_40px]";
+  })();
 
   return (
     <Card className="overflow-hidden">
       <div className="px-5 py-3 border-b bg-muted/30 flex items-center gap-2">
-        <Banknote className="w-4 h-4 text-primary" />
-        <h2 className="text-sm font-bold text-foreground">Multas e penalizações</h2>
-        <span className="text-[11px] text-muted-foreground ml-auto">{rows.length} regra{rows.length === 1 ? "" : "s"}</span>
-      </div>
-      <div className="divide-y">
-        <div className="grid grid-cols-12 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
-          <div className="col-span-6">Designação</div>
-          <div className="col-span-3">Valor</div>
-          <div className="col-span-2">Unidade</div>
-          <div className="col-span-1 text-right">Ação</div>
+        <Icon className="w-4 h-4 text-primary" />
+        <div className="min-w-0">
+          <h2 className="text-sm font-bold text-foreground">{title}</h2>
+          <p className="text-[11px] text-muted-foreground">{subtitle}</p>
         </div>
+        <span className="text-[11px] text-muted-foreground ml-auto tabular-nums shrink-0">
+          {rows.length} item{rows.length === 1 ? "" : "s"} · soma {fmt(total)} Kz
+        </span>
+      </div>
+
+      <div className="divide-y">
+        <div className={`grid ${cols} gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10`}>
+          <div>Designação</div>
+          <div>{valueLabel}</div>
+          {withUnit && <div>Unidade</div>}
+          {withTarget && <div>Aplica-se a</div>}
+          <div className="text-right">Ação</div>
+        </div>
+
         {rows.length === 0 ? (
-          <div className="px-5 py-10 text-center text-xs text-muted-foreground">Sem multas configuradas.</div>
+          <div className="px-5 py-10 text-center text-xs text-muted-foreground">
+            Sem itens configurados. Clique em <span className="font-medium text-foreground">{addLabel}</span> para começar.
+          </div>
         ) : rows.map((r) => (
-          <div key={r.id} className="grid grid-cols-12 px-5 py-2.5 items-center text-sm">
-            <div className="col-span-6 pr-3">
-              <Input className="h-9" placeholder="Ex: Atraso na entrega de trabalho" value={r.nome}
-                onChange={(e) => update(r.id, { nome: e.target.value })} />
-            </div>
-            <div className="col-span-3 pr-3">
-              <Input type="number" min={0} className="h-9 tabular-nums" value={r.valor}
-                onChange={(e) => update(r.id, { valor: Number(e.target.value) || 0 })} />
-            </div>
-            <div className="col-span-2 pr-3">
-              <Input className="h-9" placeholder="Kz / dia" value={r.unidade}
+          <div key={r.id} className={`grid ${cols} gap-3 px-5 py-2.5 items-center text-sm`}>
+            <Input className="h-9" placeholder={placeholder} value={r.nome}
+              onChange={(e) => update(r.id, { nome: e.target.value })} />
+            <Input type="number" min={0} className="h-9 tabular-nums" value={r.valor}
+              onChange={(e) => update(r.id, { valor: Number(e.target.value) || 0 })} />
+            {withUnit && (
+              <Input className="h-9" placeholder="Kz / dia" value={r.unidade || ""}
                 onChange={(e) => update(r.id, { unidade: e.target.value })} />
-            </div>
-            <div className="col-span-1 flex justify-end">
+            )}
+            {withTarget && (
+              <select
+                className="h-9 rounded-md border border-input bg-background px-2 text-sm"
+                value={r.aplicaA || "estudante"}
+                onChange={(e) => update(r.id, { aplicaA: e.target.value as LineItem["aplicaA"] })}
+              >
+                <option value="estudante">Estudante</option>
+                <option value="docente">Docente</option>
+                <option value="staff">Staff</option>
+                <option value="todos">Todos</option>
+              </select>
+            )}
+            <div className="flex justify-end">
               <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
                 onClick={() => remove(r.id)}><Trash2 className="w-3.5 h-3.5" /></Button>
             </div>
           </div>
         ))}
       </div>
+
       <div className="px-5 py-3 border-t bg-muted/10">
         <Button size="sm" variant="outline" className="gap-1.5" onClick={add}>
-          <Plus className="w-3.5 h-3.5" /> Adicionar multa
+          <Plus className="w-3.5 h-3.5" /> {addLabel}
         </Button>
       </div>
     </Card>
