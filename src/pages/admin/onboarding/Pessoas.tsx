@@ -123,10 +123,21 @@ export default function OnboardingPessoas({ mode }: { mode: Mode }) {
                 <Mail className="w-3 h-3" /> O email <span className="font-semibold">@upra.kor</span> é gerado automaticamente após confirmação.
               </p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
               <div>
-                <Label className="text-xs">Nome completo *</Label>
-                <Input className="h-9" placeholder="Ex: Maria Silva" value={draft.nome} onChange={e => setDraft({ ...draft, nome: e.target.value })} />
+                <Label className="text-xs">Prefixo</Label>
+                <Select value={draft.prefixo} onValueChange={v => setDraft({ ...draft, prefixo: v })}>
+                  <SelectTrigger className="h-9"><SelectValue placeholder="—" /></SelectTrigger>
+                  <SelectContent>{prefixosPool.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label className="text-xs">Primeiro nome *</Label>
+                <Input className="h-9" placeholder="Ex: Maria" value={primeiroNome} onChange={e => setPrimeiroNome(e.target.value)} />
+              </div>
+              <div>
+                <Label className="text-xs">Último nome *</Label>
+                <Input className="h-9" placeholder="Ex: Silva" value={ultimoNome} onChange={e => setUltimoNome(e.target.value)} />
               </div>
               <div>
                 <Label className="text-xs">Contacto</Label>
@@ -141,24 +152,26 @@ export default function OnboardingPessoas({ mode }: { mode: Mode }) {
                   </Select>
                 </div>
               ) : (
-                <>
-                  <div>
-                    <Label className="text-xs">Departamento</Label>
-                    <Select value={draft.departamento} onValueChange={v => setDraft({ ...draft, departamento: v })}>
-                      <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
-                      <SelectContent>{departamentosPool.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label className="text-xs">Função</Label>
-                    <Select value={draft.funcao} onValueChange={v => setDraft({ ...draft, funcao: v })}>
-                      <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
-                      <SelectContent>{funcoesPool.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-                    </Select>
-                  </div>
-                </>
+                <div>
+                  <Label className="text-xs">Departamento</Label>
+                  <Select value={draft.departamento} onValueChange={v => setDraft({ ...draft, departamento: v })}>
+                    <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                    <SelectContent>{departamentosPool.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
+                  </Select>
+                </div>
               )}
             </div>
+            {!isDoc && (
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
+                <div>
+                  <Label className="text-xs">Função</Label>
+                  <Select value={draft.funcao} onValueChange={v => setDraft({ ...draft, funcao: v })}>
+                    <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                    <SelectContent>{funcoesPool.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
+                  </Select>
+                </div>
+              </div>
+            )}
             <div className="flex justify-end">
               <Button onClick={add} className="gap-1.5"><UserPlus className="w-4 h-4" /> Adicionar</Button>
             </div>
