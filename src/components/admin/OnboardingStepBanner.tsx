@@ -10,18 +10,26 @@ type GroupMeta = { id: string; title: string; steps: StepMeta[] };
 // Single source of truth — mirrors src/pages/admin/Inicio.tsx
 export const ONBOARDING_GROUPS: GroupMeta[] = [
   {
-    id: "est", title: "Adicionar Estudantes",
+    id: "est", title: "Registar Discentes",
     steps: [
-      { key: "est.imp", title: "Registar estudantes", desc: "Importar lista via CSV/Excel ou adicionar manualmente.", path: "/admin/onboarding/estudantes?tab=importar&step=est.imp" },
+      { key: "est.imp", title: "Importar discentes", desc: "Carregar lista de discentes em lote.", path: "/admin/onboarding/estudantes?step=est.imp" },
+    ],
+  },
+  {
+    id: "inf", title: "Registar Geopontos do Campus",
+    steps: [
+      { key: "inf.esp", title: "Salas e edifícios", desc: "Registar todos os espaços físicos da instituição.", path: "/admin/onboarding/espacos?step=inf.esp" },
+      { key: "inf.geo", title: "Geopontos do campus", desc: "Definir pontos GPS de entradas, edifícios e zonas de presença.", path: "/admin/onboarding/espacos?tab=geopontos&step=inf.geo" },
     ],
   },
   {
     id: "aca", title: "Configurar Área Académica",
     steps: [
-      { key: "aca.fac", title: "Faculdades e cursos",   desc: "Confirmar faculdades, decanos e cursos da instituição.",        path: "/areaacademica/criador/faculdades?step=aca.fac" },
-      { key: "aca.cad", title: "Cadeiras",              desc: "Alocar cadeiras por curso, ano, semestre e docente.",            path: "/areaacademica/criador/cadeiras?step=aca.cad" },
-      { key: "aca.tur", title: "Turmas",                desc: "Gerar turmas e definir capacidade, sala e turno.",               path: "/areaacademica/criador/turmas?step=aca.tur" },
-      { key: "aca.cal", title: "Calendário académico",  desc: "Definir ano letivo, semestres, exames, feriados e férias.",      path: "/areaacademica/criador/calendario?step=aca.cal" },
+      { key: "aca.fac", title: "Faculdades", desc: "Criar as faculdades da instituição.", path: "/admin/faculdades-cursos?tab=faculdades&step=aca.fac" },
+      { key: "aca.cur", title: "Cursos", desc: "Criar cursos e associá-los às faculdades.", path: "/admin/faculdades-cursos?tab=cursos&step=aca.cur" },
+      { key: "aca.cad", title: "Cadeiras", desc: "Gerar cadeiras por curso, ano e semestre.", path: "/areaacademica/criador/cadeiras?step=aca.cad" },
+      { key: "aca.tur", title: "Turmas", desc: "Criar turmas e definir capacidade.", path: "/areaacademica/criador/turmas?step=aca.tur" },
+      { key: "aca.cal", title: "Calendário académico", desc: "Definir ano letivo, semestres e feriados.", path: "/areaacademica/criador/calendario?step=aca.cal" },
     ],
   },
   {
@@ -35,10 +43,10 @@ export const ONBOARDING_GROUPS: GroupMeta[] = [
   {
     id: "fin", title: "Configurar Finanças",
     steps: [
-      { key: "fin.prop",   title: "Propinas por curso",     desc: "Valores de propinas por curso e ano.",                       path: "/financas/configurar-receitas?step=fin.prop" },
-      { key: "fin.taxas",  title: "Emolumentos e serviços", desc: "Emolumentos administrativos e serviços académicos.",         path: "/financas/configurar-receitas?step=fin.taxas" },
-      { key: "fin.multas", title: "Multas",                 desc: "Tabela de multas e penalidades aplicáveis.",                 path: "/financas/configurar-receitas?step=fin.multas" },
-      { key: "fin.sal",    title: "Confirmar salários",     desc: "Bruto, imposto e líquido dos docentes e staff registados.",  path: "/admin/onboarding/salarios?step=fin.sal" },
+      { key: "fin.pro", title: "Propinas", desc: "Definir valores de propinas por curso e ano.", path: "/financas/configurador?tab=propinas&step=fin.pro" },
+      { key: "fin.emo", title: "Emolumentos e taxas", desc: "Configurar taxas e serviços académicos.", path: "/financas/configurador?tab=taxas&step=fin.emo" },
+      { key: "fin.mul", title: "Multas", desc: "Definir regras e valores de multas.", path: "/financas/configurador?tab=multas&step=fin.mul" },
+      { key: "fin.sal", title: "Salários", desc: "Configurar escalões e tabela salarial.", path: "/admin/onboarding/salarios?step=fin.sal" },
     ],
   },
   {
