@@ -138,7 +138,32 @@ export default function GapCandidaturas() {
         icon={<GraduationCap className="w-6 h-6 text-primary" />}
       />
 
-      {/* KPIs */}
+      {/* Submissões em tempo real do website público */}
+      {liveCands.length > 0 && (
+        <Card className="p-4 border-primary/30 bg-gradient-to-br from-primary/5 to-transparent">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center"><Globe className="w-4 h-4" /></div>
+            <div className="flex-1">
+              <h3 className="text-sm font-bold text-foreground">Submissões do site público</h3>
+              <p className="text-[11px] text-muted-foreground">Candidaturas recebidas directamente pelo formulário em upra.kor/candidatar.</p>
+            </div>
+            <Badge variant="secondary" className="text-[10px]">{liveCands.length} novas</Badge>
+          </div>
+          <div className="divide-y divide-border rounded-md border border-border bg-card">
+            {liveCands.map(c => (
+              <div key={c.id} className="px-3 py-2 flex items-center gap-3 text-sm">
+                <div className="flex-1 min-w-0">
+                  <div className="font-medium text-foreground truncate">{c.nome}</div>
+                  <div className="text-[11px] text-muted-foreground truncate">{c.email} · {c.faculdade || "—"} → {c.curso_pretendido || "—"}</div>
+                </div>
+                <Badge variant="outline" className="text-[10px] capitalize">{c.estado}</Badge>
+                <Badge variant={c.pagamento_status === "pago" ? "secondary" : "outline"} className="text-[10px] capitalize">{c.pagamento_status}</Badge>
+                <span className="text-[11px] text-muted-foreground tabular-nums">{new Date(c.created_at).toLocaleDateString("pt-PT")}</span>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {[
           { label: "Total", value: counts.todos, icon: Inbox, iconBg: "bg-muted text-muted-foreground" },
