@@ -256,6 +256,9 @@ const adminSections: NavSection[] = [
     { label: "Salas e Edifícios", icon: Building2, path: "/admin/salas" },
     { label: "Finanças", icon: Wallet, path: "/financas/configurador" },
   ]},
+  { title: "Acessos", items: [
+    { label: "Utilizadores", icon: Users, path: "/admin/utilizadores" },
+  ]},
 ];
 
 const roleSectionsMap: Record<string, NavSection[]> = {
