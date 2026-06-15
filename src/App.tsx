@@ -208,15 +208,38 @@ function RoleGuardedLayout({ homeRedirect }: { homeRedirect: string }) {
   return <AppLayout />;
 }
 
+function isOnboardingComplete(): boolean {
+  try {
+    const raw = localStorage.getItem("upra.admin.onboarding");
+    if (!raw) return false;
+    return !!JSON.parse(raw).completed;
+  } catch { return false; }
+}
+
 function AppRoutes() {
   const { isAuthenticated, user } = useAuth();
   if (!isAuthenticated) return <Routes><Route path="/" element={<Website />} /><Route path="/site" element={<Website />} /><Route path="/candidatar" element={<Candidatar />} /><Route path="*" element={<Login />} /></Routes>;
   const homeRedirect = homeRedirectMap[user?.role || "student"] || "/student";
 
+  // Admin gate: before onboarding completion, force onboarding route (no app layout)
+  if (user?.role === "admin" && !isOnboardingComplete()) {
+    return (
+      <Routes>
+        <Route path="/admin/onboarding" element={<AdminOnboarding />} />
+        <Route path="*" element={<Navigate to="/admin/onboarding" replace />} />
+      </Routes>
+    );
+  }
+
   return (
     <Routes>
       <Route path="/" element={<Website />} />
+      <Route path="/admin/onboarding" element={<AdminOnboarding />} />
       <Route element={<RoleGuardedLayout homeRedirect={homeRedirect} />}>
+        {/* Admin */}
+        <Route path="/admin" element={<AdminInicio />} />
+        <Route path="/admin/calendario" element={<FinancasCalendario />} />
+        <Route path="/admin/anuncios" element={<AdminAnuncios />} />
         {/* Student */}
         <Route path="/student" element={<StudentDashboard />} />
         <Route path="/student/disciplines" element={<StudentDisciplines />} />
