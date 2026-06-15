@@ -126,17 +126,8 @@ export default function Website() {
           </nav>
 
           {/* Right action: Portal UPRA only */}
-          <div className="ml-auto shrink-0">
-            <Link to="/login">
-              <Button
-                size="sm"
-                variant="ghost"
-                className="h-10 gap-2 rounded-full px-4 text-sm font-semibold bg-primary/8 text-primary hover:bg-primary/12 hover:text-primary border border-primary/15"
-              >
-                <LogIn className="w-4 h-4" /> Portal UPRA
-              </Button>
-            </Link>
-          </div>
+          <PortalCta />
+
         </div>
 
         {/* Sub-bar: refined announcement strip + Candidatar-me CTA */}
