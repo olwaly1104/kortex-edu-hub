@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { ArrowLeft, ChevronRight, ShieldCheck, CheckCircle2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
