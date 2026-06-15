@@ -66,6 +66,20 @@ export default function Login() {
     return isOnboardingCompleteFor(forEmail);
   };
 
+  const DEMO_ROUTE: Record<string, string> = {
+    "admin@upra.kor": "/admin",
+    "2934@upra.kor": "/student",
+    "prof.silva@upra.kor": "/professor",
+    "coordcurso@upra.kor": "/coordenador",
+    "decano@upra.kor": "/decano",
+    "reitor@upra.kor": "/reitor",
+    "academica@upra.kor": "/secretaria",
+    "financas@upra.kor": "/financas",
+    "gap@upra.kor": "/gap",
+    "inscricoes@upra.kor": "/inscricoes",
+    "areaacademica2@upra.kor": "/area-academica-2",
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -77,10 +91,35 @@ export default function Login() {
     setSubmitting(true);
     try {
       const normalizedEmail = email.trim().toLowerCase();
-      // Try real account first; if a .kor demo email is not registered, fall back to local demo auth.
+      const isDemoAccount = DEMO_ACCOUNTS.some((a) => a.email === normalizedEmail);
+
+      // ── Preview (Lovable editor): apenas contas demo .kor com a palavra-passe demo
+      if (isPreviewHost()) {
+        if (!isDemoAccount) {
+          setError("No preview apenas contas demo (.kor) podem entrar. Use 'Ver credenciais de demo'.");
+          return;
+        }
+        if (password !== DEMO_PASSWORD) {
+          setError("Palavra-passe incorrecta. Use a palavra-passe demo: " + DEMO_PASSWORD);
+          return;
+        }
+        const result = login(normalizedEmail, password);
+        if (!result.ok) {
+          setError(result.error || "Não foi possível iniciar sessão.");
+          return;
+        }
+        if (normalizedEmail.startsWith("admin")) {
+          navigate(isOnboardingDone(normalizedEmail) ? "/admin" : "/admin/onboarding");
+          return;
+        }
+        navigate(DEMO_ROUTE[normalizedEmail] ?? "/student");
+        return;
+      }
+
+      // ── Published site: tenta conta real no Lovable Cloud; fallback demo apenas com password demo
       const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({ email: normalizedEmail, password });
       if (signInError) {
-        if (normalizedEmail.endsWith(".kor")) {
+        if (isDemoAccount && password === DEMO_PASSWORD) {
           const result = login(normalizedEmail, password);
           if (!result.ok) {
             setError(result.error || "Não foi possível iniciar sessão.");
@@ -88,7 +127,9 @@ export default function Login() {
           }
           if (normalizedEmail.startsWith("admin")) {
             navigate(isOnboardingDone(normalizedEmail) ? "/admin" : "/admin/onboarding");
+            return;
           }
+          navigate(DEMO_ROUTE[normalizedEmail] ?? "/student");
           return;
         }
         setError(signInError.message || "Credenciais inválidas.");
@@ -120,9 +161,7 @@ export default function Login() {
       const target = MODULE_TO_DEMO[modulo] ?? MODULE_TO_DEMO.estudante;
       const accountEmail = signInData.user?.email || email;
       const displayName = (signInData.user?.user_metadata as any)?.display_name;
-      login(target.email, "olwaly", { sourceEmail: accountEmail, displayName });
-      // Admin (real cloud account): always run institutional onboarding (ficha de inscrição)
-      // before the inicio, until it's marked completed.
+      login(target.email, DEMO_PASSWORD, { sourceEmail: accountEmail, displayName });
       if (modulo === "admin" && !isOnboardingDone(accountEmail)) {
         navigate("/admin/onboarding");
         return;
