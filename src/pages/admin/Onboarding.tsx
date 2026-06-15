@@ -11,12 +11,12 @@ import { Building2, Loader2, Upload, CheckCircle2 } from "lucide-react";
 const STORAGE = "upra.admin.onboarding";
 
 interface OnboardingState {
-  dados: { nome: string; tipo: string; sigla: string; endereco: string; telefone: string; email: string; nif: string; logoDataUrl: string };
+  dados: { nome: string; tipo: string; sigla: string; provincia: string; municipio: string; endereco: string; telefone: string; email: string; nif: string; logoDataUrl: string };
   completed: boolean;
 }
 
 const initial: OnboardingState = {
-  dados: { nome: "", tipo: "", sigla: "", endereco: "", telefone: "", email: "", nif: "", logoDataUrl: "" },
+  dados: { nome: "", tipo: "", sigla: "", provincia: "", municipio: "", endereco: "", telefone: "", email: "", nif: "", logoDataUrl: "" },
   completed: false,
 };
 
@@ -135,8 +135,10 @@ export default function AdminOnboarding() {
             </Field>
             <Field label="Sigla"><Input value={state.dados.sigla} onChange={(e) => setDados({ sigla: e.target.value })} placeholder="UPRA" /></Field>
             <Field label="NIF"><Input value={state.dados.nif} onChange={(e) => setDados({ nif: e.target.value })} placeholder="5417000000" /></Field>
+            <Field label="Província"><Input value={state.dados.provincia} onChange={(e) => setDados({ provincia: e.target.value })} placeholder="Luanda" /></Field>
+            <Field label="Município"><Input value={state.dados.municipio} onChange={(e) => setDados({ municipio: e.target.value })} placeholder="Belas" /></Field>
             <Field label="Endereço" full>
-              <Textarea value={state.dados.endereco} onChange={(e) => setDados({ endereco: e.target.value })} placeholder="Rua, número, cidade, província" rows={2} />
+              <Input value={state.dados.endereco} onChange={(e) => setDados({ endereco: e.target.value })} placeholder="Rua, número, bairro" />
             </Field>
             <Field label="Telefone"><Input value={state.dados.telefone} onChange={(e) => setDados({ telefone: e.target.value })} placeholder="+244 000 000 000" /></Field>
             <Field label="Email institucional"><Input type="email" value={state.dados.email} onChange={(e) => setDados({ email: e.target.value })} placeholder="contacto@instituicao.ao" /></Field>
