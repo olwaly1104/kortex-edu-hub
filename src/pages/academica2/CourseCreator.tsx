@@ -8,10 +8,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cursoTemplates, cadeirasTemplate, alocacaoCandidatos } from "@/data/academica2Data";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   Sparkles, CheckCircle2, Loader2, Wand2, BookOpen, Users, Calendar, Rocket, RefreshCw,
   GraduationCap, ClipboardList, FileCheck2, CalendarDays, BrainCircuit, Megaphone, ChevronRight,
-  UserCog, Check, Pencil, Building2,
+  UserCog, Check, Pencil, Building2, ShieldCheck,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -24,12 +25,27 @@ interface Step {
   icon: typeof BookOpen;
 }
 
-const steps: Step[] = [
+const ADMIN_PROGRESS_KEY = "upra.admin.config.progress";
+const ADMIN_STEP_KEYS: Record<string, string> = {
+  faculdades: "aca.fac",
+  cadeiras: "aca.cad",
+  turmas: "aca.tur",
+  calendario: "aca.cal",
+};
+
+const stepsAcademica: Step[] = [
   { id: "faculdades", label: "Confirmar Faculdades & Cursos", description: "Validar faculdades, decanos e cursos (com coordenador) de cada uma.", icon: Building2 },
   { id: "cadeiras", label: "Confirmar Cadeiras", description: "Alocar cadeiras, docentes e banco de quizzes por curso.", icon: BookOpen },
   { id: "turmas", label: "Criar Turmas", description: "Alocar candidatos aprovados a turmas do 1º ano.", icon: ClipboardList },
   { id: "calendario", label: "Calendário Académico", description: "Semestres, feriados e mapa de exames (1ª e 2ª época).", icon: CalendarDays },
   { id: "publicar", label: "Publicar Ano Letivo", description: "Activar ano e notificar todos os perfis.", icon: Megaphone },
+];
+
+const stepsAdmin: Step[] = [
+  { id: "faculdades", label: "Confirmar Faculdades & Cursos", description: "Validar faculdades, decanos e cursos da instituição.", icon: Building2 },
+  { id: "cadeiras", label: "Confirmar Cadeiras", description: "Rever cadeiras, docentes e ECTS por curso.", icon: BookOpen },
+  { id: "turmas", label: "Confirmar Turmas", description: "Definir turmas iniciais e respectivas capacidades.", icon: ClipboardList },
+  { id: "calendario", label: "Calendário Académico", description: "Definir ano letivo, semestres, feriados e mapa de exames.", icon: CalendarDays },
 ];
 
 const coordenadoresPool = [
@@ -45,6 +61,9 @@ const docentesPool = [
 ];
 
 export default function CourseCreator() {
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
+  const steps = isAdmin ? stepsAdmin : stepsAcademica;
   const [anoLabel, setAnoLabel] = useState("2025/2026");
   const [startDate, setStartDate] = useState("01/09/2025");
   const [endDate, setEndDate] = useState("31/07/2026");
@@ -54,9 +73,14 @@ export default function CourseCreator() {
   const [sem2Start, setSem2Start] = useState("09/02/2026");
   const [sem2End, setSem2End] = useState("30/06/2026");
 
-  const [statuses, setStatuses] = useState<Record<string, StepStatus>>(
-    Object.fromEntries(steps.map(s => [s.id, "pending"])) as Record<string, StepStatus>
-  );
+  const [statuses, setStatuses] = useState<Record<string, StepStatus>>(() => {
+    if (isAdmin) {
+      let prog: Record<string, boolean> = {};
+      try { prog = JSON.parse(localStorage.getItem(ADMIN_PROGRESS_KEY) || "{}"); } catch {}
+      return Object.fromEntries(stepsAdmin.map(s => [s.id, prog[ADMIN_STEP_KEYS[s.id]] ? "done" : "pending"])) as Record<string, StepStatus>;
+    }
+    return Object.fromEntries(stepsAcademica.map(s => [s.id, "pending"])) as Record<string, StepStatus>;
+  });
   const [running, setRunning] = useState(false);
   const [active, setActive] = useState<string>("faculdades");
   const navigate = useNavigate();
@@ -143,26 +167,38 @@ export default function CourseCreator() {
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       <div className="rounded-xl border border-primary/30 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-6 flex items-center justify-between flex-wrap gap-3">
         <div>
-          <Badge className="mb-2 gap-1"><Sparkles className="w-3 h-3" /> Criador Automático</Badge>
-          <h1 className="text-2xl font-bold flex items-center gap-2"><Wand2 className="w-6 h-6 text-primary" /> Criador de Ano Letivo</h1>
-          <p className="text-muted-foreground mt-1 text-sm">Geração automática completa — sem prompts, basta executar.</p>
-        </div>
-        <div className="flex gap-2">
-          {doneCount === steps.length && (
-            <Button variant="outline" onClick={reset} className="gap-2"><RefreshCw className="w-4 h-4" /> Nova Geração</Button>
+          {isAdmin ? (
+            <>
+              <Badge className="mb-2 gap-1"><ShieldCheck className="w-3 h-3" /> Onboarding institucional</Badge>
+              <h1 className="text-2xl font-bold flex items-center gap-2"><GraduationCap className="w-6 h-6 text-primary" /> Configurar Área Académica</h1>
+              <p className="text-muted-foreground mt-1 text-sm">Confirme a estrutura académica da instituição passo a passo.</p>
+            </>
+          ) : (
+            <>
+              <Badge className="mb-2 gap-1"><Sparkles className="w-3 h-3" /> Criador Automático</Badge>
+              <h1 className="text-2xl font-bold flex items-center gap-2"><Wand2 className="w-6 h-6 text-primary" /> Criador de Ano Letivo</h1>
+              <p className="text-muted-foreground mt-1 text-sm">Geração automática completa — sem prompts, basta executar.</p>
+            </>
           )}
-          <Button onClick={runAll} disabled={running} className="gap-2">
-            {running ? <><Loader2 className="w-4 h-4 animate-spin" /> A gerar…</> : <><Rocket className="w-4 h-4" /> Gerar Tudo</>}
-          </Button>
         </div>
+        {!isAdmin && (
+          <div className="flex gap-2">
+            {doneCount === steps.length && (
+              <Button variant="outline" onClick={reset} className="gap-2"><RefreshCw className="w-4 h-4" /> Nova Geração</Button>
+            )}
+            <Button onClick={runAll} disabled={running} className="gap-2">
+              {running ? <><Loader2 className="w-4 h-4 animate-spin" /> A gerar…</> : <><Rocket className="w-4 h-4" /> Gerar Tudo</>}
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Top progress bar */}
       <Card className="p-4">
         <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
           <div className="flex items-center gap-2 text-sm">
-            <span className="font-semibold">Progresso do Ano Letivo</span>
-            <Badge variant="outline" className="text-xs">{anoLabel}</Badge>
+            <span className="font-semibold">{isAdmin ? "Progresso da configuração" : "Progresso do Ano Letivo"}</span>
+            {!isAdmin && <Badge variant="outline" className="text-xs">{anoLabel}</Badge>}
           </div>
           <span className="text-xs text-muted-foreground">{doneCount} de {steps.length} passos concluídos</span>
         </div>
@@ -184,8 +220,9 @@ export default function CourseCreator() {
         </div>
       </Card>
 
-      <div className="grid lg:grid-cols-[320px_1fr] gap-6">
-        {/* LEFT: Parameters */}
+      <div className={isAdmin ? "" : "grid lg:grid-cols-[320px_1fr] gap-6"}>
+        {/* LEFT: Parameters — academica only */}
+        {!isAdmin && (
         <Card className="p-5 space-y-4 h-fit">
           <h2 className="text-base font-semibold flex items-center gap-2"><Calendar className="w-4 h-4 text-primary" /> Parâmetros do Ano</h2>
 
@@ -215,6 +252,7 @@ export default function CourseCreator() {
             </div>
           </div>
         </Card>
+        )}
 
 
         {/* RIGHT: Steps + Detail */}
