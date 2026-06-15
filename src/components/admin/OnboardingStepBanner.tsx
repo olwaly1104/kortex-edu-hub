@@ -70,6 +70,7 @@ function markDone(email: string | null | undefined, key: string) {
   const cur = readOnboardingProgress(email);
   cur[key] = true;
   try { localStorage.setItem(progressKey(email), JSON.stringify(cur)); } catch {}
+  pushProgress(email, cur);
 }
 
 /** Hook — true when an admin is currently inside an onboarding step (URL has ?step=valid-key). */
