@@ -71,11 +71,11 @@ const GROUPS: Group[] = [
     subtitle: "Faculdades, cursos, cadeiras, turmas e calendário académico",
     icon: School,
     steps: [
+      { key: "aca.cal", title: "Ano letivo & calendário", desc: "Definir ano letivo, semestres e feriados antes de tudo.", icon: CalendarDays, path: "/areaacademica/criador/calendario?step=aca.cal" },
       { key: "aca.fac", title: "Faculdades", desc: "Criar as faculdades da instituição.", icon: Building2, path: "/admin/faculdades-cursos?tab=faculdades&step=aca.fac" },
       { key: "aca.cur", title: "Cursos", desc: "Criar cursos e associá-los às faculdades.", icon: GraduationCap, path: "/admin/faculdades-cursos?tab=cursos&step=aca.cur" },
       { key: "aca.cad", title: "Cadeiras", desc: "Gerar cadeiras por curso, ano e semestre.", icon: BookOpen, path: "/areaacademica/criador/cadeiras?step=aca.cad" },
       { key: "aca.tur", title: "Turmas", desc: "Criar turmas e definir capacidade.", icon: Layers, path: "/areaacademica/criador/turmas?step=aca.tur" },
-      { key: "aca.cal", title: "Calendário académico", desc: "Definir ano letivo, semestres e feriados.", icon: CalendarDays, path: "/areaacademica/criador/calendario?step=aca.cal" },
     ],
   },
   {
