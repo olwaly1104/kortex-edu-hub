@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cursoTemplates, cadeirasTemplate, alocacaoCandidatos } from "@/data/academica2Data";
 import { useAuth } from "@/contexts/AuthContext";
+import { progressKey } from "@/lib/onboardingStorage";
 import {
   Sparkles, CheckCircle2, Loader2, Wand2, BookOpen, Users, Calendar, Rocket, RefreshCw,
   GraduationCap, ClipboardList, FileCheck2, CalendarDays, BrainCircuit, Megaphone, ChevronRight,
@@ -25,7 +26,6 @@ interface Step {
   icon: typeof BookOpen;
 }
 
-const ADMIN_PROGRESS_KEY = "upra.admin.config.progress";
 const ADMIN_STEP_KEYS: Record<string, string> = {
   faculdades: "aca.fac",
   cadeiras: "aca.cad",
@@ -76,7 +76,7 @@ export default function CourseCreator() {
   const [statuses, setStatuses] = useState<Record<string, StepStatus>>(() => {
     if (isAdmin) {
       let prog: Record<string, boolean> = {};
-      try { prog = JSON.parse(localStorage.getItem(ADMIN_PROGRESS_KEY) || "{}"); } catch {}
+      try { prog = JSON.parse(localStorage.getItem(progressKey(user?.email)) || "{}"); } catch {}
       return Object.fromEntries(stepsAdmin.map(s => [s.id, prog[ADMIN_STEP_KEYS[s.id]] ? "done" : "pending"])) as Record<string, StepStatus>;
     }
     return Object.fromEntries(stepsAcademica.map(s => [s.id, "pending"])) as Record<string, StepStatus>;
