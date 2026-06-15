@@ -150,7 +150,7 @@ export default function Candidatar() {
   const prev = () => { setErrors(new Set()); setStep(s => Math.max(1, s - 1)); window.scrollTo({ top: 0, behavior: "smooth" }); };
   const goTo = (n: number) => { setErrors(new Set()); setStep(n); window.scrollTo({ top: 0, behavior: "smooth" }); };
 
-  const submit = () => {
+  const submit = async () => {
     const missing = new Set<string>();
     if (!form.confirmar) missing.add("confirmar");
     if (!form.docAutenticos) missing.add("docAutenticos");
@@ -160,6 +160,25 @@ export default function Candidatar() {
       return;
     }
     const ref = `CAND-2026-${String(Math.floor(Math.random() * 9000) + 1000)}`;
+    const documentos = Object.entries(docs)
+      .filter(([, v]) => v)
+      .map(([k, v]) => ({ tipo: k, nome: v!.name, tamanho: v!.size }));
+    try {
+      const { supabase } = await import("@/integrations/supabase/client");
+      await supabase.from("candidaturas" as any).insert({
+        nome: `${form.primeiroNome} ${form.ultimoNome}`.trim(),
+        email: form.email,
+        telefone: form.telemovel,
+        curso_pretendido: form.curso1,
+        faculdade: form.fac1,
+        sessao: null,
+        documentos,
+        origem: "site",
+        notas: form.motivacao || null,
+      } as any);
+    } catch (err) {
+      console.warn("candidatura insert failed", err);
+    }
     setDone(ref);
     toast({ title: "Candidatura submetida", description: `${ref} — receberá confirmação por email.` });
   };
