@@ -36,6 +36,7 @@ const buildDefault = (years: number, estudantesEsperados: number): CursoTurmas =
 };
 
 export default function CriarTurmas() {
+  const isOnboarding = useIsOnboardingStep();
   const [data, setData] = useState<Record<string, CursoTurmas>>(() =>
     Object.fromEntries(cursoTemplates.map(c => [c.id, buildDefault(c.years, c.estudantesEsperados)]))
   );
@@ -87,14 +88,13 @@ export default function CriarTurmas() {
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
-      {(() => null)()}
       <OnboardingStepBanner actions={
         <>
           <Button onClick={regenerate} size="sm" variant="outline" className="gap-1 h-8"><Wand2 className="w-3.5 h-3.5" /> Regenerar</Button>
           <Button onClick={() => toast.success("Turmas confirmadas para todos os cursos")} size="sm" variant="outline" className="gap-1 h-8"><Check className="w-3.5 h-3.5" /> Confirmar</Button>
         </>
       } />
-      {!useIsOnboardingStep() && (
+      {!isOnboarding && (
         <div>
           <Link to="/areaacademica/criador" className="text-xs text-muted-foreground hover:text-primary inline-flex items-center gap-1 mb-2">
             <ArrowLeft className="w-3 h-3" /> Voltar ao Criador
