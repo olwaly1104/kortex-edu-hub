@@ -15,15 +15,12 @@ type Person = {
   id: string;
   nome: string;
   email: string;
-  faculdade?: string;
-  cadeira?: string;
+  contacto?: string;
   grau?: string;
   departamento?: string;
   funcao?: string;
 };
 
-const faculdadesPool = ["Ciências Exatas", "Ciências da Saúde", "Ciências Sociais"];
-const cadeirasPool   = ["Matemática I", "Algoritmos", "Anatomia", "Direito Civil", "Microeconomia"];
 const grausPool      = ["Licenciado", "Mestre", "Doutor", "Pós-doc"];
 
 const departamentosPool = ["Académica", "Finanças", "GAP", "TI", "Recursos Humanos", "Manutenção"];
@@ -34,23 +31,23 @@ export default function OnboardingPessoas({ mode }: { mode: Mode }) {
 
   const seed: Person[] = isDoc
     ? [
-        { id: "d1", nome: "Prof. Sofia Martins", email: "sofia.martins@upra.kor", faculdade: faculdadesPool[0], cadeira: "Matemática I", grau: "Doutor" },
-        { id: "d2", nome: "Prof. Carlos Mendes", email: "carlos.mendes@upra.kor", faculdade: faculdadesPool[1], cadeira: "Anatomia", grau: "Mestre" },
+        { id: "d1", nome: "Prof. Sofia Martins", email: "sofia.martins@upra.kor", contacto: "+244 923 000 001", grau: "Doutor" },
+        { id: "d2", nome: "Prof. Carlos Mendes", email: "carlos.mendes@upra.kor", contacto: "+244 923 000 002", grau: "Mestre" },
       ]
     : [
-        { id: "s1", nome: "Joana Pinto", email: "joana.pinto@upra.kor", departamento: "Académica", funcao: "Coordenador" },
-        { id: "s2", nome: "Rui Tavares", email: "rui.tavares@upra.kor", departamento: "TI", funcao: "Técnico" },
+        { id: "s1", nome: "Joana Pinto", email: "joana.pinto@upra.kor", contacto: "+244 923 100 001", departamento: "Académica", funcao: "Coordenador" },
+        { id: "s2", nome: "Rui Tavares", email: "rui.tavares@upra.kor", contacto: "+244 923 100 002", departamento: "TI", funcao: "Técnico" },
       ];
 
   const [rows, setRows] = useState<Person[]>(seed);
   const emptyDraft: Person = isDoc
-    ? { id: "", nome: "", email: "", faculdade: faculdadesPool[0], cadeira: cadeirasPool[0], grau: grausPool[2] }
-    : { id: "", nome: "", email: "", departamento: departamentosPool[0], funcao: funcoesPool[0] };
+    ? { id: "", nome: "", email: "", contacto: "", grau: grausPool[2] }
+    : { id: "", nome: "", email: "", contacto: "", departamento: departamentosPool[0], funcao: funcoesPool[0] };
   const [draft, setDraft] = useState<Person>(emptyDraft);
 
   const totals = useMemo(() => ({
     total: rows.length,
-    grupos: isDoc ? new Set(rows.map(r => r.faculdade)).size : new Set(rows.map(r => r.departamento)).size,
+    grupos: isDoc ? new Set(rows.map(r => r.grau)).size : new Set(rows.map(r => r.departamento)).size,
   }), [rows, isDoc]);
 
   const add = () => {
@@ -66,8 +63,8 @@ export default function OnboardingPessoas({ mode }: { mode: Mode }) {
 
   const simulateImport = () => {
     const generated: Person[] = Array.from({ length: 8 }).map((_, i) => isDoc
-      ? { id: `id-${Date.now()}-${i}`, nome: `Prof. Importado ${i + 1}`, email: `docente${i + 1}@upra.kor`, faculdade: faculdadesPool[i % faculdadesPool.length], cadeira: cadeirasPool[i % cadeirasPool.length], grau: grausPool[i % grausPool.length] }
-      : { id: `is-${Date.now()}-${i}`, nome: `Staff Importado ${i + 1}`, email: `staff${i + 1}@upra.kor`, departamento: departamentosPool[i % departamentosPool.length], funcao: funcoesPool[i % funcoesPool.length] }
+      ? { id: `id-${Date.now()}-${i}`, nome: `Prof. Importado ${i + 1}`, email: `docente${i + 1}@upra.kor`, contacto: `+244 923 200 00${i}`, grau: grausPool[i % grausPool.length] }
+      : { id: `is-${Date.now()}-${i}`, nome: `Staff Importado ${i + 1}`, email: `staff${i + 1}@upra.kor`, contacto: `+244 923 300 00${i}`, departamento: departamentosPool[i % departamentosPool.length], funcao: funcoesPool[i % funcoesPool.length] }
     );
     setRows(prev => [...prev, ...generated]);
     toast.success(`${generated.length} ${isDoc ? "docentes" : "funcionários"} importados`);
@@ -75,8 +72,8 @@ export default function OnboardingPessoas({ mode }: { mode: Mode }) {
 
   const HeaderIcon = isDoc ? GraduationCap : Briefcase;
   const grid = isDoc
-    ? "grid-cols-[1fr_1.2fr_1fr_1fr_110px_40px]"
-    : "grid-cols-[1fr_1.4fr_1fr_1fr_40px]";
+    ? "grid-cols-[1.2fr_1.4fr_1fr_1fr_40px]"
+    : "grid-cols-[1fr_1.4fr_1fr_1fr_1fr_40px]";
 
   return (
     <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6 animate-fade-in">
