@@ -34,19 +34,21 @@ export default function OnboardingPessoas({ mode }: { mode: Mode }) {
 
   const seed: Person[] = isDoc
     ? [
-        { id: "d1", nome: "Prof. Sofia Martins", email: "sofia.martins@upra.kor", contacto: "+244 923 000 001", grau: "Doutor" },
-        { id: "d2", nome: "Prof. Carlos Mendes", email: "carlos.mendes@upra.kor", contacto: "+244 923 000 002", grau: "Mestre" },
+        { id: "d1", prefixo: "Prof.", nome: "Sofia Martins", email: "sofia.martins@upra.kor", contacto: "+244 923 000 001", grau: "Doutor" },
+        { id: "d2", prefixo: "Prof.", nome: "Carlos Mendes", email: "carlos.mendes@upra.kor", contacto: "+244 923 000 002", grau: "Mestre" },
       ]
     : [
-        { id: "s1", nome: "Joana Pinto", email: "joana.pinto@upra.kor", contacto: "+244 923 100 001", departamento: "Académica", funcao: "Coordenador" },
-        { id: "s2", nome: "Rui Tavares", email: "rui.tavares@upra.kor", contacto: "+244 923 100 002", departamento: "TI", funcao: "Técnico" },
+        { id: "s1", prefixo: "Sra.", nome: "Joana Pinto", email: "joana.pinto@upra.kor", contacto: "+244 923 100 001", departamento: "Académica", funcao: "Coordenador" },
+        { id: "s2", prefixo: "Sr.", nome: "Rui Tavares", email: "rui.tavares@upra.kor", contacto: "+244 923 100 002", departamento: "TI", funcao: "Técnico" },
       ];
 
   const [rows, setRows] = useState<Person[]>(seed);
   const emptyDraft: Person = isDoc
-    ? { id: "", nome: "", email: "", contacto: "", grau: grausPool[2] }
-    : { id: "", nome: "", email: "", contacto: "", departamento: departamentosPool[0], funcao: funcoesPool[0] };
+    ? { id: "", prefixo: "", nome: "", email: "", contacto: "", grau: grausPool[2] }
+    : { id: "", prefixo: "", nome: "", email: "", contacto: "", departamento: departamentosPool[0], funcao: funcoesPool[0] };
   const [draft, setDraft] = useState<Person>(emptyDraft);
+  const [primeiroNome, setPrimeiroNome] = useState("");
+  const [ultimoNome, setUltimoNome] = useState("");
 
   const totals = useMemo(() => ({
     total: rows.length,
@@ -54,11 +56,14 @@ export default function OnboardingPessoas({ mode }: { mode: Mode }) {
   }), [rows, isDoc]);
 
   const add = () => {
-    if (!draft.nome.trim()) { toast.error("Nome é obrigatório"); return; }
-    const nome = draft.nome.trim();
-    const email = `${nome.toLowerCase().replace(/\s+/g, ".").normalize("NFD").replace(/[^a-z.]/g, "")}@upra.kor`;
-    setRows(prev => [...prev, { ...draft, email, id: String(Date.now()) }]);
+    if (!primeiroNome.trim() || !ultimoNome.trim()) { toast.error("Primeiro e último nome são obrigatórios"); return; }
+    const nome = `${primeiroNome.trim()} ${ultimoNome.trim()}`;
+    const emailBase = `${primeiroNome.trim().toLowerCase()}.${ultimoNome.trim().toLowerCase()}`.normalize("NFD").replace(/[^a-z.]/g, "");
+    const email = `${emailBase}@upra.kor`;
+    setRows(prev => [...prev, { ...draft, nome, email, id: String(Date.now()) }]);
     setDraft(emptyDraft);
+    setPrimeiroNome("");
+    setUltimoNome("");
     toast.success(`${isDoc ? "Docente" : "Funcionário"} adicionado. Email gerado: ${email}`);
   };
   const remove = (id: string) => setRows(prev => prev.filter(r => r.id !== id));
