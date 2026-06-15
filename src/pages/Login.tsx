@@ -80,7 +80,7 @@ export default function Login() {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setSuError("");
-    if (!suName.trim() || !suEmail.trim() || !suPassword) {
+    if (!suModulo || !suName.trim() || !suEmail.trim() || !suPassword) {
       setSuError("Preencha todos os campos.");
       return;
     }
@@ -89,26 +89,34 @@ export default function Login() {
       return;
     }
     setSuLoading(true);
-    const { error: signUpError } = await supabase.auth.signUp({
+    const { data: suData, error: signUpError } = await supabase.auth.signUp({
       email: suEmail.trim(),
       password: suPassword,
       options: {
-        data: { display_name: suName.trim() },
-        emailRedirectTo: `${window.location.origin}/student/chat`,
+        data: { display_name: suName.trim(), modulo: suModulo },
+        emailRedirectTo: `${window.location.origin}/`,
       },
     });
-    setSuLoading(false);
     if (signUpError) {
+      setSuLoading(false);
       setSuError(signUpError.message || "Não foi possível criar conta.");
       return;
     }
+    // Assign role
+    const userId = suData.user?.id;
+    if (userId) {
+      const { error: roleErr } = await supabase.from("user_roles" as any).insert({
+        user_id: userId,
+        role: suModulo,
+      } as any);
+      if (roleErr) console.warn("user_roles insert failed:", roleErr.message);
+    }
+    setSuLoading(false);
     setSignupOpen(false);
     setEmail(suEmail.trim());
     setPassword(suPassword);
-    setInfo("Conta criada. Inicie sessão para entrar no chat.");
-    setSuName("");
-    setSuEmail("");
-    setSuPassword("");
+    setInfo(`Conta ${suModulo} criada. Inicie sessão para entrar.`);
+    setSuName(""); setSuEmail(""); setSuPassword("");
   };
 
   return (
