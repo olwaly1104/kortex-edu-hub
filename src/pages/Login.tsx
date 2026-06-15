@@ -361,12 +361,9 @@ export default function Login() {
                         id="su-email"
                         type="email"
                         value={suEmail}
-                        onChange={(e) => setSuEmail(e.target.value)}
-                        placeholder={`${suModulo}@nomeasugerir.com`}
+                        onChange={(e) => { setSuEmailManuallyEdited(true); setSuEmail(e.target.value); }}
+                        placeholder="modulo@nome.kor"
                       />
-                      <p className="text-xs text-muted-foreground">
-                        Sugestão: <span className="font-mono">{suModulo}@nomeasugerir.com</span>
-                      </p>
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="su-password">Palavra-passe (mín. 6)</Label>
