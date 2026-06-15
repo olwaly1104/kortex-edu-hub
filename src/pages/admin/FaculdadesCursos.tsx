@@ -144,7 +144,14 @@ export default function AdminFaculdadesCursos() {
                   <div className="min-w-0">
                     <p className="text-[10px] uppercase tracking-wide text-muted-foreground leading-tight">Decano</p>
                     {f.editing ? (
-                      <Input value={f.decano} onChange={(e) => update(f.id, { decano: e.target.value })} placeholder="Nome do decano" className="h-6 text-xs border-0 px-0 shadow-none focus-visible:ring-0" />
+                      <Select value={f.decano || undefined} onValueChange={(v) => update(f.id, { decano: v })}>
+                        <SelectTrigger className="h-6 text-xs border-0 px-0 shadow-none focus:ring-0"><SelectValue placeholder={decanoOptions.length ? "Escolher" : "Sem docentes"} /></SelectTrigger>
+                        <SelectContent>
+                          {decanoOptions.length === 0 ? (
+                            <div className="px-2 py-1.5 text-xs text-muted-foreground">Registe docentes em Configurar → Docentes.</div>
+                          ) : decanoOptions.map((d) => <SelectItem key={d} value={d} className="text-xs">{d}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
                     ) : (
                       <p className="text-xs font-semibold leading-tight">{f.decano || <span className="text-muted-foreground italic font-normal">Por atribuir</span>}</p>
                     )}
@@ -186,7 +193,14 @@ export default function AdminFaculdadesCursos() {
                         <div className="min-w-0">
                           <p className="text-[9px] uppercase tracking-wide text-muted-foreground leading-tight">Coord.</p>
                           {f.editing ? (
-                            <Input value={c.coordenador} onChange={(e) => updateCurso(f.id, c.id, { coordenador: e.target.value })} placeholder="Nome" className="h-5 text-[11px] border-0 px-0 shadow-none focus-visible:ring-0 max-w-[140px]" />
+                            <Select value={c.coordenador || undefined} onValueChange={(v) => updateCurso(f.id, c.id, { coordenador: v })}>
+                              <SelectTrigger className="h-5 text-[11px] border-0 px-0 shadow-none focus:ring-0 gap-1 max-w-[140px]"><SelectValue placeholder={coordOptions.length ? "Escolher" : "Sem docentes"} /></SelectTrigger>
+                              <SelectContent>
+                                {coordOptions.length === 0 ? (
+                                  <div className="px-2 py-1.5 text-xs text-muted-foreground">Registe docentes primeiro.</div>
+                                ) : coordOptions.map((co) => <SelectItem key={co} value={co} className="text-xs">{co}</SelectItem>)}
+                              </SelectContent>
+                            </Select>
                           ) : (
                             <p className="text-[11px] font-semibold leading-tight truncate max-w-[140px]">{c.coordenador || <span className="text-muted-foreground italic font-normal">Por atribuir</span>}</p>
                           )}
@@ -219,7 +233,18 @@ export default function AdminFaculdadesCursos() {
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="fac-decano" className="text-xs">Decano <span className="text-muted-foreground font-normal">(opcional)</span></Label>
-              <Input id="fac-decano" value={newFac.decano} onChange={(e) => setNewFac({ ...newFac, decano: e.target.value })} placeholder="Nome do decano" />
+              {decanoOptions.length === 0 ? (
+                <div className="text-xs text-muted-foreground border border-dashed border-border rounded-md px-3 py-2">
+                  Nenhum docente registado. <Link to="/admin/docentes" className="text-primary underline">Adicionar em Docentes</Link>.
+                </div>
+              ) : (
+                <Select value={newFac.decano || undefined} onValueChange={(v) => setNewFac({ ...newFac, decano: v })}>
+                  <SelectTrigger id="fac-decano"><SelectValue placeholder="Escolher decano" /></SelectTrigger>
+                  <SelectContent>
+                    {decanoOptions.map((d) => <SelectItem key={d} value={d}>{d}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              )}
             </div>
           </div>
           <DialogFooter>
@@ -258,7 +283,18 @@ export default function AdminFaculdadesCursos() {
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="cur-coord" className="text-xs">Coordenador <span className="text-muted-foreground font-normal">(opcional)</span></Label>
-              <Input id="cur-coord" value={newCurso.coordenador} onChange={(e) => setNewCurso({ ...newCurso, coordenador: e.target.value })} placeholder="Nome do coordenador" />
+              {coordOptions.length === 0 ? (
+                <div className="text-xs text-muted-foreground border border-dashed border-border rounded-md px-3 py-2">
+                  Nenhum docente registado. <Link to="/admin/docentes" className="text-primary underline">Adicionar em Docentes</Link>.
+                </div>
+              ) : (
+                <Select value={newCurso.coordenador || undefined} onValueChange={(v) => setNewCurso({ ...newCurso, coordenador: v })}>
+                  <SelectTrigger id="cur-coord"><SelectValue placeholder="Escolher coordenador" /></SelectTrigger>
+                  <SelectContent>
+                    {coordOptions.map((co) => <SelectItem key={co} value={co}>{co}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              )}
             </div>
           </div>
           <DialogFooter>
