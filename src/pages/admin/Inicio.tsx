@@ -121,7 +121,7 @@ export default function AdminInicio() {
 
   const reset = () => {
     if (!confirm("Repor onboarding? Todos os dados introduzidos serão perdidos.")) return;
-    localStorage.removeItem("upra.admin.onboarding");
+    localStorage.removeItem(onboardingKey(user?.email));
     localStorage.removeItem(ADMIN_PROGRESS_KEY);
     navigate("/admin/onboarding");
   };
