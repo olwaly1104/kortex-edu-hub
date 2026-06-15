@@ -306,12 +306,68 @@ export default function ConfigurarReceitas() {
   const ANO_LETIVO = "2024 / 2025";
 
 
+  /* ── Backend institution data (admin only) ── */
+  const facsQ = useFaculdades();
+  const cursosQ = useCursos();
+  const propinasQ = usePropinas();
+  const updatePropina = useUpdatePropina();
+
+  const backendFaculties = useMemo(() => {
+    if (!isAdmin) return [] as typeof reitorFaculties;
+    const facs = facsQ.data ?? [];
+    const cursos = cursosQ.data ?? [];
+    return facs.map((f) => ({
+      id: f.id,
+      name: f.name,
+      courses: cursos
+        .filter((c) => c.faculdade_id === f.id)
+        .map((c) => ({ id: c.id, code: c.code, name: c.name, facultyName: f.name })),
+    })) as typeof reitorFaculties;
+  }, [isAdmin, facsQ.data, cursosQ.data]);
+
   /* ── RECEITAS ── */
   const [receitas, setReceitas] = useState<ReceitaRow[]>(() => (isAdmin ? [] : initialReceitas()));
-  const accountFaculties = isAdmin ? [] : reitorFaculties;
+  const accountFaculties = isAdmin ? backendFaculties : reitorFaculties;
   const [receitaFilter, setReceitaFilter] = useState<string>("todos");
   const [selectedFaculty, setSelectedFaculty] = useState<string | null>(null);
   const [multaSubtype, setMultaSubtype] = useState<TipoReceita>("Multa Estudante");
+
+  // Seed admin propina receitas from backend whenever cursos / propinas change.
+  useEffect(() => {
+    if (!isAdmin) return;
+    const cursos = cursosQ.data ?? [];
+    const propinas = propinasQ.data ?? [];
+    const propinaByCurso = new Map(propinas.map((p) => [p.curso_id, p]));
+    const next: ReceitaRow[] = cursos.map((c) => {
+      const p = propinaByCurso.get(c.id);
+      const valor = Number(p?.valor_mensal ?? 0);
+      return {
+        id: `propina-${c.id}`,
+        nome: `Propina mensal — ${c.name}`,
+        tipo: "Propina mensal" as const,
+        escopo: c.id,
+        valor,
+        plans: [{ months: 10, valor }],
+      };
+    });
+    setReceitas((prev) => {
+      // Preserve non-propina rows (matrículas, taxas, etc.) the admin may have added.
+      const others = prev.filter((r) => r.tipo !== "Propina mensal");
+      return [...next, ...others];
+    });
+  }, [isAdmin, cursosQ.data, propinasQ.data]);
+
+  // Persist propina value changes back to the backend.
+  const persistPropinaIfBackend = (rowId: string, valor: number) => {
+    if (!isAdmin) return;
+    const r = receitas.find((x) => x.id === rowId);
+    if (!r || r.tipo !== "Propina mensal") return;
+    const cursoId = r.escopo;
+    const isBackend = (cursosQ.data ?? []).some((c) => c.id === cursoId);
+    if (!isBackend) return;
+    updatePropina.mutate({ curso_id: cursoId, valor_mensal: valor });
+  };
+
 
   const [openReceitaSection, setOpenReceitaSection] = useState<SectionDef | null>(null);
   const [editingReceita, setEditingReceita] = useState<ReceitaRow | null>(null);
