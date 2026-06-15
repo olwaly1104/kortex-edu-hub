@@ -15,15 +15,12 @@ type Person = {
   id: string;
   nome: string;
   email: string;
-  faculdade?: string;
-  cadeira?: string;
+  contacto?: string;
   grau?: string;
   departamento?: string;
   funcao?: string;
 };
 
-const faculdadesPool = ["Ciências Exatas", "Ciências da Saúde", "Ciências Sociais"];
-const cadeirasPool   = ["Matemática I", "Algoritmos", "Anatomia", "Direito Civil", "Microeconomia"];
 const grausPool      = ["Licenciado", "Mestre", "Doutor", "Pós-doc"];
 
 const departamentosPool = ["Académica", "Finanças", "GAP", "TI", "Recursos Humanos", "Manutenção"];
@@ -34,23 +31,23 @@ export default function OnboardingPessoas({ mode }: { mode: Mode }) {
 
   const seed: Person[] = isDoc
     ? [
-        { id: "d1", nome: "Prof. Sofia Martins", email: "sofia.martins@upra.kor", faculdade: faculdadesPool[0], cadeira: "Matemática I", grau: "Doutor" },
-        { id: "d2", nome: "Prof. Carlos Mendes", email: "carlos.mendes@upra.kor", faculdade: faculdadesPool[1], cadeira: "Anatomia", grau: "Mestre" },
+        { id: "d1", nome: "Prof. Sofia Martins", email: "sofia.martins@upra.kor", contacto: "+244 923 000 001", grau: "Doutor" },
+        { id: "d2", nome: "Prof. Carlos Mendes", email: "carlos.mendes@upra.kor", contacto: "+244 923 000 002", grau: "Mestre" },
       ]
     : [
-        { id: "s1", nome: "Joana Pinto", email: "joana.pinto@upra.kor", departamento: "Académica", funcao: "Coordenador" },
-        { id: "s2", nome: "Rui Tavares", email: "rui.tavares@upra.kor", departamento: "TI", funcao: "Técnico" },
+        { id: "s1", nome: "Joana Pinto", email: "joana.pinto@upra.kor", contacto: "+244 923 100 001", departamento: "Académica", funcao: "Coordenador" },
+        { id: "s2", nome: "Rui Tavares", email: "rui.tavares@upra.kor", contacto: "+244 923 100 002", departamento: "TI", funcao: "Técnico" },
       ];
 
   const [rows, setRows] = useState<Person[]>(seed);
   const emptyDraft: Person = isDoc
-    ? { id: "", nome: "", email: "", faculdade: faculdadesPool[0], cadeira: cadeirasPool[0], grau: grausPool[2] }
-    : { id: "", nome: "", email: "", departamento: departamentosPool[0], funcao: funcoesPool[0] };
+    ? { id: "", nome: "", email: "", contacto: "", grau: grausPool[2] }
+    : { id: "", nome: "", email: "", contacto: "", departamento: departamentosPool[0], funcao: funcoesPool[0] };
   const [draft, setDraft] = useState<Person>(emptyDraft);
 
   const totals = useMemo(() => ({
     total: rows.length,
-    grupos: isDoc ? new Set(rows.map(r => r.faculdade)).size : new Set(rows.map(r => r.departamento)).size,
+    grupos: isDoc ? new Set(rows.map(r => r.grau)).size : new Set(rows.map(r => r.departamento)).size,
   }), [rows, isDoc]);
 
   const add = () => {
@@ -66,8 +63,8 @@ export default function OnboardingPessoas({ mode }: { mode: Mode }) {
 
   const simulateImport = () => {
     const generated: Person[] = Array.from({ length: 8 }).map((_, i) => isDoc
-      ? { id: `id-${Date.now()}-${i}`, nome: `Prof. Importado ${i + 1}`, email: `docente${i + 1}@upra.kor`, faculdade: faculdadesPool[i % faculdadesPool.length], cadeira: cadeirasPool[i % cadeirasPool.length], grau: grausPool[i % grausPool.length] }
-      : { id: `is-${Date.now()}-${i}`, nome: `Staff Importado ${i + 1}`, email: `staff${i + 1}@upra.kor`, departamento: departamentosPool[i % departamentosPool.length], funcao: funcoesPool[i % funcoesPool.length] }
+      ? { id: `id-${Date.now()}-${i}`, nome: `Prof. Importado ${i + 1}`, email: `docente${i + 1}@upra.kor`, contacto: `+244 923 200 00${i}`, grau: grausPool[i % grausPool.length] }
+      : { id: `is-${Date.now()}-${i}`, nome: `Staff Importado ${i + 1}`, email: `staff${i + 1}@upra.kor`, contacto: `+244 923 300 00${i}`, departamento: departamentosPool[i % departamentosPool.length], funcao: funcoesPool[i % funcoesPool.length] }
     );
     setRows(prev => [...prev, ...generated]);
     toast.success(`${generated.length} ${isDoc ? "docentes" : "funcionários"} importados`);
@@ -75,8 +72,8 @@ export default function OnboardingPessoas({ mode }: { mode: Mode }) {
 
   const HeaderIcon = isDoc ? GraduationCap : Briefcase;
   const grid = isDoc
-    ? "grid-cols-[1fr_1.2fr_1fr_1fr_110px_40px]"
-    : "grid-cols-[1fr_1.4fr_1fr_1fr_40px]";
+    ? "grid-cols-[1.2fr_1.4fr_1fr_1fr_40px]"
+    : "grid-cols-[1fr_1.4fr_1fr_1fr_1fr_40px]";
 
   return (
     <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6 animate-fade-in">
@@ -88,10 +85,10 @@ export default function OnboardingPessoas({ mode }: { mode: Mode }) {
         <Card className="p-4"><div className="flex items-center gap-1.5 text-muted-foreground mb-1"><CheckCircle2 className="w-3.5 h-3.5" /><p className="text-xs">Activos</p></div><p className="text-2xl font-bold text-emerald-600">{totals.total}</p></Card>
       </div>
 
-      <Tabs defaultValue="importar" className="space-y-4">
+      <Tabs defaultValue="manual" className="space-y-4">
         <TabsList className="grid grid-cols-2 w-full max-w-md">
-          <TabsTrigger value="importar" className="gap-1.5"><Upload className="w-3.5 h-3.5" /> Importar</TabsTrigger>
           <TabsTrigger value="manual" className="gap-1.5"><UserPlus className="w-3.5 h-3.5" /> Adicionar manualmente</TabsTrigger>
+          <TabsTrigger value="importar" className="gap-1.5"><Upload className="w-3.5 h-3.5" /> Importar</TabsTrigger>
         </TabsList>
 
         <TabsContent value="importar" className="mt-0">
@@ -118,35 +115,23 @@ export default function OnboardingPessoas({ mode }: { mode: Mode }) {
                 <Mail className="w-3 h-3" /> O email <span className="font-semibold">@upra.kor</span> é gerado automaticamente após confirmação.
               </p>
             </div>
-            <div className={`grid grid-cols-1 md:${isDoc ? "grid-cols-4" : "grid-cols-3"} gap-3`}>
-              <div className={isDoc ? "md:col-span-2" : "md:col-span-1"}>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div>
                 <Label className="text-xs">Nome completo *</Label>
                 <Input className="h-9" placeholder="Ex: Maria Silva" value={draft.nome} onChange={e => setDraft({ ...draft, nome: e.target.value })} />
               </div>
+              <div>
+                <Label className="text-xs">Contacto</Label>
+                <Input className="h-9" placeholder="+244 ..." value={draft.contacto || ""} onChange={e => setDraft({ ...draft, contacto: e.target.value })} />
+              </div>
               {isDoc ? (
-                <>
-                  <div>
-                    <Label className="text-xs">Faculdade</Label>
-                    <Select value={draft.faculdade} onValueChange={v => setDraft({ ...draft, faculdade: v })}>
-                      <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
-                      <SelectContent>{faculdadesPool.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label className="text-xs">Cadeira</Label>
-                    <Select value={draft.cadeira} onValueChange={v => setDraft({ ...draft, cadeira: v })}>
-                      <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
-                      <SelectContent>{cadeirasPool.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label className="text-xs">Grau académico</Label>
-                    <Select value={draft.grau} onValueChange={v => setDraft({ ...draft, grau: v })}>
-                      <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
-                      <SelectContent>{grausPool.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-                    </Select>
-                  </div>
-                </>
+                <div>
+                  <Label className="text-xs">Grau académico</Label>
+                  <Select value={draft.grau} onValueChange={v => setDraft({ ...draft, grau: v })}>
+                    <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                    <SelectContent>{grausPool.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
+                  </Select>
+                </div>
               ) : (
                 <>
                   <div>
@@ -180,29 +165,20 @@ export default function OnboardingPessoas({ mode }: { mode: Mode }) {
         </div>
         <div className={`grid ${grid} gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b`}>
           <span>Nome</span><span>Email</span>
-          {isDoc ? (<><span>Faculdade</span><span>Cadeira</span><span>Grau</span></>) : (<><span>Departamento</span><span>Função</span></>)}
+          {isDoc ? (<><span>Contacto</span><span>Grau</span></>) : (<><span>Contacto</span><span>Departamento</span><span>Função</span></>)}
           <span></span>
         </div>
         <div className="divide-y">
           {rows.map(r => (
             <div key={r.id} className={`grid ${grid} gap-2 px-4 py-2 items-center`}>
               <Input value={r.nome} onChange={e => update(r.id, { nome: e.target.value })} className="h-8 text-xs" />
-              <Input value={r.email} onChange={e => update(r.id, { email: e.target.value })} className="h-8 text-xs" />
+              <Input value={r.email} readOnly disabled className="h-8 text-xs bg-muted/40 cursor-not-allowed" />
+              <Input value={r.contacto || ""} onChange={e => update(r.id, { contacto: e.target.value })} className="h-8 text-xs" placeholder="+244 ..." />
               {isDoc ? (
-                <>
-                  <Select value={r.faculdade} onValueChange={v => update(r.id, { faculdade: v })}>
-                    <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                    <SelectContent>{faculdadesPool.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-                  </Select>
-                  <Select value={r.cadeira} onValueChange={v => update(r.id, { cadeira: v })}>
-                    <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                    <SelectContent>{cadeirasPool.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-                  </Select>
-                  <Select value={r.grau} onValueChange={v => update(r.id, { grau: v })}>
-                    <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                    <SelectContent>{grausPool.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-                  </Select>
-                </>
+                <Select value={r.grau} onValueChange={v => update(r.id, { grau: v })}>
+                  <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                  <SelectContent>{grausPool.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
+                </Select>
               ) : (
                 <>
                   <Select value={r.departamento} onValueChange={v => update(r.id, { departamento: v })}>
@@ -225,6 +201,7 @@ export default function OnboardingPessoas({ mode }: { mode: Mode }) {
           )}
         </div>
       </Card>
+
     </div>
   );
 }

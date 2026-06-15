@@ -97,7 +97,11 @@ export function OnboardingStepBanner({
   const groupPct = Math.round((doneCount / group.steps.length) * 100);
 
   return (
-    <div className="rounded-2xl border-2 border-primary/30 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent overflow-hidden">
+    <div className="space-y-2">
+      <Link to="/admin" className="inline-flex items-center gap-1 text-xs font-semibold text-muted-foreground hover:text-foreground">
+        <ArrowLeft className="w-3.5 h-3.5" /> Voltar ao onboarding
+      </Link>
+      <div className="rounded-2xl border-2 border-primary/30 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent overflow-hidden">
       {/* HERO */}
       <div className="p-5 sm:p-6 space-y-4">
         <div className="flex items-start gap-3 flex-wrap">
@@ -124,33 +128,9 @@ export function OnboardingStepBanner({
             </h1>
             <p className="text-sm text-muted-foreground mt-1">{current.desc}</p>
           </div>
-          <div className="flex flex-col items-end gap-2 shrink-0">
-            <Link to="/admin" className="text-xs font-semibold text-muted-foreground hover:text-foreground inline-flex items-center gap-1">
-              <ArrowLeft className="w-3.5 h-3.5" /> Voltar ao onboarding
-            </Link>
-            <div className="flex items-center gap-2">
-              {actions}
-              {!isCurrentDone ? (
-                <button
-                  type="button"
-                  onClick={() => {
-                    markDone(stepKey);
-                    window.location.href = nextStep ? nextStep.path : "/admin";
-                  }}
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary-foreground bg-primary hover:bg-primary/90 rounded-md px-3 py-2 shadow-sm"
-                >
-                  {nextStep ? "Concluir e seguinte" : "Concluir grupo"} <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-              ) : nextStep ? (
-                <Link
-                  to={nextStep.path}
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary-foreground bg-primary hover:bg-primary/90 rounded-md px-3 py-2 shadow-sm"
-                >
-                  Passo seguinte <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-              ) : null}
-            </div>
-          </div>
+          {actions && (
+            <div className="flex items-center gap-2 shrink-0">{actions}</div>
+          )}
         </div>
 
         {/* Mini progress + step strip */}
@@ -191,6 +171,7 @@ export function OnboardingStepBanner({
             })}
           </ol>
         </div>
+      </div>
       </div>
     </div>
   );
