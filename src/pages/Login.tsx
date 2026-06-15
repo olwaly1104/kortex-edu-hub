@@ -90,8 +90,8 @@ export default function Login() {
             setError(result.error || "Não foi possível iniciar sessão.");
             return;
           }
-          if (normalizedEmail.startsWith("admin") && !isOnboardingDone(normalizedEmail)) {
-            navigate("/admin/onboarding");
+          if (normalizedEmail.startsWith("admin")) {
+            navigate(isOnboardingDone(normalizedEmail) ? "/admin" : "/admin/onboarding");
           }
           return;
         }
