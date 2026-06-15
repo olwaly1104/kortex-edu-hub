@@ -24,6 +24,7 @@ import { formatCurrency, salarios as initialSalarios, type Salary } from "@/data
 import { reitorFaculties } from "@/data/institutionData";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import { useFaculdades, useCursos, usePropinas, useUpdatePropina } from "@/lib/useInstitution";
 import { cn } from "@/lib/utils";
 
 
