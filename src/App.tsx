@@ -249,6 +249,7 @@ function AppRoutes() {
         <Route path="/admin/onboarding/docentes" element={<AdminOnboardingPessoas mode="docentes" />} />
         <Route path="/admin/onboarding/staff" element={<AdminOnboardingPessoas mode="staff" />} />
         <Route path="/admin/onboarding/regras-presenca" element={<AdminOnboardingRegrasPresenca />} />
+        <Route path="/admin/onboarding/salarios" element={<AdminOnboardingSalarios />} />
         {/* Student */}
         <Route path="/student" element={<StudentDashboard />} />
         <Route path="/student/disciplines" element={<StudentDisciplines />} />
