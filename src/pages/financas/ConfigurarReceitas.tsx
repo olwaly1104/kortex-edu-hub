@@ -23,7 +23,9 @@ import type { LucideIcon } from "lucide-react";
 import { formatCurrency, salarios as initialSalarios, type Salary } from "@/data/financeModuleData";
 import { reitorFaculties } from "@/data/institutionData";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
+
 
 /* ════════════════════════════════════════════════════════════════════════
    RECEITAS
@@ -286,8 +288,11 @@ export default function ConfigurarReceitas() {
   const isOnboarding = useIsOnboardingStep();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
 
   const [mode, setMode] = useState<Mode>("receitas");
+
 
   /* ── Header live clock ── */
   const [now, setNow] = useState<Date>(new Date());
@@ -301,7 +306,7 @@ export default function ConfigurarReceitas() {
 
 
   /* ── RECEITAS ── */
-  const [receitas, setReceitas] = useState<ReceitaRow[]>(initialReceitas);
+  const [receitas, setReceitas] = useState<ReceitaRow[]>(() => (isAdmin ? [] : initialReceitas()));
   const [receitaFilter, setReceitaFilter] = useState<string>("todos");
   const [selectedFaculty, setSelectedFaculty] = useState<string | null>(null);
   const [multaSubtype, setMultaSubtype] = useState<TipoReceita>("Multa Estudante");
@@ -359,12 +364,13 @@ export default function ConfigurarReceitas() {
   const [openRuleDialog, setOpenRuleDialog] = useState(false);
 
   /* ── SALÁRIOS ── */
-  const [salaries, setSalaries] = useState<Salary[]>(initialSalarios);
+  const [salaries, setSalaries] = useState<Salary[]>(isAdmin ? [] : initialSalarios);
   const [salaryConfigs, setSalaryConfigs] = useState<Record<string, SalaryConfig>>(() => {
     const map: Record<string, SalaryConfig> = {};
-    for (const s of initialSalarios) map[s.id] = seedSalaryConfig(s);
+    if (!isAdmin) for (const s of initialSalarios) map[s.id] = seedSalaryConfig(s);
     return map;
   });
+
   const [salaryDeptFilter, setSalaryDeptFilter] = useState<string>("todos");
   const [salarySearch, setSalarySearch] = useState("");
   const [editingSalary, setEditingSalary] = useState<Salary | null>(null);
