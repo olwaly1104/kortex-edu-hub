@@ -85,10 +85,10 @@ const GROUPS: Group[] = [
     subtitle: "Propinas, emolumentos, multas e salários",
     icon: Wallet,
     steps: [
-      { key: "fin.pro", title: "Propinas", desc: "Definir valores de propinas por curso e ano.", icon: Wallet, path: "/financas/configurador?tab=propinas&step=fin.pro" },
-      { key: "fin.emo", title: "Emolumentos e taxas", desc: "Configurar taxas e serviços académicos.", icon: Receipt, path: "/financas/configurador?tab=taxas&step=fin.emo" },
-      { key: "fin.mul", title: "Multas", desc: "Definir regras e valores de multas.", icon: Banknote, path: "/financas/configurador?tab=multas&step=fin.mul" },
-      { key: "fin.sal", title: "Salários", desc: "Configurar escalões e tabela salarial.", icon: Briefcase, path: "/admin/onboarding/salarios?step=fin.sal" },
+      { key: "fin.pro", title: "Receitas — Propinas & emolumentos", desc: "Propinas por curso, emolumentos e taxas académicas.", icon: TrendingUp, path: "/financas/configurador?tab=receitas&step=fin.pro" },
+      { key: "fin.des", title: "Despesas", desc: "Rubricas e categorias de despesa institucional.", icon: TrendingDown, path: "/financas/configurador?tab=despesas&step=fin.des" },
+      { key: "fin.sal", title: "Salários", desc: "Escalões salariais de docentes e staff.", icon: Briefcase, path: "/financas/configurador?tab=salarios&step=fin.sal" },
+      { key: "fin.mul", title: "Multas", desc: "Multas aplicadas a estudantes, docentes e staff.", icon: Banknote, path: "/financas/configurador?tab=multas&step=fin.mul" },
     ],
   },
   {
