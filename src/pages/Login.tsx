@@ -275,12 +275,32 @@ export default function Login() {
                 </DialogTrigger>
                 <DialogContent className="max-w-md">
                   <DialogHeader>
-                    <DialogTitle>Criar conta Cloud</DialogTitle>
+                    <DialogTitle>Criar conta</DialogTitle>
                     <DialogDescription>
-                      Conta real ligada à Lovable Cloud — usada para testar o chat em tempo real entre 2 utilizadores.
+                      Cria uma conta real ligada à Lovable Cloud. O módulo escolhido define o painel a que o utilizador acede.
                     </DialogDescription>
                   </DialogHeader>
                   <form onSubmit={handleSignup} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="su-modulo">Módulo</Label>
+                      <select
+                        id="su-modulo"
+                        value={suModulo}
+                        onChange={(e) => setSuModulo(e.target.value)}
+                        className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
+                      >
+                        <option value="admin">Admin (Onboarding institucional)</option>
+                        <option value="estudante">Estudante</option>
+                        <option value="professor">Professor</option>
+                        <option value="coordenador">Coordenador de Curso</option>
+                        <option value="decano">Decano</option>
+                        <option value="reitor">Reitor</option>
+                        <option value="financas">Finanças</option>
+                        <option value="academica">Académica</option>
+                        <option value="gap">GAP</option>
+                        <option value="inscricoes">Inscrições</option>
+                      </select>
+                    </div>
                     <div className="space-y-2">
                       <Label htmlFor="su-name">Nome a apresentar</Label>
                       <Input id="su-name" value={suName} onChange={(e) => setSuName(e.target.value)} placeholder="Ex: Maria Santos" />
