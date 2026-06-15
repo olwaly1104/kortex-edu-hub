@@ -27,6 +27,7 @@ const prefixosPool = ["Sr.", "Sra.", "Dr.", "Dra.", "Prof.", "Eng.", "Me."];
 const grausPool = ["Licenciado", "Mestre", "Doutor", "Pós-doc"];
 const departamentosPool = ["Académica", "Finanças", "GAP", "TI", "Recursos Humanos", "Manutenção"];
 const funcoesPool = ["Assistente", "Coordenador", "Técnico", "Auxiliar", "Diretor"];
+const modulosKortexPool = ["Estudante", "Professor", "Coordenador", "Decano", "Reitor", "Finanças", "Académica", "GAP", "Inscrições", "Administrador"];
 
 const emailFrom = (pn: string, un: string) => {
   if (!pn.trim() || !un.trim()) return "";
