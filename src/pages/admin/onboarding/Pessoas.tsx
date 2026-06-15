@@ -85,10 +85,10 @@ export default function OnboardingPessoas({ mode }: { mode: Mode }) {
         <Card className="p-4"><div className="flex items-center gap-1.5 text-muted-foreground mb-1"><CheckCircle2 className="w-3.5 h-3.5" /><p className="text-xs">Activos</p></div><p className="text-2xl font-bold text-emerald-600">{totals.total}</p></Card>
       </div>
 
-      <Tabs defaultValue="importar" className="space-y-4">
+      <Tabs defaultValue="manual" className="space-y-4">
         <TabsList className="grid grid-cols-2 w-full max-w-md">
-          <TabsTrigger value="importar" className="gap-1.5"><Upload className="w-3.5 h-3.5" /> Importar</TabsTrigger>
           <TabsTrigger value="manual" className="gap-1.5"><UserPlus className="w-3.5 h-3.5" /> Adicionar manualmente</TabsTrigger>
+          <TabsTrigger value="importar" className="gap-1.5"><Upload className="w-3.5 h-3.5" /> Importar</TabsTrigger>
         </TabsList>
 
         <TabsContent value="importar" className="mt-0">
@@ -115,35 +115,23 @@ export default function OnboardingPessoas({ mode }: { mode: Mode }) {
                 <Mail className="w-3 h-3" /> O email <span className="font-semibold">@upra.kor</span> é gerado automaticamente após confirmação.
               </p>
             </div>
-            <div className={`grid grid-cols-1 md:${isDoc ? "grid-cols-4" : "grid-cols-3"} gap-3`}>
-              <div className={isDoc ? "md:col-span-2" : "md:col-span-1"}>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div>
                 <Label className="text-xs">Nome completo *</Label>
                 <Input className="h-9" placeholder="Ex: Maria Silva" value={draft.nome} onChange={e => setDraft({ ...draft, nome: e.target.value })} />
               </div>
+              <div>
+                <Label className="text-xs">Contacto</Label>
+                <Input className="h-9" placeholder="+244 ..." value={draft.contacto || ""} onChange={e => setDraft({ ...draft, contacto: e.target.value })} />
+              </div>
               {isDoc ? (
-                <>
-                  <div>
-                    <Label className="text-xs">Faculdade</Label>
-                    <Select value={draft.faculdade} onValueChange={v => setDraft({ ...draft, faculdade: v })}>
-                      <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
-                      <SelectContent>{faculdadesPool.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label className="text-xs">Cadeira</Label>
-                    <Select value={draft.cadeira} onValueChange={v => setDraft({ ...draft, cadeira: v })}>
-                      <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
-                      <SelectContent>{cadeirasPool.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label className="text-xs">Grau académico</Label>
-                    <Select value={draft.grau} onValueChange={v => setDraft({ ...draft, grau: v })}>
-                      <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
-                      <SelectContent>{grausPool.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-                    </Select>
-                  </div>
-                </>
+                <div>
+                  <Label className="text-xs">Grau académico</Label>
+                  <Select value={draft.grau} onValueChange={v => setDraft({ ...draft, grau: v })}>
+                    <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                    <SelectContent>{grausPool.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
+                  </Select>
+                </div>
               ) : (
                 <>
                   <div>
@@ -177,29 +165,20 @@ export default function OnboardingPessoas({ mode }: { mode: Mode }) {
         </div>
         <div className={`grid ${grid} gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b`}>
           <span>Nome</span><span>Email</span>
-          {isDoc ? (<><span>Faculdade</span><span>Cadeira</span><span>Grau</span></>) : (<><span>Departamento</span><span>Função</span></>)}
+          {isDoc ? (<><span>Contacto</span><span>Grau</span></>) : (<><span>Contacto</span><span>Departamento</span><span>Função</span></>)}
           <span></span>
         </div>
         <div className="divide-y">
           {rows.map(r => (
             <div key={r.id} className={`grid ${grid} gap-2 px-4 py-2 items-center`}>
               <Input value={r.nome} onChange={e => update(r.id, { nome: e.target.value })} className="h-8 text-xs" />
-              <Input value={r.email} onChange={e => update(r.id, { email: e.target.value })} className="h-8 text-xs" />
+              <Input value={r.email} readOnly disabled className="h-8 text-xs bg-muted/40 cursor-not-allowed" />
+              <Input value={r.contacto || ""} onChange={e => update(r.id, { contacto: e.target.value })} className="h-8 text-xs" placeholder="+244 ..." />
               {isDoc ? (
-                <>
-                  <Select value={r.faculdade} onValueChange={v => update(r.id, { faculdade: v })}>
-                    <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                    <SelectContent>{faculdadesPool.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-                  </Select>
-                  <Select value={r.cadeira} onValueChange={v => update(r.id, { cadeira: v })}>
-                    <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                    <SelectContent>{cadeirasPool.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-                  </Select>
-                  <Select value={r.grau} onValueChange={v => update(r.id, { grau: v })}>
-                    <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                    <SelectContent>{grausPool.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-                  </Select>
-                </>
+                <Select value={r.grau} onValueChange={v => update(r.id, { grau: v })}>
+                  <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                  <SelectContent>{grausPool.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
+                </Select>
               ) : (
                 <>
                   <Select value={r.departamento} onValueChange={v => update(r.id, { departamento: v })}>
@@ -222,6 +201,7 @@ export default function OnboardingPessoas({ mode }: { mode: Mode }) {
           )}
         </div>
       </Card>
+
     </div>
   );
 }
