@@ -248,6 +248,12 @@ const adminSections: NavSection[] = [
     { label: "Início", icon: LayoutDashboard, path: "/admin" },
     { label: "Meu Perfil", icon: User, path: "/admin/perfil" },
   ]},
+  { title: "Instituição", items: [
+    { label: "Faculdades & Cursos", icon: Building2, path: "/areaacademica/criador/faculdades" },
+    { label: "Discentes", icon: Users, path: "/admin/onboarding/estudantes" },
+    { label: "Salas e Edifícios", icon: Building2, path: "/admin/onboarding/espacos" },
+    { label: "Staff", icon: UserCog, path: "/admin/onboarding/staff" },
+  ]},
 ];
 
 const roleSectionsMap: Record<string, NavSection[]> = {
