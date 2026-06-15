@@ -250,6 +250,8 @@ const adminSections: NavSection[] = [
   ]},
   { title: "Configurar", items: [
     { label: "Faculdades & Cursos", icon: Building2, path: "/admin/faculdades-cursos" },
+    { label: "Docentes", icon: GraduationCap, path: "/admin/docentes" },
+    { label: "Staff", icon: UserCog, path: "/admin/staff" },
     { label: "Salas e Edifícios", icon: Building2, path: "/admin/salas" },
     { label: "Finanças", icon: Wallet, path: "/financas/configurador" },
   ]},
