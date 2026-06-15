@@ -342,7 +342,16 @@ export default function Login() {
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="su-email">Email</Label>
-                      <Input id="su-email" type="email" value={suEmail} onChange={(e) => setSuEmail(e.target.value)} placeholder="exemplo@teste.com" />
+                      <Input
+                        id="su-email"
+                        type="email"
+                        value={suEmail}
+                        onChange={(e) => setSuEmail(e.target.value)}
+                        placeholder={`${suModulo}@nomeasugerir.com`}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Sugestão: <span className="font-mono">{suModulo}@nomeasugerir.com</span>
+                      </p>
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="su-password">Palavra-passe (mín. 6)</Label>
