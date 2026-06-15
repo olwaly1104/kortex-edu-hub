@@ -82,6 +82,7 @@ export default function AdminOnboarding() {
       setState(next);
       updateUser({ name: nome });
       try { localStorage.setItem(STORAGE, JSON.stringify(next)); } catch { /* ignore */ }
+      pushOnboarding(user?.email, next);
       setActivating(false);
       setSuccess(true);
     }, 900);
