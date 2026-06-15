@@ -3,10 +3,10 @@ import { useState } from "react";
 import { FinHeader } from "@/pages/financas/_FinHeader";
 import { useAuth } from "@/contexts/AuthContext";
 import {
-  Building2, Wallet, LifeBuoy, BookOpen, ArrowRight, CheckCircle2, Circle,
-  RotateCcw, ShieldCheck, GraduationCap, Users, CalendarDays, Receipt,
-  Banknote, FileText, Layers, School, ChevronDown, UserCog, Clock, Briefcase,
-  UserPlus, Upload, MapPin,
+  Building2, LifeBuoy, BookOpen, ArrowRight, CheckCircle2,
+  RotateCcw, ShieldCheck, GraduationCap, CalendarDays,
+  FileText, Layers, School, ChevronDown, UserCog, Clock, Briefcase,
+  MapPin,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -48,37 +48,13 @@ const GROUPS: Group[] = [
   {
     id: "aca",
     area: "Académica",
-    title: "Faculdades & Cursos",
+    title: "Cadeiras & Turmas",
     subtitle: "Estrutura curricular, turmas e calendário",
     icon: School,
     steps: [
-      { key: "aca.fac", title: "Faculdades e cursos", desc: "Confirmar faculdades e cursos da instituição.", icon: School, path: "/areaacademica/criador/faculdades?step=aca.fac" },
       { key: "aca.cad", title: "Cadeiras", desc: "Gerar cadeiras por curso, ano e semestre.", icon: BookOpen, path: "/areaacademica/criador/cadeiras?step=aca.cad" },
       { key: "aca.tur", title: "Turmas", desc: "Criar turmas e definir capacidade.", icon: Layers, path: "/areaacademica/criador/turmas?step=aca.tur" },
       { key: "aca.cal", title: "Calendário académico", desc: "Definir ano letivo, semestres e feriados.", icon: CalendarDays, path: "/areaacademica/criador/calendario?step=aca.cal" },
-    ],
-  },
-  {
-    id: "est",
-    area: "Estudantes",
-    title: "Registar Discentes",
-    subtitle: "Importar ou registar manualmente",
-    icon: UserPlus,
-    steps: [
-      { key: "est.imp", title: "Registar discentes", desc: "Importar lista CSV/Excel ou adicionar manualmente.", icon: Upload, path: "/admin/onboarding/estudantes?tab=importar&step=est.imp" },
-    ],
-  },
-  {
-    id: "fin",
-    area: "Finanças",
-    title: "Configurar Finanças",
-    subtitle: "Receitas, propinas e tabelas financeiras",
-    icon: Wallet,
-    steps: [
-      { key: "fin.prop", title: "Propinas por curso", desc: "Definir valores de propinas por curso e ano.", icon: Banknote, path: "/financas/configurar-receitas?step=fin.prop" },
-      { key: "fin.taxas", title: "Emolumentos e serviços", desc: "Configurar emolumentos administrativos e serviços académicos.", icon: Receipt, path: "/financas/configurar-receitas?step=fin.taxas" },
-      { key: "fin.multas", title: "Multas", desc: "Definir tabela de multas e penalidades aplicáveis.", icon: Receipt, path: "/financas/configurar-receitas?step=fin.multas" },
-      { key: "fin.sal", title: "Confirmar salários", desc: "Bruto, imposto e líquido dos docentes e staff registados.", icon: Banknote, path: "/admin/onboarding/salarios?step=fin.sal" },
     ],
   },
   {
