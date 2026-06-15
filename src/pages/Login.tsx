@@ -87,7 +87,7 @@ export default function Login() {
           return;
         }
         // Admin demo: send to institutional onboarding (ficha de inscrição) first if not completed
-        if (email === "admin@upra.kor" && !isOnboardingDone()) {
+        if (email === "admin@upra.kor" && !isOnboardingDone(email)) {
           navigate("/admin/onboarding");
         }
         return;
