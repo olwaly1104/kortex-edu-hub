@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { FinHeader } from "@/pages/financas/_FinHeader";
 import { useAuth } from "@/contexts/AuthContext";
-import { onboardingKey, progressKey } from "@/lib/onboardingStorage";
+import { onboardingKey, progressKey, isOnboardingCompleteFor } from "@/lib/onboardingStorage";
 import {
   Building2, LifeBuoy, BookOpen, ArrowRight, CheckCircle2,
   RotateCcw, ShieldCheck, GraduationCap, CalendarDays,
@@ -33,6 +33,16 @@ type Group = {
 };
 
 const GROUPS: Group[] = [
+  {
+    id: "inst",
+    area: "Instituição",
+    title: "Registo da Instituição",
+    subtitle: "Dados institucionais base (nome, sigla, localização)",
+    icon: ShieldCheck,
+    steps: [
+      { key: "inst.reg", title: "Ficha de registo institucional", desc: "Identificação, sigla, NIF, localização e logótipo.", icon: ShieldCheck, path: "/admin/onboarding" },
+    ],
+  },
   {
     id: "est",
     area: "Estudantes",
@@ -112,7 +122,9 @@ const ALL_STEPS = GROUPS.flatMap((g) => g.steps);
 export default function AdminInicio() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const progress = readProgress(user?.email);
+  const storedProgress = readProgress(user?.email);
+  // Auto-mark the institutional registration as complete once onboarding is done.
+  const progress = { ...storedProgress, "inst.reg": storedProgress["inst.reg"] || isOnboardingCompleteFor(user?.email) };
   const doneCount = ALL_STEPS.filter((t) => progress[t.key]).length;
   const pct = Math.round((doneCount / ALL_STEPS.length) * 100);
   const [open, setOpen] = useState<string | null>(null);
