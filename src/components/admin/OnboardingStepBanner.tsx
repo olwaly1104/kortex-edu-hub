@@ -76,7 +76,6 @@ function markDone(email: string | null | undefined, key: string) {
 export function useIsOnboardingStep(stepKeyProp?: string): boolean {
   const { user } = useAuth();
   const [params] = useSearchParams();
-  const [refresh, setRefresh] = useState(0);
   const stepKey = stepKeyProp || params.get("step") || "";
   return user?.role === "admin" && !!STEP_TO_GROUP[stepKey];
 }
