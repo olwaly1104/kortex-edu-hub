@@ -73,9 +73,14 @@ export default function CourseCreator() {
   const [sem2Start, setSem2Start] = useState("09/02/2026");
   const [sem2End, setSem2End] = useState("30/06/2026");
 
-  const [statuses, setStatuses] = useState<Record<string, StepStatus>>(
-    Object.fromEntries(steps.map(s => [s.id, "pending"])) as Record<string, StepStatus>
-  );
+  const [statuses, setStatuses] = useState<Record<string, StepStatus>>(() => {
+    if (isAdmin) {
+      let prog: Record<string, boolean> = {};
+      try { prog = JSON.parse(localStorage.getItem(ADMIN_PROGRESS_KEY) || "{}"); } catch {}
+      return Object.fromEntries(stepsAdmin.map(s => [s.id, prog[ADMIN_STEP_KEYS[s.id]] ? "done" : "pending"])) as Record<string, StepStatus>;
+    }
+    return Object.fromEntries(stepsAcademica.map(s => [s.id, "pending"])) as Record<string, StepStatus>;
+  });
   const [running, setRunning] = useState(false);
   const [active, setActive] = useState<string>("faculdades");
   const navigate = useNavigate();
