@@ -1,5 +1,5 @@
 import { Link, useSearchParams } from "react-router-dom";
-import { ArrowLeft, ChevronRight, ShieldCheck, CheckCircle2, Circle, ArrowRight } from "lucide-react";
+import { ArrowLeft, ChevronRight, ShieldCheck, CheckCircle2, Circle } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { ReactNode, useState } from "react";
 import { progressKey } from "@/lib/onboardingStorage";
@@ -102,7 +102,6 @@ export function OnboardingStepBanner({
   const current = group.steps[currentIdx];
   const doneCount = group.steps.filter((s) => progress[s.key]).length;
   const isCurrentDone = !!progress[stepKey];
-  const nextStep = group.steps.slice(currentIdx + 1).find((s) => !progress[s.key]);
   const groupPct = Math.round((doneCount / group.steps.length) * 100);
 
   return (
