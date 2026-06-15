@@ -169,6 +169,7 @@ import AdminAnuncios from "./pages/admin/Anuncios";
 import AdminOnboardingEstudantes from "./pages/admin/onboarding/Estudantes";
 import AdminOnboardingPessoas from "./pages/admin/onboarding/Pessoas";
 import AdminOnboardingRegrasPresenca from "./pages/admin/onboarding/RegrasPresenca";
+import AdminOnboardingSalarios from "./pages/admin/onboarding/Salarios";
 
 const queryClient = new QueryClient();
 
