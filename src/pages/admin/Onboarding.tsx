@@ -11,12 +11,12 @@ import { Building2, Loader2, Upload, CheckCircle2 } from "lucide-react";
 const STORAGE = "upra.admin.onboarding";
 
 interface OnboardingState {
-  dados: { nome: string; tipo: string; sigla: string; endereco: string; telefone: string; email: string; nif: string; logoDataUrl: string };
+  dados: { nome: string; tipo: string; sigla: string; provincia: string; municipio: string; endereco: string; telefone: string; email: string; nif: string; logoDataUrl: string };
   completed: boolean;
 }
 
 const initial: OnboardingState = {
-  dados: { nome: "", tipo: "", sigla: "", endereco: "", telefone: "", email: "", nif: "", logoDataUrl: "" },
+  dados: { nome: "", tipo: "", sigla: "", provincia: "", municipio: "", endereco: "", telefone: "", email: "", nif: "", logoDataUrl: "" },
   completed: false,
 };
 
