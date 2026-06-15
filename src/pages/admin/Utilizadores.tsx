@@ -7,7 +7,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Users, Plus, Search, Trash2, ShieldCheck, Loader2, User } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { isPreviewHost } from "@/lib/runtimeEnv";
 
 type StoredUser = {
   id: string;
