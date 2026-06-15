@@ -201,13 +201,7 @@ function PropinasTab({ onAddCursos }: { onAddCursos: () => void }) {
 
 /* ───────────────────────────── Emolumentos & Taxas ────────────────────────── */
 
-const DEFAULT_TAXAS: TaxaRow[] = [
-  { id: newId(), nome: "Inscrição", valor: 0 },
-  { id: newId(), nome: "Matrícula", valor: 0 },
-  { id: newId(), nome: "Declaração com notas", valor: 0 },
-  { id: newId(), nome: "Certificado de habilitações", valor: 0 },
-  { id: newId(), nome: "Cartão de estudante (2ª via)", valor: 0 },
-];
+const DEFAULT_TAXAS: TaxaRow[] = [];
 
 function TaxasTab({ storageKey }: { storageKey: string }) {
   const [rows, setRows] = useState<TaxaRow[]>(() => readJSON<TaxaRow[]>(storageKey, DEFAULT_TAXAS));
