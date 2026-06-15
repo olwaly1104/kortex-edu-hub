@@ -38,11 +38,10 @@ const GROUPS: Group[] = [
     id: "est",
     area: "Estudantes",
     title: "Adicionar Estudantes",
-    subtitle: "Importar e validar matrículas",
+    subtitle: "Importar ou registar manualmente",
     icon: UserPlus,
     steps: [
-      { key: "est.imp", title: "Importar estudantes", desc: "Carregar lista via CSV/Excel ou registo manual.", icon: Upload, path: "/admin/onboarding/estudantes?tab=importar&step=est.imp" },
-      { key: "est.val", title: "Validar matrículas",  desc: "Atribuir curso, ano e turma aos estudantes.",      icon: Layers, path: "/admin/onboarding/estudantes?tab=validar&step=est.val" },
+      { key: "est.imp", title: "Registar estudantes", desc: "Importar lista CSV/Excel ou adicionar manualmente.", icon: Upload, path: "/admin/onboarding/estudantes?tab=importar&step=est.imp" },
     ],
   },
   {
