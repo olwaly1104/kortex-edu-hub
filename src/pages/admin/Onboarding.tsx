@@ -50,6 +50,7 @@ const PROVINCIAS_OPTS = Object.keys(PROVINCIAS_MUNICIPIOS).sort();
 export default function AdminOnboarding() {
   const { user, updateUser, logout } = useAuth();
   const navigate = useNavigate();
+  const STORAGE = onboardingKey(user?.email);
   const [state, setState] = useState<OnboardingState>(() => {
     try {
       const raw = localStorage.getItem(STORAGE);
@@ -62,7 +63,7 @@ export default function AdminOnboarding() {
 
   useEffect(() => {
     try { localStorage.setItem(STORAGE, JSON.stringify(state)); } catch { /* ignore */ }
-  }, [state]);
+  }, [state, STORAGE]);
 
   const setDados = (patch: Partial<OnboardingState["dados"]>) =>
     setState((s) => ({ ...s, dados: { ...s.dados, ...patch } }));
