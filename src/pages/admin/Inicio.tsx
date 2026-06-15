@@ -8,6 +8,7 @@ import {
   RotateCcw, ShieldCheck, GraduationCap, CalendarDays,
   FileText, Layers, School, ChevronDown, UserCog, Clock, Briefcase,
   MapPin, Users, UserPlus, Upload, Wallet, Banknote, Receipt,
+  TrendingUp, TrendingDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
