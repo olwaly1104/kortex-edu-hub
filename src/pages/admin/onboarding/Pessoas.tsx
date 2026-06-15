@@ -43,20 +43,20 @@ export default function OnboardingPessoas({ mode }: { mode: Mode }) {
 
   const seed: Person[] = isDoc
     ? [
-        { id: "d1", prefixo: "Prof.", primeiroNome: "Sofia", ultimoNome: "Martins", email: "sofia.martins@upra.kor", contacto: "+244 923 000 001", grau: "Doutor" },
-        { id: "d2", prefixo: "Prof.", primeiroNome: "Carlos", ultimoNome: "Mendes", email: "carlos.mendes@upra.kor", contacto: "+244 923 000 002", grau: "Mestre" },
+        { id: "d1", prefixo: "Prof.", primeiroNome: "Sofia", ultimoNome: "Martins", email: "sofia.martins@upra.kor", contacto: "+244 923 000 001", grau: "Doutor", moduloKortex: "Professor" },
+        { id: "d2", prefixo: "Prof.", primeiroNome: "Carlos", ultimoNome: "Mendes", email: "carlos.mendes@upra.kor", contacto: "+244 923 000 002", grau: "Mestre", moduloKortex: "Professor" },
       ]
     : [
-        { id: "s1", prefixo: "Sra.", primeiroNome: "Joana", ultimoNome: "Pinto", email: "joana.pinto@upra.kor", contacto: "+244 923 100 001", departamento: "Académica", funcao: "Coordenador" },
-        { id: "s2", prefixo: "Sr.", primeiroNome: "Rui", ultimoNome: "Tavares", email: "rui.tavares@upra.kor", contacto: "+244 923 100 002", departamento: "TI", funcao: "Técnico" },
+        { id: "s1", prefixo: "Sra.", primeiroNome: "Joana", ultimoNome: "Pinto", email: "joana.pinto@upra.kor", contacto: "+244 923 100 001", departamento: "Académica", funcao: "Coordenador", moduloKortex: "Académica" },
+        { id: "s2", prefixo: "Sr.", primeiroNome: "Rui", ultimoNome: "Tavares", email: "rui.tavares@upra.kor", contacto: "+244 923 100 002", departamento: "TI", funcao: "Técnico", moduloKortex: "Administrador" },
       ];
 
   const [rows, setRows] = useState<Person[]>(seed);
 
   const addEmptyRow = () => {
     const novo: Person = isDoc
-      ? { id: String(Date.now()), prefixo: "", primeiroNome: "", ultimoNome: "", email: "", contacto: "", grau: grausPool[2] }
-      : { id: String(Date.now()), prefixo: "", primeiroNome: "", ultimoNome: "", email: "", contacto: "", departamento: departamentosPool[0], funcao: funcoesPool[0] };
+      ? { id: String(Date.now()), prefixo: "", primeiroNome: "", ultimoNome: "", email: "", contacto: "", grau: grausPool[2], moduloKortex: "Professor" }
+      : { id: String(Date.now()), prefixo: "", primeiroNome: "", ultimoNome: "", email: "", contacto: "", departamento: departamentosPool[0], funcao: funcoesPool[0], moduloKortex: "Académica" };
     setRows(prev => [...prev, novo]);
   };
 
