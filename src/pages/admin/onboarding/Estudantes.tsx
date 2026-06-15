@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Upload, FileSpreadsheet, UserPlus, Trash2, Users, GraduationCap, CheckCircle2, Mail, UserCheck, Sparkles, Search } from "lucide-react";
+import { Upload, UserPlus, Trash2, Users, GraduationCap, CheckCircle2, Mail } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
