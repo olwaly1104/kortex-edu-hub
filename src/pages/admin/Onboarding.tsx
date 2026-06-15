@@ -127,7 +127,7 @@ export default function AdminOnboarding() {
       <div className="max-w-3xl mx-auto px-6 py-10">
         <div className="mb-6 text-center">
           <div className="text-[11px] uppercase tracking-wider font-semibold text-primary">Passo 1 de 1</div>
-          <h2 className="text-2xl md:text-3xl font-bold text-foreground mt-1">Dados da universidade</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-foreground mt-1">Registo da Instituição</h2>
           <p className="text-sm text-muted-foreground mt-2 max-w-lg mx-auto">
             Comece por identificar a sua instituição. A configuração detalhada (cursos, calendário, finanças, GAP, área académica) será feita depois no painel de administração.
           </p>
@@ -161,8 +161,18 @@ export default function AdminOnboarding() {
             </Field>
             <Field label="Sigla"><Input value={state.dados.sigla} onChange={(e) => setDados({ sigla: e.target.value })} placeholder="UPRA" /></Field>
             <Field label="NIF"><Input value={state.dados.nif} onChange={(e) => setDados({ nif: e.target.value })} placeholder="5417000000" /></Field>
-            <Field label="Província"><Input value={state.dados.provincia} onChange={(e) => setDados({ provincia: e.target.value })} placeholder="Luanda" /></Field>
-            <Field label="Município"><Input value={state.dados.municipio} onChange={(e) => setDados({ municipio: e.target.value })} placeholder="Belas" /></Field>
+            <Field label="Província">
+              <Select value={state.dados.provincia} onValueChange={(v) => setDados({ provincia: v, municipio: "" })}>
+                <SelectTrigger><SelectValue placeholder="Selecionar província" /></SelectTrigger>
+                <SelectContent>{PROVINCIAS_OPTS.map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
+              </Select>
+            </Field>
+            <Field label="Município">
+              <Select value={state.dados.municipio} onValueChange={(v) => setDados({ municipio: v })} disabled={!state.dados.provincia}>
+                <SelectTrigger><SelectValue placeholder={state.dados.provincia ? "Selecionar município" : "Escolha a província primeiro"} /></SelectTrigger>
+                <SelectContent>{(PROVINCIAS_MUNICIPIOS[state.dados.provincia] || []).map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}</SelectContent>
+              </Select>
+            </Field>
             <Field label="Endereço" full>
               <Input value={state.dados.endereco} onChange={(e) => setDados({ endereco: e.target.value })} placeholder="Rua, número, bairro" />
             </Field>
