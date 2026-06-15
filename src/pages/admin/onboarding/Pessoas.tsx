@@ -169,11 +169,10 @@ export default function OnboardingPessoas({ mode }: { mode: Mode }) {
                       </Select>
                     </>
                   )}
-                  <div className="flex justify-end">
-                    <Button size="icon" variant="ghost" onClick={() => remove(r.id)} className="h-8 w-8 text-muted-foreground hover:text-destructive">
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </Button>
-                  </div>
+                  <Select value={r.moduloKortex || ""} onValueChange={v => update(r.id, { moduloKortex: v })}>
+                    <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="—" /></SelectTrigger>
+                    <SelectContent>{modulosKortexPool.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}</SelectContent>
+                  </Select>
                 </div>
               ))}
               {rows.length === 0 && (
