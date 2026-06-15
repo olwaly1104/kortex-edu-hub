@@ -201,13 +201,7 @@ function PropinasTab({ onAddCursos }: { onAddCursos: () => void }) {
 
 /* ───────────────────────────── Emolumentos & Taxas ────────────────────────── */
 
-const DEFAULT_TAXAS: TaxaRow[] = [
-  { id: newId(), nome: "Inscrição", valor: 0 },
-  { id: newId(), nome: "Matrícula", valor: 0 },
-  { id: newId(), nome: "Declaração com notas", valor: 0 },
-  { id: newId(), nome: "Certificado de habilitações", valor: 0 },
-  { id: newId(), nome: "Cartão de estudante (2ª via)", valor: 0 },
-];
+const DEFAULT_TAXAS: TaxaRow[] = [];
 
 function TaxasTab({ storageKey }: { storageKey: string }) {
   const [rows, setRows] = useState<TaxaRow[]>(() => readJSON<TaxaRow[]>(storageKey, DEFAULT_TAXAS));
@@ -264,11 +258,7 @@ function TaxasTab({ storageKey }: { storageKey: string }) {
 
 /* ───────────────────────────── Multas ─────────────────────────────────────── */
 
-const DEFAULT_MULTAS: MultaRow[] = [
-  { id: newId(), nome: "Atraso no pagamento de propina", valor: 0, unidade: "Kz / dia" },
-  { id: newId(), nome: "Falta a exame sem justificação", valor: 0, unidade: "Kz" },
-  { id: newId(), nome: "Devolução tardia de livro", valor: 0, unidade: "Kz / dia" },
-];
+const DEFAULT_MULTAS: MultaRow[] = [];
 
 function MultasTab({ storageKey }: { storageKey: string }) {
   const [rows, setRows] = useState<MultaRow[]>(() => readJSON<MultaRow[]>(storageKey, DEFAULT_MULTAS));
