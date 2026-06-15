@@ -1,68 +1,58 @@
+## Goal
+Zero out everything. Delete every account and every row of data from the backend. Then strip the Login page of all demo accounts and mock-account behaviour so the only signup path is **Registo de Instituição** (the master institution Kortex account). From there, the institution creates all its own users.
 
-# Plan
+## Step 1 — Wipe the backend (data tool)
 
-Big request — I'll group it into 6 self-contained pieces. All shipped in this single iteration.
+Delete in dependency order, then delete the auth users. Run as a single insert-tool batch:
 
-## 1. Onboarding — replace "Cadeiras & Turmas" with "Configurar Área Académica"
+```sql
+DELETE FROM public.messages;
+DELETE FROM public.conversation_participants;
+DELETE FROM public.conversations;
+DELETE FROM public.candidaturas;
+DELETE FROM public.user_roles;
+DELETE FROM public.profiles;
+DELETE FROM auth.users;
+```
 
-In `src/pages/admin/Inicio.tsx`:
-- Remove the standalone Faculdades & Cursos group (`fac`) — it moves inside the new group.
-- Rename the `cad` group label to **"Configurar Área Académica"** and add Faculdades + Cursos steps to it, so the group contains: Faculdades, Cursos, Cadeiras, Turmas.
-- Final top→bottom order stays: Discentes → Geopontos do Campus → Configurar Área Académica → Configurar Finanças → Configurar RH → Configurar GAP.
+Result: empty `auth.users`, empty `public.*`. No `admin@upra.kor`, no `gap@upra.kor`, no profiles, no roles, no candidaturas, no chat data.
 
-## 2. Sidebar — Finanças section under Staff
+## Step 2 — `src/pages/Login.tsx` (edit)
 
-In `src/components/AppSidebar.tsx`, add a **Finanças** group below Staff containing:
-- Dashboard, Receitas, Despesas, Salários, Orçamentos, **Discentes** (new), **Candidaturas** (new).
-- Add **Candidaturas** to the Estudantes section right under Discentes, above Configuração.
-- All routes mounted under `/admin/financas/*` and `/admin/candidaturas`, reusing existing finance/GAP page components (read-only mirror).
+1. **Strip all demo machinery**
+   - Remove `DEMO_PASSWORD`, `DEMO_ACCOUNTS`, `DEMO_ROUTE`, `MODULE_TO_DEMO`.
+   - Remove the "Ver credenciais de demo" dialog + button.
+   - Remove `isPreviewHost` branch in `handleSubmit` and `handleSignup`. Both preview and published now talk to real Cloud auth only.
 
-## 3. Discentes inside Finanças (new page)
+2. **Login (`handleSubmit`) — real only**
+   - Always `supabase.auth.signInWithPassword`.
+   - On success, read `user_roles.role` and route:
+     - `admin` → `/admin/onboarding` if institutional onboarding not done locally, else `/admin`
+     - `estudante → /student`, `professor → /professor`, `coordenador → /coordenador`,
+       `decano → /decano`, `reitor → /reitor`, `financas → /financas`,
+       `academica → /secretaria`, `gap → /gap`, `inscricoes → /inscricoes`
+   - On error, surface the backend error. No fallback.
 
-`src/pages/admin/FinancasDiscentes.tsx` — clean institutional table (matrícula, nome, curso, ano, turma, estado financeiro) with row-click → `/admin/discente/:id` which opens a **default student profile** modeled after the Coordenador student profile (KPIs + academic history + finances tab focus). Uses same mock dataset already used elsewhere.
+3. **Signup dialog → "Registo de Instituição" only**
+   - Title: **Registo de Instituição**. Description: "Crie a conta principal da sua instituição no Kortex. Esta conta gere toda a instituição e cria os restantes utilizadores."
+   - Remove the module `<select>`. Hardcode `modulo = "admin"`.
+   - Field "Nome a apresentar" → **"Nome da instituição"**.
+   - Auto-fill email as `admin@<slug>.kor` (slug rule unchanged).
+   - `handleSignup`:
+     - `supabase.auth.signUp` with `data: { display_name: <nome>, modulo: "admin" }`.
+     - Insert `user_roles { user_id, role: "admin" }`.
+     - Pre-seed local onboarding entry with the institution name so the next login completes the onboarding flow and routes to `/admin`.
+   - Button label: **"Registar instituição"**.
 
-## 4. Criar Conta — real backend accounts
+4. **Helper copy under the form**
+   - Replace demo caption with: "Apenas contas reais. Para começar, registe a sua instituição — depois crie todos os utilizadores a partir do painel da instituição."
+   - Trigger button label: **"Registo de Instituição"**.
 
-- Rename/repurpose the "Criar Conta" button next to "Ver Credenciais" on the admin landing.
-- Modal fields: **Módulo** (select: Estudante, Professor, Coordenador, Decano, Reitor, Finanças, Académica, GAP, Inscrições, Admin), **Nome a apresentar**, **Email**, **Palavra-passe**.
-- On submit: calls `supabase.auth.signUp` with `emailRedirectTo: window.location.origin`, writes role to a new `user_roles` table, profile auto-created via existing trigger.
-- New migration: `app_role` enum + `user_roles` table + `has_role` security-definer function + GRANTs + RLS (admin can manage, users see their own).
-- Enable Lovable Cloud email auth with auto-confirm OFF (default) so accounts are real. No Google by default since user only specified email/password.
+## Files touched
+- Backend wipe (no migration — data only via insert tool).
+- `src/pages/Login.tsx`.
 
-## 5. Candidaturas — real table wired end-to-end
-
-New migration `public.candidaturas`:
-- Fields: nome, email, telefone, curso_pretendido, faculdade, sessao (1ª/2ª/3ª), documentos (jsonb), pagamento_status (pendente/pago), estado (recebida/em_analise/aprovada/rejeitada), origem ('site' default), notas.
-- GRANTs: anon INSERT (public form), authenticated SELECT/UPDATE, service_role ALL.
-- RLS: anon can insert only; authenticated can read & update (admin module gated client-side).
-
-Wiring:
-- `/inscricoes` portal form → `INSERT INTO candidaturas` (replaces current mock submit).
-- GAP `Candidaturas.tsx` → reads from this table.
-- New `/admin/candidaturas` and `/admin/financas/candidaturas` views → read-only mirror of GAP candidaturas list/detail with the same components.
-
-## 6. Document templates — refresh with current info
-
-Update doc-preview pages so PDFs match the newer per-page info:
-- `src/pages/gap/SolicitacaoDocPreview.tsx`
-- `src/pages/gap/AtendimentoDocPreview.tsx` (if drift exists)
-- `src/pages/gap/CandidaturaDocPreview.tsx` — pull from new candidaturas row
-- `src/pages/financas/DespesaDocPreview.tsx`
-- `src/pages/financas/SolicitacaoDocPreview.tsx`
-
-Each will read the same source-of-truth shown on the detail page so headers, IDs, dates, valores, beneficiários, anexos match exactly.
-
-## 7. Verification before "done"
-
-- Build/typecheck via harness.
-- Manually click through: /admin (onboarding order), Criar Conta modal → submits → row in `user_roles`, /admin/financas/discentes table → row click → student profile, /inscricoes submit → row visible in GAP Candidaturas and admin mirror, doc previews open with matching data.
-
-## Technical details
-
-- New migration files: `xxx_user_roles.sql`, `xxx_candidaturas.sql`. Migrations include GRANTs + RLS in correct order.
-- `has_role(_user_id uuid, _role app_role)` SECURITY DEFINER; used in policies to avoid recursion.
-- Inscrições form switches from mock to `supabase.from('candidaturas').insert(...)`; keeps existing UI.
-- Criar Conta uses `supabase.auth.signUp` directly (not edge function) — display_name passed via `options.data.display_name` so the existing `handle_new_user` trigger picks it up.
-- No changes to `src/integrations/supabase/client.ts` or auto-generated types.
-
-Approve and I'll execute all 7 in one pass.
+## Out of scope
+- `src/pages/admin/Utilizadores.tsx` already creates real users for any role — unchanged.
+- No schema, RLS, route, or `AuthContext` changes.
+- `runtimeEnv.ts` stays (used by `Utilizadores.tsx`).
