@@ -6,7 +6,7 @@ import {
   Building2, LifeBuoy, BookOpen, ArrowRight, CheckCircle2,
   RotateCcw, ShieldCheck, GraduationCap, CalendarDays,
   FileText, Layers, School, ChevronDown, UserCog, Clock, Briefcase,
-  MapPin,
+  MapPin, Users, UserPlus, Upload, Wallet, Banknote, Receipt,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
