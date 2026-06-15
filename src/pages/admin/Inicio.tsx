@@ -133,6 +133,8 @@ export default function AdminInicio() {
     if (!confirm("Repor onboarding? Todos os dados introduzidos serão perdidos.")) return;
     localStorage.removeItem(onboardingKey(user?.email));
     localStorage.removeItem(progressKey(user?.email));
+    localStorage.removeItem(profileKey(user?.email));
+    clearAdminStateBackend();
     navigate("/admin/onboarding");
   };
 
