@@ -29,7 +29,6 @@ Deno.serve(async (req) => {
   const ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY") ?? Deno.env.get("SUPABASE_PUBLISHABLE_KEY")!;
 
   try {
-    // 1) Authenticate the caller and ensure they are an admin
     const authHeader = req.headers.get("Authorization") ?? "";
     if (!authHeader.startsWith("Bearer ")) {
       return json({ error: "Unauthorized" }, 401);
@@ -56,7 +55,6 @@ Deno.serve(async (req) => {
       return json({ error: "Apenas administradores podem criar utilizadores." }, 403);
     }
 
-    // 2) Validate body
     const body = (await req.json().catch(() => ({}))) as Body;
     const email = (body.email || "").trim().toLowerCase();
     const password = body.password || "";
@@ -72,7 +70,6 @@ Deno.serve(async (req) => {
       return json({ error: "Módulo inválido." }, 400);
     }
 
-    // 3) Create the auth user (immediate login, no email confirmation)
     const { data: created, error: createErr } = await admin.auth.admin.createUser({
       email,
       password,
@@ -84,18 +81,18 @@ Deno.serve(async (req) => {
     }
     const newUserId = created.user.id;
 
-    // 4) Ensure profile row + link to caller's institution
+    // Force the new user to change the admin-provided password on first sign-in.
     await admin.from("profiles").upsert(
       {
         id: newUserId,
         display_name: name,
         email,
         institution_id: callerId,
+        must_change_password: true,
       },
       { onConflict: "id" }
     );
 
-    // 5) Assign role
     const { error: roleErr } = await admin
       .from("user_roles")
       .insert({ user_id: newUserId, role: modulo });
