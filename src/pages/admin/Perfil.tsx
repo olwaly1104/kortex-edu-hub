@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/contexts/AuthContext";
-import { onboardingKey, profileKey, progressKey } from "@/lib/onboardingStorage";
+import { onboardingKey, profileKey, progressKey, pushProfile } from "@/lib/onboardingStorage";
 import {
   ShieldCheck, Building2, Mail, Phone, Globe, MapPin, Calendar, GraduationCap,
   Users, Briefcase, Settings2, Save, IdCard, Hash,
