@@ -88,7 +88,7 @@ export default function Login() {
       const accountEmail = signInData.user?.email || normalizedEmail;
       const displayName = (signInData.user?.user_metadata as any)?.display_name;
       // Hydrate the in-app shell using the role
-      login(accountEmail, password, { sourceEmail: accountEmail, displayName, role });
+      login(accountEmail, password, { sourceEmail: accountEmail, displayName });
       if (role === "admin" && !isOnboardingCompleteFor(accountEmail)) {
         navigate("/admin/onboarding");
         return;
