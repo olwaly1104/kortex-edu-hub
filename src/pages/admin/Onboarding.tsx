@@ -49,7 +49,7 @@ const PROVINCIAS_OPTS = Object.keys(PROVINCIAS_MUNICIPIOS).sort();
 
 
 export default function AdminOnboarding() {
-  const { user, updateUser } = useAuth();
+  const { user, updateUser, logout } = useAuth();
   const navigate = useNavigate();
   const [state, setState] = useState<OnboardingState>(() => {
     try {
@@ -180,7 +180,10 @@ export default function AdminOnboarding() {
             <Field label="Email institucional"><Input type="email" value={state.dados.email} onChange={(e) => setDados({ email: e.target.value })} placeholder="contacto@instituicao.ao" /></Field>
           </div>
 
-          <div className="mt-8 flex items-center justify-end gap-3 border-t border-border pt-6">
+          <div className="mt-8 flex items-center justify-between gap-3 border-t border-border pt-6">
+            <Button variant="outline" size="lg" onClick={() => { logout(); navigate("/"); }}>
+              Voltar
+            </Button>
             <Button size="lg" onClick={activate} disabled={!canSubmit || activating} className="min-w-[200px]">
               {activating ? (<><Loader2 className="w-4 h-4 mr-2 animate-spin" /> A ativar…</>) : "Ativar instituição"}
             </Button>
