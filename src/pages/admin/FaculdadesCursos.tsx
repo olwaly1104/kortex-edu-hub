@@ -20,16 +20,8 @@ const facDecanoMap: Record<string, string> = {
 };
 
 export default function AdminFaculdadesCursos() {
-  const [faculdades, setFaculdades] = useState<FacState[]>(() => {
-    const facs = Array.from(new Set(cursoTemplates.map((c) => c.faculty)));
-    return facs.map((f) => ({
-      id: f.toLowerCase().replace(/\s+/g, "-"),
-      name: f,
-      decano: facDecanoMap[f] || "—",
-      editing: false,
-      cursos: cursoTemplates.filter((c) => c.faculty === f),
-    }));
-  });
+  const [faculdades, setFaculdades] = useState<FacState[]>([]);
+
 
   const update = (id: string, patch: Partial<FacState>) =>
     setFaculdades((prev) => prev.map((f) => (f.id === id ? { ...f, ...patch } : f)));

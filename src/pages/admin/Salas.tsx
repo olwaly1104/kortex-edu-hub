@@ -10,25 +10,15 @@ type Sala = { id: string; edificioId: string; nome: string; tipo: string; piso: 
 
 const tiposSala = ["Sala de Aula", "Gabinete", "Laboratório", "Biblioteca", "Auditório", "Sala de Reuniões", "Espaço Comum"];
 
-const initEdificios: Edificio[] = [
-  { id: "e1", nome: "Edifício Central", codigo: "EC", pisos: 4, endereco: "Campus Principal" },
-  { id: "e2", nome: "Edifício de Ciências", codigo: "ECI", pisos: 3, endereco: "Campus Principal" },
-];
+const initEdificios: Edificio[] = [];
 
-const initSalas: Sala[] = [
-  { id: "s1", edificioId: "e1", nome: "A.101", tipo: "Sala de Aula", piso: "1", capacidade: 40 },
-  { id: "s2", edificioId: "e1", nome: "A.102", tipo: "Sala de Aula", piso: "1", capacidade: 35 },
-  { id: "s3", edificioId: "e1", nome: "G.201", tipo: "Gabinete", piso: "2", capacidade: 2, ocupante: "Dr. Manuel Rebelo" },
-  { id: "s4", edificioId: "e1", nome: "G.202", tipo: "Gabinete", piso: "2", capacidade: 2, ocupante: "Dra. Helena Vaz" },
-  { id: "s5", edificioId: "e2", nome: "L.001", tipo: "Laboratório", piso: "0", capacidade: 24 },
-  { id: "s6", edificioId: "e2", nome: "BIB", tipo: "Biblioteca", piso: "0", capacidade: 80 },
-  { id: "s7", edificioId: "e2", nome: "AUD", tipo: "Auditório", piso: "1", capacidade: 180 },
-];
+const initSalas: Sala[] = [];
 
 export default function AdminSalas() {
   const [edificios, setEdificios] = useState<Edificio[]>(initEdificios);
   const [salas, setSalas] = useState<Sala[]>(initSalas);
   const [q, setQ] = useState("");
+
 
   const updateEd = (id: string, patch: Partial<Edificio>) => setEdificios((p) => p.map((e) => (e.id === id ? { ...e, ...patch } : e)));
   const updateSala = (id: string, patch: Partial<Sala>) => setSalas((p) => p.map((s) => (s.id === id ? { ...s, ...patch } : s)));
