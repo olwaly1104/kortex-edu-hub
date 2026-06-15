@@ -1,3 +1,4 @@
+import { OnboardingStepBanner } from "@/components/admin/OnboardingStepBanner";
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Card } from "@/components/ui/card";
@@ -316,6 +317,7 @@ export default function GapConfiguracao() {
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
+      <OnboardingStepBanner />
       {/* Header */}
       <FinHeader
         title="Configuração"

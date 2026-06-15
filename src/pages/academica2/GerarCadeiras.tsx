@@ -1,3 +1,4 @@
+import { OnboardingStepBanner } from "@/components/admin/OnboardingStepBanner";
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
@@ -104,6 +105,7 @@ export default function GerarCadeiras() {
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
+      <OnboardingStepBanner />
       <div>
         <Link to="/areaacademica/criador" className="text-xs text-muted-foreground hover:text-primary inline-flex items-center gap-1 mb-2">
           <ArrowLeft className="w-3 h-3" /> Voltar ao Criador

@@ -40,10 +40,10 @@ const GROUPS: Group[] = [
     subtitle: "Estrutura curricular, turmas e calendário",
     icon: GraduationCap,
     steps: [
-      { key: "aca.fac", title: "Faculdades e cursos", desc: "Confirmar faculdades e cursos da instituição.", icon: School, path: "/areaacademica/criador/faculdades" },
-      { key: "aca.cad", title: "Cadeiras", desc: "Gerar cadeiras por curso, ano e semestre.", icon: BookOpen, path: "/areaacademica/criador/cadeiras" },
-      { key: "aca.tur", title: "Turmas", desc: "Criar turmas e definir capacidade.", icon: Layers, path: "/areaacademica/criador/turmas" },
-      { key: "aca.cal", title: "Calendário académico", desc: "Definir ano letivo, semestres e feriados.", icon: CalendarDays, path: "/areaacademica/criador/calendario" },
+      { key: "aca.fac", title: "Faculdades e cursos", desc: "Confirmar faculdades e cursos da instituição.", icon: School, path: "/areaacademica/criador/faculdades?step=aca.fac" },
+      { key: "aca.cad", title: "Cadeiras", desc: "Gerar cadeiras por curso, ano e semestre.", icon: BookOpen, path: "/areaacademica/criador/cadeiras?step=aca.cad" },
+      { key: "aca.tur", title: "Turmas", desc: "Criar turmas e definir capacidade.", icon: Layers, path: "/areaacademica/criador/turmas?step=aca.tur" },
+      { key: "aca.cal", title: "Calendário académico", desc: "Definir ano letivo, semestres e feriados.", icon: CalendarDays, path: "/areaacademica/criador/calendario?step=aca.cal" },
     ],
   },
   {
@@ -53,9 +53,9 @@ const GROUPS: Group[] = [
     subtitle: "Docentes, staff e regras de presença",
     icon: UserCog,
     steps: [
-      { key: "rh.doc", title: "Registar docentes", desc: "Registar todos os docentes e atribuir cadeiras.", icon: GraduationCap, path: "/areaacademica/docentes" },
-      { key: "rh.staff", title: "Registar staff", desc: "Registar funcionários administrativos e técnicos.", icon: Briefcase, path: "/areaacademica/docentes" },
-      { key: "rh.pres", title: "Regras de presença", desc: "Definir limites de presença, tolerâncias e faltas justificadas.", icon: Clock, path: "/areaacademica/docentes" },
+      { key: "rh.doc", title: "Registar docentes", desc: "Registar todos os docentes e atribuir cadeiras.", icon: GraduationCap, path: "/areaacademica/docentes?step=rh.doc" },
+      { key: "rh.staff", title: "Registar staff", desc: "Registar funcionários administrativos e técnicos.", icon: Briefcase, path: "/areaacademica/docentes?step=rh.staff" },
+      { key: "rh.pres", title: "Regras de presença", desc: "Definir limites de presença, tolerâncias e faltas justificadas.", icon: Clock, path: "/areaacademica/docentes?step=rh.pres" },
     ],
   },
   {
@@ -65,9 +65,9 @@ const GROUPS: Group[] = [
     subtitle: "Receitas, propinas e tabelas financeiras",
     icon: Wallet,
     steps: [
-      { key: "fin.prop", title: "Propinas por curso", desc: "Definir valores de propinas por curso e ano.", icon: Banknote, path: "/financas/configurar-receitas" },
-      { key: "fin.taxas", title: "Emolumentos e serviços", desc: "Configurar emolumentos administrativos e serviços académicos.", icon: Receipt, path: "/financas/configurar-receitas" },
-      { key: "fin.multas", title: "Multas", desc: "Definir tabela de multas e penalidades aplicáveis.", icon: Receipt, path: "/financas/configurar-receitas" },
+      { key: "fin.prop", title: "Propinas por curso", desc: "Definir valores de propinas por curso e ano.", icon: Banknote, path: "/financas/configurar-receitas?step=fin.prop" },
+      { key: "fin.taxas", title: "Emolumentos e serviços", desc: "Configurar emolumentos administrativos e serviços académicos.", icon: Receipt, path: "/financas/configurar-receitas?step=fin.taxas" },
+      { key: "fin.multas", title: "Multas", desc: "Definir tabela de multas e penalidades aplicáveis.", icon: Receipt, path: "/financas/configurar-receitas?step=fin.multas" },
     ],
   },
   {
@@ -77,9 +77,9 @@ const GROUPS: Group[] = [
     subtitle: "Gabinete de apoio: solicitações, agendamentos e candidaturas",
     icon: LifeBuoy,
     steps: [
-      { key: "gap.sol", title: "Solicitações", desc: "Categorias, motivos e estados das solicitações.", icon: FileText, path: "/gap/configuracao?tab=solicitacoes" },
-      { key: "gap.age", title: "Agendamentos", desc: "Tipos de atendimento, salas e horários disponíveis.", icon: CalendarDays, path: "/gap/configuracao?tab=agendamentos" },
-      { key: "gap.cand", title: "Candidaturas", desc: "Processo de candidaturas, etapas e documentos.", icon: GraduationCap, path: "/gap/configuracao?tab=candidaturas" },
+      { key: "gap.sol", title: "Solicitações", desc: "Categorias, motivos e estados das solicitações.", icon: FileText, path: "/gap/configuracao?tab=solicitacoes&step=gap.sol" },
+      { key: "gap.age", title: "Agendamentos", desc: "Tipos de atendimento, salas e horários disponíveis.", icon: CalendarDays, path: "/gap/configuracao?tab=agendamentos&step=gap.age" },
+      { key: "gap.cand", title: "Candidaturas", desc: "Processo de candidaturas, etapas e documentos.", icon: GraduationCap, path: "/gap/configuracao?tab=candidaturas&step=gap.cand" },
     ],
   },
 ];
@@ -199,29 +199,7 @@ export default function AdminInicio() {
         })}
       </div>
 
-      <div className="grid md:grid-cols-3 gap-3">
-        <KpiCard label="Estado da instituição" value="Ativa" hint="Onboarding inicial concluído" tone="emerald" icon={Building2} />
-        <KpiCard label="Passos pendentes" value={String(ALL_STEPS.length - doneCount)} hint="A concluir pelas equipas" tone="amber" icon={Circle} />
-        <KpiCard label="Passos concluídos" value={String(doneCount)} hint="Configurações finalizadas" tone="primary" icon={CheckCircle2} />
-      </div>
     </div>
   );
 }
 
-function KpiCard({ label, value, hint, tone, icon: Icon }: { label: string; value: string; hint: string; tone: "emerald" | "amber" | "primary"; icon: React.ComponentType<{ className?: string }> }) {
-  const toneMap = {
-    emerald: "bg-emerald-50 text-emerald-700 border-emerald-200",
-    amber: "bg-amber-50 text-amber-700 border-amber-200",
-    primary: "bg-primary/10 text-primary border-primary/20",
-  } as const;
-  return (
-    <div className="rounded-xl border border-border bg-card p-4">
-      <div className="flex items-center justify-between mb-2">
-        <div className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground">{label}</div>
-        <div className={`w-8 h-8 rounded-lg border flex items-center justify-center ${toneMap[tone]}`}><Icon className="w-4 h-4" /></div>
-      </div>
-      <div className="text-2xl font-bold text-foreground tabular-nums">{value}</div>
-      <div className="text-xs text-muted-foreground mt-1">{hint}</div>
-    </div>
-  );
-}

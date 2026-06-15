@@ -1,3 +1,4 @@
+import { OnboardingStepBanner } from "@/components/admin/OnboardingStepBanner";
 import { useState, useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -97,6 +98,7 @@ export default function Docentes() {
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
+      <OnboardingStepBanner />
       <div className="rounded-xl border border-primary/30 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-6">
         <Badge className="mb-2 gap-1"><GraduationCap className="w-3 h-3" /> Corpo Docente</Badge>
         <h1 className="text-2xl font-bold flex items-center gap-2">
