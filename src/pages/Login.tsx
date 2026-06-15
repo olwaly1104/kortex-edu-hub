@@ -94,6 +94,18 @@ export default function Login() {
       };
       const target = MODULE_TO_DEMO[modulo] ?? MODULE_TO_DEMO.estudante;
       login(target.email, "olwaly");
+      // Admin (real cloud account): always start with the institutional onboarding flow,
+      // scoped per user so each new admin runs "registo de inscrição" once.
+      if (modulo === "admin") {
+        const flagKey = `upra.admin.onboarding.${userId ?? "anon"}`;
+        const seen = localStorage.getItem(flagKey);
+        if (!seen) {
+          localStorage.removeItem("upra.admin.onboarding");
+          localStorage.setItem(flagKey, "started");
+          navigate("/admin/onboarding");
+          return;
+        }
+      }
       navigate(target.path);
     } finally {
       setSubmitting(false);
