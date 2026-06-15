@@ -148,6 +148,80 @@ export type Database = {
         }
         Relationships: []
       }
+      cursos: {
+        Row: {
+          code: string
+          coordenador: string | null
+          created_at: string
+          estudantes_esperados: number
+          faculdade_id: string
+          id: string
+          name: string
+          owner_user_id: string
+          updated_at: string
+          years: number
+        }
+        Insert: {
+          code: string
+          coordenador?: string | null
+          created_at?: string
+          estudantes_esperados?: number
+          faculdade_id: string
+          id?: string
+          name: string
+          owner_user_id: string
+          updated_at?: string
+          years?: number
+        }
+        Update: {
+          code?: string
+          coordenador?: string | null
+          created_at?: string
+          estudantes_esperados?: number
+          faculdade_id?: string
+          id?: string
+          name?: string
+          owner_user_id?: string
+          updated_at?: string
+          years?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cursos_faculdade_id_fkey"
+            columns: ["faculdade_id"]
+            isOneToOne: false
+            referencedRelation: "faculdades"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      faculdades: {
+        Row: {
+          created_at: string
+          decano: string | null
+          id: string
+          name: string
+          owner_user_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          decano?: string | null
+          id?: string
+          name: string
+          owner_user_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          decano?: string | null
+          id?: string
+          name?: string
+          owner_user_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           body: string
@@ -186,6 +260,7 @@ export type Database = {
           display_name: string
           email: string | null
           id: string
+          institution_id: string | null
           updated_at: string
         }
         Insert: {
@@ -193,6 +268,7 @@ export type Database = {
           display_name: string
           email?: string | null
           id: string
+          institution_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -200,9 +276,48 @@ export type Database = {
           display_name?: string
           email?: string | null
           id?: string
+          institution_id?: string | null
           updated_at?: string
         }
         Relationships: []
+      }
+      propinas: {
+        Row: {
+          created_at: string
+          curso_id: string
+          id: string
+          imposto: number
+          owner_user_id: string
+          updated_at: string
+          valor_mensal: number
+        }
+        Insert: {
+          created_at?: string
+          curso_id: string
+          id?: string
+          imposto?: number
+          owner_user_id: string
+          updated_at?: string
+          valor_mensal?: number
+        }
+        Update: {
+          created_at?: string
+          curso_id?: string
+          id?: string
+          imposto?: number
+          owner_user_id?: string
+          updated_at?: string
+          valor_mensal?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "propinas_curso_id_fkey"
+            columns: ["curso_id"]
+            isOneToOne: true
+            referencedRelation: "cursos"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
@@ -230,6 +345,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      current_institution_id: { Args: never; Returns: string }
       get_or_create_dm: { Args: { _other_user_id: string }; Returns: string }
       has_role: {
         Args: {
