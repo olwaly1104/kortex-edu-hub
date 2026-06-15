@@ -43,11 +43,7 @@ export default function OnboardingEstudantes() {
   const initialTab = params.get("tab") === "manual" ? "manual" : "importar";
 
   const [rows, setRows] = useState<Row[]>(seedRows);
-  const [tipo, setTipo] = useState<"novo" | "existente">("novo");
   const [novo, setNovo] = useState(emptyNovo);
-  const [busca, setBusca] = useState("");
-  const [escolhidoId, setEscolhidoId] = useState<string | null>(null);
-  const [destino, setDestino] = useState({ curso: "ARQ", ano: "1", turma: "A" });
 
   const totals = useMemo(() => ({
     total: rows.length,
@@ -57,34 +53,21 @@ export default function OnboardingEstudantes() {
   const remove = (id: string) => setRows(prev => prev.filter(r => r.id !== id));
 
   const confirmarAdicao = () => {
-    if (tipo === "novo") {
-      if (!novo.primeiroNome.trim() || !novo.ultimoNome.trim() || !novo.nascimento || !novo.bilhete.trim()) {
-        toast.error("Preencha nome, data de nascimento e bilhete de identidade");
-        return;
-      }
-      const nomeCompleto = `${novo.primeiroNome.trim()} ${novo.ultimoNome.trim()}`;
-      const emailGerado = `${nomeCompleto.toLowerCase().replace(/\s+/g, ".").normalize("NFD").replace(/[^a-z.]/g, "")}@upra.kor`;
-      setRows(prev => [...prev, {
-        id: String(Date.now()),
-        nome: nomeCompleto,
-        email: emailGerado,
-        curso: novo.curso, ano: novo.ano, turma: novo.turma,
-        origem: "novo",
-      }]);
-      setNovo(emptyNovo);
-      toast.success(`Estudante adicionado. Email institucional: ${emailGerado}`);
-    } else {
-      const alvo = existentesPool.find(e => e.id === escolhidoId);
-      if (!alvo) { toast.error("Selecione um estudante existente"); return; }
-      setRows(prev => [...prev, {
-        id: String(Date.now()),
-        nome: alvo.nome, email: alvo.email,
-        curso: destino.curso, ano: destino.ano, turma: destino.turma,
-        origem: "existente",
-      }]);
-      setEscolhidoId(null); setBusca("");
-      toast.success(`${alvo.nome} associado a ${destino.curso} · ${destino.ano}º · Turma ${destino.turma}`);
+    if (!novo.primeiroNome.trim() || !novo.ultimoNome.trim() || !novo.nascimento || !novo.bilhete.trim()) {
+      toast.error("Preencha nome, data de nascimento e bilhete de identidade");
+      return;
     }
+    const nomeCompleto = `${novo.primeiroNome.trim()} ${novo.ultimoNome.trim()}`;
+    const emailGerado = `${nomeCompleto.toLowerCase().replace(/\s+/g, ".").normalize("NFD").replace(/[^a-z.]/g, "")}@upra.kor`;
+    setRows(prev => [...prev, {
+      id: String(Date.now()),
+      nome: nomeCompleto,
+      email: emailGerado,
+      curso: novo.curso, ano: novo.ano, turma: novo.turma,
+      origem: "novo",
+    }]);
+    setNovo(emptyNovo);
+    toast.success(`Estudante adicionado. Email institucional: ${emailGerado}`);
   };
 
   const simulateImport = () => {
