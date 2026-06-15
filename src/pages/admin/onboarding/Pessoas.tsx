@@ -71,8 +71,8 @@ export default function OnboardingPessoas({ mode }: { mode: Mode }) {
 
   const simulateImport = () => {
     const generated: Person[] = Array.from({ length: 8 }).map((_, i) => isDoc
-      ? { id: `id-${Date.now()}-${i}`, nome: `Prof. Importado ${i + 1}`, email: `docente${i + 1}@upra.kor`, contacto: `+244 923 200 00${i}`, grau: grausPool[i % grausPool.length] }
-      : { id: `is-${Date.now()}-${i}`, nome: `Staff Importado ${i + 1}`, email: `staff${i + 1}@upra.kor`, contacto: `+244 923 300 00${i}`, departamento: departamentosPool[i % departamentosPool.length], funcao: funcoesPool[i % funcoesPool.length] }
+      ? { id: `id-${Date.now()}-${i}`, prefixo: "Prof.", nome: `Importado ${i + 1}`, email: `docente${i + 1}@upra.kor`, contacto: `+244 923 200 00${i}`, grau: grausPool[i % grausPool.length] }
+      : { id: `is-${Date.now()}-${i}`, prefixo: "Sr.", nome: `Staff Importado ${i + 1}`, email: `staff${i + 1}@upra.kor`, contacto: `+244 923 300 00${i}`, departamento: departamentosPool[i % departamentosPool.length], funcao: funcoesPool[i % funcoesPool.length] }
     );
     setRows(prev => [...prev, ...generated]);
     toast.success(`${generated.length} ${isDoc ? "docentes" : "funcionários"} importados`);
