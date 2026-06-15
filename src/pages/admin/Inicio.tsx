@@ -3,10 +3,10 @@ import { useState } from "react";
 import { FinHeader } from "@/pages/financas/_FinHeader";
 import { useAuth } from "@/contexts/AuthContext";
 import {
-  Building2, Wallet, LifeBuoy, BookOpen, ArrowRight, CheckCircle2, Circle,
-  RotateCcw, ShieldCheck, GraduationCap, Users, CalendarDays, Receipt,
-  Banknote, FileText, Layers, School, ChevronDown, UserCog, Clock, Briefcase,
-  UserPlus, Upload, MapPin,
+  Building2, LifeBuoy, BookOpen, ArrowRight, CheckCircle2, Circle,
+  RotateCcw, ShieldCheck, GraduationCap, Users, CalendarDays,
+  FileText, Layers, School, ChevronDown, UserCog, Clock, Briefcase,
+  MapPin,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
