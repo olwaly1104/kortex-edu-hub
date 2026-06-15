@@ -1,4 +1,4 @@
-import { OnboardingStepBanner } from "@/components/admin/OnboardingStepBanner";
+import { OnboardingStepBanner, useIsOnboardingStep } from "@/components/admin/OnboardingStepBanner";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
@@ -283,6 +283,7 @@ const seedSalaryConfig = (s: Salary): SalaryConfig => {
 type Mode = "receitas" | "despesas" | "salarios";
 
 export default function ConfigurarReceitas() {
+  const isOnboarding = useIsOnboardingStep();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -724,6 +725,7 @@ export default function ConfigurarReceitas() {
     <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6 animate-fade-in">
       <OnboardingStepBanner />
       {/* Header — institucional (Ano Letivo + Dia de Hoje) */}
+      {!isOnboarding && (
       <div className="rounded-xl border border-border bg-gradient-to-r from-primary/5 to-transparent px-5 py-4">
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div className="flex items-start gap-2 min-w-0">
