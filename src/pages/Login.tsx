@@ -125,7 +125,7 @@ export default function Login() {
       login(target.email, "olwaly");
       // Admin (real cloud account): always run institutional onboarding (ficha de inscrição)
       // before the inicio, until it's marked completed.
-      if (modulo === "admin" && !isOnboardingDone()) {
+      if (modulo === "admin" && !isOnboardingDone(target.email)) {
         navigate("/admin/onboarding");
         return;
       }
