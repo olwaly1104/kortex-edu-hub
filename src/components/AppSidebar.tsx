@@ -250,9 +250,21 @@ const adminSections: NavSection[] = [
   ]},
   { title: "Instituição", items: [
     { label: "Faculdades & Cursos", icon: Building2, path: "/admin/faculdades-cursos" },
-    { label: "Discentes", icon: Users, path: "/admin/discentes" },
     { label: "Salas e Edifícios", icon: Building2, path: "/admin/salas" },
     { label: "Staff", icon: UserCog, path: "/admin/staff" },
+  ]},
+  { title: "Finanças", items: [
+    { label: "Dashboard", icon: BarChart3, path: "/admin/financas/dashboard" },
+    { label: "Receitas", icon: TrendingUp, path: "/admin/financas/receitas" },
+    { label: "Despesas", icon: FileText, path: "/admin/financas/despesas" },
+    { label: "Salários", icon: Users, path: "/admin/financas/salarios" },
+    { label: "Orçamentos", icon: FolderOpen, path: "/admin/financas/orcamentos" },
+    { label: "Discentes", icon: Users, path: "/admin/financas/discentes" },
+    { label: "Candidaturas", icon: ClipboardList, path: "/admin/financas/candidaturas" },
+  ]},
+  { title: "Estudantes", items: [
+    { label: "Discentes", icon: Users, path: "/admin/discentes" },
+    { label: "Candidaturas", icon: ClipboardList, path: "/admin/candidaturas" },
   ]},
 ];
 
