@@ -151,6 +151,7 @@ export default function Login() {
           completed: false,
         };
         localStorage.setItem(onboardingKey(emailTrim), JSON.stringify(onboardingState));
+        pushOnboarding(emailTrim, onboardingState);
       } catch {
         /* ignore */
       }
