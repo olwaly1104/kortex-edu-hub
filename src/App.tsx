@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import { isOnboardingCompleteFor } from "@/lib/onboardingStorage";
 import Login from "./pages/Login";
 import Website from "./pages/Website";
 import Candidatar from "./pages/Candidatar";
@@ -220,21 +221,13 @@ function RoleGuardedLayout({ homeRedirect }: { homeRedirect: string }) {
   return <AppLayout />;
 }
 
-function isOnboardingComplete(): boolean {
-  try {
-    const raw = localStorage.getItem("upra.admin.onboarding");
-    if (!raw) return false;
-    return !!JSON.parse(raw).completed;
-  } catch { return false; }
-}
-
 function AppRoutes() {
   const { isAuthenticated, user } = useAuth();
   if (!isAuthenticated) return <Routes><Route path="/" element={<Website />} /><Route path="/site" element={<Website />} /><Route path="/candidatar" element={<Candidatar />} /><Route path="*" element={<Login />} /></Routes>;
   const homeRedirect = homeRedirectMap[user?.role || "student"] || "/student";
 
   // Admin gate: before onboarding completion, force onboarding route (no app layout)
-  if (user?.role === "admin" && !isOnboardingComplete()) {
+  if (user?.role === "admin" && !isOnboardingCompleteFor(user?.email)) {
     return (
       <Routes>
         <Route path="/admin/onboarding" element={<AdminOnboarding />} />

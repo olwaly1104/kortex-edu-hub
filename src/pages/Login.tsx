@@ -60,9 +60,9 @@ export default function Login() {
     }
   }, [suModulo, suName, suEmailManuallyEdited]);
 
-  const isOnboardingDone = () => {
+  const isOnboardingDone = (forEmail: string) => {
     try {
-      const raw = localStorage.getItem("upra.admin.onboarding");
+      const raw = localStorage.getItem(`upra.admin.onboarding:${forEmail.trim().toLowerCase()}`);
       if (!raw) return false;
       const parsed = JSON.parse(raw);
       return !!parsed?.completed;
@@ -87,7 +87,7 @@ export default function Login() {
           return;
         }
         // Admin demo: send to institutional onboarding (ficha de inscrição) first if not completed
-        if (email === "admin@upra.kor" && !isOnboardingDone()) {
+        if (email === "admin@upra.kor" && !isOnboardingDone(email)) {
           navigate("/admin/onboarding");
         }
         return;
@@ -125,7 +125,7 @@ export default function Login() {
       login(target.email, "olwaly");
       // Admin (real cloud account): always run institutional onboarding (ficha de inscrição)
       // before the inicio, until it's marked completed.
-      if (modulo === "admin" && !isOnboardingDone()) {
+      if (modulo === "admin" && !isOnboardingDone(target.email)) {
         navigate("/admin/onboarding");
         return;
       }

@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { FinHeader } from "@/pages/financas/_FinHeader";
 import { useAuth } from "@/contexts/AuthContext";
+import { onboardingKey } from "@/lib/onboardingStorage";
 import {
   Building2, LifeBuoy, BookOpen, ArrowRight, CheckCircle2,
   RotateCcw, ShieldCheck, GraduationCap, CalendarDays,
@@ -120,7 +121,7 @@ export default function AdminInicio() {
 
   const reset = () => {
     if (!confirm("Repor onboarding? Todos os dados introduzidos serão perdidos.")) return;
-    localStorage.removeItem("upra.admin.onboarding");
+    localStorage.removeItem(onboardingKey(user?.email));
     localStorage.removeItem(ADMIN_PROGRESS_KEY);
     navigate("/admin/onboarding");
   };

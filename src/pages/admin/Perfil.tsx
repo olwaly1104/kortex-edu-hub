@@ -5,15 +5,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/contexts/AuthContext";
+import { onboardingKey, profileKey } from "@/lib/onboardingStorage";
 import {
   ShieldCheck, Building2, Mail, Phone, Globe, MapPin, Calendar, GraduationCap,
   Users, Briefcase, Settings2, Save, IdCard, Hash,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-
-const STORAGE = "upra.admin.onboarding";
-const PROFILE_KEY = "upra.admin.perfil";
 
 type Instituicao = {
   nomeOficial: string; sigla: string; nif: string; fundacao: string; natureza: string;
@@ -28,7 +26,9 @@ const EMPTY: Instituicao = {
   email: "", telefone: "", website: "", morada: "", logoDataUrl: "",
 };
 
-function loadInitial(): Instituicao {
+function loadInitial(email?: string | null): Instituicao {
+  const PROFILE_KEY = profileKey(email);
+  const STORAGE = onboardingKey(email);
   try {
     const saved = localStorage.getItem(PROFILE_KEY);
     if (saved) return { ...EMPTY, ...JSON.parse(saved) };
@@ -56,11 +56,12 @@ function loadInitial(): Instituicao {
 
 export default function AdminPerfil() {
   const { user } = useAuth();
-  const [instituicao, setInstituicao] = useState<Instituicao>(loadInitial);
+  const PROFILE_KEY = profileKey(user?.email);
+  const [instituicao, setInstituicao] = useState<Instituicao>(() => loadInitial(user?.email));
 
   useEffect(() => {
     try { localStorage.setItem(PROFILE_KEY, JSON.stringify(instituicao)); } catch { /* ignore */ }
-  }, [instituicao]);
+  }, [instituicao, PROFILE_KEY]);
 
   const handleSave = () => {
     try { localStorage.setItem(PROFILE_KEY, JSON.stringify(instituicao)); } catch { /* ignore */ }
