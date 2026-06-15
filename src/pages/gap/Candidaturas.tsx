@@ -50,6 +50,20 @@ export default function GapCandidaturas() {
   const [periodo, setPeriodo] = useState<PeriodoFilter>("todos");
   const [filterOpen, setFilterOpen] = useState(false);
   const [filterView, setFilterView] = useState<"root" | "estado" | "curso" | "periodo">("root");
+  const [liveCands, setLiveCands] = useState<LiveCand[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data, error } = await supabase
+        .from("candidaturas" as any)
+        .select("id,nome,email,telefone,curso_pretendido,faculdade,estado,pagamento_status,created_at,origem")
+        .order("created_at", { ascending: false })
+        .limit(20);
+      if (!cancelled && !error && data) setLiveCands(data as any);
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   // Normaliza: 'incompleto' tratado como 'pendente'
   const normalized = useMemo(
