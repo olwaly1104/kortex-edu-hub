@@ -22,7 +22,6 @@ const DEMO_ACCOUNTS: { role: string; email: string }[] = [
   { role: "Reitor", email: "reitor@upra.kor" },
   { role: "Académica", email: "academica@upra.kor" },
   { role: "Finanças", email: "financas@upra.kor" },
-  { role: "GAP", email: "gap@upra.kor" },
   { role: "Inscrições", email: "inscricoes@upra.kor" },
   { role: "Área Académica 2", email: "areaacademica2@upra.kor" },
 ];
