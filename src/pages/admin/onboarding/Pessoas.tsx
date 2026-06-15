@@ -185,13 +185,17 @@ export default function OnboardingPessoas({ mode }: { mode: Mode }) {
           <span className="text-xs text-muted-foreground">{rows.length} {rows.length === 1 ? "registo" : "registos"}</span>
         </div>
         <div className={`grid ${grid} gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b`}>
-          <span>Nome</span><span>Email</span>
+          <span>Prefixo</span><span>Nome</span><span>Email</span>
           {isDoc ? (<><span>Contacto</span><span>Grau</span></>) : (<><span>Contacto</span><span>Departamento</span><span>Função</span></>)}
           <span></span>
         </div>
         <div className="divide-y">
           {rows.map(r => (
             <div key={r.id} className={`grid ${grid} gap-2 px-4 py-2 items-center`}>
+              <Select value={r.prefixo || ""} onValueChange={v => update(r.id, { prefixo: v })}>
+                <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="—" /></SelectTrigger>
+                <SelectContent>{prefixosPool.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
+              </Select>
               <Input value={r.nome} onChange={e => update(r.id, { nome: e.target.value })} className="h-8 text-xs" />
               <Input value={r.email} readOnly disabled className="h-8 text-xs bg-muted/40 cursor-not-allowed" />
               <Input value={r.contacto || ""} onChange={e => update(r.id, { contacto: e.target.value })} className="h-8 text-xs" placeholder="+244 ..." />
