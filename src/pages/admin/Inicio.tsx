@@ -6,7 +6,7 @@ import {
   Building2, LifeBuoy, BookOpen, ArrowRight, CheckCircle2,
   RotateCcw, ShieldCheck, GraduationCap, CalendarDays,
   FileText, Layers, School, ChevronDown, UserCog, Clock, Briefcase,
-  MapPin,
+  MapPin, Users, UserPlus, Upload, Wallet, Banknote, Receipt,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -35,9 +35,19 @@ type Group = {
 
 const GROUPS: Group[] = [
   {
+    id: "est",
+    area: "Estudantes",
+    title: "Registar Discentes",
+    subtitle: "Importar e registar discentes da instituição",
+    icon: UserPlus,
+    steps: [
+      { key: "est.imp", title: "Importar discentes", desc: "Carregar lista de discentes em lote (CSV/Excel).", icon: Upload, path: "/admin/onboarding/estudantes?step=est.imp" },
+    ],
+  },
+  {
     id: "inf",
     area: "Infraestrutura",
-    title: "Registar Salas, Edifícios e Geopontos do Campus",
+    title: "Registar Geopontos do Campus",
     subtitle: "Espaços físicos e pontos GPS de presença",
     icon: Building2,
     steps: [
@@ -55,6 +65,19 @@ const GROUPS: Group[] = [
       { key: "aca.cad", title: "Cadeiras", desc: "Gerar cadeiras por curso, ano e semestre.", icon: BookOpen, path: "/areaacademica/criador/cadeiras?step=aca.cad" },
       { key: "aca.tur", title: "Turmas", desc: "Criar turmas e definir capacidade.", icon: Layers, path: "/areaacademica/criador/turmas?step=aca.tur" },
       { key: "aca.cal", title: "Calendário académico", desc: "Definir ano letivo, semestres e feriados.", icon: CalendarDays, path: "/areaacademica/criador/calendario?step=aca.cal" },
+    ],
+  },
+  {
+    id: "fin",
+    area: "Finanças",
+    title: "Configurar Finanças",
+    subtitle: "Propinas, emolumentos, multas e salários",
+    icon: Wallet,
+    steps: [
+      { key: "fin.pro", title: "Propinas", desc: "Definir valores de propinas por curso e ano.", icon: Wallet, path: "/financas/configurador?tab=propinas&step=fin.pro" },
+      { key: "fin.emo", title: "Emolumentos e taxas", desc: "Configurar taxas e serviços académicos.", icon: Receipt, path: "/financas/configurador?tab=taxas&step=fin.emo" },
+      { key: "fin.mul", title: "Multas", desc: "Definir regras e valores de multas.", icon: Banknote, path: "/financas/configurador?tab=multas&step=fin.mul" },
+      { key: "fin.sal", title: "Salários", desc: "Configurar escalões e tabela salarial.", icon: Briefcase, path: "/admin/onboarding/salarios?step=fin.sal" },
     ],
   },
   {
