@@ -96,8 +96,8 @@ export default function OnboardingEspacos() {
           <Building2 className="w-5 h-5" />
         </div>
         <div>
-          <h1 className="text-lg font-semibold leading-tight">Registar Geopontos</h1>
-          <p className="text-xs text-muted-foreground">Defina os pontos GPS de entradas, edifícios e zonas de presença do campus.</p>
+          <h1 className="text-lg font-semibold leading-tight">Edifícios e Salas</h1>
+          <p className="text-xs text-muted-foreground">Registe todos os espaços físicos: salas de aula, gabinetes, laboratórios, bibliotecas e auditórios.</p>
         </div>
         <div className="ml-auto flex gap-4 text-right">
           <div><p className="text-xs text-muted-foreground">Edifícios</p><p className="text-lg font-semibold">{edificios.length}</p></div>
