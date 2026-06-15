@@ -60,6 +60,15 @@ export default function Login() {
     }
   }, [suModulo, suName, suEmailManuallyEdited]);
 
+  const isOnboardingDone = () => {
+    try {
+      const raw = localStorage.getItem("upra.admin.onboarding");
+      if (!raw) return false;
+      const parsed = JSON.parse(raw);
+      return !!parsed?.completed;
+    } catch { return false; }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -75,6 +84,11 @@ export default function Login() {
         const result = login(email, password);
         if (!result.ok) {
           setError(result.error || "Não foi possível iniciar sessão.");
+          return;
+        }
+        // Admin demo: send to institutional onboarding (ficha de inscrição) first if not completed
+        if (email === "admin@upra.kor" && !isOnboardingDone()) {
+          navigate("/admin/onboarding");
         }
         return;
       }
@@ -109,17 +123,11 @@ export default function Login() {
       };
       const target = MODULE_TO_DEMO[modulo] ?? MODULE_TO_DEMO.estudante;
       login(target.email, "olwaly");
-      // Admin (real cloud account): always start with the institutional onboarding flow,
-      // scoped per user so each new admin runs "registo de inscrição" once.
-      if (modulo === "admin") {
-        const flagKey = `upra.admin.onboarding.${userId ?? "anon"}`;
-        const seen = localStorage.getItem(flagKey);
-        if (!seen) {
-          localStorage.removeItem("upra.admin.onboarding");
-          localStorage.setItem(flagKey, "started");
-          navigate("/admin/onboarding");
-          return;
-        }
+      // Admin (real cloud account): always run institutional onboarding (ficha de inscrição)
+      // before the inicio, until it's marked completed.
+      if (modulo === "admin" && !isOnboardingDone()) {
+        navigate("/admin/onboarding");
+        return;
       }
       navigate(target.path);
     } finally {
