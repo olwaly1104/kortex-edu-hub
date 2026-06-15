@@ -8,10 +8,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cursoTemplates, cadeirasTemplate, alocacaoCandidatos } from "@/data/academica2Data";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   Sparkles, CheckCircle2, Loader2, Wand2, BookOpen, Users, Calendar, Rocket, RefreshCw,
   GraduationCap, ClipboardList, FileCheck2, CalendarDays, BrainCircuit, Megaphone, ChevronRight,
-  UserCog, Check, Pencil, Building2,
+  UserCog, Check, Pencil, Building2, ShieldCheck,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -24,12 +25,27 @@ interface Step {
   icon: typeof BookOpen;
 }
 
-const steps: Step[] = [
+const ADMIN_PROGRESS_KEY = "upra.admin.config.progress";
+const ADMIN_STEP_KEYS: Record<string, string> = {
+  faculdades: "aca.fac",
+  cadeiras: "aca.cad",
+  turmas: "aca.tur",
+  calendario: "aca.cal",
+};
+
+const stepsAcademica: Step[] = [
   { id: "faculdades", label: "Confirmar Faculdades & Cursos", description: "Validar faculdades, decanos e cursos (com coordenador) de cada uma.", icon: Building2 },
   { id: "cadeiras", label: "Confirmar Cadeiras", description: "Alocar cadeiras, docentes e banco de quizzes por curso.", icon: BookOpen },
   { id: "turmas", label: "Criar Turmas", description: "Alocar candidatos aprovados a turmas do 1º ano.", icon: ClipboardList },
   { id: "calendario", label: "Calendário Académico", description: "Semestres, feriados e mapa de exames (1ª e 2ª época).", icon: CalendarDays },
   { id: "publicar", label: "Publicar Ano Letivo", description: "Activar ano e notificar todos os perfis.", icon: Megaphone },
+];
+
+const stepsAdmin: Step[] = [
+  { id: "faculdades", label: "Confirmar Faculdades & Cursos", description: "Validar faculdades, decanos e cursos da instituição.", icon: Building2 },
+  { id: "cadeiras", label: "Confirmar Cadeiras", description: "Rever cadeiras, docentes e ECTS por curso.", icon: BookOpen },
+  { id: "turmas", label: "Confirmar Turmas", description: "Definir turmas iniciais e respectivas capacidades.", icon: ClipboardList },
+  { id: "calendario", label: "Calendário Académico", description: "Definir ano letivo, semestres, feriados e mapa de exames.", icon: CalendarDays },
 ];
 
 const coordenadoresPool = [
