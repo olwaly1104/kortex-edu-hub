@@ -760,6 +760,7 @@ export default function ConfigurarReceitas() {
           </div>
         </div>
       </div>
+      )}
 
       {/* Mode toggle — compact pill */}
       <div className="inline-flex items-center gap-0.5 rounded-lg border border-border bg-muted/40 p-0.5 w-fit">
