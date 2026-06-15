@@ -74,7 +74,6 @@ export default function Login() {
     "reitor@upra.kor": "/reitor",
     "academica@upra.kor": "/secretaria",
     "financas@upra.kor": "/financas",
-    "gap@upra.kor": "/gap",
     "inscricoes@upra.kor": "/inscricoes",
     "areaacademica2@upra.kor": "/area-academica-2",
   };
