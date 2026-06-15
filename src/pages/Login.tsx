@@ -38,6 +38,7 @@ export default function Login() {
 
   // Signup dialog state
   const [signupOpen, setSignupOpen] = useState(false);
+  const [suModulo, setSuModulo] = useState<string>("admin");
   const [suName, setSuName] = useState("");
   const [suEmail, setSuEmail] = useState("");
   const [suPassword, setSuPassword] = useState("");
