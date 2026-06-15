@@ -40,11 +40,22 @@ const GROUPS: Group[] = [
     subtitle: "Estrutura curricular, turmas e calendário",
     icon: GraduationCap,
     steps: [
-      { key: "aca.fac", title: "Faculdades e cursos", desc: "Confirmar faculdades e criar cursos da instituição.", icon: School, path: "/areaacademica/criador/faculdades" },
+      { key: "aca.fac", title: "Faculdades e cursos", desc: "Confirmar faculdades e cursos da instituição.", icon: School, path: "/areaacademica/criador/faculdades" },
       { key: "aca.cad", title: "Cadeiras", desc: "Gerar cadeiras por curso, ano e semestre.", icon: BookOpen, path: "/areaacademica/criador/cadeiras" },
       { key: "aca.tur", title: "Turmas", desc: "Criar turmas e definir capacidade.", icon: Layers, path: "/areaacademica/criador/turmas" },
       { key: "aca.cal", title: "Calendário académico", desc: "Definir ano letivo, semestres e feriados.", icon: CalendarDays, path: "/areaacademica/criador/calendario" },
-      { key: "aca.doc", title: "Corpo docente", desc: "Registar docentes e atribuir cadeiras.", icon: Users, path: "/areaacademica/docentes" },
+    ],
+  },
+  {
+    id: "rh",
+    area: "Recursos Humanos",
+    title: "Configurar RH",
+    subtitle: "Docentes, staff e regras de presença",
+    icon: UserCog,
+    steps: [
+      { key: "rh.doc", title: "Registar docentes", desc: "Registar todos os docentes e atribuir cadeiras.", icon: GraduationCap, path: "/areaacademica/docentes" },
+      { key: "rh.staff", title: "Registar staff", desc: "Registar funcionários administrativos e técnicos.", icon: Briefcase, path: "/areaacademica/docentes" },
+      { key: "rh.pres", title: "Regras de presença", desc: "Definir limites de presença, tolerâncias e faltas justificadas.", icon: Clock, path: "/areaacademica/docentes" },
     ],
   },
   {
@@ -71,7 +82,6 @@ const GROUPS: Group[] = [
       { key: "gap.cand", title: "Candidaturas", desc: "Processo de candidaturas, etapas e documentos.", icon: GraduationCap, path: "/gap/configuracao?tab=candidaturas" },
     ],
   },
-
 ];
 
 const ALL_STEPS = GROUPS.flatMap((g) => g.steps);
