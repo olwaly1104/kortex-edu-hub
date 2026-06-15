@@ -249,10 +249,10 @@ const adminSections: NavSection[] = [
     { label: "Meu Perfil", icon: User, path: "/admin/perfil" },
   ]},
   { title: "Instituição", items: [
-    { label: "Faculdades & Cursos", icon: Building2, path: "/areaacademica/criador/faculdades" },
-    { label: "Discentes", icon: Users, path: "/admin/onboarding/estudantes" },
-    { label: "Salas e Edifícios", icon: Building2, path: "/admin/onboarding/espacos" },
-    { label: "Staff", icon: UserCog, path: "/admin/onboarding/staff" },
+    { label: "Faculdades & Cursos", icon: Building2, path: "/admin/faculdades-cursos" },
+    { label: "Discentes", icon: Users, path: "/admin/discentes" },
+    { label: "Salas e Edifícios", icon: Building2, path: "/admin/salas" },
+    { label: "Staff", icon: UserCog, path: "/admin/staff" },
   ]},
 ];
 

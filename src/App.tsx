@@ -172,6 +172,10 @@ import AdminOnboardingPessoas from "./pages/admin/onboarding/Pessoas";
 import AdminOnboardingRegrasPresenca from "./pages/admin/onboarding/RegrasPresenca";
 import AdminOnboardingSalarios from "./pages/admin/onboarding/Salarios";
 import AdminOnboardingEspacos from "./pages/admin/onboarding/Espacos";
+import AdminFaculdadesCursos from "./pages/admin/FaculdadesCursos";
+import AdminDiscentes from "./pages/admin/Discentes";
+import AdminSalas from "./pages/admin/Salas";
+import AdminStaff from "./pages/admin/Staff";
 
 const queryClient = new QueryClient();
 
@@ -246,6 +250,10 @@ function AppRoutes() {
         {/* Admin */}
         <Route path="/admin" element={<AdminInicio />} />
         <Route path="/admin/perfil" element={<AdminPerfil />} />
+        <Route path="/admin/faculdades-cursos" element={<AdminFaculdadesCursos />} />
+        <Route path="/admin/discentes" element={<AdminDiscentes />} />
+        <Route path="/admin/salas" element={<AdminSalas />} />
+        <Route path="/admin/staff" element={<AdminStaff />} />
         <Route path="/admin/onboarding/estudantes" element={<AdminOnboardingEstudantes />} />
         <Route path="/admin/onboarding/docentes" element={<AdminOnboardingPessoas mode="docentes" />} />
         <Route path="/admin/onboarding/staff" element={<AdminOnboardingPessoas mode="staff" />} />
