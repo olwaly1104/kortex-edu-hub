@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -9,12 +9,15 @@ import ReportsMenuButton from "@/components/ReportsMenuButton";
 import {
   Search, X, Clock, Inbox, AlertCircle, GraduationCap, CalendarClock,
   SlidersHorizontal, ChevronRight, ChevronLeft, Check,
-  FileBarChart2, BarChart3, TrendingUp, BookOpen,
+  FileBarChart2, BarChart3, TrendingUp, BookOpen, Globe,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { candidaturas, estadoLabels, periodos, cursos, type EstadoCandidatura } from "@/data/admissoesData";
 import { buildCronologia, etapaEstadoStyle, etapaEstadoLabel } from "./CandidaturaDetail";
 import { FinHeader } from "@/pages/financas/_FinHeader";
+import { supabase } from "@/integrations/supabase/client";
+
+type LiveCand = { id: string; nome: string; email: string; telefone: string | null; curso_pretendido: string | null; faculdade: string | null; estado: string; pagamento_status: string; created_at: string; origem: string };
 
 const TODAY = "2025-01-15";
 
