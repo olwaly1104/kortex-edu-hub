@@ -27,8 +27,20 @@ const EMPTY: Instituicao = {
 };
 
 function currentSiteUrl(): string {
-  try { return window.location.origin; } catch { return ""; }
+  try {
+    const { protocol, hostname } = window.location;
+    // On Lovable preview hostnames like "id-preview--<uuid>.lovable.app",
+    // return the corresponding published URL "<uuid>.lovable.app".
+    const previewPrefix = "id-preview--";
+    const published = hostname.startsWith(previewPrefix)
+      ? hostname.slice(previewPrefix.length)
+      : hostname;
+    return `${protocol}//${published}`;
+  } catch {
+    return "";
+  }
 }
+
 
 function loadInitial(email?: string | null): Instituicao {
   const PROFILE_KEY = profileKey(email);
