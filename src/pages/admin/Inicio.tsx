@@ -6,6 +6,7 @@ import {
   Building2, Wallet, LifeBuoy, BookOpen, ArrowRight, CheckCircle2, Circle,
   RotateCcw, ShieldCheck, GraduationCap, Users, CalendarDays, Receipt,
   Banknote, FileText, Layers, School, ChevronDown, UserCog, Clock, Briefcase,
+  UserPlus, Upload,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -34,6 +35,17 @@ type Group = {
 
 const GROUPS: Group[] = [
   {
+    id: "est",
+    area: "Estudantes",
+    title: "Adicionar Estudantes",
+    subtitle: "Importar e validar matrículas",
+    icon: UserPlus,
+    steps: [
+      { key: "est.imp", title: "Importar estudantes", desc: "Carregar lista via CSV/Excel ou registo manual.", icon: Upload, path: "/admin/onboarding/estudantes?tab=importar&step=est.imp" },
+      { key: "est.val", title: "Validar matrículas",  desc: "Atribuir curso, ano e turma aos estudantes.",      icon: Layers, path: "/admin/onboarding/estudantes?tab=validar&step=est.val" },
+    ],
+  },
+  {
     id: "aca",
     area: "Área Académica",
     title: "Configurar Área Académica",
@@ -53,9 +65,9 @@ const GROUPS: Group[] = [
     subtitle: "Docentes, staff e regras de presença",
     icon: UserCog,
     steps: [
-      { key: "rh.doc", title: "Registar docentes", desc: "Registar todos os docentes e atribuir cadeiras.", icon: GraduationCap, path: "/areaacademica/docentes?step=rh.doc" },
-      { key: "rh.staff", title: "Registar staff", desc: "Registar funcionários administrativos e técnicos.", icon: Briefcase, path: "/areaacademica/docentes?step=rh.staff" },
-      { key: "rh.pres", title: "Regras de presença", desc: "Definir limites de presença, tolerâncias e faltas justificadas.", icon: Clock, path: "/areaacademica/docentes?step=rh.pres" },
+      { key: "rh.doc", title: "Registar docentes", desc: "Adicionar todos os docentes da instituição em lote.", icon: GraduationCap, path: "/admin/onboarding/docentes?step=rh.doc" },
+      { key: "rh.staff", title: "Registar staff", desc: "Adicionar funcionários administrativos e técnicos.", icon: Briefcase, path: "/admin/onboarding/staff?step=rh.staff" },
+      { key: "rh.pres", title: "Regras de presença", desc: "Definir limites de presença, tolerâncias e faltas justificadas.", icon: Clock, path: "/admin/onboarding/regras-presenca?step=rh.pres" },
     ],
   },
   {

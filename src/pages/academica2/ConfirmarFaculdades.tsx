@@ -1,4 +1,4 @@
-import { OnboardingStepBanner } from "@/components/admin/OnboardingStepBanner";
+import { OnboardingStepBanner, useIsOnboardingStep } from "@/components/admin/OnboardingStepBanner";
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
@@ -47,6 +47,7 @@ const initialFaculdades: FacState[] = [
 const emptyCurso = { code: "", name: "", coordenador: coordenadoresPool[0], years: 4, cadeirasPorAno: 6, estudantesEsperados: 100 };
 
 export default function ConfirmarFaculdades() {
+  const isOnboarding = useIsOnboardingStep();
   const [faculdades, setFaculdades] = useState<FacState[]>(initialFaculdades);
   const [addOpenFor, setAddOpenFor] = useState<string | null>(null);
   const [draft, setDraft] = useState({ ...emptyCurso });
@@ -99,24 +100,28 @@ export default function ConfirmarFaculdades() {
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
-      <OnboardingStepBanner />
-      <div>
-        <Link to="/areaacademica/criador" className="text-xs text-muted-foreground hover:text-primary inline-flex items-center gap-1 mb-2">
-          <ArrowLeft className="w-3 h-3" /> Voltar ao Criador
-        </Link>
-        <div className="rounded-xl border border-primary/30 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-6 flex items-center justify-between flex-wrap gap-3">
-          <div>
-            <Badge className="mb-2 gap-1"><Building2 className="w-3 h-3" /> Passo 1 de 5</Badge>
-            <h1 className="text-2xl font-bold flex items-center gap-2">
-              <Building2 className="w-6 h-6 text-primary" /> Confirmar Faculdades & Cursos
-            </h1>
-            <p className="text-muted-foreground mt-1 text-sm">
-              Validar faculdades, decanos e os cursos (com respetivos coordenadores) de cada uma.
-            </p>
+      <OnboardingStepBanner actions={
+        <Button onClick={confirmAll} size="sm" variant="outline" className="gap-1 h-8"><Check className="w-3.5 h-3.5" /> Confirmar Todas</Button>
+      } />
+      {!isOnboarding && (
+        <div>
+          <Link to="/areaacademica/criador" className="text-xs text-muted-foreground hover:text-primary inline-flex items-center gap-1 mb-2">
+            <ArrowLeft className="w-3 h-3" /> Voltar ao Criador
+          </Link>
+          <div className="rounded-xl border border-primary/30 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-6 flex items-center justify-between flex-wrap gap-3">
+            <div>
+              <Badge className="mb-2 gap-1"><Building2 className="w-3 h-3" /> Passo 1 de 5</Badge>
+              <h1 className="text-2xl font-bold flex items-center gap-2">
+                <Building2 className="w-6 h-6 text-primary" /> Confirmar Faculdades & Cursos
+              </h1>
+              <p className="text-muted-foreground mt-1 text-sm">
+                Validar faculdades, decanos e os cursos (com respetivos coordenadores) de cada uma.
+              </p>
+            </div>
+            <Button onClick={confirmAll} className="gap-2"><Check className="w-4 h-4" /> Confirmar Todas</Button>
           </div>
-          <Button onClick={confirmAll} className="gap-2"><Check className="w-4 h-4" /> Confirmar Todas</Button>
         </div>
-      </div>
+      )}
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <Card className="p-4"><p className="text-xs text-muted-foreground">Faculdades</p><p className="text-2xl font-bold">{faculdades.length}</p></Card>

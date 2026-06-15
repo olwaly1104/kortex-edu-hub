@@ -1,4 +1,4 @@
-import { OnboardingStepBanner } from "@/components/admin/OnboardingStepBanner";
+import { OnboardingStepBanner, useIsOnboardingStep } from "@/components/admin/OnboardingStepBanner";
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Card } from "@/components/ui/card";
@@ -62,6 +62,7 @@ const defaultResponsavelByDestino = (destino: string) => {
 };
 
 export default function GapConfiguracao() {
+  const isOnboarding = useIsOnboardingStep();
   const [searchParams] = useSearchParams();
   const tabParam = searchParams.get("tab");
   const initialTab = tabParam === "agendamentos" || tabParam === "candidaturas" ? tabParam : "solicitacoes";
@@ -319,11 +320,13 @@ export default function GapConfiguracao() {
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       <OnboardingStepBanner />
       {/* Header */}
-      <FinHeader
-        title="Configuração"
-        subtitle="Configure Solicitações, Agendamentos e o processo de Candidaturas do GAP."
-        icon={<Settings2 className="w-6 h-6 text-primary" />}
-      />
+      {!isOnboarding && (
+        <FinHeader
+          title="Configuração"
+          subtitle="Configure Solicitações, Agendamentos e o processo de Candidaturas do GAP."
+          icon={<Settings2 className="w-6 h-6 text-primary" />}
+        />
+      )}
 
       <Tabs defaultValue={initialTab} className="space-y-6">
         <TabsList className="grid grid-cols-3 w-full max-w-2xl">

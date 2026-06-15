@@ -1,4 +1,4 @@
-import { OnboardingStepBanner } from "@/components/admin/OnboardingStepBanner";
+import { OnboardingStepBanner, useIsOnboardingStep } from "@/components/admin/OnboardingStepBanner";
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
@@ -55,6 +55,7 @@ const buildAuto = (startISO: string, endISO: string): Evento[] => {
 };
 
 export default function CalendarioAcademico() {
+  const isOnboarding = useIsOnboardingStep();
   const [anoLetivo, setAnoLetivo] = useState("2025/2026");
   const [inicio, setInicio] = useState("2025-09-01");
   const [fim, setFim] = useState("2026-07-31");
@@ -106,25 +107,32 @@ export default function CalendarioAcademico() {
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
-      <OnboardingStepBanner />
-      <div>
-        <Link to="/areaacademica/criador" className="text-xs text-muted-foreground hover:text-primary inline-flex items-center gap-1 mb-2">
-          <ArrowLeft className="w-3 h-3" /> Voltar ao Criador
-        </Link>
-        <div className="rounded-xl border border-primary/30 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-6 flex items-center justify-between flex-wrap gap-3">
-          <div>
-            <Badge className="mb-2 gap-1"><CalendarDays className="w-3 h-3" /> Passo 5 de 6</Badge>
-            <h1 className="text-2xl font-bold flex items-center gap-2">
-              <CalendarDays className="w-6 h-6 text-primary" /> Calendário Académico
-            </h1>
-            <p className="text-muted-foreground mt-1 text-sm">Gerador automático de semestres, exames, feriados e férias. Tudo editável.</p>
-          </div>
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={regenerate} className="gap-2"><Wand2 className="w-4 h-4" /> Regenerar Automático</Button>
-            <Button onClick={() => toast.success("Calendário académico confirmado")} className="gap-2"><Check className="w-4 h-4" /> Confirmar</Button>
+      <OnboardingStepBanner actions={
+        <>
+          <Button onClick={regenerate} size="sm" variant="outline" className="gap-1 h-8"><Wand2 className="w-3.5 h-3.5" /> Regenerar</Button>
+          <Button onClick={() => toast.success("Calendário académico confirmado")} size="sm" variant="outline" className="gap-1 h-8"><Check className="w-3.5 h-3.5" /> Confirmar</Button>
+        </>
+      } />
+      {!isOnboarding && (
+        <div>
+          <Link to="/areaacademica/criador" className="text-xs text-muted-foreground hover:text-primary inline-flex items-center gap-1 mb-2">
+            <ArrowLeft className="w-3 h-3" /> Voltar ao Criador
+          </Link>
+          <div className="rounded-xl border border-primary/30 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-6 flex items-center justify-between flex-wrap gap-3">
+            <div>
+              <Badge className="mb-2 gap-1"><CalendarDays className="w-3 h-3" /> Passo 5 de 6</Badge>
+              <h1 className="text-2xl font-bold flex items-center gap-2">
+                <CalendarDays className="w-6 h-6 text-primary" /> Calendário Académico
+              </h1>
+              <p className="text-muted-foreground mt-1 text-sm">Gerador automático de semestres, exames, feriados e férias. Tudo editável.</p>
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={regenerate} className="gap-2"><Wand2 className="w-4 h-4" /> Regenerar Automático</Button>
+              <Button onClick={() => toast.success("Calendário académico confirmado")} className="gap-2"><Check className="w-4 h-4" /> Confirmar</Button>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Parameters */}
       <Card className="p-4 grid grid-cols-1 md:grid-cols-3 gap-3">
