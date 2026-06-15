@@ -8,24 +8,22 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription } from "@/components/ui/dialog";
-import { Upload, FileSpreadsheet, UserPlus, Trash2, Users, GraduationCap, Layers, CheckCircle2, Mail, Search, UserCheck, Sparkles } from "lucide-react";
+import { Upload, FileSpreadsheet, UserPlus, Trash2, Users, GraduationCap, CheckCircle2, Mail, UserCheck, Sparkles, Search } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
-type Row = { id: string; nome: string; email: string; curso: string; ano: string; turma: string; valid: boolean; origem?: "novo" | "existente" | "importado" };
+type Row = { id: string; nome: string; email: string; curso: string; ano: string; turma: string; origem?: "novo" | "existente" | "importado" };
 
 const cursosPool = ["ARQ", "ENG", "MED", "DIR", "ECO"];
 const turmasPool = ["A", "B", "C", "D", "E"];
 const provincias = ["Luanda", "Benguela", "Huíla", "Huambo", "Cabinda", "Namibe", "Uíge", "Bié"];
 
 const seedRows: Row[] = [
-  { id: "1", nome: "Ana Silva",    email: "ana.silva@upra.kor",   curso: "ARQ", ano: "1", turma: "A", valid: true, origem: "importado" },
-  { id: "2", nome: "Bruno Costa",  email: "bruno.costa@upra.kor", curso: "ENG", ano: "1", turma: "B", valid: true, origem: "importado" },
-  { id: "3", nome: "Carla Mendes", email: "carla.mendes@upra.kor",curso: "MED", ano: "2", turma: "A", valid: true, origem: "importado" },
+  { id: "1", nome: "Ana Silva",    email: "ana.silva@upra.kor",   curso: "ARQ", ano: "1", turma: "A", origem: "importado" },
+  { id: "2", nome: "Bruno Costa",  email: "bruno.costa@upra.kor", curso: "ENG", ano: "1", turma: "B", origem: "importado" },
+  { id: "3", nome: "Carla Mendes", email: "carla.mendes@upra.kor",curso: "MED", ano: "2", turma: "A", origem: "importado" },
 ];
 
-// Mock de estudantes já registados noutro curso/sistema
 const existentesPool = [
   { id: "ex-1", nome: "Diogo Pereira",  email: "diogo.pereira@upra.kor",  cursoAtual: "DIR", ano: "2" },
   { id: "ex-2", nome: "Eunice Lopes",   email: "eunice.lopes@upra.kor",   cursoAtual: "ECO", ano: "3" },
@@ -42,10 +40,9 @@ const emptyNovo = {
 
 export default function OnboardingEstudantes() {
   const [params] = useSearchParams();
-  const initialTab = params.get("tab") === "validar" ? "validar" : "importar";
+  const initialTab = params.get("tab") === "manual" ? "manual" : "importar";
 
   const [rows, setRows] = useState<Row[]>(seedRows);
-  const [open, setOpen] = useState(false);
   const [tipo, setTipo] = useState<"novo" | "existente">("novo");
   const [novo, setNovo] = useState(emptyNovo);
   const [busca, setBusca] = useState("");
@@ -54,14 +51,10 @@ export default function OnboardingEstudantes() {
 
   const totals = useMemo(() => ({
     total: rows.length,
-    validos: rows.filter(r => r.valid).length,
     cursos: new Set(rows.map(r => r.curso)).size,
   }), [rows]);
 
-  const resetDialog = () => {
-    setTipo("novo"); setNovo(emptyNovo); setBusca(""); setEscolhidoId(null);
-    setDestino({ curso: "ARQ", ano: "1", turma: "A" });
-  };
+  const remove = (id: string) => setRows(prev => prev.filter(r => r.id !== id));
 
   const confirmarAdicao = () => {
     if (tipo === "novo") {
@@ -70,14 +63,16 @@ export default function OnboardingEstudantes() {
         return;
       }
       const nomeCompleto = `${novo.primeiroNome.trim()} ${novo.ultimoNome.trim()}`;
+      const emailGerado = `${nomeCompleto.toLowerCase().replace(/\s+/g, ".").normalize("NFD").replace(/[^a-z.]/g, "")}@upra.kor`;
       setRows(prev => [...prev, {
         id: String(Date.now()),
         nome: nomeCompleto,
-        email: "— (gerado após confirmação)",
+        email: emailGerado,
         curso: novo.curso, ano: novo.ano, turma: novo.turma,
-        valid: true, origem: "novo",
+        origem: "novo",
       }]);
-      toast.success("Estudante adicionado. Email institucional será criado após confirmação.");
+      setNovo(emptyNovo);
+      toast.success(`Estudante adicionado. Email institucional: ${emailGerado}`);
     } else {
       const alvo = existentesPool.find(e => e.id === escolhidoId);
       if (!alvo) { toast.error("Selecione um estudante existente"); return; }
@@ -85,16 +80,12 @@ export default function OnboardingEstudantes() {
         id: String(Date.now()),
         nome: alvo.nome, email: alvo.email,
         curso: destino.curso, ano: destino.ano, turma: destino.turma,
-        valid: true, origem: "existente",
+        origem: "existente",
       }]);
+      setEscolhidoId(null); setBusca("");
       toast.success(`${alvo.nome} associado a ${destino.curso} · ${destino.ano}º · Turma ${destino.turma}`);
     }
-    setOpen(false);
-    resetDialog();
   };
-
-  const remove = (id: string) => setRows(prev => prev.filter(r => r.id !== id));
-  const update = (id: string, patch: Partial<Row>) => setRows(prev => prev.map(r => r.id === id ? { ...r, ...patch } : r));
 
   const simulateImport = () => {
     const generated: Row[] = Array.from({ length: 12 }).map((_, i) => ({
@@ -104,7 +95,7 @@ export default function OnboardingEstudantes() {
       curso: cursosPool[i % cursosPool.length],
       ano: String((i % 4) + 1),
       turma: turmasPool[i % turmasPool.length],
-      valid: true, origem: "importado",
+      origem: "importado",
     }));
     setRows(prev => [...prev, ...generated]);
     toast.success(`${generated.length} estudantes importados`);
@@ -122,17 +113,17 @@ export default function OnboardingEstudantes() {
 
       <div className="grid grid-cols-3 gap-3">
         <Card className="p-4"><div className="flex items-center gap-1.5 text-muted-foreground mb-1"><Users className="w-3.5 h-3.5" /><p className="text-xs">Estudantes</p></div><p className="text-2xl font-bold">{totals.total}</p></Card>
-        <Card className="p-4"><div className="flex items-center gap-1.5 text-muted-foreground mb-1"><CheckCircle2 className="w-3.5 h-3.5" /><p className="text-xs">Válidos</p></div><p className="text-2xl font-bold text-emerald-600">{totals.validos}</p></Card>
         <Card className="p-4"><div className="flex items-center gap-1.5 text-muted-foreground mb-1"><GraduationCap className="w-3.5 h-3.5" /><p className="text-xs">Cursos</p></div><p className="text-2xl font-bold">{totals.cursos}</p></Card>
+        <Card className="p-4"><div className="flex items-center gap-1.5 text-muted-foreground mb-1"><CheckCircle2 className="w-3.5 h-3.5" /><p className="text-xs">Activos</p></div><p className="text-2xl font-bold text-emerald-600">{totals.total}</p></Card>
       </div>
 
       <Tabs defaultValue={initialTab} className="space-y-4">
         <TabsList className="grid grid-cols-2 w-full max-w-md">
           <TabsTrigger value="importar" className="gap-1.5"><Upload className="w-3.5 h-3.5" /> Importar</TabsTrigger>
-          <TabsTrigger value="validar" className="gap-1.5"><Layers className="w-3.5 h-3.5" /> Validar matrículas</TabsTrigger>
+          <TabsTrigger value="manual" className="gap-1.5"><UserPlus className="w-3.5 h-3.5" /> Adicionar manualmente</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="importar" className="space-y-4 mt-0">
+        <TabsContent value="importar" className="mt-0">
           <Card className="p-5">
             <div className="flex items-center justify-between mb-3">
               <div>
@@ -146,208 +137,188 @@ export default function OnboardingEstudantes() {
               Arraste o ficheiro aqui ou clique em <span className="font-semibold text-foreground">Importar ficheiro</span>
             </div>
           </Card>
-
-          <Card className="p-5">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-sm font-semibold">Adicionar manualmente</h2>
-                <p className="text-xs text-muted-foreground">Registe um aluno novo ou associe um estudante já existente a um curso/turma.</p>
-              </div>
-              <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) resetDialog(); }}>
-                <DialogTrigger asChild>
-                  <Button className="gap-2"><UserPlus className="w-4 h-4" /> Adicionar estudante</Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-                  <DialogHeader>
-                    <DialogTitle>Adicionar estudante</DialogTitle>
-                    <DialogDescription className="flex items-center gap-1.5 text-xs">
-                      <Mail className="w-3 h-3" /> O email institucional <span className="font-semibold">@upra.kor</span> é gerado automaticamente após confirmação.
-                    </DialogDescription>
-                  </DialogHeader>
-
-                  {/* Tipo */}
-                  <div className="grid grid-cols-2 gap-2">
-                    {([
-                      { v: "novo" as const, t: "Aluno novo", d: "Primeira matrícula na UPRA", icon: Sparkles },
-                      { v: "existente" as const, t: "Aluno existente", d: "Já está registado no sistema", icon: UserCheck },
-                    ]).map(opt => {
-                      const Icon = opt.icon;
-                      const active = tipo === opt.v;
-                      return (
-                        <button key={opt.v} type="button" onClick={() => setTipo(opt.v)}
-                          className={cn("text-left rounded-lg border p-3 transition-colors", active ? "border-primary bg-primary/5" : "hover:bg-muted/40")}>
-                          <div className="flex items-center gap-2 mb-1">
-                            <Icon className={cn("w-4 h-4", active ? "text-primary" : "text-muted-foreground")} />
-                            <span className="text-sm font-medium">{opt.t}</span>
-                          </div>
-                          <p className="text-xs text-muted-foreground">{opt.d}</p>
-                        </button>
-                      );
-                    })}
-                  </div>
-
-                  {tipo === "novo" ? (
-                    <div className="space-y-4">
-                      <section className="space-y-2">
-                        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Identificação</p>
-                        <div className="grid grid-cols-2 gap-2">
-                          <div><Label className="text-xs">Primeiro nome *</Label><Input className="h-9" value={novo.primeiroNome} onChange={e => setNovo({ ...novo, primeiroNome: e.target.value })} /></div>
-                          <div><Label className="text-xs">Último nome *</Label><Input className="h-9" value={novo.ultimoNome} onChange={e => setNovo({ ...novo, ultimoNome: e.target.value })} /></div>
-                          <div><Label className="text-xs">Data de nascimento *</Label><Input type="date" className="h-9" value={novo.nascimento} onChange={e => setNovo({ ...novo, nascimento: e.target.value })} /></div>
-                          <div><Label className="text-xs">Género</Label>
-                            <Select value={novo.genero} onValueChange={v => setNovo({ ...novo, genero: v })}>
-                              <SelectTrigger className="h-9"><SelectValue placeholder="Selecione" /></SelectTrigger>
-                              <SelectContent><SelectItem value="M">Masculino</SelectItem><SelectItem value="F">Feminino</SelectItem></SelectContent>
-                            </Select>
-                          </div>
-                          <div><Label className="text-xs">Bilhete de identidade *</Label><Input className="h-9" value={novo.bilhete} onChange={e => setNovo({ ...novo, bilhete: e.target.value })} /></div>
-                          <div><Label className="text-xs">Nacionalidade</Label><Input className="h-9" value={novo.nacionalidade} onChange={e => setNovo({ ...novo, nacionalidade: e.target.value })} /></div>
-                        </div>
-                      </section>
-
-                      <section className="space-y-2">
-                        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Contacto e morada</p>
-                        <div className="grid grid-cols-2 gap-2">
-                          <div><Label className="text-xs">Telemóvel</Label><Input className="h-9" value={novo.telemovel} onChange={e => setNovo({ ...novo, telemovel: e.target.value })} /></div>
-                          <div><Label className="text-xs">Província</Label>
-                            <Select value={novo.provincia} onValueChange={v => setNovo({ ...novo, provincia: v })}>
-                              <SelectTrigger className="h-9"><SelectValue placeholder="Selecione" /></SelectTrigger>
-                              <SelectContent>{provincias.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
-                            </Select>
-                          </div>
-                          <div><Label className="text-xs">Município</Label><Input className="h-9" value={novo.municipio} onChange={e => setNovo({ ...novo, municipio: e.target.value })} /></div>
-                          <div><Label className="text-xs">Endereço</Label><Input className="h-9" value={novo.endereco} onChange={e => setNovo({ ...novo, endereco: e.target.value })} /></div>
-                        </div>
-                      </section>
-
-                      <section className="space-y-2">
-                        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Encarregado</p>
-                        <div className="grid grid-cols-3 gap-2">
-                          <div><Label className="text-xs">Nome</Label><Input className="h-9" value={novo.encNome} onChange={e => setNovo({ ...novo, encNome: e.target.value })} /></div>
-                          <div><Label className="text-xs">Parentesco</Label><Input className="h-9" value={novo.encParentesco} onChange={e => setNovo({ ...novo, encParentesco: e.target.value })} /></div>
-                          <div><Label className="text-xs">Telefone</Label><Input className="h-9" value={novo.encTelefone} onChange={e => setNovo({ ...novo, encTelefone: e.target.value })} /></div>
-                        </div>
-                      </section>
-
-                      <section className="space-y-2">
-                        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Matrícula</p>
-                        <div className="grid grid-cols-3 gap-2">
-                          <div><Label className="text-xs">Curso</Label>
-                            <Select value={novo.curso} onValueChange={v => setNovo({ ...novo, curso: v })}>
-                              <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
-                              <SelectContent>{cursosPool.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-                            </Select>
-                          </div>
-                          <div><Label className="text-xs">Ano</Label>
-                            <Select value={novo.ano} onValueChange={v => setNovo({ ...novo, ano: v })}>
-                              <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
-                              <SelectContent>{["1","2","3","4","5"].map(a => <SelectItem key={a} value={a}>{a}º ano</SelectItem>)}</SelectContent>
-                            </Select>
-                          </div>
-                          <div><Label className="text-xs">Turma</Label>
-                            <Select value={novo.turma} onValueChange={v => setNovo({ ...novo, turma: v })}>
-                              <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
-                              <SelectContent>{turmasPool.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
-                            </Select>
-                          </div>
-                        </div>
-                      </section>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      <div className="relative">
-                        <Search className="absolute left-2.5 top-2.5 w-4 h-4 text-muted-foreground" />
-                        <Input className="h-9 pl-8" placeholder="Procurar por nome ou email institucional" value={busca} onChange={e => setBusca(e.target.value)} />
-                      </div>
-                      <div className="border rounded-lg divide-y max-h-64 overflow-y-auto">
-                        {existentesFiltrados.length === 0 && (
-                          <p className="p-4 text-xs text-muted-foreground text-center italic">Sem resultados.</p>
-                        )}
-                        {existentesFiltrados.map(e => {
-                          const active = escolhidoId === e.id;
-                          return (
-                            <button key={e.id} type="button" onClick={() => setEscolhidoId(e.id)}
-                              className={cn("w-full text-left px-3 py-2 flex items-center justify-between transition-colors", active ? "bg-primary/5" : "hover:bg-muted/40")}>
-                              <div>
-                                <p className="text-sm font-medium">{e.nome}</p>
-                                <p className="text-[11px] text-muted-foreground">{e.email}</p>
-                              </div>
-                              <Badge variant="outline" className="text-[10px]">{e.cursoAtual} · {e.ano}º</Badge>
-                            </button>
-                          );
-                        })}
-                      </div>
-
-                      <section className="space-y-2">
-                        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Associar a</p>
-                        <div className="grid grid-cols-3 gap-2">
-                          <div><Label className="text-xs">Curso</Label>
-                            <Select value={destino.curso} onValueChange={v => setDestino({ ...destino, curso: v })}>
-                              <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
-                              <SelectContent>{cursosPool.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-                            </Select>
-                          </div>
-                          <div><Label className="text-xs">Ano</Label>
-                            <Select value={destino.ano} onValueChange={v => setDestino({ ...destino, ano: v })}>
-                              <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
-                              <SelectContent>{["1","2","3","4","5"].map(a => <SelectItem key={a} value={a}>{a}º ano</SelectItem>)}</SelectContent>
-                            </Select>
-                          </div>
-                          <div><Label className="text-xs">Turma</Label>
-                            <Select value={destino.turma} onValueChange={v => setDestino({ ...destino, turma: v })}>
-                              <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
-                              <SelectContent>{turmasPool.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
-                            </Select>
-                          </div>
-                        </div>
-                      </section>
-                    </div>
-                  )}
-
-                  <DialogFooter>
-                    <Button variant="outline" onClick={() => { setOpen(false); resetDialog(); }}>Cancelar</Button>
-                    <Button onClick={confirmarAdicao} className="gap-1.5"><UserPlus className="w-4 h-4" /> Adicionar</Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-            </div>
-          </Card>
         </TabsContent>
 
-        <TabsContent value="validar" className="space-y-4 mt-0">
-          <Card className="overflow-hidden">
-            <div className="grid grid-cols-[1fr_1.4fr_90px_70px_80px_40px] gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b">
-              <span>Nome</span><span>Email</span><span>Curso</span><span>Ano</span><span>Turma</span><span></span>
+        <TabsContent value="manual" className="mt-0">
+          <Card className="p-5 space-y-5">
+            <div>
+              <h2 className="text-sm font-semibold">Adicionar manualmente</h2>
+              <p className="text-xs text-muted-foreground flex items-center gap-1.5 mt-0.5">
+                <Mail className="w-3 h-3" /> O email <span className="font-semibold">@upra.kor</span> é gerado automaticamente após confirmação.
+              </p>
             </div>
-            <div className="divide-y">
-              {rows.map(r => (
-                <div key={r.id} className="grid grid-cols-[1fr_1.4fr_90px_70px_80px_40px] gap-2 px-4 py-2 items-center">
-                  <Input value={r.nome} onChange={e => update(r.id, { nome: e.target.value })} className="h-8 text-xs" />
-                  <Input value={r.email} onChange={e => update(r.id, { email: e.target.value })} className="h-8 text-xs" disabled={r.email.startsWith("—")} />
-                  <Select value={r.curso} onValueChange={v => update(r.id, { curso: v })}>
-                    <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                    <SelectContent>{cursosPool.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-                  </Select>
-                  <Select value={r.ano} onValueChange={v => update(r.id, { ano: v })}>
-                    <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                    <SelectContent>{["1","2","3","4","5"].map(c => <SelectItem key={c} value={c}>{c}º</SelectItem>)}</SelectContent>
-                  </Select>
-                  <Select value={r.turma} onValueChange={v => update(r.id, { turma: v })}>
-                    <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                    <SelectContent>{turmasPool.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-                  </Select>
-                  <Button size="icon" variant="ghost" onClick={() => remove(r.id)} className="h-8 w-8 text-muted-foreground hover:text-destructive">
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </Button>
+
+            <div className="grid grid-cols-2 gap-2">
+              {([
+                { v: "novo" as const, t: "Aluno novo", d: "Primeira matrícula na UPRA", icon: Sparkles },
+                { v: "existente" as const, t: "Aluno existente", d: "Já está registado no sistema", icon: UserCheck },
+              ]).map(opt => {
+                const Icon = opt.icon;
+                const active = tipo === opt.v;
+                return (
+                  <button key={opt.v} type="button" onClick={() => setTipo(opt.v)}
+                    className={cn("text-left rounded-lg border p-3 transition-colors", active ? "border-primary bg-primary/5" : "hover:bg-muted/40")}>
+                    <div className="flex items-center gap-2 mb-1">
+                      <Icon className={cn("w-4 h-4", active ? "text-primary" : "text-muted-foreground")} />
+                      <span className="text-sm font-medium">{opt.t}</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">{opt.d}</p>
+                  </button>
+                );
+              })}
+            </div>
+
+            {tipo === "novo" ? (
+              <div className="space-y-4">
+                <section className="space-y-2">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Identificação</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div><Label className="text-xs">Primeiro nome *</Label><Input className="h-9" value={novo.primeiroNome} onChange={e => setNovo({ ...novo, primeiroNome: e.target.value })} /></div>
+                    <div><Label className="text-xs">Último nome *</Label><Input className="h-9" value={novo.ultimoNome} onChange={e => setNovo({ ...novo, ultimoNome: e.target.value })} /></div>
+                    <div><Label className="text-xs">Data de nascimento *</Label><Input type="date" className="h-9" value={novo.nascimento} onChange={e => setNovo({ ...novo, nascimento: e.target.value })} /></div>
+                    <div><Label className="text-xs">Género</Label>
+                      <Select value={novo.genero} onValueChange={v => setNovo({ ...novo, genero: v })}>
+                        <SelectTrigger className="h-9"><SelectValue placeholder="Selecione" /></SelectTrigger>
+                        <SelectContent><SelectItem value="M">Masculino</SelectItem><SelectItem value="F">Feminino</SelectItem></SelectContent>
+                      </Select>
+                    </div>
+                    <div><Label className="text-xs">Bilhete de identidade *</Label><Input className="h-9" value={novo.bilhete} onChange={e => setNovo({ ...novo, bilhete: e.target.value })} /></div>
+                    <div><Label className="text-xs">Nacionalidade</Label><Input className="h-9" value={novo.nacionalidade} onChange={e => setNovo({ ...novo, nacionalidade: e.target.value })} /></div>
+                  </div>
+                </section>
+
+                <section className="space-y-2">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Contacto e morada</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div><Label className="text-xs">Telemóvel</Label><Input className="h-9" value={novo.telemovel} onChange={e => setNovo({ ...novo, telemovel: e.target.value })} /></div>
+                    <div><Label className="text-xs">Província</Label>
+                      <Select value={novo.provincia} onValueChange={v => setNovo({ ...novo, provincia: v })}>
+                        <SelectTrigger className="h-9"><SelectValue placeholder="Selecione" /></SelectTrigger>
+                        <SelectContent>{provincias.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
+                      </Select>
+                    </div>
+                    <div><Label className="text-xs">Município</Label><Input className="h-9" value={novo.municipio} onChange={e => setNovo({ ...novo, municipio: e.target.value })} /></div>
+                    <div><Label className="text-xs">Endereço</Label><Input className="h-9" value={novo.endereco} onChange={e => setNovo({ ...novo, endereco: e.target.value })} /></div>
+                  </div>
+                </section>
+
+                <section className="space-y-2">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Encarregado</p>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div><Label className="text-xs">Nome</Label><Input className="h-9" value={novo.encNome} onChange={e => setNovo({ ...novo, encNome: e.target.value })} /></div>
+                    <div><Label className="text-xs">Parentesco</Label><Input className="h-9" value={novo.encParentesco} onChange={e => setNovo({ ...novo, encParentesco: e.target.value })} /></div>
+                    <div><Label className="text-xs">Telefone</Label><Input className="h-9" value={novo.encTelefone} onChange={e => setNovo({ ...novo, encTelefone: e.target.value })} /></div>
+                  </div>
+                </section>
+
+                <section className="space-y-2">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Matrícula</p>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div><Label className="text-xs">Curso</Label>
+                      <Select value={novo.curso} onValueChange={v => setNovo({ ...novo, curso: v })}>
+                        <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                        <SelectContent>{cursosPool.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
+                      </Select>
+                    </div>
+                    <div><Label className="text-xs">Ano</Label>
+                      <Select value={novo.ano} onValueChange={v => setNovo({ ...novo, ano: v })}>
+                        <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                        <SelectContent>{["1","2","3","4","5"].map(a => <SelectItem key={a} value={a}>{a}º ano</SelectItem>)}</SelectContent>
+                      </Select>
+                    </div>
+                    <div><Label className="text-xs">Turma</Label>
+                      <Select value={novo.turma} onValueChange={v => setNovo({ ...novo, turma: v })}>
+                        <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                        <SelectContent>{turmasPool.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </section>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="relative">
+                  <Search className="absolute left-2.5 top-2.5 w-4 h-4 text-muted-foreground" />
+                  <Input className="h-9 pl-8" placeholder="Procurar por nome ou email institucional" value={busca} onChange={e => setBusca(e.target.value)} />
                 </div>
-              ))}
-              {rows.length === 0 && (
-                <p className="px-4 py-6 text-xs text-muted-foreground italic text-center">Sem estudantes. Use o separador <Badge variant="outline" className="mx-1">Importar</Badge> para começar.</p>
-              )}
+                <div className="border rounded-lg divide-y max-h-64 overflow-y-auto">
+                  {existentesFiltrados.length === 0 && (
+                    <p className="p-4 text-xs text-muted-foreground text-center italic">Sem resultados.</p>
+                  )}
+                  {existentesFiltrados.map(e => {
+                    const active = escolhidoId === e.id;
+                    return (
+                      <button key={e.id} type="button" onClick={() => setEscolhidoId(e.id)}
+                        className={cn("w-full text-left px-3 py-2 flex items-center justify-between transition-colors", active ? "bg-primary/5" : "hover:bg-muted/40")}>
+                        <div>
+                          <p className="text-sm font-medium">{e.nome}</p>
+                          <p className="text-[11px] text-muted-foreground">{e.email}</p>
+                        </div>
+                        <Badge variant="outline" className="text-[10px]">{e.cursoAtual} · {e.ano}º</Badge>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <section className="space-y-2">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Associar a</p>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div><Label className="text-xs">Curso</Label>
+                      <Select value={destino.curso} onValueChange={v => setDestino({ ...destino, curso: v })}>
+                        <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                        <SelectContent>{cursosPool.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
+                      </Select>
+                    </div>
+                    <div><Label className="text-xs">Ano</Label>
+                      <Select value={destino.ano} onValueChange={v => setDestino({ ...destino, ano: v })}>
+                        <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                        <SelectContent>{["1","2","3","4","5"].map(a => <SelectItem key={a} value={a}>{a}º ano</SelectItem>)}</SelectContent>
+                      </Select>
+                    </div>
+                    <div><Label className="text-xs">Turma</Label>
+                      <Select value={destino.turma} onValueChange={v => setDestino({ ...destino, turma: v })}>
+                        <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                        <SelectContent>{turmasPool.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </section>
+              </div>
+            )}
+
+            <div className="flex justify-end">
+              <Button onClick={confirmarAdicao} className="gap-1.5"><UserPlus className="w-4 h-4" /> Adicionar estudante</Button>
             </div>
           </Card>
         </TabsContent>
       </Tabs>
+
+      <Card className="overflow-hidden">
+        <div className="px-4 py-2.5 border-b flex items-center justify-between">
+          <h3 className="text-sm font-semibold">Estudantes registados</h3>
+          <span className="text-xs text-muted-foreground">{rows.length} {rows.length === 1 ? "estudante" : "estudantes"}</span>
+        </div>
+        <div className="grid grid-cols-[1fr_1.4fr_80px_70px_80px_40px] gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b">
+          <span>Nome</span><span>Email</span><span>Curso</span><span>Ano</span><span>Turma</span><span></span>
+        </div>
+        <div className="divide-y">
+          {rows.map(r => (
+            <div key={r.id} className="grid grid-cols-[1fr_1.4fr_80px_70px_80px_40px] gap-2 px-4 py-2 items-center text-xs">
+              <span className="font-medium">{r.nome}</span>
+              <span className="text-muted-foreground truncate">{r.email}</span>
+              <Badge variant="outline" className="text-[10px] justify-center">{r.curso}</Badge>
+              <span>{r.ano}º</span>
+              <span>{r.turma}</span>
+              <Button size="icon" variant="ghost" onClick={() => remove(r.id)} className="h-8 w-8 text-muted-foreground hover:text-destructive">
+                <Trash2 className="w-3.5 h-3.5" />
+              </Button>
+            </div>
+          ))}
+          {rows.length === 0 && (
+            <p className="px-4 py-8 text-xs text-muted-foreground italic text-center">Sem estudantes. Use os separadores acima para começar.</p>
+          )}
+        </div>
+      </Card>
     </div>
   );
 }

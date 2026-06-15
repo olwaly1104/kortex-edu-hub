@@ -13,8 +13,7 @@ export const ONBOARDING_GROUPS: GroupMeta[] = [
   {
     id: "est", title: "Adicionar Estudantes",
     steps: [
-      { key: "est.imp", title: "Importar estudantes",   desc: "Carregar lista de estudantes via CSV/Excel ou registo manual.", path: "/admin/onboarding/estudantes?tab=importar&step=est.imp" },
-      { key: "est.val", title: "Validar matrículas",    desc: "Atribuir curso, ano e turma aos estudantes importados.",         path: "/admin/onboarding/estudantes?tab=validar&step=est.val" },
+      { key: "est.imp", title: "Registar estudantes", desc: "Importar lista via CSV/Excel ou adicionar manualmente.", path: "/admin/onboarding/estudantes?tab=importar&step=est.imp" },
     ],
   },
   {
