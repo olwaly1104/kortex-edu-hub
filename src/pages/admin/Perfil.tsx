@@ -26,7 +26,9 @@ const EMPTY: Instituicao = {
   email: "", telefone: "", website: "", morada: "", logoDataUrl: "",
 };
 
-function loadInitial(): Instituicao {
+function loadInitial(email?: string | null): Instituicao {
+  const PROFILE_KEY = profileKey(email);
+  const STORAGE = onboardingKey(email);
   try {
     const saved = localStorage.getItem(PROFILE_KEY);
     if (saved) return { ...EMPTY, ...JSON.parse(saved) };
@@ -54,11 +56,12 @@ function loadInitial(): Instituicao {
 
 export default function AdminPerfil() {
   const { user } = useAuth();
-  const [instituicao, setInstituicao] = useState<Instituicao>(loadInitial);
+  const PROFILE_KEY = profileKey(user?.email);
+  const [instituicao, setInstituicao] = useState<Instituicao>(() => loadInitial(user?.email));
 
   useEffect(() => {
     try { localStorage.setItem(PROFILE_KEY, JSON.stringify(instituicao)); } catch { /* ignore */ }
-  }, [instituicao]);
+  }, [instituicao, PROFILE_KEY]);
 
   const handleSave = () => {
     try { localStorage.setItem(PROFILE_KEY, JSON.stringify(instituicao)); } catch { /* ignore */ }
