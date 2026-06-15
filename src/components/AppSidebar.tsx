@@ -246,8 +246,7 @@ const academica2Sections: NavSection[] = [
 const adminSections: NavSection[] = [
   { title: "Geral", items: [
     { label: "Início", icon: LayoutDashboard, path: "/admin" },
-    { label: "Calendário", icon: Calendar, path: "/admin/calendario" },
-    { label: "Anúncios", icon: Megaphone, path: "/admin/anuncios" },
+    { label: "Meu Perfil", icon: User, path: "/admin/perfil" },
   ]},
 ];
 
