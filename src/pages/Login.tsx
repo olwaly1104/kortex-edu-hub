@@ -41,6 +41,7 @@ export default function Login() {
   const [suModulo, setSuModulo] = useState<string>("admin");
   const [suName, setSuName] = useState("");
   const [suEmail, setSuEmail] = useState("");
+  const [suEmailManuallyEdited, setSuEmailManuallyEdited] = useState(false);
   const [suPassword, setSuPassword] = useState("");
   const [suError, setSuError] = useState("");
   const [suLoading, setSuLoading] = useState(false);
