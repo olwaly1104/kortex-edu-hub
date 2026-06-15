@@ -1,4 +1,5 @@
 import { FinHeader } from "@/pages/financas/_FinHeader";
+import { OnboardingStepBanner } from "@/components/admin/OnboardingStepBanner";
 import { Building2, Lock, Pencil, Check, GraduationCap, Users, UserCog, Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,6 +23,7 @@ const facDecanoMap: Record<string, string> = {
 export default function AdminFaculdadesCursos() {
   const [faculdades, setFaculdades] = useState<FacState[]>([]);
 
+  const addFaculdade = () => setFaculdades((prev) => [...prev, { id: `fac-${Date.now()}`, name: "Nova Faculdade", decano: decanosPool[0], editing: true, cursos: [] }]);
 
   const update = (id: string, patch: Partial<FacState>) =>
     setFaculdades((prev) => prev.map((f) => (f.id === id ? { ...f, ...patch } : f)));
@@ -49,7 +51,13 @@ export default function AdminFaculdadesCursos() {
 
   return (
     <div className="p-6 space-y-6 max-w-6xl mx-auto">
-      <FinHeader title="Faculdades & Cursos" subtitle="Estrutura académica da instituição" icon={<Building2 className="w-5 h-5 text-primary" />} />
+      <OnboardingStepBanner />
+      <FinHeader
+        title="Faculdades & Cursos"
+        subtitle="Estrutura académica da instituição"
+        icon={<Building2 className="w-5 h-5 text-primary" />}
+        right={<Button size="sm" onClick={addFaculdade} className="gap-1"><Plus className="w-3.5 h-3.5" /> Adicionar Faculdade</Button>}
+      />
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div className="rounded-lg border border-border bg-card p-4"><p className="text-xs text-muted-foreground">Faculdades</p><p className="text-2xl font-bold tabular-nums">{faculdades.length}</p></div>
@@ -59,6 +67,13 @@ export default function AdminFaculdadesCursos() {
       </div>
 
       <div className="space-y-4">
+        {faculdades.length === 0 && (
+          <div className="rounded-xl border border-dashed border-border bg-card p-8 text-center">
+            <Building2 className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
+            <p className="text-sm font-semibold text-foreground">Nenhuma faculdade registada</p>
+            <p className="text-xs text-muted-foreground mt-1">Adicione a primeira faculdade para começar a estrutura académica.</p>
+          </div>
+        )}
         {faculdades.map((f) => (
           <div key={f.id} className="rounded-xl border border-border bg-card overflow-hidden">
             <div className="px-5 py-4 border-b border-border bg-muted/20 flex items-center justify-between flex-wrap gap-3">
