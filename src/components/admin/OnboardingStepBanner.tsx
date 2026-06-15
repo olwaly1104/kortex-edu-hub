@@ -1,9 +1,8 @@
 import { Link, useSearchParams } from "react-router-dom";
 import { ArrowLeft, ChevronRight, ShieldCheck, CheckCircle2, Circle, ArrowRight } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { ReactNode } from "react";
-
-const PROGRESS_KEY = "upra.admin.config.progress";
+import { ReactNode, useState } from "react";
+import { progressKey } from "@/lib/onboardingStorage";
 
 type StepMeta = { key: string; title: string; desc: string; path: string };
 type GroupMeta = { id: string; title: string; steps: StepMeta[] };
@@ -56,19 +55,20 @@ const STEP_TO_GROUP: Record<string, GroupMeta> = {};
 const STEP_MAP: Record<string, StepMeta> = {};
 ONBOARDING_GROUPS.forEach((g) => g.steps.forEach((s) => { STEP_TO_GROUP[s.key] = g; STEP_MAP[s.key] = s; }));
 
-export function readOnboardingProgress(): Record<string, boolean> {
-  try { return JSON.parse(localStorage.getItem(PROGRESS_KEY) || "{}"); } catch { return {}; }
+export function readOnboardingProgress(email?: string | null): Record<string, boolean> {
+  try { return JSON.parse(localStorage.getItem(progressKey(email)) || "{}"); } catch { return {}; }
 }
-function markDone(key: string) {
-  const cur = readOnboardingProgress();
+function markDone(email: string | null | undefined, key: string) {
+  const cur = readOnboardingProgress(email);
   cur[key] = true;
-  try { localStorage.setItem(PROGRESS_KEY, JSON.stringify(cur)); } catch {}
+  try { localStorage.setItem(progressKey(email), JSON.stringify(cur)); } catch {}
 }
 
 /** Hook — true when an admin is currently inside an onboarding step (URL has ?step=valid-key). */
 export function useIsOnboardingStep(stepKeyProp?: string): boolean {
   const { user } = useAuth();
   const [params] = useSearchParams();
+  const [refresh, setRefresh] = useState(0);
   const stepKey = stepKeyProp || params.get("step") || "";
   return user?.role === "admin" && !!STEP_TO_GROUP[stepKey];
 }
@@ -88,7 +88,7 @@ export function OnboardingStepBanner({
   const group = STEP_TO_GROUP[stepKey];
   if (!group) return null;
 
-  const progress = readOnboardingProgress();
+  const progress = readOnboardingProgress(user?.email);
   const currentIdx = group.steps.findIndex((s) => s.key === stepKey);
   const current = group.steps[currentIdx];
   const doneCount = group.steps.filter((s) => progress[s.key]).length;
@@ -128,9 +128,16 @@ export function OnboardingStepBanner({
             </h1>
             <p className="text-sm text-muted-foreground mt-1">{current.desc}</p>
           </div>
-          {actions && (
-            <div className="flex items-center gap-2 shrink-0">{actions}</div>
-          )}
+          <div className="flex items-center gap-2 shrink-0">
+            {actions}
+            <button
+              type="button"
+              onClick={() => { markDone(user?.email, stepKey); setRefresh(refresh + 1); }}
+              className={`inline-flex h-8 items-center gap-1 rounded-md border px-3 text-xs font-semibold transition-colors ${isCurrentDone ? "border-emerald-200 bg-emerald-50 text-emerald-700" : "border-primary/30 bg-card text-primary hover:bg-primary/5"}`}
+            >
+              <CheckCircle2 className="w-3.5 h-3.5" /> {isCurrentDone ? "Concluído" : "Concluir passo"}
+            </button>
+          </div>
         </div>
 
         {/* Mini progress + step strip */}
