@@ -5,26 +5,24 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Eye, EyeOff, Globe, KeyRound, UserPlus, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Globe, Building2, Loader2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
 import logoUpra from "@/assets/logo-upra.asset.json";
 import { supabase } from "@/integrations/supabase/client";
 import { onboardingKey, isOnboardingCompleteFor } from "@/lib/onboardingStorage";
-import { isPreviewHost } from "@/lib/runtimeEnv";
 
-const DEMO_PASSWORD = "olwaly";
-const DEMO_ACCOUNTS: { role: string; email: string }[] = [
-  { role: "Admin — Onboarding institucional", email: "admin@upra.kor" },
-  { role: "Estudante", email: "2934@upra.kor" },
-  { role: "Professor", email: "prof.silva@upra.kor" },
-  { role: "Coordenador de Curso", email: "coordcurso@upra.kor" },
-  { role: "Decano", email: "decano@upra.kor" },
-  { role: "Reitor", email: "reitor@upra.kor" },
-  { role: "Académica", email: "academica@upra.kor" },
-  { role: "Finanças", email: "financas@upra.kor" },
-  { role: "Inscrições", email: "inscricoes@upra.kor" },
-  { role: "Área Académica 2", email: "areaacademica2@upra.kor" },
-];
+const ROLE_ROUTE: Record<string, string> = {
+  admin: "/admin",
+  estudante: "/student",
+  professor: "/professor",
+  coordenador: "/coordenador",
+  decano: "/decano",
+  reitor: "/reitor",
+  financas: "/financas",
+  academica: "/secretaria",
+  gap: "/gap",
+  inscricoes: "/inscricoes",
+};
 
 export default function Login() {
   const { login } = useAuth();
@@ -37,46 +35,26 @@ export default function Login() {
   const [info, setInfo] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  // Signup dialog state
+  // Registo de Instituição dialog
   const [signupOpen, setSignupOpen] = useState(false);
-  const [suModulo, setSuModulo] = useState<string>("admin");
-  const [suName, setSuName] = useState("");
+  const [suNome, setSuNome] = useState("");
   const [suEmail, setSuEmail] = useState("");
   const [suEmailManuallyEdited, setSuEmailManuallyEdited] = useState(false);
   const [suPassword, setSuPassword] = useState("");
   const [suError, setSuError] = useState("");
   const [suLoading, setSuLoading] = useState(false);
 
-  // Auto-fill email as modulo@nome-a-apresentar.kor
+  // Auto-fill institutional email as admin@<slug>.kor
   useEffect(() => {
-    if (!suName.trim() || suEmailManuallyEdited) return;
-    const normalized = suName
+    if (!suNome.trim() || suEmailManuallyEdited) return;
+    const slug = suNome
       .toLowerCase()
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")
       .replace(/\s+/g, "-")
       .replace(/[^a-z0-9-]/g, "");
-    if (normalized) {
-      setSuEmail(`${suModulo}@${normalized}.kor`);
-    }
-  }, [suModulo, suName, suEmailManuallyEdited]);
-
-  const isOnboardingDone = (forEmail: string) => {
-    return isOnboardingCompleteFor(forEmail);
-  };
-
-  const DEMO_ROUTE: Record<string, string> = {
-    "admin@upra.kor": "/admin",
-    "2934@upra.kor": "/student",
-    "prof.silva@upra.kor": "/professor",
-    "coordcurso@upra.kor": "/coordenador",
-    "decano@upra.kor": "/decano",
-    "reitor@upra.kor": "/reitor",
-    "academica@upra.kor": "/secretaria",
-    "financas@upra.kor": "/financas",
-    "inscricoes@upra.kor": "/inscricoes",
-    "areaacademica2@upra.kor": "/area-academica-2",
-  };
+    if (slug) setSuEmail(`admin@${slug}.kor`);
+  }, [suNome, suEmailManuallyEdited]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -89,82 +67,33 @@ export default function Login() {
     setSubmitting(true);
     try {
       const normalizedEmail = email.trim().toLowerCase();
-      const isDemoAccount = DEMO_ACCOUNTS.some((a) => a.email === normalizedEmail);
-
-      // ── Preview (Lovable editor): apenas contas demo .kor com a palavra-passe demo
-      if (isPreviewHost()) {
-        if (!isDemoAccount) {
-          setError("No preview apenas contas demo (.kor) podem entrar. Use 'Ver credenciais de demo'.");
-          return;
-        }
-        if (password !== DEMO_PASSWORD) {
-          setError("Palavra-passe incorrecta. Use a palavra-passe demo: " + DEMO_PASSWORD);
-          return;
-        }
-        const result = login(normalizedEmail, password);
-        if (!result.ok) {
-          setError(result.error || "Não foi possível iniciar sessão.");
-          return;
-        }
-        if (normalizedEmail.startsWith("admin")) {
-          navigate(isOnboardingDone(normalizedEmail) ? "/admin" : "/admin/onboarding");
-          return;
-        }
-        navigate(DEMO_ROUTE[normalizedEmail] ?? "/student");
-        return;
-      }
-
-      // ── Published site: tenta conta real no Lovable Cloud; fallback demo apenas com password demo
-      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({ email: normalizedEmail, password });
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+        email: normalizedEmail,
+        password,
+      });
       if (signInError) {
-        if (isDemoAccount && password === DEMO_PASSWORD) {
-          const result = login(normalizedEmail, password);
-          if (!result.ok) {
-            setError(result.error || "Não foi possível iniciar sessão.");
-            return;
-          }
-          if (normalizedEmail.startsWith("admin")) {
-            navigate(isOnboardingDone(normalizedEmail) ? "/admin" : "/admin/onboarding");
-            return;
-          }
-          navigate(DEMO_ROUTE[normalizedEmail] ?? "/student");
-          return;
-        }
         setError(signInError.message || "Credenciais inválidas.");
         return;
       }
-      // Look up role from user_roles, then open the matching demo shell
       const userId = signInData.user?.id;
-      let modulo: string = (signInData.user?.user_metadata as any)?.modulo || "estudante";
+      let role = "estudante";
       if (userId) {
         const { data: roleRow } = await supabase
           .from("user_roles" as any)
           .select("role")
           .eq("user_id", userId)
           .maybeSingle();
-        if (roleRow && (roleRow as any).role) modulo = (roleRow as any).role;
+        if (roleRow && (roleRow as any).role) role = (roleRow as any).role;
       }
-      const MODULE_TO_DEMO: Record<string, { email: string; path: string }> = {
-        admin:        { email: "admin@upra.kor",          path: "/admin" },
-        estudante:    { email: "2934@upra.kor",           path: "/student" },
-        professor:    { email: "prof.silva@upra.kor",     path: "/professor" },
-        coordenador:  { email: "coordcurso@upra.kor",     path: "/coordenador" },
-        decano:       { email: "decano@upra.kor",         path: "/decano" },
-        reitor:       { email: "reitor@upra.kor",         path: "/reitor" },
-        financas:     { email: "financas@upra.kor",       path: "/financas" },
-        academica:    { email: "academica@upra.kor",      path: "/secretaria" },
-        gap:          { email: "gap@upra.kor",            path: "/gap" },
-        inscricoes:   { email: "inscricoes@upra.kor",     path: "/inscricoes" },
-      };
-      const target = MODULE_TO_DEMO[modulo] ?? MODULE_TO_DEMO.estudante;
-      const accountEmail = signInData.user?.email || email;
+      const accountEmail = signInData.user?.email || normalizedEmail;
       const displayName = (signInData.user?.user_metadata as any)?.display_name;
-      login(target.email, DEMO_PASSWORD, { sourceEmail: accountEmail, displayName });
-      if (modulo === "admin" && !isOnboardingDone(accountEmail)) {
+      // Hydrate the in-app shell using the role
+      login(accountEmail, password, { sourceEmail: accountEmail, displayName, role });
+      if (role === "admin" && !isOnboardingCompleteFor(accountEmail)) {
         navigate("/admin/onboarding");
         return;
       }
-      navigate(target.path);
+      navigate(ROLE_ROUTE[role] ?? "/student");
     } finally {
       setSubmitting(false);
     }
@@ -173,7 +102,7 @@ export default function Login() {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setSuError("");
-    if (!suModulo || !suName.trim() || !suEmail.trim() || !suPassword) {
+    if (!suNome.trim() || !suEmail.trim() || !suPassword) {
       setSuError("Preencha todos os campos.");
       return;
     }
@@ -182,51 +111,60 @@ export default function Login() {
       return;
     }
     setSuLoading(true);
-    // Preview (Lovable editor) → não escreve no backend; só simula localmente.
-    // Published site / custom domain → cria conta real no Lovable Cloud.
-    if (isPreviewHost()) {
-      // No-op no backend. A conta fica apenas como demo local.
-      console.info("[signup] preview host: skipping backend signUp");
-    } else {
+    try {
+      const emailTrim = suEmail.trim();
       const { data: suData, error: signUpError } = await supabase.auth.signUp({
-        email: suEmail.trim(),
+        email: emailTrim,
         password: suPassword,
         options: {
-          data: { display_name: suName.trim(), modulo: suModulo },
+          data: { display_name: suNome.trim(), modulo: "admin" },
           emailRedirectTo: `${window.location.origin}/`,
         },
       });
       if (signUpError) {
-        setSuLoading(false);
-        setSuError(signUpError.message || "Não foi possível criar conta.");
+        setSuError(signUpError.message || "Não foi possível registar a instituição.");
         return;
       }
       const userId = suData.user?.id;
       if (userId) {
         const { error: roleErr } = await supabase.from("user_roles" as any).insert({
           user_id: userId,
-          role: suModulo,
+          role: "admin",
         } as any);
         if (roleErr) console.warn("user_roles insert failed:", roleErr.message);
       }
-    }
-    // For admin: pre-complete institutional onboarding using the name supplied at signup,
-    // so the user is never asked to register again on the next sign-in.
-    if (suModulo === "admin") {
+      // Pre-seed local onboarding entry so onboarding flow knows the institution name.
       try {
         const onboardingState = {
-          dados: { nome: suName.trim(), tipo: "", sigla: "", provincia: "", municipio: "", endereco: "", telefone: "", email: suEmail.trim(), nif: "", logoDataUrl: "" },
-          completed: true,
+          dados: {
+            nome: suNome.trim(),
+            tipo: "",
+            sigla: "",
+            provincia: "",
+            municipio: "",
+            endereco: "",
+            telefone: "",
+            email: emailTrim,
+            nif: "",
+            logoDataUrl: "",
+          },
+          completed: false,
         };
-        localStorage.setItem(onboardingKey(suEmail.trim()), JSON.stringify(onboardingState));
-      } catch { /* ignore */ }
+        localStorage.setItem(onboardingKey(emailTrim), JSON.stringify(onboardingState));
+      } catch {
+        /* ignore */
+      }
+      setSignupOpen(false);
+      setEmail(emailTrim);
+      setPassword(suPassword);
+      setInfo("Instituição registada. Inicie sessão para concluir o onboarding institucional.");
+      setSuNome("");
+      setSuEmail("");
+      setSuPassword("");
+      setSuEmailManuallyEdited(false);
+    } finally {
+      setSuLoading(false);
     }
-    setSuLoading(false);
-    setSignupOpen(false);
-    setEmail(suEmail.trim());
-    setPassword(suPassword);
-    setInfo(`Conta ${suModulo} criada. Inicie sessão para entrar.`);
-    setSuName(""); setSuEmail(""); setSuPassword("");
   };
 
   return (
@@ -241,10 +179,10 @@ export default function Login() {
         <div className="relative z-10 text-center">
           <div className="flex flex-col items-center gap-4 mb-8">
             <div className="w-28 h-28 rounded-2xl bg-primary-foreground flex items-center justify-center p-3 shadow-xl">
-              <img src={logoUpra.url} alt="UPRA" className="w-full h-full object-contain" />
+              <img src={logoUpra.url} alt="Kortex" className="w-full h-full object-contain" />
             </div>
             <div className="text-center">
-              <h1 className="text-3xl font-bold text-primary-foreground tracking-wide">UPRA</h1>
+              <h1 className="text-3xl font-bold text-primary-foreground tracking-wide">Kortex</h1>
             </div>
           </div>
           <p className="text-xl text-primary-foreground/90 max-w-md leading-relaxed">
@@ -255,7 +193,7 @@ export default function Login() {
           </p>
           <Link to="/site" className="inline-block mt-8">
             <Button variant="outline" size="lg" className="bg-transparent border-primary-foreground/40 text-primary-foreground hover:bg-primary-foreground/10 gap-2">
-              <Globe className="w-4 h-4" /> Visitar website da UPRA
+              <Globe className="w-4 h-4" /> Visitar website
             </Button>
           </Link>
         </div>
@@ -267,16 +205,16 @@ export default function Login() {
           {/* Mobile logo */}
           <div className="flex items-center gap-3 mb-10 lg:hidden">
             <div className="w-14 h-14 rounded-xl bg-muted flex items-center justify-center p-1.5">
-              <img src={logoUpra.url} alt="UPRA" className="w-full h-full object-contain" />
+              <img src={logoUpra.url} alt="Kortex" className="w-full h-full object-contain" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-foreground">UPRA</h1>
+              <h1 className="text-2xl font-bold text-foreground">Kortex</h1>
               <p className="text-xs text-muted-foreground uppercase tracking-wider">Portal Académico</p>
             </div>
           </div>
 
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-foreground">Bem-vindo de volta</h2>
+            <h2 className="text-2xl font-bold text-foreground">Bem-vindo</h2>
             <p className="text-muted-foreground mt-1">Entre com as suas credenciais para aceder à plataforma.</p>
           </div>
 
@@ -286,7 +224,7 @@ export default function Login() {
               <Input
                 id="email"
                 type="email"
-                placeholder="exemplo@escola.kor"
+                placeholder="admin@minha-instituicao.kor"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="h-11"
@@ -342,103 +280,62 @@ export default function Login() {
             </Button>
           </form>
 
-          <div className="mt-6 text-center space-y-2">
-            <p className="text-xs text-muted-foreground">
-              Email <span className="font-medium">.kor</span> para perfis demo, ou crie uma conta Cloud para testar o chat em tempo real.
+          <div className="mt-6 text-center space-y-3">
+            <p className="text-xs text-muted-foreground px-2">
+              Apenas contas reais. Para começar, registe a sua instituição — depois crie todos os utilizadores a partir do painel da instituição.
             </p>
-            <div className="flex flex-wrap items-center justify-center gap-2">
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button type="button" variant="outline" size="sm" className="gap-2">
-                    <KeyRound className="w-4 h-4" /> Ver credenciais de demo
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-md">
-                  <DialogHeader>
-                    <DialogTitle>Credenciais de demonstração</DialogTitle>
-                    <DialogDescription>
-                      Palavra-passe para todos os perfis: <span className="font-mono font-semibold text-foreground">{DEMO_PASSWORD}</span>
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="max-h-80 overflow-y-auto divide-y rounded-md border">
-                    {DEMO_ACCOUNTS.map((a) => (
-                      <button
-                        key={a.email}
-                        type="button"
-                        onClick={() => { setEmail(a.email); setPassword(DEMO_PASSWORD); }}
-                        className="w-full text-left px-3 py-2 hover:bg-muted transition-colors"
-                      >
-                        <div className="text-sm font-medium text-foreground">{a.role}</div>
-                        <div className="text-xs text-muted-foreground font-mono">{a.email}</div>
-                      </button>
-                    ))}
+            <Dialog open={signupOpen} onOpenChange={setSignupOpen}>
+              <DialogTrigger asChild>
+                <Button type="button" variant="default" size="sm" className="gap-2">
+                  <Building2 className="w-4 h-4" /> Registo de Instituição
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Registo de Instituição</DialogTitle>
+                  <DialogDescription>
+                    Crie a conta principal da sua instituição no Kortex. Esta conta gere toda a instituição e cria os restantes utilizadores (estudantes, docentes, coordenadores, decanos, reitor, finanças, académica, GAP, inscrições).
+                  </DialogDescription>
+                </DialogHeader>
+                <form onSubmit={handleSignup} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="su-nome">Nome da instituição</Label>
+                    <Input
+                      id="su-nome"
+                      value={suNome}
+                      onChange={(e) => setSuNome(e.target.value)}
+                      placeholder="Ex: Universidade Privada de Angola"
+                    />
                   </div>
-                  <p className="text-xs text-muted-foreground">Clique numa conta para preencher automaticamente.</p>
-                </DialogContent>
-              </Dialog>
-
-              <Dialog open={signupOpen} onOpenChange={setSignupOpen}>
-                <DialogTrigger asChild>
-                  <Button type="button" variant="default" size="sm" className="gap-2">
-                    <UserPlus className="w-4 h-4" /> Criar conta
+                  <div className="space-y-2">
+                    <Label htmlFor="su-email">Email do administrador da instituição</Label>
+                    <Input
+                      id="su-email"
+                      type="email"
+                      value={suEmail}
+                      onChange={(e) => { setSuEmailManuallyEdited(true); setSuEmail(e.target.value); }}
+                      placeholder="admin@minha-instituicao.kor"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="su-password">Palavra-passe (mín. 6)</Label>
+                    <Input
+                      id="su-password"
+                      type="password"
+                      value={suPassword}
+                      onChange={(e) => setSuPassword(e.target.value)}
+                      placeholder="••••••••"
+                    />
+                  </div>
+                  {suError && (
+                    <p className="text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-md">{suError}</p>
+                  )}
+                  <Button type="submit" disabled={suLoading} className="w-full">
+                    {suLoading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> A registar...</> : "Registar instituição"}
                   </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-md">
-                  <DialogHeader>
-                    <DialogTitle>Criar conta</DialogTitle>
-                    <DialogDescription>
-                      Cria uma conta real ligada à Lovable Cloud. O módulo escolhido define o painel a que o utilizador acede.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <form onSubmit={handleSignup} className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="su-modulo">Módulo</Label>
-                      <select
-                        id="su-modulo"
-                        value={suModulo}
-                        onChange={(e) => setSuModulo(e.target.value)}
-                        className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
-                      >
-                        <option value="admin">Admin (Onboarding institucional)</option>
-                        <option value="estudante">Estudante</option>
-                        <option value="professor">Professor</option>
-                        <option value="coordenador">Coordenador de Curso</option>
-                        <option value="decano">Decano</option>
-                        <option value="reitor">Reitor</option>
-                        <option value="financas">Finanças</option>
-                        <option value="academica">Académica</option>
-                        <option value="gap">GAP</option>
-                        <option value="inscricoes">Inscrições</option>
-                      </select>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="su-name">Nome a apresentar</Label>
-                      <Input id="su-name" value={suName} onChange={(e) => setSuName(e.target.value)} placeholder="Ex: Maria Santos" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="su-email">Email</Label>
-                      <Input
-                        id="su-email"
-                        type="email"
-                        value={suEmail}
-                        onChange={(e) => { setSuEmailManuallyEdited(true); setSuEmail(e.target.value); }}
-                        placeholder="modulo@nome.kor"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="su-password">Palavra-passe (mín. 6)</Label>
-                      <Input id="su-password" type="password" value={suPassword} onChange={(e) => setSuPassword(e.target.value)} placeholder="••••••••" />
-                    </div>
-                    {suError && (
-                      <p className="text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-md">{suError}</p>
-                    )}
-                    <Button type="submit" disabled={suLoading} className="w-full">
-                      {suLoading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> A criar...</> : "Criar conta"}
-                    </Button>
-                  </form>
-                </DialogContent>
-              </Dialog>
-            </div>
+                </form>
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
       </div>
