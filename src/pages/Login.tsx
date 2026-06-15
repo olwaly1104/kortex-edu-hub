@@ -60,9 +60,9 @@ export default function Login() {
     }
   }, [suModulo, suName, suEmailManuallyEdited]);
 
-  const isOnboardingDone = () => {
+  const isOnboardingDone = (forEmail: string) => {
     try {
-      const raw = localStorage.getItem("upra.admin.onboarding");
+      const raw = localStorage.getItem(`upra.admin.onboarding:${forEmail.trim().toLowerCase()}`);
       if (!raw) return false;
       const parsed = JSON.parse(raw);
       return !!parsed?.completed;
