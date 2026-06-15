@@ -260,7 +260,7 @@ export default function GerarCadeiras() {
                 <div className="flex items-center gap-2 mb-1">
                   <Badge variant="outline" className="text-[10px]">Pré-visualização</Badge>
                   <Badge variant="secondary" className="text-[10px]">{previewCurso?.code} · {(preview?.ano ?? 0) + 1}º Ano</Badge>
-                  <Badge variant="outline" className="text-[10px]">{previewCadeira.semestre}º Sem</Badge>
+                  <Badge variant="outline" className="text-[10px]">{previewCadeira.semestre === "anual" ? "Anual" : `${previewCadeira.semestre}º Sem`}</Badge>
                 </div>
                 <DialogTitle className="flex items-center gap-2 text-xl">
                   <BookOpen className="w-5 h-5 text-primary" /> {previewCadeira.name}
@@ -295,7 +295,7 @@ export default function GerarCadeiras() {
                       </div>
                       <Card className="p-4">
                         <h3 className="text-sm font-semibold mb-2">Descrição</h3>
-                        <p className="text-sm text-muted-foreground">Cadeira de {previewCadeira.name} do curso de {previewCurso?.name}, leccionada por {previewCadeira.docente} no {previewCadeira.semestre}º semestre. Inclui componente teórica e prática, com avaliação contínua através de quizzes e exame final presencial.</p>
+                        <p className="text-sm text-muted-foreground">Cadeira de {previewCadeira.name} do curso de {previewCurso?.name}, leccionada por {previewCadeira.docente} {previewCadeira.semestre === "anual" ? "ao longo do ano lectivo" : `no ${previewCadeira.semestre}º semestre`}. Inclui componente teórica e prática, com avaliação contínua através de quizzes e exame final presencial.</p>
                       </Card>
                       <Card className="p-4">
                         <h3 className="text-sm font-semibold mb-2">Plano Pedagógico</h3>
