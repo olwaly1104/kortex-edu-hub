@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,63 +6,21 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAuth } from "@/contexts/AuthContext";
-import logoUpra from "@/assets/logo-upra.asset.json";
-import {
-  Building2, GraduationCap, CalendarRange, DoorOpen, Users,
-  ClipboardCheck, Check, ChevronLeft, ChevronRight, Plus, Trash2,
-  Loader2, Upload, CheckCircle2, Sparkles,
-} from "lucide-react";
+import { Building2, Loader2, Upload, CheckCircle2 } from "lucide-react";
 
 const STORAGE = "upra.admin.onboarding";
 
-type Faculdade = { id: string; nome: string };
-type Curso = { id: string; nome: string; faculdadeId: string };
-type Etapa = { id: string; nome: string };
-type Ferias = { id: string; nome: string; inicio: string; fim: string };
-type Edificio = { id: string; nome: string };
-type Sala = { id: string; edificioId: string; nome: string; capacidade: string };
-type Docente = { id: string; nome: string; email: string; contrato: string; telefone: string };
-type Staff = { id: string; nome: string; posicao: string; contrato: string; email: string; telefone: string };
-
 interface OnboardingState {
-  step: number;
   dados: { nome: string; tipo: string; sigla: string; endereco: string; telefone: string; email: string; nif: string; logoDataUrl: string };
-  faculdades: Faculdade[];
-  cursos: Curso[];
-  calendario: { modelo: string; inicio: string; fim: string; candInicio: string; candFim: string; etapas: Etapa[]; ferias: Ferias[] };
-  edificios: Edificio[];
-  salas: Sala[];
-  docentes: Docente[];
-  staff: Staff[];
   completed: boolean;
 }
 
 const initial: OnboardingState = {
-  step: 0,
   dados: { nome: "", tipo: "", sigla: "", endereco: "", telefone: "", email: "", nif: "", logoDataUrl: "" },
-  faculdades: [],
-  cursos: [],
-  calendario: { modelo: "", inicio: "", fim: "", candInicio: "", candFim: "", etapas: [], ferias: [] },
-  edificios: [],
-  salas: [],
-  docentes: [],
-  staff: [],
   completed: false,
 };
 
 const TIPO_OPTS = ["Universidade", "Instituto Superior Politécnico", "Instituto Superior", "Escola Superior", "Academia"];
-const MODELO_OPTS = ["Semestral", "Trimestral", "Anual"];
-
-const STEPS = [
-  { key: "dados", title: "Dados da universidade", icon: Building2, desc: "Identidade institucional" },
-  { key: "academico", title: "Informação académica", icon: GraduationCap, desc: "Faculdades e cursos" },
-  { key: "calendario", title: "Calendário académico", icon: CalendarRange, desc: "Modelo e períodos" },
-  { key: "edificios", title: "Edifícios e salas", icon: DoorOpen, desc: "Infraestrutura física" },
-  { key: "pessoas", title: "Docentes e staff", icon: Users, desc: "Equipa institucional" },
-  { key: "rever", title: "Rever e ativar", icon: ClipboardCheck, desc: "Resumo final" },
-];
-
-const uid = () => Math.random().toString(36).slice(2, 9);
 
 export default function AdminOnboarding() {
   const { user, updateUser } = useAuth();
@@ -81,22 +39,8 @@ export default function AdminOnboarding() {
     try { localStorage.setItem(STORAGE, JSON.stringify(state)); } catch { /* ignore */ }
   }, [state]);
 
-  const set = <K extends keyof OnboardingState>(k: K, v: OnboardingState[K]) => setState((s) => ({ ...s, [k]: v }));
-  const setDados = (patch: Partial<OnboardingState["dados"]>) => setState((s) => ({ ...s, dados: { ...s.dados, ...patch } }));
-  const setCal = (patch: Partial<OnboardingState["calendario"]>) => setState((s) => ({ ...s, calendario: { ...s.calendario, ...patch } }));
-
-  const step = state.step;
-  const progress = Math.round(((step) / (STEPS.length - 1)) * 100);
-
-  const canNext = useMemo(() => {
-    if (step === 0) return state.dados.nome.trim().length > 0;
-    if (step === 1) return state.faculdades.length > 0 && state.faculdades.every((f) => f.nome.trim());
-    if (step === 2) return !!state.calendario.modelo;
-    return true;
-  }, [step, state]);
-
-  const next = () => setState((s) => ({ ...s, step: Math.min(s.step + 1, STEPS.length - 1) }));
-  const prev = () => setState((s) => ({ ...s, step: Math.max(s.step - 1, 0) }));
+  const setDados = (patch: Partial<OnboardingState["dados"]>) =>
+    setState((s) => ({ ...s, dados: { ...s.dados, ...patch } }));
 
   const handleLogoUpload = (file: File) => {
     const reader = new FileReader();
@@ -104,16 +48,20 @@ export default function AdminOnboarding() {
     reader.readAsDataURL(file);
   };
 
+  const canSubmit = state.dados.nome.trim().length > 0;
+
   const activate = () => {
+    if (!canSubmit) return;
     setActivating(true);
     setTimeout(() => {
       const nome = state.dados.nome.trim() || "Instituição";
-      setState((s) => ({ ...s, completed: true }));
+      const next = { ...state, completed: true };
+      setState(next);
       updateUser({ name: nome });
-      try { localStorage.setItem(STORAGE, JSON.stringify({ ...state, completed: true })); } catch { /* ignore */ }
+      try { localStorage.setItem(STORAGE, JSON.stringify(next)); } catch { /* ignore */ }
       setActivating(false);
       setSuccess(true);
-    }, 1100);
+    }, 900);
   };
 
   if (success) {
@@ -125,7 +73,7 @@ export default function AdminOnboarding() {
           </div>
           <h1 className="text-2xl font-bold text-foreground mb-2">A sua instituição está ativa.</h1>
           <p className="text-muted-foreground mb-6">
-            {state.dados.nome} foi criada com sucesso. Pode agora aceder ao portal de administração e completar a configuração detalhada com Finanças, GAP e Área Académica.
+            {state.dados.nome} foi criada com sucesso. A configuração detalhada (informação académica, calendário, finanças, GAP e área académica) é feita a partir do painel de administração pelas equipas responsáveis.
           </p>
           <Button size="lg" className="w-full" onClick={() => navigate("/admin")}>
             Entrar no portal de administração
@@ -135,400 +83,81 @@ export default function AdminOnboarding() {
     );
   }
 
-  const goTo = (i: number) => setState((st) => ({ ...st, step: i }));
-
-  const Stepper = (
-    <ol className="hidden lg:flex flex-col gap-1">
-      {STEPS.map((s, i) => {
-        const Icon = s.icon;
-        const active = i === step;
-        const done = i < step;
-        return (
-          <li key={s.key}>
-            <button
-              type="button"
-              onClick={() => goTo(i)}
-              className={`w-full text-left flex items-start gap-3 rounded-lg px-3 py-2 transition-colors ${active ? "bg-primary/10" : "hover:bg-muted"}`}
-            >
-              <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-[11px] font-semibold ${active ? "bg-primary text-primary-foreground" : done ? "bg-foreground text-background" : "bg-muted text-muted-foreground"}`}>
-                {done ? <Check className="w-3.5 h-3.5" /> : i + 1}
-              </div>
-              <div className="min-w-0 pt-0.5">
-                <div className={`text-[13px] font-semibold truncate ${active ? "text-primary" : "text-foreground"}`}>{s.title}</div>
-                <div className="text-[11px] text-muted-foreground truncate">{s.desc}</div>
-              </div>
-            </button>
-          </li>
-        );
-      })}
-    </ol>
-  );
-
   return (
     <div className="min-h-screen bg-muted/30">
-      {/* Top bar — Kortex branding + slim progress */}
+      {/* Top bar — Kortex branding */}
       <header className="bg-card border-b border-border sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-6 h-12 flex items-center justify-between gap-4">
+        <div className="max-w-3xl mx-auto px-6 h-14 flex items-center justify-between gap-4">
           <div className="flex items-center gap-2.5 min-w-0">
             <div className="w-7 h-7 rounded-md bg-foreground text-background flex items-center justify-center shrink-0 font-black text-[13px] tracking-tight">K</div>
-            <div className="min-w-0 leading-tight">
-              <div className="text-[14px] font-bold text-foreground tracking-tight">kortex</div>
-            </div>
+            <div className="text-[14px] font-bold text-foreground tracking-tight">kortex</div>
             <span className="hidden md:inline-block w-px h-4 bg-border mx-1" />
-            <span className="hidden md:inline text-[11px] uppercase tracking-[0.14em] text-muted-foreground font-medium">Onboarding</span>
+            <span className="hidden md:inline text-[11px] uppercase tracking-[0.14em] text-muted-foreground font-medium">Onboarding inicial</span>
           </div>
-          <div className="hidden sm:flex items-center gap-3 text-[11px] text-muted-foreground">
-            <span className="hidden md:inline">{user?.email}</span>
-            <span className="text-foreground font-semibold tabular-nums">{step + 1}<span className="text-muted-foreground font-normal"> / {STEPS.length}</span></span>
-          </div>
-        </div>
-
-        {/* Slim numeric stepper */}
-        <div className="border-t border-border">
-          <div className="max-w-7xl mx-auto px-6 py-2.5">
-            <div className="relative">
-              <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-px bg-border" />
-              <div
-                className="absolute left-0 top-1/2 -translate-y-1/2 h-px bg-foreground transition-all duration-500"
-                style={{ width: `${progress}%` }}
-              />
-              <ol className="relative flex items-center justify-between">
-                {STEPS.map((s, i) => {
-                  const done = i < step;
-                  const active = i === step;
-                  return (
-                    <li key={s.key}>
-                      <button
-                        type="button"
-                        onClick={() => goTo(i)}
-                        className="group flex items-center gap-2 cursor-pointer"
-                      >
-                        <span
-                          className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-semibold border transition-all
-                            ${active ? "bg-foreground border-foreground text-background"
-                              : done ? "bg-foreground border-foreground text-background"
-                              : "bg-card border-border text-muted-foreground group-hover:border-foreground/40"}`}
-                        >
-                          {done ? <Check className="w-2.5 h-2.5" /> : i + 1}
-                        </span>
-                        <span className={`hidden md:inline text-[11px] font-medium tracking-tight whitespace-nowrap transition-colors
-                          ${active ? "text-foreground" : "text-muted-foreground group-hover:text-foreground"}`}>
-                          {s.title.split(" ")[0]}
-                        </span>
-                      </button>
-                    </li>
-                  );
-                })}
-              </ol>
-            </div>
-          </div>
+          <div className="hidden sm:block text-[11px] text-muted-foreground">{user?.email}</div>
         </div>
       </header>
 
+      <div className="max-w-3xl mx-auto px-6 py-10">
+        <div className="mb-6 text-center">
+          <div className="text-[11px] uppercase tracking-wider font-semibold text-primary">Passo 1 de 1</div>
+          <h2 className="text-2xl md:text-3xl font-bold text-foreground mt-1">Dados da universidade</h2>
+          <p className="text-sm text-muted-foreground mt-2 max-w-lg mx-auto">
+            Comece por identificar a sua instituição. A configuração detalhada (cursos, calendário, finanças, GAP, área académica) será feita depois no painel de administração.
+          </p>
+        </div>
 
-
-
-
-      <div className="max-w-7xl mx-auto px-6 py-8 grid lg:grid-cols-[260px_1fr] gap-8">
-        <aside className="lg:sticky lg:top-24 self-start">
-          {Stepper}
-          <div className="lg:hidden flex items-center gap-2 text-sm font-semibold text-foreground mb-2">
-            Passo {step + 1} de {STEPS.length} — {STEPS[step].title}
-          </div>
-        </aside>
-
-        <main>
-          <div className="bg-card border border-border rounded-2xl shadow-sm p-6 md:p-8">
-            <div className="mb-6">
-              <div className="text-[11px] uppercase tracking-wider font-semibold text-primary">Passo {step + 1} de {STEPS.length}</div>
-              <h2 className="text-2xl font-bold text-foreground mt-1">{STEPS[step].title}</h2>
-              <p className="text-sm text-muted-foreground mt-1">{STEPS[step].desc}</p>
+        <div className="bg-card border border-border rounded-2xl shadow-sm p-6 md:p-8">
+          <div className="grid md:grid-cols-2 gap-5">
+            <div className="md:col-span-2 flex items-center gap-4 p-4 rounded-lg border border-dashed border-border bg-muted/30">
+              <div className="w-20 h-20 rounded-lg bg-card border border-border flex items-center justify-center overflow-hidden shrink-0">
+                {state.dados.logoDataUrl
+                  ? <img src={state.dados.logoDataUrl} alt="Logo" className="w-full h-full object-contain" />
+                  : <Building2 className="w-8 h-8 text-muted-foreground" />}
+              </div>
+              <div className="flex-1">
+                <Label className="text-sm font-semibold">Logótipo da instituição</Label>
+                <p className="text-xs text-muted-foreground mb-2">PNG, JPG ou SVG. Recomendado quadrado.</p>
+                <label className="inline-flex items-center gap-2 cursor-pointer rounded-md border border-border bg-card px-3 py-1.5 text-sm hover:bg-muted">
+                  <Upload className="w-4 h-4" /> Carregar logótipo
+                  <input type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files?.[0] && handleLogoUpload(e.target.files[0])} />
+                </label>
+              </div>
             </div>
-
-            {step === 0 && (
-              <div className="grid md:grid-cols-2 gap-5">
-                <div className="md:col-span-2 flex items-center gap-4 p-4 rounded-lg border border-dashed border-border bg-muted/30">
-                  <div className="w-20 h-20 rounded-lg bg-card border border-border flex items-center justify-center overflow-hidden shrink-0">
-                    {state.dados.logoDataUrl
-                      ? <img src={state.dados.logoDataUrl} alt="Logo" className="w-full h-full object-contain" />
-                      : <Building2 className="w-8 h-8 text-muted-foreground" />}
-                  </div>
-                  <div className="flex-1">
-                    <Label className="text-sm font-semibold">Logótipo da instituição</Label>
-                    <p className="text-xs text-muted-foreground mb-2">PNG, JPG ou SVG. Recomendado quadrado.</p>
-                    <label className="inline-flex items-center gap-2 cursor-pointer rounded-md border border-border bg-card px-3 py-1.5 text-sm hover:bg-muted">
-                      <Upload className="w-4 h-4" /> Carregar logótipo
-                      <input type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files?.[0] && handleLogoUpload(e.target.files[0])} />
-                    </label>
-                  </div>
-                </div>
-                <Field label="Nome da universidade *" required>
-                  <Input value={state.dados.nome} onChange={(e) => setDados({ nome: e.target.value })} placeholder="Universidade Privada de Angola" />
-                </Field>
-                <Field label="Tipo de instituição">
-                  <Select value={state.dados.tipo} onValueChange={(v) => setDados({ tipo: v })}>
-                    <SelectTrigger><SelectValue placeholder="Selecionar tipo" /></SelectTrigger>
-                    <SelectContent>{TIPO_OPTS.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
-                  </Select>
-                </Field>
-                <Field label="Sigla"><Input value={state.dados.sigla} onChange={(e) => setDados({ sigla: e.target.value })} placeholder="UPRA" /></Field>
-                <Field label="NIF"><Input value={state.dados.nif} onChange={(e) => setDados({ nif: e.target.value })} placeholder="5417000000" /></Field>
-                <Field label="Endereço" full>
-                  <Textarea value={state.dados.endereco} onChange={(e) => setDados({ endereco: e.target.value })} placeholder="Rua, número, cidade, província" rows={2} />
-                </Field>
-                <Field label="Telefone"><Input value={state.dados.telefone} onChange={(e) => setDados({ telefone: e.target.value })} placeholder="+244 000 000 000" /></Field>
-                <Field label="Email institucional"><Input type="email" value={state.dados.email} onChange={(e) => setDados({ email: e.target.value })} placeholder="contacto@instituicao.ao" /></Field>
-              </div>
-            )}
-
-            {step === 1 && (
-              <div className="space-y-6">
-                <RepeatableSection
-                  title="Faculdades"
-                  subtitle="Pelo menos uma faculdade é obrigatória"
-                  items={state.faculdades}
-                  onAdd={() => set("faculdades", [...state.faculdades, { id: uid(), nome: "" }])}
-                  onRemove={(id) => {
-                    set("faculdades", state.faculdades.filter((f) => f.id !== id));
-                    set("cursos", state.cursos.filter((c) => c.faculdadeId !== id));
-                  }}
-                  onUpdate={(next) => set("faculdades", state.faculdades.map((f) => f.id === next.id ? next : f))}
-                  renderRow={(f, update) => (
-                    <Input value={f.nome} onChange={(e) => update({ ...f, nome: e.target.value })} placeholder="Nome da faculdade" />
-                  )}
-                />
-                <RepeatableSection
-                  title="Cursos"
-                  subtitle="Vincule cada curso a uma faculdade"
-                  items={state.cursos}
-                  onAdd={() => set("cursos", [...state.cursos, { id: uid(), nome: "", faculdadeId: state.faculdades[0]?.id || "" }])}
-                  onRemove={(id) => set("cursos", state.cursos.filter((c) => c.id !== id))}
-                  onUpdate={(next) => set("cursos", state.cursos.map((c) => c.id === next.id ? next : c))}
-                  disabledAdd={state.faculdades.length === 0}
-                  emptyHint={state.faculdades.length === 0 ? "Adicione uma faculdade primeiro" : undefined}
-                  renderRow={(c, update) => (
-                    <div className="grid md:grid-cols-2 gap-2 w-full">
-                      <Input value={c.nome} onChange={(e) => update({ ...c, nome: e.target.value })} placeholder="Nome do curso" />
-                      <Select value={c.faculdadeId} onValueChange={(v) => update({ ...c, faculdadeId: v })}>
-                        <SelectTrigger><SelectValue placeholder="Faculdade" /></SelectTrigger>
-                        <SelectContent>{state.faculdades.map((f) => <SelectItem key={f.id} value={f.id}>{f.nome || "(sem nome)"}</SelectItem>)}</SelectContent>
-                      </Select>
-                    </div>
-                  )}
-                />
-              </div>
-            )}
-
-            {step === 2 && (
-              <div className="space-y-6">
-                <div className="grid md:grid-cols-3 gap-5">
-                  <Field label="Modelo académico *">
-                    <Select value={state.calendario.modelo} onValueChange={(v) => setCal({ modelo: v })}>
-                      <SelectTrigger><SelectValue placeholder="Selecionar" /></SelectTrigger>
-                      <SelectContent>{MODELO_OPTS.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}</SelectContent>
-                    </Select>
-                  </Field>
-                  <Field label="Data de início"><Input type="date" value={state.calendario.inicio} onChange={(e) => setCal({ inicio: e.target.value })} /></Field>
-                  <Field label="Data de fim"><Input type="date" value={state.calendario.fim} onChange={(e) => setCal({ fim: e.target.value })} /></Field>
-                  <Field label="Início das candidaturas"><Input type="date" value={state.calendario.candInicio} onChange={(e) => setCal({ candInicio: e.target.value })} /></Field>
-                  <Field label="Fim das candidaturas"><Input type="date" value={state.calendario.candFim} onChange={(e) => setCal({ candFim: e.target.value })} /></Field>
-                </div>
-                <RepeatableSection
-                  title="Etapas da candidatura"
-                  items={state.calendario.etapas}
-                  onAdd={() => setCal({ etapas: [...state.calendario.etapas, { id: uid(), nome: "" }] })}
-                  onRemove={(id) => setCal({ etapas: state.calendario.etapas.filter((x) => x.id !== id) })}
-                  onUpdate={(next) => setCal({ etapas: state.calendario.etapas.map((x) => x.id === next.id ? next : x) })}
-                  renderRow={(et, update) => <Input value={et.nome} onChange={(e) => update({ ...et, nome: e.target.value })} placeholder="Nome da etapa" />}
-                />
-                <RepeatableSection
-                  title="Períodos de férias"
-                  items={state.calendario.ferias}
-                  onAdd={() => setCal({ ferias: [...state.calendario.ferias, { id: uid(), nome: "", inicio: "", fim: "" }] })}
-                  onRemove={(id) => setCal({ ferias: state.calendario.ferias.filter((x) => x.id !== id) })}
-                  onUpdate={(next) => setCal({ ferias: state.calendario.ferias.map((x) => x.id === next.id ? next : x) })}
-                  renderRow={(p, update) => (
-                    <div className="grid md:grid-cols-3 gap-2 w-full">
-                      <Input value={p.nome} onChange={(e) => update({ ...p, nome: e.target.value })} placeholder="Nome" />
-                      <Input type="date" value={p.inicio} onChange={(e) => update({ ...p, inicio: e.target.value })} />
-                      <Input type="date" value={p.fim} onChange={(e) => update({ ...p, fim: e.target.value })} />
-                    </div>
-                  )}
-                />
-              </div>
-            )}
-
-            {step === 3 && (
-              <div className="space-y-6">
-                <RepeatableSection
-                  title="Edifícios"
-                  items={state.edificios}
-                  onAdd={() => set("edificios", [...state.edificios, { id: uid(), nome: "" }])}
-                  onRemove={(id) => {
-                    set("edificios", state.edificios.filter((e) => e.id !== id));
-                    set("salas", state.salas.filter((s) => s.edificioId !== id));
-                  }}
-                  onUpdate={(next) => set("edificios", state.edificios.map((e) => e.id === next.id ? next : e))}
-                  renderRow={(b, update) => <Input value={b.nome} onChange={(e) => update({ ...b, nome: e.target.value })} placeholder="Nome do edifício" />}
-                />
-                <RepeatableSection
-                  title="Salas"
-                  items={state.salas}
-                  disabledAdd={state.edificios.length === 0}
-                  emptyHint={state.edificios.length === 0 ? "Adicione um edifício primeiro" : undefined}
-                  onAdd={() => set("salas", [...state.salas, { id: uid(), edificioId: state.edificios[0]?.id || "", nome: "", capacidade: "" }])}
-                  onRemove={(id) => set("salas", state.salas.filter((s) => s.id !== id))}
-                  onUpdate={(next) => set("salas", state.salas.map((s) => s.id === next.id ? next : s))}
-                  renderRow={(s, update) => (
-                    <div className="grid md:grid-cols-3 gap-2 w-full">
-                      <Select value={s.edificioId} onValueChange={(v) => update({ ...s, edificioId: v })}>
-                        <SelectTrigger><SelectValue placeholder="Edifício" /></SelectTrigger>
-                        <SelectContent>{state.edificios.map((e) => <SelectItem key={e.id} value={e.id}>{e.nome || "(sem nome)"}</SelectItem>)}</SelectContent>
-                      </Select>
-                      <Input value={s.nome} onChange={(e) => update({ ...s, nome: e.target.value })} placeholder="Nome da sala" />
-                      <Input value={s.capacidade} onChange={(e) => update({ ...s, capacidade: e.target.value })} placeholder="Capacidade" type="number" />
-                    </div>
-                  )}
-                />
-              </div>
-            )}
-
-            {step === 4 && (
-              <div className="space-y-6">
-                <RepeatableSection
-                  title="Docentes"
-                  items={state.docentes}
-                  onAdd={() => set("docentes", [...state.docentes, { id: uid(), nome: "", email: "", contrato: "", telefone: "" }])}
-                  onRemove={(id) => set("docentes", state.docentes.filter((d) => d.id !== id))}
-                  onUpdate={(next) => set("docentes", state.docentes.map((d) => d.id === next.id ? next : d))}
-                  renderRow={(d, update) => (
-                    <div className="grid md:grid-cols-4 gap-2 w-full">
-                      <Input value={d.nome} onChange={(e) => update({ ...d, nome: e.target.value })} placeholder="Nome" />
-                      <Input value={d.email} onChange={(e) => update({ ...d, email: e.target.value })} placeholder="Email" type="email" />
-                      <Input value={d.contrato} onChange={(e) => update({ ...d, contrato: e.target.value })} placeholder="Contrato" />
-                      <Input value={d.telefone} onChange={(e) => update({ ...d, telefone: e.target.value })} placeholder="Telefone" />
-                    </div>
-                  )}
-                />
-                <RepeatableSection
-                  title="Staff"
-                  items={state.staff}
-                  onAdd={() => set("staff", [...state.staff, { id: uid(), nome: "", posicao: "", contrato: "", email: "", telefone: "" }])}
-                  onRemove={(id) => set("staff", state.staff.filter((s) => s.id !== id))}
-                  onUpdate={(next) => set("staff", state.staff.map((s) => s.id === next.id ? next : s))}
-                  renderRow={(s, update) => (
-                    <div className="grid md:grid-cols-5 gap-2 w-full">
-                      <Input value={s.nome} onChange={(e) => update({ ...s, nome: e.target.value })} placeholder="Nome" />
-                      <Input value={s.posicao} onChange={(e) => update({ ...s, posicao: e.target.value })} placeholder="Posição" />
-                      <Input value={s.contrato} onChange={(e) => update({ ...s, contrato: e.target.value })} placeholder="Contrato" />
-                      <Input value={s.email} onChange={(e) => update({ ...s, email: e.target.value })} placeholder="Email" type="email" />
-                      <Input value={s.telefone} onChange={(e) => update({ ...s, telefone: e.target.value })} placeholder="Telefone" />
-                    </div>
-                  )}
-                />
-              </div>
-            )}
-
-            {step === 5 && (
-              <div className="space-y-4">
-                <div className="grid sm:grid-cols-2 gap-3">
-                  <SummaryRow label="Nome da instituição" value={state.dados.nome || "—"} />
-                  <SummaryRow label="Tipo" value={state.dados.tipo || "—"} />
-                  <SummaryRow label="Nº de faculdades" value={String(state.faculdades.length)} />
-                  <SummaryRow label="Nº de cursos" value={String(state.cursos.length)} />
-                  <SummaryRow label="Modelo académico" value={state.calendario.modelo || "—"} />
-                  <SummaryRow label="Nº de edifícios / salas" value={`${state.edificios.length} / ${state.salas.length}`} />
-                  <SummaryRow label="Nº de docentes" value={String(state.docentes.length)} />
-                  <SummaryRow label="Nº de administradores (staff)" value={String(state.staff.length)} />
-                </div>
-                <div className="pt-4">
-                  <Button size="lg" className="w-full" onClick={activate} disabled={activating || !state.dados.nome.trim() || state.faculdades.length === 0 || !state.calendario.modelo}>
-                    {activating ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> A ativar instituição...</> : <><CheckCircle2 className="w-4 h-4 mr-2" /> Ativar instituição</>}
-                  </Button>
-                  {(!state.dados.nome.trim() || state.faculdades.length === 0 || !state.calendario.modelo) && (
-                    <p className="text-xs text-destructive mt-2 text-center">Complete os campos obrigatórios nos passos anteriores.</p>
-                  )}
-                </div>
-              </div>
-            )}
-
-            <div className="flex items-center justify-between gap-3 mt-8 pt-6 border-t border-border">
-              <Button type="button" variant="ghost" onClick={prev} disabled={step === 0}>
-                <ChevronLeft className="w-4 h-4 mr-1" /> Anterior
-              </Button>
-              <div className="text-xs text-muted-foreground hidden sm:block">As alterações são guardadas automaticamente.</div>
-              {step < STEPS.length - 1 ? (
-                <Button type="button" onClick={next}>
-                  Confirmar <ChevronRight className="w-4 h-4 ml-1" />
-                </Button>
-              ) : <div className="w-[88px]" />}
-            </div>
+            <Field label="Nome da universidade *">
+              <Input value={state.dados.nome} onChange={(e) => setDados({ nome: e.target.value })} placeholder="Universidade Privada de Angola" />
+            </Field>
+            <Field label="Tipo de instituição">
+              <Select value={state.dados.tipo} onValueChange={(v) => setDados({ tipo: v })}>
+                <SelectTrigger><SelectValue placeholder="Selecionar tipo" /></SelectTrigger>
+                <SelectContent>{TIPO_OPTS.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
+              </Select>
+            </Field>
+            <Field label="Sigla"><Input value={state.dados.sigla} onChange={(e) => setDados({ sigla: e.target.value })} placeholder="UPRA" /></Field>
+            <Field label="NIF"><Input value={state.dados.nif} onChange={(e) => setDados({ nif: e.target.value })} placeholder="5417000000" /></Field>
+            <Field label="Endereço" full>
+              <Textarea value={state.dados.endereco} onChange={(e) => setDados({ endereco: e.target.value })} placeholder="Rua, número, cidade, província" rows={2} />
+            </Field>
+            <Field label="Telefone"><Input value={state.dados.telefone} onChange={(e) => setDados({ telefone: e.target.value })} placeholder="+244 000 000 000" /></Field>
+            <Field label="Email institucional"><Input type="email" value={state.dados.email} onChange={(e) => setDados({ email: e.target.value })} placeholder="contacto@instituicao.ao" /></Field>
           </div>
-        </main>
+
+          <div className="mt-8 flex items-center justify-end gap-3 border-t border-border pt-6">
+            <Button size="lg" onClick={activate} disabled={!canSubmit || activating} className="min-w-[200px]">
+              {activating ? (<><Loader2 className="w-4 h-4 mr-2 animate-spin" /> A ativar…</>) : "Ativar instituição"}
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   );
 }
 
-function Field({ label, children, full, required }: { label: string; children: React.ReactNode; full?: boolean; required?: boolean }) {
+function Field({ label, children, full }: { label: string; children: React.ReactNode; full?: boolean }) {
   return (
-    <div className={`space-y-1.5 ${full ? "md:col-span-2" : ""}`}>
-      <Label className="text-sm font-medium">{label}{required && <span className="text-destructive ml-0.5">*</span>}</Label>
+    <div className={full ? "md:col-span-2 space-y-1.5" : "space-y-1.5"}>
+      <Label className="text-xs font-semibold text-foreground">{label}</Label>
       {children}
     </div>
   );
 }
-
-function SummaryRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-lg border border-border bg-muted/30 px-4 py-3">
-      <div className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground">{label}</div>
-      <div className="text-base font-semibold text-foreground mt-0.5">{value}</div>
-    </div>
-  );
-}
-
-function RepeatableSection<T extends { id: string }>({
-  title, subtitle, items, onAdd, onRemove, onUpdate, renderRow, disabledAdd, emptyHint,
-}: {
-  title: string;
-  subtitle?: string;
-  items: T[];
-  onAdd: () => void;
-  onRemove: (id: string) => void;
-  onUpdate: (next: T) => void;
-  renderRow: (item: T, update: (next: T) => void) => React.ReactNode;
-  disabledAdd?: boolean;
-  emptyHint?: string;
-}) {
-  return (
-    <div>
-      <div className="flex items-end justify-between mb-3">
-        <div>
-          <h3 className="text-base font-semibold text-foreground">{title}</h3>
-          {subtitle && <p className="text-xs text-muted-foreground">{subtitle}</p>}
-        </div>
-        <Button type="button" size="sm" variant="outline" onClick={onAdd} disabled={disabledAdd}>
-          <Plus className="w-4 h-4 mr-1" /> Adicionar
-        </Button>
-      </div>
-      {items.length === 0 ? (
-        <div className="text-sm text-muted-foreground border border-dashed border-border rounded-lg py-6 text-center">
-          {emptyHint || "Nenhum item adicionado ainda."}
-        </div>
-      ) : (
-        <div className="space-y-2">
-          {items.map((item) => (
-            <div key={item.id} className="flex items-start gap-2 rounded-lg border border-border bg-card px-3 py-2">
-              <div className="flex-1 min-w-0">{renderRow(item, onUpdate)}</div>
-              <Button type="button" variant="ghost" size="icon" onClick={() => onRemove(item.id)} className="text-muted-foreground hover:text-destructive">
-                <Trash2 className="w-4 h-4" />
-              </Button>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-

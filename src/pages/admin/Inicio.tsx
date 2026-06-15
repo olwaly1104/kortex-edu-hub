@@ -11,9 +11,9 @@ function readProgress(): Record<string, boolean> {
 }
 
 const CONFIG_STEPS = [
+  { key: "aca", title: "Área Académica — Criador curricular", desc: "Faculdades, cursos, cadeiras, turmas e calendário académico.", icon: BookOpen, path: "/areaacademica/criador", area: "Académica" },
   { key: "fin", title: "Finanças — Configurar Receitas", desc: "Definir propinas por curso, taxas e serviços.", icon: Wallet, path: "/financas/configurar-receitas", area: "Finanças" },
   { key: "gap", title: "GAP — Configuração do gabinete", desc: "Categorias de solicitações, motivos de agendamento e canais.", icon: LifeBuoy, path: "/gap/configuracao", area: "GAP" },
-  { key: "aca", title: "Área Académica — Criador curricular", desc: "Confirmar faculdades, gerar cadeiras e criar turmas.", icon: BookOpen, path: "/areaacademica/criador", area: "Académica" },
 ];
 
 export default function AdminInicio() {
