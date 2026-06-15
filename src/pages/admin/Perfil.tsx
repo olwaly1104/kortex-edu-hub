@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/contexts/AuthContext";
-import { onboardingKey, profileKey, progressKey } from "@/lib/onboardingStorage";
+import { onboardingKey, profileKey, progressKey, pushProfile } from "@/lib/onboardingStorage";
 import {
   ShieldCheck, Building2, Mail, Phone, Globe, MapPin, Calendar, GraduationCap,
   Users, Briefcase, Settings2, Save, IdCard, Hash,
@@ -90,10 +90,12 @@ export default function AdminPerfil() {
       return;
     }
     try { localStorage.setItem(PROFILE_KEY, JSON.stringify(instituicao)); } catch { /* ignore */ }
-  }, [instituicao, PROFILE_KEY]);
+    pushProfile(user?.email, instituicao);
+  }, [instituicao, PROFILE_KEY, user?.email]);
 
   const handleSave = () => {
     try { localStorage.setItem(PROFILE_KEY, JSON.stringify(instituicao)); } catch { /* ignore */ }
+    pushProfile(user?.email, instituicao);
     toast.success("Dados da instituição atualizados");
   };
 

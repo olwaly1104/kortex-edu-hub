@@ -2,7 +2,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { ArrowLeft, ChevronRight, ShieldCheck, CheckCircle2, Circle } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { ReactNode, useState } from "react";
-import { progressKey } from "@/lib/onboardingStorage";
+import { progressKey, pushProgress } from "@/lib/onboardingStorage";
 
 type StepMeta = { key: string; title: string; desc: string; path: string };
 type GroupMeta = { id: string; title: string; steps: StepMeta[] };
@@ -70,6 +70,7 @@ function markDone(email: string | null | undefined, key: string) {
   const cur = readOnboardingProgress(email);
   cur[key] = true;
   try { localStorage.setItem(progressKey(email), JSON.stringify(cur)); } catch {}
+  pushProgress(email, cur);
 }
 
 /** Hook — true when an admin is currently inside an onboarding step (URL has ?step=valid-key). */

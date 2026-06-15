@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { FinHeader } from "@/pages/financas/_FinHeader";
 import { useAuth } from "@/contexts/AuthContext";
-import { onboardingKey, progressKey, isOnboardingCompleteFor } from "@/lib/onboardingStorage";
+import { onboardingKey, progressKey, profileKey, isOnboardingCompleteFor, clearAdminStateBackend } from "@/lib/onboardingStorage";
 import {
   Building2, LifeBuoy, BookOpen, ArrowRight, CheckCircle2,
   RotateCcw, ShieldCheck, GraduationCap, CalendarDays,
@@ -133,6 +133,8 @@ export default function AdminInicio() {
     if (!confirm("Repor onboarding? Todos os dados introduzidos serão perdidos.")) return;
     localStorage.removeItem(onboardingKey(user?.email));
     localStorage.removeItem(progressKey(user?.email));
+    localStorage.removeItem(profileKey(user?.email));
+    clearAdminStateBackend();
     navigate("/admin/onboarding");
   };
 

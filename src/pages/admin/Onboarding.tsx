@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAuth } from "@/contexts/AuthContext";
-import { onboardingKey, readOnboardingStateFor } from "@/lib/onboardingStorage";
+import { onboardingKey, readOnboardingStateFor, pushOnboarding } from "@/lib/onboardingStorage";
 import { Building2, Loader2, Upload, CheckCircle2 } from "lucide-react";
 
 interface OnboardingState {
@@ -59,7 +59,8 @@ export default function AdminOnboarding() {
 
   useEffect(() => {
     try { localStorage.setItem(STORAGE, JSON.stringify(state)); } catch { /* ignore */ }
-  }, [state, STORAGE]);
+    pushOnboarding(user?.email, state);
+  }, [state, STORAGE, user?.email]);
 
   const setDados = (patch: Partial<OnboardingState["dados"]>) =>
     setState((s) => ({ ...s, dados: { ...s.dados, ...patch } }));
@@ -81,6 +82,7 @@ export default function AdminOnboarding() {
       setState(next);
       updateUser({ name: nome });
       try { localStorage.setItem(STORAGE, JSON.stringify(next)); } catch { /* ignore */ }
+      pushOnboarding(user?.email, next);
       setActivating(false);
       setSuccess(true);
     }, 900);
