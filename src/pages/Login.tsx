@@ -9,7 +9,7 @@ import { Eye, EyeOff, Globe, Building2, Loader2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
 import logoUpra from "@/assets/logo-upra.asset.json";
 import { supabase } from "@/integrations/supabase/client";
-import { onboardingKey, isOnboardingCompleteFor } from "@/lib/onboardingStorage";
+import { onboardingKey, isOnboardingCompleteFor, pushOnboarding } from "@/lib/onboardingStorage";
 
 const ROLE_ROUTE: Record<string, string> = {
   admin: "/admin",
