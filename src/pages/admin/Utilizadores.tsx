@@ -83,34 +83,32 @@ export default function AdminUtilizadores() {
     }
     setSubmitting(true);
     try {
-      let userId: string | undefined;
-      if (isPreviewHost()) {
-        // Preview (Lovable editor) → não cria conta real no backend.
-        console.info("[utilizadores] preview host: skipping backend signUp");
-        userId = `local-${Date.now()}`;
-      } else {
-        const { data, error } = await supabase.auth.signUp({
-          email: form.email.trim(),
+      const { data, error } = await supabase.functions.invoke("admin-create-user", {
+        body: {
+          email: form.email.trim().toLowerCase(),
           password: form.password,
-          options: {
-            data: { display_name: form.name.trim(), modulo: form.modulo },
-            emailRedirectTo: `${window.location.origin}/`,
-          },
-        });
-        if (error) { setErr(error.message); setSubmitting(false); return; }
-        userId = data.user?.id;
-        if (userId) {
-          const { error: roleErr } = await supabase.from("user_roles" as any).insert({
-            user_id: userId, role: form.modulo,
-          } as any);
-          if (roleErr) console.warn("user_roles insert failed:", roleErr.message);
-        }
+          name: form.name.trim(),
+          modulo: form.modulo,
+        },
+      });
+      if (error) {
+        setErr(error.message || "Falha ao criar utilizador.");
+        return;
+      }
+      if (data?.error) {
+        setErr(data.error);
+        return;
+      }
+      const created = data?.user as { id: string; email: string; name: string; modulo: string } | undefined;
+      if (!created?.id) {
+        setErr("Resposta inesperada do servidor.");
+        return;
       }
       const newRow: StoredUser = {
-        id: userId || `${Date.now()}`,
-        name: form.name.trim(),
-        email: form.email.trim().toLowerCase(),
-        modulo: form.modulo,
+        id: created.id,
+        name: created.name,
+        email: created.email,
+        modulo: created.modulo,
         createdAt: Date.now(),
       };
       setRows((prev) => [...prev, newRow]);
