@@ -458,8 +458,8 @@ export default function AdminOnboarding() {
               </Button>
               <div className="text-xs text-muted-foreground hidden sm:block">As alterações são guardadas automaticamente.</div>
               {step < STEPS.length - 1 ? (
-                <Button type="button" onClick={next} disabled={!canNext}>
-                  Continuar <ChevronRight className="w-4 h-4 ml-1" />
+                <Button type="button" onClick={next}>
+                  Confirmar <ChevronRight className="w-4 h-4 ml-1" />
                 </Button>
               ) : <div className="w-[88px]" />}
             </div>
