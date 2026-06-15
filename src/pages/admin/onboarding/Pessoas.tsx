@@ -126,18 +126,63 @@ export default function OnboardingPessoas({ mode }: { mode: Mode }) {
           <TabsTrigger value="importar" className="gap-1.5"><Upload className="w-3.5 h-3.5" /> Importar</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="importar" className="mt-0">
-          <Card className="p-5">
-            <div className="flex items-center justify-between mb-3">
-              <div>
-                <h2 className="text-sm font-semibold">Importação em lote</h2>
-                <p className="text-xs text-muted-foreground">Carregue um ficheiro CSV/Excel para registar todos de uma vez.</p>
-              </div>
-              <Button onClick={simulateImport} className="gap-2"><FileSpreadsheet className="w-4 h-4" /> Importar ficheiro</Button>
+        <TabsContent value="importar" className="mt-0 space-y-4">
+          <div className="flex items-center gap-3">
+            <Button onClick={simulateImport} variant="outline" className="gap-2 h-9">
+              <Upload className="w-4 h-4" /> Carregar CSV
+            </Button>
+            <span className="text-[11px] text-muted-foreground">Ficheiro .csv ou .xlsx</span>
+          </div>
+
+          <Card className="overflow-hidden">
+            <div className={`grid ${grid} gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b`}>
+              <span>Prefixo</span><span>Primeiro nome</span><span>Último nome</span><span>Email</span>
+              {isDoc ? (<><span>Contacto</span><span>Grau</span></>) : (<><span>Contacto</span><span>Departamento</span><span>Função</span></>)}
+              <span></span>
             </div>
-            <div className="border-2 border-dashed rounded-lg p-8 text-center text-sm text-muted-foreground bg-muted/20">
-              <Upload className="w-6 h-6 mx-auto mb-2" />
-              Arraste o ficheiro aqui ou clique em <span className="font-semibold text-foreground">Importar ficheiro</span>
+            <div className="divide-y">
+              {rows.map(r => (
+                <div key={r.id} className={`grid ${grid} gap-2 px-4 py-2 items-center`}>
+                  <Select value={r.prefixo || ""} onValueChange={v => update(r.id, { prefixo: v })}>
+                    <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="—" /></SelectTrigger>
+                    <SelectContent>{prefixosPool.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
+                  </Select>
+                  <Input value={r.primeiroNome} onChange={e => update(r.id, { primeiroNome: e.target.value })} className="h-8 text-xs" placeholder="Primeiro" />
+                  <Input value={r.ultimoNome} onChange={e => update(r.id, { ultimoNome: e.target.value })} className="h-8 text-xs" placeholder="Último" />
+                  <Input value={r.email} readOnly disabled className="h-8 text-xs bg-muted/40 cursor-not-allowed" placeholder="auto @upra.kor" />
+                  <Input value={r.contacto || ""} onChange={e => update(r.id, { contacto: e.target.value })} className="h-8 text-xs" placeholder="+244 ..." />
+                  {isDoc ? (
+                    <Select value={r.grau} onValueChange={v => update(r.id, { grau: v })}>
+                      <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                      <SelectContent>{grausPool.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
+                    </Select>
+                  ) : (
+                    <>
+                      <Select value={r.departamento} onValueChange={v => update(r.id, { departamento: v })}>
+                        <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                        <SelectContent>{departamentosPool.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
+                      </Select>
+                      <Select value={r.funcao} onValueChange={v => update(r.id, { funcao: v })}>
+                        <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                        <SelectContent>{funcoesPool.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
+                      </Select>
+                    </>
+                  )}
+                  <div className="flex justify-end">
+                    <Button size="icon" variant="ghost" onClick={() => remove(r.id)} className="h-8 w-8 text-muted-foreground hover:text-destructive">
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+              {rows.length === 0 && (
+                <p className="px-4 py-8 text-xs text-muted-foreground italic text-center">Sem registos. Clique em adicionar para começar.</p>
+              )}
+            </div>
+            <div className="border-t bg-muted/10 px-4 py-2.5">
+              <Button variant="ghost" size="sm" onClick={addEmptyRow} className="h-8 gap-1.5 text-primary hover:text-primary hover:bg-primary/5">
+                <UserPlus className="w-3.5 h-3.5" /> Adicionar {isDoc ? "docente" : "funcionário"}
+              </Button>
             </div>
           </Card>
         </TabsContent>
