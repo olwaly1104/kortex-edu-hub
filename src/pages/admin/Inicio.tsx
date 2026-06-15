@@ -79,6 +79,7 @@ const GROUPS: Group[] = [
       { key: "fin.prop", title: "Propinas por curso", desc: "Definir valores de propinas por curso e ano.", icon: Banknote, path: "/financas/configurar-receitas?step=fin.prop" },
       { key: "fin.taxas", title: "Emolumentos e serviços", desc: "Configurar emolumentos administrativos e serviços académicos.", icon: Receipt, path: "/financas/configurar-receitas?step=fin.taxas" },
       { key: "fin.multas", title: "Multas", desc: "Definir tabela de multas e penalidades aplicáveis.", icon: Receipt, path: "/financas/configurar-receitas?step=fin.multas" },
+      { key: "fin.sal", title: "Confirmar salários", desc: "Bruto, imposto e líquido dos docentes e staff registados.", icon: Banknote, path: "/admin/onboarding/salarios?step=fin.sal" },
     ],
   },
   {

@@ -169,6 +169,7 @@ import AdminAnuncios from "./pages/admin/Anuncios";
 import AdminOnboardingEstudantes from "./pages/admin/onboarding/Estudantes";
 import AdminOnboardingPessoas from "./pages/admin/onboarding/Pessoas";
 import AdminOnboardingRegrasPresenca from "./pages/admin/onboarding/RegrasPresenca";
+import AdminOnboardingSalarios from "./pages/admin/onboarding/Salarios";
 
 const queryClient = new QueryClient();
 
@@ -248,6 +249,7 @@ function AppRoutes() {
         <Route path="/admin/onboarding/docentes" element={<AdminOnboardingPessoas mode="docentes" />} />
         <Route path="/admin/onboarding/staff" element={<AdminOnboardingPessoas mode="staff" />} />
         <Route path="/admin/onboarding/regras-presenca" element={<AdminOnboardingRegrasPresenca />} />
+        <Route path="/admin/onboarding/salarios" element={<AdminOnboardingSalarios />} />
         {/* Student */}
         <Route path="/student" element={<StudentDashboard />} />
         <Route path="/student/disciplines" element={<StudentDisciplines />} />
