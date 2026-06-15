@@ -3,8 +3,8 @@ import { useState } from "react";
 import { FinHeader } from "@/pages/financas/_FinHeader";
 import { useAuth } from "@/contexts/AuthContext";
 import {
-  Building2, LifeBuoy, BookOpen, ArrowRight, CheckCircle2, Circle,
-  RotateCcw, ShieldCheck, GraduationCap, Users, CalendarDays,
+  Building2, LifeBuoy, BookOpen, ArrowRight, CheckCircle2,
+  RotateCcw, ShieldCheck, GraduationCap, CalendarDays,
   FileText, Layers, School, ChevronDown, UserCog, Clock, Briefcase,
   MapPin,
 } from "lucide-react";
