@@ -258,11 +258,7 @@ function TaxasTab({ storageKey }: { storageKey: string }) {
 
 /* ───────────────────────────── Multas ─────────────────────────────────────── */
 
-const DEFAULT_MULTAS: MultaRow[] = [
-  { id: newId(), nome: "Atraso no pagamento de propina", valor: 0, unidade: "Kz / dia" },
-  { id: newId(), nome: "Falta a exame sem justificação", valor: 0, unidade: "Kz" },
-  { id: newId(), nome: "Devolução tardia de livro", valor: 0, unidade: "Kz / dia" },
-];
+const DEFAULT_MULTAS: MultaRow[] = [];
 
 function MultasTab({ storageKey }: { storageKey: string }) {
   const [rows, setRows] = useState<MultaRow[]>(() => readJSON<MultaRow[]>(storageKey, DEFAULT_MULTAS));
