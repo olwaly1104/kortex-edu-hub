@@ -182,6 +182,8 @@ import AdminStaff from "./pages/admin/Staff";
 import AdminDocentes from "./pages/admin/Docentes";
 import AdminFinancasDiscentes from "./pages/admin/FinancasDiscentes";
 import AdminUtilizadores from "./pages/admin/Utilizadores";
+import AlterarPalavraPasse from "./pages/AlterarPalavraPasse";
+import { supabase } from "@/integrations/supabase/client";
 
 const queryClient = new QueryClient();
 
@@ -229,6 +231,7 @@ function AppRoutes() {
   const { isAuthenticated, user } = useAuth();
   const [hydrated, setHydrated] = useState(false);
   const [hydratingFor, setHydratingFor] = useState<string | null>(null);
+  const [mustChange, setMustChange] = useState<boolean | null>(null);
 
   useEffect(() => {
     if (!isAuthenticated || user?.role !== "admin") {
@@ -242,8 +245,28 @@ function AppRoutes() {
     hydrateAdminStateFromBackend(user.email).finally(() => setHydrated(true));
   }, [isAuthenticated, user?.role, user?.email, hydratingFor]);
 
+  // Check must_change_password flag on every fresh login.
+  useEffect(() => {
+    let cancelled = false;
+    if (!isAuthenticated) { setMustChange(null); return; }
+    (async () => {
+      const { data: u } = await supabase.auth.getUser();
+      if (!u.user?.id) { if (!cancelled) setMustChange(false); return; }
+      const { data } = await (supabase.from("profiles" as any) as any)
+        .select("must_change_password")
+        .eq("id", u.user.id)
+        .maybeSingle();
+      if (!cancelled) setMustChange(!!(data as any)?.must_change_password);
+    })();
+    return () => { cancelled = true; };
+  }, [isAuthenticated, user?.email]);
+
   if (!isAuthenticated) return <Routes><Route path="/" element={<Website />} /><Route path="/site" element={<Website />} /><Route path="/candidatar" element={<Candidatar />} /><Route path="*" element={<Login />} /></Routes>;
   const homeRedirect = homeRedirectMap[user?.role || "student"] || "/student";
+
+  if (mustChange) {
+    return <AlterarPalavraPasse onDone={() => setMustChange(false)} />;
+  }
 
   if (user?.role === "admin" && !hydrated) {
     return (
