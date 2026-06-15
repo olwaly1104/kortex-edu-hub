@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Upload, FileSpreadsheet, UserPlus, Trash2, GraduationCap, Briefcase } from "lucide-react";
+import { Upload, UserPlus, Trash2, GraduationCap, Briefcase } from "lucide-react";
 import { toast } from "sonner";
 
 type Mode = "docentes" | "staff";
