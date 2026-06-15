@@ -176,6 +176,7 @@ import AdminFaculdadesCursos from "./pages/admin/FaculdadesCursos";
 import AdminDiscentes from "./pages/admin/Discentes";
 import AdminSalas from "./pages/admin/Salas";
 import AdminStaff from "./pages/admin/Staff";
+import AdminFinancasDiscentes from "./pages/admin/FinancasDiscentes";
 
 const queryClient = new QueryClient();
 
@@ -254,6 +255,18 @@ function AppRoutes() {
         <Route path="/admin/discentes" element={<AdminDiscentes />} />
         <Route path="/admin/salas" element={<AdminSalas />} />
         <Route path="/admin/staff" element={<AdminStaff />} />
+        {/* Admin → Finanças (read-only mirrors) */}
+        <Route path="/admin/financas/dashboard" element={<FinancasDashboard />} />
+        <Route path="/admin/financas/receitas" element={<FinancasReceitas />} />
+        <Route path="/admin/financas/despesas" element={<FinancasDespesas />} />
+        <Route path="/admin/financas/salarios" element={<FinancasSalarios />} />
+        <Route path="/admin/financas/orcamentos" element={<FinancasOrcamentos />} />
+        <Route path="/admin/financas/discentes" element={<AdminFinancasDiscentes />} />
+        <Route path="/admin/financas/candidaturas" element={<GapCandidaturas />} />
+        <Route path="/admin/financas/candidaturas/:id" element={<GapCandidaturaDetail />} />
+        {/* Admin → Candidaturas (mirror of GAP) */}
+        <Route path="/admin/candidaturas" element={<GapCandidaturas />} />
+        <Route path="/admin/candidaturas/:id" element={<GapCandidaturaDetail />} />
         <Route path="/admin/onboarding/estudantes" element={<AdminOnboardingEstudantes />} />
         <Route path="/admin/onboarding/docentes" element={<AdminOnboardingPessoas mode="docentes" />} />
         <Route path="/admin/onboarding/staff" element={<AdminOnboardingPessoas mode="staff" />} />

@@ -38,6 +38,7 @@ export default function Login() {
 
   // Signup dialog state
   const [signupOpen, setSignupOpen] = useState(false);
+  const [suModulo, setSuModulo] = useState<string>("admin");
   const [suName, setSuName] = useState("");
   const [suEmail, setSuEmail] = useState("");
   const [suPassword, setSuPassword] = useState("");
@@ -79,7 +80,7 @@ export default function Login() {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setSuError("");
-    if (!suName.trim() || !suEmail.trim() || !suPassword) {
+    if (!suModulo || !suName.trim() || !suEmail.trim() || !suPassword) {
       setSuError("Preencha todos os campos.");
       return;
     }
@@ -88,26 +89,34 @@ export default function Login() {
       return;
     }
     setSuLoading(true);
-    const { error: signUpError } = await supabase.auth.signUp({
+    const { data: suData, error: signUpError } = await supabase.auth.signUp({
       email: suEmail.trim(),
       password: suPassword,
       options: {
-        data: { display_name: suName.trim() },
-        emailRedirectTo: `${window.location.origin}/student/chat`,
+        data: { display_name: suName.trim(), modulo: suModulo },
+        emailRedirectTo: `${window.location.origin}/`,
       },
     });
-    setSuLoading(false);
     if (signUpError) {
+      setSuLoading(false);
       setSuError(signUpError.message || "Não foi possível criar conta.");
       return;
     }
+    // Assign role
+    const userId = suData.user?.id;
+    if (userId) {
+      const { error: roleErr } = await supabase.from("user_roles" as any).insert({
+        user_id: userId,
+        role: suModulo,
+      } as any);
+      if (roleErr) console.warn("user_roles insert failed:", roleErr.message);
+    }
+    setSuLoading(false);
     setSignupOpen(false);
     setEmail(suEmail.trim());
     setPassword(suPassword);
-    setInfo("Conta criada. Inicie sessão para entrar no chat.");
-    setSuName("");
-    setSuEmail("");
-    setSuPassword("");
+    setInfo(`Conta ${suModulo} criada. Inicie sessão para entrar.`);
+    setSuName(""); setSuEmail(""); setSuPassword("");
   };
 
   return (
@@ -266,12 +275,32 @@ export default function Login() {
                 </DialogTrigger>
                 <DialogContent className="max-w-md">
                   <DialogHeader>
-                    <DialogTitle>Criar conta Cloud</DialogTitle>
+                    <DialogTitle>Criar conta</DialogTitle>
                     <DialogDescription>
-                      Conta real ligada à Lovable Cloud — usada para testar o chat em tempo real entre 2 utilizadores.
+                      Cria uma conta real ligada à Lovable Cloud. O módulo escolhido define o painel a que o utilizador acede.
                     </DialogDescription>
                   </DialogHeader>
                   <form onSubmit={handleSignup} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="su-modulo">Módulo</Label>
+                      <select
+                        id="su-modulo"
+                        value={suModulo}
+                        onChange={(e) => setSuModulo(e.target.value)}
+                        className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
+                      >
+                        <option value="admin">Admin (Onboarding institucional)</option>
+                        <option value="estudante">Estudante</option>
+                        <option value="professor">Professor</option>
+                        <option value="coordenador">Coordenador de Curso</option>
+                        <option value="decano">Decano</option>
+                        <option value="reitor">Reitor</option>
+                        <option value="financas">Finanças</option>
+                        <option value="academica">Académica</option>
+                        <option value="gap">GAP</option>
+                        <option value="inscricoes">Inscrições</option>
+                      </select>
+                    </div>
                     <div className="space-y-2">
                       <Label htmlFor="su-name">Nome a apresentar</Label>
                       <Input id="su-name" value={suName} onChange={(e) => setSuName(e.target.value)} placeholder="Ex: Maria Santos" />

@@ -1,35 +1,68 @@
-# Plan — Enrich Anúncio Detail Page
 
-## 1. Departamento tag next to Categoria (above title)
-Replace the single Categoria badge above the `<h1>` with a horizontal tag row containing two badges:
-- **Categoria** badge — keep current style (colored dot + uppercase label).
-- **Departamento** badge — outline style, `Building2` icon (w-3 h-3) + `{ann.department}`, same height/typography as Categoria. Clickable → links to `/financas/anuncios?dep=...` (same as in Dados).
+# Plan
 
-Both badges sit in a `flex flex-wrap gap-1.5` row directly above the title.
+Big request — I'll group it into 6 self-contained pieces. All shipped in this single iteration.
 
-## 2. Reduce "naked" feeling — add structure below the body
-The page currently ends right after the body text, leaving the right Dados sidebar visually taller and a lot of empty space below. Additions (inside the main card, in the left column, after Conteúdo):
+## 1. Onboarding — replace "Cadeiras & Turmas" with "Configurar Área Académica"
 
-**a. Inline summary strip above Conteúdo**
-A thin gradient/tinted row showing a one-line lead/resumo using the first sentence of `ann.content`, styled as an italic pull-quote with a left accent border in `primary`. Gives the body weight before the paragraph starts.
+In `src/pages/admin/Inicio.tsx`:
+- Remove the standalone Faculdades & Cursos group (`fac`) — it moves inside the new group.
+- Rename the `cad` group label to **"Configurar Área Académica"** and add Faculdades + Cursos steps to it, so the group contains: Faculdades, Cursos, Cadeiras, Turmas.
+- Final top→bottom order stays: Discentes → Geopontos do Campus → Configurar Área Académica → Configurar Finanças → Configurar RH → Configurar GAP.
 
-**b. "Documentos anexos" mini-section** (after the body)
-Static mock list of 1–2 attachments (e.g. `Anuncio-{ID}.pdf`, plus a contextual file like `Programa.pdf` when type is event). Each row: file icon, name, size, Download button. Styled like the EduDrive file rows already used in finances.
+## 2. Sidebar — Finanças section under Staff
 
-**c. "Partilhado com" inline preview**
-Below attachments: small horizontal stack of avatar circles (reuse `sharedWith` initials) + "{n} pessoas com acesso" label + "Ver todos" button that opens the existing dialog. Removes the hidden-only-in-header feeling.
+In `src/components/AppSidebar.tsx`, add a **Finanças** group below Staff containing:
+- Dashboard, Receitas, Despesas, Salários, Orçamentos, **Discentes** (new), **Candidaturas** (new).
+- Add **Candidaturas** to the Estudantes section right under Discentes, above Configuração.
+- All routes mounted under `/admin/financas/*` and `/admin/candidaturas`, reusing existing finance/GAP page components (read-only mirror).
 
-## 3. Related anúncios section (outside the card)
-Below the main card, add a "Mais do mesmo departamento" section using the existing `related` array (already computed but unused). Grid of compact cards (title, type badge, date). Only render if `related.length > 0`. This fills the bottom of the page meaningfully.
+## 3. Discentes inside Finanças (new page)
 
-## 4. Sidebar polish
-- Add a subtle section divider line between Dados items (already spaced; add `divide-y divide-border/60` wrapper) so the right column feels intentional rather than floating.
-- Add an "Estado" MetaCell (e.g. "Publicado" with green dot) for parity with other detail pages.
+`src/pages/admin/FinancasDiscentes.tsx` — clean institutional table (matrícula, nome, curso, ano, turma, estado financeiro) with row-click → `/admin/discente/:id` which opens a **default student profile** modeled after the Coordenador student profile (KPIs + academic history + finances tab focus). Uses same mock dataset already used elsewhere.
 
-## Out of scope
-- No data model changes — attachments and estado are presentational mocks consistent with other finance/EduDrive views.
-- No routing changes.
+## 4. Criar Conta — real backend accounts
 
-## Technical notes
-File: `src/pages/financas/AnuncioDetail.tsx` only.
-Imports to add: `Paperclip` (or reuse `FileText`) for attachments header. Reuse existing `sharedWith`, `related`, `TYPE_META`.
+- Rename/repurpose the "Criar Conta" button next to "Ver Credenciais" on the admin landing.
+- Modal fields: **Módulo** (select: Estudante, Professor, Coordenador, Decano, Reitor, Finanças, Académica, GAP, Inscrições, Admin), **Nome a apresentar**, **Email**, **Palavra-passe**.
+- On submit: calls `supabase.auth.signUp` with `emailRedirectTo: window.location.origin`, writes role to a new `user_roles` table, profile auto-created via existing trigger.
+- New migration: `app_role` enum + `user_roles` table + `has_role` security-definer function + GRANTs + RLS (admin can manage, users see their own).
+- Enable Lovable Cloud email auth with auto-confirm OFF (default) so accounts are real. No Google by default since user only specified email/password.
+
+## 5. Candidaturas — real table wired end-to-end
+
+New migration `public.candidaturas`:
+- Fields: nome, email, telefone, curso_pretendido, faculdade, sessao (1ª/2ª/3ª), documentos (jsonb), pagamento_status (pendente/pago), estado (recebida/em_analise/aprovada/rejeitada), origem ('site' default), notas.
+- GRANTs: anon INSERT (public form), authenticated SELECT/UPDATE, service_role ALL.
+- RLS: anon can insert only; authenticated can read & update (admin module gated client-side).
+
+Wiring:
+- `/inscricoes` portal form → `INSERT INTO candidaturas` (replaces current mock submit).
+- GAP `Candidaturas.tsx` → reads from this table.
+- New `/admin/candidaturas` and `/admin/financas/candidaturas` views → read-only mirror of GAP candidaturas list/detail with the same components.
+
+## 6. Document templates — refresh with current info
+
+Update doc-preview pages so PDFs match the newer per-page info:
+- `src/pages/gap/SolicitacaoDocPreview.tsx`
+- `src/pages/gap/AtendimentoDocPreview.tsx` (if drift exists)
+- `src/pages/gap/CandidaturaDocPreview.tsx` — pull from new candidaturas row
+- `src/pages/financas/DespesaDocPreview.tsx`
+- `src/pages/financas/SolicitacaoDocPreview.tsx`
+
+Each will read the same source-of-truth shown on the detail page so headers, IDs, dates, valores, beneficiários, anexos match exactly.
+
+## 7. Verification before "done"
+
+- Build/typecheck via harness.
+- Manually click through: /admin (onboarding order), Criar Conta modal → submits → row in `user_roles`, /admin/financas/discentes table → row click → student profile, /inscricoes submit → row visible in GAP Candidaturas and admin mirror, doc previews open with matching data.
+
+## Technical details
+
+- New migration files: `xxx_user_roles.sql`, `xxx_candidaturas.sql`. Migrations include GRANTs + RLS in correct order.
+- `has_role(_user_id uuid, _role app_role)` SECURITY DEFINER; used in policies to avoid recursion.
+- Inscrições form switches from mock to `supabase.from('candidaturas').insert(...)`; keeps existing UI.
+- Criar Conta uses `supabase.auth.signUp` directly (not edge function) — display_name passed via `options.data.display_name` so the existing `handle_new_user` trigger picks it up.
+- No changes to `src/integrations/supabase/client.ts` or auto-generated types.
+
+Approve and I'll execute all 7 in one pass.
