@@ -165,29 +165,73 @@ export default function AdminOnboarding() {
 
   return (
     <div className="min-h-screen bg-muted/30">
-      {/* Top bar */}
+      {/* Top bar — Kortex branding */}
       <header className="bg-card border-b border-border sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between gap-4">
+        <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center p-1.5 shrink-0">
-              <img src={logoUpra.url} alt="UPRA" className="w-full h-full object-contain" />
-            </div>
-            <div className="min-w-0">
-              <div className="text-[11px] uppercase tracking-wider font-semibold text-primary flex items-center gap-1">
-                <Sparkles className="w-3 h-3" /> Onboarding institucional
-              </div>
-              <h1 className="text-sm font-bold text-foreground truncate">Configurar nova instituição</h1>
+            <div className="w-8 h-8 rounded-md bg-foreground text-background flex items-center justify-center shrink-0 font-black text-sm tracking-tight">K</div>
+            <div className="min-w-0 leading-tight">
+              <div className="text-[15px] font-bold text-foreground tracking-tight">kortex</div>
+              <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground font-medium">Onboarding institucional</div>
             </div>
           </div>
           <div className="hidden sm:flex items-center gap-3 text-xs text-muted-foreground">
-            <span>{user?.email}</span>
-            <span className="px-2 py-1 rounded-md bg-muted font-mono">{progress}%</span>
+            <span className="hidden md:inline">{user?.email}</span>
+            <span className="text-foreground font-semibold tabular-nums">Passo {step + 1}<span className="text-muted-foreground font-normal"> / {STEPS.length}</span></span>
           </div>
         </div>
-        <div className="h-1.5 bg-muted">
-          <div className="h-full bg-primary transition-all duration-500" style={{ width: `${progress}%` }} />
+
+        {/* Stepper progress bar */}
+        <div className="border-t border-border bg-card">
+          <div className="max-w-7xl mx-auto px-6 py-4">
+            <div className="flex items-center justify-between mb-2.5">
+              <div className="text-[11px] uppercase tracking-[0.16em] font-semibold text-muted-foreground">
+                {STEPS[step].title}
+              </div>
+              <div className="text-[11px] font-semibold text-foreground tabular-nums">{progress}%</div>
+            </div>
+            <div className="relative">
+              {/* Track */}
+              <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-[2px] bg-border rounded-full" />
+              {/* Fill */}
+              <div
+                className="absolute left-0 top-1/2 -translate-y-1/2 h-[2px] bg-primary rounded-full transition-all duration-500"
+                style={{ width: `${progress}%` }}
+              />
+              {/* Dots */}
+              <ol className="relative flex items-center justify-between">
+                {STEPS.map((s, i) => {
+                  const done = i < step;
+                  const active = i === step;
+                  return (
+                    <li key={s.key}>
+                      <button
+                        type="button"
+                        onClick={() => i < step && setState((st) => ({ ...st, step: i }))}
+                        className={`group flex flex-col items-center gap-1.5 ${i < step ? "cursor-pointer" : "cursor-default"}`}
+                      >
+                        <span
+                          className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold border-2 transition-all
+                            ${active ? "bg-primary border-primary text-primary-foreground shadow-[0_0_0_4px_hsl(var(--primary)/0.15)] scale-110"
+                              : done ? "bg-primary border-primary text-primary-foreground"
+                              : "bg-card border-border text-muted-foreground"}`}
+                        >
+                          {done ? <Check className="w-3 h-3" /> : i + 1}
+                        </span>
+                        <span className={`hidden md:block text-[10px] font-medium tracking-tight whitespace-nowrap transition-colors
+                          ${active ? "text-foreground" : done ? "text-muted-foreground" : "text-muted-foreground/60"}`}>
+                          {s.title.split(" ")[0]}
+                        </span>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ol>
+            </div>
+          </div>
         </div>
       </header>
+
 
       <div className="max-w-7xl mx-auto px-6 py-8 grid lg:grid-cols-[260px_1fr] gap-8">
         <aside className="lg:sticky lg:top-24 self-start">
