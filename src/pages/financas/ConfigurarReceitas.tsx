@@ -307,6 +307,7 @@ export default function ConfigurarReceitas() {
 
   /* ── RECEITAS ── */
   const [receitas, setReceitas] = useState<ReceitaRow[]>(() => (isAdmin ? [] : initialReceitas()));
+  const accountFaculties = isAdmin ? [] : reitorFaculties;
   const [receitaFilter, setReceitaFilter] = useState<string>("todos");
   const [selectedFaculty, setSelectedFaculty] = useState<string | null>(null);
   const [multaSubtype, setMultaSubtype] = useState<TipoReceita>("Multa Estudante");
