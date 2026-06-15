@@ -1,0 +1,54 @@
+// Shared localStorage helpers for staff and docentes,
+// so the Configurador can pull dropdown options from what the user has registered.
+
+export type StaffRow = {
+  id: string;
+  prefixo: string;
+  primeiroNome: string;
+  ultimoNome: string;
+  email: string;
+  contacto: string;
+  departamento: string;
+  funcao: string;
+  moduloKortex: string;
+  editing?: boolean;
+};
+
+export type DocenteRow = {
+  id: string;
+  prefixo: string;
+  primeiroNome: string;
+  ultimoNome: string;
+  email: string;
+  contacto: string;
+  faculdade: string;
+  categoria: string; // Assistente, Auxiliar, Associado, Catedrático, Convidado
+  cargo: string;     // Docente, Coordenador, Decano, Diretor
+  editing?: boolean;
+};
+
+const STAFF_KEY = "upra_admin_staff_v1";
+const DOCENTES_KEY = "upra_admin_docentes_v1";
+
+export const loadStaff = (): StaffRow[] => {
+  try {
+    const raw = localStorage.getItem(STAFF_KEY);
+    return raw ? (JSON.parse(raw) as StaffRow[]) : [];
+  } catch { return []; }
+};
+export const saveStaff = (rows: StaffRow[]) => {
+  try { localStorage.setItem(STAFF_KEY, JSON.stringify(rows.map(({ editing: _e, ...r }) => r))); } catch {/* noop */}
+};
+
+export const loadDocentes = (): DocenteRow[] => {
+  try {
+    const raw = localStorage.getItem(DOCENTES_KEY);
+    return raw ? (JSON.parse(raw) as DocenteRow[]) : [];
+  } catch { return []; }
+};
+export const saveDocentes = (rows: DocenteRow[]) => {
+  try { localStorage.setItem(DOCENTES_KEY, JSON.stringify(rows.map(({ editing: _e, ...r }) => r))); } catch {/* noop */}
+};
+
+export const fullName = (p: { prefixo?: string; primeiroNome: string; ultimoNome: string }) =>
+  `${p.prefixo ? p.prefixo + " " : ""}${p.primeiroNome} ${p.ultimoNome}`.trim();
