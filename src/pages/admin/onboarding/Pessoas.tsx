@@ -100,8 +100,8 @@ export default function OnboardingPessoas({ mode }: { mode: Mode }) {
 
   const HeaderIcon = isDoc ? GraduationCap : Briefcase;
   const grid = isDoc
-    ? "grid-cols-[80px_1fr_1fr_1.4fr_1fr_1fr_64px]"
-    : "grid-cols-[80px_1fr_1fr_1.4fr_1fr_1fr_1fr_64px]";
+    ? "grid-cols-[80px_1fr_1fr_1.4fr_1fr_1fr_1.2fr]"
+    : "grid-cols-[80px_1fr_1fr_1.4fr_1fr_1fr_1fr_1.2fr]";
 
   return (
     <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6 animate-fade-in">
