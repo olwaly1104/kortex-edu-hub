@@ -22,6 +22,32 @@ const initial: OnboardingState = {
 
 const TIPO_OPTS = ["Universidade", "Instituto Superior Politécnico", "Instituto Superior", "Escola Superior", "Academia"];
 
+const PROVINCIAS_MUNICIPIOS: Record<string, string[]> = {
+  "Bengo": ["Ambriz", "Bula-Atumba", "Dande", "Dembos", "Kabiri", "Kiwaba-Kiazi", "Muxima", "Nambuangongo", "Pango-Aluquém", "Quiculungo", "Songo"],
+  "Benguela": ["Balombo", "Benguela", "Baía Farta", "Bocoio", "Caimbambo", "Catumbela", "Chongoroi", "Cubal", "Ganda", "Lobito", "Sumbe"],
+  "Bié": ["Andulo", "Camacupa", "Catabola", "Chinguar", "Chitembo", "Cuemba", "Cunhinga", "Cuito", "Nharea"],
+  "Cabinda": ["Belize", "Buco Zau", "Cabinda", "Cacongo", "Miconje"],
+  "Cuando Cubango": ["Calai", "Cuangar", "Cuchi", "Dirico", "Longa", "Mavinga", "Menongue", "Nancova", "Rivungo"],
+  "Cuanza Norte": ["Ambaca", "Banga", "Bolongongo", "Bom Jesus", "Cazengo", "Golungo Alto", "Kambambe", "Lucala", "Quiculungo", "Samba-Cajú"],
+  "Cuanza Sul": ["Amboim", "Cassangue", "Conda", "Ebo", "Libolo", "Mussende", "Porto Amboim", "Quibala", "Quilenda", "Seles", "Sumbe"],
+  "Cunene": ["Cahama", "Cuvelai", "Curoca", "Kuroka", "Kuvelai", "Namacunde", "Ombadja", "Ondjiva", "Tchibote"],
+  "Huambo": ["Bailundo", "Caála", "Catchiungo", "Chicala-Choloanga", "Chinjenje", "Ekunha", "Huambo", "Londuimbali", "Longonjo", "Mungo"],
+  "Huíla": ["Caconda", "Caluquembe", "Chibia", "Chicomba", "Chipindo", "Gambos", "Humpata", "Jamba", "Kuvango", "Lubango", "Matala", "Quilengues", "Quipungo"],
+  "Inhambane": ["Funhalouro", "Govuro", "Homoine", "Inhambane", "Inhassoro", "Jangamo", "Mabote", "Massinga", "Maxixe", "Morrumbene", "Panda", "Vilanculos", "Zavala"],
+  "Luanda": ["Belas", "Cacuaco", "Cazenga", "Icolo e Bengo", "Luanda", "Quilamba-Kiaxi", "Quissama", "Viana"],
+  "Lunda Norte": ["Cambulo", "Capenda-Camulemba", "Caungula", "Chitato", "Cuango", "Cuilo", "Lóvua", "Lubalo", "Lucapa", "Xá-Muteba"],
+  "Lunda Sul": ["Cacolo", "Dala", "Muconda", "Saurimo"],
+  "Malange": ["Cacolo", "Calandula", "Cambundi-Catembo", "Cangandala", "Capunda-Camulemba", "Cunda-Dia-Baze", "Kiwaba-Kiazi", "Luquembo", "Malange", "Marimba", "Massango", "Mucari", "Quela", "Quirima"],
+  "Moxico": ["Alto Zambeze", "Bundas", "Cameia", "Chavuma", "Cuando", "Léua", "Luacano", "Luchazes", "Luvale", "Moxico"],
+  "Namibe": ["Bibala", "Camacuio", "Moçâmedes", "Tombwa", "Virei"],
+  "Nígera": ["Cuimba", "M'Bimba", "Nóqui", "Nzeto", "Soyo", "Tomboco"],
+  "Uíge": ["Ambuíla", "Bembe", "Buengas", "Bungo", "Damba", "Maquela do Zombo", "Milunga", "Mucaba", "Negage", "Puri", "Quimbele", "Quitexe", "Sanza-Pombo", "Santa Cruz", "Uíge", "Vista Alegre"],
+  "Zaire": ["Cuimba", "M'Banza Kongo", "Noqui", "Nzeto", "Soyo", "Tomboco"],
+};
+
+const PROVINCIAS_OPTS = Object.keys(PROVINCIAS_MUNICIPIOS).sort();
+
+
 export default function AdminOnboarding() {
   const { user, updateUser } = useAuth();
   const navigate = useNavigate();
