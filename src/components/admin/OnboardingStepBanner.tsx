@@ -172,6 +172,7 @@ export function OnboardingStepBanner({
           </ol>
         </div>
       </div>
+      </div>
     </div>
   );
 }
