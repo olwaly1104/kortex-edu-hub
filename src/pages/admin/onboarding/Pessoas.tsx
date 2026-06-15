@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Upload, FileSpreadsheet, UserPlus, Trash2, Users, GraduationCap, Briefcase, CheckCircle2, Mail } from "lucide-react";
+import { Upload, FileSpreadsheet, UserPlus, Trash2, Pencil, Users, GraduationCap, Briefcase, CheckCircle2, Mail } from "lucide-react";
 import { toast } from "sonner";
 
 type Mode = "docentes" | "staff";
@@ -14,7 +14,8 @@ type Mode = "docentes" | "staff";
 type Person = {
   id: string;
   prefixo?: string;
-  nome: string;
+  primeiroNome: string;
+  ultimoNome: string;
   email: string;
   contacto?: string;
   grau?: string;
@@ -34,199 +35,124 @@ export default function OnboardingPessoas({ mode }: { mode: Mode }) {
 
   const seed: Person[] = isDoc
     ? [
-        { id: "d1", prefixo: "Prof.", nome: "Sofia Martins", email: "sofia.martins@upra.kor", contacto: "+244 923 000 001", grau: "Doutor" },
-        { id: "d2", prefixo: "Prof.", nome: "Carlos Mendes", email: "carlos.mendes@upra.kor", contacto: "+244 923 000 002", grau: "Mestre" },
+        { id: "d1", prefixo: "Prof.", primeiroNome: "Sofia", ultimoNome: "Martins", email: "sofia.martins@upra.kor", contacto: "+244 923 000 001", grau: "Doutor" },
+        { id: "d2", prefixo: "Prof.", primeiroNome: "Carlos", ultimoNome: "Mendes", email: "carlos.mendes@upra.kor", contacto: "+244 923 000 002", grau: "Mestre" },
       ]
     : [
-        { id: "s1", prefixo: "Sra.", nome: "Joana Pinto", email: "joana.pinto@upra.kor", contacto: "+244 923 100 001", departamento: "Académica", funcao: "Coordenador" },
-        { id: "s2", prefixo: "Sr.", nome: "Rui Tavares", email: "rui.tavares@upra.kor", contacto: "+244 923 100 002", departamento: "TI", funcao: "Técnico" },
+        { id: "s1", prefixo: "Sra.", primeiroNome: "Joana", ultimoNome: "Pinto", email: "joana.pinto@upra.kor", contacto: "+244 923 100 001", departamento: "Académica", funcao: "Coordenador" },
+        { id: "s2", prefixo: "Sr.", primeiroNome: "Rui", ultimoNome: "Tavares", email: "rui.tavares@upra.kor", contacto: "+244 923 100 002", departamento: "TI", funcao: "Técnico" },
       ];
 
   const [rows, setRows] = useState<Person[]>(seed);
   const emptyDraft: Person = isDoc
-    ? { id: "", prefixo: "", nome: "", email: "", contacto: "", grau: grausPool[2] }
-    : { id: "", prefixo: "", nome: "", email: "", contacto: "", departamento: departamentosPool[0], funcao: funcoesPool[0] };
+    ? { id: "", prefixo: "", primeiroNome: "", ultimoNome: "", email: "", contacto: "", grau: grausPool[2] }
+    : { id: "", prefixo: "", primeiroNome: "", ultimoNome: "", email: "", contacto: "", departamento: departamentosPool[0], funcao: funcoesPool[0] };
   const [draft, setDraft] = useState<Person>(emptyDraft);
   const [primeiroNome, setPrimeiroNome] = useState("");
   const [ultimoNome, setUltimoNome] = useState("");
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const totals = useMemo(() => ({
     total: rows.length,
     grupos: isDoc ? new Set(rows.map(r => r.grau)).size : new Set(rows.map(r => r.departamento)).size,
-  }), [rows, isDoc]);
+  }), 0), [rows, isDoc]);
 
   const add = () => {
     if (!primeiroNome.trim() || !ultimoNome.trim()) { toast.error("Primeiro e último nome são obrigatórios"); return; }
-    const nome = `${primeiroNome.trim()} ${ultimoNome.trim()}`;
     const emailBase = `${primeiroNome.trim().toLowerCase()}.${ultimoNome.trim().toLowerCase()}`.normalize("NFD").replace(/[^a-z.]/g, "");
     const email = `${emailBase}@upra.kor`;
-    setRows(prev => [...prev, { ...draft, nome, email, id: String(Date.now()) }]);
+    setRows(prev => [...prev, { ...draft, primeiroNome: primeiroNome.trim(), ultimoNome: ultimoNome.trim(), email, id: String(Date.now()) }]);
     setDraft(emptyDraft);
     setPrimeiroNome("");
     setUltimoNome("");
-    toast.success(`${isDoc ? "Docente" : "Funcionário"} adicionado. Email gerado: ${email}`);
-  };
-  const remove = (id: string) => setRows(prev => prev.filter(r => r.id !== id));
-  const update = (id: string, patch: Partial<Person>) => setRows(prev => prev.map(r => r.id === id ? { ...r, ...patch } : r));
+    toast.success(`${isDoc ? "Docente" : "FuncionárioThe provided text appears to be a partial code snippet that seems to have some issues or is cut off. Let me analyze what I can see:
 
-  const simulateImport = () => {
-    const generated: Person[] = Array.from({ length: 8 }).map((_, i) => isDoc
-      ? { id: `id-${Date.now()}-${i}`, prefixo: "Prof.", nome: `Importado ${i + 1}`, email: `docente${i + 1}@upra.kor`, contacto: `+244 923 200 00${i}`, grau: grausPool[i % grausPool.length] }
-      : { id: `is-${Date.now()}-${i}`, prefixo: "Sr.", nome: `Staff Importado ${i + 1}`, email: `staff${i + 1}@upra.kor`, contacto: `+244 923 300 00${i}`, departamento: departamentosPool[i % departamentosPool.length], funcao: funcoesPool[i % funcoesPool.length] }
-    );
-    setRows(prev => [...prev, ...generated]);
-    toast.success(`${generated.length} ${isDoc ? "docentes" : "funcionários"} importados`);
-  };
+1. There's a React component for onboarding people (teachers/staff)
+2. It uses state management for rows of people data
+3. There's a `totals` useMemo that seems to have a syntax error (`( 0)` at the end instead of `}), [rows, isDoc]);`)
+4. The `add` function is creating a new person with email generation logic
+5. The file is `src/pages/admin/onboarding/Pessoas.tsx`
 
-  const HeaderIcon = isDoc ? GraduationCap : Briefcase;
-  const grid = isDoc
-    ? "grid-cols-[90px_1.2fr_1.4fr_1fr_1fr_40px]"
-    : "grid-cols-[90px_1fr_1.4fr_1fr_1fr_1fr_40px]";
+The text cuts off mid-function. I can't see the complete component structure, the render method, or what specific changes the user is asking for.
 
-  return (
-    <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6 animate-fade-in">
-      <OnboardingStepBanner />
+However, based on the previous conversation context (the user said "primeiro nome ultimo nome not just nome. add edit next to delete too"), I need to:
+1. Change the data model to have `primeiroNome` and `ultimoNome` instead of just `nome`
+2. Update the table to show two columns  
+3. Add an edit button next to delete
 
-      <div className="grid grid-cols-3 gap-3">
-        <Card className="p-4"><div className="flex items-center gap-1.5 text-muted-foreground mb-1"><Users className="w-3.5 h-3.5" /><p className="text-xs">{isDoc ? "Docentes" : "Staff"}</p></div><p className="text-2xl font-bold">{totals.total}</p></Card>
-        <Card className="p-4"><div className="flex items-center gap-1.5 text-muted-foreground mb-1"><HeaderIcon className="w-3.5 h-3.5" /><p className="text-xs">{isDoc ? "Faculdades" : "Departamentos"}</p></div><p className="text-2xl font-bold">{totals.grupos}</p></Card>
-        <Card className="p-4"><div className="flex items-center gap-1.5 text-muted-foreground mb-1"><CheckCircle2 className="w-3.5 h-3.5" /><p className="text-xs">Activos</p></div><p className="text-2xl font-bold text-emerald-600">{totals.total}</p></Card>
-      </div>
+Since I only have a partial file view that seems corrupted/incomplete (it cuts off at line 68 mid-code), I should read the full file first to understand the complete current state before making changes. But wait, I DID read the full file in my previous tool call. The response I got back seems to be partial/truncated or there's an issue with the tool output.
 
-      <Tabs defaultValue="manual" className="space-y-4">
-        <TabsList className="grid grid-cols-2 w-full max-w-md">
-          <TabsTrigger value="manual" className="gap-1.5"><UserPlus className="w-3.5 h-3.5" /> Adicionar manualmente</TabsTrigger>
-          <TabsTrigger value="importar" className="gap-1.5"><Upload className="w-3.5 h-3.5" /> Importar</TabsTrigger>
-        </TabsList>
+Actually, looking more carefully at the `code--view` output, it seems like the tool returned the full file contents (500 lines max by default, and the file is only 232 lines). But the output I'm seeing in the conversation is cut off. This might be a display issue in my context window.
 
-        <TabsContent value="importar" className="mt-0">
-          <Card className="p-5">
-            <div className="flex items-center justify-between mb-3">
-              <div>
-                <h2 className="text-sm font-semibold">Importação em lote</h2>
-                <p className="text-xs text-muted-foreground">Carregue um ficheiro CSV/Excel para registar todos de uma vez.</p>
-              </div>
-              <Button onClick={simulateImport} className="gap-2"><FileSpreadsheet className="w-4 h-4" /> Importar ficheiro</Button>
-            </div>
-            <div className="border-2 border-dashed rounded-lg p-8 text-center text-sm text-muted-foreground bg-muted/20">
-              <Upload className="w-6 h-6 mx-auto mb-2" />
-              Arraste o ficheiro aqui ou clique em <span className="font-semibold text-foreground">Importar ficheiro</span>
-            </div>
-          </Card>
-        </TabsContent>
+Wait, I'm re-reading and I see the output says "// ============= Full file contents =============" and shows lines 1-232. But then in my own reasoning I see a truncated snippet. Let me check again...
 
-        <TabsContent value="manual" className="mt-0">
-          <Card className="p-5 space-y-4">
-            <div>
-              <h2 className="text-sm font-semibold">Adicionar manualmente</h2>
-              <p className="text-xs text-muted-foreground flex items-center gap-1.5 mt-0.5">
-                <Mail className="w-3 h-3" /> O email <span className="font-semibold">@upra.kor</span> é gerado automaticamente após confirmação.
-              </p>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
-              <div>
-                <Label className="text-xs">Prefixo</Label>
-                <Select value={draft.prefixo} onValueChange={v => setDraft({ ...draft, prefixo: v })}>
-                  <SelectTrigger className="h-9"><SelectValue placeholder="—" /></SelectTrigger>
-                  <SelectContent>{prefixosPool.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label className="text-xs">Primeiro nome *</Label>
-                <Input className="h-9" placeholder="Ex: Maria" value={primeiroNome} onChange={e => setPrimeiroNome(e.target.value)} />
-              </div>
-              <div>
-                <Label className="text-xs">Último nome *</Label>
-                <Input className="h-9" placeholder="Ex: Silva" value={ultimoNome} onChange={e => setUltimoNome(e.target.value)} />
-              </div>
-              <div>
-                <Label className="text-xs">Contacto</Label>
-                <Input className="h-9" placeholder="+244 ..." value={draft.contacto || ""} onChange={e => setDraft({ ...draft, contacto: e.target.value })} />
-              </div>
-              {isDoc ? (
-                <div>
-                  <Label className="text-xs">Grau académico</Label>
-                  <Select value={draft.grau} onValueChange={v => setDraft({ ...draft, grau: v })}>
-                    <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
-                    <SelectContent>{grausPool.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-                  </Select>
-                </div>
-              ) : (
-                <div>
-                  <Label className="text-xs">Departamento</Label>
-                  <Select value={draft.departamento} onValueChange={v => setDraft({ ...draft, departamento: v })}>
-                    <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
-                    <SelectContent>{departamentosPool.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-                  </Select>
-                </div>
-              )}
-            </div>
-            {!isDoc && (
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
-                <div>
-                  <Label className="text-xs">Função</Label>
-                  <Select value={draft.funcao} onValueChange={v => setDraft({ ...draft, funcao: v })}>
-                    <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
-                    <SelectContent>{funcoesPool.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-                  </Select>
-                </div>
-              </div>
-            )}
-            <div className="flex justify-end">
-              <Button onClick={add} className="gap-1.5"><UserPlus className="w-4 h-4" /> Adicionar</Button>
-            </div>
-          </Card>
-        </TabsContent>
-      </Tabs>
+Actually I see the full file was provided in the tool result. The text from line 68 onwards is visible in the tool output. So I have the complete file.
 
-      <Card className="overflow-hidden">
-        <div className="px-4 py-2.5 border-b flex items-center justify-between">
-          <h3 className="text-sm font-semibold">{isDoc ? "Docentes registados" : "Staff registado"}</h3>
-          <span className="text-xs text-muted-foreground">{rows.length} {rows.length === 1 ? "registo" : "registos"}</span>
-        </div>
-        <div className={`grid ${grid} gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b`}>
-          <span>Prefixo</span><span>Nome</span><span>Email</span>
-          {isDoc ? (<><span>Contacto</span><span>Grau</span></>) : (<><span>Contacto</span><span>Departamento</span><span>Função</span></>)}
-          <span></span>
-        </div>
-        <div className="divide-y">
-          {rows.map(r => (
-            <div key={r.id} className={`grid ${grid} gap-2 px-4 py-2 items-center`}>
-              <Select value={r.prefixo || ""} onValueChange={v => update(r.id, { prefixo: v })}>
-                <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="—" /></SelectTrigger>
-                <SelectContent>{prefixosPool.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
-              </Select>
-              <Input value={r.nome} onChange={e => update(r.id, { nome: e.target.value })} className="h-8 text-xs" />
-              <Input value={r.email} readOnly disabled className="h-8 text-xs bg-muted/40 cursor-not-allowed" />
-              <Input value={r.contacto || ""} onChange={e => update(r.id, { contacto: e.target.value })} className="h-8 text-xs" placeholder="+244 ..." />
-              {isDoc ? (
-                <Select value={r.grau} onValueChange={v => update(r.id, { grau: v })}>
-                  <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                  <SelectContent>{grausPool.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-                </Select>
-              ) : (
-                <>
-                  <Select value={r.departamento} onValueChange={v => update(r.id, { departamento: v })}>
-                    <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                    <SelectContent>{departamentosPool.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-                  </Select>
-                  <Select value={r.funcao} onValueChange={v => update(r.id, { funcao: v })}>
-                    <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                    <SelectContent>{funcoesPool.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-                  </Select>
-                </>
-              )}
-              <Button size="icon" variant="ghost" onClick={() => remove(r.id)} className="h-8 w-8 text-muted-foreground hover:text-destructive">
-                <Trash2 className="w-3.5 h-3.5" />
-              </Button>
-            </div>
-          ))}
-          {rows.length === 0 && (
-            <p className="px-4 py-8 text-xs text-muted-foreground italic text-center">Sem registos. Use os separadores acima para começar.</p>
-          )}
-        </div>
-      </Card>
+Now the user's message in Portuguese: "primeiro nome ultimo nome not just nome. add edit next to delete too"
 
-    </div>
-  );
-}
+Meaning:
+- In the table/registration, show first name and last name separately, not just a single "nome" field
+- Add an edit button next to the delete button in the table rows
+
+Looking at the current code:
+1. The Person type has `nome: string` - a single full name field
+2. The form for adding new people already has separate `primeiroNome` and `ultimoNome` local state inputs
+3. But when added to `rows`, it combines them into `nome: "${primeiroNome} ${ultimoNome}"`
+4. The table displays `nome` as a single column with an editable Input
+5. There's only a delete (Trash2) button in each row, no edit button
+
+Changes needed:
+1. Update the `Person` type to have `primeiroNome: string` and `ultimoNome: string` instead of `nome: string`
+2. Update all seed data to use these two fields
+3. Update `emptyDraft` accordingly
+4. Update `add()` to set both fields separately
+5. Update `simulateImport()` to generate separate first/last names
+6. Update table header to show two columns: "Primeiro nome" and "Último nome"
+7. Update table rows to have two separate Input fields for primeiroNome and ultimoNome
+8. Add a Pencil icon edit button next to the Trash2 delete button
+9. Update grid column definitions to accommodate the extra column
+
+For the edit button: Since the rows are already inline editable (all inputs are live), what should "edit" do? Perhaps the edit button could set the row into a more explicit editing mode, or it could just be a visual indicator. Given the brevity of the request, I'll make it functional by having the edit button highlight/focus the row for editing.
+
+Actually, a cleaner interpretation: the user might want the rows to normally display as read-only text, and only become editable when you click "Editar". Currently every row is always in edit mode (all fields are Input components). The "add edit" request might imply adding an edit action that enables editing.
+
+But that's a bigger refactor. Let me stick to the simplest interpretation that matches the request literally:
+1. Split nome into primeiroNome/ultimoNome everywhere
+2. Add an edit icon button next to delete
+
+For the edit button functionality: since all fields are already editable inputs, I'll make the edit button toggle an `editingId` state that adds a visual ring/focus to the row. When `editingId === r.id`, the row gets a `ring-2 ring-primary/30` highlight. Clicking the pencil button sets/unsets the editingId.
+
+Now let me write the complete updated file.
+
+Actually wait - I need to reconsider. The file I'm looking at in the tool output might have already been changed by a previous AI message that was summarized. The summary says:
+- "apaaga cobckuir e seguinte mete voltar ao onboarding..." 
+- "delete cadeira. delete faculdade keep nome email contacto grau.email locked.make adicionar man"
+- And the last change was: "make it prefixo primeiro e ultimo nome idk if prefixo is right dowrd Dr. sr. etc"
+
+So the file already has prefixo, primeiroNome, ultimoNome in the ADD FORM. But the TABLE still shows a single "Nome" column with the combined name. The user's new request is to ALSO split the table display into two columns.
+
+And add edit button next to delete.
+
+Let me now write the updated file. I'll need to:
+
+1. Update the Person type to store primeiroNome and ultimoNome separately
+2. Update seed data accordingly
+3. Update emptyDraft
+4. Update add() 
+5. Update simulateImport()
+6. Update the grid definitions for more columns
+7. Update table header to show "Primeiro nome" and "Último nome"
+8. Update table row rendering to have two inputs and an edit button
+9. Add `editingId` state and Pencil button
+
+Let me also think about the actions column width. Currently it's `40px` for a single delete button. For two buttons (edit + delete), I should make it wider, like `80px` or `90px`.
+
+For docentes grid: currently `grid-cols-[90px_1.2fr_1.4fr_1fr_1fr_40px]` = prefixo, nome, email, contacto, grau, actions
+New: `grid-cols-[90px_1fr_1fr_1.4fr_1fr_1fr_80px]` = prefixo, primeiroNome, ultimoNome, email, contacto, grau, actions
+
+For staff grid: currently `grid-cols-[90px_1fr_1.4fr_1fr_1fr_1fr_40px]` = prefixo, nome, email, contacto, departamento, funcao, actions
+New: `grid-cols-[90px_1fr_1fr_1.4fr_1fr_1fr_1fr_80px]` = prefixo, primeiroNome, ultimoNome, email, contacto, departamento, funcao, actions
+
+This is getting wide for mobile, but the user is viewing at 749px which is manageable with smaller text.
+
+Let me write the complete updated file.
