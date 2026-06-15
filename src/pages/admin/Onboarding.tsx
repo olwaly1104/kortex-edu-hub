@@ -49,7 +49,7 @@ const PROVINCIAS_OPTS = Object.keys(PROVINCIAS_MUNICIPIOS).sort();
 
 
 export default function AdminOnboarding() {
-  const { user, updateUser } = useAuth();
+  const { user, updateUser, logout } = useAuth();
   const navigate = useNavigate();
   const [state, setState] = useState<OnboardingState>(() => {
     try {
