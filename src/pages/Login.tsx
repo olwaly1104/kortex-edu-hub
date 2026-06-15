@@ -9,6 +9,7 @@ import { Eye, EyeOff, Globe, KeyRound, UserPlus, Loader2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
 import logoUpra from "@/assets/logo-upra.asset.json";
 import { supabase } from "@/integrations/supabase/client";
+import { onboardingKey } from "@/lib/onboardingStorage";
 
 const DEMO_PASSWORD = "olwaly";
 const DEMO_ACCOUNTS: { role: string; email: string }[] = [
@@ -62,7 +63,7 @@ export default function Login() {
 
   const isOnboardingDone = (forEmail: string) => {
     try {
-      const raw = localStorage.getItem(`upra.admin.onboarding:${forEmail.trim().toLowerCase()}`);
+      const raw = localStorage.getItem(onboardingKey(forEmail));
       if (!raw) return false;
       const parsed = JSON.parse(raw);
       return !!parsed?.completed;
@@ -122,10 +123,12 @@ export default function Login() {
         inscricoes:   { email: "inscricoes@upra.kor",     path: "/inscricoes" },
       };
       const target = MODULE_TO_DEMO[modulo] ?? MODULE_TO_DEMO.estudante;
-      login(target.email, "olwaly");
+      const accountEmail = signInData.user?.email || email;
+      const displayName = (signInData.user?.user_metadata as any)?.display_name;
+      login(target.email, "olwaly", { sourceEmail: accountEmail, displayName });
       // Admin (real cloud account): always run institutional onboarding (ficha de inscrição)
       // before the inicio, until it's marked completed.
-      if (modulo === "admin" && !isOnboardingDone(target.email)) {
+      if (modulo === "admin" && !isOnboardingDone(accountEmail)) {
         navigate("/admin/onboarding");
         return;
       }
