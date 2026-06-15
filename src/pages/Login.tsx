@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -41,9 +41,24 @@ export default function Login() {
   const [suModulo, setSuModulo] = useState<string>("admin");
   const [suName, setSuName] = useState("");
   const [suEmail, setSuEmail] = useState("");
+  const [suEmailManuallyEdited, setSuEmailManuallyEdited] = useState(false);
   const [suPassword, setSuPassword] = useState("");
   const [suError, setSuError] = useState("");
   const [suLoading, setSuLoading] = useState(false);
+
+  // Auto-fill email as modulo@nome-a-apresentar.kor
+  useEffect(() => {
+    if (!suName.trim() || suEmailManuallyEdited) return;
+    const normalized = suName
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/[^a-z0-9-]/g, "");
+    if (normalized) {
+      setSuEmail(`${suModulo}@${normalized}.kor`);
+    }
+  }, [suModulo, suName, suEmailManuallyEdited]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -346,12 +361,9 @@ export default function Login() {
                         id="su-email"
                         type="email"
                         value={suEmail}
-                        onChange={(e) => setSuEmail(e.target.value)}
-                        placeholder={`${suModulo}@nomeasugerir.com`}
+                        onChange={(e) => { setSuEmailManuallyEdited(true); setSuEmail(e.target.value); }}
+                        placeholder="modulo@nome.kor"
                       />
-                      <p className="text-xs text-muted-foreground">
-                        Sugestão: <span className="font-mono">{suModulo}@nomeasugerir.com</span>
-                      </p>
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="su-password">Palavra-passe (mín. 6)</Label>
