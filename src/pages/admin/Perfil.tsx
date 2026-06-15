@@ -83,6 +83,11 @@ export default function AdminPerfil() {
   const [instituicao, setInstituicao] = useState<Instituicao>(() => loadInitial(user?.email));
 
   useEffect(() => {
+    const site = currentSiteUrl();
+    if (instituicao.website !== site) {
+      setInstituicao((prev) => ({ ...prev, website: site }));
+      return;
+    }
     try { localStorage.setItem(PROFILE_KEY, JSON.stringify(instituicao)); } catch { /* ignore */ }
   }, [instituicao, PROFILE_KEY]);
 
@@ -218,7 +223,13 @@ export default function AdminPerfil() {
           </div>
           <div className="space-y-1.5">
             <Label className="text-xs flex items-center gap-1.5"><Globe className="w-3 h-3" /> Website</Label>
-            <Input value={instituicao.website} onChange={e => setInstituicao({ ...instituicao, website: e.target.value })} className="h-9" />
+            <Input
+              value={currentSiteUrl()}
+              readOnly
+              className="h-9 bg-muted/40 cursor-not-allowed"
+              title="Ligado automaticamente ao site publicado desta conta"
+            />
+            <p className="text-[10px] text-muted-foreground">Ligado automaticamente ao site publicado desta conta.</p>
           </div>
           <div className="space-y-1.5">
             <Label className="text-xs flex items-center gap-1.5"><MapPin className="w-3 h-3" /> Morada</Label>
