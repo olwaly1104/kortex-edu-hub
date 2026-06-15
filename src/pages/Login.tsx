@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import logoUpra from "@/assets/logo-upra.asset.json";
 import { supabase } from "@/integrations/supabase/client";
 import { onboardingKey, isOnboardingCompleteFor } from "@/lib/onboardingStorage";
+import { isPreviewHost } from "@/lib/runtimeEnv";
 
 const DEMO_PASSWORD = "olwaly";
 const DEMO_ACCOUNTS: { role: string; email: string }[] = [
