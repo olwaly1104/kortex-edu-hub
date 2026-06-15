@@ -192,7 +192,7 @@ export default function OnboardingPessoas({ mode }: { mode: Mode }) {
             <div className={`grid ${grid} gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b`}>
               <span>Prefixo</span><span>Primeiro nome</span><span>Último nome</span><span>Email</span>
               {isDoc ? (<><span>Contacto</span><span>Grau</span></>) : (<><span>Contacto</span><span>Departamento</span><span>Função</span></>)}
-              <span></span>
+              <span>Módulo Kortex</span>
             </div>
             <div className="divide-y">
               {rows.map(r => (
