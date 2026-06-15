@@ -83,6 +83,11 @@ export default function AdminPerfil() {
   const [instituicao, setInstituicao] = useState<Instituicao>(() => loadInitial(user?.email));
 
   useEffect(() => {
+    const site = currentSiteUrl();
+    if (instituicao.website !== site) {
+      setInstituicao((prev) => ({ ...prev, website: site }));
+      return;
+    }
     try { localStorage.setItem(PROFILE_KEY, JSON.stringify(instituicao)); } catch { /* ignore */ }
   }, [instituicao, PROFILE_KEY]);
 
