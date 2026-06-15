@@ -9,34 +9,72 @@ import {
   ShieldCheck, Building2, Mail, Phone, Globe, MapPin, Calendar, GraduationCap,
   Users, Briefcase, Settings2, Save, IdCard, Hash,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
+
+const STORAGE = "upra.admin.onboarding";
+const PROFILE_KEY = "upra.admin.perfil";
+
+type Instituicao = {
+  nomeOficial: string; sigla: string; nif: string; fundacao: string; natureza: string;
+  reitor: string; presidenteCA: string;
+  email: string; telefone: string; website: string; morada: string;
+  logoDataUrl?: string;
+};
+
+const EMPTY: Instituicao = {
+  nomeOficial: "", sigla: "", nif: "", fundacao: "", natureza: "",
+  reitor: "", presidenteCA: "",
+  email: "", telefone: "", website: "", morada: "", logoDataUrl: "",
+};
+
+function loadInitial(): Instituicao {
+  try {
+    const saved = localStorage.getItem(PROFILE_KEY);
+    if (saved) return { ...EMPTY, ...JSON.parse(saved) };
+  } catch { /* ignore */ }
+  try {
+    const raw = localStorage.getItem(STORAGE);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      const d = parsed?.dados || {};
+      return {
+        ...EMPTY,
+        nomeOficial: d.nome || "",
+        sigla: d.sigla || "",
+        nif: d.nif || "",
+        natureza: d.tipo || "",
+        email: d.email || "",
+        telefone: d.telefone || "",
+        morada: [d.endereco, d.municipio, d.provincia].filter(Boolean).join(", "),
+        logoDataUrl: d.logoDataUrl || "",
+      };
+    }
+  } catch { /* ignore */ }
+  return EMPTY;
+}
 
 export default function AdminPerfil() {
   const { user } = useAuth();
+  const [instituicao, setInstituicao] = useState<Instituicao>(loadInitial);
 
-  const [instituicao, setInstituicao] = useState({
-    nomeOficial: "Universidade Privada de Arquitectura — UPRA",
-    sigla: "UPRA",
-    nif: "5417123456",
-    fundacao: "2008",
-    natureza: "Privada",
-    reitor: "Prof. Dr. António Almeida",
-    presidenteCA: "Dra. Maria Joaquina Pires",
-    email: "geral@upra.kor",
-    telefone: "+244 222 000 000",
-    website: "www.upra.ao",
-    morada: "Av. Comandante Valódia, Luanda — Angola",
-  });
+  useEffect(() => {
+    try { localStorage.setItem(PROFILE_KEY, JSON.stringify(instituicao)); } catch { /* ignore */ }
+  }, [instituicao]);
 
-  const handleSave = () => toast.success("Dados da instituição atualizados");
+  const handleSave = () => {
+    try { localStorage.setItem(PROFILE_KEY, JSON.stringify(instituicao)); } catch { /* ignore */ }
+    toast.success("Dados da instituição atualizados");
+  };
 
   const stats = [
-    { label: "Faculdades", value: 5, icon: Building2 },
-    { label: "Cursos", value: 13, icon: GraduationCap },
-    { label: "Docentes", value: 108, icon: Users },
-    { label: "Staff", value: 42, icon: Briefcase },
+    { label: "Faculdades", value: 0, icon: Building2 },
+    { label: "Cursos", value: 0, icon: GraduationCap },
+    { label: "Docentes", value: 0, icon: Users },
+    { label: "Staff", value: 0, icon: Briefcase },
   ];
+
+  const nomeDisplay = instituicao.nomeOficial || "Instituição sem nome";
 
   return (
     <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6 animate-fade-in">
@@ -44,20 +82,24 @@ export default function AdminPerfil() {
       <Card className="overflow-hidden">
         <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-6 border-b">
           <div className="flex items-start gap-5 flex-wrap">
-            <div className="w-20 h-20 rounded-xl bg-primary text-primary-foreground flex items-center justify-center shrink-0 shadow-sm">
-              <ShieldCheck className="w-10 h-10" />
+            <div className="w-20 h-20 rounded-xl bg-primary text-primary-foreground flex items-center justify-center shrink-0 shadow-sm overflow-hidden">
+              {instituicao.logoDataUrl ? (
+                <img src={instituicao.logoDataUrl} alt="Logo" className="w-full h-full object-contain bg-white" />
+              ) : (
+                <ShieldCheck className="w-10 h-10" />
+              )}
             </div>
             <div className="flex-1 min-w-0">
               <Badge variant="outline" className="mb-2 gap-1 text-[10px]"><Settings2 className="w-3 h-3" /> Administração da plataforma</Badge>
-              <h1 className="text-2xl font-bold leading-tight">{instituicao.nomeOficial}</h1>
+              <h1 className="text-2xl font-bold leading-tight">{nomeDisplay}</h1>
               <p className="text-sm text-muted-foreground mt-1">
                 Perfil institucional · Conta de {user?.name || "Administrador"} — controla toda a configuração da app Kortex.
               </p>
               <div className="flex flex-wrap items-center gap-3 mt-3 text-xs text-muted-foreground">
-                <span className="inline-flex items-center gap-1.5"><Hash className="w-3.5 h-3.5" /> {instituicao.sigla}</span>
-                <span className="inline-flex items-center gap-1.5"><IdCard className="w-3.5 h-3.5" /> NIF {instituicao.nif}</span>
-                <span className="inline-flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /> Desde {instituicao.fundacao}</span>
-                <span className="inline-flex items-center gap-1.5"><Building2 className="w-3.5 h-3.5" /> {instituicao.natureza}</span>
+                {instituicao.sigla && <span className="inline-flex items-center gap-1.5"><Hash className="w-3.5 h-3.5" /> {instituicao.sigla}</span>}
+                {instituicao.nif && <span className="inline-flex items-center gap-1.5"><IdCard className="w-3.5 h-3.5" /> NIF {instituicao.nif}</span>}
+                {instituicao.fundacao && <span className="inline-flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /> Desde {instituicao.fundacao}</span>}
+                {instituicao.natureza && <span className="inline-flex items-center gap-1.5"><Building2 className="w-3.5 h-3.5" /> {instituicao.natureza}</span>}
               </div>
             </div>
             <Button onClick={handleSave} size="sm" className="gap-1.5"><Save className="w-3.5 h-3.5" /> Guardar alterações</Button>
