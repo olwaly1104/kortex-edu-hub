@@ -243,8 +243,7 @@ function AppRoutes() {
       <Route element={<RoleGuardedLayout homeRedirect={homeRedirect} />}>
         {/* Admin */}
         <Route path="/admin" element={<AdminInicio />} />
-        <Route path="/admin/calendario" element={<FinancasCalendario />} />
-        <Route path="/admin/anuncios" element={<AdminAnuncios />} />
+        <Route path="/admin/perfil" element={<StudentProfile />} />
         <Route path="/admin/onboarding/estudantes" element={<AdminOnboardingEstudantes />} />
         <Route path="/admin/onboarding/docentes" element={<AdminOnboardingPessoas mode="docentes" />} />
         <Route path="/admin/onboarding/staff" element={<AdminOnboardingPessoas mode="staff" />} />
