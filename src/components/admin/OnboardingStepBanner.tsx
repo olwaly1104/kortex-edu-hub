@@ -1,62 +1,86 @@
 import { Link, useSearchParams } from "react-router-dom";
-import { ArrowLeft, ChevronRight, ShieldCheck, CheckCircle2, Circle } from "lucide-react";
+import { ArrowLeft, ChevronRight, ShieldCheck, CheckCircle2, Circle, ArrowRight } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { ReactNode } from "react";
 
 const PROGRESS_KEY = "upra.admin.config.progress";
 
-type StepMeta = { key: string; title: string; path: string };
+type StepMeta = { key: string; title: string; desc: string; path: string };
 type GroupMeta = { id: string; title: string; steps: StepMeta[] };
 
-// Mirrors the GROUPS structure in src/pages/admin/Inicio.tsx
-const GROUPS: GroupMeta[] = [
+// Single source of truth — mirrors src/pages/admin/Inicio.tsx
+export const ONBOARDING_GROUPS: GroupMeta[] = [
+  {
+    id: "est", title: "Adicionar Estudantes",
+    steps: [
+      { key: "est.imp", title: "Importar estudantes",   desc: "Carregar lista de estudantes via CSV/Excel ou registo manual.", path: "/admin/onboarding/estudantes?tab=importar&step=est.imp" },
+      { key: "est.val", title: "Validar matrículas",    desc: "Atribuir curso, ano e turma aos estudantes importados.",         path: "/admin/onboarding/estudantes?tab=validar&step=est.val" },
+    ],
+  },
   {
     id: "aca", title: "Configurar Área Académica",
     steps: [
-      { key: "aca.fac", title: "Faculdades e cursos",     path: "/areaacademica/criador/faculdades?step=aca.fac" },
-      { key: "aca.cad", title: "Cadeiras",                path: "/areaacademica/criador/cadeiras?step=aca.cad" },
-      { key: "aca.tur", title: "Turmas",                  path: "/areaacademica/criador/turmas?step=aca.tur" },
-      { key: "aca.cal", title: "Calendário académico",    path: "/areaacademica/criador/calendario?step=aca.cal" },
+      { key: "aca.fac", title: "Faculdades e cursos",   desc: "Confirmar faculdades, decanos e cursos da instituição.",        path: "/areaacademica/criador/faculdades?step=aca.fac" },
+      { key: "aca.cad", title: "Cadeiras",              desc: "Alocar cadeiras por curso, ano, semestre e docente.",            path: "/areaacademica/criador/cadeiras?step=aca.cad" },
+      { key: "aca.tur", title: "Turmas",                desc: "Gerar turmas e definir capacidade, sala e turno.",               path: "/areaacademica/criador/turmas?step=aca.tur" },
+      { key: "aca.cal", title: "Calendário académico",  desc: "Definir ano letivo, semestres, exames, feriados e férias.",      path: "/areaacademica/criador/calendario?step=aca.cal" },
     ],
   },
   {
     id: "rh", title: "Configurar RH",
     steps: [
-      { key: "rh.doc",   title: "Registar docentes",      path: "/areaacademica/docentes?step=rh.doc" },
-      { key: "rh.staff", title: "Registar staff",         path: "/areaacademica/docentes?step=rh.staff" },
-      { key: "rh.pres",  title: "Regras de presença",     path: "/areaacademica/docentes?step=rh.pres" },
+      { key: "rh.doc",   title: "Registar docentes",    desc: "Adicionar todos os docentes da instituição em lote.",            path: "/admin/onboarding/docentes?step=rh.doc" },
+      { key: "rh.staff", title: "Registar staff",       desc: "Adicionar funcionários administrativos e técnicos.",             path: "/admin/onboarding/staff?step=rh.staff" },
+      { key: "rh.pres",  title: "Regras de presença",   desc: "Limites de presença, tolerâncias e tipos de faltas.",            path: "/admin/onboarding/regras-presenca?step=rh.pres" },
     ],
   },
   {
     id: "fin", title: "Configurar Finanças",
     steps: [
-      { key: "fin.prop",   title: "Propinas por curso",      path: "/financas/configurar-receitas?step=fin.prop" },
-      { key: "fin.taxas",  title: "Emolumentos e serviços",  path: "/financas/configurar-receitas?step=fin.taxas" },
-      { key: "fin.multas", title: "Multas",                  path: "/financas/configurar-receitas?step=fin.multas" },
+      { key: "fin.prop",   title: "Propinas por curso",     desc: "Valores de propinas por curso e ano.",                       path: "/financas/configurar-receitas?step=fin.prop" },
+      { key: "fin.taxas",  title: "Emolumentos e serviços", desc: "Emolumentos administrativos e serviços académicos.",         path: "/financas/configurar-receitas?step=fin.taxas" },
+      { key: "fin.multas", title: "Multas",                 desc: "Tabela de multas e penalidades aplicáveis.",                 path: "/financas/configurar-receitas?step=fin.multas" },
     ],
   },
   {
     id: "gap", title: "Configurar GAP",
     steps: [
-      { key: "gap.sol",  title: "Solicitações",   path: "/gap/configuracao?tab=solicitacoes&step=gap.sol" },
-      { key: "gap.age",  title: "Agendamentos",   path: "/gap/configuracao?tab=agendamentos&step=gap.age" },
-      { key: "gap.cand", title: "Candidaturas",   path: "/gap/configuracao?tab=candidaturas&step=gap.cand" },
+      { key: "gap.sol",  title: "Solicitações",   desc: "Categorias, motivos e estados das solicitações.",                      path: "/gap/configuracao?tab=solicitacoes&step=gap.sol" },
+      { key: "gap.age",  title: "Agendamentos",   desc: "Tipos de atendimento, salas e horários disponíveis.",                  path: "/gap/configuracao?tab=agendamentos&step=gap.age" },
+      { key: "gap.cand", title: "Candidaturas",   desc: "Processo de candidaturas, etapas e documentos.",                       path: "/gap/configuracao?tab=candidaturas&step=gap.cand" },
     ],
   },
 ];
 
 const STEP_TO_GROUP: Record<string, GroupMeta> = {};
-GROUPS.forEach((g) => g.steps.forEach((s) => { STEP_TO_GROUP[s.key] = g; }));
+const STEP_MAP: Record<string, StepMeta> = {};
+ONBOARDING_GROUPS.forEach((g) => g.steps.forEach((s) => { STEP_TO_GROUP[s.key] = g; STEP_MAP[s.key] = s; }));
 
-function readProgress(): Record<string, boolean> {
+export function readOnboardingProgress(): Record<string, boolean> {
   try { return JSON.parse(localStorage.getItem(PROGRESS_KEY) || "{}"); } catch { return {}; }
 }
 function markDone(key: string) {
-  const cur = readProgress();
+  const cur = readOnboardingProgress();
   cur[key] = true;
   try { localStorage.setItem(PROGRESS_KEY, JSON.stringify(cur)); } catch {}
 }
 
-export function OnboardingStepBanner({ stepKey: stepKeyProp }: { stepKey?: string }) {
+/** Hook — true when an admin is currently inside an onboarding step (URL has ?step=valid-key). */
+export function useIsOnboardingStep(stepKeyProp?: string): boolean {
+  const { user } = useAuth();
+  const [params] = useSearchParams();
+  const stepKey = stepKeyProp || params.get("step") || "";
+  return user?.role === "admin" && !!STEP_TO_GROUP[stepKey];
+}
+
+export function OnboardingStepBanner({
+  stepKey: stepKeyProp,
+  actions,
+}: {
+  stepKey?: string;
+  /** Optional contextual action buttons (e.g. "Confirmar Todas") rendered next to the primary CTA. */
+  actions?: ReactNode;
+}) {
   const { user } = useAuth();
   const [params] = useSearchParams();
   const stepKey = stepKeyProp || params.get("step") || "";
@@ -64,95 +88,110 @@ export function OnboardingStepBanner({ stepKey: stepKeyProp }: { stepKey?: strin
   const group = STEP_TO_GROUP[stepKey];
   if (!group) return null;
 
-  const progress = readProgress();
+  const progress = readOnboardingProgress();
   const currentIdx = group.steps.findIndex((s) => s.key === stepKey);
   const current = group.steps[currentIdx];
   const doneCount = group.steps.filter((s) => progress[s.key]).length;
   const isCurrentDone = !!progress[stepKey];
   const nextStep = group.steps.slice(currentIdx + 1).find((s) => !progress[s.key]);
+  const groupPct = Math.round((doneCount / group.steps.length) * 100);
 
   return (
-    <div className="rounded-xl border-2 border-primary/30 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-4 mb-4 space-y-3">
-      {/* Top row */}
-      <div className="flex items-start gap-3 flex-wrap">
-        <div className="w-10 h-10 rounded-lg bg-primary/15 text-primary flex items-center justify-center shrink-0">
-          <ShieldCheck className="w-5 h-5" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-primary mb-0.5">
-            <span>Onboarding institucional</span>
-            <ChevronRight className="w-3 h-3" />
-            <span className="text-muted-foreground normal-case tracking-normal font-medium">{group.title}</span>
+    <div className="rounded-2xl border-2 border-primary/30 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent overflow-hidden">
+      {/* HERO */}
+      <div className="p-5 sm:p-6 space-y-4">
+        <div className="flex items-start gap-3 flex-wrap">
+          <div className="w-11 h-11 rounded-xl bg-primary text-primary-foreground flex items-center justify-center shrink-0 shadow-sm">
+            <ShieldCheck className="w-5 h-5" />
           </div>
-          <div className="flex items-center gap-2 flex-wrap">
-            <h2 className="text-base font-bold text-foreground">
-              Passo {currentIdx + 1} de {group.steps.length} · {current.title}
-            </h2>
-            {isCurrentDone && (
-              <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-2 py-0.5">
-                <CheckCircle2 className="w-3 h-3" /> Concluído
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-primary mb-1">
+              <span>Onboarding institucional</span>
+              <ChevronRight className="w-3 h-3" />
+              <span className="text-muted-foreground normal-case tracking-normal font-medium">{group.title}</span>
+              <ChevronRight className="w-3 h-3 text-muted-foreground" />
+              <span className="text-muted-foreground normal-case tracking-normal font-medium tabular-nums">
+                Passo {currentIdx + 1}/{group.steps.length}
               </span>
-            )}
+            </div>
+            <h1 className="text-xl sm:text-2xl font-bold text-foreground flex items-center gap-2 flex-wrap">
+              {current.title}
+              {isCurrentDone && (
+                <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-2 py-0.5">
+                  <CheckCircle2 className="w-3 h-3" /> Concluído
+                </span>
+              )}
+            </h1>
+            <p className="text-sm text-muted-foreground mt-1">{current.desc}</p>
           </div>
-          <div className="text-[11px] text-muted-foreground mt-0.5">
-            {doneCount} de {group.steps.length} passos concluídos neste grupo
+          <div className="flex flex-col items-end gap-2 shrink-0">
+            <Link to="/admin" className="text-xs font-semibold text-muted-foreground hover:text-foreground inline-flex items-center gap-1">
+              <ArrowLeft className="w-3.5 h-3.5" /> Voltar ao onboarding
+            </Link>
+            <div className="flex items-center gap-2">
+              {actions}
+              {!isCurrentDone ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    markDone(stepKey);
+                    window.location.href = nextStep ? nextStep.path : "/admin";
+                  }}
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary-foreground bg-primary hover:bg-primary/90 rounded-md px-3 py-2 shadow-sm"
+                >
+                  {nextStep ? "Concluir e seguinte" : "Concluir grupo"} <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              ) : nextStep ? (
+                <Link
+                  to={nextStep.path}
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary-foreground bg-primary hover:bg-primary/90 rounded-md px-3 py-2 shadow-sm"
+                >
+                  Passo seguinte <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              ) : null}
+            </div>
           </div>
         </div>
-        <div className="flex items-center gap-2 shrink-0">
-          <Link to="/admin" className="text-xs font-semibold text-muted-foreground hover:text-foreground flex items-center gap-1">
-            <ArrowLeft className="w-3.5 h-3.5" /> Voltar ao onboarding
-          </Link>
-          {!isCurrentDone ? (
-            <button
-              type="button"
-              onClick={() => {
-                markDone(stepKey);
-                window.location.href = nextStep ? nextStep.path : "/admin";
-              }}
-              className="text-xs font-semibold text-primary-foreground bg-primary hover:bg-primary/90 rounded-md px-3 py-1.5"
-            >
-              {nextStep ? "Concluir e seguinte" : "Concluir grupo"}
-            </button>
-          ) : nextStep ? (
-            <Link
-              to={nextStep.path}
-              className="text-xs font-semibold text-primary-foreground bg-primary hover:bg-primary/90 rounded-md px-3 py-1.5"
-            >
-              Passo seguinte
-            </Link>
-          ) : null}
+
+        {/* Mini progress + step strip */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between text-[11px]">
+            <span className="text-muted-foreground">{doneCount} de {group.steps.length} passos concluídos neste grupo</span>
+            <span className="font-semibold text-foreground tabular-nums">{groupPct}%</span>
+          </div>
+          <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+            <div className="h-full bg-primary transition-all duration-500" style={{ width: `${groupPct}%` }} />
+          </div>
+          <ol className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-1.5 pt-1">
+            {group.steps.map((s, i) => {
+              const done = !!progress[s.key];
+              const active = s.key === stepKey;
+              return (
+                <li key={s.key}>
+                  <Link
+                    to={s.path}
+                    className={`flex items-center gap-2 rounded-lg border px-2.5 py-2 text-xs transition-colors ${
+                      active
+                        ? "border-primary bg-primary/15 text-foreground font-semibold"
+                        : done
+                          ? "border-emerald-200 bg-emerald-50/60 text-emerald-900 hover:bg-emerald-50"
+                          : "border-border bg-card text-muted-foreground hover:bg-muted/50"
+                    }`}
+                  >
+                    <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 ${
+                      done ? "bg-emerald-500 text-white" : active ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                    }`}>
+                      {done ? <CheckCircle2 className="w-3 h-3" /> : i + 1}
+                    </span>
+                    <span className="truncate">{s.title}</span>
+                    {active && !done && <Circle className="w-2 h-2 fill-primary text-primary ml-auto shrink-0" />}
+                  </Link>
+                </li>
+              );
+            })}
+          </ol>
         </div>
       </div>
-
-      {/* Group progress — all steps */}
-      <ol className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-1.5">
-        {group.steps.map((s, i) => {
-          const done = !!progress[s.key];
-          const active = s.key === stepKey;
-          return (
-            <li key={s.key}>
-              <Link
-                to={s.path}
-                className={`flex items-center gap-2 rounded-lg border px-2.5 py-2 text-xs transition-colors ${
-                  active
-                    ? "border-primary bg-primary/10 text-foreground font-semibold"
-                    : done
-                      ? "border-emerald-200 bg-emerald-50/60 text-emerald-900 hover:bg-emerald-50"
-                      : "border-border bg-card text-muted-foreground hover:bg-muted/50"
-                }`}
-              >
-                <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 ${
-                  done ? "bg-emerald-500 text-white" : active ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
-                }`}>
-                  {done ? <CheckCircle2 className="w-3 h-3" /> : i + 1}
-                </span>
-                <span className="truncate">{s.title}</span>
-                {active && !done && <Circle className="w-2 h-2 fill-primary text-primary ml-auto shrink-0" />}
-              </Link>
-            </li>
-          );
-        })}
-      </ol>
     </div>
   );
 }
