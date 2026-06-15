@@ -124,10 +124,10 @@ export default function ConfirmarFaculdades() {
       )}
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <Card className="p-4"><p className="text-xs text-muted-foreground">Faculdades</p><p className="text-2xl font-bold">{faculdades.length}</p></Card>
+        <Card className="p-4"><p className="text-xs text-muted-foreground">Cursos</p><p className="text-2xl font-bold">{totalCursos}</p></Card>
+        <Card className="p-4"><p className="text-xs text-muted-foreground">Estudantes</p><p className="text-2xl font-bold">{faculdades.reduce((s, f) => s + f.cursos.reduce((a, c) => a + c.estudantesEsperados, 0), 0)}</p></Card>
         <Card className="p-4"><p className="text-xs text-muted-foreground">Decanos</p><p className="text-2xl font-bold">{faculdades.length}</p></Card>
-        <Card className="p-4"><p className="text-xs text-muted-foreground">Cursos Alocados</p><p className="text-2xl font-bold">{totalCursos}</p></Card>
-        <Card className="p-4"><p className="text-xs text-muted-foreground">Confirmadas</p><p className="text-2xl font-bold text-emerald-600">{confirmedCount}/{faculdades.length}</p></Card>
+        <Card className="p-4"><p className="text-xs text-muted-foreground">Docentes</p><p className="text-2xl font-bold">{totalCursos * 8}</p></Card>
       </div>
 
       <div className="space-y-4">
