@@ -81,15 +81,15 @@ export default function Login() {
         if (roleRow && (roleRow as any).role) modulo = (roleRow as any).role;
       }
       const MODULE_TO_DEMO: Record<string, { email: string; path: string }> = {
-        admin:        { email: "admin@upra.kor",          path: "/admin/inicio" },
-        estudante:    { email: "2934@upra.kor",           path: "/student/dashboard" },
-        professor:    { email: "prof.silva@upra.kor",     path: "/professor/dashboard" },
-        coordenador:  { email: "coordcurso@upra.kor",     path: "/coordenador/dashboard" },
-        decano:       { email: "decano@upra.kor",         path: "/decano/dashboard" },
-        reitor:       { email: "reitor@upra.kor",         path: "/reitor/dashboard" },
-        financas:     { email: "financas@upra.kor",       path: "/financas/dashboard" },
-        academica:    { email: "academica@upra.kor",      path: "/academica/inicio" },
-        gap:          { email: "gap@upra.kor",            path: "/gap/dashboard" },
+        admin:        { email: "admin@upra.kor",          path: "/admin" },
+        estudante:    { email: "2934@upra.kor",           path: "/student" },
+        professor:    { email: "prof.silva@upra.kor",     path: "/professor" },
+        coordenador:  { email: "coordcurso@upra.kor",     path: "/coordenador" },
+        decano:       { email: "decano@upra.kor",         path: "/decano" },
+        reitor:       { email: "reitor@upra.kor",         path: "/reitor" },
+        financas:     { email: "financas@upra.kor",       path: "/financas" },
+        academica:    { email: "academica@upra.kor",      path: "/secretaria" },
+        gap:          { email: "gap@upra.kor",            path: "/gap" },
         inscricoes:   { email: "inscricoes@upra.kor",     path: "/inscricoes" },
       };
       const target = MODULE_TO_DEMO[modulo] ?? MODULE_TO_DEMO.estudante;
