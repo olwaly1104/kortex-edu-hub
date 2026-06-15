@@ -162,26 +162,38 @@ export default function CourseCreator() {
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       <div className="rounded-xl border border-primary/30 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-6 flex items-center justify-between flex-wrap gap-3">
         <div>
-          <Badge className="mb-2 gap-1"><Sparkles className="w-3 h-3" /> Criador Automático</Badge>
-          <h1 className="text-2xl font-bold flex items-center gap-2"><Wand2 className="w-6 h-6 text-primary" /> Criador de Ano Letivo</h1>
-          <p className="text-muted-foreground mt-1 text-sm">Geração automática completa — sem prompts, basta executar.</p>
-        </div>
-        <div className="flex gap-2">
-          {doneCount === steps.length && (
-            <Button variant="outline" onClick={reset} className="gap-2"><RefreshCw className="w-4 h-4" /> Nova Geração</Button>
+          {isAdmin ? (
+            <>
+              <Badge className="mb-2 gap-1"><ShieldCheck className="w-3 h-3" /> Onboarding institucional</Badge>
+              <h1 className="text-2xl font-bold flex items-center gap-2"><GraduationCap className="w-6 h-6 text-primary" /> Configurar Área Académica</h1>
+              <p className="text-muted-foreground mt-1 text-sm">Confirme a estrutura académica da instituição passo a passo.</p>
+            </>
+          ) : (
+            <>
+              <Badge className="mb-2 gap-1"><Sparkles className="w-3 h-3" /> Criador Automático</Badge>
+              <h1 className="text-2xl font-bold flex items-center gap-2"><Wand2 className="w-6 h-6 text-primary" /> Criador de Ano Letivo</h1>
+              <p className="text-muted-foreground mt-1 text-sm">Geração automática completa — sem prompts, basta executar.</p>
+            </>
           )}
-          <Button onClick={runAll} disabled={running} className="gap-2">
-            {running ? <><Loader2 className="w-4 h-4 animate-spin" /> A gerar…</> : <><Rocket className="w-4 h-4" /> Gerar Tudo</>}
-          </Button>
         </div>
+        {!isAdmin && (
+          <div className="flex gap-2">
+            {doneCount === steps.length && (
+              <Button variant="outline" onClick={reset} className="gap-2"><RefreshCw className="w-4 h-4" /> Nova Geração</Button>
+            )}
+            <Button onClick={runAll} disabled={running} className="gap-2">
+              {running ? <><Loader2 className="w-4 h-4 animate-spin" /> A gerar…</> : <><Rocket className="w-4 h-4" /> Gerar Tudo</>}
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Top progress bar */}
       <Card className="p-4">
         <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
           <div className="flex items-center gap-2 text-sm">
-            <span className="font-semibold">Progresso do Ano Letivo</span>
-            <Badge variant="outline" className="text-xs">{anoLabel}</Badge>
+            <span className="font-semibold">{isAdmin ? "Progresso da configuração" : "Progresso do Ano Letivo"}</span>
+            {!isAdmin && <Badge variant="outline" className="text-xs">{anoLabel}</Badge>}
           </div>
           <span className="text-xs text-muted-foreground">{doneCount} de {steps.length} passos concluídos</span>
         </div>
