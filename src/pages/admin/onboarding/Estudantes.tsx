@@ -72,7 +72,7 @@ export default function OnboardingEstudantes() {
         origem: "novo",
       }]);
       setNovo(emptyNovo);
-      toast.success(`Estudante adicionado. Email institucional: ${emailGerado}`);
+      toast.success(`Discente registado. Email institucional: ${emailGerado}`);
     } else {
       const alvo = existentesPool.find(e => e.id === escolhidoId);
       if (!alvo) { toast.error("Selecione um estudante existente"); return; }
@@ -98,7 +98,7 @@ export default function OnboardingEstudantes() {
       origem: "importado",
     }));
     setRows(prev => [...prev, ...generated]);
-    toast.success(`${generated.length} estudantes importados`);
+    toast.success(`${generated.length} discentes importados`);
   };
 
   const existentesFiltrados = existentesPool.filter(e =>
@@ -120,7 +120,7 @@ export default function OnboardingEstudantes() {
       <Tabs defaultValue={initialTab} className="space-y-4">
         <TabsList className="grid grid-cols-2 w-full max-w-md">
           <TabsTrigger value="importar" className="gap-1.5"><Upload className="w-3.5 h-3.5" /> Importar</TabsTrigger>
-          <TabsTrigger value="manual" className="gap-1.5"><UserPlus className="w-3.5 h-3.5" /> Adicionar manualmente</TabsTrigger>
+          <TabsTrigger value="manual" className="gap-1.5"><UserPlus className="w-3.5 h-3.5" /> Registar discente</TabsTrigger>
         </TabsList>
 
         <TabsContent value="importar" className="mt-0">
@@ -142,7 +142,7 @@ export default function OnboardingEstudantes() {
         <TabsContent value="manual" className="mt-0">
           <Card className="p-5 space-y-5">
             <div>
-              <h2 className="text-sm font-semibold">Adicionar manualmente</h2>
+              <h2 className="text-sm font-semibold">Registar discente</h2>
               <p className="text-xs text-muted-foreground flex items-center gap-1.5 mt-0.5">
                 <Mail className="w-3 h-3" /> O email <span className="font-semibold">@upra.kor</span> é gerado automaticamente após confirmação.
               </p>
@@ -287,7 +287,7 @@ export default function OnboardingEstudantes() {
             )}
 
             <div className="flex justify-end">
-              <Button onClick={confirmarAdicao} className="gap-1.5"><UserPlus className="w-4 h-4" /> Adicionar estudante</Button>
+              <Button onClick={confirmarAdicao} className="gap-1.5"><UserPlus className="w-4 h-4" /> Registar discente</Button>
             </div>
           </Card>
         </TabsContent>
@@ -295,8 +295,8 @@ export default function OnboardingEstudantes() {
 
       <Card className="overflow-hidden">
         <div className="px-4 py-2.5 border-b flex items-center justify-between">
-          <h3 className="text-sm font-semibold">Estudantes registados</h3>
-          <span className="text-xs text-muted-foreground">{rows.length} {rows.length === 1 ? "estudante" : "estudantes"}</span>
+          <h3 className="text-sm font-semibold">Discentes registados</h3>
+          <span className="text-xs text-muted-foreground">{rows.length} {rows.length === 1 ? "discente" : "discentes"}</span>
         </div>
         <div className="grid grid-cols-[1fr_1.4fr_80px_70px_80px_40px] gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b">
           <span>Nome</span><span>Email</span><span>Curso</span><span>Ano</span><span>Turma</span><span></span>

@@ -3,9 +3,7 @@ import { useState } from "react";
 import { FinHeader } from "@/pages/financas/_FinHeader";
 import { useAuth } from "@/contexts/AuthContext";
 import {
-  Building2, Wallet, LifeBuoy, BookOpen, ArrowRight, CheckCircle2, Circle,
-  RotateCcw, ShieldCheck, GraduationCap, Users, CalendarDays, Receipt,
-  Banknote, FileText, Layers, School, ChevronDown, UserCog, Clock, Briefcase,
+  ArrowRight, CheckCircle2, RotateCcw, ShieldCheck, ChevronDown,
   UserPlus, Upload, MapPin,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -35,37 +33,13 @@ type Group = {
 
 const GROUPS: Group[] = [
   {
-    id: "doc",
-    area: "Docentes",
-    title: "Registar Docentes",
-    subtitle: "Adicionar corpo docente da instituição",
-    icon: GraduationCap,
-    steps: [
-      { key: "rh.doc", title: "Registar docentes", desc: "Adicionar todos os docentes da instituição em lote.", icon: GraduationCap, path: "/admin/onboarding/docentes?step=rh.doc" },
-    ],
-  },
-  {
     id: "inf",
     area: "Infraestrutura",
-    title: "Adicionar Edifícios e Salas",
-    subtitle: "Salas de aula, gabinetes, laboratórios e geopontos do campus",
-    icon: Building2,
+    title: "Registar Geopontos",
+    subtitle: "Definir pontos GPS de entradas, edifícios e zonas de presença",
+    icon: MapPin,
     steps: [
-      { key: "inf.esp", title: "Edifícios e salas", desc: "Registar todos os espaços físicos da instituição.", icon: Building2, path: "/admin/onboarding/espacos?step=inf.esp" },
       { key: "inf.geo", title: "Registar geopontos do campus", desc: "Definir pontos GPS de entradas, edifícios e zonas de presença.", icon: MapPin, path: "/admin/onboarding/espacos?tab=geopontos&step=inf.geo" },
-    ],
-  },
-  {
-    id: "aca",
-    area: "Académica",
-    title: "Faculdades & Cursos",
-    subtitle: "Estrutura curricular, turmas e calendário",
-    icon: School,
-    steps: [
-      { key: "aca.fac", title: "Faculdades e cursos", desc: "Confirmar faculdades e cursos da instituição.", icon: School, path: "/areaacademica/criador/faculdades?step=aca.fac" },
-      { key: "aca.cad", title: "Cadeiras", desc: "Gerar cadeiras por curso, ano e semestre.", icon: BookOpen, path: "/areaacademica/criador/cadeiras?step=aca.cad" },
-      { key: "aca.tur", title: "Turmas", desc: "Criar turmas e definir capacidade.", icon: Layers, path: "/areaacademica/criador/turmas?step=aca.tur" },
-      { key: "aca.cal", title: "Calendário académico", desc: "Definir ano letivo, semestres e feriados.", icon: CalendarDays, path: "/areaacademica/criador/calendario?step=aca.cal" },
     ],
   },
   {
@@ -75,52 +49,7 @@ const GROUPS: Group[] = [
     subtitle: "Importar ou registar manualmente",
     icon: UserPlus,
     steps: [
-      { key: "est.imp", title: "Registar discentes", desc: "Importar lista CSV/Excel ou adicionar manualmente.", icon: Upload, path: "/admin/onboarding/estudantes?tab=importar&step=est.imp" },
-    ],
-  },
-  {
-    id: "staff",
-    area: "Staff",
-    title: "Registar Staff",
-    subtitle: "Funcionários administrativos e técnicos",
-    icon: Briefcase,
-    steps: [
-      { key: "rh.staff", title: "Registar staff", desc: "Adicionar funcionários administrativos e técnicos.", icon: Briefcase, path: "/admin/onboarding/staff?step=rh.staff" },
-    ],
-  },
-  {
-    id: "fin",
-    area: "Finanças",
-    title: "Configurar Finanças",
-    subtitle: "Receitas, propinas e tabelas financeiras",
-    icon: Wallet,
-    steps: [
-      { key: "fin.prop", title: "Propinas por curso", desc: "Definir valores de propinas por curso e ano.", icon: Banknote, path: "/financas/configurar-receitas?step=fin.prop" },
-      { key: "fin.taxas", title: "Emolumentos e serviços", desc: "Configurar emolumentos administrativos e serviços académicos.", icon: Receipt, path: "/financas/configurar-receitas?step=fin.taxas" },
-      { key: "fin.multas", title: "Multas", desc: "Definir tabela de multas e penalidades aplicáveis.", icon: Receipt, path: "/financas/configurar-receitas?step=fin.multas" },
-      { key: "fin.sal", title: "Confirmar salários", desc: "Bruto, imposto e líquido dos docentes e staff registados.", icon: Banknote, path: "/admin/onboarding/salarios?step=fin.sal" },
-    ],
-  },
-  {
-    id: "rh",
-    area: "Recursos Humanos",
-    title: "Configurar RH",
-    subtitle: "Regras de presença e políticas internas",
-    icon: UserCog,
-    steps: [
-      { key: "rh.pres", title: "Regras de presença", desc: "Definir limites de presença, tolerâncias e faltas justificadas.", icon: Clock, path: "/admin/onboarding/regras-presenca?step=rh.pres" },
-    ],
-  },
-  {
-    id: "gap",
-    area: "GAP",
-    title: "Configurar GAP",
-    subtitle: "Gabinete de apoio: solicitações, agendamentos e candidaturas",
-    icon: LifeBuoy,
-    steps: [
-      { key: "gap.sol", title: "Solicitações", desc: "Categorias, motivos e estados das solicitações.", icon: FileText, path: "/gap/configuracao?tab=solicitacoes&step=gap.sol" },
-      { key: "gap.age", title: "Agendamentos", desc: "Tipos de atendimento, salas e horários disponíveis.", icon: CalendarDays, path: "/gap/configuracao?tab=agendamentos&step=gap.age" },
-      { key: "gap.cand", title: "Candidaturas", desc: "Processo de candidaturas, etapas e documentos.", icon: GraduationCap, path: "/gap/configuracao?tab=candidaturas&step=gap.cand" },
+      { key: "est.imp", title: "Registar discentes", desc: "Importar lista CSV/Excel ou registar manualmente.", icon: Upload, path: "/admin/onboarding/estudantes?tab=importar&step=est.imp" },
     ],
   },
 ];
