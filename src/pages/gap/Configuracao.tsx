@@ -61,6 +61,9 @@ const defaultResponsavelByDestino = (destino: string) => {
 };
 
 export default function GapConfiguracao() {
+  const [searchParams] = useSearchParams();
+  const tabParam = searchParams.get("tab");
+  const initialTab = tabParam === "agendamentos" || tabParam === "candidaturas" ? tabParam : "solicitacoes";
   const { toast } = useToast();
 
   // Per-card edit lock
