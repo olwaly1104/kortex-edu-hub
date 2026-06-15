@@ -199,29 +199,7 @@ export default function AdminInicio() {
         })}
       </div>
 
-      <div className="grid md:grid-cols-3 gap-3">
-        <KpiCard label="Estado da instituição" value="Ativa" hint="Onboarding inicial concluído" tone="emerald" icon={Building2} />
-        <KpiCard label="Passos pendentes" value={String(ALL_STEPS.length - doneCount)} hint="A concluir pelas equipas" tone="amber" icon={Circle} />
-        <KpiCard label="Passos concluídos" value={String(doneCount)} hint="Configurações finalizadas" tone="primary" icon={CheckCircle2} />
-      </div>
     </div>
   );
 }
 
-function KpiCard({ label, value, hint, tone, icon: Icon }: { label: string; value: string; hint: string; tone: "emerald" | "amber" | "primary"; icon: React.ComponentType<{ className?: string }> }) {
-  const toneMap = {
-    emerald: "bg-emerald-50 text-emerald-700 border-emerald-200",
-    amber: "bg-amber-50 text-amber-700 border-amber-200",
-    primary: "bg-primary/10 text-primary border-primary/20",
-  } as const;
-  return (
-    <div className="rounded-xl border border-border bg-card p-4">
-      <div className="flex items-center justify-between mb-2">
-        <div className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground">{label}</div>
-        <div className={`w-8 h-8 rounded-lg border flex items-center justify-center ${toneMap[tone]}`}><Icon className="w-4 h-4" /></div>
-      </div>
-      <div className="text-2xl font-bold text-foreground tabular-nums">{value}</div>
-      <div className="text-xs text-muted-foreground mt-1">{hint}</div>
-    </div>
-  );
-}
