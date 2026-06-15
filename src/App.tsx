@@ -163,6 +163,9 @@ import Academica2Exames from "./pages/academica2/Exames";
 import Academica2Quizzes from "./pages/academica2/Quizzes";
 import Academica2Notas from "./pages/academica2/Notas";
 import Academica2Relatorios from "./pages/academica2/Relatorios";
+import AdminOnboarding from "./pages/admin/Onboarding";
+import AdminInicio from "./pages/admin/Inicio";
+import AdminAnuncios from "./pages/admin/Anuncios";
 
 const queryClient = new QueryClient();
 
@@ -177,6 +180,7 @@ const homeRedirectMap: Record<string, string> = {
   gap: "/gap",
   inscricoes: "/inscricoes",
   academica2: "/areaacademica",
+  admin: "/admin",
 };
 
 // Maps a URL prefix to the role(s) allowed to access it.
@@ -191,6 +195,7 @@ const pathRoleMap: Array<{ prefix: string; roles: string[] }> = [
   { prefix: "/gap", roles: ["gap"] },
   { prefix: "/inscricoes", roles: ["inscricoes"] },
   { prefix: "/areaacademica", roles: ["academica2"] },
+  { prefix: "/admin", roles: ["admin"] },
 ];
 
 function RoleGuardedLayout({ homeRedirect }: { homeRedirect: string }) {
@@ -203,15 +208,38 @@ function RoleGuardedLayout({ homeRedirect }: { homeRedirect: string }) {
   return <AppLayout />;
 }
 
+function isOnboardingComplete(): boolean {
+  try {
+    const raw = localStorage.getItem("upra.admin.onboarding");
+    if (!raw) return false;
+    return !!JSON.parse(raw).completed;
+  } catch { return false; }
+}
+
 function AppRoutes() {
   const { isAuthenticated, user } = useAuth();
   if (!isAuthenticated) return <Routes><Route path="/" element={<Website />} /><Route path="/site" element={<Website />} /><Route path="/candidatar" element={<Candidatar />} /><Route path="*" element={<Login />} /></Routes>;
   const homeRedirect = homeRedirectMap[user?.role || "student"] || "/student";
 
+  // Admin gate: before onboarding completion, force onboarding route (no app layout)
+  if (user?.role === "admin" && !isOnboardingComplete()) {
+    return (
+      <Routes>
+        <Route path="/admin/onboarding" element={<AdminOnboarding />} />
+        <Route path="*" element={<Navigate to="/admin/onboarding" replace />} />
+      </Routes>
+    );
+  }
+
   return (
     <Routes>
       <Route path="/" element={<Website />} />
+      <Route path="/admin/onboarding" element={<AdminOnboarding />} />
       <Route element={<RoleGuardedLayout homeRedirect={homeRedirect} />}>
+        {/* Admin */}
+        <Route path="/admin" element={<AdminInicio />} />
+        <Route path="/admin/calendario" element={<FinancasCalendario />} />
+        <Route path="/admin/anuncios" element={<AdminAnuncios />} />
         {/* Student */}
         <Route path="/student" element={<StudentDashboard />} />
         <Route path="/student/disciplines" element={<StudentDisciplines />} />
