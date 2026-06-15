@@ -191,11 +191,12 @@ const pathRoleMap: Array<{ prefix: string; roles: string[] }> = [
   { prefix: "/decano", roles: ["decano"] },
   { prefix: "/reitor", roles: ["reitor"] },
   { prefix: "/secretaria", roles: ["secretaria"] },
-  { prefix: "/financas", roles: ["financas"] },
-  { prefix: "/gap", roles: ["gap"] },
+  { prefix: "/financas", roles: ["financas", "admin"] },
+  { prefix: "/gap", roles: ["gap", "admin"] },
   { prefix: "/inscricoes", roles: ["inscricoes"] },
-  { prefix: "/areaacademica", roles: ["academica2"] },
+  { prefix: "/areaacademica", roles: ["academica2", "admin"] },
   { prefix: "/admin", roles: ["admin"] },
+
 ];
 
 function RoleGuardedLayout({ homeRedirect }: { homeRedirect: string }) {
