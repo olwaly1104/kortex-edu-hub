@@ -313,7 +313,7 @@ export default function ConfigurarReceitas() {
   const updatePropina = useUpdatePropina();
 
   const backendFaculties = useMemo(() => {
-    if (!isAdmin) return [] as typeof reitorFaculties;
+    if (!isAdmin) return [] as any[];
     const facs = facsQ.data ?? [];
     const cursos = cursosQ.data ?? [];
     return facs.map((f) => ({
@@ -322,12 +322,12 @@ export default function ConfigurarReceitas() {
       courses: cursos
         .filter((c) => c.faculdade_id === f.id)
         .map((c) => ({ id: c.id, code: c.code, name: c.name, facultyName: f.name })),
-    })) as typeof reitorFaculties;
+    }));
   }, [isAdmin, facsQ.data, cursosQ.data]);
 
   /* ── RECEITAS ── */
   const [receitas, setReceitas] = useState<ReceitaRow[]>(() => (isAdmin ? [] : initialReceitas()));
-  const accountFaculties = isAdmin ? backendFaculties : reitorFaculties;
+  const accountFaculties: any[] = isAdmin ? backendFaculties : (reitorFaculties as any[]);
   const [receitaFilter, setReceitaFilter] = useState<string>("todos");
   const [selectedFaculty, setSelectedFaculty] = useState<string | null>(null);
   const [multaSubtype, setMultaSubtype] = useState<TipoReceita>("Multa Estudante");
