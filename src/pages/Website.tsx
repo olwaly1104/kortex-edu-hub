@@ -1,5 +1,13 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { isOnboardingCompleteFor } from "@/lib/onboardingStorage";
+
+const HOME_REDIRECT_MAP: Record<string, string> = {
+  professor: "/professor", student: "/student", coordenador_curso: "/coordenador",
+  decano: "/decano", reitor: "/reitor", secretaria: "/secretaria", financas: "/financas",
+  gap: "/gap", inscricoes: "/inscricoes", academica2: "/areaacademica", admin: "/admin",
+};
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
