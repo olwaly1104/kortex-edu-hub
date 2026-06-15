@@ -518,22 +518,26 @@ export default function ConfigurarReceitas() {
   const commitInlinePlan = () => {
     if (!inlineEditPlan) return;
     const v = Number(inlineEditPlan.valor) || 0;
+    const rowId = inlineEditPlan.rowId;
     setReceitas(rs => rs.map(r => {
-      if (r.id !== inlineEditPlan.rowId || !r.plans) return r;
+      if (r.id !== rowId || !r.plans) return r;
       const plans = r.plans.map(p => p.months === inlineEditPlan.months ? { ...p, valor: v } : p);
       return { ...r, plans, valor: plans[0].valor };
     }));
+    persistPropinaIfBackend(rowId, v);
     setInlineEditPlan(null);
   };
   const commitPlanEdit = () => {
     if (!planEdit) return;
     const v = Number(planEdit.valor) || 0;
     const imp = Math.max(0, Math.min(100, Number(planEdit.imposto) || 0)) / 100;
+    const rowId = planEdit.rowId;
     setReceitas(rs => rs.map(r => {
-      if (r.id !== planEdit.rowId || !r.plans) return r;
+      if (r.id !== rowId || !r.plans) return r;
       const plans = r.plans.map(p => p.months === planEdit.months ? { ...p, valor: v, imposto: imp } : p);
       return { ...r, plans, valor: plans[0].valor };
     }));
+    persistPropinaIfBackend(rowId, v);
     setPlanEdit(null);
     toast({ title: "Plano actualizado", description: `${planEdit.months} meses · ${formatCurrency(v)}` });
   };
