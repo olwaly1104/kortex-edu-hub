@@ -50,7 +50,8 @@ function loadInitial(email?: string | null): Instituicao {
     const saved = localStorage.getItem(PROFILE_KEY);
     if (saved) {
       const parsed = { ...EMPTY, ...JSON.parse(saved) };
-      if (!parsed.website) parsed.website = defaultWebsite;
+      // Always sync website to the current published URL of this account
+      parsed.website = defaultWebsite;
       return parsed;
     }
   } catch { /* ignore */ }
