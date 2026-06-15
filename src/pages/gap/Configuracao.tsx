@@ -317,6 +317,7 @@ export default function GapConfiguracao() {
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
+      <OnboardingStepBanner />
       {/* Header */}
       <FinHeader
         title="Configuração"
