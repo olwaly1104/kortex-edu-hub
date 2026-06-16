@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import logoUpra from "@/assets/logo-upra.asset.json";
 import { supabase } from "@/integrations/supabase/client";
 import { onboardingKey, isOnboardingCompleteFor, pushOnboarding } from "@/lib/onboardingStorage";
-import { loadDevCreds, saveDevCred, type DevCred } from "@/lib/devCreds";
+import { saveDevCred } from "@/lib/devCreds";
 
 const ROLE_ROUTE: Record<string, string> = {
   admin: "/admin",
