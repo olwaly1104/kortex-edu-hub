@@ -36,21 +36,25 @@ Deno.serve(async (req) => {
     const userClient = createClient(SUPABASE_URL, ANON_KEY, {
       global: { headers: { Authorization: authHeader } },
     });
-    const { data: claims, error: claimsErr } = await userClient.auth.getClaims(
-      authHeader.replace("Bearer ", "")
-    );
-    if (claimsErr || !claims?.claims?.sub) {
-      return json({ error: "Unauthorized" }, 401);
+    const { data: userData, error: userErr } = await userClient.auth.getUser();
+    if (userErr || !userData?.user) {
+      console.error("getUser failed:", userErr?.message);
+      return json({ error: userErr?.message || "Sessão inválida. Inicie sessão novamente." }, 401);
     }
-    const callerId = claims.claims.sub as string;
+    const callerId = userData.user.id;
+    console.log("admin-create-user caller:", callerId);
 
     const admin = createClient(SUPABASE_URL, SERVICE_KEY);
-    const { data: roleRow } = await admin
+    const { data: roleRow, error: roleCheckErr } = await admin
       .from("user_roles")
       .select("role")
       .eq("user_id", callerId)
       .eq("role", "admin")
       .maybeSingle();
+    if (roleCheckErr) {
+      console.error("role check failed:", roleCheckErr.message);
+      return json({ error: "Falha ao verificar permissões: " + roleCheckErr.message }, 500);
+    }
     if (!roleRow) {
       return json({ error: "Apenas administradores podem criar utilizadores." }, 403);
     }
@@ -97,8 +101,10 @@ Deno.serve(async (req) => {
       .from("user_roles")
       .insert({ user_id: newUserId, role: modulo });
     if (roleErr) {
-      console.warn("user_roles insert failed:", roleErr.message);
+      console.error("user_roles insert failed:", roleErr.message);
+      return json({ error: "Conta criada mas falhou ao atribuir módulo: " + roleErr.message }, 500);
     }
+    console.log("admin-create-user success:", { newUserId, email, modulo });
 
     return json({
       ok: true,
