@@ -130,6 +130,10 @@ export default function AdminUtilizadores() {
         createdAt: Date.now(),
       };
       setRows((prev) => [...prev, newRow]);
+      try {
+        const { saveDevCred } = await import("@/lib/devCreds");
+        saveDevCred({ email: created.email, password: form.password, modulo: created.modulo, name: created.name });
+      } catch { /* ignore */ }
       setForm({ name: "", email: "", password: "", modulo: "estudante" });
       setOpen(false);
     } finally {
