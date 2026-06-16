@@ -5,13 +5,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/contexts/AuthContext";
-import { onboardingKey, profileKey, progressKey, pushProfile } from "@/lib/onboardingStorage";
+import { onboardingKey, profileKey, pushProfile } from "@/lib/onboardingStorage";
 import {
   ShieldCheck, Building2, Mail, Phone, Globe, MapPin, Calendar, GraduationCap,
   Users, Briefcase, Settings2, Save, IdCard, Hash,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { useFaculdades, useCursos } from "@/lib/useInstitution";
+import { loadDocentes, loadStaff } from "@/lib/peopleStorage";
 
 type Instituicao = {
   nomeOficial: string; sigla: string; nif: string; fundacao: string; natureza: string;
@@ -80,8 +82,23 @@ function loadInitial(email?: string | null): Instituicao {
 export default function AdminPerfil() {
   const { user } = useAuth();
   const PROFILE_KEY = profileKey(user?.email);
-  const PROGRESS_KEY = progressKey(user?.email);
   const [instituicao, setInstituicao] = useState<Instituicao>(() => loadInitial(user?.email));
+
+  const facsQ = useFaculdades();
+  const cursosQ = useCursos();
+  const [peopleCounts, setPeopleCounts] = useState(() => ({
+    docentes: loadDocentes().length,
+    staff: loadStaff().length,
+  }));
+  useEffect(() => {
+    const refresh = () => setPeopleCounts({ docentes: loadDocentes().length, staff: loadStaff().length });
+    window.addEventListener("focus", refresh);
+    window.addEventListener("storage", refresh);
+    return () => {
+      window.removeEventListener("focus", refresh);
+      window.removeEventListener("storage", refresh);
+    };
+  }, []);
 
   useEffect(() => {
     const site = currentSiteUrl();
@@ -99,13 +116,11 @@ export default function AdminPerfil() {
     toast.success("Dados da instituição atualizados");
   };
 
-  let progress: Record<string, boolean> = {};
-  try { progress = JSON.parse(localStorage.getItem(PROGRESS_KEY) || "{}"); } catch { /* ignore */ }
   const stats = [
-    { label: "Faculdades", value: progress["aca.fac"] ? 3 : 0, icon: Building2 },
-    { label: "Cursos", value: progress["aca.cur"] || progress["aca.fac"] ? 10 : 0, icon: GraduationCap },
-    { label: "Docentes", value: progress["rh.doc"] ? 8 : 0, icon: Users },
-    { label: "Staff", value: progress["rh.staff"] ? 8 : 0, icon: Briefcase },
+    { label: "Faculdades", value: facsQ.data?.length ?? 0, icon: Building2 },
+    { label: "Cursos", value: cursosQ.data?.length ?? 0, icon: GraduationCap },
+    { label: "Docentes", value: peopleCounts.docentes, icon: Users },
+    { label: "Staff", value: peopleCounts.staff, icon: Briefcase },
   ];
 
   const nomeDisplay = instituicao.nomeOficial || "Instituição sem nome";
