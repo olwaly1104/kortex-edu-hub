@@ -135,6 +135,7 @@ export default function Login() {
         } as any);
         if (roleErr) console.warn("user_roles insert failed:", roleErr.message);
       }
+      saveDevCred({ email: emailTrim, password: suPassword, modulo: "admin", name: suNome.trim() });
       // Pre-seed local onboarding entry so onboarding flow knows the institution name.
       try {
         const onboardingState = {
