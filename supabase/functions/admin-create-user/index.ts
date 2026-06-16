@@ -56,6 +56,90 @@ Deno.serve(async (req) => {
       return json({ error: "Falha ao verificar permissões: " + roleCheckErr.message }, 500);
     }
     if (!roleRow) {
+      const metadataRole = String(userData.user.user_metadata?.modulo ?? "").toLowerCase();
+      const callerEmail = String(userData.user.email ?? "").toLowerCase();
+      const isInstitutionAdmin = metadataRole === "admin" || /^admin@.+\.kor$/.test(callerEmail);
+      if (isInstitutionAdmin) {
+        const { error: backfillErr } = await admin
+          .from("user_roles")
+          .insert({ user_id: callerId, role: "admin" });
+        if (backfillErr && backfillErr.code !== "23505") {
+          console.error("admin role backfill failed:", backfillErr.message);
+          return json({ error: "Falha ao ativar permissões de administrador: " + backfillErr.message }, 500);
+        }
+        console.log("admin role backfilled for caller:", callerId);
+      } else {
+        return json({ error: "Apenas administradores podem criar utilizadores." }, 403);
+      }
+    }
+
+    const body = (await req.json().catch(() => ({}))) as Body;
+    const email = (body.email || "").trim().toLowerCase();
+    const password = body.password || "";
+    const name = (body.name || "").trim();
+    const modulo = (body.modulo || "").trim();
+    if (!email || !password || !name || !modulo) {
+      return json({ error: "Preencha nome, email, palavra-passe e módulo." }, 400);
+    }
+    if (password.length < 6) {
+      return json({ error: "Palavra-passe deve ter pelo menos 6 caracteres." }, 400);
+    }
+    if (!ALLOWED_ROLES.has(modulo)) {
+      return json({ error: "Módulo inválido." }, 400);
+    }
+
+    const { data: created, error: createErr } = await admin.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true,
+      user_metadata: { display_name: name, modulo },
+    });
+    if (createErr || !created.user) {
+      return json({ error: createErr?.message ?? "Falha ao criar utilizador." }, 400);
+    }
+    const newUserId = created.user.id;
+
+    // Force the new user to change the admin-provided password on first sign-in.
+    const { error: profileErr } = await admin.from("profiles").upsert(
+      {
+        id: newUserId,
+        display_name: name,
+        email,
+        institution_id: callerId,
+        must_change_password: true,
+      },
+      { onConflict: "id" }
+    );
+    if (profileErr) {
+      console.error("profiles upsert failed:", profileErr.message);
+      return json({ error: "Conta criada mas falhou ao ligar o perfil: " + profileErr.message }, 500);
+    }
+
+    const { error: roleErr } = await admin
+      .from("user_roles")
+      .insert({ user_id: newUserId, role: modulo });
+    if (roleErr) {
+      console.error("user_roles insert failed:", roleErr.message);
+      return json({ error: "Conta criada mas falhou ao atribuir módulo: " + roleErr.message }, 500);
+    }
+    console.log("admin-create-user success:", { newUserId, email, modulo });
+
+    return json({
+      ok: true,
+      user: { id: newUserId, email, name, modulo },
+    });
+  } catch (e) {
+    console.error("admin-create-user error:", e);
+    return json({ error: (e as Error).message || "Erro interno." }, 500);
+  }
+});
+
+function json(body: unknown, status = 200) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
       return json({ error: "Apenas administradores podem criar utilizadores." }, 403);
     }
 
