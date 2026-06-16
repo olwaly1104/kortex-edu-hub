@@ -50,6 +50,7 @@ export type Database = {
           estado: string
           faculdade: string | null
           id: string
+          institution_id: string | null
           nome: string
           notas: string | null
           origem: string
@@ -66,6 +67,7 @@ export type Database = {
           estado?: string
           faculdade?: string | null
           id?: string
+          institution_id?: string | null
           nome: string
           notas?: string | null
           origem?: string
@@ -82,6 +84,7 @@ export type Database = {
           estado?: string
           faculdade?: string | null
           id?: string
+          institution_id?: string | null
           nome?: string
           notas?: string | null
           origem?: string
@@ -254,6 +257,36 @@ export type Database = {
           },
         ]
       }
+      module_settings: {
+        Row: {
+          config: Json
+          created_at: string
+          enabled: boolean
+          id: string
+          institution_id: string
+          modulo: string
+          updated_at: string
+        }
+        Insert: {
+          config?: Json
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          institution_id: string
+          modulo: string
+          updated_at?: string
+        }
+        Update: {
+          config?: Json
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          institution_id?: string
+          modulo?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -360,6 +393,15 @@ export type Database = {
       is_conversation_participant: {
         Args: { _conversation_id: string; _user_id: string }
         Returns: boolean
+      }
+      list_institution_contacts: {
+        Args: never
+        Returns: {
+          display_name: string
+          email: string
+          id: string
+          modulo: string
+        }[]
       }
     }
     Enums: {
