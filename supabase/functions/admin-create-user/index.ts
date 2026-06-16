@@ -101,8 +101,10 @@ Deno.serve(async (req) => {
       .from("user_roles")
       .insert({ user_id: newUserId, role: modulo });
     if (roleErr) {
-      console.warn("user_roles insert failed:", roleErr.message);
+      console.error("user_roles insert failed:", roleErr.message);
+      return json({ error: "Conta criada mas falhou ao atribuir módulo: " + roleErr.message }, 500);
     }
+    console.log("admin-create-user success:", { newUserId, email, modulo });
 
     return json({
       ok: true,
