@@ -5,13 +5,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/contexts/AuthContext";
-import { onboardingKey, profileKey, progressKey, pushProfile } from "@/lib/onboardingStorage";
+import { onboardingKey, profileKey, pushProfile } from "@/lib/onboardingStorage";
 import {
   ShieldCheck, Building2, Mail, Phone, Globe, MapPin, Calendar, GraduationCap,
   Users, Briefcase, Settings2, Save, IdCard, Hash,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { useFaculdades, useCursos } from "@/lib/useInstitution";
+import { loadDocentes, loadStaff } from "@/lib/peopleStorage";
 
 type Instituicao = {
   nomeOficial: string; sigla: string; nif: string; fundacao: string; natureza: string;
