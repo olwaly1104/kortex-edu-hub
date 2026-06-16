@@ -182,6 +182,8 @@ import AdminStaff from "./pages/admin/Staff";
 import AdminDocentes from "./pages/admin/Docentes";
 import AdminFinancasDiscentes from "./pages/admin/FinancasDiscentes";
 import AdminUtilizadores from "./pages/admin/Utilizadores";
+import AdminSistema from "./pages/admin/Sistema";
+import AdminModulos from "./pages/admin/Modulos";
 import AlterarPalavraPasse from "./pages/AlterarPalavraPasse";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -302,6 +304,8 @@ function AppRoutes() {
         <Route path="/admin/staff" element={<AdminStaff />} />
         <Route path="/admin/docentes" element={<AdminDocentes />} />
         <Route path="/admin/utilizadores" element={<AdminUtilizadores />} />
+        <Route path="/admin/sistema" element={<AdminSistema />} />
+        <Route path="/admin/modulos" element={<AdminModulos />} />
         {/* Admin → Finanças (read-only mirrors) */}
         <Route path="/admin/financas/dashboard" element={<FinancasDashboard />} />
         <Route path="/admin/financas/receitas" element={<FinancasReceitas />} />
