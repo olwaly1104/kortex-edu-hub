@@ -91,12 +91,14 @@ export default function AdminUtilizadores() {
           modulo: form.modulo,
         },
       });
-      if (error) {
-        setErr(error.message || "Falha ao criar utilizador.");
+      // functions.invoke returns the parsed body in `data` even on non-2xx; surface its `error` field first.
+      const serverError = (data && typeof data === "object" && "error" in data) ? (data as any).error : null;
+      if (serverError) {
+        setErr(String(serverError));
         return;
       }
-      if (data?.error) {
-        setErr(data.error);
+      if (error) {
+        setErr(error.message || "Falha ao criar utilizador.");
         return;
       }
       const created = data?.user as { id: string; email: string; name: string; modulo: string } | undefined;
