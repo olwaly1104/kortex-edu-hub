@@ -1,55 +1,26 @@
-# Plano: Admin real, GAP/Finanças sem mock, contactos automáticos
+# Fix: Meu Perfil shows real counts from DB
 
-## 1. Sidebar do Admin (src/components/AppSidebar.tsx)
-Nova estrutura:
-- Geral: Início, Meu Perfil
-- Configurar: Faculdades & Cursos, Discentes, Docentes, Staff, Salas e Edifícios, Finanças
-- Operações: **Candidaturas** (novo – `/admin/candidaturas`, já existe rota)
-- Acessos: Utilizadores, **Sistema** (novo – `/admin/sistema`), **Módulos** (novo – `/admin/modulos`)
+## Problem
+In `src/pages/admin/Perfil.tsx`, the four stat cards (Faculdades, Cursos, Docentes, Staff) read from localStorage onboarding flags and use **hardcoded values** (`progress["aca.fac"] ? 3 : 0`, etc.). They ignore the actual data created in the Admin area, so newly created faculdades never appear.
 
-## 2. Novas páginas Admin
-- `src/pages/admin/Sistema.tsx` — estado da instituição, ano letivo/onboarding, secrets, integrações, branding, logs (sem mock; lê de `admin_state`, `profiles`, `user_roles`).
-- `src/pages/admin/Modulos.tsx` — lista os 10 módulos (estudante, professor, coordenador, decano, reitor, financas, academica, gap, inscricoes, admin). Cada módulo: descrição, rotas que expõe, permissões (toggle ativo/inativo por instituição), nº de utilizadores ligados (contagem real em `user_roles`). Persiste em nova tabela `module_settings (institution_id, modulo, enabled, config jsonb)`.
-- Registar rotas em `src/App.tsx`.
+Meanwhile:
+- Faculdades & Cursos live in the `faculdades` / `cursos` tables, exposed via `useFaculdades()` / `useCursos()` (already used in `FaculdadesCursos.tsx`).
+- Docentes & Staff are persisted in localStorage via `loadDocentes()` / `loadStaff()` from `@/lib/peopleStorage`.
 
-## 3. Limpar mock data — GAP
-Manter apenas `Configuracao.tsx`. Reescrever as restantes para mostrar **estado vazio real** ligado ao backend:
-- `Dashboard.tsx`, `Inicio.tsx` — KPIs a 0, listas vazias até existirem dados.
-- `Candidaturas.tsx` / `CandidaturaDetail.tsx` — `SELECT * FROM candidaturas WHERE institution_id = current_institution_id()`. Quando um utilizador faz `/inscricoes` (Candidatar) o registo passa a aparecer aqui.
-- `Solicitacoes*`, `Atendimentos*`, `Tickets`, `Estudantes`, `EstudanteProfile`, `EstudanteAgendamentosDoc`, `EstudanteRelatorioDoc` — remover arrays mock; usar query real (tabelas existem ou ficam empty-state com "Sem registos").
-- Eliminar `gap/Anuncios.tsx` e remover rota.
+## Change
 
-## 4. Limpar mock data — Finanças
-Manter `ConfigurarReceitas.tsx` (já ligado ao onboarding). Esvaziar mock em:
-- `Dashboard.tsx`, `Inicio.tsx`, `Receitas.tsx`, `Despesas.tsx`, `Salarios.tsx`, `Orcamentos.tsx`, `Solicitacoes.tsx`, `PessoalFinancas.tsx`, `Calendario.tsx`, detalhes e doc previews.
-- Eliminar `financas/Anuncios.tsx` + `AnuncioDetail.tsx` e rota.
-- Todos os listings: `SELECT … WHERE institution_id = current_institution_id()` ou estado vazio.
+Edit only `src/pages/admin/Perfil.tsx`:
 
-## 5. Anúncios globais
-Remover páginas/rotas `Anuncios` de todos os módulos (admin, financas, gap, restantes) + entradas de sidebar. Manter só notificações reais.
+1. Replace the hardcoded `stats` array with live counts:
+   - `Faculdades` ← `useFaculdades().data?.length ?? 0`
+   - `Cursos` ← `useCursos().data?.length ?? 0`
+   - `Docentes` ← `loadDocentes().length` (kept in sync via existing `focus`/`storage` listener pattern)
+   - `Staff` ← `loadStaff().length` (same pattern; import from `peopleStorage`)
+2. Add the imports (`useFaculdades`, `useCursos` from `@/lib/useInstitution`; `loadDocentes`, `loadStaff` from `@/lib/peopleStorage`).
+3. Track docentes/staff counts in `useState` with a `focus`/`storage` listener so values refresh after admin edits in other tabs/pages (mirrors the pattern already used in `FaculdadesCursos.tsx`).
+4. Remove the now-unused `PROGRESS_KEY` / `progress` reads.
 
-## 6. Candidaturas → GAP
-Garantir que o fluxo `/inscricoes` (Candidatar.tsx) insere em `public.candidaturas` com `institution_id` da conta admin alvo e `estado='submetida'`. Já existe a tabela; rever RLS:
-- INSERT permitido a `anon` para portal público.
-- SELECT/UPDATE só para `gap`, `academica`, `admin` da mesma `institution_id` (via `has_role` + `current_institution_id`).
-GAP `Candidaturas.tsx` passa a ler em tempo real (sem mock).
+No DB migration, no other files touched. UI layout/styles stay identical.
 
-## 7. Contactos automáticos
-Substituir mock de contactos por uma view derivada de `profiles` da mesma instituição:
-- Função `public.list_institution_contacts()` (SECURITY DEFINER) que devolve `id, display_name, email, modulo` de todos os perfis com mesmo `institution_id` excepto o próprio.
-- Hook `useContacts()` chama-a; usado em Chat, Email, "Novo contacto".
-- Resultado: quando admin cria a conta `financas@…` e `gap@…`, ambos vêem-se como contactos automaticamente. Sem inserts manuais.
-
-## 8. Chats e Emails
-Apagar conversas/mensagens mock. UI mostra "Sem conversas" quando `conversations` está vazio. Botão "Nova conversa" usa `useContacts()` + `get_or_create_dm`.
-
-## 9. Migração de BD
-Uma migration:
-- `CREATE TABLE public.module_settings (id, institution_id, modulo text, enabled bool default true, config jsonb default '{}', timestamps)` + GRANTs + RLS (admin da instituição CRUD; outros SELECT do seu).
-- `CREATE OR REPLACE FUNCTION public.list_institution_contacts()` + GRANT EXECUTE.
-- Ajustar policies de `candidaturas` (INSERT anon permitido; SELECT/UPDATE por institution_id + role).
-
-## Notas técnicas
-- Toda a UI lê via `supabase` client; estados vazios usam componente partilhado `<EmptyState />` (criar se faltar).
-- Nenhum array mock permanece nos ficheiros tocados.
-- App em modo "onboarding" continua a ser controlado por `admin_state` — não alterado.
+## Verification
+After saving, creating/deleting a faculdade in `/admin/faculdades-cursos` updates the count on `/admin/perfil` (DB query refetches via React Query; switch routes or use the existing refresh listeners).
