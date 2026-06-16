@@ -82,8 +82,23 @@ function loadInitial(email?: string | null): Instituicao {
 export default function AdminPerfil() {
   const { user } = useAuth();
   const PROFILE_KEY = profileKey(user?.email);
-  const PROGRESS_KEY = progressKey(user?.email);
   const [instituicao, setInstituicao] = useState<Instituicao>(() => loadInitial(user?.email));
+
+  const facsQ = useFaculdades();
+  const cursosQ = useCursos();
+  const [peopleCounts, setPeopleCounts] = useState(() => ({
+    docentes: loadDocentes().length,
+    staff: loadStaff().length,
+  }));
+  useEffect(() => {
+    const refresh = () => setPeopleCounts({ docentes: loadDocentes().length, staff: loadStaff().length });
+    window.addEventListener("focus", refresh);
+    window.addEventListener("storage", refresh);
+    return () => {
+      window.removeEventListener("focus", refresh);
+      window.removeEventListener("storage", refresh);
+    };
+  }, []);
 
   useEffect(() => {
     const site = currentSiteUrl();
@@ -101,13 +116,11 @@ export default function AdminPerfil() {
     toast.success("Dados da instituição atualizados");
   };
 
-  let progress: Record<string, boolean> = {};
-  try { progress = JSON.parse(localStorage.getItem(PROGRESS_KEY) || "{}"); } catch { /* ignore */ }
   const stats = [
-    { label: "Faculdades", value: progress["aca.fac"] ? 3 : 0, icon: Building2 },
-    { label: "Cursos", value: progress["aca.cur"] || progress["aca.fac"] ? 10 : 0, icon: GraduationCap },
-    { label: "Docentes", value: progress["rh.doc"] ? 8 : 0, icon: Users },
-    { label: "Staff", value: progress["rh.staff"] ? 8 : 0, icon: Briefcase },
+    { label: "Faculdades", value: facsQ.data?.length ?? 0, icon: Building2 },
+    { label: "Cursos", value: cursosQ.data?.length ?? 0, icon: GraduationCap },
+    { label: "Docentes", value: peopleCounts.docentes, icon: Users },
+    { label: "Staff", value: peopleCounts.staff, icon: Briefcase },
   ];
 
   const nomeDisplay = instituicao.nomeOficial || "Instituição sem nome";
