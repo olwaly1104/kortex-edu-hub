@@ -98,7 +98,23 @@ export default function AdminUtilizadores() {
         return;
       }
       if (error) {
-        setErr(error.message || "Falha ao criar utilizador.");
+        let message = error.message || "Falha ao criar utilizador.";
+        const context = (error as any).context;
+        if (context?.json) {
+          const body = await context.json().catch(() => null);
+          if (body?.error) message = String(body.error);
+        } else if (context?.text) {
+          const body = await context.text().catch(() => "");
+          if (body) {
+            try {
+              const parsed = JSON.parse(body);
+              if (parsed?.error) message = String(parsed.error);
+            } catch {
+              message = body;
+            }
+          }
+        }
+        setErr(message);
         return;
       }
       const created = data?.user as { id: string; email: string; name: string; modulo: string } | undefined;
