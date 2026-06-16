@@ -4,14 +4,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { isOnboardingCompleteFor } from "@/lib/onboardingStorage";
+import { isFullOnboardingComplete } from "@/components/admin/OnboardingStepBanner";
 import { Building2, Database, ShieldCheck, Users, Layers, CheckCircle2, Clock } from "lucide-react";
 
 export default function AdminSistema() {
   const { user } = useAuth();
   const [counts, setCounts] = useState({ profiles: 0, roles: 0, cursos: 0, faculdades: 0 });
   const [loaded, setLoaded] = useState(false);
-  const onboardingDone = isOnboardingCompleteFor(user?.email);
+  const onboardingDone = isFullOnboardingComplete(user?.email);
 
   useEffect(() => {
     (async () => {

@@ -66,6 +66,13 @@ ONBOARDING_GROUPS.forEach((g) => g.steps.forEach((s) => { STEP_TO_GROUP[s.key] =
 export function readOnboardingProgress(email?: string | null): Record<string, boolean> {
   try { return JSON.parse(localStorage.getItem(progressKey(email)) || "{}"); } catch { return {}; }
 }
+
+/** Returns true only when EVERY onboarding step (every group's step.key) is
+ *  marked done in the progress blob. Drives the "Ano lectivo activo" badge. */
+export function isFullOnboardingComplete(email?: string | null): boolean {
+  const progress = readOnboardingProgress(email);
+  return ONBOARDING_GROUPS.every((g) => g.steps.every((s) => !!progress[s.key]));
+}
 function markDone(email: string | null | undefined, key: string) {
   const cur = readOnboardingProgress(email);
   cur[key] = true;
