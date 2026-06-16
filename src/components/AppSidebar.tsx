@@ -256,10 +256,16 @@ const adminSections: NavSection[] = [
     { label: "Salas e Edifícios", icon: Building2, path: "/admin/salas" },
     { label: "Finanças", icon: Wallet, path: "/financas/configurador" },
   ]},
+  { title: "Operações", items: [
+    { label: "Candidaturas", icon: ClipboardList, path: "/admin/candidaturas" },
+  ]},
   { title: "Acessos", items: [
     { label: "Utilizadores", icon: Users, path: "/admin/utilizadores" },
+    { label: "Sistema", icon: Settings2, path: "/admin/sistema" },
+    { label: "Módulos", icon: Layers, path: "/admin/modulos" },
   ]},
 ];
+
 
 const roleSectionsMap: Record<string, NavSection[]> = {
   student: studentSections,
