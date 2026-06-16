@@ -90,8 +90,13 @@ export default function AdminUtilizadores() {
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
     setErr("");
-    if (!form.name.trim() || !form.email.trim() || !form.password) {
-      setErr("Preencha nome, email e palavra-passe.");
+    const fullName = `${form.primeiroNome.trim()} ${form.ultimoNome.trim()}`.trim();
+    if (!form.primeiroNome.trim() || !form.ultimoNome.trim() || !form.password) {
+      setErr("Preencha primeiro nome, último nome e palavra-passe.");
+      return;
+    }
+    if (!autoEmail) {
+      setErr("Email não pôde ser gerado a partir do nome.");
       return;
     }
     if (form.password.length < 6) {
@@ -102,13 +107,12 @@ export default function AdminUtilizadores() {
     try {
       const { data, error } = await supabase.functions.invoke("admin-create-user", {
         body: {
-          email: form.email.trim().toLowerCase(),
+          email: autoEmail,
           password: form.password,
-          name: form.name.trim(),
+          name: fullName,
           modulo: form.modulo,
         },
       });
-      // functions.invoke returns the parsed body in `data` even on non-2xx; surface its `error` field first.
       const serverError = (data && typeof data === "object" && "error" in data) ? (data as any).error : null;
       if (serverError) {
         setErr(String(serverError));
@@ -151,7 +155,7 @@ export default function AdminUtilizadores() {
         const { saveDevCred } = await import("@/lib/devCreds");
         saveDevCred({ email: created.email, password: form.password, modulo: created.modulo, name: created.name });
       } catch { /* ignore */ }
-      setForm({ name: "", email: "", password: "", modulo: "estudante" });
+      setForm({ primeiroNome: "", ultimoNome: "", password: "", modulo: "estudante" });
       setOpen(false);
     } finally {
       setSubmitting(false);
