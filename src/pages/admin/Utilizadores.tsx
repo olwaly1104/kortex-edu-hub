@@ -47,7 +47,24 @@ export default function AdminUtilizadores() {
   const [open, setOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [err, setErr] = useState("");
-  const [form, setForm] = useState({ name: "", email: "", password: "", modulo: "estudante" });
+  const [form, setForm] = useState({ primeiroNome: "", ultimoNome: "", password: "", modulo: "estudante" });
+
+  // Institution email domain inferred from current admin's email (e.g. admin@upra.kor → upra.kor)
+  const instDomain = useMemo(() => {
+    const e = (user?.email || "").trim().toLowerCase();
+    const at = e.indexOf("@");
+    return at > -1 ? e.slice(at + 1) : "instituicao.kor";
+  }, [user?.email]);
+
+  const slug = (s: string) =>
+    s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "").trim();
+
+  const autoEmail = useMemo(() => {
+    const p = slug(form.primeiroNome);
+    const u = slug(form.ultimoNome);
+    if (!p && !u) return "";
+    return `${[p, u].filter(Boolean).join(".")}@${instDomain}`;
+  }, [form.primeiroNome, form.ultimoNome, instDomain]);
 
   useEffect(() => { saveUsers(rows); }, [rows]);
 
