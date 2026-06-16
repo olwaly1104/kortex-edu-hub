@@ -10,8 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import logoUpra from "@/assets/logo-upra.asset.json";
 import { supabase } from "@/integrations/supabase/client";
 import { onboardingKey, isOnboardingCompleteFor, pushOnboarding } from "@/lib/onboardingStorage";
-import { loadDevCreds, saveDevCred, removeDevCred, type DevCred } from "@/lib/devCreds";
-import { KeyRound, Copy, Trash2 } from "lucide-react";
+import { loadDevCreds, saveDevCred, type DevCred } from "@/lib/devCreds";
 
 const ROLE_ROUTE: Record<string, string> = {
   admin: "/admin",
@@ -46,13 +45,8 @@ export default function Login() {
   const [suError, setSuError] = useState("");
   const [suLoading, setSuLoading] = useState(false);
 
-  // Dev credentials (local browser only)
-  const [credsOpen, setCredsOpen] = useState(false);
-  const [creds, setCreds] = useState<DevCred[]>([]);
-  const [revealed, setRevealed] = useState<Record<string, boolean>>({});
-  useEffect(() => {
-    if (credsOpen) setCreds(loadDevCreds().sort((a, b) => b.createdAt - a.createdAt));
-  }, [credsOpen]);
+
+
 
   // Auto-fill institutional email as admin@<slug>.kor
   useEffect(() => {
