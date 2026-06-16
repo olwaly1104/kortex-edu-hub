@@ -247,8 +247,8 @@ export default function AdminUtilizadores() {
             </div>
             <div className="col-span-1 flex justify-end">
               {u.id !== "current-admin" && (
-                <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive" onClick={() => remove(u.id)}>
-                  <Trash2 className="w-3.5 h-3.5" />
+                <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive" onClick={() => remove(u.id, u.email)} disabled={deletingId === u.id}>
+                  {deletingId === u.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
                 </Button>
               )}
             </div>
