@@ -78,6 +78,9 @@ export default function AdminOnboarding() {
     setActivating(true);
     setTimeout(() => {
       const nome = state.dados.nome.trim() || "Instituição";
+      // Mark Passo 1 (registo da instituição) done — but DO NOT activate the
+      // ano lectivo. The institution remains in "Onboarding" until every
+      // group in ONBOARDING_GROUPS is completed.
       const next = { ...state, completed: true };
       setState(next);
       updateUser({ name: nome });
