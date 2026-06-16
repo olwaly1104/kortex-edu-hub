@@ -46,6 +46,14 @@ export default function Login() {
   const [suError, setSuError] = useState("");
   const [suLoading, setSuLoading] = useState(false);
 
+  // Dev credentials (local browser only)
+  const [credsOpen, setCredsOpen] = useState(false);
+  const [creds, setCreds] = useState<DevCred[]>([]);
+  const [revealed, setRevealed] = useState<Record<string, boolean>>({});
+  useEffect(() => {
+    if (credsOpen) setCreds(loadDevCreds().sort((a, b) => b.createdAt - a.createdAt));
+  }, [credsOpen]);
+
   // Auto-fill institutional email as admin@<slug>.kor
   useEffect(() => {
     if (!suNome.trim() || suEmailManuallyEdited) return;
