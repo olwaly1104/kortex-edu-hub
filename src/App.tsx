@@ -454,8 +454,6 @@ function AppRoutes() {
         {/* Finanças */}
         <Route path="/financas" element={<FinancasInicio />} />
         <Route path="/financas/calendario" element={<FinancasCalendario />} />
-        <Route path="/financas/anuncios" element={<FinancasAnuncios />} />
-        <Route path="/financas/anuncios/:id" element={<FinancasAnuncioDetail />} />
 
         <Route path="/financas/solicitacoes" element={<FinancasSolicitacoes />} />
         <Route path="/financas/solicitacoes/:id" element={<FinancasSolicitacaoDetail />} />
@@ -485,7 +483,7 @@ function AppRoutes() {
         <Route path="/gap/candidaturas/:id" element={<GapCandidaturaDetail />} />
         <Route path="/gap/configuracao" element={<GapConfiguracao />} />
         <Route path="/gap/calendario" element={<FinancasCalendario />} />
-        <Route path="/gap/anuncios" element={<GapAnuncios />} />
+        
         <Route path="/gap/chat" element={<StudentChat />} />
         <Route path="/gap/email" element={<StudentEmail />} />
         <Route path="/gap/contactos" element={<StudentContacts />} />
