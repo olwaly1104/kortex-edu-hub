@@ -47,7 +47,24 @@ export default function AdminUtilizadores() {
   const [open, setOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [err, setErr] = useState("");
-  const [form, setForm] = useState({ name: "", email: "", password: "", modulo: "estudante" });
+  const [form, setForm] = useState({ primeiroNome: "", ultimoNome: "", password: "", modulo: "estudante" });
+
+  // Institution email domain inferred from current admin's email (e.g. admin@upra.kor → upra.kor)
+  const instDomain = useMemo(() => {
+    const e = (user?.email || "").trim().toLowerCase();
+    const at = e.indexOf("@");
+    return at > -1 ? e.slice(at + 1) : "instituicao.kor";
+  }, [user?.email]);
+
+  const slug = (s: string) =>
+    s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "").trim();
+
+  const autoEmail = useMemo(() => {
+    const p = slug(form.primeiroNome);
+    const u = slug(form.ultimoNome);
+    if (!p && !u) return "";
+    return `${[p, u].filter(Boolean).join(".")}@${instDomain}`;
+  }, [form.primeiroNome, form.ultimoNome, instDomain]);
 
   useEffect(() => { saveUsers(rows); }, [rows]);
 
@@ -73,8 +90,13 @@ export default function AdminUtilizadores() {
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
     setErr("");
-    if (!form.name.trim() || !form.email.trim() || !form.password) {
-      setErr("Preencha nome, email e palavra-passe.");
+    const fullName = `${form.primeiroNome.trim()} ${form.ultimoNome.trim()}`.trim();
+    if (!form.primeiroNome.trim() || !form.ultimoNome.trim() || !form.password) {
+      setErr("Preencha primeiro nome, último nome e palavra-passe.");
+      return;
+    }
+    if (!autoEmail) {
+      setErr("Email não pôde ser gerado a partir do nome.");
       return;
     }
     if (form.password.length < 6) {
@@ -85,13 +107,12 @@ export default function AdminUtilizadores() {
     try {
       const { data, error } = await supabase.functions.invoke("admin-create-user", {
         body: {
-          email: form.email.trim().toLowerCase(),
+          email: autoEmail,
           password: form.password,
-          name: form.name.trim(),
+          name: fullName,
           modulo: form.modulo,
         },
       });
-      // functions.invoke returns the parsed body in `data` even on non-2xx; surface its `error` field first.
       const serverError = (data && typeof data === "object" && "error" in data) ? (data as any).error : null;
       if (serverError) {
         setErr(String(serverError));
@@ -134,7 +155,7 @@ export default function AdminUtilizadores() {
         const { saveDevCred } = await import("@/lib/devCreds");
         saveDevCred({ email: created.email, password: form.password, modulo: created.modulo, name: created.name });
       } catch { /* ignore */ }
-      setForm({ name: "", email: "", password: "", modulo: "estudante" });
+      setForm({ primeiroNome: "", ultimoNome: "", password: "", modulo: "estudante" });
       setOpen(false);
     } finally {
       setSubmitting(false);
@@ -233,13 +254,20 @@ export default function AdminUtilizadores() {
                 {MODULOS.map((m) => <option key={m.value} value={m.value}>{m.label}</option>)}
               </select>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="u-name">Nome a apresentar</Label>
-              <Input id="u-name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Ex: Maria Santos" />
+            <div className="grid grid-cols-2 gap-2">
+              <div className="space-y-2">
+                <Label htmlFor="u-pnome">Primeiro nome</Label>
+                <Input id="u-pnome" value={form.primeiroNome} onChange={(e) => setForm({ ...form, primeiroNome: e.target.value })} placeholder="Ex: Maria" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="u-unome">Último nome</Label>
+                <Input id="u-unome" value={form.ultimoNome} onChange={(e) => setForm({ ...form, ultimoNome: e.target.value })} placeholder="Ex: Santos" />
+              </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="u-email">Email</Label>
-              <Input id="u-email" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="utilizador@instituicao.ao" />
+              <Label htmlFor="u-email">Email (gerado automaticamente)</Label>
+              <Input id="u-email" type="email" value={autoEmail} readOnly className="bg-muted/40 font-mono text-xs" placeholder={`primeiro.ultimo@${instDomain}`} />
+              <p className="text-[10px] text-muted-foreground">Domínio da instituição: <span className="font-mono">@{instDomain}</span></p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="u-password">Palavra-passe (mín. 6)</Label>

@@ -487,7 +487,7 @@ function AppRoutes() {
         <Route path="/gap/chat" element={<StudentChat />} />
         <Route path="/gap/email" element={<StudentEmail />} />
         <Route path="/gap/contactos" element={<StudentContacts />} />
-        <Route path="/gap/financas" element={<StudentFinances />} />
+        <Route path="/gap/financas" element={<FinancasPessoalFinancas />} />
         <Route path="/gap/perfil" element={<StudentProfile />} />
         {/* Área Académica II — Criador / Planeador Curricular */}
         <Route path="/areaacademica" element={<Academica2Inicio />} />
