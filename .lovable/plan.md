@@ -1,58 +1,39 @@
-## Goal
-Zero out everything. Delete every account and every row of data from the backend. Then strip the Login page of all demo accounts and mock-account behaviour so the only signup path is **Registo de Instituição** (the master institution Kortex account). From there, the institution creates all its own users.
+# Fix "create user with module" failure
 
-## Step 1 — Wipe the backend (data tool)
+## Problem
 
-Delete in dependency order, then delete the auth users. Run as a single insert-tool batch:
+When you create a new account from **Admin → Utilizadores** picking a módulo (estudante, professor, finanças, etc.) the edge function `admin-create-user` returns an error and the account is never created.
 
-```sql
-DELETE FROM public.messages;
-DELETE FROM public.conversation_participants;
-DELETE FROM public.conversations;
-DELETE FROM public.candidaturas;
-DELETE FROM public.user_roles;
-DELETE FROM public.profiles;
-DELETE FROM auth.users;
-```
+Edge-function logs are empty (no successful invocations), which points to the auth-validation step inside the function failing before any work happens.
 
-Result: empty `auth.users`, empty `public.*`. No `admin@upra.kor`, no `gap@upra.kor`, no profiles, no roles, no candidaturas, no chat data.
+The current function uses `userClient.auth.getClaims(token)` to verify the caller. That call has been unreliable in the Lovable Cloud runtime (depends on `SUPABASE_JWKS` resolving correctly and on the exact supabase-js build) and silently rejects valid admin sessions, returning `401 Unauthorized` to the dialog — which the UI surfaces as the generic "edge whatever" error you saw.
 
-## Step 2 — `src/pages/Login.tsx` (edit)
+The modules list itself is already correct: all 10 roles (admin, estudante, professor, coordenador, decano, reitor, financas, academica, gap, inscricoes) are wired in both the UI dropdown and the edge function's allow-list, with **no mock/seed users** — only the real admin session is shown until accounts are created.
 
-1. **Strip all demo machinery**
-   - Remove `DEMO_PASSWORD`, `DEMO_ACCOUNTS`, `DEMO_ROUTE`, `MODULE_TO_DEMO`.
-   - Remove the "Ver credenciais de demo" dialog + button.
-   - Remove `isPreviewHost` branch in `handleSubmit` and `handleSignup`. Both preview and published now talk to real Cloud auth only.
+## Fix
 
-2. **Login (`handleSubmit`) — real only**
-   - Always `supabase.auth.signInWithPassword`.
-   - On success, read `user_roles.role` and route:
-     - `admin` → `/admin/onboarding` if institutional onboarding not done locally, else `/admin`
-     - `estudante → /student`, `professor → /professor`, `coordenador → /coordenador`,
-       `decano → /decano`, `reitor → /reitor`, `financas → /financas`,
-       `academica → /secretaria`, `gap → /gap`, `inscricoes → /inscricoes`
-   - On error, surface the backend error. No fallback.
+Rewrite the auth-validation block in `supabase/functions/admin-create-user/index.ts` to the standard, reliable pattern used elsewhere in the project:
 
-3. **Signup dialog → "Registo de Instituição" only**
-   - Title: **Registo de Instituição**. Description: "Crie a conta principal da sua instituição no Kortex. Esta conta gere toda a instituição e cria os restantes utilizadores."
-   - Remove the module `<select>`. Hardcode `modulo = "admin"`.
-   - Field "Nome a apresentar" → **"Nome da instituição"**.
-   - Auto-fill email as `admin@<slug>.kor` (slug rule unchanged).
-   - `handleSignup`:
-     - `supabase.auth.signUp` with `data: { display_name: <nome>, modulo: "admin" }`.
-     - Insert `user_roles { user_id, role: "admin" }`.
-     - Pre-seed local onboarding entry with the institution name so the next login completes the onboarding flow and routes to `/admin`.
-   - Button label: **"Registar instituição"**.
+1. Build the `userClient` with the incoming `Authorization` header (as today).
+2. Call `userClient.auth.getUser()` — this re-validates the JWT against the Auth server and returns the user, instead of relying on local JWKS verification.
+3. If `getUser()` fails, return `401` with the real error message so the dialog shows a useful reason instead of a generic failure.
+4. Keep the rest of the flow unchanged: verify the caller has the `admin` role, then `admin.auth.admin.createUser`, upsert the `profiles` row with `must_change_password = true` and `institution_id = callerId`, and insert into `user_roles` with the chosen `modulo`.
+5. Add `console.log` checkpoints (caller id, target email, target role) and surface `roleErr.message` to the client when the role insert fails, so future failures are debuggable from the edge-function logs.
 
-4. **Helper copy under the form**
-   - Replace demo caption with: "Apenas contas reais. Para começar, registe a sua instituição — depois crie todos os utilizadores a partir do painel da instituição."
-   - Trigger button label: **"Registo de Instituição"**.
+Also tighten the frontend (`src/pages/admin/Utilizadores.tsx`) to surface any non-2xx HTTP body from `functions.invoke` instead of swallowing it — so the dialog shows the actual server message.
+
+## No data/mock changes
+
+- The 10 modules stay exactly as they are in the dropdown.
+- No seed/mock users are added anywhere.
+- Existing Utilizadores list continues to start empty except for the signed-in admin row.
 
 ## Files touched
-- Backend wipe (no migration — data only via insert tool).
-- `src/pages/Login.tsx`.
+
+- `supabase/functions/admin-create-user/index.ts` — swap `getClaims` → `getUser`, add logging, return real error messages.
+- `src/pages/admin/Utilizadores.tsx` — show real server error text in the dialog.
 
 ## Out of scope
-- `src/pages/admin/Utilizadores.tsx` already creates real users for any role — unchanged.
-- No schema, RLS, route, or `AuthContext` changes.
-- `runtimeEnv.ts` stays (used by `Utilizadores.tsx`).
+
+- No DB schema changes (the `app_role` enum already contains every módulo).
+- No changes to onboarding progression or Finanças configuration screens.
