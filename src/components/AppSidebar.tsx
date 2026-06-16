@@ -255,9 +255,7 @@ const adminSections: NavSection[] = [
     { label: "Staff", icon: UserCog, path: "/admin/staff" },
     { label: "Salas e Edifícios", icon: Building2, path: "/admin/salas" },
     { label: "Finanças", icon: Wallet, path: "/financas/configurador" },
-  ]},
-  { title: "Operações", items: [
-    { label: "Candidaturas", icon: ClipboardList, path: "/admin/candidaturas" },
+    { label: "Candidaturas", icon: ClipboardList, path: "/gap/configuracao?tab=candidaturas" },
   ]},
   { title: "Acessos", items: [
     { label: "Utilizadores", icon: Users, path: "/admin/utilizadores" },

@@ -1,10 +1,17 @@
 import React, { createContext, useContext, useState, useCallback } from "react";
 import { User, UserRole, detectRole, currentStudent, currentProfessor, currentCoordenadorCurso, currentDecano, currentReitor, currentSecretaria, currentFinancas, currentGap, currentInscricoes, currentAcademica2, currentAdmin } from "@/data/mockData";
 
+interface LoginOptions {
+  sourceEmail?: string;
+  displayName?: string;
+  /** Real DB role from public.user_roles (e.g. "gap", "financas", "estudante"...). */
+  role?: string;
+}
+
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
-  login: (email: string, password: string, options?: { sourceEmail?: string; displayName?: string }) => { ok: boolean; error?: string };
+  login: (email: string, password: string, options?: LoginOptions) => { ok: boolean; error?: string };
   logout: () => void;
   updateUser: (patch: Partial<User>) => void;
 }
@@ -13,6 +20,24 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 const MIN_PASSWORD_LENGTH = 6;
 const STORAGE_KEY = "upra.demo.session";
+
+// Map the DB role string to the internal UserRole used to pick a mock-user template.
+function dbRoleToUserRole(dbRole?: string): UserRole | null {
+  switch ((dbRole || "").toLowerCase()) {
+    case "admin": return "admin";
+    case "estudante": return "student";
+    case "professor": return "professor";
+    case "coordenador": return "coordenador_curso";
+    case "decano": return "decano";
+    case "reitor": return "reitor";
+    case "financas": return "financas";
+    case "academica": return "secretaria";
+    case "gap": return "gap";
+    case "inscricoes": return "inscricoes";
+    case "academica2": return "academica2";
+    default: return null;
+  }
+}
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(() => {
@@ -32,11 +57,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch { /* ignore */ }
   };
 
-  const login = useCallback((email: string, password: string, options?: { sourceEmail?: string; displayName?: string }) => {
+  const login = useCallback((email: string, password: string, options?: LoginOptions) => {
     if (!email || !password) return { ok: false, error: "Email e palavra-passe são obrigatórios." };
     if (password.length < MIN_PASSWORD_LENGTH) return { ok: false, error: `Palavra-passe deve ter pelo menos ${MIN_PASSWORD_LENGTH} caracteres.` };
     const accountEmail = (options?.sourceEmail || email).trim().toLowerCase();
-    const role = detectRole(email);
+    // Prefer the real DB role; only fall back to email-prefix detection when missing.
+    const role = dbRoleToUserRole(options?.role) ?? detectRole(email);
     const mockUsers: Record<UserRole, User> = {
       student: currentStudent,
       professor: currentProfessor,
