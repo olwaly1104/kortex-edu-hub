@@ -56,7 +56,21 @@ Deno.serve(async (req) => {
       return json({ error: "Falha ao verificar permissões: " + roleCheckErr.message }, 500);
     }
     if (!roleRow) {
-      return json({ error: "Apenas administradores podem criar utilizadores." }, 403);
+      const metadataRole = String(userData.user.user_metadata?.modulo ?? "").toLowerCase();
+      const callerEmail = String(userData.user.email ?? "").toLowerCase();
+      const isInstitutionAdmin = metadataRole === "admin" || /^admin@.+\.kor$/.test(callerEmail);
+      if (isInstitutionAdmin) {
+        const { error: backfillErr } = await admin
+          .from("user_roles")
+          .insert({ user_id: callerId, role: "admin" });
+        if (backfillErr && backfillErr.code !== "23505") {
+          console.error("admin role backfill failed:", backfillErr.message);
+          return json({ error: "Falha ao ativar permissões de administrador: " + backfillErr.message }, 500);
+        }
+        console.log("admin role backfilled for caller:", callerId);
+      } else {
+        return json({ error: "Apenas administradores podem criar utilizadores." }, 403);
+      }
     }
 
     const body = (await req.json().catch(() => ({}))) as Body;
@@ -86,7 +100,7 @@ Deno.serve(async (req) => {
     const newUserId = created.user.id;
 
     // Force the new user to change the admin-provided password on first sign-in.
-    await admin.from("profiles").upsert(
+    const { error: profileErr } = await admin.from("profiles").upsert(
       {
         id: newUserId,
         display_name: name,
@@ -96,6 +110,10 @@ Deno.serve(async (req) => {
       },
       { onConflict: "id" }
     );
+    if (profileErr) {
+      console.error("profiles upsert failed:", profileErr.message);
+      return json({ error: "Conta criada mas falhou ao ligar o perfil: " + profileErr.message }, 500);
+    }
 
     const { error: roleErr } = await admin
       .from("user_roles")
