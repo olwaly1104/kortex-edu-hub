@@ -162,10 +162,26 @@ export default function AdminUtilizadores() {
     }
   };
 
-  const remove = (id: string) => {
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const remove = async (id: string, email: string) => {
     if (id === "current-admin") return;
-    if (!confirm("Remover utilizador desta lista? (A conta na cloud não será apagada.)")) return;
-    setRows((prev) => prev.filter((r) => r.id !== id));
+    if (!confirm("Eliminar definitivamente este utilizador? A conta e o acesso ao Kortex serão removidos da cloud.")) return;
+    setDeletingId(id);
+    try {
+      const { data, error } = await supabase.functions.invoke("admin-delete-user", { body: { user_id: id } });
+      const serverError = (data && typeof data === "object" && "error" in data) ? (data as any).error : null;
+      if (error || serverError) {
+        alert("Falha ao eliminar: " + (serverError || error?.message || "erro desconhecido"));
+        return;
+      }
+      setRows((prev) => prev.filter((r) => r.id !== id));
+      try {
+        const { removeDevCred } = await import("@/lib/devCreds");
+        removeDevCred(email);
+      } catch { /* ignore */ }
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   return (
