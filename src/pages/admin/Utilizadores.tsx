@@ -254,13 +254,20 @@ export default function AdminUtilizadores() {
                 {MODULOS.map((m) => <option key={m.value} value={m.value}>{m.label}</option>)}
               </select>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="u-name">Nome a apresentar</Label>
-              <Input id="u-name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Ex: Maria Santos" />
+            <div className="grid grid-cols-2 gap-2">
+              <div className="space-y-2">
+                <Label htmlFor="u-pnome">Primeiro nome</Label>
+                <Input id="u-pnome" value={form.primeiroNome} onChange={(e) => setForm({ ...form, primeiroNome: e.target.value })} placeholder="Ex: Maria" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="u-unome">Último nome</Label>
+                <Input id="u-unome" value={form.ultimoNome} onChange={(e) => setForm({ ...form, ultimoNome: e.target.value })} placeholder="Ex: Santos" />
+              </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="u-email">Email</Label>
-              <Input id="u-email" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="utilizador@instituicao.ao" />
+              <Label htmlFor="u-email">Email (gerado automaticamente)</Label>
+              <Input id="u-email" type="email" value={autoEmail} readOnly className="bg-muted/40 font-mono text-xs" placeholder={`primeiro.ultimo@${instDomain}`} />
+              <p className="text-[10px] text-muted-foreground">Domínio da instituição: <span className="font-mono">@{instDomain}</span></p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="u-password">Palavra-passe (mín. 6)</Label>
