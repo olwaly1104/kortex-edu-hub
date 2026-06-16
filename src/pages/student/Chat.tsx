@@ -1,312 +1,149 @@
-import { useEffect, useState } from "react";
-import { chatConversations, chatMessages } from "@/data/mockData";
+import { useEffect, useState, useRef } from "react";
+import { useLocation, useSearchParams } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { useInstitutionContacts } from "@/hooks/useInstitutionContacts";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Search, Phone, Video, Send, Paperclip, Smile, Mic, PhoneIncoming, PhoneOutgoing, PhoneMissed, VideoIcon, Users, Mail, Image as ImageIcon } from "lucide-react";
+import { Send, MessageSquare, Plus, User } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useNavigate } from "react-router-dom";
-import EmojiPicker, { EmojiStyle, Theme } from "emoji-picker-react";
 
-const callLog = [
-  { id: "cl1", name: "Prof. António Silva", type: "incoming" as const, medium: "voice" as const, time: "14:20", date: "Hoje", duration: "5:32" },
-  { id: "cl2", name: "Maria Silva", type: "outgoing" as const, medium: "video" as const, time: "11:05", date: "Hoje", duration: "12:48" },
-  { id: "cl3", name: "Prof. Pedro Ferreira", type: "missed" as const, medium: "voice" as const, time: "09:30", date: "Ontem", duration: null },
-  { id: "cl4", name: "Grupo Matemática II", type: "outgoing" as const, medium: "video" as const, time: "16:00", date: "Ontem", duration: "45:10" },
-  { id: "cl5", name: "Prof. António Silva", type: "incoming" as const, medium: "voice" as const, time: "10:15", date: "10/02", duration: "3:05" },
-];
-
-const callIcons = { incoming: PhoneIncoming, outgoing: PhoneOutgoing, missed: PhoneMissed };
-const callColors = { incoming: "text-accent", outgoing: "text-primary", missed: "text-destructive" };
-
-const nameToEmail: Record<string, string> = {
-  "Prof. António Silva": "prof.silva@upra.kor",
-  "Maria Silva": "3012@upra.kor",
-  "Prof. Pedro Ferreira": "prof.ferreira@upra.kor",
-};
-
-type Tab = "chats" | "calls" | "groups";
-type LocalMsg = { id: string; content?: string; gifUrl?: string; time: string; isOwn: true; read: false };
-type GiphyItem = { id: string; images: { fixed_height_small: { url: string }; original: { url: string } } };
-
-const GIPHY_KEY = "dc6zaTOxFJmzC"; // public beta key
-
-function isEmojiOnly(str: string): boolean {
-  if (!str) return false;
-  const trimmed = str.trim();
-  if (!trimmed) return false;
-  // Match emoji sequences (including ZWJ, variation selectors, keycaps, flags, skin tones)
-  const emojiRegex = /^(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff]|\ufe0f|\u200d)+$/gu;
-  return emojiRegex.test(trimmed);
-}
+interface Conversation { id: string; is_group: boolean; updated_at: string; other_name?: string }
+interface Message { id: string; conversation_id: string; sender_id: string; content: string; created_at: string }
 
 export default function StudentChat() {
-  const [selectedId, setSelectedId] = useState(chatConversations[0]?.id || "");
-  const [message, setMessage] = useState("");
-  const [tab, setTab] = useState<Tab>("chats");
-  const [emojiOpen, setEmojiOpen] = useState(false);
-  const [gifOpen, setGifOpen] = useState(false);
-  const [gifQuery, setGifQuery] = useState("");
-  const [gifs, setGifs] = useState<GiphyItem[]>([]);
-  const [gifLoading, setGifLoading] = useState(false);
-  const [sentByConv, setSentByConv] = useState<Record<string, LocalMsg[]>>({});
-  const navigate = useNavigate();
-  const selected = chatConversations.find(c => c.id === selectedId);
-  const baseMessages = chatMessages.filter(m => m.conversationId === selectedId);
-  const localMessages = sentByConv[selectedId] || [];
+  const { user } = useAuth();
+  const { contacts } = useInstitutionContacts();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [selectedId, setSelectedId] = useState<string | null>(searchParams.get("conversation"));
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [draft, setDraft] = useState("");
+  const [showNew, setShowNew] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
-  const directChats = chatConversations.filter(c => !c.isGroup);
-  const groupChats = chatConversations.filter(c => c.isGroup);
-  const displayList = tab === "groups" ? groupChats : tab === "chats" ? directChats : [];
+  const loadConversations = async () => {
+    if (!user) return;
+    const { data: parts } = await (supabase as any)
+      .from("conversation_participants")
+      .select("conversation_id")
+      .eq("user_id", user.id);
+    const convIds = (parts ?? []).map((p: any) => p.conversation_id);
+    if (convIds.length === 0) { setConversations([]); return; }
+    const { data: convs } = await (supabase as any)
+      .from("conversations").select("id,is_group,updated_at").in("id", convIds).order("updated_at", { ascending: false });
+    // resolve other participant for DMs
+    const enriched: Conversation[] = [];
+    for (const c of (convs ?? [])) {
+      let name = c.is_group ? "Grupo" : "Conversa";
+      if (!c.is_group) {
+        const { data: others } = await (supabase as any)
+          .from("conversation_participants").select("user_id").eq("conversation_id", c.id);
+        const otherId = (others ?? []).find((o: any) => o.user_id !== user.id)?.user_id;
+        if (otherId) {
+          const { data: prof } = await (supabase as any).from("profiles").select("display_name").eq("id", otherId).maybeSingle();
+          name = prof?.display_name ?? name;
+        }
+      }
+      enriched.push({ ...c, other_name: name });
+    }
+    setConversations(enriched);
+  };
 
-  const goToEmail = () => {
-    if (selected) {
-      const email = nameToEmail[selected.name] || "";
-      navigate(`/student/email?to=${encodeURIComponent(email)}`);
+  useEffect(() => { loadConversations(); }, [user?.id]);
+
+  useEffect(() => {
+    if (!selectedId) { setMessages([]); return; }
+    (async () => {
+      const { data } = await (supabase as any).from("messages").select("*").eq("conversation_id", selectedId).order("created_at");
+      setMessages(data ?? []);
+    })();
+    const channel = (supabase as any).channel(`messages:${selectedId}`).on(
+      "postgres_changes",
+      { event: "INSERT", schema: "public", table: "messages", filter: `conversation_id=eq.${selectedId}` },
+      (payload: any) => setMessages((m) => [...m, payload.new]),
+    ).subscribe();
+    return () => { (supabase as any).removeChannel(channel); };
+  }, [selectedId]);
+
+  useEffect(() => { scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight }); }, [messages.length]);
+
+  const send = async () => {
+    if (!draft.trim() || !selectedId || !user) return;
+    await (supabase as any).from("messages").insert({ conversation_id: selectedId, sender_id: user.id, content: draft.trim() });
+    setDraft("");
+  };
+
+  const startWith = async (userId: string) => {
+    const { data } = await (supabase as any).rpc("get_or_create_dm", { _other_user_id: userId });
+    if (data) {
+      setShowNew(false);
+      setSelectedId(data);
+      setSearchParams({ conversation: data });
+      await loadConversations();
     }
   };
 
-  // Fetch GIFs (trending or search) when popover opens or query changes
-  useEffect(() => {
-    if (!gifOpen) return;
-    let cancelled = false;
-    setGifLoading(true);
-    const url = gifQuery.trim()
-      ? `https://api.giphy.com/v1/gifs/search?api_key=${GIPHY_KEY}&q=${encodeURIComponent(gifQuery)}&limit=24&rating=g`
-      : `https://api.giphy.com/v1/gifs/trending?api_key=${GIPHY_KEY}&limit=24&rating=g`;
-    const t = setTimeout(() => {
-      fetch(url)
-        .then(r => r.json())
-        .then(d => { if (!cancelled) setGifs(d.data || []); })
-        .catch(() => { if (!cancelled) setGifs([]); })
-        .finally(() => { if (!cancelled) setGifLoading(false); });
-    }, gifQuery ? 300 : 0);
-    return () => { cancelled = true; clearTimeout(t); };
-  }, [gifOpen, gifQuery]);
-
-  const nowTime = () => new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-
-  const sendText = () => {
-    const text = message.trim();
-    if (!text) return;
-    const msg: LocalMsg = { id: `m${Date.now()}`, content: text, time: nowTime(), isOwn: true, read: false };
-    setSentByConv(prev => ({ ...prev, [selectedId]: [...(prev[selectedId] || []), msg] }));
-    setMessage("");
-  };
-
-  const sendGif = (url: string) => {
-    const msg: LocalMsg = { id: `g${Date.now()}`, gifUrl: url, time: nowTime(), isOwn: true, read: false };
-    setSentByConv(prev => ({ ...prev, [selectedId]: [...(prev[selectedId] || []), msg] }));
-    setGifOpen(false);
-  };
-
   return (
-    <div className="h-screen flex animate-fade-in">
-      {/* Sidebar */}
-      <div className="w-80 border-r flex flex-col shrink-0 bg-card">
-        <div className="p-4 border-b">
-          <h2 className="text-lg font-bold text-foreground mb-3">Chat</h2>
-          <div className="relative mb-3">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input placeholder="Pesquisar..." className="pl-9 h-9" />
-          </div>
-          <div className="flex gap-1 bg-muted rounded-lg p-1">
-            {(["chats", "calls", "groups"] as Tab[]).map(t => (
-              <button
-                key={t}
-                onClick={() => setTab(t)}
-                className={cn("flex-1 text-xs font-medium py-1.5 rounded-md transition-colors", tab === t ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground")}
-              >
-                {t === "chats" ? "Conversas" : t === "calls" ? "Chamadas" : "Grupos"}
+    <div className="h-[calc(100vh-3.5rem)] flex">
+      <aside className="w-72 border-r border-border bg-card flex flex-col">
+        <div className="p-3 border-b border-border flex items-center justify-between">
+          <h2 className="font-semibold text-sm">Conversas</h2>
+          <Button size="sm" variant="ghost" onClick={() => setShowNew((v) => !v)} className="h-7 gap-1"><Plus className="w-3.5 h-3.5" />Nova</Button>
+        </div>
+        {showNew && (
+          <div className="p-2 border-b border-border max-h-60 overflow-auto">
+            {contacts.length === 0 ? (
+              <p className="text-[12px] text-muted-foreground p-3">Sem contactos.</p>
+            ) : contacts.map((c) => (
+              <button key={c.id} onClick={() => startWith(c.id)} className="w-full text-left px-2 py-1.5 rounded hover:bg-muted text-sm flex items-center gap-2">
+                <User className="w-3.5 h-3.5 text-muted-foreground" />{c.display_name}
               </button>
             ))}
           </div>
+        )}
+        <div className="flex-1 overflow-auto">
+          {conversations.length === 0 ? (
+            <div className="p-6 text-center text-xs text-muted-foreground">
+              <MessageSquare className="w-6 h-6 mx-auto mb-2 opacity-50" />
+              Sem conversas. Clique em "Nova" para começar.
+            </div>
+          ) : conversations.map((c) => (
+            <button key={c.id} onClick={() => { setSelectedId(c.id); setSearchParams({ conversation: c.id }); }} className={cn("w-full text-left p-3 border-b border-border hover:bg-muted/50", selectedId === c.id && "bg-muted")}>
+              <p className="text-sm font-medium truncate">{c.other_name}</p>
+              <p className="text-[11px] text-muted-foreground">{new Date(c.updated_at).toLocaleString("pt-PT")}</p>
+            </button>
+          ))}
         </div>
-        <div className="flex-1 overflow-y-auto">
-          {tab === "calls" ? (
-            callLog.map(call => {
-              const CallIcon = callIcons[call.type];
-              return (
-                <div key={call.id} className="flex items-center gap-3 px-4 py-3 hover:bg-muted/50 transition-colors">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary">
-                    {call.name.split(" ").map(n => n[0]).slice(0, 2).join("")}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-foreground truncate">{call.name}</p>
-                    <div className="flex items-center gap-1.5 text-xs">
-                      <CallIcon className={cn("w-3 h-3", callColors[call.type])} />
-                      <span className={cn(call.type === "missed" ? "text-destructive" : "text-muted-foreground")}>
-                        {call.date}, {call.time}
-                      </span>
-                      {call.duration && <span className="text-muted-foreground">• {call.duration}</span>}
+      </aside>
+      <section className="flex-1 flex flex-col">
+        {!selectedId ? (
+          <div className="flex-1 flex items-center justify-center text-sm text-muted-foreground">Seleccione uma conversa.</div>
+        ) : (
+          <>
+            <div ref={scrollRef} className="flex-1 overflow-auto p-4 space-y-2 bg-muted/20">
+              {messages.length === 0 ? (
+                <p className="text-center text-xs text-muted-foreground mt-10">Sem mensagens nesta conversa.</p>
+              ) : messages.map((m) => {
+                const own = m.sender_id === user?.id;
+                return (
+                  <div key={m.id} className={cn("flex", own ? "justify-end" : "justify-start")}>
+                    <div className={cn("rounded-2xl px-3.5 py-2 text-sm max-w-[70%]", own ? "bg-primary text-primary-foreground" : "bg-card border border-border")}>
+                      {m.content}
+                      <p className={cn("text-[10px] mt-1 opacity-70", own ? "text-primary-foreground" : "text-muted-foreground")}>{new Date(m.created_at).toLocaleTimeString("pt-PT", { hour: "2-digit", minute: "2-digit" })}</p>
                     </div>
                   </div>
-                  <Button variant="ghost" size="icon" className="shrink-0">
-                    {call.medium === "video" ? <VideoIcon className="w-4 h-4 text-muted-foreground" /> : <Phone className="w-4 h-4 text-muted-foreground" />}
-                  </Button>
-                </div>
-              );
-            })
-          ) : (
-            displayList.map(conv => (
-              <button
-                key={conv.id}
-                onClick={() => setSelectedId(conv.id)}
-                className={cn(
-                  "w-full flex items-center gap-3 px-4 py-3 hover:bg-muted/50 transition-colors text-left",
-                  selectedId === conv.id && "bg-muted"
-                )}
-              >
-                <div className="relative shrink-0">
-                  <div className={cn("w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold", conv.isGroup ? "bg-secondary/10 text-secondary" : "bg-primary/10 text-primary")}>
-                    {conv.isGroup ? <Users className="w-5 h-5" /> : conv.name.split(" ").map(n => n[0]).slice(0, 2).join("")}
-                  </div>
-                  {conv.online && !conv.isGroup && <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-accent border-2 border-card" />}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex justify-between items-center">
-                    <p className="text-sm font-medium text-foreground truncate">{conv.name}</p>
-                    <span className="text-[10px] text-muted-foreground shrink-0">{conv.time}</span>
-                  </div>
-                  <p className="text-xs text-muted-foreground truncate">{conv.lastMessage}</p>
-                </div>
-                {conv.unread > 0 && (
-                  <span className="w-5 h-5 rounded-full bg-secondary text-secondary-foreground text-[10px] font-bold flex items-center justify-center shrink-0">
-                    {conv.unread}
-                  </span>
-                )}
-              </button>
-            ))
-          )}
-        </div>
-      </div>
-
-      {/* Chat area */}
-      <div className="flex-1 flex flex-col">
-        {selected ? (
-          <>
-            <div className="flex items-center justify-between px-5 py-3 border-b bg-card">
-              <div className="flex items-center gap-3">
-                <div className={cn("w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold", selected.isGroup ? "bg-secondary/10 text-secondary" : "bg-primary/10 text-primary")}>
-                  {selected.isGroup ? <Users className="w-5 h-5" /> : selected.name.split(" ").map(n => n[0]).slice(0, 2).join("")}
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-foreground">{selected.name}</p>
-                  <p className="text-[11px] text-muted-foreground">{selected.isGroup ? "Grupo" : selected.online ? "🟢 Online" : "Offline"}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-1">
-                <Button variant="ghost" size="icon" onClick={goToEmail}><Mail className="w-4 h-4" /></Button>
-                <Button variant="ghost" size="icon"><Phone className="w-4 h-4" /></Button>
-                <Button variant="ghost" size="icon"><Video className="w-4 h-4" /></Button>
-              </div>
+                );
+              })}
             </div>
-
-            <div className="flex-1 overflow-y-auto p-5 space-y-4 bg-muted/30">
-              {baseMessages.map(msg => (
-                <div key={msg.id} className={cn("flex", msg.isOwn && "justify-end")}>
-                  <div className={cn(
-                    "max-w-[70%] rounded-2xl px-4 py-2.5",
-                    msg.isOwn ? "bg-primary text-primary-foreground rounded-br-md" : "bg-card text-foreground rounded-bl-md shadow-sm"
-                  )}>
-                    <p className={cn(isEmojiOnly(msg.content) ? "text-3xl" : "text-sm")}>{msg.content}</p>
-                    <p className={cn("text-[10px] mt-1", msg.isOwn ? "text-primary-foreground/70" : "text-muted-foreground")}>
-                      {msg.time} {msg.isOwn && (msg.read ? "✓✓" : "✓")}
-                    </p>
-                  </div>
-                </div>
-              ))}
-              {localMessages.map(msg => (
-                <div key={msg.id} className="flex justify-end">
-                  <div className={cn(
-                    "max-w-[70%] rounded-2xl rounded-br-md",
-                    msg.gifUrl ? "bg-primary p-1.5" : "bg-primary text-primary-foreground px-4 py-2.5"
-                  )}>
-                    {msg.gifUrl ? (
-                      <img src={msg.gifUrl} alt="GIF" className="rounded-xl max-h-64 w-auto" />
-                    ) : (
-                      <p className={cn("whitespace-pre-wrap break-words", isEmojiOnly(msg.content || "") ? "text-3xl" : "text-sm")}>{msg.content}</p>
-                    )}
-                    <p className="text-[10px] mt-1 text-primary-foreground/70 px-2 pb-0.5">
-                      {msg.time} ✓
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="px-4 py-3 border-t bg-card flex items-center gap-2">
-              <Popover open={emojiOpen} onOpenChange={setEmojiOpen}>
-                <PopoverTrigger asChild>
-                  <Button variant="ghost" size="icon"><Smile className="w-5 h-5 text-muted-foreground" /></Button>
-                </PopoverTrigger>
-                <PopoverContent side="top" align="start" className="p-0 border-0 w-auto">
-                  <EmojiPicker
-                    onEmojiClick={(e) => { setMessage(m => m + e.emoji); }}
-                    emojiStyle={EmojiStyle.NATIVE}
-                    theme={Theme.AUTO}
-                    width={400}
-                    height={460}
-                    searchPlaceHolder="Pesquisar emoji..."
-                    previewConfig={{ showPreview: false }}
-                  />
-                </PopoverContent>
-              </Popover>
-
-              <Popover open={gifOpen} onOpenChange={setGifOpen}>
-                <PopoverTrigger asChild>
-                  <Button variant="ghost" size="icon" title="Enviar GIF">
-                    <span className="text-xs font-bold text-muted-foreground">GIF</span>
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent side="top" align="start" className="p-3 w-80">
-                  <Input
-                    placeholder="Pesquisar GIFs..."
-                    value={gifQuery}
-                    onChange={e => setGifQuery(e.target.value)}
-                    className="h-8 mb-3"
-                  />
-                  <div className="h-72 overflow-y-auto">
-                    {gifLoading ? (
-                      <p className="text-xs text-muted-foreground text-center py-8">A carregar...</p>
-                    ) : gifs.length === 0 ? (
-                      <p className="text-xs text-muted-foreground text-center py-8">Sem resultados.</p>
-                    ) : (
-                      <div className="grid grid-cols-2 gap-1.5">
-                        {gifs.map(g => (
-                          <button
-                            key={g.id}
-                            onClick={() => sendGif(g.images.original.url)}
-                            className="rounded-md overflow-hidden hover:ring-2 ring-primary transition-all"
-                          >
-                            <img src={g.images.fixed_height_small.url} alt="gif" className="w-full h-auto block" />
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                  <p className="text-[10px] text-muted-foreground text-center mt-2">Powered by GIPHY</p>
-                </PopoverContent>
-              </Popover>
-
-              <Button variant="ghost" size="icon"><Paperclip className="w-5 h-5 text-muted-foreground" /></Button>
-              <Input
-                placeholder="Escrever mensagem..."
-                value={message}
-                onChange={e => setMessage(e.target.value)}
-                className="flex-1"
-                onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendText(); } }}
-              />
-              <Button variant="ghost" size="icon"><Mic className="w-5 h-5 text-muted-foreground" /></Button>
-              <Button size="icon" disabled={!message.trim()} onClick={sendText}><Send className="w-4 h-4" /></Button>
+            <div className="border-t border-border bg-background p-3 flex gap-2">
+              <Input placeholder="Escrever mensagem…" value={draft} onChange={(e) => setDraft(e.target.value)} onKeyDown={(e) => e.key === "Enter" && send()} />
+              <Button onClick={send} disabled={!draft.trim()} className="gap-1.5"><Send className="w-4 h-4" />Enviar</Button>
             </div>
           </>
-        ) : (
-          <div className="flex-1 flex items-center justify-center text-muted-foreground">
-            Seleccione uma conversa para começar.
-          </div>
         )}
-      </div>
+      </section>
     </div>
   );
 }
