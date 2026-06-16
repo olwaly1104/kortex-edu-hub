@@ -128,7 +128,7 @@ import GapEstudanteProfile from "./pages/gap/EstudanteProfile";
 import GapCandidaturas from "./pages/gap/Candidaturas";
 import GapCandidaturaDetail from "./pages/gap/CandidaturaDetail";
 import GapConfiguracao from "./pages/gap/Configuracao";
-import GapAnuncios from "./pages/gap/Anuncios";
+
 import FinancasDashboard from "./pages/financas/Dashboard";
 import FinancasInicio from "./pages/financas/Inicio";
 import FinancasReceitas from "./pages/financas/Receitas";
@@ -141,8 +141,6 @@ import FinancasSolicitacoes from "./pages/financas/Solicitacoes";
 import FinancasSolicitacaoDetail from "./pages/financas/SolicitacaoDetail";
 import FinancasPessoalFinancas from "./pages/financas/PessoalFinancas";
 import FinancasCalendario from "./pages/financas/Calendario";
-import FinancasAnuncios from "./pages/financas/Anuncios";
-import FinancasAnuncioDetail from "./pages/financas/AnuncioDetail";
 
 import InscricoesLayout from "./layouts/InscricoesLayout";
 import InscricoesRegistar from "./pages/inscricoes/Registar";
@@ -169,7 +167,7 @@ import Academica2Relatorios from "./pages/academica2/Relatorios";
 import AdminOnboarding from "./pages/admin/Onboarding";
 import AdminInicio from "./pages/admin/Inicio";
 import AdminPerfil from "./pages/admin/Perfil";
-import AdminAnuncios from "./pages/admin/Anuncios";
+
 import AdminOnboardingEstudantes from "./pages/admin/onboarding/Estudantes";
 import AdminOnboardingPessoas from "./pages/admin/onboarding/Pessoas";
 import AdminOnboardingRegrasPresenca from "./pages/admin/onboarding/RegrasPresenca";
@@ -182,6 +180,8 @@ import AdminStaff from "./pages/admin/Staff";
 import AdminDocentes from "./pages/admin/Docentes";
 import AdminFinancasDiscentes from "./pages/admin/FinancasDiscentes";
 import AdminUtilizadores from "./pages/admin/Utilizadores";
+import AdminSistema from "./pages/admin/Sistema";
+import AdminModulos from "./pages/admin/Modulos";
 import AlterarPalavraPasse from "./pages/AlterarPalavraPasse";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -302,6 +302,8 @@ function AppRoutes() {
         <Route path="/admin/staff" element={<AdminStaff />} />
         <Route path="/admin/docentes" element={<AdminDocentes />} />
         <Route path="/admin/utilizadores" element={<AdminUtilizadores />} />
+        <Route path="/admin/sistema" element={<AdminSistema />} />
+        <Route path="/admin/modulos" element={<AdminModulos />} />
         {/* Admin → Finanças (read-only mirrors) */}
         <Route path="/admin/financas/dashboard" element={<FinancasDashboard />} />
         <Route path="/admin/financas/receitas" element={<FinancasReceitas />} />
@@ -452,8 +454,6 @@ function AppRoutes() {
         {/* Finanças */}
         <Route path="/financas" element={<FinancasInicio />} />
         <Route path="/financas/calendario" element={<FinancasCalendario />} />
-        <Route path="/financas/anuncios" element={<FinancasAnuncios />} />
-        <Route path="/financas/anuncios/:id" element={<FinancasAnuncioDetail />} />
 
         <Route path="/financas/solicitacoes" element={<FinancasSolicitacoes />} />
         <Route path="/financas/solicitacoes/:id" element={<FinancasSolicitacaoDetail />} />
@@ -483,7 +483,7 @@ function AppRoutes() {
         <Route path="/gap/candidaturas/:id" element={<GapCandidaturaDetail />} />
         <Route path="/gap/configuracao" element={<GapConfiguracao />} />
         <Route path="/gap/calendario" element={<FinancasCalendario />} />
-        <Route path="/gap/anuncios" element={<GapAnuncios />} />
+        
         <Route path="/gap/chat" element={<StudentChat />} />
         <Route path="/gap/email" element={<StudentEmail />} />
         <Route path="/gap/contactos" element={<StudentContacts />} />
