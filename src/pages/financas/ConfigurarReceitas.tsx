@@ -917,6 +917,8 @@ function LineItemsBlock({
   withType?: boolean;
   withTax?: boolean;
   impostos?: Imposto[];
+  typeLabel?: string;
+  typeOptions?: string[];
 }) {
   const [rows, setRows] = useState<LineItem[]>(() => readJSON<LineItem[]>(storageKey, []));
   useEffect(() => writeJSON(storageKey, rows), [rows, storageKey]);
