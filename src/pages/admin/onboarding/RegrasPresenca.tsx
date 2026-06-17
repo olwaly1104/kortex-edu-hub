@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { OnboardingStepBanner } from "@/components/admin/OnboardingStepBanner";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,23 @@ import { Badge } from "@/components/ui/badge";
 import { Clock, Percent, AlertTriangle, Scale, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
-type Multa = { id: string; nome: string; valor: number; descricao: string };
+type AplicaA = "Docente" | "Staff" | "Ambos";
+type Multa = { id: string; nome: string; valor: number; descricao: string; aplicaA: AplicaA };
+
+const MULTAS_KEY = "upra.rh.multas.v1";
+
+const loadMultas = (): Multa[] => {
+  try {
+    const raw = localStorage.getItem(MULTAS_KEY);
+    if (raw) return JSON.parse(raw) as Multa[];
+  } catch { /* */ }
+  return [
+    { id: "1", nome: "Atraso superior a 15min", valor: 3000, descricao: "Atraso recorrente", aplicaA: "Ambos" },
+    { id: "2", nome: "Falta injustificada", valor: 6000, descricao: "Ausência sem justificação aceite", aplicaA: "Ambos" },
+    { id: "3", nome: "Atraso na entrega de relatório", valor: 4000, descricao: "Relatório entregue após o prazo", aplicaA: "Docente" },
+    { id: "4", nome: "Incumprimento de SLA", valor: 5000, descricao: "Tratamento de solicitação fora do prazo", aplicaA: "Staff" },
+  ];
+};
 
 export default function OnboardingRegrasPresenca() {
   const [docMin, setDocMin] = useState(85);
@@ -19,19 +35,19 @@ export default function OnboardingRegrasPresenca() {
   const [permitirDisputa, setPermitirDisputa] = useState(true);
   const [janelaDisputa, setJanelaDisputa] = useState(72);
 
-  const [multas, setMultas] = useState<Multa[]>([
-    { id: "1", nome: "Atraso superior a 15min", valor: 3000, descricao: "Atraso recorrente em aulas ou expediente" },
-    { id: "2", nome: "Falta injustificada", valor: 6000, descricao: "Ausência sem justificação aceite" },
-    { id: "3", nome: "Atraso na entrega de relatório", valor: 4000, descricao: "Relatório entregue após o prazo" },
-    { id: "4", nome: "Incumprimento de SLA", valor: 5000, descricao: "Tratamento de solicitação fora do prazo" },
-  ]);
+  const [multas, setMultas] = useState<Multa[]>(() => loadMultas());
   const [novoNome, setNovoNome] = useState("");
   const [novoValor, setNovoValor] = useState<number>(0);
+  const [novoTipo, setNovoTipo] = useState<AplicaA>("Ambos");
+
+  useEffect(() => {
+    try { localStorage.setItem(MULTAS_KEY, JSON.stringify(multas)); } catch { /* */ }
+  }, [multas]);
 
   const addMulta = () => {
     if (!novoNome.trim()) return;
-    setMultas(prev => [...prev, { id: String(Date.now()), nome: novoNome.trim(), valor: novoValor, descricao: "" }]);
-    setNovoNome(""); setNovoValor(0);
+    setMultas(prev => [...prev, { id: String(Date.now()), nome: novoNome.trim(), valor: novoValor, descricao: "", aplicaA: novoTipo }]);
+    setNovoNome(""); setNovoValor(0); setNovoTipo("Ambos");
   };
 
   return (
@@ -110,14 +126,15 @@ export default function OnboardingRegrasPresenca() {
             <div className="w-9 h-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center"><AlertTriangle className="w-4 h-4" /></div>
             <div>
               <h2 className="text-sm font-semibold">Tabela de multas</h2>
-              <p className="text-xs text-muted-foreground">Infrações aplicáveis a docentes e staff.</p>
+              <p className="text-xs text-muted-foreground">Infrações aplicáveis a docentes e staff. Finanças visualiza esta tabela em modo só-leitura.</p>
             </div>
           </div>
           <div className="space-y-1.5">
             {multas.map(m => (
               <div key={m.id} className="flex items-center justify-between gap-2 px-3 py-2 rounded-md border bg-card">
-                <div className="flex items-center gap-2 min-w-0">
+                <div className="flex items-center gap-2 min-w-0 flex-1">
                   <span className="text-sm font-medium truncate">{m.nome}</span>
+                  <Badge variant="outline" className="text-[10px]">{m.aplicaA}</Badge>
                   <Badge variant="outline" className="text-[10px] tabular-nums">{m.valor.toLocaleString("pt-PT")} Kz</Badge>
                 </div>
                 <Button size="icon" variant="ghost" onClick={() => setMultas(prev => prev.filter(x => x.id !== m.id))} className="h-7 w-7 text-muted-foreground hover:text-destructive">
@@ -125,9 +142,14 @@ export default function OnboardingRegrasPresenca() {
                 </Button>
               </div>
             ))}
-            <div className="grid grid-cols-[1fr_110px_auto] gap-2 pt-1">
+            <div className="grid grid-cols-[1fr_110px_110px_auto] gap-2 pt-1">
               <Input placeholder="Nova multa (ex: Atraso prolongado)" value={novoNome} onChange={e => setNovoNome(e.target.value)} className="h-9" />
               <Input type="number" min={0} step={500} placeholder="Valor (Kz)" value={novoValor || ""} onChange={e => setNovoValor(Number(e.target.value))} className="h-9" />
+              <select value={novoTipo} onChange={e => setNovoTipo(e.target.value as AplicaA)} className="h-9 rounded-md border border-input bg-background px-2 text-sm">
+                <option value="Docente">Docente</option>
+                <option value="Staff">Staff</option>
+                <option value="Ambos">Ambos</option>
+              </select>
               <Button onClick={addMulta} className="h-9 gap-1"><Plus className="w-3.5 h-3.5" /> Adicionar</Button>
             </div>
           </div>
