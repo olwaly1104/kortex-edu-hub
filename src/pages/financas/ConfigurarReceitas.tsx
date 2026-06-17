@@ -251,7 +251,12 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
   const updatePropina = useUpdatePropina();
   const [draft, setDraft] = useState<Record<string, { valor: string; impostoId: string }>>({});
   const [anosByCurso, setAnosByCurso] = useState<Record<string, number[]>>(() => readJSON(ANOS_KEY(email), {}));
-  const [prazoByCurso, setPrazoByCurso] = useState<Record<string, string>>(() => readJSON(PRAZO_KEY(email), {}));
+  const [prazoByCurso, setPrazoByCurso] = useState<Record<string, string[]>>(() => {
+    const raw = readJSON<Record<string, string | string[]>>(PRAZO_KEY(email), {});
+    const norm: Record<string, string[]> = {};
+    Object.entries(raw).forEach(([k, v]) => { norm[k] = Array.isArray(v) ? v : (v ? [v] : []); });
+    return norm;
+  });
   const [prazosDef, setPrazosDef] = useState<PrazoDef[]>(() => readJSON<PrazoDef[]>(PRAZOS_DEF_KEY(email), []));
   const [open, setOpen] = useState<Record<string, boolean>>({});
 
