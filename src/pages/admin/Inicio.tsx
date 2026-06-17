@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { FinHeader } from "@/pages/financas/_FinHeader";
 import { useAuth } from "@/contexts/AuthContext";
 import { onboardingKey, progressKey, profileKey, isOnboardingCompleteFor, clearAdminStateBackend } from "@/lib/onboardingStorage";
@@ -124,11 +125,46 @@ export default function AdminInicio() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const storedProgress = readProgress(user?.email);
-  // Auto-mark the institutional registration as complete once onboarding is done.
-  const progress = { ...storedProgress, "inst.reg": storedProgress["inst.reg"] || isOnboardingCompleteFor(user?.email) };
+  const [estudantesCount, setEstudantesCount] = useState<number>(0);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { count } = await supabase
+        .from("estudantes")
+        .select("id", { count: "exact", head: true });
+      if (cancelled) return;
+      const c = count ?? 0;
+      setEstudantesCount(c);
+      // Clean any stale est.imp=true left in localStorage when there are no estudantes.
+      if (c === 0) {
+        try {
+          const raw = localStorage.getItem(progressKey(user?.email));
+          if (raw) {
+            const p = JSON.parse(raw);
+            if (p["est.imp"]) {
+              delete p["est.imp"];
+              localStorage.setItem(progressKey(user?.email), JSON.stringify(p));
+            }
+          }
+        } catch { /* ignore */ }
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [user?.email]);
+
+  // Derive progress from reality, not just from localStorage clicks:
+  // - inst.reg: done iff institutional registration was completed.
+  // - est.imp: done iff there is at least one estudante in the DB.
+  const progress: Record<string, boolean> = {
+    ...storedProgress,
+    "inst.reg": storedProgress["inst.reg"] || isOnboardingCompleteFor(user?.email),
+    "est.imp": estudantesCount > 0,
+  };
   const doneCount = ALL_STEPS.filter((t) => progress[t.key]).length;
   const pct = Math.round((doneCount / ALL_STEPS.length) * 100);
   const [open, setOpen] = useState<string | null>(null);
+
 
   const reset = () => {
     if (!confirm("Repor onboarding? Todos os dados introduzidos serão perdidos.")) return;
