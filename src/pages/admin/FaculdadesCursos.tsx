@@ -197,11 +197,11 @@ export default function AdminFaculdadesCursos() {
                       </Select>
                     </div>
                   ) : (
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <p className="text-base font-semibold truncate">{f.name}</p>
+                    <div className="flex items-baseline gap-2 flex-wrap">
                       {f.sigla && (
-                        <span className="inline-flex items-center justify-center h-5 px-1.5 rounded bg-primary/10 text-primary text-[10px] font-bold tracking-wider">{f.sigla}</span>
+                        <span className="inline-flex items-center justify-center h-6 px-2 rounded-md bg-primary text-primary-foreground text-[11px] font-bold tracking-wider shadow-sm">{f.sigla}</span>
                       )}
+                      <p className="text-base font-semibold truncate leading-none">{f.name}</p>
                     </div>
                   )}
                   {!isEditing && (
