@@ -9,7 +9,7 @@ import { OnboardingStepBanner } from "@/components/admin/OnboardingStepBanner";
 import {
   ArrowLeft, Banknote, Building2, GraduationCap, Loader2, Save, AlertCircle,
   Receipt, Wallet, Plus, Trash2, TrendingUp, TrendingDown, CreditCard,
-  Users, Briefcase, BookOpenCheck, Settings2,
+  Users, BookOpenCheck, Settings2,
 } from "lucide-react";
 import { useFaculdades, useCursos, usePropinas, useUpdatePropina } from "@/lib/useInstitution";
 import { useAuth } from "@/contexts/AuthContext";
@@ -26,7 +26,7 @@ import { toast } from "sonner";
 
 type Tab = "receitas" | "despesas" | "salarios" | "multas";
 
-type LineItem = { id: string; nome: string; valor: number; unidade?: string; aplicaA?: "estudante" | "docente" | "staff" | "todos" };
+type LineItem = { id: string; nome: string; valor: number; unidade?: string; tipo?: string; aplicaA?: "estudante" | "docente" | "staff" | "todos" };
 
 const KEY = (kind: string, email?: string | null) => `upra.fin.cfg.${kind}::${email || "anon"}`;
 const newId = () => Math.random().toString(36).slice(2, 10);
@@ -114,12 +114,13 @@ function ReceitasSection({ email, onAddCursos }: { email?: string | null; onAddC
     <div className="space-y-6">
       <PropinasBlock onAddCursos={onAddCursos} />
       <LineItemsBlock
-        title="Emolumentos & Taxas académicas"
+        title="Emolumento"
         subtitle="Inscrições, matrículas, declarações, certificados, 2ª via de cartão, etc."
         icon={Receipt}
         storageKey={KEY("taxas", email)}
+        withType
         withTarget
-        addLabel="Adicionar taxa"
+        addLabel="Adicionar emolumento"
         placeholder="Ex: Certidão de matrícula"
         valueLabel="Valor (Kz)"
       />
@@ -264,27 +265,80 @@ function DespesasSection({ email }: { email?: string | null }) {
 
 /* ═══════════════════════════════ SALÁRIOS ═════════════════════════════════ */
 
+type SalLine = { id: string; nome: string; tipo: "Docente" | "Staff"; bruto: number; impostos: number };
+
 function SalariosSection({ email }: { email?: string | null }) {
+  const storageKey = KEY("salarios", email);
+  const [docentes, setDocentes] = useState<{ id: string; nome: string }[]>([]);
+  const [staff, setStaff] = useState<{ id: string; nome: string }[]>([]);
+  const [rows, setRows] = useState<Record<string, { bruto: number; impostos: number }>>(
+    () => readJSON(storageKey, {}),
+  );
+
+  useEffect(() => {
+    import("@/lib/peopleStorage").then(({ loadDocentes, loadStaff, fullName }) => {
+      setDocentes(loadDocentes().map((d) => ({ id: d.id, nome: fullName(d) })));
+      setStaff(loadStaff().map((s) => ({ id: s.id, nome: fullName(s) })));
+    });
+  }, []);
+
+  useEffect(() => writeJSON(storageKey, rows), [rows, storageKey]);
+
+  const all: SalLine[] = [
+    ...docentes.map((d) => ({ id: d.id, nome: d.nome, tipo: "Docente" as const, bruto: rows[d.id]?.bruto ?? 0, impostos: rows[d.id]?.impostos ?? 0 })),
+    ...staff.map((s) => ({ id: s.id, nome: s.nome, tipo: "Staff" as const, bruto: rows[s.id]?.bruto ?? 0, impostos: rows[s.id]?.impostos ?? 0 })),
+  ];
+
+  const update = (id: string, patch: Partial<{ bruto: number; impostos: number }>) =>
+    setRows((s) => ({ ...s, [id]: { bruto: 0, impostos: 0, ...s[id], ...patch } }));
+
   return (
     <div className="space-y-6">
-      <LineItemsBlock
-        title="Escalões salariais — Docentes"
-        subtitle="Categorias e valores base aplicados aos docentes."
-        icon={GraduationCap}
-        storageKey={KEY("sal.docentes", email)}
-        addLabel="Adicionar escalão de docente"
-        placeholder="Ex: Assistente, Professor Auxiliar, Professor Catedrático…"
-        valueLabel="Salário base (Kz)"
-      />
-      <LineItemsBlock
-        title="Escalões salariais — Staff"
-        subtitle="Categorias administrativas e técnicas."
-        icon={Briefcase}
-        storageKey={KEY("sal.staff", email)}
-        addLabel="Adicionar escalão de staff"
-        placeholder="Ex: Técnico, Coordenador, Diretor de serviços…"
-        valueLabel="Salário base (Kz)"
-      />
+      <Card className="overflow-hidden">
+        <div className="px-5 py-3 border-b bg-muted/30 flex items-center gap-2">
+          <CreditCard className="w-4 h-4 text-primary" />
+          <div className="min-w-0">
+            <h2 className="text-sm font-bold text-foreground">Salários — Docentes & Staff</h2>
+            <p className="text-[11px] text-muted-foreground">
+              Lista alimentada pelo módulo RH. Finanças define apenas salário bruto, impostos e o líquido é calculado.
+            </p>
+          </div>
+          <span className="text-[11px] text-muted-foreground ml-auto tabular-nums shrink-0">
+            {all.length} pessoa{all.length === 1 ? "" : "s"}
+          </span>
+        </div>
+
+        <div className="divide-y">
+          <div className="grid grid-cols-[1fr_110px_150px_150px_150px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
+            <div>Nome</div>
+            <div>Tipo</div>
+            <div>Salário bruto (Kz)</div>
+            <div>Impostos (Kz)</div>
+            <div>Salário líquido (Kz)</div>
+          </div>
+
+          {all.length === 0 ? (
+            <div className="px-5 py-10 text-center text-xs text-muted-foreground">
+              Sem docentes ou staff registados em RH. Adicione pessoas em <span className="font-medium text-foreground">RH → Docentes / Staff</span> para configurar salários aqui.
+            </div>
+          ) : all.map((r) => {
+            const liquido = Math.max(0, (r.bruto || 0) - (r.impostos || 0));
+            return (
+              <div key={`${r.tipo}-${r.id}`} className="grid grid-cols-[1fr_110px_150px_150px_150px] gap-3 px-5 py-2.5 items-center text-sm">
+                <div className="truncate font-medium">{r.nome}</div>
+                <div className="text-xs text-muted-foreground">{r.tipo}</div>
+                <Input type="number" min={0} className="h-9 tabular-nums" value={r.bruto}
+                  onChange={(e) => update(r.id, { bruto: Number(e.target.value) || 0 })} />
+                <Input type="number" min={0} className="h-9 tabular-nums" value={r.impostos}
+                  onChange={(e) => update(r.id, { impostos: Number(e.target.value) || 0 })} />
+                <div className="h-9 flex items-center px-2 rounded-md bg-muted/30 tabular-nums font-medium">
+                  {fmt(liquido)}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </Card>
     </div>
   );
 }
@@ -322,7 +376,7 @@ function MultasSection({ email }: { email?: string | null }) {
 
 function LineItemsBlock({
   title, subtitle, icon: Icon, storageKey, addLabel, placeholder, valueLabel,
-  withUnit = false, withTarget = false,
+  withUnit = false, withTarget = false, withType = false,
 }: {
   title: string;
   subtitle: string;
@@ -333,19 +387,27 @@ function LineItemsBlock({
   valueLabel: string;
   withUnit?: boolean;
   withTarget?: boolean;
+  withType?: boolean;
 }) {
   const [rows, setRows] = useState<LineItem[]>(() => readJSON<LineItem[]>(storageKey, []));
   useEffect(() => writeJSON(storageKey, rows), [rows, storageKey]);
 
-  const add = () => setRows((r) => [...r, { id: newId(), nome: "", valor: 0, ...(withUnit ? { unidade: "Kz" } : {}), ...(withTarget ? { aplicaA: "estudante" } : {}) }]);
+  const add = () => setRows((r) => [...r, {
+    id: newId(), nome: "", valor: 0,
+    ...(withUnit ? { unidade: "Kz" } : {}),
+    ...(withType ? { tipo: "Único" } : {}),
+    ...(withTarget ? { aplicaA: "estudante" } : {}),
+  }]);
   const update = (id: string, patch: Partial<LineItem>) => setRows((r) => r.map((x) => x.id === id ? { ...x, ...patch } : x));
   const remove = (id: string) => setRows((r) => r.filter((x) => x.id !== id));
 
   const total = rows.reduce((s, r) => s + (r.valor || 0), 0);
 
   const cols = (() => {
+    if (withType && withTarget) return "grid-cols-[1fr_130px_140px_150px_40px]";
     if (withUnit) return "grid-cols-[1fr_140px_120px_40px]";
     if (withTarget) return "grid-cols-[1fr_140px_150px_40px]";
+    if (withType) return "grid-cols-[1fr_130px_180px_40px]";
     return "grid-cols-[1fr_180px_40px]";
   })();
 
@@ -365,6 +427,7 @@ function LineItemsBlock({
       <div className="divide-y">
         <div className={`grid ${cols} gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10`}>
           <div>Designação</div>
+          {withType && <div>Tipo</div>}
           <div>{valueLabel}</div>
           {withUnit && <div>Unidade</div>}
           {withTarget && <div>Aplica-se a</div>}
@@ -379,6 +442,18 @@ function LineItemsBlock({
           <div key={r.id} className={`grid ${cols} gap-3 px-5 py-2.5 items-center text-sm`}>
             <Input className="h-9" placeholder={placeholder} value={r.nome}
               onChange={(e) => update(r.id, { nome: e.target.value })} />
+            {withType && (
+              <select
+                className="h-9 rounded-md border border-input bg-background px-2 text-sm"
+                value={r.tipo || "Único"}
+                onChange={(e) => update(r.id, { tipo: e.target.value })}
+              >
+                <option value="Único">Único</option>
+                <option value="Mensal">Mensal</option>
+                <option value="Anual">Anual</option>
+                <option value="Por pedido">Por pedido</option>
+              </select>
+            )}
             <Input type="number" min={0} className="h-9 tabular-nums" value={r.valor}
               onChange={(e) => update(r.id, { valor: Number(e.target.value) || 0 })} />
             {withUnit && (
