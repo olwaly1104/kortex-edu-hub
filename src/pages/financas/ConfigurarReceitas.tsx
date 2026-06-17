@@ -198,39 +198,36 @@ function ImpostosBlock({ impostos, setImpostos }: { impostos: Imposto[]; setImpo
 }
 
 const PRAZO_KEY = (email?: string | null) => KEY("propinas.prazo", email);
-const PRAZOS_DEF_KEY = (email?: string | null) => KEY("propinas.prazos.def", email);
+const PRAZOS_DEF_KEY = (email?: string | null) => KEY("propinas.prazos.meses", email);
 
-type PrazoDef = { id: string; nome: string; mes: number };
-const MESES = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+type PrazoDef = { id: string; nome: string; meses: number };
 
 function PrazosBlock({ prazos, setPrazos }: { prazos: PrazoDef[]; setPrazos: React.Dispatch<React.SetStateAction<PrazoDef[]>> }) {
-  const add = () => setPrazos((s) => [...s, { id: newId(), nome: `Prazo ${s.length + 1}`, mes: 1 }]);
+  const add = () => setPrazos((s) => [...s, { id: newId(), nome: `Prazo ${s.length + 1}`, meses: 10 }]);
   return (
     <Card className="overflow-hidden">
       <div className="px-5 py-3 border-b bg-muted/30 flex items-center gap-2">
         <Wallet className="w-4 h-4 text-primary" />
         <div className="min-w-0">
           <h2 className="text-sm font-bold text-foreground">Prazos de pagamento</h2>
-          <p className="text-[11px] text-muted-foreground">Defina os meses limite para pagamento. Ficam disponíveis como opções na tabela de propinas.</p>
+          <p className="text-[11px] text-muted-foreground">Defina o número de meses para pagamento. Ficam disponíveis como opções na tabela de propinas.</p>
         </div>
         <span className="text-[11px] text-muted-foreground ml-auto tabular-nums shrink-0">{prazos.length} prazo{prazos.length === 1 ? "" : "s"}</span>
       </div>
       <div className="divide-y">
-        <div className="grid grid-cols-[1fr_220px_40px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
+        <div className="grid grid-cols-[1fr_140px_40px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
           <div>Designação</div>
-          <div>Mês limite</div>
+          <div>Nº de meses</div>
           <div className="text-right">Ação</div>
         </div>
         {prazos.length === 0 ? (
           <div className="px-5 py-8 text-center text-xs text-muted-foreground">Sem prazos configurados.</div>
         ) : prazos.map((p) => (
-          <div key={p.id} className="grid grid-cols-[1fr_220px_40px] gap-3 px-5 py-2.5 items-center text-sm">
+          <div key={p.id} className="grid grid-cols-[1fr_140px_40px] gap-3 px-5 py-2.5 items-center text-sm">
             <Input className="h-9" placeholder="Ex: Prazo trimestral" value={p.nome}
               onChange={(e) => setPrazos((s) => s.map((x) => x.id === p.id ? { ...x, nome: e.target.value } : x))} />
-            <select className="h-9 rounded-md border border-input bg-background px-2 text-sm" value={p.mes}
-              onChange={(e) => setPrazos((s) => s.map((x) => x.id === p.id ? { ...x, mes: Number(e.target.value) } : x))}>
-              {MESES.map((m, idx) => <option key={m} value={idx + 1}>{m}</option>)}
-            </select>
+            <Input type="number" min={1} max={36} className="h-9 tabular-nums" value={p.meses}
+              onChange={(e) => setPrazos((s) => s.map((x) => x.id === p.id ? { ...x, meses: Number(e.target.value) || 1 } : x))} />
             <div className="flex justify-end">
               <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
                 onClick={() => setPrazos((s) => s.filter((x) => x.id !== p.id))}><Trash2 className="w-3.5 h-3.5" /></Button>
@@ -382,7 +379,7 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
                             disabled={prazosDef.length === 0}
                             onChange={(e) => setPrazoByCurso((s) => ({ ...s, [c.id]: e.target.value }))}>
                             <option value="">{prazosDef.length === 0 ? "— Defina prazos acima —" : "— Selecionar —"}</option>
-                            {prazosDef.map((pr) => <option key={pr.id} value={pr.id}>{pr.nome} · {MESES[pr.mes - 1]}</option>)}
+                            {prazosDef.map((pr) => <option key={pr.id} value={pr.id}>{pr.nome} · {pr.meses} meses</option>)}
                           </select>
                           <div className="flex justify-end gap-1">
                             <Button size="sm" variant="ghost" className="h-8 px-2 text-xs"
