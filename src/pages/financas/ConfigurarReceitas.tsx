@@ -422,7 +422,7 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
         </div>
       )}
       </Card>
-    </>
+    </div>
   );
 }
 
