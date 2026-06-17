@@ -113,7 +113,7 @@ const IMPOSTOS_KEY = (email?: string | null) => KEY("impostos", email);
 const ANOS_KEY = (email?: string | null) => KEY("propinas.anos", email);
 const REGIMES = ["Geral", "Reduzido", "Isento", "Exportação", "Intermédio"];
 
-type RecSub = "impostos" | "propinas" | "emolumentos";
+type RecSub = "impostos" | "propinas" | "emolumentos" | "servicos";
 
 function ReceitasSection({ email, onAddCursos }: { email?: string | null; onAddCursos: () => void }) {
   const [sub, setSub] = useState<RecSub>("impostos");
