@@ -197,6 +197,8 @@ function ImpostosBlock({ impostos, setImpostos }: { impostos: Imposto[]; setImpo
   );
 }
 
+const PRAZO_KEY = (email?: string | null) => KEY("propinas.prazo", email);
+
 function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null; impostos: Imposto[]; onAddCursos: () => void }) {
   const { data: faculdades = [], isLoading: lF } = useFaculdades();
   const { data: cursos = [], isLoading: lC } = useCursos();
@@ -204,9 +206,11 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
   const updatePropina = useUpdatePropina();
   const [draft, setDraft] = useState<Record<string, { valor: string; impostoId: string }>>({});
   const [anosByCurso, setAnosByCurso] = useState<Record<string, number[]>>(() => readJSON(ANOS_KEY(email), {}));
+  const [prazoByCurso, setPrazoByCurso] = useState<Record<string, number>>(() => readJSON(PRAZO_KEY(email), {}));
   const [open, setOpen] = useState<Record<string, boolean>>({});
 
   useEffect(() => writeJSON(ANOS_KEY(email), anosByCurso), [anosByCurso, email]);
+  useEffect(() => writeJSON(PRAZO_KEY(email), prazoByCurso), [prazoByCurso, email]);
 
   const propinaByCurso = useMemo(() => {
     const m = new Map<string, { valor_mensal: number; imposto: number }>();
@@ -235,14 +239,17 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
     toast.success("Propina confirmada");
   };
 
+  // Column template — explicit so headers + rows align perfectly
+  const COLS = "minmax(220px,1.4fr) 130px 130px 150px 140px 110px 120px";
+
   return (
     <Card className="overflow-hidden">
       <div className="px-5 py-3 border-b bg-muted/30 flex items-center gap-2">
         <Wallet className="w-4 h-4 text-primary" />
-        <h2 className="text-sm font-bold text-foreground">Propinas por curso</h2>
-        <span className="text-[11px] text-muted-foreground ml-auto">
-          Bruto · imposto · líquido — também configurável por ano curricular.
-        </span>
+        <div className="min-w-0">
+          <h2 className="text-sm font-bold text-foreground">Propinas por curso</h2>
+          <p className="text-[11px] text-muted-foreground">Mensal bruta → calcula automaticamente Anual e Líquido. Prazo = dia do mês para pagamento.</p>
+        </div>
       </div>
 
       {loading ? (
@@ -263,91 +270,101 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
           Configure primeiro os impostos no separador <span className="font-medium text-foreground">Impostos</span>.
         </div>
       ) : (
-        <div className="divide-y">
-          <div className="grid grid-cols-[1fr_160px_160px_140px_120px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
-            <div>Faculdade · Curso</div>
-            <div>Propina mensal bruta (Kz)</div>
-            <div>Imposto</div>
-            <div className="text-right">Líquido (Kz)</div>
-            <div className="text-right">Ação</div>
-          </div>
-          {facWithCursos.flatMap((f) =>
-            f.cursos.length === 0
-              ? [(
-                  <div key={`empty-${f.id}`} className="grid grid-cols-[1fr_160px_160px_140px_120px] px-5 py-2.5 items-center text-xs text-muted-foreground">
-                    <div className="col-span-full flex items-center gap-2">
+        <div className="overflow-x-auto">
+          <div className="min-w-[1000px] divide-y">
+            <div className="grid gap-3 px-5 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10" style={{ gridTemplateColumns: COLS }}>
+              <div>Faculdade · Curso</div>
+              <div>Propina mensal bruta</div>
+              <div>Propina anual bruta</div>
+              <div>Imposto</div>
+              <div className="text-right">Líquido mensal</div>
+              <div className="text-center">Prazo (dia)</div>
+              <div className="text-right">Ação</div>
+            </div>
+            {facWithCursos.flatMap((f) =>
+              f.cursos.length === 0
+                ? [(
+                    <div key={`empty-${f.id}`} className="px-5 py-2.5 text-xs text-muted-foreground flex items-center gap-2">
                       <AlertCircle className="w-3.5 h-3.5" />
                       <span className="font-medium text-foreground">{f.name}</span> · sem cursos
                     </div>
-                  </div>
-                )]
-              : f.cursos.map((c) => {
-                  const p = propinaByCurso.get(c.id) ?? { valor_mensal: 0, imposto: 0 };
-                  const d = draft[c.id];
-                  const valorVal = d?.valor ?? String(p.valor_mensal);
-                  const impostoId = d?.impostoId ?? findImpostoIdByTaxa(p.imposto);
-                  const taxa = impostos.find((i) => i.id === impostoId)?.taxa ?? p.imposto;
-                  const bruto = Number(valorVal) || 0;
-                  const liquido = Math.max(0, bruto - bruto * taxa);
-                  const dirty = d !== undefined;
-                  const anos = anosByCurso[c.id] ?? Array(c.years || 1).fill(bruto);
-                  const isOpen = !!open[c.id];
-                  return (
-                    <div key={c.id}>
-                      <div className="grid grid-cols-[1fr_160px_160px_140px_120px] gap-3 px-5 py-3 items-center text-sm">
-                        <div className="flex items-center gap-2 min-w-0">
-                          <GraduationCap className="w-4 h-4 text-muted-foreground shrink-0" />
-                          <div className="min-w-0">
-                            <p className="font-medium truncate">{c.name}</p>
-                            <p className="text-[11px] text-muted-foreground font-mono">
-                              {f.name} · {c.code} · {c.years} anos
-                            </p>
+                  )]
+                : f.cursos.map((c) => {
+                    const p = propinaByCurso.get(c.id) ?? { valor_mensal: 0, imposto: 0 };
+                    const d = draft[c.id];
+                    const valorVal = d?.valor ?? String(p.valor_mensal);
+                    const impostoId = d?.impostoId ?? findImpostoIdByTaxa(p.imposto);
+                    const taxa = impostos.find((i) => i.id === impostoId)?.taxa ?? p.imposto;
+                    const bruto = Number(valorVal) || 0;
+                    const anual = bruto * 12;
+                    const liquido = Math.max(0, bruto - bruto * taxa);
+                    const dirty = d !== undefined;
+                    const anos = anosByCurso[c.id] ?? Array(c.years || 1).fill(bruto);
+                    const isOpen = !!open[c.id];
+                    const prazo = prazoByCurso[c.id] ?? 5;
+                    return (
+                      <div key={c.id}>
+                        <div className="grid gap-3 px-5 py-3 items-center text-sm" style={{ gridTemplateColumns: COLS }}>
+                          <div className="flex items-center gap-2 min-w-0">
+                            <GraduationCap className="w-4 h-4 text-muted-foreground shrink-0" />
+                            <div className="min-w-0">
+                              <p className="font-medium truncate">{c.name}</p>
+                              <p className="text-[11px] text-muted-foreground font-mono truncate">
+                                {f.name} · {c.code} · {c.years} anos
+                              </p>
+                            </div>
+                          </div>
+                          <Input type="number" min={0} className="h-9 tabular-nums"
+                            value={valorVal}
+                            onChange={(e) => setDraft((s) => ({ ...s, [c.id]: { valor: e.target.value, impostoId } }))} />
+                          <div className="h-9 flex items-center justify-end px-2 rounded-md bg-muted/30 tabular-nums text-xs font-medium text-muted-foreground">
+                            {fmt(anual)} Kz
+                          </div>
+                          <select className="h-9 rounded-md border border-input bg-background px-2 text-sm"
+                            value={impostoId}
+                            onChange={(e) => setDraft((s) => ({ ...s, [c.id]: { valor: valorVal, impostoId: e.target.value } }))}>
+                            <option value="">— Selecionar —</option>
+                            {impostos.map((i) => <option key={i.id} value={i.id}>{i.nome} ({(i.taxa * 100).toFixed(0)}%)</option>)}
+                          </select>
+                          <div className="h-9 flex items-center justify-end px-2 rounded-md bg-muted/30 tabular-nums font-semibold text-foreground">{fmt(liquido)} Kz</div>
+                          <Input type="number" min={1} max={31} className="h-9 tabular-nums text-center"
+                            value={prazo}
+                            onChange={(e) => setPrazoByCurso((s) => ({ ...s, [c.id]: Math.max(1, Math.min(31, Number(e.target.value) || 1)) }))} />
+                          <div className="flex justify-end gap-1">
+                            <Button size="sm" variant="ghost" className="h-8 px-2 text-xs"
+                              onClick={() => setOpen((s) => ({ ...s, [c.id]: !isOpen }))}>
+                              {isOpen ? "Fechar" : "Por ano"}
+                            </Button>
+                            <Button size="sm" variant={dirty ? "default" : "outline"}
+                              disabled={!dirty || updatePropina.isPending}
+                              onClick={() => save(c.id)} className="gap-1.5">
+                              <Check className="w-3.5 h-3.5" /> Confirmar
+                            </Button>
                           </div>
                         </div>
-                        <Input type="number" min={0} className="h-9 tabular-nums"
-                          value={valorVal}
-                          onChange={(e) => setDraft((s) => ({ ...s, [c.id]: { valor: e.target.value, impostoId } }))} />
-                        <select className="h-9 rounded-md border border-input bg-background px-2 text-sm"
-                          value={impostoId}
-                          onChange={(e) => setDraft((s) => ({ ...s, [c.id]: { valor: valorVal, impostoId: e.target.value } }))}>
-                          <option value="">— Selecionar —</option>
-                          {impostos.map((i) => <option key={i.id} value={i.id}>{i.nome} ({(i.taxa * 100).toFixed(0)}%)</option>)}
-                        </select>
-                        <div className="h-9 flex items-center justify-end px-2 rounded-md bg-muted/30 tabular-nums font-medium">{fmt(liquido)}</div>
-                        <div className="flex justify-end gap-1">
-                          <Button size="sm" variant="ghost" className="h-8 px-2 text-xs"
-                            onClick={() => setOpen((s) => ({ ...s, [c.id]: !isOpen }))}>
-                            {isOpen ? "Fechar" : "Por ano"}
-                          </Button>
-                          <Button size="sm" variant={dirty ? "default" : "outline"}
-                            disabled={!dirty || updatePropina.isPending}
-                            onClick={() => save(c.id)} className="gap-1.5">
-                            <Check className="w-3.5 h-3.5" /> Confirmar
-                          </Button>
-                        </div>
+                        {isOpen && (
+                          <div className="px-5 pb-4 pt-1 bg-muted/10 border-t">
+                            <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">Propina mensal bruta por ano curricular (Kz)</p>
+                            <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${c.years || 1}, minmax(0, 1fr))` }}>
+                              {Array.from({ length: c.years || 1 }).map((_, idx) => (
+                                <div key={idx} className="space-y-1">
+                                  <Label className="text-[11px] text-muted-foreground">{idx + 1}.º ano</Label>
+                                  <Input type="number" min={0} className="h-9 tabular-nums" value={anos[idx] ?? 0}
+                                    onChange={(e) => setAnosByCurso((s) => {
+                                      const list = [...(s[c.id] ?? Array(c.years || 1).fill(bruto))];
+                                      list[idx] = Number(e.target.value) || 0;
+                                      return { ...s, [c.id]: list };
+                                    })} />
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
-                      {isOpen && (
-                        <div className="px-5 pb-4 pt-1 bg-muted/10 border-t">
-                          <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">Propina mensal bruta por ano curricular (Kz)</p>
-                          <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${c.years || 1}, minmax(0, 1fr))` }}>
-                            {Array.from({ length: c.years || 1 }).map((_, idx) => (
-                              <div key={idx} className="space-y-1">
-                                <Label className="text-[11px] text-muted-foreground">{idx + 1}.º ano</Label>
-                                <Input type="number" min={0} className="h-9 tabular-nums" value={anos[idx] ?? 0}
-                                  onChange={(e) => setAnosByCurso((s) => {
-                                    const list = [...(s[c.id] ?? Array(c.years || 1).fill(bruto))];
-                                    list[idx] = Number(e.target.value) || 0;
-                                    return { ...s, [c.id]: list };
-                                  })} />
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  );
-                }),
-          )}
+                    );
+                  }),
+            )}
+          </div>
         </div>
       )}
     </Card>

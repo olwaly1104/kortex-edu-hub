@@ -183,50 +183,73 @@ export default function AdminFaculdadesCursos() {
                   <Building2 className="w-5 h-5" />
                 </div>
                 <div className="min-w-0">
-                  {isEditing ? (
-                    <div className="flex items-center gap-2 mb-1 flex-wrap">
-                      <Input value={facValue(f, "name")} onChange={(e) => setFacField(f.id, { name: e.target.value })} className="h-8 text-sm font-semibold" placeholder="Nome" />
-                      <Input value={facValue(f, "sigla") || ""} onChange={(e) => setFacField(f.id, { sigla: e.target.value.toUpperCase() })} className="h-8 text-sm font-semibold w-24" placeholder="Sigla" maxLength={8} />
-                      <Select value={facValue(f, "decano") || undefined} onValueChange={(v) => setFacField(f.id, { decano: v })}>
-                        <SelectTrigger className="h-8 text-xs w-44"><SelectValue placeholder={decanoOptions.length ? "Decano" : "Sem docentes"} /></SelectTrigger>
-                        <SelectContent>
-                          {decanoOptions.length === 0 ? (
-                            <div className="px-2 py-1.5 text-xs text-muted-foreground">Registe docentes em Configurar → Docentes.</div>
-                          ) : decanoOptions.map((d) => <SelectItem key={d} value={d} className="text-xs">{d}</SelectItem>)}
-                        </SelectContent>
-                      </Select>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {isEditing ? (
+                      <>
+                        <Input
+                          value={facValue(f, "sigla") || ""}
+                          onChange={(e) => setFacField(f.id, { sigla: e.target.value.toUpperCase() })}
+                          className="h-6 px-2 py-0 text-[11px] font-bold tracking-wider w-16 bg-primary text-primary-foreground border-primary placeholder:text-primary-foreground/60"
+                          placeholder="SIGLA"
+                          maxLength={8}
+                        />
+                        <Input
+                          value={facValue(f, "name")}
+                          onChange={(e) => setFacField(f.id, { name: e.target.value })}
+                          className="h-7 text-base font-semibold w-64"
+                          placeholder="Nome da faculdade"
+                        />
+                      </>
+                    ) : (
+                      <>
+                        {f.sigla && (
+                          <span className="inline-flex items-center justify-center h-6 px-2 rounded-md bg-primary text-primary-foreground text-[11px] font-bold tracking-wider shadow-sm">{f.sigla}</span>
+                        )}
+                        <p className="text-base font-semibold truncate leading-none">{f.name}</p>
+                      </>
+                    )}
+                    {/* Decano chip — same visual as coordenador chip on cursos */}
+                    <div className="flex items-center gap-1.5 px-2 py-1 rounded border border-border bg-muted/30 shrink-0">
+                      <UserCog className="w-3 h-3 text-muted-foreground" />
+                      <div className="min-w-0">
+                        <p className="text-[9px] uppercase tracking-wide text-muted-foreground leading-tight">Decano</p>
+                        {isEditing ? (
+                          <Select value={facValue(f, "decano") || undefined} onValueChange={(v) => setFacField(f.id, { decano: v })}>
+                            <SelectTrigger className="h-5 text-[11px] border-0 px-0 shadow-none focus:ring-0 gap-1 max-w-[160px]">
+                              <SelectValue placeholder={decanoOptions.length ? "Decano" : "Decano"} />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {decanoOptions.length === 0 ? (
+                                <div className="px-2 py-1.5 text-xs text-muted-foreground">Registe docentes em Configurar → Docentes.</div>
+                              ) : decanoOptions.map((d) => <SelectItem key={d} value={d} className="text-xs">{d}</SelectItem>)}
+                            </SelectContent>
+                          </Select>
+                        ) : (
+                          <p className="text-[11px] font-semibold leading-tight truncate max-w-[160px]">{f.decano || <span className="text-muted-foreground italic font-normal">Por atribuir</span>}</p>
+                        )}
+                      </div>
                     </div>
-                  ) : (
-                    <div className="flex items-baseline gap-2 flex-wrap">
-                      {f.sigla && (
-                        <span className="inline-flex items-center justify-center h-6 px-2 rounded-md bg-primary text-primary-foreground text-[11px] font-bold tracking-wider shadow-sm">{f.sigla}</span>
-                      )}
-                      <p className="text-base font-semibold truncate leading-none">{f.name}</p>
-                    </div>
-                  )}
-                  {!isEditing && (
-                    <div className="flex items-center gap-1 text-[11px] text-muted-foreground mt-0.5">
-                      <UserCog className="w-3 h-3" />
-                      <span className="font-medium text-foreground">{f.decano || "Por atribuir"}</span>
-                    </div>
-                  )}
-                  <div className="flex items-center gap-3 text-[11px] text-muted-foreground mt-1">
+                  </div>
+                  <div className="flex items-center gap-3 text-[11px] text-muted-foreground mt-1.5">
                     <span className="flex items-center gap-1"><GraduationCap className="w-3 h-3" /> {facCursos.length} cursos</span>
                     <span className="flex items-center gap-1"><Users className="w-3 h-3" /> {facCursos.reduce((a, c) => a + (c.estudantes_esperados || 0), 0)} estudantes</span>
                   </div>
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                {!isEditing && (
-                  <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-muted text-muted-foreground text-[11px] font-semibold">
-                    <Lock className="w-3 h-3" /> Bloqueado
-                  </span>
-                )}
-                <Button size="sm" variant={isEditing ? "default" : "outline"} className="gap-1 h-7" onClick={() => toggleEdit(f)}>
-                  {isEditing ? <><Check className="w-3.5 h-3.5" /> Concluir</> : <><Pencil className="w-3.5 h-3.5" /> Editar</>}
+                <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-muted text-muted-foreground text-[11px] font-semibold">
+                  <Lock className="w-3 h-3" /> Bloqueado
+                </span>
+                <Button
+                  size="sm"
+                  variant={isEditing ? "default" : "outline"}
+                  className={`gap-1 h-7 ${isEditing ? "bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm" : ""}`}
+                  onClick={() => toggleEdit(f)}
+                >
+                  {isEditing ? <><Check className="w-3.5 h-3.5" /> Confirmar</> : <><Pencil className="w-3.5 h-3.5" /> Editar</>}
                 </Button>
                 {isEditing && (
-                  <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive hover:text-destructive" onClick={async () => {
+                  <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive hover:text-destructive" onClick={async () => {
                     if (!confirm(`Eliminar a faculdade "${f.name}" e todos os seus cursos?`)) return;
                     await deleteFac.mutateAsync(f.id);
                     toast.success("Faculdade eliminada");
