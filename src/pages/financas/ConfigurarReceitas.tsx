@@ -283,7 +283,7 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
     Object.entries(raw).forEach(([k, v]) => { norm[k] = Array.isArray(v) ? v : (v ? [v] : []); });
     return norm;
   });
-  const [prazosDef, setPrazosDef] = useState<PrazoDef[]>(() => readJSON<PrazoDef[]>(PRAZOS_DEF_KEY(email), []));
+  const [prazosDef, setPrazosDef] = useState<PrazoDef[]>(() => ensureDefaults(readJSON<PrazoDef[]>(PRAZOS_DEF_KEY(email), [])));
   const [open, setOpen] = useState<Record<string, boolean>>({});
 
   useEffect(() => writeJSON(ANOS_KEY(email), anosByCurso), [anosByCurso, email]);
