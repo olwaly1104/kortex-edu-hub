@@ -108,7 +108,7 @@ export default function OnboardingPessoas({ mode }: { mode: Mode }) {
     <div className={`grid ${grid} gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b`}>
       <span>Prefixo</span><span>Primeiro nome</span><span>Último nome</span><span>Género</span><span>Contacto</span>
       {isDoc ? (<span>Grau</span>) : (<><span>Departamento</span><span>Função</span></>)}
-      <span>Módulo</span>
+      <span>Kortex?</span>
       <span>Email <span className="normal-case text-[9px] text-muted-foreground/70">(auto)</span></span>
     </div>
   );
