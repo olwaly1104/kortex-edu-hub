@@ -258,12 +258,12 @@ function DespesasSection({ email }: { email?: string | null }) {
     return raw.map((item) => ({
       id: item.id || newId(),
       nome: item.nome || "",
+      cor: item.cor || "bg-slate-100 text-slate-700 border-slate-200",
       documentos: Array.isArray(item.documentos)
         ? item.documentos
         : item.documento
           ? String(item.documento).split(/,\s*/).filter(Boolean)
           : [],
-      orcamento: Number(item.orcamento) || 0,
     }));
   });
   const [estados, setEstados] = useState<DesEstado[]>(() => readJSON<DesEstado[]>(estKey, [
