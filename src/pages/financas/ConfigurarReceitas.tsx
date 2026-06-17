@@ -1015,6 +1015,7 @@ function LineItemsBlock({
     withType && "130px",
     "140px",                     // Valor
     withTax && "150px",
+    withTaxValue && "140px",
     withUnit && "120px",
     withTarget && "140px",
     "44px",                      // Ação
