@@ -433,8 +433,9 @@ export default function AdminFaculdadesCursos() {
                   {newFac.sigla || "SIGLA"}
                 </span>
               </div>
-
+            </div>
           </div>
+
           <DialogFooter>
             <DialogClose asChild><Button variant="outline" size="sm">Cancelar</Button></DialogClose>
             <Button size="sm" onClick={submitNewFac} disabled={!newFac.name.trim() || createFac.isPending}>
