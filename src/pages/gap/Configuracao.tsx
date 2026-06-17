@@ -911,6 +911,7 @@ export default function GapConfiguracao() {
                 <thead>
                   <tr className="text-[10px] uppercase tracking-wider text-muted-foreground border-b border-border bg-muted/30">
                     <th className="text-left font-semibold px-4 py-2">Etapa</th>
+                    <th className="text-center font-semibold px-3 py-2">Agenda</th>
                     <th className="text-center font-semibold px-3 py-2">Obrigatória</th>
                     <th className="text-left font-semibold px-3 py-2">Estados possíveis</th>
                     {isCardEditing("cd-etapas") && <th className="w-12"></th>}
