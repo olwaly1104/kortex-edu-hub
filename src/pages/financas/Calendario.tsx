@@ -101,36 +101,59 @@ export default function FinancasCalendario() {
 
           {view === "week" ? (
             <Card className="overflow-hidden border">
-              <div className="grid grid-cols-[56px_repeat(5,1fr)] border-b">
-                <div className="bg-muted/20" />
+              {/* Day strip selector */}
+              <div className="grid grid-cols-5 border-b">
                 {weekDays.map((d, i) => {
                   const iso = toISO(d);
                   const isTodayCol = iso === toISO(today);
                   const isSelected = iso === toISO(selectedDate);
                   return (
-                    <div key={iso} onClick={() => setSelectedDate(d)} className={cn("py-3 text-center border-l cursor-pointer transition-colors hover:bg-primary/10", isTodayCol ? "bg-primary/5" : "bg-muted/20", isSelected && !isTodayCol && "bg-primary/10")}>
+                    <div key={iso} onClick={() => setSelectedDate(d)} className={cn("py-3 text-center border-l first:border-l-0 cursor-pointer transition-colors hover:bg-primary/10", isTodayCol ? "bg-primary/5" : "bg-muted/20", isSelected && !isTodayCol && "bg-primary/10")}>
                       <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">{DAYS[i]}</p>
                       <p className={cn("text-lg font-bold mt-0.5 w-8 h-8 flex items-center justify-center rounded-full mx-auto tabular-nums", isSelected ? "bg-primary text-primary-foreground" : isTodayCol ? "ring-2 ring-primary text-foreground" : "text-foreground")}>{d.getDate()}</p>
                     </div>
                   );
                 })}
               </div>
-              <ScrollArea className="h-[560px]">
-                <div className="grid grid-cols-[56px_repeat(5,1fr)] relative" style={{ height: totalHeight + 20 }}>
-                  <div className="relative bg-muted/5">
-                    {HOURS.map((label, i) => (
-                      <div key={label} className="absolute w-full text-[11px] text-muted-foreground text-right pr-2 leading-none tabular-nums" style={{ top: i * HOUR_HEIGHT + 10 }}>{label}</div>
+
+              {/* Agenda — vertical list of events of the selected day */}
+              <div className="p-5">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-sm font-semibold text-foreground flex items-center gap-2 capitalize">
+                    <CalendarDays className="w-4 h-4 text-primary" />
+                    {formatDateLabel(selectedDate, today)}
+                  </h3>
+                  <Button size="sm" className="gap-1.5 h-8">
+                    <Plus className="w-3.5 h-3.5" /> Criar Evento
+                  </Button>
+                </div>
+
+                {selectedDayEvents.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center text-center py-12">
+                    <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center mb-2">
+                      <CalendarIcon className="w-5 h-5 text-muted-foreground" />
+                    </div>
+                    <p className="text-sm font-medium text-foreground">Sem eventos</p>
+                    <p className="text-xs text-muted-foreground mt-1">A agenda deste dia está livre.</p>
+                  </div>
+                ) : (
+                  <div className="divide-y divide-border">
+                    {selectedDayEvents.map((event) => (
+                      <div key={event.id} className="flex items-center gap-3 py-3">
+                        <div className="w-1 h-10 rounded-full shrink-0" style={{ background: event.color }} />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold text-foreground truncate">{event.title}</p>
+                          {event.room && (
+                            <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
+                              <MapPin className="w-3 h-3" />{event.room}
+                            </p>
+                          )}
+                        </div>
+                      </div>
                     ))}
                   </div>
-                  {weekDays.map((d) => (
-                    <div key={toISO(d)} onClick={() => setSelectedDate(d)} className="border-l relative cursor-pointer">
-                      {HOURS.map((_, i) => (
-                        <div key={i} className="absolute w-full border-t border-border/20" style={{ top: i * HOUR_HEIGHT + 10 }} />
-                      ))}
-                    </div>
-                  ))}
-                </div>
-              </ScrollArea>
+                )}
+              </div>
             </Card>
           ) : (
             <Card className="overflow-hidden border">
