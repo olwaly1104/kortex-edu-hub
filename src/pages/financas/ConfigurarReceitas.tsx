@@ -12,7 +12,9 @@ import {
   ArrowLeft, Banknote, Building2, GraduationCap, Loader2, Save, AlertCircle,
   Receipt, Wallet, Plus, Trash2, TrendingUp, TrendingDown, CreditCard,
   Users, Briefcase, BookOpenCheck, Settings2, Percent, Check, FileText, FileCheck2,
+  ChevronDown,
 } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useFaculdades, useCursos, usePropinas, useUpdatePropina } from "@/lib/useInstitution";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -249,7 +251,12 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
   const updatePropina = useUpdatePropina();
   const [draft, setDraft] = useState<Record<string, { valor: string; impostoId: string }>>({});
   const [anosByCurso, setAnosByCurso] = useState<Record<string, number[]>>(() => readJSON(ANOS_KEY(email), {}));
-  const [prazoByCurso, setPrazoByCurso] = useState<Record<string, string>>(() => readJSON(PRAZO_KEY(email), {}));
+  const [prazoByCurso, setPrazoByCurso] = useState<Record<string, string[]>>(() => {
+    const raw = readJSON<Record<string, string | string[]>>(PRAZO_KEY(email), {});
+    const norm: Record<string, string[]> = {};
+    Object.entries(raw).forEach(([k, v]) => { norm[k] = Array.isArray(v) ? v : (v ? [v] : []); });
+    return norm;
+  });
   const [prazosDef, setPrazosDef] = useState<PrazoDef[]>(() => readJSON<PrazoDef[]>(PRAZOS_DEF_KEY(email), []));
   const [open, setOpen] = useState<Record<string, boolean>>({});
 
@@ -350,7 +357,13 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
                     const dirty = d !== undefined;
                     const anos = anosByCurso[c.id] ?? Array(c.years || 1).fill(bruto);
                     const isOpen = !!open[c.id];
-                    const prazoId = prazoByCurso[c.id] ?? "";
+                    const prazoIds = prazoByCurso[c.id] ?? [];
+                    const selectedPrazos = prazosDef.filter((pr) => prazoIds.includes(pr.id));
+                    const togglePrazo = (id: string) => setPrazoByCurso((s) => {
+                      const cur = s[c.id] ?? [];
+                      const next = cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id];
+                      return { ...s, [c.id]: next };
+                    });
                     return (
                       <div key={c.id}>
                         <div className="grid gap-3 px-5 py-3 items-center text-sm" style={{ gridTemplateColumns: COLS }}>
@@ -374,13 +387,38 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
                           </select>
                           <div className="h-9 flex items-center justify-end px-2 rounded-md bg-muted/30 tabular-nums font-semibold text-foreground">{fmt(liquido)} Kz</div>
                           <div className="h-9 flex items-center justify-end px-2 rounded-md bg-muted/30 tabular-nums text-xs font-medium text-muted-foreground">{fmt(liquidoAnual)} Kz</div>
-                          <select className="h-9 rounded-md border border-input bg-background px-2 text-sm"
-                            value={prazoId}
-                            disabled={prazosDef.length === 0}
-                            onChange={(e) => setPrazoByCurso((s) => ({ ...s, [c.id]: e.target.value }))}>
-                            <option value="">{prazosDef.length === 0 ? "— Defina prazos acima —" : "— Selecionar —"}</option>
-                            {prazosDef.map((pr) => <option key={pr.id} value={pr.id}>{pr.nome} · {pr.meses} meses</option>)}
-                          </select>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button variant="outline" size="sm" disabled={prazosDef.length === 0}
+                                className="h-9 w-full justify-between font-normal px-2 text-xs">
+                                <span className="truncate">
+                                  {prazosDef.length === 0
+                                    ? "— Defina prazos acima —"
+                                    : selectedPrazos.length === 0
+                                      ? "— Nenhum —"
+                                      : selectedPrazos.length === 1
+                                        ? `${selectedPrazos[0].meses} meses`
+                                        : `${selectedPrazos.length} opções`}
+                                </span>
+                                <ChevronDown className="w-3.5 h-3.5 opacity-60 shrink-0" />
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-64 p-2" align="end">
+                              <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground px-2 py-1.5">Prazos disponíveis ao estudante</p>
+                              <div className="space-y-0.5 max-h-64 overflow-auto">
+                                {prazosDef.map((pr) => {
+                                  const checked = prazoIds.includes(pr.id);
+                                  return (
+                                    <label key={pr.id} className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-muted/50 cursor-pointer text-sm">
+                                      <Checkbox checked={checked} onCheckedChange={() => togglePrazo(pr.id)} />
+                                      <span className="flex-1 truncate">{pr.nome}</span>
+                                      <span className="text-xs text-muted-foreground tabular-nums">{pr.meses} m</span>
+                                    </label>
+                                  );
+                                })}
+                              </div>
+                            </PopoverContent>
+                          </Popover>
                           <div className="flex justify-end gap-1">
                             <Button size="sm" variant="ghost" className="h-8 px-2 text-xs"
                               onClick={() => setOpen((s) => ({ ...s, [c.id]: !isOpen }))}>
