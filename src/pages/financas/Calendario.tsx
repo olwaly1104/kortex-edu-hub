@@ -205,47 +205,6 @@ export default function FinancasCalendario() {
             )}
           </Card>
 
-          <div>
-            <div className="flex items-center justify-between mb-3">
-              <Button variant="ghost" size="icon" className="w-7 h-7" onClick={() => { const d = new Date(selectedDate); d.setDate(d.getDate() - 1); setSelectedDate(d); }}>
-                <ChevronLeft className="w-4 h-4" />
-              </Button>
-              <h3 className="text-sm font-bold text-foreground flex items-center gap-2 capitalize">
-                <CalendarDays className="w-4 h-4 text-primary" />
-                {formatDateLabel(selectedDate, today)}
-              </h3>
-              <Button variant="ghost" size="icon" className="w-7 h-7" onClick={() => { const d = new Date(selectedDate); d.setDate(d.getDate() + 1); setSelectedDate(d); }}>
-                <ChevronRight className="w-4 h-4" />
-              </Button>
-            </div>
-
-            {selectedDayEvents.length === 0 ? (
-              <Card className="p-5">
-                <div className="flex flex-col items-center justify-center text-center py-6">
-                  <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center mb-2">
-                    <CalendarIcon className="w-5 h-5 text-muted-foreground" />
-                  </div>
-                  <p className="text-sm font-medium text-foreground">Sem eventos</p>
-                  <p className="text-xs text-muted-foreground mt-1">A agenda deste dia está livre.</p>
-                </div>
-              </Card>
-            ) : (
-              <div className="space-y-3">
-                {selectedDayEvents.map(event => (
-                  <Card key={event.id} className="overflow-hidden">
-                    <div className="h-1" style={{ backgroundColor: event.color }} />
-                    <div className="p-3.5">
-                      <p className="text-sm font-bold text-foreground truncate mb-2">{event.title}</p>
-                      <div className="space-y-1.5">
-                        <div className="flex items-center gap-2 text-[11px] text-muted-foreground"><Clock className="w-3 h-3" /><span className="tabular-nums">{event.startTime} – {event.endTime}</span></div>
-                        {event.room && <div className="flex items-center gap-2 text-[11px] text-muted-foreground"><MapPin className="w-3 h-3" /><span>{event.room}</span></div>}
-                      </div>
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            )}
-          </div>
         </div>
       </div>
     </div>
