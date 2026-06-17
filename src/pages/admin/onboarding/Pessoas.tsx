@@ -226,10 +226,6 @@ export default function OnboardingPessoas({ mode }: { mode: Mode }) {
           <p className="text-xs text-muted-foreground">Registos</p>
           <p className="text-lg font-semibold">{rows.length}</p>
         </div>
-        <Button onClick={saveAll} disabled={saving || rows.length === 0} size="sm" className="gap-1.5">
-          {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
-          Guardar registos
-        </Button>
       </div>
 
       <Tabs defaultValue="manual" className="space-y-4">
