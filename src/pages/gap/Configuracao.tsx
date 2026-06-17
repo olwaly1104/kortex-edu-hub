@@ -820,8 +820,8 @@ export default function GapConfiguracao() {
               </div>
               <div>
                 <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Taxa de candidatura (Kz)</label>
-                <Input type="number" min={0} step={500} value={cdTaxa} disabled={!isCardEditing("cd-params")} onChange={e => setCdTaxa(e.target.value === "" ? "" : Number(e.target.value))} />
-                <p className="text-[10px] text-muted-foreground mt-1">Valor pago no acto de submissão</p>
+                <Input type="number" min={0} step={500} value={cdTaxa} disabled readOnly onChange={e => setCdTaxa(e.target.value === "" ? "" : Number(e.target.value))} />
+                <p className="text-[10px] text-muted-foreground mt-1">Definido em Finanças · apenas leitura</p>
               </div>
               <div>
                 <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Máx. opções de curso</label>
