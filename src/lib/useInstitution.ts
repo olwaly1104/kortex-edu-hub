@@ -6,6 +6,7 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { provisionKortexUser } from "@/lib/accountProvisioning";
 
 export type FaculdadeRow = {
   id: string;
@@ -384,28 +385,9 @@ export type EstudanteInput = {
   enc_telefone?: string | null;
 };
 
-// Generate a default initial password for auto-provisioned student accounts.
-// The admin can recover it later via the dev-credentials drawer.
-function autoPassword() {
-  return "Aluno@" + Math.random().toString(36).slice(2, 8);
-}
-
 async function provisionStudentAccount(name: string, email: string) {
   try {
-    const password = autoPassword();
-    const { data, error } = await supabase.functions.invoke("admin-create-user", {
-      body: { email, password, name, modulo: "estudante" },
-    });
-    const serverError = (data && typeof data === "object" && "error" in data) ? (data as any).error : null;
-    if (error || serverError) {
-      // Account already exists or other non-fatal — log, don't break student creation.
-      console.warn("provisionStudentAccount:", serverError || error?.message);
-      return;
-    }
-    try {
-      const { saveDevCred } = await import("@/lib/devCreds");
-      saveDevCred({ email, password, modulo: "estudante", name });
-    } catch { /* ignore */ }
+    await provisionKortexUser({ name, email, modulo: "estudante" });
   } catch (e: any) {
     console.warn("provisionStudentAccount failed:", e?.message);
   }

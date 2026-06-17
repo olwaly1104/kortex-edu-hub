@@ -7,6 +7,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Users, Plus, Search, Trash2, ShieldCheck, Loader2, User } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { OnboardingStepBanner, markOnboardingStepDone } from "@/components/admin/OnboardingStepBanner";
+import { provisionKortexUser } from "@/lib/accountProvisioning";
 
 type StoredUser = {
   id: string;
@@ -75,15 +77,15 @@ export default function AdminUtilizadores() {
   const refetchServer = async () => {
     const { data, error } = await supabase.rpc("list_institution_contacts");
     if (error || !Array.isArray(data)) return;
-    setServerRows(
-      (data as any[]).map((r) => ({
+    const mapped = (data as any[]).map((r) => ({
         id: r.id,
         name: r.display_name || r.email,
         email: r.email,
         modulo: r.modulo || "estudante",
         createdAt: 0,
-      })),
-    );
+      }));
+    setServerRows(mapped);
+    if (mapped.length > 0) markOnboardingStepDone(user?.email, "est.imp");
   };
   useEffect(() => { refetchServer(); }, [user?.id]);
 
@@ -138,44 +140,7 @@ export default function AdminUtilizadores() {
     }
     setSubmitting(true);
     try {
-      const { data, error } = await supabase.functions.invoke("admin-create-user", {
-        body: {
-          email: autoEmail,
-          password: form.password,
-          name: fullName,
-          modulo: form.modulo,
-        },
-      });
-      const serverError = (data && typeof data === "object" && "error" in data) ? (data as any).error : null;
-      if (serverError) {
-        setErr(String(serverError));
-        return;
-      }
-      if (error) {
-        let message = error.message || "Falha ao criar utilizador.";
-        const context = (error as any).context;
-        if (context?.json) {
-          const body = await context.json().catch(() => null);
-          if (body?.error) message = String(body.error);
-        } else if (context?.text) {
-          const body = await context.text().catch(() => "");
-          if (body) {
-            try {
-              const parsed = JSON.parse(body);
-              if (parsed?.error) message = String(parsed.error);
-            } catch {
-              message = body;
-            }
-          }
-        }
-        setErr(message);
-        return;
-      }
-      const created = data?.user as { id: string; email: string; name: string; modulo: string } | undefined;
-      if (!created?.id) {
-        setErr("Resposta inesperada do servidor.");
-        return;
-      }
+      const created = await provisionKortexUser({ email: autoEmail, password: form.password, name: fullName, modulo: form.modulo });
       const newRow: StoredUser = {
         id: created.id,
         name: created.name,
@@ -184,13 +149,12 @@ export default function AdminUtilizadores() {
         createdAt: Date.now(),
       };
       setRows((prev) => [...prev, newRow]);
-      try {
-        const { saveDevCred } = await import("@/lib/devCreds");
-        saveDevCred({ email: created.email, password: form.password, modulo: created.modulo, name: created.name });
-      } catch { /* ignore */ }
+      markOnboardingStepDone(user?.email, "est.imp");
       setForm({ primeiroNome: "", ultimoNome: "", password: "", modulo: "estudante" });
       setOpen(false);
       refetchServer();
+    } catch (e: any) {
+      setErr(e?.message ?? "Falha ao criar utilizador.");
     } finally {
       setSubmitting(false);
     }
@@ -221,6 +185,7 @@ export default function AdminUtilizadores() {
 
   return (
     <div className="p-6 space-y-6 max-w-6xl mx-auto">
+      <OnboardingStepBanner />
       <FinHeader
         title="Utilizadores"
         subtitle="Todas as contas de acesso ao portal da instituição"

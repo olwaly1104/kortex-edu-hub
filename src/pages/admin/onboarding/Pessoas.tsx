@@ -1,12 +1,15 @@
 import { useState } from "react";
-import { OnboardingStepBanner } from "@/components/admin/OnboardingStepBanner";
+import { OnboardingStepBanner, markOnboardingStepDone } from "@/components/admin/OnboardingStepBanner";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Upload, UserPlus, GraduationCap, Briefcase } from "lucide-react";
+import { Upload, UserPlus, GraduationCap, Briefcase, Loader2, Save } from "lucide-react";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
+import { provisionKortexUser } from "@/lib/accountProvisioning";
+import { saveDocentes, saveStaff } from "@/lib/peopleStorage";
 
 type Mode = "docentes" | "staff";
 
@@ -40,7 +43,9 @@ const emailFrom = (pn: string, un: string) => {
 };
 
 export default function OnboardingPessoas({ mode }: { mode: Mode }) {
+  const { user } = useAuth();
   const isDoc = mode === "docentes";
+  const [saving, setSaving] = useState(false);
 
   const seed: Person[] = [];
 
@@ -96,6 +101,57 @@ export default function OnboardingPessoas({ mode }: { mode: Mode }) {
     });
     setRows(prev => [...prev, ...generated]);
     toast.success(`${generated.length} ${isDoc ? "docentes" : "funcionários"} importados`);
+  };
+
+  const staffModulo = (departamento?: string) => {
+    const d = (departamento || "").toLowerCase();
+    if (d.includes("fin")) return "financas";
+    if (d.includes("gap")) return "gap";
+    if (d.includes("acad")) return "academica";
+    return "academica";
+  };
+
+  const saveAll = async () => {
+    const valid = rows.filter((r) => r.primeiroNome.trim() && r.ultimoNome.trim());
+    if (valid.length === 0) { toast.error("Adicione pelo menos um registo válido"); return; }
+    setSaving(true);
+    try {
+      if (isDoc) {
+        saveDocentes(valid.map((r) => ({
+          id: r.id,
+          prefixo: r.prefixo || "Prof.",
+          primeiroNome: r.primeiroNome,
+          ultimoNome: r.ultimoNome,
+          email: r.email,
+          contacto: r.contacto || "",
+          faculdade: "",
+          categoria: r.grau || "Assistente",
+          cargo: "Docente",
+        })));
+      } else {
+        saveStaff(valid.map((r) => ({
+          id: r.id,
+          prefixo: r.prefixo || "Sr.",
+          primeiroNome: r.primeiroNome,
+          ultimoNome: r.ultimoNome,
+          email: r.email,
+          contacto: r.contacto || "",
+          departamento: r.departamento || departamentosPool[0],
+          funcao: r.funcao || funcoesPool[0],
+          moduloKortex: r.kortex ? staffModulo(r.departamento) : "Não",
+        })));
+      }
+      await Promise.all(valid.filter((r) => r.kortex && r.email).map((r) => provisionKortexUser({
+        name: `${r.primeiroNome} ${r.ultimoNome}`.trim(),
+        email: r.email,
+        modulo: isDoc ? "professor" : staffModulo(r.departamento),
+      }).catch((e) => console.warn("provision pessoa failed:", e?.message))));
+      markOnboardingStepDone(user?.email, isDoc ? "rh.doc" : "rh.staff");
+      window.dispatchEvent(new Event("storage"));
+      toast.success(`${valid.length} ${isDoc ? "docentes" : "funcionários"} guardados`);
+    } finally {
+      setSaving(false);
+    }
   };
 
   const HeaderIcon = isDoc ? GraduationCap : Briefcase;
@@ -170,6 +226,10 @@ export default function OnboardingPessoas({ mode }: { mode: Mode }) {
           <p className="text-xs text-muted-foreground">Registos</p>
           <p className="text-lg font-semibold">{rows.length}</p>
         </div>
+        <Button onClick={saveAll} disabled={saving || rows.length === 0} size="sm" className="gap-1.5">
+          {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+          Guardar registos
+        </Button>
       </div>
 
       <Tabs defaultValue="manual" className="space-y-4">

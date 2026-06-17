@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { FinHeader } from "@/pages/financas/_FinHeader";
 import { useAuth } from "@/contexts/AuthContext";
-import { onboardingKey, progressKey, profileKey, isOnboardingCompleteFor, clearAdminStateBackend } from "@/lib/onboardingStorage";
+import { onboardingKey, progressKey, profileKey, isOnboardingCompleteFor, clearAdminStateBackend, pushProgress } from "@/lib/onboardingStorage";
 import {
   Building2, LifeBuoy, BookOpen, ArrowRight, CheckCircle2,
   RotateCcw, ShieldCheck, GraduationCap, CalendarDays,
@@ -124,19 +124,34 @@ export default function AdminInicio() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const storedProgress = readProgress(user?.email);
-  const [estudantesCount, setEstudantesCount] = useState<number>(0);
+  const [realCounts, setRealCounts] = useState({ users: 0, faculdades: 0, cursos: 0, cadeiras: 0, propinas: 0 });
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const { count } = await supabase
-        .from("estudantes")
-        .select("id", { count: "exact", head: true });
+      const [contacts, fac, cur, cad, prop] = await Promise.all([
+        (supabase as any).rpc("list_institution_contacts"),
+        supabase.from("faculdades").select("id", { count: "exact", head: true }),
+        supabase.from("cursos").select("id", { count: "exact", head: true }),
+        (supabase.from("cadeiras" as any) as any).select("id", { count: "exact", head: true }),
+        supabase.from("propinas").select("id", { count: "exact", head: true }),
+      ]);
       if (cancelled) return;
-      const c = count ?? 0;
-      setEstudantesCount(c);
-      // Clean any stale est.imp=true left in localStorage when there are no estudantes.
-      if (c === 0) {
+      const usersCount = Array.isArray(contacts.data) ? contacts.data.length : 0;
+      setRealCounts({ users: usersCount, faculdades: fac.count ?? 0, cursos: cur.count ?? 0, cadeiras: cad.count ?? 0, propinas: prop.count ?? 0 });
+      try {
+        const raw = localStorage.getItem(progressKey(user?.email));
+        const p = raw ? JSON.parse(raw) : {};
+        if (usersCount > 0) p["est.imp"] = true;
+        if ((fac.count ?? 0) > 0) p["aca.fac"] = true;
+        if ((cur.count ?? 0) > 0) p["aca.cur"] = true;
+        if ((cad.count ?? 0) > 0) p["aca.cad"] = true;
+        if ((prop.count ?? 0) > 0) p["fin.pro"] = true;
+        localStorage.setItem(progressKey(user?.email), JSON.stringify(p));
+        pushProgress(user?.email, p);
+      } catch { /* ignore */ }
+      // Clean stale est.imp=true only when there are no real created users.
+      if (usersCount === 0) {
         try {
           const raw = localStorage.getItem(progressKey(user?.email));
           if (raw) {
@@ -154,11 +169,15 @@ export default function AdminInicio() {
 
   // Derive progress from reality, not just from localStorage clicks:
   // - inst.reg: done iff institutional registration was completed.
-  // - est.imp: done iff there is at least one estudante in the DB.
+  // - est.imp: done iff there is at least one real user account in the database.
   const progress: Record<string, boolean> = {
     ...storedProgress,
     "inst.reg": storedProgress["inst.reg"] || isOnboardingCompleteFor(user?.email),
-    "est.imp": estudantesCount > 0,
+    "est.imp": realCounts.users > 0,
+    "aca.fac": realCounts.faculdades > 0,
+    "aca.cur": realCounts.cursos > 0,
+    "aca.cad": realCounts.cadeiras > 0,
+    "fin.pro": storedProgress["fin.pro"] || realCounts.propinas > 0,
   };
   const doneCount = ALL_STEPS.filter((t) => progress[t.key]).length;
   const pct = Math.round((doneCount / ALL_STEPS.length) * 100);

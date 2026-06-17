@@ -1,4 +1,4 @@
-import { OnboardingStepBanner, useIsOnboardingStep } from "@/components/admin/OnboardingStepBanner";
+import { OnboardingStepBanner, markOnboardingStepDone, useIsOnboardingStep } from "@/components/admin/OnboardingStepBanner";
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft, Check, CalendarDays, Plus, Trash2, Wand2, Sparkles, Sun, BookOpen, FileSignature, Coffee, Star } from "lucide-react";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
 
 type EventoTipo = "semestre" | "exames" | "ferias" | "feriado" | "especial";
 type Evento = {
@@ -56,6 +57,7 @@ const buildAuto = (startISO: string, endISO: string): Evento[] => {
 
 export default function CalendarioAcademico() {
   const isOnboarding = useIsOnboardingStep();
+  const { user } = useAuth();
   const [anoLetivo, setAnoLetivo] = useState("2025/2026");
   const [inicio, setInicio] = useState("2025-09-01");
   const [fim, setFim] = useState("2026-07-31");
@@ -65,6 +67,11 @@ export default function CalendarioAcademico() {
   const regenerate = () => {
     setEventos(buildAuto(inicio, fim));
     toast.success("Calendário regenerado automaticamente");
+  };
+
+  const confirmCalendar = () => {
+    markOnboardingStepDone(user?.email, "aca.cal");
+    toast.success("Calendário académico confirmado");
   };
 
   const update = (id: string, patch: Partial<Evento>) =>
@@ -110,7 +117,7 @@ export default function CalendarioAcademico() {
       <OnboardingStepBanner actions={
         <>
           <Button onClick={regenerate} size="sm" variant="outline" className="gap-1 h-8"><Wand2 className="w-3.5 h-3.5" /> Regenerar</Button>
-          <Button onClick={() => toast.success("Calendário académico confirmado")} size="sm" variant="outline" className="gap-1 h-8"><Check className="w-3.5 h-3.5" /> Confirmar</Button>
+          <Button onClick={confirmCalendar} size="sm" variant="outline" className="gap-1 h-8"><Check className="w-3.5 h-3.5" /> Confirmar</Button>
         </>
       } />
       {!isOnboarding && (
@@ -128,7 +135,7 @@ export default function CalendarioAcademico() {
             </div>
             <div className="flex gap-2">
               <Button variant="outline" onClick={regenerate} className="gap-2"><Wand2 className="w-4 h-4" /> Regenerar Automático</Button>
-              <Button onClick={() => toast.success("Calendário académico confirmado")} className="gap-2"><Check className="w-4 h-4" /> Confirmar</Button>
+              <Button onClick={confirmCalendar} className="gap-2"><Check className="w-4 h-4" /> Confirmar</Button>
             </div>
           </div>
         </div>

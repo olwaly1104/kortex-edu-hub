@@ -94,10 +94,25 @@ Deno.serve(async (req) => {
       email_confirm: true,
       user_metadata: { display_name: name, modulo },
     });
-    if (createErr || !created.user) {
-      return json({ error: createErr?.message ?? "Falha ao criar utilizador." }, 400);
+    let newUserId = created.user?.id;
+    if (createErr || !newUserId) {
+      const alreadyExists = /already|registered|exists/i.test(createErr?.message ?? "");
+      if (!alreadyExists) {
+        return json({ error: createErr?.message ?? "Falha ao criar utilizador." }, 400);
+      }
+      const { data: existingProfile, error: existingErr } = await admin
+        .from("profiles")
+        .select("id,institution_id")
+        .eq("email", email)
+        .maybeSingle();
+      if (existingErr || !existingProfile?.id) {
+        return json({ error: "Este email já existe na autenticação, mas ainda não tem perfil ligado. Crie com outro email." }, 409);
+      }
+      if (existingProfile.institution_id && existingProfile.institution_id !== callerId) {
+        return json({ error: "Este email já pertence a outra instituição." }, 409);
+      }
+      newUserId = existingProfile.id;
     }
-    const newUserId = created.user.id;
 
     // Force the new user to change the admin-provided password on first sign-in.
     const { error: profileErr } = await admin.from("profiles").upsert(
@@ -117,7 +132,7 @@ Deno.serve(async (req) => {
 
     const { error: roleErr } = await admin
       .from("user_roles")
-      .insert({ user_id: newUserId, role: modulo });
+      .upsert({ user_id: newUserId, role: modulo }, { onConflict: "user_id,role" });
     if (roleErr) {
       console.error("user_roles insert failed:", roleErr.message);
       return json({ error: "Conta criada mas falhou ao atribuir módulo: " + roleErr.message }, 500);

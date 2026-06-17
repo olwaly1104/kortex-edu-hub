@@ -1,5 +1,5 @@
 import { FinHeader } from "@/pages/financas/_FinHeader";
-import { OnboardingStepBanner } from "@/components/admin/OnboardingStepBanner";
+import { OnboardingStepBanner, markOnboardingStepDone } from "@/components/admin/OnboardingStepBanner";
 import { Building2, Lock, LockOpen, Pencil, Check, GraduationCap, Users, UserCog, Plus, X, Loader2, Trash2, Palette } from "lucide-react";
 import { FaculdadeSiglaTag } from "@/components/faculdade/FaculdadeSiglaTag";
 import {
@@ -25,8 +25,10 @@ import {
   type FaculdadeRow, type CursoRow,
 } from "@/lib/useInstitution";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function AdminFaculdadesCursos() {
+  const { user } = useAuth();
   const facsQ = useFaculdades();
   const cursosQ = useCursos();
   const createFac = useCreateFaculdade();
@@ -77,6 +79,7 @@ export default function AdminFaculdadesCursos() {
     if (!newFac.name.trim()) return;
     try {
       await createFac.mutateAsync({ name: newFac.name, sigla: newFac.sigla, decano: newFac.decano, color: newFac.color });
+      markOnboardingStepDone(user?.email, "aca.fac");
       setNewFac({ name: "", sigla: "", decano: "", color: FAC_COLORS[0] });
       setOpenAddFac(false);
       toast.success("Faculdade criada");
@@ -104,6 +107,7 @@ export default function AdminFaculdadesCursos() {
         estudantes_esperados: 0,
         coordenador: newCurso.coordenador,
       });
+      markOnboardingStepDone(user?.email, "aca.cur");
       setNewCurso({ name: "", code: "", years: 4, coordenador: "" });
       setOpenAddCurso(null);
       toast.success("Curso criado (propina iniciada em 0 Kz)");

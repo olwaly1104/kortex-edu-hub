@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { OnboardingStepBanner } from "@/components/admin/OnboardingStepBanner";
+import { OnboardingStepBanner, markOnboardingStepDone } from "@/components/admin/OnboardingStepBanner";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { MapPin, Plus, Trash2, Navigation } from "lucide-react";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
 
 type Geoponto = {
   id: string;
@@ -16,6 +17,7 @@ type Geoponto = {
 };
 
 export default function OnboardingGeopontos() {
+  const { user } = useAuth();
   const [pontos, setPontos] = useState<Geoponto[]>([]);
 
   const add = () => {
@@ -27,6 +29,12 @@ export default function OnboardingGeopontos() {
   const update = (id: string, patch: Partial<Geoponto>) =>
     setPontos(prev => prev.map(p => p.id === id ? { ...p, ...patch } : p));
   const remove = (id: string) => setPontos(prev => prev.filter(p => p.id !== id));
+
+  const save = () => {
+    if (pontos.length === 0) { toast.error("Adicione pelo menos um geoponto"); return; }
+    markOnboardingStepDone(user?.email, "geo.reg");
+    toast.success("Geopontos guardados");
+  };
 
   const useCurrent = (id: string) => {
     if (!navigator.geolocation) { toast.error("Geolocalização não suportada"); return; }
@@ -99,6 +107,9 @@ export default function OnboardingGeopontos() {
           </div>
         )}
       </Card>
+      <div className="flex justify-end">
+        <Button onClick={save}>Guardar geopontos</Button>
+      </div>
     </div>
   );
 }
