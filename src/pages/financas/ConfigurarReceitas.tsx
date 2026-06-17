@@ -231,22 +231,15 @@ function PrazosBlock({ prazos, setPrazos }: { prazos: PrazoDef[]; setPrazos: Rea
                 onChange={(e) => setPrazos((s) => s.map((x) => x.id === p.id ? { ...x, nome: e.target.value } : x))} />
               {p.locked && <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted px-1.5 py-0.5 rounded shrink-0">Padrão</span>}
             </div>
-            {p.locked ? (
-              <div className="h-9 flex items-center px-3 rounded-md bg-muted/40 text-sm font-medium text-foreground tabular-nums">
-                Prazo {p.meses} {p.meses === 1 ? "mês" : "meses"}
-              </div>
-            ) : (
-              <div className="flex items-center gap-2">
-                <Input type="number" min={1} max={36} className="h-9 w-20 tabular-nums" value={p.meses}
-                  onChange={(e) => setPrazos((s) => s.map((x) => x.id === p.id ? { ...x, meses: Number(e.target.value) || 1 } : x))} />
-                <span className="text-xs text-muted-foreground">meses</span>
-              </div>
-            )}
+            <div className="flex items-center gap-2">
+              <Input type="number" min={1} max={36} className="h-9 w-20 tabular-nums" value={p.meses}
+                disabled={p.locked}
+                onChange={(e) => setPrazos((s) => s.map((x) => x.id === p.id ? { ...x, meses: Number(e.target.value) || 1 } : x))} />
+              <span className="text-xs text-muted-foreground">meses</span>
+            </div>
             <div className="flex justify-end">
-              {!p.locked && (
-                <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                  onClick={() => setPrazos((s) => s.filter((x) => x.id !== p.id))}><Trash2 className="w-3.5 h-3.5" /></Button>
-              )}
+              <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                onClick={() => setPrazos((s) => s.filter((x) => x.id !== p.id))}><Trash2 className="w-3.5 h-3.5" /></Button>
             </div>
           </div>
         ))}
