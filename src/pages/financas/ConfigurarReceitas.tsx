@@ -244,7 +244,7 @@ function PropinasBlock({ onAddCursos }: { onAddCursos: () => void }) {
 
 /* ═══════════════════════════════ DESPESAS ═════════════════════════════════ */
 
-type DesCategoria = { id: string; nome: string; documentos: string[]; orcamento: number };
+type DesCategoria = { id: string; nome: string; cor: string; documentos: string[] };
 type DesEstado = { id: string; nome: string; cor: string };
 type DesResp = { id: string; pessoa: string; categoria: string; limite: number };
 
