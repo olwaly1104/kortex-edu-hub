@@ -1,4 +1,4 @@
-import { OnboardingStepBanner, useIsOnboardingStep } from "@/components/admin/OnboardingStepBanner";
+import { OnboardingStepBanner, markOnboardingStepDone, useIsOnboardingStep } from "@/components/admin/OnboardingStepBanner";
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Card } from "@/components/ui/card";
@@ -12,7 +12,7 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { Settings2, Plus, Layers, AlertCircle, FileText, Trash2, Pencil, CalendarClock, GraduationCap, MapPin, Clock, FileCheck2, Unlock } from "lucide-react";
+import { Settings2, Plus, Layers, AlertCircle, FileText, Trash2, Pencil, CalendarClock, GraduationCap, MapPin, Clock, FileCheck2, Unlock, Check } from "lucide-react";
 import {
   tipoConfig as initialTipoConfig,
   categoriaConfig as initialCategoriaConfig,
@@ -23,6 +23,7 @@ import { candidaturas as allCandidaturas } from "@/data/admissoesData";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { FinHeader } from "@/pages/financas/_FinHeader";
+import { useAuth } from "@/contexts/AuthContext";
 
 type EstadoItem = { key: string; label: string; color: string };
 type CategoriaItem = { key: string; label: string; color: string };
@@ -63,9 +64,11 @@ const defaultResponsavelByDestino = (destino: string) => {
 
 export default function GapConfiguracao() {
   const isOnboarding = useIsOnboardingStep();
+  const { user } = useAuth();
   const [searchParams] = useSearchParams();
   const tabParam = searchParams.get("tab");
   const initialTab = tabParam === "agendamentos" || tabParam === "candidaturas" ? tabParam : "solicitacoes";
+  const [tab, setTab] = useState(initialTab);
   const { toast } = useToast();
 
   // Per-card edit lock
@@ -303,6 +306,12 @@ export default function GapConfiguracao() {
   };
   const removeCdSessao = (key: string) => setCdSessoes(s => s.filter(x => x.key !== key));
 
+  const confirmCurrentStep = () => {
+    const key = tab === "agendamentos" ? "gap.age" : tab === "candidaturas" ? "gap.cand" : "gap.sol";
+    markOnboardingStepDone(user?.email, key);
+    toast({ title: "Configuração confirmada" });
+  };
+
   // helper components
   const EditIcon = ({ onClick, label, editing }: { onClick: () => void; label: string; editing: boolean }) =>
     editing ? (
@@ -328,8 +337,13 @@ export default function GapConfiguracao() {
           icon={<Settings2 className="w-6 h-6 text-primary" />}
         />
       )}
+      {isOnboarding && (
+        <div className="flex justify-end">
+          <Button size="sm" onClick={confirmCurrentStep} className="gap-1.5"><Check className="w-3.5 h-3.5" /> Confirmar passo</Button>
+        </div>
+      )}
 
-      <Tabs defaultValue={initialTab} className="space-y-6">
+      <Tabs value={tab} onValueChange={setTab} className="space-y-6">
         <TabsList className="grid grid-cols-3 w-full max-w-2xl">
           <TabsTrigger value="solicitacoes" className="gap-1.5"><FileText className="w-3.5 h-3.5" /> Solicitações</TabsTrigger>
           <TabsTrigger value="agendamentos" className="gap-1.5"><CalendarClock className="w-3.5 h-3.5" /> Agendamentos</TabsTrigger>
