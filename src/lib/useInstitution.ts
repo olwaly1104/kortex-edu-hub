@@ -11,6 +11,7 @@ export type FaculdadeRow = {
   id: string;
   owner_user_id: string;
   name: string;
+  sigla: string | null;
   decano: string | null;
   created_at: string;
   updated_at: string;
