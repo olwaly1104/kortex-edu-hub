@@ -190,7 +190,6 @@ export default function FinancasCalendario() {
   const [weekStart, setWeekStart] = useState<Date>(startOfWeek(today));
   const [monthCursor, setMonthCursor] = useState<Date>(new Date(today.getFullYear(), today.getMonth(), 1));
 
-  const totalHeight = (HOURS.length - 1) * HOUR_HEIGHT;
 
   const weekDays = useMemo(
     () => Array.from({ length: 5 }, (_, i) => {
