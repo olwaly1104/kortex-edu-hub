@@ -65,7 +65,18 @@ export default function AdminOnboarding() {
   const navigate = useNavigate();
   const STORAGE = onboardingKey(user?.email);
   const [state, setState] = useState<OnboardingState>(() => {
-    return readOnboardingStateFor(initial, user?.email);
+    const stored = readOnboardingStateFor(initial, user?.email);
+    // Deep-merge `dados` so updated defaults (name spelling, pre-uploaded
+    // logo) always win over stale per-account snapshots from localStorage.
+    const mergedDados = { ...initial.dados, ...(stored as any).dados };
+    if (!mergedDados.logoDataUrl) mergedDados.logoDataUrl = initial.dados.logoDataUrl;
+    if (
+      !mergedDados.nome ||
+      mergedDados.nome === "Universidade Privada de Angola"
+    ) {
+      mergedDados.nome = initial.dados.nome;
+    }
+    return { ...initial, ...stored, dados: mergedDados };
   });
   const [success, setSuccess] = useState(false);
   const [activating, setActivating] = useState(false);
