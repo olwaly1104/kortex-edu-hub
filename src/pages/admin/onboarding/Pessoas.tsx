@@ -143,11 +143,14 @@ export default function OnboardingPessoas({ mode }: { mode: Mode }) {
           </Select>
         </>
       )}
-      <Select value={r.moduloKortex || ""} onValueChange={v => update(r.id, { moduloKortex: v })}>
-        <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="—" /></SelectTrigger>
-        <SelectContent>{modulosKortexPool.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}</SelectContent>
+      <Select value={r.kortex ? "sim" : "nao"} onValueChange={v => update(r.id, { kortex: v === "sim" })}>
+        <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+        <SelectContent>
+          <SelectItem value="sim">Sim</SelectItem>
+          <SelectItem value="nao">Não</SelectItem>
+        </SelectContent>
       </Select>
-      <Input value={r.email} readOnly disabled className="h-8 text-xs bg-muted/40 cursor-not-allowed" placeholder="auto @upra.kor" />
+      <Input value={r.kortex ? r.email : "—"} readOnly disabled className="h-8 text-xs bg-muted/40 cursor-not-allowed" placeholder={r.kortex ? "auto @upra.kor" : "sem acesso"} />
     </div>
   );
 
