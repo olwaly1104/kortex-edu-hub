@@ -384,6 +384,33 @@ export type EstudanteInput = {
   enc_telefone?: string | null;
 };
 
+// Generate a default initial password for auto-provisioned student accounts.
+// The admin can recover it later via the dev-credentials drawer.
+function autoPassword() {
+  return "Aluno@" + Math.random().toString(36).slice(2, 8);
+}
+
+async function provisionStudentAccount(name: string, email: string) {
+  try {
+    const password = autoPassword();
+    const { data, error } = await supabase.functions.invoke("admin-create-user", {
+      body: { email, password, name, modulo: "estudante" },
+    });
+    const serverError = (data && typeof data === "object" && "error" in data) ? (data as any).error : null;
+    if (error || serverError) {
+      // Account already exists or other non-fatal — log, don't break student creation.
+      console.warn("provisionStudentAccount:", serverError || error?.message);
+      return;
+    }
+    try {
+      const { saveDevCred } = await import("@/lib/devCreds");
+      saveDevCred({ email, password, modulo: "estudante", name });
+    } catch { /* ignore */ }
+  } catch (e: any) {
+    console.warn("provisionStudentAccount failed:", e?.message);
+  }
+}
+
 export function useCreateEstudante() {
   const qc = useQueryClient();
   return useMutation({
@@ -401,9 +428,15 @@ export function useCreateEstudante() {
         .select()
         .single();
       if (error) throw error;
-      return data as EstudanteRow;
+      const row = data as EstudanteRow;
+      // Every student becomes a Kortex user automatically.
+      await provisionStudentAccount(input.nome, input.email);
+      return row;
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: KEY_EST }); },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: KEY_EST });
+      qc.invalidateQueries({ queryKey: ["institution-contacts"] });
+    },
   });
 }
 
@@ -425,9 +458,14 @@ export function useBulkCreateEstudantes() {
         .insert(rows)
         .select();
       if (error) throw error;
+      // Provision auth accounts in parallel — failures are non-fatal.
+      await Promise.all(inputs.map((i) => provisionStudentAccount(i.nome, i.email)));
       return (data ?? []) as EstudanteRow[];
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: KEY_EST }); },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: KEY_EST });
+      qc.invalidateQueries({ queryKey: ["institution-contacts"] });
+    },
   });
 }
 
