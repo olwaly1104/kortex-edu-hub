@@ -49,10 +49,10 @@ const GROUPS: Group[] = [
     id: "est",
     area: "Utilizadores",
     title: "Criar Utilizadores",
-    subtitle: "Importar e registar discentes da instituição",
+    subtitle: "Criar contas de acesso para staff, docentes e estudantes",
     icon: Users,
     steps: [
-      { key: "est.imp", title: "Importar discentes", desc: "Carregar lista de discentes em lote (CSV/Excel).", icon: Upload, path: "/admin/onboarding/estudantes?step=est.imp" },
+      { key: "est.imp", title: "Criar contas de utilizadores", desc: "Adicionar contas reais ligadas à cloud para qualquer perfil (estudante, professor, staff, etc.).", icon: UserPlus, path: "/admin/utilizadores?step=est.imp" },
     ],
   },
   {
