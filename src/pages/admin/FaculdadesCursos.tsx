@@ -116,35 +116,55 @@ export default function AdminFaculdadesCursos() {
     const isEditing = !!editingFacIds[f.id];
     if (isEditing) {
       // Save buffered changes
-      const facPatch = edits[f.id];
-      if (facPatch && (facPatch.name !== undefined || facPatch.sigla !== undefined || facPatch.decano !== undefined)) {
-        await updateFac.mutateAsync({
-          id: f.id,
-          patch: {
-            ...(facPatch.name !== undefined ? { name: facPatch.name } : {}),
-            ...(facPatch.sigla !== undefined ? { sigla: facPatch.sigla } : {}),
-            ...(facPatch.decano !== undefined ? { decano: facPatch.decano } : {}),
-          },
-        });
-      }
-      const cursoIds = (cursosByFac.get(f.id) ?? []).map((c) => c.id);
-      for (const cid of cursoIds) {
-        const patch = cursoEdits[cid];
-        if (!patch) continue;
-        await updateCurso.mutateAsync({
-          id: cid,
-          patch: {
-            ...(patch.name !== undefined ? { name: patch.name } : {}),
-            ...(patch.code !== undefined ? { code: patch.code } : {}),
-            ...(patch.coordenador !== undefined ? { coordenador: patch.coordenador } : {}),
-          },
-        });
-      }
-      setEdits((e) => { const n = { ...e }; delete n[f.id]; return n; });
-      setCursoEdits((e) => { const n = { ...e }; cursoIds.forEach((id) => delete n[id]); return n; });
+  const performSave = async (f: FaculdadeRow) => {
+    const facPatch = edits[f.id];
+    if (facPatch && (facPatch.name !== undefined || facPatch.sigla !== undefined || facPatch.decano !== undefined || facPatch.color !== undefined)) {
+      await updateFac.mutateAsync({
+        id: f.id,
+        patch: {
+          ...(facPatch.name !== undefined ? { name: facPatch.name } : {}),
+          ...(facPatch.sigla !== undefined ? { sigla: facPatch.sigla } : {}),
+          ...(facPatch.decano !== undefined ? { decano: facPatch.decano } : {}),
+          ...(facPatch.color !== undefined ? { color: facPatch.color } : {}),
+        },
+      });
     }
-    setEditingFacIds((m) => ({ ...m, [f.id]: !isEditing }));
+    const cursoIds = (cursosByFac.get(f.id) ?? []).map((c) => c.id);
+    for (const cid of cursoIds) {
+      const patch = cursoEdits[cid];
+      if (!patch) continue;
+      await updateCurso.mutateAsync({
+        id: cid,
+        patch: {
+          ...(patch.name !== undefined ? { name: patch.name } : {}),
+          ...(patch.code !== undefined ? { code: patch.code } : {}),
+          ...(patch.coordenador !== undefined ? { coordenador: patch.coordenador } : {}),
+        },
+      });
+    }
+    setEdits((e) => { const n = { ...e }; delete n[f.id]; return n; });
+    setCursoEdits((e) => { const n = { ...e }; cursoIds.forEach((id) => delete n[id]); return n; });
+    setEditingFacIds((m) => ({ ...m, [f.id]: false }));
+    setConfirmSaveFor(null);
+    toast.success("Alterações guardadas");
   };
+
+  const toggleEdit = (f: FaculdadeRow) => {
+    const isEditing = !!editingFacIds[f.id];
+    if (isEditing) {
+      const hasFacChanges = !!edits[f.id] && Object.keys(edits[f.id]).length > 0;
+      const cursoIds = (cursosByFac.get(f.id) ?? []).map((c) => c.id);
+      const hasCursoChanges = cursoIds.some((id) => cursoEdits[id] && Object.keys(cursoEdits[id]).length > 0);
+      if (hasFacChanges || hasCursoChanges) {
+        setConfirmSaveFor(f); // open confirmation
+      } else {
+        setEditingFacIds((m) => ({ ...m, [f.id]: false }));
+      }
+      return;
+    }
+    setEditingFacIds((m) => ({ ...m, [f.id]: true }));
+  };
+
 
   const facValue = (f: FaculdadeRow, key: keyof FaculdadeRow) =>
     (edits[f.id]?.[key] ?? f[key]) as any;
