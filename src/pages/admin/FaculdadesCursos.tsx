@@ -264,7 +264,7 @@ export default function AdminFaculdadesCursos() {
                         ) : (
                           <p className="text-xs font-medium truncate">{c.name}</p>
                         )}
-                        <p className="text-[10px] text-muted-foreground truncate">{c.years} anos · ~{c.estudantes_esperados} est.</p>
+                        <p className="text-[10px] text-muted-foreground truncate">{c.years} anos</p>
                       </div>
                       <div className="flex items-center gap-1.5 px-2 py-1 rounded border border-border bg-muted/30 shrink-0">
                         <UserCog className="w-3 h-3 text-muted-foreground" />
