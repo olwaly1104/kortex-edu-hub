@@ -5,7 +5,7 @@ import {
   Mail, Award, User, LogOut, GraduationCap,
   BarChart3, ChevronLeft, ChevronRight, Library, Wallet, Trophy, ClipboardList,
   CheckSquare, Building2, UserCog, Eye, Layers, FileText, FolderOpen, TrendingUp, HelpCircle, Settings2, BrainCircuit,
-  Sparkles, Wand2, ClipboardCheck,
+  Sparkles, Wand2, ClipboardCheck, UserPlus, ShieldCheck,
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
