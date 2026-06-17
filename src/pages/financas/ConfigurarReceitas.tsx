@@ -747,15 +747,15 @@ function LineItemsBlock({
   const total = rows.reduce((s, r) => s + (r.valor || 0), 0);
 
   const colTemplate = [
-    "1fr",                       // Designação
+    "minmax(0,1fr)",             // Designação
     withType && "130px",
     "140px",                     // Valor
     withTax && "150px",
     withUnit && "120px",
     withTarget && "140px",
     "44px",                      // Ação
-  ].filter(Boolean).join("_");
-  const cols = `grid-cols-[${colTemplate}]`;
+  ].filter(Boolean).join(" ");
+  const gridStyle = { gridTemplateColumns: colTemplate } as React.CSSProperties;
 
   return (
     <Card className="overflow-hidden">
