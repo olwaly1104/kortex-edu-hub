@@ -113,19 +113,54 @@ function CriarEventoDialog({ defaultDate, trigger }: { defaultDate: Date; trigge
             <Input id="ev-title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Ex.: Reunião com Reitoria" />
           </div>
 
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-3 gap-3 items-end">
             <div className="space-y-2">
               <Label htmlFor="ev-date" className="text-xs font-medium">Data</Label>
-              <Input id="ev-date" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+              <Input id="ev-date" type="date" min={todayISO} value={date} onChange={(e) => setDate(e.target.value)} className="h-10 tabular-nums" />
             </div>
             <div className="space-y-2">
               <Label htmlFor="ev-start" className="text-xs font-medium">Início</Label>
-              <Input id="ev-start" type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} />
+              <Input id="ev-start" type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} className="h-10 tabular-nums" />
             </div>
             <div className="space-y-2">
               <Label htmlFor="ev-end" className="text-xs font-medium">Fim</Label>
-              <Input id="ev-end" type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} />
+              <Input id="ev-end" type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} className="h-10 tabular-nums" />
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="ev-participants" className="text-xs font-medium flex items-center gap-1.5">
+              <UserPlus className="w-3.5 h-3.5" /> Participantes
+              {participants.length > 0 && (
+                <span className="text-[10px] text-muted-foreground font-normal">({participants.length} convidado{participants.length > 1 ? "s" : ""})</span>
+              )}
+            </Label>
+            <div className="flex gap-2">
+              <Input
+                id="ev-participants"
+                value={participantInput}
+                onChange={(e) => setParticipantInput(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addParticipant(); } }}
+                placeholder="Nome ou e-mail e Enter para adicionar"
+                className="h-10"
+              />
+              <Button type="button" variant="outline" size="sm" onClick={addParticipant} className="h-10 shrink-0">
+                Adicionar
+              </Button>
+            </div>
+            {participants.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 pt-1">
+                {participants.map((p) => (
+                  <span key={p} className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-primary/10 text-primary text-xs font-medium">
+                    {p}
+                    <button type="button" onClick={() => removeParticipant(p)} className="hover:bg-primary/20 rounded-sm">
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
+            <p className="text-[11px] text-muted-foreground">Os convidados receberão um pedido de reunião.</p>
           </div>
 
           {type === "reuniao" && (
