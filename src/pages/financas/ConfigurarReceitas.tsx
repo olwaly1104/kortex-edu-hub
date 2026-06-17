@@ -962,6 +962,7 @@ function ServicosAcademicosBlock({ email, impostos }: { email?: string | null; i
         typeOptions={cats.filter((c) => c.trim())}
         withTarget
         withTax
+        withTaxValue
         impostos={impostos}
         addLabel="Adicionar serviço"
         placeholder="Ex: Workshop AutoCAD"
