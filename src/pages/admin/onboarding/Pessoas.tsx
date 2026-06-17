@@ -21,7 +21,7 @@ type Person = {
   grau?: string;
   departamento?: string;
   funcao?: string;
-  moduloKortex?: string;
+  kortex?: boolean;
 };
 
 const prefixosPool = ["Sr.", "Sra.", "Dr.", "Dra.", "Prof.", "Eng.", "Me."];
@@ -29,7 +29,6 @@ const generosPool = ["Masculino", "Feminino"];
 const grausPool = ["Licenciado", "Mestre", "Doutor", "Pós-doc"];
 const departamentosPool = ["Académica", "Finanças", "GAP", "TI", "Recursos Humanos", "Manutenção"];
 const funcoesPool = ["Assistente", "Coordenador", "Técnico", "Auxiliar", "Diretor"];
-const modulosKortexPool = ["Não", "Estudante", "Professor", "Coordenador", "Decano", "Reitor", "Finanças", "Académica", "GAP", "Inscrições", "Administrador"];
 
 const emailFrom = (pn: string, un: string) => {
   if (!pn.trim() || !un.trim()) return "";
@@ -50,16 +49,16 @@ export default function OnboardingPessoas({ mode }: { mode: Mode }) {
 
   const addEmptyRow = () => {
     const novo: Person = isDoc
-      ? { id: String(Date.now()), prefixo: "", primeiroNome: "", ultimoNome: "", genero: "", email: "", contacto: "", grau: grausPool[2], moduloKortex: "Professor" }
-      : { id: String(Date.now()), prefixo: "", primeiroNome: "", ultimoNome: "", genero: "", email: "", contacto: "", departamento: departamentosPool[0], funcao: funcoesPool[0], moduloKortex: "Académica" };
+      ? { id: String(Date.now()), prefixo: "", primeiroNome: "", ultimoNome: "", genero: "", email: "", contacto: "", grau: grausPool[2], kortex: true }
+      : { id: String(Date.now()), prefixo: "", primeiroNome: "", ultimoNome: "", genero: "", email: "", contacto: "", departamento: departamentosPool[0], funcao: funcoesPool[0], kortex: true };
     setRows(prev => [...prev, novo]);
   };
 
   const update = (id: string, patch: Partial<Person>) => setRows(prev => prev.map(r => {
     if (r.id !== id) return r;
     const next = { ...r, ...patch };
-    if (patch.primeiroNome !== undefined || patch.ultimoNome !== undefined) {
-      next.email = emailFrom(next.primeiroNome, next.ultimoNome);
+    if (patch.primeiroNome !== undefined || patch.ultimoNome !== undefined || patch.kortex !== undefined) {
+      next.email = next.kortex ? emailFrom(next.primeiroNome, next.ultimoNome) : "";
     }
     return next;
   }));
@@ -79,7 +78,7 @@ export default function OnboardingPessoas({ mode }: { mode: Mode }) {
           email: emailFrom(pn, un),
           contacto: `+244 923 200 00${i}`,
           grau: grausPool[i % grausPool.length],
-          moduloKortex: "Professor",
+          kortex: true,
         };
       }
       return {
@@ -92,7 +91,7 @@ export default function OnboardingPessoas({ mode }: { mode: Mode }) {
         contacto: `+244 923 300 00${i}`,
         departamento: departamentosPool[i % departamentosPool.length],
         funcao: funcoesPool[i % funcoesPool.length],
-        moduloKortex: "Académica",
+        kortex: true,
       };
     });
     setRows(prev => [...prev, ...generated]);
@@ -109,7 +108,7 @@ export default function OnboardingPessoas({ mode }: { mode: Mode }) {
     <div className={`grid ${grid} gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b`}>
       <span>Prefixo</span><span>Primeiro nome</span><span>Último nome</span><span>Género</span><span>Contacto</span>
       {isDoc ? (<span>Grau</span>) : (<><span>Departamento</span><span>Função</span></>)}
-      <span>Módulo</span>
+      <span>Kortex?</span>
       <span>Email <span className="normal-case text-[9px] text-muted-foreground/70">(auto)</span></span>
     </div>
   );
@@ -144,11 +143,14 @@ export default function OnboardingPessoas({ mode }: { mode: Mode }) {
           </Select>
         </>
       )}
-      <Select value={r.moduloKortex || ""} onValueChange={v => update(r.id, { moduloKortex: v })}>
-        <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="—" /></SelectTrigger>
-        <SelectContent>{modulosKortexPool.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}</SelectContent>
+      <Select value={r.kortex ? "sim" : "nao"} onValueChange={v => update(r.id, { kortex: v === "sim" })}>
+        <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+        <SelectContent>
+          <SelectItem value="sim">Sim</SelectItem>
+          <SelectItem value="nao">Não</SelectItem>
+        </SelectContent>
       </Select>
-      <Input value={r.email} readOnly disabled className="h-8 text-xs bg-muted/40 cursor-not-allowed" placeholder="auto @upra.kor" />
+      <Input value={r.kortex ? r.email : "—"} readOnly disabled className="h-8 text-xs bg-muted/40 cursor-not-allowed" placeholder={r.kortex ? "auto @upra.kor" : "sem acesso"} />
     </div>
   );
 
