@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAuth } from "@/contexts/AuthContext";
 import { onboardingKey, readOnboardingStateFor, pushOnboarding } from "@/lib/onboardingStorage";
+import logoUpra from "@/assets/logo-upra.asset.json";
 import { Building2, Loader2, Upload, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -16,7 +17,18 @@ interface OnboardingState {
 }
 
 const initial: OnboardingState = {
-  dados: { nome: "", tipo: "", sigla: "", provincia: "", municipio: "", endereco: "", telefone: "", email: "", nif: "", logoDataUrl: "" },
+  dados: {
+    nome: "Universidade Privada de Angola",
+    tipo: "Universidade",
+    sigla: "UPRA",
+    provincia: "Luanda",
+    municipio: "Talatona",
+    endereco: "Via AL-20, Talatona",
+    telefone: "+244 222 000 000",
+    email: "contacto@upra.com",
+    nif: "5417000000",
+    logoDataUrl: logoUpra.url,
+  },
   completed: false,
 };
 
