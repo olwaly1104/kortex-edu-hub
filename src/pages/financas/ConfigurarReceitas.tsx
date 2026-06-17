@@ -113,7 +113,7 @@ const IMPOSTOS_KEY = (email?: string | null) => KEY("impostos", email);
 const ANOS_KEY = (email?: string | null) => KEY("propinas.anos", email);
 const REGIMES = ["Geral", "Reduzido", "Isento", "Exportação", "Intermédio"];
 
-type RecSub = "impostos" | "propinas" | "emolumentos";
+type RecSub = "impostos" | "propinas" | "emolumentos" | "servicos";
 
 function ReceitasSection({ email, onAddCursos }: { email?: string | null; onAddCursos: () => void }) {
   const [sub, setSub] = useState<RecSub>("impostos");
@@ -126,16 +126,18 @@ function ReceitasSection({ email, onAddCursos }: { email?: string | null; onAddC
   return (
     <div className="space-y-6">
       <Tabs value={sub} onValueChange={(v) => setSub(v as RecSub)}>
-        <TabsList className="grid grid-cols-3 w-full max-w-xl">
+        <TabsList className="grid grid-cols-4 w-full max-w-2xl">
           <TabsTrigger value="impostos" className="gap-1.5"><Percent className="w-3.5 h-3.5" /> Impostos</TabsTrigger>
           <TabsTrigger value="propinas" className="gap-1.5"><Wallet className="w-3.5 h-3.5" /> Propinas</TabsTrigger>
           <TabsTrigger value="emolumentos" className="gap-1.5"><Receipt className="w-3.5 h-3.5" /> Emolumentos</TabsTrigger>
+          <TabsTrigger value="servicos" className="gap-1.5"><BookOpenCheck className="w-3.5 h-3.5" /> Serviços Académicos</TabsTrigger>
         </TabsList>
       </Tabs>
 
       {sub === "impostos" && <ImpostosBlock impostos={impostos} setImpostos={setImpostos} />}
       {sub === "propinas" && <PropinasBlock email={email} impostos={impostos} onAddCursos={onAddCursos} />}
       {sub === "emolumentos" && <EmolumentosBlock email={email} impostos={impostos} />}
+      {sub === "servicos" && <ServicosAcademicosBlock email={email} impostos={impostos} />}
     </div>
   );
 }
@@ -229,22 +231,15 @@ function PrazosBlock({ prazos, setPrazos }: { prazos: PrazoDef[]; setPrazos: Rea
                 onChange={(e) => setPrazos((s) => s.map((x) => x.id === p.id ? { ...x, nome: e.target.value } : x))} />
               {p.locked && <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted px-1.5 py-0.5 rounded shrink-0">Padrão</span>}
             </div>
-            {p.locked ? (
-              <div className="h-9 flex items-center px-3 rounded-md bg-muted/40 text-sm font-medium text-foreground tabular-nums">
-                Prazo {p.meses} {p.meses === 1 ? "mês" : "meses"}
-              </div>
-            ) : (
-              <div className="flex items-center gap-2">
-                <Input type="number" min={1} max={36} className="h-9 w-20 tabular-nums" value={p.meses}
-                  onChange={(e) => setPrazos((s) => s.map((x) => x.id === p.id ? { ...x, meses: Number(e.target.value) || 1 } : x))} />
-                <span className="text-xs text-muted-foreground">meses</span>
-              </div>
-            )}
+            <div className="flex items-center gap-2">
+              <Input type="number" min={1} max={36} className="h-9 w-20 tabular-nums" value={p.meses}
+                disabled={p.locked}
+                onChange={(e) => setPrazos((s) => s.map((x) => x.id === p.id ? { ...x, meses: Number(e.target.value) || 1 } : x))} />
+              <span className="text-xs text-muted-foreground">meses</span>
+            </div>
             <div className="flex justify-end">
-              {!p.locked && (
-                <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                  onClick={() => setPrazos((s) => s.filter((x) => x.id !== p.id))}><Trash2 className="w-3.5 h-3.5" /></Button>
-              )}
+              <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                onClick={() => setPrazos((s) => s.filter((x) => x.id !== p.id))}><Trash2 className="w-3.5 h-3.5" /></Button>
             </div>
           </div>
         ))}
@@ -269,7 +264,12 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
     Object.entries(raw).forEach(([k, v]) => { norm[k] = Array.isArray(v) ? v : (v ? [v] : []); });
     return norm;
   });
-  const [prazosDef, setPrazosDef] = useState<PrazoDef[]>(() => ensureDefaults(readJSON<PrazoDef[]>(PRAZOS_DEF_KEY(email), [])));
+  const [prazosDef, setPrazosDef] = useState<PrazoDef[]>(() => {
+    const stored = readJSON<PrazoDef[] | null>(PRAZOS_DEF_KEY(email), null);
+    if (stored === null) return DEFAULT_PRAZOS.map((d) => ({ ...d }));
+    // Keep stored order; just re-mark locked status by id
+    return stored.map((p) => ({ ...p, locked: !!DEFAULT_PRAZOS.find((d) => d.id === p.id) }));
+  });
   const [open, setOpen] = useState<Record<string, boolean>>({});
 
   useEffect(() => writeJSON(ANOS_KEY(email), anosByCurso), [anosByCurso, email]);
@@ -892,6 +892,74 @@ function EmolumentosBlock({ email, impostos }: { email?: string | null; impostos
         impostos={impostos}
         addLabel="Adicionar emolumento"
         placeholder="Ex: Certidão de matrícula"
+        valueLabel="Valor (Kz)"
+      />
+    </div>
+  );
+}
+
+/* ─────────────────── Serviços Académicos: Categorias + tabela ─────────────────── */
+
+const SERV_CATS_KEY = (email?: string | null) => KEY("servicos.categorias", email);
+const DEFAULT_SERV_CATS: string[] = ["Cursos Livres", "Workshops", "Formação Contínua", "Certificações", "Aluguer de Espaços"];
+
+function ServicosAcademicosBlock({ email, impostos }: { email?: string | null; impostos: Imposto[] }) {
+  const [cats, setCats] = useState<string[]>(() => {
+    const stored = readJSON<string[] | null>(SERV_CATS_KEY(email), null);
+    return stored && stored.length ? stored : DEFAULT_SERV_CATS;
+  });
+  useEffect(() => writeJSON(SERV_CATS_KEY(email), cats), [cats, email]);
+
+  const addCat = () => setCats((s) => [...s, ""]);
+  const updCat = (idx: number, v: string) => setCats((s) => s.map((c, i) => i === idx ? v : c));
+  const delCat = (idx: number) => setCats((s) => s.filter((_, i) => i !== idx));
+
+  return (
+    <div className="space-y-6">
+      <Card className="overflow-hidden">
+        <div className="px-5 py-3 border-b bg-muted/30 flex items-center gap-2">
+          <BookOpenCheck className="w-4 h-4 text-primary" />
+          <div className="min-w-0">
+            <h2 className="text-sm font-bold text-foreground">Categorias de serviços académicos</h2>
+            <p className="text-[11px] text-muted-foreground">Defina as categorias. Ficam disponíveis na coluna Categoria da tabela de serviços.</p>
+          </div>
+          <span className="text-[11px] text-muted-foreground ml-auto tabular-nums shrink-0">{cats.length} categoria{cats.length === 1 ? "" : "s"}</span>
+        </div>
+        <div className="divide-y">
+          <div className="grid grid-cols-[1fr_40px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
+            <div>Designação</div>
+            <div className="text-right">Ação</div>
+          </div>
+          {cats.length === 0 ? (
+            <div className="px-5 py-8 text-center text-xs text-muted-foreground">Sem categorias configuradas.</div>
+          ) : cats.map((c, idx) => (
+            <div key={idx} className="grid grid-cols-[1fr_40px] gap-3 px-5 py-2.5 items-center text-sm">
+              <Input className="h-9" placeholder="Ex: Workshop" value={c} onChange={(e) => updCat(idx, e.target.value)} />
+              <div className="flex justify-end">
+                <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                  onClick={() => delCat(idx)}><Trash2 className="w-3.5 h-3.5" /></Button>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="px-5 py-3 border-t bg-muted/10">
+          <Button size="sm" variant="outline" className="gap-1.5" onClick={addCat}><Plus className="w-3.5 h-3.5" /> Adicionar categoria</Button>
+        </div>
+      </Card>
+
+      <LineItemsBlock
+        title="Serviço académico"
+        subtitle="Cursos livres, workshops, formações contínuas, certificações e aluguer de espaços."
+        icon={BookOpenCheck}
+        storageKey={KEY("servicos", email)}
+        withType
+        typeLabel="Categoria"
+        typeOptions={cats.filter((c) => c.trim())}
+        withTarget
+        withTax
+        impostos={impostos}
+        addLabel="Adicionar serviço"
+        placeholder="Ex: Workshop AutoCAD"
         valueLabel="Valor (Kz)"
       />
     </div>
