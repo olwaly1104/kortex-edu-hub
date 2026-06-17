@@ -976,7 +976,7 @@ function ServicosAcademicosBlock({ email, impostos }: { email?: string | null; i
 
 function LineItemsBlock({
   title, subtitle, icon: Icon, storageKey, addLabel, placeholder, valueLabel,
-  withUnit = false, withTarget = false, withType = false, withTax = false, impostos = [],
+  withUnit = false, withTarget = false, withType = false, withTax = false, withTaxValue = false, impostos = [],
   typeLabel = "Tipo", typeOptions,
 }: {
   title: string;
