@@ -152,7 +152,7 @@ export default function AdminStaff() {
               </div>
             </FormSection>
 
-            <FormSection icon={<KeyRound className="w-3.5 h-3.5" />} title="Acesso ao Kortex">
+            <FormSection icon={<KeyRound className="w-3.5 h-3.5" />} title="Acesso ao portal">
               <Select value={draft.moduloKortex} onValueChange={(v) => setDraftField("moduloKortex", v)}>
                 <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
                 <SelectContent>{modulosKortexPool.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}</SelectContent>
