@@ -76,6 +76,7 @@ export function markOnboardingStepDone(email: string | null | undefined, key: st
   const cur = readOnboardingProgress(email);
   cur[key] = true;
   try { localStorage.setItem(progressKey(email), JSON.stringify(cur)); } catch {}
+  window.dispatchEvent(new Event("storage"));
   pushProgress(email, cur);
 }
 
