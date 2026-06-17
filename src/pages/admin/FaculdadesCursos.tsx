@@ -225,7 +225,7 @@ export default function AdminFaculdadesCursos() {
                             </SelectContent>
                           </Select>
                         ) : (
-                          <p className="text-[11px] font-semibold leading-tight truncate max-w-[160px]">{f.decano || <span className="text-muted-foreground italic font-normal">Por atribuir</span>}</p>
+                          <p className="text-[11px] font-semibold leading-tight truncate max-w-[160px]">{f.decano || <span className="text-muted-foreground italic font-normal">Sem docentes</span>}</p>
                         )}
                       </div>
                     </div>
