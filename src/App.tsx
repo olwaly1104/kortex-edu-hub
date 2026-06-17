@@ -173,6 +173,7 @@ import AdminOnboardingPessoas from "./pages/admin/onboarding/Pessoas";
 import AdminOnboardingRegrasPresenca from "./pages/admin/onboarding/RegrasPresenca";
 import AdminOnboardingSalarios from "./pages/admin/onboarding/Salarios";
 import AdminOnboardingEspacos from "./pages/admin/onboarding/Espacos";
+import AdminOnboardingGeopontos from "./pages/admin/onboarding/Geopontos";
 import AdminFaculdadesCursos from "./pages/admin/FaculdadesCursos";
 import AdminDiscentes from "./pages/admin/Discentes";
 import AdminSalas from "./pages/admin/Salas";
