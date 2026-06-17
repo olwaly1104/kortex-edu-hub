@@ -67,11 +67,14 @@ export default function AdminOnboarding() {
   const [state, setState] = useState<OnboardingState>(() => {
     const stored = readOnboardingStateFor(initial, user?.email);
     const storedDados = (stored as any)?.dados || {};
+    // Always prefill every field with the institutional defaults so the form
+    // arrives complete; user edits made after first load still persist because
+    // they are written back into initial.dados shape via setDados.
     const mergedDados: OnboardingState["dados"] = {
       ...initial.dados,
-      ...storedDados,
-      // Always override with correct defaults on load so stale
-      // localStorage never wins over updated name/logo.
+      ...Object.fromEntries(
+        Object.entries(storedDados).filter(([, v]) => typeof v === "string" && v.trim().length > 0)
+      ),
       nome: initial.dados.nome,
       logoDataUrl: initial.dados.logoDataUrl,
     };
