@@ -981,13 +981,13 @@ function LineItemsBlock({
             {withType && (
               <select
                 className="h-9 rounded-md border border-input bg-background px-2 text-sm"
-                value={r.tipo || "Único"}
+                value={r.tipo || ""}
                 onChange={(e) => update(r.id, { tipo: e.target.value })}
               >
-                <option value="Único">Único</option>
-                <option value="Mensal">Mensal</option>
-                <option value="Anual">Anual</option>
-                <option value="Por pedido">Por pedido</option>
+                <option value="">— Selecionar —</option>
+                {(typeOptions ?? ["Único", "Mensal", "Anual", "Por pedido"]).map((opt) => (
+                  <option key={opt} value={opt}>{opt}</option>
+                ))}
               </select>
             )}
             <Input type="number" min={0} className="h-9 tabular-nums" value={r.valor}
