@@ -149,8 +149,9 @@ export default function AdminInicio() {
           }
         } catch { /* ignore */ }
       }
+    })();
     return () => { cancelled = true; };
-  }, []);
+  }, [user?.email]);
 
   // Derive progress from reality, not just from localStorage clicks:
   // - inst.reg: done iff institutional registration was completed.
