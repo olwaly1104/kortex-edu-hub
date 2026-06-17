@@ -138,13 +138,6 @@ export function OnboardingStepBanner({
           </div>
           <div className="flex items-center gap-2 shrink-0">
             {actions}
-            <button
-              type="button"
-              onClick={() => { markDone(user?.email, stepKey); setRefresh(refresh + 1); }}
-              className={`inline-flex h-8 items-center gap-1 rounded-md border px-3 text-xs font-semibold transition-colors ${isCurrentDone ? "border-emerald-200 bg-emerald-50 text-emerald-700" : "border-primary/30 bg-card text-primary hover:bg-primary/5"}`}
-            >
-              <CheckCircle2 className="w-3.5 h-3.5" /> {isCurrentDone ? "Concluído" : "Concluir passo"}
-            </button>
           </div>
         </div>
 
