@@ -248,6 +248,92 @@ export type Database = {
           },
         ]
       }
+      estudantes: {
+        Row: {
+          ano: string
+          bilhete: string | null
+          created_at: string
+          curso_id: string
+          email: string
+          enc_nome: string | null
+          enc_parentesco: string | null
+          enc_telefone: string | null
+          endereco: string | null
+          genero: string | null
+          id: string
+          municipio: string | null
+          nacionalidade: string | null
+          nascimento: string | null
+          nome: string
+          origem: string
+          owner_user_id: string
+          primeiro_nome: string | null
+          provincia: string | null
+          telemovel: string | null
+          turma: string
+          ultimo_nome: string | null
+          updated_at: string
+        }
+        Insert: {
+          ano?: string
+          bilhete?: string | null
+          created_at?: string
+          curso_id: string
+          email: string
+          enc_nome?: string | null
+          enc_parentesco?: string | null
+          enc_telefone?: string | null
+          endereco?: string | null
+          genero?: string | null
+          id?: string
+          municipio?: string | null
+          nacionalidade?: string | null
+          nascimento?: string | null
+          nome: string
+          origem?: string
+          owner_user_id: string
+          primeiro_nome?: string | null
+          provincia?: string | null
+          telemovel?: string | null
+          turma?: string
+          ultimo_nome?: string | null
+          updated_at?: string
+        }
+        Update: {
+          ano?: string
+          bilhete?: string | null
+          created_at?: string
+          curso_id?: string
+          email?: string
+          enc_nome?: string | null
+          enc_parentesco?: string | null
+          enc_telefone?: string | null
+          endereco?: string | null
+          genero?: string | null
+          id?: string
+          municipio?: string | null
+          nacionalidade?: string | null
+          nascimento?: string | null
+          nome?: string
+          origem?: string
+          owner_user_id?: string
+          primeiro_nome?: string | null
+          provincia?: string | null
+          telemovel?: string | null
+          turma?: string
+          ultimo_nome?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "estudantes_curso_id_fkey"
+            columns: ["curso_id"]
+            isOneToOne: false
+            referencedRelation: "cursos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       faculdades: {
         Row: {
           created_at: string
