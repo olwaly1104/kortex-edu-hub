@@ -924,6 +924,16 @@ export default function GapConfiguracao() {
                       <td className="px-3 py-2.5 text-center">
                         <button
                           disabled={!isCardEditing("cd-etapas")}
+                          onClick={() => toggleEtapaAgenda(et.key)}
+                          className={cn("inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium",
+                            et.agenda ? "bg-blue-50 text-blue-700 border-blue-200" : "bg-muted text-muted-foreground border-border",
+                            !isCardEditing("cd-etapas") && "cursor-default")}>
+                          {et.agenda ? "Sim" : "Não"}
+                        </button>
+                      </td>
+                      <td className="px-3 py-2.5 text-center">
+                        <button
+                          disabled={!isCardEditing("cd-etapas")}
                           onClick={() => toggleEtapaObrig(et.key)}
                           className={cn("inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium",
                             et.obrigatoria ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-muted text-muted-foreground border-border",
