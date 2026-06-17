@@ -1,7 +1,7 @@
 import { Link, useSearchParams } from "react-router-dom";
 import { ArrowLeft, ChevronRight, ShieldCheck, CheckCircle2, Circle } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { ReactNode, useState } from "react";
+import { ReactNode } from "react";
 import { progressKey, pushProgress } from "@/lib/onboardingStorage";
 
 type StepMeta = { key: string; title: string; desc: string; path: string };
@@ -91,7 +91,6 @@ export function OnboardingStepBanner({
 }) {
   const { user } = useAuth();
   const [params] = useSearchParams();
-  const [refresh, setRefresh] = useState(0);
   const stepKey = stepKeyProp || params.get("step") || "";
   if (user?.role !== "admin") return null;
   const group = STEP_TO_GROUP[stepKey];
@@ -138,13 +137,6 @@ export function OnboardingStepBanner({
           </div>
           <div className="flex items-center gap-2 shrink-0">
             {actions}
-            <button
-              type="button"
-              onClick={() => { markDone(user?.email, stepKey); setRefresh(refresh + 1); }}
-              className={`inline-flex h-8 items-center gap-1 rounded-md border px-3 text-xs font-semibold transition-colors ${isCurrentDone ? "border-emerald-200 bg-emerald-50 text-emerald-700" : "border-primary/30 bg-card text-primary hover:bg-primary/5"}`}
-            >
-              <CheckCircle2 className="w-3.5 h-3.5" /> {isCurrentDone ? "Concluído" : "Concluir passo"}
-            </button>
           </div>
         </div>
 
