@@ -42,6 +42,14 @@ function CriarEventoDialog({ defaultDate, trigger }: { defaultDate: Date; trigge
   const [participantInput, setParticipantInput] = useState("");
   const [participantFocus, setParticipantFocus] = useState(false);
   const { contacts } = useInstitutionContacts();
+  const geopontos = useMemo<{ id: string; nome: string }[]>(() => {
+    if (!open) return [];
+    try {
+      const raw = localStorage.getItem("upra:geopontos");
+      const arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr.filter((g: any) => g?.nome) : [];
+    } catch { return []; }
+  }, [open]);
 
   const filteredContacts = useMemo(() => {
     const q = participantInput.trim().toLowerCase();
