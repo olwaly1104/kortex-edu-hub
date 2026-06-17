@@ -244,8 +244,17 @@ export default function AdminPerfil() {
         <Separator />
         <div className="grid md:grid-cols-2 gap-4">
           <div className="space-y-1.5">
-            <Label className="text-xs flex items-center gap-1.5"><Mail className="w-3 h-3" /> Email geral</Label>
-            <Input value={instituicao.email} onChange={e => setInstituicao({ ...instituicao, email: e.target.value })} className="h-9" />
+            <Label className="text-xs flex items-center gap-1.5"><Mail className="w-3 h-3" /> Email institucional *</Label>
+            <Input
+              type="email"
+              value={instituicao.email}
+              onChange={e => setInstituicao({ ...instituicao, email: e.target.value })}
+              placeholder="contacto@instituicao.com"
+              className={`h-9 ${instituicao.email && !emailValid ? "border-destructive" : ""}`}
+            />
+            {instituicao.email && !emailValid && (
+              <p className="text-[10px] text-destructive">Deve ser um email válido terminado em .com</p>
+            )}
           </div>
           <div className="space-y-1.5">
             <Label className="text-xs flex items-center gap-1.5"><Phone className="w-3 h-3" /> Telefone</Label>
