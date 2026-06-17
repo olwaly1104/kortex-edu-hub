@@ -37,18 +37,27 @@ function CriarEventoDialog({ defaultDate, trigger }: { defaultDate: Date; trigge
   const [location, setLocation] = useState("");
   const [link, setLink] = useState("");
   const [notes, setNotes] = useState("");
-  const [participants, setParticipants] = useState<string[]>([]);
+  const [participants, setParticipants] = useState<{ id: string; name: string; email: string | null }[]>([]);
   const [participantInput, setParticipantInput] = useState("");
+  const [participantFocus, setParticipantFocus] = useState(false);
+  const { contacts } = useInstitutionContacts();
 
-  const addParticipant = () => {
-    const v = participantInput.trim();
-    if (!v) return;
-    if (participants.includes(v)) { setParticipantInput(""); return; }
-    setParticipants([...participants, v]);
+  const filteredContacts = useMemo(() => {
+    const q = participantInput.trim().toLowerCase();
+    const selectedIds = new Set(participants.map((p) => p.id));
+    return contacts
+      .filter((c) => !selectedIds.has(c.id))
+      .filter((c) => !q || c.display_name.toLowerCase().includes(q) || (c.email ?? "").toLowerCase().includes(q))
+      .slice(0, 8);
+  }, [contacts, participantInput, participants]);
+
+  const addContact = (c: { id: string; display_name: string; email: string | null }) => {
+    if (participants.some((p) => p.id === c.id)) return;
+    setParticipants([...participants, { id: c.id, name: c.display_name, email: c.email }]);
     setParticipantInput("");
   };
 
-  const removeParticipant = (p: string) => setParticipants(participants.filter((x) => x !== p));
+  const removeParticipant = (id: string) => setParticipants(participants.filter((p) => p.id !== id));
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
