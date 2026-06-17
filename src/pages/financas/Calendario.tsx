@@ -25,16 +25,30 @@ const EVENT_TYPES: { value: EventType; label: string; icon: typeof Video }[] = [
 ];
 
 function CriarEventoDialog({ defaultDate, trigger }: { defaultDate: Date; trigger: React.ReactNode }) {
+  const todayISO = new Date().toISOString().split("T")[0];
   const [open, setOpen] = useState(false);
   const [type, setType] = useState<EventType>("reuniao");
   const [modalidade, setModalidade] = useState<Modalidade>("presencial");
   const [title, setTitle] = useState("");
-  const [date, setDate] = useState(defaultDate.toISOString().split("T")[0]);
+  const initialDate = defaultDate.toISOString().split("T")[0];
+  const [date, setDate] = useState(initialDate < todayISO ? todayISO : initialDate);
   const [startTime, setStartTime] = useState("09:00");
   const [endTime, setEndTime] = useState("10:00");
   const [location, setLocation] = useState("");
   const [link, setLink] = useState("");
   const [notes, setNotes] = useState("");
+  const [participants, setParticipants] = useState<string[]>([]);
+  const [participantInput, setParticipantInput] = useState("");
+
+  const addParticipant = () => {
+    const v = participantInput.trim();
+    if (!v) return;
+    if (participants.includes(v)) { setParticipantInput(""); return; }
+    setParticipants([...participants, v]);
+    setParticipantInput("");
+  };
+
+  const removeParticipant = (p: string) => setParticipants(participants.filter((x) => x !== p));
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,9 +56,20 @@ function CriarEventoDialog({ defaultDate, trigger }: { defaultDate: Date; trigge
       toast.error("Insira um título para o evento.");
       return;
     }
-    toast.success("Evento criado com sucesso.");
+    if (date < todayISO) {
+      toast.error("A data não pode ser anterior a hoje.");
+      return;
+    }
+    if (endTime <= startTime) {
+      toast.error("O horário de fim deve ser após o início.");
+      return;
+    }
+    const msg = participants.length > 0
+      ? `Evento criado. Pedidos enviados a ${participants.length} participante${participants.length > 1 ? "s" : ""}.`
+      : "Evento criado com sucesso.";
+    toast.success(msg);
     setOpen(false);
-    setTitle(""); setLocation(""); setLink(""); setNotes("");
+    setTitle(""); setLocation(""); setLink(""); setNotes(""); setParticipants([]); setParticipantInput("");
   };
 
   return (
