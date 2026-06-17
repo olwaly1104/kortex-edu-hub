@@ -230,8 +230,9 @@ export default function GapConfiguracao() {
 
   // ===== CANDIDATURAS =====
   type CdEstado = { key: string; label: string; color: string };
-  type CdEtapa = { key: string; label: string; obrigatoria: boolean; estadosPossiveis: string[] };
-  type CdSessao = { key: string; etapa: string; data: string; hora: string; local: string; capacidade: number };
+ type CdEtapa = { key: string; label: string; agenda: boolean; obrigatoria: boolean; estadosPossiveis: string[] };
+ type CdSessao = { key: string; etapa: string; data: string; hora: string; local: string; capacidade: number };
+
 
   const [cdEstados, setCdEstados] = useState<CdEstado[]>([
     { key: "completo", label: "Completo", color: "bg-green-50 text-green-700 border-green-200" },
@@ -242,10 +243,10 @@ export default function GapConfiguracao() {
     { key: "reprovado", label: "Reprovado", color: "bg-red-50 text-red-700 border-red-200" },
   ]);
   const [cdEtapas, setCdEtapas] = useState<CdEtapa[]>([
-    { key: "submissao", label: "Submissão da candidatura", obrigatoria: true, estadosPossiveis: ["completo"] },
-    { key: "entrevista", label: "Entrevista", obrigatoria: true, estadosPossiveis: ["agendado", "completo", "remarcado", "falta"] },
-    { key: "curso_preparatorio", label: "Curso Preparatório", obrigatoria: false, estadosPossiveis: ["agendado", "completo", "remarcado"] },
-    { key: "exame", label: "Exame de Acesso", obrigatoria: true, estadosPossiveis: ["agendado", "aprovado", "reprovado", "remarcado"] },
+    { key: "submissao", label: "Submissão da candidatura", agenda: false, obrigatoria: true, estadosPossiveis: ["completo"] },
+    { key: "entrevista", label: "Entrevista", agenda: true, obrigatoria: true, estadosPossiveis: ["agendado", "completo", "remarcado", "falta"] },
+    { key: "curso_preparatorio", label: "Curso Preparatório", agenda: true, obrigatoria: false, estadosPossiveis: ["agendado", "completo", "remarcado"] },
+    { key: "exame", label: "Exame de Acesso", agenda: true, obrigatoria: true, estadosPossiveis: ["agendado", "aprovado", "reprovado", "remarcado"] },
   ]);
   const [cdSessoes, setCdSessoes] = useState<CdSessao[]>([]);
   const [cdNotaMinima, setCdNotaMinima] = useState<number | "">("");
@@ -285,11 +286,12 @@ export default function GapConfiguracao() {
   const addCdEtapa = () => {
     const v = newCdEtapaLabel.trim(); if (!v) return;
     const key = v.toLowerCase().replace(/\s+/g, "_");
-    setCdEtapas(es => [...es, { key, label: v, obrigatoria: false, estadosPossiveis: [] }]);
+    setCdEtapas(es => [...es, { key, label: v, agenda: false, obrigatoria: false, estadosPossiveis: [] }]);
     setNewCdEtapaLabel(""); setCdEtapaOpen(false);
   };
   const removeCdEtapa = (key: string) => setCdEtapas(es => es.filter(e => e.key !== key));
   const toggleEtapaObrig = (key: string) => setCdEtapas(es => es.map(e => e.key === key ? { ...e, obrigatoria: !e.obrigatoria } : e));
+  const toggleEtapaAgenda = (key: string) => setCdEtapas(es => es.map(e => e.key === key ? { ...e, agenda: !e.agenda } : e));
   const addCdSessao = () => {
     if (!newCdSessEtapa.trim()) { toast({ title: "Selecione a etapa", variant: "destructive" }); return; }
     if (!newCdSessData) { toast({ title: "Defina a data", variant: "destructive" }); return; }
@@ -909,6 +911,7 @@ export default function GapConfiguracao() {
                 <thead>
                   <tr className="text-[10px] uppercase tracking-wider text-muted-foreground border-b border-border bg-muted/30">
                     <th className="text-left font-semibold px-4 py-2">Etapa</th>
+                    <th className="text-center font-semibold px-3 py-2">Agenda</th>
                     <th className="text-center font-semibold px-3 py-2">Obrigatória</th>
                     <th className="text-left font-semibold px-3 py-2">Estados possíveis</th>
                     {isCardEditing("cd-etapas") && <th className="w-12"></th>}
@@ -918,6 +921,16 @@ export default function GapConfiguracao() {
                   {cdEtapas.map(et => (
                     <tr key={et.key} className="border-b border-border/50 last:border-0">
                       <td className="px-4 py-2.5 text-sm font-medium text-foreground">{et.label}</td>
+                      <td className="px-3 py-2.5 text-center">
+                        <button
+                          disabled={!isCardEditing("cd-etapas")}
+                          onClick={() => toggleEtapaAgenda(et.key)}
+                          className={cn("inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium",
+                            et.agenda ? "bg-blue-50 text-blue-700 border-blue-200" : "bg-muted text-muted-foreground border-border",
+                            !isCardEditing("cd-etapas") && "cursor-default")}>
+                          {et.agenda ? "Sim" : "Não"}
+                        </button>
+                      </td>
                       <td className="px-3 py-2.5 text-center">
                         <button
                           disabled={!isCardEditing("cd-etapas")}
