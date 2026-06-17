@@ -189,7 +189,7 @@ export default function AdminOnboarding() {
               </div>
             </div>
             <Field label="Nome da universidade *">
-              <Input value={state.dados.nome} onChange={(e) => setDados({ nome: e.target.value })} placeholder="Universidade Privada de Angola" />
+              <Input value={state.dados.nome} onChange={(e) => setDados({ nome: e.target.value })} placeholder="Universidade Privada De Angola" />
             </Field>
             <Field label="Tipo de instituição">
               <Select value={state.dados.tipo} onValueChange={(v) => setDados({ tipo: v })}>
