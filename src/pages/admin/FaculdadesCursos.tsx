@@ -493,6 +493,29 @@ export default function AdminFaculdadesCursos() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Confirm save changes */}
+      <AlertDialog open={!!confirmSaveFor} onOpenChange={(o) => !o && setConfirmSaveFor(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar alterações?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tens a certeza que queres guardar as alterações na faculdade{" "}
+              <strong>{confirmSaveFor?.name}</strong>? Esta ação irá actualizar os dados em toda a plataforma.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-emerald-600 hover:bg-emerald-700 text-white"
+              onClick={() => confirmSaveFor && performSave(confirmSaveFor)}
+            >
+              <Check className="w-3.5 h-3.5 mr-1.5" /> Sim, guardar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
+
   );
 }
