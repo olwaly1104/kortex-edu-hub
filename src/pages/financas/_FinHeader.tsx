@@ -81,7 +81,7 @@ export function FinHeader({ title, subtitle, icon, right, anoLetivo = "2024 / 20
               <CalendarDays className="w-3.5 h-3.5 text-muted-foreground" />{todayLabel}
             </span>
             <span className="hidden sm:block w-px bg-border" />
-            <span className="flex items-center gap-1.5 px-2.5 py-1 font-mono tabular-nums text-primary bg-muted/30">
+            <span className="flex items-center gap-1.5 px-2.5 py-1 tabular-nums font-semibold text-primary bg-muted/30 tracking-tight">
               <Clock className="w-3.5 h-3.5" />{liveTime}
             </span>
           </div>

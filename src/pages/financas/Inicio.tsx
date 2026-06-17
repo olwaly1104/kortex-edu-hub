@@ -13,7 +13,7 @@ export default function FinancasInicio() {
         Minha Presença
       </span>
       <span className="w-px bg-border" />
-      <span className="flex items-center gap-1.5 px-2.5 py-1 font-mono tabular-nums text-primary bg-muted/30">
+      <span className="flex items-center gap-1.5 px-2.5 py-1 tabular-nums font-semibold text-primary bg-muted/30 tracking-tight">
         0%
       </span>
     </div>
