@@ -78,7 +78,7 @@ export default function OnboardingPessoas({ mode }: { mode: Mode }) {
           email: emailFrom(pn, un),
           contacto: `+244 923 200 00${i}`,
           grau: grausPool[i % grausPool.length],
-          moduloKortex: "Professor",
+          kortex: true,
         };
       }
       return {
@@ -91,7 +91,7 @@ export default function OnboardingPessoas({ mode }: { mode: Mode }) {
         contacto: `+244 923 300 00${i}`,
         departamento: departamentosPool[i % departamentosPool.length],
         funcao: funcoesPool[i % funcoesPool.length],
-        moduloKortex: "Académica",
+        kortex: true,
       };
     });
     setRows(prev => [...prev, ...generated]);
