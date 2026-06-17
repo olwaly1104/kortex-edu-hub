@@ -71,10 +71,24 @@ export default function AdminOnboarding() {
     reader.readAsDataURL(file);
   };
 
-  const canSubmit = state.dados.nome.trim().length > 0;
+  const emailValid = /^[^\s@]+@[^\s@]+\.com$/i.test(state.dados.email.trim());
+  const d = state.dados;
+  const canSubmit =
+    d.nome.trim().length > 0 &&
+    d.tipo.trim().length > 0 &&
+    d.sigla.trim().length > 0 &&
+    d.nif.trim().length > 0 &&
+    d.provincia.trim().length > 0 &&
+    d.municipio.trim().length > 0 &&
+    d.endereco.trim().length > 0 &&
+    d.telefone.trim().length > 0 &&
+    emailValid;
 
   const activate = () => {
-    if (!canSubmit) return;
+    if (!canSubmit) {
+      if (!emailValid) toast.error?.("Email institucional deve terminar em .com");
+      return;
+    }
     setActivating(true);
     setTimeout(() => {
       const nome = state.dados.nome.trim() || "Instituição";
@@ -178,7 +192,7 @@ export default function AdminOnboarding() {
               <Input value={state.dados.endereco} onChange={(e) => setDados({ endereco: e.target.value })} placeholder="Rua, número, bairro" />
             </Field>
             <Field label="Telefone"><Input value={state.dados.telefone} onChange={(e) => setDados({ telefone: e.target.value })} placeholder="+244 000 000 000" /></Field>
-            <Field label="Email institucional"><Input type="email" value={state.dados.email} onChange={(e) => setDados({ email: e.target.value })} placeholder="contacto@instituicao.ao" /></Field>
+            <Field label="Email institucional"><Input type="email" value={state.dados.email} onChange={(e) => setDados({ email: e.target.value })} placeholder="contacto@instituicao.com" />{state.dados.email && !/^[^\s@]+@[^\s@]+\.com$/i.test(state.dados.email.trim()) && (<p className="text-[10px] text-destructive mt-1">Deve ser um email válido terminado em .com</p>)}</Field>
           </div>
 
           <div className="mt-8 flex items-center justify-between gap-3 border-t border-border pt-6">

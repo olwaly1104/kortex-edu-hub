@@ -247,12 +247,7 @@ export default function GapConfiguracao() {
     { key: "curso_preparatorio", label: "Curso Preparatório", obrigatoria: false, estadosPossiveis: ["agendado", "completo", "remarcado"] },
     { key: "exame", label: "Exame de Acesso", obrigatoria: true, estadosPossiveis: ["agendado", "aprovado", "reprovado", "remarcado"] },
   ]);
-  const [cdSessoes, setCdSessoes] = useState<CdSessao[]>([
-    { key: "cp_s1", etapa: "Curso Preparatório", data: "2026-07-18", hora: "09:00", local: "Anfiteatro A — Campus UPRA", capacidade: 80 },
-    { key: "cp_s2", etapa: "Curso Preparatório", data: "2026-07-25", hora: "09:00", local: "Anfiteatro B — Campus UPRA", capacidade: 80 },
-    { key: "ex_s1", etapa: "Exame de Acesso", data: "2026-08-15", hora: "09:00", local: "Edifício Central, Sala 04", capacidade: 60 },
-    { key: "ex_s2", etapa: "Exame de Acesso", data: "2026-08-22", hora: "14:00", local: "Edifício Central, Sala 06", capacidade: 60 },
-  ]);
+  const [cdSessoes, setCdSessoes] = useState<CdSessao[]>([]);
   const [cdNotaMinima, setCdNotaMinima] = useState(10);
   const [cdTaxa, setCdTaxa] = useState(15000);
   const [cdMaxOpcoes, setCdMaxOpcoes] = useState(3);
@@ -296,7 +291,11 @@ export default function GapConfiguracao() {
   const removeCdEtapa = (key: string) => setCdEtapas(es => es.filter(e => e.key !== key));
   const toggleEtapaObrig = (key: string) => setCdEtapas(es => es.map(e => e.key === key ? { ...e, obrigatoria: !e.obrigatoria } : e));
   const addCdSessao = () => {
-    if (!newCdSessData || !newCdSessLocal.trim()) { toast({ title: "Preencha data e local", variant: "destructive" }); return; }
+    if (!newCdSessEtapa.trim()) { toast({ title: "Selecione a etapa", variant: "destructive" }); return; }
+    if (!newCdSessData) { toast({ title: "Defina a data", variant: "destructive" }); return; }
+    if (!newCdSessHora) { toast({ title: "Defina a hora", variant: "destructive" }); return; }
+    if (!newCdSessLocal.trim()) { toast({ title: "Indique o local", variant: "destructive" }); return; }
+    if (!Number.isFinite(newCdSessCap) || newCdSessCap <= 0) { toast({ title: "Capacidade deve ser maior que zero", variant: "destructive" }); return; }
     setCdSessoes(s => [...s, { key: `s-${Date.now()}`, etapa: newCdSessEtapa, data: newCdSessData, hora: newCdSessHora, local: newCdSessLocal.trim(), capacidade: newCdSessCap }]);
     setNewCdSessData(""); setNewCdSessLocal(""); setNewCdSessCap(60); setCdSessOpen(false);
   };
