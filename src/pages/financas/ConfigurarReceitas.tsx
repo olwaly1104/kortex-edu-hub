@@ -193,9 +193,10 @@ const PRAZOS_DEF_KEY = (email?: string | null) => KEY("propinas.prazos.meses", e
 type PrazoDef = { id: string; nome: string; meses: number; locked?: boolean };
 
 const DEFAULT_PRAZOS: PrazoDef[] = [
-  { id: "prazo-mensal",    nome: "Mensal",    meses: 1,  locked: true },
-  { id: "prazo-semestral", nome: "Semestral", meses: 6,  locked: true },
-  { id: "prazo-anual",     nome: "Anual",     meses: 12, locked: true },
+  { id: "prazo-mensal",     nome: "Mensal",     meses: 1,  locked: true },
+  { id: "prazo-trimestral", nome: "Trimestral", meses: 3,  locked: true },
+  { id: "prazo-semestral",  nome: "Semestral",  meses: 6,  locked: true },
+  { id: "prazo-anual",      nome: "Anual",      meses: 12, locked: true },
 ];
 
 function ensureDefaults(list: PrazoDef[]): PrazoDef[] {
@@ -858,15 +859,17 @@ function EmolumentosBlock({ email, impostos }: { email?: string | null; impostos
           <span className="text-[11px] text-muted-foreground ml-auto tabular-nums shrink-0">{cats.length} categoria{cats.length === 1 ? "" : "s"}</span>
         </div>
         <div className="divide-y">
-          <div className="grid grid-cols-[1fr_40px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
+          <div className="grid grid-cols-[1fr_140px_40px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
             <div>Designação</div>
+            <div>Pré-visualização</div>
             <div className="text-right">Ação</div>
           </div>
           {cats.length === 0 ? (
             <div className="px-5 py-8 text-center text-xs text-muted-foreground">Sem categorias configuradas.</div>
           ) : cats.map((c, idx) => (
-            <div key={idx} className="grid grid-cols-[1fr_40px] gap-3 px-5 py-2.5 items-center text-sm">
+            <div key={idx} className="grid grid-cols-[1fr_140px_40px] gap-3 px-5 py-2.5 items-center text-sm">
               <Input className="h-9" placeholder="Ex: Certificado" value={c} onChange={(e) => updCat(idx, e.target.value)} />
+              <span className="inline-flex items-center justify-center px-2.5 py-1.5 rounded-md border text-xs font-medium truncate bg-primary/10 text-primary border-primary/20">{c || "—"}</span>
               <div className="flex justify-end">
                 <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
                   onClick={() => delCat(idx)}><Trash2 className="w-3.5 h-3.5" /></Button>
@@ -926,15 +929,17 @@ function ServicosAcademicosBlock({ email, impostos }: { email?: string | null; i
           <span className="text-[11px] text-muted-foreground ml-auto tabular-nums shrink-0">{cats.length} categoria{cats.length === 1 ? "" : "s"}</span>
         </div>
         <div className="divide-y">
-          <div className="grid grid-cols-[1fr_40px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
+          <div className="grid grid-cols-[1fr_140px_40px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
             <div>Designação</div>
+            <div>Pré-visualização</div>
             <div className="text-right">Ação</div>
           </div>
           {cats.length === 0 ? (
             <div className="px-5 py-8 text-center text-xs text-muted-foreground">Sem categorias configuradas.</div>
           ) : cats.map((c, idx) => (
-            <div key={idx} className="grid grid-cols-[1fr_40px] gap-3 px-5 py-2.5 items-center text-sm">
+            <div key={idx} className="grid grid-cols-[1fr_140px_40px] gap-3 px-5 py-2.5 items-center text-sm">
               <Input className="h-9" placeholder="Ex: Workshop" value={c} onChange={(e) => updCat(idx, e.target.value)} />
+              <span className="inline-flex items-center justify-center px-2.5 py-1.5 rounded-md border text-xs font-medium truncate bg-primary/10 text-primary border-primary/20">{c || "—"}</span>
               <div className="flex justify-end">
                 <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
                   onClick={() => delCat(idx)}><Trash2 className="w-3.5 h-3.5" /></Button>
@@ -957,6 +962,7 @@ function ServicosAcademicosBlock({ email, impostos }: { email?: string | null; i
         typeOptions={cats.filter((c) => c.trim())}
         withTarget
         withTax
+        withTaxValue
         impostos={impostos}
         addLabel="Adicionar serviço"
         placeholder="Ex: Workshop AutoCAD"
@@ -970,7 +976,7 @@ function ServicosAcademicosBlock({ email, impostos }: { email?: string | null; i
 
 function LineItemsBlock({
   title, subtitle, icon: Icon, storageKey, addLabel, placeholder, valueLabel,
-  withUnit = false, withTarget = false, withType = false, withTax = false, impostos = [],
+  withUnit = false, withTarget = false, withType = false, withTax = false, withTaxValue = false, impostos = [],
   typeLabel = "Tipo", typeOptions,
 }: {
   title: string;
@@ -984,6 +990,7 @@ function LineItemsBlock({
   withTarget?: boolean;
   withType?: boolean;
   withTax?: boolean;
+  withTaxValue?: boolean;
   impostos?: Imposto[];
   typeLabel?: string;
   typeOptions?: string[];
@@ -1008,6 +1015,7 @@ function LineItemsBlock({
     withType && "130px",
     "140px",                     // Valor
     withTax && "150px",
+    withTaxValue && "140px",
     withUnit && "120px",
     withTarget && "140px",
     "44px",                      // Ação
@@ -1033,6 +1041,7 @@ function LineItemsBlock({
           {withType && <div>{typeLabel}</div>}
           <div>{valueLabel}</div>
           {withTax && <div>Imposto</div>}
+          {withTaxValue && <div>Valor Imposto</div>}
           {withUnit && <div>Unidade</div>}
           {withTarget && <div>Aplica-se a</div>}
           <div className="text-right">Ação</div>
@@ -1067,6 +1076,11 @@ function LineItemsBlock({
                 <option value="">— Sem imposto —</option>
                 {impostos.map((i) => <option key={i.id} value={i.id}>{i.nome} ({(i.taxa * 100).toFixed(0)}%)</option>)}
               </select>
+            )}
+            {withTaxValue && (
+              <div className="h-9 flex items-center justify-end px-2 rounded-md bg-muted/30 tabular-nums font-medium text-xs text-muted-foreground">
+                {fmt((r.valor || 0) * (impostos.find((i) => i.id === r.impostoId)?.taxa ?? 0))} Kz
+              </div>
             )}
             {withUnit && (
               <Input className="h-9" placeholder="Kz / dia" value={r.unidade || ""}
