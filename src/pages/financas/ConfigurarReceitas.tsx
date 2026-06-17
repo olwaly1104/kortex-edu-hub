@@ -193,9 +193,10 @@ const PRAZOS_DEF_KEY = (email?: string | null) => KEY("propinas.prazos.meses", e
 type PrazoDef = { id: string; nome: string; meses: number; locked?: boolean };
 
 const DEFAULT_PRAZOS: PrazoDef[] = [
-  { id: "prazo-mensal",    nome: "Mensal",    meses: 1,  locked: true },
-  { id: "prazo-semestral", nome: "Semestral", meses: 6,  locked: true },
-  { id: "prazo-anual",     nome: "Anual",     meses: 12, locked: true },
+  { id: "prazo-mensal",     nome: "Mensal",     meses: 1,  locked: true },
+  { id: "prazo-trimestral", nome: "Trimestral", meses: 3,  locked: true },
+  { id: "prazo-semestral",  nome: "Semestral",  meses: 6,  locked: true },
+  { id: "prazo-anual",      nome: "Anual",      meses: 12, locked: true },
 ];
 
 function ensureDefaults(list: PrazoDef[]): PrazoDef[] {
