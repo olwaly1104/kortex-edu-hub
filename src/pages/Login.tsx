@@ -5,12 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Eye, EyeOff, Globe, Building2, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Globe, Loader2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
 import logoUpra from "@/assets/logo-upra.asset.json";
 import { supabase } from "@/integrations/supabase/client";
-import { onboardingKey, isOnboardingCompleteFor, pushOnboarding } from "@/lib/onboardingStorage";
-import { loadDevCreds, saveDevCred, removeDevCred, type DevCred } from "@/lib/devCreds";
+import { isOnboardingCompleteFor } from "@/lib/onboardingStorage";
+import { loadDevCreds, removeDevCred, type DevCred } from "@/lib/devCreds";
 import { KeyRound, Copy, Trash2 } from "lucide-react";
 
 const ROLE_ROUTE: Record<string, string> = {
@@ -37,15 +37,6 @@ export default function Login() {
   const [info, setInfo] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  // Registo de Instituição dialog
-  const [signupOpen, setSignupOpen] = useState(false);
-  const [suNome, setSuNome] = useState("");
-  const [suEmail, setSuEmail] = useState("");
-  const [suEmailManuallyEdited, setSuEmailManuallyEdited] = useState(false);
-  const [suPassword, setSuPassword] = useState("");
-  const [suError, setSuError] = useState("");
-  const [suLoading, setSuLoading] = useState(false);
-
   // Dev credentials (local browser only)
   const [credsOpen, setCredsOpen] = useState(false);
   const [creds, setCreds] = useState<DevCred[]>([]);
@@ -53,17 +44,6 @@ export default function Login() {
   useEffect(() => {
     if (credsOpen) setCreds(loadDevCreds().sort((a, b) => b.createdAt - a.createdAt));
   }, [credsOpen]);
-  // Auto-fill institutional email as admin@<slug>.kor
-  useEffect(() => {
-    if (!suNome.trim() || suEmailManuallyEdited) return;
-    const slug = suNome
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/\s+/g, "-")
-      .replace(/[^a-z0-9-]/g, "");
-    if (slug) setSuEmail(`admin@${slug}.kor`);
-  }, [suNome, suEmailManuallyEdited]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -96,7 +76,6 @@ export default function Login() {
       }
       const accountEmail = signInData.user?.email || normalizedEmail;
       const displayName = (signInData.user?.user_metadata as any)?.display_name;
-      // Hydrate the in-app shell using the real DB role
       login(accountEmail, password, { sourceEmail: accountEmail, displayName, role });
       if (role === "admin" && !isOnboardingCompleteFor(accountEmail)) {
         navigate("/admin/onboarding");
@@ -105,76 +84,6 @@ export default function Login() {
       navigate(ROLE_ROUTE[role] ?? "/student");
     } finally {
       setSubmitting(false);
-    }
-  };
-
-  const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSuError("");
-    if (!suNome.trim() || !suEmail.trim() || !suPassword) {
-      setSuError("Preencha todos os campos.");
-      return;
-    }
-    if (suPassword.length < 6) {
-      setSuError("Palavra-passe deve ter pelo menos 6 caracteres.");
-      return;
-    }
-    setSuLoading(true);
-    try {
-      const emailTrim = suEmail.trim();
-      const { data: suData, error: signUpError } = await supabase.auth.signUp({
-        email: emailTrim,
-        password: suPassword,
-        options: {
-          data: { display_name: suNome.trim(), modulo: "admin" },
-          emailRedirectTo: `${window.location.origin}/`,
-        },
-      });
-      if (signUpError) {
-        setSuError(signUpError.message || "Não foi possível registar a instituição.");
-        return;
-      }
-      const userId = suData.user?.id;
-      if (userId) {
-        const { error: roleErr } = await supabase.from("user_roles" as any).insert({
-          user_id: userId,
-          role: "admin",
-        } as any);
-        if (roleErr) console.warn("user_roles insert failed:", roleErr.message);
-      }
-      saveDevCred({ email: emailTrim, password: suPassword, modulo: "admin", name: suNome.trim() });
-      // Pre-seed local onboarding entry so onboarding flow knows the institution name.
-      try {
-        const onboardingState = {
-          dados: {
-            nome: suNome.trim(),
-            tipo: "",
-            sigla: "",
-            provincia: "",
-            municipio: "",
-            endereco: "",
-            telefone: "",
-            email: emailTrim,
-            nif: "",
-            logoDataUrl: "",
-          },
-          completed: false,
-        };
-        localStorage.setItem(onboardingKey(emailTrim), JSON.stringify(onboardingState));
-        pushOnboarding(emailTrim, onboardingState);
-      } catch {
-        /* ignore */
-      }
-      setSignupOpen(false);
-      setEmail(emailTrim);
-      setPassword(suPassword);
-      setInfo("Instituição registada. Inicie sessão para concluir o onboarding institucional.");
-      setSuNome("");
-      setSuEmail("");
-      setSuPassword("");
-      setSuEmailManuallyEdited(false);
-    } finally {
-      setSuLoading(false);
     }
   };
 
@@ -190,10 +99,11 @@ export default function Login() {
         <div className="relative z-10 text-center">
           <div className="flex flex-col items-center gap-4 mb-8">
             <div className="w-28 h-28 rounded-2xl bg-primary-foreground flex items-center justify-center p-3 shadow-xl">
-              <img src={logoUpra.url} alt="Kortex" className="w-full h-full object-contain" />
+              <img src={logoUpra.url} alt="UPRA" className="w-full h-full object-contain" />
             </div>
             <div className="text-center">
-              <h1 className="text-3xl font-bold text-primary-foreground tracking-wide">Kortex</h1>
+              <h1 className="text-3xl font-bold text-primary-foreground tracking-wide">UPRA</h1>
+              <p className="text-sm text-primary-foreground/80 mt-1">Universidade Privada de Angola</p>
             </div>
           </div>
           <p className="text-xl text-primary-foreground/90 max-w-md leading-relaxed">
@@ -216,17 +126,17 @@ export default function Login() {
           {/* Mobile logo */}
           <div className="flex items-center gap-3 mb-10 lg:hidden">
             <div className="w-14 h-14 rounded-xl bg-muted flex items-center justify-center p-1.5">
-              <img src={logoUpra.url} alt="Kortex" className="w-full h-full object-contain" />
+              <img src={logoUpra.url} alt="UPRA" className="w-full h-full object-contain" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-foreground">Kortex</h1>
+              <h1 className="text-2xl font-bold text-foreground">UPRA</h1>
               <p className="text-xs text-muted-foreground uppercase tracking-wider">Portal Académico</p>
             </div>
           </div>
 
           <div className="mb-8">
             <h2 className="text-2xl font-bold text-foreground">Bem-vindo</h2>
-            <p className="text-muted-foreground mt-1">Entre com as suas credenciais para aceder à plataforma.</p>
+            <p className="text-muted-foreground mt-1">Entre com as suas credenciais para aceder ao portal da UPRA.</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -235,7 +145,7 @@ export default function Login() {
               <Input
                 id="email"
                 type="email"
-                placeholder="admin@minha-instituicao.kor"
+                placeholder="nome@upra.kor"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="h-11"
@@ -293,7 +203,7 @@ export default function Login() {
 
           <div className="mt-6 text-center space-y-3">
             <p className="text-xs text-muted-foreground px-2">
-              Apenas contas reais. Para começar, registe a sua instituição — depois crie todos os utilizadores a partir do painel da instituição.
+              As contas são criadas pela administração da UPRA. Se ainda não tem acesso, contacte os serviços académicos.
             </p>
 
             {/* Dev-only: ver contas e palavras-passe guardadas neste browser */}
@@ -312,7 +222,7 @@ export default function Login() {
                 </DialogHeader>
                 {creds.length === 0 ? (
                   <p className="text-sm text-muted-foreground py-6 text-center">
-                    Sem contas guardadas. Registe uma instituição ou crie utilizadores em Admin → Utilizadores.
+                    Sem contas guardadas. Crie utilizadores em Admin → Utilizadores.
                   </p>
                 ) : (
                   <div className="space-y-2 max-h-[60vh] overflow-auto">
@@ -351,59 +261,6 @@ export default function Login() {
                     ))}
                   </div>
                 )}
-              </DialogContent>
-            </Dialog>
-
-            <Dialog open={signupOpen} onOpenChange={setSignupOpen}>
-              <DialogTrigger asChild>
-                <Button type="button" variant="default" size="sm" className="gap-2">
-                  <Building2 className="w-4 h-4" /> Registo de Instituição
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-md">
-                <DialogHeader>
-                  <DialogTitle>Registo de Instituição</DialogTitle>
-                  <DialogDescription>
-                    Crie a conta principal da sua instituição no Kortex. Esta conta gere toda a instituição e cria os restantes utilizadores (estudantes, docentes, coordenadores, decanos, reitor, finanças, académica, GAP, inscrições).
-                  </DialogDescription>
-                </DialogHeader>
-                <form onSubmit={handleSignup} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="su-nome">Nome da instituição</Label>
-                    <Input
-                      id="su-nome"
-                      value={suNome}
-                      onChange={(e) => setSuNome(e.target.value)}
-                      placeholder="Ex: Universidade Privada de Angola"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="su-email">Email do administrador da instituição</Label>
-                    <Input
-                      id="su-email"
-                      type="email"
-                      value={suEmail}
-                      onChange={(e) => { setSuEmailManuallyEdited(true); setSuEmail(e.target.value); }}
-                      placeholder="admin@minha-instituicao.kor"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="su-password">Palavra-passe (mín. 6)</Label>
-                    <Input
-                      id="su-password"
-                      type="password"
-                      value={suPassword}
-                      onChange={(e) => setSuPassword(e.target.value)}
-                      placeholder="••••••••"
-                    />
-                  </div>
-                  {suError && (
-                    <p className="text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-md">{suError}</p>
-                  )}
-                  <Button type="submit" disabled={suLoading} className="w-full">
-                    {suLoading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> A registar...</> : "Registar instituição"}
-                  </Button>
-                </form>
               </DialogContent>
             </Dialog>
           </div>
