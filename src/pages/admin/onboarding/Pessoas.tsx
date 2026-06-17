@@ -15,6 +15,7 @@ type Person = {
   prefixo?: string;
   primeiroNome: string;
   ultimoNome: string;
+  genero?: string;
   email: string;
   contacto?: string;
   grau?: string;
@@ -24,6 +25,7 @@ type Person = {
 };
 
 const prefixosPool = ["Sr.", "Sra.", "Dr.", "Dra.", "Prof.", "Eng.", "Me."];
+const generosPool = ["Masculino", "Feminino"];
 const grausPool = ["Licenciado", "Mestre", "Doutor", "Pós-doc"];
 const departamentosPool = ["Académica", "Finanças", "GAP", "TI", "Recursos Humanos", "Manutenção"];
 const funcoesPool = ["Assistente", "Coordenador", "Técnico", "Auxiliar", "Diretor"];
@@ -48,8 +50,8 @@ export default function OnboardingPessoas({ mode }: { mode: Mode }) {
 
   const addEmptyRow = () => {
     const novo: Person = isDoc
-      ? { id: String(Date.now()), prefixo: "", primeiroNome: "", ultimoNome: "", email: "", contacto: "", grau: grausPool[2], moduloKortex: "Professor" }
-      : { id: String(Date.now()), prefixo: "", primeiroNome: "", ultimoNome: "", email: "", contacto: "", departamento: departamentosPool[0], funcao: funcoesPool[0], moduloKortex: "Académica" };
+      ? { id: String(Date.now()), prefixo: "", primeiroNome: "", ultimoNome: "", genero: "", email: "", contacto: "", grau: grausPool[2], moduloKortex: "Professor" }
+      : { id: String(Date.now()), prefixo: "", primeiroNome: "", ultimoNome: "", genero: "", email: "", contacto: "", departamento: departamentosPool[0], funcao: funcoesPool[0], moduloKortex: "Académica" };
     setRows(prev => [...prev, novo]);
   };
 
@@ -65,26 +67,32 @@ export default function OnboardingPessoas({ mode }: { mode: Mode }) {
   const simulateImport = () => {
     const generated: Person[] = Array.from({ length: 8 }).map((_, i) => {
       const n = i + 1;
+      const pn = isDoc ? "Importado" : "Staff";
+      const un = isDoc ? `${n}` : `Importado ${n}`;
       if (isDoc) {
         return {
           id: `id-${Date.now()}-${i}`,
           prefixo: "Prof.",
-          primeiroNome: "Importado",
-          ultimoNome: `${n}`,
-          email: `docente${n}@upra.kor`,
+          primeiroNome: pn,
+          ultimoNome: un,
+          genero: i % 2 === 0 ? "Masculino" : "Feminino",
+          email: emailFrom(pn, un),
           contacto: `+244 923 200 00${i}`,
           grau: grausPool[i % grausPool.length],
+          moduloKortex: "Professor",
         };
       }
       return {
         id: `is-${Date.now()}-${i}`,
         prefixo: "Sr.",
-        primeiroNome: "Staff",
-        ultimoNome: `Importado ${n}`,
-        email: `staff${n}@upra.kor`,
+        primeiroNome: pn,
+        ultimoNome: un,
+        genero: i % 2 === 0 ? "Masculino" : "Feminino",
+        email: emailFrom(pn, un),
         contacto: `+244 923 300 00${i}`,
         departamento: departamentosPool[i % departamentosPool.length],
         funcao: funcoesPool[i % funcoesPool.length],
+        moduloKortex: "Académica",
       };
     });
     setRows(prev => [...prev, ...generated]);
@@ -92,9 +100,57 @@ export default function OnboardingPessoas({ mode }: { mode: Mode }) {
   };
 
   const HeaderIcon = isDoc ? GraduationCap : Briefcase;
+  // Columns order: Prefixo | Primeiro | Último | Género | Contacto | (Grau | (Dept | Função)) | Módulo | Email (auto)
   const grid = isDoc
-    ? "grid-cols-[80px_1fr_1fr_1.4fr_1fr_1fr_1.2fr]"
-    : "grid-cols-[80px_1fr_1fr_1.4fr_1fr_1fr_1fr_1.2fr]";
+    ? "grid-cols-[80px_1fr_1fr_0.9fr_1fr_1fr_1.1fr_1.4fr]"
+    : "grid-cols-[80px_1fr_1fr_0.9fr_1fr_1fr_1fr_1.1fr_1.4fr]";
+
+  const HeaderRow = () => (
+    <div className={`grid ${grid} gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b`}>
+      <span>Prefixo</span><span>Primeiro nome</span><span>Último nome</span><span>Género</span><span>Contacto</span>
+      {isDoc ? (<span>Grau</span>) : (<><span>Departamento</span><span>Função</span></>)}
+      <span>Módulo</span>
+      <span>Email <span className="normal-case text-[9px] text-muted-foreground/70">(auto)</span></span>
+    </div>
+  );
+
+  const Row = ({ r }: { r: Person }) => (
+    <div key={r.id} className={`grid ${grid} gap-2 px-4 py-2 items-center`}>
+      <Select value={r.prefixo || ""} onValueChange={v => update(r.id, { prefixo: v })}>
+        <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="—" /></SelectTrigger>
+        <SelectContent>{prefixosPool.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
+      </Select>
+      <Input value={r.primeiroNome} onChange={e => update(r.id, { primeiroNome: e.target.value })} className="h-8 text-xs" placeholder="Primeiro" />
+      <Input value={r.ultimoNome} onChange={e => update(r.id, { ultimoNome: e.target.value })} className="h-8 text-xs" placeholder="Último" />
+      <Select value={r.genero || ""} onValueChange={v => update(r.id, { genero: v })}>
+        <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="—" /></SelectTrigger>
+        <SelectContent>{generosPool.map(g => <SelectItem key={g} value={g}>{g}</SelectItem>)}</SelectContent>
+      </Select>
+      <Input value={r.contacto || ""} onChange={e => update(r.id, { contacto: e.target.value })} className="h-8 text-xs" placeholder="+244 ..." />
+      {isDoc ? (
+        <Select value={r.grau} onValueChange={v => update(r.id, { grau: v })}>
+          <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+          <SelectContent>{grausPool.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
+        </Select>
+      ) : (
+        <>
+          <Select value={r.departamento} onValueChange={v => update(r.id, { departamento: v })}>
+            <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+            <SelectContent>{departamentosPool.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
+          </Select>
+          <Select value={r.funcao} onValueChange={v => update(r.id, { funcao: v })}>
+            <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+            <SelectContent>{funcoesPool.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
+          </Select>
+        </>
+      )}
+      <Select value={r.moduloKortex || ""} onValueChange={v => update(r.id, { moduloKortex: v })}>
+        <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="—" /></SelectTrigger>
+        <SelectContent>{modulosKortexPool.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}</SelectContent>
+      </Select>
+      <Input value={r.email} readOnly disabled className="h-8 text-xs bg-muted/40 cursor-not-allowed" placeholder="auto @upra.kor" />
+    </div>
+  );
 
   return (
     <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6 animate-fade-in">
@@ -129,45 +185,9 @@ export default function OnboardingPessoas({ mode }: { mode: Mode }) {
           </div>
 
           <Card className="overflow-hidden">
-            <div className={`grid ${grid} gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b`}>
-              <span>Prefixo</span><span>Primeiro nome</span><span>Último nome</span><span>Email</span>
-              {isDoc ? (<><span>Contacto</span><span>Grau</span></>) : (<><span>Contacto</span><span>Departamento</span><span>Função</span></>)}
-              <span>Módulo</span>
-            </div>
+            <HeaderRow />
             <div className="divide-y">
-              {rows.map(r => (
-                <div key={r.id} className={`grid ${grid} gap-2 px-4 py-2 items-center`}>
-                  <Select value={r.prefixo || ""} onValueChange={v => update(r.id, { prefixo: v })}>
-                    <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="—" /></SelectTrigger>
-                    <SelectContent>{prefixosPool.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
-                  </Select>
-                  <Input value={r.primeiroNome} onChange={e => update(r.id, { primeiroNome: e.target.value })} className="h-8 text-xs" placeholder="Primeiro" />
-                  <Input value={r.ultimoNome} onChange={e => update(r.id, { ultimoNome: e.target.value })} className="h-8 text-xs" placeholder="Último" />
-                  <Input value={r.email} readOnly disabled className="h-8 text-xs bg-muted/40 cursor-not-allowed" placeholder="auto @upra.kor" />
-                  <Input value={r.contacto || ""} onChange={e => update(r.id, { contacto: e.target.value })} className="h-8 text-xs" placeholder="+244 ..." />
-                  {isDoc ? (
-                    <Select value={r.grau} onValueChange={v => update(r.id, { grau: v })}>
-                      <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                      <SelectContent>{grausPool.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-                    </Select>
-                  ) : (
-                    <>
-                      <Select value={r.departamento} onValueChange={v => update(r.id, { departamento: v })}>
-                        <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                        <SelectContent>{departamentosPool.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-                      </Select>
-                      <Select value={r.funcao} onValueChange={v => update(r.id, { funcao: v })}>
-                        <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                        <SelectContent>{funcoesPool.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-                      </Select>
-                    </>
-                  )}
-                  <Select value={r.moduloKortex || ""} onValueChange={v => update(r.id, { moduloKortex: v })}>
-                    <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="—" /></SelectTrigger>
-                    <SelectContent>{modulosKortexPool.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}</SelectContent>
-                  </Select>
-                </div>
-              ))}
+              {rows.map(r => <Row key={r.id} r={r} />)}
               {rows.length === 0 && (
                 <p className="px-4 py-8 text-xs text-muted-foreground italic text-center">Sem registos. Clique em adicionar para começar.</p>
               )}
@@ -182,45 +202,9 @@ export default function OnboardingPessoas({ mode }: { mode: Mode }) {
 
         <TabsContent value="manual" className="mt-0">
           <Card className="overflow-hidden">
-            <div className={`grid ${grid} gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b`}>
-              <span>Prefixo</span><span>Primeiro nome</span><span>Último nome</span><span>Email</span>
-              {isDoc ? (<><span>Contacto</span><span>Grau</span></>) : (<><span>Contacto</span><span>Departamento</span><span>Função</span></>)}
-              <span>Módulo</span>
-            </div>
+            <HeaderRow />
             <div className="divide-y">
-              {rows.map(r => (
-                <div key={r.id} className={`grid ${grid} gap-2 px-4 py-2 items-center`}>
-                  <Select value={r.prefixo || ""} onValueChange={v => update(r.id, { prefixo: v })}>
-                    <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="—" /></SelectTrigger>
-                    <SelectContent>{prefixosPool.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
-                  </Select>
-                  <Input value={r.primeiroNome} onChange={e => update(r.id, { primeiroNome: e.target.value })} className="h-8 text-xs" placeholder="Primeiro" />
-                  <Input value={r.ultimoNome} onChange={e => update(r.id, { ultimoNome: e.target.value })} className="h-8 text-xs" placeholder="Último" />
-                  <Input value={r.email} readOnly disabled className="h-8 text-xs bg-muted/40 cursor-not-allowed" placeholder="auto @upra.kor" />
-                  <Input value={r.contacto || ""} onChange={e => update(r.id, { contacto: e.target.value })} className="h-8 text-xs" placeholder="+244 ..." />
-                  {isDoc ? (
-                    <Select value={r.grau} onValueChange={v => update(r.id, { grau: v })}>
-                      <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                      <SelectContent>{grausPool.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-                    </Select>
-                  ) : (
-                    <>
-                      <Select value={r.departamento} onValueChange={v => update(r.id, { departamento: v })}>
-                        <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                        <SelectContent>{departamentosPool.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-                      </Select>
-                      <Select value={r.funcao} onValueChange={v => update(r.id, { funcao: v })}>
-                        <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                        <SelectContent>{funcoesPool.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-                      </Select>
-                    </>
-                  )}
-                  <Select value={r.moduloKortex || ""} onValueChange={v => update(r.id, { moduloKortex: v })}>
-                    <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="—" /></SelectTrigger>
-                    <SelectContent>{modulosKortexPool.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}</SelectContent>
-                  </Select>
-                </div>
-              ))}
+              {rows.map(r => <Row key={r.id} r={r} />)}
               {rows.length === 0 && (
                 <p className="px-4 py-8 text-xs text-muted-foreground italic text-center">Sem registos. Clique em adicionar para começar.</p>
               )}
