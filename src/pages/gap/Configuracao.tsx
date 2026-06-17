@@ -248,11 +248,11 @@ export default function GapConfiguracao() {
     { key: "exame", label: "Exame de Acesso", obrigatoria: true, estadosPossiveis: ["agendado", "aprovado", "reprovado", "remarcado"] },
   ]);
   const [cdSessoes, setCdSessoes] = useState<CdSessao[]>([]);
-  const [cdNotaMinima, setCdNotaMinima] = useState(10);
-  const [cdTaxa, setCdTaxa] = useState(15000);
-  const [cdMaxOpcoes, setCdMaxOpcoes] = useState(3);
-  const [cdPeriodoInicio, setCdPeriodoInicio] = useState("2026-09-01");
-  const [cdPeriodoFim, setCdPeriodoFim] = useState("2026-11-30");
+  const [cdNotaMinima, setCdNotaMinima] = useState<number | "">("");
+  const [cdTaxa, setCdTaxa] = useState<number | "">("");
+  const [cdMaxOpcoes, setCdMaxOpcoes] = useState<number | "">("");
+  const [cdPeriodoInicio, setCdPeriodoInicio] = useState("");
+  const [cdPeriodoFim, setCdPeriodoFim] = useState("");
 
   const [cdEstadoOpen, setCdEstadoOpen] = useState(false);
   const [cdEtapaOpen, setCdEtapaOpen] = useState(false);
@@ -813,17 +813,17 @@ export default function GapConfiguracao() {
               </div>
               <div>
                 <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Nota mínima de aprovação</label>
-                <Input type="number" min={0} max={20} step={0.5} value={cdNotaMinima} disabled={!isCardEditing("cd-params")} onChange={e => setCdNotaMinima(Number(e.target.value))} />
+                <Input type="number" min={0} max={20} step={0.5} value={cdNotaMinima} disabled={!isCardEditing("cd-params")} onChange={e => setCdNotaMinima(e.target.value === "" ? "" : Number(e.target.value))} />
                 <p className="text-[10px] text-muted-foreground mt-1">Escala 0–20 no exame de acesso</p>
               </div>
               <div>
                 <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Taxa de candidatura (Kz)</label>
-                <Input type="number" min={0} step={500} value={cdTaxa} disabled={!isCardEditing("cd-params")} onChange={e => setCdTaxa(Number(e.target.value))} />
+                <Input type="number" min={0} step={500} value={cdTaxa} disabled={!isCardEditing("cd-params")} onChange={e => setCdTaxa(e.target.value === "" ? "" : Number(e.target.value))} />
                 <p className="text-[10px] text-muted-foreground mt-1">Valor pago no acto de submissão</p>
               </div>
               <div>
                 <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Máx. opções de curso</label>
-                <Input type="number" min={1} max={10} value={cdMaxOpcoes} disabled={!isCardEditing("cd-params")} onChange={e => setCdMaxOpcoes(Number(e.target.value))} />
+                <Input type="number" min={1} max={10} value={cdMaxOpcoes} disabled={!isCardEditing("cd-params")} onChange={e => setCdMaxOpcoes(e.target.value === "" ? "" : Number(e.target.value))} />
                 <p className="text-[10px] text-muted-foreground mt-1">N.º de cursos que o candidato pode escolher</p>
               </div>
             </div>
