@@ -91,7 +91,6 @@ export function OnboardingStepBanner({
 }) {
   const { user } = useAuth();
   const [params] = useSearchParams();
-  const [refresh, setRefresh] = useState(0);
   const stepKey = stepKeyProp || params.get("step") || "";
   if (user?.role !== "admin") return null;
   const group = STEP_TO_GROUP[stepKey];
