@@ -125,7 +125,7 @@ export function OnboardingStepBanner({
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-primary mb-1">
-              <span>Onboarding institucional</span>
+              <span>Admin Instituição</span>
               <ChevronRight className="w-3 h-3" />
               <span className="text-muted-foreground normal-case tracking-normal font-medium">{group.title}</span>
               <ChevronRight className="w-3 h-3 text-muted-foreground" />
