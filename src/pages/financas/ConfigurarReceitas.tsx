@@ -295,15 +295,16 @@ function DespesasSection({ email }: { email?: string | null }) {
           <TrendingDown className="w-4 h-4 text-primary" />
           <div className="min-w-0">
             <h2 className="text-sm font-bold text-foreground">Categorias de despesa</h2>
-            <p className="text-[11px] text-muted-foreground">Rubricas usadas em Finanças → Despesas, com documento exigido e orçamento mensal.</p>
+            <p className="text-[11px] text-muted-foreground">Rubricas usadas em Finanças → Despesas, com cor de tag e documentos exigidos.</p>
           </div>
           <span className="text-[11px] text-muted-foreground ml-auto tabular-nums shrink-0">{categorias.length} categoria{categorias.length === 1 ? "" : "s"}</span>
         </div>
         <div className="divide-y">
-          <div className="grid grid-cols-[1fr_1fr_160px_40px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
+          <div className="grid grid-cols-[1fr_180px_140px_1fr_40px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
             <div>Designação</div>
+            <div>Cor</div>
+            <div>Pré-visualização</div>
             <div>Documentos exigidos</div>
-            <div>Orçamento mensal (Kz)</div>
             <div className="text-right">Ação</div>
           </div>
           {categorias.length === 0 ? (
@@ -317,9 +318,14 @@ function DespesasSection({ email }: { email?: string | null }) {
               }));
             };
             return (
-              <div key={c.id} className="grid grid-cols-[1fr_1fr_160px_40px] gap-3 px-5 py-2.5 items-center text-sm">
+              <div key={c.id} className="grid grid-cols-[1fr_180px_140px_1fr_40px] gap-3 px-5 py-2.5 items-center text-sm">
                 <Input className="h-9" placeholder="Ex: Infraestrutura" value={c.nome}
                   onChange={(e) => setCategorias((s) => s.map((x) => x.id === c.id ? { ...x, nome: e.target.value } : x))} />
+                <select className="h-9 rounded-md border border-input bg-background px-2 text-sm" value={c.cor}
+                  onChange={(e) => setCategorias((s) => s.map((x) => x.id === c.id ? { ...x, cor: e.target.value } : x))}>
+                  {COR_OPCOES.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+                </select>
+                <span className={`inline-flex items-center justify-center px-2.5 py-1 rounded-md border text-xs font-medium ${c.cor}`}>{c.nome || "—"}</span>
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-1.5">
                     <Checkbox id={`${c.id}-fatura`} checked={c.documentos.includes("Fatura")} onCheckedChange={() => toggleDoc("Fatura")} />
@@ -330,8 +336,6 @@ function DespesasSection({ email }: { email?: string | null }) {
                     <Label htmlFor={`${c.id}-comprovativo`} className="text-xs font-normal cursor-pointer">Comprovativo</Label>
                   </div>
                 </div>
-                <Input type="number" min={0} className="h-9 tabular-nums" value={c.orcamento}
-                  onChange={(e) => setCategorias((s) => s.map((x) => x.id === c.id ? { ...x, orcamento: Number(e.target.value) || 0 } : x))} />
                 <div className="flex justify-end">
                   <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
                     onClick={() => setCategorias((s) => s.filter((x) => x.id !== c.id))}><Trash2 className="w-3.5 h-3.5" /></Button>
@@ -342,7 +346,7 @@ function DespesasSection({ email }: { email?: string | null }) {
         </div>
         <div className="px-5 py-3 border-t bg-muted/10">
           <Button size="sm" variant="outline" className="gap-1.5"
-            onClick={() => setCategorias((s) => [...s, { id: newId(), nome: "", documentos: [], orcamento: 0 }])}>
+            onClick={() => setCategorias((s) => [...s, { id: newId(), nome: "", cor: COR_OPCOES[0].value, documentos: [] }])}>
             <Plus className="w-3.5 h-3.5" /> Adicionar categoria
           </Button>
         </div>
