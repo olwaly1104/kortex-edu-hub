@@ -62,19 +62,38 @@ export default function OnboardingRegrasPresenca() {
     <div className="p-6 lg:p-8 max-w-5xl mx-auto space-y-6 animate-fade-in">
       <OnboardingStepBanner />
 
-      {/* SECTION 1 — Controlo de Presença */}
+      {/* Master toggles */}
+      <Card className="p-5">
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <h2 className="text-base font-semibold">Conformidade &amp; Multas</h2>
+            <p className="text-xs text-muted-foreground">Activar ou desactivar módulos de assiduidade e sistema de multas.</p>
+          </div>
+          <div className="flex items-center gap-6">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-medium">Assiduidade</span>
+              <Switch checked={presencaEnabled} onCheckedChange={setPresencaEnabled} />
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-medium">Multas</span>
+              <Switch checked={multasEnabled} onCheckedChange={setMultasEnabled} />
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      {/* SECTION 1 — Assiduidade */}
       <Card className="p-5 space-y-5">
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center"><ShieldCheck className="w-5 h-5" /></div>
             <div>
-              <h2 className="text-base font-semibold">Controlo de Presença</h2>
+              <h2 className="text-base font-semibold">Assiduidade</h2>
               <p className="text-xs text-muted-foreground">Limites mínimos, tolerância de chegada e marcação automática de faltas.</p>
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <span className="text-[11px] text-muted-foreground">{presencaEnabled ? "Activo" : "Desactivado"}</span>
-            <Switch checked={presencaEnabled} onCheckedChange={setPresencaEnabled} />
+            <Badge variant={presencaEnabled ? "default" : "secondary"}>{presencaEnabled ? "Activo" : "Desactivado"}</Badge>
           </div>
         </div>
 
@@ -122,8 +141,7 @@ export default function OnboardingRegrasPresenca() {
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <span className="text-[11px] text-muted-foreground">{multasEnabled ? "Activo" : "Desactivado"}</span>
-            <Switch checked={multasEnabled} onCheckedChange={setMultasEnabled} />
+            <Badge variant={multasEnabled ? "default" : "secondary"}>{multasEnabled ? "Activo" : "Desactivado"}</Badge>
           </div>
         </div>
 
