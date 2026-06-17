@@ -257,10 +257,10 @@ const adminSections: NavSection[] = [
     { label: "Finanças", icon: Wallet, path: "/financas/configurador?tab=receitas&step=fin.pro" },
     { label: "GAP", icon: ClipboardList, path: "/gap/configuracao?tab=candidaturas&step=gap.cand" },
   ]},
-  { title: "Acessos", items: [
+  { title: "Sistema", items: [
     { label: "Utilizadores", icon: Users, path: "/admin/utilizadores" },
-    { label: "Sistema", icon: Settings2, path: "/admin/sistema" },
     { label: "Roles e Permissões", icon: ShieldCheck, path: "/admin/modulos" },
+    { label: "Sistema", icon: Settings2, path: "/admin/sistema" },
   ]},
 ];
 
