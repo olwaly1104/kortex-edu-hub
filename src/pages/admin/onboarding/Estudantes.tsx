@@ -63,15 +63,8 @@ export default function OnboardingEstudantes() {
   };
 
   const simulateImport = () => {
-    const generated: Row[] = Array.from({ length: 12 }).map((_, i) => ({
-      id: `imp-${Date.now()}-${i}`,
-      nome: `Estudante Importado ${i + 1}`,
-      email: `estudante${i + 1}@upra.kor`,
-      curso: cursosPool[i % cursosPool.length],
-      ano: String((i % 4) + 1),
-      turma: turmasPool[i % turmasPool.length],
-      origem: "importado",
-    }));
+    const generated: Row[] = []
+    };
     setRows(prev => [...prev, ...generated]);
     toast.success(`${generated.length} estudantes importados`);
   };
