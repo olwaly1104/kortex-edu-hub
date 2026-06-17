@@ -5,7 +5,7 @@ import {
   Mail, Award, User, LogOut, GraduationCap,
   BarChart3, ChevronLeft, ChevronRight, Library, Wallet, Trophy, ClipboardList,
   CheckSquare, Building2, UserCog, Eye, Layers, FileText, FolderOpen, TrendingUp, HelpCircle, Settings2, BrainCircuit,
-  Sparkles, Wand2, ClipboardCheck, UserPlus, ShieldCheck,
+  Sparkles, Wand2, ClipboardCheck, UserPlus, ShieldCheck, MapPin,
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -253,7 +253,7 @@ const adminSections: NavSection[] = [
     { label: "Faculdades & Cursos", icon: Building2, path: "/admin/faculdades-cursos?tab=faculdades&step=aca.fac" },
     { label: "Docentes", icon: GraduationCap, path: "/admin/onboarding/docentes?step=rh.doc" },
     { label: "Staff", icon: UserCog, path: "/admin/onboarding/staff?step=rh.staff" },
-    { label: "Salas e Edifícios", icon: Building2, path: "/admin/onboarding/espacos?step=inf.esp" },
+    { label: "Geopontos", icon: MapPin, path: "/admin/onboarding/geopontos?step=geo.reg" },
     { label: "Finanças", icon: Wallet, path: "/financas/configurador?tab=receitas&step=fin.pro" },
     { label: "Candidaturas", icon: ClipboardList, path: "/gap/configuracao?tab=candidaturas&step=gap.cand" },
   ]},
