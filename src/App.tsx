@@ -170,6 +170,7 @@ import AdminPerfil from "./pages/admin/Perfil";
 
 import AdminOnboardingEstudantes from "./pages/admin/onboarding/Estudantes";
 import AdminOnboardingPessoas from "./pages/admin/onboarding/Pessoas";
+import AdminOnboardingRH from "./pages/admin/onboarding/RH";
 import AdminOnboardingRegrasPresenca from "./pages/admin/onboarding/RegrasPresenca";
 import AdminOnboardingSalarios from "./pages/admin/onboarding/Salarios";
 import AdminOnboardingEspacos from "./pages/admin/onboarding/Espacos";
@@ -320,6 +321,7 @@ function AppRoutes() {
         <Route path="/admin/onboarding/estudantes" element={<AdminOnboardingEstudantes />} />
         <Route path="/admin/onboarding/docentes" element={<AdminOnboardingPessoas mode="docentes" />} />
         <Route path="/admin/onboarding/staff" element={<AdminOnboardingPessoas mode="staff" />} />
+        <Route path="/admin/onboarding/rh" element={<AdminOnboardingRH />} />
         <Route path="/admin/onboarding/espacos" element={<AdminOnboardingEspacos />} />
         <Route path="/admin/onboarding/geopontos" element={<AdminOnboardingGeopontos />} />
         <Route path="/admin/onboarding/regras-presenca" element={<AdminOnboardingRegrasPresenca />} />
