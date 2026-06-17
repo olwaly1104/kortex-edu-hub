@@ -102,11 +102,14 @@ Deno.serve(async (req) => {
       }
       const { data: existingProfile, error: existingErr } = await admin
         .from("profiles")
-        .select("id")
+        .select("id,institution_id")
         .eq("email", email)
         .maybeSingle();
       if (existingErr || !existingProfile?.id) {
         return json({ error: "Este email já existe na autenticação, mas ainda não tem perfil ligado. Crie com outro email." }, 409);
+      }
+      if (existingProfile.institution_id && existingProfile.institution_id !== callerId) {
+        return json({ error: "Este email já pertence a outra instituição." }, 409);
       }
       newUserId = existingProfile.id;
     }
