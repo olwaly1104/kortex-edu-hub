@@ -53,10 +53,37 @@ export type CadeiraRow = {
   updated_at: string;
 };
 
+export type EstudanteRow = {
+  id: string;
+  owner_user_id: string;
+  curso_id: string;
+  nome: string;
+  email: string;
+  ano: string;
+  turma: string;
+  origem: string;
+  primeiro_nome: string | null;
+  ultimo_nome: string | null;
+  nascimento: string | null;
+  genero: string | null;
+  nacionalidade: string | null;
+  bilhete: string | null;
+  telemovel: string | null;
+  provincia: string | null;
+  municipio: string | null;
+  endereco: string | null;
+  enc_nome: string | null;
+  enc_parentesco: string | null;
+  enc_telefone: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
 const KEY_FAC = ["institution", "faculdades"] as const;
 const KEY_CUR = ["institution", "cursos"] as const;
 const KEY_PROP = ["institution", "propinas"] as const;
 const KEY_CAD = ["institution", "cadeiras"] as const;
+const KEY_EST = ["institution", "estudantes"] as const;
 
 async function currentUserId(): Promise<string | null> {
   const { data } = await supabase.auth.getUser();
