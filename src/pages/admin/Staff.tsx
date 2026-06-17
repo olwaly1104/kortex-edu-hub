@@ -46,8 +46,8 @@ export default function AdminStaff() {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <Stat label="Total" value={rows.length} />
         <Stat label="Departamentos" value={new Set(rows.map((r) => r.departamento)).size} />
-        <Stat label="Com Kortex" value={rows.filter((r) => r.moduloKortex !== "Não").length} />
-        <Stat label="Sem Kortex" value={rows.filter((r) => r.moduloKortex === "Não").length} />
+        <Stat label="Com acesso" value={rows.filter((r) => r.moduloKortex !== "Não").length} />
+        <Stat label="Sem acesso" value={rows.filter((r) => r.moduloKortex === "Não").length} />
       </div>
 
       <div className="flex items-center gap-3">
