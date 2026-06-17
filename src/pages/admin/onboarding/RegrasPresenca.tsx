@@ -69,15 +69,33 @@ export default function OnboardingRegrasPresenca() {
             <h2 className="text-base font-semibold">Conformidade &amp; Multas</h2>
             <p className="text-xs text-muted-foreground">Activar ou desactivar módulos de assiduidade e sistema de multas.</p>
           </div>
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-medium">Assiduidade</span>
-              <Switch checked={presencaEnabled} onCheckedChange={setPresencaEnabled} />
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-medium">Multas</span>
-              <Switch checked={multasEnabled} onCheckedChange={setMultasEnabled} />
-            </div>
+          <div className="inline-flex items-center gap-1 p-1 rounded-lg border bg-muted/30">
+            <button
+              type="button"
+              onClick={() => setPresencaEnabled((v) => !v)}
+              className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                presencaEnabled
+                  ? "bg-background shadow-sm text-foreground"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <ShieldCheck className="w-3.5 h-3.5" />
+              Assiduidade
+              {presencaEnabled && <Check className="w-3 h-3 text-primary" />}
+            </button>
+            <button
+              type="button"
+              onClick={() => setMultasEnabled((v) => !v)}
+              className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                multasEnabled
+                  ? "bg-background shadow-sm text-foreground"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <Coins className="w-3.5 h-3.5" />
+              Multas
+              {multasEnabled && <Check className="w-3 h-3 text-primary" />}
+            </button>
           </div>
         </div>
       </Card>
