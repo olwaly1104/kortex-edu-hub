@@ -189,7 +189,7 @@ export default function AdminFaculdadesCursos() {
                         <Input
                           value={facValue(f, "sigla") || ""}
                           onChange={(e) => setFacField(f.id, { sigla: e.target.value.toUpperCase() })}
-                          className="h-6 px-2 py-0 text-[11px] font-bold tracking-wider w-16 bg-primary text-primary-foreground border-primary placeholder:text-primary-foreground/60"
+                          className="h-6 px-2 py-0 text-[11px] font-bold tracking-wider w-16 bg-muted border-border text-foreground placeholder:text-muted-foreground"
                           placeholder="SIGLA"
                           maxLength={8}
                         />
@@ -203,7 +203,7 @@ export default function AdminFaculdadesCursos() {
                     ) : (
                       <>
                         {f.sigla && (
-                          <span className="inline-flex items-center justify-center h-6 px-2 rounded-md bg-primary text-primary-foreground text-[11px] font-bold tracking-wider shadow-sm">{f.sigla}</span>
+                          <span className="inline-flex items-center justify-center h-6 px-2 rounded-md bg-muted border border-border text-muted-foreground text-[11px] font-bold tracking-wider">{f.sigla}</span>
                         )}
                         <p className="text-base font-semibold truncate leading-none">{f.name}</p>
                       </>
@@ -225,7 +225,7 @@ export default function AdminFaculdadesCursos() {
                             </SelectContent>
                           </Select>
                         ) : (
-                          <p className="text-[11px] font-semibold leading-tight truncate max-w-[160px]">{f.decano || <span className="text-muted-foreground italic font-normal">Por atribuir</span>}</p>
+                          <p className="text-[11px] font-semibold leading-tight truncate max-w-[160px]">{f.decano || <span className="text-muted-foreground italic font-normal">Sem docentes</span>}</p>
                         )}
                       </div>
                     </div>
