@@ -1,4 +1,4 @@
-import { OnboardingStepBanner, useIsOnboardingStep } from "@/components/admin/OnboardingStepBanner";
+import { OnboardingStepBanner, markOnboardingStepDone, useIsOnboardingStep } from "@/components/admin/OnboardingStepBanner";
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { cursoTemplates, alocacaoCandidatos } from "@/data/academica2Data";
 import { ArrowLeft, Check, Users, ChevronDown, ChevronRight, Building2, GraduationCap, Plus, Trash2, MapPin, ClipboardList, Layers, Wand2 } from "lucide-react";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
 
 type Turma = { id: string; letra: string; capacidade: number; sala: string; turno: "Manhã" | "Tarde" | "Noite" };
 type CursoTurmas = Record<number, Turma[]>; // year -> turmas
@@ -37,6 +38,7 @@ const buildDefault = (years: number, estudantesEsperados: number): CursoTurmas =
 
 export default function CriarTurmas() {
   const isOnboarding = useIsOnboardingStep();
+  const { user } = useAuth();
   const [data, setData] = useState<Record<string, CursoTurmas>>(() =>
     Object.fromEntries(cursoTemplates.map(c => [c.id, buildDefault(c.years, c.estudantesEsperados)]))
   );
@@ -71,6 +73,11 @@ export default function CriarTurmas() {
   const regenerate = () =>
     setData(Object.fromEntries(cursoTemplates.map(c => [c.id, buildDefault(c.years, c.estudantesEsperados)])));
 
+  const confirmTurmas = () => {
+    markOnboardingStepDone(user?.email, "aca.tur");
+    toast.success("Turmas confirmadas para todos os cursos");
+  };
+
   const totals = useMemo(() => {
     let turmas = 0, capacidade = 0;
     Object.values(data).forEach(c => Object.values(c).forEach(arr => arr.forEach(t => { turmas++; capacidade += t.capacidade; })));
@@ -91,7 +98,7 @@ export default function CriarTurmas() {
       <OnboardingStepBanner actions={
         <>
           <Button onClick={regenerate} size="sm" variant="outline" className="gap-1 h-8"><Wand2 className="w-3.5 h-3.5" /> Regenerar</Button>
-          <Button onClick={() => toast.success("Turmas confirmadas para todos os cursos")} size="sm" variant="outline" className="gap-1 h-8"><Check className="w-3.5 h-3.5" /> Confirmar</Button>
+          <Button onClick={confirmTurmas} size="sm" variant="outline" className="gap-1 h-8"><Check className="w-3.5 h-3.5" /> Confirmar</Button>
         </>
       } />
       {!isOnboarding && (
@@ -109,7 +116,7 @@ export default function CriarTurmas() {
             </div>
             <div className="flex gap-2">
               <Button variant="outline" onClick={regenerate} className="gap-2"><Wand2 className="w-4 h-4" /> Regenerar Automático</Button>
-              <Button onClick={() => toast.success("Turmas confirmadas para todos os cursos")} className="gap-2"><Check className="w-4 h-4" /> Confirmar Turmas</Button>
+              <Button onClick={confirmTurmas} className="gap-2"><Check className="w-4 h-4" /> Confirmar Turmas</Button>
             </div>
           </div>
         </div>
