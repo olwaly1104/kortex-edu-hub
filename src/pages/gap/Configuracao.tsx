@@ -243,10 +243,10 @@ export default function GapConfiguracao() {
     { key: "reprovado", label: "Reprovado", color: "bg-red-50 text-red-700 border-red-200" },
   ]);
   const [cdEtapas, setCdEtapas] = useState<CdEtapa[]>([
-    { key: "submissao", label: "Submissão da candidatura", obrigatoria: true, estadosPossiveis: ["completo"] },
-    { key: "entrevista", label: "Entrevista", obrigatoria: true, estadosPossiveis: ["agendado", "completo", "remarcado", "falta"] },
-    { key: "curso_preparatorio", label: "Curso Preparatório", obrigatoria: false, estadosPossiveis: ["agendado", "completo", "remarcado"] },
-    { key: "exame", label: "Exame de Acesso", obrigatoria: true, estadosPossiveis: ["agendado", "aprovado", "reprovado", "remarcado"] },
+    { key: "submissao", label: "Submissão da candidatura", agenda: false, obrigatoria: true, estadosPossiveis: ["completo"] },
+    { key: "entrevista", label: "Entrevista", agenda: true, obrigatoria: true, estadosPossiveis: ["agendado", "completo", "remarcado", "falta"] },
+    { key: "curso_preparatorio", label: "Curso Preparatório", agenda: true, obrigatoria: false, estadosPossiveis: ["agendado", "completo", "remarcado"] },
+    { key: "exame", label: "Exame de Acesso", agenda: true, obrigatoria: true, estadosPossiveis: ["agendado", "aprovado", "reprovado", "remarcado"] },
   ]);
   const [cdSessoes, setCdSessoes] = useState<CdSessao[]>([]);
   const [cdNotaMinima, setCdNotaMinima] = useState<number | "">("");
