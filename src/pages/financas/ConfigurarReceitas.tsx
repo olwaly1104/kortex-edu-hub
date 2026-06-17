@@ -89,7 +89,6 @@ export default function ConfigurarReceitas() {
         title="Configurar Finanças"
         subtitle="Receitas, despesas, salários e multas — base que alimenta todo o módulo financeiro."
         icon={<Settings2 className="w-5 h-5 text-primary" />}
-        right={<Button size="sm" onClick={confirmCurrentStep} className="gap-1.5"><Check className="w-3.5 h-3.5" /> Confirmar passo</Button>}
       />
 
       <Tabs value={tab} onValueChange={(v) => changeTab(v as Tab)}>
