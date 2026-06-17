@@ -70,7 +70,7 @@ export default function AdminStaff() {
                 <th className="text-left font-semibold py-2.5 px-4">Contacto</th>
                 <th className="text-left font-semibold py-2.5 px-4">Departamento</th>
                 <th className="text-left font-semibold py-2.5 px-4">Função</th>
-                <th className="text-left font-semibold py-2.5 px-4">Kortex</th>
+                <th className="text-left font-semibold py-2.5 px-4">Acesso</th>
                 <th className="w-10"></th>
               </tr>
             </thead>
