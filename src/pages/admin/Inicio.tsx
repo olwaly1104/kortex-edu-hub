@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { FinHeader } from "@/pages/financas/_FinHeader";
 import { useAuth } from "@/contexts/AuthContext";
-import { onboardingKey, progressKey, profileKey, isOnboardingCompleteFor, clearAdminStateBackend } from "@/lib/onboardingStorage";
+import { onboardingKey, progressKey, profileKey, isOnboardingCompleteFor, clearAdminStateBackend, pushProgress } from "@/lib/onboardingStorage";
 import {
   Building2, LifeBuoy, BookOpen, ArrowRight, CheckCircle2,
   RotateCcw, ShieldCheck, GraduationCap, CalendarDays,
@@ -139,6 +139,17 @@ export default function AdminInicio() {
       if (cancelled) return;
       const usersCount = Array.isArray(contacts.data) ? contacts.data.length : 0;
       setRealCounts({ users: usersCount, faculdades: fac.count ?? 0, cursos: cur.count ?? 0, cadeiras: cad.count ?? 0, propinas: prop.count ?? 0 });
+      try {
+        const raw = localStorage.getItem(progressKey(user?.email));
+        const p = raw ? JSON.parse(raw) : {};
+        if (usersCount > 0) p["est.imp"] = true;
+        if ((fac.count ?? 0) > 0) p["aca.fac"] = true;
+        if ((cur.count ?? 0) > 0) p["aca.cur"] = true;
+        if ((cad.count ?? 0) > 0) p["aca.cad"] = true;
+        if ((prop.count ?? 0) > 0) p["fin.pro"] = true;
+        localStorage.setItem(progressKey(user?.email), JSON.stringify(p));
+        pushProgress(user?.email, p);
+      } catch { /* ignore */ }
       // Clean stale est.imp=true only when there are no real created users.
       if (usersCount === 0) {
         try {
