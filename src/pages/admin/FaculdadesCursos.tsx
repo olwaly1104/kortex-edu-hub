@@ -112,10 +112,6 @@ export default function AdminFaculdadesCursos() {
     }
   };
 
-  const toggleEdit = async (f: FaculdadeRow) => {
-    const isEditing = !!editingFacIds[f.id];
-    if (isEditing) {
-      // Save buffered changes
   const performSave = async (f: FaculdadeRow) => {
     const facPatch = edits[f.id];
     if (facPatch && (facPatch.name !== undefined || facPatch.sigla !== undefined || facPatch.decano !== undefined || facPatch.color !== undefined)) {
