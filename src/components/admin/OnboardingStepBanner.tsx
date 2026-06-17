@@ -45,7 +45,7 @@ export const ONBOARDING_GROUPS: GroupMeta[] = [
     steps: [
       { key: "rh.doc",   title: "Registar docentes",    desc: "Adicionar todos os docentes da instituição em lote.",            path: "/admin/onboarding/docentes?step=rh.doc" },
       { key: "rh.staff", title: "Registar staff",       desc: "Adicionar funcionários administrativos e técnicos.",             path: "/admin/onboarding/staff?step=rh.staff" },
-      { key: "rh.pres",  title: "Regras de presença",   desc: "Limites de presença, tolerâncias e tipos de faltas.",            path: "/admin/onboarding/regras-presenca?step=rh.pres" },
+      { key: "rh.pres",  title: "Conformidade & Multas", desc: "Controlo de presença, tolerâncias, multas e disputas.",            path: "/admin/onboarding/regras-presenca?step=rh.pres" },
     ],
   },
   {
