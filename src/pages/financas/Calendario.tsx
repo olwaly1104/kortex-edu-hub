@@ -93,56 +93,133 @@ function CriarEventoDialog({ defaultDate, trigger }: { defaultDate: Date; trigge
           <DialogDescription>Agende um novo evento no calendário financeiro.</DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label className="text-xs font-medium">Tipo de evento</Label>
-            <div className="grid grid-cols-4 gap-2">
-              {EVENT_TYPES.map((t) => {
-                const Icon = t.icon;
-                const active = type === t.value;
-                return (
-                  <button
-                    key={t.value}
-                    type="button"
-                    onClick={() => setType(t.value)}
-                    className={cn(
-                      "flex flex-col items-center gap-1.5 py-3 rounded-lg border text-xs font-medium transition-all",
-                      active ? "border-primary bg-primary/10 text-primary" : "border-border bg-card text-muted-foreground hover:bg-muted/40"
-                    )}
-                  >
-                    <Icon className="w-4 h-4" />
-                    {t.label}
-                  </button>
-                );
-              })}
+        <form onSubmit={handleSubmit} className="space-y-3.5">
+          {/* Tipo — compact segmented */}
+          <div className="grid grid-cols-4 gap-1.5 p-1 bg-muted/40 rounded-lg">
+            {EVENT_TYPES.map((t) => {
+              const Icon = t.icon;
+              const active = type === t.value;
+              return (
+                <button
+                  key={t.value}
+                  type="button"
+                  onClick={() => setType(t.value)}
+                  className={cn(
+                    "flex items-center justify-center gap-1.5 h-8 rounded-md text-xs font-medium transition-all",
+                    active ? "bg-card text-primary shadow-sm" : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  <Icon className="w-3.5 h-3.5" />
+                  {t.label}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Título */}
+          <div className="space-y-1.5">
+            <Label htmlFor="ev-title" className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Título</Label>
+            <Input id="ev-title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Ex.: Reunião com Reitoria" className="h-9" />
+          </div>
+
+          {/* Data + Horários */}
+          <div className="grid grid-cols-3 gap-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="ev-date" className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Data</Label>
+              <Input id="ev-date" type="date" min={todayISO} value={date} onChange={(e) => setDate(e.target.value)} className="h-9 tabular-nums" />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="ev-start" className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Início</Label>
+              <Input id="ev-start" type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} className="h-9 tabular-nums" />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="ev-end" className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Fim</Label>
+              <Input id="ev-end" type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} className="h-9 tabular-nums" />
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="ev-title" className="text-xs font-medium">Título</Label>
-            <Input id="ev-title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Ex.: Reunião com Reitoria" />
+          {/* Modalidade + Local/Link (reuniao) */}
+          {type === "reuniao" && (
+            <div className="space-y-2">
+              <div className="inline-flex p-0.5 bg-muted/40 rounded-md">
+                {([
+                  { value: "presencial" as const, label: "Presencial", icon: Building2 },
+                  { value: "virtual" as const, label: "Virtual", icon: Video },
+                ]).map((m) => {
+                  const Icon = m.icon;
+                  const active = modalidade === m.value;
+                  return (
+                    <button
+                      key={m.value}
+                      type="button"
+                      onClick={() => setModalidade(m.value)}
+                      className={cn(
+                        "flex items-center gap-1.5 px-3 h-7 rounded text-xs font-medium transition-all",
+                        active ? "bg-card text-primary shadow-sm" : "text-muted-foreground hover:text-foreground"
+                      )}
+                    >
+                      <Icon className="w-3.5 h-3.5" />
+                      {m.label}
+                    </button>
+                  );
+                })}
+              </div>
+              {modalidade === "presencial" ? (
+                <Select value={location} onValueChange={setLocation}>
+                  <SelectTrigger className="h-9">
+                    <SelectValue placeholder={geopontos.length === 0 ? "Sem geopontos registados" : "Selecionar local"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {geopontos.map((g) => (
+                      <SelectItem key={g.id} value={g.nome || g.id}>
+                        <span className="flex items-center gap-2">
+                          <MapPin className="w-3.5 h-3.5 text-muted-foreground" />
+                          {g.nome || "Sem nome"}
+                        </span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <Input value={link} onChange={(e) => setLink(e.target.value)} placeholder="https://meet.google.com/..." className="h-9" />
+              )}
+            </div>
+          )}
+
+          {/* Local (não-reuniao) */}
+          {type !== "reuniao" && (
+            <div className="space-y-1.5">
+              <Label className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Local (opcional)</Label>
+              <Select value={location} onValueChange={setLocation}>
+                <SelectTrigger className="h-9">
+                  <SelectValue placeholder={geopontos.length === 0 ? "Sem geopontos registados" : "Selecionar local"} />
+                </SelectTrigger>
+                <SelectContent>
+                  {geopontos.map((g) => (
+                    <SelectItem key={g.id} value={g.nome || g.id}>
+                      <span className="flex items-center gap-2">
+                        <MapPin className="w-3.5 h-3.5 text-muted-foreground" />
+                        {g.nome || "Sem nome"}
+                      </span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
+          {/* Notas */}
+          <div className="space-y-1.5">
+            <Label htmlFor="ev-notes" className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Notas (opcional)</Label>
+            <Textarea id="ev-notes" value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} placeholder="Detalhes adicionais..." className="resize-none" />
           </div>
 
-          <div className="grid grid-cols-3 gap-3 items-end">
-            <div className="space-y-2">
-              <Label htmlFor="ev-date" className="text-xs font-medium">Data</Label>
-              <Input id="ev-date" type="date" min={todayISO} value={date} onChange={(e) => setDate(e.target.value)} className="h-10 tabular-nums" />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="ev-start" className="text-xs font-medium">Início</Label>
-              <Input id="ev-start" type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} className="h-10 tabular-nums" />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="ev-end" className="text-xs font-medium">Fim</Label>
-              <Input id="ev-end" type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} className="h-10 tabular-nums" />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="ev-participants" className="text-xs font-medium flex items-center gap-1.5">
+          {/* Participantes — no fim */}
+          <div className="space-y-2 pt-1 border-t border-border/60">
+            <Label htmlFor="ev-participants" className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1.5 pt-3">
               <UserPlus className="w-3.5 h-3.5" /> Participantes
               {participants.length > 0 && (
-                <span className="text-[10px] text-muted-foreground font-normal">({participants.length} convidado{participants.length > 1 ? "s" : ""})</span>
+                <span className="text-[10px] text-muted-foreground normal-case tracking-normal">· {participants.length} convidado{participants.length > 1 ? "s" : ""}</span>
               )}
             </Label>
             <div className="relative">
@@ -152,8 +229,8 @@ function CriarEventoDialog({ defaultDate, trigger }: { defaultDate: Date; trigge
                 onChange={(e) => { setParticipantInput(e.target.value); setParticipantFocus(true); }}
                 onFocus={() => setParticipantFocus(true)}
                 onBlur={() => setTimeout(() => setParticipantFocus(false), 150)}
-                placeholder="Procurar por nome ou e-mail..."
-                className="h-10"
+                placeholder="Procurar contacto..."
+                className="h-9"
                 autoComplete="off"
               />
               {participantFocus && filteredContacts.length > 0 && (
@@ -166,7 +243,7 @@ function CriarEventoDialog({ defaultDate, trigger }: { defaultDate: Date; trigge
                       className="w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-muted/60 transition-colors"
                     >
                       <div className="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[11px] font-semibold shrink-0">
-                        {c.display_name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase()}
+                        {initials(c.display_name)}
                       </div>
                       <div className="min-w-0 flex-1">
                         <p className="text-sm font-medium text-foreground truncate">{c.display_name}</p>
@@ -183,80 +260,37 @@ function CriarEventoDialog({ defaultDate, trigger }: { defaultDate: Date; trigge
               )}
             </div>
             {participants.length > 0 && (
-              <div className="flex flex-wrap gap-1.5 pt-1">
+              <div className="flex flex-wrap gap-1.5">
                 {participants.map((p) => (
-                  <span key={p.id} className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-primary/10 text-primary text-xs font-medium">
+                  <span
+                    key={p.id}
+                    className="inline-flex items-center gap-1.5 pl-1 pr-2 py-1 rounded-full bg-muted border border-border text-xs font-medium text-foreground"
+                  >
+                    <span className="w-5 h-5 rounded-full bg-primary/15 text-primary flex items-center justify-center text-[9px] font-bold">
+                      {initials(p.name)}
+                    </span>
                     {p.name}
-                    <button type="button" onClick={() => removeParticipant(p.id)} className="hover:bg-primary/20 rounded-sm">
+                    <button type="button" onClick={() => removeParticipant(p.id)} className="text-muted-foreground hover:text-foreground transition-colors">
                       <X className="w-3 h-3" />
                     </button>
                   </span>
                 ))}
               </div>
             )}
-            <p className="text-[11px] text-muted-foreground">Os convidados receberão um pedido de reunião.</p>
           </div>
 
-          {type === "reuniao" && (
-            <div className="space-y-2">
-              <Label className="text-xs font-medium">Modalidade</Label>
-              <div className="grid grid-cols-2 gap-2">
-                {([
-                  { value: "presencial" as const, label: "Presencial", icon: Building2 },
-                  { value: "virtual" as const, label: "Virtual", icon: Video },
-                ]).map((m) => {
-                  const Icon = m.icon;
-                  const active = modalidade === m.value;
-                  return (
-                    <button
-                      key={m.value}
-                      type="button"
-                      onClick={() => setModalidade(m.value)}
-                      className={cn(
-                        "flex items-center justify-center gap-2 py-2.5 rounded-lg border text-sm font-medium transition-all",
-                        active ? "border-primary bg-primary/10 text-primary" : "border-border bg-card text-muted-foreground hover:bg-muted/40"
-                      )}
-                    >
-                      <Icon className="w-4 h-4" />
-                      {m.label}
-                    </button>
-                  );
-                })}
-              </div>
-              {modalidade === "presencial" ? (
-                <div className="space-y-2 pt-1">
-                  <Label htmlFor="ev-loc" className="text-xs font-medium">Local</Label>
-                  <Input id="ev-loc" value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Ex.: Sala de Reuniões A" />
-                </div>
-              ) : (
-                <div className="space-y-2 pt-1">
-                  <Label htmlFor="ev-link" className="text-xs font-medium">Link da reunião</Label>
-                  <Input id="ev-link" value={link} onChange={(e) => setLink(e.target.value)} placeholder="https://meet.google.com/..." />
-                </div>
-              )}
-            </div>
-          )}
-
-          {type !== "reuniao" && (
-            <div className="space-y-2">
-              <Label htmlFor="ev-loc-2" className="text-xs font-medium">Local (opcional)</Label>
-              <Input id="ev-loc-2" value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Ex.: Gabinete de Finanças" />
-            </div>
-          )}
-
-          <div className="space-y-2">
-            <Label htmlFor="ev-notes" className="text-xs font-medium">Notas (opcional)</Label>
-            <Textarea id="ev-notes" value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} placeholder="Detalhes adicionais..." />
-          </div>
-
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
-            <Button type="submit">Criar evento</Button>
+          <DialogFooter className="pt-2">
+            <Button type="button" variant="outline" size="sm" onClick={() => setOpen(false)}>Cancelar</Button>
+            <Button type="submit" size="sm">Criar evento</Button>
           </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
   );
+}
+
+function initials(name: string) {
+  return name.split(" ").filter(Boolean).map((n) => n[0]).slice(0, 2).join("").toUpperCase();
 }
 
 function startOfWeek(d: Date) {
