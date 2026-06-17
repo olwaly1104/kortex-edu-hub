@@ -198,6 +198,52 @@ function ImpostosBlock({ impostos, setImpostos }: { impostos: Imposto[]; setImpo
 }
 
 const PRAZO_KEY = (email?: string | null) => KEY("propinas.prazo", email);
+const PRAZOS_DEF_KEY = (email?: string | null) => KEY("propinas.prazos.def", email);
+
+type PrazoDef = { id: string; nome: string; mes: number };
+const MESES = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+
+function PrazosBlock({ prazos, setPrazos }: { prazos: PrazoDef[]; setPrazos: React.Dispatch<React.SetStateAction<PrazoDef[]>> }) {
+  const add = () => setPrazos((s) => [...s, { id: newId(), nome: `Prazo ${s.length + 1}`, mes: 1 }]);
+  return (
+    <Card className="overflow-hidden">
+      <div className="px-5 py-3 border-b bg-muted/30 flex items-center gap-2">
+        <Wallet className="w-4 h-4 text-primary" />
+        <div className="min-w-0">
+          <h2 className="text-sm font-bold text-foreground">Prazos de pagamento</h2>
+          <p className="text-[11px] text-muted-foreground">Defina os meses limite para pagamento. Ficam disponíveis como opções na tabela de propinas.</p>
+        </div>
+        <span className="text-[11px] text-muted-foreground ml-auto tabular-nums shrink-0">{prazos.length} prazo{prazos.length === 1 ? "" : "s"}</span>
+      </div>
+      <div className="divide-y">
+        <div className="grid grid-cols-[1fr_220px_40px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
+          <div>Designação</div>
+          <div>Mês limite</div>
+          <div className="text-right">Ação</div>
+        </div>
+        {prazos.length === 0 ? (
+          <div className="px-5 py-8 text-center text-xs text-muted-foreground">Sem prazos configurados.</div>
+        ) : prazos.map((p) => (
+          <div key={p.id} className="grid grid-cols-[1fr_220px_40px] gap-3 px-5 py-2.5 items-center text-sm">
+            <Input className="h-9" placeholder="Ex: Prazo trimestral" value={p.nome}
+              onChange={(e) => setPrazos((s) => s.map((x) => x.id === p.id ? { ...x, nome: e.target.value } : x))} />
+            <select className="h-9 rounded-md border border-input bg-background px-2 text-sm" value={p.mes}
+              onChange={(e) => setPrazos((s) => s.map((x) => x.id === p.id ? { ...x, mes: Number(e.target.value) } : x))}>
+              {MESES.map((m, idx) => <option key={m} value={idx + 1}>{m}</option>)}
+            </select>
+            <div className="flex justify-end">
+              <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                onClick={() => setPrazos((s) => s.filter((x) => x.id !== p.id))}><Trash2 className="w-3.5 h-3.5" /></Button>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="px-5 py-3 border-t bg-muted/10">
+        <Button size="sm" variant="outline" className="gap-1.5" onClick={add}><Plus className="w-3.5 h-3.5" /> Adicionar prazo</Button>
+      </div>
+    </Card>
+  );
+}
 
 function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null; impostos: Imposto[]; onAddCursos: () => void }) {
   const { data: faculdades = [], isLoading: lF } = useFaculdades();
@@ -206,11 +252,13 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
   const updatePropina = useUpdatePropina();
   const [draft, setDraft] = useState<Record<string, { valor: string; impostoId: string }>>({});
   const [anosByCurso, setAnosByCurso] = useState<Record<string, number[]>>(() => readJSON(ANOS_KEY(email), {}));
-  const [prazoByCurso, setPrazoByCurso] = useState<Record<string, number>>(() => readJSON(PRAZO_KEY(email), {}));
+  const [prazoByCurso, setPrazoByCurso] = useState<Record<string, string>>(() => readJSON(PRAZO_KEY(email), {}));
+  const [prazosDef, setPrazosDef] = useState<PrazoDef[]>(() => readJSON<PrazoDef[]>(PRAZOS_DEF_KEY(email), []));
   const [open, setOpen] = useState<Record<string, boolean>>({});
 
   useEffect(() => writeJSON(ANOS_KEY(email), anosByCurso), [anosByCurso, email]);
   useEffect(() => writeJSON(PRAZO_KEY(email), prazoByCurso), [prazoByCurso, email]);
+  useEffect(() => writeJSON(PRAZOS_DEF_KEY(email), prazosDef), [prazosDef, email]);
 
   const propinaByCurso = useMemo(() => {
     const m = new Map<string, { valor_mensal: number; imposto: number }>();
@@ -240,15 +288,19 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
   };
 
   // Column template — explicit so headers + rows align perfectly
-  const COLS = "minmax(220px,1.4fr) 130px 130px 150px 140px 110px 120px";
+  // Faculdade·Curso | Mensal bruta | Imposto | Líquido mensal | Líquido anual | Prazo | Ação
+  const COLS = "minmax(220px,1.4fr) 140px 160px 150px 150px 170px 130px";
 
   return (
-    <Card className="overflow-hidden">
+    <div className="space-y-6">
+      <PrazosBlock prazos={prazosDef} setPrazos={setPrazosDef} />
+
+      <Card className="overflow-hidden">
       <div className="px-5 py-3 border-b bg-muted/30 flex items-center gap-2">
         <Wallet className="w-4 h-4 text-primary" />
         <div className="min-w-0">
           <h2 className="text-sm font-bold text-foreground">Propinas por curso</h2>
-          <p className="text-[11px] text-muted-foreground">Mensal bruta → calcula automaticamente Anual e Líquido. Prazo = dia do mês para pagamento.</p>
+          <p className="text-[11px] text-muted-foreground">Mensal bruta → calcula automaticamente Líquido mensal e anual. Prazo selecionado entre os definidos acima.</p>
         </div>
       </div>
 
@@ -271,14 +323,14 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
         </div>
       ) : (
         <div className="overflow-x-auto">
-          <div className="min-w-[1000px] divide-y">
+          <div className="min-w-[1100px] divide-y">
             <div className="grid gap-3 px-5 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10" style={{ gridTemplateColumns: COLS }}>
               <div>Faculdade · Curso</div>
               <div>Propina mensal bruta</div>
-              <div>Propina anual bruta</div>
               <div>Imposto</div>
               <div className="text-right">Líquido mensal</div>
-              <div className="text-center">Prazo (dia)</div>
+              <div className="text-right">Líquido anual</div>
+              <div>Prazo</div>
               <div className="text-right">Ação</div>
             </div>
             {facWithCursos.flatMap((f) =>
@@ -296,12 +348,12 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
                     const impostoId = d?.impostoId ?? findImpostoIdByTaxa(p.imposto);
                     const taxa = impostos.find((i) => i.id === impostoId)?.taxa ?? p.imposto;
                     const bruto = Number(valorVal) || 0;
-                    const anual = bruto * 12;
                     const liquido = Math.max(0, bruto - bruto * taxa);
+                    const liquidoAnual = liquido * 12;
                     const dirty = d !== undefined;
                     const anos = anosByCurso[c.id] ?? Array(c.years || 1).fill(bruto);
                     const isOpen = !!open[c.id];
-                    const prazo = prazoByCurso[c.id] ?? 5;
+                    const prazoId = prazoByCurso[c.id] ?? "";
                     return (
                       <div key={c.id}>
                         <div className="grid gap-3 px-5 py-3 items-center text-sm" style={{ gridTemplateColumns: COLS }}>
@@ -317,9 +369,6 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
                           <Input type="number" min={0} className="h-9 tabular-nums"
                             value={valorVal}
                             onChange={(e) => setDraft((s) => ({ ...s, [c.id]: { valor: e.target.value, impostoId } }))} />
-                          <div className="h-9 flex items-center justify-end px-2 rounded-md bg-muted/30 tabular-nums text-xs font-medium text-muted-foreground">
-                            {fmt(anual)} Kz
-                          </div>
                           <select className="h-9 rounded-md border border-input bg-background px-2 text-sm"
                             value={impostoId}
                             onChange={(e) => setDraft((s) => ({ ...s, [c.id]: { valor: valorVal, impostoId: e.target.value } }))}>
@@ -327,9 +376,14 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
                             {impostos.map((i) => <option key={i.id} value={i.id}>{i.nome} ({(i.taxa * 100).toFixed(0)}%)</option>)}
                           </select>
                           <div className="h-9 flex items-center justify-end px-2 rounded-md bg-muted/30 tabular-nums font-semibold text-foreground">{fmt(liquido)} Kz</div>
-                          <Input type="number" min={1} max={31} className="h-9 tabular-nums text-center"
-                            value={prazo}
-                            onChange={(e) => setPrazoByCurso((s) => ({ ...s, [c.id]: Math.max(1, Math.min(31, Number(e.target.value) || 1)) }))} />
+                          <div className="h-9 flex items-center justify-end px-2 rounded-md bg-muted/30 tabular-nums text-xs font-medium text-muted-foreground">{fmt(liquidoAnual)} Kz</div>
+                          <select className="h-9 rounded-md border border-input bg-background px-2 text-sm"
+                            value={prazoId}
+                            disabled={prazosDef.length === 0}
+                            onChange={(e) => setPrazoByCurso((s) => ({ ...s, [c.id]: e.target.value }))}>
+                            <option value="">{prazosDef.length === 0 ? "— Defina prazos acima —" : "— Selecionar —"}</option>
+                            {prazosDef.map((pr) => <option key={pr.id} value={pr.id}>{pr.nome} · {MESES[pr.mes - 1]}</option>)}
+                          </select>
                           <div className="flex justify-end gap-1">
                             <Button size="sm" variant="ghost" className="h-8 px-2 text-xs"
                               onClick={() => setOpen((s) => ({ ...s, [c.id]: !isOpen }))}>
@@ -367,7 +421,8 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
           </div>
         </div>
       )}
-    </Card>
+      </Card>
+    </div>
   );
 }
 
