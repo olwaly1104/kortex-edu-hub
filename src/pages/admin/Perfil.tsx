@@ -111,6 +111,10 @@ export default function AdminPerfil() {
   }, [instituicao, PROFILE_KEY, user?.email]);
 
   const handleSave = () => {
+    if (instituicao.email && !/^[^\s@]+@[^\s@]+\.com$/i.test(instituicao.email.trim())) {
+      toast.error("Email geral deve ser válido e terminar em .com");
+      return;
+    }
     try { localStorage.setItem(PROFILE_KEY, JSON.stringify(instituicao)); } catch { /* ignore */ }
     pushProfile(user?.email, instituicao);
     toast.success("Dados da instituição atualizados");
