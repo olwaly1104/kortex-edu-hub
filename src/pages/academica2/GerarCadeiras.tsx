@@ -1,4 +1,4 @@
-import { OnboardingStepBanner, useIsOnboardingStep } from "@/components/admin/OnboardingStepBanner";
+import { OnboardingStepBanner, markOnboardingStepDone, useIsOnboardingStep } from "@/components/admin/OnboardingStepBanner";
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
@@ -11,6 +11,7 @@ import {
   Building2, ChevronDown, ChevronRight, Users, Timer, Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   useFaculdades, useCursos,
   useCadeiras, useCreateCadeira, useUpdateCadeira, useDeleteCadeira,
@@ -19,6 +20,7 @@ import {
 
 export default function GerarCadeiras() {
   const isOnboarding = useIsOnboardingStep();
+  const { user } = useAuth();
 
   const { data: faculdades = [], isLoading: facLoading } = useFaculdades();
   const { data: cursos = [], isLoading: curLoading } = useCursos();
@@ -98,7 +100,10 @@ export default function GerarCadeiras() {
     });
   };
 
-  const confirmAll = () => toast.success("Alocação confirmada");
+  const confirmAll = () => {
+    markOnboardingStepDone(user?.email, "aca.cad");
+    toast.success("Alocação confirmada");
+  };
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
