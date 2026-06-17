@@ -1041,6 +1041,7 @@ function LineItemsBlock({
           {withType && <div>{typeLabel}</div>}
           <div>{valueLabel}</div>
           {withTax && <div>Imposto</div>}
+          {withTaxValue && <div>Valor Imposto</div>}
           {withUnit && <div>Unidade</div>}
           {withTarget && <div>Aplica-se a</div>}
           <div className="text-right">Ação</div>
