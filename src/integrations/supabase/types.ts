@@ -41,6 +41,56 @@ export type Database = {
         }
         Relationships: []
       }
+      cadeiras: {
+        Row: {
+          ano: number
+          created_at: string
+          curso_id: string
+          docente: string | null
+          ects: number
+          id: string
+          name: string
+          ordem: number
+          owner_user_id: string
+          semestre: string
+          updated_at: string
+        }
+        Insert: {
+          ano: number
+          created_at?: string
+          curso_id: string
+          docente?: string | null
+          ects?: number
+          id?: string
+          name: string
+          ordem?: number
+          owner_user_id: string
+          semestre?: string
+          updated_at?: string
+        }
+        Update: {
+          ano?: number
+          created_at?: string
+          curso_id?: string
+          docente?: string | null
+          ects?: number
+          id?: string
+          name?: string
+          ordem?: number
+          owner_user_id?: string
+          semestre?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cadeiras_curso_id_fkey"
+            columns: ["curso_id"]
+            isOneToOne: false
+            referencedRelation: "cursos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       candidaturas: {
         Row: {
           created_at: string
