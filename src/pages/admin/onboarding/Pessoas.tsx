@@ -49,16 +49,16 @@ export default function OnboardingPessoas({ mode }: { mode: Mode }) {
 
   const addEmptyRow = () => {
     const novo: Person = isDoc
-      ? { id: String(Date.now()), prefixo: "", primeiroNome: "", ultimoNome: "", genero: "", email: "", contacto: "", grau: grausPool[2], moduloKortex: "Professor" }
-      : { id: String(Date.now()), prefixo: "", primeiroNome: "", ultimoNome: "", genero: "", email: "", contacto: "", departamento: departamentosPool[0], funcao: funcoesPool[0], moduloKortex: "Académica" };
+      ? { id: String(Date.now()), prefixo: "", primeiroNome: "", ultimoNome: "", genero: "", email: "", contacto: "", grau: grausPool[2], kortex: true }
+      : { id: String(Date.now()), prefixo: "", primeiroNome: "", ultimoNome: "", genero: "", email: "", contacto: "", departamento: departamentosPool[0], funcao: funcoesPool[0], kortex: true };
     setRows(prev => [...prev, novo]);
   };
 
   const update = (id: string, patch: Partial<Person>) => setRows(prev => prev.map(r => {
     if (r.id !== id) return r;
     const next = { ...r, ...patch };
-    if (patch.primeiroNome !== undefined || patch.ultimoNome !== undefined) {
-      next.email = emailFrom(next.primeiroNome, next.ultimoNome);
+    if (patch.primeiroNome !== undefined || patch.ultimoNome !== undefined || patch.kortex !== undefined) {
+      next.email = next.kortex ? emailFrom(next.primeiroNome, next.ultimoNome) : "";
     }
     return next;
   }));
