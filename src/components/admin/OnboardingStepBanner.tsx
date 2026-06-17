@@ -1,7 +1,7 @@
 import { Link, useSearchParams } from "react-router-dom";
 import { ArrowLeft, ChevronRight, ShieldCheck, CheckCircle2, Circle } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { progressKey, pushProgress } from "@/lib/onboardingStorage";
 
 type StepMeta = { key: string; title: string; desc: string; path: string };
@@ -84,6 +84,12 @@ export function markOnboardingStepDone(email: string | null | undefined, key: st
 export function useIsOnboardingStep(stepKeyProp?: string): boolean {
   const { user } = useAuth();
   const [params] = useSearchParams();
+  const [, setProgressVersion] = useState(0);
+  useEffect(() => {
+    const refresh = () => setProgressVersion((v) => v + 1);
+    window.addEventListener("storage", refresh);
+    return () => window.removeEventListener("storage", refresh);
+  }, []);
   const stepKey = stepKeyProp || params.get("step") || "";
   return user?.role === "admin" && !!STEP_TO_GROUP[stepKey];
 }
