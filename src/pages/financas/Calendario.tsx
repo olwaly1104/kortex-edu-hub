@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 
-import { CalendarDays, ChevronLeft, ChevronRight, Plus, Users, MapPin, Calendar as CalendarIcon, Video, Building2, DollarSign, Clock, FileText } from "lucide-react";
+import { CalendarDays, ChevronLeft, ChevronRight, Plus, Users, MapPin, Calendar as CalendarIcon, Video, Building2, DollarSign, Clock, FileText, X, UserPlus } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const DAYS = ["Seg", "Ter", "Qua", "Qui", "Sex"];
@@ -25,16 +25,30 @@ const EVENT_TYPES: { value: EventType; label: string; icon: typeof Video }[] = [
 ];
 
 function CriarEventoDialog({ defaultDate, trigger }: { defaultDate: Date; trigger: React.ReactNode }) {
+  const todayISO = new Date().toISOString().split("T")[0];
   const [open, setOpen] = useState(false);
   const [type, setType] = useState<EventType>("reuniao");
   const [modalidade, setModalidade] = useState<Modalidade>("presencial");
   const [title, setTitle] = useState("");
-  const [date, setDate] = useState(defaultDate.toISOString().split("T")[0]);
+  const initialDate = defaultDate.toISOString().split("T")[0];
+  const [date, setDate] = useState(initialDate < todayISO ? todayISO : initialDate);
   const [startTime, setStartTime] = useState("09:00");
   const [endTime, setEndTime] = useState("10:00");
   const [location, setLocation] = useState("");
   const [link, setLink] = useState("");
   const [notes, setNotes] = useState("");
+  const [participants, setParticipants] = useState<string[]>([]);
+  const [participantInput, setParticipantInput] = useState("");
+
+  const addParticipant = () => {
+    const v = participantInput.trim();
+    if (!v) return;
+    if (participants.includes(v)) { setParticipantInput(""); return; }
+    setParticipants([...participants, v]);
+    setParticipantInput("");
+  };
+
+  const removeParticipant = (p: string) => setParticipants(participants.filter((x) => x !== p));
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,9 +56,20 @@ function CriarEventoDialog({ defaultDate, trigger }: { defaultDate: Date; trigge
       toast.error("Insira um título para o evento.");
       return;
     }
-    toast.success("Evento criado com sucesso.");
+    if (date < todayISO) {
+      toast.error("A data não pode ser anterior a hoje.");
+      return;
+    }
+    if (endTime <= startTime) {
+      toast.error("O horário de fim deve ser após o início.");
+      return;
+    }
+    const msg = participants.length > 0
+      ? `Evento criado. Pedidos enviados a ${participants.length} participante${participants.length > 1 ? "s" : ""}.`
+      : "Evento criado com sucesso.";
+    toast.success(msg);
     setOpen(false);
-    setTitle(""); setLocation(""); setLink(""); setNotes("");
+    setTitle(""); setLocation(""); setLink(""); setNotes(""); setParticipants([]); setParticipantInput("");
   };
 
   return (
@@ -88,19 +113,54 @@ function CriarEventoDialog({ defaultDate, trigger }: { defaultDate: Date; trigge
             <Input id="ev-title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Ex.: Reunião com Reitoria" />
           </div>
 
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-3 gap-3 items-end">
             <div className="space-y-2">
               <Label htmlFor="ev-date" className="text-xs font-medium">Data</Label>
-              <Input id="ev-date" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+              <Input id="ev-date" type="date" min={todayISO} value={date} onChange={(e) => setDate(e.target.value)} className="h-10 tabular-nums" />
             </div>
             <div className="space-y-2">
               <Label htmlFor="ev-start" className="text-xs font-medium">Início</Label>
-              <Input id="ev-start" type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} />
+              <Input id="ev-start" type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} className="h-10 tabular-nums" />
             </div>
             <div className="space-y-2">
               <Label htmlFor="ev-end" className="text-xs font-medium">Fim</Label>
-              <Input id="ev-end" type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} />
+              <Input id="ev-end" type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} className="h-10 tabular-nums" />
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="ev-participants" className="text-xs font-medium flex items-center gap-1.5">
+              <UserPlus className="w-3.5 h-3.5" /> Participantes
+              {participants.length > 0 && (
+                <span className="text-[10px] text-muted-foreground font-normal">({participants.length} convidado{participants.length > 1 ? "s" : ""})</span>
+              )}
+            </Label>
+            <div className="flex gap-2">
+              <Input
+                id="ev-participants"
+                value={participantInput}
+                onChange={(e) => setParticipantInput(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addParticipant(); } }}
+                placeholder="Nome ou e-mail e Enter para adicionar"
+                className="h-10"
+              />
+              <Button type="button" variant="outline" size="sm" onClick={addParticipant} className="h-10 shrink-0">
+                Adicionar
+              </Button>
+            </div>
+            {participants.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 pt-1">
+                {participants.map((p) => (
+                  <span key={p} className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-primary/10 text-primary text-xs font-medium">
+                    {p}
+                    <button type="button" onClick={() => removeParticipant(p)} className="hover:bg-primary/20 rounded-sm">
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
+            <p className="text-[11px] text-muted-foreground">Os convidados receberão um pedido de reunião.</p>
           </div>
 
           {type === "reuniao" && (
