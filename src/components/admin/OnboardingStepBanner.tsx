@@ -10,26 +10,28 @@ type GroupMeta = { id: string; title: string; steps: StepMeta[] };
 // Single source of truth — mirrors src/pages/admin/Inicio.tsx
 export const ONBOARDING_GROUPS: GroupMeta[] = [
   {
-    id: "est", title: "Registar Discentes",
+    id: "est", title: "Criar Utilizadores",
     steps: [
       { key: "est.imp", title: "Importar discentes", desc: "Carregar lista de discentes em lote.", path: "/admin/onboarding/estudantes?step=est.imp" },
     ],
   },
   {
-    id: "inf", title: "Registar Geopontos do Campus",
-    steps: [
-      { key: "inf.esp", title: "Salas e edifícios", desc: "Registar todos os espaços físicos da instituição.", path: "/admin/onboarding/espacos?step=inf.esp" },
-      { key: "inf.geo", title: "Geopontos do campus", desc: "Definir pontos GPS de entradas, edifícios e zonas de presença.", path: "/admin/onboarding/espacos?tab=geopontos&step=inf.geo" },
-    ],
-  },
-  {
     id: "aca", title: "Configurar Área Académica",
     steps: [
-      { key: "aca.cal", title: "Ano letivo & calendário", desc: "Definir ano letivo, semestres e feriados antes de tudo.", path: "/areaacademica/criador/calendario?step=aca.cal" },
       { key: "aca.fac", title: "Faculdades", desc: "Criar as faculdades da instituição.", path: "/admin/faculdades-cursos?tab=faculdades&step=aca.fac" },
       { key: "aca.cur", title: "Cursos", desc: "Criar cursos e associá-los às faculdades.", path: "/admin/faculdades-cursos?tab=cursos&step=aca.cur" },
       { key: "aca.cad", title: "Cadeiras", desc: "Gerar cadeiras por curso, ano e semestre.", path: "/areaacademica/criador/cadeiras?step=aca.cad" },
+      { key: "aca.cal", title: "Ano letivo & calendário", desc: "Definir ano letivo, semestres e feriados.", path: "/areaacademica/criador/calendario?step=aca.cal" },
       { key: "aca.tur", title: "Turmas", desc: "Criar turmas e definir capacidade.", path: "/areaacademica/criador/turmas?step=aca.tur" },
+    ],
+  },
+  {
+    id: "fin", title: "Configurar Finanças",
+    steps: [
+      { key: "fin.pro", title: "Receitas — Propinas & emolumentos", desc: "Propinas por curso, emolumentos e taxas académicas.", path: "/financas/configurador?tab=receitas&step=fin.pro" },
+      { key: "fin.des", title: "Despesas", desc: "Rubricas e categorias de despesa institucional.", path: "/financas/configurador?tab=despesas&step=fin.des" },
+      { key: "fin.sal", title: "Salários", desc: "Escalões salariais de docentes e staff.", path: "/financas/configurador?tab=salarios&step=fin.sal" },
+      { key: "fin.mul", title: "Multas", desc: "Multas aplicadas a estudantes, docentes e staff.", path: "/financas/configurador?tab=multas&step=fin.mul" },
     ],
   },
   {
