@@ -58,13 +58,13 @@ export default function AdminFaculdadesCursos() {
 
   // Add Faculdade dialog
   const [openAddFac, setOpenAddFac] = useState(false);
-  const [newFac, setNewFac] = useState({ name: "", decano: "" });
+  const [newFac, setNewFac] = useState({ name: "", sigla: "", decano: "" });
 
   const submitNewFac = async () => {
     if (!newFac.name.trim()) return;
     try {
-      await createFac.mutateAsync({ name: newFac.name, decano: newFac.decano });
-      setNewFac({ name: "", decano: "" });
+      await createFac.mutateAsync({ name: newFac.name, sigla: newFac.sigla, decano: newFac.decano });
+      setNewFac({ name: "", sigla: "", decano: "" });
       setOpenAddFac(false);
       toast.success("Faculdade criada");
     } catch (e: any) {
@@ -74,7 +74,7 @@ export default function AdminFaculdadesCursos() {
 
   // Add Curso dialog
   const [openAddCurso, setOpenAddCurso] = useState<string | null>(null);
-  const [newCurso, setNewCurso] = useState({ name: "", code: "", years: 4, estudantes_esperados: 0, coordenador: "" });
+  const [newCurso, setNewCurso] = useState({ name: "", code: "", years: 4, coordenador: "" });
 
   const submitNewCurso = async () => {
     if (!openAddCurso || !newCurso.name.trim() || !newCurso.code.trim()) return;
@@ -84,10 +84,10 @@ export default function AdminFaculdadesCursos() {
         name: newCurso.name,
         code: newCurso.code,
         years: newCurso.years || 4,
-        estudantes_esperados: newCurso.estudantes_esperados || 0,
+        estudantes_esperados: 0,
         coordenador: newCurso.coordenador,
       });
-      setNewCurso({ name: "", code: "", years: 4, estudantes_esperados: 0, coordenador: "" });
+      setNewCurso({ name: "", code: "", years: 4, coordenador: "" });
       setOpenAddCurso(null);
       toast.success("Curso criado (propina iniciada em 0 Kz)");
     } catch (e: any) {
