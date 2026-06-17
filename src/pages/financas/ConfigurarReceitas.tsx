@@ -446,10 +446,6 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
                             </PopoverContent>
                           </Popover>
                           <div className="flex justify-end gap-1">
-                            <Button size="sm" variant="ghost" className="h-8 px-2 text-xs"
-                              onClick={() => setOpen((s) => ({ ...s, [c.id]: !isOpen }))}>
-                              {isOpen ? "Fechar" : "Por ano"}
-                            </Button>
                             <Button size="sm" variant={dirty ? "default" : "outline"}
                               disabled={!dirty || updatePropina.isPending}
                               onClick={() => save(c.id)} className="gap-1.5">
@@ -457,24 +453,6 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
                             </Button>
                           </div>
                         </div>
-                        {isOpen && (
-                          <div className="px-5 pb-4 pt-1 bg-muted/10 border-t">
-                            <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">Propina mensal bruta por ano curricular (Kz)</p>
-                            <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${c.years || 1}, minmax(0, 1fr))` }}>
-                              {Array.from({ length: c.years || 1 }).map((_, idx) => (
-                                <div key={idx} className="space-y-1">
-                                  <Label className="text-[11px] text-muted-foreground">{idx + 1}.º ano</Label>
-                                  <Input type="number" min={0} className="h-9 tabular-nums" value={anos[idx] ?? 0}
-                                    onChange={(e) => setAnosByCurso((s) => {
-                                      const list = [...(s[c.id] ?? Array(c.years || 1).fill(bruto))];
-                                      list[idx] = Number(e.target.value) || 0;
-                                      return { ...s, [c.id]: list };
-                                    })} />
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
                       </div>
                     );
                   }),
