@@ -900,6 +900,74 @@ function EmolumentosBlock({ email, impostos }: { email?: string | null; impostos
   );
 }
 
+/* ─────────────────── Serviços Académicos: Categorias + tabela ─────────────────── */
+
+const SERV_CATS_KEY = (email?: string | null) => KEY("servicos.categorias", email);
+const DEFAULT_SERV_CATS: string[] = ["Cursos Livres", "Workshops", "Formação Contínua", "Certificações", "Aluguer de Espaços"];
+
+function ServicosAcademicosBlock({ email, impostos }: { email?: string | null; impostos: Imposto[] }) {
+  const [cats, setCats] = useState<string[]>(() => {
+    const stored = readJSON<string[] | null>(SERV_CATS_KEY(email), null);
+    return stored && stored.length ? stored : DEFAULT_SERV_CATS;
+  });
+  useEffect(() => writeJSON(SERV_CATS_KEY(email), cats), [cats, email]);
+
+  const addCat = () => setCats((s) => [...s, ""]);
+  const updCat = (idx: number, v: string) => setCats((s) => s.map((c, i) => i === idx ? v : c));
+  const delCat = (idx: number) => setCats((s) => s.filter((_, i) => i !== idx));
+
+  return (
+    <div className="space-y-6">
+      <Card className="overflow-hidden">
+        <div className="px-5 py-3 border-b bg-muted/30 flex items-center gap-2">
+          <BookOpenCheck className="w-4 h-4 text-primary" />
+          <div className="min-w-0">
+            <h2 className="text-sm font-bold text-foreground">Categorias de serviços académicos</h2>
+            <p className="text-[11px] text-muted-foreground">Defina as categorias. Ficam disponíveis na coluna Categoria da tabela de serviços.</p>
+          </div>
+          <span className="text-[11px] text-muted-foreground ml-auto tabular-nums shrink-0">{cats.length} categoria{cats.length === 1 ? "" : "s"}</span>
+        </div>
+        <div className="divide-y">
+          <div className="grid grid-cols-[1fr_40px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
+            <div>Designação</div>
+            <div className="text-right">Ação</div>
+          </div>
+          {cats.length === 0 ? (
+            <div className="px-5 py-8 text-center text-xs text-muted-foreground">Sem categorias configuradas.</div>
+          ) : cats.map((c, idx) => (
+            <div key={idx} className="grid grid-cols-[1fr_40px] gap-3 px-5 py-2.5 items-center text-sm">
+              <Input className="h-9" placeholder="Ex: Workshop" value={c} onChange={(e) => updCat(idx, e.target.value)} />
+              <div className="flex justify-end">
+                <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                  onClick={() => delCat(idx)}><Trash2 className="w-3.5 h-3.5" /></Button>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="px-5 py-3 border-t bg-muted/10">
+          <Button size="sm" variant="outline" className="gap-1.5" onClick={addCat}><Plus className="w-3.5 h-3.5" /> Adicionar categoria</Button>
+        </div>
+      </Card>
+
+      <LineItemsBlock
+        title="Serviço académico"
+        subtitle="Cursos livres, workshops, formações contínuas, certificações e aluguer de espaços."
+        icon={BookOpenCheck}
+        storageKey={KEY("servicos", email)}
+        withType
+        typeLabel="Categoria"
+        typeOptions={cats.filter((c) => c.trim())}
+        withTarget
+        withTax
+        impostos={impostos}
+        addLabel="Adicionar serviço"
+        placeholder="Ex: Workshop AutoCAD"
+        valueLabel="Valor (Kz)"
+      />
+    </div>
+  );
+}
+
 /* ═══════════════════════════════ Generic block ════════════════════════════ */
 
 function LineItemsBlock({
