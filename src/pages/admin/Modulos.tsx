@@ -71,9 +71,9 @@ export default function AdminModulos() {
   return (
     <div className="p-6 max-w-6xl mx-auto space-y-6">
       <header>
-        <h1 className="text-2xl font-bold">Módulos</h1>
+        <h1 className="text-2xl font-bold">Roles e Permissões</h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Gestão dos módulos da plataforma: descrição, rotas expostas, utilizadores ligados e activação por instituição.
+          Gestão dos perfis (roles) e permissões da plataforma: descrição, rotas expostas, utilizadores ligados e activação por instituição.
         </p>
       </header>
 
