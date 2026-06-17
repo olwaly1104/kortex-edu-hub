@@ -198,10 +198,9 @@ function ImpostosBlock({ impostos, setImpostos }: { impostos: Imposto[]; setImpo
 }
 
 const PRAZO_KEY = (email?: string | null) => KEY("propinas.prazo", email);
-const PRAZOS_DEF_KEY = (email?: string | null) => KEY("propinas.prazos.def", email);
+const PRAZOS_DEF_KEY = (email?: string | null) => KEY("propinas.prazos.meses", email);
 
-type PrazoDef = { id: string; nome: string; mes: number };
-const MESES = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+type PrazoDef = { id: string; nome: string; meses: number };
 
 function PrazosBlock({ prazos, setPrazos }: { prazos: PrazoDef[]; setPrazos: React.Dispatch<React.SetStateAction<PrazoDef[]>> }) {
   const add = () => setPrazos((s) => [...s, { id: newId(), nome: `Prazo ${s.length + 1}`, mes: 1 }]);
