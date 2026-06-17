@@ -412,7 +412,7 @@ function DespesasSection({ email }: { email?: string | null }) {
           <span className="text-[11px] text-muted-foreground ml-auto tabular-nums shrink-0">{categorias.length} categoria{categorias.length === 1 ? "" : "s"}</span>
         </div>
         <div className="divide-y">
-          <div className="grid grid-cols-[1fr_180px_140px_1fr_40px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
+          <div className="grid grid-cols-[1.2fr_160px_140px_1.4fr_44px] gap-4 px-5 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
             <div>Designação</div>
             <div>Cor</div>
             <div>Pré-visualização</div>
@@ -429,24 +429,33 @@ function DespesasSection({ email }: { email?: string | null }) {
                 return { ...x, documentos: has ? x.documentos.filter((d) => d !== doc) : [...x.documentos, doc] };
               }));
             };
+            const DocChip = ({ doc, icon: I }: { doc: string; icon: React.ComponentType<{ className?: string }> }) => {
+              const active = c.documentos.includes(doc);
+              return (
+                <button type="button" onClick={() => toggleDoc(doc)}
+                  className={`inline-flex items-center gap-1.5 h-8 px-3 rounded-md border text-xs font-medium transition-colors ${
+                    active
+                      ? "bg-primary/10 border-primary/30 text-primary"
+                      : "bg-background border-input text-muted-foreground hover:bg-muted"
+                  }`}>
+                  <I className="w-3.5 h-3.5" />
+                  {doc}
+                  {active && <Check className="w-3 h-3" />}
+                </button>
+              );
+            };
             return (
-              <div key={c.id} className="grid grid-cols-[1fr_180px_140px_1fr_40px] gap-3 px-5 py-2.5 items-center text-sm">
+              <div key={c.id} className="grid grid-cols-[1.2fr_160px_140px_1.4fr_44px] gap-4 px-5 py-3 items-center text-sm">
                 <Input className="h-9" placeholder="Ex: Infraestrutura" value={c.nome}
                   onChange={(e) => setCategorias((s) => s.map((x) => x.id === c.id ? { ...x, nome: e.target.value } : x))} />
                 <select className="h-9 rounded-md border border-input bg-background px-2 text-sm" value={c.cor}
                   onChange={(e) => setCategorias((s) => s.map((x) => x.id === c.id ? { ...x, cor: e.target.value } : x))}>
                   {COR_OPCOES.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
                 </select>
-                <span className={`inline-flex items-center justify-center px-2.5 py-1 rounded-md border text-xs font-medium ${c.cor}`}>{c.nome || "—"}</span>
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-1.5">
-                    <Checkbox id={`${c.id}-fatura`} checked={c.documentos.includes("Fatura")} onCheckedChange={() => toggleDoc("Fatura")} />
-                    <Label htmlFor={`${c.id}-fatura`} className="text-xs font-normal cursor-pointer">Fatura</Label>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <Checkbox id={`${c.id}-comprovativo`} checked={c.documentos.includes("Comprovativo")} onCheckedChange={() => toggleDoc("Comprovativo")} />
-                    <Label htmlFor={`${c.id}-comprovativo`} className="text-xs font-normal cursor-pointer">Comprovativo</Label>
-                  </div>
+                <span className={`inline-flex items-center justify-center px-2.5 py-1.5 rounded-md border text-xs font-medium truncate ${c.cor}`}>{c.nome || "—"}</span>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <DocChip doc="Fatura" icon={FileText} />
+                  <DocChip doc="Comprovativo" icon={FileCheck2} />
                 </div>
                 <div className="flex justify-end">
                   <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
