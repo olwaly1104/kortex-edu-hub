@@ -990,6 +990,7 @@ function LineItemsBlock({
   withTarget?: boolean;
   withType?: boolean;
   withTax?: boolean;
+  withTaxValue?: boolean;
   impostos?: Imposto[];
   typeLabel?: string;
   typeOptions?: string[];
