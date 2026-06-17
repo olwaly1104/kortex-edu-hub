@@ -295,30 +295,47 @@ function DespesasSection({ email }: { email?: string | null }) {
         <div className="divide-y">
           <div className="grid grid-cols-[1fr_1fr_160px_40px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
             <div>Designação</div>
-            <div>Documento exigido</div>
+            <div>Documentos exigidos</div>
             <div>Orçamento mensal (Kz)</div>
             <div className="text-right">Ação</div>
           </div>
           {categorias.length === 0 ? (
             <div className="px-5 py-10 text-center text-xs text-muted-foreground">Sem categorias configuradas.</div>
-          ) : categorias.map((c) => (
-            <div key={c.id} className="grid grid-cols-[1fr_1fr_160px_40px] gap-3 px-5 py-2.5 items-center text-sm">
-              <Input className="h-9" placeholder="Ex: Infraestrutura" value={c.nome}
-                onChange={(e) => setCategorias((s) => s.map((x) => x.id === c.id ? { ...x, nome: e.target.value } : x))} />
-              <Input className="h-9" placeholder="Ex: Fatura, Recibo, Contrato" value={c.documento}
-                onChange={(e) => setCategorias((s) => s.map((x) => x.id === c.id ? { ...x, documento: e.target.value } : x))} />
-              <Input type="number" min={0} className="h-9 tabular-nums" value={c.orcamento}
-                onChange={(e) => setCategorias((s) => s.map((x) => x.id === c.id ? { ...x, orcamento: Number(e.target.value) || 0 } : x))} />
-              <div className="flex justify-end">
-                <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                  onClick={() => setCategorias((s) => s.filter((x) => x.id !== c.id))}><Trash2 className="w-3.5 h-3.5" /></Button>
+          ) : categorias.map((c) => {
+            const toggleDoc = (doc: string) => {
+              setCategorias((s) => s.map((x) => {
+                if (x.id !== c.id) return x;
+                const has = x.documentos.includes(doc);
+                return { ...x, documentos: has ? x.documentos.filter((d) => d !== doc) : [...x.documentos, doc] };
+              }));
+            };
+            return (
+              <div key={c.id} className="grid grid-cols-[1fr_1fr_160px_40px] gap-3 px-5 py-2.5 items-center text-sm">
+                <Input className="h-9" placeholder="Ex: Infraestrutura" value={c.nome}
+                  onChange={(e) => setCategorias((s) => s.map((x) => x.id === c.id ? { ...x, nome: e.target.value } : x))} />
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-1.5">
+                    <Checkbox id={`${c.id}-fatura`} checked={c.documentos.includes("Fatura")} onCheckedChange={() => toggleDoc("Fatura")} />
+                    <Label htmlFor={`${c.id}-fatura`} className="text-xs font-normal cursor-pointer">Fatura</Label>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <Checkbox id={`${c.id}-comprovativo`} checked={c.documentos.includes("Comprovativo")} onCheckedChange={() => toggleDoc("Comprovativo")} />
+                    <Label htmlFor={`${c.id}-comprovativo`} className="text-xs font-normal cursor-pointer">Comprovativo</Label>
+                  </div>
+                </div>
+                <Input type="number" min={0} className="h-9 tabular-nums" value={c.orcamento}
+                  onChange={(e) => setCategorias((s) => s.map((x) => x.id === c.id ? { ...x, orcamento: Number(e.target.value) || 0 } : x))} />
+                <div className="flex justify-end">
+                  <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                    onClick={() => setCategorias((s) => s.filter((x) => x.id !== c.id))}><Trash2 className="w-3.5 h-3.5" /></Button>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
         <div className="px-5 py-3 border-t bg-muted/10">
           <Button size="sm" variant="outline" className="gap-1.5"
-            onClick={() => setCategorias((s) => [...s, { id: newId(), nome: "", documento: "", orcamento: 0 }])}>
+            onClick={() => setCategorias((s) => [...s, { id: newId(), nome: "", documentos: [], orcamento: 0 }])}>
             <Plus className="w-3.5 h-3.5" /> Adicionar categoria
           </Button>
         </div>
