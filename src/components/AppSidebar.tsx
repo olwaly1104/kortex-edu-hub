@@ -251,7 +251,6 @@ const adminSections: NavSection[] = [
   ]},
   { title: "Configurar", items: [
     { label: "Faculdades & Cursos", icon: Building2, path: "/admin/faculdades-cursos?tab=faculdades&step=aca.fac" },
-    { label: "Discentes", icon: Users, path: "/admin/onboarding/estudantes?step=est.imp" },
     { label: "Docentes", icon: GraduationCap, path: "/admin/onboarding/docentes?step=rh.doc" },
     { label: "Staff", icon: UserCog, path: "/admin/onboarding/staff?step=rh.staff" },
     { label: "Salas e Edifícios", icon: Building2, path: "/admin/onboarding/espacos?step=inf.esp" },
@@ -261,7 +260,7 @@ const adminSections: NavSection[] = [
   { title: "Acessos", items: [
     { label: "Utilizadores", icon: Users, path: "/admin/utilizadores" },
     { label: "Sistema", icon: Settings2, path: "/admin/sistema" },
-    { label: "Módulos", icon: Layers, path: "/admin/modulos" },
+    { label: "Roles e Permissões", icon: ShieldCheck, path: "/admin/modulos" },
   ]},
 ];
 
