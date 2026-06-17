@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card } from "@/components/ui/card";
-import { CalendarDays, Clock, ChevronRight, ShieldCheck, ClipboardCheck } from "lucide-react";
+import { CalendarDays, Clock, ChevronRight, ShieldCheck, ClipboardCheck, Calendar, Megaphone } from "lucide-react";
 import { ONBOARDING_GROUPS, readOnboardingProgress } from "@/components/admin/OnboardingStepBanner";
 
 export default function FinancasInicio() {
