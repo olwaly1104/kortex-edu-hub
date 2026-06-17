@@ -228,7 +228,7 @@ export default function OnboardingEstudantes() {
             <div>
               <h2 className="text-sm font-semibold">Adicionar manualmente</h2>
               <p className="text-xs text-muted-foreground flex items-center gap-1.5 mt-0.5">
-                <Mail className="w-3 h-3" /> O email <span className="font-semibold">@upra.kor</span> é gerado automaticamente após confirmação.
+                <Mail className="w-3 h-3" /> Todo o estudante registado recebe automaticamente email <span className="font-semibold">@upra.kor</span> e conta de utilizador no Kortex.
               </p>
             </div>
 
