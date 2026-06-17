@@ -18,7 +18,7 @@ interface OnboardingState {
 
 const initial: OnboardingState = {
   dados: {
-    nome: "Universidade Privada de Angola",
+    nome: "Universidade Privada De Angola",
     tipo: "Universidade",
     sigla: "UPRA",
     provincia: "Luanda",
