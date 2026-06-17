@@ -1,0 +1,1 @@
+ALTER TABLE public.faculdades ADD COLUMN IF NOT EXISTS sigla TEXT;
