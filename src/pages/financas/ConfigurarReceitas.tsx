@@ -929,15 +929,17 @@ function ServicosAcademicosBlock({ email, impostos }: { email?: string | null; i
           <span className="text-[11px] text-muted-foreground ml-auto tabular-nums shrink-0">{cats.length} categoria{cats.length === 1 ? "" : "s"}</span>
         </div>
         <div className="divide-y">
-          <div className="grid grid-cols-[1fr_40px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
+          <div className="grid grid-cols-[1fr_140px_40px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
             <div>Designação</div>
+            <div>Pré-visualização</div>
             <div className="text-right">Ação</div>
           </div>
           {cats.length === 0 ? (
             <div className="px-5 py-8 text-center text-xs text-muted-foreground">Sem categorias configuradas.</div>
           ) : cats.map((c, idx) => (
-            <div key={idx} className="grid grid-cols-[1fr_40px] gap-3 px-5 py-2.5 items-center text-sm">
+            <div key={idx} className="grid grid-cols-[1fr_140px_40px] gap-3 px-5 py-2.5 items-center text-sm">
               <Input className="h-9" placeholder="Ex: Workshop" value={c} onChange={(e) => updCat(idx, e.target.value)} />
+              <span className="inline-flex items-center justify-center px-2.5 py-1.5 rounded-md border text-xs font-medium truncate bg-primary/10 text-primary border-primary/20">{c || "—"}</span>
               <div className="flex justify-end">
                 <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
                   onClick={() => delCat(idx)}><Trash2 className="w-3.5 h-3.5" /></Button>
