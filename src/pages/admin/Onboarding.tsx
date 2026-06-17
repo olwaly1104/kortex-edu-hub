@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useAuth } from "@/contexts/AuthContext";
 import { onboardingKey, readOnboardingStateFor, pushOnboarding } from "@/lib/onboardingStorage";
 import { Building2, Loader2, Upload, CheckCircle2 } from "lucide-react";
+import { toast } from "sonner";
 
 interface OnboardingState {
   dados: { nome: string; tipo: string; sigla: string; provincia: string; municipio: string; endereco: string; telefone: string; email: string; nif: string; logoDataUrl: string };
