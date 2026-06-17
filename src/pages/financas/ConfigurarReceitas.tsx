@@ -106,37 +106,115 @@ export default function ConfigurarReceitas() {
 
 /* ═══════════════════════════════ RECEITAS ═════════════════════════════════ */
 
+export type Imposto = { id: string; nome: string; taxa: number; regime: string };
+const IMPOSTOS_KEY = (email?: string | null) => KEY("impostos", email);
+const ANOS_KEY = (email?: string | null) => KEY("propinas.anos", email);
+const REGIMES = ["Geral", "Reduzido", "Isento", "Exportação", "Intermédio"];
+
+type RecSub = "impostos" | "propinas" | "emolumentos";
+
 function ReceitasSection({ email, onAddCursos }: { email?: string | null; onAddCursos: () => void }) {
+  const [sub, setSub] = useState<RecSub>("impostos");
+  const [impostos, setImpostos] = useState<Imposto[]>(() => readJSON<Imposto[]>(IMPOSTOS_KEY(email), [
+    { id: "iva14", nome: "IVA 14%", taxa: 0.14, regime: "Geral" },
+    { id: "iva0", nome: "Isento", taxa: 0, regime: "Isento" },
+  ]));
+  useEffect(() => writeJSON(IMPOSTOS_KEY(email), impostos), [impostos, email]);
+
   return (
     <div className="space-y-6">
-      <PropinasBlock onAddCursos={onAddCursos} />
-      <LineItemsBlock
-        title="Emolumento"
-        subtitle="Inscrições, matrículas, declarações, certificados, 2ª via de cartão, etc."
-        icon={Receipt}
-        storageKey={KEY("taxas", email)}
-        withType
-        withTarget
-        addLabel="Adicionar emolumento"
-        placeholder="Ex: Certidão de matrícula"
-        valueLabel="Valor (Kz)"
-      />
+      <Tabs value={sub} onValueChange={(v) => setSub(v as RecSub)}>
+        <TabsList className="grid grid-cols-3 w-full max-w-xl">
+          <TabsTrigger value="impostos" className="gap-1.5"><Percent className="w-3.5 h-3.5" /> Impostos</TabsTrigger>
+          <TabsTrigger value="propinas" className="gap-1.5"><Wallet className="w-3.5 h-3.5" /> Propinas</TabsTrigger>
+          <TabsTrigger value="emolumentos" className="gap-1.5"><Receipt className="w-3.5 h-3.5" /> Emolumentos</TabsTrigger>
+        </TabsList>
+      </Tabs>
+
+      {sub === "impostos" && <ImpostosBlock impostos={impostos} setImpostos={setImpostos} />}
+      {sub === "propinas" && <PropinasBlock email={email} impostos={impostos} onAddCursos={onAddCursos} />}
+      {sub === "emolumentos" && (
+        <LineItemsBlock
+          title="Emolumento"
+          subtitle="Inscrições, matrículas, declarações, certificados, 2ª via de cartão, etc."
+          icon={Receipt}
+          storageKey={KEY("taxas", email)}
+          withType
+          withTarget
+          withTax
+          impostos={impostos}
+          addLabel="Adicionar emolumento"
+          placeholder="Ex: Certidão de matrícula"
+          valueLabel="Valor (Kz)"
+        />
+      )}
     </div>
   );
 }
 
-function PropinasBlock({ onAddCursos }: { onAddCursos: () => void }) {
+function ImpostosBlock({ impostos, setImpostos }: { impostos: Imposto[]; setImpostos: React.Dispatch<React.SetStateAction<Imposto[]>> }) {
+  const add = () => setImpostos((s) => [...s, { id: newId(), nome: "", taxa: 0, regime: "Geral" }]);
+  return (
+    <Card className="overflow-hidden">
+      <div className="px-5 py-3 border-b bg-muted/30 flex items-center gap-2">
+        <Percent className="w-4 h-4 text-primary" />
+        <div className="min-w-0">
+          <h2 className="text-sm font-bold text-foreground">Impostos & Regime de IVA</h2>
+          <p className="text-[11px] text-muted-foreground">Configure as taxas usadas em Propinas e Emolumentos. Selecionáveis em todas as tabelas de receita.</p>
+        </div>
+        <span className="text-[11px] text-muted-foreground ml-auto tabular-nums shrink-0">{impostos.length} imposto{impostos.length === 1 ? "" : "s"}</span>
+      </div>
+      <div className="divide-y">
+        <div className="grid grid-cols-[1fr_140px_180px_40px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
+          <div>Designação</div>
+          <div>Taxa (0–1)</div>
+          <div>Regime de IVA</div>
+          <div className="text-right">Ação</div>
+        </div>
+        {impostos.length === 0 ? (
+          <div className="px-5 py-10 text-center text-xs text-muted-foreground">Sem impostos configurados.</div>
+        ) : impostos.map((i) => (
+          <div key={i.id} className="grid grid-cols-[1fr_140px_180px_40px] gap-3 px-5 py-2.5 items-center text-sm">
+            <Input className="h-9" placeholder="Ex: IVA 14%" value={i.nome}
+              onChange={(e) => setImpostos((s) => s.map((x) => x.id === i.id ? { ...x, nome: e.target.value } : x))} />
+            <Input type="number" step="0.01" min={0} max={1} className="h-9 tabular-nums" value={i.taxa}
+              onChange={(e) => setImpostos((s) => s.map((x) => x.id === i.id ? { ...x, taxa: Number(e.target.value) || 0 } : x))} />
+            <select className="h-9 rounded-md border border-input bg-background px-2 text-sm" value={i.regime}
+              onChange={(e) => setImpostos((s) => s.map((x) => x.id === i.id ? { ...x, regime: e.target.value } : x))}>
+              {REGIMES.map((r) => <option key={r} value={r}>{r}</option>)}
+            </select>
+            <div className="flex justify-end">
+              <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                onClick={() => setImpostos((s) => s.filter((x) => x.id !== i.id))}><Trash2 className="w-3.5 h-3.5" /></Button>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="px-5 py-3 border-t bg-muted/10">
+        <Button size="sm" variant="outline" className="gap-1.5" onClick={add}><Plus className="w-3.5 h-3.5" /> Adicionar imposto</Button>
+      </div>
+    </Card>
+  );
+}
+
+function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null; impostos: Imposto[]; onAddCursos: () => void }) {
   const { data: faculdades = [], isLoading: lF } = useFaculdades();
   const { data: cursos = [], isLoading: lC } = useCursos();
   const { data: propinas = [], isLoading: lP } = usePropinas();
   const updatePropina = useUpdatePropina();
-  const [draft, setDraft] = useState<Record<string, { valor: string; imposto: string }>>({});
+  const [draft, setDraft] = useState<Record<string, { valor: string; impostoId: string }>>({});
+  const [anosByCurso, setAnosByCurso] = useState<Record<string, number[]>>(() => readJSON(ANOS_KEY(email), {}));
+  const [open, setOpen] = useState<Record<string, boolean>>({});
+
+  useEffect(() => writeJSON(ANOS_KEY(email), anosByCurso), [anosByCurso, email]);
 
   const propinaByCurso = useMemo(() => {
     const m = new Map<string, { valor_mensal: number; imposto: number }>();
     propinas.forEach((p) => m.set(p.curso_id, { valor_mensal: Number(p.valor_mensal) || 0, imposto: Number(p.imposto) || 0 }));
     return m;
   }, [propinas]);
+
+  const findImpostoIdByTaxa = (taxa: number) => impostos.find((i) => Math.abs(i.taxa - taxa) < 0.0001)?.id || "";
 
   const facWithCursos = useMemo(
     () => faculdades.map((f) => ({ ...f, cursos: cursos.filter((c) => c.faculdade_id === f.id) })),
@@ -149,12 +227,12 @@ function PropinasBlock({ onAddCursos }: { onAddCursos: () => void }) {
     const d = draft[cursoId];
     const cur = propinaByCurso.get(cursoId) ?? { valor_mensal: 0, imposto: 0 };
     const valor = d?.valor !== undefined ? Number(d.valor) : cur.valor_mensal;
-    const imposto = d?.imposto !== undefined ? Number(d.imposto) : cur.imposto;
+    const impostoObj = d?.impostoId ? impostos.find((i) => i.id === d.impostoId) : impostos.find((i) => Math.abs(i.taxa - cur.imposto) < 0.0001);
+    const taxa = impostoObj?.taxa ?? cur.imposto;
     if (Number.isNaN(valor) || valor < 0) { toast.error("Valor inválido"); return; }
-    if (Number.isNaN(imposto) || imposto < 0 || imposto > 1) { toast.error("Imposto deve estar entre 0 e 1 (ex: 0.14)"); return; }
-    await updatePropina.mutateAsync({ curso_id: cursoId, valor_mensal: valor, imposto });
+    await updatePropina.mutateAsync({ curso_id: cursoId, valor_mensal: valor, imposto: taxa });
     setDraft((s) => { const n = { ...s }; delete n[cursoId]; return n; });
-    toast.success("Propina atualizada");
+    toast.success("Propina confirmada");
   };
 
   return (
@@ -163,7 +241,7 @@ function PropinasBlock({ onAddCursos }: { onAddCursos: () => void }) {
         <Wallet className="w-4 h-4 text-primary" />
         <h2 className="text-sm font-bold text-foreground">Propinas por curso</h2>
         <span className="text-[11px] text-muted-foreground ml-auto">
-          Valor mensal pago pelo estudante · alimenta Finanças → Receitas
+          Bruto · imposto · líquido — também configurável por ano curricular.
         </span>
       </div>
 
@@ -180,19 +258,24 @@ function PropinasBlock({ onAddCursos }: { onAddCursos: () => void }) {
           </p>
           <Button className="mt-4" size="sm" onClick={onAddCursos}>Ir para Faculdades & Cursos</Button>
         </div>
+      ) : impostos.length === 0 ? (
+        <div className="px-5 py-10 text-center text-xs text-muted-foreground">
+          Configure primeiro os impostos no separador <span className="font-medium text-foreground">Impostos</span>.
+        </div>
       ) : (
         <div className="divide-y">
-          <div className="grid grid-cols-12 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
-            <div className="col-span-5">Faculdade · Curso</div>
-            <div className="col-span-3">Propina mensal (Kz)</div>
-            <div className="col-span-2">Imposto (0–1)</div>
-            <div className="col-span-2 text-right">Ação</div>
+          <div className="grid grid-cols-[1fr_160px_160px_140px_120px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
+            <div>Faculdade · Curso</div>
+            <div>Propina mensal bruta (Kz)</div>
+            <div>Imposto</div>
+            <div className="text-right">Líquido (Kz)</div>
+            <div className="text-right">Ação</div>
           </div>
           {facWithCursos.flatMap((f) =>
             f.cursos.length === 0
               ? [(
-                  <div key={`empty-${f.id}`} className="grid grid-cols-12 px-5 py-2.5 items-center text-xs text-muted-foreground">
-                    <div className="col-span-12 flex items-center gap-2">
+                  <div key={`empty-${f.id}`} className="grid grid-cols-[1fr_160px_160px_140px_120px] px-5 py-2.5 items-center text-xs text-muted-foreground">
+                    <div className="col-span-full flex items-center gap-2">
                       <AlertCircle className="w-3.5 h-3.5" />
                       <span className="font-medium text-foreground">{f.name}</span> · sem cursos
                     </div>
@@ -202,36 +285,65 @@ function PropinasBlock({ onAddCursos }: { onAddCursos: () => void }) {
                   const p = propinaByCurso.get(c.id) ?? { valor_mensal: 0, imposto: 0 };
                   const d = draft[c.id];
                   const valorVal = d?.valor ?? String(p.valor_mensal);
-                  const impVal = d?.imposto ?? String(p.imposto);
+                  const impostoId = d?.impostoId ?? findImpostoIdByTaxa(p.imposto);
+                  const taxa = impostos.find((i) => i.id === impostoId)?.taxa ?? p.imposto;
+                  const bruto = Number(valorVal) || 0;
+                  const liquido = Math.max(0, bruto - bruto * taxa);
                   const dirty = d !== undefined;
+                  const anos = anosByCurso[c.id] ?? Array(c.years || 1).fill(bruto);
+                  const isOpen = !!open[c.id];
                   return (
-                    <div key={c.id} className="grid grid-cols-12 px-5 py-3 items-center text-sm">
-                      <div className="col-span-5 flex items-center gap-2 min-w-0">
-                        <GraduationCap className="w-4 h-4 text-muted-foreground shrink-0" />
-                        <div className="min-w-0">
-                          <p className="font-medium truncate">{c.name}</p>
-                          <p className="text-[11px] text-muted-foreground font-mono">
-                            {f.name} · {c.code} · {c.years} anos
-                          </p>
+                    <div key={c.id}>
+                      <div className="grid grid-cols-[1fr_160px_160px_140px_120px] gap-3 px-5 py-3 items-center text-sm">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <GraduationCap className="w-4 h-4 text-muted-foreground shrink-0" />
+                          <div className="min-w-0">
+                            <p className="font-medium truncate">{c.name}</p>
+                            <p className="text-[11px] text-muted-foreground font-mono">
+                              {f.name} · {c.code} · {c.years} anos
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                      <div className="col-span-3">
                         <Input type="number" min={0} className="h-9 tabular-nums"
                           value={valorVal}
-                          onChange={(e) => setDraft((s) => ({ ...s, [c.id]: { valor: e.target.value, imposto: impVal } }))} />
+                          onChange={(e) => setDraft((s) => ({ ...s, [c.id]: { valor: e.target.value, impostoId } }))} />
+                        <select className="h-9 rounded-md border border-input bg-background px-2 text-sm"
+                          value={impostoId}
+                          onChange={(e) => setDraft((s) => ({ ...s, [c.id]: { valor: valorVal, impostoId: e.target.value } }))}>
+                          <option value="">— Selecionar —</option>
+                          {impostos.map((i) => <option key={i.id} value={i.id}>{i.nome} ({(i.taxa * 100).toFixed(0)}%)</option>)}
+                        </select>
+                        <div className="h-9 flex items-center justify-end px-2 rounded-md bg-muted/30 tabular-nums font-medium">{fmt(liquido)}</div>
+                        <div className="flex justify-end gap-1">
+                          <Button size="sm" variant="ghost" className="h-8 px-2 text-xs"
+                            onClick={() => setOpen((s) => ({ ...s, [c.id]: !isOpen }))}>
+                            {isOpen ? "Fechar" : "Por ano"}
+                          </Button>
+                          <Button size="sm" variant={dirty ? "default" : "outline"}
+                            disabled={!dirty || updatePropina.isPending}
+                            onClick={() => save(c.id)} className="gap-1.5">
+                            <Check className="w-3.5 h-3.5" /> Confirmar
+                          </Button>
+                        </div>
                       </div>
-                      <div className="col-span-2">
-                        <Input type="number" step="0.01" min={0} max={1} className="h-9 tabular-nums"
-                          value={impVal}
-                          onChange={(e) => setDraft((s) => ({ ...s, [c.id]: { valor: valorVal, imposto: e.target.value } }))} />
-                      </div>
-                      <div className="col-span-2 flex justify-end">
-                        <Button size="sm" variant={dirty ? "default" : "outline"}
-                          disabled={!dirty || updatePropina.isPending}
-                          onClick={() => save(c.id)} className="gap-1.5">
-                          <Save className="w-3.5 h-3.5" /> Guardar
-                        </Button>
-                      </div>
+                      {isOpen && (
+                        <div className="px-5 pb-4 pt-1 bg-muted/10 border-t">
+                          <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">Propina mensal bruta por ano curricular (Kz)</p>
+                          <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${c.years || 1}, minmax(0, 1fr))` }}>
+                            {Array.from({ length: c.years || 1 }).map((_, idx) => (
+                              <div key={idx} className="space-y-1">
+                                <Label className="text-[11px] text-muted-foreground">{idx + 1}.º ano</Label>
+                                <Input type="number" min={0} className="h-9 tabular-nums" value={anos[idx] ?? 0}
+                                  onChange={(e) => setAnosByCurso((s) => {
+                                    const list = [...(s[c.id] ?? Array(c.years || 1).fill(bruto))];
+                                    list[idx] = Number(e.target.value) || 0;
+                                    return { ...s, [c.id]: list };
+                                  })} />
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   );
                 }),
