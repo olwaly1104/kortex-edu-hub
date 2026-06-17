@@ -101,7 +101,7 @@ const GROUPS: Group[] = [
     steps: [
       { key: "rh.doc", title: "Registar docentes", desc: "Adicionar todos os docentes da instituição em lote.", icon: GraduationCap, path: "/admin/onboarding/docentes?step=rh.doc" },
       { key: "rh.staff", title: "Registar staff", desc: "Adicionar funcionários administrativos e técnicos.", icon: Briefcase, path: "/admin/onboarding/staff?step=rh.staff" },
-      { key: "rh.pres", title: "Regras de presença", desc: "Definir limites de presença, tolerâncias e faltas justificadas.", icon: Clock, path: "/admin/onboarding/regras-presenca?step=rh.pres" },
+      { key: "rh.pres", title: "Conformidade & Multas", desc: "Controlo de presença, tolerâncias, multas e disputas.", icon: Clock, path: "/admin/onboarding/regras-presenca?step=rh.pres" },
     ],
   },
   {
