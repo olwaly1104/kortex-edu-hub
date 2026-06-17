@@ -1,0 +1,1 @@
+ALTER TABLE public.faculdades ADD COLUMN IF NOT EXISTS color text NOT NULL DEFAULT '#475569';
