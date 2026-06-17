@@ -19,7 +19,7 @@ type StoredUser = {
 const STORAGE_KEY = "upra_admin_users_v1";
 
 const MODULOS: { value: string; label: string }[] = [
-  { value: "admin", label: "Admin (Onboarding institucional)" },
+  { value: "admin", label: "Admin (Instituição)" },
   { value: "estudante", label: "Estudante" },
   { value: "professor", label: "Professor" },
   { value: "coordenador", label: "Coordenador de Curso" },
@@ -165,7 +165,7 @@ export default function AdminUtilizadores() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const remove = async (id: string, email: string) => {
     if (id === "current-admin") return;
-    if (!confirm("Eliminar definitivamente este utilizador? A conta e o acesso ao Kortex serão removidos da cloud.")) return;
+    if (!confirm("Eliminar definitivamente este utilizador? A conta e o acesso ao portal serão removidos da cloud.")) return;
     setDeletingId(id);
     try {
       const { data, error } = await supabase.functions.invoke("admin-delete-user", { body: { user_id: id } });
@@ -188,7 +188,7 @@ export default function AdminUtilizadores() {
     <div className="p-6 space-y-6 max-w-6xl mx-auto">
       <FinHeader
         title="Utilizadores"
-        subtitle="Todas as contas de acesso ao Kortex da instituição"
+        subtitle="Todas as contas de acesso ao portal da instituição"
         icon={<Users className="w-5 h-5 text-primary" />}
         right={
           <Button size="sm" onClick={() => setOpen(true)} className="gap-1.5">

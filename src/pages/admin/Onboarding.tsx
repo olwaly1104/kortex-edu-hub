@@ -112,14 +112,14 @@ export default function AdminOnboarding() {
 
   return (
     <div className="min-h-screen bg-muted/30">
-      {/* Top bar — Kortex branding */}
+      {/* Top bar — institutional branding */}
       <header className="bg-card border-b border-border sticky top-0 z-10">
         <div className="max-w-3xl mx-auto px-6 h-14 flex items-center justify-between gap-4">
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-7 h-7 rounded-md bg-foreground text-background flex items-center justify-center shrink-0 font-black text-[13px] tracking-tight">K</div>
-            <div className="text-[14px] font-bold text-foreground tracking-tight">kortex</div>
+            <div className="w-7 h-7 rounded-md bg-primary text-primary-foreground flex items-center justify-center shrink-0 font-black text-[13px] tracking-tight">U</div>
+            <div className="text-[14px] font-bold text-foreground tracking-tight">UPRA</div>
             <span className="hidden md:inline-block w-px h-4 bg-border mx-1" />
-            <span className="hidden md:inline text-[11px] uppercase tracking-[0.14em] text-muted-foreground font-medium">Onboarding inicial</span>
+            <span className="hidden md:inline text-[11px] uppercase tracking-[0.14em] text-muted-foreground font-medium">Admin Instituição · Configuração inicial</span>
           </div>
           <div className="hidden sm:block text-[11px] text-muted-foreground">{user?.email}</div>
         </div>

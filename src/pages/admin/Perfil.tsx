@@ -142,7 +142,7 @@ export default function AdminPerfil() {
               <Badge variant="outline" className="mb-2 gap-1 text-[10px]"><Settings2 className="w-3 h-3" /> Administração da plataforma</Badge>
               <h1 className="text-2xl font-bold leading-tight">{nomeDisplay}</h1>
               <p className="text-sm text-muted-foreground mt-1">
-                Perfil institucional · Conta de {user?.name || "Administrador"} — controla toda a configuração da app Kortex.
+                Perfil institucional · Conta de {user?.name || "Administrador"} — controla toda a configuração do portal da instituição.
               </p>
               <div className="flex flex-wrap items-center gap-3 mt-3 text-xs text-muted-foreground">
                 {instituicao.sigla && <span className="inline-flex items-center gap-1.5"><Hash className="w-3.5 h-3.5" /> {instituicao.sigla}</span>}

@@ -46,8 +46,8 @@ export default function AdminStaff() {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <Stat label="Total" value={rows.length} />
         <Stat label="Departamentos" value={new Set(rows.map((r) => r.departamento)).size} />
-        <Stat label="Com Kortex" value={rows.filter((r) => r.moduloKortex !== "Não").length} />
-        <Stat label="Sem Kortex" value={rows.filter((r) => r.moduloKortex === "Não").length} />
+        <Stat label="Com acesso" value={rows.filter((r) => r.moduloKortex !== "Não").length} />
+        <Stat label="Sem acesso" value={rows.filter((r) => r.moduloKortex === "Não").length} />
       </div>
 
       <div className="flex items-center gap-3">
@@ -70,7 +70,7 @@ export default function AdminStaff() {
                 <th className="text-left font-semibold py-2.5 px-4">Contacto</th>
                 <th className="text-left font-semibold py-2.5 px-4">Departamento</th>
                 <th className="text-left font-semibold py-2.5 px-4">Função</th>
-                <th className="text-left font-semibold py-2.5 px-4">Kortex</th>
+                <th className="text-left font-semibold py-2.5 px-4">Acesso</th>
                 <th className="w-10"></th>
               </tr>
             </thead>
@@ -152,7 +152,7 @@ export default function AdminStaff() {
               </div>
             </FormSection>
 
-            <FormSection icon={<KeyRound className="w-3.5 h-3.5" />} title="Acesso ao Kortex">
+            <FormSection icon={<KeyRound className="w-3.5 h-3.5" />} title="Acesso ao portal">
               <Select value={draft.moduloKortex} onValueChange={(v) => setDraftField("moduloKortex", v)}>
                 <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
                 <SelectContent>{modulosKortexPool.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}</SelectContent>
