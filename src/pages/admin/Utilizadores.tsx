@@ -190,6 +190,7 @@ export default function AdminUtilizadores() {
       } catch { /* ignore */ }
       setForm({ primeiroNome: "", ultimoNome: "", password: "", modulo: "estudante" });
       setOpen(false);
+      refetchServer();
     } finally {
       setSubmitting(false);
     }
