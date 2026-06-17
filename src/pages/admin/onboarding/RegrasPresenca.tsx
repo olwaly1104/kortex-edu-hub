@@ -141,8 +141,7 @@ export default function OnboardingRegrasPresenca() {
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <span className="text-[11px] text-muted-foreground">{multasEnabled ? "Activo" : "Desactivado"}</span>
-            <Switch checked={multasEnabled} onCheckedChange={setMultasEnabled} />
+            <Badge variant={multasEnabled ? "default" : "secondary"}>{multasEnabled ? "Activo" : "Desactivado"}</Badge>
           </div>
         </div>
 
