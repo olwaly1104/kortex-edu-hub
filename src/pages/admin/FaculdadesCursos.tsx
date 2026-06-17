@@ -184,9 +184,17 @@ export default function AdminFaculdadesCursos() {
                 </div>
                 <div className="min-w-0">
                   {isEditing ? (
-                    <div className="flex items-center gap-2 mb-1">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
                       <Input value={facValue(f, "name")} onChange={(e) => setFacField(f.id, { name: e.target.value })} className="h-8 text-sm font-semibold" placeholder="Nome" />
                       <Input value={facValue(f, "sigla") || ""} onChange={(e) => setFacField(f.id, { sigla: e.target.value.toUpperCase() })} className="h-8 text-sm font-semibold w-24" placeholder="Sigla" maxLength={8} />
+                      <Select value={facValue(f, "decano") || undefined} onValueChange={(v) => setFacField(f.id, { decano: v })}>
+                        <SelectTrigger className="h-8 text-xs w-44"><SelectValue placeholder={decanoOptions.length ? "Decano" : "Sem docentes"} /></SelectTrigger>
+                        <SelectContent>
+                          {decanoOptions.length === 0 ? (
+                            <div className="px-2 py-1.5 text-xs text-muted-foreground">Registe docentes em Configurar → Docentes.</div>
+                          ) : decanoOptions.map((d) => <SelectItem key={d} value={d} className="text-xs">{d}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
                     </div>
                   ) : (
                     <div className="flex items-center gap-2 flex-wrap">
@@ -196,40 +204,27 @@ export default function AdminFaculdadesCursos() {
                       )}
                     </div>
                   )}
-                  <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
+                  {!isEditing && (
+                    <div className="flex items-center gap-1 text-[11px] text-muted-foreground mt-0.5">
+                      <UserCog className="w-3 h-3" />
+                      <span className="font-medium text-foreground">{f.decano || "Por atribuir"}</span>
+                    </div>
+                  )}
+                  <div className="flex items-center gap-3 text-[11px] text-muted-foreground mt-1">
                     <span className="flex items-center gap-1"><GraduationCap className="w-3 h-3" /> {facCursos.length} cursos</span>
                     <span className="flex items-center gap-1"><Users className="w-3 h-3" /> {facCursos.reduce((a, c) => a + (c.estudantes_esperados || 0), 0)} estudantes</span>
                   </div>
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded-md border bg-card">
-                  <UserCog className="w-3.5 h-3.5 text-muted-foreground" />
-                  <div className="min-w-0">
-                    <p className="text-[10px] uppercase tracking-wide text-muted-foreground leading-tight">Decano</p>
-                    {isEditing ? (
-                      <Select value={facValue(f, "decano") || undefined} onValueChange={(v) => setFacField(f.id, { decano: v })}>
-                        <SelectTrigger className="h-6 text-xs border-0 px-0 shadow-none focus:ring-0"><SelectValue placeholder={decanoOptions.length ? "Escolher" : "Sem docentes"} /></SelectTrigger>
-                        <SelectContent>
-                          {decanoOptions.length === 0 ? (
-                            <div className="px-2 py-1.5 text-xs text-muted-foreground">Registe docentes em Configurar → Docentes.</div>
-                          ) : decanoOptions.map((d) => <SelectItem key={d} value={d} className="text-xs">{d}</SelectItem>)}
-                        </SelectContent>
-                      </Select>
-                    ) : (
-                      <p className="text-xs font-semibold leading-tight">{f.decano || <span className="text-muted-foreground italic font-normal">Por atribuir</span>}</p>
-                    )}
-                  </div>
-                  <span className="w-px h-7 bg-border mx-1" />
-                  {!isEditing && (
-                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-muted text-muted-foreground text-[11px] font-semibold">
-                      <Lock className="w-3 h-3" /> Bloqueado
-                    </span>
-                  )}
-                  <Button size="sm" variant={isEditing ? "default" : "outline"} className="gap-1 h-7" onClick={() => toggleEdit(f)}>
-                    {isEditing ? <><Check className="w-3.5 h-3.5" /> Concluir</> : <><Pencil className="w-3.5 h-3.5" /> Editar</>}
-                  </Button>
-                </div>
+                {!isEditing && (
+                  <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-muted text-muted-foreground text-[11px] font-semibold">
+                    <Lock className="w-3 h-3" /> Bloqueado
+                  </span>
+                )}
+                <Button size="sm" variant={isEditing ? "default" : "outline"} className="gap-1 h-7" onClick={() => toggleEdit(f)}>
+                  {isEditing ? <><Check className="w-3.5 h-3.5" /> Concluir</> : <><Pencil className="w-3.5 h-3.5" /> Editar</>}
+                </Button>
                 {isEditing && (
                   <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive hover:text-destructive" onClick={async () => {
                     if (!confirm(`Eliminar a faculdade "${f.name}" e todos os seus cursos?`)) return;
