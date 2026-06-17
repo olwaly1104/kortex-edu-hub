@@ -296,9 +296,10 @@ export default function AdminFaculdadesCursos() {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-muted text-muted-foreground text-[11px] font-semibold">
-                  <Lock className="w-3 h-3" /> Bloqueado
+                <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-semibold ${isEditing ? "bg-emerald-100 text-emerald-700 border border-emerald-200" : "bg-muted text-muted-foreground"}`}>
+                  {isEditing ? <><LockOpen className="w-3 h-3" /> Desbloqueado</> : <><Lock className="w-3 h-3" /> Bloqueado</>}
                 </span>
+
                 <Button
                   size="sm"
                   variant={isEditing ? "default" : "outline"}
