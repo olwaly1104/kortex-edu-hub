@@ -110,9 +110,15 @@ export default function AdminPerfil() {
     pushProfile(user?.email, instituicao);
   }, [instituicao, PROFILE_KEY, user?.email]);
 
+  const emailValid = /^[^\s@]+@[^\s@]+\.com$/i.test((instituicao.email || "").trim());
+
   const handleSave = () => {
-    if (instituicao.email && !/^[^\s@]+@[^\s@]+\.com$/i.test(instituicao.email.trim())) {
-      toast.error("Email geral deve ser válido e terminar em .com");
+    if (!instituicao.nomeOficial.trim()) {
+      toast.error("Nome oficial é obrigatório");
+      return;
+    }
+    if (!emailValid) {
+      toast.error("Email institucional é obrigatório e deve terminar em .com");
       return;
     }
     try { localStorage.setItem(PROFILE_KEY, JSON.stringify(instituicao)); } catch { /* ignore */ }
