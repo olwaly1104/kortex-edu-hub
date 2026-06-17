@@ -7,7 +7,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { FinHeader } from "@/pages/financas/_FinHeader";
-import { OnboardingStepBanner } from "@/components/admin/OnboardingStepBanner";
+import { OnboardingStepBanner, markOnboardingStepDone } from "@/components/admin/OnboardingStepBanner";
 import {
   ArrowLeft, Banknote, Building2, GraduationCap, Loader2, Save, AlertCircle,
   Receipt, Wallet, Plus, Trash2, TrendingUp, TrendingDown, CreditCard,
@@ -75,6 +75,12 @@ export default function ConfigurarReceitas() {
     setParams(np, { replace: true });
   };
 
+  const confirmCurrentStep = () => {
+    const key = Object.entries(STEP_TO_TAB).find(([, value]) => value === tab)?.[0];
+    if (key) markOnboardingStepDone(user?.email, key);
+    toast.success("Configuração confirmada");
+  };
+
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in max-w-6xl mx-auto">
       <OnboardingStepBanner />
@@ -83,6 +89,7 @@ export default function ConfigurarReceitas() {
         title="Configurar Finanças"
         subtitle="Receitas, despesas, salários e multas — base que alimenta todo o módulo financeiro."
         icon={<Settings2 className="w-5 h-5 text-primary" />}
+        right={<Button size="sm" onClick={confirmCurrentStep} className="gap-1.5"><Check className="w-3.5 h-3.5" /> Confirmar passo</Button>}
       />
 
       <Tabs value={tab} onValueChange={(v) => changeTab(v as Tab)}>
