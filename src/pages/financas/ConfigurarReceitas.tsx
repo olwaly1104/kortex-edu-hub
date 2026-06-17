@@ -135,21 +135,7 @@ function ReceitasSection({ email, onAddCursos }: { email?: string | null; onAddC
 
       {sub === "impostos" && <ImpostosBlock impostos={impostos} setImpostos={setImpostos} />}
       {sub === "propinas" && <PropinasBlock email={email} impostos={impostos} onAddCursos={onAddCursos} />}
-      {sub === "emolumentos" && (
-        <LineItemsBlock
-          title="Emolumento"
-          subtitle="Inscrições, matrículas, declarações, certificados, 2ª via de cartão, etc."
-          icon={Receipt}
-          storageKey={KEY("taxas", email)}
-          withType
-          withTarget
-          withTax
-          impostos={impostos}
-          addLabel="Adicionar emolumento"
-          placeholder="Ex: Certidão de matrícula"
-          valueLabel="Valor (Kz)"
-        />
-      )}
+      {sub === "emolumentos" && <EmolumentosBlock email={email} impostos={impostos} />}
     </div>
   );
 }
