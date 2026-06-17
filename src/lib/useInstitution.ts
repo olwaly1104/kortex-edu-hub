@@ -39,9 +39,24 @@ export type PropinaRow = {
   updated_at: string;
 };
 
+export type CadeiraRow = {
+  id: string;
+  curso_id: string;
+  owner_user_id: string;
+  ano: number;
+  name: string;
+  docente: string | null;
+  ects: number;
+  semestre: string; // '1' | '2' | 'anual'
+  ordem: number;
+  created_at: string;
+  updated_at: string;
+};
+
 const KEY_FAC = ["institution", "faculdades"] as const;
 const KEY_CUR = ["institution", "cursos"] as const;
 const KEY_PROP = ["institution", "propinas"] as const;
+const KEY_CAD = ["institution", "cadeiras"] as const;
 
 async function currentUserId(): Promise<string | null> {
   const { data } = await supabase.auth.getUser();
