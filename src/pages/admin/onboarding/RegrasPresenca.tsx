@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { OnboardingStepBanner } from "@/components/admin/OnboardingStepBanner";
+import { OnboardingStepBanner, markOnboardingStepDone } from "@/components/admin/OnboardingStepBanner";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Clock, Percent, AlertTriangle, Scale, Plus, Trash2, ShieldCheck, Coins, Check } from "lucide-react";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
 
 type AplicaA = "Docente" | "Staff" | "Ambos";
 type Multa = { id: string; nome: string; valor: number; descricao: string; aplicaA: AplicaA };
@@ -28,6 +29,7 @@ const loadMultas = (): Multa[] => {
 };
 
 export default function OnboardingRegrasPresenca() {
+  const { user } = useAuth();
   // Master toggles separating the two domains
   const [presencaEnabled, setPresencaEnabled] = useState(true);
   const [multasEnabled, setMultasEnabled] = useState(true);
@@ -54,6 +56,11 @@ export default function OnboardingRegrasPresenca() {
     if (!novoNome.trim()) return;
     setMultas(prev => [...prev, { id: String(Date.now()), nome: novoNome.trim(), valor: novoValor, descricao: "", aplicaA: novoTipo }]);
     setNovoNome(""); setNovoValor(0); setNovoTipo("Ambos");
+  };
+
+  const saveConfig = () => {
+    markOnboardingStepDone(user?.email, "rh.pres");
+    toast.success("Configuração de RH guardada");
   };
 
   const dim = (active: boolean) => active ? "" : "opacity-50 pointer-events-none";
@@ -214,7 +221,7 @@ export default function OnboardingRegrasPresenca() {
       </Card>
 
       <div className="flex justify-end">
-        <Button onClick={() => toast.success("Configuração de RH guardada")} className="gap-2">Guardar configuração</Button>
+        <Button onClick={saveConfig} className="gap-2">Guardar configuração</Button>
       </div>
     </div>
   );
