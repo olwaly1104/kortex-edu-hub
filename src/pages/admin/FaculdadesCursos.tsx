@@ -1,6 +1,13 @@
 import { FinHeader } from "@/pages/financas/_FinHeader";
 import { OnboardingStepBanner } from "@/components/admin/OnboardingStepBanner";
-import { Building2, Lock, Pencil, Check, GraduationCap, Users, UserCog, Plus, X, Loader2, Trash2 } from "lucide-react";
+import { Building2, Lock, LockOpen, Pencil, Check, GraduationCap, Users, UserCog, Plus, X, Loader2, Trash2, Palette } from "lucide-react";
+import { FaculdadeSiglaTag } from "@/components/faculdade/FaculdadeSiglaTag";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -56,21 +63,31 @@ export default function AdminFaculdadesCursos() {
   const [edits, setEdits] = useState<Record<string, Partial<FaculdadeRow>>>({});
   const [cursoEdits, setCursoEdits] = useState<Record<string, Partial<CursoRow>>>({});
 
+  // Faculty color palette
+  const FAC_COLORS = [
+    "#475569", "#1B3A6B", "#0F766E", "#15803D", "#B45309",
+    "#B91C1C", "#7C3AED", "#DB2777", "#0EA5E9", "#CA8A04",
+  ];
+
   // Add Faculdade dialog
   const [openAddFac, setOpenAddFac] = useState(false);
-  const [newFac, setNewFac] = useState({ name: "", sigla: "", decano: "" });
+  const [newFac, setNewFac] = useState({ name: "", sigla: "", decano: "", color: FAC_COLORS[0] });
 
   const submitNewFac = async () => {
     if (!newFac.name.trim()) return;
     try {
-      await createFac.mutateAsync({ name: newFac.name, sigla: newFac.sigla, decano: newFac.decano });
-      setNewFac({ name: "", sigla: "", decano: "" });
+      await createFac.mutateAsync({ name: newFac.name, sigla: newFac.sigla, decano: newFac.decano, color: newFac.color });
+      setNewFac({ name: "", sigla: "", decano: "", color: FAC_COLORS[0] });
       setOpenAddFac(false);
       toast.success("Faculdade criada");
     } catch (e: any) {
       toast.error(e?.message ?? "Falha ao criar faculdade");
     }
   };
+
+  // Confirmation dialog for edits
+  const [confirmSaveFor, setConfirmSaveFor] = useState<FaculdadeRow | null>(null);
+
 
   // Add Curso dialog
   const [openAddCurso, setOpenAddCurso] = useState<string | null>(null);
