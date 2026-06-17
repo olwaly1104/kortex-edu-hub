@@ -77,15 +77,15 @@ export default function AdminUtilizadores() {
   const refetchServer = async () => {
     const { data, error } = await supabase.rpc("list_institution_contacts");
     if (error || !Array.isArray(data)) return;
-    setServerRows(
-      (data as any[]).map((r) => ({
+    const mapped = (data as any[]).map((r) => ({
         id: r.id,
         name: r.display_name || r.email,
         email: r.email,
         modulo: r.modulo || "estudante",
         createdAt: 0,
-      })),
-    );
+      }));
+    setServerRows(mapped);
+    if (mapped.length > 0) markOnboardingStepDone(user?.email, "est.imp");
   };
   useEffect(() => { refetchServer(); }, [user?.id]);
 
