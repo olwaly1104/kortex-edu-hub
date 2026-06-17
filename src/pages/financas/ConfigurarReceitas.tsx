@@ -28,7 +28,7 @@ import { toast } from "sonner";
 
 type Tab = "receitas" | "despesas" | "salarios" | "multas";
 
-type LineItem = { id: string; nome: string; valor: number; unidade?: string; tipo?: string; aplicaA?: "estudante" | "docente" | "staff" | "todos" };
+type LineItem = { id: string; nome: string; valor: number; unidade?: string; tipo?: string; aplicaA?: "estudante" | "docente" | "staff" | "todos"; impostoId?: string };
 
 const KEY = (kind: string, email?: string | null) => `upra.fin.cfg.${kind}::${email || "anon"}`;
 const newId = () => Math.random().toString(36).slice(2, 10);
