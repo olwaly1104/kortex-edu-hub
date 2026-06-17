@@ -12,7 +12,7 @@ export const ONBOARDING_GROUPS: GroupMeta[] = [
   {
     id: "est", title: "Criar Utilizadores",
     steps: [
-      { key: "est.imp", title: "Importar discentes", desc: "Carregar lista de discentes em lote.", path: "/admin/onboarding/estudantes?step=est.imp" },
+      { key: "est.imp", title: "Criar contas de utilizadores", desc: "Adicionar contas reais para qualquer perfil (estudante, professor, staff, etc.).", path: "/admin/utilizadores?step=est.imp" },
     ],
   },
   {
