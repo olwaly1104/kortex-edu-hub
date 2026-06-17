@@ -376,7 +376,7 @@ function MultasSection({ email }: { email?: string | null }) {
 
 function LineItemsBlock({
   title, subtitle, icon: Icon, storageKey, addLabel, placeholder, valueLabel,
-  withUnit = false, withTarget = false,
+  withUnit = false, withTarget = false, withType = false,
 }: {
   title: string;
   subtitle: string;
@@ -387,19 +387,27 @@ function LineItemsBlock({
   valueLabel: string;
   withUnit?: boolean;
   withTarget?: boolean;
+  withType?: boolean;
 }) {
   const [rows, setRows] = useState<LineItem[]>(() => readJSON<LineItem[]>(storageKey, []));
   useEffect(() => writeJSON(storageKey, rows), [rows, storageKey]);
 
-  const add = () => setRows((r) => [...r, { id: newId(), nome: "", valor: 0, ...(withUnit ? { unidade: "Kz" } : {}), ...(withTarget ? { aplicaA: "estudante" } : {}) }]);
+  const add = () => setRows((r) => [...r, {
+    id: newId(), nome: "", valor: 0,
+    ...(withUnit ? { unidade: "Kz" } : {}),
+    ...(withType ? { tipo: "Único" } : {}),
+    ...(withTarget ? { aplicaA: "estudante" } : {}),
+  }]);
   const update = (id: string, patch: Partial<LineItem>) => setRows((r) => r.map((x) => x.id === id ? { ...x, ...patch } : x));
   const remove = (id: string) => setRows((r) => r.filter((x) => x.id !== id));
 
   const total = rows.reduce((s, r) => s + (r.valor || 0), 0);
 
   const cols = (() => {
+    if (withType && withTarget) return "grid-cols-[1fr_130px_140px_150px_40px]";
     if (withUnit) return "grid-cols-[1fr_140px_120px_40px]";
     if (withTarget) return "grid-cols-[1fr_140px_150px_40px]";
+    if (withType) return "grid-cols-[1fr_130px_180px_40px]";
     return "grid-cols-[1fr_180px_40px]";
   })();
 
@@ -419,6 +427,7 @@ function LineItemsBlock({
       <div className="divide-y">
         <div className={`grid ${cols} gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10`}>
           <div>Designação</div>
+          {withType && <div>Tipo</div>}
           <div>{valueLabel}</div>
           {withUnit && <div>Unidade</div>}
           {withTarget && <div>Aplica-se a</div>}
@@ -433,6 +442,18 @@ function LineItemsBlock({
           <div key={r.id} className={`grid ${cols} gap-3 px-5 py-2.5 items-center text-sm`}>
             <Input className="h-9" placeholder={placeholder} value={r.nome}
               onChange={(e) => update(r.id, { nome: e.target.value })} />
+            {withType && (
+              <select
+                className="h-9 rounded-md border border-input bg-background px-2 text-sm"
+                value={r.tipo || "Único"}
+                onChange={(e) => update(r.id, { tipo: e.target.value })}
+              >
+                <option value="Único">Único</option>
+                <option value="Mensal">Mensal</option>
+                <option value="Anual">Anual</option>
+                <option value="Por pedido">Por pedido</option>
+              </select>
+            )}
             <Input type="number" min={0} className="h-9 tabular-nums" value={r.valor}
               onChange={(e) => update(r.id, { valor: Number(e.target.value) || 0 })} />
             {withUnit && (
