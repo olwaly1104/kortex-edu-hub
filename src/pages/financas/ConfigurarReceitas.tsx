@@ -1077,6 +1077,11 @@ function LineItemsBlock({
                 {impostos.map((i) => <option key={i.id} value={i.id}>{i.nome} ({(i.taxa * 100).toFixed(0)}%)</option>)}
               </select>
             )}
+            {withTaxValue && (
+              <div className="h-9 flex items-center justify-end px-2 rounded-md bg-muted/30 tabular-nums font-medium text-xs text-muted-foreground">
+                {fmt((r.valor || 0) * (impostos.find((i) => i.id === r.impostoId)?.taxa ?? 0))} Kz
+              </div>
+            )}
             {withUnit && (
               <Input className="h-9" placeholder="Kz / dia" value={r.unidade || ""}
                 onChange={(e) => update(r.id, { unidade: e.target.value })} />
