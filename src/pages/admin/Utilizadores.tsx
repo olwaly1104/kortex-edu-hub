@@ -19,7 +19,7 @@ type StoredUser = {
 const STORAGE_KEY = "upra_admin_users_v1";
 
 const MODULOS: { value: string; label: string }[] = [
-  { value: "admin", label: "Admin (Onboarding institucional)" },
+  { value: "admin", label: "Admin (Instituição)" },
   { value: "estudante", label: "Estudante" },
   { value: "professor", label: "Professor" },
   { value: "coordenador", label: "Coordenador de Curso" },
