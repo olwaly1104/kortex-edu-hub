@@ -16,9 +16,16 @@ type Geoponto = {
   descricao?: string;
 };
 
+const GEOPONTOS_STORAGE_KEY = "upra:geopontos";
+
 export default function OnboardingGeopontos() {
   const { user } = useAuth();
-  const [pontos, setPontos] = useState<Geoponto[]>([]);
+  const [pontos, setPontos] = useState<Geoponto[]>(() => {
+    try {
+      const raw = localStorage.getItem(GEOPONTOS_STORAGE_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch { return []; }
+  });
 
   const add = () => {
     setPontos(prev => [
@@ -32,6 +39,7 @@ export default function OnboardingGeopontos() {
 
   const save = () => {
     if (pontos.length === 0) { toast.error("Adicione pelo menos um geoponto"); return; }
+    try { localStorage.setItem(GEOPONTOS_STORAGE_KEY, JSON.stringify(pontos)); } catch {}
     markOnboardingStepDone(user?.email, "geo.reg");
     toast.success("Geopontos guardados");
   };
