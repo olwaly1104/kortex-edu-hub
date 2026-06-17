@@ -1,43 +1,56 @@
-# Fixes: institution state, sidebar, login role
+## Goal
 
-## 1. Login resolves the real role (gap/financas no longer become "estudante")
+Restore the old institutional dashboard layout for `src/pages/financas/Inicio.tsx`, matching the pattern used in Coordenador / Secretaria / Decano dashboards. The right side of the welcome hero (which on those roles shows "Ano Lectivo 2024/2025") will instead show an **Onboarding** progress chip for Finanças.
 
-**Problem** — `src/contexts/AuthContext.tsx::login()` builds the in-app user from `detectRole(email)` in `src/data/mockData.ts`, which only matches email *prefixes* like `gap…`, `financas…`. Accounts created via Admin → Utilizadores use `primeiro.ultimo@instituicao.kor`, so `detectRole` falls through to `"student"`. The real DB role is fetched in `src/pages/Login.tsx` but only used for routing, never passed into the AuthContext.
+## Layout (top → bottom)
 
-**Fix**
-- Extend `login()` options with `role?: string` (the DB value: `admin|estudante|professor|coordenador|decano|reitor|financas|academica|gap|inscricoes`).
-- Map DB role → internal `UserRole` (e.g. `estudante→student`, `coordenador→coordenador_curso`, `academica→secretaria`) and use that to pick the mock-user template; fall back to `detectRole(email)` only when no role is provided.
-- In `Login.tsx::handleSubmit`, pass `role` from the `user_roles` lookup into `login(...)`.
+```
+┌──────────────────────────────────────────────────────────────┐
+│ Hero: "Bom dia, {nome} 👋"          Onboarding · 2/4 →       │
+│       Finanças — UPRA                (links to next step)    │
+└──────────────────────────────────────────────────────────────┘
+[ Minha Presença ] [ Solicitações ] [ Agenda ] [ Lançamentos ]
+┌─────────────── Agenda de Hoje (2/3) ────────┐ ┌─ Anúncios ──┐
+│ time | bar | title · sala  · status         │ │ 3 cards     │
+└─────────────────────────────────────────────┘ └─────────────┘
+┌─────────────── Solicitações Pendentes ──────────────────────┐
+│ list with priority + Aprovar / Rejeitar / Ver detalhes      │
+└─────────────────────────────────────────────────────────────┘
+```
 
-## 2. Institution state stays "Onboarding" until every step is done
+## Pieces
 
-**Problem** — `src/pages/admin/Onboarding.tsx::activate()` sets `completed: true` after step 1, and `src/pages/admin/Sistema.tsx` shows "Ano lectivo activo" based solely on `isOnboardingCompleteFor()`. So the institution flips to "Ano Letivo" before the other groups (RH, Finanças, GAP, Académica, etc.) are configured.
+### 1. Welcome hero
+- `Card` with `border-l-4 border-l-primary`, `p-6`.
+- Left: `h1` greeting + subtitle "Finanças — UPRA".
+- Right: **Onboarding chip** instead of the "Ver Detalhes" link.
+  - Reads finance onboarding steps from `OnboardingStepBanner` (`fin.pro`, `fin.des`, `fin.sal`, `fin.mul`) and the `markOnboardingStepDone` storage key to compute `done/total`.
+  - Displays `Onboarding · {done}/{total}` and links to the next pending step's path (or `/admin` when complete).
+  - Listens to `storage` events so it updates live, same pattern as `OnboardingStepBanner`.
 
-**Fix**
-- Add `isFullOnboardingComplete(email)` in `src/lib/onboardingStorage.ts` (or in `OnboardingStepBanner.tsx` next to `readOnboardingProgress`) that returns true only when **every** `step.key` in `ONBOARDING_GROUPS` is marked done in the progress blob.
-- In `src/pages/admin/Onboarding.tsx::activate()`, do **not** set `completed: true`. Keep the institution data save and navigate to `/admin`. Remove the "instituição está ativa" success screen (or relabel it to "Registo concluído — continue o onboarding no painel").
-- In `src/pages/admin/Sistema.tsx`, replace `isOnboardingCompleteFor` with the new full check so the badge reads "Em onboarding" until all groups are 100%.
-- Audit other call sites of `isOnboardingCompleteFor` (`src/pages/Login.tsx` post-login redirect, any module gating) — keep the cheap check for "did the admin even register the institution?" (rename to `isInstitutionRegisteredFor`) and use `isFullOnboardingComplete` only where we mean "ano letivo ativo".
+### 2. KPI strip (4 cards, same visual as Coordenador `stats`)
+- `Minha Presença` — `96%`, primary
+- `Solicitações` — count of pending finance solicitações
+- `Agenda` — events count today
+- `Lançamentos` — recent transactions count
 
-## 3. Candidaturas tab → Configurar (admin sidebar)
+Values can come from existing finance mock data (`reitorSolicitacoes` filtered, `coordAgendaEvents`); placeholder zeros where no source exists yet.
 
-In `src/components/AppSidebar.tsx` (admin section, lines 246–267):
-- Remove the `Operações > Candidaturas` entry pointing to `/admin/candidaturas` (data view belongs to GAP).
-- Add a `Configurar > Candidaturas` entry pointing to `/gap/configuracao?tab=candidaturas` (configuration only).
-- Drop the now-empty `Operações` group.
+### 3. Agenda de Hoje + Anúncios row
+- `grid lg:grid-cols-3 gap-6`, agenda spans 2 cols.
+- Reuse the exact agenda renderer from Coordenador (time block, color bar, title + sala, status badge with `em_curso` highlight) using `coordAgendaEvents` filtered to TODAY_DATE.
+- Anúncios card shows top 3 of `announcements` with the same `typeStyles` chip + meta + content, "Ver todos" link to `/financas/anuncios`.
 
-## 4. Remove "Ver contas e palavras-passe" from Login
+### 4. Solicitações Pendentes
+- Full-width card listing top 3 pending finance solicitações using existing styling (icon + title + priority + requester + date + Aprovar/Rejeitar/Ver detalhes).
+- "Ver todas" links to `/financas/solicitacoes`.
 
-In `src/pages/Login.tsx`:
-- Delete the `credsOpen/creds/revealed` state, the `loadDevCreds/removeDevCred` imports, the `KeyRound` button + Dialog block (around line 301), and any unused imports.
-- Leave `saveDevCred` calls in `Login.tsx` signup and `admin/Utilizadores.tsx` alone for now (not user-visible); we can purge `src/lib/devCreds.ts` later if you want.
+## Files
 
-## Files touched
-- `src/contexts/AuthContext.tsx`
-- `src/pages/Login.tsx`
-- `src/pages/admin/Onboarding.tsx`
-- `src/pages/admin/Sistema.tsx`
-- `src/lib/onboardingStorage.ts` (+ maybe `src/components/admin/OnboardingStepBanner.tsx`)
-- `src/components/AppSidebar.tsx`
+- **Edit** `src/pages/financas/Inicio.tsx` — replace the current 60-line placeholder with the layout above. Remove the `FinHeader` import here (the welcome hero replaces it on Início; other pages keep `FinHeader`).
+- No new routes, no new data files. Reuses `mockData`, `institutionData`, `OnboardingStepBanner` storage helpers.
 
-No DB migrations needed.
+## Out of scope (for this step)
+
+- Receitas and Despesas redesigns — handled in follow-up turns once Início is approved.
+- Real data wiring for KPIs beyond what the other dashboards already use.
