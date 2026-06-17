@@ -962,7 +962,7 @@ function LineItemsBlock({
       <div className="divide-y">
         <div className="grid gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10" style={gridStyle}>
           <div>Designação</div>
-          {withType && <div>Tipo</div>}
+          {withType && <div>{typeLabel}</div>}
           <div>{valueLabel}</div>
           {withTax && <div>Imposto</div>}
           {withUnit && <div>Unidade</div>}
