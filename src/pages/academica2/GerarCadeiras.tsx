@@ -1,113 +1,111 @@
 import { OnboardingStepBanner, useIsOnboardingStep } from "@/components/admin/OnboardingStepBanner";
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { cursoTemplates, cadeirasTemplate } from "@/data/academica2Data";
-import { getCadeiraContent } from "@/data/cadeiraContentData";
-import { BookOpen, Check, ArrowLeft, Plus, Trash2, Eye, FileText, Video, ClipboardList, Calendar, User, Clock, GraduationCap, FileSignature, MapPin, Building2, ChevronDown, ChevronRight, Users, Timer } from "lucide-react";
+import {
+  BookOpen, Check, ArrowLeft, Plus, Trash2, GraduationCap,
+  Building2, ChevronDown, ChevronRight, Users, Timer, Loader2,
+} from "lucide-react";
 import { toast } from "sonner";
-
-const buildExames = (cadeiraName: string) => ([
-  { id: "ex1", epoca: "1ª Época", data: "12 Jun 2026", hora: "09:00", duracao: 120, sala: "Auditório A", peso: "50%", tipo: "Presencial" },
-  { id: "ex2", epoca: "2ª Época", data: "03 Jul 2026", hora: "14:00", duracao: 120, sala: "Auditório B", peso: "50%", tipo: "Presencial" },
-  { id: "ex3", epoca: "Época Especial", data: "18 Set 2026", hora: "10:00", duracao: 120, sala: "Sala 204", peso: "100%", tipo: "Presencial" },
-]);
-
-const docentesPool = [
-  "Prof. Sofia Martins", "Prof. Carlos Mendes", "Prof. Ana Costa", "Prof. António Silva",
-  "Prof. Pedro Ferreira", "Prof. Hugo Faria", "Prof. Sílvia Antunes", "Prof. Tomás Henriques",
-  "Prof. Luísa Brito", "Prof. João Almeida", "Prof. Inês Carvalho", "Prof. Rui Santos",
-  "Prof. Margarida Sá", "Prof. Bruno Tavares", "Prof. Cláudia Nunes",
-];
-
-type CadeiraAlloc = { name: string; docente: string; ects: number; semestre: 1 | 2 | "anual" };
+import {
+  useFaculdades, useCursos,
+  useCadeiras, useCreateCadeira, useUpdateCadeira, useDeleteCadeira,
+  type CadeiraRow,
+} from "@/lib/useInstitution";
 
 export default function GerarCadeiras() {
   const isOnboarding = useIsOnboardingStep();
-  const cursosWithCadeiras = Object.keys(cadeirasTemplate);
-  const [cadeiraCurso, setCadeiraCurso] = useState<string>(cursosWithCadeiras[0]);
 
-  const [cadeirasAlloc, setCadeirasAlloc] = useState<Record<string, CadeiraAlloc[][]>>(() => {
-    const out: Record<string, CadeiraAlloc[][]> = {};
-    Object.entries(cadeirasTemplate).forEach(([cid, anos]) => {
-      out[cid] = anos.map(arr => arr.map((n, i) => ({
-        name: n,
-        docente: docentesPool[(i + cid.length) % docentesPool.length],
-        ects: 6,
-        semestre: (i % 2 === 0 ? 1 : 2) as 1 | 2 | "anual",
-      })));
-    });
-    return out;
-  });
+  const { data: faculdades = [], isLoading: facLoading } = useFaculdades();
+  const { data: cursos = [], isLoading: curLoading } = useCursos();
+  const { data: cadeiras = [], isLoading: cadLoading } = useCadeiras();
 
-  const update = (cid: string, ano: number, idx: number, patch: Partial<CadeiraAlloc>) => {
-    setCadeirasAlloc(prev => {
-      const copy = { ...prev };
-      copy[cid] = copy[cid].map((row, i) => i !== ano ? row : row.map((c, j) => j === idx ? { ...c, ...patch } : c));
-      return copy;
-    });
-  };
+  const createCadeira = useCreateCadeira();
+  const updateCadeira = useUpdateCadeira();
+  const deleteCadeira = useDeleteCadeira();
 
-  const addCadeira = (cid: string, ano: number) => {
-    setCadeirasAlloc(prev => {
-      const copy = { ...prev };
-      copy[cid] = copy[cid].map((row, i) => i !== ano ? row : [...row, { name: "Nova Cadeira", docente: docentesPool[0], ects: 6, semestre: 1 }]);
-      return copy;
-    });
-  };
+  const loading = facLoading || curLoading || cadLoading;
 
-  const removeCadeira = (cid: string, ano: number, idx: number) => {
-    setCadeirasAlloc(prev => {
-      const copy = { ...prev };
-      copy[cid] = copy[cid].map((row, i) => i !== ano ? row : row.filter((_, j) => j !== idx));
-      return copy;
-    });
-  };
-
-  const total = useMemo(() =>
-    Object.values(cadeirasAlloc).reduce((acc, anos) => acc + anos.reduce((a, r) => a + r.length, 0), 0)
-  , [cadeirasAlloc]);
-
-  const cursoTotal = useMemo(() =>
-    cadeirasAlloc[cadeiraCurso]?.reduce((a, r) => a + r.length, 0) ?? 0
-  , [cadeirasAlloc, cadeiraCurso]);
-
-  const confirmAll = () => toast.success("Cadeiras alocadas para todos os cursos");
-
-  const [preview, setPreview] = useState<{ cid: string; ano: number; idx: number } | null>(null);
-  const previewCadeira = preview ? cadeirasAlloc[preview.cid][preview.ano][preview.idx] : null;
-  const previewCurso = preview ? cursoTemplates.find(c => c.id === preview.cid) : null;
-  const previewContent = preview && previewCadeira
-    ? getCadeiraContent(`sim-${preview.cid}-${preview.ano}-${preview.idx}`, previewCadeira.name)
-    : null;
-
-  const faculdades = useMemo(
-    () => Array.from(new Set(cursosWithCadeiras.map(cid => cursoTemplates.find(c => c.id === cid)?.faculty ?? "—"))),
-    [cursosWithCadeiras]
-  );
+  const [cadeiraCurso, setCadeiraCurso] = useState<string>("");
   const [openFacs, setOpenFacs] = useState<Record<string, boolean>>({});
   const toggleFac = (f: string) => setOpenFacs(p => ({ ...p, [f]: !p[f] }));
 
+  // Auto-select first curso when data arrives.
+  if (!cadeiraCurso && cursos.length > 0) {
+    setTimeout(() => setCadeiraCurso(cursos[0].id), 0);
+  }
+
+  const selectedCurso = cursos.find(c => c.id === cadeiraCurso);
+  const cadeirasByCurso = useMemo(() => {
+    const map: Record<string, CadeiraRow[]> = {};
+    cadeiras.forEach(c => {
+      (map[c.curso_id] ||= []).push(c);
+    });
+    return map;
+  }, [cadeiras]);
+
+  const cadeirasOfSelected = cadeirasByCurso[cadeiraCurso] ?? [];
+  const anosRange = useMemo(() => {
+    const years = selectedCurso?.years ?? 4;
+    return Array.from({ length: years }, (_, i) => i);
+  }, [selectedCurso]);
+
+  const cadeirasByAno = useMemo(() => {
+    const map: Record<number, CadeiraRow[]> = {};
+    cadeirasOfSelected.forEach(c => {
+      (map[c.ano] ||= []).push(c);
+    });
+    return map;
+  }, [cadeirasOfSelected]);
+
+  const total = cadeiras.length;
+  const cursoTotal = cadeirasOfSelected.length;
   const docentesUsados = useMemo(() => {
     const s = new Set<string>();
-    Object.values(cadeirasAlloc).forEach(anos => anos.forEach(arr => arr.forEach(c => s.add(c.docente))));
+    cadeiras.forEach(c => { if (c.docente) s.add(c.docente); });
     return s.size;
-  }, [cadeirasAlloc]);
-
-  // Each cadeira ≈ 8 aulas × 90 min
+  }, [cadeiras]);
   const minutosAula = total * 8 * 90;
+
+  const facsWithCursos = useMemo(
+    () => faculdades.filter(f => cursos.some(c => c.faculdade_id === f.id)),
+    [faculdades, cursos]
+  );
+
+  const handleAdd = (ano: number) => {
+    if (!cadeiraCurso) return;
+    const ordem = (cadeirasByAno[ano]?.length ?? 0);
+    createCadeira.mutate(
+      { curso_id: cadeiraCurso, ano, name: "Nova Cadeira", ects: 6, semestre: "1", ordem },
+      { onError: (e: any) => toast.error(e.message ?? "Erro ao criar cadeira") }
+    );
+  };
+
+  const handleUpdate = (id: string, patch: Partial<CadeiraRow>) => {
+    updateCadeira.mutate(
+      { id, patch: patch as any },
+      { onError: (e: any) => toast.error(e.message ?? "Erro ao atualizar") }
+    );
+  };
+
+  const handleDelete = (id: string) => {
+    deleteCadeira.mutate(id, {
+      onError: (e: any) => toast.error(e.message ?? "Erro ao remover"),
+    });
+  };
+
+  const confirmAll = () => toast.success("Alocação confirmada");
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       <OnboardingStepBanner actions={
-        <Button onClick={confirmAll} size="sm" variant="outline" className="gap-1 h-8"><Check className="w-3.5 h-3.5" /> Confirmar Alocação</Button>
+        <Button onClick={confirmAll} size="sm" variant="outline" className="gap-1 h-8">
+          <Check className="w-3.5 h-3.5" /> Confirmar Alocação
+        </Button>
       } />
       {!isOnboarding && (
         <div>
@@ -120,7 +118,9 @@ export default function GerarCadeiras() {
               <h1 className="text-2xl font-bold flex items-center gap-2">
                 <BookOpen className="w-6 h-6 text-primary" /> Confirmar Cadeiras
               </h1>
-              <p className="text-muted-foreground mt-1 text-sm">Alocar cadeiras, docente, ECTS, semestre e banco de quizzes por curso e por ano.</p>
+              <p className="text-muted-foreground mt-1 text-sm">
+                Alocar cadeiras, docente, ECTS e semestre por curso e por ano.
+              </p>
             </div>
             <Button onClick={confirmAll} className="gap-2"><Check className="w-4 h-4" /> Confirmar Alocação</Button>
           </div>
@@ -130,19 +130,19 @@ export default function GerarCadeiras() {
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
         <Card className="p-4">
           <div className="flex items-center gap-1.5 text-muted-foreground mb-1"><Building2 className="w-3.5 h-3.5" /><p className="text-xs">Faculdades</p></div>
-          <p className="text-2xl font-bold">{faculdades.length}</p>
+          <p className="text-2xl font-bold">{facsWithCursos.length}</p>
         </Card>
         <Card className="p-4">
           <div className="flex items-center gap-1.5 text-muted-foreground mb-1"><GraduationCap className="w-3.5 h-3.5" /><p className="text-xs">Cursos</p></div>
-          <p className="text-2xl font-bold">{cursosWithCadeiras.length}</p>
+          <p className="text-2xl font-bold">{cursos.length}</p>
         </Card>
         <Card className="p-4">
           <div className="flex items-center gap-1.5 text-muted-foreground mb-1"><BookOpen className="w-3.5 h-3.5" /><p className="text-xs">Cadeiras</p></div>
           <p className="text-2xl font-bold text-primary">{total}</p>
         </Card>
         <Card className="p-4">
-          <div className="flex items-center gap-1.5 text-muted-foreground mb-1"><Users className="w-3.5 h-3.5" /><p className="text-xs">Docentes Disp.</p></div>
-          <p className="text-2xl font-bold">{docentesUsados}<span className="text-sm text-muted-foreground font-normal">/{docentesPool.length}</span></p>
+          <div className="flex items-center gap-1.5 text-muted-foreground mb-1"><Users className="w-3.5 h-3.5" /><p className="text-xs">Docentes</p></div>
+          <p className="text-2xl font-bold">{docentesUsados}</p>
         </Card>
         <Card className="p-4">
           <div className="flex items-center gap-1.5 text-muted-foreground mb-1"><Timer className="w-3.5 h-3.5" /><p className="text-xs">Minutos de Aula</p></div>
@@ -150,249 +150,148 @@ export default function GerarCadeiras() {
         </Card>
       </div>
 
-      <div className="grid md:grid-cols-[260px_1fr] gap-4">
-        <Card className="p-3 h-fit space-y-2">
-          {faculdades.map(fac => {
-            const cursosOfFac = cursosWithCadeiras.filter(cid => (cursoTemplates.find(c => c.id === cid)?.faculty ?? "—") === fac);
-            const isOpen = openFacs[fac];
-            return (
-              <div key={fac} className="space-y-1.5">
-                <button
-                  onClick={() => toggleFac(fac)}
-                  className="w-full flex items-center gap-1.5 px-2 py-2 rounded-md hover:bg-muted/50 transition"
-                >
-                  {isOpen ? <ChevronDown className="w-3.5 h-3.5 shrink-0" /> : <ChevronRight className="w-3.5 h-3.5 shrink-0" />}
-                  <Building2 className="w-3.5 h-3.5 text-primary shrink-0" />
-                  <span className="text-[11px] font-bold uppercase tracking-wide flex-1 text-left leading-tight break-words">{fac.replace("Faculdade de Ciências da Saúde", "Faculdade de Saúde").replace("Faculdade de Ciências Sociais", "Faculdade Sociais")}</span>
-                  <Badge variant="outline" className="text-[10px]">{cursosOfFac.length}</Badge>
-                </button>
-                {isOpen && (
-                  <div className="space-y-0.5 pl-4 border-l ml-3">
-                    {cursosOfFac.map(cid => {
-                      const curso = cursoTemplates.find(c => c.id === cid);
-                      const isSel = cadeiraCurso === cid;
-                      const count = cadeirasAlloc[cid].reduce((a, r) => a + r.length, 0);
-                      return (
-                        <button key={cid} onClick={() => setCadeiraCurso(cid)}
-                          className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm flex items-center justify-between transition ${
-                            isSel ? "bg-primary text-primary-foreground" : "hover:bg-muted/50"
-                          }`}>
-                          <span className="truncate font-medium flex items-center gap-1.5">
-                            <GraduationCap className="w-3 h-3 shrink-0 opacity-70" />
-                            {curso?.name}
-                          </span>
-                          <Badge variant={isSel ? "secondary" : "outline"} className="text-[10px] ml-2">{count}</Badge>
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            );
-          })}
+      {loading ? (
+        <Card className="p-12 flex items-center justify-center text-muted-foreground">
+          <Loader2 className="w-5 h-5 animate-spin mr-2" /> A carregar…
         </Card>
-
-
-
-        <div className="space-y-3 min-w-0">
-          {cadeirasAlloc[cadeiraCurso].map((cadeiras, ano) => (
-            <Card key={ano} className="overflow-hidden">
-              <div className="bg-primary/10 px-4 py-2.5 border-b flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <p className="text-sm font-bold text-primary">{ano + 1}º Ano</p>
-                  <Badge variant="outline" className="text-[10px]">{cadeiras.length} cadeiras</Badge>
+      ) : cursos.length === 0 ? (
+        <Card className="p-12 text-center text-muted-foreground">
+          <BookOpen className="w-10 h-10 mx-auto mb-3 opacity-40" />
+          <p className="text-sm">Ainda não existem cursos. Crie faculdades e cursos antes de alocar cadeiras.</p>
+        </Card>
+      ) : (
+        <div className="grid md:grid-cols-[260px_1fr] gap-4">
+          <Card className="p-3 h-fit space-y-2">
+            {facsWithCursos.map(fac => {
+              const cursosOfFac = cursos.filter(c => c.faculdade_id === fac.id);
+              const isOpen = openFacs[fac.id];
+              return (
+                <div key={fac.id} className="space-y-1.5">
+                  <button
+                    onClick={() => toggleFac(fac.id)}
+                    className="w-full flex items-center gap-1.5 px-2 py-2 rounded-md hover:bg-muted/50 transition"
+                  >
+                    {isOpen ? <ChevronDown className="w-3.5 h-3.5 shrink-0" /> : <ChevronRight className="w-3.5 h-3.5 shrink-0" />}
+                    <Building2 className="w-3.5 h-3.5 text-primary shrink-0" />
+                    <span className="text-[11px] font-bold uppercase tracking-wide flex-1 text-left leading-tight break-words">{fac.name}</span>
+                    <Badge variant="outline" className="text-[10px]">{cursosOfFac.length}</Badge>
+                  </button>
+                  {isOpen && (
+                    <div className="space-y-0.5 pl-4 border-l ml-3">
+                      {cursosOfFac.map(curso => {
+                        const isSel = cadeiraCurso === curso.id;
+                        const count = cadeirasByCurso[curso.id]?.length ?? 0;
+                        return (
+                          <button
+                            key={curso.id}
+                            onClick={() => setCadeiraCurso(curso.id)}
+                            className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm flex items-center justify-between transition ${
+                              isSel ? "bg-primary text-primary-foreground" : "hover:bg-muted/50"
+                            }`}
+                          >
+                            <span className="truncate font-medium flex items-center gap-1.5">
+                              <GraduationCap className="w-3 h-3 shrink-0 opacity-70" />
+                              {curso.name}
+                            </span>
+                            <Badge variant={isSel ? "secondary" : "outline"} className="text-[10px] ml-2">{count}</Badge>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
-                <Button size="sm" variant="ghost" onClick={() => addCadeira(cadeiraCurso, ano)} className="h-7 gap-1 text-xs">
-                  <Plus className="w-3 h-3" /> Adicionar
-                </Button>
-              </div>
-              <div className="grid grid-cols-[1fr_180px_90px_70px_36px_36px] gap-2 px-3 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b">
-                <span>Cadeira</span><span>Docente</span><span>Semestre</span><span>ECTS</span><span></span><span></span>
-              </div>
-              <div className="divide-y">
-                {cadeiras.map((c, idx) => (
-                  <div key={idx} className="grid grid-cols-[1fr_180px_90px_70px_36px_36px] gap-2 p-2 items-center">
-                    <Select value={c.name} onValueChange={v => update(cadeiraCurso, ano, idx, { name: v })}>
-                      <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        {Array.from(new Set([c.name, ...(cadeirasTemplate[cadeiraCurso]?.[ano] ?? [])])).map(n =>
-                          <SelectItem key={n} value={n}>{n}</SelectItem>
-                        )}
-                      </SelectContent>
-                    </Select>
-                    <Select value={c.docente} onValueChange={v => update(cadeiraCurso, ano, idx, { docente: v })}>
-                      <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                      <SelectContent>{docentesPool.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent>
-                    </Select>
-                    <Select value={String(c.semestre)} onValueChange={v => update(cadeiraCurso, ano, idx, { semestre: (v === "anual" ? "anual" : (+v as 1 | 2)) })}>
-                      <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="1">1º Sem</SelectItem>
-                        <SelectItem value="2">2º Sem</SelectItem>
-                        <SelectItem value="anual">Anual</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <Select value={String(c.ects)} onValueChange={v => update(cadeiraCurso, ano, idx, { ects: +v })}>
-                      <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        {[3, 4, 5, 6, 7.5, 9, 12].map(v => <SelectItem key={v} value={String(v)}>{v}</SelectItem>)}
-                      </SelectContent>
-                    </Select>
-                    <Button size="icon" variant="ghost" onClick={() => setPreview({ cid: cadeiraCurso, ano, idx })} className="h-8 w-8 text-muted-foreground hover:text-primary" title="Ver Cadeira">
-                      <Eye className="w-3.5 h-3.5" />
-                    </Button>
-                    <Button size="icon" variant="ghost" onClick={() => removeCadeira(cadeiraCurso, ano, idx)} className="h-8 w-8 text-muted-foreground hover:text-destructive">
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            </Card>
-          ))}
-        </div>
-      </div>
+              );
+            })}
+          </Card>
 
-      <Dialog open={!!preview} onOpenChange={(o) => !o && setPreview(null)}>
-        <DialogContent className="max-w-5xl p-0 overflow-hidden">
-          {previewCadeira && previewContent && (
-            <>
-              <DialogHeader className="px-6 pt-6 pb-4 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border-b">
-                <div className="flex items-center gap-2 mb-1">
-                  <Badge variant="outline" className="text-[10px]">Pré-visualização</Badge>
-                  <Badge variant="secondary" className="text-[10px]">{previewCurso?.code} · {(preview?.ano ?? 0) + 1}º Ano</Badge>
-                  <Badge variant="outline" className="text-[10px]">{previewCadeira.semestre === "anual" ? "Anual" : `${previewCadeira.semestre}º Sem`}</Badge>
+          <div className="space-y-3 min-w-0">
+            {!selectedCurso ? (
+              <Card className="p-12 text-center text-sm text-muted-foreground">
+                Selecione um curso na barra lateral.
+              </Card>
+            ) : (
+              <>
+                <div className="flex items-center justify-between px-1">
+                  <p className="text-sm text-muted-foreground">
+                    <span className="font-semibold text-foreground">{selectedCurso.name}</span> · {cursoTotal} cadeiras
+                  </p>
                 </div>
-                <DialogTitle className="flex items-center gap-2 text-xl">
-                  <BookOpen className="w-5 h-5 text-primary" /> {previewCadeira.name}
-                </DialogTitle>
-                <DialogDescription className="flex items-center gap-4 text-xs pt-1">
-                  <span className="inline-flex items-center gap-1"><User className="w-3 h-3" /> {previewCadeira.docente}</span>
-                  <span className="inline-flex items-center gap-1"><GraduationCap className="w-3 h-3" /> {previewCadeira.ects} ECTS</span>
-                  <span className="inline-flex items-center gap-1"><Clock className="w-3 h-3" /> 60h lectivas</span>
-                </DialogDescription>
-              </DialogHeader>
-
-              <Tabs defaultValue="visao" className="w-full">
-                <div className="px-6 border-b">
-                  <TabsList className="h-10 bg-transparent p-0 gap-1">
-                    <TabsTrigger value="visao" className="data-[state=active]:bg-primary/10">Visão Geral</TabsTrigger>
-                    <TabsTrigger value="aulas" className="data-[state=active]:bg-primary/10">Aulas ({previewContent.aulas.length})</TabsTrigger>
-                    <TabsTrigger value="conteudos" className="data-[state=active]:bg-primary/10">Conteúdos ({previewContent.conteudos.length})</TabsTrigger>
-                    <TabsTrigger value="quizzes" className="data-[state=active]:bg-primary/10">Quizzes ({previewContent.quizzes.length})</TabsTrigger>
-                    <TabsTrigger value="exames" className="data-[state=active]:bg-primary/10">Exames (3)</TabsTrigger>
-                    <TabsTrigger value="calendario" className="data-[state=active]:bg-primary/10">Calendário</TabsTrigger>
-                  </TabsList>
-                </div>
-
-                <ScrollArea className="h-[60vh]">
-                  <div className="p-6">
-                    <TabsContent value="visao" className="mt-0 space-y-4">
-                      <div className="grid grid-cols-4 gap-3">
-                        <Card className="p-3"><p className="text-[10px] text-muted-foreground uppercase">Aulas</p><p className="text-xl font-bold">{previewContent.aulas.length}</p></Card>
-                        <Card className="p-3"><p className="text-[10px] text-muted-foreground uppercase">Conteúdos</p><p className="text-xl font-bold">{previewContent.conteudos.length}</p></Card>
-                        <Card className="p-3"><p className="text-[10px] text-muted-foreground uppercase">Quizzes</p><p className="text-xl font-bold">{previewContent.quizzes.length}</p></Card>
-                        <Card className="p-3"><p className="text-[10px] text-muted-foreground uppercase">Estudantes</p><p className="text-xl font-bold">{previewCurso?.estudantesEsperados ?? 0}</p></Card>
+                {anosRange.map(ano => {
+                  const list = (cadeirasByAno[ano] ?? []);
+                  return (
+                    <Card key={ano} className="overflow-hidden">
+                      <div className="bg-primary/10 px-4 py-2.5 border-b flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm font-bold text-primary">{ano + 1}º Ano</p>
+                          <Badge variant="outline" className="text-[10px]">{list.length} cadeiras</Badge>
+                        </div>
+                        <Button size="sm" variant="ghost" onClick={() => handleAdd(ano)} disabled={createCadeira.isPending} className="h-7 gap-1 text-xs">
+                          <Plus className="w-3 h-3" /> Adicionar
+                        </Button>
                       </div>
-                      <Card className="p-4">
-                        <h3 className="text-sm font-semibold mb-2">Descrição</h3>
-                        <p className="text-sm text-muted-foreground">Cadeira de {previewCadeira.name} do curso de {previewCurso?.name}, leccionada por {previewCadeira.docente} {previewCadeira.semestre === "anual" ? "ao longo do ano lectivo" : `no ${previewCadeira.semestre}º semestre`}. Inclui componente teórica e prática, com avaliação contínua através de quizzes e exame final presencial.</p>
-                      </Card>
-                      <Card className="p-4">
-                        <h3 className="text-sm font-semibold mb-2">Plano Pedagógico</h3>
-                        <ul className="text-sm space-y-1 text-muted-foreground list-disc pl-5">
-                          <li>{previewContent.aulas.length} aulas teórico-práticas (90 min cada)</li>
-                          <li>{previewContent.quizzes.length} quizzes de avaliação contínua</li>
-                          <li>1 trabalho prático em grupo</li>
-                          <li>Exame final presencial (1ª e 2ª época)</li>
-                        </ul>
-                      </Card>
-                    </TabsContent>
-
-                    <TabsContent value="aulas" className="mt-0 space-y-2">
-                      {previewContent.aulas.map(a => (
-                        <Card key={a.id} className="p-3 flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-md bg-primary/10 text-primary flex items-center justify-center font-bold text-sm">{a.n}</div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium truncate">{a.titulo}</p>
-                            <p className="text-xs text-muted-foreground">{a.data} · {a.duracao} min · {a.attachments.length} anexos</p>
-                          </div>
-                          <Badge variant={a.publicada ? "default" : "outline"} className="text-[10px]">{a.publicada ? "Publicada" : "Rascunho"}</Badge>
-                        </Card>
-                      ))}
-                    </TabsContent>
-
-                    <TabsContent value="conteudos" className="mt-0 space-y-2">
-                      {previewContent.conteudos.map(c => (
-                        <Card key={c.id} className="p-3 flex items-center gap-3">
-                          <FileText className="w-4 h-4 text-primary" />
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium truncate">{c.titulo}</p>
-                            <p className="text-xs text-muted-foreground">Semana {c.semana} · {c.size}</p>
-                          </div>
-                          <Badge variant="outline" className="text-[10px]">{c.tipo}</Badge>
-                        </Card>
-                      ))}
-                    </TabsContent>
-
-                    <TabsContent value="quizzes" className="mt-0 space-y-2">
-                      {previewContent.quizzes.map(q => (
-                        <Card key={q.id} className="p-3">
-                          <div className="flex items-center gap-3">
-                            <ClipboardList className="w-4 h-4 text-primary" />
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium">{q.titulo}</p>
-                              <p className="text-xs text-muted-foreground">{q.descricao}</p>
+                      <div className="grid grid-cols-[1fr_180px_90px_70px_36px] gap-2 px-3 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b">
+                        <span>Cadeira</span><span>Docente</span><span>Semestre</span><span>ECTS</span><span></span>
+                      </div>
+                      {list.length === 0 ? (
+                        <div className="p-4 text-xs text-muted-foreground text-center">
+                          Sem cadeiras neste ano. Clique em "Adicionar".
+                        </div>
+                      ) : (
+                        <div className="divide-y">
+                          {list.map(c => (
+                            <div key={c.id} className="grid grid-cols-[1fr_180px_90px_70px_36px] gap-2 p-2 items-center">
+                              <Input
+                                defaultValue={c.name}
+                                onBlur={e => {
+                                  const v = e.target.value.trim();
+                                  if (v && v !== c.name) handleUpdate(c.id, { name: v });
+                                }}
+                                className="h-8 text-xs"
+                              />
+                              <Input
+                                defaultValue={c.docente ?? ""}
+                                placeholder="Docente"
+                                onBlur={e => {
+                                  const v = e.target.value.trim();
+                                  if (v !== (c.docente ?? "")) handleUpdate(c.id, { docente: v || null } as any);
+                                }}
+                                className="h-8 text-xs"
+                              />
+                              <Select
+                                value={c.semestre}
+                                onValueChange={v => handleUpdate(c.id, { semestre: v })}
+                              >
+                                <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="1">1º Sem</SelectItem>
+                                  <SelectItem value="2">2º Sem</SelectItem>
+                                  <SelectItem value="anual">Anual</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <Select
+                                value={String(c.ects)}
+                                onValueChange={v => handleUpdate(c.id, { ects: Number(v) })}
+                              >
+                                <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                                <SelectContent>
+                                  {[3, 4, 5, 6, 7.5, 9, 12].map(v => <SelectItem key={v} value={String(v)}>{v}</SelectItem>)}
+                                </SelectContent>
+                              </Select>
+                              <Button size="icon" variant="ghost" onClick={() => handleDelete(c.id)} className="h-8 w-8 text-muted-foreground hover:text-destructive">
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </Button>
                             </div>
-                            <Badge variant="outline" className="text-[10px]">{q.questions.length} perguntas · {q.duracao} min</Badge>
-                          </div>
-                        </Card>
-                      ))}
-                    </TabsContent>
-
-                    <TabsContent value="exames" className="mt-0 space-y-2">
-                      {buildExames(previewCadeira.name).map(ex => (
-                        <Card key={ex.id} className="p-3 flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-md bg-primary/10 text-primary flex items-center justify-center">
-                            <FileSignature className="w-4 h-4" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium">{ex.epoca} · {previewCadeira.name}</p>
-                            <p className="text-xs text-muted-foreground flex items-center gap-3 mt-0.5">
-                              <span className="inline-flex items-center gap-1"><Calendar className="w-3 h-3" /> {ex.data}</span>
-                              <span className="inline-flex items-center gap-1"><Clock className="w-3 h-3" /> {ex.hora} · {ex.duracao} min</span>
-                              <span className="inline-flex items-center gap-1"><MapPin className="w-3 h-3" /> {ex.sala}</span>
-                            </p>
-                          </div>
-                          <Badge variant="outline" className="text-[10px]">Peso {ex.peso}</Badge>
-                          <Badge variant="secondary" className="text-[10px]">{ex.tipo}</Badge>
-                        </Card>
-                      ))}
-                    </TabsContent>
-
-                    <TabsContent value="calendario" className="mt-0 space-y-2">
-
-                      {previewContent.calendario.map(e => (
-                        <Card key={e.id} className="p-3 flex items-center gap-3">
-                          <Calendar className="w-4 h-4 text-primary" />
-                          <div className="flex-1"><p className="text-sm font-medium">{e.titulo}</p><p className="text-xs text-muted-foreground">{e.data}</p></div>
-                          <Badge variant="outline" className="text-[10px] capitalize">{e.tipo}</Badge>
-                        </Card>
-                      ))}
-                    </TabsContent>
-                  </div>
-                </ScrollArea>
-              </Tabs>
-
-              <div className="px-6 py-3 border-t bg-muted/20 flex justify-end gap-2">
-                <Button variant="outline" onClick={() => setPreview(null)}>Fechar</Button>
-                <Button className="gap-2" onClick={() => { toast.success(`Conteúdo de "${previewCadeira.name}" confirmado`); setPreview(null); }}>
-                  <Check className="w-4 h-4" /> Confirmar Conteúdo
-                </Button>
-              </div>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
+                          ))}
+                        </div>
+                      )}
+                    </Card>
+                  );
+                })}
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
       <div className="flex justify-end gap-2 pt-4">
         <Button variant="outline" asChild><Link to="/areaacademica/criador/cursos">Voltar</Link></Button>
