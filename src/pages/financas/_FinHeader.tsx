@@ -74,7 +74,6 @@ export function FinHeader({ title, subtitle, icon, right, anoLetivo = "2024 / 20
             </h1>
             {subtitle && <p className="text-sm text-muted-foreground mt-0.5">{subtitle}</p>}
           </div>
-          {right && <div className="pt-1">{right}</div>}
         </div>
         <div className="flex flex-col items-end gap-2 shrink-0">
           <div className="inline-flex items-stretch rounded-md border border-border bg-card overflow-hidden text-[11px] uppercase tracking-wider font-medium shadow-sm">
@@ -86,6 +85,7 @@ export function FinHeader({ title, subtitle, icon, right, anoLetivo = "2024 / 20
               <Clock className="w-3.5 h-3.5" />{liveTime}
             </span>
           </div>
+          {right}
         </div>
       </div>
     </div>
