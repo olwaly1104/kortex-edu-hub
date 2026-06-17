@@ -423,7 +423,7 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
                                     : selectedPrazos.length === 0
                                       ? "— Nenhum —"
                                       : selectedPrazos.length === 1
-                                        ? `${selectedPrazos[0].meses} meses`
+                                        ? `Prazo ${selectedPrazos[0].meses} meses`
                                         : `${selectedPrazos.length} opções`}
                                 </span>
                                 <ChevronDown className="w-3.5 h-3.5 opacity-60 shrink-0" />
