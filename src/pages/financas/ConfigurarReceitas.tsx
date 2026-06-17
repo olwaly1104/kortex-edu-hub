@@ -258,7 +258,19 @@ function DespesasSection({ email }: { email?: string | null }) {
   const estKey = KEY("des.estados", email);
   const respKey = KEY("des.responsaveis", email);
 
-  const [categorias, setCategorias] = useState<DesCategoria[]>(() => readJSON<DesCategoria[]>(catKey, []));
+  const [categorias, setCategorias] = useState<DesCategoria[]>(() => {
+    const raw = readJSON<any[]>(catKey, []);
+    return raw.map((item) => ({
+      id: item.id || newId(),
+      nome: item.nome || "",
+      documentos: Array.isArray(item.documentos)
+        ? item.documentos
+        : item.documento
+          ? String(item.documento).split(/,\s*/).filter(Boolean)
+          : [],
+      orcamento: Number(item.orcamento) || 0,
+    }));
+  });
   const [estados, setEstados] = useState<DesEstado[]>(() => readJSON<DesEstado[]>(estKey, [
     { id: "e1", nome: "Pendente", cor: "bg-amber-100 text-amber-700 border-amber-200" },
     { id: "e2", nome: "Aprovada", cor: "bg-emerald-100 text-emerald-700 border-emerald-200" },
