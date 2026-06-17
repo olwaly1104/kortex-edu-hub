@@ -236,3 +236,80 @@ export function useUpdatePropina() {
     onSuccess: () => { qc.invalidateQueries({ queryKey: KEY_PROP }); },
   });
 }
+
+// ---------- Cadeiras ----------
+
+export function useCadeiras() {
+  return useQuery({
+    queryKey: KEY_CAD,
+    queryFn: async (): Promise<CadeiraRow[]> => {
+      const { data, error } = await (supabase.from("cadeiras" as any) as any)
+        .select("*")
+        .order("ano", { ascending: true })
+        .order("ordem", { ascending: true })
+        .order("created_at", { ascending: true });
+      if (error) throw error;
+      return (data ?? []) as CadeiraRow[];
+    },
+  });
+}
+
+export function useCreateCadeira() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: {
+      curso_id: string;
+      ano: number;
+      name: string;
+      docente?: string | null;
+      ects?: number;
+      semestre?: string;
+      ordem?: number;
+    }) => {
+      const uid = await currentUserId();
+      if (!uid) throw new Error("Sessão expirada.");
+      const { data, error } = await (supabase.from("cadeiras" as any) as any)
+        .insert({
+          owner_user_id: uid,
+          curso_id: input.curso_id,
+          ano: input.ano,
+          name: input.name.trim() || "Nova Cadeira",
+          docente: input.docente?.trim() || null,
+          ects: input.ects ?? 6,
+          semestre: input.semestre ?? "1",
+          ordem: input.ordem ?? 0,
+        })
+        .select()
+        .single();
+      if (error) throw error;
+      return data as CadeiraRow;
+    },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: KEY_CAD }); },
+  });
+}
+
+export function useUpdateCadeira() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { id: string; patch: Partial<Pick<CadeiraRow, "name" | "docente" | "ects" | "semestre" | "ano" | "ordem">> }) => {
+      const { error } = await (supabase.from("cadeiras" as any) as any)
+        .update(input.patch)
+        .eq("id", input.id);
+      if (error) throw error;
+    },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: KEY_CAD }); },
+  });
+}
+
+export function useDeleteCadeira() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await (supabase.from("cadeiras" as any) as any)
+        .delete()
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: KEY_CAD }); },
+  });
+}
