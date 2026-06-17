@@ -58,13 +58,13 @@ export default function AdminFaculdadesCursos() {
 
   // Add Faculdade dialog
   const [openAddFac, setOpenAddFac] = useState(false);
-  const [newFac, setNewFac] = useState({ name: "", decano: "" });
+  const [newFac, setNewFac] = useState({ name: "", sigla: "", decano: "" });
 
   const submitNewFac = async () => {
     if (!newFac.name.trim()) return;
     try {
-      await createFac.mutateAsync({ name: newFac.name, decano: newFac.decano });
-      setNewFac({ name: "", decano: "" });
+      await createFac.mutateAsync({ name: newFac.name, sigla: newFac.sigla, decano: newFac.decano });
+      setNewFac({ name: "", sigla: "", decano: "" });
       setOpenAddFac(false);
       toast.success("Faculdade criada");
     } catch (e: any) {
@@ -74,7 +74,7 @@ export default function AdminFaculdadesCursos() {
 
   // Add Curso dialog
   const [openAddCurso, setOpenAddCurso] = useState<string | null>(null);
-  const [newCurso, setNewCurso] = useState({ name: "", code: "", years: 4, estudantes_esperados: 0, coordenador: "" });
+  const [newCurso, setNewCurso] = useState({ name: "", code: "", years: 4, coordenador: "" });
 
   const submitNewCurso = async () => {
     if (!openAddCurso || !newCurso.name.trim() || !newCurso.code.trim()) return;
@@ -84,10 +84,10 @@ export default function AdminFaculdadesCursos() {
         name: newCurso.name,
         code: newCurso.code,
         years: newCurso.years || 4,
-        estudantes_esperados: newCurso.estudantes_esperados || 0,
+        estudantes_esperados: 0,
         coordenador: newCurso.coordenador,
       });
-      setNewCurso({ name: "", code: "", years: 4, estudantes_esperados: 0, coordenador: "" });
+      setNewCurso({ name: "", code: "", years: 4, coordenador: "" });
       setOpenAddCurso(null);
       toast.success("Curso criado (propina iniciada em 0 Kz)");
     } catch (e: any) {
@@ -100,11 +100,12 @@ export default function AdminFaculdadesCursos() {
     if (isEditing) {
       // Save buffered changes
       const facPatch = edits[f.id];
-      if (facPatch && (facPatch.name !== undefined || facPatch.decano !== undefined)) {
+      if (facPatch && (facPatch.name !== undefined || facPatch.sigla !== undefined || facPatch.decano !== undefined)) {
         await updateFac.mutateAsync({
           id: f.id,
           patch: {
             ...(facPatch.name !== undefined ? { name: facPatch.name } : {}),
+            ...(facPatch.sigla !== undefined ? { sigla: facPatch.sigla } : {}),
             ...(facPatch.decano !== undefined ? { decano: facPatch.decano } : {}),
           },
         });
@@ -183,9 +184,17 @@ export default function AdminFaculdadesCursos() {
                 </div>
                 <div className="min-w-0">
                   {isEditing ? (
-                    <Input value={facValue(f, "name")} onChange={(e) => setFacField(f.id, { name: e.target.value })} className="h-8 text-sm font-semibold mb-1" />
+                    <div className="flex items-center gap-2 mb-1">
+                      <Input value={facValue(f, "name")} onChange={(e) => setFacField(f.id, { name: e.target.value })} className="h-8 text-sm font-semibold" placeholder="Nome" />
+                      <Input value={facValue(f, "sigla") || ""} onChange={(e) => setFacField(f.id, { sigla: e.target.value.toUpperCase() })} className="h-8 text-sm font-semibold w-24" placeholder="Sigla" maxLength={8} />
+                    </div>
                   ) : (
-                    <p className="text-base font-semibold truncate">{f.name}</p>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className="text-base font-semibold truncate">{f.name}</p>
+                      {f.sigla && (
+                        <span className="inline-flex items-center justify-center h-5 px-1.5 rounded bg-primary/10 text-primary text-[10px] font-bold tracking-wider">{f.sigla}</span>
+                      )}
+                    </div>
                   )}
                   <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
                     <span className="flex items-center gap-1"><GraduationCap className="w-3 h-3" /> {facCursos.length} cursos</span>
@@ -211,11 +220,16 @@ export default function AdminFaculdadesCursos() {
                       <p className="text-xs font-semibold leading-tight">{f.decano || <span className="text-muted-foreground italic font-normal">Por atribuir</span>}</p>
                     )}
                   </div>
+                  <span className="w-px h-7 bg-border mx-1" />
+                  {!isEditing && (
+                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-muted text-muted-foreground text-[11px] font-semibold">
+                      <Lock className="w-3 h-3" /> Bloqueado
+                    </span>
+                  )}
+                  <Button size="sm" variant={isEditing ? "default" : "outline"} className="gap-1 h-7" onClick={() => toggleEdit(f)}>
+                    {isEditing ? <><Check className="w-3.5 h-3.5" /> Concluir</> : <><Pencil className="w-3.5 h-3.5" /> Editar</>}
+                  </Button>
                 </div>
-                {!isEditing && <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-muted text-muted-foreground text-[11px] font-semibold"><Lock className="w-3 h-3" /> Bloqueado</span>}
-                <Button size="sm" variant={isEditing ? "default" : "outline"} className="gap-1 h-8" onClick={() => toggleEdit(f)}>
-                  {isEditing ? <><Check className="w-3.5 h-3.5" /> Concluir</> : <><Pencil className="w-3.5 h-3.5" /> Editar</>}
-                </Button>
                 {isEditing && (
                   <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive hover:text-destructive" onClick={async () => {
                     if (!confirm(`Eliminar a faculdade "${f.name}" e todos os seus cursos?`)) return;
@@ -250,7 +264,7 @@ export default function AdminFaculdadesCursos() {
                         ) : (
                           <p className="text-xs font-medium truncate">{c.name}</p>
                         )}
-                        <p className="text-[10px] text-muted-foreground truncate">{c.years} anos · ~{c.estudantes_esperados} est.</p>
+                        <p className="text-[10px] text-muted-foreground truncate">{c.years} anos</p>
                       </div>
                       <div className="flex items-center gap-1.5 px-2 py-1 rounded border border-border bg-muted/30 shrink-0">
                         <UserCog className="w-3 h-3 text-muted-foreground" />
@@ -296,9 +310,15 @@ export default function AdminFaculdadesCursos() {
             <DialogTitle>Nova Faculdade</DialogTitle>
           </DialogHeader>
           <div className="space-y-3 py-2">
-            <div className="space-y-1.5">
-              <Label htmlFor="fac-name" className="text-xs">Nome da Faculdade</Label>
-              <Input id="fac-name" value={newFac.name} onChange={(e) => setNewFac({ ...newFac, name: e.target.value })} placeholder="Ex: Faculdade de Ciências Exatas" />
+            <div className="grid grid-cols-3 gap-2">
+              <div className="col-span-2 space-y-1.5">
+                <Label htmlFor="fac-name" className="text-xs">Nome da Faculdade</Label>
+                <Input id="fac-name" value={newFac.name} onChange={(e) => setNewFac({ ...newFac, name: e.target.value })} placeholder="Ex: Faculdade de Ciências Exatas" />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="fac-sigla" className="text-xs">Sigla</Label>
+                <Input id="fac-sigla" value={newFac.sigla} onChange={(e) => setNewFac({ ...newFac, sigla: e.target.value.toUpperCase() })} placeholder="FCE" maxLength={8} />
+              </div>
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="fac-decano" className="text-xs">Decano <span className="text-muted-foreground font-normal">(opcional)</span></Label>
@@ -338,19 +358,13 @@ export default function AdminFaculdadesCursos() {
                 <Input id="cur-name" value={newCurso.name} onChange={(e) => setNewCurso({ ...newCurso, name: e.target.value })} placeholder="Ex: Arquitectura" />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="cur-code" className="text-xs">Código</Label>
+                <Label htmlFor="cur-code" className="text-xs">Sigla</Label>
                 <Input id="cur-code" value={newCurso.code} onChange={(e) => setNewCurso({ ...newCurso, code: e.target.value })} placeholder="ARQ" />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-2">
-              <div className="space-y-1.5">
-                <Label htmlFor="cur-years" className="text-xs">Duração (anos)</Label>
-                <Input id="cur-years" type="number" min={1} max={8} value={newCurso.years} onChange={(e) => setNewCurso({ ...newCurso, years: Number(e.target.value) })} />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="cur-est" className="text-xs">Estudantes esperados</Label>
-                <Input id="cur-est" type="number" min={0} value={newCurso.estudantes_esperados} onChange={(e) => setNewCurso({ ...newCurso, estudantes_esperados: Number(e.target.value) })} />
-              </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="cur-years" className="text-xs">Duração (anos)</Label>
+              <Input id="cur-years" type="number" min={1} max={8} value={newCurso.years} onChange={(e) => setNewCurso({ ...newCurso, years: Number(e.target.value) })} />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="cur-coord" className="text-xs">Coordenador <span className="text-muted-foreground font-normal">(opcional)</span></Label>

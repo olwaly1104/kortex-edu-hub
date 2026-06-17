@@ -11,6 +11,7 @@ export type FaculdadeRow = {
   id: string;
   owner_user_id: string;
   name: string;
+  sigla: string | null;
   decano: string | null;
   created_at: string;
   updated_at: string;
@@ -135,13 +136,14 @@ export function usePropinas() {
 export function useCreateFaculdade() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (input: { name: string; decano?: string | null }) => {
+    mutationFn: async (input: { name: string; sigla?: string | null; decano?: string | null }) => {
       const uid = await currentUserId();
       if (!uid) throw new Error("Sessão expirada.");
       const { data, error } = await (supabase.from("faculdades" as any) as any)
         .insert({
           owner_user_id: uid,
           name: input.name.trim(),
+          sigla: input.sigla?.trim() || null,
           decano: input.decano?.trim() || null,
         })
         .select()
@@ -156,7 +158,7 @@ export function useCreateFaculdade() {
 export function useUpdateFaculdade() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (input: { id: string; patch: Partial<Pick<FaculdadeRow, "name" | "decano">> }) => {
+    mutationFn: async (input: { id: string; patch: Partial<Pick<FaculdadeRow, "name" | "sigla" | "decano">> }) => {
       const { error } = await (supabase.from("faculdades" as any) as any)
         .update(input.patch)
         .eq("id", input.id);
