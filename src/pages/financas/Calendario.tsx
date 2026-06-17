@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { FinHeader } from "./_FinHeader";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
+
 import { CalendarDays, ChevronLeft, ChevronRight, Plus, Users, MapPin, Calendar as CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
