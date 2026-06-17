@@ -16,6 +16,12 @@ export const ONBOARDING_GROUPS: GroupMeta[] = [
     ],
   },
   {
+    id: "geo", title: "Registar Geopontos da Instituição",
+    steps: [
+      { key: "geo.reg", title: "Geopontos institucionais", desc: "Definir campus, polos e edifícios com coordenadas GPS e raio.", path: "/admin/onboarding/geopontos?step=geo.reg" },
+    ],
+  },
+  {
     id: "aca", title: "Configurar Área Académica",
     steps: [
       { key: "aca.fac", title: "Faculdades", desc: "Criar as faculdades da instituição.", path: "/admin/faculdades-cursos?tab=faculdades&step=aca.fac" },
