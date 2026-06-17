@@ -81,7 +81,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return { ok: true };
   }, []);
 
-  const logout = useCallback(() => persist(null), []);
+  const logout = useCallback(() => {
+    localStorage.clear();
+    persist(null);
+  }, []);
 
   const updateUser = useCallback((patch: Partial<User>) => {
     setUser((prev) => {
