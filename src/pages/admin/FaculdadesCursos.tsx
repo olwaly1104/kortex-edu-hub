@@ -1,6 +1,13 @@
 import { FinHeader } from "@/pages/financas/_FinHeader";
 import { OnboardingStepBanner } from "@/components/admin/OnboardingStepBanner";
-import { Building2, Lock, Pencil, Check, GraduationCap, Users, UserCog, Plus, X, Loader2, Trash2 } from "lucide-react";
+import { Building2, Lock, LockOpen, Pencil, Check, GraduationCap, Users, UserCog, Plus, X, Loader2, Trash2, Palette } from "lucide-react";
+import { FaculdadeSiglaTag } from "@/components/faculdade/FaculdadeSiglaTag";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -56,21 +63,31 @@ export default function AdminFaculdadesCursos() {
   const [edits, setEdits] = useState<Record<string, Partial<FaculdadeRow>>>({});
   const [cursoEdits, setCursoEdits] = useState<Record<string, Partial<CursoRow>>>({});
 
+  // Faculty color palette
+  const FAC_COLORS = [
+    "#475569", "#1B3A6B", "#0F766E", "#15803D", "#B45309",
+    "#B91C1C", "#7C3AED", "#DB2777", "#0EA5E9", "#CA8A04",
+  ];
+
   // Add Faculdade dialog
   const [openAddFac, setOpenAddFac] = useState(false);
-  const [newFac, setNewFac] = useState({ name: "", sigla: "", decano: "" });
+  const [newFac, setNewFac] = useState({ name: "", sigla: "", decano: "", color: FAC_COLORS[0] });
 
   const submitNewFac = async () => {
     if (!newFac.name.trim()) return;
     try {
-      await createFac.mutateAsync({ name: newFac.name, sigla: newFac.sigla, decano: newFac.decano });
-      setNewFac({ name: "", sigla: "", decano: "" });
+      await createFac.mutateAsync({ name: newFac.name, sigla: newFac.sigla, decano: newFac.decano, color: newFac.color });
+      setNewFac({ name: "", sigla: "", decano: "", color: FAC_COLORS[0] });
       setOpenAddFac(false);
       toast.success("Faculdade criada");
     } catch (e: any) {
       toast.error(e?.message ?? "Falha ao criar faculdade");
     }
   };
+
+  // Confirmation dialog for edits
+  const [confirmSaveFor, setConfirmSaveFor] = useState<FaculdadeRow | null>(null);
+
 
   // Add Curso dialog
   const [openAddCurso, setOpenAddCurso] = useState<string | null>(null);
@@ -95,39 +112,55 @@ export default function AdminFaculdadesCursos() {
     }
   };
 
-  const toggleEdit = async (f: FaculdadeRow) => {
+  const performSave = async (f: FaculdadeRow) => {
+    const facPatch = edits[f.id];
+    if (facPatch && (facPatch.name !== undefined || facPatch.sigla !== undefined || facPatch.decano !== undefined || facPatch.color !== undefined)) {
+      await updateFac.mutateAsync({
+        id: f.id,
+        patch: {
+          ...(facPatch.name !== undefined ? { name: facPatch.name } : {}),
+          ...(facPatch.sigla !== undefined ? { sigla: facPatch.sigla } : {}),
+          ...(facPatch.decano !== undefined ? { decano: facPatch.decano } : {}),
+          ...(facPatch.color !== undefined ? { color: facPatch.color } : {}),
+        },
+      });
+    }
+    const cursoIds = (cursosByFac.get(f.id) ?? []).map((c) => c.id);
+    for (const cid of cursoIds) {
+      const patch = cursoEdits[cid];
+      if (!patch) continue;
+      await updateCurso.mutateAsync({
+        id: cid,
+        patch: {
+          ...(patch.name !== undefined ? { name: patch.name } : {}),
+          ...(patch.code !== undefined ? { code: patch.code } : {}),
+          ...(patch.coordenador !== undefined ? { coordenador: patch.coordenador } : {}),
+        },
+      });
+    }
+    setEdits((e) => { const n = { ...e }; delete n[f.id]; return n; });
+    setCursoEdits((e) => { const n = { ...e }; cursoIds.forEach((id) => delete n[id]); return n; });
+    setEditingFacIds((m) => ({ ...m, [f.id]: false }));
+    setConfirmSaveFor(null);
+    toast.success("Alterações guardadas");
+  };
+
+  const toggleEdit = (f: FaculdadeRow) => {
     const isEditing = !!editingFacIds[f.id];
     if (isEditing) {
-      // Save buffered changes
-      const facPatch = edits[f.id];
-      if (facPatch && (facPatch.name !== undefined || facPatch.sigla !== undefined || facPatch.decano !== undefined)) {
-        await updateFac.mutateAsync({
-          id: f.id,
-          patch: {
-            ...(facPatch.name !== undefined ? { name: facPatch.name } : {}),
-            ...(facPatch.sigla !== undefined ? { sigla: facPatch.sigla } : {}),
-            ...(facPatch.decano !== undefined ? { decano: facPatch.decano } : {}),
-          },
-        });
-      }
+      const hasFacChanges = !!edits[f.id] && Object.keys(edits[f.id]).length > 0;
       const cursoIds = (cursosByFac.get(f.id) ?? []).map((c) => c.id);
-      for (const cid of cursoIds) {
-        const patch = cursoEdits[cid];
-        if (!patch) continue;
-        await updateCurso.mutateAsync({
-          id: cid,
-          patch: {
-            ...(patch.name !== undefined ? { name: patch.name } : {}),
-            ...(patch.code !== undefined ? { code: patch.code } : {}),
-            ...(patch.coordenador !== undefined ? { coordenador: patch.coordenador } : {}),
-          },
-        });
+      const hasCursoChanges = cursoIds.some((id) => cursoEdits[id] && Object.keys(cursoEdits[id]).length > 0);
+      if (hasFacChanges || hasCursoChanges) {
+        setConfirmSaveFor(f); // open confirmation
+      } else {
+        setEditingFacIds((m) => ({ ...m, [f.id]: false }));
       }
-      setEdits((e) => { const n = { ...e }; delete n[f.id]; return n; });
-      setCursoEdits((e) => { const n = { ...e }; cursoIds.forEach((id) => delete n[id]); return n; });
+      return;
     }
-    setEditingFacIds((m) => ({ ...m, [f.id]: !isEditing }));
+    setEditingFacIds((m) => ({ ...m, [f.id]: true }));
   };
+
 
   const facValue = (f: FaculdadeRow, key: keyof FaculdadeRow) =>
     (edits[f.id]?.[key] ?? f[key]) as any;
@@ -186,6 +219,33 @@ export default function AdminFaculdadesCursos() {
                   <div className="flex items-center gap-2 flex-wrap">
                     {isEditing ? (
                       <>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <button
+                              type="button"
+                              className="inline-flex items-center justify-center h-6 px-2 rounded-md text-[11px] font-bold tracking-wider shadow-sm border border-black/10 hover:opacity-90"
+                              style={{ backgroundColor: facValue(f, "color") || "#475569", color: "#fff" }}
+                              title="Cor da faculdade"
+                            >
+                              {(facValue(f, "sigla") || "SIGLA").toString().slice(0, 8) || "SIGLA"}
+                            </button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-2" align="start">
+                            <p className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1.5 px-1">Cor da faculdade</p>
+                            <div className="grid grid-cols-5 gap-1.5">
+                              {FAC_COLORS.map((c) => (
+                                <button
+                                  key={c}
+                                  type="button"
+                                  onClick={() => setFacField(f.id, { color: c })}
+                                  className={`w-6 h-6 rounded-md border-2 ${ (facValue(f, "color") || "#475569") === c ? "border-foreground" : "border-transparent" }`}
+                                  style={{ backgroundColor: c }}
+                                  aria-label={c}
+                                />
+                              ))}
+                            </div>
+                          </PopoverContent>
+                        </Popover>
                         <Input
                           value={facValue(f, "sigla") || ""}
                           onChange={(e) => setFacField(f.id, { sigla: e.target.value.toUpperCase() })}
@@ -202,12 +262,11 @@ export default function AdminFaculdadesCursos() {
                       </>
                     ) : (
                       <>
-                        {f.sigla && (
-                          <span className="inline-flex items-center justify-center h-6 px-2 rounded-md bg-muted border border-border text-muted-foreground text-[11px] font-bold tracking-wider">{f.sigla}</span>
-                        )}
+                        <FaculdadeSiglaTag sigla={f.sigla} color={(f as any).color} className="h-6 text-[11px]" />
                         <p className="text-base font-semibold truncate leading-none">{f.name}</p>
                       </>
                     )}
+
                     {/* Decano chip — same visual as coordenador chip on cursos */}
                     <div className="flex items-center gap-1.5 px-2 py-1 rounded border border-border bg-muted/30 shrink-0">
                       <UserCog className="w-3 h-3 text-muted-foreground" />
@@ -237,9 +296,10 @@ export default function AdminFaculdadesCursos() {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-muted text-muted-foreground text-[11px] font-semibold">
-                  <Lock className="w-3 h-3" /> Bloqueado
+                <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-semibold ${isEditing ? "bg-emerald-100 text-emerald-700 border border-emerald-200" : "bg-muted text-muted-foreground"}`}>
+                  {isEditing ? <><LockOpen className="w-3 h-3" /> Desbloqueado</> : <><Lock className="w-3 h-3" /> Bloqueado</>}
                 </span>
+
                 <Button
                   size="sm"
                   variant={isEditing ? "default" : "outline"}
@@ -353,7 +413,29 @@ export default function AdminFaculdadesCursos() {
                 </Select>
               )}
             </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs flex items-center gap-1.5"><Palette className="w-3 h-3" /> Cor da Faculdade</Label>
+              <div className="flex items-center gap-2 flex-wrap">
+                {FAC_COLORS.map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => setNewFac({ ...newFac, color: c })}
+                    className={`w-7 h-7 rounded-md border-2 transition-all ${newFac.color === c ? "border-foreground scale-110" : "border-transparent hover:scale-105"}`}
+                    style={{ backgroundColor: c }}
+                    aria-label={c}
+                  />
+                ))}
+                <span
+                  className="ml-2 inline-flex items-center justify-center h-6 px-2 rounded-md text-[11px] font-bold tracking-wider shadow-sm"
+                  style={{ backgroundColor: newFac.color, color: "#fff" }}
+                >
+                  {newFac.sigla || "SIGLA"}
+                </span>
+              </div>
+            </div>
           </div>
+
           <DialogFooter>
             <DialogClose asChild><Button variant="outline" size="sm">Cancelar</Button></DialogClose>
             <Button size="sm" onClick={submitNewFac} disabled={!newFac.name.trim() || createFac.isPending}>
@@ -411,6 +493,29 @@ export default function AdminFaculdadesCursos() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Confirm save changes */}
+      <AlertDialog open={!!confirmSaveFor} onOpenChange={(o) => !o && setConfirmSaveFor(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar alterações?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tens a certeza que queres guardar as alterações na faculdade{" "}
+              <strong>{confirmSaveFor?.name}</strong>? Esta ação irá actualizar os dados em toda a plataforma.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-emerald-600 hover:bg-emerald-700 text-white"
+              onClick={() => confirmSaveFor && performSave(confirmSaveFor)}
+            >
+              <Check className="w-3.5 h-3.5 mr-1.5" /> Sim, guardar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
+
   );
 }
