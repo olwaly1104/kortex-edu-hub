@@ -771,7 +771,7 @@ function LineItemsBlock({
       </div>
 
       <div className="divide-y">
-        <div className={`grid ${cols} gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10`}>
+        <div className="grid gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10" style={gridStyle}>
           <div>Designação</div>
           {withType && <div>Tipo</div>}
           <div>{valueLabel}</div>
@@ -786,7 +786,7 @@ function LineItemsBlock({
             Sem itens configurados. Clique em <span className="font-medium text-foreground">{addLabel}</span> para começar.
           </div>
         ) : rows.map((r) => (
-          <div key={r.id} className={`grid ${cols} gap-3 px-5 py-2.5 items-center text-sm`}>
+          <div key={r.id} className="grid gap-3 px-5 py-2.5 items-center text-sm" style={gridStyle}>
             <Input className="h-9" placeholder={placeholder} value={r.nome}
               onChange={(e) => update(r.id, { nome: e.target.value })} />
             {withType && (
