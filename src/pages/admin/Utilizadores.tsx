@@ -213,6 +213,7 @@ export default function AdminUtilizadores() {
         const { removeDevCred } = await import("@/lib/devCreds");
         removeDevCred(email);
       } catch { /* ignore */ }
+      refetchServer();
     } finally {
       setDeletingId(null);
     }
