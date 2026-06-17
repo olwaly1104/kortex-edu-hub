@@ -219,6 +219,33 @@ export default function AdminFaculdadesCursos() {
                   <div className="flex items-center gap-2 flex-wrap">
                     {isEditing ? (
                       <>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <button
+                              type="button"
+                              className="inline-flex items-center justify-center h-6 px-2 rounded-md text-[11px] font-bold tracking-wider shadow-sm border border-black/10 hover:opacity-90"
+                              style={{ backgroundColor: facValue(f, "color") || "#475569", color: "#fff" }}
+                              title="Cor da faculdade"
+                            >
+                              {(facValue(f, "sigla") || "SIGLA").toString().slice(0, 8) || "SIGLA"}
+                            </button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-2" align="start">
+                            <p className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1.5 px-1">Cor da faculdade</p>
+                            <div className="grid grid-cols-5 gap-1.5">
+                              {FAC_COLORS.map((c) => (
+                                <button
+                                  key={c}
+                                  type="button"
+                                  onClick={() => setFacField(f.id, { color: c })}
+                                  className={`w-6 h-6 rounded-md border-2 ${ (facValue(f, "color") || "#475569") === c ? "border-foreground" : "border-transparent" }`}
+                                  style={{ backgroundColor: c }}
+                                  aria-label={c}
+                                />
+                              ))}
+                            </div>
+                          </PopoverContent>
+                        </Popover>
                         <Input
                           value={facValue(f, "sigla") || ""}
                           onChange={(e) => setFacField(f.id, { sigla: e.target.value.toUpperCase() })}
@@ -235,12 +262,11 @@ export default function AdminFaculdadesCursos() {
                       </>
                     ) : (
                       <>
-                        {f.sigla && (
-                          <span className="inline-flex items-center justify-center h-6 px-2 rounded-md bg-muted border border-border text-muted-foreground text-[11px] font-bold tracking-wider">{f.sigla}</span>
-                        )}
+                        <FaculdadeSiglaTag sigla={f.sigla} color={(f as any).color} className="h-6 text-[11px]" />
                         <p className="text-base font-semibold truncate leading-none">{f.name}</p>
                       </>
                     )}
+
                     {/* Decano chip — same visual as coordenador chip on cursos */}
                     <div className="flex items-center gap-1.5 px-2 py-1 rounded border border-border bg-muted/30 shrink-0">
                       <UserCog className="w-3 h-3 text-muted-foreground" />
