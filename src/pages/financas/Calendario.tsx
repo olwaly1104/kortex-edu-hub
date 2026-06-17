@@ -145,25 +145,49 @@ function CriarEventoDialog({ defaultDate, trigger }: { defaultDate: Date; trigge
                 <span className="text-[10px] text-muted-foreground font-normal">({participants.length} convidado{participants.length > 1 ? "s" : ""})</span>
               )}
             </Label>
-            <div className="flex gap-2">
+            <div className="relative">
               <Input
                 id="ev-participants"
                 value={participantInput}
-                onChange={(e) => setParticipantInput(e.target.value)}
-                onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addParticipant(); } }}
-                placeholder="Nome ou e-mail e Enter para adicionar"
+                onChange={(e) => { setParticipantInput(e.target.value); setParticipantFocus(true); }}
+                onFocus={() => setParticipantFocus(true)}
+                onBlur={() => setTimeout(() => setParticipantFocus(false), 150)}
+                placeholder="Procurar por nome ou e-mail..."
                 className="h-10"
+                autoComplete="off"
               />
-              <Button type="button" variant="outline" size="sm" onClick={addParticipant} className="h-10 shrink-0">
-                Adicionar
-              </Button>
+              {participantFocus && filteredContacts.length > 0 && (
+                <div className="absolute z-50 mt-1 w-full rounded-md border bg-popover shadow-lg max-h-56 overflow-y-auto">
+                  {filteredContacts.map((c) => (
+                    <button
+                      key={c.id}
+                      type="button"
+                      onMouseDown={(e) => { e.preventDefault(); addContact(c); }}
+                      className="w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-muted/60 transition-colors"
+                    >
+                      <div className="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[11px] font-semibold shrink-0">
+                        {c.display_name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase()}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium text-foreground truncate">{c.display_name}</p>
+                        <p className="text-[11px] text-muted-foreground truncate">{c.email ?? c.modulo ?? ""}</p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+              {participantFocus && participantInput.trim() && filteredContacts.length === 0 && (
+                <div className="absolute z-50 mt-1 w-full rounded-md border bg-popover shadow-lg px-3 py-2 text-xs text-muted-foreground">
+                  Nenhum contacto encontrado.
+                </div>
+              )}
             </div>
             {participants.length > 0 && (
               <div className="flex flex-wrap gap-1.5 pt-1">
                 {participants.map((p) => (
-                  <span key={p} className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-primary/10 text-primary text-xs font-medium">
-                    {p}
-                    <button type="button" onClick={() => removeParticipant(p)} className="hover:bg-primary/20 rounded-sm">
+                  <span key={p.id} className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-primary/10 text-primary text-xs font-medium">
+                    {p.name}
+                    <button type="button" onClick={() => removeParticipant(p.id)} className="hover:bg-primary/20 rounded-sm">
                       <X className="w-3 h-3" />
                     </button>
                   </span>
