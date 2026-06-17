@@ -110,9 +110,15 @@ export default function AdminPerfil() {
     pushProfile(user?.email, instituicao);
   }, [instituicao, PROFILE_KEY, user?.email]);
 
+  const emailValid = /^[^\s@]+@[^\s@]+\.com$/i.test((instituicao.email || "").trim());
+
   const handleSave = () => {
-    if (instituicao.email && !/^[^\s@]+@[^\s@]+\.com$/i.test(instituicao.email.trim())) {
-      toast.error("Email geral deve ser válido e terminar em .com");
+    if (!instituicao.nomeOficial.trim()) {
+      toast.error("Nome oficial é obrigatório");
+      return;
+    }
+    if (!emailValid) {
+      toast.error("Email institucional é obrigatório e deve terminar em .com");
       return;
     }
     try { localStorage.setItem(PROFILE_KEY, JSON.stringify(instituicao)); } catch { /* ignore */ }
@@ -238,8 +244,17 @@ export default function AdminPerfil() {
         <Separator />
         <div className="grid md:grid-cols-2 gap-4">
           <div className="space-y-1.5">
-            <Label className="text-xs flex items-center gap-1.5"><Mail className="w-3 h-3" /> Email geral</Label>
-            <Input value={instituicao.email} onChange={e => setInstituicao({ ...instituicao, email: e.target.value })} className="h-9" />
+            <Label className="text-xs flex items-center gap-1.5"><Mail className="w-3 h-3" /> Email institucional *</Label>
+            <Input
+              type="email"
+              value={instituicao.email}
+              onChange={e => setInstituicao({ ...instituicao, email: e.target.value })}
+              placeholder="contacto@instituicao.com"
+              className={`h-9 ${instituicao.email && !emailValid ? "border-destructive" : ""}`}
+            />
+            {instituicao.email && !emailValid && (
+              <p className="text-[10px] text-destructive">Deve ser um email válido terminado em .com</p>
+            )}
           </div>
           <div className="space-y-1.5">
             <Label className="text-xs flex items-center gap-1.5"><Phone className="w-3 h-3" /> Telefone</Label>
