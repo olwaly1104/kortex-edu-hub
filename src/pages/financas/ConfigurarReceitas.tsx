@@ -716,7 +716,7 @@ function MultasSection({ email: _email }: { email?: string | null }) {
 
 function LineItemsBlock({
   title, subtitle, icon: Icon, storageKey, addLabel, placeholder, valueLabel,
-  withUnit = false, withTarget = false, withType = false,
+  withUnit = false, withTarget = false, withType = false, withTax = false, impostos = [],
 }: {
   title: string;
   subtitle: string;
@@ -728,6 +728,8 @@ function LineItemsBlock({
   withUnit?: boolean;
   withTarget?: boolean;
   withType?: boolean;
+  withTax?: boolean;
+  impostos?: Imposto[];
 }) {
   const [rows, setRows] = useState<LineItem[]>(() => readJSON<LineItem[]>(storageKey, []));
   useEffect(() => writeJSON(storageKey, rows), [rows, storageKey]);
@@ -737,19 +739,23 @@ function LineItemsBlock({
     ...(withUnit ? { unidade: "Kz" } : {}),
     ...(withType ? { tipo: "Único" } : {}),
     ...(withTarget ? { aplicaA: "estudante" } : {}),
+    ...(withTax ? { impostoId: impostos[0]?.id ?? "" } : {}),
   }]);
   const update = (id: string, patch: Partial<LineItem>) => setRows((r) => r.map((x) => x.id === id ? { ...x, ...patch } : x));
   const remove = (id: string) => setRows((r) => r.filter((x) => x.id !== id));
 
   const total = rows.reduce((s, r) => s + (r.valor || 0), 0);
 
-  const cols = (() => {
-    if (withType && withTarget) return "grid-cols-[1fr_130px_140px_150px_40px]";
-    if (withUnit) return "grid-cols-[1fr_140px_120px_40px]";
-    if (withTarget) return "grid-cols-[1fr_140px_150px_40px]";
-    if (withType) return "grid-cols-[1fr_130px_180px_40px]";
-    return "grid-cols-[1fr_180px_40px]";
-  })();
+  const colTemplate = [
+    "1fr",                       // Designação
+    withType && "130px",
+    "140px",                     // Valor
+    withTax && "150px",
+    withUnit && "120px",
+    withTarget && "140px",
+    "44px",                      // Ação
+  ].filter(Boolean).join("_");
+  const cols = `grid-cols-[${colTemplate}]`;
 
   return (
     <Card className="overflow-hidden">
@@ -769,6 +775,7 @@ function LineItemsBlock({
           <div>Designação</div>
           {withType && <div>Tipo</div>}
           <div>{valueLabel}</div>
+          {withTax && <div>Imposto</div>}
           {withUnit && <div>Unidade</div>}
           {withTarget && <div>Aplica-se a</div>}
           <div className="text-right">Ação</div>
@@ -796,6 +803,14 @@ function LineItemsBlock({
             )}
             <Input type="number" min={0} className="h-9 tabular-nums" value={r.valor}
               onChange={(e) => update(r.id, { valor: Number(e.target.value) || 0 })} />
+            {withTax && (
+              <select className="h-9 rounded-md border border-input bg-background px-2 text-sm"
+                value={r.impostoId || ""}
+                onChange={(e) => update(r.id, { impostoId: e.target.value })}>
+                <option value="">— Sem imposto —</option>
+                {impostos.map((i) => <option key={i.id} value={i.id}>{i.nome} ({(i.taxa * 100).toFixed(0)}%)</option>)}
+              </select>
+            )}
             {withUnit && (
               <Input className="h-9" placeholder="Kz / dia" value={r.unidade || ""}
                 onChange={(e) => update(r.id, { unidade: e.target.value })} />
