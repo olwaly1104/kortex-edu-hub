@@ -81,11 +81,6 @@ export default function ConfigurarReceitas() {
         title="Configurar Finanças"
         subtitle="Receitas, despesas, salários e multas — base que alimenta todo o módulo financeiro."
         icon={<Settings2 className="w-5 h-5 text-primary" />}
-        right={
-          <Button size="sm" variant="outline" className="gap-1.5" onClick={() => navigate(-1)}>
-            <ArrowLeft className="w-3.5 h-3.5" /> Voltar
-          </Button>
-        }
       />
 
       <Tabs value={tab} onValueChange={(v) => changeTab(v as Tab)}>
