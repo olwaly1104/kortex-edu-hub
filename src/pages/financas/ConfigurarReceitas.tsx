@@ -264,7 +264,12 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
     Object.entries(raw).forEach(([k, v]) => { norm[k] = Array.isArray(v) ? v : (v ? [v] : []); });
     return norm;
   });
-  const [prazosDef, setPrazosDef] = useState<PrazoDef[]>(() => ensureDefaults(readJSON<PrazoDef[]>(PRAZOS_DEF_KEY(email), [])));
+  const [prazosDef, setPrazosDef] = useState<PrazoDef[]>(() => {
+    const stored = readJSON<PrazoDef[] | null>(PRAZOS_DEF_KEY(email), null);
+    if (stored === null) return DEFAULT_PRAZOS.map((d) => ({ ...d }));
+    // Keep stored order; just re-mark locked status by id
+    return stored.map((p) => ({ ...p, locked: !!DEFAULT_PRAZOS.find((d) => d.id === p.id) }));
+  });
   const [open, setOpen] = useState<Record<string, boolean>>({});
 
   useEffect(() => writeJSON(ANOS_KEY(email), anosByCurso), [anosByCurso, email]);
