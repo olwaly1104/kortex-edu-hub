@@ -165,7 +165,7 @@ export default function AdminUtilizadores() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const remove = async (id: string, email: string) => {
     if (id === "current-admin") return;
-    if (!confirm("Eliminar definitivamente este utilizador? A conta e o acesso ao Kortex serão removidos da cloud.")) return;
+    if (!confirm("Eliminar definitivamente este utilizador? A conta e o acesso ao portal serão removidos da cloud.")) return;
     setDeletingId(id);
     try {
       const { data, error } = await supabase.functions.invoke("admin-delete-user", { body: { user_id: id } });
