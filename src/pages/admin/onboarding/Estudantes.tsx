@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { OnboardingStepBanner } from "@/components/admin/OnboardingStepBanner";
 import { Card } from "@/components/ui/card";
@@ -8,69 +8,171 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Upload, UserPlus, Trash2, Users, GraduationCap, CheckCircle2, Mail } from "lucide-react";
+import { Upload, UserPlus, Trash2, Users, GraduationCap, CheckCircle2, Mail, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
+import {
+  useCursos,
+  useEstudantes,
+  useCreateEstudante,
+  useBulkCreateEstudantes,
+  useDeleteEstudante,
+  type EstudanteInput,
+} from "@/lib/useInstitution";
 
-type Row = { id: string; nome: string; email: string; curso: string; ano: string; turma: string; origem?: "novo" | "existente" | "importado" };
-
-const cursosPool = ["ARQ", "ENG", "MED", "DIR", "ECO"];
 const turmasPool = ["A", "B", "C", "D", "E"];
 const provincias = ["Luanda", "Benguela", "Huíla", "Huambo", "Cabinda", "Namibe", "Uíge", "Bié"];
-
-const seedRows: Row[] = [];
-
-const existentesPool: Array<{ id: string; nome: string; email: string; cursoAtual: string; ano: string }> = [];
-
 
 const emptyNovo = {
   primeiroNome: "", ultimoNome: "", nascimento: "", genero: "", nacionalidade: "Angolana",
   bilhete: "", telemovel: "", provincia: "", municipio: "", endereco: "",
   encNome: "", encParentesco: "", encTelefone: "",
-  curso: "ARQ", ano: "1", turma: "A",
+  curso_id: "", ano: "1", turma: "A",
 };
+
+function generateEmail(nomeCompleto: string) {
+  return `${nomeCompleto
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim()
+    .replace(/\s+/g, ".")
+    .replace(/[^a-z.]/g, "")}@upra.kor`;
+}
+
+// Minimal CSV parser. Expected headers: nome,email,curso,ano,turma
+// `curso` matches against cursos.code or cursos.name.
+function parseCSV(text: string): Record<string, string>[] {
+  const lines = text.split(/\r?\n/).filter((l) => l.trim().length > 0);
+  if (lines.length < 2) return [];
+  const headers = lines[0].split(/[,;]/).map((h) => h.trim().toLowerCase());
+  return lines.slice(1).map((line) => {
+    const cells = line.split(/[,;]/).map((c) => c.trim());
+    const row: Record<string, string> = {};
+    headers.forEach((h, i) => { row[h] = cells[i] ?? ""; });
+    return row;
+  });
+}
 
 export default function OnboardingEstudantes() {
   const [params] = useSearchParams();
   const initialTab = params.get("tab") === "manual" ? "manual" : "importar";
 
-  const [rows, setRows] = useState<Row[]>(seedRows);
-  const [novo, setNovo] = useState(emptyNovo);
+  const { data: cursos = [], isLoading: loadingCursos } = useCursos();
+  const { data: rows = [], isLoading: loadingRows } = useEstudantes();
+  const createOne = useCreateEstudante();
+  const createBulk = useBulkCreateEstudantes();
+  const removeOne = useDeleteEstudante();
+
+  const fileRef = useRef<HTMLInputElement | null>(null);
+  const [novo, setNovo] = useState(() => ({ ...emptyNovo }));
+
+  const cursoById = useMemo(() => {
+    const m = new Map<string, { code: string; name: string }>();
+    cursos.forEach((c) => m.set(c.id, { code: c.code, name: c.name }));
+    return m;
+  }, [cursos]);
 
   const totals = useMemo(() => ({
     total: rows.length,
-    cursos: new Set(rows.map(r => r.curso)).size,
+    cursos: new Set(rows.map((r) => r.curso_id)).size,
   }), [rows]);
 
-  const remove = (id: string) => setRows(prev => prev.filter(r => r.id !== id));
+  const remove = (id: string) => {
+    removeOne.mutate(id, {
+      onSuccess: () => toast.success("Estudante removido"),
+      onError: (e: any) => toast.error(e?.message ?? "Erro ao remover"),
+    });
+  };
 
   const confirmarAdicao = () => {
     if (!novo.primeiroNome.trim() || !novo.ultimoNome.trim() || !novo.nascimento || !novo.bilhete.trim()) {
       toast.error("Preencha nome, data de nascimento e bilhete de identidade");
       return;
     }
+    if (!novo.curso_id) {
+      toast.error("Seleccione o curso");
+      return;
+    }
     const nomeCompleto = `${novo.primeiroNome.trim()} ${novo.ultimoNome.trim()}`;
-    const emailGerado = `${nomeCompleto.toLowerCase().replace(/\s+/g, ".").normalize("NFD").replace(/[^a-z.]/g, "")}@upra.kor`;
-    setRows(prev => [...prev, {
-      id: String(Date.now()),
+    const emailGerado = generateEmail(nomeCompleto);
+    const payload: EstudanteInput = {
+      curso_id: novo.curso_id,
       nome: nomeCompleto,
       email: emailGerado,
-      curso: novo.curso, ano: novo.ano, turma: novo.turma,
+      ano: novo.ano,
+      turma: novo.turma,
       origem: "novo",
-    }]);
-    setNovo(emptyNovo);
-    toast.success(`Estudante adicionado. Email institucional: ${emailGerado}`);
-  };
-
-  const simulateImport = () => {
-    const generated: Row[] = []
+      primeiro_nome: novo.primeiroNome.trim(),
+      ultimo_nome: novo.ultimoNome.trim(),
+      nascimento: novo.nascimento || null,
+      genero: novo.genero || null,
+      nacionalidade: novo.nacionalidade || null,
+      bilhete: novo.bilhete.trim() || null,
+      telemovel: novo.telemovel || null,
+      provincia: novo.provincia || null,
+      municipio: novo.municipio || null,
+      endereco: novo.endereco || null,
+      enc_nome: novo.encNome || null,
+      enc_parentesco: novo.encParentesco || null,
+      enc_telefone: novo.encTelefone || null,
     };
-    setRows(prev => [...prev, ...generated]);
-    toast.success(`${generated.length} estudantes importados`);
+    createOne.mutate(payload, {
+      onSuccess: () => {
+        setNovo({ ...emptyNovo, curso_id: novo.curso_id });
+        toast.success(`Estudante adicionado. Email institucional: ${emailGerado}`);
+      },
+      onError: (e: any) => toast.error(e?.message ?? "Erro ao adicionar estudante"),
+    });
   };
 
-
-
+  const handleFile = async (file: File) => {
+    if (cursos.length === 0) {
+      toast.error("Crie cursos antes de importar estudantes");
+      return;
+    }
+    try {
+      const text = await file.text();
+      const parsed = parseCSV(text);
+      if (parsed.length === 0) {
+        toast.error("Ficheiro vazio ou sem cabeçalho válido");
+        return;
+      }
+      const inputs: EstudanteInput[] = [];
+      const skipped: string[] = [];
+      for (const r of parsed) {
+        const nome = (r["nome"] || r["name"] || "").trim();
+        if (!nome) continue;
+        const cursoKey = (r["curso"] || r["course"] || "").trim().toLowerCase();
+        const curso = cursos.find(
+          (c) => c.code.toLowerCase() === cursoKey || c.name.toLowerCase() === cursoKey,
+        );
+        if (!curso) { skipped.push(nome); continue; }
+        const email = (r["email"] || generateEmail(nome)).trim();
+        inputs.push({
+          curso_id: curso.id,
+          nome,
+          email,
+          ano: (r["ano"] || "1").trim(),
+          turma: (r["turma"] || "A").trim().toUpperCase(),
+          origem: "importado",
+        });
+      }
+      if (inputs.length === 0) {
+        toast.error("Nenhum estudante válido encontrado no ficheiro");
+        return;
+      }
+      createBulk.mutate(inputs, {
+        onSuccess: (data) => {
+          toast.success(`${data.length} estudantes importados${skipped.length ? ` · ${skipped.length} ignorados (curso inválido)` : ""}`);
+        },
+        onError: (e: any) => toast.error(e?.message ?? "Erro ao importar"),
+      });
+    } catch (e: any) {
+      toast.error(e?.message ?? "Erro ao ler ficheiro");
+    } finally {
+      if (fileRef.current) fileRef.current.value = "";
+    }
+  };
 
   return (
     <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6 animate-fade-in">
@@ -93,10 +195,29 @@ export default function OnboardingEstudantes() {
             <div className="flex items-center justify-between gap-4">
               <div className="min-w-0">
                 <h2 className="text-sm font-semibold">Importação em lote</h2>
-                <p className="text-xs text-muted-foreground mt-0.5">Carregue um ficheiro CSV ou Excel. O email institucional é gerado automaticamente.</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Carregue um ficheiro CSV com as colunas <span className="font-mono">nome,email,curso,ano,turma</span>. O email institucional é gerado automaticamente quando omitido. O curso deve corresponder ao código ou nome existente.
+                </p>
               </div>
-              <Button onClick={simulateImport} variant="outline" size="sm" className="gap-2 shrink-0">
-                <Upload className="w-4 h-4" /> Carregar ficheiro
+              <input
+                ref={fileRef}
+                type="file"
+                accept=".csv,text/csv"
+                className="hidden"
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) handleFile(f);
+                }}
+              />
+              <Button
+                onClick={() => fileRef.current?.click()}
+                variant="outline"
+                size="sm"
+                className="gap-2 shrink-0"
+                disabled={createBulk.isPending}
+              >
+                {createBulk.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                Carregar ficheiro
               </Button>
             </div>
           </Card>
@@ -156,10 +277,10 @@ export default function OnboardingEstudantes() {
               <section className="space-y-2">
                 <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Matrícula</p>
                 <div className="grid grid-cols-3 gap-2">
-                  <div><Label className="text-xs">Curso</Label>
-                    <Select value={novo.curso} onValueChange={v => setNovo({ ...novo, curso: v })}>
-                      <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
-                      <SelectContent>{cursosPool.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
+                  <div><Label className="text-xs">Curso *</Label>
+                    <Select value={novo.curso_id} onValueChange={v => setNovo({ ...novo, curso_id: v })}>
+                      <SelectTrigger className="h-9"><SelectValue placeholder={loadingCursos ? "A carregar…" : (cursos.length === 0 ? "Crie cursos primeiro" : "Selecione")} /></SelectTrigger>
+                      <SelectContent>{cursos.map(c => <SelectItem key={c.id} value={c.id}>{c.code} — {c.name}</SelectItem>)}</SelectContent>
                     </Select>
                   </div>
                   <div><Label className="text-xs">Ano</Label>
@@ -179,7 +300,10 @@ export default function OnboardingEstudantes() {
             </div>
 
             <div className="flex justify-end">
-              <Button onClick={confirmarAdicao} className="gap-1.5"><UserPlus className="w-4 h-4" /> Adicionar estudante</Button>
+              <Button onClick={confirmarAdicao} className="gap-1.5" disabled={createOne.isPending}>
+                {createOne.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <UserPlus className="w-4 h-4" />}
+                Adicionar estudante
+              </Button>
             </div>
           </Card>
         </TabsContent>
@@ -198,7 +322,7 @@ export default function OnboardingEstudantes() {
             <div key={r.id} className="grid grid-cols-[1fr_1.4fr_80px_70px_80px_40px] gap-2 px-4 py-2 items-center text-xs">
               <span className="font-medium">{r.nome}</span>
               <span className="text-muted-foreground truncate">{r.email}</span>
-              <Badge variant="outline" className="text-[10px] justify-center">{r.curso}</Badge>
+              <Badge variant="outline" className="text-[10px] justify-center">{cursoById.get(r.curso_id)?.code ?? "—"}</Badge>
               <span>{r.ano}º</span>
               <span>{r.turma}</span>
               <Button size="icon" variant="ghost" onClick={() => remove(r.id)} className="h-8 w-8 text-muted-foreground hover:text-destructive">
@@ -206,8 +330,11 @@ export default function OnboardingEstudantes() {
               </Button>
             </div>
           ))}
-          {rows.length === 0 && (
+          {rows.length === 0 && !loadingRows && (
             <p className="px-4 py-8 text-xs text-muted-foreground italic text-center">Sem estudantes. Use os separadores acima para começar.</p>
+          )}
+          {loadingRows && (
+            <p className="px-4 py-8 text-xs text-muted-foreground italic text-center">A carregar…</p>
           )}
         </div>
       </Card>
