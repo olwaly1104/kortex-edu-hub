@@ -321,7 +321,7 @@ function AppRoutes() {
         <Route path="/admin/onboarding/docentes" element={<AdminOnboardingPessoas mode="docentes" />} />
         <Route path="/admin/onboarding/staff" element={<AdminOnboardingPessoas mode="staff" />} />
         <Route path="/admin/onboarding/espacos" element={<AdminOnboardingEspacos />} />
-        <Route path="/admin/onboarding/geopontos" element={<AdminOnboardingGeopontos />} />
+        <Route path="/admin/onboarding/geopontos" element={<AdminOnboardingEspacos />} />
         <Route path="/admin/onboarding/regras-presenca" element={<AdminOnboardingRegrasPresenca />} />
         <Route path="/admin/onboarding/salarios" element={<AdminOnboardingSalarios />} />
         {/* Student */}
