@@ -340,3 +340,100 @@ export function useDeleteCadeira() {
     onSuccess: () => { qc.invalidateQueries({ queryKey: KEY_CAD }); },
   });
 }
+
+// ---------- Estudantes ----------
+
+export function useEstudantes() {
+  return useQuery({
+    queryKey: KEY_EST,
+    queryFn: async (): Promise<EstudanteRow[]> => {
+      const { data, error } = await (supabase.from("estudantes" as any) as any)
+        .select("*")
+        .order("created_at", { ascending: true });
+      if (error) throw error;
+      return (data ?? []) as EstudanteRow[];
+    },
+  });
+}
+
+export type EstudanteInput = {
+  curso_id: string;
+  nome: string;
+  email: string;
+  ano?: string;
+  turma?: string;
+  origem?: string;
+  primeiro_nome?: string | null;
+  ultimo_nome?: string | null;
+  nascimento?: string | null;
+  genero?: string | null;
+  nacionalidade?: string | null;
+  bilhete?: string | null;
+  telemovel?: string | null;
+  provincia?: string | null;
+  municipio?: string | null;
+  endereco?: string | null;
+  enc_nome?: string | null;
+  enc_parentesco?: string | null;
+  enc_telefone?: string | null;
+};
+
+export function useCreateEstudante() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: EstudanteInput) => {
+      const uid = await currentUserId();
+      if (!uid) throw new Error("Sessão expirada.");
+      const { data, error } = await (supabase.from("estudantes" as any) as any)
+        .insert({
+          owner_user_id: uid,
+          ano: "1",
+          turma: "A",
+          origem: "novo",
+          ...input,
+        })
+        .select()
+        .single();
+      if (error) throw error;
+      return data as EstudanteRow;
+    },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: KEY_EST }); },
+  });
+}
+
+export function useBulkCreateEstudantes() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (inputs: EstudanteInput[]) => {
+      const uid = await currentUserId();
+      if (!uid) throw new Error("Sessão expirada.");
+      if (inputs.length === 0) return [];
+      const rows = inputs.map((i) => ({
+        owner_user_id: uid,
+        ano: "1",
+        turma: "A",
+        origem: "importado",
+        ...i,
+      }));
+      const { data, error } = await (supabase.from("estudantes" as any) as any)
+        .insert(rows)
+        .select();
+      if (error) throw error;
+      return (data ?? []) as EstudanteRow[];
+    },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: KEY_EST }); },
+  });
+}
+
+export function useDeleteEstudante() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await (supabase.from("estudantes" as any) as any)
+        .delete()
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: KEY_EST }); },
+  });
+}
