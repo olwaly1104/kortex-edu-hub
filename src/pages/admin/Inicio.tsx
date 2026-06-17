@@ -56,6 +56,16 @@ const GROUPS: Group[] = [
     ],
   },
   {
+    id: "geo",
+    area: "Geopontos",
+    title: "Registar Geopontos da Instituição",
+    subtitle: "Pontos geográficos usados para marcação de presenças",
+    icon: MapPin,
+    steps: [
+      { key: "geo.reg", title: "Geopontos institucionais", desc: "Definir campus, polos e edifícios com coordenadas GPS e raio de tolerância.", icon: MapPin, path: "/admin/onboarding/geopontos?step=geo.reg" },
+    ],
+  },
+  {
     id: "aca",
     area: "Académica",
     title: "Configurar Área Académica",
