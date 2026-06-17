@@ -203,7 +203,7 @@ export default function AdminFaculdadesCursos() {
                     ) : (
                       <>
                         {f.sigla && (
-                          <span className="inline-flex items-center justify-center h-6 px-2 rounded-md bg-primary text-primary-foreground text-[11px] font-bold tracking-wider shadow-sm">{f.sigla}</span>
+                          <span className="inline-flex items-center justify-center h-6 px-2 rounded-md bg-muted border border-border text-muted-foreground text-[11px] font-bold tracking-wider">{f.sigla}</span>
                         )}
                         <p className="text-base font-semibold truncate leading-none">{f.name}</p>
                       </>
