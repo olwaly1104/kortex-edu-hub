@@ -125,11 +125,31 @@ export default function AdminInicio() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const storedProgress = readProgress(user?.email);
-  // Auto-mark the institutional registration as complete once onboarding is done.
-  const progress = { ...storedProgress, "inst.reg": storedProgress["inst.reg"] || isOnboardingCompleteFor(user?.email) };
+  const [estudantesCount, setEstudantesCount] = useState<number>(0);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { count } = await supabase
+        .from("estudantes")
+        .select("id", { count: "exact", head: true });
+      if (!cancelled) setEstudantesCount(count ?? 0);
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  // Derive progress from reality, not just from localStorage clicks:
+  // - inst.reg: done iff institutional registration was completed.
+  // - est.imp: done iff there is at least one estudante in the DB.
+  const progress: Record<string, boolean> = {
+    ...storedProgress,
+    "inst.reg": storedProgress["inst.reg"] || isOnboardingCompleteFor(user?.email),
+    "est.imp": estudantesCount > 0,
+  };
   const doneCount = ALL_STEPS.filter((t) => progress[t.key]).length;
   const pct = Math.round((doneCount / ALL_STEPS.length) * 100);
   const [open, setOpen] = useState<string | null>(null);
+
 
   const reset = () => {
     if (!confirm("Repor onboarding? Todos os dados introduzidos serão perdidos.")) return;
