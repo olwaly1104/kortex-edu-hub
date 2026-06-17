@@ -184,9 +184,17 @@ export default function AdminFaculdadesCursos() {
                 </div>
                 <div className="min-w-0">
                   {isEditing ? (
-                    <Input value={facValue(f, "name")} onChange={(e) => setFacField(f.id, { name: e.target.value })} className="h-8 text-sm font-semibold mb-1" />
+                    <div className="flex items-center gap-2 mb-1">
+                      <Input value={facValue(f, "name")} onChange={(e) => setFacField(f.id, { name: e.target.value })} className="h-8 text-sm font-semibold" placeholder="Nome" />
+                      <Input value={facValue(f, "sigla") || ""} onChange={(e) => setFacField(f.id, { sigla: e.target.value.toUpperCase() })} className="h-8 text-sm font-semibold w-24" placeholder="Sigla" maxLength={8} />
+                    </div>
                   ) : (
-                    <p className="text-base font-semibold truncate">{f.name}</p>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className="text-base font-semibold truncate">{f.name}</p>
+                      {f.sigla && (
+                        <span className="inline-flex items-center justify-center h-5 px-1.5 rounded bg-primary/10 text-primary text-[10px] font-bold tracking-wider">{f.sigla}</span>
+                      )}
+                    </div>
                   )}
                   <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
                     <span className="flex items-center gap-1"><GraduationCap className="w-3 h-3" /> {facCursos.length} cursos</span>
@@ -212,11 +220,16 @@ export default function AdminFaculdadesCursos() {
                       <p className="text-xs font-semibold leading-tight">{f.decano || <span className="text-muted-foreground italic font-normal">Por atribuir</span>}</p>
                     )}
                   </div>
+                  <span className="w-px h-7 bg-border mx-1" />
+                  {!isEditing && (
+                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-muted text-muted-foreground text-[11px] font-semibold">
+                      <Lock className="w-3 h-3" /> Bloqueado
+                    </span>
+                  )}
+                  <Button size="sm" variant={isEditing ? "default" : "outline"} className="gap-1 h-7" onClick={() => toggleEdit(f)}>
+                    {isEditing ? <><Check className="w-3.5 h-3.5" /> Concluir</> : <><Pencil className="w-3.5 h-3.5" /> Editar</>}
+                  </Button>
                 </div>
-                {!isEditing && <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-muted text-muted-foreground text-[11px] font-semibold"><Lock className="w-3 h-3" /> Bloqueado</span>}
-                <Button size="sm" variant={isEditing ? "default" : "outline"} className="gap-1 h-8" onClick={() => toggleEdit(f)}>
-                  {isEditing ? <><Check className="w-3.5 h-3.5" /> Concluir</> : <><Pencil className="w-3.5 h-3.5" /> Editar</>}
-                </Button>
                 {isEditing && (
                   <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive hover:text-destructive" onClick={async () => {
                     if (!confirm(`Eliminar a faculdade "${f.name}" e todos os seus cursos?`)) return;
