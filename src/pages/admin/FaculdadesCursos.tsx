@@ -100,11 +100,12 @@ export default function AdminFaculdadesCursos() {
     if (isEditing) {
       // Save buffered changes
       const facPatch = edits[f.id];
-      if (facPatch && (facPatch.name !== undefined || facPatch.decano !== undefined)) {
+      if (facPatch && (facPatch.name !== undefined || facPatch.sigla !== undefined || facPatch.decano !== undefined)) {
         await updateFac.mutateAsync({
           id: f.id,
           patch: {
             ...(facPatch.name !== undefined ? { name: facPatch.name } : {}),
+            ...(facPatch.sigla !== undefined ? { sigla: facPatch.sigla } : {}),
             ...(facPatch.decano !== undefined ? { decano: facPatch.decano } : {}),
           },
         });
