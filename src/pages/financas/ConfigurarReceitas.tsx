@@ -292,7 +292,7 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
   const COLS = "minmax(220px,1.4fr) 140px 160px 150px 150px 170px 130px";
 
   return (
-    <>
+    <div className="space-y-6">
       <PrazosBlock prazos={prazosDef} setPrazos={setPrazosDef} />
 
       <Card className="overflow-hidden">
