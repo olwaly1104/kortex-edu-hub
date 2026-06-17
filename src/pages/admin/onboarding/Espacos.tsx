@@ -5,14 +5,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Building2, Plus, Trash2, DoorOpen, Briefcase, FlaskConical, Library, Users, Coffee } from "lucide-react";
+import { Building2, Plus, Trash2, DoorOpen, Briefcase, Wrench } from "lucide-react";
 import { toast } from "sonner";
 
-type Sala = {
+type Tipo = "Sala" | "Gabinete" | "Instalação";
+
+type Espaco = {
   id: string;
   edificioId: string;
   nome: string;
-  tipo: string;
+  tipo: Tipo;
   piso: string;
   capacidade: number;
   ocupante?: string;
@@ -26,26 +28,17 @@ type Edificio = {
   endereco?: string;
 };
 
-const tiposSala = [
-  { value: "Sala de Aula", icon: DoorOpen },
-  { value: "Gabinete", icon: Briefcase },
-  { value: "Laboratório", icon: FlaskConical },
-  { value: "Biblioteca", icon: Library },
-  { value: "Auditório", icon: Users },
-  { value: "Sala de Reuniões", icon: Users },
-  { value: "Espaço Comum", icon: Coffee },
+const TIPOS: { value: Tipo; icon: typeof DoorOpen; label: string }[] = [
+  { value: "Sala", icon: DoorOpen, label: "Salas" },
+  { value: "Gabinete", icon: Briefcase, label: "Gabinetes" },
+  { value: "Instalação", icon: Wrench, label: "Instalações" },
 ];
 
-const seedEdificios: Edificio[] = [];
-
-const seedSalas: Sala[] = [];
-
-
 export default function OnboardingEspacos() {
-  const [edificios, setEdificios] = useState<Edificio[]>(seedEdificios);
-  const [salas, setSalas] = useState<Sala[]>(seedSalas);
+  const [edificios, setEdificios] = useState<Edificio[]>([]);
+  const [espacos, setEspacos] = useState<Espaco[]>([]);
+  const [tab, setTab] = useState<"edificios" | Tipo>("edificios");
   const [filtroEdif, setFiltroEdif] = useState<string>("all");
-  const [filtroTipo, setFiltroTipo] = useState<string>("all");
 
   const addEdificio = () => {
     const n = edificios.length + 1;
@@ -54,29 +47,74 @@ export default function OnboardingEspacos() {
   const updateEdif = (id: string, patch: Partial<Edificio>) =>
     setEdificios(prev => prev.map(e => e.id === id ? { ...e, ...patch } : e));
   const removeEdif = (id: string) => {
-    if (salas.some(s => s.edificioId === id)) { toast.error("Remova primeiro as salas deste edifício"); return; }
+    if (espacos.some(s => s.edificioId === id)) { toast.error("Remova primeiro os espaços deste edifício"); return; }
     setEdificios(prev => prev.filter(e => e.id !== id));
   };
 
-  const addSala = () => {
+  const addEspaco = (tipo: Tipo) => {
     if (edificios.length === 0) { toast.error("Crie primeiro um edifício"); return; }
     const edif = filtroEdif !== "all" ? filtroEdif : edificios[0].id;
-    setSalas(prev => [...prev, { id: `s${Date.now()}`, edificioId: edif, nome: "", tipo: filtroTipo !== "all" ? filtroTipo : "Sala de Aula", piso: "0", capacidade: 30 }]);
+    setEspacos(prev => [...prev, { id: `s${Date.now()}`, edificioId: edif, nome: "", tipo, piso: "0", capacidade: tipo === "Gabinete" ? 4 : 30 }]);
   };
-  const updateSala = (id: string, patch: Partial<Sala>) =>
-    setSalas(prev => prev.map(s => s.id === id ? { ...s, ...patch } : s));
-  const removeSala = (id: string) => setSalas(prev => prev.filter(s => s.id !== id));
+  const updateEspaco = (id: string, patch: Partial<Espaco>) =>
+    setEspacos(prev => prev.map(s => s.id === id ? { ...s, ...patch } : s));
+  const removeEspaco = (id: string) => setEspacos(prev => prev.filter(s => s.id !== id));
 
-  const salasFiltradas = useMemo(() => salas.filter(s =>
-    (filtroEdif === "all" || s.edificioId === filtroEdif) &&
-    (filtroTipo === "all" || s.tipo === filtroTipo)
-  ), [salas, filtroEdif, filtroTipo]);
-
-  const totalsByTipo = useMemo(() => {
-    const m: Record<string, number> = {};
-    salas.forEach(s => { m[s.tipo] = (m[s.tipo] || 0) + 1; });
+  const countsByTipo = useMemo(() => {
+    const m: Record<string, number> = { Sala: 0, Gabinete: 0, "Instalação": 0 };
+    espacos.forEach(s => { m[s.tipo] = (m[s.tipo] || 0) + 1; });
     return m;
-  }, [salas]);
+  }, [espacos]);
+
+  const renderEspacosTable = (tipo: Tipo, placeholderNome: string) => {
+    const filtrados = espacos.filter(s => s.tipo === tipo && (filtroEdif === "all" || s.edificioId === filtroEdif));
+    return (
+      <div className="space-y-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <Select value={filtroEdif} onValueChange={setFiltroEdif}>
+            <SelectTrigger className="h-8 text-xs w-[220px]"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos os edifícios</SelectItem>
+              {edificios.map(e => <SelectItem key={e.id} value={e.id}>{e.nome}</SelectItem>)}
+            </SelectContent>
+          </Select>
+          <span className="text-[11px] text-muted-foreground ml-auto">{filtrados.length} {tipo === "Instalação" ? "instalações" : tipo === "Gabinete" ? "gabinetes" : "salas"}</span>
+        </div>
+        <Card className="overflow-hidden">
+          <div className="grid grid-cols-[1.2fr_1fr_80px_100px_1.6fr_64px] gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b">
+            <span>Edifício</span><span>Nome / Nº</span><span>Piso</span><span>Capacidade</span><span>{tipo === "Gabinete" ? "Ocupante" : "Notas"}</span><span></span>
+          </div>
+          <div className="divide-y">
+            {filtrados.map(s => (
+              <div key={s.id} className="grid grid-cols-[1.2fr_1fr_80px_100px_1.6fr_64px] gap-2 px-4 py-2 items-center">
+                <Select value={s.edificioId} onValueChange={v => updateEspaco(s.id, { edificioId: v })}>
+                  <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                  <SelectContent>{edificios.map(e => <SelectItem key={e.id} value={e.id}>{e.nome}</SelectItem>)}</SelectContent>
+                </Select>
+                <Input value={s.nome} onChange={ev => updateEspaco(s.id, { nome: ev.target.value })} className="h-8 text-xs" placeholder={placeholderNome} />
+                <Input value={s.piso} onChange={ev => updateEspaco(s.id, { piso: ev.target.value })} className="h-8 text-xs" />
+                <Input type="number" min={0} value={s.capacidade} onChange={ev => updateEspaco(s.id, { capacidade: Number(ev.target.value) })} className="h-8 text-xs" />
+                <Input value={s.ocupante || ""} onChange={ev => updateEspaco(s.id, { ocupante: ev.target.value })} className="h-8 text-xs" placeholder={tipo === "Gabinete" ? "Pessoa ocupante" : "—"} />
+                <div className="flex justify-end">
+                  <Button size="icon" variant="ghost" onClick={() => removeEspaco(s.id)} className="h-8 w-8 text-muted-foreground hover:text-destructive">
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </Button>
+                </div>
+              </div>
+            ))}
+            {filtrados.length === 0 && (
+              <p className="px-4 py-8 text-xs text-muted-foreground italic text-center">Sem registos.</p>
+            )}
+          </div>
+          <div className="border-t bg-muted/10 px-4 py-2.5">
+            <Button variant="ghost" size="sm" onClick={() => addEspaco(tipo)} className="h-8 gap-1.5 text-primary hover:text-primary hover:bg-primary/5">
+              <Plus className="w-3.5 h-3.5" /> Adicionar {tipo.toLowerCase()}
+            </Button>
+          </div>
+        </Card>
+      </div>
+    );
+  };
 
   return (
     <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6 animate-fade-in">
@@ -87,34 +125,39 @@ export default function OnboardingEspacos() {
           <Building2 className="w-5 h-5" />
         </div>
         <div>
-          <h1 className="text-lg font-semibold leading-tight">Edifícios e Salas</h1>
-          <p className="text-xs text-muted-foreground">Registe todos os espaços físicos: salas de aula, gabinetes, laboratórios, bibliotecas e auditórios.</p>
-        </div>
-        <div className="ml-auto flex gap-4 text-right">
-          <div><p className="text-xs text-muted-foreground">Edifícios</p><p className="text-lg font-semibold">{edificios.length}</p></div>
-          <div><p className="text-xs text-muted-foreground">Salas</p><p className="text-lg font-semibold">{salas.length}</p></div>
+          <h1 className="text-lg font-semibold leading-tight">Edifícios e Espaços</h1>
+          <p className="text-xs text-muted-foreground">Registe todos os espaços físicos: edifícios, salas, gabinetes e instalações.</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2">
-        {tiposSala.map(t => {
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+        <Card className="p-3 flex items-center gap-2">
+          <div className="w-8 h-8 rounded-md bg-muted text-foreground flex items-center justify-center"><Building2 className="w-4 h-4" /></div>
+          <div className="min-w-0">
+            <p className="text-[10px] uppercase tracking-wide text-muted-foreground truncate">Edifícios</p>
+            <p className="text-base font-semibold leading-none">{edificios.length}</p>
+          </div>
+        </Card>
+        {TIPOS.map(t => {
           const I = t.icon;
           return (
             <Card key={t.value} className="p-3 flex items-center gap-2">
               <div className="w-8 h-8 rounded-md bg-muted text-foreground flex items-center justify-center"><I className="w-4 h-4" /></div>
               <div className="min-w-0">
-                <p className="text-[10px] uppercase tracking-wide text-muted-foreground truncate">{t.value}</p>
-                <p className="text-base font-semibold leading-none">{totalsByTipo[t.value] || 0}</p>
+                <p className="text-[10px] uppercase tracking-wide text-muted-foreground truncate">{t.label}</p>
+                <p className="text-base font-semibold leading-none">{countsByTipo[t.value] || 0}</p>
               </div>
             </Card>
           );
         })}
       </div>
 
-      <Tabs defaultValue="salas" className="space-y-4">
-        <TabsList className="grid grid-cols-2 w-full max-w-md">
-          <TabsTrigger value="salas" className="gap-1.5"><DoorOpen className="w-3.5 h-3.5" /> Salas & Gabinetes</TabsTrigger>
+      <Tabs value={tab} onValueChange={(v) => setTab(v as any)} className="space-y-4">
+        <TabsList className="grid grid-cols-4 w-full max-w-2xl">
           <TabsTrigger value="edificios" className="gap-1.5"><Building2 className="w-3.5 h-3.5" /> Edifícios</TabsTrigger>
+          <TabsTrigger value="Sala" className="gap-1.5"><DoorOpen className="w-3.5 h-3.5" /> Salas</TabsTrigger>
+          <TabsTrigger value="Gabinete" className="gap-1.5"><Briefcase className="w-3.5 h-3.5" /> Gabinetes</TabsTrigger>
+          <TabsTrigger value="Instalação" className="gap-1.5"><Wrench className="w-3.5 h-3.5" /> Instalações</TabsTrigger>
         </TabsList>
 
         <TabsContent value="edificios" className="mt-0">
@@ -148,62 +191,9 @@ export default function OnboardingEspacos() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="salas" className="mt-0 space-y-3">
-          <div className="flex flex-wrap items-center gap-2">
-            <Select value={filtroEdif} onValueChange={setFiltroEdif}>
-              <SelectTrigger className="h-8 text-xs w-[200px]"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todos os edifícios</SelectItem>
-                {edificios.map(e => <SelectItem key={e.id} value={e.id}>{e.nome}</SelectItem>)}
-              </SelectContent>
-            </Select>
-            <Select value={filtroTipo} onValueChange={setFiltroTipo}>
-              <SelectTrigger className="h-8 text-xs w-[180px]"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todos os tipos</SelectItem>
-                {tiposSala.map(t => <SelectItem key={t.value} value={t.value}>{t.value}</SelectItem>)}
-              </SelectContent>
-            </Select>
-            <span className="text-[11px] text-muted-foreground ml-auto">{salasFiltradas.length} de {salas.length}</span>
-          </div>
-
-          <Card className="overflow-hidden">
-            <div className="grid grid-cols-[1.2fr_1fr_1.4fr_80px_100px_1.4fr_64px] gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b">
-              <span>Edifício</span><span>Nome / Nº</span><span>Tipo</span><span>Piso</span><span>Capacidade</span><span>Ocupante / Notas</span><span></span>
-            </div>
-            <div className="divide-y">
-              {salasFiltradas.map(s => (
-                <div key={s.id} className="grid grid-cols-[1.2fr_1fr_1.4fr_80px_100px_1.4fr_64px] gap-2 px-4 py-2 items-center">
-                  <Select value={s.edificioId} onValueChange={v => updateSala(s.id, { edificioId: v })}>
-                    <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                    <SelectContent>{edificios.map(e => <SelectItem key={e.id} value={e.id}>{e.nome}</SelectItem>)}</SelectContent>
-                  </Select>
-                  <Input value={s.nome} onChange={ev => updateSala(s.id, { nome: ev.target.value })} className="h-8 text-xs" placeholder="A.101" />
-                  <Select value={s.tipo} onValueChange={v => updateSala(s.id, { tipo: v })}>
-                    <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                    <SelectContent>{tiposSala.map(t => <SelectItem key={t.value} value={t.value}>{t.value}</SelectItem>)}</SelectContent>
-                  </Select>
-                  <Input value={s.piso} onChange={ev => updateSala(s.id, { piso: ev.target.value })} className="h-8 text-xs" />
-                  <Input type="number" min={0} value={s.capacidade} onChange={ev => updateSala(s.id, { capacidade: Number(ev.target.value) })} className="h-8 text-xs" />
-                  <Input value={s.ocupante || ""} onChange={ev => updateSala(s.id, { ocupante: ev.target.value })} className="h-8 text-xs" placeholder={s.tipo === "Gabinete" ? "Pessoa ocupante" : "—"} />
-                  <div className="flex justify-end">
-                    <Button size="icon" variant="ghost" onClick={() => removeSala(s.id)} className="h-8 w-8 text-muted-foreground hover:text-destructive">
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </Button>
-                  </div>
-                </div>
-              ))}
-              {salasFiltradas.length === 0 && (
-                <p className="px-4 py-8 text-xs text-muted-foreground italic text-center">Sem salas para os filtros selecionados.</p>
-              )}
-            </div>
-            <div className="border-t bg-muted/10 px-4 py-2.5">
-              <Button variant="ghost" size="sm" onClick={addSala} className="h-8 gap-1.5 text-primary hover:text-primary hover:bg-primary/5">
-                <Plus className="w-3.5 h-3.5" /> Adicionar sala / gabinete
-              </Button>
-            </div>
-          </Card>
-        </TabsContent>
+        <TabsContent value="Sala" className="mt-0">{renderEspacosTable("Sala", "A.101")}</TabsContent>
+        <TabsContent value="Gabinete" className="mt-0">{renderEspacosTable("Gabinete", "G.05")}</TabsContent>
+        <TabsContent value="Instalação" className="mt-0">{renderEspacosTable("Instalação", "Ginásio / Cantina…")}</TabsContent>
       </Tabs>
     </div>
   );
