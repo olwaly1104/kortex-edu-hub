@@ -379,7 +379,7 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
                             disabled={prazosDef.length === 0}
                             onChange={(e) => setPrazoByCurso((s) => ({ ...s, [c.id]: e.target.value }))}>
                             <option value="">{prazosDef.length === 0 ? "— Defina prazos acima —" : "— Selecionar —"}</option>
-                            {prazosDef.map((pr) => <option key={pr.id} value={pr.id}>{pr.nome} · {MESES[pr.mes - 1]}</option>)}
+                            {prazosDef.map((pr) => <option key={pr.id} value={pr.id}>{pr.nome} · {pr.meses} meses</option>)}
                           </select>
                           <div className="flex justify-end gap-1">
                             <Button size="sm" variant="ghost" className="h-8 px-2 text-xs"
