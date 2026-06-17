@@ -68,14 +68,47 @@ export default function AdminUtilizadores() {
 
   useEffect(() => { saveUsers(rows); }, [rows]);
 
-  // Always show the current admin at the top, merged with the locally tracked accounts.
+  // Live source of truth: every profile in this institution (returned by the
+  // list_institution_contacts RPC). This catches accounts created from any
+  // page — Utilizadores dialog, Estudantes onboarding, etc.
+  const [serverRows, setServerRows] = useState<StoredUser[]>([]);
+  const refetchServer = async () => {
+    const { data, error } = await supabase.rpc("list_institution_contacts");
+    if (error || !Array.isArray(data)) return;
+    setServerRows(
+      (data as any[]).map((r) => ({
+        id: r.id,
+        name: r.display_name || r.email,
+        email: r.email,
+        modulo: r.modulo || "estudante",
+        createdAt: 0,
+      })),
+    );
+  };
+  useEffect(() => { refetchServer(); }, [user?.id]);
+
+  // Merge: current admin (top) → server profiles → any local-only extras.
   const allUsers: StoredUser[] = useMemo(() => {
     const seed: StoredUser[] = user
       ? [{ id: "current-admin", name: user.name, email: user.email, modulo: "admin", createdAt: 0 }]
       : [];
-    const extras = rows.filter((r) => r.email.toLowerCase() !== (user?.email || "").toLowerCase());
-    return [...seed, ...extras];
-  }, [rows, user]);
+    const seen = new Set<string>([user?.email?.toLowerCase() || ""]);
+    const merged: StoredUser[] = [...seed];
+    for (const r of serverRows) {
+      const k = r.email.toLowerCase();
+      if (seen.has(k)) continue;
+      seen.add(k);
+      merged.push(r);
+    }
+    for (const r of rows) {
+      const k = r.email.toLowerCase();
+      if (seen.has(k)) continue;
+      seen.add(k);
+      merged.push(r);
+    }
+    return merged;
+  }, [rows, serverRows, user]);
+
 
   const filtered = useMemo(() => allUsers.filter((u) =>
     [u.name, u.email, moduloLabel(u.modulo)].some((v) => v.toLowerCase().includes(q.toLowerCase()))
