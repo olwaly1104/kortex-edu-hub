@@ -153,7 +153,7 @@ export default function AdminOnboarding() {
       <header className="bg-card border-b border-border sticky top-0 z-10">
         <div className="max-w-3xl mx-auto px-6 h-14 flex items-center justify-between gap-4">
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-7 h-7 rounded-md bg-emerald-600 text-white flex items-center justify-center shrink-0 font-black text-[13px] tracking-tight">K</div>
+            <div className="w-7 h-7 rounded-md bg-purple-900 text-white flex items-center justify-center shrink-0 font-black text-[13px] tracking-tight">K</div>
             <div className="text-[14px] font-bold text-foreground tracking-tight">Kortex</div>
             <span className="hidden md:inline-block w-px h-4 bg-border mx-1" />
             <span className="hidden md:inline text-[11px] uppercase tracking-[0.14em] text-muted-foreground font-medium">Admin Instituição · Configuração inicial</span>
