@@ -9,7 +9,7 @@ import { OnboardingStepBanner } from "@/components/admin/OnboardingStepBanner";
 import {
   ArrowLeft, Banknote, Building2, GraduationCap, Loader2, Save, AlertCircle,
   Receipt, Wallet, Plus, Trash2, TrendingUp, TrendingDown, CreditCard,
-  Users, BookOpenCheck, Settings2,
+  Users, Briefcase, BookOpenCheck, Settings2,
 } from "lucide-react";
 import { useFaculdades, useCursos, usePropinas, useUpdatePropina } from "@/lib/useInstitution";
 import { useAuth } from "@/contexts/AuthContext";
