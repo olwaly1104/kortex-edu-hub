@@ -188,7 +188,7 @@ export default function AdminUtilizadores() {
     <div className="p-6 space-y-6 max-w-6xl mx-auto">
       <FinHeader
         title="Utilizadores"
-        subtitle="Todas as contas de acesso ao Kortex da instituição"
+        subtitle="Todas as contas de acesso ao portal da instituição"
         icon={<Users className="w-5 h-5 text-primary" />}
         right={
           <Button size="sm" onClick={() => setOpen(true)} className="gap-1.5">
