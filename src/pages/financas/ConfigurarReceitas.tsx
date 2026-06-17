@@ -247,25 +247,171 @@ function PropinasBlock({ onAddCursos }: { onAddCursos: () => void }) {
 
 /* ═══════════════════════════════ DESPESAS ═════════════════════════════════ */
 
+type DesCategoria = { id: string; nome: string; documento: string; orcamento: number };
+type DesEstado = { id: string; nome: string; cor: string };
+type DesResp = { id: string; pessoa: string; categoria: string; limite: number };
+
 function DespesasSection({ email }: { email?: string | null }) {
+  const catKey = KEY("des.categorias", email);
+  const estKey = KEY("des.estados", email);
+  const respKey = KEY("des.responsaveis", email);
+
+  const [categorias, setCategorias] = useState<DesCategoria[]>(() => readJSON<DesCategoria[]>(catKey, []));
+  const [estados, setEstados] = useState<DesEstado[]>(() => readJSON<DesEstado[]>(estKey, [
+    { id: "e1", nome: "Pendente", cor: "bg-amber-100 text-amber-700 border-amber-200" },
+    { id: "e2", nome: "Aprovada", cor: "bg-emerald-100 text-emerald-700 border-emerald-200" },
+    { id: "e3", nome: "Rejeitada", cor: "bg-red-100 text-red-700 border-red-200" },
+    { id: "e4", nome: "Paga", cor: "bg-blue-100 text-blue-700 border-blue-200" },
+  ]));
+  const [responsaveis, setResponsaveis] = useState<DesResp[]>(() => readJSON<DesResp[]>(respKey, []));
+
+  useEffect(() => writeJSON(catKey, categorias), [categorias, catKey]);
+  useEffect(() => writeJSON(estKey, estados), [estados, estKey]);
+  useEffect(() => writeJSON(respKey, responsaveis), [responsaveis, respKey]);
+
+  const COR_OPCOES = [
+    { label: "Âmbar", value: "bg-amber-100 text-amber-700 border-amber-200" },
+    { label: "Verde", value: "bg-emerald-100 text-emerald-700 border-emerald-200" },
+    { label: "Vermelho", value: "bg-red-100 text-red-700 border-red-200" },
+    { label: "Azul", value: "bg-blue-100 text-blue-700 border-blue-200" },
+    { label: "Cinza", value: "bg-slate-100 text-slate-700 border-slate-200" },
+    { label: "Violeta", value: "bg-violet-100 text-violet-700 border-violet-200" },
+  ];
+
   return (
     <div className="space-y-6">
-      <LineItemsBlock
-        title="Categorias de despesa"
-        subtitle="Rubricas usadas para classificar todas as despesas registadas em Finanças → Despesas."
-        icon={TrendingDown}
-        storageKey={KEY("despesas", email)}
-        addLabel="Adicionar categoria"
-        placeholder="Ex: Infraestrutura, Material didáctico, Serviços e utilities…"
-        valueLabel="Orçamento mensal (Kz)"
-      />
+      {/* Categorias */}
+      <Card className="overflow-hidden">
+        <div className="px-5 py-3 border-b bg-muted/30 flex items-center gap-2">
+          <TrendingDown className="w-4 h-4 text-primary" />
+          <div className="min-w-0">
+            <h2 className="text-sm font-bold text-foreground">Categorias de despesa</h2>
+            <p className="text-[11px] text-muted-foreground">Rubricas usadas em Finanças → Despesas, com documento exigido e orçamento mensal.</p>
+          </div>
+          <span className="text-[11px] text-muted-foreground ml-auto tabular-nums shrink-0">{categorias.length} categoria{categorias.length === 1 ? "" : "s"}</span>
+        </div>
+        <div className="divide-y">
+          <div className="grid grid-cols-[1fr_1fr_160px_40px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
+            <div>Designação</div>
+            <div>Documento exigido</div>
+            <div>Orçamento mensal (Kz)</div>
+            <div className="text-right">Ação</div>
+          </div>
+          {categorias.length === 0 ? (
+            <div className="px-5 py-10 text-center text-xs text-muted-foreground">Sem categorias configuradas.</div>
+          ) : categorias.map((c) => (
+            <div key={c.id} className="grid grid-cols-[1fr_1fr_160px_40px] gap-3 px-5 py-2.5 items-center text-sm">
+              <Input className="h-9" placeholder="Ex: Infraestrutura" value={c.nome}
+                onChange={(e) => setCategorias((s) => s.map((x) => x.id === c.id ? { ...x, nome: e.target.value } : x))} />
+              <Input className="h-9" placeholder="Ex: Fatura, Recibo, Contrato" value={c.documento}
+                onChange={(e) => setCategorias((s) => s.map((x) => x.id === c.id ? { ...x, documento: e.target.value } : x))} />
+              <Input type="number" min={0} className="h-9 tabular-nums" value={c.orcamento}
+                onChange={(e) => setCategorias((s) => s.map((x) => x.id === c.id ? { ...x, orcamento: Number(e.target.value) || 0 } : x))} />
+              <div className="flex justify-end">
+                <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                  onClick={() => setCategorias((s) => s.filter((x) => x.id !== c.id))}><Trash2 className="w-3.5 h-3.5" /></Button>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="px-5 py-3 border-t bg-muted/10">
+          <Button size="sm" variant="outline" className="gap-1.5"
+            onClick={() => setCategorias((s) => [...s, { id: newId(), nome: "", documento: "", orcamento: 0 }])}>
+            <Plus className="w-3.5 h-3.5" /> Adicionar categoria
+          </Button>
+        </div>
+      </Card>
+
+      {/* Estados */}
+      <Card className="overflow-hidden">
+        <div className="px-5 py-3 border-b bg-muted/30 flex items-center gap-2">
+          <AlertCircle className="w-4 h-4 text-primary" />
+          <div className="min-w-0">
+            <h2 className="text-sm font-bold text-foreground">Estados de despesa</h2>
+            <p className="text-[11px] text-muted-foreground">Fases do ciclo de vida de uma despesa (ex: Pendente, Aprovada, Rejeitada, Paga).</p>
+          </div>
+          <span className="text-[11px] text-muted-foreground ml-auto tabular-nums shrink-0">{estados.length} estado{estados.length === 1 ? "" : "s"}</span>
+        </div>
+        <div className="divide-y">
+          <div className="grid grid-cols-[1fr_180px_120px_40px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
+            <div>Designação</div>
+            <div>Cor</div>
+            <div>Pré-visualização</div>
+            <div className="text-right">Ação</div>
+          </div>
+          {estados.map((es) => (
+            <div key={es.id} className="grid grid-cols-[1fr_180px_120px_40px] gap-3 px-5 py-2.5 items-center text-sm">
+              <Input className="h-9" placeholder="Ex: Aprovada" value={es.nome}
+                onChange={(e) => setEstados((s) => s.map((x) => x.id === es.id ? { ...x, nome: e.target.value } : x))} />
+              <select className="h-9 rounded-md border border-input bg-background px-2 text-sm" value={es.cor}
+                onChange={(e) => setEstados((s) => s.map((x) => x.id === es.id ? { ...x, cor: e.target.value } : x))}>
+                {COR_OPCOES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
+              </select>
+              <span className={`inline-flex items-center justify-center px-2.5 py-1 rounded-md border text-xs font-medium ${es.cor}`}>{es.nome || "—"}</span>
+              <div className="flex justify-end">
+                <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                  onClick={() => setEstados((s) => s.filter((x) => x.id !== es.id))}><Trash2 className="w-3.5 h-3.5" /></Button>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="px-5 py-3 border-t bg-muted/10">
+          <Button size="sm" variant="outline" className="gap-1.5"
+            onClick={() => setEstados((s) => [...s, { id: newId(), nome: "", cor: COR_OPCOES[0].value }])}>
+            <Plus className="w-3.5 h-3.5" /> Adicionar estado
+          </Button>
+        </div>
+      </Card>
+
+      {/* Responsáveis */}
+      <Card className="overflow-hidden">
+        <div className="px-5 py-3 border-b bg-muted/30 flex items-center gap-2">
+          <Users className="w-4 h-4 text-primary" />
+          <div className="min-w-0">
+            <h2 className="text-sm font-bold text-foreground">Responsáveis por aprovação</h2>
+            <p className="text-[11px] text-muted-foreground">Quem aprova despesas por categoria e até que limite (Kz). Acima do limite, escala automaticamente.</p>
+          </div>
+          <span className="text-[11px] text-muted-foreground ml-auto tabular-nums shrink-0">{responsaveis.length} responsáve{responsaveis.length === 1 ? "l" : "is"}</span>
+        </div>
+        <div className="divide-y">
+          <div className="grid grid-cols-[1fr_1fr_160px_40px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
+            <div>Pessoa / Cargo</div>
+            <div>Categoria</div>
+            <div>Limite aprovação (Kz)</div>
+            <div className="text-right">Ação</div>
+          </div>
+          {responsaveis.length === 0 ? (
+            <div className="px-5 py-10 text-center text-xs text-muted-foreground">Sem responsáveis configurados.</div>
+          ) : responsaveis.map((r) => (
+            <div key={r.id} className="grid grid-cols-[1fr_1fr_160px_40px] gap-3 px-5 py-2.5 items-center text-sm">
+              <Input className="h-9" placeholder="Ex: Director Financeiro" value={r.pessoa}
+                onChange={(e) => setResponsaveis((s) => s.map((x) => x.id === r.id ? { ...x, pessoa: e.target.value } : x))} />
+              <select className="h-9 rounded-md border border-input bg-background px-2 text-sm" value={r.categoria}
+                onChange={(e) => setResponsaveis((s) => s.map((x) => x.id === r.id ? { ...x, categoria: e.target.value } : x))}>
+                <option value="">— Qualquer categoria —</option>
+                {categorias.filter((c) => c.nome).map((c) => <option key={c.id} value={c.nome}>{c.nome}</option>)}
+              </select>
+              <Input type="number" min={0} className="h-9 tabular-nums" value={r.limite}
+                onChange={(e) => setResponsaveis((s) => s.map((x) => x.id === r.id ? { ...x, limite: Number(e.target.value) || 0 } : x))} />
+              <div className="flex justify-end">
+                <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                  onClick={() => setResponsaveis((s) => s.filter((x) => x.id !== r.id))}><Trash2 className="w-3.5 h-3.5" /></Button>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="px-5 py-3 border-t bg-muted/10">
+          <Button size="sm" variant="outline" className="gap-1.5"
+            onClick={() => setResponsaveis((s) => [...s, { id: newId(), pessoa: "", categoria: "", limite: 0 }])}>
+            <Plus className="w-3.5 h-3.5" /> Adicionar responsável
+          </Button>
+        </div>
+      </Card>
     </div>
   );
 }
 
 /* ═══════════════════════════════ SALÁRIOS ═════════════════════════════════ */
-
-type SalLine = { id: string; nome: string; tipo: "Docente" | "Staff"; bruto: number; impostos: number };
 
 function SalariosSection({ email }: { email?: string | null }) {
   const storageKey = KEY("salarios", email);
@@ -284,93 +430,136 @@ function SalariosSection({ email }: { email?: string | null }) {
 
   useEffect(() => writeJSON(storageKey, rows), [rows, storageKey]);
 
-  const all: SalLine[] = [
-    ...docentes.map((d) => ({ id: d.id, nome: d.nome, tipo: "Docente" as const, bruto: rows[d.id]?.bruto ?? 0, impostos: rows[d.id]?.impostos ?? 0 })),
-    ...staff.map((s) => ({ id: s.id, nome: s.nome, tipo: "Staff" as const, bruto: rows[s.id]?.bruto ?? 0, impostos: rows[s.id]?.impostos ?? 0 })),
-  ];
-
   const update = (id: string, patch: Partial<{ bruto: number; impostos: number }>) =>
     setRows((s) => ({ ...s, [id]: { bruto: 0, impostos: 0, ...s[id], ...patch } }));
 
-  return (
-    <div className="space-y-6">
+  const renderTable = (
+    title: string,
+    subtitle: string,
+    icon: React.ComponentType<{ className?: string }>,
+    people: { id: string; nome: string }[],
+    emptyHint: string,
+  ) => {
+    const Icon = icon;
+    return (
       <Card className="overflow-hidden">
         <div className="px-5 py-3 border-b bg-muted/30 flex items-center gap-2">
-          <CreditCard className="w-4 h-4 text-primary" />
+          <Icon className="w-4 h-4 text-primary" />
           <div className="min-w-0">
-            <h2 className="text-sm font-bold text-foreground">Salários — Docentes & Staff</h2>
-            <p className="text-[11px] text-muted-foreground">
-              Lista alimentada pelo módulo RH. Finanças define apenas salário bruto, impostos e o líquido é calculado.
-            </p>
+            <h2 className="text-sm font-bold text-foreground">{title}</h2>
+            <p className="text-[11px] text-muted-foreground">{subtitle}</p>
           </div>
-          <span className="text-[11px] text-muted-foreground ml-auto tabular-nums shrink-0">
-            {all.length} pessoa{all.length === 1 ? "" : "s"}
-          </span>
+          <span className="text-[11px] text-muted-foreground ml-auto tabular-nums shrink-0">{people.length} pessoa{people.length === 1 ? "" : "s"}</span>
         </div>
-
         <div className="divide-y">
-          <div className="grid grid-cols-[1fr_110px_150px_150px_150px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
+          <div className="grid grid-cols-[1fr_150px_150px_150px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
             <div>Nome</div>
-            <div>Tipo</div>
             <div>Salário bruto (Kz)</div>
             <div>Impostos (Kz)</div>
             <div>Salário líquido (Kz)</div>
           </div>
-
-          {all.length === 0 ? (
-            <div className="px-5 py-10 text-center text-xs text-muted-foreground">
-              Sem docentes ou staff registados em RH. Adicione pessoas em <span className="font-medium text-foreground">RH → Docentes / Staff</span> para configurar salários aqui.
-            </div>
-          ) : all.map((r) => {
-            const liquido = Math.max(0, (r.bruto || 0) - (r.impostos || 0));
+          {people.length === 0 ? (
+            <div className="px-5 py-10 text-center text-xs text-muted-foreground">{emptyHint}</div>
+          ) : people.map((p) => {
+            const bruto = rows[p.id]?.bruto ?? 0;
+            const impostos = rows[p.id]?.impostos ?? 0;
+            const liquido = Math.max(0, bruto - impostos);
             return (
-              <div key={`${r.tipo}-${r.id}`} className="grid grid-cols-[1fr_110px_150px_150px_150px] gap-3 px-5 py-2.5 items-center text-sm">
-                <div className="truncate font-medium">{r.nome}</div>
-                <div className="text-xs text-muted-foreground">{r.tipo}</div>
-                <Input type="number" min={0} className="h-9 tabular-nums" value={r.bruto}
-                  onChange={(e) => update(r.id, { bruto: Number(e.target.value) || 0 })} />
-                <Input type="number" min={0} className="h-9 tabular-nums" value={r.impostos}
-                  onChange={(e) => update(r.id, { impostos: Number(e.target.value) || 0 })} />
-                <div className="h-9 flex items-center px-2 rounded-md bg-muted/30 tabular-nums font-medium">
-                  {fmt(liquido)}
-                </div>
+              <div key={p.id} className="grid grid-cols-[1fr_150px_150px_150px] gap-3 px-5 py-2.5 items-center text-sm">
+                <div className="truncate font-medium">{p.nome}</div>
+                <Input type="number" min={0} className="h-9 tabular-nums" value={bruto}
+                  onChange={(e) => update(p.id, { bruto: Number(e.target.value) || 0 })} />
+                <Input type="number" min={0} className="h-9 tabular-nums" value={impostos}
+                  onChange={(e) => update(p.id, { impostos: Number(e.target.value) || 0 })} />
+                <div className="h-9 flex items-center px-2 rounded-md bg-muted/30 tabular-nums font-medium">{fmt(liquido)}</div>
               </div>
             );
           })}
         </div>
       </Card>
+    );
+  };
+
+  return (
+    <div className="space-y-6">
+      {renderTable("Salários — Docentes", "Lista alimentada por RH → Docentes. Finanças define apenas bruto e impostos.", GraduationCap, docentes,
+        "Sem docentes registados em RH. Adicione em RH → Docentes para configurar salários aqui.")}
+      {renderTable("Salários — Staff", "Lista alimentada por RH → Staff. Finanças define apenas bruto e impostos.", Briefcase, staff,
+        "Sem staff registado em RH. Adicione em RH → Staff para configurar salários aqui.")}
     </div>
   );
 }
 
 /* ═══════════════════════════════ MULTAS ═══════════════════════════════════ */
 
-function MultasSection({ email }: { email?: string | null }) {
+type RhMulta = { id: string; nome: string; valor: number; descricao: string; aplicaA: "Docente" | "Staff" | "Ambos" };
+
+function MultasSection({ email: _email }: { email?: string | null }) {
+  const [multas, setMultas] = useState<RhMulta[]>([]);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("upra.rh.multas.v1");
+      setMultas(raw ? (JSON.parse(raw) as RhMulta[]) : []);
+    } catch { setMultas([]); }
+  }, []);
+
+  const docentes = multas.filter((m) => m.aplicaA === "Docente" || m.aplicaA === "Ambos");
+  const staff = multas.filter((m) => m.aplicaA === "Staff" || m.aplicaA === "Ambos");
+
+  const renderTable = (
+    title: string,
+    icon: React.ComponentType<{ className?: string }>,
+    list: RhMulta[],
+  ) => {
+    const Icon = icon;
+    return (
+      <Card className="overflow-hidden">
+        <div className="px-5 py-3 border-b bg-muted/30 flex items-center gap-2">
+          <Icon className="w-4 h-4 text-primary" />
+          <div className="min-w-0">
+            <h2 className="text-sm font-bold text-foreground">{title}</h2>
+            <p className="text-[11px] text-muted-foreground">Tabela de multas configurada em RH. Finanças visualiza em modo só-leitura.</p>
+          </div>
+          <span className="text-[11px] text-muted-foreground ml-auto tabular-nums shrink-0">{list.length} multa{list.length === 1 ? "" : "s"}</span>
+        </div>
+        <div className="divide-y">
+          <div className="grid grid-cols-[1fr_140px_140px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
+            <div>Designação</div>
+            <div>Aplica-se a</div>
+            <div className="text-right">Valor (Kz)</div>
+          </div>
+          {list.length === 0 ? (
+            <div className="px-5 py-10 text-center text-xs text-muted-foreground">
+              Sem multas configuradas em RH. Configure em <span className="font-medium text-foreground">RH → Regras de Presença → Tabela de multas</span>.
+            </div>
+          ) : list.map((m) => (
+            <div key={m.id} className="grid grid-cols-[1fr_140px_140px] gap-3 px-5 py-2.5 items-center text-sm">
+              <div className="min-w-0">
+                <p className="font-medium truncate">{m.nome}</p>
+                {m.descricao && <p className="text-[11px] text-muted-foreground truncate">{m.descricao}</p>}
+              </div>
+              <span className="text-xs text-muted-foreground">{m.aplicaA}</span>
+              <div className="text-right tabular-nums font-medium">{fmt(m.valor)}</div>
+            </div>
+          ))}
+        </div>
+      </Card>
+    );
+  };
+
   return (
     <div className="space-y-6">
-      <LineItemsBlock
-        title="Multas a estudantes"
-        subtitle="Atrasos de pagamento, faltas a exames, devoluções tardias na biblioteca, etc."
-        icon={Users}
-        storageKey={KEY("mul.estudante", email)}
-        withUnit
-        addLabel="Adicionar multa de estudante"
-        placeholder="Ex: Atraso no pagamento de propina"
-        valueLabel="Valor"
-      />
-      <LineItemsBlock
-        title="Multas a docentes & staff"
-        subtitle="Atrasos no lançamento de notas, faltas não justificadas, etc."
-        icon={BookOpenCheck}
-        storageKey={KEY("mul.docente", email)}
-        withUnit
-        addLabel="Adicionar multa de docente/staff"
-        placeholder="Ex: Atraso no lançamento de notas"
-        valueLabel="Valor"
-      />
+      <div className="rounded-md border border-amber-200 bg-amber-50 px-4 py-2.5 text-xs text-amber-800 flex items-center gap-2">
+        <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+        Tabelas geridas pelo módulo RH. Finanças tem apenas visualização — para editar, vá a Configurar RH → Regras de Presença.
+      </div>
+      {renderTable("Multas a docentes", GraduationCap, docentes)}
+      {renderTable("Multas a staff", Briefcase, staff)}
     </div>
   );
 }
+
 
 /* ═══════════════════════════════ Generic block ════════════════════════════ */
 
