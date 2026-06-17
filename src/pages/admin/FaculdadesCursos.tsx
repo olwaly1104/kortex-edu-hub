@@ -413,6 +413,27 @@ export default function AdminFaculdadesCursos() {
                 </Select>
               )}
             </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs flex items-center gap-1.5"><Palette className="w-3 h-3" /> Cor da Faculdade</Label>
+              <div className="flex items-center gap-2 flex-wrap">
+                {FAC_COLORS.map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => setNewFac({ ...newFac, color: c })}
+                    className={`w-7 h-7 rounded-md border-2 transition-all ${newFac.color === c ? "border-foreground scale-110" : "border-transparent hover:scale-105"}`}
+                    style={{ backgroundColor: c }}
+                    aria-label={c}
+                  />
+                ))}
+                <span
+                  className="ml-2 inline-flex items-center justify-center h-6 px-2 rounded-md text-[11px] font-bold tracking-wider shadow-sm"
+                  style={{ backgroundColor: newFac.color, color: "#fff" }}
+                >
+                  {newFac.sigla || "SIGLA"}
+                </span>
+              </div>
+
           </div>
           <DialogFooter>
             <DialogClose asChild><Button variant="outline" size="sm">Cancelar</Button></DialogClose>
