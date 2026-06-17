@@ -224,9 +224,14 @@ export default function FinancasCalendario() {
         subtitle="Eventos financeiros e reuniões"
         icon={<CalendarIcon className="w-5 h-5 text-primary" />}
         right={
-          <Button size="sm" className="gap-2 h-8">
-            <Plus className="w-3.5 h-3.5" /> Criar Evento
-          </Button>
+          <CriarEventoDialog
+            defaultDate={selectedDate}
+            trigger={
+              <Button size="sm" className="gap-2 h-8">
+                <Plus className="w-3.5 h-3.5" /> Criar Evento
+              </Button>
+            }
+          />
         }
       />
 
