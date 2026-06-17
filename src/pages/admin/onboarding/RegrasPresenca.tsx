@@ -6,29 +6,32 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { Clock, Percent, AlertTriangle, FileCheck2, Plus, Trash2 } from "lucide-react";
+import { Clock, Percent, AlertTriangle, Scale, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+
+type Multa = { id: string; nome: string; valor: number; descricao: string };
 
 export default function OnboardingRegrasPresenca() {
   const [docMin, setDocMin] = useState(85);
-  const [stuMin, setStuMin] = useState(80);
+  const [staffMin, setStaffMin] = useState(85);
   const [tolerancia, setTolerancia] = useState(10);
   const [autoFalta, setAutoFalta] = useState(true);
-  const [permitirJust, setPermitirJust] = useState(true);
-  const [janelaJust, setJanelaJust] = useState(72);
+  const [permitirDisputa, setPermitirDisputa] = useState(true);
+  const [janelaDisputa, setJanelaDisputa] = useState(72);
 
-  const [tipos, setTipos] = useState<{ id: string; nome: string; documento: boolean }[]>([
-    { id: "1", nome: "Doença",            documento: true },
-    { id: "2", nome: "Luto familiar",     documento: true },
-    { id: "3", nome: "Convocação oficial", documento: true },
-    { id: "4", nome: "Outra",             documento: false },
+  const [multas, setMultas] = useState<Multa[]>([
+    { id: "1", nome: "Atraso superior a 15min", valor: 3000, descricao: "Atraso recorrente em aulas ou expediente" },
+    { id: "2", nome: "Falta injustificada", valor: 6000, descricao: "Ausência sem justificação aceite" },
+    { id: "3", nome: "Atraso na entrega de relatório", valor: 4000, descricao: "Relatório entregue após o prazo" },
+    { id: "4", nome: "Incumprimento de SLA", valor: 5000, descricao: "Tratamento de solicitação fora do prazo" },
   ]);
-  const [novoTipo, setNovoTipo] = useState("");
+  const [novoNome, setNovoNome] = useState("");
+  const [novoValor, setNovoValor] = useState<number>(0);
 
-  const addTipo = () => {
-    if (!novoTipo.trim()) return;
-    setTipos(prev => [...prev, { id: String(Date.now()), nome: novoTipo.trim(), documento: true }]);
-    setNovoTipo("");
+  const addMulta = () => {
+    if (!novoNome.trim()) return;
+    setMultas(prev => [...prev, { id: String(Date.now()), nome: novoNome.trim(), valor: novoValor, descricao: "" }]);
+    setNovoNome(""); setNovoValor(0);
   };
 
   return (
@@ -41,7 +44,7 @@ export default function OnboardingRegrasPresenca() {
             <div className="w-9 h-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center"><Percent className="w-4 h-4" /></div>
             <div>
               <h2 className="text-sm font-semibold">Limites mínimos de presença</h2>
-              <p className="text-xs text-muted-foreground">Abaixo destes valores o sistema marca em risco.</p>
+              <p className="text-xs text-muted-foreground">Aplicável a docentes e staff. Abaixo destes valores o sistema marca em risco.</p>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
@@ -50,8 +53,8 @@ export default function OnboardingRegrasPresenca() {
               <Input type="number" min={0} max={100} value={docMin} onChange={e => setDocMin(Number(e.target.value))} className="h-9" />
             </div>
             <div className="space-y-1">
-              <Label className="text-xs">Estudantes (%)</Label>
-              <Input type="number" min={0} max={100} value={stuMin} onChange={e => setStuMin(Number(e.target.value))} className="h-9" />
+              <Label className="text-xs">Staff (%)</Label>
+              <Input type="number" min={0} max={100} value={staffMin} onChange={e => setStaffMin(Number(e.target.value))} className="h-9" />
             </div>
           </div>
         </Card>
@@ -72,7 +75,7 @@ export default function OnboardingRegrasPresenca() {
             <div className="flex items-center justify-between rounded-md border p-3">
               <div>
                 <p className="text-sm font-medium">Marcar falta automaticamente</p>
-                <p className="text-xs text-muted-foreground">Após o fim da aula, presenças não registadas viram falta.</p>
+                <p className="text-xs text-muted-foreground">Após o fim do expediente, presenças não registadas viram falta.</p>
               </div>
               <Switch checked={autoFalta} onCheckedChange={setAutoFalta} />
             </div>
@@ -81,23 +84,23 @@ export default function OnboardingRegrasPresenca() {
 
         <Card className="p-5 space-y-4">
           <div className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center"><FileCheck2 className="w-4 h-4" /></div>
+            <div className="w-9 h-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center"><Scale className="w-4 h-4" /></div>
             <div>
-              <h2 className="text-sm font-semibold">Justificação de faltas</h2>
-              <p className="text-xs text-muted-foreground">Como o estudante/docente justifica.</p>
+              <h2 className="text-sm font-semibold">Disputar multas</h2>
+              <p className="text-xs text-muted-foreground">Como docentes e staff contestam multas aplicadas.</p>
             </div>
           </div>
           <div className="space-y-3">
             <div className="flex items-center justify-between rounded-md border p-3">
               <div>
-                <p className="text-sm font-medium">Permitir justificação</p>
-                <p className="text-xs text-muted-foreground">Activa o fluxo de submissão de justificações.</p>
+                <p className="text-sm font-medium">Permitir disputa</p>
+                <p className="text-xs text-muted-foreground">Activa o fluxo de contestação de multas.</p>
               </div>
-              <Switch checked={permitirJust} onCheckedChange={setPermitirJust} />
+              <Switch checked={permitirDisputa} onCheckedChange={setPermitirDisputa} />
             </div>
             <div className="space-y-1">
-              <Label className="text-xs">Janela para submeter (horas após a falta)</Label>
-              <Input type="number" min={0} max={336} value={janelaJust} onChange={e => setJanelaJust(Number(e.target.value))} className="h-9" disabled={!permitirJust} />
+              <Label className="text-xs">Janela para disputar (horas após aplicação)</Label>
+              <Input type="number" min={0} max={336} value={janelaDisputa} onChange={e => setJanelaDisputa(Number(e.target.value))} className="h-9" disabled={!permitirDisputa} />
             </div>
           </div>
         </Card>
@@ -106,32 +109,33 @@ export default function OnboardingRegrasPresenca() {
           <div className="flex items-center gap-2">
             <div className="w-9 h-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center"><AlertTriangle className="w-4 h-4" /></div>
             <div>
-              <h2 className="text-sm font-semibold">Tipos de falta justificada</h2>
-              <p className="text-xs text-muted-foreground">Categorias aceites no fluxo de justificação.</p>
+              <h2 className="text-sm font-semibold">Tabela de multas</h2>
+              <p className="text-xs text-muted-foreground">Infrações aplicáveis a docentes e staff.</p>
             </div>
           </div>
           <div className="space-y-1.5">
-            {tipos.map(t => (
-              <div key={t.id} className="flex items-center justify-between gap-2 px-3 py-2 rounded-md border bg-card">
+            {multas.map(m => (
+              <div key={m.id} className="flex items-center justify-between gap-2 px-3 py-2 rounded-md border bg-card">
                 <div className="flex items-center gap-2 min-w-0">
-                  <span className="text-sm font-medium truncate">{t.nome}</span>
-                  {t.documento && <Badge variant="outline" className="text-[10px]">Documento</Badge>}
+                  <span className="text-sm font-medium truncate">{m.nome}</span>
+                  <Badge variant="outline" className="text-[10px] tabular-nums">{m.valor.toLocaleString("pt-PT")} Kz</Badge>
                 </div>
-                <Button size="icon" variant="ghost" onClick={() => setTipos(prev => prev.filter(x => x.id !== t.id))} className="h-7 w-7 text-muted-foreground hover:text-destructive">
+                <Button size="icon" variant="ghost" onClick={() => setMultas(prev => prev.filter(x => x.id !== m.id))} className="h-7 w-7 text-muted-foreground hover:text-destructive">
                   <Trash2 className="w-3.5 h-3.5" />
                 </Button>
               </div>
             ))}
-            <div className="flex items-center gap-2 pt-1">
-              <Input placeholder="Novo tipo (ex: Estágio)" value={novoTipo} onChange={e => setNovoTipo(e.target.value)} className="h-9" />
-              <Button onClick={addTipo} className="h-9 gap-1"><Plus className="w-3.5 h-3.5" /> Adicionar</Button>
+            <div className="grid grid-cols-[1fr_110px_auto] gap-2 pt-1">
+              <Input placeholder="Nova multa (ex: Atraso prolongado)" value={novoNome} onChange={e => setNovoNome(e.target.value)} className="h-9" />
+              <Input type="number" min={0} step={500} placeholder="Valor (Kz)" value={novoValor || ""} onChange={e => setNovoValor(Number(e.target.value))} className="h-9" />
+              <Button onClick={addMulta} className="h-9 gap-1"><Plus className="w-3.5 h-3.5" /> Adicionar</Button>
             </div>
           </div>
         </Card>
       </div>
 
       <div className="flex justify-end">
-        <Button onClick={() => toast.success("Regras de presença guardadas")} className="gap-2">Guardar regras</Button>
+        <Button onClick={() => toast.success("Regras de RH guardadas")} className="gap-2">Guardar regras</Button>
       </div>
     </div>
   );
