@@ -2,13 +2,168 @@ import { useMemo, useState } from "react";
 import { FinHeader } from "./_FinHeader";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { toast } from "sonner";
 
-import { CalendarDays, ChevronLeft, ChevronRight, Plus, Users, MapPin, Calendar as CalendarIcon } from "lucide-react";
+import { CalendarDays, ChevronLeft, ChevronRight, Plus, Users, MapPin, Calendar as CalendarIcon, Video, Building2, DollarSign, Clock, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const DAYS = ["Seg", "Ter", "Qua", "Qui", "Sex"];
-const HOURS = ["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00"];
-const HOUR_HEIGHT = 60;
+
+type EventType = "reuniao" | "pagamento" | "prazo" | "outro";
+type Modalidade = "virtual" | "presencial";
+
+const EVENT_TYPES: { value: EventType; label: string; icon: typeof Video }[] = [
+  { value: "reuniao", label: "Reunião", icon: Users },
+  { value: "pagamento", label: "Pagamento", icon: DollarSign },
+  { value: "prazo", label: "Prazo", icon: Clock },
+  { value: "outro", label: "Outro", icon: FileText },
+];
+
+function CriarEventoDialog({ defaultDate, trigger }: { defaultDate: Date; trigger: React.ReactNode }) {
+  const [open, setOpen] = useState(false);
+  const [type, setType] = useState<EventType>("reuniao");
+  const [modalidade, setModalidade] = useState<Modalidade>("presencial");
+  const [title, setTitle] = useState("");
+  const [date, setDate] = useState(defaultDate.toISOString().split("T")[0]);
+  const [startTime, setStartTime] = useState("09:00");
+  const [endTime, setEndTime] = useState("10:00");
+  const [location, setLocation] = useState("");
+  const [link, setLink] = useState("");
+  const [notes, setNotes] = useState("");
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!title.trim()) {
+      toast.error("Insira um título para o evento.");
+      return;
+    }
+    toast.success("Evento criado com sucesso.");
+    setOpen(false);
+    setTitle(""); setLocation(""); setLink(""); setNotes("");
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>{trigger}</DialogTrigger>
+      <DialogContent className="sm:max-w-[520px]">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <CalendarIcon className="w-4 h-4 text-primary" /> Criar Evento
+          </DialogTitle>
+          <DialogDescription>Agende um novo evento no calendário financeiro.</DialogDescription>
+        </DialogHeader>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label className="text-xs font-medium">Tipo de evento</Label>
+            <div className="grid grid-cols-4 gap-2">
+              {EVENT_TYPES.map((t) => {
+                const Icon = t.icon;
+                const active = type === t.value;
+                return (
+                  <button
+                    key={t.value}
+                    type="button"
+                    onClick={() => setType(t.value)}
+                    className={cn(
+                      "flex flex-col items-center gap-1.5 py-3 rounded-lg border text-xs font-medium transition-all",
+                      active ? "border-primary bg-primary/10 text-primary" : "border-border bg-card text-muted-foreground hover:bg-muted/40"
+                    )}
+                  >
+                    <Icon className="w-4 h-4" />
+                    {t.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="ev-title" className="text-xs font-medium">Título</Label>
+            <Input id="ev-title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Ex.: Reunião com Reitoria" />
+          </div>
+
+          <div className="grid grid-cols-3 gap-3">
+            <div className="space-y-2">
+              <Label htmlFor="ev-date" className="text-xs font-medium">Data</Label>
+              <Input id="ev-date" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="ev-start" className="text-xs font-medium">Início</Label>
+              <Input id="ev-start" type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="ev-end" className="text-xs font-medium">Fim</Label>
+              <Input id="ev-end" type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} />
+            </div>
+          </div>
+
+          {type === "reuniao" && (
+            <div className="space-y-2">
+              <Label className="text-xs font-medium">Modalidade</Label>
+              <div className="grid grid-cols-2 gap-2">
+                {([
+                  { value: "presencial" as const, label: "Presencial", icon: Building2 },
+                  { value: "virtual" as const, label: "Virtual", icon: Video },
+                ]).map((m) => {
+                  const Icon = m.icon;
+                  const active = modalidade === m.value;
+                  return (
+                    <button
+                      key={m.value}
+                      type="button"
+                      onClick={() => setModalidade(m.value)}
+                      className={cn(
+                        "flex items-center justify-center gap-2 py-2.5 rounded-lg border text-sm font-medium transition-all",
+                        active ? "border-primary bg-primary/10 text-primary" : "border-border bg-card text-muted-foreground hover:bg-muted/40"
+                      )}
+                    >
+                      <Icon className="w-4 h-4" />
+                      {m.label}
+                    </button>
+                  );
+                })}
+              </div>
+              {modalidade === "presencial" ? (
+                <div className="space-y-2 pt-1">
+                  <Label htmlFor="ev-loc" className="text-xs font-medium">Local</Label>
+                  <Input id="ev-loc" value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Ex.: Sala de Reuniões A" />
+                </div>
+              ) : (
+                <div className="space-y-2 pt-1">
+                  <Label htmlFor="ev-link" className="text-xs font-medium">Link da reunião</Label>
+                  <Input id="ev-link" value={link} onChange={(e) => setLink(e.target.value)} placeholder="https://meet.google.com/..." />
+                </div>
+              )}
+            </div>
+          )}
+
+          {type !== "reuniao" && (
+            <div className="space-y-2">
+              <Label htmlFor="ev-loc-2" className="text-xs font-medium">Local (opcional)</Label>
+              <Input id="ev-loc-2" value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Ex.: Gabinete de Finanças" />
+            </div>
+          )}
+
+          <div className="space-y-2">
+            <Label htmlFor="ev-notes" className="text-xs font-medium">Notas (opcional)</Label>
+            <Textarea id="ev-notes" value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} placeholder="Detalhes adicionais..." />
+          </div>
+
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
+            <Button type="submit">Criar evento</Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
 
 function startOfWeek(d: Date) {
   const x = new Date(d);
