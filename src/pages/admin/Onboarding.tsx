@@ -66,16 +66,15 @@ export default function AdminOnboarding() {
   const STORAGE = onboardingKey(user?.email);
   const [state, setState] = useState<OnboardingState>(() => {
     const stored = readOnboardingStateFor(initial, user?.email);
-    // Deep-merge `dados` so updated defaults (name spelling, pre-uploaded
-    // logo) always win over stale per-account snapshots from localStorage.
-    const mergedDados = { ...initial.dados, ...(stored as any).dados };
-    if (!mergedDados.logoDataUrl) mergedDados.logoDataUrl = initial.dados.logoDataUrl;
-    if (
-      !mergedDados.nome ||
-      mergedDados.nome === "Universidade Privada de Angola"
-    ) {
-      mergedDados.nome = initial.dados.nome;
-    }
+    const storedDados = (stored as any)?.dados || {};
+    const mergedDados: OnboardingState["dados"] = {
+      ...initial.dados,
+      ...storedDados,
+      // Always override with correct defaults on load so stale
+      // localStorage never wins over updated name/logo.
+      nome: initial.dados.nome,
+      logoDataUrl: initial.dados.logoDataUrl,
+    };
     return { ...initial, ...stored, dados: mergedDados };
   });
   const [success, setSuccess] = useState(false);
@@ -190,7 +189,7 @@ export default function AdminOnboarding() {
               </div>
             </div>
             <Field label="Nome da universidade *">
-              <Input value={state.dados.nome} onChange={(e) => setDados({ nome: e.target.value })} placeholder="Universidade Privada de Angola" />
+              <Input value={state.dados.nome} onChange={(e) => setDados({ nome: e.target.value })} placeholder="Universidade Privada De Angola" />
             </Field>
             <Field label="Tipo de instituição">
               <Select value={state.dados.tipo} onValueChange={(v) => setDados({ tipo: v })}>
