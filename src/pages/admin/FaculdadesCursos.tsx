@@ -339,19 +339,13 @@ export default function AdminFaculdadesCursos() {
                 <Input id="cur-name" value={newCurso.name} onChange={(e) => setNewCurso({ ...newCurso, name: e.target.value })} placeholder="Ex: Arquitectura" />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="cur-code" className="text-xs">Código</Label>
+                <Label htmlFor="cur-code" className="text-xs">Sigla</Label>
                 <Input id="cur-code" value={newCurso.code} onChange={(e) => setNewCurso({ ...newCurso, code: e.target.value })} placeholder="ARQ" />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-2">
-              <div className="space-y-1.5">
-                <Label htmlFor="cur-years" className="text-xs">Duração (anos)</Label>
-                <Input id="cur-years" type="number" min={1} max={8} value={newCurso.years} onChange={(e) => setNewCurso({ ...newCurso, years: Number(e.target.value) })} />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="cur-est" className="text-xs">Estudantes esperados</Label>
-                <Input id="cur-est" type="number" min={0} value={newCurso.estudantes_esperados} onChange={(e) => setNewCurso({ ...newCurso, estudantes_esperados: Number(e.target.value) })} />
-              </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="cur-years" className="text-xs">Duração (anos)</Label>
+              <Input id="cur-years" type="number" min={1} max={8} value={newCurso.years} onChange={(e) => setNewCurso({ ...newCurso, years: Number(e.target.value) })} />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="cur-coord" className="text-xs">Coordenador <span className="text-muted-foreground font-normal">(opcional)</span></Label>
