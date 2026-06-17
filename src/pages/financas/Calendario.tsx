@@ -282,9 +282,14 @@ export default function FinancasCalendario() {
                     <CalendarDays className="w-4 h-4 text-primary" />
                     {formatDateLabel(selectedDate, today)}
                   </h3>
-                  <Button size="sm" className="gap-1.5 h-8">
-                    <Plus className="w-3.5 h-3.5" /> Criar Evento
-                  </Button>
+                  <CriarEventoDialog
+                    defaultDate={selectedDate}
+                    trigger={
+                      <Button size="sm" className="gap-1.5 h-8">
+                        <Plus className="w-3.5 h-3.5" /> Criar Evento
+                      </Button>
+                    }
+                  />
                 </div>
 
                 {selectedDayEvents.length === 0 ? (
