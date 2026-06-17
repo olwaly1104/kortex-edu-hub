@@ -754,10 +754,11 @@ function SalariosSection({ email }: { email?: string | null }) {
 
 /* ═══════════════════════════════ MULTAS ═══════════════════════════════════ */
 
-type RhMulta = { id: string; nome: string; valor: number; descricao: string; aplicaA: "Docente" | "Staff" | "Ambos" };
+type RhMulta = { id: string; nome: string; valor: number; descricao: string; aplicaA: "Docente" | "Staff" | "Discente" | "Ambos" };
 
 function MultasSection({ email: _email }: { email?: string | null }) {
   const [multas, setMultas] = useState<RhMulta[]>([]);
+  const [target, setTarget] = useState<"docentes" | "staff" | "discentes">("docentes");
 
   useEffect(() => {
     try {
@@ -768,22 +769,52 @@ function MultasSection({ email: _email }: { email?: string | null }) {
 
   const docentes = multas.filter((m) => m.aplicaA === "Docente" || m.aplicaA === "Ambos");
   const staff = multas.filter((m) => m.aplicaA === "Staff" || m.aplicaA === "Ambos");
+  const discentes = multas.filter((m) => m.aplicaA === "Discente");
 
-  const renderTable = (
-    title: string,
-    icon: React.ComponentType<{ className?: string }>,
-    list: RhMulta[],
-  ) => {
-    const Icon = icon;
-    return (
+  const current = target === "docentes" ? docentes : target === "staff" ? staff : discentes;
+  const meta = {
+    docentes:  { title: "Multas a docentes",  icon: GraduationCap, source: "RH → Docentes" },
+    staff:     { title: "Multas a staff",     icon: Briefcase,     source: "RH → Staff" },
+    discentes: { title: "Multas a discentes", icon: Users,         source: "Académica → Regras de Disciplina" },
+  }[target];
+  const Icon = meta.icon;
+
+  const toggles: { key: typeof target; label: string; icon: React.ComponentType<{ className?: string }>; count: number }[] = [
+    { key: "docentes",  label: "Docentes",  icon: GraduationCap, count: docentes.length },
+    { key: "staff",     label: "Staff",     icon: Briefcase,     count: staff.length },
+    { key: "discentes", label: "Discentes", icon: Users,         count: discentes.length },
+  ];
+
+  return (
+    <div className="space-y-6">
+      <div className="rounded-md border border-amber-200 bg-amber-50 px-4 py-2.5 text-xs text-amber-800 flex items-center gap-2">
+        <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+        Tabelas geridas por RH e Académica. Finanças tem apenas visualização.
+      </div>
+
+      <div className="inline-flex items-center gap-1 p-1 rounded-lg border bg-muted/30">
+        {toggles.map((t) => {
+          const TIcon = t.icon;
+          const active = target === t.key;
+          return (
+            <button key={t.key} type="button" onClick={() => setTarget(t.key)}
+              className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${active ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"}`}>
+              <TIcon className="w-3.5 h-3.5" />
+              {t.label}
+              <span className={`tabular-nums text-[10px] px-1.5 py-0.5 rounded ${active ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>{t.count}</span>
+            </button>
+          );
+        })}
+      </div>
+
       <Card className="overflow-hidden">
         <div className="px-5 py-3 border-b bg-muted/30 flex items-center gap-2">
           <Icon className="w-4 h-4 text-primary" />
           <div className="min-w-0">
-            <h2 className="text-sm font-bold text-foreground">{title}</h2>
-            <p className="text-[11px] text-muted-foreground">Tabela de multas configurada em RH. Finanças visualiza em modo só-leitura.</p>
+            <h2 className="text-sm font-bold text-foreground">{meta.title}</h2>
+            <p className="text-[11px] text-muted-foreground">Configurada em {meta.source}. Finanças visualiza em modo só-leitura.</p>
           </div>
-          <span className="text-[11px] text-muted-foreground ml-auto tabular-nums shrink-0">{list.length} multa{list.length === 1 ? "" : "s"}</span>
+          <span className="text-[11px] text-muted-foreground ml-auto tabular-nums shrink-0">{current.length} multa{current.length === 1 ? "" : "s"}</span>
         </div>
         <div className="divide-y">
           <div className="grid grid-cols-[1fr_140px_140px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
@@ -791,11 +822,11 @@ function MultasSection({ email: _email }: { email?: string | null }) {
             <div>Aplica-se a</div>
             <div className="text-right">Valor (Kz)</div>
           </div>
-          {list.length === 0 ? (
+          {current.length === 0 ? (
             <div className="px-5 py-10 text-center text-xs text-muted-foreground">
-              Sem multas configuradas em RH. Configure em <span className="font-medium text-foreground">RH → Regras de Presença → Tabela de multas</span>.
+              Sem multas configuradas. Configure em <span className="font-medium text-foreground">{meta.source}</span>.
             </div>
-          ) : list.map((m) => (
+          ) : current.map((m) => (
             <div key={m.id} className="grid grid-cols-[1fr_140px_140px] gap-3 px-5 py-2.5 items-center text-sm">
               <div className="min-w-0">
                 <p className="font-medium truncate">{m.nome}</p>
@@ -807,20 +838,10 @@ function MultasSection({ email: _email }: { email?: string | null }) {
           ))}
         </div>
       </Card>
-    );
-  };
-
-  return (
-    <div className="space-y-6">
-      <div className="rounded-md border border-amber-200 bg-amber-50 px-4 py-2.5 text-xs text-amber-800 flex items-center gap-2">
-        <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-        Tabelas geridas pelo módulo RH. Finanças tem apenas visualização — para editar, vá a Configurar RH → Regras de Presença.
-      </div>
-      {renderTable("Multas a docentes", GraduationCap, docentes)}
-      {renderTable("Multas a staff", Briefcase, staff)}
     </div>
   );
 }
+
 
 
 /* ═══════════════════════════════ Generic block ════════════════════════════ */
