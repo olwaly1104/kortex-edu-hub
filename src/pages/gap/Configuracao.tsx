@@ -230,8 +230,9 @@ export default function GapConfiguracao() {
 
   // ===== CANDIDATURAS =====
   type CdEstado = { key: string; label: string; color: string };
-  type CdEtapa = { key: string; label: string; obrigatoria: boolean; estadosPossiveis: string[] };
-  type CdSessao = { key: string; etapa: string; data: string; hora: string; local: string; capacidade: number };
+ type CdEtapa = { key: string; label: string; agenda: boolean; obrigatoria: boolean; estadosPossiveis: string[] };
+ type CdSessao = { key: string; etapa: string; data: string; hora: string; local: string; capacidade: number };
+
 
   const [cdEstados, setCdEstados] = useState<CdEstado[]>([
     { key: "completo", label: "Completo", color: "bg-green-50 text-green-700 border-green-200" },
