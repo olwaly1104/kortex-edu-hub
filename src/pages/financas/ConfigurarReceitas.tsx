@@ -114,12 +114,13 @@ function ReceitasSection({ email, onAddCursos }: { email?: string | null; onAddC
     <div className="space-y-6">
       <PropinasBlock onAddCursos={onAddCursos} />
       <LineItemsBlock
-        title="Emolumentos & Taxas académicas"
+        title="Emolumento"
         subtitle="Inscrições, matrículas, declarações, certificados, 2ª via de cartão, etc."
         icon={Receipt}
         storageKey={KEY("taxas", email)}
+        withType
         withTarget
-        addLabel="Adicionar taxa"
+        addLabel="Adicionar emolumento"
         placeholder="Ex: Certidão de matrícula"
         valueLabel="Valor (Kz)"
       />
