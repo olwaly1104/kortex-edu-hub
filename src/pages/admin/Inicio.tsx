@@ -133,8 +133,22 @@ export default function AdminInicio() {
       const { count } = await supabase
         .from("estudantes")
         .select("id", { count: "exact", head: true });
-      if (!cancelled) setEstudantesCount(count ?? 0);
-    })();
+      if (cancelled) return;
+      const c = count ?? 0;
+      setEstudantesCount(c);
+      // Clean any stale est.imp=true left in localStorage when there are no estudantes.
+      if (c === 0) {
+        try {
+          const raw = localStorage.getItem(progressKey(user?.email));
+          if (raw) {
+            const p = JSON.parse(raw);
+            if (p["est.imp"]) {
+              delete p["est.imp"];
+              localStorage.setItem(progressKey(user?.email), JSON.stringify(p));
+            }
+          }
+        } catch { /* ignore */ }
+      }
     return () => { cancelled = true; };
   }, []);
 
