@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { FinHeader } from "./_FinHeader";
+import { useInstitutionContacts } from "@/hooks/useInstitutionContacts";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
@@ -37,18 +38,27 @@ function CriarEventoDialog({ defaultDate, trigger }: { defaultDate: Date; trigge
   const [location, setLocation] = useState("");
   const [link, setLink] = useState("");
   const [notes, setNotes] = useState("");
-  const [participants, setParticipants] = useState<string[]>([]);
+  const [participants, setParticipants] = useState<{ id: string; name: string; email: string | null }[]>([]);
   const [participantInput, setParticipantInput] = useState("");
+  const [participantFocus, setParticipantFocus] = useState(false);
+  const { contacts } = useInstitutionContacts();
 
-  const addParticipant = () => {
-    const v = participantInput.trim();
-    if (!v) return;
-    if (participants.includes(v)) { setParticipantInput(""); return; }
-    setParticipants([...participants, v]);
+  const filteredContacts = useMemo(() => {
+    const q = participantInput.trim().toLowerCase();
+    const selectedIds = new Set(participants.map((p) => p.id));
+    return contacts
+      .filter((c) => !selectedIds.has(c.id))
+      .filter((c) => !q || c.display_name.toLowerCase().includes(q) || (c.email ?? "").toLowerCase().includes(q))
+      .slice(0, 8);
+  }, [contacts, participantInput, participants]);
+
+  const addContact = (c: { id: string; display_name: string; email: string | null }) => {
+    if (participants.some((p) => p.id === c.id)) return;
+    setParticipants([...participants, { id: c.id, name: c.display_name, email: c.email }]);
     setParticipantInput("");
   };
 
-  const removeParticipant = (p: string) => setParticipants(participants.filter((x) => x !== p));
+  const removeParticipant = (id: string) => setParticipants(participants.filter((p) => p.id !== id));
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -135,25 +145,49 @@ function CriarEventoDialog({ defaultDate, trigger }: { defaultDate: Date; trigge
                 <span className="text-[10px] text-muted-foreground font-normal">({participants.length} convidado{participants.length > 1 ? "s" : ""})</span>
               )}
             </Label>
-            <div className="flex gap-2">
+            <div className="relative">
               <Input
                 id="ev-participants"
                 value={participantInput}
-                onChange={(e) => setParticipantInput(e.target.value)}
-                onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addParticipant(); } }}
-                placeholder="Nome ou e-mail e Enter para adicionar"
+                onChange={(e) => { setParticipantInput(e.target.value); setParticipantFocus(true); }}
+                onFocus={() => setParticipantFocus(true)}
+                onBlur={() => setTimeout(() => setParticipantFocus(false), 150)}
+                placeholder="Procurar por nome ou e-mail..."
                 className="h-10"
+                autoComplete="off"
               />
-              <Button type="button" variant="outline" size="sm" onClick={addParticipant} className="h-10 shrink-0">
-                Adicionar
-              </Button>
+              {participantFocus && filteredContacts.length > 0 && (
+                <div className="absolute z-50 mt-1 w-full rounded-md border bg-popover shadow-lg max-h-56 overflow-y-auto">
+                  {filteredContacts.map((c) => (
+                    <button
+                      key={c.id}
+                      type="button"
+                      onMouseDown={(e) => { e.preventDefault(); addContact(c); }}
+                      className="w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-muted/60 transition-colors"
+                    >
+                      <div className="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[11px] font-semibold shrink-0">
+                        {c.display_name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase()}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium text-foreground truncate">{c.display_name}</p>
+                        <p className="text-[11px] text-muted-foreground truncate">{c.email ?? c.modulo ?? ""}</p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+              {participantFocus && participantInput.trim() && filteredContacts.length === 0 && (
+                <div className="absolute z-50 mt-1 w-full rounded-md border bg-popover shadow-lg px-3 py-2 text-xs text-muted-foreground">
+                  Nenhum contacto encontrado.
+                </div>
+              )}
             </div>
             {participants.length > 0 && (
               <div className="flex flex-wrap gap-1.5 pt-1">
                 {participants.map((p) => (
-                  <span key={p} className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-primary/10 text-primary text-xs font-medium">
-                    {p}
-                    <button type="button" onClick={() => removeParticipant(p)} className="hover:bg-primary/20 rounded-sm">
+                  <span key={p.id} className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-primary/10 text-primary text-xs font-medium">
+                    {p.name}
+                    <button type="button" onClick={() => removeParticipant(p.id)} className="hover:bg-primary/20 rounded-sm">
                       <X className="w-3 h-3" />
                     </button>
                   </span>
