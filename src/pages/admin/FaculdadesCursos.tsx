@@ -297,9 +297,15 @@ export default function AdminFaculdadesCursos() {
             <DialogTitle>Nova Faculdade</DialogTitle>
           </DialogHeader>
           <div className="space-y-3 py-2">
-            <div className="space-y-1.5">
-              <Label htmlFor="fac-name" className="text-xs">Nome da Faculdade</Label>
-              <Input id="fac-name" value={newFac.name} onChange={(e) => setNewFac({ ...newFac, name: e.target.value })} placeholder="Ex: Faculdade de Ciências Exatas" />
+            <div className="grid grid-cols-3 gap-2">
+              <div className="col-span-2 space-y-1.5">
+                <Label htmlFor="fac-name" className="text-xs">Nome da Faculdade</Label>
+                <Input id="fac-name" value={newFac.name} onChange={(e) => setNewFac({ ...newFac, name: e.target.value })} placeholder="Ex: Faculdade de Ciências Exatas" />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="fac-sigla" className="text-xs">Sigla</Label>
+                <Input id="fac-sigla" value={newFac.sigla} onChange={(e) => setNewFac({ ...newFac, sigla: e.target.value.toUpperCase() })} placeholder="FCE" maxLength={8} />
+              </div>
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="fac-decano" className="text-xs">Decano <span className="text-muted-foreground font-normal">(opcional)</span></Label>
