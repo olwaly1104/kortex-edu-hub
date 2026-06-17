@@ -189,7 +189,7 @@ export default function AdminFaculdadesCursos() {
                         <Input
                           value={facValue(f, "sigla") || ""}
                           onChange={(e) => setFacField(f.id, { sigla: e.target.value.toUpperCase() })}
-                          className="h-6 px-2 py-0 text-[11px] font-bold tracking-wider w-16 bg-primary text-primary-foreground border-primary placeholder:text-primary-foreground/60"
+                          className="h-6 px-2 py-0 text-[11px] font-bold tracking-wider w-16 bg-muted border-border text-foreground placeholder:text-muted-foreground"
                           placeholder="SIGLA"
                           maxLength={8}
                         />
