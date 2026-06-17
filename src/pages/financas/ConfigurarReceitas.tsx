@@ -135,21 +135,7 @@ function ReceitasSection({ email, onAddCursos }: { email?: string | null; onAddC
 
       {sub === "impostos" && <ImpostosBlock impostos={impostos} setImpostos={setImpostos} />}
       {sub === "propinas" && <PropinasBlock email={email} impostos={impostos} onAddCursos={onAddCursos} />}
-      {sub === "emolumentos" && (
-        <LineItemsBlock
-          title="Emolumento"
-          subtitle="Inscrições, matrículas, declarações, certificados, 2ª via de cartão, etc."
-          icon={Receipt}
-          storageKey={KEY("taxas", email)}
-          withType
-          withTarget
-          withTax
-          impostos={impostos}
-          addLabel="Adicionar emolumento"
-          placeholder="Ex: Certidão de matrícula"
-          valueLabel="Valor (Kz)"
-        />
-      )}
+      {sub === "emolumentos" && <EmolumentosBlock email={email} impostos={impostos} />}
     </div>
   );
 }
@@ -844,11 +830,80 @@ function MultasSection({ email: _email }: { email?: string | null }) {
 
 
 
+/* ─────────────────── Emolumentos: Categorias + tabela ─────────────────── */
+
+const EMOL_CATS_KEY = (email?: string | null) => KEY("emolumentos.categorias", email);
+const DEFAULT_EMOL_CATS: string[] = ["Inscrição", "Matrícula", "Declaração", "Certificado", "2ª Via"];
+
+function EmolumentosBlock({ email, impostos }: { email?: string | null; impostos: Imposto[] }) {
+  const [cats, setCats] = useState<string[]>(() => {
+    const stored = readJSON<string[] | null>(EMOL_CATS_KEY(email), null);
+    return stored && stored.length ? stored : DEFAULT_EMOL_CATS;
+  });
+  useEffect(() => writeJSON(EMOL_CATS_KEY(email), cats), [cats, email]);
+
+  const addCat = () => setCats((s) => [...s, ""]);
+  const updCat = (idx: number, v: string) => setCats((s) => s.map((c, i) => i === idx ? v : c));
+  const delCat = (idx: number) => setCats((s) => s.filter((_, i) => i !== idx));
+
+  return (
+    <div className="space-y-6">
+      <Card className="overflow-hidden">
+        <div className="px-5 py-3 border-b bg-muted/30 flex items-center gap-2">
+          <Receipt className="w-4 h-4 text-primary" />
+          <div className="min-w-0">
+            <h2 className="text-sm font-bold text-foreground">Categorias de emolumentos</h2>
+            <p className="text-[11px] text-muted-foreground">Defina as categorias. Ficam disponíveis na coluna Categoria da tabela de emolumentos.</p>
+          </div>
+          <span className="text-[11px] text-muted-foreground ml-auto tabular-nums shrink-0">{cats.length} categoria{cats.length === 1 ? "" : "s"}</span>
+        </div>
+        <div className="divide-y">
+          <div className="grid grid-cols-[1fr_40px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
+            <div>Designação</div>
+            <div className="text-right">Ação</div>
+          </div>
+          {cats.length === 0 ? (
+            <div className="px-5 py-8 text-center text-xs text-muted-foreground">Sem categorias configuradas.</div>
+          ) : cats.map((c, idx) => (
+            <div key={idx} className="grid grid-cols-[1fr_40px] gap-3 px-5 py-2.5 items-center text-sm">
+              <Input className="h-9" placeholder="Ex: Certificado" value={c} onChange={(e) => updCat(idx, e.target.value)} />
+              <div className="flex justify-end">
+                <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                  onClick={() => delCat(idx)}><Trash2 className="w-3.5 h-3.5" /></Button>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="px-5 py-3 border-t bg-muted/10">
+          <Button size="sm" variant="outline" className="gap-1.5" onClick={addCat}><Plus className="w-3.5 h-3.5" /> Adicionar categoria</Button>
+        </div>
+      </Card>
+
+      <LineItemsBlock
+        title="Emolumento"
+        subtitle="Inscrições, matrículas, declarações, certificados, 2ª via de cartão, etc."
+        icon={Receipt}
+        storageKey={KEY("taxas", email)}
+        withType
+        typeLabel="Categoria"
+        typeOptions={cats.filter((c) => c.trim())}
+        withTarget
+        withTax
+        impostos={impostos}
+        addLabel="Adicionar emolumento"
+        placeholder="Ex: Certidão de matrícula"
+        valueLabel="Valor (Kz)"
+      />
+    </div>
+  );
+}
+
 /* ═══════════════════════════════ Generic block ════════════════════════════ */
 
 function LineItemsBlock({
   title, subtitle, icon: Icon, storageKey, addLabel, placeholder, valueLabel,
   withUnit = false, withTarget = false, withType = false, withTax = false, impostos = [],
+  typeLabel = "Tipo", typeOptions,
 }: {
   title: string;
   subtitle: string;
@@ -862,6 +917,8 @@ function LineItemsBlock({
   withType?: boolean;
   withTax?: boolean;
   impostos?: Imposto[];
+  typeLabel?: string;
+  typeOptions?: string[];
 }) {
   const [rows, setRows] = useState<LineItem[]>(() => readJSON<LineItem[]>(storageKey, []));
   useEffect(() => writeJSON(storageKey, rows), [rows, storageKey]);
@@ -905,7 +962,7 @@ function LineItemsBlock({
       <div className="divide-y">
         <div className="grid gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10" style={gridStyle}>
           <div>Designação</div>
-          {withType && <div>Tipo</div>}
+          {withType && <div>{typeLabel}</div>}
           <div>{valueLabel}</div>
           {withTax && <div>Imposto</div>}
           {withUnit && <div>Unidade</div>}
@@ -924,13 +981,13 @@ function LineItemsBlock({
             {withType && (
               <select
                 className="h-9 rounded-md border border-input bg-background px-2 text-sm"
-                value={r.tipo || "Único"}
+                value={r.tipo || ""}
                 onChange={(e) => update(r.id, { tipo: e.target.value })}
               >
-                <option value="Único">Único</option>
-                <option value="Mensal">Mensal</option>
-                <option value="Anual">Anual</option>
-                <option value="Por pedido">Por pedido</option>
+                <option value="">— Selecionar —</option>
+                {(typeOptions ?? ["Único", "Mensal", "Anual", "Por pedido"]).map((opt) => (
+                  <option key={opt} value={opt}>{opt}</option>
+                ))}
               </select>
             )}
             <Input type="number" min={0} className="h-9 tabular-nums" value={r.valor}
