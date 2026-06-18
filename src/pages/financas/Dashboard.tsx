@@ -54,7 +54,7 @@ const REC_COLORS = ["hsl(var(--accent))", "hsl(150, 60%, 40%)", "hsl(200, 70%, 5
 const recCatData = Array.from(recMap.entries()).sort((a, b) => b[1] - a[1]).map(([name, value], i) => ({ name, value, color: REC_COLORS[i % REC_COLORS.length] }));
 const receitaTotal = recCatData.reduce((s, c) => s + c.value, 0);
 const receitaEsperadaMes = receitas.reduce((s, r) => s + r.amount, 0);
-const despesaOrcamentadaMes = 42000000;
+const despesaOrcamentadaMes = 0;
 
 /* all transactions merged */
 const allTx = [
