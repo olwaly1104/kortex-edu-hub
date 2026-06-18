@@ -124,7 +124,7 @@ export default function Despesas() {
         subtitle="Aprovação e acompanhamento de despesas institucionais."
         icon={<TrendingDown className="w-5 h-5 text-primary" />}
         right={
-          <Button size="sm" onClick={() => setSheetOpen(true)} className="gap-1.5"><Plus className="w-4 h-4" /> Nova Despesa</Button>
+          <Button size="sm" onClick={() => setSheetOpen(true)} className="gap-1.5"><Plus className="w-4 h-4" /> Adicionar Despesa</Button>
         }
       />
 
