@@ -4,7 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
-import { isOnboardingCompleteFor, hydrateAdminStateFromBackend } from "@/lib/onboardingStorage";
+import { hydrateAdminStateFromBackend } from "@/lib/onboardingStorage";
 import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 import Login from "./pages/Login";
