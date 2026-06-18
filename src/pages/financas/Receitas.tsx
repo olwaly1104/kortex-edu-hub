@@ -45,7 +45,7 @@ export default function Receitas() {
 
   useEffect(() => {
     setReceitas(receitasSeed);
-  }, []);
+  }, [receitasSeed]);
 
   const isSortActive = sortField !== null;
   const isStatusActive = filterStatus !== "todos";
