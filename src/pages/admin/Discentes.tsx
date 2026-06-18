@@ -99,6 +99,7 @@ async function uploadDoc(file: File, prefix: string, email: string): Promise<str
 export default function AdminDiscentes() {
   const { data: rows = [], isLoading } = useEstudantes();
   const { data: cursos = [] } = useCursos();
+  const { data: faculdades = [] } = useFaculdades();
   const createMut = useCreateEstudante();
   const deleteMut = useDeleteEstudante();
 
@@ -109,11 +110,26 @@ export default function AdminDiscentes() {
   const biInput = useRef<HTMLInputElement>(null);
   const certInput = useRef<HTMLInputElement>(null);
 
+  // Cursos scoped to the selected faculdade.
+  const cursosDaFac = useMemo(
+    () => (draft.faculdade_id ? cursos.filter((c: any) => c.faculdade_id === draft.faculdade_id) : []),
+    [cursos, draft.faculdade_id],
+  );
+
+  // Initialise faculdade → curso defaults.
   useEffect(() => {
-    if (!draft.curso_id && cursos.length > 0) {
-      setDraft((d) => ({ ...d, curso_id: (cursos[0] as any).id }));
+    if (!draft.faculdade_id && faculdades.length > 0) {
+      setDraft((d) => ({ ...d, faculdade_id: (faculdades[0] as any).id }));
     }
-  }, [cursos, draft.curso_id]);
+  }, [faculdades, draft.faculdade_id]);
+
+  useEffect(() => {
+    if (!draft.faculdade_id) return;
+    const validCurso = cursosDaFac.find((c: any) => c.id === draft.curso_id);
+    if (!validCurso) {
+      setDraft((d) => ({ ...d, curso_id: cursosDaFac[0]?.id || "" }));
+    }
+  }, [cursosDaFac, draft.faculdade_id, draft.curso_id]);
 
   const cursoCode = useMemo(() => {
     const m = new Map<string, string>();
@@ -213,7 +229,7 @@ export default function AdminDiscentes() {
         certificado_url,
       });
       toast.success(`Discente adicionado · ${previewEmail}`);
-      setDraft(emptyDraft(draft.curso_id));
+      setDraft(emptyDraft(draft.faculdade_id, draft.curso_id));
       if (fotoInput.current) fotoInput.current.value = "";
       if (biInput.current) biInput.current.value = "";
       if (certInput.current) certInput.current.value = "";
