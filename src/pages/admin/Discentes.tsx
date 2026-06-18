@@ -203,9 +203,11 @@ export default function AdminDiscentes() {
       let foto_url: string | null = null;
       let bilhete_url: string | null = null;
       let certificado_url: string | null = null;
+      let enc_bilhete_url: string | null = null;
       if (draft.fotoFile) foto_url = await uploadDoc(draft.fotoFile, "foto", previewEmail);
       if (draft.bilheteFile) bilhete_url = await uploadDoc(draft.bilheteFile, "bi", previewEmail);
       if (draft.certificadoFile) certificado_url = await uploadDoc(draft.certificadoFile, "certificado", previewEmail);
+      if (draft.encBilheteFile) enc_bilhete_url = await uploadDoc(draft.encBilheteFile, "enc-bi", previewEmail);
 
       const nome = `${draft.primeiroNome.trim()} ${draft.ultimoNome.trim()}`.trim();
       await createMut.mutateAsync({
@@ -230,12 +232,14 @@ export default function AdminDiscentes() {
         foto_url,
         bilhete_url,
         certificado_url,
+        enc_bilhete_url,
       });
       toast.success(`Discente adicionado · ${previewEmail}`);
       setDraft(emptyDraft(draft.faculdade_id, draft.curso_id));
       if (fotoInput.current) fotoInput.current.value = "";
       if (biInput.current) biInput.current.value = "";
       if (certInput.current) certInput.current.value = "";
+      if (encBiInput.current) encBiInput.current.value = "";
     } catch (e: any) {
       toast.error(e?.message || "Erro ao adicionar discente");
     } finally {
