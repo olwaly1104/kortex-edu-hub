@@ -1,0 +1,2 @@
+ALTER TABLE public.calendario_events DROP CONSTRAINT IF EXISTS calendario_events_type_check;
+ALTER TABLE public.calendario_events ADD CONSTRAINT calendario_events_type_check CHECK (type IN ('reuniao','prazo','pessoal','outro'));
