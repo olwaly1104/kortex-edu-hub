@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { TrendingUp, Search, ArrowUpDown, X, Wallet, Clock, AlertTriangle, FileText, Receipt, Pencil, Check, Settings2 } from "lucide-react";
+import { TrendingUp, Search, ArrowUpDown, X, Wallet, Clock, AlertTriangle, FileText, Receipt, Pencil, Check, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -86,13 +86,12 @@ export default function Receitas() {
         icon={<TrendingUp className="w-5 h-5 text-primary" />}
         right={
           <Button
-            variant="outline"
             size="sm"
-            onClick={() => navigate("/financas/configurar-receitas")}
-            className="h-9 gap-2 border-border/70 text-foreground hover:bg-muted/60 hover:text-foreground"
+            onClick={() => toast({ title: "Nova receita", description: "Formulário em breve." })}
+            className="h-9 gap-2"
           >
-            <Settings2 className="w-4 h-4 text-muted-foreground" />
-            Configurar Receitas
+            <Plus className="w-4 h-4" />
+            Nova Receita
           </Button>
         }
       />
