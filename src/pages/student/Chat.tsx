@@ -189,10 +189,10 @@ export default function StudentChat() {
 
   const filteredConvs = useMemo(
     () =>
-      conversations.filter((c) =>
-        (c.other_name ?? "").toLowerCase().includes(query.toLowerCase()),
-      ),
-    [conversations, query],
+      conversations
+        .filter((c) => (tab === "grupos" ? c.is_group : !c.is_group))
+        .filter((c) => (c.other_name ?? "").toLowerCase().includes(query.toLowerCase())),
+    [conversations, query, tab],
   );
 
   const filteredContacts = useMemo(
