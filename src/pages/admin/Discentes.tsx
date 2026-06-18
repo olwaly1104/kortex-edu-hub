@@ -462,17 +462,6 @@ export default function AdminDiscentes() {
                   <SelectContent>{turmasPool.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
                 </Select>
               </Field>
-              <div className="md:col-span-4">
-                <Field label="Certificado Ensino Médio (upload)">
-                  <FileButton
-                    file={draft.certificadoFile}
-                    onPick={(f) => setF("certificadoFile", f)}
-                    inputRef={certInput}
-                    accept="image/*,application/pdf"
-                    Icon={FileText}
-                  />
-                </Field>
-              </div>
             </div>
           </div>
 
