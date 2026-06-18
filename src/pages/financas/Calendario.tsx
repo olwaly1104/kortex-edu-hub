@@ -94,34 +94,12 @@ const TYPE_META: Record<EventType, { label: string; text: string; soft: string; 
   prazo:   { label: "Prazo",    text: "text-amber-700",   soft: "bg-amber-50 border-amber-200",     bar: "bg-amber-500",   icon: FileText },
 };
 
-const DEPT_PEOPLE = [
-  "Maria Tavares — Contabilidade",
-  "João Mendes — Tesouraria",
-  "Ana Lopes — Orçamento",
-  "Pedro Silva — Auditoria Interna",
-  "Carla Neto — Folha Salarial",
-  "Reitor — Prof. Manuel Costa",
-  "Decano FCE",
-];
+const DEPT_PEOPLE: string[] = [];
 
-const PRESET_EVENTS: AgendaEvent[] = [
-  { id: "p1", title: "Reunião do Departamento Financeiro", type: "reuniao", date: "2024-02-14", startTime: "15:00", endTime: "16:30", location: "Sala de Reuniões — Reitoria", obligatory: true, description: "Revisão do fecho mensal e ponto de situação dos orçamentos.", organizer: "Diretor Financeiro", modality: "presencial", participants: ["Maria Tavares — Contabilidade","João Mendes — Tesouraria","Ana Lopes — Orçamento","Carla Neto — Folha Salarial"] },
-  { id: "p2", title: "Reunião com Reitoria — Orçamento", type: "reuniao", date: "2024-02-15", startTime: "10:00", endTime: "11:30", location: "Gabinete do Reitor", obligatory: true, organizer: "Reitor — Prof. Manuel Costa", modality: "presencial", participants: ["Diretor Financeiro","Ana Lopes — Orçamento"] },
-  { id: "p3", title: "Encerramento Mensal — Janeiro", type: "prazo", date: "2024-02-13", startTime: "17:00", endTime: "18:00", description: "Prazo para encerramento contabilístico." },
-  { id: "p4", title: "Pagamento de Salários", type: "prazo", date: "2024-02-28", obligatory: true, description: "Processamento e transferência de salários do mês." },
-  { id: "p5", title: "Feriado Nacional", type: "feriado", date: "2024-02-04", description: "Dia do Início da Luta Armada." },
-  { id: "p6", title: "Férias Académicas de Inverno", type: "ferias", date: "2024-02-26", endDate: "2024-03-01", description: "Pausa académica entre semestres." },
-  { id: "p7", title: "Conselho Administrativo", type: "reuniao", date: "2024-02-16", startTime: "09:00", endTime: "12:00", location: "Sala Virtual UPRA", obligatory: true, organizer: "Reitoria", modality: "virtual", meetingLink: "https://meet.upra.ao/conselho-admin-feb2024", participants: ["Reitor — Prof. Manuel Costa","Decano FCE","Diretor Financeiro"] },
-  { id: "p8", title: "Almoço com equipa", type: "pessoal", date: "2024-02-14", startTime: "12:30", endTime: "13:30", location: "Cantina" },
-];
+const PRESET_EVENTS: AgendaEvent[] = [];
 
-const INITIAL_REQUESTS: MeetingRequest[] = [
-  { id: "r1", title: "Revisão de Orçamento — Curso de Arquitectura", date: "2024-02-15", startTime: "14:00", endTime: "15:00", location: "Sala 204", organizer: "Coordenação ARQ", description: "Análise de despesas extra-orçamentais do semestre.", participants: ["Coordenador ARQ","Diretor Financeiro","Ana Lopes — Orçamento"], agenda: ["Despesas extra-orçamentais","Projeções Q2","Pedidos pendentes"], status: "pending", requestedAt: "2024-02-09", modality: "presencial" },
-  { id: "r2", title: "Reunião de planeamento — GAP", date: "2024-02-19", startTime: "11:00", endTime: "12:00", location: "Sala Virtual UPRA", organizer: "Gestão Académica de Pessoal", participants: ["Coord. GAP","Diretor Financeiro"], status: "pending", requestedAt: "2024-02-12", modality: "virtual", meetingLink: "https://meet.upra.ao/gap-planeamento-feb2024" },
-  { id: "r3", title: "Auditoria de processos", date: "2024-02-21", startTime: "09:30", endTime: "11:00", location: "Reitoria", organizer: "Pedro Silva", description: "Revisão dos processos contabilísticos do trimestre.", participants: ["Pedro Silva — Auditoria Interna","Diretor Financeiro","Maria Tavares — Contabilidade"], status: "pending", requestedAt: "2024-02-13", modality: "presencial" },
-  { id: "r4", title: "Pagamentos a fornecedores", date: "2024-02-22", startTime: "15:00", endTime: "16:00", location: "Sala Virtual UPRA", organizer: "João Mendes", participants: ["João Mendes — Tesouraria","Diretor Financeiro"], status: "pending", requestedAt: "2024-02-14", modality: "virtual", meetingLink: "https://meet.upra.ao/pagamentos-fornec-feb2024" },
-  { id: "r5", title: "Folha salarial — fecho mês", date: "2024-02-26", startTime: "10:00", endTime: "11:00", location: "Sala 102", organizer: "Carla Neto", participants: ["Carla Neto — Folha Salarial","Diretor Financeiro"], status: "pending", requestedAt: "2024-02-14", modality: "presencial" },
-];
+const INITIAL_REQUESTS: MeetingRequest[] = [];
+
 
 /* ── helpers ───────────────────────────────────────── */
 function toISO(d: Date) { return d.toISOString().split("T")[0]; }
