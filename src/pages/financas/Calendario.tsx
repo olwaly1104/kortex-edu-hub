@@ -202,9 +202,9 @@ function CriarEventoDialog({ defaultDate, trigger, onCreated }: { defaultDate: D
         {step === "form" && (
         <form onSubmit={handleSubmit} className="space-y-3.5">
           <div className="space-y-1.5">
-            <Label className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Tipo</Label>
+            <Label className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Categoria</Label>
             <div className="inline-flex rounded-md border bg-muted/30 p-0.5">
-              {(["reuniao", "prazo", "pessoal"] as EventType[]).map((t) => (
+              {(["reuniao", "prazo", "pessoal", "outro"] as EventType[]).map((t) => (
                 <button
                   key={t}
                   type="button"
@@ -219,6 +219,7 @@ function CriarEventoDialog({ defaultDate, trigger, onCreated }: { defaultDate: D
               ))}
             </div>
           </div>
+
 
 
           {/* Título */}
