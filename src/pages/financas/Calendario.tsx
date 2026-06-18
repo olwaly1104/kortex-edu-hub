@@ -1,6 +1,7 @@
 import { useMemo, useState, useCallback, useEffect } from "react";
 import { FinHeader } from "./_FinHeader";
 import { useInstitutionContacts } from "@/hooks/useInstitutionContacts";
+import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
@@ -32,29 +33,11 @@ type StoredEvent = {
   color: string;
 };
 
-const STORAGE_KEY = "upra:calendario:events";
-const CHANGE_EVENT = "upra:calendario:changed";
-
 const EVENT_COLORS: Record<EventType, string> = {
   reuniao: "hsl(142 65% 35%)",
   prazo: "hsl(0 72% 51%)",
   pessoal: "hsl(217 91% 60%)",
 };
-
-function loadEvents(): StoredEvent[] {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    const arr = raw ? JSON.parse(raw) : [];
-    return Array.isArray(arr) ? arr : [];
-  } catch { return []; }
-}
-
-function saveEvent(ev: StoredEvent) {
-  const all = loadEvents();
-  all.push(ev);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
-  window.dispatchEvent(new CustomEvent(CHANGE_EVENT));
-}
 
 const EVENT_TYPES: { value: EventType; label: string; icon: typeof Video }[] = [
   { value: "reuniao", label: "Reunião", icon: Users },
