@@ -579,6 +579,7 @@ export type Database = {
     Functions: {
       current_institution_id: { Args: never; Returns: string }
       get_or_create_dm: { Args: { _other_user_id: string }; Returns: string }
+      get_user_name: { Args: { _user_id: string }; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

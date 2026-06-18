@@ -108,12 +108,8 @@ export default function StudentChat() {
             other_name = match.display_name;
             other_modulo = match.modulo;
           } else {
-            const { data: prof } = await (supabase as any)
-              .from("profiles")
-              .select("display_name")
-              .eq("id", otherId)
-              .maybeSingle();
-            other_name = prof?.display_name ?? other_name;
+            const { data: name } = await (supabase as any).rpc("get_user_name", { _user_id: otherId });
+            other_name = name ?? other_name;
           }
         }
       }
