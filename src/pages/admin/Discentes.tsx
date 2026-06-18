@@ -38,7 +38,8 @@ type Draft = {
   provincia: string;
   municipio: string;
   endereco: string;
-  enc_nome: string;
+  enc_primeiro_nome: string;
+  enc_ultimo_nome: string;
   enc_parentesco: string;
   enc_telefone: string;
   encBilheteFile: File | null;
@@ -51,6 +52,33 @@ type Draft = {
 const anosPool = ["1", "2", "3", "4", "5", "6"];
 const turmasPool = ["A", "B", "C", "D", "E"];
 const EMAIL_DOMAIN = "upra.kor";
+
+const PROVINCIAS = [
+  "Bengo", "Benguela", "Bié", "Cabinda", "Cuando Cubango", "Cuanza Norte",
+  "Cuanza Sul", "Cunene", "Huambo", "Huíla", "Luanda", "Lunda Norte",
+  "Lunda Sul", "Malanje", "Moxico", "Namibe", "Uíge", "Zaire",
+];
+
+const MUNICIPIOS: Record<string, string[]> = {
+  "Luanda": ["Luanda", "Belas", "Cacuaco", "Cazenga", "Kilamba Kiaxi", "Talatona", "Viana"],
+  "Benguela": ["Benguela", "Baía Farta", "Bocoio", "Catumbela", "Cubal", "Ganda", "Lobito"],
+  "Bié": ["Kuito", "Andulo", "Chinguar", "Cunhinga", "Nharêa"],
+  "Cabinda": ["Cabinda", "Belize", "Buco Zau", "Cacongo"],
+  "Cunene": ["Ondjiva", "Cahama", "Cuanhama", "Curoca", "Namacunde", "Cuvelai"],
+  "Huambo": ["Huambo", "Bailundo", "Caála", "Ecunha", "Londuimbali", "Ucuma"],
+  "Huíla": ["Lubango", "Caconda", "Caluquembe", "Chibia", "Humpata", "Jamba", "Matala"],
+  "Lunda Norte": ["Dundo", "Cambulo", "Chitato", "Cuango", "Luvuca"],
+  "Lunda Sul": ["Saurimo", "Cacolo", "Dala", "Muconda"],
+  "Malanje": ["Malanje", "Cacuso", "Calandula", "Cambundi-Catembo", "Kunda-dia-Base", "Massango"],
+  "Namibe": ["Namibe", "Bibala", "Camucoio", "Tombua"],
+  "Uíge": ["Uíge", "Ambuíla", "Bembe", "Maquela do Zombo", "Mucaba", "Negage"],
+  "Zaire": ["Mbanza Kongo", "Cuimba", "Luvo", "Nóqui", "Soyo", "Tomboco"],
+  "Bengo": ["Caxito", "Ambriz", "Bula Atumba", "Dande", "Dembos", "Nambuangongo", "Pango-Aluquém"],
+  "Cuanza Norte": ["Ndalatando", "Ambaca", "Banga", "Bolongongo", "Cambambe", "Golungo Alto"],
+  "Cuanza Sul": ["Sumbe", "Amboim", "Cassongue", "Conda", "Ebo", "Mussende", "Porto Amboim", "Quibala", "Quilenda", "Seles"],
+  "Cuando Cubango": ["Menongue", "Calai", "Changar", "Cuchi", "Cuito Cuanavale", "Dirico", "Mavinga", "Nancova", "Rivungo"],
+  "Moxico": ["Luena", "Alto Zambeze", "Cameia", "Léua", "Luau", "Luchazes"],
+};
 
 const slug = (s: string) =>
   s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "").trim();
@@ -77,7 +105,8 @@ const emptyDraft = (faculdade_id = "", curso_id = ""): Draft => ({
   provincia: "",
   municipio: "",
   endereco: "",
-  enc_nome: "",
+  enc_primeiro_nome: "",
+  enc_ultimo_nome: "",
   enc_parentesco: "",
   enc_telefone: "",
   encBilheteFile: null,
