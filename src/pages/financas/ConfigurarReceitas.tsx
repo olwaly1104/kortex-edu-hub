@@ -689,7 +689,9 @@ function DespesasSection({ email }: { email?: string | null }) {
           </Button>
         </div>
       </Card>
+      )}
     </div>
+
   );
 }
 
