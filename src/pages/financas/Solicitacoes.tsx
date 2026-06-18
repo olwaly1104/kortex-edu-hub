@@ -196,10 +196,17 @@ export default function FinancasSolicitacoes() {
       <div className="rounded-xl border border-border bg-gradient-to-r from-primary/5 to-transparent px-5 py-4">
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div className="min-w-0 space-y-2.5">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-[11px] uppercase tracking-wider font-semibold text-primary">
-              <GraduationCap className="w-3.5 h-3.5" />
-              Ano Letivo <span className="font-bold tabular-nums">{ANO_LETIVO}</span>
-            </span>
+            {live ? (
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-[11px] uppercase tracking-wider font-semibold text-primary">
+                <GraduationCap className="w-3.5 h-3.5" />
+                Ano Letivo <span className="font-bold tabular-nums">{ANO_LETIVO}</span>
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-300 bg-amber-50 px-3 py-1 text-[11px] uppercase tracking-wider font-semibold text-amber-800">
+                <Rocket className="w-3.5 h-3.5" />
+                Onboarding
+              </span>
+            )}
             <div>
               <h1 className="text-xl font-bold text-foreground flex items-center gap-2 leading-tight">
                 Minhas Solicitações
