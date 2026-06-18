@@ -436,7 +436,11 @@ export default function StudentChat() {
                                 : "bg-card border border-border rounded-bl-md",
                             )}
                           >
-                            <p className="whitespace-pre-wrap break-words">{m.content}</p>
+                            {/^https?:\/\/\S+\.(gif|png|jpe?g|webp)(\?\S*)?$/i.test(m.content) ? (
+                              <img src={m.content} alt="gif" className="rounded-lg max-w-full max-h-60 object-contain" />
+                            ) : (
+                              <p className="whitespace-pre-wrap break-words">{m.content}</p>
+                            )}
                             <p
                               className={cn(
                                 "text-[10px] mt-1",
