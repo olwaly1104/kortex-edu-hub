@@ -421,15 +421,6 @@ export default function AdminDiscentes() {
               <Field label="Nº Bilhete de Identidade">
                 <Input value={draft.bilhete} onChange={(e) => setF("bilhete", e.target.value)} placeholder="00000000XX000" className="h-8 text-xs" />
               </Field>
-              <Field label="Bilhete (upload)">
-                <FileButton
-                  file={draft.bilheteFile}
-                  onPick={(f) => setF("bilheteFile", f)}
-                  inputRef={biInput}
-                  accept="image/*,application/pdf"
-                  Icon={IdCard}
-                />
-              </Field>
             </div>
           </div>
 
@@ -471,17 +462,6 @@ export default function AdminDiscentes() {
                   <SelectContent>{turmasPool.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
                 </Select>
               </Field>
-              <div className="md:col-span-4">
-                <Field label="Certificado Ensino Médio (upload)">
-                  <FileButton
-                    file={draft.certificadoFile}
-                    onPick={(f) => setF("certificadoFile", f)}
-                    inputRef={certInput}
-                    accept="image/*,application/pdf"
-                    Icon={FileText}
-                  />
-                </Field>
-              </div>
             </div>
           </div>
 
@@ -535,6 +515,38 @@ export default function AdminDiscentes() {
               <Field label="Contacto do responsável">
                 <Input value={draft.enc_telefone} onChange={(e) => setF("enc_telefone", e.target.value)} placeholder="+244 9XX XXX XXX" className="h-8 text-xs" />
               </Field>
+            </div>
+          </div>
+
+          {/* Auto email */}
+          <Field label="Email institucional (gerado automaticamente)">
+            <div className="h-8 px-2.5 flex items-center text-[11px] text-muted-foreground bg-background border border-input rounded-md truncate font-mono">
+              {previewEmail || `nome.apelido@${EMAIL_DOMAIN}`}
+            </div>
+          </Field>
+
+          {/* Documentação */}
+          <div>
+            <p className="text-[10px] uppercase tracking-wide text-muted-foreground font-semibold mb-2">Documentação</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+              <Field label="Bilhete de Identidade (upload)">
+                <FileButton
+                  file={draft.bilheteFile}
+                  onPick={(f) => setF("bilheteFile", f)}
+                  inputRef={biInput}
+                  accept="image/*,application/pdf"
+                  Icon={IdCard}
+                />
+              </Field>
+              <Field label="Certificado Ensino Médio (upload)">
+                <FileButton
+                  file={draft.certificadoFile}
+                  onPick={(f) => setF("certificadoFile", f)}
+                  inputRef={certInput}
+                  accept="image/*,application/pdf"
+                  Icon={FileText}
+                />
+              </Field>
               <Field label="Bilhete do responsável (upload)">
                 <FileButton
                   file={draft.encBilheteFile}
@@ -546,13 +558,6 @@ export default function AdminDiscentes() {
               </Field>
             </div>
           </div>
-
-          {/* Auto email */}
-          <Field label="Email institucional (gerado automaticamente)">
-            <div className="h-8 px-2.5 flex items-center text-[11px] text-muted-foreground bg-background border border-input rounded-md truncate font-mono">
-              {previewEmail || `nome.apelido@${EMAIL_DOMAIN}`}
-            </div>
-          </Field>
 
           <div className="flex justify-end">
             <Button
