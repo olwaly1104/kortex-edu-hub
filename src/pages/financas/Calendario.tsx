@@ -62,8 +62,9 @@ const EVENT_TYPES: { value: EventType; label: string; icon: typeof Video }[] = [
   { value: "pessoal", label: "Pessoal", icon: User },
 ];
 
-function CriarEventoDialog({ defaultDate, trigger }: { defaultDate: Date; trigger: React.ReactNode }) {
+function CriarEventoDialog({ defaultDate, trigger, onCreated }: { defaultDate: Date; trigger: React.ReactNode; onCreated?: (dateISO: string) => void }) {
   const todayISO = new Date().toISOString().split("T")[0];
+  const [step, setStep] = useState<"form" | "confirm">("form");
   const [open, setOpen] = useState(false);
   const [type, setType] = useState<EventType>("reuniao");
   const [modalidade, setModalidade] = useState<Modalidade>("presencial");
