@@ -110,6 +110,14 @@ export default function StudentChat() {
           } else {
             const { data: name } = await (supabase as any).rpc("get_user_name", { _user_id: otherId });
             other_name = name ?? other_name;
+            const { data: roleRow } = await (supabase as any)
+              .from("user_roles")
+              .select("role")
+              .eq("user_id", otherId)
+              .order("created_at", { ascending: true })
+              .limit(1)
+              .maybeSingle();
+            other_modulo = roleRow?.role ?? null;
           }
         }
       }
