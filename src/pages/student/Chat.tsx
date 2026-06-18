@@ -444,11 +444,16 @@ export default function StudentChat() {
                     selectedId === c.id && "bg-muted",
                   )}
                 >
-                  <Avatar className="w-10 h-10 shrink-0">
-                    <AvatarFallback className="text-xs bg-primary/10 text-primary font-medium">
-                      {initials(c.other_name ?? "?")}
-                    </AvatarFallback>
-                  </Avatar>
+                  <div className="relative shrink-0">
+                    <Avatar className="w-10 h-10">
+                      <AvatarFallback className="text-xs bg-primary/10 text-primary font-medium">
+                        {initials(c.other_name ?? "?")}
+                      </AvatarFallback>
+                    </Avatar>
+                    {c.other_id && onlineIds.has(c.other_id) && (
+                      <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-card" />
+                    )}
+                  </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-1.5 min-w-0">
