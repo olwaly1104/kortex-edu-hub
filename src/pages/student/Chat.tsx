@@ -173,7 +173,7 @@ export default function StudentChat() {
   }, [selectedId]);
 
   const send = async () => {
-    if (!draft.trim() || !selectedId || !user) return;
+    if (!draft.trim() || !selectedId || !uid) return;
     const content = draft.trim();
     setDraft("");
     await (supabase as any)
