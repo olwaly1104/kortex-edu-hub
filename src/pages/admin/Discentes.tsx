@@ -38,7 +38,8 @@ type Draft = {
   provincia: string;
   municipio: string;
   endereco: string;
-  enc_nome: string;
+  enc_primeiro_nome: string;
+  enc_ultimo_nome: string;
   enc_parentesco: string;
   enc_telefone: string;
   encBilheteFile: File | null;
@@ -51,6 +52,33 @@ type Draft = {
 const anosPool = ["1", "2", "3", "4", "5", "6"];
 const turmasPool = ["A", "B", "C", "D", "E"];
 const EMAIL_DOMAIN = "upra.kor";
+
+const PROVINCIAS = [
+  "Bengo", "Benguela", "Bié", "Cabinda", "Cuando Cubango", "Cuanza Norte",
+  "Cuanza Sul", "Cunene", "Huambo", "Huíla", "Luanda", "Lunda Norte",
+  "Lunda Sul", "Malanje", "Moxico", "Namibe", "Uíge", "Zaire",
+];
+
+const MUNICIPIOS: Record<string, string[]> = {
+  "Luanda": ["Luanda", "Belas", "Cacuaco", "Cazenga", "Kilamba Kiaxi", "Talatona", "Viana"],
+  "Benguela": ["Benguela", "Baía Farta", "Bocoio", "Catumbela", "Cubal", "Ganda", "Lobito"],
+  "Bié": ["Kuito", "Andulo", "Chinguar", "Cunhinga", "Nharêa"],
+  "Cabinda": ["Cabinda", "Belize", "Buco Zau", "Cacongo"],
+  "Cunene": ["Ondjiva", "Cahama", "Cuanhama", "Curoca", "Namacunde", "Cuvelai"],
+  "Huambo": ["Huambo", "Bailundo", "Caála", "Ecunha", "Londuimbali", "Ucuma"],
+  "Huíla": ["Lubango", "Caconda", "Caluquembe", "Chibia", "Humpata", "Jamba", "Matala"],
+  "Lunda Norte": ["Dundo", "Cambulo", "Chitato", "Cuango", "Luvuca"],
+  "Lunda Sul": ["Saurimo", "Cacolo", "Dala", "Muconda"],
+  "Malanje": ["Malanje", "Cacuso", "Calandula", "Cambundi-Catembo", "Kunda-dia-Base", "Massango"],
+  "Namibe": ["Namibe", "Bibala", "Camucoio", "Tombua"],
+  "Uíge": ["Uíge", "Ambuíla", "Bembe", "Maquela do Zombo", "Mucaba", "Negage"],
+  "Zaire": ["Mbanza Kongo", "Cuimba", "Luvo", "Nóqui", "Soyo", "Tomboco"],
+  "Bengo": ["Caxito", "Ambriz", "Bula Atumba", "Dande", "Dembos", "Nambuangongo", "Pango-Aluquém"],
+  "Cuanza Norte": ["Ndalatando", "Ambaca", "Banga", "Bolongongo", "Cambambe", "Golungo Alto"],
+  "Cuanza Sul": ["Sumbe", "Amboim", "Cassongue", "Conda", "Ebo", "Mussende", "Porto Amboim", "Quibala", "Quilenda", "Seles"],
+  "Cuando Cubango": ["Menongue", "Calai", "Changar", "Cuchi", "Cuito Cuanavale", "Dirico", "Mavinga", "Nancova", "Rivungo"],
+  "Moxico": ["Luena", "Alto Zambeze", "Cameia", "Léua", "Luau", "Luchazes"],
+};
 
 const slug = (s: string) =>
   s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "").trim();
@@ -77,7 +105,8 @@ const emptyDraft = (faculdade_id = "", curso_id = ""): Draft => ({
   provincia: "",
   municipio: "",
   endereco: "",
-  enc_nome: "",
+  enc_primeiro_nome: "",
+  enc_ultimo_nome: "",
   enc_parentesco: "",
   enc_telefone: "",
   encBilheteFile: null,
@@ -228,7 +257,7 @@ export default function AdminDiscentes() {
         provincia: draft.provincia.trim() || null,
         municipio: draft.municipio.trim() || null,
         endereco: draft.endereco.trim() || null,
-        enc_nome: draft.enc_nome.trim() || null,
+        enc_nome: `${draft.enc_primeiro_nome.trim()} ${draft.enc_ultimo_nome.trim()}`.trim() || null,
         enc_parentesco: draft.enc_parentesco.trim() || null,
         enc_telefone: draft.enc_telefone.trim() || null,
         foto_url,
@@ -447,23 +476,14 @@ export default function AdminDiscentes() {
                   <Field label="Nº Bilhete de Identidade">
                     <Input value={draft.bilhete} onChange={(e) => setF("bilhete", e.target.value)} placeholder="00000000XX000" className="h-8 text-xs" />
                   </Field>
-                  <Field label="Regime">
-                    <Select value={draft.regime} onValueChange={(v) => setF("regime", v as Regime)}>
-                      <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="normal">Normal</SelectItem>
-                        <SelectItem value="bolseiro">Bolseiro</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </Field>
                 </div>
               </div>
             </section>
 
             {/* 2. Enquadramento Académico */}
             <section>
-              <SectionTitle index={2} title="Enquadramento Académico" hint="Faculdade, curso, ano e turma de inscrição" />
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              <SectionTitle index={2} title="Enquadramento Académico" hint="Faculdade, curso, ano, turma e regime de inscrição" />
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
                 <Field label="Faculdade">
                   <Select value={draft.faculdade_id} onValueChange={(v) => setF("faculdade_id", v)}>
                     <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="—" /></SelectTrigger>
@@ -498,6 +518,15 @@ export default function AdminDiscentes() {
                     <SelectContent>{turmasPool.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
                   </Select>
                 </Field>
+                <Field label="Regime">
+                  <Select value={draft.regime} onValueChange={(v) => setF("regime", v as Regime)}>
+                    <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="normal">Normal</SelectItem>
+                      <SelectItem value="bolseiro">Bolseiro</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </Field>
               </div>
             </section>
 
@@ -524,10 +553,26 @@ export default function AdminDiscentes() {
               <SectionTitle index={4} title="Morada de Residência" hint="Localização atual do estudante" />
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                 <Field label="Província">
-                  <Input value={draft.provincia} onChange={(e) => setF("provincia", e.target.value)} placeholder="Luanda" className="h-8 text-xs" />
+                  <Select value={draft.provincia} onValueChange={(v) => setDraft((d) => ({ ...d, provincia: v, municipio: "" }))}>
+                    <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="—" /></SelectTrigger>
+                    <SelectContent>
+                      {PROVINCIAS.map((p) => (
+                        <SelectItem key={p} value={p}>{p}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </Field>
                 <Field label="Município">
-                  <Input value={draft.municipio} onChange={(e) => setF("municipio", e.target.value)} placeholder="Belas" className="h-8 text-xs" />
+                  <Select value={draft.municipio} onValueChange={(v) => setF("municipio", v)} disabled={!draft.provincia}>
+                    <SelectTrigger className="h-8 text-xs">
+                      <SelectValue placeholder={draft.provincia ? "—" : "Escolha província"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {(MUNICIPIOS[draft.provincia] || []).map((m) => (
+                        <SelectItem key={m} value={m}>{m}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </Field>
                 <div className="md:col-span-2">
                   <Field label="Endereço">
@@ -540,9 +585,12 @@ export default function AdminDiscentes() {
             {/* 5. Encarregado */}
             <section>
               <SectionTitle index={5} title="Encarregado de Educação" hint="Pessoa responsável pelo estudante" />
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                <Field label="Nome completo">
-                  <Input value={draft.enc_nome} onChange={(e) => setF("enc_nome", e.target.value)} placeholder="João Silva" className="h-8 text-xs" />
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                <Field label="Primeiro nome">
+                  <Input value={draft.enc_primeiro_nome} onChange={(e) => setF("enc_primeiro_nome", e.target.value)} placeholder="João" className="h-8 text-xs" />
+                </Field>
+                <Field label="Último nome">
+                  <Input value={draft.enc_ultimo_nome} onChange={(e) => setF("enc_ultimo_nome", e.target.value)} placeholder="Silva" className="h-8 text-xs" />
                 </Field>
                 <Field label="Parentesco">
                   <Input value={draft.enc_parentesco} onChange={(e) => setF("enc_parentesco", e.target.value)} placeholder="Pai / Mãe / Tutor" className="h-8 text-xs" />
