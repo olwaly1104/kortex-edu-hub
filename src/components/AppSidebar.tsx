@@ -5,12 +5,13 @@ import {
   Mail, Award, User, LogOut, GraduationCap,
   BarChart3, ChevronLeft, ChevronRight, Library, Wallet, Trophy, ClipboardList,
   CheckSquare, Building2, UserCog, Eye, Layers, FileText, FolderOpen, TrendingUp, HelpCircle, Settings2, BrainCircuit,
-  Sparkles, Wand2, ClipboardCheck, UserPlus, ShieldCheck, MapPin,
+  Sparkles, Wand2, ClipboardCheck, UserPlus, ShieldCheck, MapPin, Clock, Rocket,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import logoUpra from "@/assets/logo-upra.asset.json";
 import { useFinAnunciosUnread } from "@/hooks/useFinAnunciosUnread";
+import { isInstitutionLive } from "@/pages/financas/_FinHeader";
 
 
 interface NavItem { label: string; icon: React.ElementType; path: string; badge?: number; }
@@ -297,8 +298,29 @@ export default function AppSidebar() {
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
   const { unreadCount: finAnunciosUnread } = useFinAnunciosUnread();
+  const [now, setNow] = useState<Date>(new Date());
+  const [live, setLive] = useState<boolean>(() => isInstitutionLive(user?.email));
+
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  useEffect(() => {
+    const recheck = () => setLive(isInstitutionLive(user?.email));
+    recheck();
+    window.addEventListener("focus", recheck);
+    window.addEventListener("storage", recheck);
+    return () => {
+      window.removeEventListener("focus", recheck);
+      window.removeEventListener("storage", recheck);
+    };
+  }, [user?.email]);
 
   if (!user) return null;
+
+  const liveTime = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}:${String(now.getSeconds()).padStart(2, "0")}`;
+  const todayLabel = now.toLocaleDateString("pt-PT", { weekday: "short", day: "2-digit", month: "short" });
 
   const baseSections = roleSectionsMap[user.role] || studentSections;
   const sections = user.role === "financas"
@@ -326,7 +348,32 @@ export default function AppSidebar() {
             </div>
           )}
         </div>
+
+        {!collapsed && (
+          <div className="mt-3 space-y-1.5">
+            {live ? (
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-sidebar-border bg-sidebar-accent/40 px-2 py-0.5 text-[9.5px] uppercase tracking-wider font-semibold text-sidebar-primary">
+                <GraduationCap className="w-3 h-3" />
+                Ano Letivo
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-300 bg-amber-50 px-2 py-0.5 text-[9.5px] uppercase tracking-wider font-semibold text-amber-800">
+                <Rocket className="w-3 h-3" />
+                Onboarding
+              </span>
+            )}
+            <div className="flex items-center gap-1.5 text-[10.5px] text-sidebar-foreground/70 font-medium capitalize">
+              <CalendarDays className="w-3 h-3 shrink-0" />
+              <span className="truncate">{todayLabel}</span>
+              <span className="text-sidebar-foreground/30">·</span>
+              <Clock className="w-3 h-3 shrink-0" />
+              <span className="tabular-nums font-semibold text-sidebar-primary">{liveTime}</span>
+            </div>
+          </div>
+        )}
       </div>
+
+
 
 
       <nav className="flex-1 overflow-y-auto py-2 px-2">
