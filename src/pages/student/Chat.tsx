@@ -57,6 +57,23 @@ const moduloLabel = (m?: string | null) => {
   return map[m] ?? m;
 };
 
+function formatLastSeen(iso?: string | null): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  const now = new Date();
+  const diffMs = now.getTime() - d.getTime();
+  const diffMin = Math.floor(diffMs / 60000);
+  if (diffMin < 1) return "visto agora mesmo";
+  if (diffMin < 60) return `visto há ${diffMin} min`;
+  const sameDay = d.toDateString() === now.toDateString();
+  const yesterday = new Date(now); yesterday.setDate(now.getDate() - 1);
+  const isYesterday = d.toDateString() === yesterday.toDateString();
+  const hhmm = d.toLocaleTimeString("pt-PT", { hour: "2-digit", minute: "2-digit" });
+  if (sameDay) return `visto hoje às ${hhmm}`;
+  if (isYesterday) return `visto ontem às ${hhmm}`;
+  return `visto em ${d.toLocaleDateString("pt-PT", { day: "2-digit", month: "2-digit" })} às ${hhmm}`;
+}
+
 export default function StudentChat() {
   const uid = useAuthUid();
   const { contacts } = useInstitutionContacts();
@@ -70,6 +87,8 @@ export default function StudentChat() {
   const [tab, setTab] = useState<"chats" | "chamadas" | "grupos">("chats");
   const [pickerOpen, setPickerOpen] = useState(false);
   const [call, setCall] = useState<{ mode: "audio" | "video"; name: string } | null>(null);
+  const [onlineIds, setOnlineIds] = useState<Set<string>>(new Set());
+  const [lastSeen, setLastSeen] = useState<Record<string, string | null>>({});
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
