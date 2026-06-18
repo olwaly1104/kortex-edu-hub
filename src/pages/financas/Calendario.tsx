@@ -76,7 +76,7 @@ function CriarEventoDialog({ defaultDate, trigger }: { defaultDate: Date; trigge
       toast.error("A data não pode ser anterior a hoje.");
       return;
     }
-    if (type !== "prazo" && endTime <= startTime) {
+    if (type === "reuniao" && endTime <= startTime) {
       toast.error("O horário de fim deve ser após o início.");
       return;
     }
