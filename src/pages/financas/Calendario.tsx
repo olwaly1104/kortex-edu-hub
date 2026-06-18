@@ -213,25 +213,11 @@ function CriarEventoDialog({ defaultDate, trigger }: { defaultDate: Date; trigge
             </div>
           )}
 
-          {/* Local (não-reuniao) */}
-          {type !== "reuniao" && (
+          {/* Local (pessoal) */}
+          {type === "pessoal" && (
             <div className="space-y-1.5">
-              <Label className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Local (opcional)</Label>
-              <Select value={location} onValueChange={setLocation}>
-                <SelectTrigger className="h-9">
-                  <SelectValue placeholder={geopontos.length === 0 ? "Sem geopontos registados" : "Selecionar local"} />
-                </SelectTrigger>
-                <SelectContent>
-                  {geopontos.map((g) => (
-                    <SelectItem key={g.id} value={g.nome || g.id}>
-                      <span className="flex items-center gap-2">
-                        <MapPin className="w-3.5 h-3.5 text-muted-foreground" />
-                        {g.nome || "Sem nome"}
-                      </span>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Label htmlFor="ev-local" className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Local (opcional)</Label>
+              <Input id="ev-local" value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Escrever local..." className="h-9" />
             </div>
           )}
 
