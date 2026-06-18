@@ -9,7 +9,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Send, MessageSquare, Search, Plus, Phone, Video, MoreVertical, Paperclip, Users, PhoneCall } from "lucide-react";
+import { Send, MessageSquare, Search, Plus, Phone, Video, MoreVertical, Paperclip, Users, PhoneCall, Check, CheckCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { EmojiPicker } from "@/components/chat/EmojiPicker";
 import { GifPicker } from "@/components/chat/GifPicker";
