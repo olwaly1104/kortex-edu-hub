@@ -9,8 +9,9 @@ import {
 } from "@/components/ui/dialog";
 import {
   ArrowLeft, Mail, MessageCircle, Users, Phone, MapPin, UserCheck, Calendar,
-  GraduationCap, FileText, Building2, IdCard, Loader2, Award,
+  GraduationCap, FileText, Building2, IdCard, Loader2, Award, Eye, Download,
 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useEstudantes, useCursos, useFaculdades } from "@/lib/useInstitution";
@@ -32,6 +33,7 @@ function useSignedUrl(path: string | null) {
 export default function AdminDiscenteProfile() {
   const { discenteId } = useParams();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const { data: rows = [], isLoading } = useEstudantes();
   const { data: cursos = [] } = useCursos();
   const { data: faculdades = [] } = useFaculdades();
