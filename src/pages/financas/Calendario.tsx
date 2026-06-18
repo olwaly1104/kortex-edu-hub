@@ -117,6 +117,7 @@ function CriarEventoDialog({ defaultDate, trigger, onCreated }: { defaultDate: D
 
   const resetForm = () => {
     setTitle(""); setLocation(""); setLink(""); setParticipants([]); setParticipantInput("");
+    setCategoria("entrada");
     setStep("form");
   };
 
