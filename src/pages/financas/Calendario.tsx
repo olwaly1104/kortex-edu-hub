@@ -409,9 +409,9 @@ function CriarEventoDialog({ defaultDate, trigger, onCreated }: { defaultDate: D
                 <div className="min-w-0">
                   <p className="text-sm font-semibold text-foreground truncate">{title}</p>
                   <p className="text-[11px] text-muted-foreground capitalize">
-                    {EVENT_TYPES.find(t => t.value === type)?.label}
-                    {type === "caixa" && categoria ? ` · ${CAIXA_CATEGORIAS.find(c => c.value === categoria)?.label}` : ""}
+                    {EVENT_TYPE_LABELS[type]}
                   </p>
+
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3 text-xs">
