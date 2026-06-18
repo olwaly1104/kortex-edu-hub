@@ -21,16 +21,24 @@ const turmasPool = ["A", "B", "C", "D", "E"];
 type Draft = {
   primeiroNome: string;
   ultimoNome: string;
-  email: string;
   curso_id: string;
   ano: string;
   turma: string;
 };
 
+const EMAIL_DOMAIN = "upra.kor";
+const slug = (s: string) =>
+  s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "").trim();
+const buildEmail = (primeiro: string, ultimo: string) => {
+  const p = slug(primeiro);
+  const u = slug(ultimo);
+  if (!p && !u) return "";
+  return `${[p, u].filter(Boolean).join(".")}@${EMAIL_DOMAIN}`;
+};
+
 const empty = (curso_id = ""): Draft => ({
   primeiroNome: "",
   ultimoNome: "",
-  email: "",
   curso_id,
   ano: "1",
   turma: "A",
@@ -67,19 +75,21 @@ export default function GapEstudantes() {
   };
 
   const save = async () => {
-    if (!draft.primeiroNome.trim() || !draft.email.trim() || !draft.curso_id) return;
+    if (!draft.primeiroNome.trim() || !draft.curso_id) return;
     const nome = `${draft.primeiroNome.trim()} ${draft.ultimoNome.trim()}`.trim();
+    const email = buildEmail(draft.primeiroNome, draft.ultimoNome);
+    if (!email) { toast.error("Não foi possível gerar email a partir do nome"); return; }
     try {
       await createMut.mutateAsync({
         curso_id: draft.curso_id,
         nome,
-        email: draft.email.trim(),
+        email,
         ano: draft.ano,
         turma: draft.turma,
         primeiro_nome: draft.primeiroNome.trim(),
         ultimo_nome: draft.ultimoNome.trim() || null,
       });
-      toast.success("Discente adicionado");
+      toast.success(`Discente adicionado · ${email}`);
       setOpen(false);
     } catch (e: any) {
       toast.error(e?.message || "Erro ao adicionar discente");
@@ -256,14 +266,10 @@ export default function GapEstudantes() {
             </FormSection>
 
             <FormSection icon={<Mail className="w-3.5 h-3.5" />} title="Acesso">
-              <Label className="text-xs">Email institucional</Label>
-              <Input
-                className="h-9 mt-1"
-                type="email"
-                value={draft.email}
-                onChange={(e) => setF("email", e.target.value)}
-                placeholder="estudante@upra.kor"
-              />
+              <Label className="text-xs">Email institucional (gerado automaticamente)</Label>
+              <div className="h-9 mt-1 px-3 flex items-center text-xs font-mono text-muted-foreground bg-muted/40 border border-input rounded-md truncate">
+                {buildEmail(draft.primeiroNome, draft.ultimoNome) || `nome@${EMAIL_DOMAIN}`}
+              </div>
             </FormSection>
 
             <FormSection icon={<BookOpen className="w-3.5 h-3.5" />} title="Matrícula">
@@ -328,7 +334,6 @@ export default function GapEstudantes() {
               onClick={save}
               disabled={
                 !draft.primeiroNome.trim() ||
-                !draft.email.trim() ||
                 !draft.curso_id ||
                 createMut.isPending
               }

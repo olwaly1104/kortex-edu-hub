@@ -16,7 +16,6 @@ import {
 type Draft = {
   primeiroNome: string;
   ultimoNome: string;
-  email: string;
   curso_id: string;
   ano: string;
   turma: string;
@@ -24,11 +23,26 @@ type Draft = {
 
 const anosPool = ["1", "2", "3", "4", "5", "6"];
 const turmasPool = ["A", "B", "C", "D", "E"];
+const EMAIL_DOMAIN = "upra.kor";
+
+const slug = (s: string) =>
+  s
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "")
+    .trim();
+
+const buildEmail = (primeiro: string, ultimo: string) => {
+  const p = slug(primeiro);
+  const u = slug(ultimo);
+  if (!p && !u) return "";
+  return `${[p, u].filter(Boolean).join(".")}@${EMAIL_DOMAIN}`;
+};
 
 const emptyDraft = (curso_id = ""): Draft => ({
   primeiroNome: "",
   ultimoNome: "",
-  email: "",
   curso_id,
   ano: "1",
   turma: "A",
@@ -90,22 +104,27 @@ export default function AdminDiscentes() {
   const setF = <K extends keyof Draft>(k: K, v: Draft[K]) => setDraft((d) => ({ ...d, [k]: v }));
 
   const addRow = async () => {
-    if (!draft.primeiroNome.trim() || !draft.email.trim() || !draft.curso_id) {
-      toast.error("Preencha nome, email e curso");
+    if (!draft.primeiroNome.trim() || !draft.curso_id) {
+      toast.error("Preencha nome e curso");
       return;
     }
     const nome = `${draft.primeiroNome.trim()} ${draft.ultimoNome.trim()}`.trim();
+    const email = buildEmail(draft.primeiroNome, draft.ultimoNome);
+    if (!email) {
+      toast.error("Não foi possível gerar email a partir do nome");
+      return;
+    }
     try {
       await createMut.mutateAsync({
         curso_id: draft.curso_id,
         nome,
-        email: draft.email.trim(),
+        email,
         ano: draft.ano,
         turma: draft.turma,
         primeiro_nome: draft.primeiroNome.trim(),
         ultimo_nome: draft.ultimoNome.trim() || null,
       });
-      toast.success("Discente adicionado");
+      toast.success(`Discente adicionado · ${email}`);
       setDraft(emptyDraft(draft.curso_id));
     } catch (e: any) {
       toast.error(e?.message || "Erro ao adicionar discente");
@@ -225,13 +244,9 @@ export default function AdminDiscentes() {
               placeholder="Último nome"
               className="h-8 text-xs"
             />
-            <Input
-              type="email"
-              value={draft.email}
-              onChange={(e) => setF("email", e.target.value)}
-              placeholder="estudante@upra.kor"
-              className="h-8 text-xs"
-            />
+            <div className="h-8 px-2.5 flex items-center text-[11px] text-muted-foreground bg-muted/40 border border-input rounded-md truncate font-mono" title="Email gerado automaticamente">
+              {buildEmail(draft.primeiroNome, draft.ultimoNome) || `nome@${EMAIL_DOMAIN}`}
+            </div>
             <Select value={draft.curso_id} onValueChange={(v) => setF("curso_id", v)}>
               <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="—" /></SelectTrigger>
               <SelectContent>
