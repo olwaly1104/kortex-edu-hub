@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 import { EmojiPicker } from "@/components/chat/EmojiPicker";
 import { GifPicker } from "@/components/chat/GifPicker";
 import { CallDialog } from "@/components/chat/CallDialog";
+import { ModuleTag } from "@/components/chat/ModuleTag";
 
 interface Conversation {
   id: string;
@@ -269,7 +270,7 @@ export default function StudentChat() {
                         </Avatar>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium truncate">{c.display_name}</p>
-                          <p className="text-[11px] text-muted-foreground truncate">{moduloLabel(c.modulo)}</p>
+                          <div className="mt-0.5"><ModuleTag modulo={c.modulo} size="xs" /></div>
                         </div>
                       </button>
                     ))
@@ -355,11 +356,7 @@ export default function StudentChat() {
                     </span>
                   </div>
                   <div className="flex items-center gap-1.5 mt-0.5">
-                    {c.other_modulo && (
-                      <Badge variant="secondary" className="h-4 px-1.5 text-[9px] font-normal">
-                        {moduloLabel(c.other_modulo)}
-                      </Badge>
-                    )}
+                    {c.other_modulo && <ModuleTag modulo={c.other_modulo} size="xs" />}
                     <p className="text-[11px] text-muted-foreground truncate flex-1">
                       {c.last_message ?? "Sem mensagens"}
                     </p>
@@ -396,9 +393,7 @@ export default function StudentChat() {
                 </Avatar>
                 <div>
                   <p className="text-sm font-semibold leading-tight">{selected.other_name}</p>
-                  <p className="text-[11px] text-muted-foreground">
-                    {moduloLabel(selected.other_modulo)}
-                  </p>
+                  <div className="mt-1"><ModuleTag modulo={selected.other_modulo} size="xs" /></div>
                 </div>
               </div>
               <div className="flex items-center gap-1">

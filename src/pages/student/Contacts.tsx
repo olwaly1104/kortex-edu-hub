@@ -1,12 +1,12 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Mail, MessageSquare, User, Users } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useInstitutionContacts } from "@/hooks/useInstitutionContacts";
 import EmptyState from "@/components/EmptyState";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { ModuleTag } from "@/components/chat/ModuleTag";
 
 export default function Contacts() {
   const navigate = useNavigate();
@@ -51,7 +51,7 @@ export default function Contacts() {
                 <div className="min-w-0 flex-1">
                   <p className="font-semibold text-foreground truncate">{c.display_name}</p>
                   <p className="text-xs text-muted-foreground truncate">{c.email ?? "—"}</p>
-                  {c.modulo && <Badge variant="outline" className="text-[10px] mt-2 capitalize">{c.modulo}</Badge>}
+                  {c.modulo && <div className="mt-2"><ModuleTag modulo={c.modulo} /></div>}
                 </div>
               </div>
               <div className="flex gap-2 mt-3">
