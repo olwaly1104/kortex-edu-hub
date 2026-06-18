@@ -6,9 +6,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
+import { Upload, Paperclip, Trash2, Calendar as CalendarIcon, Coins, Tag, User2, ShieldCheck, FileSignature } from "lucide-react";
 import { formatCurrency, type Transaction } from "@/data/financeModuleData";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -28,7 +31,32 @@ const statusLabels: Record<string, string> = { aprovada: "Aprovada", pendente: "
 const despesas: Transaction[] = [];
 
 
-const despesaCategories: string[] = [];
+const DESPESA_CATEGORIES = ["Operacional", "Pedagógica", "Manutenção", "Serviços", "Material", "Salários", "Outros"] as const;
+const todayISO = () => new Date().toISOString().slice(0, 10);
+
+type NewDespesa = {
+  date: string;
+  description: string;
+  category: string;
+  amount: string;
+  requestedBy: string;
+  responsavel: string;
+  status: "pendente" | "aprovada" | "rejeitada";
+  justificacao: string;
+  docs: { name: string; size: number }[];
+};
+
+const emptyDespesa: NewDespesa = {
+  date: todayISO(),
+  description: "",
+  category: "",
+  amount: "",
+  requestedBy: "",
+  responsavel: "",
+  status: "pendente",
+  justificacao: "",
+  docs: [],
+};
 
 export default function Despesas() {
   const { toast } = useToast();
@@ -41,7 +69,28 @@ export default function Despesas() {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [periodo, setPeriodo] = useState<Periodo>("mes");
   const [periodoValue, setPeriodoValue] = useState<string>(periodoDefaultValue("mes"));
+  const [form, setForm] = useState<NewDespesa>(emptyDespesa);
   const mult = PERIODO_MULT[periodo];
+
+  const setField = <K extends keyof NewDespesa>(k: K, v: NewDespesa[K]) => setForm(f => ({ ...f, [k]: v }));
+  const amountNum = Number(form.amount.replace(/[^0-9.,]/g, "").replace(",", ".")) || 0;
+  const isValid = form.description.trim().length >= 3 && !!form.category && amountNum > 0 && !!form.date;
+
+  const handleFiles = (files: FileList | null) => {
+    if (!files) return;
+    const added = Array.from(files).slice(0, 5).map(f => ({ name: f.name, size: f.size }));
+    setForm(f => ({ ...f, docs: [...f.docs, ...added].slice(0, 5) }));
+  };
+
+  const submit = () => {
+    if (!isValid) {
+      toast({ title: "Campos obrigatórios em falta", description: "Descrição, categoria, valor e data são obrigatórios.", variant: "destructive" });
+      return;
+    }
+    toast({ title: "Despesa registada", description: `${form.description} · ${formatCurrency(amountNum)}` });
+    setForm(emptyDespesa);
+    setSheetOpen(false);
+  };
 
 
   const isSortActive = sortField !== null;
@@ -75,7 +124,7 @@ export default function Despesas() {
         subtitle="Aprovação e acompanhamento de despesas institucionais."
         icon={<TrendingDown className="w-5 h-5 text-primary" />}
         right={
-          <Button size="sm" onClick={() => setSheetOpen(true)} className="gap-1.5"><Plus className="w-4 h-4" /> Nova Despesa</Button>
+          <Button size="sm" onClick={() => setSheetOpen(true)} className="gap-1.5"><Plus className="w-4 h-4" /> Adicionar Despesa</Button>
         }
       />
 
@@ -111,7 +160,7 @@ export default function Despesas() {
           {/* Categories first */}
           <div className="flex items-center gap-2">
             <Button size="sm" variant={filterCategory === "todos" ? "default" : "outline"} onClick={() => setFilterCategory("todos")} className="text-xs">Todas</Button>
-            {despesaCategories.map(c => (
+            {DESPESA_CATEGORIES.map(c => (
               <Button key={c} size="sm" variant={filterCategory === c ? "default" : "outline"} onClick={() => setFilterCategory(c)} className="text-xs">{c}</Button>
             ))}
           </div>
@@ -206,22 +255,193 @@ export default function Despesas() {
         <div className="border-t bg-muted/20 px-3 py-2 text-xs text-muted-foreground">{filtered.length} de {despesas.length} despesas</div>
       </Card>
 
-      {/* Sheet */}
+      {/* Sheet — Adicionar Despesa */}
       <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
-        <SheetContent>
-          <SheetHeader><SheetTitle>Nova Despesa</SheetTitle></SheetHeader>
-          <div className="space-y-4 mt-6">
-            {["Descrição", "Categoria", "Solicitado por", "Responsável", "Valor (Kz)", "Data"].map(f => (
-              <div key={f} className="space-y-1.5">
-                <Label className="text-xs">{f}</Label>
-                <Input placeholder={f} className="h-9" />
+        <SheetContent className="w-full sm:max-w-xl overflow-y-auto p-0">
+          <div className="sticky top-0 z-10 bg-gradient-to-br from-primary/10 via-card to-card border-b border-border px-6 py-5">
+            <SheetHeader className="space-y-2 text-left">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-lg bg-primary text-primary-foreground flex items-center justify-center shadow-sm">
+                  <TrendingDown className="w-4 h-4" />
+                </div>
+                <SheetTitle className="text-lg font-bold">Adicionar Despesa</SheetTitle>
               </div>
-            ))}
-            <div className="space-y-1.5">
-              <Label className="text-xs">Justificação</Label>
-              <Textarea placeholder="Motivo da despesa..." className="min-h-[80px]" />
+              <SheetDescription className="text-xs">
+                Preencha os campos abaixo. Os dados alinham-se com as colunas da tabela de despesas.
+              </SheetDescription>
+            </SheetHeader>
+          </div>
+
+          <div className="px-6 py-5 space-y-5">
+            {/* Section: Identificação */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <FileSignature className="w-3.5 h-3.5 text-primary" />
+                <h3 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Identificação</h3>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label className="text-xs font-medium">Descrição <span className="text-destructive">*</span></Label>
+                <Input
+                  placeholder="Ex: Aquisição de projector para sala 12"
+                  value={form.description}
+                  onChange={e => setField("description", e.target.value)}
+                  maxLength={140}
+                  className="h-9"
+                />
+                <p className="text-[10px] text-muted-foreground text-right">{form.description.length}/140</p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-medium flex items-center gap-1"><Tag className="w-3 h-3" /> Categoria <span className="text-destructive">*</span></Label>
+                  <Select value={form.category} onValueChange={v => setField("category", v)}>
+                    <SelectTrigger className="h-9"><SelectValue placeholder="Selecione" /></SelectTrigger>
+                    <SelectContent>
+                      {DESPESA_CATEGORIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-medium flex items-center gap-1"><CalendarIcon className="w-3 h-3" /> Data <span className="text-destructive">*</span></Label>
+                  <Input type="date" value={form.date} max={todayISO()} onChange={e => setField("date", e.target.value)} className="h-9" />
+                </div>
+              </div>
             </div>
-            <Button className="w-full mt-4">Guardar Despesa</Button>
+
+            <Separator />
+
+            {/* Section: Valor */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Coins className="w-3.5 h-3.5 text-primary" />
+                <h3 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Valor</h3>
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs font-medium">Montante (Kz) <span className="text-destructive">*</span></Label>
+                <div className="relative">
+                  <Input
+                    inputMode="decimal"
+                    placeholder="0,00"
+                    value={form.amount}
+                    onChange={e => setField("amount", e.target.value)}
+                    className="h-10 pr-16 text-right text-base font-semibold tabular-nums"
+                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-muted-foreground">Kz</span>
+                </div>
+                {amountNum > 0 && (
+                  <p className="text-[11px] text-destructive font-medium">Previsão: -{formatCurrency(amountNum)}</p>
+                )}
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Section: Pessoas */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <User2 className="w-3.5 h-3.5 text-primary" />
+                <h3 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Pessoas</h3>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-medium">Solicitado por</Label>
+                  <Input placeholder="Nome do solicitante" value={form.requestedBy} onChange={e => setField("requestedBy", e.target.value)} className="h-9" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-medium">Responsável</Label>
+                  <Input placeholder="Aprovador / gestor" value={form.responsavel} onChange={e => setField("responsavel", e.target.value)} className="h-9" />
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Section: Estado & Justificação */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-3.5 h-3.5 text-primary" />
+                <h3 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Estado & Justificação</h3>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label className="text-xs font-medium">Estado inicial</Label>
+                <div className="grid grid-cols-3 gap-2">
+                  {(["pendente", "aprovada", "rejeitada"] as const).map(s => (
+                    <button
+                      key={s}
+                      type="button"
+                      onClick={() => setField("status", s)}
+                      className={cn(
+                        "h-9 rounded-md border text-xs font-medium capitalize transition-colors",
+                        form.status === s
+                          ? s === "aprovada" ? "bg-accent/15 border-accent text-accent"
+                          : s === "rejeitada" ? "bg-destructive/10 border-destructive text-destructive"
+                          : "bg-amber-50 border-amber-300 text-amber-700"
+                          : "bg-background border-input text-muted-foreground hover:border-primary hover:text-primary"
+                      )}
+                    >
+                      {statusLabels[s]}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label className="text-xs font-medium">Justificação</Label>
+                <Textarea
+                  placeholder="Motivo, contexto e impacto da despesa..."
+                  value={form.justificacao}
+                  onChange={e => setField("justificacao", e.target.value)}
+                  maxLength={500}
+                  className="min-h-[88px] text-xs"
+                />
+                <p className="text-[10px] text-muted-foreground text-right">{form.justificacao.length}/500</p>
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Section: Documentos */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Paperclip className="w-3.5 h-3.5 text-primary" />
+                <h3 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Documentos de suporte</h3>
+              </div>
+
+              <label className="flex flex-col items-center justify-center gap-1.5 border-2 border-dashed border-input rounded-lg p-5 cursor-pointer hover:border-primary hover:bg-primary/5 transition-colors">
+                <Upload className="w-5 h-5 text-muted-foreground" />
+                <span className="text-xs font-medium text-foreground">Carregar comprovativos</span>
+                <span className="text-[10px] text-muted-foreground">PDF, JPG, PNG · até 5 ficheiros</span>
+                <input type="file" multiple accept=".pdf,.jpg,.jpeg,.png" className="hidden" onChange={e => handleFiles(e.target.files)} />
+              </label>
+
+              {form.docs.length > 0 && (
+                <ul className="space-y-1.5">
+                  {form.docs.map((d, i) => (
+                    <li key={i} className="flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-md bg-muted/40 text-xs">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <FileText className="w-3.5 h-3.5 text-primary shrink-0" />
+                        <span className="truncate font-medium text-foreground">{d.name}</span>
+                        <span className="text-[10px] text-muted-foreground shrink-0">{(d.size / 1024).toFixed(0)} KB</span>
+                      </div>
+                      <button onClick={() => setForm(f => ({ ...f, docs: f.docs.filter((_, idx) => idx !== i) }))} className="text-muted-foreground hover:text-destructive">
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div className="sticky bottom-0 bg-card border-t border-border px-6 py-3 flex items-center justify-between gap-2">
+            <Button variant="ghost" size="sm" onClick={() => { setForm(emptyDespesa); setSheetOpen(false); }}>Cancelar</Button>
+            <Button size="sm" disabled={!isValid} onClick={submit} className="gap-1.5">
+              <Check className="w-4 h-4" /> Guardar Despesa
+            </Button>
           </div>
         </SheetContent>
       </Sheet>
