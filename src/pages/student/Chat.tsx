@@ -9,7 +9,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Send, MessageSquare, Search, Plus, Phone, Video, MoreVertical, Paperclip, Users, PhoneCall } from "lucide-react";
+import { Send, MessageSquare, Search, Plus, Phone, Video, MoreVertical, Paperclip, Users, PhoneCall, Check, CheckCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { EmojiPicker } from "@/components/chat/EmojiPicker";
 import { GifPicker } from "@/components/chat/GifPicker";
@@ -31,6 +31,7 @@ interface Message {
   sender_id: string;
   body: string;
   created_at: string;
+  read_at?: string | null;
 }
 
 const initials = (name: string) =>
@@ -89,6 +90,7 @@ export default function StudentChat() {
   const [call, setCall] = useState<{ mode: "audio" | "video"; name: string } | null>(null);
   const [onlineIds, setOnlineIds] = useState<Set<string>>(new Set());
   const [lastSeen, setLastSeen] = useState<Record<string, string | null>>({});
+  const [userRoles, setUserRoles] = useState<Record<string, string | null>>({});
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -177,19 +179,33 @@ export default function StudentChat() {
         .eq("conversation_id", selectedId)
         .order("created_at");
       setMessages(data ?? []);
+      // Mark incoming messages as read
+      await (supabase as any).rpc("mark_conversation_read", { _conversation_id: selectedId });
     })();
     const channel = (supabase as any)
       .channel(`messages:${selectedId}`)
       .on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "messages", filter: `conversation_id=eq.${selectedId}` },
-        (payload: any) => setMessages((m) => [...m, payload.new]),
+        (payload: any) => {
+          setMessages((m) => [...m, payload.new]);
+          if (payload.new.sender_id !== uid) {
+            (supabase as any).rpc("mark_conversation_read", { _conversation_id: selectedId });
+          }
+        },
+      )
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "messages", filter: `conversation_id=eq.${selectedId}` },
+        (payload: any) => {
+          setMessages((m) => m.map((msg) => msg.id === payload.new.id ? { ...msg, ...payload.new } : msg));
+        },
       )
       .subscribe();
     return () => {
       (supabase as any).removeChannel(channel);
     };
-  }, [selectedId]);
+  }, [selectedId, uid]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
@@ -235,23 +251,27 @@ export default function StudentChat() {
     };
   }, [uid]);
 
-  // Fetch last_seen for all known contacts
+  // Fetch presence (role + last_seen) for all contacts AND conversation partners
   useEffect(() => {
-    if (contacts.length === 0) return;
+    const ids = new Set<string>();
+    contacts.forEach((c) => ids.add(c.id));
+    conversations.forEach((c) => { if (c.other_id) ids.add(c.other_id); });
+    if (ids.size === 0) return;
     let cancelled = false;
     (async () => {
-      const ids = contacts.map((c) => c.id);
-      const { data } = await (supabase as any)
-        .from("profiles")
-        .select("id,last_seen_at")
-        .in("id", ids);
+      const { data } = await (supabase as any).rpc("get_users_presence", { _ids: Array.from(ids) });
       if (cancelled || !data) return;
-      const map: Record<string, string | null> = {};
-      for (const p of data) map[p.id] = p.last_seen_at;
-      setLastSeen(map);
+      const seen: Record<string, string | null> = {};
+      const roles: Record<string, string | null> = {};
+      for (const p of data as Array<{ id: string; role: string | null; last_seen_at: string | null }>) {
+        seen[p.id] = p.last_seen_at;
+        roles[p.id] = p.role;
+      }
+      setLastSeen(seen);
+      setUserRoles(roles);
     })();
     return () => { cancelled = true; };
-  }, [contacts]);
+  }, [contacts, conversations]);
 
   const send = async () => {
     if (!draft.trim() || !selectedId || !uid) return;
@@ -458,7 +478,7 @@ export default function StudentChat() {
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-1.5 min-w-0">
                         <p className="text-sm font-medium truncate">{c.other_name}</p>
-                        {c.other_modulo && <ModuleTag modulo={c.other_modulo} size="xs" />}
+                        <ModuleTag modulo={c.other_modulo ?? (c.other_id ? userRoles[c.other_id] : null)} size="xs" />
                       </div>
                       <span className="text-[10px] text-muted-foreground shrink-0">
                         {new Date(c.updated_at).toLocaleTimeString("pt-PT", { hour: "2-digit", minute: "2-digit" })}
@@ -535,7 +555,7 @@ export default function StudentChat() {
                 <div>
                   <div className="flex items-center gap-2">
                     <p className="text-sm font-semibold leading-tight">{selected.other_name}</p>
-                    <ModuleTag modulo={selected.other_modulo} size="xs" />
+                    <ModuleTag modulo={selected.other_modulo ?? (selected.other_id ? userRoles[selected.other_id] : null)} size="xs" />
                   </div>
                   {selected.other_id && (
                     <p className={cn(
@@ -595,17 +615,26 @@ export default function StudentChat() {
                             ) : (
                               <p className="whitespace-pre-wrap break-words">{m.body}</p>
                             )}
-                            <p
+                            <div
                               className={cn(
-                                "text-[10px] mt-1",
-                                own ? "text-primary-foreground/70" : "text-muted-foreground",
+                                "flex items-center gap-1 mt-1 text-[10px]",
+                                own ? "text-primary-foreground/70 justify-end" : "text-muted-foreground",
                               )}
                             >
-                              {new Date(m.created_at).toLocaleTimeString("pt-PT", {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              })}
-                            </p>
+                              <span>
+                                {new Date(m.created_at).toLocaleTimeString("pt-PT", {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })}
+                              </span>
+                              {own && (
+                                m.read_at ? (
+                                  <CheckCheck className="w-3.5 h-3.5 text-sky-300" />
+                                ) : (
+                                  <Check className="w-3.5 h-3.5" />
+                                )
+                              )}
+                            </div>
                           </div>
                         </div>
                       );
