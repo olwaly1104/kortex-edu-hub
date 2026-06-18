@@ -332,6 +332,22 @@ export default function Orcamentos() {
           })}</tbody>
         </table>
         {filtered.length === 0 && <p className="text-center text-muted-foreground py-8">Nenhum orçamento encontrado.</p>}
+        {orcamentos.length > 0 && (() => {
+          const pct = totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0;
+          const pctColor = pct >= 100 ? "text-destructive" : pct >= 90 ? "text-amber-600" : "text-accent";
+          return (
+            <div className="border-t bg-muted/10 px-4 py-3 space-y-2">
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-semibold text-foreground">Progresso Global do Orçamento</span>
+                <span className="text-muted-foreground">{formatCurrency(totalSpent)} <span className="text-muted-foreground/60">de</span> {formatCurrency(totalBudget)}</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <Progress value={Math.min(pct, 100)} className="h-2 flex-1" />
+                <span className={cn("text-xs font-bold tabular-nums w-12 text-right", pctColor)}>{pct.toFixed(1)}%</span>
+              </div>
+            </div>
+          );
+        })()}
         <div className="border-t bg-muted/20 px-3 py-2 text-xs text-muted-foreground">{filtered.length} de {orcamentos.length} orçamentos</div>
       </Card>
     </div>
