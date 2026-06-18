@@ -678,13 +678,39 @@ export default function FinancasCalendario() {
               <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
                 <Users className="w-4 h-4 text-primary" /> Pedidos de Reunião
               </h3>
-              <span className="text-[11px] text-muted-foreground tabular-nums">{meetingRequests.length}</span>
+              <span className="text-[11px] text-muted-foreground tabular-nums">
+                {(pedidosTab === "recebidos" ? pedidosRecebidos : pedidosEnviados).length}
+              </span>
             </div>
-            {meetingRequests.length === 0 ? (
-              <p className="text-xs text-muted-foreground py-4 text-center">Sem pedidos pendentes.</p>
+            <div className="flex bg-muted rounded-md p-0.5 mb-3">
+              <button
+                type="button"
+                onClick={() => setPedidosTab("recebidos")}
+                className={cn(
+                  "flex-1 px-2.5 py-1 rounded text-[11px] font-medium transition-colors",
+                  pedidosTab === "recebidos" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                Recebidos
+              </button>
+              <button
+                type="button"
+                onClick={() => setPedidosTab("enviados")}
+                className={cn(
+                  "flex-1 px-2.5 py-1 rounded text-[11px] font-medium transition-colors",
+                  pedidosTab === "enviados" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                Enviados
+              </button>
+            </div>
+            {(pedidosTab === "recebidos" ? pedidosRecebidos : pedidosEnviados).length === 0 ? (
+              <p className="text-xs text-muted-foreground py-4 text-center">
+                {pedidosTab === "recebidos" ? "Sem pedidos recebidos." : "Sem pedidos enviados."}
+              </p>
             ) : (
               <div className="space-y-2">
-                {meetingRequests.map(r => (
+                {(pedidosTab === "recebidos" ? pedidosRecebidos : pedidosEnviados).map(r => (
                   <div key={r.id} className="px-3 py-2 rounded-lg border border-border">
                     <p className="text-xs font-semibold text-foreground">{r.title}</p>
                     <p className="text-[11px] text-muted-foreground">{r.from} · {r.when}</p>
