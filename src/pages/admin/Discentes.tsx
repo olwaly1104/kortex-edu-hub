@@ -242,6 +242,7 @@ export default function AdminDiscentes() {
       if (biInput.current) biInput.current.value = "";
       if (certInput.current) certInput.current.value = "";
       if (encBiInput.current) encBiInput.current.value = "";
+      setOpen(false);
     } catch (e: any) {
       toast.error(e?.message || "Erro ao adicionar discente");
     } finally {
