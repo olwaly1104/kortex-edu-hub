@@ -642,9 +642,11 @@ function DespesasSection({ email }: { email?: string | null }) {
           </Button>
         </div>
       </Card>
+      )}
 
-      {/* Responsáveis */}
+      {desTab === "aprovacoes" && (
       <Card className="overflow-hidden">
+
         <div className="px-5 py-3 border-b bg-muted/30 flex items-center gap-2">
           <Users className="w-4 h-4 text-primary" />
           <div className="min-w-0">
