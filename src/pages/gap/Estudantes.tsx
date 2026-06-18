@@ -1,38 +1,56 @@
-import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Users, Search, GraduationCap, X, Inbox, BookOpen, Layers } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { FinHeader } from "@/pages/financas/_FinHeader";
-import { useEstudantes, useCursos } from "@/lib/useInstitution";
-import { supabase } from "@/integrations/supabase/client";
+import { Users, Plus, Search, Trash2, GraduationCap, User, Mail, BookOpen, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { useMemo, useState, useEffect } from "react";
+import { FormSection, EmptyState } from "@/pages/admin/Staff";
+import {
+  useEstudantes,
+  useCursos,
+  useCreateEstudante,
+  useDeleteEstudante,
+} from "@/lib/useInstitution";
+import { toast } from "sonner";
 
-function useGapCounts() {
-  return useQuery({
-    queryKey: ["gap-estudante-counts"],
-    queryFn: async () => {
-      const [sol, agd] = await Promise.all([
-        (supabase as any).from("solicitacoes_gap").select("estudante_id"),
-        (supabase as any).from("agendamentos_gap").select("estudante_id"),
-      ]);
-      const sols = new Map<string, number>();
-      const agds = new Map<string, number>();
-      (sol.data || []).forEach((r: any) => sols.set(r.estudante_id, (sols.get(r.estudante_id) || 0) + 1));
-      (agd.data || []).forEach((r: any) => agds.set(r.estudante_id, (agds.get(r.estudante_id) || 0) + 1));
-      return { sols, agds };
-    },
-  });
-}
+const anosPool = ["1", "2", "3", "4", "5", "6"];
+const turmasPool = ["A", "B", "C", "D", "E"];
+
+type Draft = {
+  primeiroNome: string;
+  ultimoNome: string;
+  email: string;
+  curso_id: string;
+  ano: string;
+  turma: string;
+};
+
+const empty = (curso_id = ""): Draft => ({
+  primeiroNome: "",
+  ultimoNome: "",
+  email: "",
+  curso_id,
+  ano: "1",
+  turma: "A",
+});
 
 export default function GapEstudantes() {
-  const navigate = useNavigate();
-  const { data: estudantes = [], isLoading } = useEstudantes();
+  const { data: rows = [], isLoading } = useEstudantes();
   const { data: cursos = [] } = useCursos();
-  const { data: counts } = useGapCounts();
-  const [search, setSearch] = useState("");
+  const createMut = useCreateEstudante();
+  const deleteMut = useDeleteEstudante();
+
+  const [q, setQ] = useState("");
+  const [open, setOpen] = useState(false);
+  const [draft, setDraft] = useState<Draft>(empty());
+
+  useEffect(() => {
+    if (!draft.curso_id && cursos.length > 0) {
+      setDraft((d) => ({ ...d, curso_id: (cursos[0] as any).id }));
+    }
+  }, [cursos, draft.curso_id]);
 
   const cursoCode = useMemo(() => {
     const m = new Map<string, string>();
@@ -40,152 +58,301 @@ export default function GapEstudantes() {
     return m;
   }, [cursos]);
 
-  const rows = useMemo(() => {
-    const term = search.trim().toLowerCase();
-    return estudantes
-      .map((e: any) => {
-        const parts = (e.nome || "").trim().split(/\s+/);
-        const primeiro = e.primeiro_nome || parts[0] || "";
-        const ultimo = e.ultimo_nome || (parts.length > 1 ? parts.slice(1).join(" ") : "");
+  const setF = <K extends keyof Draft>(k: K, v: Draft[K]) =>
+    setDraft((d) => ({ ...d, [k]: v }));
+
+  const openNew = () => {
+    setDraft(empty((cursos[0] as any)?.id ?? ""));
+    setOpen(true);
+  };
+
+  const save = async () => {
+    if (!draft.primeiroNome.trim() || !draft.email.trim() || !draft.curso_id) return;
+    const nome = `${draft.primeiroNome.trim()} ${draft.ultimoNome.trim()}`.trim();
+    try {
+      await createMut.mutateAsync({
+        curso_id: draft.curso_id,
+        nome,
+        email: draft.email.trim(),
+        ano: draft.ano,
+        turma: draft.turma,
+        primeiro_nome: draft.primeiroNome.trim(),
+        ultimo_nome: draft.ultimoNome.trim() || null,
+      });
+      toast.success("Discente adicionado");
+      setOpen(false);
+    } catch (e: any) {
+      toast.error(e?.message || "Erro ao adicionar discente");
+    }
+  };
+
+  const remove = async (id: string) => {
+    try {
+      await deleteMut.mutateAsync(id);
+      toast.success("Discente removido");
+    } catch (e: any) {
+      toast.error(e?.message || "Erro ao remover");
+    }
+  };
+
+  const normalized = useMemo(
+    () =>
+      rows.map((r: any) => {
+        const parts = (r.nome || "").trim().split(/\s+/);
         return {
-          ...e,
-          primeiro,
-          ultimo,
-          curso: cursoCode.get(e.curso_id) || "—",
-          nSol: counts?.sols.get(e.id) || 0,
-          nAgd: counts?.agds.get(e.id) || 0,
+          id: r.id as string,
+          primeiroNome: r.primeiro_nome || parts[0] || "",
+          ultimoNome: r.ultimo_nome || (parts.length > 1 ? parts.slice(1).join(" ") : ""),
+          email: r.email as string,
+          curso: cursoCode.get(r.curso_id) || "—",
+          ano: r.ano as string,
+          turma: r.turma as string,
+          estado: "Ativo" as const,
         };
-      })
-      .filter((r) =>
-        !term ||
-        [r.matricula, r.primeiro, r.ultimo, r.email, r.curso].some((v) => String(v).toLowerCase().includes(term)),
-      );
-  }, [estudantes, cursoCode, search, counts]);
+      }),
+    [rows, cursoCode],
+  );
 
-  const numCursos = new Set(rows.map((r) => r.curso)).size;
-  const numTurmas = new Set(rows.map((r) => `${r.curso}-${r.ano}${r.turma}`)).size;
-
-  const kpis = [
-    { label: "Total", value: estudantes.length, icon: Inbox, iconBg: "bg-muted text-muted-foreground" },
-    { label: "Activos", value: rows.length, icon: GraduationCap, iconBg: "bg-primary/10 text-primary" },
-    { label: "Cursos", value: numCursos, icon: BookOpen, iconBg: "bg-blue-50 text-blue-600" },
-    { label: "Turmas", value: numTurmas, icon: Layers, iconBg: "bg-emerald-50 text-emerald-600" },
-  ];
+  const filtered = useMemo(
+    () =>
+      normalized.filter((r) =>
+        [r.primeiroNome, r.ultimoNome, r.email, r.curso].some((v) =>
+          String(v).toLowerCase().includes(q.toLowerCase()),
+        ),
+      ),
+    [normalized, q],
+  );
 
   return (
-    <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
+    <div className="p-6 space-y-6 max-w-6xl mx-auto">
       <FinHeader
         title="Discentes"
-        subtitle="Estudantes matriculados na instituição e acompanhados pelo GAP."
-        icon={<Users className="w-6 h-6 text-primary" />}
+        subtitle="Todos os estudantes registados na instituição"
+        icon={<Users className="w-5 h-5 text-primary" />}
       />
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        {kpis.map((k) => (
-          <Card key={k.label} className="p-4 hover:shadow-sm transition-shadow">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">{k.label}</p>
-                <p className="text-2xl font-bold mt-1 text-foreground tabular-nums">{k.value}</p>
-              </div>
-              <div className={cn("w-9 h-9 rounded-lg flex items-center justify-center", k.iconBg)}>
-                <k.icon className="w-4 h-4" />
-              </div>
-            </div>
-          </Card>
-        ))}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <Stat label="Total" value={normalized.length} />
+        <Stat label="Ativos" value={normalized.length} accent />
+        <Stat label="Cursos" value={new Set(normalized.map((r) => r.curso)).size} />
+        <Stat label="Turmas" value={new Set(normalized.map((r) => `${r.curso}-${r.ano}${r.turma}`)).size} />
       </div>
 
-      <Card className="p-3">
-        <div className="flex items-center gap-2 flex-wrap">
-          <div className="relative flex-1 min-w-[220px] max-w-[380px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
-            <Input
-              placeholder="Pesquisar ID, discente, email ou curso…"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-9 pr-8 h-9 text-xs"
-            />
-            {search && (
-              <button
-                onClick={() => setSearch("")}
-                className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 rounded hover:bg-muted text-muted-foreground hover:text-foreground"
-                aria-label="Limpar pesquisa"
-              >
-                <X className="w-3 h-3" />
-              </button>
-            )}
-          </div>
-          {search && (
-            <Button variant="ghost" size="sm" onClick={() => setSearch("")} className="h-9 px-2.5 text-xs text-muted-foreground hover:text-foreground gap-1">
-              <X className="w-3 h-3" /> Limpar
-            </Button>
-          )}
-          <div className="ml-auto text-[11px] text-muted-foreground tabular-nums whitespace-nowrap">
-            {rows.length} de {estudantes.length}
-          </div>
+      <div className="flex items-center gap-3">
+        <div className="relative flex-1 max-w-sm">
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            placeholder="Procurar discente..."
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            className="pl-8 h-9"
+          />
         </div>
-      </Card>
+        <div className="text-xs text-muted-foreground tabular-nums">
+          {filtered.length} de {normalized.length}
+        </div>
+        <Button size="sm" onClick={openNew} className="ml-auto gap-1">
+          <Plus className="w-3.5 h-3.5" /> Adicionar Discente
+        </Button>
+      </div>
 
       {isLoading ? (
-        <Card className="p-12 text-center text-sm text-muted-foreground">A carregar discentes…</Card>
+        <div className="py-16 flex items-center justify-center text-sm text-muted-foreground gap-2">
+          <Loader2 className="w-4 h-4 animate-spin" /> A carregar discentes…
+        </div>
+      ) : normalized.length === 0 ? (
+        <EmptyState
+          onAdd={openNew}
+          icon={<GraduationCap className="w-7 h-7" />}
+          title="Nenhum discente registado"
+          hint="Comece por adicionar estudantes manualmente ou via inscrições."
+          cta="Adicionar Discente"
+        />
       ) : (
-        <Card className="overflow-hidden p-0">
+        <div className="overflow-hidden rounded-xl border border-border bg-card">
           <table className="w-full text-sm">
-            <thead className="bg-muted/40 text-[11px] uppercase tracking-wider text-muted-foreground border-b border-border">
+            <thead className="bg-muted/40 text-xs uppercase tracking-wider text-muted-foreground">
               <tr>
-                <th className="text-left font-semibold py-2.5 px-4">ID</th>
-                <th className="text-left font-semibold py-2.5 px-4">Discente</th>
+                <th className="text-left font-semibold py-2.5 px-4">Estudante</th>
+                <th className="text-left font-semibold py-2.5 px-4">Email</th>
                 <th className="text-left font-semibold py-2.5 px-4">Curso</th>
                 <th className="text-left font-semibold py-2.5 px-4">Ano · Turma</th>
-                <th className="text-right font-semibold py-2.5 px-4">Nº Solicitações</th>
-                <th className="text-right font-semibold py-2.5 px-4">Nº Agendamentos</th>
                 <th className="text-left font-semibold py-2.5 px-4">Estado</th>
+                <th className="w-10"></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {rows.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="py-12 text-center">
-                    <div className="w-12 h-12 mx-auto rounded-full bg-muted text-muted-foreground flex items-center justify-center mb-3">
-                      <GraduationCap className="w-6 h-6" />
+              {filtered.map((r) => (
+                <tr key={r.id} className="hover:bg-muted/30">
+                  <td className="py-3 px-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+                        <GraduationCap className="w-4 h-4" />
+                      </div>
+                      <span className="font-semibold">
+                        {r.primeiroNome} {r.ultimoNome}
+                      </span>
                     </div>
-                    <p className="text-sm font-semibold text-foreground">Nenhum discente encontrado</p>
-                    <p className="text-xs text-muted-foreground mt-1">Ajuste a pesquisa ou registe novos estudantes na instituição.</p>
+                  </td>
+                  <td className="py-3 px-4 text-xs text-muted-foreground">{r.email}</td>
+                  <td className="py-3 px-4 text-xs font-mono">{r.curso}</td>
+                  <td className="py-3 px-4 text-xs tabular-nums">
+                    {r.ano}º · {r.turma}
+                  </td>
+                  <td className="py-3 px-4">
+                    <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700">
+                      {r.estado}
+                    </span>
+                  </td>
+                  <td className="py-3 px-2">
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="h-7 w-7 text-destructive"
+                      onClick={() => remove(r.id)}
+                      disabled={deleteMut.isPending}
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </Button>
                   </td>
                 </tr>
-              ) : (
-                rows.map((r) => (
-                  <tr
-                    key={r.id}
-                    onClick={() => r.matricula && navigate(`/gap/estudantes/${r.matricula}`)}
-                    className={cn("hover:bg-muted/30 transition-colors", r.matricula && "cursor-pointer")}
-                  >
-                    <td className="py-3 px-4 text-xs font-mono text-foreground">{r.matricula || "—"}</td>
-                    <td className="py-3 px-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                          <GraduationCap className="w-4 h-4" />
-                        </div>
-                        <span className="font-semibold text-foreground">{r.primeiro} {r.ultimo}</span>
-                      </div>
-                    </td>
-                    <td className="py-3 px-4 text-xs font-mono text-foreground">{r.curso}</td>
-                    <td className="py-3 px-4 text-xs tabular-nums text-foreground">{r.ano}º · {r.turma}</td>
-                    <td className="py-3 px-4 text-xs tabular-nums text-right text-foreground">{r.nSol}</td>
-                    <td className="py-3 px-4 text-xs tabular-nums text-right text-foreground">{r.nAgd}</td>
-                    <td className="py-3 px-4">
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700">
-                        Activo
-                      </span>
-                    </td>
-                  </tr>
-                ))
-              )}
+              ))}
             </tbody>
           </table>
-        </Card>
+        </div>
       )}
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <GraduationCap className="w-5 h-5 text-primary" /> Adicionar Discente
+            </DialogTitle>
+            <DialogDescription>
+              O estudante poderá completar os seus restantes dados pessoais ao primeiro acesso.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-5 py-2">
+            <FormSection icon={<User className="w-3.5 h-3.5" />} title="Identificação">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label className="text-xs">Primeiro nome</Label>
+                  <Input
+                    className="h-9 mt-1"
+                    value={draft.primeiroNome}
+                    onChange={(e) => setF("primeiroNome", e.target.value)}
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs">Último nome</Label>
+                  <Input
+                    className="h-9 mt-1"
+                    value={draft.ultimoNome}
+                    onChange={(e) => setF("ultimoNome", e.target.value)}
+                  />
+                </div>
+              </div>
+            </FormSection>
+
+            <FormSection icon={<Mail className="w-3.5 h-3.5" />} title="Acesso">
+              <Label className="text-xs">Email institucional</Label>
+              <Input
+                className="h-9 mt-1"
+                type="email"
+                value={draft.email}
+                onChange={(e) => setF("email", e.target.value)}
+                placeholder="estudante@upra.kor"
+              />
+            </FormSection>
+
+            <FormSection icon={<BookOpen className="w-3.5 h-3.5" />} title="Matrícula">
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <Label className="text-xs">Curso</Label>
+                  <Select value={draft.curso_id} onValueChange={(v) => setF("curso_id", v)}>
+                    <SelectTrigger className="h-9 mt-1">
+                      <SelectValue placeholder="Selecionar…" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {cursos.map((c: any) => (
+                        <SelectItem key={c.id} value={c.id}>
+                          {c.codigo || c.nome}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label className="text-xs">Ano</Label>
+                  <Select value={draft.ano} onValueChange={(v) => setF("ano", v)}>
+                    <SelectTrigger className="h-9 mt-1">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {anosPool.map((a) => (
+                        <SelectItem key={a} value={a}>
+                          {a}º
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label className="text-xs">Turma</Label>
+                  <Select value={draft.turma} onValueChange={(v) => setF("turma", v)}>
+                    <SelectTrigger className="h-9 mt-1">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {turmasPool.map((t) => (
+                        <SelectItem key={t} value={t}>
+                          {t}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <p className="text-[11px] text-muted-foreground mt-1.5">
+                O bilhete de identidade e restantes dados pessoais serão preenchidos pelo próprio estudante.
+              </p>
+            </FormSection>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setOpen(false)} disabled={createMut.isPending}>
+              Cancelar
+            </Button>
+            <Button
+              onClick={save}
+              disabled={
+                !draft.primeiroNome.trim() ||
+                !draft.email.trim() ||
+                !draft.curso_id ||
+                createMut.isPending
+              }
+            >
+              {createMut.isPending ? (
+                <>
+                  <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" /> A adicionar…
+                </>
+              ) : (
+                "Adicionar Discente"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
+
+function Stat({ label, value, accent }: { label: string; value: number; accent?: boolean }) {
+  return (
+    <div className="rounded-lg border border-border bg-card p-4">
+      <p className="text-xs text-muted-foreground">{label}</p>
+      <p className={`text-2xl font-bold tabular-nums ${accent ? "text-emerald-600" : ""}`}>{value}</p>
     </div>
   );
 }
