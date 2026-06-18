@@ -94,6 +94,9 @@ export default function Receitas() {
         }
       />
 
+      <RevDespTabs />
+
+
       {/* Período toggle + result + selector */}
       <PeriodSelector periodo={periodo} setPeriodo={setPeriodo} value={periodoValue} setValue={setPeriodoValue} />
 

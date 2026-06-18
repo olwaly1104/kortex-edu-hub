@@ -13,6 +13,7 @@ import { formatCurrency, despesas } from "@/data/financeModuleData";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { FinHeader } from "./_FinHeader";
+import { RevDespTabs } from "./_RevDespTabs";
 import { PeriodSelector, PERIODO_MULT, type Periodo, periodoDefaultValue } from "./_PeriodSelector";
 
 type SortField = "amount";
@@ -76,6 +77,10 @@ export default function Despesas() {
           <Button size="sm" onClick={() => setSheetOpen(true)} className="gap-1.5"><Plus className="w-4 h-4" /> Nova Despesa</Button>
         }
       />
+
+      <RevDespTabs />
+
+
 
       {/* Período toggle + result + selector */}
       <PeriodSelector periodo={periodo} setPeriodo={setPeriodo} value={periodoValue} setValue={setPeriodoValue} />
