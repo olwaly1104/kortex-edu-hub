@@ -433,7 +433,7 @@ export default function StudentChat() {
                                 own ? "text-primary-foreground/80" : "text-primary",
                               )}
                             >
-                              {own ? "Você" : selected.other_name}
+                              {own ? "Eu" : selected.other_name}
                             </p>
                             {/^https?:\/\/\S+\.(gif|png|jpe?g|webp)(\?\S*)?$/i.test(m.body) ? (
                               <img src={m.body} alt="gif" className="rounded-lg max-w-full max-h-60 object-contain" />
