@@ -244,13 +244,9 @@ export default function AdminDiscentes() {
               placeholder="Último nome"
               className="h-8 text-xs"
             />
-            <Input
-              type="email"
-              value={draft.email}
-              onChange={(e) => setF("email", e.target.value)}
-              placeholder="estudante@upra.kor"
-              className="h-8 text-xs"
-            />
+            <div className="h-8 px-2.5 flex items-center text-[11px] text-muted-foreground bg-muted/40 border border-input rounded-md truncate font-mono" title="Email gerado automaticamente">
+              {buildEmail(draft.primeiroNome, draft.ultimoNome) || `nome@${EMAIL_DOMAIN}`}
+            </div>
             <Select value={draft.curso_id} onValueChange={(v) => setF("curso_id", v)}>
               <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="—" /></SelectTrigger>
               <SelectContent>
