@@ -11,12 +11,12 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 
-import { CalendarDays, ChevronLeft, ChevronRight, Plus, Users, MapPin, Calendar as CalendarIcon, Video, Building2, Clock, X, UserPlus, User, Wallet, ArrowDownToLine, ArrowUpFromLine, Tag } from "lucide-react";
+import { CalendarDays, ChevronLeft, ChevronRight, Plus, Users, MapPin, Calendar as CalendarIcon, Video, Building2, Clock, X, UserPlus, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const DAYS = ["Seg", "Ter", "Qua", "Qui", "Sex"];
 
-type EventType = "reuniao" | "prazo" | "pessoal" | "caixa";
+type EventType = "reuniao" | "prazo" | "pessoal";
 type Modalidade = "kortex" | "presencial";
 
 type StoredEvent = {
@@ -30,7 +30,6 @@ type StoredEvent = {
   link?: string;
   modalidade?: Modalidade;
   participants?: { id: string; name: string; modulo: string | null }[];
-  categoria?: string;
   color: string;
 };
 
@@ -46,7 +45,6 @@ function mapDbEvent(row: any): StoredEvent {
     link: row.link || undefined,
     modalidade: row.modalidade || undefined,
     participants: Array.isArray(row.participants) ? row.participants : [],
-    categoria: row.categoria || undefined,
     color: row.color,
   };
 }
@@ -55,20 +53,13 @@ const EVENT_COLORS: Record<EventType, string> = {
   reuniao: "hsl(142 65% 35%)",
   prazo: "hsl(0 72% 51%)",
   pessoal: "hsl(217 91% 60%)",
-  caixa: "hsl(38 92% 50%)",
 };
 
-const EVENT_TYPES: { value: EventType; label: string; description: string; icon: typeof Video }[] = [
-  { value: "reuniao", label: "Reunião", description: "Encontro com participantes", icon: Users },
-  { value: "prazo", label: "Prazo", description: "Data limite", icon: Clock },
-  { value: "pessoal", label: "Pessoal", description: "Bloqueio de agenda", icon: User },
-  { value: "caixa", label: "Caixa", description: "Movimento financeiro", icon: Wallet },
-];
-
-const CAIXA_CATEGORIAS: { value: string; label: string; icon: typeof Video; tone: string }[] = [
-  { value: "entrada", label: "Entrada", icon: ArrowDownToLine, tone: "text-emerald-600" },
-  { value: "saida", label: "Saída", icon: ArrowUpFromLine, tone: "text-rose-600" },
-];
+const EVENT_TYPE_LABELS: Record<EventType, string> = {
+  reuniao: "Reunião",
+  prazo: "Prazo",
+  pessoal: "Pessoal",
+};
 
 function CriarEventoDialog({ defaultDate, trigger, onCreated }: { defaultDate: Date; trigger: React.ReactNode; onCreated?: (event: StoredEvent) => void }) {
   const todayISO = new Date().toISOString().split("T")[0];
@@ -84,7 +75,7 @@ function CriarEventoDialog({ defaultDate, trigger, onCreated }: { defaultDate: D
   const [endTime, setEndTime] = useState("10:00");
   const [location, setLocation] = useState("");
   const [link, setLink] = useState("");
-  const [categoria, setCategoria] = useState<string>("entrada");
+  
   const [participants, setParticipants] = useState<{ id: string; name: string; email: string | null; modulo: string | null }[]>([]);
   const [participantInput, setParticipantInput] = useState("");
   const [participantFocus, setParticipantFocus] = useState(false);
@@ -117,7 +108,6 @@ function CriarEventoDialog({ defaultDate, trigger, onCreated }: { defaultDate: D
 
   const resetForm = () => {
     setTitle(""); setLocation(""); setLink(""); setParticipants([]); setParticipantInput("");
-    setCategoria("entrada");
     setStep("form");
   };
 
@@ -139,7 +129,6 @@ function CriarEventoDialog({ defaultDate, trigger, onCreated }: { defaultDate: D
   };
 
   const handleConfirm = async () => {
-    const caixaColor = categoria === "entrada" ? "hsl(142 65% 35%)" : "hsl(0 72% 51%)";
     const ev: StoredEvent = {
       id: crypto.randomUUID(),
       type,
@@ -151,8 +140,7 @@ function CriarEventoDialog({ defaultDate, trigger, onCreated }: { defaultDate: D
       link: link || undefined,
       modalidade: type === "reuniao" ? modalidade : undefined,
       participants: type === "reuniao" ? participants.map((p) => ({ id: p.id, name: p.name, modulo: p.modulo })) : undefined,
-      categoria: type === "caixa" ? categoria : undefined,
-      color: type === "caixa" ? caixaColor : EVENT_COLORS[type],
+      color: EVENT_COLORS[type],
     };
     setSaving(true);
     const { data, error } = await (supabase as any)
@@ -168,10 +156,9 @@ function CriarEventoDialog({ defaultDate, trigger, onCreated }: { defaultDate: D
         link: ev.link ?? null,
         modalidade: ev.modalidade ?? null,
         participants: ev.participants ?? [],
-        categoria: ev.categoria ?? null,
         color: ev.color,
       })
-      .select("id,type,title,event_date,start_time,end_time,location,link,modalidade,participants,categoria,color")
+      .select("id,type,title,event_date,start_time,end_time,location,link,modalidade,participants,color")
       .single();
     setSaving(false);
     if (error) {
@@ -213,72 +200,24 @@ function CriarEventoDialog({ defaultDate, trigger, onCreated }: { defaultDate: D
         {step === "form" && (
         <form onSubmit={handleSubmit} className="space-y-3.5">
           <div className="space-y-1.5">
-            <Label className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1.5">
-              <Tag className="w-3 h-3" /> Tipo de Evento
-            </Label>
-            <div className="grid grid-cols-2 gap-2">
-              {EVENT_TYPES.map((t) => {
-                const Icon = t.icon;
-                const active = type === t.value;
-                const color = EVENT_COLORS[t.value];
-                return (
-                  <button
-                    key={t.value}
-                    type="button"
-                    onClick={() => setType(t.value)}
-                    className={cn(
-                      "group relative flex items-center gap-2.5 p-2.5 rounded-lg border text-left transition-all",
-                      active
-                        ? "border-foreground/80 bg-card shadow-sm ring-1 ring-foreground/10"
-                        : "border-border bg-card/40 hover:border-foreground/30 hover:bg-card"
-                    )}
-                  >
-                    <span
-                      className={cn(
-                        "w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors"
-                      )}
-                      style={{ background: active ? color : `${color}1a`, color: active ? "#fff" : color }}
-                    >
-                      <Icon className="w-4 h-4" />
-                    </span>
-                    <span className="min-w-0">
-                      <span className="block text-[13px] font-semibold text-foreground leading-tight">{t.label}</span>
-                      <span className="block text-[10.5px] text-muted-foreground leading-tight mt-0.5 truncate">{t.description}</span>
-                    </span>
-                  </button>
-                );
-              })}
+            <Label className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Tipo</Label>
+            <div className="inline-flex rounded-md border bg-muted/30 p-0.5">
+              {(["reuniao", "prazo", "pessoal"] as EventType[]).map((t) => (
+                <button
+                  key={t}
+                  type="button"
+                  onClick={() => setType(t)}
+                  className={cn(
+                    "px-3 h-7 text-xs font-medium rounded transition-colors",
+                    type === t ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  {EVENT_TYPE_LABELS[t]}
+                </button>
+              ))}
             </div>
           </div>
 
-          {/* Categoria (Caixa) */}
-          {type === "caixa" && (
-            <div className="space-y-1.5">
-              <Label className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Categoria</Label>
-              <div className="grid grid-cols-2 gap-2">
-                {CAIXA_CATEGORIAS.map((c) => {
-                  const Icon = c.icon;
-                  const active = categoria === c.value;
-                  return (
-                    <button
-                      key={c.value}
-                      type="button"
-                      onClick={() => setCategoria(c.value)}
-                      className={cn(
-                        "flex items-center justify-center gap-2 h-10 rounded-lg border text-sm font-medium transition-all",
-                        active
-                          ? "border-foreground/70 bg-card shadow-sm ring-1 ring-foreground/10 text-foreground"
-                          : "border-border bg-card/40 text-muted-foreground hover:text-foreground hover:border-foreground/30"
-                      )}
-                    >
-                      <Icon className={cn("w-4 h-4", active ? c.tone : "")} />
-                      {c.label}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
 
           {/* Título */}
           <div className="space-y-1.5">
@@ -470,9 +409,9 @@ function CriarEventoDialog({ defaultDate, trigger, onCreated }: { defaultDate: D
                 <div className="min-w-0">
                   <p className="text-sm font-semibold text-foreground truncate">{title}</p>
                   <p className="text-[11px] text-muted-foreground capitalize">
-                    {EVENT_TYPES.find(t => t.value === type)?.label}
-                    {type === "caixa" && categoria ? ` · ${CAIXA_CATEGORIAS.find(c => c.value === categoria)?.label}` : ""}
+                    {EVENT_TYPE_LABELS[type]}
                   </p>
+
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3 text-xs">
@@ -750,10 +689,8 @@ export default function FinancasCalendario() {
                 ) : (
                   <div className="divide-y divide-border">
                     {selectedDayEvents.map((event) => {
-                      const typeLabel = EVENT_TYPES.find(t => t.value === event.type)?.label ?? event.type;
-                      const catLabel = event.type === "caixa" && event.categoria
-                        ? CAIXA_CATEGORIAS.find(c => c.value === event.categoria)?.label
-                        : null;
+                      const typeLabel = EVENT_TYPE_LABELS[event.type] ?? event.type;
+
                       if (event.type === "prazo") {
                         return (
                           <div key={event.id} className="flex items-center gap-2 py-2">
@@ -777,7 +714,7 @@ export default function FinancasCalendario() {
                                 className="text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded shrink-0"
                                 style={{ background: `${event.color}1a`, color: event.color }}
                               >
-                                {catLabel ?? typeLabel}
+                                {typeLabel}
                               </span>
                             </div>
                             <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-2 tabular-nums">
