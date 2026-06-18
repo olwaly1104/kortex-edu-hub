@@ -182,19 +182,16 @@ export default function GapTickets() {
           </Card>
         ))}
 
-        {/* Histórico do GAP */}
-        <Card className="p-4 hover:shadow-sm transition-shadow border-primary/30 bg-gradient-to-br from-primary/5 to-transparent flex items-center justify-between">
-          <div className="min-w-0">
-            <p className="text-[11px] font-medium text-primary uppercase tracking-wider">Histórico do GAP</p>
-            <p className="text-[11px] text-muted-foreground mt-1 leading-snug">
-              Relatórios mensais de solicitações, encaminhamentos e SLA.
-            </p>
-            <div className="mt-2">
-              <ReportsMenuButton categories={gapReportCategories} data={gapReportData} />
+        {/* Em Atraso */}
+        <Card className="p-4 hover:shadow-sm transition-shadow">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Em Atraso</p>
+              <p className={cn("text-2xl font-bold mt-1 tabular-nums", counts.em_atraso > 0 ? "text-destructive" : "text-foreground")}>{counts.em_atraso}</p>
             </div>
-          </div>
-          <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-primary/10 text-primary shrink-0">
-            <FileBarChart2 className="w-4 h-4" />
+            <div className={cn("w-9 h-9 rounded-lg flex items-center justify-center", counts.em_atraso > 0 ? "bg-destructive/10 text-destructive" : "bg-muted text-muted-foreground")}>
+              <AlertCircle className="w-4 h-4" />
+            </div>
           </div>
         </Card>
       </div>
