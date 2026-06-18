@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuthUid } from "@/hooks/useAuthUid";
 import { useInstitutionContacts } from "@/hooks/useInstitutionContacts";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -9,8 +9,11 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Send, MessageSquare, Search, Plus, Phone, Video, MoreVertical, Smile, Paperclip, Users, PhoneCall } from "lucide-react";
+import { Send, MessageSquare, Search, Plus, Phone, Video, MoreVertical, Paperclip, Users, PhoneCall } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { EmojiPicker } from "@/components/chat/EmojiPicker";
+import { GifPicker } from "@/components/chat/GifPicker";
+import { CallDialog } from "@/components/chat/CallDialog";
 
 interface Conversation {
   id: string;
@@ -54,7 +57,7 @@ const moduloLabel = (m?: string | null) => {
 };
 
 export default function StudentChat() {
-  const { user } = useAuth();
+  const uid = useAuthUid();
   const { contacts } = useInstitutionContacts();
   const [searchParams, setSearchParams] = useSearchParams();
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -65,15 +68,16 @@ export default function StudentChat() {
   const [contactQuery, setContactQuery] = useState("");
   const [tab, setTab] = useState<"chats" | "chamadas" | "grupos">("chats");
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [call, setCall] = useState<{ mode: "audio" | "video"; name: string } | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const loadConversations = async () => {
-    if (!user) return;
+    if (!uid) return;
     const { data: parts } = await (supabase as any)
       .from("conversation_participants")
       .select("conversation_id")
-      .eq("user_id", user.id);
+      .eq("user_id", uid);
     const convIds = (parts ?? []).map((p: any) => p.conversation_id);
     if (convIds.length === 0) {
       setConversations([]);
@@ -95,7 +99,7 @@ export default function StudentChat() {
           .from("conversation_participants")
           .select("user_id")
           .eq("conversation_id", c.id);
-        const otherId = (others ?? []).find((o: any) => o.user_id !== user.id)?.user_id;
+        const otherId = (others ?? []).find((o: any) => o.user_id !== uid)?.user_id;
         if (otherId) {
           other_id = otherId;
           const match = contacts.find((ct) => ct.id === otherId);
@@ -132,7 +136,7 @@ export default function StudentChat() {
   useEffect(() => {
     loadConversations();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id, contacts.length]);
+  }, [uid, contacts.length]);
 
   useEffect(() => {
     if (!selectedId) {
@@ -169,12 +173,12 @@ export default function StudentChat() {
   }, [selectedId]);
 
   const send = async () => {
-    if (!draft.trim() || !selectedId || !user) return;
+    if (!draft.trim() || !selectedId || !uid) return;
     const content = draft.trim();
     setDraft("");
     await (supabase as any)
       .from("messages")
-      .insert({ conversation_id: selectedId, sender_id: user.id, content });
+      .insert({ conversation_id: selectedId, sender_id: uid, content });
     loadConversations();
   };
 
@@ -398,11 +402,14 @@ export default function StudentChat() {
                 </div>
               </div>
               <div className="flex items-center gap-1">
-                <Button variant="ghost" size="icon" className="h-8 w-8"><Phone className="w-4 h-4" /></Button>
-                <Button variant="ghost" size="icon" className="h-8 w-8"><Video className="w-4 h-4" /></Button>
+                <Button onClick={() => setCall({ mode: "audio", name: selected.other_name ?? "Contacto" })} variant="ghost" size="icon" className="h-8 w-8"><Phone className="w-4 h-4" /></Button>
+                <Button onClick={() => setCall({ mode: "video", name: selected.other_name ?? "Contacto" })} variant="ghost" size="icon" className="h-8 w-8"><Video className="w-4 h-4" /></Button>
                 <Button variant="ghost" size="icon" className="h-8 w-8"><MoreVertical className="w-4 h-4" /></Button>
               </div>
             </header>
+            {call && (
+              <CallDialog open={!!call} onClose={() => setCall(null)} name={call.name} mode={call.mode} />
+            )}
 
             <div ref={scrollRef} className="flex-1 overflow-auto px-6 py-4 space-y-4">
               {grouped.length === 0 ? (
@@ -418,7 +425,7 @@ export default function StudentChat() {
                       <div className="flex-1 h-px bg-border/60" />
                     </div>
                     {g.items.map((m) => {
-                      const own = m.sender_id === user?.id;
+                      const own = m.sender_id === uid;
                       return (
                         <div key={m.id} className={cn("flex", own ? "justify-end" : "justify-start")}>
                           <div
@@ -429,7 +436,11 @@ export default function StudentChat() {
                                 : "bg-card border border-border rounded-bl-md",
                             )}
                           >
-                            <p className="whitespace-pre-wrap break-words">{m.content}</p>
+                            {/^https?:\/\/\S+\.(gif|png|jpe?g|webp)(\?\S*)?$/i.test(m.content) ? (
+                              <img src={m.content} alt="gif" className="rounded-lg max-w-full max-h-60 object-contain" />
+                            ) : (
+                              <p className="whitespace-pre-wrap break-words">{m.content}</p>
+                            )}
                             <p
                               className={cn(
                                 "text-[10px] mt-1",
@@ -453,6 +464,11 @@ export default function StudentChat() {
             <div className="border-t border-border bg-card p-3">
               <div className="flex items-end gap-2">
                 <Button variant="ghost" size="icon" className="h-9 w-9 shrink-0"><Paperclip className="w-4 h-4" /></Button>
+                <GifPicker onPick={(url) => {
+                  if (!selectedId || !uid) return;
+                  (supabase as any).from("messages").insert({ conversation_id: selectedId, sender_id: uid, content: url }).then(() => loadConversations());
+                }} />
+                <EmojiPicker onPick={(e) => setDraft((d) => d + e)} />
                 <Input
                   ref={inputRef}
                   placeholder="Escrever mensagem…"
@@ -461,7 +477,6 @@ export default function StudentChat() {
                   onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && (e.preventDefault(), send())}
                   className="h-9"
                 />
-                <Button variant="ghost" size="icon" className="h-9 w-9 shrink-0"><Smile className="w-4 h-4" /></Button>
                 <Button onClick={send} disabled={!draft.trim()} size="icon" className="h-9 w-9 shrink-0">
                   <Send className="w-4 h-4" />
                 </Button>
