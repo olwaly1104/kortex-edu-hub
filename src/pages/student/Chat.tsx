@@ -464,7 +464,7 @@ export default function StudentChat() {
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-1.5 min-w-0">
                         <p className="text-sm font-medium truncate">{c.other_name}</p>
-                        {c.other_modulo && <ModuleTag modulo={c.other_modulo} size="xs" />}
+                        <ModuleTag modulo={c.other_modulo ?? (c.other_id ? userRoles[c.other_id] : null)} size="xs" />
                       </div>
                       <span className="text-[10px] text-muted-foreground shrink-0">
                         {new Date(c.updated_at).toLocaleTimeString("pt-PT", { hour: "2-digit", minute: "2-digit" })}
