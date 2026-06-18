@@ -19,6 +19,9 @@ import {
   Eye, AlignLeft, Tag, CalendarRange, Info, Briefcase, Sparkles, Video, Building2, Link2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Rocket } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { isInstitutionLive } from "@/pages/financas/_FinHeader";
 
 /* ── constants ─────────────────────────────────────── */
 const TODAY = "2024-02-14";
