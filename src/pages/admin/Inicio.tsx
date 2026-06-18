@@ -217,7 +217,7 @@ export default function AdminInicio() {
           <div className="text-right">
             <div className="text-[11px] uppercase tracking-wider text-muted-foreground">Progresso global</div>
             <div className="text-2xl font-bold text-foreground tabular-nums">{pct}%</div>
-            <div className="text-xs text-muted-foreground">{doneCount} de {ALL_STEPS.length} passos</div>
+            <div className="text-xs text-muted-foreground">{doneCount} de {visibleSteps.length} passos</div>
           </div>
         </div>
         <div className="h-2 rounded-full bg-muted overflow-hidden">
