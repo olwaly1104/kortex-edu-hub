@@ -1,0 +1,1 @@
+ALTER TABLE public.estudantes ADD COLUMN IF NOT EXISTS enc_bilhete_url text;
