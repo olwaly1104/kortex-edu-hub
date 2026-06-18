@@ -427,6 +427,7 @@ export type Database = {
           conversation_id: string
           created_at: string
           id: string
+          read_at: string | null
           sender_id: string
         }
         Insert: {
@@ -434,6 +435,7 @@ export type Database = {
           conversation_id: string
           created_at?: string
           id?: string
+          read_at?: string | null
           sender_id: string
         }
         Update: {
@@ -441,6 +443,7 @@ export type Database = {
           conversation_id?: string
           created_at?: string
           id?: string
+          read_at?: string | null
           sender_id?: string
         }
         Relationships: [
@@ -629,6 +632,14 @@ export type Database = {
       get_last_seen: { Args: { _user_id: string }; Returns: string }
       get_or_create_dm: { Args: { _other_user_id: string }; Returns: string }
       get_user_name: { Args: { _user_id: string }; Returns: string }
+      get_users_presence: {
+        Args: { _ids: string[] }
+        Returns: {
+          id: string
+          last_seen_at: string
+          role: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -648,6 +659,10 @@ export type Database = {
           id: string
           modulo: string
         }[]
+      }
+      mark_conversation_read: {
+        Args: { _conversation_id: string }
+        Returns: undefined
       }
       touch_last_seen: { Args: never; Returns: undefined }
     }
