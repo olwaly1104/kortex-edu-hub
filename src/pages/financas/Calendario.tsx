@@ -200,72 +200,24 @@ function CriarEventoDialog({ defaultDate, trigger, onCreated }: { defaultDate: D
         {step === "form" && (
         <form onSubmit={handleSubmit} className="space-y-3.5">
           <div className="space-y-1.5">
-            <Label className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1.5">
-              <Tag className="w-3 h-3" /> Tipo de Evento
-            </Label>
-            <div className="grid grid-cols-2 gap-2">
-              {EVENT_TYPES.map((t) => {
-                const Icon = t.icon;
-                const active = type === t.value;
-                const color = EVENT_COLORS[t.value];
-                return (
-                  <button
-                    key={t.value}
-                    type="button"
-                    onClick={() => setType(t.value)}
-                    className={cn(
-                      "group relative flex items-center gap-2.5 p-2.5 rounded-lg border text-left transition-all",
-                      active
-                        ? "border-foreground/80 bg-card shadow-sm ring-1 ring-foreground/10"
-                        : "border-border bg-card/40 hover:border-foreground/30 hover:bg-card"
-                    )}
-                  >
-                    <span
-                      className={cn(
-                        "w-8 h-8 rounded-md flex items-center justify-center shrink-0 transition-colors"
-                      )}
-                      style={{ background: active ? color : `${color}1a`, color: active ? "#fff" : color }}
-                    >
-                      <Icon className="w-4 h-4" />
-                    </span>
-                    <span className="min-w-0">
-                      <span className="block text-[13px] font-semibold text-foreground leading-tight">{t.label}</span>
-                      <span className="block text-[10.5px] text-muted-foreground leading-tight mt-0.5 truncate">{t.description}</span>
-                    </span>
-                  </button>
-                );
-              })}
+            <Label className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Tipo</Label>
+            <div className="inline-flex rounded-md border bg-muted/30 p-0.5">
+              {(["reuniao", "prazo", "pessoal"] as EventType[]).map((t) => (
+                <button
+                  key={t}
+                  type="button"
+                  onClick={() => setType(t)}
+                  className={cn(
+                    "px-3 h-7 text-xs font-medium rounded transition-colors",
+                    type === t ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  {EVENT_TYPE_LABELS[t]}
+                </button>
+              ))}
             </div>
           </div>
 
-          {/* Categoria (Caixa) */}
-          {type === "caixa" && (
-            <div className="space-y-1.5">
-              <Label className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Categoria</Label>
-              <div className="grid grid-cols-2 gap-2">
-                {CAIXA_CATEGORIAS.map((c) => {
-                  const Icon = c.icon;
-                  const active = categoria === c.value;
-                  return (
-                    <button
-                      key={c.value}
-                      type="button"
-                      onClick={() => setCategoria(c.value)}
-                      className={cn(
-                        "flex items-center justify-center gap-2 h-10 rounded-lg border text-sm font-medium transition-all",
-                        active
-                          ? "border-foreground/70 bg-card shadow-sm ring-1 ring-foreground/10 text-foreground"
-                          : "border-border bg-card/40 text-muted-foreground hover:text-foreground hover:border-foreground/30"
-                      )}
-                    >
-                      <Icon className={cn("w-4 h-4", active ? c.tone : "")} />
-                      {c.label}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
 
           {/* Título */}
           <div className="space-y-1.5">
