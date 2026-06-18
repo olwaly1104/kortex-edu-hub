@@ -356,11 +356,7 @@ export default function StudentChat() {
                     </span>
                   </div>
                   <div className="flex items-center gap-1.5 mt-0.5">
-                    {c.other_modulo && (
-                      <Badge variant="secondary" className="h-4 px-1.5 text-[9px] font-normal">
-                        {moduloLabel(c.other_modulo)}
-                      </Badge>
-                    )}
+                    {c.other_modulo && <ModuleTag modulo={c.other_modulo} size="xs" />}
                     <p className="text-[11px] text-muted-foreground truncate flex-1">
                       {c.last_message ?? "Sem mensagens"}
                     </p>
