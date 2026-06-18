@@ -130,6 +130,7 @@ async function uploadDoc(file: File, prefix: string, email: string): Promise<str
 }
 
 export default function AdminDiscentes() {
+  const navigate = useNavigate();
   const { data: rows = [], isLoading } = useEstudantes();
   const { data: cursos = [] } = useCursos();
   const { data: faculdades = [] } = useFaculdades();
