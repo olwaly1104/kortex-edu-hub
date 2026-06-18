@@ -213,12 +213,9 @@ export const currentSecretaria: User = {
 
 export const currentFinancas: User = {
   id: "8",
-  name: "Dr. Manuel Sousa",
+  name: "",
   email: "financas@upra.kor",
   role: "financas",
-  presence: "96%",
-  position: "Diretor Financeiro",
-  department: "Departamento Financeiro",
 };
 
 export const currentGap: User = {
