@@ -57,6 +57,23 @@ const moduloLabel = (m?: string | null) => {
   return map[m] ?? m;
 };
 
+function formatLastSeen(iso?: string | null): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  const now = new Date();
+  const diffMs = now.getTime() - d.getTime();
+  const diffMin = Math.floor(diffMs / 60000);
+  if (diffMin < 1) return "visto agora mesmo";
+  if (diffMin < 60) return `visto há ${diffMin} min`;
+  const sameDay = d.toDateString() === now.toDateString();
+  const yesterday = new Date(now); yesterday.setDate(now.getDate() - 1);
+  const isYesterday = d.toDateString() === yesterday.toDateString();
+  const hhmm = d.toLocaleTimeString("pt-PT", { hour: "2-digit", minute: "2-digit" });
+  if (sameDay) return `visto hoje às ${hhmm}`;
+  if (isYesterday) return `visto ontem às ${hhmm}`;
+  return `visto em ${d.toLocaleDateString("pt-PT", { day: "2-digit", month: "2-digit" })} às ${hhmm}`;
+}
+
 export default function StudentChat() {
   const uid = useAuthUid();
   const { contacts } = useInstitutionContacts();
@@ -70,6 +87,8 @@ export default function StudentChat() {
   const [tab, setTab] = useState<"chats" | "chamadas" | "grupos">("chats");
   const [pickerOpen, setPickerOpen] = useState(false);
   const [call, setCall] = useState<{ mode: "audio" | "video"; name: string } | null>(null);
+  const [onlineIds, setOnlineIds] = useState<Set<string>>(new Set());
+  const [lastSeen, setLastSeen] = useState<Record<string, string | null>>({});
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -179,6 +198,60 @@ export default function StudentChat() {
   useEffect(() => {
     inputRef.current?.focus();
   }, [selectedId]);
+
+  // Presence + last-seen heartbeat
+  useEffect(() => {
+    if (!uid) return;
+    let mounted = true;
+
+    const touch = () => (supabase as any).rpc("touch_last_seen");
+    touch();
+    const interval = setInterval(touch, 30000);
+
+    const channel = (supabase as any).channel("online-users", {
+      config: { presence: { key: uid } },
+    });
+    channel
+      .on("presence", { event: "sync" }, () => {
+        if (!mounted) return;
+        const state = channel.presenceState() as Record<string, unknown>;
+        setOnlineIds(new Set(Object.keys(state)));
+      })
+      .subscribe(async (status: string) => {
+        if (status === "SUBSCRIBED") {
+          await channel.track({ online_at: new Date().toISOString() });
+        }
+      });
+
+    const handleUnload = () => { (supabase as any).rpc("touch_last_seen"); };
+    window.addEventListener("beforeunload", handleUnload);
+
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+      window.removeEventListener("beforeunload", handleUnload);
+      (supabase as any).rpc("touch_last_seen");
+      (supabase as any).removeChannel(channel);
+    };
+  }, [uid]);
+
+  // Fetch last_seen for all known contacts
+  useEffect(() => {
+    if (contacts.length === 0) return;
+    let cancelled = false;
+    (async () => {
+      const ids = contacts.map((c) => c.id);
+      const { data } = await (supabase as any)
+        .from("profiles")
+        .select("id,last_seen_at")
+        .in("id", ids);
+      if (cancelled || !data) return;
+      const map: Record<string, string | null> = {};
+      for (const p of data) map[p.id] = p.last_seen_at;
+      setLastSeen(map);
+    })();
+    return () => { cancelled = true; };
+  }, [contacts]);
 
   const send = async () => {
     if (!draft.trim() || !selectedId || !uid) return;
@@ -371,11 +444,16 @@ export default function StudentChat() {
                     selectedId === c.id && "bg-muted",
                   )}
                 >
-                  <Avatar className="w-10 h-10 shrink-0">
-                    <AvatarFallback className="text-xs bg-primary/10 text-primary font-medium">
-                      {initials(c.other_name ?? "?")}
-                    </AvatarFallback>
-                  </Avatar>
+                  <div className="relative shrink-0">
+                    <Avatar className="w-10 h-10">
+                      <AvatarFallback className="text-xs bg-primary/10 text-primary font-medium">
+                        {initials(c.other_name ?? "?")}
+                      </AvatarFallback>
+                    </Avatar>
+                    {c.other_id && onlineIds.has(c.other_id) && (
+                      <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-card" />
+                    )}
+                  </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-1.5 min-w-0">
@@ -444,16 +522,29 @@ export default function StudentChat() {
           <>
             <header className="h-14 border-b border-border bg-card px-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <Avatar className="w-9 h-9">
-                  <AvatarFallback className="text-xs bg-primary/10 text-primary font-medium">
-                    {initials(selected.other_name ?? "?")}
-                  </AvatarFallback>
-                </Avatar>
+                <div className="relative">
+                  <Avatar className="w-9 h-9">
+                    <AvatarFallback className="text-xs bg-primary/10 text-primary font-medium">
+                      {initials(selected.other_name ?? "?")}
+                    </AvatarFallback>
+                  </Avatar>
+                  {selected.other_id && onlineIds.has(selected.other_id) && (
+                    <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-card" />
+                  )}
+                </div>
                 <div>
                   <div className="flex items-center gap-2">
                     <p className="text-sm font-semibold leading-tight">{selected.other_name}</p>
                     <ModuleTag modulo={selected.other_modulo} size="xs" />
                   </div>
+                  {selected.other_id && (
+                    <p className={cn(
+                      "text-[11px] leading-tight mt-0.5",
+                      onlineIds.has(selected.other_id) ? "text-emerald-600 font-medium" : "text-muted-foreground"
+                    )}>
+                      {onlineIds.has(selected.other_id) ? "online" : formatLastSeen(lastSeen[selected.other_id])}
+                    </p>
+                  )}
                 </div>
               </div>
               <div className="flex items-center gap-1">
