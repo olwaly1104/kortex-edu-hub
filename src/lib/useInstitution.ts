@@ -79,6 +79,9 @@ export type EstudanteRow = {
   enc_nome: string | null;
   enc_parentesco: string | null;
   enc_telefone: string | null;
+  foto_url: string | null;
+  bilhete_url: string | null;
+  certificado_url: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -383,6 +386,9 @@ export type EstudanteInput = {
   enc_nome?: string | null;
   enc_parentesco?: string | null;
   enc_telefone?: string | null;
+  foto_url?: string | null;
+  bilhete_url?: string | null;
+  certificado_url?: string | null;
   regime?: "bolseiro" | "normal";
 };
 
