@@ -457,7 +457,9 @@ function CriarEventoDialog({ defaultDate, trigger, onCreated }: { defaultDate: D
             </div>
             <DialogFooter>
               <Button type="button" variant="outline" size="sm" onClick={() => setStep("form")}>Voltar</Button>
-              <Button type="button" size="sm" onClick={handleConfirm}>Confirmar e adicionar</Button>
+              <Button type="button" size="sm" onClick={handleConfirm} disabled={saving}>
+                {saving ? "A guardar..." : "Confirmar e adicionar"}
+              </Button>
             </DialogFooter>
           </div>
         )}
@@ -513,16 +515,28 @@ export default function FinancasCalendario() {
   const weekLabel = `${weekDays[0].toLocaleDateString("pt-PT", { day: "2-digit", month: "short" })} – ${weekDays[4].toLocaleDateString("pt-PT", { day: "2-digit", month: "short", year: "numeric" })}`;
   const monthLabel = monthCursor.toLocaleDateString("pt-PT", { month: "long", year: "numeric" });
 
-  const [events, setEvents] = useState<StoredEvent[]>(() => loadEvents());
-  useEffect(() => {
-    const refresh = () => setEvents(loadEvents());
-    window.addEventListener(CHANGE_EVENT, refresh);
-    window.addEventListener("storage", refresh);
-    return () => {
-      window.removeEventListener(CHANGE_EVENT, refresh);
-      window.removeEventListener("storage", refresh);
-    };
+  const [events, setEvents] = useState<StoredEvent[]>([]);
+  const [loadingEvents, setLoadingEvents] = useState(true);
+
+  const fetchEvents = useCallback(async () => {
+    setLoadingEvents(true);
+    const { data, error } = await (supabase as any)
+      .from("calendario_events")
+      .select("id,type,title,event_date,start_time,end_time,location,link,modalidade,participants,color")
+      .order("event_date", { ascending: true })
+      .order("start_time", { ascending: true });
+    if (error) {
+      toast.error("Não foi possível carregar os eventos do backend.");
+      setLoadingEvents(false);
+      return;
+    }
+    setEvents(((data ?? []) as any[]).map(mapDbEvent));
+    setLoadingEvents(false);
   }, []);
+
+  useEffect(() => {
+    fetchEvents();
+  }, [fetchEvents]);
   const [pedidosTab, setPedidosTab] = useState<"recebidos" | "enviados">("recebidos");
   const pedidosRecebidos: { id: string; title: string; from: string; when: string }[] = [];
   const pedidosEnviados: { id: string; title: string; from: string; when: string }[] = [];
@@ -555,8 +569,9 @@ export default function FinancasCalendario() {
         right={
           <CriarEventoDialog
             defaultDate={selectedDate}
-            onCreated={(iso) => {
-              const d = new Date(iso + "T00:00");
+            onCreated={(event) => {
+              setEvents((prev) => [...prev.filter((e) => e.id !== event.id), event].sort((a, b) => `${a.date} ${a.startTime}`.localeCompare(`${b.date} ${b.startTime}`)));
+              const d = new Date(event.date + "T00:00");
               setSelectedDate(d);
               setWeekStart(startOfWeek(d));
               setMonthCursor(new Date(d.getFullYear(), d.getMonth(), 1));
@@ -625,7 +640,10 @@ export default function FinancasCalendario() {
                   </h3>
                   <CriarEventoDialog
                     defaultDate={selectedDate}
-                    onCreated={(iso) => setSelectedDate(new Date(iso + "T00:00"))}
+                    onCreated={(event) => {
+                      setEvents((prev) => [...prev.filter((e) => e.id !== event.id), event].sort((a, b) => `${a.date} ${a.startTime}`.localeCompare(`${b.date} ${b.startTime}`)));
+                      setSelectedDate(new Date(event.date + "T00:00"));
+                    }}
                     trigger={
                       <Button size="sm" className="gap-1.5 h-8">
                         <Plus className="w-3.5 h-3.5" /> Criar Evento
