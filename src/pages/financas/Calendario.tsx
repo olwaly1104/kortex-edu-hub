@@ -10,19 +10,18 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 
-import { CalendarDays, ChevronLeft, ChevronRight, Plus, Users, MapPin, Calendar as CalendarIcon, Video, Building2, DollarSign, Clock, FileText, X, UserPlus } from "lucide-react";
+import { CalendarDays, ChevronLeft, ChevronRight, Plus, Users, MapPin, Calendar as CalendarIcon, Video, Building2, Clock, X, UserPlus, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const DAYS = ["Seg", "Ter", "Qua", "Qui", "Sex"];
 
-type EventType = "reuniao" | "pagamento" | "prazo" | "outro";
-type Modalidade = "virtual" | "presencial";
+type EventType = "reuniao" | "prazo" | "pessoal";
+type Modalidade = "kortex" | "presencial";
 
 const EVENT_TYPES: { value: EventType; label: string; icon: typeof Video }[] = [
   { value: "reuniao", label: "Reunião", icon: Users },
-  { value: "pagamento", label: "Pagamento", icon: DollarSign },
   { value: "prazo", label: "Prazo", icon: Clock },
-  { value: "outro", label: "Outro", icon: FileText },
+  { value: "pessoal", label: "Pessoal", icon: User },
 ];
 
 function CriarEventoDialog({ defaultDate, trigger }: { defaultDate: Date; trigger: React.ReactNode }) {
@@ -37,7 +36,6 @@ function CriarEventoDialog({ defaultDate, trigger }: { defaultDate: Date; trigge
   const [endTime, setEndTime] = useState("10:00");
   const [location, setLocation] = useState("");
   const [link, setLink] = useState("");
-  const [notes, setNotes] = useState("");
   const [participants, setParticipants] = useState<{ id: string; name: string; email: string | null }[]>([]);
   const [participantInput, setParticipantInput] = useState("");
   const [participantFocus, setParticipantFocus] = useState(false);
@@ -87,7 +85,7 @@ function CriarEventoDialog({ defaultDate, trigger }: { defaultDate: Date; trigge
       : "Evento criado com sucesso.";
     toast.success(msg);
     setOpen(false);
-    setTitle(""); setLocation(""); setLink(""); setNotes(""); setParticipants([]); setParticipantInput("");
+    setTitle(""); setLocation(""); setLink(""); setParticipants([]); setParticipantInput("");
   };
 
   return (
@@ -98,12 +96,13 @@ function CriarEventoDialog({ defaultDate, trigger }: { defaultDate: Date; trigge
           <DialogTitle className="flex items-center gap-2">
             <CalendarIcon className="w-4 h-4 text-primary" /> Criar Evento
           </DialogTitle>
-          <DialogDescription>Agende um novo evento no calendário financeiro.</DialogDescription>
+          <DialogDescription>Agende um novo evento no calendário geral.</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-3.5">
+          <Label className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Categorias</Label>
           {/* Tipo — compact segmented */}
-          <div className="grid grid-cols-4 gap-1.5 p-1 bg-muted/40 rounded-lg">
+          <div className="grid grid-cols-3 gap-1.5 p-1 bg-muted/40 rounded-lg">
             {EVENT_TYPES.map((t) => {
               const Icon = t.icon;
               const active = type === t.value;
@@ -152,7 +151,7 @@ function CriarEventoDialog({ defaultDate, trigger }: { defaultDate: Date; trigge
               <div className="inline-flex p-0.5 bg-muted/40 rounded-md">
                 {([
                   { value: "presencial" as const, label: "Presencial", icon: Building2 },
-                  { value: "virtual" as const, label: "Virtual", icon: Video },
+                  { value: "kortex" as const, label: "Kortex Link", icon: Video },
                 ]).map((m) => {
                   const Icon = m.icon;
                   const active = modalidade === m.value;
@@ -189,7 +188,7 @@ function CriarEventoDialog({ defaultDate, trigger }: { defaultDate: Date; trigge
                   </SelectContent>
                 </Select>
               ) : (
-                <Input value={link} onChange={(e) => setLink(e.target.value)} placeholder="https://meet.google.com/..." className="h-9" />
+                <Input value={link} onChange={(e) => setLink(e.target.value)} placeholder="Link da chamada Kortex..." className="h-9" />
               )}
             </div>
           )}
@@ -215,12 +214,6 @@ function CriarEventoDialog({ defaultDate, trigger }: { defaultDate: Date; trigge
               </Select>
             </div>
           )}
-
-          {/* Notas */}
-          <div className="space-y-1.5">
-            <Label htmlFor="ev-notes" className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Notas (opcional)</Label>
-            <Textarea id="ev-notes" value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} placeholder="Detalhes adicionais..." className="resize-none" />
-          </div>
 
           {/* Participantes — no fim */}
           <div className="space-y-2 pt-1 border-t border-border/60">
@@ -357,7 +350,7 @@ export default function FinancasCalendario() {
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       <FinHeader
         title="Calendário"
-        subtitle="Eventos financeiros e reuniões"
+        subtitle="Eventos gerais e reuniões"
         icon={<CalendarIcon className="w-5 h-5 text-primary" />}
         right={
           <CriarEventoDialog
