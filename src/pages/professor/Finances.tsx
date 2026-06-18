@@ -67,7 +67,7 @@ export default function ProfessorFinances() {
             </div>
             <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Próximo Pagamento</p>
           </div>
-          <p className="text-xl font-bold text-foreground">31 Mar</p>
+          <p className="text-xl font-bold text-foreground">—</p>
         </div>
       </div>
 
