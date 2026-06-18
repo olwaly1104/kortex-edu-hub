@@ -266,14 +266,10 @@ export default function GapEstudantes() {
             </FormSection>
 
             <FormSection icon={<Mail className="w-3.5 h-3.5" />} title="Acesso">
-              <Label className="text-xs">Email institucional</Label>
-              <Input
-                className="h-9 mt-1"
-                type="email"
-                value={draft.email}
-                onChange={(e) => setF("email", e.target.value)}
-                placeholder="estudante@upra.kor"
-              />
+              <Label className="text-xs">Email institucional (gerado automaticamente)</Label>
+              <div className="h-9 mt-1 px-3 flex items-center text-xs font-mono text-muted-foreground bg-muted/40 border border-input rounded-md truncate">
+                {buildEmail(draft.primeiroNome, draft.ultimoNome) || `nome@${EMAIL_DOMAIN}`}
+              </div>
             </FormSection>
 
             <FormSection icon={<BookOpen className="w-3.5 h-3.5" />} title="Matrícula">
