@@ -539,7 +539,19 @@ export default function FinancasCalendario() {
   }, [fetchEvents]);
   const [pedidosTab, setPedidosTab] = useState<"recebidos" | "enviados">("recebidos");
   const pedidosRecebidos: { id: string; title: string; from: string; when: string }[] = [];
-  const pedidosEnviados: { id: string; title: string; from: string; when: string }[] = [];
+  const pedidosEnviados: { id: string; title: string; from: string; when: string }[] = useMemo(() => (
+    events
+      .filter((event) => event.type === "reuniao" && (event.participants?.length ?? 0) > 0)
+      .map((event) => {
+        const names = event.participants?.map((p) => p.name).filter(Boolean) ?? [];
+        return {
+          id: event.id,
+          title: event.title,
+          from: names.length > 2 ? `Para ${names.slice(0, 2).join(", ")} +${names.length - 2}` : `Para ${names.join(", ")}`,
+          when: `${new Date(event.date + "T00:00").toLocaleDateString("pt-PT", { day: "2-digit", month: "short" })} · ${event.startTime}`,
+        };
+      })
+  ), [events]);
 
   const selectedDayEvents = events.filter((e) => e.date === toISO(selectedDate));
   const eventsByDate = useMemo(() => {
