@@ -536,7 +536,7 @@ export default function FinancasCalendario() {
     setLoadingEvents(true);
     const { data, error } = await (supabase as any)
       .from("calendario_events")
-      .select("id,type,title,event_date,start_time,end_time,location,link,modalidade,participants,color")
+      .select("id,type,title,event_date,start_time,end_time,location,link,modalidade,participants,categoria,color")
       .order("event_date", { ascending: true })
       .order("start_time", { ascending: true });
     if (error) {
