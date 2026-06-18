@@ -9,9 +9,11 @@ import {
   Clock, CheckCircle2, Search, X, Inbox, Send,
   Plus, GraduationCap, CalendarDays, Calendar, ArrowUpRight,
   AlertTriangle, BadgeCheck, ChevronLeft, ChevronRight,
-  Paperclip, FileText, Trash2, ArrowRight, Check,
+  Paperclip, FileText, Trash2, ArrowRight, Check, Rocket,
   type LucideIcon,
 } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { isInstitutionLive } from "@/pages/financas/_FinHeader";
 import { cn } from "@/lib/utils";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose, DialogTrigger,
@@ -137,14 +139,25 @@ export default function FinancasSolicitacoes() {
     { key: "rejeitadas", label: "Rejeitadas", count: counts.rejeitadas },
   ];
 
-  /* live clock */
+  const { user } = useAuth();
   const [now, setNow] = useState<Date>(new Date());
+  const [live, setLive] = useState<boolean>(() => isInstitutionLive(user?.email));
   useEffect(() => {
     const id = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(id);
   }, []);
+  useEffect(() => {
+    const recheck = () => setLive(isInstitutionLive(user?.email));
+    recheck();
+    window.addEventListener("focus", recheck);
+    window.addEventListener("storage", recheck);
+    return () => {
+      window.removeEventListener("focus", recheck);
+      window.removeEventListener("storage", recheck);
+    };
+  }, [user?.email]);
   const liveTime = `${String(now.getHours()).padStart(2,"0")}h:${String(now.getMinutes()).padStart(2,"0")}min:${String(now.getSeconds()).padStart(2,"0")}s`;
-  const todayLabel = new Date().toLocaleDateString("pt-PT", { weekday: "long", day: "2-digit", month: "long", year: "numeric" });
+  const todayLabel = now.toLocaleDateString("pt-PT", { weekday: "long", day: "2-digit", month: "long", year: "numeric" });
   const ANO_LETIVO = "2024 / 2025";
 
   const handleNewSubmit = () => {
@@ -183,10 +196,17 @@ export default function FinancasSolicitacoes() {
       <div className="rounded-xl border border-border bg-gradient-to-r from-primary/5 to-transparent px-5 py-4">
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div className="min-w-0 space-y-2.5">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-[11px] uppercase tracking-wider font-semibold text-primary">
-              <GraduationCap className="w-3.5 h-3.5" />
-              Ano Letivo <span className="font-bold tabular-nums">{ANO_LETIVO}</span>
-            </span>
+            {live ? (
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-[11px] uppercase tracking-wider font-semibold text-primary">
+                <GraduationCap className="w-3.5 h-3.5" />
+                Ano Letivo <span className="font-bold tabular-nums">{ANO_LETIVO}</span>
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-300 bg-amber-50 px-3 py-1 text-[11px] uppercase tracking-wider font-semibold text-amber-800">
+                <Rocket className="w-3.5 h-3.5" />
+                Onboarding
+              </span>
+            )}
             <div>
               <h1 className="text-xl font-bold text-foreground flex items-center gap-2 leading-tight">
                 Minhas Solicitações
