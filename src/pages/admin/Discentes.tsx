@@ -415,58 +415,80 @@ export default function AdminDiscentes() {
             </div>
           </div>
 
-          {/* Contact + identity docs */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-            <Field label="Telemóvel / Contacto">
-              <Input value={draft.telemovel} onChange={(e) => setF("telemovel", e.target.value)} placeholder="+244 9XX XXX XXX" className="h-8 text-xs" />
-            </Field>
-            <Field label="Nº Bilhete de Identidade">
-              <Input value={draft.bilhete} onChange={(e) => setF("bilhete", e.target.value)} placeholder="00000000XX000" className="h-8 text-xs" />
-            </Field>
-            <Field label="Regime">
-              <Select value={draft.regime} onValueChange={(v) => setF("regime", v as Regime)}>
-                <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="normal">Normal</SelectItem>
-                  <SelectItem value="bolseiro">Bolseiro</SelectItem>
-                </SelectContent>
-              </Select>
-            </Field>
-            <Field label="Curso">
-              <Select value={draft.curso_id} onValueChange={(v) => setF("curso_id", v)}>
-                <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="—" /></SelectTrigger>
-                <SelectContent>
-                  {cursos.map((c: any) => (
-                    <SelectItem key={c.id} value={c.id}>{c.codigo || c.nome}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </Field>
+          {/* Académico: Faculdade → Curso → Ano → Turma */}
+          <div>
+            <p className="text-[10px] uppercase tracking-wide text-muted-foreground font-semibold mb-2">Académico</p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              <Field label="Faculdade">
+                <Select value={draft.faculdade_id} onValueChange={(v) => setF("faculdade_id", v)}>
+                  <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="—" /></SelectTrigger>
+                  <SelectContent>
+                    {faculdades.map((f: any) => (
+                      <SelectItem key={f.id} value={f.id}>{f.sigla || f.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </Field>
+              <Field label="Curso">
+                <Select value={draft.curso_id} onValueChange={(v) => setF("curso_id", v)} disabled={cursosDaFac.length === 0}>
+                  <SelectTrigger className="h-8 text-xs">
+                    <SelectValue placeholder={cursosDaFac.length === 0 ? "Sem cursos" : "—"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {cursosDaFac.map((c: any) => (
+                      <SelectItem key={c.id} value={c.id}>{c.code || c.codigo || c.name || c.nome}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </Field>
+              <Field label="Ano">
+                <Select value={draft.ano} onValueChange={(v) => setF("ano", v)}>
+                  <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                  <SelectContent>{anosPool.map((a) => <SelectItem key={a} value={a}>{a}º</SelectItem>)}</SelectContent>
+                </Select>
+              </Field>
+              <Field label="Turma">
+                <Select value={draft.turma} onValueChange={(v) => setF("turma", v)}>
+                  <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                  <SelectContent>{turmasPool.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
+                </Select>
+              </Field>
+            </div>
           </div>
 
-          {/* Ano / Turma + uploads */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-            <Field label="Ano">
-              <Select value={draft.ano} onValueChange={(v) => setF("ano", v)}>
-                <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                <SelectContent>{anosPool.map((a) => <SelectItem key={a} value={a}>{a}º</SelectItem>)}</SelectContent>
-              </Select>
-            </Field>
-            <Field label="Turma">
-              <Select value={draft.turma} onValueChange={(v) => setF("turma", v)}>
-                <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                <SelectContent>{turmasPool.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
-              </Select>
-            </Field>
-            <Field label="Bilhete (upload)">
-              <FileButton
-                file={draft.bilheteFile}
-                onPick={(f) => setF("bilheteFile", f)}
-                inputRef={biInput}
-                accept="image/*,application/pdf"
-                Icon={IdCard}
-              />
-            </Field>
+          {/* Contacto e identificação */}
+          <div>
+            <p className="text-[10px] uppercase tracking-wide text-muted-foreground font-semibold mb-2">Contacto & Identificação</p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              <Field label="Telemóvel / Contacto">
+                <Input value={draft.telemovel} onChange={(e) => setF("telemovel", e.target.value)} placeholder="+244 9XX XXX XXX" className="h-8 text-xs" />
+              </Field>
+              <Field label="Nº Bilhete de Identidade">
+                <Input value={draft.bilhete} onChange={(e) => setF("bilhete", e.target.value)} placeholder="00000000XX000" className="h-8 text-xs" />
+              </Field>
+              <Field label="Regime">
+                <Select value={draft.regime} onValueChange={(v) => setF("regime", v as Regime)}>
+                  <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="normal">Normal</SelectItem>
+                    <SelectItem value="bolseiro">Bolseiro</SelectItem>
+                  </SelectContent>
+                </Select>
+              </Field>
+              <Field label="Bilhete (upload)">
+                <FileButton
+                  file={draft.bilheteFile}
+                  onPick={(f) => setF("bilheteFile", f)}
+                  inputRef={biInput}
+                  accept="image/*,application/pdf"
+                  Icon={IdCard}
+                />
+              </Field>
+            </div>
+          </div>
+
+          {/* Documento académico */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
             <Field label="Certificado Ensino Médio (upload)">
               <FileButton
                 file={draft.certificadoFile}
