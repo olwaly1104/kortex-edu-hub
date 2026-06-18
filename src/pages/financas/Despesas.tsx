@@ -175,7 +175,7 @@ export default function Despesas() {
             <th className="text-left p-3 font-medium text-muted-foreground">Solicitado por</th>
             <th className="text-left p-3 font-medium text-muted-foreground">Responsável</th>
             <th className="text-center p-3 font-medium text-muted-foreground">Estado</th>
-            <th className="text-center p-3 font-medium text-muted-foreground">Comprovativo</th>
+            <th className="text-center p-3 font-medium text-muted-foreground">Docs</th>
           </tr></thead>
           <tbody>{filtered.map(d => (
             <tr key={d.id} className="border-b last:border-0 hover:bg-muted/20 transition-colors cursor-pointer" onClick={() => navigate(`/financas/despesas/${d.id}`)}>
@@ -187,13 +187,17 @@ export default function Despesas() {
               <td className="p-3 text-xs text-foreground">{d.responsavel || "—"}</td>
               <td className="p-3 text-center"><Badge variant="outline" className={cn("text-[10px]", statusColors[d.status])}>{statusLabels[d.status] || d.status}</Badge></td>
               <td className="p-3 text-center" onClick={e => e.stopPropagation()}>
-                {d.status === "aprovada" ? (
-                  <Button variant="ghost" size="sm" className="h-7 px-2 text-[10px] gap-1 text-muted-foreground hover:text-primary" onClick={() => toast({ title: "Comprovativo aberto" })}>
-                    <FileText className="w-3 h-3" /> Comprovativo
-                  </Button>
-                ) : (
-                  <span className="text-[10px] text-muted-foreground/60">—</span>
-                )}
+                {(() => {
+                  const total = (d as any).docsRequired ?? 0;
+                  const entregues = (d as any).docsSubmitted ?? 0;
+                  if (total === 0) return <span className="text-[10px] text-muted-foreground/60">—</span>;
+                  const complete = entregues >= total;
+                  return (
+                    <Button variant="ghost" size="sm" className={cn("h-7 px-2 text-[10px] gap-1", complete ? "text-primary hover:text-primary" : "text-muted-foreground hover:text-primary")} onClick={() => toast({ title: `${entregues}/${total} documentos entregues` })}>
+                      <FileText className="w-3 h-3" /> {entregues}/{total}
+                    </Button>
+                  );
+                })()}
               </td>
             </tr>
           ))}</tbody>
