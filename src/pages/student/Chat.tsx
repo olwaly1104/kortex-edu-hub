@@ -427,6 +427,14 @@ export default function StudentChat() {
                                 : "bg-card border border-border rounded-bl-md",
                             )}
                           >
+                            <p
+                              className={cn(
+                                "text-[10px] font-semibold mb-0.5",
+                                own ? "text-primary-foreground/80" : "text-primary",
+                              )}
+                            >
+                              {own ? "Você" : selected.other_name}
+                            </p>
                             {/^https?:\/\/\S+\.(gif|png|jpe?g|webp)(\?\S*)?$/i.test(m.body) ? (
                               <img src={m.body} alt="gif" className="rounded-lg max-w-full max-h-60 object-contain" />
                             ) : (
