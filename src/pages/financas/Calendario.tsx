@@ -496,7 +496,9 @@ export default function FinancasCalendario() {
       window.removeEventListener("storage", refresh);
     };
   }, []);
-  const meetingRequests: { id: string; title: string; from: string; when: string }[] = [];
+  const [pedidosTab, setPedidosTab] = useState<"recebidos" | "enviados">("recebidos");
+  const pedidosRecebidos: { id: string; title: string; from: string; when: string }[] = [];
+  const pedidosEnviados: { id: string; title: string; from: string; when: string }[] = [];
 
   const selectedDayEvents = events.filter((e) => e.date === toISO(selectedDate));
   const eventsByDate = useMemo(() => {
