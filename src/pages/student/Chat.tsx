@@ -107,9 +107,12 @@ export default function StudentChat() {
           if (match) {
             other_name = match.display_name;
             other_modulo = match.modulo;
-          } else {
-            const { data: name } = await (supabase as any).rpc("get_user_name", { _user_id: otherId });
-            other_name = name ?? other_name;
+          }
+          if (!other_modulo) {
+            if (!match) {
+              const { data: name } = await (supabase as any).rpc("get_user_name", { _user_id: otherId });
+              other_name = name ?? other_name;
+            }
             const { data: roleRow } = await (supabase as any)
               .from("user_roles")
               .select("role")
