@@ -689,10 +689,8 @@ export default function FinancasCalendario() {
                 ) : (
                   <div className="divide-y divide-border">
                     {selectedDayEvents.map((event) => {
-                      const typeLabel = EVENT_TYPES.find(t => t.value === event.type)?.label ?? event.type;
-                      const catLabel = event.type === "caixa" && event.categoria
-                        ? CAIXA_CATEGORIAS.find(c => c.value === event.categoria)?.label
-                        : null;
+                      const typeLabel = EVENT_TYPE_LABELS[event.type] ?? event.type;
+
                       if (event.type === "prazo") {
                         return (
                           <div key={event.id} className="flex items-center gap-2 py-2">
