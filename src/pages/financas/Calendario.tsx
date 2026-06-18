@@ -18,6 +18,44 @@ const DAYS = ["Seg", "Ter", "Qua", "Qui", "Sex"];
 type EventType = "reuniao" | "prazo" | "pessoal";
 type Modalidade = "kortex" | "presencial";
 
+type StoredEvent = {
+  id: string;
+  type: EventType;
+  title: string;
+  date: string;
+  startTime: string;
+  endTime?: string;
+  location?: string;
+  link?: string;
+  modalidade?: Modalidade;
+  participants?: { id: string; name: string; modulo: string | null }[];
+  color: string;
+};
+
+const STORAGE_KEY = "upra:calendario:events";
+const CHANGE_EVENT = "upra:calendario:changed";
+
+const EVENT_COLORS: Record<EventType, string> = {
+  reuniao: "hsl(142 65% 35%)",
+  prazo: "hsl(0 72% 51%)",
+  pessoal: "hsl(217 91% 60%)",
+};
+
+function loadEvents(): StoredEvent[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    const arr = raw ? JSON.parse(raw) : [];
+    return Array.isArray(arr) ? arr : [];
+  } catch { return []; }
+}
+
+function saveEvent(ev: StoredEvent) {
+  const all = loadEvents();
+  all.push(ev);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
+  window.dispatchEvent(new CustomEvent(CHANGE_EVENT));
+}
+
 const EVENT_TYPES: { value: EventType; label: string; icon: typeof Video }[] = [
   { value: "reuniao", label: "Reunião", icon: Users },
   { value: "prazo", label: "Prazo", icon: Clock },
