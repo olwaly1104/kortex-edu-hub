@@ -60,7 +60,7 @@ const buildEmail = (primeiro: string, ultimo: string) => {
   return `${[p, u].filter(Boolean).join(".")}@${EMAIL_DOMAIN}`;
 };
 
-const emptyDraft = (curso_id = ""): Draft => ({
+const emptyDraft = (faculdade_id = "", curso_id = ""): Draft => ({
   fotoFile: null,
   fotoPreview: "",
   primeiroNome: "",
@@ -78,6 +78,7 @@ const emptyDraft = (curso_id = ""): Draft => ({
   enc_nome: "",
   enc_parentesco: "",
   enc_telefone: "",
+  faculdade_id,
   curso_id,
   ano: "1",
   turma: "A",
