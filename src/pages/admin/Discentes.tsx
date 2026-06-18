@@ -109,6 +109,7 @@ export default function AdminDiscentes() {
   const [filtroCurso, setFiltroCurso] = useState<string>("all");
   const [draft, setDraft] = useState<Draft>(emptyDraft());
   const [uploading, setUploading] = useState(false);
+  const [open, setOpen] = useState(false);
   const fotoInput = useRef<HTMLInputElement>(null);
   const biInput = useRef<HTMLInputElement>(null);
   const certInput = useRef<HTMLInputElement>(null);
