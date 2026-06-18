@@ -503,10 +503,33 @@ function DespesasSection({ email }: { email?: string | null }) {
     { label: "Violeta", value: "bg-violet-100 text-violet-700 border-violet-200" },
   ];
 
+  const [desTab, setDesTab] = useState<"estados" | "categorias" | "aprovacoes">("estados");
+  const desToggles: { key: typeof desTab; label: string; icon: React.ComponentType<{ className?: string }>; count: number }[] = [
+    { key: "estados",    label: "Estados",    icon: AlertCircle, count: estados.length },
+    { key: "categorias", label: "Categorias", icon: TrendingDown, count: categorias.length },
+    { key: "aprovacoes", label: "Aprovações", icon: Users,       count: responsaveis.length },
+  ];
+
   return (
     <div className="space-y-6">
-      {/* Categorias */}
+      <div className="inline-flex items-center gap-1 p-1 rounded-lg border bg-muted/30">
+        {desToggles.map((t) => {
+          const TIcon = t.icon;
+          const active = desTab === t.key;
+          return (
+            <button key={t.key} type="button" onClick={() => setDesTab(t.key)}
+              className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${active ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"}`}>
+              <TIcon className="w-3.5 h-3.5" />
+              {t.label}
+              <span className={`tabular-nums text-[10px] px-1.5 py-0.5 rounded ${active ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>{t.count}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {desTab === "categorias" && (
       <Card className="overflow-hidden">
+
         <div className="px-5 py-3 border-b bg-muted/30 flex items-center gap-2">
           <TrendingDown className="w-4 h-4 text-primary" />
           <div className="min-w-0">
@@ -576,9 +599,11 @@ function DespesasSection({ email }: { email?: string | null }) {
           </Button>
         </div>
       </Card>
+      )}
 
-      {/* Estados */}
+      {desTab === "estados" && (
       <Card className="overflow-hidden">
+
         <div className="px-5 py-3 border-b bg-muted/30 flex items-center gap-2">
           <AlertCircle className="w-4 h-4 text-primary" />
           <div className="min-w-0">
@@ -617,9 +642,11 @@ function DespesasSection({ email }: { email?: string | null }) {
           </Button>
         </div>
       </Card>
+      )}
 
-      {/* Responsáveis */}
+      {desTab === "aprovacoes" && (
       <Card className="overflow-hidden">
+
         <div className="px-5 py-3 border-b bg-muted/30 flex items-center gap-2">
           <Users className="w-4 h-4 text-primary" />
           <div className="min-w-0">
@@ -662,7 +689,9 @@ function DespesasSection({ email }: { email?: string | null }) {
           </Button>
         </div>
       </Card>
+      )}
     </div>
+
   );
 }
 
