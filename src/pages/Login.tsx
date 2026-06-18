@@ -9,7 +9,7 @@ import { Eye, EyeOff, Globe, Loader2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
 import logoUpra from "@/assets/logo-upra.asset.json";
 import { supabase } from "@/integrations/supabase/client";
-import { isOnboardingCompleteFor } from "@/lib/onboardingStorage";
+
 import { loadDevCreds, removeDevCred, type DevCred } from "@/lib/devCreds";
 import { KeyRound, Copy, Trash2 } from "lucide-react";
 
@@ -77,10 +77,6 @@ export default function Login() {
       const accountEmail = signInData.user?.email || normalizedEmail;
       const displayName = (signInData.user?.user_metadata as any)?.display_name;
       login(accountEmail, password, { sourceEmail: accountEmail, displayName, role });
-      if (role === "admin" && !isOnboardingCompleteFor(accountEmail)) {
-        navigate("/admin/onboarding");
-        return;
-      }
       navigate(ROLE_ROUTE[role] ?? "/student");
     } finally {
       setSubmitting(false);
