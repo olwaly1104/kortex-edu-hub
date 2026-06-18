@@ -236,6 +236,63 @@ export default function AdminDiscenteProfile() {
             </div>
           </Card>
         </TabsContent>
+
+        <TabsContent value="financas" className="space-y-4">
+          {(() => {
+            const isBolseiro = student.regime === "bolseiro";
+            const valorMensal = Number(propina?.valor_mensal || 0);
+            const imposto = Number(propina?.imposto || 0);
+            const totalMensal = valorMensal + (valorMensal * imposto) / 100;
+            const totalAnual = totalMensal * 12;
+            return (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <Card className="p-4">
+                    <div className="flex items-center gap-2 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
+                      <Wallet className="w-3.5 h-3.5" /> Propina Mensal
+                    </div>
+                    <p className="text-2xl font-bold tabular-nums mt-2">
+                      {isBolseiro ? "Isento" : fmtAOA(totalMensal)}
+                    </p>
+                    <p className="text-[11px] text-muted-foreground mt-0.5">
+                      {isBolseiro ? "Regime de Bolsa" : `Base ${fmtAOA(valorMensal)} + ${imposto}%`}
+                    </p>
+                  </Card>
+                  <Card className="p-4">
+                    <div className="flex items-center gap-2 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
+                      <CircleDollarSign className="w-3.5 h-3.5" /> Total Anual Estimado
+                    </div>
+                    <p className="text-2xl font-bold tabular-nums mt-2">
+                      {isBolseiro ? fmtAOA(0) : fmtAOA(totalAnual)}
+                    </p>
+                    <p className="text-[11px] text-muted-foreground mt-0.5">12 mensalidades</p>
+                  </Card>
+                  <Card className="p-4">
+                    <div className="flex items-center gap-2 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
+                      <Receipt className="w-3.5 h-3.5" /> Estado
+                    </div>
+                    <div className="mt-2">
+                      <Badge variant="outline" className={cn("text-xs px-2 py-0.5",
+                        isBolseiro ? "bg-amber-50 text-amber-700 border-amber-200" : "bg-accent/10 text-accent border-accent/30")}>
+                        {isBolseiro ? "Bolseiro" : "Regularizado"}
+                      </Badge>
+                    </div>
+                    <p className="text-[11px] text-muted-foreground mt-2">Sem pendências</p>
+                  </Card>
+                </div>
+
+                <SectionCard title="Plano Financeiro" icon={<Wallet className="w-4 h-4" />}>
+                  <InfoRow label="Regime" value={isBolseiro ? "Bolseiro" : "Normal"} icon={<Award className="w-4 h-4 text-primary" />} />
+                  <InfoRow label="Curso" value={cursoName} icon={<GraduationCap className="w-4 h-4 text-primary" />} />
+                  <InfoRow label="Propina base" value={propina ? fmtAOA(valorMensal) : "—"} icon={<Wallet className="w-4 h-4 text-primary" />} />
+                  <InfoRow label="Imposto" value={propina ? `${imposto}%` : "—"} icon={<Receipt className="w-4 h-4 text-primary" />} />
+                  <InfoRow label="Mensalidade final" value={isBolseiro ? "Isento" : (propina ? fmtAOA(totalMensal) : "—")} icon={<CircleDollarSign className="w-4 h-4 text-primary" />} />
+                  <InfoRow label="Data de matriculação" value={dataMatricula} icon={<Calendar className="w-4 h-4 text-primary" />} />
+                </SectionCard>
+              </>
+            );
+          })()}
+        </TabsContent>
       </Tabs>
 
       <Dialog open={docOpen} onOpenChange={setDocOpen}>
