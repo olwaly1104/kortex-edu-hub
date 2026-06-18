@@ -754,6 +754,19 @@ export default function FinancasCalendario() {
                       const catLabel = event.type === "caixa" && event.categoria
                         ? CAIXA_CATEGORIAS.find(c => c.value === event.categoria)?.label
                         : null;
+                      if (event.type === "prazo") {
+                        return (
+                          <div key={event.id} className="flex items-center gap-2 py-2">
+                            <span className="w-2 h-2 rounded-full shrink-0" style={{ background: event.color }} />
+                            <span className="text-xs font-semibold text-foreground truncate">{event.title}</span>
+                            <span className="text-[10px] tabular-nums text-muted-foreground">{event.startTime}</span>
+                            <span
+                              className="ml-auto text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded shrink-0"
+                              style={{ background: `${event.color}1a`, color: event.color }}
+                            >Prazo</span>
+                          </div>
+                        );
+                      }
                       return (
                         <div key={event.id} className="flex items-center gap-3 py-3">
                           <div className="w-1 h-10 rounded-full shrink-0" style={{ background: event.color }} />
