@@ -179,19 +179,33 @@ export default function StudentChat() {
         .eq("conversation_id", selectedId)
         .order("created_at");
       setMessages(data ?? []);
+      // Mark incoming messages as read
+      await (supabase as any).rpc("mark_conversation_read", { _conversation_id: selectedId });
     })();
     const channel = (supabase as any)
       .channel(`messages:${selectedId}`)
       .on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "messages", filter: `conversation_id=eq.${selectedId}` },
-        (payload: any) => setMessages((m) => [...m, payload.new]),
+        (payload: any) => {
+          setMessages((m) => [...m, payload.new]);
+          if (payload.new.sender_id !== uid) {
+            (supabase as any).rpc("mark_conversation_read", { _conversation_id: selectedId });
+          }
+        },
+      )
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "messages", filter: `conversation_id=eq.${selectedId}` },
+        (payload: any) => {
+          setMessages((m) => m.map((msg) => msg.id === payload.new.id ? { ...msg, ...payload.new } : msg));
+        },
       )
       .subscribe();
     return () => {
       (supabase as any).removeChannel(channel);
     };
-  }, [selectedId]);
+  }, [selectedId, uid]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
