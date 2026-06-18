@@ -535,6 +535,7 @@ export type Database = {
           email: string | null
           id: string
           institution_id: string | null
+          last_seen_at: string | null
           must_change_password: boolean
           updated_at: string
         }
@@ -544,6 +545,7 @@ export type Database = {
           email?: string | null
           id: string
           institution_id?: string | null
+          last_seen_at?: string | null
           must_change_password?: boolean
           updated_at?: string
         }
@@ -553,6 +555,7 @@ export type Database = {
           email?: string | null
           id?: string
           institution_id?: string | null
+          last_seen_at?: string | null
           must_change_password?: boolean
           updated_at?: string
         }
@@ -623,6 +626,7 @@ export type Database = {
     }
     Functions: {
       current_institution_id: { Args: never; Returns: string }
+      get_last_seen: { Args: { _user_id: string }; Returns: string }
       get_or_create_dm: { Args: { _other_user_id: string }; Returns: string }
       get_user_name: { Args: { _user_id: string }; Returns: string }
       has_role: {
@@ -645,6 +649,7 @@ export type Database = {
           modulo: string
         }[]
       }
+      touch_last_seen: { Args: never; Returns: undefined }
     }
     Enums: {
       app_role:
