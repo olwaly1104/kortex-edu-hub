@@ -439,8 +439,10 @@ export default function StudentChat() {
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="text-sm font-semibold leading-tight">{selected.other_name}</p>
-                  <div className="mt-1"><ModuleTag modulo={selected.other_modulo} size="xs" /></div>
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-semibold leading-tight">{selected.other_name}</p>
+                    <ModuleTag modulo={selected.other_modulo} size="xs" />
+                  </div>
                 </div>
               </div>
               <div className="flex items-center gap-1">
