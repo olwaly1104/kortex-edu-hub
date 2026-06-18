@@ -541,7 +541,7 @@ export default function StudentChat() {
                 <div>
                   <div className="flex items-center gap-2">
                     <p className="text-sm font-semibold leading-tight">{selected.other_name}</p>
-                    <ModuleTag modulo={selected.other_modulo} size="xs" />
+                    <ModuleTag modulo={selected.other_modulo ?? (selected.other_id ? userRoles[selected.other_id] : null)} size="xs" />
                   </div>
                   {selected.other_id && (
                     <p className={cn(
