@@ -9,7 +9,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { formatCurrency, despesas } from "@/data/financeModuleData";
+import { formatCurrency, type Transaction } from "@/data/financeModuleData";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { FinHeader } from "./_FinHeader";
@@ -25,6 +25,7 @@ const statusColors: Record<string, string> = {
   rejeitada: "bg-destructive/15 text-destructive border-destructive/30",
 };
 const statusLabels: Record<string, string> = { aprovada: "Aprovada", pendente: "Pendente", rejeitada: "Rejeitada" };
+const despesas: Transaction[] = [];
 
 
 const despesaCategories: string[] = [];
