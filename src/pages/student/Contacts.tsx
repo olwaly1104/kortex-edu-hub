@@ -51,7 +51,7 @@ export default function Contacts() {
                 <div className="min-w-0 flex-1">
                   <p className="font-semibold text-foreground truncate">{c.display_name}</p>
                   <p className="text-xs text-muted-foreground truncate">{c.email ?? "—"}</p>
-                  {c.modulo && <Badge variant="outline" className="text-[10px] mt-2 capitalize">{c.modulo}</Badge>}
+                  {c.modulo && <div className="mt-2"><ModuleTag modulo={c.modulo} /></div>}
                 </div>
               </div>
               <div className="flex gap-2 mt-3">
