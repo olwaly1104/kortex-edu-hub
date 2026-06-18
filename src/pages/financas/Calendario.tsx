@@ -130,7 +130,7 @@ function CriarEventoDialog({ defaultDate, trigger }: { defaultDate: Date; trigge
           </div>
 
           {/* Data + Horários */}
-          {type === "prazo" ? (
+          {type !== "reuniao" ? (
             <div className="grid grid-cols-2 gap-2">
               <div className="space-y-1.5">
                 <Label htmlFor="ev-date" className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Data</Label>
