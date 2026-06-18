@@ -151,7 +151,7 @@ function CriarEventoDialog({ defaultDate, trigger }: { defaultDate: Date; trigge
               <div className="inline-flex p-0.5 bg-muted/40 rounded-md">
                 {([
                   { value: "presencial" as const, label: "Presencial", icon: Building2 },
-                  { value: "virtual" as const, label: "Virtual", icon: Video },
+                  { value: "kortex" as const, label: "Kortex Link", icon: Video },
                 ]).map((m) => {
                   const Icon = m.icon;
                   const active = modalidade === m.value;
@@ -188,7 +188,7 @@ function CriarEventoDialog({ defaultDate, trigger }: { defaultDate: Date; trigge
                   </SelectContent>
                 </Select>
               ) : (
-                <Input value={link} onChange={(e) => setLink(e.target.value)} placeholder="https://meet.google.com/..." className="h-9" />
+                <Input value={link} onChange={(e) => setLink(e.target.value)} placeholder="Link da chamada Kortex..." className="h-9" />
               )}
             </div>
           )}
