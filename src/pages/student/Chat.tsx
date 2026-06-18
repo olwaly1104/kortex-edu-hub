@@ -212,6 +212,16 @@ export default function StudentChat() {
     [contacts, contactQuery],
   );
 
+  // Contacts matching the main search that are NOT already in the visible conversations list.
+  const searchableContacts = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q || tab !== "chats") return [];
+    const existingIds = new Set(conversations.filter((c) => !c.is_group).map((c) => c.other_id));
+    return contacts.filter(
+      (c) => !existingIds.has(c.id) && c.display_name.toLowerCase().includes(q),
+    );
+  }, [contacts, conversations, query, tab]);
+
   const selected = conversations.find((c) => c.id === selectedId);
 
   const grouped = useMemo(() => {
