@@ -617,6 +617,18 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
+function SectionTitle({ index, title, hint }: { index: number; title: string; hint?: string }) {
+  return (
+    <div className="flex items-center gap-2 mb-3 pb-2 border-b border-border/60">
+      <span className="w-5 h-5 rounded-md bg-primary/10 text-primary text-[10px] font-bold flex items-center justify-center shrink-0">{index}</span>
+      <div className="flex items-baseline gap-2 min-w-0">
+        <h3 className="text-xs font-semibold text-foreground">{title}</h3>
+        {hint && <span className="text-[10px] text-muted-foreground truncate">— {hint}</span>}
+      </div>
+    </div>
+  );
+}
+
 function FileButton({
   file, onPick, inputRef, accept, Icon,
 }: {
