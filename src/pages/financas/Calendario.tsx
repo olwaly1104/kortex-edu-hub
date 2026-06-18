@@ -214,11 +214,7 @@ function CriarEventoDialog({ defaultDate, trigger }: { defaultDate: Date; trigge
             </div>
           )}
 
-          {/* Notas */}
-          <div className="space-y-1.5">
-            <Label htmlFor="ev-notes" className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Notas (opcional)</Label>
-            <Textarea id="ev-notes" value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} placeholder="Detalhes adicionais..." className="resize-none" />
-          </div>
+          {/* Participantes */}
 
           {/* Participantes — no fim */}
           <div className="space-y-2 pt-1 border-t border-border/60">
