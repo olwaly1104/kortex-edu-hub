@@ -41,11 +41,13 @@ export default function AdminDiscenteProfile() {
   const { data: rows = [], isLoading } = useEstudantes();
   const { data: cursos = [] } = useCursos();
   const { data: faculdades = [] } = useFaculdades();
+  const { data: propinas = [] } = usePropinas();
   const [docOpen, setDocOpen] = useState(false);
 
   const student = useMemo(() => rows.find((r: any) => r.id === discenteId) as any, [rows, discenteId]);
   const curso = useMemo(() => cursos.find((c: any) => c.id === student?.curso_id) as any, [cursos, student]);
   const faculdade = useMemo(() => faculdades.find((f: any) => f.id === curso?.faculdade_id) as any, [faculdades, curso]);
+  const propina = useMemo(() => propinas.find((p: any) => p.curso_id === student?.curso_id) as any, [propinas, student]);
 
   const fotoUrl = useSignedUrl(student?.foto_url || null);
 
