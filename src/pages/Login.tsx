@@ -77,10 +77,6 @@ export default function Login() {
       const accountEmail = signInData.user?.email || normalizedEmail;
       const displayName = (signInData.user?.user_metadata as any)?.display_name;
       login(accountEmail, password, { sourceEmail: accountEmail, displayName, role });
-      if (role === "admin" && !isOnboardingCompleteFor(accountEmail)) {
-        navigate("/admin/onboarding");
-        return;
-      }
       navigate(ROLE_ROUTE[role] ?? "/student");
     } finally {
       setSubmitting(false);

@@ -280,15 +280,6 @@ function AppRoutes() {
     );
   }
 
-  // Admin gate: before onboarding completion, force onboarding route (no app layout)
-  if (user?.role === "admin" && !isOnboardingCompleteFor(user?.email)) {
-    return (
-      <Routes>
-        <Route path="/admin/onboarding" element={<AdminOnboarding />} />
-        <Route path="*" element={<Navigate to="/admin/onboarding" replace />} />
-      </Routes>
-    );
-  }
 
   return (
     <Routes>
