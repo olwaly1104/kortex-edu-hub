@@ -607,11 +607,12 @@ export default function FinancasCalendario() {
                         <div className="w-1 h-10 rounded-full shrink-0" style={{ background: event.color }} />
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-semibold text-foreground truncate">{event.title}</p>
-                          {event.room && (
-                            <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
-                              <MapPin className="w-3 h-3" />{event.room}
-                            </p>
-                          )}
+                          <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-2 tabular-nums">
+                            <Clock className="w-3 h-3" />
+                            {event.startTime}{event.endTime ? ` – ${event.endTime}` : ""}
+                            {event.location && (<><span className="text-border">·</span><MapPin className="w-3 h-3" />{event.location}</>)}
+                            {event.modalidade === "kortex" && (<><span className="text-border">·</span><Video className="w-3 h-3 text-primary" /><span className="text-primary">Virtual</span></>)}
+                          </p>
                         </div>
                       </div>
                     ))}
