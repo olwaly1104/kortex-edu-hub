@@ -31,7 +31,32 @@ const statusLabels: Record<string, string> = { aprovada: "Aprovada", pendente: "
 const despesas: Transaction[] = [];
 
 
-const despesaCategories: string[] = [];
+const DESPESA_CATEGORIES = ["Operacional", "Pedagógica", "Manutenção", "Serviços", "Material", "Salários", "Outros"] as const;
+const todayISO = () => new Date().toISOString().slice(0, 10);
+
+type NewDespesa = {
+  date: string;
+  description: string;
+  category: string;
+  amount: string;
+  requestedBy: string;
+  responsavel: string;
+  status: "pendente" | "aprovada" | "rejeitada";
+  justificacao: string;
+  docs: { name: string; size: number }[];
+};
+
+const emptyDespesa: NewDespesa = {
+  date: todayISO(),
+  description: "",
+  category: "",
+  amount: "",
+  requestedBy: "",
+  responsavel: "",
+  status: "pendente",
+  justificacao: "",
+  docs: [],
+};
 
 export default function Despesas() {
   const { toast } = useToast();
@@ -44,7 +69,28 @@ export default function Despesas() {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [periodo, setPeriodo] = useState<Periodo>("mes");
   const [periodoValue, setPeriodoValue] = useState<string>(periodoDefaultValue("mes"));
+  const [form, setForm] = useState<NewDespesa>(emptyDespesa);
   const mult = PERIODO_MULT[periodo];
+
+  const setField = <K extends keyof NewDespesa>(k: K, v: NewDespesa[K]) => setForm(f => ({ ...f, [k]: v }));
+  const amountNum = Number(form.amount.replace(/[^0-9.,]/g, "").replace(",", ".")) || 0;
+  const isValid = form.description.trim().length >= 3 && !!form.category && amountNum > 0 && !!form.date;
+
+  const handleFiles = (files: FileList | null) => {
+    if (!files) return;
+    const added = Array.from(files).slice(0, 5).map(f => ({ name: f.name, size: f.size }));
+    setForm(f => ({ ...f, docs: [...f.docs, ...added].slice(0, 5) }));
+  };
+
+  const submit = () => {
+    if (!isValid) {
+      toast({ title: "Campos obrigatórios em falta", description: "Descrição, categoria, valor e data são obrigatórios.", variant: "destructive" });
+      return;
+    }
+    toast({ title: "Despesa registada", description: `${form.description} · ${formatCurrency(amountNum)}` });
+    setForm(emptyDespesa);
+    setSheetOpen(false);
+  };
 
 
   const isSortActive = sortField !== null;
