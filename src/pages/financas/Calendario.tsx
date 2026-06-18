@@ -85,7 +85,7 @@ function CriarEventoDialog({ defaultDate, trigger }: { defaultDate: Date; trigge
       : "Evento criado com sucesso.";
     toast.success(msg);
     setOpen(false);
-    setTitle(""); setLocation(""); setLink(""); setNotes(""); setParticipants([]); setParticipantInput("");
+    setTitle(""); setLocation(""); setLink(""); setParticipants([]); setParticipantInput("");
   };
 
   return (
