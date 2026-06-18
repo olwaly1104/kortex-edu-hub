@@ -486,11 +486,28 @@ export default function FinancasCalendario() {
   const weekLabel = `${weekDays[0].toLocaleDateString("pt-PT", { day: "2-digit", month: "short" })} – ${weekDays[4].toLocaleDateString("pt-PT", { day: "2-digit", month: "short", year: "numeric" })}`;
   const monthLabel = monthCursor.toLocaleDateString("pt-PT", { month: "long", year: "numeric" });
 
-  // Empty data placeholders (no mock).
-  const events: { id: string; date: string; startTime: string; endTime: string; title: string; room?: string; color: string }[] = [];
+  const [events, setEvents] = useState<StoredEvent[]>(() => loadEvents());
+  useEffect(() => {
+    const refresh = () => setEvents(loadEvents());
+    window.addEventListener(CHANGE_EVENT, refresh);
+    window.addEventListener("storage", refresh);
+    return () => {
+      window.removeEventListener(CHANGE_EVENT, refresh);
+      window.removeEventListener("storage", refresh);
+    };
+  }, []);
   const meetingRequests: { id: string; title: string; from: string; when: string }[] = [];
 
   const selectedDayEvents = events.filter((e) => e.date === toISO(selectedDate));
+  const eventsByDate = useMemo(() => {
+    const map = new Map<string, StoredEvent[]>();
+    events.forEach((e) => {
+      const arr = map.get(e.date) ?? [];
+      arr.push(e);
+      map.set(e.date, arr);
+    });
+    return map;
+  }, [events]);
 
   // Month grid
   const monthDays = useMemo(() => {
