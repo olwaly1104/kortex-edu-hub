@@ -5,48 +5,16 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
-  ArrowLeft, Mail, MessageCircle, BookOpen, Award, Users, Phone, MapPin,
-  UserCheck, Calendar, GraduationCap, CheckCircle, Wallet, FileText,
-  CreditCard, AlertCircle, Hash, Building2, IdCard, Loader2,
+  Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  ArrowLeft, Mail, MessageCircle, Users, Phone, MapPin, UserCheck, Calendar,
+  GraduationCap, FileText, Building2, IdCard, Loader2, Award,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useEstudantes, useCursos, useFaculdades } from "@/lib/useInstitution";
-
-const fmtAOA = (n: number) =>
-  new Intl.NumberFormat("pt-PT", { style: "currency", currency: "AOA", maximumFractionDigits: 0 }).format(n);
-
-const financeStateMap = {
-  regularizado: { label: "Regularizado", cls: "bg-accent/15 text-accent border-accent/30" },
-  atencao: { label: "Atenção", cls: "bg-muted text-muted-foreground border-border" },
-  por_regularizar: { label: "Por Regularizar", cls: "bg-destructive/15 text-destructive border-destructive/30" },
-} as const;
-
-function getFinanceiro(id: string, name: string) {
-  const seed = (id.charCodeAt(id.length - 1) || 0) % 4;
-  const propinaMensal = 45000;
-  const mesesPagos = 8 + (seed % 3);
-  const mesesTotal = 10;
-  const emDivida = mesesTotal - mesesPagos;
-  const valorDivida = emDivida * propinaMensal;
-  const estado: keyof typeof financeStateMap =
-    emDivida === 0 ? "regularizado" : emDivida >= 2 ? "por_regularizar" : "atencao";
-  return {
-    matricula: `MAT-${id.slice(0, 8).toUpperCase()}-2024`,
-    plano: "Mensal · Ano Letivo 2024/25",
-    propinaMensal,
-    mesesPagos,
-    mesesTotal,
-    emDivida,
-    valorDivida,
-    valorPago: mesesPagos * propinaMensal,
-    proximaFatura: { mes: "Junho 2026", valor: propinaMensal, venc: "05/06/2026" },
-    ultimoPagamento: { mes: "Maio 2026", valor: propinaMensal, data: "03/05/2026", metodo: "Transferência" },
-    estado,
-    titular: name,
-    iban: "AO06 0040 0000 1234 5678 9012 3",
-  };
-}
+import DiscenteDocPreview from "./DiscenteDocPreview";
 
 function useSignedUrl(path: string | null) {
   const [url, setUrl] = useState<string | null>(null);
@@ -67,12 +35,12 @@ export default function AdminDiscenteProfile() {
   const { data: rows = [], isLoading } = useEstudantes();
   const { data: cursos = [] } = useCursos();
   const { data: faculdades = [] } = useFaculdades();
+  const [docOpen, setDocOpen] = useState(false);
 
   const student = useMemo(() => rows.find((r: any) => r.id === discenteId) as any, [rows, discenteId]);
   const curso = useMemo(() => cursos.find((c: any) => c.id === student?.curso_id) as any, [cursos, student]);
   const faculdade = useMemo(() => faculdades.find((f: any) => f.id === curso?.faculdade_id) as any, [faculdades, curso]);
 
-  const fin = useMemo(() => student ? getFinanceiro(student.id, student.nome) : null, [student]);
   const fotoUrl = useSignedUrl(student?.foto_url || null);
 
   if (isLoading) {
@@ -83,7 +51,7 @@ export default function AdminDiscenteProfile() {
     );
   }
 
-  if (!student || !fin) {
+  if (!student) {
     return (
       <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
         <Button variant="ghost" onClick={() => navigate(-1)} className="gap-2"><ArrowLeft className="w-4 h-4" /> Voltar</Button>
@@ -92,11 +60,10 @@ export default function AdminDiscenteProfile() {
     );
   }
 
-  const fs = financeStateMap[fin.estado];
-  const finPct = Math.round((fin.mesesPagos / fin.mesesTotal) * 100);
   const cursoName = curso?.name || curso?.nome || "—";
   const cursoCode = curso?.code || curso?.codigo || "";
   const facName = faculdade?.sigla || faculdade?.name || "—";
+  const displayId = `DISC-${(student.id as string).slice(0, 8).toUpperCase()}`;
 
   const initials = (student.nome || "?")
     .split(/\s+/).filter(Boolean).slice(0, 2).map((p: string) => p[0]?.toUpperCase()).join("");
@@ -125,12 +92,15 @@ export default function AdminDiscenteProfile() {
                   <span className="mx-1.5 text-muted-foreground/40">·</span>
                   {student.ano}º Ano · Turma {student.turma}
                 </p>
-                <div className="flex items-center gap-2 mt-4">
+                <div className="flex items-center gap-2 mt-4 flex-wrap">
                   <Button size="sm" variant="outline" className="gap-1.5 text-xs h-7">
                     <MessageCircle className="w-3.5 h-3.5" /> Chat
                   </Button>
                   <Button size="sm" variant="outline" className="gap-1.5 text-xs h-7">
                     <Mail className="w-3.5 h-3.5" /> Email
+                  </Button>
+                  <Button size="sm" className="gap-1.5 text-xs h-7" onClick={() => setDocOpen(true)}>
+                    <FileText className="w-3.5 h-3.5" /> Ver Ficha
                   </Button>
                 </div>
               </div>
@@ -158,12 +128,8 @@ export default function AdminDiscenteProfile() {
               </div>
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Situação Financeira</p>
-              <div className="mt-1.5">
-                <Badge variant="outline" className={cn("text-xs px-2 py-0.5", fs.cls)}>
-                  <Wallet className="w-3 h-3 mr-1" /> {fs.label}
-                </Badge>
-              </div>
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Matrícula</p>
+              <p className="text-xs font-mono font-bold mt-1.5 truncate">{displayId}</p>
             </div>
           </div>
         </div>
@@ -173,10 +139,8 @@ export default function AdminDiscenteProfile() {
         <TabsList className="bg-muted/40">
           <TabsTrigger value="overview" className="text-xs">Visão Geral</TabsTrigger>
           <TabsTrigger value="documentos" className="text-xs">Documentos</TabsTrigger>
-          <TabsTrigger value="financeiro" className="text-xs">Financeiro</TabsTrigger>
         </TabsList>
 
-        {/* === Visão Geral === */}
         <TabsContent value="overview" className="space-y-4">
           <div className="grid lg:grid-cols-2 gap-4">
             <SectionCard title="Informações Pessoais" icon={<UserCheck className="w-4 h-4" />}>
@@ -194,7 +158,7 @@ export default function AdminDiscenteProfile() {
               <InfoRow label="Ano Curricular" value={`${student.ano}º Ano`} icon={<Calendar className="w-4 h-4 text-primary" />} />
               <InfoRow label="Turma" value={`Turma ${student.turma}`} icon={<Users className="w-4 h-4 text-primary" />} />
               <InfoRow label="Regime" value={student.regime === "bolseiro" ? "Bolseiro" : "Normal"} icon={<Award className="w-4 h-4 text-primary" />} />
-              <InfoRow label="Nº de Matrícula" value={fin.matricula} icon={<Hash className="w-4 h-4 text-primary" />} />
+              <InfoRow label="Matrícula" value={displayId} icon={<IdCard className="w-4 h-4 text-primary" />} />
             </SectionCard>
           </div>
 
@@ -211,34 +175,8 @@ export default function AdminDiscenteProfile() {
               <InfoRow label="Endereço" value={student.endereco || "—"} icon={<Building2 className="w-4 h-4 text-primary" />} />
             </SectionCard>
           </div>
-
-          {/* Estado Financeiro destaque */}
-          <Card className="overflow-hidden p-0">
-            <div className="p-4 border-b bg-muted/30 flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
-                <Wallet className="w-4 h-4 text-primary" /> Estado Financeiro
-              </h3>
-              <Badge variant="outline" className={cn("text-[10px]", fs.cls)}>{fs.label}</Badge>
-            </div>
-            <div className="grid sm:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-border">
-              <FinKpi label="Valor Pago" value={fmtAOA(fin.valorPago)} sub={`${fin.mesesPagos}/${fin.mesesTotal} meses`} tone="accent" />
-              <FinKpi label="Por Regularizar" value={fmtAOA(fin.valorDivida)} sub={fin.emDivida > 0 ? `${fin.emDivida} meses pendentes` : "Tudo em dia"} tone={fin.valorDivida > 0 ? "destructive" : "neutral"} />
-              <FinKpi label="Propina Mensal" value={fmtAOA(fin.propinaMensal)} sub={fin.plano} tone="neutral" />
-              <FinKpi label="Próxima Fatura" value={fmtAOA(fin.proximaFatura.valor)} sub={`Vence ${fin.proximaFatura.venc}`} tone="neutral" />
-            </div>
-            <div className="px-4 py-3 border-t border-border bg-muted/20">
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Plano de Pagamentos · Ano Letivo</span>
-                <span className="text-xs font-semibold text-foreground tabular-nums">{finPct}% concluído</span>
-              </div>
-              <div className="relative h-2 w-full rounded-full bg-muted overflow-hidden">
-                <div className={cn("h-full", fin.estado === "por_regularizar" ? "bg-destructive" : fin.estado === "atencao" ? "bg-muted-foreground/60" : "bg-accent")} style={{ width: `${finPct}%` }} />
-              </div>
-            </div>
-          </Card>
         </TabsContent>
 
-        {/* === Documentos === */}
         <TabsContent value="documentos" className="space-y-4">
           <Card className="overflow-hidden">
             <div className="p-4 border-b bg-muted/30">
@@ -254,57 +192,24 @@ export default function AdminDiscenteProfile() {
             </div>
           </Card>
         </TabsContent>
-
-        {/* === Financeiro === */}
-        <TabsContent value="financeiro" className="space-y-4">
-          <div className="grid lg:grid-cols-[1.4fr_1fr] gap-4">
-            <Card className="overflow-hidden p-0">
-              <div className="p-4 border-b bg-muted/30 flex items-center justify-between">
-                <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
-                  <Wallet className="w-4 h-4 text-primary" /> Resumo Financeiro
-                </h3>
-                <Badge variant="outline" className={cn("text-[10px]", fs.cls)}>{fs.label}</Badge>
-              </div>
-              <div className="grid sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-border">
-                <FinKpi label="Valor Pago" value={fmtAOA(fin.valorPago)} sub={`${fin.mesesPagos}/${fin.mesesTotal} meses`} tone="accent" />
-                <FinKpi label="Por Regularizar" value={fmtAOA(fin.valorDivida)} sub={fin.emDivida > 0 ? `${fin.emDivida} meses` : "Em dia"} tone={fin.valorDivida > 0 ? "destructive" : "neutral"} />
-              </div>
-              <div className="px-4 py-3 border-t border-border bg-muted/20">
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Plano de Pagamentos</span>
-                  <span className="text-xs font-semibold text-foreground tabular-nums">{finPct}%</span>
-                </div>
-                <div className="relative h-2 w-full rounded-full bg-muted overflow-hidden">
-                  <div className={cn("h-full", fin.estado === "por_regularizar" ? "bg-destructive" : fin.estado === "atencao" ? "bg-muted-foreground/60" : "bg-accent")} style={{ width: `${finPct}%` }} />
-                </div>
-              </div>
-            </Card>
-
-            <SectionCard title="Dados do Plano" icon={<CreditCard className="w-4 h-4" />}>
-              <InfoRow label="Matrícula" value={fin.matricula} icon={<Hash className="w-4 h-4 text-primary" />} />
-              <InfoRow label="Plano" value={fin.plano} icon={<Calendar className="w-4 h-4 text-primary" />} />
-              <InfoRow label="Propina Mensal" value={fmtAOA(fin.propinaMensal)} icon={<Wallet className="w-4 h-4 text-primary" />} />
-              <InfoRow label="Titular" value={fin.titular} icon={<UserCheck className="w-4 h-4 text-primary" />} />
-              <InfoRow label="IBAN Conta" value={fin.iban} icon={<CreditCard className="w-4 h-4 text-primary" />} />
-            </SectionCard>
-          </div>
-
-          <div className="grid lg:grid-cols-2 gap-4">
-            <SectionCard title="Próxima Fatura" icon={<AlertCircle className="w-4 h-4" />}>
-              <InfoRow label="Referência" value={fin.proximaFatura.mes} icon={<Calendar className="w-4 h-4 text-primary" />} />
-              <InfoRow label="Valor" value={fmtAOA(fin.proximaFatura.valor)} icon={<Wallet className="w-4 h-4 text-primary" />} />
-              <InfoRow label="Data de Vencimento" value={fin.proximaFatura.venc} icon={<Calendar className="w-4 h-4 text-primary" />} />
-            </SectionCard>
-
-            <SectionCard title="Último Pagamento" icon={<CheckCircle className="w-4 h-4" />}>
-              <InfoRow label="Referência" value={fin.ultimoPagamento.mes} icon={<Calendar className="w-4 h-4 text-primary" />} />
-              <InfoRow label="Valor" value={fmtAOA(fin.ultimoPagamento.valor)} icon={<Wallet className="w-4 h-4 text-primary" />} />
-              <InfoRow label="Data de Pagamento" value={fin.ultimoPagamento.data} icon={<Calendar className="w-4 h-4 text-primary" />} />
-              <InfoRow label="Método" value={fin.ultimoPagamento.metodo} icon={<CreditCard className="w-4 h-4 text-primary" />} />
-            </SectionCard>
-          </div>
-        </TabsContent>
       </Tabs>
+
+      <Dialog open={docOpen} onOpenChange={setDocOpen}>
+        <DialogContent className="max-w-5xl w-[95vw] h-[92vh] p-0 gap-0 overflow-hidden">
+          <DialogHeader className="sr-only">
+            <DialogTitle>Ficha do Discente {displayId}</DialogTitle>
+            <DialogDescription>Pré-visualização do documento institucional gerado automaticamente.</DialogDescription>
+          </DialogHeader>
+          <DiscenteDocPreview
+            discente={student}
+            fotoSrc={fotoUrl}
+            cursoName={cursoName}
+            cursoCode={cursoCode}
+            faculdadeName={facName}
+            displayId={displayId}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
@@ -328,17 +233,6 @@ function InfoRow({ label, value, icon }: { label: string; value: string; icon: R
         <p className="text-sm text-muted-foreground truncate">{label}</p>
       </div>
       <p className="text-sm font-semibold text-foreground text-right truncate">{value}</p>
-    </div>
-  );
-}
-
-function FinKpi({ label, value, sub, tone }: { label: string; value: string | number; sub?: string; tone: "accent" | "destructive" | "neutral" }) {
-  const cls = tone === "accent" ? "text-accent" : tone === "destructive" ? "text-destructive" : "text-foreground";
-  return (
-    <div className="p-4">
-      <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">{label}</p>
-      <p className={cn("text-xl font-bold tabular-nums mt-1.5", cls)}>{value}</p>
-      {sub && <p className="text-[11px] text-muted-foreground mt-0.5">{sub}</p>}
     </div>
   );
 }
