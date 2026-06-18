@@ -754,6 +754,19 @@ export default function FinancasCalendario() {
                       const catLabel = event.type === "caixa" && event.categoria
                         ? CAIXA_CATEGORIAS.find(c => c.value === event.categoria)?.label
                         : null;
+                      if (event.type === "prazo") {
+                        return (
+                          <div key={event.id} className="flex items-center gap-2 py-2">
+                            <span className="w-2 h-2 rounded-full shrink-0" style={{ background: event.color }} />
+                            <span className="text-xs font-semibold text-foreground truncate">{event.title}</span>
+                            <span className="text-[10px] tabular-nums text-muted-foreground">{event.startTime}</span>
+                            <span
+                              className="ml-auto text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded shrink-0"
+                              style={{ background: `${event.color}1a`, color: event.color }}
+                            >Prazo</span>
+                          </div>
+                        );
+                      }
                       return (
                         <div key={event.id} className="flex items-center gap-3 py-3">
                           <div className="w-1 h-10 rounded-full shrink-0" style={{ background: event.color }} />
@@ -801,14 +814,24 @@ export default function FinancasCalendario() {
                   return (
                     <div key={day} onClick={() => setSelectedDate(d)} className={cn("min-h-[90px] border-t border-l p-1.5 cursor-pointer hover:bg-primary/5 transition-colors", isTodayDay && "bg-primary/5", isSelected && !isTodayDay && "bg-primary/10")}>
                       <p className={cn("text-xs font-semibold mb-1 w-6 h-6 flex items-center justify-center rounded-full tabular-nums", isSelected ? "bg-primary text-primary-foreground" : isTodayDay ? "ring-2 ring-primary text-foreground" : "text-foreground")}>{day}</p>
-                      <div className="space-y-0.5">
-                        {dayEvts.slice(0, 2).map((ev) => (
+                    <div className="space-y-0.5">
+                        {dayEvts.filter(e => e.type !== "prazo").slice(0, 2).map((ev) => (
                           <div key={ev.id} className="text-[10px] truncate px-1 py-0.5 rounded text-foreground" style={{ background: `${ev.color}22`, borderLeft: `2px solid ${ev.color}` }}>
                             {ev.title}
                           </div>
                         ))}
-                        {dayEvts.length > 2 && (
-                          <div className="text-[10px] text-muted-foreground px-1">+{dayEvts.length - 2}</div>
+                        {dayEvts.filter(e => e.type === "prazo").length > 0 && (
+                          <div className="flex items-center gap-1 px-1">
+                            {dayEvts.filter(e => e.type === "prazo").slice(0, 4).map((ev) => (
+                              <span key={ev.id} className="w-1.5 h-1.5 rounded-full" style={{ background: ev.color }} />
+                            ))}
+                            {dayEvts.filter(e => e.type === "prazo").length > 4 && (
+                              <span className="text-[9px] text-muted-foreground">+{dayEvts.filter(e => e.type === "prazo").length - 4}</span>
+                            )}
+                          </div>
+                        )}
+                        {dayEvts.filter(e => e.type !== "prazo").length > 2 && (
+                          <div className="text-[10px] text-muted-foreground px-1">+{dayEvts.filter(e => e.type !== "prazo").length - 2}</div>
                         )}
                       </div>
                     </div>
