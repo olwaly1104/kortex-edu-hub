@@ -716,7 +716,11 @@ export default function FinancasCalendario() {
                     defaultDate={selectedDate}
                     onCreated={(event) => {
                       setEvents((prev) => [...prev.filter((e) => e.id !== event.id), event].sort((a, b) => `${a.date} ${a.startTime}`.localeCompare(`${b.date} ${b.startTime}`)));
-                      setSelectedDate(new Date(event.date + "T00:00"));
+                      const d = new Date(event.date + "T00:00");
+                      setSelectedDate(d);
+                      setWeekStart(startOfWeek(d));
+                      setMonthCursor(new Date(d.getFullYear(), d.getMonth(), 1));
+                      setView("week");
                     }}
                     trigger={
                       <Button size="sm" className="gap-1.5 h-8">
