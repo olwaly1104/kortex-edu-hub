@@ -14,8 +14,11 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
-import { useEstudantes, useCursos, useFaculdades } from "@/lib/useInstitution";
+import { useEstudantes, useCursos, useFaculdades, usePropinas } from "@/lib/useInstitution";
 import DiscenteDocPreview from "./DiscenteDocPreview";
+
+const fmtAOA = (n: number) =>
+  new Intl.NumberFormat("pt-PT", { style: "currency", currency: "AOA", maximumFractionDigits: 0 }).format(n || 0);
 
 function useSignedUrl(path: string | null) {
   const [url, setUrl] = useState<string | null>(null);
