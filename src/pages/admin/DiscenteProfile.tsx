@@ -10,6 +10,7 @@ import {
 import {
   ArrowLeft, Mail, MessageCircle, Users, Phone, MapPin, UserCheck, Calendar,
   GraduationCap, FileText, Building2, IdCard, Loader2, Award, Eye, Download,
+  Wallet, Receipt, CircleDollarSign,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
