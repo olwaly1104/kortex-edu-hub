@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 import { EmojiPicker } from "@/components/chat/EmojiPicker";
 import { GifPicker } from "@/components/chat/GifPicker";
 import { CallDialog } from "@/components/chat/CallDialog";
+import { ModuleTag } from "@/components/chat/ModuleTag";
 
 interface Conversation {
   id: string;
