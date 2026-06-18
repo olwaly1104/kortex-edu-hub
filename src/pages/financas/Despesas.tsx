@@ -160,7 +160,7 @@ export default function Despesas() {
           {/* Categories first */}
           <div className="flex items-center gap-2">
             <Button size="sm" variant={filterCategory === "todos" ? "default" : "outline"} onClick={() => setFilterCategory("todos")} className="text-xs">Todas</Button>
-            {despesaCategories.map(c => (
+            {DESPESA_CATEGORIES.map(c => (
               <Button key={c} size="sm" variant={filterCategory === c ? "default" : "outline"} onClick={() => setFilterCategory(c)} className="text-xs">{c}</Button>
             ))}
           </div>
