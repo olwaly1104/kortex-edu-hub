@@ -237,23 +237,27 @@ export default function StudentChat() {
     };
   }, [uid]);
 
-  // Fetch last_seen for all known contacts
+  // Fetch presence (role + last_seen) for all contacts AND conversation partners
   useEffect(() => {
-    if (contacts.length === 0) return;
+    const ids = new Set<string>();
+    contacts.forEach((c) => ids.add(c.id));
+    conversations.forEach((c) => { if (c.other_id) ids.add(c.other_id); });
+    if (ids.size === 0) return;
     let cancelled = false;
     (async () => {
-      const ids = contacts.map((c) => c.id);
-      const { data } = await (supabase as any)
-        .from("profiles")
-        .select("id,last_seen_at")
-        .in("id", ids);
+      const { data } = await (supabase as any).rpc("get_users_presence", { _ids: Array.from(ids) });
       if (cancelled || !data) return;
-      const map: Record<string, string | null> = {};
-      for (const p of data) map[p.id] = p.last_seen_at;
-      setLastSeen(map);
+      const seen: Record<string, string | null> = {};
+      const roles: Record<string, string | null> = {};
+      for (const p of data as Array<{ id: string; role: string | null; last_seen_at: string | null }>) {
+        seen[p.id] = p.last_seen_at;
+        roles[p.id] = p.role;
+      }
+      setLastSeen(seen);
+      setUserRoles(roles);
     })();
     return () => { cancelled = true; };
-  }, [contacts]);
+  }, [contacts, conversations]);
 
   const send = async () => {
     if (!draft.trim() || !selectedId || !uid) return;
