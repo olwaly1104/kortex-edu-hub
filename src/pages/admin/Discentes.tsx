@@ -421,15 +421,6 @@ export default function AdminDiscentes() {
               <Field label="Nº Bilhete de Identidade">
                 <Input value={draft.bilhete} onChange={(e) => setF("bilhete", e.target.value)} placeholder="00000000XX000" className="h-8 text-xs" />
               </Field>
-              <Field label="Bilhete (upload)">
-                <FileButton
-                  file={draft.bilheteFile}
-                  onPick={(f) => setF("bilheteFile", f)}
-                  inputRef={biInput}
-                  accept="image/*,application/pdf"
-                  Icon={IdCard}
-                />
-              </Field>
             </div>
           </div>
 
