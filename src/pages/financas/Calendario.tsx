@@ -130,20 +130,33 @@ function CriarEventoDialog({ defaultDate, trigger }: { defaultDate: Date; trigge
           </div>
 
           {/* Data + Horários */}
-          <div className="grid grid-cols-3 gap-2">
-            <div className="space-y-1.5">
-              <Label htmlFor="ev-date" className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Data</Label>
-              <Input id="ev-date" type="date" min={todayISO} value={date} onChange={(e) => setDate(e.target.value)} className="h-9 tabular-nums" />
+          {type === "prazo" ? (
+            <div className="grid grid-cols-2 gap-2">
+              <div className="space-y-1.5">
+                <Label htmlFor="ev-date" className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Data</Label>
+                <Input id="ev-date" type="date" min={todayISO} value={date} onChange={(e) => setDate(e.target.value)} className="h-9 tabular-nums" />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="ev-hora" className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Hora</Label>
+                <Input id="ev-hora" type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} className="h-9 tabular-nums" />
+              </div>
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="ev-start" className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Início</Label>
-              <Input id="ev-start" type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} className="h-9 tabular-nums" />
+          ) : (
+            <div className="grid grid-cols-3 gap-2">
+              <div className="space-y-1.5">
+                <Label htmlFor="ev-date" className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Data</Label>
+                <Input id="ev-date" type="date" min={todayISO} value={date} onChange={(e) => setDate(e.target.value)} className="h-9 tabular-nums" />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="ev-start" className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Início</Label>
+                <Input id="ev-start" type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} className="h-9 tabular-nums" />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="ev-end" className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Fim</Label>
+                <Input id="ev-end" type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} className="h-9 tabular-nums" />
+              </div>
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="ev-end" className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Fim</Label>
-              <Input id="ev-end" type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} className="h-9 tabular-nums" />
-            </div>
-          </div>
+          )}
 
           {/* Modalidade + Local/Link (reuniao) */}
           {type === "reuniao" && (
