@@ -199,6 +199,60 @@ export default function StudentChat() {
     inputRef.current?.focus();
   }, [selectedId]);
 
+  // Presence + last-seen heartbeat
+  useEffect(() => {
+    if (!uid) return;
+    let mounted = true;
+
+    const touch = () => (supabase as any).rpc("touch_last_seen");
+    touch();
+    const interval = setInterval(touch, 30000);
+
+    const channel = (supabase as any).channel("online-users", {
+      config: { presence: { key: uid } },
+    });
+    channel
+      .on("presence", { event: "sync" }, () => {
+        if (!mounted) return;
+        const state = channel.presenceState() as Record<string, unknown>;
+        setOnlineIds(new Set(Object.keys(state)));
+      })
+      .subscribe(async (status: string) => {
+        if (status === "SUBSCRIBED") {
+          await channel.track({ online_at: new Date().toISOString() });
+        }
+      });
+
+    const handleUnload = () => { (supabase as any).rpc("touch_last_seen"); };
+    window.addEventListener("beforeunload", handleUnload);
+
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+      window.removeEventListener("beforeunload", handleUnload);
+      (supabase as any).rpc("touch_last_seen");
+      (supabase as any).removeChannel(channel);
+    };
+  }, [uid]);
+
+  // Fetch last_seen for all known contacts
+  useEffect(() => {
+    if (contacts.length === 0) return;
+    let cancelled = false;
+    (async () => {
+      const ids = contacts.map((c) => c.id);
+      const { data } = await (supabase as any)
+        .from("profiles")
+        .select("id,last_seen_at")
+        .in("id", ids);
+      if (cancelled || !data) return;
+      const map: Record<string, string | null> = {};
+      for (const p of data) map[p.id] = p.last_seen_at;
+      setLastSeen(map);
+    })();
+    return () => { cancelled = true; };
+  }, [contacts]);
+
   const send = async () => {
     if (!draft.trim() || !selectedId || !uid) return;
     const content = draft.trim();
