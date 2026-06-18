@@ -57,7 +57,7 @@ const moduloLabel = (m?: string | null) => {
 };
 
 export default function StudentChat() {
-  const { user } = useAuth();
+  const uid = useAuthUid();
   const { contacts } = useInstitutionContacts();
   const [searchParams, setSearchParams] = useSearchParams();
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -68,6 +68,7 @@ export default function StudentChat() {
   const [contactQuery, setContactQuery] = useState("");
   const [tab, setTab] = useState<"chats" | "chamadas" | "grupos">("chats");
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [call, setCall] = useState<{ mode: "audio" | "video"; name: string } | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
