@@ -270,7 +270,7 @@ export default function StudentChat() {
                         </Avatar>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium truncate">{c.display_name}</p>
-                          <p className="text-[11px] text-muted-foreground truncate">{moduloLabel(c.modulo)}</p>
+                          <div className="mt-0.5"><ModuleTag modulo={c.modulo} size="xs" /></div>
                         </div>
                       </button>
                     ))
