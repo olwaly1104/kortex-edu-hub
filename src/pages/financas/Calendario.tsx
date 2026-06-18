@@ -1,4 +1,4 @@
-import { useMemo, useState, useCallback } from "react";
+import { useMemo, useState, useCallback, useEffect } from "react";
 import { FinHeader } from "./_FinHeader";
 import { useInstitutionContacts } from "@/hooks/useInstitutionContacts";
 import { Card } from "@/components/ui/card";
@@ -18,14 +18,53 @@ const DAYS = ["Seg", "Ter", "Qua", "Qui", "Sex"];
 type EventType = "reuniao" | "prazo" | "pessoal";
 type Modalidade = "kortex" | "presencial";
 
+type StoredEvent = {
+  id: string;
+  type: EventType;
+  title: string;
+  date: string;
+  startTime: string;
+  endTime?: string;
+  location?: string;
+  link?: string;
+  modalidade?: Modalidade;
+  participants?: { id: string; name: string; modulo: string | null }[];
+  color: string;
+};
+
+const STORAGE_KEY = "upra:calendario:events";
+const CHANGE_EVENT = "upra:calendario:changed";
+
+const EVENT_COLORS: Record<EventType, string> = {
+  reuniao: "hsl(142 65% 35%)",
+  prazo: "hsl(0 72% 51%)",
+  pessoal: "hsl(217 91% 60%)",
+};
+
+function loadEvents(): StoredEvent[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    const arr = raw ? JSON.parse(raw) : [];
+    return Array.isArray(arr) ? arr : [];
+  } catch { return []; }
+}
+
+function saveEvent(ev: StoredEvent) {
+  const all = loadEvents();
+  all.push(ev);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
+  window.dispatchEvent(new CustomEvent(CHANGE_EVENT));
+}
+
 const EVENT_TYPES: { value: EventType; label: string; icon: typeof Video }[] = [
   { value: "reuniao", label: "Reunião", icon: Users },
   { value: "prazo", label: "Prazo", icon: Clock },
   { value: "pessoal", label: "Pessoal", icon: User },
 ];
 
-function CriarEventoDialog({ defaultDate, trigger }: { defaultDate: Date; trigger: React.ReactNode }) {
+function CriarEventoDialog({ defaultDate, trigger, onCreated }: { defaultDate: Date; trigger: React.ReactNode; onCreated?: (dateISO: string) => void }) {
   const todayISO = new Date().toISOString().split("T")[0];
+  const [step, setStep] = useState<"form" | "confirm">("form");
   const [open, setOpen] = useState(false);
   const [type, setType] = useState<EventType>("reuniao");
   const [modalidade, setModalidade] = useState<Modalidade>("presencial");
@@ -66,6 +105,11 @@ function CriarEventoDialog({ defaultDate, trigger }: { defaultDate: Date; trigge
 
   const removeParticipant = (id: string) => setParticipants(participants.filter((p) => p.id !== id));
 
+  const resetForm = () => {
+    setTitle(""); setLocation(""); setLink(""); setParticipants([]); setParticipantInput("");
+    setStep("form");
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) {
@@ -80,13 +124,37 @@ function CriarEventoDialog({ defaultDate, trigger }: { defaultDate: Date; trigge
       toast.error("O horário de fim deve ser após o início.");
       return;
     }
-    const msg = participants.length > 0
-      ? `Evento criado. Pedidos enviados a ${participants.length} participante${participants.length > 1 ? "s" : ""}.`
-      : "Evento criado com sucesso.";
-    toast.success(msg);
-    setOpen(false);
-    setTitle(""); setLocation(""); setLink(""); setParticipants([]); setParticipantInput("");
+    setStep("confirm");
   };
+
+  const handleConfirm = () => {
+    const ev: StoredEvent = {
+      id: `ev-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      type,
+      title: title.trim(),
+      date,
+      startTime,
+      endTime: type === "reuniao" ? endTime : undefined,
+      location: location || undefined,
+      link: link || undefined,
+      modalidade: type === "reuniao" ? modalidade : undefined,
+      participants: type === "reuniao" ? participants.map((p) => ({ id: p.id, name: p.name, modulo: p.modulo })) : undefined,
+      color: EVENT_COLORS[type],
+    };
+    saveEvent(ev);
+    const msg = type === "reuniao" && participants.length > 0
+      ? `Evento confirmado. Pedidos enviados a ${participants.length} participante${participants.length > 1 ? "s" : ""}.`
+      : "Evento confirmado e adicionado à agenda.";
+    toast.success(msg);
+    onCreated?.(date);
+    setOpen(false);
+    resetForm();
+  };
+
+  useEffect(() => {
+    if (!open) resetForm();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -96,9 +164,12 @@ function CriarEventoDialog({ defaultDate, trigger }: { defaultDate: Date; trigge
           <DialogTitle className="flex items-center gap-2">
             <CalendarIcon className="w-4 h-4 text-primary" /> Criar Evento
           </DialogTitle>
-          <DialogDescription>Agende um novo evento no calendário geral.</DialogDescription>
+          <DialogDescription>
+            {step === "form" ? "Agende um novo evento no calendário geral." : "Reveja os detalhes e confirme para adicionar à agenda."}
+          </DialogDescription>
         </DialogHeader>
 
+        {step === "form" && (
         <form onSubmit={handleSubmit} className="space-y-3.5">
           <Label className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Categorias</Label>
           {/* Tipo — compact segmented */}
@@ -303,6 +374,66 @@ function CriarEventoDialog({ defaultDate, trigger }: { defaultDate: Date; trigge
             <Button type="submit" size="sm">Criar evento</Button>
           </DialogFooter>
         </form>
+        )}
+
+        {step === "confirm" && (
+          <div className="space-y-4">
+            <div className="rounded-lg border bg-muted/30 p-4 space-y-3">
+              <div className="flex items-center gap-2">
+                <span className="w-1.5 h-6 rounded-full" style={{ background: EVENT_COLORS[type] }} />
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-foreground truncate">{title}</p>
+                  <p className="text-[11px] text-muted-foreground capitalize">{EVENT_TYPES.find(t => t.value === type)?.label}</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3 text-xs">
+                <div className="flex items-center gap-1.5 text-muted-foreground">
+                  <CalendarIcon className="w-3.5 h-3.5" />
+                  <span className="text-foreground font-medium tabular-nums">
+                    {new Date(date + "T00:00").toLocaleDateString("pt-PT", { day: "2-digit", month: "short", year: "numeric" })}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5 text-muted-foreground">
+                  <Clock className="w-3.5 h-3.5" />
+                  <span className="text-foreground font-medium tabular-nums">
+                    {startTime}{type === "reuniao" ? ` – ${endTime}` : ""}
+                  </span>
+                </div>
+              </div>
+              {type === "reuniao" && modalidade === "kortex" && link && (
+                <div className="flex items-center gap-1.5 text-xs">
+                  <Video className="w-3.5 h-3.5 text-primary" />
+                  <span className="text-primary font-medium truncate">{link}</span>
+                </div>
+              )}
+              {((type === "reuniao" && modalidade === "presencial") || type === "pessoal") && location && (
+                <div className="flex items-center gap-1.5 text-xs">
+                  <MapPin className="w-3.5 h-3.5 text-muted-foreground" />
+                  <span className="text-foreground">{location}</span>
+                </div>
+              )}
+              {type === "reuniao" && participants.length > 0 && (
+                <div className="pt-2 border-t border-border/60 space-y-1.5">
+                  <p className="text-[11px] text-muted-foreground uppercase tracking-wide font-medium">{participants.length} participante{participants.length > 1 ? "s" : ""}</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {participants.map((p) => (
+                      <span key={p.id} className="inline-flex items-center gap-1.5 pl-1 pr-2 py-0.5 rounded-full bg-card border text-[11px] font-medium">
+                        <span className="w-5 h-5 rounded-full bg-primary/15 text-primary flex items-center justify-center text-[9px] font-bold">
+                          {initials(p.name)}
+                        </span>
+                        {p.name}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" size="sm" onClick={() => setStep("form")}>Voltar</Button>
+              <Button type="button" size="sm" onClick={handleConfirm}>Confirmar e adicionar</Button>
+            </DialogFooter>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );
@@ -355,11 +486,28 @@ export default function FinancasCalendario() {
   const weekLabel = `${weekDays[0].toLocaleDateString("pt-PT", { day: "2-digit", month: "short" })} – ${weekDays[4].toLocaleDateString("pt-PT", { day: "2-digit", month: "short", year: "numeric" })}`;
   const monthLabel = monthCursor.toLocaleDateString("pt-PT", { month: "long", year: "numeric" });
 
-  // Empty data placeholders (no mock).
-  const events: { id: string; date: string; startTime: string; endTime: string; title: string; room?: string; color: string }[] = [];
+  const [events, setEvents] = useState<StoredEvent[]>(() => loadEvents());
+  useEffect(() => {
+    const refresh = () => setEvents(loadEvents());
+    window.addEventListener(CHANGE_EVENT, refresh);
+    window.addEventListener("storage", refresh);
+    return () => {
+      window.removeEventListener(CHANGE_EVENT, refresh);
+      window.removeEventListener("storage", refresh);
+    };
+  }, []);
   const meetingRequests: { id: string; title: string; from: string; when: string }[] = [];
 
   const selectedDayEvents = events.filter((e) => e.date === toISO(selectedDate));
+  const eventsByDate = useMemo(() => {
+    const map = new Map<string, StoredEvent[]>();
+    events.forEach((e) => {
+      const arr = map.get(e.date) ?? [];
+      arr.push(e);
+      map.set(e.date, arr);
+    });
+    return map;
+  }, [events]);
 
   // Month grid
   const monthDays = useMemo(() => {
@@ -378,6 +526,12 @@ export default function FinancasCalendario() {
         right={
           <CriarEventoDialog
             defaultDate={selectedDate}
+            onCreated={(iso) => {
+              const d = new Date(iso + "T00:00");
+              setSelectedDate(d);
+              setWeekStart(startOfWeek(d));
+              setMonthCursor(new Date(d.getFullYear(), d.getMonth(), 1));
+            }}
             trigger={
               <Button size="sm" className="gap-2 h-8">
                 <Plus className="w-3.5 h-3.5" /> Criar Evento
@@ -418,10 +572,16 @@ export default function FinancasCalendario() {
                   const iso = toISO(d);
                   const isTodayCol = iso === toISO(today);
                   const isSelected = iso === toISO(selectedDate);
+                  const dayEvts = eventsByDate.get(iso) ?? [];
                   return (
                     <div key={iso} onClick={() => setSelectedDate(d)} className={cn("py-3 text-center border-l first:border-l-0 cursor-pointer transition-colors hover:bg-primary/10", isTodayCol ? "bg-primary/5" : "bg-muted/20", isSelected && !isTodayCol && "bg-primary/10")}>
                       <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">{DAYS[i]}</p>
                       <p className={cn("text-lg font-bold mt-0.5 w-8 h-8 flex items-center justify-center rounded-full mx-auto tabular-nums", isSelected ? "bg-primary text-primary-foreground" : isTodayCol ? "ring-2 ring-primary text-foreground" : "text-foreground")}>{d.getDate()}</p>
+                      <div className="flex items-center justify-center gap-0.5 mt-1 h-1.5">
+                        {dayEvts.slice(0, 3).map((ev) => (
+                          <span key={ev.id} className="w-1.5 h-1.5 rounded-full" style={{ background: ev.color }} />
+                        ))}
+                      </div>
                     </div>
                   );
                 })}
@@ -436,6 +596,7 @@ export default function FinancasCalendario() {
                   </h3>
                   <CriarEventoDialog
                     defaultDate={selectedDate}
+                    onCreated={(iso) => setSelectedDate(new Date(iso + "T00:00"))}
                     trigger={
                       <Button size="sm" className="gap-1.5 h-8">
                         <Plus className="w-3.5 h-3.5" /> Criar Evento
@@ -459,11 +620,12 @@ export default function FinancasCalendario() {
                         <div className="w-1 h-10 rounded-full shrink-0" style={{ background: event.color }} />
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-semibold text-foreground truncate">{event.title}</p>
-                          {event.room && (
-                            <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
-                              <MapPin className="w-3 h-3" />{event.room}
-                            </p>
-                          )}
+                          <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-2 tabular-nums">
+                            <Clock className="w-3 h-3" />
+                            {event.startTime}{event.endTime ? ` – ${event.endTime}` : ""}
+                            {event.location && (<><span className="text-border">·</span><MapPin className="w-3 h-3" />{event.location}</>)}
+                            {event.modalidade === "kortex" && (<><span className="text-border">·</span><Video className="w-3 h-3 text-primary" /><span className="text-primary">Virtual</span></>)}
+                          </p>
                         </div>
                       </div>
                     ))}
@@ -487,9 +649,20 @@ export default function FinancasCalendario() {
                   const iso = toISO(d);
                   const isTodayDay = iso === toISO(today);
                   const isSelected = iso === toISO(selectedDate);
+                  const dayEvts = eventsByDate.get(iso) ?? [];
                   return (
                     <div key={day} onClick={() => setSelectedDate(d)} className={cn("min-h-[90px] border-t border-l p-1.5 cursor-pointer hover:bg-primary/5 transition-colors", isTodayDay && "bg-primary/5", isSelected && !isTodayDay && "bg-primary/10")}>
                       <p className={cn("text-xs font-semibold mb-1 w-6 h-6 flex items-center justify-center rounded-full tabular-nums", isSelected ? "bg-primary text-primary-foreground" : isTodayDay ? "ring-2 ring-primary text-foreground" : "text-foreground")}>{day}</p>
+                      <div className="space-y-0.5">
+                        {dayEvts.slice(0, 2).map((ev) => (
+                          <div key={ev.id} className="text-[10px] truncate px-1 py-0.5 rounded text-foreground" style={{ background: `${ev.color}22`, borderLeft: `2px solid ${ev.color}` }}>
+                            {ev.title}
+                          </div>
+                        ))}
+                        {dayEvts.length > 2 && (
+                          <div className="text-[10px] text-muted-foreground px-1">+{dayEvts.length - 2}</div>
+                        )}
+                      </div>
                     </div>
                   );
                 })}
