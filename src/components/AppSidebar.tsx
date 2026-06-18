@@ -5,12 +5,13 @@ import {
   Mail, Award, User, LogOut, GraduationCap,
   BarChart3, ChevronLeft, ChevronRight, Library, Wallet, Trophy, ClipboardList,
   CheckSquare, Building2, UserCog, Eye, Layers, FileText, FolderOpen, TrendingUp, HelpCircle, Settings2, BrainCircuit,
-  Sparkles, Wand2, ClipboardCheck, UserPlus, ShieldCheck, MapPin,
+  Sparkles, Wand2, ClipboardCheck, UserPlus, ShieldCheck, MapPin, Clock, Rocket,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import logoUpra from "@/assets/logo-upra.asset.json";
 import { useFinAnunciosUnread } from "@/hooks/useFinAnunciosUnread";
+import { isInstitutionLive } from "@/pages/financas/_FinHeader";
 
 
 interface NavItem { label: string; icon: React.ElementType; path: string; badge?: number; }
