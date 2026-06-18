@@ -33,6 +33,22 @@ type StoredEvent = {
   color: string;
 };
 
+function mapDbEvent(row: any): StoredEvent {
+  return {
+    id: row.id,
+    type: row.type,
+    title: row.title,
+    date: row.event_date,
+    startTime: row.start_time?.slice(0, 5) ?? "",
+    endTime: row.end_time?.slice(0, 5) || undefined,
+    location: row.location || undefined,
+    link: row.link || undefined,
+    modalidade: row.modalidade || undefined,
+    participants: Array.isArray(row.participants) ? row.participants : [],
+    color: row.color,
+  };
+}
+
 const EVENT_COLORS: Record<EventType, string> = {
   reuniao: "hsl(142 65% 35%)",
   prazo: "hsl(0 72% 51%)",
@@ -45,10 +61,11 @@ const EVENT_TYPES: { value: EventType; label: string; icon: typeof Video }[] = [
   { value: "pessoal", label: "Pessoal", icon: User },
 ];
 
-function CriarEventoDialog({ defaultDate, trigger, onCreated }: { defaultDate: Date; trigger: React.ReactNode; onCreated?: (dateISO: string) => void }) {
+function CriarEventoDialog({ defaultDate, trigger, onCreated }: { defaultDate: Date; trigger: React.ReactNode; onCreated?: (event: StoredEvent) => void }) {
   const todayISO = new Date().toISOString().split("T")[0];
   const [step, setStep] = useState<"form" | "confirm">("form");
   const [open, setOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [type, setType] = useState<EventType>("reuniao");
   const [modalidade, setModalidade] = useState<Modalidade>("presencial");
   const [title, setTitle] = useState("");
@@ -110,9 +127,9 @@ function CriarEventoDialog({ defaultDate, trigger, onCreated }: { defaultDate: D
     setStep("confirm");
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     const ev: StoredEvent = {
-      id: `ev-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      id: crypto.randomUUID(),
       type,
       title: title.trim(),
       date,
@@ -124,20 +141,47 @@ function CriarEventoDialog({ defaultDate, trigger, onCreated }: { defaultDate: D
       participants: type === "reuniao" ? participants.map((p) => ({ id: p.id, name: p.name, modulo: p.modulo })) : undefined,
       color: EVENT_COLORS[type],
     };
-    saveEvent(ev);
+    setSaving(true);
+    const { data, error } = await (supabase as any)
+      .from("calendario_events")
+      .insert({
+        id: ev.id,
+        type: ev.type,
+        title: ev.title,
+        event_date: ev.date,
+        start_time: ev.startTime,
+        end_time: ev.endTime ?? null,
+        location: ev.location ?? null,
+        link: ev.link ?? null,
+        modalidade: ev.modalidade ?? null,
+        participants: ev.participants ?? [],
+        color: ev.color,
+      })
+      .select("id,type,title,event_date,start_time,end_time,location,link,modalidade,participants,color")
+      .single();
+    setSaving(false);
+    if (error) {
+      toast.error("Não foi possível guardar o evento no backend.");
+      return;
+    }
+    const created = mapDbEvent(data);
     const msg = type === "reuniao" && participants.length > 0
       ? `Evento confirmado. Pedidos enviados a ${participants.length} participante${participants.length > 1 ? "s" : ""}.`
       : "Evento confirmado e adicionado à agenda.";
     toast.success(msg);
-    onCreated?.(date);
+    onCreated?.(created);
     setOpen(false);
     resetForm();
   };
 
   useEffect(() => {
     if (!open) resetForm();
+    else {
+      const nextDate = defaultDate.toISOString().split("T")[0];
+      setDate(nextDate < todayISO ? todayISO : nextDate);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
+  }, [open, defaultDate]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
