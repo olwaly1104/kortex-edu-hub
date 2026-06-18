@@ -269,7 +269,6 @@ export default function AdminDiscentes() {
 
   return (
     <div className="p-6 lg:p-8 max-w-7xl mx-auto space-y-6 animate-fade-in">
-      <OnboardingStepBanner stepKey="dis.reg" />
 
       <div className="flex items-center gap-3 pb-1">
         <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
