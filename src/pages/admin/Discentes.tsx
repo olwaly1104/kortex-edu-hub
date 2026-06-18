@@ -525,6 +525,40 @@ export default function AdminDiscentes() {
             </div>
           </Field>
 
+          {/* Documentação */}
+          <div>
+            <p className="text-[10px] uppercase tracking-wide text-muted-foreground font-semibold mb-2">Documentação</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+              <Field label="Bilhete de Identidade (upload)">
+                <FileButton
+                  file={draft.bilheteFile}
+                  onPick={(f) => setF("bilheteFile", f)}
+                  inputRef={biInput}
+                  accept="image/*,application/pdf"
+                  Icon={IdCard}
+                />
+              </Field>
+              <Field label="Certificado Ensino Médio (upload)">
+                <FileButton
+                  file={draft.certificadoFile}
+                  onPick={(f) => setF("certificadoFile", f)}
+                  inputRef={certInput}
+                  accept="image/*,application/pdf"
+                  Icon={FileText}
+                />
+              </Field>
+              <Field label="Bilhete do responsável (upload)">
+                <FileButton
+                  file={draft.encBilheteFile}
+                  onPick={(f) => setF("encBilheteFile", f)}
+                  inputRef={encBiInput}
+                  accept="image/*,application/pdf"
+                  Icon={IdCard}
+                />
+              </Field>
+            </div>
+          </div>
+
           <div className="flex justify-end">
             <Button
               size="sm"
