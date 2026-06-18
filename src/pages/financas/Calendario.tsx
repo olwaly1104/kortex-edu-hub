@@ -36,7 +36,6 @@ function CriarEventoDialog({ defaultDate, trigger }: { defaultDate: Date; trigge
   const [endTime, setEndTime] = useState("10:00");
   const [location, setLocation] = useState("");
   const [link, setLink] = useState("");
-  const [notes, setNotes] = useState("");
   const [participants, setParticipants] = useState<{ id: string; name: string; email: string | null }[]>([]);
   const [participantInput, setParticipantInput] = useState("");
   const [participantFocus, setParticipantFocus] = useState(false);
