@@ -105,41 +105,10 @@ function rand(min: number, max: number): number {
   return Math.floor(min + (max - min) * ((Math.sin(min * 9301 + max * 49297) + 1) / 2));
 }
 
-function generateSalarios(): Salary[] {
-  const list: Salary[] = [];
-  for (let i = 0; i < 100; i++) {
-    const first = firstNames[i % firstNames.length];
-    const last = lastNames[i % lastNames.length];
-    const roleInfo = roles[i % roles.length];
-    const dept = departments[i % departments.length];
-    const contract = contracts[i % contracts.length];
-    const status = salaryStatuses[i % salaryStatuses.length];
-    const gross = roleInfo.gross[0] + Math.round(((i * 7 + 13) % (roleInfo.gross[1] - roleInfo.gross[0])) / 1000) * 1000;
-    const deductionRate = 0.14;
-    const deductions = Math.round(gross * deductionRate);
-    const net = gross - deductions;
-    const prefix = i < 50 ? "Prof. " : (i < 70 ? "Dr(a). " : "");
-    list.push({
-      id: `s${i + 1}`,
-      employeeId: `FUN-${String(i + 1).padStart(3, "0")}`,
-      name: `${prefix}${first} ${last}`,
-      role: roleInfo.role,
-      department: dept,
-      contractType: contract,
-      grossSalary: gross,
-      netSalary: net,
-      deductions,
-      status,
-      payDate: status === "pago" ? "2025-03-31" : "2025-04-30",
-    });
-  }
-  return list;
-}
-
-export const salarios: Salary[] = generateSalarios();
+export const salarios: Salary[] = [];
 
 export const payrollBudget = {
-  totalBudget: 65000000,
+  totalBudget: 0,
   currentMonth: "Abril 2025",
 };
 
@@ -155,14 +124,6 @@ export interface Budget {
   responsavelRole: string;
 }
 
-export const orcamentos: Budget[] = [
-  { id: "o1", name: "Orçamento Geral — Fac. Engenharia", department: "Fac. Engenharia", totalBudget: 120000000, spent: 78000000, period: "2025", status: "activo", responsavel: "Dr. Manuel Carvalho", responsavelRole: "Decano Fac. Engenharia" },
-  { id: "o2", name: "Orçamento Geral — Fac. Direito", department: "Fac. Direito", totalBudget: 85000000, spent: 52000000, period: "2025", status: "activo", responsavel: "Dra. Teresa Lopes", responsavelRole: "Decana Fac. Direito" },
-  { id: "o3", name: "Orçamento Geral — Fac. Medicina", department: "Fac. Medicina", totalBudget: 200000000, spent: 185000000, period: "2025", status: "em_revisao", responsavel: "Dr. Rui Andrade", responsavelRole: "Decano Fac. Medicina" },
-  { id: "o4", name: "Infraestrutura e Manutenção", department: "Administração", totalBudget: 50000000, spent: 46000000, period: "2025", status: "em_revisao", responsavel: "Arq. Sofia Mendes", responsavelRole: "Gestora de Infraestruturas" },
-  { id: "o5", name: "Tecnologias de Informação", department: "TI", totalBudget: 30000000, spent: 18500000, period: "2025", status: "activo", responsavel: "Dr. Luís Campos", responsavelRole: "Director de TI" },
-  { id: "o6", name: "Investigação e Desenvolvimento", department: "Reitoria", totalBudget: 40000000, spent: 12000000, period: "2025", status: "activo", responsavel: "Prof. Joaquim Silva", responsavelRole: "Vice-Reitor para I&D" },
-  { id: "o7", name: "Bolsas de Estudo", department: "Reitoria", totalBudget: 25000000, spent: 25000000, period: "2025", status: "esgotado", responsavel: "Dra. Inês Carvalho", responsavelRole: "Secretária Geral" },
-  { id: "o8", name: "Eventos e Conferências", department: "Administração", totalBudget: 15000000, spent: 8200000, period: "2025", status: "activo", responsavel: "Dr. António Cunha", responsavelRole: "Director Administrativo" },
-];
+export const orcamentos: Budget[] = [];
+
 
