@@ -714,7 +714,7 @@ export default function FinancasCalendario() {
                                 className="text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded shrink-0"
                                 style={{ background: `${event.color}1a`, color: event.color }}
                               >
-                                {catLabel ?? typeLabel}
+                                {typeLabel}
                               </span>
                             </div>
                             <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-2 tabular-nums">
