@@ -383,6 +383,7 @@ export type EstudanteInput = {
   enc_nome?: string | null;
   enc_parentesco?: string | null;
   enc_telefone?: string | null;
+  regime?: "bolseiro" | "normal";
 };
 
 async function provisionStudentAccount(name: string, email: string) {
