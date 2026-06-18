@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, MessageSquare, Search, Plus, Phone, Video, MoreVertical, Smile, Paperclip } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Send, MessageSquare, Search, Plus, Phone, Video, MoreVertical, Smile, Paperclip, Users, PhoneCall } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Conversation {
@@ -62,6 +63,8 @@ export default function StudentChat() {
   const [draft, setDraft] = useState("");
   const [query, setQuery] = useState("");
   const [contactQuery, setContactQuery] = useState("");
+  const [tab, setTab] = useState<"chats" | "chamadas" | "grupos">("chats");
+  const [pickerOpen, setPickerOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -186,10 +189,10 @@ export default function StudentChat() {
 
   const filteredConvs = useMemo(
     () =>
-      conversations.filter((c) =>
-        (c.other_name ?? "").toLowerCase().includes(query.toLowerCase()),
-      ),
-    [conversations, query],
+      conversations
+        .filter((c) => (tab === "grupos" ? c.is_group : !c.is_group))
+        .filter((c) => (c.other_name ?? "").toLowerCase().includes(query.toLowerCase())),
+    [conversations, query, tab],
   );
 
   const filteredContacts = useMemo(
@@ -218,8 +221,8 @@ export default function StudentChat() {
     <div className="h-[calc(100vh-3.5rem)] flex bg-background">
       {/* Conversations column */}
       <aside className="w-80 border-r border-border bg-card flex flex-col">
-        <div className="p-4 border-b border-border">
-          <div className="flex items-center justify-between mb-3">
+        <div className="p-4 border-b border-border space-y-3">
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
                 <MessageSquare className="w-4.5 h-4.5 text-primary" />
@@ -229,24 +232,97 @@ export default function StudentChat() {
                 <p className="text-[11px] text-muted-foreground">{conversations.length} conversa{conversations.length === 1 ? "" : "s"}</p>
               </div>
             </div>
+            <Popover open={pickerOpen} onOpenChange={setPickerOpen}>
+              <PopoverTrigger asChild>
+                <Button size="icon" variant="ghost" className="h-8 w-8"><Plus className="w-4 h-4" /></Button>
+              </PopoverTrigger>
+              <PopoverContent align="end" className="w-72 p-0">
+                <div className="p-2 border-b border-border">
+                  <div className="relative">
+                    <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      value={contactQuery}
+                      onChange={(e) => setContactQuery(e.target.value)}
+                      placeholder="Pesquisar contactos…"
+                      className="pl-8 h-8 text-sm"
+                    />
+                  </div>
+                </div>
+                <ScrollArea className="max-h-72">
+                  {filteredContacts.length === 0 ? (
+                    <p className="p-4 text-center text-xs text-muted-foreground">Sem contactos.</p>
+                  ) : (
+                    filteredContacts.map((c) => (
+                      <button
+                        key={c.id}
+                        onClick={() => { startWith(c.id); setPickerOpen(false); }}
+                        className="w-full text-left px-3 py-2 hover:bg-muted/50 flex items-center gap-3"
+                      >
+                        <Avatar className="w-7 h-7">
+                          <AvatarFallback className="text-[10px] bg-muted text-foreground font-medium">
+                            {initials(c.display_name)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">{c.display_name}</p>
+                          <p className="text-[11px] text-muted-foreground truncate">{moduloLabel(c.modulo)}</p>
+                        </div>
+                      </button>
+                    ))
+                  )}
+                </ScrollArea>
+              </PopoverContent>
+            </Popover>
           </div>
-          <div className="relative">
-            <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Pesquisar conversas…"
-              className="pl-8 h-9 text-sm"
-            />
+
+          <div className="flex bg-muted/50 rounded-lg p-0.5">
+            {([
+              { k: "chats", label: "Chats", icon: MessageSquare },
+              { k: "chamadas", label: "Chamadas", icon: PhoneCall },
+              { k: "grupos", label: "Grupos", icon: Users },
+            ] as const).map((t) => {
+              const Icon = t.icon;
+              const active = tab === t.k;
+              return (
+                <button
+                  key={t.k}
+                  onClick={() => { setTab(t.k); setSelectedId(null); }}
+                  className={cn(
+                    "flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md text-[11px] font-medium transition-colors",
+                    active ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  <Icon className="w-3.5 h-3.5" />
+                  {t.label}
+                </button>
+              );
+            })}
           </div>
+
+          {tab !== "chamadas" && (
+            <div className="relative">
+              <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder={tab === "grupos" ? "Pesquisar grupos…" : "Pesquisar conversas…"}
+                className="pl-8 h-9 text-sm"
+              />
+            </div>
+          )}
         </div>
 
         <ScrollArea className="flex-1">
-          {filteredConvs.length === 0 ? (
+          {tab === "chamadas" ? (
+            <div className="p-8 text-center">
+              <PhoneCall className="w-8 h-8 mx-auto mb-2 text-muted-foreground/40" />
+              <p className="text-xs text-muted-foreground">Sem chamadas recentes.</p>
+            </div>
+          ) : filteredConvs.length === 0 ? (
             <div className="p-6 text-center">
               <MessageSquare className="w-8 h-8 mx-auto mb-2 text-muted-foreground/40" />
               <p className="text-xs text-muted-foreground">
-                {query ? "Sem resultados" : "Sem conversas. Inicie uma do painel de contactos."}
+                {query ? "Sem resultados" : tab === "grupos" ? "Sem grupos." : "Sem conversas. Use + para iniciar."}
               </p>
             </div>
           ) : (
@@ -394,51 +470,6 @@ export default function StudentChat() {
           </>
         )}
       </section>
-
-      {/* Contacts column */}
-      <aside className="w-72 border-l border-border bg-card flex flex-col">
-        <div className="p-4 border-b border-border">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="font-semibold text-sm">Contactos</h3>
-            <span className="text-[11px] text-muted-foreground">{contacts.length}</span>
-          </div>
-          <div className="relative">
-            <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              value={contactQuery}
-              onChange={(e) => setContactQuery(e.target.value)}
-              placeholder="Pesquisar…"
-              className="pl-8 h-9 text-sm"
-            />
-          </div>
-        </div>
-        <ScrollArea className="flex-1">
-          {filteredContacts.length === 0 ? (
-            <p className="p-6 text-center text-xs text-muted-foreground">Sem contactos.</p>
-          ) : (
-            filteredContacts.map((c) => (
-              <button
-                key={c.id}
-                onClick={() => startWith(c.id)}
-                className="w-full text-left px-3 py-2 hover:bg-muted/50 transition-colors flex items-center gap-3 border-b border-border/40"
-              >
-                <Avatar className="w-8 h-8">
-                  <AvatarFallback className="text-[10px] bg-muted text-foreground font-medium">
-                    {initials(c.display_name)}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate">{c.display_name}</p>
-                  <p className="text-[11px] text-muted-foreground truncate">
-                    {moduloLabel(c.modulo)}
-                  </p>
-                </div>
-                <Plus className="w-3.5 h-3.5 text-muted-foreground" />
-              </button>
-            ))
-          )}
-        </ScrollArea>
-      </aside>
     </div>
   );
 }
