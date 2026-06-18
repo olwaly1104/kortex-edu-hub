@@ -294,6 +294,11 @@ function initials(name: string) {
   return name.split(" ").filter(Boolean).map((n) => n[0]).slice(0, 2).join("").toUpperCase();
 }
 
+function generateKortexLink() {
+  const id = Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
+  return `https://kortex.upra.kor/meet/${id}`;
+}
+
 function startOfWeek(d: Date) {
   const x = new Date(d);
   const day = (x.getDay() + 6) % 7; // Mon = 0
