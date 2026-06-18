@@ -129,7 +129,6 @@ function CriarEventoDialog({ defaultDate, trigger, onCreated }: { defaultDate: D
   };
 
   const handleConfirm = async () => {
-    const caixaColor = categoria === "entrada" ? "hsl(142 65% 35%)" : "hsl(0 72% 51%)";
     const ev: StoredEvent = {
       id: crypto.randomUUID(),
       type,
@@ -141,8 +140,7 @@ function CriarEventoDialog({ defaultDate, trigger, onCreated }: { defaultDate: D
       link: link || undefined,
       modalidade: type === "reuniao" ? modalidade : undefined,
       participants: type === "reuniao" ? participants.map((p) => ({ id: p.id, name: p.name, modulo: p.modulo })) : undefined,
-      categoria: type === "caixa" ? categoria : undefined,
-      color: type === "caixa" ? caixaColor : EVENT_COLORS[type],
+      color: EVENT_COLORS[type],
     };
     setSaving(true);
     const { data, error } = await (supabase as any)
@@ -158,10 +156,9 @@ function CriarEventoDialog({ defaultDate, trigger, onCreated }: { defaultDate: D
         link: ev.link ?? null,
         modalidade: ev.modalidade ?? null,
         participants: ev.participants ?? [],
-        categoria: ev.categoria ?? null,
         color: ev.color,
       })
-      .select("id,type,title,event_date,start_time,end_time,location,link,modalidade,participants,categoria,color")
+      .select("id,type,title,event_date,start_time,end_time,location,link,modalidade,participants,color")
       .single();
     setSaving(false);
     if (error) {
