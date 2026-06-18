@@ -668,13 +668,25 @@ function DespesasSection({ email }: { email?: string | null }) {
 
 /* ═══════════════════════════════ SALÁRIOS ═════════════════════════════════ */
 
+type SalarioImposto = { id: string; nome: string; percentagem: number };
+const DEFAULT_SALARIO_IMPOSTOS: SalarioImposto[] = [
+  { id: "irt", nome: "IRT", percentagem: 0 },
+  { id: "seg-social", nome: "Segurança Social", percentagem: 0 },
+];
+
 function SalariosSection({ email }: { email?: string | null }) {
   const storageKey = KEY("salarios", email);
+  const impostosKey = KEY("salarios.impostos", email);
+  const [tab, setTab] = useState<"docentes" | "staff" | "impostos">("docentes");
   const [docentes, setDocentes] = useState<{ id: string; nome: string }[]>([]);
   const [staff, setStaff] = useState<{ id: string; nome: string }[]>([]);
   const [rows, setRows] = useState<Record<string, { bruto: number; impostos: number }>>(
     () => readJSON(storageKey, {}),
   );
+  const [impostos, setImpostos] = useState<SalarioImposto[]>(() => {
+    const stored = readJSON<SalarioImposto[] | null>(impostosKey, null);
+    return stored && stored.length ? stored : DEFAULT_SALARIO_IMPOSTOS;
+  });
 
   useEffect(() => {
     import("@/lib/peopleStorage").then(({ loadDocentes, loadStaff, fullName }) => {
@@ -684,11 +696,27 @@ function SalariosSection({ email }: { email?: string | null }) {
   }, []);
 
   useEffect(() => writeJSON(storageKey, rows), [rows, storageKey]);
+  useEffect(() => writeJSON(impostosKey, impostos), [impostos, impostosKey]);
 
   const update = (id: string, patch: Partial<{ bruto: number; impostos: number }>) =>
     setRows((s) => ({ ...s, [id]: { bruto: 0, impostos: 0, ...s[id], ...patch } }));
 
-  const renderTable = (
+  const updateImposto = (id: string, patch: Partial<SalarioImposto>) =>
+    setImpostos((arr) => arr.map((i) => (i.id === id ? { ...i, ...patch } : i)));
+
+  const addImposto = () =>
+    setImpostos((arr) => [...arr, { id: `imp-${Date.now()}`, nome: "Novo imposto", percentagem: 0 }]);
+
+  const removeImposto = (id: string) =>
+    setImpostos((arr) => arr.filter((i) => i.id !== id));
+
+  const toggles: { key: typeof tab; label: string; icon: React.ComponentType<{ className?: string }>; count: number }[] = [
+    { key: "docentes", label: "Docentes", icon: GraduationCap, count: docentes.length },
+    { key: "staff", label: "Staff", icon: Briefcase, count: staff.length },
+    { key: "impostos", label: "Impostos", icon: Percent, count: impostos.length },
+  ];
+
+  const renderPeopleTable = (
     title: string,
     subtitle: string,
     icon: React.ComponentType<{ className?: string }>,
@@ -717,14 +745,14 @@ function SalariosSection({ email }: { email?: string | null }) {
             <div className="px-5 py-10 text-center text-xs text-muted-foreground">{emptyHint}</div>
           ) : people.map((p) => {
             const bruto = rows[p.id]?.bruto ?? 0;
-            const impostos = rows[p.id]?.impostos ?? 0;
-            const liquido = Math.max(0, bruto - impostos);
+            const imp = rows[p.id]?.impostos ?? 0;
+            const liquido = Math.max(0, bruto - imp);
             return (
               <div key={p.id} className="grid grid-cols-[1fr_150px_150px_150px] gap-3 px-5 py-2.5 items-center text-sm">
                 <div className="truncate font-medium">{p.nome}</div>
                 <Input type="number" min={0} className="h-9 tabular-nums" value={bruto}
                   onChange={(e) => update(p.id, { bruto: Number(e.target.value) || 0 })} />
-                <Input type="number" min={0} className="h-9 tabular-nums" value={impostos}
+                <Input type="number" min={0} className="h-9 tabular-nums" value={imp}
                   onChange={(e) => update(p.id, { impostos: Number(e.target.value) || 0 })} />
                 <div className="h-9 flex items-center px-2 rounded-md bg-muted/30 tabular-nums font-medium">{fmt(liquido)}</div>
               </div>
@@ -735,15 +763,74 @@ function SalariosSection({ email }: { email?: string | null }) {
     );
   };
 
+  const renderImpostos = () => (
+    <Card className="overflow-hidden">
+      <div className="px-5 py-3 border-b bg-muted/30 flex items-center gap-2">
+        <Percent className="w-4 h-4 text-primary" />
+        <div className="min-w-0">
+          <h2 className="text-sm font-bold text-foreground">Impostos sobre salários</h2>
+          <p className="text-[11px] text-muted-foreground">Defina os impostos aplicáveis aos salários (ex.: IRT, Segurança Social).</p>
+        </div>
+        <Button size="sm" variant="outline" className="ml-auto h-8 gap-1.5" onClick={addImposto}>
+          <Plus className="w-3.5 h-3.5" /> Adicionar
+        </Button>
+      </div>
+      <div className="divide-y">
+        <div className="grid grid-cols-[1fr_180px_60px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
+          <div>Designação</div>
+          <div>Percentagem (%)</div>
+          <div></div>
+        </div>
+        {impostos.length === 0 ? (
+          <div className="px-5 py-10 text-center text-xs text-muted-foreground">Sem impostos configurados.</div>
+        ) : impostos.map((i) => (
+          <div key={i.id} className="grid grid-cols-[1fr_180px_60px] gap-3 px-5 py-2.5 items-center text-sm">
+            <Input value={i.nome} className="h-9" onChange={(e) => updateImposto(i.id, { nome: e.target.value })} />
+            <Input type="number" min={0} step={0.01} className="h-9 tabular-nums" value={i.percentagem}
+              onChange={(e) => updateImposto(i.id, { percentagem: Number(e.target.value) || 0 })} />
+            <Button size="icon" variant="ghost" className="h-9 w-9 text-muted-foreground hover:text-destructive" onClick={() => removeImposto(i.id)}>
+              <Trash2 className="w-4 h-4" />
+            </Button>
+          </div>
+        ))}
+      </div>
+    </Card>
+  );
+
   return (
     <div className="space-y-6">
-      {renderTable("Salários — Docentes", "Lista alimentada por RH → Docentes. Finanças define apenas bruto e impostos.", GraduationCap, docentes,
-        "Sem docentes registados em RH. Adicione em RH → Docentes para configurar salários aqui.")}
-      {renderTable("Salários — Staff", "Lista alimentada por RH → Staff. Finanças define apenas bruto e impostos.", Briefcase, staff,
-        "Sem staff registado em RH. Adicione em RH → Staff para configurar salários aqui.")}
+      <div className="inline-flex items-center gap-1 p-1 rounded-lg border bg-muted/30">
+        {toggles.map((t) => {
+          const TIcon = t.icon;
+          const active = tab === t.key;
+          return (
+            <button key={t.key} type="button" onClick={() => setTab(t.key)}
+              className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${active ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"}`}>
+              <TIcon className="w-3.5 h-3.5" />
+              {t.label}
+              <span className={`tabular-nums text-[10px] px-1.5 py-0.5 rounded ${active ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>{t.count}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {tab === "docentes" && renderPeopleTable(
+        "Salários — Docentes",
+        "Lista alimentada por RH → Docentes. Finanças define apenas bruto e impostos.",
+        GraduationCap, docentes,
+        "Sem docentes registados em RH. Adicione em RH → Docentes para configurar salários aqui.",
+      )}
+      {tab === "staff" && renderPeopleTable(
+        "Salários — Staff",
+        "Lista alimentada por RH → Staff. Finanças define apenas bruto e impostos.",
+        Briefcase, staff,
+        "Sem staff registado em RH. Adicione em RH → Staff para configurar salários aqui.",
+      )}
+      {tab === "impostos" && renderImpostos()}
     </div>
   );
 }
+
 
 /* ═══════════════════════════════ MULTAS ═══════════════════════════════════ */
 
