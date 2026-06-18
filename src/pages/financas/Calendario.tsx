@@ -374,6 +374,66 @@ function CriarEventoDialog({ defaultDate, trigger, onCreated }: { defaultDate: D
             <Button type="submit" size="sm">Criar evento</Button>
           </DialogFooter>
         </form>
+        )}
+
+        {step === "confirm" && (
+          <div className="space-y-4">
+            <div className="rounded-lg border bg-muted/30 p-4 space-y-3">
+              <div className="flex items-center gap-2">
+                <span className="w-1.5 h-6 rounded-full" style={{ background: EVENT_COLORS[type] }} />
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-foreground truncate">{title}</p>
+                  <p className="text-[11px] text-muted-foreground capitalize">{EVENT_TYPES.find(t => t.value === type)?.label}</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3 text-xs">
+                <div className="flex items-center gap-1.5 text-muted-foreground">
+                  <CalendarIcon className="w-3.5 h-3.5" />
+                  <span className="text-foreground font-medium tabular-nums">
+                    {new Date(date + "T00:00").toLocaleDateString("pt-PT", { day: "2-digit", month: "short", year: "numeric" })}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5 text-muted-foreground">
+                  <Clock className="w-3.5 h-3.5" />
+                  <span className="text-foreground font-medium tabular-nums">
+                    {startTime}{type === "reuniao" ? ` – ${endTime}` : ""}
+                  </span>
+                </div>
+              </div>
+              {type === "reuniao" && modalidade === "kortex" && link && (
+                <div className="flex items-center gap-1.5 text-xs">
+                  <Video className="w-3.5 h-3.5 text-primary" />
+                  <span className="text-primary font-medium truncate">{link}</span>
+                </div>
+              )}
+              {((type === "reuniao" && modalidade === "presencial") || type === "pessoal") && location && (
+                <div className="flex items-center gap-1.5 text-xs">
+                  <MapPin className="w-3.5 h-3.5 text-muted-foreground" />
+                  <span className="text-foreground">{location}</span>
+                </div>
+              )}
+              {type === "reuniao" && participants.length > 0 && (
+                <div className="pt-2 border-t border-border/60 space-y-1.5">
+                  <p className="text-[11px] text-muted-foreground uppercase tracking-wide font-medium">{participants.length} participante{participants.length > 1 ? "s" : ""}</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {participants.map((p) => (
+                      <span key={p.id} className="inline-flex items-center gap-1.5 pl-1 pr-2 py-0.5 rounded-full bg-card border text-[11px] font-medium">
+                        <span className="w-5 h-5 rounded-full bg-primary/15 text-primary flex items-center justify-center text-[9px] font-bold">
+                          {initials(p.name)}
+                        </span>
+                        {p.name}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" size="sm" onClick={() => setStep("form")}>Voltar</Button>
+              <Button type="button" size="sm" onClick={handleConfirm}>Confirmar e adicionar</Button>
+            </DialogFooter>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );
