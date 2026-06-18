@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils";
 
 const DAYS = ["Seg", "Ter", "Qua", "Qui", "Sex"];
 
-type EventType = "reuniao" | "prazo" | "pessoal";
+type EventType = "reuniao" | "prazo" | "pessoal" | "outro";
 type Modalidade = "kortex" | "presencial";
 
 type StoredEvent = {
