@@ -180,6 +180,7 @@ export default function AdminDiscenteProfile() {
         <TabsList className="bg-muted/40">
           <TabsTrigger value="overview" className="text-xs">Visão Geral</TabsTrigger>
           <TabsTrigger value="documentos" className="text-xs">Documentos</TabsTrigger>
+          <TabsTrigger value="financas" className="text-xs">Finanças</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
