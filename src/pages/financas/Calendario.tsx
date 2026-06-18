@@ -350,7 +350,7 @@ export default function FinancasCalendario() {
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       <FinHeader
         title="Calendário"
-        subtitle="Eventos financeiros e reuniões"
+        subtitle="Eventos gerais e reuniões"
         icon={<CalendarIcon className="w-5 h-5 text-primary" />}
         right={
           <CriarEventoDialog
