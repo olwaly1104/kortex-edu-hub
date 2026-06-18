@@ -9,9 +9,11 @@ import {
   Clock, CheckCircle2, Search, X, Inbox, Send,
   Plus, GraduationCap, CalendarDays, Calendar, ArrowUpRight,
   AlertTriangle, BadgeCheck, ChevronLeft, ChevronRight,
-  Paperclip, FileText, Trash2, ArrowRight, Check,
+  Paperclip, FileText, Trash2, ArrowRight, Check, Rocket,
   type LucideIcon,
 } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { isInstitutionLive } from "@/pages/financas/_FinHeader";
 import { cn } from "@/lib/utils";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose, DialogTrigger,
