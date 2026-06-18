@@ -647,7 +647,7 @@ function NovoAgendamentoDialog() {
   const [open, setOpen] = useState(false);
   const [studentQuery, setStudentQuery] = useState("");
   const [selectedStudent, setSelectedStudent] = useState<GapAtendimento | null>(null);
-  const [categoria, setCategoria] = useState<TicketCategoria | null>(null);
+  const [categoria, setCategoria] = useState<TicketCategoria | "">("");
   const [responsavel, setResponsavel] = useState<string>("helena");
   const [motivo, setMotivo] = useState("");
   const [descricao, setDescricao] = useState("");
@@ -661,15 +661,15 @@ function NovoAgendamentoDialog() {
     const map = new Map<string, GapAtendimento>();
     gapAtendimentos.forEach(a => { if (!map.has(a.matricula)) map.set(a.matricula, a); });
     const arr = Array.from(map.values());
-    if (!studentQuery.trim()) return arr.slice(0, 6);
+    if (!studentQuery.trim()) return arr.slice(0, 5);
     const q = studentQuery.toLowerCase();
     return arr.filter(s =>
       s.discente.toLowerCase().includes(q) || s.matricula.includes(studentQuery)
-    ).slice(0, 8);
+    ).slice(0, 6);
   }, [studentQuery]);
 
   const reset = () => {
-    setStudentQuery(""); setSelectedStudent(null); setCategoria(null);
+    setStudentQuery(""); setSelectedStudent(null); setCategoria("");
     setResponsavel("helena"); setMotivo(""); setDescricao("");
     setData(TODAY); setHora("09:00"); setDuracao("50 min");
     setModalidade("presencial"); setSala("Gab. GAP 1");
@@ -678,414 +678,199 @@ function NovoAgendamentoDialog() {
   const onOpenChange = (o: boolean) => { setOpen(o); if (!o) setTimeout(reset, 200); };
 
   const endTime = useMemo(() => addMinutesToHHMM(hora, parseDuracaoMin(duracao)), [hora, duracao]);
-  const dateObj = useMemo(() => new Date(data), [data]);
-  const fmtDate = (d: Date) => d.toLocaleDateString("pt-AO", { weekday: "short", day: "2-digit", month: "short" });
 
-  const canConfirm = !!selectedStudent && !!categoria && motivo.trim().length > 2;
-  const resp = RESPONSAVEIS.find(r => r.id === responsavel)!;
-
-  // Step wizard
-  const STEPS = [
-    { n: 1, label: "Participantes" },
-    { n: 2, label: "Categoria" },
-    { n: 3, label: "Motivo" },
-    { n: 4, label: "Quando" },
-    { n: 5, label: "Modalidade" },
-    { n: 6, label: "Descrição" },
-  ] as const;
-  const [step, setStep] = useState<1 | 2 | 3 | 4 | 5 | 6>(1);
-
-  const stepValid: Record<number, boolean> = {
-    1: !!selectedStudent && !!responsavel,
-    2: !!categoria,
-    3: motivo.trim().length > 2,
-    4: !!data && !!hora && !!duracao,
-    5: !!modalidade && sala.trim().length > 0,
-    6: true,
-  };
-
-  const goNext = () => setStep(s => (s < 6 ? ((s + 1) as typeof s) : s));
-  const goPrev = () => setStep(s => (s > 1 ? ((s - 1) as typeof s) : s));
-
-  const onOpenChangeWizard = (o: boolean) => {
-    setOpen(o);
-    if (!o) setTimeout(() => { reset(); setStep(1); }, 200);
-  };
+  const canConfirm = !!selectedStudent && !!categoria && motivo.trim().length > 2 && !!data && !!hora;
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChangeWizard}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
         <Button size="sm" className="gap-1.5"><Plus className="w-4 h-4" /> Novo Agendamento</Button>
       </DialogTrigger>
-      <DialogContent className="max-w-2xl p-0 gap-0 overflow-hidden rounded-2xl border-border">
-        {/* Header */}
-        <div className="px-6 pt-5 pb-4 border-b border-border bg-card">
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="w-10 h-10 rounded-xl bg-primary text-primary-foreground flex items-center justify-center shrink-0">
-              <CalendarIcon className="w-5 h-5" />
+      <DialogContent className="max-w-xl p-0 gap-0 overflow-hidden rounded-2xl border-border">
+        <div className="px-6 pt-5 pb-4 border-b border-border">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-lg bg-primary text-primary-foreground flex items-center justify-center shrink-0">
+              <CalendarIcon className="w-4 h-4" />
             </div>
-            <div className="min-w-0 flex-1">
-              <DialogTitle className="text-base font-semibold leading-tight">Novo Agendamento</DialogTitle>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                Passo {step} de {STEPS.length} — {STEPS[step - 1].label}
-              </p>
+            <div className="min-w-0">
+              <DialogTitle className="text-base font-semibold">Novo Agendamento</DialogTitle>
+              <p className="text-xs text-muted-foreground mt-0.5">Marcar uma sessão de apoio com um discente.</p>
             </div>
-          </div>
-
-          {/* Numbered stepper */}
-          <div className="mt-4 flex items-center gap-1 overflow-x-auto">
-            {STEPS.map((s, i) => {
-              const isActive = step === s.n;
-              const isDone = step > s.n;
-              const reachable = isDone || isActive || stepValid[s.n - 1] !== false;
-              return (
-                <div key={s.n} className="flex items-center gap-1 shrink-0">
-                  <button
-                    type="button"
-                    onClick={() => { if (reachable) setStep(s.n as typeof step); }}
-                    className={cn(
-                      "flex items-center gap-1.5 h-7 pl-1 pr-2 rounded-full border transition-colors",
-                      isActive
-                        ? "bg-primary text-primary-foreground border-primary"
-                        : isDone
-                          ? "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100"
-                          : "bg-muted/40 text-muted-foreground border-border hover:bg-muted"
-                    )}
-                  >
-                    <span className={cn(
-                      "w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold",
-                      isActive ? "bg-primary-foreground/20" : isDone ? "bg-emerald-200/70" : "bg-background"
-                    )}>
-                      {isDone ? <CheckCircle2 className="w-3 h-3" /> : s.n}
-                    </span>
-                    <span className="text-[10px] font-semibold whitespace-nowrap hidden sm:inline">
-                      {s.label}
-                    </span>
-                  </button>
-                  {i < STEPS.length - 1 && <div className="w-3 h-px bg-border" />}
-                </div>
-              );
-            })}
           </div>
         </div>
 
-        {/* Body — one step at a time */}
-        <div className="px-6 py-5 min-h-[320px] max-h-[60vh] overflow-y-auto">
-
-          {/* STEP 1 — Participantes (Discente + Responsável) */}
-          {step === 1 && (
-            <div className="space-y-5">
-              <FieldBlock n={1} title="Discente">
-                {selectedStudent ? (
-                  <div className="flex items-center gap-3 p-3 rounded-lg border border-border bg-muted/30">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-semibold text-sm ring-1 ring-primary/15">
-                      {selectedStudent.discente.split(" ").slice(0, 2).map(n => n[0]).join("")}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold truncate">{selectedStudent.discente}</p>
-                      <p className="text-[11px] text-muted-foreground truncate">
-                        {selectedStudent.matricula} · {selectedStudent.curso} · {selectedStudent.ano}º ano
-                      </p>
-                    </div>
-                    <Button variant="ghost" size="sm" className="h-7 text-xs"
-                      onClick={() => { setSelectedStudent(null); setStudentQuery(""); }}>
-                      Alterar
-                    </Button>
+        <div className="px-6 py-5 space-y-4 max-h-[65vh] overflow-y-auto">
+          {/* Discente */}
+          <div className="space-y-1.5">
+            <Label className="text-xs font-medium">Discente</Label>
+            {selectedStudent ? (
+              <div className="flex items-center gap-3 p-2.5 rounded-lg border border-border bg-muted/30">
+                <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-semibold text-xs">
+                  {selectedStudent.discente.split(" ").slice(0, 2).map(n => n[0]).join("")}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium truncate">{selectedStudent.discente}</p>
+                  <p className="text-[11px] text-muted-foreground truncate">
+                    {selectedStudent.matricula} · {selectedStudent.curso}
+                  </p>
+                </div>
+                <Button variant="ghost" size="sm" className="h-7 text-xs"
+                  onClick={() => { setSelectedStudent(null); setStudentQuery(""); }}>
+                  Alterar
+                </Button>
+              </div>
+            ) : (
+              <>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Pesquisar por nome ou matrícula…"
+                    value={studentQuery}
+                    onChange={e => setStudentQuery(e.target.value)}
+                    className="pl-9 h-9"
+                  />
+                </div>
+                {studentOptions.length > 0 && (
+                  <div className="mt-1 grid grid-cols-1 max-h-40 overflow-y-auto rounded-lg border border-border bg-card">
+                    {studentOptions.map(s => (
+                      <button
+                        key={s.matricula}
+                        onClick={() => setSelectedStudent(s)}
+                        className="flex items-center gap-3 px-3 py-2 text-left hover:bg-muted/50 border-b border-border last:border-b-0"
+                      >
+                        <div className="w-7 h-7 rounded-full bg-muted text-muted-foreground flex items-center justify-center text-[10px] font-semibold">
+                          {s.discente.split(" ").slice(0, 2).map(n => n[0]).join("")}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">{s.discente}</p>
+                          <p className="text-[11px] text-muted-foreground truncate tabular-nums">
+                            {s.matricula} · {s.curso}
+                          </p>
+                        </div>
+                      </button>
+                    ))}
                   </div>
-                ) : (
-                  <>
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                      <Input
-                        autoFocus
-                        placeholder="Pesquisar por nome ou matrícula…"
-                        value={studentQuery}
-                        onChange={e => setStudentQuery(e.target.value)}
-                        className="pl-9 h-10"
-                      />
-                    </div>
-                    <div className="mt-2 grid grid-cols-1 gap-1 max-h-44 overflow-y-auto rounded-lg border border-border bg-card">
-                      {studentOptions.length === 0 ? (
-                        <p className="text-xs text-muted-foreground p-3 text-center">Nenhum discente encontrado.</p>
-                      ) : studentOptions.map(s => (
-                        <button
-                          key={s.matricula}
-                          onClick={() => setSelectedStudent(s)}
-                          className="flex items-center gap-3 px-3 py-2 text-left hover:bg-muted/50 transition-colors border-b border-border last:border-b-0"
-                        >
-                          <div className="w-8 h-8 rounded-full bg-muted text-muted-foreground flex items-center justify-center text-[10px] font-semibold">
-                            {s.discente.split(" ").slice(0, 2).map(n => n[0]).join("")}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium truncate">{s.discente}</p>
-                            <p className="text-[11px] text-muted-foreground truncate tabular-nums">
-                              {s.matricula} · {s.curso}
-                            </p>
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  </>
                 )}
-              </FieldBlock>
+              </>
+            )}
+          </div>
 
-              <FieldBlock n={2} title="Responsável GAP">
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                  {RESPONSAVEIS.map(r => {
-                    const active = responsavel === r.id;
-                    return (
-                      <button
-                        key={r.id}
-                        onClick={() => setResponsavel(r.id)}
-                        className={cn(
-                          "flex items-center gap-2.5 p-2.5 rounded-lg border text-left transition-all",
-                          active
-                            ? "border-primary bg-primary/5 ring-2 ring-primary/15"
-                            : "border-border bg-card hover:border-primary/40 hover:bg-muted/30"
-                        )}
-                      >
-                        <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-semibold text-[11px] ring-1 ring-primary/15">
-                          {r.initials}
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-xs font-semibold truncate">{r.nome}</p>
-                          <p className="text-[10px] text-muted-foreground truncate">{r.role}</p>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              </FieldBlock>
+          {/* Categoria + Responsável */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label className="text-xs font-medium">Categoria</Label>
+              <Select value={categoria} onValueChange={(v) => setCategoria(v as TicketCategoria)}>
+                <SelectTrigger className="h-9"><SelectValue placeholder="Selecionar categoria" /></SelectTrigger>
+                <SelectContent>
+                  {(Object.keys(categoriaConfig) as TicketCategoria[]).map(c => (
+                    <SelectItem key={c} value={c}>{categoriaConfig[c].label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-          )}
+            <div className="space-y-1.5">
+              <Label className="text-xs font-medium">Responsável GAP</Label>
+              <Select value={responsavel} onValueChange={setResponsavel}>
+                <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {RESPONSAVEIS.map(r => (
+                    <SelectItem key={r.id} value={r.id}>{r.nome} — {r.role}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
 
-          {/* STEP 2 — Categoria */}
-          {step === 2 && (
-            <FieldBlock n={2} title="Categoria de apoio">
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                {(Object.keys(categoriaConfig) as TicketCategoria[]).map(c => {
-                  const cfg = categoriaConfig[c];
-                  const active = categoria === c;
-                  return (
-                    <button
-                      key={c}
-                      onClick={() => setCategoria(c)}
-                      className={cn(
-                        "flex flex-col items-start gap-1.5 p-3 rounded-lg border text-left transition-all",
-                        active
-                          ? "border-primary bg-primary/5 ring-2 ring-primary/15"
-                          : "border-border bg-card hover:border-primary/40 hover:bg-muted/30"
-                      )}
-                    >
-                      <Badge variant="outline" className={cn("text-[10px] border-0", cfg.color)}>
-                        {cfg.label}
-                      </Badge>
-                      <span className="text-[10px] text-muted-foreground leading-snug line-clamp-2">
-                        {CATEGORIA_HINT[c]}
-                      </span>
-                    </button>
-                  );
-                })}
+          {/* Motivo */}
+          <div className="space-y-1.5">
+            <Label className="text-xs font-medium">Motivo</Label>
+            <Input
+              placeholder="Ex: 1ª sessão de acompanhamento, orientação vocacional…"
+              value={motivo}
+              onChange={e => setMotivo(e.target.value)}
+              className="h-9"
+            />
+          </div>
+
+          {/* Agendamento */}
+          <div className="space-y-2 p-3 rounded-lg border border-border bg-muted/20">
+            <Label className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold flex items-center gap-1.5">
+              <CalendarIcon className="w-3.5 h-3.5" /> Agendamento
+            </Label>
+            <div className="grid grid-cols-3 gap-2">
+              <div className="space-y-1">
+                <Label className="text-[10px] text-muted-foreground">Data</Label>
+                <Input type="date" value={data} onChange={e => setData(e.target.value)} className="h-9 text-sm" />
               </div>
-            </FieldBlock>
-          )}
-
-          {/* STEP 3 — Motivo */}
-          {step === 3 && (
-            <FieldBlock n={3} title="Motivo da sessão">
-              <Input
-                autoFocus
-                placeholder="Ex: 1ª sessão de acompanhamento, orientação vocacional…"
-                value={motivo}
-                onChange={e => setMotivo(e.target.value)}
-                className="h-10 text-sm"
-              />
-              <p className="text-[10px] text-muted-foreground mt-2">
-                Título curto e claro do propósito da sessão.
-              </p>
-            </FieldBlock>
-          )}
-
-          {/* STEP 4 — Quando */}
-          {step === 4 && (
-            <FieldBlock n={4} title="Quando">
-              <div className="space-y-4">
-                <div>
-                  <Label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5 block">Data</Label>
-                  <div className="flex items-center gap-2">
-                    <Input type="date" value={data} onChange={e => setData(e.target.value)} className="h-9 w-44 text-sm" />
-                    <span className="text-[11px] text-muted-foreground capitalize">{fmtDate(dateObj)}</span>
-                  </div>
-                </div>
-                <div>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <Label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Hora</Label>
-                    <span className="text-[10px] text-muted-foreground tabular-nums">
-                      Termina às <strong className="text-foreground">{endTime}</strong>
-                    </span>
-                  </div>
-                  <div className="flex flex-wrap gap-1.5">
-                    {HORAS_SUGERIDAS.map(h => (
-                      <button
-                        key={h}
-                        onClick={() => setHora(h)}
-                        className={cn(
-                          "px-2.5 h-8 rounded-md text-xs font-medium tabular-nums border transition-colors",
-                          hora === h
-                            ? "bg-primary text-primary-foreground border-primary"
-                            : "bg-background text-foreground border-input hover:border-primary hover:text-primary"
-                        )}
-                      >
-                        {h}
-                      </button>
-                    ))}
-                    <Input type="time" value={hora} onChange={e => setHora(e.target.value)} className="h-8 w-28 text-xs" />
-                  </div>
-                </div>
-                <div>
-                  <Label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5 block">Duração</Label>
-                  <div className="flex flex-wrap gap-1.5">
-                    {DURACOES.map(d => (
-                      <button
-                        key={d.v}
-                        onClick={() => setDuracao(d.v)}
-                        className={cn(
-                          "px-2.5 h-8 rounded-md text-xs font-medium border transition-colors",
-                          duracao === d.v
-                            ? "bg-primary text-primary-foreground border-primary"
-                            : "bg-background text-foreground border-input hover:border-primary hover:text-primary"
-                        )}
-                      >
-                        {d.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
+              <div className="space-y-1">
+                <Label className="text-[10px] text-muted-foreground">Hora</Label>
+                <Input type="time" value={hora} onChange={e => setHora(e.target.value)} className="h-9 text-sm tabular-nums" />
               </div>
-            </FieldBlock>
-          )}
-
-          {/* STEP 5 — Modalidade */}
-          {step === 5 && (
-            <FieldBlock n={5} title="Modalidade">
-              <div className="grid grid-cols-2 gap-2">
-                {([
-                  { v: "presencial" as const, label: "Presencial", icon: MapPin, hint: "No gabinete GAP" },
-                  { v: "online" as const,     label: "Online",     icon: Video,  hint: "Videochamada" },
-                ]).map(m => {
-                  const active = modalidade === m.v;
-                  return (
-                    <button
-                      key={m.v}
-                      onClick={() => setModalidade(m.v)}
-                      className={cn(
-                        "flex items-center gap-3 p-3 rounded-lg border text-left transition-all",
-                        active
-                          ? "border-primary bg-primary/5 ring-2 ring-primary/15"
-                          : "border-border bg-card hover:border-primary/40 hover:bg-muted/30"
-                      )}
-                    >
-                      <div className={cn(
-                        "w-9 h-9 rounded-lg flex items-center justify-center shrink-0",
-                        active ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
-                      )}>
-                        <m.icon className="w-4 h-4" />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-sm font-medium">{m.label}</p>
-                        <p className="text-[11px] text-muted-foreground">{m.hint}</p>
-                      </div>
-                    </button>
-                  );
-                })}
+              <div className="space-y-1">
+                <Label className="text-[10px] text-muted-foreground">Duração</Label>
+                <Select value={duracao} onValueChange={setDuracao}>
+                  <SelectTrigger className="h-9 text-sm"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {DURACOES.map(d => <SelectItem key={d.v} value={d.v}>{d.label}</SelectItem>)}
+                  </SelectContent>
+                </Select>
               </div>
-              <Label className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mt-3 mb-1.5 block">
-                {modalidade === "presencial" ? "Sala" : "Link da videochamada"}
+            </div>
+            <p className="text-[10px] text-muted-foreground tabular-nums pt-0.5">
+              Termina às <strong className="text-foreground">{endTime}</strong>
+            </p>
+          </div>
+
+          {/* Modalidade */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label className="text-xs font-medium">Modalidade</Label>
+              <Select value={modalidade} onValueChange={(v) => setModalidade(v as "presencial" | "online")}>
+                <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="presencial">Presencial</SelectItem>
+                  <SelectItem value="online">Online</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs font-medium">
+                {modalidade === "presencial" ? "Sala" : "Link"}
               </Label>
               <Input
                 placeholder={modalidade === "presencial" ? "Ex: Gab. GAP 1" : "https://…"}
                 value={sala}
                 onChange={e => setSala(e.target.value)}
-                className="h-10 text-sm"
+                className="h-9"
               />
-            </FieldBlock>
-          )}
+            </div>
+          </div>
 
-          {/* STEP 6 — Descrição */}
-          {step === 6 && (
-            <FieldBlock n={6} title="Descrição" optional>
-              <Textarea
-                autoFocus
-                placeholder="Notas adicionais, contexto da sessão, objectivos…"
-                value={descricao}
-                onChange={e => setDescricao(e.target.value)}
-                rows={5}
-                className="resize-none text-sm"
-              />
-
-              {/* Resumo final */}
-              <div className="mt-4 rounded-lg border border-border bg-muted/20 p-3 space-y-1.5 text-[11px]">
-                <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">Resumo</p>
-                <p><span className="text-muted-foreground">Discente:</span> <strong>{selectedStudent?.discente ?? "—"}</strong></p>
-                <p><span className="text-muted-foreground">Responsável:</span> <strong>{resp.nome}</strong></p>
-                <p><span className="text-muted-foreground">Categoria:</span> <strong>{categoria ? categoriaConfig[categoria].label : "—"}</strong></p>
-                <p><span className="text-muted-foreground">Motivo:</span> <strong>{motivo || "—"}</strong></p>
-                <p><span className="text-muted-foreground">Quando:</span> <strong className="capitalize">{fmtDate(dateObj)}</strong> · <strong>{hora}–{endTime}</strong> ({duracao})</p>
-                <p><span className="text-muted-foreground">Modalidade:</span> <strong>{modalidade === "online" ? "Online" : "Presencial"}</strong> · {sala || "—"}</p>
-              </div>
-            </FieldBlock>
-          )}
+          {/* Descrição */}
+          <div className="space-y-1.5">
+            <Label className="text-xs font-medium">Descrição <span className="text-muted-foreground font-normal">(opcional)</span></Label>
+            <Textarea
+              placeholder="Notas adicionais, contexto da sessão, objectivos…"
+              value={descricao}
+              onChange={e => setDescricao(e.target.value)}
+              rows={3}
+              className="resize-none text-sm"
+            />
+          </div>
         </div>
 
-        {/* Footer */}
-        <DialogFooter className="px-6 py-4 border-t border-border bg-muted/20 flex-row items-center justify-between gap-3 sm:justify-between">
-          <div className="text-[11px] text-muted-foreground tabular-nums">
-            Passo <strong className="text-foreground">{step}</strong> de {STEPS.length}
-          </div>
-          <div className="flex items-center gap-2 shrink-0">
-            <DialogClose asChild>
-              <Button variant="outline" size="sm">Cancelar</Button>
-            </DialogClose>
-            {step > 1 && (
-              <Button variant="ghost" size="sm" onClick={goPrev} className="gap-1">
-                <ChevronLeft className="w-4 h-4" /> Voltar
-              </Button>
-            )}
-            {step < 6 ? (
-              <Button
-                size="sm"
-                disabled={!stepValid[step]}
-                onClick={goNext}
-                className="gap-1.5"
-              >
-                Continuar <ChevronRight className="w-4 h-4" />
-              </Button>
-            ) : (
-              <DialogClose asChild>
-                <Button size="sm" disabled={!canConfirm} className="gap-1.5">
-                  <CheckCircle2 className="w-4 h-4" /> Confirmar
-                </Button>
-              </DialogClose>
-            )}
-          </div>
+        <DialogFooter className="px-6 py-3 border-t border-border bg-muted/20 flex-row items-center justify-end gap-2">
+          <DialogClose asChild>
+            <Button variant="outline" size="sm">Cancelar</Button>
+          </DialogClose>
+          <DialogClose asChild>
+            <Button size="sm" disabled={!canConfirm} className="gap-1.5">
+              <CheckCircle2 className="w-4 h-4" /> Confirmar
+            </Button>
+          </DialogClose>
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  );
-}
-
-function FieldBlock({ n, title, optional, children }: { n: number; title: string; optional?: boolean; children: React.ReactNode }) {
-  return (
-    <section>
-      <div className="flex items-center gap-2 mb-2">
-        <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-muted text-muted-foreground text-[10px] font-bold">{n}</span>
-        <Label className="text-[11px] uppercase tracking-wider text-foreground font-semibold">
-          {title}
-          {optional && <span className="ml-1.5 normal-case tracking-normal text-muted-foreground font-normal">(opcional)</span>}
-        </Label>
-      </div>
-      {children}
-    </section>
   );
 }
 
