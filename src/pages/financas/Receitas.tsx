@@ -10,6 +10,7 @@ import { formatCurrency, receitas as receitasSeed } from "@/data/financeModuleDa
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { FinHeader } from "./_FinHeader";
+import { RevDespTabs } from "./_RevDespTabs";
 import { PeriodSelector, PERIODO_MULT, type Periodo, periodoDefaultValue } from "./_PeriodSelector";
 
 type SortField = "amount";
@@ -92,6 +93,9 @@ export default function Receitas() {
           </Button>
         }
       />
+
+      <RevDespTabs />
+
 
       {/* Período toggle + result + selector */}
       <PeriodSelector periodo={periodo} setPeriodo={setPeriodo} value={periodoValue} setValue={setPeriodoValue} />
