@@ -615,17 +615,26 @@ export default function StudentChat() {
                             ) : (
                               <p className="whitespace-pre-wrap break-words">{m.body}</p>
                             )}
-                            <p
+                            <div
                               className={cn(
-                                "text-[10px] mt-1",
-                                own ? "text-primary-foreground/70" : "text-muted-foreground",
+                                "flex items-center gap-1 mt-1 text-[10px]",
+                                own ? "text-primary-foreground/70 justify-end" : "text-muted-foreground",
                               )}
                             >
-                              {new Date(m.created_at).toLocaleTimeString("pt-PT", {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              })}
-                            </p>
+                              <span>
+                                {new Date(m.created_at).toLocaleTimeString("pt-PT", {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })}
+                              </span>
+                              {own && (
+                                m.read_at ? (
+                                  <CheckCheck className="w-3.5 h-3.5 text-sky-300" />
+                                ) : (
+                                  <Check className="w-3.5 h-3.5" />
+                                )
+                              )}
+                            </div>
                           </div>
                         </div>
                       );
