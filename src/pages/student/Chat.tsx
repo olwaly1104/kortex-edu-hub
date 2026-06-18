@@ -29,7 +29,7 @@ interface Message {
   id: string;
   conversation_id: string;
   sender_id: string;
-  content: string;
+  body: string;
   created_at: string;
 }
 
@@ -119,7 +119,7 @@ export default function StudentChat() {
       }
       const { data: last } = await (supabase as any)
         .from("messages")
-        .select("content")
+        .select("body")
         .eq("conversation_id", c.id)
         .order("created_at", { ascending: false })
         .limit(1);
@@ -128,7 +128,7 @@ export default function StudentChat() {
         other_id,
         other_name,
         other_modulo,
-        last_message: last?.[0]?.content,
+        last_message: last?.[0]?.body,
       });
     }
     setConversations(enriched);
@@ -179,7 +179,7 @@ export default function StudentChat() {
     setDraft("");
     await (supabase as any)
       .from("messages")
-      .insert({ conversation_id: selectedId, sender_id: uid, content });
+      .insert({ conversation_id: selectedId, sender_id: uid, body: content });
     loadConversations();
   };
 
@@ -431,10 +431,10 @@ export default function StudentChat() {
                                 : "bg-card border border-border rounded-bl-md",
                             )}
                           >
-                            {/^https?:\/\/\S+\.(gif|png|jpe?g|webp)(\?\S*)?$/i.test(m.content) ? (
-                              <img src={m.content} alt="gif" className="rounded-lg max-w-full max-h-60 object-contain" />
+                            {/^https?:\/\/\S+\.(gif|png|jpe?g|webp)(\?\S*)?$/i.test(m.body) ? (
+                              <img src={m.body} alt="gif" className="rounded-lg max-w-full max-h-60 object-contain" />
                             ) : (
-                              <p className="whitespace-pre-wrap break-words">{m.content}</p>
+                              <p className="whitespace-pre-wrap break-words">{m.body}</p>
                             )}
                             <p
                               className={cn(
@@ -461,7 +461,7 @@ export default function StudentChat() {
                 <Button variant="ghost" size="icon" className="h-9 w-9 shrink-0"><Paperclip className="w-4 h-4" /></Button>
                 <GifPicker onPick={(url) => {
                   if (!selectedId || !uid) return;
-                  (supabase as any).from("messages").insert({ conversation_id: selectedId, sender_id: uid, content: url }).then(() => loadConversations());
+                  (supabase as any).from("messages").insert({ conversation_id: selectedId, sender_id: uid, body: url }).then(() => loadConversations());
                 }} />
                 <EmojiPicker onPick={(e) => setDraft((d) => d + e)} />
                 <Input
