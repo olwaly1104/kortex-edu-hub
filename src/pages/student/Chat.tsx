@@ -63,6 +63,8 @@ export default function StudentChat() {
   const [draft, setDraft] = useState("");
   const [query, setQuery] = useState("");
   const [contactQuery, setContactQuery] = useState("");
+  const [tab, setTab] = useState<"chats" | "chamadas" | "grupos">("chats");
+  const [pickerOpen, setPickerOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
