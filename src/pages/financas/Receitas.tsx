@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { TrendingUp, Search, ArrowUpDown, X, Wallet, Clock, AlertTriangle, FileText, Receipt, Pencil, Check, Settings2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { formatCurrency, receitas as receitasSeed } from "@/data/financeModuleData";
+import { formatCurrency, type Transaction } from "@/data/financeModuleData";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { FinHeader } from "./_FinHeader";
@@ -22,6 +22,7 @@ const statusColors: Record<string, string> = {
   em_atraso: "bg-destructive/15 text-destructive border-destructive/30",
 };
 const statusLabels: Record<string, string> = { pago: "Recebido", pendente: "Pendente", em_atraso: "Em Atraso" };
+const emptyReceitas: Transaction[] = [];
 
 // Receita Esperada = soma de todas as propinas anuais brutas dos estudantes.
 // Permanece a 0 até o Reitor activar o ano lectivo (fim do onboarding) e as
@@ -30,7 +31,7 @@ const estimativaMensal = 0;
 
 export default function Receitas() {
   const { toast } = useToast();
-  const [receitas, setReceitas] = useState(receitasSeed);
+  const receitas = emptyReceitas;
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("todos");
   const [filterCategory, setFilterCategory] = useState("todos");
@@ -42,10 +43,6 @@ export default function Receitas() {
   const [editValue, setEditValue] = useState<string>("");
 
   const mult = PERIODO_MULT[periodo];
-
-  useEffect(() => {
-    setReceitas(receitasSeed);
-  }, [receitasSeed]);
 
   const isSortActive = sortField !== null;
   const isStatusActive = filterStatus !== "todos";
@@ -74,7 +71,6 @@ export default function Receitas() {
   const commitEdit = (id: string) => {
     const n = Number(editValue);
     if (!isNaN(n) && n >= 0) {
-      setReceitas(prev => prev.map(r => r.id === id ? { ...r, amount: n } : r));
       toast({ title: "Valor actualizado" });
     }
     setEditingId(null);
