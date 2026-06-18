@@ -470,51 +470,6 @@ export default function StudentChat() {
           </>
         )}
       </section>
-
-      {/* Contacts column */}
-      <aside className="w-72 border-l border-border bg-card flex flex-col">
-        <div className="p-4 border-b border-border">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="font-semibold text-sm">Contactos</h3>
-            <span className="text-[11px] text-muted-foreground">{contacts.length}</span>
-          </div>
-          <div className="relative">
-            <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              value={contactQuery}
-              onChange={(e) => setContactQuery(e.target.value)}
-              placeholder="Pesquisar…"
-              className="pl-8 h-9 text-sm"
-            />
-          </div>
-        </div>
-        <ScrollArea className="flex-1">
-          {filteredContacts.length === 0 ? (
-            <p className="p-6 text-center text-xs text-muted-foreground">Sem contactos.</p>
-          ) : (
-            filteredContacts.map((c) => (
-              <button
-                key={c.id}
-                onClick={() => startWith(c.id)}
-                className="w-full text-left px-3 py-2 hover:bg-muted/50 transition-colors flex items-center gap-3 border-b border-border/40"
-              >
-                <Avatar className="w-8 h-8">
-                  <AvatarFallback className="text-[10px] bg-muted text-foreground font-medium">
-                    {initials(c.display_name)}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate">{c.display_name}</p>
-                  <p className="text-[11px] text-muted-foreground truncate">
-                    {moduloLabel(c.modulo)}
-                  </p>
-                </div>
-                <Plus className="w-3.5 h-3.5 text-muted-foreground" />
-              </button>
-            ))
-          )}
-        </ScrollArea>
-      </aside>
     </div>
   );
 }
