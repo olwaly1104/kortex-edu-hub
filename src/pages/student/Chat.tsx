@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, MessageSquare, Search, Plus, Phone, Video, MoreVertical, Smile, Paperclip } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Send, MessageSquare, Search, Plus, Phone, Video, MoreVertical, Smile, Paperclip, Users, PhoneCall } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Conversation {
