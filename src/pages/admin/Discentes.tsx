@@ -14,6 +14,7 @@ import { supabase } from "@/integrations/supabase/client";
 import {
   useEstudantes,
   useCursos,
+  useFaculdades,
   useCreateEstudante,
   useDeleteEstudante,
 } from "@/lib/useInstitution";
@@ -39,6 +40,7 @@ type Draft = {
   enc_nome: string;
   enc_parentesco: string;
   enc_telefone: string;
+  faculdade_id: string;
   curso_id: string;
   ano: string;
   turma: string;
@@ -58,7 +60,7 @@ const buildEmail = (primeiro: string, ultimo: string) => {
   return `${[p, u].filter(Boolean).join(".")}@${EMAIL_DOMAIN}`;
 };
 
-const emptyDraft = (curso_id = ""): Draft => ({
+const emptyDraft = (faculdade_id = "", curso_id = ""): Draft => ({
   fotoFile: null,
   fotoPreview: "",
   primeiroNome: "",
@@ -76,6 +78,7 @@ const emptyDraft = (curso_id = ""): Draft => ({
   enc_nome: "",
   enc_parentesco: "",
   enc_telefone: "",
+  faculdade_id,
   curso_id,
   ano: "1",
   turma: "A",
@@ -96,6 +99,7 @@ async function uploadDoc(file: File, prefix: string, email: string): Promise<str
 export default function AdminDiscentes() {
   const { data: rows = [], isLoading } = useEstudantes();
   const { data: cursos = [] } = useCursos();
+  const { data: faculdades = [] } = useFaculdades();
   const createMut = useCreateEstudante();
   const deleteMut = useDeleteEstudante();
 
@@ -106,11 +110,26 @@ export default function AdminDiscentes() {
   const biInput = useRef<HTMLInputElement>(null);
   const certInput = useRef<HTMLInputElement>(null);
 
+  // Cursos scoped to the selected faculdade.
+  const cursosDaFac = useMemo(
+    () => (draft.faculdade_id ? cursos.filter((c: any) => c.faculdade_id === draft.faculdade_id) : []),
+    [cursos, draft.faculdade_id],
+  );
+
+  // Initialise faculdade → curso defaults.
   useEffect(() => {
-    if (!draft.curso_id && cursos.length > 0) {
-      setDraft((d) => ({ ...d, curso_id: (cursos[0] as any).id }));
+    if (!draft.faculdade_id && faculdades.length > 0) {
+      setDraft((d) => ({ ...d, faculdade_id: (faculdades[0] as any).id }));
     }
-  }, [cursos, draft.curso_id]);
+  }, [faculdades, draft.faculdade_id]);
+
+  useEffect(() => {
+    if (!draft.faculdade_id) return;
+    const validCurso = cursosDaFac.find((c: any) => c.id === draft.curso_id);
+    if (!validCurso) {
+      setDraft((d) => ({ ...d, curso_id: cursosDaFac[0]?.id || "" }));
+    }
+  }, [cursosDaFac, draft.faculdade_id, draft.curso_id]);
 
   const cursoCode = useMemo(() => {
     const m = new Map<string, string>();
@@ -210,7 +229,7 @@ export default function AdminDiscentes() {
         certificado_url,
       });
       toast.success(`Discente adicionado · ${previewEmail}`);
-      setDraft(emptyDraft(draft.curso_id));
+      setDraft(emptyDraft(draft.faculdade_id, draft.curso_id));
       if (fotoInput.current) fotoInput.current.value = "";
       if (biInput.current) biInput.current.value = "";
       if (certInput.current) certInput.current.value = "";
@@ -396,58 +415,80 @@ export default function AdminDiscentes() {
             </div>
           </div>
 
-          {/* Contact + identity docs */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-            <Field label="Telemóvel / Contacto">
-              <Input value={draft.telemovel} onChange={(e) => setF("telemovel", e.target.value)} placeholder="+244 9XX XXX XXX" className="h-8 text-xs" />
-            </Field>
-            <Field label="Nº Bilhete de Identidade">
-              <Input value={draft.bilhete} onChange={(e) => setF("bilhete", e.target.value)} placeholder="00000000XX000" className="h-8 text-xs" />
-            </Field>
-            <Field label="Regime">
-              <Select value={draft.regime} onValueChange={(v) => setF("regime", v as Regime)}>
-                <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="normal">Normal</SelectItem>
-                  <SelectItem value="bolseiro">Bolseiro</SelectItem>
-                </SelectContent>
-              </Select>
-            </Field>
-            <Field label="Curso">
-              <Select value={draft.curso_id} onValueChange={(v) => setF("curso_id", v)}>
-                <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="—" /></SelectTrigger>
-                <SelectContent>
-                  {cursos.map((c: any) => (
-                    <SelectItem key={c.id} value={c.id}>{c.codigo || c.nome}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </Field>
+          {/* Académico: Faculdade → Curso → Ano → Turma */}
+          <div>
+            <p className="text-[10px] uppercase tracking-wide text-muted-foreground font-semibold mb-2">Académico</p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              <Field label="Faculdade">
+                <Select value={draft.faculdade_id} onValueChange={(v) => setF("faculdade_id", v)}>
+                  <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="—" /></SelectTrigger>
+                  <SelectContent>
+                    {faculdades.map((f: any) => (
+                      <SelectItem key={f.id} value={f.id}>{f.sigla || f.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </Field>
+              <Field label="Curso">
+                <Select value={draft.curso_id} onValueChange={(v) => setF("curso_id", v)} disabled={cursosDaFac.length === 0}>
+                  <SelectTrigger className="h-8 text-xs">
+                    <SelectValue placeholder={cursosDaFac.length === 0 ? "Sem cursos" : "—"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {cursosDaFac.map((c: any) => (
+                      <SelectItem key={c.id} value={c.id}>{c.code || c.codigo || c.name || c.nome}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </Field>
+              <Field label="Ano">
+                <Select value={draft.ano} onValueChange={(v) => setF("ano", v)}>
+                  <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                  <SelectContent>{anosPool.map((a) => <SelectItem key={a} value={a}>{a}º</SelectItem>)}</SelectContent>
+                </Select>
+              </Field>
+              <Field label="Turma">
+                <Select value={draft.turma} onValueChange={(v) => setF("turma", v)}>
+                  <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                  <SelectContent>{turmasPool.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
+                </Select>
+              </Field>
+            </div>
           </div>
 
-          {/* Ano / Turma + uploads */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-            <Field label="Ano">
-              <Select value={draft.ano} onValueChange={(v) => setF("ano", v)}>
-                <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                <SelectContent>{anosPool.map((a) => <SelectItem key={a} value={a}>{a}º</SelectItem>)}</SelectContent>
-              </Select>
-            </Field>
-            <Field label="Turma">
-              <Select value={draft.turma} onValueChange={(v) => setF("turma", v)}>
-                <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                <SelectContent>{turmasPool.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
-              </Select>
-            </Field>
-            <Field label="Bilhete (upload)">
-              <FileButton
-                file={draft.bilheteFile}
-                onPick={(f) => setF("bilheteFile", f)}
-                inputRef={biInput}
-                accept="image/*,application/pdf"
-                Icon={IdCard}
-              />
-            </Field>
+          {/* Contacto e identificação */}
+          <div>
+            <p className="text-[10px] uppercase tracking-wide text-muted-foreground font-semibold mb-2">Contacto & Identificação</p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              <Field label="Telemóvel / Contacto">
+                <Input value={draft.telemovel} onChange={(e) => setF("telemovel", e.target.value)} placeholder="+244 9XX XXX XXX" className="h-8 text-xs" />
+              </Field>
+              <Field label="Nº Bilhete de Identidade">
+                <Input value={draft.bilhete} onChange={(e) => setF("bilhete", e.target.value)} placeholder="00000000XX000" className="h-8 text-xs" />
+              </Field>
+              <Field label="Regime">
+                <Select value={draft.regime} onValueChange={(v) => setF("regime", v as Regime)}>
+                  <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="normal">Normal</SelectItem>
+                    <SelectItem value="bolseiro">Bolseiro</SelectItem>
+                  </SelectContent>
+                </Select>
+              </Field>
+              <Field label="Bilhete (upload)">
+                <FileButton
+                  file={draft.bilheteFile}
+                  onPick={(f) => setF("bilheteFile", f)}
+                  inputRef={biInput}
+                  accept="image/*,application/pdf"
+                  Icon={IdCard}
+                />
+              </Field>
+            </div>
+          </div>
+
+          {/* Documento académico */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
             <Field label="Certificado Ensino Médio (upload)">
               <FileButton
                 file={draft.certificadoFile}
