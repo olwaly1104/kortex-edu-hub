@@ -93,7 +93,7 @@ function CriarEventoDialog({ defaultDate, trigger }: { defaultDate: Date; trigge
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className="sm:max-w-[520px] max-h-[85vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[520px] max-h-[85vh] overflow-y-auto top-4 translate-y-0 data-[state=open]:slide-in-from-top-4">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <CalendarIcon className="w-4 h-4 text-primary" /> Criar Evento
