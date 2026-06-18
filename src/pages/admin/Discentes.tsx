@@ -515,15 +515,6 @@ export default function AdminDiscentes() {
               <Field label="Contacto do responsável">
                 <Input value={draft.enc_telefone} onChange={(e) => setF("enc_telefone", e.target.value)} placeholder="+244 9XX XXX XXX" className="h-8 text-xs" />
               </Field>
-              <Field label="Bilhete do responsável (upload)">
-                <FileButton
-                  file={draft.encBilheteFile}
-                  onPick={(f) => setF("encBilheteFile", f)}
-                  inputRef={encBiInput}
-                  accept="image/*,application/pdf"
-                  Icon={IdCard}
-                />
-              </Field>
             </div>
           </div>
 
