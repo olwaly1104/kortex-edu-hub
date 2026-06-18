@@ -192,6 +192,7 @@ const financasSections: NavSection[] = [
 const gapSections: NavSection[] = [
   { title: "Geral", items: [
     { label: "Início", icon: LayoutDashboard, path: "/gap" },
+    { label: "Minhas Solicitações", icon: HelpCircle, path: "/gap/minhas-solicitacoes" },
     { label: "Calendário", icon: Calendar, path: "/gap/calendario" },
   ]},
 
