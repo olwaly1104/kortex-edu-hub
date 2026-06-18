@@ -215,8 +215,6 @@ function CriarEventoDialog({ defaultDate, trigger }: { defaultDate: Date; trigge
             </div>
           )}
 
-          {/* Participantes */}
-
           {/* Participantes — no fim */}
           <div className="space-y-2 pt-1 border-t border-border/60">
             <Label htmlFor="ev-participants" className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1.5 pt-3">
