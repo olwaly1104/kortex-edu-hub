@@ -111,6 +111,7 @@ export default function AdminDiscentes() {
   const fotoInput = useRef<HTMLInputElement>(null);
   const biInput = useRef<HTMLInputElement>(null);
   const certInput = useRef<HTMLInputElement>(null);
+  const encBiInput = useRef<HTMLInputElement>(null);
 
   // Cursos scoped to the selected faculdade.
   const cursosDaFac = useMemo(
