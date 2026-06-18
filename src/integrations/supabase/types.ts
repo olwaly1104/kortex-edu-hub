@@ -91,6 +91,57 @@ export type Database = {
           },
         ]
       }
+      calendario_events: {
+        Row: {
+          color: string
+          created_at: string
+          end_time: string | null
+          event_date: string
+          id: string
+          link: string | null
+          location: string | null
+          modalidade: string | null
+          owner_user_id: string
+          participants: Json
+          start_time: string
+          title: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          color: string
+          created_at?: string
+          end_time?: string | null
+          event_date: string
+          id?: string
+          link?: string | null
+          location?: string | null
+          modalidade?: string | null
+          owner_user_id?: string
+          participants?: Json
+          start_time: string
+          title: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          end_time?: string | null
+          event_date?: string
+          id?: string
+          link?: string | null
+          location?: string | null
+          modalidade?: string | null
+          owner_user_id?: string
+          participants?: Json
+          start_time?: string
+          title?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       candidaturas: {
         Row: {
           created_at: string

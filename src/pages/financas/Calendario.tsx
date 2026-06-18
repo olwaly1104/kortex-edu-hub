@@ -1,6 +1,7 @@
 import { useMemo, useState, useCallback, useEffect } from "react";
 import { FinHeader } from "./_FinHeader";
 import { useInstitutionContacts } from "@/hooks/useInstitutionContacts";
+import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
@@ -32,8 +33,21 @@ type StoredEvent = {
   color: string;
 };
 
-const STORAGE_KEY = "upra:calendario:events";
-const CHANGE_EVENT = "upra:calendario:changed";
+function mapDbEvent(row: any): StoredEvent {
+  return {
+    id: row.id,
+    type: row.type,
+    title: row.title,
+    date: row.event_date,
+    startTime: row.start_time?.slice(0, 5) ?? "",
+    endTime: row.end_time?.slice(0, 5) || undefined,
+    location: row.location || undefined,
+    link: row.link || undefined,
+    modalidade: row.modalidade || undefined,
+    participants: Array.isArray(row.participants) ? row.participants : [],
+    color: row.color,
+  };
+}
 
 const EVENT_COLORS: Record<EventType, string> = {
   reuniao: "hsl(142 65% 35%)",
@@ -41,31 +55,17 @@ const EVENT_COLORS: Record<EventType, string> = {
   pessoal: "hsl(217 91% 60%)",
 };
 
-function loadEvents(): StoredEvent[] {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    const arr = raw ? JSON.parse(raw) : [];
-    return Array.isArray(arr) ? arr : [];
-  } catch { return []; }
-}
-
-function saveEvent(ev: StoredEvent) {
-  const all = loadEvents();
-  all.push(ev);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
-  window.dispatchEvent(new CustomEvent(CHANGE_EVENT));
-}
-
 const EVENT_TYPES: { value: EventType; label: string; icon: typeof Video }[] = [
   { value: "reuniao", label: "Reunião", icon: Users },
   { value: "prazo", label: "Prazo", icon: Clock },
   { value: "pessoal", label: "Pessoal", icon: User },
 ];
 
-function CriarEventoDialog({ defaultDate, trigger, onCreated }: { defaultDate: Date; trigger: React.ReactNode; onCreated?: (dateISO: string) => void }) {
+function CriarEventoDialog({ defaultDate, trigger, onCreated }: { defaultDate: Date; trigger: React.ReactNode; onCreated?: (event: StoredEvent) => void }) {
   const todayISO = new Date().toISOString().split("T")[0];
   const [step, setStep] = useState<"form" | "confirm">("form");
   const [open, setOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [type, setType] = useState<EventType>("reuniao");
   const [modalidade, setModalidade] = useState<Modalidade>("presencial");
   const [title, setTitle] = useState("");
@@ -127,9 +127,9 @@ function CriarEventoDialog({ defaultDate, trigger, onCreated }: { defaultDate: D
     setStep("confirm");
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     const ev: StoredEvent = {
-      id: `ev-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      id: crypto.randomUUID(),
       type,
       title: title.trim(),
       date,
@@ -141,20 +141,47 @@ function CriarEventoDialog({ defaultDate, trigger, onCreated }: { defaultDate: D
       participants: type === "reuniao" ? participants.map((p) => ({ id: p.id, name: p.name, modulo: p.modulo })) : undefined,
       color: EVENT_COLORS[type],
     };
-    saveEvent(ev);
+    setSaving(true);
+    const { data, error } = await (supabase as any)
+      .from("calendario_events")
+      .insert({
+        id: ev.id,
+        type: ev.type,
+        title: ev.title,
+        event_date: ev.date,
+        start_time: ev.startTime,
+        end_time: ev.endTime ?? null,
+        location: ev.location ?? null,
+        link: ev.link ?? null,
+        modalidade: ev.modalidade ?? null,
+        participants: ev.participants ?? [],
+        color: ev.color,
+      })
+      .select("id,type,title,event_date,start_time,end_time,location,link,modalidade,participants,color")
+      .single();
+    setSaving(false);
+    if (error) {
+      toast.error("Não foi possível guardar o evento no backend.");
+      return;
+    }
+    const created = mapDbEvent(data);
     const msg = type === "reuniao" && participants.length > 0
       ? `Evento confirmado. Pedidos enviados a ${participants.length} participante${participants.length > 1 ? "s" : ""}.`
       : "Evento confirmado e adicionado à agenda.";
     toast.success(msg);
-    onCreated?.(date);
+    onCreated?.(created);
     setOpen(false);
     resetForm();
   };
 
   useEffect(() => {
     if (!open) resetForm();
+    else {
+      const nextDate = defaultDate.toISOString().split("T")[0];
+      setDate(nextDate < todayISO ? todayISO : nextDate);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
+  }, [open, defaultDate]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -430,7 +457,9 @@ function CriarEventoDialog({ defaultDate, trigger, onCreated }: { defaultDate: D
             </div>
             <DialogFooter>
               <Button type="button" variant="outline" size="sm" onClick={() => setStep("form")}>Voltar</Button>
-              <Button type="button" size="sm" onClick={handleConfirm}>Confirmar e adicionar</Button>
+              <Button type="button" size="sm" onClick={handleConfirm} disabled={saving}>
+                {saving ? "A guardar..." : "Confirmar e adicionar"}
+              </Button>
             </DialogFooter>
           </div>
         )}
@@ -486,19 +515,43 @@ export default function FinancasCalendario() {
   const weekLabel = `${weekDays[0].toLocaleDateString("pt-PT", { day: "2-digit", month: "short" })} – ${weekDays[4].toLocaleDateString("pt-PT", { day: "2-digit", month: "short", year: "numeric" })}`;
   const monthLabel = monthCursor.toLocaleDateString("pt-PT", { month: "long", year: "numeric" });
 
-  const [events, setEvents] = useState<StoredEvent[]>(() => loadEvents());
-  useEffect(() => {
-    const refresh = () => setEvents(loadEvents());
-    window.addEventListener(CHANGE_EVENT, refresh);
-    window.addEventListener("storage", refresh);
-    return () => {
-      window.removeEventListener(CHANGE_EVENT, refresh);
-      window.removeEventListener("storage", refresh);
-    };
+  const [events, setEvents] = useState<StoredEvent[]>([]);
+  const [loadingEvents, setLoadingEvents] = useState(true);
+
+  const fetchEvents = useCallback(async () => {
+    setLoadingEvents(true);
+    const { data, error } = await (supabase as any)
+      .from("calendario_events")
+      .select("id,type,title,event_date,start_time,end_time,location,link,modalidade,participants,color")
+      .order("event_date", { ascending: true })
+      .order("start_time", { ascending: true });
+    if (error) {
+      toast.error("Não foi possível carregar os eventos do backend.");
+      setLoadingEvents(false);
+      return;
+    }
+    setEvents(((data ?? []) as any[]).map(mapDbEvent));
+    setLoadingEvents(false);
   }, []);
+
+  useEffect(() => {
+    fetchEvents();
+  }, [fetchEvents]);
   const [pedidosTab, setPedidosTab] = useState<"recebidos" | "enviados">("recebidos");
   const pedidosRecebidos: { id: string; title: string; from: string; when: string }[] = [];
-  const pedidosEnviados: { id: string; title: string; from: string; when: string }[] = [];
+  const pedidosEnviados: { id: string; title: string; from: string; when: string }[] = useMemo(() => (
+    events
+      .filter((event) => event.type === "reuniao" && (event.participants?.length ?? 0) > 0)
+      .map((event) => {
+        const names = event.participants?.map((p) => p.name).filter(Boolean) ?? [];
+        return {
+          id: event.id,
+          title: event.title,
+          from: names.length > 2 ? `Para ${names.slice(0, 2).join(", ")} +${names.length - 2}` : `Para ${names.join(", ")}`,
+          when: `${new Date(event.date + "T00:00").toLocaleDateString("pt-PT", { day: "2-digit", month: "short" })} · ${event.startTime}`,
+        };
+      })
+  ), [events]);
 
   const selectedDayEvents = events.filter((e) => e.date === toISO(selectedDate));
   const eventsByDate = useMemo(() => {
@@ -528,8 +581,9 @@ export default function FinancasCalendario() {
         right={
           <CriarEventoDialog
             defaultDate={selectedDate}
-            onCreated={(iso) => {
-              const d = new Date(iso + "T00:00");
+            onCreated={(event) => {
+              setEvents((prev) => [...prev.filter((e) => e.id !== event.id), event].sort((a, b) => `${a.date} ${a.startTime}`.localeCompare(`${b.date} ${b.startTime}`)));
+              const d = new Date(event.date + "T00:00");
               setSelectedDate(d);
               setWeekStart(startOfWeek(d));
               setMonthCursor(new Date(d.getFullYear(), d.getMonth(), 1));
@@ -598,7 +652,10 @@ export default function FinancasCalendario() {
                   </h3>
                   <CriarEventoDialog
                     defaultDate={selectedDate}
-                    onCreated={(iso) => setSelectedDate(new Date(iso + "T00:00"))}
+                    onCreated={(event) => {
+                      setEvents((prev) => [...prev.filter((e) => e.id !== event.id), event].sort((a, b) => `${a.date} ${a.startTime}`.localeCompare(`${b.date} ${b.startTime}`)));
+                      setSelectedDate(new Date(event.date + "T00:00"));
+                    }}
                     trigger={
                       <Button size="sm" className="gap-1.5 h-8">
                         <Plus className="w-3.5 h-3.5" /> Criar Evento
@@ -607,7 +664,15 @@ export default function FinancasCalendario() {
                   />
                 </div>
 
-                {selectedDayEvents.length === 0 ? (
+                {loadingEvents ? (
+                  <div className="flex flex-col items-center justify-center text-center py-12">
+                    <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center mb-2">
+                      <CalendarIcon className="w-5 h-5 text-muted-foreground" />
+                    </div>
+                    <p className="text-sm font-medium text-foreground">A carregar eventos</p>
+                    <p className="text-xs text-muted-foreground mt-1">A sincronizar com o backend.</p>
+                  </div>
+                ) : selectedDayEvents.length === 0 ? (
                   <div className="flex flex-col items-center justify-center text-center py-12">
                     <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center mb-2">
                       <CalendarIcon className="w-5 h-5 text-muted-foreground" />
