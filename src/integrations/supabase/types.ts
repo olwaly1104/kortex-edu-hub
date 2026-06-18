@@ -93,6 +93,7 @@ export type Database = {
       }
       calendario_events: {
         Row: {
+          categoria: string | null
           color: string
           created_at: string
           end_time: string | null
@@ -109,6 +110,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          categoria?: string | null
           color: string
           created_at?: string
           end_time?: string | null
@@ -125,6 +127,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          categoria?: string | null
           color?: string
           created_at?: string
           end_time?: string | null
