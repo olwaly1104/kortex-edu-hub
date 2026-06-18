@@ -16,7 +16,6 @@ import {
 type Draft = {
   primeiroNome: string;
   ultimoNome: string;
-  email: string;
   curso_id: string;
   ano: string;
   turma: string;
@@ -24,11 +23,26 @@ type Draft = {
 
 const anosPool = ["1", "2", "3", "4", "5", "6"];
 const turmasPool = ["A", "B", "C", "D", "E"];
+const EMAIL_DOMAIN = "upra.kor";
+
+const slug = (s: string) =>
+  s
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "")
+    .trim();
+
+const buildEmail = (primeiro: string, ultimo: string) => {
+  const p = slug(primeiro);
+  const u = slug(ultimo);
+  if (!p && !u) return "";
+  return `${[p, u].filter(Boolean).join(".")}@${EMAIL_DOMAIN}`;
+};
 
 const emptyDraft = (curso_id = ""): Draft => ({
   primeiroNome: "",
   ultimoNome: "",
-  email: "",
   curso_id,
   ano: "1",
   turma: "A",
