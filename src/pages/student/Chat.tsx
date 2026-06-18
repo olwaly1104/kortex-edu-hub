@@ -349,18 +349,18 @@ export default function StudentChat() {
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
+                  {c.other_modulo && (
+                    <div className="mb-0.5"><ModuleTag modulo={c.other_modulo} size="xs" /></div>
+                  )}
                   <div className="flex items-center justify-between gap-2">
                     <p className="text-sm font-medium truncate">{c.other_name}</p>
                     <span className="text-[10px] text-muted-foreground shrink-0">
                       {new Date(c.updated_at).toLocaleTimeString("pt-PT", { hour: "2-digit", minute: "2-digit" })}
                     </span>
                   </div>
-                  <div className="flex items-center gap-1.5 mt-0.5">
-                    {c.other_modulo && <ModuleTag modulo={c.other_modulo} size="xs" />}
-                    <p className="text-[11px] text-muted-foreground truncate flex-1">
-                      {c.last_message ?? "Sem mensagens"}
-                    </p>
-                  </div>
+                  <p className="text-[11px] text-muted-foreground truncate mt-0.5">
+                    {c.last_message ?? "Sem mensagens"}
+                  </p>
                 </div>
               </button>
             ))
