@@ -358,8 +358,10 @@ export default function GapCandidaturas() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b bg-muted/30">
-                <th className="text-left p-3 font-medium text-muted-foreground">ID Candidato</th>
+                <th className="text-left p-3 font-medium text-muted-foreground">ID</th>
                 <th className="text-center p-3 font-medium text-muted-foreground whitespace-nowrap">Data de Submissão</th>
+                <th className="text-left p-3 font-medium text-muted-foreground">Primeiro Nome</th>
+                <th className="text-left p-3 font-medium text-muted-foreground">Último Nome</th>
                 <th className="text-left p-3 font-medium text-muted-foreground">1ª Opção</th>
                 <th className="text-left p-3 font-medium text-muted-foreground">Etapa</th>
                 <th className="text-center p-3 font-medium text-muted-foreground">Estado</th>
@@ -372,22 +374,29 @@ export default function GapCandidaturas() {
                 const anoCand = d.getFullYear();
                 const displayId = `CAND-${anoCand}-${numCand}`;
                 const cron = buildCronologia(c);
-                // Current etapa = last entry where done, or first not-done
                 const lastDoneIdx = cron.reduce((acc, h, i) => (h.done ? i : acc), -1);
                 const currentIdx = lastDoneIdx < cron.length - 1 ? lastDoneIdx + 1 : lastDoneIdx;
                 const etapa = cron[Math.max(0, currentIdx)];
+                const parts = c.nome.trim().split(/\s+/);
+                const primeiro = parts[0] ?? "";
+                const ultimo = parts.length > 1 ? parts.slice(1).join(" ") : "";
                 return (
                   <tr key={c.id}
                     onClick={() => navigate(`/gap/candidaturas/${c.id}`)}
                     className="border-b last:border-0 hover:bg-muted/30 transition-colors cursor-pointer">
                     <td className="p-3">
-                      <p className="font-medium text-foreground text-sm leading-tight">{c.nome}</p>
-                      <p className="text-[10px] font-mono text-primary tabular-nums mt-0.5">{displayId}</p>
+                      <p className="text-[10px] font-mono text-primary tabular-nums">{displayId}</p>
                     </td>
                     <td className="p-3 text-center whitespace-nowrap">
                       <p className="text-xs font-medium text-foreground tabular-nums">
                         {d.toLocaleDateString("pt-AO", { day: "2-digit", month: "short", year: "numeric" })}
                       </p>
+                    </td>
+                    <td className="p-3">
+                      <p className="text-sm font-medium text-foreground leading-tight">{primeiro}</p>
+                    </td>
+                    <td className="p-3">
+                      <p className="text-sm font-medium text-foreground leading-tight">{ultimo || "—"}</p>
                     </td>
                     <td className="p-3">
                       <p className="text-xs text-foreground leading-tight">{c.cursoOpcao1}</p>
@@ -425,6 +434,7 @@ export default function GapCandidaturas() {
                 );
               })}
             </tbody>
+
           </table>
         </div>
         {filtered.length === 0 && <p className="text-center text-muted-foreground py-8 text-sm">Nenhuma candidatura encontrada.</p>}
