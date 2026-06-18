@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { OnboardingStepBanner } from "@/components/admin/OnboardingStepBanner";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -297,7 +298,7 @@ export default function AdminDiscentes() {
     window.open(data.signedUrl, "_blank");
   };
 
-  const GRID = "grid grid-cols-[36px_1fr_1fr_100px_70px_90px_70px_60px_60px_110px_1.4fr_56px] gap-2 px-4 py-2 items-center";
+  const GRID = "grid grid-cols-[36px_1fr_1fr_100px_90px_70px_60px_60px_70px_110px_1.4fr_56px] gap-2 px-4 py-2 items-center";
 
   return (
     <div className="p-6 lg:p-8 max-w-7xl mx-auto space-y-6 animate-fade-in">
@@ -371,11 +372,11 @@ export default function AdminDiscentes() {
             <span>Primeiro</span>
             <span>Último</span>
             <span>Nascimento</span>
-            <span>Regime</span>
             <span>Telemóvel</span>
             <span>Curso</span>
             <span>Ano</span>
             <span>Turma</span>
+            <span>Regime</span>
             <span>Docs</span>
             <span>Email</span>
             <span></span>
@@ -383,24 +384,31 @@ export default function AdminDiscentes() {
 
           <div className="divide-y">
             {filtered.map((r) => (
-              <div key={r.id} className={GRID}>
+              <div
+                key={r.id}
+                className={`${GRID} cursor-pointer hover:bg-muted/40 transition-colors`}
+                onClick={() => navigate(`/admin/discentes/${r.id}`)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => { if (e.key === "Enter") navigate(`/admin/discentes/${r.id}`); }}
+              >
                 <Avatar path={r.foto_url} name={`${r.primeiroNome} ${r.ultimoNome}`} />
                 <span className="text-xs font-medium truncate">{r.primeiroNome}</span>
                 <span className="text-xs truncate">{r.ultimoNome || "—"}</span>
                 <span className="text-xs tabular-nums text-muted-foreground">{r.nascimento || "—"}</span>
-                <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold w-fit ${r.regime === "bolseiro" ? "bg-amber-50 text-amber-700" : "bg-muted text-muted-foreground"}`}>
-                  {r.regime === "bolseiro" ? "Bolseiro" : "Normal"}
-                </span>
                 <span className="text-xs tabular-nums truncate">{r.telemovel || "—"}</span>
                 <span className="text-xs font-mono">{r.curso}</span>
                 <span className="text-xs tabular-nums">{r.ano}º</span>
                 <span className="text-xs tabular-nums">{r.turma}</span>
-                <div className="flex items-center gap-1">
+                <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold w-fit ${r.regime === "bolseiro" ? "bg-amber-50 text-amber-700" : "bg-muted text-muted-foreground"}`}>
+                  {r.regime === "bolseiro" ? "Bolseiro" : "Normal"}
+                </span>
+                <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
                   <DocPill label="BI" path={r.bilhete_url} onOpen={openDoc} Icon={IdCard} />
                   <DocPill label="Cert" path={r.certificado_url} onOpen={openDoc} Icon={FileText} />
                 </div>
                 <span className="text-[11px] text-muted-foreground truncate font-mono">{r.email}</span>
-                <div className="flex justify-end">
+                <div className="flex justify-end" onClick={(e) => e.stopPropagation()}>
                   <Button
                     size="icon"
                     variant="ghost"
