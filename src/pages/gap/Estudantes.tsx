@@ -105,14 +105,6 @@ export default function GapEstudantes() {
       {/* Table */}
       {isLoading ? (
         <Card className="p-12 text-center text-sm text-muted-foreground">A carregar discentes…</Card>
-      ) : rows.length === 0 ? (
-        <Card className="p-12 text-center border-dashed">
-          <div className="w-12 h-12 mx-auto rounded-full bg-muted text-muted-foreground flex items-center justify-center mb-3">
-            <GraduationCap className="w-6 h-6" />
-          </div>
-          <p className="text-sm font-semibold text-foreground">Nenhum discente encontrado</p>
-          <p className="text-xs text-muted-foreground mt-1">Ajuste a pesquisa ou registe novos estudantes na instituição.</p>
-        </Card>
       ) : (
         <Card className="overflow-hidden p-0">
           <table className="w-full text-sm">
@@ -126,30 +118,42 @@ export default function GapEstudantes() {
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {rows.map((r) => (
-                <tr
-                  key={r.id}
-                  onClick={() => r.matricula && navigate(`/gap/estudantes/${r.matricula}`)}
-                  className={cn("hover:bg-muted/30 transition-colors", r.matricula && "cursor-pointer")}
-                >
-                  <td className="py-3 px-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                        <GraduationCap className="w-4 h-4" />
-                      </div>
-                      <span className="font-semibold text-foreground">{r.primeiro} {r.ultimo}</span>
+              {rows.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="py-12 text-center">
+                    <div className="w-12 h-12 mx-auto rounded-full bg-muted text-muted-foreground flex items-center justify-center mb-3">
+                      <GraduationCap className="w-6 h-6" />
                     </div>
-                  </td>
-                  <td className="py-3 px-4 text-xs text-muted-foreground">{r.email || "—"}</td>
-                  <td className="py-3 px-4 text-xs font-mono text-foreground">{r.curso}</td>
-                  <td className="py-3 px-4 text-xs tabular-nums text-foreground">{r.ano}º · {r.turma}</td>
-                  <td className="py-3 px-4">
-                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700">
-                      Activo
-                    </span>
+                    <p className="text-sm font-semibold text-foreground">Nenhum discente encontrado</p>
+                    <p className="text-xs text-muted-foreground mt-1">Ajuste a pesquisa ou registe novos estudantes na instituição.</p>
                   </td>
                 </tr>
-              ))}
+              ) : (
+                rows.map((r) => (
+                  <tr
+                    key={r.id}
+                    onClick={() => r.matricula && navigate(`/gap/estudantes/${r.matricula}`)}
+                    className={cn("hover:bg-muted/30 transition-colors", r.matricula && "cursor-pointer")}
+                  >
+                    <td className="py-3 px-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                          <GraduationCap className="w-4 h-4" />
+                        </div>
+                        <span className="font-semibold text-foreground">{r.primeiro} {r.ultimo}</span>
+                      </div>
+                    </td>
+                    <td className="py-3 px-4 text-xs text-muted-foreground">{r.email || "—"}</td>
+                    <td className="py-3 px-4 text-xs font-mono text-foreground">{r.curso}</td>
+                    <td className="py-3 px-4 text-xs tabular-nums text-foreground">{r.ano}º · {r.turma}</td>
+                    <td className="py-3 px-4">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700">
+                        Activo
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </Card>
