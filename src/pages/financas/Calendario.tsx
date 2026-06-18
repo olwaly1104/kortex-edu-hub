@@ -71,10 +71,21 @@ function CriarEventoDialog({ defaultDate, trigger, onCreated }: { defaultDate: D
   const [type, setType] = useState<EventType>("reuniao");
   const [modalidade, setModalidade] = useState<Modalidade>("presencial");
   const [title, setTitle] = useState("");
+  const nowRoundedHHMM = () => {
+    const d = new Date();
+    d.setMinutes(d.getMinutes() + 30 - (d.getMinutes() % 30));
+    d.setSeconds(0, 0);
+    return d.toTimeString().slice(0, 5);
+  };
   const initialDate = defaultDate.toISOString().split("T")[0];
   const [date, setDate] = useState(initialDate < todayISO ? todayISO : initialDate);
-  const [startTime, setStartTime] = useState("09:00");
-  const [endTime, setEndTime] = useState("10:00");
+  const initialStart = (initialDate < todayISO ? todayISO : initialDate) === todayISO ? nowRoundedHHMM() : "09:00";
+  const [startTime, setStartTime] = useState(initialStart);
+  const [endTime, setEndTime] = useState(() => {
+    const [h, m] = initialStart.split(":").map(Number);
+    const end = new Date(); end.setHours(h + 1, m, 0, 0);
+    return end.toTimeString().slice(0, 5);
+  });
   const [location, setLocation] = useState("");
   const [link, setLink] = useState("");
   
