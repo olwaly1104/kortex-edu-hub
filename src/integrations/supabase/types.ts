@@ -483,6 +483,51 @@ export type Database = {
         }
         Relationships: []
       }
+      orcamentos: {
+        Row: {
+          created_at: string
+          department: string
+          id: string
+          name: string
+          owner_user_id: string
+          period: string
+          responsavel: string
+          responsavel_role: string
+          spent: number
+          status: string
+          total_budget: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          department?: string
+          id?: string
+          name: string
+          owner_user_id: string
+          period?: string
+          responsavel?: string
+          responsavel_role?: string
+          spent?: number
+          status?: string
+          total_budget?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          department?: string
+          id?: string
+          name?: string
+          owner_user_id?: string
+          period?: string
+          responsavel?: string
+          responsavel_role?: string
+          spent?: number
+          status?: string
+          total_budget?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
