@@ -1,12 +1,16 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { OnboardingStepBanner } from "@/components/admin/OnboardingStepBanner";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { GraduationCap, Plus, Trash2, Users, BookOpen, Layers, Loader2 } from "lucide-react";
+import {
+  GraduationCap, Plus, Trash2, Users, BookOpen, Layers, Loader2,
+  Camera, Upload, FileText, IdCard, Check, X,
+} from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 import {
   useEstudantes,
   useCursos,
@@ -18,11 +22,23 @@ type Regime = "bolseiro" | "normal";
 type Genero = "M" | "F" | "Outro";
 
 type Draft = {
+  fotoFile: File | null;
+  fotoPreview: string;
   primeiroNome: string;
   ultimoNome: string;
   nascimento: string;
   genero: Genero;
   regime: Regime;
+  telemovel: string;
+  bilhete: string;
+  bilheteFile: File | null;
+  certificadoFile: File | null;
+  provincia: string;
+  municipio: string;
+  endereco: string;
+  enc_nome: string;
+  enc_parentesco: string;
+  enc_telefone: string;
   curso_id: string;
   ano: string;
   turma: string;
@@ -43,15 +59,39 @@ const buildEmail = (primeiro: string, ultimo: string) => {
 };
 
 const emptyDraft = (curso_id = ""): Draft => ({
+  fotoFile: null,
+  fotoPreview: "",
   primeiroNome: "",
   ultimoNome: "",
   nascimento: "",
   genero: "M",
   regime: "normal",
+  telemovel: "",
+  bilhete: "",
+  bilheteFile: null,
+  certificadoFile: null,
+  provincia: "",
+  municipio: "",
+  endereco: "",
+  enc_nome: "",
+  enc_parentesco: "",
+  enc_telefone: "",
   curso_id,
   ano: "1",
   turma: "A",
 });
+
+async function uploadDoc(file: File, prefix: string, email: string): Promise<string> {
+  const ext = file.name.split(".").pop() || "bin";
+  const safeEmail = email.replace(/[^a-z0-9.@_-]/gi, "_");
+  const path = `${safeEmail}/${prefix}-${Date.now()}.${ext}`;
+  const { error } = await supabase.storage.from("discentes").upload(path, file, {
+    upsert: true,
+    contentType: file.type || undefined,
+  });
+  if (error) throw error;
+  return path;
+}
 
 export default function AdminDiscentes() {
   const { data: rows = [], isLoading } = useEstudantes();
@@ -61,6 +101,10 @@ export default function AdminDiscentes() {
 
   const [filtroCurso, setFiltroCurso] = useState<string>("all");
   const [draft, setDraft] = useState<Draft>(emptyDraft());
+  const [uploading, setUploading] = useState(false);
+  const fotoInput = useRef<HTMLInputElement>(null);
+  const biInput = useRef<HTMLInputElement>(null);
+  const certInput = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!draft.curso_id && cursos.length > 0) {
@@ -88,8 +132,12 @@ export default function AdminDiscentes() {
           ano: r.ano as string,
           turma: r.turma as string,
           nascimento: (r.nascimento as string) || "",
-          genero: (r.genero as string) || "—",
           regime: ((r.regime as string) || "normal") as Regime,
+          telemovel: (r.telemovel as string) || "",
+          provincia: (r.provincia as string) || "",
+          foto_url: (r.foto_url as string) || null,
+          bilhete_url: (r.bilhete_url as string) || null,
+          certificado_url: (r.certificado_url as string) || null,
         };
       }),
     [rows, cursoCode],
@@ -114,17 +162,30 @@ export default function AdminDiscentes() {
 
   const previewEmail = buildEmail(draft.primeiroNome, draft.ultimoNome);
 
+  const onFoto = (f: File | null) => {
+    if (!f) return;
+    setDraft((d) => ({ ...d, fotoFile: f, fotoPreview: URL.createObjectURL(f) }));
+  };
+
   const addRow = async () => {
     if (!draft.primeiroNome.trim() || !draft.curso_id) {
-      toast.error("Preencha nome e curso");
+      toast.error("Preencha primeiro nome e curso");
       return;
     }
     if (!previewEmail) {
       toast.error("Não foi possível gerar email a partir do nome");
       return;
     }
-    const nome = `${draft.primeiroNome.trim()} ${draft.ultimoNome.trim()}`.trim();
+    setUploading(true);
     try {
+      let foto_url: string | null = null;
+      let bilhete_url: string | null = null;
+      let certificado_url: string | null = null;
+      if (draft.fotoFile) foto_url = await uploadDoc(draft.fotoFile, "foto", previewEmail);
+      if (draft.bilheteFile) bilhete_url = await uploadDoc(draft.bilheteFile, "bi", previewEmail);
+      if (draft.certificadoFile) certificado_url = await uploadDoc(draft.certificadoFile, "certificado", previewEmail);
+
+      const nome = `${draft.primeiroNome.trim()} ${draft.ultimoNome.trim()}`.trim();
       await createMut.mutateAsync({
         curso_id: draft.curso_id,
         nome,
@@ -136,11 +197,27 @@ export default function AdminDiscentes() {
         nascimento: draft.nascimento || null,
         genero: draft.genero,
         regime: draft.regime,
+        telemovel: draft.telemovel.trim() || null,
+        bilhete: draft.bilhete.trim() || null,
+        provincia: draft.provincia.trim() || null,
+        municipio: draft.municipio.trim() || null,
+        endereco: draft.endereco.trim() || null,
+        enc_nome: draft.enc_nome.trim() || null,
+        enc_parentesco: draft.enc_parentesco.trim() || null,
+        enc_telefone: draft.enc_telefone.trim() || null,
+        foto_url,
+        bilhete_url,
+        certificado_url,
       });
       toast.success(`Discente adicionado · ${previewEmail}`);
       setDraft(emptyDraft(draft.curso_id));
+      if (fotoInput.current) fotoInput.current.value = "";
+      if (biInput.current) biInput.current.value = "";
+      if (certInput.current) certInput.current.value = "";
     } catch (e: any) {
       toast.error(e?.message || "Erro ao adicionar discente");
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -153,7 +230,16 @@ export default function AdminDiscentes() {
     }
   };
 
-  const GRID = "grid grid-cols-[1.1fr_1fr_100px_70px_90px_90px_60px_60px_1.5fr_56px] gap-2 px-4 py-2 items-center";
+  const openDoc = async (path: string) => {
+    const { data, error } = await supabase.storage.from("discentes").createSignedUrl(path, 300);
+    if (error || !data?.signedUrl) {
+      toast.error("Não foi possível abrir o documento");
+      return;
+    }
+    window.open(data.signedUrl, "_blank");
+  };
+
+  const GRID = "grid grid-cols-[36px_1fr_1fr_100px_70px_90px_70px_60px_60px_110px_1.4fr_56px] gap-2 px-4 py-2 items-center";
 
   return (
     <div className="p-6 lg:p-8 max-w-7xl mx-auto space-y-6 animate-fade-in">
@@ -165,7 +251,7 @@ export default function AdminDiscentes() {
         </div>
         <div>
           <h1 className="text-lg font-semibold leading-tight">Discentes</h1>
-          <p className="text-xs text-muted-foreground">Registe todos os estudantes da instituição. Email institucional é gerado automaticamente.</p>
+          <p className="text-xs text-muted-foreground">Registo completo do estudante. Email institucional é gerado automaticamente.</p>
         </div>
       </div>
 
@@ -203,14 +289,16 @@ export default function AdminDiscentes() {
 
       <Card className="overflow-hidden">
         <div className={`${GRID} text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b !py-2`}>
+          <span></span>
           <span>Primeiro</span>
           <span>Último</span>
           <span>Nascimento</span>
-          <span>Género</span>
           <span>Regime</span>
+          <span>Telemóvel</span>
           <span>Curso</span>
           <span>Ano</span>
           <span>Turma</span>
+          <span>Docs</span>
           <span>Email</span>
           <span></span>
         </div>
@@ -225,16 +313,21 @@ export default function AdminDiscentes() {
           ) : (
             filtered.map((r) => (
               <div key={r.id} className={GRID}>
+                <Avatar path={r.foto_url} name={`${r.primeiroNome} ${r.ultimoNome}`} />
                 <span className="text-xs font-medium truncate">{r.primeiroNome}</span>
                 <span className="text-xs truncate">{r.ultimoNome || "—"}</span>
                 <span className="text-xs tabular-nums text-muted-foreground">{r.nascimento || "—"}</span>
-                <span className="text-xs">{r.genero}</span>
                 <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold w-fit ${r.regime === "bolseiro" ? "bg-amber-50 text-amber-700" : "bg-muted text-muted-foreground"}`}>
                   {r.regime === "bolseiro" ? "Bolseiro" : "Normal"}
                 </span>
+                <span className="text-xs tabular-nums truncate">{r.telemovel || "—"}</span>
                 <span className="text-xs font-mono">{r.curso}</span>
                 <span className="text-xs tabular-nums">{r.ano}º</span>
                 <span className="text-xs tabular-nums">{r.turma}</span>
+                <div className="flex items-center gap-1">
+                  <DocPill label="BI" path={r.bilhete_url} onOpen={openDoc} Icon={IdCard} />
+                  <DocPill label="Cert" path={r.certificado_url} onOpen={openDoc} Icon={FileText} />
+                </div>
                 <span className="text-[11px] text-muted-foreground truncate font-mono">{r.email}</span>
                 <div className="flex justify-end">
                   <Button
@@ -252,28 +345,64 @@ export default function AdminDiscentes() {
           )}
         </div>
 
-        {/* Inline add row */}
-        <div className="border-t bg-muted/10 px-4 py-3 space-y-3">
+        {/* Inline add form */}
+        <div className="border-t bg-muted/10 px-4 py-4 space-y-4">
           <p className="text-[10px] uppercase tracking-wide text-muted-foreground font-semibold">Adicionar discente</p>
+
+          {/* Photo + identity */}
+          <div className="flex items-start gap-4">
+            <button
+              type="button"
+              onClick={() => fotoInput.current?.click()}
+              className="w-20 h-20 shrink-0 rounded-lg border-2 border-dashed border-input bg-background flex items-center justify-center overflow-hidden hover:border-primary hover:bg-primary/5 transition"
+            >
+              {draft.fotoPreview ? (
+                <img src={draft.fotoPreview} alt="foto" className="w-full h-full object-cover" />
+              ) : (
+                <div className="flex flex-col items-center text-muted-foreground">
+                  <Camera className="w-5 h-5 mb-0.5" />
+                  <span className="text-[9px]">Foto</span>
+                </div>
+              )}
+              <input
+                ref={fotoInput}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => onFoto(e.target.files?.[0] || null)}
+              />
+            </button>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 flex-1">
+              <Field label="Primeiro nome">
+                <Input value={draft.primeiroNome} onChange={(e) => setF("primeiroNome", e.target.value)} placeholder="Ana" className="h-8 text-xs" />
+              </Field>
+              <Field label="Último nome">
+                <Input value={draft.ultimoNome} onChange={(e) => setF("ultimoNome", e.target.value)} placeholder="Silva" className="h-8 text-xs" />
+              </Field>
+              <Field label="Data de nascimento">
+                <Input type="date" value={draft.nascimento} onChange={(e) => setF("nascimento", e.target.value)} className="h-8 text-xs" />
+              </Field>
+              <Field label="Género">
+                <Select value={draft.genero} onValueChange={(v) => setF("genero", v as Genero)}>
+                  <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="M">Masculino</SelectItem>
+                    <SelectItem value="F">Feminino</SelectItem>
+                    <SelectItem value="Outro">Outro</SelectItem>
+                  </SelectContent>
+                </Select>
+              </Field>
+            </div>
+          </div>
+
+          {/* Contact + identity docs */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-            <Field label="Primeiro nome">
-              <Input value={draft.primeiroNome} onChange={(e) => setF("primeiroNome", e.target.value)} placeholder="Ana" className="h-8 text-xs" />
+            <Field label="Telemóvel / Contacto">
+              <Input value={draft.telemovel} onChange={(e) => setF("telemovel", e.target.value)} placeholder="+244 9XX XXX XXX" className="h-8 text-xs" />
             </Field>
-            <Field label="Último nome">
-              <Input value={draft.ultimoNome} onChange={(e) => setF("ultimoNome", e.target.value)} placeholder="Silva" className="h-8 text-xs" />
-            </Field>
-            <Field label="Data de nascimento">
-              <Input type="date" value={draft.nascimento} onChange={(e) => setF("nascimento", e.target.value)} className="h-8 text-xs" />
-            </Field>
-            <Field label="Género">
-              <Select value={draft.genero} onValueChange={(v) => setF("genero", v as Genero)}>
-                <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="M">Masculino</SelectItem>
-                  <SelectItem value="F">Feminino</SelectItem>
-                  <SelectItem value="Outro">Outro</SelectItem>
-                </SelectContent>
-              </Select>
+            <Field label="Nº Bilhete de Identidade">
+              <Input value={draft.bilhete} onChange={(e) => setF("bilhete", e.target.value)} placeholder="00000000XX000" className="h-8 text-xs" />
             </Field>
             <Field label="Regime">
               <Select value={draft.regime} onValueChange={(v) => setF("regime", v as Regime)}>
@@ -294,6 +423,10 @@ export default function AdminDiscentes() {
                 </SelectContent>
               </Select>
             </Field>
+          </div>
+
+          {/* Ano / Turma + uploads */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
             <Field label="Ano">
               <Select value={draft.ano} onValueChange={(v) => setF("ano", v)}>
                 <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
@@ -306,8 +439,61 @@ export default function AdminDiscentes() {
                 <SelectContent>{turmasPool.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
               </Select>
             </Field>
+            <Field label="Bilhete (upload)">
+              <FileButton
+                file={draft.bilheteFile}
+                onPick={(f) => setF("bilheteFile", f)}
+                inputRef={biInput}
+                accept="image/*,application/pdf"
+                Icon={IdCard}
+              />
+            </Field>
+            <Field label="Certificado Ensino Médio (upload)">
+              <FileButton
+                file={draft.certificadoFile}
+                onPick={(f) => setF("certificadoFile", f)}
+                inputRef={certInput}
+                accept="image/*,application/pdf"
+                Icon={FileText}
+              />
+            </Field>
           </div>
 
+          {/* Address */}
+          <div>
+            <p className="text-[10px] uppercase tracking-wide text-muted-foreground font-semibold mb-2">Morada</p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              <Field label="Província">
+                <Input value={draft.provincia} onChange={(e) => setF("provincia", e.target.value)} placeholder="Luanda" className="h-8 text-xs" />
+              </Field>
+              <Field label="Município">
+                <Input value={draft.municipio} onChange={(e) => setF("municipio", e.target.value)} placeholder="Belas" className="h-8 text-xs" />
+              </Field>
+              <div className="md:col-span-2">
+                <Field label="Endereço">
+                  <Input value={draft.endereco} onChange={(e) => setF("endereco", e.target.value)} placeholder="Rua, bairro, nº" className="h-8 text-xs" />
+                </Field>
+              </div>
+            </div>
+          </div>
+
+          {/* Encarregado */}
+          <div>
+            <p className="text-[10px] uppercase tracking-wide text-muted-foreground font-semibold mb-2">Encarregado / Responsável</p>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+              <Field label="Nome do responsável">
+                <Input value={draft.enc_nome} onChange={(e) => setF("enc_nome", e.target.value)} placeholder="João Silva" className="h-8 text-xs" />
+              </Field>
+              <Field label="Parentesco">
+                <Input value={draft.enc_parentesco} onChange={(e) => setF("enc_parentesco", e.target.value)} placeholder="Pai / Mãe / Tutor" className="h-8 text-xs" />
+              </Field>
+              <Field label="Contacto do responsável">
+                <Input value={draft.enc_telefone} onChange={(e) => setF("enc_telefone", e.target.value)} placeholder="+244 9XX XXX XXX" className="h-8 text-xs" />
+              </Field>
+            </div>
+          </div>
+
+          {/* Auto email */}
           <Field label="Email institucional (gerado automaticamente)">
             <div className="h-8 px-2.5 flex items-center text-[11px] text-muted-foreground bg-background border border-input rounded-md truncate font-mono">
               {previewEmail || `nome.apelido@${EMAIL_DOMAIN}`}
@@ -318,11 +504,11 @@ export default function AdminDiscentes() {
             <Button
               size="sm"
               onClick={addRow}
-              disabled={createMut.isPending || !draft.primeiroNome.trim() || !draft.curso_id}
+              disabled={uploading || createMut.isPending || !draft.primeiroNome.trim() || !draft.curso_id}
               className="h-8 gap-1.5"
             >
-              {createMut.isPending ? (
-                <><Loader2 className="w-3.5 h-3.5 animate-spin" /> A adicionar…</>
+              {(uploading || createMut.isPending) ? (
+                <><Loader2 className="w-3.5 h-3.5 animate-spin" /> A guardar…</>
               ) : (
                 <><Plus className="w-3.5 h-3.5" /> Adicionar discente</>
               )}
@@ -339,6 +525,91 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
     <div className="space-y-1">
       <Label className="text-[10px] uppercase tracking-wide text-muted-foreground font-semibold">{label}</Label>
       {children}
+    </div>
+  );
+}
+
+function FileButton({
+  file, onPick, inputRef, accept, Icon,
+}: {
+  file: File | null;
+  onPick: (f: File | null) => void;
+  inputRef: React.RefObject<HTMLInputElement>;
+  accept: string;
+  Icon: React.ComponentType<{ className?: string }>;
+}) {
+  return (
+    <div className="flex items-center gap-1">
+      <button
+        type="button"
+        onClick={() => inputRef.current?.click()}
+        className={`flex-1 h-8 px-2 rounded-md border text-[11px] flex items-center gap-1.5 truncate transition ${file ? "border-emerald-300 bg-emerald-50 text-emerald-700" : "border-dashed border-input bg-background text-muted-foreground hover:border-primary hover:text-primary"}`}
+      >
+        {file ? <Check className="w-3.5 h-3.5 shrink-0" /> : <Upload className="w-3.5 h-3.5 shrink-0" />}
+        <span className="truncate">{file ? file.name : "Carregar ficheiro"}</span>
+        <Icon className="w-3.5 h-3.5 ml-auto shrink-0 opacity-70" />
+      </button>
+      {file && (
+        <button
+          type="button"
+          onClick={() => { onPick(null); if (inputRef.current) inputRef.current.value = ""; }}
+          className="h-8 w-8 rounded-md border border-input bg-background text-muted-foreground hover:text-destructive flex items-center justify-center"
+          aria-label="Remover"
+        >
+          <X className="w-3.5 h-3.5" />
+        </button>
+      )}
+      <input
+        ref={inputRef}
+        type="file"
+        accept={accept}
+        className="hidden"
+        onChange={(e) => onPick(e.target.files?.[0] || null)}
+      />
+    </div>
+  );
+}
+
+function DocPill({
+  label, path, onOpen, Icon,
+}: {
+  label: string;
+  path: string | null;
+  onOpen: (p: string) => void;
+  Icon: React.ComponentType<{ className?: string }>;
+}) {
+  if (!path) {
+    return (
+      <span className="inline-flex items-center gap-0.5 text-[9px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
+        <Icon className="w-2.5 h-2.5" /> {label}
+      </span>
+    );
+  }
+  return (
+    <button
+      type="button"
+      onClick={() => onOpen(path)}
+      className="inline-flex items-center gap-0.5 text-[9px] px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-semibold"
+    >
+      <Icon className="w-2.5 h-2.5" /> {label}
+    </button>
+  );
+}
+
+function Avatar({ path, name }: { path: string | null; name: string }) {
+  const [url, setUrl] = useState<string | null>(null);
+  useEffect(() => {
+    let mounted = true;
+    if (!path) { setUrl(null); return; }
+    supabase.storage.from("discentes").createSignedUrl(path, 3600).then(({ data }) => {
+      if (mounted) setUrl(data?.signedUrl || null);
+    });
+    return () => { mounted = false; };
+  }, [path]);
+  const initials = name.split(/\s+/).filter(Boolean).slice(0, 2).map((p) => p[0]?.toUpperCase()).join("") || "?";
+  return (
+    <div className="w-8 h-8 rounded-full bg-muted overflow-hidden flex items-center justify-center text-[10px] font-semibold text-muted-foreground">
+      {url ? <img src={url} alt={name} className="w-full h-full object-cover" /> : initials}
     </div>
   );
 }
