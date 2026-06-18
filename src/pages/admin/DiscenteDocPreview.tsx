@@ -67,6 +67,11 @@ export default function DiscenteDocPreview({
 }: Props) {
   const { toast } = useToast();
 
+  const encParts = (d.enc_nome || "").trim().split(/\s+/).filter(Boolean);
+  const encPrimeiro = encParts[0] || "";
+  const encUltimo = encParts.length > 1 ? encParts.slice(1).join(" ") : "";
+
+
   const docs: { nome: string; ok: boolean }[] = [
     { nome: "Bilhete de Identidade", ok: !!d.bilhete_url },
     { nome: "Certificado Ensino Médio", ok: !!d.certificado_url },
@@ -95,6 +100,7 @@ export default function DiscenteDocPreview({
         ["Ano curricular", `${d.ano}º Ano`],
         ["Turma", `Turma ${d.turma}`],
         ["Regime", regimeLabel(d.regime)],
+        ["Data de matriculação", fmtDataShort(d.created_at)],
         ["Email institucional", d.email],
       ],
     },
@@ -110,7 +116,8 @@ export default function DiscenteDocPreview({
     {
       title: "Encarregado de Educação",
       rows: [
-        ["Nome", d.enc_nome || "—"],
+        ["Primeiro nome", encPrimeiro || "—"],
+        ["Último nome", encUltimo || "—"],
         ["Parentesco", d.enc_parentesco || "—"],
         ["Contacto telefónico", d.enc_telefone || "—"],
       ],
