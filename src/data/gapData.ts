@@ -223,7 +223,7 @@ export const gapKpis = {
   atendimentosHoje: gapAtendimentos.filter(a => a.data === "2025-12-16" && a.estado === "agendado").length,
   estudantesAtivos: gapEstudantesSeguimento.length,
   estudantesRiscoAlto: gapEstudantesSeguimento.filter(e => e.risco === "alto").length,
-  satisfacao: 94,
+  satisfacao: 0,
 };
 
 export const solicitacoesPorDestino = (Object.keys(destinoConfig) as Destino[]).map(d => ({
