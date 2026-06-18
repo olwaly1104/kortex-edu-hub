@@ -73,11 +73,11 @@ export default function StudentChat() {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const loadConversations = async () => {
-    if (!user) return;
+    if (!uid) return;
     const { data: parts } = await (supabase as any)
       .from("conversation_participants")
       .select("conversation_id")
-      .eq("user_id", user.id);
+      .eq("user_id", uid);
     const convIds = (parts ?? []).map((p: any) => p.conversation_id);
     if (convIds.length === 0) {
       setConversations([]);
@@ -99,7 +99,7 @@ export default function StudentChat() {
           .from("conversation_participants")
           .select("user_id")
           .eq("conversation_id", c.id);
-        const otherId = (others ?? []).find((o: any) => o.user_id !== user.id)?.user_id;
+        const otherId = (others ?? []).find((o: any) => o.user_id !== uid)?.user_id;
         if (otherId) {
           other_id = otherId;
           const match = contacts.find((ct) => ct.id === otherId);
@@ -136,7 +136,7 @@ export default function StudentChat() {
   useEffect(() => {
     loadConversations();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id, contacts.length]);
+  }, [uid, contacts.length]);
 
   useEffect(() => {
     if (!selectedId) {
@@ -178,7 +178,7 @@ export default function StudentChat() {
     setDraft("");
     await (supabase as any)
       .from("messages")
-      .insert({ conversation_id: selectedId, sender_id: user.id, content });
+      .insert({ conversation_id: selectedId, sender_id: uid, content });
     loadConversations();
   };
 
@@ -422,7 +422,7 @@ export default function StudentChat() {
                       <div className="flex-1 h-px bg-border/60" />
                     </div>
                     {g.items.map((m) => {
-                      const own = m.sender_id === user?.id;
+                      const own = m.sender_id === uid;
                       return (
                         <div key={m.id} className={cn("flex", own ? "justify-end" : "justify-start")}>
                           <div
