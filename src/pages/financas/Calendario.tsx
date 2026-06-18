@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useCallback } from "react";
 import { FinHeader } from "./_FinHeader";
 import { useInstitutionContacts } from "@/hooks/useInstitutionContacts";
 import { Card } from "@/components/ui/card";
@@ -159,7 +159,11 @@ function CriarEventoDialog({ defaultDate, trigger }: { defaultDate: Date; trigge
                     <button
                       key={m.value}
                       type="button"
-                      onClick={() => setModalidade(m.value)}
+                      onClick={() => {
+                        setModalidade(m.value);
+                        if (m.value === "kortex") setLink(generateKortexLink());
+                        else setLink("");
+                      }}
                       className={cn(
                         "flex items-center gap-1.5 px-3 h-7 rounded text-xs font-medium transition-all",
                         active ? "bg-card text-primary shadow-sm" : "text-muted-foreground hover:text-foreground"
@@ -188,7 +192,10 @@ function CriarEventoDialog({ defaultDate, trigger }: { defaultDate: Date; trigge
                   </SelectContent>
                 </Select>
               ) : (
-                <Input value={link} onChange={(e) => setLink(e.target.value)} placeholder="Link da chamada Kortex..." className="h-9" />
+                <div className="flex items-center gap-2">
+                  <Video className="w-3.5 h-3.5 text-primary shrink-0" />
+                  <Input value={link} readOnly className="h-9 text-xs font-medium text-primary bg-primary/5 border-primary/20" />
+                </div>
               )}
             </div>
           )}
@@ -292,6 +299,11 @@ function CriarEventoDialog({ defaultDate, trigger }: { defaultDate: Date; trigge
 
 function initials(name: string) {
   return name.split(" ").filter(Boolean).map((n) => n[0]).slice(0, 2).join("").toUpperCase();
+}
+
+function generateKortexLink() {
+  const id = Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
+  return `https://kortex.upra.kor/meet/${id}`;
 }
 
 function startOfWeek(d: Date) {
