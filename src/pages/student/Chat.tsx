@@ -90,6 +90,7 @@ export default function StudentChat() {
   const [call, setCall] = useState<{ mode: "audio" | "video"; name: string } | null>(null);
   const [onlineIds, setOnlineIds] = useState<Set<string>>(new Set());
   const [lastSeen, setLastSeen] = useState<Record<string, string | null>>({});
+  const [userRoles, setUserRoles] = useState<Record<string, string | null>>({});
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
