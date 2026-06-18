@@ -476,7 +476,7 @@ function AppRoutes() {
         <Route path="/gap/agendamentos/:id" element={<GapAtendimentoDetail />} />
         <Route path="/gap/estudantes" element={<GapEstudantes />} />
         <Route path="/gap/estudantes/:matricula" element={<GapEstudanteProfile />} />
-        <Route path="/gap/cadastrar-discentes" element={<AdminOnboardingEstudantes />} />
+        
         <Route path="/gap/candidaturas" element={<GapCandidaturas />} />
         <Route path="/gap/candidaturas/:id" element={<GapCandidaturaDetail />} />
         <Route path="/gap/configuracao" element={<GapConfiguracao />} />
