@@ -649,6 +649,7 @@ export default function FinancasCalendario() {
               setSelectedDate(d);
               setWeekStart(startOfWeek(d));
               setMonthCursor(new Date(d.getFullYear(), d.getMonth(), 1));
+              setView("week");
             }}
             trigger={
               <Button size="sm" className="gap-2 h-8">
