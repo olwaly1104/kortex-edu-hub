@@ -226,7 +226,7 @@ export default function AdminInicio() {
       </div>
 
       <div className="space-y-3">
-        {GROUPS.map((g) => {
+        {visibleGroups.map((g) => {
           const GIcon = g.icon;
           const gDone = g.steps.filter((t) => progress[t.key]).length;
           const gTotal = g.steps.length;
