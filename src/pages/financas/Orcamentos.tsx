@@ -1,14 +1,32 @@
 import { useState, useMemo } from "react";
-import { Search, X, FolderOpen, Wallet, AlertTriangle, CheckCircle2, ArrowUpDown } from "lucide-react";
+import { Search, X, FolderOpen, Wallet, AlertTriangle, CheckCircle2, ArrowUpDown, Plus } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Progress } from "@/components/ui/progress";
-import { formatCurrency, orcamentos, type Budget } from "@/data/financeModuleData";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { formatCurrency } from "@/data/financeModuleData";
 import { cn } from "@/lib/utils";
 import { FinHeader } from "./_FinHeader";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+
+type Budget = {
+  id: string;
+  name: string;
+  department: string;
+  total_budget: number;
+  spent: number;
+  period: string;
+  status: "activo" | "em_revisao" | "esgotado";
+  responsavel: string;
+  responsavel_role: string;
+};
 
 type SortField = "total" | "spent" | "remaining" | "usage";
 type SortDir = "asc" | "desc";
@@ -20,11 +38,65 @@ const statusColors: Record<Budget["status"], string> = {
 };
 const statusLabels: Record<Budget["status"], string> = { activo: "Activo", em_revisao: "Em revisão", esgotado: "Esgotado" };
 
+const QK = ["institution", "orcamentos"] as const;
+
 export default function Orcamentos() {
+  const qc = useQueryClient();
+  const { toast } = useToast();
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("todos");
   const [sortField, setSortField] = useState<SortField | null>(null);
   const [sortDir, setSortDir] = useState<SortDir>("desc");
+  const [open, setOpen] = useState(false);
+  const [form, setForm] = useState({
+    name: "",
+    department: "",
+    total_budget: "",
+    spent: "",
+    period: "",
+    status: "activo" as Budget["status"],
+    responsavel: "",
+    responsavel_role: "",
+  });
+
+  const { data: orcamentos = [] } = useQuery({
+    queryKey: QK,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("orcamentos")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return (data ?? []) as Budget[];
+    },
+  });
+
+  const createMutation = useMutation({
+    mutationFn: async () => {
+      const { data: userData } = await supabase.auth.getUser();
+      const uid = userData.user?.id;
+      if (!uid) throw new Error("Não autenticado");
+      const { error } = await supabase.from("orcamentos").insert({
+        owner_user_id: uid,
+        name: form.name,
+        department: form.department,
+        total_budget: Number(form.total_budget) || 0,
+        spent: Number(form.spent) || 0,
+        period: form.period,
+        status: form.status,
+        responsavel: form.responsavel,
+        responsavel_role: form.responsavel_role,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: QK });
+      toast({ title: "Orçamento criado" });
+      setOpen(false);
+      setForm({ name: "", department: "", total_budget: "", spent: "", period: "", status: "activo", responsavel: "", responsavel_role: "" });
+    },
+    onError: (e: any) => toast({ title: "Erro", description: e.message, variant: "destructive" }),
+  });
 
   const isSortActive = sortField !== null;
   const isStatusActive = filterStatus !== "todos";
@@ -37,17 +109,17 @@ export default function Orcamentos() {
       .filter(o => filterStatus === "todos" || o.status === filterStatus);
     if (sortField) {
       list = [...list].sort((a, b) => {
-        const get = (o: Budget) => sortField === "total" ? o.totalBudget : sortField === "spent" ? o.spent : sortField === "remaining" ? (o.totalBudget - o.spent) : (o.spent / o.totalBudget);
+        const get = (o: Budget) => sortField === "total" ? o.total_budget : sortField === "spent" ? o.spent : sortField === "remaining" ? (o.total_budget - o.spent) : (o.total_budget > 0 ? o.spent / o.total_budget : 0);
         return sortDir === "asc" ? get(a) - get(b) : get(b) - get(a);
       });
     }
     return list;
-  }, [search, sortField, sortDir, filterStatus]);
+  }, [orcamentos, search, sortField, sortDir, filterStatus]);
 
-  const totalBudget = orcamentos.reduce((s, o) => s + o.totalBudget, 0);
-  const totalSpent = orcamentos.reduce((s, o) => s + o.spent, 0);
+  const totalBudget = orcamentos.reduce((s, o) => s + Number(o.total_budget), 0);
+  const totalSpent = orcamentos.reduce((s, o) => s + Number(o.spent), 0);
   const totalRemaining = totalBudget - totalSpent;
-  const emRisco = orcamentos.filter(o => o.spent / o.totalBudget >= 0.9 && o.status !== "esgotado").length;
+  const emRisco = orcamentos.filter(o => o.total_budget > 0 && o.spent / o.total_budget >= 0.9 && o.status !== "esgotado").length;
 
   const resetAll = () => { setFilterStatus("todos"); setSortField(null); setSortDir("desc"); setSearch(""); };
 
@@ -57,6 +129,40 @@ export default function Orcamentos() {
         title="Orçamentos"
         subtitle="Gestão e acompanhamento dos orçamentos por departamento."
         icon={<FolderOpen className="w-5 h-5 text-primary" />}
+        right={
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <Button size="sm" className="h-9 gap-2"><Plus className="w-4 h-4" /> Novo Orçamento</Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-lg">
+              <DialogHeader><DialogTitle>Novo Orçamento</DialogTitle></DialogHeader>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="col-span-2 space-y-1"><Label>Nome</Label><Input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} /></div>
+                <div className="space-y-1"><Label>Departamento</Label><Input value={form.department} onChange={e => setForm({ ...form, department: e.target.value })} /></div>
+                <div className="space-y-1"><Label>Período</Label><Input placeholder="2026" value={form.period} onChange={e => setForm({ ...form, period: e.target.value })} /></div>
+                <div className="space-y-1"><Label>Total (AOA)</Label><Input type="number" value={form.total_budget} onChange={e => setForm({ ...form, total_budget: e.target.value })} /></div>
+                <div className="space-y-1"><Label>Executado (AOA)</Label><Input type="number" value={form.spent} onChange={e => setForm({ ...form, spent: e.target.value })} /></div>
+                <div className="space-y-1"><Label>Responsável</Label><Input value={form.responsavel} onChange={e => setForm({ ...form, responsavel: e.target.value })} /></div>
+                <div className="space-y-1"><Label>Cargo</Label><Input value={form.responsavel_role} onChange={e => setForm({ ...form, responsavel_role: e.target.value })} /></div>
+                <div className="col-span-2 space-y-1">
+                  <Label>Estado</Label>
+                  <Select value={form.status} onValueChange={(v) => setForm({ ...form, status: v as Budget["status"] })}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="activo">Activo</SelectItem>
+                      <SelectItem value="em_revisao">Em revisão</SelectItem>
+                      <SelectItem value="esgotado">Esgotado</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
+                <Button onClick={() => createMutation.mutate()} disabled={!form.name || createMutation.isPending}>Criar</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        }
       />
 
       {/* KPIs */}
@@ -142,8 +248,8 @@ export default function Orcamentos() {
             <th className="text-center p-3 font-medium text-muted-foreground">Estado</th>
           </tr></thead>
           <tbody>{filtered.map(o => {
-            const usage = o.totalBudget > 0 ? (o.spent / o.totalBudget) * 100 : 0;
-            const remaining = o.totalBudget - o.spent;
+            const usage = o.total_budget > 0 ? (Number(o.spent) / Number(o.total_budget)) * 100 : 0;
+            const remaining = Number(o.total_budget) - Number(o.spent);
             const usageColor = usage >= 100 ? "text-destructive" : usage >= 90 ? "text-amber-600" : "text-foreground";
             return (
               <tr key={o.id} className="border-b last:border-0 hover:bg-muted/20 transition-colors">
@@ -153,11 +259,11 @@ export default function Orcamentos() {
                 </td>
                 <td className="p-3 text-xs">
                   <div className="text-foreground">{o.responsavel}</div>
-                  <div className="text-muted-foreground text-[10px]">{o.responsavelRole}</div>
+                  <div className="text-muted-foreground text-[10px]">{o.responsavel_role}</div>
                 </td>
                 <td className="p-3 text-xs text-muted-foreground">{o.period}</td>
-                <td className="p-3 text-right text-xs text-foreground">{formatCurrency(o.totalBudget)}</td>
-                <td className="p-3 text-right text-xs text-foreground">{formatCurrency(o.spent)}</td>
+                <td className="p-3 text-right text-xs text-foreground">{formatCurrency(Number(o.total_budget))}</td>
+                <td className="p-3 text-right text-xs text-foreground">{formatCurrency(Number(o.spent))}</td>
                 <td className={cn("p-3 text-right text-xs font-semibold", remaining <= 0 ? "text-destructive" : "text-accent")}>{formatCurrency(remaining)}</td>
                 <td className="p-3">
                   <div className="flex items-center gap-2">
