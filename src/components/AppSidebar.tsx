@@ -298,8 +298,29 @@ export default function AppSidebar() {
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
   const { unreadCount: finAnunciosUnread } = useFinAnunciosUnread();
+  const [now, setNow] = useState<Date>(new Date());
+  const [live, setLive] = useState<boolean>(() => isInstitutionLive(user?.email));
+
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  useEffect(() => {
+    const recheck = () => setLive(isInstitutionLive(user?.email));
+    recheck();
+    window.addEventListener("focus", recheck);
+    window.addEventListener("storage", recheck);
+    return () => {
+      window.removeEventListener("focus", recheck);
+      window.removeEventListener("storage", recheck);
+    };
+  }, [user?.email]);
 
   if (!user) return null;
+
+  const liveTime = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}:${String(now.getSeconds()).padStart(2, "0")}`;
+  const todayLabel = now.toLocaleDateString("pt-PT", { weekday: "short", day: "2-digit", month: "short" });
 
   const baseSections = roleSectionsMap[user.role] || studentSections;
   const sections = user.role === "financas"
