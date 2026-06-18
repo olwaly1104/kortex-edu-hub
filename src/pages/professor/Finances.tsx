@@ -6,39 +6,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 
-const salaryHistory = [
-  { month: "Janeiro 2025", gross: 450000, net: 382500, date: "31 Jan 2025", status: "paid" as const },
-  { month: "Fevereiro 2025", gross: 450000, net: 382500, date: "28 Fev 2025", status: "paid" as const },
-  { month: "Março 2025", gross: 450000, net: 382500, date: "31 Mar 2025", status: "pending" as const },
-  { month: "Abril 2025", gross: 450000, net: 382500, date: "30 Abr 2025", status: "pending" as const },
-  { month: "Maio 2025", gross: 450000, net: 382500, date: "31 Mai 2025", status: "pending" as const },
-  { month: "Junho 2025", gross: 450000, net: 382500, date: "30 Jun 2025", status: "pending" as const },
-  { month: "Julho 2025", gross: 450000, net: 382500, date: "31 Jul 2025", status: "pending" as const },
-  { month: "Agosto 2025", gross: 450000, net: 382500, date: "31 Ago 2025", status: "pending" as const },
-  { month: "Setembro 2025", gross: 450000, net: 382500, date: "30 Set 2025", status: "pending" as const },
-  { month: "Outubro 2025", gross: 450000, net: 382500, date: "31 Out 2025", status: "pending" as const },
-  { month: "Novembro 2025", gross: 450000, net: 382500, date: "30 Nov 2025", status: "pending" as const },
-  { month: "Dezembro 2025", gross: 450000, net: 382500, date: "31 Dez 2025", status: "pending" as const },
-];
+const salaryHistory: { month: string; gross: number; net: number; date: string; status: "paid" | "pending" }[] = [];
 
-const deductions = [
-  { label: "IRT (Imposto)", percentage: "10%", amount: 45000 },
-  { label: "Segurança Social", percentage: "3%", amount: 13500 },
-  { label: "Seguro de Saúde", percentage: "2%", amount: 9000 },
-];
+const deductions: { label: string; percentage: string; amount: number }[] = [];
 
-const multas = [
-  { id: "m1", date: "15 Fev 2025", reason: "Atraso na entrega de notas", amount: 5000, status: "aplicada" as const, details: "Notas do Teste 1 de Matemática II entregues com 3 dias de atraso." },
-  { id: "m2", date: "20 Jan 2025", reason: "Falta injustificada", amount: 8000, status: "pendente" as const, details: "Falta à aula de 20/01/2025 sem justificação apresentada dentro do prazo." },
-  { id: "m3", date: "05 Dez 2024", reason: "Atraso na entrega de programa", amount: 3000, status: "aplicada" as const, details: "Programa da disciplina de Estatística entregue com 5 dias de atraso." },
-  { id: "m4", date: "18 Nov 2024", reason: "Falta injustificada", amount: 8000, status: "aplicada" as const, details: "Falta à aula de 18/11/2024 sem justificação." },
-  { id: "m5", date: "02 Nov 2024", reason: "Atraso na publicação de notas", amount: 4000, status: "aplicada" as const, details: "Notas do Quiz 2 publicadas com 5 dias de atraso." },
-  { id: "m6", date: "10 Out 2024", reason: "Não compareceu à reunião de departamento", amount: 6000, status: "aplicada" as const, details: "Ausência na reunião de departamento de 10/10/2024." },
-  { id: "m7", date: "25 Set 2024", reason: "Atraso na entrega de pautas", amount: 5000, status: "pendente" as const, details: "Pautas finais entregues 4 dias após o prazo." },
-  { id: "m8", date: "12 Set 2024", reason: "Falta injustificada", amount: 8000, status: "aplicada" as const, details: "Falta à aula de 12/09/2024 sem justificação." },
-  { id: "m9", date: "01 Ago 2024", reason: "Incumprimento de horário de atendimento", amount: 3500, status: "aplicada" as const, details: "Não cumpriu horário de atendimento a estudantes em 01/08/2024." },
-  { id: "m10", date: "15 Jul 2024", reason: "Atraso na correcção de exames", amount: 7000, status: "aplicada" as const, details: "Exames corrigidos com 7 dias de atraso face ao prazo regulamentar." },
-];
+const multas: { id: string; date: string; reason: string; amount: number; status: "aplicada" | "pendente"; details: string }[] = [];
+
 
 function formatCurrency(value: number) {
   return new Intl.NumberFormat("pt-AO", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value) + " Kz";
