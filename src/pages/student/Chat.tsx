@@ -259,13 +259,16 @@ export default function StudentChat() {
                 <Button size="icon" variant="ghost" className="h-8 w-8"><Plus className="w-4 h-4" /></Button>
               </PopoverTrigger>
               <PopoverContent align="end" className="w-72 p-0">
-                <div className="p-2 border-b border-border">
+                <div className="p-2 border-b border-border space-y-2">
+                  <p className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold px-1">
+                    Iniciar conversa
+                  </p>
                   <div className="relative">
                     <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
                     <Input
                       value={contactQuery}
                       onChange={(e) => setContactQuery(e.target.value)}
-                      placeholder="Pesquisar contactos…"
+                      placeholder="Escolher utilizador…"
                       className="pl-8 h-8 text-sm"
                     />
                   </div>
