@@ -12,9 +12,18 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell,
 } from "recharts";
-import {
-  formatCurrency, monthlyData, salarios, receitas, despesas,
-} from "@/data/financeModuleData";
+const formatCurrency = (v: number) => new Intl.NumberFormat("pt-PT", { style: "currency", currency: "AOA", maximumFractionDigits: 0 }).format(v).replace("AOA", "Kz");
+const monthlyData: { month: string; receitas: number; despesas: number }[] = [
+  { month: "Jan", receitas: 0, despesas: 0 },
+  { month: "Fev", receitas: 0, despesas: 0 },
+  { month: "Mar", receitas: 0, despesas: 0 },
+  { month: "Abr", receitas: 0, despesas: 0 },
+  { month: "Mai", receitas: 0, despesas: 0 },
+  { month: "Jun", receitas: 0, despesas: 0 },
+];
+const salarios: { grossSalary: number; status: string }[] = [];
+const receitas: { id: string; description: string; date: string; amount: number; category: string; status: string; payer?: string }[] = [];
+const despesas: { id: string; description: string; date: string; amount: number; category: string; status: string; requestedBy?: string }[] = [];
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { FinHeader } from "./_FinHeader";
@@ -45,7 +54,7 @@ const REC_COLORS = ["hsl(var(--accent))", "hsl(150, 60%, 40%)", "hsl(200, 70%, 5
 const recCatData = Array.from(recMap.entries()).sort((a, b) => b[1] - a[1]).map(([name, value], i) => ({ name, value, color: REC_COLORS[i % REC_COLORS.length] }));
 const receitaTotal = recCatData.reduce((s, c) => s + c.value, 0);
 const receitaEsperadaMes = receitas.reduce((s, r) => s + r.amount, 0);
-const despesaOrcamentadaMes = 42000000;
+const despesaOrcamentadaMes = 0;
 
 /* all transactions merged */
 const allTx = [
