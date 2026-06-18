@@ -26,7 +26,12 @@ export default function GapInicio() {
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
-      <FinHeader title="Início" subtitle="Cockpit do Gabinete de Apoio ao Discente" icon={<LayoutDashboard className="w-5 h-5" />} />
+      <FinHeader
+        title={`Bom dia, ${user?.name?.split(" ").pop() || "GAP"}`}
+        subtitle="Cockpit do Gabinete de Apoio ao Discente"
+        icon={<LayoutDashboard className="w-5 h-5" />}
+        right={presencaPill}
+      />
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {kpis.map((k) => {
