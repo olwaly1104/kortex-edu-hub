@@ -179,13 +179,8 @@ export default function AdminInicio() {
     "aca.cad": realCounts.cadeiras > 0,
     "fin.pro": storedProgress["fin.pro"] || realCounts.propinas > 0,
   };
-  // Hide the institutional registration group once it has been completed —
-  // those steps were done during the initial onboarding flow.
-  const instDone = !!progress["inst.reg"];
-  const visibleGroups = instDone ? GROUPS.filter((g) => g.id !== "inst") : GROUPS;
-  const visibleSteps = visibleGroups.flatMap((g) => g.steps);
-  const doneCount = visibleSteps.filter((t) => progress[t.key]).length;
-  const pct = visibleSteps.length === 0 ? 100 : Math.round((doneCount / visibleSteps.length) * 100);
+  const doneCount = ALL_STEPS.filter((t) => progress[t.key]).length;
+  const pct = Math.round((doneCount / ALL_STEPS.length) * 100);
   const [open, setOpen] = useState<string | null>(null);
 
 
@@ -217,7 +212,7 @@ export default function AdminInicio() {
           <div className="text-right">
             <div className="text-[11px] uppercase tracking-wider text-muted-foreground">Progresso global</div>
             <div className="text-2xl font-bold text-foreground tabular-nums">{pct}%</div>
-            <div className="text-xs text-muted-foreground">{doneCount} de {visibleSteps.length} passos</div>
+            <div className="text-xs text-muted-foreground">{doneCount} de {ALL_STEPS.length} passos</div>
           </div>
         </div>
         <div className="h-2 rounded-full bg-muted overflow-hidden">
@@ -226,7 +221,7 @@ export default function AdminInicio() {
       </div>
 
       <div className="space-y-3">
-        {visibleGroups.map((g) => {
+        {GROUPS.map((g) => {
           const GIcon = g.icon;
           const gDone = g.steps.filter((t) => progress[t.key]).length;
           const gTotal = g.steps.length;
