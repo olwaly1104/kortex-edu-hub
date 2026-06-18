@@ -13,7 +13,7 @@ import { formatCurrency, type Transaction } from "@/data/financeModuleData";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { FinHeader } from "./_FinHeader";
-import { RevDespTabs } from "./_RevDespTabs";
+
 import { PeriodSelector, PERIODO_MULT, type Periodo, periodoDefaultValue } from "./_PeriodSelector";
 
 type SortField = "amount";
