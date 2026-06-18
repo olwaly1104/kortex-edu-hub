@@ -447,6 +447,15 @@ export default function AdminDiscentes() {
                   <Field label="Nº Bilhete de Identidade">
                     <Input value={draft.bilhete} onChange={(e) => setF("bilhete", e.target.value)} placeholder="00000000XX000" className="h-8 text-xs" />
                   </Field>
+                  <Field label="Regime">
+                    <Select value={draft.regime} onValueChange={(v) => setF("regime", v as Regime)}>
+                      <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="normal">Normal</SelectItem>
+                        <SelectItem value="bolseiro">Bolseiro</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </Field>
                 </div>
               </div>
             </div>
@@ -498,15 +507,6 @@ export default function AdminDiscentes() {
               <div className="grid grid-cols-2 gap-2">
                 <Field label="Telemóvel / Contacto">
                   <Input value={draft.telemovel} onChange={(e) => setF("telemovel", e.target.value)} placeholder="+244 9XX XXX XXX" className="h-8 text-xs" />
-                </Field>
-                <Field label="Regime">
-                  <Select value={draft.regime} onValueChange={(v) => setF("regime", v as Regime)}>
-                    <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="normal">Normal</SelectItem>
-                      <SelectItem value="bolseiro">Bolseiro</SelectItem>
-                    </SelectContent>
-                  </Select>
                 </Field>
               </div>
             </div>
