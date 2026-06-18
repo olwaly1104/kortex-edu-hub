@@ -15,6 +15,7 @@ import { FinHeader } from "./_FinHeader";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend, CartesianGrid } from "recharts";
 
 type Budget = {
   id: string;
@@ -183,6 +184,60 @@ export default function Orcamentos() {
         ))}
       </div>
 
+      {/* Visuals */}
+      {orcamentos.length > 0 && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <Card className="p-4 lg:col-span-2">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-semibold text-foreground">Execução por Orçamento</h3>
+              <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Total vs Executado</span>
+            </div>
+            <ResponsiveContainer width="100%" height={240}>
+              <BarChart data={orcamentos.map(o => ({ name: o.name.length > 14 ? o.name.slice(0, 14) + "…" : o.name, Total: Number(o.total_budget), Executado: Number(o.spent) }))}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                <XAxis dataKey="name" tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} />
+                <YAxis tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} tickFormatter={(v) => `${(v / 1_000_000).toFixed(1)}M`} />
+                <Tooltip
+                  contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }}
+                  formatter={(v: number) => formatCurrency(v)}
+                />
+                <Legend wrapperStyle={{ fontSize: 11 }} />
+                <Bar dataKey="Total" fill="hsl(var(--primary) / 0.35)" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="Executado" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </Card>
+          <Card className="p-4">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-semibold text-foreground">Distribuição por Estado</h3>
+              <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Orçamentos</span>
+            </div>
+            <ResponsiveContainer width="100%" height={240}>
+              <PieChart>
+                <Pie
+                  data={[
+                    { name: "Activo", value: orcamentos.filter(o => o.status === "activo").length },
+                    { name: "Em revisão", value: orcamentos.filter(o => o.status === "em_revisao").length },
+                    { name: "Esgotado", value: orcamentos.filter(o => o.status === "esgotado").length },
+                  ].filter(d => d.value > 0)}
+                  dataKey="value"
+                  nameKey="name"
+                  innerRadius={45}
+                  outerRadius={80}
+                  paddingAngle={2}
+                >
+                  {["hsl(var(--accent))", "hsl(45 90% 55%)", "hsl(var(--destructive))"].map((c, i) => (
+                    <Cell key={i} fill={c} />
+                  ))}
+                </Pie>
+                <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }} />
+                <Legend wrapperStyle={{ fontSize: 11 }} />
+              </PieChart>
+            </ResponsiveContainer>
+          </Card>
+        </div>
+      )}
+
       {/* Controls */}
       <div className="rounded-xl border border-border bg-card p-4 space-y-3">
         <div className="flex gap-2 items-center flex-wrap">
@@ -277,6 +332,22 @@ export default function Orcamentos() {
           })}</tbody>
         </table>
         {filtered.length === 0 && <p className="text-center text-muted-foreground py-8">Nenhum orçamento encontrado.</p>}
+        {orcamentos.length > 0 && (() => {
+          const pct = totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0;
+          const pctColor = pct >= 100 ? "text-destructive" : pct >= 90 ? "text-amber-600" : "text-accent";
+          return (
+            <div className="border-t bg-muted/10 px-4 py-3 space-y-2">
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-semibold text-foreground">Progresso Global do Orçamento</span>
+                <span className="text-muted-foreground">{formatCurrency(totalSpent)} <span className="text-muted-foreground/60">de</span> {formatCurrency(totalBudget)}</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <Progress value={Math.min(pct, 100)} className="h-2 flex-1" />
+                <span className={cn("text-xs font-bold tabular-nums w-12 text-right", pctColor)}>{pct.toFixed(1)}%</span>
+              </div>
+            </div>
+          );
+        })()}
         <div className="border-t bg-muted/20 px-3 py-2 text-xs text-muted-foreground">{filtered.length} de {orcamentos.length} orçamentos</div>
       </Card>
     </div>
