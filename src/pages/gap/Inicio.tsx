@@ -1,7 +1,22 @@
+import { useAuth } from "@/contexts/AuthContext";
 import { FinHeader } from "@/pages/financas/_FinHeader";
-import { LayoutDashboard, HelpCircle, CalendarDays, ClipboardList, Users } from "lucide-react";
+import { LayoutDashboard, HelpCircle, CalendarDays, ClipboardList, Users, ClipboardCheck } from "lucide-react";
 
 export default function GapInicio() {
+  const { user } = useAuth();
+
+  const presencaPill = (
+    <div className="inline-flex items-stretch rounded-md border border-border bg-card overflow-hidden text-[11px] uppercase tracking-wider font-medium shadow-sm">
+      <span className="flex items-center gap-1.5 px-2.5 py-1 text-foreground">
+        <ClipboardCheck className="w-3.5 h-3.5 text-muted-foreground" />
+        Minha Presença
+      </span>
+      <span className="w-px bg-border" />
+      <span className="flex items-center gap-1.5 px-2.5 py-1 tabular-nums font-semibold text-primary bg-muted/30 tracking-tight">
+        0%
+      </span>
+    </div>
+  );
   const kpis = [
     { label: "Solicitações", value: 0, icon: HelpCircle },
     { label: "Agenda de hoje", value: 0, icon: CalendarDays },
