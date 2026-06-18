@@ -179,8 +179,13 @@ export default function AdminInicio() {
     "aca.cad": realCounts.cadeiras > 0,
     "fin.pro": storedProgress["fin.pro"] || realCounts.propinas > 0,
   };
-  const doneCount = ALL_STEPS.filter((t) => progress[t.key]).length;
-  const pct = Math.round((doneCount / ALL_STEPS.length) * 100);
+  // Hide the institutional registration group once it has been completed —
+  // those steps were done during the initial onboarding flow.
+  const instDone = !!progress["inst.reg"];
+  const visibleGroups = instDone ? GROUPS.filter((g) => g.id !== "inst") : GROUPS;
+  const visibleSteps = visibleGroups.flatMap((g) => g.steps);
+  const doneCount = visibleSteps.filter((t) => progress[t.key]).length;
+  const pct = visibleSteps.length === 0 ? 100 : Math.round((doneCount / visibleSteps.length) * 100);
   const [open, setOpen] = useState<string | null>(null);
 
 
