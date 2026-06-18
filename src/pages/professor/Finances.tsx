@@ -58,7 +58,7 @@ export default function ProfessorFinances() {
             </div>
             <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Salário Líquido</p>
           </div>
-          <p className="text-xl font-bold text-foreground">{formatCurrency(382500)}</p>
+          <p className="text-xl font-bold text-foreground">{formatCurrency(0)}</p>
         </div>
         <div className="rounded-xl border border-border bg-card p-5">
           <div className="flex items-center gap-3 mb-3">
