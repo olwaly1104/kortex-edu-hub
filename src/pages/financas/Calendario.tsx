@@ -105,6 +105,11 @@ function CriarEventoDialog({ defaultDate, trigger, onCreated }: { defaultDate: D
 
   const removeParticipant = (id: string) => setParticipants(participants.filter((p) => p.id !== id));
 
+  const resetForm = () => {
+    setTitle(""); setLocation(""); setLink(""); setParticipants([]); setParticipantInput("");
+    setStep("form");
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) {
@@ -119,13 +124,37 @@ function CriarEventoDialog({ defaultDate, trigger, onCreated }: { defaultDate: D
       toast.error("O horário de fim deve ser após o início.");
       return;
     }
-    const msg = participants.length > 0
-      ? `Evento criado. Pedidos enviados a ${participants.length} participante${participants.length > 1 ? "s" : ""}.`
-      : "Evento criado com sucesso.";
-    toast.success(msg);
-    setOpen(false);
-    setTitle(""); setLocation(""); setLink(""); setParticipants([]); setParticipantInput("");
+    setStep("confirm");
   };
+
+  const handleConfirm = () => {
+    const ev: StoredEvent = {
+      id: `ev-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      type,
+      title: title.trim(),
+      date,
+      startTime,
+      endTime: type === "reuniao" ? endTime : undefined,
+      location: location || undefined,
+      link: link || undefined,
+      modalidade: type === "reuniao" ? modalidade : undefined,
+      participants: type === "reuniao" ? participants.map((p) => ({ id: p.id, name: p.name, modulo: p.modulo })) : undefined,
+      color: EVENT_COLORS[type],
+    };
+    saveEvent(ev);
+    const msg = type === "reuniao" && participants.length > 0
+      ? `Evento confirmado. Pedidos enviados a ${participants.length} participante${participants.length > 1 ? "s" : ""}.`
+      : "Evento confirmado e adicionado à agenda.";
+    toast.success(msg);
+    onCreated?.(date);
+    setOpen(false);
+    resetForm();
+  };
+
+  useEffect(() => {
+    if (!open) resetForm();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
