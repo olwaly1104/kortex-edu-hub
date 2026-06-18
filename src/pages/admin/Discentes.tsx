@@ -374,6 +374,9 @@ export default function AdminDiscentes() {
         <div className="border-t bg-muted/10 px-4 py-4 space-y-4">
           <p className="text-[10px] uppercase tracking-wide text-muted-foreground font-semibold">Adicionar discente</p>
 
+          {/* Dados Pessoais */}
+          <p className="text-[10px] uppercase tracking-wide text-muted-foreground font-semibold mb-2">Dados Pessoais</p>
+
           {/* Photo + identity */}
           <div className="flex items-start gap-4">
             <button
