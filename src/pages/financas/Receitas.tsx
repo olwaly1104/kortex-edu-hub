@@ -23,7 +23,10 @@ const statusColors: Record<string, string> = {
 };
 const statusLabels: Record<string, string> = { pago: "Recebido", pendente: "Pendente", em_atraso: "Em Atraso" };
 
-const estimativaMensal = 4800000;
+// Receita Esperada = soma de todas as propinas anuais brutas dos estudantes.
+// Permanece a 0 até o Reitor activar o ano lectivo (fim do onboarding) e as
+// propinas serem definidas em Configurar Receitas.
+const estimativaMensal = 0;
 
 export default function Receitas() {
   const { toast } = useToast();
