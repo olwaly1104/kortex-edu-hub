@@ -464,6 +464,11 @@ export default function StudentChat() {
             <div className="border-t border-border bg-card p-3">
               <div className="flex items-end gap-2">
                 <Button variant="ghost" size="icon" className="h-9 w-9 shrink-0"><Paperclip className="w-4 h-4" /></Button>
+                <GifPicker onPick={(url) => {
+                  if (!selectedId || !uid) return;
+                  (supabase as any).from("messages").insert({ conversation_id: selectedId, sender_id: uid, content: url }).then(() => loadConversations());
+                }} />
+                <EmojiPicker onPick={(e) => setDraft((d) => d + e)} />
                 <Input
                   ref={inputRef}
                   placeholder="Escrever mensagem…"
@@ -472,7 +477,6 @@ export default function StudentChat() {
                   onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && (e.preventDefault(), send())}
                   className="h-9"
                 />
-                <Button variant="ghost" size="icon" className="h-9 w-9 shrink-0"><Smile className="w-4 h-4" /></Button>
                 <Button onClick={send} disabled={!draft.trim()} size="icon" className="h-9 w-9 shrink-0">
                   <Send className="w-4 h-4" />
                 </Button>
