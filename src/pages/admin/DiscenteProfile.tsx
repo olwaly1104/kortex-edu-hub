@@ -86,14 +86,13 @@ export default function AdminDiscenteProfile() {
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
-      <Button variant="ghost" onClick={() => navigate(-1)} className="gap-2 -ml-2">
-        <ArrowLeft className="w-4 h-4" /> Voltar
-      </Button>
+      <div className="flex items-center justify-between">
+        <Button variant="ghost" onClick={() => navigate(-1)} className="gap-2 -ml-2">
+          <ArrowLeft className="w-4 h-4" /> Voltar
+        </Button>
 
-      {/* Identity header */}
-      <Card className="overflow-hidden p-0 relative">
-        {/* Uniform institutional document badge — top right corner */}
-        <div className="absolute top-4 right-4 z-10 inline-flex items-center gap-2 pl-1.5 pr-1 py-1 rounded-md border border-border bg-background shadow-sm">
+        {/* Uniform institutional document badge — white area top right */}
+        <div className="inline-flex items-center gap-2 pl-1.5 pr-1 py-1 rounded-md border border-border bg-background shadow-sm">
           <div className="w-6 h-6 rounded bg-red-50 border border-red-200 flex items-center justify-center shrink-0">
             <FileText className="w-3 h-3 text-red-600" />
           </div>
@@ -119,6 +118,10 @@ export default function AdminDiscenteProfile() {
             <Download className="w-3 h-3" />
           </button>
         </div>
+      </div>
+
+      {/* Identity header */}
+      <Card className="overflow-hidden p-0">
 
         <div className="grid lg:grid-cols-[1.6fr_1fr] divide-y lg:divide-y-0 lg:divide-x divide-border">
           <div className="p-6">
