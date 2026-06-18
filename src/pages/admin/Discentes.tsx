@@ -508,15 +508,6 @@ export default function AdminDiscentes() {
                 <Field label="Telemóvel / Contacto">
                   <Input value={draft.telemovel} onChange={(e) => setF("telemovel", e.target.value)} placeholder="+244 9XX XXX XXX" className="h-8 text-xs" />
                 </Field>
-                <Field label="Regime">
-                  <Select value={draft.regime} onValueChange={(v) => setF("regime", v as Regime)}>
-                    <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="normal">Normal</SelectItem>
-                      <SelectItem value="bolseiro">Bolseiro</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </Field>
               </div>
             </div>
 
