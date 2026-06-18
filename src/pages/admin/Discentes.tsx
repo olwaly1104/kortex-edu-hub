@@ -40,6 +40,7 @@ type Draft = {
   enc_nome: string;
   enc_parentesco: string;
   enc_telefone: string;
+  encBilheteFile: File | null;
   faculdade_id: string;
   curso_id: string;
   ano: string;
@@ -78,6 +79,7 @@ const emptyDraft = (faculdade_id = "", curso_id = ""): Draft => ({
   enc_nome: "",
   enc_parentesco: "",
   enc_telefone: "",
+  encBilheteFile: null,
   faculdade_id,
   curso_id,
   ano: "1",
