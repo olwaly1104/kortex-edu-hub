@@ -19,6 +19,9 @@ import {
   Eye, AlignLeft, Tag, CalendarRange, Info, Briefcase, Sparkles, Video, Building2, Link2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Rocket } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { isInstitutionLive } from "@/pages/financas/_FinHeader";
 
 /* ── constants ─────────────────────────────────────── */
 const TODAY = "2024-02-14";
@@ -151,13 +154,26 @@ function eventState(ev: AgendaEvent): EvState {
 
 /* ─────────────────────────────────────────────────── */
 export default function FinancasCalendario() {
+  const { user } = useAuth();
   const [view, setView] = useState<"week" | "month">("week");
   const [now, setNow] = useState<Date>(new Date());
+  const [live, setLive] = useState<boolean>(() => isInstitutionLive(user?.email));
   useEffect(() => {
     const id = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(id);
   }, []);
+  useEffect(() => {
+    const recheck = () => setLive(isInstitutionLive(user?.email));
+    recheck();
+    window.addEventListener("focus", recheck);
+    window.addEventListener("storage", recheck);
+    return () => {
+      window.removeEventListener("focus", recheck);
+      window.removeEventListener("storage", recheck);
+    };
+  }, [user?.email]);
   const liveTime = `${String(now.getHours()).padStart(2, "0")}h:${String(now.getMinutes()).padStart(2, "0")}min:${String(now.getSeconds()).padStart(2, "0")}s`;
+  const todayLabel = now.toLocaleDateString("pt-PT", { weekday: "long", day: "2-digit", month: "long", year: "numeric" });
   const [cursor, setCursor] = useState<string>(TODAY);
   const [selectedDate, setSelectedDate] = useState<string>(TODAY);
   const [openCreate, setOpenCreate] = useState(false);
@@ -248,15 +264,24 @@ export default function FinancasCalendario() {
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div className="min-w-0 space-y-3">
             <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-[11px] uppercase tracking-wider font-semibold text-primary">
-              <GraduationCap className="w-3.5 h-3.5" />
-              Ano Letivo <span className="font-bold tabular-nums">{ANO_LETIVO}</span>
+              {live ? (
+                <>
+                  <GraduationCap className="w-3.5 h-3.5" />
+                  Ano Letivo <span className="font-bold tabular-nums">{ANO_LETIVO}</span>
+                </>
+              ) : (
+                <>
+                  <Rocket className="w-3.5 h-3.5" />
+                  Onboarding
+                </>
+              )}
             </span>
             <h1 className="text-2xl font-bold text-foreground">Calendário</h1>
           </div>
           <div className="flex flex-col items-end gap-3 shrink-0">
             <div className="inline-flex items-stretch rounded-md border border-border bg-card overflow-hidden text-[11px] uppercase tracking-wider font-medium shadow-sm">
               <span className="flex items-center gap-1.5 px-2.5 py-1 text-foreground">
-                <CalendarDays className="w-3.5 h-3.5 text-muted-foreground" />{fmtLong(TODAY)}
+                <CalendarDays className="w-3.5 h-3.5 text-muted-foreground" />{todayLabel}
               </span>
               <span className="w-px bg-border" />
               <span className="flex items-center gap-1.5 px-2.5 py-1 font-mono tabular-nums text-primary bg-muted/30">
