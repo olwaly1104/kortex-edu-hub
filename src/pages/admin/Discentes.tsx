@@ -3,6 +3,7 @@ import { OnboardingStepBanner } from "@/components/admin/OnboardingStepBanner";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { GraduationCap, Plus, Trash2, Users, BookOpen, Layers, Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -13,9 +14,15 @@ import {
   useDeleteEstudante,
 } from "@/lib/useInstitution";
 
+type Regime = "bolseiro" | "normal";
+type Genero = "M" | "F" | "Outro";
+
 type Draft = {
   primeiroNome: string;
   ultimoNome: string;
+  nascimento: string;
+  genero: Genero;
+  regime: Regime;
   curso_id: string;
   ano: string;
   turma: string;
@@ -26,12 +33,7 @@ const turmasPool = ["A", "B", "C", "D", "E"];
 const EMAIL_DOMAIN = "upra.kor";
 
 const slug = (s: string) =>
-  s
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "")
-    .trim();
+  s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "").trim();
 
 const buildEmail = (primeiro: string, ultimo: string) => {
   const p = slug(primeiro);
@@ -43,6 +45,9 @@ const buildEmail = (primeiro: string, ultimo: string) => {
 const emptyDraft = (curso_id = ""): Draft => ({
   primeiroNome: "",
   ultimoNome: "",
+  nascimento: "",
+  genero: "M",
+  regime: "normal",
   curso_id,
   ano: "1",
   turma: "A",
@@ -82,6 +87,9 @@ export default function AdminDiscentes() {
           curso: cursoCode.get(r.curso_id) || "—",
           ano: r.ano as string,
           turma: r.turma as string,
+          nascimento: (r.nascimento as string) || "",
+          genero: (r.genero as string) || "—",
+          regime: ((r.regime as string) || "normal") as Regime,
         };
       }),
     [rows, cursoCode],
@@ -95,6 +103,7 @@ export default function AdminDiscentes() {
   const counts = useMemo(
     () => ({
       total: normalized.length,
+      bolseiros: normalized.filter((r) => r.regime === "bolseiro").length,
       cursos: new Set(normalized.map((r) => r.curso_id)).size,
       turmas: new Set(normalized.map((r) => `${r.curso_id}-${r.ano}${r.turma}`)).size,
     }),
@@ -103,28 +112,32 @@ export default function AdminDiscentes() {
 
   const setF = <K extends keyof Draft>(k: K, v: Draft[K]) => setDraft((d) => ({ ...d, [k]: v }));
 
+  const previewEmail = buildEmail(draft.primeiroNome, draft.ultimoNome);
+
   const addRow = async () => {
     if (!draft.primeiroNome.trim() || !draft.curso_id) {
       toast.error("Preencha nome e curso");
       return;
     }
-    const nome = `${draft.primeiroNome.trim()} ${draft.ultimoNome.trim()}`.trim();
-    const email = buildEmail(draft.primeiroNome, draft.ultimoNome);
-    if (!email) {
+    if (!previewEmail) {
       toast.error("Não foi possível gerar email a partir do nome");
       return;
     }
+    const nome = `${draft.primeiroNome.trim()} ${draft.ultimoNome.trim()}`.trim();
     try {
       await createMut.mutateAsync({
         curso_id: draft.curso_id,
         nome,
-        email,
+        email: previewEmail,
         ano: draft.ano,
         turma: draft.turma,
         primeiro_nome: draft.primeiroNome.trim(),
         ultimo_nome: draft.ultimoNome.trim() || null,
+        nascimento: draft.nascimento || null,
+        genero: draft.genero,
+        regime: draft.regime,
       });
-      toast.success(`Discente adicionado · ${email}`);
+      toast.success(`Discente adicionado · ${previewEmail}`);
       setDraft(emptyDraft(draft.curso_id));
     } catch (e: any) {
       toast.error(e?.message || "Erro ao adicionar discente");
@@ -140,8 +153,10 @@ export default function AdminDiscentes() {
     }
   };
 
+  const GRID = "grid grid-cols-[1.1fr_1fr_100px_70px_90px_90px_60px_60px_1.5fr_56px] gap-2 px-4 py-2 items-center";
+
   return (
-    <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6 animate-fade-in">
+    <div className="p-6 lg:p-8 max-w-7xl mx-auto space-y-6 animate-fade-in">
       <OnboardingStepBanner stepKey="dis.reg" />
 
       <div className="flex items-center gap-3 pb-1">
@@ -150,14 +165,14 @@ export default function AdminDiscentes() {
         </div>
         <div>
           <h1 className="text-lg font-semibold leading-tight">Discentes</h1>
-          <p className="text-xs text-muted-foreground">Registe todos os estudantes da instituição. Cada discente recebe acesso ao Kortex automaticamente.</p>
+          <p className="text-xs text-muted-foreground">Registe todos os estudantes da instituição. Email institucional é gerado automaticamente.</p>
         </div>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
         {[
           { label: "Total", value: counts.total, Icon: Users },
-          { label: "Ativos", value: counts.total, Icon: GraduationCap },
+          { label: "Bolseiros", value: counts.bolseiros, Icon: GraduationCap },
           { label: "Cursos", value: counts.cursos, Icon: BookOpen },
           { label: "Turmas", value: counts.turmas, Icon: Layers },
         ].map((k) => (
@@ -187,13 +202,16 @@ export default function AdminDiscentes() {
       </div>
 
       <Card className="overflow-hidden">
-        <div className="grid grid-cols-[1.2fr_1fr_1.6fr_90px_70px_70px_56px] gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b">
-          <span>Primeiro nome</span>
-          <span>Último nome</span>
-          <span>Email institucional</span>
+        <div className={`${GRID} text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b !py-2`}>
+          <span>Primeiro</span>
+          <span>Último</span>
+          <span>Nascimento</span>
+          <span>Género</span>
+          <span>Regime</span>
           <span>Curso</span>
           <span>Ano</span>
           <span>Turma</span>
+          <span>Email</span>
           <span></span>
         </div>
 
@@ -206,13 +224,18 @@ export default function AdminDiscentes() {
             <p className="px-4 py-8 text-xs text-muted-foreground italic text-center">Sem discentes registados.</p>
           ) : (
             filtered.map((r) => (
-              <div key={r.id} className="grid grid-cols-[1.2fr_1fr_1.6fr_90px_70px_70px_56px] gap-2 px-4 py-2 items-center">
+              <div key={r.id} className={GRID}>
                 <span className="text-xs font-medium truncate">{r.primeiroNome}</span>
                 <span className="text-xs truncate">{r.ultimoNome || "—"}</span>
-                <span className="text-xs text-muted-foreground truncate">{r.email}</span>
+                <span className="text-xs tabular-nums text-muted-foreground">{r.nascimento || "—"}</span>
+                <span className="text-xs">{r.genero}</span>
+                <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold w-fit ${r.regime === "bolseiro" ? "bg-amber-50 text-amber-700" : "bg-muted text-muted-foreground"}`}>
+                  {r.regime === "bolseiro" ? "Bolseiro" : "Normal"}
+                </span>
                 <span className="text-xs font-mono">{r.curso}</span>
                 <span className="text-xs tabular-nums">{r.ano}º</span>
                 <span className="text-xs tabular-nums">{r.turma}</span>
+                <span className="text-[11px] text-muted-foreground truncate font-mono">{r.email}</span>
                 <div className="flex justify-end">
                   <Button
                     size="icon"
@@ -230,56 +253,92 @@ export default function AdminDiscentes() {
         </div>
 
         {/* Inline add row */}
-        <div className="border-t bg-muted/10 px-4 py-2.5 space-y-2">
-          <div className="grid grid-cols-[1.2fr_1fr_1.6fr_90px_70px_70px_56px] gap-2 items-center">
-            <Input
-              value={draft.primeiroNome}
-              onChange={(e) => setF("primeiroNome", e.target.value)}
-              placeholder="Primeiro nome"
-              className="h-8 text-xs"
-            />
-            <Input
-              value={draft.ultimoNome}
-              onChange={(e) => setF("ultimoNome", e.target.value)}
-              placeholder="Último nome"
-              className="h-8 text-xs"
-            />
-            <div className="h-8 px-2.5 flex items-center text-[11px] text-muted-foreground bg-muted/40 border border-input rounded-md truncate font-mono" title="Email gerado automaticamente">
-              {buildEmail(draft.primeiroNome, draft.ultimoNome) || `nome@${EMAIL_DOMAIN}`}
-            </div>
-            <Select value={draft.curso_id} onValueChange={(v) => setF("curso_id", v)}>
-              <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="—" /></SelectTrigger>
-              <SelectContent>
-                {cursos.map((c: any) => (
-                  <SelectItem key={c.id} value={c.id}>{c.codigo || c.nome}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select value={draft.ano} onValueChange={(v) => setF("ano", v)}>
-              <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-              <SelectContent>{anosPool.map((a) => <SelectItem key={a} value={a}>{a}º</SelectItem>)}</SelectContent>
-            </Select>
-            <Select value={draft.turma} onValueChange={(v) => setF("turma", v)}>
-              <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-              <SelectContent>{turmasPool.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
-            </Select>
-            <div />
+        <div className="border-t bg-muted/10 px-4 py-3 space-y-3">
+          <p className="text-[10px] uppercase tracking-wide text-muted-foreground font-semibold">Adicionar discente</p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+            <Field label="Primeiro nome">
+              <Input value={draft.primeiroNome} onChange={(e) => setF("primeiroNome", e.target.value)} placeholder="Ana" className="h-8 text-xs" />
+            </Field>
+            <Field label="Último nome">
+              <Input value={draft.ultimoNome} onChange={(e) => setF("ultimoNome", e.target.value)} placeholder="Silva" className="h-8 text-xs" />
+            </Field>
+            <Field label="Data de nascimento">
+              <Input type="date" value={draft.nascimento} onChange={(e) => setF("nascimento", e.target.value)} className="h-8 text-xs" />
+            </Field>
+            <Field label="Género">
+              <Select value={draft.genero} onValueChange={(v) => setF("genero", v as Genero)}>
+                <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="M">Masculino</SelectItem>
+                  <SelectItem value="F">Feminino</SelectItem>
+                  <SelectItem value="Outro">Outro</SelectItem>
+                </SelectContent>
+              </Select>
+            </Field>
+            <Field label="Regime">
+              <Select value={draft.regime} onValueChange={(v) => setF("regime", v as Regime)}>
+                <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="normal">Normal</SelectItem>
+                  <SelectItem value="bolseiro">Bolseiro</SelectItem>
+                </SelectContent>
+              </Select>
+            </Field>
+            <Field label="Curso">
+              <Select value={draft.curso_id} onValueChange={(v) => setF("curso_id", v)}>
+                <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="—" /></SelectTrigger>
+                <SelectContent>
+                  {cursos.map((c: any) => (
+                    <SelectItem key={c.id} value={c.id}>{c.codigo || c.nome}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </Field>
+            <Field label="Ano">
+              <Select value={draft.ano} onValueChange={(v) => setF("ano", v)}>
+                <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                <SelectContent>{anosPool.map((a) => <SelectItem key={a} value={a}>{a}º</SelectItem>)}</SelectContent>
+              </Select>
+            </Field>
+            <Field label="Turma">
+              <Select value={draft.turma} onValueChange={(v) => setF("turma", v)}>
+                <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                <SelectContent>{turmasPool.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
+              </Select>
+            </Field>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={addRow}
-            disabled={createMut.isPending}
-            className="h-8 gap-1.5 text-primary hover:text-primary hover:bg-primary/5"
-          >
-            {createMut.isPending ? (
-              <><Loader2 className="w-3.5 h-3.5 animate-spin" /> A adicionar…</>
-            ) : (
-              <><Plus className="w-3.5 h-3.5" /> Adicionar discente</>
-            )}
-          </Button>
+
+          <Field label="Email institucional (gerado automaticamente)">
+            <div className="h-8 px-2.5 flex items-center text-[11px] text-muted-foreground bg-background border border-input rounded-md truncate font-mono">
+              {previewEmail || `nome.apelido@${EMAIL_DOMAIN}`}
+            </div>
+          </Field>
+
+          <div className="flex justify-end">
+            <Button
+              size="sm"
+              onClick={addRow}
+              disabled={createMut.isPending || !draft.primeiroNome.trim() || !draft.curso_id}
+              className="h-8 gap-1.5"
+            >
+              {createMut.isPending ? (
+                <><Loader2 className="w-3.5 h-3.5 animate-spin" /> A adicionar…</>
+              ) : (
+                <><Plus className="w-3.5 h-3.5" /> Adicionar discente</>
+              )}
+            </Button>
+          </div>
         </div>
       </Card>
+    </div>
+  );
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="space-y-1">
+      <Label className="text-[10px] uppercase tracking-wide text-muted-foreground font-semibold">{label}</Label>
+      {children}
     </div>
   );
 }
