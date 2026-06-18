@@ -66,6 +66,14 @@ export default function AdminDiscenteProfile() {
   const cursoCode = curso?.code || curso?.codigo || "";
   const facName = faculdade?.sigla || faculdade?.name || "—";
   const displayId = `DISC-${(student.id as string).slice(0, 8).toUpperCase()}`;
+  const dataMatricula = student.created_at
+    ? new Date(student.created_at).toLocaleDateString("pt-PT", { day: "2-digit", month: "2-digit", year: "numeric" })
+    : "—";
+
+  // Encarregado: split full name into Primeiro / Último for display
+  const encParts = (student.enc_nome || "").trim().split(/\s+/).filter(Boolean);
+  const encPrimeiro = encParts[0] || "";
+  const encUltimo = encParts.length > 1 ? encParts.slice(1).join(" ") : "";
 
   const initials = (student.nome || "?")
     .split(/\s+/).filter(Boolean).slice(0, 2).map((p: string) => p[0]?.toUpperCase()).join("");
@@ -101,9 +109,34 @@ export default function AdminDiscenteProfile() {
                   <Button size="sm" variant="outline" className="gap-1.5 text-xs h-7">
                     <Mail className="w-3.5 h-3.5" /> Email
                   </Button>
-                  <Button size="sm" className="gap-1.5 text-xs h-7" onClick={() => setDocOpen(true)}>
-                    <FileText className="w-3.5 h-3.5" /> Ver Ficha
-                  </Button>
+
+                  {/* Uniform institutional document badge — same pattern as GAP/Finanças */}
+                  <div className="inline-flex items-center gap-2 pl-1.5 pr-1 py-1 rounded-md border border-border bg-background shadow-sm">
+                    <div className="w-6 h-6 rounded bg-red-50 border border-red-200 flex items-center justify-center shrink-0">
+                      <FileText className="w-3 h-3 text-red-600" />
+                    </div>
+                    <div className="flex flex-col min-w-0 leading-tight">
+                      <span className="text-[11px] font-semibold text-foreground tabular-nums">{displayId}</span>
+                      <span className="text-[9px] tracking-[0.02em] text-muted-foreground font-medium">Gerado automaticamente</span>
+                    </div>
+                    <span className="self-stretch w-px bg-border mx-0.5" />
+                    <button
+                      type="button"
+                      onClick={() => setDocOpen(true)}
+                      className="w-5 h-5 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                      title="Ver documento"
+                    >
+                      <Eye className="w-3 h-3" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => toast({ title: "Documento exportado", description: `${displayId}.pdf` })}
+                      className="w-5 h-5 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                      title="Exportar"
+                    >
+                      <Download className="w-3 h-3" />
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -161,12 +194,14 @@ export default function AdminDiscenteProfile() {
               <InfoRow label="Turma" value={`Turma ${student.turma}`} icon={<Users className="w-4 h-4 text-primary" />} />
               <InfoRow label="Regime" value={student.regime === "bolseiro" ? "Bolseiro" : "Normal"} icon={<Award className="w-4 h-4 text-primary" />} />
               <InfoRow label="Matrícula" value={displayId} icon={<IdCard className="w-4 h-4 text-primary" />} />
+              <InfoRow label="Data de Matriculação" value={dataMatricula} icon={<Calendar className="w-4 h-4 text-primary" />} />
             </SectionCard>
           </div>
 
           <div className="grid lg:grid-cols-2 gap-4">
             <SectionCard title="Encarregado de Educação" icon={<UserCheck className="w-4 h-4" />}>
-              <InfoRow label="Nome" value={student.enc_nome || "—"} icon={<UserCheck className="w-4 h-4 text-primary" />} />
+              <InfoRow label="Primeiro nome" value={encPrimeiro || "—"} icon={<UserCheck className="w-4 h-4 text-primary" />} />
+              <InfoRow label="Último nome" value={encUltimo || "—"} icon={<UserCheck className="w-4 h-4 text-primary" />} />
               <InfoRow label="Parentesco" value={student.enc_parentesco || "—"} icon={<Users className="w-4 h-4 text-primary" />} />
               <InfoRow label="Contacto telefónico" value={student.enc_telefone || "—"} icon={<Phone className="w-4 h-4 text-primary" />} />
             </SectionCard>
