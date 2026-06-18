@@ -29,7 +29,7 @@ export default function ProfessorFinances() {
   const pendenteCount = multas.filter(m => m.status === "pendente").length;
 
   // Net salary = liquido - applied multas
-  const salarioRecebido = 382500 - totalMultasAplicadas;
+  const salarioRecebido = 0 - totalMultasAplicadas;
 
   return (
     <div className="p-6 lg:p-8 max-w-5xl mx-auto space-y-6 animate-fade-in">
