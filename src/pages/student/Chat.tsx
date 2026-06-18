@@ -107,9 +107,12 @@ export default function StudentChat() {
           if (match) {
             other_name = match.display_name;
             other_modulo = match.modulo;
-          } else {
-            const { data: name } = await (supabase as any).rpc("get_user_name", { _user_id: otherId });
-            other_name = name ?? other_name;
+          }
+          if (!other_modulo) {
+            if (!match) {
+              const { data: name } = await (supabase as any).rpc("get_user_name", { _user_id: otherId });
+              other_name = name ?? other_name;
+            }
             const { data: roleRow } = await (supabase as any)
               .from("user_roles")
               .select("role")
@@ -256,13 +259,16 @@ export default function StudentChat() {
                 <Button size="icon" variant="ghost" className="h-8 w-8"><Plus className="w-4 h-4" /></Button>
               </PopoverTrigger>
               <PopoverContent align="end" className="w-72 p-0">
-                <div className="p-2 border-b border-border">
+                <div className="p-2 border-b border-border space-y-2">
+                  <p className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold px-1">
+                    Iniciar conversa
+                  </p>
                   <div className="relative">
                     <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
                     <Input
                       value={contactQuery}
                       onChange={(e) => setContactQuery(e.target.value)}
-                      placeholder="Pesquisar contactos…"
+                      placeholder="Escolher utilizador…"
                       className="pl-8 h-8 text-sm"
                     />
                   </div>
@@ -348,6 +354,11 @@ export default function StudentChat() {
             </div>
           ) : (
             <>
+              {filteredConvs.length > 0 && (
+                <div className="px-3 pt-3 pb-1 text-[10px] uppercase tracking-wide text-muted-foreground font-semibold">
+                  Conversas
+                </div>
+              )}
               {filteredConvs.map((c) => (
                 <button
                   key={c.id}
