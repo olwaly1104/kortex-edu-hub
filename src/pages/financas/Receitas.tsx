@@ -97,7 +97,7 @@ export default function Receitas() {
         }
       />
 
-      <RevDespTabs />
+
 
 
       {/* Período toggle + result + selector */}
