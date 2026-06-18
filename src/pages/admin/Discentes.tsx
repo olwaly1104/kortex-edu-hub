@@ -104,22 +104,27 @@ export default function AdminDiscentes() {
   const setF = <K extends keyof Draft>(k: K, v: Draft[K]) => setDraft((d) => ({ ...d, [k]: v }));
 
   const addRow = async () => {
-    if (!draft.primeiroNome.trim() || !draft.email.trim() || !draft.curso_id) {
-      toast.error("Preencha nome, email e curso");
+    if (!draft.primeiroNome.trim() || !draft.curso_id) {
+      toast.error("Preencha nome e curso");
       return;
     }
     const nome = `${draft.primeiroNome.trim()} ${draft.ultimoNome.trim()}`.trim();
+    const email = buildEmail(draft.primeiroNome, draft.ultimoNome);
+    if (!email) {
+      toast.error("Não foi possível gerar email a partir do nome");
+      return;
+    }
     try {
       await createMut.mutateAsync({
         curso_id: draft.curso_id,
         nome,
-        email: draft.email.trim(),
+        email,
         ano: draft.ano,
         turma: draft.turma,
         primeiro_nome: draft.primeiroNome.trim(),
         ultimo_nome: draft.ultimoNome.trim() || null,
       });
-      toast.success("Discente adicionado");
+      toast.success(`Discente adicionado · ${email}`);
       setDraft(emptyDraft(draft.curso_id));
     } catch (e: any) {
       toast.error(e?.message || "Erro ao adicionar discente");
