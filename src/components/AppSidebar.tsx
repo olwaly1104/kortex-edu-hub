@@ -348,7 +348,32 @@ export default function AppSidebar() {
             </div>
           )}
         </div>
+
+        {!collapsed && (
+          <div className="mt-3 space-y-1.5">
+            {live ? (
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-sidebar-border bg-sidebar-accent/40 px-2 py-0.5 text-[9.5px] uppercase tracking-wider font-semibold text-sidebar-primary">
+                <GraduationCap className="w-3 h-3" />
+                Ano Letivo
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-300 bg-amber-50 px-2 py-0.5 text-[9.5px] uppercase tracking-wider font-semibold text-amber-800">
+                <Rocket className="w-3 h-3" />
+                Onboarding
+              </span>
+            )}
+            <div className="flex items-center gap-1.5 text-[10.5px] text-sidebar-foreground/70 font-medium capitalize">
+              <CalendarDays className="w-3 h-3 shrink-0" />
+              <span className="truncate">{todayLabel}</span>
+              <span className="text-sidebar-foreground/30">·</span>
+              <Clock className="w-3 h-3 shrink-0" />
+              <span className="tabular-nums font-semibold text-sidebar-primary">{liveTime}</span>
+            </div>
+          </div>
+        )}
       </div>
+
+
 
 
       <nav className="flex-1 overflow-y-auto py-2 px-2">
