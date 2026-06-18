@@ -350,6 +350,8 @@ export type Database = {
         Row: {
           ano: string
           bilhete: string | null
+          bilhete_url: string | null
+          certificado_url: string | null
           created_at: string
           curso_id: string
           email: string
@@ -357,6 +359,7 @@ export type Database = {
           enc_parentesco: string | null
           enc_telefone: string | null
           endereco: string | null
+          foto_url: string | null
           genero: string | null
           id: string
           municipio: string | null
@@ -376,6 +379,8 @@ export type Database = {
         Insert: {
           ano?: string
           bilhete?: string | null
+          bilhete_url?: string | null
+          certificado_url?: string | null
           created_at?: string
           curso_id: string
           email: string
@@ -383,6 +388,7 @@ export type Database = {
           enc_parentesco?: string | null
           enc_telefone?: string | null
           endereco?: string | null
+          foto_url?: string | null
           genero?: string | null
           id?: string
           municipio?: string | null
@@ -402,6 +408,8 @@ export type Database = {
         Update: {
           ano?: string
           bilhete?: string | null
+          bilhete_url?: string | null
+          certificado_url?: string | null
           created_at?: string
           curso_id?: string
           email?: string
@@ -409,6 +417,7 @@ export type Database = {
           enc_parentesco?: string | null
           enc_telefone?: string | null
           endereco?: string | null
+          foto_url?: string | null
           genero?: string | null
           id?: string
           municipio?: string | null
