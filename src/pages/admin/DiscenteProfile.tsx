@@ -10,12 +10,16 @@ import {
 import {
   ArrowLeft, Mail, MessageCircle, Users, Phone, MapPin, UserCheck, Calendar,
   GraduationCap, FileText, Building2, IdCard, Loader2, Award, Eye, Download,
+  Wallet, Receipt, CircleDollarSign,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
-import { useEstudantes, useCursos, useFaculdades } from "@/lib/useInstitution";
+import { useEstudantes, useCursos, useFaculdades, usePropinas } from "@/lib/useInstitution";
 import DiscenteDocPreview from "./DiscenteDocPreview";
+
+const fmtAOA = (n: number) =>
+  new Intl.NumberFormat("pt-PT", { style: "currency", currency: "AOA", maximumFractionDigits: 0 }).format(n || 0);
 
 function useSignedUrl(path: string | null) {
   const [url, setUrl] = useState<string | null>(null);
@@ -37,11 +41,13 @@ export default function AdminDiscenteProfile() {
   const { data: rows = [], isLoading } = useEstudantes();
   const { data: cursos = [] } = useCursos();
   const { data: faculdades = [] } = useFaculdades();
+  const { data: propinas = [] } = usePropinas();
   const [docOpen, setDocOpen] = useState(false);
 
   const student = useMemo(() => rows.find((r: any) => r.id === discenteId) as any, [rows, discenteId]);
   const curso = useMemo(() => cursos.find((c: any) => c.id === student?.curso_id) as any, [cursos, student]);
   const faculdade = useMemo(() => faculdades.find((f: any) => f.id === curso?.faculdade_id) as any, [faculdades, curso]);
+  const propina = useMemo(() => propinas.find((p: any) => p.curso_id === student?.curso_id) as any, [propinas, student]);
 
   const fotoUrl = useSignedUrl(student?.foto_url || null);
 
@@ -85,7 +91,35 @@ export default function AdminDiscenteProfile() {
       </Button>
 
       {/* Identity header */}
-      <Card className="overflow-hidden p-0">
+      <Card className="overflow-hidden p-0 relative">
+        {/* Uniform institutional document badge — top right corner */}
+        <div className="absolute top-4 right-4 z-10 inline-flex items-center gap-2 pl-1.5 pr-1 py-1 rounded-md border border-border bg-background shadow-sm">
+          <div className="w-6 h-6 rounded bg-red-50 border border-red-200 flex items-center justify-center shrink-0">
+            <FileText className="w-3 h-3 text-red-600" />
+          </div>
+          <div className="flex flex-col min-w-0 leading-tight">
+            <span className="text-[11px] font-semibold text-foreground tabular-nums">{displayId}</span>
+            <span className="text-[9px] tracking-[0.02em] text-muted-foreground font-medium">Gerado automaticamente</span>
+          </div>
+          <span className="self-stretch w-px bg-border mx-0.5" />
+          <button
+            type="button"
+            onClick={() => setDocOpen(true)}
+            className="w-5 h-5 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+            title="Ver documento"
+          >
+            <Eye className="w-3 h-3" />
+          </button>
+          <button
+            type="button"
+            onClick={() => toast({ title: "Documento exportado", description: `${displayId}.pdf` })}
+            className="w-5 h-5 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+            title="Exportar"
+          >
+            <Download className="w-3 h-3" />
+          </button>
+        </div>
+
         <div className="grid lg:grid-cols-[1.6fr_1fr] divide-y lg:divide-y-0 lg:divide-x divide-border">
           <div className="p-6">
             <div className="flex items-start gap-5">
@@ -109,34 +143,6 @@ export default function AdminDiscenteProfile() {
                   <Button size="sm" variant="outline" className="gap-1.5 text-xs h-7">
                     <Mail className="w-3.5 h-3.5" /> Email
                   </Button>
-
-                  {/* Uniform institutional document badge — same pattern as GAP/Finanças */}
-                  <div className="inline-flex items-center gap-2 pl-1.5 pr-1 py-1 rounded-md border border-border bg-background shadow-sm">
-                    <div className="w-6 h-6 rounded bg-red-50 border border-red-200 flex items-center justify-center shrink-0">
-                      <FileText className="w-3 h-3 text-red-600" />
-                    </div>
-                    <div className="flex flex-col min-w-0 leading-tight">
-                      <span className="text-[11px] font-semibold text-foreground tabular-nums">{displayId}</span>
-                      <span className="text-[9px] tracking-[0.02em] text-muted-foreground font-medium">Gerado automaticamente</span>
-                    </div>
-                    <span className="self-stretch w-px bg-border mx-0.5" />
-                    <button
-                      type="button"
-                      onClick={() => setDocOpen(true)}
-                      className="w-5 h-5 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-                      title="Ver documento"
-                    >
-                      <Eye className="w-3 h-3" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => toast({ title: "Documento exportado", description: `${displayId}.pdf` })}
-                      className="w-5 h-5 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-                      title="Exportar"
-                    >
-                      <Download className="w-3 h-3" />
-                    </button>
-                  </div>
                 </div>
               </div>
             </div>
@@ -174,6 +180,7 @@ export default function AdminDiscenteProfile() {
         <TabsList className="bg-muted/40">
           <TabsTrigger value="overview" className="text-xs">Visão Geral</TabsTrigger>
           <TabsTrigger value="documentos" className="text-xs">Documentos</TabsTrigger>
+          <TabsTrigger value="financas" className="text-xs">Finanças</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
@@ -228,6 +235,63 @@ export default function AdminDiscenteProfile() {
               <DocRow label="Fotografia" path={student.foto_url} icon={<UserCheck className="w-4 h-4 text-primary" />} />
             </div>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="financas" className="space-y-4">
+          {(() => {
+            const isBolseiro = student.regime === "bolseiro";
+            const valorMensal = Number(propina?.valor_mensal || 0);
+            const imposto = Number(propina?.imposto || 0);
+            const totalMensal = valorMensal + (valorMensal * imposto) / 100;
+            const totalAnual = totalMensal * 12;
+            return (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <Card className="p-4">
+                    <div className="flex items-center gap-2 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
+                      <Wallet className="w-3.5 h-3.5" /> Propina Mensal
+                    </div>
+                    <p className="text-2xl font-bold tabular-nums mt-2">
+                      {isBolseiro ? "Isento" : fmtAOA(totalMensal)}
+                    </p>
+                    <p className="text-[11px] text-muted-foreground mt-0.5">
+                      {isBolseiro ? "Regime de Bolsa" : `Base ${fmtAOA(valorMensal)} + ${imposto}%`}
+                    </p>
+                  </Card>
+                  <Card className="p-4">
+                    <div className="flex items-center gap-2 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
+                      <CircleDollarSign className="w-3.5 h-3.5" /> Total Anual Estimado
+                    </div>
+                    <p className="text-2xl font-bold tabular-nums mt-2">
+                      {isBolseiro ? fmtAOA(0) : fmtAOA(totalAnual)}
+                    </p>
+                    <p className="text-[11px] text-muted-foreground mt-0.5">12 mensalidades</p>
+                  </Card>
+                  <Card className="p-4">
+                    <div className="flex items-center gap-2 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
+                      <Receipt className="w-3.5 h-3.5" /> Estado
+                    </div>
+                    <div className="mt-2">
+                      <Badge variant="outline" className={cn("text-xs px-2 py-0.5",
+                        isBolseiro ? "bg-amber-50 text-amber-700 border-amber-200" : "bg-accent/10 text-accent border-accent/30")}>
+                        {isBolseiro ? "Bolseiro" : "Regularizado"}
+                      </Badge>
+                    </div>
+                    <p className="text-[11px] text-muted-foreground mt-2">Sem pendências</p>
+                  </Card>
+                </div>
+
+                <SectionCard title="Plano Financeiro" icon={<Wallet className="w-4 h-4" />}>
+                  <InfoRow label="Regime" value={isBolseiro ? "Bolseiro" : "Normal"} icon={<Award className="w-4 h-4 text-primary" />} />
+                  <InfoRow label="Curso" value={cursoName} icon={<GraduationCap className="w-4 h-4 text-primary" />} />
+                  <InfoRow label="Propina base" value={propina ? fmtAOA(valorMensal) : "—"} icon={<Wallet className="w-4 h-4 text-primary" />} />
+                  <InfoRow label="Imposto" value={propina ? `${imposto}%` : "—"} icon={<Receipt className="w-4 h-4 text-primary" />} />
+                  <InfoRow label="Mensalidade final" value={isBolseiro ? "Isento" : (propina ? fmtAOA(totalMensal) : "—")} icon={<CircleDollarSign className="w-4 h-4 text-primary" />} />
+                  <InfoRow label="Data de matriculação" value={dataMatricula} icon={<Calendar className="w-4 h-4 text-primary" />} />
+                </SectionCard>
+              </>
+            );
+          })()}
         </TabsContent>
       </Tabs>
 
