@@ -526,6 +526,12 @@ export default function FinancasCalendario() {
         right={
           <CriarEventoDialog
             defaultDate={selectedDate}
+            onCreated={(iso) => {
+              const d = new Date(iso + "T00:00");
+              setSelectedDate(d);
+              setWeekStart(startOfWeek(d));
+              setMonthCursor(new Date(d.getFullYear(), d.getMonth(), 1));
+            }}
             trigger={
               <Button size="sm" className="gap-2 h-8">
                 <Plus className="w-3.5 h-3.5" /> Criar Evento
