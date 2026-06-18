@@ -334,7 +334,6 @@ export default function GapEstudantes() {
               onClick={save}
               disabled={
                 !draft.primeiroNome.trim() ||
-                !draft.email.trim() ||
                 !draft.curso_id ||
                 createMut.isPending
               }
