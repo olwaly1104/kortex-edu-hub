@@ -517,16 +517,29 @@ export default function StudentChat() {
           <>
             <header className="h-14 border-b border-border bg-card px-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <Avatar className="w-9 h-9">
-                  <AvatarFallback className="text-xs bg-primary/10 text-primary font-medium">
-                    {initials(selected.other_name ?? "?")}
-                  </AvatarFallback>
-                </Avatar>
+                <div className="relative">
+                  <Avatar className="w-9 h-9">
+                    <AvatarFallback className="text-xs bg-primary/10 text-primary font-medium">
+                      {initials(selected.other_name ?? "?")}
+                    </AvatarFallback>
+                  </Avatar>
+                  {selected.other_id && onlineIds.has(selected.other_id) && (
+                    <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-card" />
+                  )}
+                </div>
                 <div>
                   <div className="flex items-center gap-2">
                     <p className="text-sm font-semibold leading-tight">{selected.other_name}</p>
                     <ModuleTag modulo={selected.other_modulo} size="xs" />
                   </div>
+                  {selected.other_id && (
+                    <p className={cn(
+                      "text-[11px] leading-tight mt-0.5",
+                      onlineIds.has(selected.other_id) ? "text-emerald-600 font-medium" : "text-muted-foreground"
+                    )}>
+                      {onlineIds.has(selected.other_id) ? "online" : formatLastSeen(lastSeen[selected.other_id])}
+                    </p>
+                  )}
                 </div>
               </div>
               <div className="flex items-center gap-1">
