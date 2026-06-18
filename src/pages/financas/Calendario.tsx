@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils";
 
 const DAYS = ["Seg", "Ter", "Qua", "Qui", "Sex"];
 
-type EventType = "reuniao" | "prazo" | "pessoal" | "caixa";
+type EventType = "reuniao" | "prazo" | "pessoal";
 type Modalidade = "kortex" | "presencial";
 
 type StoredEvent = {
@@ -30,7 +30,6 @@ type StoredEvent = {
   link?: string;
   modalidade?: Modalidade;
   participants?: { id: string; name: string; modulo: string | null }[];
-  categoria?: string;
   color: string;
 };
 
@@ -46,7 +45,6 @@ function mapDbEvent(row: any): StoredEvent {
     link: row.link || undefined,
     modalidade: row.modalidade || undefined,
     participants: Array.isArray(row.participants) ? row.participants : [],
-    categoria: row.categoria || undefined,
     color: row.color,
   };
 }
@@ -55,20 +53,13 @@ const EVENT_COLORS: Record<EventType, string> = {
   reuniao: "hsl(142 65% 35%)",
   prazo: "hsl(0 72% 51%)",
   pessoal: "hsl(217 91% 60%)",
-  caixa: "hsl(38 92% 50%)",
 };
 
-const EVENT_TYPES: { value: EventType; label: string; description: string; icon: typeof Video }[] = [
-  { value: "reuniao", label: "Reunião", description: "Encontro com participantes", icon: Users },
-  { value: "prazo", label: "Prazo", description: "Data limite", icon: Clock },
-  { value: "pessoal", label: "Pessoal", description: "Bloqueio de agenda", icon: User },
-  { value: "caixa", label: "Caixa", description: "Movimento financeiro", icon: Wallet },
-];
-
-const CAIXA_CATEGORIAS: { value: string; label: string; icon: typeof Video; tone: string }[] = [
-  { value: "entrada", label: "Entrada", icon: ArrowDownToLine, tone: "text-emerald-600" },
-  { value: "saida", label: "Saída", icon: ArrowUpFromLine, tone: "text-rose-600" },
-];
+const EVENT_TYPE_LABELS: Record<EventType, string> = {
+  reuniao: "Reunião",
+  prazo: "Prazo",
+  pessoal: "Pessoal",
+};
 
 function CriarEventoDialog({ defaultDate, trigger, onCreated }: { defaultDate: Date; trigger: React.ReactNode; onCreated?: (event: StoredEvent) => void }) {
   const todayISO = new Date().toISOString().split("T")[0];
