@@ -110,6 +110,14 @@ export default function StudentChat() {
           } else {
             const { data: name } = await (supabase as any).rpc("get_user_name", { _user_id: otherId });
             other_name = name ?? other_name;
+            const { data: roleRow } = await (supabase as any)
+              .from("user_roles")
+              .select("role")
+              .eq("user_id", otherId)
+              .order("created_at", { ascending: true })
+              .limit(1)
+              .maybeSingle();
+            other_modulo = roleRow?.role ?? null;
           }
         }
       }
@@ -204,6 +212,16 @@ export default function StudentChat() {
     [contacts, contactQuery],
   );
 
+  // Contacts matching the main search that are NOT already in the visible conversations list.
+  const searchableContacts = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q || tab !== "chats") return [];
+    const existingIds = new Set(conversations.filter((c) => !c.is_group).map((c) => c.other_id));
+    return contacts.filter(
+      (c) => !existingIds.has(c.id) && c.display_name.toLowerCase().includes(q),
+    );
+  }, [contacts, conversations, query, tab]);
+
   const selected = conversations.find((c) => c.id === selectedId);
 
   const grouped = useMemo(() => {
@@ -265,8 +283,10 @@ export default function StudentChat() {
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium truncate">{c.display_name}</p>
-                          <div className="mt-0.5"><ModuleTag modulo={c.modulo} size="xs" /></div>
+                          <div className="flex items-center gap-1.5 min-w-0">
+                            <p className="text-sm font-medium truncate">{c.display_name}</p>
+                            <ModuleTag modulo={c.modulo} size="xs" />
+                          </div>
                         </div>
                       </button>
                     ))
@@ -306,7 +326,7 @@ export default function StudentChat() {
               <Input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder={tab === "grupos" ? "Pesquisar grupos…" : "Pesquisar conversas…"}
+                placeholder={tab === "grupos" ? "Pesquisar grupos…" : "Pesquisar conversas, utilizadores…"}
                 className="pl-8 h-9 text-sm"
               />
             </div>
@@ -319,7 +339,7 @@ export default function StudentChat() {
               <PhoneCall className="w-8 h-8 mx-auto mb-2 text-muted-foreground/40" />
               <p className="text-xs text-muted-foreground">Sem chamadas recentes.</p>
             </div>
-          ) : filteredConvs.length === 0 ? (
+          ) : filteredConvs.length === 0 && searchableContacts.length === 0 ? (
             <div className="p-6 text-center">
               <MessageSquare className="w-8 h-8 mx-auto mb-2 text-muted-foreground/40" />
               <p className="text-xs text-muted-foreground">
@@ -327,39 +347,70 @@ export default function StudentChat() {
               </p>
             </div>
           ) : (
-            filteredConvs.map((c) => (
-              <button
-                key={c.id}
-                onClick={() => {
-                  setSelectedId(c.id);
-                  setSearchParams({ conversation: c.id });
-                }}
-                className={cn(
-                  "w-full text-left px-3 py-2.5 border-b border-border/60 hover:bg-muted/40 transition-colors flex gap-3 items-center",
-                  selectedId === c.id && "bg-muted",
-                )}
-              >
-                <Avatar className="w-10 h-10 shrink-0">
-                  <AvatarFallback className="text-xs bg-primary/10 text-primary font-medium">
-                    {initials(c.other_name ?? "?")}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-1.5 min-w-0">
-                      <p className="text-sm font-medium truncate">{c.other_name}</p>
-                      {c.other_modulo && <ModuleTag modulo={c.other_modulo} size="xs" />}
+            <>
+              {filteredConvs.map((c) => (
+                <button
+                  key={c.id}
+                  onClick={() => {
+                    setSelectedId(c.id);
+                    setSearchParams({ conversation: c.id });
+                  }}
+                  className={cn(
+                    "w-full text-left px-3 py-2.5 border-b border-border/60 hover:bg-muted/40 transition-colors flex gap-3 items-center",
+                    selectedId === c.id && "bg-muted",
+                  )}
+                >
+                  <Avatar className="w-10 h-10 shrink-0">
+                    <AvatarFallback className="text-xs bg-primary/10 text-primary font-medium">
+                      {initials(c.other_name ?? "?")}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <p className="text-sm font-medium truncate">{c.other_name}</p>
+                        {c.other_modulo && <ModuleTag modulo={c.other_modulo} size="xs" />}
+                      </div>
+                      <span className="text-[10px] text-muted-foreground shrink-0">
+                        {new Date(c.updated_at).toLocaleTimeString("pt-PT", { hour: "2-digit", minute: "2-digit" })}
+                      </span>
                     </div>
-                    <span className="text-[10px] text-muted-foreground shrink-0">
-                      {new Date(c.updated_at).toLocaleTimeString("pt-PT", { hour: "2-digit", minute: "2-digit" })}
-                    </span>
+                    <p className="text-[11px] text-muted-foreground truncate mt-0.5">
+                      {c.last_message ?? "Sem mensagens"}
+                    </p>
                   </div>
-                  <p className="text-[11px] text-muted-foreground truncate mt-0.5">
-                    {c.last_message ?? "Sem mensagens"}
-                  </p>
-                </div>
-              </button>
-            ))
+                </button>
+              ))}
+              {searchableContacts.length > 0 && (
+                <>
+                  <div className="px-3 pt-3 pb-1 text-[10px] uppercase tracking-wide text-muted-foreground font-semibold">
+                    Utilizadores
+                  </div>
+                  {searchableContacts.map((u) => (
+                    <button
+                      key={u.id}
+                      onClick={() => startWith(u.id)}
+                      className="w-full text-left px-3 py-2.5 border-b border-border/60 hover:bg-muted/40 transition-colors flex gap-3 items-center"
+                    >
+                      <Avatar className="w-10 h-10 shrink-0">
+                        <AvatarFallback className="text-xs bg-muted text-foreground font-medium">
+                          {initials(u.display_name)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5 min-w-0">
+                          <p className="text-sm font-medium truncate">{u.display_name}</p>
+                          <ModuleTag modulo={u.modulo} size="xs" />
+                        </div>
+                        <p className="text-[11px] text-muted-foreground truncate mt-0.5">
+                          Iniciar conversa
+                        </p>
+                      </div>
+                    </button>
+                  ))}
+                </>
+              )}
+            </>
           )}
         </ScrollArea>
       </aside>
@@ -388,8 +439,10 @@ export default function StudentChat() {
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="text-sm font-semibold leading-tight">{selected.other_name}</p>
-                  <div className="mt-1"><ModuleTag modulo={selected.other_modulo} size="xs" /></div>
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-semibold leading-tight">{selected.other_name}</p>
+                    <ModuleTag modulo={selected.other_modulo} size="xs" />
+                  </div>
                 </div>
               </div>
               <div className="flex items-center gap-1">
