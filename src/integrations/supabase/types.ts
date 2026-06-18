@@ -41,6 +41,50 @@ export type Database = {
         }
         Relationships: []
       }
+      agendamentos_gap: {
+        Row: {
+          assunto: string
+          created_at: string
+          data_hora: string
+          estado: string
+          estudante_id: string
+          id: string
+          notas: string | null
+          owner_user_id: string
+          updated_at: string
+        }
+        Insert: {
+          assunto: string
+          created_at?: string
+          data_hora: string
+          estado?: string
+          estudante_id: string
+          id?: string
+          notas?: string | null
+          owner_user_id: string
+          updated_at?: string
+        }
+        Update: {
+          assunto?: string
+          created_at?: string
+          data_hora?: string
+          estado?: string
+          estudante_id?: string
+          id?: string
+          notas?: string | null
+          owner_user_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agendamentos_gap_estudante_id_fkey"
+            columns: ["estudante_id"]
+            isOneToOne: false
+            referencedRelation: "estudantes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cadeiras: {
         Row: {
           ano: number
@@ -598,6 +642,47 @@ export type Database = {
             columns: ["curso_id"]
             isOneToOne: true
             referencedRelation: "cursos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      solicitacoes_gap: {
+        Row: {
+          assunto: string
+          created_at: string
+          descricao: string | null
+          estado: string
+          estudante_id: string
+          id: string
+          owner_user_id: string
+          updated_at: string
+        }
+        Insert: {
+          assunto: string
+          created_at?: string
+          descricao?: string | null
+          estado?: string
+          estudante_id: string
+          id?: string
+          owner_user_id: string
+          updated_at?: string
+        }
+        Update: {
+          assunto?: string
+          created_at?: string
+          descricao?: string | null
+          estado?: string
+          estudante_id?: string
+          id?: string
+          owner_user_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "solicitacoes_gap_estudante_id_fkey"
+            columns: ["estudante_id"]
+            isOneToOne: false
+            referencedRelation: "estudantes"
             referencedColumns: ["id"]
           },
         ]
