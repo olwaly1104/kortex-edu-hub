@@ -14,6 +14,7 @@ import { supabase } from "@/integrations/supabase/client";
 import {
   useEstudantes,
   useCursos,
+  useFaculdades,
   useCreateEstudante,
   useDeleteEstudante,
 } from "@/lib/useInstitution";
@@ -39,6 +40,7 @@ type Draft = {
   enc_nome: string;
   enc_parentesco: string;
   enc_telefone: string;
+  faculdade_id: string;
   curso_id: string;
   ano: string;
   turma: string;
