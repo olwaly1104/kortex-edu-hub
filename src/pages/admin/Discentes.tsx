@@ -394,13 +394,13 @@ export default function AdminDiscentes() {
             <DialogTitle className="flex items-center gap-2">
               <GraduationCap className="w-5 h-5 text-primary" /> Adicionar Discente
             </DialogTitle>
-            <DialogDescription>Registo completo do estudante. Email institucional é gerado automaticamente.</DialogDescription>
+            <DialogDescription>Preencha os dados do estudante. O email institucional é gerado automaticamente.</DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-5 py-2">
-            {/* Dados Pessoais */}
-            <div>
-              <p className="text-[10px] uppercase tracking-wide text-muted-foreground font-semibold mb-2">Dados Pessoais</p>
+          <div className="space-y-6 py-2">
+            {/* 1. Identificação Pessoal */}
+            <section>
+              <SectionTitle index={1} title="Identificação Pessoal" hint="Dados do estudante e documento de identidade" />
               <div className="flex items-start gap-4">
                 <button
                   type="button"
@@ -458,11 +458,11 @@ export default function AdminDiscentes() {
                   </Field>
                 </div>
               </div>
-            </div>
+            </section>
 
-            {/* Académico */}
-            <div>
-              <p className="text-[10px] uppercase tracking-wide text-muted-foreground font-semibold mb-2">Académico</p>
+            {/* 2. Enquadramento Académico */}
+            <section>
+              <SectionTitle index={2} title="Enquadramento Académico" hint="Faculdade, curso, ano e turma de inscrição" />
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                 <Field label="Faculdade">
                   <Select value={draft.faculdade_id} onValueChange={(v) => setF("faculdade_id", v)}>
@@ -499,21 +499,29 @@ export default function AdminDiscentes() {
                   </Select>
                 </Field>
               </div>
-            </div>
+            </section>
 
-            {/* Contacto */}
-            <div>
-              <p className="text-[10px] uppercase tracking-wide text-muted-foreground font-semibold mb-2">Contacto</p>
-              <div className="grid grid-cols-2 gap-2">
-                <Field label="Telemóvel / Contacto">
+            {/* 3. Contacto & Email */}
+            <section>
+              <SectionTitle index={3} title="Contacto & Email Institucional" hint="Telemóvel pessoal e email gerado automaticamente" />
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                <Field label="Telemóvel">
                   <Input value={draft.telemovel} onChange={(e) => setF("telemovel", e.target.value)} placeholder="+244 9XX XXX XXX" className="h-8 text-xs" />
                 </Field>
+                <div className="md:col-span-2">
+                  <Field label="Email institucional">
+                    <div className="h-8 px-2.5 flex items-center justify-between gap-2 text-[11px] bg-muted/40 border border-input rounded-md">
+                      <span className="truncate font-mono text-foreground/80">{previewEmail || `nome.apelido@${EMAIL_DOMAIN}`}</span>
+                      <span className="text-[9px] uppercase tracking-wide px-1.5 py-0.5 rounded bg-primary/10 text-primary font-semibold shrink-0">Auto</span>
+                    </div>
+                  </Field>
+                </div>
               </div>
-            </div>
+            </section>
 
-            {/* Morada */}
-            <div>
-              <p className="text-[10px] uppercase tracking-wide text-muted-foreground font-semibold mb-2">Morada</p>
+            {/* 4. Morada */}
+            <section>
+              <SectionTitle index={4} title="Morada de Residência" hint="Localização atual do estudante" />
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                 <Field label="Província">
                   <Input value={draft.provincia} onChange={(e) => setF("provincia", e.target.value)} placeholder="Luanda" className="h-8 text-xs" />
@@ -527,36 +535,29 @@ export default function AdminDiscentes() {
                   </Field>
                 </div>
               </div>
-            </div>
+            </section>
 
-            {/* Encarregado */}
-            <div>
-              <p className="text-[10px] uppercase tracking-wide text-muted-foreground font-semibold mb-2">Encarregado / Responsável</p>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                <Field label="Nome do responsável">
+            {/* 5. Encarregado */}
+            <section>
+              <SectionTitle index={5} title="Encarregado de Educação" hint="Pessoa responsável pelo estudante" />
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                <Field label="Nome completo">
                   <Input value={draft.enc_nome} onChange={(e) => setF("enc_nome", e.target.value)} placeholder="João Silva" className="h-8 text-xs" />
                 </Field>
                 <Field label="Parentesco">
                   <Input value={draft.enc_parentesco} onChange={(e) => setF("enc_parentesco", e.target.value)} placeholder="Pai / Mãe / Tutor" className="h-8 text-xs" />
                 </Field>
-                <Field label="Contacto do responsável">
+                <Field label="Contacto telefónico">
                   <Input value={draft.enc_telefone} onChange={(e) => setF("enc_telefone", e.target.value)} placeholder="+244 9XX XXX XXX" className="h-8 text-xs" />
                 </Field>
               </div>
-            </div>
+            </section>
 
-            {/* Auto email */}
-            <Field label="Email institucional (gerado automaticamente)">
-              <div className="h-8 px-2.5 flex items-center text-[11px] text-muted-foreground bg-background border border-input rounded-md truncate font-mono">
-                {previewEmail || `nome.apelido@${EMAIL_DOMAIN}`}
-              </div>
-            </Field>
-
-            {/* Documentação */}
-            <div>
-              <p className="text-[10px] uppercase tracking-wide text-muted-foreground font-semibold mb-2">Documentação</p>
+            {/* 6. Documentação */}
+            <section>
+              <SectionTitle index={6} title="Documentação Anexa" hint="Carregue os ficheiros em PDF ou imagem" />
               <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                <Field label="Bilhete de Identidade (upload)">
+                <Field label="Bilhete de Identidade">
                   <FileButton
                     file={draft.bilheteFile}
                     onPick={(f) => setF("bilheteFile", f)}
@@ -565,7 +566,7 @@ export default function AdminDiscentes() {
                     Icon={IdCard}
                   />
                 </Field>
-                <Field label="Certificado Ensino Médio (upload)">
+                <Field label="Certificado Ensino Médio">
                   <FileButton
                     file={draft.certificadoFile}
                     onPick={(f) => setF("certificadoFile", f)}
@@ -574,7 +575,7 @@ export default function AdminDiscentes() {
                     Icon={FileText}
                   />
                 </Field>
-                <Field label="Bilhete do responsável (upload)">
+                <Field label="BI do Encarregado">
                   <FileButton
                     file={draft.encBilheteFile}
                     onPick={(f) => setF("encBilheteFile", f)}
@@ -584,7 +585,7 @@ export default function AdminDiscentes() {
                   />
                 </Field>
               </div>
-            </div>
+            </section>
           </div>
 
           <DialogFooter>
@@ -612,6 +613,18 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
     <div className="space-y-1">
       <Label className="text-[10px] uppercase tracking-wide text-muted-foreground font-semibold">{label}</Label>
       {children}
+    </div>
+  );
+}
+
+function SectionTitle({ index, title, hint }: { index: number; title: string; hint?: string }) {
+  return (
+    <div className="flex items-center gap-2 mb-3 pb-2 border-b border-border/60">
+      <span className="w-5 h-5 rounded-md bg-primary/10 text-primary text-[10px] font-bold flex items-center justify-center shrink-0">{index}</span>
+      <div className="flex items-baseline gap-2 min-w-0">
+        <h3 className="text-xs font-semibold text-foreground">{title}</h3>
+        {hint && <span className="text-[10px] text-muted-foreground truncate">— {hint}</span>}
+      </div>
     </div>
   );
 }
