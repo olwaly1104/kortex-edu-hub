@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils";
 
 const DAYS = ["Seg", "Ter", "Qua", "Qui", "Sex"];
 
-type EventType = "reuniao" | "prazo" | "pessoal";
+type EventType = "reuniao" | "prazo" | "pessoal" | "outro";
 type Modalidade = "kortex" | "presencial";
 
 type StoredEvent = {
@@ -53,12 +53,14 @@ const EVENT_COLORS: Record<EventType, string> = {
   reuniao: "hsl(142 65% 35%)",
   prazo: "hsl(0 72% 51%)",
   pessoal: "hsl(217 91% 60%)",
+  outro: "hsl(262 60% 55%)",
 };
 
 const EVENT_TYPE_LABELS: Record<EventType, string> = {
   reuniao: "Reunião",
   prazo: "Prazo",
   pessoal: "Pessoal",
+  outro: "Outro",
 };
 
 function CriarEventoDialog({ defaultDate, trigger, onCreated }: { defaultDate: Date; trigger: React.ReactNode; onCreated?: (event: StoredEvent) => void }) {
@@ -69,10 +71,21 @@ function CriarEventoDialog({ defaultDate, trigger, onCreated }: { defaultDate: D
   const [type, setType] = useState<EventType>("reuniao");
   const [modalidade, setModalidade] = useState<Modalidade>("presencial");
   const [title, setTitle] = useState("");
+  const nowRoundedHHMM = () => {
+    const d = new Date();
+    d.setMinutes(d.getMinutes() + 30 - (d.getMinutes() % 30));
+    d.setSeconds(0, 0);
+    return d.toTimeString().slice(0, 5);
+  };
   const initialDate = defaultDate.toISOString().split("T")[0];
   const [date, setDate] = useState(initialDate < todayISO ? todayISO : initialDate);
-  const [startTime, setStartTime] = useState("09:00");
-  const [endTime, setEndTime] = useState("10:00");
+  const initialStart = (initialDate < todayISO ? todayISO : initialDate) === todayISO ? nowRoundedHHMM() : "09:00";
+  const [startTime, setStartTime] = useState(initialStart);
+  const [endTime, setEndTime] = useState(() => {
+    const [h, m] = initialStart.split(":").map(Number);
+    const end = new Date(); end.setHours(h + 1, m, 0, 0);
+    return end.toTimeString().slice(0, 5);
+  });
   const [location, setLocation] = useState("");
   const [link, setLink] = useState("");
   
@@ -119,6 +132,10 @@ function CriarEventoDialog({ defaultDate, trigger, onCreated }: { defaultDate: D
     }
     if (date < todayISO) {
       toast.error("A data não pode ser anterior a hoje.");
+      return;
+    }
+    if (date === todayISO && startTime < new Date().toTimeString().slice(0, 5)) {
+      toast.error("A hora não pode ser anterior à hora atual.");
       return;
     }
     if (type === "reuniao" && endTime <= startTime) {
@@ -200,9 +217,9 @@ function CriarEventoDialog({ defaultDate, trigger, onCreated }: { defaultDate: D
         {step === "form" && (
         <form onSubmit={handleSubmit} className="space-y-3.5">
           <div className="space-y-1.5">
-            <Label className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Tipo</Label>
+            <Label className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Categoria</Label>
             <div className="inline-flex rounded-md border bg-muted/30 p-0.5">
-              {(["reuniao", "prazo", "pessoal"] as EventType[]).map((t) => (
+              {(["reuniao", "prazo", "pessoal", "outro"] as EventType[]).map((t) => (
                 <button
                   key={t}
                   type="button"
@@ -217,6 +234,7 @@ function CriarEventoDialog({ defaultDate, trigger, onCreated }: { defaultDate: D
               ))}
             </div>
           </div>
+
 
 
           {/* Título */}
