@@ -1,162 +1,270 @@
-import { FinHeader } from "@/pages/financas/_FinHeader";
-import { Users, Plus, Search, Trash2, GraduationCap, User, Mail, BookOpen } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { OnboardingStepBanner } from "@/components/admin/OnboardingStepBanner";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-import { useMemo, useState } from "react";
-import { FormSection, EmptyState } from "./Staff";
+import { GraduationCap, Plus, Trash2, Users, BookOpen, Layers, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import {
+  useEstudantes,
+  useCursos,
+  useCreateEstudante,
+  useDeleteEstudante,
+} from "@/lib/useInstitution";
 
-type Discente = { id: string; primeiroNome: string; ultimoNome: string; email: string; curso: string; ano: string; turma: string; estado: "Ativo" | "Inativo" };
+type Draft = {
+  primeiroNome: string;
+  ultimoNome: string;
+  email: string;
+  curso_id: string;
+  ano: string;
+  turma: string;
+};
 
-const cursosPool = ["ARQ", "EC", "EI", "MED", "DIR", "ECN", "LET", "HIST", "AGR", "VET"];
 const anosPool = ["1", "2", "3", "4", "5", "6"];
 const turmasPool = ["A", "B", "C", "D", "E"];
 
-const empty = (): Discente => ({ id: "", primeiroNome: "", ultimoNome: "", email: "", curso: "ARQ", ano: "1", turma: "A", estado: "Ativo" });
+const emptyDraft = (curso_id = ""): Draft => ({
+  primeiroNome: "",
+  ultimoNome: "",
+  email: "",
+  curso_id,
+  ano: "1",
+  turma: "A",
+});
 
 export default function AdminDiscentes() {
-  const [rows, setRows] = useState<Discente[]>([]);
-  const [q, setQ] = useState("");
-  const [open, setOpen] = useState(false);
-  const [draft, setDraft] = useState<Discente>(empty());
+  const { data: rows = [], isLoading } = useEstudantes();
+  const { data: cursos = [] } = useCursos();
+  const createMut = useCreateEstudante();
+  const deleteMut = useDeleteEstudante();
 
-  const setF = <K extends keyof Discente>(k: K, v: Discente[K]) => setDraft((d) => ({ ...d, [k]: v }));
-  const openNew = () => { setDraft(empty()); setOpen(true); };
-  const save = () => {
-    if (!draft.primeiroNome.trim() || !draft.email.trim()) return;
-    setRows((p) => [...p, { ...draft, id: `${Date.now()}` }]);
-    setOpen(false);
-  };
-  const remove = (id: string) => setRows((p) => p.filter((r) => r.id !== id));
+  const [filtroCurso, setFiltroCurso] = useState<string>("all");
+  const [draft, setDraft] = useState<Draft>(emptyDraft());
 
-  const filtered = useMemo(() => rows.filter((r) => [r.primeiroNome, r.ultimoNome, r.email, r.curso].some((v) => v.toLowerCase().includes(q.toLowerCase()))), [rows, q]);
+  useEffect(() => {
+    if (!draft.curso_id && cursos.length > 0) {
+      setDraft((d) => ({ ...d, curso_id: (cursos[0] as any).id }));
+    }
+  }, [cursos, draft.curso_id]);
 
-  return (
-    <div className="p-6 space-y-6 max-w-6xl mx-auto">
-      <FinHeader title="Discentes" subtitle="Todos os estudantes registados na instituição" icon={<Users className="w-5 h-5 text-primary" />} />
+  const cursoCode = useMemo(() => {
+    const m = new Map<string, string>();
+    cursos.forEach((c: any) => m.set(c.id, c.codigo || c.nome || "—"));
+    return m;
+  }, [cursos]);
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <Stat label="Total" value={rows.length} />
-        <Stat label="Ativos" value={rows.filter((r) => r.estado === "Ativo").length} accent />
-        <Stat label="Cursos" value={new Set(rows.map((r) => r.curso)).size} />
-        <Stat label="Turmas" value={new Set(rows.map((r) => `${r.curso}-${r.ano}${r.turma}`)).size} />
-      </div>
-
-      <div className="flex items-center gap-3">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input placeholder="Procurar discente..." value={q} onChange={(e) => setQ(e.target.value)} className="pl-8 h-9" />
-        </div>
-        <div className="text-xs text-muted-foreground tabular-nums">{filtered.length} de {rows.length}</div>
-        <Button size="sm" onClick={openNew} className="ml-auto gap-1"><Plus className="w-3.5 h-3.5" /> Adicionar Discente</Button>
-      </div>
-
-      {rows.length === 0 ? (
-        <EmptyState onAdd={openNew} icon={<GraduationCap className="w-7 h-7" />} title="Nenhum discente registado" hint="Comece por adicionar estudantes manualmente ou via inscrições." cta="Adicionar Discente" />
-      ) : (
-        <div className="overflow-hidden rounded-xl border border-border bg-card">
-          <table className="w-full text-sm">
-            <thead className="bg-muted/40 text-xs uppercase tracking-wider text-muted-foreground">
-              <tr>
-                <th className="text-left font-semibold py-2.5 px-4">Estudante</th>
-                <th className="text-left font-semibold py-2.5 px-4">Email</th>
-                <th className="text-left font-semibold py-2.5 px-4">Curso</th>
-                <th className="text-left font-semibold py-2.5 px-4">Ano · Turma</th>
-                <th className="text-left font-semibold py-2.5 px-4">Estado</th>
-                <th className="w-10"></th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {filtered.map((r) => (
-                <tr key={r.id} className="hover:bg-muted/30">
-                  <td className="py-3 px-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center"><GraduationCap className="w-4 h-4" /></div>
-                      <span className="font-semibold">{r.primeiroNome} {r.ultimoNome}</span>
-                    </div>
-                  </td>
-                  <td className="py-3 px-4 text-xs text-muted-foreground">{r.email}</td>
-                  <td className="py-3 px-4 text-xs font-mono">{r.curso}</td>
-                  <td className="py-3 px-4 text-xs tabular-nums">{r.ano}º · {r.turma}</td>
-                  <td className="py-3 px-4">
-                    <span className={`px-2 py-0.5 rounded-full text-[11px] font-semibold ${r.estado === "Ativo" ? "bg-emerald-50 text-emerald-700" : "bg-muted text-muted-foreground"}`}>{r.estado}</span>
-                  </td>
-                  <td className="py-3 px-2">
-                    <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive" onClick={() => remove(r.id)}><Trash2 className="w-3.5 h-3.5" /></Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2"><GraduationCap className="w-5 h-5 text-primary" /> Adicionar Discente</DialogTitle>
-            <DialogDescription>O estudante poderá completar os seus restantes dados pessoais ao primeiro acesso.</DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-5 py-2">
-            <FormSection icon={<User className="w-3.5 h-3.5" />} title="Identificação">
-              <div className="grid grid-cols-2 gap-3">
-                <div><Label className="text-xs">Primeiro nome</Label>
-                  <Input className="h-9 mt-1" value={draft.primeiroNome} onChange={(e) => setF("primeiroNome", e.target.value)} />
-                </div>
-                <div><Label className="text-xs">Último nome</Label>
-                  <Input className="h-9 mt-1" value={draft.ultimoNome} onChange={(e) => setF("ultimoNome", e.target.value)} />
-                </div>
-              </div>
-            </FormSection>
-
-            <FormSection icon={<Mail className="w-3.5 h-3.5" />} title="Acesso">
-              <Label className="text-xs">Email institucional</Label>
-              <Input className="h-9 mt-1" type="email" value={draft.email} onChange={(e) => setF("email", e.target.value)} placeholder="estudante@upra.kor" />
-            </FormSection>
-
-            <FormSection icon={<BookOpen className="w-3.5 h-3.5" />} title="Matrícula">
-              <div className="grid grid-cols-3 gap-3">
-                <div><Label className="text-xs">Curso</Label>
-                  <Select value={draft.curso} onValueChange={(v) => setF("curso", v)}>
-                    <SelectTrigger className="h-9 mt-1"><SelectValue /></SelectTrigger>
-                    <SelectContent>{cursosPool.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-                  </Select>
-                </div>
-                <div><Label className="text-xs">Ano</Label>
-                  <Select value={draft.ano} onValueChange={(v) => setF("ano", v)}>
-                    <SelectTrigger className="h-9 mt-1"><SelectValue /></SelectTrigger>
-                    <SelectContent>{anosPool.map((a) => <SelectItem key={a} value={a}>{a}º</SelectItem>)}</SelectContent>
-                  </Select>
-                </div>
-                <div><Label className="text-xs">Turma</Label>
-                  <Select value={draft.turma} onValueChange={(v) => setF("turma", v)}>
-                    <SelectTrigger className="h-9 mt-1"><SelectValue /></SelectTrigger>
-                    <SelectContent>{turmasPool.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
-                  </Select>
-                </div>
-              </div>
-              <p className="text-[11px] text-muted-foreground mt-1.5">O bilhete de identidade e restantes dados pessoais serão preenchidos pelo próprio estudante.</p>
-            </FormSection>
-          </div>
-
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
-            <Button onClick={save} disabled={!draft.primeiroNome.trim() || !draft.email.trim()}>Adicionar Discente</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </div>
+  const normalized = useMemo(
+    () =>
+      rows.map((r: any) => {
+        const parts = (r.nome || "").trim().split(/\s+/);
+        return {
+          id: r.id as string,
+          primeiroNome: r.primeiro_nome || parts[0] || "",
+          ultimoNome: r.ultimo_nome || (parts.length > 1 ? parts.slice(1).join(" ") : ""),
+          email: r.email as string,
+          curso_id: r.curso_id as string,
+          curso: cursoCode.get(r.curso_id) || "—",
+          ano: r.ano as string,
+          turma: r.turma as string,
+        };
+      }),
+    [rows, cursoCode],
   );
-}
 
-function Stat({ label, value, accent }: { label: string; value: number; accent?: boolean }) {
+  const filtered = useMemo(
+    () => normalized.filter((r) => filtroCurso === "all" || r.curso_id === filtroCurso),
+    [normalized, filtroCurso],
+  );
+
+  const counts = useMemo(
+    () => ({
+      total: normalized.length,
+      cursos: new Set(normalized.map((r) => r.curso_id)).size,
+      turmas: new Set(normalized.map((r) => `${r.curso_id}-${r.ano}${r.turma}`)).size,
+    }),
+    [normalized],
+  );
+
+  const setF = <K extends keyof Draft>(k: K, v: Draft[K]) => setDraft((d) => ({ ...d, [k]: v }));
+
+  const addRow = async () => {
+    if (!draft.primeiroNome.trim() || !draft.email.trim() || !draft.curso_id) {
+      toast.error("Preencha nome, email e curso");
+      return;
+    }
+    const nome = `${draft.primeiroNome.trim()} ${draft.ultimoNome.trim()}`.trim();
+    try {
+      await createMut.mutateAsync({
+        curso_id: draft.curso_id,
+        nome,
+        email: draft.email.trim(),
+        ano: draft.ano,
+        turma: draft.turma,
+        primeiro_nome: draft.primeiroNome.trim(),
+        ultimo_nome: draft.ultimoNome.trim() || null,
+      });
+      toast.success("Discente adicionado");
+      setDraft(emptyDraft(draft.curso_id));
+    } catch (e: any) {
+      toast.error(e?.message || "Erro ao adicionar discente");
+    }
+  };
+
+  const removeRow = async (id: string) => {
+    try {
+      await deleteMut.mutateAsync(id);
+      toast.success("Discente removido");
+    } catch (e: any) {
+      toast.error(e?.message || "Erro ao remover");
+    }
+  };
+
   return (
-    <div className="rounded-lg border border-border bg-card p-4">
-      <p className="text-xs text-muted-foreground">{label}</p>
-      <p className={`text-2xl font-bold tabular-nums ${accent ? "text-emerald-600" : ""}`}>{value}</p>
+    <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6 animate-fade-in">
+      <OnboardingStepBanner stepKey="dis.reg" />
+
+      <div className="flex items-center gap-3 pb-1">
+        <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+          <GraduationCap className="w-5 h-5" />
+        </div>
+        <div>
+          <h1 className="text-lg font-semibold leading-tight">Discentes</h1>
+          <p className="text-xs text-muted-foreground">Registe todos os estudantes da instituição. Cada discente recebe acesso ao Kortex automaticamente.</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+        {[
+          { label: "Total", value: counts.total, Icon: Users },
+          { label: "Ativos", value: counts.total, Icon: GraduationCap },
+          { label: "Cursos", value: counts.cursos, Icon: BookOpen },
+          { label: "Turmas", value: counts.turmas, Icon: Layers },
+        ].map((k) => (
+          <Card key={k.label} className="p-3 flex items-center gap-2">
+            <div className="w-8 h-8 rounded-md bg-muted text-foreground flex items-center justify-center">
+              <k.Icon className="w-4 h-4" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-[10px] uppercase tracking-wide text-muted-foreground truncate">{k.label}</p>
+              <p className="text-base font-semibold leading-none">{k.value}</p>
+            </div>
+          </Card>
+        ))}
+      </div>
+
+      <div className="flex flex-wrap items-center gap-2">
+        <Select value={filtroCurso} onValueChange={setFiltroCurso}>
+          <SelectTrigger className="h-8 text-xs w-[220px]"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos os cursos</SelectItem>
+            {cursos.map((c: any) => (
+              <SelectItem key={c.id} value={c.id}>{c.codigo || c.nome}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <span className="text-[11px] text-muted-foreground ml-auto">{filtered.length} discentes</span>
+      </div>
+
+      <Card className="overflow-hidden">
+        <div className="grid grid-cols-[1.2fr_1fr_1.6fr_90px_70px_70px_56px] gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b">
+          <span>Primeiro nome</span>
+          <span>Último nome</span>
+          <span>Email institucional</span>
+          <span>Curso</span>
+          <span>Ano</span>
+          <span>Turma</span>
+          <span></span>
+        </div>
+
+        <div className="divide-y">
+          {isLoading ? (
+            <p className="px-4 py-8 text-xs text-muted-foreground italic text-center flex items-center justify-center gap-2">
+              <Loader2 className="w-3.5 h-3.5 animate-spin" /> A carregar…
+            </p>
+          ) : filtered.length === 0 ? (
+            <p className="px-4 py-8 text-xs text-muted-foreground italic text-center">Sem discentes registados.</p>
+          ) : (
+            filtered.map((r) => (
+              <div key={r.id} className="grid grid-cols-[1.2fr_1fr_1.6fr_90px_70px_70px_56px] gap-2 px-4 py-2 items-center">
+                <span className="text-xs font-medium truncate">{r.primeiroNome}</span>
+                <span className="text-xs truncate">{r.ultimoNome || "—"}</span>
+                <span className="text-xs text-muted-foreground truncate">{r.email}</span>
+                <span className="text-xs font-mono">{r.curso}</span>
+                <span className="text-xs tabular-nums">{r.ano}º</span>
+                <span className="text-xs tabular-nums">{r.turma}</span>
+                <div className="flex justify-end">
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => removeRow(r.id)}
+                    disabled={deleteMut.isPending}
+                    className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </Button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
+        {/* Inline add row */}
+        <div className="border-t bg-muted/10 px-4 py-2.5 space-y-2">
+          <div className="grid grid-cols-[1.2fr_1fr_1.6fr_90px_70px_70px_56px] gap-2 items-center">
+            <Input
+              value={draft.primeiroNome}
+              onChange={(e) => setF("primeiroNome", e.target.value)}
+              placeholder="Primeiro nome"
+              className="h-8 text-xs"
+            />
+            <Input
+              value={draft.ultimoNome}
+              onChange={(e) => setF("ultimoNome", e.target.value)}
+              placeholder="Último nome"
+              className="h-8 text-xs"
+            />
+            <Input
+              type="email"
+              value={draft.email}
+              onChange={(e) => setF("email", e.target.value)}
+              placeholder="estudante@upra.kor"
+              className="h-8 text-xs"
+            />
+            <Select value={draft.curso_id} onValueChange={(v) => setF("curso_id", v)}>
+              <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="—" /></SelectTrigger>
+              <SelectContent>
+                {cursos.map((c: any) => (
+                  <SelectItem key={c.id} value={c.id}>{c.codigo || c.nome}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={draft.ano} onValueChange={(v) => setF("ano", v)}>
+              <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+              <SelectContent>{anosPool.map((a) => <SelectItem key={a} value={a}>{a}º</SelectItem>)}</SelectContent>
+            </Select>
+            <Select value={draft.turma} onValueChange={(v) => setF("turma", v)}>
+              <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+              <SelectContent>{turmasPool.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
+            </Select>
+            <div />
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={addRow}
+            disabled={createMut.isPending}
+            className="h-8 gap-1.5 text-primary hover:text-primary hover:bg-primary/5"
+          >
+            {createMut.isPending ? (
+              <><Loader2 className="w-3.5 h-3.5 animate-spin" /> A adicionar…</>
+            ) : (
+              <><Plus className="w-3.5 h-3.5" /> Adicionar discente</>
+            )}
+          </Button>
+        </div>
+      </Card>
     </div>
   );
 }
