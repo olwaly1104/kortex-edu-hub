@@ -355,6 +355,7 @@ export type Database = {
           created_at: string
           curso_id: string
           email: string
+          enc_bilhete_url: string | null
           enc_nome: string | null
           enc_parentesco: string | null
           enc_telefone: string | null
@@ -384,6 +385,7 @@ export type Database = {
           created_at?: string
           curso_id: string
           email: string
+          enc_bilhete_url?: string | null
           enc_nome?: string | null
           enc_parentesco?: string | null
           enc_telefone?: string | null
@@ -413,6 +415,7 @@ export type Database = {
           created_at?: string
           curso_id?: string
           email?: string
+          enc_bilhete_url?: string | null
           enc_nome?: string | null
           enc_parentesco?: string | null
           enc_telefone?: string | null
