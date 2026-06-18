@@ -749,20 +749,34 @@ export default function FinancasCalendario() {
                   </div>
                 ) : (
                   <div className="divide-y divide-border">
-                    {selectedDayEvents.map((event) => (
-                      <div key={event.id} className="flex items-center gap-3 py-3">
-                        <div className="w-1 h-10 rounded-full shrink-0" style={{ background: event.color }} />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-semibold text-foreground truncate">{event.title}</p>
-                          <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-2 tabular-nums">
-                            <Clock className="w-3 h-3" />
-                            {event.startTime}{event.endTime ? ` – ${event.endTime}` : ""}
-                            {event.location && (<><span className="text-border">·</span><MapPin className="w-3 h-3" />{event.location}</>)}
-                            {event.modalidade === "kortex" && (<><span className="text-border">·</span><Video className="w-3 h-3 text-primary" /><span className="text-primary">Virtual</span></>)}
-                          </p>
+                    {selectedDayEvents.map((event) => {
+                      const typeLabel = EVENT_TYPES.find(t => t.value === event.type)?.label ?? event.type;
+                      const catLabel = event.type === "caixa" && event.categoria
+                        ? CAIXA_CATEGORIAS.find(c => c.value === event.categoria)?.label
+                        : null;
+                      return (
+                        <div key={event.id} className="flex items-center gap-3 py-3">
+                          <div className="w-1 h-10 rounded-full shrink-0" style={{ background: event.color }} />
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <p className="text-sm font-semibold text-foreground truncate">{event.title}</p>
+                              <span
+                                className="text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded shrink-0"
+                                style={{ background: `${event.color}1a`, color: event.color }}
+                              >
+                                {catLabel ?? typeLabel}
+                              </span>
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-2 tabular-nums">
+                              <Clock className="w-3 h-3" />
+                              {event.startTime}{event.endTime ? ` – ${event.endTime}` : ""}
+                              {event.location && (<><span className="text-border">·</span><MapPin className="w-3 h-3" />{event.location}</>)}
+                              {event.modalidade === "kortex" && (<><span className="text-border">·</span><Video className="w-3 h-3 text-primary" /><span className="text-primary">Virtual</span></>)}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
               </div>
