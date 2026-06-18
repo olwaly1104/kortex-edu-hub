@@ -154,13 +154,26 @@ function eventState(ev: AgendaEvent): EvState {
 
 /* ─────────────────────────────────────────────────── */
 export default function FinancasCalendario() {
+  const { user } = useAuth();
   const [view, setView] = useState<"week" | "month">("week");
   const [now, setNow] = useState<Date>(new Date());
+  const [live, setLive] = useState<boolean>(() => isInstitutionLive(user?.email));
   useEffect(() => {
     const id = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(id);
   }, []);
+  useEffect(() => {
+    const recheck = () => setLive(isInstitutionLive(user?.email));
+    recheck();
+    window.addEventListener("focus", recheck);
+    window.addEventListener("storage", recheck);
+    return () => {
+      window.removeEventListener("focus", recheck);
+      window.removeEventListener("storage", recheck);
+    };
+  }, [user?.email]);
   const liveTime = `${String(now.getHours()).padStart(2, "0")}h:${String(now.getMinutes()).padStart(2, "0")}min:${String(now.getSeconds()).padStart(2, "0")}s`;
+  const todayLabel = now.toLocaleDateString("pt-PT", { weekday: "long", day: "2-digit", month: "long", year: "numeric" });
   const [cursor, setCursor] = useState<string>(TODAY);
   const [selectedDate, setSelectedDate] = useState<string>(TODAY);
   const [openCreate, setOpenCreate] = useState(false);
