@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuthUid } from "@/hooks/useAuthUid";
 import { useInstitutionContacts } from "@/hooks/useInstitutionContacts";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -9,8 +9,11 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Send, MessageSquare, Search, Plus, Phone, Video, MoreVertical, Smile, Paperclip, Users, PhoneCall } from "lucide-react";
+import { Send, MessageSquare, Search, Plus, Phone, Video, MoreVertical, Paperclip, Users, PhoneCall } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { EmojiPicker } from "@/components/chat/EmojiPicker";
+import { GifPicker } from "@/components/chat/GifPicker";
+import { CallDialog } from "@/components/chat/CallDialog";
 
 interface Conversation {
   id: string;
