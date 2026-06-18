@@ -367,6 +367,7 @@ export type Database = {
           owner_user_id: string
           primeiro_nome: string | null
           provincia: string | null
+          regime: string
           telemovel: string | null
           turma: string
           ultimo_nome: string | null
@@ -392,6 +393,7 @@ export type Database = {
           owner_user_id: string
           primeiro_nome?: string | null
           provincia?: string | null
+          regime?: string
           telemovel?: string | null
           turma?: string
           ultimo_nome?: string | null
@@ -417,6 +419,7 @@ export type Database = {
           owner_user_id?: string
           primeiro_nome?: string | null
           provincia?: string | null
+          regime?: string
           telemovel?: string | null
           turma?: string
           ultimo_nome?: string | null

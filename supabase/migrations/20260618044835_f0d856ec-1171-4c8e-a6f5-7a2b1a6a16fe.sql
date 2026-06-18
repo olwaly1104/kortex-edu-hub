@@ -1,0 +1,1 @@
+ALTER TABLE public.estudantes ADD COLUMN IF NOT EXISTS regime TEXT NOT NULL DEFAULT 'normal' CHECK (regime IN ('bolseiro','normal'));
