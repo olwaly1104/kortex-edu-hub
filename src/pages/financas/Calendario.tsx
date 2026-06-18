@@ -264,15 +264,24 @@ export default function FinancasCalendario() {
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div className="min-w-0 space-y-3">
             <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-[11px] uppercase tracking-wider font-semibold text-primary">
-              <GraduationCap className="w-3.5 h-3.5" />
-              Ano Letivo <span className="font-bold tabular-nums">{ANO_LETIVO}</span>
+              {live ? (
+                <>
+                  <GraduationCap className="w-3.5 h-3.5" />
+                  Ano Letivo <span className="font-bold tabular-nums">{ANO_LETIVO}</span>
+                </>
+              ) : (
+                <>
+                  <Rocket className="w-3.5 h-3.5" />
+                  Onboarding
+                </>
+              )}
             </span>
             <h1 className="text-2xl font-bold text-foreground">Calendário</h1>
           </div>
           <div className="flex flex-col items-end gap-3 shrink-0">
             <div className="inline-flex items-stretch rounded-md border border-border bg-card overflow-hidden text-[11px] uppercase tracking-wider font-medium shadow-sm">
               <span className="flex items-center gap-1.5 px-2.5 py-1 text-foreground">
-                <CalendarDays className="w-3.5 h-3.5 text-muted-foreground" />{fmtLong(TODAY)}
+                <CalendarDays className="w-3.5 h-3.5 text-muted-foreground" />{todayLabel}
               </span>
               <span className="w-px bg-border" />
               <span className="flex items-center gap-1.5 px-2.5 py-1 font-mono tabular-nums text-primary bg-muted/30">
