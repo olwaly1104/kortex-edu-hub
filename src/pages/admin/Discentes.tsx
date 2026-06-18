@@ -399,7 +399,7 @@ export default function AdminDiscentes() {
               />
             </button>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 flex-1">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-2 flex-1">
               <Field label="Primeiro nome">
                 <Input value={draft.primeiroNome} onChange={(e) => setF("primeiroNome", e.target.value)} placeholder="Ana" className="h-8 text-xs" />
               </Field>
@@ -419,10 +419,22 @@ export default function AdminDiscentes() {
                   </SelectContent>
                 </Select>
               </Field>
+              <Field label="Nº Bilhete de Identidade">
+                <Input value={draft.bilhete} onChange={(e) => setF("bilhete", e.target.value)} placeholder="00000000XX000" className="h-8 text-xs" />
+              </Field>
+              <Field label="Bilhete (upload)">
+                <FileButton
+                  file={draft.bilheteFile}
+                  onPick={(f) => setF("bilheteFile", f)}
+                  inputRef={biInput}
+                  accept="image/*,application/pdf"
+                  Icon={IdCard}
+                />
+              </Field>
             </div>
           </div>
 
-          {/* Académico: Faculdade → Curso → Ano → Turma */}
+          {/* Académico: Faculdade → Curso → Ano → Turma + Certificado */}
           <div>
             <p className="text-[10px] uppercase tracking-wide text-muted-foreground font-semibold mb-2">Académico</p>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
@@ -460,18 +472,26 @@ export default function AdminDiscentes() {
                   <SelectContent>{turmasPool.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
                 </Select>
               </Field>
+              <div className="md:col-span-4">
+                <Field label="Certificado Ensino Médio (upload)">
+                  <FileButton
+                    file={draft.certificadoFile}
+                    onPick={(f) => setF("certificadoFile", f)}
+                    inputRef={certInput}
+                    accept="image/*,application/pdf"
+                    Icon={FileText}
+                  />
+                </Field>
+              </div>
             </div>
           </div>
 
-          {/* Contacto e identificação */}
+          {/* Contacto */}
           <div>
-            <p className="text-[10px] uppercase tracking-wide text-muted-foreground font-semibold mb-2">Contacto & Identificação</p>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+            <p className="text-[10px] uppercase tracking-wide text-muted-foreground font-semibold mb-2">Contacto</p>
+            <div className="grid grid-cols-2 md:grid-cols-2 gap-2">
               <Field label="Telemóvel / Contacto">
                 <Input value={draft.telemovel} onChange={(e) => setF("telemovel", e.target.value)} placeholder="+244 9XX XXX XXX" className="h-8 text-xs" />
-              </Field>
-              <Field label="Nº Bilhete de Identidade">
-                <Input value={draft.bilhete} onChange={(e) => setF("bilhete", e.target.value)} placeholder="00000000XX000" className="h-8 text-xs" />
               </Field>
               <Field label="Regime">
                 <Select value={draft.regime} onValueChange={(v) => setF("regime", v as Regime)}>
@@ -482,29 +502,7 @@ export default function AdminDiscentes() {
                   </SelectContent>
                 </Select>
               </Field>
-              <Field label="Bilhete (upload)">
-                <FileButton
-                  file={draft.bilheteFile}
-                  onPick={(f) => setF("bilheteFile", f)}
-                  inputRef={biInput}
-                  accept="image/*,application/pdf"
-                  Icon={IdCard}
-                />
-              </Field>
             </div>
-          </div>
-
-          {/* Documento académico */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-            <Field label="Certificado Ensino Médio (upload)">
-              <FileButton
-                file={draft.certificadoFile}
-                onPick={(f) => setF("certificadoFile", f)}
-                inputRef={certInput}
-                accept="image/*,application/pdf"
-                Icon={FileText}
-              />
-            </Field>
           </div>
 
           {/* Address */}
@@ -528,7 +526,7 @@ export default function AdminDiscentes() {
           {/* Encarregado */}
           <div>
             <p className="text-[10px] uppercase tracking-wide text-muted-foreground font-semibold mb-2">Encarregado / Responsável</p>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
               <Field label="Nome do responsável">
                 <Input value={draft.enc_nome} onChange={(e) => setF("enc_nome", e.target.value)} placeholder="João Silva" className="h-8 text-xs" />
               </Field>
@@ -537,6 +535,15 @@ export default function AdminDiscentes() {
               </Field>
               <Field label="Contacto do responsável">
                 <Input value={draft.enc_telefone} onChange={(e) => setF("enc_telefone", e.target.value)} placeholder="+244 9XX XXX XXX" className="h-8 text-xs" />
+              </Field>
+              <Field label="Bilhete do responsável (upload)">
+                <FileButton
+                  file={draft.encBilheteFile}
+                  onPick={(f) => setF("encBilheteFile", f)}
+                  inputRef={encBiInput}
+                  accept="image/*,application/pdf"
+                  Icon={IdCard}
+                />
               </Field>
             </div>
           </div>
