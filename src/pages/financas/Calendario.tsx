@@ -53,12 +53,14 @@ const EVENT_COLORS: Record<EventType, string> = {
   reuniao: "hsl(142 65% 35%)",
   prazo: "hsl(0 72% 51%)",
   pessoal: "hsl(217 91% 60%)",
+  outro: "hsl(262 60% 55%)",
 };
 
 const EVENT_TYPE_LABELS: Record<EventType, string> = {
   reuniao: "Reunião",
   prazo: "Prazo",
   pessoal: "Pessoal",
+  outro: "Outro",
 };
 
 function CriarEventoDialog({ defaultDate, trigger, onCreated }: { defaultDate: Date; trigger: React.ReactNode; onCreated?: (event: StoredEvent) => void }) {
