@@ -27,7 +27,7 @@ const statusColors: Record<string, string> = {
 const statusLabels: Record<string, string> = { aprovada: "Aprovada", pendente: "Pendente", rejeitada: "Rejeitada" };
 
 
-const despesaCategories = ["Salários", "Infraestrutura", "Material Didáctico", "Serviços e Utilities", "Investigação", "Bolsas e Apoios"];
+const despesaCategories: string[] = [];
 
 export default function Despesas() {
   const { toast } = useToast();

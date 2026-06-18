@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { TrendingUp, Search, ArrowUpDown, X, Wallet, Clock, AlertTriangle, FileText, Receipt, Pencil, Check, Settings2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
@@ -42,6 +42,10 @@ export default function Receitas() {
   const [editValue, setEditValue] = useState<string>("");
 
   const mult = PERIODO_MULT[periodo];
+
+  useEffect(() => {
+    setReceitas(receitasSeed);
+  }, [receitasSeed]);
 
   const isSortActive = sortField !== null;
   const isStatusActive = filterStatus !== "todos";

@@ -25,89 +25,20 @@ export interface Transaction {
   course?: string;
 }
 
-export const recentTransactions: Transaction[] = [
-  { id: "t1", date: "2025-04-10", description: "Propina — Abril", category: "Propinas", amount: 52000, type: "receita", status: "pago", source: "Propinas", payer: "João Mendes", studentId: "EST-1001" },
-  { id: "t2", date: "2025-04-09", description: "Salários — Docentes Fac. Engenharia", category: "Pessoal", amount: 8200000, type: "despesa", status: "aprovada", department: "Fac. Engenharia" },
-  { id: "t3", date: "2025-04-08", description: "Manutenção Laboratórios", category: "Infraestrutura", amount: 1500000, type: "despesa", status: "pendente", department: "Manutenção", requestedBy: "Eng. Pedro Neto" },
-  { id: "t4", date: "2025-04-07", description: "Propina — Abril", category: "Propinas", amount: 65000, type: "receita", status: "pago", source: "Propinas", payer: "Maria Santos", studentId: "EST-1002" },
-  { id: "t5", date: "2025-04-06", description: "Material de Escritório", category: "Operacional", amount: 350000, type: "despesa", status: "aprovada", department: "Administração" },
-  { id: "t6", date: "2025-04-05", description: "Propina — Abril", category: "Propinas", amount: 52000, type: "receita", status: "pendente", source: "Propinas", payer: "Carlos Ferreira", studentId: "EST-1003" },
-  { id: "t7", date: "2025-04-04", description: "Seguro Institucional — Mensal", category: "Operacional", amount: 2100000, type: "despesa", status: "aprovada", department: "Administração" },
-  { id: "t8", date: "2025-04-03", description: "Taxa de Exame", category: "Taxas", amount: 15000, type: "receita", status: "pago", source: "Taxas", payer: "Ana Lopes", studentId: "EST-1004" },
-  { id: "t9", date: "2025-04-02", description: "Compra de Projetores", category: "Infraestrutura", amount: 4500000, type: "despesa", status: "rejeitada", department: "TI", requestedBy: "Dr. Luís Campos" },
-  { id: "t10", date: "2025-04-01", description: "Propina — Março", category: "Propinas", amount: 52000, type: "receita", status: "em_atraso", source: "Propinas", payer: "Pedro Baptista", studentId: "EST-1005" },
-];
+export const recentTransactions: Transaction[] = [];
 
 export const monthlyData = [
-  { month: "Nov", receitas: 42000000, despesas: 35000000 },
-  { month: "Dez", receitas: 38000000, despesas: 32000000 },
-  { month: "Jan", receitas: 48000000, despesas: 37000000 },
-  { month: "Fev", receitas: 45000000, despesas: 36000000 },
-  { month: "Mar", receitas: 50000000, despesas: 39000000 },
-  { month: "Abr", receitas: 47000000, despesas: 38000000 },
+  { month: "Nov", receitas: 0, despesas: 0 },
+  { month: "Dez", receitas: 0, despesas: 0 },
+  { month: "Jan", receitas: 0, despesas: 0 },
+  { month: "Fev", receitas: 0, despesas: 0 },
+  { month: "Mar", receitas: 0, despesas: 0 },
+  { month: "Abr", receitas: 0, despesas: 0 },
 ];
 
-export const expenseCategories = [
-  { name: "Pessoal", value: 58, color: "hsl(var(--primary))" },
-  { name: "Operacional", value: 22, color: "hsl(var(--secondary))" },
-  { name: "Infraestrutura", value: 12, color: "hsl(25, 95%, 53%)" },
-  { name: "Outros", value: 8, color: "hsl(var(--muted-foreground))" },
-];
+export const expenseCategories: { name: string; value: number; color: string }[] = [];
 
-export const alerts = [
-  { id: "a1", type: "warning" as const, message: "3 pagamentos de propinas em atraso — Fac. Direito" },
-  { id: "a2", type: "info" as const, message: "2 despesas pendentes de aprovação" },
-  { id: "a3", type: "error" as const, message: "Orçamento de Infraestrutura atingiu 92% do limite" },
-];
-
-// Per-student receitas
-const studentNames = [
-  "João Mendes", "Maria Santos", "Carlos Ferreira", "Ana Lopes", "Pedro Baptista",
-  "Sofia Rodrigues", "André Costa", "Beatriz Silva", "Diogo Nascimento", "Catarina Almeida",
-  "Ricardo Neto", "Inês Martins", "Hugo Tavares", "Marta Gonçalves", "Tiago Pereira",
-  "Raquel Sousa", "Bruno Fernandes", "Cláudia Ramos", "Daniel Moreira", "Filipa Cardoso",
-  "Miguel Oliveira", "Sara Teixeira", "Nuno Vieira", "Luísa Carvalho", "Rui Campos",
-  "Diana Pinto", "Paulo Machado", "Teresa Figueiredo", "Vitor Correia", "Joana Barros",
-  "Marco Reis", "Patrícia Duarte", "Simão Gomes", "Helena Castro", "Fábio Araújo",
-  "Lara Henriques", "Gustavo Monteiro", "Vera Marques", "Sérgio Coelho", "Mónica Freitas",
-];
-
-const courses = ["Eng. Informática", "Eng. Civil", "Direito", "Medicina", "Arquitectura", "Ciências", "Letras", "Gestão"];
-const receitaStatuses: Array<'pago' | 'pendente' | 'em_atraso'> = ["pago", "pago", "pago", "pendente", "em_atraso"];
-const propinasAmounts = [52000, 55000, 58000, 62000, 65000, 70000, 48000, 50000];
-
-function generateReceitas(): Transaction[] {
-  const items: Transaction[] = [];
-  let id = 1;
-  for (let i = 0; i < 40; i++) {
-    const name = studentNames[i];
-    const course = courses[i % courses.length];
-    const amount = propinasAmounts[i % propinasAmounts.length];
-    const status = receitaStatuses[i % receitaStatuses.length];
-    const day = String(Math.max(1, 28 - i)).padStart(2, "0");
-    const month = i < 15 ? "04" : i < 30 ? "03" : "02";
-    items.push({
-      id: `r${id++}`, date: `2025-${month}-${day}`, description: "Propina Mensal", category: "Propinas",
-      amount, type: "receita", status, source: "Propinas", payer: name, studentId: `EST-${1000 + i + 1}`, course,
-    });
-  }
-  // Additional non-propina receitas
-  items.push(
-    { id: `r${id++}`, date: "2025-04-05", description: "Taxa de Exame", category: "Emolumentos", amount: 15000, type: "receita", status: "pago", source: "Emolumentos", payer: "João Mendes", studentId: "EST-1001", course: "Eng. Informática" },
-    { id: `r${id++}`, date: "2025-04-03", description: "Taxa de Matrícula", category: "Emolumentos", amount: 25000, type: "receita", status: "pago", source: "Emolumentos", payer: "Sofia Rodrigues", studentId: "EST-1006", course: "Arquitectura" },
-    { id: `r${id++}`, date: "2025-04-01", description: "Emolumentos de Inscrição", category: "Emolumentos", amount: 18000, type: "receita", status: "pendente", source: "Emolumentos", payer: "Carlos Ferreira", studentId: "EST-1003", course: "Direito" },
-    { id: `r${id++}`, date: "2025-03-28", description: "Taxa de Certificado", category: "Emolumentos", amount: 8000, type: "receita", status: "pago", source: "Emolumentos", payer: "Ana Lopes", studentId: "EST-1004", course: "Medicina" },
-    { id: `r${id++}`, date: "2025-03-25", description: "Propina Mensal", category: "Propinas", amount: 52000, type: "receita", status: "em_atraso", source: "Propinas", payer: "Diogo Nascimento", studentId: "EST-1009", course: "Eng. Informática" },
-    { id: `r${id++}`, date: "2025-04-08", description: "Aluguer Auditório — Evento Externo", category: "Serviços", amount: 450000, type: "receita", status: "pago", source: "Serviços", payer: "Empresa XYZ Lda.", studentId: "N/A", course: "—" },
-    { id: `r${id++}`, date: "2025-04-06", description: "Cursos de Formação Contínua", category: "Serviços", amount: 320000, type: "receita", status: "pago", source: "Serviços", payer: "Formandos Q1", studentId: "N/A", course: "—" },
-    { id: `r${id++}`, date: "2025-04-02", description: "Consultoria Engenharia — Projecto Público", category: "Serviços", amount: 1200000, type: "receita", status: "pendente", source: "Serviços", payer: "Ministério das Obras", studentId: "N/A", course: "—" },
-    { id: `r${id++}`, date: "2025-04-01", description: "Laboratórios — Análises Externas", category: "Serviços", amount: 180000, type: "receita", status: "pago", source: "Serviços", payer: "Clínica Saúde+", studentId: "N/A", course: "—" },
-    { id: `r${id++}`, date: "2025-03-30", description: "Multa — Atraso Entrega Documentos", category: "Multas", amount: 25000, type: "receita", status: "pago", source: "Multas", payer: "Estudante Atrasado", studentId: "EST-1050", course: "Direito" },
-    { id: `r${id++}`, date: "2025-03-27", description: "Multa — Biblioteca — Atraso Devolução", category: "Multas", amount: 5000, type: "receita", status: "pago", source: "Multas", payer: "Pedro Baptista", studentId: "EST-1005", course: "Eng. Informática" },
-    { id: `r${id++}`, date: "2025-03-22", description: "Multa — Quebra Material Didáctico", category: "Multas", amount: 15000, type: "receita", status: "pendente", source: "Multas", payer: "Tiago Pereira", studentId: "EST-1015", course: "Medicina" },
-  );
-  return items;
-}
+export const alerts: { id: string; type: "warning" | "info" | "error"; message: string }[] = [];
 
 export const receitas: Transaction[] = [];
 
