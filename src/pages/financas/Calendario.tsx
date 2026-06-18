@@ -590,6 +590,7 @@ export default function FinancasCalendario() {
                   </h3>
                   <CriarEventoDialog
                     defaultDate={selectedDate}
+                    onCreated={(iso) => setSelectedDate(new Date(iso + "T00:00"))}
                     trigger={
                       <Button size="sm" className="gap-1.5 h-8">
                         <Plus className="w-3.5 h-3.5" /> Criar Evento
