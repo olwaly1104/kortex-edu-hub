@@ -351,6 +351,11 @@ export default function StudentChat() {
             </div>
           ) : (
             <>
+              {filteredConvs.length > 0 && (
+                <div className="px-3 pt-3 pb-1 text-[10px] uppercase tracking-wide text-muted-foreground font-semibold">
+                  Conversas
+                </div>
+              )}
               {filteredConvs.map((c) => (
                 <button
                   key={c.id}
