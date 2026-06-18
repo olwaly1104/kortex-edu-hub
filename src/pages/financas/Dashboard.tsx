@@ -127,7 +127,7 @@ export default function FinancasDashboard() {
         <KPICard label={periodo === "mes" ? "Receitas do Mês" : periodo === "semestre" ? "Receitas do Semestre" : "Receitas do Ano"} value={formatCurrency(cur.receitas * mult)} change={receitaVar} icon={TrendingUp} positive />
         <KPICard label="Despesa Orçamentada" value={formatCurrency(despesaOrcamentadaMes * mult)} subtitle={periodo === "mes" ? "Este Mês" : periodo === "semestre" ? "Este Semestre" : "Este Ano"} icon={FileText} accent />
         <KPICard label={periodo === "mes" ? "Despesas do Mês" : periodo === "semestre" ? "Despesas do Semestre" : "Despesas do Ano"} value={formatCurrency(cur.despesas * mult)} change={despesaVar} icon={TrendingDown} positive={false} />
-        <KPICard label="Salários a Processar" value={formatCurrency(totalBruto * mult)} subtitle={`${salariosPagos} pagos · ${salariosPendentes} pendentes`} icon={CreditCard} />
+        <KPICard label="Salários em Atraso" value={formatCurrency(totalBruto * mult)} subtitle={`${salariosPagos} pagos · ${salariosPendentes} pendentes`} icon={CreditCard} />
       </div>
 
 
