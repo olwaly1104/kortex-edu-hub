@@ -324,7 +324,7 @@ export default function StudentChat() {
               <Input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder={tab === "grupos" ? "Pesquisar grupos…" : "Pesquisar conversas…"}
+                placeholder={tab === "grupos" ? "Pesquisar grupos…" : "Pesquisar conversas, utilizadores…"}
                 className="pl-8 h-9 text-sm"
               />
             </div>
