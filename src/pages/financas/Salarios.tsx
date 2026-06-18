@@ -78,7 +78,7 @@ export default function Salarios() {
           { label: periodo === "mes" ? "Folha Bruta do Mês" : periodo === "semestre" ? "Folha Bruta do Semestre" : "Folha Bruta do Ano", value: formatCurrency(totalBruto * mult), icon: Wallet, color: "text-foreground" },
           { label: "Pagos (Líquido)", value: formatCurrency(pagos * mult), icon: Wallet, color: "text-accent" },
           { label: "Pendentes (Líquido)", value: formatCurrency(pendentes * mult), icon: Clock, color: "text-amber-600" },
-          { label: "A Processar", value: String(processando), icon: Loader2, color: "text-blue-600" },
+          { label: "Em Atraso", value: String(processando), icon: Loader2, color: "text-blue-600" },
         ].map(kpi => (
           <Card key={kpi.label} className="p-4">
             <div className="flex items-center gap-2 mb-3">
