@@ -164,9 +164,12 @@ function CriarEventoDialog({ defaultDate, trigger, onCreated }: { defaultDate: D
           <DialogTitle className="flex items-center gap-2">
             <CalendarIcon className="w-4 h-4 text-primary" /> Criar Evento
           </DialogTitle>
-          <DialogDescription>Agende um novo evento no calendário geral.</DialogDescription>
+          <DialogDescription>
+            {step === "form" ? "Agende um novo evento no calendário geral." : "Reveja os detalhes e confirme para adicionar à agenda."}
+          </DialogDescription>
         </DialogHeader>
 
+        {step === "form" && (
         <form onSubmit={handleSubmit} className="space-y-3.5">
           <Label className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Categorias</Label>
           {/* Tipo — compact segmented */}
