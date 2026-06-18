@@ -120,21 +120,27 @@ export default function ProfessorFinances() {
           </Button>
         </div>
         <div className="divide-y divide-border">
-          <div className="flex items-center justify-between px-5 py-3.5">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-secondary/10 flex items-center justify-center shrink-0">
-                <FileText className="w-4 h-4 text-secondary" />
+          {salaryHistory.length === 0 ? (
+            <div className="px-5 py-8 text-center text-xs text-muted-foreground">
+              Sem registos salariais.
+            </div>
+          ) : (
+            <div className="flex items-center justify-between px-5 py-3.5">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-secondary/10 flex items-center justify-center shrink-0">
+                  <FileText className="w-4 h-4 text-secondary" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-foreground">{salaryHistory[0].month}</p>
+                  <p className="text-xs text-muted-foreground">{salaryHistory[0].date}</p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm font-medium text-foreground">{salaryHistory[2].month}</p>
-                <p className="text-xs text-muted-foreground">{salaryHistory[2].date}</p>
+              <div className="flex items-center gap-3">
+                <p className="text-sm font-semibold text-foreground">{formatCurrency(salaryHistory[0].net)}</p>
+                <Badge className="bg-secondary/10 text-secondary border-0 text-[10px]">Pendente</Badge>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <p className="text-sm font-semibold text-foreground">{formatCurrency(salaryHistory[2].net)}</p>
-              <Badge className="bg-secondary/10 text-secondary border-0 text-[10px]">Pendente</Badge>
-            </div>
-          </div>
+          )}
         </div>
       </div>
 
