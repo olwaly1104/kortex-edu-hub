@@ -164,7 +164,7 @@ function CriarEventoDialog({ defaultDate, trigger }: { defaultDate: Date; trigge
               <div className="inline-flex p-0.5 bg-muted/40 rounded-md">
                 {([
                   { value: "presencial" as const, label: "Presencial", icon: Building2 },
-                  { value: "kortex" as const, label: "Kortex Link", icon: Video },
+                  { value: "kortex" as const, label: "Virtual", icon: Video },
                 ]).map((m) => {
                   const Icon = m.icon;
                   const active = modalidade === m.value;
