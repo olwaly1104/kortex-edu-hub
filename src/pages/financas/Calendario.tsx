@@ -649,9 +649,20 @@ export default function FinancasCalendario() {
                   const iso = toISO(d);
                   const isTodayDay = iso === toISO(today);
                   const isSelected = iso === toISO(selectedDate);
+                  const dayEvts = eventsByDate.get(iso) ?? [];
                   return (
                     <div key={day} onClick={() => setSelectedDate(d)} className={cn("min-h-[90px] border-t border-l p-1.5 cursor-pointer hover:bg-primary/5 transition-colors", isTodayDay && "bg-primary/5", isSelected && !isTodayDay && "bg-primary/10")}>
                       <p className={cn("text-xs font-semibold mb-1 w-6 h-6 flex items-center justify-center rounded-full tabular-nums", isSelected ? "bg-primary text-primary-foreground" : isTodayDay ? "ring-2 ring-primary text-foreground" : "text-foreground")}>{day}</p>
+                      <div className="space-y-0.5">
+                        {dayEvts.slice(0, 2).map((ev) => (
+                          <div key={ev.id} className="text-[10px] truncate px-1 py-0.5 rounded text-foreground" style={{ background: `${ev.color}22`, borderLeft: `2px solid ${ev.color}` }}>
+                            {ev.title}
+                          </div>
+                        ))}
+                        {dayEvts.length > 2 && (
+                          <div className="text-[10px] text-muted-foreground px-1">+{dayEvts.length - 2}</div>
+                        )}
+                      </div>
                     </div>
                   );
                 })}
