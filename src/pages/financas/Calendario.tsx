@@ -36,7 +36,7 @@ function CriarEventoDialog({ defaultDate, trigger }: { defaultDate: Date; trigge
   const [endTime, setEndTime] = useState("10:00");
   const [location, setLocation] = useState("");
   const [link, setLink] = useState("");
-  const [participants, setParticipants] = useState<{ id: string; name: string; email: string | null }[]>([]);
+  const [participants, setParticipants] = useState<{ id: string; name: string; email: string | null; modulo: string | null }[]>([]);
   const [participantInput, setParticipantInput] = useState("");
   const [participantFocus, setParticipantFocus] = useState(false);
   const { contacts } = useInstitutionContacts();
@@ -58,9 +58,9 @@ function CriarEventoDialog({ defaultDate, trigger }: { defaultDate: Date; trigge
       .slice(0, 8);
   }, [contacts, participantInput, participants]);
 
-  const addContact = (c: { id: string; display_name: string; email: string | null }) => {
+  const addContact = (c: { id: string; display_name: string; email: string | null; modulo: string | null }) => {
     if (participants.some((p) => p.id === c.id)) return;
-    setParticipants([...participants, { id: c.id, name: c.display_name, email: c.email }]);
+    setParticipants([...participants, { id: c.id, name: c.display_name, email: c.email, modulo: c.modulo }]);
     setParticipantInput("");
   };
 
