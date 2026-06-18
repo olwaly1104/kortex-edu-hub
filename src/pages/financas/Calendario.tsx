@@ -10,19 +10,18 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 
-import { CalendarDays, ChevronLeft, ChevronRight, Plus, Users, MapPin, Calendar as CalendarIcon, Video, Building2, DollarSign, Clock, FileText, X, UserPlus } from "lucide-react";
+import { CalendarDays, ChevronLeft, ChevronRight, Plus, Users, MapPin, Calendar as CalendarIcon, Video, Building2, Clock, X, UserPlus, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const DAYS = ["Seg", "Ter", "Qua", "Qui", "Sex"];
 
-type EventType = "reuniao" | "pagamento" | "prazo" | "outro";
-type Modalidade = "virtual" | "presencial";
+type EventType = "reuniao" | "prazo" | "pessoal";
+type Modalidade = "kortex" | "presencial";
 
 const EVENT_TYPES: { value: EventType; label: string; icon: typeof Video }[] = [
   { value: "reuniao", label: "Reunião", icon: Users },
-  { value: "pagamento", label: "Pagamento", icon: DollarSign },
   { value: "prazo", label: "Prazo", icon: Clock },
-  { value: "outro", label: "Outro", icon: FileText },
+  { value: "pessoal", label: "Pessoal", icon: User },
 ];
 
 function CriarEventoDialog({ defaultDate, trigger }: { defaultDate: Date; trigger: React.ReactNode }) {
