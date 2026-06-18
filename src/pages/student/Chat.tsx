@@ -402,11 +402,14 @@ export default function StudentChat() {
                 </div>
               </div>
               <div className="flex items-center gap-1">
-                <Button variant="ghost" size="icon" className="h-8 w-8"><Phone className="w-4 h-4" /></Button>
-                <Button variant="ghost" size="icon" className="h-8 w-8"><Video className="w-4 h-4" /></Button>
+                <Button onClick={() => setCall({ mode: "audio", name: selected.other_name ?? "Contacto" })} variant="ghost" size="icon" className="h-8 w-8"><Phone className="w-4 h-4" /></Button>
+                <Button onClick={() => setCall({ mode: "video", name: selected.other_name ?? "Contacto" })} variant="ghost" size="icon" className="h-8 w-8"><Video className="w-4 h-4" /></Button>
                 <Button variant="ghost" size="icon" className="h-8 w-8"><MoreVertical className="w-4 h-4" /></Button>
               </div>
             </header>
+            {call && (
+              <CallDialog open={!!call} onClose={() => setCall(null)} name={call.name} mode={call.mode} />
+            )}
 
             <div ref={scrollRef} className="flex-1 overflow-auto px-6 py-4 space-y-4">
               {grouped.length === 0 ? (
