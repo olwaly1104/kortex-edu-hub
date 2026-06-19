@@ -252,7 +252,7 @@ const adminSections: NavSection[] = [
   { title: "Configurar", items: [
     { label: "Faculdades & Cursos", icon: Building2, path: "/admin/faculdades-cursos?tab=faculdades&step=aca.fac" },
     { label: "RH", icon: UserCog, path: "/admin/onboarding/rh?tab=docentes&step=rh.doc" },
-    { label: "Discentes", icon: GraduationCap, path: "/admin/discentes" },
+    
     { label: "Geopontos", icon: MapPin, path: "/admin/onboarding/geopontos?step=geo.reg" },
     { label: "Finanças", icon: Wallet, path: "/financas/configurador?tab=receitas&step=fin.pro" },
     { label: "GAP", icon: ClipboardList, path: "/gap/configuracao?tab=candidaturas&step=gap.cand" },

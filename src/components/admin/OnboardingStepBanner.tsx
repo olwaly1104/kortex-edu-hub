@@ -51,6 +51,7 @@ export const ONBOARDING_GROUPS: GroupMeta[] = [
   {
     id: "gap", title: "Configurar GAP",
     steps: [
+      { key: "gap.disc", title: "Discentes",      desc: "Registar discentes da instituição.",                                   path: "/gap/configuracao?tab=discentes&step=gap.disc" },
       { key: "gap.sol",  title: "Solicitações",   desc: "Categorias, motivos e estados das solicitações.",                      path: "/gap/configuracao?tab=solicitacoes&step=gap.sol" },
       { key: "gap.age",  title: "Agendamentos",   desc: "Tipos de atendimento, salas e horários disponíveis.",                  path: "/gap/configuracao?tab=agendamentos&step=gap.age" },
       { key: "gap.cand", title: "Candidaturas",   desc: "Processo de candidaturas, etapas e documentos.",                       path: "/gap/configuracao?tab=candidaturas&step=gap.cand" },
