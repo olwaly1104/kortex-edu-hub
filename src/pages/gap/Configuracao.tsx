@@ -67,7 +67,7 @@ export default function GapConfiguracao() {
   const { user } = useAuth();
   const [searchParams] = useSearchParams();
   const tabParam = searchParams.get("tab");
-  const initialTab = tabParam === "agendamentos" || tabParam === "candidaturas" ? tabParam : "solicitacoes";
+  const initialTab = tabParam === "agendamentos" || tabParam === "candidaturas" || tabParam === "discentes" ? tabParam : "solicitacoes";
   const [tab, setTab] = useState(initialTab);
   const { toast } = useToast();
 
