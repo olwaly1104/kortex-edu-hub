@@ -211,8 +211,9 @@ export default function OnboardingRegrasPresenca() {
             </Card>
 
             {/* Tabela de Multas */}
-            <Card className="p-5 space-y-4">
-              <div className="flex items-center justify-between gap-2">
+            <Card className="overflow-hidden">
+              {/* Table header */}
+              <div className="flex items-center justify-between px-4 py-3 bg-muted/30 border-b">
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <AlertTriangle className="w-3.5 h-3.5" />
                   <p className="text-[11px] uppercase tracking-wide font-medium">Tabela de infrações</p>
@@ -220,33 +221,35 @@ export default function OnboardingRegrasPresenca() {
                 <Badge variant="outline" className="text-[10px]">{totalMultas} {totalMultas === 1 ? "registo" : "registos"}</Badge>
               </div>
 
-              {/* Table header */}
-              <div className="grid grid-cols-[1fr_120px_120px_40px] gap-2 px-3 text-[10px] uppercase tracking-wide text-muted-foreground">
+              <div className="grid grid-cols-[1fr_120px_120px_56px] gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b">
                 <span>Infração</span>
                 <span>Aplica a</span>
                 <span className="text-right">Valor</span>
                 <span />
               </div>
-              <div className="space-y-1.5">
+
+              <div className="divide-y">
                 {multas.map(m => (
-                  <div key={m.id} className="grid grid-cols-[1fr_120px_120px_40px] items-center gap-2 px-3 py-2 rounded-md border bg-card">
+                  <div key={m.id} className="grid grid-cols-[1fr_120px_120px_56px] items-center gap-2 px-4 py-2.5 hover:bg-muted/40 transition-colors">
                     <span className="text-sm font-medium truncate">{m.nome}</span>
                     <Badge variant="outline" className="text-[10px] w-fit">{m.aplicaA}</Badge>
                     <span className="text-sm tabular-nums text-right">{m.valor.toLocaleString("pt-PT")} Kz</span>
-                    <Button size="icon" variant="ghost" onClick={() => setMultas(prev => prev.filter(x => x.id !== m.id))} className="h-7 w-7 text-muted-foreground hover:text-destructive justify-self-end">
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </Button>
+                    <div className="flex justify-end">
+                      <Button size="icon" variant="ghost" onClick={() => setMultas(prev => prev.filter(x => x.id !== m.id))} className="h-8 w-8 text-muted-foreground hover:text-destructive">
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </Button>
+                    </div>
                   </div>
                 ))}
                 {multas.length === 0 && (
-                  <div className="text-xs text-muted-foreground text-center py-4 border border-dashed rounded-md">
+                  <div className="text-xs text-muted-foreground text-center py-6">
                     Sem infrações configuradas.
                   </div>
                 )}
               </div>
 
               {/* Add row */}
-              <div className="pt-2 border-t">
+              <div className="px-4 py-3 border-t bg-muted/20">
                 <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-2">Adicionar infração</p>
                 <div className="grid grid-cols-[1fr_120px_120px_auto] gap-2">
                   <Input placeholder="Ex: Atraso prolongado" value={novoNome} onChange={e => setNovoNome(e.target.value)} className="h-9" />
