@@ -307,7 +307,7 @@ export default function GapConfiguracao() {
   const removeCdSessao = (key: string) => setCdSessoes(s => s.filter(x => x.key !== key));
 
   const confirmCurrentStep = () => {
-    const key = tab === "agendamentos" ? "gap.age" : tab === "candidaturas" ? "gap.cand" : "gap.sol";
+    const key = tab === "discentes" ? "gap.disc" : tab === "agendamentos" ? "gap.age" : tab === "candidaturas" ? "gap.cand" : "gap.sol";
     markOnboardingStepDone(user?.email, key);
     toast({ title: "Configuração confirmada" });
   };
