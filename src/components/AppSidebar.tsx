@@ -200,8 +200,6 @@ const gapSections: NavSection[] = [
     { label: "Dashboard", icon: BarChart3, path: "/gap/dashboard" },
     { label: "Solicitações", icon: HelpCircle, path: "/gap/solicitacoes" },
     { label: "Agendamentos", icon: CalendarDays, path: "/gap/agendamentos" },
-    { label: "Discentes", icon: Users, path: "/gap/estudantes" },
-    
     { label: "Candidaturas", icon: ClipboardList, path: "/gap/candidaturas" },
     { label: "Configuração", icon: Settings2, path: "/gap/configuracao" },
   ]},
