@@ -333,7 +333,7 @@ export default function GapConfiguracao() {
       {!isOnboarding && (
         <FinHeader
           title="Configuração"
-          subtitle="Configure Discentes, Solicitações, Agendamentos e o processo de Candidaturas do GAP."
+          subtitle="Configure Solicitações, Agendamentos e o processo de Candidaturas do GAP."
           icon={<Settings2 className="w-6 h-6 text-primary" />}
         />
       )}
@@ -344,18 +344,11 @@ export default function GapConfiguracao() {
       )}
 
       <Tabs value={tab} onValueChange={setTab} className="space-y-6">
-        <TabsList className="grid grid-cols-4 w-full max-w-2xl">
-          <TabsTrigger value="discentes" className="gap-1.5"><Users className="w-3.5 h-3.5" /> Discentes</TabsTrigger>
+        <TabsList className="grid grid-cols-3 w-full max-w-2xl">
           <TabsTrigger value="solicitacoes" className="gap-1.5"><FileText className="w-3.5 h-3.5" /> Solicitações</TabsTrigger>
           <TabsTrigger value="agendamentos" className="gap-1.5"><CalendarClock className="w-3.5 h-3.5" /> Agendamentos</TabsTrigger>
           <TabsTrigger value="candidaturas" className="gap-1.5"><GraduationCap className="w-3.5 h-3.5" /> Candidaturas</TabsTrigger>
         </TabsList>
-
-        <TabsContent value="discentes" className="space-y-6 mt-0">
-          <div className="rounded-md border border-dashed border-border p-8 text-center text-xs text-muted-foreground">
-            Configuração de discentes em desenvolvimento.
-          </div>
-        </TabsContent>
 
         <TabsContent value="solicitacoes" className="space-y-6 mt-0">
           {/* Estados */}
