@@ -12,7 +12,7 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { Settings2, Plus, Layers, AlertCircle, FileText, Trash2, Pencil, CalendarClock, GraduationCap, MapPin, Clock, FileCheck2, Unlock, Check } from "lucide-react";
+import { Settings2, Plus, Layers, AlertCircle, FileText, Trash2, Pencil, CalendarClock, GraduationCap, MapPin, Clock, FileCheck2, Unlock, Check, Users } from "lucide-react";
 import {
   tipoConfig as initialTipoConfig,
   categoriaConfig as initialCategoriaConfig,
@@ -67,7 +67,7 @@ export default function GapConfiguracao() {
   const { user } = useAuth();
   const [searchParams] = useSearchParams();
   const tabParam = searchParams.get("tab");
-  const initialTab = tabParam === "agendamentos" || tabParam === "candidaturas" ? tabParam : "solicitacoes";
+  const initialTab = tabParam === "agendamentos" || tabParam === "candidaturas" || tabParam === "discentes" ? tabParam : "solicitacoes";
   const [tab, setTab] = useState(initialTab);
   const { toast } = useToast();
 
@@ -307,7 +307,7 @@ export default function GapConfiguracao() {
   const removeCdSessao = (key: string) => setCdSessoes(s => s.filter(x => x.key !== key));
 
   const confirmCurrentStep = () => {
-    const key = tab === "agendamentos" ? "gap.age" : tab === "candidaturas" ? "gap.cand" : "gap.sol";
+    const key = tab === "discentes" ? "gap.disc" : tab === "agendamentos" ? "gap.age" : tab === "candidaturas" ? "gap.cand" : "gap.sol";
     markOnboardingStepDone(user?.email, key);
     toast({ title: "Configuração confirmada" });
   };
@@ -333,7 +333,7 @@ export default function GapConfiguracao() {
       {!isOnboarding && (
         <FinHeader
           title="Configuração"
-          subtitle="Configure Solicitações, Agendamentos e o processo de Candidaturas do GAP."
+          subtitle="Configure Discentes, Solicitações, Agendamentos e o processo de Candidaturas do GAP."
           icon={<Settings2 className="w-6 h-6 text-primary" />}
         />
       )}
@@ -344,11 +344,18 @@ export default function GapConfiguracao() {
       )}
 
       <Tabs value={tab} onValueChange={setTab} className="space-y-6">
-        <TabsList className="grid grid-cols-3 w-full max-w-2xl">
+        <TabsList className="grid grid-cols-4 w-full max-w-2xl">
+          <TabsTrigger value="discentes" className="gap-1.5"><Users className="w-3.5 h-3.5" /> Discentes</TabsTrigger>
           <TabsTrigger value="solicitacoes" className="gap-1.5"><FileText className="w-3.5 h-3.5" /> Solicitações</TabsTrigger>
           <TabsTrigger value="agendamentos" className="gap-1.5"><CalendarClock className="w-3.5 h-3.5" /> Agendamentos</TabsTrigger>
           <TabsTrigger value="candidaturas" className="gap-1.5"><GraduationCap className="w-3.5 h-3.5" /> Candidaturas</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="discentes" className="space-y-6 mt-0">
+          <div className="rounded-md border border-dashed border-border p-8 text-center text-xs text-muted-foreground">
+            Configuração de discentes em desenvolvimento.
+          </div>
+        </TabsContent>
 
         <TabsContent value="solicitacoes" className="space-y-6 mt-0">
           {/* Estados */}
