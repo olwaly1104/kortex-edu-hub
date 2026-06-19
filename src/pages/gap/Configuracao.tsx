@@ -333,7 +333,7 @@ export default function GapConfiguracao() {
       {!isOnboarding && (
         <FinHeader
           title="Configuração"
-          subtitle="Configure Solicitações, Agendamentos e o processo de Candidaturas do GAP."
+          subtitle="Configure Discentes, Solicitações, Agendamentos e o processo de Candidaturas do GAP."
           icon={<Settings2 className="w-6 h-6 text-primary" />}
         />
       )}
