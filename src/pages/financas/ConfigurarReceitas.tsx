@@ -185,7 +185,7 @@ function ReceitasSection({ email, onAddCursos }: { email?: string | null; onAddC
         </TabsList>
       </Tabs>
 
-      {sub === "impostos" && <ImpostosBlock impostos={impostos} setImpostos={setImpostos} />}
+      {sub === "impostos" && <ImpostosBlock impostos={impostos} setImpostos={setImpostos} email={email} />}
       {sub === "propinas" && <PropinasBlock email={email} impostos={impostos} onAddCursos={onAddCursos} />}
       {sub === "emolumentos" && <EmolumentosBlock email={email} impostos={impostos} />}
       {sub === "servicos" && <ServicosAcademicosBlock email={email} impostos={impostos} />}
@@ -193,18 +193,41 @@ function ReceitasSection({ email, onAddCursos }: { email?: string | null; onAddC
   );
 }
 
-function ImpostosBlock({ impostos, setImpostos }: { impostos: Imposto[]; setImpostos: React.Dispatch<React.SetStateAction<Imposto[]>> }) {
+function ImpostosBlock({ impostos, setImpostos, email }: { impostos: Imposto[]; setImpostos: React.Dispatch<React.SetStateAction<Imposto[]>>; email?: string | null }) {
   const add = () => setImpostos((s) => [...s, { id: newId(), nome: nomeForImposto("Personalizado", 0), taxa: 0, regime: "Personalizado" }]);
+  const nif = useMemo(() => {
+    try {
+      const profKey = `upra.admin.profile::${email || "anon"}`;
+      const p = JSON.parse(localStorage.getItem(profKey) || "null");
+      if (p?.nif) return String(p.nif);
+      const onbKey = `upra.admin.onboarding::${email || "anon"}`;
+      const o = JSON.parse(localStorage.getItem(onbKey) || "null");
+      return String(o?.dados?.nif || "");
+    } catch { return ""; }
+  }, [email]);
   return (
-    <Card className="overflow-hidden">
-      <div className="px-5 py-3 border-b bg-muted/30 flex items-center gap-2">
-        <Percent className="w-4 h-4 text-primary" />
-        <div className="min-w-0">
-          <h2 className="text-sm font-bold text-foreground">Impostos & Regime de IVA</h2>
-          <p className="text-[11px] text-muted-foreground">Regimes de IVA de Angola bloqueados. Adicione apenas impostos personalizados.</p>
+    <div className="space-y-4">
+      <Card className="overflow-hidden">
+        <div className="px-5 py-3 border-b bg-muted/30 flex items-center gap-2">
+          <FileText className="w-4 h-4 text-primary" />
+          <div className="min-w-0">
+            <h2 className="text-sm font-bold text-foreground">Número de Identificação Fiscal (NIF)</h2>
+            <p className="text-[11px] text-muted-foreground">Definido na Ficha Institucional. Para alterar, edite no perfil da instituição.</p>
+          </div>
         </div>
-        <span className="text-[11px] text-muted-foreground ml-auto tabular-nums shrink-0">{impostos.length} imposto{impostos.length === 1 ? "" : "s"}</span>
-      </div>
+        <div className="px-5 py-4">
+          <Input value={nif || "—"} readOnly className="h-9 max-w-xs font-mono tabular-nums bg-muted/40 cursor-not-allowed" />
+        </div>
+      </Card>
+      <Card className="overflow-hidden">
+        <div className="px-5 py-3 border-b bg-muted/30 flex items-center gap-2">
+          <Percent className="w-4 h-4 text-primary" />
+          <div className="min-w-0">
+            <h2 className="text-sm font-bold text-foreground">Impostos & Regime de IVA</h2>
+            <p className="text-[11px] text-muted-foreground">Regimes de IVA de Angola bloqueados. Adicione apenas impostos personalizados.</p>
+          </div>
+          <span className="text-[11px] text-muted-foreground ml-auto tabular-nums shrink-0">{impostos.length} imposto{impostos.length === 1 ? "" : "s"}</span>
+        </div>
       <div className="divide-y">
         <div className="grid grid-cols-[1fr_160px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
           <div>Regime de IVA (Angola)</div>
@@ -242,7 +265,8 @@ function ImpostosBlock({ impostos, setImpostos }: { impostos: Imposto[]; setImpo
       <div className="px-5 py-3 border-t bg-muted/10">
         <Button size="sm" variant="outline" className="gap-1.5" onClick={add}><Plus className="w-3.5 h-3.5" /> Adicionar imposto personalizado</Button>
       </div>
-    </Card>
+      </Card>
+    </div>
   );
 }
 
