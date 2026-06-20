@@ -8,7 +8,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { onboardingKey, profileKey, pushProfile } from "@/lib/onboardingStorage";
 import {
   ShieldCheck, Building2, Mail, Phone, Globe, MapPin, Calendar, GraduationCap,
-  Users, Briefcase, Settings2, Save, IdCard, Hash,
+  Users, Briefcase, Settings2, Save, IdCard, Hash, Pencil, X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -87,6 +87,8 @@ export default function AdminPerfil() {
   const { user } = useAuth();
   const PROFILE_KEY = profileKey(user?.email);
   const [instituicao, setInstituicao] = useState<Instituicao>(() => loadInitial(user?.email));
+  const [editing, setEditing] = useState(false);
+  const [snapshot, setSnapshot] = useState<Instituicao | null>(null);
 
   const facsQ = useFaculdades();
   const cursosQ = useCursos();
@@ -115,7 +117,17 @@ export default function AdminPerfil() {
   }, [instituicao, PROFILE_KEY, user?.email]);
 
   const emailValid = /^[^\s@]+@[^\s@]+\.com$/i.test((instituicao.email || "").trim());
+  const locked = !editing;
 
+  const handleEdit = () => {
+    setSnapshot(instituicao);
+    setEditing(true);
+  };
+  const handleCancel = () => {
+    if (snapshot) setInstituicao(snapshot);
+    setSnapshot(null);
+    setEditing(false);
+  };
   const handleSave = () => {
     if (!instituicao.nomeOficial.trim()) {
       toast.error("Nome oficial é obrigatório");
@@ -127,6 +139,8 @@ export default function AdminPerfil() {
     }
     try { localStorage.setItem(PROFILE_KEY, JSON.stringify(instituicao)); } catch { /* ignore */ }
     pushProfile(user?.email, instituicao);
+    setSnapshot(null);
+    setEditing(false);
     toast.success("Dados da instituição atualizados");
   };
 
@@ -145,17 +159,20 @@ export default function AdminPerfil() {
       <Card className="overflow-hidden">
         <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-6 border-b">
           <div className="flex items-start gap-5 flex-wrap">
-            <label className="w-20 h-20 rounded-xl bg-primary text-primary-foreground flex items-center justify-center shrink-0 shadow-sm overflow-hidden cursor-pointer group relative" title="Carregar / substituir logo">
+            <label className={`w-20 h-20 rounded-xl bg-primary text-primary-foreground flex items-center justify-center shrink-0 shadow-sm overflow-hidden group relative ${locked ? "cursor-not-allowed" : "cursor-pointer"}`} title={locked ? "Clique em Editar para alterar o logo" : "Carregar / substituir logo"}>
               {instituicao.logoDataUrl ? (
                 <img src={instituicao.logoDataUrl} alt="Logo" className="w-full h-full object-contain bg-white" />
               ) : (
                 <ShieldCheck className="w-10 h-10" />
               )}
-              <span className="absolute inset-0 bg-black/40 text-white text-[10px] uppercase tracking-wide font-semibold flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">Substituir</span>
+              {!locked && (
+                <span className="absolute inset-0 bg-black/40 text-white text-[10px] uppercase tracking-wide font-semibold flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">Substituir</span>
+              )}
               <input
                 type="file"
                 accept="image/*"
                 className="hidden"
+                disabled={locked}
                 onChange={(e) => {
                   const f = e.target.files?.[0];
                   if (!f) return;
@@ -182,7 +199,14 @@ export default function AdminPerfil() {
                 {instituicao.natureza && <span className="inline-flex items-center gap-1.5"><Building2 className="w-3.5 h-3.5" /> {instituicao.natureza}</span>}
               </div>
             </div>
-            <Button onClick={handleSave} size="sm" className="gap-1.5"><Save className="w-3.5 h-3.5" /> Guardar alterações</Button>
+            {locked ? (
+              <Button onClick={handleEdit} size="sm" variant="outline" className="gap-1.5"><Pencil className="w-3.5 h-3.5" /> Editar</Button>
+            ) : (
+              <div className="flex items-center gap-2">
+                <Button onClick={handleCancel} size="sm" variant="outline" className="gap-1.5"><X className="w-3.5 h-3.5" /> Cancelar</Button>
+                <Button onClick={handleSave} size="sm" className="gap-1.5"><Save className="w-3.5 h-3.5" /> Guardar</Button>
+              </div>
+            )}
           </div>
         </div>
 
@@ -214,25 +238,25 @@ export default function AdminPerfil() {
         <div className="grid md:grid-cols-2 gap-4">
           <div className="space-y-1.5">
             <Label className="text-xs">Nome oficial</Label>
-            <Input value={instituicao.nomeOficial} onChange={e => setInstituicao({ ...instituicao, nomeOficial: e.target.value })} className="h-9" />
+            <Input value={instituicao.nomeOficial} onChange={e => setInstituicao({ ...instituicao, nomeOficial: e.target.value })} className={`h-9 ${locked ? "bg-muted/40 cursor-not-allowed" : ""}`} readOnly={locked} />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label className="text-xs">Sigla</Label>
-              <Input value={instituicao.sigla} onChange={e => setInstituicao({ ...instituicao, sigla: e.target.value })} className="h-9" />
+              <Input value={instituicao.sigla} onChange={e => setInstituicao({ ...instituicao, sigla: e.target.value })} className={`h-9 ${locked ? "bg-muted/40 cursor-not-allowed" : ""}`} readOnly={locked} />
             </div>
             <div className="space-y-1.5">
               <Label className="text-xs">NIF</Label>
-              <Input value={instituicao.nif} onChange={e => setInstituicao({ ...instituicao, nif: e.target.value })} className="h-9" />
+              <Input value={instituicao.nif} onChange={e => setInstituicao({ ...instituicao, nif: e.target.value })} className={`h-9 ${locked ? "bg-muted/40 cursor-not-allowed" : ""}`} readOnly={locked} />
             </div>
           </div>
           <div className="space-y-1.5">
             <Label className="text-xs">Ano de fundação</Label>
-            <Input value={instituicao.fundacao} onChange={e => setInstituicao({ ...instituicao, fundacao: e.target.value })} className="h-9" />
+            <Input value={instituicao.fundacao} onChange={e => setInstituicao({ ...instituicao, fundacao: e.target.value })} className={`h-9 ${locked ? "bg-muted/40 cursor-not-allowed" : ""}`} readOnly={locked} />
           </div>
           <div className="space-y-1.5">
             <Label className="text-xs">Natureza</Label>
-            <Input value={instituicao.natureza} onChange={e => setInstituicao({ ...instituicao, natureza: e.target.value })} className="h-9" />
+            <Input value={instituicao.natureza} onChange={e => setInstituicao({ ...instituicao, natureza: e.target.value })} className={`h-9 ${locked ? "bg-muted/40 cursor-not-allowed" : ""}`} readOnly={locked} />
           </div>
         </div>
       </Card>
@@ -252,7 +276,8 @@ export default function AdminPerfil() {
               value={instituicao.email}
               onChange={e => setInstituicao({ ...instituicao, email: e.target.value })}
               placeholder="contacto@instituicao.com"
-              className={`h-9 ${instituicao.email && !emailValid ? "border-destructive" : ""}`}
+              readOnly={locked}
+              className={`h-9 ${instituicao.email && !emailValid ? "border-destructive" : ""} ${locked ? "bg-muted/40 cursor-not-allowed" : ""}`}
             />
             {instituicao.email && !emailValid && (
               <p className="text-[10px] text-destructive">Deve ser um email válido terminado em .com</p>
@@ -260,7 +285,7 @@ export default function AdminPerfil() {
           </div>
           <div className="space-y-1.5">
             <Label className="text-xs flex items-center gap-1.5"><Phone className="w-3 h-3" /> Telefone</Label>
-            <Input value={instituicao.telefone} onChange={e => setInstituicao({ ...instituicao, telefone: e.target.value })} className="h-9" />
+            <Input value={instituicao.telefone} onChange={e => setInstituicao({ ...instituicao, telefone: e.target.value })} className={`h-9 ${locked ? "bg-muted/40 cursor-not-allowed" : ""}`} readOnly={locked} />
           </div>
           <div className="space-y-1.5">
             <Label className="text-xs flex items-center gap-1.5"><Globe className="w-3 h-3" /> Website</Label>
@@ -274,7 +299,7 @@ export default function AdminPerfil() {
           </div>
           <div className="space-y-1.5">
             <Label className="text-xs flex items-center gap-1.5"><MapPin className="w-3 h-3" /> Morada</Label>
-            <Input value={instituicao.morada} onChange={e => setInstituicao({ ...instituicao, morada: e.target.value })} className="h-9" />
+            <Input value={instituicao.morada} onChange={e => setInstituicao({ ...instituicao, morada: e.target.value })} className={`h-9 ${locked ? "bg-muted/40 cursor-not-allowed" : ""}`} readOnly={locked} />
           </div>
         </div>
       </Card>
@@ -289,18 +314,21 @@ export default function AdminPerfil() {
         <div className="grid md:grid-cols-2 gap-4">
           <div className="space-y-1.5">
             <Label className="text-xs">Reitor</Label>
-            <Input value={instituicao.reitor} onChange={e => setInstituicao({ ...instituicao, reitor: e.target.value })} className="h-9" />
+            <Input value={instituicao.reitor} onChange={e => setInstituicao({ ...instituicao, reitor: e.target.value })} className={`h-9 ${locked ? "bg-muted/40 cursor-not-allowed" : ""}`} readOnly={locked} />
           </div>
           <div className="space-y-1.5">
             <Label className="text-xs">Promotor</Label>
-            <Input value={instituicao.promotor} onChange={e => setInstituicao({ ...instituicao, promotor: e.target.value })} className="h-9" />
+            <Input value={instituicao.promotor} onChange={e => setInstituicao({ ...instituicao, promotor: e.target.value })} className={`h-9 ${locked ? "bg-muted/40 cursor-not-allowed" : ""}`} readOnly={locked} />
           </div>
         </div>
       </Card>
 
-      <div className="flex justify-end">
-        <Button onClick={handleSave} className="gap-1.5"><Save className="w-4 h-4" /> Guardar alterações</Button>
-      </div>
+      {!locked && (
+        <div className="flex justify-end gap-2">
+          <Button onClick={handleCancel} variant="outline" className="gap-1.5"><X className="w-4 h-4" /> Cancelar</Button>
+          <Button onClick={handleSave} className="gap-1.5"><Save className="w-4 h-4" /> Guardar alterações</Button>
+        </div>
+      )}
     </div>
   );
 }
