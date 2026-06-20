@@ -173,6 +173,14 @@ export default function AdminDiscentes() {
     return m;
   }, [cursos]);
 
+  const cursoFacSigla = useMemo(() => {
+    const facMap = new Map<string, string>();
+    faculdades.forEach((f: any) => facMap.set(f.id, f.sigla || f.codigo || f.nome || "—"));
+    const m = new Map<string, string>();
+    cursos.forEach((c: any) => m.set(c.id, facMap.get(c.faculdade_id) || "—"));
+    return m;
+  }, [cursos, faculdades]);
+
   const normalized = useMemo(
     () =>
       rows.map((r: any) => {
@@ -184,6 +192,7 @@ export default function AdminDiscentes() {
           email: r.email as string,
           curso_id: r.curso_id as string,
           curso: cursoCode.get(r.curso_id) || "—",
+          faculdadeSigla: cursoFacSigla.get(r.curso_id) || "—",
           ano: r.ano as string,
           turma: r.turma as string,
           nascimento: (r.nascimento as string) || "",
@@ -195,8 +204,9 @@ export default function AdminDiscentes() {
           certificado_url: (r.certificado_url as string) || null,
         };
       }),
-    [rows, cursoCode],
+    [rows, cursoCode, cursoFacSigla],
   );
+
 
   const filtered = useMemo(
     () => normalized.filter((r) => filtroCurso === "all" || r.curso_id === filtroCurso),
