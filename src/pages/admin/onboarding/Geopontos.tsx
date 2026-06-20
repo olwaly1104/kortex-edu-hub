@@ -187,16 +187,23 @@ export default function OnboardingGeopontos() {
 
         <TabsContent value="edificios" className="mt-0">
           <Card className="overflow-hidden">
-            <div className="grid grid-cols-[1.4fr_100px_100px_1.5fr_64px] gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b">
-              <span>Nome</span><span>Código</span><span>Pisos</span><span>Endereço</span><span></span>
+            <div className="grid grid-cols-[100px_1.4fr_80px_80px_1.4fr_64px] gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b">
+              <span>Sigla</span><span>Nome</span><span>Pisos</span><span>Salas</span><span>Responsável</span><span></span>
             </div>
             <div className="divide-y">
               {edificios.map(e => (
-                <div key={e.id} className="grid grid-cols-[1.4fr_100px_100px_1.5fr_64px] gap-2 px-4 py-2 items-center">
+                <div key={e.id} className="grid grid-cols-[100px_1.4fr_80px_80px_1.4fr_64px] gap-2 px-4 py-2 items-center">
+                  <Input value={e.sigla} onChange={ev => updEdif(e.id, { sigla: ev.target.value.toUpperCase() })} className="h-8 text-xs" />
                   <Input value={e.nome} onChange={ev => updEdif(e.id, { nome: ev.target.value })} className="h-8 text-xs" />
-                  <Input value={e.codigo} onChange={ev => updEdif(e.id, { codigo: ev.target.value.toUpperCase() })} className="h-8 text-xs" />
                   <Input type="number" min={1} max={20} value={e.pisos} onChange={ev => updEdif(e.id, { pisos: Number(ev.target.value) })} className="h-8 text-xs" />
-                  <Input value={e.endereco || ""} onChange={ev => updEdif(e.id, { endereco: ev.target.value })} className="h-8 text-xs" placeholder="Campus, rua…" />
+                  <Input type="number" min={0} value={e.salas} onChange={ev => updEdif(e.id, { salas: Number(ev.target.value) })} className="h-8 text-xs" />
+                  <Select value={e.responsavel ?? "none"} onValueChange={v => updEdif(e.id, { responsavel: v === "none" ? null : v })}>
+                    <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="—" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">— Sem responsável —</SelectItem>
+                      {contacts.map(c => <SelectItem key={c.id} value={c.id}>{c.display_name || c.email}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
                   <div className="flex justify-end">
                     <Button size="icon" variant="ghost" onClick={() => rmEdif(e.id)} className="h-8 w-8 text-muted-foreground hover:text-destructive">
                       <Trash2 className="w-3.5 h-3.5" />
