@@ -199,14 +199,6 @@ export default function AdminPerfil() {
                 {instituicao.natureza && <span className="inline-flex items-center gap-1.5"><Building2 className="w-3.5 h-3.5" /> {instituicao.natureza}</span>}
               </div>
             </div>
-            {locked ? (
-              <Button onClick={handleEdit} size="sm" variant="outline" className="gap-1.5"><Pencil className="w-3.5 h-3.5" /> Editar</Button>
-            ) : (
-              <div className="flex items-center gap-2">
-                <Button onClick={handleCancel} size="sm" variant="outline" className="gap-1.5"><X className="w-3.5 h-3.5" /> Cancelar</Button>
-                <Button onClick={handleSave} size="sm" className="gap-1.5"><Save className="w-3.5 h-3.5" /> Guardar</Button>
-              </div>
-            )}
           </div>
         </div>
 
@@ -230,9 +222,19 @@ export default function AdminPerfil() {
 
       {/* Identificação institucional */}
       <Card className="p-6 space-y-4">
-        <div className="flex items-center gap-2">
-          <Building2 className="w-4 h-4 text-primary" />
-          <h2 className="text-sm font-semibold">Identificação Institucional</h2>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Building2 className="w-4 h-4 text-primary" />
+            <h2 className="text-sm font-semibold">Identificação Institucional</h2>
+          </div>
+          {locked ? (
+            <Button onClick={handleEdit} size="sm" variant="outline" className="gap-1.5"><Pencil className="w-3.5 h-3.5" /> Editar</Button>
+          ) : (
+            <div className="flex items-center gap-2">
+              <Button onClick={handleCancel} size="sm" variant="outline" className="gap-1.5"><X className="w-3.5 h-3.5" /> Cancelar</Button>
+              <Button onClick={handleSave} size="sm" className="gap-1.5"><Save className="w-3.5 h-3.5" /> Guardar</Button>
+            </div>
+          )}
         </div>
         <Separator />
         <div className="grid md:grid-cols-2 gap-4">
@@ -323,12 +325,6 @@ export default function AdminPerfil() {
         </div>
       </Card>
 
-      {!locked && (
-        <div className="flex justify-end gap-2">
-          <Button onClick={handleCancel} variant="outline" className="gap-1.5"><X className="w-4 h-4" /> Cancelar</Button>
-          <Button onClick={handleSave} className="gap-1.5"><Save className="w-4 h-4" /> Guardar alterações</Button>
-        </div>
-      )}
     </div>
   );
 }
