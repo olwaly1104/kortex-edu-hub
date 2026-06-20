@@ -206,10 +206,9 @@ function ImpostosBlock({ impostos, setImpostos }: { impostos: Imposto[]; setImpo
         <span className="text-[11px] text-muted-foreground ml-auto tabular-nums shrink-0">{impostos.length} imposto{impostos.length === 1 ? "" : "s"}</span>
       </div>
       <div className="divide-y">
-        <div className="grid grid-cols-[1fr_160px_40px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
+        <div className="grid grid-cols-[1fr_160px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
           <div>Regime de IVA (Angola)</div>
           <div className="text-right">Taxa (%)</div>
-          <div className="text-right">Ação</div>
         </div>
         {impostos.length === 0 ? (
           <div className="px-5 py-10 text-center text-xs text-muted-foreground">Sem impostos configurados.</div>
@@ -217,9 +216,8 @@ function ImpostosBlock({ impostos, setImpostos }: { impostos: Imposto[]; setImpo
           const custom = isCustomRegime(i.regime);
           const locked = i.locked;
           return (
-          <div key={i.id} className="grid grid-cols-[1fr_160px_40px] gap-3 px-5 py-2.5 items-center text-sm">
-            <select className="h-9 rounded-md border border-input bg-background px-2 text-sm disabled:opacity-60 disabled:cursor-not-allowed" value={i.regime}
-              disabled={locked}
+          <div key={i.id} className="grid grid-cols-[1fr_160px] gap-3 px-5 py-2.5 items-center text-sm">
+            <select className={`h-9 rounded-md border border-input bg-background px-2 text-sm ${locked ? "pointer-events-none" : ""}`} value={i.regime}
               onChange={(e) => {
                 const regime = e.target.value;
                 const nowCustom = isCustomRegime(regime);
@@ -237,14 +235,6 @@ function ImpostosBlock({ impostos, setImpostos }: { impostos: Imposto[]; setImpo
             ) : (
               <div className="text-right tabular-nums font-medium text-foreground">{(i.taxa * 100).toFixed(0)}%</div>
             )}
-            <div className="flex justify-end">
-              {locked ? (
-                <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Bloqueado</span>
-              ) : (
-                <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                  onClick={() => setImpostos((s) => s.filter((x) => x.id !== i.id))}><Trash2 className="w-3.5 h-3.5" /></Button>
-              )}
-            </div>
           </div>
           );
         })}
