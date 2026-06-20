@@ -344,6 +344,7 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
                               </option>
                             ))}
                           </select>
+                          <div className="h-9 flex items-center justify-end px-2 rounded-md bg-muted/30 tabular-nums text-sm font-medium text-foreground">{fmt(brutoAnual)} Kz</div>
                           <div className="h-9 flex items-center justify-end px-2 rounded-md bg-muted/30 tabular-nums font-semibold text-foreground">{fmt(liquidoMensal)} Kz</div>
                           <div className="h-9 flex items-center justify-end px-2 rounded-md bg-muted/30 tabular-nums text-xs font-medium text-muted-foreground">{fmt(liquidoAnual)} Kz</div>
                           <div className="flex justify-end gap-1">
