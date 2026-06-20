@@ -922,6 +922,7 @@ function EmolumentosBlock({ email, impostos }: { email?: string | null; impostos
         typeOptions={cats.filter((c) => c.trim())}
         withTarget
         withTax
+        withTaxValue
         impostos={impostos}
         addLabel="Adicionar emolumento"
         placeholder="Ex: Certidão de matrícula"
@@ -1071,7 +1072,7 @@ function LineItemsBlock({
           {withType && <div>{typeLabel}</div>}
           <div>{valueLabel}</div>
           {withTax && <div>Imposto</div>}
-          {withTaxValue && <div>Valor Imposto</div>}
+          {withTaxValue && <div>Valor c/ IVA incl.</div>}
           {withUnit && <div>Unidade</div>}
           {withTarget && <div>Aplica-se a</div>}
           <div className="text-right">Ação</div>
@@ -1109,7 +1110,7 @@ function LineItemsBlock({
             )}
             {withTaxValue && (
               <div className="h-9 flex items-center justify-end px-2 rounded-md bg-muted/30 tabular-nums font-medium text-xs text-muted-foreground">
-                {fmt((r.valor || 0) * (impostos.find((i) => i.id === r.impostoId)?.taxa ?? 0))} Kz
+                {fmt((r.valor || 0) * (1 + (impostos.find((i) => i.id === r.impostoId)?.taxa ?? 0)))} Kz
               </div>
             )}
             {withUnit && (
