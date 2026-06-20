@@ -14,6 +14,8 @@ export type StaffRow = {
   editing?: boolean;
 };
 
+export type Grau = "Licenciatura" | "Mestrado" | "Doutoramento" | "Agregação";
+
 export type DocenteRow = {
   id: string;
   prefixo: string;
@@ -24,8 +26,26 @@ export type DocenteRow = {
   faculdade: string;
   categoria: string; // Assistente, Auxiliar, Associado, Catedrático, Convidado
   cargo: string;     // Docente, Coordenador, Decano, Diretor
+  // Identification
+  nascimento?: string;
+  genero?: "M" | "F" | "Outro";
+  bilhete?: string;
+  bilheteFileName?: string;
+  fotoDataUrl?: string;
+  // Address
+  provincia?: string;
+  municipio?: string;
+  endereco?: string;
+  // Academic profile
+  grau?: Grau;
+  especialidade?: string;
+  instituicaoFormacao?: string;
+  anosExperiencia?: string;
+  cvFileName?: string;
+  diplomaFileName?: string;
   editing?: boolean;
 };
+
 
 const STAFF_KEY = "upra_admin_staff_v1";
 const DOCENTES_KEY = "upra_admin_docentes_v1";
