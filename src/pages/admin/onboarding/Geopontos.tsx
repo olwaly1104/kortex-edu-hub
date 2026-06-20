@@ -8,6 +8,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Building2, Plus, Trash2, DoorOpen, Briefcase, Wrench } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 type EspacoTipo = "Sala" | "Gabinete" | "Instalação";
 type Espaco = {
@@ -19,9 +20,9 @@ type Espaco = {
   capacidade: number;
   notas?: string;
 };
-type Edificio = { id: string; nome: string; codigo: string; pisos: number; endereco?: string };
+type Edificio = { id: string; sigla: string; nome: string; pisos: number; salas: number; responsavel: string | null };
+type Contact = { id: string; display_name: string | null; email: string | null };
 
-const EDIFICIOS_KEY = "upra:edificios";
 const ESPACOS_KEY = "upra:espacos";
 
 function loadLS<T>(key: string): T[] {
@@ -34,21 +35,43 @@ export default function OnboardingGeopontos() {
   const { user } = useAuth();
   const [tab, setTab] = useState<"edificios" | EspacoTipo>("edificios");
 
-  const [edificios, setEdificios] = useState<Edificio[]>(() => loadLS<Edificio>(EDIFICIOS_KEY));
+  const [edificios, setEdificios] = useState<Edificio[]>([]);
+  const [contacts, setContacts] = useState<Contact[]>([]);
   const [espacos, setEspacos] = useState<Espaco[]>(() => loadLS<Espaco>(ESPACOS_KEY));
   const [filtroEdif, setFiltroEdif] = useState<string>("all");
 
-  useEffect(() => { try { localStorage.setItem(EDIFICIOS_KEY, JSON.stringify(edificios)); } catch {} }, [edificios]);
   useEffect(() => { try { localStorage.setItem(ESPACOS_KEY, JSON.stringify(espacos)); } catch {} }, [espacos]);
 
-  // ---- Edifícios
-  const addEdif = () => {
+  useEffect(() => {
+    (async () => {
+      const [{ data: eds }, { data: cts }] = await Promise.all([
+        supabase.from("edificios").select("id, sigla, nome, pisos, salas, responsavel").order("created_at"),
+        supabase.rpc("list_institution_contacts"),
+      ]);
+      if (eds) setEdificios(eds.map((e: any) => ({ id: e.id, sigla: e.sigla || "", nome: e.nome || "", pisos: e.pisos ?? 1, salas: e.salas ?? 0, responsavel: e.responsavel })));
+      if (cts) setContacts(cts as Contact[]);
+    })();
+  }, [user?.id]);
+
+  // ---- Edifícios (DB)
+  const addEdif = async () => {
+    if (!user?.id) return;
     const n = edificios.length + 1;
-    setEdificios(p => [...p, { id: `e${Date.now()}`, nome: `Novo Edifício ${n}`, codigo: `E${n}`, pisos: 2, endereco: "" }]);
+    const { data, error } = await supabase.from("edificios").insert({
+      owner_user_id: user.id, sigla: `E${n}`, nome: `Novo Edifício ${n}`, pisos: 2, salas: 0, responsavel: null,
+    }).select().single();
+    if (error) { toast.error(error.message); return; }
+    setEdificios(p => [...p, { id: data.id, sigla: data.sigla, nome: data.nome, pisos: data.pisos, salas: data.salas, responsavel: data.responsavel }]);
   };
-  const updEdif = (id: string, patch: Partial<Edificio>) => setEdificios(p => p.map(e => e.id === id ? { ...e, ...patch } : e));
-  const rmEdif = (id: string) => {
+  const updEdif = async (id: string, patch: Partial<Edificio>) => {
+    setEdificios(p => p.map(e => e.id === id ? { ...e, ...patch } : e));
+    const { error } = await supabase.from("edificios").update(patch).eq("id", id);
+    if (error) toast.error(error.message);
+  };
+  const rmEdif = async (id: string) => {
     if (espacos.some(s => s.edificioId === id)) { toast.error("Remova primeiro os espaços deste edifício"); return; }
+    const { error } = await supabase.from("edificios").delete().eq("id", id);
+    if (error) { toast.error(error.message); return; }
     setEdificios(p => p.filter(e => e.id !== id));
   };
 
