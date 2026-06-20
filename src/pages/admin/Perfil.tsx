@@ -17,14 +17,14 @@ import { loadDocentes, loadStaff } from "@/lib/peopleStorage";
 
 type Instituicao = {
   nomeOficial: string; sigla: string; nif: string; fundacao: string; natureza: string;
-  reitor: string; presidenteCA: string;
+  reitor: string; promotor: string;
   email: string; telefone: string; website: string; morada: string;
   logoDataUrl?: string;
 };
 
 const EMPTY: Instituicao = {
   nomeOficial: "", sigla: "", nif: "", fundacao: "", natureza: "",
-  reitor: "", presidenteCA: "",
+  reitor: "", promotor: "",
   email: "", telefone: "", website: "", morada: "", logoDataUrl: "",
 };
 
