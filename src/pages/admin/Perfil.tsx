@@ -325,12 +325,6 @@ export default function AdminPerfil() {
         </div>
       </Card>
 
-      {!locked && (
-        <div className="flex justify-end gap-2">
-          <Button onClick={handleCancel} variant="outline" className="gap-1.5"><X className="w-4 h-4" /> Cancelar</Button>
-          <Button onClick={handleSave} className="gap-1.5"><Save className="w-4 h-4" /> Guardar alterações</Button>
-        </div>
-      )}
     </div>
   );
 }
