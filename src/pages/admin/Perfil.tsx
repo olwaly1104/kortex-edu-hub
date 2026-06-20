@@ -44,39 +44,43 @@ function currentSiteUrl(): string {
 }
 
 
+function readOnboardingDados(email?: string | null): any {
+  try {
+    const raw = localStorage.getItem(onboardingKey(email));
+    if (!raw) return {};
+    return JSON.parse(raw)?.dados || {};
+  } catch { return {}; }
+}
+
 function loadInitial(email?: string | null): Instituicao {
   const PROFILE_KEY = profileKey(email);
-  const STORAGE = onboardingKey(email);
   const defaultWebsite = currentSiteUrl();
+  const onb = readOnboardingDados(email);
   try {
     const saved = localStorage.getItem(PROFILE_KEY);
     if (saved) {
       const parsed = { ...EMPTY, ...JSON.parse(saved) };
-      // Always sync website to the current published URL of this account
       parsed.website = defaultWebsite;
+      // Backfill from onboarding when profile fields are still empty
+      if (!parsed.logoDataUrl && onb.logoDataUrl) parsed.logoDataUrl = onb.logoDataUrl;
+      if (!parsed.nif && onb.nif) parsed.nif = onb.nif;
+      if (!parsed.sigla && onb.sigla) parsed.sigla = onb.sigla;
+      if (!parsed.nomeOficial && onb.nome) parsed.nomeOficial = onb.nome;
       return parsed;
     }
   } catch { /* ignore */ }
-  try {
-    const raw = localStorage.getItem(STORAGE);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      const d = parsed?.dados || {};
-      return {
-        ...EMPTY,
-        nomeOficial: d.nome || "",
-        sigla: d.sigla || "",
-        nif: d.nif || "",
-        natureza: d.tipo || "",
-        email: d.email || "",
-        telefone: d.telefone || "",
-        website: defaultWebsite,
-        morada: [d.endereco, d.municipio, d.provincia].filter(Boolean).join(", "),
-        logoDataUrl: d.logoDataUrl || "",
-      };
-    }
-  } catch { /* ignore */ }
-  return { ...EMPTY, website: defaultWebsite };
+  return {
+    ...EMPTY,
+    nomeOficial: onb.nome || "",
+    sigla: onb.sigla || "",
+    nif: onb.nif || "",
+    natureza: onb.tipo || "",
+    email: onb.email || "",
+    telefone: onb.telefone || "",
+    website: defaultWebsite,
+    morada: [onb.endereco, onb.municipio, onb.provincia].filter(Boolean).join(", "),
+    logoDataUrl: onb.logoDataUrl || "",
+  };
 }
 
 export default function AdminPerfil() {
