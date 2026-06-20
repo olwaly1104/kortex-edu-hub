@@ -65,12 +65,14 @@ function loadInitial(email?: string | null): Instituicao {
       if (!parsed.logoDataUrl && onb.logoDataUrl) parsed.logoDataUrl = onb.logoDataUrl;
       if (!parsed.nif && onb.nif) parsed.nif = onb.nif;
       if (!parsed.sigla && onb.sigla) parsed.sigla = onb.sigla;
+      if (!parsed.nomeLegal && onb.nomeLegal) parsed.nomeLegal = onb.nomeLegal;
       if (!parsed.nomeOficial && onb.nome) parsed.nomeOficial = onb.nome;
       return parsed;
     }
   } catch { /* ignore */ }
   return {
     ...EMPTY,
+    nomeLegal: onb.nomeLegal || "",
     nomeOficial: onb.nome || "",
     sigla: onb.sigla || "",
     nif: onb.nif || "",
