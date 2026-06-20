@@ -196,7 +196,7 @@ function ImpostosBlock({ impostos, setImpostos }: { impostos: Imposto[]; setImpo
 const PRAZO_KEY = (email?: string | null) => KEY("propinas.prazo", email);
 
 // Number of months between payments (interval). 12/meses = pagamentos/ano.
-const MESES_OPCOES = [1, 2, 3, 4, 6, 12];
+const MESES_OPCOES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
 function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null; impostos: Imposto[]; onAddCursos: () => void }) {
   const { data: faculdades = [], isLoading: lF } = useFaculdades();
@@ -340,7 +340,9 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
                           >
                             <option value="">— Selecionar —</option>
                             {MESES_OPCOES.map((m) => (
-                              <option key={m} value={m}>{12 / m}× / ano · cada {m} {m === 1 ? "mês" : "meses"}</option>
+                              <option key={m} value={m}>
+                                {m === 0 ? "0 pagamentos" : m === 1 ? "1 pagamento / ano" : `${12 / m}× / ano · cada ${m} meses`}
+                              </option>
                             ))}
                           </select>
                           <div className="h-9 flex items-center justify-end px-2 rounded-md bg-muted/30 tabular-nums font-semibold text-foreground">{fmt(liquidoMensal)} Kz</div>
