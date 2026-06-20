@@ -265,7 +265,8 @@ function ImpostosBlock({ impostos, setImpostos, email }: { impostos: Imposto[]; 
       <div className="px-5 py-3 border-t bg-muted/10">
         <Button size="sm" variant="outline" className="gap-1.5" onClick={add}><Plus className="w-3.5 h-3.5" /> Adicionar imposto personalizado</Button>
       </div>
-    </Card>
+      </Card>
+    </div>
   );
 }
 
