@@ -119,6 +119,28 @@ const IMPOSTOS_KEY = (email?: string | null) => KEY("impostos", email);
 const ANOS_KEY = (email?: string | null) => KEY("propinas.anos", email);
 const REGIMES = ["Geral", "Reduzido", "Isento", "Exportação", "Intermédio"];
 
+const COR_OPCOES_GLOBAL = [
+  { label: "Âmbar", value: "bg-amber-100 text-amber-700 border-amber-200" },
+  { label: "Verde", value: "bg-emerald-100 text-emerald-700 border-emerald-200" },
+  { label: "Vermelho", value: "bg-red-100 text-red-700 border-red-200" },
+  { label: "Azul", value: "bg-blue-100 text-blue-700 border-blue-200" },
+  { label: "Cinza", value: "bg-slate-100 text-slate-700 border-slate-200" },
+  { label: "Violeta", value: "bg-violet-100 text-violet-700 border-violet-200" },
+  { label: "Primário", value: "bg-primary/10 text-primary border-primary/20" },
+];
+
+type CatItem = { nome: string; cor: string };
+const migrateCats = (raw: unknown, fallback: string[]): CatItem[] => {
+  if (Array.isArray(raw) && raw.length) {
+    return raw.map((x) =>
+      typeof x === "string"
+        ? { nome: x, cor: COR_OPCOES_GLOBAL[6].value }
+        : { nome: String((x as CatItem)?.nome ?? ""), cor: String((x as CatItem)?.cor ?? COR_OPCOES_GLOBAL[6].value) }
+    );
+  }
+  return fallback.map((n) => ({ nome: n, cor: COR_OPCOES_GLOBAL[6].value }));
+};
+
 type RecSub = "impostos" | "propinas" | "emolumentos" | "servicos";
 
 function ReceitasSection({ email, onAddCursos }: { email?: string | null; onAddCursos: () => void }) {
@@ -867,14 +889,13 @@ const EMOL_CATS_KEY = (email?: string | null) => KEY("emolumentos.categorias", e
 const DEFAULT_EMOL_CATS: string[] = ["Inscrição", "Matrícula", "Declaração", "Certificado", "2ª Via"];
 
 function EmolumentosBlock({ email, impostos }: { email?: string | null; impostos: Imposto[] }) {
-  const [cats, setCats] = useState<string[]>(() => {
-    const stored = readJSON<string[] | null>(EMOL_CATS_KEY(email), null);
-    return stored && stored.length ? stored : DEFAULT_EMOL_CATS;
-  });
+  const [cats, setCats] = useState<CatItem[]>(() =>
+    migrateCats(readJSON<unknown>(EMOL_CATS_KEY(email), null), DEFAULT_EMOL_CATS)
+  );
   useEffect(() => writeJSON(EMOL_CATS_KEY(email), cats), [cats, email]);
 
-  const addCat = () => setCats((s) => [...s, ""]);
-  const updCat = (idx: number, v: string) => setCats((s) => s.map((c, i) => i === idx ? v : c));
+  const addCat = () => setCats((s) => [...s, { nome: "", cor: COR_OPCOES_GLOBAL[6].value }]);
+  const updCat = (idx: number, patch: Partial<CatItem>) => setCats((s) => s.map((c, i) => i === idx ? { ...c, ...patch } : c));
   const delCat = (idx: number) => setCats((s) => s.filter((_, i) => i !== idx));
 
   return (
@@ -889,17 +910,22 @@ function EmolumentosBlock({ email, impostos }: { email?: string | null; impostos
           <span className="text-[11px] text-muted-foreground ml-auto tabular-nums shrink-0">{cats.length} categoria{cats.length === 1 ? "" : "s"}</span>
         </div>
         <div className="divide-y">
-          <div className="grid grid-cols-[1fr_140px_40px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
+          <div className="grid grid-cols-[1fr_160px_140px_40px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
             <div>Designação</div>
+            <div>Cor</div>
             <div>Pré-visualização</div>
             <div className="text-right">Ação</div>
           </div>
           {cats.length === 0 ? (
             <div className="px-5 py-8 text-center text-xs text-muted-foreground">Sem categorias configuradas.</div>
           ) : cats.map((c, idx) => (
-            <div key={idx} className="grid grid-cols-[1fr_140px_40px] gap-3 px-5 py-2.5 items-center text-sm">
-              <Input className="h-9" placeholder="Ex: Certificado" value={c} onChange={(e) => updCat(idx, e.target.value)} />
-              <span className="inline-flex items-center justify-center px-2.5 py-1.5 rounded-md border text-xs font-medium truncate bg-primary/10 text-primary border-primary/20">{c || "—"}</span>
+            <div key={idx} className="grid grid-cols-[1fr_160px_140px_40px] gap-3 px-5 py-2.5 items-center text-sm">
+              <Input className="h-9" placeholder="Ex: Certificado" value={c.nome} onChange={(e) => updCat(idx, { nome: e.target.value })} />
+              <select className="h-9 rounded-md border border-input bg-background px-2 text-sm" value={c.cor}
+                onChange={(e) => updCat(idx, { cor: e.target.value })}>
+                {COR_OPCOES_GLOBAL.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </select>
+              <span className={`inline-flex items-center justify-center px-2.5 py-1.5 rounded-md border text-xs font-medium truncate ${c.cor}`}>{c.nome || "—"}</span>
               <div className="flex justify-end">
                 <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
                   onClick={() => delCat(idx)}><Trash2 className="w-3.5 h-3.5" /></Button>
@@ -919,7 +945,7 @@ function EmolumentosBlock({ email, impostos }: { email?: string | null; impostos
         storageKey={KEY("taxas", email)}
         withType
         typeLabel="Categoria"
-        typeOptions={cats.filter((c) => c.trim())}
+        typeOptions={cats.map((c) => c.nome).filter((c) => c.trim())}
         withTarget
         withTax
         withTaxValue
@@ -938,14 +964,13 @@ const SERV_CATS_KEY = (email?: string | null) => KEY("servicos.categorias", emai
 const DEFAULT_SERV_CATS: string[] = ["Cursos Livres", "Workshops", "Formação Contínua", "Certificações", "Aluguer de Espaços"];
 
 function ServicosAcademicosBlock({ email, impostos }: { email?: string | null; impostos: Imposto[] }) {
-  const [cats, setCats] = useState<string[]>(() => {
-    const stored = readJSON<string[] | null>(SERV_CATS_KEY(email), null);
-    return stored && stored.length ? stored : DEFAULT_SERV_CATS;
-  });
+  const [cats, setCats] = useState<CatItem[]>(() =>
+    migrateCats(readJSON<unknown>(SERV_CATS_KEY(email), null), DEFAULT_SERV_CATS)
+  );
   useEffect(() => writeJSON(SERV_CATS_KEY(email), cats), [cats, email]);
 
-  const addCat = () => setCats((s) => [...s, ""]);
-  const updCat = (idx: number, v: string) => setCats((s) => s.map((c, i) => i === idx ? v : c));
+  const addCat = () => setCats((s) => [...s, { nome: "", cor: COR_OPCOES_GLOBAL[6].value }]);
+  const updCat = (idx: number, patch: Partial<CatItem>) => setCats((s) => s.map((c, i) => i === idx ? { ...c, ...patch } : c));
   const delCat = (idx: number) => setCats((s) => s.filter((_, i) => i !== idx));
 
   return (
@@ -960,17 +985,22 @@ function ServicosAcademicosBlock({ email, impostos }: { email?: string | null; i
           <span className="text-[11px] text-muted-foreground ml-auto tabular-nums shrink-0">{cats.length} categoria{cats.length === 1 ? "" : "s"}</span>
         </div>
         <div className="divide-y">
-          <div className="grid grid-cols-[1fr_140px_40px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
+          <div className="grid grid-cols-[1fr_160px_140px_40px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
             <div>Designação</div>
+            <div>Cor</div>
             <div>Pré-visualização</div>
             <div className="text-right">Ação</div>
           </div>
           {cats.length === 0 ? (
             <div className="px-5 py-8 text-center text-xs text-muted-foreground">Sem categorias configuradas.</div>
           ) : cats.map((c, idx) => (
-            <div key={idx} className="grid grid-cols-[1fr_140px_40px] gap-3 px-5 py-2.5 items-center text-sm">
-              <Input className="h-9" placeholder="Ex: Workshop" value={c} onChange={(e) => updCat(idx, e.target.value)} />
-              <span className="inline-flex items-center justify-center px-2.5 py-1.5 rounded-md border text-xs font-medium truncate bg-primary/10 text-primary border-primary/20">{c || "—"}</span>
+            <div key={idx} className="grid grid-cols-[1fr_160px_140px_40px] gap-3 px-5 py-2.5 items-center text-sm">
+              <Input className="h-9" placeholder="Ex: Workshop" value={c.nome} onChange={(e) => updCat(idx, { nome: e.target.value })} />
+              <select className="h-9 rounded-md border border-input bg-background px-2 text-sm" value={c.cor}
+                onChange={(e) => updCat(idx, { cor: e.target.value })}>
+                {COR_OPCOES_GLOBAL.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </select>
+              <span className={`inline-flex items-center justify-center px-2.5 py-1.5 rounded-md border text-xs font-medium truncate ${c.cor}`}>{c.nome || "—"}</span>
               <div className="flex justify-end">
                 <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
                   onClick={() => delCat(idx)}><Trash2 className="w-3.5 h-3.5" /></Button>
@@ -990,7 +1020,7 @@ function ServicosAcademicosBlock({ email, impostos }: { email?: string | null; i
         storageKey={KEY("servicos", email)}
         withType
         typeLabel="Categoria"
-        typeOptions={cats.filter((c) => c.trim())}
+        typeOptions={cats.map((c) => c.nome).filter((c) => c.trim())}
         withTarget
         withTax
         withTaxValue
