@@ -922,6 +922,7 @@ function EmolumentosBlock({ email, impostos }: { email?: string | null; impostos
         typeOptions={cats.filter((c) => c.trim())}
         withTarget
         withTax
+        withTaxValue
         impostos={impostos}
         addLabel="Adicionar emolumento"
         placeholder="Ex: Certidão de matrícula"
