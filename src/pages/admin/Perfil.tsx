@@ -199,14 +199,6 @@ export default function AdminPerfil() {
                 {instituicao.natureza && <span className="inline-flex items-center gap-1.5"><Building2 className="w-3.5 h-3.5" /> {instituicao.natureza}</span>}
               </div>
             </div>
-            {locked ? (
-              <Button onClick={handleEdit} size="sm" variant="outline" className="gap-1.5"><Pencil className="w-3.5 h-3.5" /> Editar</Button>
-            ) : (
-              <div className="flex items-center gap-2">
-                <Button onClick={handleCancel} size="sm" variant="outline" className="gap-1.5"><X className="w-3.5 h-3.5" /> Cancelar</Button>
-                <Button onClick={handleSave} size="sm" className="gap-1.5"><Save className="w-3.5 h-3.5" /> Guardar</Button>
-              </div>
-            )}
           </div>
         </div>
 
