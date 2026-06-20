@@ -117,7 +117,16 @@ export default function ConfigurarReceitas() {
 export type Imposto = { id: string; nome: string; taxa: number; regime: string };
 const IMPOSTOS_KEY = (email?: string | null) => KEY("impostos", email);
 const ANOS_KEY = (email?: string | null) => KEY("propinas.anos", email);
-const REGIMES = ["Geral", "Reduzido", "Isento", "Exportação", "Intermédio"];
+// Taxas reais de IVA em Angola (Código do IVA, Lei n.º 14/23)
+const REGIMES_IVA: { regime: string; taxa: number; label: string }[] = [
+  { regime: "Geral", taxa: 0.14, label: "Geral — 14%" },
+  { regime: "Intermédio", taxa: 0.07, label: "Intermédio — 7%" },
+  { regime: "Reduzido", taxa: 0.05, label: "Reduzido — 5%" },
+  { regime: "Isento", taxa: 0, label: "Isento — 0%" },
+  { regime: "Exportação", taxa: 0, label: "Exportação — 0%" },
+];
+const REGIMES = REGIMES_IVA.map((r) => r.regime);
+const taxaForRegime = (regime: string) => REGIMES_IVA.find((r) => r.regime === regime)?.taxa ?? 0;
 
 const COR_OPCOES_GLOBAL = [
   { label: "Âmbar", value: "bg-amber-100 text-amber-700 border-amber-200" },
@@ -183,24 +192,27 @@ function ImpostosBlock({ impostos, setImpostos }: { impostos: Imposto[]; setImpo
         <span className="text-[11px] text-muted-foreground ml-auto tabular-nums shrink-0">{impostos.length} imposto{impostos.length === 1 ? "" : "s"}</span>
       </div>
       <div className="divide-y">
-        <div className="grid grid-cols-[1fr_140px_180px_40px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
+        <div className="grid grid-cols-[1fr_220px_120px_40px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
           <div>Designação</div>
-          <div>Taxa (%)</div>
-          <div>Regime de IVA</div>
+          <div>Regime de IVA (Angola)</div>
+          <div className="text-right">Taxa</div>
           <div className="text-right">Ação</div>
         </div>
         {impostos.length === 0 ? (
           <div className="px-5 py-10 text-center text-xs text-muted-foreground">Sem impostos configurados.</div>
         ) : impostos.map((i) => (
-          <div key={i.id} className="grid grid-cols-[1fr_140px_180px_40px] gap-3 px-5 py-2.5 items-center text-sm">
-            <Input className="h-9" placeholder="Ex: IVA 14%" value={i.nome}
+          <div key={i.id} className="grid grid-cols-[1fr_220px_120px_40px] gap-3 px-5 py-2.5 items-center text-sm">
+            <Input className="h-9" placeholder="Ex: IVA Geral" value={i.nome}
               onChange={(e) => setImpostos((s) => s.map((x) => x.id === i.id ? { ...x, nome: e.target.value } : x))} />
-            <Input type="number" min={0} max={100} step={1} className="h-9 tabular-nums" value={i.taxa * 100}
-              onChange={(e) => setImpostos((s) => s.map((x) => x.id === i.id ? { ...x, taxa: Number(e.target.value) / 100 } : x))} />
             <select className="h-9 rounded-md border border-input bg-background px-2 text-sm" value={i.regime}
-              onChange={(e) => setImpostos((s) => s.map((x) => x.id === i.id ? { ...x, regime: e.target.value } : x))}>
-              {REGIMES.map((r) => <option key={r} value={r}>{r}</option>)}
+              onChange={(e) => {
+                const regime = e.target.value;
+                const taxa = taxaForRegime(regime);
+                setImpostos((s) => s.map((x) => x.id === i.id ? { ...x, regime, taxa } : x));
+              }}>
+              {REGIMES_IVA.map((r) => <option key={r.regime} value={r.regime}>{r.label}</option>)}
             </select>
+            <div className="text-right tabular-nums font-medium text-foreground">{(i.taxa * 100).toFixed(0)}%</div>
             <div className="flex justify-end">
               <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
                 onClick={() => setImpostos((s) => s.filter((x) => x.id !== i.id))}><Trash2 className="w-3.5 h-3.5" /></Button>
