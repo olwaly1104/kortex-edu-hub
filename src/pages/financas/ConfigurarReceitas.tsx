@@ -283,7 +283,7 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
             <div className="grid gap-3 px-5 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10" style={{ gridTemplateColumns: COLS }}>
               <div>Faculdade · Curso</div>
               <div>Propina bruta mensal</div>
-              <div>Imposto</div>
+              <div>Regime</div>
               <div className="text-right">Propina mensal c/ IVA incl.</div>
               <div>Meses</div>
               <div className="text-right">Propina bruta anual</div>
@@ -333,7 +333,7 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
                             <option value="">— Selecionar —</option>
                             {impostos.map((i) => <option key={i.id} value={i.id}>{i.nome} ({(i.taxa * 100).toFixed(0)}%)</option>)}
                           </select>
-                          <div className="h-9 flex items-center justify-end px-2 rounded-md bg-muted/30 tabular-nums text-sm font-medium text-foreground">{fmt(bruto)} Kz</div>
+                          <div className="h-9 flex items-center justify-end px-2 rounded-md bg-muted/30 tabular-nums text-sm font-medium text-foreground">{fmt(bruto * (1 + taxa))} Kz</div>
                           <select
                             className="h-9 rounded-md border border-input bg-background px-2 text-sm"
                             value={meses || ""}
