@@ -333,6 +333,7 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
                             <option value="">— Selecionar —</option>
                             {impostos.map((i) => <option key={i.id} value={i.id}>{i.nome} ({(i.taxa * 100).toFixed(0)}%)</option>)}
                           </select>
+                          <div className="h-9 flex items-center justify-end px-2 rounded-md bg-muted/30 tabular-nums text-sm font-medium text-foreground">{fmt(bruto)} Kz</div>
                           <select
                             className="h-9 rounded-md border border-input bg-background px-2 text-sm"
                             value={meses || ""}
