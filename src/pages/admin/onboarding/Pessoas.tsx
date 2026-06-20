@@ -49,10 +49,16 @@ export default function OnboardingPessoas({ mode }: { mode: Mode }) {
   const isDoc = mode === "docentes";
   const [saving, setSaving] = useState(false);
 
+  // Docentes mode uses the full DocenteFormDialog flow (same as Discentes).
+  if (isDoc) {
+    return <DocentesOnboardingPanel userEmail={user?.email} />;
+  }
+
   const seed: Person[] = [];
 
 
   const [rows, setRows] = useState<Person[]>(seed);
+
 
   const addEmptyRow = () => {
     const novo: Person = isDoc
