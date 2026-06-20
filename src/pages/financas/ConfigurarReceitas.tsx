@@ -306,10 +306,9 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
                     const taxa = impostos.find((i) => i.id === impostoId)?.taxa ?? p.imposto;
                     const bruto = Number(valorVal) || 0;
                     const meses = prazoByCurso[c.id] ?? 0;
-                    const pagPorAno = meses > 0 ? 12 / meses : 0;
-                    const liquidoPorPag = Math.max(0, bruto - bruto * taxa);
-                    const liquidoAnual = liquidoPorPag * pagPorAno;
-                    const liquidoMensal = liquidoAnual / 12;
+                    const brutoAnual = bruto * meses;
+                    const liquidoMensal = Math.max(0, bruto - bruto * taxa);
+                    const liquidoAnual = liquidoMensal * meses;
                     const dirty = d !== undefined;
                     const setMeses = (m: number) => setPrazoByCurso((s) => ({ ...s, [c.id]: m }));
                     return (
@@ -341,7 +340,7 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
                             <option value="">— Selecionar —</option>
                             {MESES_OPCOES.map((m) => (
                               <option key={m} value={m}>
-                                {m === 0 ? "0 pagamentos" : m === 1 ? "1 pagamento / ano" : `${12 / m}× / ano · cada ${m} meses`}
+                                {m === 1 ? "1 mês" : `${m} meses`}
                               </option>
                             ))}
                           </select>
