@@ -177,6 +177,7 @@ import AdminOnboardingSalarios from "./pages/admin/onboarding/Salarios";
 import AdminOnboardingEspacos from "./pages/admin/onboarding/Espacos";
 import AdminOnboardingGeopontos from "./pages/admin/onboarding/Geopontos";
 import AdminFaculdadesCursos from "./pages/admin/FaculdadesCursos";
+import AdminAreaAcademica from "./pages/admin/AreaAcademica";
 import AdminDiscentes from "./pages/admin/Discentes";
 import AdminDiscenteProfile from "./pages/admin/DiscenteProfile";
 import AdminSalas from "./pages/admin/Salas";
