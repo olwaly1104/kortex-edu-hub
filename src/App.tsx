@@ -292,7 +292,7 @@ function AppRoutes() {
         {/* Admin */}
         <Route path="/admin" element={<AdminInicio />} />
         <Route path="/admin/perfil" element={<AdminPerfil />} />
-        <Route path="/admin/faculdades-cursos" element={<AdminFaculdadesCursos />} />
+        <Route path="/admin/faculdades-cursos" element={<AdminAreaAcademica />} />
         <Route path="/admin/discentes" element={<AdminDiscentes />} />
         <Route path="/admin/discentes/:discenteId" element={<AdminDiscenteProfile />} />
         <Route path="/admin/salas" element={<AdminSalas />} />
