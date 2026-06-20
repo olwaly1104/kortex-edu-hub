@@ -5,13 +5,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Upload, UserPlus, GraduationCap, Briefcase, Loader2, Save } from "lucide-react";
+import { Upload, UserPlus, GraduationCap, Briefcase, Trash2, User } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { provisionKortexUser } from "@/lib/accountProvisioning";
-import { saveDocentes, saveStaff } from "@/lib/peopleStorage";
+import { loadDocentes, saveDocentes, saveStaff, type DocenteRow } from "@/lib/peopleStorage";
+import { DocenteFormDialog } from "@/components/admin/DocenteFormDialog";
 
 type Mode = "docentes" | "staff";
+
 
 type Person = {
   id: string;
@@ -47,10 +49,16 @@ export default function OnboardingPessoas({ mode }: { mode: Mode }) {
   const isDoc = mode === "docentes";
   const [saving, setSaving] = useState(false);
 
+  // Docentes mode uses the full DocenteFormDialog flow (same as Discentes).
+  if (isDoc) {
+    return <DocentesOnboardingPanel userEmail={user?.email} />;
+  }
+
   const seed: Person[] = [];
 
 
   const [rows, setRows] = useState<Person[]>(seed);
+
 
   const addEmptyRow = () => {
     const novo: Person = isDoc
@@ -278,3 +286,102 @@ export default function OnboardingPessoas({ mode }: { mode: Mode }) {
     </div>
   );
 }
+
+function DocentesOnboardingPanel({ userEmail }: { userEmail?: string | null }) {
+  const [rows, setRows] = useState<DocenteRow[]>(() => loadDocentes());
+  const [open, setOpen] = useState(false);
+
+  const persist = (next: DocenteRow[]) => {
+    setRows(next);
+    saveDocentes(next);
+    window.dispatchEvent(new Event("storage"));
+  };
+
+  const onSave = async (row: DocenteRow) => {
+    const next = [...rows, row];
+    persist(next);
+    setOpen(false);
+    try {
+      await provisionKortexUser({
+        name: `${row.primeiroNome} ${row.ultimoNome}`.trim(),
+        email: row.email,
+        modulo: "professor",
+      });
+    } catch (e: any) {
+      console.warn("provision docente failed:", e?.message);
+    }
+    markOnboardingStepDone(userEmail, "rh.doc");
+    toast.success(`Docente ${row.primeiroNome} adicionado`);
+  };
+
+  const remove = (id: string) => persist(rows.filter((r) => r.id !== id));
+
+  return (
+    <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6 animate-fade-in">
+      <OnboardingStepBanner />
+
+      <div className="flex items-center gap-3 pb-1">
+        <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+          <GraduationCap className="w-5 h-5" />
+        </div>
+        <div>
+          <h1 className="text-lg font-semibold leading-tight">Docentes</h1>
+          <p className="text-xs text-muted-foreground">
+            Registo completo do corpo docente. O email institucional <span className="font-medium text-foreground">@upra.kor</span> é gerado automaticamente.
+          </p>
+        </div>
+        <div className="ml-auto flex items-center gap-3">
+          <div className="text-right">
+            <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Registos</p>
+            <p className="text-lg font-semibold leading-none">{rows.length}</p>
+          </div>
+          <Button size="sm" onClick={() => setOpen(true)} className="gap-1.5">
+            <UserPlus className="w-3.5 h-3.5" /> Adicionar Docente
+          </Button>
+        </div>
+      </div>
+
+      {rows.length === 0 ? (
+        <Card className="p-10 flex flex-col items-center justify-center text-center gap-3">
+          <div className="w-12 h-12 rounded-full bg-muted text-muted-foreground flex items-center justify-center">
+            <GraduationCap className="w-6 h-6" />
+          </div>
+          <div>
+            <p className="text-sm font-semibold">Nenhum docente registado</p>
+            <p className="text-xs text-muted-foreground mt-0.5">Adicione docentes para os atribuir a faculdades, cursos e cargos.</p>
+          </div>
+          <Button size="sm" onClick={() => setOpen(true)} className="gap-1.5">
+            <UserPlus className="w-3.5 h-3.5" /> Adicionar Docente
+          </Button>
+        </Card>
+      ) : (
+        <Card className="overflow-hidden">
+          <div className="grid grid-cols-[40px_1.4fr_1.4fr_1fr_0.9fr_0.9fr_0.9fr_48px] gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b">
+            <span></span><span>Docente</span><span>Email</span><span>Faculdade</span><span>Grau</span><span>Categoria</span><span>Cargo</span><span></span>
+          </div>
+          <div className="divide-y">
+            {rows.map((r) => (
+              <div key={r.id} className="grid grid-cols-[40px_1.4fr_1.4fr_1fr_0.9fr_0.9fr_0.9fr_48px] gap-2 px-4 py-2.5 items-center">
+                <div className="w-8 h-8 rounded-full bg-muted overflow-hidden flex items-center justify-center text-muted-foreground">
+                  {r.fotoDataUrl ? <img src={r.fotoDataUrl} alt="" className="w-full h-full object-cover" /> : <User className="w-4 h-4" />}
+                </div>
+                <span className="text-xs font-medium truncate">{r.prefixo} {r.primeiroNome} {r.ultimoNome}</span>
+                <span className="text-xs text-muted-foreground truncate font-mono">{r.email}</span>
+                <span className="text-xs truncate">{r.faculdade || <span className="text-muted-foreground italic">—</span>}</span>
+                <span className="text-xs">{r.grau || "—"}</span>
+                <span className="text-xs">{r.categoria}</span>
+                <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold bg-primary/10 text-primary w-fit">{r.cargo}</span>
+                <Button size="icon" variant="ghost" className="h-7 w-7 text-muted-foreground hover:text-destructive" onClick={() => remove(r.id)}>
+                  <Trash2 className="w-3.5 h-3.5" />
+                </Button>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
+
+      <DocenteFormDialog open={open} onOpenChange={setOpen} onSave={onSave} />
+    </div>
+  );
+}
+
