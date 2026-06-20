@@ -205,23 +205,19 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
   const updatePropina = useUpdatePropina();
   const [draft, setDraft] = useState<Record<string, { valor: string; impostoId: string }>>({});
   const [anosByCurso, setAnosByCurso] = useState<Record<string, number[]>>(() => readJSON(ANOS_KEY(email), {}));
-  const [prazoByCurso, setPrazoByCurso] = useState<Record<string, string>>(() => {
-    const raw = readJSON<Record<string, string | string[]>>(PRAZO_KEY(email), {});
-    const norm: Record<string, string> = {};
-    Object.entries(raw).forEach(([k, v]) => { norm[k] = Array.isArray(v) ? (v[0] ?? "") : (v || ""); });
+  const [prazoByCurso, setPrazoByCurso] = useState<Record<string, number>>(() => {
+    const raw = readJSON<Record<string, number | string | string[]>>(PRAZO_KEY(email), {});
+    const norm: Record<string, number> = {};
+    Object.entries(raw).forEach(([k, v]) => {
+      const n = typeof v === "number" ? v : Number(Array.isArray(v) ? v[0] : v);
+      if (!Number.isNaN(n) && n > 0) norm[k] = n;
+    });
     return norm;
-  });
-  const [prazosDef, setPrazosDef] = useState<PrazoDef[]>(() => {
-    const stored = readJSON<PrazoDef[] | null>(PRAZOS_DEF_KEY(email), null);
-    if (stored === null) return DEFAULT_PRAZOS.map((d) => ({ ...d }));
-    // Keep stored order; just re-mark locked status by id
-    return stored.map((p) => ({ ...p, locked: !!DEFAULT_PRAZOS.find((d) => d.id === p.id) }));
   });
   const [open, setOpen] = useState<Record<string, boolean>>({});
 
   useEffect(() => writeJSON(ANOS_KEY(email), anosByCurso), [anosByCurso, email]);
   useEffect(() => writeJSON(PRAZO_KEY(email), prazoByCurso), [prazoByCurso, email]);
-  useEffect(() => writeJSON(PRAZOS_DEF_KEY(email), prazosDef), [prazosDef, email]);
 
   const propinaByCurso = useMemo(() => {
     const m = new Map<string, { valor_mensal: number; imposto: number }>();
