@@ -268,7 +268,7 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
   };
 
   // Column template — explicit so headers + rows align perfectly
-  // Faculdade·Curso | Propina mensal | Regime | Meses | Propina mensal c/ IVA incl. | Propina bruta anual | Líquido anual | Ação
+  // Faculdade·Curso | Propina mensal | Regime | Meses | Propina mensal c/ IVA incl. | Propina bruta total | Líquido total | Ação
   const COLS = "minmax(220px,1.4fr) 150px 160px 120px 150px 150px 150px 130px";
 
   return (
@@ -278,7 +278,7 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
         <Wallet className="w-4 h-4 text-primary" />
         <div className="min-w-0">
           <h2 className="text-sm font-bold text-foreground">Propinas por curso</h2>
-          <p className="text-[11px] text-muted-foreground">Cada curso + nº de pagamentos é um produto. Escolha o intervalo em meses — Líquido anual é calculado automaticamente.</p>
+          <p className="text-[11px] text-muted-foreground">Cada curso + nº de pagamentos é um produto. Escolha o intervalo em meses — Líquido total é calculado automaticamente.</p>
         </div>
       </div>
 
@@ -308,8 +308,8 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
               <div>Regime</div>
               <div>Meses</div>
               <div className="text-right">Propina mensal c/ IVA incl.</div>
-              <div className="text-right">Propina bruta anual</div>
-              <div className="text-right">Propina líquida anual</div>
+              <div className="text-right">Propina bruta total</div>
+              <div className="text-right">Propina líquida total</div>
               <div className="text-right">Ação</div>
             </div>
             {facWithCursos.flatMap((f) =>
@@ -351,7 +351,7 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
                             value={impostoId}
                             onChange={(e) => setDraft((s) => ({ ...s, [c.id]: { valor: valorVal, impostoId: e.target.value } }))}>
                             <option value="">— Selecionar —</option>
-                            {impostos.map((i) => <option key={i.id} value={i.id}>{i.nome} ({(i.taxa * 100).toFixed(0)}%)</option>)}
+                            {impostos.map((i) => <option key={i.id} value={i.id}>{i.nome}</option>)}
                           </select>
                           <select
                             className="h-9 rounded-md border border-input bg-background px-2 text-sm"
