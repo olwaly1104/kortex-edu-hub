@@ -340,7 +340,9 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
                           >
                             <option value="">— Selecionar —</option>
                             {MESES_OPCOES.map((m) => (
-                              <option key={m} value={m}>{12 / m}× / ano · cada {m} {m === 1 ? "mês" : "meses"}</option>
+                              <option key={m} value={m}>
+                                {m === 0 ? "0 pagamentos" : m === 1 ? "1 pagamento / ano" : `${12 / m}× / ano · cada ${m} meses`}
+                              </option>
                             ))}
                           </select>
                           <div className="h-9 flex items-center justify-end px-2 rounded-md bg-muted/30 tabular-nums font-semibold text-foreground">{fmt(liquidoMensal)} Kz</div>
