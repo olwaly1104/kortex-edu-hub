@@ -195,15 +195,24 @@ function ReceitasSection({ email, onAddCursos }: { email?: string | null; onAddC
 
 function ImpostosBlock({ impostos, setImpostos, email }: { impostos: Imposto[]; setImpostos: React.Dispatch<React.SetStateAction<Imposto[]>>; email?: string | null }) {
   const add = () => setImpostos((s) => [...s, { id: newId(), nome: nomeForImposto("Personalizado", 0), taxa: 0, regime: "Personalizado" }]);
-  const nif = useMemo(() => {
-    try {
-      const profKey = `upra.admin.profile::${email || "anon"}`;
-      const p = JSON.parse(localStorage.getItem(profKey) || "null");
-      if (p?.nif) return String(p.nif);
-      const onbKey = `upra.admin.onboarding::${email || "anon"}`;
-      const o = JSON.parse(localStorage.getItem(onbKey) || "null");
-      return String(o?.dados?.nif || "");
-    } catch { return ""; }
+  const [nif, setNif] = useState<string>("");
+  useEffect(() => {
+    const suffix = (email || "").trim().toLowerCase();
+    const profKey = suffix ? `upra.admin.perfil:${suffix}` : "upra.admin.perfil";
+    const onbKey = suffix ? `upra.admin.onboarding:${suffix}` : "upra.admin.onboarding";
+    const read = () => {
+      try {
+        const p = JSON.parse(localStorage.getItem(profKey) || "null");
+        if (p?.nif) { setNif(String(p.nif)); return; }
+        const o = JSON.parse(localStorage.getItem(onbKey) || "null");
+        setNif(String(o?.dados?.nif || ""));
+      } catch { setNif(""); }
+    };
+    read();
+    const onStorage = (e: StorageEvent) => { if (!e.key || e.key === profKey || e.key === onbKey) read(); };
+    window.addEventListener("storage", onStorage);
+    window.addEventListener("focus", read);
+    return () => { window.removeEventListener("storage", onStorage); window.removeEventListener("focus", read); };
   }, [email]);
   return (
     <div className="space-y-4">
