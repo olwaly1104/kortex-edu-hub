@@ -216,25 +216,6 @@ export default function AdminPerfil() {
         </div>
       </Card>
 
-      {/* Liderança */}
-      <Card className="p-6 space-y-4">
-        <div className="flex items-center gap-2">
-          <Users className="w-4 h-4 text-primary" />
-          <h2 className="text-sm font-semibold">Liderança</h2>
-        </div>
-        <Separator />
-        <div className="grid md:grid-cols-2 gap-4">
-          <div className="space-y-1.5">
-            <Label className="text-xs">Reitor</Label>
-            <Input value={instituicao.reitor} onChange={e => setInstituicao({ ...instituicao, reitor: e.target.value })} className="h-9" />
-          </div>
-          <div className="space-y-1.5">
-            <Label className="text-xs">Presidente do Conselho de Administração</Label>
-            <Input value={instituicao.presidenteCA} onChange={e => setInstituicao({ ...instituicao, presidenteCA: e.target.value })} className="h-9" />
-          </div>
-        </div>
-      </Card>
-
       {/* Contactos */}
       <Card className="p-6 space-y-4">
         <div className="flex items-center gap-2">
@@ -273,6 +254,25 @@ export default function AdminPerfil() {
           <div className="space-y-1.5">
             <Label className="text-xs flex items-center gap-1.5"><MapPin className="w-3 h-3" /> Morada</Label>
             <Input value={instituicao.morada} onChange={e => setInstituicao({ ...instituicao, morada: e.target.value })} className="h-9" />
+          </div>
+        </div>
+      </Card>
+
+      {/* Liderança */}
+      <Card className="p-6 space-y-4">
+        <div className="flex items-center gap-2">
+          <Users className="w-4 h-4 text-primary" />
+          <h2 className="text-sm font-semibold">Liderança</h2>
+        </div>
+        <Separator />
+        <div className="grid md:grid-cols-2 gap-4">
+          <div className="space-y-1.5">
+            <Label className="text-xs">Reitor</Label>
+            <Input value={instituicao.reitor} onChange={e => setInstituicao({ ...instituicao, reitor: e.target.value })} className="h-9" />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs">Promotor</Label>
+            <Input value={instituicao.promotor} onChange={e => setInstituicao({ ...instituicao, promotor: e.target.value })} className="h-9" />
           </div>
         </div>
       </Card>
