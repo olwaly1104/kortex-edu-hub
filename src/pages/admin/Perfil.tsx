@@ -249,12 +249,12 @@ export default function AdminPerfil() {
             <Input value={instituicao.nif} onChange={e => setInstituicao({ ...instituicao, nif: e.target.value })} className={`h-9 ${locked ? "bg-muted/40 cursor-not-allowed" : ""}`} readOnly={locked} />
           </div>
           <div className="space-y-1.5">
-            <Label className="text-xs">Sigla</Label>
-            <Input value={instituicao.sigla} onChange={e => setInstituicao({ ...instituicao, sigla: e.target.value })} className={`h-9 ${locked ? "bg-muted/40 cursor-not-allowed" : ""}`} readOnly={locked} />
-          </div>
-          <div className="space-y-1.5">
             <Label className="text-xs">Nome da instituição</Label>
             <Input value={instituicao.nomeOficial} onChange={e => setInstituicao({ ...instituicao, nomeOficial: e.target.value })} className={`h-9 ${locked ? "bg-muted/40 cursor-not-allowed" : ""}`} readOnly={locked} />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs">Sigla</Label>
+            <Input value={instituicao.sigla} onChange={e => setInstituicao({ ...instituicao, sigla: e.target.value })} className={`h-9 ${locked ? "bg-muted/40 cursor-not-allowed" : ""}`} readOnly={locked} />
           </div>
           <div className="space-y-1.5">
             <Label className="text-xs">Ano de fundação</Label>
