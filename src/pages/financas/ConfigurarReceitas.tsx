@@ -195,8 +195,7 @@ function ImpostosBlock({ impostos, setImpostos }: { impostos: Imposto[]; setImpo
 
 const PRAZO_KEY = (email?: string | null) => KEY("propinas.prazo", email);
 
-// Number of months between payments (interval). 12/meses = pagamentos/ano.
-const MESES_OPCOES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+const MESES_OPCOES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
 function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null; impostos: Imposto[]; onAddCursos: () => void }) {
   const { data: faculdades = [], isLoading: lF } = useFaculdades();
@@ -247,8 +246,8 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
   };
 
   // Column template — explicit so headers + rows align perfectly
-  // Faculdade·Curso | Bruto/pagamento | Imposto | Nº Pagamentos | Líquido mensal | Líquido anual | Ação
-  const COLS = "minmax(220px,1.4fr) 150px 160px 170px 150px 150px 130px";
+  // Faculdade·Curso | Propina bruta mensal | Imposto | Meses | Propina bruta anual | Líquido mensal | Líquido anual | Ação
+  const COLS = "minmax(220px,1.4fr) 150px 160px 120px 150px 150px 150px 130px";
 
   return (
     <div className="space-y-6">
@@ -285,7 +284,8 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
               <div>Faculdade · Curso</div>
               <div>Propina bruta mensal</div>
               <div>Imposto</div>
-              <div>Nº Pagamentos</div>
+              <div>Meses</div>
+              <div className="text-right">Propina bruta anual</div>
               <div className="text-right">Líquido mensal</div>
               <div className="text-right">Líquido anual</div>
               <div className="text-right">Ação</div>
@@ -306,10 +306,9 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
                     const taxa = impostos.find((i) => i.id === impostoId)?.taxa ?? p.imposto;
                     const bruto = Number(valorVal) || 0;
                     const meses = prazoByCurso[c.id] ?? 0;
-                    const pagPorAno = meses > 0 ? 12 / meses : 0;
-                    const liquidoPorPag = Math.max(0, bruto - bruto * taxa);
-                    const liquidoAnual = liquidoPorPag * pagPorAno;
-                    const liquidoMensal = liquidoAnual / 12;
+                    const brutoAnual = bruto * meses;
+                    const liquidoMensal = Math.max(0, bruto - bruto * taxa);
+                    const liquidoAnual = liquidoMensal * meses;
                     const dirty = d !== undefined;
                     const setMeses = (m: number) => setPrazoByCurso((s) => ({ ...s, [c.id]: m }));
                     return (
@@ -341,10 +340,11 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
                             <option value="">— Selecionar —</option>
                             {MESES_OPCOES.map((m) => (
                               <option key={m} value={m}>
-                                {m === 0 ? "0 pagamentos" : m === 1 ? "1 pagamento / ano" : `${12 / m}× / ano · cada ${m} meses`}
+                                {m === 1 ? "1 mês" : `${m} meses`}
                               </option>
                             ))}
                           </select>
+                          <div className="h-9 flex items-center justify-end px-2 rounded-md bg-muted/30 tabular-nums text-sm font-medium text-foreground">{fmt(brutoAnual)} Kz</div>
                           <div className="h-9 flex items-center justify-end px-2 rounded-md bg-muted/30 tabular-nums font-semibold text-foreground">{fmt(liquidoMensal)} Kz</div>
                           <div className="h-9 flex items-center justify-end px-2 rounded-md bg-muted/30 tabular-nums text-xs font-medium text-muted-foreground">{fmt(liquidoAnual)} Kz</div>
                           <div className="flex justify-end gap-1">
