@@ -384,13 +384,14 @@ export default function AdminDiscentes() {
             <span>Último</span>
             <span>Nascimento</span>
             <span>Telemóvel</span>
+            <span>Faculdade</span>
             <span>Curso</span>
             <span>Ano</span>
             <span>Turma</span>
             <span>Regime</span>
             <span>Docs</span>
-            <span>Email</span>
             <span></span>
+
           </div>
 
           <div className="divide-y">
