@@ -346,6 +346,50 @@ export type Database = {
           },
         ]
       }
+      edificios: {
+        Row: {
+          created_at: string
+          id: string
+          nome: string
+          owner_user_id: string
+          pisos: number
+          responsavel: string | null
+          salas: number
+          sigla: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          nome: string
+          owner_user_id: string
+          pisos?: number
+          responsavel?: string | null
+          salas?: number
+          sigla: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          nome?: string
+          owner_user_id?: string
+          pisos?: number
+          responsavel?: string | null
+          salas?: number
+          sigla?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "edificios_responsavel_fkey"
+            columns: ["responsavel"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       estudantes: {
         Row: {
           ano: string
