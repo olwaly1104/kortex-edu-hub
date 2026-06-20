@@ -246,8 +246,8 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
   };
 
   // Column template — explicit so headers + rows align perfectly
-  // Faculdade·Curso | Propina bruta mensal | Imposto | Meses | Propina bruta anual | Líquido mensal | Líquido anual | Ação
-  const COLS = "minmax(220px,1.4fr) 150px 160px 120px 150px 150px 150px 130px";
+  // Faculdade·Curso | Propina bruta mensal | Imposto | Propina mensal c/ IVA incl. | Meses | Propina bruta anual | Líquido mensal | Líquido anual | Ação
+  const COLS = "minmax(220px,1.4fr) 150px 160px 150px 120px 150px 150px 150px 130px";
 
   return (
     <div className="space-y-6">
@@ -284,6 +284,7 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
               <div>Faculdade · Curso</div>
               <div>Propina bruta mensal</div>
               <div>Imposto</div>
+              <div className="text-right">Propina mensal c/ IVA incl.</div>
               <div>Meses</div>
               <div className="text-right">Propina bruta anual</div>
               <div className="text-right">Líquido mensal</div>
@@ -332,6 +333,7 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
                             <option value="">— Selecionar —</option>
                             {impostos.map((i) => <option key={i.id} value={i.id}>{i.nome} ({(i.taxa * 100).toFixed(0)}%)</option>)}
                           </select>
+                          <div className="h-9 flex items-center justify-end px-2 rounded-md bg-muted/30 tabular-nums text-sm font-medium text-foreground">{fmt(bruto)} Kz</div>
                           <select
                             className="h-9 rounded-md border border-input bg-background px-2 text-sm"
                             value={meses || ""}
