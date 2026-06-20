@@ -145,13 +145,30 @@ export default function AdminPerfil() {
       <Card className="overflow-hidden">
         <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-6 border-b">
           <div className="flex items-start gap-5 flex-wrap">
-            <div className="w-20 h-20 rounded-xl bg-primary text-primary-foreground flex items-center justify-center shrink-0 shadow-sm overflow-hidden">
+            <label className="w-20 h-20 rounded-xl bg-primary text-primary-foreground flex items-center justify-center shrink-0 shadow-sm overflow-hidden cursor-pointer group relative" title="Carregar / substituir logo">
               {instituicao.logoDataUrl ? (
                 <img src={instituicao.logoDataUrl} alt="Logo" className="w-full h-full object-contain bg-white" />
               ) : (
                 <ShieldCheck className="w-10 h-10" />
               )}
-            </div>
+              <span className="absolute inset-0 bg-black/40 text-white text-[10px] uppercase tracking-wide font-semibold flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">Substituir</span>
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (!f) return;
+                  const reader = new FileReader();
+                  reader.onload = () => {
+                    const dataUrl = String(reader.result || "");
+                    setInstituicao((prev) => ({ ...prev, logoDataUrl: dataUrl }));
+                    toast.success("Logo atualizado");
+                  };
+                  reader.readAsDataURL(f);
+                }}
+              />
+            </label>
             <div className="flex-1 min-w-0">
               <Badge variant="outline" className="mb-2 gap-1 text-[10px]"><Settings2 className="w-3 h-3" /> Administração da plataforma</Badge>
               <h1 className="text-2xl font-bold leading-tight">{nomeDisplay}</h1>
