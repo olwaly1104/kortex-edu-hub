@@ -114,7 +114,7 @@ export default function ConfigurarReceitas() {
 
 /* ═══════════════════════════════ RECEITAS ═════════════════════════════════ */
 
-export type Imposto = { id: string; nome: string; taxa: number; regime: string };
+export type Imposto = { id: string; nome: string; taxa: number; regime: string; locked?: boolean };
 const IMPOSTOS_KEY = (email?: string | null) => KEY("impostos", email);
 const ANOS_KEY = (email?: string | null) => KEY("propinas.anos", email);
 // Taxas reais de IVA em Angola (Código do IVA, Lei n.º 14/23)
@@ -131,6 +131,14 @@ const taxaForRegime = (regime: string) => REGIMES_IVA.find((r) => r.regime === r
 const isCustomRegime = (regime: string) => !!REGIMES_IVA.find((r) => r.regime === regime)?.custom;
 const nomeForImposto = (regime: string, taxa: number) =>
   isCustomRegime(regime) ? `Personalizado ${(taxa * 100).toFixed(0)}%` : `IVA ${regime} ${(taxa * 100).toFixed(0)}%`;
+
+const LOCKED_IMPOSTOS: Imposto[] = [
+  { id: "iva-geral", nome: nomeForImposto("Geral", 0.14), taxa: 0.14, regime: "Geral", locked: true },
+  { id: "iva-intermedio", nome: nomeForImposto("Intermédio", 0.07), taxa: 0.07, regime: "Intermédio", locked: true },
+  { id: "iva-reduzido", nome: nomeForImposto("Reduzido", 0.05), taxa: 0.05, regime: "Reduzido", locked: true },
+  { id: "iva-isento", nome: nomeForImposto("Isento", 0), taxa: 0, regime: "Isento", locked: true },
+  { id: "iva-exportacao", nome: nomeForImposto("Exportação", 0), taxa: 0, regime: "Exportação", locked: true },
+];
 
 const COR_OPCOES_GLOBAL = [
   { label: "Âmbar", value: "bg-amber-100 text-amber-700 border-amber-200" },
@@ -158,10 +166,12 @@ type RecSub = "impostos" | "propinas" | "emolumentos" | "servicos";
 
 function ReceitasSection({ email, onAddCursos }: { email?: string | null; onAddCursos: () => void }) {
   const [sub, setSub] = useState<RecSub>("impostos");
-  const [impostos, setImpostos] = useState<Imposto[]>(() => readJSON<Imposto[]>(IMPOSTOS_KEY(email), [
-    { id: "iva14", nome: "IVA 14%", taxa: 0.14, regime: "Geral" },
-    { id: "iva0", nome: "Isento", taxa: 0, regime: "Isento" },
-  ]));
+  const [impostos, setImpostos] = useState<Imposto[]>(() => {
+    const saved = readJSON<Imposto[]>(IMPOSTOS_KEY(email), []);
+    const merged = [...LOCKED_IMPOSTOS];
+    saved.forEach((s) => { if (!s.locked && !merged.find((m) => m.id === s.id)) merged.push(s); });
+    return merged;
+  });
   useEffect(() => writeJSON(IMPOSTOS_KEY(email), impostos), [impostos, email]);
 
   return (
@@ -184,14 +194,14 @@ function ReceitasSection({ email, onAddCursos }: { email?: string | null; onAddC
 }
 
 function ImpostosBlock({ impostos, setImpostos }: { impostos: Imposto[]; setImpostos: React.Dispatch<React.SetStateAction<Imposto[]>> }) {
-  const add = () => setImpostos((s) => [...s, { id: newId(), nome: nomeForImposto("Geral", 0.14), taxa: 0.14, regime: "Geral" }]);
+  const add = () => setImpostos((s) => [...s, { id: newId(), nome: nomeForImposto("Personalizado", 0), taxa: 0, regime: "Personalizado" }]);
   return (
     <Card className="overflow-hidden">
       <div className="px-5 py-3 border-b bg-muted/30 flex items-center gap-2">
         <Percent className="w-4 h-4 text-primary" />
         <div className="min-w-0">
           <h2 className="text-sm font-bold text-foreground">Impostos & Regime de IVA</h2>
-          <p className="text-[11px] text-muted-foreground">Configure as taxas usadas em Propinas e Emolumentos. Selecionáveis em todas as tabelas de receita.</p>
+          <p className="text-[11px] text-muted-foreground">Regimes de IVA de Angola bloqueados. Adicione apenas impostos personalizados.</p>
         </div>
         <span className="text-[11px] text-muted-foreground ml-auto tabular-nums shrink-0">{impostos.length} imposto{impostos.length === 1 ? "" : "s"}</span>
       </div>
@@ -205,9 +215,11 @@ function ImpostosBlock({ impostos, setImpostos }: { impostos: Imposto[]; setImpo
           <div className="px-5 py-10 text-center text-xs text-muted-foreground">Sem impostos configurados.</div>
         ) : impostos.map((i) => {
           const custom = isCustomRegime(i.regime);
+          const locked = i.locked;
           return (
           <div key={i.id} className="grid grid-cols-[1fr_160px_40px] gap-3 px-5 py-2.5 items-center text-sm">
-            <select className="h-9 rounded-md border border-input bg-background px-2 text-sm" value={i.regime}
+            <select className="h-9 rounded-md border border-input bg-background px-2 text-sm disabled:opacity-60 disabled:cursor-not-allowed" value={i.regime}
+              disabled={locked}
               onChange={(e) => {
                 const regime = e.target.value;
                 const nowCustom = isCustomRegime(regime);
@@ -216,7 +228,7 @@ function ImpostosBlock({ impostos, setImpostos }: { impostos: Imposto[]; setImpo
               }}>
               {REGIMES_IVA.map((r) => <option key={r.regime} value={r.regime}>{r.label}</option>)}
             </select>
-            {custom ? (
+            {custom && !locked ? (
               <Input type="number" min={0} max={100} step={1} className="h-9 text-right tabular-nums" value={Math.round(i.taxa * 100)}
                 onChange={(e) => {
                   const taxa = Math.max(0, Math.min(100, Number(e.target.value) || 0)) / 100;
@@ -226,15 +238,19 @@ function ImpostosBlock({ impostos, setImpostos }: { impostos: Imposto[]; setImpo
               <div className="text-right tabular-nums font-medium text-foreground">{(i.taxa * 100).toFixed(0)}%</div>
             )}
             <div className="flex justify-end">
-              <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                onClick={() => setImpostos((s) => s.filter((x) => x.id !== i.id))}><Trash2 className="w-3.5 h-3.5" /></Button>
+              {locked ? (
+                <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Bloqueado</span>
+              ) : (
+                <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                  onClick={() => setImpostos((s) => s.filter((x) => x.id !== i.id))}><Trash2 className="w-3.5 h-3.5" /></Button>
+              )}
             </div>
           </div>
           );
         })}
       </div>
       <div className="px-5 py-3 border-t bg-muted/10">
-        <Button size="sm" variant="outline" className="gap-1.5" onClick={add}><Plus className="w-3.5 h-3.5" /> Adicionar imposto</Button>
+        <Button size="sm" variant="outline" className="gap-1.5" onClick={add}><Plus className="w-3.5 h-3.5" /> Adicionar imposto personalizado</Button>
       </div>
     </Card>
   );
