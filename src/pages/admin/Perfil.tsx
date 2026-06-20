@@ -238,25 +238,25 @@ export default function AdminPerfil() {
         <div className="grid md:grid-cols-2 gap-4">
           <div className="space-y-1.5">
             <Label className="text-xs">Nome oficial</Label>
-            <Input value={instituicao.nomeOficial} onChange={e => setInstituicao({ ...instituicao, nomeOficial: e.target.value })} className="h-9" />
+            <Input value={instituicao.nomeOficial} onChange={e => setInstituicao({ ...instituicao, nomeOficial: e.target.value })} className={`h-9 ${locked ? "bg-muted/40 cursor-not-allowed" : ""}`} readOnly={locked} />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label className="text-xs">Sigla</Label>
-              <Input value={instituicao.sigla} onChange={e => setInstituicao({ ...instituicao, sigla: e.target.value })} className="h-9" />
+              <Input value={instituicao.sigla} onChange={e => setInstituicao({ ...instituicao, sigla: e.target.value })} className={`h-9 ${locked ? "bg-muted/40 cursor-not-allowed" : ""}`} readOnly={locked} />
             </div>
             <div className="space-y-1.5">
               <Label className="text-xs">NIF</Label>
-              <Input value={instituicao.nif} onChange={e => setInstituicao({ ...instituicao, nif: e.target.value })} className="h-9" />
+              <Input value={instituicao.nif} onChange={e => setInstituicao({ ...instituicao, nif: e.target.value })} className={`h-9 ${locked ? "bg-muted/40 cursor-not-allowed" : ""}`} readOnly={locked} />
             </div>
           </div>
           <div className="space-y-1.5">
             <Label className="text-xs">Ano de fundação</Label>
-            <Input value={instituicao.fundacao} onChange={e => setInstituicao({ ...instituicao, fundacao: e.target.value })} className="h-9" />
+            <Input value={instituicao.fundacao} onChange={e => setInstituicao({ ...instituicao, fundacao: e.target.value })} className={`h-9 ${locked ? "bg-muted/40 cursor-not-allowed" : ""}`} readOnly={locked} />
           </div>
           <div className="space-y-1.5">
             <Label className="text-xs">Natureza</Label>
-            <Input value={instituicao.natureza} onChange={e => setInstituicao({ ...instituicao, natureza: e.target.value })} className="h-9" />
+            <Input value={instituicao.natureza} onChange={e => setInstituicao({ ...instituicao, natureza: e.target.value })} className={`h-9 ${locked ? "bg-muted/40 cursor-not-allowed" : ""}`} readOnly={locked} />
           </div>
         </div>
       </Card>
@@ -276,7 +276,8 @@ export default function AdminPerfil() {
               value={instituicao.email}
               onChange={e => setInstituicao({ ...instituicao, email: e.target.value })}
               placeholder="contacto@instituicao.com"
-              className={`h-9 ${instituicao.email && !emailValid ? "border-destructive" : ""}`}
+              readOnly={locked}
+              className={`h-9 ${instituicao.email && !emailValid ? "border-destructive" : ""} ${locked ? "bg-muted/40 cursor-not-allowed" : ""}`}
             />
             {instituicao.email && !emailValid && (
               <p className="text-[10px] text-destructive">Deve ser um email válido terminado em .com</p>
@@ -284,7 +285,7 @@ export default function AdminPerfil() {
           </div>
           <div className="space-y-1.5">
             <Label className="text-xs flex items-center gap-1.5"><Phone className="w-3 h-3" /> Telefone</Label>
-            <Input value={instituicao.telefone} onChange={e => setInstituicao({ ...instituicao, telefone: e.target.value })} className="h-9" />
+            <Input value={instituicao.telefone} onChange={e => setInstituicao({ ...instituicao, telefone: e.target.value })} className={`h-9 ${locked ? "bg-muted/40 cursor-not-allowed" : ""}`} readOnly={locked} />
           </div>
           <div className="space-y-1.5">
             <Label className="text-xs flex items-center gap-1.5"><Globe className="w-3 h-3" /> Website</Label>
@@ -298,7 +299,7 @@ export default function AdminPerfil() {
           </div>
           <div className="space-y-1.5">
             <Label className="text-xs flex items-center gap-1.5"><MapPin className="w-3 h-3" /> Morada</Label>
-            <Input value={instituicao.morada} onChange={e => setInstituicao({ ...instituicao, morada: e.target.value })} className="h-9" />
+            <Input value={instituicao.morada} onChange={e => setInstituicao({ ...instituicao, morada: e.target.value })} className={`h-9 ${locked ? "bg-muted/40 cursor-not-allowed" : ""}`} readOnly={locked} />
           </div>
         </div>
       </Card>
@@ -313,11 +314,11 @@ export default function AdminPerfil() {
         <div className="grid md:grid-cols-2 gap-4">
           <div className="space-y-1.5">
             <Label className="text-xs">Reitor</Label>
-            <Input value={instituicao.reitor} onChange={e => setInstituicao({ ...instituicao, reitor: e.target.value })} className="h-9" />
+            <Input value={instituicao.reitor} onChange={e => setInstituicao({ ...instituicao, reitor: e.target.value })} className={`h-9 ${locked ? "bg-muted/40 cursor-not-allowed" : ""}`} readOnly={locked} />
           </div>
           <div className="space-y-1.5">
             <Label className="text-xs">Promotor</Label>
-            <Input value={instituicao.promotor} onChange={e => setInstituicao({ ...instituicao, promotor: e.target.value })} className="h-9" />
+            <Input value={instituicao.promotor} onChange={e => setInstituicao({ ...instituicao, promotor: e.target.value })} className={`h-9 ${locked ? "bg-muted/40 cursor-not-allowed" : ""}`} readOnly={locked} />
           </div>
         </div>
       </Card>
