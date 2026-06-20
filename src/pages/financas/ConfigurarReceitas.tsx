@@ -889,26 +889,6 @@ const EMOL_CATS_KEY = (email?: string | null) => KEY("emolumentos.categorias", e
 const DEFAULT_EMOL_CATS: string[] = ["Inscrição", "Matrícula", "Declaração", "Certificado", "2ª Via"];
 
 function EmolumentosBlock({ email, impostos }: { email?: string | null; impostos: Imposto[] }) {
-  const [cats, setCats] = useState<string[]>(() => {
-    const stored = readJSON<string[] | null>(EMOL_CATS_KEY(email), null);
-    return stored && stored.length ? stored : DEFAULT_EMOL_CATS;
-  });
-  useEffect(() => writeJSON(EMOL_CATS_KEY(email), cats), [cats, email]);
-
-  const addCat = () => setCats((s) => [...s, ""]);
-  const updCat = (idx: number, v: string) => setCats((s) => s.map((c, i) => i === idx ? v : c));
-  const delCat = (idx: number) => setCats((s) => s.filter((_, i) => i !== idx));
-
-  return (
-    <div className="space-y-6">
-      <Card className="overflow-hidden">
-        <div className="px-5 py-3 border-b bg-muted/30 flex items-center gap-2">
-          <Receipt className="w-4 h-4 text-primary" />
-          <div className="min-w-0">
-            <h2 className="text-sm font-bold text-foreground">Categorias de emolumentos</h2>
-            <p className="text-[11px] text-muted-foreground">Defina as categorias. Ficam disponíveis na coluna Categoria da tabela de emolumentos.</p>
-          </div>
-function EmolumentosBlock({ email, impostos }: { email?: string | null; impostos: Imposto[] }) {
   const [cats, setCats] = useState<CatItem[]>(() =>
     migrateCats(readJSON<unknown>(EMOL_CATS_KEY(email), null), DEFAULT_EMOL_CATS)
   );
