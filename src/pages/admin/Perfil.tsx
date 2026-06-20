@@ -16,14 +16,14 @@ import { useFaculdades, useCursos } from "@/lib/useInstitution";
 import { loadDocentes, loadStaff } from "@/lib/peopleStorage";
 
 type Instituicao = {
-  nomeOficial: string; sigla: string; nif: string; fundacao: string; natureza: string;
+  nomeLegal: string; nomeOficial: string; sigla: string; nif: string; fundacao: string; natureza: string;
   reitor: string; promotor: string;
   email: string; telefone: string; website: string; morada: string;
   logoDataUrl?: string;
 };
 
 const EMPTY: Instituicao = {
-  nomeOficial: "", sigla: "", nif: "", fundacao: "", natureza: "",
+  nomeLegal: "", nomeOficial: "", sigla: "", nif: "", fundacao: "", natureza: "",
   reitor: "", promotor: "",
   email: "", telefone: "", website: "", morada: "", logoDataUrl: "",
 };
@@ -65,12 +65,14 @@ function loadInitial(email?: string | null): Instituicao {
       if (!parsed.logoDataUrl && onb.logoDataUrl) parsed.logoDataUrl = onb.logoDataUrl;
       if (!parsed.nif && onb.nif) parsed.nif = onb.nif;
       if (!parsed.sigla && onb.sigla) parsed.sigla = onb.sigla;
+      if (!parsed.nomeLegal && onb.nomeLegal) parsed.nomeLegal = onb.nomeLegal;
       if (!parsed.nomeOficial && onb.nome) parsed.nomeOficial = onb.nome;
       return parsed;
     }
   } catch { /* ignore */ }
   return {
     ...EMPTY,
+    nomeLegal: onb.nomeLegal || "",
     nomeOficial: onb.nome || "",
     sigla: onb.sigla || "",
     nif: onb.nif || "",
@@ -239,18 +241,20 @@ export default function AdminPerfil() {
         <Separator />
         <div className="grid md:grid-cols-2 gap-4">
           <div className="space-y-1.5">
-            <Label className="text-xs">Nome oficial</Label>
+            <Label className="text-xs">Nome legal</Label>
+            <Input value={instituicao.nomeLegal} onChange={e => setInstituicao({ ...instituicao, nomeLegal: e.target.value })} className={`h-9 ${locked ? "bg-muted/40 cursor-not-allowed" : ""}`} readOnly={locked} />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs">Nome da instituição</Label>
             <Input value={instituicao.nomeOficial} onChange={e => setInstituicao({ ...instituicao, nomeOficial: e.target.value })} className={`h-9 ${locked ? "bg-muted/40 cursor-not-allowed" : ""}`} readOnly={locked} />
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <Label className="text-xs">Sigla</Label>
-              <Input value={instituicao.sigla} onChange={e => setInstituicao({ ...instituicao, sigla: e.target.value })} className={`h-9 ${locked ? "bg-muted/40 cursor-not-allowed" : ""}`} readOnly={locked} />
-            </div>
-            <div className="space-y-1.5">
-              <Label className="text-xs">NIF</Label>
-              <Input value={instituicao.nif} onChange={e => setInstituicao({ ...instituicao, nif: e.target.value })} className={`h-9 ${locked ? "bg-muted/40 cursor-not-allowed" : ""}`} readOnly={locked} />
-            </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs">Sigla</Label>
+            <Input value={instituicao.sigla} onChange={e => setInstituicao({ ...instituicao, sigla: e.target.value })} className={`h-9 ${locked ? "bg-muted/40 cursor-not-allowed" : ""}`} readOnly={locked} />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs">NIF</Label>
+            <Input value={instituicao.nif} onChange={e => setInstituicao({ ...instituicao, nif: e.target.value })} className={`h-9 ${locked ? "bg-muted/40 cursor-not-allowed" : ""}`} readOnly={locked} />
           </div>
           <div className="space-y-1.5">
             <Label className="text-xs">Ano de fundação</Label>
