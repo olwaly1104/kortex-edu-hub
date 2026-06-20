@@ -8,7 +8,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { onboardingKey, profileKey, pushProfile } from "@/lib/onboardingStorage";
 import {
   ShieldCheck, Building2, Mail, Phone, Globe, MapPin, Calendar, GraduationCap,
-  Users, Briefcase, Settings2, Save, IdCard, Hash,
+  Users, Briefcase, Settings2, Save, IdCard, Hash, Pencil, X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
