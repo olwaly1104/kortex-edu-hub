@@ -196,7 +196,7 @@ function ImpostosBlock({ impostos, setImpostos }: { impostos: Imposto[]; setImpo
 const PRAZO_KEY = (email?: string | null) => KEY("propinas.prazo", email);
 
 // Number of months between payments (interval). 12/meses = pagamentos/ano.
-const MESES_OPCOES = [1, 2, 3, 4, 6, 12];
+const MESES_OPCOES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
 function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null; impostos: Imposto[]; onAddCursos: () => void }) {
   const { data: faculdades = [], isLoading: lF } = useFaculdades();
