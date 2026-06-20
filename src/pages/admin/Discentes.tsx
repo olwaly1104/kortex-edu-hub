@@ -409,6 +409,7 @@ export default function AdminDiscentes() {
                 <span className="text-xs truncate">{r.ultimoNome || "—"}</span>
                 <span className="text-xs tabular-nums text-muted-foreground">{r.nascimento || "—"}</span>
                 <span className="text-xs tabular-nums truncate">{r.telemovel || "—"}</span>
+                <span className="text-xs font-mono font-semibold">{r.faculdadeSigla}</span>
                 <span className="text-xs font-mono">{r.curso}</span>
                 <span className="text-xs tabular-nums">{r.ano}º</span>
                 <span className="text-xs tabular-nums">{r.turma}</span>
@@ -419,7 +420,6 @@ export default function AdminDiscentes() {
                   <DocPill label="BI" path={r.bilhete_url} onOpen={openDoc} Icon={IdCard} />
                   <DocPill label="Cert" path={r.certificado_url} onOpen={openDoc} Icon={FileText} />
                 </div>
-                <span className="text-[11px] text-muted-foreground truncate font-mono">{r.email}</span>
                 <div className="flex justify-end" onClick={(e) => e.stopPropagation()}>
                   <Button
                     size="icon"
