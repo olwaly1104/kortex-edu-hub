@@ -44,39 +44,43 @@ function currentSiteUrl(): string {
 }
 
 
+function readOnboardingDados(email?: string | null): any {
+  try {
+    const raw = localStorage.getItem(onboardingKey(email));
+    if (!raw) return {};
+    return JSON.parse(raw)?.dados || {};
+  } catch { return {}; }
+}
+
 function loadInitial(email?: string | null): Instituicao {
   const PROFILE_KEY = profileKey(email);
-  const STORAGE = onboardingKey(email);
   const defaultWebsite = currentSiteUrl();
+  const onb = readOnboardingDados(email);
   try {
     const saved = localStorage.getItem(PROFILE_KEY);
     if (saved) {
       const parsed = { ...EMPTY, ...JSON.parse(saved) };
-      // Always sync website to the current published URL of this account
       parsed.website = defaultWebsite;
+      // Backfill from onboarding when profile fields are still empty
+      if (!parsed.logoDataUrl && onb.logoDataUrl) parsed.logoDataUrl = onb.logoDataUrl;
+      if (!parsed.nif && onb.nif) parsed.nif = onb.nif;
+      if (!parsed.sigla && onb.sigla) parsed.sigla = onb.sigla;
+      if (!parsed.nomeOficial && onb.nome) parsed.nomeOficial = onb.nome;
       return parsed;
     }
   } catch { /* ignore */ }
-  try {
-    const raw = localStorage.getItem(STORAGE);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      const d = parsed?.dados || {};
-      return {
-        ...EMPTY,
-        nomeOficial: d.nome || "",
-        sigla: d.sigla || "",
-        nif: d.nif || "",
-        natureza: d.tipo || "",
-        email: d.email || "",
-        telefone: d.telefone || "",
-        website: defaultWebsite,
-        morada: [d.endereco, d.municipio, d.provincia].filter(Boolean).join(", "),
-        logoDataUrl: d.logoDataUrl || "",
-      };
-    }
-  } catch { /* ignore */ }
-  return { ...EMPTY, website: defaultWebsite };
+  return {
+    ...EMPTY,
+    nomeOficial: onb.nome || "",
+    sigla: onb.sigla || "",
+    nif: onb.nif || "",
+    natureza: onb.tipo || "",
+    email: onb.email || "",
+    telefone: onb.telefone || "",
+    website: defaultWebsite,
+    morada: [onb.endereco, onb.municipio, onb.provincia].filter(Boolean).join(", "),
+    logoDataUrl: onb.logoDataUrl || "",
+  };
 }
 
 export default function AdminPerfil() {
@@ -141,13 +145,30 @@ export default function AdminPerfil() {
       <Card className="overflow-hidden">
         <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-6 border-b">
           <div className="flex items-start gap-5 flex-wrap">
-            <div className="w-20 h-20 rounded-xl bg-primary text-primary-foreground flex items-center justify-center shrink-0 shadow-sm overflow-hidden">
+            <label className="w-20 h-20 rounded-xl bg-primary text-primary-foreground flex items-center justify-center shrink-0 shadow-sm overflow-hidden cursor-pointer group relative" title="Carregar / substituir logo">
               {instituicao.logoDataUrl ? (
                 <img src={instituicao.logoDataUrl} alt="Logo" className="w-full h-full object-contain bg-white" />
               ) : (
                 <ShieldCheck className="w-10 h-10" />
               )}
-            </div>
+              <span className="absolute inset-0 bg-black/40 text-white text-[10px] uppercase tracking-wide font-semibold flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">Substituir</span>
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (!f) return;
+                  const reader = new FileReader();
+                  reader.onload = () => {
+                    const dataUrl = String(reader.result || "");
+                    setInstituicao((prev) => ({ ...prev, logoDataUrl: dataUrl }));
+                    toast.success("Logo atualizado");
+                  };
+                  reader.readAsDataURL(f);
+                }}
+              />
+            </label>
             <div className="flex-1 min-w-0">
               <Badge variant="outline" className="mb-2 gap-1 text-[10px]"><Settings2 className="w-3 h-3" /> Administração da plataforma</Badge>
               <h1 className="text-2xl font-bold leading-tight">{nomeDisplay}</h1>
