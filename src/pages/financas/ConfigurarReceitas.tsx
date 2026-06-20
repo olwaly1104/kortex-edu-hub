@@ -328,8 +328,8 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
                     const taxa = impostos.find((i) => i.id === impostoId)?.taxa ?? p.imposto;
                     const bruto = Number(valorVal) || 0;
                     const meses = prazoByCurso[c.id] ?? 0;
-                    const brutoAnual = bruto * meses;
-                    const liquidoAnual = Math.max(0, bruto - bruto * taxa) * meses;
+                    const brutaAnual = bruto * (1 + taxa) * meses;
+                    const liquidaAnual = bruto * meses;
                     const dirty = d !== undefined;
                     const setMeses = (m: number) => setPrazoByCurso((s) => ({ ...s, [c.id]: m }));
                     return (
