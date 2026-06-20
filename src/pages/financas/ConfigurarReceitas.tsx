@@ -328,8 +328,8 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
                     const taxa = impostos.find((i) => i.id === impostoId)?.taxa ?? p.imposto;
                     const bruto = Number(valorVal) || 0;
                     const meses = prazoByCurso[c.id] ?? 0;
-                    const brutoAnual = bruto * meses;
-                    const liquidoAnual = Math.max(0, bruto - bruto * taxa) * meses;
+                    const brutaAnual = bruto * (1 + taxa) * meses;
+                    const liquidaAnual = bruto * meses;
                     const dirty = d !== undefined;
                     const setMeses = (m: number) => setPrazoByCurso((s) => ({ ...s, [c.id]: m }));
                     return (
@@ -366,8 +366,8 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
                             ))}
                           </select>
                           <div className="h-9 flex items-center justify-end px-2 rounded-md bg-muted/30 tabular-nums text-sm font-medium text-foreground">{fmt(bruto * (1 + taxa))} Kz</div>
-                          <div className="h-9 flex items-center justify-end px-2 rounded-md bg-muted/30 tabular-nums text-sm font-medium text-foreground">{fmt(brutoAnual)} Kz</div>
-                          <div className="h-9 flex items-center justify-end px-2 rounded-md bg-muted/30 tabular-nums text-xs font-medium text-muted-foreground">{fmt(liquidoAnual)} Kz</div>
+                          <div className="h-9 flex items-center justify-end px-2 rounded-md bg-muted/30 tabular-nums text-sm font-medium text-foreground">{fmt(brutaAnual)} Kz</div>
+                          <div className="h-9 flex items-center justify-end px-2 rounded-md bg-muted/30 tabular-nums text-xs font-medium text-muted-foreground">{fmt(liquidaAnual)} Kz</div>
                           <div className="flex justify-end gap-1">
                             <Button size="sm" variant={dirty ? "default" : "outline"}
                               disabled={!dirty || updatePropina.isPending}
