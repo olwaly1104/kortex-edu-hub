@@ -119,6 +119,28 @@ const IMPOSTOS_KEY = (email?: string | null) => KEY("impostos", email);
 const ANOS_KEY = (email?: string | null) => KEY("propinas.anos", email);
 const REGIMES = ["Geral", "Reduzido", "Isento", "Exportação", "Intermédio"];
 
+const COR_OPCOES_GLOBAL = [
+  { label: "Âmbar", value: "bg-amber-100 text-amber-700 border-amber-200" },
+  { label: "Verde", value: "bg-emerald-100 text-emerald-700 border-emerald-200" },
+  { label: "Vermelho", value: "bg-red-100 text-red-700 border-red-200" },
+  { label: "Azul", value: "bg-blue-100 text-blue-700 border-blue-200" },
+  { label: "Cinza", value: "bg-slate-100 text-slate-700 border-slate-200" },
+  { label: "Violeta", value: "bg-violet-100 text-violet-700 border-violet-200" },
+  { label: "Primário", value: "bg-primary/10 text-primary border-primary/20" },
+];
+
+type CatItem = { nome: string; cor: string };
+const migrateCats = (raw: unknown, fallback: string[]): CatItem[] => {
+  if (Array.isArray(raw) && raw.length) {
+    return raw.map((x) =>
+      typeof x === "string"
+        ? { nome: x, cor: COR_OPCOES_GLOBAL[6].value }
+        : { nome: String((x as CatItem)?.nome ?? ""), cor: String((x as CatItem)?.cor ?? COR_OPCOES_GLOBAL[6].value) }
+    );
+  }
+  return fallback.map((n) => ({ nome: n, cor: COR_OPCOES_GLOBAL[6].value }));
+};
+
 type RecSub = "impostos" | "propinas" | "emolumentos" | "servicos";
 
 function ReceitasSection({ email, onAddCursos }: { email?: string | null; onAddCursos: () => void }) {
