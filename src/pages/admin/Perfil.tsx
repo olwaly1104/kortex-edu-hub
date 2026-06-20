@@ -87,6 +87,8 @@ export default function AdminPerfil() {
   const { user } = useAuth();
   const PROFILE_KEY = profileKey(user?.email);
   const [instituicao, setInstituicao] = useState<Instituicao>(() => loadInitial(user?.email));
+  const [editing, setEditing] = useState(false);
+  const [snapshot, setSnapshot] = useState<Instituicao | null>(null);
 
   const facsQ = useFaculdades();
   const cursosQ = useCursos();
@@ -115,7 +117,17 @@ export default function AdminPerfil() {
   }, [instituicao, PROFILE_KEY, user?.email]);
 
   const emailValid = /^[^\s@]+@[^\s@]+\.com$/i.test((instituicao.email || "").trim());
+  const locked = !editing;
 
+  const handleEdit = () => {
+    setSnapshot(instituicao);
+    setEditing(true);
+  };
+  const handleCancel = () => {
+    if (snapshot) setInstituicao(snapshot);
+    setSnapshot(null);
+    setEditing(false);
+  };
   const handleSave = () => {
     if (!instituicao.nomeOficial.trim()) {
       toast.error("Nome oficial é obrigatório");
@@ -127,6 +139,8 @@ export default function AdminPerfil() {
     }
     try { localStorage.setItem(PROFILE_KEY, JSON.stringify(instituicao)); } catch { /* ignore */ }
     pushProfile(user?.email, instituicao);
+    setSnapshot(null);
+    setEditing(false);
     toast.success("Dados da instituição atualizados");
   };
 
