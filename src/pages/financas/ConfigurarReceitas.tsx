@@ -265,10 +265,10 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
   const updatePropina = useUpdatePropina();
   const [draft, setDraft] = useState<Record<string, { valor: string; impostoId: string }>>({});
   const [anosByCurso, setAnosByCurso] = useState<Record<string, number[]>>(() => readJSON(ANOS_KEY(email), {}));
-  const [prazoByCurso, setPrazoByCurso] = useState<Record<string, string[]>>(() => {
+  const [prazoByCurso, setPrazoByCurso] = useState<Record<string, string>>(() => {
     const raw = readJSON<Record<string, string | string[]>>(PRAZO_KEY(email), {});
-    const norm: Record<string, string[]> = {};
-    Object.entries(raw).forEach(([k, v]) => { norm[k] = Array.isArray(v) ? v : (v ? [v] : []); });
+    const norm: Record<string, string> = {};
+    Object.entries(raw).forEach(([k, v]) => { norm[k] = Array.isArray(v) ? (v[0] ?? "") : (v || ""); });
     return norm;
   });
   const [prazosDef, setPrazosDef] = useState<PrazoDef[]>(() => {
@@ -311,8 +311,8 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
   };
 
   // Column template — explicit so headers + rows align perfectly
-  // Faculdade·Curso | Mensal bruta | Imposto | Líquido mensal | Líquido anual | Prazo | Ação
-  const COLS = "minmax(220px,1.4fr) 140px 160px 150px 150px 170px 130px";
+  // Faculdade·Curso | Mensal bruta | Imposto | Prazo | Líquido mensal | Líquido anual | Ação
+  const COLS = "minmax(220px,1.4fr) 140px 160px 170px 150px 150px 130px";
 
   return (
     <div className="space-y-6">
@@ -323,7 +323,7 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
         <Wallet className="w-4 h-4 text-primary" />
         <div className="min-w-0">
           <h2 className="text-sm font-bold text-foreground">Propinas por curso</h2>
-          <p className="text-[11px] text-muted-foreground">Mensal bruta → calcula automaticamente Líquido mensal e anual. Prazo selecionado entre os definidos acima.</p>
+          <p className="text-[11px] text-muted-foreground">Cada curso + prazo é um produto. Selecione o prazo no menu — Líquido mensal e anual são calculados automaticamente.</p>
         </div>
       </div>
 
@@ -351,9 +351,9 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
               <div>Faculdade · Curso</div>
               <div>Propina mensal bruta</div>
               <div>Imposto</div>
+              <div>Prazo</div>
               <div className="text-right">Líquido mensal</div>
               <div className="text-right">Líquido anual</div>
-              <div>Prazo</div>
               <div className="text-right">Ação</div>
             </div>
             {facWithCursos.flatMap((f) =>
@@ -376,13 +376,9 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
                     const dirty = d !== undefined;
                     const anos = anosByCurso[c.id] ?? Array(c.years || 1).fill(bruto);
                     const isOpen = !!open[c.id];
-                    const prazoIds = prazoByCurso[c.id] ?? [];
-                    const selectedPrazos = prazosDef.filter((pr) => prazoIds.includes(pr.id));
-                    const togglePrazo = (id: string) => setPrazoByCurso((s) => {
-                      const cur = s[c.id] ?? [];
-                      const next = cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id];
-                      return { ...s, [c.id]: next };
-                    });
+                    const prazoId = prazoByCurso[c.id] ?? "";
+                    const selectedPrazo = prazosDef.find((pr) => pr.id === prazoId);
+                    const setPrazo = (id: string) => setPrazoByCurso((s) => ({ ...s, [c.id]: id }));
                     return (
                       <div key={c.id}>
                         <div className="grid gap-3 px-5 py-3 items-center text-sm" style={{ gridTemplateColumns: COLS }}>
@@ -404,40 +400,19 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
                             <option value="">— Selecionar —</option>
                             {impostos.map((i) => <option key={i.id} value={i.id}>{i.nome} ({(i.taxa * 100).toFixed(0)}%)</option>)}
                           </select>
+                          <select
+                            className="h-9 rounded-md border border-input bg-background px-2 text-sm"
+                            disabled={prazosDef.length === 0}
+                            value={prazoId}
+                            onChange={(e) => setPrazo(e.target.value)}
+                          >
+                            <option value="">{prazosDef.length === 0 ? "— Defina prazos acima —" : "— Selecionar prazo —"}</option>
+                            {prazosDef.map((pr) => (
+                              <option key={pr.id} value={pr.id}>{pr.nome} ({pr.meses} m)</option>
+                            ))}
+                          </select>
                           <div className="h-9 flex items-center justify-end px-2 rounded-md bg-muted/30 tabular-nums font-semibold text-foreground">{fmt(liquido)} Kz</div>
                           <div className="h-9 flex items-center justify-end px-2 rounded-md bg-muted/30 tabular-nums text-xs font-medium text-muted-foreground">{fmt(liquidoAnual)} Kz</div>
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <Button variant="outline" size="sm" disabled={prazosDef.length === 0}
-                                className="h-9 w-full justify-between font-normal px-2 text-xs">
-                                <span className="truncate">
-                                  {prazosDef.length === 0
-                                    ? "— Defina prazos acima —"
-                                    : selectedPrazos.length === 0
-                                      ? "— Nenhum —"
-                                      : selectedPrazos.length === 1
-                                        ? `Prazo ${selectedPrazos[0].meses} meses`
-                                        : `${selectedPrazos.length} opções`}
-                                </span>
-                                <ChevronDown className="w-3.5 h-3.5 opacity-60 shrink-0" />
-                              </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-64 p-2" align="end">
-                              <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground px-2 py-1.5">Prazos disponíveis ao estudante</p>
-                              <div className="space-y-0.5 max-h-64 overflow-auto">
-                                {prazosDef.map((pr) => {
-                                  const checked = prazoIds.includes(pr.id);
-                                  return (
-                                    <label key={pr.id} className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-muted/50 cursor-pointer text-sm">
-                                      <Checkbox checked={checked} onCheckedChange={() => togglePrazo(pr.id)} />
-                                      <span className="flex-1 truncate">{pr.nome}</span>
-                                      <span className="text-xs text-muted-foreground tabular-nums">{pr.meses} m</span>
-                                    </label>
-                                  );
-                                })}
-                              </div>
-                            </PopoverContent>
-                          </Popover>
                           <div className="flex justify-end gap-1">
                             <Button size="sm" variant={dirty ? "default" : "outline"}
                               disabled={!dirty || updatePropina.isPending}
