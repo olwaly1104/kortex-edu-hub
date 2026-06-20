@@ -185,7 +185,7 @@ function ImpostosBlock({ impostos, setImpostos }: { impostos: Imposto[]; setImpo
       <div className="divide-y">
         <div className="grid grid-cols-[1fr_140px_180px_40px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
           <div>Designação</div>
-          <div>Taxa (0–1)</div>
+          <div>Taxa (%)</div>
           <div>Regime de IVA</div>
           <div className="text-right">Ação</div>
         </div>
@@ -195,8 +195,8 @@ function ImpostosBlock({ impostos, setImpostos }: { impostos: Imposto[]; setImpo
           <div key={i.id} className="grid grid-cols-[1fr_140px_180px_40px] gap-3 px-5 py-2.5 items-center text-sm">
             <Input className="h-9" placeholder="Ex: IVA 14%" value={i.nome}
               onChange={(e) => setImpostos((s) => s.map((x) => x.id === i.id ? { ...x, nome: e.target.value } : x))} />
-            <Input type="number" min={0} max={1} step={0.01} className="h-9 tabular-nums" value={i.taxa}
-              onChange={(e) => setImpostos((s) => s.map((x) => x.id === i.id ? { ...x, taxa: Number(e.target.value) } : x))} />
+            <Input type="number" min={0} max={100} step={1} className="h-9 tabular-nums" value={i.taxa * 100}
+              onChange={(e) => setImpostos((s) => s.map((x) => x.id === i.id ? { ...x, taxa: Number(e.target.value) / 100 } : x))} />
             <select className="h-9 rounded-md border border-input bg-background px-2 text-sm" value={i.regime}
               onChange={(e) => setImpostos((s) => s.map((x) => x.id === i.id ? { ...x, regime: e.target.value } : x))}>
               {REGIMES.map((r) => <option key={r} value={r}>{r}</option>)}
