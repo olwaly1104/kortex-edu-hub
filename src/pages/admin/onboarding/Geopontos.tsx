@@ -8,6 +8,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Building2, Plus, Trash2, DoorOpen, Briefcase, Wrench } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 type EspacoTipo = "Sala" | "Gabinete" | "Instalação";
 type Espaco = {
@@ -19,9 +20,9 @@ type Espaco = {
   capacidade: number;
   notas?: string;
 };
-type Edificio = { id: string; nome: string; codigo: string; pisos: number; endereco?: string };
+type Edificio = { id: string; sigla: string; nome: string; pisos: number; salas: number; responsavel: string | null };
+type Contact = { id: string; display_name: string | null; email: string | null };
 
-const EDIFICIOS_KEY = "upra:edificios";
 const ESPACOS_KEY = "upra:espacos";
 
 function loadLS<T>(key: string): T[] {
@@ -34,21 +35,43 @@ export default function OnboardingGeopontos() {
   const { user } = useAuth();
   const [tab, setTab] = useState<"edificios" | EspacoTipo>("edificios");
 
-  const [edificios, setEdificios] = useState<Edificio[]>(() => loadLS<Edificio>(EDIFICIOS_KEY));
+  const [edificios, setEdificios] = useState<Edificio[]>([]);
+  const [contacts, setContacts] = useState<Contact[]>([]);
   const [espacos, setEspacos] = useState<Espaco[]>(() => loadLS<Espaco>(ESPACOS_KEY));
   const [filtroEdif, setFiltroEdif] = useState<string>("all");
 
-  useEffect(() => { try { localStorage.setItem(EDIFICIOS_KEY, JSON.stringify(edificios)); } catch {} }, [edificios]);
   useEffect(() => { try { localStorage.setItem(ESPACOS_KEY, JSON.stringify(espacos)); } catch {} }, [espacos]);
 
-  // ---- Edifícios
-  const addEdif = () => {
+  useEffect(() => {
+    (async () => {
+      const [{ data: eds }, { data: cts }] = await Promise.all([
+        supabase.from("edificios").select("id, sigla, nome, pisos, salas, responsavel").order("created_at"),
+        supabase.rpc("list_institution_contacts"),
+      ]);
+      if (eds) setEdificios(eds.map((e: any) => ({ id: e.id, sigla: e.sigla || "", nome: e.nome || "", pisos: e.pisos ?? 1, salas: e.salas ?? 0, responsavel: e.responsavel })));
+      if (cts) setContacts(cts as Contact[]);
+    })();
+  }, [user?.id]);
+
+  // ---- Edifícios (DB)
+  const addEdif = async () => {
+    if (!user?.id) return;
     const n = edificios.length + 1;
-    setEdificios(p => [...p, { id: `e${Date.now()}`, nome: `Novo Edifício ${n}`, codigo: `E${n}`, pisos: 2, endereco: "" }]);
+    const { data, error } = await supabase.from("edificios").insert({
+      owner_user_id: user.id, sigla: `E${n}`, nome: `Novo Edifício ${n}`, pisos: 2, salas: 0, responsavel: null,
+    }).select().single();
+    if (error) { toast.error(error.message); return; }
+    setEdificios(p => [...p, { id: data.id, sigla: data.sigla, nome: data.nome, pisos: data.pisos, salas: data.salas, responsavel: data.responsavel }]);
   };
-  const updEdif = (id: string, patch: Partial<Edificio>) => setEdificios(p => p.map(e => e.id === id ? { ...e, ...patch } : e));
-  const rmEdif = (id: string) => {
+  const updEdif = async (id: string, patch: Partial<Edificio>) => {
+    setEdificios(p => p.map(e => e.id === id ? { ...e, ...patch } : e));
+    const { error } = await supabase.from("edificios").update(patch).eq("id", id);
+    if (error) toast.error(error.message);
+  };
+  const rmEdif = async (id: string) => {
     if (espacos.some(s => s.edificioId === id)) { toast.error("Remova primeiro os espaços deste edifício"); return; }
+    const { error } = await supabase.from("edificios").delete().eq("id", id);
+    if (error) { toast.error(error.message); return; }
     setEdificios(p => p.filter(e => e.id !== id));
   };
 
@@ -164,16 +187,23 @@ export default function OnboardingGeopontos() {
 
         <TabsContent value="edificios" className="mt-0">
           <Card className="overflow-hidden">
-            <div className="grid grid-cols-[1.4fr_100px_100px_1.5fr_64px] gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b">
-              <span>Nome</span><span>Código</span><span>Pisos</span><span>Endereço</span><span></span>
+            <div className="grid grid-cols-[100px_1.4fr_80px_80px_1.4fr_64px] gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b">
+              <span>Sigla</span><span>Nome</span><span>Pisos</span><span>Salas</span><span>Responsável</span><span></span>
             </div>
             <div className="divide-y">
               {edificios.map(e => (
-                <div key={e.id} className="grid grid-cols-[1.4fr_100px_100px_1.5fr_64px] gap-2 px-4 py-2 items-center">
+                <div key={e.id} className="grid grid-cols-[100px_1.4fr_80px_80px_1.4fr_64px] gap-2 px-4 py-2 items-center">
+                  <Input value={e.sigla} onChange={ev => updEdif(e.id, { sigla: ev.target.value.toUpperCase() })} className="h-8 text-xs" />
                   <Input value={e.nome} onChange={ev => updEdif(e.id, { nome: ev.target.value })} className="h-8 text-xs" />
-                  <Input value={e.codigo} onChange={ev => updEdif(e.id, { codigo: ev.target.value.toUpperCase() })} className="h-8 text-xs" />
                   <Input type="number" min={1} max={20} value={e.pisos} onChange={ev => updEdif(e.id, { pisos: Number(ev.target.value) })} className="h-8 text-xs" />
-                  <Input value={e.endereco || ""} onChange={ev => updEdif(e.id, { endereco: ev.target.value })} className="h-8 text-xs" placeholder="Campus, rua…" />
+                  <Input type="number" min={0} value={e.salas} onChange={ev => updEdif(e.id, { salas: Number(ev.target.value) })} className="h-8 text-xs" />
+                  <Select value={e.responsavel ?? "none"} onValueChange={v => updEdif(e.id, { responsavel: v === "none" ? null : v })}>
+                    <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="—" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">— Sem responsável —</SelectItem>
+                      {contacts.map(c => <SelectItem key={c.id} value={c.id}>{c.display_name || c.email}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
                   <div className="flex justify-end">
                     <Button size="icon" variant="ghost" onClick={() => rmEdif(e.id)} className="h-8 w-8 text-muted-foreground hover:text-destructive">
                       <Trash2 className="w-3.5 h-3.5" />
