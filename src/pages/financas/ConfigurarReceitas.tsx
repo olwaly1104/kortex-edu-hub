@@ -185,7 +185,7 @@ function ReceitasSection({ email, onAddCursos }: { email?: string | null; onAddC
         </TabsList>
       </Tabs>
 
-      {sub === "impostos" && <ImpostosBlock impostos={impostos} setImpostos={setImpostos} />}
+      {sub === "impostos" && <ImpostosBlock impostos={impostos} setImpostos={setImpostos} email={email} />}
       {sub === "propinas" && <PropinasBlock email={email} impostos={impostos} onAddCursos={onAddCursos} />}
       {sub === "emolumentos" && <EmolumentosBlock email={email} impostos={impostos} />}
       {sub === "servicos" && <ServicosAcademicosBlock email={email} impostos={impostos} />}
