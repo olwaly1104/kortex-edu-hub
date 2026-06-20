@@ -114,7 +114,7 @@ export default function ConfigurarReceitas() {
 
 /* ═══════════════════════════════ RECEITAS ═════════════════════════════════ */
 
-export type Imposto = { id: string; nome: string; taxa: number; regime: string };
+export type Imposto = { id: string; nome: string; taxa: number; regime: string; locked?: boolean };
 const IMPOSTOS_KEY = (email?: string | null) => KEY("impostos", email);
 const ANOS_KEY = (email?: string | null) => KEY("propinas.anos", email);
 // Taxas reais de IVA em Angola (Código do IVA, Lei n.º 14/23)
@@ -131,6 +131,14 @@ const taxaForRegime = (regime: string) => REGIMES_IVA.find((r) => r.regime === r
 const isCustomRegime = (regime: string) => !!REGIMES_IVA.find((r) => r.regime === regime)?.custom;
 const nomeForImposto = (regime: string, taxa: number) =>
   isCustomRegime(regime) ? `Personalizado ${(taxa * 100).toFixed(0)}%` : `IVA ${regime} ${(taxa * 100).toFixed(0)}%`;
+
+const LOCKED_IMPOSTOS: Imposto[] = [
+  { id: "iva-geral", nome: nomeForImposto("Geral", 0.14), taxa: 0.14, regime: "Geral", locked: true },
+  { id: "iva-intermedio", nome: nomeForImposto("Intermédio", 0.07), taxa: 0.07, regime: "Intermédio", locked: true },
+  { id: "iva-reduzido", nome: nomeForImposto("Reduzido", 0.05), taxa: 0.05, regime: "Reduzido", locked: true },
+  { id: "iva-isento", nome: nomeForImposto("Isento", 0), taxa: 0, regime: "Isento", locked: true },
+  { id: "iva-exportacao", nome: nomeForImposto("Exportação", 0), taxa: 0, regime: "Exportação", locked: true },
+];
 
 const COR_OPCOES_GLOBAL = [
   { label: "Âmbar", value: "bg-amber-100 text-amber-700 border-amber-200" },
