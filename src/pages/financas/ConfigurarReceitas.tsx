@@ -118,15 +118,19 @@ export type Imposto = { id: string; nome: string; taxa: number; regime: string }
 const IMPOSTOS_KEY = (email?: string | null) => KEY("impostos", email);
 const ANOS_KEY = (email?: string | null) => KEY("propinas.anos", email);
 // Taxas reais de IVA em Angola (Código do IVA, Lei n.º 14/23)
-const REGIMES_IVA: { regime: string; taxa: number; label: string }[] = [
+const REGIMES_IVA: { regime: string; taxa: number; label: string; custom?: boolean }[] = [
   { regime: "Geral", taxa: 0.14, label: "Geral — 14%" },
   { regime: "Intermédio", taxa: 0.07, label: "Intermédio — 7%" },
   { regime: "Reduzido", taxa: 0.05, label: "Reduzido — 5%" },
   { regime: "Isento", taxa: 0, label: "Isento — 0%" },
   { regime: "Exportação", taxa: 0, label: "Exportação — 0%" },
+  { regime: "Personalizado", taxa: 0, label: "Personalizado", custom: true },
 ];
 const REGIMES = REGIMES_IVA.map((r) => r.regime);
 const taxaForRegime = (regime: string) => REGIMES_IVA.find((r) => r.regime === regime)?.taxa ?? 0;
+const isCustomRegime = (regime: string) => !!REGIMES_IVA.find((r) => r.regime === regime)?.custom;
+const nomeForImposto = (regime: string, taxa: number) =>
+  isCustomRegime(regime) ? `Personalizado ${(taxa * 100).toFixed(0)}%` : `IVA ${regime} ${(taxa * 100).toFixed(0)}%`;
 
 const COR_OPCOES_GLOBAL = [
   { label: "Âmbar", value: "bg-amber-100 text-amber-700 border-amber-200" },
