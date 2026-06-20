@@ -246,8 +246,8 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
   };
 
   // Column template — explicit so headers + rows align perfectly
-  // Faculdade·Curso | Propina bruta mensal | Imposto | Meses | Propina bruta anual | Líquido mensal | Líquido anual | Ação
-  const COLS = "minmax(220px,1.4fr) 150px 160px 120px 150px 150px 150px 130px";
+  // Faculdade·Curso | Propina bruta mensal | Imposto | Propina mensal c/ IVA incl. | Meses | Propina bruta anual | Líquido mensal | Líquido anual | Ação
+  const COLS = "minmax(220px,1.4fr) 150px 160px 150px 120px 150px 150px 150px 130px";
 
   return (
     <div className="space-y-6">
