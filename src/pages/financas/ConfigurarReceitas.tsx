@@ -184,7 +184,7 @@ function ReceitasSection({ email, onAddCursos }: { email?: string | null; onAddC
 }
 
 function ImpostosBlock({ impostos, setImpostos }: { impostos: Imposto[]; setImpostos: React.Dispatch<React.SetStateAction<Imposto[]>> }) {
-  const add = () => setImpostos((s) => [...s, { id: newId(), nome: "", taxa: 0, regime: "Geral" }]);
+  const add = () => setImpostos((s) => [...s, { id: newId(), nome: nomeForImposto("Geral", 0.14), taxa: 0.14, regime: "Geral" }]);
   return (
     <Card className="overflow-hidden">
       <div className="px-5 py-3 border-b bg-muted/30 flex items-center gap-2">
@@ -196,33 +196,42 @@ function ImpostosBlock({ impostos, setImpostos }: { impostos: Imposto[]; setImpo
         <span className="text-[11px] text-muted-foreground ml-auto tabular-nums shrink-0">{impostos.length} imposto{impostos.length === 1 ? "" : "s"}</span>
       </div>
       <div className="divide-y">
-        <div className="grid grid-cols-[1fr_220px_120px_40px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
-          <div>Designação</div>
+        <div className="grid grid-cols-[1fr_160px_40px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
           <div>Regime de IVA (Angola)</div>
-          <div className="text-right">Taxa</div>
+          <div className="text-right">Taxa (%)</div>
           <div className="text-right">Ação</div>
         </div>
         {impostos.length === 0 ? (
           <div className="px-5 py-10 text-center text-xs text-muted-foreground">Sem impostos configurados.</div>
-        ) : impostos.map((i) => (
-          <div key={i.id} className="grid grid-cols-[1fr_220px_120px_40px] gap-3 px-5 py-2.5 items-center text-sm">
-            <Input className="h-9" placeholder="Ex: IVA Geral" value={i.nome}
-              onChange={(e) => setImpostos((s) => s.map((x) => x.id === i.id ? { ...x, nome: e.target.value } : x))} />
+        ) : impostos.map((i) => {
+          const custom = isCustomRegime(i.regime);
+          return (
+          <div key={i.id} className="grid grid-cols-[1fr_160px_40px] gap-3 px-5 py-2.5 items-center text-sm">
             <select className="h-9 rounded-md border border-input bg-background px-2 text-sm" value={i.regime}
               onChange={(e) => {
                 const regime = e.target.value;
-                const taxa = taxaForRegime(regime);
-                setImpostos((s) => s.map((x) => x.id === i.id ? { ...x, regime, taxa } : x));
+                const nowCustom = isCustomRegime(regime);
+                const taxa = nowCustom ? i.taxa : taxaForRegime(regime);
+                setImpostos((s) => s.map((x) => x.id === i.id ? { ...x, regime, taxa, nome: nomeForImposto(regime, taxa) } : x));
               }}>
               {REGIMES_IVA.map((r) => <option key={r.regime} value={r.regime}>{r.label}</option>)}
             </select>
-            <div className="text-right tabular-nums font-medium text-foreground">{(i.taxa * 100).toFixed(0)}%</div>
+            {custom ? (
+              <Input type="number" min={0} max={100} step={1} className="h-9 text-right tabular-nums" value={Math.round(i.taxa * 100)}
+                onChange={(e) => {
+                  const taxa = Math.max(0, Math.min(100, Number(e.target.value) || 0)) / 100;
+                  setImpostos((s) => s.map((x) => x.id === i.id ? { ...x, taxa, nome: nomeForImposto(x.regime, taxa) } : x));
+                }} />
+            ) : (
+              <div className="text-right tabular-nums font-medium text-foreground">{(i.taxa * 100).toFixed(0)}%</div>
+            )}
             <div className="flex justify-end">
               <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
                 onClick={() => setImpostos((s) => s.filter((x) => x.id !== i.id))}><Trash2 className="w-3.5 h-3.5" /></Button>
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
       <div className="px-5 py-3 border-t bg-muted/10">
         <Button size="sm" variant="outline" className="gap-1.5" onClick={add}><Plus className="w-3.5 h-3.5" /> Adicionar imposto</Button>
