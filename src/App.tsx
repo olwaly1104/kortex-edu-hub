@@ -177,6 +177,7 @@ import AdminOnboardingSalarios from "./pages/admin/onboarding/Salarios";
 import AdminOnboardingEspacos from "./pages/admin/onboarding/Espacos";
 import AdminOnboardingGeopontos from "./pages/admin/onboarding/Geopontos";
 import AdminFaculdadesCursos from "./pages/admin/FaculdadesCursos";
+import AdminAreaAcademica from "./pages/admin/AreaAcademica";
 import AdminDiscentes from "./pages/admin/Discentes";
 import AdminDiscenteProfile from "./pages/admin/DiscenteProfile";
 import AdminSalas from "./pages/admin/Salas";
@@ -291,7 +292,7 @@ function AppRoutes() {
         {/* Admin */}
         <Route path="/admin" element={<AdminInicio />} />
         <Route path="/admin/perfil" element={<AdminPerfil />} />
-        <Route path="/admin/faculdades-cursos" element={<AdminFaculdadesCursos />} />
+        <Route path="/admin/faculdades-cursos" element={<AdminAreaAcademica />} />
         <Route path="/admin/discentes" element={<AdminDiscentes />} />
         <Route path="/admin/discentes/:discenteId" element={<AdminDiscenteProfile />} />
         <Route path="/admin/salas" element={<AdminSalas />} />
