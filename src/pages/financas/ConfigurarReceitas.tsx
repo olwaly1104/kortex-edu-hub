@@ -166,10 +166,12 @@ type RecSub = "impostos" | "propinas" | "emolumentos" | "servicos";
 
 function ReceitasSection({ email, onAddCursos }: { email?: string | null; onAddCursos: () => void }) {
   const [sub, setSub] = useState<RecSub>("impostos");
-  const [impostos, setImpostos] = useState<Imposto[]>(() => readJSON<Imposto[]>(IMPOSTOS_KEY(email), [
-    { id: "iva14", nome: "IVA 14%", taxa: 0.14, regime: "Geral" },
-    { id: "iva0", nome: "Isento", taxa: 0, regime: "Isento" },
-  ]));
+  const [impostos, setImpostos] = useState<Imposto[]>(() => {
+    const saved = readJSON<Imposto[]>(IMPOSTOS_KEY(email), []);
+    const merged = [...LOCKED_IMPOSTOS];
+    saved.forEach((s) => { if (!s.locked && !merged.find((m) => m.id === s.id)) merged.push(s); });
+    return merged;
+  });
   useEffect(() => writeJSON(IMPOSTOS_KEY(email), impostos), [impostos, email]);
 
   return (
