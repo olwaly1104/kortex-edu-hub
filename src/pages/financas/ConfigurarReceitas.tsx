@@ -194,69 +194,9 @@ function ImpostosBlock({ impostos, setImpostos }: { impostos: Imposto[]; setImpo
 }
 
 const PRAZO_KEY = (email?: string | null) => KEY("propinas.prazo", email);
-const PRAZOS_DEF_KEY = (email?: string | null) => KEY("propinas.prazos.meses", email);
 
-type PrazoDef = { id: string; nome: string; meses: number; locked?: boolean };
-
-const DEFAULT_PRAZOS: PrazoDef[] = [
-  { id: "prazo-mensal",     nome: "Mensal",     meses: 1,  locked: true },
-  { id: "prazo-trimestral", nome: "Trimestral", meses: 3,  locked: true },
-  { id: "prazo-semestral",  nome: "Semestral",  meses: 6,  locked: true },
-  { id: "prazo-anual",      nome: "Anual",      meses: 12, locked: true },
-];
-
-function ensureDefaults(list: PrazoDef[]): PrazoDef[] {
-  const byId = new Map(list.map((p) => [p.id, p]));
-  const merged = [...DEFAULT_PRAZOS.map((d) => ({ ...d, ...(byId.get(d.id) ?? {}), locked: true }))];
-  list.forEach((p) => { if (!DEFAULT_PRAZOS.find((d) => d.id === p.id)) merged.push({ ...p, locked: false }); });
-  return merged;
-}
-
-function PrazosBlock({ prazos, setPrazos }: { prazos: PrazoDef[]; setPrazos: React.Dispatch<React.SetStateAction<PrazoDef[]>> }) {
-  const add = () => setPrazos((s) => [...s, { id: newId(), nome: `Prazo personalizado ${s.filter((p) => !p.locked).length + 1}`, meses: 3 }]);
-  return (
-    <Card className="overflow-hidden">
-      <div className="px-5 py-3 border-b bg-muted/30 flex items-center gap-2">
-        <Wallet className="w-4 h-4 text-primary" />
-        <div className="min-w-0">
-          <h2 className="text-sm font-bold text-foreground">Prazos de pagamento</h2>
-          <p className="text-[11px] text-muted-foreground">Mensal, Semestral e Anual vêm pré-criados e bloqueados. Adicione prazos personalizados conforme necessário.</p>
-        </div>
-        <span className="text-[11px] text-muted-foreground ml-auto tabular-nums shrink-0">{prazos.length} prazo{prazos.length === 1 ? "" : "s"}</span>
-      </div>
-      <div className="divide-y">
-        <div className="grid grid-cols-[1fr_180px_40px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
-          <div>Designação</div>
-          <div>Prazo</div>
-          <div className="text-right">Ação</div>
-        </div>
-        {prazos.map((p) => (
-          <div key={p.id} className="grid grid-cols-[1fr_180px_40px] gap-3 px-5 py-2.5 items-center text-sm">
-            <div className="flex items-center gap-2 min-w-0">
-              <Input className="h-9" placeholder="Ex: Prazo trimestral" value={p.nome}
-                disabled={p.locked}
-                onChange={(e) => setPrazos((s) => s.map((x) => x.id === p.id ? { ...x, nome: e.target.value } : x))} />
-              {p.locked && <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted px-1.5 py-0.5 rounded shrink-0">Padrão</span>}
-            </div>
-            <div className="flex items-center gap-2">
-              <Input type="number" min={1} max={36} className="h-9 w-20 tabular-nums" value={p.meses}
-                disabled={p.locked}
-                onChange={(e) => setPrazos((s) => s.map((x) => x.id === p.id ? { ...x, meses: Number(e.target.value) || 1 } : x))} />
-              <span className="text-xs text-muted-foreground">meses</span>
-            </div>
-            <div className="flex justify-end">
-              <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                onClick={() => setPrazos((s) => s.filter((x) => x.id !== p.id))}><Trash2 className="w-3.5 h-3.5" /></Button>
-            </div>
-          </div>
-        ))}
-      </div>
-      <div className="px-5 py-3 border-t bg-muted/10">
-        <Button size="sm" variant="outline" className="gap-1.5" onClick={add}><Plus className="w-3.5 h-3.5" /> Adicionar prazo personalizado</Button>
-      </div>
-    </Card>
-  );
-}
+// Number of months between payments (interval). 12/meses = pagamentos/ano.
+const MESES_OPCOES = [1, 2, 3, 4, 6, 12];
 
 function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null; impostos: Imposto[]; onAddCursos: () => void }) {
   const { data: faculdades = [], isLoading: lF } = useFaculdades();
