@@ -195,6 +195,7 @@ function ReceitasSection({ email, onAddCursos }: { email?: string | null; onAddC
 
 function ImpostosBlock({ impostos, setImpostos, email }: { impostos: Imposto[]; setImpostos: React.Dispatch<React.SetStateAction<Imposto[]>>; email?: string | null }) {
   const add = () => setImpostos((s) => [...s, { id: newId(), nome: nomeForImposto("Personalizado", 0), taxa: 0, regime: "Personalizado" }]);
+  const [nomeLegal, setNomeLegal] = useState<string>("");
   const [nif, setNif] = useState<string>("");
   useEffect(() => {
     const suffix = (email || "").trim().toLowerCase();
@@ -203,8 +204,10 @@ function ImpostosBlock({ impostos, setImpostos, email }: { impostos: Imposto[]; 
     const read = () => {
       try {
         const p = JSON.parse(localStorage.getItem(profKey) || "null");
+        if (p?.nomeLegal) setNomeLegal(String(p.nomeLegal));
         if (p?.nif) { setNif(String(p.nif)); return; }
         const o = JSON.parse(localStorage.getItem(onbKey) || "null");
+        if (!nomeLegal) setNomeLegal(String(o?.dados?.nomeLegal || ""));
         setNif(String(o?.dados?.nif || ""));
       } catch { setNif(""); }
     };
@@ -220,12 +223,19 @@ function ImpostosBlock({ impostos, setImpostos, email }: { impostos: Imposto[]; 
         <div className="px-5 py-3 border-b bg-muted/30 flex items-center gap-2">
           <FileText className="w-4 h-4 text-primary" />
           <div className="min-w-0">
-            <h2 className="text-sm font-bold text-foreground">Número de Identificação Fiscal (NIF)</h2>
+            <h2 className="text-sm font-bold text-foreground">Identificação Institucional</h2>
             <p className="text-[11px] text-muted-foreground">Definido na Ficha Institucional. Para alterar, edite no perfil da instituição.</p>
           </div>
         </div>
-        <div className="px-5 py-4">
-          <Input value={nif || "—"} readOnly className="h-9 max-w-xs font-mono tabular-nums bg-muted/40 cursor-not-allowed" />
+        <div className="px-5 py-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="space-y-1.5">
+            <Label className="text-xs text-muted-foreground">Nome Legal</Label>
+            <Input value={nomeLegal || "—"} readOnly className="h-9 bg-muted/40 cursor-not-allowed" />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs text-muted-foreground">Número de Identificação Fiscal (NIF)</Label>
+            <Input value={nif || "—"} readOnly className="h-9 font-mono tabular-nums bg-muted/40 cursor-not-allowed" />
+          </div>
         </div>
       </Card>
       <Card className="overflow-hidden">
