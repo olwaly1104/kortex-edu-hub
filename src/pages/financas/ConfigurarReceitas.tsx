@@ -246,8 +246,8 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
   };
 
   // Column template — explicit so headers + rows align perfectly
-  // Faculdade·Curso | Propina bruta mensal | Imposto | Propina mensal c/ IVA incl. | Meses | Propina bruta anual | Líquido mensal | Líquido anual | Ação
-  const COLS = "minmax(220px,1.4fr) 150px 160px 150px 120px 150px 150px 150px 130px";
+  // Faculdade·Curso | Propina mensal | Regime | Meses | Propina mensal c/ IVA incl. | Propina bruta anual | Líquido anual | Ação
+  const COLS = "minmax(220px,1.4fr) 150px 160px 120px 150px 150px 150px 130px";
 
   return (
     <div className="space-y-6">
@@ -256,7 +256,7 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
         <Wallet className="w-4 h-4 text-primary" />
         <div className="min-w-0">
           <h2 className="text-sm font-bold text-foreground">Propinas por curso</h2>
-          <p className="text-[11px] text-muted-foreground">Cada curso + nº de pagamentos é um produto. Escolha o intervalo em meses — Líquido mensal e anual são calculados automaticamente.</p>
+          <p className="text-[11px] text-muted-foreground">Cada curso + nº de pagamentos é um produto. Escolha o intervalo em meses — Líquido anual é calculado automaticamente.</p>
         </div>
       </div>
 
@@ -282,12 +282,11 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
           <div className="min-w-[1100px] divide-y">
             <div className="grid gap-3 px-5 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10" style={{ gridTemplateColumns: COLS }}>
               <div>Faculdade · Curso</div>
-              <div>Propina bruta mensal</div>
+              <div>Propina mensal</div>
               <div>Regime</div>
-              <div className="text-right">Propina mensal c/ IVA incl.</div>
               <div>Meses</div>
+              <div className="text-right">Propina mensal c/ IVA incl.</div>
               <div className="text-right">Propina bruta anual</div>
-              <div className="text-right">Líquido mensal</div>
               <div className="text-right">Líquido anual</div>
               <div className="text-right">Ação</div>
             </div>
@@ -308,8 +307,7 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
                     const bruto = Number(valorVal) || 0;
                     const meses = prazoByCurso[c.id] ?? 0;
                     const brutoAnual = bruto * meses;
-                    const liquidoMensal = Math.max(0, bruto - bruto * taxa);
-                    const liquidoAnual = liquidoMensal * meses;
+                    const liquidoAnual = Math.max(0, bruto - bruto * taxa) * meses;
                     const dirty = d !== undefined;
                     const setMeses = (m: number) => setPrazoByCurso((s) => ({ ...s, [c.id]: m }));
                     return (
