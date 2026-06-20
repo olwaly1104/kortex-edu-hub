@@ -159,17 +159,20 @@ export default function AdminPerfil() {
       <Card className="overflow-hidden">
         <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-6 border-b">
           <div className="flex items-start gap-5 flex-wrap">
-            <label className="w-20 h-20 rounded-xl bg-primary text-primary-foreground flex items-center justify-center shrink-0 shadow-sm overflow-hidden cursor-pointer group relative" title="Carregar / substituir logo">
+            <label className={`w-20 h-20 rounded-xl bg-primary text-primary-foreground flex items-center justify-center shrink-0 shadow-sm overflow-hidden group relative ${locked ? "cursor-not-allowed" : "cursor-pointer"}`} title={locked ? "Clique em Editar para alterar o logo" : "Carregar / substituir logo"}>
               {instituicao.logoDataUrl ? (
                 <img src={instituicao.logoDataUrl} alt="Logo" className="w-full h-full object-contain bg-white" />
               ) : (
                 <ShieldCheck className="w-10 h-10" />
               )}
-              <span className="absolute inset-0 bg-black/40 text-white text-[10px] uppercase tracking-wide font-semibold flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">Substituir</span>
+              {!locked && (
+                <span className="absolute inset-0 bg-black/40 text-white text-[10px] uppercase tracking-wide font-semibold flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">Substituir</span>
+              )}
               <input
                 type="file"
                 accept="image/*"
                 className="hidden"
+                disabled={locked}
                 onChange={(e) => {
                   const f = e.target.files?.[0];
                   if (!f) return;
@@ -196,7 +199,14 @@ export default function AdminPerfil() {
                 {instituicao.natureza && <span className="inline-flex items-center gap-1.5"><Building2 className="w-3.5 h-3.5" /> {instituicao.natureza}</span>}
               </div>
             </div>
-            <Button onClick={handleSave} size="sm" className="gap-1.5"><Save className="w-3.5 h-3.5" /> Guardar alterações</Button>
+            {locked ? (
+              <Button onClick={handleEdit} size="sm" variant="outline" className="gap-1.5"><Pencil className="w-3.5 h-3.5" /> Editar</Button>
+            ) : (
+              <div className="flex items-center gap-2">
+                <Button onClick={handleCancel} size="sm" variant="outline" className="gap-1.5"><X className="w-3.5 h-3.5" /> Cancelar</Button>
+                <Button onClick={handleSave} size="sm" className="gap-1.5"><Save className="w-3.5 h-3.5" /> Guardar</Button>
+              </div>
+            )}
           </div>
         </div>
 
