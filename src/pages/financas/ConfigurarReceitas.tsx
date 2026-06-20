@@ -311,8 +311,8 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
   };
 
   // Column template — explicit so headers + rows align perfectly
-  // Faculdade·Curso | Mensal bruta | Imposto | Líquido mensal | Líquido anual | Prazo | Ação
-  const COLS = "minmax(220px,1.4fr) 140px 160px 150px 150px 170px 130px";
+  // Faculdade·Curso | Mensal bruta | Imposto | Prazo | Líquido mensal | Líquido anual | Ação
+  const COLS = "minmax(220px,1.4fr) 140px 160px 170px 150px 150px 130px";
 
   return (
     <div className="space-y-6">
@@ -323,7 +323,7 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
         <Wallet className="w-4 h-4 text-primary" />
         <div className="min-w-0">
           <h2 className="text-sm font-bold text-foreground">Propinas por curso</h2>
-          <p className="text-[11px] text-muted-foreground">Mensal bruta → calcula automaticamente Líquido mensal e anual. Prazo selecionado entre os definidos acima.</p>
+          <p className="text-[11px] text-muted-foreground">Cada curso + prazo é um produto. Selecione o prazo no menu — Líquido mensal e anual são calculados automaticamente.</p>
         </div>
       </div>
 
@@ -351,9 +351,9 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
               <div>Faculdade · Curso</div>
               <div>Propina mensal bruta</div>
               <div>Imposto</div>
+              <div>Prazo</div>
               <div className="text-right">Líquido mensal</div>
               <div className="text-right">Líquido anual</div>
-              <div>Prazo</div>
               <div className="text-right">Ação</div>
             </div>
             {facWithCursos.flatMap((f) =>
