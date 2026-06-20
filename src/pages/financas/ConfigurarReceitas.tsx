@@ -247,19 +247,17 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
   };
 
   // Column template — explicit so headers + rows align perfectly
-  // Faculdade·Curso | Mensal bruta | Imposto | Prazo | Líquido mensal | Líquido anual | Ação
-  const COLS = "minmax(220px,1.4fr) 140px 160px 170px 150px 150px 130px";
+  // Faculdade·Curso | Bruto/pagamento | Imposto | Nº Pagamentos | Líquido mensal | Líquido anual | Ação
+  const COLS = "minmax(220px,1.4fr) 150px 160px 170px 150px 150px 130px";
 
   return (
     <div className="space-y-6">
-      <PrazosBlock prazos={prazosDef} setPrazos={setPrazosDef} />
-
       <Card className="overflow-hidden">
       <div className="px-5 py-3 border-b bg-muted/30 flex items-center gap-2">
         <Wallet className="w-4 h-4 text-primary" />
         <div className="min-w-0">
           <h2 className="text-sm font-bold text-foreground">Propinas por curso</h2>
-          <p className="text-[11px] text-muted-foreground">Cada curso + prazo é um produto. Selecione o prazo no menu — Líquido mensal e anual são calculados automaticamente.</p>
+          <p className="text-[11px] text-muted-foreground">Cada curso + nº de pagamentos é um produto. Escolha o intervalo em meses — Líquido mensal e anual são calculados automaticamente.</p>
         </div>
       </div>
 
@@ -285,9 +283,9 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
           <div className="min-w-[1100px] divide-y">
             <div className="grid gap-3 px-5 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10" style={{ gridTemplateColumns: COLS }}>
               <div>Faculdade · Curso</div>
-              <div>Propina mensal bruta</div>
+              <div>Bruto / pagamento</div>
               <div>Imposto</div>
-              <div>Prazo</div>
+              <div>Nº Pagamentos</div>
               <div className="text-right">Líquido mensal</div>
               <div className="text-right">Líquido anual</div>
               <div className="text-right">Ação</div>
@@ -307,14 +305,13 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
                     const impostoId = d?.impostoId ?? findImpostoIdByTaxa(p.imposto);
                     const taxa = impostos.find((i) => i.id === impostoId)?.taxa ?? p.imposto;
                     const bruto = Number(valorVal) || 0;
-                    const liquido = Math.max(0, bruto - bruto * taxa);
-                    const liquidoAnual = liquido * 12;
+                    const meses = prazoByCurso[c.id] ?? 0;
+                    const pagPorAno = meses > 0 ? 12 / meses : 0;
+                    const liquidoPorPag = Math.max(0, bruto - bruto * taxa);
+                    const liquidoAnual = liquidoPorPag * pagPorAno;
+                    const liquidoMensal = liquidoAnual / 12;
                     const dirty = d !== undefined;
-                    const anos = anosByCurso[c.id] ?? Array(c.years || 1).fill(bruto);
-                    const isOpen = !!open[c.id];
-                    const prazoId = prazoByCurso[c.id] ?? "";
-                    const selectedPrazo = prazosDef.find((pr) => pr.id === prazoId);
-                    const setPrazo = (id: string) => setPrazoByCurso((s) => ({ ...s, [c.id]: id }));
+                    const setMeses = (m: number) => setPrazoByCurso((s) => ({ ...s, [c.id]: m }));
                     return (
                       <div key={c.id}>
                         <div className="grid gap-3 px-5 py-3 items-center text-sm" style={{ gridTemplateColumns: COLS }}>
@@ -338,16 +335,15 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
                           </select>
                           <select
                             className="h-9 rounded-md border border-input bg-background px-2 text-sm"
-                            disabled={prazosDef.length === 0}
-                            value={prazoId}
-                            onChange={(e) => setPrazo(e.target.value)}
+                            value={meses || ""}
+                            onChange={(e) => setMeses(Number(e.target.value))}
                           >
-                            <option value="">{prazosDef.length === 0 ? "— Defina prazos acima —" : "— Selecionar prazo —"}</option>
-                            {prazosDef.map((pr) => (
-                              <option key={pr.id} value={pr.id}>{pr.nome} ({pr.meses} m)</option>
+                            <option value="">— Selecionar —</option>
+                            {MESES_OPCOES.map((m) => (
+                              <option key={m} value={m}>{12 / m}× / ano · cada {m} {m === 1 ? "mês" : "meses"}</option>
                             ))}
                           </select>
-                          <div className="h-9 flex items-center justify-end px-2 rounded-md bg-muted/30 tabular-nums font-semibold text-foreground">{fmt(liquido)} Kz</div>
+                          <div className="h-9 flex items-center justify-end px-2 rounded-md bg-muted/30 tabular-nums font-semibold text-foreground">{fmt(liquidoMensal)} Kz</div>
                           <div className="h-9 flex items-center justify-end px-2 rounded-md bg-muted/30 tabular-nums text-xs font-medium text-muted-foreground">{fmt(liquidoAnual)} Kz</div>
                           <div className="flex justify-end gap-1">
                             <Button size="sm" variant={dirty ? "default" : "outline"}
