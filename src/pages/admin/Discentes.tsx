@@ -173,6 +173,14 @@ export default function AdminDiscentes() {
     return m;
   }, [cursos]);
 
+  const cursoFacSigla = useMemo(() => {
+    const facMap = new Map<string, string>();
+    faculdades.forEach((f: any) => facMap.set(f.id, f.sigla || f.codigo || f.nome || "—"));
+    const m = new Map<string, string>();
+    cursos.forEach((c: any) => m.set(c.id, facMap.get(c.faculdade_id) || "—"));
+    return m;
+  }, [cursos, faculdades]);
+
   const normalized = useMemo(
     () =>
       rows.map((r: any) => {
@@ -184,6 +192,7 @@ export default function AdminDiscentes() {
           email: r.email as string,
           curso_id: r.curso_id as string,
           curso: cursoCode.get(r.curso_id) || "—",
+          faculdadeSigla: cursoFacSigla.get(r.curso_id) || "—",
           ano: r.ano as string,
           turma: r.turma as string,
           nascimento: (r.nascimento as string) || "",
@@ -195,8 +204,9 @@ export default function AdminDiscentes() {
           certificado_url: (r.certificado_url as string) || null,
         };
       }),
-    [rows, cursoCode],
+    [rows, cursoCode, cursoFacSigla],
   );
+
 
   const filtered = useMemo(
     () => normalized.filter((r) => filtroCurso === "all" || r.curso_id === filtroCurso),
@@ -299,7 +309,7 @@ export default function AdminDiscentes() {
     window.open(data.signedUrl, "_blank");
   };
 
-  const GRID = "grid grid-cols-[36px_1fr_1fr_100px_90px_70px_60px_60px_70px_110px_1.4fr_56px] gap-2 px-4 py-2 items-center";
+  const GRID = "grid grid-cols-[36px_1fr_1fr_100px_90px_70px_1fr_60px_60px_70px_110px_56px] gap-2 px-4 py-2 items-center";
 
   return (
     <div className="p-6 lg:p-8 max-w-7xl mx-auto space-y-6 animate-fade-in">
@@ -374,13 +384,14 @@ export default function AdminDiscentes() {
             <span>Último</span>
             <span>Nascimento</span>
             <span>Telemóvel</span>
+            <span>Faculdade</span>
             <span>Curso</span>
             <span>Ano</span>
             <span>Turma</span>
             <span>Regime</span>
             <span>Docs</span>
-            <span>Email</span>
             <span></span>
+
           </div>
 
           <div className="divide-y">
@@ -398,6 +409,7 @@ export default function AdminDiscentes() {
                 <span className="text-xs truncate">{r.ultimoNome || "—"}</span>
                 <span className="text-xs tabular-nums text-muted-foreground">{r.nascimento || "—"}</span>
                 <span className="text-xs tabular-nums truncate">{r.telemovel || "—"}</span>
+                <span className="text-xs font-mono font-semibold">{r.faculdadeSigla}</span>
                 <span className="text-xs font-mono">{r.curso}</span>
                 <span className="text-xs tabular-nums">{r.ano}º</span>
                 <span className="text-xs tabular-nums">{r.turma}</span>
@@ -408,7 +420,6 @@ export default function AdminDiscentes() {
                   <DocPill label="BI" path={r.bilhete_url} onOpen={openDoc} Icon={IdCard} />
                   <DocPill label="Cert" path={r.certificado_url} onOpen={openDoc} Icon={FileText} />
                 </div>
-                <span className="text-[11px] text-muted-foreground truncate font-mono">{r.email}</span>
                 <div className="flex justify-end" onClick={(e) => e.stopPropagation()}>
                   <Button
                     size="icon"
