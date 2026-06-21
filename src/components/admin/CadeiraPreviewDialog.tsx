@@ -79,6 +79,8 @@ export function CadeiraPreviewDialog({ open, onOpenChange, cadeira }: Props) {
     }
   }, [open, cadeira?.id]);
 
+  const totalPeso = useMemo(() => state.avaliacoes.reduce((a, e) => a + (e.peso || 0), 0), [state.avaliacoes]);
+
   if (!cadeira) return null;
 
   const ro = locked; // read-only flag
@@ -97,7 +99,6 @@ export function CadeiraPreviewDialog({ open, onOpenChange, cadeira }: Props) {
   const addEval = () => setState(s => ({ ...s, avaliacoes: [...s.avaliacoes, { id: uid("ev"), titulo: "Nova avaliação", data: "", peso: 0 }] }));
   const removeEval = (id: string) => setState(s => ({ ...s, avaliacoes: s.avaliacoes.filter(e => e.id !== id) }));
   const updEval = (id: string, patch: Partial<Avaliacao>) => setState(s => ({ ...s, avaliacoes: s.avaliacoes.map(e => e.id === id ? { ...e, ...patch } : e) }));
-  const totalPeso = useMemo(() => state.avaliacoes.reduce((a, e) => a + (e.peso || 0), 0), [state.avaliacoes]);
 
   const addAnuncio = () => setState(s => ({ ...s, anuncios: [...s.anuncios, { id: uid("an"), titulo: "Novo anúncio", texto: "", data: "" }] }));
   const removeAnuncio = (id: string) => setState(s => ({ ...s, anuncios: s.anuncios.filter(a => a.id !== id) }));
