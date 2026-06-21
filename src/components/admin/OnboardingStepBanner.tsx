@@ -43,6 +43,7 @@ export const ONBOARDING_GROUPS: GroupMeta[] = [
   {
     id: "rh", title: "Configurar RH",
     steps: [
+      { key: "rh.dep",   title: "Registar departamentos", desc: "Criar departamentos institucionais (sigla, designação, responsável).", path: "/admin/onboarding/rh?tab=departamentos&step=rh.dep" },
       { key: "rh.doc",   title: "Registar docentes",    desc: "Adicionar todos os docentes da instituição em lote.",            path: "/admin/onboarding/docentes?step=rh.doc" },
       { key: "rh.staff", title: "Registar staff",       desc: "Adicionar funcionários administrativos e técnicos.",             path: "/admin/onboarding/staff?step=rh.staff" },
       { key: "rh.pres",  title: "Conformidade & Multas", desc: "Controlo de presença, tolerâncias, multas e disputas.",            path: "/admin/onboarding/regras-presenca?step=rh.pres" },
