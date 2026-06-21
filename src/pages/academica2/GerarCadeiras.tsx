@@ -35,6 +35,7 @@ export default function GerarCadeiras() {
 
   const [cadeiraCurso, setCadeiraCurso] = useState<string>("");
   const [openFacs, setOpenFacs] = useState<Record<string, boolean>>({});
+  const [previewCadeira, setPreviewCadeira] = useState<CadeiraRow | null>(null);
   const toggleFac = (f: string) => setOpenFacs(p => ({ ...p, [f]: !p[f] }));
 
   // Auto-select first curso when data arrives.
