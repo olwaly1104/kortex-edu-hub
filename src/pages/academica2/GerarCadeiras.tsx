@@ -246,7 +246,7 @@ export default function GerarCadeiras() {
                       ) : (
                         <div className="divide-y">
                           {list.map(c => (
-                            <div key={c.id} className="grid grid-cols-[1fr_180px_90px_70px_36px] gap-2 p-2 items-center">
+                            <div key={c.id} className="grid grid-cols-[1fr_180px_90px_70px_36px_36px] gap-2 p-2 items-center">
                               <Input
                                 defaultValue={c.name}
                                 onBlur={e => {
