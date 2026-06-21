@@ -99,6 +99,7 @@ const GROUPS: Group[] = [
     subtitle: "Docentes, staff e políticas internas",
     icon: UserCog,
     steps: [
+      { key: "rh.dep", title: "Registar departamentos", desc: "Criar departamentos institucionais (sigla, designação, responsável).", icon: Building2, path: "/admin/onboarding/rh?tab=departamentos&step=rh.dep" },
       { key: "rh.doc", title: "Registar docentes", desc: "Adicionar todos os docentes da instituição em lote.", icon: GraduationCap, path: "/admin/onboarding/docentes?step=rh.doc" },
       { key: "rh.staff", title: "Registar staff", desc: "Adicionar funcionários administrativos e técnicos.", icon: Briefcase, path: "/admin/onboarding/staff?step=rh.staff" },
       { key: "rh.pres", title: "Conformidade & Multas", desc: "Controlo de presença, tolerâncias, multas e disputas.", icon: Clock, path: "/admin/onboarding/regras-presenca?step=rh.pres" },
