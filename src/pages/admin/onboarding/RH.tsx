@@ -136,9 +136,7 @@ export default function OnboardingRH() {
           <OnboardingPessoas mode="staff" />
         </TabsContent>
         <TabsContent value="conformidade" className="mt-4">
-          <div className="p-6 text-center text-muted-foreground text-sm">
-            Módulo de conformidade e multas em desenvolvimento.
-          </div>
+          <OnboardingRegrasPresenca />
         </TabsContent>
       </Tabs>
     </div>
