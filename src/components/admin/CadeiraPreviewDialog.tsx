@@ -79,6 +79,8 @@ export function CadeiraPreviewDialog({ open, onOpenChange, cadeira }: Props) {
     }
   }, [open, cadeira?.id]);
 
+  const totalPeso = useMemo(() => state.avaliacoes.reduce((a, e) => a + (e.peso || 0), 0), [state.avaliacoes]);
+
   if (!cadeira) return null;
 
   const ro = locked; // read-only flag
