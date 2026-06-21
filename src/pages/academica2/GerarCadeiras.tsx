@@ -7,9 +7,10 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
-  BookOpen, Check, ArrowLeft, Plus, Trash2, GraduationCap,
+  BookOpen, Check, ArrowLeft, Plus, Trash2, GraduationCap, Eye,
   Building2, ChevronDown, ChevronRight, Users, Timer, Loader2,
 } from "lucide-react";
+import { CadeiraPreviewDialog } from "@/components/admin/CadeiraPreviewDialog";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import {
