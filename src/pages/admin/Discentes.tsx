@@ -209,8 +209,19 @@ export default function AdminDiscentes() {
 
 
   const filtered = useMemo(
-    () => normalized.filter((r) => filtroCurso === "all" || r.curso_id === filtroCurso),
-    [normalized, filtroCurso],
+    () => normalized.filter((r) => {
+      if (!searchTerm.trim()) return true;
+      const q = searchTerm.toLowerCase();
+      return (
+        r.primeiroNome.toLowerCase().includes(q) ||
+        r.ultimoNome.toLowerCase().includes(q) ||
+        r.email.toLowerCase().includes(q) ||
+        r.curso.toLowerCase().includes(q) ||
+        r.faculdadeSigla.toLowerCase().includes(q) ||
+        r.telemovel.toLowerCase().includes(q)
+      );
+    }),
+    [normalized, searchTerm],
   );
 
   const counts = useMemo(
