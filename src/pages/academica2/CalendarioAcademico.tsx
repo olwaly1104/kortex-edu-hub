@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Check, CalendarDays, Plus, Trash2, Wand2, Sparkles, Sun, BookOpen, FileSignature, Coffee, Star } from "lucide-react";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
+import { ArrowLeft, Check, CalendarDays, Plus, Trash2, Wand2, Sparkles, Sun, BookOpen, FileSignature, Coffee, Star, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -19,16 +20,23 @@ type Evento = {
   fim: string;
 };
 
-const TIPO_META: Record<EventoTipo, { label: string; color: string; icon: typeof BookOpen }> = {
-  semestre: { label: "Semestre", color: "bg-primary text-primary-foreground", icon: BookOpen },
-  exames:   { label: "Exames",   color: "bg-amber-500 text-white",            icon: FileSignature },
-  ferias:   { label: "Férias",   color: "bg-sky-500 text-white",              icon: Sun },
-  feriado:  { label: "Feriado",  color: "bg-rose-500 text-white",             icon: Star },
-  especial: { label: "Especial", color: "bg-violet-500 text-white",           icon: Sparkles },
+const TIPO_META: Record<EventoTipo, { label: string; color: string; dot: string; ring: string; icon: typeof BookOpen }> = {
+  semestre: { label: "Semestre", color: "bg-primary text-primary-foreground",  dot: "bg-primary",     ring: "border-l-primary",     icon: BookOpen },
+  exames:   { label: "Exames",   color: "bg-amber-500 text-white",             dot: "bg-amber-500",   ring: "border-l-amber-500",   icon: FileSignature },
+  ferias:   { label: "Férias",   color: "bg-sky-500 text-white",               dot: "bg-sky-500",     ring: "border-l-sky-500",     icon: Sun },
+  feriado:  { label: "Feriado",  color: "bg-rose-500 text-white",              dot: "bg-rose-500",    ring: "border-l-rose-500",    icon: Star },
+  especial: { label: "Especial", color: "bg-violet-500 text-white",            dot: "bg-violet-500",  ring: "border-l-violet-500",  icon: Sparkles },
+};
+
+const ANOS_LETIVOS = ["2025/2026", "2026/2027", "2027/2028", "2028/2029"];
+const rangeFromAno = (ano: string) => {
+  const [y1, y2] = ano.split("/").map(Number);
+  return { inicio: `${y1}-09-01`, fim: `${y2}-07-31` };
 };
 
 const fmt = (d: Date) => d.toISOString().slice(0, 10);
 const addDays = (d: Date, n: number) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
+const fmtPT = (s: string) => new Date(s).toLocaleDateString("pt-PT", { day: "2-digit", month: "short" });
 
 const buildAuto = (startISO: string, endISO: string): Evento[] => {
   const start = new Date(startISO);
@@ -59,10 +67,19 @@ export default function CalendarioAcademico() {
   const isOnboarding = useIsOnboardingStep();
   const { user } = useAuth();
   const [anoLetivo, setAnoLetivo] = useState("2025/2026");
-  const [inicio, setInicio] = useState("2025-09-01");
-  const [fim, setFim] = useState("2026-07-31");
-  const [eventos, setEventos] = useState<Evento[]>(() => buildAuto("2025-09-01", "2026-07-31"));
+  const initial = rangeFromAno("2025/2026");
+  const [inicio, setInicio] = useState(initial.inicio);
+  const [fim, setFim] = useState(initial.fim);
+  const [eventos, setEventos] = useState<Evento[]>(() => buildAuto(initial.inicio, initial.fim));
   const [filter, setFilter] = useState<EventoTipo | "all">("all");
+
+  const changeAno = (v: string) => {
+    setAnoLetivo(v);
+    const r = rangeFromAno(v);
+    setInicio(r.inicio);
+    setFim(r.fim);
+    setEventos(buildAuto(r.inicio, r.fim));
+  };
 
   const regenerate = () => {
     setEventos(buildAuto(inicio, fim));
@@ -77,8 +94,10 @@ export default function CalendarioAcademico() {
   const update = (id: string, patch: Partial<Evento>) =>
     setEventos(prev => prev.map(e => e.id === id ? { ...e, ...patch } : e));
   const remove = (id: string) => setEventos(prev => prev.filter(e => e.id !== id));
-  const add = (tipo: EventoTipo) =>
+  const add = (tipo: EventoTipo) => {
     setEventos(prev => [...prev, { id: `n-${Date.now()}`, tipo, titulo: `Novo ${TIPO_META[tipo].label}`, inicio, fim: inicio }]);
+    toast.success(`${TIPO_META[tipo].label} adicionado`);
+  };
 
   const filtered = useMemo(() =>
     (filter === "all" ? eventos : eventos.filter(e => e.tipo === filter))
@@ -92,25 +111,33 @@ export default function CalendarioAcademico() {
     return c;
   }, [eventos]);
 
-  // Timeline grid: months from inicio to fim
+  // Group events by month for the new timeline
   const months = useMemo(() => {
-    const out: { label: string; start: Date; end: Date }[] = [];
+    const out: { key: string; label: string; year: number; month: number }[] = [];
     const s = new Date(inicio); const e = new Date(fim);
     const cur = new Date(s.getFullYear(), s.getMonth(), 1);
     while (cur <= e) {
-      const next = new Date(cur.getFullYear(), cur.getMonth() + 1, 1);
-      out.push({ label: cur.toLocaleDateString("pt-PT", { month: "short", year: "2-digit" }), start: new Date(cur), end: new Date(next.getTime() - 1) });
+      out.push({
+        key: `${cur.getFullYear()}-${cur.getMonth()}`,
+        label: cur.toLocaleDateString("pt-PT", { month: "long", year: "numeric" }),
+        year: cur.getFullYear(),
+        month: cur.getMonth(),
+      });
       cur.setMonth(cur.getMonth() + 1);
     }
     return out;
   }, [inicio, fim]);
 
-  const rangeStart = new Date(inicio).getTime();
-  const rangeEnd = new Date(fim).getTime();
-  const pos = (d: string) => {
-    const t = new Date(d).getTime();
-    return Math.max(0, Math.min(100, ((t - rangeStart) / (rangeEnd - rangeStart)) * 100));
-  };
+  const eventsByMonth = useMemo(() => {
+    const map: Record<string, Evento[]> = {};
+    eventos.forEach(e => {
+      const d = new Date(e.inicio);
+      const key = `${d.getFullYear()}-${d.getMonth()}`;
+      (map[key] ||= []).push(e);
+    });
+    Object.values(map).forEach(list => list.sort((a, b) => a.inicio.localeCompare(b.inicio)));
+    return map;
+  }, [eventos]);
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
@@ -145,7 +172,12 @@ export default function CalendarioAcademico() {
       <Card className="p-4 grid grid-cols-1 md:grid-cols-3 gap-3">
         <div>
           <p className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">Ano Letivo</p>
-          <Input value={anoLetivo} onChange={e => setAnoLetivo(e.target.value)} className="h-9" />
+          <Select value={anoLetivo} onValueChange={changeAno}>
+            <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              {ANOS_LETIVOS.map(a => <SelectItem key={a} value={a}>{a}</SelectItem>)}
+            </SelectContent>
+          </Select>
         </div>
         <div>
           <p className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">Início</p>
@@ -170,56 +202,88 @@ export default function CalendarioAcademico() {
         })}
       </div>
 
-      {/* Timeline */}
-      <Card className="p-4 space-y-3">
+      {/* New monthly schedule view */}
+      <Card className="p-4 space-y-4">
         <div className="flex items-center justify-between">
-          <p className="text-sm font-semibold flex items-center gap-2"><CalendarDays className="w-4 h-4 text-primary" /> Linha do Tempo — {anoLetivo}</p>
-          <p className="text-[11px] text-muted-foreground">{months.length} meses</p>
-        </div>
-        <div className="relative border rounded-lg bg-muted/20 p-3">
-          <div className="grid gap-px" style={{ gridTemplateColumns: `repeat(${months.length}, 1fr)` }}>
-            {months.map(m => (
-              <div key={m.label} className="text-[10px] uppercase text-muted-foreground text-center py-1 border-r last:border-r-0">{m.label}</div>
+          <div>
+            <p className="text-sm font-semibold flex items-center gap-2"><CalendarDays className="w-4 h-4 text-primary" /> Plano do Ano — {anoLetivo}</p>
+            <p className="text-[11px] text-muted-foreground mt-0.5">{months.length} meses · {eventos.length} eventos</p>
+          </div>
+          <div className="hidden md:flex items-center gap-3 text-[11px] text-muted-foreground">
+            {(Object.keys(TIPO_META) as EventoTipo[]).map(t => (
+              <span key={t} className="inline-flex items-center gap-1.5">
+                <span className={`w-2 h-2 rounded-full ${TIPO_META[t].dot}`} />{TIPO_META[t].label}
+              </span>
             ))}
           </div>
-          <div className="relative mt-2 space-y-1.5">
-            {(["semestre", "exames", "ferias", "feriado", "especial"] as EventoTipo[]).map(tipo => {
-              const items = eventos.filter(e => e.tipo === tipo);
-              return (
-                <div key={tipo} className="relative h-6">
-                  {items.map(e => {
-                    const left = pos(e.inicio);
-                    const right = pos(e.fim);
-                    const width = Math.max(1.5, right - left);
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+          {months.map(m => {
+            const list = eventsByMonth[m.key] ?? [];
+            return (
+              <div key={m.key} className="rounded-lg border bg-card overflow-hidden flex flex-col">
+                <div className="px-3 py-2 border-b bg-muted/40 flex items-center justify-between">
+                  <p className="text-xs font-semibold capitalize">{m.label}</p>
+                  <Badge variant="outline" className="text-[10px] h-5">{list.length}</Badge>
+                </div>
+                <div className="p-2 space-y-1.5 min-h-[80px]">
+                  {list.length === 0 && (
+                    <p className="text-[11px] text-muted-foreground/70 italic px-1 py-2">Sem eventos</p>
+                  )}
+                  {list.map(e => {
+                    const M = TIPO_META[e.tipo];
+                    const sameDay = e.inicio === e.fim;
                     return (
-                      <div key={e.id}
-                        title={`${e.titulo} (${e.inicio} → ${e.fim})`}
-                        className={`absolute top-0 h-6 rounded text-[10px] px-1.5 flex items-center truncate ${TIPO_META[tipo].color}`}
-                        style={{ left: `${left}%`, width: `${width}%` }}>
-                        {e.titulo}
+                      <div key={e.id} className={`group rounded-md border-l-2 ${M.ring} bg-muted/30 hover:bg-muted/60 transition px-2 py-1.5`}>
+                        <div className="flex items-start justify-between gap-2">
+                          <p className="text-xs font-medium leading-tight truncate">{e.titulo}</p>
+                          <span className={`shrink-0 w-1.5 h-1.5 rounded-full ${M.dot} mt-1`} />
+                        </div>
+                        <p className="text-[10px] text-muted-foreground mt-0.5 tabular-nums">
+                          {sameDay ? fmtPT(e.inicio) : `${fmtPT(e.inicio)} → ${fmtPT(e.fim)}`}
+                        </p>
                       </div>
                     );
                   })}
                 </div>
-              );
-            })}
-          </div>
+              </div>
+            );
+          })}
         </div>
       </Card>
 
       {/* Filters + add */}
       <Card className="p-3 flex items-center gap-2 flex-wrap">
-        <Button size="sm" variant={filter === "all" ? "default" : "outline"} onClick={() => setFilter("all")} className="h-7 text-xs">Todos ({eventos.length})</Button>
+        <Button size="sm" variant={filter === "all" ? "default" : "outline"} onClick={() => setFilter("all")} className="h-8 text-xs">Todos ({eventos.length})</Button>
         {(Object.keys(TIPO_META) as EventoTipo[]).map(t => (
-          <Button key={t} size="sm" variant={filter === t ? "default" : "outline"} onClick={() => setFilter(t)} className="h-7 text-xs">{TIPO_META[t].label} ({counts[t]})</Button>
+          <Button key={t} size="sm" variant={filter === t ? "default" : "outline"} onClick={() => setFilter(t)} className="h-8 text-xs gap-1.5">
+            <span className={`w-1.5 h-1.5 rounded-full ${TIPO_META[t].dot}`} />{TIPO_META[t].label} ({counts[t]})
+          </Button>
         ))}
         <div className="flex-1" />
-        <Select onValueChange={v => add(v as EventoTipo)}>
-          <SelectTrigger className="h-8 w-[180px] text-xs"><span className="inline-flex items-center gap-1"><Plus className="w-3 h-3" /> Adicionar evento</span></SelectTrigger>
-          <SelectContent>
-            {(Object.keys(TIPO_META) as EventoTipo[]).map(t => <SelectItem key={t} value={t}>{TIPO_META[t].label}</SelectItem>)}
-          </SelectContent>
-        </Select>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button size="sm" className="h-8 gap-1.5 shadow-sm">
+              <Plus className="w-3.5 h-3.5" /> Adicionar Evento <ChevronDown className="w-3 h-3 opacity-70" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuLabel className="text-[10px] uppercase tracking-wide text-muted-foreground">Tipo de evento</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            {(Object.keys(TIPO_META) as EventoTipo[]).map(t => {
+              const M = TIPO_META[t]; const Icon = M.icon;
+              return (
+                <DropdownMenuItem key={t} onClick={() => add(t)} className="gap-2 cursor-pointer">
+                  <span className={`w-6 h-6 rounded-md flex items-center justify-center ${M.color}`}>
+                    <Icon className="w-3 h-3" />
+                  </span>
+                  <span className="text-xs">{M.label}</span>
+                </DropdownMenuItem>
+              );
+            })}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </Card>
 
       {/* Event rows */}
