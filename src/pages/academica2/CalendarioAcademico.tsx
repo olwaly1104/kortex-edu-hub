@@ -118,10 +118,23 @@ export default function CalendarioAcademico() {
   };
 
   const update = (id: string, patch: Partial<Evento>) =>
-    setEventos(prev => prev.map(e => e.id === id ? { ...e, ...patch } : e));
+    setEventos(prev => prev.map(e => {
+      if (e.id !== id) return e;
+      const next = { ...e, ...patch };
+      if (next.tipo === "exames" && ("epoca" in patch || "semestre" in patch)) {
+        next.titulo = buildExameTitulo(next.epoca, next.semestre);
+      }
+      return next;
+    }));
   const remove = (id: string) => setEventos(prev => prev.filter(e => e.id !== id));
   const add = (tipo: EventoTipo) => {
-    setEventos(prev => [...prev, { id: `n-${Date.now()}`, tipo, titulo: `Novo ${TIPO_META[tipo].label}`, inicio, fim: inicio }]);
+    const base: Evento = { id: `n-${Date.now()}`, tipo, titulo: `Novo ${TIPO_META[tipo].label}`, inicio, fim: inicio };
+    if (tipo === "exames") {
+      base.epoca = "1";
+      base.semestre = "1";
+      base.titulo = buildExameTitulo(base.epoca, base.semestre);
+    }
+    setEventos(prev => [...prev, base]);
     toast.success(`${TIPO_META[tipo].label} adicionado`);
   };
 
