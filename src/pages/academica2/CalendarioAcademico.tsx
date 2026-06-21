@@ -53,7 +53,7 @@ function buildExameTitulo(epoca?: Epoca, semestre?: Semestre | null) {
 const ANOS_LETIVOS = ["2025/2026", "2026/2027", "2027/2028", "2028/2029"];
 const rangeFromAno = (ano: string) => {
   const [y1, y2] = ano.split("/").map(Number);
-  return { inicio: `${y1}-09-01`, fim: `${y2}-07-31` };
+  return { inicio: `${y1}-09-01`, fim: `${y2}-08-31` };
 };
 
 const fmt = (d: Date) => d.toISOString().slice(0, 10);

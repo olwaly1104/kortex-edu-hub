@@ -17,10 +17,10 @@ export interface AnoLetivo {
 }
 
 export const anosLetivos: AnoLetivo[] = [
-  { id: "2022-2023", label: "2022/2023", startDate: "01/09/2022", endDate: "31/07/2023", status: "arquivado", cursos: 11, cadeiras: 142, turmas: 48, estudantes: 1820, docentes: 96, progresso: 100 },
-  { id: "2023-2024", label: "2023/2024", startDate: "01/09/2023", endDate: "31/07/2024", status: "arquivado", cursos: 12, cadeiras: 156, turmas: 52, estudantes: 1980, docentes: 102, progresso: 100 },
-  { id: "2024-2025", label: "2024/2025", startDate: "01/09/2024", endDate: "31/07/2025", status: "ativo", cursos: 13, cadeiras: 168, turmas: 58, estudantes: 2145, docentes: 108, progresso: 100 },
-  { id: "2025-2026", label: "2025/2026", startDate: "01/09/2025", endDate: "31/07/2026", status: "planeado", cursos: 13, cadeiras: 0, turmas: 0, estudantes: 0, docentes: 0, progresso: 18 },
+  { id: "2022-2023", label: "2022/2023", startDate: "01/09/2022", endDate: "31/08/2023", status: "arquivado", cursos: 11, cadeiras: 142, turmas: 48, estudantes: 1820, docentes: 96, progresso: 100 },
+  { id: "2023-2024", label: "2023/2024", startDate: "01/09/2023", endDate: "31/08/2024", status: "arquivado", cursos: 12, cadeiras: 156, turmas: 52, estudantes: 1980, docentes: 102, progresso: 100 },
+  { id: "2024-2025", label: "2024/2025", startDate: "01/09/2024", endDate: "31/08/2025", status: "ativo", cursos: 13, cadeiras: 168, turmas: 58, estudantes: 2145, docentes: 108, progresso: 100 },
+  { id: "2025-2026", label: "2025/2026", startDate: "01/09/2025", endDate: "31/08/2026", status: "planeado", cursos: 13, cadeiras: 0, turmas: 0, estudantes: 0, docentes: 0, progresso: 18 },
 ];
 
 export interface CursoTemplate {
