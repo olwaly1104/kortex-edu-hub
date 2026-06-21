@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import {
   GraduationCap, Plus, Trash2, Users, BookOpen, Layers, Loader2,
-  Camera, Upload, FileText, IdCard, Check, X,
+  Camera, Upload, FileText, IdCard, Check, X, Search,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
