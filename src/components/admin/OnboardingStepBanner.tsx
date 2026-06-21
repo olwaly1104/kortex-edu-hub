@@ -1,8 +1,13 @@
 import { Link, useSearchParams } from "react-router-dom";
 import { ArrowLeft, ChevronRight, ShieldCheck, CheckCircle2, Circle } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, createContext, useContext, useEffect, useState } from "react";
 import { progressKey, pushProgress } from "@/lib/onboardingStorage";
+
+const SuppressBannerCtx = createContext(false);
+export const SuppressOnboardingBanner = ({ children }: { children: ReactNode }) => (
+  <SuppressBannerCtx.Provider value={true}>{children}</SuppressBannerCtx.Provider>
+);
 
 type StepMeta = { key: string; title: string; desc: string; path: string };
 type GroupMeta = { id: string; title: string; steps: StepMeta[] };
