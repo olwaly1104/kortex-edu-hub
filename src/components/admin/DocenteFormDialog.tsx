@@ -8,7 +8,7 @@ import {
   GraduationCap, Plus, User, Mail, Briefcase, Award,
   Camera, Upload, Check, X, FileText, IdCard, MapPin, BookOpen,
 } from "lucide-react";
-import type { DocenteRow, Grau } from "@/lib/peopleStorage";
+import { DEPARTAMENTOS_POOL, type DocenteRow, type Grau } from "@/lib/peopleStorage";
 
 const prefixosPool = ["Sr.", "Sra.", "Dr.", "Dra.", "Prof.", "Eng.", "Me."];
 const categoriasPool = ["Assistente", "Auxiliar", "Associado", "Catedrático", "Convidado"];
@@ -31,7 +31,7 @@ const diplomaLabel = (g?: Grau) => (g ? `Diploma de ${g}` : "Diploma académico"
 
 export const emptyDocente = (): DocenteRow => ({
   id: "", prefixo: "Dr.", primeiroNome: "", ultimoNome: "", email: "", contacto: "",
-  faculdade: "", categoria: "Assistente", cargo: "Docente",
+  faculdade: "", departamento: "", categoria: "Assistente", cargo: "Docente",
   nascimento: "", genero: "M", bilhete: "", bilheteFileName: "", fotoDataUrl: "",
   provincia: "", municipio: "", endereco: "",
   grau: "Licenciatura", especialidade: "", instituicaoFormacao: "", anosExperiencia: "",
@@ -167,9 +167,15 @@ export function DocenteFormDialog({
 
           <section>
             <SectionTitle index={4} icon={<Briefcase className="w-3.5 h-3.5" />} title="Afiliação Académica" hint="Faculdade, categoria e cargo institucional" />
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
               <Field label="Faculdade">
                 <Input className="h-8 text-xs" value={draft.faculdade} onChange={(e) => setF("faculdade", e.target.value)} placeholder="Ex.: Ciências Exatas" />
+              </Field>
+              <Field label="Departamento">
+                <Select value={draft.departamento || ""} onValueChange={(v) => setF("departamento", v)}>
+                  <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="—" /></SelectTrigger>
+                  <SelectContent>{DEPARTAMENTOS_POOL.map((d) => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent>
+                </Select>
               </Field>
               <Field label="Categoria">
                 <Select value={draft.categoria} onValueChange={(v) => setF("categoria", v)}>
