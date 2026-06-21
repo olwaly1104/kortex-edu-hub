@@ -66,7 +66,7 @@ function DepartamentosPanel() {
     if (error) { toast.error(error.message); setRows(prev); }
   };
 
-  const gridCols = "grid-cols-[100px_1.4fr_1.4fr_64px]";
+  const gridCols = "grid-cols-[40px_100px_1.4fr_1.4fr_64px]";
 
   return (
     <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6 animate-fade-in">
@@ -82,11 +82,29 @@ function DepartamentosPanel() {
 
       <Card className="overflow-hidden">
         <div className={`grid ${gridCols} gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b`}>
-          <span>Sigla</span><span>Designação</span><span>Responsável</span><span></span>
+          <span>Pré-visualização</span><span>Sigla</span><span>Designação</span><span>Responsável</span><span></span>
         </div>
         <div className="divide-y">
           {rows.map((r) => (
             <div key={r.id} className={`grid ${gridCols} gap-2 px-4 py-2 items-center`}>
+              <div className="flex items-center justify-center">
+                <label className="relative cursor-pointer">
+                  <span
+                    className="block w-5 h-5 rounded-full border shadow-sm"
+                    style={{ backgroundColor: r.cor || "#1B3A6B", borderColor: r.cor || "#1B3A6B" }}
+                    title="Pré-visualização da cor"
+                  />
+                  <input
+                    type="color"
+                    value={r.cor || "#1B3A6B"}
+                    onChange={(ev) => {
+                      upd(r.id, { cor: ev.target.value });
+                      persist(r.id, { cor: ev.target.value });
+                    }}
+                    className="absolute inset-0 opacity-0 w-5 h-5 cursor-pointer"
+                  />
+                </label>
+              </div>
               <Input
                 value={r.sigla}
                 onChange={(ev) => upd(r.id, { sigla: ev.target.value.toUpperCase() })}
