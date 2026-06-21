@@ -137,7 +137,7 @@ export default function AdminDiscentes() {
   const createMut = useCreateEstudante();
   const deleteMut = useDeleteEstudante();
 
-  const [filtroCurso, setFiltroCurso] = useState<string>("all");
+  const [searchTerm, setSearchTerm] = useState("");
   const [draft, setDraft] = useState<Draft>(emptyDraft());
   const [uploading, setUploading] = useState(false);
   const [open, setOpen] = useState(false);
