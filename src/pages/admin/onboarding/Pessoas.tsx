@@ -35,7 +35,7 @@ function PageHeader({
   onCta: () => void;
 }) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {/* Dados (title) above */}
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
@@ -48,10 +48,10 @@ function PageHeader({
       </div>
 
       {/* Registos left · CTA right */}
-      <div className="flex items-center gap-3 border-y border-border/60 py-2.5">
-        <div className="flex items-baseline gap-2">
+      <div className="flex items-center gap-3 border-y border-border/60 py-1.5">
+        <div className="flex items-baseline gap-1.5">
           <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Registos</span>
-          <span className="text-lg font-bold tabular-nums leading-none">{count}</span>
+          <span className="text-sm font-bold tabular-nums leading-none">{count}</span>
         </div>
         <Button size="sm" onClick={onCta} className="ml-auto gap-1.5">
           <UserPlus className="w-3.5 h-3.5" /> {ctaLabel}
