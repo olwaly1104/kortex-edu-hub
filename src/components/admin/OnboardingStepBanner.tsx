@@ -24,10 +24,9 @@ export const ONBOARDING_GROUPS: GroupMeta[] = [
   {
     id: "aca", title: "Configurar Área Académica",
     steps: [
-      { key: "aca.fac", title: "Faculdades", desc: "Criar as faculdades da instituição.", path: "/admin/faculdades-cursos?tab=faculdades&step=aca.fac" },
-      { key: "aca.cur", title: "Cursos", desc: "Criar cursos e associá-los às faculdades.", path: "/admin/faculdades-cursos?tab=cursos&step=aca.cur" },
+      { key: "aca.fac", title: "Faculdades & Cursos", desc: "Criar faculdades e cursos da instituição.", path: "/admin/faculdades-cursos?tab=faculdades&step=aca.fac" },
       { key: "aca.cad", title: "Cadeiras", desc: "Gerar cadeiras por curso, ano e semestre.", path: "/admin/faculdades-cursos?tab=cadeiras&step=aca.cad" },
-      { key: "aca.cal", title: "Ano letivo & calendário", desc: "Definir ano letivo, semestres e feriados.", path: "/admin/faculdades-cursos?tab=calendario&step=aca.cal" },
+      { key: "aca.cal", title: "Ano lectivo & Calendário", desc: "Definir ano lectivo, semestres e feriados.", path: "/admin/faculdades-cursos?tab=calendario&step=aca.cal" },
       { key: "aca.tur", title: "Turmas", desc: "Criar turmas e definir capacidade.", path: "/admin/faculdades-cursos?tab=turmas&step=aca.tur" },
     ],
   },

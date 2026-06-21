@@ -72,11 +72,10 @@ const GROUPS: Group[] = [
     subtitle: "Faculdades, cursos, cadeiras, calendário e turmas",
     icon: School,
     steps: [
-      { key: "aca.fac", title: "Faculdades", desc: "Criar as faculdades da instituição.", icon: Building2, path: "/admin/faculdades-cursos?tab=faculdades&step=aca.fac" },
-      { key: "aca.cur", title: "Cursos", desc: "Criar cursos e associá-los às faculdades.", icon: GraduationCap, path: "/admin/faculdades-cursos?tab=cursos&step=aca.cur" },
-      { key: "aca.cad", title: "Cadeiras", desc: "Gerar cadeiras por curso, ano e semestre.", icon: BookOpen, path: "/areaacademica/criador/cadeiras?step=aca.cad" },
-      { key: "aca.cal", title: "Ano letivo & calendário", desc: "Definir ano letivo, semestres e feriados.", icon: CalendarDays, path: "/areaacademica/criador/calendario?step=aca.cal" },
-      { key: "aca.tur", title: "Turmas", desc: "Criar turmas e definir capacidade.", icon: Layers, path: "/areaacademica/criador/turmas?step=aca.tur" },
+      { key: "aca.fac", title: "Faculdades & Cursos", desc: "Criar faculdades e cursos da instituição.", icon: Building2, path: "/admin/faculdades-cursos?tab=faculdades&step=aca.fac" },
+      { key: "aca.cad", title: "Cadeiras", desc: "Gerar cadeiras por curso, ano e semestre.", icon: BookOpen, path: "/admin/faculdades-cursos?tab=cadeiras&step=aca.cad" },
+      { key: "aca.cal", title: "Ano lectivo & Calendário", desc: "Definir ano lectivo, semestres e feriados.", icon: CalendarDays, path: "/admin/faculdades-cursos?tab=calendario&step=aca.cal" },
+      { key: "aca.tur", title: "Turmas", desc: "Criar turmas e definir capacidade.", icon: Layers, path: "/admin/faculdades-cursos?tab=turmas&step=aca.tur" },
     ],
   },
   {
@@ -145,7 +144,6 @@ export default function AdminInicio() {
         const p = raw ? JSON.parse(raw) : {};
         if (usersCount > 0) p["est.imp"] = true;
         if ((fac.count ?? 0) > 0) p["aca.fac"] = true;
-        if ((cur.count ?? 0) > 0) p["aca.cur"] = true;
         if ((cad.count ?? 0) > 0) p["aca.cad"] = true;
         if ((prop.count ?? 0) > 0) p["fin.pro"] = true;
         localStorage.setItem(progressKey(user?.email), JSON.stringify(p));
@@ -176,7 +174,6 @@ export default function AdminInicio() {
     "inst.reg": storedProgress["inst.reg"] || isOnboardingCompleteFor(user?.email),
     "est.imp": realCounts.users > 0,
     "aca.fac": realCounts.faculdades > 0,
-    "aca.cur": realCounts.cursos > 0,
     "aca.cad": realCounts.cadeiras > 0,
     "fin.pro": storedProgress["fin.pro"] || realCounts.propinas > 0,
   };
