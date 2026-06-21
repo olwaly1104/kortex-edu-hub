@@ -1,6 +1,7 @@
 import { useSearchParams } from "react-router-dom";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Building2, BookOpen, CalendarDays, Users } from "lucide-react";
+import { OnboardingStepBanner, SuppressOnboardingBanner } from "@/components/admin/OnboardingStepBanner";
 import AdminFaculdadesCursos from "./FaculdadesCursos";
 import GerarCadeiras from "../academica2/GerarCadeiras";
 import CalendarioAcademico from "../academica2/CalendarioAcademico";
@@ -28,7 +29,8 @@ export default function AreaAcademica() {
   };
 
   return (
-    <div className="p-6 lg:p-8 max-w-6xl mx-auto">
+    <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-4">
+      <OnboardingStepBanner />
       <Tabs value={tab} onValueChange={onChange} className="space-y-4">
         <TabsList className="grid grid-cols-4 w-full max-w-2xl">
           <TabsTrigger value="faculdades" className="gap-1.5">
@@ -45,18 +47,20 @@ export default function AreaAcademica() {
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="faculdades" className="mt-0">
-          <AdminFaculdadesCursos />
-        </TabsContent>
-        <TabsContent value="cadeiras" className="mt-0">
-          <GerarCadeiras />
-        </TabsContent>
-        <TabsContent value="calendario" className="mt-0">
-          <CalendarioAcademico />
-        </TabsContent>
-        <TabsContent value="turmas" className="mt-0">
-          <CriarTurmas />
-        </TabsContent>
+        <SuppressOnboardingBanner>
+          <TabsContent value="faculdades" className="mt-0">
+            <AdminFaculdadesCursos />
+          </TabsContent>
+          <TabsContent value="cadeiras" className="mt-0">
+            <GerarCadeiras />
+          </TabsContent>
+          <TabsContent value="calendario" className="mt-0">
+            <CalendarioAcademico />
+          </TabsContent>
+          <TabsContent value="turmas" className="mt-0">
+            <CriarTurmas />
+          </TabsContent>
+        </SuppressOnboardingBanner>
       </Tabs>
     </div>
   );
