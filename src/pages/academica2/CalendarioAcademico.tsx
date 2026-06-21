@@ -81,6 +81,8 @@ export default function CalendarioAcademico() {
     setInicio(r.inicio);
     setFim(r.fim);
     setEventos(buildAuto(r.inicio, r.fim));
+    const d = new Date(r.inicio);
+    setMonthCursor(new Date(d.getFullYear(), d.getMonth(), 1));
   };
 
   const regenerate = () => {
