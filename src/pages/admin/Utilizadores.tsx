@@ -28,7 +28,7 @@ const MODULOS: { value: string; label: string }[] = [
   { value: "decano", label: "Decano" },
   { value: "reitor", label: "Reitor" },
   { value: "financas", label: "Finanças" },
-  { value: "academica", label: "Académica" },
+  { value: "academica", label: "Área Académica" },
   { value: "gap", label: "GAP" },
   { value: "inscricoes", label: "Inscrições" },
 ];
