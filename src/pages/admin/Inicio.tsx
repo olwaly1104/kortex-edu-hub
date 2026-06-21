@@ -144,7 +144,6 @@ export default function AdminInicio() {
         const p = raw ? JSON.parse(raw) : {};
         if (usersCount > 0) p["est.imp"] = true;
         if ((fac.count ?? 0) > 0) p["aca.fac"] = true;
-        if ((cur.count ?? 0) > 0) p["aca.cur"] = true;
         if ((cad.count ?? 0) > 0) p["aca.cad"] = true;
         if ((prop.count ?? 0) > 0) p["fin.pro"] = true;
         localStorage.setItem(progressKey(user?.email), JSON.stringify(p));
@@ -175,7 +174,6 @@ export default function AdminInicio() {
     "inst.reg": storedProgress["inst.reg"] || isOnboardingCompleteFor(user?.email),
     "est.imp": realCounts.users > 0,
     "aca.fac": realCounts.faculdades > 0,
-    "aca.cur": realCounts.cursos > 0,
     "aca.cad": realCounts.cadeiras > 0,
     "fin.pro": storedProgress["fin.pro"] || realCounts.propinas > 0,
   };
