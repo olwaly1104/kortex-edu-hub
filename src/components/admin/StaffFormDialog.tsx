@@ -5,15 +5,12 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import {
-  GraduationCap, Plus, User, Mail, Briefcase, Award,
-  Camera, Upload, Check, X, FileText, IdCard, MapPin, BookOpen,
+  Briefcase, Plus, User, Mail, Camera, Upload, Check, X, FileText, IdCard, MapPin, Building2,
 } from "lucide-react";
-import { DEPARTAMENTOS_POOL, type DocenteRow, type Grau } from "@/lib/peopleStorage";
+import { DEPARTAMENTOS_POOL, type StaffRow } from "@/lib/peopleStorage";
 
-const prefixosPool = ["Sr.", "Sra.", "Dr.", "Dra.", "Prof.", "Eng.", "Me."];
-const categoriasPool = ["Assistente", "Auxiliar", "Associado", "Catedrático", "Convidado"];
-const cargosPool = ["Docente", "Coordenador", "Decano", "Diretor"];
-const grausPool: Grau[] = ["Licenciatura", "Mestrado", "Doutoramento", "Agregação"];
+const prefixosPool = ["Sr.", "Sra.", "Dr.", "Dra.", "Eng.", "Me."];
+const funcoesPool = ["Assistente", "Coordenador", "Técnico", "Auxiliar", "Diretor", "Analista", "Gestor"];
 const PROVINCIAS = [
   "Bengo","Benguela","Bié","Cabinda","Cuando Cubango","Cuanza Norte","Cuanza Sul","Cunene",
   "Huambo","Huíla","Luanda","Lunda Norte","Lunda Sul","Malanje","Moxico","Namibe","Uíge","Zaire",
@@ -22,38 +19,54 @@ const EMAIL_DOMAIN = "upra.kor";
 
 const slug = (s: string) =>
   s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "").trim();
-export const buildDocenteEmail = (p: string, u: string) => {
+export const buildStaffEmail = (p: string, u: string) => {
   const a = slug(p), b = slug(u);
   if (!a && !b) return "";
   return `${[a, b].filter(Boolean).join(".")}@${EMAIL_DOMAIN}`;
 };
-const diplomaLabel = (g?: Grau) => (g ? `Diploma de ${g}` : "Diploma académico");
 
-export const emptyDocente = (): DocenteRow => ({
-  id: "", prefixo: "Dr.", primeiroNome: "", ultimoNome: "", email: "", contacto: "",
-  faculdade: "", departamento: "", categoria: "Assistente", cargo: "Docente",
+const moduloFromDepartamento = (d?: string) => {
+  const x = (d || "").toLowerCase();
+  if (x.includes("fin")) return "financas";
+  if (x.includes("gap")) return "gap";
+  if (x.includes("acad")) return "academica";
+  return "academica";
+};
+
+// StaffRow extras kept locally via fields already present, plus optional file fields are not part of StaffRow type.
+type StaffDraft = StaffRow & {
+  nascimento?: string;
+  genero?: "M" | "F" | "Outro";
+  bilhete?: string;
+  bilheteFileName?: string;
+  fotoDataUrl?: string;
+  provincia?: string;
+  municipio?: string;
+  endereco?: string;
+  cvFileName?: string;
+};
+
+export const emptyStaff = (): StaffDraft => ({
+  id: "", prefixo: "Sr.", primeiroNome: "", ultimoNome: "", email: "", contacto: "",
+  departamento: DEPARTAMENTOS_POOL[0], funcao: funcoesPool[0], moduloKortex: "academica",
   nascimento: "", genero: "M", bilhete: "", bilheteFileName: "", fotoDataUrl: "",
-  provincia: "", municipio: "", endereco: "",
-  grau: "Licenciatura", especialidade: "", instituicaoFormacao: "", anosExperiencia: "",
-  cvFileName: "", diplomaFileName: "",
+  provincia: "", municipio: "", endereco: "", cvFileName: "",
 });
 
-export function DocenteFormDialog({
-  open, onOpenChange, onSave, initial,
+export function StaffFormDialog({
+  open, onOpenChange, onSave,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
-  onSave: (row: DocenteRow) => void;
-  initial?: DocenteRow;
+  onSave: (row: StaffRow & { fotoDataUrl?: string }) => void;
 }) {
-  const [draft, setDraft] = useState<DocenteRow>(initial || emptyDocente());
+  const [draft, setDraft] = useState<StaffDraft>(emptyStaff());
   const fotoInput = useRef<HTMLInputElement>(null);
   const biInput = useRef<HTMLInputElement>(null);
   const cvInput = useRef<HTMLInputElement>(null);
-  const diplomaInput = useRef<HTMLInputElement>(null);
 
-  const setF = <K extends keyof DocenteRow>(k: K, v: DocenteRow[K]) => setDraft((d) => ({ ...d, [k]: v }));
-  const previewEmail = useMemo(() => buildDocenteEmail(draft.primeiroNome, draft.ultimoNome), [draft.primeiroNome, draft.ultimoNome]);
+  const setF = <K extends keyof StaffDraft>(k: K, v: StaffDraft[K]) => setDraft((d) => ({ ...d, [k]: v }));
+  const previewEmail = useMemo(() => buildStaffEmail(draft.primeiroNome, draft.ultimoNome), [draft.primeiroNome, draft.ultimoNome]);
 
   const onFoto = (f: File | null) => {
     if (!f) return;
@@ -64,16 +77,21 @@ export function DocenteFormDialog({
 
   const handleSave = () => {
     if (!draft.primeiroNome.trim() || !previewEmail) return;
-    onSave({ ...draft, email: previewEmail, id: draft.id || `${Date.now()}` });
-    setDraft(emptyDocente());
+    onSave({
+      ...draft,
+      email: previewEmail,
+      id: draft.id || `${Date.now()}`,
+      moduloKortex: moduloFromDepartamento(draft.departamento),
+    });
+    setDraft(emptyStaff());
   };
 
   return (
-    <Dialog open={open} onOpenChange={(v) => { if (!v) setDraft(emptyDocente()); onOpenChange(v); }}>
+    <Dialog open={open} onOpenChange={(v) => { if (!v) setDraft(emptyStaff()); onOpenChange(v); }}>
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2"><GraduationCap className="w-5 h-5 text-primary" /> Adicionar Docente</DialogTitle>
-          <DialogDescription>Preencha o registo completo do docente. O email institucional é gerado automaticamente.</DialogDescription>
+          <DialogTitle className="flex items-center gap-2"><Briefcase className="w-5 h-5 text-primary" /> Adicionar Staff</DialogTitle>
+          <DialogDescription>Preencha o registo completo do funcionário. O email institucional é gerado automaticamente.</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6 py-2">
@@ -103,7 +121,7 @@ export function DocenteFormDialog({
                   </Select>
                 </Field>
                 <Field label="Primeiro nome">
-                  <Input className="h-8 text-xs" value={draft.primeiroNome} onChange={(e) => setF("primeiroNome", e.target.value)} placeholder="Ana" />
+                  <Input className="h-8 text-xs" value={draft.primeiroNome} onChange={(e) => setF("primeiroNome", e.target.value)} placeholder="João" />
                 </Field>
                 <Field label="Último nome">
                   <Input className="h-8 text-xs" value={draft.ultimoNome} onChange={(e) => setF("ultimoNome", e.target.value)} placeholder="Silva" />
@@ -112,7 +130,7 @@ export function DocenteFormDialog({
                   <Input className="h-8 text-xs" type="date" value={draft.nascimento || ""} onChange={(e) => setF("nascimento", e.target.value)} />
                 </Field>
                 <Field label="Género">
-                  <Select value={draft.genero || "M"} onValueChange={(v) => setF("genero", v as DocenteRow["genero"])}>
+                  <Select value={draft.genero || "M"} onValueChange={(v) => setF("genero", v as StaffDraft["genero"])}>
                     <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="M">Masculino</SelectItem>
@@ -146,7 +164,7 @@ export function DocenteFormDialog({
           </section>
 
           <section>
-            <SectionTitle index={3} icon={<MapPin className="w-3.5 h-3.5" />} title="Morada de Residência" hint="Localização atual do docente" />
+            <SectionTitle index={3} icon={<MapPin className="w-3.5 h-3.5" />} title="Morada de Residência" hint="Localização atual do funcionário" />
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
               <Field label="Província">
                 <Select value={draft.provincia || ""} onValueChange={(v) => setDraft((d) => ({ ...d, provincia: v, municipio: "" }))}>
@@ -166,65 +184,31 @@ export function DocenteFormDialog({
           </section>
 
           <section>
-            <SectionTitle index={4} icon={<Briefcase className="w-3.5 h-3.5" />} title="Afiliação Académica" hint="Faculdade, categoria e cargo institucional" />
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-              <Field label="Faculdade">
-                <Input className="h-8 text-xs" value={draft.faculdade} onChange={(e) => setF("faculdade", e.target.value)} placeholder="Ex.: Ciências Exatas" />
-              </Field>
+            <SectionTitle index={4} icon={<Building2 className="w-3.5 h-3.5" />} title="Afiliação Institucional" hint="Departamento e função do funcionário" />
+            <div className="grid grid-cols-2 md:grid-cols-2 gap-2">
               <Field label="Departamento">
-                <Select value={draft.departamento || ""} onValueChange={(v) => setF("departamento", v)}>
-                  <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="—" /></SelectTrigger>
+                <Select value={draft.departamento} onValueChange={(v) => setF("departamento", v)}>
+                  <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
                   <SelectContent>{DEPARTAMENTOS_POOL.map((d) => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent>
                 </Select>
               </Field>
-              <Field label="Categoria">
-                <Select value={draft.categoria} onValueChange={(v) => setF("categoria", v)}>
+              <Field label="Função">
+                <Select value={draft.funcao} onValueChange={(v) => setF("funcao", v)}>
                   <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                  <SelectContent>{categoriasPool.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
+                  <SelectContent>{funcoesPool.map((f) => <SelectItem key={f} value={f}>{f}</SelectItem>)}</SelectContent>
                 </Select>
-              </Field>
-              <Field label="Cargo institucional">
-                <Select value={draft.cargo} onValueChange={(v) => setF("cargo", v)}>
-                  <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                  <SelectContent>{cargosPool.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-                </Select>
-              </Field>
-            </div>
-            <p className="text-[11px] text-muted-foreground mt-1.5">Decanos e Coordenadores ficam disponíveis nas configurações de Faculdades e Cursos.</p>
-          </section>
-
-          <section>
-            <SectionTitle index={5} icon={<BookOpen className="w-3.5 h-3.5" />} title="Formação Académica" hint="Grau máximo concluído e área de especialidade" />
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-              <Field label="Grau académico">
-                <Select value={draft.grau || "Licenciatura"} onValueChange={(v) => setF("grau", v as Grau)}>
-                  <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                  <SelectContent>{grausPool.map((g) => <SelectItem key={g} value={g}>{g}</SelectItem>)}</SelectContent>
-                </Select>
-              </Field>
-              <Field label="Especialidade">
-                <Input className="h-8 text-xs" value={draft.especialidade || ""} onChange={(e) => setF("especialidade", e.target.value)} placeholder="Ex.: Arquitectura" />
-              </Field>
-              <Field label="Instituição">
-                <Input className="h-8 text-xs" value={draft.instituicaoFormacao || ""} onChange={(e) => setF("instituicaoFormacao", e.target.value)} placeholder="Universidade que conferiu o grau" />
-              </Field>
-              <Field label="Anos de experiência">
-                <Input className="h-8 text-xs" type="number" min="0" value={draft.anosExperiencia || ""} onChange={(e) => setF("anosExperiencia", e.target.value)} placeholder="0" />
               </Field>
             </div>
           </section>
 
           <section>
-            <SectionTitle index={6} icon={<Award className="w-3.5 h-3.5" />} title="Documentação Anexa" hint="CV, diploma e bilhete de identidade" />
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+            <SectionTitle index={5} icon={<FileText className="w-3.5 h-3.5" />} title="Documentação Anexa" hint="Bilhete de identidade e CV" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
               <Field label="Bilhete de Identidade">
                 <FileButton fileName={draft.bilheteFileName} onPick={(f) => setF("bilheteFileName", f?.name || "")} inputRef={biInput} accept="image/*,application/pdf" Icon={IdCard} />
               </Field>
               <Field label="Curriculum Vitae (CV)">
                 <FileButton fileName={draft.cvFileName} onPick={(f) => setF("cvFileName", f?.name || "")} inputRef={cvInput} accept="application/pdf,.doc,.docx" Icon={FileText} />
-              </Field>
-              <Field label={diplomaLabel(draft.grau)}>
-                <FileButton fileName={draft.diplomaFileName} onPick={(f) => setF("diplomaFileName", f?.name || "")} inputRef={diplomaInput} accept="image/*,application/pdf" Icon={Award} />
               </Field>
             </div>
           </section>
@@ -233,7 +217,7 @@ export function DocenteFormDialog({
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
           <Button onClick={handleSave} disabled={!draft.primeiroNome.trim() || !previewEmail} className="gap-1.5">
-            <Plus className="w-3.5 h-3.5" /> Adicionar Docente
+            <Plus className="w-3.5 h-3.5" /> Adicionar Staff
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -24,6 +24,7 @@ export type DocenteRow = {
   email: string;
   contacto: string;
   faculdade: string;
+  departamento?: string;
   categoria: string; // Assistente, Auxiliar, Associado, Catedrático, Convidado
   cargo: string;     // Docente, Coordenador, Decano, Diretor
   // Identification
@@ -45,6 +46,17 @@ export type DocenteRow = {
   diplomaFileName?: string;
   editing?: boolean;
 };
+
+export const DEPARTAMENTOS_POOL = [
+  "Académica",
+  "Finanças",
+  "GAP",
+  "TI",
+  "Recursos Humanos",
+  "Manutenção",
+  "Biblioteca",
+  "Investigação",
+];
 
 
 const STAFF_KEY = "upra_admin_staff_v1";
