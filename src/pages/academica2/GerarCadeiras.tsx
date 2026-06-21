@@ -284,6 +284,9 @@ export default function GerarCadeiras() {
                                   {[3, 4, 5, 6, 7.5, 9, 12].map(v => <SelectItem key={v} value={String(v)}>{v}</SelectItem>)}
                                 </SelectContent>
                               </Select>
+                              <Button size="icon" variant="ghost" onClick={() => setPreviewCadeira(c)} className="h-8 w-8 text-muted-foreground hover:text-primary" title="Pré-visualizar como estudante">
+                                <Eye className="w-3.5 h-3.5" />
+                              </Button>
                               <Button size="icon" variant="ghost" onClick={() => handleDelete(c.id)} className="h-8 w-8 text-muted-foreground hover:text-destructive">
                                 <Trash2 className="w-3.5 h-3.5" />
                               </Button>
