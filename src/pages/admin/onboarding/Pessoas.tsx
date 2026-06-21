@@ -1,8 +1,9 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { markOnboardingStepDone } from "@/components/admin/OnboardingStepBanner";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { UserPlus, GraduationCap, Briefcase, Trash2, User, Users, BookOpen, Award, Medal } from "lucide-react";
+import { UserPlus, GraduationCap, Briefcase, Trash2, User } from "lucide-react";
+
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { provisionKortexUser } from "@/lib/accountProvisioning";
