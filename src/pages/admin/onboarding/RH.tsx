@@ -104,7 +104,7 @@ export default function OnboardingRH() {
   const onChange = (v: string) => {
     const next = new URLSearchParams(params);
     next.set("tab", v);
-    next.set("step", v === "departamentos" ? "rh.dep" : v === "docentes" ? "rh.doc" : v === "staff" ? "rh.staff" : "rh.conf");
+    next.set("step", v === "departamentos" ? "rh.dep" : v === "docentes" ? "rh.doc" : v === "staff" ? "rh.staff" : "rh.pres");
     setParams(next, { replace: true });
   };
 
