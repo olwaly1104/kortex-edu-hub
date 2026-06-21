@@ -440,7 +440,27 @@ export default function CalendarioAcademico() {
                     {(Object.keys(TIPO_META) as EventoTipo[]).map(t => <SelectItem key={t} value={t}>{TIPO_META[t].label}</SelectItem>)}
                   </SelectContent>
                 </Select>
-                <Input value={e.titulo} onChange={ev => update(e.id, { titulo: ev.target.value })} className="h-8 text-xs" />
+                {e.tipo === "exames" ? (
+                  <div className="flex gap-2">
+                    <Select value={e.epoca ?? "1"} onValueChange={v => update(e.id, { epoca: v as Epoca })}>
+                      <SelectTrigger className="h-8 text-xs flex-1"><SelectValue placeholder="Época" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1">1ª Época</SelectItem>
+                        <SelectItem value="2">2ª Época</SelectItem>
+                        <SelectItem value="especial">Época Especial</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Select value={e.semestre ?? ""} onValueChange={v => update(e.id, { semestre: v === "" ? null : (v as Semestre) })}>
+                      <SelectTrigger className="h-8 text-xs flex-1"><SelectValue placeholder="Semestre" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1">1º Semestre</SelectItem>
+                        <SelectItem value="2">2º Semestre</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                ) : (
+                  <Input value={e.titulo} onChange={ev => update(e.id, { titulo: ev.target.value })} className="h-8 text-xs" />
+                )}
                 <Input type="date" value={e.inicio} onChange={ev => update(e.id, { inicio: ev.target.value })} className="h-8 text-xs" />
                 <Input type="date" value={e.fim} onChange={ev => update(e.id, { fim: ev.target.value })} className="h-8 text-xs" />
                 <Button size="icon" variant="ghost" onClick={() => remove(e.id)} className="h-8 w-8 text-muted-foreground hover:text-destructive">
