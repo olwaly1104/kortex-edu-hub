@@ -24,7 +24,7 @@ function DepartamentosPanel() {
     (async () => {
       const { data, error } = await (supabase as any)
         .from("departamentos")
-        .select("id, sigla, designacao, responsavel")
+        .select("id, sigla, designacao, responsavel, cor")
         .order("created_at", { ascending: true });
       if (cancelled) return;
       if (error) {
@@ -42,8 +42,8 @@ function DepartamentosPanel() {
     if (!user?.id) { toast.error("Sessão expirada."); return; }
     const { data, error } = await (supabase as any)
       .from("departamentos")
-      .insert({ owner_user_id: user.id, sigla: "", designacao: "", responsavel: null })
-      .select("id, sigla, designacao, responsavel")
+      .insert({ owner_user_id: user.id, sigla: "", designacao: "", responsavel: null, cor: "#1B3A6B" })
+      .select("id, sigla, designacao, responsavel, cor")
       .single();
     if (error) { toast.error(error.message); return; }
     setRows((prev) => [...prev, data as Departamento]);
