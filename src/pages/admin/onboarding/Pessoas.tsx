@@ -25,38 +25,26 @@ export default function OnboardingPessoas({ mode }: { mode: Mode }) {
 /* ---------------- Shared header ---------------- */
 
 function PageHeader({
-  icon: Icon, title, subtitle, count, ctaLabel, onCta,
+  icon: Icon, title, subtitle, ctaLabel, onCta,
 }: {
   icon: React.ComponentType<{ className?: string }>;
   title: string;
   subtitle: string;
-  count: number;
   ctaLabel: string;
   onCta: () => void;
 }) {
   return (
-    <div className="space-y-3">
-      {/* Dados (title) above */}
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
-          <Icon className="w-5 h-5" />
-        </div>
-        <div className="min-w-0">
-          <h1 className="text-lg font-semibold leading-tight">{title}</h1>
-          <p className="text-xs text-muted-foreground">{subtitle}</p>
-        </div>
+    <div className="flex items-center gap-3">
+      <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+        <Icon className="w-5 h-5" />
       </div>
-
-      {/* Registos left · CTA right */}
-      <div className="flex items-center gap-3 border-y border-border/60 py-1.5">
-        <div className="flex items-baseline gap-1.5">
-          <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Registos</span>
-          <span className="text-sm font-bold tabular-nums leading-none">{count}</span>
-        </div>
-        <Button size="sm" onClick={onCta} className="ml-auto gap-1.5">
-          <UserPlus className="w-3.5 h-3.5" /> {ctaLabel}
-        </Button>
+      <div className="min-w-0 flex-1">
+        <h1 className="text-lg font-semibold leading-tight">{title}</h1>
+        <p className="text-xs text-muted-foreground">{subtitle}</p>
       </div>
+      <Button size="sm" onClick={onCta} className="gap-1.5">
+        <UserPlus className="w-3.5 h-3.5" /> {ctaLabel}
+      </Button>
     </div>
   );
 }
