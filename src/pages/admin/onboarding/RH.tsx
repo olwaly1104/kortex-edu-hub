@@ -1,118 +1,145 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Building2, GraduationCap, Briefcase, ClipboardCheck, Plus, Trash2, Pencil, Check, X } from "lucide-react";
+import { Building2, GraduationCap, Briefcase, ClipboardCheck, Plus, Trash2, UserPlus } from "lucide-react";
 import { OnboardingStepBanner } from "@/components/admin/OnboardingStepBanner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import OnboardingPessoas from "./Pessoas";
 
 type Departamento = { id: string; sigla: string; designacao: string; responsavel?: string };
 const DEPT_KEY = "upra_admin_departamentos_v1";
 
+function DepartamentoFormDialog({
+  open, onOpenChange, onSave,
+}: {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  onSave: (d: Departamento) => void;
+}) {
+  const [sigla, setSigla] = useState("");
+  const [designacao, setDesignacao] = useState("");
+  const [responsavel, setResponsavel] = useState("");
+
+  const canSave = sigla.trim().length > 0 && designacao.trim().length > 0;
+
+  const reset = () => { setSigla(""); setDesignacao(""); setResponsavel(""); };
+
+  const save = () => {
+    if (!canSave) return;
+    onSave({
+      id: crypto.randomUUID(),
+      sigla: sigla.toUpperCase().trim(),
+      designacao: designacao.trim(),
+      responsavel: responsavel.trim() || undefined,
+    });
+    reset();
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={(v) => { if (!v) reset(); onOpenChange(v); }}>
+      <DialogContent className="max-w-lg">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2"><Building2 className="w-4 h-4 text-primary" /> Adicionar Departamento</DialogTitle>
+          <DialogDescription>Registe um novo departamento institucional.</DialogDescription>
+        </DialogHeader>
+        <div className="space-y-3 py-2">
+          <div>
+            <Label className="text-xs">Sigla</Label>
+            <Input value={sigla} onChange={(e) => setSigla(e.target.value.toUpperCase())} placeholder="DAF" maxLength={8} className="h-9 mt-1" />
+          </div>
+          <div>
+            <Label className="text-xs">Designação</Label>
+            <Input value={designacao} onChange={(e) => setDesignacao(e.target.value)} placeholder="Departamento Administrativo e Financeiro" className="h-9 mt-1" />
+          </div>
+          <div>
+            <Label className="text-xs">Responsável <span className="text-muted-foreground">(opcional)</span></Label>
+            <Input value={responsavel} onChange={(e) => setResponsavel(e.target.value)} placeholder="—" className="h-9 mt-1" />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="ghost" onClick={() => onOpenChange(false)}>Cancelar</Button>
+          <Button onClick={save} disabled={!canSave} className="gap-1.5"><Plus className="w-3.5 h-3.5" /> Adicionar</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 function DepartamentosPanel() {
   const [rows, setRows] = useState<Departamento[]>(() => {
     try { return JSON.parse(localStorage.getItem(DEPT_KEY) || "[]"); } catch { return []; }
   });
-  const [draft, setDraft] = useState<Departamento>({ id: "", sigla: "", designacao: "", responsavel: "" });
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [open, setOpen] = useState(false);
 
   useEffect(() => { localStorage.setItem(DEPT_KEY, JSON.stringify(rows)); }, [rows]);
 
-  const canAdd = draft.sigla.trim().length > 0 && draft.designacao.trim().length > 0;
-
-  const add = () => {
-    if (!canAdd) return;
-    setRows(prev => [...prev, { ...draft, id: crypto.randomUUID(), sigla: draft.sigla.toUpperCase().trim(), designacao: draft.designacao.trim() }]);
-    setDraft({ id: "", sigla: "", designacao: "", responsavel: "" });
+  const onSave = (d: Departamento) => {
+    setRows((prev) => [...prev, d]);
+    setOpen(false);
   };
-  const remove = (id: string) => setRows(prev => prev.filter(r => r.id !== id));
-  const update = (id: string, patch: Partial<Departamento>) => setRows(prev => prev.map(r => r.id === id ? { ...r, ...patch } : r));
+  const remove = (id: string) => setRows((prev) => prev.filter((r) => r.id !== id));
 
   return (
-    <div className="space-y-4">
-      <Card className="p-4">
-        <div className="flex items-center gap-2 mb-3">
-          <Building2 className="w-4 h-4 text-primary" />
-          <h3 className="text-sm font-semibold">Dados</h3>
-          <span className="ml-auto text-xs text-muted-foreground">{rows.length} departamento{rows.length === 1 ? "" : "s"}</span>
+    <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6 animate-fade-in">
+      {/* Header — matches Docentes/Staff */}
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+          <Building2 className="w-5 h-5" />
         </div>
-        <div className="grid grid-cols-12 gap-2 items-end">
-          <div className="col-span-2">
-            <label className="text-[11px] text-muted-foreground">Sigla</label>
-            <Input value={draft.sigla} onChange={e => setDraft({ ...draft, sigla: e.target.value.toUpperCase() })} placeholder="DAF" maxLength={8} className="h-9" />
-          </div>
-          <div className="col-span-5">
-            <label className="text-[11px] text-muted-foreground">Designação</label>
-            <Input value={draft.designacao} onChange={e => setDraft({ ...draft, designacao: e.target.value })} placeholder="Departamento Administrativo e Financeiro" className="h-9" />
-          </div>
-          <div className="col-span-3">
-            <label className="text-[11px] text-muted-foreground">Responsável</label>
-            <Input value={draft.responsavel} onChange={e => setDraft({ ...draft, responsavel: e.target.value })} placeholder="—" className="h-9" />
-          </div>
-          <div className="col-span-2">
-            <Button onClick={add} disabled={!canAdd} className="w-full h-9 gap-1.5"><Plus className="w-4 h-4" />Adicionar</Button>
-          </div>
+        <div className="min-w-0 flex-1">
+          <h1 className="text-lg font-semibold leading-tight">Departamentos</h1>
+          <p className="text-xs text-muted-foreground">Registo institucional dos departamentos da universidade.</p>
         </div>
-      </Card>
+        <Button size="sm" onClick={() => setOpen(true)} className="gap-1.5">
+          <UserPlus className="w-3.5 h-3.5" /> Adicionar Departamento
+        </Button>
+      </div>
 
-      <Card className="p-0 overflow-hidden">
-        <div className="flex items-center justify-between px-4 py-2 border-b bg-muted/30">
-          <div className="text-xs font-medium">Registos <span className="text-muted-foreground">({rows.length})</span></div>
-        </div>
-        {rows.length === 0 ? (
-          <div className="p-8 text-center text-sm text-muted-foreground">Sem departamentos registados.</div>
-        ) : (
-          <table className="w-full text-sm">
-            <thead className="bg-muted/20 text-xs text-muted-foreground">
-              <tr>
-                <th className="text-left px-4 py-2 font-medium w-24">Sigla</th>
-                <th className="text-left px-4 py-2 font-medium">Designação</th>
-                <th className="text-left px-4 py-2 font-medium w-56">Responsável</th>
-                <th className="w-24" />
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map(r => {
-                const editing = editingId === r.id;
-                return (
-                  <tr key={r.id} className="border-t">
-                    <td className="px-4 py-2">
-                      {editing ? (
-                        <Input value={r.sigla} onChange={e => update(r.id, { sigla: e.target.value.toUpperCase() })} className="h-8" />
-                      ) : <span className="font-mono text-xs font-semibold">{r.sigla}</span>}
-                    </td>
-                    <td className="px-4 py-2">
-                      {editing ? (
-                        <Input value={r.designacao} onChange={e => update(r.id, { designacao: e.target.value })} className="h-8" />
-                      ) : r.designacao}
-                    </td>
-                    <td className="px-4 py-2 text-muted-foreground">
-                      {editing ? (
-                        <Input value={r.responsavel || ""} onChange={e => update(r.id, { responsavel: e.target.value })} className="h-8" />
-                      ) : (r.responsavel || "—")}
-                    </td>
-                    <td className="px-2 py-2 text-right">
-                      <div className="flex gap-1 justify-end">
-                        {editing ? (
-                          <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => setEditingId(null)}><Check className="w-3.5 h-3.5" /></Button>
-                        ) : (
-                          <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => setEditingId(r.id)}><Pencil className="w-3.5 h-3.5" /></Button>
-                        )}
-                        <Button size="sm" variant="ghost" className="h-7 w-7 p-0 text-destructive" onClick={() => remove(r.id)}><Trash2 className="w-3.5 h-3.5" /></Button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        )}
-      </Card>
+      {rows.length === 0 ? (
+        <Card className="p-10 flex flex-col items-center justify-center text-center gap-3">
+          <div className="w-12 h-12 rounded-full bg-muted text-muted-foreground flex items-center justify-center">
+            <Building2 className="w-6 h-6" />
+          </div>
+          <div>
+            <p className="text-sm font-semibold">Nenhum departamento registado</p>
+            <p className="text-xs text-muted-foreground mt-0.5">Adicione departamentos para os atribuir a docentes e staff.</p>
+          </div>
+          <Button size="sm" onClick={() => setOpen(true)} className="gap-1.5">
+            <UserPlus className="w-3.5 h-3.5" /> Adicionar Departamento
+          </Button>
+        </Card>
+      ) : (
+        <Card className="overflow-hidden">
+          <div className="grid grid-cols-[40px_0.8fr_2fr_1.4fr_48px] gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b">
+            <span></span><span>Sigla</span><span>Designação</span><span>Responsável</span><span></span>
+          </div>
+          <div className="divide-y">
+            {rows.map((r) => (
+              <div key={r.id} className="grid grid-cols-[40px_0.8fr_2fr_1.4fr_48px] gap-2 px-4 py-2.5 items-center">
+                <div className="w-8 h-8 rounded-md bg-primary/10 text-primary flex items-center justify-center">
+                  <Building2 className="w-4 h-4" />
+                </div>
+                <span className="text-xs font-mono font-semibold">{r.sigla}</span>
+                <span className="text-xs truncate">{r.designacao}</span>
+                <span className="text-xs text-muted-foreground truncate">{r.responsavel || <span className="italic">—</span>}</span>
+                <Button size="icon" variant="ghost" className="h-7 w-7 text-muted-foreground hover:text-destructive" onClick={() => remove(r.id)}>
+                  <Trash2 className="w-3.5 h-3.5" />
+                </Button>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
+
+      <DepartamentoFormDialog open={open} onOpenChange={setOpen} onSave={onSave} />
     </div>
   );
 }
+
 
 export default function OnboardingRH() {
   const [params, setParams] = useSearchParams();
